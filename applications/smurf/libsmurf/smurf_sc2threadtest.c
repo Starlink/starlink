@@ -441,6 +441,8 @@ void smurf_sc2threadtest( int *status ) {
     smf_filter_ident( filt, 1, status );
 
     for( j=0; (*status==SAI__OK)&&(j<nsub); j++ ) {
+      msgOutiff( MSG__DEBUG, "", "  filter chunk %zu/%zu, bolo %zu/%zu",
+                 status, i+1, nchunks, j+1, nsub );
       smf_filter_execute( wf, res[i]->sdata[j], filt, status );
     }
 
