@@ -404,7 +404,8 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt,
       pdata->plan_inverse = &plan_inverse;
 
       /* Submit the job */
-      pdata->ijob = smf_add_job( wf, 0, pdata, smfParallelFilt, NULL, status );
+      pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata, smfParallelFilt, 
+                                 NULL, status );
     }
     /* Wait until all of the submitted jobs have completed */
     smf_wait( wf, status );

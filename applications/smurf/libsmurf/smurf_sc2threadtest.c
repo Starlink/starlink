@@ -355,7 +355,7 @@ void smurf_sc2threadtest( int *status ) {
     } else {
       /* Since we know there is one job_data per thread, just submit jobs
          immediately */
-      pdata->ijob = smf_add_job( wf, 0, pdata, smfParallelTime,
+      pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata, smfParallelTime,
                                  NULL, status );
     }
   }
@@ -387,7 +387,7 @@ void smurf_sc2threadtest( int *status ) {
     } else {
       /* Since we know there is one job_data per thread, just submit jobs
          immediately */
-      pdata->ijob = smf_add_job( wf, 0, pdata, smfParallelTime,
+      pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata, smfParallelTime,
                                  NULL, status );
     }
   }
@@ -419,7 +419,7 @@ void smurf_sc2threadtest( int *status ) {
     } else {
       /* Since we know there is one job_data per thread, just submit jobs
          immediately */
-      pdata->ijob = smf_add_job( wf, 0, pdata, smfParallelTime,
+      pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata, smfParallelTime,
                                  NULL, status );
     }
   }
