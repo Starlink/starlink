@@ -23314,7 +23314,7 @@ f     AST_MAPSPLIT
 
 *  Synopsis:
 c     #include "mapping.h"
-c     void astMapSplit( AstMapping *this, int nin, const int *in, int *nout,
+c     void astMapSplit( AstMapping *this, int nin, const int *in, int *out,
 c                       AstMapping **map )
 f     CALL AST_MAPSPLIT( THIS, NIN, IN, OUT, MAP, STATUS )
 
