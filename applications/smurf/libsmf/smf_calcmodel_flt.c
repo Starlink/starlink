@@ -49,6 +49,8 @@
 *        Initial Version
 *     2009-04-17 (EC)
 *        - switch to subkeymap notation in config file 
+*     2009-04-27 (EC)
+*        Enable multiple threads in call to smf_filter_execute
 *     {enter_further_changes_here}
 
 
@@ -178,7 +180,7 @@ void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
       /* Apply the filter to the residual */
       if( dofft ) {
-        smf_filter_execute( NULL, res->sdata[idx], filt, status );
+        smf_filter_execute( wf, res->sdata[idx], filt, status );
       }
 
       /* Store the difference between the filtered signal and the residual
