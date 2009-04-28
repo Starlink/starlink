@@ -115,9 +115,7 @@ pthread_mutex_t smf_filter_execute_mutex = PTHREAD_MUTEX_INITIALIZER;
 /* Structure containing information about blocks of bolos to be
    filtered by each thread. All threads read/write to/from mutually
    exclusive parts of the master smfData so we don't need to make
-   local copies of the entire smfData. The filter and plans are only
-   read inside a thread and therefore don't need to be local copies
-   either. */
+   local copies of the entire smfData. */
 typedef struct smfFilterExecuteData {
   size_t b1;               /* Index of first bolometer to be filtered */
   size_t b2;               /* Index of last bolometer to be filtered */
