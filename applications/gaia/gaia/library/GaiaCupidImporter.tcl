@@ -13,6 +13,8 @@
 #     Imports a CUPID catalogue allowing the selection of the RA and Dec
 #     axes columns and the columns that determine the extent of the
 #     clump.
+#
+#     XXX deal with non-RA and Dec systems.
 
 #  Invocations:
 #
@@ -297,7 +299,7 @@ itcl::class gaia::GaiaCupidImporter {
       set ::cupid(SCALE) 1.0
 
       set symbol1 [list PIDENT Cen3 Size1 Size2 Size3]
-      set symbol2 [list rectangle green {$Size1/$Size2} {} {} {($Cen3 > ($%%cupid(COORD) - ($Size3*$%%cupid(SCALE)))) && ($Cen3 < ($%%cupid(COORD) + ($Size3*$%%cupid(SCALE))))}]
+      set symbol2 [list rectangle green {$Size2/$Size1} {} {} {($Cen3 > ($%%cupid(COORD) - ($Size3*$%%cupid(SCALE)))) && ($Cen3 < ($%%cupid(COORD) + ($Size3*$%%cupid(SCALE))))}]
       set symbol3 [list {$Size1/3600.0} {deg 2000.0}]
       #  XXX should be:
       #set symbol3 [list {$Size1/3600.0*$%%cupid(SCALE)} {deg 2000.0}]
