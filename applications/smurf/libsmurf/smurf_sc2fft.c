@@ -104,6 +104,7 @@
 #include "prm_par.h"
 #include "sae_par.h"
 #include "msg_par.h"
+#include "fftw3.h"
 
 #include "smurf_par.h"
 #include "libsmf/smf.h"
@@ -187,7 +188,7 @@ void smurf_sc2fft( int *status ) {
       }
 
       /* Tranform the data */
-      odata = smf_fft_data( idata, inverse, status );
+      odata = smf_fft_data( NULL, idata, inverse, status );
       smf_convert_bad( odata, status );      
 
       if( inverse ) {
@@ -227,4 +228,7 @@ void smurf_sc2fft( int *status ) {
   grpDelet( &ogrp, status);
 
   ndfEnd( status );
+
+  /* Ensure that FFTW doesn't have any used memory kicking around */
+  fftw_cleanup();
 }

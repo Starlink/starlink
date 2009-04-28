@@ -432,10 +432,10 @@ void smf_apply_mask( smfData *indata, unsigned char *quality,
                      const smfArray *bpms, smf_dark_sub_meth method, 
                      int *status );
 
-void smf_bolonoise( smfData *data, unsigned char *quality, size_t window, 
-                    double f_low, double f_white1, double f_white2, 
-                    double flagratio, double *whitenoise, double *fratio, 
-                    int nep, int *status );
+void smf_bolonoise( smfWorkForce *wf, smfData *data, unsigned char *quality, 
+                    size_t window, double f_low, double f_white1, 
+                    double f_white2, double flagratio, double *whitenoise, 
+                    double *fratio, int nep, int *status );
 
 double smf_calc_covar( const smfData *data, const int i, const int j,
                        int lo, int hi, int *status);
@@ -732,7 +732,8 @@ void smf_ext2km( int indf, const char *xname, AstKeyMap *keymap, int mode,
 
 void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status );
 
-smfData *smf_fft_data( const smfData *indata, int inverse, int *status );
+smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse, 
+                       int *status );
 
 void smf_filter_edge( smfFilter *filt, double f, int lowpass, int *status );
 

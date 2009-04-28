@@ -13,12 +13,15 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_bolonoise( smfData *data, unsigned char *quality, size_t window, 
-*                    double f_low, double f_white1, double f_white2, 
-*                    double flagratio, double *whitenoise, double *fratio, 
-*                    int nep, int *status )
+*     smf_bolonoise( smfWorkForce *wf, smfData *data, 
+*                    unsigned char *quality, size_t window, double f_low, 
+*                    double f_white1, double f_white2, double flagratio,
+*                    double *whitenoise, double *fratio, int nep, 
+*                    int *status )
 
 *  Arguments:
+*     wf = smfWorkForce * (Given)
+*        Pointer to a pool of worker threads (can be NULL)
 *     data = smfData * (Given)
 *        Pointer to the input smfData.
 *     quality = unsigned char * (Given and Returned)
@@ -123,10 +126,10 @@
 
 #define FUNC_NAME "smf_bolonoise"
 
-void smf_bolonoise( smfData *data, unsigned char *quality, size_t window, 
-                    double f_low, double f_white1, double f_white2, 
-                    double flagratio, double *whitenoise, double *fratio, 
-                    int nep, int *status ) {
+void smf_bolonoise( smfWorkForce *wf, smfData *data, unsigned char *quality, 
+                    size_t window, double f_low, double f_white1, 
+                    double f_white2, double flagratio, double *whitenoise, 
+                    double *fratio, int nep, int *status ) {
 
   double *base=NULL;       /* Pointer to base coordinates of array */
   size_t bstride;          /* bolometer index stride */
@@ -190,7 +193,7 @@ void smf_bolonoise( smfData *data, unsigned char *quality, size_t window,
   if( fratio ) for(i=0; i<nbolo; i++) fratio[i] = VAL__BADD;
 
   /* FFT the data and convert to polar power form */
-  pow = smf_fft_data( data, 0, status );
+  pow = smf_fft_data( wf, data, 0, status );
   smf_fft_cart2pol( pow, 0, 1, status );
   smf_isfft( pow, NULL, NULL, &nf, status );
 
