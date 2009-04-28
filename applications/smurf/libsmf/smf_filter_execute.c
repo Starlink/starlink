@@ -200,7 +200,6 @@ void smfParallelFilt( void *job_data_ptr, int *status ) {
     if( !qua || !(qua[i*bstride]&SMF__Q_BADB) ) { /* Check for bad bolo flag */
       
       /* Obtain pointer to the correct chunk of data */
-      //base = &((double *)data->pntr[0])[i*bstride];
       base = data->pntr[0];
       base += i*bstride;
 
