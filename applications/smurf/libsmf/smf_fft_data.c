@@ -144,8 +144,6 @@ void smfFFTDataParallel( void *job_data_ptr, int *status ) {
   double *baseI=NULL;           /* base pointer to imag part of transform */
   double *baseB=NULL;           /* base pointer to bolo in time domain */
   dim_t i;                      /* Loop counter */
-  double norm=1.;               /* Normalization factor for the FFT */
-  double *val=NULL;             /* Element of data to be normalized */
 
    if( *status != SAI__OK ) return;
 
@@ -205,16 +203,6 @@ void smfFFTDataParallel( void *job_data_ptr, int *status ) {
        baseI = baseR + pdata->nf*pdata->nbolo;
        fftw_execute_split_dft_r2c( pdata->plan, baseB, baseR, baseI );
      }
-
-     /* Each sample needs to have a normalization applied */
-     norm = 1. / (double) pdata->ntslice; 
-        
-     val = pdata->retdata->pntr[0];
-
-     for( i=0; i<pdata->nf*pdata->nbolo*2; i++ ) {
-       *val *= norm;
-       val++;
-     }
    }
 
    /* Debugging message indicating thread finished work */
@@ -251,6 +239,7 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
   dim_t nbolo=0;                /* Number of detectors  */
   dim_t ndata=0;                /* Number of elements in new array */
   dim_t nf=0;                   /* Number of frequencies in FFT */
+  double norm=1.;               /* Normalization factor for the FFT */
   dim_t ntslice=0;              /* Number of time slices */
   int nw;                       /* Number of worker threads */
   smfFFTData *pdata=NULL;       /* Pointer to current job data */
@@ -261,6 +250,7 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
   size_t step;                  /* step size for dividing up work */
   double steptime;              /* Length of a sample in seconds */
   AstFrameSet *tswcs=NULL;      /* WCS for 4d FFT data */
+  double *val=NULL;             /* Element of data to be normalized */
   double zshift2[3];            /* Amount by which to shift bolo origin */
   double zshift;                /* Amount by which to shift freq. origin */
   AstShiftMap *zshiftmapping=NULL;  /* Map to shift origin of freq. GRID */
@@ -540,6 +530,19 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
     pdata = job_data;
     smfFFTDataParallel( job_data, status );
   }
+  
+  /* Each sample needs to have a normalization applied if forward FFT */
+  if( (*status==SAI__OK) && !inverse ) {
+    norm = 1. / (double) ntslice; 
+  
+    val = retdata->pntr[0];
+    
+    for( j=0; j<nf*nbolo*2; j++ ) {
+      *val *= norm;
+      val++;
+    }
+  }
+
   
  CLEANUP:
   if( data ) smf_close_file( &data, status );
