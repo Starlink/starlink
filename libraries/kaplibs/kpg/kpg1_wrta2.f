@@ -210,6 +210,7 @@
       INTEGER SCHEME             ! Says how columns are stored in KeyMap
       INTEGER TI                 ! CAT identifier for TITLE parameter
       INTEGER TYPE               ! AST KeyMap entry data type
+      INTEGER VLEN               ! Used length of value string
       LOGICAL COPIED             ! Has a copy of the Frameet been taken?
       LOGICAL DONE               ! Leave the loop?
       LOGICAL GOTVAL             ! Does the KeyMap have the entry?
@@ -339,12 +340,13 @@
       MAXLEN = 0
 
       IF( KEYMAP .NE. AST__NULL ) THEN
-         SCHEME = 1
+      CALL AST_SHOW( KEYMAP, STATUS )
 
 *  Scheme 1 - does the KeyMap have an entry called COLNAMES? If so, it
 *  is a vector holding the column names. Each column value is in a separate
 *  scalar entry.
          IF( AST_MAPHASKEY( KEYMAP, 'COLNAMES', STATUS ) ) THEN
+            SCHEME = 1
 
 *  Get the number of columns described by the KeyMap and check it is
 *  not too high.
@@ -437,6 +439,7 @@
 *  zero to indicate that the catalogue column should not be created.
                IF( TYPE .EQ. AST__BADTYPE ) THEN
                   KMLEN( I ) = 0
+                  LENC = 0
 
 *  Otherwise, convert the data type from AST to CAT.
                ELSE IF( TYPE .EQ . AST__INTTYPE ) THEN
@@ -464,12 +467,15 @@
                   GO TO 999
                END IF
    
-*  Update the maximum formatted length of any column.
-               MAXLEN = MAX( MAXLEN, LENC )
-   
-*  Create the column, storing its CAT identifier in KMCOL.
-               CALL CAT_CNEWS( CI, COLNAM( I ), CATYPE, LENC, ' ', ' ', 
-     :                         ' ', KMCOL( I ), STATUS )
+*  If any values were supplied for the column, update the maximum 
+*  formatted length of any column, and create  the column, storing its
+*  CAT identifier in KMCOL.
+               IF( KMLEN( I ) .GT. 0 ) THEN
+                  MAXLEN = MAX( MAXLEN, LENC )
+                  CALL CAT_CNEWS( CI, COLNAM( I ), CATYPE, LENC, ' ', 
+     :                            ' ', ' ', KMCOL( I ), STATUS )
+               END IF
+
             END DO
 
 *  Scheme 2 - each entry is a vector representing a whole column, with
@@ -548,6 +554,9 @@
       IF( MAXLEN .GT. 0 ) CALL PSX_CALLOC( MAXLEN, '_CHAR', IPTEXT, 
      :                                     STATUS )
 
+*  Ensure we can use the IPTEXT pointer safely.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
 *  Loop round each supplied position.
       DO I = 1, NPOS
 
@@ -585,52 +594,54 @@
 
 *  Loop round each extra column supplied in the KeyMap, skipping empty
 *  columns.
-         DO J = 1, NKMCOL
-            IF( KMLEN( I ) .GT. 0 ) THEN         
+         IF( MAXLEN .GT. 0 ) THEN
+            DO J = 1, NKMCOL
+               IF( KMLEN( I ) .GT. 0 ) THEN         
 
 *  If the KeyMap uses the scheme based on scalar-values...
-               IF( SCHEME .EQ. 1 ) THEN
+                  IF( SCHEME .EQ. 1 ) THEN
 
 *  Form the key for the entry holding the column value for the current
 *  row.
-                  KEY = COLNAM( J )
-                  IAT = CHR_LEN( KEY )
-                  CALL CHR_APPND( '_', KEY, IAT )
-                  CALL CHR_PUTI( I, KEY, IAT )
+                     KEY = COLNAM( J )
+                     IAT = CHR_LEN( KEY )
+                     CALL CHR_APPND( '_', KEY, IAT )
+                     CALL CHR_PUTI( I, KEY, IAT )
 
 *  Atemmpt to get the formatted value from the KeyMap. 
-                  GOTVAL = AST_MAPGET0C( KEYMAP, KEY, 
-     :                                   %VAL( CNF_PVAL( IPTEXT ) ), 
-     :                                   STATUS, %VAL( MAXLEN ) ) 
+                     GOTVAL = AST_MAPGET0C( KEYMAP, KEY, 
+     :                                    %VAL( CNF_PVAL( IPTEXT ) ), 
+     :                                    VLEN, STATUS, %VAL( MAXLEN ) ) 
 
 *  If the KeyMap uses the scheme based on vector-values...
-               ELSE
+                  ELSE
 
 *  The key is just the column name.
-                  KEY = COLNAM( J )
+                     KEY = COLNAM( J )
                
 *  If the current row is within the bounds of the vector, get the
 *  formatted value of the vector element corresponding to the current 
 *  row.
-                  IF( I .LE. KMLEN( J ) ) THEN
-                     GOTVAL = AST_MAPGETELEMC( KEYMAP, KEY, I, 
+                     IF( I .LE. KMLEN( J ) ) THEN
+                        GOTVAL = AST_MAPGETELEMC( KEYMAP, KEY, I, 
      :                                       %VAL( CNF_PVAL( IPTEXT ) ), 
      :                                       STATUS, %VAL( MAXLEN ) ) 
-                  ELSE
-                     GOTVAL = .FALSE.
+                     ELSE
+                        GOTVAL = .FALSE.
+                     END IF
                   END IF
-               END IF
 
 *  If no value was obtained, fill the value with spaces.
-               IF( .NOT. GOTVAL ) CALL CHR_FILL( ' ', 
+                  IF( .NOT. GOTVAL ) CALL CHR_FILL( ' ', 
      :                                         %VAL( CNF_PVAL(IPTEXT) ), 
      :                                         %VAL( MAXLEN ) ) 
 
 *  Store the value.
-               CALL CAT_PUT0C( KMCOL( J ), %VAL( CNF_PVAL( IPTEXT ) ),
-     :                         .NOT. GOTVAL, STATUS, %VAL( MAXLEN ) )
-            END IF
-         END DO
+                  CALL CAT_PUT0C( KMCOL( J ), %VAL( CNF_PVAL(IPTEXT) ),
+     :                            .NOT. GOTVAL, STATUS, %VAL( MAXLEN ) )
+               END IF
+            END DO
+         END IF
 
 *  Append the current row buffer to the catalogue.
          CALL CAT_RAPND( CI, STATUS )
