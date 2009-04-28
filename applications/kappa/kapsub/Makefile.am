@@ -21,7 +21,7 @@ kps1_clpa2.f kps1_cntdr.f kps1_cntgd.f kps1_cntky.f \
 kps1_cntpn.f kps1_cntsc.f kps1_cntst.f kps1_cnvfp.f kps1_cnvlv.f \
 kps1_clptm.f kps1_clpky.f kps1_clpcp.f kps1_cnvrp.f kps1_cremg.f \
 kps1_crets.f kps1_curfm.f kps1_curhd.f kps1_curdv.f kps1_discl.f \
-kps1_dnrth.f kps1_dtpcl.f kps1_elgau.f kps1_elmap.f \
+kps1_dnrth.f kps1_dtpcl.f kps1_elmap.f \
 kps1_elpr1.f kps1_elpr2.f kps1_elpr3.f kps1_elpr4.f kps1_elpr5.f \
 kps1_errcl.f kps1_fspe2.f kps1_fspf2.f kps1_fswpe.f kps1_fswse.f \
 kps1_gamln.f \

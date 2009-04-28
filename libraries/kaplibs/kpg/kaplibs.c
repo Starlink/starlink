@@ -1598,3 +1598,34 @@ void fts1Astwn( AstFitsChan *fc, int indf, int *status ){
    F77_IMPORT_INTEGER( STATUS, *status );
 }
 
+F77_SUBROUTINE(kpg1_elgau)( REAL_ARRAY(SIG), 
+                            REAL(SIG0),
+                            REAL(AXIS),
+                            REAL(THETA),
+                            INTEGER(STATUS) );
+
+void kpg1Elgau( float *sig, float *sig0, float *axis, float *theta, 
+                int *status ) {
+
+   DECLARE_REAL_ARRAY_DYN(SIG);
+   DECLARE_REAL(SIG0);
+   DECLARE_REAL(AXIS);
+   DECLARE_REAL(THETA);
+   DECLARE_INTEGER(STATUS);
+   F77_CREATE_REAL_ARRAY( SIG, 4 );
+   F77_EXPORT_REAL_ARRAY( sig, SIG, 4 );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(kpg1_elgau)( REAL_ARRAY_ARG(SIG),
+                         REAL_ARG(&SIG0),
+                         REAL_ARG(&AXIS),
+                         REAL_ARG(&THETA),
+                         INTEGER_ARG(&STATUS) );
+   F77_IMPORT_REAL( SIG0, *sig0 );
+   F77_IMPORT_REAL( AXIS, *axis );
+   F77_IMPORT_REAL( THETA, *theta );
+   F77_IMPORT_INTEGER( STATUS, *status );
+
+}
+
+

@@ -178,5 +178,6 @@ void kpg1Ghstr( int, int, const float *, int, int, float *, float *, int *, int 
 void kpg1Hsstp( int, const int *, double, double, double *, double *, double *, double *, int * );
 void fts1Astwn( AstFitsChan *, int, int * );
 void kpg1Ky2hd( AstKeyMap *, HDSLoc *, int * );
+void kpg1Elgau( float *, float *, float *, float *, int * );
 
 #endif

@@ -1,7 +1,7 @@
-      SUBROUTINE KPS1_ELGAU( SIG, SIG0, AXISR, THETA, STATUS )
+      SUBROUTINE KPG1_ELGAU( SIG, SIG0, AXISR, THETA, STATUS )
 *+
 *  Name:
-*     KPS1_ELGAU
+*     KPG1_ELGAU
 
 *  Purpose:
 *     Calculates the axis ratio, inclination and minor-axis width of a
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_ELGAU( SIG, SIG0, AXISR, THETA, STATUS )
+*     CALL KPG1_ELGAU( SIG, SIG0, AXISR, THETA, STATUS )
 
 *  Description:
 *     The reciprocal of the square of the width varies approximately
@@ -43,6 +43,7 @@
 
 *  Copyright:
 *     Copyright (C) 1981, 1990 Science & Engineering Research Council.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -64,6 +65,7 @@
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Durham Univ.)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -72,6 +74,8 @@
 *     1990 September 18 (MJC):
 *        Renamed from ELLIPS, re-ordered arguments, added status, 
 *        commented the variables, tidied, and converted the prologue.
+*     28-APR-2009 (DSB):
+*        Renamed from kps1_elgau to kpg1_elgau.
 *     {enter_further_changes_here}
 
 *-

@@ -502,7 +502,7 @@
 *       Find the parameters of an elliptical star image
 *       from the marginal widths.
  
-         CALL KPS1_ELGAU( SIGMA, SIG0, AXISR, THETA, STATUS )
+         CALL KPG1_ELGAU( SIGMA, SIG0, AXISR, THETA, STATUS )
 
 *    If no star positions could be used, report an error.
 

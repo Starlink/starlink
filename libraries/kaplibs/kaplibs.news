@@ -7,6 +7,8 @@ and which may be of use to anyone developing their own KAPPA-like
 applications (see SUN/238).
 
 Version 2.8
+   - KPG1_ELGAU added from KAPPA routine KPS1_ELGAU. It finds ellipse
+     parameters given the ellipse width in four different directions.
    - KPG1_WRCAT added. It writes a catalogue, exactly like KPG1_WRTAB,
      except that it allows an arbitrary set of extra columns to be supplied,
      specified via an AST KeyMap.

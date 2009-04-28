@@ -14710,6 +14710,59 @@ from one graphical element to another.
    }
 }
 \sstroutine{
+   KPG1\_ELGAU
+}{
+   Calculates the axis ratio, inclination and minor-axis width of a
+   star image, given the Gaussian widths of marginal profiles at
+   45-degree intervals
+}{
+   \sstdescription{
+      The reciprocal of the square of the width varies approximately
+      like the length of an ellipse diameter as the angle of projection
+      varies.  The routine calculates the required parameters assuming
+      this relationship holds, then iterates, calculating the expected
+      deviation from this law and subtracting it from the data before
+      calculating a new estimate.  The solution of the ellipse
+      equations is analogous to using the Stokes parameters of linear
+      polarization to find the ellipse parameters.
+   }
+   \sstinvocation{
+      CALL KPG1\_ELGAU( SIG, SIG0, AXISR, THETA, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         SIG( 4 ) = REAL (Given)
+      }{
+         The Gaussian widths of the marginal profiles of the star in
+         directions at 0, 45, 90 and 135 degrees to the x axis.
+      }
+      \sstsubsection{
+         SIG0 = REAL (Returned)
+      }{
+         The width of the minor axis of the ellipse.
+      }
+      \sstsubsection{
+         AXISR = REAL (Returned)
+      }{
+         The axis ratio of the ellipse.
+      }
+      \sstsubsection{
+         THETA = REAL (Returned)
+      }{
+         The inclination of the major axis to the x axis in radians
+         (x through y positive).
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      The routine assumes a Gaussian profile for the star.
+   }
+}
+\sstroutine{
    KPG1\_ENV0R
 }{
    Reads a floating point value from an environment variable

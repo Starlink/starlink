@@ -188,6 +188,7 @@ kpg1_debug.f \
 kpg1_dnag2r.f \
 kpg1_dr2nag.f \
 kpg1_dsfr1.f \
+kpg1_elgau.f \
 kpg1_env0r.f \
 kpg1_envdf.f \
 kpg1_fftbd.f \

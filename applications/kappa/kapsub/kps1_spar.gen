@@ -491,7 +491,7 @@
                PRF( 2 ) = SIG( I, 2 )
                PRF( 3 ) = SIG( I, 3 )
                PRF( 4 ) = SIG( I, 4 )
-               CALL KPS1_ELGAU( PRF, STASIG, STAAXS, STATHE, STATUS )
+               CALL KPG1_ELGAU( PRF, STASIG, STAAXS, STATHE, STATUS )
 
 *  Find the parameters of the ellipe after mapping it into the current Frame. 
 *  Note the half- pixel shifts because the co-ordinates are pixel indices and 
@@ -604,7 +604,7 @@
          PRF( 2 ) = SIG( I, 2 )
          PRF( 3 ) = SIG( I, 3 )
          PRF( 4 ) = SIG( I, 4 )
-         CALL KPS1_ELGAU( PRF, STASIG, STAAXS, STATHE, STATUS )
+         CALL KPG1_ELGAU( PRF, STASIG, STAAXS, STATHE, STATUS )
 
 *  Find the parameters of the ellipe after mapping it into the current Frame. 
 *  Note the half- pixel shifts because the co-ordinates are pixel indices and 
