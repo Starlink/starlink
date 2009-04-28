@@ -2,6 +2,7 @@
 #include "cupid.h"
 #include "ndf.h"
 #include "star/hds.h"
+#include "star/kaplibs.h"
 #include "mers.h"
 #include "prm_par.h"
 #include <math.h>
@@ -13,12 +14,18 @@
 /* The maximum length of a column name. */
 #define MXNAMLEN 30
 
+/* The square root of two. */
+#define ROOT_TWO 1.4142136
+
+/* Prototype for a Channel sink function that writes to dynemic memory. */
+static void cupidMemSink( const char * );
 
 double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap, 
                         AstFrame *wcsfrm, const char *dataunits,
-                        double beamcorr[ 3 ], int backoff, double *cpars, 
-                        const char ***names, const char ***units, int *ncpar, 
-                        int *ok, int *status ){
+                        double beamcorr[ 3 ], int backoff, 
+                        int velax, double *cpars, const char ***names, 
+                        const char ***units, int *ncpar, int *ok, 
+                        char **stcs, int *status ){
 /*
 *+
 *  Name:
@@ -33,9 +40,10 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
 *  Synopsis:
 *     double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap, 
 *                             AstFrame *wcsfrm, const char *dataunits,
-*                             double beamcorr[ 3 ], int backoff, double *cpars,
-*                             const char ***names, const char ***units, 
-*                             int *ncpar, int *ok, int *status ){
+*                             double beamcorr[ 3 ], int backoff, 
+*                             int velax, double *cpars, const char ***names, 
+*                             const char ***units, int *ncpar, int *ok, 
+*                             char **stcs, int *status ){
 
 *  Description:
 *     This function calculates the parameters describing a single clump,
@@ -97,6 +105,9 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
 *        The background level is the minimum data value in the clump. If
 *        zero, then the clump sizes and centroid are based on the full data 
 *        values (this is what the IDL version of ClumpFind does).
+*     velax
+*        The zero-based index of the velocity pixel axis. Should be -1 if
+*        there is no velocity axis.
 *     cpars
 *        Pointer to an array in which to store the clump parameters. If
 *        this is NULL, a new dynamic array is allocated and a pointer to
@@ -122,6 +133,13 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
 *        Pointer to an int in which to return a flag indicating if the
 *        clump can be used or not. This will be set to zero if the clump
 *        size is zero after correction for the effect of beam smoothing.
+*     stcs
+*        A pointer to a location at which to return a pointer to a
+*        dynamically allocated string containing an STC-S description of 
+*        the spatial extent of the clump. The memory containing the
+*        returned string should be freed using astFree when no longer 
+*        needed. No STC-S description is created if a NULL value is 
+*        supplied for "stcs".
 *     status
 *        Pointer to the inherited status value.
 
@@ -134,6 +152,7 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
 *     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -176,6 +195,8 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
 *        weighting.
 *     18-MAR-2008 (DSB):
 *        Added argument "backoff" for Jenny Hatchell.
+*     27-APR-2009 (DSB):
+*        Added arguments "stcs" and "velax".
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -186,32 +207,57 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
 
 /* Local Variables: */
    AstFrame *axfrm;         /* 1D Frame containing current Axis only */
+   AstRegion *ellipse;      /* Ellipse describing spatial extent of clump */
    HDSLoc *cloc=NULL;       /* Locator to component of CUPID extension */
-   HDSLoc *xloc=NULL;       /* Locator to CUPID extension */
    HDSLoc *loc=NULL;        /* Locator to object holding extra column values */
+   HDSLoc *xloc=NULL;       /* Locator to CUPID extension */
    char *vu;                /* Pointers to volume unit concatenation point */
    double *ipd;             /* Pointer to start of data array */
    double *pd;              /* Pointer to next element of data array */
    double *ret;             /* Returned list of parameters */
+   double alpha[ 3 ];       /* List of transformed wcs x values */
+   double angle;            /* Inclination of major axis to Y axis */
+   double axlens[ 2 ];      /* Semi-major and semi-minor axis lengths */
+   double bc2;              /* Squared beam correction for U and V axes */
+   double beta[ 3 ];        /* List of transformed wcs y values */
+   double cen[ 2 ];         /* Centroid (X,Y) position */
    double csw;              /* Clump size in WCS units */
+   double cu;               /* Position of centroid on U axis */
+   double cv;               /* Position of centroid on V axis */
+   double cx;               /* Position of centroid on X axis */
+   double cy;               /* Position of centroid on Y axis */
    double d;                /* Height above background (the pixel weight) */
    double dmax;             /* Max value in data array */
    double dmin;             /* Min value in data array */
    double outlier[ 3 ];     /* Offset position */
+   double p1[ 2 ];          /* End of ellipse major axis */
+   double p2[ 2 ];          /* End of ellipse minor axis */
    double peakfactor;       /* Factor by which to increase the peak value */
    double pixpos[ 3 ][ 5 ]; /* Pixel coord positions */
    double pixvol;           /* Volume of 1 cubic pixel in WCS units */
-   double sd;               /* Sum of weights */
    double s;                /* Sum of data values */
+   double sd;               /* Sum of weights */
+   double su2;              /* Sum of weighted squared U pixel indices */
+   double su;               /* Sum of weighted U axis pixel indices */
+   double sv2;              /* Sum of weighted squared V pixel indices */
+   double sv;               /* Sum of weighted V axis pixel indices */
    double sx2;              /* Sum of weighted squared X pixel indices */
    double sx;               /* Sum of weighted X pixel indices */
    double sy2;              /* Sum of weighted squared X pixel indices */
    double sy;               /* Sum of weighted Y pixel indices */
    double sz2;              /* Sum of weighted squared X pixel indices */
    double sz;               /* Sum of weighted Z pixel indices */
+   double tt;               /* Temp value */
+   double u;                /* U coord value */
    double v0;               /* Variance before corr'n for instrumental blurring */
    double v;                /* Variance after corr'n for instrumental blurring */
    double wcspos[ 3 ][ 5 ]; /* WCS coord positions */
+   double x[ 3 ];           /* List of pixel x values to transform */
+   double y[ 3 ];           /* List of pixel y values to transform */
+   float axisr;             /* Ratio of major to minor ellipse axis */
+   float sig0;              /* Semi-minor axis of ellipse in pixels */
+   float sig[4];            /* Clump widths on X, U, Y and V axes */
+   float theta;             /* Inclination of major axis to X axis */
    int i;                   /* Pixel index on 1st pixel axis */
    int icol;                /* Index into returned column arrays */
    int icomp;               /* Index into CUPID extension */
@@ -221,26 +267,36 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
    int n;                   /* Number of good pixels indices */
    int ndim;                /* Number of pixel axes */   
    int nel;                 /* Number of elements in mapped array */
+   int outax[ 3 ];          /* Indices of spatial WCS axes */
    int px;                  /* X pixel index at peak value */
    int py;                  /* Y pixel index at peak value */
    int pz;                  /* Z pixel index at peak value */
    int there;               /* Has the NDF got a CUPID extension? */
    int ubnd[ 3 ];           /* Upper NDF pixel bounds */   
 
-   static int ncomp;        /* No. of components in the CUPID extension */
-   static int skyaxis[ 3 ]; /* Flags indicating which axes are skyaxes */
-   static const char *pnames[ MXPAR ];  /* Parameter names to return */
+   static AstFrame *pixel_frm = NULL;  /* 2D spatial PIXEL Frame */
+   static AstFrame *space_frm = NULL;  /* 2D spatial WCS Frame */
+   static AstMapping *space_map = NULL;/* 2D spatial WCS Mapping */
+   static AstStcsChan *stcs_chan = NULL;     /* Creates STC-S descriptions */
    static char name_buf[ MXPAR ][ MXNAMLEN ];/* Buffers for parameter names */
-   static const char *punits[ MXPAR ];  /* Parameter units to return */
-   static char unit_buf[ 3 ][ 20 ];  /* Buffers for units strings */
-   static char volunit_buf[ 60 ];    /* Buffer for volume units string */
+   static char unit_buf[ 3 ][ 20 ];    /* Buffers for units strings */
+   static char volunit_buf[ 60 ];      /* Buffer for volume units string */
+   static const char *pnames[ MXPAR ]; /* Parameter names to return */
+   static const char *punits[ MXPAR ]; /* Parameter units to return */
+   static int ncomp;           /* No. of components in the CUPID extension */
+   static int skyaxis[ 3 ];    /* Flags indicating which axes are skyaxes */
+   static int space_axes[ 2 ]; /* Zero based indices of spatial pixel axes */
 
 /* Initialise. */
    ret = cpars;
    *ok = 0;
+   if( stcs ) *stcs = NULL;
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return ret;
+
+/* More initialisation. */
+   ellipse = NULL;
 
 /* Get the bounds of the NDF. */
    ndfBound(  indf, 3, lbnd, ubnd, &ndim, status );
@@ -267,11 +323,11 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
          ncomp = 0;
       }
 
-/* Determine the number of parameters needed to describe the clump. This
-   includes the diagnostic values in the CUPID extension. */
+/* Determine the number of numerical parameters needed to describe the clump. 
+   This includes the diagnostic values in the CUPID extension. */
       *ncpar = ndim*3 + 3 + ncomp; 
 
-/* Allocate memory for this number of parameters. */
+/* Allocate memory for this number of numerical parameters. */
       ret = astMalloc( sizeof( double )*( *ncpar ) );
 
 /* Now create the parameter names. */ 
@@ -320,6 +376,10 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
    describing the clump volume. */
       vu = volunit_buf;
 
+/* Annul any existing spatial Mapping and Frame */
+      if( space_frm ) space_frm = astAnnul( space_frm );
+      if( space_map ) space_map = astAnnul( space_map );
+
 /* Store the parameter units. First deal with cases where catalogue
    columns use WCS units. */ 
       if( wcsmap ) {
@@ -350,6 +410,9 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
                punits[ i - 1 + 2*ndim ] = unit_buf[ i - 1 ];
             }
 
+/*  Annul the Frame pointer */
+            axfrm = astAnnul( axfrm );
+
 /* The two clump positions are specified in the axis units chosen above. */
             punits[ i - 1 ] = unit_buf[ i - 1 ];
             punits[ i - 1 + ndim ] = unit_buf[ i - 1 ];
@@ -362,6 +425,44 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
                strcpy( vu, "." );
                vu++;
             }
+         }
+
+/* Stuff neeed to create an STC-S description of the spatial clump
+   extent. */
+         if( stcs ) {
+
+/* Store the  zero based indices of the spatial pixel axes. */
+            if( velax == 0 ) {
+               space_axes[ 0 ] = 2;
+               space_axes[ 1 ] = 3;
+  
+            } else if( velax == 1 ) {
+               space_axes[ 0 ] = 1;
+               space_axes[ 1 ] = 3;
+   
+            } else {
+               space_axes[ 0 ] = 1;
+               space_axes[ 1 ] = 2;
+            }
+
+/* Attempt to split off the pixel->WCS mapping for the spatial axes. */
+            astMapSplit( wcsmap, 2, space_axes, outax, &space_map );
+
+/* Check any split Mapping can be used. Annul it if not. */
+            if( space_map ){
+               if( astGetI( space_map, "Nout" ) != 2 ) {
+                  space_map = astAnnul( space_map );
+
+/* If it can, get a pointer to the 2D spatial WCS Frame. */
+               } else {
+                  space_frm = astPickAxes( wcsfrm, 2, outax, NULL );
+               }
+            }
+
+/* The values in "space_axes" are curently one-based (as required by
+   astMapSplit). Change them to zero based for further use. */
+            space_axes[ 0 ]--;
+            space_axes[ 1 ]--;
          }
 
 /* Now deal with cases where the output catalogue contains column values in 
@@ -393,6 +494,14 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
 
 /* Return a pointer to the array of units strings. */
       *units = punits;
+
+/* If an STC-S description of the clump is required, create an StcsChan. */
+      if( stcs ){
+         if( !stcs_chan ) stcs_chan = astStcsChan( NULL, cupidMemSink, " " ); 
+
+/* Create 2D PIXEL frame within whiuch the clump Ellipse will be defined. */
+         if( !pixel_frm ) pixel_frm = astFrame( 2, "Domain=PIXEL" );
+      }
    }
 
 /* Map the NDF data array */
@@ -438,9 +547,13 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
       }
 
 /* Find the other required statistics of the data values. */
+      su = 0;
+      sv = 0;
       sx = 0;
       sy = 0;
       sz = 0;
+      su2 = 0;
+      sv2 = 0;
       sx2 = 0;
       sy2 = 0;
       sz2 = 0;
@@ -467,19 +580,47 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
                   }
 
 /* update the weighted sums. */
-                  sx += d*i;
-                  sy += d*j;
-                  sz += d*k;
+                  tt = d*i;
+                  sx += tt;
+                  sx2 += tt*i;
 
-                  sx2 += d*i*i;
-                  sy2 += d*j*j;
-                  sz2 += d*k*k;
+                  tt = d*j;
+                  sy += tt;
+                  sy2 += tt*j;
+
+                  tt = d*k;
+                  sz += tt;
+                  sz2 += tt*k;
 
                   sd += d;
-
                   s += *pd;
-
                   n++;
+
+/* U and V are axes at 45 degrees to the first and second spatial axes. We 
+   record the statistics along these extra axes in order to work out an 
+   elliptical approximation to the spatial extent of the clump. */
+                  if( stcs ) {
+                     if( velax == 0 ) {
+                        u = ( k + j )/ROOT_TWO;
+                        v = ( k - j )/ROOT_TWO;
+   
+                     } else if( velax == 1 ) {
+                        u = ( k + i )/ROOT_TWO;
+                        v = ( k - i )/ROOT_TWO;
+   
+                     } else {
+                        u = ( j + i )/ROOT_TWO;
+                        v = ( j - i )/ROOT_TWO;
+                     }
+   
+                     tt = d*u;
+                     su += tt;
+                     su2 += tt*u;
+
+                     tt = d*v;
+                     sv += tt;
+                     sv2 += tt*v;
+                  }
                }            
             }
          }
@@ -570,6 +711,61 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
       ret[ 3*ndim + 1 ] = dmax*( (peakfactor > 0.0) ? sqrt( peakfactor ) : 1.0 );
       ret[ 3*ndim + 2 ] = n;
 
+/* If an STC-S description is required, and the clump is usable, create an 
+   AST Ellipse describing the spatial extent of the clump. */
+      if( stcs && *ok ) {
+
+/* Estimate the squared instrumental smoothing factor along the U and V
+   axes. */
+         bc2 =  0.5*( beamcorr[ space_axes[ 0 ] ]*beamcorr[ space_axes[ 0 ] ] +
+                      beamcorr[ space_axes[ 1 ] ]*beamcorr[ space_axes[ 1 ] ] );
+
+/* Store the centroid position and RMS width of the clump along the X and Y. */
+         cx = ret[ ndim + space_axes[ 0 ] ];
+         cy = ret[ ndim + space_axes[ 1 ] ];
+         sig[ 0 ] = ret[ 2*ndim + space_axes[ 0 ] ];
+         sig[ 2 ] = ret[ 2*ndim + space_axes[ 1 ] ];
+
+/* Get the centroid values on the U and V axes. */
+         cu = su/sd;
+         cv = sv/sd;
+
+/* Find the RMS width of the clump along the U and V axes. */
+         v0 = su2/sd - cu*cu;
+         if( deconv ) v0 -= bc2/5.5451774;
+         if( v0 > 0 ) {
+            sig[ 1 ] = sqrt( v0 );
+         } else {
+            *ok = 0;
+         }
+
+         v0 = sv2/sd - cv*cv;
+         if( deconv ) v0 -= bc2/5.5451774;
+         if( v0 > 0 ) {
+            sig[ 3 ] = sqrt( v0 );
+         } else {
+            *ok = 0;
+         }
+
+/* If the widths are all positive, find the parameters of the ellipse
+   that has the same widths as the clump. */
+         if( *ok ) {
+            kpg1Elgau( sig, &sig0, &axisr, &theta, status );
+
+/* Create an AST Ellipse with these parameters, defined in a 2D PIXEL
+   frame. */
+            cen[ 0 ] = 0.5*( cx + ( cu - cv )/ROOT_TWO );
+            cen[ 1 ] = 0.5*( cy + ( cu + cv )/ROOT_TWO );
+           
+            axlens[ 0 ] = sig0*axisr;
+            axlens[ 1 ] = sig0;
+            angle = AST__DPIBY2 - theta;
+
+            ellipse = (AstRegion *) astEllipse( pixel_frm, 1, cen, axlens, 
+                                                &angle, NULL, " " );
+         }
+      }
+
 /* If required, convert the parameter values from pixel units to WCS
    units. */
       if( wcsmap ) {
@@ -629,7 +825,45 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
                ret[ ndim + i ] *= AST__DR2D;
             }
          }
+
+/* If an STC-S description is required, get the positions of the centre,
+   and the end points of the major and minor axes. */
+         if( ellipse && space_frm && space_map ) {
+            astEllipsePars( ellipse, cen, axlens, axlens + 1, &angle, p1, p2 );
+
+/* Transform them from pixel coords to WCS coord.s */
+            x[ 0 ] = cen[ 0 ];
+            x[ 1 ] = p1[ 0 ];
+            x[ 2 ] = p2[ 0 ];
+
+            y[ 0 ] = cen[ 1 ];
+            y[ 1 ] = p1[ 1 ];
+            y[ 2 ] = p2[ 1 ];
+
+            astTran2( space_map, 3, x, y, 1, alpha, beta );
+
+            cen[ 0 ] = alpha[ 0 ];
+            p1[ 0 ] = alpha[ 1 ];
+            p2[ 0 ] = alpha[ 2 ];
+
+            cen[ 1 ] = beta[ 0 ];
+            p1[ 1 ] = beta[ 1 ];
+            p2[ 1 ] = beta[ 2 ];
+
+/* Create a new ellipse defined in the WCS Frame. */
+            (void) astAnnul( ellipse );
+            ellipse = (AstRegion *) astEllipse( space_frm, 0, cen, p1, p2, 
+                                                NULL, " " );
+         }
       }
+   }
+
+/* If an STC-S description is required, and an AST Ellipse describing
+   the spatial extent of the clump is available, generate the STC-S
+   description, storing it in dynamically allocated memory. */
+   if( ellipse ) {
+      astPutChannelData( stcs_chan, stcs );
+      if( astWrite( stcs_chan, ellipse ) == 0 ) *stcs = astFree( *stcs );
    }
 
 /* If there is a CUPID extension, store the values of its components at
@@ -652,8 +886,21 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
 /* Unmap the NDF data array */
    ndfUnmap(  indf, "Data", status );
 
+/* Free AST Objects. */
+   if( ellipse ) ellipse = astAnnul( ellipse );
+
 /* Return the array of clump parameters. */
    return ret;
+}
 
+
+
+static void cupidMemSink( const char *text ) {
+   int nc;
+   char **buffer;
+
+   buffer = astChannelData;
+   nc = ( *buffer ) ? strlen( *buffer ) : 0;
+   *buffer = astAppendString( *buffer, &nc, text );
 }
 

@@ -602,7 +602,7 @@ void findclumps( int *status ) {
 *     application paremeter DECONV is set TRUE, the clump widths written to 
 *     the output catalogue are reduced (in quadrature) by this amount. [2.0]
 *     - ReinholdClumps.MaxBad: The maximum number of pixels in a clump that
-*     are allowed to be adjacent to a bad pixel. If the number fo clump
+*     are allowed to be adjacent to a bad pixel. If the number of clump
 *     pixels adjacent to a bad pixel exceeds this value, the clump is 
 *     excluded. [4]
 *     - Reinhold.MinLen: The minimum number of pixels spanned by a peak
@@ -673,15 +673,15 @@ void findclumps( int *status ) {
 *     "PERSPECTRUM" is set TRUE. [1]
 *     - FellWalker.FlatSlope: Any initial section to a walk which has an
 *     average gradient (measured over 4 steps) less than this value will not 
-*     be included in the clump. The value can be supplied either as an 
-*     absolute data value, or as a mutliple of the RMS noise using the 
-*     syntax "[x]*RMS", where "[x]" is a numerical value (e.g. 
-*     "3.2*RMS"). [1.0*RMS]
+*     be included in the clump. The value is the data increment between
+*     pixels, and can be supplied either as an absolute data value, or as a 
+*     mutliple of the RMS noise using the syntax "[x]*RMS", where "[x]" is 
+*     a numerical value (e.g. "3.2*RMS"). [1.0*RMS]
 *     - FellWalker.FwhmBeam: The FWHM of the instrument beam, in pixels. If 
 *     application paremeter DECONV is set TRUE, the clump widths written to 
 *     the output catalogue are reduced (in quadrature) by this amount. [2.0]
 *     - FellWalker.MaxBad: The maximum number of pixels in a clump that
-*     are allowed to be adjacent to a bad pixel. If the number fo clump
+*     are allowed to be adjacent to a bad pixel. If the number of clump
 *     pixels adjacent to a bad pixel exceeds this value, the clump is 
 *     excluded. [4]
 *     - FellWalker.MinDip: If the dip between two adjacent peaks is less
@@ -855,6 +855,7 @@ void findclumps( int *status ) {
    int var;                     /* Does the i/p NDF have a Variance component? */
    int vax;                     /* Index of the velocity WCS axis (if any) */
    int velax;                   /* Index of the velocity pixel axis (if any) */
+   int vo;                      /* Use VO catalogue format? */
    void *ipd;                   /* Pointer to Data array */
    void *ipo;                   /* Pointer to output Data array */
 
@@ -957,6 +958,9 @@ void findclumps( int *status ) {
          logfile = fopen( logfilename, "w" );
       }
    }
+
+/* See if "Virtual Observatory" catalogue format is required. */
+   parGet0l( "VO", &vo, status );
 
 /* See if the clump parameters are to be described using WCS values or
    pixel values. The default is yes if the current WCS Frame consists
@@ -1245,9 +1249,9 @@ void findclumps( int *status ) {
    (if needed). This may reject further clumps (such clumps will have the
    "Unit" component set to "BAD"). */
       ndfState( indf, "WCS", &gotwcs, status );
-      cupidStoreClumps( "OUTCAT", xloc, ndfs, nsig, deconv, backoff, 
-                        beamcorr, "Output from CUPID:FINDCLUMPS", usewcs, 
-                        gotwcs ? iwcs : NULL, dataunits, 
+      cupidStoreClumps( "OUTCAT", xloc, ndfs, nsig, deconv, backoff, vo,
+                        velax, beamcorr, "Output from CUPID:FINDCLUMPS", 
+                        usewcs, gotwcs ? iwcs : NULL, dataunits, 
                         confgrp, logfile, &nclumps, status );
 
       if( logfile ) fprintf( logfile, "\n\n" );

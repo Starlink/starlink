@@ -173,6 +173,8 @@ void extractclumps( int *status ) {
 /* Local Variables: */
    AstFrameSet *iwcs;           /* Pointer to the WCS FrameSet */
    AstKeyMap *config;           /* Pointer to KeyMap holding used config settings */
+   AstMapping *map;             /* Pointer to PIXEl->WCS Mapping */
+   AstMapping *tmap;            /* Pointer to temporary Mapping */
    AstObject *mconfig;          /* Pointer to KeyMap holding algorithm settings */
    FILE *logfile = NULL;        /* File identifier for output log file */
    Grp *grp;                    /* GRP group holding NDF names */
@@ -219,13 +221,15 @@ void extractclumps( int *status ) {
    int nskyax;                  /* No. of sky axes in current WCS Frame */
    int nspecax;                 /* No. of spectral axes in current WCS Frame */
    int sdim[ NDF__MXDIM ];      /* The indices of the significant pixel axes */
-   size_t size;                 /* Number of elements in "grp" */
    int skip[ 3 ];               /* Pixel axis skips */
    int slbnd[ NDF__MXDIM ];     /* The lower bounds of the significant pixel axes */
    int subnd[ NDF__MXDIM ];     /* The upper bounds of the significant pixel axes */
    int there;                   /* Does object exist? */
    int type;                    /* Integer identifier for data type */
    int usewcs;                  /* Use WCS coords in output catalogue? */
+   int vax;                     /* Index of velocity WCS axis */
+   int velax;                   /* Index of velocity pixel axis */
+   size_t size;                 /* Number of elements in "grp" */
    void *ipd;                   /* Pointer to Data array */
 
 /* Abort if an error has already occurred. */
@@ -291,9 +295,11 @@ void extractclumps( int *status ) {
    }
 
 /* Count the number of sky axes and spectral axes in the current Frame of
-   the input NDFs WCS FrameSet. */
+   the input NDFs WCS FrameSet. Also note the index of the spectral WCS
+   axis. */
    nskyax = 0;
    nspecax = 0;
+   vax = -1;
    for( i = 0; i < nsig; i++ ) {
       sprintf( attr, "Domain(%d)", i + 1 );
       dom = astGetC( iwcs, attr );
@@ -303,8 +309,27 @@ void extractclumps( int *status ) {
          } else if( !strcmp( dom, "SPECTRUM" ) ||
                     !strcmp( dom, "DSBSPECTRUM" ) ) {
             nspecax++;
+            vax = i;
          }
       }
+   }
+
+/* Identify the pixel axis corresponding to the spectral WCS axis. Note,
+   astMapSplit uses one-based axis indices, so we need to convert to and
+   from zero-based for further use. */
+   if( vax != -1 ) {
+      map = astGetMapping( iwcs, AST__CURRENT, AST__BASE );
+      vax++;
+      astMapSplit( map, 1, &vax, &velax, &tmap );
+      if( tmap ) {
+         tmap = astAnnul( tmap );
+         velax--;
+      } else {
+         velax = -1;
+      }         
+      map = astAnnul( map );
+   } else {
+      velax = -1;
    }
 
 /* See if a log file is to be created. */
@@ -506,8 +531,8 @@ void extractclumps( int *status ) {
    (if needed). */
       ndfState( indf1, "WCS", &gotwcs, status );
       msgBlank( status );
-      cupidStoreClumps( "OUTCAT", xloc, ndfs, nsig, deconv, backoff, 
-                        beamcorr, "Output from CUPID:EXTRACTCLUMPS", 
+      cupidStoreClumps( "OUTCAT", xloc, ndfs, nsig, deconv, backoff, 1,
+                        velax, beamcorr, "Output from CUPID:EXTRACTCLUMPS", 
                         usewcs, gotwcs ? iwcs : NULL, dataunits, 
                         NULL, logfile, &nclumps, status );
 

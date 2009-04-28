@@ -452,9 +452,9 @@ void makeclumps( int *status ) {
 /* Store the clump properties in the output catalogue. */
    beamcorr[ 0 ] = beamfwhm;
    beamcorr[ 1 ] = beamfwhm;
-   beamcorr[ 3 ] = velfwhm;
-   cupidStoreClumps( "OUTCAT", xloc, obj, ndim, deconv, 1, beamcorr,
-                     "Output from CUPID:MAKECLUMPS", 0, NULL, "",
+   beamcorr[ 2 ] = velfwhm;
+   cupidStoreClumps( "OUTCAT", xloc, obj, ndim, deconv, 1, 0, 2,
+                     beamcorr, "Output from CUPID:MAKECLUMPS", 0, NULL, "",
                      NULL, NULL, &nclumps, status );
 
 /* Relase the extension locator.*/

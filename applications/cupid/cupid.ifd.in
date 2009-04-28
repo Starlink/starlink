@@ -412,6 +412,16 @@ package cupid {
             default FALSE
             helpkey *
           }
+
+         parameter vo {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT,DEFAULT
+            prompt {Produce VO format catalogue?}
+            default FALSE
+            helpkey *
+          }
       }
 
       icl {defstring cupidh(elp) !$CUPID_DIR/cupidhelp}

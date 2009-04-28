@@ -16,7 +16,8 @@
 #define LOGTAB   16   /* Width of one log file column, in characters */
 
 void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj, 
-                       int ndim, int deconv, int backoff, double beamcorr[ 3 ],
+                       int ndim, int deconv, int backoff, int stccol,  
+                       int velax, double beamcorr[ 3 ],
                        const char *ttl, int usewcs, AstFrameSet *iwcs, 
                        const char *dataunits, Grp *hist,
                        FILE *logfile, int *nclumps, int *status ){
@@ -33,8 +34,8 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 
 *  Synopsis:
 *     void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj, 
-*                            int ndim, int deconv, int backoff, 
-*                            double beamcorr[ 3 ], const char *ttl, 
+*                            int ndim, int deconv, int backoff, int stccol,
+*                            int velax, double beamcorr[ 3 ], const char *ttl, 
 *                            int usewcs, AstFrameSet *iwcs, 
 *                            const char *dataunits, Grp *hist,
 *                            FILE *logfile, int *nclumps, int *status )
@@ -67,6 +68,14 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 *        The background level is the minimum data value in the clump. If
 *        zero, then the clump sizes and centroid are based on the full data 
 *        values (this is what the IDL version of ClumpFind does).
+*     stccol
+*        If non-zero, then the output catalogue will contain a column holding
+*        a textual description of the spatial extent of each clump, in  the 
+*        form of an STC-S description.
+*     velax
+*        The index of the velocity pixel axis. Only used if "ndim" is 3.
+*     backoff
+*        If non-zero, then the background level is subtracted from all
 *     beamcorr
 *        An array holding the FWHM (in pixels) describing the instrumental 
 *        smoothing along each pixel axis. If "deconv" is non-zero, the clump 
@@ -99,6 +108,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
 *     Copyright (C) 2008, 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -141,6 +151,8 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 *        Added argument "backoff" for Jenny Hatchell.
 *     14-JAN-2009 (TIMJ):
 *        Use MERS for message filtering.
+*     27-APR-2009 (DSB):
+*        Added parameters "velax" and "stccol".
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -150,47 +162,51 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 */
 
 /* Local Variables: */
-   AstFrame *frm1;              /* Frame describing clump parameters */
-   AstFrame *frm2;              /* Frame describing clump centres */
-   AstMapping *map;             /* Mapping from "frm1" to "frm2" */
-   AstFrame *wcsfrm;            /* Current Frame describing WCS coords */
-   AstMapping *wcsmap;          /* Mapping from PIXEL to current Frame */
-   HDSLoc *aloc;                /* Locator for array of Clump structures */
-   HDSLoc *cloc;                /* Locator for array cell */
-   HDSLoc *dloc;                /* Locator for cell value */
-   HDSLoc *ncloc;               /* Locator for array cell */
-   char *line = NULL;           /* Pointer to buffer for log file output */
-   char attr[ 15 ];             /* AST attribute name */
-   char buf[ 2*LOGTAB ];        /* Buffer for a log file column value */
-   char buf2[ 2*LOGTAB ];       /* Buffer for a log file unit string */
-   char cat[ MAXCAT + 1 ];      /* Catalogue name */
-   char unit[ 10 ];             /* String for NDF Unit component */
-   const char **names;          /* Component names */
-   const char **units;          /* Component units */
-   const char *dom;             /* Pointer to domain string */
-   double *cpars;               /* Array of parameters for a single clump */
-   double *t;                   /* Pointer to next table value */
-   double *tab;                 /* Pointer to catalogue table */
-   int nc;                      /* Number of characters currently in "line" */
-   double *tj;                  /* Pointer to next table entry to write*/
-   int bad;                     /* Does clump touch an area of bad pixels? */
-   int i;                       /* Index of next locator */
-   int iclump;                  /* Usable clump index */
-   int icol;                    /* Zero based column index */
-   int ifrm;                    /* Frame index */
-   int indf2;                   /* Identifier for copied NDF */
-   int indf;                    /* Identifier for supplied NDF */
-   int irow;                    /* One-based row index */
-   int nbad;                    /* No. of clumps touching an area of bad pixels */
-   int ncpar;                   /* Number of clump parameters */
-   int nok;                     /* No. of usable clumps */
-   int nfrm;                    /* Total number of Frames */
-   size_t nndf;                 /* Total number of NDFs */
-   int nsmall;                  /* No. of clumps smaller than the beam size */
-   int ok;                      /* Is the clump usable? */
-   int pixfrm;                  /* Index of PIXEL Frame */
-   int place;                   /* Place holder for copied NDF */
-   int there;                   /* Does component exist?*/
+   AstFrame *frm1;          /* Frame describing clump parameters */
+   AstFrame *frm2;          /* Frame describing clump centres */
+   AstFrame *wcsfrm;        /* Current Frame describing WCS coords */
+   AstKeyMap *stc_km;       /* KeyMap holding STC-S clump descriptions */
+   AstMapping *map;         /* Mapping from "frm1" to "frm2" */
+   AstMapping *wcsmap;      /* Mapping from PIXEL to current Frame */
+   HDSLoc *aloc;            /* Locator for array of Clump structures */
+   HDSLoc *cloc;            /* Locator for array cell */
+   HDSLoc *dloc;            /* Locator for cell value */
+   HDSLoc *ncloc;           /* Locator for array cell */
+   char *line = NULL;       /* Pointer to buffer for log file output */
+   char *stcptr = NULL;     /* Pointer to buffer holding STC-S clump description */
+   char attr[ 15 ];         /* AST attribute name */
+   char buf2[ 2*LOGTAB ];   /* Buffer for a log file unit string */
+   char buf[ 2*LOGTAB ];    /* Buffer for a log file column value */
+   char cat[ MAXCAT + 1 ];  /* Catalogue name */
+   char key[ 20 ];          /* KeyMap key */
+   char unit[ 10 ];         /* String for NDF Unit component */
+   const char **names;      /* Component names */
+   const char **units;      /* Component units */
+   const char *dom;         /* Pointer to domain string */
+   double *cpars;           /* Array of parameters for a single clump */
+   double *t;               /* Pointer to next table value */
+   double *tab;             /* Pointer to catalogue table */
+   double *tj;              /* Pointer to next table entry to write*/
+   int bad;                 /* Does clump touch an area of bad pixels? */
+   int i;                   /* Index of next locator */
+   int iclump;              /* Usable clump index */
+   int icol;                /* Zero based column index */
+   int ifrm;                /* Frame index */
+   int indf2;               /* Identifier for copied NDF */
+   int indf;                /* Identifier for supplied NDF */
+   int irow;                /* One-based row index */
+   int istc;                /* Number of STC-S descriptions created */
+   int nbad;                /* No. of clumps touching an area of bad pixels */
+   int nc;                  /* Number of characters currently in "line" */
+   int ncpar;               /* Number of clump parameters */
+   int nfrm;                /* Total number of Frames */
+   int nok;                 /* No. of usable clumps */
+   int nsmall;              /* No. of clumps smaller than the beam size */
+   int ok;                  /* Is the clump usable? */
+   int pixfrm;              /* Index of PIXEL Frame */
+   int place;               /* Place holder for copied NDF */
+   int there;               /* Does component exist?*/
+   size_t nndf;             /* Total number of NDFs */
 
 /* Initialise */
    *nclumps = 0;
@@ -232,6 +248,9 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 /* Number of CLUMP structures created so far. */
    iclump = 0;
 
+/* Number of STC-S descriptions stored. */
+   istc = 0;
+
 /* Loop round all Frames in the FrameSet, noting the index of the PIXEL
    Frame, and removing any GRID or AXIS Frames. */
    pixfrm = AST__NOFRAME;
@@ -265,6 +284,17 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 /* Indicate that no memory has yet been allocated to store the full table
    of parameters for all clumps. */
    tab = NULL;
+
+/* If we are creating an STC-S column, create a KeyMap to hold the
+   strings to put in the column. The kpg1Wrcat function requires the
+   KeyMap to contain an entry called COLNAMES that holds all the column 
+   names. */
+   if( stccol ) {
+      stc_km =  astKeyMap( " " );
+      astMapPut0C( stc_km, "COLNAMES", "Shape", NULL );
+   } else {
+      stc_km = NULL;
+   }
 
 /* Loop round the non-null identifiers, keeping track of the one-based row 
    number corresponding to each one. */
@@ -300,8 +330,9 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
    units, the indices of the parameters holding the clump central position, 
    and the number of parameters). */
          cpars = cupidClumpDesc( indf, deconv, wcsmap, wcsfrm, dataunits, 
-                                 beamcorr, backoff, cpars, &names, &units, 
-                                 &ncpar, &ok, status );
+                                 beamcorr, backoff, velax, cpars, 
+                                 &names, &units, &ncpar, &ok, 
+                                 ( stccol ? &stcptr : NULL ), status );
 
 /* If we have not yet done so, allocate memory to hold a table of clump 
    parameters. In this table, all the values for column 1 come first, 
@@ -407,6 +438,16 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
                datAnnul( &cloc, status );
             }
          }
+
+/* If required, store the STC-S clump description in the KeyMap, and then
+   free the string returned by cupidClumPDesc. */
+         if( stc_km && stcptr && ok ) {
+            sprintf( key, "Shape_%d", ++istc );
+            astMapPut0C( stc_km, key, stcptr, NULL ); 
+         }
+         stcptr = astFree( stcptr );
+
+/* Free the NDF identifier. */
          ndfAnnul( &indf, status );
       }
    }
@@ -454,7 +495,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 /* Otherwise create the catalogue. */
    } else if( tab && *status == SAI__OK ) {
 
-/* Remove any rows in the table which descibe clumps smaller than the
+/* Remove any rows in the table which describe clumps smaller than the
    beam size (these will have been set to bad values above). The good
    rows are shuffled down to fill the gaps left by the bad rows. */
       iclump = 0;
@@ -552,11 +593,11 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
    kpg1_wrlst to write out the positions in the original base Frame. */
          astSet( iwcs, "ID=FIXED_BASE" );
       }
-   
+
 /* Create the output catalogue */
       if( iclump > 0 ) {
-         kpg1Wrtab( param, nndf, iclump, ncpar, tab, AST__BASE, iwcs,
-                    ttl, 1, NULL, NULL, hist, 1, status );
+        kpg1Wrcat( param, nndf, iclump, ncpar, tab, AST__BASE, iwcs,
+                   ttl, 1, NULL, stc_km, NULL, hist, 1, status );
       }
    }
 
@@ -564,6 +605,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
    if( aloc ) datAnnul( &aloc, status );
 
 /* Free resources. */
+   if( stc_km ) stc_km = astAnnul( stc_km );
    if( line ) line = astFree( line );
    tab = astFree( tab );
    cpars = astFree( cpars );
