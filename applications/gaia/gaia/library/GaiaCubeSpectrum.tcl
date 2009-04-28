@@ -630,13 +630,13 @@ itcl::class gaia::GaiaCubeSpectrum {
       $spectrum_ update_label ""
 
       #  Eval the notification command, if have one. Note contract assumes
-      #  a single character string, no remove any newlines (polygon).
+      #  a single character string, so remove any newlines (polygon).
       if { $itk_option(-notify_cmd) != {} } {
          regsub -all {\n} $region { } region
          if { $action == "localstart" } {
-            eval $itk_option(-notify_cmd) r 1 $region
+            eval $itk_option(-notify_cmd) r 1 \"$region\"
          } else {
-            eval $itk_option(-notify_cmd) r 0 $region
+            eval $itk_option(-notify_cmd) r 0 \"$region\"
          }
       }
 
