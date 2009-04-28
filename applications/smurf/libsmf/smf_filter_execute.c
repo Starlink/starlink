@@ -118,7 +118,7 @@ pthread_mutex_t smf_filter_execute_mutex = PTHREAD_MUTEX_INITIALIZER;
    local copies of the entire smfData. The filter and plans are only
    read inside a thread and therefore don't need to be local copies
    either. */
-typedef struct smfBoloChunkData {
+typedef struct smfFilterExecuteData {
   size_t b1;               /* Index of first bolometer to be filtered */
   size_t b2;               /* Index of last bolometer to be filtered */
   smfData *data;           /* Pointer to master smfData */
@@ -128,24 +128,25 @@ typedef struct smfBoloChunkData {
   int ijob;                /* Job identifier */
   fftw_plan plan_forward;  /* for forward transformation */
   fftw_plan plan_inverse;  /* for inverse transformation */
-} smfBoloChunkData;
+} smfFilterExecuteData;
 
 /* Function to be executed in thread: filter all of the bolos from b1 to b2
    using the same filt */
 
-void smfParallelFilt( void *job_data_ptr, int *status );
+void smfFilterExecuteParallel( void *job_data_ptr, int *status );
 
-void smfParallelFilt( void *job_data_ptr, int *status ) {
+void smfFilterExecuteParallel( void *job_data_ptr, int *status ) {
   double ac, bd, aPb, cPd;      /* Components for complex multiplication */
   double *base=NULL;            /* Pointer to start of current bolo in array */
   size_t bstride;               /* Bolometer stride */
   double *data_fft_r=NULL;      /* Real part of the data FFT */
   double *data_fft_i=NULL;      /* Imaginary part of the data FFT */
   smfData *data=NULL;           /* smfData that we're working on */
-  smfBoloChunkData *pdata=NULL; /* Pointer to job data */
+  smfFilterExecuteData *pdata=NULL; /* Pointer to job data */
   smfFilter *filt=NULL;         /* Frequency domain filter */
   size_t i;                     /* Loop counter */
   size_t j;                     /* Loop counter */
+  dim_t nbolo;                  /* Number of bolometers */
   dim_t ntslice;                /* Number of time slices */
   unsigned char *qua=NULL;      /* pointer to quality */
 
@@ -157,7 +158,7 @@ void smfParallelFilt( void *job_data_ptr, int *status ) {
   /* Check for valid inputs */
   if( !pdata ) {
     *status = SAI__ERROR;
-    errRep( "", "smfParallelFilt: No job data supplied", status );
+    errRep( "", "smfFilterExecuteParallel: No job data supplied", status );
     return;
   }
 
@@ -169,32 +170,42 @@ void smfParallelFilt( void *job_data_ptr, int *status ) {
 
   if( !data ) {
     *status = SAI__ERROR;
-    errRep( "", "smfParallelFilt: No valid smfData supplied", status );
+    errRep( "", "smfFilterExecuteParallel: No valid smfData supplied", status );
     return;
   }
 
   if( !filt ) {
     *status = SAI__ERROR;
-    errRep( "", "smfParallelFilt: No valid smfFilter supplied", status );
+    errRep( "", "smfFilterExecuteParallel: No valid smfFilter supplied", 
+            status );
     return;
   }
 
   if( !data_fft_r || !data_fft_i ) {
     *status = SAI__ERROR;
-    errRep( "", "smfParallelFilt: Invaid data_fft_* pointers provided", 
+    errRep( "", "smfFilterExecuteParallel: Invaid data_fft_* pointers provided",
             status );
     return;
   }
 
   /* Debugging message indicating thread started work */
   msgOutiff( MSG__DEBUG, "", 
-             "smfParallelFilt: thread starting on bolos %zu -- %zu",
+             "smfFilterExecuteParallel: thread starting on bolos %zu -- %zu",
              status, pdata->b1, pdata->b2 );
 
 
   /* Filter the data one bolo at a time */
-  smf_get_dims( data, NULL, NULL, NULL, &ntslice, NULL, &bstride, NULL, 
+  smf_get_dims( data, NULL, NULL, &nbolo, &ntslice, NULL, &bstride, NULL, 
                 status );
+
+  /* if b1 past end of the work, nothing to do so we return */
+  if( pdata->b1 >= nbolo ) {
+    msgOutif( MSG__DEBUG, "", 
+               "smfFilterExecuteParallel: nothing for thread to do, returning",
+               status);
+    return;
+  }
+
 
   for( i=pdata->b1; (*status==SAI__OK) && (i<=pdata->b2); i++ ) 
     if( !qua || !(qua[i*bstride]&SMF__Q_BADB) ) { /* Check for bad bolo flag */
@@ -234,7 +245,7 @@ void smfParallelFilt( void *job_data_ptr, int *status ) {
     }
 
   msgOutiff( MSG__DEBUG, "", 
-             "smfParallelFilt: thread finishing bolos %zu -- %zu",
+             "smfFilterExecuteParallel: thread finishing bolos %zu -- %zu",
              status, pdata->b1, pdata->b2 );
   
 }
@@ -249,12 +260,13 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt,
   /* Local Variables */
   fftw_iodim dims;                /* I/O dimensions for transformations */
   int i;                          /* Loop counter */
-  smfBoloChunkData *job_data=NULL;/* Array of job data for each thread */
+  smfFilterExecuteData *job_data=NULL;/* Array of job data for each thread */
   dim_t nbolo=0;                  /* Number of bolometers */
   dim_t ndata=0;                  /* Total number of data points */
   int nw;                         /* Number of worker threads */
   dim_t ntslice=0;                /* Number of time slices */
-  smfBoloChunkData *pdata=NULL;   /* Pointer to current job data */
+  smfFilterExecuteData *pdata=NULL;   /* Pointer to current job data */
+  size_t step;                    /* step size for dividing up work */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -310,21 +322,29 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt,
 
   /* Describe the input and output array dimensions for FFTW guru interface.
      - dims describes the length and stepsize of time slices within a bolometer 
-     - howmany_dims gives the number of bolos, and stride from one to the next*/
+  */
 
   dims.n = ntslice;
   dims.is = 1;
   dims.os = 1;
 
   /* Set up the job data */
+
+  if( nw > (int) nbolo ) {
+    step = 1;
+  } else {
+    step = nbolo/nw;
+  }
+
   job_data = smf_malloc( nw, sizeof(*job_data), 1, status );
   for( i=0; (*status==SAI__OK)&&i<nw; i++ ) {
     pdata = job_data + i;
 
-    pdata->b1 = i*(nbolo/nw);
-    pdata->b2 = (i+1)*(nbolo/nw)-1;
-    /* Ensure that the last thread gets the remainder of the bolos */
-    if( i==(nw-1) ) {
+    pdata->b1 = i*step;
+    pdata->b2 = (i+1)*step-1;
+
+    /* Ensure that the last thread picks up any left-over bolometers */
+    if( (i==(nw-1)) && (pdata->b1<(nbolo-1)) ) {
       pdata->b2=nbolo-1;
     }
     pdata->data = data;
@@ -389,15 +409,16 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt,
     /* Submit jobs in parallel if we have multiple worker threads */
     for( i=0; (*status==SAI__OK)&&i<nw; i++ ) {
       pdata = job_data + i;
-      pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata, smfParallelFilt, 
+      pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata, 
+                                 smfFilterExecuteParallel, 
                                  NULL, status );
     }
     /* Wait until all of the submitted jobs have completed */
     smf_wait( wf, status );
   } else {
-    /* If there is only a single thread call smfParallelFilt directly */
+    /* If there is only a single thread call smfFilterExecuteParallel directly*/
     pdata = job_data;
-    smfParallelFilt( job_data, status );
+    smfFilterExecuteParallel( job_data, status );
   }
 
   /* Clean up the job data array */
