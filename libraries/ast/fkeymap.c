@@ -473,10 +473,11 @@ F77_LOGICAL_FUNCTION(ast_mapget0c)( INTEGER(THIS),
          *L = 0;
       }
 
-      for( ; i < VALUE_length; i++ ) {
-         VALUE[ i ] = ' ';
+      if( VALUE ) {
+         for( ; i < VALUE_length; i++ ) {
+            VALUE[ i ] = ' ';
+         }
       }
-
    )
    return RESULT;
 }
@@ -911,7 +912,7 @@ F77_LOGICAL_FUNCTION(ast_mapgetelemc)( INTEGER(THIS),
    F77_LOGICAL_TYPE(RESULT);
    char *key;
    char *values, *c, *d;
-   int j, term;
+   int j;
 
    astAt( "AST_MAPGETELEMC", NULL, 0 );
    astWatchSTATUS(
@@ -928,15 +929,15 @@ F77_LOGICAL_FUNCTION(ast_mapgetelemc)( INTEGER(THIS),
          c = values;
          d = VALUE;
 
-         term = 0;
          for( j = 0; j < VALUE_length; j++, d++, c++ ) {
-            if( term ) {
+            if( (*d = *c) == 0 ) {
                *d = ' ';
-            } else if( (*d = *c) == 0 ) {
-               *d = ' ';
-               term = 1;
+               break;
             } 
          }
+
+         for( ; j < VALUE_length; j++, d++ ) *d = ' ';
+
       }
       astFree( values );
    )
