@@ -47,6 +47,8 @@
  *-
 */
 
+#include <config.h>
+
 #include "f77.h"
 
 #include "subpar.h"
