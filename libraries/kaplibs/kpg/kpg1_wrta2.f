@@ -53,13 +53,28 @@
 *        The individual integer identifiers to associate with each
 *        position. Only accessed if ID0 is less than or equal to zero.
 *     KEYMAP = INTEGER (Given)
-*        An optional AST KeyMap containing data for up to 10 extra columns 
-*        to add to the catalogue. An error will be reported if the KeyMap
-*        contains more than 10 entries. Each entry in the KeyMap should be 
-*        a vector with length equal to NPOS. The key for the entry is used 
-*        as the column name in the table. No extra columns are added if a 
-*        value of AST__NULL is supplied for KEYMAP. This keyMap can be used
-*        (for instance) to add character columns to the catalogue.
+*        An optional AST KeyMap containing data for extra columns to 
+*        add to the catalogue. It can be used (for instance) to add 
+*        character columns to the catalogue. If a value of AST__NULL
+*        is supplied, no extra columns are added to the catalogue. 
+*        Otherwise, the column names and values can be specified using 
+*        either of the following two schemes: 
+*
+*        - If the KeyMap contains an entry called "COLNAMES", it is
+*        assumed to be a vector entry holding the names of the columns.
+*        For each of these column names, the value to store in a
+*        particular row of the catalogue is assumed to be held in a
+*        scalar KeyMap entry with key "<colname>_<row number>" ( "_1"
+*        for the first row). If no such entry exists for a particular 
+*        row, then the value is marked as bad in the catalogue. The data 
+*        type of the column is determined from the first row value found 
+*        for the column.
+*
+*        - If the KeyMap does not contain an entry called "COLNAMES", 
+*        it is assumed that each entry in the KeyMap contains a vector
+*        holding all the values for a single column, in row order. The
+*        entry key is used as the column name, and the column data type 
+*        is determined from the entry data type.
 *     LABS = INTEGER (Given)
 *        A GRP group identifier containing the labels to be associated
 *        with the positions. The number of elements in this group should
@@ -112,6 +127,9 @@
 *        Added parameter HIST.
 *     27-APR-2009 (DSB):
 *        Added parameter KEYMAP.
+*     28-APR-2009 (DSB):
+*        Add a second scheme for holding column values in a KeyMap,
+*        based on the use of scalar entries rather than vector entries.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -166,6 +184,7 @@
       CHARACTER LABEL*100        ! Position label
       CHARACTER SYM*20           ! Axis symbol
       CHARACTER UNT*20           ! Axis units
+      CHARACTER COLNAM( MXKEYS )*30! Column names from KeyMap
       DOUBLE PRECISION C( MXDIM) ! Buffer for a single position
       INTEGER AXFRM              ! 1D Frame holding current axis
       INTEGER AXMAP              ! Mapping from full Frame to 1D Frame
@@ -175,11 +194,12 @@
       INTEGER FRM                ! Pointer to Frame
       INTEGER I                  ! Position index
       INTEGER IAT                ! No. of characters in string
+      INTEGER IAT0               ! Length of key root
       INTEGER IPTEXT             ! Pointer to text buffer
       INTEGER J                  ! Axis index
       INTEGER KMCOL( MXKEYS )    ! CAT identifiers for extra columns
       INTEGER KMLEN( MXKEYS )    ! No. of values for each extra column
-      INTEGER KMSIZE             ! No. of columns supplied in KeyMap
+      INTEGER NKMCOL             ! No. of columns supplied in KeyMap
       INTEGER LABLEN             ! Length of longest label
       INTEGER LENC               ! Length of formatted KeyMap entry
       INTEGER LWCS               ! Pointer to the FrameSet to be stored
@@ -187,9 +207,12 @@
       INTEGER NHIST              ! Number of lines of history text
       INTEGER NLAB               ! Number of labels supplied
       INTEGER QI                 ! CAT identifier for another parameter
+      INTEGER SCHEME             ! Says how columns are stored in KeyMap
       INTEGER TI                 ! CAT identifier for TITLE parameter
       INTEGER TYPE               ! AST KeyMap entry data type
       LOGICAL COPIED             ! Has a copy of the Frameet been taken?
+      LOGICAL DONE               ! Leave the loop?
+      LOGICAL GOTVAL             ! Does the KeyMap have the entry?
       LOGICAL HASSKY             ! Does the Frame contain a SkyFrame?
       LOGICAL JUNK               ! Unused
       LOGICAL SKYAX              ! Is the Axis a SkyAxis?
@@ -312,70 +335,212 @@
       END IF
 
 *  Create columns to hold the entries in any supplied KeyMap.
-      KMSIZE = 0
+      NKMCOL = 0
       MAXLEN = 0
 
       IF( KEYMAP .NE. AST__NULL ) THEN
+         SCHEME = 1
 
-*  Loop round all entries in the supplied KeyMap.
-         KMSIZE = AST_MAPSIZE( KEYMAP, STATUS )
+*  Scheme 1 - does the KeyMap have an entry called COLNAMES? If so, it
+*  is a vector holding the column names. Each column value is in a separate
+*  scalar entry.
+         IF( AST_MAPHASKEY( KEYMAP, 'COLNAMES', STATUS ) ) THEN
 
-         IF( KMSIZE .GT. MXKEYS .AND. STATUS .EQ. SAI__OK ) THEN
-            STATUS = SAI__ERROR
-            CALL MSG_SETI( 'N', KMSIZE )
-            CALL MSG_SETI( 'M', MXKEYS )
-            CALL MSG_SETC( 'P', PARAM )
-            CALL ERR_REP( ' ', 'Cannot create ^N extra columns in the'//
-     :                       ' catalogue associated with parameter '//
-     :                       '''^P'' - no more than ^M are allowed '//
-     :                       '(programming error).', STATUS )
-            GO TO 999
-         END IF
-
-         DO I = 1, KMSIZE
-
-*  Get the column name.
-            KEY = AST_MAPKEY( KEYMAP, I, STATUS ) 
-
-*  Get the column data type, and convert from AST to CAT.
-            TYPE = AST_MAPTYPE( KEYMAP, KEY )
-
-            IF( TYPE .EQ . AST__INTTYPE ) THEN
-               CATYPE = CAT__TYPEI
-
-            ELSE IF( TYPE .EQ . AST__DOUBLETYPE ) THEN
-               CATYPE = CAT__TYPED
-
-            ELSE IF( TYPE .EQ . AST__FLOATTYPE ) THEN
-               CATYPE = CAT__TYPER
-
-            ELSE IF( TYPE .EQ . AST__STRINGTYPE ) THEN
-               CATYPE = CAT__TYPEC
-
-            ELSE IF( STATUS .EQ. SAI__OK ) THEN
+*  Get the number of columns described by the KeyMap and check it is
+*  not too high.
+            NKMCOL = AST_MAPLENGTH( KEYMAP, 'COLNAMES', STATUS )
+            IF( NKMCOL .GT. MXKEYS .AND. STATUS .EQ. SAI__OK ) THEN
                STATUS = SAI__ERROR
-               CALL MSG_SETC( 'K', KEY )
+               CALL MSG_SETI( 'N', NKMCOL )
+               CALL MSG_SETI( 'M', MXKEYS )
                CALL MSG_SETC( 'P', PARAM )
-               CALL ERR_REP( ' ', 'Cannot create the ''^K'' column '//
-     :                       'within the catalogue associated with '//
-     :                       'parameter ''^P'' - the column data type'//
-     :                       ' is inappropriate (programming error).',
-     :                       STATUS )
+               CALL ERR_REP( ' ', 'Cannot create ^N extra columns in '//
+     :                       'the catalogue associated with parameter'//
+     :                       ' ''^P'' - no more than ^M are allowed '//
+     :                       '(programming error).', STATUS )
                GO TO 999
             END IF
+   
+*  Read all the column names into a local array.
+            GOTVAL = AST_MAPGET1C( KEYMAP, 'COLNAMES', NKMCOL, NKMCOL, 
+     :                             COLNAM, STATUS ) 
 
-*  Record the maximum formatted length. 
-            LENC = AST_MAPLENC( KEYMAP, KEY ) 
-            MAXLEN = MAX( MAXLEN, LENC )
+*  To create the catalogue column, we need to determine a data type for
+*  the column, and the maximum length of a formatted column value. The
+*  data type we get from the first value found in the KeyMap. The
+*  formatted length can also be taken from the first value unless the
+*  data type is string, in which case we meed to scan all column values 
+*  to find the longest string. Loop round all columns described by the 
+*  KeyMap.
+            DO I = 1, NKMCOL
 
-*  Create the column
-            CALL CAT_CNEWS( CI, KEY, CATYPE, LENC, ' ', ' ', ' ', 
-     :                      KMCOL( I ), STATUS )
+*  Form the root key name for KeyMap entries holding values for this 
+*  catalogue column. The row number needs to be appended to this root
+*  key to form the full key.
+               KEY = COLNAM( I )
+               IAT0 = CHR_LEN( KEY )
+               CALL CHR_APPND( '_', KEY, IAT0 )
 
-*  Store the number of values in each entry.
-            KMLEN( I ) = AST_MAPLENGTH( KEYMAP, KEY )
+*  Inidcate we do not yet know the column data type.
+               TYPE = AST__BADTYPE
 
-         END DO
+*  Loop round the rows looking for the first row with a value for this 
+*  column.
+               J = 1
+               DONE = .FALSE.
+               DO WHILE( .NOT. DONE .AND. STATUS .EQ. SAI__OK )
+
+*  Form the full key for the entry holding the value of column I, row J.
+                  IAT = IAT0
+                  CALL CHR_PUTI( J, KEY, IAT )
+
+*  If the entry exists in the KeyMap...
+                  IF( AST_MAPHASKEY( KEYMAP, KEY( : IAT ), 
+     :                               STATUS ) ) THEN
+
+*  If this is the first value found, get its data type, and store the
+*  length of the formatted value
+                     IF( TYPE .EQ. AST__BADTYPE ) THEN
+                        TYPE = AST_MAPTYPE( KEYMAP, KEY( : IAT ), 
+     :                                      STATUS )
+                        LENC = AST_MAPLENC( KEYMAP, KEY( : IAT ),
+     :                                      STATUS )
+
+*  If this is not the first value found, update the maximum length of
+*  a formatted column value.
+                     ELSE
+                        LENC = MAX( LENC, AST_MAPLENC( KEYMAP, 
+     :                                                 KEY( : IAT ),
+     :                                                 STATUS ) )
+                     END IF
+
+*  If the column holds strings, we need to continue looping to find the 
+*  length of the longest string in the column. Otherwise, we can leave
+*  the loop now since all formatted values will be equal in length.
+                     IF( TYPE .NE. AST__STRINGTYPE ) DONE = .TRUE.
+
+*  If the entry does not exists in the KeyMap, find the index of the next 
+*  row, or leave the loop if all rows have been done.
+                  ELSE IF( J .LT. NPOS ) THEN
+                     J = J + 1
+
+                  ELSE
+                     DONE = .TRUE.
+                  END IF
+
+               END DO
+
+*  Set the maximum number of values in the column.
+               KMLEN( I ) = NPOS
+
+*  If no values were found for this column, set the column size to
+*  zero to indicate that the catalogue column should not be created.
+               IF( TYPE .EQ. AST__BADTYPE ) THEN
+                  KMLEN( I ) = 0
+
+*  Otherwise, convert the data type from AST to CAT.
+               ELSE IF( TYPE .EQ . AST__INTTYPE ) THEN
+                  CATYPE = CAT__TYPEI
+   
+               ELSE IF( TYPE .EQ . AST__DOUBLETYPE ) THEN
+                  CATYPE = CAT__TYPED
+   
+               ELSE IF( TYPE .EQ . AST__FLOATTYPE ) THEN
+                  CATYPE = CAT__TYPER
+   
+               ELSE IF( TYPE .EQ . AST__STRINGTYPE ) THEN
+                  CATYPE = CAT__TYPEC
+   
+*  Report an error for complex data types.
+               ELSE IF( STATUS .EQ. SAI__OK ) THEN
+                  STATUS = SAI__ERROR
+                  CALL MSG_SETC( 'K', COLNAM( I ) )
+                  CALL MSG_SETC( 'P', PARAM )
+                  CALL ERR_REP( ' ', 'Cannot create the ''^K'' column'//
+     :                          ' within the catalogue associated '//
+     :                          'with parameter ''^P'' - the column '//
+     :                          'data type is inappropriate '//
+     :                          '(programming error).', STATUS )
+                  GO TO 999
+               END IF
+   
+*  Update the maximum formatted length of any column.
+               MAXLEN = MAX( MAXLEN, LENC )
+   
+*  Create the column, storing its CAT identifier in KMCOL.
+               CALL CAT_CNEWS( CI, COLNAM( I ), CATYPE, LENC, ' ', ' ', 
+     :                         ' ', KMCOL( I ), STATUS )
+            END DO
+
+*  Scheme 2 - each entry is a vector representing a whole column, with
+*  the entry key being the column name.
+         ELSE
+            SCHEME = 2
+
+*  Get the number of columns described by the KeyMap and check it is
+*  not too high.
+            NKMCOL = AST_MAPSIZE( KEYMAP, STATUS )
+            IF( NKMCOL .GT. MXKEYS .AND. STATUS .EQ. SAI__OK ) THEN
+               STATUS = SAI__ERROR
+               CALL MSG_SETI( 'N', NKMCOL )
+               CALL MSG_SETI( 'M', MXKEYS )
+               CALL MSG_SETC( 'P', PARAM )
+               CALL ERR_REP( ' ', 'Cannot create ^N extra columns in '//
+     :                       'the catalogue associated with parameter'//
+     :                       ' ''^P'' - no more than ^M are allowed '//
+     :                       '(programming error).', STATUS )
+               GO TO 999
+            END IF
+   
+*  Loop round all columns described by the KeyMap.
+            DO I = 1, NKMCOL
+   
+*  Get the entry key and store it as the column name.
+               KEY = AST_MAPKEY( KEYMAP, I, STATUS ) 
+               COLNAM( I ) = KEY
+   
+*  Get the column data type, and convert from AST to CAT.
+               TYPE = AST_MAPTYPE( KEYMAP, KEY, STATUS )
+   
+               IF( TYPE .EQ . AST__INTTYPE ) THEN
+                  CATYPE = CAT__TYPEI
+   
+               ELSE IF( TYPE .EQ . AST__DOUBLETYPE ) THEN
+                  CATYPE = CAT__TYPED
+   
+               ELSE IF( TYPE .EQ . AST__FLOATTYPE ) THEN
+                  CATYPE = CAT__TYPER
+   
+               ELSE IF( TYPE .EQ . AST__STRINGTYPE ) THEN
+                  CATYPE = CAT__TYPEC
+   
+*  Report an error for complex data types.
+               ELSE IF( STATUS .EQ. SAI__OK ) THEN
+                  STATUS = SAI__ERROR
+                  CALL MSG_SETC( 'K', KEY )
+                  CALL MSG_SETC( 'P', PARAM )
+                  CALL ERR_REP( ' ', 'Cannot create the ''^K'' column'//
+     :                          ' within the catalogue associated '//
+     :                          'with parameter ''^P'' - the column '//
+     :                          'data type is inappropriate '//
+     :                          '(programming error).', STATUS )
+                  GO TO 999
+               END IF
+   
+*  Get the maximum formatted length of any element in this column, and
+*  update the maximum formatted length of any column. 
+               LENC = AST_MAPLENC( KEYMAP, KEY, STATUS ) 
+               MAXLEN = MAX( MAXLEN, LENC )
+   
+*  Create the column, storing its CAT identifier in KMCOL.
+               CALL CAT_CNEWS( CI, COLNAM( I ), CATYPE, LENC, ' ', ' ', 
+     :                         ' ', KMCOL( I ), STATUS )
+   
+*  Set the maximum number of values in the column.
+               KMLEN( I ) = AST_MAPLENGTH( KEYMAP, KEY, STATUS )
+
+            END DO
+         END IF
       END IF
 
 *  Allocate memory to hold a string that is large enough for the longest
@@ -418,21 +583,53 @@
      :                      ( C( J ) .EQ. AST__BAD ), STATUS )
          END DO
 
-*  Extra columns. 
-         DO J = 1, KMSIZE
+*  Loop round each extra column supplied in the KeyMap, skipping empty
+*  columns.
+         DO J = 1, NKMCOL
+            IF( KMLEN( I ) .GT. 0 ) THEN         
 
-            IF( I .LE. KMLEN( J ) ) THEN
-               KEY = AST_MAPKEY( KEYMAP, J, STATUS ) 
-               JUNK = AST_MAPGETELEMC( KEYMAP, KEY, I, 
-     :                                 %VAL( CNF_PVAL( IPTEXT ) ), 
-     :                                 STATUS, %VAL( MAXLEN ) ) 
+*  If the KeyMap uses the scheme based on scalar-values...
+               IF( SCHEME .EQ. 1 ) THEN
+
+*  Form the key for the entry holding the column value for the current
+*  row.
+                  KEY = COLNAM( J )
+                  IAT = CHR_LEN( KEY )
+                  CALL CHR_APPND( '_', KEY, IAT )
+                  CALL CHR_PUTI( I, KEY, IAT )
+
+*  Atemmpt to get the formatted value from the KeyMap. 
+                  GOTVAL = AST_MAPGET0C( KEYMAP, KEY, 
+     :                                   %VAL( CNF_PVAL( IPTEXT ) ), 
+     :                                   STATUS, %VAL( MAXLEN ) ) 
+
+*  If the KeyMap uses the scheme based on vector-values...
+               ELSE
+
+*  The key is just the column name.
+                  KEY = COLNAM( J )
+               
+*  If the current row is within the bounds of the vector, get the
+*  formatted value of the vector element corresponding to the current 
+*  row.
+                  IF( I .LE. KMLEN( J ) ) THEN
+                     GOTVAL = AST_MAPGETELEMC( KEYMAP, KEY, I, 
+     :                                       %VAL( CNF_PVAL( IPTEXT ) ), 
+     :                                       STATUS, %VAL( MAXLEN ) ) 
+                  ELSE
+                     GOTVAL = .FALSE.
+                  END IF
+               END IF
+
+*  If no value was obtained, fill the value with spaces.
+               IF( .NOT. GOTVAL ) CALL CHR_FILL( ' ', 
+     :                                         %VAL( CNF_PVAL(IPTEXT) ), 
+     :                                         %VAL( MAXLEN ) ) 
+
+*  Store the value.
                CALL CAT_PUT0C( KMCOL( J ), %VAL( CNF_PVAL( IPTEXT ) ),
-     :                         .FALSE., STATUS, %VAL( MAXLEN ) )
-
-            ELSE
-               CALL CAT_PUT0C( KMCOL( J ), ' ', .TRUE., STATUS )
+     :                         .NOT. GOTVAL, STATUS, %VAL( MAXLEN ) )
             END IF
-
          END DO
 
 *  Append the current row buffer to the catalogue.

@@ -24213,12 +24213,33 @@ from one graphical element to another.
       \sstsubsection{
          KEYMAP = INTEGER (Given)
       }{
-         An optional AST KeyMap containing data for extra columns to add
-         to the catalogue. Each entry in the KeyMap should be a vector
-         with length equal to NPOS. The key for the entry is used as the
-         column name in the table. No extra columns are added if a value
-         of AST\_\_NULL is supplied for KEYMAP. This keyMap can be used
-         (for instance) to add character columns to the catalogue.
+         An optional AST KeyMap containing data for extra columns to
+         add to the catalogue. It can be used (for instance) to add
+         character columns to the catalogue. If a value of AST\_\_NULL
+         is supplied, no extra columns are added to the catalogue.
+         Otherwise, the column names and values can be specified using
+         either of the following two schemes:
+
+         \sstitemlist{
+
+            \sstitem
+            If the KeyMap contains an entry called {\tt "}COLNAMES{\tt "}, it is
+            assumed to be a vector entry holding the names of the columns.
+            For each of these column names, the value to store in a
+            particular row of the catalogue is assumed to be held in a
+            scalar KeyMap entry with key {\tt "}$<$colname$>$\_$<$row number$>${\tt "} ( {\tt "}\_1{\tt "}
+            for the first row). If no such entry exists for a particular
+            row, then the value is marked as bad in the catalogue. The data
+            type of the column is determined from the first row value found
+            for the column.
+
+            \sstitem
+            If the KeyMap does not contain an entry called {\tt "}COLNAMES{\tt "},
+            it is assumed that each entry in the KeyMap contains a vector
+            holding all the values for a single column, in row order. The
+            entry key is used as the column name, and the column data type
+            is determined from the entry data type.
+         }
       }
       \sstsubsection{
          LABS = INTEGER (Given)
@@ -24467,13 +24488,33 @@ from one graphical element to another.
       \sstsubsection{
          KEYMAP = INTEGER (Given)
       }{
-         An optional AST KeyMap containing data for up to 10 extra columns
-         to add to the catalogue. An error will be reported if the KeyMap
-         contains more than 10 entries. Each entry in the KeyMap should be
-         a vector with length equal to NPOS. The key for the entry is used
-         as the column name in the table. No extra columns are added if a
-         value of AST\_\_NULL is supplied for KEYMAP. This keyMap can be used
-         (for instance) to add character columns to the catalogue.
+         An optional AST KeyMap containing data for extra columns to
+         add to the catalogue. It can be used (for instance) to add
+         character columns to the catalogue. If a value of AST\_\_NULL
+         is supplied, no extra columns are added to the catalogue.
+         Otherwise, the column names and values can be specified using
+         either of the following two schemes:
+
+         \sstitemlist{
+
+            \sstitem
+            If the KeyMap contains an entry called {\tt "}COLNAMES{\tt "}, it is
+            assumed to be a vector entry holding the names of the columns.
+            For each of these column names, the value to store in a
+            particular row of the catalogue is assumed to be held in a
+            scalar KeyMap entry with key {\tt "}$<$colname$>$\_$<$row number$>${\tt "} ( {\tt "}\_1{\tt "}
+            for the first row). If no such entry exists for a particular
+            row, then the value is marked as bad in the catalogue. The data
+            type of the column is determined from the first row value found
+            for the column.
+
+            \sstitem
+            If the KeyMap does not contain an entry called {\tt "}COLNAMES{\tt "},
+            it is assumed that each entry in the KeyMap contains a vector
+            holding all the values for a single column, in row order. The
+            entry key is used as the column name, and the column data type
+            is determined from the entry data type.
+         }
       }
       \sstsubsection{
          LABS = INTEGER (Given)
