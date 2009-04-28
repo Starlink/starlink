@@ -116,8 +116,7 @@ itcl::class ::gaia3d::Gaia3dCupidPrism {
       }
    }
 
-   #  Make the extent along the axis fit the data cube limits.
-   #  XXX we want each rectangle to fix to +/-Size3 not the data.
+   #  Extrude the 2D shapes along the selected axis.
    public method fit_to_data {} {
       foreach index [array names collection_] {
          $collection_($index) fit_to_data
@@ -164,7 +163,7 @@ itcl::class ::gaia3d::Gaia3dCupidPrism {
          if { $tranwcs != 0 } {
 
             #  Unformat the ones that might be in sexagesimal.
-            #  Note values from table are already transformed into 
+            #  Note values from table are already transformed into
             #  celestial positions in RA and Dec, so we use that WCS
             #  to unformat not tranwcs, which is in plain degrees.
             set cen1 [gaiautils::astunformat $wcs 1 $cen1]
@@ -179,14 +178,14 @@ itcl::class ::gaia3d::Gaia3dCupidPrism {
             set size2 [expr ($size2/3600.0)]
 
             #  Size[123] are distances, so offset from centre to get positions.
-            set d11 [expr $cen1 - $size1]
-            set d12 [expr $cen2 - $size2]
-            set d13 [expr $cen3 - $size3]
+            set d11 [expr $cen1-$size1]
+            set d12 [expr $cen2-$size2]
+            set d13 [expr $cen3-$size3]
 
-            set d21 [expr $cen1 + $size1]
-            set d22 [expr $cen2 + $size2]
-            set d23 [expr $cen3 + $size3]
-            
+            set d21 [expr $cen1+$size1]
+            set d22 [expr $cen2+$size2]
+            set d23 [expr $cen3+$size3]
+
             #  Transform end positions in degrees to pixels.
             lassign [tran3d_ $tranwcs 0 $d11 $d12 $d13] d11 d12 d13
             lassign [tran3d_ $tranwcs 0 $d21 $d22 $d23] d21 d22 d23
@@ -202,10 +201,18 @@ itcl::class ::gaia3d::Gaia3dCupidPrism {
 
          set x0 [expr $cen1-$size1]
          set x1 [expr $cen1+$size1]
+
          set y0 [expr $cen2-$size2]
          set y1 [expr $cen2+$size2]
-         set collection_($n) [gaia3d::Gaia3dVtkArdRectPrism \#auto \
-                                 -x0 $x0 -y0 $y0 -x1 $x1 -y1 $y1]
+
+         set z0 [expr $cen3-$size3]
+         set z1 [expr $cen3+$size3]
+
+         puts "$x0:$x1, $y0:$y1, $z0:$z1"
+
+         set collection_($n) [gaia3d::Gaia3dVtkRectPrism \#auto \
+                                 -x0 $x0 -y0 $y0 -x1 $x1 -y1 $y1 \
+                                 -zlow $z0 -zhigh $z1]
          incr n
       }
       apply_configuration_
@@ -230,7 +237,6 @@ itcl::class ::gaia3d::Gaia3dCupidPrism {
    protected method apply_configuration_ {} {
       foreach index [array names collection_] {
          $collection_($index) configure \
-            -dataset $dataset \
             -renwindow $renwindow \
             -align_to_axis $align_to_axis \
             -axis $axis \
@@ -245,16 +251,6 @@ itcl::class ::gaia3d::Gaia3dCupidPrism {
    #  The render window (a Gaia3dVtkWindow instance).
    public variable renwindow {} {
       apply_configuration_
-   }
-
-   #  The current vtkImageData instance. Make sure extent information is
-   #  available.
-   public variable dataset {} {
-      if { $dataset != {} } {
-         $dataset Update
-         apply_configuration_
-         fit_to_data
-      }
    }
 
    #  The WCS of the actual datacube.

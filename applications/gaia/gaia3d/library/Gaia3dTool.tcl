@@ -1063,7 +1063,6 @@ itcl::class gaia3d::Gaia3dTool {
          #  Draw the CUPID regions if requested.
          if { $cupid_cat_ == {} } {
             set cupid_cat_ [gaia3d::Gaia3dCupidPrism \#auto \
-                               -dataset [$imagedata_ get_imagedata] \
                                -wcs [$imagedata_ get_wcs] \
                                -renwindow $renwindow_ \
                                -align_to_axis 1 \
