@@ -1,18 +1,18 @@
 #+
 #  Name:
-#     Gaia3dArdLinePrism
+#     Gaia3dVtkColumnPrism
 
 #  Type of Module:
 #     [incr Tcl] class
 
 #  Purpose:
-#     Create and manipulate a line ARD prism (a plane).
+#     Create and manipulate a column prism (an axis aligned plane).
 
 #  Description:
-#     Class that extends Gaia3dVtkLinePrism to support line shapes.
+#     Class that extends Gaia3dVtkPrism to support column shapes.
 
 #  Copyright:
-#     Copyright (C) 2007-2009 Science and Technology Facilities Council
+#     Copyright (C) 2009 Science and Technology Facilities Council
 #     All Rights Reserved.
 
 #  Licence:
@@ -36,7 +36,7 @@
 #     {enter_new_authors_here}
 
 #  History:
-#     07-DEC-2007 (PWD):
+#     28-APR-2009 (PWD):
 #        Original version.
 #     {enter_further_changes_here}
 
@@ -44,11 +44,11 @@
 
 #.
 
-itcl::class ::gaia3d::Gaia3dVtkArdLinePrism {
+itcl::class ::gaia3d::Gaia3dVtkColumnPrism {
 
    #  Inheritances:
    #  -------------
-   inherit gaia3d::Gaia3dVtkLinePrism
+   inherit gaia3d::Gaia3dVtkPrism
 
    #  Constructor:
    #  ------------
@@ -66,35 +66,45 @@ itcl::class ::gaia3d::Gaia3dVtkArdLinePrism {
    #  Methods and procedures:
    #  -----------------------
 
-   #  Get an ARD description for this shape.
-   public method get_desc {} {
-      return "LINE($x0,$y0,$x1,$y1)"
+   #  Create the polygon for the column locus. Should extrude into an axis
+   #  aligned plane. Columns are along the first non-axis dimension, so the 
+   #  coordinate is an X value. Note -1 correction to VTK grid coordinates.
+   protected method create_polygon_ {} {
+
+      $points_ Reset
+      $cells_ Reset
+      $cells_ InsertNextCell 2
+      
+      lassign [get_dimensions_] xdim ydim zdim
+      set col [expr $coord-1]
+
+      if { $axis == 1 } {
+         $points_ InsertPoint 0 $zlow $col 0
+         $points_ InsertPoint 1 $zlow $col $zdim
+      } elseif { $axis == 2 } {
+         $points_ InsertPoint 0 $col $zlow 0
+         $points_ InsertPoint 1 $col $zlow $zdim
+      } else {
+         $points_ InsertPoint 0 $col 0 $zlow
+         $points_ InsertPoint 1 $col $ydim $zlow
+      }
+      $cells_ InsertCellPoint 0
+      $cells_ InsertCellPoint 1
+
+      $polydata_ SetPoints $points_
+      $polydata_ SetPolys $cells_
    }
 
-   #  Set the properties of this object from an ARD description.
-   public method set_from_desc {desc} {
-      lassign [gaia3d::Gaia3dArdUtils::get_ard_args $desc] x0 y0 x1 y1
-      configure -x0 $x0 -x1 $x1 -y0 $y0 -y1 $y1
-   }
-
-   #  Gaia3dArdPrismProxy support
-   #  ===========================
-
-   #  See if an ARD description presents a line.
-   public proc matches {desc} {
-      return [string match -nocase "lin*" $desc]
-   }
-
-   #  Given an ARD description of a line create an instance of this class.
-   #  Make sure this passes the matches check first.
-   public proc instance {desc} {
-      lassign [gaia3d::Gaia3dArdUtils::get_ard_args $desc] x0 y0 x1 y1
-      return [uplevel \#0 gaia3d::Gaia3dVtkArdLinePrism \#auto \
-                 -x0 $x0 -x1 $x1 -y0 $y0 -y1 $y1]
+   #  Apply a shift to the column position.
+   protected method apply_shift_ {sx sy} {
+      configure -coord [expr $coord+$sx]
    }
 
    #  Configuration options: (public variables)
    #  ----------------------
+
+   #  Coordinate of the column.
+   public variable coord 0.0
 
    #  Protected variables: (available to instance)
    #  --------------------

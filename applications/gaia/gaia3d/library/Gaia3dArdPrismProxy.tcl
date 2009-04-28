@@ -279,18 +279,15 @@ itcl::class ::gaia3d::Gaia3dArdPrismProxy {
    #  instance factory method and to map shapes to classes.
    common subclasses_
    array set subclasses_ {
+      circle  Gaia3dVtkArdCirclePrism
+      column  Gaia3dVtkArdColumnPrism
+      ellipse Gaia3dVtkArdEllipsePrism
+      line    Gaia3dVtkArdLinePrism
+      polygon Gaia3dVtkArdPolygonPrism
+      rotbox  Gaia3dVtkArdRotboxPrism
       rect    Gaia3dVtkArdRectPrism
+      row     Gaia3dVtkArdRowPrism
    }
-   #array set subclasses_ {
-   #   circle  Gaia3dVtkArdCirclePrism
-   #   column  Gaia3dVtkArdColumnPrism
-   #   ellipse Gaia3dVtkArdEllipsePrism
-   #   line    Gaia3dVtkArdLinePrism
-   #   polygon Gaia3dVtkArdPolygonPrism
-   #   rect    Gaia3dVtkArdRectPrism
-   #   rotbox  Gaia3dVtkArdRotboxPrism
-   #   row     Gaia3dVtkArdRowPrism
-   #}
 
 #  End of class definition.
 }

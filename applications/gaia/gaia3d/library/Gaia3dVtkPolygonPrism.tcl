@@ -1,18 +1,18 @@
 #+
 #  Name:
-#     Gaia3dArdLinePrism
+#     Gaia3dPolygonPrism
 
 #  Type of Module:
 #     [incr Tcl] class
 
 #  Purpose:
-#     Create and manipulate a line ARD prism (a plane).
+#     Create and manipulate a polygon prism.
 
 #  Description:
-#     Class that extends Gaia3dVtkLinePrism to support line shapes.
+#     Class that extends Gaia3dVtkPrism to support polygon shapes.
 
 #  Copyright:
-#     Copyright (C) 2007-2009 Science and Technology Facilities Council
+#     Copyright (C) 2009 Science and Technology Facilities Council
 #     All Rights Reserved.
 
 #  Licence:
@@ -36,7 +36,7 @@
 #     {enter_new_authors_here}
 
 #  History:
-#     07-DEC-2007 (PWD):
+#     28-APR-2009 (PWD):
 #        Original version.
 #     {enter_further_changes_here}
 
@@ -44,11 +44,11 @@
 
 #.
 
-itcl::class ::gaia3d::Gaia3dVtkArdLinePrism {
+itcl::class ::gaia3d::Gaia3dVtkPolygonPrism {
 
    #  Inheritances:
    #  -------------
-   inherit gaia3d::Gaia3dVtkLinePrism
+   inherit gaia3d::Gaia3dVtkPrism
 
    #  Constructor:
    #  ------------
@@ -66,35 +66,54 @@ itcl::class ::gaia3d::Gaia3dVtkArdLinePrism {
    #  Methods and procedures:
    #  -----------------------
 
-   #  Get an ARD description for this shape.
-   public method get_desc {} {
-      return "LINE($x0,$y0,$x1,$y1)"
+   #  Create the polygon locus. Note -1 correction to VTK grid coords.
+   protected method create_polygon_ {} {
+
+      $points_ Reset
+      $cells_ Reset
+
+      set npoints [expr [llength $coords]/2]
+      $cells_ InsertNextCell $npoints
+
+      #  Separate loops for speed.
+      set i 0
+      if { $axis == 1 } {
+         foreach {x y} $coords {
+            $points_ InsertPoint $i $zlow [expr $x-1] [expr $y-1]
+            $cells_ InsertCellPoint $i
+            incr i
+         }
+      } elseif { $axis == 2 } {
+         foreach {x y} $coords {
+            $points_ InsertPoint $i [expr $x-1] $zlow [expr $y-1]
+            $cells_ InsertCellPoint $i
+            incr i
+         }
+      } else {
+         foreach {x y} $coords {
+            $points_ InsertPoint $i [expr $x-1] [expr $y-1] $zlow
+            $cells_ InsertCellPoint $i
+            incr i
+         }
+      }
+      $polydata_ SetPoints $points_
+      $polydata_ SetPolys $cells_
    }
 
-   #  Set the properties of this object from an ARD description.
-   public method set_from_desc {desc} {
-      lassign [gaia3d::Gaia3dArdUtils::get_ard_args $desc] x0 y0 x1 y1
-      configure -x0 $x0 -x1 $x1 -y0 $y0 -y1 $y1
-   }
-
-   #  Gaia3dArdPrismProxy support
-   #  ===========================
-
-   #  See if an ARD description presents a line.
-   public proc matches {desc} {
-      return [string match -nocase "lin*" $desc]
-   }
-
-   #  Given an ARD description of a line create an instance of this class.
-   #  Make sure this passes the matches check first.
-   public proc instance {desc} {
-      lassign [gaia3d::Gaia3dArdUtils::get_ard_args $desc] x0 y0 x1 y1
-      return [uplevel \#0 gaia3d::Gaia3dVtkArdLinePrism \#auto \
-                 -x0 $x0 -x1 $x1 -y0 $y0 -y1 $y1]
+   #  Apply a shift to the polygon.
+   protected method apply_shift_ {sx sy} {
+      set newcoords {}
+      foreach {x y} $coords {
+         lappend newcoords [expr $x+$sx] [expr $y+$sy]
+      }
+      configure -coords $newcoords
    }
 
    #  Configuration options: (public variables)
    #  ----------------------
+
+   #  X, Y coordinates in pairs.
+   public variable coords {0.0 0.0 1.0 1.0}
 
    #  Protected variables: (available to instance)
    #  --------------------

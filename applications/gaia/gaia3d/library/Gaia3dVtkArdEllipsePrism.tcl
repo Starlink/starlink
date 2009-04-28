@@ -9,7 +9,8 @@
 #     Create and manipulate an elliptical ARD prism.
 
 #  Description:
-#     Class that extends Gaia3dVtkArdPrism to support elliptical shapes.
+#     Class that extends Gaia3dVtkEllipsePrism to support ARD elliptical
+#     shapes.
 
 #  Copyright:
 #     Copyright (C) 2007 Science and Technology Facilities Council
@@ -48,7 +49,7 @@ itcl::class ::gaia3d::Gaia3dVtkArdEllipsePrism {
 
    #  Inheritances:
    #  -------------
-   inherit gaia3d::Gaia3dVtkArdPrism
+   inherit gaia3d::Gaia3dVtkEllipsePrism
 
    #  Constructor:
    #  ------------
@@ -66,63 +67,6 @@ itcl::class ::gaia3d::Gaia3dVtkArdEllipsePrism {
    #  Methods and procedures:
    #  -----------------------
 
-   #  Create the polygon for the elliptical locus. Note -1 correction of
-   #  centre to VTK grid coords.
-   protected method create_polygon_ {} {
-
-      $points_ Reset
-      $cells_ Reset
-      $cells_ InsertNextCell $segments
-      set step [expr $2pi_/($segments-1)]
-
-      set cospa [expr cos($angle*$d2r_)]
-      set sinpa [expr sin($angle*$d2r_)]
-      set minorcospa [expr $semiminor*$cospa]
-      set majorcospa [expr $semimajor*$cospa]
-      set minorsinpa [expr $semiminor*$sinpa]
-      set majorsinpa [expr $semimajor*$sinpa]
-
-      set xc [expr $xcentre-1]
-      set yc [expr $ycentre-1]
-
-      #  Separate loops by axis for speed.
-      if { $axis == 1 } {
-         for {set i 0} {$i < $segments} {incr i} {
-            set costheta [expr cos($step*$i)]
-            set sintheta [expr sin($step*$i)]
-            set x [expr $xc + $majorcospa*$costheta - $minorsinpa*$sintheta]
-            set y [expr $yc + $majorsinpa*$costheta + $minorcospa*$sintheta]
-            $points_ InsertPoint $i 0.0 $x $y
-            $cells_ InsertCellPoint $i
-         }
-      } elseif { $axis == 2 } {
-         for {set i 0} {$i < $segments} {incr i} {
-            set costheta [expr cos($step*$i)]
-            set sintheta [expr sin($step*$i)]
-            set x [expr $xc + $majorcospa*$costheta - $minorsinpa*$sintheta]
-            set y [expr $yc + $majorsinpa*$costheta + $minorcospa*$sintheta]
-            $points_ InsertPoint $i $x 0.0 $y
-            $cells_ InsertCellPoint $i
-         }
-      } else {
-         for {set i 0} {$i < $segments} {incr i} {
-            set costheta [expr cos($step*$i)]
-            set sintheta [expr sin($step*$i)]
-            set x [expr $xc + $majorcospa*$costheta - $minorsinpa*$sintheta]
-            set y [expr $yc + $majorsinpa*$costheta + $minorcospa*$sintheta]
-            $points_ InsertPoint $i $x $y 0.0
-            $cells_ InsertCellPoint $i
-         }
-      }
-      $polydata_ SetPoints $points_
-      $polydata_ SetPolys $cells_
-   }
-
-   #  Apply a shift to the centre.
-   protected method apply_shift_ {sx sy} {
-      configure -xcentre [expr $xcentre+$sx] -ycentre [expr $ycentre+$sy]
-   }
-
    #  Get an ARD description for this shape.
    public method get_desc {} {
       return "ELLIPSE($xcentre,$ycentre,$semimajor,$semiminor,$angle)"
@@ -130,11 +74,14 @@ itcl::class ::gaia3d::Gaia3dVtkArdEllipsePrism {
 
    #  Set the properties of this object from an ARD description.
    public method set_from_desc {desc} {
-      lassign [get_ard_args $desc] xcentre ycentre smajor sminor angle
+      lassign [gaia3d::Gaia3dArdUtils::get_ard_args $desc] \
+         xcentre ycentre smajor sminor angle
       configure -xcentre $xcentre -ycentre $ycentre -semimajor $smajor \
          -semiminor $sminor -angle $angle
    }
 
+   #  Gaia3dArdPrismProxy support
+   #  ===========================
 
    #  See if an ARD description presents an ellipse.
    public proc matches {desc} {
@@ -144,7 +91,8 @@ itcl::class ::gaia3d::Gaia3dVtkArdEllipsePrism {
    #  Given an ARD description of an ellipse create an instance of this class.
    #  Make sure this passes the matches check first.
    public proc instance {desc} {
-      lassign [get_ard_args $desc] xcentre ycentre smajor sminor angle
+      lassign [gaia3d::Gaia3dArdUtils::get_ard_args $desc] \
+         xcentre ycentre smajor sminor angle
       return [uplevel \#0 gaia3d::Gaia3dVtkArdEllipsePrism \#auto \
                  -xcentre $xcentre -ycentre $ycentre \
                  -semimajor $smajor -semiminor $sminor -angle $angle]
@@ -152,24 +100,6 @@ itcl::class ::gaia3d::Gaia3dVtkArdEllipsePrism {
 
    #  Configuration options: (public variables)
    #  ----------------------
-
-   #  X position.
-   public variable xcentre 0
-
-   #  Y position.
-   public variable ycentre 0
-
-   #  Semimajor axis.
-   public variable semimajor 1.0
-
-   #  Semiminor axis.
-   public variable semiminor 1.0
-
-   #  Position angle.
-   public variable angle 0.0
-
-   #  Number of segments used for the locus.
-   public variable segments 30
 
    #  Protected variables: (available to instance)
    #  --------------------

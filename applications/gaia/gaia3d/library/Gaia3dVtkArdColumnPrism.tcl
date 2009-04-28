@@ -9,7 +9,7 @@
 #     Create and manipulate a column ARD prism (an axis aligned plane).
 
 #  Description:
-#     Class that extends Gaia3dVtkArdPrism to support column shapes.
+#     Class that extends Gaia3dVtkColumnPrism to support ARD column shapes.
 
 #  Copyright:
 #     Copyright (C) 2007 Science and Technology Facilities Council
@@ -48,7 +48,7 @@ itcl::class ::gaia3d::Gaia3dVtkArdColumnPrism {
 
    #  Inheritances:
    #  -------------
-   inherit gaia3d::Gaia3dVtkArdPrism
+   inherit gaia3d::Gaia3dVtkColumnPrism
 
    #  Constructor:
    #  ------------
@@ -66,40 +66,6 @@ itcl::class ::gaia3d::Gaia3dVtkArdColumnPrism {
    #  Methods and procedures:
    #  -----------------------
 
-   #  Create the polygon for the column locus. Should extrude into an axis
-   #  aligned plane. Columns are along the first non-axis dimension, so the 
-   #  coordinate is an X value. Note -1 correction to VTK grid coordinates.
-   protected method create_polygon_ {} {
-
-      $points_ Reset
-      $cells_ Reset
-      $cells_ InsertNextCell 2
-      
-      lassign [get_dimensions_] xdim ydim zdim
-      set col [expr $coord-1]
-
-      if { $axis == 1 } {
-         $points_ InsertPoint 0 0.0 $col 0
-         $points_ InsertPoint 1 0.0 $col $zdim
-      } elseif { $axis == 2 } {
-         $points_ InsertPoint 0 $col 0.0 0
-         $points_ InsertPoint 1 $col 0.0 $zdim
-      } else {
-         $points_ InsertPoint 0 $col 0 0.0
-         $points_ InsertPoint 1 $col $ydim 0.0
-      }
-      $cells_ InsertCellPoint 0
-      $cells_ InsertCellPoint 1
-
-      $polydata_ SetPoints $points_
-      $polydata_ SetPolys $cells_
-   }
-
-   #  Apply a shift to the column position.
-   protected method apply_shift_ {sx sy} {
-      configure -coord [expr $coord+$sx]
-   }
-
    #  Get an ARD description for this shape.
    public method get_desc {} {
       return "COLUMN($coord)"
@@ -107,8 +73,11 @@ itcl::class ::gaia3d::Gaia3dVtkArdColumnPrism {
 
    #  Set the properties of this object from an ARD description.
    public method set_from_desc {desc} {
-      configure -coord [get_ard_args $desc]
+      configure -coord [gaia3d::Gaia3dArdUtils::get_ard_args $desc]
    }
+
+   #  Gaia3dArdPrismProxy support
+   #  ===========================
 
    #  See if an ARD description presents a column.
    public proc matches {desc} {
@@ -118,16 +87,13 @@ itcl::class ::gaia3d::Gaia3dVtkArdColumnPrism {
    #  Given an ARD description of a column create an instance of this class.
    #  Make sure this passes the matches check first.
    public proc instance {desc} {
-      set coord [get_ard_args $desc]
+      set coord [gaia3d::Gaia3dArdUtils::get_ard_args $desc]
       return [uplevel \#0 gaia3d::Gaia3dVtkArdColumnPrism \#auto \
                  -coord $coord]
    }
 
    #  Configuration options: (public variables)
    #  ----------------------
-
-   #  Coordinate of the column.
-   public variable coord 0.0
 
    #  Protected variables: (available to instance)
    #  --------------------

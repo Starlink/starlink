@@ -9,7 +9,7 @@
 #     Create and manipulate a row ARD prism (an axis aligned plane).
 
 #  Description:
-#     Class that extends Gaia3dVtkArdPrism to support row shapes.
+#     Class that extends Gaia3dVtkRowPrism to support row shapes.
 
 #  Copyright:
 #     Copyright (C) 2007 Science and Technology Facilities Council
@@ -48,7 +48,7 @@ itcl::class ::gaia3d::Gaia3dVtkArdRowPrism {
 
    #  Inheritances:
    #  -------------
-   inherit gaia3d::Gaia3dVtkArdPrism
+   inherit gaia3d::Gaia3dVtkRowPrism
 
    #  Constructor:
    #  ------------
@@ -66,49 +66,18 @@ itcl::class ::gaia3d::Gaia3dVtkArdRowPrism {
    #  Methods and procedures:
    #  -----------------------
 
-   #  Create the polygon for the row locus. Should extrude into an axis
-   #  aligned plane. Rows are along the second non-axis dimension, so the
-   #  coordinate is an Y value. Note -1 correction to VTK grid coords.
-   protected method create_polygon_ {} {
-
-      $points_ Reset
-      $cells_ Reset
-      $cells_ InsertNextCell 2
-
-      lassign [get_dimensions_] xdim ydim zdim
-      set row [expr $coord-1]
-
-      if { $axis == 1 } {
-         $points_ InsertPoint 0 0.0 0     $row
-         $points_ InsertPoint 1 0.0 $ydim $row
-      } elseif { $axis == 2 } {
-         $points_ InsertPoint 0 0     0.0 $row
-         $points_ InsertPoint 1 $xdim 0.0 $row
-      } else {
-         $points_ InsertPoint 0 0     $row 0.0
-         $points_ InsertPoint 1 $xdim $row 0.0
-      }
-      $cells_ InsertCellPoint 0
-      $cells_ InsertCellPoint 1
-
-      $polydata_ SetPoints $points_
-      $polydata_ SetPolys $cells_
-   }
-
-   #  Apply a shift to the row position.
-   protected method apply_shift_ {sx sy} {
-      configure -coord [expr $coord+$sy]
-   }
-
    #  Set the properties of this object from an ARD description.
    public method set_from_desc {desc} {
-      configure -coord [get_ard_args $desc]
+      configure -coord [gaia3d::Gaia3dArdUtils::get_ard_args $desc]
    }
 
    #  Get an ARD description for this shape.
    public method get_desc {} {
       return "ROW($coord)"
    }
+
+   #  Gaia3dArdPrismProxy support
+   #  ===========================
 
    #  See if an ARD description presents a row.
    public proc matches {desc} {
@@ -118,15 +87,12 @@ itcl::class ::gaia3d::Gaia3dVtkArdRowPrism {
    #  Given an ARD description of a row create an instance of this class.
    #  Make sure this passes the matches check first.
    public proc instance {desc} {
-      set coord [get_ard_args $desc] 
+      set coord [gaia3d::Gaia3dArdUtils::get_ard_args $desc] 
       return [uplevel \#0 gaia3d::Gaia3dVtkArdRowPrism \#auto -coord $coord]
    }
 
    #  Configuration options: (public variables)
    #  ----------------------
-
-   #  Coordinate of the row.
-   public variable coord 0.0
 
    #  Protected variables: (available to instance)
    #  --------------------
