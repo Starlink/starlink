@@ -762,7 +762,7 @@
 *        Change smf_open_ndfname API.
 *        Use smf_expand_tilegroup
 *     24-APR-2009 (TIMJ):
-*        Now summarizes the inpout observations.
+*        Now summarizes the input observations.
 
 *  Copyright:
 *     Copyright (C) 2007-2009 Science and Technology Facilities Council.
