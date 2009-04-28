@@ -19,7 +19,7 @@
 
 *  Arguments:
 *     wf = smfWorkForce * (Given)
-*        Pointer to a pool of worker threads that will do the re-binning.
+*        Pointer to a pool of worker threads (can be NULL)
 *     data = smfData * (Given and Returned)
 *        The data to be filtered (performed in-place)
 *     srate = double (Given)
