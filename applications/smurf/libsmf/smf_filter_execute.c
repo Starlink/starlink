@@ -110,7 +110,7 @@
 /* ------------------------------------------------------------------------ */
 /* Local variables and functions */
 
-pthread_mutex_t plan_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t smf_filter_execute_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 /* Structure containing information about blocks of bolos to be
    filtered by each thread. All threads read/write to/from mutually
@@ -339,7 +339,7 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt,
 
     /* Setup forward FFT plan using guru interface. Requires protection
        with a mutex */
-    smf_mutex_lock( &plan_mutex, status );
+    smf_mutex_lock( &smf_filter_execute_mutex, status );
 
     if( *status == SAI__OK ) {
       /* Just use the data_fft_* arrays from the first chunk of job data since
@@ -353,7 +353,7 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt,
                                                           FFTW_UNALIGNED );
     }
     
-    smf_mutex_unlock( &plan_mutex, status );
+    smf_mutex_unlock( &smf_filter_execute_mutex, status );
     
     if( !pdata->plan_forward && (*status == SAI__OK) ) {
       *status = SAI__ERROR;
@@ -363,7 +363,7 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt,
     }
     
     /* Setup inverse FFT plan using guru interface */
-    smf_mutex_lock( &plan_mutex, status );
+    smf_mutex_lock( &smf_filter_execute_mutex, status );
     
     if( *status == SAI__OK ) {
       pdata->plan_inverse = fftw_plan_guru_split_dft_c2r( 1, &dims, 0, NULL,
@@ -374,7 +374,7 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt,
                                                           FFTW_UNALIGNED);
     }
     
-    smf_mutex_unlock( &plan_mutex, status );
+    smf_mutex_unlock( &smf_filter_execute_mutex, status );
     
     if( !pdata->plan_inverse && (*status==SAI__OK) ) {
       *status = SAI__ERROR;
@@ -410,10 +410,10 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt,
       if( pdata->data_fft_i ) pdata->data_fft_i = smf_free( pdata->data_fft_i, 
                                                             status);
       /* Destroy the plans */ 
-      smf_mutex_lock( &plan_mutex, status );
+      smf_mutex_lock( &smf_filter_execute_mutex, status );
       fftw_destroy_plan( pdata->plan_forward );
       fftw_destroy_plan( pdata->plan_inverse );
-      smf_mutex_unlock( &plan_mutex, status );
+      smf_mutex_unlock( &smf_filter_execute_mutex, status );
     }
     job_data = smf_free( job_data, status );
   }
