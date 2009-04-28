@@ -78,16 +78,17 @@ itcl::class ::gaia3d::Gaia3dVtkLinePrism {
       set x1v [expr $x1-1]
       set y0v [expr $y0-1]
       set y1v [expr $y1-1]
+      set z0v [expr $zlow-1]
 
       if { $axis == 1 } {
-         $points_ InsertPoint 0 $zlow $x0v $y0v
-         $points_ InsertPoint 1 $zlow $x1v $y1v
+         $points_ InsertPoint 0 $z0v $x0v $y0v
+         $points_ InsertPoint 1 $z0v $x1v $y1v
       } elseif { $axis == 2 } {
-         $points_ InsertPoint 0 $x0v $zlow $y0v
-         $points_ InsertPoint 1 $x1v $zlow $y1v
+         $points_ InsertPoint 0 $x0v $z0v $y0v
+         $points_ InsertPoint 1 $x1v $z0v $y1v
       } else {
-         $points_ InsertPoint 0 $x0v $y0v $zlow
-         $points_ InsertPoint 1 $x1v $y1v $zlow
+         $points_ InsertPoint 0 $x0v $y0v $z0v
+         $points_ InsertPoint 1 $x1v $y1v $z0v
       }
       $cells_ InsertCellPoint 0
       $cells_ InsertCellPoint 1

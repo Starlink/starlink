@@ -75,23 +75,25 @@ itcl::class ::gaia3d::Gaia3dVtkPolygonPrism {
       set npoints [expr [llength $coords]/2]
       $cells_ InsertNextCell $npoints
 
+      set z [expr $zlow-1]
+
       #  Separate loops for speed.
       set i 0
       if { $axis == 1 } {
          foreach {x y} $coords {
-            $points_ InsertPoint $i $zlow [expr $x-1] [expr $y-1]
+            $points_ InsertPoint $i $z [expr $x-1] [expr $y-1]
             $cells_ InsertCellPoint $i
             incr i
          }
       } elseif { $axis == 2 } {
          foreach {x y} $coords {
-            $points_ InsertPoint $i [expr $x-1] $zlow [expr $y-1]
+            $points_ InsertPoint $i [expr $x-1] $z [expr $y-1]
             $cells_ InsertCellPoint $i
             incr i
          }
       } else {
          foreach {x y} $coords {
-            $points_ InsertPoint $i [expr $x-1] [expr $y-1] $zlow
+            $points_ InsertPoint $i [expr $x-1] [expr $y-1] $z
             $cells_ InsertCellPoint $i
             incr i
          }

@@ -77,16 +77,17 @@ itcl::class ::gaia3d::Gaia3dVtkRowPrism {
 
       lassign [get_dimensions_] xdim ydim zdim
       set row [expr $coord-1]
+      set z [expr $zlow-1]
 
       if { $axis == 1 } {
-         $points_ InsertPoint 0 $zlow 0     $row
-         $points_ InsertPoint 1 $zlow $ydim $row
+         $points_ InsertPoint 0 $z 0     $row
+         $points_ InsertPoint 1 $z $ydim $row
       } elseif { $axis == 2 } {
-         $points_ InsertPoint 0 0     $zlow $row
-         $points_ InsertPoint 1 $xdim $zlow $row
+         $points_ InsertPoint 0 0     $z $row
+         $points_ InsertPoint 1 $xdim $z $row
       } else {
-         $points_ InsertPoint 0 0     $row $zlow
-         $points_ InsertPoint 1 $xdim $row $zlow
+         $points_ InsertPoint 0 0     $row $z
+         $points_ InsertPoint 1 $xdim $row $z
       }
       $cells_ InsertCellPoint 0
       $cells_ InsertCellPoint 1

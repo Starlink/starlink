@@ -67,26 +67,27 @@ itcl::class ::gaia3d::Gaia3dVtkColumnPrism {
    #  -----------------------
 
    #  Create the polygon for the column locus. Should extrude into an axis
-   #  aligned plane. Columns are along the first non-axis dimension, so the 
+   #  aligned plane. Columns are along the first non-axis dimension, so the
    #  coordinate is an X value. Note -1 correction to VTK grid coordinates.
    protected method create_polygon_ {} {
 
       $points_ Reset
       $cells_ Reset
       $cells_ InsertNextCell 2
-      
+
       lassign [get_dimensions_] xdim ydim zdim
       set col [expr $coord-1]
+      set z [expr $zlow-1]
 
       if { $axis == 1 } {
-         $points_ InsertPoint 0 $zlow $col 0
-         $points_ InsertPoint 1 $zlow $col $zdim
+         $points_ InsertPoint 0 $z $col 0
+         $points_ InsertPoint 1 $z $col $zdim
       } elseif { $axis == 2 } {
-         $points_ InsertPoint 0 $col $zlow 0
-         $points_ InsertPoint 1 $col $zlow $zdim
+         $points_ InsertPoint 0 $col $z 0
+         $points_ InsertPoint 1 $col $z $zdim
       } else {
-         $points_ InsertPoint 0 $col 0 $zlow
-         $points_ InsertPoint 1 $col $ydim $zlow
+         $points_ InsertPoint 0 $col 0 $z
+         $points_ InsertPoint 1 $col $ydim $z
       }
       $cells_ InsertCellPoint 0
       $cells_ InsertCellPoint 1

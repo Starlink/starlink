@@ -93,27 +93,28 @@ itcl::class ::gaia3d::Gaia3dVtkRotboxPrism {
 
       set xc [expr $xcentre-1]
       set yc [expr $ycentre-1]
-    
+      set zc [expr $zlow-1]
+
       #  Now Apply rotation and offset. Separate loops for speed.
       if { $axis == 1 } {
          for {set i 0} {$i < 4} {incr i} {
             set x [expr $xc + $cx($i)*$cospa - $cy($i)*$sinpa]
             set y [expr $yc + $cx($i)*$sinpa + $cy($i)*$cospa]
-            $points_ InsertPoint $i $zlow $x $y
+            $points_ InsertPoint $i $zc $x $y
             $cells_ InsertCellPoint $i
          }
       } elseif { $axis == 2 } {
          for {set i 0} {$i < 4} {incr i} {
             set x [expr $xc + $cx($i)*$cospa - $cy($i)*$sinpa]
             set y [expr $yc + $cx($i)*$sinpa + $cy($i)*$cospa]
-            $points_ InsertPoint $i $x $zlow $y
+            $points_ InsertPoint $i $x $zc $y
             $cells_ InsertCellPoint $i
          }
       } else {
          for {set i 0} {$i < 4} {incr i} {
             set x [expr $xc + $cx($i)*$cospa - $cy($i)*$sinpa]
             set y [expr $yc + $cx($i)*$sinpa + $cy($i)*$cospa]
-            $points_ InsertPoint $i $x $y $zlow
+            $points_ InsertPoint $i $x $y $zc
             $cells_ InsertCellPoint $i
          }
       }

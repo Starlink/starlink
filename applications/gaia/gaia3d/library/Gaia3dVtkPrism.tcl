@@ -229,8 +229,8 @@ itcl::class ::gaia3d::Gaia3dVtkPrism {
    public variable axis 3 {}
 
    #  The extrusion limits. Only used if the dataset is not defined.
-   public variable zhigh 0
-   public variable zlow 0
+   public variable zhigh 1
+   public variable zlow 1
 
    #  The colour (Tcl colour).
    public variable colour {#0ff} {

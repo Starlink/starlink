@@ -84,6 +84,7 @@ itcl::class ::gaia3d::Gaia3dVtkEllipsePrism {
 
       set xc [expr $xcentre-1]
       set yc [expr $ycentre-1]
+      set zc [expr $zlow-1]
 
       #  Separate loops by axis for speed.
       if { $axis == 1 } {
@@ -92,7 +93,7 @@ itcl::class ::gaia3d::Gaia3dVtkEllipsePrism {
             set sintheta [expr sin($step*$i)]
             set x [expr $xc + $majorcospa*$costheta - $minorsinpa*$sintheta]
             set y [expr $yc + $majorsinpa*$costheta + $minorcospa*$sintheta]
-            $points_ InsertPoint $i $zlow $x $y
+            $points_ InsertPoint $i $zc $x $y
             $cells_ InsertCellPoint $i
          }
       } elseif { $axis == 2 } {
@@ -101,7 +102,7 @@ itcl::class ::gaia3d::Gaia3dVtkEllipsePrism {
             set sintheta [expr sin($step*$i)]
             set x [expr $xc + $majorcospa*$costheta - $minorsinpa*$sintheta]
             set y [expr $yc + $majorsinpa*$costheta + $minorcospa*$sintheta]
-            $points_ InsertPoint $i $x $zlow $y
+            $points_ InsertPoint $i $x $zc $y
             $cells_ InsertCellPoint $i
          }
       } else {
@@ -110,7 +111,7 @@ itcl::class ::gaia3d::Gaia3dVtkEllipsePrism {
             set sintheta [expr sin($step*$i)]
             set x [expr $xc + $majorcospa*$costheta - $minorsinpa*$sintheta]
             set y [expr $yc + $majorsinpa*$costheta + $minorcospa*$sintheta]
-            $points_ InsertPoint $i $x $y $zlow
+            $points_ InsertPoint $i $x $y $zc
             $cells_ InsertCellPoint $i
          }
       }

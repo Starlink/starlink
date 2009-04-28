@@ -65,7 +65,7 @@ itcl::class ::gaia3d::Gaia3dVtkLine {
       #  Create the mapper.
       set mapper_ [::vtkPolyDataMapper New]
       $mapper_ SetInput [$line_ GetOutput]
-      
+
       #  And the prop.
       set prop_ [::vtkActor New]
       $prop_ SetMapper $mapper_
@@ -222,7 +222,7 @@ itcl::class ::gaia3d::Gaia3dVtkLine {
    #  Clip a position to lie with the current cube. If no cube is defined
    #  then the position is returned unchanged.
    protected method clip_position_ {x y z} {
-      if { $dataset != {} } { 
+      if { $dataset != {} } {
          lassign [get_dimensions_] xdim ydim zdim
          if { $x < 0 } {
             set x 0

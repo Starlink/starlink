@@ -77,6 +77,7 @@ itcl::class ::gaia3d::Gaia3dVtkCirclePrism {
 
       set xc [expr $xcentre-1]
       set yc [expr $ycentre-1]
+      set zc [expr $zlow-1]
 
       set step [expr $2pi_/($segments-1)]
 
@@ -85,21 +86,21 @@ itcl::class ::gaia3d::Gaia3dVtkCirclePrism {
          for {set i 0} {$i < $segments} {incr i} {
             set x [expr $xc + $radius*cos($step*$i)]
             set y [expr $yc + $radius*sin($step*$i)]
-            $points_ InsertPoint $i $zlow $x $y
+            $points_ InsertPoint $i $zc $x $y
             $cells_ InsertCellPoint $i
          }
       } elseif { $axis == 2 } {
          for {set i 0} {$i < $segments} {incr i} {
             set x [expr $xc + $radius*cos($step*$i)]
             set y [expr $yc + $radius*sin($step*$i)]
-            $points_ InsertPoint $i $x $zlow $y
+            $points_ InsertPoint $i $x $zc $y
             $cells_ InsertCellPoint $i
          }
       } else {
          for {set i 0} {$i < $segments} {incr i} {
             set x [expr $xc + $radius*cos($step*$i)]
             set y [expr $yc + $radius*sin($step*$i)]
-            $points_ InsertPoint $i $x $y $zlow
+            $points_ InsertPoint $i $x $y $zc
             $cells_ InsertCellPoint $i
          }
       }

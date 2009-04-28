@@ -208,8 +208,6 @@ itcl::class ::gaia3d::Gaia3dCupidPrism {
          set z0 [expr $cen3-$size3]
          set z1 [expr $cen3+$size3]
 
-         puts "$x0:$x1, $y0:$y1, $z0:$z1"
-
          set collection_($n) [gaia3d::Gaia3dVtkRectPrism \#auto \
                                  -x0 $x0 -y0 $y0 -x1 $x1 -y1 $y1 \
                                  -zlow $z0 -zhigh $z1]
