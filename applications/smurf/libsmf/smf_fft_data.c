@@ -243,7 +243,6 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
   double df=0;                  /* Frequency step size in Hz */
   fftw_iodim dims;              /* I/O dimensions for transformations */
   AstCmpMap *fftmapping=NULL;   /* Mapping from GRID to curframe2d */
-  fftw_iodim howmany_dims;      /* I/O dimensions for transformations */
   int i;                        /* Loop counter */
   int isFFT=0;                  /* Are the input data freq. domain? */
   size_t j;                     /* Loop counter */
@@ -428,7 +427,7 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
         baseB = retdata->pntr[0];
 
         smf_mutex_lock( &smf_fft_data_mutex, status );
-        pdata->plan = fftw_plan_guru_split_dft_c2r( 1, &dims, 1, &howmany_dims,
+        pdata->plan = fftw_plan_guru_split_dft_c2r( 1, &dims, 0, NULL,
                                                     baseR, baseI, 
                                                     baseB, 
                                                     FFTW_ESTIMATE |
