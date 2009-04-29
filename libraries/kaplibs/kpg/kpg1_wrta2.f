@@ -340,7 +340,6 @@
       MAXLEN = 0
 
       IF( KEYMAP .NE. AST__NULL ) THEN
-      CALL AST_SHOW( KEYMAP, STATUS )
 
 *  Scheme 1 - does the KeyMap have an entry called COLNAMES? If so, it
 *  is a vector holding the column names. Each column value is in a separate
@@ -596,7 +595,7 @@
 *  columns.
          IF( MAXLEN .GT. 0 ) THEN
             DO J = 1, NKMCOL
-               IF( KMLEN( I ) .GT. 0 ) THEN         
+               IF( KMLEN( J ) .GT. 0 ) THEN         
 
 *  If the KeyMap uses the scheme based on scalar-values...
                   IF( SCHEME .EQ. 1 ) THEN
