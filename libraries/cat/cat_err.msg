@@ -39,4 +39,5 @@ INVCD	<Invalid catalogue description>
 INVAS	<Invalid AST frame-set>
 INVAP	<Invalid AST frame-set specification>
 DUPNM	<Duplicate column, parameter or expression name>
+CSIZE	<Character column size too large>
 .END

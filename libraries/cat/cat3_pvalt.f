@@ -382,7 +382,7 @@
 
             IF (.NOT. LNULFG) THEN
                CALL FTPCLS (FITUNT, COLNO, ROWNO, ELEM, 1,
-     :           BUFFC(1 : 20),
+     :           BUFFC,
      :           FITSTT)
             ELSE
                CALL FTPCLU (FITUNT, COLNO, ROWNO, ELEM, 1, FITSTT)
@@ -831,7 +831,7 @@
 
             IF (.NOT. LNULFG) THEN
                CALL FTPCLS (FITUNT, COLNO, ROWNO, ELEM, 1,
-     :           BUFFC(1 : 20),
+     :           BUFFC,
      :           FITSTT)
             ELSE
                CALL FTPCLU (FITUNT, COLNO, ROWNO, ELEM, 1, FITSTT)
@@ -1280,7 +1280,7 @@
 
             IF (.NOT. LNULFG) THEN
                CALL FTPCLS (FITUNT, COLNO, ROWNO, ELEM, 1,
-     :           BUFFC(1 : 20),
+     :           BUFFC,
      :           FITSTT)
             ELSE
                CALL FTPCLU (FITUNT, COLNO, ROWNO, ELEM, 1, FITSTT)
@@ -1729,7 +1729,7 @@
 
             IF (.NOT. LNULFG) THEN
                CALL FTPCLS (FITUNT, COLNO, ROWNO, ELEM, 1,
-     :           BUFFC(1 : 20),
+     :           BUFFC,
      :           FITSTT)
             ELSE
                CALL FTPCLU (FITUNT, COLNO, ROWNO, ELEM, 1, FITSTT)
@@ -2178,7 +2178,7 @@
 
             IF (.NOT. LNULFG) THEN
                CALL FTPCLS (FITUNT, COLNO, ROWNO, ELEM, 1,
-     :           BUFFC(1 : 20),
+     :           BUFFC,
      :           FITSTT)
             ELSE
                CALL FTPCLU (FITUNT, COLNO, ROWNO, ELEM, 1, FITSTT)
@@ -2627,7 +2627,7 @@
 
             IF (.NOT. LNULFG) THEN
                CALL FTPCLS (FITUNT, COLNO, ROWNO, ELEM, 1,
-     :           BUFFC(1 : 20),
+     :           BUFFC,
      :           FITSTT)
             ELSE
                CALL FTPCLU (FITUNT, COLNO, ROWNO, ELEM, 1, FITSTT)
@@ -3076,7 +3076,7 @@
 
             IF (.NOT. LNULFG) THEN
                CALL FTPCLS (FITUNT, COLNO, ROWNO, ELEM, 1,
-     :           BUFFC(1 : 20),
+     :           BUFFC,
      :           FITSTT)
             ELSE
                CALL FTPCLU (FITUNT, COLNO, ROWNO, ELEM, 1, FITSTT)

@@ -122,6 +122,7 @@
       IMPLICIT NONE
 *  Global Constants:
       INCLUDE 'CAT_PAR'           ! External CAT constants.
+      INCLUDE 'CAT_ERR'           ! CAT error constants.
 *  Arguments Given:
       INTEGER
      :  FI,
@@ -180,6 +181,18 @@
          CALL CAT_TIQAC (FI, 'EXFMT', EXTFMT, STATUS)
          CALL CAT_TIQAL (FI, 'PRFDSP', PRFDSP, STATUS)
          CALL CAT_TIQAC (FI, 'COMM', COMM, STATUS)
+
+*
+*  Check the string size is not greater than the maximum allowed size.
+         IF( CSIZE .GT. CAT__SZVAL .AND. STATUS .EQ. CAT__OK ) THEN
+            STATUS = CAT__CSIZE
+            CALL MSG_SETC( 'N', FNAME )
+            CALL MSG_SETI( 'C', CSIZE )
+            CALL MSG_SETI( 'M', CAT__SZVAL )
+            CALL ERR_REP( 'CAT_CINQ_CSIZE', 'Size of character column'//
+     :                    ' ^N is ^C, but the maximum allowed is ^M.',
+     :                    STATUS )
+         END IF
 
 *
 *       Report any error.

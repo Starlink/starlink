@@ -120,7 +120,7 @@
       PARAMETER (CAT__SZCOM = 80)  ! or parameter.
 
       INTEGER CAT__SZVAL   ! Maximum size of value attribute for a 
-      PARAMETER (CAT__SZVAL = 80)  ! parameter.
+      PARAMETER (CAT__SZVAL = 500)  ! parameter.
 
       INTEGER CAT__SZEXP   ! Maximum size of character string to hold an
       PARAMETER (CAT__SZEXP = 200) ! expression.

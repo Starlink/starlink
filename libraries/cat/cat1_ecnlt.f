@@ -124,7 +124,7 @@
 *  Status:
       INTEGER STATUS         ! Global status
 *  Local Variables:
-      CHARACTER*80
+      CHARACTER*(CAT__SZVAL)
      :  LVAL     ! Local buffer of same data type as input null value.
       CHARACTER
      :  BUFFER*(CAT__SZVAL)  ! Local character buffer.

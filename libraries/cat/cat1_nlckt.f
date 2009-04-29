@@ -334,7 +334,7 @@
       INTEGER
      :  NULTYP,    ! Type of null: default, explicit or locum.
      :  ERRLEN     ! Length of ERRMSG (excl. trail. blanks).
-      CHARACTER*80
+      CHARACTER*(CAT__SZVAL)
      :  SNULL      ! Exception value for the column.
       CHARACTER
      :  ERRMSG*75, ! Error message.
