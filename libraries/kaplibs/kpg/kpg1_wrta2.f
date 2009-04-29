@@ -420,12 +420,12 @@
 *  length of the longest string in the column. Otherwise, we can leave
 *  the loop now since all formatted values will be equal in length.
                      IF( TYPE .NE. AST__STRINGTYPE ) DONE = .TRUE.
+                  END IF
 
-*  If the entry does not exists in the KeyMap, find the index of the next 
-*  row, or leave the loop if all rows have been done.
-                  ELSE IF( J .LT. NPOS ) THEN
+*  Find the index of the next row, or leave the loop if all rows have been 
+*  done.
+                  IF( J .LT. NPOS ) THEN
                      J = J + 1
-
                   ELSE
                      DONE = .TRUE.
                   END IF
@@ -611,7 +611,8 @@
 *  Atemmpt to get the formatted value from the KeyMap. 
                      GOTVAL = AST_MAPGET0C( KEYMAP, KEY, 
      :                                    %VAL( CNF_PVAL( IPTEXT ) ), 
-     :                                    VLEN, STATUS, %VAL( MAXLEN ) ) 
+     :                                    VLEN, STATUS, %VAL(LEN(KEY)),
+     :                                    %VAL(MAXLEN) ) 
 
 *  If the KeyMap uses the scheme based on vector-values...
                   ELSE
@@ -625,7 +626,8 @@
                      IF( I .LE. KMLEN( J ) ) THEN
                         GOTVAL = AST_MAPGETELEMC( KEYMAP, KEY, I, 
      :                                       %VAL( CNF_PVAL( IPTEXT ) ), 
-     :                                       STATUS, %VAL( MAXLEN ) ) 
+     :                                       STATUS, %VAL( LEN( KEY ) ),
+     :                                       %VAL( MAXLEN ) ) 
                      ELSE
                         GOTVAL = .FALSE.
                      END IF
@@ -633,8 +635,8 @@
 
 *  If no value was obtained, fill the value with spaces.
                   IF( .NOT. GOTVAL ) CALL CHR_FILL( ' ', 
-     :                                         %VAL( CNF_PVAL(IPTEXT) ), 
-     :                                         %VAL( MAXLEN ) ) 
+     :                                       %VAL( CNF_PVAL(IPTEXT) ), 
+     :                                       %VAL( 1 ), %VAL( MAXLEN ) ) 
 
 *  Store the value.
                   CALL CAT_PUT0C( KMCOL( J ), %VAL( CNF_PVAL(IPTEXT) ),
