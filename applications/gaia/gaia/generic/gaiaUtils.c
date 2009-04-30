@@ -188,7 +188,7 @@ int gaiaUtilsGtAxisWcs( AstFrameSet *fullwcs, int axis, int offset,
        }
        inperm[ iaxes[0] - 1 ] = 1;
        outperm[0] = iaxes[0];
-       joined = (AstMapping *) astPermMap( nin, inperm, 1, outperm, zero, "" );
+       joined = (AstMapping *) astPermMap( nin, inperm, 1, outperm, zero, " " );
 
        /* Add in the new frame */
        astAddFrame( *iwcs, AST__CURRENT, joined, tmpframe );
@@ -200,7 +200,7 @@ int gaiaUtilsGtAxisWcs( AstFrameSet *fullwcs, int axis, int offset,
            double shift[1];
            AstShiftMap *map;
            shift[0] = (double) -offset;
-           map = astShiftMap( 1, shift, "" );
+           map = astShiftMap( 1, shift, " " );
            astRemapFrame( *iwcs, AST__BASE, map );
        }
    }
@@ -218,7 +218,7 @@ int gaiaUtilsGtAxisWcs( AstFrameSet *fullwcs, int axis, int offset,
        }
        inperm[ iaxes[0] - 1 ] = 1;
        outperm[0] = iaxes[0];
-       joined = (AstMapping *)astPermMap( nout, inperm, 1, outperm, zero, "" );
+       joined = (AstMapping *)astPermMap( nout, inperm, 1, outperm, zero, " " );
 
        astAddFrame( *iwcs, AST__CURRENT, joined, tmpframe );
    }
@@ -440,7 +440,7 @@ int gaiaUtilsGt2DWcs( AstFrameSet *fullwcs, int axis1, int axis2, int length1,
     inperm[axis1-1] = 1;
     inperm[axis2-1] = 2;
     zero[0] = (double) index;
-    map = (AstMapping *) astPermMap( nbase, inperm, 2, outperm, zero, "" );
+    map = (AstMapping *) astPermMap( nbase, inperm, 2, outperm, zero, " " );
 
     /* Now add this frame to the FrameSet and make it the base one. Also
      * reinstate the currentframe as the current frame. */
@@ -515,7 +515,7 @@ int gaiaUtilsGt2DWcs( AstFrameSet *fullwcs, int axis1, int axis2, int length1,
 
     /* Create a mapping for this permutation that doesn't have <bad>
      * values as the result. */
-    map = (AstMapping *)astPermMap( ncurrent, inperm, 2, outperm, zero, "" );
+    map = (AstMapping *)astPermMap( ncurrent, inperm, 2, outperm, zero, " " );
 
     /* Now add this frame to the FrameSet. */
     astAddFrame( *iwcs, icurrent, map, newframe );
@@ -602,7 +602,7 @@ int gaiaUtilsGtFitsChan( char header[], int ncards, AstFitsChan **fitschan )
     int i;
 
     /*  Create and fill a FITS channel with the given cards. */
-    *fitschan = astFitsChan( NULL, NULL, "" );
+    *fitschan = astFitsChan( NULL, NULL, " " );
     if ( astOK ) {
         ptr = header;
         for ( i = 0 ; i < ncards; i++, ptr += 80 ) {
