@@ -165,7 +165,7 @@ itcl::class gaia::GaiaImageCtrl {
       bind $canvas_ <Shift-Button> [code $this handle_shift_button_ %W %b]
 
       #  Pass on UKIRT quick look configs.
-      $image_ configure -ukirt_ql $itk_option(-ukirt_ql) 
+      $image_ configure -ukirt_ql $itk_option(-ukirt_ql)
       $image_ configure -ukirt_xy $itk_option(-ukirt_xy)
 
       #  Same for pixel indices request.
@@ -436,8 +436,8 @@ itcl::class gaia::GaiaImageCtrl {
          -filter "*" \
          -transient 1 \
          -withdraw 1 \
-         -filter_types {{any *} {GIF(.gif) *.gif} {JPEG(.jpg) *.jpg} 
-            {JPEG(.jpeg) *.jpeg} {PNG(.png) *.png} {TIFF(.tiff) *.tiff} 
+         -filter_types {{any *} {GIF(.gif) *.gif} {JPEG(.jpg) *.jpg}
+            {JPEG(.jpeg) *.jpeg} {PNG(.png) *.png} {TIFF(.tiff) *.tiff}
             {TIFF(.tif) *.tif}}
 
       if { [$w_.capture activate] } {
@@ -462,7 +462,7 @@ itcl::class gaia::GaiaImageCtrl {
          #  sure everything is up to date.
          busy {
             set image [::image create photo]
-            
+
             #  Attempt to unobscure.
             ::raise $w_
             ::update
@@ -480,7 +480,7 @@ itcl::class gaia::GaiaImageCtrl {
             }
 
             #  Write to disk file. This can fail if the window is still
-            #  obscured. So trap and complain. 
+            #  obscured. So trap and complain.
             if { [catch {$image write $filename -format $format} msg ] } {
                if { $msg == "too many colors" } {
                   info_dialog "The image display window must not be obscured,
@@ -1233,29 +1233,36 @@ move any overlapping windows and try again"
 
       #  Fit to all items on the canvas, not just the image.
       lassign [$canvas_ bbox all] x0 y0 x1 y1
+
       $image_ convert coords $x0 $y0 canvas x0 y0 image
       $image_ convert coords $x1 $y1 canvas x1 y1 image
 
-      set w [expr int(abs($x1-$x0))]
-      set h [expr int(abs($y1-$y0))]
+      #  Width of all in image pixels.
+      set w [expr abs($x1-$x0)]
+      set h [expr abs($y1-$y0)]
 
       #  Nothing on canvas, so nothing to do.
       if { $w == 0 || $h == 0 } {
          return
       }
 
+      #  Add in fudge to keep a margin. Helps with centre of image not being
+      #  centre of graphics.
+      set w [expr $w+0.5]
+      set h [expr $h+0.5]
+
       if { $autofill_ } {
          set xf [expr min(150,int($cw/$w))]
          set yf [expr min(150,int($ch/$h))]
 
          if { $xf == 0 } {
-            set xf [expr -$w/$cw]
+            set xf [expr -int($w/$cw)]
             if {$xf >= -1} {
                set xf 2
             }
          }
          if { $yf == 0 } {
-            set yf [expr -$h/$ch]
+            set yf [expr -int($h/$ch)]
             if {$yf >= -1} {
                set yf 2
             }
@@ -1268,9 +1275,12 @@ move any overlapping windows and try again"
 
       } else {
 
-         set factor [expr {min(150,min($cw/$w, $ch/$h))}]
+         #  Factor must be an int, but we do that after getting an initial
+         #  scale. Rounding too early gives slight larger zooms than needed.
+         set factor [expr min(150,min(int($cw/$w), int($ch/$h)))]
          if {$factor == 0} {
-            set factor [expr {-max(($w-1)/$cw+1, ($h-1)/$ch+1)}]
+            #  Unzoom.
+            set factor [expr -max(int(($w-1)/$cw+1), int(($h-1)/$ch+1))]
             if {$factor >= -1} {
                set factor 1
             }
@@ -1361,7 +1371,7 @@ move any overlapping windows and try again"
    #  Whether to enable the UKIRT quick look realtime events and the
    #  interface (ATC version).
    itk_option define -ukirt_ql ukirt_ql UKIRT_QL 0
-   
+
    #  Whether to enable the UKIRT quick look realtime events only
    #  (JAC version).
    itk_option define -ukirt_xy ukirt_xy UKIRT_XY 0
