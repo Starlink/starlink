@@ -570,14 +570,23 @@ void smf_calc_mapcoord( smfWorkForce *wf, smfData *data, AstFrameSet *outfset,
                                             SMF__NOCREATE_VARIANCE |
                                             SMF__NOCREATE_QUALITY, status );
         smf_lock_data( pdata->data, 0, status );        
+      }
 
-        /* Submit the job immediately */
-        pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata, 
-                                   smfCalcMapcoordPar, NULL, status );
+      if( nw > 1 ) {
+        for( ii=0; ii<nw; ii++ ) {
+          /* Submit the job */
+          pdata = job_data + ii;
+          pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata, 
+                                     smfCalcMapcoordPar, NULL, status );
+        }
+        /* Wait until all of the submitted jobs have completed */
+        smf_wait( wf, status );   
+      } else {
+        /* Call smfCalcMapcoordPar directly using 1 core */
+        smfCalcMapcoordPar( job_data, status );
       }
       
-      /* Wait until all of the submitted jobs have completed */
-      smf_wait( wf, status );   
+
 
       /* --- End parellelized portion -------------------------------------- */
 
