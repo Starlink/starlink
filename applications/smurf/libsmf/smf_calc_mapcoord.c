@@ -14,11 +14,13 @@
 *     C function
 
 *  Invocation:
-*     smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving, 
-*                        int *lbnd_out, int *ubnd_out, int flags, 
+*     smf_calc_mapcoord( smfWorkForce *wf, smfData *data, AstFrameSet *outfset, 
+*                        int moving, int *lbnd_out, int *ubnd_out, int flags, 
 *                        int *status );
 
 *  Arguments:
+*     wf = smfWorkForce * (Given)
+*        Pointer to a pool of worker threads (can be NULL)
 *     data = smfData* (Given)
 *        Pointer to smfData struct
 *     outfset = AstFrameSet* (Given)
@@ -73,12 +75,14 @@
 *        -explicitly close MAPCOORD extension before calculating new one
 *     2008-04-21 (EC):
 *        -Applied Andy's fix for off-by-one errors in nearest-neighbour calc
+*     2009-04-30 (EC):
+*        -Parellelized, borrowing code from smf_rebinmap and smf_rebinslices
 
 *  Notes:
 *     This routines asserts ICD data order.
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2005-2009 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -116,10 +120,153 @@
 /* SMURF includes */
 #include "libsmf/smf.h"
 
+/* ------------------------------------------------------------------------ */
+/* Local variables and functions */
+
+/* Structure containing information about blocks of time slices that each
+ thread will process*/
+typedef struct smfCalcMapcoordData {
+  AstSkyFrame *abskyfrm;
+  smfData *data;           /* Pointer to local smfData with copy of header */
+  int ijob;                /* Job identifier */
+  int *lut;                
+  int *lbnd_out;
+  int moving;
+  AstMapping *sky2map;
+  size_t t1;               /* Index of first timeslice of block */
+  size_t t2;               /* Index of last timeslice of block */
+  int *ubnd_out;
+} smfCalcMapcoordData;
+
+/* Function to be executed in thread: coordinates for blocks of tslices*/
+
+void smfCalcMapcoordPar( void *job_data_ptr, int *status );
+
+void smfCalcMapcoordPar( void *job_data_ptr, int *status ) {
+  AstSkyFrame *abskyfrm=NULL;
+  AstMapping *bolo2map=NULL;
+  smfData *data=NULL;
+  size_t i;                /* Loop counter */
+  size_t j;                /* Loop counter */
+  int lbnd_in[ 2 ];        /* Lower pixel bounds for input maps */
+  int *lbnd_out=NULL;
+  int *lut=NULL;
+  int moving;
+  int ubnd_in[ 2 ];        /* Upper pixel bounds for input maps */
+  int *ubnd_out=NULL;
+  dim_t nbolo;             /* number of bolometers */
+  dim_t ntslice;           /* number of time slices */
+  double *outmapcoord=NULL;/* Coordinates of each bolo */
+  smfCalcMapcoordData *pdata=NULL; /* Pointer to job data */
+  AstMapping *sky2map=NULL;
+  int xnear;               /* x-nearest neighbour pixel */
+  int ynear;               /* y-nearest neighbour pixel */
+
+  if( *status != SAI__OK ) return;
+
+  /* Pointer to the data that this thread will process */
+  pdata = job_data_ptr;
+
+  /* Check for valid inputs */
+  if( !pdata ) {
+    *status = SAI__ERROR;
+    errRep( "", "smfCalcMapcoordPar: No job data supplied", status );
+    return;
+  }
+
+  /* if t1 past end of the work, nothing to do so we return */
+  if( pdata->t1 >= ntslice ) {
+    msgOutif( MSG__DEBUG, "", 
+               "smfCalcMapcoordPar: nothing for thread to do, returning",
+               status);
+    return;
+  }
+
+  /* Debugging message indicating thread started work */
+  msgOutiff( MSG__DEBUG, "", 
+             "smfCalcMapcoordPar: thread starting on tslices %zu -- %zu",
+             status, pdata->t1, pdata->t2 );
+
+  /* Extract values from pdata */
+  abskyfrm = pdata->abskyfrm;
+  data = pdata->data;
+  lut = pdata->lut;
+  lbnd_out = pdata->lbnd_out;
+  moving = pdata->moving;
+  sky2map = pdata->sky2map;
+  ubnd_out = pdata->ubnd_out;  
+
+  smf_get_dims( data,  NULL, NULL, &nbolo, &ntslice, NULL, NULL, NULL, status );
+  lbnd_in[0] = 1;
+  lbnd_in[1] = 1;
+  ubnd_in[0] = (data->dims)[ 0 ];
+  ubnd_in[1] = (data->dims)[ 1 ];
+
+  /* Lock the supplied AST object pointers for exclusive use by this
+     thread.  The invoking thread should have unlocked them before
+     starting this job. */
+  astLock( abskyfrm, 0 );
+  astLock( sky2map, 0 );
+  smf_lock_data( data, 1, status );
+
+  /* Calculate the number of bolometers and allocate space for the
+     x- and y- output map coordinates */
+  outmapcoord = smf_malloc( nbolo*2, sizeof(*outmapcoord), 0, status );
+      
+  /* Loop over time slices */
+  for( i=pdata->t1; i<=pdata->t2; i++ ) {
+    
+    /* Calculate the bolometer to map-pixel transformation for tslice */
+    bolo2map = smf_rebin_totmap( data, i, abskyfrm, sky2map, moving,
+                                 status );
+    
+    if( *status == SAI__OK ) {
+      astTranGrid( bolo2map, 2, lbnd_in, ubnd_in, 0.1, 1000000, 1,
+                   2, nbolo, outmapcoord );
+      
+      for( j=0; j<nbolo; j++ ) {
+        xnear = (int) (outmapcoord[j] - 0.5);
+        ynear = (int) (outmapcoord[nbolo+j] - 0.5);
+	
+        if( (xnear >= 0) && (xnear <= ubnd_out[0] - lbnd_out[0]) &&
+            (ynear >= 0) && (ynear <= ubnd_out[1] - lbnd_out[1]) ) {
+          /* Point lands on map */
+          lut[i*nbolo+j] = ynear*(ubnd_out[0]-lbnd_out[0]+1) + xnear;
+        } else {
+          /* Point lands outside map */
+          lut[i*nbolo+j] = VAL__BADI;
+        }
+      }
+    }
+    /* clean up ast objects */
+    bolo2map = astAnnul( bolo2map );
+    
+    /* Break out of loop over time slices if bad status */
+    if (*status != SAI__OK) {
+      i = pdata->t2;
+    }
+  }
+
+  /* Unlock the supplied AST object pointers so that other threads can use
+     them. */
+  smf_lock_data( data, 0, status );
+  astUnlock( abskyfrm, 1 );
+  astUnlock( sky2map, 1 );
+
+  /* Clean up */
+  if( outmapcoord ) outmapcoord = smf_free( outmapcoord, status );
+
+  msgOutiff( MSG__DEBUG, "", 
+             "smfCalcMapcoordPar: thread finishing tslices %zu -- %zu",
+             status, pdata->t1, pdata->t2 );
+}
+
+/* ------------------------------------------------------------------------ */
+
 #define FUNC_NAME "smf_calc_mapcoord"
 
-void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving,
-                        int *lbnd_out, int *ubnd_out, int flags,
+void smf_calc_mapcoord( smfWorkForce *wf, smfData *data, AstFrameSet *outfset, 
+                        int moving, int *lbnd_out, int *ubnd_out, int flags,
                         int *status ) {
 
   /* Local Variables */
@@ -133,8 +280,8 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving,
   int doextension=0;           /* Try to write LUT to MAPCOORD extension */
   smfFile *file=NULL;          /* smfFile pointer */
   AstObject *fstemp = NULL;    /* AstObject version of outfset */
-  dim_t i;                     /* loop counter */
-  dim_t j;                     /* loop counter */
+  int ii;                      /* loop counter */
+  smfCalcMapcoordData *job_data=NULL; /* Array of job */
   int lbnd[1];                 /* Pixel bounds for 1d pointing array */
   int lbnd_in[2];              /* Pixel bounds for asttrangrid */
   int lbnd_old[2];             /* Pixel bounds for existing LUT */
@@ -142,8 +289,10 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving,
   int lutndf=NDF__NOID;        /* NDF identifier for coordinates */
   AstMapping *map2sky_old=NULL;/* Existing mapping map->celestial coord. */
   HDSLoc *mapcoordloc=NULL;    /* HDS locator to the MAPCOORD extension */
+  int nw;                      /* Number of worker threads */
   AstFrameSet *oldfset=NULL;   /* Pointer to existing WCS info */
   AstSkyFrame *oskyfrm = NULL; /* SkyFrame from the output WCS Frameset */
+  smfCalcMapcoordData *pdata=NULL; /* Pointer to job data */
   int ubnd[1];                 /* Pixel bounds for 1d pointing array */
   int ubnd_in[2];              /* Pixel bounds for asttrangrid */
   int ubnd_old[2];             /* Pixel bounds for existing LUT */
@@ -152,17 +301,17 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving,
   dim_t nbolo=0;               /* Number of bolometers */
   dim_t ntslice=0;             /* Number of time slices */
   int nmap;                    /* Number of mapped elements */
-  double *outmapcoord=NULL;    /* map coordinates for each bolometer */
   AstMapping *sky2map=NULL;    /* Mapping celestial->map coordinates */
+  size_t step;                 /* step size for dividing up work */
   const char *system=NULL;     /* Coordinate system */
   AstCmpMap *testcmpmap=NULL;  /* Combined forward/inverse mapping */
   AstMapping *testsimpmap=NULL;/* Simplified testcmpmap */
-  int xnear;                   /* x-nearest neighbour pixel */
-  int ynear;                   /* y-nearest neighbour pixel */
-
 
   /* Main routine */
   if (*status != SAI__OK) return;
+
+  /* How many threads do we get to play with */
+  nw = wf ? wf->nworker : 1;
 
   /* Initialize bounds to avoid compiler warnings */
   lbnd_old[0] = 0;
@@ -305,7 +454,7 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving,
                 (ubnd_old[1] == ubnd_out[1]) ) {
 	      
               docalc = 0; /* We don't have to re-calculate the LUT */
-              msgOutif(MSG__VERB," ","SMF_CALC_MAPCOORD: Existing LUT OK",
+              msgOutif(MSG__VERB," ",FUNC_NAME ": Existing LUT OK",
                        status);
             }
           }
@@ -326,7 +475,7 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving,
 
   /* If we need to calculate the LUT do it here */
   if( docalc && (*status == SAI__OK) ) {
-    msgOutif(MSG__VERB," ","SMF_CALC_MAPCOORD: Calculate new LUT", 
+    msgOutif(MSG__VERB," ", FUNC_NAME ": Calculate new LUT", 
              status);
 
     if( doextension ) {
@@ -348,7 +497,7 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving,
     /* Calculate the number of bolometers and allocate space for the
        x- and y- output map coordinates */
       
-    outmapcoord = smf_malloc( nbolo*2, sizeof(double), 0, status );
+    //outmapcoord = smf_malloc( nbolo*2, sizeof(double), 0, status );
       
     /* Retrieve the sky2map mapping from the output frameset (actually
        map2sky) */
@@ -371,37 +520,66 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving,
       lbnd_in[1] = 1;
       ubnd_in[1] = (data->dims)[1];
       
-      /* Loop over time slices */
-      for( i=0; i<ntslice; i++ ) {
+      /* --- Begin parellelized portion ------------------------------------ */
 
-        /* Calculate the bolometer to map-pixel transformation for tslice */
-        bolo2map = smf_rebin_totmap( data, i, abskyfrm, sky2map, moving,
-                                     status );
-	
-        if( *status == SAI__OK ) {
-          astTranGrid( bolo2map, 2, lbnd_in, ubnd_in, 0.1, 1000000, 1,
-                       2, nbolo, outmapcoord );
-	  
-          for( j=0; j<nbolo; j++ ) {
-            xnear = (int) (outmapcoord[j] - 0.5);
-            ynear = (int) (outmapcoord[nbolo+j] - 0.5);
-	    
-            if( (xnear >= 0) && (xnear <= ubnd_out[0] - lbnd_out[0]) &&
-                (ynear >= 0) && (ynear <= ubnd_out[1] - lbnd_out[1]) ) {
-              /* Point lands on map */
-              lut[i*nbolo+j] = ynear*(ubnd_out[0]-lbnd_out[0]+1) + xnear;
-            } else {
-              /* Point lands outside map */
-              lut[i*nbolo+j] = VAL__BADI;
-            }
-          }
-        }
-        /* clean up ast objects */
-        bolo2map = astAnnul( bolo2map );
+      /* Allocate job data for threads */
+      job_data = smf_malloc( nw, sizeof(*job_data), 1, status );
 
-        /* Break out of loop over time slices if bad status */
-        if (*status != SAI__OK) goto CLEANUP;
+      /* Set up job data, and start calculating pointing for blocks of
+         time slices in different threads */
+
+      if( nw > (int) ntslice ) {
+        step = 1;
+      } else {
+        step = ntslice/nw;
       }
+
+      for( ii=0; (*status==SAI__OK)&&(ii<nw); ii++ ) {
+        pdata = job_data + ii;
+        
+        /* Blocks of time slices */
+        pdata->t1 = ii*step;
+        pdata->t2 = (ii+1)*step-1;
+        
+        /* Ensure that the last thread picks up any left-over tslices */
+        if( (ii==(nw-1)) && (pdata->t1<(ntslice-1)) ) {
+          pdata->t2=ntslice-1;
+        }
+
+        pdata->ijob = -1;
+        pdata->lut = lut;
+        pdata->lbnd_out = lbnd_out;
+        pdata->moving = moving;
+        pdata->ubnd_out = ubnd_out;
+
+        /* Make deep copies of AST objects and unlock them so that each
+           thread can then lock them for their own exclusive use */
+
+        pdata->abskyfrm = astCopy( abskyfrm );
+        astUnlock( pdata->abskyfrm, 1 );
+        pdata->sky2map = astCopy( sky2map );
+        astUnlock( pdata->sky2map, 1 );
+
+        /* Similarly, make a copy of the smfData, including only the header
+           information which each thread will need in order to make calls to 
+           smf_rebin_totmap */
+
+        pdata->data = smf_deepcopy_smfData( data, 0, SMF__NOCREATE_FILE |
+                                            SMF__NOCREATE_DA | 
+                                            SMF__NOCREATE_DATA |
+                                            SMF__NOCREATE_VARIANCE |
+                                            SMF__NOCREATE_QUALITY, status );
+        smf_lock_data( pdata->data, 0, status );        
+
+        /* Submit the job immediately */
+        pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata, 
+                                   smfCalcMapcoordPar, NULL, status );
+      }
+      
+      /* Wait until all of the submitted jobs have completed */
+      smf_wait( wf, status );   
+
+      /* --- End parellelized portion -------------------------------------- */
 
       /* Set the lut pointer in data to the buffer */
       data->lut = lut;
@@ -449,9 +627,7 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving,
   }
 
   /* Clean Up */
- CLEANUP:
 
-  if( outmapcoord ) outmapcoord = smf_free( outmapcoord, status );
   if( testsimpmap ) testsimpmap = astAnnul( testsimpmap );
   if( testcmpmap ) testcmpmap = astAnnul( testcmpmap );
   if( map2sky_old ) map2sky_old = astAnnul( map2sky_old );	
@@ -467,6 +643,24 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving,
      the caller; "UPDATE" so that the caller can modify it if desired. */
   if( (*status == SAI__OK) && (docalc == 0) ) {
     smf_open_mapcoord( data, "UPDATE", status );
+  }
+
+  /* Clean up job data */
+  if( job_data ) {
+    for( ii=0; (*status==SAI__OK)&&(ii<nw); ii++ ) {
+      pdata = job_data + ii;  
+
+      if( pdata->data ) {
+        smf_lock_data( pdata->data, 1, status );
+        smf_close_file( &(pdata->data), status );
+      }
+      astLock( pdata->abskyfrm, 0 );
+      pdata->abskyfrm = astAnnul( pdata->abskyfrm );
+      
+      astLock( pdata->sky2map, 0 );
+      pdata->sky2map = astAnnul( pdata->sky2map );
+    }
+    job_data = smf_free( job_data, status );
   }
 
 }

@@ -13,14 +13,17 @@
 *     Library routine
 
 *  Invocation:
-*     smf_model_create( const smfGroup *igroup, const smfArray **iarray,
-*                       dim_t nchunks, smf_modeltype mtype, int isTordered, 
+*     smf_model_create( smfWorkForce *wf, const smfGroup *igroup, 
+*                       const smfArray **iarray, dim_t nchunks, 
+*                       smf_modeltype mtype, int isTordered, 
 *		        AstFrameSet *outfset, int moving, 
 *		        int *lbnd_out, int *ubnd_out,
 *                       smfGroup **mgroup, int nofile, int leaveopen,
 *                       smfArray **mdata, int *status);
 
 *  Arguments:
+*     wf = smfWorkForce * (Given)
+*        Pointer to a pool of worker threads (can be NULL)
 *     igroup = const smfGroup * (Given)
 *        NDG group identifier for input template files
 *     iarray = const smfArray ** (Given)
@@ -207,12 +210,12 @@
 
 #define FUNC_NAME "smf_model_create"
 
-void smf_model_create( const smfGroup *igroup, smfArray **iarray,
-                       dim_t nchunks, smf_modeltype mtype, int isTordered,
-                       AstFrameSet *outfset, int moving, 
-                       int *lbnd_out, int *ubnd_out,
-                       smfGroup **mgroup, int nofile, int leaveopen,
-                       smfArray **mdata, double flagstat, int *status ) {
+void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, 
+                       smfArray **iarray, dim_t nchunks, smf_modeltype mtype, 
+                       int isTordered, AstFrameSet *outfset, int moving, 
+                       int *lbnd_out, int *ubnd_out, smfGroup **mgroup, 
+                       int nofile, int leaveopen, smfArray **mdata, 
+                       double flagstat, int *status ) {
 
   /* Local Variables */
   size_t bstride;               /* Bolometer stride in data array */
@@ -412,7 +415,7 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
             /* Calculate the LUT if necessary */
 	  
             if( mtype == SMF__LUT ) {
-              smf_calc_mapcoord( idata, outfset, moving, lbnd_out, 
+              smf_calc_mapcoord( wf, idata, outfset, moving, lbnd_out, 
                                  ubnd_out, SMF__NOCREATE_FILE, status );
             }
 

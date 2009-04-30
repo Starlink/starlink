@@ -444,8 +444,9 @@ double smf_calc_fcon( smfData *data, dim_t nchan, int report,
                       AstMapping **specmap, AstFrame **specframe,
                       int *status );
 
-void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving, 
-			int *lbnd_out, int *ubnd_out, int flags, int *status );
+void smf_calc_mapcoord( smfWorkForce *wf, smfData *data, AstFrameSet *outfset, 
+                        int moving, int *lbnd_out, int *ubnd_out, int flags, 
+                        int *status );
 
 double smf_calc_mappa( smfHead *hdr, const char *system, AstFrame *sf, 
                        int *status );
@@ -563,9 +564,10 @@ void smf_collapse_tseries( const smfData *indata, int nclip, const float clip[],
                            double snrlim, int flagconst, smf_dtype dtype,
                            smfData **outdata, int *status );
 
-void smf_concat_smfGroup( smfGroup *igrp, const smfArray * darks, 
-                          const smfArray *bpms, size_t whichchunk, 
-                          int isTordered, AstFrameSet *outfset, int moving, 
+void smf_concat_smfGroup( smfWorkForce *wf, smfGroup *igrp, 
+                          const smfArray *darks, const smfArray *bpms, 
+                          size_t whichchunk, int isTordered, 
+                          AstFrameSet *outfset, int moving, 
                           int *lbnd_out, int *ubnd_out, dim_t padStart,
                           dim_t padEnd, int flags, smfArray **concat, 
                           int *status );
@@ -889,9 +891,9 @@ AstKeyMap *smf_groupscans( Grp *igrp,  int size, int *maxsyspop,
 Grp *smf_grpCopy( const Grp *grp1, size_t indxlo, size_t indxhi, int reject, 
                   int *status );
 
-void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
-                       dim_t maxlen, dim_t *maxconcatlen, smfGroup **group,
-                       int *status );
+void smf_grp_related( Grp *igrp, const int grpsize, const int grpbywave, 
+                      dim_t maxlen, dim_t *maxconcatlen, smfGroup **group, 
+                      int *status );
 
 void smf_history_add( smfData* data, const char * appl, 
 			const char * text, int *status);
@@ -959,12 +961,12 @@ void smf_mapbounds_approx( Grp *igrp, size_t index, char *system,
 
 void smf_maskacsis( int indf, int *mask, int *status );
 
-void smf_model_create( const smfGroup *igroup, smfArray **iarray,
-		       dim_t nchunks, smf_modeltype mtype, int isTordered, 
-		       AstFrameSet *outfset, int moving, 
-		       int *lbnd_out, int *ubnd_out,
-		       smfGroup **mgroup, int nofile, int leaveopen,
-		       smfArray **mdata, double flagstat, int *status );
+void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, 
+                       smfArray **iarray, dim_t nchunks, smf_modeltype mtype, 
+                       int isTordered, AstFrameSet *outfset, int moving, 
+                       int *lbnd_out, int *ubnd_out, smfGroup **mgroup, 
+                       int nofile, int leaveopen, smfArray **mdata, 
+                       double flagstat, int *status );
 
 void smf_model_createHdr( smfData *model, smf_modeltype type, 
                           smfHead *refhdr, int *status );

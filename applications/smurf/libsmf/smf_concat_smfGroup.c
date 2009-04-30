@@ -13,14 +13,17 @@
 *     C function
 
 *  Invocation:
-*     smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
-*                          const smfArray *bpms, size_t whichchunk, 
-*                          int isTordered, AstFrameSet *outfset, int moving, 
+*     smf_concat_smfGroup( smfWorkForce *wf, smfGroup *igrp, 
+*                          const smfArray *darks, const smfArray *bpms, 
+*                          size_t whichchunk, int isTordered, 
+*                          AstFrameSet *outfset, int moving, 
 *                          int *lbnd_out, int *ubnd_out, dim_t padStart,
 *                          dim_t padEnd, int flags, smfArray **concat,
 *                          int *status )
 
 *  Arguments:
+*     wf = smfWorkForce * (Given)
+*        Pointer to a pool of worker threads (can be NULL)
 *     igrp = smfGroup* (Given)
 *        Group of input data files
 *     darks = const smfArray * (Given)
@@ -182,9 +185,10 @@
 
 #define FUNC_NAME "smf_concat_smfGroup"
 
-void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks, 
-                          const smfArray *bpms, size_t whichchunk, 
-                          int isTordered, AstFrameSet *outfset, int moving, 
+void smf_concat_smfGroup( smfWorkForce *wf, smfGroup *igrp, 
+                          const smfArray *darks, const smfArray *bpms, 
+                          size_t whichchunk, int isTordered, 
+                          AstFrameSet *outfset, int moving, 
                           int *lbnd_out, int *ubnd_out, dim_t padStart,
                           dim_t padEnd, int flags, smfArray **concat, 
                           int *status ) {
@@ -418,7 +422,7 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
             havelut = 1;
 
             /* Calculate the LUT for this chunk */
-            smf_calc_mapcoord( refdata, outfset, moving, lbnd_out, ubnd_out, 
+            smf_calc_mapcoord( wf, refdata, outfset, moving, lbnd_out, ubnd_out,
                                SMF__NOCREATE_FILE, status );
           } else {
             havelut = 0;

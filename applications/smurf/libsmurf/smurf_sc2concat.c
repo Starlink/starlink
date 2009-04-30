@@ -145,11 +145,16 @@ void smurf_sc2concat( int *status ) {
   dim_t padEnd=0;            /* How many samples padding at end */
   char *pname=NULL;          /* Poiner to fname */
   int temp;                  /* Temporary signed integer */
+  smfWorkForce *wf = NULL;   /* Pointer to a pool of worker threads */
 
   if (*status != SAI__OK) return;
 
   /* Main routine */
   ndfBegin();
+
+  /* Find the number of cores/processors available and create a pool of 
+     threads of the same size. */
+  wf = smf_create_workforce( smf_get_nthread( status ), status );
 
   /* Read the input file */
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &isize, status );
@@ -227,7 +232,7 @@ void smurf_sc2concat( int *status ) {
   for( contchunk=0;(*status==SAI__OK)&&contchunk<ncontchunks; contchunk++ ) {
 
     /* Concatenate this continuous chunk */
-    smf_concat_smfGroup( igroup, darks, NULL, contchunk, 1, NULL, 0, NULL, 
+    smf_concat_smfGroup( wf, igroup, darks, NULL, contchunk, 1, NULL, 0, NULL, 
                          NULL, padStart, padEnd, 0, &concat, status );
     
     /* Export concatenated data for each subarray to NDF file */
@@ -265,6 +270,7 @@ void smurf_sc2concat( int *status ) {
   }
 
  CLEANUP:
+  if( wf ) wf = smf_destroy_workforce( wf );
   if( darks ) smf_close_related( &darks, status );
   if( igrp ) grpDelet( &igrp, status);
   if( basegrp ) grpDelet( &basegrp, status );
