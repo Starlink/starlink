@@ -1857,7 +1857,7 @@ static int GaiaUtilsAstFindFrame( ClientData clientData, Tcl_Interp *interp,
  *
  * There are four arguments, the address of a Mapping/FrameSet, the
  * lower bounds and upper bounds of a region in the base coordinate system
- * to check the linear over, and a tolerance (delta in base coordinates).
+ * to check the linear over, and a tolerance a distance in current coordinates.
  *
  * The result is a list of the coefficient values.
  */
@@ -1931,7 +1931,7 @@ static int GaiaUtilsAstLinearApprox( ClientData clientData, Tcl_Interp *interp,
     }
 
     /* Do the check */
-    for ( int i = 0; i < 56; i++ ) fit[i] = AST__BAD;
+    for ( int i = 0; i < (MAX_DIMS*MAX_DIMS+MAX_DIMS); i++ ) fit[i] = AST__BAD;
     if ( astLinearApprox( mapping, lbnd, ubnd, tol, fit ) ) {
         Tcl_ResetResult( interp );
         resultObj = Tcl_GetObjResult( interp );
