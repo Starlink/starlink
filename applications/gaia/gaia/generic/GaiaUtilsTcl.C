@@ -1633,6 +1633,10 @@ static int GaiaUtilsAstTran2( ClientData clientData, Tcl_Interp *interp,
  * By default the result is a list of unformatted transformed values,
  * but if the third optional argument is set to 1 then formatted values
  * will be returned.
+ *
+ * The result will be normalised if the forward mapping is used.
+ * This can be evaded by setting the fourth optional argument to 
+ * false.
  */
 static int GaiaUtilsAstTranN( ClientData clientData, Tcl_Interp *interp,
                               int objc, Tcl_Obj *CONST objv[] )
@@ -1645,15 +1649,16 @@ static int GaiaUtilsAstTranN( ClientData clientData, Tcl_Interp *interp,
     double out[MAX_DIMS];
     int formatted = 0;
     int forward = 1;
+    int norm = -1;  //  Not set
     int i;
     int indims;
     int outdims;
     long adr;
 
     /* Check arguments, only allow three or four. */
-    if ( objc != 4 && objc != 5 ) {
-        Tcl_WrongNumArgs( interp, 1, objv,
-                          "mapping forward {coord1 coord2 ...} [formatted]" );
+    if ( objc < 4 || objc > 6 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "mapping forward "
+                          "{coord1 coord2 ...} [formatted] [normalised]" );
         return TCL_ERROR;
     }
 
@@ -1686,6 +1691,17 @@ static int GaiaUtilsAstTranN( ClientData clientData, Tcl_Interp *interp,
         }
     }
 
+    /* Should we normalise the result. If true always, if false never, 
+     * if not set only for forward transformations. */
+    if ( objc == 6 ) {
+        if ( Tcl_GetBooleanFromObj( interp, objv[5], &norm ) != TCL_OK ) {
+            return TCL_ERROR;
+        }
+    }
+    else {
+        norm = forward;
+    }
+
     /* The output dimensions maybe be different to the input ones */
     if ( forward ) {
         outdims = astGetI( mapping, "Nout" );
@@ -1697,9 +1713,10 @@ static int GaiaUtilsAstTranN( ClientData clientData, Tcl_Interp *interp,
     /* Do the transform */
     astTranN( mapping, 1, indims, 1, in, forward, outdims, 1, out );
 
-    /* Normalise against the current frame only. Assume baseframes are
-     * pixels. */
-    if ( forward ) {
+    /* Normalise against if this is the forward transform and not asked not
+     * to, or we have been asked to normalise (default position assumes only
+     * current coordinates are likely to be celestial). */
+    if ( norm ) {
         astNorm( mapping, out );
     }
 
