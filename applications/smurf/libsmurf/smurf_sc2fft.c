@@ -61,11 +61,13 @@
 *        Handle raw data (filter out / apply darks, flatfield)
 *     2009-03-30 (TIMJ):
 *        Add OUTFILES parameter.
+*     2009-04-30 (EC):
+*        Use threads
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2008-2009 Science and Technology Facilities Council.
-*     Copyright (C) 2008 University of British Columbia.
+*     Copyright (C) 2008-2009 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -131,9 +133,14 @@ void smurf_sc2fft( int *status ) {
   int polar=0;              /* Flag for FFT in polar coordinates */
   int power=0;              /* Flag for squaring amplitude coeffs */
   size_t size;              /* Number of files in input group */
+  smfWorkForce *wf = NULL;  /* Pointer to a pool of worker threads */
 
   /* Main routine */
   ndfBegin();
+
+  /* Find the number of cores/processors available and create a pool of 
+     threads of the same size. */
+  wf = smf_create_workforce( smf_get_nthread( status ), status );
 
   /* Get input file(s) */
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
@@ -188,7 +195,7 @@ void smurf_sc2fft( int *status ) {
       }
 
       /* Tranform the data */
-      odata = smf_fft_data( NULL, idata, inverse, status );
+      odata = smf_fft_data( wf, idata, inverse, status );
       smf_convert_bad( odata, status );      
 
       if( inverse ) {
@@ -226,6 +233,8 @@ void smurf_sc2fft( int *status ) {
   /* Tidy up after ourselves: release the resources used by the grp routines */
   grpDelet( &igrp, status);
   grpDelet( &ogrp, status);
+
+  if( wf ) wf = smf_destroy_workforce( wf );
 
   ndfEnd( status );
 

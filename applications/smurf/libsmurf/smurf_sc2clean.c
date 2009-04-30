@@ -93,6 +93,8 @@
 *     2009-04-17 (EC):
 *        Factor out parsing parameters to smf_get_cleanpar
 *        Factor filter generation out to smf_filter_fromkeymap
+*     2009-04-30 (EC):
+*        Use threads
 *     {enter_further_changes_here}
  
 *  Copyright:
@@ -138,6 +140,7 @@
 #include "prm_par.h"
 #include "sae_par.h"
 #include "msg_par.h"
+#include "fftw3.h"
 
 #include "smurf_par.h"
 #include "libsmf/smf.h"
@@ -174,9 +177,14 @@ void smurf_sc2clean( int *status ) {
   size_t spikeiter=0;       /* Number of iterations for spike finder */
   int dofft=0;              /* Set if freq. domain filtering the data */
   smfFilter *filt=NULL;     /* Pointer to filter struct */
+  smfWorkForce *wf = NULL;  /* Pointer to a pool of worker threads */
 
   /* Main routine */
   ndfBegin();
+
+  /* Find the number of cores/processors available and create a pool of 
+     threads of the same size. */
+  wf = smf_create_workforce( smf_get_nthread( status ), status );
 
   /* Read the input file */
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
@@ -343,7 +351,7 @@ void smurf_sc2clean( int *status ) {
 
     if( dofft ) {
       msgOutif( MSG__VERB," ", "Apply frequency domain filter", status );
-      smf_filter_execute( NULL, ffdata, filt, status );
+      smf_filter_execute( wf, ffdata, filt, status );
       smf_convert_bad( ffdata, status );      
     }
 
@@ -369,5 +377,7 @@ void smurf_sc2clean( int *status ) {
   grpDelet( &igrp, status);
   grpDelet( &ogrp, status);
   if( keymap ) keymap = astAnnul( keymap );
+  if( wf ) wf = smf_destroy_workforce( wf );
+  fftw_cleanup();
   ndfEnd( status );
 }
