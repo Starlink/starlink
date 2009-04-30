@@ -213,17 +213,17 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
   qua_data = pdata->qua_data;
   weight = pdata->weight;
 
-  /* if b1 past end of the work, nothing to do so we return */
-  if( pdata->b1 >= nbolo ) {
-    msgOutif( MSG__DEBUG, "", 
-               "smfCalcmodelComPar: nothing for thread to do, returning",
-               status);
-    return;
-  }
-
   if( pdata->operation == 0 ) {
     /* undo the previous iteration of the model, each thread handles a
      block of bolos */
+
+    /* if b1 past end of the work, nothing to do so we return */
+    if( pdata->b1 >= nbolo ) {
+      msgOutif( MSG__DEBUG, "",
+                "smfCalcmodelComPar: nothing for thread to do, returning",
+                status);
+      return;
+    }
 
     /* Debugging message indicating thread started work */
     msgOutiff( MSG__DEBUG, "", 
@@ -259,6 +259,14 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
     /* Calculate the new common mode averaging over all detectors. Each thread
        handles a block of time slices */
 
+    /* if t1 past end of the work, nothing to do so we return */
+    if( pdata->t1 >= ntslice ) {
+      msgOutif( MSG__DEBUG, "",
+                "smfCalcmodelComPar: nothing for thread to do, returning",
+                status);
+      return;
+    }
+
     /* Debugging message indicating thread started work */
     msgOutiff( MSG__DEBUG, "", 
                "smfCalcmodelComPar(%i): thread starting on tslices %zu -- %zu",
@@ -293,6 +301,14 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
 
   } else if( pdata->operation == 2 ) {
     /* Loop over the block of bolos for this thread and fit the template */
+
+    /* if b1 past end of the work, nothing to do so we return */
+    if( pdata->b1 >= nbolo ) {
+      msgOutif( MSG__DEBUG, "",
+                "smfCalcmodelComPar: nothing for thread to do, returning",
+                status);
+      return;
+    }
 
     /* Debugging message indicating thread started work */
     msgOutiff( MSG__DEBUG, "", 
@@ -480,7 +496,6 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   /* Which QUALITY bits should be checked for measuring the mean */
   mask_meas = mask_cor;
 
-
   /* Allocate job data for threads */
   job_data = smf_malloc( nw, sizeof(*job_data), 1, status );
 
@@ -539,7 +554,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         pdata->t1 = ii*step;
         pdata->t2 = (ii+1)*step-1;
         
-        /* Ensure that the last thread picks up any left-over bolometers */
+        /* Ensure that the last thread picks up any left-over tslices */
         if( (ii==(nw-1)) && (pdata->t1<(ntslice-1)) ) {
           pdata->t2=ntslice-1;
         }
