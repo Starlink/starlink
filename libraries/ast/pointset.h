@@ -61,6 +61,8 @@
 *     Public:
 *        astAppendPoints
 *           Append one PointSet to another.
+*        astBndPoints
+*           Find the axis bounds of the points in a PointSet.
 *        astGetPoints
 *           Get a pointer to the coordinate values associated with a PointSet.
 *        astPermPoints
@@ -395,14 +397,15 @@ typedef struct AstPointSetVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
+   AstPointSet *(* AppendPoints)( AstPointSet *, AstPointSet *, int * );
    double **(* GetPoints)( AstPointSet *, int * );
    int (* GetNcoord)( const AstPointSet *, int * );
    int (* GetNpoint)( const AstPointSet *, int * );
+   void (* BndPoints)( AstPointSet *, double *, double *, int * );
    void (* PermPoints)( AstPointSet *, int, const int[], int * );
-   void (* SetPoints)( AstPointSet *, double **, int * );
    void (* SetNpoint)( AstPointSet *, int, int * );
+   void (* SetPoints)( AstPointSet *, double **, int * );
    void (* SetSubPoints)( AstPointSet *, int, int, AstPointSet *, int * );
-   AstPointSet *(* AppendPoints)( AstPointSet *, AstPointSet *, int * );
 
    double (* GetPointAccuracy)( AstPointSet *, int, int * );
    int (* TestPointAccuracy)( AstPointSet *, int, int * );
@@ -467,6 +470,7 @@ void astSetPoints_( AstPointSet *, double **, int * );
 void astSetNpoint_( AstPointSet *, int, int * );
 void astSetSubPoints_( AstPointSet *, int, int, AstPointSet *, int * );
 AstPointSet *astAppendPoints_( AstPointSet *, AstPointSet *, int * );
+void astBndPoints_( AstPointSet *, double *, double *, int * );
 
 # if defined(astCLASS)           /* Protected */
 int astGetNcoord_( const AstPointSet *, int * );
@@ -537,6 +541,8 @@ astINVOKE(V,astSetNpoint_(astCheckPointSet(this),np,STATUS_PTR))
 astINVOKE(V,astSetSubPoints_(astCheckPointSet(point1),point,coord,astCheckPointSet(point2),STATUS_PTR))
 #define astAppendPoints(this,that) \
 astINVOKE(O,astAppendPoints_(astCheckPointSet(this),astCheckPointSet(that),STATUS_PTR))
+#define astBndPoints(this,lbnd,ubnd) \
+astINVOKE(V,astBndPoints_(astCheckPointSet(this),lbnd,ubnd,STATUS_PTR))
 
 #if defined(astCLASS)            /* Protected */
 #define astGetNpoint(this) \

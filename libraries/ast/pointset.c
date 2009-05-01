@@ -60,6 +60,8 @@
 *        Override astGetObjSize.
 *     22-FEB-2006 (DSB):
 *        Avoid allocating memory for "acc" unless needed.
+*     1-MAY-2009 (DSB):
+*        Added astBndPoints.
 */
 
 /* Module Macros. */
@@ -522,6 +524,7 @@ static int GetNpoint( const AstPointSet *, int * );
 static int GetObjSize( AstObject *, int * );
 static int TestAttrib( AstObject *, const char *, int * );
 static AstPointSet *AppendPoints( AstPointSet *, AstPointSet *, int * );
+static void BndPoints( AstPointSet *, double *, double *, int * );
 static void CheckPerm( AstPointSet *, const int *, const char *, int * );
 static void ClearAttrib( AstObject *, const char *, int * );
 static void Copy( const AstObject *, AstObject *, int * );
@@ -550,7 +553,7 @@ static AstPointSet *AppendPoints( AstPointSet *this, AstPointSet *that, int *sta
 *     Append one PointSet to another.
 
 *  Type:
-*     Public virtual function.
+*     Protected virtual function.
 
 *  Synopsis:
 *     #include "pointset.h"
@@ -637,6 +640,102 @@ static AstPointSet *AppendPoints( AstPointSet *this, AstPointSet *that, int *sta
 
 /* Return the result. */
    return result;
+}
+
+static void BndPoints( AstPointSet *this, double *lbnd, double *ubnd, int *status ) {
+/*
+*+
+*  Name:
+*     astBndPoints
+
+*  Purpose:
+*     Find the axis bounds of the points in a PointSet.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "pointset.h"
+*     void astBndPoints( AstPointSet *this, double *lbnd, double *ubnd )
+
+*  Class Membership:
+*     PointSet method.
+
+*  Description:
+*     This function returns the lower and upper limits of the axis values
+*     of the points in a PointSet.
+
+*  Parameters:
+*     this
+*        Pointer to the first PointSet.
+*     lbnd
+*        Pointer to an array in which to return the lowest value for
+*        each coordinate. The length of the array should equal the number
+*        returned by astGetNcoord.
+*     ubnd
+*        Pointer to an array in which to return the highest value for
+*        each coordinate. The length of the array should equal the number
+*        returned by astGetNcoord.
+
+*-
+*/
+
+/* Local Variables: */
+   double **ptr;
+   double *p;
+   double lb;
+   double ub;
+   int ic;
+   int ip;
+   int nc;     
+   int np;     
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Get pointers to the PointSet data, the number of axes adn the number
+   of points. */
+   ptr = astGetPoints( this );
+   nc = astGetNcoord( this );
+   np = astGetNpoint( this );
+
+/* Check the pointers can be used safely. */
+   if( astOK ) {
+
+/* Loop round each axis. */
+      for( ic = 0; ic < nc; ic++ ) {
+
+/* Initialise the bounds for this axis. */
+         lb = AST__BAD;
+         ub = AST__BAD;
+
+/* Search for the first good point. Use it to initialise the bounds and
+   break out of the loop. */
+         p = ptr[ ic ];
+         for( ip = 0; ip < nc; ip++,p++ ) {
+            if( *p != AST__BAD ) {
+               lb = ub = *p;
+               break;
+            }
+         }
+
+/* Search through the remaining points. Update the bounds if the axis 
+   value is good. */
+         for( ; ip < nc; ip++,p++ ) {
+            if( *p != AST__BAD ) {
+               if( *p < lb ) {
+                  lb = *p;
+               } else if( *p > ub ) {
+                  ub = *p;
+               }
+            }
+         }
+
+/* Store the returned bounds. */
+         lbnd[ ic ] = lb;
+         ubnd[ ic ] = ub;
+      }
+   }
 }
 
 static void CheckPerm( AstPointSet *this, const int *perm, const char *method, int *status ) {
@@ -1181,7 +1280,7 @@ static int GetNcoord( const AstPointSet *this, int *status ) {
 *     Get the number of coordinate values per point from a PointSet.
 
 *  Type:
-*     Public virtual function.
+*     Protected virtual function.
 
 *  Synopsis:
 *     #include "pointset.h"
@@ -1224,7 +1323,7 @@ static int GetNpoint( const AstPointSet *this, int *status ) {
 *     Get the number of points in a PointSet.
 
 *  Type:
-*     Public virtual function.
+*     Protected virtual function.
 
 *  Synopsis:
 *     #include "pointset.h"
@@ -1266,7 +1365,7 @@ static double **GetPoints( AstPointSet *this, int *status ) {
 *     Get a pointer for the coordinate values associated with a PointSet.
 
 *  Type:
-*     Public virtual function.
+*     Protected virtual function.
 
 *  Synopsis:
 *     #include "pointset.h"
@@ -1437,6 +1536,7 @@ void astInitPointSetVtab_(  AstPointSetVtab *vtab, const char *name, int *status
 /* Store pointers to the member functions (implemented here) that
    provide virtual methods for this class. */
    vtab->AppendPoints = AppendPoints;
+   vtab->BndPoints = BndPoints;
    vtab->GetNcoord = GetNcoord;
    vtab->GetNpoint = GetNpoint;
    vtab->GetPoints = GetPoints;
@@ -1660,7 +1760,7 @@ static void SetNpoint( AstPointSet *this, int npoint, int *status ) {
 *     Reduce the number of points in a PointSet.
 
 *  Type:
-*     Public virtual function.
+*     Protected virtual function.
 
 *  Synopsis:
 *     #include "pointset.h"
@@ -1708,7 +1808,7 @@ static void SetPoints( AstPointSet *this, double **ptr, int *status ) {
 *     Associate coordinate values with a PointSet.
 
 *  Type:
-*     Public virtual function.
+*     Protected virtual function.
 
 *  Synopsis:
 *     #include "pointset.h"
@@ -1817,7 +1917,7 @@ static void SetSubPoints( AstPointSet *point1, int point, int coord,
 *     Associate a subset of one PointSet with another PointSet.
 
 *  Type:
-*     Public virtual function.
+*     Protected virtual function.
 
 *  Synopsis:
 *     #include "pointset.h"
@@ -2326,7 +2426,7 @@ AstPointSet *astPointSet_( int npoint, int ncoord, const char *options, int *sta
 *     Create a PointSet.
 
 *  Type:
-*     Public function.
+*     Protected function.
 
 *  Synopsis:
 *     #include "pointset.h"
@@ -2860,6 +2960,10 @@ void astSetSubPoints_( AstPointSet *point1, int point, int coord,
 AstPointSet *astAppendPoints_( AstPointSet *this, AstPointSet *that, int *status ) {
    if ( !astOK ) return NULL;
    return (**astMEMBER(this,PointSet,AppendPoints))( this, that, status );
+}
+void astBndPoints_( AstPointSet *this, double *lbnd, double *ubnd, int *status ) {
+   if ( !astOK ) return;
+   (**astMEMBER(this,PointSet,BndPoints))( this, lbnd, ubnd, status );
 }
 
 
