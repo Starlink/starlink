@@ -120,7 +120,7 @@ typedef struct AstCircleVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
-   void (* CirclePars)( AstCircle *, double *, double *, int * );
+   void (* CirclePars)( AstCircle *, double *, double *, double *, int * );
 } AstCircleVtab;
 
 #if defined(THREAD_SAFE) 
@@ -175,7 +175,7 @@ AstCircle *astLoadCircle_( void *, size_t, AstCircleVtab *,
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
-void astCirclePars_( AstCircle *, double *, double *, int * );
+void astCirclePars_( AstCircle *, double *, double *, double *, int * );
 
 # if defined(astCLASS)           /* Protected */
 AstRegion *astBestCircle_( AstPointSet *, double *, AstRegion *, int * );
@@ -227,8 +227,8 @@ astINVOKE(O,astLoadCircle_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PT
    before use.  This provides a contextual error report if a pointer
    to the wrong sort of Object is supplied. */
 
-#define astCirclePars(this,centre,radius) \
-astINVOKE(V,astCirclePars_(astCheckCircle(this),centre,radius,STATUS_PTR))
+#define astCirclePars(this,centre,radius,p1) \
+astINVOKE(V,astCirclePars_(astCheckCircle(this),centre,radius,p1,STATUS_PTR))
 
 #if defined(astCLASS)            /* Protected */
 #define astBestCircle(pset,cen,unc) astBestCircle_(pset,cen,unc,STATUS_PTR)

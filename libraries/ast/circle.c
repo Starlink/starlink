@@ -165,8 +165,8 @@ static double *CircumPoint( AstFrame *, int, const double *, double, int * );
 static double *RegCentre( AstRegion *this, double *, double **, int, int, int * );
 static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int **, int * );
 static void Cache( AstCircle *, int * );
-static void CalcPars( AstFrame *, AstPointSet *, double *, double *, int * );
-static void CirclePars( AstCircle *, double *, double *, int * );
+static void CalcPars( AstFrame *, AstPointSet *, double *, double *, double *, int * );
+static void CirclePars( AstCircle *, double *, double *, double *, int * );
 static void Copy( const AstObject *, AstObject *, int * );
 static void Delete( AstObject *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
@@ -347,7 +347,8 @@ static void Cache( AstCircle *this, int *status ){
 
 /* Get the radius and centre of the Circle in the base Frame, using the
    centre and circumference positions stored in the parent Region structure. */
-      CalcPars( frm, ( (AstRegion *) this)->points, centre, &radius, status );
+      CalcPars( frm, ( (AstRegion *) this)->points, centre, &radius, NULL, 
+                status );
 
 /* Allocate memory to store the base frame bounding box. This is just
    initialised here. It is set properly when the astRegBaseMesh
@@ -389,7 +390,7 @@ static void Cache( AstCircle *this, int *status ){
 }
 
 static void CalcPars( AstFrame *frm, AstPointSet *pset, double *centre, 
-                      double *radius, int *status ){
+                      double *radius, double *p1, int *status ){
 /*
 *  Name:
 *     CalcPars
@@ -403,7 +404,7 @@ static void CalcPars( AstFrame *frm, AstPointSet *pset, double *centre,
 *  Synopsis:
 *     #include "circle.h"
 *     double *CalcPars( AstFrame *frm, AstPointSet *pset, double *centre,
-*                       double *radius, int *status )
+*                       double *radius, double *p1, int *status )
 
 *  Class Membership:
 *     Circle member function 
@@ -422,11 +423,16 @@ static void CalcPars( AstFrame *frm, AstPointSet *pset, double *centre,
 *        circumference.
 *     centre
 *        An array in which to return the axis values at the circle centre. 
-*        The length of this array shoould be no less than the number of
+*        The length of this array should be no less than the number of
 *        axes in "frm".
 *     radius
 *        Pointer to a double in which to return the circle radius,
 *        expressed as a geodesic distance in the supplied Frame.
+*     p1
+*        An array in which to return the coordinates of a point on the
+*        circumference of the circle. The length of this array should be 
+*        no less than the number of axes in "frm". Can be NULL if the
+*        circumference position is not needed.
 *     status
 *        Pointer to the inherited status variable.
 
@@ -444,11 +450,16 @@ static void CalcPars( AstFrame *frm, AstPointSet *pset, double *centre,
 /* Get and the number of axes. */
    nc = astGetNaxes( frm );
 
-/* Allocate memory to store a circumference position in the supplied Frame. */
-   circum = (double *) astMalloc( sizeof( double )*(size_t) nc );   
-
 /* Get pointers to the coordinate data in the supplied PointSet. */
    ptr = astGetPoints( pset );
+
+/* If no p1 array was supplied, create a temporary work array to hold the
+   circumference position. */
+   if( !p1 ) {
+      circum = astMalloc( sizeof( double )*nc );
+   } else {
+      circum = p1;
+   }
 
 /* Check pointers can be used safely. */
    if( ptr ) {
@@ -461,14 +472,14 @@ static void CalcPars( AstFrame *frm, AstPointSet *pset, double *centre,
 
 /* Return the geodesic distance between these two points as the radius. */
       *radius = astDistance( frm, centre, circum );      
-
-/* Free the unwanted array. */
-      circum = astFree( circum );
    }
+
+/* Free any work array. */
+   if( !p1 ) circum = astFree( circum );
 }
 
 static void CirclePars( AstCircle *this, double *centre, double *radius,
-                        int *status ){
+                        double *p1, int *status ){
 /*
 *++
 *  Name:
@@ -483,8 +494,9 @@ f     AST_CIRCLEPARS
 
 *  Synopsis:
 c     #include "circle.h"
-c     void astCirclePars( AstCircle *this, double *centre, double *radius )
-f     CALL AST_CIRCLEPARS( THIS, CENTRE, RADIUS, STATUS )
+c     void astCirclePars( AstCircle *this, double *centre, double *radius, 
+c                         double *p1 )
+f     CALL AST_CIRCLEPARS( THIS, CENTRE, RADIUS, P1, STATUS )
 
 *  Class Membership:
 *     Region method.
@@ -502,13 +514,22 @@ c     centre
 f     CENTRE( * ) = DOUBLE PRECISION (Returned)
 c        Pointer to an array
 f        An array
-*        in which to return the the coordinates of the Circle centre.
+*        in which to return the coordinates of the Circle centre.
 *        The length of this array should be no less than the number of
 *        axes in the associated coordinate system.
 c     radius
 f     RADIUS = DOUBLE PRECISION (Returned)
 *        Returned holding the radius of the Circle, as an geodesic
 *        distance in the associated coordinate system.
+c     p1
+f     P1( * ) = DOUBLE PRECISION (Returned)
+c        Pointer to an array
+f        An array
+*        in which to return the coordinates of a point on the
+*        circumference of the Circle. The length of this array should be 
+*        no less than the number of axes in the associated coordinate system.
+c        A NULL pointer can be supplied if the circumference position is
+c        not needed.
 f     STATUS = INTEGER (Given and Returned)
 f        The global status.
 
@@ -541,7 +562,7 @@ f        The global status.
    frm = astGetFrame( this_region->frameset, AST__CURRENT );
 
 /* Calculate the required parameters. */
-   CalcPars( frm, pset, centre, radius, status );
+   CalcPars( frm, pset, centre, radius, p1, status );
    
 /* Free resources */
    frm = astAnnul( frm );
@@ -2710,10 +2731,10 @@ AstCircle *astLoadCircle_( void *mem, size_t size, AstCircleVtab *vtab,
 
 
 void astCirclePars_( AstCircle *this, double *centre, double *radius,
-                     int *status ){
+                     double *p1, int *status ){
    if ( !astOK ) return;
    return (**astMEMBER(this,Circle,CirclePars))( this, centre, radius,
-                                                 status );
+                                                 p1, status );
 }
 
 

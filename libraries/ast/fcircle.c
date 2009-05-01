@@ -110,14 +110,16 @@ F77_INTEGER_FUNCTION(ast_circle)( INTEGER(FRAME),
 F77_SUBROUTINE(ast_circlepars)( INTEGER(THIS),
                                 DOUBLE_ARRAY(CENTRE),
                                 DOUBLE(RADIUS),
+                                DOUBLE_ARRAY(P1),
                                 INTEGER(STATUS) ) {
    GENPTR_INTEGER(THIS)
    GENPTR_DOUBLE_ARRAY(CENTRE)
    GENPTR_DOUBLE(RADIUS)
+   GENPTR_DOUBLE_ARRAY(P1)
 
    astAt( "AST_CIRCLEPARS", NULL, 0 );
    astWatchSTATUS(
-      astCirclePars( astI2P( *THIS ), CENTRE, RADIUS );
+      astCirclePars( astI2P( *THIS ), CENTRE, RADIUS, P1 );
    )
 }
 

@@ -125,7 +125,7 @@ typedef struct AstEllipseVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
-   void (* EllipsePars)( AstEllipse *, double[2], double *, double *, double *, int * );
+   void (* EllipsePars)( AstEllipse *, double[2], double *, double *, double *, double[2], double[2], int * );
 
 } AstEllipseVtab;
 
@@ -180,7 +180,7 @@ AstEllipse *astLoadEllipse_( void *, size_t, AstEllipseVtab *,
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
-void astEllipsePars_( AstEllipse *, double[2], double *, double *, double *, int * );
+void astEllipsePars_( AstEllipse *, double[2], double *, double *, double *, double[2], double[2], int * );
 # if defined(astCLASS)           /* Protected */
 AstRegion *astBestEllipse_( AstPointSet *, double *, AstRegion *, int * );
 #endif
@@ -230,8 +230,8 @@ astINVOKE(O,astLoadEllipse_(mem,size,vtab,name,astCheckChannel(channel),STATUS_P
 /* Here we make use of astCheckEllipse to validate Ellipse pointers
    before use.  This provides a contextual error report if a pointer
    to the wrong sort of Object is supplied. */
-#define astEllipsePars(this,centre,a,b,angle) \
-astINVOKE(V,astEllipsePars_(astCheckEllipse(this),centre,a,b,angle,STATUS_PTR))
+#define astEllipsePars(this,centre,a,b,angle,p1,p2) \
+astINVOKE(V,astEllipsePars_(astCheckEllipse(this),centre,a,b,angle,p1,p2,STATUS_PTR))
 
 #if defined(astCLASS)            /* Protected */
 #define astBestEllipse(pset,cen,unc) astBestEllipse_(pset,cen,unc,STATUS_PTR)

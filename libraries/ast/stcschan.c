@@ -5362,7 +5362,7 @@ static int WriteRegion( AstStcsChan *this, AstRegion *reg, AstKeyMap *props,
             astMapPut0C( spprops, "ID", "Circle", NULL );
 
 /* Get the geometric parameters of the Circle. */
-            astCirclePars( spreg, centre, &a );
+            astCirclePars( spreg, centre, &a, NULL );
 
 /* Create a string holding the formatted centre axis values, scaling
    to the required units. Use the Frame's Digits attribute to specify 
@@ -5455,7 +5455,7 @@ static int WriteRegion( AstStcsChan *this, AstRegion *reg, AstKeyMap *props,
             astMapPut0C( spprops, "ID", "Ellipse", NULL );
 
 /* Get the geometric parameters of the Ellipse. */
-            astEllipsePars( spreg, centre, &a, &b, &angle );
+            astEllipsePars( spreg, centre, &a, &b, &angle, NULL, NULL );
 
 /* Create a string holding the formatted centre axis values, scaling
    to the required units. Use the Frame's Digits attribute to specify 

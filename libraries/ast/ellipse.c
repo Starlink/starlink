@@ -169,7 +169,7 @@ static void CalcPars( AstFrame *, double[2], double[2], double[2], double *, dou
 static void Copy( const AstObject *, AstObject *, int * );
 static void Delete( AstObject *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
-static void EllipsePars( AstEllipse *, double[2], double *, double *, double *, int * );
+static void EllipsePars( AstEllipse *, double[2], double *, double *, double *, double[2], double[2], int * );
 static void RegBaseBox( AstRegion *this, double *, double *, int * );
 static void ResetCache( AstRegion *this, int * );
 static void SetRegFS( AstRegion *, AstFrame *, int * );
@@ -679,8 +679,8 @@ static void Cache( AstEllipse *this, int *status ){
 }
 
 static void CalcPars( AstFrame *frm, double centre[2], double point1[2], 
-                      double point2[2], double *a, double *b, double *angle, 
-                      int *status ){
+                      double point2[2], double *a, double *b, 
+                      double *angle, int *status ){
 /*
 *  Name:
 *     CalcPars
@@ -712,7 +712,8 @@ static void CalcPars( AstFrame *frm, double centre[2], double point1[2],
 *     point1
 *        Array holding coords at end of primary axis 
 *     point2
-*        Array holding coords at another point on ellipse 
+*        Array holding coords at another point on ellipse. On exit it
+*        holds the coords at the end of the secondary axis.
 *     a
 *        Pointer to location at which to store the half-length of the
 *        primary axis.
@@ -722,7 +723,8 @@ static void CalcPars( AstFrame *frm, double centre[2], double point1[2],
 *     angle
 *        Pointer to location at which to store the angle from the 
 *        positive direction of the second Frame axis to the primary 
-*        ellipse axis, in radians.
+*        ellipse axis, in radians. Rotation from the second to the first
+*        Frame axis is positive.
 *     status
 *        Pointer to the inherited status variable.
 
@@ -755,17 +757,21 @@ static void CalcPars( AstFrame *frm, double centre[2], double point1[2],
       } else {
          *b = *a;
       }
-   
+
 /* Find the angle from the positive direction of the second axis to the
    primary ellipse axis. */
       point3[ 0 ] = centre[ 0 ];
       point3[ 1 ] = centre[ 1 ] + fabs( 0.1*(*a) );
       *angle = astAngle( frm, point3, centre, point1 );
+
+/* Find the end point of the secondary axis. */
+      (void) astOffset2( frm, centre, *angle + AST__DPIBY2, *b, point2 ); 
    }
 }
 
 static void EllipsePars( AstEllipse *this, double centre[2], double *a,
-                         double *b, double *angle, int *status ){
+                         double *b, double *angle, double p1[2], 
+                         double p2[2], int *status ){
 /*
 *++
 *  Name:
@@ -781,8 +787,8 @@ f     AST_ELLIPSEPARS
 *  Synopsis:
 c     #include "ellipse.h"
 c     void astEllipsePars( AstEllipse *this, double centre[2], double *a,
-c                          double *b, double *angle )
-f     CALL AST_ELLIPSEPARS( THIS, CENTRE, A, B, ANGLE, STATUS )
+c                          double *b, double *angle, double p1[2], double p2[2] )
+f     CALL AST_ELLIPSEPARS( THIS, CENTRE, A, B, ANGLE, P1, P2, STATUS )
 
 *  Class Membership:
 *     Region method.
@@ -817,6 +823,16 @@ f        ANGLE
 *        the Y axis to the first axis of the ellipse, in radians.
 *        Positive rotation is in the same sense as rotation from the 
 *        positive direction of Y to the positive direction of X.
+c     p1
+f     P1( 2 ) = DOUBLE PRECISION (Returned)
+*        An array in which to return the coordinates at one of the two ends 
+*        of the first axis  of the ellipse. 
+c        A NULL pointer can be supplied if these coordinates are not needed.
+c     p2
+f     P2( 2 ) = DOUBLE PRECISION (Returned)
+*        An array in which to return the coordinates at one of the two ends 
+*        of the second axis  of the ellipse.
+c        A NULL pointer can be supplied if these coordinates are not needed.
 f     STATUS = INTEGER (Given and Returned)
 f        The global status.
 
@@ -834,12 +850,14 @@ f        The global status.
 */
 
 /* Local Variables: */
-   AstRegion *this_region;  /* Parent Region pointer */
    AstFrame *frm;           /* Current Frame represented by the Ellipse */
    AstPointSet *pset;       /* PointSet holding PointList axis values */
+   AstRegion *this_region;  /* Parent Region pointer */
    double **ptr;            /* Pointer to axes values in the PointList */
-   double point1[ 2 ];      /* Array holding coords at end of primary axis */
-   double point2[ 2 ];      /* Array holding coords at another point on ellipse */
+   double *point1;          /* Pointer to "p1" or "buf1" */
+   double *point2;          /* Pointer to "p2" or "buf2" */
+   double buf1[2];          /* Local substitute array for "p1" */
+   double buf2[2];          /* Local substitute array for "p2" */
    int i;                   /* Axis index */
 
 /* Check the inherited status. */
@@ -853,7 +871,20 @@ f        The global status.
 
 /* Get pointers to the coordinate data. */
    ptr = astGetPoints( pset );
-   
+
+/* Choose the arrays to use - supplied arrays if possible, local arrays
+   otherwise. */
+   if( p1 ) {
+      point1 = p1;
+   } else {   
+      point1 = buf1;
+   }
+   if( p2 ) {
+      point2 = p2;
+   } else {   
+      point2 = buf2;
+   }
+
 /* Check pointers can be used safely. */
    if( astOK ) {
    
@@ -2826,10 +2857,11 @@ AstEllipse *astLoadEllipse_( void *mem, size_t size, AstEllipseVtab *vtab,
    same interface. */
 
 void astEllipsePars_( AstEllipse *this, double centre[2], double *a,
-                      double *b, double *angle, int *status ){
+                      double *b, double *angle, double p1[2], double p2[2],
+                      int *status ){
    if ( !astOK ) return;
    return (**astMEMBER(this,Ellipse,EllipsePars))( this, centre, a, b,
-                                                   angle, status );
+                                                   angle, p1, p2, status );
 }
 
 

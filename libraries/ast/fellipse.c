@@ -114,16 +114,20 @@ F77_SUBROUTINE(ast_ellipsepars)( INTEGER(THIS),
                                  DOUBLE(A),
                                  DOUBLE(B),
                                  DOUBLE(ANGLE),
+                                 DOUBLE_ARRAY(P1),
+                                 DOUBLE_ARRAY(P2),
                                  INTEGER(STATUS) ) {
    GENPTR_INTEGER(THIS)
    GENPTR_DOUBLE_ARRAY(CENTRE)
    GENPTR_DOUBLE(A)
    GENPTR_DOUBLE(B)
    GENPTR_DOUBLE(ANGLE)
+   GENPTR_DOUBLE_ARRAY(P1)
+   GENPTR_DOUBLE_ARRAY(P2)
 
    astAt( "AST_ELLIPSEPARS", NULL, 0 );
    astWatchSTATUS(
-      astEllipsePars( astI2P( *THIS ), CENTRE, A, B, ANGLE );
+      astEllipsePars( astI2P( *THIS ), CENTRE, A, B, ANGLE, P1, P2 );
    )
 }
 
