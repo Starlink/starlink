@@ -896,7 +896,6 @@ static void Dump( AstObject *, AstChannel *, int * );
 static void GetRegionBounds( AstRegion *, double *, double *, int * );
 static void GetRegionBounds2( AstRegion *, double *, double *, int * );
 static void GetRegionPoints( AstRegion *, int, int, int *, double *, int * );
-static void GetUncBounds( AstRegion *, double *, double *, int * );
 static void Intersect( AstFrame *, const double[2], const double[2], const double[2], const double[2], double[2], int * );
 static void LineOffset( AstFrame *, AstLineDef *, double, double, double[2], int * );
 static void Negate( AstRegion *, int * );
@@ -3044,7 +3043,7 @@ static int GetBounded( AstRegion *this, int *status ) {
 *-
 */
 
-/* For Regions which are defined by one or more clsoed curves such as Circles, 
+/* For Regions which are defined by one or more closed curves such as Circles, 
    Boxes, etc, the Region is bounded so long as it has not been negated. 
    Classes for which this is not true should over-ride this implementation. */
    return !astGetNegated( this );
@@ -4159,7 +4158,6 @@ void astInitRegionVtab_(  AstRegionVtab *vtab, const char *name, int *status ) {
    vtab->GetUncFrm = GetUncFrm;
    vtab->SetUnc = SetUnc;
    vtab->GetUnc = GetUnc;
-   vtab->GetUncBounds = GetUncBounds;
    vtab->ShowMesh = ShowMesh;
    vtab->GetRegionBounds = GetRegionBounds;
    vtab->GetRegionBounds2 = GetRegionBounds2;
@@ -7777,54 +7775,103 @@ f        The global status.
 */
 
 /* Local Variables: */
+   AstFrame *frm;             /* Current Frame */
    AstMapping *smap;          /* Simplified base -> current Mapping */
-   double *lbndb;             /* Pointer to lower bounds on base box */
-   double *ubndb;             /* Pointer to upper bounds on base box */
+   AstPointSet *bmesh;        /* PointSet holding base Frame mesh */
+   AstPointSet *cmesh;        /* PointSet holding current Frame mesh */
+   double **bptr;             /* Pointer to PointSet coord arrays */
+   double *p;                 /* Array of values for current axis */
+   double width;              /* Width of bounding box on i'th axis */
    int i;                     /* Axis count */
+   int ip;                    /* Index of current corner */
+   int j;                     /* Timer for low/high swaps */
+   int jmax;                  /* Increment between low/high swaps */
+   int lo;                    /* Assign low bound to next corner? */
    int nbase;                 /* Number of base Frame axes */
    int ncur;                  /* Number of current Frame axes */
-
+   int npos;                  /* Number of box corners */
+   
 /* Check the inherited status. */
    if( !astOK ) return;
-
-/* Find the number of axes in the base and current Frames of the
-   encapsulated FrameSet. */
-   nbase = astGetNin( this->frameset );
-   ncur = astGetNout( this->frameset );
-
-/* Get the bounding box in the base Frame of the encapsulated FrameSet. */
-   lbndb = astMalloc( sizeof( double )*(size_t) nbase );   
-   ubndb = astMalloc( sizeof( double )*(size_t) nbase );   
-   astRegBaseBox( this, lbndb, ubndb );      
 
 /* Get the simplified base to current Mapping. */
    smap = astRegMapping( this );
 
-/* Check pointers can be used safely. */
-   if( smap ) {
+/* If the simplified Mapping is a UnitMap, just store the base box bounds
+   in the returned arrays */
+   if( astIsAUnitMap( smap ) ) {
+      astRegBaseBox( this, lbnd, ubnd );      
 
-/* If the simplified Mapping is a UnitMap, just copy the base box bounds
-   to the returned arrays */
-      if( astIsAUnitMap( smap ) ) {
-         for( i = 0; i < ncur; i++ ) {
-            lbnd[ i ] = lbndb[ i ];
-            ubnd[ i ] = ubndb[ i ];
-         }
+/* Otherwise, we get a mesh of points over the boundary of the Region within 
+   the base Frame, transform them into the current Frame, and find their bounds. */
+   } else {
 
-/* Otherwise, use astMapBox to find the corresponding current Frame
-   limits. */ 
+/* If the Region is bounded, we can get a genuine mesh of points on the
+   boundary of the Region. */
+      if( astGetBounded( this ) ) {
+         bmesh = astRegBaseMesh( this );
+
+/* If the Region is not bounded, no mesh can be created so we use the
+   corners of the base frame bounding box instead. */
       } else {
-         for( i = 0; i < ncur; i++ ) {
-            astMapBox( smap, lbndb, ubndb, 1, i, lbnd + i, ubnd + i, 
-                       NULL, NULL );
-         }            
+
+/* Get the base Frame bounding box. */
+         astRegBaseBox( this, lbnd, ubnd );      
+
+/* Get the number of corners in the base Frame bounding box. */
+         nbase = astGetNin( smap );
+         npos = pow( 2, nbase );
+
+/* Create a PointSet to hold the positions at the corners in the base
+   frame box. */
+         bmesh = astPointSet( npos, nbase, " ", status );
+         bptr = astGetPoints( bmesh );
+         if( bptr ) {
+
+/* Store the coordinates of the box corners in the PointSet. */
+            jmax = 1;
+            for( i = 0; i < nbase; i++ ) {
+               p = bptr[ i ];
+   
+               lo = 1;
+               j = 0;
+               for( ip = 0; ip < npos; ip++,j++ ) {
+                  if( j == jmax ) {
+                     lo = 1 - lo;
+                     j = 0;
+                  }
+                  p[ ip ] = lo ? lbnd[ i ] : ubnd[ i ];
+               }
+   
+               jmax *= 2;
+            }
+         }
       }
-   }
+
+/* Create a new PointSet holding the above points transformed into the 
+   current Frame. */
+      cmesh = astTransform( smap, bmesh, 1, NULL );
+
+/* Get the axis bounds of this PointSet. */
+      astBndPoints( cmesh, lbnd, ubnd );     
+
+/* There is a possibility that these bounds may span a singularity in the
+   coordinate system such as the RA=0 line in a SkyFrame. So for each
+   axis we ensure the width (i.e. "ubnd-lbnd" ) is correct. */
+      frm = astGetFrame( this->frameset, AST__CURRENT );
+      ncur = astGetNaxes( frm );
+
+      for( i = 0; i < ncur; i++ ) {
+         width = astAxDistance( frm, i + 1, lbnd[ i ], ubnd[ i ] );
+         ubnd[ i ] = lbnd[ i ] + width;
+      }
 
 /* Release resources. */
+      frm = astAnnul( frm );
+      bmesh = astAnnul( bmesh );
+      cmesh = astAnnul( cmesh );
+   } 
    smap = astAnnul( smap );
-   lbndb = astFree( lbndb );
-   ubndb = astFree( ubndb );
 }
 
 static void GetRegionBounds2( AstRegion *this, double *lbnd, double *ubnd, int *status ){
@@ -8128,149 +8175,6 @@ f        AST_DECOMPOSE
       pset = astAnnul( pset );
 
    }
-}
-
-static void GetUncBounds( AstRegion *this, double *lbnd, double *ubnd, int *status ){
-/*
-*+
-*  Name:
-*     astGetUncBounds
-
-*  Purpose:
-*     Returns the bounding box of Region.
-
-*  Type:
-*     Protected virtual function.
-
-*  Synopsis:
-*     #include "region.h"
-*     void astGetUncBounds( AstRegion *this, double *lbnd, double *ubnd )
-
-*  Class Membership:
-*     Region method.
-
-*  Description:
-*     This function returns the upper and lower limits of a box which just 
-*     encompasses the supplied Region. The limits are returned as axis values 
-*     within the Frame represented by the Region. The value of the Negated
-*     attribute is ignored (i.e. it is assumed that the Region has not
-*     been negated). 
-*
-*     This function differs from astGetRegionBounds in the algorithm it
-*     uses. Instead of transforming the corners of the box from base
-*     Frame to current Frame (which is what astGetRegionBounds does).
-*     it uses the Jacobian matrix of the base->current Mapping to scale
-*     the box from base Frame to current Frame. This makes it more
-*     appropriate for cases where the base->current Mapping have singularies
-*     (such as the pixel->wcs mapping in all-sky images). However, it
-*     should usually only be used on small regions over which the Jacobian 
-*     can be assumed constant. This makes it more appropriate for finding
-*     the bounding boxes of uncertainty Regions rather than their parent 
-*     Regions.
-
-*  Parameters:
-*     this
-*        Pointer to the Region.
-*     lbnd
-*        Pointer to an array in which to return the lower axis bounds covered 
-*        by the Region. It should have at least as many elements as there are 
-*        axes in the Region. If an axis has no lower limit, the returned value 
-*        will be the largest possible negative value.
-*     ubnd
-*        Pointer to an array in which to return the upper axis bounds covered 
-*        by the Region. It should have at least as many elements as there are 
-*        axes in the Region. If an axis has no upper limit, the returned value 
-*        will be the largest possible positive value.
-
-*  Notes:
-*    - The value of the Negated attribute is ignored (i.e. it is assumed that 
-*    the Region has not been negated).
-*    - If an axis has no extent on an axis then the lower limit will be
-*    returned larger than the upper limit. Note, this is different to an
-*    axis which has a constant value (in which case both lower and upper 
-*    limit will be returned set to the constant value).
-
-*-
-*/
-
-/* Local Variables: */
-   AstMapping *smap;          /* Simplified base -> current Mapping */
-   double *cenb;              /* Array holding base frame centre */
-   double *cenc;              /* Array holding current frame centre */
-   double *hwb;               /* Array holding base frame half-widths */
-   double *lbndb;             /* Pointer to lower bounds on base box */
-   double *ubndb;             /* Pointer to upper bounds on base box */
-   double hwc;                /* Current Frame half width */
-   int i;                     /* Axis count */
-   int j;                     /* Axis count */
-   int nbase;                 /* Number of base Frame axes */
-   int ncur;                  /* Number of current Frame axes */
-
-/* Check the inherited status. */
-   if( !astOK ) return;
-
-/* Find the number of axes in the base and current Frames of the
-   encapsulated FrameSet. */
-   nbase = astGetNin( this->frameset );
-   ncur = astGetNout( this->frameset );
-
-/* Get the bounding box in the base Frame of the encapsulated FrameSet. */
-   lbndb = astMalloc( sizeof( double )*(size_t) nbase );   
-   ubndb = astMalloc( sizeof( double )*(size_t) nbase );   
-   astRegBaseBox( this, lbndb, ubndb );      
-
-/* Get the simplified base to current Mapping. */
-   smap = astRegMapping( this );
-
-/* Check pointers can be used safely. */
-   if( smap ) {
-
-/* If the simplified Mapping is a UnitMap, just copy the base box bounds
-   to the returned arrays */
-      if( astIsAUnitMap( smap ) ) {
-         for( j = 0; j < ncur; j++ ) {
-            lbnd[ j ] = lbndb[ j ];
-            ubnd[ j ] = ubndb[ j ];
-         }
-
-/* Otherwise, use the Jacobian of the Mapping to find the corresponding 
-   current Frame limits. */ 
-      } else {
-
-/* Store the centre of the base Frame uncertainty box, and transform it to 
-   the current Frame. Also store the half-widths of the base frame box in
-   the "hwb" array. */
-         cenb = astMalloc( sizeof( double )*(size_t)nbase );
-         cenc = astMalloc( sizeof( double )*(size_t)ncur );
-         hwb = astMalloc( sizeof( double )*(size_t)nbase );
-         if( hwb ) {
-            for( i = 0; i < nbase; i++ ) {
-               cenb[ i ] = 0.5*( lbndb[ i ] + ubndb[ i ] );
-               hwb[ i ] = fabs( 0.5*( ubndb[ i ] - lbndb[ i ] ) );
-            }        
-            astTranN( smap, 1, nbase, 1, cenb, 1, ncur, 1, cenc );
-
-/* Scale the base-frame uncertainty box into the current Frame. */
-            for( j = 0; j < ncur; j++ ) {
-               hwc = 0.0;                           
-               for( i = 0; i < nbase; i++ ) {
-                  hwc += hwb[ i ]*astRate( smap, cenb, j, i );
-               }
-               hwc = fabs( hwc );
-               lbnd[ j ] = cenc[ j ] - hwc;
-               ubnd[ j ] = cenc[ j ] + hwc;
-            }
-         }            
-         cenc = astFree( cenc );
-         cenb = astFree( cenb );
-         hwb = astFree( hwb );
-      }
-   }
-
-/* Release resources. */
-   smap = astAnnul( smap );
-   lbndb = astFree( lbndb );
-   ubndb = astFree( ubndb );
 }
 
 static void RegOverlay( AstRegion *this, AstRegion *that, int unc, int *status ){
@@ -9584,7 +9488,7 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
    the uncertainty region, centred on the current centre of the uncertainty
    region (we know all uncertainty regions are bounded). */
          } else {
-            astGetUncBounds( sunc, lbnd, ubnd );      
+            astGetRegionBounds( sunc, lbnd, ubnd );      
             for( ic = 0; ic < naxb; ic++ ) {
                delta = 0.5*fabs( ubnd[ ic ] - lbnd[ ic ] );
                lbnd[ ic ] = orig_cen[ ic ] - delta;
@@ -9600,7 +9504,7 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
    current Frame, which is the same as the base Frame of "this". */
          s1_lbnd = astMalloc( sizeof( double )*(size_t)naxb );      
          s1_ubnd = astMalloc( sizeof( double )*(size_t)naxb );      
-         astGetUncBounds( sunc, s1_lbnd, s1_ubnd );      
+         astGetRegionBounds( sunc, s1_lbnd, s1_ubnd );      
 
 /* Now re-centre the uncertainty Region at the upper bounds of the test
    box. */
@@ -9609,7 +9513,7 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
 /* Get the bounding box of the re-centred uncertainty Region. */
          s2_lbnd = astMalloc( sizeof( double )*(size_t)naxb );      
          s2_ubnd = astMalloc( sizeof( double )*(size_t)naxb );      
-         astGetUncBounds( sunc, s2_lbnd, s2_ubnd );      
+         astGetRegionBounds( sunc, s2_lbnd, s2_ubnd );      
 
 /* Get a pointer to the base Frame of "this". */
          bfrm = astGetFrame( this->frameset, AST__BASE );
@@ -12004,10 +11908,6 @@ void astGetRegionPoints_( AstRegion *this, int maxpoint, int maxcoord,
 void astShowMesh_( AstRegion *this, int format, const char *ttl, int *status ){
    if ( !astOK ) return;
    (**astMEMBER(this,Region,ShowMesh))( this, format,ttl, status );
-}
-void astGetUncBounds_( AstRegion *this, double *lbnd, double *ubnd, int *status ){
-   if ( !astOK ) return;
-   (**astMEMBER(this,Region,GetUncBounds))( this, lbnd, ubnd, status );
 }
 void astGetRegionBounds2_( AstRegion *this, double *lbnd, double *ubnd, int *status ){
    if ( !astOK ) return;

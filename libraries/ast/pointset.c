@@ -712,7 +712,7 @@ static void BndPoints( AstPointSet *this, double *lbnd, double *ubnd, int *statu
 /* Search for the first good point. Use it to initialise the bounds and
    break out of the loop. */
          p = ptr[ ic ];
-         for( ip = 0; ip < nc; ip++,p++ ) {
+         for( ip = 0; ip < np; ip++,p++ ) {
             if( *p != AST__BAD ) {
                lb = ub = *p;
                break;
@@ -721,7 +721,7 @@ static void BndPoints( AstPointSet *this, double *lbnd, double *ubnd, int *statu
 
 /* Search through the remaining points. Update the bounds if the axis 
    value is good. */
-         for( ; ip < nc; ip++,p++ ) {
+         for( ; ip < np; ip++,p++ ) {
             if( *p != AST__BAD ) {
                if( *p < lb ) {
                   lb = *p;

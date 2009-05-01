@@ -1058,7 +1058,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    Frame of the uncertainty Region is the same as the base Frame of the
    Polygon. */
    tunc = astGetUncFrm( this, AST__BASE );      
-   astGetUncBounds( tunc, lbnd_tunc, ubnd_tunc ); 
+   astGetRegionBounds( tunc, lbnd_tunc, ubnd_tunc ); 
 
 /* Find the geodesic length within the base Frame of "this" of the diagonal of 
    the bounding box. */
@@ -1068,7 +1068,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 /* Also get the Region which defines the uncertainty of the supplied points
    and get its bounding box in the same Frame. */
    if( unc ) {
-      astGetUncBounds( unc, lbnd_unc, ubnd_unc ); 
+      astGetRegionBounds( unc, lbnd_unc, ubnd_unc ); 
 
 /* Find the geodesic length of the diagonal of this bounding box. */
       l2 = astDistance( frm, lbnd_unc, ubnd_unc );

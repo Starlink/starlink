@@ -476,7 +476,7 @@ static AstBox *BestBox( AstFrame *frm, AstPointSet *mesh, AstRegion *unc, int *s
    if( axval ) {
 
 /* Get the bounding box of the uncertainty region. */
-      astGetUncBounds( unc, lbnd, ubnd ); 
+      astGetRegionBounds( unc, lbnd, ubnd ); 
 
 /* We fit the box one axis at a time. */
       for( ic = 0; ic < nc; ic++ ) {
@@ -765,7 +765,7 @@ static void Cache( AstBox *this, int lohi, int *status ){
 /* Get the bounding box of the uncertainty Region in the base Frame of
    the supplied Box. */
             unc = astGetUncFrm( this, AST__BASE );
-            astGetUncBounds( unc, lbnd_unc, ubnd_unc ); 
+            astGetRegionBounds( unc, lbnd_unc, ubnd_unc ); 
 
 /* Ensure the shrunk extents are at least half the width of the uncertainty 
    bounding box. */
@@ -3101,14 +3101,14 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    tunc = astGetUncFrm( this, AST__BASE );      
    lbnd_tunc = astMalloc( sizeof( double )*(size_t) nc );
    ubnd_tunc = astMalloc( sizeof( double )*(size_t) nc );
-   astGetUncBounds( tunc, lbnd_tunc, ubnd_tunc ); 
+   astGetRegionBounds( tunc, lbnd_tunc, ubnd_tunc ); 
 
 /* Also get the Region which defines the uncertainty of the supplied points
    and get its bounding box. */
    if( unc ) {
       lbnd_unc = astMalloc( sizeof( double )*(size_t) nc );
       ubnd_unc = astMalloc( sizeof( double )*(size_t) nc );
-      astGetUncBounds( unc, lbnd_unc, ubnd_unc ); 
+      astGetRegionBounds( unc, lbnd_unc, ubnd_unc ); 
    } else {
       lbnd_unc = NULL;
       ubnd_unc = NULL;

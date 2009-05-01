@@ -1928,11 +1928,11 @@ static int Overlap( AstRegion *this, AstRegion *that, int *status ){
             nc = astGetNaxes( frm );
             lbndu_this = astMalloc( sizeof( double )*(size_t)nc );
             ubndu_this = astMalloc( sizeof( double )*(size_t)nc );
-            astGetUncBounds( unc_this, lbndu_this, ubndu_this ); 
+            astGetRegionBounds( unc_this, lbndu_this, ubndu_this ); 
 
             lbndu_that = astMalloc( sizeof( double )*(size_t)nc );
             ubndu_that = astMalloc( sizeof( double )*(size_t)nc );
-            astGetUncBounds( unc_that, lbndu_that, ubndu_that ); 
+            astGetRegionBounds( unc_that, lbndu_that, ubndu_that ); 
 
 /* Transform the PointSet holding the limits for the second Interval into
    the Frame of the first Interval. */
@@ -2706,14 +2706,14 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    tunc = astGetUncFrm( this, AST__BASE );      
    lbnd_tunc = astMalloc( sizeof( double )*(size_t) nc );
    ubnd_tunc = astMalloc( sizeof( double )*(size_t) nc );
-   astGetUncBounds( tunc, lbnd_tunc, ubnd_tunc ); 
+   astGetRegionBounds( tunc, lbnd_tunc, ubnd_tunc ); 
 
 /* Also get the Region which defines the uncertainty of the supplied points
    and get its bounding box. */
    if( unc ) {
       lbnd_unc = astMalloc( sizeof( double )*(size_t) nc );
       ubnd_unc = astMalloc( sizeof( double )*(size_t) nc );
-      astGetUncBounds( unc, lbnd_unc, ubnd_unc ); 
+      astGetRegionBounds( unc, lbnd_unc, ubnd_unc ); 
    } else {
       lbnd_unc = NULL;
       ubnd_unc = NULL;
@@ -3602,7 +3602,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
                            unc = astGetUncFrm( reg, AST__BASE );
                            lbnd_unc = astMalloc( sizeof( double)*(size_t) ncoord_tmp );
                            ubnd_unc = astMalloc( sizeof( double)*(size_t) ncoord_tmp );
-                           astGetUncBounds( unc, lbnd_unc, ubnd_unc );
+                           astGetRegionBounds( unc, lbnd_unc, ubnd_unc );
                         }
 
 /* Set the gap between the limits to be equal to the uincertainty on this
@@ -3768,7 +3768,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
                            unc = astGetUncFrm( reg, AST__BASE );
                            lbnd_unc = astMalloc( sizeof( double)*(size_t) ncoord_tmp );
                            ubnd_unc = astMalloc( sizeof( double)*(size_t) ncoord_tmp );
-                           astGetUncBounds( unc, lbnd_unc, ubnd_unc );
+                           astGetRegionBounds( unc, lbnd_unc, ubnd_unc );
                         }
 
 /* Set the gap between the limits to be equal to the uincertainty on this
