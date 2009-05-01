@@ -3687,7 +3687,7 @@ void astWatchMemory_( int id ) {
    Watched_ID = id;
 }
 
-int astMemoryId_( void *ptr, int *status ){
+int astMemoryId_( const void *ptr, int *status ){
 /*
 *+
 *  Name:
@@ -3701,7 +3701,7 @@ int astMemoryId_( void *ptr, int *status ){
 
 *  Synopsis:
 *     #include "memory.h"
-*     int astMemoryId( void *ptr )
+*     int astMemoryId( const void *ptr )
 
 *  Description:
 *     This function returns the integer identifier associated with a
@@ -3797,7 +3797,7 @@ void astMemoryAlarm_( const char *verb ){
    printf( "astMemoryAlarm: Memory id %d has been %s.\n", Watched_ID, verb );
 }
 
-void astMemoryUse_( void *ptr, const char *verb, int *status ){
+void astMemoryUse_( const void *ptr, const char *verb, int *status ){
 /*
 *+
 *  Name:

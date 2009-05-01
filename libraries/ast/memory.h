@@ -218,8 +218,8 @@ void astFlushMemory_( int, int * );
 int astMemoryTune_( const char *, int, int * );
 void *astMemoryPtr_( int );
 void astMemoryAlarm_( const char * );
-void astMemoryUse_( void *, const char *, int * );
-int astMemoryId_( void *, int * );
+void astMemoryUse_( const void *, const char *, int * );
+int astMemoryId_( const void *, int * );
 void astBeginPM_( int * );
 void astEndPM_( int * );
 #endif
