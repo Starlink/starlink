@@ -4145,7 +4145,7 @@ f        one.
 *        An error will be reported if the value is outside the range of
 *        the vector.
 c     value
-f     VALUE( MXVAL ) = <X>type (Returned)
+f     VALUE = <X>type (Returned)
 c        A pointer to a buffer in which to return the requested value. 
 f        The requested value. 
 *        If the requested key is not found, then the contents of the
