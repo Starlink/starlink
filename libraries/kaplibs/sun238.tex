@@ -14330,6 +14330,56 @@ from one graphical element to another.
    }
 }
 \sstroutine{
+   KPG1\_CTCPx
+}{
+   Copies values from catalogue columns to an AST KeyMap
+}{
+   \sstdescription{
+      This routine gets NEL values for a set of given CAT (see SUN/181)
+      columns, derived from rows 1 to NEL of a given catalogue,
+      selection, or index, and stores them in a KeyMap.
+   }
+   \sstinvocation{
+      CALL KPG1\_CTCPK( CI, NAX, GI, NEL, KEYMAP, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         CI = INTEGER (Given)
+      }{
+         The CAT identifier for the catalogue, selection or index
+         containing the required data.
+      }
+      \sstsubsection{
+         NAX= INTEGER (Given)
+      }{
+         The number of columns from which values are to be read.
+      }
+      \sstsubsection{
+         GI( NAX ) = INTEGER (Given)
+      }{
+         The CAT identifiers for the column, expressions or parameters
+         to be evaluated for rows 1 to NEL of the component identified
+         by CI.
+      }
+      \sstsubsection{
+         NEL = INTEGER (Given)
+      }{
+         The number of rows to copy.
+      }
+      \sstsubsection{
+         KEYMAP = INTEGER (Given)
+      }{
+         The KeyMap. Each column value is stored as a scalar string with
+         key {\tt "}$<$colname$>$\_$<$row index$>${\tt "}.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
    KPG1\_DANOT
 }{
    Generates an annotation from the NDF{\tt '}s label and units
