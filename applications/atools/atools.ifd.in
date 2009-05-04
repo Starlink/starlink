@@ -2902,6 +2902,46 @@ iraf! {
           }
       }
 
+      action astlinearapprox {
+         helplib {$ATOOLS_HELP}
+         parameter tol {
+            position 4
+            type _DOUBLE
+            access READ
+            prompt {Deviation from linearity}
+            ppath CURRENT DEFAULT
+            default 1
+            helpkey *
+          }
+         parameter lbndin {
+            position 2
+            type _DOUBLE
+            prompt {Lower bounds of input region}
+            ppath CURRENT
+            helpkey *
+          }
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The input Mapping}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+         parameter ubndin {
+            position 3
+            type _DOUBLE
+            prompt {Upper bounds of input region}
+            ppath CURRENT
+            helpkey *
+          }
+         parameter fit {
+            type _DOUBLE
+            access WRITE
+            vpath INTERNAL
+            helpkey *
+          }
+      }
    }
 
    command astshow {
