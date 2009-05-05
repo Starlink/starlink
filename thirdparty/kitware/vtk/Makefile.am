@@ -16,7 +16,8 @@ all:
 	  pwd=`pwd`; \
 	  TCL_LIBRARY_PATH=$(prefix)/lib; export TCL_LIBRARY_PATH; \
 	  cd VTK && \
-	  cmake -D BUILD_SHARED_LIBS:BOOL=ON \
+	  cmake -Wno-dev \
+	        -D BUILD_SHARED_LIBS:BOOL=ON \
 	        -D BUILD_TESTING:BOOL=OFF \
 	        -D CMAKE_INSTALL_PREFIX:PATH=$(prefix) \
 		-D CMAKE_INCLUDE_PATH:PATH=$(prefix)/include \
