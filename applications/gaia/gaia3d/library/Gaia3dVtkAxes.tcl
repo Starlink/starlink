@@ -14,7 +14,7 @@
 #     the associated WCS.
 
 #  Copyright:
-#     Copyright (C) 2007 Science and Technology Facilities Council
+#     Copyright (C) 2007-2009 Science and Technology Facilities Council
 #     All Rights Reserved.
 
 #  Licence:
@@ -135,60 +135,67 @@ itcl::class ::gaia3d::Gaia3dVtkAxes {
    #  axes.
    protected method orient_axes_ {} {
 
-      #  Project two positions in grid coordinates. These points
-      #  need to be valid.
-      lassign [gaiautils::asttrann $wcs 1 "0 0 0"] x0 y0 z0
-      lassign [gaiautils::asttrann $wcs 1 "1 1 1"] x1 y1 z1
+      #  Get a linear transformation to represent the decomposition
+      #  into scales and direction vectors.
+      lassign [gaiautils::astlinearapprox $wcs {0 0 0} {1 1 1} 1] \
+         X0 Y0 Z0 X1 Y1 Z1 X2 Y2 Z2 X3 Y3 Z3
 
-      #  Use shifts in each axes to determine the WCS directions by getting
-      #  the end points (in GRID coords from centre above).
-      lassign [gaiautils::asttrann $wcs 0 "$x1 $y0 $z0"] p1x p1y p1z
-      lassign [gaiautils::asttrann $wcs 0 "$x0 $y1 $z0"] p2x p2y p2z
-      lassign [gaiautils::asttrann $wcs 0 "$x0 $y0 $z1"] p3x p3y p3z
-
-      #  Normalise into unit vectors.
-      lassign [normalise $p1x $p1y $p1z] p1x p1y p1z
-      lassign [normalise $p2x $p2y $p2z] p2x p2y p2z
-      lassign [normalise $p3x $p3y $p3z] p3x p3y p3z
-
-      #  Convert these into orientations.
+      #  Look for a longtude axis. If that is formatted in time we 
+      #  need to correct all its scale factors for a term cos(dec)
+      #  where dec is the associated latitude axis.
       catch {
-         set matrix [vtkMatrix4x4 New]
+         set lonaxis [gaiautils::astget $wcs "lonaxis"]
+         set lataxis [gaiautils::astget $wcs "lataxis"]
 
-         if { $x0 > $x1 } {
-            $matrix SetElement 0 0 [expr $p1x*-1]
-            $matrix SetElement 1 0 $p2x
-            $matrix SetElement 2 0 $p3x
-         } else {
-            $matrix SetElement 0 0 $p1x
-            $matrix SetElement 1 0 [expr $p2x*-1]
-            $matrix SetElement 2 0 [expr $p3x*-1]
+         #  If the lonaxis is in time.
+         set astime [gaiautils::astget $wcs "astime($lonaxis)"]
+         if { $astime } {
+
+            #  Project a position into world coordinates. Needed to 
+            #  establish a cos(dec).
+            lassign [gaiautils::asttrann $wcs 1 "0 0 0"] dec(1) dec(2) dec(3)
+            set cosdec [expr cos($dec($lataxis))]
+
+            #  Scale to offset degrees.
+            if { $lonaxis == 1 } {
+               set X1 [expr $X1*$cosdec]
+               set Y1 [expr $Y1*$cosdec]
+               set Z1 [expr $Z1*$cosdec]
+            } elseif { $lonaxis == 2 } {
+               set X2 [expr $X2*$cosdec]
+               set Y2 [expr $Y2*$cosdec]
+               set Z2 [expr $Z2*$cosdec]
+            } elseif { $lonaxis == 3 } {
+               set X3 [expr $X3*$cosdec]
+               set Y3 [expr $Y3*$cosdec]
+               set Z3 [expr $Z3*$cosdec]
+            }
          }
-
-         if { $y0 > $y1 } {
-            $matrix SetElement 0 1 $p1y
-            $matrix SetElement 1 1 [expr $p2y*-1]
-            $matrix SetElement 2 1 [expr $p3y*-1]
-         } else {
-            $matrix SetElement 0 1 [expr $p1y*-1]
-            $matrix SetElement 1 1 $p2y
-            $matrix SetElement 2 1 $p3y
-         }
-
-         if { $z0 > $z1 } {
-            $matrix SetElement 0 2 [expr $p1z*-1]
-            $matrix SetElement 1 2 [expr $p2z*-1]
-            $matrix SetElement 2 2 [expr $p3z*-1]
-         } else {
-            $matrix SetElement 0 2 $p1z
-            $matrix SetElement 1 2 $p2z
-            $matrix SetElement 2 2 $p3z
-         }
-
-         $axes_ SetUserMatrix $matrix
-         $matrix Delete
-
       }
+
+      #  Normalise, removes scale factors so we just have directions.
+      lassign [normalise $X1 $X2 $X3] X1 X2 X3
+      lassign [normalise $Y1 $Y2 $Y3] Y1 Y2 Y3
+      lassign [normalise $Z1 $Z2 $Z3] Z1 Z2 Z3
+
+      #  Set direction vectors as components of matrix and apply to axes.
+      set matrix [vtkMatrix4x4 New]
+
+      $matrix SetElement 0 0 $X1
+      $matrix SetElement 1 0 $Y1
+      $matrix SetElement 2 0 $Z1
+
+      $matrix SetElement 0 1 $X2
+      $matrix SetElement 1 1 $Y2
+      $matrix SetElement 2 1 $Z2
+
+      $matrix SetElement 0 2 $X3
+      $matrix SetElement 1 2 $Y3
+      $matrix SetElement 2 2 $Z3
+
+      $axes_ SetUserMatrix $matrix
+      $matrix Delete
+      return
    }
 
    #  Set the axis labels. Done when a WCS is defined.
