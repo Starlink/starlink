@@ -30321,6 +30321,13 @@ KAPPA: \htmlref{LOG10}{LOG10},
             and the upper-right pixel last.
 
             \sstitem
+            {\tt "wlist"} --- Each row of textual output consists of the
+            WCS co-ordinate values, followed by the pixel data value.  No 
+            headers or blank lines are included.  The pixels are listed in 
+            `Fortran order'---the lower-left pixel first, and the 
+            upper-right pixel last.
+
+            \sstitem
             {\tt "region"} --- The pixel data values are listed as a two-dimensional
             region.  Each row of textual output contains a whole row of data
             values.  The textual output may be truncated if it is too wide.  The
@@ -55825,6 +55832,13 @@ The following applications have been modified:
          the date and time of the new history record to be set explicitly 
          rather than to the default current time.  There is a choice of 
          formats including Gregorian Date and Time, and Julian Date.
+      \end{itemize}
+
+   \item [\htmlref{LOOK}{LOOK}] \mbox{}
+      \begin{itemize}
+         \item A new option ``WLIST'' has been added to the FORMAT parameter.
+         This produces a list in which each row contains the WCS
+         co-ordinates of a pixel follwoed by the pixel value.
       \end{itemize}
 
    \item [\htmlref{NDFCOPY}{NDFCOPY}] \mbox{}

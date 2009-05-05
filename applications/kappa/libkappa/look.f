@@ -97,6 +97,12 @@
 *        - "cglist" -- Like "clist" except bad pixels are omitted from
 *        the list.
 *
+*        - "wlist" -- Each row of textual output consists of the WCS
+*        co-ordinates of the pixel, followed by the pixel data value. No 
+*        headers or blank lines are included. The pixels are listed in 
+*        "Fortran order" - the lower left pixel first, and the upper 
+*        right pixel last. 
+*
 *        - "vlist" -- Each row of textual output consists of just the
 *        pixel data value. No headers or blank lines are included. The 
 *        pixels are listed in "Fortran order" - the lower-left pixel
@@ -266,8 +272,10 @@
 
 *  Copyright:
 *     Copyright (C) 2001, 2004 Central Laboratory of the Research
-*     Councils. Copyright (C) 2006 Particle Physics & Astronomy
-*     Research Council. All Rights Reserved.
+*     Councils. 
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council. 
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -297,6 +305,8 @@
 *        Use CNF_PVAL
 *     4-APR-2006 (DSB):
 *        Added CGlist format.
+*     5-MAY-2009 (DSB):
+*        Added Wlist format.
 *     {enter_further_changes_here}
 
 *-
@@ -340,6 +350,7 @@
       INTEGER IPLINE           ! Pointer to line buffer
       INTEGER IWCS             ! Pointer to the WCS FrameSet from the NDF
       INTEGER MAXLEN           ! Maximum line length
+      INTEGER NAX              ! No. of WCS axes 
       INTEGER NC               ! No. of characters used
       INTEGER NDIM             ! No. of pixel axes in NDF
       INTEGER NVAL             ! No. of values obtained from parameter
@@ -458,7 +469,21 @@
 
 *  Obtain the formatting method to use.
       CALL PAR_CHOIC( 'FORMAT', 'strips', 'Strips,Clist,Vlist,'//
-     :                'Region,CGlist', .FALSE., FORMAT, STATUS )
+     :                'Region,CGlist,Wlist', .FALSE., FORMAT, STATUS )
+
+*  For WLIST format, check the current WCS Frame is two dimensional.
+      IF( FORMAT .EQ. 'WLIST' ) THEN
+         NAX = AST_GETi( IWCS, 'Naxes', STATUS ) 
+         IF( NAX .GT. 2 ) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( ' ', 'Current WCS co-ordinate frame has '//
+     :                    'more than 2 axes.', STATUS )
+         ELSE IF( NAX .GT. 2 ) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( ' ', 'Current WCS co-ordinate frame has '//
+     :                    'only one axis.', STATUS )
+         END IF
+      END IF
 
 *  Create a 1D Frame and set its style. The AST_FORMAT method for axis 1 of
 *  this Frame is used to format the data values.
@@ -589,7 +614,7 @@
      :                   RUBND( 2 ), %VAL( CNF_PVAL( IPDAT ) ), 
      :                   QUIET, LOG, FDL,
      :                   %VAL( CNF_PVAL( IPLINE ) ), 
-     :                   FORMAT, MAXLEN, VALUE,
+     :                   IWCS, FORMAT, MAXLEN, VALUE,
      :                   STATUS, %VAL( CNF_CVAL( MAXLEN ) ) )
 
 *  Annull the temporary resources.

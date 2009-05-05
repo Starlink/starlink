@@ -1,5 +1,6 @@
       SUBROUTINE KPS1_LOOK( FRM, XLO, XHI, YLO, YHI, ARRAY, QUIET, LOG,
-     :                      FD, LINE, FORMAT, MAXLEN, VALUE, STATUS )
+     :                      FD, LINE, IWCS, FORMAT, MAXLEN, VALUE, 
+     :                      STATUS )
 *+
 *  Name:
 *     KPS1_LOOK
@@ -12,7 +13,7 @@
 
 *  Invocation:
 *     CALL KPS1_LOOK( FRM, XLO, XHI, YLO, YHI, ARRAY, QUIET, LOG, FD, LINE,
-*                     FORMAT, MAXLEN, LINE, VALUE, STATUS )
+*                     IWCS, FORMAT, MAXLEN, LINE, VALUE, STATUS )
 
 *  Description:
 *     This routine writes out the contents of an array to a text file 
@@ -41,6 +42,8 @@
 *     LINE = CHARACTER * ( * ) (Given)
 *        Work space to use as a buffer for textual output. Should be at least 
 *        MAXLEN characters long.
+*     IWCS = INTEGER (Given)
+*        The WCS FrameSet from the NDF.
 *     FORMAT = CHARACTER * ( * ) (Given)
 *        The format in which the array contents are to be listed:
 *
@@ -56,9 +59,20 @@
 *        listed in "fortran order" - the lower left pixel first, and the
 *        upper right pixel last. 
 *
+*        - "WLIST" -- Each row of textual output consists of the WCS
+*        co-ords of the pixel, followed by the pixel data value. No 
+*        headers or blank lines are included. The pixels are listed in 
+*        "fortran order" - the lower left pixel first, and the upper 
+*        right pixel last. 
+*
 *        - "CGLIST" -- Like CLIST except bad pixels are omitted.
 *
 *        - "VLIST" -- Each row of textual output consists of just the
+*        pixel data value. No headers or blank lines are included. The 
+*        pixels are listed in "fortran order" - the lower left pixel first, 
+*        and the upper right pixel last.
+*
+*        - "WLIST" -- Each row of textual output consists of just the
 *        pixel data value. No headers or blank lines are included. The 
 *        pixels are listed in "fortran order" - the lower left pixel first, 
 *        and the upper right pixel last.
@@ -68,7 +82,7 @@
 *        values. The textual output may be truncated if it is too wide. The
 *        highest row is listed first.
 *
-*        In all cases, adjacent values are sepaerated by spaces, and bad
+*        In all cases, adjacent values are separated by spaces, and bad
 *        pixel values are represented by the string "BAD". Values equal
 *        to (VAL__MAXD - 1) are represented by the string "OUT".
 *     MAXLEN = INTEGER (Given)
@@ -81,6 +95,7 @@
 *  Copyright:
 *     Copyright (C) 2001 Central Laboratory of the Research Councils.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -108,6 +123,8 @@
 *        Original version.
 *     4-APR-2006 (DSB):
 *        Added CGList format.
+*     5-MAY-2009 (DSB):
+*        Added WList format.
 *     {enter_further_changes_here}
 
 *-
@@ -131,6 +148,7 @@
       LOGICAL LOG
       INTEGER FD
       CHARACTER LINE*(*)
+      INTEGER IWCS
       CHARACTER FORMAT*(*)
       INTEGER MAXLEN
 
@@ -138,9 +156,14 @@
       DOUBLE PRECISION VALUE
 
 *  Status:
-      INTEGER STATUS             ! Global status
+      INTEGER STATUS           ! Global status
 
-*  Local Variables:
+*  External References:
+      INTEGER CHR_LEN          ! Used length of a string
+*  Local Constants:
+      INTEGER MXSTOR           ! No. of WCS positions to transform 
+      PARAMETER( MXSTOR = 100 )
+
       INTEGER BADLEN           ! Length of text for bad values
       PARAMETER( BADLEN = 3 )
 
@@ -160,13 +183,24 @@
       PARAMETER( XGAP = 3    ) ! values in Strips format (one will be a ":").
 
 *  Local Variables:
+      DOUBLE PRECISION A       ! Value for first WCS axis
+      DOUBLE PRECISION ASTORE( MXSTOR ) ! Stored WCS axis 1 values
+      DOUBLE PRECISION B       ! Value for second WCS axis
+      DOUBLE PRECISION BSTORE( MXSTOR ) ! Stored WCS axis 2 values
+      DOUBLE PRECISION POS( 2 )! Normalised WCS position
+      DOUBLE PRECISION XSTORE( MXSTOR ) ! Stored pixel axis 1 values
+      DOUBLE PRECISION YSTORE( MXSTOR ) ! Stored pixel axis 2 values
       INTEGER COLWID           ! Max field width for a column in a "strip"
+      INTEGER I                ! Loop index for stored positions
       INTEGER IAT              ! Length of string
+      INTEGER IPIX             ! Index of PIXEL Frame in WCS FrameSet
       INTEGER IX               ! X pixel index
       INTEGER IX0              ! X pixel index of left most column in strip
       INTEGER IY               ! Y pixel index
       INTEGER JAT              ! Length of string
+      INTEGER MAP              ! PIXEL-> WCS Mapping
       INTEGER NV               ! Max number of columns in a strip
+      INTEGER STORED           ! No. of positions in store arrays
       INTEGER VWID             ! Max field width for a data value
       INTEGER XWID             ! Max field width for an X pixel index
       INTEGER YWID             ! Max field width for a Y pixel index
@@ -176,8 +210,16 @@
 *  Check the global inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  For CLIST and CGLIST format, assume the maximum possible field width.
-      IF( FORMAT .EQ. 'CLIST' .OR. FORMAT .EQ. 'CGLIST' ) THEN
+*  For WLIST, get the Mapping from PIXEL to WCS Frame.
+      IF( FORMAT .EQ. 'WLIST' ) THEN
+         CALL KPG1_ASFFR( IWCS, 'PIXEL', IPIX, STATUS )
+         MAP = AST_GETMAPPING( IWCS, IPIX, AST__CURRENT, STATUS )
+      END IF
+
+*  For WLIST, CLIST and CGLIST format, assume the maximum possible field 
+*  width.
+      IF( FORMAT .EQ. 'WLIST' .OR. FORMAT .EQ. 'CLIST' .OR. 
+     :    FORMAT .EQ. 'CGLIST' ) THEN
          VWID = VAL__SZD
 
 *  For other formats, format every value, using CHR to get the most compact 
@@ -199,18 +241,26 @@
          END DO
       END IF
 
-*  Find the maximum field width for a pixel index.
-      CALL CHR_ITOC( XLO, LINE, IAT )
-      XWID = IAT
+*  Find the maximum field width for a pixel index or WCS coord value.
+      IF( FORMAT .EQ. 'WLIST' ) THEN
+         CALL AST_TRAN2( MAP, 1, DBLE( XLO ), DBLE( YLO ), .TRUE.,
+     :                   A, B, STATUS )
+         XWID = CHR_LEN( AST_FORMAT( IWCS, 1, A, STATUS ) )
+         YWID = CHR_LEN( AST_FORMAT( IWCS, 2, B, STATUS ) )
 
-      CALL CHR_ITOC( XHI, LINE, IAT )
-      XWID = MAX( XWID, IAT )
-
-      CALL CHR_ITOC( YLO, LINE, IAT )
-      YWID = IAT
-
-      CALL CHR_ITOC( YHI, LINE, IAT )
-      YWID = MAX( YWID, IAT )
+      ELSE
+         CALL CHR_ITOC( XLO, LINE, IAT )
+         XWID = IAT
+   
+         CALL CHR_ITOC( XHI, LINE, IAT )
+         XWID = MAX( XWID, IAT )
+   
+         CALL CHR_ITOC( YLO, LINE, IAT )
+         YWID = IAT
+   
+         CALL CHR_ITOC( YHI, LINE, IAT )
+         YWID = MAX( YWID, IAT )
+      END IF
 
 *  Add an extra space onto all field widths.
       VWID = VWID + 1
@@ -362,6 +412,78 @@
          
                   CALL KPG1_REPRT( LINE( : IAT ), QUIET, LOG, FD, 
      :                             STATUS )
+
+               END IF
+            END DO
+         END DO
+
+*  "WLIST": Each row of textual output consists of the WCS coords, followed 
+*  by the pixel data value. No headers or blank lines are included. The 
+*  pixels are listed in "fortran order" - the lower left pixel first, and 
+*  the upper right pixel last. All columns left justified.
+      ELSE IF( FORMAT .EQ. 'WLIST' ) THEN
+
+*  Transforming every pixel position into WCS using a separate call to
+*  AST_TRAN2 would be very inefficient. So we collect a group of
+*  positions together, and transform them all using a single call to 
+*  AST_TRAN2. Initialise the number of positions ready to transform.
+         STORED = 0
+
+*  Loop round every pixel.
+         DO IY = YLO, YHI
+            DO IX = XLO, XHI
+
+*  Add these pixel centre positions to the store of positions to be 
+*  transformed.
+               STORED = STORED + 1
+               XSTORE( STORED ) = DBLE( IX ) - 0.5D0
+               YSTORE( STORED ) = DBLE( IX ) - 0.5D0
+
+*  If the store is now full, or if this is the last pixel, transform the
+*  stored pixel positions into WCS positions. 
+               IF( STORED .EQ. MXSTOR .OR. 
+     :             ( IX .EQ. XHI .AND. IY .EQ. YHI ) ) THEN
+                  CALL AST_TRAN2( MAP, STORED, XSTORE, YSTORE, .TRUE.,
+     :                            ASTORE, BSTORE, STATUS )
+
+*  Loop round displaying each stored WCS position and the corresponding
+*  pixel value.
+                  DO I = 1, STORED 
+                     LINE = ' '
+                     IAT = 0
+
+                     POS( 1 ) = ASTORE( I )
+                     POS( 2 ) = BSTORE( I )
+                     CALL AST_NORM( IWCS, POS, STATUS )
+
+                     CALL CHR_APPND( AST_FORMAT( IWCS, 1, POS( 1 ), 
+     :                                           STATUS ), LINE, IAT )
+                     IAT = XWID
+                     JAT = IAT
+                     CALL CHR_APPND( AST_FORMAT( IWCS, 2, POS( 2 ), 
+     :                                           STATUS ), LINE, IAT )
+                     IAT = JAT + YWID
+
+                     IF( ARRAY( IX, IY ) .EQ. VAL__BADD ) THEN
+                        CALL CHR_PUTC( BADTXT, LINE, IAT )
+	             
+                     ELSE IF( ARRAY( IX, IY ) .EQ. OUTVAL ) THEN
+                        CALL CHR_PUTC( OUTTXT, LINE, IAT )
+	             
+                     ELSE
+                        CALL CHR_PUTC( AST_FORMAT( FRM, 1, 
+     :                                             ARRAY( IX, IY ), 
+     :                                             STATUS ), 
+     :                                 LINE, IAT )
+                     END IF
+	             
+                     CALL KPG1_REPRT( LINE( : IAT ), QUIET, LOG, FD, 
+     :                                STATUS )
+
+                  END DO
+
+*  Indicate no positions are ready to be transformed.
+                  STORED = 0
 
                END IF
             END DO

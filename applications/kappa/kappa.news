@@ -34,6 +34,12 @@
       rather than to the default current time.  There is a choice of 
       formats including Gregorian Date and Time, and Julian Date.
 
+   o  LOOK
+
+      -  A new option "WLIST" has been added to the FORMAT parameter.
+      This produces a list in which each row contains the WCS
+      co-ordinates of a pixel follwoed by the pixel value.
+
    o  NDFCOPY
 
       -  A new parameter caller EXTEN has been added.  This can be set
