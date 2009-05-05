@@ -161,6 +161,15 @@ f     The CmpFrame class does not define any new routines beyond those
 *        in the component frames). This enables, for instance, a (detector 
 *        index,mjd) frame to match with a ((velocity,detector index),mjd) 
 *        frame.
+*     5-MAY-2009 (DSB):
+*        In GetAttrib, if an index is included in the attribute name, attempt 
+*        to use the GetAttrib method of the primary frame before using the 
+*        parent GetAttrib method. This is because the Frame getattrib
+*        method will dissociate axes from their parent class. Thus, a
+*        SkyAxis attribute such as AsTime will come out wrong since its
+*        value is managed by the SkyFrame class rather than the SkyAxis
+*        class.
+
 *class--
 */
 
@@ -2357,62 +2366,60 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
    to access the attribute fails, we can try a different approach. */
       oldrep = astReporting( 0 );
       
-/* Our first attempt is to see if the attribute is recognised by the parent
-   class (Frame). */
-      result = (*parent_getattrib)( this_object, attrib, status );
-
-/* Indicate success. */
-      if( astOK ) {
-         ok = 1;
-
-/* Otherwise, clear the error condition so that we can try a different 
-   approach. */
-      } else {
-         astClearStatus;
-
 /* If the attribute is qualified by an axis index, try accessing it as an
    attribute of the primary Frame containing the specified index. */
-         if ( nc = 0,
-             ( 2 == astSscanf( attrib, "%[^(](%d)%n", buf1, &axis, &nc ) )
-             && ( nc >= len ) ) {
+      if ( nc = 0,
+          ( 2 == astSscanf( attrib, "%[^(](%d)%n", buf1, &axis, &nc ) )
+          && ( nc >= len ) ) {
 
 /* Find the primary Frame containing the specified axis. */
-            astPrimaryFrame( this, axis - 1, &pfrm, &paxis );
-            if( astOK ) {
+         astPrimaryFrame( this, axis - 1, &pfrm, &paxis );
+         if( astOK ) {
 
 /* Create a new attribute with the same name but with the axis index
    appropriate to the primary Frame. */
-               sprintf( buf2, "%s(%d)", buf1, paxis + 1 );
+            sprintf( buf2, "%s(%d)", buf1, paxis + 1 );
 
 /* Attempt to access the attribute. */
-               result = astGetAttrib( pfrm, buf2 );
+            result = astGetAttrib( pfrm, buf2 );
    
 /* Indicate success. */
-               if( astOK ) {
-                  ok = 1;
+            if( astOK ) {
+               ok = 1;
    
 /* Otherwise clear the status value, and try again without any axis index. */
-               } else {               
-                  astClearStatus;
-                  result = astGetAttrib( pfrm, buf1 );
+            } else {               
+               astClearStatus;
+               result = astGetAttrib( pfrm, buf1 );
    
 /* Indicate success, or clear the status value. */
-                  if( astOK ) {
-                     ok = 1;
-                  } else {
-                     astClearStatus;
-                  }
+               if( astOK ) {
+                  ok = 1;
+               } else {
+                  astClearStatus;
                }
+            }
    
 /* Free the primary frame pointer. */
-               pfrm = astAnnul( pfrm );
-            }
+            pfrm = astAnnul( pfrm );
+         }
 
 /* If the attribute is not qualified by an axis index, try accessing it
-   using the primary Frame of each axis in turn. */
-         } else {
+   using the parent Frame method. */
+      } else if( astOK ){
+         result = (*parent_getattrib)( this_object, attrib, status );
 
-/* Loop round all axes, until one is found which defines the specified
+/* Indicate success. */
+         if( astOK ) {
+            ok = 1;
+
+/* Otherwise, clear the error condition so that we can try a different 
+   approach. */
+         } else {
+            astClearStatus;
+
+/* Next try accessing it using the primary Frame of each axis in turn. 
+   Loop round all axes, until one is found which defines the specified
    attribute. */
 	    for( axis = 0; axis < astGetNaxes( this ) && !ok; axis++ ) {
 
