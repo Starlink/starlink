@@ -53,6 +53,7 @@ c     - astRate: Calculate the rate of change of a Mapping output
 c     - astRebin<X>: Rebin a region of a data grid
 f     - astRebinSeq<X>: Rebin a region of a sequence of data grids
 c     - astResample<X>: Resample a region of a data grid
+c     - astRemoveRegions: Remove any Regions from a Mapping
 c     - astSimplify: Simplify a Mapping
 c     - astTran1: Transform 1-dimensional coordinates
 c     - astTran2: Transform 2-dimensional coordinates
@@ -67,6 +68,7 @@ f     - AST_MAPSPLIT: Split a Mapping up into parallel component Mappings
 f     - AST_RATE: Calculate the rate of change of a Mapping output
 f     - AST_REBIN<X>: Rebin a region of a data grid
 f     - AST_REBINSEQ<X>: Rebin a region of a sequence of data grids
+f     - AST_REMOVEREGIONS: Remove any Regions from a Mapping
 f     - AST_RESAMPLE<X>: Resample a region of a data grid
 f     - AST_SIMPLIFY: Simplify a Mapping
 f     - AST_TRAN1: Transform 1-dimensional coordinates
@@ -260,6 +262,8 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        in astRebinSeq.
 *     9-MAY-2008 (DSB):
 *        Prevent memory over-run in RebinSeq<X>.
+*     5-MAY-2009 (DSB):
+*        Added astRemoveRegions.
 *class--
 */
 
@@ -448,6 +452,7 @@ static void RebinSeqLD( AstMapping *, double, int, const int [], const int [], c
 static void ConserveFluxLD( double, int, const int *, long double, long double *, long double *, int * );
 #endif
 
+static AstMapping *RemoveRegions( AstMapping *, int * );
 static AstMapping *Simplify( AstMapping *, int * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
 static PN *FitPN( AstMapping *, double *, int, int, double, double, double *, int * );
@@ -2687,6 +2692,7 @@ void astInitMappingVtab_(  AstMappingVtab *vtab, const char *name, int *status )
    vtab->RebinSeqD = RebinSeqD;
    vtab->RebinSeqF = RebinSeqF;
    vtab->RebinSeqI = RebinSeqI;
+   vtab->RemoveRegions = RemoveRegions;
    vtab->ResampleB = ResampleB;
    vtab->ResampleD = ResampleD;
    vtab->ResampleF = ResampleF;
@@ -12084,6 +12090,89 @@ static void RebinWithBlocking( AstMapping *this, const double *linear_fit,
    lbnd_block = astFree( lbnd_block );
    ubnd_block = astFree( ubnd_block );
    dim_block = astFree( dim_block );
+}
+
+static AstMapping *RemoveRegions( AstMapping *this, int *status ) {
+/*
+*++
+*  Name:
+c     astRemoveRegions
+f     AST_REMOVEREGIONS
+
+*  Purpose:
+*     Remove any Regions from a Mapping.
+
+*  Type:
+*     Public function.
+
+*  Synopsis:
+c     #include "mapping.h"
+c     AstMapping *astRemoveRegions( AstMapping *this )
+f     RESULT = AST_REMOVEREGIONS( THIS, STATUS )
+
+*  Class Membership:
+*     Mapping method.
+
+*  Description:
+*     This function searches the suppliedMapping (which may be a 
+*     compound Mapping such as a CmpMap) for any component Mappings 
+*     that are instances of the AST Region class. It then creates a new
+*     Mapping from which all Regions have been removed. If a Region
+*     cannot simply be removed (for instance, if it is a component of a
+*     parallel CmpMap), then it is replaced with an equivalent UnitMap 
+*     in the returned Mapping.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the original Mapping.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Returned Value:
+c     astRemoveRegions()
+f     AST_REMOVEREGIONS = INTEGER
+*        A new pointer to the (possibly modified) Mapping.
+
+*  Applicability:
+*     CmpFrame
+*        If the supplied Mapping is a CmpFrame, any component Frames that
+*        are instances of the Region class are replaced by the equivalent 
+*        Frame.
+*     FrameSet
+*        If the supplied Mapping is a FrameSet, the returned Mapping
+*        will be a copy of the supplied FrameSet in which Regions have
+*        been removed from all the inter-Frame Mappings, and any Frames
+*        which are instances of the Region class are repalced by the
+*        equivalent Frame.
+*     Mapping
+*        This function applies to all Mappings.
+*     Region
+*        If the supplied Mapping is a Region, the returned Mapping will
+*        be the equivalent Frame.
+
+*  Notes:
+*     - This function can safely be applied even to Mappings which
+*     contain no Regions. If no Regions are found, it
+c     behaves exactly like astClone and returns a pointer to the
+f     behaves exactly like AST_CLONE and returns a pointer to the
+*     original Mapping.
+*     - The Mapping returned by this function may not be independent
+*     of the original (even if some Regions were removed), and
+*     modifying it may therefore result in indirect modification of
+*     the original. If a completely independent result is required, a
+c     copy should be made using astCopy.
+f     copy should be made using AST_COPY.
+*     - A null Object pointer (AST__NULL) will be returned if this
+c     function is invoked with the AST error status set, or if it
+f     function is invoked with STATUS set to an error value, or if it
+*     should fail for any reason.
+*--
+*/
+
+/* This base iplementation just returns a clone of the supplied Mapping
+   pointer. Sub-classes should override it as necessary. */
+   return astClone( this );
 }
 
 static void ReportPoints( AstMapping *this, int forward,
@@ -22769,6 +22858,10 @@ double astRate_( AstMapping *this, double *at, int ax1, int ax2, int *status ){
    } else {    
       return (**astMEMBER(this,Mapping,Rate))( this, at, ax1, ax2, status );
    }   
+}
+AstMapping *astRemoveRegions_( AstMapping *this, int *status ) {
+   if ( !astOK ) return NULL;
+   return (**astMEMBER(this,Mapping,RemoveRegions))( this, status );
 }
 AstMapping *astSimplify_( AstMapping *this, int *status ) {
    AstMapping *result;

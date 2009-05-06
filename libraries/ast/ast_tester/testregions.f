@@ -8,6 +8,7 @@
 c      call ast_SetWatchId( 292567 )
 
       call ast_begin( status )
+      call checkRemoveRegions( status )
       call checkInterval( status )
       call checkEllipse( status )
       call checkPrism( status )
@@ -3787,12 +3788,100 @@ C
 
 
 
+      subroutine checkRemoveRegions( status )
+      implicit none
+
+      include 'SAE_PAR' 
+      include 'AST_PAR'
+
+      integer status, sf1, sf2, reg, fs, map, fs2
+      double precision cen(2), ixin(2), iyin(2), gxin(2), gyin(2), 
+     :                 xout(2), yout(2)
+
+      if( status .ne. sai__ok ) return
+
+      call ast_begin( status )
+
+      sf1 = ast_skyframe( 'System=ICRS', status )
+      cen(1) = 0.0
+      cen(2) = 0.0
+      reg = ast_circle( sf1, 1, cen, 0.001D0, AST__NULL, ' ', status )
+
+      ixin(1) = 0.0
+      iyin(1) = 0.0
+      ixin(2) = 0.01
+      iyin(2) = 0.01
+
+      call ast_tran2( reg, 2, ixin, iyin, .true., xout, yout, status )
+
+      if( xout(1) .eq. AST__BAD .or. yout(1) .eq. AST__BAD ) then
+         call stopit( status, 'RemoveRegions test 1 failed' )
+
+      else if( abs( xout(1) - ixin(1) ) .gt. 1.0E-10 .or. 
+     :         abs( yout(1) - iyin(1) ) .gt. 1.0E-10 ) then
+         call stopit( status, 'RemoveRegions test 2 failed' )
+
+      else if( xout(2) .ne. AST__BAD .or. yout(2) .ne. AST__BAD ) then
+         write(*,*) xout(2), ixin(2)
+         write(*,*) yout(2), iyin(2)
+         call stopit( status, 'RemoveRegions test 3 failed' )
+      end if
 
 
 
 
+      sf2 = ast_skyframe( 'System=Galactic', status )
+      fs = ast_convert( sf1, sf2, ' ', status )
+      call ast_tran2( fs, 2, ixin, iyin, .true., gxin, gyin, status )
+
+      fs2 = ast_frameset( sf2, ' ', status )
+      call ast_addframe( fs2, AST__BASE, ast_unitmap( 2, ' ', status ),
+     :                   sf2, status )
 
 
+      fs = ast_convert( fs2, reg, ' ', status )
+
+
+      map = ast_getmapping( fs, AST__BASE, AST__CURRENT, status )
+      call ast_tran2( map, 2, gxin, gyin, .true., xout, yout, status )
+
+      if( xout(1) .eq. AST__BAD .or. yout(1) .eq. AST__BAD ) then
+         call stopit( status, 'RemoveRegions test 4 failed' )
+
+      else if( abs( xout(1) - ixin(1) ) .gt. 1.0E-10 .or. 
+     :           abs( yout(1) - iyin(1) ) .gt. 1.0E-10 ) then
+         call stopit( status, 'RemoveRegions test 5 failed' )
+
+      else if( xout(2) .ne. AST__BAD .or. yout(2) .ne. AST__BAD ) then
+         write(*,*) xout(2), ixin(2)
+         write(*,*) yout(2), iyin(2)
+         call stopit( status, 'RemoveRegions test 6 failed' )
+      end if
+
+
+
+      fs2 = ast_removeregions( fs, status )
+
+      map = ast_getmapping( fs2, AST__BASE, AST__CURRENT, status )
+      call ast_tran2( map, 2, gxin, gyin, .true., xout, yout, status )
+
+      if( xout(1) .eq. AST__BAD .or. yout(1) .eq. AST__BAD ) then
+         call stopit( status, 'RemoveRegions test 7 failed' )
+
+      else if( abs( xout(1) - ixin(1) ) .gt. 1.0E-10 .or. 
+     :           abs( yout(1) - iyin(1) ) .gt. 1.0E-10 ) then
+         call stopit( status, 'RemoveRegions test 8 failed' )
+
+      else if( abs( xout(2) - ixin(2) ) .gt. 1.0E-10 .or. 
+     :           abs( yout(2) - iyin(2) ) .gt. 1.0E-10 ) then
+         call stopit( status, 'RemoveRegions test 9 failed' )
+      end if
+
+
+
+      call ast_end( status )
+
+      end
 
 
 

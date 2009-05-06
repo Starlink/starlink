@@ -21698,6 +21698,19 @@ current version):
 \item A new class of Channel, called StcsChan, has been added that allows
 conversion of suitable AST Objects to and from IVOA STC-S format.
 
+\item A new method called 
+c+
+astRemoveRegions 
+c-
+f+
+AST\_REMOVEREGIONS
+f-
+has been added to the Mapping class. It searches a (possibly compound)
+Mapping (or Frame) for any instances of the AST Region class, and either 
+removes them, or replaces them with UnitMaps (or equivalent Frames). It
+can be used to remove the masking effects of Regions from a compound
+Mapping or Frame.
+
 \item A new set of methods, called 
 c+
 astMapGetElem<X>

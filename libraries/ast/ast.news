@@ -19,6 +19,12 @@ Main Changes in this Version
 - A new class of Channel, called StcsChan, has been added that allows
 conversion of suitable AST Objects to and from IVOA STC-S format.
 
+- A new method called astRemoveRegions (AST_REMOVEREGIONS) has been added
+to the Mapping class. It removes the masking effects of any Regions found
+within a (possibly compound) Mapping or Frame. In effect, it replaces
+each Region found within the Mapping or Frame with a UnitMap or
+equivalent Frame.
+
 - A new set of methods, called astMapGetElem<X> (AST_MAPGETELEM<X>) has
 been added to the KeyMap class. They allow a single element of a vector
 valued entry to be returned.

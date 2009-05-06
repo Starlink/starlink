@@ -156,6 +156,7 @@ AstNormMap *astNormMapId_( void *, const char *, ... );
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
+static AstMapping *RemoveRegions( AstMapping *, int * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
 static double Rate( AstMapping *, double *, int, int, int * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
@@ -315,6 +316,8 @@ void astInitNormMapVtab_(  AstNormMapVtab *vtab, const char *name, int *status )
    replace them with pointers to the new member functions. */
    object = (AstObjectVtab *) vtab;
    mapping = (AstMappingVtab *) vtab;
+
+   mapping->RemoveRegions = RemoveRegions;
 
 #if defined(THREAD_SAFE)
    parent_managelock = object->ManageLock;
@@ -831,6 +834,96 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2, int *status 
 */
 
    return ( ax1 == ax2 ) ? 1.0 : 0.0;
+}
+
+static AstMapping *RemoveRegions( AstMapping *this_mapping, int *status ) {
+/*
+*  Name:
+*     RemoveRegions
+
+*  Purpose:
+*     Remove any Regions from a Mapping.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "normmap.h"
+*     AstMapping *RemoveRegions( AstMapping *this, int *status )
+
+*  Class Membership:
+*     NormMap method (over-rides the astRemoveRegions method inherited
+*     from the Mapping class).
+
+*  Description:
+*     This function searches the supplied Mapping (which may be a 
+*     compound Mapping such as a CmpMap) for any component Mappings 
+*     that are instances of the AST Region class. It then creates a new
+*     Mapping from which all Regions have been removed. If a Region
+*     cannot simply be removed (for instance, if it is a component of a
+*     parallel CmpMap), then it is replaced with an equivalent UnitMap 
+*     in the returned Mapping.
+*
+*     The implementation provided by the NormMap class invokes the
+*     astRemoveRegions method on the encapsulated Frame, and returns a
+*     new NormMap containing the resulting Frame.
+
+*  Parameters:
+*     this
+*        Pointer to the original Region.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     A pointer to the modified mapping.
+
+*  Notes:
+*     - A NULL pointer value will be returned if this function is
+*     invoked with the AST error status set, or if it should fail for
+*     any reason.
+*/
+
+/* Local Variables: */
+   AstFrame *newfrm;             /* New component Frame */
+   AstMapping *result;           /* Result pointer to return */
+   AstNormMap *new;              /* Pointer to new MormMap */
+   AstNormMap *this;             /* Pointer to NormMap structure */
+
+/* Initialise. */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get a pointer to the NormMap. */
+   this = (AstNormMap *) this_mapping;
+
+/* Invoke the astRemoveRegions method on the component Frame. */
+   newfrm = astRemoveRegions( this->frame );
+
+/* If the Frame was not modified, just return a clone of the supplied
+   pointer. */
+   if( this->frame == newfrm ) {
+      result = astClone( this );
+
+/* Otherwise, we need to create a new NormMap to return. We take a deep 
+   copy of the supplied NormMap and then modify the Frame so that we 
+   retain any extra information in the supplied NormMap. */
+   } else {
+      new = astCopy( this );
+      (void) astAnnul( new->frame );
+      new->frame = astClone( newfrm );
+      result = (AstMapping *) new;
+   }
+
+/* Free resources. */
+   newfrm = astAnnul( newfrm );
+
+/* Annul the returned Mapping if an error has occurred. */
+   if( !astOK ) result = astAnnul( result );
+
+/* Return the result. */
+   return result;
 }
 
 static AstPointSet *Transform( AstMapping *this, AstPointSet *in,

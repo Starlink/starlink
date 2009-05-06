@@ -161,6 +161,7 @@ AstTranMap *astTranMapId_( void *, void *, const char *, ... );
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
+static AstMapping *RemoveRegions( AstMapping *, int * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
 static double Rate( AstMapping *, double *, int, int, int * );
 static int *MapSplit( AstMapping *, int, const int *, AstMapping **, int * );
@@ -520,6 +521,8 @@ void astInitTranMapVtab_(  AstTranMapVtab *vtab, const char *name, int *status )
    mapping = (AstMappingVtab *) vtab;
    parent_getobjsize = object->GetObjSize;
    object->GetObjSize = GetObjSize;
+
+   mapping->RemoveRegions = RemoveRegions;
 
 #if defined(THREAD_SAFE)
    parent_managelock = object->ManageLock;
@@ -1264,6 +1267,135 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2, int *status 
 
 /* Re-instate the Invert flag of the component Mapping. */
    astSetInvert( cmap, old_inv );
+
+/* Return the result. */
+   return result;
+}
+
+static AstMapping *RemoveRegions( AstMapping *this_mapping, int *status ) {
+/*
+*  Name:
+*     RemoveRegions
+
+*  Purpose:
+*     Remove any Regions from a Mapping.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "tranmap.h"
+*     AstMapping *RemoveRegions( AstMapping *this, int *status )
+
+*  Class Membership:
+*     TranMap method (over-rides the astRemoveRegions method inherited
+*     from the Mapping class).
+
+*  Description:
+*     This function searches the supplied Mapping (which may be a 
+*     compound Mapping such as a TranMap) for any component Mappings 
+*     that are instances of the AST Region class. It then creates a new
+*     Mapping from which all Regions have been removed. If a Region
+*     cannot simply be removed (for instance, if it is a component of a
+*     parallel TranMap), then it is replaced with an equivalent UnitMap 
+*     in the returned Mapping.
+*
+*     The implementation provided by the TranMap class invokes the
+*     astRemoveRegions method on the two component Mappings, and joins
+*     the results together into a new TranMap.
+
+*  Parameters:
+*     this
+*        Pointer to the original Region.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     A pointer to the modified mapping.
+
+*  Notes:
+*     - A NULL pointer value will be returned if this function is
+*     invoked with the AST error status set, or if it should fail for
+*     any reason.
+*/
+
+/* Local Variables: */
+   AstTranMap *new;              /* Pointer to new TranMap */
+   AstTranMap *this;             /* Pointer to TranMap structure */
+   AstMapping *newmap1;          /* New first component Mapping */
+   AstMapping *newmap2;          /* New second component Mapping */
+   AstMapping *result;           /* Result pointer to return */
+   int nax;                      /* Number of Frame axes */
+   int unit1;                    /* Is new first Mapping a UnitMap? */
+   int unit2;                    /* Is new second Mapping a UnitMap? */
+
+/* Initialise. */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get a pointer to the TranMap. */
+   this = (AstTranMap *) this_mapping;
+
+/* Invoke the astRemoveRegions method on the two component Mappings. */
+   newmap1 = astRemoveRegions( this->map1 );
+   newmap2 = astRemoveRegions( this->map2 );
+
+/* If neither component was modified, just return a clone of the supplied
+   pointer. */
+   if( this->map1 == newmap1 && this->map2 == newmap2 ) {
+      result = astClone( this );
+
+/* Otherwise, we need to create a new Mapping to return. */
+   } else {
+
+/* The implementation of the astRemoveRegions method provided by the
+   Region class returns a Frame rather than a UnitMap. But we need
+   Mappings here, not Frames. So if either of these new Mappings is 
+   a Frame, replace it with an equivalent UnitMap. Also, get flags
+   indicating if either Mapping is a UnitMap.*/
+      if( astIsAFrame( newmap1 ) ) {
+         nax = astGetNin( newmap1 );
+         (void) astAnnul( newmap1 );
+         newmap1 = (AstMapping *) astUnitMap( nax, " ", status );
+         unit1 = 1;
+      } else {
+         unit1 = astIsAUnitMap( newmap1 );
+      }
+   
+      if( astIsAFrame( newmap2 ) ) {
+         nax = astGetNin( newmap2 );
+         (void) astAnnul( newmap2 );
+         newmap2 = (AstMapping *) astUnitMap( nax, " ", status );
+         unit2 = 1;
+      } else {
+         unit2 = astIsAUnitMap( newmap2 );
+      }
+
+/* If both new Mappings are UnitMaps, return an equivalent UnitMap. */
+      if( unit1 && unit2 ) {
+         result = (AstMapping *) astUnitMap( astGetNin( newmap1 ) + 
+                                             astGetNin( newmap2 ), " ", 
+                                             status );
+
+/* Otherwise, return a new TranMap containing the two new Mappings. */
+      } else {
+         new = astCopy( this );
+         (void) astAnnul( new->map1 );
+         (void) astAnnul( new->map2 );
+         new->map1 = astClone( newmap1 );
+         new->map2 = astClone( newmap2 );
+         result = (AstMapping *) new;
+      }
+   }
+
+/* Free resources. */
+   newmap1 = astAnnul( newmap1 );
+   newmap2 = astAnnul( newmap2 );
+
+/* Annul the returned Mapping if an error has occurred. */
+   if( !astOK ) result = astAnnul( result );
 
 /* Return the result. */
    return result;

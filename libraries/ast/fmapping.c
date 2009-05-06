@@ -23,6 +23,7 @@
 *     AST_MAPBOX
 *     AST_MAPSPLIT
 *     AST_RATE
+*     AST_REMOVEREGIONS
 *     AST_RESAMPLE<X>
 *     AST_SIMPLIFY
 *     AST_TRAN1
@@ -80,6 +81,8 @@
 *        Added AST_REBINSEQ<X>.
 *     8-MAR-2006 (DSB):
 *        Added AST_TRANGRID.
+*     5-MAY-2009 (DSB):
+*        Added AST_REMOVEREGIONS.
 */
 
 /* Define the astFORTRAN77 macro which prevents error messages from
@@ -563,6 +566,18 @@ MAKE_AST_REBINSEQ(d,D,DOUBLE,D,double)
 MAKE_AST_REBINSEQ(r,R,REAL,F,float)
 MAKE_AST_REBINSEQ(i,I,INTEGER,I,int)
 #undef MAKE_AST_REBINSEQ
+
+F77_INTEGER_FUNCTION(ast_removeregions)( INTEGER(THIS),
+                                         INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   F77_INTEGER_TYPE(RESULT);
+
+   astAt( "AST_REMOVEREGIONS", NULL, 0 );
+   astWatchSTATUS(
+      RESULT = astP2I( astRemoveRegions( astI2P( *THIS ) ) );
+   )
+   return RESULT;
+}
 
 F77_INTEGER_FUNCTION(ast_simplify)( INTEGER(THIS),
                                     INTEGER(STATUS) ) {

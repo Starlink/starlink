@@ -303,6 +303,8 @@
 *        Use HAVE_LONG_DOUBLE in place of AST_LONG_DOUBLE
 *     8-MAR-2006 (DSB):
 *        Add astTranGrid.
+*     5-MAY-2009 (DSB):
+*        Add astRemoveRegions.
 *--
 */
 
@@ -414,6 +416,7 @@ typedef struct AstMappingVtab {
    void (* RebinSeqLD)( AstMapping *, double, int, const int [], const int [], const long double [], const long double [], int, const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [], double [], int *, int * );
 #endif
 
+   AstMapping *(* RemoveRegions)( AstMapping *, int * );
    AstMapping *(* Simplify)( AstMapping *, int * );
    AstPointSet *(* Transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
    double (* Rate)( AstMapping *, double *, int, int, int * );
@@ -518,6 +521,7 @@ void astRebinLD_( AstMapping *, double, int, const int [], const int [], const l
 void astRebinSeqLD_( AstMapping *, double, int, const int [], const int [], const long double [], const long double [], int, const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [], double [], int *, int * );
 #endif
 
+AstMapping *astRemoveRegions_( AstMapping *, int * );
 AstMapping *astSimplify_( AstMapping *, int * );
 void astRebinD_( AstMapping *, double, int, const int [], const int [], const double [], const double [], int, const double [], int, double, int, double, int, const int [], const int [], const int [], const int [], double [], double [], int * );
 void astRebinF_( AstMapping *, double, int, const int [], const int [], const float [], const float [], int, const double [], int, double, int, float, int, const int [], const int [], const int [], const int [], float [], float [], int * );
@@ -661,6 +665,7 @@ astINVOKE(V,astResampleUS_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_v
 astINVOKE(V,astResampleB_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var,STATUS_PTR))
 #define astResampleUB(this,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
 astINVOKE(V,astResampleUB_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var,STATUS_PTR))
+#define astRemoveRegions(this) astINVOKE(O,astRemoveRegions_(astCheckMapping(this),STATUS_PTR))
 #define astSimplify(this) astINVOKE(O,astSimplify_(astCheckMapping(this),STATUS_PTR))
 #define astTran1(this,npoint,xin,forward,xout) \
 astINVOKE(V,astTran1_(astCheckMapping(this),npoint,xin,forward,xout,STATUS_PTR))

@@ -666,6 +666,7 @@ AstCmpFrame *astCmpFrameId_( void *, void *, const char *, ... );
 /* ======================================== */
 static int GetObjSize( AstObject *, int * );
 static AstAxis *GetAxis( AstFrame *, int, int * );
+static AstMapping *RemoveRegions( AstMapping *, int * );
 static AstMapping *Simplify( AstMapping *, int * );
 static AstPointSet *ResolvePoints( AstFrame *, const double [], const double [], AstPointSet *, AstPointSet *, int * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
@@ -3673,6 +3674,7 @@ void astInitCmpFrameVtab_(  AstCmpFrameVtab *vtab, const char *name, int *status
    object->ManageLock = ManageLock;
 #endif
 
+   mapping->RemoveRegions = RemoveRegions;
    mapping->Simplify = Simplify;
    mapping->Transform = Transform;
 
@@ -6258,6 +6260,105 @@ static int QsortCmpAxes( const void *a, const void *b ) {
    } else {
       result = 1;
    }
+
+/* Return the result. */
+   return result;
+}
+
+static AstMapping *RemoveRegions( AstMapping *this_mapping, int *status ) {
+/*
+*  Name:
+*     RemoveRegions
+
+*  Purpose:
+*     Remove any Regions from a Mapping.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     AstMapping *RemoveRegions( AstMapping *this, int *status )
+
+*  Class Membership:
+*     CmpFrame method (over-rides the astRemoveRegions method inherited
+*     from the Frame class).
+
+*  Description:
+*     This function searches the supplied Mapping (which may be a 
+*     compound Mapping such as a CmpMap) for any component Mappings 
+*     that are instances of the AST Region class. It then creates a new
+*     Mapping from which all Regions have been removed. If a Region
+*     cannot simply be removed (for instance, if it is a component of a
+*     parallel CmpMap), then it is replaced with an equivalent UnitMap 
+*     in the returned Mapping.
+*
+*     The implementation provided by the CmpFrame class invokes the
+*     astRemoveRegions method on the two component Frames, and joins
+*     the results together into a new CmpFrame. This replaces any Regions
+*     with their equivalent Frames.
+
+*  Parameters:
+*     this
+*        Pointer to the original Region.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     A pointer to the modified mapping.
+
+*  Notes:
+*     - A NULL pointer value will be returned if this function is
+*     invoked with the AST error status set, or if it should fail for
+*     any reason.
+*/
+
+/* Local Variables: */
+   AstCmpFrame *new;             /* Pointer to new CmpFrame */
+   AstCmpFrame *this;            /* Pointer to CmpFrame structure */
+   AstFrame *newfrm1;            /* New first component Frame */
+   AstFrame *newfrm2;            /* New second component Frame */
+   AstMapping *result;           /* Result pointer to return */
+
+/* Initialise. */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get a pointer to the CmpFrame. */
+   this = (AstCmpFrame *) this_mapping;
+
+/* Invoke the astRemoveRegions method on the two component Frames. */
+   newfrm1 = astRemoveRegions( this->frame1 );
+   newfrm2 = astRemoveRegions( this->frame2 );
+
+/* If neither component was modified, just return a clone of the supplied
+   pointer. */
+   if( this->frame1 == newfrm1 && this->frame2 == newfrm2 ) {
+      result = astClone( this );
+
+/* Annul new new Frame pointers. */
+      newfrm1 = astAnnul( newfrm1 );
+      newfrm2 = astAnnul( newfrm2 );
+
+/* Otherwise, we need to create a new CmpFrame to return. */
+   } else {
+
+/* Make a copy of the supplied CmpFrame so that the new CmpFrame retains
+   any attribute settings of the supplied CmpFrame. */
+      new = astCopy( this );
+      result = (AstMapping *) new;
+
+/* Replace the two component Frames with the simplified Frames. */
+      (void) astAnnul( new->frame1 );
+      (void) astAnnul( new->frame2 );
+      new->frame1 = (AstFrame *) newfrm1;
+      new->frame2 = (AstFrame *) newfrm2;
+   }
+
+/* Annul the returned Mapping if an error has occurred. */
+   if( !astOK ) result = astAnnul( result );
 
 /* Return the result. */
    return result;

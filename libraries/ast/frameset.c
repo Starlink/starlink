@@ -819,6 +819,7 @@ static AstFrameSet *ConvertX( AstFrame *, AstFrame *, const char *, int * );
 static AstFrameSet *FindFrame( AstFrame *, AstFrame *, const char *, int * );
 static AstMapping *CombineMaps( AstMapping *, int, AstMapping *, int, int, int * );
 static AstMapping *GetMapping( AstFrameSet *, int, int, int * );
+static AstMapping *RemoveRegions( AstMapping *, int * );
 static AstMapping *Simplify( AstMapping *, int * );
 static AstPointSet *ResolvePoints( AstFrame *, const double [], const double [], AstPointSet *, AstPointSet *, int * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
@@ -4948,6 +4949,7 @@ void astInitFrameSetVtab_(  AstFrameSetVtab *vtab, const char *name, int *status
    mapping->GetTranInverse = GetTranInverse;
    mapping->Rate = Rate;
    mapping->ReportPoints = ReportPoints;
+   mapping->RemoveRegions = RemoveRegions;
    mapping->Simplify = Simplify;
    mapping->Transform = Transform;
    mapping->MapSplit = MapSplit;
@@ -6969,6 +6971,151 @@ f     IFRAME argument to specify the base Frame or the current
          }
       }
    }
+}
+
+static AstMapping *RemoveRegions( AstMapping *this_mapping, int *status ) {
+/*
+*  Name:
+*     RemoveRegions
+
+*  Purpose:
+*     Remove any Regions from a Mapping.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "frameset.h"
+*     AstMapping *RemoveRegions( AstMapping *this, int *status )
+
+*  Class Membership:
+*     FrameSet method (over-rides the astRemoveRegions method inherited
+*     from the Mapping class).
+
+*  Description:
+*     This function searches the supplied Mapping (which may be a 
+*     compound Mapping such as a FrameSet) for any component Mappings 
+*     that are instances of the AST Region class. It then creates a new
+*     Mapping from which all Regions have been removed. If a Region
+*     cannot simply be removed (for instance, if it is a component of a
+*     parallel FrameSet), then it is replaced with an equivalent UnitMap 
+*     in the returned Mapping.
+*
+*     The implementation provided by the FrameSet class invokes the
+*     astRemoveRegions method on all the component Frames and Mappings, 
+*     and joins the results together into a new FrameSet.
+
+*  Parameters:
+*     this
+*        Pointer to the original Region.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     A pointer to the modified mapping.
+
+*  Notes:
+*     - A NULL pointer value will be returned if this function is
+*     invoked with the AST error status set, or if it should fail for
+*     any reason.
+*/
+
+/* Local Variables: */
+   AstFrame **newfrms;           /* Array of new Frames */
+   AstFrameSet *new;             /* Pointer to new FrameSet */
+   AstFrameSet *this;            /* Pointer to FrameSet structure */
+   AstMapping **newmaps;         /* Array of new Mappings */
+   AstMapping *result;           /* Result pointer to return */
+   int changed;                  /* Has any mapping been changed? */
+   int i;                        /* Loop count */
+   int nax;                      /* Number of Frame axes */
+
+/* Initialise. */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get a pointer to the FrameSet. */
+   this = (AstFrameSet *) this_mapping;
+
+/* Allocate arrays to hold the modified Mapping and Frame pointers. */
+   newmaps = astMalloc( sizeof( AstMapping *)*( this->nnode - 1 ) );
+   newfrms = astMalloc( sizeof( AstFrame *)*( this->nframe ) );
+   if( astOK ) {
+
+/* Invoke the astRemoveRegions method on all the component Mappings. */
+      changed = 0;
+      for( i = 0; i < this->nnode - 1; i++ ) {
+         newmaps[ i ] = astRemoveRegions( this->map[ i ] );
+
+/* Note if any Mapping was changed. */
+         if( newmaps[ i ] != this->map[ i ] ) {
+            changed = 1;
+
+/* The implementation of the astRemoveRegions method provided by the
+   Region class returns a Frame rather than a UnitMap. But we need
+   Mappings here, not Frames. So if the new Mapping is a Frame, replace 
+   it with an equivalent UnitMap. */
+            if( astIsAFrame( newmaps[ i ] ) ) {
+               nax = astGetNin( newmaps[ i ] );
+               (void) astAnnul( newmaps[ i ] );
+               newmaps[ i ] = (AstMapping *) astUnitMap( nax, " ", status );
+            }
+         }
+      }
+
+/* Invoke the astRemoveRegions method on all the component Frames. */
+      for( i = 0; i < this->nframe; i++ ) {
+         newfrms[ i ] = astRemoveRegions( this->frame[ i ] );
+
+/* Note if any Frame was changed. */
+         if( newfrms[ i ] != this->frame[ i ] ) changed = 1;
+      }
+
+/* If no component was modified, just return a clone of the supplied
+   pointer. */
+      if( ! changed ) {
+         result = astClone( this );
+
+/* Otherwise, we need to create a new FrameSet to return. We take a deep 
+   copy of the supplied FrameSet and then modify the Mappings and Frames 
+   so that we retain any extra information in the supplied FrameSet. */
+      } else {
+         new = astCopy( this );
+
+         for( i = 0; i < this->nnode - 1; i++ ) {
+            (void) astAnnul( new->map[ i ] );
+            new->map[ i ] = astClone( newmaps[ i ] );
+         }
+
+         for( i = 0; i < this->nframe; i++ ) {
+            (void) astAnnul( new->frame[ i ] );
+            new->frame[ i ] = astClone( newfrms[ i ] );
+         }
+
+         result = (AstMapping *) new;
+      }
+
+/* Free resources. */
+      for( i = 0; i < this->nnode - 1; i++ ) {
+         newmaps[ i ] = astAnnul( newmaps[ i ] );
+      }
+
+      for( i = 0; i < this->nframe; i++ ) {
+         newfrms[ i ] = astAnnul( newfrms[ i ] );
+      }
+
+   }
+
+   newfrms = astFree( newfrms );
+   newmaps = astFree( newmaps );
+
+/* Annul the returned Mapping if an error has occurred. */
+   if( !astOK ) result = astAnnul( result );
+
+/* Return the result. */
+   return result;
 }
 
 static void ReportPoints( AstMapping *this_mapping, int forward,

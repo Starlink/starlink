@@ -47,7 +47,13 @@ f     AST_TRAN<X> routines
 *     is not a true inverse of the forward transformation, since applying
 *     the forward transformation to a point outside the Region, and then
 *     applying the inverse transformation results, in a set of AST__BAD axis
-*     values rather than the original axis values.
+*     values rather than the original axis values. If required, the 
+c     astRemoveRegions 
+f     AST_REMOVEREGIONS 
+*     function can be used to remove the "masking" effect of any Regions
+*     contained within a compound Mapping or FrameSet. It does this by 
+*     replacing each Region with a UnitMap or equivalent Frame (depending
+*     on the context in which the Region is used).
 *
 *     If the coordinate system represented by the Region is changed (by
 *     changing the values of one or more of the attribute which the Region
@@ -847,6 +853,7 @@ static AstFrameSet *FindFrame( AstFrame *, AstFrame *, const char *, int * );
 static AstFrameSet *GetRegFS( AstRegion *, int * );
 static AstLineDef *LineDef( AstFrame *, const double[2], const double[2], int * );
 static AstMapping *RegMapping( AstRegion *, int * );
+static AstMapping *RemoveRegions( AstMapping *, int * );
 static AstMapping *Simplify( AstMapping *, int * );
 static AstPointSet *BTransform( AstRegion *, AstPointSet *, int, AstPointSet *, int * );
 static AstPointSet *BndBaseMesh( AstRegion *, double *, double *, int * );
@@ -4210,6 +4217,7 @@ void astInitRegionVtab_(  AstRegionVtab *vtab, const char *name, int *status ) {
    object->TestAttrib = TestAttrib;
 
    mapping->ReportPoints = ReportPoints;
+   mapping->RemoveRegions = RemoveRegions;
    mapping->Simplify = Simplify;
 
    frame->Abbrev = Abbrev;
@@ -8408,6 +8416,57 @@ static void RegSetAttrib( AstRegion *this, const char *asetting,
 /* Free resources. */
    setting = astFree( setting );
 
+}
+
+static AstMapping *RemoveRegions( AstMapping *this_mapping, int *status ) {
+/*
+*  Name:
+*     RemoveRegions
+
+*  Purpose:
+*     Remove any Regions from a Mapping.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "region.h"
+*     AstMapping *RemoveRegions( AstMapping *this, int *status )
+
+*  Class Membership:
+*     Region method (over-rides the astRemoveRegions method inherited
+*     from the Frame class).
+
+*  Description:
+*     This function searches the supplied Mapping (which may be a 
+*     compound Mapping such as a CmpMap) for any component Mappings 
+*     that are instances of the AST Region class. It then creates a new
+*     Mapping from which all Regions have been removed. If a Region
+*     cannot simply be removed (for instance, if it is a component of a
+*     parallel CmpMap), then it is replaced with an equivalent UnitMap 
+*     in the returned Mapping.
+*
+*     The implementation provided by the Region class just returns the
+*     equivalent Frame.
+
+*  Parameters:
+*     this
+*        Pointer to the original Region.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     A pointer to the modified mapping.
+
+*  Notes:
+*     - A NULL pointer value will be returned if this function is
+*     invoked with the AST error status set, or if it should fail for
+*     any reason.
+*/
+
+/* The Region class just returns a pointer to a deep copy of the Region's
+   equivalent Frame. */
+   return astGetRegionFrame( (AstRegion *)this_mapping );
 }
 
 static void ReportPoints( AstMapping *this_mapping, int forward,

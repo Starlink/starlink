@@ -204,6 +204,7 @@ AstSwitchMap *astSwitchMapId_( void *, void *, int, void **, const char *, ... )
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
+static AstMapping *RemoveRegions( AstMapping *, int * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
 static double Rate( AstMapping *, double *, int, int, int * );
 static int Equal( AstObject *, AstObject *, int * );
@@ -680,6 +681,7 @@ void astInitSwitchMapVtab_(  AstSwitchMapVtab *vtab, const char *name, int *stat
    object->Equal = Equal;
    mapping->MapMerge = MapMerge;
    mapping->Rate = Rate;
+   mapping->RemoveRegions = RemoveRegions;
 
 /* Declare the copy constructor, destructor and class dump function. */
    astSetCopy( vtab, Copy );
@@ -1221,6 +1223,175 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2, int *status 
    return result;
 }
 
+static AstMapping *RemoveRegions( AstMapping *this_mapping, int *status ) {
+/*
+*  Name:
+*     RemoveRegions
+
+*  Purpose:
+*     Remove any Regions from a Mapping.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "switchmap.h"
+*     AstMapping *RemoveRegions( AstMapping *this, int *status )
+
+*  Class Membership:
+*     SwitchMap method (over-rides the astRemoveRegions method inherited
+*     from the Mapping class).
+
+*  Description:
+*     This function searches the supplied Mapping (which may be a 
+*     compound Mapping such as a SwitchMap) for any component Mappings 
+*     that are instances of the AST Region class. It then creates a new
+*     Mapping from which all Regions have been removed. If a Region
+*     cannot simply be removed (for instance, if it is a component of a
+*     parallel SwitchMap), then it is replaced with an equivalent UnitMap 
+*     in the returned Mapping.
+*
+*     The implementation provided by the SwitchMap class invokes the
+*     astRemoveRegions method on all the component Mappings, and joins
+*     the results together into a new SwitchMap.
+
+*  Parameters:
+*     this
+*        Pointer to the original Region.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     A pointer to the modified mapping.
+
+*  Notes:
+*     - A NULL pointer value will be returned if this function is
+*     invoked with the AST error status set, or if it should fail for
+*     any reason.
+*/
+
+/* Local Variables: */
+   AstMapping **temp;            /* Array of new route Mappings */
+   AstMapping *newfsmap;         /* New forward selector Mapping */
+   AstMapping *newismap;         /* New inverse selector Mapping */
+   AstMapping *result;           /* Result pointer to return */
+   AstSwitchMap *new;            /* Pointer to new SwitchMap */
+   AstSwitchMap *this;           /* Pointer to SwitchMap structure */
+   int changed;                  /* Has any mapping been changed? */
+   int i;                        /* Loop count */
+   int nax;                      /* Number of Frame axes */
+
+/* Initialise. */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get a pointer to the SwitchMap. */
+   this = (AstSwitchMap *) this_mapping;
+
+/* Allocate an array to hold the modified Mapping pointers. */
+   temp = astMalloc( sizeof( AstMapping *)*( this->nroute ) );
+   if( astOK ) {
+
+/* Invoke the astRemoveRegions method on all the component Mappings. */
+      changed = 0;
+      for( i = 0; i < this->nroute; i++ ) {
+         temp[ i ] = astRemoveRegions( this->routemap[ i ] );
+
+/* Note if any Mapping was changed. */
+         if( temp[ i ] != this->routemap[ i ] ) {
+            changed = 1;
+
+/* The implementation of the astRemoveRegions method provided by the
+   Region class returns a Frame rather than a UnitMap. But we need
+   Mappings here, not Frames. So if the new Mapping is a Frame, replace 
+   it with an equivalent UnitMap. */
+            if( astIsAFrame( temp[ i ] ) ) {
+               nax = astGetNin( temp[ i ] );
+               (void) astAnnul( temp[ i ] );
+               temp[ i ] = (AstMapping *) astUnitMap( nax, " ", status );
+            }
+         }
+      }
+
+/* And on the other ancillary Mappings */
+      if( this->fsmap ) {
+         newfsmap = astRemoveRegions( this->fsmap );
+         if( newfsmap != this->fsmap ) {
+            changed = 1;
+            if( astIsAFrame( newfsmap ) ) {
+               nax = astGetNin( newfsmap );
+               (void) astAnnul( newfsmap );
+               newfsmap = (AstMapping *) astUnitMap( nax, " ", status );
+            }
+         }
+
+      } else {
+         newfsmap = NULL;
+      }
+
+      if( this->ismap ) {
+         newismap = astRemoveRegions( this->ismap );
+         if( newismap != this->ismap ) {
+            changed = 1;
+            if( astIsAFrame( newismap ) ) {
+               nax = astGetNin( newismap );
+               (void) astAnnul( newismap );
+               newismap = (AstMapping *) astUnitMap( nax, " ", status );
+            }
+         }
+
+      } else {
+         newismap = NULL;
+      }
+
+/* If no component was modified, just return a clone of the supplied
+   pointer. */
+      if( ! changed ) {
+         result = astClone( this );
+
+/* Otherwise, we need to create a new Mapping to return. We take a deep 
+   copy of the supplied SwitchMap and then modify the Mappings so that 
+   we retain any extra information in the supplied SwitchMap. */
+      } else {
+         new = astCopy( this );
+
+         for( i = 0; i < this->nroute; i++ ) {
+            (void) astAnnul( new->routemap[ i ] );
+            new->routemap[ i ] = astClone( temp[ i ] );
+         }
+
+         if( newfsmap ) {
+            (void) astAnnul( new->fsmap );
+            new->fsmap = astClone( newfsmap );
+         }
+
+         if( newismap ) {
+            (void) astAnnul( new->ismap );
+            new->ismap = astClone( newismap );
+         }
+
+         result = (AstMapping *) new;
+      }
+
+/* Free resources. */
+      for( i = 0; i < this->nroute; i++ ) {
+         temp[ i ] = astAnnul( temp[ i ] );
+      }
+
+      if( newfsmap ) newfsmap = astAnnul( newfsmap );
+      if( newismap ) newismap = astAnnul( newismap );
+   }
+
+   temp = astFree( temp );
+
+/* Annul the returned Mapping if an error has occurred. */
+   if( !astOK ) result = astAnnul( result );
+
+/* Return the result. */
+   return result;
+}
 
 int astSwitchList_( AstSwitchMap *this, int invert, int *nmap, 
                     AstMapping ***map_list, int **invert_list, int *status ) {

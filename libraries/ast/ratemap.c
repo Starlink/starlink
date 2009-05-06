@@ -156,6 +156,7 @@ AstRateMap *astRateMapId_( void *, int, int, const char *, ... );
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
+static AstMapping *RemoveRegions( AstMapping *, int * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
 static void Copy( const AstObject *, AstObject *, int * );
@@ -412,6 +413,8 @@ void astInitRateMapVtab_(  AstRateMapVtab *vtab, const char *name, int *status )
    mapping = (AstMappingVtab *) vtab;
    parent_getobjsize = object->GetObjSize;
    object->GetObjSize = GetObjSize;
+
+   mapping->RemoveRegions = RemoveRegions;
 
 #if defined(THREAD_SAFE)
    parent_managelock = object->ManageLock;
@@ -957,6 +960,104 @@ static int *MapSplit( AstMapping *this_map, int nin, const int *in, AstMapping *
    }
 
 /* Return the list of output indices. */
+   return result;
+}
+
+static AstMapping *RemoveRegions( AstMapping *this_mapping, int *status ) {
+/*
+*  Name:
+*     RemoveRegions
+
+*  Purpose:
+*     Remove any Regions from a Mapping.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "ratemap.h"
+*     AstMapping *RemoveRegions( AstMapping *this, int *status )
+
+*  Class Membership:
+*     RateMap method (over-rides the astRemoveRegions method inherited
+*     from the Mapping class).
+
+*  Description:
+*     This function searches the supplied Mapping (which may be a 
+*     compound Mapping such as a CmpMap) for any component Mappings 
+*     that are instances of the AST Region class. It then creates a new
+*     Mapping from which all Regions have been removed. If a Region
+*     cannot simply be removed (for instance, if it is a component of a
+*     parallel CmpMap), then it is replaced with an equivalent UnitMap 
+*     in the returned Mapping.
+*
+*     The implementation provided by the RateMap class invokes the
+*     astRemoveRegions method on the encapsulated Mapping, and returns a
+*     new RateMap containing the resulting Mapping.
+
+*  Parameters:
+*     this
+*        Pointer to the original Region.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     A pointer to the modified mapping.
+
+*  Notes:
+*     - A NULL pointer value will be returned if this function is
+*     invoked with the AST error status set, or if it should fail for
+*     any reason.
+*/
+
+/* Local Variables: */
+   AstMapping *newmap;           /* New component Mapping */
+   AstMapping *result;           /* Result pointer to return */
+   AstRateMap *new;              /* Pointer to new RateMap */
+   AstRateMap *this;             /* Pointer to RateMap structure */
+
+/* Initialise. */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get a pointer to the RateMap. */
+   this = (AstRateMap *) this_mapping;
+
+/* Invoke the astRemoveRegions method on the component Mapping. */
+   newmap = astRemoveRegions( this->map );
+
+/* If the Mapping was not modified, just return a clone of the supplied
+   pointer. */
+   if( this->map == newmap ) {
+      result = astClone( this );
+
+/* Otherwise, we need to create a new RateMap to return. */
+   } else {
+
+/* If the new Mapping is a Frame (as will be the case if the original
+   Mapping was a Region), use a UnitMap instead. */
+      if( astIsAFrame( newmap ) ) {
+         (void) astAnnul( newmap );
+         newmap = astUnitMap( astGetNin( this ), " ", status );
+      }
+
+/* Take a deep copy of the supplied RateMap and then modify the Mapping
+   so that we retain any extra information in the supplied RateMap. */
+      new = astCopy( this );
+      (void) astAnnul( new->map );
+      new->map = astClone( newmap );
+      result = (AstMapping *) new;
+   }
+
+/* Free resources. */
+   newmap = astAnnul( newmap );
+
+/* Annul the returned Mapping if an error has occurred. */
+   if( !astOK ) result = astAnnul( result );
+
+/* Return the result. */
    return result;
 }
 
