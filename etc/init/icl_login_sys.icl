@@ -32,6 +32,7 @@
 {
 {  Authors:
 {    AJC: A J Chipperfield  (Starlink)
+{    BRADC: Brad Cavanagh (JAC, Hawaii)
 {    BLY: M J Bly (Starlink, RAL)
 {    TIMJ: Tim Jenness (JAC, Hawaii)
 {    MJC: Malcolm J. Currie (Starlink, RAL)
@@ -71,6 +72,8 @@
 {       Photom now uses photom.icl
 {    2008 July 2 (MJC):
 {       Added DATACUBE definitions.
+{    2009 May 6 (BRADC):
+<       Added CUPID definitions.
 
 {  Display ICL Version
 VERSION
@@ -201,7 +204,17 @@ elseif file_exists("$CONVERT_DIR/convert.csh")
 else
    defstring convert(start) notinstalled CONVERT
 endif
-   
+
+{  CUPID
+defhelp cupid $ADAM_PACKAGES CUPID
+if file_exists("$CUPID_DIR/cupid.icl")
+   defstring cupid load $CUPID_DIR/cupid.icl
+elseif file_exists("$CUPID_DIR/cupid.csh")
+   defstring cupid notavailable CUPID
+else
+   defstring cupid notinstalled CUPID
+endif
+
 {  DAOPHOT
 defhelp daophot $ADAM_PACKAGES DAOPHOT
 if file_exists("$DAOPHOT_DIR/daophot_init") 
