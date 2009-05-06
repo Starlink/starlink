@@ -1400,7 +1400,7 @@ f     AST_WARNINGS
 
 *  Synopsis:
 c     #include "channel.h"
-c     AstKeyMap *Warnings( AstChannel *this )
+c     AstKeyMap *astWarnings( AstChannel *this )
 f     RESULT = AST_WARNINGS( THIS, STATUS )
 
 *  Class Membership:
