@@ -73,7 +73,7 @@
 {    2008 July 2 (MJC):
 {       Added DATACUBE definitions.
 {    2009 May 6 (BRADC):
-<       Added CUPID definitions.
+{       Added CUPID definitions.
 
 {  Display ICL Version
 VERSION
