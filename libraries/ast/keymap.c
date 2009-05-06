@@ -4311,9 +4311,10 @@ static int MapGetElem##X( AstKeyMap *this, const char *key, int elem, \
 /* Ensure the requested element is within the bounds of the vector */ \
       if( elem >= nel || elem < 0 ) { \
          if( astOK ) { \
-            astError( AST__MPVIN, "astMapGetElem<X>(KeyMap): Illegal vector " \
-                      "index %d supplied for KeyMap entry '%s' - should be " \
-                      "in the range 1 to %d.", status, elem + 1, key, nel + 1 ); \
+            astError( AST__MPVIN, "astMapGetElem<X>(KeyMap): Illegal " \
+                      "zero-based vector index %d supplied for KeyMap " \
+                      "entry '%s' - the vector has %d elements.", status, \
+                      elem, key, nel ); \
          } \
 \
 /* Get a pointer to the requested raw value. */ \
