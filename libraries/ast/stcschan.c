@@ -857,7 +857,7 @@ static void GetFmt( const char *key, AstKeyMap *props, int i, int defdigs,
 *     GetFmt
 
 *  Purpose:
-*     Decide how many digits to use when formatting a numerical STC/S
+*     Decide how many digits to use when formatting a numerical STC-S
 *     property value.
 
 *  Type:
@@ -5649,15 +5649,15 @@ static int WriteRegion( AstStcsChan *this, AstRegion *reg, AstKeyMap *props,
                }
 
                if( tfrm && equinox != AST__BAD ) {
-                  if( astGetEquinox( spfrm ) != equinox ) {
-                     tfrm = NULL;
+                  if( astGetD( spfrm, "Equinox" ) != equinox ) {
                      astAddWarning( this, 1, "STC-S requires an equinox "
                                     "of %g for the %s frame, but the "
                                     "supplied %s equinox is %g.", "astWrite", 
                                     status, equinox, tfrm, 
                                     astGetClass( spfrm ), 
-                                    astGetEquinox( spfrm ) );
+                                    astGetD( spfrm, "Equinox" ) );
                      ok = 0;
+                     tfrm = NULL;
                   }
                }
             }
