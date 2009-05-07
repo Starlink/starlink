@@ -326,7 +326,7 @@ itcl::class gaia3d::Gaia3dTool {
    #  Add generic controls for the data handling.
    protected method add_controls_ {} {
 
-      set lwidth 12
+      set lwidth 14
 
       itk_component add controls {
          ::frame $w_.controls
@@ -731,8 +731,9 @@ itcl::class gaia3d::Gaia3dTool {
 
    #  Called when variable that controls visibility of the CUPID catalogue
    #  clumps. When the clumps are translucent we must re-establish the
-   #  prop order, with the clumps at the back. So this is done the
-   #  hard way by completely redrawing the scene.
+   #  prop order, with the clumps at the back. Also we match the objects
+   #  displayed in the catalogue, which might have changed. So this is done 
+   #  the hard way by completely redrawing the scene.
    protected method changed_show_cupid_cat_ {} {
       if { $drawn_ } {
          if { $cupid_cat_ != {} } {
@@ -950,15 +951,15 @@ itcl::class gaia3d::Gaia3dTool {
       }
    }
 
-   #  Set the CUPID catalogue astrocat instance.
-   public method set_cupid_astrocat {astrocat} {
-      set astrocat_ $astrocat
-      puts "set_cupid_astrocat: $cupid_cat_, $astrocat"
+   #  Set the CUPID catalogue importer. This has handles to all the
+   #  CUPID catalogues.
+   public method set_cupid_importer {cupidimporter} {
+      set importer_ $cupidimporter
       if { $cupid_cat_ != {} } {
 
          #  Fast LOD updates for volumes.
          $renwindow_ set_rate_to_desired
-         $cupid_cat_ set_catalogue $astrocat_
+         $cupid_cat_ set_importer $importer_
          $renwindow_ render
          $renwindow_ set_rate_to_still
       }
@@ -1068,11 +1069,13 @@ itcl::class gaia3d::Gaia3dTool {
                                -align_to_axis 1 \
                                -colour $spectral_colour_ \
                                -axis [$itk_option(-gaiacube) get_axis]]
-            $cupid_cat_ set_catalogue $astrocat_
+            $cupid_cat_ set_importer $importer_
             $cupid_cat_ add_to_window
          }
          if { $show_cupid_cat_ } {
-            $cupid_cat_ set_visible
+            #  Complete rendering so that new or removed regions are handled.
+            $cupid_cat_ set_importer $importer_
+            #$cupid_cat_ set_visible
          } else {
             $cupid_cat_ set_invisible
          }
@@ -1388,7 +1391,7 @@ itcl::class gaia3d::Gaia3dTool {
    #  Whether to show the AST axes.
    protected variable show_ast_axes_ 0
 
-   #  Whether to show the CUPID catalogue.
+   #  Whether to show the CUPID catalogues.
    protected variable show_cupid_cat_ 0
 
    #  The Plot3D instance used to draw axes (and markers).
@@ -1439,11 +1442,11 @@ itcl::class gaia3d::Gaia3dTool {
    #  Global properties handler.
    protected variable props_ {}
 
-   #  CUPID catalogue handler.
+   #  CUPID catalogues handler.
    protected variable cupid_cat_ {}
 
-   #  The astrocat instance for the CUPID catalogue.
-   protected variable astrocat_ {}
+   #  The importer for the CUPID catalogue (gaia::GaiaCupidImporter).
+   protected variable importer_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------

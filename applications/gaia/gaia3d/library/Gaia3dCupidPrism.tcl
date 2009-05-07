@@ -105,12 +105,12 @@ itcl::class ::gaia3d::Gaia3dCupidPrism {
       }
    }
 
-   #  Accept an astrocat instance that has the CUPID catalogue opened
-   #  as the current catalogue. Parse the contents and create a suitable
-   #  list of objects for rendering.
-   public method set_catalogue {astrocat} {
-      if { $astrocat != {} } {
-         create_objects_ $astrocat
+   #  Accept an gaia::GaiaCupidImport instance that has CUPID catalogues
+   #  opened. Parse and create a suitable list of objects for rendering.
+   public method set_importer {importer} {
+      if { $importer != {} } {
+         delete_objects_
+         create_objects_ $importer
          add_to_window
          set_visible
       }
@@ -123,102 +123,117 @@ itcl::class ::gaia3d::Gaia3dCupidPrism {
       }
    }
 
-   #  Apply the current configuration to the currently active object.
-   protected method create_objects_ {astrocat} {
-
-      #  Need to connect the catalogue coordinates to the grid coordinates
-      #  of the dataset. So see if the catalogue has a WCS, as this is from
-      #  CUPID it should.
-      set comments [$astrocat comments]
-      set tranwcs 0
-      if { $comments != {} } {
-         set astref [gaia::GaiaSearch::get_kaplibs_frameset $comments]
-         if { $astref != 0 } {
-
-            #  Want transformation from current coordinates of the
-            #  catalogue to base coordinates of the cube. So we connect them,
-            #  going via SKY-DSBSPECTRUM or PIXEL coordinates.
-            set wcs_current [gaiautils::astget $wcs "Current"]
-            set wcs_base [gaiautils::astget $wcs "Base"]
-
-            gaiautils::astset $wcs "Current=$wcs_base"
-            set tranwcs [gaiautils::astconvert $wcs $astref \
-                            "SKY-DSBSPECTRUM,PIXEL,"]
-
-            gaiautils::astset $wcs "Current=$wcs_current"
-            gaiautils::astset $wcs "Base=$wcs_base"
-            gaiautils::astannul $astref
-         }
+   #  Delete all the existing objects.
+   protected method delete_objects_ {} {
+      foreach index [array names collection_] {
+         ::delete object $collection_($index)
+         unset collection_($index)
       }
+   }
 
-      #  Get the data from the catalogue.
+   #  Create objects to display the CUPID detections.
+   protected method create_objects_ {importer} {
+
+      #  Counter for all objects created.
       set n 0
-      foreach line [$astrocat content] {
-         lassign $line \
-            pident peak1 peak2 peak3 cen1 cen2 cen3 size1 size2 size3
 
-         #  Transform from catalogue coordinates to grid. Note WCS
-         #  has 12 axes, but only the first three are used to connect
-         #  to the cube.
-         if { $tranwcs != 0 } {
+      #  Loop over the catalogues in hand.
+      foreach catwin [$importer get 1] {
+         set results [$catwin get_table]
 
-            #  Unformat the ones that might be in sexagesimal.
-            #  Note values from table are already transformed into
-            #  celestial positions in RA and Dec, so we use that WCS
-            #  to unformat not tranwcs, which is in plain degrees.
-            set cen1 [gaiautils::astunformat $wcs 1 $cen1]
-            set cen2 [gaiautils::astunformat $wcs 2 $cen2]
+         #  Need to connect the catalogue coordinates to the grid coordinates
+         #  of the dataset. So see if the catalogue has a WCS, as this is from
+         #  CUPID it should.
+         set comments [$catwin comments]
+         set tranwcs 0
+         if { $comments != {} } {
+            set astref [gaia::GaiaSearch::get_kaplibs_frameset $comments]
+            if { $astref != 0 } {
 
-            #  Radians to degrees, now same as catalogue WCS.
-            set cen1 [expr $cen1*$r2d_]
-            set cen2 [expr $cen2*$r2d_]
+               #  Want transformation from current coordinates of the
+               #  catalogue to base coordinates of the cube. So we connect
+               #  them, going via SKY-DSBSPECTRUM or PIXEL coordinates.
+               set wcs_current [gaiautils::astget $wcs "Current"]
+               set wcs_base [gaiautils::astget $wcs "Base"]
 
-            #  Sizes from arcsec to degrees.
-            set size1 [expr ($size1/3600.0)]
-            set size2 [expr ($size2/3600.0)]
+               gaiautils::astset $wcs "Current=$wcs_base"
+               set tranwcs [gaiautils::astconvert $wcs $astref \
+                               "SKY-DSBSPECTRUM,PIXEL,"]
 
-            #  Size[123] are distances, so offset from centre to get positions.
-            set d11 [expr $cen1-$size1]
-            set d12 [expr $cen2-$size2]
-            set d13 [expr $cen3-$size3]
-
-            set d21 [expr $cen1+$size1]
-            set d22 [expr $cen2+$size2]
-            set d23 [expr $cen3+$size3]
-
-            #  Transform end positions in degrees to pixels.
-            lassign [tran3d_ $tranwcs 0 $d11 $d12 $d13] d11 d12 d13
-            lassign [tran3d_ $tranwcs 0 $d21 $d22 $d23] d21 d22 d23
-
-            #  Recover sizes in pixels.
-            set size1 [expr abs(0.5*($d21 - $d11))]
-            set size2 [expr abs(0.5*($d22 - $d12))]
-            set size3 [expr abs(0.5*($d23 - $d13))]
-
-            #  Transform centre from degrees to pixels.
-            lassign [tran3d_ $tranwcs 0 $cen1 $cen2 $cen3] cen1 cen2 cen3
+               gaiautils::astset $wcs "Current=$wcs_current"
+               gaiautils::astset $wcs "Base=$wcs_base"
+               gaiautils::astannul $astref
+            }
          }
 
-         set x0 [expr $cen1-$size1]
-         set x1 [expr $cen1+$size1]
+         #  Get the data from the catalogue. XXX selected rows option XXX.
+         foreach line [$results get_contents] {
+            lassign $line \
+               pident peak1 peak2 peak3 cen1 cen2 cen3 size1 size2 size3
 
-         set y0 [expr $cen2-$size2]
-         set y1 [expr $cen2+$size2]
+            #  Transform from catalogue coordinates to grid. Note WCS
+            #  has 12 axes, but only the first three are used to connect
+            #  to the cube.
+            if { $tranwcs != 0 } {
 
-         set z0 [expr $cen3-$size3]
-         set z1 [expr $cen3+$size3]
+               #  Unformat the ones that might be in sexagesimal.
+               #  Note values from table are already transformed into
+               #  celestial positions in RA and Dec, so we use that WCS
+               #  to unformat not tranwcs, which is in plain degrees.
+               set cen1 [gaiautils::astunformat $wcs 1 $cen1]
+               set cen2 [gaiautils::astunformat $wcs 2 $cen2]
 
-         set collection_($n) [gaia3d::Gaia3dVtkRectPrism \#auto \
-                                 -x0 $x0 -y0 $y0 -x1 $x1 -y1 $y1 \
-                                 -zlow $z0 -zhigh $z1]
-         incr n
+               #  Radians to degrees, now same as catalogue WCS.
+               set cen1 [expr $cen1*$r2d_]
+               set cen2 [expr $cen2*$r2d_]
+
+               #  Sizes from arcsec to degrees.
+               set size1 [expr ($size1/3600.0)]
+               set size2 [expr ($size2/3600.0)]
+
+               #  Size[123] are distances, so offset from centre to get
+               #  positions.
+               set d11 [expr $cen1-$size1]
+               set d12 [expr $cen2-$size2]
+               set d13 [expr $cen3-$size3]
+
+               set d21 [expr $cen1+$size1]
+               set d22 [expr $cen2+$size2]
+               set d23 [expr $cen3+$size3]
+
+               #  Transform end positions in degrees to pixels.
+               lassign [tran3d_ $tranwcs 0 $d11 $d12 $d13] d11 d12 d13
+               lassign [tran3d_ $tranwcs 0 $d21 $d22 $d23] d21 d22 d23
+
+               #  Recover sizes in pixels.
+               set size1 [expr abs(0.5*($d21 - $d11))]
+               set size2 [expr abs(0.5*($d22 - $d12))]
+               set size3 [expr abs(0.5*($d23 - $d13))]
+
+               #  Transform centre from degrees to pixels.
+               lassign [tran3d_ $tranwcs 0 $cen1 $cen2 $cen3] cen1 cen2 cen3
+            }
+
+            set x0 [expr $cen1-$size1]
+            set x1 [expr $cen1+$size1]
+
+            set y0 [expr $cen2-$size2]
+            set y1 [expr $cen2+$size2]
+
+            set z0 [expr $cen3-$size3]
+            set z1 [expr $cen3+$size3]
+
+            set collection_($n) [gaia3d::Gaia3dVtkRectPrism \#auto \
+                                    -x0 $x0 -y0 $y0 -x1 $x1 -y1 $y1 \
+                                    -zlow $z0 -zhigh $z1]
+            incr n
+         }
+         if { $tranwcs != 0 } {
+            gaiautils::astannul $tranwcs
+         }
       }
       apply_configuration_
       fit_to_data
-
-      if { $tranwcs != 0 } {
-         gaiautils::astannul $tranwcs
-      }
    }
 
    #  Transform a 3D position. Assumes a catalogue-based WCS with

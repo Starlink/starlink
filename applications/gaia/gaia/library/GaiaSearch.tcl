@@ -113,7 +113,7 @@ itcl::class gaia::GaiaSearch {
       #  available.
       set m [get_menu File]
       if { $iscat_ } {
-	 $m delete "Save with image"
+         $m delete "Save with image"
       }
 
       #  Use our Open dialog so we can browse for HDUs.
@@ -472,6 +472,11 @@ itcl::class gaia::GaiaSearch {
 
       #  Set display format to hms or degrees as appropriate for the catalogue.
       $w_.cat hms $hms
+   }
+
+   #  Return any comments in the current catalogue.
+   public method comments {} {
+      return [$w_.cat comments]
    }
 
    #  Set or reset the origin used when plotting positions and

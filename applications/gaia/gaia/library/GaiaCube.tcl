@@ -969,9 +969,15 @@ itcl::class gaia::GaiaCube {
    #  and update any displayed catalogues if propagate is true.
    public method set_cupid_coord {propagate} {
       if { [winfo exists $w_.cupidimporter] } {
+
+         #  XXX cupid(COORD) needs to be in the coordinate system of the
+         #  catalogue, not the cube. Or transform catalogue values...
          set coord [get_plane_coord 0 0 0]
+
+
+
          set ::cupid(COORD) $coord
-         if { [wm state $w_.cupidimporter] != "withdrawn" && $propagate } {
+         if { $propagate } {
             $w_.cupidimporter replot
          }
       } else {
@@ -1588,7 +1594,7 @@ itcl::class gaia::GaiaCube {
 
             #  Establish the CUPID catalogue handler. If already active.
             if { [winfo exists $w_.cupidimporter] } {
-               renderers_set_cupid_astrocat_ [$w_.cupidimporter get_astrocat]
+               renderers_set_cupid_importer_
             }
          }
       }
@@ -1681,14 +1687,12 @@ itcl::class gaia::GaiaCube {
       }
    }
 
-   #  Set the CUPID catalogue to display (only one).
-   protected method renderers_set_cupid_astrocat_ {astrocat} {
-      puts "renderers_set_cupid_astrocat_: $astrocat"
+   #  Set the CUPID catalogue importer.
+   protected method renderers_set_cupid_importer_ {} {
       foreach name "isosurface volume" {
          if { [info exists itk_component($name) ] } {
             if { [winfo exists $itk_component($name) ] } {
-               puts "$itk_component($name) set_cupid_astrocat $astrocat"
-               eval $itk_component($name) set_cupid_astrocat $astrocat
+               eval $itk_component($name) set_cupid_importer $w_.cupidimporter
             }
          }
       }
@@ -1850,13 +1854,13 @@ itcl::class gaia::GaiaCube {
    #  ================
    #  CUPID catalogues
    #  ================
-   protected method import_cupid_cat_ {} {
-      utilReUseWidget GaiaCupidImporter $w_.cupidimporter \
-         -gaiacube $this
 
-      #  XXX Do this only once 
-      #  XXX Need another call for each time the catalogue changes...
-      renderers_set_cupid_astrocat_ [$w_.cupidimporter get_astrocat]
+   #  Import a CUPID catalogue. May import more than one, but only
+   #  one importer for each instance of this. Any 3D uses query the 
+   #  importer for catalogues.
+   protected method import_cupid_cat_ {} {
+      utilReUseWidget GaiaCupidImporter $w_.cupidimporter -gaiacube $this
+      renderers_set_cupid_importer_
    }
 
    #  Configuration options: (public variables)

@@ -290,7 +290,7 @@ itcl::class gaia::GaiaCupidImporter {
    }
 
    #  Define a basic symbol {COORD} is the coordinate of the current slice.
-   #  XXX in the coordinates of the table, not the image XXX
+   #  XXX in the coordinates of the table, not the cube spectral axis XXX
    #  {SCALE} is a scale factor (sizes are sigmas, so 2 + 3 should be typical).
    #  Sizes are in arcsec for celestial coordinates.
    protected method set_plot_symbol_ {catwin} {
@@ -328,7 +328,7 @@ itcl::class gaia::GaiaCupidImporter {
 
    #  Refresh all catalogues that are displaying.
    public method replot {} {
-      foreach {catalogue catwin} [array get catwin_] {
+      foreach {name catwin} [array get catwin_] {
          if { [winfo exists $catwin] && [wm state $catwin] != "withdrawn" } {
             $catwin plot
             ::update idletasks
@@ -336,9 +336,25 @@ itcl::class gaia::GaiaCupidImporter {
       }
    }
 
-   #  Get the astrocat instance.
-   public method get_astrocat {} {
-      return $astrocat_
+   #  Return a list of the imported catalogues. Instances of GaiaSearch.
+   #  If requested only active, i.e. currently open instances will be
+   #  returned.
+   public method get {active} {
+      set result {}
+      if { [info exists catwin_] } {
+         if { $active } {
+            foreach {name catwin} [array get catwin_] {
+               if { [wm state $catwin] != "withdrawn" } {
+                  lappend result $catwin
+               }
+            }
+         } else {
+            foreach {name catwin} [array get catwin_] {
+               lappend result $catwin
+            }
+         }
+      }
+      return $result
    }
 
    #  Configuration options: (public variables)
