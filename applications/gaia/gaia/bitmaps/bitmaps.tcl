@@ -24,7 +24,6 @@ puts {
 
 #include <tcl.h>
 #include <tk.h>
-#include <tix.h>
 
 }
 puts "void defineGaiaBitmaps(Tcl_Interp *interp) {"
