@@ -8741,7 +8741,7 @@ static AstPointSet *ResolvePoints( AstFrame *this_frame, const double point1[],
 /* Obtain a pointer to the Region's encapsulated Frame and invoke this
    Frame's astResolve method. Annul the Frame pointer afterwards. */
    fr = astGetFrame( this->frameset, AST__CURRENT );
-   result = astResolvePoints( this, point1, point2, in, out );
+   result = astResolvePoints( fr, point1, point2, in, out );
    fr = astAnnul( fr );
 
 /* Return a pointer to the output PointSet. */
