@@ -125,6 +125,10 @@ HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, int nel,
 *     19-MAR-2007 (DSB):
 *        Check each pixel in a clump to see if it is bad. If it is, do
 *        not include it in the NDF.
+*     8-MAY-2009 (DSB):
+*        AllowEdge may be set non-zero, so test if the clump touches the
+*        edge of the data array before accessing neighbouring pixels
+*        (which may potentially be off the edge of the array).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -134,7 +138,6 @@ HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, int nel,
 */
 
 /* Local Variables: */
-
    HDSLoc *dloc;             /* Component locator */
    HDSLoc *ret;              /* The returned HDS object */
    HDSLoc *cloc;             /* Cell locator */
@@ -206,7 +209,7 @@ HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, int nel,
 /* Find the 1D vector index within the input array of the first pixel in the 
    clump bounding box. */
       ivinz = ( clbnd[ 0 ] - 1 ) + dims[ 0 ]*( ( clbnd[ 1 ] - 1 ) + 
-                                    dims[ 1 ]*( clbnd[ 2 ] - 1 ) );
+                                     dims[ 1 ]*( clbnd[ 2 ] - 1 ) );
 
 /* Store a pointer to the next output pixel value */
       pout = out;
@@ -235,11 +238,15 @@ HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, int nel,
 
 /* Check the input data pixel on either side of the current pixel on the
    first pixel axis. If either is bad, increment the number of contacts
-   between the clump and and areas of bad pixels. We assume that no clumps 
-   touch the edge of the main array (meaning we do not need to check the
-   value of ivinx). */
-                     if( ipd[ ivinx - 1 ] == CGEN_BAD ||
-                         ipd[ ivinx + 1 ] == CGEN_BAD ) bad++;
+   between the clump and and areas of bad pixels. If the AllowEdge
+   attribute has been set non-zero, then clumps may touch the edge of the
+   data array. So we need to check that grid index on the first pixel
+   axis to make sure that there are in fact pixels on either side of the
+   current pixel. */
+                     if( ix > 1 && ix < dims[ 0 ] ) {
+                        if( ipd[ ivinx - 1 ] == CGEN_BAD ||
+                            ipd[ ivinx + 1 ] == CGEN_BAD ) bad++;
+                     }
                   }
 
 /* If this pixel is not in the clump, store a bad value in the output.*/
