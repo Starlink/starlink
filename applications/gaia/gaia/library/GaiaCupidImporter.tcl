@@ -14,7 +14,7 @@
 #     axes columns and the columns that determine the extent of the
 #     clump.
 #
-#     XXX deal with non-RA and Dec systems.
+#     XXX warning about non-RA and Dec systems when found.
 
 #  Invocations:
 #
@@ -154,6 +154,17 @@ itcl::class gaia::GaiaCupidImporter {
          }
       }
 
+      #  Or use the STC shape.
+      itk_component add stc {
+         StarLabelCheck $w_.stc \
+            -text "STC shape:" \
+            -onvalue 1 -offvalue 0 \
+            -labelwidth 8 \
+            -variable [scope itk_option(-use_stc)]
+      }
+      pack $itk_component(stc) -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(stc) {Draw STC shapes if available}
+
       #  Add buttons to import the catalogue and close the window.
       itk_component add actionframe {frame $w_.action}
       pack $itk_component(actionframe) -side bottom -fill x -pady 3 -padx 3
@@ -243,6 +254,12 @@ itcl::class gaia::GaiaCupidImporter {
          return
       }
 
+      #  Do we have STC?
+      set have_stc_ 0
+      if { [string first "Shape" $headings] != -1 } {
+         set have_stc_ 1
+      }
+
       #  Now open the catalogue window.
       set catwin [gaia::GaiaSearch::new_local_catalog $catalogue \
                      [code $image_] ::gaia::GaiaSearch 0 catalog $w_\
@@ -277,6 +294,9 @@ itcl::class gaia::GaiaCupidImporter {
       $astrocat_ entry update [list "dec_col $dec_col"] $catalogue
       $astrocat_ entry update [list "x_col -1"] $catalogue
       $astrocat_ entry update [list "y_col -1"] $catalogue
+
+      #  STC column, fixed at 13 but could scan for it.
+      $astrocat_ entry update [list "stc_col 13"] $catalogue
    }
 
    #  Wait for a command to return 1 (non-blocking?).
@@ -298,12 +318,18 @@ itcl::class gaia::GaiaCupidImporter {
       #  XXX hack, parameterise this.
       set ::cupid(SCALE) 1.0
 
-      set symbol1 [list PIDENT Cen3 Size1 Size2 Size3]
-      set symbol2 [list rectangle green {$Size2/$Size1} {} {} {($Cen3 > ($%%cupid(COORD) - ($Size3*$%%cupid(SCALE)))) && ($Cen3 < ($%%cupid(COORD) + ($Size3*$%%cupid(SCALE))))}]
-      set symbol3 [list {$Size1/3600.0} {deg 2000.0}]
-      #  XXX should be:
-      #set symbol3 [list {$Size1/3600.0*$%%cupid(SCALE)} {deg 2000.0}]
+      if { $itk_option(-use_stc) && $have_stc_ } {
+         set symbol1 [list PIDENT Shape Cen3 Size1 Size2 Size3]
+         set symbol2 [list stcshape green {} {} {} {($Cen3 > ($%%cupid(COORD) - ($Size3*$%%cupid(SCALE)))) && ($Cen3 < ($%%cupid(COORD) + ($Size3*$%%cupid(SCALE))))}]
+         set symbol3 [list 1 {deg 2000.0}]
+      } else {
 
+         set symbol1 [list PIDENT Cen3 Size1 Size2 Size3]
+         set symbol2 [list rectangle green {$Size2/$Size1} {} {} {($Cen3 > ($%%cupid(COORD) - ($Size3*$%%cupid(SCALE)))) && ($Cen3 < ($%%cupid(COORD) + ($Size3*$%%cupid(SCALE))))}]
+         set symbol3 [list {$Size1/3600.0} {deg 2000.0}]
+         #  XXX should be:
+         #set symbol3 [list {$Size1/3600.0*$%%cupid(SCALE)} {deg 2000.0}]
+      }
       $catwin set_symbol $symbol1 $symbol2 $symbol3
    }
 
@@ -375,6 +401,9 @@ itcl::class gaia::GaiaCupidImporter {
    #  Filters for selecting files.
    itk_option define -filter_types filter_types Filter_types {{FITS *.FIT}}
 
+   #  Prefer to use STC shapes as markers.
+   itk_option define -use_stc use_stc Use_Stc 1
+
    #  Protected variables: (available to instance)
    #  --------------------
 
@@ -390,6 +419,9 @@ itcl::class gaia::GaiaCupidImporter {
 
    #  Local astrocat command.
    protected variable astrocat_ {}
+
+   #  Does currently importing catalogue have a Shape column.
+   protected variable have_stc_ 0
 
    #  Common variables: (shared by all instances)
    #  -----------------

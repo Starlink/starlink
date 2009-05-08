@@ -537,7 +537,7 @@ int GaiaSkySearch::csizeCmd( int argc, char *argv[] )
  *  have both pixel coordinates and sky coordinates. Also now we
  *  are using AST transformations we need to make sure that further
  *  transformations are not applied (the equinox is now the same as the
- *  image).
+ *  image) and support STC regions.
  */
 int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
                                  const char* cols, const char* symbol,
@@ -614,9 +614,21 @@ int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
         if (nexpr > 1 && strlen(exprList[1]))
             units = exprList[1];
 
+        //  Is this an STC shape?
+        int stc_shape = 0;
+        if ( strcmp( shape, "stcshape" ) == 0 && r.stc_col() != -1 ) {
+            stc_shape = 1;
+        }
+
+        //  xy_units are re-used to carry the shape, need to handle
+        //  storage for that.
+        char xy_storage[32];
+        char *xy_units = xy_storage;
+
         // for each row in the catalog, eval the expressions and plot the symbols
         int nrows = r.numRows();
         int id_col = r.id_col();
+        int stc_col = r.stc_col();
         for (int rownum = 0; rownum < nrows; rownum++) {
             char* id;
             if ((status = r.get(rownum, id_col, id)) != 0)
@@ -625,7 +637,6 @@ int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
             if ((status = r.getPos(rownum, pos)) != 0)
                 break;
             double x, y;
-            char xy_units[32];
             if (r.isPix() && ! r.isWcs() ) { // PWD: modify here
                 x = pos.x();
                 y = pos.y();
@@ -639,11 +650,18 @@ int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
                 x = pos.ra_deg();
                 y = pos.dec_deg();
 
-                //  Degrees in the same units as image, so same equinox
-                //  in skycat speak.
-                const char *equinox = image->image()->wcs().equinoxStr();
-                strcpy(xy_units, "deg ");
-                strcat(xy_units, equinox);
+                if ( stc_shape ) {
+                    //  xy_units are the shape.
+                    if ((status = r.get(rownum, stc_col, xy_units)) != 0)
+                        break;
+                }
+                else {
+                    //  Degrees in the same units as image, so same equinox
+                    //  in skycat speak.
+                    const char *equinox = image->image()->wcs().equinoxStr();
+                    strcpy(xy_units, "deg ");
+                    strcat(xy_units, equinox);
+                }
             }
             else {
                 status = error("no wcs or image coordinates to plot");
@@ -691,6 +709,7 @@ int GaiaSkySearch::parse_symbol( const QueryResult& r, int argc, char** argv,
         "line",
         "plus",
         "square",
+        "stcshape",
         "triangle",
         "rectangle",
         "rotbox",

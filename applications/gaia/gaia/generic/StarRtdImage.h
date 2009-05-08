@@ -332,6 +332,13 @@ class StarRtdImage : public Skycat
                               double ratio = 1., double angle = 0.0,
                               const char *label = NULL, const 
                               char *label_tags = NULL);
+   virtual int draw_stcshape(double x, double y, const char *xy_units,
+                             double radius, const char *radius_units,
+                             const char *bg, const char *fg,
+                             const char *symbol_tags,
+                             double ratio = 1., double angle = 0.0,
+                             const char *label = NULL, const 
+                             char *label_tags = NULL);
 
    //  Set the colour of blank pixels.
    int blankcolorCmd( int argc, char *argv[] );

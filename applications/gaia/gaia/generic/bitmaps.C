@@ -11,6 +11,7 @@
 #include <tcl.h>
 #include <tk.h>
 
+
 void defineGaiaBitmaps(Tcl_Interp *interp) {
     #include "cross.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("cross"), (char*)cross_bits, cross_width, cross_height);
@@ -47,6 +48,9 @@ void defineGaiaBitmaps(Tcl_Interp *interp) {
 
     #include "annular_circle.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("annular_circle"), (char*)annular_circle_bits, annular_circle_width, annular_circle_height);
+
+    #include "stcshape.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("stcshape"), (char*)stcshape_bits, stcshape_width, stcshape_height);
 
     #include "line.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("line"), (char*)line_bits, line_width, line_height);

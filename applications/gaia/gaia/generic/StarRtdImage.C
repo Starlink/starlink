@@ -367,6 +367,29 @@ static Tk_ConfigSpec configSpecs_[] = {
 };
 
 //+
+//  Support for reading a string into an AST channel.
+//-
+typedef struct ChannelData {
+    const char *content;        //  The string to read into channel
+    int read;                   //  true when string has been read,
+                                //  set this initially to false
+} ChannelData;
+
+//  Static member to pass channel data string.
+static ChannelData channelData;
+
+//  Function to use as source for AST channel.
+static const char *StcsSource()
+{
+    if ( channelData.read == 0 ) {
+        channelData.read = 1;
+        return channelData.content;
+    }
+    return NULL;
+}
+
+
+//+
 //  Gaia_Init
 //
 //  Function to perform startup initialisation (called from tkAppInit).
@@ -3326,12 +3349,15 @@ int StarRtdImage::astsystemCmd( int argc, char *argv[] )
 //  bg and fg color, canvas tags list, x/y ratio and rotation angle.
 //
 //  shape may be one of "circle", "square", "plus", "cross", "triangle",
-//  "diamond", "ellipse", "compass", "line", "arrow", "rotbox" and
-//  rectangle.
+//  "diamond", "ellipse", "compass", "line", "arrow", "rotbox", "rectangle"
+//  and "stcshape".
 //
 //  x and y are the coordinates "xy_units", which is one of the units
 //  accepted by the Rtd commands (canvas, image, screen, "wcs $equinox",
-//  "deg $equinox").
+//  "deg $equinox"), or if the shape is "stcshape" the STC description
+//  which describes the shape and its units, for stcshape many of the
+//  other arguments are ignored, but x and y should still be an indicative
+//  position if possible (for clipping etc.).
 //
 //  The radius value is interpreted in radius_units.
 //
@@ -3388,6 +3414,7 @@ int StarRtdImage::draw_symbol( const char *shape,
         {"rectangle", &StarRtdImage::draw_rectangle},
         {"rotbox", &StarRtdImage::draw_rotbox},
         {"square", &Skycat::draw_square},
+        {"stcshape", &StarRtdImage::draw_stcshape},
         {"triangle", &Skycat::draw_triangle}
     };
     static int nsymbols = sizeof(symbols)/sizeof(SymbolTab);
@@ -3538,7 +3565,7 @@ int StarRtdImage::draw_rectangle( double x, double y, const char *xy_units,
            << x0-1 << ' ' << y0-1 << ' ' << x1+1 << ' ' << y1+1
            << " -outline " << bg
            << " -fill " << bg
-           << " -width 1 -stipple pat7 -tags " << "{" << symbol_tags << "}" 
+           << " -width 1 -stipple pat7 -tags " << "{" << symbol_tags << "}"
            << std::endl;
     }
     os << canvasName_ << " create rect "
@@ -3547,12 +3574,102 @@ int StarRtdImage::draw_rectangle( double x, double y, const char *xy_units,
        << " -fill " << bg
        << " -width 1 -stipple pat7 -tags " << "{" << symbol_tags << "}"
        << std::endl;
-    
-    if (label && strlen(label)) 
+
+    if (label && strlen(label))
         make_label(os, label, x, y, label_tags, fg);
-    
+
     return eval(os.str().c_str());
 
+}
+
+//
+//  Draw an STC-S encoded shape, if possible. The shape must parse
+//  into one of the supported symbol types. XXX polygon will break
+//  this model and need its own handlers.
+//
+int StarRtdImage::draw_stcshape( double x, double y, const char *stc_shape,
+                                 double radius, const char *radius_units,
+                                 const char *bg, const char *fg,
+                                 const char *symbol_tags, double ratio,
+                                 double angle, const char *label,
+                                 const char *label_tags )
+{
+#ifdef _DEBUG_
+    cout << "Called StarRtdImage::draw_stcshape" << std::endl;
+#endif
+
+    //  Get the actual shape.
+    AstStcsChan *chan = astStcsChan( StcsSource, NULL, " " );
+    channelData.read = 0;
+    channelData.content = stc_shape;
+    AstRegion *region = (AstRegion *) astRead( chan );
+
+    if ( astIsAEllipse( region ) ) {
+
+        //  Transform the region into the coordinates of the image WCS,
+        //  which needs to be a celestial system, by matching the system
+        //  epoch and equinox.
+        // XXX this doesn't work seems to transform the ellipses off image.
+        // bit like the system isn't understood.
+#if 0
+        StarWCS* wcsp = getStarWCSPtr();
+        char atts[200];
+        atts[0] = '\0';
+        const char *system = wcsp->astGetAttrib( "System" );
+        if ( system ) {
+            strcat( atts, "System=" );
+            strcat( atts, system );
+        }
+        const char *equinox = wcsp->astGetAttrib( "Equinox" );
+        if ( equinox ) {
+            if ( atts[0] != '\0' ) {
+                strcat( atts, "," );
+            }
+            strcat( atts, "Equinox=" );
+            strcat( atts, equinox );
+        }
+        const char *epoch = wcsp->astGetAttrib( "Epoch" );
+        if ( equinox ) {
+            if ( atts[0] != '\0' ) {
+                strcat( atts, "," );
+            }
+            strcat( atts, "Epoch=" );
+            strcat( atts, epoch );
+        }
+        if ( atts[0] != '\0' ) {
+            cout << "atts = " << atts << endl;
+            astShow( region );
+            astSet( region, atts, " " );
+            astShow( region );
+         }
+#endif
+        double centre[2];
+        double a;
+        double b;
+        double angle;
+        double p1[2];
+        double p2[2];
+        astEllipsePars( (AstEllipse *)region, centre, &a, &b, &angle, p1, p2 );
+
+        //  Radians to degrees.
+        centre[0] *= r2d_;
+        centre[1] *= r2d_;
+        a *= r2d_;
+        b *= r2d_;
+        angle *= r2d_;
+
+        cout << "ellipsepars: " << centre[0] << " " << centre[1] <<
+            " " << a << " " << b << " " << angle << endl;
+
+        return draw_ellipse( centre[0], centre[1], "deg", a, "deg", bg, fg,
+                             symbol_tags, b/a, angle, label, label_tags );
+    }
+
+    //  Don't exit with AST still in error.
+    if ( !astOK ) {
+        astClearStatus;
+    }
+    return error( "Unknown STC shape" );
 }
 
 //+
@@ -6625,8 +6742,8 @@ int StarRtdImage::autosetcutlevelsCmd( int argc, char *argv[] )
  *
  * Which makes use of 5 of the 9 reserved integers in the
  * rtdIMAGE_INFO structure.
- * 
- * For the UKIRT XY profile extensions these members are reused with 
+ *
+ * For the UKIRT XY profile extensions these members are reused with
  * much the same meaning. However, these are updated for each realtime
  * event and do not also require a motion event (not sure why the
  * old ones do either).

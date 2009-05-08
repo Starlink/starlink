@@ -88,7 +88,7 @@ itcl::class gaia::GaiaSymbolConfig {
    #  Add local symbols to the Symbol menu. Only rotbox.
    protected method init {} {
       cat::SymbolConfig::init
-      foreach i {rotbox rectangle} {
+      foreach i {rotbox rectangle stcshape} {
          $symbol_ add \
             -bitmap $i \
             -value $i \
@@ -102,6 +102,9 @@ itcl::class gaia::GaiaSymbolConfig {
          $angle_ config -state normal
       } elseif { "$symbol" == "rectangle" } {
          $ratio_ config -state normal
+         $angle_ config -state disabled
+      } elseif { "$symbol" == "stcshape" } {
+         $ratio_ config -state disabled
          $angle_ config -state disabled
       } else {
          cat::SymbolConfig::set_symbol $symbol
