@@ -116,37 +116,44 @@ CFLAGS="$CFLAGS -DXSL_URL=\\\"file://$datadir/${PACKAGE_NAME}/${PACKAGE_NAME}.xs
 
 # Special optimization options for the INTEL C compiler
 if test $use_icc = "yes" -a $CC = "icc"; then
-  CFLAGS="$CFLAGS -O3 -axiMKW -ipo -ipo_obj -unroll"
+   CFLAGS="$CFLAGS -O3 -axiMKW -ipo -ipo_obj -unroll"
 fi
 
 # Link with gprof option
 if test "$use_gprof" = "yes"; then
-  if test "$use_icc" = "yes"; then
-    CFLAGS="$CFLAGS -pq"
-  else
-    CFLAGS="$CFLAGS -pg"
-fi
-  use_static="no"
+   if test "$use_icc" = "yes"; then
+      CFLAGS="$CFLAGS -pq"
+   else
+       CFLAGS="$CFLAGS -pg"
+   fi
+   use_static="no"
 fi
 
 if test "$use_static" = "yes"; then
-LDFLAGS="$LDFLAGS -static"
+   LDFLAGS="$LDFLAGS -static"
 fi
 
 # Override automatic CFLAGS and LDFLAGS with those of user
 if test -n "$mycflags"; then
-CFLAGS="$mycflags"
+   CFLAGS="$mycflags"
 fi
 if test -n "$myldflags"; then
-LDFLAGS="$myldflags"
+   LDFLAGS="$myldflags"
+fi
+
+# Except for GCC 4.1 there is an optimization bug, so don't let anything
+# except -O and -O0 through.
+if test "$GCC" = "yes"; then
+   CFLAGS="`echo $CFLAGS | sed 's/\-O[[1-9]]//g'`"
+   AC_MSG_RESULT([Warning CFLAGS optimization may have been altered])
 fi
 
 # Starlink.
 AC_MSG_CHECKING([Starlink installation])
 STARLINK=${STARLINK=/star}
 if test ! -x "${STARLINK}"; then
-    echo "What directory is the root of the Starlink development system?"
-    read STARLINK
+   echo "What directory is the root of the Starlink development system?"
+   read STARLINK
 fi
 AC_MSG_RESULT($STARLINK)
 CPPFLAGS="-I${STARLINK}/include"
