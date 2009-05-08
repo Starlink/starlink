@@ -9,7 +9,7 @@
 #     C-shell script.
 #
 #  Usage:
-#     peakmap [-c units] [-f filename] -l logfile [-v units]
+#     make_fitgauss_table.csh [-c units] [-f filename] -l logfile [-v units]
 #
 # Description:
 #    This primitive creates a Starlink small text-file (STL) catalogue.
