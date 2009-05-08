@@ -209,7 +209,7 @@
 #define SMF__MINSTATSAMP 3
 
 /* Define the size of strings defining NDF char components (Units, label) */
-#define SMF__CHARLABEL  32
+#define SMF__CHARLABEL  80
 
 /* Different data types supported by SMURF */
 typedef enum smf_dtype {

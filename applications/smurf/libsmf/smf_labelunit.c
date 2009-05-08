@@ -41,10 +41,13 @@
 *        Initial version.
 *     29-OCT-2007 (EC):
 *        Modified interface to smf_open_file.
+*     7-MAY-2009 (DSB):
+*        Use SMF__CHARLABEL to define lengths of NDF character components.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -92,10 +95,10 @@
 void smf_labelunit( Grp *igrp,  int size, smfData *odata, int *status ){
 
 /* Local Variables */
-   char label1[ 51 ];    /* Label from first NDF */
-   char label[ 51 ];     /* Label from current NDF */
-   char unit1[ 21 ];     /* Unit from first NDF */
-   char unit[ 21 ];      /* Unit from current NDF */
+   char label1[ SMF__CHARLABEL ];/* Label from first NDF */
+   char label[ SMF__CHARLABEL ]; /* Label from current NDF */
+   char unit1[ SMF__CHARLABEL ]; /* Unit from first NDF */
+   char unit[ SMF__CHARLABEL ];  /* Unit from current NDF */
    int ifile;            /* Index of current input file */
    int indf;             /* NDF Identifier for current input NDF */
    smfData *data = NULL; /* Pointer to data struct for current input file */
@@ -114,10 +117,10 @@ void smf_labelunit( Grp *igrp,  int size, smfData *odata, int *status ){
 
 /* Get the Label and Unit components from the input NDF. */
       label[ 0 ] = 0;
-      ndfCget( indf, "Label", label, 50, status ); 
+      ndfCget( indf, "Label", label, SMF__CHARLABEL, status ); 
 
       unit[ 0 ] = 0;
-      ndfCget( indf, "Unit", unit, 20, status ); 
+      ndfCget( indf, "Unit", unit, SMF__CHARLABEL, status ); 
 
 /* If this is the first input NDF, copy the Label and Unit string to the
    output NDF, and save them for later use. */
