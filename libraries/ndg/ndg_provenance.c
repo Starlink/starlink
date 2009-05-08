@@ -1275,10 +1275,18 @@ void ndgGtprvk( int indf, int ianc, AstKeyMap **prov, HDSLoc **more,
 
 /* Annul the locator to the ANCESTORS array element. */
                datAnnul( &cloc, status );
+
+/* Return a NULL KeyMap pointer if the ancestor inex is out of bounds. */
+            } else {
+               *prov = astAnnul( *prov );
             }
 
 /* Annul the locator to the ANCESTORS array. */
             datAnnul( &aloc, status );
+
+/* Return a NULL KeyMap pointer if there are no ancestors. */
+         } else {
+            *prov = astAnnul( *prov );
          }
       }
 
