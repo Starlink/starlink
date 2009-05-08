@@ -57,6 +57,7 @@
  *    Dennis Kelly (REVAD::BDK)
  *    Alan Chipperfield (RAL::AJC)
  *    Tim Jenness (JAC, Hawaii)
+ *    David Berry (JAC, Hawaii)
 
  *  History:
  *     3-JAN-1983 (UCL::JRG):
@@ -73,6 +74,9 @@
  *       NUL terminate
  *     4-MAR-2009 (TIMJ):
  *       Do not call CNF if datGetC returns bad status.
+ *     8-MAY-2009 (DSB):
+ *       Call CNF if datGetC returns a status indicating that the
+ *       returned string may still be useful.
 
  *  Notes:
  *    For datGet0C the buffer must be preallocated by the caller
@@ -120,7 +124,7 @@ int datGet0C ( const HDSLoc * loc, char * value, size_t str_len, int * status ) 
 
   /* Terminate the string but first make sure we fool CNF by forcing
      a ' ' as the last character in the "fortran" string */
-  if (*status == DAT__OK) {
+  if (*status == DAT__OK || *status == DAT__TRUNC || *status == DAT__CONER ) {
     value[str_len-1] = ' ';
     cnfImprt( value, str_len, value );
   } else {
