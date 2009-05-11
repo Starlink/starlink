@@ -70,6 +70,18 @@
 *        data type of the array being processed.  The suggested default
 *        is the upper threshold. This parameter is ignored if THRLO is
 *        greater than THRHI.
+*     NUMLO = _INTEGER (Write)
+*        The number of pixels whose values were thresholded as being
+*        less than the THRLO threshold.
+*     NUMHI = _INTEGER (Write)
+*        The number of pixels whose values were thresholded as being
+*        greater than the THRHI threshold.
+*     NUMRANGE = _INTEGER (Write)
+*        The number of pixels whose values were thresholded as being
+*        between the THRLO and THRHI thresholds, if THRLO is greater
+*        than THRHI.
+*     NUMSAME = _INTEGER (Write)
+*        The number of unchanged pixels.
 *     OUT = NDF (Write)
 *        Output NDF structure containing the thresholded version of
 *        the array.
@@ -146,6 +158,7 @@
 *     MJC: Malcolm J. Currie  (STARLINK)
 *     DSB: David S. Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     BRADC: Brad Cavanagh (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -165,6 +178,8 @@
 *        Correct setting of bad pixel flag in output.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
+*     11-MAY-2009 (BRADC);:
+*        Return number of changed and unchanged pixels via parameters.
 *     {enter_further_changes_here}
 
 *-
@@ -211,6 +226,7 @@
                                ! threshold
       INTEGER NREPLO           ! Number of replacements made below the
                                ! threshold
+      INTEGER NUMSAME          ! Number of unchanged pixels
       INTEGER PNTRI( 1 )       ! Pointer to input array component
       INTEGER PNTRO( 1 )       ! Pointer to output array component
       REAL RNEWHI              ! New value for pixels above THRHI
@@ -427,6 +443,9 @@
      :           /'array below the threshold.', STATUS )
             END IF
 
+*  Write the number of replacements to the output parameter.
+            CALL PAR_PUT0I( 'NUMLO', NREPLO, STATUS )
+
 *  Report the number of replacements in the array that were above the
 *  threshold.
             CALL MSG_SETC( 'COMPS', MCOMP )
@@ -441,6 +460,12 @@
      :           /'array above the threshold.', STATUS )
             END IF
 
+*  Write the number of replacements to the output parameter.
+            CALL PAR_PUT0I( 'NUMHI', NREPHI, STATUS )
+
+*  Calculate and write the number of unchanged pixels.
+            NUMSAME = EL - NREPHI - NREPLO
+            CALL PAR_PUT0I( 'NUMSAME', NUMSAME, STATUS )
 
 *  Now report results when replacing data inside a given range.
          ELSE
@@ -457,6 +482,13 @@
      :           'One element was changed in the ^COMPS '/
      :           /'array between the thresholds.', STATUS )
             END IF
+
+*  Write the number of replacements to the output parameter.
+            CALL PAR_PUT0I( 'NUMRANGE', NREPLO, STATUS )
+
+*  Calculate and write the number of unchanged pixels.
+            NUMSAME = EL - NREPLO
+            CALL PAR_PUT0I( 'NUMSAME', NUMSAME, STATUS )
 
          END IF
 
