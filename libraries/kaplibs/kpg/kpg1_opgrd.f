@@ -340,6 +340,16 @@
       LOGICAL OPTY          
       REAL DX
       REAL DY
+
+
+      logical dumpit
+      integer pass
+      common /fred/ dumpit,pass
+
+
+
+
+
 *.
 
 *  Initialise
@@ -498,6 +508,13 @@
      :                         PAR( 7 ) .EQ. AST__BAD ) ) THEN
          OK = .FALSE.
 
+
+
+         pass = ichar( 'A' ) - 1
+
+
+
+
 *  If the positions are grouped into clusters of points, where each
 *  cluster represents a single sky position with errors, then the mean
 *  spacing between samples, SPC, will be much smaller than the required
@@ -510,6 +527,7 @@
          MXWAVE = 0.5*SPC
          SPC = 0.0
          DO WHILE( MXWAVE .GT. 10.0*SPC .AND. STATUS .EQ. SAI__OK ) 
+            pass = pass + 1
 
 *  Allocate a 1D work array which spans the circle enclosing the
 *  bounding box, but using smaller pixels (one fifth of the current
@@ -525,6 +543,12 @@
 *  Store the grid co-ordinate within this work array that will 
 *  correspond to the central position (XC,YC).
             SPC0 = DBLE( ( HISTSZ + 1 )/2 )
+
+
+c      write(*,*) ' '
+c      write(*,*) ' Course scanning angles with grid spacing of ',spc
+c      write(*,*) ' '
+
 
 *  Imagine a line passing through the centre position (XC,YC). We step 
 *  through all orientations of this line in units of 3 degrees. Zero
@@ -562,6 +586,7 @@ c      write(*,*)
 
 *  Check a direction was found that shows some periodicity.
          IF( MXWAVE .GT. 0.0 ) THEN      
+            pass = pass + 1
 
 *  Now do a finer search through a cone of angles centred on the rough
 *  angle found above. The cone is 3 degrees wide and we use 0.1-degree 
@@ -1021,36 +1046,41 @@ c      write(*,*)
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      DOUBLE PRECISION COSANG
-      DOUBLE PRECISION D
-      DOUBLE PRECISION DSUM
-      DOUBLE PRECISION FBIN
       DOUBLE PRECISION LIMSUM
+      DOUBLE PRECISION NEWAMP
+      DOUBLE PRECISION COSANG
+      DOUBLE PRECISION SUMINC
+      DOUBLE PRECISION SINANG
       DOUBLE PRECISION LLLSUM2
-      DOUBLE PRECISION LLSUM2
+      DOUBLE PRECISION D
       DOUBLE PRECISION LSUM2
       DOUBLE PRECISION MAXSUM
-      DOUBLE PRECISION MINSUM
-      DOUBLE PRECISION NEWAMP
+      DOUBLE PRECISION FFBIN
       DOUBLE PRECISION NEWWAV
-      DOUBLE PRECISION SINANG
+      DOUBLE PRECISION LLSUM2
       DOUBLE PRECISION SUM2
-      DOUBLE PRECISION SUMINC
+      DOUBLE PRECISION DSUM
+      DOUBLE PRECISION FBIN
       DOUBLE PRECISION SUMW
       DOUBLE PRECISION W
       DOUBLE PRECISION USUM
       DOUBLE PRECISION WBIN
       DOUBLE PRECISION WBIN2
       DOUBLE PRECISION XSHIFT
+      DOUBLE PRECISION MINSUM
       INTEGER COUNT
       INTEGER I
       INTEGER IBIN
       INTEGER IBIN2
+      INTEGER II
       INTEGER J
       INTEGER MAXSH
       INTEGER MINSH
       INTEGER SHIFT
       LOGICAL MORE             
+      REAL OFFSET( 3 )
+
+      DATA OFFSET /-0.5, 0.0, 0.5 /
 *.
 
 *  Check the inherited global status.
@@ -1082,42 +1112,61 @@ c      write(*,*)
 *  of pixels in the (x,y) system.
             D = ( X( I ) - XC )*SINANG + ( Y( I ) - YC )*COSANG
 
-*  Find the index of the histogram bin containing this point.
-            FBIN = SPC0 + D/SPC
-            IBIN = NINT( FBIN )
+*  Find the floating point centre of the histogram bin containing this point.
+            FFBIN = SPC0 + D/SPC
+
+*  It's possible to get aliasing between the sample spacing on the sky and 
+*  the histogram spacing. For instance, if a sample falls on or close
+*  to the edge of two histogram bins, it will be evenly divided between
+*  them, resulting in each bin having only half a sample contribution.
+*  One the other hand if a sampel falls in the middle of a histogram bin,
+*  then the bin will receive the whole sample. Since the squared amplitude in
+*  each bin is important, this will unduly favour bins that receive the whole
+*  sample. To avoid this, we add the sample into the histogram several
+*  times, with a slightly jiggled position each time. This causes the
+*  effect of each sample to be spread out over the neighbouring bins. 
+            DO II = 1, 3
+
+*  Select the fraction pixel offset to use.
+               FBIN = FFBIN + OFFSET( II )
+
+*  Find the index of the central bin using the current jigled sample
+*  position.
+               IBIN = NINT( FBIN )
 
 *  We increment the histogram using either nearest neighbour or linear
 *  interpolation.
-            IF( LIN ) THEN
+               IF( LIN ) THEN
 
 *  Split the contribution from this point between the IBIN bin and the 
 *  neighbouring bin, using linear interpolation.
-               D = FBIN - IBIN
-               IF( D .GT. 0.0 ) THEN
-                  WBIN = 1.0 - D
-                  IBIN2 = IBIN + 1
-                  WBIN2 = D
-               ELSE
-                  WBIN = 1.0 + D
-                  IBIN2 = IBIN - 1
-                  WBIN2 = -D
-               END IF
+                  D = FBIN - IBIN
+                  IF( D .GT. 0.0 ) THEN
+                     WBIN = 1.0 - D
+                     IBIN2 = IBIN + 1
+                     WBIN2 = D
+                  ELSE
+                     WBIN = 1.0 + D
+                     IBIN2 = IBIN - 1
+                     WBIN2 = -D
+                  END IF
 
 *  Increment the neighbour bin.
-               IF( IBIN2 .GE. 1 .AND. IBIN2 .LE. HISTSZ ) THEN
-                  HIST( IBIN2 ) = HIST( IBIN2 ) + WBIN2
-               END IF
+                  IF( IBIN2 .GE. 1 .AND. IBIN2 .LE. HISTSZ ) THEN
+                     HIST( IBIN2 ) = HIST( IBIN2 ) + WBIN2
+                  END IF
 
 *  For nearest neighbour, put all the weight in one bin.
-            ELSE
-               WBIN = 1.0
-            END IF
+               ELSE
+                  WBIN = 1.0
+               END IF
 
 *  Increment the central bin.
-            IF( IBIN .GE. 1 .AND. IBIN .LE. HISTSZ ) THEN
-               HIST( IBIN ) = HIST( IBIN ) + WBIN 
-            END IF
+               IF( IBIN .GE. 1 .AND. IBIN .LE. HISTSZ ) THEN
+                  HIST( IBIN ) = HIST( IBIN ) + WBIN 
+               END IF
 
+            END DO
          END IF
       END DO
 
@@ -1653,7 +1702,8 @@ c     :           histsz,')'
       include 'AST_PAR'
 
       logical dumpit
-      common /fred/ dumpit
+      integer pass
+      common /fred/ dumpit,pass
 
       double precision ang, dang
       integer n, status, place, indf, el, iat, pntr
@@ -1666,13 +1716,15 @@ c     :           histsz,')'
       if( status .ne. sai__ok .or. .not. dumpit ) return
 
       if( fft ) then
-         name = 'fft'
-         iat = 3
-      else
-         name = 'hist'
+         name = 'fft_'
          iat = 4
+      else
+         name = 'hist_'
+         iat = 5
       end if
 
+      call chr_appnd( char(pass), name, iat )
+      call chr_appnd( '_', name, iat )
 
       dang = AST__DR2D*ang
 
