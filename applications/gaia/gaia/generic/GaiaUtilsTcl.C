@@ -68,6 +68,15 @@ struct sourceInfo {
 typedef struct sourceInfo sourceInfo;
 static sourceInfo SOURCEInfo;
 
+/* Local function to supply as AST channel source. */
+static const char *channel_source()
+{
+    if ( SOURCEInfo.next < SOURCEInfo.nlines ) {
+        return SOURCEInfo.lines[SOURCEInfo.next++];
+    }
+    return NULL;
+}
+
 /* Local prototypes */
 static int GaiaUtilsAstAnnul( ClientData clientData, Tcl_Interp *interp,
                               int objc, Tcl_Obj *CONST objv[] );
@@ -95,6 +104,8 @@ static int GaiaUtilsAstGetRefPos( ClientData clientData, Tcl_Interp *interp,
                                   int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsAstLinearApprox( ClientData clientData, Tcl_Interp *interp,
                                      int objc, Tcl_Obj *CONST objv[] );
+static int GaiaUtilsAstRegionPars( ClientData clientData, Tcl_Interp *interp,
+                                   int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsAstSet( ClientData clientData, Tcl_Interp *interp,
                             int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsAstShow( ClientData clientData, Tcl_Interp *interp,
@@ -131,8 +142,12 @@ static int GaiaUtilsGtFrame( ClientData clientData, Tcl_Interp *interp,
                              int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsGtROIPlots( ClientData clientData, Tcl_Interp *interp,
                                 int objc, Tcl_Obj *CONST objv[] );
+static int GaiaUtilsRegionType( ClientData clientData, Tcl_Interp *interp,
+                                int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsShiftWcs( ClientData clientData, Tcl_Interp *interp,
                               int objc, Tcl_Obj *CONST objv[] );
+static int GaiaUtilsStcRegion( ClientData clientData, Tcl_Interp *interp,
+                               int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsUrlGet( ClientData clientData, Tcl_Interp *interp,
                             int objc, Tcl_Obj *CONST objv[] );
 
@@ -184,6 +199,10 @@ int GaiaUtils_Init( Tcl_Interp *interp )
     Tcl_CreateObjCommand( interp, "gaiautils::astlinearapprox",
                           GaiaUtilsAstLinearApprox, (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "gaiautils::astregionpars",
+                          GaiaUtilsAstRegionPars,
+                          (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::astset", GaiaUtilsAstSet,
                           (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
@@ -247,7 +266,13 @@ int GaiaUtils_Init( Tcl_Interp *interp )
                           GaiaUtilsGtROIPlots, (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
+    Tcl_CreateObjCommand( interp, "gaiautils::regiontype", GaiaUtilsRegionType,
+                          (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
+
     Tcl_CreateObjCommand( interp, "gaiautils::shiftwcs", GaiaUtilsShiftWcs,
+                          (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "gaiautils::stcregion", GaiaUtilsStcRegion,
                           (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::urlget", GaiaUtilsUrlGet,
@@ -550,13 +575,6 @@ static int GaiaUtilsAstShow( ClientData clientData, Tcl_Interp *interp,
  * The first argument should be the encoding type, native, FITS or XML.
  * The second argument a string containing the encoding.
  */
-static const char *read_in()
-{
-    if ( SOURCEInfo.next < SOURCEInfo.nlines ) {
-        return SOURCEInfo.lines[SOURCEInfo.next++];
-    }
-    return NULL;
-}
 static int GaiaUtilsAstCreate( ClientData clientData, Tcl_Interp *interp,
                                int objc, Tcl_Obj *CONST objv[] )
 {
@@ -577,13 +595,13 @@ static int GaiaUtilsAstCreate( ClientData clientData, Tcl_Interp *interp,
 
     /* Determine type of channel, XXX FITS and XML not tested. */
     if ( strcmp( encoding, "native" ) == 0 ) {
-        chan = (AstChannel *) astChannel( &read_in, NULL, " " );
+        chan = (AstChannel *) astChannel( &channel_source, NULL, " " );
     }
     else if ( strcmp( encoding, "FITS" ) == 0 ) {
-        chan = (AstChannel *) astFitsChan( &read_in, NULL, " " );
+        chan = (AstChannel *) astFitsChan( &channel_source, NULL, " " );
     }
     else if ( strcmp( encoding, "XML" ) == 0 ) {
-        chan = (AstChannel *) astXmlChan( &read_in, NULL, " " );
+        chan = (AstChannel *) astXmlChan( &channel_source, NULL, " " );
     }
     else {
         char *buf = ckalloc( 1024 );
@@ -1635,7 +1653,7 @@ static int GaiaUtilsAstTran2( ClientData clientData, Tcl_Interp *interp,
  * will be returned.
  *
  * The result will be normalised if the forward mapping is used.
- * This can be evaded by setting the fourth optional argument to 
+ * This can be evaded by setting the fourth optional argument to
  * false.
  */
 static int GaiaUtilsAstTranN( ClientData clientData, Tcl_Interp *interp,
@@ -1691,7 +1709,7 @@ static int GaiaUtilsAstTranN( ClientData clientData, Tcl_Interp *interp,
         }
     }
 
-    /* Should we normalise the result. If true always, if false never, 
+    /* Should we normalise the result. If true always, if false never,
      * if not set only for forward transformations. */
     if ( objc == 6 ) {
         if ( Tcl_GetBooleanFromObj( interp, objv[5], &norm ) != TCL_OK ) {
@@ -2082,5 +2100,190 @@ static int GaiaUtilsGrfFontResize( ClientData clientData, Tcl_Interp *interp,
         return TCL_ERROR;
     }
     astTk_ResizeFonts( resize );
+    return TCL_OK;
+}
+
+/*  ===================================
+ *  STC and AST region support commands
+ *  ===================================
+ */
+
+/**
+ * Create an AST region from an STC-S description.
+ *
+ * There is one argument the STC-S description for the region to create.
+ * The result is the address of the new object.
+ */
+static int GaiaUtilsStcRegion( ClientData clientData, Tcl_Interp *interp,
+                               int objc, Tcl_Obj *CONST objv[] )
+{
+    /* Check arguments, only allow one. */
+    if ( objc != 2 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "STC-S-region-description" );
+        return TCL_ERROR;
+    }
+
+    /*  Create the shape by reading from a channel. */
+    AstStcsChan *chan = astStcsChan( channel_source, NULL, " " );
+    SOURCEInfo.next = 0;
+    SOURCEInfo.lines = (const char **) malloc( sizeof( char * ) );
+    SOURCEInfo.lines[0] = Tcl_GetString( objv[1] );
+    SOURCEInfo.nlines = 1;
+    AstRegion *region = (AstRegion *) astRead( chan );
+
+    chan = (AstStcsChan *) astAnnul( chan );
+    free( SOURCEInfo.lines );
+
+    /* Export the new object as a long containing the address */
+    if ( astOK ) {
+        Tcl_SetObjResult( interp, Tcl_NewLongObj( (long) region ) );
+        return TCL_OK;
+    }
+    astClearStatus;
+    Tcl_SetResult( interp, "Failed to create STC region", TCL_VOLATILE );
+    return TCL_ERROR;
+}
+
+/**
+ * Get the parameterisation of a region
+ *
+ * There is one argument the address of an AST region. Only certain
+ * region types can be parameterised, ellipse, circle etc. The parameters
+ * returned are a simple list of the available values in the order shown
+ * in the SUN/211 documentation.
+ */
+static int GaiaUtilsAstRegionPars( ClientData clientData, Tcl_Interp *interp,
+                                   int objc, Tcl_Obj *CONST objv[] )
+{
+    /* Check arguments, only allow one. */
+    if ( objc != 2 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "AST-region" );
+        return TCL_ERROR;
+    }
+
+    /* Get the Region */
+    long adr;
+    if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    AstRegion *region = (AstRegion *) adr;
+
+    /* If a supported region return the parameters. */
+    if ( astIsACircle( region ) ) {
+        double centre[2];
+        double radius;
+        double p1[2];
+        astCirclePars( (AstCircle *)region, centre, &radius, p1 );
+        if ( astOK ) {
+            Tcl_ResetResult( interp );
+            Tcl_Obj *resultObj = Tcl_GetObjResult( interp );
+
+            Tcl_ListObjAppendElement( interp, resultObj,
+                                      Tcl_NewDoubleObj( centre[0] ) );
+            Tcl_ListObjAppendElement( interp, resultObj,
+                                      Tcl_NewDoubleObj( centre[1] ) );
+            Tcl_ListObjAppendElement( interp, resultObj,
+                                      Tcl_NewDoubleObj( radius ) );
+            Tcl_ListObjAppendElement( interp, resultObj,
+                                      Tcl_NewDoubleObj( p1[0] ) );
+            Tcl_ListObjAppendElement( interp, resultObj,
+                                      Tcl_NewDoubleObj( p1[1] ) );
+            return TCL_OK;
+        }
+        astClearStatus;
+        Tcl_SetResult( interp, "Failed to get parameters for an AST circle",
+                       TCL_VOLATILE );
+        return TCL_ERROR;
+    }
+    else if ( astIsAEllipse( region ) ) {
+        double centre[2];
+        double a;
+        double b;
+        double angle;
+        double p1[2];
+        double p2[2];
+        astEllipsePars( (AstEllipse *)region, centre, &a, &b, &angle, p1, p2 );
+        if ( astOK ) {
+            Tcl_ResetResult( interp );
+            Tcl_Obj *resultObj = Tcl_GetObjResult( interp );
+
+            Tcl_ListObjAppendElement( interp, resultObj,
+                                      Tcl_NewDoubleObj( centre[0] ) );
+            Tcl_ListObjAppendElement( interp, resultObj,
+                                      Tcl_NewDoubleObj( centre[1] ) );
+            Tcl_ListObjAppendElement( interp, resultObj,
+                                      Tcl_NewDoubleObj( a ) );
+            Tcl_ListObjAppendElement( interp, resultObj,
+                                      Tcl_NewDoubleObj( b ) );
+            Tcl_ListObjAppendElement( interp, resultObj,
+                                      Tcl_NewDoubleObj( angle ) );
+            Tcl_ListObjAppendElement( interp, resultObj,
+                                      Tcl_NewDoubleObj( p1[0] ) );
+            Tcl_ListObjAppendElement( interp, resultObj,
+                                      Tcl_NewDoubleObj( p1[1] ) );
+            Tcl_ListObjAppendElement( interp, resultObj,
+                                      Tcl_NewDoubleObj( p2[0] ) );
+            Tcl_ListObjAppendElement( interp, resultObj,
+                                      Tcl_NewDoubleObj( p2[1] ) );
+            return TCL_OK;
+        }
+        astClearStatus;
+        Tcl_SetResult( interp, "Failed to get parameters for an AST ellipse",
+                       TCL_VOLATILE );
+        return TCL_ERROR;
+    }
+    astClearStatus;
+    Tcl_SetResult( interp, "Unsupported AST region, cannot parameterise",
+                   TCL_VOLATILE );
+    return TCL_ERROR;
+}
+
+/**
+ * Return the type of a given region.
+ */
+static int GaiaUtilsRegionType( ClientData clientData, Tcl_Interp *interp,
+                                int objc, Tcl_Obj *CONST objv[] )
+{
+    /* Check arguments, only allow one. */
+    if ( objc != 2 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "AST-region" );
+        return TCL_ERROR;
+    }
+
+    /* Get the Region */
+    long adr;
+    if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    AstRegion *region = (AstRegion *) adr;
+
+    /* Check and return the type. */
+    char *result = "unsupported";
+    if ( astIsABox( region ) ) {
+        result = "box";
+    }
+    else if ( astIsACircle( region  ) ) {
+        result = "circle";
+    }
+    else if ( astIsACmpRegion( region ) ) {
+        result = "cmpregion";
+    }
+    else if ( astIsAEllipse( region ) ) {
+        result = "ellipse";
+    }
+    else if ( astIsAInterval( region ) ) {
+        result = "interval";
+    }
+    else if ( astIsANullRegion( region ) ) {
+        result = "nullregion";
+    }
+    else if ( astIsAPolygon( region ) ) {
+        result = "polygon";
+    }
+    else if ( astIsAPrism( region ) ) {
+        result = "prism";
+    }
+
+    Tcl_SetResult( interp, result, TCL_VOLATILE );
     return TCL_OK;
 }

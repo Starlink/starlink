@@ -169,6 +169,7 @@ Options:
  -cat <bool>              - include ESO/Archive catalog extensions (default).
  -catalog  "<c1> <c2> .." - open windows for the given catalogs on startup.
  -check_for_cubes <bool>  - Check input files to see if they are cubes (default: 1) \\
+ -cupidcat catalog        - open catalog as CUPID output (requires cube) \\
  -colorramp_height <n>    - height of colorramp window (default: 12).
  -component <component>   - NDF component to display (one of: data, variance)
  -debug <bool>            - debug flag: run bg processes in fg.
@@ -1448,6 +1449,12 @@ itcl::class gaia::Gaia {
       #  dimensions 1, or 2, but not 3.
       if {( $naxis4 == {} || $naxis4 == 1 ) && $naxis3 != {} && $naxis3 != 1} {
          open_cube_ $fullname
+
+         #  If a CUPID catalogue is defined, open it.
+         if { $itk_option(-cupidcat) != {} } {
+            open_cupid_cat_ $itk_option(-cupidcat)
+            set itk_option(-cupidcat) {}
+         }
       } else {
          #  Make sure toolbox is withdrawn.
          if { [info exists itk_component(opencube)] } {
@@ -1686,6 +1693,13 @@ itcl::class gaia::Gaia {
          if { $msg != {} } {
             info_dialog "$msg" $w_
          }
+      }
+   }
+
+   #  Get the cube toolbox to open a CUPID catalogue.
+   protected method open_cupid_cat_ {name} {
+      if { [info exists itk_component(opencube)] } {
+         $itk_component(opencube) import_cupid_cat $name
       }
    }
 
@@ -2616,6 +2630,9 @@ window gives you access to this."
 
    #  Check any images that are opened to see if they are cubes.
    itk_option define -check_for_cubes check_for_cubes Check_For_Cubes 1
+
+   #  Open a CUPID catalogue if accompanied by a cube.
+   itk_option define -cupidcat cupidcat CupidCat {}
 
    #  Whether to autocut realtime images to the default cut.
    itk_option define -rtd_autocut rtd_autocut Rtd_AutoCut 0

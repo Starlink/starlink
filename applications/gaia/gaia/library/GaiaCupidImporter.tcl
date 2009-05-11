@@ -217,7 +217,13 @@ itcl::class gaia::GaiaCupidImporter {
       set index_($name) $index
    }
 
-   #  Import the table.
+   #  Import a given table.
+   public method open {cat} {
+      configure -catalogue $cat
+      import_
+   }
+
+   #  Import the current table.
    protected method import_ {} {
       if { $itk_option(-catalogue) == {} } {
          warning_dialog "No catalogue has been selected" $w_

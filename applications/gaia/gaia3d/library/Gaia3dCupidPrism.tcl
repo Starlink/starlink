@@ -169,11 +169,12 @@ itcl::class ::gaia3d::Gaia3dCupidPrism {
          #  Get the data from the catalogue. XXX selected rows option XXX.
          foreach line [$results get_contents] {
             lassign $line \
-               pident peak1 peak2 peak3 cen1 cen2 cen3 size1 size2 size3
+               pident peak1 peak2 peak3 cen1 cen2 cen3 size1 size2 size3 \
+               sum peak volume shape
 
             #  Transform from catalogue coordinates to grid. Note WCS
             #  has 12 axes, but only the first three are used to connect
-            #  to the cube.
+            #  to the cube. If shape is used that represents an STC region.
             if { $tranwcs != 0 } {
 
                #  Unformat the ones that might be in sexagesimal.
@@ -202,16 +203,72 @@ itcl::class ::gaia3d::Gaia3dCupidPrism {
                set d23 [expr $cen3+$size3]
 
                #  Transform end positions in degrees to pixels.
-               lassign [tran3d_ $tranwcs 0 $d11 $d12 $d13] d11 d12 d13
-               lassign [tran3d_ $tranwcs 0 $d21 $d22 $d23] d21 d22 d23
+               lassign [tran3d_ $tranwcs 0 $d11 $d12 $d13] d11t d12t d13t
+               lassign [tran3d_ $tranwcs 0 $d21 $d22 $d23] d21t d22t d23t
 
                #  Recover sizes in pixels.
-               set size1 [expr abs(0.5*($d21 - $d11))]
-               set size2 [expr abs(0.5*($d22 - $d12))]
-               set size3 [expr abs(0.5*($d23 - $d13))]
+               set size1 [expr abs(0.5*($d21t - $d11t))]
+               set size2 [expr abs(0.5*($d22t - $d12t))]
+               set size3 [expr abs(0.5*($d23t - $d13t))]
 
                #  Transform centre from degrees to pixels.
-               lassign [tran3d_ $tranwcs 0 $cen1 $cen2 $cen3] cen1 cen2 cen3
+               lassign [tran3d_ $tranwcs 0 $cen1 $cen2 $cen3] cen1t cen2t cen3t
+
+               if { [info exists shape] && $shape != {} } {
+                  #  Shape is a 2D region that connects to the sky coordinates.
+                  #  Need to connect this to the cube and transform into pixels.
+                  set region [gaiautils::stcregion $shape]
+                  set type [gaiautils::regiontype $region]
+                  if { $type == "ellipse" } {
+                     set pars [gaiautils::astregionpars $region]
+                     lassign $pars cen1 cen2 a b angle d11 d12 d21 d22
+
+                     #  Radians to degrees.
+                     set cen1 [expr $cen1*$r2d_]
+                     set cen2 [expr $cen2*$r2d_]
+
+                     set d11 [expr $d11*$r2d_]
+                     set d12 [expr $d12*$r2d_]
+                     set d21 [expr $d21*$r2d_]
+                     set d22 [expr $d22*$r2d_]
+
+                     #  Transform end points of various kinds.
+                     lassign [tran3d_ $tranwcs 0 $cen1 $cen2 $cen3] cen1t cen2t cen3t
+                     lassign [tran3d_ $tranwcs 0 $d11 $d12 $d13] d11t d12t d13t
+                     lassign [tran3d_ $tranwcs 0 $d21 $d22 $d23] d21t d22t d23t
+
+                     #  Recover angle, semi-major & semi-minor axes from end points.
+                     set xdiff [expr $d11t - $cen1t];
+                     set ydiff [expr $d12t - $cen2t];
+                     set smaj [expr sqrt($xdiff*$xdiff + $ydiff*$ydiff)];
+                     set angle [expr atan2($ydiff,$xdiff)*$r2d_];
+            
+                     set xdiff [expr $d21t - $cen1t];
+                     set ydiff [expr $d22t - $cen2t];
+                     set smin [expr sqrt($xdiff*$xdiff + $ydiff*$ydiff)];
+
+                     #  Prism extent.
+                     set size3 [expr abs(0.5*($d23t - $d13t))]
+                     set z0 [expr $cen3t-$size3]
+                     set z1 [expr $cen3t+$size3]
+
+                     puts "xcentre = $cen1t, ycentre = $cen2t"
+                     puts "smajor = $smaj, sminor = $smin"
+                     puts "angle = $angle"
+
+                     set collection_($n) [gaia3d::Gaia3dVtkEllipsePrism \#auto \
+                                             -xcentre $cen1t -ycentre $cen2t \
+                                             -semimajor $smaj \
+                                             -semiminor $smin \
+                                             -angle $angle \
+                                             -zlow $z0 -zhigh $z1]
+                  }
+                  gaiautils::astannul $region
+               }
+
+               set cen1 $cen1t
+               set cen2 $cen2t
+               set cen3 $cen3t
             }
 
             set x0 [expr $cen1-$size1]
@@ -222,10 +279,12 @@ itcl::class ::gaia3d::Gaia3dCupidPrism {
 
             set z0 [expr $cen3-$size3]
             set z1 [expr $cen3+$size3]
-
-            set collection_($n) [gaia3d::Gaia3dVtkRectPrism \#auto \
-                                    -x0 $x0 -y0 $y0 -x1 $x1 -y1 $y1 \
-                                    -zlow $z0 -zhigh $z1]
+            
+            if { ! [info exists collection_($n)] } {
+               set collection_($n) [gaia3d::Gaia3dVtkRectPrism \#auto \
+                                       -x0 $x0 -y0 $y0 -x1 $x1 -y1 $y1 \
+                                       -zlow $z0 -zhigh $z1]
+            }
             incr n
          }
          if { $tranwcs != 0 } {

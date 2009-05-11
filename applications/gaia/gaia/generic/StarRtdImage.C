@@ -3656,13 +3656,12 @@ int StarRtdImage::draw_stcshape( double x, double y, const char *stc_shape,
         centre[1] *= r2d_;
         a *= r2d_;
         b *= r2d_;
-        angle *= r2d_;
 
-        cout << "ellipsepars: " << centre[0] << " " << centre[1] <<
-            " " << a << " " << b << " " << angle << endl;
+        //  To correct orientation (Y through X).
+        angle = angle * r2d_ + 90.0;
 
-        return draw_ellipse( centre[0], centre[1], "deg", a, "deg", bg, fg,
-                             symbol_tags, b/a, angle, label, label_tags );
+        return draw_ellipse( centre[0], centre[1], "deg", b, "deg", bg, fg,
+                             symbol_tags, a/b, angle, label, label_tags );
     }
 
     //  Don't exit with AST still in error.

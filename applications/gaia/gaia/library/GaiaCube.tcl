@@ -148,7 +148,7 @@ itcl::class gaia::GaiaCube {
       #  CUPID catalogue.
       add_menuitem $View command "Import CUPID catalogue..." \
          {Import a CUPID catalogue for display over the plane} \
-         -command [code $this import_cupid_cat_]
+         -command [code $this make_cupid_importer_]
 
       #  Add the Options menu.
       set Options [add_menubutton "Options"]
@@ -1855,10 +1855,16 @@ itcl::class gaia::GaiaCube {
    #  CUPID catalogues
    #  ================
 
-   #  Import a CUPID catalogue. May import more than one, but only
-   #  one importer for each instance of this. Any 3D uses query the 
-   #  importer for catalogues.
-   protected method import_cupid_cat_ {} {
+   #  Import a CUPID catalogue.
+   public method import_cupid_cat {cat} {
+      make_cupid_importer_
+      $w_.cupidimporter open $cat
+   }
+
+   #  Create the CUPID catalogue importer. May import more than one, but only
+   #  one importer for each instance of this. Any 3D uses query the importer
+   #  for catalogues.
+   protected method make_cupid_importer_ {} {
       utilReUseWidget GaiaCupidImporter $w_.cupidimporter -gaiacube $this
       renderers_set_cupid_importer_
    }
