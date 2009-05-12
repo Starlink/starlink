@@ -260,29 +260,31 @@ itcl::class gaia::GaiaCupidImporter {
          return
       }
 
-      #  Do we have STC?
-      set have_stc_ 0
-      if { [string first "Shape" $headings] != -1 } {
-         set have_stc_ 1
-      }
-
       #  Now open the catalogue window.
       set catwin [gaia::GaiaSearch::new_local_catalog $catalogue \
                      [code $image_] ::gaia::GaiaSearch 0 catalog $w_\
                      [code $this set_cat_info_ $catalogue]]
       if { $catwin != {} } {
          set catwin_($catalogue) $catwin
+      } else {
+         set catwin $catwin_($catalogue)
+      }
+
+      #  Do we have STC?
+      set have_stc_($catwin) 0
+      if { [string first "Shape" $headings] != -1 } {
+         set have_stc_($catwin) 1
       }
 
       #  Make sure slice coordinate is set.
       $itk_option(-gaiacube) set_cupid_coord 0
 
       #  And display the catalogue. Note wait for the realization.
-      wait_ "$catwin_($catalogue) set_maxobjs 2000"
+      wait_ "$catwin set_maxobjs 2000"
       gaia::GaiaSearch::allow_searches 1
-      set_plot_symbol_ $catwin_($catalogue)
+      set_plot_symbol_ $catwin
 
-      $catwin_($catalogue) search
+      $catwin search
    }
 
    #  Set the columns in which the various coordinates are found. This
@@ -324,12 +326,13 @@ itcl::class gaia::GaiaCupidImporter {
       #  XXX hack, parameterise this.
       set ::cupid(SCALE) 1.0
 
-      if { $itk_option(-use_stc) && $have_stc_ } {
+      if { $itk_option(-use_stc) && $have_stc_($catwin) } {
          set symbol1 [list PIDENT Shape Cen3 Size1 Size2 Size3]
          set symbol2 [list stcshape green {} {} {} {($Cen3 > ($%%cupid(COORD) - ($Size3*$%%cupid(SCALE)))) && ($Cen3 < ($%%cupid(COORD) + ($Size3*$%%cupid(SCALE))))}]
          set symbol3 [list 1 {deg 2000.0}]
       } else {
-
+         #  STC may be available, but not used for this import.
+         set have_stc_($catwin) 0
          set symbol1 [list PIDENT Cen3 Size1 Size2 Size3]
          set symbol2 [list rectangle green {$Size2/$Size1} {} {} {($Cen3 > ($%%cupid(COORD) - ($Size3*$%%cupid(SCALE)))) && ($Cen3 < ($%%cupid(COORD) + ($Size3*$%%cupid(SCALE))))}]
          set symbol3 [list {$Size1/3600.0} {deg 2000.0}]
@@ -389,6 +392,14 @@ itcl::class gaia::GaiaCupidImporter {
       return $result
    }
 
+   #  Return if a catalogue should be drawn using STC.
+   public method using_stc {catwin} {
+      if { [info exists have_stc_($catwin)] } {
+         return $have_stc_($catwin)
+      }
+      return 0
+   }
+
    #  Configuration options: (public variables)
    #  ----------------------
 
@@ -427,7 +438,7 @@ itcl::class gaia::GaiaCupidImporter {
    protected variable astrocat_ {}
 
    #  Does currently importing catalogue have a Shape column.
-   protected variable have_stc_ 0
+   protected variable have_stc_
 
    #  Common variables: (shared by all instances)
    #  -----------------

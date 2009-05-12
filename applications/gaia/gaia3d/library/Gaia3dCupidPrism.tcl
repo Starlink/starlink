@@ -139,160 +139,196 @@ itcl::class ::gaia3d::Gaia3dCupidPrism {
 
       #  Loop over the catalogues in hand.
       foreach catwin [$importer get 1] {
-         set results [$catwin get_table]
 
-         #  Need to connect the catalogue coordinates to the grid coordinates
-         #  of the dataset. So see if the catalogue has a WCS, as this is from
-         #  CUPID it should.
-         set comments [$catwin comments]
-         set tranwcs 0
-         if { $comments != {} } {
-            set astref [gaia::GaiaSearch::get_kaplibs_frameset $comments]
-            if { $astref != 0 } {
+         #  Connect the catalogue coordinates to the grid coordinates.
+         set tranwcs [get_kaplibs_wcs_ $catwin]
 
-               #  Want transformation from current coordinates of the
-               #  catalogue to base coordinates of the cube. So we connect
-               #  them, going via SKY-DSBSPECTRUM or PIXEL coordinates.
-               set wcs_current [gaiautils::astget $wcs "Current"]
-               set wcs_base [gaiautils::astget $wcs "Base"]
-
-               gaiautils::astset $wcs "Current=$wcs_base"
-               set tranwcs [gaiautils::astconvert $wcs $astref \
-                               "SKY-DSBSPECTRUM,PIXEL,"]
-
-               gaiautils::astset $wcs "Current=$wcs_current"
-               gaiautils::astset $wcs "Base=$wcs_base"
-               gaiautils::astannul $astref
-            }
+         #  Draw the sort of graphics expected. Simple prism rectangles
+         #  or STC regions.
+         if { [$importer using_stc $catwin] } {
+            set n [create_stc_objects_ $n $catwin $tranwcs]
+         } else {
+            set n [create_rect_objects_ $n $catwin $tranwcs]
          }
+      }
+      if { $tranwcs != 0 } {
+         gaiautils::astannul $tranwcs
+      }
+      apply_configuration_
+      fit_to_data
+   }
 
-         #  Get the data from the catalogue. XXX selected rows option XXX.
-         foreach line [$results get_contents] {
-            lassign $line \
-               pident peak1 peak2 peak3 cen1 cen2 cen3 size1 size2 size3 \
-               sum peak volume shape
+   #  Connect the catalogue coordinates to the grid coordinates of the
+   #  dataset. So see if the catalogue has a WCS, as this is from
+   #  CUPID it should. Returns a 3D WCS that transforms sky and spectral
+   #  values (dimensions 1, 2 and 3).
+   protected method get_kaplibs_wcs_ {catwin} {
+      set comments [$catwin comments]
+      set tranwcs 0
+      if { $comments != {} } {
+         set astref [gaia::GaiaSearch::get_kaplibs_frameset $comments]
+         if { $astref != 0 } {
+
+            #  Want transformation from current coordinates of the
+            #  catalogue to base coordinates of the cube. So we connect
+            #  them, going via SKY-DSBSPECTRUM or PIXEL coordinates.
+            set wcs_current [gaiautils::astget $wcs "Current"]
+            set wcs_base [gaiautils::astget $wcs "Base"]
+
+            gaiautils::astset $wcs "Current=$wcs_base"
+            set tranwcs [gaiautils::astconvert $wcs $astref \
+                            "SKY-DSBSPECTRUM,PIXEL,"]
+
+            gaiautils::astset $wcs "Current=$wcs_current"
+            gaiautils::astset $wcs "Base=$wcs_base"
+            gaiautils::astannul $astref
+         }
+      }
+      return $tranwcs
+   }
+
+   #  Create STC region based objects.
+   protected method create_stc_objects_ {index catwin tranwcs} {
+
+      #  Get the data from the catalogue.
+      set results [$catwin get_table]
+      foreach line [$results get_contents] {
+         lassign $line \
+            pident peak1 peak2 peak3 cen1 cen2 cen3 size1 size2 size3 \
+            sum peak volume shape
+
+         #  Shape is a 2D region that connects to the sky coordinates.
+         #  Need to connect this to the cube and transform into pixels.
+         set region [gaiautils::stcregion $shape]
+         set type [gaiautils::regiontype $region]
+         if { $type == "ellipse" } {
+
+            # XXX connect region to catalogue WCS (below to pixels).
+            set pars [gaiautils::astregionpars $region]
+            lassign $pars cen1 cen2 a b angle d11 d12 d21 d22
 
             #  Transform from catalogue coordinates to grid. Note WCS
             #  has 12 axes, but only the first three are used to connect
             #  to the cube. If shape is used that represents an STC region.
             if { $tranwcs != 0 } {
 
-               #  Unformat the ones that might be in sexagesimal.
-               #  Note values from table are already transformed into
-               #  celestial positions in RA and Dec, so we use that WCS
-               #  to unformat not tranwcs, which is in plain degrees.
-               set cen1 [gaiautils::astunformat $wcs 1 $cen1]
-               set cen2 [gaiautils::astunformat $wcs 2 $cen2]
-
-               #  Radians to degrees, now same as catalogue WCS.
+               #  Radians to degrees.
                set cen1 [expr $cen1*$r2d_]
                set cen2 [expr $cen2*$r2d_]
 
-               #  Sizes from arcsec to degrees.
-               set size1 [expr ($size1/3600.0)]
-               set size2 [expr ($size2/3600.0)]
+               set d11 [expr $d11*$r2d_]
+               set d12 [expr $d12*$r2d_]
+               set d21 [expr $d21*$r2d_]
+               set d22 [expr $d22*$r2d_]
 
-               #  Size[123] are distances, so offset from centre to get
-               #  positions.
-               set d11 [expr $cen1-$size1]
-               set d12 [expr $cen2-$size2]
+               #  Size3 from catalogue column are distances, so offset
+               #  from centre to get positions to match end points of ellipse.
                set d13 [expr $cen3-$size3]
-
-               set d21 [expr $cen1+$size1]
-               set d22 [expr $cen2+$size2]
                set d23 [expr $cen3+$size3]
 
-               #  Transform end positions in degrees to pixels.
-               lassign [tran3d_ $tranwcs 0 $d11 $d12 $d13] d11t d12t d13t
-               lassign [tran3d_ $tranwcs 0 $d21 $d22 $d23] d21t d22t d23t
+               #  Transform end points of various kinds.
+               lassign [tran3d_ $tranwcs 0 $cen1 $cen2 $cen3] cen1 cen2 cen3
+               lassign [tran3d_ $tranwcs 0 $d11 $d12 $d13] d11 d12 d13
+               lassign [tran3d_ $tranwcs 0 $d21 $d22 $d23] d21 d22 d23
 
-               #  Recover sizes in pixels.
-               set size1 [expr abs(0.5*($d21t - $d11t))]
-               set size2 [expr abs(0.5*($d22t - $d12t))]
-               set size3 [expr abs(0.5*($d23t - $d13t))]
+               #  Recover angle, semi-major & semi-minor axes from end points.
+               set xdiff [expr $d11-$cen1];
+               set ydiff [expr $d12-$cen2];
+               set smaj [expr sqrt($xdiff*$xdiff + $ydiff*$ydiff)];
+               set angle [expr atan2($ydiff,$xdiff)*$r2d_];
 
-               #  Transform centre from degrees to pixels.
-               lassign [tran3d_ $tranwcs 0 $cen1 $cen2 $cen3] cen1t cen2t cen3t
+               set xdiff [expr $d21-$cen1];
+               set ydiff [expr $d22-$cen2];
+               set smin [expr sqrt($xdiff*$xdiff + $ydiff*$ydiff)];
 
-               if { [info exists shape] && $shape != {} } {
-                  #  Shape is a 2D region that connects to the sky coordinates.
-                  #  Need to connect this to the cube and transform into pixels.
-                  set region [gaiautils::stcregion $shape]
-                  set type [gaiautils::regiontype $region]
-                  if { $type == "ellipse" } {
-                     set pars [gaiautils::astregionpars $region]
-                     lassign $pars cen1 cen2 a b angle d11 d12 d21 d22
+               #  Prism extent.
+               set size3 [expr abs(0.5*($d23-$d13))]
+               set z0 [expr $cen3-$size3]
+               set z1 [expr $cen3+$size3]
 
-                     #  Radians to degrees.
-                     set cen1 [expr $cen1*$r2d_]
-                     set cen2 [expr $cen2*$r2d_]
-
-                     set d11 [expr $d11*$r2d_]
-                     set d12 [expr $d12*$r2d_]
-                     set d21 [expr $d21*$r2d_]
-                     set d22 [expr $d22*$r2d_]
-
-                     #  Transform end points of various kinds.
-                     lassign [tran3d_ $tranwcs 0 $cen1 $cen2 $cen3] cen1t cen2t cen3t
-                     lassign [tran3d_ $tranwcs 0 $d11 $d12 $d13] d11t d12t d13t
-                     lassign [tran3d_ $tranwcs 0 $d21 $d22 $d23] d21t d22t d23t
-
-                     #  Recover angle, semi-major & semi-minor axes from end points.
-                     set xdiff [expr $d11t - $cen1t];
-                     set ydiff [expr $d12t - $cen2t];
-                     set smaj [expr sqrt($xdiff*$xdiff + $ydiff*$ydiff)];
-                     set angle [expr atan2($ydiff,$xdiff)*$r2d_];
-            
-                     set xdiff [expr $d21t - $cen1t];
-                     set ydiff [expr $d22t - $cen2t];
-                     set smin [expr sqrt($xdiff*$xdiff + $ydiff*$ydiff)];
-
-                     #  Prism extent.
-                     set size3 [expr abs(0.5*($d23t - $d13t))]
-                     set z0 [expr $cen3t-$size3]
-                     set z1 [expr $cen3t+$size3]
-
-                     puts "xcentre = $cen1t, ycentre = $cen2t"
-                     puts "smajor = $smaj, sminor = $smin"
-                     puts "angle = $angle"
-
-                     set collection_($n) [gaia3d::Gaia3dVtkEllipsePrism \#auto \
-                                             -xcentre $cen1t -ycentre $cen2t \
-                                             -semimajor $smaj \
-                                             -semiminor $smin \
-                                             -angle $angle \
-                                             -zlow $z0 -zhigh $z1]
-                  }
-                  gaiautils::astannul $region
-               }
-
-               set cen1 $cen1t
-               set cen2 $cen2t
-               set cen3 $cen3t
+               #  and create.
+               set collection_($index) [gaia3d::Gaia3dVtkEllipsePrism \#auto \
+                                           -xcentre $cen1 -ycentre $cen2 \
+                                           -semimajor $smaj \
+                                           -semiminor $smin \
+                                           -angle $angle \
+                                           -zlow $z0 -zhigh $z1]
+               incr index
             }
-
-            set x0 [expr $cen1-$size1]
-            set x1 [expr $cen1+$size1]
-
-            set y0 [expr $cen2-$size2]
-            set y1 [expr $cen2+$size2]
-
-            set z0 [expr $cen3-$size3]
-            set z1 [expr $cen3+$size3]
-            
-            if { ! [info exists collection_($n)] } {
-               set collection_($n) [gaia3d::Gaia3dVtkRectPrism \#auto \
-                                       -x0 $x0 -y0 $y0 -x1 $x1 -y1 $y1 \
-                                       -zlow $z0 -zhigh $z1]
-            }
-            incr n
-         }
-         if { $tranwcs != 0 } {
-            gaiautils::astannul $tranwcs
+            gaiautils::astannul $region
          }
       }
-      apply_configuration_
-      fit_to_data
+      return $index
+   }
+
+   #  Create rectangular region based objects.
+   protected method create_rect_objects_ {index catwin tranwcs} {
+
+      #  Get the data from the catalogue.
+      set results [$catwin get_table]
+      foreach line [$results get_contents] {
+         lassign $line pid peak1 peak2 peak3 cen1 cen2 cen3 size1 size2 size3
+
+         #  Transform from catalogue coordinates to grid. Note WCS
+         #  has 12 axes, but only the first three are used to connect
+         #  to the cube. If shape is used that represents an STC region.
+         if { $tranwcs != 0 } {
+
+            #  Unformat the ones that might be in sexagesimal.
+            #  Note values from table are already transformed into
+            #  celestial positions in RA and Dec, so we use that WCS
+            #  to unformat not tranwcs, which is in plain degrees.
+            set cen1 [gaiautils::astunformat $wcs 1 $cen1]
+            set cen2 [gaiautils::astunformat $wcs 2 $cen2]
+
+            #  Radians to degrees, now same as catalogue WCS.
+            set cen1 [expr $cen1*$r2d_]
+            set cen2 [expr $cen2*$r2d_]
+
+            #  Sizes from arcsec to degrees.
+            set size1 [expr ($size1/3600.0)]
+            set size2 [expr ($size2/3600.0)]
+
+            #  Size[123] are distances, so offset from centre to get
+            #  positions.
+            set d11 [expr $cen1-$size1]
+            set d12 [expr $cen2-$size2]
+            set d13 [expr $cen3-$size3]
+
+            set d21 [expr $cen1+$size1]
+            set d22 [expr $cen2+$size2]
+            set d23 [expr $cen3+$size3]
+
+            #  Transform end positions in degrees to pixels.
+            lassign [tran3d_ $tranwcs 0 $d11 $d12 $d13] d11 d12 d13
+            lassign [tran3d_ $tranwcs 0 $d21 $d22 $d23] d21 d22 d23
+
+            #  Recover sizes in pixels.
+            set size1 [expr abs(0.5*($d21-$d11))]
+            set size2 [expr abs(0.5*($d22-$d12))]
+            set size3 [expr abs(0.5*($d23-$d13))]
+
+            #  Transform centre from degrees to pixels.
+            lassign [tran3d_ $tranwcs 0 $cen1 $cen2 $cen3] cen1 cen2 cen3
+         }
+
+         #  Derive coordinate of ranges along each axis.
+         set x0 [expr $cen1-$size1]
+         set x1 [expr $cen1+$size1]
+
+         set y0 [expr $cen2-$size2]
+         set y1 [expr $cen2+$size2]
+
+         set z0 [expr $cen3-$size3]
+         set z1 [expr $cen3+$size3]
+
+         #  and create.
+         set collection_($index) [gaia3d::Gaia3dVtkRectPrism \#auto \
+                                     -x0 $x0 -y0 $y0 -x1 $x1 -y1 $y1 \
+                                     -zlow $z0 -zhigh $z1]
+         incr index
+      }
+      return $index
    }
 
    #  Transform a 3D position. Assumes a catalogue-based WCS with
@@ -354,7 +390,6 @@ itcl::class ::gaia3d::Gaia3dCupidPrism {
 
    #  If objects should be made visible.
    protected variable visible_ 0
-
 
    #  Common variables: (shared by all instances)
    #  -----------------
