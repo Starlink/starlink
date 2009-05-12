@@ -191,8 +191,7 @@ itcl::class ::gaia3d::Gaia3dCupidPrism {
    protected method create_stc_objects_ {index catwin tranwcs} {
 
       #  Get the data from the catalogue.
-      set results [$catwin get_table]
-      foreach line [$results get_contents] {
+      foreach line [get_content_ $catwin] {
          lassign $line \
             pident peak1 peak2 peak3 cen1 cen2 cen3 size1 size2 size3 \
             sum peak volume shape
@@ -203,7 +202,7 @@ itcl::class ::gaia3d::Gaia3dCupidPrism {
          set type [gaiautils::regiontype $region]
          if { $type == "ellipse" } {
 
-            # XXX connect region to catalogue WCS (below to pixels).
+            #  Get the parameterisation of the ellipse.
             set pars [gaiautils::astregionpars $region]
             lassign $pars cen1 cen2 a b angle d11 d12 d21 d22
 
@@ -265,8 +264,7 @@ itcl::class ::gaia3d::Gaia3dCupidPrism {
    protected method create_rect_objects_ {index catwin tranwcs} {
 
       #  Get the data from the catalogue.
-      set results [$catwin get_table]
-      foreach line [$results get_contents] {
+      foreach line [get_content_ $catwin] {
          lassign $line pid peak1 peak2 peak3 cen1 cen2 cen3 size1 size2 size3
 
          #  Transform from catalogue coordinates to grid. Note WCS
@@ -331,6 +329,17 @@ itcl::class ::gaia3d::Gaia3dCupidPrism {
       return $index
    }
 
+   #  Get the contents of a given catalogue window. If selected is enabled
+   #  only the selected rows are returned, otherwise all rows are returned
+   #  (that are shown in the table window, not the underlying catalogue).
+   protected method get_content_ {catwin} {
+      set results [$catwin get_table]
+      if { $selected } {
+         return [$results get_selected]
+      }
+      return [$results get_contents]
+   }
+
    #  Transform a 3D position. Assumes a catalogue-based WCS with
    #  3 input and 12 output axes. On output only the first three values
    #  will be used.
@@ -363,6 +372,9 @@ itcl::class ::gaia3d::Gaia3dCupidPrism {
 
    #  The WCS of the actual datacube.
    public variable wcs {}
+
+   #  Whether to just plot the selected objects.
+   public variable selected 0
 
    #  Whether to align to an axis.
    public variable align_to_axis 0 {
