@@ -168,13 +168,6 @@ itcl::class gaia3d::Gaia3dIsosurface {
    #  Add the controls for the iso-surface attributes.
    protected method add_tool_controls_ {} {
 
-      #  Add tab table to contain the various pages of controls.
-      itk_component add tab {
-         ::iwidgets::tabnotebook $itk_component(controls).tab \
-            -angle 0 -equaltabs 0 -tabpos n -width 300
-      }
-      pack $itk_component(tab) -fill both -expand 1
-
       #  Get pane for levels and attributes.
       $itk_component(tab) add -label Levels
 

@@ -143,12 +143,15 @@ itcl::class ::gaia3d::Gaia3dCupidPrism {
          #  Connect the catalogue coordinates to the grid coordinates.
          set tranwcs [get_kaplibs_wcs_ $catwin]
 
+         #  Get a colour for this catalogue, same as the plot symbol.
+         set colour [get_symbol_colour_ $catwin]
+
          #  Draw the sort of graphics expected. Simple prism rectangles
          #  or STC regions.
          if { [$importer using_stc $catwin] } {
-            set n [create_stc_objects_ $n $catwin $tranwcs]
+            set n [create_stc_objects_ $n $catwin $tranwcs $colour]
          } else {
-            set n [create_rect_objects_ $n $catwin $tranwcs]
+            set n [create_rect_objects_ $n $catwin $tranwcs $colour]
          }
       }
       if { $tranwcs != 0 } {
@@ -187,8 +190,19 @@ itcl::class ::gaia3d::Gaia3dCupidPrism {
       return $tranwcs
    }
 
+   #  Get the colour of the symbol used to draw markers in the main window.
+   protected method get_symbol_colour_ {catwin} {
+      set symbol [$catwin get_symbol]
+      set symbol [lindex [lindex $symbol 0] 1]
+      set colour [lindex $symbol 1]
+      if { $colour == {} } {
+         return black
+      }
+      return $colour
+   }
+
    #  Create STC region based objects.
-   protected method create_stc_objects_ {index catwin tranwcs} {
+   protected method create_stc_objects_ {index catwin tranwcs colour} {
 
       #  Get the data from the catalogue.
       foreach line [get_content_ $catwin] {
@@ -251,7 +265,8 @@ itcl::class ::gaia3d::Gaia3dCupidPrism {
                                            -semimajor $smaj \
                                            -semiminor $smin \
                                            -angle $angle \
-                                           -zlow $z0 -zhigh $z1]
+                                           -zlow $z0 -zhigh $z1 \
+                                           -colour $colour]
                incr index
             }
             gaiautils::astannul $region
@@ -261,7 +276,7 @@ itcl::class ::gaia3d::Gaia3dCupidPrism {
    }
 
    #  Create rectangular region based objects.
-   protected method create_rect_objects_ {index catwin tranwcs} {
+   protected method create_rect_objects_ {index catwin tranwcs colour} {
 
       #  Get the data from the catalogue.
       foreach line [get_content_ $catwin] {
@@ -323,7 +338,7 @@ itcl::class ::gaia3d::Gaia3dCupidPrism {
          #  and create.
          set collection_($index) [gaia3d::Gaia3dVtkRectPrism \#auto \
                                      -x0 $x0 -y0 $y0 -x1 $x1 -y1 $y1 \
-                                     -zlow $z0 -zhigh $z1]
+                                     -zlow $z0 -zhigh $z1 -colour $colour]
          incr index
       }
       return $index
@@ -351,13 +366,13 @@ itcl::class ::gaia3d::Gaia3dCupidPrism {
       return [gaiautils::asttrann $wcs 0 "$x1 $x2 $x3 4 5 6 7 8 9 10 11 12"]
     }
 
+   #  Apply the current configuration to all objects.
    protected method apply_configuration_ {} {
       foreach index [array names collection_] {
          $collection_($index) configure \
             -renwindow $renwindow \
             -align_to_axis $align_to_axis \
-            -axis $axis \
-            -colour $colour
+            -axis $axis
       }
    }
 
@@ -386,16 +401,14 @@ itcl::class ::gaia3d::Gaia3dCupidPrism {
       apply_configuration_
    }
 
-   #  The colour.
-   public variable colour {#0ff} {
-      apply_configuration_
-   }
-
    #  Protected variables: (available to instance)
    #  --------------------
 
    #  The objects, indexed by a number.
    protected variable collection_
+
+   #  Colour of each object. These differ per-catalogue.
+   protected variable colour_
 
    #  If objects should be added to the render window.
    protected variable add_to_window_ 0

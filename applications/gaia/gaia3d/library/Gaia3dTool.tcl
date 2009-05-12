@@ -31,7 +31,7 @@
 #     Performs the given method on this object.
 
 #  Copyright:
-#     Copyright (C) 2007 Science and Technology Facilities Council
+#     Copyright (C) 2007-2009 Science and Technology Facilities Council
 #     All Rights Reserved.
 
 #  Licence:
@@ -326,19 +326,30 @@ itcl::class gaia3d::Gaia3dTool {
    #  Add generic controls for the data handling.
    protected method add_controls_ {} {
 
+      #  Frame for all controls.
       set lwidth 14
-
       itk_component add controls {
          ::frame $w_.controls
       }
-
       itk_component add rule {
          LabelRule $itk_component(controls).rule -text "Controls:"
       }
       pack $itk_component(rule) -side top -fill x
 
+      #  Add tab table to the top of the controls frame. This should contain
+      #  the various pages of tool-specific controls and should be used by the
+      #  add_tool_controls_ overrides to add further controls.
+      itk_component add tab {
+         ::iwidgets::tabnotebook $itk_component(controls).tab \
+            -angle 0 -equaltabs 0 -tabpos n -width 300
+      }
+      pack $itk_component(tab) -fill both -expand 1
+
       #  Tool specific controls.
       add_tool_controls_
+
+      #  Add CUPID import controls.
+      add_cupid_controls_
 
       #  Switch on bad pixel replacement, or not.
       itk_component add replacebad {
@@ -436,21 +447,6 @@ itcl::class gaia3d::Gaia3dTool {
       pack $itk_component(showastaxes) -fill x -expand 0 -ipady 5
       add_short_help $itk_component(showastaxes) \
          {Show annotated axes around cube (RA and Dec labelling)}
-
-      #  CUPID catalogue.
-      itk_component add showcupidcat {
-         gaia::StarLabelCheck $itk_component(controls).showcupidcat \
-            -text "CUPID catalogue:" \
-            -onvalue 1 \
-            -offvalue 0 \
-            -labelwidth $lwidth \
-            -variable [scope show_cupid_cat_] \
-            -command [code $this changed_show_cupid_cat_]
-      }
-      pack $itk_component(showcupidcat) -fill x -expand 0 -ipady 5
-      add_short_help $itk_component(showcupidcat) \
-         {Show CUPID catalogue clumps, if a catalogue is available}
-
    }
 
    #  Get a list of the standard colourmaps, sorted in alphabetic order
@@ -553,6 +549,30 @@ itcl::class gaia3d::Gaia3dTool {
    #  etc).
    protected method add_tool_controls_ {} {
       error "Implement an add_tool_controls_ method"
+   }
+
+   #  Controls for CUPID catalogue options.
+   protected method add_cupid_controls_ {} {
+      $itk_component(tab) add -label CUPID
+      set w [$itk_component(tab) childsite CUPID]
+      
+      #  Render any CUPID catalogues opened in the GAIA cube toolbox.
+      itk_component add showcupidcat {
+         gaia::StarLabelCheck $w.showcupidcat \
+            -text "Display CUPID catalogues:" \
+            -onvalue 1 \
+            -offvalue 0 \
+            -variable [scope show_cupid_cat_] \
+            -command [code $this changed_show_cupid_cat_]
+      }
+      pack $itk_component(showcupidcat) -fill x -expand 0 -ipady 5
+      add_short_help $itk_component(showcupidcat) \
+         {Show CUPID catalogue clumps, if any catalogues are available}
+
+      #  XXX more controls.
+      #  Like display selected rows,
+      #  Name the catalogues displayed and a colour for each.
+      #  Offer to import a catalogue, reuse dialog of main cube toolbox.
    }
 
    #  Control extra cubes isosurface toolbox.
@@ -732,7 +752,7 @@ itcl::class gaia3d::Gaia3dTool {
    #  Called when variable that controls visibility of the CUPID catalogue
    #  clumps. When the clumps are translucent we must re-establish the
    #  prop order, with the clumps at the back. Also we match the objects
-   #  displayed in the catalogue, which might have changed. So this is done 
+   #  displayed in the catalogue, which might have changed. So this is done
    #  the hard way by completely redrawing the scene.
    protected method changed_show_cupid_cat_ {} {
       if { $drawn_ } {
@@ -1061,23 +1081,26 @@ itcl::class gaia3d::Gaia3dTool {
             $textwcs_ set_invisible
          }
 
-         #  Draw the CUPID regions if requested.
-         if { $cupid_cat_ == {} } {
+         #  Draw the CUPID regions if requested. Lazily create this object
+         #  as it always renders immediately.
+         if { $cupid_cat_ == {} && $show_cupid_cat_ } {
             set cupid_cat_ [gaia3d::Gaia3dCupidPrism \#auto \
                                -wcs [$imagedata_ get_wcs] \
                                -renwindow $renwindow_ \
                                -align_to_axis 1 \
-                               -colour $spectral_colour_ \
                                -axis [$itk_option(-gaiacube) get_axis]]
             $cupid_cat_ set_importer $importer_
             $cupid_cat_ add_to_window
-         }
-         if { $show_cupid_cat_ } {
-            #  Complete rendering so that new or removed regions are handled.
-            $cupid_cat_ set_importer $importer_
-            #$cupid_cat_ set_visible
          } else {
-            $cupid_cat_ set_invisible
+            if { $cupid_cat_ != {} } {
+               if { $show_cupid_cat_ } {
+                  #  Complete re-rendering so that new or removed regions are
+                  #  revealed and removed.
+                  $cupid_cat_ set_importer $importer_
+               } else {
+                  $cupid_cat_ set_invisible
+               }
+            }
          }
 
          #  Draw AST axes if requested. XXX allow attributes...

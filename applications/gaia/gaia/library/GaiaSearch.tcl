@@ -219,6 +219,11 @@ itcl::class gaia::GaiaSearch {
       $w_.cat symbol $args
    }
 
+   #  Method to get the symbol used when plotting.
+   public method get_symbol {} {
+      return [$w_.cat symbol]
+   }
+
    #  Method to set the symbol used when plotting. This is the same
    #  format as a line in a local catalogue. This version only sets
    #  symbol, if not already set.

@@ -83,7 +83,7 @@ itcl::class gaia3d::Gaia3dVolume {
       wm title $w_ "GAIA3D: Volume render ($itk_option(-number))"
 
       #  Make it a decent size (packing doesn't work).
-      wm geometry  $w_ 800x700+0+0
+      wm geometry  $w_ 800x800+0+0
 
       #  Add window help.
       add_help_button volume "On Window..."
@@ -119,12 +119,17 @@ itcl::class gaia3d::Gaia3dVolume {
    #  Add the controls for the volume attributes.
    protected method add_tool_controls_ {} {
 
+      #  Get pane for attributes.
+      $itk_component(tab) add -label Isosurface
+
+      #  Add controls for line attributes.
+      set w [$itk_component(tab) childsite 0]
       set lwidth 10
 
       #  Option to use a min/max colour transfer function or one based on a
       #  standard colour map.
       itk_component add coloursource {
-         gaia::StarLabelCheck $itk_component(controls).coloursource \
+         gaia::StarLabelCheck $w.coloursource \
             -text "Two colour:" \
             -onvalue 1 \
             -offvalue 0 \
@@ -138,7 +143,7 @@ itcl::class gaia3d::Gaia3dVolume {
 
       #  Menus for selecting the min and max colours.
       itk_component add mincolour {
-         util::LabelMenu $itk_component(controls).mincolour \
+         util::LabelMenu $w.mincolour \
             -relief raised \
             -labelwidth $lwidth \
             -text "Min colour:" \
@@ -147,7 +152,7 @@ itcl::class gaia3d::Gaia3dVolume {
       add_short_help $itk_component(mincolour) {Colour for Min value}
 
       itk_component add maxcolour {
-         util::LabelMenu $itk_component(controls).maxcolour \
+         util::LabelMenu $w.maxcolour \
             -relief raised \
             -labelwidth $lwidth \
             -text "Max colour:" \
@@ -157,7 +162,7 @@ itcl::class gaia3d::Gaia3dVolume {
 
       #  Menu of colour maps.
       itk_component add colourmap {
-         util::LabelMenu $itk_component(controls).colourmap \
+         util::LabelMenu $w.colourmap \
             -relief raised \
             -labelwidth $lwidth \
             -text "Colour map:" \
@@ -204,7 +209,7 @@ itcl::class gaia3d::Gaia3dVolume {
 
       #  Data limits.
       itk_component add minvalue {
-         util::LabelEntry $itk_component(controls).minvalue \
+         util::LabelEntry $w.minvalue \
             -text "Min value:" \
             -labelwidth $lwidth \
             -validate real \
@@ -214,7 +219,7 @@ itcl::class gaia3d::Gaia3dVolume {
          {Minimum data value used during rendering}
 
       itk_component add maxvalue {
-         util::LabelEntry $itk_component(controls).maxvalue \
+         util::LabelEntry $w.maxvalue \
             -text "Max value:" \
             -labelwidth $lwidth \
             -validate real \
@@ -245,7 +250,7 @@ itcl::class gaia3d::Gaia3dVolume {
 
       #  Opacity limits.
       itk_component add minopacity {
-         util::LabelEntry $itk_component(controls).minopacity \
+         util::LabelEntry $w.minopacity \
             -text "Min opacity:" \
             -labelwidth $lwidth \
             -validate real \
@@ -255,7 +260,7 @@ itcl::class gaia3d::Gaia3dVolume {
          {Minimum opacity used during rendering (min value)}
 
       itk_component add maxopacity {
-         util::LabelEntry $itk_component(controls).maxopacity \
+         util::LabelEntry $w.maxopacity \
             -text "Max opacity:" \
             -labelwidth $lwidth \
             -validate real \
@@ -277,6 +282,9 @@ itcl::class gaia3d::Gaia3dVolume {
       }
       add_short_help $itk_component(stop) {Stop rendering}
       pack $itk_component(stop) -side left -expand 1 -pady 3 -padx 3
+
+      #  Display the pane.
+      $itk_component(tab) select 0
    }
 
    #  Add a customized colour to the menus. Use an index if supplied.
