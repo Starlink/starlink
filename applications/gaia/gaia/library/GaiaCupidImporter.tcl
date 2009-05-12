@@ -323,7 +323,7 @@ itcl::class gaia::GaiaCupidImporter {
    #  Sizes are in arcsec for celestial coordinates.
    protected method set_plot_symbol_ {catwin} {
 
-      #  XXX hack, parameterise this.
+      #  XXX hack, parameterise this. Apply to STC shape?
       set ::cupid(SCALE) 1.0
 
       if { $itk_option(-use_stc) && $have_stc_($catwin) } {
@@ -335,9 +335,7 @@ itcl::class gaia::GaiaCupidImporter {
          set have_stc_($catwin) 0
          set symbol1 [list PIDENT Cen3 Size1 Size2 Size3]
          set symbol2 [list rectangle green {$Size2/$Size1} {} {} {($Cen3 > ($%%cupid(COORD) - ($Size3*$%%cupid(SCALE)))) && ($Cen3 < ($%%cupid(COORD) + ($Size3*$%%cupid(SCALE))))}]
-         set symbol3 [list {$Size1/3600.0} {deg 2000.0}]
-         #  XXX should be:
-         #set symbol3 [list {$Size1/3600.0*$%%cupid(SCALE)} {deg 2000.0}]
+         set symbol3 [list {$Size1/3600.0*$%%cupid(SCALE)} {deg 2000.0}]
       }
       $catwin set_symbol $symbol1 $symbol2 $symbol3
    }

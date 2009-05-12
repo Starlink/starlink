@@ -531,6 +531,18 @@ int GaiaSkySearch::csizeCmd( int argc, char *argv[] )
     return TCL_OK;
 }
 
+/*
+ * In GAIA %% is a pseudonym for "::". Needed as ":" separates multiple
+ * symbols and "::" allows global variable access.
+ */
+static void replace_percents( char *str ) 
+{
+    char *p = str;
+    while ( ( p = strstr( p, "%%" ) ) ) {
+        *p++ = ':';
+        *p++ = ':';
+    }
+}
 
 /**
  *  Override plot_objects to sort out problems with plotting when
@@ -543,16 +555,17 @@ int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
                                  const char* cols, const char* symbol,
                                  const char* expr )
 {
-    int status = 0;
-    int numCols = 0;
-    char** colNames = NULL;
-    int* colIndexes = NULL;
-    int nsymb = 0;
-    char** symb = NULL;
-    int nexpr = 0;
-    char** exprList = NULL;
+    char *glexpr;
     char *glsymbol;
     char *p;
+    char** colNames = NULL;
+    char** exprList = NULL;
+    char** symb = NULL;
+    int nexpr = 0;
+    int nsymb = 0;
+    int numCols = 0;
+    int status = 0;
+    int* colIndexes = NULL;
 
     //  This loop executes only once and is used for error
     //  handling/cleanup via "break".
@@ -575,19 +588,17 @@ int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
             break;
         }
 
-        //  In GAIA %% is a pseudonym for "::". Needed as ":" separates
-        //  multiple symbols and "::" allows global variable access.
+        //  In GAIA %% is a pseudonym for "::".
         glsymbol = strdup( symbol );
-        p = glsymbol;
-        while ( ( p = strstr( p, "%%" ) ) ) {
-            *p++ = ':';
-            *p++ = ':';
-        }
+        replace_percents( glsymbol );
 
         //  Parse symbol info, a variable length list of
         //  {shape color ratio angle label cond}
-        if ((status = Tcl_SplitList(interp_, glsymbol, &nsymb, &symb)) != TCL_OK)
+        if ((status = Tcl_SplitList(interp_, glsymbol, 
+                                    &nsymb, &symb)) != TCL_OK) {
+            free( glsymbol );
             break;
+        }
         free( glsymbol );
 
         //  Default values
@@ -603,8 +614,14 @@ int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
             break;
 
         // parse the size expr list: {size units}
-        if ((status = Tcl_SplitList(interp_, (char*)expr, &nexpr, &exprList)) != TCL_OK)
+        glexpr = strdup( expr );
+        replace_percents( glexpr );
+        if ((status = Tcl_SplitList(interp_, (char*)glexpr, 
+                                    &nexpr, &exprList)) != TCL_OK) {
+            free( glexpr );
             break;
+        }
+        free( glexpr );
         if (nexpr == 0 || strlen(exprList[0]) == 0) {
             status = error("invalid symbol expression: ", expr);
             break;
@@ -668,8 +685,9 @@ int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
                 break;
             }
             if ((status = plot_row(image, r, rownum, id, x, y, xy_units,
-                                   numCols, colNames, colIndexes, shape, bg, fg, ratio,
-                                   angle, label, cond, size, units)) != TCL_OK)
+                                   numCols, colNames, colIndexes, shape,
+                                   bg, fg, ratio, angle, label, cond, size, 
+                                   units)) != TCL_OK)
                 break;
         }
     }
@@ -686,7 +704,6 @@ int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
 
     return status;
 }
-
 
 /*
  * Parse the given symbol info and set the values of the last 7 args from
