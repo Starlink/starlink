@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.35}
 \newcommand{\stardocnumber}    {95.35}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2009 March 27}
+\newcommand{\stardocdate}      {2009 May 11}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.10}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -46718,16 +46718,6 @@ right.
          applied.
       }
       \sstsubsection{
-         NEWLO = LITERAL (Read)
-      }{
-         This gives the value to which all input array-element values
-         less than the lower threshold are set.  If this is set to
-         {\tt "Bad"}, the bad value is substituted.  Numerical values of
-         NEWLO must lie in within the minimum and maximum values of the
-         data type of the array being processed.  The suggested default
-         is the lower threshold.
-      }
-      \sstsubsection{
          NEWHI = LITERAL (Read)
       }{
          This gives the value to which all input array-element values
@@ -46737,6 +46727,16 @@ right.
          data type of the array being processed.  The suggested default
          is the upper threshold.  This parameter is ignored if THRLO is
          greater than THRHI.
+      }
+      \sstsubsection{
+         NEWLO = LITERAL (Read)
+      }{
+         This gives the value to which all input array-element values
+         less than the lower threshold are set.  If this is set to
+         {\tt "Bad"}, the bad value is substituted.  Numerical values of
+         NEWLO must lie in within the minimum and maximum values of the
+         data type of the array being processed.  The suggested default
+         is the lower threshold.
       }
       \sstsubsection{
          OUT = NDF (Write)
@@ -46765,6 +46765,32 @@ right.
       }{
          \htmlref{Title}{apndf:title} for the output NDF structure.  A null value ({\tt{!}})
          propagates the title from the input NDF to the output NDF. {\tt [!]} }
+   }
+   \sstresparameters{
+      \sstsubsection{
+         NUMHI = \_INTEGER (Write)
+      }{
+         The number of pixels whose values were thresholded as being
+         greater than the THRHI threshold.
+      }
+      \sstsubsection{
+         NUMLO = \_INTEGER (Write)
+      }{
+         The number of pixels whose values were thresholded as being
+         less than the THRLO threshold.
+      }
+      \sstsubsection{
+         NUMRANGE = \_INTEGER (Write)
+      }{
+         The number of pixels whose values were thresholded as being
+         between the THRLO and THRHI thresholds, if THRLO is greater
+         than THRHI.
+      }
+      \sstsubsection{
+         NUMSAME = \_INTEGER (Write)
+      }{
+         The number of unchanged pixels.
+      }
    }
    \sstexamples{
       \sstexamplesubsection{
@@ -55863,6 +55889,12 @@ The following applications have been modified:
          degrees and arbitrary angles that should greatly reduce the memory
          requirements for processing cubes.  Additional efficiencies have
          be made for the 0-degree rotation special case.
+      \end{itemize}
+
+   \item [\htmlref{THRESH}{THRESH}] \mbox{}
+      \begin{itemize}
+        \item New result parameters NUMHI, NUMLO, NUMRANGE, and NUMSAME
+         return the number of changed and unchanged pixels.
       \end{itemize}
 
 \end{description}

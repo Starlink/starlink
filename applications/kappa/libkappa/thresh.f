@@ -55,13 +55,6 @@
 *     IN = NDF  (Read)
 *        Input NDF structure containing the array to have thresholds
 *        applied.
-*     NEWLO = LITERAL (Read)
-*        This gives the value to which all input array-element values
-*        less than the lower threshold are set.  If this is set to
-*        "Bad", the bad value is substituted.  Numerical values of
-*        NEWLO must lie in within the minimum and maximum values of the
-*        data type of the array being processed.  The suggested default
-*        is the lower threshold.
 *     NEWHI = LITERAL (Read)
 *        This gives the value to which all input array-element values
 *        greater than the upper threshold are set.  If this is set to
@@ -70,12 +63,19 @@
 *        data type of the array being processed.  The suggested default
 *        is the upper threshold. This parameter is ignored if THRLO is
 *        greater than THRHI.
-*     NUMLO = _INTEGER (Write)
-*        The number of pixels whose values were thresholded as being
-*        less than the THRLO threshold.
+*     NEWLO = LITERAL (Read)
+*        This gives the value to which all input array-element values
+*        less than the lower threshold are set.  If this is set to
+*        "Bad", the bad value is substituted.  Numerical values of
+*        NEWLO must lie in within the minimum and maximum values of the
+*        data type of the array being processed.  The suggested default
+*        is the lower threshold.
 *     NUMHI = _INTEGER (Write)
 *        The number of pixels whose values were thresholded as being
 *        greater than the THRHI threshold.
+*     NUMLO = _INTEGER (Write)
+*        The number of pixels whose values were thresholded as being
+*        less than the THRLO threshold.
 *     NUMRANGE = _INTEGER (Write)
 *        The number of pixels whose values were thresholded as being
 *        between the THRLO and THRHI thresholds, if THRLO is greater
@@ -141,7 +141,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -151,8 +151,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
@@ -178,7 +178,7 @@
 *        Correct setting of bad pixel flag in output.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
-*     11-MAY-2009 (BRADC);:
+*     11-MAY-2009 (BRADC):
 *        Return number of changed and unchanged pixels via parameters.
 *     {enter_further_changes_here}
 

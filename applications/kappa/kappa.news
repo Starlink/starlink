@@ -61,6 +61,10 @@
       requirements for processing cubes.  Additional efficiencies have
       be made for the 0-degree rotation special case.
 
+   o THRESH
+      -  New result parameters NUMHI, NUMLO, NUMRANGE, and NUMSAME
+      return the number of changed and unchanged pixels.
+
 1 KAPPA_Version_1.9
 
    A new release of KAPPA (V1.9-11) is available.  The main changes
