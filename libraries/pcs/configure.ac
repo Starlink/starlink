@@ -1,7 +1,7 @@
 dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
-AC_INIT(pcs, 4.1-2, ussc@star.rl.ac.uk)
+AC_INIT(pcs, 4.1-3, ussc@star.rl.ac.uk)
 
 AC_PREREQ(2.50)
 AM_INIT_AUTOMAKE(1.8.2-starlink)
@@ -105,7 +105,7 @@ AC_LANG_PUSH([Fortran])
 AC_FC_CHECK_INTRINSICS([getarg get_command_argument iargc command_argument_count])
 AC_CHECK_FUNCS([getarg get_command_argument iargc command_argument_count])
 
-AC_FC_CHECK_INTRINSICS([getcwd chdir putenv])
+AC_FC_CHECK_INTRINSICS([getcwd chdir])
 AC_FC_OPEN_SPECIFIERS([readonly])
 
 AC_LANG_POP([Fortran])

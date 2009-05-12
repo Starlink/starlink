@@ -55,7 +55,9 @@
 *  Copyright:
 *     Copyright (C) 1991-1993 Science & Engineering Research Council.
 *     Copyright (C) 1995-1997, 2000 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Councils.
+*     Copyright (C) 2009 Science and Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -107,6 +109,8 @@
 *      4-FEB-2000 (AJC):
 *        Allow task action name in PAR_RESET message
 *        Strip quotes and blank following = from the setenv string
+*     11-MAY-2009 (BRADC):
+*        Replace intrinsic PUTENV with call to PSX_PUTENV.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -145,10 +149,6 @@
 #if HAVE_INTRINSIC_CHDIR
       INTRINSIC CHDIR            ! Change working directory
       INTEGER CHDIR
-#endif
-#if HAVE_INTRINSIC_PUTENV
-      INTRINSIC PUTENV           ! Set environment variable
-      INTEGER PUTENV
 #endif
 
 *  Local Variables:
@@ -218,7 +218,6 @@
 
       ELSE IF ( UACT .EQ. 'SETENV' ) THEN
 
-#if HAVE_INTRINSIC_PUTENV
 *   Strip quotes and blank following the = in the given string.
 *   This allows the string to be given quoted or unquoted in an ICL
 *   SEND command.
@@ -244,27 +243,11 @@
             LENGTH = CHR_LEN( DEFN )
 
 *   and set the environment variable
-            ISTAT = PUTENV( DEFN(1:LENGTH) )
-            IF ( ISTAT .NE. 0) THEN
+            CALL PSX_PUTENV( DEFN(1:EQPTR-1), DEFN(EQPTR+1:LENGTH),
+     :                       STATUS )
 
-*   Report failure to set environment variable
-               STATUS = DTASK__BADDEF
-               CALL EMS_REP( 'DTASK_CONTROL', 
-     :                    'Failed to set environment variable',
-     :                    STATUS )
-
-            ENDIF
          ENDIF
          
-#else
-
-         STATUS = DTASK__BADDEF
-         CALL EMS_REP( 'DTASK_CONTROL', 
-     :        'SETENV unimplemented',
-     :        STATUS )
-
-#endif
-
       ELSE IF ( UACT .EQ. 'PAR_RESET' ) THEN
          RVALUE = VALUE
 *  Find the action number
