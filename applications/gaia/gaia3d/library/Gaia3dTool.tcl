@@ -555,13 +555,16 @@ itcl::class gaia3d::Gaia3dTool {
    protected method add_cupid_controls_ {} {
       $itk_component(tab) add -label CUPID
       set w [$itk_component(tab) childsite CUPID]
-      
+
+      set lwidth 25
+
       #  Render any CUPID catalogues opened in the GAIA cube toolbox.
       itk_component add showcupidcat {
          gaia::StarLabelCheck $w.showcupidcat \
-            -text "Display CUPID catalogues:" \
+            -text "Display catalogues:" \
             -onvalue 1 \
             -offvalue 0 \
+            -labelwidth $lwidth \
             -variable [scope show_cupid_cat_] \
             -command [code $this changed_show_cupid_cat_]
       }
@@ -569,10 +572,28 @@ itcl::class gaia3d::Gaia3dTool {
       add_short_help $itk_component(showcupidcat) \
          {Show CUPID catalogue clumps, if any catalogues are available}
 
-      #  XXX more controls.
-      #  Like display selected rows,
-      #  Name the catalogues displayed and a colour for each.
-      #  Offer to import a catalogue, reuse dialog of main cube toolbox.
+      #   Just show the selected rows.
+      itk_component add showcupidselected {
+         gaia::StarLabelCheck $w.showcupidselected \
+            -text "Only show selected rows:" \
+            -onvalue 1 \
+            -offvalue 0 \
+            -labelwidth $lwidth \
+            -variable [scope show_cupid_selected_] \
+            -command [code $this changed_show_cupid_selected_]
+      }
+      pack $itk_component(showcupidselected) -fill x -expand 0 -ipady 5
+      add_short_help $itk_component(showcupidselected) \
+         {Only display rows selected in CUPID catalogues}
+
+      #  Quick import.
+      itk_component add cupidimport {
+         button $w.import \
+            -text "Import" \
+            -command [code $this import_cupid_catalogue_]
+      }
+      pack $itk_component(cupidimport) -side top -ipadx 1m -ipady 1m -pady 4m
+      add_short_help $itk_component(cupidimport) {Import another catalogue}
    }
 
    #  Control extra cubes isosurface toolbox.
@@ -765,6 +786,18 @@ itcl::class gaia3d::Gaia3dTool {
                $renwindow_ render
             }
          }
+      }
+   }
+
+   #  Import a CUPID catalogue. Uses the cube toolbox control.
+   protected method import_cupid_catalogue_ {} {
+      $itk_option(-gaiacube) make_cupid_importer
+   }
+
+   #  Change if selected CUPID clumps are shown, or all.
+   protected method changed_show_cupid_selected_ {} {
+      if { $drawn_ } {
+         draw
       }
    }
 
@@ -1088,11 +1121,13 @@ itcl::class gaia3d::Gaia3dTool {
                                -wcs [$imagedata_ get_wcs] \
                                -renwindow $renwindow_ \
                                -align_to_axis 1 \
-                               -axis [$itk_option(-gaiacube) get_axis]]
+                               -axis [$itk_option(-gaiacube) get_axis]\
+                               -selected $show_cupid_selected_]
             $cupid_cat_ set_importer $importer_
             $cupid_cat_ add_to_window
          } else {
             if { $cupid_cat_ != {} } {
+               $cupid_cat_ configure -selected $show_cupid_selected_
                if { $show_cupid_cat_ } {
                   #  Complete re-rendering so that new or removed regions are
                   #  revealed and removed.
@@ -1467,6 +1502,9 @@ itcl::class gaia3d::Gaia3dTool {
 
    #  CUPID catalogues handler.
    protected variable cupid_cat_ {}
+
+   #  Whether to show only selected objects.
+   protected variable show_cupid_selected_ 0
 
    #  The importer for the CUPID catalogue (gaia::GaiaCupidImporter).
    protected variable importer_ {}

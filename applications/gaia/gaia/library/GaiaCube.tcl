@@ -148,7 +148,7 @@ itcl::class gaia::GaiaCube {
       #  CUPID catalogue.
       add_menuitem $View command "Import CUPID catalogue..." \
          {Import a CUPID catalogue for display over the plane} \
-         -command [code $this make_cupid_importer_]
+         -command [code $this make_cupid_importer]
 
       #  Add the Options menu.
       set Options [add_menubutton "Options"]
@@ -974,8 +974,6 @@ itcl::class gaia::GaiaCube {
          #  catalogue, not the cube. Or transform catalogue values...
          set coord [get_plane_coord 0 0 0]
 
-
-
          set ::cupid(COORD) $coord
          if { $propagate } {
             $w_.cupidimporter replot
@@ -1591,7 +1589,6 @@ itcl::class gaia::GaiaCube {
                make_${type}_toolbox $basename $clone
             }
 
-
             #  Establish the CUPID catalogue handler. If already active.
             if { [winfo exists $w_.cupidimporter] } {
                renderers_set_cupid_importer_
@@ -1857,14 +1854,14 @@ itcl::class gaia::GaiaCube {
 
    #  Import a CUPID catalogue.
    public method import_cupid_cat {cat} {
-      make_cupid_importer_
+      make_cupid_importer
       $w_.cupidimporter open $cat
    }
 
    #  Create the CUPID catalogue importer. May import more than one, but only
    #  one importer for each instance of this. Any 3D uses query the importer
    #  for catalogues.
-   protected method make_cupid_importer_ {} {
+   public method make_cupid_importer {} {
       utilReUseWidget GaiaCupidImporter $w_.cupidimporter -gaiacube $this
       renderers_set_cupid_importer_
    }
