@@ -894,6 +894,7 @@ static int OverlapX( AstRegion *, AstRegion *, int * );
 static int RegDummyFS( AstRegion *, int * );
 static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int **, int * );
 static int SubFrame( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame **, int * );
+static int RegTrace( AstRegion *, int, double *, double **, int * );
 static int Unformat( AstFrame *, int, const char *, double *, int * );
 static int ValidateAxis( AstFrame *, int, const char *, int * );
 static void CheckPerm( AstFrame *, const int *, const char *, int * );
@@ -4141,6 +4142,7 @@ void astInitRegionVtab_(  AstRegionVtab *vtab, const char *name, int *status ) {
    vtab->TestFillFactor = TestFillFactor;
 
    vtab->ResetCache = ResetCache;
+   vtab->RegTrace = RegTrace;
    vtab->GetBounded = GetBounded;
    vtab->TestUnc = TestUnc;
    vtab->ClearUnc = ClearUnc;
@@ -9911,6 +9913,63 @@ static const char *SystemString( AstFrame *this_frame, AstSystemType system, int
 
 }
 
+static int RegTrace( AstRegion *this, int n, double *dist, double **ptr, int *status ){
+/*
+*+
+*  Name:
+*     astRegTrace
+
+*  Purpose:
+*     Return requested positions on the boundary of a 2D Region.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "region.h"
+*     int astRegTrace( AstRegion *this, int n, double *dist, double **ptr );
+
+*  Class Membership:
+*     Region virtual function 
+
+*  Description:
+*     This function returns positions on the boundary of the supplied
+*     Region, if possible. The required positions are indicated by a
+*     supplied list of scalar parameter values in the range zero to one.
+*     Zero corresponds to some arbitrary starting point on the boundary,
+*     and one corresponds to the end (which for a closed region will be 
+*     the same place as the start).
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+*     n
+*        The number of positions to return. If this is zero, the function
+*        returns without action (but the returned function value still
+*        indicates if the method is supported or not).
+*     dist
+*        Pointer to an array of "n" scalar parameter values in the range
+*        0 to 1.0.
+*     ptr 
+*        A pointer to an array of pointers. The number of elements in
+*        this array should equal tthe number of axes in the Frame spanned
+*        by the Region. Each element of the array should be a pointer to
+*        an array of "n" doubles, in which to return the "n" values for
+*        the corresponding axis. The contents of the arrays are unchanged
+*        if the supplied Region belongs to a class that does not
+*        implement this method.
+
+*  Returned Value:
+*     Non-zero if the astRegTrace method is implemented by the class
+*     of Region supplied, and zero if not.
+
+*-
+*/
+
+/* Concrete sub-classes of Region must over-ride this method. */
+   return 0;
+}
+
 static int TestAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
@@ -11953,6 +12012,10 @@ void astRegBaseBox2_( AstRegion *this, double *lbnd, double *ubnd, int *status )
 void astResetCache_( AstRegion *this, int *status ){
    if ( !astOK ) return;
    (**astMEMBER(this,Region,ResetCache))( this, status );
+}
+int astRegTrace_( AstRegion *this, int n, double *dist, double **ptr, int *status ){
+   if ( !astOK ) return 0;
+   return (**astMEMBER(this,Region,RegTrace))( this, n, dist, ptr, status );
 }
 void astGetRegionBounds_( AstRegion *this, double *lbnd, double *ubnd, int *status ){
    if ( !astOK ) return;

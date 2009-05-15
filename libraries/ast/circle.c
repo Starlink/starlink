@@ -164,6 +164,7 @@ static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, 
 static double *CircumPoint( AstFrame *, int, const double *, double, int * );
 static double *RegCentre( AstRegion *this, double *, double **, int, int, int * );
 static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int **, int * );
+static int RegTrace( AstRegion *, int, double *, double **, int * );
 static void Cache( AstCircle *, int * );
 static void CalcPars( AstFrame *, AstPointSet *, double *, double *, double *, int * );
 static void CirclePars( AstCircle *, double *, double *, double *, int * );
@@ -732,6 +733,7 @@ void astInitCircleVtab_(  AstCircleVtab *vtab, const char *name, int *status ) {
    region->ResetCache = ResetCache;
 
    region->RegPins = RegPins;
+   region->RegTrace = RegTrace;
    region->RegBaseMesh = RegBaseMesh;
    region->RegBaseBox = RegBaseBox;
    region->RegCentre = RegCentre;
@@ -1522,6 +1524,150 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
       result = 0;
       if( mask ) *mask = astAnnul( *mask );
    }
+
+/* Return the result. */
+   return result;
+}
+
+static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr, 
+                     int *status ){
+/*
+*+
+*  Name:
+*     RegTrace
+
+*  Purpose:
+*     Return requested positions on the boundary of a 2D Region.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "circle.h"
+*     int astTraceRegion( AstRegion *this, int n, double *dist, double **ptr );
+
+*  Class Membership:
+*     Circle member function (overrides the astTraceRegion method
+*     inherited from the parent Region class).
+
+*  Description:
+*     This function returns positions on the boundary of the supplied
+*     Region, if possible. The required positions are indicated by a
+*     supplied list of scalar parameter values in the range zero to one.
+*     Zero corresponds to some arbitrary starting point on the boundary,
+*     and one corresponds to the end (which for a closed region will be 
+*     the same place as the start).
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+*     n
+*        The number of positions to return. If this is zero, the function
+*        returns without action (but the returned function value still
+*        indicates if the method is supported or not).
+*     dist
+*        Pointer to an array of "n" scalar parameter values in the range
+*        0 to 1.0.
+*     ptr 
+*        A pointer to an array of pointers. The number of elements in
+*        this array should equal tthe number of axes in the Frame spanned
+*        by the Region. Each element of the array should be a pointer to
+*        an array of "n" doubles, in which to return the "n" values for
+*        the corresponding axis. The contents of the arrays are unchanged
+*        if the supplied Region belongs to a class that does not
+*        implement this method.
+
+*  Returned Value:
+*     Non-zero if the astTraceRegion method is implemented by the class
+*     of Region supplied, and zero if not.
+
+*-
+*/
+
+/* Local Variables; */
+   AstCircle *this;
+   AstFrame *frm;
+   AstMapping *map;
+   AstPointSet *bpset;
+   AstPointSet *cpset;
+   double **bptr;
+   double angle;
+   double p[ 2 ];
+   int i;
+   int ncur;
+   int result;         
+
+/* Initialise */
+   result = 0;
+
+/* Check inherited status. */
+   if( ! astOK ) return result;
+
+/* Get a pointer to the base Frame in the encapsulated FrameSet. */
+   frm = astGetFrame( this_region->frameset, AST__BASE );
+
+/* Check it is 2-dimensional. */
+   if( astGetNaxes( frm ) == 2 ) result = 1;
+
+/* Check we have some points to find. */
+   if( result && n > 0 ) {
+
+/* Get a pointer to the Circle structure. */
+      this = (AstCircle *) this_region;
+
+/* Ensure cached information is available. */
+      Cache( this, status );
+
+/* We first determine the required positions in the base Frame of the
+   Region, and then transform them into the current Frame. Get the 
+   base->current Mapping, and the number of current Frame axes. */
+      map = astGetMapping( this_region->frameset, AST__BASE, AST__CURRENT );
+
+/* If it's a UnitMap we do not need to do the transformation, so put the
+   base Frame positions directly into the supplied arrays. */
+      if( astIsAUnitMap( map ) ) {
+         bpset = NULL;
+         bptr = ptr;
+         ncur = 2;
+
+/* Otherwise, create a PointSet to hold the base Frame positions. */
+      } else {
+         bpset = astPointSet( n, 2, " ", status );
+         bptr = astGetPoints( bpset );
+         ncur = astGetNout( map );
+      }
+
+/* Check the pointers can be used safely. */
+      if( astOK ) {
+
+/* Loop round each point. Get the angle around the circle, and offset
+   along that angle to find the point that is one radius away from the
+   centre. Copy the results into the required arrays. */
+         for( i = 0; i < n; i++ ) {
+            angle = dist[ i ]*2*AST__DPI;
+            astOffset2( frm, this->centre, angle, this->radius, p );
+            bptr[ 0 ][ i ] = p[ 0 ];
+            bptr[ 1 ][ i ] = p[ 1 ];
+         }
+
+      }
+
+/* If required, transform the base frame positions into the current
+   Frame, storing them in the supplied array. Then free resources. */
+      if( bpset ) {
+         cpset = astPointSet( n, ncur, " ", status );
+         astSetPoints( cpset, ptr );
+   
+         (void) astTransform( map, bpset, 1, cpset );
+   
+         cpset = astAnnul( cpset );
+         bpset = astAnnul( bpset );
+      }
+
+/* Free remaining resources. */
+      map = astAnnul( map );
+   }
+   frm = astAnnul( frm );
 
 /* Return the result. */
    return result;

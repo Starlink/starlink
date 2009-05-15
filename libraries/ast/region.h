@@ -152,6 +152,7 @@ typedef struct AstRegionVtab {
    AstRegion *(* GetDefUnc)( AstRegion *, int * );
    AstRegion *(* RegBasePick)( AstRegion *this, int, const int *, int * );
    void (* ResetCache)( AstRegion *, int * );
+   int (* RegTrace)( AstRegion *, int, double *, double **, int * );
    void (* SetUnc)( AstRegion *, AstRegion *, int * );
    void (* SetRegFS)( AstRegion *, AstFrame *, int * );
    double *(* RegCentre)( AstRegion *, double *, double **, int, int, int * );
@@ -299,6 +300,7 @@ void astSetRegFS_( AstRegion *, AstFrame *, int * );
 double *astRegCentre_( AstRegion *, double *, double **, int, int, int * );
 double *astRegTranPoint_( AstRegion *, double *, int, int, int * );
 void astResetCache_( AstRegion *, int * );
+int astRegTrace_( AstRegion *, int, double *, double **, int * );
 
 int astGetNegated_( AstRegion *, int * );
 int astTestNegated_( AstRegion *, int * );
@@ -444,6 +446,7 @@ astINVOKE(V,astGetRegionPoints_(astCheckRegion(this),maxpoint,maxcoord,npoint,po
 #define astSetRegFS(this,frm) astINVOKE(V,astSetRegFS_(astCheckRegion(this),astCheckFrame(frm),STATUS_PTR))
 #define astTestUnc(this) astINVOKE(V,astTestUnc_(astCheckRegion(this),STATUS_PTR))
 #define astResetCache(this) astINVOKE(V,astResetCache_(astCheckRegion(this),STATUS_PTR))
+#define astRegTrace(this,n,dist,ptr) astINVOKE(V,astRegTrace_(astCheckRegion(this),n,dist,ptr,STATUS_PTR))
 
 /* Since a NULL PointSet pointer is acceptable for "out", we must omit the 
    argument checking in that case. (But unfortunately, "out" then gets 

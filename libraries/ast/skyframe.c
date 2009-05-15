@@ -4985,21 +4985,23 @@ static void LineOffset( AstFrame *this, AstLineDef *line, double par,
    } else {
 
 /* Get a pointer to the SkyLineDef structure. */ 
-       sl = (SkyLineDef *) line;
+      sl = (SkyLineDef *) line;
 
 /* Move a distance par from start to end. */
-       c = cos( par );
-       s = sin( par );
-       nx = c * sl->start[ 0 ] + s * sl->q[ 0 ];
-       ny = c * sl->start[ 1 ] + s * sl->q[ 1 ];
-       nz = c * sl->start[ 2 ] + s * sl->q[ 2 ];
+      c = cos( par );
+      s = sin( par );
+      nx = c * sl->start[ 0 ] + s * sl->q[ 0 ];
+      ny = c * sl->start[ 1 ] + s * sl->q[ 1 ];
+      nz = c * sl->start[ 2 ] + s * sl->q[ 2 ];
 
 /* Move a distance prp from this point towards the pole point. */
-       c = cos( prp );
-       s = sin( prp );
-       v[ 0 ] = c * nx + s * sl->dir[ 0 ];
-       v[ 1 ] = c * ny + s * sl->dir[ 1 ];
-       v[ 2 ] = c * nz + s * sl->dir[ 2 ];
+      if( prp != 0.0 ) {
+         c = cos( prp );
+         s = sin( prp );
+         v[ 0 ] = c * nx + s * sl->dir[ 0 ];
+         v[ 1 ] = c * ny + s * sl->dir[ 1 ];
+         v[ 2 ] = c * nz + s * sl->dir[ 2 ];
+      }
 
 /* Convert to lon/lat */
       palSlaDcc2s( v, p, p + 1 );

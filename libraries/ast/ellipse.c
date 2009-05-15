@@ -164,6 +164,7 @@ static AstPointSet *RegBaseMesh( AstRegion *, int * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
 static double *RegCentre( AstRegion *this, double *, double **, int, int, int * );
 static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int **, int * );
+static int RegTrace( AstRegion *, int, double *, double **, int * );
 static void Cache( AstEllipse *, int * );
 static void CalcPars( AstFrame *, double[2], double[2], double[2], double *, double *, double *, int * );
 static void Copy( const AstObject *, AstObject *, int * );
@@ -546,6 +547,7 @@ void astInitEllipseVtab_(  AstEllipseVtab *vtab, const char *name, int *status )
    region->RegBaseMesh = RegBaseMesh;
    region->RegBaseBox = RegBaseBox;
    region->RegCentre = RegCentre;
+   region->RegTrace = RegTrace;
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
@@ -1508,14 +1510,16 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    found above. */
       p1[ 0 ] = this->a + 0.5*drad;
       p1[ 1 ] = this->b + 0.5*drad;
-      large_ellipse = astEllipse( frm, 1, this->centre, p1, &(this->angle), NULL, "", status );
+      large_ellipse = astEllipse( frm, 1, this->centre, p1, &(this->angle), 
+                                  NULL, " ", status );
 
       p1[ 0 ] = this->a - 0.5*drad;
       p1[ 1 ] = this->b - 0.5*drad;
       lim = 1.0E-6*drad;
       if( p1[ 0 ] < lim ) p1[ 0 ] = lim;
       if( p1[ 1 ] < lim ) p1[ 1 ] = lim;
-      small_ellipse = astEllipse( frm, 1, this->centre, p1, &(this->angle), NULL, "", status );
+      small_ellipse = astEllipse( frm, 1, this->centre, p1, &(this->angle), 
+                                  NULL, " ", status );
 
 /* Negate the smaller region.*/
       astNegate( small_ellipse );
@@ -1596,6 +1600,172 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 
 /* Return the result. */
    return result;
+}
+
+static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr, 
+                     int *status ){
+/*
+*+
+*  Name:
+*     RegTrace
+
+*  Purpose:
+*     Return requested positions on the boundary of a 2D Region.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "ellipse.h"
+*     int astTraceRegion( AstRegion *this, int n, double *dist, double **ptr );
+
+*  Class Membership:
+*     Ellipse member function (overrides the astTraceRegion method
+*     inherited from the parent Region class).
+
+*  Description:
+*     This function returns positions on the boundary of the supplied
+*     Region, if possible. The required positions are indicated by a
+*     supplied list of scalar parameter values in the range zero to one.
+*     Zero corresponds to some arbitrary starting point on the boundary,
+*     and one corresponds to the end (which for a closed region will be 
+*     the same place as the start).
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+*     n
+*        The number of positions to return. If this is zero, the function
+*        returns without action (but the returned function value still
+*        indicates if the method is supported or not).
+*     dist
+*        Pointer to an array of "n" scalar parameter values in the range
+*        0 to 1.0.
+*     ptr 
+*        A pointer to an array of pointers. The number of elements in
+*        this array should equal tthe number of axes in the Frame spanned
+*        by the Region. Each element of the array should be a pointer to
+*        an array of "n" doubles, in which to return the "n" values for
+*        the corresponding axis. The contents of the arrays are unchanged
+*        if the supplied Region belongs to a class that does not
+*        implement this method.
+
+*  Returned Value:
+*     Non-zero if the astTraceRegion method is implemented by the class
+*     of Region supplied, and zero if not.
+
+*-
+*/
+
+/* Local Variables; */
+   AstEllipse *this;
+   AstFrame *frm;
+   AstMapping *map;
+   AstPointSet *bpset;
+   AstPointSet *cpset;
+   double **bptr;
+   double ang;
+   double angle;
+   double dx;
+   double dy;
+   double p2[ 2 ];
+   double p[ 2 ];
+   int i;
+   int ncur;
+
+/* Check inherited status, and the number of points to return, returning
+   a non-zero value to indicate that this class supports the astRegTrace 
+   method. */
+   if( ! astOK || n == 0 ) return 1;
+
+/* Get a pointer to the Ellipse structure. */
+   this = (AstEllipse *) this_region;
+
+/* Ensure cached information is available. */
+   Cache( this, status );
+
+/* Get a pointer to the base Frame in the encapsulated FrameSet. */
+   frm = astGetFrame( this_region->frameset, AST__BASE );
+
+/* We first determine the required positions in the base Frame of the
+   Region, and then transform them into the current Frame. Get the 
+   base->current Mapping, and the number of current Frame axes. */
+   map = astGetMapping( this_region->frameset, AST__BASE, AST__CURRENT );
+
+/* If it's a UnitMap we do not need to do the transformation, so put the
+   base Frame positions directly into the supplied arrays. */
+   if( astIsAUnitMap( map ) ) {
+      bpset = NULL;
+      bptr = ptr;
+      ncur = 2;
+
+/* Otherwise, create a PointSet to hold the base Frame positions (known
+   to be 2D since this is an ellipse). */
+   } else {
+      bpset = astPointSet( n, 2, " ", status );
+      bptr = astGetPoints( bpset );
+      ncur = astGetNout( map );
+   }
+
+/* Check the pointers can be used safely. */
+   if( astOK ) {
+
+/* Loop round each point. */
+      for( i = 0; i < n; i++ ) {
+
+/* The supplied scalar parameter values are the parametric angles, phi, 
+   where the ellipse is defined by:
+
+   dx = a.cos( phi )
+   dy = a.sin( phi )
+
+   measured from the primary ellipse. Positive in the sense of rotation from
+   axis 2 to axis 1.  */
+         angle = dist[ i ]*2*AST__DPI;
+
+/* Find the offsets from the centre. "dx" is geodesic distance along the
+   primary axis, and dy is geodesic distance along the secondary axis. */
+         dx = this->a*cos( angle );
+         dy = this->b*sin( angle );
+
+/* Now find the point which corresponds to this dx and dy, taking account
+   of the potential spherical geometry of hte coordinate system. First
+   move a distance "dx" from the centre along the primary axis. The
+   function value returned is the direction of the geodesic curve at the 
+   end point. That is, the angle (in radians) between the positive direction 
+   of the second axis and the continuation of the geodesic curve at the 
+   requested end point. */
+         ang = astOffset2( frm, this->centre, this->angle, dx, p );
+
+/* Now move a distance "dy" from the point found above at right angles to
+   the primary axis. */
+         astOffset2( frm, p, ang + AST__DPIBY2, dy, p2 );
+
+/* Store the resulting axis values. */
+         bptr[ 0 ][ i ] = p2[ 0 ];
+         bptr[ 1 ][ i ] = p2[ 1 ];
+      }
+   }
+
+/* If required, transform the base frame positions into the current
+   Frame, storing them in the supplied array. Then free resources. */
+   if( bpset ) {
+      cpset = astPointSet( n, ncur, " ", status );
+      astSetPoints( cpset, ptr );
+
+      (void) astTransform( map, bpset, 1, cpset );
+
+      cpset = astAnnul( cpset );
+      bpset = astAnnul( bpset );
+   }
+
+/* Free remaining resources. */
+   map = astAnnul( map );
+   frm = astAnnul( frm );
+
+/* Return a non-zero value to indicate that this class supports the
+   astRegTrace method. */
+   return 1;
 }
 
 static void ResetCache( AstRegion *this, int *status ){
@@ -2650,7 +2820,7 @@ AstEllipse *astInitEllipse_( void *mem, size_t size, int init, AstEllipseVtab *v
 
 /* Create a PointSet to hold the supplied values, and get points to the
    data arrays. */
-   pset = astPointSet( 3, nc, "", status );
+   pset = astPointSet( 3, nc, " ", status );
    ptr = astGetPoints( pset );
 
 /* Copy the supplied coordinates into the PointSet, checking that no bad 

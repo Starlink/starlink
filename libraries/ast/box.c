@@ -198,6 +198,7 @@ static int GetObjSize( AstObject *, int * );
 static int MakeGrid( int, double **, int, double *, double *, int, int, double, int * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
 static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int **, int * );
+static int RegTrace( AstRegion *, int, double *, double **, int * );
 static void BoxPoints( AstBox *, double *, double *, int *);
 static void Cache( AstBox *, int, int * );
 static void ClearClosed( AstRegion *, int * );
@@ -1214,6 +1215,7 @@ void astInitBoxVtab_(  AstBoxVtab *vtab, const char *name, int *status ) {
    region->RegBasePick = RegBasePick;
    region->RegBaseBox = RegBaseBox;
    region->RegPins = RegPins;
+   region->RegTrace = RegTrace;
    region->RegCentre = RegCentre;
 
 /* Declare the copy constructor, destructor and class dump
@@ -3225,6 +3227,165 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    if( !astOK ) {
       result = 0;
       if( mask ) *mask = astAnnul( *mask );
+   }
+
+/* Return the result. */
+   return result;
+}
+
+static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr, 
+                     int *status ){
+/*
+*+
+*  Name:
+*     RegTrace
+
+*  Purpose:
+*     Return requested positions on the boundary of a 2D Region.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "box.h"
+*     int astTraceRegion( AstRegion *this, int n, double *dist, double **ptr );
+
+*  Class Membership:
+*     Box member function (overrides the astTraceRegion method
+*     inherited from the parent Region class).
+
+*  Description:
+*     This function returns positions on the boundary of the supplied
+*     Region, if possible. The required positions are indicated by a
+*     supplied list of scalar parameter values in the range zero to one.
+*     Zero corresponds to some arbitrary starting point on the boundary,
+*     and one corresponds to the end (which for a closed region will be 
+*     the same place as the start).
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+*     n
+*        The number of positions to return. If this is zero, the function
+*        returns without action (but the returned function value still
+*        indicates if the method is supported or not).
+*     dist
+*        Pointer to an array of "n" scalar parameter values in the range
+*        0 to 1.0.
+*     ptr 
+*        A pointer to an array of pointers. The number of elements in
+*        this array should equal tthe number of axes in the Frame spanned
+*        by the Region. Each element of the array should be a pointer to
+*        an array of "n" doubles, in which to return the "n" values for
+*        the corresponding axis. The contents of the arrays are unchanged
+*        if the supplied Region belongs to a class that does not
+*        implement this method.
+
+*  Returned Value:
+*     Non-zero if the astTraceRegion method is implemented by the class
+*     of Region supplied, and zero if not.
+
+*-
+*/
+
+/* Local Variables; */
+   AstMapping *map;
+   AstPointSet *bpset;
+   AstPointSet *cpset;
+   double **bptr;
+   double d;
+   double lbnd[ 2 ];
+   double ubnd[ 2 ];
+   int i;
+   int ncur;
+   int result;         
+
+/* Initialise */
+   result = 0;
+
+/* Check inherited status. */
+   if( ! astOK ) return result;
+
+/* Check it is 2-dimensional. */
+   if( astGetNin( this_region->frameset ) == 2 ) result = 1;
+
+/* Check we have some points to find. */
+   if( result && n > 0 ) {
+
+/* We first determine the required positions in the base Frame of the
+   Region, and then transform them into the current Frame. Get the 
+   base->current Mapping, and the number of current Frame axes. */
+      map = astGetMapping( this_region->frameset, AST__BASE, AST__CURRENT );
+
+/* If it's a UnitMap we do not need to do the transformation, so put the
+   base Frame positions directly into the supplied arrays. */
+      if( astIsAUnitMap( map ) ) {
+         bpset = NULL;
+         bptr = ptr;
+         ncur = 2;
+
+/* Otherwise, create a PointSet to hold the base Frame positions. */
+      } else {
+         bpset = astPointSet( n, 2, " ", status );
+         bptr = astGetPoints( bpset );
+         ncur = astGetNout( map );
+      }
+
+/* Check the pointers can be used safely. */
+      if( astOK ) {
+
+/* Get the bounds of the Region in the base Frame. */
+         astRegBaseBox( this_region, lbnd, ubnd );
+
+/* Loop round each point. Each edge of the box covers a parameteric
+   distance of 0.25, regardless of the aspect ratio of the box. */
+         for( i = 0; i < n; i++ ) {
+
+/* The right hand edge starts at 0.75 (parameter increases top to bottom). */
+            d = 4*dist[ i ] - 3;
+            if( d > 0 ) {
+               bptr[ 0 ][ i ] = ubnd[ 0 ];
+               bptr[ 1 ][ i ] = ( 1.0 - d )*ubnd[ 1 ] + d*lbnd[ 1 ];
+
+/* The top edge starts at 0.5 (parameter increases left to right). */
+            } else {
+               d += 1.0;
+               if( d > 0 ) {
+                  bptr[ 0 ][ i ] = ( 1.0 - d )*lbnd[ 0 ] + d*ubnd[ 0 ];
+                  bptr[ 1 ][ i ] = ubnd[ 1 ];
+
+/* The left hand edge starts at 0.25 (parameter increases bottom to top). */
+               } else {
+                  d += 1.0;
+                  if( d > 0 ) {
+                     bptr[ 0 ][ i ] = lbnd[ 0 ];
+                     bptr[ 1 ][ i ] = ( 1.0 - d )*lbnd[ 1 ] + d*ubnd[ 1 ];
+
+/* The bottom edge starts at 0.0 (parameter increases right to left). */
+                  } else {
+                     d += 1.0;
+                     bptr[ 0 ][ i ] = ( 1.0 - d )*ubnd[ 0 ] + d*lbnd[ 0 ];
+                     bptr[ 1 ][ i ] = lbnd[ 1 ];
+                  }
+               }
+            }
+         }
+      }
+
+/* If required, transform the base frame positions into the current
+   Frame, storing them in the supplied array. Then free resources. */
+      if( bpset ) {
+         cpset = astPointSet( n, ncur, " ", status );
+         astSetPoints( cpset, ptr );
+   
+         (void) astTransform( map, bpset, 1, cpset );
+   
+         cpset = astAnnul( cpset );
+         bpset = astAnnul( bpset );
+      }
+
+/* Free remaining resources. */
+      map = astAnnul( map );
    }
 
 /* Return the result. */

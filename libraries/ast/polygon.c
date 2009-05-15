@@ -184,6 +184,7 @@ static AstPointSet *RegBaseMesh( AstRegion *, int * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
 static double Polywidth( AstFrame *, AstLineDef **, int, int, double[ 2 ], int * );
 static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int **, int * );
+static int RegTrace( AstRegion *, int, double *, double **, int * );
 static void Cache( AstPolygon *, int * );
 static void Copy( const AstObject *, AstObject *, int * );
 static void Delete( AstObject *, int * );
@@ -239,7 +240,7 @@ static void Cache( AstPolygon *this, int *status ){
 /* Check the global error status. */
    if ( !astOK ) return;
 
-/* Do Nothing if the cached information is up to date. */
+/* Do nothing if the cached information is up to date. */
    if( this->stale ) {
 
 /* Get a pointer to the base Frame. */
@@ -260,20 +261,28 @@ static void Cache( AstPolygon *this, int *status ){
 /* Allocate memory to store new edge information if necessary. */
       } else {
          this->edges = astMalloc( sizeof( AstLineDef *)*(size_t) nv );
+         this->startsat = astMalloc( sizeof( double )*(size_t) nv );
       }
    
 /* Check pointers can be used safely. */
       if( this->edges ) {
    
-/* Create and store a description of each edge. */
-         start[ 0 ] = ptr[ 0 ][ nv - 1];
-         start[ 1 ] = ptr[ 1 ][ nv - 1];
+/* Create and store a description of each edge. Also form the total
+   distance round the polygon, and the distance from the first vertex
+   at which each edge starts. */
+         this->totlen = 0.0;
+         start[ 0 ] = ptr[ 0 ][ nv - 1 ];
+         start[ 1 ] = ptr[ 1 ][ nv - 1 ];
+
          for( i = 0; i < nv; i++ ) {
             end[ 0 ] = ptr[ 0 ][ i ];
             end[ 1 ] = ptr[ 1 ][ i ];
             this->edges[ i ] = astLineDef( frm, start, end );
             start[ 0 ] = end[ 0 ];
             start[ 1 ] = end[ 1 ];
+
+            this->startsat[ i ] = this->totlen;
+            this->totlen += this->edges[ i ]->length;
          }     
 
 /* We now look for a point that is inside the polygon. We want a point
@@ -315,7 +324,6 @@ static void Cache( AstPolygon *this, int *status ){
 
 /* Indicate cached information is up to date. */
       this->stale = 0;
-
    }
 }
 
@@ -401,6 +409,7 @@ void astInitPolygonVtab_(  AstPolygonVtab *vtab, const char *name, int *status )
    region->RegPins = RegPins;
    region->RegBaseMesh = RegBaseMesh;
    region->RegBaseBox = RegBaseBox;
+   region->RegTrace = RegTrace;
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
@@ -1165,6 +1174,187 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    return result;
 }
 
+static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr, 
+                     int *status ){
+/*
+*+
+*  Name:
+*     RegTrace
+
+*  Purpose:
+*     Return requested positions on the boundary of a 2D Region.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "polygon.h"
+*     int astTraceRegion( AstRegion *this, int n, double *dist, double **ptr );
+
+*  Class Membership:
+*     Polygon member function (overrides the astTraceRegion method
+*     inherited from the parent Region class).
+
+*  Description:
+*     This function returns positions on the boundary of the supplied
+*     Region, if possible. The required positions are indicated by a
+*     supplied list of scalar parameter values in the range zero to one.
+*     Zero corresponds to some arbitrary starting point on the boundary,
+*     and one corresponds to the end (which for a closed region will be 
+*     the same place as the start).
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+*     n
+*        The number of positions to return. If this is zero, the function
+*        returns without action (but the returned function value still
+*        indicates if the method is supported or not).
+*     dist
+*        Pointer to an array of "n" scalar parameter values in the range
+*        0 to 1.0.
+*     ptr 
+*        A pointer to an array of pointers. The number of elements in
+*        this array should equal tthe number of axes in the Frame spanned
+*        by the Region. Each element of the array should be a pointer to
+*        an array of "n" doubles, in which to return the "n" values for
+*        the corresponding axis. The contents of the arrays are unchanged
+*        if the supplied Region belongs to a class that does not
+*        implement this method.
+
+*  Returned Value:
+*     Non-zero if the astTraceRegion method is implemented by the class
+*     of Region supplied, and zero if not.
+
+*-
+*/
+
+/* Local Variables; */
+   AstFrame *frm;
+   AstMapping *map;
+   AstPointSet *bpset;
+   AstPointSet *cpset;
+   AstPolygon *this;
+   double **bptr;
+   double d;
+   double p[ 2 ];
+   int i;
+   int j0;
+   int j;
+   int ncur;
+   int nv;
+   int monotonic;        
+
+/* Check inherited status, and the number of points to return, returning
+   a non-zero value to indicate that this class supports the astRegTrace 
+   method. */
+   if( ! astOK || n == 0 ) return 1;
+
+/* Get a pointer to the Polygon structure. */
+   this = (AstPolygon *) this_region;
+
+/* Ensure cached information is available. */
+   Cache( this, status );
+
+/* Get a pointer to the base Frame in the encapsulated FrameSet. */
+   frm = astGetFrame( this_region->frameset, AST__BASE );
+
+/* We first determine the required positions in the base Frame of the
+   Region, and then transform them into the current Frame. Get the 
+   base->current Mapping, and the number of current Frame axes. */
+   map = astGetMapping( this_region->frameset, AST__BASE, AST__CURRENT );
+
+/* If it's a UnitMap we do not need to do the transformation, so put the
+   base Frame positions directly into the supplied arrays. */
+   if( astIsAUnitMap( map ) ) {
+      bpset = NULL;
+      bptr = ptr;
+      ncur = 2;
+
+/* Otherwise, create a PointSet to hold the base Frame positions (known
+   to be 2D since this is an polygon). */
+   } else {
+      bpset = astPointSet( n, 2, " ", status );
+      bptr = astGetPoints( bpset );
+      ncur = astGetNout( map );
+   }
+
+/* Check the pointers can be used safely. */
+   if( astOK ) {
+
+/* Get the number of vertices. */
+      nv = astGetNpoint( this_region->points );
+   
+/* If we have a reasonable number of pointsand there are a reasonable
+   number of vertices, we can be quicker if we know if the parameteric 
+   distances are monotonic increasing. Find out now. */
+      if( n > 5 && nv > 5 ) {
+
+         monotonic = 1;
+         for( i = 0; i < n; i++ ) {
+            if( dist[ i + 1 ] < dist[ i ] ) {
+               monotonic = 0;
+               break;
+            }
+         }
+
+      } else {
+         monotonic = 0;
+      }
+
+/* Loop round each point. */
+      j0 = 1;
+      for( i = 0; i < n; i++ ) {
+
+/* Get the required round the polygon, starting from vertex zero. */
+         d = dist[ i ]*this->totlen;
+
+/* Loop round each vertex until we find one which is beyond the required
+   point. If the supplied distances are monotonic increasing, we can
+   start the checks at the same vertex that was used for the previous 
+   since we know there will never be a backward step. */
+         for( j = j0; j < nv; j++ ) {
+            if( this->startsat[ j ] > d ) break;
+         }
+
+/* If the distances are monotonic increasing, record the vertex that we
+   have reached so far. */
+         if( monotonic ) j0 = j;
+
+/* Find the distance to travel beyond the previous vertex. */
+         d -= this->startsat[ j - 1 ];
+
+/* Find the position, that is the required distance from the previous
+   vertex towards the next vertex. */
+         astLineOffset( frm, this->edges[ j - 1 ], d, 0.0, p );
+
+/* Store the resulting axis values. */
+         bptr[ 0 ][ i ] = p[ 0 ];
+         bptr[ 1 ][ i ] = p[ 1 ];
+      }
+   }
+
+/* If required, transform the base frame positions into the current
+   Frame, storing them in the supplied array. Then free resources. */
+   if( bpset ) {
+      cpset = astPointSet( n, ncur, " ", status );
+      astSetPoints( cpset, ptr );
+
+      (void) astTransform( map, bpset, 1, cpset );
+
+      cpset = astAnnul( cpset );
+      bpset = astAnnul( bpset );
+   }
+
+/* Free remaining resources. */
+   map = astAnnul( map );
+   frm = astAnnul( frm );
+
+/* Return a non-zero value to indicate that this class supports the
+   astRegTrace method. */
+   return 1;
+}
+
 static void ResetCache( AstRegion *this, int *status ){
 /*
 *  Name:
@@ -1698,6 +1888,7 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
 /* For safety, first clear any references to the input memory from
    the output Polygon. */
    out->edges = NULL;
+   out->startsat = NULL;
 
 /* Indicate cached information needs nre-calculating. */
    astResetCache( (AstPolygon *) out );
@@ -1764,6 +1955,7 @@ static void Delete( AstObject *obj, int *status ) {
          this->edges[ i ] = astFree( this->edges[ i ] );
       }
       this->edges = astFree( this->edges );
+      this->startsat = astFree( this->startsat );
 
    }
 }
@@ -2275,6 +2467,8 @@ AstPolygon *astInitPolygon_( void *mem, size_t size, int init, AstPolygonVtab *v
          new->lbnd[ 1 ] = AST__BAD;
          new->ubnd[ 1 ] = AST__BAD;
          new->edges = NULL;
+         new->startsat = NULL;
+         new->totlen = 0.0;
          new->stale = 1;
 
 /* If an error occurred, clean up by deleting the new Polygon. */
@@ -2424,6 +2618,8 @@ AstPolygon *astLoadPolygon_( void *mem, size_t size, AstPolygonVtab *vtab,
       new->lbnd[ 1 ] = AST__BAD;
       new->ubnd[ 1 ] = AST__BAD;
       new->edges = NULL;
+      new->startsat = NULL;
+      new->totlen = 0.0;
       new->stale = 1;
 
 /* If an error occurred, clean up by deleting the new Polygon. */

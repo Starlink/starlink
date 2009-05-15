@@ -197,6 +197,7 @@ static int GetBounded( AstRegion *, int * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
 static int Overlap( AstRegion *, AstRegion *, int * );
 static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int **, int * );
+static int RegTrace( AstRegion *, int, double *, double **, int * );
 static void Copy( const AstObject *, AstObject *, int * );
 static void Delete( AstObject *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
@@ -805,6 +806,7 @@ void astInitIntervalVtab_(  AstIntervalVtab *vtab, const char *name, int *status
    region->GetBounded = GetBounded;
    region->GetDefUnc = GetDefUnc;
    region->RegPins = RegPins;
+   region->RegTrace = RegTrace;
    region->RegBaseMesh = RegBaseMesh;
    region->BndBaseMesh = BndBaseMesh;
    region->RegBaseBox = RegBaseBox;
@@ -2867,6 +2869,83 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 /* Return the result. */
    return result;
 }
+
+static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr, 
+                     int *status ){
+/*
+*+
+*  Name:
+*     RegTrace
+
+*  Purpose:
+*     Return requested positions on the boundary of a 2D Region.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "interval.h"
+*     int astTraceRegion( AstRegion *this, int n, double *dist, double **ptr );
+
+*  Class Membership:
+*     Interval member function (overrides the astTraceRegion method
+*     inherited from the parent Region class).
+
+*  Description:
+*     This function returns positions on the boundary of the supplied
+*     Region, if possible. The required positions are indicated by a
+*     supplied list of scalar parameter values in the range zero to one.
+*     Zero corresponds to some arbitrary starting point on the boundary,
+*     and one corresponds to the end (which for a closed region will be 
+*     the same place as the start).
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+*     n
+*        The number of positions to return. If this is zero, the function
+*        returns without action (but the returned function value still
+*        indicates if the method is supported or not).
+*     dist
+*        Pointer to an array of "n" scalar parameter values in the range
+*        0 to 1.0.
+*     ptr 
+*        A pointer to an array of pointers. The number of elements in
+*        this array should equal tthe number of axes in the Frame spanned
+*        by the Region. Each element of the array should be a pointer to
+*        an array of "n" doubles, in which to return the "n" values for
+*        the corresponding axis. The contents of the arrays are unchanged
+*        if the supplied Region belongs to a class that does not
+*        implement this method.
+
+*  Returned Value:
+*     Non-zero if the astTraceRegion method is implemented by the class
+*     of Region supplied, and zero if not.
+
+*-
+*/
+
+/* Local Variables; */
+   AstBox *box;
+   int result;         
+
+/* Initialise */
+   result = 0;
+
+/* Check inherited status. */
+   if( ! astOK ) return result;
+
+/* If the Interval is effectively a Box, invoke the astRegTrace function on 
+   the equivalent Box. A pointer to the equivalent Box will be stored in the 
+   Interval structure. */
+   box = Cache( (AstInterval *) this_region, status );
+   if( box ) result = astRegTrace( box, n, dist, ptr );
+
+/* Return the result. */
+   return result;
+}
+
+
 
 static void ResetCache( AstRegion *this, int *status ){
 /*
