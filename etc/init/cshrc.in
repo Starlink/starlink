@@ -472,6 +472,7 @@ if ( -e ${orac_dir}/src ) then
 endif
 
 if ( ! -e ${orac_dir}/etc/cshrc ) then
+   alias oracdr_acsis      ${staretcdir}/notinst oracdr_acsis
    alias oracdr_cgs4       ${staretcdir}/notinst oracdr_cgs4
    alias oracdr_classiccam ${staretcdir}/notinst oracdr_classiccam
    alias oracdr_gmos       ${staretcdir}/notinst oracdr_gmos
@@ -484,6 +485,10 @@ if ( ! -e ${orac_dir}/etc/cshrc ) then
    alias oracdr_naco       ${staretcdir}/notinst oracdr_naco
    alias oracdr_niri       ${staretcdir}/notinst oracdr_niri
    alias oracdr_scuba      ${staretcdir}/notinst oracdr_scuba
+   alias oracdr_scuba2l    ${staretcdir}/notinst oracdr_scuba2l
+   alias oracdr_scuba2s    ${staretcdir}/notinst oracdr_scuba2s
+   alias oracdr_scuba2lq   ${staretcdir}/notinst oracdr_scuba2lq
+   alias oracdr_scuba2sq   ${staretcdir}/notinst oracdr_scuba2sq
    alias oracdr_sofi       ${staretcdir}/notinst oracdr_sofi
    alias oracdr_spex       ${staretcdir}/notinst oracdr_spex
    alias oracdr_swfcam     ${staretcdir}/notinst oracdr_swfcam
