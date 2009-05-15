@@ -462,9 +462,16 @@ endif
  
 #
 #   Orac-dr
-#
+#     - New layout is $bindir/oracdr/src/etc
+#     - Old layout is $bindir/oracdr/etc
+#   support both in interim
 
-if ( ! -e ${bindir}/oracdr/etc/cshrc ) then
+set orac_dir=${bindir}/oracdr
+if ( -e ${orac_dir}/src ) then
+   set orac_dir="${orac_dir}/src"
+endif
+
+if ( ! -e ${orac_dir}/etc/cshrc ) then
    alias oracdr_cgs4       ${staretcdir}/notinst oracdr_cgs4
    alias oracdr_classiccam ${staretcdir}/notinst oracdr_classiccam
    alias oracdr_gmos       ${staretcdir}/notinst oracdr_gmos
@@ -489,8 +496,9 @@ if ( ! -e ${bindir}/oracdr/etc/cshrc ) then
    alias oracdr_uist       ${staretcdir}/notinst oracdr_uist
    alias xoracdr           ${staretcdir}/notinst xoracdr
 else
-   source ${bindir}/oracdr/etc/cshrc
+   source ${orac_dir}/etc/cshrc
 endif
+unset orac_dir
 
 #
 #   Period
