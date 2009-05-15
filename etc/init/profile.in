@@ -614,6 +614,7 @@ else
   if test -f ${bindir}/oracdr/etc/profile; then
     source ${bindir}/oracdr/etc/profile
   else
+    oracdr_acsis () { ${staretcdir}/notinst oracdr_acsis; }
     oracdr_cgs4 () { ${staretcdir}/notinst oracdr_cgs4; }
     oracdr_classiccam () { ${staretcdir}/notinst oracdr_classiccam; }
     oracdr_gmos () { ${staretcdir}/notinst oracdr_gmos; }
@@ -626,6 +627,10 @@ else
     oracdr_naco () { ${staretcdir}/notinst oracdr_naco; }
     oracdr_niri () { ${staretcdir}/notinst oracdr_niri; }
     oracdr_scuba () { ${staretcdir}/notinst oracdr_scuba; }
+    oracdr_scuba2l () { ${staretcdir}/notinst oracdr_scuba2l; }
+    oracdr_scuba2s () { ${staretcdir}/notinst oracdr_scuba2s; }
+    oracdr_scuba2lq () { ${staretcdir}/notinst oracdr_scuba2lq; }
+    oracdr_scuba2sq () { ${staretcdir}/notinst oracdr_scuba2sq; }
     oracdr_sofi () { ${staretcdir}/notinst oracdr_sofi; }
     oracdr_spex () { ${staretcdir}/notinst oracdr_spex; }
     oracdr_swfcam () { ${staretcdir}/notinst oracdr_swfcam; }
