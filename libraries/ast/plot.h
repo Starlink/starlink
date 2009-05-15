@@ -85,6 +85,7 @@
 /* ---------------------- */
 #include "frameset.h"              /* Parent FrameSet class */
 #include "keymap.h"              
+#include "region.h"              
 
 #if defined(astCLASS)       /* Protected */
 #include "grf.h"              
@@ -644,6 +645,11 @@ typedef struct AstPlotGlobals {
    AstMapping   *Map4_map_t;
    AstMapping   *Map4_umap_t;
    void         *Map4_statics_t;
+   int           Map5_ncoord_t;
+   AstPlot      *Map5_plot_t;
+   AstMapping   *Map5_map_t;
+   AstRegion    *Map5_region_t;
+   void         *Map5_statics_t;
    AstPlotCurveData Curve_data_t;
    char GetAttrib_Buff[ 200 ];
    char SplitValue_Buff[ 200 ];

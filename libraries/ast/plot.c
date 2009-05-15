@@ -1428,6 +1428,7 @@ static void SetUsed##attr( Ast##class *this, type value, int *status ) { \
 #include "wcsmap.h"              /* FITS-WCS projectsions */
 #include "unitmap.h"             /* Unit mappings */
 #include "permmap.h"             /* Axis permutations */
+#include "region.h"              /* Frame regions */
 #include "globals.h"             /* Thread-safe global data access */
 
 
@@ -1499,7 +1500,6 @@ typedef struct CrvStatics {
 #endif
 
 } CrvStatics;
-
 
 /* Structure to hold static data used internally within the Crv function. */
 typedef struct GetTicksStatics {
@@ -1584,6 +1584,16 @@ typedef struct Map4Statics {
    int nl;                   /* No. of points in pset1 and pset2 */
 } Map4Statics;
 
+/* Structure to hold static data used internally within the Map5
+   function. */
+typedef struct Map5Statics {
+   AstPointSet *pset1;       /* PointSet holding physical coords */
+   AstPointSet *pset2;       /* PointSet holding graphics coords */
+   double **ptr1;            /* Pointer to physical coord data */
+   double *ptr2[ 2 ];        /* Pointers to graphics coord data */
+   int nl;                   /* No. of points in pset1 and pset2 */
+} Map5Statics;
+
 /* Structure to hold information about tick marks for a single axis. */
 typedef struct TickInfo{
    int nmajor;               /* No. of major tick marks */
@@ -1666,6 +1676,10 @@ static const char *xlbling[2] = { "interior", "exterior" };
    globals->Map4_map_t = NULL; \
    globals->Map4_umap_t = NULL; \
    globals->Map4_statics_t = NULL; \
+   globals->Map5_plot_t = NULL; \
+   globals->Map5_region_t = NULL; \
+   globals->Map5_map_t = NULL; \
+   globals->Map5_statics_t = NULL; \
    globals->Poly_n_t = 0; \
    globals->Curve_data_t.nbrk = -1; \
    globals->GetAttrib_Buff[ 0 ] = 0; \
@@ -1743,6 +1757,11 @@ astMAKE_INITGLOBALS(Plot)
 #define Map4_map 	astGLOBAL(Plot,Map4_map_t)       
 #define Map4_umap 	astGLOBAL(Plot,Map4_umap_t)      
 #define Map4_statics 	astGLOBAL(Plot,Map4_statics_t)      
+#define Map5_plot 	astGLOBAL(Plot,Map5_plot_t)      
+#define Map5_region 	astGLOBAL(Plot,Map5_region_t)      
+#define Map5_map 	astGLOBAL(Plot,Map5_map_t)       
+#define Map5_ncoord 	astGLOBAL(Plot,Map5_ncoord_t)       
+#define Map5_statics 	astGLOBAL(Plot,Map5_statics_t)      
 #define Curve_data 	astGLOBAL(Plot,Curve_data_t)      
 #define getattrib_buff  astGLOBAL(Plot,GetAttrib_Buff)      
 #define splitvalue_buff astGLOBAL(Plot,SplitValue_Buff)      
@@ -1843,6 +1862,13 @@ static AstPlot      *Map4_plot = NULL;
 static AstMapping   *Map4_map = NULL; 
 static AstMapping   *Map4_umap = NULL; 
 static void         *Map4_statics = NULL;
+
+/* Variables used by function Map5. See the prologue of Map5 for details. */
+static AstPlot      *Map5_plot = NULL; 
+static AstMapping   *Map5_map = NULL; 
+static AstRegion    *Map5_region = NULL; 
+static void         *Map5_statics = NULL;
+static int           Map5_ncoord;       
 
 /* A structure which stores information about the breaks in the last curve
    drawn using the public methods "astGridLine" and "astCurve". */
@@ -2083,6 +2109,7 @@ static double GetUseSize( AstPlot *, int, int * );
 static AstKeyMap *GetGrfContext( AstPlot *, int * );
 static double GetUseWidth( AstPlot *, int, int * );
 static double GoodGrid( AstPlot *, int *, AstPointSet **, AstPointSet **, const char *, const char *, int * );
+static AstPointSet *GetDrawnTicks( AstPlot *, int, int, int * );
 static double Typical( int, double *, double, double, double *, int * );
 static int Border( AstPlot *, int * );
 static int Boundary( AstPlot *, const char *, const char *, int * );
@@ -2103,9 +2130,6 @@ static int Compared( const void *, const void * );
 static int CountGood( int, double *, int * );
 static int Cross( float, float, float, float, float, float, float, float, int * );
 static int CvBrk( AstPlot *, int, double *, double *, double *, int * );
-static void Mirror( AstPlot *, int, int * );
-static AstPointSet *GetDrawnTicks( AstPlot *, int, int, int * );
-static void SetTickValues( AstPlot *, int, int, double *, int, double *, int * );
 static int EdgeCrossings( AstPlot *, int, int, double, double *, double **, EdgeCrossingsStatics **, const char *, const char *, int * );
 static int EdgeLabels( AstPlot *, int, TickInfo **, AstPlotCurveData **, int, const char *, const char *, int * );
 static int FindDPTZ( AstFrame *, int, const char *, const char *, int *, int *, int * );
@@ -2125,14 +2149,18 @@ static int IsASkyAxis( AstFrame *, int, int * );
 static int IsASkyFrame( AstObject *, int * );
 static int Overlap( AstPlot *, int, int, const char *, float, float, const char *, float, float, float **, const char *, const char *, int * );
 static int PopGat( AstPlot *, float *, const char *, const char *, int * );
+static int RegionOutline( AstPlot *, AstFrame *, const char *, const char *, int * );
 static int TestUseColour( AstPlot *, int, int * );
 static int TestUseFont( AstPlot *, int, int * );
 static int TestUseSize( AstPlot *, int, int * );
 static int TestUseStyle( AstPlot *, int, int * );
 static int TestUseWidth( AstPlot *, int, int * );
 static int ToggleLogLin( AstPlot *, int, int, const char *, int * );
+static int TraceBorder( AstPlot *, AstMapping *, double, double, double, double, int, double, int[ 4 ], const char *, const char *, int * );
 static int Ustrcmp( const char *, const char *, int * );
 static int Ustrncmp( const char *, const char *, size_t, int * );
+static void Mirror( AstPlot *, int, int * );
+static void SetTickValues( AstPlot *, int, int, double *, int, double *, int * );
 static int swapEdges( AstPlot *, TickInfo **, AstPlotCurveData **, int * );
 static void AddCdt( AstPlotCurveData *, AstPlotCurveData *, const char *, const char *, int * );
 static void Apoly( AstPlot *, float, float, const char *, const char *, int * );
@@ -2175,6 +2203,7 @@ static void Map1( int, double *, double *, double *, const char *, const char *,
 static void Map2( int, double *, double *, double *, const char *, const char *, int * GLOBALS_PROTO );
 static void Map3( int, double *, double *, double *, const char *, const char *, int * GLOBALS_PROTO );
 static void Map4( int, double *, double *, double *, const char *, const char *, int * GLOBALS_PROTO );
+static void Map5( int, double *, double *, double *, const char *, const char *, int * GLOBALS_PROTO );
 static void Mark( AstPlot *, int, int, int, const double *, int, int * );
 static void Norm1( AstMapping *, int, int, double *, double, double, int * );
 static void Opoly( AstPlot *, const char *, const char *, int * );
@@ -2188,7 +2217,6 @@ static void SaveTick( AstPlot *, int, double, double, int, int * );
 static void Text( AstPlot *, const char *, const double [], const float [], const char *, int * );
 static void TextLabels( AstPlot *, int, int *, const char *, const char *, int * );
 static void Ticker( AstPlot *, int, int, double, double *, double, int, int, EdgeCrossingsStatics **, const char *, const char *, int * );
-static void TraceBorder( AstPlot *, double **, double **, int, int *, const char *, const char *, int * );
 static void UpdateConcat( float *, float *, float, float, float, float, float *, float *, float, float, float *, float *, float *, float *, int * );
 
 #if defined(THREAD_SAFE)
@@ -4741,41 +4769,22 @@ static int Boundary( AstPlot *this, const char *method, const char *class, int *
 */
 
 /* Local Variables: */
+   AstFrame *bfrm;         /* Pointer to base Plot Frame */
+   AstFrame *cfrm;         /* Pointer to current Plot Frame */
    AstMapping *map;        /* Pointer to Plot mapping (graphics -> physical) */
-   AstPointSet *pset1;     /* PointSet holding coarse grid graphics coords */
-   AstPointSet *pset2;     /* PointSet holding coarse grid physical coords */
-   AstPointSet *pset3;     /* PointSet holding fine grid graphics coords */
-   AstPointSet *pset4;     /* PointSet holding fine grid physical coords */
-   double **ptr1;          /* Pointer to coarse grid graphics coords */
-   double **ptr2;          /* Pointer to coarse grid physical coords */
-   double **ptr3;          /* Pointer to fine grid graphics coords */
-   double **ptr4;          /* Pointer to fine grid physical coords */
-   double *ptr3b[2];       /* Pointers to next fine grid graphics coords */
-   double *ptr4b[2];       /* Pointers to next fine grid physical coords */
+   AstMapping *rmap;       /* Pointer to Plot mapping (graphics -> physical) */
+   AstRegion *breg;        /* Region mapped into base Plot Frame */
+   double blbnd[ 2 ];      /* Lower grid bounds in base frame */
+   double bubnd[ 2 ];      /* Upper grid bounds in base frame */
+   double dx;              /* Plotting area width */
+   double dy;              /* Plotting area height */
    double power;           /* Exponent in pow call */
-   double rlimit;          /* Maximum grid dimension */
+   double rat;             /* Ratio by which to reduce DIM */
    double tol;             /* Fractional plotting tolerance */
-   int *flag;              /* Pointer to next cell's flag */
-   int *flags;             /* Pointer to array of cell flags */
-   int bc;                 /* Number ofmbad corners in current cell */
-   int c0;                 /* Index of bottom left corner */
-   int c1;                 /* Index of bottom right corner */
-   int c2;                 /* Index of top right corner */
-   int c3;                 /* Index of top left corner */
    int dim;                /* No. of points along each edge of coarse grid */
-   int edge[ 4 ];          /* Intersection flags for each cell edge */
-   int el;                 /* Index of next cell within PointSet */
-   int flag_value;         /* Flag value for cells currently being drawn */
-   int i;                  /* Column index */
-   int j;                  /* Row index */
-   int limit;              /* Maximum grid dimension */
-   int nbndry;             /* No. of boundary cells with current flag value */
-   int ncell;              /* No. of cells along each edge of coarse grid */
+   int edges[ 4 ];         /* Flags indicating edges bisected by boundary */
    int rate_disabled;      /* Was the astRate method initially disabled? */
-   int rdim;               /* No. of points along each edge of fine grid */
    int ret;                /* Any regions containing bad physical coords? */
-   int rsize;              /* No. of points in fine grid */
-   int size;               /* No. of cells in coarse grid */
 
 /* Check global status. */
    if( !astOK ) return 0;
@@ -4784,302 +4793,98 @@ static int Boundary( AstPlot *this, const char *method, const char *class, int *
    physical coordinates have been found. */
    ret = 0;
 
-/* Store the fractional plotting tolerance. The following algorithm seems
-   not to be calibrated corectly in terms of tol (i.e. the visible errors
-   for a given tol are much larger than the value of tolwould imply.
-   Therefore we introduce a factor which seems to bring the calibration
-   to something more reasonable. */
-   tol = 0.1*astGetTol( this );
+/* Get the current Frame from the Plot. */
+   cfrm = astGetFrame( this, AST__CURRENT );
 
-/* Extract the mapping from the Plot. */
-   map = astGetMapping( this, AST__BASE, AST__CURRENT );
+/* If it is a region, we use a special method, if possible, to trace the 
+   Region boundary. Otherwise, we use a grid tracing method that makes no
+   assumptions about the nature of the Mapping or Frame. */
+   if( !RegionOutline( this, cfrm, method, class, status ) ) {
+
+/* Each basic element of the boundary drawn by the following algorithm 
+   will be drawn at a multiple of 45 degrees to the horizontal. This can
+   cause noticable aliasing. For instance, if the border is a straight
+   line at 50 degrees to the horizontal, it will be drawn at 45 degrees
+   for long sections, followed by a vertical leap to catch up with where
+   it should be. Because of this we use a finer tolerance than for other
+   drawing. */
+      tol = 0.25*astGetTol( this );
 
 /* Set up the dimension of a coarse grid in graphics coordinates to cover the 
    whole plotting area. This is chosen to give a finer grid for smaller
    plotting tolerances. Note, putting the power as a literal constant in
    the call to pow seems to cause a segmentation violation on some systems. */
-   power = -0.666666666;
-   dim = (int) pow( tol, power ) + 10;
-   if( dim > 400 ) dim = 400;
+      dim = (int) 4*pow( tol, power ) + 10;
+      if( dim > 400 ) dim = 400;
+      if( dim < 3 ) dim = 3;
 
+/* Store the required plotting tolerance as a distance in graphics
+   coords. */
+      dx = fabs( this->xhi - this->xlo );
+      dy = fabs( this->xhi - this->xlo );
+      tol *= ( ( dx > dy ) ? dx : dy );
+
+/* Extract the Mapping from the Plot. */
+      map = astGetMapping( this, AST__BASE, AST__CURRENT );
+
+/* Select the area covered by the coarse grid. If the current Frame is a
+   Region, we use the bounding box of Region after being mapped into
+   graphics coords. */
+      if( astIsARegion( cfrm ) ) {
+         bfrm = astGetFrame( this, AST__BASE );
+
+/* Get the Mapping from the current to the base Frame in the Plot, and
+   remove the effects of any Regions. */
+
+         astInvert( map );
+         rmap = astRemoveRegions( map );
+         astInvert( map );
+
+/* Map the Region into the GRAPHICS frame. */
+         breg = astMapRegion( cfrm, rmap, bfrm );
+         astGetRegionBounds( breg, blbnd, bubnd );
+   
+         rmap = astAnnul( rmap );
+         bfrm = astAnnul( bfrm );
+         breg = astAnnul( breg );
+   
+         rat = ( ( bubnd[ 0 ] - blbnd[ 0 ] )*( bubnd[ 1 ] - blbnd[ 1 ] ) )/
+               ( ( this->xhi - this->xlo )*( this->yhi - this->ylo ) );
+         rat = sqrt( rat );
+         dim = (int) ( rat*dim );
+         if( dim < 3 ) dim = 3;
+   
+/* If the current Frame is not a Region, use the whole plot. */
+      } else {
+         blbnd[ 0 ] = this->xlo;
+         blbnd[ 1 ] = this->ylo;
+         bubnd[ 0 ] = this->xhi;
+         bubnd[ 1 ] = this->yhi;
+      }
+   
 /* Disable the astRate method in order to improve the speed of
    evaluating the Mapping in cases where the Mapping includes an
-   AstRateMap. Note the original value of hte flag so that it can be
+   AstRateMap. Note the original value of the flag so that it can be
    re-instated at the end. */
-   rate_disabled = astRateState( 1 );
-
-/* Create the grid. */
-   ptr2 = MakeGrid( this, NULL, map, 0, dim, this->xlo, this->xhi, this->ylo, 
-                    this->yhi, 2, &pset1, &pset2, 0, method, class, status );
-
-/* Store the number of cells along each edge of the grid. */
-   ncell = dim - 1;
-
-/* Allocate memory to hold a flag for each cell of the coarse grid. These
-   flags indicate if the good/bad boundary passes through each cell. */
-   size = ncell*ncell;
-   flags = (int *) astMalloc( sizeof(int)*(size_t)size );
-   flag = flags;
-
-/* Check the pointers just obtained can be used. */
-   if( astOK ){
-
-/* Initialise the edge flags. */
-      edge[ 0 ] = 0;
-      edge[ 1 ] = 0;
-      edge[ 2 ] = 0;
-      edge[ 3 ] = 0;
-
-/* Initialise the flag for every cell to indicate that the good/bad
-   boundary does not pass through the cell. */
-      for( i = 0; i < size; i++ ) flags[ i ] = 0;
-
-/* Loop through each row in the coarse grid. */
-      for( j = 0; j < ncell; j++ ){   
-
-/* Store the indices within the PointSet of the four corners of the first
-   cell in the current row. The corners are: c0-bottom left, c1-bottom right, 
-   c2-top right, c3-top left. */
-         c0 = j*dim;
-         c1 = c0 + 1;
-         c2 = c1 + dim;
-         c3 = c2 - 1;      
-
-/* Loop through every cell in the current row. */
-         for( i = 0; i < ncell; i++ ){   
-
-/* Count the number of bad corners in the current cell. */
-            bc = 0;       
-            if( ptr2[ 0 ][ c0 ] == AST__BAD ||
-                ptr2[ 1 ][ c0 ] == AST__BAD ) bc++;
-            if( ptr2[ 0 ][ c1 ] == AST__BAD ||
-                ptr2[ 1 ][ c1 ] == AST__BAD ) bc++;
-            if( ptr2[ 0 ][ c2 ] == AST__BAD ||
-                ptr2[ 1 ][ c2 ] == AST__BAD ) bc++;
-            if( ptr2[ 0 ][ c3 ] == AST__BAD ||
-                ptr2[ 1 ][ c3 ] == AST__BAD ) bc++;
-  
-/* If any bad corners were found, set the returned flag to indicate that
-   some regions containing invalid physical coordinates have been found. */
-            if( bc ) ret = 1;
-
-/* The good/bad boundary is assumed to pass through the cell if there are both
-   good and bad corners. If it does, set the flag for the cell. */
-            if( bc > 0 && bc < 4 ) *flag = 1;
-
-/* Update everything to refer to the next cell. */
-            c0++;
-            c1++;
-            c2++;
-            c3++;
-            flag++;
-          }
-  
-      }
-
-/* Count the boundary cells. */
-      flag = flags;
-      nbndry = 0;
-      for( i = 0; i < size; i++ ) {
-         if( *(flag++) ) nbndry++;
-      }
-
-/* If any boundary cells were found, draw the boundary using a refined
-   grid. */
-      if( nbndry ){
-
-/* Get a pointer to the graphics coordinate data for the coarse grid. */
-         ptr1 = astGetPoints( pset1 );         
-
-
-/* Each of the boundary cells from the coarse grid is sub-divided into
-   a refined grid so that the refined grid has cells of the size specified
-   by the supplied plotting tolerance. Find the dimension for the refined 
-   grids covering each individual boundary cell. Do not let the total
-   number of cells in all the refined grids exceed 1E6. */
-         rdim = (int)( 1.0 / ( tol*dim ) ) + 1;
-
-         if( rdim < 2 ) {
-            rdim = 2;
-
-         } else {
-            rlimit = sqrt( 1.0E6 / (double) nbndry );
-            limit = (int) rlimit;
-            if( rdim > limit ) rdim = limit;
-         }
-
-         rsize = rdim*rdim;
-
-/* Loop until all boundary cells have been drawn. We initially draw the
-   boundary through cells which are flagged with the value 1. */
-         flag_value = 1;
-         while( nbndry ){
-
-/* Create two PointSets to hold the graphics and physical coordinates for 
-   the refined grids for all boundary cells. */
-            pset3 = astPointSet( rsize*nbndry, 2, "", status );
-            pset4 = astPointSet( rsize*nbndry, 2, "", status );
-
-/* Get a pointer to the graphics coordinate PointSet data arrays, and
-   store the starting address of each axis. */
-            ptr3 = astGetPoints( pset3 );         
-            ptr3b[ 0 ] = ptr3[ 0 ];
-            ptr3b[ 1 ] = ptr3[ 1 ];
-
-/* Store a pointer to the boundary flag for the first cell in the coarse
-   grid. */
-            flag = flags;
-
-/* Check everything is OK. */
-            if( astOK ){
-
-/* Loop through each row of cells in the coarse grid. */
-               for( j = 0; j < ncell; j++ ){   
-
-/* Store the indices within the coarse grid PointSets of the bottom left
-   and top right corners of the first cell in the current row. */
-                  c0 = j*dim;
-                  c2 = c0 + 1 + dim;
+      rate_disabled = astRateState( 1 );
    
-/* Loop through each cell in the current row of the coarse grid. */
-                  for( i = 0; i < ncell; i++ ){   
-
-/* If this cell is a boundary cell with the required flag value, store a 
-   refined grid of graphics coordinates covering the area of the cell. */
-                     if( *( flag++ ) == flag_value ){
-                        (void) GraphGrid( rdim, 0, ptr1[ 0 ][ c0 ], 
-                                          ptr1[ 0 ][ c2 ], ptr1[ 1 ][ c0 ], 
-                                          ptr1[ 1 ][ c2 ], ptr3b, status );
-
-/* Increment the pointers to the next values to be added to the PointSet
-   arrays. */
-                        ptr3b[ 0 ] += rsize;
-                        ptr3b[ 1 ] += rsize;
-                     }
-
-/* Update the corner indices to refer to the next cell of the coarse grid. */
-                     c0++;
-                     c2++;
-                   }
-               }
-            }
-
-/* Transform the graphics coordinates to get the corresponding physical
-   coordinates. */
-            (void) Trans( this, NULL, map, pset3, 1, pset4, 0, method, class, status ); 
-
-/* Get a pointer to the physical coordinate PointSet data array. */
-            ptr4 = astGetPoints( pset4 );         
-
-/* Store pointers to the start of each graphics and physical axis. */
-            ptr3b[ 0 ] = ptr3[ 0 ];
-            ptr3b[ 1 ] = ptr3[ 1 ];
-            ptr4b[ 0 ] = ptr4[ 0 ];
-            ptr4b[ 1 ] = ptr4[ 1 ];
-
-/* Check everything is OK. */
-            if( astOK ){
-
-/* Store a pointer to the boundary flag for the first cell in the coarse
-   grid. */
-               flag = flags;
-
-/* Initialise the index of the first coarse grid cell in the PointSet. */
-               el = 0;
-
-/* Initialise the number of boundary cells found to be processed with a new
-   flag value on the next pass through the "while" loop. */
-               nbndry = 0;
-
-/* Loop through each row of cells in the coarse grid. */
-               for( j = 0; j < ncell; j++ ){   
-
-/* Loop through each cell in the current row of the coarse grid. */
-                  for( i = 0; i < ncell; i++ ){   
-
-/* If this cell is a boundary cell with the current flag value, trace the 
-   boundary through it using the refined grid. */
-                     if( *( flag++ ) == flag_value ){
-                        TraceBorder( this, ptr3b, ptr4b, rdim, edge, method, class, status );
-
-/* Increment the pointers to the next values to be read from the PointSet
-   arrays. */
-                        ptr3b[ 0 ] += rsize;
-                        ptr3b[ 1 ] += rsize;
-                        ptr4b[ 0 ] += rsize;
-                        ptr4b[ 1 ] += rsize;
-
-/* If the curve passes into a coarse grid cell which has not been flagged
-   as a boundary cell, flag it now, and count the number of extra boundary
-   cells which need to be done. First deal with cases where the curve passes 
-   through the bottom edge of the current coarse grid cell. */
-                        if( edge[ 0 ] && j > 0 ) {
-                           if( !flags[ el - ncell ] ){
-                              flags[ el - ncell ] = flag_value + 1;
-                              nbndry++;
-                           }
-                        }
-
-/* Now deal with cases where the curves passes through the right-hand
-   edge of the current coarse grid cell. */
-                        if( edge[ 1 ] && i < ncell - 1 ) {
-                           if( !flags[ el + 1 ] ){
-                              flags[ el + 1 ] = flag_value + 1;
-                              nbndry++;
-                           }
-                        }
-
-/* Now deal with cases where the curves passes through the top edge of 
-   the current coarse grid cell. */
-                        if( edge[ 2 ] && j < ncell - 1 ) {
-                           if( !flags[ el + ncell ] ){
-                              flags[ el + ncell ] = flag_value + 1;
-                              nbndry++;
-                           }
-                        }
-
-/* Now deal with cases where the curves passes through the left-hand
-   edge of the current coarse grid cell. */
-                        if( edge[ 3 ] && i > 0 ) {
-                           if( !flags[ el - 1 ] ){
-                              flags[ el - 1 ] = flag_value + 1;
-                              nbndry++;
-                           }
-                        }
-                     }
-
-/* Increment the index of the current coarse grid cell in the PointSet. */
-                     el++;
-                   }
-               }
-            }
-
-/* Annul the PointSets holding the refined grid. */
-            pset3 = astAnnul( pset3 );
-            pset4 = astAnnul( pset4 );
-
-/* Increment the flag value for the cells to be processed on the next
-   pass. */
-            flag_value++;
-          }
-       }
-    }
-
+/* Draw the boundary. */
+      ret = TraceBorder( this, map, blbnd[ 0 ], bubnd[ 0 ], blbnd[ 1 ], 
+                         bubnd[ 1 ], dim, tol, edges, method, class, status );
+   
 /* Re-instate the original setting of the "astRate disabled" flag. */
-   astRateState( rate_disabled );
+      astRateState( rate_disabled );
 
 /* Release the remaining resources. */
-   map = astAnnul( map );
-   pset1 = astAnnul( pset1 );
-   pset2 = astAnnul( pset2 );
-   flags = (int *) astFree( (void *) flags );
+      map = astAnnul( map );
+   }
+   cfrm = astAnnul( cfrm );
 
 /* If an error has occurred, return 0. */
    if( !astOK ) ret = 0;
 
 /* Return the answer. */
    return ret;
-
 }
 
 static int Border( AstPlot *this_nd, int *status ){
@@ -5224,7 +5029,9 @@ f     with STATUS set to an error value, or if it should fail for any
              1, &cdata, method, class, status );
 
 /* Now draw a curve following the boundary through the interior of the 
-   plotting area. */
+   plotting area. If the current Frame in the Plot is a Region, we use a
+   shorter method if possible. If this is not possible, we use a longer
+   method. */
    inval = Boundary( this, method, class, status );
 
 /* Re-establish the original graphical attributes. */
@@ -21363,6 +21170,181 @@ static void Map4( int n, double *dist, double *x, double *y,
 
 }
 
+static void Map5( int n, double *dist, double *x, double *y, 
+                  const char *method, const char *class, 
+                  int *status GLOBALS_ARG ){
+/*
+*  Name:
+*     Map5
+
+*  Purpose:
+*     Find graphics coordinates at given distances along the boundary of
+*     a Region.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     void Map5( int n, double *dist, double *x, double *y,
+*                const char *method, const char *class, 
+*                int *status [,AstGlobals *AST__GLOBALS] )
+
+*  Class Membership:
+*     Plot member function.
+
+*  Description:
+*     The supplied distances are converted into physical coordinates
+*     using the Region specified by an external variable, and then 
+*     these physical coordinates are mapped into graphics coordinates. 
+
+*  Parameters:
+*     n 
+*        The number of points to map. Static resources are released but
+*        no points are mapped if zero is supplied.
+*     dist
+*        A pointer to an array holding "n" distances. A "dist" value of
+*        zero corresponds to the starting position supplied in external 
+*        variable Map1_origin. A "dist" value of one corresponds to the 
+*        finishing position which is a distance Map1_length away from 
+*        Map1_origin, moving in the positive direction of the axis given 
+*        by Map1_axis. "dist" values can be either linearly or
+*        logarithmically related to axis values (see Map1_log).
+*     x
+*        A pointer to an array in which to store the "n" graphics X 
+*        coordinate values corresponding to the positions in "dist".
+*     y
+*        A pointer to an array in which to store the "n" graphics Y
+*        coordinate values corresponding to the positions in "dist".
+*     method
+*        Pointer to a string holding the name of the calling method.
+*        This is only for use in constructing error messages.
+*     class 
+*        Pointer to a string holding the name of the supplied object class.
+*        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
+*     AST__GLOBALS
+*        Only present if compiled with -DTHREAD_SAFE. It is a pointer to
+*        the structure holding the global data for the executing thread.
+*        It is passed as a function parameter, rather than being accessed
+*        within this function using the astGET_GLOBALS(NULL) macro (as
+*        other Object-less functions do) in order to avoid the time
+*        overheads of calling astGET_GLOBALS(NULL) . This function is
+*        time-critical.
+
+*  External Variables:
+*     Map1_log = int (Read)
+*        If zero, then "dist" in learly related to axis value. Otherwise
+*        it is linearly related to log10(axis value).
+*     Map1_ncoord = int (Read)
+*        The number of axes in the physical coordinate system.
+*     Map1_axis = int (Read)
+*        The zero-based index of the axis which the curve follows (i.e.
+*        the axis which changes value along the curve).
+*     Map1_statics = Map1Statics * (Read and Write)
+*        Pointer to a structure holding other static data used by Map1.
+*     Map1_origin = const double * (Read)
+*        A pointer to an array holding the physical coordinate value on 
+*        each axis at the start of the curve (i.e. at dist = 0.0).
+*     Map1_length = double (Read)
+*        The scale factor to convert "dist" values into increments
+*        along the physical axis given by Map1_axis.
+*     Map1_plot = AstPlot * (Read)
+*        A pointer to the Plot defining the mapping from graphics cordinates
+*        to physical coordinates.
+*     Map1_map = AstMapping * (Read)
+*        A pointer to the mapping from graphics cordinates to physical 
+*        coordinates extracted from the Plot.
+*     Map1_frame = AstFrame * (Read)
+*        A pointer to the Current Frame in the Plot.
+*     Map1_norm = int (Read)
+*        A flag indicating if physical coordinate values which are not in
+*        the normal ranges of the corresponding axes should be considered
+*        bad.
+
+*  Notes:
+*     -  On the first call, this function allocates static resources which 
+*     are used by subsequent invocation. These resources should be freed before
+*     calling this function with new values for any of the external variables, 
+*     or when no longer needed, by calling this function with "n" supplied as 
+*     zero.
+*     -  If an error has already occurred, this runction returns without 
+*     action ,except that if "n" is supplied as zero then static resources
+*     are released even if an error has already occurred.
+
+*/
+
+/* Local Constants: */
+   Map5Statics *statics;             /* Pointer to structure holding static data */
+
+/* Convert the global "void *" pointer to a Map5Statics pointer */
+   statics = (Map5Statics *) Map5_statics;
+
+/* If zero points were supplied, release static resources and return. */
+   if( n == 0 ){
+      if( statics ) {
+         if( statics->pset1 ) statics->pset1 = astAnnul( statics->pset1 );
+         if( statics->pset2 ) statics->pset2 = astAnnul( statics->pset2 );
+         Map5_statics = astFree( statics );
+      }
+      return;
+   }
+   
+/* Otherwise, check the inherited global status. */
+   if( !astOK ) return;
+
+/* Create and initialise a structure to hold extra static information if 
+   this has not already been done. */
+   if( !statics ) {
+      statics = astMalloc( sizeof( Map3Statics ) );
+      if( statics ) {    
+         statics->pset1 = NULL;
+         statics->pset2 = NULL;
+         statics->ptr1 = NULL; 
+         statics->ptr2[ 0 ] = NULL;
+         statics->ptr2[ 1 ] = NULL;
+         statics->nl = 0;      
+         Map5_statics = statics;
+      }
+   }
+
+/* If the number of points to be mapped is different to last time, 
+   set up some PointSets to store the specified number of points. */
+   if( n != statics->nl ){
+      statics->nl = n;
+
+/* Create a PointSet to hold the physical coordinates corresponding to
+   the supplied offsets. First annul any existing PointSet. */
+      if( statics->pset1 ) statics->pset1 = astAnnul( statics->pset1 );
+      statics->pset1 = astPointSet( n, Map5_ncoord, "", status );   
+      statics->ptr1 = astGetPoints( statics->pset1 );
+
+/* Create a PointSet to hold the corresponding graphics coordinates. 
+   The supplied "x" and "y" arrays will be used to store the data 
+   so we do not need to get pointers to the data using astGetPoints. First 
+   annul any existing PointSet. */
+      if( statics->pset2 ) statics->pset2 = astAnnul( statics->pset2 );
+      statics->pset2 = astPointSet( n, 2, "", status );   
+   }
+
+/* Get the physical coords at the required positions along the Region
+   border. */
+   astRegTrace( Map5_region, n, dist, statics->ptr1 );
+
+/* Store pointers to the results arrays in PointSet 2. */
+   statics->ptr2[ 0 ] = x;
+   statics->ptr2[ 1 ] = y;   
+   astSetPoints( statics->pset2, statics->ptr2 );
+
+/* Map all the positions into graphics coordinates. */
+   (void) Trans( Map5_plot, NULL, Map5_map, statics->pset1, 0, 
+                 statics->pset2, 1, method, class, status );
+   
+/* Return. */
+   return;
+}
+
 static void Mark( AstPlot *this, int nmark, int ncoord, int indim, 
                   const double *in, int type, int *status ){
 /*
@@ -23084,6 +23066,142 @@ static void PushGat( AstPlot *this, float rise, const char *method,
 
       }
    }
+}
+
+static int RegionOutline( AstPlot *this, AstFrame *frm, const char *method, 
+                          const char *class, int *status ){
+/*
+*
+*  Name:
+*     RegionOutline
+
+*  Purpose:
+*     Draw the outline of a Region.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     int RegionOutline( AstPlot *this, AstFrame *frm, const char *method, 
+*                        const char *class, int *status )
+
+*  Class Membership:
+*     Plot member function.
+
+*  Description:
+*     If the current Frame in the supplied Plot is a Region, this function 
+*     draws a curve marking the outline of the Region. It returns without
+*     action otherwise.
+
+*  Parameters:
+*     this
+*        Pointer to the Plot.
+*     frm 
+*        Pointer to the current Frame in the Plot (possibly a Region).
+*     method
+*        Pointer to a string holding the name of the calling method.
+*        This is only for use in constructing error messages.
+*     class 
+*        Pointer to a string holding the name of the supplied object class.
+*        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     Non-zero if and only if a Region outline was drawn.
+
+*/
+
+/* Local Variables: */
+   AstMapping *map;        /* Mapping with Region masking included */
+   AstPlotCurveData cdata; /* Stores information about curve breaks */
+   astDECLARE_GLOBALS      /* Pointer to thread-specific global data */
+   double d[ CRV_NPNT ];   /* Offsets to evenly spaced points along curve */
+   double tol;             /* Absolute tolerance value */
+   double x[ CRV_NPNT ];   /* X coords at evenly spaced points along curve */
+   double y[ CRV_NPNT ];   /* Y coords at evenly spaced points along curve */
+   int i;                  /* Loop count */
+   int result;             /* The returned value */
+
+/* Initialise */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this);
+
+/* Check the current Frame is a Region, and is of a class that implements
+   the astRegTrace method. */
+   if( astIsARegion( frm ) && 
+       astRegTrace( (AstRegion *) frm, 0, NULL, NULL ) ){
+
+/* Set up the externals used to communicate with the Map5 function...
+   The number of axes in the physical coordinate system (i.e. the
+   Region). */
+      Map5_ncoord =  astGetNaxes( frm );
+
+/* A pointer to the Plot, the Region, and the Mapping. */
+      Map5_plot = this;
+      Map5_region = (AstRegion *) frm;
+
+/* Also store a pointer to the Mapping, ensuring that the Mapping does 
+   not contain any masking effects from the Region. */
+      map = astGetMapping( this, AST__BASE, AST__CURRENT );
+      Map5_map = astRemoveRegions( map );
+      map = astAnnul( map );
+
+/* Convert the tolerance from relative to absolute graphics coordinates. */
+      tol = astGetTol( this )*MAX( this->xhi - this->xlo, 
+                                   this->yhi - this->ylo );
+
+/* Now set up the external variables used by the Crv and CrvLine function. */
+      Crv_scerr = ( astGetLogPlot( this, 0 ) || 
+                    astGetLogPlot( this, 1 ) ) ? 100.0 : 1.5;
+      Crv_ux0 = AST__BAD;    
+      Crv_tol = tol;
+      Crv_limit = 0.5*tol*tol;
+      Crv_map = Map5;
+      Crv_ink = 1;
+      Crv_xlo = this->xlo;
+      Crv_xhi = this->xhi;
+      Crv_ylo = this->ylo;
+      Crv_yhi = this->yhi;
+      Crv_out = 1;
+      Crv_xbrk = cdata.xbrk;
+      Crv_ybrk = cdata.ybrk;
+      Crv_vxbrk = cdata.vxbrk;
+      Crv_vybrk = cdata.vybrk;
+      Crv_clip = astGetClip( this ) & 1;
+
+/* Set up a list of points spread evenly over the curve. */
+      for( i = 0; i < CRV_NPNT; i++ ){
+        d[ i ] = ( (double) i)/( (double) CRV_NSEG );
+      }
+
+/* Map these points into graphics coordinates. */
+      Map5( CRV_NPNT, d, x, y, method, class, status GLOBALS_NAME );
+
+/* Use Crv and Map5 to draw the curve. */
+      Crv( this, d, x, y, 0, NULL, NULL, method, class, status );
+
+/* End the current poly line. */
+      Opoly( this, method, class, status );
+
+/* Tidy up the static data used by Map5. */
+      Map5( 0, NULL, NULL, NULL, method, class, status GLOBALS_NAME );
+
+/* Annul the Mapping. */
+      Map5_map = astAnnul( Map5_map );
+
+/* Indicate the outline was drawn. */
+      result = 1;
+   }
+
+/* Return. */
+   return result;
 }
 
 static void RemoveFrame( AstFrameSet *this_fset, int iframe, int *status ) {
@@ -26097,8 +26215,10 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
 
 }
 
-static void TraceBorder( AstPlot *this, double **ptr1, double **ptr2, int dim, int *edge,
-                         const char *method, const char *class, int *status ){
+static int TraceBorder( AstPlot *this, AstMapping *map, double xlo, double xhi,
+                        double ylo, double yhi, int dim, double tol, 
+                        int edges[ 4 ], const char *method, const char *class, 
+                        int *status ) {
 /*
 *  Name:
 *     TraceBorder
@@ -26112,41 +26232,62 @@ static void TraceBorder( AstPlot *this, double **ptr1, double **ptr2, int dim, i
 
 *  Synopsis:
 *     #include "plot.h"
-*     void TraceBorder( AstPlot *this, double **ptr1, double **ptr2, int dim, int *edge,
-*                      const char *method, const char *class, int *status )
+*     int TraceBorder( AstPlot *this, AstMapping *map, double xlo, double xhi,
+*                      double ylo, double yhi, int dim, double tol, 
+*                      int edges[ 4 ], const char *method, const char *class, 
+*                      int *status ) {
 
 *  Class Membership:
 *     Plot member function.
 
 *  Description:
-*     Each edge cell of the fine grid is checked until a cell is found 
-*     through which the good/bad boundary passes (as shown by a mixture of 
-*     bad and good physical coordinates at the four cell corners). The boundary
-*     is then traced away from the grid edge outwards from this starting cell.
-*     For each cell, the next cell along the curve is identified by 
-*     looking for two adjacent cell corners with differing validity (i.e.
-*     one has good physical coordinates and the other has not). The curve
-*     is assumed to leave the current cell at the mid point between these
-*     two adjacent cell corners, and to pass on into the neighbouring cell.
-*     The polyline is continued in this way until the edge of the fine grid
-*     is reached.
+*     A rectangular grid of points in graphics coords is created covering
+*     the region specified by (xlo,xhi,ylo,yhi), using "dim" points along
+*     each axis. This grid of points is converted into physical (WCS)
+*     coords, and a flag is associatred with each point saying whether
+*     the WCS coords are good or bad. The cells in this grid are then
+*     scanned from bottom left to top right in raster fashion (each cell
+*     has a grid point at each of its 4 corners). If a cell has a mix of 
+*     bad and good corners, the good/bad boundary must pass through it.
+*     If the grid is sufficiently fine (as defined by "tol") then this
+*     function draws a single straight line through each cell as an 
+*     approximation to the good bad boundary. This line joins the centres
+*     of the two cells edges through which the boundary passes (as
+*     indicated by the fact that one end of the edge has good WCS coords 
+*     and the other end has bad WCS coords). If the grid is not
+*     sufficiently fine to meet the "tol" requirement, then this function
+*     is invoked recursively to draw the curve through each cell through
+*     which the boundary passes.
 
 *  Parameters:
-*     ptr1
-*        A pointer to an array of two pointers, giving the arrays
-*        holding the graphics coordinates at each point in the grid, row
-*        by row, starting at the bottom left corner. 
-*     ptr2
-*        A pointer to an array of two pointers, giving the arrays
-*        holding the physical coordinates at each point in the grid, row
-*        by row, starting at the bottom left corner. 
+*     this
+*        The plot.
+*     map
+*        The Graphics->WCS mapping.
+*     xlo
+*        The lower bounds on the graphics X axis of the rectangle being
+*        considered.
+*     xhi
+*        The upper bounds on the graphics X axis of the rectangle being
+*        considered.
+*     ylo
+*        The lower bounds on the graphics Y axis of the rectangle being
+*        considered.
+*     yhi
+*        The upper bounds on the graphics Y axis of the rectangle being
+*        considered.
 *     dim
 *        The number of points along one edge of the fine grid.
-*     edge
-*        A pointer to an array of 4 values, in which will be returned
+*     tol
+*        The plotting tolerance. Once each cell is smaller than this
+*        distance (in graphics coords), the cell is drawn. Otherwise,
+*        this function is invoked recursively to draw the cell using a 
+*        finer grid.
+*     edges
+*        A pointer to an array of 4 int, in which will be returned
 *        flags indicating if the good/bad boundary intersects any of the 
-*        edges of the grid. These flags are stored in the order bottom, 
-*        right-hand, top, left-hand.
+*        edges of the grid. These flags are stored in the order left,
+*        top, right, bottom.
 *     method
 *        Pointer to a string holding the name of the calling method.
 *        This is only for use in constructing error messages.
@@ -26159,386 +26300,404 @@ static void TraceBorder( AstPlot *this, double **ptr1, double **ptr2, int dim, i
 */
 
 /* Local Variables: */
-   double *gx[ 4 ];   /* Pointers to graphics x coords at cell corners */
-   double *gy[ 4 ];   /* Pointers to graphics y coords at cell corners */
-   double *px[ 4 ];   /* Pointers to physical x coords at cell corners */
-   double x0;         /* X graphics coord at crossing in starting cell */
-   double y0;         /* Y graphics coord at crossing in starting cell */
-   int bad;           /* Is the current cell corner bad? */
-   int ca;            /* Index of corner at anticlockwise end of edge */
-   int cb;            /* Index of corner at clockwise end of edge */
-   int ed0;           /* Edge of the starting cell crossed by the boundary */
-   int ed;            /* Edge through which curve leaves current cell */
-   int i0;            /* Column index of starting cell */
-   int i;             /* Column index */
-   int j0;            /* Row index of starting cell */
-   int j;             /* Row index */
-   int k;             /* Various uses */
-   int lbad;          /* Was the previous cell corner bad? */
-   int lost;          /* Has the curve been lost? */
-   int ncell;         /* No. of cells in the fine grid */
-   int npass;         /* No. of passes through loop */
-   int npass_lim;     /* Maximum number of passes through loop to make */
-   int test_edge;     /* Edge to test for a crossing */
+   AstPointSet *pset1;
+   AstPointSet *pset2;
+   double **ptr2;
+   double *px1;
+   double *px2;
+   double *py1;
+   double *py2;
+   double cxhi;
+   double cxlo;
+   double cyhi;
+   double cylo;
+   double dx;
+   double dy;
+   float xc;
+   float yc;
+   int *bndry;
+   int *drawn;
+   int bad1;
+   int bad2;
+   int bad3;
+   int bad4;
+   int icell;
+   int icol;
+   int irow;
+   int lastcell;
+   int ncell;
+   int recurse;
+   int result;
+   int sedges[ 4 ];
+   int totcells;
 
-/* Check the global error status. */
-   if ( !astOK ) return;
+/* Initialise returned edge flags */
+   edges[ 0 ] = 0;
+   edges[ 1 ] = 0;
+   edges[ 2 ] = 0;
+   edges[ 3 ] = 0;
 
-/* Initialise variables to avoid "used of uninitialised variable"
-   messages from dumb compilers. */
-   x0 = 0;
-   y0 = 0;
-   i0 = 0;
-   j0  = 0;
+/* Initialise the returned flag to indicate that no bad regions were
+   found. */
+   result = 0;
 
-/* Initialise the returned flags to indicate that the good/bad boundary
-   does not intersect any of the edges. */
-   edge[ 0 ] = 0;
-   edge[ 1 ] = 0;
-   edge[ 2 ] = 0;
-   edge[ 3 ] = 0;
+/* Check the global status. */
+   if ( !astOK ) return result;
 
-/* Store the number of cells in the grid. */
+/* Create a grid of graphics and WCS coords covering the specified region
+   of graphics coords. "ptr2" is used to access the WCS coords at each
+   point in the grid. */
+   ptr2 = MakeGrid( this, NULL, map, 0, dim, xlo, xhi, ylo, yhi,
+                    2, &pset1, &pset2, 0, method, class, status );
+
+/* The number of cells along each axis of the grid is one less than the
+   number of points. Also get the number of cells in the whole grid. */
    ncell = dim - 1;
+   totcells = ncell*ncell;
 
-/* We first find a cell (the "starting cell") through which the boundary 
-   passes. Set a flag indicating that no such cell has yet been found. */
-   ed0 = -1;
+/* Store the dimensions of each cell in graphics coords. */
+   dx = ( xhi - xlo )/ncell;
+   dy = ( yhi - ylo )/ncell;
 
-/* We scan each edge of the grid in turn looking for the starting cell. First 
-   do the bottom edge (edge 0). Store pointers to the graphics and physical 
-   coordinates at the bottom two corners of the first cell in the bottom row. 
-   The corners are: 0=bottom left, 1=bottom right, 2=top right, 3=top left. */
-   gx[ 0 ] = ptr1[ 0 ];
-   gy[ 0 ] = ptr1[ 1 ];
-   px[ 0 ] = ptr2[ 0 ];
+/* Set a flag indicating if the cell size is larger than the required
+   plotting tolerance. If so, we will call this function recursively to
+   draw the curve using a finer grid. */
+   recurse = ( dx > tol || dy > tol );
 
-   gx[ 1 ] = gx[ 0 ] + 1;
-   gy[ 1 ] = gy[ 0 ] + 1;
-   px[ 1 ] = px[ 0 ] + 1;
-
-/* See if the bottom left corner of the current cell is bad. */
-   bad = ( *( px[ 0 ] ) == AST__BAD );
-
-/* Loop round each cell in the bottom row. */
-   for( i = 0; i < ncell; i++ ){
-
-/* See if the bottom left and right corners of the current cell are bad. 
-   The bottom right corner of the previous cell becomes the bottom left
-   corner of the current cell. */
-      lbad = bad;
-      bad = ( *( px[ 1 ] ) == AST__BAD );
-
-/* If one corner is bad and the other is not bad, the good/bad boundary 
-   crosses the edge. We assume it passes half way between them, so record a 
-   crossing at the mid point between them, and break out of the loop. */
-      if( lbad != bad ){
-         i0 = i;
-         j0 = 0;
-         ed0 = 0;
-         x0 = 0.5*( *( gx[ 0 ] ) + *( gx[ 1 ] ) );
-         y0 = 0.5*( *( gy[ 0 ] ) + *( gy[ 1 ] ) );
-         edge[ 0 ] = 1;
-         break;
-      }
-
-/* Update the pointers to the corner coordinates so that they refer to 
-   the next cell in this row. */
-      gx[ 0 ]++;
-      gy[ 0 ]++;
-      px[ 0 ]++;
-
-      gx[ 1 ]++;
-      gy[ 1 ]++;
-
+/* If we have not yet reached the plotting tolerance, allocate work arrays 
+   with one element for each cell in the grid. */
+   if( recurse ) {
+      bndry = astMalloc( sizeof( int )*totcells );
+      drawn = astMalloc( sizeof( int )*totcells );
+   } else {
+      bndry = NULL;
+      drawn = NULL;
    }
 
-/* If no crossing was found on the bottom edge of the grid, do the top
-   edge in the same way. */ 
-   if( ed0 == -1 ){
+/* Check pointers can be used safely. */
+   if( astOK ) {
 
-/* Store pointers to the graphics and physical coordinates at the top two 
-   corners of the first cell in the top row. */
-      k = ncell*dim + 1;
-      gx[ 2 ] = ptr1[ 0 ] + k;
-      gy[ 2 ] = ptr1[ 1 ] + k;
-      px[ 2 ] = ptr2[ 0 ] + k;
+/* If required, initialise work arrays to hold zero. */
+      if( recurse ) {
 
-      gx[ 3 ] = gx[ 2 ] - 1;
-      gy[ 3 ] = gy[ 2 ] - 1;
-      px[ 3 ] = px[ 2 ] - 1;
+/* Initialise "boundary passes through cell" flags to zero. */
+         memset( bndry, 0, sizeof( int )*totcells );
 
-/* See if the top left corner of the current cell is bad. */
-      bad = ( *( px[ 3 ] ) == AST__BAD );
-
-/* Loop round each cell in the top row. */
-      for( i = 0; i < ncell; i++ ){
-
-/* See if the top left and right corners of the current cell are bad. 
-   The top right corner of the previous cell becomes the top left
-   corner of the current cell. */
-         lbad = bad;
-         bad = ( *( px[ 2 ] ) == AST__BAD );
-
-/* If one corner is bad and the other is not bad, the good/bad boundary 
-   crosses the edge. We assume it passes half way between them, so record a 
-   crossing at the mid point between them, and break out of the loop. */
-         if( lbad != bad ){
-            i0 = i;
-            j0 = ncell - 1;
-            ed0 = 2;
-            x0 = 0.5*( *( gx[ 2 ] ) + *( gx[ 3 ] ) );
-            y0 = 0.5*( *( gy[ 2 ] ) + *( gy[ 3 ] ) );
-            edge[ 2 ] = 1;
-            break;
-         }
-
-/* Update the pointers to the corner coordinates so that they refer to 
-   the next cell in this row. */
-         gx[ 2 ]++;
-         gy[ 2 ]++;
-         px[ 2 ]++;
-   
-         gx[ 3 ]++;
-         gy[ 3 ]++;
-
+/* Initialise "cell has been drawn" flags to zero. */
+         memset( drawn, 0, sizeof( int )*totcells );
       }
-   }
 
-/* If no crossing has yet been found, do the left edge in the same way. */ 
-   if( ed0 == -1 ){
+/* Store the Y graphics coords at the bottom and top of the first row. */
+      cylo = ylo;
+      cyhi = ylo + dy;
 
-/* Store pointers to the graphics and physical coordinates at the left two 
-   corners of the first cell in the bottom row. */
-      gx[ 0 ] = ptr1[ 0 ];
-      gy[ 0 ] = ptr1[ 1 ];
-      px[ 0 ] = ptr2[ 0 ];
+/* Store pointers to the physical coords at the bottom left corner of the
+   first cell in the first row. */
+      px1 = ptr2[ 0 ];
+      py1 = ptr2[ 1 ];
 
-      gx[ 3 ] = gx[ 0 ] + dim;
-      gy[ 3 ] = gy[ 0 ] + dim;
-      px[ 3 ] = px[ 0 ] + dim;
+/* Store pointers to the physical coords at the top left corner of the
+   first cell in the first row. */
+      px2 = px1 + dim;
+      py2 = py1 + dim;
 
-/* See if the bottom left corner of the bottom left cell is bad. */
-      bad = ( *( px[ 0 ] ) == AST__BAD );
+/* Store the index of the last cell in a row or column. */
+      lastcell = ncell - 1;
 
-/* Loop round each row in the left hand column. */
-      for( j = 0; j < ncell; j++ ){
+/* Initialise index of next cell. */
+      icell = 0;
 
-/* See if the two left corners of the current cell are bad. The top left 
-   corner of the previous cell becomes the bottom left corner of the current 
-   cell. */
-         lbad = bad;
-         bad = ( *( px[ 3 ] ) == AST__BAD );
+/* Loop round every row of cells in this grid. */
+      for( irow = 0; irow < ncell; irow++ ) {
 
-/* If one corner is bad and the other is not bad, the good/bad boundary 
-   crosses the edge. We assume it passes half way between them, so record a 
-   crossing at the mid point between them, and break out of the loop. */
-         if( lbad != bad ){
-            i0 = 0;
-            j0 = j;
-            ed0 = 3;
-            x0 = 0.5*( *( gx[ 0 ] ) + *( gx[ 3 ] ) );
-            y0 = 0.5*( *( gy[ 0 ] ) + *( gy[ 3 ] ) );
-            edge[ 3 ] = 1;
-            break;
-         }
+/* See if the physical coords are bad at the bottom left corner of the
+   first cell in this row. At the same time, increment the pointers so
+   they refer to the bottom right corner of the first cell in this row. */
+         bad1 = ( *px1 == AST__BAD || *py1 == AST__BAD );
 
-/* Update the pointers to the corner coordinates so that they refer to 
-   the next cell in this row. */
-         gx[ 0 ] += dim;
-         gy[ 0 ] += dim;
-   
-         gx[ 3 ] += dim;
-         gy[ 3 ] += dim;
-         px[ 3 ] += dim;
+/* Increment the pointers. Do not do it in the above "if" statement since
+   the or (!!) means that the second expression may never be evaluated. */
+         px1++;
+         py1++;
 
-      }
-   }
+/* See if the physical coords are bad at the top left corner of the
+   first cell in this row. At the same time, increment the pointers so
+   they refer to the top right corner of the first cell in this row. */
+         bad2 = ( *px2 == AST__BAD || *py2 == AST__BAD );
+         px2++;
+         py2++;
 
-/* If no crossing has yet been found, do the right edge in the same way. */ 
-   if( ed0 == -1 ){
+/* Loop round every cell in the current row of cells. */
+         for( icol = 0; icol < ncell; icol++, icell++ ) {
 
-/* Store pointers to the graphics and physical coordinates at the right two 
-   corners of the last cell in the bottom row. */
-      gx[ 1 ] = ptr1[ 0 ] + ncell;
-      gy[ 1 ] = ptr1[ 1 ] + ncell;
-      px[ 1 ] = ptr2[ 0 ] + ncell;
+/* See if the physical coords are bad at the bottom right corner of the
+   current cell in this row. At the same time, increment the pointers so
+   they refer to the bottom right corner of the next cell in this row. */
+            bad3 = ( *px1 == AST__BAD || *py1 == AST__BAD );
+            px1++;
+            py1++;
 
-      gx[ 2 ] = gx[ 1 ] + dim;
-      gy[ 2 ] = gy[ 1 ] + dim;
-      px[ 2 ] = px[ 1 ] + dim;
+/* See if the physical coords are bad at the top right corner of the
+   current cell in this row. At the same time, increment the pointers so
+   they refer to the top right corner of the next cell in this row. */
+            bad4 = ( *px2 == AST__BAD || *py2 == AST__BAD );
+            px2++;
+            py2++;
 
-/* See if the bottom right corner of the bottom right cell is bad. */
-      bad = ( *( px[ 1 ] ) == AST__BAD );
+/* Set the returned flag non-zero if any invalidpositions are found. */
+            if( bad1 || bad2 || bad3 || bad4 ) result = 1;
 
-/* Loop round each row in the right hand column. */
-      for( j = 0; j < ncell; j++ ){
+/* If there are a mixture of good and bad corners, the good/bad boundary
+   must pass through the current cell. */
+            if( bad2 != bad1 || bad3 != bad1 || bad4 != bad1 ) {
 
-/* See if the two right corners of the current cell are bad. The top right
-   corner of the previous cell becomes the bottom right corner of the current 
-   cell. */
-         lbad = bad;
-         bad = ( *( px[ 2 ] ) == AST__BAD );
+/* If we have not yet reached the required plotting tolerance, set a flag 
+   to indicate that the boundary should be plotted through this cell 
+   using a recirsive call to this function. */
+               if( recurse ) {
+                  bndry[ icell ] = 1;
 
-/* If one corner is bad and the other is not bad, the good/bad boundary 
-   crosses the edge. We assume it passes half way between them, so record a 
-   crossing at the mid point between them, and break out of the loop. */
-         if( lbad != bad ){
-            i0 = ncell - 1;
-            j0 = j;
-            ed0 = 1;
-            x0 = 0.5*( *( gx[ 1 ] ) + *( gx[ 2 ] ) );
-            y0 = 0.5*( *( gy[ 1 ] ) + *( gy[ 2 ] ) );
-            edge[ 1 ] = 1;
-            break;
-         }
+/* If we have reached the required plotting tolerance, draw the boundary
+   as a straight line between the centres of the edges through which the
+   boundary enteres and leaves the current cell. */
+               } else {
 
-/* Update the pointers to the corner coordinates so that they refer to 
-   the next cell in this row. */
-         gx[ 1 ] += dim;
-         gy[ 1 ] += dim;
-   
-         gx[ 2 ] += dim;
-         gy[ 2 ] += dim;
-         px[ 2 ] += dim;
+/* Get the upper and lower graphics X bounds of the current cell. */
+                  cxlo = xlo + icol*dx; 
+                  cxhi = cxlo + dx;
 
-      }
-   }
+/* If an edge of the current cell has good coords at one end but bad
+   coords at the other, the boundary is assumed to pass through the edge
+   at its centre. Normally, we expect only two cell edges to have this
+   property (i.e the boundary enters the cell through one edge and leaves
+   through the other). However, sometimes all four edges may have this
+   property. In this case, two sections of the boundary must pass through
+   the cell, and there is no way of knowing which edges connect together
+   (short of further recursion), and we arbitrarily decide to join opposite
+   edges. */
+                  if( bad1 == bad4 && bad2 == bad3 ) {
 
-/* If we have found a starting cell we trace the curve out in both directions 
-   from it. */
-   if( ed0 != -1 ){
+/* Draw a horizontal line through the cell centre */
+                     yc = 0.5*( cylo + cyhi );
+                     Bpoly( this, (float) cxlo, yc, method, class, status );
+                     Apoly( this, (float) cxhi, yc, method, class, status );
 
-/* Start the polyline at the recorded edge crossing. */
-      Bpoly( this, (float) x0, (float) y0, method, class, status );
+/* Draw a vertical line through the cell centre */
+                     xc = 0.5*( cxlo + cxhi );
+                     Bpoly( this, xc, (float) cylo, method, class, status );
+                     Apoly( this, xc, (float) cyhi, method, class, status );
 
-/* Initialise the row and column of the starting cell, and the edge
-   through which the curve enters the starting cell. */
-      i = i0;
-      j = j0;
-      ed = ed0;
+/* If the boundary passes through the left hand edge, it must also have
+   passed through the right edge of the previous cell in the row (unless
+   this is the first cell in the row), so we do not need to begin a new
+   polyline (we can just extend the existing polyline). */
+                  } else if( bad1 != bad2 ) {
 
-/* We now follow the curve until it crosses one of the edges of the grid, or 
-   is lost. Loops in the border may cause an infinte loop so abort after
-   half the cells in the grid have been checked. */
-      npass = 0;
-      npass_lim = 0.5*ncell*ncell;
-      lost = 0;
-      while( !lost && npass++ < npass_lim ){
-         k = j*dim + i;
+/* If this is the first cell in the row, begin a new polyline. */
+                     yc = 0.5*( cylo + cyhi );
+                     if( icol == 0 ) Bpoly( this, (float) cxlo, yc, method, class, status );
 
-/* Store pointers to the graphics and physical coordinates at the four corners 
-   of the current cell. */
-         gx[ 0 ] = ptr1[ 0 ] + k;
-         gy[ 0 ] = ptr1[ 1 ] + k; 
-         px[ 0 ] = ptr2[ 0 ] + k;
-       
-         px[ 1 ] = px[ 0 ] + 1;
-         gx[ 1 ] = gx[ 0 ] + 1;
-         gy[ 1 ] = gy[ 0 ] + 1;
-       
-         px[ 2 ] = px[ 1 ] + dim;
-         gx[ 2 ] = gx[ 1 ] + dim;
-         gy[ 2 ] = gy[ 1 ] + dim;
-       
-         px[ 3 ] = px[ 2 ] - 1;
-         gx[ 3 ] = gx[ 2 ] - 1;
-         gy[ 3 ] = gy[ 2 ] - 1;
+/* and through the top edge, draw a line between the centres of the left
+   and top edges. */
+                     if( bad2 != bad4 ) {
+                        xc = 0.5*( cxlo + cxhi );
+                        Apoly( this, xc, (float) cyhi, method, class, status );
 
-/* Check each edge of the current cell to see if the boundary crosses it. */
-         lost = 1;
-         bad = ( *( px[ 0 ] ) == AST__BAD );
-         for( test_edge = 0; test_edge < 4; test_edge++ ){
+/* or through the right edge, draw a line between the centres of the left
+   and right edges. */
+                     } else if( bad3 != bad4 ) {
+                        Apoly( this, (float) cxhi, yc, method, class, status );
 
-/* Get the index of the corner at the anti-clockwise end of the edge. */
-            if( test_edge == 3 ) {
-               ca = 0;
-            } else {
-               ca = test_edge + 1;
+/* Otherwise, draw a line between the centres of the left and bottom edges. */
+                     } else {
+                        xc = 0.5*( cxlo + cxhi );
+                        Apoly( this, xc, (float) cylo, method, class, status );
+                     }
+
+/* If the boundary passes through the top edge (we do not need to check
+   the left edge because that was done above)... */
+                  } else if( bad4 != bad2 ) {
+
+/* and through the right edge, draw a line between the centres of the top
+   and right edges. */
+                     if( bad3 != bad4 ) {
+                        xc = 0.5*( cxlo + cxhi );
+                        yc = 0.5*( cylo + cyhi );
+                        Bpoly( this, xc, (float) cyhi, method, class, status );
+                        Apoly( this, (float) cxhi, yc, method, class, status );
+
+/* Otherwise, draw a line between the centres of the top and bottom edges. */
+                     } else {
+                        xc = 0.5*( cxlo + cxhi );
+                        Bpoly( this, xc, (float) cyhi, method, class, status );
+                        Apoly( this, xc, (float) cylo, method, class, status );
+                     }
+
+/* If the boundary passes through the right edge it must also pass
+   throught the bottom edge since all other combinations will have been
+   trapped above. */
+                  } else {
+                     xc = 0.5*( cxlo + cxhi );
+                     yc = 0.5*( cylo + cyhi );
+                     Bpoly( this, xc, (float) cylo, method, class, status );
+                     Apoly( this, (float) cxhi, yc, method, class, status );
+                  }
+
+/* If the current cell is on the edge of the grid, set flags in the
+   returned "edges" array to indicate that the boundary passes out of 
+   the grid on the appropriate edge. */
+                  if( icol == 0 ) {
+                     if( bad1 != bad2 ) edges[ 0 ] = 1;  /* Left edge */
+                  } else if( icol == lastcell ) {
+                     if( bad3 != bad4 ) edges[ 2 ] = 1;  /* Right edge */
+                  }
+
+                  if( irow == 0 ) {
+                     if( bad1 != bad3 ) edges[ 3 ] = 1;  /* Bottom edge */
+                  } else if( irow == lastcell ) {
+                     if( bad2 != bad4 ) edges[ 1 ] = 1;  /* Top edge */
+                  }
+               } 
             }
 
-/* Get the index of the corner at the clockwise end of the edge. */
-            cb = test_edge;
-
-/* Get flags indicating if the corners at the two ends of the edge are bad. */
-            lbad = bad;
-            bad = ( *( px[ ca ]  )== AST__BAD );
-
-/* If one is and one is not, the good/bad boundary crosses the edge (we
-   ignore the edge through which the curve entered the cell). Add a section 
-   to the polyline which ends at the mid point of the edge. */
-            if( lbad != bad && test_edge != ed ){
-               Apoly( this, (float) ( 0.5*( *( gx[ ca ] ) + *( gx[ cb ] ) ) ),
-                      (float) ( 0.5*( *( gy[ ca ] ) + *( gy[ cb ] ) ) ),
-                      method, class, status );
-
-/* Indicate that the curve has not been lost, save the index of the edge 
-   through which the curve leaves the cell, and leave the loop. */
-               lost = 0;
-               ed = test_edge;
-               break;
-            }
-
+/* The flags for the right hand corners of the current cell can be
+   re-used as the flags for the left hand corners of the next cell. */
+            bad1 = bad3;
+            bad2 = bad4;
          }
 
-/* If the current cell is on the bottom row, and the curve has passed out
-   through the bottom edge, set the edge's flag and leave the loop. */
-         if( j == 0 && ed == 0 ){
-            edge[ 0 ] = 1;
-            break;
-
-/* Otherwise, if the current cell is on the right hand edge of the grid,
-   and the curve passes through the right hand edge of the cell, set the
-   edge's flag and leave the loop. */
-         } else if( i == ( ncell - 1 ) && ed == 1 ){
-            edge[ 1 ] = 1;
-            break;
-
-/* Otherwise, if the current cell is on the top edge of the grid,
-   and the curve passes through the top edge of the cell, set the
-   edge's flag and leave the loop. */
-         } else if( j == ( ncell - 1 ) && ed == 2 ){
-            edge[ 2 ] = 1;
-            break;
-
-/* Otherwise, if the current cell is on the left hand edge of the grid,
-   and the curve passes through the left hand edge of the cell, set the
-   edge's flag and leave the loop. */
-         } else if( i == 0 && ed == 3 ){
-            edge[ 3 ] = 1;
-            break;
-
-/* Otherwise, find the row and column numbers of the cell into which the curve
-   passes. Also, modify the edge number so that it refers to the new cell. */
-         } else {
-
-            if( ed == 0 ){
-               j--;
-               ed = 2;
-            } else if( ed == 1 ){
-               i++;
-               ed = 3;
-            } else if( ed == 2 ){
-               j++;
-               ed = 0;
-            } else {
-               i--;
-               ed = 1;
-            }              
-
-         }
-
+/* Store the Y graphics coords at the bottom and top of the next row. */
+         cylo = cyhi;
+         cyhi = cylo + dy;
       }
 
-/* We have now reached the edge of the grid, or the curve has been lost.
-   In either case end the poly line. */
-      Opoly( this, method, class, status );
+/* If we have not yet reached the required plotting tolerance, call this
+   function recursively to draw the boundary through the cells identified
+   above. On each pass through this loop, we may discover more boundary
+   cells in the grid, in addition to those found above. Continue looping
+   until no further boundary cells are found. */
+      while( recurse ) {
 
+/* Assume that the current pass though this loop will result in all boundary
+   cells being draw, in which case we can then leave the loop. */
+         recurse = 0;
+
+/* Store the Y graphics coords at the bottom and top of the first row. */
+         cylo = ylo;
+         cyhi = ylo + dy;
+
+/* Initialise the cell index */
+         icell = 0;
+
+/* Loop round every row of cells in this grid. */
+         for( irow = 0; irow < ncell; irow++ ) {
+
+/* Loop round every cell in the current row of cells. */
+            for( icol = 0; icol < ncell; icol++, icell++ ) {
+
+/* If the good/bad boundary passes through the current cell we need to
+   draw it unless it has already been drawn. */
+               if( bndry[ icell ] && ! drawn[ icell ] ){
+
+/* Get the upper and lower graphics X bounds of the current cell. */
+                  cxlo = xlo + icol*dx; 
+                  cxhi = cxlo + dx;
+
+/* Call this function recursively to draw the boundary through the current 
+   cell, setting the returned flag non-zero if any bad positions are found. */
+                  if( TraceBorder( this, map, cxlo, cxhi, cylo, cyhi, 3, tol, 
+                                   sedges, method, class, status ) ) result = 1;
+
+/* The boundary may have passed out of the current cell and then back
+   into the cell on the same edge (i.e. a small loop that pokes out into
+   a neighbouring cell). Such neighbouring cells may not have been
+   identified by the earlier section of this function, so we now ensure
+   that any such cells are flagged as boundary cells. */
+
+/* If the boundary passed out of the left edge of the cell... */
+                  if( sedges[ 0 ] ) {
+
+/* If the current cell is at the left edge of the grid, indicate that the
+   boundary passes out of the left edge of the grid. */
+                     if( icol == 0 ) {
+                        edges[ 0 ] = 1;  /* Left edge */
+
+/* Otherwise, if the left hand neighbour of the current cell is not
+   flagged as a boundary cell, flag it now and indicate that another pass
+   though the loop is needed to draw the extra cell. */
+                     } else if( ! bndry[ icell - 1 ] ) { 
+                        bndry[ icell - 1 ] = 1;
+                        recurse = 1;
+                     }
+                  }
+
+/* If the boundary passed out of the top edge of the cell... */
+                  if( sedges[ 1 ] ) {
+
+/* If the current cell is at the top edge of the grid, indicate that the
+   boundary passes out of the top edge of the grid. */
+                     if( irow == lastcell ) {
+                        edges[ 1 ] = 1;  /* Top edge */
+
+/* Otherwise, ensure that the upper neighbour of the current cell is
+   flagged as a boundary cell. */
+                     } else {
+                        bndry[ icell + ncell ] = 1;
+                     }
+                  }
+
+/* If the boundary passed out of the right edge of the cell... */
+                  if( sedges[ 2 ] ) {
+
+/* If the current cell is at the right edge of the grid, indicate that the
+   boundary passes out of the right edge of the grid. */
+                     if( icol == lastcell ) {
+                        edges[ 2 ] = 1;  /* Right edge */
+
+/* Otherwise, ensure that the right hand neighbour of the current cell is
+   flagged as a boundary cell. */
+                     } else {
+                        bndry[ icell + 1 ] = 1;
+                     }
+                  }
+
+/* If the boundary passed out of the bottom edge of the cell... */
+                  if( sedges[ 3 ] ) {
+
+/* If the current cell is at the bottom edge of the grid, indicate that the
+   boundary passes out of the bottom edge of the grid. */
+                     if( irow == 0 ) {
+                        edges[ 3 ] = 1;  /* Bottom edge */
+
+/* Otherwise, if the lower neighbour of the current cell is not flagged 
+   as a boundary cell, flag it now and indicate that another pass though 
+   the loop is needed to draw the extra cell. */
+                     } else if( ! bndry[ icell - ncell ] ) { 
+                        bndry[ icell - ncell ] = 1;
+                        recurse = 1;
+                     }
+                  }
+
+/* Indicate this cell has been drawn. */
+                  drawn[ icell ] = 1;
+               }
+            }
+
+/* Store the Y graphics coords at the bottom and top of the next row. */
+            cylo += dy;
+            cyhi = cylo + dy;
+         }
+      }
    }
 
-/* Return. */
-   return;
+/* Free resources */
+   bndry = astFree( bndry );
+   drawn = astFree( drawn );
+   pset1 = astAnnul( pset1 );
+   pset2 = astAnnul( pset2 );
 
+/* Return the result. */
+   return result;
 }
 
 static AstPointSet *Trans( AstPlot *this, AstFrame *frm, AstMapping *mapping, 
@@ -26657,7 +26816,7 @@ static AstPointSet *Trans( AstPlot *this, AstFrame *frm, AstMapping *mapping,
    ncoord_out = astGetNcoord( result );
    npoint = astGetNpoint( result );
    ptr_out = astGetPoints( result );
-
+   
 /* If we have done a forward mapping, we now normalise the returned physical 
    positions if required using the astNorm method for the supplied object. */
    if( forward && norm ){
@@ -30544,10 +30703,6 @@ f     function is invoked with STATUS set to an error value, or if it
    return astMakeId( new );
 
 }
-
-
-
-
 
 
 
