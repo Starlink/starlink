@@ -1608,6 +1608,26 @@ iraf! {
           }
       }
 
+      action astnegate {
+         helplib {$ATOOLS_HELP}
+         parameter result {
+            position 2
+            type LITERAL
+            prompt {Name of file in which to store the negated Region}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The input Region}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+      }
+
       action astspecframe {
          helplib {$ATOOLS_HELP}
          parameter options {
