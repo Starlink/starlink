@@ -390,6 +390,10 @@
 *  Map each NDF section for reading using the appropriate floating
 *  point data type and determine if it is necessary to check for the
 *  presence of bad pixel values.
+         PNTRI( 1 ) = 0
+         PNTRI( 2 ) = 0
+         PNTRJ( 1 ) = 0
+         PNTRJ( 2 ) = 0
          CALL NDF_MAP( NDFI, COMP, ITYPE, 'READ', PNTRI, EL, STATUS )
          CALL NDF_MAP( NDFJ, COMP, ITYPE, 'READ', PNTRJ, EL, STATUS )
          CALL NDF_MBAD( .TRUE., NDFI, NDFJ, COMP, .FALSE., BAD, STATUS )
