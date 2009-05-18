@@ -159,6 +159,10 @@
 *     01-JUL-1999 (PDRAPER):
 *        Added initialization of ORIG values. These where not set if 
 *        GETS or GETZ only where true (Linux random values).
+*     18-MAY-2009 (PDRAPER):
+*        Correct error messages from PDA_LSQR calls to show correct
+*        error value and associated parameter name. Proceed with the
+*        solution if the iteration limit was reached (ISTOP=7).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -740,12 +744,12 @@
      :                  ANORM, ACOND, RNORM, ARNORM, XNORM )
 
 *  If there is no solution, then report an error.
-         IF ( INFO .EQ. 3 .OR. INFO .GT. 5  ) THEN
+         IF ( INFO .EQ. 3 .OR. INFO .EQ. 6  ) THEN
             STATUS = USER__001
             CALL MSG_SETI( 'INFO', INFO )
             CALL ERR_REP( 'CCD1_SZSLV_LSQR',
      :                    'Error solving for consistent scale ' //
-     :                    'factor corrections - INFO=^INFO ' //
+     :                    'factor corrections - ISTOP=^INFO ' //
      :                    'returned by routine PDA_LSQR.', STATUS )
          ELSE
 
@@ -807,13 +811,13 @@
      :                  ANORM, ACOND, RNORM, ARNORM, XNORM )
 
 *  If there is no solution, then report an error.
-         IF ( INFO .EQ. 3 .OR. INFO .GT. 5  ) THEN
+         IF ( INFO .EQ. 3 .OR. INFO .EQ. 6  ) THEN
             STATUS = USER__001
             CALL MSG_SETI( 'INFO', INFO )
             CALL ERR_REP( 'CCD1_SZSLV_F04QAF',
      :                    'Error solving for consistent zero ' //
-     :                    'point corrections - IFAIL=^IFAIL ' //
-     :                    'returned by routine PDA.', STATUS )
+     :                    'point corrections - ISTOP=^INFO ' //
+     :                    'returned by routine PDA_LSQR.', STATUS )
          ELSE
 
 *  If successful, normalise the zero point corrections, either to have
