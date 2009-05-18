@@ -153,6 +153,7 @@ static void (* parent_clearmeshsize)( AstRegion *, int * );
 static double (*parent_getfillfactor)( AstRegion *, int * );
 static void (*parent_regsetattrib)( AstRegion *, const char *, char **, int * );
 static void (*parent_regclearattrib)( AstRegion *, const char *, char **, int * );
+static void (* parent_resetcache)( AstRegion *, int * );
 
 #if defined(THREAD_SAFE)
 static int (* parent_managelock)( AstObject *, int, int, AstObject **, int * );
@@ -197,13 +198,16 @@ AstCmpRegion *astCmpRegionId_( void *, void *, int, const char *, ... );
 static AstMapping *Simplify( AstMapping *, int * );
 static AstPointSet *RegBaseMesh( AstRegion *, int * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
-static AstRegion *RegBasePick( AstRegion *this, int, const int *, int * );
 static AstRegion *GetDefUnc( AstRegion *, int * );
 static AstRegion *MatchRegion( AstRegion *, int, AstRegion *, const char *, int * );
+static AstRegion *RegBasePick( AstRegion *this, int, const int *, int * );
 static double GetFillFactor( AstRegion *, int * );
 static int Equal( AstObject *, AstObject *, int * );
 static int GetBounded( AstRegion *, int * );
 static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int **, int * );
+static int RegTrace( AstRegion *, int, double *, double **, int * );
+static void ClearClosed( AstRegion *, int * );
+static void ClearMeshSize( AstRegion *, int * );
 static void Copy( const AstObject *, AstObject *, int * );
 static void Decompose( AstMapping *, AstMapping **, AstMapping **, int *, int *, int *, int * );
 static void Delete( AstObject *, int * );
@@ -213,11 +217,11 @@ static void RegBaseBox( AstRegion *, double *, double *, int * );
 static void RegBaseBox2( AstRegion *, double *, double *, int * );
 static void RegClearAttrib( AstRegion *, const char *, char **, int * );
 static void RegSetAttrib( AstRegion *, const char *, char **, int * );
-static void SetRegFS( AstRegion *, AstFrame *, int * );
+static void ResetCache( AstRegion *this, int * );
+static void SetBreakInfo( AstCmpRegion *, int, int * );
 static void SetClosed( AstRegion *, int, int * );
 static void SetMeshSize( AstRegion *, int, int * );
-static void ClearClosed( AstRegion *, int * );
-static void ClearMeshSize( AstRegion *, int * );
+static void SetRegFS( AstRegion *, AstFrame *, int * );
 
 #if defined(THREAD_SAFE)
 static int ManageLock( AstObject *, int, int, AstObject **, int * );
@@ -986,6 +990,9 @@ void astInitCmpRegionVtab_(  AstCmpRegionVtab *vtab, const char *name, int *stat
    parent_setregfs = region->SetRegFS;
    region->SetRegFS = SetRegFS;
 
+   parent_resetcache = region->ResetCache;
+   region->ResetCache = ResetCache;
+
    parent_equal = object->Equal;
    object->Equal = Equal;
 
@@ -1022,6 +1029,7 @@ void astInitCmpRegionVtab_(  AstCmpRegionVtab *vtab, const char *name, int *stat
    region->RegBaseBox2 = RegBaseBox2;
    region->RegBaseMesh = RegBaseMesh;
    region->RegPins = RegPins;
+   region->RegTrace = RegTrace;
    region->GetBounded = GetBounded;
    region->RegBasePick = RegBasePick;
 
@@ -1190,8 +1198,9 @@ static AstRegion *MatchRegion( AstRegion *this, int ifrm, AstRegion *that,
 /* Initialise */
    result = NULL;
 
-/* Check the global error status. */
-   if ( !astOK ) return result;
+/* Check the global error status. Also return NULL if no Regions were
+   supplied. */
+   if ( !astOK || !this || !that ) return result;
 
 /* Temporarily invert "this" if we are matching its base Frame (since the 
    astConvert method matches current Frames). */
@@ -2097,8 +2106,8 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    pset2 = astAnnul( pset2 );
    psetb1 = astAnnul( psetb1 );
    psetb2 = astAnnul( psetb2 );
-   unc1 = astAnnul( unc1 );
-   unc2 = astAnnul( unc2 );
+   if( unc1 ) unc1 = astAnnul( unc1 );
+   if( unc2 ) unc2 = astAnnul( unc2 );
 
 /* If an error has occurred, return zero. */
    if( !astOK ) {
@@ -2202,6 +2211,333 @@ static void RegSetAttrib( AstRegion *this_region, const char *setting,
    }
 }
 
+static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr, 
+                     int *status ){
+/*
+*+
+*  Name:
+*     RegTrace
+
+*  Purpose:
+*     Return requested positions on the boundary of a 2D Region.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpregion.h"
+*     int astRegTrace( AstRegion *this, int n, double *dist, double **ptr );
+
+*  Class Membership:
+*     CmpRegion member function (overrides the astRegTrace method
+*     inherited from the parent Region class).
+
+*  Description:
+*     This function returns positions on the boundary of the supplied
+*     Region, if possible. The required positions are indicated by a
+*     supplied list of scalar parameter values in the range zero to one.
+*     Zero corresponds to some arbitrary starting point on the boundary,
+*     and one corresponds to the end (which for a closed region will be 
+*     the same place as the start).
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+*     n
+*        The number of positions to return. If this is zero, the function
+*        returns without action (but the returned function value still
+*        indicates if the method is supported or not).
+*     dist
+*        Pointer to an array of "n" scalar parameter values in the range
+*        0 to 1.0.
+*     ptr 
+*        A pointer to an array of pointers. The number of elements in
+*        this array should equal tthe number of axes in the Frame spanned
+*        by the Region. Each element of the array should be a pointer to
+*        an array of "n" doubles, in which to return the "n" values for
+*        the corresponding axis. The contents of the arrays are unchanged
+*        if the supplied Region belongs to a class that does not
+*        implement this method.
+
+*  Returned Value:
+*     Non-zero if the astRegTrace method is implemented by the class
+*     of Region supplied, and zero if not.
+
+*-
+*/
+
+/* Local Variables; */
+   AstCmpRegion *this;
+   AstFrame *frm;
+   AstMapping *map;
+   AstPointSet *bpset;
+   AstPointSet *cpset;
+   double **bptr;
+   int i;
+   int j;
+   int ncur;
+   int result;         
+   double *rval;
+   double *off;
+   double *r1d;
+   double *r2d;
+   double *r1ptr[ 2 ];
+   double *r2ptr[ 2 ];
+   double **r1ptrb;
+   double **r2ptrb;
+   double dbreak;
+   double dtot;
+   double x;
+   int r1n;
+   int r2n;
+   AstPointSet *r1pset;
+   AstPointSet *r2pset;
+   AstPointSet *r1psetb;
+   AstPointSet *r2psetb;
+
+/* Initialise */
+   result = 0;
+
+/* Check inherited status. */
+   if( ! astOK ) return result;
+
+/* Get a pointer to the CmpRegion structure. */
+   this = (AstCmpRegion *) this_region;
+
+/* Get a pointer to the base Frame in the encapsulated FrameSet. */
+   frm = astGetFrame( this_region->frameset, AST__BASE );
+
+/* Check it is 2-dimensional. */
+   result = 1;
+   if( astGetNaxes( frm ) != 2 ) result = 0;
+
+/* Check the component Regions can be traced. */
+   if( !astRegTrace( this->region1, 0, NULL, NULL ) || 
+       !astRegTrace( this->region1, 0, NULL, NULL ) ) result = 0;
+
+/* Check we have some points to find. */
+   if( result && n > 0 ) {
+
+/* We first determine the required positions in the base Frame of the
+   Region, and then transform them into the current Frame. Get the 
+   base->current Mapping, and the number of current Frame axes. */
+      map = astGetMapping( this_region->frameset, AST__BASE, AST__CURRENT );
+
+/* If it's a UnitMap we do not need to do the transformation, so put the
+   base Frame positions directly into the supplied arrays. */
+      if( astIsAUnitMap( map ) ) {
+         bpset = NULL;
+         bptr = ptr;
+         ncur = 2;
+
+/* Otherwise, create a PointSet to hold the base Frame positions. */
+      } else {
+         bpset = astPointSet( n, 2, " ", status );
+         bptr = astGetPoints( bpset );
+         ncur = astGetNout( map );
+      }
+
+      r1d = astMalloc( sizeof( double )*n );
+      r2d = astMalloc( sizeof( double )*n );
+
+/* Ensure information about the breaks in the boundary of each component
+   region is available within the CmpRegion structure. These breaks are
+   the points at which the two boundaries cross. */
+      SetBreakInfo( this, 0, status );
+      SetBreakInfo( this, 1, status );
+
+/* Get the constants needed to convert the supplied distances (normalised
+   so that the border of the entire Cmpregion has a length of 1.0), into
+   distances around the border of each component Region. */
+      dtot = this->d0[ 0 ] + this->d0[ 1 ];
+      dbreak = this->d0[ 0 ]/dtot;
+
+/* Check the pointers can be used safely. */
+      if( astOK ) {
+
+/* Loop round all supplied distances, determining if they represent a
+   position on the firts or second component Region. */
+         r1n = 0;
+         r2n = 0;
+         for( i = 0; i < n; i++ ) {
+
+/* If the current distance represents a point in the second component
+   Region... */
+            if( dist[ i ] > dbreak ) {
+
+/* Find the correspond distance around the used sections of the second
+   component region (normalised so that the entire border of the 
+   component region has a length of "this->d0[1]"). */
+               x = ( dist[ i ] - dbreak )*dtot;
+
+/* Convert this into the correspond distance around the entire border of 
+   the second component region (normalised so that the entire border of the 
+   component region has unit length). */
+               rval = this->rvals[ 1 ];
+               off = this->offs[ 1 ];
+
+               for( j = 0; j < this->nbreak[ 1 ]; j++,rval++,off++ ) {
+                  if( x <= *rval ){
+                     x += *off;                  
+                     break;
+                  }
+               }
+
+/* Store this as the next distance to move around the second component
+   Region. */
+               r2d[ r2n++ ] = x;
+
+/* Now we do the same if the current distance corresponds to a position
+   in the first component Region. */
+            } else {
+
+               x = dist[ i ]*dtot;
+
+               rval = this->rvals[ 0 ];
+               off = this->offs[ 0 ];
+
+               for( j = 0; j < this->nbreak[ 0 ]; j++,rval++,off++ ) {
+                  if( x <= *rval ){
+                     x += *off;                  
+                     break;
+                  }
+               }
+
+               r1d[ r1n++ ] = x;
+
+            }
+
+         }                     
+      }
+
+/* Allocate memory to hold the axis values at the corresponding positions
+   in the first component Region. */
+      r1ptr[ 0 ] = astMalloc( sizeof( double )*r1n );
+      r1ptr[ 1 ] = astMalloc( sizeof( double )*r1n );
+
+/* Allocate memory to hold the axis values at the corresponding positions
+   in the second component Region. */
+      r2ptr[ 0 ] = astMalloc( sizeof( double )*r2n );
+      r2ptr[ 1 ] = astMalloc( sizeof( double )*r2n );
+         
+/* Check the pointers can be used safely. */
+      if( astOK ) {
+
+/* Find the axis values at each of the required positions that fall in
+   the first component Region. Negate it first if needed to ensure the
+   Region is bounded (not guaranteed, but likely). */ 
+         if( astGetBounded( this->region1 ) ) {  
+            (void) astRegTrace( this->region1, r1n, r1d, r1ptr );
+         } else {
+            astNegate( this->region1 );
+            (void) astRegTrace( this->region1, r1n, r1d, r1ptr );
+            astNegate( this->region1 );
+         }
+
+/* Do the same for the second component Region. */
+         if( astGetBounded( this->region2 ) ) {  
+            (void) astRegTrace( this->region2, r2n, r2d, r2ptr );
+         } else {
+            astNegate( this->region2 );
+            (void) astRegTrace( this->region2, r2n, r2d, r2ptr );
+            astNegate( this->region2 );
+         }
+
+/* If the two component Regions are ANDed together, we want to remove the
+   positions from the boundary of the required component Region that fall 
+   outside the other region. We can do this by simply using the other Region 
+   as a Mapping. If the two component Regions are ORed together, we want to 
+   remove the position that fall within (rather than outside) the other 
+   Region. To do this we need to negate the other region  first. */
+         if( this->oper == AST__OR ) {
+            astNegate( this->region1 );
+            astNegate( this->region2 );
+         }
+   
+/* Now transform the points on the boundary of the first Region in order 
+   to set invalid those positions which are not on the boundary of the 
+   supplied CmpRegion. */
+         if( r1n > 0 ) {
+            r1pset = astPointSet( r1n, 2, " ", status );
+            astSetPoints( r1pset, r1ptr );
+            r1psetb = astTransform( this->region2, r1pset, 1, NULL );
+            r1ptrb = astGetPoints( r1psetb );
+         } else {
+            r1pset = NULL;
+            r1psetb = NULL;
+            r1ptrb = NULL;
+         }
+
+/* Now transform the points on the boundary of the second Region in order 
+   to set invalid those positions which are not on the boundary of the 
+   supplied CmpRegion. */
+         if( r2n > 0 ) {
+            r2pset = astPointSet( r2n, 2, " ", status );
+            astSetPoints( r2pset, r2ptr );
+            r2psetb = astTransform( this->region1, r2pset, 1, NULL );
+            r2ptrb = astGetPoints( r2psetb );
+         } else {
+            r2pset = NULL;
+            r2psetb = NULL;
+            r2ptrb = NULL;
+         }
+
+/* Re-instate the original Negated values */
+         if( this->oper == AST__OR ) {
+            astNegate( this->region1 );
+            astNegate( this->region2 );
+         }
+
+/* Check pointer can be used safely. */
+         if( astOK ) {
+
+/* Copy the boundary positions from each component Region into a single
+   PointSet. These positions are in the base Frame of the Cmpregion. */
+            r1n = 0;
+            r2n = 0;
+            for( i = 0; i < n; i++ ) {
+               if( dist[ i ] > dbreak ) {
+                  bptr[ 0 ][ i ] = r2ptrb[ 0 ][ r2n ];
+                  bptr[ 1 ][ i ] = r2ptrb[ 1 ][ r2n++ ];
+               } else {
+                  bptr[ 0 ][ i ] = r1ptrb[ 0 ][ r1n ];
+                  bptr[ 1 ][ i ] = r1ptrb[ 1 ][ r1n++ ];
+               }
+            }                     
+
+         }
+
+/* Free resources. */
+         if( r1pset ) r1pset = astAnnul( r1pset );
+         if( r2pset ) r2pset = astAnnul( r2pset );
+         if( r1psetb ) r1psetb = astAnnul( r1psetb );
+         if( r2psetb ) r2psetb = astAnnul( r2psetb );
+
+      }
+
+
+/* If required, transform the base frame positions into the current
+   Frame of the Cmpregion, storing them in the supplied array. Then 
+   free resources. */
+      if( bpset ) {
+         cpset = astPointSet( n, ncur, " ", status );
+         astSetPoints( cpset, ptr );
+   
+         (void) astTransform( map, bpset, 1, cpset );
+   
+         cpset = astAnnul( cpset );
+         bpset = astAnnul( bpset );
+      }
+
+/* Free remaining resources. */
+      map = astAnnul( map );
+   }
+   frm = astAnnul( frm );
+
+/* Return the result. */
+   return result;
+}
+
 static void RegClearAttrib( AstRegion *this_region, const char *attrib, 
                             char **base_attrib, int *status ) {
 /*
@@ -2286,6 +2622,289 @@ static void RegClearAttrib( AstRegion *this_region, const char *attrib,
       batt = astFree( batt );
    }
 }
+
+static void ResetCache( AstRegion *this_region, int *status ){
+/*
+*  Name:
+*     ResetCache
+
+*  Purpose:
+*     Clear cached information within the supplied Region.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpregion.h"
+*     void ResetCache( AstRegion *this, int *status )
+
+*  Class Membership:
+*     Region member function (overrides the astResetCache method
+*     inherited from the parent Region class).
+
+*  Description:
+*     This function clears cached information from the supplied Region 
+*     structure.
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+*     status
+*        Pointer to the inherited status variable.
+*/
+
+/* Local Variables *: */
+   AstCmpRegion *this;
+   int i;
+
+/* Check a Region was supplied. */
+   if( this_region ) {
+
+/* Get a pointer to the CmpRegion structure. */
+      this = (AstCmpRegion *) this_region;
+
+/* Clear information cached in the CmpRegion structure. */
+      for( i = 0; i < 2; i++ ) {
+         this->rvals[ i ] = astFree(  this->rvals[ i ] );
+         this->offs[ i ] = astFree(  this->offs[ i ] );
+         this->nbreak[ i ] = 0;
+         this->d0[ i ] = AST__BAD;
+      }
+
+/* Clear information cached in the component regions. */
+      if( this->region1 ) astResetCache( this->region1 );
+      if( this->region2 ) astResetCache( this->region2 );
+
+/* Clear information cached in the parent Region structure. */
+      (*parent_resetcache)( this_region, status );
+   }
+}
+
+static void SetBreakInfo( AstCmpRegion *this, int comp, int *status ){
+/*
+*  Name:
+*     SetBreakInfo
+
+*  Purpose:
+*     Ensure that a CmpRegion has information about the breaks in the
+*     boundaries of one of the two component Regions.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpregion.h"
+*     void SetBreakInfo( AstCmpRegion *this, int comp, int *status )
+
+*  Class Membership:
+*     CmpRegion method.
+
+*  Description:
+*     This function returns without action if the supplied CmpRegion
+*     already contains break information for the specified component Region. 
+*     Otherwise, it creates the required information and stores it in the 
+*     Cmpregion.
+*
+*     Each component Region in the CmpRegion has a boundary. But in
+*     general only part of the boundary of a component Region will also
+*     be included in the CmpRegion boundary. Thus the component Region
+*     boundary can be broken up into sections; sections that form part
+*     of the CmpRegion boundary, and sections that do not. This function
+*     stores information about the breaks between these sections.
+*
+*     The complete boundary of a component Region is parameterised by a
+*     distance that goes from 0.0 to 1.0. This function find the ranges
+*     of this parameter that correspond to the sections of the boundary that
+*     are also on the Cmpregion boundary, and thus finds the total length
+*     that the component boundary contributes to the CmpRegion boundary.
+*     This length is stored in "this->d0" (a two element array, one for
+*     each component Region).
+*
+*     It also find two arrays "this->rvals" and "this->offs" that allow a 
+*     distance value in the range 0.0 to "this->d0" (i.e. a distance
+*     measured by skipping over the parts of the component boundary that 
+*     are not on the Cmpregion boundary), to be converted into the
+*     corresponding distance value in the range 0.0 to 1.0 (i.e. a distance
+*     measured round the complete component boundary, including the parts
+*     not on the Cmpregion boundary).
+
+*  Parameters:
+*     this
+*        Pointer to a CmpRegion.
+*     comp
+*        Zero or one, indicating which component Region is to be checked.
+*     status
+*        Pointer to the inherited status variable.
+
+*/
+
+/* The number of points to be spread evenly over the entire boundary of the 
+   component Region. */
+#define NP 101 
+
+/* Local Variables: */
+   AstPointSet *pset1;
+   AstPointSet *pset2;
+   AstRegion *other;
+   AstRegion *reg;
+   double **ptr1;
+   double **ptr2;
+   double *d;
+   double *offs;        
+   double *p;
+   double *q;
+   double *rvals;
+   double delta;
+   double rval;
+   int i;
+   int j;
+   int nn;
+   int prevgood;
+   
+/* Check inherited status */
+   if( !astOK ) return;
+
+/* If the information describing breaks in the component boundary has not
+   yet been set up, do so now. */
+   if( this->d0[ comp ] == AST__BAD ) {
+
+/* Get a pointer to the component Region for which break information is 
+   required. */
+      reg = comp ? this->region2 : this->region1;
+
+/* Check the component class implements the astRegTrace method. */
+      if( astRegTrace( reg, 0, NULL, NULL ) ) {
+
+/* Create a pointSet to hold axis values at evenly spaced positions along 
+   the entire boundary of the selected component region. */
+         pset1 = astPointSet( NP, 2, " ", status );
+         ptr1 = astGetPoints( pset1 );
+
+/* Allocate memory to hold an array of corresponding scalar distances around 
+   the boundary. */
+         d = astMalloc( NP*sizeof( double ) );
+
+/* Check pointers can be used safely. */
+         if( astOK ) {
+
+/* Get the distance increment between points (the entire boundary has
+   unit length). */
+            delta = 1.0/( NP - 1 );
+
+/* Set up the array of evenly spaced distances around the boundary of the
+   component region. */
+            for( i = 0; i < NP; i++ ) d[ i ] = i*delta;
+
+/* Get the corresponding Frame positions. If the Region is unbounded
+   (e.g. a negated circle, etc), then negate it first in the hope that
+   this may produced a bounded Region. */
+            if( astGetBounded( reg ) ) {  
+               (void) astRegTrace( reg, NP, d, ptr1 );
+            } else {
+               astNegate( reg );
+               (void) astRegTrace( reg, NP, d, ptr1 );
+               astNegate( reg );
+            }
+
+/* Get a pointer to the other component Region. */
+            other = comp ? this->region1 : this->region2;
+
+/* If the two component Regions are ANDed together, we want to remove the
+   positions from the boundary of the required component Region that fall 
+   outside the other region. We can do this by simply using the other Region 
+   as a Mapping. If the two component Regions are ORed together, we want to 
+   remove the position that fall within (rather than outside) the other 
+   Region. To do this we need to negate the other region  first. */
+            if( this->oper == AST__OR ) astNegate( other );
+
+/* Now transform the points on the boundary of the selected Region in
+   order to set invalid those positions which are not on the boundary of 
+   the supplied CmpRegion. */
+            pset2 = astTransform( other, pset1, 1, NULL );
+         
+/* Negate the other region again to revert it to is original state */
+            if( this->oper == AST__OR ) astNegate( other );
+
+/* Modify the distance array by setting invalid each element that is not 
+   on the boundary of the CmpRegion. */
+            ptr2 = astGetPoints( pset2 );
+            if( astOK ) {
+               p = ptr2[ 0 ];
+               q = ptr2[ 1 ];
+               for( i = 0; i < NP; i++,p++,q++ ) {
+                  if( *p == AST__BAD || *q == AST__BAD ) d[ i ] = AST__BAD;
+               }
+
+/* At each good/bad junction in this list, extend the good section by one
+   point. This ensures that the good sections of the curve do in fact
+   touch each other (they may in fact overlap a little but that does not
+   matter). */
+               prevgood = ( d[ 0 ] != AST__BAD );
+               for( i = 1; i < NP; i++,p++,q++ ) {
+                  if( d[ i ] == AST__BAD ) {
+                     if( prevgood ) d[ i ] = i*delta;
+                     prevgood = 0;
+
+                  } else {
+                     if( !prevgood ) d[ i - 1 ] = ( i - 1 )*delta;
+                     prevgood = 1;
+                  }
+               }
+
+/* Now create two arrays - "rvals" holds the distance travelled around
+   the used parts of the border at which breaks occur, "offs" holds the jump
+   in distance around the complete border at each break. The distance
+   around the complete border is normalised to the range [0.0,1.0].
+   Therefore the total distance around the used parts of the border will in
+   general be less than 1.0 */
+               nn = 0;
+               rval = 0.0;
+               rvals = NULL;
+               offs = NULL;
+
+               prevgood = ( d[ 0 ] != AST__BAD );
+               for( i = 1; i < NP; i++,p++,q++ ) {
+
+                  if( d[ i ] == AST__BAD ) {
+                     if( prevgood ) {
+                        j = nn++;
+                        rvals = astGrow( rvals, nn, sizeof( double ) );
+                        offs = astGrow( offs, nn, sizeof( double ) );
+                        if( astOK ) {
+                           rvals[ j ] = rval;
+                           offs[ j ] = d[ i - 1 ] - rval +  0.5*delta;
+                        } else {
+                           break;
+                        }
+                     }
+
+                     prevgood = 0;
+
+                  } else {
+                     rval += delta;
+                     prevgood = 1;
+                  }
+               }
+
+/* Record the information in the CmpRegion structure. */
+               this->rvals[ comp ] = rvals;
+               this->offs[ comp ] = offs;
+               this->nbreak[ comp ] = nn;
+               this->d0[ comp ] = rval;
+            }
+
+/* Free resources. */
+            pset2 = astAnnul( pset2 );
+         }
+
+         pset1 = astAnnul( pset1 );
+         d = astFree( d );
+
+      }
+   }
+}
+
+#undef NP 
 
 static void SetRegFS( AstRegion *this_region, AstFrame *frm, int *status ) {
 /*
@@ -2871,6 +3490,7 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
 /* Local Variables: */
    AstCmpRegion *in;                /* Pointer to input CmpRegion */
    AstCmpRegion *out;               /* Pointer to output CmpRegion */
+   int i;                           /* Loop count */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -2883,6 +3503,13 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
    Regions from the output CmpRegion. */
    out->region1 = NULL;
    out->region2 = NULL;
+
+   for( i = 0; i < 2; i++ ) {
+      out->rvals[ i ] = NULL;
+      out->offs[ i ] = NULL;
+      out->nbreak[ i ] = 0;
+      out->d0[ i ] = AST__BAD;
+   }
 
 /* Make copies of these Regions and store pointers to them in the output
    CmpRegion structure. */
@@ -2925,9 +3552,16 @@ static void Delete( AstObject *obj, int *status ) {
 
 /* Local Variables: */
    AstCmpRegion *this;              /* Pointer to CmpRegion */
+   int i;
 
 /* Obtain a pointer to the CmpRegion structure. */
    this = (AstCmpRegion *) obj;
+
+/* Free arrays holding cached information. */
+   for( i = 0; i < 2; i++ ) {
+      this->rvals[ i ] = astFree( this->rvals[ i ] );
+      this->offs[ i ] = astFree( this->offs[ i ] );
+   }
 
 /* Annul the pointers to the component Regions. */
    this->region1 = astAnnul( this->region1 );
@@ -3405,6 +4039,7 @@ AstCmpRegion *astInitCmpRegion_( void *mem, size_t size, int init,
    AstRegion *new_reg2;          /* 2nd Region mapped into 1st Region's Frame */
    AstRegion *reg1;              /* Copy of first supplied Region */
    AstRegion *reg2;              /* Copy of second supplied Region */
+   int i;                        /* Loop count */
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -3471,6 +4106,14 @@ AstCmpRegion *astInitCmpRegion_( void *mem, size_t size, int init,
 
 /* Note the operator used to combine the somponent Regions. */
       new->oper = oper;
+
+/* Initialised cached values to show they have not yet been found. */
+      for( i = 0; i < 2; i++ ) {
+         new->rvals[ i ] = NULL;
+         new->offs[ i ] = NULL;
+         new->nbreak[ i ] = 0;
+         new->d0[ i ] = AST__BAD;
+      }
 
 /* If the base->current Mapping in the FrameSet within each component Region 
    is a UnitMap, then the FrameSet does not need to be included in the
@@ -3589,9 +4232,10 @@ AstCmpRegion *astLoadCmpRegion_( void *mem, size_t size,
 
 /* Local Variables: */
    astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
-   AstCmpRegion *new;               /* Pointer to the new CmpRegion */
-   AstFrame *f1;                    /* Base Frame in parent Region */
-   AstRegion *creg;                 /* Pointer to component Region */
+   AstCmpRegion *new;            /* Pointer to the new CmpRegion */
+   AstFrame *f1;                 /* Base Frame in parent Region */
+   AstRegion *creg;              /* Pointer to component Region */
+   int i;                        /* Loop count */
 
 /* Initialise. */
    new = NULL;
@@ -3652,6 +4296,14 @@ AstCmpRegion *astLoadCmpRegion_( void *mem, size_t size,
 /* --------------- */
       new->region2 = astReadObject( channel, "regionb", NULL );
 
+/* Initialised cached values to show they have not yet been found. */
+      for( i = 0; i < 2; i++ ) {
+         new->rvals[ i ] = NULL;
+         new->offs[ i ] = NULL;
+         new->nbreak[ i ] = 0;
+         new->d0[ i ] = AST__BAD;
+      }
+
 /* If either component Region has a dummy FrameSet rather than the correct
    FrameSet, the correct FrameSet will have copies of the base Frame of the 
    new CmpRegion as both its current and base Frames, connected by a UnitMap 
@@ -3690,9 +4342,6 @@ AstCmpRegion *astLoadCmpRegion_( void *mem, size_t size,
    same interface. */
 
 /* None. */
-
-
-
 
 
 

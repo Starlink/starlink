@@ -1291,8 +1291,8 @@ static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr,
       if( n > 5 && nv > 5 ) {
 
          monotonic = 1;
-         for( i = 0; i < n; i++ ) {
-            if( dist[ i + 1 ] < dist[ i ] ) {
+         for( i = 1; i < n; i++ ) {
+            if( dist[ i ] < dist[ i - 1 ] ) {
                monotonic = 0;
                break;
             }

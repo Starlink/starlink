@@ -5001,6 +5001,10 @@ static void LineOffset( AstFrame *this, AstLineDef *line, double par,
          v[ 0 ] = c * nx + s * sl->dir[ 0 ];
          v[ 1 ] = c * ny + s * sl->dir[ 1 ];
          v[ 2 ] = c * nz + s * sl->dir[ 2 ];
+      } else {
+         v[ 0 ] = nx;
+         v[ 1 ] = ny;
+         v[ 2 ] = nz;
       }
 
 /* Convert to lon/lat */

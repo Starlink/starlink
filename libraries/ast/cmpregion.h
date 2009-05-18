@@ -110,6 +110,10 @@ typedef struct AstCmpRegion {
    AstRegion *region1;           /* First component Region */
    AstRegion *region2;           /* Second component Region */
    int oper;                     /* Boolean operator */
+   double *rvals[ 2 ];           /* Used boundary length at each break */
+   double *offs[ 2 ];            /* Jump at each break */
+   int nbreak[ 2 ];              /* Number of breaks */
+   double d0[ 2 ];               /* Total used boundary length */
 
 } AstCmpRegion;
 
