@@ -2918,15 +2918,21 @@ static AstMapping *RemoveRegions( AstMapping *this_mapping, int *status ) {
 /* First handle series CmpMaps. */
       if( this->series ) {
 
-/* If the first new Mapping is a UnitMap, return the second new Mapping
-   since the first one will have no effect. */
+/* Otherwise, if the second new Mapping is a UnitMap, return a copy of the 
+   first new Mapping (with the original Invert attribute) since the second 
+   one will have no effect. */
          if( unit1 ) {
-            result = astClone( newmap2 );
+            result = astCopy( newmap2 );
+            astSetInvert( result, this->invert2 );
+            if( astGetInvert( this ) ) astInvert( result );
 
-/* Otherwise, if the second new Mapping is a UnitMap, return the first 
-   new Mapping since the second one will have no effect. */
+/* Otherwise, if the second new Mapping is a UnitMap, return a copy of the 
+   first new Mapping (with the original Invert attribute) since the second 
+   one will have no effect. */
          } else if( unit2 ) {
-            result = astClone( newmap1 );
+            result = astCopy( newmap1 );
+            astSetInvert( result, this->invert1 );
+            if( astGetInvert( this ) ) astInvert( result );
 
 /* If neither of the new Mappings is a UnitMap, return a new CmpMap
    containing the two new Mappings. We take a deep copy of the supplied
