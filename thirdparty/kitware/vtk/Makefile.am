@@ -3,7 +3,7 @@
 @SET_MAKE@
 
 ##  Extension for shared libraries.
-SHLIB_EXT = @TCL_SHLIB_EXT@
+SHLIB_EXT = @SHLIB_EXT@
 
 ##  First build CMake, then use that to configure VTK and finall build it.
 ##  Note need a softlink so that include files are located using <vtk/>
@@ -20,27 +20,18 @@ all:
 	  TCL_LIBRARY_PATH=$(prefix)/lib; export TCL_LIBRARY_PATH; \
 	  cd VTK && \
 	  cmake -Wno-dev \
-                -D CMAKE_BUILD_TYPE=Debug \
 	        -D BUILD_SHARED_LIBS:BOOL=ON \
 	        -D BUILD_TESTING:BOOL=OFF \
-		-D CMAKE_INCLUDE_PATH:PATH=$(prefix)/include \
 	        -D CMAKE_INSTALL_PREFIX:PATH=$(prefix) \
+		-D CMAKE_INCLUDE_PATH:PATH=$(prefix)/include \
 		-D CMAKE_LIBRARY_PATH:PATH=$(prefix)/lib \
-	        -D TCL_TCLSH:PATH=$(prefix)/bin/tclsh \
-	        -D TCL_INCLUDE_PATH:PATH=$(prefix)/include \
-	        -D TCL_LIBRARY:FILEPATH=$(prefix)/lib/libtcl8.4$(SHLIB_EXT) \
-	        -D TK_INCLUDE_PATH:PATH=$(prefix)/include \
-	        -D TK_LIBRARY:FILEPATH=$(prefix)/lib/libtk8.4$(SHLIB_EXT) \
+	        -D VTK_USE_GUISUPPORT:BOOL=ON \
+	        -D VTK_WRAP_TCL:BOOL=ON \
+	        -D VTK_USE_X:BOOL=ON \
+	        -D VTK_USE_MANGLED_MESA:BOOL=OFF \
 	        -D VTK_OPENGL_HAS_OSMESA:BOOL=OFF \
 	        -D VTK_USE_CARBON:BOOL=OFF \
-	        -D VTK_USE_COCOA:BOOL=OFF  \
-	        -D VTK_USE_GEOVIS:BOOL=OFF \
-	        -D VTK_USE_GUISUPPORT:BOOL=ON \
-	        -D VTK_USE_INFOVIS:BOOL=OFF \
-	        -D VTK_USE_MANGLED_MESA:BOOL=OFF \
-	        -D VTK_USE_VIEWS:BOOL=OFF \
-	        -D VTK_USE_X:BOOL=ON \
-	        -D VTK_WRAP_TCL:BOOL=ON . && \
+	        -D VTK_USE_COCOA:BOOL=OFF . && \
 	  $(MAKE) )
 
 ##  Automake really requires local versions for these targets.
