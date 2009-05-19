@@ -199,6 +199,10 @@ itcl::class ::gaia3d::Gaia3dVtkImagePlane {
          set dy [expr $y-$lasty_]
          set dz [expr $z-$lastz_]
       }
+      set x [expr int($x)]
+      set y [expr int($y)]
+      set z [expr int($z)]
+
       set lastx_ $x
       set lasty_ $y
       set lastz_ $z
@@ -318,15 +322,6 @@ itcl::class ::gaia3d::Gaia3dVtkImagePlane {
          $plane_ UpdatePlacement
       }
    }
-
-   #  Add bindings to the image plane so we can display coordinate and
-   #  data value information when tracking over.
-   protected method add_plane_bindings_ {} {
-      $plane_ AddObserver InteractionEvent [code $this report_position_]
-      $plane_ AddObserver StartInteractionEvent [code $this start_report_position_]
-      $plane_ AddObserver EndInteractionEvent [code $this end_report_position_]
-  }
-
 
    #  Configuration options: (public variables)
    #  ----------------------

@@ -87,7 +87,9 @@ sources=`cd ${srcdir}; echo generic/*.[Cc]`
 changequote([, ])
 
 headers=`cd ${srcdir}; echo generic/*.h`
-includes="-I. -I${srcdir}/generic -I../gaia/generic -I${prefix}/include/skycat -I${prefix}/include/rtd -I${prefix}/include/cat -I${prefix}/include/astrotcl -I${prefix}/include/tclutil"
+includes="-I. -I${srcdir}/generic -I../gaia/generic -I${prefix}/include/skycat \
+-I${prefix}/include/rtd -I${prefix}/include/cat -I${prefix}/include/astrotcl \
+-I${prefix}/include/tclutil -I${prefix}/include/vtk"
 tclsources=`cd ${srcdir}; echo library/*.tcl`
 
 ]) 

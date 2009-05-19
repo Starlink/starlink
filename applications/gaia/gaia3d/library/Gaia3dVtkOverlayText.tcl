@@ -63,7 +63,7 @@ itcl::class ::gaia3d::Gaia3dVtkOverlayText {
       set text_ [::vtkTextActor New]
 
       #  Make it suitable for overlaying and positioning with the viewport.
-      $text_ ScaledTextOff
+      $text_ SetTextScaleModeToNone
 
       set prop [$text_ GetTextProperty]
       $prop SetJustificationToLeft
