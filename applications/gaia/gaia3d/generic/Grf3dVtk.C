@@ -1039,7 +1039,7 @@ static int vtkG3DTxExt( const char *text, float ref[3], const char *just,
      * text justification. The above process implicitly assumed a justification
      * of "BL". */
     float w;
-    if ( !newjust || newjust[0] == 'C' || newjust[0] == 0 ) {
+    if ( newjust[0] == 'C' || newjust[0] == 0 ) {
         w = 0.5 * ( tyhi + tylo );
         tylo -= w;
         tyhi -= w;
@@ -1063,7 +1063,7 @@ static int vtkG3DTxExt( const char *text, float ref[3], const char *just,
         return 0;
     }
 
-    if ( !newjust || newjust[1] == 'C' || newjust[1] == 0 ) {
+    if ( newjust[1] == 'C' || newjust[1] == 0 ) {
         w = 0.5 * ( txhi + txlo );
         txlo -= w;
         txhi -= w;
@@ -1300,7 +1300,7 @@ static vtkFollower *CreateVectorText( const char *text, float ref[3],
     /* Adjust initial position for justification. */
     double *bounds = prop->GetBounds();
     double *centre = prop->GetCenter();
-    if ( !newjust || ( newjust[0] == 'C' && newjust[1] == 'C' ) ) {
+    if ( newjust[0] == 'C' && newjust[1] == 'C' ) {
         prop->SetOrigin( centre[0], centre[1], centre[2] );
     }
     else {
