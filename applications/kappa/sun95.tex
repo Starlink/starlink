@@ -29788,6 +29788,11 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
             {\tt "Cross"} --- A combination of {\tt "Vline"} and {\tt "Hline"}.
 
             \sstitem
+            {\tt "STCS"} --- Indicates that each position should be
+            marked using the 2-dimensional STC-S shape read from the 
+            catalogue column specified by parameter STCSCOL. 
+
+            \sstitem
             {\tt "Text"} --- A text string is used to mark each position.  The string
             is drawn horizontally with the justification specified by Parameter
             JUST.  The strings to use for each position are specified using
@@ -29826,6 +29831,24 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
          created.  If a null ({\tt{!}}) value is supplied, the value used is {\tt TRUE}
          if any graphics or labels are being plotted (see Parameters PLOT
          and LABEL), and {\tt FALSE} otherwise. {\tt [!]}
+      }
+      \sstsubsection{
+         STCSCOL = LITERAL (Read)
+      }{
+         The name of a catalogue column containing an STC-S description of
+         a 2-dimensional spatial shape associated with each position. The 
+         STC-S format is an IVOA proposal for describing regions of space,
+         time and spectral position. For further details, see the STC-S
+         document on the IVOA web site 
+         (\htmladdnormallink{{\tt{http://www.ivoa.net/Documents/}}}
+         {http://www.ivoa.net/Documents/}). An STC-S description of a 
+         shape includes the co-ordinate system in which the shape is
+         defined. This application assumes that all the STC-S shapes 
+         read from the specified column will be defined within the same 
+         co-ordinate system. The transformation from the STC-S co-ordinate 
+         system to the co-ordinate system of the displayed image is
+         determined once from the first shape plotted, and then re-used 
+         for all later shapes. {\tt ["Shape"]}
       }
       \sstsubsection{
          STRINGS = LITERAL (Read)
@@ -55858,6 +55881,14 @@ The following applications have been modified:
          the date and time of the new history record to be set explicitly 
          rather than to the default current time.  There is a choice of 
          formats including Gregorian Date and Time, and Julian Date.
+      \end{itemize}
+
+   \item [\htmlref{LISTSHOW}{LISTSHOW}] \mbox{}
+      \begin{itemize}
+         \item A new option ``STCS'' has been added to the PLOT parameter.
+         This marks each position by drawing the shape giving in the
+         column specified by new parameter STCSCOL. The shape is
+         specified using the IVOA "STC-S" format.
       \end{itemize}
 
    \item [\htmlref{LOOK}{LOOK}] \mbox{}

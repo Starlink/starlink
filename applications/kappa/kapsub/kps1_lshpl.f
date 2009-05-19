@@ -1,6 +1,6 @@
-      SUBROUTINE KPS1_LSHPL( IPLOT, NPOS, NAX, POS, PLOT, GEO, IMARK, 
-     :                       CLOSE, LABTYP, IGRP, IGRP2, JUST, IDS,
-     :                       WORK, STATUS )
+      SUBROUTINE KPS1_LSHPL( IPLOT, NPOS, NAX, POS, PLOT, KEYMAP, GEO, 
+     :                       IMARK, CLOSE, LABTYP, IGRP, IGRP2, JUST,
+     :                       IDS, WORK, STATUS )
 *+
 *  Name:
 *     KPS1_LSHFM
@@ -12,8 +12,9 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_LSHPL( IPLOT, NPOS, NAX, POS, PLOT, GEO, IMARK, CLOSE, 
-*                      LABTYP, IGRP, IGRP2, JUST, IDS, WORK, STATUS )
+*     CALL KPS1_LSHPL( IPLOT, NPOS, NAX, POS, PLOT, KEYMAP, GEO, IMARK, 
+*                      CLOSE, LABTYP, IGRP, IGRP2, JUST, IDS, WORK, 
+*                      STATUS )
 
 *  Description:
 *     This routine plots the supplied positions on the currently
@@ -30,6 +31,9 @@
 *        The supplied positions (in the Current Frame of IPLOT).
 *     PLOT = CHARACTER * ( * ) (Given)
 *        The type of plotting required (see KPG1_MKPOS).
+*     KEYMAP = INTEGER (Given)
+*        An AST KeyMap holding STC-S descriptions to be plotted, or
+*        AST__NULL if we are not plotting STC-S shapes.
 *     GEO = LOGICAL (Given)
 *        Should geodesic polygons be drawn?
 *     IMARK = INTEGER (Given)
@@ -60,6 +64,7 @@
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils.
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -91,6 +96,8 @@
 *        displayed).
 *     21-NOV-2006 (DSB):
 *        Added LABTYP and IGRP2 arguments.
+*     3-MAY-2009 (DSB):
+*        Added KEYMAP argument.
 *     {enter_further_changes_here}
 
 *-
@@ -104,12 +111,17 @@
       INCLUDE 'GRP_PAR'          ! GRP constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
 
+*  Global Variables:
+      CHARACTER STCS*500         ! Used to pass info to kpg1_lshsc
+      COMMON /KPG1_LSHPL/ STCS
+       
 *  Arguments Given:
       INTEGER IPLOT
       INTEGER NPOS
       INTEGER NAX
       DOUBLE PRECISION POS( NPOS, NAX )
       CHARACTER PLOT*(*)
+      INTEGER KEYMAP
       LOGICAL GEO
       INTEGER IMARK
       LOGICAL CLOSE
@@ -126,6 +138,7 @@
       INTEGER STATUS               ! Global status
 
 *  External References:
+      EXTERNAL KPS1_LSHSC
       INTEGER CHR_LEN
 
 *  Local Constants:
@@ -133,6 +146,7 @@
       PARAMETER (MXDIM = 50)
 
 *  Local Variables:
+      CHARACTER KEY*30             ! Key for STCS description
       CHARACTER TEXT*(GRP__SZNAM)  ! Marker or label text
       DOUBLE PRECISION DX          ! X position offset to label centre
       DOUBLE PRECISION DY          ! Y position offset to label centre
@@ -143,14 +157,18 @@
       DOUBLE PRECISION START( MXDIM )! Start of closing curve
       DOUBLE PRECISION SZ0         ! Original size for strings
       DOUBLE PRECISION WD0         ! Original width for strings
+      INTEGER CHAN                 ! StcsChan pointer
       INTEGER CL0                  ! Original colour index for strings
       INTEGER FN0                  ! Original font for strings
       INTEGER I                    ! Loop count
       INTEGER IAT                  ! No. of characters in a string
-      INTEGER ICURR0               ! Index of original current frame
+      INTEGER IAT0                 ! Length of key root string
       INTEGER ICURR                ! Index of new current frame
+      INTEGER ICURR0               ! Index of original current frame
       INTEGER J                    ! Axis index
+      INTEGER LSTCS                ! Length of STCS string
       INTEGER NSTR                 ! Number of marker strings supplied
+      INTEGER REGION               ! STCS Region pointer
       INTEGER ST0                  ! Original style for strings
       REAL UP(2)                   ! Up vector
       REAL X1, X2, Y1, Y2          ! Bounds of PGPLOT window (millimetres)
@@ -281,13 +299,44 @@
          NSTR = 0
       END IF
 
+*  If STC-S shapes are being plotted, create an StcsChan to convert the
+*  STC-S descriptions into AST Regions. Also get the column name containing
+*  the STC-S description. This is used as the root name for the KeyMap
+*  entries containing the STC-S descriptions.
+      IF( KEYMAP .NE. AST__NULL ) THEN
+         CHAN = AST_STCSCHAN( KPS1_LSHSC, AST_NULL, ' ', STATUS )
+         IF( .NOT. AST_MAPGETELEMC( KEYMAP, 'COLNAMES', 1, KEY, 
+     :                              STATUS ) ) KEY = 'SHAPE'
+         IAT0 = CHR_LEN( KEY )
+         CALL CHR_APPND( '_', KEY, IAT0 ) 
+      ELSE
+         CHAN = AST__NULL
+      END IF
+
 *  Loop round each position.
       DO I = 1, NPOS
 
-*  Extract the position from the supplied array.
+*  Get the axis values at the position.
          DO J = 1, NAX
             LPOS( J ) = POS( I, J )
          END DO
+
+*  If STC-S shapes are being plotted, get the STC-S description for this
+*  position form the supplied KeyMap and then convert it to an AST Region
+*  using the StcsChan created above. 
+         IF( CHAN .NE. AST__NULL ) THEN
+            IAT = IAT0
+            CALL CHR_PUTI( I, KEY, IAT )
+            CALL CHR_UCASE( KEY( : IAT ) )
+            IF( AST_MAPGET0C( KEYMAP, KEY( : IAT ), STCS, LSTCS,
+     :                        STATUS ) ) THEN
+               REGION = AST_READ( CHAN, STATUS )
+            ELSE
+               REGION = AST__NULL
+            END IF
+         ELSE
+            REGION = AST__NULL
+         END IF
 
 *  If text is being used to mark each position, extract the string for
 *  this position from the GRP group. If no group was supplied, or if the
@@ -304,13 +353,15 @@
 
 *  Draw the position.
          CALL KPG1_MKPOS( NAX, LPOS, IPLOT, .TRUE., PLOT, IMARK, GEO, 
-     :                    .FALSE., CLOSE, TEXT, JUST, STATUS )
+     :                    .FALSE., CLOSE, TEXT, JUST, REGION, STATUS )
 
+*  For efficiency, annul any Region pointer.
+         IF( REGION .NE. AST__NULL ) CALL AST_ANNUL( REGION, STATUS )
       END DO
 
 *  Complete any polygons.
       CALL KPG1_MKPOS( NAX, LPOS, IPLOT, .TRUE., PLOT, IMARK, GEO, 
-     :                 .TRUE., CLOSE, TEXT, JUST, STATUS )
+     :                 .TRUE., CLOSE, TEXT, JUST, AST__NULL, STATUS )
 
 *  Remove the Current Frame added by KPG1_ASSIM and re-instate the original 
 *  Current Frame.
@@ -321,3 +372,49 @@
       CALL AST_END( STATUS )
 
       END
+
+
+
+
+
+
+      SUBROUTINE KPS1_LSHSC( status )
+
+*  Type Definitions:
+      IMPLICIT NONE            
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Global Variables:
+      CHARACTER STCS*500         ! Used to communicate with kpg1_lshpl
+      COMMON /KPG1_LSHPL/ STCS
+       
+*  Status:
+      INTEGER STATUS               ! Global status
+
+*  External References:
+      INTEGER CHR_LEN
+
+*  Local Variables:
+      INTEGER L
+*.
+
+*  Check the global inherited status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Get the used length of the STCS description. If a previous invocation
+*  of this routine has set it blank, use a negative length to tell the
+*  StcsChan that there is no more source text.
+      L = CHR_LEN( STCS )
+      IF( L .EQ. 0 ) L = -1
+
+*  Send the text to the StcsChan.
+      CALL AST_PUTLINE( STCS, L, STATUS ) 
+
+*  Set the text blank to indicate it has been read.
+      STCS = ' '
+
+      END
+
+

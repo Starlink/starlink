@@ -174,6 +174,7 @@
       INTEGER JAT                ! No. of characters in a string
       INTEGER MAP                ! Pointer to mapping from file to IWCS
       INTEGER NAXCAT             ! No. of axes in Frame read from catalogue
+      INTEGER NCNAM              ! Number of column names
       INTEGER NDIM               ! No of axes
       LOGICAL DONE               ! Have we read enough AST Objects?
       LOGICAL GOTRD              ! Found RA and DEC columns in catalogue?
@@ -587,16 +588,29 @@
 
 *  Get CAT column identifiers for all column names listed in the COLNAMES 
 *  entry.
-         NAX = MAX( MXDIM, AST_MAPLENGTH( KEYMAP, 'COLNAMES', STATUS ) )
-         DO J = 1, NAX
+         NCNAM = MIN( MXDIM, AST_MAPLENGTH( KEYMAP, 'COLNAMES', 
+     :                                      STATUS ) )
+         DO J = 1, NCNAM
             IF( AST_MAPGETELEMC( KEYMAP, 'COLNAMES', J, COLNAM, 
      :                           STATUS ) ) THEN
-               CALL CAT_TIDNT( CI, COLNAM, GAXIS( J ), STATUS )
+               IF( STATUS .EQ. SAI__OK ) THEN
+                  CALL CAT_TIDNT( CI, COLNAM, GAXIS( J ), STATUS )
+                  IF( STATUS .EQ. CAT__NOCMP ) THEN
+                     CALL ERR_ANNUL( STATUS )
+                     STATUS = SAI__ERROR
+                     CALL MSG_SETC( 'CAT', CNAME )
+                     CALL MSG_SETC( 'COL', COLNAM )
+                     CALL ERR_REP( ' ', 'Supplied catalogue ''^CAT'' '//
+     :                             'does not contains a column called'//
+     :                             ' ^COL.', STATUS )
+                     GO TO 999
+                  END IF
+               END IF
             END IF
          END DO
 
 *  Read the columns into the KeyMap. 
-         CALL KPG1_CTCPK( CI, NAX, GAXIS, NPOS, KEYMAP, STATUS )
+         CALL KPG1_CTCPK( CI, NCNAM, GAXIS, NPOS, KEYMAP, STATUS )
 
       END IF
 

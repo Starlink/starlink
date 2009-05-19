@@ -104,6 +104,9 @@
 *  Check the inherited status. 
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Initialise the buffer
+      TEXT = ' '
+
 *  Loop round each row.
       DO I = 1, NEL
 
@@ -132,15 +135,21 @@
                TLEN = 1
             END IF
 
-*  Create the KeyMap entry key in the form "<colname>_<row index>".
+*  Create the KeyMap entry key in the form "<colname>_<row index>" (upper
+*  case).
             CALL CAT_TIQAC( GI( J ), 'NAME', KEY, STATUS )
             KLEN = CHR_LEN( KEY )
             CALL CHR_APPND( '_', KEY, KLEN )
             CALL CHR_PUTI( I, KEY, KLEN ) 
+            CALL CHR_UCASE( KEY( : KLEN ) ) 
  
 *  Add the entry to the KeyMap.
             CALL AST_MAPPUT0C( KEYMAP, KEY( : KLEN ), TEXT( : TLEN ), 
      :                         ' ', STATUS )
+
+*  Clear the buffer
+            TEXT( : TLEN ) = ' '
+
          END DO
 
       END DO

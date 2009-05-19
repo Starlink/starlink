@@ -16743,38 +16743,6 @@ iraf! {
             helpkey *
           }
 
-         parameter numhi {
-            type _INTEGER
-            access WRITE
-            vpath DEFAULT
-            default 0
-            helpkey *
-          }
-
-         parameter numlo {
-            type _INTEGER
-            access WRITE
-            vpath DEFAULT
-            default 0
-            helpkey *
-          }
-
-         parameter numrange {
-            type _INTEGER
-            access WRITE
-            vpath DEFAULT
-            default 0
-            helpkey *
-          }
-
-         parameter numsame {
-            type _INTEGER
-            access WRITE
-            vpath DEFAULT
-            default 0
-            helpkey *
-          }
-
       }
 
       action trandat {
@@ -17569,6 +17537,15 @@ iraf! {
             ppath DYNAMIC DEFAULT
             default !
             helpkey *
+          }
+
+         parameter stcscol {
+            type LITERAL
+            vpath CURRENT DEFAULT
+            ppath DEFAULT
+            prompt {Name of column holding STC-S descriptions}
+            helpkey *
+            default Shape
           }
 
          parameter strings {

@@ -34,6 +34,13 @@
       rather than to the default current time.  There is a choice of 
       formats including Gregorian Date and Time, and Julian Date.
 
+   o  LISTSHOW
+
+      -  A new option ``STCS'' has been added to the PLOT parameter. This
+      marks each position by drawing the shape giving in the column
+      specified by new parameter STCSCOL. The shape is specified using
+      the IVOA "STC-S" format.
+
    o  LOOK
 
       -  A new option "WLIST" has been added to the FORMAT parameter.

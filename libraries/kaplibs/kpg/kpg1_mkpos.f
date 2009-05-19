@@ -1,5 +1,6 @@
       SUBROUTINE KPG1_MKPOS( NAX, POS, IPLOT, CURR, MODE, MARKER,
-     :                       GEO, DONE, CLOSE, TEXT, JUST, STATUS )
+     :                       GEO, DONE, CLOSE, TEXT, JUST, REGION,
+     :                       STATUS )
 *+
 *  Name:
 *     KPG1_MKPOS
@@ -12,7 +13,7 @@
 
 *  Invocation:
 *     CALL KPG1_MKPOS( NAX, POS, IPLOT, CURR, MODE, MARKER, GEO, DONE, 
-*                      CLOSE, TEXT, JUST, STATUS )
+*                      CLOSE, TEXT, JUST, REGION, STATUS )
 
 *  Description:
 *     This routine marks a position on a graphics device in various ways.
@@ -69,6 +70,8 @@
 *
 *        -  "BLANK" -- Nothing is drawn.
 *
+*        -  "REGION" -- The AST Region given by REGION is outlined.
+*
 *     MARKER = INTEGER (Given)
 *        The PGPLOT marker type to use if MODE is "MARKER" or "CHAIN".
 *     GEO = LOGICAL (Given)
@@ -94,6 +97,17 @@
 *        "L", "C" or "R", meaning left, centre or right. The text is
 *        displayed so that the position supplied in POS is at the
 *        specified point within the displayed text string.
+*     REGION = INTEGER (Given)
+*        A 2-dimensional AST Region pointer. Only used if PLOT is "REGION".
+*        In order to save time calling AST_CONVERT for every Region, the 
+*        first Region to be plotted using this routine defines the 
+*        co-ordinate frame for all subsequent Regions draw by later 
+*        invocations of this routine. If in fact, later Regions may have a
+*        different coordinate frame, then this routine should be called
+*        with MODE=REGION and REGION=AST__NULL. This will cause the
+*        current Region coordinate frame to be forgotten so that the next 
+*        non-NULL Region to be draw will define a new current coordinate
+*        frame for subsequent Regions.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -128,6 +142,8 @@
 *        Added BLANK option for MODE. Added argument JUST.
 *     12-APR-2000 (DSB):
 *        Corrected erroneous use of Y2 instead of Y1 in calls to PGQWIN.
+*     3-MAY-2009 (DSB):
+*        Added argument REGION.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -155,6 +171,7 @@
       LOGICAL CLOSE
       CHARACTER TEXT*(*)
       CHARACTER JUST*(*)
+      INTEGER REGION
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -164,22 +181,28 @@
       DOUBLE PRECISION FPOS( NDF__MXDIM ) ! First position
       DOUBLE PRECISION LPOS( NDF__MXDIM ) ! Previous position
       DOUBLE PRECISION RPOS( NDF__MXDIM ) ! Current position
+      INTEGER FS                 ! FrameSet that aligns Region with Plot
       INTEGER I                  ! Loop count
+      INTEGER IBASE              ! Index of Base Frame
       INTEGER ICURR              ! Index of Current Frame
+      INTEGER MAP                ! Mapping from Plot base Frame to Region
+      INTEGER MAP2               ! Mapping from Plot base Frame to Region
       INTEGER NAXC               ! No. of Current Frame axes
       INTEGER RNAX               ! No. of axes in RPOS
       LOGICAL DOING              ! Has a Poly or Chain been started?
       LOGICAL GOTPOS             ! Are both ends of the line defined?
+      LOGICAL JUNK               ! Unused
       REAL UP( 2 )               ! Up-vector for text
       REAL X1, X2, Y1, Y2        ! Bounds of PGPLOT window
 
 *  Data Initialisation:
       DATA LPOS /NDF__MXDIM*AST__BAD/, 
      :     FPOS /NDF__MXDIM*AST__BAD/,
-     :     DOING /.FALSE./
+     :     DOING /.FALSE./,
+     :     MAP2 /AST__NULL/
 
 *  Ensure variable values are retained between invocations of this routine.
-      SAVE LPOS, FPOS, DOING
+      SAVE LPOS, FPOS, DOING, MAP2
 *.
 
 *  Check the inherited status. Also return if no graphics are required.
@@ -759,6 +782,76 @@ c
 *  Blank (i.e. draw nothing).
 *  ==========================
       ELSE IF( MODE .EQ. 'BLANK' ) THEN
+
+
+*  Deal with Regions.
+*  ===================
+      ELSE IF( MODE .EQ. 'REGION' ) THEN
+
+*  If no Region was supplied, just annul any cached Mapping and return.
+         IF( REGION .EQ. AST__NULL ) THEN
+            IF( MAP2 .NE. AST__NULL ) CALL AST_ANNUL( MAP2, STATUS )
+
+*  If we have a Region, draw it.
+         ELSE
+
+*  If this is the first region to be drawn since a NULL Region was
+*  supplied, find the Mapping that aligns the Region with the Plot, and
+*  save it for use in subsequent invocations of this routine.
+            IF( MAP2 .EQ. AST__NULL ) THEN
+
+*  Save the index of the original base Frame within the Plot so it 
+*  can be re-instated later. 
+               IBASE = AST_GETI( IPLOT, 'BASE', STATUS )
+
+*  Attempt to get a Mapping from the current Frame in the Plot to the Frame
+*  represented by the Region. This will change the base Frame index in
+*  the Plot.
+               FS = AST_CONVERT( IPLOT, REGION, ' ', STATUS )
+
+*  Re-instate the original base Frame
+               CALL AST_SETI( IPLOT, 'BASE', IBASE, STATUS )
+
+*  If the Region could be aligned with the Plot...
+               IF( FS .NE. AST__NULL ) THEN
+
+*  Get the Mapping from current plot Frame to Region.
+                  MAP = AST_GETMAPPING( FS, AST__BASE, AST__CURRENT, 
+     :                                  STATUS )
+
+*  Remove all Region effects from the Mapping.
+                  MAP2 = AST_REMOVEREGIONS( MAP, STATUS )
+
+*  Free resources.
+                  CALL AST_ANNUL( MAP, STATUS )
+                  CALL AST_ANNUL( FS, STATUS )
+               END IF
+
+            END IF
+
+*  Check the Mapping was obtained.
+            IF( MAP2 .NE. AST__NULL ) THEN
+
+*  Save the index of the original current Frame within the Plot so it 
+*  can be re-instated later. 
+               ICURR = AST_GETI( IPLOT, 'CURRENT', STATUS )
+
+*  Add the Region into the Plot, making it the current Frame. 
+               CALL AST_ADDFRAME( IPLOT, AST__CURRENT, MAP2, REGION, 
+     :                            STATUS )    
+
+*  Draw the boundary of the Region.
+               JUNK = AST_BORDER( IPLOT, STATUS )
+
+*  Remove the Region from the Plot.
+               CALL AST_REMOVEFRAME( IPLOT, AST__CURRENT, STATUS )
+
+*  Re-instate original current Frame in the Plot.
+               CALL AST_SETI( IPLOT, 'CURRENT', ICURR, STATUS )
+
+            END IF                           
+
+         END IF
 
 *  Tidy up.
 *  ========

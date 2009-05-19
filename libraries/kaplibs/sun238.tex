@@ -19452,7 +19452,7 @@ from one graphical element to another.
    }
    \sstinvocation{
       CALL KPG1\_MKPOS( NAX, POS, IPLOT, CURR, MODE, MARKER, GEO, DONE,
-                       CLOSE, TEXT, JUST, STATUS )
+                       CLOSE, TEXT, JUST, REGION, STATUS )
    }
    \sstarguments{
       \sstsubsection{
@@ -19531,6 +19531,9 @@ from one graphical element to another.
 
             \sstitem
             {\tt "}BLANK{\tt "} -- Nothing is drawn.
+
+            \sstitem
+            {\tt "}REGION{\tt "} -- The AST Region given by REGION is outlined.
          }
       }
       \sstsubsection{
@@ -19575,6 +19578,20 @@ from one graphical element to another.
          {\tt "}L{\tt "}, {\tt "}C{\tt "} or {\tt "}R{\tt "}, meaning left, centre or right. The text is
          displayed so that the position supplied in POS is at the
          specified point within the displayed text string.
+      }
+      \sstsubsection{
+         REGION = INTEGER (Given)
+      }{
+         A 2-dimensional AST Region pointer. Only used if PLOT is {\tt "}REGION{\tt "}.
+         In order to save time calling AST\_CONVERT for every Region, the
+         first Region to be plotted using this routine defines the
+         co-ordinate frame for all subsequent Regions draw by later
+         invocations of this routine. If in fact, later Regions may have a
+         different coordinate frame, then this routine should be called
+         with MODE=REGION and REGION=AST\_\_NULL. This will cause the
+         current Region coordinate frame to be forgotten so that the next
+         non-NULL Region to be draw will define a new current coordinate
+         frame for subsequent Regions.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -22818,6 +22835,108 @@ from one graphical element to another.
       ASTPT = INTEGER (Given)
          A pointer to the contents of the HDS object, mapped in {\tt '}READ{\tt '}
          mode.
+   }
+}
+\sstroutine{
+   KPG1\_RDCAT
+}{
+   Reads a set of positions with labels from a CAT catalogue
+}{
+   \sstdescription{
+      This routine is equivalent to KPG1\_RDTAB except that the values of
+      an arbitrary set of columns (including character-valued columns)
+      can be returned within an AST KeyMap (see KEYMAP).
+
+      See KPG1\_RDTAB for further information.
+   }
+   \sstinvocation{
+      CALL KPG1\_RDCAT( PARAM, CURFRM, KEYMAP, LABS, IWCS, NPOS, NAX,
+                       IPPOS, IPID, TITLE, NAME, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The name of the parameter to use.
+      }
+      \sstsubsection{
+         CURFRM = LOGICAL (Given)
+      }{
+         If .TRUE. the positions read from the catalogue are Mapped
+         into the Current Frame of the associated FrameSet before being
+         returned. Otherwise, they are returned in the Base Frame.
+      }
+      \sstsubsection{
+         KEYMAP = INTEGER (Given)
+      }{
+         An AST pointer to an existing KeyMap, or AST\_\_NULL. If a KeyMap
+         is supplied, it should contain a vector valued entry called
+         {\tt "}COLNAMES{\tt "} containing the names of one or more catalogue columns
+         to be returned in the KeyMap. On exit, the KeyMap will contain
+         the column values within a set of scalar entries. Each such
+         entry will have a key of the form {\tt "}$<$colname$>$\_$<$row number$>${\tt "}
+         ({\tt "}\_1{\tt "} for the first row). An error will be reported if the
+         catalogue does not contain the requested columns.
+      }
+      \sstsubsection{
+         LABS = INTEGER (Given and Returned)
+      }{
+         A GRP identifier for a group containing the values in the LABEL
+         column. If the catalogue contains a LABEL column, then its values
+         are appended to the end of the supplied group. If LABS holds
+         GRP\_\_NOID on entry, then a new GRP group is created and its
+         identifier returned in LABS, but only if the catalogue contains
+         a LABEL column (otherwise the supplied value of GRP\_\_NOID is
+         retained on exit).
+      }
+      \sstsubsection{
+         IWCS = INTEGER (Returned)
+      }{
+         An AST pointer to the FrameSet read from the catalogue.
+      }
+      \sstsubsection{
+         NPOS = INTEGER (Returned)
+      }{
+         The number of positions returned.
+      }
+      \sstsubsection{
+         NAX = INTEGER (Returned)
+      }{
+         The number of axes in the Frame requested by CURFRM.
+      }
+      \sstsubsection{
+         IPPOS = INTEGER (Returned)
+      }{
+         A pointer to a 2-dimensional DOUBLE PRECISION array holding the
+         returned positions. Element (I,J) of this array gives axis J for
+         position I. The first axis will have NPOS elements, and the
+         second will have NAX elements. Should be released using PSX\_FREE
+         when no longer needed.
+      }
+      \sstsubsection{
+         IPID = INTEGER (Returned)
+      }{
+         A pointer to a 1-dimensional INTEGER array holding the integer
+         identifiers for the returned positions. The array will have NPOS
+         elements. Should be released using PSX\_FREE when no longer needed.
+      }
+      \sstsubsection{
+         TITLE = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The value of the TITLE parameter in the supplied catalogue.
+         Returned blank if there is no TITLE parameter.
+      }
+      \sstsubsection{
+         NAME = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The file spec of the catalogue containing the positions list.
+         Not accessed if the declared length is 1.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
    }
 }
 \sstroutine{

@@ -237,6 +237,10 @@
 *
 *        - "Cross" -- A combination of "Vline" and "Hline".
 *
+*        - "STCS" -- Indicates that each position should be marked using
+*        the 2-dimensional STC-S shape read from the catalogue column 
+*        specified by parameter STCSCOL. 
+*
 *        - "Text" -- A text string is used to mark each position.  The
 *        string is drawn horizontally with the justification specified 
 *        by parameter JUST.  The strings to use for each position are
@@ -270,6 +274,20 @@
 *        are still created.  If a null (!) value is supplied, the value
 *        used is TRUE if any graphics or labels are being plotted (see
 *        parameters PLOT and LABEL), and FALSE otherwise.  [!]
+*     STCSCOL = LITERAL (Read)
+*        The name of a catalogue column containing an STC-S description 
+*        of a 2-dimensional spatial shape associated with each 
+*        position. The STC-S format is an IVOA proposal for describing 
+*        regions of space, time and spectral position. For further 
+*        details, see the STC-S document on the IVOA web site 
+*        (http://www.ivoa.net/Documents/). An STC-S description of a 
+*        shape includes the co-ordinate system in which the shape is
+*        defined. This application assumes that all the STC-S shapes 
+*        read from the specified column will be defined within the same 
+*        co-ordinate system. The transformation from the STC-S co-ordinate 
+*        system to the co-ordinate system of the displayed image is
+*        determined once from the first shape plotted, and then re-used 
+*        for all later shapes. ["Shape"]
 *     STRINGS = LITERAL (Read)
 *        A group of text strings which are used to mark the supplied
 *        positions if parameter PLOT is set to "TEXT".  The first 
@@ -412,6 +430,9 @@
 *        wrapped long lines.
 *     20-NOV-2006 (DSB):
 *        Added parameter LABTYPE. Modified use of parameter LABEL.
+*     3-MAY-2009 (DSB):
+*        Added parameter STCSCOL, and the "STCS" option for the PLOT
+*        parameter.
 *     {enter_further_changes_here}
 
 *-
@@ -431,11 +452,15 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  External References:
+      INTEGER CHR_LEN            ! Used length of a string
+
 *  Local Variables:
       CHARACTER JUST*2           ! Justification for text strings
       CHARACTER LABTYP*5         ! Type of labels to display
       CHARACTER PICNAM*15        ! AGI picture name.
       CHARACTER PLOT*15          ! Nature of required graphics
+      CHARACTER STCSCN*30        ! Name of STCS description column
       CHARACTER TEXT*(GRP__SZNAM)! Text buffer
       CHARACTER TITLE*80         ! Title from positions list
       INTEGER BFRM               ! Copy of original Frame 
@@ -471,6 +496,7 @@
       INTEGER NRAX               ! Number of axes in requested Frame
       INTEGER NSTR               ! Number of marker strings supplied
       INTEGER SIZE               ! Number of elements in group
+      INTEGER STCSKM             ! KeyMap holding STCS descriptions
       LOGICAL CLOSE              ! Close the polygon?
       LOGICAL DESC               ! Describe each Coordinate Frame?
       LOGICAL GEO                ! Draw geodesic polygon?
@@ -498,7 +524,7 @@
 
 *  See what type of graphics are required. 
       CALL PAR_CHOIC( 'PLOT', 'None', 'Poly,Mark,Chain,Box,None,'//
-     :                'Vline,Hline,Cross,Text,Blank', .TRUE., PLOT, 
+     :                'Vline,Hline,Cross,Text,Blank,STCS', .TRUE., PLOT, 
      :                STATUS )
 
 *  Abort if an error has occurred.
@@ -541,6 +567,20 @@
       QUIET = ( PLOT .NE. 'NONE' .AND. PLOT .NE. 'BLANK' ) .OR. LABEL
       CALL PAR_DEF0L( 'QUIET', QUIET, STATUS )
 
+*  If we are plotting STCS shapes, get the name of the column containing
+*  the shape descriptions, and store it in a KeyMap as required by
+*  kpg1_rdcat. Also change the plot type to "REGION" as required by
+*  KPG1_MKPOS.
+      IF( PLOT .EQ. 'STCS' ) THEN
+         PLOT = 'REGION'
+         CALL PAR_GET0C( 'STCSCOL', STCSCN, STATUS )
+         STCSKM = AST_KEYMAP( ' ', STATUS ) 
+         CALL AST_MAPPUT0C( STCSKM, 'COLNAMES', 
+     :                      STCSCN( : CHR_LEN( STCSCN ) ), ' ', STATUS )
+      ELSE
+         STCSKM = AST__NULL
+      END IF
+
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
@@ -554,8 +594,8 @@
 *  FrameSet.
       IGRP3 = GRP__NOID
       IWCS = AST__NULL
-      CALL KPG1_RDTAB( 'INCAT', .FALSE., IGRP3, IWCS, NPOS, NBAX, 
-     :                 IPPOS, IPID, TITLE, ' ', STATUS )
+      CALL KPG1_RDCAT( 'INCAT', .FALSE., STCSKM, IGRP3, IWCS, NPOS, 
+     :                 NBAX, IPPOS, IPID, TITLE, ' ', STATUS )
 
 *  Give a suitable message, store zero for NUMBER, and abort if the 
 *  file was empty.
@@ -863,7 +903,7 @@
 
 *  Produce the graphics.
          CALL KPS1_LSHPL( IWCS, NDISP, NRAX, %VAL( CNF_PVAL( IPW2 ) ), 
-     :                    PLOT,
+     :                    PLOT, STCSKM,
      :                    GEO, IMARK, CLOSE, LABTYP, IGRP2, IGRP4, JUST,
      :                    %VAL( CNF_PVAL( IPID ) ), 
      :                    %VAL( CNF_PVAL( IPW3 ) ), STATUS )
