@@ -84,9 +84,9 @@ itcl::class ::gaia3d::Gaia3dVtkAxes {
       $tprop Delete
 
       #  Don't want the text scaled to fit each axes independently.
-      [$xca GetTextActor] ScaledTextOff
-      [$yca GetTextActor] ScaledTextOff
-      [$zca GetTextActor] ScaledTextOff
+      [$xca GetTextActor] SetTextScaleModeToNone
+      [$yca GetTextActor] SetTextScaleModeToNone
+      [$zca GetTextActor] SetTextScaleModeToNone
 
       #  Activate the orientation marker.
       set marker_ [vtkOrientationMarkerWidget New]
