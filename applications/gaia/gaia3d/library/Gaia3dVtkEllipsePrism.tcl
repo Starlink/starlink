@@ -1,6 +1,6 @@
 #+
 #  Name:
-#     Gaia3dEllipsePrism
+#     Gaia3dVtkEllipsePrism
 
 #  Type of Module:
 #     [incr Tcl] class
