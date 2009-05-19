@@ -11,7 +11,7 @@
 
   Changes in V1.9-5
 
-  - New commands astcircle, astlinearapprox, astnegate.
+  - New commands astcircle, astlinearapprox, astnegate, astremoveregion.
 
   Changes in V1.9-4
 
