@@ -4814,6 +4814,7 @@ static int Boundary( AstPlot *this, const char *method, const char *class, int *
    whole plotting area. This is chosen to give a finer grid for smaller
    plotting tolerances. Note, putting the power as a literal constant in
    the call to pow seems to cause a segmentation violation on some systems. */
+      power = -0.666666666;
       dim = (int) 4*pow( tol, power ) + 10;
       if( dim > 400 ) dim = 400;
       if( dim < 3 ) dim = 3;
