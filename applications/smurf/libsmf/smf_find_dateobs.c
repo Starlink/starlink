@@ -46,6 +46,8 @@
 *  History:
 *     2009-01-13 (TIMJ):
 *        Initial version.
+*     2009-05-19 (TIMJ):
+*        Fix end date calculation from JCMTSTATE.
 
 *  Copyright:
 *     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
@@ -134,7 +136,7 @@ static double smf__find_utc( const smfHead *hdr, int first, int *status) {
         index = hdr->nframes;
       }
       astSet( tf, "TimeScale=TAI" );
-      astSet( tf, "TimeOrigin=MJD %.*g", DBL_DIG, (hdr->allState)[0].rts_end);
+      astSet( tf, "TimeOrigin=MJD %.*g", DBL_DIG, (hdr->allState)[index].rts_end);
       astSet( tf, "TimeScale=UTC" ); /* we need UTC */
 
     } else if (hdr->fitshdr) {
