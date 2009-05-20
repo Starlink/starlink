@@ -492,6 +492,8 @@
 *        Use KPG1_GDFNP in place of AGI_RCLP to find the picture in which
 *        to report coordinates. KPG1_GDFNP has an extra requirement that
 *        pictures should have defined WCS.
+*     20-MAY-2009 (DSB):
+*        Add REGION argument to KPG1_MKPOS.
 *     {enter_further_changes_here}
 
 *-
@@ -1343,7 +1345,7 @@
                GXY( 2 ) = DBLE( YC )
                CALL KPG1_MKPOS( 2, GXY, IPLOT, .FALSE., PLOT, IMARK, 
      :                          GEO, .FALSE., .FALSE., TEXT, JUST, 
-     :                          STATUS )
+     :                          AST__NULL, STATUS )
             END IF
 
 *  Leave the loop if the maximum number of positions have been supplied.
@@ -1409,11 +1411,11 @@
                   IF( IMARK .NE. 8 ) THEN
                      CALL KPG1_MKPOS( 2, START, IPLOTB, .FALSE., 'MARK',
      :                                8, .FALSE., .FALSE., .FALSE., 
-     :                                ' ', ' ', STATUS )
+     :                                ' ', ' ', AST__NULL, STATUS )
                   ELSE
                      CALL KPG1_MKPOS( 2, START, IPLOTB, .FALSE., 'MARK',
      :                                10, .FALSE., .FALSE., .FALSE., 
-     :                                ' ', ' ', STATUS )
+     :                                ' ', ' ', AST__NULL, STATUS )
                   END IF
 
 *  Re-instate the original Plot attributes.
@@ -1494,7 +1496,7 @@
 
 *  Close any polygons or chains being drawn.
       CALL KPG1_MKPOS( 2, GXY, IPLOT, .FALSE., PLOT, IMARK, GEO, .TRUE.,
-     :                 CLOSE, TEXT, JUST, STATUS )
+     :                 CLOSE, TEXT, JUST, AST__NULL, STATUS )
 
 *  Store the number of valid positions given in the output parameter
 *  NUMBER.
