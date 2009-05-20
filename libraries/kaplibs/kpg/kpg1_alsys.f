@@ -66,6 +66,10 @@
 *  History:
 *     16-MAR-2007 (DSB):
 *        Original version.
+*     20-MAY-2009 (DSB):
+*        Check the Frames are compatible before attempting to set the
+*        AlignSystem attribute (e.g. check we're not trying to align a
+*        SpecFrame with a SkyFrame).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -99,6 +103,7 @@
       CHARACTER VALUE*100        ! New value for AlignSystem
       INTEGER FRM1B              ! Pointer to FRM1 Frame
       INTEGER FRM2B              ! Pointer to FRM2 Frame
+      INTEGER FS                 ! FrameSet connecting the two Frames
       INTEGER IAT1               ! Used length of ATTR1
       INTEGER IAT2               ! Used length of ATTR2
       LOGICAL MORE               ! Get a new parameter value?
@@ -121,65 +126,73 @@
       ELSE
          FRM2B = AST_CLONE( FRM2, STATUS )
       END IF
+ 
+*  If the Frames are of different classes, they cannot be aligned in any
+*  system. Attempt to align them in order to see if there is any point in
+*  trying to change AlignSystem. */
+      FS = AST_CONVERT( FRM1B, FRM2B, ' ', STATUS )
+      IF( FS .NE. AST__NULL ) THEN
+         CALL AST_ANNUL( FS, STATUS ) 
 
 *  Create attribute names that refers to the requested Frame axis.
-      ATTR1 = 'AlignSystem'
-      IAT1 =  11
-      ATTR2 = 'System'
-      IAT2 =  6
-
-      IF( AST_ISACMPFRAME( FRM1B, STATUS ) .AND.
-     :    AST_ISACMPFRAME( FRM2B, STATUS ) .AND.
-     :    AXIS .GT. 0 ) THEN
-
-         CALL CHR_PUTC( '(', ATTR1, IAT1 )
-         CALL CHR_PUTI( AXIS, ATTR1, IAT1 )
-         CALL CHR_PUTC( ')', ATTR1, IAT1 )
-
-         CALL CHR_PUTC( '(', ATTR2, IAT2 )
-         CALL CHR_PUTI( AXIS, ATTR2, IAT2 )
-         CALL CHR_PUTC( ')', ATTR2, IAT2 )
-
-      END IF
+         ATTR1 = 'AlignSystem'
+         IAT1 =  11
+         ATTR2 = 'System'
+         IAT2 =  6
+         
+         IF( AST_ISACMPFRAME( FRM1B, STATUS ) .AND.
+     :       AST_ISACMPFRAME( FRM2B, STATUS ) .AND.
+     :       AXIS .GT. 0 ) THEN
+         
+            CALL CHR_PUTC( '(', ATTR1, IAT1 )
+            CALL CHR_PUTI( AXIS, ATTR1, IAT1 )
+            CALL CHR_PUTC( ')', ATTR1, IAT1 )
+         
+            CALL CHR_PUTC( '(', ATTR2, IAT2 )
+            CALL CHR_PUTI( AXIS, ATTR2, IAT2 )
+            CALL CHR_PUTC( ')', ATTR2, IAT2 )
+         
+         END IF
 
 *  Loop until we have a good value for the AlignSystem attribute.
-      MORE = .TRUE.
-      DO WHILE( MORE .AND. STATUS .EQ. SAI__OK ) 
+         MORE = .TRUE.
+         DO WHILE( MORE .AND. STATUS .EQ. SAI__OK ) 
 
 *  Get a value for the parameter.
-         CALL PAR_GET0C( PARAM, VALUE, STATUS )
+            CALL PAR_GET0C( PARAM, VALUE, STATUS )
 
 *  If a null value was supplied, annul the error and exit, leaving the 
 *  AlignSystem value in FRM1B unchanged.
-         IF( STATUS .NE. SAI__OK ) THEN
-            IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
-            MORE = .FALSE.
+            IF( STATUS .NE. SAI__OK ) THEN
+               IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
+               MORE = .FALSE.
 
 *  Otherwise, if "Data" was supplied (case-insensitive), then use the 
 *  System value from FRM2B.
-         ELSE IF( CHR_SIMLR( VALUE, 'DATA' ) ) THEN
-            VALUE = AST_GETC( FRM2B, ATTR2, STATUS )
-         END IF
+            ELSE IF( CHR_SIMLR( VALUE, 'DATA' ) ) THEN
+               VALUE = AST_GETC( FRM2B, ATTR2, STATUS )
+            END IF
 
 *  If a value was obtained, attempt to use the value, but if an error occurs, 
 *  flush the error and the parameter and get a new value.         
-         IF( MORE ) THEN
-            CALL AST_SETC( FRM1B, ATTR1, VALUE, STATUS )
-            IF( STATUS .NE. SAI__OK ) THEN
-               CALL MSG_SETC( 'V', VALUE )
-               CALL ERR_REP( 'KPG1_ALSYS_1', 'Cannot use "^V" as the '//
-     :                       'co-ordinate system for aligning old and'//
-     :                       ' new data.', STATUS )
-               CALL MSG_SETC( 'P', PARAM )
-               CALL ERR_REP( 'KPG1_ALSYS_2', 'Please supply a new '//
-     :                       'value for parameter %^P.', STATUS )
-               CALL ERR_FLUSH( STATUS )
-               CALL PAR_CANCL( PARAM, STATUS )
-            ELSE
-               MORE = .FALSE.
+            IF( MORE ) THEN
+               CALL AST_SETC( FRM1B, ATTR1, VALUE, STATUS )
+               IF( STATUS .NE. SAI__OK ) THEN
+                  CALL MSG_SETC( 'V', VALUE )
+                  CALL ERR_REP( 'KPG1_ALSYS_1', 'Cannot use "^V" as '//
+     :                          'the co-ordinate system for aligning '//
+     :                          'old and new data.', STATUS )
+                  CALL MSG_SETC( 'P', PARAM )
+                  CALL ERR_REP( 'KPG1_ALSYS_2', 'Please supply a new '//
+     :                          'value for parameter %^P.', STATUS )
+                  CALL ERR_FLUSH( STATUS )
+                  CALL PAR_CANCL( PARAM, STATUS )
+               ELSE
+                  MORE = .FALSE.
+               END IF
             END IF
-         END IF
-      END DO
+         END DO
+      END IF
 
 *  Free resources
       CALL AST_ANNUL( FRM1B, STATUS )
