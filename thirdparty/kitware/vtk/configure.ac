@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision: 24276 $)
 
 dnl    Initialisation: package name and version number
-AC_INIT(vtk, 5.2.1, ussc@star.rl.ac.uk)
+AC_INIT(vtk, 5.4.0, ussc@star.rl.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -40,11 +40,11 @@ dnl    used during a bootstrap (cmELF for instance).
 STAR_SPECIAL_INSTALL_COMMAND([
    ( cd VTK; $(MAKE) DESTDIR=$$DESTDIR install ); \
    ( cd $$DESTDIR$(libdir); \
-        for f in `cd vtk-5.2 && ls *$(SHLIB_EXT)*`; do \
+        for f in `cd vtk-5.4 && ls *$(SHLIB_EXT)*`; do \
            if test -f "$$f"; then rm "$$f"; fi; \
-	   mv vtk-5.2/$$f .; \
+	   mv vtk-5.4/$$f .; \
 	done );
-   ( cd $$DESTDIR$(prefix)/include && rm -rf vtk && $(LN_S) vtk-5.2 vtk )
+   ( cd $$DESTDIR$(prefix)/include && rm -rf vtk && $(LN_S) vtk-5.4 vtk )
 ])
 
 AC_CONFIG_FILES([Makefile component.xml])

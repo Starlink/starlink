@@ -20,18 +20,23 @@ all:
 	  TCL_LIBRARY_PATH=$(prefix)/lib; export TCL_LIBRARY_PATH; \
 	  cd VTK && \
 	  cmake -Wno-dev \
+                -D CMAKE_BUILD_TYPE=Debug \
 	        -D BUILD_SHARED_LIBS:BOOL=ON \
 	        -D BUILD_TESTING:BOOL=OFF \
-	        -D CMAKE_INSTALL_PREFIX:PATH=$(prefix) \
 		-D CMAKE_INCLUDE_PATH:PATH=$(prefix)/include \
+	        -D CMAKE_INSTALL_PREFIX:PATH=$(prefix) \
 		-D CMAKE_LIBRARY_PATH:PATH=$(prefix)/lib \
-	        -D VTK_USE_GUISUPPORT:BOOL=ON \
-	        -D VTK_WRAP_TCL:BOOL=ON \
-	        -D VTK_USE_X:BOOL=ON \
-	        -D VTK_USE_MANGLED_MESA:BOOL=OFF \
+	        -D TCL_TCLSH:PATH=$(prefix)/bin/tclsh \
 	        -D VTK_OPENGL_HAS_OSMESA:BOOL=OFF \
 	        -D VTK_USE_CARBON:BOOL=OFF \
-	        -D VTK_USE_COCOA:BOOL=OFF . && \
+	        -D VTK_USE_COCOA:BOOL=OFF  \
+	        -D VTK_USE_GEOVIS:BOOL=OFF \
+	        -D VTK_USE_GUISUPPORT:BOOL=ON \
+	        -D VTK_USE_INFOVIS:BOOL=OFF \
+	        -D VTK_USE_MANGLED_MESA:BOOL=OFF \
+	        -D VTK_USE_VIEWS:BOOL=OFF \
+	        -D VTK_USE_X:BOOL=ON \
+	        -D VTK_WRAP_TCL:BOOL=ON . && \
 	  $(MAKE) )
 
 ##  Automake really requires local versions for these targets.
