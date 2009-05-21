@@ -556,6 +556,12 @@ itcl::class gaia3d::Gaia3dTool {
       $itk_component(tab) add -label CUPID
       set w [$itk_component(tab) childsite CUPID]
 
+      itk_component add catrule {
+         LabelRule $w.catrule \
+            -text "Catalogue:"
+      }
+      pack $itk_component(catrule) -side top -fill x -expand 1
+
       set lwidth 25
 
       #  Render any CUPID catalogues opened in the GAIA cube toolbox.
@@ -568,7 +574,7 @@ itcl::class gaia3d::Gaia3dTool {
             -variable [scope show_cupid_cat_] \
             -command [code $this changed_show_cupid_cat_]
       }
-      pack $itk_component(showcupidcat) -fill x -expand 0 -ipady 5
+      pack $itk_component(showcupidcat) -fill x -expand 0 -ipadx 1m
       add_short_help $itk_component(showcupidcat) \
          {Show CUPID catalogue clumps, if any catalogues are available}
 
@@ -582,7 +588,7 @@ itcl::class gaia3d::Gaia3dTool {
             -variable [scope show_cupid_selected_] \
             -command [code $this changed_show_cupid_selected_]
       }
-      pack $itk_component(showcupidselected) -fill x -expand 0 -ipady 5
+      pack $itk_component(showcupidselected) -fill x -expand 0 -ipadx 1m
       add_short_help $itk_component(showcupidselected) \
          {Only display rows selected in CUPID catalogues}
 
@@ -592,8 +598,16 @@ itcl::class gaia3d::Gaia3dTool {
             -text "Import" \
             -command [code $this import_cupid_catalogue_]
       }
-      pack $itk_component(cupidimport) -side top -ipadx 1m -ipady 1m -pady 4m
+      pack $itk_component(cupidimport) -side top -ipadx 1m
       add_short_help $itk_component(cupidimport) {Import another catalogue}
+
+      #  Pixel masks.
+      itk_component add pixelmask {
+         gaia3d::Gaia3dCupidMasks $w.pixelmask \
+            -filter_types $itk_option(-filter_types)
+      }
+      pack $itk_component(pixelmask) -side top -fill both -expand 1
+      add_short_help $itk_component(pixelmask) {Display pixel masks}
    }
 
    #  Control extra cubes isosurface toolbox.
@@ -1163,6 +1177,9 @@ itcl::class gaia3d::Gaia3dTool {
             $itk_component(extratoolbox) render $renwindow_ \
                [$imagedata_ get_wcs]
          }
+
+         #  And any masks.
+         $itk_component(pixelmask) render $renwindow_ [$imagedata_ get_wcs]
 
          #  2D Widgets go last. Add a orientation marker that is always
          #  visible to determine the directions.

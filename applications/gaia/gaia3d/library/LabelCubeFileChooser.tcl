@@ -93,9 +93,9 @@ itcl::class gaia3d::LabelCubeFileChooser {
       set history_ [GaiaCubeHistory \#auto -gaia_cube $this]
 
       #  Add a menu button to the widget.
-      set menu $w_.go.m
+      set menu $itk_component(eframe).go.m
       itk_component add go {
-         menubutton $w_.go -text "Go" \
+         menubutton $itk_component(eframe).go -text "Go" \
             -menu $menu
       } {
          keep -indicatoron -borderwidth -state
@@ -104,7 +104,6 @@ itcl::class gaia3d::LabelCubeFileChooser {
          rename -anchor -buttonanchor buttonAnchor ButtonAnchor
          ignore -disabledforeground -font
       }
-      pack $itk_component(go) -side right -padx 1m -ipadx 1m
       
       itk_component add menu {
          menu $menu \
@@ -113,6 +112,7 @@ itcl::class gaia3d::LabelCubeFileChooser {
          ignore -disabledforeground
 
       }
+      pack $itk_component(go) -side right
 
       #  Now handle unprocessed configurations.
       eval itk_initialize $args
@@ -161,6 +161,15 @@ itcl::class gaia3d::LabelCubeFileChooser {
    #  GaiaCube configuration item.
    itk_option define -cube cube Cube {} {
       configure -value $itk_option(-cube)
+   }
+
+   #  Orientation.
+   itk_option define -orientation orientation Orientation right {
+      if { $itk_option(-orientation) == "vertical" } {
+         pack $itk_component(eframe) -side bottom -fill x -expand 1 -padx 1m
+      } else {
+         pack $itk_component(eframe) -side right -fill x -expand 1 -padx 1m
+      }
    }
 
    #  Protected variables: (available to instance)

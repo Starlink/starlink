@@ -121,7 +121,12 @@ proc gaia::setXdefaults {} {
     option add *LabelEntryMenu.indicatorOn  1
 
     option add *LabelFileChooser.anchor w
+    option add *LabelFileChooser.buttonRelief raised
     option add *LabelFontChooser.anchor w
+
+    option add *LabelCubeFileChooser.anchor w
+    option add *LabelCubeFileChooser.buttonRelief raised
+    option add *LabelCubeFontChooser.anchor w
 
     option add *GaiaQueryResult.relief       sunken
     option add *GaiaQueryResult.borderwidth  3

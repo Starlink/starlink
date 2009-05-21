@@ -85,16 +85,21 @@ itcl::class gaia::LabelFileChooser {
    #  ------------
    constructor {args} {
 
+      itk_component add eframe {
+         frame $w_.eframe
+      }
+
       #  Add a button to the widget.
       itk_component add chooser {
-         button $w_.chooser -text "Choose file..." \
+         button $itk_component(eframe).chooser -text "Choose file..." \
             -command [code $this choose_file_]
       } {
          keep -relief -borderwidth
          rename -font -labelfont labelFont LabelFont
          rename -relief -buttonrelief buttonRelief ButtonRelief
       }
-      pack $itk_component(chooser) -side right -padx 1m -ipadx 1m
+      pack $itk_component(chooser) -side right
+      pack $itk_component(eframe) -side right -padx 1m
 
       #  Now handle unprocessed configurations.
       eval itk_initialize $args
