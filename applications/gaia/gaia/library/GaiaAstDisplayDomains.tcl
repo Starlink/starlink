@@ -42,6 +42,7 @@
 #  Copyright:
 #     Copyright (C) 2001-2005 Central Laboratory of the Research Councils.
 #     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     Copyright (C) 2009 Science and Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -253,12 +254,12 @@ itcl::class gaia::GaiaAstDisplayDomains {
       # X and Y coordinates, update the readout. Trap problem domains
       # (bad coordinates etc.) and pass on to later ones.
       set i 0
+      set oldx [set ::${var}(X)]
+      set oldy [set ::${var}(Y)]
       foreach {domain dims} $domains_ {
          catch {
             incr i
             $itk_option(-rtdimage) astset current $i
-            set oldx [set ::${var}(X)]
-            set oldy [set ::${var}(Y)]
             set xylist [$itk_option(-rtdimage) astpix2cur $oldx $oldy]
             set j 0
             foreach value "$xylist" {
@@ -279,12 +280,13 @@ itcl::class gaia::GaiaAstDisplayDomains {
       }
    }
 
-   #  Start tracing changes in coordinates.
+   #  Start tracing changes in coordinates. Trace (Y) as that is set
+   #  after (X).
    protected method start_trace_ {} {
       if { ! $trace_active_ } {
          set var $itk_option(-rtdimage)
          global ::$var
-         trace variable ::${var}(X) w [code $this update_readouts_]
+         trace variable ::${var}(Y) w [code $this update_readouts_]
          set trace_active_ 1
       }
    }
@@ -293,7 +295,7 @@ itcl::class gaia::GaiaAstDisplayDomains {
    protected method stop_trace_ {} {
       set var $itk_option(-rtdimage)
       global ::$var
-      trace vdelete ::${var}(X) w [code $this update_readouts_]
+      trace vdelete ::${var}(Y) w [code $this update_readouts_]
       set trace_active_ 0
    }
 

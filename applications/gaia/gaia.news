@@ -76,6 +76,10 @@
     This was introduced when dashed lines were offered as an option for
     contouring.
 
+    A bug tracking coordinates using the arrow keys and the "Show all 
+    coordinates" toolbox has been fixed. Previously the reported Y 
+    coordinates were those of the last position, not the current one.
+
   Lehuakona Release
   =================
 
