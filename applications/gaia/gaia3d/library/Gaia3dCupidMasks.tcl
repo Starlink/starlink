@@ -328,14 +328,22 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
 
    #  Get which lookup table to use for colouring segments.
    protected method get_lut_ {i} {
+      return $lut_($i)
+   }
 
-      #  Random = 1, Rainbow = 2, Grey = 3.
-      return 3;# 1
+   #  Set which lookup table to use for colouring segments.
+   protected method set_lut_ {i value} {
+      set lut_($i) $value
    }
 
    #  Get the opacity of the colours.
    protected method get_opacity_ {i} {
-      return 1.0
+      return $opacity_($i)
+   }
+
+   #  Set the opacity of the colours.
+   protected method set_opacity_ {i value} {
+      set opacity_($i) $value
    }
 
    #  Release all segmenters.
@@ -440,6 +448,44 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
          pack $itk_component(values$i) -side top -fill x -ipadx 1m -ipady 2m
          add_short_help $itk_component(values$i) \
             {Values of masked regions to display, empty for all}
+
+         #  Lookup table selection. Very basic for these.
+         itk_component add lut$i {
+            util::LabelMenu $parent.lut$i \
+               -text "Colours:" \
+               -relief raised
+         }
+         foreach {index desc} "1 Random 2 Rainbow 3 Grey" {
+            $itk_component(lut$i) add \
+               -label $desc \
+               -value $index \
+               -command [code $this set_lut_ $i $index]
+         }
+         $itk_component(lut$i) configure -value 1
+         set lut_($i) 1
+         pack $itk_component(lut$i) -side top -fill x -ipadx 1m -ipady 2m
+         add_short_help $itk_component(lut$i) \
+            {Lookup table for assigning colours to regions}
+
+         #  Add menu for selecting the opacity.
+         itk_component add opacity$i {
+            util::LabelMenu $parent.opacity$i \
+               -text "Opacity:" \
+               -relief raised
+         }
+
+         #  Now add the range of opacities to it.
+         for {set j 0.0} {$j <= 1.0} {set j [expr $j+0.1]} {
+            $itk_component(opacity$i) add \
+               -label $j \
+               -value $j \
+               -command [code $this set_opacity_ $i $j]
+         }
+         $itk_component(opacity$i) configure -value 1.0
+         set opacity_($i) 1.0
+         pack $itk_component(opacity$i) -side top -fill x -ipadx 1m -ipady 2m
+         add_short_help $itk_component(opacity$i) \
+            {Opacity of coloured regions}
       }
    }
 
@@ -509,6 +555,12 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
 
    #  Values of masked regions to display.
    protected variable values_
+
+   #  Lookup table for each segmenter
+   protected variable lut_
+
+   #  Opacity for each segmenter.
+   protected variable opacity_
 
    #  Common variables: (shared by all instances)
    #  -----------------
