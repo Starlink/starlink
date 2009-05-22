@@ -122,23 +122,19 @@ itcl::class ::gaia3d::Gaia3dVtkSegmenter {
    #  Set the values to extract and display. Each element of args is a
    #  value or a range of values (two values in a list element). The exception
    #  is if a single -1 is given. That means use all values in the mask.
-   public method set_values {args} {
+   public method set_values {values} {
 
       #  Clear all existing values.
       set nvalues_ 0
       $segmenter_ SetNumberOfContours 0
 
-      #  Record range for mapper scalars.
-      set vmin 1
-      set vmax -1
-
-      if {[llength $args] == 1 && $args == "-1" } {
-         #  XXX stats of the data?
-         $segmenter_ GenerateValues 1000 0 999
-         set vmin 0
-         set vmax 999
+      #  All values.
+      if {[llength $values] == 1 && $values == "-1" } {
+         get_dataminmax_
+         $segmenter_ GenerateValues [expr $dmax_-$dmin_+1] $dmin_ $dmax_
       } else {
-         foreach value $args {
+         #  Given values and ranges.
+         foreach value $values {
             if { [llength $value] == 2 } {
                set lb [lindex $value 0]
                set ub [lindex $value 1]
@@ -146,30 +142,35 @@ itcl::class ::gaia3d::Gaia3dVtkSegmenter {
                   $segmenter_ SetValue $nvalues_ $i
                   incr nvalues_
                }
-               set vmin [expr min($vmin,$lb)]
-               set vmax [expr max($vmax,$ub)]
             } else {
                $segmenter_ SetValue $nvalues_ $value
                incr nvalues_
-               set vmin [expr min($vmin,$value)]
-               set vmax [expr max($vmax,$value)]
             }
          }
       }
-      make_lut_ $vmin $vmax
    }
 
-   #  Set the lookup table. Range of three, random, rainbow or grey.
-   public method set_lut {n} {
+   #  Set the lookup table and opacity. Range of three lookup tables are
+   #  avaiable random=1, rainbow=2 or grey=3.
+   public method set_lut {n opacity} {
       set nlut_ [expr min(3,max(1,$n))]
+      set opacity_ $opacity
+      make_lut_
    }
 
-   #  Make a lookup table of the current type to match the given
-   #  data value range.
-   protected method make_lut_ {vmin vmax} {
+   #  Set the opacity.
+   public method set_opacity {opacity} {
+      set opacity_ $opacity
+      make_lut_
+   }
+
+   #  Make a lookup table of the current type to match the data range.
+   protected method make_lut_ {} {
+      get_dataminmax_
+
       set lut [vtkLookupTable New]
-      $lut SetNumberOfColors [expr $vmax-$vmin+1]
-      $lut SetTableRange $vmin $vmax
+      $lut SetNumberOfColors [expr $dmax_-$dmin_+1]
+      $lut SetTableRange $dmin_ $dmax_
       $lut SetScaleToLinear
       $lut Build
       
@@ -183,29 +184,29 @@ itcl::class ::gaia3d::Gaia3dVtkSegmenter {
             set j [expr $j+0.1]
          }
          set j 0
-         for {set i $vmin} {$i < $vmax } {incr i} {
+         for {set i $dmin_} {$i <= $dmax_ } {incr i} {
             if { $j > 9 } {
                set j 0
             }
-            eval $lut SetTableValue $i $r($j) $g($j) $b($j) $opacity
+            eval $lut SetTableValue $i $r($j) $g($j) $b($j) $opacity_
             incr j
          }
       } elseif { $nlut_ == 2 } {
          #  Rainbow, the default lut, just make sure we get all colours.
          $lut SetHueRange 0.0 1.0
-         $lut SetAlphaRange $opacity $opacity
+         $lut SetAlphaRange $opacity_ $opacity_
       } else {
          #  Random.
          set math [vtkMath New]
          $math RandomSeed 5071
-         for { set i $vmin } { $i < $vmax } { incr i } {
+         for { set i $dmin_ } { $i <= $dmax_ } { incr i } {
             $lut  SetTableValue $i \
-               [$math Random .2 1]  [$math Random .2 1]  [$math Random .2 1]  $opacity
+               [$math Random .2 1]  [$math Random .2 1]  [$math Random .2 1]  $opacity_
          }
       }
 
       $mapper_ SetLookupTable $lut
-      $mapper_ SetScalarRange $vmin $vmax
+      $mapper_ SetScalarRange $dmin_ $dmax_
    }
 
    #  Update the UI.
@@ -219,6 +220,24 @@ itcl::class ::gaia3d::Gaia3dVtkSegmenter {
       if { $imagedata == {} } {
          remove_from_window
          set_invisible
+      }
+      set read_imagedata_ 0
+   }
+
+   #  Get the data min and max values. These are used to set the lookup tables
+   #  and scalar ranges.
+   protected method get_dataminmax_ {} {
+      if { ! $read_imagedata_ } {
+         #  Make sure imagedata is available.
+         $imagedata Update
+         lassign [$imagedata GetScalarRange] smin smax
+
+         #  Lower value is usually BAD, so assume 0, or need to visit the raw cube.
+         set dmin_ 0
+         set dmax_ [expr int($smax)]
+
+         #  Done for now.
+         set read_imagedata_ 1
       }
    }
 
@@ -267,9 +286,6 @@ itcl::class ::gaia3d::Gaia3dVtkSegmenter {
       set last_wcs_ $wcs
    }
 
-   #  Opacity of colours.
-   public variable opacity 1
-
    #  Protected variables: (available to instance)
    #  --------------------
 
@@ -283,6 +299,16 @@ itcl::class ::gaia3d::Gaia3dVtkSegmenter {
 
    #  Current lut.
    protected variable nlut_ 1
+
+   #  Whether imagedata has been read yet.
+   protected variable read_imagedata_ 0
+
+   #  Min and max integers in data.
+   protected variable dmin_ 0
+   protected variable dmax_ 0
+
+   #  Opacity.
+   protected variable opacity_ 1.0
 
    #  Common variables: (shared by all instances)
    #  -----------------

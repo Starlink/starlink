@@ -304,24 +304,42 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
       }
 
       #  Get and set attributes.
+      $segmenter_($i) set_lut [get_lut_ $i] [get_opacity_ $i]
       $segmenter_($i) set_values [get_values_ $i]
-      $segmenter_($i) set_lut [get_lut_ $i]
    }
 
    #  Get the values to be segmented from a mask.
    protected  method get_values_ {i} {
 
-      #  All for now.
-      return -1
+      if { $values_($i) == {} } {
+         #  All.
+         return -1
+      }
+
+      #  Need lists of single values or pairs of values. 
+      #  Clean up first, replace "," with space, remove multiple spaces and trim.
+      set value [regsub -all -- {,} $values_($i) { }]
+      set value [regsub -all -- {\s+} $value { }]
+      set value [string trim $value]
+      set range {}
+      foreach v $value {
+         #  Ranges are low-high, that's a single element.
+         lappend range [regsub -all -- {-} $v { }]
+      }
+      return $range
    }
 
    #  Get which lookup table to use for colouring segments.
    protected method get_lut_ {i} {
 
-      #  Rainbow.
-      return 0
+      #  Random = 1, Rainbow = 2, Grey = 3.
+      return 3;# 1
    }
 
+   #  Get the opacity of the colours.
+   protected method get_opacity_ {i} {
+      return 1.0
+   }
 
    #  Release all segmenters.
    public method release_all_objects {} {
@@ -414,6 +432,17 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
          add_short_help $itk_component(cube$i) \
             {Name of a data file, must be a cube}
 
+         #  Which regions to display? All, selected (from catalogue?) or a given
+         #  list.
+         itk_component add values$i {
+            util::LabelEntry $parent.values$i \
+               -labelwidth 5 \
+               -text "Values:" \
+               -textvariable [scope values_($i)]
+         }
+         pack $itk_component(values$i) -side top -fill x -ipadx 1m -ipady 2m
+         add_short_help $itk_component(values$i) \
+            {Values of masked regions to display, empty for all}
       }
    }
 
@@ -477,6 +506,9 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
 
    #  Whether to match the cube spectral coordinates using the base system.
    protected variable match_base_system_ 1
+
+   #  Values of masked regions to display.
+   protected variable values_
 
    #  Common variables: (shared by all instances)
    #  -----------------
