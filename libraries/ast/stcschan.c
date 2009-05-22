@@ -147,6 +147,8 @@ f     The StcsChan class does not define any new routines beyond those
 *  History:
 *     18-DEC-2008 (DSB):
 *        Original version.
+*     22-MAY-2008 (DSB):
+*        Retain default Equinox values in SkyFrame when reading an STC-S.
 *class--
 */
 
@@ -1405,7 +1407,6 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
    double bsize[ 3 ];        /* Box dimensions */
    double centre[ 3 ];       /* Circle or ellipse centre */
    double epoch;             /* Value to use for the Epoch attribue */
-   double equinox;           /* Value to use for the Equinox attribue */
    double err[ 3 ];          /* Sub-phrase error values */
    double fill;              /* Filling factor */
    double hilim;             /* Axis upper limit */
@@ -1513,7 +1514,6 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
 
 /* Initialise everything else. */
    epoch = AST__BAD;
-   equinox = AST__BAD;
    err[ 0 ] = AST__BAD;
    fbuf = NULL;
    fill = AST__BAD;
@@ -1747,10 +1747,9 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
 
 /* We have now finished reading the space sub-phrase, so we can now
    finalise any remaining details of the space Frame and Region. Store 
-   any epoch and equinox value in any space Frame. */
+   any epoch value in any space Frame. */
          if( spacefrm ) {
             if( epoch != AST__BAD ) astSetEpoch( spacefrm, epoch );
-            if( equinox != AST__BAD ) astSetEquinox( spacefrm, equinox );
 
 /* Create a suitable Region to enclose the space positions. This
    includes scaling the supplied axis values to the units used by 
@@ -2143,23 +2142,18 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
 
          } else if( !strcmp( word, "FK5" ) ) {
             sys = AST__FK5;
-            equinox = 2000.0;
 
          } else if( !strcmp( word, "FK4" ) ) {
             sys = AST__FK4;
-            equinox = 1950.0;
 
          } else if( !strcmp( word, "J2000" ) ) {
             sys = AST__FK5;
-            equinox = 2000.0;
 
          } else if( !strcmp( word, "B1950" ) ) {
             sys = AST__FK4;
-            equinox = 1950.0;
 
          } else if( !strcmp( word, "ECLIPTIC" ) ) {
             sys = AST__ECLIPTIC;
-            equinox = 2000.0;
 
          } else if( !strcmp( word, "GALACTIC" ) ) {
             sys = AST__GALACTIC;
