@@ -45,6 +45,8 @@
 *  History:
 *     2009-04-24 (TIMJ):
 *        Initial version. Some code relocated from smf_find_darks.
+*     2009-05-21 (TIMJ):
+*        Store SWMODE
 
 *  Copyright:
 *     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
@@ -122,6 +124,7 @@ void smf_obsmap_fill( const smfData * data, AstKeyMap * obsmap, AstKeyMap * objm
       astMapPut0C( obsinfo, "OBJECT", object, NULL );
       astMapPut0I( obsinfo, "OBSMODE", data->hdr->obsmode, NULL );
       astMapPut0I( obsinfo, "OBSTYPE", data->hdr->obstype, NULL );
+      astMapPut0I( obsinfo, "SWMODE", data->hdr->swmode, NULL );
       smf_fits_getI( data->hdr, "OBSNUM", &itemp, status );
       astMapPut0I( obsinfo, "OBSNUM", itemp, NULL );
       smf_fits_getI( data->hdr, "UTDATE", &itemp, status );

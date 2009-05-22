@@ -37,6 +37,8 @@
 *  History:
 *     2009-04-24 (TIMJ):
 *        Initial version. Some code relocated from smf_find_darks.
+*     2009-05-21 (TIMJ):
+*        Support switching mode
 
 *  Copyright:
 *     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
@@ -137,13 +139,24 @@ void smf_obsmap_report( AstKeyMap * obsmap, AstKeyMap * objmap,
         } else {
           msgSetc( "OT", " ");
         }
+
+        /* Do not display SELF or NONE switch mode as they contain
+           no useful information over the obs mode */
+        astMapGet0I( obsinfo, "SWMODE", &itemp );
+        if (itemp != SMF__SWM_NULL && itemp != SMF__SWM_SELF) {
+          msgSetc( "SW", "/");
+          msgSetc( "SW", smf_swmode_str( itemp, status ) );
+        } else {
+          msgSetc( "SW", " " );
+        }
+
         astMapGet0I( obsinfo, "OBSMODE", &itemp );
         msgSetc( "OM", smf_obsmode_str( itemp, status) );
         astMapGet0I( obsinfo, "OBSNUM", &itemp );
         msgSeti( "ON", itemp);
         astMapGet0I( obsinfo, "UTDATE", &itemp );
         msgSeti( "UT", itemp);
-        msgOutif(MSG__NORM, "", "  ^UT #^ON ^OM ^OBJ ^OT", status);
+        msgOutif(MSG__NORM, "", "  ^UT #^ON ^OM^SW ^OBJ ^OT", status);
       }
     }
     msgBlank( status );
