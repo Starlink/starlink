@@ -74,45 +74,42 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
          }
          pack $itk_component(attrule) -side top -fill x -expand 1
       }
-         
-      #  Coordinate matching on and off.
-      itk_component add match {
-         gaia::StarLabelCheck $w_.match \
-            -text {Match coordinates} \
-            -labelwidth $lwidth \
+
+      #  Add coordinate matching options to the given menu.
+      if { $itk_option(-options_menu) != {} } {
+
+         #  Assume menu is associated with the same top-level as this object.
+         set top [winfo toplevel $w_]
+
+         $itk_option(-options_menu) add checkbutton \
+            -label {Match coordinates} \
             -variable [scope match_] \
             -onvalue 1 \
             -offvalue 0
-      }
-      pack $itk_component(match) -fill x -expand 0 -ipadx 1m
-      add_short_help $itk_component(match) \
-         {Determine transformations to the main cube coordinates}
+         $top add_menu_short_help $itk_option(-options_menu) \
+            {Match coordinates} \
+            {Determine transformations to the main cube coordinates}
 
-      #  Matching with knowledge of the sidebands.
-      itk_component add matchsidebands {
-         gaia::StarLabelCheck $w_.matchsidebands \
-            -text {Match sidebands} \
-            -labelwidth $lwidth \
+         #  Matching with knowledge of the sidebands.
+         $itk_option(-options_menu) add checkbutton \
+            -label {Match sidebands} \
             -variable [scope match_sidebands_] \
             -onvalue 1 \
             -offvalue 0
-      }
-      pack $itk_component(matchsidebands) -fill x -expand 0 -ipadx 1m
-      add_short_help $itk_component(matchsidebands) \
-         {Match spectral axes using sidebands}
+         $top add_menu_short_help $itk_option(-options_menu) \
+            {Match sidebands} \
+            {Match spectral axes using sidebands}
 
-      #  Matching using the base system, useful for velocities.
-      itk_component add matchbasesystem {
-         gaia::StarLabelCheck $w_.matchbasesystem \
-            -text {Match using base system} \
-            -labelwidth $lwidth \
+         #  Matching using the base system, useful for velocities.
+         $itk_option(-options_menu) add checkbutton \
+            -label {Match using base system} \
             -variable [scope match_base_system_] \
             -onvalue 1 \
             -offvalue 0
+         $top add_menu_short_help $itk_option(-options_menu) \
+            {Match using base system} \
+            {Match spectral axes using current coordinate system}
       }
-      pack $itk_component(matchbasesystem) -fill x -expand 0 -ipadx 1m
-      add_short_help $itk_component(matchbasesystem) \
-         {Match spectral axes using current coordinate system}
 
       #  Main controls.
       add_controls_
@@ -316,7 +313,7 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
          return -1
       }
 
-      #  Need lists of single values or pairs of values. 
+      #  Need lists of single values or pairs of values.
       #  Clean up first, replace "," with space, remove multiple spaces and trim.
       set value [regsub -all -- {,} $values_($i) { }]
       set value [regsub -all -- {\s+} $value { }]
@@ -472,6 +469,9 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
 
    #  Filters for selecting files.
    itk_option define -filter_types filter_types Filter_types {}
+
+   #  Menu to populate with options for matching coordinate systems.
+   itk_option define -options_menu options_menu Options_Menu {}
 
    #  Protected variables: (available to instance)
    #  --------------------

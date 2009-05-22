@@ -126,14 +126,18 @@ itcl::class gaia3d::Gaia3dTool {
          -accelerator {Control-c}
       bind $w_ <Control-c> [code $this close]
 
+      #  Add the view menu
+      set view_menu_ [add_menubutton "View"]
+      configure_menubutton View -underline 0
+
+      #  Create the extra cubes toolbox.
+      add_menuitem $view_menu_ command "Other cubes..." \
+         {Render isosurfaces of other cubes into the scene} \
+         -command [code $this make_extratoolbox]
+
       #  Add the options menu
       set Options [add_menubutton "Options"]
       configure_menubutton Options -underline 0
-
-      #  Create the extra cubes toolbox.
-      add_menuitem $Options command "Other cubes..." \
-         {Render isosurfaces of other cubes into the scene} \
-         -command [code $this make_extratoolbox]
 
       #  Add an option to add a customized colour.
       $Options add command \
@@ -604,7 +608,8 @@ itcl::class gaia3d::Gaia3dTool {
       #  Pixel masks.
       itk_component add pixelmask {
          gaia3d::Gaia3dCupidMasks $w.pixelmask \
-            -filter_types $itk_option(-filter_types)
+            -filter_types $itk_option(-filter_types) \
+            -options_menu $view_menu_
       }
       pack $itk_component(pixelmask) -side top -fill both -expand 1
       add_short_help $itk_component(pixelmask) {Display pixel masks}
@@ -1525,6 +1530,9 @@ itcl::class gaia3d::Gaia3dTool {
 
    #  The importer for the CUPID catalogue (gaia::GaiaCupidImporter).
    protected variable importer_ {}
+
+   #  The "View" menu.
+   protected variable view_menu_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------
