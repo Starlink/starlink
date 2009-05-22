@@ -64,8 +64,6 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
       #  Evaluate any options [incr Tk].
       eval itk_initialize $args
 
-      set lwidth 25
-
       #  Different UI layout for 1 cube.
       if { $itk_option(-maxcubes) == 1 } {
          itk_component add attrule {
@@ -412,7 +410,7 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
                -text "Display:" \
                -onvalue 1 \
                -offvalue 0 \
-               -labelwidth 25 \
+               -labelwidth $lwidth_ \
                -anchor w \
                -variable [scope display_($i)]
          }
@@ -424,7 +422,7 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
          set cubename_($i) {}
          itk_component add cube$i {
             LabelCubeFileChooser $parent.cube$i \
-               -labelwidth 5 \
+               -labelwidth $lwidth_ \
                -text "Mask:" \
                -textvariable [scope cubename_($i)] \
                -command [code $this set_cubename_ $i] \
@@ -441,7 +439,7 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
          #  list.
          itk_component add values$i {
             util::LabelEntry $parent.values$i \
-               -labelwidth 5 \
+               -labelwidth $lwidth_ \
                -text "Values:" \
                -textvariable [scope values_($i)]
          }
@@ -453,6 +451,7 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
          itk_component add lut$i {
             util::LabelMenu $parent.lut$i \
                -text "Colours:" \
+               -labelwidth $lwidth_ \
                -relief raised
          }
          foreach {index desc} "1 Random 2 Rainbow 3 Grey" {
@@ -471,6 +470,7 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
          itk_component add opacity$i {
             util::LabelMenu $parent.opacity$i \
                -text "Opacity:" \
+               -labelwidth $lwidth_ \
                -relief raised
          }
 
@@ -561,6 +561,9 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
 
    #  Opacity for each segmenter.
    protected variable opacity_
+
+   #  Usual labelwith.
+   protected variable lwidth_ 7
 
    #  Common variables: (shared by all instances)
    #  -----------------

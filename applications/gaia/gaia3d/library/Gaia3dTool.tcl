@@ -557,20 +557,26 @@ itcl::class gaia3d::Gaia3dTool {
 
    #  Controls for CUPID catalogue options.
    protected method add_cupid_controls_ {} {
+
       $itk_component(tab) add -label CUPID
       set w [$itk_component(tab) childsite CUPID]
 
+      itk_component add catframe {
+         frame $w.catframe
+      }
+      pack $itk_component(catframe) -side top -fill x -expand 0
+
       itk_component add catrule {
-         LabelRule $w.catrule \
+         LabelRule $itk_component(catframe).catrule \
             -text "Catalogue:"
       }
       pack $itk_component(catrule) -side top -fill x -expand 1
 
-      set lwidth 25
+      set lwidth 21
 
       #  Render any CUPID catalogues opened in the GAIA cube toolbox.
       itk_component add showcupidcat {
-         gaia::StarLabelCheck $w.showcupidcat \
+         gaia::StarLabelCheck $itk_component(catframe).showcupidcat \
             -text "Display catalogues:" \
             -onvalue 1 \
             -offvalue 0 \
@@ -584,7 +590,7 @@ itcl::class gaia3d::Gaia3dTool {
 
       #   Just show the selected rows.
       itk_component add showcupidselected {
-         gaia::StarLabelCheck $w.showcupidselected \
+         gaia::StarLabelCheck $itk_component(catframe).showcupidselected \
             -text "Only show selected rows:" \
             -onvalue 1 \
             -offvalue 0 \
@@ -598,11 +604,11 @@ itcl::class gaia3d::Gaia3dTool {
 
       #  Quick import.
       itk_component add cupidimport {
-         button $w.import \
+         button $itk_component(catframe).import \
             -text "Import" \
             -command [code $this import_cupid_catalogue_]
       }
-      pack $itk_component(cupidimport) -side top -ipadx 1m
+      pack $itk_component(cupidimport) -side top -ipadx 1m -pady 1m
       add_short_help $itk_component(cupidimport) {Import another catalogue}
 
       #  Pixel masks.
@@ -611,7 +617,7 @@ itcl::class gaia3d::Gaia3dTool {
             -filter_types $itk_option(-filter_types) \
             -options_menu $view_menu_
       }
-      pack $itk_component(pixelmask) -side top -fill both -expand 1
+      pack $itk_component(pixelmask) -side top -fill x -expand 0
       add_short_help $itk_component(pixelmask) {Display pixel masks}
    }
 
