@@ -21,6 +21,21 @@ C 18-Jan-1991 - [GvG]
 C-----------------------------------------------------------------------
       REAL YB, YT
       INTEGER I, J, ICOL, LSTCOL
+
+C
+C In some strange cases we can get bounds that are one greater than the
+C size of the array. Presumably a rounding error but catch them here
+C rather than attempting a proper debugging. Added by TIMJ.
+C
+      IF ( J2 .GT. JDIM ) THEN
+         CALL GRWARN( 'GRPXRE: J2 Out of array bounds. Limiting range.')
+         J2 = JDIM
+      END IF
+      IF ( I2 .GT. IDIM ) THEN
+         CALL GRWARN( 'GRPXRE: I1 Out of array bounds. Limiting range.')
+         I2 = IDIM
+      END IF
+
 C
 C Save color attribute
 C
