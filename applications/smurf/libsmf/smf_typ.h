@@ -149,6 +149,8 @@
 *        Add SMF__FLT to smf_modeltype
 *     2009-04-24 (TIMJ):
 *        Add ACSIS observing modes.
+*     2009-05-20 (TIMJ):
+*        Add switching modes.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -247,6 +249,14 @@ typedef enum smf_obsmode {
   SMF__OBS_GRID,
   SMF__OBS_JIGGLE
 } smf_obsmode;
+
+typedef enum smf_swmode {
+  SMF__SWM_NULL,
+  SMF__SWM_CHOP,
+  SMF__SWM_PSSW,
+  SMF__SWM_FREQSW,
+  SMF__SWM_SELF
+} smf_swmode;
 
 typedef enum smf_obstype {
   SMF__TYP_NULL,
@@ -394,6 +404,7 @@ typedef struct smfHead {
   dim_t nframes;            /* Number of frames in smfData */
   smf_obstype obstype;      /* Observation type */
   smf_obsmode obsmode;      /* observing mode */
+  smf_swmode swmode;        /* switching mode */
   int isCloned;             /* If false, allState is owned by this
 			       struct, if true it should not be freed */
   JCMTState *allState;     /* Array of STATE for every time slice */ 

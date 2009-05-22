@@ -16,8 +16,8 @@
 *     pntr = smf_construct_smfHead( smfHead * tofill, inst_t instrument,
 *              AstFrameSet * wcs, AstFrameSet * tswcs,
 *              AstFitsChan * fitshdr, const JCMTState * allState,
-*              dim_t curframe, smf_obsmode obsmode, smf_obstype obstype,
-*              unsigned int ndet,
+*              dim_t curframe, smf_obsmode obsmode, smf_swmode swmode, 
+*              smf_obstype obstype, unsigned int ndet,
 *              const double fplanex[], const double fplaney[],
 *              const double detpos[], const char *detname, int dpazel,
 *              const double tsys[], 
@@ -48,6 +48,8 @@
 *        Number of frames (timeslices) in data.
 *     obsmode = smf_obsmode (Given)
 *        Observing mode.
+*     swmode = smf_swmode (Given)
+*        Switching mode.
 *     obstype = smf_obstype (Given)
 *        Observation type
 *     ndet = unsigned int (Given)
@@ -136,10 +138,12 @@
 *        Add obsmode, obstype.
 *     2008-07-28 (TIMJ):
 *        Add steptime
+*     2009-05-21 (TIMJ):
+*        Add switching mode.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research
 *     Council. Copyright (C) 2006-2007 University of British Columbia.
 *     All Rights Reserved.
@@ -188,7 +192,7 @@ smf_construct_smfHead( smfHead * tofill, inst_t instrument,
 		       AstFitsChan * fitshdr,
 		       JCMTState * allState, dim_t curframe,
            const double instap[], dim_t nframes, double steptime,
-           smf_obsmode obsmode, smf_obstype obstype, unsigned int ndet,
+           smf_obsmode obsmode, smf_swmode swmode, smf_obstype obstype, unsigned int ndet,
 		       double fplanex[], double fplaney[],
 		       double detpos[], char *detname, 
            int dpazel, double tsys[], const char title[],
@@ -227,6 +231,7 @@ smf_construct_smfHead( smfHead * tofill, inst_t instrument,
     hdr->telpos[1] = telpos[1];
     hdr->telpos[2] = telpos[2];
     hdr->obsmode = obsmode;
+    hdr->swmode = swmode;
     hdr->obstype = obstype;
     hdr->steptime= steptime;
 

@@ -70,6 +70,8 @@
 *        Add obsmode, obstype.
 *     2008-07-28 (TIMJ):
 *        Add steptime.
+*     2009-05-21 (TIMJ):
+*        smf_construct_smfHead API tweak
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -203,7 +205,7 @@ smf_deepcopy_smfHead( const smfHead *old, int * status ) {
   /* Insert elements into new smfHead */
   new = smf_construct_smfHead( new, instrument, wcs, tswcs, fitshdr,
                                allState, curframe, instap, nframes,
-                               old->steptime, old->obsmode, old->obstype,ndet,
+                               old->steptime, old->obsmode, old->swmode, old->obstype,ndet,
                                fplanex, fplaney, detpos,detname, old->dpazel,
                                tsys, old->title, old->dlabel, old->units,
                                old->telpos, status );

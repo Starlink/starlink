@@ -69,10 +69,12 @@
 *        initialise steptime
 *     2008-12-03 (DSB):
 *        Add rename cache as cache1, and add cache2 and cache3.
+*     2009-05-21 (TIMJ):
+*        Add switching mode.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 *     Copyright (C) 2006-2007 Particle Physics and Astronomy Research
 *     Council. 
 *     Copyright (C) 2006-2007 University of British Columbia.
@@ -158,6 +160,7 @@ smf_create_smfHead( int * status ) {
   hdr->tsys = NULL;
   hdr->obsmode = SMF__OBS_NULL;
   hdr->obstype = SMF__TYP_NULL;
+  hdr->swmode = SMF__SWM_NULL;
   hdr->steptime = VAL__BADD;
   (hdr->units)[0] = '\0';
   (hdr->dlabel)[0] = '\0';

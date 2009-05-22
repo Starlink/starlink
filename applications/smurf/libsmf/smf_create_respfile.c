@@ -41,6 +41,8 @@
 *  History:
 *     2009-03-27 (TIMJ):
 *        Initial version.
+*     2009-05-21 (TIMJ):
+*        smf_construct_smfHead API tweak
 
 *  Notes:
 *     - Does not propogate provenance or history from refdata.
@@ -113,8 +115,8 @@ void smf_create_respfile( const Grp * rgrp, size_t index,
     (*respmap)->hdr = smf_construct_smfHead( NULL, refdata->hdr->instrument,
                                              NULL, NULL, NULL, NULL, 0, refdata->hdr->instap, 1,
                                              refdata->hdr->steptime, refdata->hdr->obsmode,
-                                             refdata->hdr->obstype, 0, NULL, NULL, NULL, NULL,
-                                             0, NULL, buffer, "Responsivity",
+                                             refdata->hdr->swmode, refdata->hdr->obstype, 0, NULL, NULL,
+                                             NULL, NULL, 0, NULL, buffer, "Responsivity",
                                              "Amps/Watt", refdata->hdr->telpos, status );
     smf_write_clabels( *respmap, status );
 

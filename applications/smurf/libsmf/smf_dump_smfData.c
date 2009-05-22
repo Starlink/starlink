@@ -48,11 +48,13 @@
 *        Support obstype and obsmode. Minor tidying.
 *     2008-07-28 (TIMJ):
 *        Add step time
+*     2009-05-21 (TIMJ):
+*        Add switching mode.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2008 University of British Columbia.
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -277,13 +279,14 @@ void smf_dump_smfData( const smfData *data, int showflags, int *status) {
     } else {
       msgSetc( "MOD", "<NULL>" );
     }
+    msgSetc( "SW", smf_swmode_str( hdr->swmode, status ));
     tempstr = smf_obstype_str( hdr->obstype, status );
     if (tempstr) {
       msgSetc( "TYP", tempstr );
     } else {
       msgSetc( "TYP", "<NULL>" );
     }
-    msgOut(" ", "    obsmode = ^MOD  obstype = ^TYP", status );
+    msgOut(" ", "    obsmode = ^MOD / switch mode = ^SW / obstype = ^TYP", status );
 
     /* Step time */
     msgSetd( "ST", hdr->steptime );

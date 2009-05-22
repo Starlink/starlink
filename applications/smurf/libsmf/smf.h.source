@@ -600,7 +600,7 @@ smfHead *smf_construct_smfHead( smfHead * tofill, inst_t instrument,
                                 AstFitsChan * fitshdr, JCMTState * allState, 
                                 dim_t curframe, const double instap[], 
                                 dim_t nframes, double steptime,
-                                smf_obsmode obsmode, smf_obstype obstype, 
+                                smf_obsmode obsmode, smf_swmode swmode, smf_obstype obstype,
                                 unsigned int ndet, double fplanex[], 
                                 double fplaney[], double detpos[], 
                                 char *detname, int rpazel, double tsys[], 
@@ -1241,6 +1241,8 @@ void smf_subtract_poly( smfData *data, unsigned char *quality, int rel,
 			int *status );
 
 void smf_summarize_obs( const Grp * igrp, int * status );
+
+const char * smf_swmode_str( smf_swmode mode, int * status );
 
 void smf_telpos_get( smfHead * hdr, int * status );
 

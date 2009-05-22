@@ -87,9 +87,11 @@ void smf_calc_mode ( smfHead * hdr, int * status ) {
   
   char sam_mode[SZFITSCARD+1];   /* Value of SAM_MODE header */
   char obs_type[SZFITSCARD+1];   /* value of OBS_TYPE header */
+  char sw_mode[SZFITSCARD+1];    /* value of SW_MODE header */
 
   smf_obstype type = SMF__TYP_NULL;   /* temporary type */
   smf_obsmode mode = SMF__OBS_NULL;   /* temporary mode */
+  smf_swmode  swmode = SMF__SWM_NULL; /* Switching mode */
 
   if (*status != SAI__OK) return;
 
@@ -104,6 +106,7 @@ void smf_calc_mode ( smfHead * hdr, int * status ) {
 
     /* Read the relevant headers */
     smf_fits_getS( hdr, "SAM_MODE", sam_mode, sizeof(sam_mode), status );
+    smf_fits_getS( hdr, "SW_MODE", sw_mode, sizeof(sw_mode), status );
     smf_fits_getS( hdr, "OBS_TYPE", obs_type, sizeof(obs_type), status );
 
     /* start with sample type */
@@ -123,6 +126,27 @@ void smf_calc_mode ( smfHead * hdr, int * status ) {
         *status = SAI__ERROR;
         msgSetc( "MOD", sam_mode );
         errRep( " ", "Unrecognized observing mode '^MOD'", status );
+      }
+    }
+
+    /* switching mode: options are "none", "pssw", "chop", "freqsw", "self" */
+    if (strcasecmp( sw_mode, "NONE" ) == 0 ) {
+      swmode = SMF__SWM_NULL;
+    } else if (strcasecmp( sw_mode, "PSSW" ) == 0) {
+      swmode = SMF__SWM_PSSW;
+    } else if (strcasecmp( sw_mode, "CHOP" ) == 0) {
+      swmode = SMF__SWM_CHOP;
+    } else if (strcasecmp( sw_mode, "JIGGLE" ) == 0) {
+      swmode = SMF__OBS_JIGGLE;
+    } else if (strcasecmp( sw_mode, "SELF" ) == 0) {
+      swmode = SMF__SWM_SELF;
+    } else if (strcasecmp( sw_mode, "FREQSW" ) == 0) {
+      swmode = SMF__SWM_FREQSW;
+    } else {
+      if (*status != SAI__OK) {
+        *status = SAI__ERROR;
+        msgSetc( "MOD", sw_mode );
+        errRep( " ", "Unrecognized switching mode '^MOD'", status );
       }
     }
 
@@ -150,6 +174,7 @@ void smf_calc_mode ( smfHead * hdr, int * status ) {
 
   hdr->obstype = type;
   hdr->obsmode = mode;
+  hdr->swmode = swmode;
 
 }
 
