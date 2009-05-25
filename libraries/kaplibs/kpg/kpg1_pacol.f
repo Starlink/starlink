@@ -28,6 +28,12 @@
 *       A named colour - Uses the named colour from the palette, and if
 *                        it is not present, the nearest colour from the
 *                        palette is selected.
+*       An HTML code   - Has the form "#aabbcc" (or "@aabbcc" - for use
+*                        in contexts where "#" is a comment character,
+*                        e.g. kappa style files) where a, b and c are 
+*                        hexadecimal digits, and "aa", "bb" and "cc" give 
+*                        red, blue and green intensities normalised to a 
+*                        maximum of "ff" (256).
 
 *  Arguments:
 *     PNCOL = CHARACTER * ( * ) (Given)
@@ -47,6 +53,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -72,6 +79,10 @@
 *  History:
 *     18-AUG-1998 (DSB):
 *        Original version, based on KPG1_MACOL by MJC.
+*     25-MAY-2009 (DSB):
+*        Remove the PAR_ restrictions on the acceptable characters that 
+*        can be included in the parameter value. Document HTML colour
+*        code option.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -116,13 +127,6 @@
      :     /'(^LP).', STATUS )
          GOTO 999
       END IF
-
-*  Define the range of acceptable "colours".  This uses the ASCII
-*  collating sequence.  The range includes all numbers and upper and
-*  lowercase letters, but also includes the next adjacent characters at
-*  either end to indicate the MIN and MAX values.
-      CALL PAR_MINC( PNCOL, '/', STATUS )
-      CALL PAR_MAXC( PNCOL, '{', STATUS )
 
 *  Loop until a permitted value has been obtained, or until an error
 *  occurred.

@@ -23,7 +23,12 @@
 *     NAME = CHARACTER * ( * ) (Given)
 *        The name of the nearest colour in the named colour set to the
 *        input RGB colour.  Note at least eighteen characters are
-*        required to avoid truncation.
+*        required to avoid truncation. This string may also be an HTML 
+*        code of the form "#aabbcc" (or "@aabbcc" - for use in contexts 
+*        where "#" is a comment character, e.g. kappa style files) where 
+*        a, b and c are hexadecimal digits, and "aa", "bb" and "cc" give 
+*        red, blue and green intensities normalised to a maximum of "ff" 
+*        (256).
 *     R = REAL (Returned)
 *        The red intensity of the named colour to be identified.  It is
 *        in the range 0.0 to 1.0.
@@ -40,6 +45,7 @@
 *  Copyright:
 *     Copyright (C) 1991, 1992 Science & Engineering Research Council.
 *     Copyright (C) 2001 Central Laboratory of the Research Councils.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -70,6 +76,8 @@
 *        Used MIT colour set with new common-variable names.
 *     19-NOV-2001 (DSB):
 *        Allow specification of colour by RGB triples and HTML code.
+*     25-MAY-2009 (DSB):
+*        Document HTML code option.
 *     {enter_further_changes_here}
 
 *  Bugs:

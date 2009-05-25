@@ -19894,7 +19894,12 @@ from one graphical element to another.
       }{
          The name of the nearest colour in the named colour set to the
          input RGB colour.  Note at least eighteen characters are
-         required to avoid truncation.
+         required to avoid truncation. This string may also be an HTML
+         code of the form {\tt "}\#aabbcc{\tt "} (or {\tt "}@aabbcc{\tt "} - for use in contexts
+         where {\tt "}\#{\tt "} is a comment character, e.g. kappa style files) where
+         a, b and c are hexadecimal digits, and {\tt "}aa{\tt "}, {\tt "}bb{\tt "} and {\tt "}cc{\tt "} give
+         red, blue and green intensities normalised to a maximum of {\tt "}ff{\tt "}
+         (256).
       }
       \sstsubsection{
          R = REAL (Returned)
@@ -20146,6 +20151,12 @@ from one graphical element to another.
         A named colour - Uses the named colour from the palette, and if
                          it is not present, the nearest colour from the
                          palette is selected.
+        An HTML code   - Has the form {\tt "}\#aabbcc{\tt "} (or {\tt "}@aabbcc{\tt "} - for use
+                         in contexts where {\tt "}\#{\tt "} is a comment character,
+                         e.g. kappa style files) where a, b and c are
+                         hexadecimal digits, and {\tt "}aa{\tt "}, {\tt "}bb{\tt "} and {\tt "}cc{\tt "} give
+                         red, blue and green intensities normalised to a
+                         maximum of {\tt "}ff{\tt "} (256).
    }
    \sstinvocation{
       CALL KPG1\_PACOL( PNCOL, LP, UP, COLIND, STATUS )

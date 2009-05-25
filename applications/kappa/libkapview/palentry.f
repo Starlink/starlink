@@ -47,8 +47,7 @@
 *          commas or spaces.  Each value must lie in the range 0.0--1.0.
 *          For example, "0.7,0.7,1.0" would give a pale blue.
 *
-*          o  An HTML colour code such as #ff002d.  The leading #
-*          character can be replaced if required by a "@" character.
+*          o  An HTML colour code such as #ff002d.  
 *
 *     DEVICE = DEVICE (Read)
 *        Name of the image display to be used. 
