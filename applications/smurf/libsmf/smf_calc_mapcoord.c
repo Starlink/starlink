@@ -174,19 +174,6 @@ void smfCalcMapcoordPar( void *job_data_ptr, int *status ) {
     return;
   }
 
-  /* if t1 past end of the work, nothing to do so we return */
-  if( pdata->t1 >= ntslice ) {
-    msgOutif( MSG__DEBUG, "", 
-               "smfCalcMapcoordPar: nothing for thread to do, returning",
-               status);
-    return;
-  }
-
-  /* Debugging message indicating thread started work */
-  msgOutiff( MSG__DEBUG, "", 
-             "smfCalcMapcoordPar: thread starting on tslices %zu -- %zu",
-             status, pdata->t1, pdata->t2 );
-
   /* Extract values from pdata */
   abskyfrm = pdata->abskyfrm;
   data = pdata->data;
@@ -201,6 +188,19 @@ void smfCalcMapcoordPar( void *job_data_ptr, int *status ) {
   lbnd_in[1] = 1;
   ubnd_in[0] = (data->dims)[ 0 ];
   ubnd_in[1] = (data->dims)[ 1 ];
+
+  /* if t1 past end of the work, nothing to do so we return */
+  if( pdata->t1 >= ntslice ) {
+    msgOutif( MSG__DEBUG, "", 
+               "smfCalcMapcoordPar: nothing for thread to do, returning",
+               status);
+    return;
+  }
+
+  /* Debugging message indicating thread started work */
+  msgOutiff( MSG__DEBUG, "", 
+             "smfCalcMapcoordPar: thread starting on tslices %zu -- %zu",
+             status, pdata->t1, pdata->t2 );
 
   /* Lock the supplied AST object pointers for exclusive use by this
      thread.  The invoking thread should have unlocked them before
