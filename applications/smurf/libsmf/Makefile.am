@@ -130,6 +130,7 @@ smf_fits_getI.c \
 smf_fits_getL.c \
 smf_fits_getS.c \
 smf_fits_outhdr.c \
+smf_fix_metadata.c \
 smf_flag_spikes.c \
 smf_flag_stationary.c \
 smf_flat_responsivity.c \

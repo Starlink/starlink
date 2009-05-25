@@ -397,6 +397,7 @@
 #include "smurf_par.h"
 #include "star/grp.h"
 #include "smf_typ.h"
+#include "msg_par.h"
 #include "star/kaplibs.h"
 
 /* Handle GCC __attribute__ */
@@ -795,6 +796,8 @@ void smf_fits_getS( const smfHead * hdr, const char * cardname,
 
 void smf_fits_outhdr( AstFitsChan * inhdr, AstFitsChan ** outhdr,
                       AstKeyMap ** obsidmap, int * status );
+
+int smf_fix_metadata( msglev_t msglev, smfData * data, int * status );
 
 void smf_flag_spikes( smfData *data, double *bolovar, unsigned char *quality, 
                       unsigned char mask, double thresh, size_t niter, 
