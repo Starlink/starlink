@@ -98,6 +98,7 @@ void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
   size_t i;
   size_t nobs;        /* number of distinct observations */
   size_t nobj;        /* number of distinct objects */
+  size_t nsim = 0;    /* number of simulated observations */
   AstKeyMap * obsinfo = NULL; /* observation information */
 
   if (*status != SAI__OK) return;
@@ -156,16 +157,33 @@ void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
           msgSetc( "SW", " " );
         }
 
+        /* Simulation information */
+        astMapGet0I( obsinfo, "SIMULATE", &itemp );
+        if (itemp) {
+          msgSetc( "SIM", "(simulated)" );
+          nsim++;
+        } else {
+          msgSetc( "SIM", "" );
+        }
+
         astMapGet0I( obsinfo, "OBSMODE", &itemp );
         msgSetc( "OM", smf_obsmode_str( itemp, status) );
         astMapGet0I( obsinfo, "OBSNUM", &itemp );
         msgSeti( "ON", itemp);
         astMapGet0I( obsinfo, "UTDATE", &itemp );
         msgSeti( "UT", itemp);
-        msgOutif(msglev, "", "  ^UT #^ON ^OM^SW ^OBJ ^OT", status);
+        msgOutif(msglev, "", "  ^UT #^ON ^OM^SW ^OBJ ^OT ^SIM", status);
       }
     }
     msgBlank( status );
+
+    /* Warn if we seem to have a mix of simulated and non-simulated data */
+    if (nsim != 0 && nsim != nobs) {
+      msgOutif( MSG__QUIET, "", "WARNING: Mixing simulated and observational data",
+                status );
+      msgBlank( status );
+    }
+
   }
 
   return;

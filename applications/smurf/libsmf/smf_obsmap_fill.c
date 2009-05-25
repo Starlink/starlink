@@ -47,6 +47,8 @@
 *        Initial version. Some code relocated from smf_find_darks.
 *     2009-05-21 (TIMJ):
 *        Store SWMODE
+*     2009-05-25 (TIMJ):
+*        Store SIMULATE information
 
 *  Copyright:
 *     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
@@ -129,6 +131,8 @@ void smf_obsmap_fill( const smfData * data, AstKeyMap * obsmap, AstKeyMap * objm
       astMapPut0I( obsinfo, "OBSNUM", itemp, NULL );
       smf_fits_getI( data->hdr, "UTDATE", &itemp, status );
       astMapPut0I( obsinfo, "UTDATE", itemp, NULL );
+      smf_fits_getL( data->hdr, "SIMULATE", &itemp, status );
+      astMapPut0I( obsinfo, "SIMULATE", itemp, NULL );
 
       /* store information in the global observation map
          and also track how many distinct objects we have */
