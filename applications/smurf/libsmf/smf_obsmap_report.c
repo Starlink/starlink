@@ -13,9 +13,13 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_obsmap_report( AstKeyMap * obsmap, AstKeyMap * objmap, int * status );
+*     smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
+*                        int * status );
 
 *  Arguments:
+*     msglev = msglev_t (Given)
+*        Messaging level to be used for output information. This allows a
+*        caller to control when the summary information will appear.
 *     obsmap = AstKeyMap * (Given)
 *        Key map containing observation information. Populated by
 *        smf_obsmap_fill().
@@ -39,6 +43,8 @@
 *        Initial version. Some code relocated from smf_find_darks.
 *     2009-05-21 (TIMJ):
 *        Support switching mode
+*     2009-05-25 (TIMJ):
+*        Add message level argument.
 
 *  Copyright:
 *     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
@@ -86,7 +92,7 @@
 #include "smf_typ.h"
 #include "smf_err.h"
 
-void smf_obsmap_report( AstKeyMap * obsmap, AstKeyMap * objmap,
+void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
                       int * status ) {
 
   size_t i;
@@ -113,7 +119,7 @@ void smf_obsmap_report( AstKeyMap * obsmap, AstKeyMap * objmap,
     } else {
       msgSetc( "OBJ", " ");
     }
-    msgOutif(MSG__NORM, " ", "Processing data ^OBJ from the following observation^S :", status);
+    msgOutif(msglev, " ", "Processing data ^OBJ from the following observation^S :", status);
     for (i = 0; i < nobs; i++) {
       AstObject * ao = NULL;
       if (astMapGet0A( obsmap, astMapKey(obsmap, i ), &ao )) {
@@ -156,7 +162,7 @@ void smf_obsmap_report( AstKeyMap * obsmap, AstKeyMap * objmap,
         msgSeti( "ON", itemp);
         astMapGet0I( obsinfo, "UTDATE", &itemp );
         msgSeti( "UT", itemp);
-        msgOutif(MSG__NORM, "", "  ^UT #^ON ^OM^SW ^OBJ ^OT", status);
+        msgOutif(msglev, "", "  ^UT #^ON ^OM^SW ^OBJ ^OT", status);
       }
     }
     msgBlank( status );

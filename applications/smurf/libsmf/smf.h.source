@@ -990,7 +990,7 @@ void smf_ndf_sbnd( int ndim, int *lbnd, int *ubnd, smfData *data, int *status );
 void smf_obsmap_fill( const smfData * data, AstKeyMap * obsmap, 
                       AstKeyMap * objmap, int * status );
 
-void smf_obsmap_report( AstKeyMap * obsmap, AstKeyMap * objmap,
+void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
                         int * status );
 
 const char * smf_obsmode_str( smf_obsmode type, int * status );

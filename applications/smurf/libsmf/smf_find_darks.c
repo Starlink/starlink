@@ -71,6 +71,8 @@
 *        Do not react badly if a fits header is missing.
 *     2009-04-24 (TIMJ):
 *        Factor out observation summary reporting.
+*     2009-05-25 (TIMJ):
+*        Use new smf_obsmap_report API.
 
 *  Copyright:
 *     Copyright (C) 2008-2009 Science and Technology Facilities Council.
@@ -294,7 +296,7 @@ void smf_find_darks( const Grp * ingrp, Grp **outgrp, Grp **darkgrp,
   }
 
   /* Now report the details of the observation */
-  smf_obsmap_report( obsmap, objmap, status );
+  smf_obsmap_report( MSG__NORM, obsmap, objmap, status );
 
   obsmap = astAnnul( obsmap );
   objmap = astAnnul( objmap );

@@ -36,6 +36,8 @@
 *  History:
 *     2009-04-24 (TIMJ):
 *        Initial version. Some code relocated from smf_find_darks.
+*     2009-05-25 (TIMJ):
+*        Use new smf_obsmap_report API.
 
 *  Copyright:
 *     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
@@ -98,7 +100,7 @@ void smf_summarize_obs( const Grp * igrp, int * status ) {
     smf_obsmap_fill( data, obsmap, objmap, status );
     smf_close_file( &data, status );
   }
-  smf_obsmap_report( obsmap, objmap, status );
+  smf_obsmap_report( MSG__NORM, obsmap, objmap, status );
   obsmap = astAnnul( obsmap );
   objmap = astAnnul( objmap );
 

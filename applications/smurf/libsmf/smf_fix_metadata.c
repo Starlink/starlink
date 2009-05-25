@@ -56,6 +56,8 @@
 *  History:
 *     2009-05-19 (TIMJ):
 *        Initial version. Just processes ACS_EXPOSURE and ACS_OFFEXPOSURE
+*     2009-05-25 (TIMJ):
+*        Use new smf_obsmap_report API.
 
 *  Copyright:
 *     Copyright (C) 2009 Science & Technology Facilities Council.
@@ -145,7 +147,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
   obsmap = astKeyMap( " " );
   objmap = astKeyMap( " " );
   smf_obsmap_fill( data, obsmap, objmap, status );
-  smf_obsmap_report( obsmap, objmap, status );
+  smf_obsmap_report( msglev, obsmap, objmap, status );
   obsmap = astAnnul( obsmap );
   objmap = astAnnul( objmap );
 
