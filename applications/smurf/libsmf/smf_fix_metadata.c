@@ -167,36 +167,37 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
   smf_getfitsi( hdr, "NREFSTEP", &(fitsvals.nrefstep), status );
   smf_getfitsi( hdr, "JIGL_CNT", &(fitsvals.jigl_cnt), status );
 
-  /* Off exposure time - depends on observing mode
-     JIGGLE CHOP: 
+  /* FITS header fix ups */
 
-     GRID:
-           20070122  #89  NO
-                     #90 YES (but SIMULATION)
-           20070123 first release of ACS_OFFEXPOSURE and ACS_EXPOSURE
+  /* LOFREQS and LOFREQE can come from FE_LOFREQ from 20061013. Prior to that date
+     the information can only be guessed. */
 
-           20070125:  OFFEXPOSURE PRESENT BUT BAD #1-#16
-                      EXPOSURE PRESENT BUT ~ 0  eg #1-#16
+  /* TCS_TAI is missing before 20061013 */
 
-     RASTER: On exposure will be STEPTIME
-             Off exposure depends on time between the offs due to interpolation.
-             This requires that we can guesstimate the time of the OFFs so need all the spectra
-             from a row. We may not get all the spectra from a row if they fall into a different file.
-             Even worse if the steps are out of order.
 
+  /* Off exposure time - depends on observing mode.
+
+     o ACS_EXPOSURE and ACS_NO_ONS pops up occassionally
+     before 20070123 but should not be trusted.
+
+        - jiggle/chop stores STEPTIME rather than actual
+          exposure time.
+        - ACS_NO_ONS is filled in for SCAN but reflects
+          the number of steps in each scan.
+
+     o Everything seems to be complete by 20070123.
+
+     o Off exposure will be an estimate in some cases.
    */
-
-  /* Get some JOS parameters and some local variables */
-
 
   /* Assumes that STEPTIME is correct... */
   state = &((hdr->allState)[0]);
 
-  if ( (state->acs_exposure == VAL__BADR) || (state->acs_exposure < hdr->steptime) ) {
+  if ( (state->acs_exposure == VAL__BADR) || (state->acs_exposure < (0.98 * hdr->steptime)) ) {
     missing_exp = 1;
     msgOutif( msglev, "", "Missing ACS_EXPOSURE", status );
   }
-  if ( (state->acs_offexposure == VAL__BADR) || (state->acs_offexposure < hdr->steptime) ) {
+  if ( (state->acs_offexposure == VAL__BADR) || (state->acs_offexposure < (0.98 *hdr->steptime)) ) {
     missing_off = 1;
     msgOutif( msglev, "", "Missing ACS_OFFEXPOSURE", status );
   }
@@ -210,6 +211,15 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
       *status = SAI__ERROR;
       errRepf( "", "ACS_*EXPOSURE missing or BAD but data are newer than expected (%d > %d)",
                status, fitsvals.utdate, utmax);
+    }
+
+    /* if we are missing OFF exposure but on exposure seems to be present
+       we do not trust it (See above). Some of the above logic becomes
+       superfluous once we assume this since we are declaring that presence
+       of OFFEXPOSURE controls everything. */
+    if (missing_off && !missing_exp ) {
+      msgOutiff( msglev, "", "ACS_EXPOSURE is present but untrustworthy", status );
+      missing_exp = 1;
     }
 
     /* On exposure is assumed to be identical for all spectra */
