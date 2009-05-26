@@ -25,7 +25,6 @@
  *        File access mode
  *     flags = int (Given)
  *        Bitmask controls which components are opened. If 0 open everything.
- *        Mainly required to work around sc2store problems.
  *     data = smfData ** (Returned)
  *        Pointer to pointer smfData struct to be filled with file info and data
  *        Should be freed using smf_close_file. Will be NULL if this routine completes
@@ -46,6 +45,7 @@
  *     - The following bit flags defined in smf_typ.h are used for "flags" par:
  *       SMF__NOCREATE_HEAD: Do not allocate smfHead
  *       SMF__NOCREATE_DATA: Do not map DATA/VARIANCE/QUALITY
+ *       SMF__NOFIX_METADATA: Do not fix metadata using smf_fix_metadata
 
  *  Authors:
  *     Andy Gibb (UBC)
@@ -184,6 +184,8 @@
  *     2009-04-06 (TIMJ):
  *        Improve the step time guess to take into account RTS_NUM.
  *        The only guaranteed way to "guess" is to read the embedded XML configuration.
+ *     2009-05-26 (TIMJ):
+ *        Move TCS_TAI fix up to smf_fix_metadata
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -929,28 +931,8 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
     hdr->steptime = steptime;
   }
 
-  /* Fix up JCMTState if there are any compatibility problems */
-  if (*status == SAI__OK && hdr && hdr->allState) {
-    /* TCS_TAI can be missing with old data files */
-    tmpState = hdr->allState;
-    if (tmpState[0].tcs_tai == VAL__BADD) {
-      /* need the step time - if we do not have it set
-       tcs_tai to rts_end */
-      steptime = hdr->steptime;
-      if (steptime == VAL__BADD) {
-        msgOutif(MSG__DEBUG," ","Could not determine step time when correcting TCS_TAI from RTS_END", status );
-        steptime = 0.0;
-      }
-
-      /* correct TCS_TAI by half step time corrected to days */
-      steptime = 0.5 * steptime / SPD; 
-      if (*status == SAI__OK) {
-        for (i=0; i < hdr->nframes; i++) {
-          tmpState[i].tcs_tai = tmpState[i].rts_end - steptime;
-        }
-      }
-    }
-  }
+  /* Metadata corrections - hide the messages by default */
+  if ( !(flags & SMF__NOFIX_METADATA) ) smf_fix_metadata( MSG__VERB, *data, status );
 
   /* free resources on error */
   if (*status != SAI__OK) {

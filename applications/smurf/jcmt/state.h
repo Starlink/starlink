@@ -67,6 +67,7 @@
 *        - Change type of SC2_HEAT to _INTEGER and WVM_TIME to _DOUBLE.
 *     26-MAY-2009 (TIMJ):
 *        Allow ACS_OFFEXPOSURE to be missing since it is now populated later.
+*        TCS_TAI now optional for ACSIS but mandatory for SCUBA-2.
 
 *  Copyright:
 *     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
@@ -284,7 +285,9 @@ static const HDSdataRecord hdsRecords[JCMT_COMP_NUM] =
     { SMU_TR_JIG_Y, "_DOUBLE", "SMU_TR_JIG_Y", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
     { SMU_TR_CHOP_X, "_DOUBLE", "SMU_TR_CHOP_X", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
     { SMU_TR_CHOP_Y, "_DOUBLE", "SMU_TR_CHOP_Y", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
-    { TCS_TAI, "_DOUBLE", "TCS_TAI", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__SCUBA2 },
+    /* TCS_TAI is only optional for ACSIS because it was missing in data earlier than 20061013.
+       SCUBA-2 should always have this component */
+    { TCS_TAI, "_DOUBLE", "TCS_TAI", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__ACSIS },
     { TCS_AIRMASS, "_DOUBLE", "TCS_AIRMASS", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
     { TCS_AZ_ANG, "_DOUBLE", "TCS_AZ_ANG", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
     { TCS_AZ_AC1, "_DOUBLE", "TCS_AZ_AC1", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },

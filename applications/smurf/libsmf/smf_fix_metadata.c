@@ -126,7 +126,8 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
   int missing_off = 0;       /* Are we missing ACS_OFFEXPOSURE? */
   AstKeyMap * obsmap = NULL; /* Info from all observations */
   AstKeyMap * objmap = NULL; /* All the object names used */
-  JCMTState * state = NULL;  /* JCMT State for a particular RTS step */
+  double steptime = 0.0;     /* Step time */
+  JCMTState * tmpState = NULL; /* Pointer to allState */
 
   if (*status != SAI__OK) return have_fixed;
 
@@ -138,12 +139,12 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
   smf_validate_smfHead( hdr, 1, 1, status );
   if (*status != SAI__OK) return have_fixed;
 
-  /* Only do something for ACSIS data */
+  /* Only do something for ACSIS data - SCUBA-2 data is currently "perfect" */
   if (hdr->instrument != INST__ACSIS) return have_fixed;
 
   /* Print out summary of this observation - this may get repetitive if multiple files come
      from the same observation in one invocation but it seems better to describe each fix up
-     separately. */
+     separately and in context. */
   obsmap = astKeyMap( " " );
   objmap = astKeyMap( " " );
   smf_obsmap_fill( data, obsmap, objmap, status );
@@ -152,6 +153,8 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
   objmap = astAnnul( objmap );
 
   fits = hdr->fitshdr;
+  tmpState = hdr->allState;
+  steptime = hdr->steptime;
 
   /* Get the MJD of the observation. Does not need to be accurate so do not care whether
      it is from DATE-OBS or JCMTSTATE */
@@ -172,8 +175,32 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
   /* LOFREQS and LOFREQE can come from FE_LOFREQ from 20061013. Prior to that date
      the information can only be guessed. */
 
+  /* JCMTSTATE fix ups */
+
   /* TCS_TAI is missing before 20061013 */
 
+  if (*status == SAI__OK) {
+    /* TCS_TAI can be missing with old data files */
+    if (tmpState[0].tcs_tai == VAL__BADD) {
+      /* need the step time - if we do not have it set
+       tcs_tai to rts_end */
+      double step = steptime;
+      if (step == VAL__BADD) {
+        msgOutif(MSG__DEBUG," ","Could not determine step time when correcting TCS_TAI from RTS_END", status );
+        step = 0.0;
+      }
+
+      /* correct TCS_TAI by half step time corrected to days */
+      msgOutif( msglev, "", "Missing TCS_TAI. Estimating using RTS_END and STEPTIME.", status );
+      step = 0.5 * step / SPD; 
+      if (*status == SAI__OK) {
+        for (i=0; i < hdr->nframes; i++) {
+          tmpState[i].tcs_tai = tmpState[i].rts_end - step;
+        }
+      }
+      have_fixed = 1;
+    }
+  }
 
   /* Off exposure time - depends on observing mode.
 
@@ -191,13 +218,11 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
    */
 
   /* Assumes that STEPTIME is correct... */
-  state = &((hdr->allState)[0]);
-
-  if ( (state->acs_exposure == VAL__BADR) || (state->acs_exposure < (0.98 * hdr->steptime)) ) {
+  if ( (tmpState[0].acs_exposure == VAL__BADR) || (tmpState[0].acs_exposure < (0.98 * hdr->steptime)) ) {
     missing_exp = 1;
     msgOutif( msglev, "", "Missing ACS_EXPOSURE", status );
   }
-  if ( (state->acs_offexposure == VAL__BADR) || (state->acs_offexposure < (0.98 *hdr->steptime)) ) {
+  if ( (tmpState[0].acs_offexposure == VAL__BADR) || (tmpState[0].acs_offexposure < (0.98 *hdr->steptime)) ) {
     missing_off = 1;
     msgOutif( msglev, "", "Missing ACS_OFFEXPOSURE", status );
   }
@@ -311,9 +336,8 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
 
     /* fix up the state structure - assume all values identical */
     for (i = 0; i < hdr->nframes; i++) {
-      state = &((hdr->allState)[i]);
-      if (missing_exp) state->acs_exposure = exp_time;
-      if (missing_off) state->acs_offexposure = off_time;
+      if (missing_exp) tmpState[i].acs_exposure = exp_time;
+      if (missing_off) tmpState[i].acs_offexposure = off_time;
     }
     have_fixed = 1;
 
