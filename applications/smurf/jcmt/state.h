@@ -65,9 +65,11 @@
 *        - Remove WVM_TW/TH/QUAL
 *        - Do not write JOS_DRCONTROL or SMU_XYZ to SCUBA-2 files
 *        - Change type of SC2_HEAT to _INTEGER and WVM_TIME to _DOUBLE.
+*     26-MAY-2009 (TIMJ):
+*        Allow ACS_OFFEXPOSURE to be missing since it is now populated later.
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
 *     Copyright (C) 2004, 2006, 2007 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -318,7 +320,7 @@ static const HDSdataRecord hdsRecords[JCMT_COMP_NUM] =
     { ACS_NO_NEXT_REF, "_INTEGER", "ACS_NO_NEXT_REF", INST__ACSIS, INST__NONE },
     { ACS_NO_ONS, "_INTEGER", "ACS_NO_ONS", INST__ACSIS, INST__NONE },
     { ACS_EXPOSURE, "_REAL", "ACS_EXPOSURE", INST__ACSIS, INST__NONE },
-    { ACS_OFFEXPOSURE, "_REAL", "ACS_OFFEXPOSURE", INST__ACSIS, INST__NONE },
+    { ACS_OFFEXPOSURE, "_REAL", "ACS_OFFEXPOSURE", INST__ACSIS, INST__ACSIS },
     { POL_ANG, "_DOUBLE", "POL_ANG", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
     { FTS_POS, "_REAL", "FTS_POS", INST__SCUBA2, INST__NONE },
     { FE_LOFREQ, "_DOUBLE", "FE_LOFREQ", INST__ACSIS, INST__ACSIS },
