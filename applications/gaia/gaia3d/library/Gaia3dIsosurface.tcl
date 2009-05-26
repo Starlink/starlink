@@ -80,7 +80,7 @@ itcl::class gaia3d::Gaia3dIsosurface {
       wm title $w_ "GAIA3D: Iso-surfaces ($itk_option(-number))"
 
       #  Make it a decent size (packing doesn't work).
-      wm geometry  $w_ 800x700+0+0
+      wm geometry  $w_ 800x800+0+0
 
       #  Add window help.
       add_help_button isosurface "On Window..."
@@ -203,7 +203,11 @@ itcl::class gaia3d::Gaia3dIsosurface {
       #  Use a scrolled frame to get all these in a small amount of
       #  real estate.
       itk_component add atframe {
-         ::iwidgets::scrolledframe $w.atframe -width 75 -height 200
+         ::iwidgets::scrolledframe $w.atframe \
+            -width 75 \
+            -height 200 \
+            -hscrollmode dynamic \
+            -vscrollmode dynamic
       }
       pack $itk_component(atframe) -fill both -expand 1
       set parent [$itk_component(atframe) childsite]

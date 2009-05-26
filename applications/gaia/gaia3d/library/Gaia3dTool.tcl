@@ -96,7 +96,7 @@ itcl::class gaia3d::Gaia3dTool {
       }
 
       #  Make it a decent size (packing doesn't work).
-      wm geometry  $w_ 800x720+0+0
+      wm geometry  $w_ 800x800
 
       #  Add short help window.
       make_short_help

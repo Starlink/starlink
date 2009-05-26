@@ -175,28 +175,20 @@ itcl::class ::gaia3d::Gaia3dVtkSegmenter {
       $lut Build
       
       if { $nlut_ == 3 } {
-         #  Grey, wrapped every 10 steps.
-         set j 0.0
-         for {set i 0} {$i < 10} {incr i} {
-            set r($i) $j
-            set g($i) $j
-            set b($i) $j
-            set j [expr $j+0.1]
+         #  Random grey.
+         set math [vtkMath New]
+         $math RandomSeed 5071
+         for { set i $dmin_ } { $i <= $dmax_ } { incr i } {
+            set value [$math Random .2 1]
+            $lut  SetTableValue $i $value $value $value $opacity_
          }
-         set j 0
-         for {set i $dmin_} {$i <= $dmax_ } {incr i} {
-            if { $j > 9 } {
-               set j 0
-            }
-            eval $lut SetTableValue $i $r($j) $g($j) $b($j) $opacity_
-            incr j
-         }
+
       } elseif { $nlut_ == 2 } {
          #  Rainbow, the default lut, just make sure we get all colours.
          $lut SetHueRange 0.0 1.0
          $lut SetAlphaRange $opacity_ $opacity_
       } else {
-         #  Random.
+         #  Random colour.
          set math [vtkMath New]
          $math RandomSeed 5071
          for { set i $dmin_ } { $i <= $dmax_ } { incr i } {

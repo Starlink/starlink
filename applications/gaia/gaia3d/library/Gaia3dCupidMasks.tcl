@@ -454,7 +454,7 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
                -labelwidth $lwidth_ \
                -relief raised
          }
-         foreach {index desc} "1 Random 2 Rainbow 3 Grey" {
+         foreach {index desc} "1 {Random colour} 2 {Rainbow colour} 3 {Random grey}" {
             $itk_component(lut$i) add \
                -label $desc \
                -value $index \
