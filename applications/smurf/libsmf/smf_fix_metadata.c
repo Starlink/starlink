@@ -98,6 +98,7 @@
    without having to use many variables */
 
 struct FitsHeaderStruct {
+  int obsnum;
   int utdate;
   int jigl_cnt;
   int num_cyc;
@@ -163,6 +164,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
   /* Read some header values that are likely to be useful. Use a struct for the results
      to stop bloat of variable names. KeyMap or FitsChan are too cumbersone for multiple
      accesses.*/
+  smf_getfitsi( hdr, "OBSNUM", &(fitsvals.obsnum), status );
   smf_getfitsi( hdr, "UTDATE", &(fitsvals.utdate), status );
   smf_getfitsi( hdr, "NUM_CYC", &(fitsvals.num_cyc), status );
   smf_getfitsi( hdr, "JOS_MULT", &(fitsvals.jos_mult), status );
@@ -268,8 +270,8 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
           */
           off_time = 1.5 * fitsvals.nrefstep * hdr->steptime;
           if (missing_off) {
-            msgOutiff( MSG__QUIET, "", "WARNING: OFF exposure time has been estimated as %g sec",
-                      status, off_time );
+            msgOutiff( MSG__QUIET, "", "WARNING: %d #%d: OFF exposure time has been estimated as %g sec",
+                       status, fitsvals.utdate, fitsvals.obsnum, off_time );
           }
         } else {
           *status = SAI__ERROR;
