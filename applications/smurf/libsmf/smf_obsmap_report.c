@@ -175,13 +175,13 @@ void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
         msgOutif(msglev, "", "  ^UT #^ON ^OM^SW ^OBJ ^OT ^SIM", status);
       }
     }
-    msgBlank( status );
+    msgBlankif( msglev, status );
 
     /* Warn if we seem to have a mix of simulated and non-simulated data */
     if (nsim != 0 && nsim != nobs) {
       msgOutif( MSG__QUIET, "", "WARNING: Mixing simulated and observational data",
                 status );
-      msgBlank( status );
+      msgBlankif( msglev, status );
     }
 
   }
