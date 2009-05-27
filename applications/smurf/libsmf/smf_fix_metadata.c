@@ -174,8 +174,19 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
 
   /* FITS header fix ups */
 
-  /* LOFREQS and LOFREQE can come from FE_LOFREQ from 20061013. Prior to that date
-     the information can only be guessed. */
+  /* LOFREQS and LOFREQE can come from FE_LOFREQ. HARP had incorrect header tables
+     for quite a long period of time. */
+  if (!astTestFits( fits, "LOFREQS", NULL ) ) {
+    /* undef or missing makes no difference */
+    smf_fits_updateD( hdr, "LOFREQS", tmpState[0].fe_lofreq, "[GHz] LO Frequency at start of obs.", status );
+    have_fixed = 1;
+  }
+  if (!astTestFits( fits, "LOFREQE", NULL ) ) {
+    /* undef or missing makes no difference */
+    smf_fits_updateD( hdr, "LOFREQE", tmpState[hdr->nframes - 1].fe_lofreq,
+                      "[GHz] LO Frequency at end of obs.", status );
+    have_fixed = 1;
+  }
 
   /* JCMTSTATE fix ups */
 
