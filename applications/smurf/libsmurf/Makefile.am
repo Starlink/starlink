@@ -21,6 +21,7 @@ smurf_makecube.c \
 smurf_makemap.c \
 smurf_qlmakemap.c \
 smurf_rawunpress.c \
+smurf_rawfixmeta.c \
 smurf_remsky.c \
 smurf_sc2clean.c \
 smurf_sc2concat.c \

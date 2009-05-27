@@ -117,6 +117,8 @@
 *        Add CALCDARK
 *     2009-03-27 (TIMJ):
 *        Add CALCRESP
+*     2009-05-19 (TIMJ):
+*        Add RAWFIXMETA
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -276,6 +278,8 @@ void smurf_mon( int * status ) {
     smurf_calcflat( status );
   } else if (strcmp( taskname, "CALCRESP" ) == 0 ) {
     smurf_calcresp( status );
+  } else if (strcmp( taskname, "RAWFIXMETA" ) == 0 ) {
+    smurf_rawfixmeta( status );
   } else if (strcmp( taskname, "SC2THREADTEST" ) == 0 ) {
     smurf_sc2threadtest( status );
   } else {

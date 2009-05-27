@@ -65,6 +65,8 @@
 *        Add calcflat / calcdark
 *     2009-09-27 (TIMJ):
 *        Add calcresp
+*     2009-05-19 (TIMJ):
+*        Add RAWFIXMETA
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -115,6 +117,7 @@ void smurf_timesort( int * );
 void smurf_gsd2acsis( int * );
 void smurf_unmakecube( int * );
 void smurf_rawunpress( int * );
+void smurf_rawfixmeta( int * );
 void smurf_sc2clean( int * );
 void smurf_gsdshow( int * );
 void smurf_sc2concat( int * );
