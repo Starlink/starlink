@@ -84,6 +84,11 @@
 *        This from DSB's updated KPG1_GTAXI modified to ensure that the 
 *        Symbols appear in order at the start of the list of options, so 
 *        that supplied integer values correspond to axis indices. 
+*     2009 May 27 (MJC):
+*        Annul attribute access errors in cases where the Frame contains 
+*        isolated sky axes (i.e. sky axes that are not contained within 
+*        a SkyFrame).  [This is effectively the same modification as 
+*        masde by DSB to KPG1_GTAXI.]
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -98,6 +103,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'AST_PAR'          ! AST constants and functions
+      INCLUDE 'AST_ERR'          ! AST error constants 
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
 
 *  Arguments Given:
@@ -177,19 +183,29 @@
 
 *  If this is a celestial axis, find the indices of the longitude and
 *  latitude axes and allow the user to specify them using the options
-*  "SKYLON" and "SKYLAT".
+*  "SKYLON" and "SKYLAT".  Annul any "unknown attribute name" error, 
+*  since the SKY axis may not form part of a SkyFrame (for instance, it
+*  may be a single sky axis picked from a SkyFrame), in which case 
+*  SkyFrame attributes will not be available.
          ELSE IF ( DOM .EQ. 'SKY' .AND. DOSKY ) THEN
-            NOPT = NOPT + 1
-            CAXIS( NOPT ) = 'SKYLAT'
-            AXPOS( NOPT ) = AST_GETI( FRAME, 'LatAxis(' // 
-     :                                PAXIS( : NCP ) // ')', STATUS )
+            IF ( STATUS .EQ. SAI__OK ) THEN
+               NOPT = NOPT + 1
+               CAXIS( NOPT ) = 'SKYLAT'
+               AXPOS( NOPT ) = AST_GETI( FRAME, 'LatAxis(' // 
+     :                                   PAXIS( : NCP ) // ')', STATUS )
 
-            NOPT = NOPT + 1
-            CAXIS( NOPT ) = 'SKYLON'
-            AXPOS( NOPT ) = AST_GETI( FRAME, 'LonAxis(' // 
-     :                                PAXIS( : NCP ) // ')', STATUS )
+               NOPT = NOPT + 1
+               CAXIS( NOPT ) = 'SKYLON'
+               AXPOS( NOPT ) = AST_GETI( FRAME, 'LonAxis(' // 
+     :                                   PAXIS( : NCP ) // ')', STATUS )
 
-            DOSKY = .FALSE.
+               IF ( STATUS .EQ. AST__BADAT ) THEN
+                  CALL ERR_ANNUL( STATUS )
+                  NOPT = NOPT - 2
+               END IF
+
+               DOSKY = .FALSE.
+            END IF
          END IF
 
       END DO
