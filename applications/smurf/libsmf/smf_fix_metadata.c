@@ -91,6 +91,7 @@
 #include "mers.h"
 
 #include "smf.h"
+#include "smf_err.h"
 
 #include <stdio.h>
 
@@ -114,6 +115,7 @@ struct FitsHeaderStruct {
   int focstep;
 };
 
+#define FUNC_NAME "smf_fix_metadata"
 
 int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
 
@@ -140,6 +142,50 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
   smf_validate_smfHead( hdr, 1, 1, status );
   if (*status != SAI__OK) return have_fixed;
 
+  fits = hdr->fitshdr;
+  tmpState = hdr->allState;
+
+  /* Get the step time from the header if we have a hdr */
+  if ( hdr->instrument!=INST__NONE  ) {
+    steptime = VAL__BADD;
+    smf_getfitsd( hdr, "STEPTIME", &steptime, status );
+    if (*status == SMF__NOKWRD || ( *status == SAI__OK && 
+                                    steptime == VAL__BADD ) ) {
+      if (*status != SAI__OK) errAnnul( status );
+      /* Attempt to calculate it from adjacent entries - it will not
+         be correct but it might be close. The problem occurs if the
+         state entries are derived from distinct sequences. Almost
+         certainly to be the case for ACSIS in all cases except raster. */
+      if (hdr->nframes > 1 && tmpState[0].rts_end != VAL__BADD
+          && tmpState[1].rts_end != VAL__BADD) {
+        steptime = tmpState[1].rts_end - tmpState[0].rts_end;
+        steptime *= SPD;
+        /* Correct for actual number of steps */
+        steptime /= (tmpState[1].rts_num - tmpState[0].rts_num ); 
+        msgSetd("STP", steptime);
+        msgOutif(MSG__QUIET, " ", "WARNING: Determined step time to be ^STP"
+                 " by examining state information", status );
+
+        /* Update the FitsChan - the header should be present */
+        smf_fits_updateD( hdr, "STEPTIME", steptime, NULL, status );
+
+      } else {
+        /* no idea - make this fatal for now */
+        steptime = VAL__BADD;
+        *status = SAI__ERROR;
+        errRep( "", FUNC_NAME ": Unable to determine step time from header or "
+                " from state information", status );
+      }
+    }
+    if (*status == SAI__OK && steptime != VAL__BADD && steptime < VAL__SMLD) {
+      *status = SAI__ERROR;
+      msgSetd( "STP", steptime);
+      errRep( "", FUNC_NAME ": Determined a negative steptime (^STP). "
+              "This can not happen", status);
+      steptime = VAL__BADD;
+    }
+  }
+
   /* Only do something for ACSIS data - SCUBA-2 data is currently "perfect" */
   if (hdr->instrument != INST__ACSIS) return have_fixed;
 
@@ -152,10 +198,6 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
   smf_obsmap_report( msglev, obsmap, objmap, status );
   obsmap = astAnnul( obsmap );
   objmap = astAnnul( objmap );
-
-  fits = hdr->fitshdr;
-  tmpState = hdr->allState;
-  steptime = hdr->steptime;
 
   /* Get the MJD of the observation. Does not need to be accurate so do not care whether
      it is from DATE-OBS or JCMTSTATE */
@@ -231,11 +273,11 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
    */
 
   /* Assumes that STEPTIME is correct... */
-  if ( (tmpState[0].acs_exposure == VAL__BADR) || (tmpState[0].acs_exposure < (0.98 * hdr->steptime)) ) {
+  if ( (tmpState[0].acs_exposure == VAL__BADR) || (tmpState[0].acs_exposure < (0.98 * steptime)) ) {
     missing_exp = 1;
     msgOutif( msglev, "", "Missing ACS_EXPOSURE", status );
   }
-  if ( (tmpState[0].acs_offexposure == VAL__BADR) || (tmpState[0].acs_offexposure < (0.98 *hdr->steptime)) ) {
+  if ( (tmpState[0].acs_offexposure == VAL__BADR) || (tmpState[0].acs_offexposure < (0.98 * steptime)) ) {
     missing_off = 1;
     msgOutif( msglev, "", "Missing ACS_OFFEXPOSURE", status );
   }
@@ -264,7 +306,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
     switch (hdr->obsmode) {
       case SMF__OBS_SCAN:
         /* On exposure is simply the step time */
-        exp_time = hdr->steptime;
+        exp_time = steptime;
 
         if (hdr->swmode == SMF__SWM_PSSW) {
           /* off exposure time depends on the position of the spectrum
@@ -279,7 +321,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
              Note that in more recent observations the JOS calculates NREFSTEP
              dynamically for each row.
           */
-          off_time = 1.5 * fitsvals.nrefstep * hdr->steptime;
+          off_time = 1.5 * fitsvals.nrefstep * steptime;
           if (missing_off) {
             msgOutiff( MSG__QUIET, "", "WARNING: %d #%d: OFF exposure time has been estimated as %g sec",
                        status, fitsvals.utdate, fitsvals.obsnum, off_time );
@@ -293,14 +335,14 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
         /* depends on switch mode */
         if (hdr->swmode == SMF__SWM_CHOP) {
           /* this is really jiggle/chop (2.0 is for nod) */
-          exp_time = 2.0 * fitsvals.jos_mult * hdr->steptime;
+          exp_time = 2.0 * fitsvals.jos_mult * steptime;
           off_time = exp_time;
         } else if (hdr->swmode == SMF__SWM_PSSW) {
           /* For older data we use JOS_MIN and coadd online. For newer data we actually write out
              each spectrum separately and coadd off line. See jos_dr_control for whether this has been
              done. We should not really be dealing with cases where the latter is being done and we
               are missing exposure time information so ignore for now. */
-          exp_time = fitsvals.jos_min * hdr->steptime;
+          exp_time = fitsvals.jos_min * steptime;
           off_time = exp_time;
         } else {
           *status = SAI__ERROR;
@@ -312,7 +354,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
            but add an explicit trap. */
         if (hdr->swmode == SMF__SWM_CHOP) {
           /* 2.0 is for nod */
-          exp_time = 2.0 * fitsvals.jos_mult * hdr->steptime;
+          exp_time = 2.0 * fitsvals.jos_mult * steptime;
 
           /* off time depends on how the pattern is broken up since it is actually
            done as 2 * N_CYC_OFF per N_JIGS_ON. In the vast majority of cases
@@ -330,7 +372,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
           } else {
             /* First 2.0 is for Nodding. Second 2.0 is for spreading the off jiggle over both
                sides of the on */
-            off_time = 2.0 * ceil(sqrt((double)fitsvals.jigl_cnt)/2.0) * 2.0 * hdr->steptime;
+            off_time = 2.0 * ceil(sqrt((double)fitsvals.jigl_cnt)/2.0) * 2.0 * steptime;
           }
         } else if (hdr->swmode == SMF__SWM_PSSW) {
           *status = SAI__ERROR;

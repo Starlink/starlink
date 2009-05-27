@@ -313,8 +313,6 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
 
   IRQLocs *qlocs = NULL;     /* Named quality resources */
   char xname[DAT__SZNAM+1];  /* Name of extension holding quality names */
-  double steptime = 0.0;     /* Step time for this file */
-
 
   /* make sure return pointer is initialised */
   *data = NULL;
@@ -529,17 +527,11 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
           errAnnul( status );
         }
 
-        /* Determine the instrument */
+        /* Determine the instrument - assume that header fixups are not required for this */
         hdr->instrument = smf_inst_get( hdr, status );
 
-        /* and work out the observing mode */
+        /* and work out the observing mode (again, hope that headers are right) */
         if (hdr->fitshdr) smf_calc_mode( hdr, status );
-
-        /* Determine and store the telescope location in hdr->telpos */
-        smf_telpos_get( hdr, status );
-
-        /* Store the INSTAP values */
-        smf_instap_get( hdr, status );
 
         /* If not time series, then we can retrieve the stored WCS
            info. Note that the JCMTState parameter is filled ONLY for
@@ -595,7 +587,19 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
 
           /* Annul the locator in any case */
           if( xloc ) datAnnul( &xloc, status );
+
+          /* Metadata corrections - hide the messages by default.
+             Only correct time series data at the moment.
+           */
+          if ( !(flags & SMF__NOFIX_METADATA) ) smf_fix_metadata( MSG__VERB, *data, status );
+
         }
+
+        /* Determine and store the telescope location in hdr->telpos */
+        smf_telpos_get( hdr, status );
+
+        /* Store the INSTAP values */
+        smf_instap_get( hdr, status );
 
         /* On the basis of the instrument, we know need to fill in some
            additional header parameters. Some of these may be constants,
@@ -720,12 +724,6 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
           /* Determine the instrument */
           hdr->instrument = smf_inst_get( hdr, status );
 
-          /* Determine and store the telescope location in hdr->telpos */
-          smf_telpos_get( hdr, status );
-
-          /* Store the INSTAP values */
-          smf_instap_get( hdr, status );
-
           if (hdr->fitshdr) {
             /* and work out the observing mode */
             smf_calc_mode( hdr, status );
@@ -734,6 +732,15 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
             (void )smf_getobsidss( hdr->fitshdr, NULL, 0, hdr->obsidss, 
                                    sizeof(hdr->obsidss), status );
           }
+
+          /* Metadata corrections - hide the messages by default */
+          if ( !(flags & SMF__NOFIX_METADATA) ) smf_fix_metadata( MSG__VERB, *data, status );
+
+          /* Determine and store the telescope location in hdr->telpos */
+          smf_telpos_get( hdr, status );
+
+          /* Store the INSTAP values */
+          smf_instap_get( hdr, status );
 
           /* On the basis of the instrument, we know need to fill in some
              additional header parameters. Some of these may be constants,
@@ -892,47 +899,13 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
   /* Read and store history */
   smf_history_read( *data, status );
 
-  /* Get the step time from the header if we have a hdr */
-  if (hdr && (hdr->instrument!=INST__NONE) ) {
-    steptime = VAL__BADD;
+  /* Store the STEPTIME in the hdr - assumes that smf_fix_metadata has fixed things
+     up or complained. */
+  if ( hdr &&  (hdr->instrument!=INST__NONE) ) {
+    double steptime = VAL__BADD;
     smf_getfitsd( hdr, "STEPTIME", &steptime, status );
-    if (*status == SMF__NOKWRD || ( *status == SAI__OK && 
-                                    steptime == VAL__BADD ) ) {
-      if (*status != SAI__OK) errAnnul( status );
-      /* Attempt to calculate it from adjacent entries - it will not
-         be correct but it might be close. The problem occurs if the
-         state entries are derived from distinct sequences. Almost
-         certainly to be the case for ACSIS in all cases except raster. */
-      tmpState = hdr->allState;
-      if (hdr->nframes > 1 && tmpState[0].rts_end != VAL__BADD
-          && tmpState[1].rts_end != VAL__BADD) {
-        steptime = tmpState[1].rts_end - tmpState[0].rts_end;
-        steptime *= SPD;
-        /* Correct for actual number of steps */
-        steptime /= (tmpState[1].rts_num - tmpState[0].rts_num ); 
-        msgSetd("STP", steptime);
-        msgOutif(MSG__QUIET, " ", "WARNING: Determined step time to be ^STP"
-                 " by examining state information", status );
-      } else {
-        /* no idea - make this fatal for now */
-        steptime = VAL__BADD;
-        *status = SAI__ERROR;
-        errRep( "", FUNC_NAME ": Unable to determine step time from header or "
-                " from state information", status );
-      }
-    }
-    if (*status == SAI__OK && steptime < VAL__SMLD) {
-      *status = SAI__ERROR;
-      msgSetd( "STP", steptime);
-      errRep( "", FUNC_NAME ": Determined a negative steptime (^STP). "
-              "This can not happen", status);
-      steptime = VAL__BADD;
-    }
     hdr->steptime = steptime;
   }
-
-  /* Metadata corrections - hide the messages by default */
-  if ( !(flags & SMF__NOFIX_METADATA) ) smf_fix_metadata( MSG__VERB, *data, status );
 
   /* free resources on error */
   if (*status != SAI__OK) {
