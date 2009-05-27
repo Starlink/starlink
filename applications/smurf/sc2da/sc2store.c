@@ -958,6 +958,9 @@ int *status                   /* global status (given and returned) */
    RETRIEVE_STATE( acs_no_next_ref, ACS_NO_NEXT_REF, int, VAL__BADI );
    RETRIEVE_STATE( acs_no_ons, ACS_NO_ONS, int, VAL__BADI );
 
+   RETRIEVE_STATE( fe_lofreq, FE_LOFREQ, double, VAL__BADD );
+   RETRIEVE_STATE( fe_doppler, FE_DOPPLER, double, VAL__BADD );
+
    RETRIEVE_STATE( pol_ang, POL_ANG, double, VAL__BADD );
    RETRIEVE_STATE( fts_pos, FTS_POS, float, VAL__BADR );
 
