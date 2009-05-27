@@ -21,7 +21,7 @@ reduce your SCUBA-2 data.
       <uname>timj</uname>
     </person>
   </developers>
-  <documentation> sun258 sun259</documentation>
+  <documentation> sun258 sun259 sc18</documentation>
   <bugreports>t.jenness@jach.hawaii.edu</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
