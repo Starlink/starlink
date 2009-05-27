@@ -45,6 +45,8 @@
 *        Support switching mode
 *     2009-05-25 (TIMJ):
 *        Add message level argument.
+*     2009-05-27 (TIMJ):
+*        Sort observations into date order.
 
 *  Copyright:
 *     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
@@ -92,6 +94,21 @@
 #include "smf_typ.h"
 #include "smf_err.h"
 
+/* Define a simple struct to contain the integer index into the KeyMap
+   timestamp for sorting. We will store these in an array
+   and pass them to qsort so that we can ensure that the reports
+   are in time order.
+*/
+
+typedef struct {
+  int index;
+  double utc;
+} smfSortInfo;
+
+/* local qsort sort routine */
+static int sortbytime( const void *in1, const void *in2);
+
+
 void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
                       int * status ) {
 
@@ -100,6 +117,7 @@ void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
   size_t nobj;        /* number of distinct objects */
   size_t nsim = 0;    /* number of simulated observations */
   AstKeyMap * obsinfo = NULL; /* observation information */
+  smfSortInfo * obslist = NULL; /* Sorted struct array */
 
   if (*status != SAI__OK) return;
 
@@ -120,10 +138,31 @@ void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
     } else {
       msgSetc( "OBJ", " ");
     }
-    msgOutif(msglev, " ", "Processing data ^OBJ from the following observation^S :", status);
+
+    /* Sort everything into order - this takes additional time since we have to read the
+       KeyMap twice, but makes the output more amenable to scrutiny */
+    obslist = smf_malloc( nobs, sizeof(*obslist), 1, status );
     for (i = 0; i < nobs; i++) {
       AstObject * ao = NULL;
       if (astMapGet0A( obsmap, astMapKey(obsmap, i ), &ao )) {
+        double dateobs;
+        obsinfo = (AstKeyMap*)ao;  /* strict-aliasing warning avoidance in astMapGet0A */
+        astMapGet0D( obsinfo, "MJD-OBS", &dateobs );
+        obslist[i].index = i;
+        obslist[i].utc = dateobs;
+        obsinfo = astAnnul( obsinfo );
+      }
+    }
+    qsort( obslist, nobs, sizeof(*obslist), sortbytime );
+
+    /* Now do the actual summarizing */
+    msgOutif(msglev, " ", "Processing data ^OBJ from the following observation^S :", status);
+    for (i = 0; i < nobs; i++) {
+      AstObject * ao = NULL;
+      int mapindex;
+      mapindex = obslist[i].index;
+
+      if (astMapGet0A( obsmap, astMapKey(obsmap, mapindex ), &ao )) {
         const char * ctemp;
         int itemp;
 
@@ -177,6 +216,8 @@ void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
     }
     msgBlankif( msglev, status );
 
+    obslist = smf_free( obslist, status );
+
     /* Warn if we seem to have a mix of simulated and non-simulated data */
     if (nsim != 0 && nsim != nobs) {
       msgOutif( MSG__QUIET, "", "WARNING: Mixing simulated and observational data",
@@ -187,4 +228,28 @@ void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
   }
 
   return;
+}
+
+
+/* This routine can be used to sort the darks */
+static int sortbytime ( const void *in1, const void *in2 ) {
+  const smfSortInfo * sort1;
+  const smfSortInfo * sort2;
+  double utc1;
+  double utc2;
+
+  sort1 = in1;
+  sort2 = in2;
+
+  utc1 = sort1->utc;
+  utc2 = sort2->utc;
+
+  if (utc1 < utc2) {
+    return -1;
+  } else if (utc1 > utc2) {
+    return 1;
+  } else {
+    /* least likely case last */
+    return 0;
+  }
 }

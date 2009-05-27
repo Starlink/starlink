@@ -49,6 +49,8 @@
 *        Store SWMODE
 *     2009-05-25 (TIMJ):
 *        Store SIMULATE information
+*     2009-05-27 (TIMJ):
+*        Store MJD-OBS to enable sorting.
 
 *  Copyright:
 *     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
@@ -99,6 +101,7 @@
 void smf_obsmap_fill( const smfData * data, AstKeyMap * obsmap, AstKeyMap * objmap,
                       int * status ) {
 
+  double dateobs = 0.0;    /* MJD UTC of start of observation */
   char object[SZFITSCARD]; /* Object name */
   char obsid[SZFITSCARD]; /* Observation ID */
   AstKeyMap * obsinfo = NULL; /* observation information */
@@ -133,6 +136,10 @@ void smf_obsmap_fill( const smfData * data, AstKeyMap * obsmap, AstKeyMap * objm
       astMapPut0I( obsinfo, "UTDATE", itemp, NULL );
       smf_fits_getL( data->hdr, "SIMULATE", &itemp, status );
       astMapPut0I( obsinfo, "SIMULATE", itemp, NULL );
+
+      /* store the MJD of observation for sorting purposes */
+      smf_find_dateobs( data->hdr, &dateobs, NULL, status );
+      astMapPut0D( obsinfo, "MJD-OBS", dateobs, NULL );
 
       /* store information in the global observation map
          and also track how many distinct objects we have */
