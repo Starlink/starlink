@@ -2735,6 +2735,16 @@ f        The global status.
 *     significant.
 *     - If the supplied key is already in use in the KeyMap, the new value
 *     will replace the old value.
+*     - If the stored value is an AST Object pointer, the Object's reference 
+*     count is incremented by this call. Any subsequent changes made to
+*     the Object using the returned pointer will be reflected in any
+*     any other active pointers for the Object, including any obtained
+*     later using
+c     astMapget0A.
+f     AST_MAPGET0A.
+*     The reference count for the Object will be decremented when the
+*     KeyMap is destroyed, or the entry is removed or over-written with a
+*     different pointer.
 
 *  Data Type Codes:
 *     To select the appropriate 
@@ -3246,6 +3256,14 @@ c     and the string to which it points will not be over-written for a
 c     total of 50 successive invocations of this function. After this,
 c     the memory containing the string may be re-used, so a copy of
 c     the string should be made if it is needed for longer than this.
+*     - If the returned value is an AST Object pointer, the Object's reference 
+*     count is incremented by this call. Any subsequent changes made to
+*     the Object using the returned pointer will be reflected in any
+*     any other active pointers for the Object. The returned pointer
+*     should be annulled using
+c     astAnnul
+f     AST_ANNUL
+*     when it is no longer needed.
 
 *  Data Type Codes:
 *     To select the appropriate 
