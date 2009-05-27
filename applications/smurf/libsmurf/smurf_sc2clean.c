@@ -43,7 +43,7 @@
 *          all the output NDFs created by this application (one per
 *          line). If a null (!) value is supplied no file is created. [!]
 *     APOD = _INTEGER (Read)
-*          Apodize time series start and end with trif function that rolls off
+*          Apodize time series start and end with trig function that rolls off
 *          in APOD samples.
 *     BADFRAC = _DOUBLE (Read)
 *          Fraction of bad samples in order for entire bolometer to be
