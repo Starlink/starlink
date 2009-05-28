@@ -63,6 +63,7 @@
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
+*     Andy Gibb (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -74,10 +75,13 @@
 *        Trap erroneous final dark.
 *     2009-03-27 (TIMJ):
 *        Use new smf_create_respfile routine for creating the responsivity image.
+*     2009-05-28 (AGG):
+*        Explicitly check for good status after requesting RESP parameter
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2008-2009 Science and Technology Facilities Council.
+*     Copyright (C) 2009 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -379,7 +383,12 @@ void smurf_calcflat( int *status ) {
 
       kpg1Wgndf( "RESP", NULL, 1, 1, "", &rgrp, &rsize, status );
 
-      if (*status == PAR__NULL) {
+      if (*status == SAI__OK) {
+        /* Create the file on disk and handle provenance */
+        smfData *refdata = (bbhtframe->sdata)[0];
+        smf_create_respfile( rgrp, 1, refdata, &respmap, status );
+        smf_accumulate_prov( NULL, dkgrp, 1, respmap->file->ndfid, "SMURF:CALCFLAT", status );
+      } else if (*status == PAR__NULL) {
         void *pntr[] = {NULL, NULL, NULL};
         dim_t mydims[2];
         errAnnul( status );
@@ -392,12 +401,6 @@ void smurf_calcflat( int *status ) {
         respmap = smf_construct_smfData( NULL, NULL, NULL, NULL, SMF__DOUBLE,
                                          pntr, 0, mydims, 2, 0, 0, NULL,
                                          NULL, status );
-
-      } else {
-        /* Create the file on disk and handle provenance */
-        smfData *refdata = (bbhtframe->sdata)[0];
-        smf_create_respfile( rgrp, 1, refdata, &respmap, status );
-        smf_accumulate_prov( NULL, dkgrp, 1, respmap->file->ndfid, "SMURF:CALCFLAT", status );
       }
       if (rgrp) grpDelet( &rgrp, status );
     }
