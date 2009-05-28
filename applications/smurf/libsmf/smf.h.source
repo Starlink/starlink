@@ -800,6 +800,9 @@ void smf_fits_outhdr( AstFitsChan * inhdr, AstFitsChan ** outhdr,
 int smf_fits_updateD( smfHead * hdr, const char * name, double value, 
                       const char * comment, int *status );
 
+int smf_fits_updateS( smfHead * hdr, const char * name, const char * value,
+                      const char * comment, int *status );
+
 int smf_fix_metadata( msglev_t msglev, smfData * data, int * status );
 
 void smf_flag_spikes( smfData *data, double *bolovar, unsigned char *quality, 
