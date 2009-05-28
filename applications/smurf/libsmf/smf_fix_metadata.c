@@ -120,6 +120,9 @@ struct FitsHeaderStruct {
 
 #define FUNC_NAME "smf_fix_metadata"
 
+/* Indent for informational messages */
+#define INDENT "   "
+
 int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
 
   double dateobs;            /* MJD UTC of observation start */
@@ -249,7 +252,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
   if (fitsvals.utdate < 20080323) {
     if ( fitsvals.obsgeox == -5464545.0 ) {
       /* hard-coded OBSGEO-X implies -Y and -Z also wrong */
-      msgOutif( msglev, "", "Correcting telescope coordinates.", status );
+      msgOutif( msglev, "", INDENT "Correcting telescope coordinates.", status );
       smf_fits_updateD( hdr, "OBSGEO-X", -5464594.335493, NULL, status );
       smf_fits_updateD( hdr, "OBSGEO-Y", -2492695.151639, NULL, status );
       smf_fits_updateD( hdr, "OBSGEO-Z", 2150964.058506, NULL, status );
@@ -276,7 +279,8 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
       }
 
       /* correct TCS_TAI by half step time corrected to days */
-      msgOutif( msglev, "", "Missing TCS_TAI. Estimating using RTS_END and STEPTIME.", status );
+      msgOutiff( msglev, "", INDENT "Missing TCS_TAI. Estimating using RTS_END and STEPTIME of %g sec.",
+                 status, step);
       step = 0.5 * step / SPD; 
       if (*status == SAI__OK) {
         for (i=0; i < hdr->nframes; i++) {
@@ -305,11 +309,11 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
   /* Assumes that STEPTIME is correct... */
   if ( (tmpState[0].acs_exposure == VAL__BADR) || (tmpState[0].acs_exposure < (0.98 * steptime)) ) {
     missing_exp = 1;
-    msgOutif( msglev, "", "Missing ACS_EXPOSURE", status );
+    msgOutif( msglev, "", INDENT "Missing ACS_EXPOSURE", status );
   }
   if ( (tmpState[0].acs_offexposure == VAL__BADR) || (tmpState[0].acs_offexposure < (0.98 * steptime)) ) {
     missing_off = 1;
-    msgOutif( msglev, "", "Missing ACS_OFFEXPOSURE", status );
+    msgOutif( msglev, "", INDENT "Missing ACS_OFFEXPOSURE", status );
   }
 
   if ( (missing_exp || missing_off) && (*status == SAI__OK) ) {
@@ -319,7 +323,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
 
     if (fitsvals.utdate > utmax) {
       *status = SAI__ERROR;
-      errRepf( "", "ACS_*EXPOSURE missing or BAD but data are newer than expected (%d > %d)",
+      errRepf( "", INDENT "ACS_*EXPOSURE missing or BAD but data are newer than expected (%d > %d)",
                status, fitsvals.utdate, utmax);
     }
 
@@ -328,7 +332,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
        superfluous once we assume this since we are declaring that presence
        of OFFEXPOSURE controls everything. */
     if (missing_off && !missing_exp ) {
-      msgOutiff( msglev, "", "ACS_EXPOSURE is present but untrustworthy", status );
+      msgOutiff( msglev, "", INDENT "ACS_EXPOSURE is present but untrustworthy", status );
       missing_exp = 1;
     }
 
@@ -416,7 +420,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
         *status = SAI__ERROR;
         errRep( "", "Unsupported observing mode.", status );
     }
-    msgOutiff( msglev, "", "  Calculating ON exposure = %g sec and OFF exposure = %g sec", status, exp_time,
+    msgOutiff( msglev, "", INDENT "Calculating ON exposure = %g sec and OFF exposure = %g sec", status, exp_time,
                off_time);
 
     /* fix up the state structure - assume all values identical */
