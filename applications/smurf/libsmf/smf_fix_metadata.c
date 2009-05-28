@@ -307,11 +307,11 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
    */
 
   /* Assumes that STEPTIME is correct... */
-  if ( (tmpState[0].acs_exposure == VAL__BADR) || (tmpState[0].acs_exposure < (0.98 * steptime)) ) {
+  if ( (tmpState[0].acs_exposure == VAL__BADR) || (tmpState[0].acs_exposure < (0.90 * steptime)) ) {
     missing_exp = 1;
     msgOutif( msglev, "", INDENT "Missing ACS_EXPOSURE", status );
   }
-  if ( (tmpState[0].acs_offexposure == VAL__BADR) || (tmpState[0].acs_offexposure < (0.98 * steptime)) ) {
+  if ( (tmpState[0].acs_offexposure == VAL__BADR) || (tmpState[0].acs_offexposure < (0.90 * steptime)) ) {
     missing_off = 1;
     msgOutif( msglev, "", INDENT "Missing ACS_OFFEXPOSURE", status );
   }
