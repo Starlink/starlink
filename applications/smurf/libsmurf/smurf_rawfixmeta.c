@@ -99,7 +99,7 @@ void smurf_rawfixmeta( int * status ) {
   for (i=1; i<=size && ( *status == SAI__OK ); i++) {
 
     /* First open the file for READ to see whether we need to modify it */
-    smf_open_file( igrp, i, "READ", SMF__NOCREATE_DATA, &data, status );
+    smf_open_file( igrp, i, "READ", SMF__NOCREATE_DATA | SMF__NOFIX_METADATA, &data, status );
 
     /* see if things need fixing */
     fixed = smf_fix_metadata( MSG__NORM, data, status );
