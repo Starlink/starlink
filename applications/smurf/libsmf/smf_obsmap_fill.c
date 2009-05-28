@@ -145,6 +145,8 @@ void smf_obsmap_fill( const smfData * data, AstKeyMap * obsmap, AstKeyMap * objm
          and also track how many distinct objects we have */
       astMapPut0A( obsmap, obsid, obsinfo, NULL );
       astMapPut0I( objmap, object, 0, NULL );
+
+      obsinfo = astAnnul( obsinfo );
     }
   }
 

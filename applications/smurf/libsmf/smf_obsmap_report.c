@@ -212,6 +212,8 @@ void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
         astMapGet0I( obsinfo, "UTDATE", &itemp );
         msgSeti( "UT", itemp);
         msgOutif(msglev, "", "  ^UT #^ON ^OM^SW ^OBJ ^OT ^SIM", status);
+
+        obsinfo = astAnnul( obsinfo );
       }
     }
     msgBlankif( msglev, status );
