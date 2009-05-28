@@ -1611,6 +1611,40 @@ iraf! {
           }
       }
 
+      action astdownsize {
+         helplib {$ATOOLS_HELP}
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The input Polygon}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+         parameter maxerr {
+            position 2
+            type _DOUBLE
+            prompt {Maximum error between old and new Polygons}
+            ppath CURRENT
+            helpkey *
+         }
+         parameter maxvert {
+            position 3
+            type _INTEGER
+            prompt {Maximum number of vertices in new Polygon}
+            ppath CURRENT
+            helpkey *
+         }
+         parameter result {
+            position 4
+            type LITERAL
+            prompt {The new Polygon}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+      }
+
       action astinvert {
          helplib {$ATOOLS_HELP}
          parameter result {

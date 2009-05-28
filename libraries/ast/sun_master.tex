@@ -21711,6 +21711,18 @@ removes them, or replaces them with UnitMaps (or equivalent Frames). It
 can be used to remove the masking effects of Regions from a compound
 Mapping or Frame.
 
+\item A new method called 
+c+
+astDownsize
+c-
+f+
+AST\_DOWNSIZE
+f-
+has been added to the Polygon class. It produces a new Polygon that
+contains a subset of the vertices in the supplied Polygon. The subset is
+chosen to retain the main features of the supplied Polygion, in so far 
+as that is possible, within specified constraints.
+
 \item A new set of methods, called 
 c+
 astMapGetElem<X>

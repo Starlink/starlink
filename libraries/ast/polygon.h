@@ -122,6 +122,7 @@ typedef struct AstPolygonVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
+   AstPolygon *(* Downsize)( AstPolygon *, double, int, int * );
 } AstPolygonVtab;
 
 #if defined(THREAD_SAFE) 
@@ -173,6 +174,7 @@ AstPolygon *astLoadPolygon_( void *, size_t, AstPolygonVtab *,
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
+AstPolygon *astDownsize_( AstPolygon *, double, int, int * );
 # if defined(astCLASS)           /* Protected */
 #endif
 
@@ -223,6 +225,8 @@ astINVOKE(O,astLoadPolygon_(mem,size,vtab,name,astCheckChannel(channel),STATUS_P
    before use.  This provides a contextual error report if a pointer
    to the wrong sort of Object is supplied. */
 
+#define astDownsize(this,maxerr,maxvert) \
+astINVOKE(O,astDownsize_(astCheckPolygon(this),maxerr,maxvert,STATUS_PTR))
 #if defined(astCLASS)            /* Protected */
 #endif
 #endif

@@ -41,13 +41,19 @@ f     AST_POLYGON
 *     those which are applicable to all Regions.
 
 *  Functions:
-c     The Polygon class does not define any new functions beyond those
-f     The Polygon class does not define any new routines beyond those
-*     which are applicable to all Regions.
+c     In addition to those functions applicable to all Regions, the
+c     following functions may also be applied to all Polygons:
+f     In addition to those routines applicable to all Regions, the
+f     following routines may also be applied to all Polygons:
+*
+c     - astDownsize: Reduce the number of vertices in a Polygon. 
+f     - AST_DOWNSIZE: Reduce the number of vertices in a Polygon. 
 
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
 *     Research Councils
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -71,6 +77,8 @@ f     The Polygon class does not define any new routines beyond those
 *  History:
 *     26-OCT-2004 (DSB):
 *        Original version.
+*     28-MAY-2009 (DSB):
+*        Added astDownsize.
 *class--
 */
 
@@ -126,9 +134,26 @@ f     The Polygon class does not define any new routines beyond those
 #include <float.h>
 #include <math.h>
 #include <stdarg.h>
+#include <stdlib.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
+
+/* Type definitions. */
+/* ================= */
+
+/* A structure that holds information about an edge of the new Polygon
+   being created by astDownsize. The edge is a line betweeen two of the
+   vertices of the original Polygon. */
+typedef struct Segment {
+   int i1;        /* Index of starting vertex within old Polygon */
+   int i2;        /* Index of ending vertex within old Polygon */
+   double error;  /* Max geodesic distance from any old vertex to the line */
+   int imax;      /* Index of the old vertex at which max error is reached */
+   struct Segment *next;/* Pointer to next Segment in a double link list */
+   struct Segment *prev;/* Pointer to previous Segment in a double link list */
+} Segment;
+
 
 /* Module Variables. */
 /* ================= */
@@ -182,19 +207,111 @@ AstPolygon *astPolygonId_( void *, int, int, const double *, void *, const char 
 static AstMapping *Simplify( AstMapping *, int * );
 static AstPointSet *RegBaseMesh( AstRegion *, int * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static AstPolygon *Downsize( AstPolygon *, double, int, int * );
+static Segment *AddToChain( Segment *, Segment *, int * );
+static Segment *NewSegment( int, int, int, int * );
+static Segment *RemoveFromChain( Segment *, Segment *, int * );
 static double Polywidth( AstFrame *, AstLineDef **, int, int, double[ 2 ], int * );
+static int IntCmp( const void *, const void * );
 static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int **, int * );
 static int RegTrace( AstRegion *, int, double *, double **, int * );
 static void Cache( AstPolygon *, int * );
 static void Copy( const AstObject *, AstObject *, int * );
 static void Delete( AstObject *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
+static void FindMax( Segment *, AstFrame *, double *, double *, int, int * );
 static void RegBaseBox( AstRegion *this, double *, double *, int * );
 static void ResetCache( AstRegion *this, int * );
 static void SetRegFS( AstRegion *, AstFrame *, int * );
 
 /* Member functions. */
 /* ================= */
+static Segment *AddToChain( Segment *head, Segment *seg, int *status ){
+/*
+*  Name:
+*     AddToChain
+
+*  Purpose:
+*     Add a Segment into the linked list of Segments, maintaining the 
+*     required order in the list.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "polygon.h"
+*     Segment *AddToChain( Segment *head, Segment *seg, int *status )
+
+*  Class Membership:
+*     Polygon member function 
+
+*  Description:
+*     The linked list of Segments maintained by astDownsize is searched
+*     from the high error end (the head), until a Segment is foound which
+*     has a lower error than the supplied segment. The supplied Segment
+*     is then inserted into the list at that point.
+
+*  Parameters:
+*     head
+*        The Segment structure at the head of the list (i.e. the segment
+*        with maximum error).
+*     seg
+*        The Segment to be added into the list.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     Pointer to the link head (which will have changed if "seg" has a
+*     higher error than the original head).
+
+*/
+
+/* Local Variables: */
+   Segment *tseg;
+
+/* Check the global error status. */
+   if ( !astOK ) return head;
+
+/* If the list is empty, return the supplied segment as the new list
+   head. */
+   if( !head ) {
+      head = seg;
+
+/* If the supplied segment has a higher error than the original head,
+   insert the new segment in front of the original head. */
+   } else if( seg->error > head->error ){
+      seg->next = head;
+      head->prev = seg;
+      head = seg;
+
+/* Otherwise, move down the list from the head until a segment is found
+   which has a lower error than the supplied Segment. Then insert the
+   supplied segment into the list in front of it. */
+   } else {
+      tseg = head;
+      seg->next = NULL;
+
+      while( tseg->next ) {
+         if( seg->error > tseg->next->error ) {
+            seg->next = tseg->next;
+            seg->prev = tseg;
+            tseg->next->prev = seg;
+            tseg->next = seg;
+            break;
+         }
+         tseg = tseg->next;
+      }
+
+      if( !seg->next ) {
+         tseg->next = seg;
+         seg->prev = tseg;
+      }
+   }
+
+/* Return the new head. */
+   return head;
+}
+
 static void Cache( AstPolygon *this, int *status ){
 /*
 *  Name:
@@ -327,6 +444,467 @@ static void Cache( AstPolygon *this, int *status ){
    }
 }
 
+static AstPolygon *Downsize( AstPolygon *this, double maxerr, int maxvert, 
+                             int *status ) {
+/*
+*++
+*  Name:
+c     astDownsize
+f     AST_DOWNSIZE
+
+*  Purpose:
+*     Reduce the number of vertices in a Polygon.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "polygon.h"
+c     AstPolygon *astDownsize( AstPolygon *this, double maxerr, int maxvert )
+f     RESULT = AST_DOWNSIZE( THIS, MAXERR, MAXVERT, STATUS )
+
+*  Class Membership:
+*     Polygon method.
+
+*  Description:
+*     This function returns a pointer to a new Polygon that contains a
+*     subset of the vertices in the supplied Polygon. The subset is
+*     chosen so that the returned Polygon is a good approximation to 
+*     the supplied Polygon, within the limits specified by the supplied
+*     parameter values. That is, the density of points in the returned
+*     Polygon is greater at points where the curvature of the boundary of
+*     the supplied Polygon is greater.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Polygon.
+c     maxerr
+f     MAXERR = DOUBLE PRECISION (Given)
+*        The maximum allowed discrepancy between the supplied and
+*        returned Polygons, expressed as a geodesic distance within the
+*        Polygon's coordinate frame. If this is zero or less, the
+*        returned Polygon will have the number of vertices specified by 
+c        maxvert.
+f        MAXVERT.
+c     maxvert 
+f     MAXVERT = INTEGER (Given)
+*        The maximum allowed number of vertices in the returned Polygon.
+*        If this is less than 3, the number of vertices in the returned 
+*        Polygon will be the minimum needed to achieve the maximum 
+*        discrepancy specified by
+c        maxerr.
+f        MAXERR.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Returned Value:
+c     astDownsize()
+f     AST_DOWNSIZE = INTEGER
+*        Pointer to the new Polygon.
+
+*  Notes:
+*     - A null Object pointer (AST__NULL) will be returned if this
+c     function is invoked with the AST error status set, or if it
+f     function is invoked with STATUS set to an error value, or if it
+*     should fail for any reason.
+*--
+*/
+
+/* Local Variables: */
+   AstFrame *frm;         /* Base Frame from the Polygon */
+   AstPolygon *result;    /* Returned pointer to new Polygon */
+   Segment *head;         /* Pointer to new polygon edge with highest error */
+   Segment *seg1;         /* Pointer to new polygon edge */
+   Segment *seg2;         /* Pointer to new polygon edge */
+   Segment *seg3;         /* Pointer to new polygon edge */
+   double **ptr;          /* Pointer to arrays of axis values */
+   double *x;             /* Pointer to array of X values for old Polygon */
+   double *xnew;          /* Pointer to array of X values for new Polygon */
+   double *y;             /* Pointer to array of Y values for old Polygon */
+   double *ynew;          /* Pointer to array of Y values for new Polygon */
+   int *newpoly;          /* Holds indices of retained input vertices */
+   int i1;                /* Index of first vertex added to output polygon */
+   int i2;                /* Index of second vertex added to output polygon */
+   int i3;                /* Index of third vertex added to output polygon */
+   int iadd;              /* Normalised vertex index */
+   int iat;               /* Index at which to store new vertex index */
+   int newlen;            /* Number of vertices currently in new Polygon */
+   int nv;                /* Number of vertices in old Polygon */
+
+/* Initialise. */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get the number of vertices in the supplied polygon. */
+   nv = astGetNpoint( ((AstRegion *) this)->points );
+
+/* Get pointers to the X and Y arrays holding the vertex coordinates in
+   the supplied Polygon. */
+   ptr = astGetPoints( ((AstRegion *) this)->points );
+   x = ptr[ 0 ];
+   y = ptr[ 1 ];
+
+/* Get a pointer to the base Frame of the Polygon. */
+   frm = astGetFrame( ((AstRegion *) this)->frameset, AST__BASE );
+   
+/* Allocate memory for an array to hold the original indices of the vertices 
+   to be used to create the returned Polygon. This array is expanded as
+   needed. */
+   newpoly = astMalloc( 10*sizeof( int ) );
+
+/* Check the pointers can be used safely. */
+   if( astOK ) {
+
+/* The first attempt picks three vertices from the supplied Polygon.
+   Later attempts add further input vertices to the output Polygon until
+   the specified requirements are met. The first three vertices are
+   chosen to be evenly spaced through the list of vertices. */
+      i1 = nv/6;
+      i2 = nv/2;
+      i3 = nv - i1;
+
+/* Create Segment structures to describe each of these three edges. */
+      seg1 = NewSegment( i1, i2, nv, status );
+      seg2 = NewSegment( i2, i3, nv, status );
+      seg3 = NewSegment( i3, i1, nv, status );
+
+/* Record these 3 vertices in an array holding the original indices of 
+   the vertices to be used to create the returned Polygon. */   
+      newpoly[ 0 ] = i1;
+      newpoly[ 1 ] = i2; 
+      newpoly[ 2 ] = i3;
+
+/* Indicate the new polygon currently has 3 vertices. */
+      newlen = 3;
+
+/* Search the old vertices between the start and end of segment 3, looking 
+   for the vertex which lies furthest from the line of segment 3. The
+   residual between this point and the line is stored in the Segment
+   structure, as is the index of the vertex at which this maximum residual
+   occurred. */
+      FindMax( seg3, frm, x, y, nv, status );
+
+/* The "head" variable points to the head of a double linked list of
+   Segment structures. This list is ordered by residual, so that the 
+   Segment with the maximum residual is at the head, and the Segment 
+   with the minimum residual is at the tail. Initially "seg3" is at the
+   head. */
+      head = seg3;
+
+/* If the maximum allowed number of vertices in the output Polygon is
+   less than 3, allow any number of vertices up to the number in the
+   input Polygon (termination will then be determined just by "maxerr"). */
+      if( maxvert < 3 ) maxvert = nv;
+
+/* Loop round adding an extra vertex to the returned Polygon until the
+   maximum residual between the new and old polygons is no more than 
+   "maxerr". Abort early if the specifie dmaximum number of vertices is
+   reached. */
+      while( head->error > maxerr && newlen < maxvert ) {
+
+/* Search the old vertices between the start and end of segment 1, looking 
+   for the vertex which lies furthest from the line of segment 1. The
+   residual between this point and the line is stored in the Segment
+   structure, as is the index of the vertex at which this maximum residual
+   occurred. */
+         FindMax( seg1, frm, x, y, nv, status );
+
+/* Insert segment 1 into the linked list of Segments, at a position that
+   maintains the ordering of the segments by error. Thus the head of the
+   list will still have the max error. */
+         head = AddToChain( head, seg1, status );
+
+/* Do the same for segment 2. */
+         FindMax( seg2, frm, x, y, nv, status );
+         head = AddToChain( head, seg2, status );
+
+/* The segment at the head of the list has the max error (that is, it is
+   the segment that departs most from the supplied Polygon). To make the
+   new polygon a better fit to the old polygon, we add the vertex that is
+   furthest away from this segment to the new polygon. Remember that a
+   polygon is cyclic so if the vertex has an index that is greater than the
+   number of vertices in the old polygon, reduce the index by the number
+   of vertices in the old polygon. */
+         iadd = head->imax;
+         if( iadd >= nv ) iadd -= nv;
+         iat = newlen++;
+         newpoly = astGrow( newpoly, newlen, sizeof( int ) );
+         if( !astOK ) break;
+         newpoly[ iat ] = iadd;
+
+/* We now split the segment that had the highest error into two segments.
+   The split occurs at the vertex that had the highest error. */
+         seg1 = NewSegment( head->imax, head->i2, nv, status );
+         seg2 = head;
+         seg2->i2 = head->imax; 
+
+/* We do not know where these two new segments hsould be in the ordered
+   linked list, so remove them from the list. */
+         head = RemoveFromChain( head, seg1, status );
+         head = RemoveFromChain( head, seg2, status );
+      }
+
+/* Now we have reached the required accuracy, free resources. */
+      seg1 = astFree( seg1 );
+      seg2 = astFree( seg2 );
+
+      while( head ) {
+         seg1 = head;
+         head = head->next;
+         seg1 = astFree( seg1 );
+      }
+
+/* Get a deep copy of the supplied Polygon. */
+      result = astCopy( this );
+
+/* If any vertices have been removed, change the size of the PointSet in
+   the returned Polygon. */
+      if( result && newlen < nv ) {
+         astSetNpoint( ((AstRegion *) result)->points, newlen );
+
+/* Get pointers to the axis values of the new Polygon. */
+         ptr = astGetPoints( ((AstRegion *) result)->points );
+         xnew = ptr[ 0 ];
+         ynew = ptr[ 1 ];
+
+/* Sort the indices of the vertices to be retained so that they are in
+   the same order as they were in the supplied Polygon. */
+         qsort( newpoly, newlen, sizeof( int ), IntCmp );
+
+
+/* Copy the axis values for the retained vertices from the old to the new
+   Polygon. */
+         if( astOK ) {
+            for( iat = 0; iat < newlen; iat++ ) {
+               xnew[ iat ] = x[ newpoly[ iat ] ];
+               ynew[ iat ] = y[ newpoly[ iat ] ];
+            }
+
+/* Indicate the cached information in the new Polygon is out of date. */
+            astResetCache( (AstRegion *) result );
+         }
+      }
+   }
+
+/* Free resources. */
+   newpoly = astFree( newpoly );
+
+/* If an error occurred, annul the returned Polygon. */
+   if ( !astOK ) result = astAnnul( result );
+
+/* Return the result. */
+   return result;
+}
+
+static void FindMax( Segment *seg, AstFrame *frm, double *x, double *y, 
+                     int nv, int *status ){
+/*
+*  Name:
+*     FindMax
+
+*  Purpose:
+*     Find the maximum discrepancy between a given line segment and the 
+*     Polygon being downsized.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "polygon.h"
+*     void FindMax( Segment *seg, AstFrame *frm, double *x, double *y, 
+*                   int nv, int *status )
+
+*  Class Membership:
+*     Polygon member function 
+
+*  Description:
+*     The supplied Segment structure describes a range of vertices in 
+*     the polygon being downsized. This function checks each of these
+*     vertices to find the one that lies furthest from the line joining the
+*     first and last vertices in the segment. The maximum error, and the
+*     vertex index at which this maximum error is found, is stored in the
+*     Segment structure. 
+
+*  Parameters:
+*     seg
+*        The structure describing the range of vertices to check. It
+*        corresponds to a candidate edge in the downsized polygon.
+*     frm
+*        The Frame in which the positions are defined.
+*     x
+*        Pointer to the X axis values in the original Polygon.
+*     y
+*        Pointer to the Y axis values in the original Polygon.
+*     nv
+*        Total number of vertics in the old Polygon..
+*     status
+*        Pointer to the inherited status variable.
+
+*/
+
+/* Local Variables: */
+   AstPointSet *pset1; /* PointSet holding vertex positions */
+   AstPointSet *pset2; /* PointSet holding offset par/perp components */
+   double **ptr1;      /* Pointers to "pset1" data arrays */
+   double **ptr2;      /* Pointers to "pset2" data arrays */
+   double *px;         /* Pointer to next X value */
+   double *py;         /* Pointer to next Y value */
+   double ax;          /* X value at start */
+   double ay;          /* Y value at start */
+   double ba2;         /* Squared distance between a and b */
+   double bax;         /* X increment from a to b */
+   double bay;         /* Y increment from a to b */
+   double ca2;         /* Squared distance between a and c */
+   double cadotba;     /* Dot product of a->c and a->b vectors */
+   double cax;         /* X increment from a to c */
+   double cay;         /* Y increment from a to c */
+   double end[ 2 ];    /* Position of starting vertex */
+   double error;       /* Error value for current vertex */
+   double start[ 2 ];  /* Position of starting vertex */
+   int i1;             /* Starting index (always in first cycle) */
+   int i2;             /* Ending index converted to first cycle */
+   int i2b;            /* Upper vertex limit in first cycle */
+   int i;              /* Loop count */
+   int n;              /* Number of vertices to check */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Stuff needed for handling cyclic redundancy of vertex indices. */
+   i1 = seg->i1;
+   i2 = seg->i2;
+   n = i2 - i1 - 1;
+   i2b = i2;
+   if( i2 >= nv ) {
+      i2 -= nv;
+      i2b = nv;
+   }
+
+/* For speed, we use simple plane geometry if the Polygon is defined in a
+   simple Frame. */
+   if( !strcmp( astGetClass( frm ), "Frame" ) ) {
+
+/* Point "a" is the vertex that marks the start of the segment. Point "b" 
+   is the vertex that marks the end of the segment. */
+      ax = x[ i1 ];      
+      ay = y[ i1 ];      
+      bax = x[ i2 ] - ax;
+      bay = y[ i2 ] - ay;
+      ba2 = bax*bax + bay*bay;
+   
+/* Initialise the largest error found so far. */
+      seg->error = -1.0;
+
+/* Check the vertices from the start (plus one) up to the end (minus one) 
+   or the last vertex (which ever comes first). */
+      for( i = i1 + 1; i < i2b; i++ ) {
+
+/* Position "c" is the vertex being tested. Find the squared distance from 
+   "c" to the line joining "a" and "b". */
+         cax = x[ i ] - ax;      
+         cay = y[ i ] - ay;      
+         ca2 = cax*cax + cay*cay;
+         cadotba = cax*bax + cay*bay;
+         error = ca2 - cadotba*cadotba/ba2;
+
+/* If this is the largest value found so far, record it. Note the error
+   here is a squared distance. */
+         if( error > seg->error ) {
+            seg->error = error;
+            seg->imax = i;
+         }
+      }
+   
+/* If the end vertex is in the next cycle, check the remaining vertex
+   positions in the same way. */
+      if( i2b != i2 ) {
+
+         for( i = 0; i < i2; i++ ) {
+
+            cax = x[ i ] - ax;      
+            cay = y[ i ] - ay;      
+            ca2 = cax*cax + cay*cay;
+            cadotba = cax*bax + cay*bay;
+            error = ca2 - cadotba*cadotba/ba2;
+
+            if( error > seg->error ) {
+               seg->error = error;
+               seg->imax = i + i2b;
+            }
+
+         }
+      }
+
+/* Convert the error from squared distance to distance. */
+      seg->error = sqrt( seg->error );
+
+/* If the polygon is not defined in a simple Frame, we use the overloaded 
+   Frame methods to do the geometry. */
+   } else {
+
+/* Create a PointSet to hold the positions of the vertices to test. We do
+   not need to test the start or end vertex. */
+      pset1 = astPointSet( n, 2, " ", status );
+      ptr1 = astGetPoints( pset1 );
+      if( astOK ) {
+
+/* Copy the vertex axis values form the start (plus one) up to the end
+   (minus one) vertex or the last vertex (which ever comes first). */
+         px = ptr1[ 0 ];
+         py = ptr1[ 1 ];
+
+         for( i = i1 + 1; i < i2b; i++ ){ 
+            *(px++) = x[ i ];
+            *(py++) = y[ i ];
+         }
+
+/* If the end vertex is in the next cycle, copy the remaining vertex
+   positions into the PointSet. */
+         if( i2b != i2 ) {
+            for( i = 0; i < i2; i++ ) {
+               *(px++) = x[ i ];
+               *(py++) = y[ i ];
+            }
+         }
+
+/* Record the start and end vertex positions. */
+         start[ 0 ] = x[ i1 ];
+         start[ 1 ] = y[ i1 ];
+         end[ 0 ] = x[ i2 ];
+         end[ 1 ] = y[ i2 ];
+
+/* Resolve the vector from the start to each vertex into two components,
+   parallel and perpendicular to the start->end vector. */
+         pset2 = astResolvePoints( frm, start, end, pset1, NULL );
+         ptr2 = astGetPoints( pset2 );
+         if( astOK ) {
+
+/* Find the vertex with largest perpendicular component. */
+            seg->error = -1.0;
+            py = ptr2[ 1 ];
+            for( i = 1; i <= n; i++ ) {
+
+               error = fabs( *(py++) );
+
+               if( error > seg->error ) {
+                  seg->error = error;
+                  seg->imax = i + i1;
+               }
+
+            }
+         }
+
+/* Free resources. */
+         pset2 = astAnnul( pset2 );
+      }
+      pset1 = astAnnul( pset1 );
+   }
+
+}
+
 void astInitPolygonVtab_(  AstPolygonVtab *vtab, const char *name, int *status ) {
 /*
 *+
@@ -388,6 +966,7 @@ void astInitPolygonVtab_(  AstPolygonVtab *vtab, const char *name, int *status )
 /* ------------------------------------ */
 /* Store pointers to the member functions (implemented here) that provide
    virtual methods for this class. */
+   vtab->Downsize = Downsize;
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
@@ -424,6 +1003,132 @@ void astInitPolygonVtab_(  AstPolygonVtab *vtab, const char *name, int *status )
    that the vtab is now initialised. */
    if( vtab == &class_vtab ) class_init = 1;
 
+}
+
+static int IntCmp( const void *a, const void *b ){
+/*
+*  Name:
+*     IntCmp
+
+*  Purpose:
+*     An integer comparison function for the "qsort" function.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "polygon.h"
+*     int IntCmp( const void *a, const void *b )
+
+*  Class Membership:
+*     Polygon member function 
+
+*  Description:
+*     See the docs for "qsort".
+
+*  Parameters:
+*     a
+*        Pointer to the first int
+*     b
+*        Pointer to the second int
+
+*  Returnd Value:
+*     Positive, negative or zero, depending on whether a is larger than,
+*     equal to, or less than b.
+
+*/
+
+   return *((int*)a) - *((int*)b);
+}
+
+static Segment *NewSegment( int i1, int i2, int nvert, int *status ){
+/*
+*  Name:
+*     NewSegment
+
+*  Purpose:
+*     Return a new structure describing a segment of the new Polygon
+*     created by astDownsize.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "polygon.h"
+*     Segment *NewSegment( int i1, int i2, int nvert, int *status )
+
+*  Class Membership:
+*     Polygon member function 
+
+*  Description:
+*     This function allocates memory to hold a new Segment structure, and
+*     initialises its contents to describe the specified range of verices
+*     within the old Polygon. The cyclic nature of vertex indices is
+*     taken into account.
+
+*  Parameters:
+*     i1
+*        The index of a vertex within the old Polygon (supplied to 
+*        astDownsize) that marks the start of the new line segment in 
+*        the downsized polygon.
+*     i2
+*        The index of a vertex within the old Polygon (supplied to 
+*        astDownsize) that marks the end of the new line segment in 
+*        the downsized polygon.
+*     nvert
+*        Total number of vertics in the old Polygon..
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returnd Value:
+*     Pointer to the new Segment structure. It should be freed using
+*     astFree when no longer needed.
+
+*/
+
+/* Local Variables: */
+   Segment *result;
+
+/* Check the global error status. */
+   if ( !astOK ) return NULL;
+
+/* Allocate memory for the new structure. */
+   result = astMalloc( sizeof( Segment ) );
+
+/* Check the pointer can be used safely. */
+   if( result ) {
+
+/* If the supplied ending index is less than the starting index, the
+   ending index must have gone all the way round the polygon and started
+   round again. Increase the ending index by the number of vertices to 
+   put it in the same cycle as the starting index. */
+      if( i2 < i1 ) i2 += nvert;
+
+/* If the supplied starting index is within the first cycle (i.e. zero ->
+   nvert-1 ), use the indices as they are (which may mean that the ending
+   index is greater than nvert, but this is handled correctly by other
+   functions). */
+      if( i1 < nvert ) {
+         result->i1 = i1;
+         result->i2 = i2;
+
+/* If the supplied starting index is within the second cycle (i.e. nvert 
+   or greater) the endign index will be even greater, so we can reduce
+   both by "nvert" to put them both in the first cycle. The goal is that
+   the starting index should always be in the first cycle, but the ending
+   index may possibly be in the second cycle. */
+      } else {
+         result->i1 = i1 - nvert;
+         result->i2 = i2 - nvert;
+      }
+
+/* Nullify the links to other Segments */
+      result->next = NULL;
+      result->prev = NULL;
+   }
+
+/* Return the pointer to the new Segment structure. */
+   return result;
 }
 
 static double Polywidth( AstFrame *frm, AstLineDef **edges, int i, int nv, 
@@ -1353,6 +2058,62 @@ static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr,
 /* Return a non-zero value to indicate that this class supports the
    astRegTrace method. */
    return 1;
+}
+
+static Segment *RemoveFromChain( Segment *head, Segment *seg, int *status ){
+/*
+*  Name:
+*     RemoveFromChain
+
+*  Purpose:
+*     Remove a Segment from the link list maintained by astDownsize.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "polygon.h"
+*     Segment *RemoveFromChain( Segment *head, Segment *seg, int *status )
+
+*  Class Membership:
+*     Polygon member function 
+
+*  Description:
+*     The supplied Segment is removed form the list, and the gap is
+*     closed up.
+
+*  Parameters:
+*     head
+*        The Segment structure at the head of the list.
+*     seg
+*        The Segment to be removed from the list.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     Pointer to the link head (which will have changed if "seg" was the
+*     original head).
+
+*/
+
+/* Check the global error status. */
+   if ( !astOK ) return head;
+
+/* If the Segment was the original head, make the next segment the new
+   head. */
+   if( head == seg ) head = seg->next;
+
+/* Close up the links between the Segments on either side of the segment
+   being removed. */
+   if( seg->prev ) seg->prev->next = seg->next;
+   if( seg->next ) seg->next->prev = seg->prev;
+
+/* Nullify the links in the segment being removed. */
+   seg->next = NULL;
+   seg->prev = NULL;
+
+/* Return the new head. */
+   return head;
 }
 
 static void ResetCache( AstRegion *this, int *status ){
@@ -2641,6 +3402,20 @@ AstPolygon *astLoadPolygon_( void *mem, size_t size, AstPolygonVtab *vtab,
    Note that the member function may not be the one defined here, as it may
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
+
+
+AstPolygon *astDownsize_( AstPolygon *this, double maxerr, int maxvert, 
+                          int *status ) {
+   if ( !astOK ) return NULL;
+   return (**astMEMBER(this,Polygon,Downsize))( this, maxerr, maxvert, status );
+}
+
+
+
+
+
+
+
 
 
 

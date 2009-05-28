@@ -436,6 +436,7 @@ c      PARAMETER ( AST__UKERNN = 2 )
 *  Polygon class.
       INTEGER AST_POLYGON
       LOGICAL AST_ISAPOLYGON
+      INTEGER AST_DOWNSIZE
 
 *  Circle class.
       INTEGER AST_CIRCLE

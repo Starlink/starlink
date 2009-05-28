@@ -16,10 +16,13 @@
 *  Routines Defined:
 *     AST_ISAPOLYGON
 *     AST_POLYGON
+*     AST_DOWNSIZE
 
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
 *     Research Councils
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -43,6 +46,8 @@
 *  History:
 *     27-OCT-2004 (DSB):
 *        Original version.
+*     28-MAY-2009 (DSB):
+*        Added AST_DOWNSIZE.
 */
 
 /* Define the astFORTRAN77 macro which prevents error messages from
@@ -105,3 +110,22 @@ F77_INTEGER_FUNCTION(ast_polygon)( INTEGER(FRAME),
    )
    return RESULT;
 }
+
+F77_INTEGER_FUNCTION(ast_downsize)( INTEGER(THIS),
+                                    DOUBLE(MAXERR),
+                                    INTEGER(MAXVERT),
+                                    INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_DOUBLE(MAXERR)
+   GENPTR_INTEGER(MAXVERT)
+   F77_INTEGER_TYPE(RESULT);
+
+   astAt( "AST_DOWNSIZE", NULL, 0 );
+   astWatchSTATUS(
+      RESULT = astP2I( astDownsize( astI2P( *THIS ), *MAXERR, *MAXVERT ) );
+   )
+   return RESULT;
+}
+
+
+
