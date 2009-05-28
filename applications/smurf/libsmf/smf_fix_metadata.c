@@ -99,6 +99,9 @@
    without having to use many variables */
 
 struct FitsHeaderStruct {
+  double obsgeox;
+  double obsgeoy;
+  double obsgeoz;
   int obsnum;
   int utdate;
   int jigl_cnt;
@@ -213,6 +216,9 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
   smf_getfitsi( hdr, "JOS_MIN", &(fitsvals.jos_min), status );
   smf_getfitsi( hdr, "NREFSTEP", &(fitsvals.nrefstep), status );
   smf_getfitsi( hdr, "JIGL_CNT", &(fitsvals.jigl_cnt), status );
+  smf_getfitsd( hdr, "OBSGEO-X", &(fitsvals.obsgeox), status );
+  smf_getfitsd( hdr, "OBSGEO-Y", &(fitsvals.obsgeoy), status );
+  smf_getfitsd( hdr, "OBSGEO-Z", &(fitsvals.obsgeoz), status );
 
   /* FITS header fix ups */
 
@@ -229,6 +235,30 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
                       "[GHz] LO Frequency at end of obs.", status );
     have_fixed = 1;
   }
+
+  /*
+   * Telescope position
+   *  Before 20061013 observations had inaccurate telescope position.
+   *  Needs to be replaced with the version used at the time by the telescope.
+   *  Sometimes an old position was used for testing even after 20061013 since the coordinates
+   *  were not obtained directly from the telescope.
+   *  After 20080323 the telescope position was updated again but those files are all correct.
+   *  We do not adopt the new position since we have to be consistent with the AZEL numbers
+   *  stored in JCMTSTATE.
+   */
+  if (fitsvals.utdate < 20080323) {
+    if ( fitsvals.obsgeox == -5464545.0 ) {
+      /* hard-coded OBSGEO-X implies -Y and -Z also wrong */
+      msgOutif( msglev, "", "Correcting telescope coordinates.", status );
+      smf_fits_updateD( hdr, "OBSGEO-X", -5464594.335493, NULL, status );
+      smf_fits_updateD( hdr, "OBSGEO-Y", -2492695.151639, NULL, status );
+      smf_fits_updateD( hdr, "OBSGEO-Z", 2150964.058506, NULL, status );
+      smf_fits_updateD( hdr, "LONG-OBS", 19.82583335521, NULL, status );
+      smf_fits_updateD( hdr, "LAT-OBS", -155.4797222301, NULL, status );
+      have_fixed = 1;
+    }
+  }
+
 
   /* JCMTSTATE fix ups */
 
