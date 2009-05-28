@@ -13,10 +13,20 @@
       `staircase', dots or markers at each point, and lines 
       connecting data points (the only available mode previously).
 
+   o  COLCOMP
+   
+      -  Parameter BADCOL has the additional option of an HTML 
+      colour code.
+
    o  CONVOLVE
 
       -  No longer aborts if a slice within a cube contains no 
       good data.
+
+   o  DISPLAY
+   
+      -  Parameter BADCOL has the additional option of an HTML 
+      colour code.
 
    o  FITSMOD
 

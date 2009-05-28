@@ -78,6 +78,8 @@
 *        if it is not present, the nearest colour from the palette is 
 *        selected.
 *
+*        -  An HTML colour code such as \#ff002d.
+*
 *        If the colour is to remain unaltered as the lookup table is
 *        manipulated choose an integer between 0 and 15, or a named
 *        colour.  The suggested default is the current value. 
