@@ -516,7 +516,9 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
     missing_exp = 1;
     msgOutif( msglev, "", INDENT "Missing ACS_EXPOSURE", status );
   }
-  if ( (tmpState[0].acs_offexposure == VAL__BADR) || (tmpState[0].acs_offexposure < (0.80 * steptime)) ) {
+  /* Skydips do not have off exposures */
+  if ( hdr->obstype != SMF__TYP_SKYDIP &&
+       ((tmpState[0].acs_offexposure == VAL__BADR) || (tmpState[0].acs_offexposure < (0.80 * steptime))) ) {
     missing_off = 1;
     msgOutif( msglev, "", INDENT "Missing ACS_OFFEXPOSURE", status );
   }
