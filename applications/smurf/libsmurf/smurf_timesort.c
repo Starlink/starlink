@@ -1002,36 +1002,53 @@ void smurf_timesort( int *status ) {
                   timescl = astGetC( cfrm, "TimeScale(3)" );
                   timeorg = astGetC( cfrm, "TimeOrigin(3)" );
                   timeunt = astGetC( cfrm, "Unit(3)" );
-         
+
+                  msgSetc( "TSYS", timesys );
+                  msgSetc( "TSCL", timescl );
+                  msgSetc( "TORG", timeorg );
+                  msgSetc( "TUNT", timeunt );
+                  msgOutif( MSG__VERB, "", "Retrieved timesys, timescl, timeorg,"
+                            " and timeunt of (^TSYS), (^TSCL), (^TORG), (^TUNT)",
+                            status );
+                  
 /* For later input NDFs, report an error if any of the details are
    different. */
                } else if( *status == SAI__OK ) {
                   if( strcmp( timesys, astGetC( cfrm, "System(3)" ) ) ) {
                      ndfMsg( "N", indf1 );
                      msgSetc( "T", astGetC( cfrm, "System(3)" ) );
+                     msgSetc( "TE", timesys );
                      *status = SAI__ERROR;
-                     errRep( "", "Unexpected time system (^T) in \"^N\".",
+                     errRep( "",
+                             "Unexpected time system (^T) in \"^N\" does not "
+                             "match first time system (^TE).",
                              status );
       
                   } else if( strcmp( timescl, astGetC( cfrm, "TimeScale(3)" ) ) ) {
                      ndfMsg( "N", indf1 );
                      msgSetc( "T", astGetC( cfrm, "TimeScale(3)" ) );
+                     msgSetc( "TE", timescl );
                      *status = SAI__ERROR;
-                     errRep( "", "Unexpected time scale (^T) in \"^N\".",
+                     errRep( "", "Unexpected time scale (^T) in \"^N\" does not "
+                             "match first time scale (^TE).",
                              status );
       
                   } else if( strcmp( timeorg, astGetC( cfrm, "TimeOrigin(3)" ) ) ) {
                      ndfMsg( "N", indf1 );
                      msgSetc( "T", astGetC( cfrm, "TimeOrigin(3)" ) );
+                     msgSetc( "TE", timeorg );
                      *status = SAI__ERROR;
-                     errRep( "", "Unexpected time origin (^T) in \"^N\".",
+                     errRep( "", "Unexpected time origin (^T) in \"^N\" does not "
+                             "match first time origin (^TE).",
                              status );
       
                   } else if( strcmp( timeunt, astGetC( cfrm, "Unit(3)" ) ) ) {
                      ndfMsg( "N", indf1 );
                      msgSetc( "T", astGetC( cfrm, "Unit(3)" ) );
+                     msgSetc( "TE", timeunt );
                      *status = SAI__ERROR;
-                     errRep( "", "Unexpected time unit (^T) in \"^N\".",
+                     errRep( "", "Unexpected time unit (^T) in \"^N\" does not "
+                             "match first time unit (^TE).",
                              status );
                   }
                }
