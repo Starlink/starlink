@@ -783,9 +783,15 @@ static void FindMax( Segment *seg, AstFrame *frm, double *x, double *y,
       i2b = nv;
    }
 
+/* If the segment has no intermediate vertices, set the segment error to
+   zero and return. */
+   if( n < 1 ) {
+      seg->error = 0.0;
+      seg->imax = i1;
+
 /* For speed, we use simple plane geometry if the Polygon is defined in a
    simple Frame. */
-   if( !strcmp( astGetClass( frm ), "Frame" ) ) {
+   } else if( !strcmp( astGetClass( frm ), "Frame" ) ) {
 
 /* Point "a" is the vertex that marks the start of the segment. Point "b" 
    is the vertex that marks the end of the segment. */
