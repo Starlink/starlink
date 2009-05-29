@@ -116,6 +116,8 @@ struct FitsHeaderStruct {
   char focaxis[2];
   int nfocstep;
   int focstep;
+  double instap_x;
+  double instap_y;
 };
 
 #define FUNC_NAME "smf_fix_metadata"
@@ -128,6 +130,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
   double dateobs;            /* MJD UTC of observation start */
   AstFitsChan * fits = NULL; /* FITS header (FitsChan) */
   struct FitsHeaderStruct fitsvals; /* Quick access Fits header struct */
+  int has_dhsver = 0;        /* Do we have DHSVER header? */
   int have_fixed = 0;        /* Did we fix anything? */
   smfHead *hdr = NULL;       /* Data header struct */
   size_t i;
@@ -209,6 +212,11 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
      it is from DATE-OBS or JCMTSTATE */
   smf_find_dateobs( hdr, &dateobs, NULL, status );
 
+  /* Determine that we have a DHSVER header. This can be used to decide whether
+     we have already fixed up this header. Some things can be determined from the values,
+     but others are just fixups involving change of sign convention. */
+  has_dhsver = astTestFits( fits, "DHSVER", NULL);
+
   /* Read some header values that are likely to be useful. Use a struct for the results
      to stop bloat of variable names. KeyMap or FitsChan are too cumbersone for multiple
      accesses.*/
@@ -222,6 +230,8 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
   smf_getfitsd( hdr, "OBSGEO-X", &(fitsvals.obsgeox), status );
   smf_getfitsd( hdr, "OBSGEO-Y", &(fitsvals.obsgeoy), status );
   smf_getfitsd( hdr, "OBSGEO-Z", &(fitsvals.obsgeoz), status );
+  smf_getfitsd( hdr, "INSTAP_X", &(fitsvals.instap_x), status );
+  smf_getfitsd( hdr, "INSTAP_Y", &(fitsvals.instap_y), status );
 
   /* FITS header fix ups */
 
@@ -262,6 +272,15 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
     }
   }
 
+  /* Instrument aperture changed sign convention when we started reading it from the TCS.
+     See JCMT fault 20090330.009 */
+  if (!has_dhsver && fitsvals.utdate < 20080508
+      && ( fitsvals.instap_x != 0.0 || fitsvals.instap_y != 0.0) ) {
+    msgOutif( msglev, "", INDENT "Fixing instrument aperture sign convention.", status );
+    smf_fits_updateD( hdr, "INSTAP_X", -1.0 * fitsvals.instap_x, NULL, status );
+    smf_fits_updateD( hdr, "INSTAP_Y", -1.0 * fitsvals.instap_y, NULL, status );
+    have_fixed = 1;
+  }
 
   /* JCMTSTATE fix ups */
 
@@ -430,6 +449,13 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
     }
     have_fixed = 1;
 
+  }
+
+  /* If we have fixed up the header, we need to record this by modifying the
+     DHSVER header */
+  if (have_fixed) {
+    /* need to include date and consider not overwriting previous value */
+    smf_fits_updateS( hdr, "DHSVER", "MOD", "Data Handling Version", status );
   }
 
   return have_fixed;
