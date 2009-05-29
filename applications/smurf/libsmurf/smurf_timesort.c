@@ -150,7 +150,9 @@
 *          output NDF will be created holding all the input data. [!]
 
 *  Authors:
-*     David Berry (JAC, UCLan)
+*     DSB: David Berry (JAC, UCLan)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
+*     BEC: Brad Cavanagh (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -189,6 +191,8 @@
 *        Handle single time slice NDFs correctly.
 *     24-APR-2009 (TIMJ):
 *        Now summarizes the input observations.
+*     29-MAY-2009 (BEC):
+*        Add some debugging messages.
 
 *  Copyright:
 *     Copyright (C) 2007-2009 Science and Technology Facilities Council.
@@ -1007,7 +1011,7 @@ void smurf_timesort( int *status ) {
                   msgSetc( "TSCL", timescl );
                   msgSetc( "TORG", timeorg );
                   msgSetc( "TUNT", timeunt );
-                  msgOutif( MSG__VERB, "", "Retrieved timesys, timescl, timeorg,"
+                  msgOutif( MSG__DEBUG, "", "Retrieved timesys, timescl, timeorg,"
                             " and timeunt of (^TSYS), (^TSCL), (^TORG), (^TUNT)",
                             status );
                   
