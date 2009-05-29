@@ -121,6 +121,7 @@ struct FitsHeaderStruct {
   double instap_x;
   double instap_y;
   char chop_crd[81];
+  char instrume[81];
 };
 
 /* Struct defining dut1 information */
@@ -373,6 +374,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
   smf_getfitsd( hdr, "CHOP_THR", &(fitsvals.chop_thr), status );
   smf_getfitsd( hdr, "CHOP_PA", &(fitsvals.chop_pa), status );
   smf_getfitss( hdr, "CHOP_CRD", fitsvals.chop_crd, sizeof(fitsvals.chop_crd), status );
+  smf_getfitss( hdr, "INSTRUME", fitsvals.instrume, sizeof(fitsvals.instrume), status );
 
   /* FITS header fix ups */
 
@@ -441,6 +443,13 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
     smf_fits_updateD( hdr, "INSTAP_X", -1.0 * fitsvals.instap_x, NULL, status );
     smf_fits_updateD( hdr, "INSTAP_Y", -1.0 * fitsvals.instap_y, NULL, status );
     have_fixed = 1;
+  }
+  /* RxW data did some strange things to aperture */
+  if ( fitsvals.utdate < 20090601 && strncasecmp( fitsvals.instrume, "RxW", 3 ) == 0 &&
+       ( fitsvals.instap_x != 0.0 || fitsvals.instap_y != 0.0) ) {
+    msgOutiff( msglev, "", INDENT "Fixing instrument aperture to 0,0 for %s.", status, fitsvals.instrume );
+    smf_fits_updateD( hdr, "INSTAP_X", 0.0, NULL, status );
+    smf_fits_updateD( hdr, "INSTAP_Y", 0.0, NULL, status );
   }
 
   /* JCMTSTATE fix ups */
