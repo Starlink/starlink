@@ -102,6 +102,8 @@ struct FitsHeaderStruct {
   double obsgeox;
   double obsgeoy;
   double obsgeoz;
+  double chop_thr;
+  double chop_pa;
   int obsnum;
   int utdate;
   int jigl_cnt;
@@ -118,6 +120,7 @@ struct FitsHeaderStruct {
   int focstep;
   double instap_x;
   double instap_y;
+  char chop_crd[81];
 };
 
 #define FUNC_NAME "smf_fix_metadata"
@@ -232,6 +235,9 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
   smf_getfitsd( hdr, "OBSGEO-Z", &(fitsvals.obsgeoz), status );
   smf_getfitsd( hdr, "INSTAP_X", &(fitsvals.instap_x), status );
   smf_getfitsd( hdr, "INSTAP_Y", &(fitsvals.instap_y), status );
+  smf_getfitsd( hdr, "CHOP_THR", &(fitsvals.chop_thr), status );
+  smf_getfitsd( hdr, "CHOP_PA", &(fitsvals.chop_pa), status );
+  smf_getfitss( hdr, "CHOP_CRD", fitsvals.chop_crd, sizeof(fitsvals.chop_crd), status );
 
   /* FITS header fix ups */
 
@@ -309,6 +315,31 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
       have_fixed = 1;
     }
   }
+
+  /* Older data have BAD values for chop entries. For AZEL chopping we can easily fill in an estimate,
+     but for TRACKING chops we will have to do some work. Only bother for CHOP observations */
+  if (*status == SAI__OK && hdr->swmode == SMF__SWM_CHOP && 
+      (tmpState[0].smu_az_chop_x == VAL__BADD || tmpState[0].smu_az_chop_y == VAL__BADD )) {
+    msgOutif( msglev, "", INDENT "Blanked SMU_AZ_CHOP entries.", status );
+
+    if (strcmp( fitsvals.chop_crd, "AZEL" ) == 0) {
+      /* we need AZEL numbers and these are already in AZEL so this is easy */
+      double pa = fitsvals.chop_pa * AST__DD2R;
+      double chop_x = - (fitsvals.chop_thr / 2.0) * sin( pa );
+      double chop_y = (fitsvals.chop_thr / 2.0) * cos( pa );
+
+      for (i = 0; i < hdr->nframes; i++ ) {
+        if (tmpState[i].smu_az_chop_x == VAL__BADD) tmpState[i].smu_az_chop_x = chop_x;
+        if (tmpState[i].smu_az_chop_y == VAL__BADD) tmpState[i].smu_az_chop_y = chop_y;
+      }
+      have_fixed = 1;
+    } else {
+      *status = SAI__ERROR;
+      errRepf( "", "Missing SMU_AZ_CHOP entry but not yet able to fix for %s chop coordinate system",
+               status, fitsvals.chop_crd );
+    }
+  }
+
 
   /* Off exposure time - depends on observing mode.
 
