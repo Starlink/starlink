@@ -342,7 +342,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
 
     if (fitsvals.utdate > utmax) {
       *status = SAI__ERROR;
-      errRepf( "", INDENT "ACS_*EXPOSURE missing or BAD but data are newer than expected (%d > %d)",
+      errRepf( "", "ACS_*EXPOSURE missing or BAD but data are newer than expected (%d > %d)",
                status, fitsvals.utdate, utmax);
     }
 
