@@ -58,11 +58,13 @@
 *        Factor out into separate function.
 *     28-JUL-2008 (TIMJ):
 *        Parameter update is now optional.
+*     28-MAY-2009 (TIMJ):
+*        Remove some code duplication by using a loop.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2007 Particle Physics and Astronomy Research Council.
-*     Copyright (C) 2007, 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2007-2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -115,6 +117,11 @@ smf_store_outputbounds (int updatepars, const int lbnd_out[3],
   char tmpstr[10];           /* temporary unit string */
   double wcslbnd_out[3];     /* Array of lower bounds of output cube */
   double wcsubnd_out[3];     /* Array of upper bounds of output cube */
+
+  /* Parameter names associated with the bounds */
+  const char * bounds[] = {
+    "FTR", "FTL", "FBR", "FBL", NULL
+  };
 
 
   if (*status != SAI__OK) return;
@@ -196,25 +203,12 @@ smf_store_outputbounds (int updatepars, const int lbnd_out[3],
 
    astTran2( oskymap, 4, gx_in, gy_in, 1, gx_out, gy_out );
    
-/* Horrible code duplication */
-   corner[ 0 ] = gx_out[ 0 ];
-   corner[ 1 ] = gy_out[ 0 ];
-   astNorm( oskyfrm, corner );
-   parPut1d( "FTR", 2, corner, status );
-
-   corner[ 0 ] = gx_out[ 1 ];
-   corner[ 1 ] = gy_out[ 1 ];
-   astNorm( oskyfrm, corner );
-   parPut1d( "FTL", 2, corner, status );
-
-   corner[ 0 ] = gx_out[ 2 ];
-   corner[ 1 ] = gy_out[ 2 ];
-   astNorm( oskyfrm, corner );
-   parPut1d( "FBR", 2, corner, status );
-
-   corner[ 0 ] = gx_out[ 3 ];
-   corner[ 1 ] = gy_out[ 3 ];
-   astNorm( oskyfrm, corner );
-   parPut1d( "FBL", 2, corner, status );
+   /* Store the bounds in the parameters */
+   for (i = 0; i < 4; i++) {
+     corner[ 0 ] = gx_out[ i ];
+     corner[ 1 ] = gy_out[ i ];
+     astNorm( oskyfrm, corner );
+     parPut1d( bounds[i], 2, corner, status );
+   }
 
 }
