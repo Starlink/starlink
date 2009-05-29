@@ -193,6 +193,10 @@
 *        Now summarizes the input observations.
 *     29-MAY-2009 (BEC):
 *        Add some debugging messages.
+*     29-MAY-2009 (TIMJ):
+*        Can not rely on astGetC to not be called 50 times whilst caching
+*        values for comparison. When we tried to sort 8 files at once random
+*        values turned up in timesys.
 
 *  Copyright:
 *     Copyright (C) 2007-2009 Science and Technology Facilities Council.
@@ -240,6 +244,7 @@
 #include "star/atl.h"
 #include "star/kaplibs.h"
 #include "par.h"
+#include "star/one.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"
@@ -287,10 +292,10 @@ void smurf_timesort( int *status ) {
    const char *dom = NULL;
    const char *key = NULL;
    const char *lab = NULL;
-   const char *timeorg = NULL;
-   const char *timescl = NULL;
-   const char *timesys = NULL;
-   const char *timeunt = NULL;
+   char timeorg[32];
+   char timescl[32];
+   char timesys[32];
+   char timeunt[32];
    const double *tsys;
    dim_t irec;
    dim_t jrec;
@@ -1002,10 +1007,10 @@ void smurf_timesort( int *status ) {
 /* If this is the first input NDF, record the main details of the time
    axis. */
                if( isubscan == 0 ) {
-                  timesys = astGetC( cfrm, "System(3)" );
-                  timescl = astGetC( cfrm, "TimeScale(3)" );
-                  timeorg = astGetC( cfrm, "TimeOrigin(3)" );
-                  timeunt = astGetC( cfrm, "Unit(3)" );
+                  one_strlcpy( timesys, astGetC( cfrm, "System(3)" ), sizeof(timesys), status );
+                  one_strlcpy( timescl, astGetC( cfrm, "TimeScale(3)" ), sizeof(timescl), status );
+                  one_strlcpy( timeorg, astGetC( cfrm, "TimeOrigin(3)" ), sizeof(timeorg), status);
+                  one_strlcpy( timeunt, astGetC( cfrm, "Unit(3)" ), sizeof(timeunt), status );
 
                   msgSetc( "TSYS", timesys );
                   msgSetc( "TSCL", timescl );
