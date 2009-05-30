@@ -47,7 +47,7 @@
 *        Initial version.
 *     29-MAY-2009 (TIMJ):
 *        Use sysconf to get number of processors rather than non-portable
-*        parsing of /proc.
+*        parsing of /proc. Use strtol instead of sscanf.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -90,22 +90,16 @@ int smf_get_nthread( int *status ){
 
 /* Local Variables */
    const char *env_text = NULL;
-   int nc;
-   int result;
+   int result = 1;    /* Number of threads selected */
    
-/* Initialise */
-   result = 1;
-
 /* Check inherited status */
    if( *status != SAI__OK ) return result;
 
 /* If the SMURF_THREADS environment variable has been set, use its value. */
    env_text = getenv( "SMURF_THREADS" );
    if( env_text ) {
-      nc = 0;
-      result = 0;
-      if( sscanf( env_text, " %d%n", &result, &nc ) != 1 || 
-          nc != (int) strlen( env_text ) || result < 1 ) {
+      result = strtol( env_text, NULL, 10 );
+      if( result < 1 ) {
          *status = SAI__ERROR;
          msgSetc( "S", env_text );
          errRep( "", "Illegal value for environment variable "
