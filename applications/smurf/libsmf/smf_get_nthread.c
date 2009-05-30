@@ -30,14 +30,8 @@
 *     means one worker thread in addition to the required manager thread
 *     that co-ordinates the workers (i.e. the main thread in which the
 *     application is started). The default value is the number
-*     of CPU cores available (determined by searching the /proc/cpuinfo
-*     file for lines that look like "processor : <int>"), but this can be
-*     over-ridden by setting the environment variable SMURF_THREADS to some
-*     other value.
-
-*     NOTE, CURRENTLY THE ABOVE IS NOT TRUE. THE DEFAULT IS CURRENTLY 1.
-*     THIS MAY BE CHANGED ONCE MORE EXPERIENCE WITH MULTI-THREADED SMURF
-*     HAS BEEN OBTAINED.
+*     of CPU cores available, but this can be over-ridden by setting the
+*     environment variable SMURF_THREADS to some other value.
 
 *  Notes:
 *     - This function is not in smf_threads.c because it does not make
@@ -45,15 +39,19 @@
 
 *  Authors:
 *     David S Berry (JAC, UCLan)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     9-JUN-2008 (DSB):
 *        Initial version.
+*     29-MAY-2009 (TIMJ):
+*        Use sysconf to get number of processors rather than non-portable
+*        parsing of /proc.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2008, 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -79,6 +77,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 /* Starlink includes */
 #include "sae_par.h"
@@ -90,11 +89,8 @@
 int smf_get_nthread( int *status ){
 
 /* Local Variables */
-   FILE *fd = NULL;
-   char line[ 200 ];
    const char *env_text = NULL;
    int nc;
-   int p;
    int result;
    
 /* Initialise */
@@ -115,33 +111,15 @@ int smf_get_nthread( int *status ){
          errRep( "", "Illegal value for environment variable "
                  "SMURF_THREADS: '^S'.", status );
       } 
+      msgOutiff( MSG__VERB, "", "Using %d threads obtained from environment variable",
+                 status, result );
 
-
-
-
-/* FOR THE MOMENT RETURN A DEFAULT OF 1. */
-   } else if( 1 ) {
-      result = 1;
-
-
-
-/* Otherwise, attempt to open the /proc/cpuinfo file. */
+/* Otherwise, use sysconf. This is fairly portable (Tru64, Linux, OSX, Solaris)
+   and supposedly POSIX compliant. */
    } else {
-      fd = fopen( "/proc/cpuinfo", "r" );
-      if( fd ) { 
-   
-/* Read the next line of text from /proc/cpuinfo into "line". */
-         result = 0;
-         while( fgets( line, 200, fd ) ) {
-   
-/* If it looks like "processor : <int>" increment the count of matching
-      lines. */
-            if( sscanf( line, "processor : %d", &p ) ) result++;
-         }
-   
-/* Close the file */
-         fclose( fd );
-      } 
+      result = sysconf(_SC_NPROCESSORS_ONLN);
+      msgOutiff( MSG__VERB, "", "Using %d threads derived from number of CPU cores",
+                 status, result );
    }
 
 /* Ensure we have at least one thread. */
