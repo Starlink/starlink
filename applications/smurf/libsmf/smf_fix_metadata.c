@@ -328,7 +328,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
     if (*status == SAI__OK && steptime != VAL__BADD && steptime < VAL__SMLD) {
       *status = SAI__ERROR;
       msgSetd( "STP", steptime);
-      errRep( "", FUNC_NAME ": Determined a negative steptime (^STP). "
+      errRep( "", FUNC_NAME ": Steptime must be positive but is ^STP sec. "
               "This can not happen", status);
       steptime = VAL__BADD;
     }
