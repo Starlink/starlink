@@ -231,6 +231,7 @@ via the forget() method.
 
 sub DESTROY {
   my $self = shift;
+  local($., $@, $!, $^E, $?);
   if (defined $self->pid) {
     # Cant use the auto destructor at this point since other
     # references to the object may exist
