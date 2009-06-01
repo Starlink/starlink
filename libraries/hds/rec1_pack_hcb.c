@@ -45,6 +45,7 @@
 /* Authors:                                                                 */
 /*    RFWS: R.F. Warren-Smith (STARLINK)                                    */
 /*    BKM:  B.K. McIlwrath    (STARLINK)                                    */
+/*    TIMJ: Tim Jenness       (JAC, Hawaii)                                 */
 /*    {@enter_new_authors_here@}                                            */
 
 /* History:                                                                 */
@@ -63,6 +64,8 @@
 /*       Choice of HDS V3 (32-bit) or HDS-V4 (64-bit) HCB                   */
 /*    24-JUL-2007 (BKM):                                                    */
 /*       Positively identify if writing HCB in HDS3 or HDS4 format!         */
+/*    01-JUN-2009 (TIMJ):                                                   */
+/*       Initialise phcb[31] in 64-bit mode to fix valgrind warning.        */
 /*    {@enter_further_changes_here@}                                        */
 
 /* Bugs:                                                                    */
@@ -116,6 +119,7 @@
 
       phcb [ 29 ] = 0;
       phcb [ 30 ] = 0;
+      phcb [ 31 ] = 0;
       byte = 31;
    } else {
 
