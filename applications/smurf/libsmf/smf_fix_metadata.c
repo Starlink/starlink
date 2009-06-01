@@ -42,6 +42,7 @@
 
 *  Authors:
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     EC: Ed Chapin (UBC)
 
 *  Notes:
 *     o Currently only examines ACSIS data. All other smfDatas cause the
@@ -58,9 +59,12 @@
 *        Initial version. Just processes ACS_EXPOSURE and ACS_OFFEXPOSURE
 *     2009-05-25 (TIMJ):
 *        Use new smf_obsmap_report API.
+*     2009-06-01 (EC):
+*        Need to include strings.h for strncasecmp
 
 *  Copyright:
 *     Copyright (C) 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2009 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -94,6 +98,7 @@
 #include "smf_err.h"
 
 #include <stdio.h>
+#include <strings.h>
 
 /* Local struct containing header information that may be accessed multiple times
    without having to use many variables */
