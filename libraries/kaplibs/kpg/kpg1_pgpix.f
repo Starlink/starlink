@@ -45,6 +45,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -70,6 +71,10 @@
 *  History:
 *     19-AUG-1998 (DSB):
 *        Original version.
+*     2-JUN-2009 (DSB):
+*        Ensure the image does not quite fill the PGPLOT viewport. 
+*        If the image exactly fills the viewport, rounding errors in 
+*        PGPLOT can cause PGPLOT to use incorrect array bounds. 
 *     {enter_changes_here}
 
 *  Bugs:
@@ -83,6 +88,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and functions
+      INCLUDE 'PRM_PAR'          ! VAL_ constants 
 
 *  Arguments Given:
       INTEGER IPLOT
@@ -102,6 +108,11 @@
       DOUBLE PRECISION XOUT( 2 ) ! X co-ords in GRAPHICS Domain
       DOUBLE PRECISION YIN( 2 )  ! Y co-ords in supplied Domain
       DOUBLE PRECISION YOUT( 2 ) ! Y co-ords in GRAPHICS Domain
+      REAL DELTA                 ! Boundary to allow for rounding errors
+      REAL X1, Y1                ! World coords at bottom left of PGPLOT
+                                 ! viewport
+      REAL X2, Y2                ! World coords at top right of PGPLOT
+                                 ! viewport
 *.
 
 *  Check the inherited status. 
@@ -129,9 +140,21 @@
 
 *  If succesful, draw the image.
          IF( STATUS .EQ. SAI__OK ) THEN
-            CALL PGPIXL( COLI, NX, NY, 1, NX, 1, NY, REAL( XOUT( 1 ) ),
-     :                   REAL( XOUT( 2 ) ), REAL( YOUT( 1 ) ),
-     :                   REAL( YOUT( 2 ) ) )
+
+*  First ensure that the image does not quite fill the PGPLTO viewport.
+*  This is to allow for some rounding error in PGPLOT.
+            CALL PGQWIN( X1, X2, Y1, Y2 )
+
+            DELTA = 10*VAL__EPSR*( X2 - X1 )
+            X1 = MAX( REAL( XOUT( 1 ) ), X1 + DELTA )
+            X2 = MIN( REAL( XOUT( 2 ) ), X2 - DELTA )
+
+            DELTA = 10*VAL__EPSR*( Y2 - Y1 )
+            Y1 = MAX( REAL( YOUT( 1 ) ), Y1 + DELTA )
+            Y2 = MIN( REAL( YOUT( 2 ) ), Y2 - DELTA )
+
+*  Now draw the image
+            CALL PGPIXL( COLI, NX, NY, 1, NX, 1, NY, X1, X2, Y1, Y2 )
          END IF
 
 *  Re-instate the original Current Frame in the Plot (modified by
