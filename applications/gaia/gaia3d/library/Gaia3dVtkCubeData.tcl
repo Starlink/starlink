@@ -137,7 +137,7 @@ itcl::class ::gaia3d::Gaia3dVtkCubeData {
       set wcs_ [$cubeaccessor getwcs]
       if { $limits != {} } {
          set shifts "[lindex $limits 0] [lindex $limits 2] [lindex $limits 4]"
-         set wcs_ [gaiautils::shiftwcs $wcs_ $shifts]
+         set wcs_ [gaiautils::shiftwcs $wcs_ $shifts 1]
       }
 
       #  The next section would deal with BAD pixels, if VisibilityConstraint
