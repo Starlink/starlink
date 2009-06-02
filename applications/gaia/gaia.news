@@ -80,6 +80,9 @@
     coordinates" toolbox has been fixed. Previously the reported Y 
     coordinates were those of the last position, not the current one.
 
+    It is now possible to resize the 3D toolboxes during the first 
+    rendering. Previously this could case the application to terminate.
+
   Lehuakona Release
   =================
 

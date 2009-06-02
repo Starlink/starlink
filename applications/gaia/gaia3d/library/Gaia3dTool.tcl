@@ -1222,12 +1222,17 @@ itcl::class gaia3d::Gaia3dTool {
             }
          }
 
-         #  Do rendering. If new data file reset camera to make sure the
+         #  Do rendering. 
+         $renwindow_ render
+
+         #  If this is a new data file reset camera to make sure the
          #  volume and everything else is withing clipping range.
+         #  NOTE must do this after the first full render in case the
+         #  window has been resized and some attributes are not initialised.
          if { $datachange == 1 } {
             $renwindow_ reset_camera
+            $renwindow_ render
          }
-         $renwindow_ render
       }
    }
 
