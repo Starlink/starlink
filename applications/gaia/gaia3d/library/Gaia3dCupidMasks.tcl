@@ -182,22 +182,24 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
                if { $display_($i) &&
                     [info exists cubename_($i)] && $cubename_($i) != {} } {
 
+                  set wcs [$imagedata_($i) get_wcs]
+
                   #  If required match the spectral coordinates using
                   #  sidebands. Both need setting and have DSBSpecFrames.
                   if { $dsbspecaxis_(target) != 0 && $dsbspecaxis_($i) != 0 } {
-                     gaiautils::astset $wcs_($i) \
+                     gaiautils::astset $wcs \
                         "AlignSideBand($dsbspecaxis_($i))=$match_sidebands_"
                   }
 
                   #  Connect the coordinates of this cube with the target.
-                  set wcs_current [gaiautils::astget $wcs_($i) "Current"]
-                  set wcs_base [gaiautils::astget $wcs_($i) "Base"]
-                  gaiautils::astset $wcs_($i) "Current=$wcs_base"
+                  set wcs_current [gaiautils::astget $wcs "Current"]
+                  set wcs_base [gaiautils::astget $wcs "Base"]
+                  gaiautils::astset $wcs "Current=$wcs_base"
 
                   set connection_wcs \
-                     [gaiautils::astconvert $wcs_($i) $target_wcs $domain]
-                  gaiautils::astset $wcs_($i) "Current=$wcs_current"
-                  gaiautils::astset $wcs_($i) "Base=$wcs_base"
+                     [gaiautils::astconvert $wcs $target_wcs $domain]
+                  gaiautils::astset $wcs "Current=$wcs_current"
+                  gaiautils::astset $wcs "Base=$wcs_base"
 
                   #  Create the segmenter for this mask.
                   create_segmenter_ $i $connection_wcs $renwindow
@@ -237,9 +239,10 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
          if { [info exists cubename_($i)] && $cubename_($i) != {} } {
 
             #  Check name of cube data, if changed need to release the
-            #  existing cube and access the new data.
+            #  existing cube and access the new data. Also true if the
+            #  limits are different.
             set newname [$cubeaccessor_($i) cget -dataset]
-            if { $cubename_($i) != $newname } {
+            if { $changed_limits_ || $cubename_($i) != $newname } {
 
                #  New cube or data has changed. Release existing cube and data.
                if { [info exists imagedata_($i)] && $imagedata_($i) != {} } {
@@ -250,24 +253,32 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
                $cubeaccessor_($i) configure -dataset $cubename_($i)
                $itk_component(cube$i) add_to_history $cubename_($i)
 
-               #  For speed of access cache the full WCS.
-               set wcs_($i) [$cubeaccessor_($i) getwcs]
-
-               #  And check for SpecFrames and DSBSpecFrames.
-               set dsbspecaxis_($i) [locate_axis_ $wcs_($i) "dsbspecframe"]
-               set specaxis_($i) [locate_axis_ $wcs_($i) "specframe"]
-
-               #  Access data, wrapping to an vtkImageData instance.
+               #  Wrap with an vtkImageData instance.
                set imagedata_($i) [gaia3d::Gaia3dVtkCubeData \#auto]
                $imagedata_($i) configure -cubeaccessor $cubeaccessor_($i) \
                   -checkbad 0 -nullvalue 0
+
+               #  Clip the range if requested.
+               if { $axlimits_ != {} } {
+                  $imagedata_($i) set_axis_limits $limits_axis_ $axlimits_
+               } else {
+                  $imagedata_($i) configure -limits {}
+               }
+
+               #  And read.
                $imagedata_($i) access
+
+               #  Finally check imagedata WCS for SpecFrames and DSBSpecFrames.
+               set wcs [$imagedata_($i) get_wcs]
+               set dsbspecaxis_($i) [locate_axis_ $wcs "dsbspecframe"]
+               set specaxis_($i) [locate_axis_ $wcs "specframe"]
             }
          }
 
          #  Always release objects.
          release_objects $i
       }
+      set changed_limits_ 0
    }
 
    #  Create objects to segment the mask into regions based on their data
@@ -506,6 +517,29 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
       return $axis
    }
 
+   #  Apply some pixel bounds to limit the cube data along the spectral
+   #  axis. Need a redraw to make this happen. "axlimits" is a pair
+   #  of values along axis "axis".
+   public method set_axis_limits {axis axlimits} {
+      if { $axis != $limits_axis_ || $axlimits != $axlimits_ } {
+         set changed_limits_ 1
+      } else {
+         set changed_limits_ 0
+      }
+      if { $itk_option(-apply_limits) } {
+         set limits_axis_ $axis
+         set axlimits_ $axlimits
+      } else {
+         set limits_axis_ {}
+         set axlimits_ {}
+      }
+   }
+
+   #  Clear any axes limits. Need a redraw to make this happen.
+   public method clear_axis_limits {} {
+      set limits_axis_ {}
+      set axlimits_ {}
+   }
 
    #  Configuration options: (public variables)
    #  ----------------------
@@ -519,6 +553,10 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
    #  Menu to populate with options for matching coordinate systems.
    itk_option define -options_menu options_menu Options_Menu {}
 
+   #  Whether to apply axis limits. Only useful when pixel bounds
+   #  are the same as the main cube.
+   itk_option define -apply_limits apply_limits Apply_Limits 1
+
    #  Protected variables: (available to instance)
    #  --------------------
 
@@ -527,9 +565,6 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
 
    #  The cube accessors.
    protected variable cubeaccessor_
-
-   #  The cached AST FrameSet.
-   protected variable wcs_
 
    #  Indices of the SpecFrame and DSBSpecFrame axes, if present.
    protected variable specaxis_
@@ -564,6 +599,13 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
 
    #  Usual labelwith.
    protected variable lwidth_ 7
+
+   #  Axis and limits used to clip any masks to the some range along
+   #  the spectral axis. Only useful if all masks have same pixel bounds
+   #  as the main cube and each other.
+   protected variable limits_axis_ {}
+   protected variable axlimits_ {}
+   protected variable changed_limits_ 0
 
    #  Common variables: (shared by all instances)
    #  -----------------

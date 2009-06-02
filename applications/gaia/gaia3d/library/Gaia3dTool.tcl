@@ -1316,7 +1316,6 @@ itcl::class gaia3d::Gaia3dTool {
          set changed_wcs 1
       }
 
-
       #  Check name of cube data, if changed re-access, or
       #  bad value handling changed.
       set newname [$cubeaccessor_ cget -dataset]
@@ -1364,9 +1363,11 @@ itcl::class gaia3d::Gaia3dTool {
                set ul [expr max($l1,$l2)]
                set axis [$itk_option(-gaiacube) get_axis]
                $imagedata_ set_axis_limits $axis "$ll $ul"
+               $itk_component(pixelmask) set_axis_limits $axis "$ll $ul"
             } else {
                #  No limits, so back to full cube.
                $imagedata_ configure -limits {}
+               $itk_component(pixelmask) clear_axis_limits
             }
          }
 
