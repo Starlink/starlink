@@ -9,8 +9,9 @@
 #     Add additional CUPID masks into a scene.
 
 #  Description:
-#     Series of controls for selecting CUPID cubes, choosing the values
-#     to display and how to colour them.
+#     Series of controls for selecting CUPID mask cubes, choosing the values
+#     to display, how to colour them and whether to display or just make
+#     available as stencils for segmenting related cubes.
 #
 #     The coordinate system used to match these cubes to the primary one
 #     associated with the Gaia3dTool instance can be made to take into
@@ -139,11 +140,14 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
       }
    }
 
-   #  Render any masks we have into a given renderer. The target coordinates
-   #  are defined by the supplied AST FrameSet.
-   public method render {renwindow target_wcs} {
+   #  Open all masks, renewing them as necessary. The target coordinates
+   #  (which connect to another cube) are defined by the supplied AST
+   #  FrameSet. This method should be called before "render", which
+   #  is only needed if any cubes are to be actually displayed (they
+   #  can also be used as stencils to segment the related cube).
+   public method open {target_wcs} {
 
-      #  Make sure all cube data is available. Also clear existing contours.
+      #  Make sure all cube data is available.
       open_cubes_
 
       if { $match_ } {
@@ -179,8 +183,7 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
          #  Don't want to exit this method without resetting the domain.
          catch {
             for { set i 0 } { $i < $itk_option(-maxcubes) } { incr i } {
-               if { $display_($i) &&
-                    [info exists cubename_($i)] && $cubename_($i) != {} } {
+               if { [info exists cubename_($i)] && $cubename_($i) != {} } {
 
                   set wcs [$imagedata_($i) get_wcs]
 
@@ -202,7 +205,7 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
                   gaiautils::astset $wcs "Base=$wcs_base"
 
                   #  Create the segmenter for this mask.
-                  create_segmenter_ $i $connection_wcs $renwindow
+                  create_segmenter_ $i $connection_wcs
 
                   #  Add all the required levels and lookup table.
                   update_segmenter_ $i
@@ -225,10 +228,19 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
       } else {
          #  Not matching. Transforms are unit maps.
          for { set i 0 } { $i < $itk_option(-maxcubes) } { incr i } {
-            if { $display_($i) && [info exists cubename_($i)] && $cubename_($i) != {} } {
-               create_segmenter_ $i {} $renwindow
+            if { [info exists cubename_($i)] && $cubename_($i) != {} } {
+               create_segmenter_ $i {}
                update_segmenter_ $i
             }
+         }
+      }
+   }
+
+   #  Render any masks we have already opened into a given renderer.
+   public method render {renwindow} {
+      for { set i 0 } { $i < $itk_option(-maxcubes) } { incr i } {
+         if { [info exists segmenter_($i)] } {
+            render_segmenter_ $i $renwindow
          }
       }
    }
@@ -284,19 +296,32 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
    #  Create objects to segment the mask into regions based on their data
    #  value: i is cube index, "wcs" is an AST Mapping/FrameSet connecting the
    #  cube coordinates to the graphics coordinates, can be {}.
-   protected method create_segmenter_ {i wcs renwindow} {
+   protected method create_segmenter_ {i wcs} {
       if { $cubename_($i) != {} } {
          if { $wcs != {} } {
             set segmenter_($i) [Gaia3dVtkSegmenter \#auto \
                                    -imagedata [$imagedata_($i) get_imagedata] \
-                                   -renwindow $renwindow -wcs $wcs]
+                                   -wcs $wcs]
          } else {
             set segmenter($i) [Gaia3dVtkSegmenter \#auto \
-                                   -imagedata [$imagedata_($i) get_imagedata] \
-                                   -renwindow $renwindow]
+                                  -imagedata [$imagedata_($i) get_imagedata]]
          }
+      }
+   }
+
+   #  Arrange for displayable segments to be rendered in the given 
+   #  window. Remove if not being displayed.
+   protected method render_segmenter_ {i renwindow} {
+
+      $segmenter_($i) configure -renwindow $renwindow
+
+      #  Only if displaying.
+      if { $display_($i) } {
          $segmenter_($i) add_to_window
          $segmenter_($i) set_visible
+      } else {
+         $segmenter_($i) remove_from_window
+         $segmenter_($i) set_invisible
       }
    }
 
@@ -371,7 +396,7 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
          catch {
             $segmenter_($i) remove_from_window
             ::delete object $segmenter_($i)
-            unset segmenter_($i,$j)
+            unset segmenter_($i)
          }
       }
    }
@@ -446,8 +471,8 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
          add_short_help $itk_component(cube$i) \
             {Name of a data file, must be a cube}
 
-         #  Which regions to display? All, selected (from catalogue?) or a given
-         #  list.
+         #  Which regions to display? XXX all, selected (from catalogue?) or a
+         #  given list.
          itk_component add values$i {
             util::LabelEntry $parent.values$i \
                -labelwidth $lwidth_ \
@@ -539,6 +564,33 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
    public method clear_axis_limits {} {
       set limits_axis_ {}
       set axlimits_ {}
+   }
+
+   #  Apply a segmenter to some external data using a stencil filter
+   #  (vtkPolyDataToImageStencil instance or similar).
+   public method connect_stencil_filter {i stencil_filter} {
+      puts "connect_stencil_filter: $i $stencil_filter"
+      if { [info exists segmenter_($i)] } {
+         puts "$i: $segmenter_($i) connect_stencil_filter $stencil_filter"
+         $segmenter_($i) connect_stencil_filter $stencil_filter
+      }
+   }
+
+   #  Return if a segmenter has "changed". That means that the values
+   #  it is extracted are different.
+   public method changed {i} {
+      if { [info exists segmenter_($i)] } {
+         return [$segmenter_($i) changed]
+      }
+      return 0
+   }
+
+   #  Return if a segmenter exists.
+   public method exists {i} {
+      if { [info exists segmenter_($i)] } {
+         return 1
+      }
+      return 0
    }
 
    #  Configuration options: (public variables)

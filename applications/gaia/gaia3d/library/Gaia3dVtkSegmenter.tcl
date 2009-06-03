@@ -88,6 +88,9 @@ itcl::class ::gaia3d::Gaia3dVtkSegmenter {
    #  Destructor:
    #  -----------
    destructor  {
+      $segmenter_ RemoveObserver ProgressEvent
+      $mapper_ RemoveObserver ProgressEvent
+
       remove_from_window
       $prop_ Delete
       $mapper_ Delete
@@ -123,6 +126,13 @@ itcl::class ::gaia3d::Gaia3dVtkSegmenter {
    #  value or a range of values (two values in a list element). The exception
    #  is if a single -1 is given. That means use all values in the mask.
    public method set_values {values} {
+
+      if { $values != $last_values_ } {
+         set values_changed_ 1
+         set last_values_ $values
+      } else {
+         set values_changed_ 0
+      }
 
       #  Clear all existing values.
       set nvalues_ 0
@@ -173,7 +183,7 @@ itcl::class ::gaia3d::Gaia3dVtkSegmenter {
       $lut SetTableRange $dmin_ $dmax_
       $lut SetScaleToLinear
       $lut Build
-      
+
       if { $nlut_ == 3 } {
          #  Random grey.
          set math [vtkMath New]
@@ -182,7 +192,7 @@ itcl::class ::gaia3d::Gaia3dVtkSegmenter {
             set value [$math Random .2 1]
             $lut  SetTableValue $i $value $value $value $opacity_
          }
-
+         $math Delete
       } elseif { $nlut_ == 2 } {
          #  Rainbow, the default lut, just make sure we get all colours.
          $lut SetHueRange 0.0 1.0
@@ -195,6 +205,7 @@ itcl::class ::gaia3d::Gaia3dVtkSegmenter {
             $lut  SetTableValue $i \
                [$math Random .2 1]  [$math Random .2 1]  [$math Random .2 1]  $opacity_
          }
+         $math Delete
       }
 
       $mapper_ SetLookupTable $lut
@@ -259,6 +270,20 @@ itcl::class ::gaia3d::Gaia3dVtkSegmenter {
       $tpdf Delete
    }
 
+   #  Connect this to a given stencil filter (vtkPolyDataToImageStencil). 
+   #  Used to apply the current mask to some data (the surfaces in the
+   #  discrete marching cubes are picked out by this and can be applied to
+   #  another dataset attached to an vtkImageStencil).
+   public method connect_stencil_filter {stencil_filter} {
+      $stencil_filter SetInputConnection [$segmenter_ GetOutputPort]
+   }
+
+   #  See if the values changed last time values was called. Use as an
+   #  indicator that the output from the stencil filter will change.
+   public method changed {} {
+      return $values_changed_
+   }
+
    #  Configuration options: (public variables)
    #  ----------------------
 
@@ -288,6 +313,10 @@ itcl::class ::gaia3d::Gaia3dVtkSegmenter {
 
    #  Value of last WCS variable.
    protected variable last_wcs_ {}
+
+   #  Last values. Used to check if any changes are seen.
+   protected variable last_values_ {}
+   protected variable values_changed_ 0
 
    #  Current lut.
    protected variable nlut_ 1

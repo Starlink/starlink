@@ -15,7 +15,7 @@
 #     to the world coordinate and apparent size.
 
 #  Copyright:
-#     Copyright (C) 2007 Science and Technology Facilities Council
+#     Copyright (C) 2007-2009 Science and Technology Facilities Council
 #     All Rights Reserved.
 
 #  Licence:
@@ -75,6 +75,12 @@ itcl::class ::gaia3d::Gaia3dVtkCubeData {
          if { $wcs_ != {} } {
             catch {gaiautils::astannul $wcs_}
          }
+      }
+      if { $stencil_ != {} } {
+         $stencil_ Delete
+      }
+      if { $stencil_filter_ != {} } {
+         $stencil_filter_ Delete
       }
    }
 
@@ -164,12 +170,46 @@ itcl::class ::gaia3d::Gaia3dVtkCubeData {
       #        set imagedata_ $uniformgrid
       #      }
       #   }
+
+      #  If asked apply the CUPID mask to pick out regions of the data.
+      if { $applymask && $pixelmask != {} } {
+
+         #  The base segmenter should contain the relevant mask.
+         if { [$pixelmask exists 0] } {
+            if { $stencil_ == {} } {
+               set stencil_ [::vtkImageStencil New]
+            }
+            if { $stencil_filter_ == {} } {
+               set stencil_filter_ [::vtkPolyDataToImageStencil New]
+            }
+            $stencil_ SetInput $imagedata_
+            $stencil_ SetStencil [$stencil_filter_ GetOutput]
+            $stencil_ SetBackgroundValue 0.0
+
+            $pixelmask connect_stencil_filter 0 $stencil_filter_
+         }
+      } else {
+         #  Clear any existing stencil objects.
+         if { $stencil_ != {} } {
+            $stencil_ Delete
+            set stencil_ {}
+         }
+         if { $stencil_filter_ != {} } {
+            $stencil_filter_ Delete
+            set stencil_filter_ {}
+         }
+      }
       return
    }
 
    #  Access the vtkImageData instance.
    public method get_imagedata {} {
       return $imagedata_
+   }
+
+   #  Access vtkImageStencil if being applied, empty if not.
+   public method get_stencil {} {
+      return $stencil_
    }
 
    #  Access the WCS of the cube, you should use this method, rather than the
@@ -184,7 +224,7 @@ itcl::class ::gaia3d::Gaia3dVtkCubeData {
       return $dims_
    }
 
-   #  Convert a pixel index from the full cube into a grid index for the 
+   #  Convert a pixel index from the full cube into a grid index for the
    #  used part of the cube along a given axis.
    public method pixel2grid {axis pindex} {
       if { $limits != {} } {
@@ -195,7 +235,7 @@ itcl::class ::gaia3d::Gaia3dVtkCubeData {
       return [expr round($pindex+1-$zo)]
    }
 
-   #  Convert a grid index from the apparent cube into a grid index for the 
+   #  Convert a grid index from the apparent cube into a grid index for the
    #  full cube along a given axis.
    public method grid2pixel {axis gindex} {
       if { $limits != {} } {
@@ -284,6 +324,12 @@ itcl::class ::gaia3d::Gaia3dVtkCubeData {
    #  are pairs along each axis.
    public variable limits {}
 
+   #  Whether the data should have regions extracted using the CUPID mask.
+   public variable applymask 0
+
+   #  Instance of Gaia3dCupidMasks that manages the CUPID mask.
+   public variable pixelmask {}
+
    #  Protected variables: (available to instance)
    #  --------------------
 
@@ -297,7 +343,7 @@ itcl::class ::gaia3d::Gaia3dVtkCubeData {
    protected variable ubnd_
 
    #  The AST FrameSet describing the cube coordinates. Will be changed if
-   #  limits are being used.   
+   #  limits are being used.
    protected variable wcs_ {}
 
    #  The apparent dimensions of the cube. Will differ if limits are being
@@ -307,6 +353,10 @@ itcl::class ::gaia3d::Gaia3dVtkCubeData {
    #  Pixel bounds of the full cube.
    protected variable flbnds_
    protected variable fubnds_
+
+   #  The stencil and stencil filter.
+   protected variable stencil_ {}
+   protected variable stencil_filter_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------

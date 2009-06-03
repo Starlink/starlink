@@ -29,7 +29,7 @@
 #     Performs the given method on this object.
 
 #  Copyright:
-#     Copyright (C) 2007 Science and Technology Facilities Council
+#     Copyright (C) 2007-2009 Science and Technology Facilities Council
 #     All Rights Reserved.
 
 #  Licence:
@@ -103,11 +103,11 @@ itcl::class gaia3d::Gaia3dVolume {
    #  Destructor:
    #  -----------
    destructor  {
-      
+
       #  Min and max colour menus.
       if { $min_colour_menu_ != {} } {
          catch {delete object $min_colour_menu_}
-      } 
+      }
       if { $max_colour_menu_ != {} } {
          catch {delete object $max_colour_menu_}
       }
@@ -120,7 +120,7 @@ itcl::class gaia3d::Gaia3dVolume {
    protected method add_tool_controls_ {} {
 
       #  Get pane for attributes.
-      $itk_component(tab) add -label Isosurface
+      $itk_component(tab) add -label Volume
 
       #  Add controls for line attributes.
       set w [$itk_component(tab) childsite 0]
@@ -315,7 +315,7 @@ itcl::class gaia3d::Gaia3dVolume {
          $itk_component(colourmap) configure -state normal
       }
    }
-   
+
    #  Called when the colour map is changed.
    protected method changed_colourmap_ {value} {
       set volume_colourmap_ $value
@@ -338,7 +338,7 @@ itcl::class gaia3d::Gaia3dVolume {
       }
 
       #  Update the scene to use the current settings.
-      update_scene_ $newdata 
+      update_scene_ $newdata
 
       #  Reset camera, note need to do this for new volume, not just new data.
       #  New data reset performed in super-class.
@@ -404,8 +404,14 @@ itcl::class gaia3d::Gaia3dVolume {
 
       #  Set image data, if changed or new.
       if { $newdata } {
-         $mainmapper_ SetInput [$imagedata_ get_imagedata]
-         $fastmapper_ SetInput [$imagedata_ get_imagedata]
+         set stencil [$imagedata_ get_stencil]
+         if { $stencil == {} } {
+            $mainmapper_ SetInput [$imagedata_ get_imagedata]
+            $fastmapper_ SetInput [$imagedata_ get_imagedata]
+         } else {
+            $mainmapper_ SetInputConnection [$stencil GetOutputPort]
+            $fastmapper_ SetInputConnection [$stencil GetOutputPort]
+         }
       }
 
       #  Gather properties.
@@ -439,8 +445,8 @@ itcl::class gaia3d::Gaia3dVolume {
          gvtk::cmap set $volume_colourmap_ $colourfunction_ $minval $maxval
          $colourfunction_ SetRange $minval $maxval
       }
-      
-      #  Opacity. 
+
+      #  Opacity.
       $opacityfunction_ RemoveAllPoints
       $opacityfunction_ AddPoint $minval $minop
       $opacityfunction_ AddPoint $maxval $maxop

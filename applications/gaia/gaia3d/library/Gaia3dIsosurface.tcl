@@ -29,7 +29,7 @@
 #     Performs the given method on this object.
 
 #  Copyright:
-#     Copyright (C) 2007 Science and Technology Facilities Council
+#     Copyright (C) 2007-2009 Science and Technology Facilities Council
 #     All Rights Reserved.
 
 #  Licence:
@@ -605,6 +605,7 @@ itcl::class gaia3d::Gaia3dIsosurface {
    protected method create_iso_contour_ {index} {
       if { $imagedata_ != {} } {
          set contour_($index) [Gaia3dVtkIso \#auto \
+                                  -stencil [$imagedata_ get_stencil] \
                                   -imagedata [$imagedata_ get_imagedata] \
                                   -renwindow $renwindow_]
          $contour_($index) add_to_window

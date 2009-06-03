@@ -451,6 +451,22 @@ itcl::class gaia3d::Gaia3dTool {
       pack $itk_component(showastaxes) -fill x -expand 0 -ipady 5
       add_short_help $itk_component(showastaxes) \
          {Show annotated axes around cube (RA and Dec labelling)}
+
+      #  Apply the CUPID pixelmask. Note the stencil of the Gaia3dVtkCubeData
+      #  should be used as the input connection for subclasses when this is
+      #  active. 
+      itk_component add applymask {
+         gaia::StarLabelCheck $itk_component(controls).applymask \
+            -text "Apply mask:" \
+            -onvalue 1 \
+            -offvalue 0 \
+            -labelwidth $lwidth \
+            -variable [scope applymask_] \
+            -command [code $this changed_applymask_]
+      }
+      pack $itk_component(applymask) -fill x -expand 0 -ipady 5
+      add_short_help $itk_component(applymask) \
+         {Apply CUPID mask to select data regions}
    }
 
    #  Get a list of the standard colourmaps, sorted in alphabetic order
@@ -675,6 +691,12 @@ itcl::class gaia3d::Gaia3dTool {
    #  bad value handling changed. "args" is ignored.
    protected method changed_bad_ { args } {
       set changed_bad_ 1
+   }
+
+   #  Set variable to get data update next read. Usually when
+   #  mask value handling changed. "args" is ignored.
+   protected method changed_applymask_ {args} {
+      set changed_mask_ 1
    }
 
    #  Called when variable that controls visibility of the image plane
@@ -1177,6 +1199,9 @@ itcl::class gaia3d::Gaia3dTool {
             grid_plot3d_
          }
 
+         #  Access any masks. These may be used to mask the data.
+         $itk_component(pixelmask) open [$imagedata_ get_wcs]
+
          #  Do the work of rendering the fuller scene using the main
          #  cube. Note use ProgressEvents when possible to update the UI from
          #  time to time, so although blocked it might not be too bad.
@@ -1189,8 +1214,8 @@ itcl::class gaia3d::Gaia3dTool {
                [$imagedata_ get_wcs]
          }
 
-         #  And any masks.
-         $itk_component(pixelmask) render $renwindow_ [$imagedata_ get_wcs]
+         #  And draw the masks if that is also required.
+         $itk_component(pixelmask) render $renwindow_
 
          #  2D Widgets go last. Add a orientation marker that is always
          #  visible to determine the directions.
@@ -1222,7 +1247,7 @@ itcl::class gaia3d::Gaia3dTool {
             }
          }
 
-         #  Do rendering. 
+         #  Do rendering.
          $renwindow_ render
 
          #  If this is a new data file reset camera to make sure the
@@ -1331,14 +1356,24 @@ itcl::class gaia3d::Gaia3dTool {
          set result 1
          set cubename_ $newname
       } else {
-         if { $changed_bad_ || $changed_limits || $changed_wcs } {
+         if { $changed_bad_ || $changed_limits || $changed_wcs ||
+              $changed_mask_ } {
             set result 2
+         } else {
+            if { $applymask_ } {
+               #  Maybe the mask has changed some property that will
+               #  regenerate it.
+               if { [$itk_component(pixelmask) changed 0] } {
+                  set result 2
+               }
+            }
          }
       }
 
       #  Read data if needed.
       if { $result != 0 } {
          set changed_bad_ 0
+         set changed_mask_ 0
 
          #  Create object to access the cube data.
          if { $imagedata_ == {} } {
@@ -1353,7 +1388,9 @@ itcl::class gaia3d::Gaia3dTool {
          $imagedata_ configure \
             -cubeaccessor $cubeaccessor_ \
             -checkbad $checkbad_ \
-            -nullvalue [$itk_component(replacevalue) get]
+            -nullvalue [$itk_component(replacevalue) get] \
+            -pixelmask $itk_component(pixelmask) \
+            -applymask $applymask_
 
          #  If we have limits for the spectral axis, update them so that only
          #  part of the date is read (forces a copy however).
@@ -1545,6 +1582,12 @@ itcl::class gaia3d::Gaia3dTool {
 
    #  The "View" menu.
    protected variable view_menu_ {}
+
+   #  Whether to apply the CUPID mask to pick out data.
+   protected variable applymask_ 0
+
+   #  Whether user preference for handling masks has changed.
+   protected variable changed_mask_ 0
 
    #  Common variables: (shared by all instances)
    #  -----------------

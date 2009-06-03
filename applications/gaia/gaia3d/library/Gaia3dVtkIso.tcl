@@ -18,7 +18,7 @@
 #     (usually the GRID coordinates of another cube).
 
 #  Copyright:
-#     Copyright (C) 2007 Science and Technology Facilities Council
+#     Copyright (C) 2007-2009 Science and Technology Facilities Council
 #     All Rights Reserved.
 
 #  Licence:
@@ -146,7 +146,14 @@ itcl::class ::gaia3d::Gaia3dVtkIso {
 
    #  Set the imagedata object. If blank remove visibility.
    protected method update_imagedata_ {} {
-      $contour_ SetInput $imagedata
+      if { $stencil == {} } {
+         puts "update_imagedata: direct connection ($imagedata)"
+         $contour_ SetInput $imagedata
+      } else {
+         puts "update_imagedata: stencil connection ($stencil)"
+         $contour_ SetInputConnection [$stencil GetOutputPort]
+      }
+
       if { $imagedata == {} } {
          remove_from_window
          set_invisible
@@ -198,6 +205,9 @@ itcl::class ::gaia3d::Gaia3dVtkIso {
    public variable imagedata {} {
       update_imagedata_
    }
+
+   #  The vtkImageStencil if masking of the contours should be applied.
+   public variable stencil {} {}
 
    #  The level.
    public variable level 0 {
