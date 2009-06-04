@@ -5524,7 +5524,7 @@ static int WriteRegion( AstStcsChan *this, AstRegion *reg, AstKeyMap *props,
                      (void) sprintf( buf, fmt, scale*(*p) );
                      prop = astAppendString( prop, &nc, buf );
                      prop = astAppendString( prop, &nc, " " );
-                     p += nspace;
+                     p += np;
                   } else {
                      astAddWarning( this, 1, "The supplied Polygon contains "
                                     "one or more bad axis values.", "astWrite", 
