@@ -1,5 +1,5 @@
                             Starlink Documentation
-Date: 22nd May, 2009
+Date: 4th June, 2009
 File: /star/docs/docs_lis
 
 SC                             STARLINK COOKBOOKS                             SC
@@ -20,7 +20,7 @@ SC                             STARLINK COOKBOOKS                             SC
 015.02  2000-08-22 aa    100  The Graphics Cookbook
 016.02  2002-09-30 AA    55   The IFU Data product cookbook
 017.01  2001-12-31 acd   40   The GAIA Cookbook
-018.01  2009-MM-DD ???   ??   The SMURF SCUBA-2 data analysis cookbook
+019.01  2009-MM-DD ???   ??   The SMURF SCUBA-2 data analysis cookbook
 
 SG                               STARLINK GUIDES                              SG
 003.05  1996-03-12 dm    76   IUEDR - Reference manual
