@@ -25,6 +25,11 @@ vertices in the supplied Polygon. The subset is chosen to retain the main
 features of the supplied Polygion, in so far as that is possible, within
 specified constraints.
 
+- A new constructor called astOutline (AST_OUTLINE) has been added to the
+Polygon class. Given a 2D data array, it identifies the boundary of a
+region within the array that holds pixels with specified values. It then
+creates a new Polygon to describe this boundary to a specified accuracy.
+
 - A new method called astRemoveRegions (AST_REMOVEREGIONS) has been added
 to the Mapping class. It removes the masking effects of any Regions found
 within a (possibly compound) Mapping or Frame. In effect, it replaces

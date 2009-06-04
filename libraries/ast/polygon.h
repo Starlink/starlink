@@ -68,6 +68,7 @@
 /* ---------------------- */
 #include "frame.h"               /* Coordinate systems */
 #include "region.h"              /* Coordinate regions (parent class) */
+#include "timeframe.h"           /* For AST__LT definition */
 
 #if defined(astCLASS)            /* Protected */
 #include "channel.h"             /* I/O channels */
@@ -86,6 +87,15 @@
 #ifndef __GNUC__
 #  define  __attribute__(x)  /*NOTHING*/
 #endif
+
+/* Flags used to indicate how astOutline<X> should define the pixel
+   region to be outlined. We omit AST__LT here since it is defined in
+   timeframe.h (with value 11). */
+#define AST__LE 2
+#define AST__EQ 3
+#define AST__GE 4
+#define AST__GT 5
+#define AST__NE 6
 
 /* Type Definitions. */
 /* ================= */
@@ -123,6 +133,7 @@ typedef struct AstPolygonVtab {
 
 /* Properties (e.g. methods) specific to this class. */
    AstPolygon *(* Downsize)( AstPolygon *, double, int, int * );
+
 } AstPolygonVtab;
 
 #if defined(THREAD_SAFE) 
@@ -175,6 +186,21 @@ AstPolygon *astLoadPolygon_( void *, size_t, AstPolygonVtab *,
 /* Prototypes for member functions. */
 /* -------------------------------- */
 AstPolygon *astDownsize_( AstPolygon *, double, int, int * );
+
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
+AstPolygon *astOutlineLD_( long double, int,long double[], int[2], int[2], double, int, int[2], int, int * );
+#endif
+AstPolygon *astOutlineB_( signed char, int, signed char[], int[2], int[2], double, int, int[2], int, int * );
+AstPolygon *astOutlineD_( double, int, double[], int[2], int[2], double, int, int[2], int, int * );
+AstPolygon *astOutlineF_( float, int, float[], int[2], int[2], double, int, int[2], int, int * );
+AstPolygon *astOutlineI_( int, int, int[], int[2], int[2], double, int, int[2], int, int * );
+AstPolygon *astOutlineL_( long int, int, long int[], int[2], int[2], double, int, int[2], int, int * );
+AstPolygon *astOutlineS_( short int, int, short int[], int[2], int[2], double, int, int[2], int, int * );
+AstPolygon *astOutlineUB_( unsigned char, int, unsigned char[], int[2], int[2], double, int, int[2], int, int * );
+AstPolygon *astOutlineUI_( unsigned int, int, unsigned int[], int[2], int[2], double, int, int[2], int, int * );
+AstPolygon *astOutlineUL_( unsigned long int, int, unsigned long int[], int[2], int[2], double, int, int[2], int, int * );
+AstPolygon *astOutlineUS_( unsigned short int, int, unsigned short int[], int[2], int[2], double, int, int[2], int, int * );
+
 # if defined(astCLASS)           /* Protected */
 #endif
 
@@ -227,6 +253,35 @@ astINVOKE(O,astLoadPolygon_(mem,size,vtab,name,astCheckChannel(channel),STATUS_P
 
 #define astDownsize(this,maxerr,maxvert) \
 astINVOKE(O,astDownsize_(astCheckPolygon(this),maxerr,maxvert,STATUS_PTR))
+
+
+
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
+#define astOutlineLD(value,oper,array,lbnd,ubnd,maxerr,maxvert,inside,starpix) \
+astINVOKE(O,astOutlineLD_(value,oper,array,lbnd,ubnd,maxerr,maxvert,inside,starpix,STATUS_PTR))
+#endif
+
+#define astOutlineB(value,oper,array,lbnd,ubnd,maxerr,maxvert,inside,starpix) \
+astINVOKE(O,astOutlineB_(value,oper,array,lbnd,ubnd,maxerr,maxvert,inside,starpix,STATUS_PTR))
+#define astOutlineD(value,oper,array,lbnd,ubnd,maxerr,maxvert,inside,starpix) \
+astINVOKE(O,astOutlineD_(value,oper,array,lbnd,ubnd,maxerr,maxvert,inside,starpix,STATUS_PTR))
+#define astOutlineF(value,oper,array,lbnd,ubnd,maxerr,maxvert,inside,starpix) \
+astINVOKE(O,astOutlineF_(value,oper,array,lbnd,ubnd,maxerr,maxvert,inside,starpix,STATUS_PTR))
+#define astOutlineI(value,oper,array,lbnd,ubnd,maxerr,maxvert,inside,starpix) \
+astINVOKE(O,astOutlineI_(value,oper,array,lbnd,ubnd,maxerr,maxvert,inside,starpix,STATUS_PTR))
+#define astOutlineL(value,oper,array,lbnd,ubnd,maxerr,maxvert,inside,starpix) \
+astINVOKE(O,astOutlineL_(value,oper,array,lbnd,ubnd,maxerr,maxvert,inside,starpix,STATUS_PTR))
+#define astOutlineS(value,oper,array,lbnd,ubnd,maxerr,maxvert,inside,starpix) \
+astINVOKE(O,astOutlineS_(value,oper,array,lbnd,ubnd,maxerr,maxvert,inside,starpix,STATUS_PTR))
+#define astOutlineUB(value,oper,array,lbnd,ubnd,maxerr,maxvert,inside,starpix) \
+astINVOKE(O,astOutlineUB_(value,oper,array,lbnd,ubnd,maxerr,maxvert,inside,starpix,STATUS_PTR))
+#define astOutlineUI(value,oper,array,lbnd,ubnd,maxerr,maxvert,inside,starpix) \
+astINVOKE(O,astOutlineUI_(value,oper,array,lbnd,ubnd,maxerr,maxvert,inside,starpix,STATUS_PTR))
+#define astOutlineUL(value,oper,array,lbnd,ubnd,maxerr,maxvert,inside,starpix) \
+astINVOKE(O,astOutlineUL_(value,oper,array,lbnd,ubnd,maxerr,maxvert,inside,starpix,STATUS_PTR))
+#define astOutlineUS(value,oper,array,lbnd,ubnd,maxerr,maxvert,inside,starpix) \
+astINVOKE(O,astOutlineUS_(value,oper,array,lbnd,ubnd,maxerr,maxvert,inside,starpix,STATUS_PTR))
+
 #if defined(astCLASS)            /* Protected */
 #endif
 #endif

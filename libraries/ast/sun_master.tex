@@ -21723,6 +21723,18 @@ contains a subset of the vertices in the supplied Polygon. The subset is
 chosen to retain the main features of the supplied Polygion, in so far 
 as that is possible, within specified constraints.
 
+\item A new constructor called 
+c+
+astOutline 
+c-
+f+
+AST\_OUTLINE
+f-
+has been added to the Polygon class. Given a 2D data array, it identifies
+the boundary of a region within the array that holds pixels with
+specified values. It then creates a new Polygon to describe this boundary
+to a specified accuracy.
+
 \item A new set of methods, called 
 c+
 astMapGetElem<X>

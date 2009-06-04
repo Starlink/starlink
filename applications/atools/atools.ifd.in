@@ -1094,6 +1094,73 @@ iraf! {
 
       }
 
+      action astoutline {
+         helplib {$ATOOLS_HELP}
+
+         parameter array {
+            position 3
+            type NDF
+            access READ
+            ppath GLOBAL
+            association <-GLOBAL.DATA_ARRAY
+            prompt {The input NDF}
+            helpkey *
+         }
+
+         parameter inside {
+            position 6
+            type _INTEGER 
+            prompt {Pixel indices of a point in the polygon}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+            size *
+         }
+
+         parameter maxerr {
+            position 4
+            type _DOUBLE
+            prompt {The maximum allowed positional error in the polygon}
+            ppath CURRENT DEFAULT
+            default 0.0
+            helpkey *
+         }
+
+         parameter maxvert {
+            position 5
+            type _INTEGER
+            prompt {The maximum number of vertices in the polygon}
+            ppath CURRENT DEFAULT
+            default 10
+            helpkey *
+         }
+
+         parameter oper {
+            position 2
+            type LITERAL
+            prompt {Operation defining the pixels to be outlined}
+            ppath CURRENT DEFAULT
+            default EQ
+            helpkey *
+          }
+
+         parameter result {
+            position 7
+            type LITERAL
+            prompt {Name of file in which to store the Polygon}
+            helpkey *
+          }
+
+         parameter value {
+            position 1
+            type LITERAL
+            prompt {The value that defines the pixels to be outlined}
+            ppath CURRENT DEFAULT
+            default BAD
+            helpkey *
+          }
+      }
+
       action astunitmap {
          helplib {$ATOOLS_HELP}
 

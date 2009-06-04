@@ -48,6 +48,8 @@ f     following routines may also be applied to all Polygons:
 *
 c     - astDownsize: Reduce the number of vertices in a Polygon. 
 f     - AST_DOWNSIZE: Reduce the number of vertices in a Polygon. 
+c     - astOutline<X>: Create a Polygon outlining values in a pixel array
+f     - AST_OUTLINE<X>: Create a Polygon outlining values in a pixel array
 
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
@@ -79,6 +81,8 @@ f     - AST_DOWNSIZE: Reduce the number of vertices in a Polygon.
 *        Original version.
 *     28-MAY-2009 (DSB):
 *        Added astDownsize.
+*     29-MAY-2009 (DSB):
+*        Added astOutline<X>.
 *class--
 */
 
@@ -122,7 +126,7 @@ f     - AST_DOWNSIZE: Reduce the number of vertices in a Polygon.
 #include "polygon.h"             /* Interface definition for this class */
 #include "mapping.h"             /* Position mappings */
 #include "unitmap.h"             /* Unit Mapping */
-#include "pal.h"              /* SLALIB library interface */
+#include "pal.h"                 /* SLALIB library interface */
 #include "frame.h"               /* Coordinate system description */
 
 /* Error code definitions. */
@@ -138,6 +142,7 @@ f     - AST_DOWNSIZE: Reduce the number of vertices in a Polygon.
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
+#include <limits.h>
 
 /* Type definitions. */
 /* ================= */
@@ -204,12 +209,77 @@ AstPolygon *astPolygonId_( void *, int, int, const double *, void *, const char 
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
+
+/* Define a macro that expands to a single prototype for function
+   FindInsidePoint for a given data type and operation. */
+#define FINDINSIDEPOINT_PROTO0(X,Xtype,Oper) \
+static void FindInsidePoint##Oper##X( Xtype, Xtype *, int[2], int[2], int *, int *, int *, int * ); 
+
+/* Define a macro that expands to a set of prototypes for all operations
+   for function FindInsidePoint for a given data type. */
+#define FINDINSIDEPOINT_PROTO(X,Xtype) \
+FINDINSIDEPOINT_PROTO0(X,Xtype,LT) \
+FINDINSIDEPOINT_PROTO0(X,Xtype,LE) \
+FINDINSIDEPOINT_PROTO0(X,Xtype,EQ) \
+FINDINSIDEPOINT_PROTO0(X,Xtype,GE) \
+FINDINSIDEPOINT_PROTO0(X,Xtype,GT) \
+FINDINSIDEPOINT_PROTO0(X,Xtype,NE)
+
+/* Use the above macros to define all FindInsidePoint prototypes for all
+   data types and operations. */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
+FINDINSIDEPOINT_PROTO(LD,long double)
+#endif
+FINDINSIDEPOINT_PROTO(D,double)
+FINDINSIDEPOINT_PROTO(L,long int)
+FINDINSIDEPOINT_PROTO(UL,unsigned long int)
+FINDINSIDEPOINT_PROTO(I,int)
+FINDINSIDEPOINT_PROTO(UI,unsigned int)
+FINDINSIDEPOINT_PROTO(S,short int)
+FINDINSIDEPOINT_PROTO(US,unsigned short int)
+FINDINSIDEPOINT_PROTO(B,signed char)
+FINDINSIDEPOINT_PROTO(UB,unsigned char)
+FINDINSIDEPOINT_PROTO(F,float) 
+
+/* Define a macro that expands to a single prototype for function
+   TraceEdge for a given data type and operation. */
+#define TRACEEDGE_PROTO0(X,Xtype,Oper) \
+static AstPointSet *TraceEdge##Oper##X( Xtype, Xtype *, int[2], int[2], int, int, int, int, int, int * );
+
+/* Define a macro that expands to a set of prototypes for all operations
+   for function TraceEdge for a given data type. */
+#define TRACEEDGE_PROTO(X,Xtype) \
+TRACEEDGE_PROTO0(X,Xtype,LT) \
+TRACEEDGE_PROTO0(X,Xtype,LE) \
+TRACEEDGE_PROTO0(X,Xtype,EQ) \
+TRACEEDGE_PROTO0(X,Xtype,GE) \
+TRACEEDGE_PROTO0(X,Xtype,GT) \
+TRACEEDGE_PROTO0(X,Xtype,NE)
+
+/* Use the above macros to define all TraceEdge prototypes for all
+   data types and operations. */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
+TRACEEDGE_PROTO(LD,long double)
+#endif
+TRACEEDGE_PROTO(D,double)
+TRACEEDGE_PROTO(L,long int)
+TRACEEDGE_PROTO(UL,unsigned long int)
+TRACEEDGE_PROTO(I,int)
+TRACEEDGE_PROTO(UI,unsigned int)
+TRACEEDGE_PROTO(S,short int)
+TRACEEDGE_PROTO(US,unsigned short int)
+TRACEEDGE_PROTO(B,signed char)
+TRACEEDGE_PROTO(UB,unsigned char)
+TRACEEDGE_PROTO(F,float) 
+
+/* Non-generic function prototypes. */
 static AstMapping *Simplify( AstMapping *, int * );
+static AstPointSet *DownsizePoly( AstPointSet *, double, int, AstFrame *, int * );
 static AstPointSet *RegBaseMesh( AstRegion *, int * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
 static AstPolygon *Downsize( AstPolygon *, double, int, int * );
 static Segment *AddToChain( Segment *, Segment *, int * );
-static Segment *NewSegment( int, int, int, int * );
+static Segment *NewSegment( Segment *, int, int, int, int * );
 static Segment *RemoveFromChain( Segment *, Segment *, int * );
 static double Polywidth( AstFrame *, AstLineDef **, int, int, double[ 2 ], int * );
 static int IntCmp( const void *, const void * );
@@ -219,10 +289,12 @@ static void Cache( AstPolygon *, int * );
 static void Copy( const AstObject *, AstObject *, int * );
 static void Delete( AstObject *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
-static void FindMax( Segment *, AstFrame *, double *, double *, int, int * );
+static void FindMax( Segment *, AstFrame *, double *, double *, int, int, int * );
 static void RegBaseBox( AstRegion *this, double *, double *, int * );
 static void ResetCache( AstRegion *this, int * );
+static void SetPointSet( AstPolygon *, AstPointSet *, int * );
 static void SetRegFS( AstRegion *, AstFrame *, int * );
+static void SmoothPoly( AstPointSet *, int, double, int * );
 
 /* Member functions. */
 /* ================= */
@@ -513,7 +585,99 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* Local Variables: */
    AstFrame *frm;         /* Base Frame from the Polygon */
+   AstPointSet *pset;     /* PointSet holding vertices of downsized polygon */
    AstPolygon *result;    /* Returned pointer to new Polygon */
+
+/* Initialise. */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get a pointer to the base Frame of the Polygon. */
+   frm = astGetFrame( ((AstRegion *) this)->frameset, AST__BASE );
+
+/* Create a PointSet holding the vertices of the downsized polygon. */
+   pset = DownsizePoly( ((AstRegion *) this)->points, maxerr, maxvert, 
+                        frm, status );
+
+/* Take a deep copy of the supplied Polygon. */
+   result = astCopy( this );
+
+/* Change the PointSet within the result Polygon to the one created above. */ \
+   SetPointSet( result, pset, status ); \
+
+/* Free resources. */
+   frm = astAnnul( frm );
+   pset = astAnnul( pset );
+
+/* If an error occurred, annul the returned Polygon. */
+   if ( !astOK ) result = astAnnul( result );
+
+/* Return the result. */
+   return result;
+}
+
+static AstPointSet *DownsizePoly( AstPointSet *pset, double maxerr, 
+                                  int maxvert, AstFrame *frm, int *status ) {
+/*
+*  Name:
+*     DownsizePoly
+
+*  Purpose:
+*     Reduce the number of vertices in a Polygon.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*    #include "polygon.h"
+*    AstPointSet *DownsizePoly( AstPointSet *pset, double maxerr, int maxvert, 
+*                               AstFrame *frm, int *status )
+
+*  Class Membership:
+*     Polygon member function.
+
+*  Description:
+*     This function returns a pointer to a new PointSet that contains a
+*     subset of the vertices in the supplied PointSet. The subset is
+*     chosen so that the returned polygon is a good approximation to 
+*     the supplied polygon, within the limits specified by the supplied
+*     parameter values. That is, the density of points in the returned
+*     polygon is greater at points where the curvature of the boundary of
+*     the supplied polygon is greater.
+
+*  Parameters:
+*     pset 
+*        Pointer to the PointSet holding the polygon vertices.
+*     maxerr
+*        The maximum allowed discrepancy between the supplied and
+*        returned Polygons, expressed as a geodesic distance within the
+*        Polygon's coordinate frame. If this is zero or less, the
+*        returned Polygon will have the number of vertices specified by 
+*        maxvert.
+*     maxvert 
+*        The maximum allowed number of vertices in the returned Polygon.
+*        If this is less than 3, the number of vertices in the returned 
+*        Polygon will be the minimum needed to achieve the maximum 
+*        discrepancy specified by
+*        maxerr.
+*     frm
+*        Pointer to the Frame in which the polygon is defined.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*        Pointer to the new PointSet.
+
+*  Notes:
+*     - A null Object pointer (AST__NULL) will be returned if this
+*     function is invoked with the AST error status set, or if it
+*     should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstPointSet *result;   /* Returned pointer to new PointSet */
    Segment *head;         /* Pointer to new polygon edge with highest error */
    Segment *seg1;         /* Pointer to new polygon edge */
    Segment *seg2;         /* Pointer to new polygon edge */
@@ -523,9 +687,17 @@ f     function is invoked with STATUS set to an error value, or if it
    double *xnew;          /* Pointer to array of X values for new Polygon */
    double *y;             /* Pointer to array of Y values for old Polygon */
    double *ynew;          /* Pointer to array of Y values for new Polygon */
+   double x1;             /* Lowest X value at any vertex */
+   double x2;             /* Highest X value at any vertex */
+   double y1;             /* Lowest Y value at any vertex */
+   double y2;             /* Highest Y value at any vertex */
    int *newpoly;          /* Holds indices of retained input vertices */
    int i1;                /* Index of first vertex added to output polygon */
+   int i1x;               /* Index of vertex with lowest X */
+   int i1y;               /* Index of vertex with lowest Y */
    int i2;                /* Index of second vertex added to output polygon */
+   int i2x;               /* Index of vertex with highest X */
+   int i2y;               /* Index of vertex with highest Y */
    int i3;                /* Index of third vertex added to output polygon */
    int iadd;              /* Normalised vertex index */
    int iat;               /* Index at which to store new vertex index */
@@ -539,78 +711,150 @@ f     function is invoked with STATUS set to an error value, or if it
    if ( !astOK ) return result;
 
 /* Get the number of vertices in the supplied polygon. */
-   nv = astGetNpoint( ((AstRegion *) this)->points );
+   nv = astGetNpoint( pset );
+
+/* If the maximum error allowed is zero, and the maximum number of
+   vertices is equal to or greater than the number in the supplied
+   polygon, just return a deep copy of the supplied PointSet. */
+   if( maxerr <= 0.0 && ( maxvert < 3 || maxvert >= nv ) ) {
+      result = astCopy( pset );
+
+/* Otherwise... */
+   } else {
 
 /* Get pointers to the X and Y arrays holding the vertex coordinates in
-   the supplied Polygon. */
-   ptr = astGetPoints( ((AstRegion *) this)->points );
-   x = ptr[ 0 ];
-   y = ptr[ 1 ];
+   the supplied polygon. */
+      ptr = astGetPoints( pset );
+      x = ptr[ 0 ];
+      y = ptr[ 1 ];
 
-/* Get a pointer to the base Frame of the Polygon. */
-   frm = astGetFrame( ((AstRegion *) this)->frameset, AST__BASE );
-   
 /* Allocate memory for an array to hold the original indices of the vertices 
    to be used to create the returned Polygon. This array is expanded as
    needed. */
-   newpoly = astMalloc( 10*sizeof( int ) );
-
+      newpoly = astMalloc( 10*sizeof( int ) );
+ 
 /* Check the pointers can be used safely. */
-   if( astOK ) {
+      if( astOK ) {
 
-/* The first attempt picks three vertices from the supplied Polygon.
-   Later attempts add further input vertices to the output Polygon until
-   the specified requirements are met. The first three vertices are
-   chosen to be evenly spaced through the list of vertices. */
-      i1 = nv/6;
-      i2 = nv/2;
-      i3 = nv - i1;
+/* We first need to decide on three widely spaced vertices which form a
+   reasonable triangular approximation to the whole polygon. First find
+   the vertices with the highest and lowest Y values, and the highest and
+   lowest X values. */
+         x1 = DBL_MAX;
+         x2 = -DBL_MAX;
+         y1 = DBL_MAX;
+         y2 = -DBL_MAX;
+
+         for( i3 = 0; i3 < nv; i3++ ) {
+            if( y[ i3 ] < y1 ) {
+               y1 = y[ i3 ];
+               i1y = i3;
+            } else if( y[ i3 ] > y2 ) {
+               y2 = y[ i3 ];
+               i2y = i3;
+            }
+
+            if( x[ i3 ] < x1 ) {
+               x1 = x[ i3 ];
+               i1x = i3;
+            } else if( x[ i3 ] > x2 ) {
+               x2 = x[ i3 ];
+               i2x = i3;
+            }
+         }
+
+/* Use the axis which spans the greater range. */
+         if( y2 - y1 > x2 - x1 ) {
+            i1 = i1y;
+            i2 = i2y;
+         } else {
+            i1 = i1x;
+            i2 = i2x;
+         }
+
+/* The index with vertex i1 is definitely going to be one of our three
+   vertices. We are going to use the line from i1 to i2 to choose the two 
+   other vertices to use. Create a structure describing the segment of the 
+   Polygon from the lowest value on the selected axis (X or Y) to the 
+   highest value. As always, the polygons is traversed in an anti-clockwise 
+   direction. */
+         seg1 = NewSegment( NULL, i1, i2, nv, status );
+
+/* Find the vertex within this segment which is furthest away from the
+   line on the right hand side (as moving from vertex i1 to vertex i2). */
+         FindMax( seg1, frm, x, y, nv, 0, status );
+
+/* Likewise, create a structure describing the remained of the Polygon
+   (i.e. the segment from the highest value on the selected axis to the 
+   lowest value). Then find the vertex within this segment which is 
+   furthest away from the line on the right hand side. */
+         seg2 = NewSegment( NULL, i2, i1, nv, status );
+         FindMax( seg2, frm, x, y, nv, 0, status );
+
+/* Select the segment for which the found vertex is furthest from the
+   line. */
+         if( seg2->error > seg1->error ) {
+
+/* If the second segment, we will use the vertex that is farthest from
+   the line as one of our threee vertices. To ensure that movement from
+   vertex i1 to i2 to i3 is anti-clockeise, we must use this new vertex
+   as vertex i3, not i2. */
+            i3 = seg2->imax;
+
+/* Create a description of the polygon segment from vertex i1 to i3, and
+   find the vertex which is furthest to the right of the line joining the
+   two vertices. We use this as the middle vertex (i2). */
+            seg1 = NewSegment( seg1, i1, i3, nv, status );
+            FindMax( seg1, frm, x, y, nv, 0, status );
+            i2 = seg1->imax;
+
+/* Do the same if we are choosing the other segment, ordering the
+   vertices to retain anti-clockwise movement from i1 to i2 to i3. */
+         } else {
+            i2 = seg1->imax;
+            seg1 = NewSegment( seg1, i2, i1, nv, status );
+            FindMax( seg1, frm, x, y, nv, 0, status );
+            i3 = seg1->imax;
+         }
+
+/* Ensure the vertex indices are in the first cycle. */
+         if( i2 > nv ) i2 -= nv;
+         if( i3 > nv ) i3 -= nv;
 
 /* Create Segment structures to describe each of these three edges. */
-      seg1 = NewSegment( i1, i2, nv, status );
-      seg2 = NewSegment( i2, i3, nv, status );
-      seg3 = NewSegment( i3, i1, nv, status );
+         seg1 = NewSegment( seg1, i1, i2, nv, status );
+         seg2 = NewSegment( seg2, i2, i3, nv, status );
+         seg3 = NewSegment( NULL, i3, i1, nv, status );
 
 /* Record these 3 vertices in an array holding the original indices of 
    the vertices to be used to create the returned Polygon. */   
-      newpoly[ 0 ] = i1;
-      newpoly[ 1 ] = i2; 
-      newpoly[ 2 ] = i3;
+         newpoly[ 0 ] = i1;
+         newpoly[ 1 ] = i2; 
+         newpoly[ 2 ] = i3;
 
 /* Indicate the new polygon currently has 3 vertices. */
-      newlen = 3;
+         newlen = 3;
 
 /* Search the old vertices between the start and end of segment 3, looking 
    for the vertex which lies furthest from the line of segment 3. The
    residual between this point and the line is stored in the Segment
    structure, as is the index of the vertex at which this maximum residual
    occurred. */
-      FindMax( seg3, frm, x, y, nv, status );
+         FindMax( seg3, frm, x, y, nv, 1, status );
 
 /* The "head" variable points to the head of a double linked list of
    Segment structures. This list is ordered by residual, so that the 
    Segment with the maximum residual is at the head, and the Segment 
    with the minimum residual is at the tail. Initially "seg3" is at the
    head. */
-      head = seg3;
-
-/* If the maximum allowed number of vertices in the output Polygon is
-   less than 3, allow any number of vertices up to the number in the
-   input Polygon (termination will then be determined just by "maxerr"). */
-      if( maxvert < 3 ) maxvert = nv;
-
-/* Loop round adding an extra vertex to the returned Polygon until the
-   maximum residual between the new and old polygons is no more than 
-   "maxerr". Abort early if the specifie dmaximum number of vertices is
-   reached. */
-      while( head->error > maxerr && newlen < maxvert ) {
+         head = seg3;
 
 /* Search the old vertices between the start and end of segment 1, looking 
    for the vertex which lies furthest from the line of segment 1. The
    residual between this point and the line is stored in the Segment
    structure, as is the index of the vertex at which this maximum residual
    occurred. */
-         FindMax( seg1, frm, x, y, nv, status );
+         FindMax( seg1, frm, x, y, nv, 1, status );
 
 /* Insert segment 1 into the linked list of Segments, at a position that
    maintains the ordering of the segments by error. Thus the head of the
@@ -618,8 +862,19 @@ f     function is invoked with STATUS set to an error value, or if it
          head = AddToChain( head, seg1, status );
 
 /* Do the same for segment 2. */
-         FindMax( seg2, frm, x, y, nv, status );
+         FindMax( seg2, frm, x, y, nv, 1, status );
          head = AddToChain( head, seg2, status );
+
+/* If the maximum allowed number of vertices in the output Polygon is
+   less than 3, allow any number of vertices up to the number in the
+   input Polygon (termination will then be determined just by "maxerr"). */
+         if( maxvert < 3 ) maxvert = nv;
+
+/* Loop round adding an extra vertex to the returned Polygon until the
+   maximum residual between the new and old polygons is no more than 
+   "maxerr". Abort early if the specified maximum number of vertices is
+   reached. */
+         while( head->error > maxerr && newlen < maxvert ) {
 
 /* The segment at the head of the list has the max error (that is, it is
    the segment that departs most from the supplied Polygon). To make the
@@ -628,79 +883,450 @@ f     function is invoked with STATUS set to an error value, or if it
    polygon is cyclic so if the vertex has an index that is greater than the
    number of vertices in the old polygon, reduce the index by the number
    of vertices in the old polygon. */
-         iadd = head->imax;
-         if( iadd >= nv ) iadd -= nv;
-         iat = newlen++;
-         newpoly = astGrow( newpoly, newlen, sizeof( int ) );
-         if( !astOK ) break;
-         newpoly[ iat ] = iadd;
+            iadd = head->imax;
+            if( iadd >= nv ) iadd -= nv;
+            iat = newlen++;
+            newpoly = astGrow( newpoly, newlen, sizeof( int ) );
+            if( !astOK ) break;
+            newpoly[ iat ] = iadd;
 
 /* We now split the segment that had the highest error into two segments.
    The split occurs at the vertex that had the highest error. */
-         seg1 = NewSegment( head->imax, head->i2, nv, status );
-         seg2 = head;
-         seg2->i2 = head->imax; 
+            seg1 = NewSegment( NULL, head->imax, head->i2, nv, status );
+            seg2 = head;
+            seg2->i2 = head->imax; 
 
-/* We do not know where these two new segments hsould be in the ordered
+/* We do not know where these two new segments should be in the ordered
    linked list, so remove them from the list. */
-         head = RemoveFromChain( head, seg1, status );
-         head = RemoveFromChain( head, seg2, status );
-      }
+            head = RemoveFromChain( head, seg1, status );
+            head = RemoveFromChain( head, seg2, status );
+
+/* Find the vertex that deviates most from the first of these two new
+   segments, and then add the segment into the list of vertices, using
+   the maximum deviation to determine the position of the segment within
+   the list. */
+            FindMax( seg1, frm, x, y, nv, 1, status );
+            head = AddToChain( head, seg1, status );
+
+/* Do the same for the second new segment. */
+            FindMax( seg2, frm, x, y, nv, 1, status );
+            head = AddToChain( head, seg2, status );
+         }
 
 /* Now we have reached the required accuracy, free resources. */
-      seg1 = astFree( seg1 );
-      seg2 = astFree( seg2 );
+         while( head ) {
+            seg1 = head;
+            head = head->next;
+            seg1 = astFree( seg1 );
+         }
 
-      while( head ) {
-         seg1 = head;
-         head = head->next;
-         seg1 = astFree( seg1 );
-      }
+/* If no vertices have been left out, return a deep copy of the supplied
+   PointSet. */
+         if( newlen == nv ) {
+            result = astCopy( pset );
 
-/* Get a deep copy of the supplied Polygon. */
-      result = astCopy( this );
+/* Otherwise, sort the indices of the vertices to be retained so that they 
+   are in the same order as they were in the supplied Polygon. */
+         } else if( astOK ){
+            qsort( newpoly, newlen, sizeof( int ), IntCmp );
 
-/* If any vertices have been removed, change the size of the PointSet in
-   the returned Polygon. */
-      if( result && newlen < nv ) {
-         astSetNpoint( ((AstRegion *) result)->points, newlen );
-
-/* Get pointers to the axis values of the new Polygon. */
-         ptr = astGetPoints( ((AstRegion *) result)->points );
-         xnew = ptr[ 0 ];
-         ynew = ptr[ 1 ];
-
-/* Sort the indices of the vertices to be retained so that they are in
-   the same order as they were in the supplied Polygon. */
-         qsort( newpoly, newlen, sizeof( int ), IntCmp );
-
+/* Create a new PointSet and get pointers to its axis values. */
+            result = astPointSet( newlen, 2, " ", status );
+            ptr = astGetPoints( result );
+            xnew = ptr[ 0 ];
+            ynew = ptr[ 1 ];
 
 /* Copy the axis values for the retained vertices from the old to the new
-   Polygon. */
-         if( astOK ) {
-            for( iat = 0; iat < newlen; iat++ ) {
-               xnew[ iat ] = x[ newpoly[ iat ] ];
-               ynew[ iat ] = y[ newpoly[ iat ] ];
+   PointSet. */
+            if( astOK ) {
+               for( iat = 0; iat < newlen; iat++ ) {
+                  *(xnew++) = x[ newpoly[ iat ] ];
+                  *(ynew++) = y[ newpoly[ iat ] ];
+               }
             }
-
-/* Indicate the cached information in the new Polygon is out of date. */
-            astResetCache( (AstRegion *) result );
          }
       }
-   }
 
 /* Free resources. */
-   newpoly = astFree( newpoly );
+      newpoly = astFree( newpoly );
+   }
 
-/* If an error occurred, annul the returned Polygon. */
+/* If an error occurred, annul the returned PointSet. */
    if ( !astOK ) result = astAnnul( result );
 
 /* Return the result. */
    return result;
 }
 
+/*
+*  Name:
+*     FindInsidePoint
+
+*  Purpose:
+*     Find a point that is inside the required outline.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "polygon.h"
+*     void FindInsidePoint<Oper><X>( <Xtype> value, <Xtype> array[], 
+*                                    int lbnd[ 2 ], int ubnd[ 2 ], 
+*                                    int *inx, int *iny, int *iv, 
+*                                    int *status );
+
+*  Class Membership:
+*     Polygon member function 
+
+*  Description:
+*     The central pixel in the array is checked to see if its value meets
+*     the requirements implied by <Oper> and "value". If so, its pixel
+*     indices and vector index are returned> if not, a spiral search is
+*     made until such a pixel value is found.
+
+*  Parameters:
+*     value
+*        The data value defining valid pixels.
+*     array
+*        The data array.
+*     lbnd 
+*        The lower pixel index bounds of the array.
+*     ubnd 
+*        The upper pixel index bounds of the array.
+*     inx 
+*        Pointer to an int in which to return the X pixel index of the
+*        first point that meets the requirements implied by <oper> and 
+*        "value".
+*     iny
+*        Pointer to an int in which to return the Y pixel index of the
+*        first point that meets the requirements implied by <oper> and 
+*        "value".
+*     iv
+*        Pointer to an int in which to return the vector index of the
+*        first point that meets the requirements implied by <oper> and 
+*        "value".
+*     status
+*        Pointer to the inherited status variable.
+
+*  Notes: 
+*     - <Oper> must be one of LT, LE, EQ, NE, GE, GT.
+
+
+*/
+
+/* Define a macro to implement the function for a specific data
+   type and operation. */
+#define MAKE_FINDINSIDEPOINT(X,Xtype,Oper,OperI) \
+static void FindInsidePoint##Oper##X( Xtype value, Xtype array[], \
+                                      int lbnd[ 2 ], int ubnd[ 2 ], \
+                                      int *inx, int *iny, int *iv, \
+                                      int *status ){ \
+\
+/* Local Variables: */ \
+   Xtype *pv;        /* Pointer to next data value to test */ \
+   const char *text; /* Pointer to text describing oper */ \
+   int cy;           /* Central row index */ \
+   int iskin;        /* Index of spiral layer being searched */ \
+   int nskin;        /* Number of spiral layers to search */ \
+   int nx;           /* Pixel per row */ \
+   int tmp;          /* Temporary storage */ \
+   int xhi;          /* High X pixel index bound of current skin */ \
+   int xlo;          /* Low X pixel index bound of current skin */ \
+   int yhi;          /* High X pixel index bound of current skin */ \
+   int ylo;          /* Low X pixel index bound of current skin */ \
+\
+/* Check the global error status. */ \
+   if ( !astOK ) return; \
+\
+/* Find number of pixels in one row of the array. */ \
+   nx = ( ubnd[ 0 ] - lbnd[ 0 ] + 1 ); \
+\
+/* Find the pixel indices of the central pixel */ \
+   *inx = ( ubnd[ 0 ] + lbnd[ 0 ] )/2; \
+   *iny = ( ubnd[ 1 ] + lbnd[ 1 ] )/2; \
+\
+/* Initialise the vector index and pointer to refer to the central pixel. */ \
+   *iv = ( *inx - lbnd[ 0 ] ) + nx*( *iny - lbnd[ 1 ] ) ; \
+   pv = array + (*iv); \
+\
+/* Test the pixel value, returning if it is valid. This \
+   relies on the compiler optimisation to remove the "if" statements \
+   for all but the operation appropriate to the function being defined. */ \
+   if( OperI == AST__LT ) { \
+      if( *pv < value ) return; \
+\
+   } else if( OperI == AST__LE ) { \
+      if( *pv <= value ) return; \
+\
+   } else if( OperI == AST__EQ ) { \
+      if( *pv == value ) return; \
+\
+   } else if( OperI == AST__NE ) { \
+      if( *pv != value ) return; \
+\
+   } else if( OperI == AST__GE ) { \
+      if( *pv >= value ) return; \
+\
+   } else { \
+      if( *pv > value ) return; \
+   } \
+\
+/* The central pixel is invalid if we arrive here. So we need to do a \
+   spiral search out from the centre looking for a valid pixel. Record \
+   the central row index (this is the row at which we jump to the next \
+   outer skin when doing the spiral search below). */ \
+   cy = *iny; \
+\
+/* Find how many skins can be searched as part of the spiral search \
+   before the edge of the array is encountered. */ \
+   nskin = ubnd[ 0 ] - *inx; \
+   tmp = *inx - lbnd[ 0 ]; \
+   if( tmp < nskin ) nskin = tmp; \
+   tmp = ubnd[ 1 ] - *iny; \
+   if( tmp < nskin ) nskin = tmp; \
+   tmp = *iny - lbnd[ 1 ]; \
+   if( tmp < nskin ) nskin = tmp; \
+\
+/* Initialise the skin box bounds to be just the central pixel. */ \
+   xlo = xhi = *inx; \
+   ylo = yhi = *iny; \
+\
+/* Loop round each skin looking for a valid test pixel. */ \
+   for( iskin = 0; iskin < nskin; iskin++ ) { \
+\
+/* Increment the upper and lower bounds of the box forming the next \
+   skin. */ \
+      xhi++; \
+      xlo--; \
+      yhi++; \
+      ylo--; \
+\
+/* Initialise things for the first pixel in the new skin by moving one \
+   pixel to the right. */ \
+      pv++; \
+      (*iv)++; \
+      (*inx)++; \
+\
+/* Move up the right hand edge of the box corresponding to the current \
+   skin. We start at the middle of the right hand edge. */ \
+      for( *iny = cy; *iny <= yhi; (*iny)++ ) { \
+\
+/* Test the pixel value, returning if it is valid. This relies on the \
+   compiler optimisation to remove the "if" statements for all but the \
+   operation appropriate to the function being defined. */ \
+         if( OperI == AST__LT ) { \
+            if( *pv < value ) return; \
+\
+         } else if( OperI == AST__LE ) { \
+            if( *pv <= value ) return; \
+\
+         } else if( OperI == AST__EQ ) { \
+            if( *pv == value ) return; \
+\
+         } else if( OperI == AST__NE ) { \
+            if( *pv != value ) return; \
+\
+         } else if( OperI == AST__GE ) { \
+            if( *pv >= value ) return; \
+\
+         } else { \
+            if( *pv > value ) return; \
+         } \
+\
+/* Move up a pixel. */ \
+         pv += nx; \
+         *iv += nx; \
+      } \
+\
+/* Move down a pixel so that *iny == yhi. */ \
+      pv -= nx; \
+      *iv -= nx; \
+      (*iny)--; \
+\
+/* Move left along the top edge of the box corresponding to the current \
+   skin. */ \
+      for( *inx = xhi; *inx >= xlo; (*inx)-- ) { \
+\
+/* Test the pixel value, returning if it is valid. */ \
+         if( OperI == AST__LT ) { \
+            if( *pv < value ) return; \
+\
+         } else if( OperI == AST__LE ) { \
+            if( *pv <= value ) return; \
+\
+         } else if( OperI == AST__EQ ) { \
+            if( *pv == value ) return; \
+\
+         } else if( OperI == AST__NE ) { \
+            if( *pv != value ) return; \
+\
+         } else if( OperI == AST__GE ) { \
+            if( *pv >= value ) return; \
+\
+         } else { \
+            if( *pv > value ) return; \
+         } \
+\
+/* Move left a pixel. */ \
+         pv--; \
+         (*iv)--; \
+      } \
+\
+/* Move right a pixel so that *inx == xlo. */ \
+      pv++; \
+      (*iv)++; \
+      (*inx)++; \
+\
+/* Move down along the left hand edge of the box corresponding to the current \
+   skin. */ \
+      for( *iny = yhi; *iny >= ylo; (*iny)-- ) { \
+\
+/* Test the pixel value, returning if it is valid. */ \
+         if( OperI == AST__LT ) { \
+            if( *pv < value ) return; \
+\
+         } else if( OperI == AST__LE ) { \
+            if( *pv <= value ) return; \
+\
+         } else if( OperI == AST__EQ ) { \
+            if( *pv == value ) return; \
+\
+         } else if( OperI == AST__NE ) { \
+            if( *pv != value ) return; \
+\
+         } else if( OperI == AST__GE ) { \
+            if( *pv >= value ) return; \
+\
+         } else { \
+            if( *pv > value ) return; \
+         } \
+\
+/* Move down a pixel. */ \
+         pv -= nx; \
+         *iv -= nx; \
+      } \
+\
+/* Move up a pixel so that *iny == ylo. */ \
+      pv += nx; \
+      *iv += nx; \
+      (*iny)++; \
+\
+/* Move right along the bottom edge of the box corresponding to the current \
+   skin. */ \
+      for( *inx = xlo; *inx <= xhi; (*inx)++ ) { \
+\
+/* Test the pixel value, returning if it is valid. */ \
+         if( OperI == AST__LT ) { \
+            if( *pv < value ) return; \
+\
+         } else if( OperI == AST__LE ) { \
+            if( *pv <= value ) return; \
+\
+         } else if( OperI == AST__EQ ) { \
+            if( *pv == value ) return; \
+\
+         } else if( OperI == AST__NE ) { \
+            if( *pv != value ) return; \
+\
+         } else if( OperI == AST__GE ) { \
+            if( *pv >= value ) return; \
+\
+         } else { \
+            if( *pv > value ) return; \
+         } \
+\
+/* Move right a pixel. */ \
+         pv++; \
+         (*iv)++; \
+      } \
+\
+/* Move left a pixel so that *inx == xhi. */ \
+      pv--; \
+      (*iv)--; \
+      (*inx)--; \
+\
+/* Move up the right hand edge of the box correspionding to the current \
+   skin. We stop just below the middle of the right hand edge. */ \
+      for( *iny = ylo; *iny < cy; (*iny)++ ) { \
+\
+/* Test the pixel value, returning if it is valid. This relies on the \
+   compiler optimisation to remove the "if" statements for all but the \
+   operation appropriate to the function being defined. */ \
+         if( OperI == AST__LT ) { \
+            if( *pv < value ) return; \
+\
+         } else if( OperI == AST__LE ) { \
+            if( *pv <= value ) return; \
+\
+         } else if( OperI == AST__EQ ) { \
+            if( *pv == value ) return; \
+\
+         } else if( OperI == AST__NE ) { \
+            if( *pv != value ) return; \
+\
+         } else if( OperI == AST__GE ) { \
+            if( *pv >= value ) return; \
+\
+         } else { \
+            if( *pv > value ) return; \
+         } \
+\
+/* Move up a pixel. */ \
+         pv += nx; \
+         *iv += nx; \
+      } \
+   } \
+\
+/* Report an error if no inside pooint could be found. */ \
+   if( OperI == AST__LT ) { \
+      text = "less than"; \
+   } else if( OperI == AST__LE ) { \
+      text = "less than or equal to"; \
+   } else if( OperI == AST__EQ ) { \
+      text = "equal to"; \
+   } else if( OperI == AST__NE ) { \
+      text = "not equal to"; \
+   } else if( OperI == AST__GE ) { \
+      text = "greater than or equal to"; \
+   } else { \
+      text = "greater than"; \
+   } \
+   astError( AST__NONIN, "astOutline"#X": Could not find a pixel value %s " \
+             "%g in the supplied array.", status, text, (double) value ); \
+} 
+
+/* Define a macro that uses the above macro to to create implementations
+   of FindInsidePoint for all operations. */
+#define MAKEALL_FINDINSIDEPOINT(X,Xtype) \
+MAKE_FINDINSIDEPOINT(X,Xtype,LT,AST__LT) \
+MAKE_FINDINSIDEPOINT(X,Xtype,LE,AST__LE) \
+MAKE_FINDINSIDEPOINT(X,Xtype,EQ,AST__EQ) \
+MAKE_FINDINSIDEPOINT(X,Xtype,GE,AST__GE) \
+MAKE_FINDINSIDEPOINT(X,Xtype,GT,AST__GT) \
+MAKE_FINDINSIDEPOINT(X,Xtype,NE,AST__NE)
+
+/* Expand the above macro to generate a function for each required
+   data type and operation. */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
+MAKEALL_FINDINSIDEPOINT(LD,long double) 
+#endif
+MAKEALL_FINDINSIDEPOINT(D,double)
+MAKEALL_FINDINSIDEPOINT(L,long int)
+MAKEALL_FINDINSIDEPOINT(UL,unsigned long int)
+MAKEALL_FINDINSIDEPOINT(I,int)
+MAKEALL_FINDINSIDEPOINT(UI,unsigned int)
+MAKEALL_FINDINSIDEPOINT(S,short int)
+MAKEALL_FINDINSIDEPOINT(US,unsigned short int)
+MAKEALL_FINDINSIDEPOINT(B,signed char)
+MAKEALL_FINDINSIDEPOINT(UB,unsigned char)
+MAKEALL_FINDINSIDEPOINT(F,float)
+
+/* Undefine the macros. */
+#undef MAKE_FINDINSIDEPOINT
+#undef MAKEALL_FINDINSIDEPOINT
+
 static void FindMax( Segment *seg, AstFrame *frm, double *x, double *y, 
-                     int nv, int *status ){
+                     int nv, int abs, int *status ){
 /*
 *  Name:
 *     FindMax
@@ -715,7 +1341,7 @@ static void FindMax( Segment *seg, AstFrame *frm, double *x, double *y,
 *  Synopsis:
 *     #include "polygon.h"
 *     void FindMax( Segment *seg, AstFrame *frm, double *x, double *y, 
-*                   int nv, int *status )
+*                   int nv, int abs, int *status )
 
 *  Class Membership:
 *     Polygon member function 
@@ -740,6 +1366,11 @@ static void FindMax( Segment *seg, AstFrame *frm, double *x, double *y,
 *        Pointer to the Y axis values in the original Polygon.
 *     nv
 *        Total number of vertics in the old Polygon..
+*     abs
+*        If non-zero, then the stored maximum is the position with
+*        maximum absolute error. Otherwise, the stored maximum is the 
+*        position with maximum positive error (positive errors are to the
+*        right when travelling from start to end of the segment).
 *     status
 *        Pointer to the inherited status variable.
 
@@ -754,11 +1385,9 @@ static void FindMax( Segment *seg, AstFrame *frm, double *x, double *y,
    double *py;         /* Pointer to next Y value */
    double ax;          /* X value at start */
    double ay;          /* Y value at start */
-   double ba2;         /* Squared distance between a and b */
+   double ba;          /* Distance between a and b */
    double bax;         /* X increment from a to b */
    double bay;         /* Y increment from a to b */
-   double ca2;         /* Squared distance between a and c */
-   double cadotba;     /* Dot product of a->c and a->b vectors */
    double cax;         /* X increment from a to c */
    double cay;         /* Y increment from a to c */
    double end[ 2 ];    /* Position of starting vertex */
@@ -799,7 +1428,7 @@ static void FindMax( Segment *seg, AstFrame *frm, double *x, double *y,
       ay = y[ i1 ];      
       bax = x[ i2 ] - ax;
       bay = y[ i2 ] - ay;
-      ba2 = bax*bax + bay*bay;
+      ba = sqrt( bax*bax + bay*bay );
    
 /* Initialise the largest error found so far. */
       seg->error = -1.0;
@@ -812,9 +1441,8 @@ static void FindMax( Segment *seg, AstFrame *frm, double *x, double *y,
    "c" to the line joining "a" and "b". */
          cax = x[ i ] - ax;      
          cay = y[ i ] - ay;      
-         ca2 = cax*cax + cay*cay;
-         cadotba = cax*bax + cay*bay;
-         error = ca2 - cadotba*cadotba/ba2;
+         error = ( bay*cax - cay*bax )/ba;
+         if( abs ) error = fabs( error );
 
 /* If this is the largest value found so far, record it. Note the error
    here is a squared distance. */
@@ -825,16 +1453,15 @@ static void FindMax( Segment *seg, AstFrame *frm, double *x, double *y,
       }
    
 /* If the end vertex is in the next cycle, check the remaining vertex
-   positions in the same way. */
+   posI would have thought a telentitions in the same way. */
       if( i2b != i2 ) {
 
          for( i = 0; i < i2; i++ ) {
 
             cax = x[ i ] - ax;      
             cay = y[ i ] - ay;      
-            ca2 = cax*cax + cay*cay;
-            cadotba = cax*bax + cay*bay;
-            error = ca2 - cadotba*cadotba/ba2;
+            error = ( bay*cax - cay*bax )/ba;
+            if( abs ) error = fabs( error );
 
             if( error > seg->error ) {
                seg->error = error;
@@ -843,9 +1470,6 @@ static void FindMax( Segment *seg, AstFrame *frm, double *x, double *y,
 
          }
       }
-
-/* Convert the error from squared distance to distance. */
-      seg->error = sqrt( seg->error );
 
 /* If the polygon is not defined in a simple Frame, we use the overloaded 
    Frame methods to do the geometry. */
@@ -893,7 +1517,8 @@ static void FindMax( Segment *seg, AstFrame *frm, double *x, double *y,
             py = ptr2[ 1 ];
             for( i = 1; i <= n; i++ ) {
 
-               error = fabs( *(py++) );
+               error = *(py++);
+               if( abs ) error = fabs( error );
 
                if( error > seg->error ) {
                   seg->error = error;
@@ -1047,13 +1672,14 @@ static int IntCmp( const void *a, const void *b ){
    return *((int*)a) - *((int*)b);
 }
 
-static Segment *NewSegment( int i1, int i2, int nvert, int *status ){
+static Segment *NewSegment( Segment *seg, int i1, int i2, int nvert, 
+                            int *status ){
 /*
 *  Name:
 *     NewSegment
 
 *  Purpose:
-*     Return a new structure describing a segment of the new Polygon
+*     Initialise a structure describing a segment of the new Polygon
 *     created by astDownsize.
 
 *  Type:
@@ -1061,18 +1687,24 @@ static Segment *NewSegment( int i1, int i2, int nvert, int *status ){
 
 *  Synopsis:
 *     #include "polygon.h"
-*     Segment *NewSegment( int i1, int i2, int nvert, int *status )
+*     Segment *NewSegment( Segment *seg, int i1, int i2, int nvert, 
+*                          int *status )
 
 *  Class Membership:
 *     Polygon member function 
 
 *  Description:
-*     This function allocates memory to hold a new Segment structure, and
-*     initialises its contents to describe the specified range of verices
-*     within the old Polygon. The cyclic nature of vertex indices is
-*     taken into account.
+*     This function initialises the contents of a structure describing
+*     the specified range of vertices within a Polygon. The cyclic nature 
+*     of vertex indices is taken into account.
+*
+*     If no structure is supplied, memory is allocated to hold a new
+*     structure.
 
 *  Parameters:
+*     seg
+*        Pointer to a structure to initialise, or NULL if a new structure
+*        is to be allocated.
 *     i1
 *        The index of a vertex within the old Polygon (supplied to 
 *        astDownsize) that marks the start of the new line segment in 
@@ -1087,7 +1719,7 @@ static Segment *NewSegment( int i1, int i2, int nvert, int *status ){
 *        Pointer to the inherited status variable.
 
 *  Returnd Value:
-*     Pointer to the new Segment structure. It should be freed using
+*     Pointer to the initialised Segment structure. It should be freed using
 *     astFree when no longer needed.
 
 */
@@ -1098,8 +1730,9 @@ static Segment *NewSegment( int i1, int i2, int nvert, int *status ){
 /* Check the global error status. */
    if ( !astOK ) return NULL;
 
-/* Allocate memory for the new structure. */
-   result = astMalloc( sizeof( Segment ) );
+/* Get a pointer to the structure to be initialised, allocating memory 
+   for a new structure if none was supplied. */
+   result = seg ? seg : astMalloc( sizeof( Segment ) );
 
 /* Check the pointer can be used safely. */
    if( result ) {
@@ -1119,7 +1752,7 @@ static Segment *NewSegment( int i1, int i2, int nvert, int *status ){
          result->i2 = i2;
 
 /* If the supplied starting index is within the second cycle (i.e. nvert 
-   or greater) the endign index will be even greater, so we can reduce
+   or greater) the ending index will be even greater, so we can reduce
    both by "nvert" to put them both in the first cycle. The goal is that
    the starting index should always be in the first cycle, but the ending
    index may possibly be in the second cycle. */
@@ -1136,6 +1769,609 @@ static Segment *NewSegment( int i1, int i2, int nvert, int *status ){
 /* Return the pointer to the new Segment structure. */
    return result;
 }
+
+/*
+*++
+*  Name:
+c     astOutline<X>
+f     AST_OUTLINE<X>
+
+*  Purpose:
+*     Create a new Polygon outling values in a 2D data grid.
+
+*  Type:
+*     Public function.
+
+*  Synopsis:
+c     #include "polygon.h"
+c     AstPolygon *astOutline<X>( <Xtype> value, int oper, <Xtype> array[],
+c                                int lbnd[2], int ubnd[2], double maxerr,
+c                                int maxvert, int inside[2], int starpix )
+f     RESULT = AST_OUTLINE<X>( VALUE, OPER, ARRAY, LBND, UBND, MAXERR,
+f                              MAXVERT, INSIDE, STARPIX, STATUS )
+
+*  Class Membership:
+*     Polygon method.
+
+*  Description:
+*     This is a set of functions that create a Polygon enclosing a single
+*     contiguous set of pixels that have a specified value within a gridded 
+*     2-dimensional data array (e.g. an image). 
+*
+*     A basic 2-dimensional Frame is used to represent the pixel coordinate
+*     system in the returned Polygon. The Domain attribute is set to
+*     "PIXEL", the Title attribute is set to "Pixel coordinates", and the 
+*     Unit attribute for each axis is set to "pixel". All other
+*     attributes are left unset. The nature of the pixel coordinate system 
+*     is determined by parameter 
+c     "starpix".
+f     STARPIX.
+*
+*     The 
+c     "maxerr" and "maxvert"
+f     MAXERR and MAXVERT
+*     parameters can be used to control how accurately the returned
+*     Polygon represents the required region in the data array. The
+*     number of vertices in the returned Polygon will be the minimum
+*     needed to achieve the required accuracy. 
+*
+*     You should use a function which matches the numerical type of the 
+*     data you are processing by replacing <X> in the generic function 
+*     name 
+c     astOutline<X> 
+f     AST_OUTLINE<X> 
+c     by an appropriate 1- or 2-character type code. For example, if you 
+*     are procesing data with type 
+c     "float", you should use the function astOutlineF
+f     REAL, you should use the function AST_OUTLINER
+*     (see the "Data Type Codes" section below for the codes appropriate to
+*     other numerical types).
+
+*  Parameters:
+c     value
+f     VALUE = <Xtype> (Given)
+*        A data value that specifies the pixels to be outlined. 
+c     oper
+f     OPER = INTEGER (Given)
+*        Indicates how the 
+c        "value"
+f        VALUE
+*        parameter is used to select the outlined pixels. It can
+*        have any of the following values:
+c        - AST__LT: outline pixels with value less than "value".
+c        - AST__LE: outline pixels with value less than or equal to "value".
+c        - AST__EQ: outline pixels with value equal to "value".
+c        - AST__NE: outline pixels with value not equal to "value".
+c        - AST__GE: outline pixels with value greater than or equal to "value".
+c        - AST__GT: outline pixels with value greater than "value".
+f        - AST__LT: outline pixels with value less than VALUE.
+f        - AST__LE: outline pixels with value less than or equal to VALUE.
+f        - AST__EQ: outline pixels with value equal to VALUE.
+f        - AST__NE: outline pixels with value not equal to VALUE.
+f        - AST__GE: outline pixels with value greater than or equal to VALUE.
+f        - AST__GT: outline pixels with value greater than VALUE.
+c     array
+f     ARRAY( * ) = <Xtype> (Given)
+c        Pointer to a
+f        A 
+*        2-dimensional array containing the data to be processed.  The
+*        numerical type of this array should match the 1- or
+*        2-character type code appended to the function name (e.g. if
+c        you are using astOutlineF, the type of each array element
+c        should be "float").
+f        you are using AST_OUTLINER, the type of each array element
+f        should be REAL).
+*
+*        The storage order of data within this array should be such
+*        that the index of the first grid dimension varies most
+*        rapidly and that of the second dimension least rapidly
+c        (i.e. Fortran array indexing is used).
+f        (i.e. normal Fortran array storage order).
+c     lbnd
+f     LBND( 2 ) = INTEGER (Given)
+c        Pointer to an array of two integers
+f        An array
+*        containing the coordinates of the centre of the first pixel
+*        in the input grid along each dimension.
+c     ubnd
+f     UBND( 2) = INTEGER (Given)
+c        Pointer to an array of two integers
+f        An array
+*        containing the coordinates of the centre of the last pixel in
+*        the input grid along each dimension.
+*
+c        Note that "lbnd" and "ubnd" together define the shape
+f        Note that LBND and UBND together define the shape
+*        and size of the input grid, its extent along a particular
+c        (j'th) dimension being ubnd[j]-lbnd[j]+1 (assuming the
+c        index "j" to be zero-based). They also define
+f        (J'th) dimension being UBND(J)-LBND(J)+1. They also define
+*        the input grid's coordinate system, each pixel having unit
+*        extent along each dimension with integral coordinate values
+*        at its centre or upper corner, as selected by parameter
+c        "starpix".
+f        STARPIX.
+c     maxerr
+f     MAXERR = DOUBLE PRECISION (Given)
+*        Together with 
+c        "maxvert",
+f        MAXVERT,
+*        this determines how accurately the returned Polygon represents
+*        the required region of the data array. It gives the target
+*        discrepancy between the returned Polygon and the accurate outline 
+*        in the data array, expressed as a number of pixels. Insignificant 
+*        vertices are removed from the accurate outline, one by one, until 
+*        the number of vertices remaining in the returned Polygon equals 
+c        "maxvert", 
+f        MAXVERT,
+*        or the largest discrepancy between the accurate outline and the 
+*        returned Polygon is greater than 
+c        "maxerr". If "maxerr"
+f        MAXERR. If MAXERR
+*        is zero or less, its value is ignored and the returned Polygon will 
+*        have the number of vertices specified by 
+c        "maxvert".
+f        MAXVERT.
+c     maxvert 
+f     MAXVERT = INTEGER (Given)
+*        Together with 
+c        "maxerr",
+f        MAXERR,
+*        this determines how accurately the returned Polygon represents
+*        the required region of the data array. It gives the maximum 
+*        allowed number of vertices in the returned Polygon. Insignificant 
+*        vertices are removed from the accurate outline, one by one, until 
+*        the number of vertices remaining in the returned Polygon equals 
+c        "maxvert", 
+f        MAXVERT,
+*        or the largest discrepancy between the accurate outline and the 
+*        returned Polygon is greater than 
+c        "maxerr". If "maxvert"
+f        MAXERR. If MAXVERT
+*        is less than 3, its value is ignored and the number of vertices in 
+*        the returned Polygon will be the minimum needed to ensure that the 
+*        discrepancy between the accurate outline and the returned
+*        Polygon is less than 
+c        "maxerr".
+f        MAXERR.
+c     inside
+f     INSIDE( 2 ) = INTEGER (Given)
+c        Pointer to an array of two integers
+f        An array
+*        containing the indices of a pixel known to be inside the
+*        required region. This is needed because the supplied data 
+*        array may contain several disjoint areas of pixels that satisfy 
+*        the criterion specified by
+c        "value" and "oper".
+f        VALUE and OPER.
+*        In such cases, the area described by the returned Polygon will 
+*        be the one that contains the pixel specified by
+c        "inside".
+f        INSIDE.
+*        If the specified pixel is outside the bounds given by
+c        "lbnd" and "ubnd",
+f        LBND and UBND,
+*        or has a value that does not meet the criterion specified by
+c        "value" and "oper",
+f        VALUE and OPER,
+*        then this function will search for a suitable pixel. The search
+*        starts at the central pixel and proceeds in a spiral manner until 
+*        a pixel is found that meets the specified crierion.
+c     starpix
+f     STARPIX = LOGICAL (Given)
+*        A flag indicating the nature of the pixel coordinate system used
+*        to describe the vertex positions in the returned Polygon. If
+c        non-zero,
+f        .TRUE.,
+*        the standard Starlink definition of pixel coordinate is used in
+*        which a pixel with integer index I spans a range of pixel coordinate
+*        from (I-1) to I (i.e. pixel corners have integral pixel coordinates).
+c        If zero,
+f        If .FALSE.,
+*        the definition of pixel coordinate used by other AST functions
+c        such as astResample, astMask, 
+f        such as AST_RESAMPLE, AST_MASK, 
+*        etc., is used. In this definition, a pixel with integer index I 
+*        spans a range of pixel coordinate from (I-0.5) to (I+0.5) (i.e. 
+*        pixel centres have integral pixel coordinates).
+c     boxsize
+f     BOXSIZE = INTEGER (Given)
+*        The full width in pixels of a smoothing box to be applied to the
+*        polygon vertices before downsizing the polygon to a smaller number
+*        of vertices. If an even number is supplied, the next larger odd
+*        number is used. Values of one or zero result in no smoothing.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Returned Value:
+c     astOutline<X>()
+f     AST_OUTLINE<X> = INTEGER
+*        The number of pixels to which a value of 
+c        "badval" 
+f        BADVAL 
+*        has been assigned.
+
+*  Notes:
+*     - This function proceeds by first finding a very accurate polygon,
+*     and then removing insignificant vertices from this fine polygon
+*     using 
+c     astDownsize.
+f     AST_DOWNSIZE.
+*     - The returned Polygon is the outer boundary of the contiguous set 
+*     of pixels that includes ths specified "inside" point, and satisfy
+*     the specified value requirement. This set of pixels may potentially 
+*     include "holes" where the pixel values fail to meet the specified
+*     value requirement. Such holes will be ignored by this function.
+*     - A value of zero will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+
+*  Data Type Codes:
+*     To select the appropriate masking function, you should
+c     replace <X> in the generic function name astOutline<X> with a
+f     replace <X> in the generic function name AST_OUTLINE<X> with a
+*     1- or 2-character data type code, so as to match the numerical
+*     type <Xtype> of the data you are processing, as follows:
+c     - D: double
+c     - F: float
+c     - L: long int
+c     - UL: unsigned long int
+c     - I: int
+c     - UI: unsigned int
+c     - S: short int
+c     - US: unsigned short int
+c     - B: byte (signed char)
+c     - UB: unsigned byte (unsigned char)
+f     - D: DOUBLE PRECISION
+f     - R: REAL
+f     - I: INTEGER
+f     - UI: INTEGER (treated as unsigned)
+f     - S: INTEGER*2 (short integer)
+f     - US: INTEGER*2 (short integer, treated as unsigned)
+f     - B: BYTE (treated as signed)
+f     - UB: BYTE (treated as unsigned)
+*
+c     For example, astOutlineD would be used to process "double"
+c     data, while astOutlineS would be used to process "short int"
+c     data, etc.
+f     For example, AST_OUTLINED would be used to process DOUBLE
+f     PRECISION data, while AST_OUTLINES would be used to process
+f     short integer data (stored in an INTEGER*2 array), etc.
+f
+f     For compatibility with other Starlink facilities, the codes W
+f     and UW are provided as synonyms for S and US respectively (but
+f     only in the Fortran interface to AST).
+
+*--
+*/
+/* Define a macro to implement the function for a specific data
+   type. Note, this function cannot be a virtual function since the
+   argument list does not include a Polygon, and so no virtual function
+   table is available. */
+#define MAKE_OUTLINE(X,Xtype) \
+AstPolygon *astOutline##X##_( Xtype value, int oper, Xtype array[], \
+                              int lbnd[2], int ubnd[2], double maxerr, \
+                              int maxvert, int inside[2], int starpix, \
+                              int *status ) { \
+\
+/* Local Variables: */ \
+   AstFrame *frm;            /* Frame in which to define the Polygon */ \
+   AstPointSet *candidate;   /* Candidate polygon vertices */ \
+   AstPointSet *pset;        /* PointSet holding downsized polygon vertices */ \
+   AstPolygon *result;       /* Result value to return */ \
+   Xtype *pv;                /* Pointer to next test point */ \
+   Xtype v;                  /* Value of current pixel */ \
+   double **ptr;             /* Pointers to PointSet arrays */ \
+   int boxsize;              /* Half width of smoothign box in vertices */ \
+   int inx;                  /* X index of inside point */ \
+   int iny;                  /* Y index of inside point */ \
+   int iv;                   /* Vector index of next test pixel */ \
+   int ixv;                  /* X pixel index of next test point */ \
+   int nv0;                  /* Number of vertices in accurate outline */ \
+   int nx;                   /* Length of array x axis */ \
+   int smooth;               /* Do we need to smooth the polygon? */ \
+   int stop_at_invalid;      /* Indicates when to stop rightwards search */ \
+   int tmp;                  /* Alternative boxsize */ \
+   int valid;                /* Does current pixel meet requirements? */ \
+   static double junk[ 6 ] = {0.0, 0.0, 1.0, 1.0, 0.0, 1.0 }; /* Junk poly */ \
+\
+/* Initialise. */ \
+   result = NULL; \
+\
+/* Check the global error status. */ \
+   if ( !astOK ) return result; \
+\
+/* If we are going to be smoothing the polygon before downsizing it, we \
+   need to ensure that the full polygon is retained within TraceEdge. if \
+   this is not the case, TraceEdge can remove all vertices from straight \
+   lines, except for the vertices that mark the beinning and end of the \
+   straight line. */ \
+   smooth = ( maxerr > 0.0 || maxvert > 2 ); \
+\
+/* Store the X dimension of the array. */ \
+   nx = ubnd[ 0 ] - lbnd[ 0 ] + 1; \
+\
+/* See if a valid inside point was supplied. It must be inside the bounds \
+   of the array, and must have a pixel value that meets the specified \
+   requirement. */ \
+   inx = inside[ 0 ]; \
+   iny = inside[ 1 ]; \
+   valid = ( inx >= lbnd[ 0 ] && inx <= ubnd[ 0 ] && \
+             iny >= lbnd[ 1 ] && iny <= ubnd[ 1 ] ); \
+\
+   if( valid  ) { \
+      iv = ( inx - lbnd[ 0 ] ) + (iny - lbnd[ 1 ] )*nx; \
+      v = array[ iv ]; \
+\
+      if( oper == AST__LT ) { \
+         valid = ( v < value ); \
+\
+      } else if( oper == AST__LE ) { \
+         valid = ( v <= value ); \
+\
+      } else if( oper == AST__EQ ) { \
+         valid = ( v == value ); \
+\
+      } else if( oper == AST__NE ) { \
+         valid = ( v != value ); \
+\
+      } else if( oper == AST__GE ) { \
+         valid = ( v >= value ); \
+\
+      } else if( oper == AST__GT ) { \
+         valid = ( v > value ); \
+\
+      } else if( astOK ){ \
+         astError( AST__OPRIN, "astOutline"#X": Invalid operation code " \
+                   "(%d) supplied (programming error).", status, oper ); \
+      } \
+   } \
+\
+/* If no valid inside point was supplied, find one now. */ \
+   if( !valid ) { \
+\
+      if( oper == AST__LT ) { \
+         FindInsidePointLT##X( value, array, lbnd, ubnd, &inx, &iny, &iv, status ); \
+\
+      } else if( oper == AST__LE ) { \
+         FindInsidePointLE##X( value, array, lbnd, ubnd, &inx, &iny, &iv, status ); \
+\
+      } else if( oper == AST__EQ ) { \
+         FindInsidePointEQ##X( value, array, lbnd, ubnd, &inx, &iny, &iv, status ); \
+\
+      } else if( oper == AST__NE ) { \
+         FindInsidePointNE##X( value, array, lbnd, ubnd, &inx, &iny, &iv, status ); \
+\
+      } else if( oper == AST__GE ) { \
+         FindInsidePointGE##X( value, array, lbnd, ubnd, &inx, &iny, &iv, status ); \
+\
+      } else if( oper == AST__GT ) { \
+         FindInsidePointGT##X( value, array, lbnd, ubnd, &inx, &iny, &iv, status ); \
+\
+      } else if( astOK ){ \
+         astError( AST__OPRIN, "astOutline"#X": Invalid operation code " \
+                   "(%d) supplied (programming error).", status, oper ); \
+      } \
+   } \
+\
+/* We now need to find a point on the boundary of the region containing \
+   the inside point. Starting at the inside point, move to the right \
+   through the array until a pixel is found which fails to meet the value \
+   requirement or the edge of the array is reached. */ \
+\
+   candidate = NULL; \
+   pv = array + iv; \
+   ixv = inx; \
+   stop_at_invalid = 1; \
+\
+   while( ++ixv <= ubnd[ 0 ] ) { \
+\
+/* Get the next pixel value. */ \
+      v = *(++pv); \
+\
+/* See if it meets the value requirement. */ \
+      if( oper == AST__LT ) { \
+         valid = ( v < value ); \
+\
+      } else if( oper == AST__LE ) { \
+         valid = ( v <= value ); \
+\
+      } else if( oper == AST__EQ ) { \
+         valid = ( v == value ); \
+\
+      } else if( oper == AST__NE ) { \
+         valid = ( v != value ); \
+\
+      } else if( oper == AST__GE ) { \
+         valid = ( v >= value ); \
+\
+      } else if( oper == AST__GT ) { \
+         valid = ( v > value ); \
+\
+      } else if( astOK ){ \
+         astError( AST__OPRIN, "astOutline"#X": Invalid operation code " \
+                   "(%d) supplied (programming error).", status, oper ); \
+         break; \
+      } \
+\
+/* If we are currently looking for the next invalid pixel, and this pixel \
+   is invalid... */ \
+      if( stop_at_invalid ) { \
+         if( ! valid ) { \
+\
+/* The current pixel may be on the required polygon, or it may be on the  \
+   edge of a hole contained within the region being outlined. We would  \
+   like to jump over such holes so that we can continue to look for the  \
+   real edge of the region being outlined. In order to determine if we  \
+   have reached a hole, we trace the edge that passes through the current  \
+   pixel, forming a candidate polygon in the process. In the process, We  \
+   see if the inside point falls within this candidate polygon. If it does  \
+   then the polygon is accepted as the required polygon. Otherwise, it is  \
+   rejected as a mere hole, and we continue moving away from the inside  \
+   point, looking for a new edge. */ \
+            if( oper == AST__LT ) { \
+               candidate = TraceEdgeLT##X( value, array, lbnd, ubnd, iv - 1, \
+                                           ixv - 1, iny, starpix, smooth, status ); \
+\
+            } else if( oper == AST__LE ) { \
+               candidate = TraceEdgeLE##X( value, array, lbnd, ubnd, iv - 1, \
+                                           ixv - 1, iny, starpix, smooth, status ); \
+\
+            } else if( oper == AST__EQ ) { \
+               candidate = TraceEdgeEQ##X( value, array, lbnd, ubnd, iv - 1, \
+                                           ixv - 1, iny, starpix, smooth, status ); \
+\
+            } else if( oper == AST__NE ) { \
+               candidate = TraceEdgeNE##X( value, array, lbnd, ubnd, iv - 1, \
+                                           ixv - 1, iny, starpix, smooth, status ); \
+\
+            } else if( oper == AST__GE ) { \
+               candidate = TraceEdgeGE##X( value, array, lbnd, ubnd, iv - 1, \
+                                           ixv - 1, iny, starpix, smooth, status ); \
+\
+            } else if( oper == AST__GT ) { \
+               candidate = TraceEdgeGT##X( value, array, lbnd, ubnd, iv - 1, \
+                                           ixv - 1, iny, starpix, smooth, status ); \
+\
+            } else if( astOK ){ \
+               astError( AST__OPRIN, "astOutline"#X": Invalid operation code " \
+                         "(%d) supplied (programming error).", status, oper ); \
+            } \
+\
+/* If the candidate polygon is the required polygon, break out of the \
+   loop. Otherwise, indicate that we want to continue moving right, \
+   across the hole, until we reach the far side of the hole (i.e. find   \
+   the next valid pixel). */ \
+            if( candidate ) { \
+               break; \
+            } else { \
+               stop_at_invalid = 0; \
+            } \
+         } \
+\
+/* If we are currently looking for the next valid pixel, and the current \
+   pixel is valid... */ \
+      } else if( valid ) { \
+\
+/* We have reached the far side of a hole. Continue moving right, looking \
+   now for the next invalid pixel (which may be on the required polygon). */ \
+         stop_at_invalid = 1; \
+      } \
+   } \
+\
+/* If we have not yet found the required polygon, we must have reached \
+   the right hand edge of the array. So we now follow the edge of the \
+   array round until we meet the boundary of the required region. */ \
+   if( !candidate ) { \
+      if( oper == AST__LT ) { \
+         candidate = TraceEdgeLT##X( value, array, lbnd, ubnd, iv - 1, \
+                                     ixv - 1, iny, starpix, smooth, status ); \
+\
+      } else if( oper == AST__LE ) { \
+         candidate = TraceEdgeLE##X( value, array, lbnd, ubnd, iv - 1, \
+                                     ixv - 1, iny, starpix, smooth, status ); \
+\
+      } else if( oper == AST__EQ ) { \
+         candidate = TraceEdgeEQ##X( value, array, lbnd, ubnd, iv - 1, \
+                                     ixv - 1, iny, starpix, smooth, status ); \
+\
+      } else if( oper == AST__NE ) { \
+         candidate = TraceEdgeNE##X( value, array, lbnd, ubnd, iv - 1, \
+                                     ixv - 1, iny, starpix, smooth, status ); \
+\
+      } else if( oper == AST__GE ) { \
+         candidate = TraceEdgeGE##X( value, array, lbnd, ubnd, iv - 1, \
+                                     ixv - 1, iny, starpix, smooth, status ); \
+\
+      } else if( oper == AST__GT ) { \
+         candidate = TraceEdgeGT##X( value, array, lbnd, ubnd, iv - 1, \
+                                     ixv - 1, iny, starpix, smooth, status ); \
+\
+      } else if( astOK ){ \
+         astError( AST__OPRIN, "astOutline"#X": Invalid operation code " \
+                   "(%d) supplied (programming error).", status, oper ); \
+      } \
+   } \
+\
+/* If required smooth the full resolution polygon before downsizing it. */ \
+   if( smooth ) { \
+\
+/* Initially, set the boxsize to be equal to the required accouracy. */ \
+      if( maxerr > 0 ) { \
+         boxsize = (int) maxerr; \
+      } else { \
+         boxsize = INT_MAX; \
+      } \
+\
+/* Determine a second box size equal to the average number of vertices in \
+   the accurate outline, per vertex in the returned Polygon. */ \
+      nv0 = astGetNpoint( candidate ); \
+      if( maxvert > 2 ) { \
+         tmp = nv0/(2*maxvert); \
+      } else { \
+         tmp = INT_MAX; \
+      } \
+\
+/* Use the minimum of the two box sizes. */ \
+      if( tmp < boxsize ) boxsize = tmp; \
+\
+/* Ensure the box is sufficiently small to allow at least 10 full boxes \
+   (=20 half boxes) around the polygon. */ \
+      tmp = nv0/20; \
+      if( tmp < boxsize ) boxsize = tmp; \
+      if( boxsize == 0 ) boxsize = 1; \
+\
+/* Smooth the polygon. */ \
+      SmoothPoly( candidate, boxsize, 1.0, status ); \
+   } \
+\
+/* Reduce the number of vertices in the outline. */ \
+   frm = astFrame( 2, "Domain=PIXEL,Unit(1)=pixel,Unit(2)=pixel," \
+                   "Title=Pixel coordinates", status ); \
+   pset = DownsizePoly( candidate, maxerr, maxvert, frm, status ); \
+\
+/* Create a default Polygon with 3 junk vertices. */ \
+   result = astPolygon( frm, 3, 3, junk, NULL, " ", status ); \
+\
+/* Change the PointSet within the Polygon to the one created above. */ \
+   SetPointSet( result, pset, status ); \
+\
+/* Free resources. Note, we need to free the arrays within the candidate \
+   PointSet explicitly, since they were not created as part of the \
+   construction of the PointSet (see TraceEdge). */ \
+   pset = astAnnul( pset ); \
+   frm = astAnnul( frm ); \
+   ptr = astGetPoints( candidate ); \
+   astFree( ptr[ 0 ] ); \
+   astFree( ptr[ 1 ] ); \
+   candidate = astAnnul( candidate ); \
+\
+/* If an error occurred, clear the returned result. */ \
+   if ( !astOK ) result = astAnnul( result ); \
+\
+/* Return the result. */ \
+   return result; \
+}
+
+
+/* Expand the above macro to generate a function for each required
+   data type. */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
+MAKE_OUTLINE(LD,long double)
+#endif
+MAKE_OUTLINE(D,double)
+MAKE_OUTLINE(L,long int)
+MAKE_OUTLINE(UL,unsigned long int)
+MAKE_OUTLINE(I,int)
+MAKE_OUTLINE(UI,unsigned int)
+MAKE_OUTLINE(S,short int)
+MAKE_OUTLINE(US,unsigned short int)
+MAKE_OUTLINE(B,signed char)
+MAKE_OUTLINE(UB,unsigned char)
+MAKE_OUTLINE(F,float)
+
+/* Undefine the macros. */
+#undef MAKE_OUTLINE
 
 static double Polywidth( AstFrame *frm, AstLineDef **edges, int i, int nv, 
                          double cen[ 2 ], int *status ){
@@ -2158,6 +3394,53 @@ static void ResetCache( AstRegion *this, int *status ){
    }
 }
 
+static void SetPointSet( AstPolygon *this, AstPointSet *pset, int *status ){
+/*
+*  Name:
+*     SetPointSet
+
+*  Purpose:
+*     Store a new set of vertices in an existing Polygon.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "polygon.h"
+*     void SetPointSet( AstPolygon *this, AstPointSet *pset, int *status )
+
+*  Class Membership:
+*     Polygon member function 
+
+*  Description:
+*     The PointSet in the supplied Polygon is annulled, are stored in the supplied
+*     Polygon, replacing the existing data pointers.
+
+*  Parameters:
+*     this
+*        Pointer to the Polygon to be changed.
+*     pset
+*        The PointSet containing the enw vertex information.
+*     status
+*        Pointer to the inherited status variable.
+
+*/
+
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Annul the pointer to the PointSet already in the supplied Polygon. */
+   (void) astAnnul( ((AstRegion *) this)->points );
+
+/* Store a clone of the supplie dnew PointSet pointer. */
+   ((AstRegion *) this)->points = astClone( pset );
+
+/* Indicate the cached information in the polygon will need to be
+   re-calculated when needed. */
+   astResetCache( this );
+}
+
 static void SetRegFS( AstRegion *this_region, AstFrame *frm, int *status ) {
 /*
 *  Name:
@@ -2370,6 +3653,592 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
    return result;
 }
 
+static void SmoothPoly( AstPointSet *pset, int boxsize, double strength, 
+                        int *status ) {
+/*
+*  Name:
+*     SmoothPoly
+
+*  Purpose:
+*     Smoooth a polygon assuming plane geometry.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "polygon.h"
+*     void SmoothPoly( AstPointSet *pset, int boxsize, double strength, 
+*                      int *status )
+
+*  Class Membership:
+*     Polygon member function 
+
+*  Description:
+*     This function smooths a polygon, without changing the number of
+*     vertices. It assumes plane geometry, so should not be used to
+*     smooth polygons defined within a SkyFrame or CmpFrame.
+*
+*     Each vertex is replaced by a new vertex determined as follows: the 
+*     mean X and Y axis value of the vertices in a section of the polygon 
+*     centred on the vertex being replaced are found (the length of the
+*     section is given by parameter "boxsize"). The new vertex position 
+*     is then the weighted mean of this mean (X,Y) position and the old 
+*     vertex position. The weight for the mean (X,Y) position is given 
+*     by parameter "strength", and the weight for the old vertex
+*     position is (1.0 - strength)
+
+*  Parameters:
+*     pset
+*        A PointSet holding the polygon vertices.
+*     boxsize
+*        Half width of the box filter, given as a number of vertices.
+*     strength
+*        The weight to use for the mean (X,Y) position when finding each
+*        new vertex position. Should be in the range 0.0 to 1.0. A value
+*        of zero results in no change being made to the polygon. A value
+*        of 1.0 results in the returned polygon being fully smoothed.
+*     status
+*        Pointer to the inherited status variable.
+
+*/
+
+/* Local Variables: */
+   double **ptr;
+   double *newx;
+   double *newy;
+   double *nx;
+   double *ny;
+   double *oldx;
+   double *oldy;
+   double *ox;
+   double *oy;        
+   double *px;
+   double *py;
+   double *qx;
+   double *qy;
+   double a;
+   double b;
+   double sx;
+   double sy;
+   int half_width;
+   int i;
+   int nv;
+   int top;
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Get the number of vertices. */
+   nv = astGetNpoint( pset );
+
+/* Get pointers to arrays holding the supplied vertex positions. */
+   ptr = astGetPoints( pset );
+   oldx = ptr[ 0 ];
+   oldy = ptr[ 1 ];
+
+/* Allocate arrays to hold the returned vertex positions. */
+   newx = astMalloc( nv*sizeof( double ) );
+   newy = astMalloc( nv*sizeof( double ) );
+
+/* Check these pointers can be used safely. */
+   if( astOK ) {
+
+/* Get weighting factors for the fully smoothed and unsmoothed positions. */
+      a = strength;
+      b = 1.0 - a;
+
+/* Ensure the box size is sufficiently small for there to be room for 
+   two boxes along the polygon. */
+      half_width = nv/4 - 1;
+      if( boxsize < half_width ) half_width = boxsize;
+      if( half_width < 1 ) half_width = 1;
+
+/* Modify the weight for the fully smoothed position to include the 
+   normalisation factor needed to account for the box width. */
+      a /= 2*half_width + 1;
+
+/* Find the sum of the x and y coordinates within a box centred on the
+   first vertex. This includes vertices from the end of the polygon. */
+      px = oldx + 1;
+      qx = oldx + nv;
+      sx = (oldx)[ 0 ];
+   
+      py = oldy + 1;
+      qy = oldy + nv;
+      sy = (oldy)[ 0 ];
+
+      for( i = 0; i < half_width; i++ ) {
+         sx += *(px++) + *(--qx);
+         sy += *(py++) + *(--qy);
+      }
+
+/* Replacing vertices within the first half box will include vertices at 
+   both ends of the polygon. Set up the pointers accordingly, and then
+   find replacements for each vertex in the first half box.*/
+      ox = oldx;
+      oy = oldy;
+      nx = newx;
+      ny = newy;
+      for( i = 0; i < half_width; i++ ) {
+
+/* Form the new vertex (x,y) values as the weighted mean of the mean 
+   (x,y) values in the box, and the old (x,y) values. */
+         *(nx++) = a*sx + b*( *(ox++) );
+         *(ny++) = a*sy + b*( *(oy++) );
+
+/* Add in the next vertex X and Y axis values to the running sums, and 
+   remove the position that has now passed out of the box. */
+         sx += *(px++) - *(qx++);
+         sy += *(py++) - *(qy++);
+      }
+
+/* Adjust the pointer for the rest of the polygon, up to one half box away 
+   from the end. In this section, the smoothing box does not touch either
+   end of the polygon. */
+      top = nv - half_width - 1;
+      qx = oldx;
+      qy = oldy;
+      for( ; i < top; i++ ){
+
+/* Form the new vertex (x,y) values as the weighted mean of the mean 
+   (x,y) values in the box, and the old (x,y) values. */
+         *(nx++) = a*sx + b*( *(ox++) );
+         *(ny++) = a*sy + b*( *(oy++) );
+
+/* Add in the next vertex X and Y axis values to the running sums, and 
+   remove the position that has now passed out of the box. */
+         sx += *(px++) - *(qx++);
+         sy += *(py++) - *(qy++);
+      }
+
+/* Now do the last half box (which includes vertices from the start of 
+   the polygon). */
+      top = nv;
+      px = oldx;
+      py = oldy;
+      for( ; i < top; i++ ){
+         *(nx++) = a*sx + b*( *(ox++) );
+         *(ny++) = a*sy + b*( *(oy++) );
+         sx += *(px++) - *(qx++);
+         sy += *(py++) - *(qy++);
+      }
+
+/* Replace the data points in the PointSet. */
+      oldx = astFree( oldx );
+      oldy = astFree( oldy );
+      ptr[ 0 ] = newx;
+      ptr[ 1 ] = newy;
+      astSetPoints( pset, ptr );
+   }
+}
+
+/*
+*  Name:
+*     TraceEdge
+
+*  Purpose:
+*     Find a point that is inside the required outline.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "polygon.h"
+*     void TraceEdge<Oper><X>( <Xtype> value, <Xtype> array[], 
+*                              int lbnd[ 2 ], int ubnd[ 2 ], int iv0,
+*                              int ix0, int iy0, int starpix, int full,
+*                              int *status );
+
+*  Class Membership:
+*     Polygon member function 
+
+*  Description:
+*     This function forms a polygon enclosing the region of the data
+*     array specified by <Oper> and "value". If this polygon contains
+*     the point "(inx,iny)", then a PointSet is returned holding the
+*     pixel coordinates of the Polygon vertices. If the polygon
+*     does not contain "(inx,iny)", a NULL pointer is returned.
+*
+*     Each vertex in the polygon corresponds to a corner of a pixel in
+*     the data array.
+
+*  Parameters:
+*     value
+*        The data value defining valid pixels.
+*     array
+*        The data array.
+*     lbnd 
+*        The lower pixel index bounds of the array.
+*     ubnd 
+*        The upper pixel index bounds of the array.
+*     iv0
+*        The vector index of a pixel inside the region such that the
+*        pixel to the right is NOT inside the region. This defines the 
+*        start of the polygon.
+*     ix0
+*        The X pixel index of the pixel specified by "iv0".
+*     inx 
+*        The X pixel index of a point which must be inside the polygon
+*        for the polygon to be acceptable.
+*     iny
+*        The Y pixel index of a point which must be inside the polygon
+*        for the polygon to be acceptable.
+*     starpix
+*        If non-zero, the usual Starlink definition of pixel coordinate
+*        is used (integral values at pixel corners). Otherwise, the
+*        system used by other AST functions such as astResample is used 
+*        (integral values at pixel centres).
+*     full
+*        If non-zero, the full polygon is stored. If zero, vertices in the 
+*        middle of straight sections of the Polygon are omitted.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     A pointer to a PointSet holding the vertices of the polygon, or
+*     NULL if the polygon did not contain "(inx,iny)".
+
+*  Notes: 
+*     - <Oper> must be one of LT, LE, EQ, GE, GT, NE.
+
+
+*/
+
+/* Define a macro to implement the function for a specific data
+   type and operation. */
+#define MAKE_TRACEEDGE(X,Xtype,Oper,OperI) \
+static AstPointSet *TraceEdge##Oper##X( Xtype value, Xtype array[], \
+                                        int lbnd[ 2 ], int ubnd[ 2 ], \
+                                        int iv0, int ix0, int iy0, \
+                                        int starpix, int full, \
+                                        int *status ){ \
+\
+/* Local Variables: */ \
+   AstPointSet *result; /* Pointer to text describing oper */ \
+   Xtype *pa;           /* Pointer to current valid pixel value */ \
+   Xtype *pb;           /* Pointer to neigbouring valid pixel value */ \
+   Xtype *pc;           /* Pointer to neigbouring valid pixel value */ \
+   double *ptr[ 2 ];    /* PointSet data pointers */ \
+   double *xvert;       /* Pointer to array holding vertex X axis values */ \
+   double *yvert;       /* Pointer to array holding vertex Y axis values */ \
+   double xx;           /* Pixel X coord at corner */ \
+   double yy;           /* Pixel Y coord at corner */ \
+   int at;              /* The pixel corner to draw to */ \
+   int done;            /* Have we arrived back at the start of the polygon? */ \
+   int ii;              /* Index of new vertex */ \
+   int ix;              /* X pixel index of current valid pixel */ \
+   int iy;              /* Y pixel index of current valid pixel */ \
+   int nright;          /* Overall number of right hand turns along polygon */ \
+   int nvert;           /* Number of vertices */ \
+   int nx;              /* Pixels per row */ \
+\
+/* Initialise */ \
+   result = NULL; \
+\
+/* Check the global error status. */ \
+   if ( !astOK ) return result; \
+\
+\
+/* Initialise pointers to arrays holding the X and Y pixel coordinates at \
+   the vertices of the polygon. */ \
+   xvert = NULL; \
+   yvert = NULL; \
+   nvert = 0; \
+\
+/* Find number of pixels in one row of the array. */ \
+   nx = ( ubnd[ 0 ] - lbnd[ 0 ] + 1 ); \
+\
+/* The four corners of a pixel are numbered as follows: 0=bottom left, \
+   1=top left, 2=top right, 3=bottom right. The following algorithm moves \
+   along pixel edges, from corner to corner, using the above numbering \
+   scheme to identify the corners. We start the polygon by moving from the \
+   bottom right to the top right corner of pixel "(ix0,iy0)". */ \
+   ix = ix0; \
+   iy = iy0; \
+   at = 2; \
+\
+/* Store a pointer to the first good pixel value. */ \
+   pa = array + ( ix - lbnd[ 0 ] ) + nx*( iy - lbnd[ 1 ] ) ; \
+\
+/* We count the number of times the polygon turns to the right compared \
+   to the left. Initialise it to zero. */ \
+   nright = 0; \
+\
+/* Loop round tracing out the polygon until we arrive back at the \
+   beginning. The Polygon class requires that the inside of the polygon \
+   is to the left as we move round the polygon in an anti-clockwise \
+   direction. So at each corner, we attempt to move to the next \
+   anti-clockwise good pixel corner. */ \
+   done = 0; \
+   while( !done ) { \
+\
+/* If we have arrived at the bottom left corner of the good pixel, we must \
+   have come from the top left corner since all movements around a pixel \
+   must be anti-clockwise. */ \
+      if( at == 0 ) { \
+\
+/* Note the pixel coordinates at the bottom left corner of the current \
+   pixel. */ \
+         if( starpix ) { \
+            xx = ix - 1.0; \
+            yy = iy - 1.0; \
+         } else { \
+            xx = ix - 0.5; \
+            yy = iy - 0.5; \
+         } \
+\
+/* Get a pointer to lower left pixel value */ \
+         pb = pa - nx - 1; \
+\
+/* Get a pointer to lower mid pixel value. */ \
+         pc = pb + 1; \
+\
+/* If the lower left pixel is within the array and meets the validity \
+   requirements, move to the left along its top edge. */ \
+         if( iy > lbnd[ 1 ] && ix > lbnd[ 0 ] && ISVALID(*pb,OperI,value) ) { \
+            nright++; \
+            pa = pb; \
+            at = 1; \
+            ix--; \
+            iy--; \
+\
+/* Otherwise, if lower mid pixel is good, move down its left edge. */ \
+         } else if( iy > lbnd[ 1 ] && ISVALID(*pc,OperI,value) ) { \
+            pa = pc; \
+            at = 0; \
+            iy--; \
+\
+/* Otherwise, move to the right along the bottom edge of the current pixel. */ \
+         } else { \
+            nright--; \
+            at = 3; \
+         } \
+\
+/* If the polygon bends at this point, or if we will be smoothing the \
+   polygon, append the pixel coordinates at this pixel corner to the \
+   polygon. */ \
+         if( full || pa != pc ) ADD( xx, yy ); \
+\
+/* If we have arrived at the top left corner of the good pixel, we must \
+   have come from the top right corner. */ \
+      } else if( at == 1 ) { \
+\
+/* Note the pixel coordinates at the top left corner of the current \
+   pixel. */ \
+         if( starpix ) { \
+            xx = ix - 1.0; \
+            yy = iy; \
+         } else { \
+            xx = ix - 0.5; \
+            yy = iy + 0.5; \
+         } \
+\
+/* Get a pointer to upper left pixel value */ \
+         pb = pa + nx - 1; \
+\
+/* Get a pointer to mid left pixel value. */ \
+         pc = pa - 1; \
+\
+/* If upper left pixel is good, move up its left edge. */ \
+         if( iy < ubnd[ 1 ] && ix > lbnd[ 0 ] && ISVALID(*pb,OperI,value) ) { \
+            nright++; \
+            pa = pb; \
+            at = 2; \
+            ix--; \
+            iy++; \
+\
+/* Otherwise, if left mid pixel is good, move left along its top edge. */ \
+         } else if( ix > lbnd[ 0 ] && ISVALID(*pc,OperI,value) ) { \
+            pa = pc; \
+            at = 1; \
+            ix--; \
+\
+/* Otherwise, move down the left edge of the current pixel. */ \
+         } else { \
+            nright--; \
+            at = 0; \
+         } \
+\
+/* If the polygon bends at this point, or if we will be smoothing the \
+   polygon, append the pixel coordinates at this pixel corner to the \
+   polygon. */ \
+         if( full || pa != pc ) ADD( xx, yy ); \
+\
+/* If we have arrived at the top right corner of the good pixel, we must \
+   have come from the bottom right corner. */ \
+      } else if( at == 2 ) { \
+\
+/* Note the pixel coordinates at the top right corner of the current \
+   pixel. */ \
+         if( starpix ) { \
+            xx = ix; \
+            yy = iy; \
+         } else { \
+            xx = ix + 0.5; \
+            yy = iy + 0.5; \
+         } \
+\
+/* Pointer to upper right pixel value */ \
+         pb = pa + nx + 1; \
+\
+/* Pointer to top mid pixel value. */ \
+         pc = pa + nx; \
+\
+/* If upper right pixel is good, move right along its bottom edge. */ \
+         if( iy < ubnd[ 1 ] && ix < ubnd[ 0 ] && ISVALID(*pb,OperI,value) ){ \
+            nright++; \
+            pa = pb; \
+            at = 3; \
+            ix++; \
+            iy++; \
+\
+/* Otherwise, if upper mid pixel is good, move up its right edge. */ \
+         } else if( iy < ubnd[ 1 ] && ISVALID(*pc,OperI,value) ) { \
+            pa = pc; \
+            at = 2; \
+            iy++; \
+\
+/* Otherwise, move left along the top edge of the current pixel. */ \
+         } else { \
+            nright--; \
+            at = 1; \
+         } \
+\
+/* If the polygon bends at this point, or if we will be smoothing the \
+   polygon, append the pixel coordinates at this pixel corner to the \
+   polygon. */ \
+         if( full || pa != pc ) ADD( xx, yy ); \
+\
+/* Arrived at bottom right corner of good pixel from lower left. */ \
+      } else { \
+\
+/* Note the pixel coordinates at the bottom right corner of the current \
+   pixel. */ \
+         if( starpix ) { \
+            xx = ix; \
+            yy = iy - 1.0; \
+         } else { \
+            xx = ix + 0.5; \
+            yy = iy - 0.5; \
+         } \
+\
+/* Pointer to lower right pixel value */ \
+         pb = pa - ( nx - 1 ); \
+\
+/* Pointer to mid right pixel value. */ \
+         pc = pa + 1; \
+\
+/* If lower right pixel is good, move down its left edge. */ \
+         if( iy > lbnd[ 1 ] && ix < ubnd[ 0 ] && ISVALID(*pb,OperI,value) ) { \
+            nright++; \
+            pa = pb; \
+            at = 0; \
+            ix++; \
+            iy--; \
+\
+/* Otherwise, if right mid pixel is good, move right along its lower edge. */ \
+         } else if( ix < ubnd[ 0 ] && ISVALID(*pc,OperI,value) ) { \
+            pa = pc; \
+            at = 3; \
+            ix++; \
+\
+/* Otherwise, move up the left edge of the current pixel. */ \
+         } else { \
+            nright--; \
+            at = 2; \
+         } \
+\
+/* If the polygon bends at this point, or if we will be smoothing the \
+   polygon, append the pixel coordinates at this pixel corner to the \
+   polygon. */ \
+         if( full || pa != pc ) ADD( xx, yy ); \
+      } \
+\
+/* If we have arrived back at the start, break out of the loop. */ \
+      if( ix == ix0 && iy == iy0 && at == 2 ) done = 1; \
+   } \
+\
+/* If we have circled round to the right, the polygon will not enclosed \
+   the specified position, so free resources and return a NULL pointer. */ \
+   if( nright > 0 ) { \
+      xvert = astFree( xvert ); \
+      yvert = astFree( yvert ); \
+\
+/* If we have circled round to the left, the polygon will enclose \
+   the specified position, so create and return a PointSet. */ \
+   } else { \
+      result = astPointSet( nvert, 2, " ", status ); \
+      ptr[ 0 ] = xvert; \
+      ptr[ 1 ] = yvert; \
+      astSetPoints( result, ptr ); \
+   } \
+\
+/* Annul the returned PointSet if anythign went wrong. */ \
+   if( !astOK && result ) result = astAnnul( result ); \
+\
+/* Return the PointSet pointer. */ \
+   return result; \
+}
+
+/* Define a macro for testing if a pixel value <V> satisfies the requirements
+   specified by <Oper> and <Value>. Compiler optimisation should remove
+   all the "if" testing from this expression. */
+#define ISVALID(V,OperI,Value) ( \
+   ( OperI == AST__LT ) ? ( (V) < Value ) : ( \
+      ( OperI == AST__LE ) ? ( (V) <= Value ) : ( \
+         ( OperI == AST__EQ ) ? ( (V) == Value ) : ( \
+            ( OperI == AST__GE ) ? ( (V) >= Value ) : ( \
+               ( OperI == AST__NE ) ? ( (V) != Value ) : ( \
+                  (V) > Value \
+               ) \
+            ) \
+         ) \
+      ) \
+   ) \
+)
+
+/* Define a macro to add a vertex position to dynamically allocated
+   arrays of X and Y positions. */
+#define ADD(X,Y) {\
+   ii = nvert++; \
+   xvert = (double *) astGrow( xvert, nvert, sizeof( double ) ); \
+   yvert = (double *) astGrow( yvert, nvert, sizeof( double ) ); \
+   if( astOK ) { \
+      xvert[ ii ] = (X); \
+      yvert[ ii ] = (Y); \
+   } \
+}
+
+/* Define a macro that uses the above macro to to create implementations
+   of TraceEdge for all operations. */
+#define MAKEALL_TRACEEDGE(X,Xtype) \
+MAKE_TRACEEDGE(X,Xtype,LT,AST__LT) \
+MAKE_TRACEEDGE(X,Xtype,LE,AST__LE) \
+MAKE_TRACEEDGE(X,Xtype,EQ,AST__EQ) \
+MAKE_TRACEEDGE(X,Xtype,NE,AST__NE) \
+MAKE_TRACEEDGE(X,Xtype,GE,AST__GE) \
+MAKE_TRACEEDGE(X,Xtype,GT,AST__GT)
+
+/* Expand the above macro to generate a function for each required
+   data type and operation. */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
+MAKEALL_TRACEEDGE(LD,long double) 
+#endif
+MAKEALL_TRACEEDGE(D,double)
+MAKEALL_TRACEEDGE(L,long int)
+MAKEALL_TRACEEDGE(UL,unsigned long int)
+MAKEALL_TRACEEDGE(I,int)
+MAKEALL_TRACEEDGE(UI,unsigned int)
+MAKEALL_TRACEEDGE(S,short int)
+MAKEALL_TRACEEDGE(US,unsigned short int)
+MAKEALL_TRACEEDGE(B,signed char)
+MAKEALL_TRACEEDGE(UB,unsigned char)
+MAKEALL_TRACEEDGE(F,float)
+
+/* Undefine the macros. */
+#undef MAKE_TRACEEDGE
+#undef MAKEALL_TRACEEDGE
+#undef ISVALID
 
 static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
                                int forward, AstPointSet *out, int *status ) {
@@ -3037,8 +4906,6 @@ AstPolygon *astPolygonId_( void *frame_void, int npnt, int dim,
    int *status;                  /* Get a pointer to the thread specific global data structure. */
    astGET_GLOBALS(NULL);
 
-/* Pointer to inherited status value */
-
 /* Get a pointer to the inherited status value. */
    status = astGetStatusPtr;
 
@@ -3415,28 +5282,5 @@ AstPolygon *astDownsize_( AstPolygon *this, double maxerr, int maxvert,
    if ( !astOK ) return NULL;
    return (**astMEMBER(this,Polygon,Downsize))( this, maxerr, maxvert, status );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
