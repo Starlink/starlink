@@ -19,14 +19,31 @@ STAR_DEFAULTS
 dnl    We may want to invoke make recursively
 AC_PROG_MAKE_SET
 
+dnl    Conditional defining whether we build with POSIX thread support.
+dnl    We do this by default.
+star_extra_items=
+AC_ARG_WITH([pthreads],
+            [ --with-pthreads   Build package with POSIX threads support],
+            [if test "$withval" = "yes"; then
+               use_pthreads="yes"
+             else
+               use_pthreads="no"
+             fi],
+            [use_pthreads="yes"])
+if test "$use_pthreads" = "yes"; then
+   AC_CHECK_LIB([pthread], [pthread_create], ,[use_pthreads="no"])
+   if test "$use_pthreads" = "yes"; then
+      star_extra_items="--enable-threads"
+   fi
+fi
+
 dnl    To configure fftw, run ./configure in the subdirectory.
 
 #  Look for --disable-shared and pass it on.
-star_extra_items=
 for ac_arg in $ac_configure_args; do
    case $ac_arg in 
       *-disable-shared*)
-         star_extra_items="--disable-shared"
+         star_extra_items="$star_extra_items --disable-shared"
       ;;
    esac
 done
