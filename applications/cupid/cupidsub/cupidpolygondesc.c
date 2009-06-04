@@ -1,0 +1,305 @@
+#include "sae_par.h"
+#include "prm_par.h"
+#include "ast.h"
+#include <string.h>
+
+AstRegion *cupidPolygonDesc( double *ipd, int velax, double *peak,
+                             int space_axes[ 2 ], int ndim, int *lbnd, 
+                             int *ubnd, AstMapping *wcsmap, 
+                             AstFrame *space_frm, AstMapping *space_map, 
+                             int *status ){
+/*
+*+
+*  Name:
+*     cupidPolygonDesc
+
+*  Purpose:
+*     Create an AST Polygon describing the spatial extent of a clump. 
+
+*  Language:
+*     Starlink C
+
+*  Synopsis:
+*     AstRegion *cupidPolygonDesc( double *ipd, int velax, double *peak,
+*                                  int space_axes[ 2 ], int ndim, int *lbnd, 
+*                                  int *ubnd, AstMapping *wcsmap, 
+*                                  AstFrame *space_frm, AstMapping *space_map, 
+*                                  int *status )
+
+*  Description:
+*     This function returns an Polygon describing the spatial extent of the
+*     clump specified by the supplied statistics.
+*     
+*     The supplied statistics include the Polygon centre, and the distance 
+*     from the centre to the Polygon perimeter in four different directions, 
+*     all specified in pixels coords. These directions are the pixel X and Y 
+*     axes, plus the "U" and "V" axes, which are axes at 45 degrees to the X 
+*     and Y spatial axes. 
+
+*  Parameters:
+*     ipd 
+*        Pointer to the 2D or 3D masked clump data array.
+*     velax
+*        The zero-based index of the velocity pixel axis. Should be -1 if
+*        there is no velocity axis.
+*     peak
+*        Array holding pixel coords of clump peak value.
+*     space_axes[ 2 ]
+*        Zero based indices of the two spatial pixel axes.
+*     ndim
+*        Number of pixel axes.
+*     lbnd
+*        Point to array holding lower pixel indices of array "ipd".
+*     ubnd
+*        Point to array holding upper pixel indices of array "ipd".
+*     wcsmap
+*        If the returned Polygon is to be defined in pixel coordinates, then 
+*        a NULL pointer should be supplied for "wcsmap". Otherwise, a pointer 
+*        to a Mapping from the input PIXEL Frame to the WCS Frame should be 
+*        supplied.
+*     space_frm
+*        A pointer to the 2D spatial WCS Frame. Ignored if "wcsmap" is NULL.
+*     space_map
+*        A pointer to the 2D spatial pixel->WCS Mapping. Ignored if "wcsmap" 
+*        is NULL.
+*     status
+*        Pointer to the inherited status value.
+
+*  Returned Value:
+*     A pointer to the Polygon, or NULL if no Polygon can be created.
+
+*  Copyright:
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     DSB: David S. Berry (JAC, Hawaii)
+*     {enter_new_authors_here}
+
+*  History:
+*     25-MAY-2009 (DSB):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+*/
+
+/* Local Variables: */
+   AstPolygon *polygon;     /* Returned Polygon */
+   AstRegion *new;          /* Mapped Polygon */
+   double *pd;              /* Point to next input mask value */ 
+   double *px;              /* Pointer to next vertex X axis value */
+   double *py;              /* Pointer to next vertex Y axis value */
+   double *verts;           /* Pointer to memory holding vertex axis values */
+   double pos[ 2 ];         /* Normalised vertex position */
+   int *iph;                /* Pointer to histogram array */
+   int *ipm;                /* Pointer to 2D mask array */
+   int *pix;                /* Pointer to X spatial index in 3D data */
+   int *piy;                /* Pointer to Y spatial index in 3D data */
+   int *pm;                 /* Pointer to next 2D mask element */
+   int dim[ 3 ];            /* Array pixel dimensions */
+   int hi;                  /* Highest no. of  spectral channels in 2D mask */
+   int i;                   /* Pixel index on 1st pixel axis */
+   int inside[ 2 ];         /* Spatial pixel indices at clump peak */
+   int j;                   /* Pixel index on 2nd pixel axis */
+   int k;                   /* Pixel index on 3rd pixel axis */
+   int lo;                  /* Lowest no. of  spectral channels in 2D mask */
+   int nel;                 /* Number of elements in 2D mask */
+   int nvert;               /* Number of vertices in Polygon */
+   int nx;                  /* X dimension of 2D mask */
+   int ny;                  /* Y dimension of 2D mask */
+   int target;              /* Threshold for no. of spectral channels */
+   int tot;                 /* Total no. of  spectral channels in 2D mask */
+
+/* Abort if an error has already occurred, or if the data is
+   one-dimensional. */
+   if( *status != SAI__OK || ndim == 1 ) return NULL;
+
+/* Initialisation. */
+   polygon = NULL;
+
+/* Get the pixel axis dimensions. */
+   dim[ 0 ] = ubnd[ 0 ] - lbnd[ 0 ] + 1;
+   dim[ 1 ] = ubnd[ 1 ] - lbnd[ 1 ] + 1;
+   dim[ 2 ] = ubnd[ 2 ] - lbnd[ 2 ] + 1;
+
+/* Allocate memory for a 2D integer mask array for the clump. */
+   nx = dim[ space_axes[ 0 ] ];
+   ny = dim[ space_axes[ 1 ] ];
+   nel = nx*ny;
+   ipm = astMalloc( nel*sizeof( *ipm ) );
+
+/* Check the pointer can be used safely. */
+   if( astOK ) {
+
+/* Initialise the 2D mask to hold zero at every pixel. */
+      memset( ipm, 0, nel*sizeof( *ipm )  );
+
+/* If the data is 2D, each good data value in the supplied mask is set to
+   1 in the 2D mask. */
+      if( ndim == 2 ) {
+         pd = ipd;
+         pm = ipm;
+         for( i = 0; i < nel; i++, pd++, pm++ ) {
+            if( *pd != VAL__BADD ) *pm = 1;
+         }
+
+/* If the data is 3D, we need to collapse the supplied 3D mask array along 
+   the spectral axis to get a 2D mask. */
+      } else if( ndim == 3 ) {
+
+/* Get pointers to the spatial pixel index variables. */
+         if( velax == 0 ) {
+            pix = &j;
+            piy = &k;
+
+         } else if( velax == 1 ) {
+            pix = &i;
+            piy = &k;
+
+         } else {
+            pix = &i;
+            piy = &j;
+         }
+
+/* Loop round every element of the supplied 3D mask array. */
+         pd = ipd;
+         for( k = 0; k < dim[ 2 ]; k++ ) {
+            for( j = 0; j < dim[ 1 ]; j++ ) {
+               for( i = 0; i < dim[ 0 ]; i++,pd++ ) {
+
+/* If the 3D mask element is not bad, increment the count in the
+   corresponding 2D mask. */
+                  if( *pd != VAL__BADD ) ipm[ *pix + nx*( *piy ) ]++;
+               }
+            }
+         }
+
+/* We need to trim the 2D mask to exclude pixels around the edge of the
+   clump that are only present in a very small number of spectral channels.
+   We exclude the pixel that contain the bottom 10% of the spectral
+   coverage. First, find the largest and smallest (non-zero) number of 3D 
+   pixels that contribute to each spatial pixel */
+         pm = ipm;
+         for( i = 0; i < nel; i++, pm++ ) {
+            if( *pm > 0 ) break;
+         }
+
+         lo = *pm;
+         hi = *pm;
+
+         for( ; i < nel; i++, pd++, pm++ ) {
+            if( *pm > hi ) {
+               hi = *pm;
+            } else if( *pm > 0 && *pm < lo ) {
+               lo = *pm;
+            }
+         }
+
+/* Create a histogram of 2D mask values between these two limits. */
+         iph = astMalloc( ( hi - lo + 1 )*sizeof( *iph ) );
+         memset( iph, 0, ( hi - lo + 1 )*sizeof( *iph )  );
+         pm = ipm;
+         for( i = 0; i < nel; i++, pm++ ) {
+            if( *pm > 0 ) {
+               iph[ *pm - lo ]++;               
+               tot++;
+            }
+         }
+
+/* Find the 2D mask value that corresponds to the 10% point in this
+   histogram. This is the minimum number of contributions that must be
+   made to a 2D mask pixel in order for that pixel to be included in the 2D
+   mask. */
+         target = tot/10;                   
+         i = lo;
+         tot = iph[ 0 ];
+         while( tot < target ) tot += iph[ ++i ];
+         if( tot > target ) i--; 
+         if( i < 1 ) i = 1;
+
+/* Set values below this minimum value to zero in the 2D mask. */
+         target = i;
+         pm = ipm;
+         for( i = 0; i < nel; i++, pm++ ) {
+            if( *pm < target ) *pm = 0;
+         }
+
+/* Free resources */
+         iph = astFree( iph );
+      }
+
+/* Store the pixel indices of the clump peak. */
+      inside[ 0 ] = (int)( peak[ space_axes[ 0 ] ] + 1.0 );
+      inside[ 1 ] = (int)( peak[ space_axes[ 1 ] ] + 1.0 );
+
+/* Create a Polygon with up to 15 vertices, enclosing the non-zero pixels
+   around the clump peak. */
+      polygon = astOutlineI( 0, AST__NE, ipm, lbnd, ubnd, 1.0, 15, inside, 1 );
+   
+/* If required, transform the polygon vertices into WCS. */
+      if( wcsmap ) {
+         
+/* See how many vertices the Polygon has. */
+         astGetRegionPoints( polygon, 0, 2, &nvert, NULL ) ;
+
+/* Allocate memory to hold the vertex axis values */
+         verts = astMalloc( 2*sizeof( *verts )*nvert );
+         if( astOK ) {
+
+/* Get the axis values at the vertices (in pixel coords). */
+            astGetRegionPoints( polygon, nvert, 2, &nvert, verts );
+
+/* Transform into WCS. */
+            astTranN( space_map, nvert, 2, nvert, verts, 1, 2, nvert,
+                      verts );
+
+/* Normalise. */
+            px = verts;
+            py = verts + nvert;
+            for( i = 0; i < nvert; i++ ) {
+               pos[ 0 ] = *px;
+               pos[ 1 ] = *py;
+               astNorm( space_frm, pos );
+               *(px++) = pos[ 0 ];
+               *(py++) = pos[ 1 ];
+            }
+
+/* Create a new Polygon from these transformed and normalised positions.
+   This polygon ins defined in the spatial coordinate Frame. */
+            (void) astAnnul( polygon );            
+            polygon = astPolygon( space_frm, nvert, nvert, verts, NULL, " " );
+         }
+
+/* Free resources. */
+         verts = astFree( verts );
+      }
+   }
+
+/* Free resources */
+   ipm = astFree( ipm );
+
+/* Return the Region pointer. */
+   return (AstRegion *) polygon;
+}
+
+

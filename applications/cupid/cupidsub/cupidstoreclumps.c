@@ -71,7 +71,11 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 *     stccol
 *        If non-zero, then the output catalogue will contain a column holding
 *        a textual description of the spatial extent of each clump, in  the 
-*        form of an STC-S description.
+*        form of an STC-S description. The non-zero value indicates the shape 
+*        to use:
+*           0 - No STC-S to be created
+*           1 - Use an ellipse to describe the spatial extent of the clump
+*           2 - Use a polygon to describe the spatial extent of the clump
 *     velax
 *        The index of the velocity pixel axis. Only used if "ndim" is 3.
 *     backoff
@@ -168,6 +172,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
    AstKeyMap *stc_km;       /* KeyMap holding STC-S clump descriptions */
    AstMapping *map;         /* Mapping from "frm1" to "frm2" */
    AstMapping *wcsmap;      /* Mapping from PIXEL to current Frame */
+   AstRegion *region;       /* Region describing clump outline */
    HDSLoc *aloc;            /* Locator for array of Clump structures */
    HDSLoc *cloc;            /* Locator for array cell */
    HDSLoc *dloc;            /* Locator for cell value */
@@ -330,9 +335,9 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
    units, the indices of the parameters holding the clump central position, 
    and the number of parameters). */
          cpars = cupidClumpDesc( indf, deconv, wcsmap, wcsfrm, dataunits, 
-                                 beamcorr, backoff, velax, cpars, 
-                                 &names, &units, &ncpar, &ok, 
-                                 ( stccol ? &stcptr : NULL ), status );
+                                 beamcorr, backoff, stccol, velax, cpars, 
+                                 &names, &units, &ncpar, &ok, &stcptr, 
+                                 &region, status );
 
 /* If we have not yet done so, allocate memory to hold a table of clump 
    parameters. In this table, all the values for column 1 come first, 
@@ -434,13 +439,20 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
                ndfCopy( indf, &place, &indf2, status );
                ndfAnnul( &indf2, status );
 
+/* Store an AST Region in a component called "OUTLINE" of the CLUMP 
+   structure. */
+               if( region ) {
+                  kpg1Wwrt( region, "OUTLINE", cloc, status );
+                  region = astAnnul( region );
+               }
+
 /* Free the locator to the CLUMP structure. */
                datAnnul( &cloc, status );
             }
          }
 
 /* If required, store the STC-S clump description in the KeyMap, and then
-   free the string returned by cupidClumPDesc. */
+   free the string returned by cupidClumpDesc. */
          if( stc_km && stcptr && ok ) {
             sprintf( key, "Shape_%d", ++istc );
             astMapPut0C( stc_km, key, stcptr, NULL ); 

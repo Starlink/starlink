@@ -238,6 +238,8 @@ extern int cupid_ps_cache_size;
 /* Function prototypes */
 /* ------------------  */
 AstKeyMap *cupidRetrieveConfig( HDSLoc *, int * );
+AstRegion *cupidEllipseDesc( AstFrame *, int[ 2 ], double[ 3 ], int, double, double, double, double, double, double, float[ 4 ], int, int *, AstMapping *, AstFrame *, AstMapping *, int * );
+AstRegion *cupidPolygonDesc( double *ipd, int velax, double *peak, int space_axes[ 2 ], int ndim, int *lbnd, int *ubnd, AstMapping *wcsmap, AstFrame *space_frm, AstMapping *space_map, int *status );
 CupidBoxIter *cupidBoxIterator( CupidBoxIter *, int[3], int[3], int[3], int, int * );
 CupidPixelSet *cupidCFDeletePS( CupidPixelSet *, int * );
 CupidPixelSet *cupidCFFreePS( CupidPixelSet *, int *, int, int * );
@@ -247,7 +249,7 @@ HDSLoc *cupidFellWalker( int, int, int *, int *, void *, double *, double, AstKe
 HDSLoc *cupidGaussClumps( int, int, int *, int *, void *, double *, double, AstKeyMap *, int, double[3], int * );
 HDSLoc *cupidReinhold( int, int, int *, int *, void *, double *, double, AstKeyMap *, int, double[3], int * );
 double *cupidCFLevels( AstKeyMap *, double, double, double, int *, int * );
-double *cupidClumpDesc( int, int, AstMapping *, AstFrame *, const char *, double[ 3 ], int, int, double *, const char ***, const char ***, int *, int *, char **, int * );
+double *cupidClumpDesc( int, int, AstMapping *, AstFrame *, const char *, double[ 3 ], int, int, int, double *, const char ***, const char ***, int *, int *, char **, AstRegion **, int * );
 double cupidConfigD( AstKeyMap *, const char *, double, int * );
 double cupidConfigRMS( AstKeyMap *, const char *, double, double, int * );
 double cupidGCChiSq( int, double *, int, int, int * );

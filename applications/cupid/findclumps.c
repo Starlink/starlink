@@ -815,6 +815,7 @@ void findclumps( int *status ) {
    char logfilename[ GRP__SZNAM + 1 ]; /* Log file name */ 
    char method[ 15 ];           /* Algorithm string supplied by user */
    char ndfname[GRP__SZNAM+1];  /* Input NDF name, derived from GRP */
+   char voshape[ 10 ];          /* Shape for STC-S regions in VO output */
    const char *dom;             /* Axis domain */
    const char *lab;             /* AST Label attribute for an axis */
    const char *sys;             /* AST System attribute for an axis */
@@ -959,9 +960,6 @@ void findclumps( int *status ) {
       }
    }
 
-/* See if "Virtual Observatory" catalogue format is required. */
-   parGet0l( "VO", &vo, status );
-
 /* See if the clump parameters are to be described using WCS values or
    pixel values. The default is yes if the current WCS Frame consists
    entirely of sky and spectral axes, and does not contain more than 1
@@ -971,6 +969,36 @@ void findclumps( int *status ) {
                        ( nsig == 3 && nspecax == 1 && nskyax == 2 ),
              status );
    parGet0l( "WCSPAR", &usewcs, status );
+
+/* See if "Virtual Observatory" catalogue format is required. */
+   parGet0l( "VO", &vo, status );
+
+/* If producing VO format, see what STC-S shape should be used to
+   describe each spatial clump. */
+   if( vo ) {
+      parChoic( "VOSHAPE", "POLYGON", "Ellipse,Polygon", 1, voshape, 10,  
+                status );
+      if( *status == SAI__OK ) {
+         if( !strcmp( voshape, "POLYGON" ) ) {
+            vo = 2;
+         } else {
+            vo = 1;
+         }
+      }
+   }
+
+/* Report an error if an attempt is made to produce a VO table using
+   pixel coords. */
+   if( vo && *status == SAI__OK ) {
+      if( nskyax < 2 ) {
+         *status = SAI__ERROR;
+         errRep( " ", "VO output requires that the current WCS frame in "
+                 "the input contains a pair of celestial sky axes.", status );
+      } else if( !usewcs ) {
+         *status = SAI__ERROR;
+         errRep( " ", "VO output requires that WCSPAR=TRUE be used.", status );
+      }
+   }
 
 /* If the NDF has 3 pixel axes, identify the velocity axis. */
    velax = -1;

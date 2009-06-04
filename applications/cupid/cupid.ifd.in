@@ -422,6 +422,16 @@ package cupid {
             default FALSE
             helpkey *
           }
+
+         parameter voshape {
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT,DEFAULT
+            prompt {Spatial clump shape in VO coutput}
+            default Polygon
+            helpkey *
+          }
       }
 
       icl {defstring cupidh(elp) !$CUPID_DIR/cupidhelp}
