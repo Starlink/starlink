@@ -140,12 +140,12 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
       }
    }
 
-   #  Open all masks, renewing them as necessary. The target coordinates
-   #  (which connect to another cube) are defined by the supplied AST
-   #  FrameSet. This method should be called before "render", which
-   #  is only needed if any cubes are to be actually displayed (they
+   #  Access and open all masks, renewing them as necessary. The target
+   #  coordinates (which connect to another cube) are defined by the 
+   #  supplied AST FrameSet. This method should be called before "render", 
+   #  which is only needed if any cubes are to be actually displayed (they
    #  can also be used as stencils to segment the related cube).
-   public method open {target_wcs} {
+   public method access {target_wcs} {
 
       #  Make sure all cube data is available.
       open_cubes_
@@ -569,9 +569,7 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
    #  Apply a segmenter to some external data using a stencil filter
    #  (vtkPolyDataToImageStencil instance or similar).
    public method connect_stencil_filter {i stencil_filter} {
-      puts "connect_stencil_filter: $i $stencil_filter"
       if { [info exists segmenter_($i)] } {
-         puts "$i: $segmenter_($i) connect_stencil_filter $stencil_filter"
          $segmenter_($i) connect_stencil_filter $stencil_filter
       }
    }

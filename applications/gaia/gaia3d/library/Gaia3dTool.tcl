@@ -1199,9 +1199,6 @@ itcl::class gaia3d::Gaia3dTool {
             grid_plot3d_
          }
 
-         #  Access any masks. These may be used to mask the data.
-         $itk_component(pixelmask) open [$imagedata_ get_wcs]
-
          #  Do the work of rendering the fuller scene using the main
          #  cube. Note use ProgressEvents when possible to update the UI from
          #  time to time, so although blocked it might not be too bad.
@@ -1415,6 +1412,11 @@ itcl::class gaia3d::Gaia3dTool {
 
          #  Finally ready to read the data.
          $imagedata_ access
+
+         #  Access any masks. These can only be applied when WCS is available.
+         #  So the connection of the masks to imagedata_ must be deferred.
+         $itk_component(pixelmask) access [$imagedata_ get_wcs]
+         $imagedata_ applymasks
       }
       return $result
    }

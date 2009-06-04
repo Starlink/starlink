@@ -170,8 +170,14 @@ itcl::class ::gaia3d::Gaia3dVtkCubeData {
       #        set imagedata_ $uniformgrid
       #      }
       #   }
+      return
+   }
 
-      #  If asked apply the CUPID mask to pick out regions of the data.
+   #  If required apply the CUPID mask to pick out regions of the data.
+   #  Should be done sometime after access but before anything has been 
+   #  realised. Usually you will setup the masks between a call to access
+   #  and this.
+   public method applymasks {} {
       if { $applymask && $pixelmask != {} } {
 
          #  The base segmenter should contain the relevant mask.

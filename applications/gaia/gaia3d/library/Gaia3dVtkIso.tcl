@@ -146,11 +146,11 @@ itcl::class ::gaia3d::Gaia3dVtkIso {
 
    #  Set the imagedata object. If blank remove visibility.
    protected method update_imagedata_ {} {
+
+      #  If masking with a stencil connect using that to partition the data.
       if { $stencil == {} } {
-         puts "update_imagedata: direct connection ($imagedata)"
          $contour_ SetInput $imagedata
       } else {
-         puts "update_imagedata: stencil connection ($stencil)"
          $contour_ SetInputConnection [$stencil GetOutputPort]
       }
 
