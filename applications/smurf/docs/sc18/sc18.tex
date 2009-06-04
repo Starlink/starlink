@@ -105,6 +105,8 @@ University of British Columbia}
 % Non surf tasks
 
 % KAPPA 
+\newcommand{\qualtobad}{\xref{\task{qualtobad}}{sun95}{QUALTOBAD}}
+\newcommand{\showqual}{\xref{\task{showqual}}{sun95}{SHOWQUAL}}
 \newcommand{\display}{\xref{\task{display}}{sun95}{DISPLAY}}
 \newcommand{\aperadd}{\xref{\task{aperadd}}{sun95}{APERADD}}
 \newcommand{\linplot}{\xref{\task{linplot}}{sun95}{LINPLOT}}
@@ -531,7 +533,7 @@ automatically filtered out. However, it is not generally necessary to
 use \flatfield\ before proceeding with map-making. \smurf\ will
 flatfield the data internally as needed.
 
-\section{\xlabel{time_series}Visualizing time-series data}
+\section{\xlabel{time_series}Visualizing data}
 
 In this section several procedures are described for looking at
 SCUBA-2 data. If you are interested in making maps using a single command,
@@ -756,7 +758,7 @@ bad by the DA system so that they get ignored in the future; apodized
 over a period of 1000 samples; and finally performed a high-pass
 filter with a hard lower cutoff frequency of 0.1\,Hz.
 
-\subsubsection{\xlabel{fftfilter}Detector power-spectra} 
+\subsection{\xlabel{pspec}Detector power-spectra} 
 
 The frequency-domain power spectra of SCUBA-2 detectors can be
 produced with the \smurf\ task \fft\ using the following steps:
@@ -804,8 +806,10 @@ dimensions:
 \end{myquote}
 
 It is then possible to click on each detector to display its power
-spectrum. Once the `Spectral plot' window has been spawned, it will
-also be necessary to modify the axis displays. Select
+spectrum. Note that in 
+
+Once the `Spectral plot' window has been spawned, it will also be
+necessary to modify the axis displays. Select
 Options$\rightarrow$Positive~Y~Only, and
 Options$\rightarrow$Log~Y~Axis.  There are also similar options to
 produce a logarithmically scaled x-axis (frequency) if
@@ -820,6 +824,255 @@ detector, with a $1/f$ knee apparent at about 3\,Hz.
 \label{fig:pspec}
 \end{center}
 \end{figure}
+
+\subsection{\xlabel{quality}Data quality flagging} 
+
+NDF files manipulated by \smurf\ can specify data quality flags using
+the standard QUALITY components. QUALITY itself is stored as an 8-bit
+integer for each sample in a data file, and each bit can reflect a
+different condition. The following example flags all of the data that
+were taken while the telescope was stationary (defined by a slew speed
+less than 2 arcsec/sec), and then displays some statistics about the
+resulting quality bits that get set using the \Kappa\ task \showqual:
+
+\begin{myquote}
+\begin{verbatim}
+% sc2clean s4d20090107_00007_0003 '*_clean' flagstat=2
+Processing data for object 'JUPITER' from the following observation  :
+  20090107 #7 scan
+
+% showqual s4d20090107_00007_0003_clean yes
+  BADSAM          (bit 1) - "Set iff a sample is flagged by the DA" (3097286)
+  BADBOL          (bit 2) - "Set iff all data from bolo to be ignored" (0)
+  SPIKE           (bit 3) - "Set iff a spike is detected" (0)
+  DCJUMP          (bit 4) - "Set iff a DC jump is present" (0)
+  PAD             (bit 5) - "Set iff data are padding" (0)
+  APOD            (bit 6) - "Set iff data are apodized/boundary" (0)
+  STAT            (bit 7) - "Set iff telescope was stationary" (629760)
+\end{verbatim}
+\end{myquote}
+
+This example shows that 629760 samples in total were flagged `{\texttt
+  STAT}' while the telescope was stationary. Since there are
+$40\times32=1280$ detectors, this corresponds to $629760/1280=492$
+samples in time. In addition, a number of detectors were known to be
+bad by the data acquisition system, so that all of their samples are
+given a `{\texttt BADSAM}' flag.
+
+During map-making flagged samples will not get used. However, for
+visualization purposes the \Kappa\ task \qualtobad\ may be used to
+convert samples with given quality bits to a {\em magic\/} or {\em
+  invalid\/} value.
+
+\begin{myquote}
+\begin{verbatim}
+% qualtobad s4d20090107_00007_0003_clean badmasked stat
+\end{verbatim}
+\end{myquote}
+
+If badmasked is subsequently viewed with \gaia, for example, none of
+the data taken while the telescope was stationary will appear.
+
+\section{\xlabel{maps}Iterative Map-Making} 
+
+Rather than manually cleaning the data by hand and then re-gridding it
+all at the end, we can instead do everything in one go using the
+\smurf\ iterative map-maker. 
+
+In the following example we will use all of the default settings to
+produce a map of Jupiter:
+
+\begin{myquote}
+\begin{verbatim}
+% makemap 's4d20090107_00007_000?.sdf' jupiter 3 method=iterate \
+config=^$STARLINK/share/smurf/dimmconfig.lis
+
+Out of 5 input files, 3 were darks and 2 were not darks
+Processing data for object 'JUPITER' from the following observation  :
+  20090107 #7 scan
+
+Setting up subarray 7 coordinates: (-33.500000,-41.500000) rot 0.000000
+
+   Projection parameters used:
+      CRPIX1 = 0
+      CRPIX2 = 0
+      CRVAL1 = 302.620833333333 ( RA = 20:10:29.0 )
+      CRVAL2 = -20.4880555555556 ( Dec = -20:29:17 )
+      CDELT1 = -0.000833333333333333 ( -3 arcsec )
+      CDELT2 = 0.000833333333333333 ( 3 arcsec )
+      CROTA2 = 0
+Setting up subarray 7 coordinates: (-33.500000,-41.500000) rot 0.000000
+
+   Output map pixel bounds: ( -74:84, -66:92 )
+
+   Output map WCS bounds:
+        Right ascension: 20:10:11.2 -> 20:10:45.1
+        Declination: -20:32:39 -> -20:24:42
+
+smf_iteratemap: 5 Iterations
+smf_iteratemap: Continuous chunk 1 / 1 =========
+Setting up subarray 7 coordinates: (-33.500000,-41.500000) rot 0.000000
+Setting up subarray 7 coordinates: (-33.500000,-41.500000) rot 0.000000
+Setting up subarray 7 coordinates: (-33.500000,-41.500000) rot 0.000000
+Setting up subarray 7 coordinates: (-33.500000,-41.500000) rot 0.000000
+smf_iteratemap: Iteration 1 / 5 ---------------
+smf_iteratemap: Pre-conditioning chunk
+smf_iteratemap: Calculate time-stream model components
+smf_iteratemap: Rebin residual to estimate MAP
+smf_iteratemap: Will calculate chi^2 next iteration
+smf_iteratemap: Calculate ast
+smf_iteratemap: Iteration 2 / 5 ---------------
+smf_iteratemap: Calculate time-stream model components
+smf_iteratemap: Rebin residual to estimate MAP
+smf_iteratemap: *** CHISQUARED = 15.1716718718417 for chunk 1
+smf_iteratemap: Calculate ast
+smf_iteratemap: Iteration 3 / 5 ---------------
+smf_iteratemap: Calculate time-stream model components
+smf_iteratemap: Rebin residual to estimate MAP
+smf_iteratemap: *** CHISQUARED = 10.8749999107426 for chunk 1
+smf_iteratemap: *** change: -4.29667196109915
+smf_iteratemap: Calculate ast
+smf_iteratemap: Iteration 4 / 5 ---------------
+smf_iteratemap: Calculate time-stream model components
+smf_iteratemap: Rebin residual to estimate MAP
+smf_iteratemap: *** CHISQUARED = 10.6172184496517 for chunk 1
+smf_iteratemap: *** change: -0.25778146109087
+smf_iteratemap: Calculate ast
+smf_iteratemap: Iteration 5 / 5 ---------------
+smf_iteratemap: Calculate time-stream model components
+smf_iteratemap: Rebin residual to estimate MAP
+smf_iteratemap: *** CHISQUARED = 10.558921347067 for chunk 1
+smf_iteratemap: *** change: -0.0582971025847616
+smf_iteratemap: Calculate ast
+smf_iteratemap: ****** Completed in 5 iterations
+\end{verbatim}
+\end{myquote}
+
+The \smurf\ task \makemap\ needs to know that it will use the
+iterative algorithm with `{\texttt method=iterate}', and then all of
+the additional parameters that it requires are stored in the config
+file `{\texttt dimmconfig.lis}'. In this example we have used the
+default config file that is installed in the \starlink\ tree, which is
+quite well documented. A local copy can be made and altered if
+desired. Fig.~\ref{fig:itermap} shows the resulting image.
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.5\linewidth]{map_iterate.eps}
+\caption{Map of Jupiter produced with the \smurf\ task \makemap\ using
+  the iterative algorithm with default parameters. Most of the noise
+  using simpler reductions has been reduced. The extended structures
+  around the main source are not believed to be related to the
+  map-making process as they are repeatable using different scan
+  patterns at different times (possibly due to the telescope being out
+  of focus).}
+\label{fig:itermap}
+\end{center}
+\end{figure}
+
+The iterative map-maker estimates several components of the bolometer
+signal simultaneously with the map. The particular components that it
+fits are given by {\texttt modelorder} given in the config file:
+
+\begin{myquote}
+\begin{verbatim}
+# Model components/order (space delimited list)
+# Note: components specified AFTER 'ast' will not be calculated for the
+# first time until the second iteration.
+#  dks = fit and remove dark squid for the column
+#  com = remove common-mode signal
+#  gai = if com specified, fit gain/offset of common mode
+#  ext = apply extinction correction
+#  ast = estimate the map and astronomical signal
+#  flt = apply filter to time streams
+#  noi = estimate time-domain variance
+
+modelorder = (com,gai,ext,ast,flt,noi)
+\end{verbatim}
+\end{myquote}
+
+By default, the final values of these fitted models are not written to
+files. However, this can be modified by setting {\texttt exportndf} to
+the list of models that you wish to view, such as
+
+\begin{myquote}
+\begin{verbatim}
+# Export model files as NDF?
+# Specify a value of 1 or 0 to export all or none of the components
+# You can also specify an array of components to export using the same
+# format as modelorder. Note that you can specify additional
+# components 'res' and 'qua' to what may be provided to modelorder if
+# you wish to export the residual model or quality arrays
+# respectively. Exportation of 'res' is implied if either 'noi' or
+# 'qua' are specified as they become the variance and quality
+# components of the resulting NDF for 'res' respectively.
+
+exportndf = (com,ast,flt,res,noi,qua)
+\end{verbatim}
+\end{myquote}
+
+Re-running the iterative map-maker with this modified {\texttt
+  dimmconfig.lis} produces several new files at the end:
+
+\begin{myquote}
+\begin{verbatim}
+s4d20090107_00007_0002_con_ast.sdf
+s4d20090107_00007_0002_con_com.sdf
+s4d20090107_00007_0002_con_flt.sdf
+s4d20090107_00007_0002_con_res.sdf
+\end{verbatim}
+\end{myquote}
+
+Note that the quality and variance model components become VARIANCE
+and QUALITY components of the residual file.
+
+As with the input data, these are all standard \starlink\ NDF files
+and can be examined using all of the existing tools, manipulated by
+\smurf\ cleaning routines etc. The base of the filenames are the first
+input files that went into the maps, and the `{\texttt con}' suffix
+indicates that several data files may have been concatenated
+together. Finally, `{\texttt *ast.sdf}' is the time-domain projection
+of the astronomical signal as estimated in the final map (same
+dimensions as the input bolometer data), `{\texttt *com.sdf}' is a
+1-dimensional NDF containing the estimate of the common-mode signal
+(predominantly sky emission), `{\texttt *flt.sdf}' is low-frequency
+noise that was filtered out of each detector (same dimensions as the
+input bolometer data, primarily independent detector drift), and
+finally `{\texttt *res.sdf}' is the residual bolometer signal once the
+other components have been subtracted from the original data, and
+should look predominantly like symmetric white noise (same dimensions
+as the input bolometer data).
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.9\linewidth]{iter_ast.eps} \\
+\includegraphics[width=0.9\linewidth]{iter_com.eps} \\
+\includegraphics[width=0.9\linewidth]{iter_flt.eps} \\
+\includegraphics[width=0.9\linewidth]{iter_res.eps} \\
+\includegraphics[width=0.9\linewidth]{iter_qua.eps} \\
+\caption{Time-domain components of the iterative solution. From top to
+  bottom: ASTronomical signal, COMmon mode, FiLTered, RESidual, and
+  QUAlity. All of the figures (with the exception of the 1-d
+  common-mode that was plotted with \Kappa\ \linplot) were produced
+  with \gaia. Most of the large excursions in the residual signal
+  happen at the start and end of the data set where there was
+  apodization, padding and additional flagging due to the telescope
+  being stationary. The only portion of the data used to make the
+  final map is where the quality is 0, roughly from 50:20 -- 51:15.}
+\label{fig:itercomp}
+\end{center}
+\end{figure}
+
+Time traces for a single bolometer are compared for all of these model
+components in Fig.~\ref{fig:itercomp}. Jupiter is quite bright, so
+that the astronomical signal component is the dominant source of
+time-varying fluctuations. The common-mode signal is the next largest,
+and bares little resemblance to the low-frequency drift of this
+particular detector that was removed with iterative low-pass
+filtering. Finally, the residual signal, with the exceptions of the
+start and finish where there is ringing and apodization due to the FFT
+filtering, is quite flat. 
+
 
 \begin{thebibliography}{}
 \addcontentsline{toc}{section}{References}

@@ -2,5 +2,6 @@
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION_SC18@ array_mean.eps     \
 gaia_main.eps gaia_sections.eps gaia_spec.eps map_highpass.eps     \
-pspec.eps rawmap.eps sc18_logo.eps spec_filt.eps
+pspec.eps rawmap.eps sc18_logo.eps spec_filt.eps map_iterate.eps   \
+iter_ast.eps iter_com.eps iter_flt.eps iter_qua.eps iter_res.eps
 
