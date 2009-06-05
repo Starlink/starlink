@@ -9,6 +9,24 @@
 *  Description:
 *     Gets an AST Object from an NDF, FITS file, HDS path or text file 
 *     using an environment parameter.
+*
+*     First, attempt to interpret the parameter value as an HDS path. The 
+*     HDS object must have a type of WCS, must be scalar, and must contain 
+*     a single 1-D array component with name DATA and type _CHAR. This is 
+*     the scheme used for HDS structures created by KPG1_WWRT.
+*
+*     If the above attempt fails, attempt to interpret the parameter
+*     value as an NDF name. If the NDF is opened succesfully, its WCS
+*     FrameSet is returned.
+*
+*     If the above attempt fails, and the parameter value ends with 
+*     ".FIT", attempt to interpret the parameter value as the name of a
+*     FITS file. Open the FITS file and attempt to obtained an AST 
+*     FrameSet from the primary HDU headers.
+*
+*     If the above attempt fails, attempt to interpret the parameter
+*     value as the name of a text file containing either an AST object
+*     dump, or a set of FITS headers.
 
 *  Language:
 *     Starlink Fortran 77
@@ -111,6 +129,7 @@
       INTEGER IAST2
       INTEGER IGRP
       INTEGER INDF
+      INTEGER IPAR
       LOGICAL OK
 *.
 
@@ -122,8 +141,11 @@
 
 *  First of all, attempt to get an object assuming the user has supplied 
 *  an HDS path. Do not use DAT_ASSOC since it required the parameter to
-*  be declared as type UNIV in the IFL file.
-      CALL PAR_GET0C( PARAM, PATH, STATUS )
+*  be declared as type UNIV in the IFL file. Instead, get the value of 
+*  the parameter using SUBPAR to avoid interpretation of the string by 
+*  the parameter system.
+      CALL SUBPAR_FINDPAR( PARAM, IPAR, STATUS )
+      CALL SUBPAR_GETNAME( IPAR, PATH, STATUS )
 
       CALL HDS_FIND( DAT__ROOT, PATH, 'Read', LOC1, STATUS )
       CALL DAT_NAME( LOC1, NAME, STATUS )
