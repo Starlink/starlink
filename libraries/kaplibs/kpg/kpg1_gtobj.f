@@ -7,8 +7,8 @@
 *     Gets an AST Object using an environment parameter.
 
 *  Description:
-*     Gets an AST Object from an NDF, FITS file or text file using an 
-*     environment parameter.
+*     Gets an AST Object from an NDF, FITS file, HDS path or text file 
+*     using an environment parameter.
 
 *  Language:
 *     Starlink Fortran 77
@@ -69,7 +69,9 @@
 *     31-MAY-2006 (DSB):
 *        Move from ATL to KAPLIBS because of the NDF dependency.
 *     23-APR-2009 (DSB):
-*        Take acount of forieign format conversion by the NDF library.
+*        Take acount of foreign format conversion by the NDF library.
+*     5-JUN-2009 (DSB):
+*        Allow AST objects to be read from an HDS path.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -83,6 +85,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants
+      INCLUDE 'DAT_PAR'          ! HDS constants
       INCLUDE 'NDF_PAR'          ! NDF constants
 
 *  Arguments Given:
@@ -100,6 +103,10 @@
       EXTERNAL ISA
 
 *  Local Variables:
+      CHARACTER LOC1*(DAT__SZLOC)
+      CHARACTER LOC2*(DAT__SZLOC)
+      CHARACTER NAME*(DAT__SZNAM)
+      CHARACTER PATH*512
       INTEGER DOCVT
       INTEGER IAST2
       INTEGER IGRP
@@ -113,32 +120,61 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Attempt to access the parameter as an NDF, without foreign format
-*  conversion (in case the file has a known foreign format file type 
-*  but does not actualy contain an NDF). First switch off format
+*  First of all, attempt to get an object assuming the user has supplied 
+*  an HDS path. Do not use DAT_ASSOC since it required the parameter to
+*  be declared as type UNIV in the IFL file.
+      CALL PAR_GET0C( PARAM, PATH, STATUS )
+
+      CALL HDS_FIND( DAT__ROOT, PATH, 'Read', LOC1, STATUS )
+      CALL DAT_NAME( LOC1, NAME, STATUS )
+      CALL DAT_PAREN( LOC1, LOC2, STATUS ) 
+
+      CALL KPG1_WREAD( LOC2, NAME, IAST, STATUS ) 
+
+      CALL DAT_ANNUL( LOC2, STATUS )
+      CALL DAT_ANNUL( LOC1, STATUS )
+
+      IF( STATUS .NE. SAI__OK ) THEN
+         CALL AST_ANNUL( IAST, STATUS )
+         CALL ERR_ANNUL( STATUS )
+
+      ELSE IF( IAST .NE. AST__NULL ) THEN
+         CALL DAT_MSG( 'OBJ', LOC1 ) 
+         CALL ATL_NOTIF( '   AST data read from HDS object ''^OBJ''.', 
+     :                   STATUS )
+      END IF
+
+
+*  If this failed, attempt to access the parameter as an NDF, without 
+*  foreign format conversion (in case the file has a known foreign format 
+*  file type but does not actualy contain an NDF). First switch off format
 *  conversion, then access the NDF then switch format conversion back on
 *  again if required.
-      CALL NDF_GTUNE( 'DOCVT', DOCVT, STATUS ) 
-      CALL NDF_TUNE( 0, 'DOCVT', STATUS ) 
-      CALL NDF_EXIST( PARAM, 'READ', INDF, STATUS )
-      CALL NDF_TUNE( DOCVT, 'DOCVT', STATUS ) 
-
+      IF( IAST .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
+         CALL NDF_GTUNE( 'DOCVT', DOCVT, STATUS ) 
+         CALL NDF_TUNE( 0, 'DOCVT', STATUS ) 
+         CALL NDF_EXIST( PARAM, 'READ', INDF, STATUS )
+         CALL NDF_TUNE( DOCVT, 'DOCVT', STATUS ) 
+   
 *  If succesful, get the WCS FrameSet from it.
-      IF( INDF .NE. NDF__NOID ) THEN
-         CALL KPG1_GTWCS( INDF, IAST, STATUS )
-
+         IF( INDF .NE. NDF__NOID ) THEN
+            CALL KPG1_GTWCS( INDF, IAST, STATUS )
+   
 *  Tell the user where the object came from. 
-         IF( IAST .NE. AST__NULL ) THEN
-            CALL NDF_MSG( 'NDF', INDF ) 
-            CALL ATL_NOTIF( '   AST data read from NDF ''^NDF''.', 
-     :                       STATUS )
-         END IF
-
+            IF( IAST .NE. AST__NULL ) THEN
+               CALL NDF_MSG( 'NDF', INDF ) 
+               CALL ATL_NOTIF( '   AST data read from NDF ''^NDF''.', 
+     :                         STATUS )
+            END IF
+   
 *  Annul the NDF identifer.
-         CALL NDF_ANNUL( INDF, STATUS )
+            CALL NDF_ANNUL( INDF, STATUS )
+   
+         END IF
+      END IF
 
-*  If it was not a native HDS NDF...
-      ELSE IF( STATUS .EQ. SAI__OK ) THEN
+*  If it was not a native HDS NDF or HDS object ...
+      IF( IAST .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
 
 *  Obtain a GRP group containing text from which an Object is to be read.
          CALL ATL_GTGRP( PARAM, IGRP, STATUS )
