@@ -5814,8 +5814,10 @@ static int LineCrossing( AstFrame *this, AstLineDef *l1, AstLineDef *l2,
 
 *  Returned Value:
 *     A non-zero value is returned if the lines cross at a point which is
-*     within the [start,end) segment of both lines. If the crossing point
-*     is outside this segment on either line, or if the lines are parallel,
+*     within the [start,end) segment of the lines that are flagged as
+*     finite (if a line is marked as infinite any crossing is assumed to
+*     be within the bounds of the line). If the crossing point is outside 
+*     this segment on either (inifinte) line, or if the lines are parallel,
 *     zero is returned. Note, the start point is considered to be inside
 *     the length of the segment, but the end point is outside.
 
@@ -5880,8 +5882,12 @@ static int LineCrossing( AstFrame *this, AstLineDef *l1, AstLineDef *l2,
             crossing[ 1 ] = l2->start[ 1 ] + t2*l2->dir[ 1 ];
          } 
 
-/* See if the intersection iw within the length of both lines (excluding
-   the end points). */
+/* See if the intersection is within the length of both lines (excluding
+   the end points). If a line is flagged as infinite, set the "t" parameter
+   to zero to make it look like the crossing is within the line. */
+         if( l1->infinite ) t1 = 0.0;
+         if( l2->infinite ) t2 = 0.0;
+
          if( t1 >= 0.0 && t1 < l1->length &&
              t2 >= 0.0 && t2 < l2->length ) result = 1;
 
@@ -6006,6 +6012,10 @@ static AstLineDef *LineDef( AstFrame *this, const double start[2],
 
 /* Store a pointer to the defining Frame. */
          result->frame = this;
+
+/* Indicate that the line is considered to be terminated at the start and
+   end points. */
+         result->infinite = 0; 
       }
    }
 

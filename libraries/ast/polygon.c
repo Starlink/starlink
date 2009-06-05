@@ -2462,12 +2462,17 @@ static double Polywidth( AstFrame *frm, AstLineDef **edges, int i, int nv,
 /* Create a description of the required line. */
    line = astLineDef( frm, start, end );
 
+/* Set a flag indicating that this line should be considered to have
+   inifinite length when it is used within astLineCrossing. */
+   line->infinite = 1;
+
 /* Loop round every edge, except for the supplied edge. */
    for( j = 0; j < nv; j++ ) {
       if( j != i ) {
 
-/* Find the position at which the line created above crosses the current
-   edge. Skip to the next edge if the line does not intersect the edge. */
+/* Find the position at which the (infinite) line created above crosses the 
+   current (finite) edge. Skip to the next edge if the line does not 
+   intersect the edge within the length of the edge. */
          if( astLineCrossing( frm, line, edges[ j ], &cross ) ) {
 
 /* Find the distance between the crossing point and the line start. */

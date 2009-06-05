@@ -688,6 +688,7 @@ int astTest##attr##_( AstSkyFrame *this, int axis, int *status ) { \
 typedef struct SkyLineDef {
    AstFrame *frame;            /* Pointer to Frame in which the line is defined */
    double length;              /* Line length */
+   int infinite;               /* Disregard the start and end of the line? */
    double start[3];            /* Unit vector defining start of line */
    double end[3];              /* Unit vector defining end of line */
    double dir[3];              /* Unit vector defining line direction */
@@ -4903,9 +4904,13 @@ static int LineIncludes( SkyLineDef *l, double point[3], int *status ) {
 /* Check the global error status. */
    if ( !astOK ) return 0;
 
-/* Get the unsigned distance of the point from the start of the line in
-   the range 0 - 180 degs. Check it is less than the line length. Then
-   check that the point is not more than 90 degs away from the quarter 
+/* If the line is of infite length, it is assumed to include the supplied
+   point. */
+   if( l->infinite ) return 1;
+
+/* Otherwise, get the unsigned distance of the point from the start of the 
+   line in the range 0 - 180 degs. Check it is less than the line length. 
+   Then check that the point is not more than 90 degs away from the quarter 
    point. */
    t1 = palSlaDvdv( l->start, point );
    t2 = acos( t1 );

@@ -631,6 +631,7 @@ typedef struct AstFrame {
 typedef struct AstLineDef {
    AstFrame *frame;            /* Pointer to Frame in which the line is defined */
    double length;              /* Line length */
+   int infinite;               /* Disregard the start and end of the line? */
    double start[2];            /* Frame axis values at line start */
    double end[2];              /* Frame axis values at line end */
    double dir[2];              /* Unit vector defining line direction */
