@@ -91,7 +91,10 @@
 *     5-JUN-2009 (DSB):
 *        Allow AST objects to be read from an HDS path.
 *     8-JUN-2009 (DSB):
-*        Cancel the parameter before leaving to avoid an HDS locator leak.
+*        Avoid use of NDF_EXIST since it gives the appearance of a
+*        locator leak (KAPPA monolith locator checsk do not, and cannot,
+*        filter out the locators stored in the parameter system by 
+*        NDF_EXIST and NDF_ASSOC).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -126,7 +129,7 @@
       CHARACTER LOC1*(DAT__SZLOC)
       CHARACTER LOC2*(DAT__SZLOC)
       CHARACTER NAME*(DAT__SZNAM)
-      CHARACTER PATH*512
+      CHARACTER PARVAL*512
       INTEGER DOCVT
       INTEGER IAST2
       INTEGER IGRP
@@ -147,9 +150,9 @@
 *  the parameter using SUBPAR to avoid interpretation of the string by 
 *  the parameter system.
       CALL SUBPAR_FINDPAR( PARAM, IPAR, STATUS )
-      CALL SUBPAR_GETNAME( IPAR, PATH, STATUS )
+      CALL SUBPAR_GETNAME( IPAR, PARVAL, STATUS )
 
-      CALL HDS_FIND( DAT__ROOT, PATH, 'Read', LOC1, STATUS )
+      CALL HDS_FIND( DAT__ROOT, PARVAL, 'Read', LOC1, STATUS )
       CALL DAT_NAME( LOC1, NAME, STATUS )
       CALL DAT_PAREN( LOC1, LOC2, STATUS ) 
 
@@ -173,11 +176,20 @@
 *  foreign format conversion (in case the file has a known foreign format 
 *  file type but does not actualy contain an NDF). First switch off format
 *  conversion, then access the NDF then switch format conversion back on
-*  again if required.
+*  again if required. Note, use NDF_FIND rather than NDF_EXIST since
+*  NDF_EXIST causes HDS locators for the NDF to be stored in the
+*  parameter system until the parameter is cancelled. This gives the
+*  (erroneous) appearance of an HDS locator leak to packages such as
+*  KAPPA that perform checks for HDS locators leaks.
       IF( IAST .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
          CALL NDF_GTUNE( 'DOCVT', DOCVT, STATUS ) 
          CALL NDF_TUNE( 0, 'DOCVT', STATUS ) 
-         CALL NDF_EXIST( PARAM, 'READ', INDF, STATUS )
+
+         IF( STATUS .EQ. SAI__OK ) THEN
+            CALL NDF_FIND( DAT__ROOT, PARVAL, INDF, STATUS )
+            IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
+         END IF
+
          CALL NDF_TUNE( DOCVT, 'DOCVT', STATUS ) 
    
 *  If succesful, get the WCS FrameSet from it.
@@ -209,11 +221,14 @@
 *  Delete the group.
          CALL GRP_DELET( IGRP, STATUS )
 
-*  If it was not in a format readable by ATL, annull the error, switch on
-*  NDF data conversion (if it is enabled), and try to access it as a 
-*  foreign format NDF.
+*  If it was not in a format readable by ATL, annull the error, and try to 
+*  access it as a foreign format NDF.
          IF( STATUS .NE. SAI__OK .AND. DOCVT .NE. 0 ) THEN
-            CALL NDF_EXIST( PARAM, 'READ', INDF, STATUS )
+            CALL ERR_ANNUL( STATUS )
+
+            CALL NDF_FIND( DAT__ROOT, PARVAL, INDF, STATUS )
+            IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
+
             IF( INDF .NE. NDF__NOID ) THEN
                CALL KPG1_GTWCS( INDF, IAST, STATUS )
 
@@ -289,10 +304,6 @@
          END IF
 
       END IF
-
-*  Cancel the parameter (if this is not done an HDS locator for the 
-*  parameter structure seems to be leaked).
-      CALL PAR_CANCL( PARAM, STATUS )
 
 *  Annul the object if an error occurred.
       IF( STATUS .NE. SAI__OK ) CALL AST_ANNUL( IAST, STATUS )
