@@ -4,7 +4,7 @@
 *     KPG1_ASFGT
 
 *  Purpose:
-*     Create a new Frame with a Domain specified through the environment.
+*     Create a new Frame specified through the environment.
 
 *  Language:
 *     Starlink Fortran 77
@@ -13,11 +13,24 @@
 *     CALL KPG1_ASFGT( PDOM, PDIM, PEP, FRM, NAX, STATUS )
 
 *  Description:
-*     This routine creates a new AST Frame with a Domain specified through
-*     the environment. If the string obtained for the parameter looks
-*     like an IRAS90 "Sky Co-ordinate System" (SCS) specification, then
-*     a SkyFrame is returned with the properties specified by the SCS.
-*     Otherwise, a simple Frame is returned with the specified Domain, 
+*     This routine creates a new AST Frame with properties specified by
+*     the given environment parameter. The parameter value is interpreted
+*     as an HDS path containing a WCS FrameSet in the form created by 
+*     KPG1_WWRT. If this is succesful, the current Frame of the FrameSet
+*     is returned. Otherwise, an attempt is made to interpret the parameter
+*     value as an NDF name. If the NDF is opened succesfully, its current 
+*     WCS Frame is returned. If this fails, and the parameter value ends 
+*     with ".FIT", am attempt is made to interpret the parameter value as 
+*     the name of a FITS file. If successful, the primary WCS Frame from
+*     the primary HDU headers is returned. If the above attempt fails, 
+*     an attempt is made to interpret the parameter value as the name of a 
+*     text file containing either an AST Frame dump, or a set of FITS 
+*     headers.
+*
+*     If all the above fails, and the parameter value looks like an IRAS90 
+*     "Sky Co-ordinate System" (SCS) specification, then a SkyFrame is 
+*     returned with the properties specified by the SCS. Otherwise, a 
+*     simple Frame is returned with Domain set to the parameter value, 
 *     the number of axes in the Frame being specified by another environment 
 *     parameter.
 
@@ -41,6 +54,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998, 1999, 2001, 2002 Central Laboratory of the Research Councils.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -74,6 +88,9 @@
 *        Added NDC as a special case Domain.
 *     13-AUG-2002 (DSB):
 *        Added CURNDC as a special case Domain.
+*     8-JUN-2009 (DSB):
+*        Extend options for interpreting the parameter value by calling
+*        KPG1_GTOBJ.
 *     {enter_further_changes_here}
 
 *-
@@ -100,12 +117,14 @@
 *  External References:
       LOGICAL KPG1_ASSIR         ! Is string an IRAS90 SCS?
       INTEGER CHR_LEN            ! Used length of a string
+      EXTERNAL AST_ISAFRAME      ! Passed to KPG1_GTOBJ
 
 *  Local Variables:
       CHARACTER DOM*30           ! Co-ordinate Frame specification
       CHARACTER TEXT*60          ! Attribute value or name
       INTEGER I                  ! Axis count
       INTEGER IAT                ! No. of characters in a string
+      INTEGER NEW                ! Pointer to new AST Object
 *.
 
 *  Initialise
@@ -115,130 +134,156 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Attempt to get a Frame from the parameter value as an HDS path, an NDF
+*  name, or a text file.
+      CALL KPG1_GTOBJ( PDOM, 'Frame', AST_ISAFRAME, FRM, STATUS )
+
+*  If successful, get the number of axes. 
+      IF( STATUS .EQ. SAI__OK ) THEN      
+         NAX = AST_GETI( FRM, 'NAXES', STATUS )
+
+*  If a FrameSet was supplied, return the current Frame.
+         IF( AST_ISAFRAMESET( FRM ) ) THEN
+            NEW = AST_GETFRAME( FRM, AST__CURRENT, STATUS )
+            CALL AST_ANNUL( FRM, STATUS )
+            FRM = NEW
+         END IF
+
+*  If not successful, annul the error and interpret the parameter value as a
+*  Domain name or IRAS90 SCS.
+      ELSE
+         CALL ERR_ANNUL( STATUS )
+
 *  Get the string describing the required co-ordinate Frame.
-      CALL PAR_GET0C( PDOM, DOM, STATUS )
+         CALL PAR_GET0C( PDOM, DOM, STATUS )
 
 *  Convert to upper case, and remove blanks.
-      CALL CHR_UCASE( DOM )
-      CALL CHR_RMBLK( DOM )
+         CALL CHR_UCASE( DOM )
+         CALL CHR_RMBLK( DOM )
 
 *  Create a default SkyFrame.
-      FRM = AST_SKYFRAME( ' ', STATUS )
-      NAX = 2
+         FRM = AST_SKYFRAME( ' ', STATUS )
+         NAX = 2
 
 *  Is the supplied string "SKY" or an IRAS90 SCS? If so, the SkyFrame 
 *  properties are changed to match the SCS. If not, we need to return a 
 *  simple Frame instead of a SkyFrame.
-      IF( DOM .NE. 'SKY' .AND. .NOT. KPG1_ASSIR( FRM, DOM, PEP, 
-     :                                          STATUS ) ) THEN
+         IF( DOM .NE. 'SKY' .AND. .NOT. KPG1_ASSIR( FRM, DOM, PEP, 
+     :                                             STATUS ) ) THEN
 
 *  Annul the SkyFrame.
-         CALL AST_ANNUL( FRM, STATUS )
+            CALL AST_ANNUL( FRM, STATUS )
 
 *  Get the number of axes for the Frame.
-         IF( DOM .EQ. 'GRAPHICS' .OR. DOM .EQ. 'BASEPIC' .OR.
-     :       DOM .EQ. 'CURPIC' .OR. DOM .EQ. 'NDC' .OR. 
-     :       DOM .EQ. 'CURNDC' ) THEN
-            NAX = 2
-         ELSE
-            CALL PAR_GDR0I( PDIM, 2, 1, NDF__MXDIM, .FALSE., NAX, 
-     :                      STATUS )
-         END IF
+            IF( DOM .EQ. 'GRAPHICS' .OR. DOM .EQ. 'BASEPIC' .OR.
+     :          DOM .EQ. 'CURPIC' .OR. DOM .EQ. 'NDC' .OR. 
+     :          DOM .EQ. 'CURNDC' ) THEN
+               NAX = 2
+            ELSE
+               CALL PAR_GDR0I( PDIM, 2, 1, NDF__MXDIM, .FALSE., NAX, 
+     :                         STATUS )
+            END IF
 
 *  Create a Frame with this many axes.
-         FRM = AST_FRAME( NAX, ' ', STATUS )
-
+            FRM = AST_FRAME( NAX, ' ', STATUS )
+   
 *  Give it the supplied Domain.
-         CALL AST_SETC( FRM, 'DOMAIN', DOM( : CHR_LEN( DOM ) ), STATUS )
-
+            CALL AST_SETC( FRM, 'DOMAIN', DOM( : CHR_LEN( DOM ) ), 
+     :                     STATUS )
+   
 *  If the DOMAIN was one of the standard Domains, set up Title, Symbols,
 *  units, labels, etc.
-
+   
 *  Pixel co-ordinates...
-         IF( DOM .EQ. 'PIXEL' ) THEN
-
+            IF( DOM .EQ. 'PIXEL' ) THEN
+   
 *  Do not set a title since the title produced by the NDF library includes 
 *  the pixel origin which we do not know here. Setting a title would mean
 *  that the Frame would not match another PIXEL Frame (because the other
 *  Frames Title would be set to a different value). 
-
+   
 *  For each axis, set up a label, symbol and unit value.
-            DO I = 1, NAX
-               IAT = 0
-               CALL CHR_PUTI( I, TEXT, IAT )
-               CALL AST_SETC( FRM, 'Label(' // TEXT( : IAT ) // ')',
-     :                     'Pixel coordinate ' // TEXT( : IAT ), 
-     :                     STATUS )
-               CALL AST_SETC( FRM, 'Symbol(' // TEXT( : IAT ) // ')',
-     :                     'p' // TEXT( : IAT ), STATUS )
-               CALL AST_SETC( FRM, 'Unit(' // TEXT( : IAT ) // ')',
-     :                     'pixel', STATUS )
-            END DO
-
+               DO I = 1, NAX
+                  IAT = 0
+                  CALL CHR_PUTI( I, TEXT, IAT )
+                  CALL AST_SETC( FRM, 'Label(' // TEXT( : IAT ) // ')',
+     :                        'Pixel coordinate ' // TEXT( : IAT ), 
+     :                        STATUS )
+                  CALL AST_SETC( FRM, 'Symbol(' // TEXT( : IAT ) // ')',
+     :                        'p' // TEXT( : IAT ), STATUS )
+                  CALL AST_SETC( FRM, 'Unit(' // TEXT( : IAT ) // ')',
+     :                        'pixel', STATUS )
+               END DO
+   
 *  Data grid co-ordinates...
-         ELSE IF( DOM .EQ. 'GRID' ) THEN
-
+            ELSE IF( DOM .EQ. 'GRID' ) THEN
+   
 *  Store a string holding the coordinates at the centre of the first pixel.
-            TEXT = '('
-            IAT = 1
-            DO I = 1, NAX
-               IF ( I .GT. 1 ) CALL CHR_PUTC( ',', TEXT, IAT )
-               CALL CHR_APPND( '1', TEXT, IAT )
-            END DO
-            CALL CHR_APPND( ')', TEXT, IAT )
-
+               TEXT = '('
+               IAT = 1
+               DO I = 1, NAX
+                  IF ( I .GT. 1 ) CALL CHR_PUTC( ',', TEXT, IAT )
+                  CALL CHR_APPND( '1', TEXT, IAT )
+               END DO
+               CALL CHR_APPND( ')', TEXT, IAT )
+   
 *  Set up a suitable Frame title.
-            IF ( NAX .EQ. 1 ) THEN
-               CALL AST_SETC( FRM, 'Title', 'Data grid index; first '//
-     :                        'pixel at '//TEXT( : IAT ), STATUS )
-            ELSE
-               CALL AST_SETC( FRM, 'Title', 'Data grid indices; '//
-     :                        'first pixel at '//TEXT( : IAT ), STATUS ) 
-            END IF
-
+               IF ( NAX .EQ. 1 ) THEN
+                  CALL AST_SETC( FRM, 'Title', 'Data grid index; '//
+     :                           'FIRST pixel at '//TEXT( : IAT ), 
+     :                           STATUS )
+               ELSE
+                  CALL AST_SETC( FRM, 'Title', 'Data grid indices; '//
+     :                           'first pixel at '//TEXT( : IAT ), 
+     :                           STATUS ) 
+               END IF
+   
 *  For each axis, set up a label, symbol and unit value.
-            DO I = 1, NAX
-               IAT = 0
-               CALL CHR_PUTI( I, TEXT, IAT )
-               CALL AST_SETC( FRM, 'Label(' // TEXT( : IAT ) // ')',
-     :                     'Data grid index ' // TEXT( : IAT ), STATUS )
-               CALL AST_SETC( FRM, 'Symbol(' // TEXT( : IAT ) // ')',
-     :                     'g' // TEXT( : IAT ), STATUS )
-               CALL AST_SETC( FRM, 'Unit(' // TEXT( : IAT ) // ')',
-     :                     'pixel', STATUS )
-            END DO
-
+               DO I = 1, NAX
+                  IAT = 0
+                  CALL CHR_PUTI( I, TEXT, IAT )
+                  CALL AST_SETC( FRM, 'Label(' // TEXT( : IAT ) // ')',
+     :                           'Data grid index ' // TEXT( : IAT ), 
+     :                           STATUS )
+                  CALL AST_SETC( FRM, 'Symbol(' // TEXT( : IAT ) // ')',
+     :                           'g' // TEXT( : IAT ), STATUS )
+                  CALL AST_SETC( FRM, 'Unit(' // TEXT( : IAT ) // ')',
+     :                           'pixel', STATUS )
+               END DO
+   
 *  Graphical co-ordinates (symbols and labels are not set since these are
 *  not set either by KPG1_GDGET or AST_PLOT)...
-         ELSE IF( DOM .EQ. 'GRAPHICS' ) THEN
-            CALL AST_SETC( FRM, 'Title', 'Graphical Coordinates', 
-     :                     STATUS )
-            CALL AST_SETC( FRM, 'Unit(1)', 'mm', STATUS )
-            CALL AST_SETC( FRM, 'Unit(2)', 'mm', STATUS )
-
+            ELSE IF( DOM .EQ. 'GRAPHICS' ) THEN
+               CALL AST_SETC( FRM, 'Title', 'Graphical Coordinates', 
+     :                        STATUS )
+               CALL AST_SETC( FRM, 'Unit(1)', 'mm', STATUS )
+               CALL AST_SETC( FRM, 'Unit(2)', 'mm', STATUS )
+   
 *  AGI BASE picture world co-ordinates.
-         ELSE IF( DOM .EQ. 'BASEPIC' ) THEN
-            CALL AST_SETC( FRM, 'Title', 'Normalised world '//
-     :                     'co-ordinates in the AGI BASE picture.', 
-     :                     STATUS )
-
+            ELSE IF( DOM .EQ. 'BASEPIC' ) THEN
+               CALL AST_SETC( FRM, 'Title', 'Normalised world '//
+     :                        'co-ordinates in the AGI BASE picture.', 
+     :                        STATUS )
+   
 *  PGPLOT normalized device coords
-         ELSE IF( DOM .EQ. 'NDC' ) THEN
-            CALL AST_SETC( FRM, 'Title', 'Normalised device '//
-     :                     'co-ordinates.', STATUS )
-
+            ELSE IF( DOM .EQ. 'NDC' ) THEN
+               CALL AST_SETC( FRM, 'Title', 'Normalised device '//
+     :                        'co-ordinates.', STATUS )
+   
 *  AGI picture equal-scale normalized co-ordinates.
-         ELSE IF( DOM .EQ. 'CURPIC' ) THEN
-            CALL AST_SETC( FRM, 'Title', 'Normalised world '//
-     :                     'co-ordinates within an AGI picture.', 
-     :                     STATUS )
-
+            ELSE IF( DOM .EQ. 'CURPIC' ) THEN
+               CALL AST_SETC( FRM, 'Title', 'Normalised world '//
+     :                        'co-ordinates within an AGI picture.', 
+     :                        STATUS )
+   
 *  AGI picture unequal-scale normalized co-ordinates.
-         ELSE IF( DOM .EQ. 'CURNDC' ) THEN
-            CALL AST_SETC( FRM, 'Title', 'Normalised world '//
-     :                     'co-ordinates within an AGI picture.', 
-     :                     STATUS )
-
+            ELSE IF( DOM .EQ. 'CURNDC' ) THEN
+               CALL AST_SETC( FRM, 'Title', 'Normalised world '//
+     :                        'co-ordinates within an AGI picture.', 
+     :                        STATUS )
+   
+            END IF
+   
          END IF
 
       END IF

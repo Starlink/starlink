@@ -11282,14 +11282,27 @@ from one graphical element to another.
 \sstroutine{
    KPG1\_ASFGT
 }{
-   Create a new Frame with a Domain specified through the environment
+   Create a new Frame specified through the environment
 }{
    \sstdescription{
-      This routine creates a new AST Frame with a Domain specified through
-      the environment. If the string obtained for the parameter looks
-      like an IRAS90 {\tt "}Sky Co-ordinate System{\tt "} (SCS) specification, then
-      a SkyFrame is returned with the properties specified by the SCS.
-      Otherwise, a simple Frame is returned with the specified Domain,
+      This routine creates a new AST Frame with properties specified by
+      the given environment parameter. The parameter value is interpreted
+      as an HDS path containing a WCS FrameSet in the form created by
+      KPG1\_WWRT. If this is succesful, the current Frame of the FrameSet
+      is returned. Otherwise, an attempt is made to interpret the parameter
+      value as an NDF name. If the NDF is opened succesfully, its current
+      WCS Frame is returned. If this fails, and the parameter value ends
+      with {\tt "}.FIT{\tt "}, am attempt is made to interpret the parameter value as
+      the name of a FITS file. If successful, the primary WCS Frame from
+      the primary HDU headers is returned. If the above attempt fails,
+      an attempt is made to interpret the parameter value as the name of a
+      text file containing either an AST Frame dump, or a set of FITS
+      headers.
+
+      If all the above fails, and the parameter value looks like an IRAS90
+      {\tt "}Sky Co-ordinate System{\tt "} (SCS) specification, then a SkyFrame is
+      returned with the properties specified by the SCS. Otherwise, a
+      simple Frame is returned with Domain set to the parameter value,
       the number of axes in the Frame being specified by another environment
       parameter.
    }
@@ -17757,8 +17770,26 @@ from one graphical element to another.
    Gets an AST Object using an environment parameter
 }{
    \sstdescription{
-      Gets an AST Object from an NDF, FITS file or text file using an
-      environment parameter.
+      Gets an AST Object from an NDF, FITS file, HDS path or text file
+      using an environment parameter.
+
+      First, attempt to interpret the parameter value as an HDS path. The
+      HDS object must have a type of WCS, must be scalar, and must contain
+      a single 1-D array component with name DATA and type \_CHAR. This is
+      the scheme used for HDS structures created by KPG1\_WWRT.
+
+      If the above attempt fails, attempt to interpret the parameter
+      value as an NDF name. If the NDF is opened succesfully, its WCS
+      FrameSet is returned.
+
+      If the above attempt fails, and the parameter value ends with
+      {\tt "}.FIT{\tt "}, attempt to interpret the parameter value as the name of a
+      FITS file. Open the FITS file and attempt to obtained an AST
+      FrameSet from the primary HDU headers.
+
+      If the above attempt fails, attempt to interpret the parameter
+      value as the name of a text file containing either an AST object
+      dump, or a set of FITS headers.
    }
    \sstinvocation{
       CALL KPG1\_GTOBJ( PARAM, CLASS, ISA, IAST, STATUS )
