@@ -39,7 +39,7 @@
 #     util::FrameWidget
 
 #  Copyright:
-#     Copyright (C) 2007 Science and Technology Facilities Council
+#     Copyright (C) 2007-2009 Science and Technology Facilities Council
 #     All Rights Reserved.
 
 #  Licence:
@@ -145,6 +145,10 @@ itcl::class gaia3d::Gaia3dVtkWindow {
       if { $renwindow_ != {} } {
          $renwindow_ Delete
          set renwindow_ {}
+      }
+      if { $lightkit_ != {} } {
+         $lightkit_ Delete
+         set lightkit_ {}
       }
    }
 
@@ -314,6 +318,10 @@ itcl::class gaia3d::Gaia3dVtkWindow {
       set renderer_ [::vtkRenderer New]
       $renwindow_ AddRenderer $renderer_
 
+      #  Lights for the scene, do this early so we don't get the default 
+      #  lighting as well.
+      add_lightkit_
+
       #  Initial backingstore state (funny order as options already
       #  configured as need width & height above).
       configure -backingstore_on $itk_option(-backingstore_on)
@@ -357,6 +365,32 @@ itcl::class gaia3d::Gaia3dVtkWindow {
       return $renderer_
    }
 
+   #  Add lightkit to light up the scene.
+   protected method add_lightkit_ {} {
+      if { $lightkit_ == {} } {
+         set lightkit_ [::vtkLightKit New]
+
+         #  Set defaults, like the default lighting used in VTK.
+         $lightkit_ SetKeyLightIntensity  1.0
+         $lightkit_ SetKeyToFillRatio     10.0
+         $lightkit_ SetKeyToBackRatio     10.0
+         $lightkit_ SetKeyToHeadRatio     15.0
+         $lightkit_ SetKeyLightElevation  0.0
+         $lightkit_ SetKeyLightAzimuth    0.0
+         $lightkit_ SetKeyLightWarmth     0.5
+         $lightkit_ SetFillLightWarmth    0.5
+         $lightkit_ SetBackLightWarmth    0.5
+         $lightkit_ SetHeadLightWarmth    0.5
+      }
+      $renderer_ LightFollowCameraOn
+      $lightkit_ AddLightsToRenderer $renderer_
+   }
+
+   #  Get the vtkLightKit object.
+   public method get_lightkit {} {
+      return $lightkit_
+   }
+
    #-------------------------------------------------------------------------
    #  Bindings, don't use standard vtk::bind_tk_render_widget to avoid
    #  unwanted keyboard interactions ("q" and "e" that exit the application).
@@ -366,7 +400,7 @@ itcl::class gaia3d::Gaia3dVtkWindow {
       ::gaia3d::bind_tk_widget $itk_component(renwidget) $renwindow_
       return
    }
-   
+
    #  Add a custom binding mouse or keyboard binding.
    public method add_binding {tag cmd} {
       ::bind $itk_component(renwidget) $tag $cmd
@@ -615,6 +649,7 @@ itcl::class gaia3d::Gaia3dVtkWindow {
    protected variable renderer_ {}
    protected variable renwindow_ {}
    protected variable interactor_ {}
+   protected variable lightkit_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------

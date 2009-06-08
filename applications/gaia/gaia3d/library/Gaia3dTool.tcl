@@ -135,6 +135,11 @@ itcl::class gaia3d::Gaia3dTool {
          {Render isosurfaces of other cubes into the scene} \
          -command [code $this make_extratoolbox]
 
+      #  Create the light controls toolbox.
+      add_menuitem $view_menu_ command "Lighting..." \
+         {Change the lighting of the scene} \
+         -command [code $this make_lightingtoolbox]
+
       #  Add the options menu
       set Options [add_menubutton "Options"]
       configure_menubutton Options -underline 0
@@ -652,6 +657,24 @@ itcl::class gaia3d::Gaia3dTool {
                   -rtdimage $itk_option(-rtdimage) \
                   -number $itk_option(-number) \
                   -filter_types $itk_option(-filter_types)
+            }
+         }
+      }
+   }
+
+   #  Control scene lighting.
+   public method make_lightingtoolbox {} {
+
+      #  If the window exists then just raise it.
+      if { [info exists itk_component(lightingtoolbox) ] &&
+           [winfo exists $itk_component(lightingtoolbox) ] } {
+         wm deiconify $itk_component(lightingtoolbox)
+         raise $itk_component(lightingtoolbox)
+      } else {
+         busy {
+            itk_component add lightingtoolbox {
+               Gaia3dVtkLights $w_.\#auto \
+                  -renwindow $renwindow_
             }
          }
       }

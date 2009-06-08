@@ -4,6 +4,7 @@
 #  Copyright:
 #     Copyright (C) 1996-2005 Central Laboratory of the Research Councils.
 #     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     Copyright (C) 2009 Science and Technology Facilities Council.
 #     All Rights Reserved.
 #
 #  Licence:
@@ -127,6 +128,8 @@ proc gaia::setXdefaults {} {
     option add *LabelCubeFileChooser.anchor w
     option add *LabelCubeFileChooser.buttonRelief raised
     option add *LabelCubeFontChooser.anchor w
+
+    option add *LabelScale.anchor w
 
     option add *GaiaQueryResult.relief       sunken
     option add *GaiaQueryResult.borderwidth  3
