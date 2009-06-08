@@ -90,6 +90,8 @@
 *        Take acount of foreign format conversion by the NDF library.
 *     5-JUN-2009 (DSB):
 *        Allow AST objects to be read from an HDS path.
+*     8-JUN-2009 (DSB):
+*        Cancel the parameter before leaving to avoid an HDS locator leak.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -287,6 +289,10 @@
          END IF
 
       END IF
+
+*  Cancel the parameter (if this is not done an HDS locator for the 
+*  parameter structure seems to be leaked).
+      CALL PAR_CANCL( PARAM, STATUS )
 
 *  Annul the object if an error occurred.
       IF( STATUS .NE. SAI__OK ) CALL AST_ANNUL( IAST, STATUS )
