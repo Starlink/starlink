@@ -965,8 +965,11 @@ c      end if
 
 *  Check it is an Interval.
       if( .not. ast_isainterval( ast_getstcregion( obj, status ),
-     :                           status  ) )
-     :                      call stopit( status, 'Error 1a' )
+     :                           status  ) ) then
+         write(*,*) ast_GetC( ast_getstcregion( obj, status ), 'Class',
+     :                       status )
+         call stopit( status, 'Error 1a' )
+      end if
 
 *  Check it has no uncertainty
       if( ast_getunc( obj, .false., status ) .NE. AST__NULL )

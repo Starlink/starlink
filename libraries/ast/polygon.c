@@ -27,7 +27,7 @@ f     AST_POLYGON
 *     than 180 degrees. The closed path joining all the vertices in order
 *     will divide the celestial sphere into two disjoint regions. The
 *     inside of the polygon is the region which is circled in an
-*     anti-clockwise manner (when viewed from the outside of the celestial
+*     anti-clockwise manner (when viewed from the inside of the celestial
 *     sphere) when moving through the list of vertices in the order in
 *     which they were supplied when the Polygon was created (i.e. the
 *     inside is to the left of the boundary when moving through the
@@ -800,7 +800,7 @@ static AstPointSet *DownsizePoly( AstPointSet *pset, double maxerr,
 
 /* If the second segment, we will use the vertex that is farthest from
    the line as one of our threee vertices. To ensure that movement from
-   vertex i1 to i2 to i3 is anti-clockeise, we must use this new vertex
+   vertex i1 to i2 to i3 is anti-clockwise, we must use this new vertex
    as vertex i3, not i2. */
             i3 = seg2->imax;
 
@@ -2498,7 +2498,7 @@ static double Polywidth( AstFrame *frm, AstLineDef **edges, int i, int nv,
 
 /* The usual reason for not finding a width is if the polygon vertices
    are supplied in clockwise order, effectively negating the polygon, and
-   resulting int eh "inside" of the polygon being the infinite region
+   resulting in the "inside" of the polygon being the infinite region
    outside a polygonal hole. In this case, the end point of the line 
    perpendicular to the initial edge can be returned as a representative
    "inside" point. */
@@ -4667,7 +4667,14 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
    actual default attribute value.  Since "set" will be zero, these
    values are for information only and will not be read back. */
 
-/* There are no values to write, so return without further action. */
+/* A flag indicating the convention used for determining the interior of
+   the polygon. A zero value indicates that the old AST system is in 
+   use (inside to the left when moving anti-clockwise round the vertices  
+   as viewed from the outside of the celestial sphere). A non-zero value 
+   indicates the STC system is in use (inside to the left when moving 
+   anti-clockwise round the vertices as viewed from the inside of the 
+   celestial sphere). AST currently uses the STC system. */
+   astWriteInt( channel, "Order", 1, 0, 1, "Polygon uses STC vertex order convention" );
 }
 
 /* Standard class functions. */
@@ -4722,7 +4729,7 @@ f     RESULT = AST_POLYGON( FRAME, NPNT, DIM, POINTS, UNC, OPTIONS, STATUS )
 *     than 180 degrees. The closed path joining all the vertices in order
 *     will divide the celestial sphere into two disjoint regions. The
 *     inside of the polygon is the region which is circled in an
-*     anti-clockwise manner (when viewed from the outside of the celestial
+*     anti-clockwise manner (when viewed from the inside of the celestial
 *     sphere) when moving through the list of vertices in the order in
 *     which they were supplied when the Polygon was created (i.e. the
 *     inside is to the left of the boundary when moving through the
@@ -5211,6 +5218,7 @@ AstPolygon *astLoadPolygon_( void *mem, size_t size, AstPolygonVtab *vtab,
 /* Local Variables: */
    astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstPolygon *new;              /* Pointer to the new Polygon */
+   int order;                    /* Is the new (STC) order convention used? */
 
 /* Initialise. */
    new = NULL;
@@ -5259,9 +5267,9 @@ AstPolygon *astLoadPolygon_( void *mem, size_t size, AstPolygonVtab *vtab,
    obtained, we then use the appropriate (private) Set... member
    function to validate and set the value properly. */
 
-
-/* There are no values to read. */
-/* ---------------------------- */
+/* A flag indicating what order the vertices are stored in. See the Dump
+   function. */
+      order = astReadInt( channel, "order", 0 );
 
 /* Initialise other class properties. */
       new->lbnd[ 0 ] = AST__BAD;
@@ -5272,6 +5280,11 @@ AstPolygon *astLoadPolygon_( void *mem, size_t size, AstPolygonVtab *vtab,
       new->startsat = NULL;
       new->totlen = 0.0;
       new->stale = 1;
+
+/* If the order in which the vertices were written used the old AST
+   convention, negate the Polygon so that it is consistent with the 
+   current conevtion (based on STC). */
+      if( ! order ) astNegate( new );
 
 /* If an error occurred, clean up by deleting the new Polygon. */
       if ( !astOK ) new = astDelete( new );

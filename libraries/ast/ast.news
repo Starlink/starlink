@@ -16,6 +16,18 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
+- The Polygon class has been modified to make it consistent with the
+IVOA STC definition of a Polygon. Specifically, the inside of a polygon
+is now the area to the left of each edge as the vertices are traversed in 
+an anti-clockwise manner, as seen from the inside of the celestial sphere.
+Previously, AST used the anti-clockwise convention, but viewed from the
+outside of the celestial sphere instead of the inside. Any Polygon saved 
+using previous versions of AST will be identified and negated automatically 
+when read by AST V5.2.
+
+A new class of Channel, called StcsChan, has been added that allows
+conversion of suitable AST Objects to and from IVOA STC-S format.
+
 - A new class of Channel, called StcsChan, has been added that allows
 conversion of suitable AST Objects to and from IVOA STC-S format.
 

@@ -693,6 +693,8 @@ typedef struct SkyLineDef {
    double end[3];              /* Unit vector defining end of line */
    double dir[3];              /* Unit vector defining line direction */
    double q[3];                /* Unit vector perpendicular to line */
+   double start_2d[2];
+   double end_2d[2];
 } SkyLineDef;
 
 
@@ -4569,7 +4571,7 @@ static int LineContains( AstFrame *this, AstLineDef *l, int def, double *point, 
 
 /* Check that the point is 90 degrees away from the pole of the great
    circle containing the line. */
-        t1 = palSlaDvdv( sl->dir, b );
+        t1 = palSlaDvdv( sl->q, b );
         t2 = 1.0E-7*sl->length;
         if( t2 < 1.0E-10 ) t2 = 1.0E-10;
         if( fabs( t1 ) <= t2 ) result = 1;
@@ -4691,7 +4693,7 @@ static int LineCrossing( AstFrame *this, AstLineDef *l1, AstLineDef *l2,
 /* Point of intersection of the two great circles is perpendicular to the
    pole vectors of both great circles. Put the Cartesian coords in elements
    2 to 4 of the returned array. */
-      palSlaDvxv( sl1->dir, sl2->dir, temp );
+      palSlaDvxv( sl1->q, sl2->q, temp );
       b = crossing + 2;
       palSlaDvn( temp, b, &len );
 
@@ -4830,19 +4832,20 @@ static AstLineDef *LineDef( AstFrame *this, const double start[2],
 /* Find a unit vector representing the pole of the system in which the
    equator is given by the great circle. This is such that going the
    short way from the start to the end, the pole is to the left of the 
-   line. If the line has zero length, or 180 degrees length, the pole is
+   line as seen by the observer (i.e. from the centre of the sphere). 
+   If the line has zero length, or 180 degrees length, the pole is
    undefined, so we use an arbitrary value. */
          if( result->length == 0.0 || result->length > pi - 5.0E-11 ) {
             palSlaDcs2c( p1[ 0 ] + 0.01, p1[ 1 ] + 0.01, temp );
-            palSlaDvxv( result->start, temp, result->q );
+            palSlaDvxv( temp, result->start, result->dir );
          } else {
-            palSlaDvxv( result->start, result->end, result->q );
+            palSlaDvxv( result->end, result->start, result->dir );
          }
-         palSlaDvn( result->q, result->dir, &len );
+         palSlaDvn( result->dir, result->q, &len );
 
 /* Also store a point which is 90 degrees along the great circle from the
    start. */
-         palSlaDvxv( result->dir, result->start, result->q );
+         palSlaDvxv( result->start, result->q, result->dir );
 
 /* Store a pointer to the defining SkyFrame. */
          result->frame = this;
@@ -4850,6 +4853,16 @@ static AstLineDef *LineDef( AstFrame *this, const double start[2],
 /* Indicate that the line is considered to be terminated at the start and
    end points. */
          result->infinite = 0; 
+
+
+   result->start_2d[ 0 ] = start[ 0 ];
+   result->start_2d[ 1 ] = start[ 1 ];
+   result->end_2d[ 0 ] = end[ 0 ];
+   result->end_2d[ 1 ] = end[ 1 ];
+
+   astNorm( this, result->start_2d );
+   astNorm( this, result->end_2d );
+
       }
    }
 
@@ -4918,7 +4931,7 @@ static int LineIncludes( SkyLineDef *l, double point[3], int *status ) {
    point. */
    t1 = palSlaDvdv( l->start, point );
    t2 = acos( t1 );
-   t3 = palSlaDvdv( l->q, point );   
+   t3 = palSlaDvdv( l->dir, point );   
    return ( ((l->length > 0) ? t2 < l->length : t2 == 0.0 ) && t3 >= -1.0E-8 );
 }
 
@@ -4957,7 +4970,7 @@ static void LineOffset( AstFrame *this, AstLineDef *line, double par,
 *     prp
 *        The distance to move at right angles to the line. Positive
 *        values result in movement to the left of the line, as seen from
-*        the outside when moving from start towards the end.
+*        the observer, when moving from start towards the end.
 *     status
 *        Pointer to the inherited status variable.
 
@@ -4999,17 +5012,17 @@ static void LineOffset( AstFrame *this, AstLineDef *line, double par,
 /* Move a distance par from start to end. */
       c = cos( par );
       s = sin( par );
-      nx = c * sl->start[ 0 ] + s * sl->q[ 0 ];
-      ny = c * sl->start[ 1 ] + s * sl->q[ 1 ];
-      nz = c * sl->start[ 2 ] + s * sl->q[ 2 ];
+      nx = c * sl->start[ 0 ] + s * sl->dir[ 0 ];
+      ny = c * sl->start[ 1 ] + s * sl->dir[ 1 ];
+      nz = c * sl->start[ 2 ] + s * sl->dir[ 2 ];
 
 /* Move a distance prp from this point towards the pole point. */
       if( prp != 0.0 ) {
          c = cos( prp );
          s = sin( prp );
-         v[ 0 ] = c * nx + s * sl->dir[ 0 ];
-         v[ 1 ] = c * ny + s * sl->dir[ 1 ];
-         v[ 2 ] = c * nz + s * sl->dir[ 2 ];
+         v[ 0 ] = c * nx + s * sl->q[ 0 ];
+         v[ 1 ] = c * ny + s * sl->q[ 1 ];
+         v[ 2 ] = c * nz + s * sl->q[ 2 ];
       } else {
          v[ 0 ] = nx;
          v[ 1 ] = ny;

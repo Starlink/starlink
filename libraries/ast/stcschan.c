@@ -495,18 +495,20 @@ static double *BoxCorners( AstFrame *frm, const double centre[2],
    initially parallel to the positive first frame axis (i.e. position 
    angle +pi/2). The end position goes in "rv1" and the position angle of
    the great circle (or straight line) at that point is returned as the 
-   function value. */
+   function value. NOTE, the use of the words "left" and "right" below is 
+   vague because it depends on whether we are using a SkyFrame (which has 
+   a reversed first axis) or a basic Frame. In general, the choice of "left"
+   and "right" below is appropriate for a basic Frame. */
    pa = astOffset2( frm, centre, AST__DPIBY2, bsize[ 0 ]/2, rv1 );  
 
-/* Turn to the left by 90 degrees and offset away by half the box height.
-   This is done so that we have a second point (rv2) to define the great 
-   circle (or straight line) that forms the right vertical edge of the Box 
-   (i.e. the great circle or straight line through rv1 and rv2). Note, for
-   spherical Frames (i.e. SkyFrames) "rv2" is not necessarily a corner of 
-   the box. */
+/* Turn by 90 degrees and offset away by half the box height. This is done 
+   so that we have a second point (rv2) to define the great circle (or 
+   straight line) that forms the first vertical edge of the Box (i.e. the 
+   great circle or straight line through rv1 and rv2). Note, for spherical 
+   Frames (i.e. SkyFrames) "rv2" is not necessarily a corner of the box. */
    (void) astOffset2( frm, rv1, pa + AST__DPIBY2, bsize[ 1 ]/2, rv2 );  
 
-/* In the same way, get two points on the left vertical Box edge. */
+/* In the same way, get two points on the second vertical Box edge. */
    pa = astOffset2( frm, centre, -AST__DPIBY2, bsize[ 0 ]/2, lv1 );  
    (void) astOffset2( frm, lv1, pa + AST__DPIBY2, bsize[ 1 ]/2, lv2 );  
 
@@ -518,7 +520,7 @@ static double *BoxCorners( AstFrame *frm, const double centre[2],
    pa = astOffset2( frm, centre, AST__DPI, bsize[ 1 ]/2, bh1 );  
    (void) astOffset2( frm, bh1, pa + AST__DPIBY2, bsize[ 0 ]/2, bh2 );  
 
-/* The top left corner of the Box is at the intersection of the left
+/* The first corner of the Box is at the intersection of the first
    vertical and top horizontal edges. */
    astIntersect( frm, lv1, lv2, th1, th2, tlc );
 
@@ -535,20 +537,33 @@ static double *BoxCorners( AstFrame *frm, const double centre[2],
    astIntersect( frm, rv1, rv2, bh1, bh2, brc );
 
 /* Gather the corners together into an array suitable for use with
-   astPolygon. */
+   astPolygon. Make sure the vertices are traversed in an ant-clockwise
+   sense whether in a SkyFrame or a basic Frame. */
    result = astMalloc( 8*sizeof( *result ) );
    if( result ) {
-      result[ 0 ] = tlc[ 0 ];
-      result[ 1 ] = trc[ 0 ];
-      result[ 2 ] = brc[ 0 ];
-      result[ 3 ] = blc[ 0 ];
-      result[ 4 ] = tlc[ 1 ];
-      result[ 5 ] = trc[ 1 ];
-      result[ 6 ] = brc[ 1 ];
-      result[ 7 ] = blc[ 1 ];
+      if( astIsASkyFrame( frm ) ) {        
+         result[ 0 ] = tlc[ 0 ];
+         result[ 1 ] = trc[ 0 ];
+         result[ 2 ] = brc[ 0 ];
+         result[ 3 ] = blc[ 0 ];
+         result[ 4 ] = tlc[ 1 ];
+         result[ 5 ] = trc[ 1 ];
+         result[ 6 ] = brc[ 1 ];
+         result[ 7 ] = blc[ 1 ];
+      } else {
+         result[ 3 ] = tlc[ 0 ];
+         result[ 2 ] = trc[ 0 ];
+         result[ 1 ] = brc[ 0 ];
+         result[ 0 ] = blc[ 0 ];
+         result[ 7 ] = tlc[ 1 ];
+         result[ 6 ] = trc[ 1 ];
+         result[ 5 ] = brc[ 1 ];
+         result[ 4 ] = blc[ 1 ];
+      }
+
    }
 
-/* Return the poitner. */
+/* Return the pointer. */
    return result;
 }
 

@@ -850,16 +850,16 @@ c      call ast_listissued( 'testregions' )
       p2(1) = 0.01  
       unc = ast_circle( frm, 1, p1, p2, AST__NULL, ' ', status )
 
-      p(5,1) = 0.0
-      p(5,2) = 0.0
-      p(4,1) = 1.0
-      p(4,2) = 0.5*pi
+      p(1,1) = 0.0
+      p(1,2) = 0.0
+      p(2,1) = 1.0
+      p(2,2) = 0.5*pi
       p(3,1) = 0.5*pi
       p(3,2) = 0.25*pi
-      p(2,1) = 0.25*pi
-      p(2,2) = 0.0
-      p(1,1) = 0.25*pi
-      p(1,2) = 0.25*pi
+      p(4,1) = 0.25*pi
+      p(4,2) = 0.0
+      p(5,1) = 0.25*pi
+      p(5,2) = 0.25*pi
 
       pol1 = ast_polygon( frm, 5, 5, p, unc, 'closed=0', status )
 
@@ -959,13 +959,13 @@ c      call ast_listissued( 'testregions' )
       p2(1) = 0.01  
       unc = ast_circle( frm, 1, p1, p2, AST__NULL, ' ', status )
 
-      p(1,1) = 0.0
+      p(1,1) = 1.5*pi
       p(1,2) = 0.4*pi
-      p(2,1) = 0.5*pi
+      p(2,1) = pi
       p(2,2) = 0.4*pi
-      p(3,1) = pi
+      p(3,1) = 0.5*pi
       p(3,2) = 0.4*pi
-      p(4,1) = 1.5*pi
+      p(4,1) = 0.0
       p(4,2) = 0.4*pi
 
       pol1 = ast_polygon( frm, 4, 5, p, unc, ' ', status )

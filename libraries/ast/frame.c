@@ -6006,7 +6006,8 @@ static AstLineDef *LineDef( AstFrame *this, const double start[2],
          } 
 
 /* Store a unit vector perpendicular to the line, such that the vector
-   points to the left when moving from the start to the end of the line. */
+   points to the left, as vewied from the observer, when moving from the 
+   start to the end of the line. */
          result->q[ 0 ] = -result->dir[ 1 ];
          result->q[ 1 ] = result->dir[ 0 ];
 
@@ -6061,7 +6062,7 @@ static void LineOffset( AstFrame *this, AstLineDef *line, double par,
 *     prp
 *        The distance to move at right angles to the line. Positive
 *        values result in movement to the left of the line, as seen from
-*        the outside when moving from start towards the end.
+*        the observer, when moving from start towards the end.
 
 *  Notes:
 *     - The pointer supplied for "line" should have been created using the 

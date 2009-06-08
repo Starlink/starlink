@@ -3727,6 +3727,7 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
 /* Local Variables: */
    AstBox *box;                  /* Pointer to Box structure */
    AstBox *newbox;               /* Pointer to simpler Box */
+   AstFrame *bfrm;               /* Pointer to base Frame */
    AstFrame *frm;                /* Pointer to current Frame */
    AstMapping *map;              /* Base -> current Mapping */
    AstMapping *result;           /* Result pointer to return */
@@ -3756,12 +3757,15 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
    int *outperm;                 /* Output axis permutation array */
    int closed;                   /* Was original Region closed? */
    int feed;                     /* Source of value for current axis */
+   int frm_rot;                  /* Does the Frame have reversed rotation? */
    int ic;                       /* Axis index */
    int isInterval;               /* Is the simplified Box an Interval */
    int isNull;                   /* Is the simplified Box a NullRegion? */
    int neg;                      /* Was original Region negated? */
    int nin;                      /* No. of base Frame axes (Mapping inputs) */
    int nout;                     /* No. of current Frame axes (Mapping outputs) */
+   int olddir0;                  /* Original value of Direction(1) attribute */
+   int olddir1;                  /* Original value of Direction(2) attribute */
    int simpler;                  /* Has some simplication taken place? */
    
 /* Initialise. */
@@ -3989,7 +3993,7 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
          basemesh = astAnnul( basemesh );
 
 /* If the transformed Box is not itself a Box, see if it can be
-   represented accuractely by a Polygon. This is only p[ossible for
+   represented accurately by a Polygon. This is only possible for
    2-dimensional Boxes. */
       } else if( astGetNin( map ) == 2 && astGetNout( map ) == 2 ) {
 
@@ -4011,9 +4015,31 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
             ryy = astRate( map, box->centre, 1, 1 );
             det = rxx*ryy - rxy*ryx;
 
+/* We also need to know if either of the axes are reversed or not. */
+            bfrm = astGetFrame( new->frameset, AST__BASE );
+
+            if( astTestDirection( bfrm, 0 )  ) {
+               olddir0 = astGetDirection( bfrm, 0 ) ? 1 : 0;
+               astClearDirection( bfrm, 0 );
+            } else {
+               olddir0 = -1;
+            }
+
+            if( astTestDirection( bfrm, 1 )  ) {
+               olddir1 = astGetDirection( bfrm, 1 ) ? 1 : 0;
+               astClearDirection( bfrm, 1 );
+            } else {
+               olddir1 = -1;
+            }
+
+            frm_rot = ( astGetDirection( bfrm, 0 ) !=  astGetDirection( bfrm, 1 ) );
+
+            if( olddir0 != - 1 ) astSetDirection( bfrm, 0, olddir0 );
+            if( olddir1 != - 1 ) astSetDirection( bfrm, 1, olddir1 );
+
 /* If the mapping does not reverse rotation, store the corners in an
    anti-clockwise order as required by the Polygon constructor. */
-            if( det > 0.0 ) {
+            if( ( det > 0.0 && ! frm_rot ) || ( det <= 0.0 && frm_rot ) ) {
                ptr1[ 0 ][ 0 ] = box->centre[ 0 ] - box->extent[ 0 ];
                ptr1[ 1 ][ 0 ] = box->centre[ 1 ] + box->extent[ 1 ];
    

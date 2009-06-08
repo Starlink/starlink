@@ -2527,18 +2527,6 @@ static AstRegion *BoxReader( AstXmlChan *this, AstXmlElement *elem,
       size[1] = 0.0;
       ElemListD( this, scan->el[1][0], 2, size, status );
 
-/* Create the (x,y) at the four corners of the box. */
-      x = pos;
-      y = pos+ 4;
-      x[ 0 ] = cen[ 0 ] + 0.5*size[ 0 ];
-      y[ 0 ] = cen[ 1 ] - 0.5*size[ 1 ];
-      x[ 1 ] = cen[ 0 ] + 0.5*size[ 0 ];
-      y[ 1 ] = cen[ 1 ] + 0.5*size[ 1 ];
-      x[ 2 ] = cen[ 0 ] - 0.5*size[ 0 ];
-      y[ 2 ] = cen[ 1 ] + 0.5*size[ 1 ];
-      x[ 3 ] = cen[ 0 ] - 0.5*size[ 0 ];
-      y[ 3 ] = cen[ 1 ] - 0.5*size[ 1 ];
-
 /* Get the units attribute from the supplied element. These are the units
    of the centre and size values. */
       unit = astXmlGetAttributeValue( elem, "unit" );
@@ -2550,6 +2538,18 @@ static AstRegion *BoxReader( AstXmlChan *this, AstXmlElement *elem,
 /* Since the SkyFrame class does not have active Units we must handle it
    separately. */
       if( astIsASkyFrame( frm ) ) {
+
+/* Create the anti-clockwise list of (x,y) at the four corners of the box. */
+         x = pos;
+         y = pos+ 4;
+         x[ 3 ] = cen[ 0 ] + 0.5*size[ 0 ];
+         y[ 3 ] = cen[ 1 ] - 0.5*size[ 1 ];
+         x[ 2 ] = cen[ 0 ] + 0.5*size[ 0 ];
+         y[ 2 ] = cen[ 1 ] + 0.5*size[ 1 ];
+         x[ 1 ] = cen[ 0 ] - 0.5*size[ 0 ];
+         y[ 1 ] = cen[ 1 ] + 0.5*size[ 1 ];
+         x[ 0 ] = cen[ 0 ] - 0.5*size[ 0 ];
+         y[ 0 ] = cen[ 1 ] - 0.5*size[ 1 ];
 
 /* Convert the axis values to radians. */
          map = astUnitMapper( unit, "rad", NULL, NULL );
@@ -2565,6 +2565,18 @@ static AstRegion *BoxReader( AstXmlChan *this, AstXmlElement *elem,
 
 /* Now handles Frames other than SkyFrames. */
       } else {
+
+/* Create the anti-clockwise list of (x,y) at the four corners of the box. */
+         x = pos;
+         y = pos+ 4;
+         x[ 0 ] = cen[ 0 ] + 0.5*size[ 0 ];
+         y[ 0 ] = cen[ 1 ] - 0.5*size[ 1 ];
+         x[ 1 ] = cen[ 0 ] + 0.5*size[ 0 ];
+         y[ 1 ] = cen[ 1 ] + 0.5*size[ 1 ];
+         x[ 2 ] = cen[ 0 ] - 0.5*size[ 0 ];
+         y[ 2 ] = cen[ 1 ] + 0.5*size[ 1 ];
+         x[ 3 ] = cen[ 0 ] - 0.5*size[ 0 ];
+         y[ 3 ] = cen[ 1 ] - 0.5*size[ 1 ];
 
 /* Take a copy of the supplied Frame and set its Units to the value
    obtained from the supplied element. */
@@ -6255,18 +6267,17 @@ static AstRegion *PolygonReader( AstXmlChan *this, AstXmlElement *elem,
       nv = scan->count[0];
       pos = astMalloc( sizeof( double )*(size_t) (2*nv) );
 
-/* Read each vertex element in turn. Reverse the order of the vertices since 
-   STC and AstPolygon define the inside of a polygon in opposite senses. 
-   Record whether or not the first 4 vertices have <SmallCircles>. */
-      x0 = pos + nv - 1;
+/* Read each vertex element in turn. Record whether or not the first 4 
+   vertices have <SmallCircles>. */
+      x0 = pos;
       y0 = x0 + nv;
-      for( i = 0; i < nv; i++, x0--, y0-- ) {
+      for( i = 0; i < nv; i++, x0++, y0++ ) {
          small [ i % 4 ] = VertexReader( this, scan->el[0][i], x0, y0, status );
       }
 
-/* Increment the pointers so that they point to the first x and y values. */
-      x0++;
-      y0++;
+/* Reset the pointers so that they point to the first x and y values. */
+      x0 = pos;
+      y0 = x0 + nv;
 
 /* Since the SkyFrame class does not have active Units we must handle it
    separately. Convert the axis values from the supplied units (e.g.

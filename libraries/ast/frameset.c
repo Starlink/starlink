@@ -5510,7 +5510,7 @@ static void LineOffset( AstFrame *this_frame, AstLineDef *line, double par,
 *     prp
 *        The distance to move at right angles to the line. Positive
 *        values result in movement to the left of the line, as seen from
-*        the outside when moving from start towards the end.
+*        the observer, when moving from start towards the end.
 *     status
 *        Pointer to the inherited status variable.
 
