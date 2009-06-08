@@ -4846,6 +4846,10 @@ static AstLineDef *LineDef( AstFrame *this, const double start[2],
 
 /* Store a pointer to the defining SkyFrame. */
          result->frame = this;
+
+/* Indicate that the line is considered to be terminated at the start and
+   end points. */
+         result->infinite = 0; 
       }
    }
 

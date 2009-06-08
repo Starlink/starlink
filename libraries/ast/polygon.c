@@ -492,7 +492,7 @@ static void Cache( AstPolygon *this, int *status ){
 /* If the width of the polygon perpendicular to the current edge is
    greater than the width perpdeicular to any other edge, record the
    width and also store the current polygon centre. */
-               if( polwid > maxwid ) {
+               if( polwid > maxwid && polwid != AST__BAD ) {
                   maxwid = polwid;
                   (this->in)[ 0 ] = polcen[ 0 ];                  
                   (this->in)[ 1 ] = polcen[ 1 ];                  
@@ -500,11 +500,14 @@ static void Cache( AstPolygon *this, int *status ){
             }
          }
 
-/* Report an error if no point was found. */
-         if( maxwid < 0 && astOK ) {
-            if( astOK ) astError( AST__BADIN, "astInitPolygon(%s): Degenerate "
-                                  "(zero-area) polygon supplied.", status,
-                                  astGetClass( this ) );
+/* If no width was found it probably means that the polygon vertices were
+   given in clockwise order, resulting in the above process probing the
+   infinite extent outside the polygonal hole. In this case any point
+   outside the hole will do, so we use the current contents of the "polcen"
+   array. */
+         if( maxwid < 0.0 ) {
+            (this->in)[ 0 ] = polcen[ 0 ];                  
+            (this->in)[ 1 ] = polcen[ 1 ];                  
          }
       }
    
@@ -2418,7 +2421,10 @@ static double Polywidth( AstFrame *frm, AstLineDef **edges, int i, int nv,
 *        Pointer to the inherited status variable.
 
 *  Returnd Value:
-*     The width of the polygon perpendicular to the given edge.
+*     The width of the polygon perpendicular to the given edge, or
+*     AST__BAD if the width cannot be determined (usually because the 
+*     vertices been supplied in a clockwise direction, effectively
+*     negating the Polygon).
 
 */
 
@@ -2447,7 +2453,7 @@ static double Polywidth( AstFrame *frm, AstLineDef **edges, int i, int nv,
 /* We now move away from this position at right angles to the line. We
    start off by moving 5 times the length of the specified edge. For
    some Frames (e.g. SkyFrames) this may result in a position that is 
-   much too closer (i.e. if it goes all the wat round the great circle
+   much too close (i.e. if it goes all the way round the great circle
    and comes back to the beginning). Therefore, we check that the end
    point is the requested distance from the start point, and if not, we
    halve the length of the line and try again. */
@@ -2462,17 +2468,13 @@ static double Polywidth( AstFrame *frm, AstLineDef **edges, int i, int nv,
 /* Create a description of the required line. */
    line = astLineDef( frm, start, end );
 
-/* Set a flag indicating that this line should be considered to have
-   inifinite length when it is used within astLineCrossing. */
-   line->infinite = 1;
-
 /* Loop round every edge, except for the supplied edge. */
    for( j = 0; j < nv; j++ ) {
       if( j != i ) {
 
-/* Find the position at which the (infinite) line created above crosses the 
-   current (finite) edge. Skip to the next edge if the line does not 
-   intersect the edge within the length of the edge. */
+/* Find the position at which the line created above crosses the current 
+   edge. Skip to the next edge if the line does not intersect the edge 
+   within the length of the edge. */
          if( astLineCrossing( frm, line, edges[ j ], &cross ) ) {
 
 /* Find the distance between the crossing point and the line start. */
@@ -2493,6 +2495,16 @@ static double Polywidth( AstFrame *frm, AstLineDef **edges, int i, int nv,
 /* If a width was found, return the point half way across the polygon. */
    if( result != AST__BAD ) {
       astOffset( frm, start, end, 0.5*result, cen );
+
+/* The usual reason for not finding a width is if the polygon vertices
+   are supplied in clockwise order, effectively negating the polygon, and
+   resulting int eh "inside" of the polygon being the infinite region
+   outside a polygonal hole. In this case, the end point of the line 
+   perpendicular to the initial edge can be returned as a representative
+   "inside" point. */
+   } else {
+      cen[ 0 ] = end[ 0 ];
+      cen[ 1 ] = end[ 1 ];
    }
 
 /* Return the width. */
@@ -4400,7 +4412,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
             p[ 1 ] = *py;
             a = astLineDef( frm, this->in, p );
 
-/* We now dtermine the number of times this line crosses the polygon
+/* We now determine the number of times this line crosses the polygon
    boundary. Initialise the number of crossings to zero. */
             ncross = 0;
             pos = UNKNOWN;
