@@ -34,6 +34,12 @@
       rather than to the default current time.  There is a choice of 
       formats including Gregorian Date and Time, and Julian Date.
 
+   o  LISTMAKE
+
+      -  The FRAME parameter now allows the co-ordinate frame to be
+      specified in more ways (for example, as an AST Object dump or 
+      the current Frame in an NDF).
+
    o  LISTSHOW
 
       -  A new option ``STCS'' has been added to the PLOT parameter. This

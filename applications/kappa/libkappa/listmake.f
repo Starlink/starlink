@@ -108,16 +108,31 @@
 *        only accessed if parameter MODE is given the value "File".
 *     FRAME = LITERAL (Read)
 *        Specifies the co-ordinate Frame of the positions supplied using
-*        parameter POSITION or FILE.  If an IRAS90 Sky Co-ordinate
-*        System (SCS) string such as EQUAT(J2000) is supplied (see 
-*        SUN/163), then the positions are assumed to be two-dimensional
+*        parameter POSITION or FILE.  The parameter value is interpreted
+*        first as an HDS path containing a WCS FrameSet. If this is 
+*        successful, the current Frame of the FrameSet is used. Otherwise, 
+*        an attempt is made to interpret the parameter value as an NDF 
+*        name. If this is successful, the current WCS coordinate frame in
+*        the NDF is used. If this fails, and the parameter value ends 
+*        with ".FIT", an attempt is made to interpret the parameter value
+*        as the name of a FITS file. If successful, the primary WCS 
+*        co-ordinate system from the primary HDU headers is used. If the 
+*        above attempt fails, an attempt is made to interpret the parameter 
+*        value as the name of a text file containing either an AST Frame 
+*        dump (such as produced by commands in the ATOOLS package), or a 
+*        set of FITS headers.
+*
+*        If all the above fails, and the parameter value looks like an 
+*        IRAS90 "Sky Co-ordinate System" (SCS) string such as "EQUAT(J2000)"
+*        (see SUN/163), then the positions are assumed to be two-dimensional
 *        celestial co-ordinates in the specified system.  Otherwise, the
-*        given string is used as a Domain name without any 
-*        interpretation.  Any string may be supplied, but normally one
-*        of the standard Domain names such as GRID, PIXEL, GRAPHICS, 
-*        etc. should be given.  Parameter DIM is used to determine the
-*        number of axes in the Frame.  This parameter is only accessed 
-*        if the parameter NDF is given a null value.
+*        given string is used as a Domain name without any interpretation. 
+*        Any Domain name may be supplied, but normally one of the standard 
+*        Domain names, such as GRID, PIXEL, GRAPHICS should be given.  
+*        Parameter DIM is used to determine the number of axes in the Frame.  
+*
+*        This parameter is only accessed if the parameter NDF is given a 
+*        null value.
 *     INCAT = FILENAME (Read)
 *        A catalogue containing an existing positions list which is to
 *        be included at the start of the output positions list.  These
@@ -250,8 +265,10 @@
 
 *  Copyright:
 *     Copyright (C) 1998-1999, 2001, 2004 Central Laboratory of the
-*     Research Councils. Copyright (C) 2006 Particle Physics &
-*     Astronomy Research Council. All Rights Reserved.
+*     Research Councils. 
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council. 
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -285,6 +302,8 @@
 *        Use CNF_PVAL
 *     20-JAN-2006 (DSB):
 *        Added option "Good" for parameter MODE.
+*     8-JUN-2009 (DSB):
+*        Document new options for parameter FRAME.
 *     {enter_further_changes_here}
 
 *-

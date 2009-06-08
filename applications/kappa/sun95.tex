@@ -29306,17 +29306,34 @@ plot (10k).
       \sstsubsection{
          FRAME = LITERAL (Read)
       }{
-         Specifies the co-ordinate Frame of the positions supplied using Parameter
-         POSITION or FILE.  If an IRAS90 \emph{Sky Co-ordinate System} (SCS) string
-         such as {\tt "EQUAT(J2000)"} is supplied (see \xref{SUN/163}{sun163}{}),
-         then the positions are assumed to be two-dimensional celestial co-ordinates
-         in the specified system.  Otherwise, the given string is used as a Domain
-         name without any interpretation.  Any string may be supplied, but normally
-         one of the standard \htmlref{Domain names}{se:domains}, such as 
-         \htmlref{GRID, PIXEL, GRAPHICS}{se:resdoms}~ 
-         should be given.  Parameter DIM is used to determine the number
-         of axes in the Frame.  This parameter is only accessed if the
-         Parameter NDF is given a null value.
+         Specifies the co-ordinate Frame of the positions supplied using
+         parameter POSITION or FILE.  The parameter value is interpreted
+         first as an HDS path containing a WCS FrameSet. If this is 
+         successful, the current Frame of the FrameSet is used. Otherwise, 
+         an attempt is made to interpret the parameter value as an NDF 
+         name. If this is successful, the current WCS coordinate frame in
+         the NDF is used. If this fails, and the parameter value ends 
+         with {\tt .FIT}, an attempt is made to interpret the parameter value
+         as the name of a FITS file. If successful, the primary WCS 
+         co-ordinate system from the primary HDU headers is used. If the 
+         above attempt fails, an attempt is made to interpret the parameter 
+         value as the name of a text file containing either an AST Frame 
+         dump (such as produced by commands in the ATOOLS package), or a 
+         set of FITS headers.
+
+         If all the above fails, and the parameter value looks like an 
+         IRAS90 \emph{Sky Co-ordinate System} (SCS) string
+         such as {\tt "EQUAT(J2000)"} (see \xref{SUN/163}{sun163}{}),
+         then the positions are assumed to be two-dimensional
+         celestial co-ordinates in the specified system.  Otherwise, the
+         given string is used as a Domain name without any interpretation. 
+         Any Domain name may be supplied, but normally one of the standard 
+         \htmlref{Domain names}{se:domains}, such as 
+         \htmlref{GRID, PIXEL, GRAPHICS}{se:resdoms}~ should be given.  
+         Parameter DIM is used to determine the number of axes in the Frame.  
+
+         This parameter is only accessed if the parameter NDF is given a 
+         null value.
       }
       \sstsubsection{
          INCAT = FILENAME (Read)
@@ -55880,6 +55897,13 @@ The following applications have been modified:
          the date and time of the new history record to be set explicitly 
          rather than to the default current time.  There is a choice of 
          formats including Gregorian Date and Time, and Julian Date.
+      \end{itemize}
+
+   \item [\htmlref{LISTMAKE}{LISTMAKE}] \mbox{}
+      \begin{itemize}
+         \item The FRAME parameter now allows the co-ordinate frame to be
+         specified in more ways (for example, as an AST Object dump or 
+         the current Frame in an NDF).
       \end{itemize}
 
    \item [\htmlref{LISTSHOW}{LISTSHOW}] \mbox{}
