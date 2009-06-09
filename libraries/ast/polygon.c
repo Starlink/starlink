@@ -821,8 +821,8 @@ static AstPointSet *DownsizePoly( AstPointSet *pset, double maxerr,
          }
 
 /* Ensure the vertex indices are in the first cycle. */
-         if( i2 > nv ) i2 -= nv;
-         if( i3 > nv ) i3 -= nv;
+         if( i2 >= nv ) i2 -= nv;
+         if( i3 >= nv ) i3 -= nv;
 
 /* Create Segment structures to describe each of these three edges. */
          seg1 = NewSegment( seg1, i1, i2, nv, status );
@@ -3721,6 +3721,7 @@ static void SmoothPoly( AstPointSet *pset, int boxsize, double strength,
 
 /* Local Variables: */
    double **ptr;
+   double *newptr[ 2 ];
    double *newx;
    double *newy;
    double *nx;
@@ -3841,11 +3842,9 @@ static void SmoothPoly( AstPointSet *pset, int boxsize, double strength,
       }
 
 /* Replace the data points in the PointSet. */
-      oldx = astFree( oldx );
-      oldy = astFree( oldy );
-      ptr[ 0 ] = newx;
-      ptr[ 1 ] = newy;
-      astSetPoints( pset, ptr );
+      newptr[ 0 ] = newx;
+      newptr[ 1 ] = newy;
+      astSetPoints( pset, newptr );
    }
 }
 
