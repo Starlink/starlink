@@ -3721,7 +3721,6 @@ static void SmoothPoly( AstPointSet *pset, int boxsize, double strength,
 
 /* Local Variables: */
    double **ptr;
-   double *newptr[ 2 ];
    double *newx;
    double *newy;
    double *nx;
@@ -3842,9 +3841,10 @@ static void SmoothPoly( AstPointSet *pset, int boxsize, double strength,
       }
 
 /* Replace the data points in the PointSet. */
-      newptr[ 0 ] = newx;
-      newptr[ 1 ] = newy;
-      astSetPoints( pset, newptr );
+      ptr[ 0 ] = newx;
+      ptr[ 1 ] = newy;
+      oldx = astFree( oldx );
+      oldy = astFree( oldy );
    }
 }
 
