@@ -95,6 +95,8 @@
 *        locator leak (KAPPA monolith locator checsk do not, and cannot,
 *        filter out the locators stored in the parameter system by 
 *        NDF_EXIST and NDF_ASSOC).
+*     9-JUN-2009 (DSB):
+*        Improve error reporting.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -110,6 +112,7 @@
       INCLUDE 'AST_PAR'          ! AST constants
       INCLUDE 'DAT_PAR'          ! HDS constants
       INCLUDE 'NDF_PAR'          ! NDF constants
+      INCLUDE 'PAR_ERR'          ! PAR error constants
 
 *  Arguments Given:
       CHARACTER PARAM*(*)
@@ -144,14 +147,19 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Get a string form the user. Use subpar to avoid problem caused by
+*  interpretion of the text within thr parameter system.
+      CALL SUBPAR_FINDPAR( PARAM, IPAR, STATUS )
+      CALL SUBPAR_GETNAME( IPAR, PARVAL, STATUS )
+
+*  Check we got some text successfully.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
 *  First of all, attempt to get an object assuming the user has supplied 
 *  an HDS path. Do not use DAT_ASSOC since it required the parameter to
 *  be declared as type UNIV in the IFL file. Instead, get the value of 
 *  the parameter using SUBPAR to avoid interpretation of the string by 
 *  the parameter system.
-      CALL SUBPAR_FINDPAR( PARAM, IPAR, STATUS )
-      CALL SUBPAR_GETNAME( IPAR, PARVAL, STATUS )
-
       CALL HDS_FIND( DAT__ROOT, PARVAL, 'Read', LOC1, STATUS )
       CALL DAT_NAME( LOC1, NAME, STATUS )
       CALL DAT_PAREN( LOC1, LOC2, STATUS ) 
@@ -163,7 +171,9 @@
 
       IF( STATUS .NE. SAI__OK ) THEN
          CALL AST_ANNUL( IAST, STATUS )
-         CALL ERR_ANNUL( STATUS )
+         IF( STATUS .NE. PAR__NULL .AND. STATUS .NE. PAR__ABORT ) THEN
+            CALL ERR_ANNUL( STATUS )
+         END IF
 
       ELSE IF( IAST .NE. AST__NULL ) THEN
          CALL DAT_MSG( 'OBJ', LOC1 ) 
@@ -215,6 +225,10 @@
 *  Obtain a GRP group containing text from which an Object is to be read.
          CALL ATL_GTGRP( PARAM, IGRP, STATUS )
 
+*  Abort if requested.
+         IF( STATUS .EQ. PAR__NULL .OR. 
+     :       STATUS .EQ. PAR__ABORT ) GO TO 999
+
 *  Tried to read an object from the group.
          CALL ATL_RDGRP( IGRP, IAST, STATUS )
 
@@ -246,7 +260,8 @@
       END IF
 
 *  Check the Object class if CLASS is not blank.
-      IF( CLASS .NE. ' ' .AND. STATUS .EQ. SAI__OK ) THEN 
+      IF( CLASS .NE. ' ' .AND. STATUS .EQ. SAI__OK .AND. 
+     :    IAST .NE. AST__NULL ) THEN 
 
 *  See if the object is of the required class.
          OK = ISA( IAST, STATUS ) 
@@ -305,7 +320,24 @@
 
       END IF
 
+*  Report an error if no object was read.
+      IF( IAST .EQ. AST__NULL ) THEN
+         IF( STATUS .EQ. SAI__OK ) STATUS = SAI__ERROR
+         CALL MSG_SETC( 'P', PARAM ) 
+         CALL MSG_SETC( 'V', PARVAL ) 
+         CALL MSG_SETC( 'L', CLASS )
+
+         IF( INDEX( PARVAL( 1 : 1 ), 'AEIOU' ) .NE. 0 ) THEN
+            CALL MSG_SETC( 'A', 'a' )
+         ELSE
+            CALL MSG_SETC( 'A', 'an' )
+         END IF
+
+         CALL ERR_REP( 'KPG1_GTOBJ_ERR3', 'Failed to obtain ^A '//
+     :                 '^L from ''^V'' (parameter ''^P'').', STATUS )
+      END IF         
+
 *  Annul the object if an error occurred.
-      IF( STATUS .NE. SAI__OK ) CALL AST_ANNUL( IAST, STATUS )
+ 999  IF( STATUS .NE. SAI__OK ) CALL AST_ANNUL( IAST, STATUS )
 
       END
