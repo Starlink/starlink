@@ -2345,8 +2345,10 @@ AstPolygon *astOutline##X##_( Xtype value, int oper, Xtype array[], \
    pset = astAnnul( pset ); \
    frm = astAnnul( frm ); \
    ptr = astGetPoints( candidate ); \
-   astFree( ptr[ 0 ] ); \
-   astFree( ptr[ 1 ] ); \
+   if( astOK ) { \
+      astFree( ptr[ 0 ] ); \
+      astFree( ptr[ 1 ] ); \
+   } \
    candidate = astAnnul( candidate ); \
 \
 /* If an error occurred, clear the returned result. */ \
