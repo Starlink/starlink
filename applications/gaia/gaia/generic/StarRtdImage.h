@@ -205,6 +205,9 @@ class StarRtdImage : public Skycat
    //  Replace the image data.
    int replaceImageDataCmd( int argc, char *argv[] );
 
+   //  Get the image data.
+   int imageDataCmd( int argc, char *argv[] );
+
    //  Run a foreign procedure.
    int foreignCmd( int argc, char *argv[] );
 

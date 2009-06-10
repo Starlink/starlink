@@ -127,6 +127,9 @@ extern "C" {
     /* Create a logical mask identifying bad pixels */
     unsigned char *gaiaArrayCreateUnsignedMask( ARRAYinfo *info, int memtype );
 
+    /* Mask data coping to a memory location */
+    void gaiaArrayMaskData( ARRAYinfo *dataInfo, ARRAYinfo *maskInfo, 
+                            int memtype, void **dstPtr );
 #ifdef __cplusplus
 }
 #endif

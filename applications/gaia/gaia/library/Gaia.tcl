@@ -108,6 +108,8 @@
 #        Added plastic support.
 #     23-JUL-2008 (PWD):
 #        Start adding VO support.
+#     09-JUN-2009 (PWD):
+#        Add mask toolbox.
 #     24-JUN-2009 (MBT):
 #        Replace PLASTIC support with SAMP support.
 #     {enter_changes_here}
@@ -363,7 +365,7 @@ itcl::class gaia::Gaia {
 
       #  Do base class inits. Note stop creation of cat menu and opening
       #  of catalogues from the command-line so we can override use of
-      #  SkySearch class. 
+      #  SkySearch class.
       set curval $itk_option(-cat)
       set curcats $itk_option(-catalog)
       set itk_option(-cat) 0
@@ -642,6 +644,11 @@ itcl::class gaia::Gaia {
       insert_menuitem $m $index command "Open cube..." \
          {Open a cube and display image sections from it} \
          -command [code $this make_opencube_toolbox]
+
+      #  And mask.
+      insert_menuitem $m $index command "Mask image..." \
+         {Select regions using an integer mask} \
+         -command [code $this make_mask_toolbox]
 
       #  Close also needs the command changing to delete the object.
       $m entryconfigure "Close" \
@@ -1414,6 +1421,30 @@ itcl::class gaia::Gaia {
          }
       }
       return ""
+   }
+
+   #  Create the mask image toolbox. Note this is different from the usual
+   #  toolboxes, as it lives in the File menu and there can only be one.
+   public method make_mask_toolbox {} {
+
+      #  If the window exists then just raise it.
+      if { [info exists itk_component(mask) ] &&
+           [winfo exists $itk_component(mask) ] } {
+         wm deiconify $itk_component(mask)
+         raise $itk_component(mask)
+      } else {
+
+         busy {
+            itk_component add mask {
+               GaiaMask $w_.\#auto \
+                  -gaia $w_ \
+                  -rtdimage [$image_ get_image] \
+                  -transient $itk_option(-transient_tools) \
+                  -number $clone_ \
+                  -filter_types $itk_option(-file_types)
+            }
+         }
+      }
    }
 
    #  Notification that a file has been loaded into the GaiaImageCtrl.
@@ -2397,7 +2428,7 @@ window gives you access to this."
    #  ----------
 
    #  Open a dialog for querying SIAP services for any images. There
-   #  are two flavours, one queries a list of servers for images and 
+   #  are two flavours, one queries a list of servers for images and
    #  the other allows each server to be queried individual.
    public method vo_siap_query {use_list} {
       if { [gaia::GaiaVOTableAccess::check_for_gaiavo] } {
@@ -2433,7 +2464,7 @@ window gives you access to this."
    protected method vo_query_siap_ {headers row} {
       if { [gaia::GaiaVOTableAccess::check_for_gaiavo] } {
 
-         #  See if the given headers and row data specify a SIAP server. 
+         #  See if the given headers and row data specify a SIAP server.
          #  Need a accessURL field for that.
          set accessURL [gaiavo::GaiaVOCatSIAP::getAccessURL $headers $row]
          if { $accessURL != {} } {

@@ -10,7 +10,7 @@
 
  *  Copyright:
  *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
- *     Copyright (C) 2007 Science and Technology Facilities Council.
+ *     Copyright (C) 2007-2009 Science and Technology Facilities Council.
  *     All Rights Reserved.
 
  *  Licence:
@@ -59,8 +59,25 @@
 #define MIN(a,b) ( (a) < (b) ? (a) : (b) )
 #define MAX(a,b) ( (a) > (b) ? (a) : (b) )
 
+/* Deal with swapping, sometimes need macros that eval to noop for bigendian
+ * (byteswap.h defines the SWAP_xxx functions) */
+
+#if BIGENDIAN
+#define SWAP_DOUBLE_(value) value
+#define SWAP_FLOAT_(value) value
+#define SWAP_INT_(value) value
+#define SWAP_SHORT_(value) value
+#define SWAP_USHORT_(value) value
+#else
+#define SWAP_DOUBLE_(value) SWAP_DOUBLE(value)
+#define SWAP_FLOAT_(value) SWAP_FLOAT(value)
+#define SWAP_INT_(value) SWAP_INT(value)
+#define SWAP_SHORT_(value) SWAP_SHORT(value)
+#define SWAP_USHORT_(value) SWAP_USHORT(value)
+#endif
+
 /* Local types as HDS type strings, static for simple export */
-static char *hdstypes[] = {
+static const char *hdstypes[] = {
     "_UBYTE", "_BYTE", "_UWORD", "_WORD", "_INTEGER", "_REAL", "_DOUBLE"
 };
 
@@ -294,7 +311,7 @@ char const *gaiaArrayTypeToHDS( int type )
  * type that would be used to return an image or spectrum (different for
  * scaled integer FITS and NDF byte data).
  */
-char const *gaiaArrayFullTypeToHDS( int intype, int isfits, double bscale, 
+char const *gaiaArrayFullTypeToHDS( int intype, int isfits, double bscale,
                                     double bzero )
 {
     int type = gaiaArrayScaledType( intype, isfits, bscale, bzero );
@@ -865,7 +882,7 @@ static void RawCubeFromCube( ARRAYinfo *cubeinfo, int dims[3], int lbnd[3],
 
     if ( lbnd[0] == 0 && ubnd[0] == dims[0] &&
          lbnd[1] == 0 && ubnd[1] == dims[1] ) {
-        
+
         /* Full sized first and second dimensions with extraction limits along
          * third (or possibly whole cube). This memory will be contiguous, so
          * just copy. */
@@ -1213,7 +1230,7 @@ void gaiaArrayRegionSpectrumFromCube( ARRAYinfo *info, int dims[3], int axis,
     /* Need to take care when the output type is not the same as the input
      * type, this happens for scaled FITS and NDF byte data. Allocate memory
      * as this type not intype. */
-    *outtype = gaiaArrayScaledType( intype, info->isfits, info->bscale, 
+    *outtype = gaiaArrayScaledType( intype, info->isfits, info->bscale,
                                     info->bzero );
 
     /* Allocate memory for spectrum. Only need "arange" spanning values when
@@ -1566,7 +1583,7 @@ static void DataNormalise( void *inPtr, int intype, int nel, int isfits,
     }
 #endif
 
-    /* If the data is to be scaled to a floating type, or converted to word, 
+    /* If the data is to be scaled to a floating type, or converted to word,
      * then allocate the necessary memory. */
     *outtype = gaiaArrayScaledType( intype, isfits, bscale, bzero );
     scaled = ( intype != (*outtype) );
@@ -1886,7 +1903,7 @@ void gaiaArrayRawCubeFromCube( ARRAYinfo *ininfo, int dims[3], int lbnd[3],
 
     /* Create an ARRAYinfo structure. */
     *outinfo = gaiaArrayCreateInfo( outPtr, type, nel, ininfo->isfits,
-                                    ininfo->haveblank, ininfo->blank, 
+                                    ininfo->haveblank, ininfo->blank,
                                     ininfo->bscale, ininfo->bzero, memtype );
 }
 
@@ -1960,7 +1977,7 @@ void gaiaArrayNormalisedFromArray( ARRAYinfo *inInfo, ARRAYinfo **outInfo,
  *  and can also change all bad values into a given nullvalue, if requested.
  *
  *  This variant always creates a copy, unless the input array is not FITS
- *  and no bad value transformation is require.
+ *  and no bad value transformation is required.
  */
 static void DataNormaliseCopy( void *inPtr, int intype, int nel, int isfits,
                                int haveblank, int inBlank, double bscale,
@@ -2069,21 +2086,6 @@ static void DataNormaliseCopy( void *inPtr, int intype, int nel, int isfits,
             fscaled = 1;
         }
     }
-
-    /* Deal with swapping, need macros that eval to noop for bigendian */
-#if BIGENDIAN
-#define SWAP_DOUBLE_(value) value
-#define SWAP_FLOAT_(value) value
-#define SWAP_INT_(value) value
-#define SWAP_SHORT_(value) value
-#define SWAP_USHORT_(value) value
-#else
-#define SWAP_DOUBLE_(value) SWAP_DOUBLE(value)
-#define SWAP_FLOAT_(value) SWAP_FLOAT(value)
-#define SWAP_INT_(value) SWAP_INT(value)
-#define SWAP_SHORT_(value) SWAP_SHORT(value)
-#define SWAP_USHORT_(value) SWAP_USHORT(value)
-#endif
 
     /* BAD value transformation and variant scaling for integer types.
      * Also count bad values detected. Useful for optimisations. */
@@ -2578,4 +2580,274 @@ unsigned char *gaiaArrayCreateUnsignedMask( ARRAYinfo *info, int memtype )
         mask = NULL;
     }
     return mask;
+}
+
+/**
+ *  Name:
+ *     gaiaArrayMaskData
+ *
+ *  Purpose:
+ *     Apply an integer mask to a given data array returning the result
+ *     in a given array of the same data type as the data.
+ *
+ *  Arguments:
+ *     dataInfo
+ *         Pointer to the data ARRAYinfo structure.
+ *     maskInfo
+ *         Pointer to the mask ARRAYinfo structure.
+ *     destInfo
+ *         Pointer to a memory region to get the masked data.
+ */
+void gaiaArrayMaskData( ARRAYinfo *dataInfo, ARRAYinfo *maskInfo,
+                        int memtype, void **dstPtr )
+{
+    int *maskPtr = (int *)maskInfo->ptr;
+    int i;
+    int maskValue;
+    int nel = dataInfo->el;
+    size_t length;
+
+    /*  Allocate memory for the masked copy. */
+    length = nel * gaiaArraySizeOf( dataInfo->type );
+    AllocateMemory( memtype, length, dstPtr );
+
+    /*  Note on swapping etc. We only test the mask value, which we know
+     *  is integer, so that only requires swapping on little-endian machines
+     *  if the mask data is FITS, the other data can just be copied. */
+    if ( maskInfo->isfits ) {
+
+        /*  FITS mask, may need to handle swapping. */
+        switch ( dataInfo->type )
+        {
+            case HDS_DOUBLE: {
+                double *dataPtr = (double *)dataInfo->ptr;
+                double *destptr = (double *)*dstPtr;
+                double bad = SWAP_DOUBLE_( VAL__BADD );
+                for ( i = 0; i < nel; i++ ) {
+                    maskValue = SWAP_INT_( maskPtr[i] );
+                    if ( maskValue == VAL__BADI ) {
+                        destptr[i] = bad;
+                    }
+                    else {
+                        destptr[i] = dataPtr[i];
+                    }
+                }
+            }
+            break;
+
+            case HDS_REAL: {
+                float *dataPtr = (float *)dataInfo->ptr;
+                float *destptr = (float *)*dstPtr;
+                float bad = SWAP_FLOAT_( VAL__BADR );
+                for ( i = 0; i < nel; i++ ) {
+                    maskValue = SWAP_INT_( maskPtr[i] );
+                    if ( maskValue == VAL__BADI ) {
+                        destptr[i] = bad;
+                    }
+                    else {
+                        destptr[i] = dataPtr[i];
+                    }
+                }
+            }
+            break;
+
+            case HDS_INTEGER: {
+                int *dataPtr = (int *)dataInfo->ptr;
+                int *destptr = (int *)*dstPtr;
+                int bad = SWAP_INT_( VAL__BADI );
+                for ( i = 0; i < nel; i++ ) {
+                    maskValue = SWAP_INT_( maskPtr[i] );
+                    if ( maskValue == VAL__BADI ) {
+                        destptr[i] = bad;
+                    }
+                    else {
+                        destptr[i] = dataPtr[i];
+                    }
+                }
+            }
+            break;
+
+            case HDS_WORD: {
+                short *dataPtr = (short *)dataInfo->ptr;
+                short *destptr = (short *)*dstPtr;
+                short bad = SWAP_SHORT_( VAL__BADW );
+                for ( i = 0; i < nel; i++ ) {
+                    maskValue = SWAP_INT_( maskPtr[i] );
+                    if ( maskValue == VAL__BADI ) {
+                        destptr[i] = bad;
+                    }
+                    else {
+                        destptr[i] = dataPtr[i];
+                    }
+                }
+            }
+            break;
+
+            case HDS_UWORD: {
+                unsigned short *dataPtr = (unsigned short *)dataInfo->ptr;
+                unsigned short *destptr = (unsigned short *)*dstPtr;
+                unsigned short bad = SWAP_USHORT_( VAL__BADUW );
+                for ( i = 0; i < nel; i++ ) {
+                    maskValue = SWAP_INT_( maskPtr[i] );
+                    if ( maskValue == VAL__BADI ) {
+                        destptr[i] = bad;
+                    }
+                    else {
+                        destptr[i] = dataPtr[i];
+                    }
+                }
+            }
+            break;
+
+            case HDS_BYTE: {
+                char *dataPtr = (char *)dataInfo->ptr;
+                char *destptr = (char *)*dstPtr;
+                char bad = VAL__BADB;
+                for ( i = 0; i < nel; i++ ) {
+                    maskValue = SWAP_INT_( maskPtr[i] );
+                    if ( maskValue == VAL__BADI ) {
+                        destptr[i] = bad;
+                    }
+                    else {
+                        destptr[i] = dataPtr[i];
+                    }
+                }
+            }
+            break;
+
+            case HDS_UBYTE: {
+                unsigned char *dataPtr = (unsigned char *)dataInfo->ptr;
+                unsigned char *destptr = (unsigned char *)*dstPtr;
+                unsigned char bad = VAL__BADUB;
+                for ( i = 0; i < nel; i++ ) {
+                    maskValue = SWAP_INT_( maskPtr[i] );
+                    if ( maskValue == VAL__BADI ) {
+                        destptr[i] = bad;
+                    }
+                    else {
+                        destptr[i] = dataPtr[i];
+                    }
+                }
+            }
+            break;
+        }
+    }
+    else {
+        /* Non-FITS so no byte swapping needed. */
+
+        switch ( dataInfo->type )
+        {
+            case HDS_DOUBLE: {
+                double *dataPtr = (double *)dataInfo->ptr;
+                double *destptr = (double *)*dstPtr;
+                double bad = VAL__BADD;
+                for ( i = 0; i < nel; i++ ) {
+                    maskValue = maskPtr[i];
+                    if ( maskValue == VAL__BADI ) {
+                        destptr[i] = bad;
+                    }
+                    else {
+                        destptr[i] = dataPtr[i];
+                    }
+                }
+            }
+            break;
+
+            case HDS_REAL: {
+                float *dataPtr = (float *)dataInfo->ptr;
+                float *destptr = (float *)*dstPtr;
+                float bad = VAL__BADR;
+                for ( i = 0; i < nel; i++ ) {
+                    maskValue = maskPtr[i];
+                    if ( maskValue == VAL__BADI ) {
+                        destptr[i] = bad;
+                    }
+                    else {
+                        destptr[i] = dataPtr[i];
+                    }
+                }
+            }
+            break;
+
+            case HDS_INTEGER: {
+                int *dataPtr = (int *)dataInfo->ptr;
+                int *destptr = (int *)*dstPtr;
+                int bad = VAL__BADI;
+                for ( i = 0; i < nel; i++ ) {
+                    maskValue = maskPtr[i];
+                    if ( maskValue == VAL__BADI ) {
+                        destptr[i] = bad;
+                    }
+                    else {
+                        destptr[i] = dataPtr[i];
+                    }
+                }
+            }
+            break;
+
+            case HDS_WORD: {
+                short *dataPtr = (short *)dataInfo->ptr;
+                short *destptr = (short *)*dstPtr;
+                short bad = VAL__BADW;
+                for ( i = 0; i < nel; i++ ) {
+                    maskValue = maskPtr[i];
+                    if ( maskValue == VAL__BADI ) {
+                        destptr[i] = bad;
+                    }
+                    else {
+                        destptr[i] = dataPtr[i];
+                    }
+                }
+            }
+            break;
+
+            case HDS_UWORD: {
+                unsigned short *dataPtr = (unsigned short *)dataInfo->ptr;
+                unsigned short *destptr = (unsigned short *)*dstPtr;
+                unsigned short bad = VAL__BADUW;
+                for ( i = 0; i < nel; i++ ) {
+                    maskValue = maskPtr[i];
+                    if ( maskValue == VAL__BADI ) {
+                        destptr[i] = bad;
+                    }
+                    else {
+                        destptr[i] = dataPtr[i];
+                    }
+                }
+            }
+            break;
+
+            case HDS_BYTE: {
+                char *dataPtr = (char *)dataInfo->ptr;
+                char *destptr = (char *)*dstPtr;
+                char bad = VAL__BADB;
+                for ( i = 0; i < nel; i++ ) {
+                    maskValue = maskPtr[i];
+                    if ( maskValue == VAL__BADI ) {
+                        destptr[i] = bad;
+                    }
+                    else {
+                        destptr[i] = dataPtr[i];
+                    }
+                }
+            }
+            break;
+
+            case HDS_UBYTE: {
+                unsigned char *dataPtr = (unsigned char *)dataInfo->ptr;
+                unsigned char *destptr = (unsigned char *)*dstPtr;
+                unsigned char bad = VAL__BADUB;
+                for ( i = 0; i < nel; i++ ) {
+                    maskValue =  maskPtr[i];
+                    if ( maskValue == VAL__BADI ) {
+                        destptr[i] = bad;
+                    }
+                    else {
+                        destptr[i] = dataPtr[i];
+                    }
+                }
+            }
+            break;
+        }
+    }
 }

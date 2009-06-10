@@ -3,7 +3,7 @@
        gaiaArrayTcl
  *
  *  Purpose:
- *     Perform operations on data cubes.
+ *     Perform operations on array data (mainly data cubes).
 
  *  Language:
  *     C
@@ -13,6 +13,7 @@
 
  *  Copyright:
  *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+ *     Copyright (C) 2009 Science and Technology Facilities Council.
  *     All Rights Reserved.
 
  *  Licence:
@@ -50,18 +51,20 @@
 #include <GaiaArray.h>
 
 /* Local prototypes */
-static int gaiaArrayRegionSpectrum( ClientData clientData, Tcl_Interp *interp,
-                                    int objc, Tcl_Obj *CONST objv[] );
-static int gaiaArraySpectrum( ClientData clientData, Tcl_Interp *interp,
-                              int objc, Tcl_Obj *CONST objv[] );
-static int gaiaArrayImage( ClientData clientData, Tcl_Interp *interp,
-                           int objc, Tcl_Obj *CONST objv[] );
-static int gaiaArrayRelease( ClientData clientData, Tcl_Interp *interp,
-                             int objc, Tcl_Obj *CONST objv[] );
-static int gaiaArrayInfo( ClientData clientData, Tcl_Interp *interp,
-                          int objc, Tcl_Obj *CONST objv[] );
 static int gaiaArrayCopy( ClientData clientData, Tcl_Interp *interp,
                           int objc, Tcl_Obj *CONST objv[] );
+static int gaiaArrayImage( ClientData clientData, Tcl_Interp *interp,
+                           int objc, Tcl_Obj *CONST objv[] );
+static int gaiaArrayInfo( ClientData clientData, Tcl_Interp *interp,
+                          int objc, Tcl_Obj *CONST objv[] );
+static int gaiaArrayMask( ClientData clientData, Tcl_Interp *interp,
+                          int objc, Tcl_Obj *CONST objv[] );
+static int gaiaArrayRegionSpectrum( ClientData clientData, Tcl_Interp *interp,
+                                    int objc, Tcl_Obj *CONST objv[] );
+static int gaiaArrayRelease( ClientData clientData, Tcl_Interp *interp,
+                             int objc, Tcl_Obj *CONST objv[] );
+static int gaiaArraySpectrum( ClientData clientData, Tcl_Interp *interp,
+                              int objc, Tcl_Obj *CONST objv[] );
 
 /**
  * Register all the array commands.
@@ -86,6 +89,10 @@ int Array_Init( Tcl_Interp *interp )
                           (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "array::getinfo", gaiaArrayInfo,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "array::maskdata", gaiaArrayMask,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
@@ -580,6 +587,67 @@ static int gaiaArrayCopy( ClientData clientData, Tcl_Interp *interp,
     /* Do the copy */
     nel = gaiaArraySizeOf( fromInfo->type );
     memcpy( toInfo->ptr, fromInfo->ptr, nel * fromInfo->el );
+    return TCL_OK;
+}
+
+/**
+ * Apply an integer mask to an ARRAYinfo struct copying the result
+ * into a new array.
+ *
+ * The result is a the memory address of a array struct.
+ */
+static int gaiaArrayMask( ClientData clientData, Tcl_Interp *interp,
+                          int objc, Tcl_Obj *CONST objv[] )
+{
+    ARRAYinfo *dataInfo;
+    ARRAYinfo *maskInfo;
+    ARRAYinfo *outInfo;
+    long adr;
+    void *outPtr = NULL;
+
+    /*  Check arguments */
+    if ( objc != 3 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "data mask" );
+        return TCL_ERROR;
+    }
+
+    /*  Get memory addresses */
+    if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
+        Tcl_AppendResult( interp, ": failed to read data pointer",
+                          (char *) NULL );
+        return TCL_ERROR;
+    }
+    dataInfo = (ARRAYinfo *) adr;
+
+    if ( Tcl_GetLongFromObj( interp, objv[2], &adr ) != TCL_OK ) {
+        Tcl_AppendResult( interp, ": failed to read data pointer",
+                          (char *) NULL );
+        return TCL_ERROR;
+    }
+    maskInfo = (ARRAYinfo *) adr;
+
+    /*  Basic check of dimensionality */
+    if ( dataInfo->el != maskInfo->el ) {
+        Tcl_SetResult( interp, "Cannot mask arrays with differing sizes",
+                       TCL_VOLATILE );
+        return TCL_ERROR;
+    }
+
+    /*  Mask must be integer. */
+    if ( maskInfo->type != HDS_INTEGER ) {
+        Tcl_SetResult( interp, "Cannot use non integer mask", TCL_VOLATILE );
+        return TCL_ERROR;
+    }
+
+    /*  Do the masking, just check for BAD data for now... That should
+     *  mean outside of the mask, i.e. all masked data. */
+    gaiaArrayMaskData( dataInfo, maskInfo, GAIA_ARRAY_MALLOC, &outPtr );
+
+    /*  Export the result. */
+    outInfo = gaiaArrayCreateInfo( outPtr, dataInfo->type, dataInfo->el,
+                                   0, 0, 0, 1.0, 0.0, GAIA_ARRAY_MALLOC );
+    Tcl_SetObjResult( interp, Tcl_NewLongObj( (long) outInfo ) );
+
     return TCL_OK;
 }
 

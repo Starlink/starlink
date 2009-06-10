@@ -15,7 +15,7 @@
  *  Copyright:
  *     Copyright (C) 1997-2005 Central Laboratory of the Research Councils.
  *     Copyright (C) 2006-2007 Particle Physics & Astronomy Research Council.
- *     Copyright (C) 2008 Science and Technology Facilities Council.
+ *     Copyright (C) 2008-2009 Science and Technology Facilities Council.
  *     All Rights Reserved.
 
  *  Licence:
@@ -200,6 +200,8 @@
  *        Removed astaddcolour & astfontresize (moved into gaiautils::).
  *     08-APR-2008 (PWD):
  *        Add -pixel_indices support.
+ *     09-JUN-2009 (PWD):
+ *        Add imagedataCmd.
  *-
  */
 #if HAVE_CONFIG_H
@@ -314,6 +316,7 @@ public:
     { "gband",           &StarRtdImage::gbandCmd,           6, 6 },
     { "globalstats",     &StarRtdImage::globalstatsCmd,     2, 2 },
     { "hdu",             &StarRtdImage::hduCmd,             0, 6 },
+    { "imagedata",       &StarRtdImage::imageDataCmd,       0, 0 },
     { "iscompound",      &StarRtdImage::isCompoundCmd,      0, 0 },
     { "isfits",          &StarRtdImage::isfitsCmd,          0, 0 },
     { "origin",          &StarRtdImage::originCmd,          2, 3 },
@@ -808,6 +811,26 @@ int StarRtdImage::replaceImageDataCmd( int argc, char *argv[] )
 
     //  And update data.
     return updateImageNewData( data );
+}
+
+//+
+//   StarRtdImage::imageDataCmd.
+//
+//   Returns the memory address of the image data. This is for use
+//   with fast updates (complements the shared memory access, but 
+//   for local process), clearly if the memory is to be modified
+//   it must have been mapped in using an update access method.
+//
+//   Address is returned in a long.
+//-
+int StarRtdImage::imageDataCmd( int argc, char *argv[] )
+{
+#ifdef _DEBUG_
+    cout << "Called StarRtdImage::imageDataCmd" << std::endl;
+#endif
+    long adr = (long) image_->data().ptr();
+    Tcl_SetObjResult( interp_, Tcl_NewLongObj( adr ) );
+    return TCL_OK;
 }
 
 //+

@@ -475,6 +475,49 @@ itcl::class gaia::GaiaNDAccess {
       return $accessor
    }
 
+   #  Create an NDF that represents a bare bones copy the attached dataset,
+   #  The bare bones are an NDF of the include everything, except the data
+   #  components. Returns a new instance of this class wrapping the new NDF.
+   public method createcopy {name {component "DATA"}} {
+      if { $addr_($component) == 0 } {
+         error "Must map in data before creating an image"
+      }
+
+      #  Get the underlying info. Note the type may not be the image type
+      #  (because of scaling of variants) so we must check what getimage will
+      #  return.
+      lassign [getinfo $addr_($component)] adr nel hdstype fulltype
+
+      #  Get the WCS.
+      set fullwcs [${type_}::getwcs $handle_]
+
+      #  Get the bounds.
+      set bounds [getbounds 0]
+      set lbnd {}
+      set ubnd {}
+      foreach {l u} $bounds {
+         lappend lbnd $l
+         lappend ubnd $u
+      }
+
+      #  And create the NDF as a copy, but without any data arrays. If deep
+      #  searches are enabled propagate the extension. If underlying data is
+      #  FITS create basic NDF only.
+      if { $type_ == "ndf" && $deep_search } {
+         set newhandle [ndf::copy $name $handle_ "AXIS, UNITS" \
+                           $lbnd $ubnd $fulltype $fullwcs]
+      } else {
+         #  Create a simple NDF.
+         set newhandle [ndf::create $name $lbnd $ubnd $fulltype $fullwcs]
+      }
+
+      #  Create a new instance to manage the new NDF.
+      set accessor [uplevel \#0 GaiaNDAccess \#auto]
+      $accessor acquire $name $newhandle
+
+      return $accessor
+   }
+
    #  Create a WCS that represents the coordinates of an image extracted from
    #  the attached dataset. The axis value is the axis that is not part of the
    #  image and index is an index along this axis (its coordinates is used to
