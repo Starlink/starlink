@@ -565,7 +565,7 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       } else if( iclump - nclump > 1 ) {
         msgOutiff( MSG__NORM, "",
                    "%d clumps rejected because they touch an edge of "
-                   "the data array.", status, iclump - nclump );
+                   "the data array.", status, (int)( iclump - nclump ) );
       }
 
 /* Tell the user how many iterations have been performed (i.e. how many
@@ -575,7 +575,7 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       } else {
         msgOutiff( MSG__DEBUG1, "",
                    "Fits attempted for %d candidate clumps (%d failed).",
-                   status, niter - iclump, niter );
+                   status, (int)( niter - iclump ), niter );
       }
 
 /* Free resources */

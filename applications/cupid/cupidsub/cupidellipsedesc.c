@@ -146,12 +146,6 @@ AstRegion *cupidEllipseDesc( AstFrame *pixel_frm, int space_axes[ 2 ],
    float axisr;             /* Ratio of major to minor ellipse axis */
    float sig0;              /* Semi-minor axis of ellipse in pixels */
    float theta;             /* Inclination of major axis to X axis */
-   int i;                   /* Pixel index on 1st pixel axis */
-   int j;                   /* Pixel index on 2nd pixel axis */
-   int k;                   /* Pixel index on 3rd pixel axis */
-   int px;                  /* X pixel index at peak value */
-   int py;                  /* Y pixel index at peak value */
-   int pz;                  /* Z pixel index at peak value */
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return NULL;

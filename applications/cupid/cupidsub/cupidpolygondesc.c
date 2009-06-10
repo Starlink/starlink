@@ -118,6 +118,7 @@ AstRegion *cupidPolygonDesc( double *ipd, int velax, double *peak,
    int *pm;                 /* Pointer to next 2D mask element */
    int dim[ 3 ];            /* Array pixel dimensions */
    int hi;                  /* Highest no. of  spectral channels in 2D mask */
+   int hist_size;           /* Length of histogram array */
    int i;                   /* Pixel index on 1st pixel axis */
    int inside[ 2 ];         /* Spatial pixel indices at clump peak */
    int j;                   /* Pixel index on 2nd pixel axis */
@@ -216,8 +217,10 @@ AstRegion *cupidPolygonDesc( double *ipd, int velax, double *peak,
          }
 
 /* Create a histogram of 2D mask values between these two limits. */
-         iph = astMalloc( ( hi - lo + 1 )*sizeof( *iph ) );
-         memset( iph, 0, ( hi - lo + 1 )*sizeof( *iph )  );
+         hist_size = hi - lo + 1;
+         iph = astMalloc( hist_size*sizeof( *iph ) );
+         memset( iph, 0, hist_size*sizeof( *iph )  );
+         tot = 0;
          pm = ipm;
          for( i = 0; i < nel; i++, pm++ ) {
             if( *pm > 0 ) {
@@ -231,14 +234,13 @@ AstRegion *cupidPolygonDesc( double *ipd, int velax, double *peak,
    made to a 2D mask pixel in order for that pixel to be included in the 2D
    mask. */
          target = tot/10;                   
-         i = lo;
+         i = 0;
          tot = iph[ 0 ];
          while( tot < target ) tot += iph[ ++i ];
          if( tot > target ) i--; 
-         if( i < 1 ) i = 1;
 
 /* Set values below this minimum value to zero in the 2D mask. */
-         target = i;
+         target = lo + i;
          pm = ipm;
          for( i = 0; i < nel; i++, pm++ ) {
             if( *pm < target ) *pm = 0;

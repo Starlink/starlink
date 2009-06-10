@@ -230,23 +230,11 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
    double *ipd;             /* Pointer to start of data array */
    double *pd;              /* Pointer to next element of data array */
    double *ret;             /* Returned list of parameters */
-   double alpha[ 3 ];       /* List of transformed wcs x values */
-   double angle;            /* Inclination of major axis to Y axis */
-   double axlens[ 2 ];      /* Semi-major and semi-minor axis lengths */
-   double bc2;              /* Squared beam correction for U and V axes */
-   double beta[ 3 ];        /* List of transformed wcs y values */
-   double cen[ 2 ];         /* Centroid (X,Y) position */
    double csw;              /* Clump size in WCS units */
-   double cu;               /* Position of centroid on U axis */
-   double cv;               /* Position of centroid on V axis */
-   double cx;               /* Position of centroid on X axis */
-   double cy;               /* Position of centroid on Y axis */
    double d;                /* Height above background (the pixel weight) */
    double dmax;             /* Max value in data array */
    double dmin;             /* Min value in data array */
    double outlier[ 3 ];     /* Offset position */
-   double p1[ 2 ];          /* End of ellipse major axis */
-   double p2[ 2 ];          /* End of ellipse minor axis */
    double peakfactor;       /* Factor by which to increase the peak value */
    double pixpos[ 3 ][ 5 ]; /* Pixel coord positions */
    double pixvol;           /* Volume of 1 cubic pixel in WCS units */
@@ -267,12 +255,7 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
    double v0;               /* Variance before corr'n for instrumental blurring */
    double v;                /* Variance after corr'n for instrumental blurring */
    double wcspos[ 3 ][ 5 ]; /* WCS coord positions */
-   double x[ 3 ];           /* List of pixel x values to transform */
-   double y[ 3 ];           /* List of pixel y values to transform */
-   float axisr;             /* Ratio of major to minor ellipse axis */
-   float sig0;              /* Semi-minor axis of ellipse in pixels */
    float sig[4];            /* Clump widths on X, U, Y and V axes */
-   float theta;             /* Inclination of major axis to X axis */
    int i;                   /* Pixel index on 1st pixel axis */
    int icol;                /* Index into returned column arrays */
    int icomp;               /* Index into CUPID extension */
