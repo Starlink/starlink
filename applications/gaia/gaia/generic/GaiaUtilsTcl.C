@@ -2151,6 +2151,9 @@ static int GaiaUtilsStcRegion( ClientData clientData, Tcl_Interp *interp,
  * region types can be parameterised, ellipse, circle etc. The parameters
  * returned are a simple list of the available values in the order shown
  * in the SUN/211 documentation.
+ *
+ * The exception to the above is the polygon. That has no "Pars" function
+ * but the vertices can be obtained anyway, so is handled here.
  */
 static int GaiaUtilsAstRegionPars( ClientData clientData, Tcl_Interp *interp,
                                    int objc, Tcl_Obj *CONST objv[] )
@@ -2232,6 +2235,36 @@ static int GaiaUtilsAstRegionPars( ClientData clientData, Tcl_Interp *interp,
                        TCL_VOLATILE );
         return TCL_ERROR;
     }
+    else if ( astIsAPolygon( region ) ) {
+
+        int npoint;
+        double *points;
+        astGetRegionPoints( region, 0, 0, &npoint, points );
+        if ( astOK && npoint > 0 ) {
+            points = new double[npoint*2];
+            astGetRegionPoints( region, npoint, 2, &npoint, points );
+            if ( astOK ) {
+                Tcl_ResetResult( interp );
+                Tcl_Obj *resultObj = Tcl_GetObjResult( interp );
+                double *x = points;
+                double *y = points + npoint;
+                for ( int i = 0; i < npoint; i++ ) {
+                    Tcl_ListObjAppendElement( interp, resultObj,
+                                              Tcl_NewDoubleObj( x[i] ) );
+                    Tcl_ListObjAppendElement( interp, resultObj,
+                                              Tcl_NewDoubleObj( y[i] ) );
+                }
+                delete[] points;
+                return TCL_OK;
+            }
+            delete[] points;
+        }
+        astClearStatus;
+        Tcl_SetResult( interp, "Failed to get parameters for an AST polygon",
+                       TCL_VOLATILE );
+        return TCL_ERROR;
+    }
+
     astClearStatus;
     Tcl_SetResult( interp, "Unsupported AST region, cannot parameterise",
                    TCL_VOLATILE );

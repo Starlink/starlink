@@ -5,14 +5,14 @@
 /*+
  *  Name:
  *     StarRtdImage
- 
+
  *  Purpose:
  *     Include file that defines the class that extends Skycat to add
  *     features required by the Starlink implementation.
- 
+
  *  Authors:
  *     P.W. Draper (PWD)
- 
+
  *  Copyright:
  *     Copyright (C) 1997-2005 Central Laboratory of the Research Councils.
  *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
@@ -34,7 +34,7 @@
  *     along with this program; if not, write to the Free Software
  *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
  *     02111-1307, USA
- 
+
  *  History:
  *     15-FEB-1996 (PWD):
  *        Original version.
@@ -312,35 +312,40 @@ class StarRtdImage : public Skycat
                            const char *bg, const char *fg,
                            const char *symbol_tags,
                            double ratio = 1., double angle = 0.,
-                           const char *label = NULL, 
+                           const char *label = NULL,
                            const char *label_tags = NULL);
    virtual int draw_ellipse(double x, double y, const char *xy_units,
                             double radius, const char *radius_units,
                             const char *bg, const char *fg,
                             const char *symbol_tags,
                             double ratio = 1., double angle = 0.0,
-                            const char *label = NULL, 
+                            const char *label = NULL,
                             const char *label_tags = NULL);
    virtual int draw_rotbox(double x, double y, const char *xy_units,
                            double radius, const char *radius_units,
                            const char *bg, const char *fg,
                            const char *symbol_tags,
                            double ratio = 1., double angle = 0.0,
-                           const char *label = NULL, 
+                           const char *label = NULL,
                            const char *label_tags = NULL);
    virtual int draw_rectangle(double x, double y, const char *xy_units,
                               double radius, const char *radius_units,
                               const char *bg, const char *fg,
                               const char *symbol_tags,
                               double ratio = 1., double angle = 0.0,
-                              const char *label = NULL, const 
+                              const char *label = NULL, const
                               char *label_tags = NULL);
+   virtual int draw_polygon( int npoint, double *x, double *y,
+                             const char *bg, const char *fg,
+                             const char *symbol_tags, const char *label,
+                             const char *label_tags );
+
    virtual int draw_stcshape(double x, double y, const char *xy_units,
                              double radius, const char *radius_units,
                              const char *bg, const char *fg,
                              const char *symbol_tags,
                              double ratio = 1., double angle = 0.0,
-                             const char *label = NULL, const 
+                             const char *label = NULL, const
                              char *label_tags = NULL);
 
    //  Set the colour of blank pixels.
@@ -521,7 +526,7 @@ class StarRtdImage : public Skycat
 
    //  Create AST plot for drawing grids and contours to canvas.
    AstPlot* createPlot( AstFrameSet *wcs, AstFrameSet *extraset,
-                        const char *domain, int full, int image, 
+                        const char *domain, int full, int image,
                         double region[], int report );
 
    //  Implementation of hdu command for FITS files.

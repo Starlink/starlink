@@ -817,7 +817,7 @@ int StarRtdImage::replaceImageDataCmd( int argc, char *argv[] )
 //   StarRtdImage::imageDataCmd.
 //
 //   Returns the memory address of the image data. This is for use
-//   with fast updates (complements the shared memory access, but 
+//   with fast updates (complements the shared memory access, but
 //   for local process), clearly if the memory is to be modified
 //   it must have been mapped in using an update access method.
 //
@@ -3606,6 +3606,61 @@ int StarRtdImage::draw_rectangle( double x, double y, const char *xy_units,
 }
 
 //
+//  Draw a polygon. Like the other shapes, except only acceptable as
+//  an STC shape. Coordinates are in degrees.
+//
+int StarRtdImage::draw_polygon( int npoint, double *x, double *y,
+                                const char *bg, const char *fg,
+                                const char *symbol_tags, const char *label,
+                                const char *label_tags )
+{
+#ifdef _DEBUG_
+    cout << "Called StarRtdImage::draw_polygon" << std::endl;
+#endif
+    //  Convert degrees into canvas coordinates.
+    int nbad = 0;
+    for ( int i = 0; i < npoint; i++ ) {
+        if ( convertCoords( 0, x[i], y[i], "deg", "canvas" ) != TCL_OK ) {
+            nbad++;
+            x[i] = 0.0;
+            y[i] = 0.0;
+        }
+    }
+    if ( nbad != 0 ) {
+        printf( "%d bad polygon vertices\n", nbad );
+    }
+
+    //  If using 2 colors, draw 2 symbols, for visibility, one thicker
+    //  If needed look into using rtd_polygon for speed.
+    std::ostringstream os;
+    if ( strcmp( fg, bg ) != 0 ) {
+        os << canvasName_ << " create polygon ";
+        for ( int i = 0; i < npoint; i++ ) {
+            os << x[i] << ' ' << y[i] << ' ';
+        }
+        os << " -outline " << bg
+           << " -fill " << bg
+           << " -width 2 -stipple pat7 -tags " << "{" << symbol_tags << "}"
+           << std::endl;
+    }
+    os << canvasName_ << " create polygon ";
+    for ( int i = 0; i < npoint; i++ ) {
+        os << x[i] << ' ' << y[i] << ' ';
+    }
+    os << " -outline " << fg
+       << " -fill " << fg
+       << " -width 1 -stipple pat7 -tags " << "{" << symbol_tags << "}"
+       << std::endl;
+
+    //  Where to position label. Just next to first point.
+    if ( label && strlen( label ) ) {
+        make_label( os, label, x[0], y[0], label_tags, fg );
+    }
+    return eval( os.str().c_str() );
+
+}
+
+//
 //  Draw an STC-S encoded shape, if possible. The shape must parse
 //  into one of the supported symbol types. XXX polygon will break
 //  this model and need its own handlers.
@@ -3632,8 +3687,10 @@ int StarRtdImage::draw_stcshape( double x, double y, const char *stc_shape,
         //  Transform the region into the coordinates of the image WCS,
         //  which needs to be a celestial system, by matching the system
         //  epoch and equinox.
+
         // XXX this doesn't work seems to transform the ellipses off image.
         // bit like the system isn't understood.
+        printf( "Need to align ellipse coordinates\n" );
 #if 0
         StarWCS* wcsp = getStarWCSPtr();
         char atts[200];
@@ -3685,6 +3742,38 @@ int StarRtdImage::draw_stcshape( double x, double y, const char *stc_shape,
 
         return draw_ellipse( centre[0], centre[1], "deg", b, "deg", bg, fg,
                              symbol_tags, a/b, angle, label, label_tags );
+    }
+    else if ( astIsAPolygon( region ) ) {
+
+        //  Transform the region into the coordinates of the image WCS,
+        //  which needs to be a celestial system, by matching the system
+        //  epoch and equinox.
+
+        printf( "Need to align polygon coordinates\n" );
+
+        int npoint;
+        double *points;
+        astGetRegionPoints( region, 0, 0, &npoint, points );
+        points = new double[npoint*2];
+        astGetRegionPoints( region, npoint, 2, &npoint, points );
+
+        double *x = new double[npoint];
+        double *y = new double[npoint];
+
+        //  Radians to degrees.
+        for ( int i = 0; i < npoint; i++ ) {
+            x[i] = points[i] * r2d_;
+        }
+        for ( int i = npoint, j = 0; i < npoint*2; i++, j++ ) {
+            y[j] = points[i] * r2d_;
+        }
+
+        int result = draw_polygon( npoint, x, y, bg, fg, symbol_tags,
+                                   label, label_tags );
+        delete[] points;
+        delete[] x;
+        delete[] y;
+        return result;
     }
 
     //  Don't exit with AST still in error.

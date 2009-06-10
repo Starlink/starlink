@@ -269,8 +269,56 @@ itcl::class ::gaia3d::Gaia3dCupidPrism {
                                            -colour $colour]
                incr index
             }
-            gaiautils::astannul $region
+
+         } elseif { $type == "polygon" } {
+
+            #  Get the coordinates of the polygon vertices.
+            set coords [gaiautils::astregionpars $region]
+
+            #  Transform from catalogue coordinates to grid. Note WCS
+            #  has 12 axes, but only the first three are used to connect
+            #  to the cube. If shape is used that represents an STC region.
+            if { $tranwcs != 0 } {
+
+               #  Transform coordinates to grid positions, also do 
+               #  radians to degrees (catalogue WCS is in degrees).
+               set newcoords {}
+               foreach {x y} $coords {
+                  set x1 [expr $x*$r2d_]
+                  set y1 [expr $y*$r2d_]
+                  lassign [tran3d_ $tranwcs 0 $x1 $y1 $cen3] x y z
+                  lappend newcoords $x $y
+               }
+
+
+               #  Size3 from catalogue column are distances, so offset
+               #  from centre to get positions to match end points of prism.
+               set d13 [expr $cen3-$size3]
+               set d23 [expr $cen3+$size3]
+
+               #  Transform those so get the prism extent.
+               set x1 [lindex $coords 0]
+               set y1 [lindex $coords 1]
+               lassign [tran3d_ $tranwcs 0 $x1 $y1 $d13] d11 d12 d13
+               lassign [tran3d_ $tranwcs 0 $x1 $y1 $d23] d21 d22 d23
+
+               #  Prism extent.
+               set size3 [expr abs(0.5*($d23-$d13))]
+
+               #  Offset from new centre along 3.
+               lassign [tran3d_ $tranwcs 0 $x1 $y1 $cen3] x y cen3
+               set z0 [expr $cen3-$size3]
+               set z1 [expr $cen3+$size3]
+
+               #  and create.
+               set collection_($index) [gaia3d::Gaia3dVtkPolygonPrism \#auto \
+                                           -coords $newcoords \
+                                           -zlow $z0 -zhigh $z1 \
+                                           -colour $colour]
+               incr index
+            }
          }
+         gaiautils::astannul $region
       }
       return $index
    }
