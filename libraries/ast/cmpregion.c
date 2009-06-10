@@ -2352,13 +2352,15 @@ static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr,
       dtot = this->d0[ 0 ] + this->d0[ 1 ];
       dbreak = this->d0[ 0 ]/dtot;
 
+/* Initialise here to avoid compiler warnings. */
+      r1n = 0;
+      r2n = 0;
+
 /* Check the pointers can be used safely. */
       if( astOK ) {
 
 /* Loop round all supplied distances, determining if they represent a
-   position on the firts or second component Region. */
-         r1n = 0;
-         r2n = 0;
+   position on the first or second component Region. */
          for( i = 0; i < n; i++ ) {
 
 /* If the current distance represents a point in the second component

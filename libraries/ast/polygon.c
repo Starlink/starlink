@@ -748,6 +748,9 @@ static AstPointSet *DownsizePoly( AstPointSet *pset, double maxerr,
          y1 = DBL_MAX;
          y2 = -DBL_MAX;
 
+         i1y = i1x = 0;
+         i2y = i2x = nv/2;
+         
          for( i3 = 0; i3 < nv; i3++ ) {
             if( y[ i3 ] < y1 ) {
                y1 = y[ i3 ];
@@ -2083,6 +2086,9 @@ AstPolygon *astOutline##X##_( Xtype value, int oper, Xtype array[], \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return result; \
+\
+/* Avoid compiler warnings. */ \
+   iv = 0; \
 \
 /* If we are going to be smoothing the polygon before downsizing it, we \
    need to ensure that the full polygon is retained within TraceEdge. if \
