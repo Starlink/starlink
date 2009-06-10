@@ -1040,7 +1040,7 @@ static AstMapping *RemoveRegions( AstMapping *this_mapping, int *status ) {
    Mapping was a Region), use a UnitMap instead. */
       if( astIsAFrame( newmap ) ) {
          (void) astAnnul( newmap );
-         newmap = astUnitMap( astGetNin( this ), " ", status );
+         newmap = (AstMapping *) astUnitMap( astGetNin( this ), " ", status );
       }
 
 /* Take a deep copy of the supplied RateMap and then modify the Mapping
