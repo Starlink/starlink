@@ -442,7 +442,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 /* Store an AST Region in a component called "OUTLINE" of the CLUMP 
    structure. */
                if( region ) {
-                  kpg1Wwrt( region, "OUTLINE", cloc, status );
+                  kpg1Wwrt( (AstObject *) region, "OUTLINE", cloc, status );
                   region = astAnnul( region );
                }
 
