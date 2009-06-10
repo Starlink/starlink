@@ -645,11 +645,6 @@ itcl::class gaia::Gaia {
          {Open a cube and display image sections from it} \
          -command [code $this make_opencube_toolbox]
 
-      #  And mask.
-      insert_menuitem $m $index command "Mask image..." \
-         {Select regions using an integer mask} \
-         -command [code $this make_mask_toolbox]
-
       #  Close also needs the command changing to delete the object.
       $m entryconfigure "Close" \
          -label "Close Window" \
@@ -934,6 +929,10 @@ itcl::class gaia::Gaia {
       add_menuitem $m command "Polarimetry toolbox... " \
          {Display and manipulate POLPACK vector maps} \
          -command [code $this make_toolbox polarimetry 0 1] \
+
+      add_menuitem $m command "Mask image..." \
+         {Display regions using an integer mask as a stencil} \
+         -command [code $this make_toolbox mask 0 0]
 
       if { $itk_option(-demo_mode) } {
          add_menuitem $m command "Demonstration mode..." \
@@ -1354,6 +1353,18 @@ itcl::class gaia::Gaia {
       return [$itk_component(polarimetry) opener $catalog]
    }
 
+   #  Create the mask image toolbox.
+   public method make_mask_toolbox {name {cloned 0}} {
+      itk_component add $name {
+         GaiaMask $w_.\#auto \
+            -gaia $w_ \
+            -rtdimage [$image_ get_image] \
+            -transient $itk_option(-transient_tools) \
+            -number $clone_ \
+            -filter_types $itk_option(-file_types)
+      }
+   }
+
    #  Start the demonstration toolbox.
    public method make_demo_toolbox {name {cloned 0}} {
       itk_component add $name {
@@ -1421,30 +1432,6 @@ itcl::class gaia::Gaia {
          }
       }
       return ""
-   }
-
-   #  Create the mask image toolbox. Note this is different from the usual
-   #  toolboxes, as it lives in the File menu and there can only be one.
-   public method make_mask_toolbox {} {
-
-      #  If the window exists then just raise it.
-      if { [info exists itk_component(mask) ] &&
-           [winfo exists $itk_component(mask) ] } {
-         wm deiconify $itk_component(mask)
-         raise $itk_component(mask)
-      } else {
-
-         busy {
-            itk_component add mask {
-               GaiaMask $w_.\#auto \
-                  -gaia $w_ \
-                  -rtdimage [$image_ get_image] \
-                  -transient $itk_option(-transient_tools) \
-                  -number $clone_ \
-                  -filter_types $itk_option(-file_types)
-            }
-         }
-      }
    }
 
    #  Notification that a file has been loaded into the GaiaImageCtrl.
