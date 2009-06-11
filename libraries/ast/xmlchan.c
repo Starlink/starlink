@@ -13006,14 +13006,16 @@ f     affects the behaviour of the AST_WRITE routine  when
 *     extra information indicates which AST attribute values should be
 *     enclosed in quotes before being passed to a Channel. 
 *
-*     - "IVOA": This is an experimental format which uses XML schemas
-*     being developed by the International Virtual Observatory Alliance
-*     (IVOA - see "http://www.ivoa.net/") to describe coordinate systems, 
-*     regions, mappings, etc. Current support is limited to the draft STC
-*     schema described at "http://hea-www.harvard.edu/~arots/nvometa/STC.html".
-*     Note, this format is under active development and is consequently
-*     liable to change. The current implementation reflects version 1.2
-*     of the draft STC document.
+*     - "IVOA": This is a format that uses an early draft of the STC-X schema 
+*     developed by the International Virtual Observatory Alliance (IVOA - 
+*     see "http://www.ivoa.net/") to describe coordinate systems, regions, 
+*     mappings, etc. Support is limited to V1.20 described at 
+*     "http://www.ivoa.net/Documents/WD/STC/STC-20050225.html". Since the
+*     version of STC-X finally adopted by the IVOA differs in several
+*     significant respects from V1.20, this format is now mainly of 
+*     historical interest. Note, the alternative "STC-S" format (a
+*     simpler non-XML encoding of the STC metadata) is supported by the 
+*     StcsChan class.
 
 *  Choice of Default Format;
 *     If the XmlFormat attribute of an XmlChan is not set, the default
@@ -13038,9 +13040,13 @@ f     AST_READ.
 *     over-rides this default behaviour.
 
 *  The IVOA Format:
-*     The IVOA format should be considered experimental. It currently
-*     caters only for certain parts of V1.20 of the the draft Space-Time 
-*     Coordinate (STC) schema (see http://hea-www.harvard.edu/~arots/nvometa/STC.ht$
+*     The IVOA support caters only for certain parts of V1.20 of the 
+*     draft Space-Time Coordinate (STC) schema (see 
+*     http://www.ivoa.net/Documents/WD/STC/STC-20050225.html). Note, this
+*     draft has now been superceded by an officially adopted version that
+*     differs in several significant respects from V1.20. Consequently,
+*     the "IVOA" XmlChan format is of historical interest only.
+*
 *     The following points should be noted when using an XmlChan to read
 *     or write STC information (note, this list is currently incomplete):
 *

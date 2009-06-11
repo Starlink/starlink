@@ -1396,21 +1396,6 @@ library - no other software will understand it. However, more specialised
 forms of Channel are provided which use text formats more widely
 understood.
 
-An XmlChan is a type of Channel which stores the text in the form of 
-XML markup. Currently, two forms of markup are provided by the XmlChan
-class, one is closely related to the text format produced by the basic Channel 
-class (currently, no schema or DTD is available describing this format). 
-The other is a subset of the draft IVOA Space-Time-Coordinates (STC) schema
-(V1.20) described at \htmladdnormallink{
-http://hea-www.harvard.edu/~arots/nvometa/v1.2/STC.html 
-}{
-http://hea-www.harvard.edu/~arots/nvometa/v1.2/STC.html 
-}\footnote{XML documents which use only the subset of the STC schema
-supported by AST can be read by the XmlChan class to produce corresponding 
-AST objects (subclasses of the Stc class). However, the reverse is not
-possible. That is, AST objects can not currently be written out in the 
-form of STC documents.}.
-
 To further facilitate the storage of coordinate system information in
 astronomical datasets, a more specialised form of Channel called a
 FitsChan is provided. Instead of using free-format text, a FitsChan
@@ -1418,6 +1403,33 @@ converts AST Objects to and from FITS header cards. It also allows the
 information to be encoded in the FITS cards in a number of ways
 (called {\em{encodings}}), so that WCS information from a variety of
 sources can be handled.
+
+Another sub-class of Channel, called XmlChan, is a specialised form of
+Channel that stores the text in the form of XML markup. Currently, two
+markup formats are provided by the XmlChan class, one is closely related
+to the text format produced by the basic Channel class (currently, no
+schema or DTD is available describing this format). The other is a subset
+of an early draft of the IVOA Space-Time-Coordinates XML (STC-X) schema
+(V1.20) described at \htmladdnormallink{
+http://www.ivoa.net/Documents/WD/STC/STC-20050225.html
+}{
+http://www.ivoa.net/Documents/WD/STC/STC-20050225.html
+}\footnote{XML documents which use only the subset of the STC schema
+supported by AST can be read by the XmlChan class to produce
+corresponding AST objects (subclasses of the Stc class). However, the
+reverse is not possible. That is, AST objects can not currently be
+written out in the form of STC documents.}. The version of STC-X that has
+been adopted by the IVOA differs in several significant respects from
+V1.20, and therefore this XmlChan format is of historical interest only.
+
+Finally, the StcsChan class provides facilities for reading and writing
+IVOA STC-S region descriptions. STC-S (see \htmladdnormallink{
+http://www.ivoa.net/Documents/latest/STC-S.html}{
+http://www.ivoa.net/Documents/latest/STC-S.html}) is a linear string
+syntax that allows simple specification of STC metadata. AST supports a
+subset of the STC-S specification, allowing an STC-S description of a 
+region within an AST-supported astronomical coordinate system to be converted 
+into an equivalent AST Region object, and vice-versa.
 
 {\bf{Further reading:}} For a more complete description of Channels
 see \secref{ss:channels} and for FitsChans see \secref{ss:nativefits}
@@ -14110,154 +14122,6 @@ also be implemented {\em{via}} source and sink functions in basically
 the same way.
 
 \cleardoublepage
-\section{\label{ss:xmlchan}Storing AST Objects as XML (XmlChan)}
-
-\begin{latexonly}
-XML\footnote{http://www.w3.org/XML/}
-\end{latexonly}
-\begin{htmlonly}
-\htmladdnormallink{XML}{http://www.w3.org/XML/}
-\end{htmlonly}
-is fast becoming the standard format for passing structured data around
-the internet, and much general purpose software has been written for
-tasks such as the parsing, editing, display and transformation of XML
-data. The XmlChan class (a specialised form of Channel) provides
-facilities for storing AST objects externally in the form of XML documents, 
-thus allowing such software to be used.
-
-The primary XML format used by the XmlChan class is a fairly close
-transliteration of the AST native format produced by the basic Channel
-class. Currently, there is no DTD or schema defining the structure of data 
-produced in this format by an XmlChan. The following is a native AST 
-representation of a simple 1-D Frame (including comments and with the Full 
-attribute set to zero so that some default attribute values are included 
-as extra comments):
-
-\begin{quote}
-\small
-\begin{verbatim}
- Begin Frame    # Coordinate system description
-#   Title = "1-d coordinate system"     # Title of coordinate system
-    Naxes = 1   # Number of coordinate axes
-    Domain = "SCREEN"   # Coordinate system domain
-#   Lbl1 = "Axis 1"     # Label for axis 1
-#   Uni1 = "cm"         # Units for axis 1
-    Ax1 =       # Axis number 1
-       Begin Axis       # Coordinate axis
-          Unit = "cm"   # Axis units
-       End Axis
- End Frame
-\end{verbatim}
-\normalsize
-\end{quote}
-
-The corresponding XmlChan output would look like:
-
-\begin{quote}
-\small
-\begin{verbatim}
- <Frame xmlns="http://www.starlink.ac.uk/ast/xml/" 
-        desc="Coordinate system description">
-    <_attribute name="Title" quoted="true" value="1-d coordinate system"
-                desc="Title of coordinate system" default="true"/>
-    <_attribute name="Naxes" value="1" desc="Number of coordinate axes"/>
-    <_attribute name="Domain" quoted="true" value="SCREEN"
-                desc="Coordinate system domain"/>
-    <_attribute name="Lbl1" quoted="true" value="Axis 1" 
-                desc="Label for axis 1" default="true"/>
-    <_attribute name="Uni1" quoted="true" value="cm" 
-                desc="Units for axis 1" default="true"/>
-    <Axis label="Ax1" desc="Coordinate axis">
-       <!--Axis number 1-->
-       <_attribute name="Unit" quoted="true" value="cm" desc="Axis units"/>
-    </Axis>
- </Frame>
-\end{verbatim}
-\normalsize
-\end{quote}
-
-
-Notes:
-
-\begin{enumerate}
-\item The AST class name is used as the name for an XML element which contain 
-a description of an AST object.
-
-\item AST attributes are described by XML elements with the name
-``\_attribute''. Unfortunately, the word ``attribute'' is also used by XML
-to refer to a ``name=value'' pair within an element start tag. So for
-instance, the ``Title'' attribute of the AST Frame object is described
-within an XML element with name ``\_attribute'' in which the XML attribute
-``name'' has the value ``Title'', and the XML attribute ``value'' has the 
-value ``1-d coordinate system''. The moral is always to be clear clear 
-about the context (AST or XML) in which the word \emph{attribute} is being 
-used!
-
-\item The XML includes comments both as XML attributes with the name ``desc'', 
-and as separate comment tags.
-
-\item Elements which describe default values are identified by the fact
-that they have an XML attribute called ``default'' set to the value
-``true''. These elements are ignored when being read back into an XmlChan.
-
-\item The outer-most XML element of an AST object will set the default
-namespace to \verb+http://www.starlink.ac.uk/ast/xml/+ which will be
-inherited by all nested elements.
-
-\end{enumerate}
-
-
-The XmlChan class changes the default value for the Comment and Full
-attributes (inherited from the base Channel class) to zero and -1,
-resulting in terse output by default. With the default values for these
-attributes, the above XML is reduced to the following:
-
-\begin{quote}
-\small
-\begin{verbatim}
- <Frame xmlns="http://www.starlink.ac.uk/ast/xml/">
-    <_attribute name="Naxes" value="1"/>
-    <_attribute name="Domain" quoted="true" value="SCREEN"/>
-    <Axis label="Ax1">
-       <_attribute name="Unit" quoted="true" value="cm"/>
-    </Axis>
- </Frame>
-\end{verbatim}
-\normalsize
-\end{quote}
-
-
-The XmlChan class uses the Skip attributes very similarly to the Channel
-class. If Skip is zero (the default) then an error will be reported if the text
-supplied by the source function does not begin with an AST Object. If
-Skip is non-zero, then initial text is skipped over without error until
-the start of an AST object is found. this allows an AST object to be
-located within a larger XML document.
-
-\subsection{Reading IVOA Space-Time-Coordinates (STC) Descriptions}
-Note, the XmlChan also provides experimental support for reading XML documents
-which use a restricted subset of the IVOA Space-Time-Coordinates (STC)
-system.
-
-The StcsChan class supports the conversion of suitable AST Objects to and 
-from the STC Linear String Implementation (also known as STC-S) described at 
-\htmladdnormallink{http://www.ivoa.net/Documents/latest/STC-S.html }{
-http://www.ivoa.net/Documents/latest/STC-S.html}. See the description of the 
-StcsChan class for further details.
-
-The XmlChan class supports the conversion of AST Objects to and from an
-early draft (V1.2) the STC-X XML schema described at \htmladdnormallink{
-http://hea-www.harvard.edu/~arots/nvometa/v1.2/STC.html 
-}{
-http://hea-www.harvard.edu/~arots/nvometa/v1.2/STC.html 
-} (there is currently no facilities for writing such documents). When an
-STC document is read using an XmlChan, the read operation produces an AST
-Object of the Stc class, which is itself a subclass of Region. Specifically, 
-each such Object will be an instance of StcSearchLocation, StcResourceProfile,
-StcCatalogEntryLocation or StcObsDataLocation. See the description of the 
-XmlChan class and the XmlFormat attribute for further details.
-
-\cleardoublepage
 \section{\label{ss:nativefits}Storing AST Objects in FITS Headers (FitsChans)}
 
 \begin{latexonly}
@@ -16311,6 +16175,170 @@ remainder of the header will risk producing two inconsistent sets of
 information. This could obviously be confusing to subsequent
 software. Whether you consider this a worthwhile risk probably depends
 on the use to which you expect your data to be put.
+
+\cleardoublepage
+\section{\label{ss:xmlchan}Storing AST Objects as XML (XmlChan)}
+
+\begin{latexonly}
+XML\footnote{http://www.w3.org/XML/}
+\end{latexonly}
+\begin{htmlonly}
+\htmladdnormallink{XML}{http://www.w3.org/XML/}
+\end{htmlonly}
+is fast becoming the standard format for passing structured data around
+the internet, and much general purpose software has been written for
+tasks such as the parsing, editing, display and transformation of XML
+data. The XmlChan class (a specialised form of Channel) provides
+facilities for storing AST objects externally in the form of XML documents, 
+thus allowing such software to be used.
+
+The primary XML format used by the XmlChan class is a fairly close
+transliteration of the AST native format produced by the basic Channel
+class. Currently, there is no DTD or schema defining the structure of data 
+produced in this format by an XmlChan. The following is a native AST 
+representation of a simple 1-D Frame (including comments and with the Full 
+attribute set to zero so that some default attribute values are included 
+as extra comments):
+
+\begin{quote}
+\small
+\begin{verbatim}
+ Begin Frame    # Coordinate system description
+#   Title = "1-d coordinate system"     # Title of coordinate system
+    Naxes = 1   # Number of coordinate axes
+    Domain = "SCREEN"   # Coordinate system domain
+#   Lbl1 = "Axis 1"     # Label for axis 1
+#   Uni1 = "cm"         # Units for axis 1
+    Ax1 =       # Axis number 1
+       Begin Axis       # Coordinate axis
+          Unit = "cm"   # Axis units
+       End Axis
+ End Frame
+\end{verbatim}
+\normalsize
+\end{quote}
+
+The corresponding XmlChan output would look like:
+
+\begin{quote}
+\small
+\begin{verbatim}
+ <Frame xmlns="http://www.starlink.ac.uk/ast/xml/" 
+        desc="Coordinate system description">
+    <_attribute name="Title" quoted="true" value="1-d coordinate system"
+                desc="Title of coordinate system" default="true"/>
+    <_attribute name="Naxes" value="1" desc="Number of coordinate axes"/>
+    <_attribute name="Domain" quoted="true" value="SCREEN"
+                desc="Coordinate system domain"/>
+    <_attribute name="Lbl1" quoted="true" value="Axis 1" 
+                desc="Label for axis 1" default="true"/>
+    <_attribute name="Uni1" quoted="true" value="cm" 
+                desc="Units for axis 1" default="true"/>
+    <Axis label="Ax1" desc="Coordinate axis">
+       <!--Axis number 1-->
+       <_attribute name="Unit" quoted="true" value="cm" desc="Axis units"/>
+    </Axis>
+ </Frame>
+\end{verbatim}
+\normalsize
+\end{quote}
+
+
+Notes:
+
+\begin{enumerate}
+\item The AST class name is used as the name for an XML element which contain 
+a description of an AST object.
+
+\item AST attributes are described by XML elements with the name
+``\_attribute''. Unfortunately, the word ``attribute'' is also used by XML
+to refer to a ``name=value'' pair within an element start tag. So for
+instance, the ``Title'' attribute of the AST Frame object is described
+within an XML element with name ``\_attribute'' in which the XML attribute
+``name'' has the value ``Title'', and the XML attribute ``value'' has the 
+value ``1-d coordinate system''. The moral is always to be clear clear 
+about the context (AST or XML) in which the word \emph{attribute} is being 
+used!
+
+\item The XML includes comments both as XML attributes with the name ``desc'', 
+and as separate comment tags.
+
+\item Elements which describe default values are identified by the fact
+that they have an XML attribute called ``default'' set to the value
+``true''. These elements are ignored when being read back into an XmlChan.
+
+\item The outer-most XML element of an AST object will set the default
+namespace to \verb+http://www.starlink.ac.uk/ast/xml/+ which will be
+inherited by all nested elements.
+
+\end{enumerate}
+
+
+The XmlChan class changes the default value for the Comment and Full
+attributes (inherited from the base Channel class) to zero and -1,
+resulting in terse output by default. With the default values for these
+attributes, the above XML is reduced to the following:
+
+\begin{quote}
+\small
+\begin{verbatim}
+ <Frame xmlns="http://www.starlink.ac.uk/ast/xml/">
+    <_attribute name="Naxes" value="1"/>
+    <_attribute name="Domain" quoted="true" value="SCREEN"/>
+    <Axis label="Ax1">
+       <_attribute name="Unit" quoted="true" value="cm"/>
+    </Axis>
+ </Frame>
+\end{verbatim}
+\normalsize
+\end{quote}
+
+
+The XmlChan class uses the Skip attributes very similarly to the Channel
+class. If Skip is zero (the default) then an error will be reported if the text
+supplied by the source function does not begin with an AST Object. If
+Skip is non-zero, then initial text is skipped over without error until
+the start of an AST object is found. this allows an AST object to be
+located within a larger XML document.
+
+\subsection{Reading IVOA Space-Time-Coordinates XML (STC-X) Descriptions}
+The XmlChan class also provides support for reading (but not writing) XML 
+documents which use a restricted subset of an early draft (V1.20) of the 
+IVOA Space-Time-Coordinates XML (STC-X) system. The version of STC-X 
+finally adopted by the IVOA differs in several significant respects from 
+V1.20, and so the STC-X support currently provided by AST is mainly of 
+historical interest. Note, AST also supports the alternative ``STC-S'' 
+linear string description of the STC model (see \secref{ss:stcschans}). 
+
+STC-X V1.20 is documented at \htmladdnormallink{
+http://www.ivoa.net/Documents/WD/STC/STC-20050225.html}{
+http://www.ivoa.net/Documents/WD/STC/STC-20050225.html}, and the current
+version is documented at \htmladdnormallink{
+http://www.ivoa.net/Documents/latest/STC-X.html}{
+http://www.ivoa.net/Documents/latest/STC-X.html}.
+
+When an STC-X document is read using an XmlChan, the read operation
+produces an AST Object of the Stc class, which is itself a subclass of
+Region. Specifically, each such Object will be an instance of
+StcSearchLocation, StcResourceProfile, StcCatalogEntryLocation or
+StcObsDataLocation. See the description of the XmlChan class and the
+XmlFormat attribute for further details.
+
+\cleardoublepage
+\section{\label{ss:stcschans}Reading and writing STC-S descriptions (StcsChans)}
+
+The StcsChan class provides facilities for reading and writing
+IVOA ``STC-S'' descriptions. STC-S (see \htmladdnormallink{
+http://www.ivoa.net/Documents/latest/STC-S.html}{
+http://www.ivoa.net/Documents/latest/STC-S.html}) is a linear string
+syntax that allows simple specification of the STC metadata describing a
+region in an astronomical coordinate system. AST supports a
+subset of the STC-S specification, allowing an STC-S description of a 
+region within an AST-supported astronomical coordinate system to be converted 
+into an equivalent AST Region object, and vice-versa. For further
+details, see the full description of the StcsChan class in 
+\appref{ss:classdescriptions}. 
+
 
 \cleardoublepage
 \section{\label{ss:intramaps}Creating Your Own Private Mappings (IntraMaps)}
@@ -18795,7 +18823,7 @@ Object             - Base class for all AST Objects
    Channel         - Basic (textual) I/O channel
       FitsChan     - I/O Channel using FITS header cards
       XmlChan      - I/O Channel using XML
-      StcsChan     - I/O Channel using STC-S descriptions
+      StcsChan     - I/O Channel using IVOA STC-S descriptions
    KeyMap          - Store a set of key/value pairs
    Mapping         - Inter-relate two coordinate systems
       CmpMap       - Compound Mapping
@@ -18816,11 +18844,11 @@ Object             - Base class for all AST Objects
             PointList  - A collection of points in a Frame
             Polygon    - A polygonal region within a 2-dimensional Frame
             Prism  - An extrusion of a Region into orthogonal dimensions
-            Stc    - Represents an generic instance of an IVOA STC description
-               StcResourceProfile - Represents an an IVOA STC ResourceProfile
-               StcSearchLocation  - Represents an an IVOA STC SearchLocation
-               StcCatalogEntryLocation - Represents an an IVOA STC CatalogEntryLocation
-               StcObsDataLocation - Represents an an IVOA STC ObsDataLocation
+            Stc    - Represents an generic instance of an IVOA STC-X description
+               StcResourceProfile - Represents an an IVOA STC-X ResourceProfile
+               StcSearchLocation  - Represents an an IVOA STC-X SearchLocation
+               StcCatalogEntryLocation - Represents an an IVOA STC-X CatalogEntryLocation
+               StcObsDataLocation - Represents an an IVOA STC-X ObsDataLocation
          SkyFrame  - Celestial coordinate system description
          SpecFrame - Spectral coordinate system description
             DSBSpecFrame - Dual sideband spectral coordinate system description
@@ -21120,7 +21148,7 @@ occurred in the AST library between versions V3.7 and V4.0:
 
 \begin{enumerate}
 
-\item Experimental support for reading IVOA Space-Time-Coordinates (STC)
+\item Experimental support for reading IVOA Space-Time-Coordinates (STC-X)
 descriptions using the XmlChan class has been added. Support is included
 for a subset of V1.20 of the draft STC specification.
 
