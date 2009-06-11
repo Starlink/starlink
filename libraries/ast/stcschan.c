@@ -1077,6 +1077,7 @@ static const char *GetNextWord( AstStcsChan *this, WordContext *con,
    the source function. First free the memory holding the previous line. */
       if( !result || ! *result ) {
          if( con->line ) con->line = astFree( con->line );
+         con->e = NULL;
          con->line = astGetNextText( this );
 
 /* Get a pointer to the first non-white character in the new line. */
