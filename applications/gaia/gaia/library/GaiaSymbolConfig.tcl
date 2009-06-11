@@ -94,6 +94,7 @@ itcl::class gaia::GaiaSymbolConfig {
             -value $i \
             -command [code $this set_symbol $i]
       }
+      fill_table
    }
 
    protected method set_symbol {symbol} {
