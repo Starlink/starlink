@@ -103,6 +103,8 @@ f     - AST_WRITE: Write an Object to a Channel
 *        Added astPutChannelData and astChannelData functions.
 *     16-JAN-2009 (DSB):
 *        Added astAddWarning and astWarnings.
+*     11-JUN-2009 (DSB):
+*        Enable astChannelData to be used from within astRead.
 *class--
 */
 
@@ -5748,8 +5750,11 @@ void astPutNextText_( AstChannel *this, const char *line, int *status ) {
    (**astMEMBER(this,Channel,PutNextText))( this, line, status );
 }
 AstObject *astRead_( AstChannel *this, int *status ) {
+   astDECLARE_GLOBALS            
    if ( !astOK ) return NULL;
+   astGET_GLOBALS(this);
    astAddWarning( this, 0, NULL, NULL, status );
+   channel_data = this->data;
    return (**astMEMBER(this,Channel,Read))( this, status );
 }
 void astReadClassData_( AstChannel *this, const char *class, int *status ) {
