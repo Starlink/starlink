@@ -10,7 +10,7 @@
 
 #  Description:
 #     This class defines a object that controls a series of defined
-#     filters for converting to and from FITS, other CAT and ASCII 
+#     filters for converting to and from FITS, other CAT and ASCII
 #     supported formats and VOTable.
 
 #  Invocations:
@@ -69,8 +69,8 @@
 #        Changed to map file types to lower case.
 #     14-MAY-2007 (PWD):
 #        Changed to handle import of FITS catalogues using native support
-#        (CAT support for FITS is ageing, so 'K' format). Native support 
-#        is Skycat, plus some GAIA changes for backwards compatibility in 
+#        (CAT support for FITS is ageing, so 'K' format). Native support
+#        is Skycat, plus some GAIA changes for backwards compatibility in
 #        dealing with the meta-data. Export of FITS still uses CAT, but
 #        that's quite lossy.
 #     01-JUL-2008 (PWD):
@@ -130,7 +130,7 @@ itcl::class gaia::GaiaConvertTable {
       set type [get_type_ $in]
 
       if { $type == ".fits" || $type == ".fit" } {
-         
+
          #  Use native support for FITS files.
          lassign [get_hdu_ $in] in hdu
          if { $hdu == -1 } {
@@ -168,7 +168,7 @@ itcl::class gaia::GaiaConvertTable {
                                       -application $to_app_($type) \
                                       -show_output 0]
          }
-         
+
          #  Now attempt the conversion. Note VOTables may contain more
          #  than one table, so a HDU concept is supported.
          if { $type == ".xml" || $type == ".vot" } {
@@ -216,7 +216,7 @@ itcl::class gaia::GaiaConvertTable {
          set cmd "$in $out"
          set res [catch {$from_filter_($type) runnows $cmd} msg]
       } else {
-      
+
          #  CAT will not overwrite existing files, so do this ourselves.
          if { [file exists $out] } {
             file delete $out
@@ -262,7 +262,7 @@ itcl::class gaia::GaiaConvertTable {
       }
       return $type
    }
-   
+
    #  Return the HDU for the given FITS or VOTable filename specification. The
    #  HDU is given as a number in {} or in []. The {} format supports backwards
    #  compatibility with CAT. The result is two values, the input name without
@@ -287,7 +287,7 @@ itcl::class gaia::GaiaConvertTable {
    #  properties. This is just a list of paired entries like:
    #  {{shortname shortname} {fullname filename} {symbol ...} ...}.
    protected method create_config_entry {rtdimage filename hdu} {
-      
+
       set headings [$rtdimage hdu list]
       set headings [lindex $headings [expr $hdu-1]]
 
@@ -302,7 +302,7 @@ itcl::class gaia::GaiaConvertTable {
       lappend entry [list long_name "$filename"]
       lappend entry [list url "$filename"]
 
-      #  Catalogue parameters. 
+      #  Catalogue parameters.
       #
       #  Only interested in a fixed set of possible values. Symbol may span
       #  more than one line (and be suffixed by an integer from 1 to 9 to allow
@@ -346,21 +346,23 @@ itcl::class gaia::GaiaConvertTable {
       set xcol -1
       set ycol -1
       set idcol -1
-      
+      set stccol -1
+      set iscupid 0
+
       set headings [$rtdimage hdu headings $hdu]
       set nc [llength $headings]
-      
+
       for { set i 0 } { $i < $nc } { incr i } {
          set name [string tolower [lindex $headings $i]]
-         
+
          #  Check any units for special significance, radians or degrees are
-         #  assumed to be possible sky coordinates. 
+         #  assumed to be possible sky coordinates.
          set unit {}
          set j [expr $i + 1]
          if { [info exists units(tunit$j)] } {
             set unit $units(tunit$j)
          }
-         if { [string match "radian*" $unit] || 
+         if { [string match "radian*" $unit] ||
               [string match "deg*" $unit] } {
 
             #  Assuming this is a column with angle data. This is either an RA
@@ -376,7 +378,7 @@ itcl::class gaia::GaiaConvertTable {
             } else {
                #  "daz" is AZEL for JAC, also DEl, but that should be a dec.
                #  "cen1" and "cen2" are support for CUPID. Both follow
-               #   in definite columns (there can be others with degrees) so 
+               #   in definite columns (there can be others with degrees) so
                #   we assume one is followed by the other.
                switch -glob -- $name {
                   ra* -
@@ -388,8 +390,14 @@ itcl::class gaia::GaiaConvertTable {
                         set racol $i
                      }
                   }
-                  daz -
+                  daz {
+                     if { $racol == -1 } {
+                        set racol $i
+                        set deccol [expr $i+1]
+                     }
+                  }
                   cen1 {
+                     set iscupid 1
                      if { $racol == -1 } {
                         set racol $i
                         set deccol [expr $i+1]
@@ -418,7 +426,7 @@ itcl::class gaia::GaiaConvertTable {
 
             #  Check for SExtractor specific names without units. SExtractor
             #  world coordinates are in degrees. Also allow X/Y and X_*/Y_*
-            #  as generic X and Y columns.
+            #  as generic X and Y columns and look for the CUPID shape column.
             switch -glob -- $name {
                x_world {
                   if { $racol == -1 } {
@@ -430,7 +438,7 @@ itcl::class gaia::GaiaConvertTable {
                      set deccol $i
                   }
                }
-               x_image - 
+               x_image -
                x_* -
                x {
                   if { $xcol == -1 } {
@@ -447,6 +455,11 @@ itcl::class gaia::GaiaConvertTable {
                id_col {
                   if { $idcol == -1 } {
                      set idcol $i
+                  }
+               }
+               shape {
+                  if { $stccol == -1 } {
+                     set stccol $i
                   }
                }
             }
@@ -471,6 +484,14 @@ itcl::class gaia::GaiaConvertTable {
       if { $xcol != -1 && $ycol != -1 } {
          lappend entry "x_col $xcol"
          lappend entry "y_col $ycol"
+      }
+
+      #  If have a shape column, set the stc_col and an appropriate symbol.
+      if { $iscupid && $stccol != -1 } {
+         lappend entry "stc_col $stccol"
+         if { $symbol == {} } {
+            set symbol {{} {stcshape {} {} {} {} {}} {1 {deg 2000}}}
+         }
       }
 
       #  If no symbol use a default.
