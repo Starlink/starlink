@@ -6,7 +6,7 @@
 #     [incr Tk] class
 
 #  Purpose:
-#     Creates a toolbox for importing a catalogue created by the
+#     Creates a toolbox for importing a 3D catalogue created by the
 #     CUPID application.
 
 #  Description:
@@ -92,6 +92,9 @@ itcl::class gaia::GaiaCupidImporter {
 
       #  Evaluate any options
       eval itk_initialize $args
+
+      #  Set up for 3D or 2D import.
+      tune_
 
       #  Set the top-level window title.
       wm title $w_ "GAIA: import CUPID catalogue ($itk_option(-number))"
@@ -206,10 +209,10 @@ itcl::class gaia::GaiaCupidImporter {
 
    #  Set the default selections for columns.
    protected method set_defaults_ {} {
-      $itk_component(ra) configure -value 4
-      set index_(ra) 4
-      $itk_component(dec) configure -value 5
-      set index_(dec) 5
+      $itk_component(ra) configure -value $ra_col_
+      set index_(ra) $ra_col_
+      $itk_component(dec) configure -value $dec_col_
+      set index_(dec) $dec_col_
    }
 
    #  Set the column number used for a column type.
@@ -276,8 +279,10 @@ itcl::class gaia::GaiaCupidImporter {
          set have_stc_($catwin) 1
       }
 
-      #  Make sure slice coordinate is set.
-      $itk_option(-gaiacube) set_cupid_coord 0
+      #  Make sure slice coordinate is set for 3D import.
+      if { $threed_ } {
+         $itk_option(-gaiacube) set_cupid_coord 0
+      }
 
       #  And display the catalogue. Note wait for the realization.
       wait_ "$catwin set_maxobjs 2000"
@@ -302,9 +307,7 @@ itcl::class gaia::GaiaCupidImporter {
       $astrocat_ entry update [list "dec_col $dec_col"] $catalogue
       $astrocat_ entry update [list "x_col -1"] $catalogue
       $astrocat_ entry update [list "y_col -1"] $catalogue
-
-      #  STC column, fixed at 13 but could scan for it.
-      $astrocat_ entry update [list "stc_col 13"] $catalogue
+      $astrocat_ entry update [list "stc_col $stc_col_"] $catalogue
    }
 
    #  Wait for a command to return 1 (non-blocking?).
@@ -317,25 +320,43 @@ itcl::class gaia::GaiaCupidImporter {
       }
    }
 
-   #  Define a basic symbol {COORD} is the coordinate of the current slice.
+   #  Define a basic symbol {COORD} is the coordinate of the current slice
+   #  when doing a 3D import.
+   #
    #  XXX in the coordinates of the table, not the cube spectral axis XXX
+   #
    #  {SCALE} is a scale factor (sizes are sigmas, so 2 + 3 should be typical).
    #  Sizes are in arcsec for celestial coordinates.
    protected method set_plot_symbol_ {catwin} {
 
-      #  XXX hack, parameterise this. Apply to STC shape?
+      #  XXX hack, parameterise this.
       set ::cupid(SCALE) 1.0
 
-      if { $itk_option(-use_stc) && $have_stc_($catwin) } {
-         set symbol1 [list PIDENT Shape Cen3 Size1 Size2 Size3]
-         set symbol2 [list stcshape green {} {} {} {($Cen3 > ($%%cupid(COORD) - ($Size3*$%%cupid(SCALE)))) && ($Cen3 < ($%%cupid(COORD) + ($Size3*$%%cupid(SCALE))))}]
-         set symbol3 [list 1 {deg 2000.0}]
+      if { $threed_ } {
+         set cond {($Cen3 > ($%%cupid(COORD) - ($Size3*$%%cupid(SCALE)))) && ($Cen3 < ($%%cupid(COORD) + ($Size3*$%%cupid(SCALE))))}
+         if { $itk_option(-use_stc) && $have_stc_($catwin) } {
+            set symbol1 [list PIDENT Shape Cen3 Size1 Size2 Size3]
+            set symbol2 [list stcshape green {} {} {} $cond]
+            set symbol3 [list 1 {deg 2000.0}]
+         } else {
+            #  STC may be available, but not used for this import.
+            set have_stc_($catwin) 0
+            set symbol1 [list PIDENT Cen3 Size1 Size2 Size3]
+            set symbol2 [list rectangle green {$Size2/$Size1} {} {} $cond]
+            set symbol3 [list {$Size1/3600.0*$%%cupid(SCALE)} {deg 2000.0}]
+         }
       } else {
-         #  STC may be available, but not used for this import.
-         set have_stc_($catwin) 0
-         set symbol1 [list PIDENT Cen3 Size1 Size2 Size3]
-         set symbol2 [list rectangle green {$Size2/$Size1} {} {} {($Cen3 > ($%%cupid(COORD) - ($Size3*$%%cupid(SCALE)))) && ($Cen3 < ($%%cupid(COORD) + ($Size3*$%%cupid(SCALE))))}]
-         set symbol3 [list {$Size1/3600.0*$%%cupid(SCALE)} {deg 2000.0}]
+         if { $itk_option(-use_stc) && $have_stc_($catwin) } {
+            set symbol1 [list PIDENT Shape Size1 Size2]
+            set symbol2 [list stcshape green {} {} {} {}]
+            set symbol3 [list 1 {deg 2000}]
+         } else {
+            #  STC may be available, but not used for this import.
+            set have_stc_($catwin) 0
+            set symbol1 [list PIDENT Size1 Size2]
+            set symbol2 [list rectangle green {$Size2/$Size1} {} {} {}]
+            set symbol3 [list {$Size1/3600.0*$%%cupid(SCALE)} {deg 2000}]
+         }
       }
       $catwin set_symbol $symbol1 $symbol2 $symbol3
    }
@@ -398,13 +419,41 @@ itcl::class gaia::GaiaCupidImporter {
       return 0
    }
 
+   #  Tune the various settings for 2 or 3D import.
+   protected method tune_ {} {
+      if { $threed_ } {
+         set coltypes_ "RA ra Dec dec"
+         set colnames_ "Peak1 1 Peak2 2 Peak3 3 Cen1 4 Cen2 5 Cen3 6"
+         set ra_col_ 4
+         set dec_col_ 5
+         set stc_col_ 13
+      } else {
+         set coltypes_ "RA ra Dec dec"
+         set colnames_ "Peak1 1 Peak2 2 Cen1 3 Cen2 4"
+         set ra_col_ 3
+         set dec_col_ 4
+         set stc_col_ 10
+      }
+   }
+
    #  Configuration options: (public variables)
    #  ----------------------
 
-   #  The GaiaCube instance.
+   #  The Gaia instance for overlaying the catalogue. Only define
+   #  this or -gaiacube, not both.
+   itk_option define -gaia gaia Gaia {} {
+      if { $itk_option(-gaia) != {} } {
+         set image_ [$itk_option(-gaia) get_image]
+         set threed_ 0
+      }
+   }
+
+   #  The GaiaCube instance. If not set then a 2D import is assumed.
    itk_option define -gaiacube gaiacube GaiaCube {} {
-      set gaia_ [$itk_option(-gaiacube) cget -gaia]
-      set image_ [$gaia_ get_image]
+      if { $itk_option(-gaiacube) != {} } {
+         configure -gaia [$itk_option(-gaiacube) cget -gaia]
+         set threed_ 1
+      }
    }
 
    #  The catalogue.
@@ -422,6 +471,9 @@ itcl::class gaia::GaiaCupidImporter {
    #  Protected variables: (available to instance)
    #  --------------------
 
+   #  Whether import is for 3D or 2D.
+   protected variable threed_ 1
+
    #  Column names versus index chosen to represent them.
    protected variable index_
 
@@ -438,15 +490,20 @@ itcl::class gaia::GaiaCupidImporter {
    #  Does currently importing catalogue have a Shape column.
    protected variable have_stc_
 
-   #  Common variables: (shared by all instances)
-   #  -----------------
-
    #  Special column types, display and window names.
-   protected common coltypes_ "RA ra Dec dec"
+   protected variable coltypes_ "RA ra Dec dec"
 
    #  CUPID column names we may use, plus the column index.
-   protected common colnames_ \
+   protected variable colnames_ \
       "Peak1 1 Peak2 2 Peak3 3 Cen1 4 Cen2 5 Cen3 6"
+
+   #  Various default column position.s
+   protected variable ra_col_ -1
+   protected variable dec_col_ -1
+   protected variable stc_col_ -1
+
+   #  Common variables: (shared by all instances)
+   #  -----------------
 
 #  End of class definition.
 }

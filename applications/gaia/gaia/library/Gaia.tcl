@@ -920,6 +920,10 @@ itcl::class gaia::Gaia {
          {Import a space or fixed width plain text file as a catalogue} \
          -command [code $this import_catalogue_]
 
+      add_menuitem $m.positions command "Import CUPID catalogue..." \
+         {Import a CUPID catalogue selecting RA and Dec columns} \
+         -command [code $this import_cupid_cat_]
+
       add_menuitem $m command "Mean X & Y profiles...  " \
          {Show X and Y averaged profiles of a rectangular region} \
          -command [code $this make_toolbox xyprofile 0 1] \
@@ -2159,6 +2163,13 @@ window gives you access to this."
             ::gaia::GaiaSearch \
             0 $this
       }
+   }
+
+   #  Import a CUPID catalogue.
+   protected method import_cupid_cat_ {} {
+      utilReUseWidget gaia::GaiaCupidImporter $w_.cupidimp \
+         -title "Import CUPID catalogue ($itk_option(-number))" \
+         -gaia $this
    }
 
    #  Apply the autoscale value. Need to also manage autofill, which
