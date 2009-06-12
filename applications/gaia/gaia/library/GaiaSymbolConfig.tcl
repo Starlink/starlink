@@ -94,7 +94,15 @@ itcl::class gaia::GaiaSymbolConfig {
             -value $i \
             -command [code $this set_symbol $i]
       }
-      fill_table
+      fill_table 1
+   }
+
+   #  Don't do this before we're ready, there's a timed event in fill_table
+   #  proper when no symbol is defined.
+   protected method fill_table {{doit 0}} {
+      if { $doit == 1 } {
+         SymbolConfig::fill_table
+      }
    }
 
    protected method set_symbol {symbol} {
