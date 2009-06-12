@@ -85,6 +85,7 @@ extern "C" {
 #include "TclQueryUtil.h"
 #include "GaiaWorldCoords.h"
 #include "GaiaQueryResult.h"
+#include "StarRtdImage.h"
 
 //  Trig conversion factors.
 static const double pi_ = 3.14159265358979323846;
@@ -557,7 +558,6 @@ int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
 {
     char *glexpr;
     char *glsymbol;
-    char *p;
     char** colNames = NULL;
     char** exprList = NULL;
     char** symb = NULL;
@@ -1245,9 +1245,10 @@ int GaiaSkySearch::imgplotCmd( int argc, char* argv[] )
         return error( "no catalog is currently open" );
     }
 
-    //  Get a pointer to the C++ class implementing the extended rtdimage object.
-    //  We will need this to access the image to plot the catalog symbols.
-    Skycat *image = Skycat::getInstance( argv[0] );
+    //  Get a pointer to the C++ class implementing the extended rtdimage
+    //  object. We will need this to access the image to plot the catalog
+    //  symbols.
+    StarRtdImage *image = (StarRtdImage *) Skycat::getInstance( argv[0] );
     if ( ! image ) {
         return TCL_ERROR;
     }
@@ -1293,6 +1294,9 @@ int GaiaSkySearch::imgplotCmd( int argc, char* argv[] )
                 "catalogue coordinates" << endl;
         }
     }
+
+    //  For STC shapes we need to reset the cache.
+    image->clearStcMapping();
 
     //  Get the column names
     if ( argc < 4 ) {

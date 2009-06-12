@@ -334,8 +334,6 @@ public:
 };
 
 
-// XXX new 2.4.7 commands needed (overrides) biasimageCmd, infoCmd.
-
 //+
 //  starRtdImageType
 //
@@ -369,28 +367,17 @@ static Tk_ConfigSpec configSpecs_[] = {
     {TK_CONFIG_END, NULL, NULL, NULL, NULL, 0, 0, NULL}
 };
 
-//+
-//  Support for reading a string into an AST channel.
-//-
-typedef struct ChannelData {
-    const char *content;        //  The string to read into channel
-    int read;                   //  true when string has been read,
-                                //  set this initially to false
-} ChannelData;
-
-//  Static member to pass channel data string.
-static ChannelData channelData;
-
-//  Function to use as source for AST channel.
-static const char *StcsSource()
+//  Function to use as source for an AST channel. See also the
+//  channelData member.
+static const char *ChannelSource()
 {
-    if ( channelData.read == 0 ) {
-        channelData.read = 1;
-        return channelData.content;
+    ChannelData *channelData = (ChannelData *) astChannelData;
+    if ( channelData->read == 0 ) {
+        channelData->read = 1;
+        return channelData->content;
     }
     return NULL;
-}
-
+};
 
 //+
 //  Gaia_Init
@@ -451,7 +438,7 @@ int StarRtdImage::CreateImage( Tcl_Interp *interp,
     // Generate an argv from the objv argument
     char* argv[64];  // there shouldn't be more than a few options...
     for(int i = 0; i < argc; i++)
-	argv[i] = Tcl_GetString(objv[i]);
+        argv[i] = Tcl_GetString(objv[i]);
     argv[argc] = NULL;
 
     //  Now Create the image.
@@ -492,7 +479,8 @@ StarRtdImage::StarRtdImage(Tcl_Interp* interp, const char* instname,
     : Skycat(interp, instname, argc, argv, master, imageType, specs, options),
       origset_(NULL),
       newset_(NULL),
-      oldset_(NULL)
+      oldset_(NULL),
+      stcMapping_(NULL)
 {
 #ifdef _DEBUG_
     cout << "Created StarRtdImage object " << std::endl;
@@ -1118,8 +1106,9 @@ int StarRtdImage::configureImage(int argc, char* argv[], int flags)
 #ifdef _DEBUG_
     cout << "Called StarRtdImage::configureImage" << std::endl;
 #endif
-    if (TkImage::configureImage(argc, argv, flags) != TCL_OK)
-	return TCL_ERROR;
+    if ( TkImage::configureImage(argc, argv, flags) != TCL_OK ) {
+        return TCL_ERROR;
+    }
 
     int status = TCL_OK;
     int reset = 0;
@@ -1131,86 +1120,87 @@ int StarRtdImage::configureImage(int argc, char* argv[], int flags)
     // if necessary (note: Tk sets a flag in the config entry when
     // the option is specified. We use the OFFSET macro defined above
     // as an efficient way to compare options)
-    for (Tk_ConfigSpec* p=configSpecs_; p->type != TK_CONFIG_END; p++) {
-	if (p->specFlags & TK_CONFIG_OPTION_SPECIFIED) {
-	    switch(p->offset) {
+    for ( Tk_ConfigSpec* p=configSpecs_; p->type != TK_CONFIG_END; p++ ) {
+        if ( p->specFlags & TK_CONFIG_OPTION_SPECIFIED ) {
+            switch(p->offset) {
 
-	    case RTD_OPTION(usexshm):
-		if (initialized_) {
-		    deleteXImage();
-		    reset++;
-		}
-		break;
+            case RTD_OPTION(usexshm):
+                if (initialized_) {
+                    deleteXImage();
+                    reset++;
+                }
+                break;
 
-	    case RTD_OPTION(usexsync):
-		if (usingXSync_ && usexsync()) {
-		    /*
-		     * XSyncSetPriority() was commented out since it can block all
-		     * other X-applications when fast image events are received-
-		     */
-		    // XSyncSetPriority(display_, None, 65535);
-		    // fprintf(stderr, "Raising priority of client %s\n", name());
-		}
-		break;
+            case RTD_OPTION(usexsync):
+                if (usingXSync_ && usexsync()) {
+                    /*
+                     * XSyncSetPriority() was commented out since it can block all
+                     * other X-applications when fast image events are received-
+                     */
+                    // XSyncSetPriority(display_, None, 65535);
+                    // fprintf(stderr, "Raising priority of client %s\n", name());
+                }
+                break;
 
-	    case RTD_OPTION(displaymode):
-	    case RTD_OPTION(shm_header):
-	    case RTD_OPTION(shm_data):
-		if (initialized_)
-		    reset++;
-		break;
-	    case RTD_OPTION(verbose):
-	    case RTD_OPTION(debug):
-		if (dbl_)
-		    dbl_->setlog ((int)(debug() & verbose()));
-		break;
-	    case RTD_OPTION(fitWidth):
-	    case RTD_OPTION(fitHeight):
-		if (initialized_) {
-		    if (image_ && fitWidth() && fitHeight()) {
-			image_->shrinkToFit(fitWidth(), fitHeight());
-		    }
-		    reset++;
-		}
-		break;
+            case RTD_OPTION(displaymode):
+            case RTD_OPTION(shm_header):
+            case RTD_OPTION(shm_data):
+                if (initialized_)
+                    reset++;
+                break;
+            case RTD_OPTION(verbose):
+            case RTD_OPTION(debug):
+                if (dbl_)
+                    dbl_->setlog ((int)(debug() & verbose()));
+                break;
+            case RTD_OPTION(fitWidth):
+            case RTD_OPTION(fitHeight):
+                if (initialized_) {
+                    if (image_ && fitWidth() && fitHeight()) {
+                        image_->shrinkToFit(fitWidth(), fitHeight());
+                    }
+                    reset++;
+                }
+                break;
 
-	    case RTD_OPTION(fillWidth):
-	    case RTD_OPTION(fillHeight):
-		if (initialized_) {
-		    if (image_ && fillWidth() && fillHeight()) {
-			image_->fillToFit(fillWidth(), fillHeight());
-		    }
-		    reset++;
-		}
-		break;
+            case RTD_OPTION(fillWidth):
+            case RTD_OPTION(fillHeight):
+                if (initialized_) {
+                    if (image_ && fillWidth() && fillHeight()) {
+                        image_->fillToFit(fillWidth(), fillHeight());
+                    }
+                    reset++;
+                }
+                break;
 
-	    case RTD_OPTION(file):
-		status = loadFile();
-		break;
+            case RTD_OPTION(file):
+                status = loadFile();
+                break;
 
-	    case RTD_OPTION(sampmethod):
-		if (initialized_ && image_) {
-		    if (image_->sampmethod() != sampmethod()) {
-			image_->sampmethod(sampmethod());
-			reset++;
-		    }
-		}
-		break;
+            case RTD_OPTION(sampmethod):
+                if (initialized_ && image_) {
+                    if (image_->sampmethod() != sampmethod()) {
+                        image_->sampmethod(sampmethod());
+                        reset++;
+                    }
+                }
+                break;
 
-	    case RTD_OPTION(subsample):
-		if (initialized_ && image_) {
-		    if (image_->subsample() != subsample()) {
-			image_->subsample(subsample());
-			reset++;
-		    }
-		}
-		break;
-	    }
-	}
+            case RTD_OPTION(subsample):
+                if (initialized_ && image_) {
+                    if (image_->subsample() != subsample()) {
+                        image_->subsample(subsample());
+                        reset++;
+                    }
+                }
+                break;
+            }
+        }
     }
 
-    if (reset)
-	return resetImage();
+    if ( reset ) {
+        return resetImage();
+    }
     return status;
 }
 
@@ -3461,27 +3451,26 @@ int StarRtdImage::draw_symbol( const char *shape,
 //  This method overrides Skycat version to use local rtd_ellipse,
 //  rather than a smoother polygon.
 //
-int StarRtdImage::draw_ellipse(double x, double y, const char *xy_units,
-                               double radius, const char *radius_units,
-                               const char *bg, const char *fg,
-                               const char *symbol_tags, double ratio,
-                               double angle, const char *label,
-                               const char *label_tags)
+int StarRtdImage::draw_ellipse( double x, double y, const char *xy_units,
+                                double radius, const char *radius_units,
+                                const char *bg, const char *fg,
+                                const char *symbol_tags, double ratio,
+                                double angle, const char *label,
+                                const char *label_tags )
 {
 #ifdef _DEBUG_
     cout << "Called StarRtdImage::draw_ellipse" << std::endl;
 #endif
     double cx, cy, nx, ny, ex, ey;
-    if (get_compass(x, y, xy_units, radius, radius_units, ratio, angle,
-                    cx, cy, nx, ny, ex, ey) != TCL_OK) {
+    if ( get_compass( x, y, xy_units, radius, radius_units, ratio, angle,
+                      cx, cy, nx, ny, ex, ey ) != TCL_OK ) {
         reset_result(); // ignore off scale symbols
         return TCL_OK;
     }
 
-
     // if using 2 colors, draw 2 symbols, for visibility, one thicker
     std::ostringstream os;
-    if (strcmp(fg, bg) != 0) {
+    if ( strcmp( fg, bg ) != 0 ) {
         os << canvasName_ << " create rtd_ellipse "
            << cx << " " << cy << " "
            << ex << " " << ey << " "
@@ -3500,11 +3489,60 @@ int StarRtdImage::draw_ellipse(double x, double y, const char *xy_units,
        << " -width 1 -stipple pat7 -tags {" << symbol_tags << "}"
        << std::endl;
 
-    if (label && strlen(label))
-        make_label(os, label, cx, cy, label_tags, fg);
+    if ( label && strlen( label ) ) {
+        make_label( os, label, cx, cy, label_tags, fg );
+    }
 
     int result = eval( os.str().c_str() );
     return result;
+}
+
+//
+//  Draw an ellipse at the given coords, rtd coords version.
+//  The x and y coordinates are the position of the centre, the end of the
+//  semi-major axis and the semi-minor.
+//
+int StarRtdImage::draw_rtdellipse( double *x, double *y, const char *xy_units,
+                                   const char *bg, const char *fg,
+                                   const char *symbol_tags, const char *label,
+                                   const char *label_tags )
+{
+#ifdef _DEBUG_
+    cout << "Called StarRtdImage::draw_ellipse" << std::endl;
+#endif
+    //  Convert given units into canvas coordinates.
+    for ( int i = 0; i < 3; i++ ) {
+        if ( convertCoords( 0, x[i], y[i], xy_units, "canvas" ) != TCL_OK ) {
+            x[i] = 0.0;
+            y[i] = 0.0;
+        }
+    }
+
+    // if using 2 colors, draw 2 symbols, for visibility, one thicker
+    std::ostringstream os;
+    if ( strcmp( fg, bg ) != 0 ) {
+        os << canvasName_ << " create rtd_ellipse "
+           << x[0] << " " << y[0] << " "
+           << x[1] << " " << y[1] << " "
+           << x[2] << " " << y[2]
+           << " -outline " << bg
+           << " -fill " << bg
+           << " -width 2 -stipple pat7 -tags {" << symbol_tags << "}"
+           << std::endl;
+    }
+    os << canvasName_ << " create rtd_ellipse "
+       << x[0] << " " << y[0] << " "
+       << x[1] << " " << y[1] << " "
+       << x[2] << " " << y[2]
+       << " -outline " << bg
+       << " -fill " << fg
+       << " -width 1 -stipple pat7 -tags {" << symbol_tags << "}"
+       << std::endl;
+
+    if ( label && strlen( label ) ) {
+        make_label( os, label, x[0], y[0], label_tags, fg );
+    }
+    return eval( os.str().c_str() );
 }
 
 //
@@ -3610,6 +3648,7 @@ int StarRtdImage::draw_rectangle( double x, double y, const char *xy_units,
 //  an STC shape. Coordinates are in degrees.
 //
 int StarRtdImage::draw_polygon( int npoint, double *x, double *y,
+                                const char *xy_units,
                                 const char *bg, const char *fg,
                                 const char *symbol_tags, const char *label,
                                 const char *label_tags )
@@ -3617,17 +3656,12 @@ int StarRtdImage::draw_polygon( int npoint, double *x, double *y,
 #ifdef _DEBUG_
     cout << "Called StarRtdImage::draw_polygon" << std::endl;
 #endif
-    //  Convert degrees into canvas coordinates.
-    int nbad = 0;
+    //  Convert given units into canvas coordinates.
     for ( int i = 0; i < npoint; i++ ) {
-        if ( convertCoords( 0, x[i], y[i], "deg", "canvas" ) != TCL_OK ) {
-            nbad++;
+        if ( convertCoords( 0, x[i], y[i], xy_units, "canvas" ) != TCL_OK ) {
             x[i] = 0.0;
             y[i] = 0.0;
         }
-    }
-    if ( nbad != 0 ) {
-        printf( "%d bad polygon vertices\n", nbad );
     }
 
     //  If using 2 colors, draw 2 symbols, for visibility, one thicker
@@ -3662,8 +3696,7 @@ int StarRtdImage::draw_polygon( int npoint, double *x, double *y,
 
 //
 //  Draw an STC-S encoded shape, if possible. The shape must parse
-//  into one of the supported symbol types. XXX polygon will break
-//  this model and need its own handlers.
+//  into one of the supported symbol types.
 //
 int StarRtdImage::draw_stcshape( double x, double y, const char *stc_shape,
                                  double radius, const char *radius_units,
@@ -3677,52 +3710,52 @@ int StarRtdImage::draw_stcshape( double x, double y, const char *stc_shape,
 #endif
 
     //  Get the actual shape.
-    AstStcsChan *chan = astStcsChan( StcsSource, NULL, " " );
-    channelData.read = 0;
-    channelData.content = stc_shape;
+    AstStcsChan *chan = astStcsChan( ChannelSource, NULL, " " );
+    channelData_.read = 0;
+    channelData_.content = stc_shape;
+    astPutChannelData( chan, &channelData_ );
     AstRegion *region = (AstRegion *) astRead( chan );
+
+    //  Create the mapping from region coordinates to image coordinates.
+    //  Need to do this as the symbol plotting applies further transformations
+    //  (the skycat equinox method) that we should avoid. The mapping is
+    //  cached so that we do not astConvert every time, use the
+    //  clearStcMapping method to reset this for new catalogues, or when the
+    //  catalogue is known to have mixed coordinate systems in the regions.
+    if ( region != NULL && stcMapping_ == NULL ) {
+        StarWCS* wcsp = getStarWCSPtr();
+        AstFrameSet *wcs = wcsp->astWCSClone();
+
+        //  Need base to become current, so we get a transform to GRID.
+        int base = astGetI( wcs, "Base" );
+        int current = astGetI( wcs, "Current" );
+        astSetI( wcs, "Current", base );
+
+        AstFrameSet *fs = (AstFrameSet *) astConvert( wcs, region, " " );
+        astSetI( wcs, "Current", current );
+        astSetI( wcs, "Base", base );
+
+        if ( fs != NULL ) {
+            AstMapping *map = (AstMapping *) astGetMapping( fs, AST__BASE,
+                                                            AST__CURRENT );
+
+            //  Removal all region effects (otherwise BAD coordinates outside
+            //  the region).
+            stcMapping_ = (AstMapping *) astRemoveRegions( map );
+
+            astAnnul( map );
+            astAnnul( fs );
+        }
+        astAnnul( wcs );
+    }
+    if ( !astOK ) {
+        astClearStatus;
+    }
 
     if ( astIsAEllipse( region ) ) {
 
-        //  Transform the region into the coordinates of the image WCS,
-        //  which needs to be a celestial system, by matching the system
-        //  epoch and equinox.
-
-        // XXX this doesn't work seems to transform the ellipses off image.
-        // bit like the system isn't understood.
-        printf( "Need to align ellipse coordinates\n" );
-#if 0
-        StarWCS* wcsp = getStarWCSPtr();
-        char atts[200];
-        atts[0] = '\0';
-        const char *system = wcsp->astGetAttrib( "System" );
-        if ( system ) {
-            strcat( atts, "System=" );
-            strcat( atts, system );
-        }
-        const char *equinox = wcsp->astGetAttrib( "Equinox" );
-        if ( equinox ) {
-            if ( atts[0] != '\0' ) {
-                strcat( atts, "," );
-            }
-            strcat( atts, "Equinox=" );
-            strcat( atts, equinox );
-        }
-        const char *epoch = wcsp->astGetAttrib( "Epoch" );
-        if ( equinox ) {
-            if ( atts[0] != '\0' ) {
-                strcat( atts, "," );
-            }
-            strcat( atts, "Epoch=" );
-            strcat( atts, epoch );
-        }
-        if ( atts[0] != '\0' ) {
-            cout << "atts = " << atts << endl;
-            astShow( region );
-            astSet( region, atts, " " );
-            astShow( region );
-         }
-#endif
+        //  Get the parameters. Use this rather than astGetRegionPoints
+        //  as we get the end points of the ellipse axes.
         double centre[2];
         double a;
         double b;
@@ -3731,49 +3764,92 @@ int StarRtdImage::draw_stcshape( double x, double y, const char *stc_shape,
         double p2[2];
         astEllipsePars( (AstEllipse *)region, centre, &a, &b, &angle, p1, p2 );
 
-        //  Radians to degrees.
-        centre[0] *= r2d_;
-        centre[1] *= r2d_;
-        a *= r2d_;
-        b *= r2d_;
+        if ( stcMapping_ != NULL ) {
+            //  Transform to image coordinates.
+            double xin[3];
+            double yin[3];
+            double xout[3];
+            double yout[3];
+            xin[0] = centre[0];
+            yin[0] = centre[1];
+            xin[1] = p1[0];
+            yin[1] = p1[1];
+            xin[2] = p2[0];
+            yin[2] = p2[1];
+            astTran2( stcMapping_, 3, xin, yin, 0, xout, yout );
+            if ( !astOK ) {
+                astClearStatus;
+            }
+            return draw_rtdellipse( xout, yout, "image", bg, fg, symbol_tags,
+                                    label, label_tags );
+        }
+        else {
+            //  Assume we're in deg J2000 and proceed.
+            centre[0] *= r2d_;
+            centre[1] *= r2d_;
+            a *= r2d_;
+            b *= r2d_;
 
-        //  To correct orientation (Y through X).
-        angle = angle * r2d_ + 90.0;
+            //  To correct orientation (Y through X).
+            angle = angle * r2d_ + 90.0;
 
-        return draw_ellipse( centre[0], centre[1], "deg", b, "deg", bg, fg,
-                             symbol_tags, a/b, angle, label, label_tags );
+            return draw_ellipse( centre[0], centre[1], "deg", b, "deg", bg, fg,
+                                 symbol_tags, a/b, angle, label, label_tags );
+        }
     }
     else if ( astIsAPolygon( region ) ) {
 
         //  Transform the region into the coordinates of the image WCS,
         //  which needs to be a celestial system, by matching the system
         //  epoch and equinox.
-
-        printf( "Need to align polygon coordinates\n" );
-
-        int npoint;
+        int npoint = 0;
         double *points;
         astGetRegionPoints( region, 0, 0, &npoint, points );
-        points = new double[npoint*2];
-        astGetRegionPoints( region, npoint, 2, &npoint, points );
+        if ( npoint > 0 ) {
+            points = new double[npoint*2];
+            astGetRegionPoints( region, npoint, 2, &npoint, points );
 
-        double *x = new double[npoint];
-        double *y = new double[npoint];
+            double *x = new double[npoint];
+            double *y = new double[npoint];
+            const char *units;
 
-        //  Radians to degrees.
-        for ( int i = 0; i < npoint; i++ ) {
-            x[i] = points[i] * r2d_;
+            //  Transform to GRID, if no mapping just push on assuming degrees.
+            if ( stcMapping_ != NULL ) {
+                double *xin = new double[npoint];
+                double *yin = new double[npoint];
+                for ( int i = 0; i < npoint; i++ ) {
+                    xin[i] = points[i];
+                }
+                for ( int i = npoint, j = 0; i < npoint*2; i++, j++ ) {
+                    yin[j] = points[i];
+                }
+                units = "image";
+                astTran2( stcMapping_, npoint, xin, yin, 0, x, y );
+                delete[] xin;
+                delete[] yin;
+
+            }
+            else {
+                //  Radians to degrees.
+                units = "deg";
+                for ( int i = 0; i < npoint; i++ ) {
+                    x[i] = points[i] * r2d_;
+                }
+                for ( int i = npoint, j = 0; i < npoint*2; i++, j++ ) {
+                    y[j] = points[i] * r2d_;
+                }
+            }
+            int result = draw_polygon( npoint, x, y, units, bg, fg,
+                                       symbol_tags, label, label_tags );
+            delete[] points;
+            delete[] x;
+            delete[] y;
+            return result;
         }
-        for ( int i = npoint, j = 0; i < npoint*2; i++, j++ ) {
-            y[j] = points[i] * r2d_;
+        if ( !astOK ) {
+            astClearStatus;
         }
-
-        int result = draw_polygon( npoint, x, y, bg, fg, symbol_tags,
-                                   label, label_tags );
-        delete[] points;
-        delete[] x;
-        delete[] y;
-        return result;
+        return error( "no points in STC region" );
     }
 
     //  Don't exit with AST still in error.

@@ -77,6 +77,7 @@
 #include "Skycat.h"
 #include "StarWCS.h"
 #include "ImageColor.h"
+#include "NDFIO.h"
 extern "C" {
 #include "ast.h"
 }
@@ -99,6 +100,15 @@ typedef struct Gaia_Options : Rtd_Options
     int pixel_indices;  // Whether X,Y coordinates are pixel indices.
 } Gaia_Options;
 
+//
+//  Support for reading a string into an AST channel.
+//
+typedef struct ChannelData {
+    const char *content;        //  The string to read into channel
+    int read;                   //  true when string has been read,
+                                //  set this initially to false
+} ChannelData;
+
 class StarRtdImageOptions : public RtdImageOptions
 {
   public:
@@ -108,15 +118,15 @@ class StarRtdImageOptions : public RtdImageOptions
     StarRtdImageOptions() :
         RtdImageOptions( &gaia_options_ )
     {
-	memset( &gaia_options_, '\0', sizeof( Gaia_Options ) );
+        memset( &gaia_options_, '\0', sizeof( Gaia_Options ) );
 
         // Repeat RtdImageOptions initialisations. Probably better way to do
         // this.
- 	gaia_options_.displaymode = 1;
- 	gaia_options_.usexshm = 1;
- 	gaia_options_.usexsync = 1;
+        gaia_options_.displaymode = 1;
+        gaia_options_.usexshm = 1;
+        gaia_options_.usexsync = 1;
         gaia_options_.min_colors = 30;
- 	gaia_options_.max_colors = 60;
+        gaia_options_.max_colors = 60;
 
         gaia_options_.ast_tag = NULL;
         gaia_options_.component= NULL;
@@ -321,6 +331,10 @@ class StarRtdImage : public Skycat
                             double ratio = 1., double angle = 0.0,
                             const char *label = NULL,
                             const char *label_tags = NULL);
+   virtual int draw_rtdellipse( double *x, double *y, const char *xy_units,
+                                const char *bg, const char *fg,
+                                const char *symbol_tags, const char *label,
+                                const char *label_tags );
    virtual int draw_rotbox(double x, double y, const char *xy_units,
                            double radius, const char *radius_units,
                            const char *bg, const char *fg,
@@ -336,6 +350,7 @@ class StarRtdImage : public Skycat
                               const char *label = NULL, const
                               char *label_tags = NULL);
    virtual int draw_polygon( int npoint, double *x, double *y,
+                             const char *xy_units,
                              const char *bg, const char *fg,
                              const char *symbol_tags, const char *label,
                              const char *label_tags );
@@ -408,6 +423,13 @@ class StarRtdImage : public Skycat
 
    // Command to get the value of the autoSetCutLevels_ member.
    int autosetcutlevelsCmd( int argc, char *argv[] );
+
+   //  Clear the cached STC mapping. Do this for new catalogues.
+   void clearStcMapping() {
+       if ( stcMapping_ != NULL ) {
+           stcMapping_ = (AstMapping *) astAnnul( stcMapping_ );
+       }
+   };
 
  protected:
 
@@ -579,14 +601,21 @@ class StarRtdImage : public Skycat
    // Flag indicating if image data has been updated externally.
    int volatile_;
 
- private:
+   // Member to pass channel data string.
+   ChannelData channelData_;
 
-   // Copy constructor -- not defined.
-   StarRtdImage( const StarRtdImage&) ;
+   //  Cached mapping used when plotting STC regions. Don't
+   //  want to connect every region to the WCS.
+   AstMapping *stcMapping_;
 
    // Return true if there is an image and it has a celestial
    // coordinate system.
    int isCelestial();
+
+ private:
+
+   // Copy constructor -- not defined.
+   StarRtdImage( const StarRtdImage&) ;
 };
 
 #endif // StarRtdImage
