@@ -39,9 +39,9 @@ f     (AST_GETFITS<X>) or changed (AST_SETFITS<X>).
 *     When you create a FitsChan, you have the option of specifying
 *     "source" and "sink" functions which connect it to external data
 *     stores by reading and writing FITS header cards. If you provide
-*     a source function, it is used to fill the FitsChan with header
-*     cards when it is created. If you do not provide a source
-*     function, the FitsChan remains empty until you explicitly enter
+*     a source function, it is used to fill the FitsChan with header cards
+*     when it is accessed for the first time. If you do not provide a 
+*     source function, the FitsChan remains empty until you explicitly enter
 c     data into it (e.g. using astPutFits, astPutCards or astWrite). If you
 f     data into it (e.g. using AST_PUTFITS, AST_PUTCARDS or AST_WRITE). If you
 *     provide a sink function, it is used to deliver any remaining
@@ -860,6 +860,16 @@ f     - AST_TESTFITS: Test if a keyword has a defined value in a FitsChan
 *     13-MAR-2009 (DSB):
 *        The VELOSYS value read from the header is never used, so do not 
 *        report an error if VELOSYS has an undefined value.
+*     11-JUN-2009 (DSB):
+*        Delay reading cards from the source until they are actually
+*        needed. Previously, the source function was called in the
+*        FitsChan initialiser, but this means it is not possible for 
+*        application code to call astPutChannelData before the source 
+*        function is called. The ReadFromSource function is now called
+*        at the start of each (nearly) public or protected function to 
+*        ensure the source function has been called (the source function
+*        pointer in the FitsChan is then nullified to ensure it is not 
+*        called again).
 *class--
 */
 
@@ -5428,6 +5438,9 @@ static void ClearCard( AstFitsChan *this, int *status ){
 /* Local Variables; */
    astDECLARE_GLOBALS            /* Declare the thread specific global data */
 
+/* Ensure the source function has been called */
+   ReadFromSource( this, status );
+
 /* Check the supplied FitsChan. If its is empty, return. */
    if ( !this || !(this->head) ) return;
 
@@ -6664,6 +6677,9 @@ f        The global status.
 
 /* Check the global error status. */
    if ( !astOK ) return;
+
+/* Ensure the source function has been called */
+   ReadFromSource( this, status );
 
 /* Delete the current card. The next card will be made the current card. */
    DeleteCard( this, "astDelFits", astGetClass( this ), status );
@@ -10158,6 +10174,9 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 /* Obtain a pointers to the FitsChan structure. */
    this = (AstFitsChan *) this_object;
 
+/* Ensure the source function has been called */
+   ReadFromSource( this, status );
+
 /* Invoke the GetObjSize method inherited from the parent class, and then
    add on any components of the class structure defined by thsi class
    which are stored in dynamically allocated memory. */
@@ -11761,6 +11780,9 @@ static int KeyFields( AstFitsChan *this, const char *filter, int maxfld,
 /* Check the global error status. */
    if ( !astOK || !filter ) return nf;
 
+/* Ensure the source function has been called */
+   ReadFromSource( this, status );
+
 /* Store the method name and object class for use in error messages. */
    method = "astKeyFields";
    class = astGetClass( this );
@@ -12019,6 +12041,9 @@ f     RESULT = AST_FINDFITS( FITSCHAN, 'CRVAL%1d', CARD, .TRUE., STATUS )
 
 /* Check the global status, and supplied keyword name. */
    if( !astOK ) return 0;
+
+/* Ensure the source function has been called */
+   ReadFromSource( this, status );
 
 /* Store the calling method and object class. */ 
    method = "astFindFits";
@@ -12417,6 +12442,9 @@ static int FitsEof( AstFitsChan *this, int *status ){
 /* Check the supplied object. */
    if( !this ) return 1;
 
+/* Ensure the source function has been called */
+   ReadFromSource( this, status );
+
 /* If no more cards remain to be read, the current card pointer in the
    FitsChan will be NULL. Return an appropriate integer value. */
    return  this->card ? 0 : 1;
@@ -12464,6 +12492,9 @@ static int FitsSof( AstFitsChan *this, int *status ){
 
 /* Return if no FitsChan was supplied, or if the FitsChan is empty. */
    if ( !this || !this->head ) return 1;
+
+/* Ensure the source function has been called */
+   ReadFromSource( this, status );
 
 /* If the current card is at the head of the linked list, it is the first
    card. */
@@ -12622,6 +12653,9 @@ static int GetFits##code( AstFitsChan *this, const char *name, ctype value, int 
 /* Check the global error status. */ \
    if ( !astOK ) return 0; \
 \
+/* Ensure the source function has been called */ \
+   ReadFromSource( this, status ); \
+\
 /* Store the calling method and object class. */ \
    method = "astGetFits"#code; \
    class = astGetClass( this ); \
@@ -12777,6 +12811,9 @@ static int FitsGetCom( AstFitsChan *this, const char *name,
 
 /* Get a pointer to the structure holding thread-specific global data. */   
    astGET_GLOBALS(this);
+
+/* Ensure the source function has been called */
+   ReadFromSource( this, status );
 
 /* Initialise the returned value. */ 
    ret = 0; 
@@ -13170,6 +13207,9 @@ static void SetFits##code( AstFitsChan *this, const char *name, ctype value, con
 /* Check the global error status. */ \
    if ( !astOK ) return; \
 \
+/* Ensure the source function has been called */ \
+   ReadFromSource( this, status ); \
+\
 /* Store the object clas and calling method. */ \
    class = astGetClass( this ); \
    method = "astSetFits"#code; \
@@ -13313,6 +13353,9 @@ f        The global status.
 /* Check the global error status. */ 
    if ( !astOK ) return; 
 
+/* Ensure the source function has been called */
+   ReadFromSource( this, status );
+
 /* Store the object clas and calling method. */ 
    class = astGetClass( this ); 
    method = "astSetFitsU";
@@ -13433,6 +13476,9 @@ static void SetFitsCom( AstFitsChan *this, const char *name,
 
 /* Check the global error status. */
    if ( !astOK ) return;
+
+/* Ensure the source function has been called */
+   ReadFromSource( this, status );
 
 /* Store the calling method and object class. */
    method = "astSetFitsCom";
@@ -14257,6 +14303,9 @@ static int GetCard( AstFitsChan *this, int *status ){
    FitsCard *card0;        /* Pointer to current FitsCard */
    int index;              /* Index of next FitsCard */
 
+/* Ensure the source function has been called */
+   ReadFromSource( this, status );
+
 /* Return if no FitsChan was supplied, or if the FitsChan is empty. */
    if ( !this || !this->head ) return 0;
 
@@ -14472,6 +14521,9 @@ static int GetNcard( AstFitsChan *this, int *status ){
    const char *method;     /* Pointer to method string */
    FitsCard *card0;        /* Pointer to current card on entry */
    int ncard;              /* Number of cards so far */
+
+/* Ensure the source function has been called */
+   ReadFromSource( this, status );
 
 /* Return zero if an error has already occurred, or no FitsChan was supplied, 
    or the FitsChan is empty. */
@@ -20540,6 +20592,9 @@ f        The global status.
 /* Check the global status. */
    if( !astOK ) return;
 
+/* Ensure the source function has been called */
+   ReadFromSource( this, status );
+
 /* Loop round attempting to read AST objects form the FitsChan. This will
    flag cards as used that are involved in the creation of these object
    (including NATIVE encodings). */
@@ -20636,6 +20691,9 @@ f        The global status.
 
 /* Check the global error status. */
    if ( !astOK ) return;
+
+/* Ensure the source function has been called */
+   ReadFromSource( this, status );
 
 /* Store the current method, and the class of the supplied object for use 
    in error messages.*/
@@ -20739,6 +20797,9 @@ f        The global status.
 
 /* Check the global error status. */
    if ( !astOK ) return;
+
+/* Ensure the source function has been called */
+   ReadFromSource( this, status );
 
 /* Store the current method, and the class of the supplied object for use 
    in error messages.*/
@@ -20912,6 +20973,9 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
 
 /* Obtain a pointer to the FitsChan structure. */
    this = (AstFitsChan *) this_channel;
+
+/* Ensure the source function has been called */
+   ReadFromSource( this, status );
 
 /* Store the calling method, and object class. */
    method = "astRead";
@@ -21178,6 +21242,18 @@ static void ReadFromSource( AstFitsChan *this, int *status ){
 *     If no source function was provided, the FitsChan is left as supplied.
 *     This is different to a standard Channel, which tries to read data
 *     from standard input if no source function is provided.
+*
+*     This function should be called at the start of most public or protected 
+*     FitsChan functions, and most private functions that are used to override
+*     methods inherited form the Channel class. Previously, this function
+*     was called only once, from the FitsChan initialiser (astInitFitschan). 
+*     However, calling it from astInitFitsChan means that application code
+*     cannot use the astPutChannelData function with a FitsChan, since the 
+*     source function would already have been called by the time the 
+*     FitsChan constructor returned (and thus before astPutChannelData
+*     could have been called). In order to ensure that teh source
+*     function is called only once, this function now nullifies the source
+*     function pointer after its first use.
 
 *  Parameters:
 *     this
@@ -21193,15 +21269,21 @@ static void ReadFromSource( AstFitsChan *this, int *status ){
 */
 
 /* Local Variables: */
-   const char *card;            /* Pointer to externally-read header card */
-   int icard;                   /* Current card index on entry */
+   const char *(* source)( void ); /* Pointer to source function */
+   const char *card;               /* Pointer to externally-read header card */
+   int icard;                      /* Current card index on entry */
 
 /* Check the global status. */
-   if( !astOK ) return;
+   if( !astOK || !this ) return;
 
 /* Only proceed if source function and wrapper were supplied when the FitsChan 
-   was created. */
+   was created and are still available. */
    if( this->source && this->source_wrap ){
+
+/* Save the source function pointer and then nullify the pointer in the
+   FitsChan structure. This avoids infinte loops. */
+      source = this->source;
+      this->source = NULL;
 
 /* Ensure the FitsChan is at end-of-file. This will result in the 
    new cards being appended to the end of the FitsChan. */
@@ -21214,7 +21296,7 @@ static void ReadFromSource( AstFitsChan *this, int *status ){
    externally supplied function which may not be thread-safe, so lock a 
    mutex first. */
       LOCK_MUTEX2;
-      card = ( *this->source_wrap )( this->source, status );
+      card = ( *this->source_wrap )( source, status );
       UNLOCK_MUTEX2;
 
 /* Loop until a NULL pointer is returned by the source function, or an
@@ -21228,16 +21310,14 @@ static void ReadFromSource( AstFitsChan *this, int *status ){
          card = (char *) astFree( (void *) card );
 
 /* Obtain the next header card. */
-         card = ( *this->source_wrap )( this->source, status );
+         card = ( *this->source_wrap )( source, status );
 
       }
 
 /* Set the current card index so that the first of the new cards will be the 
    next card to be read from the FitsChan. */
       astSetCard( this, icard );
-
    }
-
 }
 
 static void RetainFits( AstFitsChan *this, int *status ){
@@ -21293,6 +21373,9 @@ f        The global status.
 
 /* Local variables: */
    int flags;
+
+/* Ensure the source function has been called */
+   ReadFromSource( this, status );
 
 /* Return if the global error status has been set, or the current card
    is not defined. */
@@ -21933,6 +22016,9 @@ static void SetCard( AstFitsChan *this, int icard, int *status ){
 
 /* Check the supplied object. */
    if ( !this ) return;
+
+/* Ensure the source function has been called */
+   ReadFromSource( this, status );
 
 /* Rewind the FitsChan. */
    astClearCard( this );
@@ -26778,6 +26864,9 @@ static int TestCard( AstFitsChan *this, int *status ){
    int card;               /* The original value of Card */
    int ret;                /* The returned flag */
 
+/* Ensure the source function has been called */
+   ReadFromSource( this, status );
+
 /* Get the current value of Card. */
    card = astGetCard( this );
 
@@ -26899,6 +26988,9 @@ f     -  .FALSE.
 
 /* Check the global error status. */ 
    if ( !astOK ) return 0; 
+
+/* Ensure the source function has been called */
+   ReadFromSource( this, status );
 
 /* Store the calling method and object class. */ 
    method = "astTestFits"; 
@@ -31929,6 +32021,9 @@ static int Write( AstChannel *this_channel, AstObject *object, int *status ) {
 /* Obtain a pointer to the FitsChan structure. */
    this = (AstFitsChan *) this_channel;
 
+/* Ensure the source function has been called */
+   ReadFromSource( this, status );
+
 /* Store the calling method, and object class. */
    method = "astWrite";
    class = astGetClass( this );
@@ -34563,8 +34658,8 @@ f     existing ones may be deleted (AST_DELFITS) or changed (AST_SETFITS<X>).
 *     When you create a FitsChan, you have the option of specifying
 *     "source" and "sink" functions which connect it to external data
 *     stores by reading and writing FITS header cards. If you provide
-*     a source function, it is used to fill the FitsChan with header
-*     cards when it is created. If you do not provide a source
+*     a source function, it is used to fill the FitsChan with header cards 
+*     when it is accessed for the first time. If you do not provide a source
 *     function, the FitsChan remains empty until you explicitly enter
 c     data into it (e.g. using astPutCards, astPutFits or astWrite). If you
 f     data into it (e.g. using AST_PUTCARDS, AST_PUTFITS or AST_WRITE). If you
@@ -35209,9 +35304,6 @@ AstFitsChan *astInitFitsChan_( void *mem, size_t size, int init,
       new->source_wrap = source_wrap;
       new->sink = sink;
       new->sink_wrap = sink_wrap;
-
-/* Fill the FitsChan with header cards read using the source function. */
-      ReadFromSource( new, status );
 
 /* Rewind the FitsChan so that the next read operation will return the
    first card. */
