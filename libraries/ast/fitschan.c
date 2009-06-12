@@ -25622,12 +25622,12 @@ int Split( const char *card, char **name, char **value,
       if( strspn( *name, " " ) == strlen( *name ) ){
          blank_name = 1;
 
-/* If the card contains a keyword name, replace any trailing blanks with
+/* If the card contains a keyword name, replace any white space with
    nulls. */
       } else {
          blank_name = 0;
          dd = *name + strlen( *name ) - 1;
-         while( *dd == ' ' ) *(dd--) = 0;
+         while( isspace( *dd ) ) *(dd--) = 0;
       }
       
 /* Check the keyword name is legal. */
