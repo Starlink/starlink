@@ -4277,10 +4277,15 @@ static int CheckFitsName( const char *name, const char *method,
                      astError( AST__BDFTS, "%s(%s): An equals sign ('=') was found "
                                "before column %d within a FITS keyword name or header "
                                "card.", status, method, class, FITSNAMLEN + 1 );                
-                  } else {   
+                  } else if( *c < ' ' ) {   
                      astError( AST__BDFTS, "%s(%s): The supplied FITS keyword "
-                               "name ('%s') contains an illegal character ('%c').", status,
-                               method, class, name, *c );                
+                               "name ('%s') contains an illegal non-printing "
+                               "character (ascii value %d).", status, method, class, 
+                               name, *c );
+                  } else if( *c < ' ' ) {   
+                     astError( AST__BDFTS, "%s(%s): The supplied FITS keyword "
+                               "name ('%s') contains an illegal character ('%c').",
+                               status, method, class, name, *c );
                   }
                   break;
                }
