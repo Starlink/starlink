@@ -25,6 +25,11 @@
       % stcschan-demo1 stcs-ex1.txt 1996-01-01T00:00:15 11:56:00 -11:30:00 \
                        1420.4 1000 
 
+   To compile and link:
+      Assuming your starlink distribution is in "/star":
+
+      % gcc -o stcschan-demo1 stcschan-demo1.c -L/star/lib \
+            -I/star/include `ast_link`
 */
 
 /* Include system headers. */
