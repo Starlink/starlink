@@ -264,9 +264,6 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        Prevent memory over-run in RebinSeq<X>.
 *     5-MAY-2009 (DSB):
 *        Added astRemoveRegions.
-*     15-JUN-2009 (DSB):
-*        In FitPN, do not accept the fit unless the function values have
-*        a significant dynamic range over the specified interval.
 *class--
 */
 
@@ -7960,8 +7957,10 @@ static int *MapSplit( AstMapping *this, int nin, const int *in,
 *     correspond to some subset of the Mapping outputs. That is, there
 *     must exist a subset of the Mapping outputs for which each output
 *     depends only on the selected Mapping inputs, and not on any of the
-*     inputs which have not been selected. If this condition is not met
-*     by the supplied Mapping, then a NULL Mapping is returned.
+*     inputs which have not been selected. Also, any output which is not in 
+*     this subset must not depend on any of the selected inputs. If these 
+*     conditions are not met by the supplied Mapping, then a NULL Mapping
+*     is returned.
 
 *  Parameters:
 *     this
@@ -23455,7 +23454,9 @@ f     This routine
 *     subset of the Mapping outputs. That is, there must exist a subset of 
 *     the Mapping outputs for which each output depends only on the selected 
 *     Mapping inputs, and not on any of the inputs which have not been 
-*     selected. If this condition is not met by the supplied Mapping, then
+*     selected. Also, any output which is not in this subset must not depend
+*     on any of the selected inputs. If these conditions are not met by the 
+*     supplied Mapping, then
 c     a NULL 
 f     an AST__NULL 
 *     Mapping pointer is returned.

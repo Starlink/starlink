@@ -137,7 +137,8 @@ f     The MatrixMap class does not define any new routines beyond those
 *        Override astEqual.
 *     15-MAR-2009 (DSB):
 *        MapSplit: Only create the returned Mapping if it would have some 
-*        outputs.
+*        outputs. Also, do not create the returned Mapping if any output
+*        depends on a mixture of selected and unselected inputs.
 *class--
 */
 
@@ -2065,8 +2066,10 @@ static int *MapSplit( AstMapping *this_map, int nin, const int *in, AstMapping *
 *     correspond to some subset of the MatrixMap outputs. That is, there
 *     must exist a subset of the MatrixMap outputs for which each output
 *     depends only on the selected MatrixMap inputs, and not on any of the
-*     inputs which have not been selected. If this condition is not met
-*     by the supplied MatrixMap, then a NULL Mapping is returned.
+*     inputs which have not been selected. In addition, outputs that are
+*     not in this subset must not depend on any selected inputs. If these
+*     conditions are not met by the supplied MatrixMap, then a NULL Mapping 
+*     is returned.
 
 *  Parameters:
 *     this
@@ -2233,6 +2236,13 @@ static int *MapSplit( AstMapping *this_map, int nin, const int *in, AstMapping *
 /* Copy the elements of the current matrix row which correspond to the
    selected inputs into the new matrix. */
                   for( i = 0; i < nin; i++ ) *(pmat++) = prow[ in[ i ] ];
+               }
+
+/* If this output depends on a selected input, but also depends on an
+   unselected input, we cannot split the MatrixMap. */
+               if( sel && unsel ) {
+                  ok = 0;
+                  break;
                }
             }
          }
