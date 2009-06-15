@@ -264,6 +264,9 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        Prevent memory over-run in RebinSeq<X>.
 *     5-MAY-2009 (DSB):
 *        Added astRemoveRegions.
+*     15-JUN-2009 (DSB):
+*        In FitPN, do not accept the fit unless the function values have
+*        a significant dynamic range over the specified interval.
 *class--
 */
 
@@ -1436,7 +1439,8 @@ static PN *FitPN( AstMapping *map, double *at, int ax1, int ax2, double x0,
 */
 
 /* Local Variables: */
-   double x[ RATE_ORDER + 2 ], y[ RATE_ORDER + 2 ], dh, off, s2, e;   
+   double x[ RATE_ORDER + 2 ], y[ RATE_ORDER + 2 ], dh, off, s2, e, mean,
+          max, min;   
    PN *ret;
    int i0, i, n;
 
@@ -1457,6 +1461,28 @@ static PN *FitPN( AstMapping *map, double *at, int ax1, int ax2, double x0,
 
 /* Get the function values at these positions. */
    FunPN( map, at, ax1, ax2, RATE_ORDER + 1, x, y, status );
+
+/* Get the mean, max and min function value. */
+   mean = max = min = y[ 0 ];
+   if( mean == AST__BAD ) return NULL;
+   for( i = 1; i <= RATE_ORDER; i++ ) {
+
+      if( y[ i ] == AST__BAD ) return NULL;
+
+      mean += y[ i ];
+
+      if( y[ i ] > max ) {
+         max = y[ i ];
+
+      } else if( y[ i ] < min ) {
+         min = y[ i ];
+
+      }
+   }
+
+/* If the dynamic range of the function values is less than 1E-6 return
+   NULL. */
+   if( max - min <= 1.0E-6*fabs( mean )/( RATE_ORDER + 1 ) ) return NULL;
 
 /* Convert the x values into x offsets from "x0", and convert the y
    values into y offsets from the central y value. */
@@ -8523,7 +8549,7 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2, int *status 
 /* Local Variables: */
 #define MXY 100
    double x0, h, s1, s2, sp, r, dh, ed2, ret, rms, h0, x[MXY], y[MXY];
-   int nin, nout, i, ixy, fitted, fitok;
+   int ntry, nin, nout, i, ixy, fitted, fitok;
    PN *fit;
 
 /* Initialise */
@@ -8582,8 +8608,14 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2, int *status 
    of the calculated function values and the rate of change of the
    derivative of the function in the region of "x0". Find a polynomial fit 
    to the function over this initial interval. The independant variable 
-   of this fit is (x-x0) and the dependant variable is (y(x)-y(x0). */
+   of this fit is (x-x0) and the dependant variable is (y(x)-y(x0). If
+   this fails, repeat up to ten times with a larger "h" value. */
       fit = FitPN( this, at, ax1, ax2, x0, h, NULL, status );
+      ntry = 0;
+      while( !fit && ntry++ < 10 ) {
+         h *= 1000;
+         fit = FitPN( this, at, ax1, ax2, x0, h, NULL, status );
+      }
       if( !fit ) return AST__BAD;
 
 /* We need an estimate of how much the derivative may typically change
@@ -8632,7 +8664,7 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2, int *status 
      (a/h)**2 + (d2*h)**2
 
    where "a" is the accuracy with which the function can be evaluated 
-   (assumed to be 1.0E5*DBL_EPSILON*sp) and f2 is the second derivative. 
+   (assumed to be 1.0E5*DBL_EPSILON*sp) and d2 is the second derivative. 
    The value of "h" below is the value which minimises the above
    total error expression. */
 
