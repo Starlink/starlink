@@ -1616,7 +1616,8 @@ iraf! {
          parameter lbndout {
             type _DOUBLE
             access WRITE
-            vpath INTERNAL
+            vpath DEFAULT
+            default 0.0
             helpkey *
           }
          parameter this {
@@ -1637,7 +1638,8 @@ iraf! {
          parameter ubndout {
             type _DOUBLE
             access WRITE
-            vpath INTERNAL
+            vpath DEFAULT
+            default 0.0
             helpkey *
           }
          parameter xl {
@@ -1650,6 +1652,46 @@ iraf! {
             type _DOUBLE
             access WRITE
             vpath INTERNAL
+            helpkey *
+          }
+      }
+
+      action astrate {
+         helplib {$ATOOLS_HELP}
+         parameter at {
+            position 2
+            type _DOUBLE
+            prompt {Input position at which rate of change is to be determined}
+            ppath CURRENT
+            helpkey *
+          }
+         parameter ax1 {
+            position 3
+            type _INTEGER
+            prompt {Index of output axis for which rate of change is required}
+            ppath CURRENT
+            helpkey *
+          }
+         parameter ax2 {
+            position 4
+            type _INTEGER
+            prompt {Index of input axis for which is to be varied}
+            ppath CURRENT
+            helpkey *
+          }
+         parameter rate {
+            type _DOUBLE
+            access WRITE
+            vpath DEFAULT
+            default 0.0
+            helpkey *
+          }
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The input Mapping}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
             helpkey *
           }
       }
