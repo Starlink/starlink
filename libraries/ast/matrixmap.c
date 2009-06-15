@@ -33,6 +33,8 @@ f     The MatrixMap class does not define any new routines beyond those
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
 *     Research Councils
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -133,6 +135,9 @@ f     The MatrixMap class does not define any new routines beyond those
 *        Correct row/col confusion in CompressMatrix.
 *     15-MAR-2006 (DSB):
 *        Override astEqual.
+*     15-MAR-2009 (DSB):
+*        MapSplit: Only create the returned Mapping if it would have some 
+*        outputs.
 *class--
 */
 
@@ -2233,7 +2238,7 @@ static int *MapSplit( AstMapping *this_map, int nin, const int *in, AstMapping *
          }
 
 /* If the returned Mapping can be created, create it. */
-         if( ok ) {
+         if( ok && nout > 0 ) {
             *map = (AstMapping *) astMatrixMap( nin, nout, 0, rmat, "", status );
 
 /* Otherwise, free the returned array. */
