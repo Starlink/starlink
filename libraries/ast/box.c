@@ -81,6 +81,12 @@ f     The Box class does not define any new routines beyond those
 *        Over-ride astRegBasePick.
 *     26-JAN-2009 (DSB):
 *        Over-ride astMapMerge.
+*     12-JUL-2009 (DSB):
+*        Modify Simplify so that if a Box can be split into two
+*        simpler components and then joined together into a Prism, it
+*        does so. This is because being able to express a Region in 
+*        its current Frame is more important than having the simplest
+*        possible structure. 
 *class--
 */
 
@@ -3736,6 +3742,7 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
    AstPointSet *ps1;             /* Box corners in base Frame */
    AstPointSet *ps2;             /* Box corners in current Frame */
    AstPolygon *newpoly;          /* New Polygon to replace Box */
+   AstRegion *prism;             /* Prism combining all axes */
    AstRegion *new;               /* Pointer to simplified Region */
    AstRegion *this;              /* Pointer to supplied Region structure */
    AstRegion *unc;               /* Pointer to uncertainty Region */
@@ -3767,7 +3774,7 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
    int olddir0;                  /* Original value of Direction(1) attribute */
    int olddir1;                  /* Original value of Direction(2) attribute */
    int simpler;                  /* Has some simplication taken place? */
-   
+
 /* Initialise. */
    result = NULL;
 
@@ -3789,6 +3796,10 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
 /* Get the Mapping from base to current Frame. */
    map = astGetMapping( new->frameset, AST__BASE, AST__CURRENT );
 
+/* Get the number of inputs and outputs for the PermMap */
+   nin = astGetNin( map );
+   nout = astGetNout( map );
+
 /* If the Mapping from base to current Frame is a PermMap, we now explicitly 
    how to swap the axes of the Box to produce either a new Box or an 
    Interval. */
@@ -3803,10 +3814,6 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
 
 /* Ensure cached information is up to date. */
       Cache( newbox, 0, status );
-
-/* Get the number of inputs and outputs for the PermMap */
-      nin = astGetNin( map );
-      nout = astGetNout( map );
 
 /* Get the input and output permutation arrays and the array of constants
    from the PermMap. */
@@ -3995,7 +4002,7 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
 /* If the transformed Box is not itself a Box, see if it can be
    represented accurately by a Polygon. This is only possible for
    2-dimensional Boxes. */
-      } else if( astGetNin( map ) == 2 && astGetNout( map ) == 2 ) {
+      } else if( nin == 2 && nout == 2 ) {
 
 /* Create a PointSet holding the base Frame axis values at the four
    corners of the Box. */
@@ -4098,6 +4105,25 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
 
          ps1 = astAnnul( ps1 );
          ps2 = astAnnul( ps2 );
+      } 
+
+/* If we have yet been able to produce a simpler region, we now try
+   splitting the Box into two separate Boxes defined in separate
+   coordinate Frames. If either of these two Boxes can be simplified,
+   create a Prism containing the two simplified Boxes, and attempt to
+   simplify the Prism. Otherwise a clone of "new" is returned by
+   astConvertToPrism. */
+      if( !simpler ) {
+         prism = astConvertToPrism( new );
+
+         if( prism != new ) {
+            simpler = 1;
+            (void) astAnnul( new );
+            new = prism;
+
+         } else {
+            prism = astAnnul( prism );
+         }
       }
 
       frm = astAnnul( frm );

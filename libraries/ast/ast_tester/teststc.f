@@ -486,7 +486,7 @@ c      call ast_listissued( 'teststc' )
 
       if( .not. ast_mapget0A( km, AST__STCERROR, r, status ) ) then
          call stopit( status, 'Error 26b' )
-      else if( .not.ast_isabox( r, status ) ) then
+      else if( .not.ast_isaprism( r, status ) ) then
          call stopit( status, 'Error 27b' )
       else if( ast_geti( r, 'naxes', status ) .ne. 4 ) then
          call stopit( status, 'Error 28b' )

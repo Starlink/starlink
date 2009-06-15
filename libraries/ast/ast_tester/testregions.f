@@ -1434,11 +1434,11 @@ C
       box2 = ast_mapregion( box1, map2, frm2, status )
 
       if( ast_getc( box2, 'Domain', status ) .ne. 'B' ) then
-         call stopit( status, 'ast_mapregion: Box2 domain is not B' )
+         call stopit( status, 'ast_mapregion1: Box2 domain is not B' )
       end if
 
       if( hasframeset( box2, status ) ) then
-         call stopit( status, 'ast_mapregion: Box2 has FrameSet' )
+         call stopit( status, 'ast_mapregion2: Box2 has FrameSet' )
       end if
 
       matrix(1) = 2.0
@@ -1452,14 +1452,15 @@ C
       matrix(9) = 6.0
 
       map2 = ast_matrixmap( 3, 3, 0, matrix, ' ', status )
+
       box2 = ast_mapregion( box1, map2, frm2, status )
 
       if( ast_getc( box2, 'Domain', status ) .ne. 'B' ) then
-         call stopit( status, 'ast_mapregion: Box2 domain is not B' )
+         call stopit( status, 'ast_mapregion3: Box2 domain is not B' )
       end if
 
-      if( .NOT. hasframeset( box2, status ) ) then
-         call stopit( status, 'ast_mapregion: Box2 has no FrameSet' )
+      if( hasframeset( box2, status ) ) then
+         call stopit( status, 'ast_mapregion4: Box2 has FrameSet' )
       end if
 
       call checkdump( box2, 'checkdump box2', status )
@@ -1475,11 +1476,11 @@ C
       box2 = ast_mapregion( box1, map2, frm2, status )
 
       if( ast_getc( box2, 'Domain', status ) .ne. 'B' ) then
-         call stopit( status, 'ast_mapregion: Box2 domain is not B' )
+         call stopit( status, 'ast_mapregion5: Box2 domain is not B' )
       end if
 
       if( hasframeset( box2, status ) ) then
-         call stopit( status, 'ast_mapregion: Box2 has FrameSet (B)' )
+         call stopit( status, 'ast_mapregion6: Box2 has FrameSet (B)' )
       end if
 
       frm1 = ast_skyframe( ' ', status )
@@ -1498,7 +1499,7 @@ C
       box2 = ast_mapregion( box1, fs, frm2, status )
 
       if( hasframeset( box2, status ) ) then
-         call stopit( status, 'ast_mapregion: Box2 has FrameSet (C)' )
+         call stopit( status, 'ast_mapregion7: Box2 has FrameSet (C)' )
       end if
 
       xin( 1 ) = 0.00049
@@ -1542,7 +1543,7 @@ C
       box2 = ast_Simplify( box2, status )
 
       if( hasframeset( box2, status ) ) then
-         call stopit( status, 'ast_mapregion: Box2 has '//
+         call stopit( status, 'ast_mapregion8: Box2 has '//
      :               'FrameSet (B)' )
       end if
 
