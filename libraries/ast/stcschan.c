@@ -5437,7 +5437,7 @@ static int WriteRegion( AstStcsChan *this, AstRegion *reg, AstKeyMap *props,
 
 /* Remove the trailing space, and store the property value in the KeyMap. */
             prop[ nc - 1 ] = 0;
-            astMapPut0C( props, "LOLIMIT", prop, NULL );
+            astMapPut0C( spprops, "LOLIMIT", prop, NULL );
          
 /* Do the same for the upper limits. */
             nc = 0;
@@ -5458,7 +5458,7 @@ static int WriteRegion( AstStcsChan *this, AstRegion *reg, AstKeyMap *props,
 
 /* Remove the trailing space, and store the property value in the KeyMap. */
             prop[ nc - 1 ] = 0;
-            astMapPut0C( props, "HILIMIT", prop, NULL );
+            astMapPut0C( spprops, "HILIMIT", prop, NULL );
          
 /* Store properties that are specific to Ellipse sub-phrases... */
          } else if( astIsAEllipse( spreg ) ) {
