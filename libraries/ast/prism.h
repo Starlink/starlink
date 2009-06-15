@@ -178,6 +178,7 @@ AstPrism *astLoadPrism_( void *, size_t, AstPrismVtab *,
 /* Prototypes for member functions. */
 /* -------------------------------- */
 # if defined(astCLASS)           /* Protected */
+AstRegion *astConvertToPrism_( AstRegion *, int * );
 #endif
 
 /* Function interfaces. */
@@ -227,6 +228,7 @@ astINVOKE(O,astLoadPrism_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR
    to the wrong sort of Object is supplied. */
 
 #if defined(astCLASS)            /* Protected */
+#define astConvertToPrism(this) astConvertToPrism_(this,STATUS_PTR)
 #endif
 #endif
 

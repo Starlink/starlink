@@ -229,6 +229,197 @@ static int ManageLock( AstObject *, int, int, AstObject **, int * );
 
 /* Member functions. */
 /* ================= */
+AstRegion *astConvertToPrism_( AstRegion *this, int *status ) {
+/*
+*+
+*  Name:
+*     astConvertToPrism
+
+*  Purpose:
+*     Convert a supplied Region into a Prism if possible.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "prism.h"
+*     AstRegion *astConvertToPrism( AstRegion *this, int *status )
+
+*  Description:
+*     This function attempts to split the supplied Region into two
+*     regions defined within separate coordinate system. If this is
+*     possible, and if either one of the two resulting Regions can be
+*     simplified, then the two simplified Regions are joined into a Prism
+*     equivalent to the supplied Region. The Prism is then simplified and
+*     returned.
+*
+*     If the supplied Region cannot be split into two components, or if
+*     neither of the two components can eb simplified, then a clone of the 
+*     supplied Region pointer is returned.
+
+*  Parameters:
+*     this
+*        Pointer to the original Region.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     A pointer to the equivalent simplified Prism, or a clone of the
+*     supplied Region pointer.
+
+*  Notes:
+*     - A NULL pointer value will be returned if this function is
+*     invoked with the AST error status set, or if it should fail for
+*     any reason.
+*-
+*/
+
+/* Local Variables: */
+   AstFrame *frm;                /* Current Frame in supplied Region */
+   AstFrame *pickfrm1;           /* Frame formed by picking current subset of axes */
+   AstFrame *pickfrm2;           /* Frame formed by picking all other axes */
+   AstMapping *junk;             /* Unused Mapping pointer */
+   AstMapping *map;              /* Base -> current Mapping */
+   AstPrism *prism;              /* Prism combining all axes */
+   AstPrism *newprism;           /* Prism combining all axes, in original Frame */
+   AstRegion *result;            /* Result pointer to return */
+   AstRegion *sp1;               /* Simplified region spanning selected axes */
+   AstRegion *sp2;               /* Simplified region spanning unselected axes */
+   AstUnitMap *um;               /* A UnitMap */
+   int *ax;                      /* Pointer to array of selecte axis indices */
+   int *perm;                    /* Axis permutation array */
+   int axis;                     /* Axis index */
+   int bitmask;                  /* Integer with set bits for selected axes */
+   int i;                        /* Loop index */
+   int mask;                     /* Integer with a set bit at current axis */
+   int nax;                      /* Number of selected axes */
+   int nin;                      /* No. of base Frame axes (Mapping inputs) */
+   int nout;                     /* No. of current Frame axes (Mapping outputs) */
+   int topmask;                  /* Integer that selects all axes */
+
+/* Initialise. */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get the Mapping from base to current Frame. */
+   map = astGetMapping( this->frameset, AST__BASE, AST__CURRENT );
+
+/* Get the number of inputs and outputs for the Mapping. */
+   nin = astGetNin( map );
+   nout = astGetNout( map );
+
+/* Allocate memory to hold the indices of the current Frame axes in the 
+   current subset */
+   ax = astMalloc( sizeof( int )* nout );
+   if( ax ) {
+
+/* We need to scan through all possible subsets of the current Frame 
+   axes, looking for a subset that results in the Region being split. 
+   We use the binary pattern of bits in "bitmask" to indicate if the 
+   corresponding axes should be included in the subset of axes. 
+   Loop round all possible combinations, until a combination is found
+   that results in a Prism being formed. */
+      topmask = pow( 2, nout );
+      for( bitmask = 1; bitmask < topmask  && !result; bitmask++ ) {
+   
+/* Store the indices of the axes forming the current subset. */
+         nax = 0;
+         mask = 1;         
+         for( axis = 0; axis < nout; axis++  ) {
+            if( bitmask & mask ) ax[ nax++ ] = axis;
+            mask <<= 1;
+         }
+
+/* See if the current subset of current Frame axes can be split off from
+   the Region. If it can, the Frame pointer returned by astPickAxes will identify 
+   a Region. */
+         pickfrm1 = astPickAxes( this, nax, ax, &junk );
+         if( astIsARegion( pickfrm1 ) ) {
+
+/* Check that the remaining (unselected) axes can also be picked into a
+   new Region. */
+            nax = 0;
+            mask = 1;         
+            for( axis = 0; axis < nout; axis++  ) {
+               if( ( bitmask & mask ) == 0 ) ax[ nax++ ] = axis;
+               mask <<= 1;
+            }
+
+            pickfrm2 = astPickAxes( this, nax, ax, &junk );
+            if( astIsARegion( pickfrm2 ) ) {
+
+/* See if either of these picked Regions can be simplified. */
+               sp1 = astSimplify( pickfrm1 );
+               sp2 = astSimplify( pickfrm2 );
+               if( (AstFrame *) sp1 != pickfrm1 || 
+                   (AstFrame *) sp2 != pickfrm2 ) {
+
+/* If so form a Prism containing the simplified Regions. */
+                  prism = astPrism( sp1, sp2, " ", status );
+
+/* Permute the axes of the Prism so that they are in the same order as
+   in the Box. */
+                  perm = astMalloc( sizeof( int )*nout );
+                  if( perm ) {
+
+                     for( i = 0; i < nout; i++ ) perm[ i ] = -1;
+
+                     for( i = 0; i < nax; i++ ) {
+                        perm[ ax[ i ] ] = i + ( nout - nax );
+                     }
+
+                     nax = 0;
+                     for( i = 0; i < nout; i++ ) {
+                        if( perm[ i ] == -1 ) perm[ i ] = nax++;
+                     }
+
+                     astPermAxes( prism, perm );
+                     perm = astFree( perm );
+                  }
+
+/* Put the original current Frame back in (in place of the CmpFrame
+   containined in the Prism). */
+                  frm = astGetFrame( this->frameset, AST__CURRENT );
+                  um = astUnitMap( nout, " ", status );
+                  newprism = astMapRegion( prism, um, frm );
+                  um = astAnnul( um );
+                  frm = astAnnul( frm );
+
+/* Attempt to simplify the Prism. */
+                  result = astSimplify( newprism );               
+
+/* Free resources */
+                  prism = astAnnul( prism );          
+                  newprism = astAnnul( newprism );          
+               }
+
+               sp1 = astAnnul( sp1 );
+               sp2 = astAnnul( sp2 );
+               pickfrm2 = astAnnul( pickfrm2 );
+            }
+         }
+
+         pickfrm1 = astAnnul( pickfrm1 );
+      }
+
+      ax = astFree( ax );
+   }
+
+   map = astAnnul( map );
+
+/* If no Prism could be made, return a clone of the supplied Region
+   pointer. */
+   if( !result ) result = astClone( this );
+
+/* If an error occurred, annul the returned pointer. */
+   if ( !astOK ) result = astAnnul( result );
+
+/* Return the result. */
+   return result;
+}
+
 static void Decompose( AstMapping *this_mapping, AstMapping **map1, 
                        AstMapping **map2, int *series, int *invert1, 
                        int *invert2, int *status ) {
