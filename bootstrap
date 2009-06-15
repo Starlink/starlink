@@ -178,9 +178,13 @@ fi
 if test $? -ne 0; then
    echo ""
    echo "The './update-modules' script has failed to complete."
+   echo ""
    echo "Check that git is available and can run on this system and that it"
    echo "is able to download submodules. Note you can just run the "
    echo "'./update-modules' command directly while checking the problem."
+   echo ""
+   echo "It may now be necessary to clean up the repository before you can"
+   echo "proceed. See the 'Notes' section in the './update-modules' script."
    exit 1
 fi
 
