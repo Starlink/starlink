@@ -4,7 +4,7 @@
 #     update-modules
 
 #  Purpose:
-#     Update git submodules
+#     Update or initialise the git submodules
 
 #  Type of Module:
 #     Bourne shell script
@@ -13,22 +13,22 @@
 #     update-modules [-f] [submodule]
 
 #  Description:
-#     This script attempts to safely update the content of all the submodules
-#     or the given submodule. It should be ran whenever a submodule is known
-#     to be out-of-date, but can be run at other times to get a listing of the
-#     submodules and their status.
+#     This script attempts to safely update or initialise the content of all
+#     the submodules or the given submodule. It should be ran whenever a
+#     submodule is known to be out-of-date, or when the submodules have not
+#     yet been initialised. It can also be run at other times to get a listing
+#     of the submodules and their status.
 #
-#     It can update a single submodule, or if no command-line argument is
-#     given all the known submodules (when new submodules are added to the
-#     repository these must be made known by a git-pull or git-fetch first).
-#     New submodules are uninitialised and will be initialised after being
-#     detected.
+#     The script can update or initialise a single submodule, or if no
+#     command-line argument is given all the known submodules. Note that after
+#     any new submodules are added to the repository these must be made known
+#     by a git-pull or git-fetch before running this script.
 #
 #     If any of the submodules contain local changes then this script will
 #     refuse to run as the update process is destructive (although most
-#     committed changes will be recoverable see git-reflog). Note this means
+#     committed changes will be recoverable, see git-reflog). Note this means
 #     that no changes to any submodules will be made, regardless of whether
-#     they could be updated and/or initialised or not until the problem has
+#     they could be updated and/or initialized or not until the problem has
 #     been resolved.
 #
 #     In extreme circumstances when you do not have any changes to preserve
@@ -37,6 +37,20 @@
 #     It is necessary that this script be ran at least once after a
 #     repository clone is created. This will be done by the bootstrap
 #     script.
+
+#  Notes:
+#     Recovering after errors: If a submodule fails to clone (typical causes
+#     are usually network errors or badly configured git) on the initial
+#     update the container directory can often be automatically removed. In 
+#     that case you'll need to re-create it before updating will succeed. It
+#     can also be a good idea to remove the partial repository that a failed
+#     clone can give you, so for instance if the Perl module failed to clone
+#     you should do:  
+#
+#         rm -rf thirdparty/perlsys/perl/perl
+#         mkdir thirdparty/perlsys/perl/perl
+#
+#     before attempting to continue.
 
 #  Authors:
 #     PWD: P.W. Draper (JAC, Durham University)
