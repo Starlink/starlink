@@ -178,6 +178,8 @@ f     - AST_SHOWMESH: Display a mesh of points on the surface of a Region
 *        Region.
 *     18-FEB-2009 (DSB):
 *        Remove methods astGetEnclosure and astSetEnclosure.
+*     15-JUN-2009 (DSB):
+*        Modify MapRegion to use FrameSets properly.
 *class--
 
 *  Implementation Notes:
@@ -4880,8 +4882,8 @@ static int ManageLock( AstObject *this_object, int mode, int extra,
 }
 #endif
 
-static AstRegion *MapRegion( AstRegion *this, AstMapping *map,
-                             AstFrame *frame, int *status ) {
+static AstRegion *MapRegion( AstRegion *this, AstMapping *map0,
+                             AstFrame *frame0, int *status ) {
 /*
 *+
 *  Name:
@@ -4942,7 +4944,9 @@ static AstRegion *MapRegion( AstRegion *this, AstMapping *map,
 */
 
 /* Local Variables: */
+   AstFrame *frame;  
    AstFrameSet *fs;  
+   AstMapping *map;
    AstPointSet *ps2;
    AstPointSet *ps1;
    AstPointSet *pst;
@@ -4962,6 +4966,21 @@ static AstRegion *MapRegion( AstRegion *this, AstMapping *map,
 
 /* Check the global error status. */
    if ( !astOK ) return result;
+
+/* If a FrameSet was supplied for the Mapping, use the base->current
+   Mapping */
+   if( astIsAFrameSet( map0 ) ) {
+      map = astGetMapping( (AstFrameSet *) map0, AST__BASE, AST__CURRENT );
+   } else {
+      map = astClone( map0 );
+   }
+
+/* If a FrameSet was supplied for the Frame, use the current Frame. */
+   if( astIsAFrameSet( frame0 ) ) {
+      frame = astGetFrame( (AstFrameSet *) frame0, AST__CURRENT );
+   } else {
+      frame = astClone( frame0 );
+   }
 
 /* First check the Mapping is suitable. It must defined both a forward
    and an inverse Mapping. */
@@ -5043,6 +5062,10 @@ static AstRegion *MapRegion( AstRegion *this, AstMapping *map,
 /* Since the Mapping has been changed, any cached information calculated
    on the basis of the Mapping properties may no longer be up to date. */
    astResetCache( this );   
+
+/* Free resources */
+   map = astAnnul( map );
+   frame = astAnnul( frame );
 
 /* If not OK, annul the returned pointer. */
    if( !astOK ) result = astAnnul( result );
