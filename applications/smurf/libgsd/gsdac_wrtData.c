@@ -79,6 +79,8 @@
 *        Use matchFreqs instead of special flag.
 *     2008-07-03 (TIMJ):
 *        Fix some warnings.
+*     2009-06-15 (TIMJ):
+*        New API for acsSpecWriteTS
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -322,7 +324,7 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
       acsSpecWriteTS( ( subBandNum % nSubsys ) + 1, 
                       gsdVars->BEChans[subBandNum], 
       	              &(gsdVars->data[specIndex]), record, 
-                      specHdr, status );
+                      specHdr, NULL, status );
 
       /* Have we written a fitschan for this output file yet? */
       if ( stepNum == 0 && subBandNum < nSubsys ) {
