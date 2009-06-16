@@ -241,6 +241,10 @@ f     The SkyFrame class does not define any new routines beyond those
 *        Override the astIntersect method.
 *     21-JAN-2009 (DSB):
 *        Fix mis-use of results buffers for GetFormat and GetAttrib.
+*     16-JUN-2009 (DSB):
+*        All sky coordinate systems currently supported by SkyFrame are
+*        left handed. So fix GetDirection method to return zero for all 
+*        longitude axes and 1 for all latitude axes.
 *class--
 */
 
@@ -2344,23 +2348,15 @@ static int GetDirection( AstFrame *this_frame, int axis, int *status ) {
 */
 
 /* Local Variables: */
-   AstAxis *ax;                  /* Pointer to Axis object */
    AstSkyFrame *this;            /* Pointer to the SkyFrame structure */
-   int as_time_set;              /* AsTime attribute set? */
    int axis_p;                   /* Permuted axis index */
-   int is_latitude;              /* IsLatitude attribute value */
-   int is_latitude_set;          /* IsLatitude attribute set? */
    int result;                   /* Result to be returned */
-   int skyaxis;                  /* Axis object is a SkyAxis? */
 
 /* Check the global error status. */
    if ( !astOK ) return 0;
 
 /* Initialise. */
    result = 0;
-   as_time_set = 0;
-   is_latitude = 0;
-   is_latitude_set = 0;
 
 /* Obtain a pointer to the SkyFrame structure. */
    this = (AstSkyFrame *) this_frame;
@@ -2373,48 +2369,14 @@ static int GetDirection( AstFrame *this_frame, int axis, int *status ) {
    if ( astTestDirection( this, axis ) ) {
       result = (*parent_getdirection)( this_frame, axis, status );
 
-/* Otherwise, we will generate a default Direction value. Obtain a pointer to
-   the Axis object for the SkyFrame's axis. */
+/* Otherwise, we will generate a default Direction value. Currently all
+   systems supported by SkyFrame are left handed, so all longitude axes
+   are reversed and all latitude axes are not reversed. */
+   } else if( axis_p == 0 ) {
+      result = 0;
    } else {
-      ax = astGetAxis( this, axis );
-
-/* Determine the settings of any attributes that may affect the default
-   Direction value. */
-      skyaxis = astIsASkyAxis( ax );
-      if ( skyaxis ) {
-         as_time_set = astTestAsTime( this, axis );
-         is_latitude_set = astTestAxisIsLatitude( ax );
-         is_latitude = astGetAxisIsLatitude( ax );
-
-/* If no AsTime value is set for the axis, set a temporary value as determined
-   by the astGetAsTime method, which supplies suitable defaults for the axes of
-   a SkyFrame. */
-         if ( !as_time_set ) {
-            astSetAsTime( this, axis, astGetAsTime( this, axis ) );
-         }
-
-/* Temporarly over-ride the SkyAxis IsLatitude attribute, regardless of its
-   setting, as the second axis of a SkyFrame is always the latitude axis. */
-         astSetAxisIsLatitude( ax, axis_p == 1 );
-      }
-
-/* Invoke the parent method to obtain a default Direction value. */
-      result = (*parent_getdirection)( this_frame, axis, status );
-
-/* Now restore the attributes that were temporarily over-ridden above to their
-   previous states. */
-      if ( skyaxis ) {
-         if ( !as_time_set ) astClearAsTime( this, axis );
-         if ( !is_latitude_set ) {
-            astClearAxisIsLatitude( ax );
-         } else {
-            astSetAxisIsLatitude( ax, is_latitude );
-         }
-      }
-
-/* Annul the pointer to the Axis object. */
-      ax = astAnnul( ax );
-   }
+      result = 1;
+   }      
 
 /* If an error occurred, clear the result value. */
    if ( !astOK ) result = 0;
