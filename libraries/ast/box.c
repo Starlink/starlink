@@ -3733,7 +3733,6 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
 /* Local Variables: */
    AstBox *box;                  /* Pointer to Box structure */
    AstBox *newbox;               /* Pointer to simpler Box */
-   AstFrame *bfrm;               /* Pointer to base Frame */
    AstFrame *frm;                /* Pointer to current Frame */
    AstMapping *map;              /* Base -> current Mapping */
    AstMapping *result;           /* Result pointer to return */
@@ -3752,7 +3751,6 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
    double *lbnd;                 /* Lower bounds for new Box */
    double *ubnd;                 /* Upper bounds for new Box */
    double corners[8];            /* Box corners in current Frame */
-   double det;                   /* Determinant of Jacobian matrix */
    double k;                     /* Axis constant value */
    double lb;                    /* Lower axis bound */
    double rxx;                   /* Element of the Jacobian matrix */
@@ -3764,7 +3762,7 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
    int *outperm;                 /* Output axis permutation array */
    int closed;                   /* Was original Region closed? */
    int feed;                     /* Source of value for current axis */
-   int frm_rot;                  /* Does the Frame have reversed rotation? */
+   int right_handed;             /* Is the new Frame right handed? */
    int ic;                       /* Axis index */
    int isInterval;               /* Is the simplified Box an Interval */
    int isNull;                   /* Is the simplified Box a NullRegion? */
@@ -4012,41 +4010,50 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
             box = (AstBox *) new;
             Cache( box, 0, status );
 
-/* If the determinant of the Jacobian matrix of the Mapping is negative
-   then a clockwise rotation is mapped into an anti-clockwise rotation
-   by the Mapping. We need to know this in order to determine the order
-   in which to store the polygon vertices. */
-            rxx = astRate( map, box->centre, 0, 0 );
-            rxy = astRate( map, box->centre, 0, 1 );
-            ryx = astRate( map, box->centre, 1, 0 );
-            ryy = astRate( map, box->centre, 1, 1 );
-            det = rxx*ryy - rxy*ryx;
-
-/* We also need to know if either of the axes are reversed or not. */
-            bfrm = astGetFrame( new->frameset, AST__BASE );
-
-            if( astTestDirection( bfrm, 0 )  ) {
-               olddir0 = astGetDirection( bfrm, 0 ) ? 1 : 0;
-               astClearDirection( bfrm, 0 );
+/* For a "normal" right handed coordinate system, rotation from the positive 
+   first axis to the positive second axis is anti-clockwise. But for left
+   handed coordinate systems, it's the opposite. Determine if the required 
+   system is left or right handed by looking at the default values for
+   the Direction attribute. If the default values are equal, then the
+   system is right handed - otherwise it is left handed. We need to clear
+   any set Direction value first in order to get the default value, but
+   take care to re-instate any set Direction values afterwards. */
+            if( astTestDirection( frm, 0 )  ) {
+               olddir0 = astGetDirection( frm, 0 ) ? 1 : 0;
+               astClearDirection( frm, 0 );
             } else {
                olddir0 = -1;
             }
 
-            if( astTestDirection( bfrm, 1 )  ) {
-               olddir1 = astGetDirection( bfrm, 1 ) ? 1 : 0;
-               astClearDirection( bfrm, 1 );
+            if( astTestDirection( frm, 1 )  ) {
+               olddir1 = astGetDirection( frm, 1 ) ? 1 : 0;
+               astClearDirection( frm, 1 );
             } else {
                olddir1 = -1;
             }
 
-            frm_rot = ( astGetDirection( bfrm, 0 ) !=  astGetDirection( bfrm, 1 ) );
+            right_handed = ( astGetDirection( frm, 0 ) == astGetDirection( frm, 1 ) );
 
-            if( olddir0 != - 1 ) astSetDirection( bfrm, 0, olddir0 );
-            if( olddir1 != - 1 ) astSetDirection( bfrm, 1, olddir1 );
+            if( olddir0 != - 1 ) astSetDirection( frm, 0, olddir0 );
+            if( olddir1 != - 1 ) astSetDirection( frm, 1, olddir1 );
 
-/* If the mapping does not reverse rotation, store the corners in an
-   anti-clockwise order as required by the Polygon constructor. */
-            if( ( det > 0.0 && ! frm_rot ) || ( det <= 0.0 && frm_rot ) ) {
+/* The Mapping may change the handedness of the axes. That is, the
+   Mapping may reverse one axis without reversing the other. This will be
+   the case if the determinant of the Jacobian matrix of the Mapping is 
+   negative. Get the determinant. If it is negative, reverse the
+   handedness of the axes. */
+            rxx = astRate( map, box->centre, 0, 0 );
+            rxy = astRate( map, box->centre, 0, 1 );
+            ryx = astRate( map, box->centre, 1, 0 );
+            ryy = astRate( map, box->centre, 1, 1 );
+            if( rxx*ryy - rxy*ryx < 0 ) right_handed = ! right_handed;
+
+/* The order in which the polygon vertices are stored determines whether
+   the interior or exterior of the polygon forms the inside of the
+   Region. We want the inside to be the interior so we must store the
+   vertices in anti-clockwise order within the new coordinate Frame. Do
+   right handed systems first. */
+            if( right_handed ) {
                ptr1[ 0 ][ 0 ] = box->centre[ 0 ] - box->extent[ 0 ];
                ptr1[ 1 ][ 0 ] = box->centre[ 1 ] + box->extent[ 1 ];
    
@@ -4059,9 +4066,7 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
                ptr1[ 0 ][ 3 ] = box->centre[ 0 ] + box->extent[ 0 ];
                ptr1[ 1 ][ 3 ] = box->centre[ 1 ] + box->extent[ 1 ];
 
-/* Otherwise, store the corners in a clockwise order so tha the mapping will 
-   then turn them into an anti-clockwise order, as required by the Polygon 
-   constructor. */
+/* For left handed systems, "anti-clockwise" implies the opposite order */
             } else {
                ptr1[ 0 ][ 3 ] = box->centre[ 0 ] - box->extent[ 0 ];
                ptr1[ 1 ][ 3 ] = box->centre[ 1 ] + box->extent[ 1 ];
