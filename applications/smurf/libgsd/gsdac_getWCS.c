@@ -334,8 +334,8 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   }
 
   /* Create the keymaps. */
-  datePointing = astKeyMap( "" );
-  cellMap = astKeyMap( "" ); 
+  datePointing = astKeyMap( " " );
+  cellMap = astKeyMap( " " );
 
   if ( subBandNum == 0 && DEBUGON ) printf ( "CENTRE (base) RA_DEC (radians) : %f %f\n", wcs->baseTr1, wcs->baseTr2 );
 

@@ -330,7 +330,7 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
       if ( stepNum == 0 && subBandNum < nSubsys ) {
 
         /* Initialize the astFitsChan for this file. */
-        fitschan[subBandNum % nSubsys] = astFitsChan ( NULL, NULL, "" );
+        fitschan[subBandNum % nSubsys] = astFitsChan ( NULL, NULL, " " );
 
         /* Fill the FITS headers. */
         gsdac_putFits ( gsdVars, subBandNum, nSubsys, obsNum, utDate, nSteps, 
