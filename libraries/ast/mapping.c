@@ -358,6 +358,8 @@ typedef struct PN {
    double xlo;                   /* The lower x limit covered by the polynomial */
    double xhi;                   /* The upper x limit covered by the polynomial */
    double y0;                    /* The y offset to be added to the polynomial value */
+   int too_small;                /* Dynamic range of function value over h is
+                                    close to zero */
 } PN;
 
 /* Convert from floating point to floating point or integer */
@@ -1477,10 +1479,6 @@ static PN *FitPN( AstMapping *map, double *at, int ax1, int ax2, double x0,
       }
    }
 
-/* If the dynamic range of the function values is less than 1E-6 return
-   NULL. */
-   if( max - min <= 1.0E-6*fabs( mean )/( RATE_ORDER + 1 ) ) return NULL;
-
 /* Convert the x values into x offsets from "x0", and convert the y
    values into y offsets from the central y value. */
    off = y[ i0 ];
@@ -1496,11 +1494,14 @@ static PN *FitPN( AstMapping *map, double *at, int ax1, int ax2, double x0,
 
 /* Find the polynomial which interpolates these points. */
    ret = InterpPN( RATE_ORDER + 1, x, y, status );
+   if( ret ) {
+      ret->y0 = off;
+
+/* Indicate if the dynamic range of the function values is clsoe to zero. */
+      ret->too_small = ( max - min <= 1.0E-6*fabs( mean )/( RATE_ORDER + 1 ) );
 
 /* If required, find the rms error between the polynomial and the 
    function at points mid-way between the interpolating points. */
-   if( ret ) {
-      ret->y0 = off;
       if( rms ) {
 
 /* Store the x values at which to evaluate the function. These are the
@@ -8611,7 +8612,8 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2, int *status 
    this fails, repeat up to ten times with a larger "h" value. */
       fit = FitPN( this, at, ax1, ax2, x0, h, NULL, status );
       ntry = 0;
-      while( !fit && ntry++ < 10 ) {
+      while( ( !fit || fit->too_small ) && ntry++ < 10 ) {
+         (void) astFree( fit );
          h *= 1000;
          fit = FitPN( this, at, ax1, ax2, x0, h, NULL, status );
       }
