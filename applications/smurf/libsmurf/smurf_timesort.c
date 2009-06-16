@@ -86,7 +86,8 @@
 *          - "SLICES": SIZELIMIT is the maximum number of time slices in 
 *          each output NDF.
 *          - "FILESIZE": SIZELIMIT is the maximum number of megabytes of 
-*          data in each output NDF.
+*          data in each output NDF. Here, the SI definition of megabytes
+*          is used in which 1 MB = 1,000,000 bytes.
 *
 *          Note, when using the FILESIZE option the specified file size
 *          only includes the size of the Data and Variance components in
@@ -142,10 +143,10 @@
 *          number of output NDFs needed to hold all the input data will be
 *          used. The final output NDF may be smaller than the specified
 *          maximum size. The value given is either the file size in
-*          megabytes, the number of time slices, or the number of spectra,
-*          as specified by parameter LIMITTYPE. If a null (!) value is
-*          supplied, then the number of output NDFs will be the same as
-*          the number of input NDFs, and all output NDFs will have the
+*          SI megabytes (1,000,000 bytes), the number of time slices, or the 
+*          number of spectra, as specified by parameter LIMITTYPE. If a null 
+*          (!) value is supplied, then the number of output NDFs will be the 
+*          same as the number of input NDFs, and all output NDFs will have the
 *          same size. If a negative or zero value is supplied, then a single 
 *          output NDF will be created holding all the input data. [!]
 
@@ -197,6 +198,9 @@
 *        Can not rely on astGetC to not be called 50 times whilst caching
 *        values for comparison. When we tried to sort 8 files at once random
 *        values turned up in timesys.
+*     16-JUN-2009 (DSB):
+*        The SIZELIMIT value was being mis-interpreted as bytes rather than
+*        megabytes when LIMITTYPE=FILESIZE.
 
 *  Copyright:
 *     Copyright (C) 2007-2009 Science and Technology Facilities Council.
@@ -1155,7 +1159,7 @@ void smurf_timesort( int *status ) {
                      if( ndet_out > 0 ) tslimit = sizelimit / ndet_out;
             
                   } else if( !strcmp( ltbuf, "FILESIZE" ) ) {
-                     tslimit = sizelimit / 
+                     tslimit = (sizelimit*1000000) / 
                                  ( ndet_out*nchan*( VAL__NBR*( hasvar ? 2 : 1 ) + 
                                                 ( hasqual ? VAL__NBUB : 0) ) );
                   }
