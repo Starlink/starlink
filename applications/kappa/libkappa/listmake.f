@@ -107,29 +107,37 @@
 *        values for a single position, separated by white space.  It is
 *        only accessed if parameter MODE is given the value "File".
 *     FRAME = LITERAL (Read)
-*        Specifies the co-ordinate Frame of the positions supplied using
-*        parameter POSITION or FILE.  The parameter value is interpreted
-*        first as an HDS path containing a WCS FrameSet. If this is 
-*        successful, the current Frame of the FrameSet is used. Otherwise, 
-*        an attempt is made to interpret the parameter value as an NDF 
-*        name. If this is successful, the current WCS coordinate frame in
-*        the NDF is used. If this fails, and the parameter value ends 
-*        with ".FIT", an attempt is made to interpret the parameter value
-*        as the name of a FITS file. If successful, the primary WCS 
-*        co-ordinate system from the primary HDU headers is used. If the 
-*        above attempt fails, an attempt is made to interpret the parameter 
-*        value as the name of a text file containing either an AST Frame 
-*        dump (such as produced by commands in the ATOOLS package), or a 
-*        set of FITS headers.
+*        Specifies the co-ordinate Frame of the positions supplied through
+*        Parameters POSITION or FILE.  There is a cascade of allowed
+*        interpretations of this parameter value; the search for the 
+*        co-ordinate Frame ends once there is a successful interpretation, 
+*        otherwise the search moves on to the next possible meaning in 
+*        the following order.
+*        
+*        -  An HDS path containing a WCS FrameSet, whose current 
+*        Frame defines the co-ordinate Frame.
 *
-*        If all the above fails, and the parameter value looks like an 
-*        IRAS90 "Sky Co-ordinate System" (SCS) string such as "EQUAT(J2000)"
-*        (see SUN/163), then the positions are assumed to be two-dimensional
-*        celestial co-ordinates in the specified system.  Otherwise, the
-*        given string is used as a Domain name without any interpretation. 
-*        Any Domain name may be supplied, but normally one of the standard 
-*        Domain names, such as GRID, PIXEL, GRAPHICS should be given.  
-*        Parameter DIM is used to determine the number of axes in the Frame.  
+*        -  The name of an NDF, whose current WCS co-ordinate Frame
+*        is used.
+*
+*        -  If the parameter value ends with ".FIT", an attempt is 
+*        made to interpret the parameter value as the name of a FITS 
+*        file.  If successful, the primary WCS co-ordinate system from
+*        the primary HDU headers is used.  
+*
+*        -  A text file containing either an AST Frame dump (such as 
+*        produced by commands in the ATOOLS package), or a set of FITS 
+*        WCS headers.
+*
+*        -  An IRAS90 "Sky Co-ordinate System" (SCS) string such as 
+*        "EQUAT(J2000)" (see SUN/163}), whereupon the positions are
+*        assumed to be two-dimensional celestial co-ordinates in the 
+*        specified system. 
+*
+*        -  Domain name without any interpretation.  Any Domain name may
+*        be supplied, but normally one of the standard Domain names,
+*        such as GRID, PIXEL, GRAPHICS should be given.  Parameter DIM 
+*        is used to determine the number of axes in the Frame.  
 *
 *        This parameter is only accessed if the parameter NDF is given a 
 *        null value.

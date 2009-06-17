@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.35}
 \newcommand{\stardocnumber}    {95.35}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2009 May 11}
+\newcommand{\stardocdate}      {2009 June 10}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.10}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -3681,7 +3681,7 @@ supplied, ending up with blue contours.
 
 \subsubsection{\xlabel{se_colour_attributes}Colour Attributes\label{se:colattr}}
 The {\att Colour} attribute can be used to specify the colours of various
-components of a plot.  The value assigned to the attribute can be pne
+components of a plot.  The value assigned to the attribute can be one
 of the following options.
 \begin{itemize}
 
@@ -3928,7 +3928,7 @@ It is often useful to specify values for some of the attributes of the current
       element of of a plot.  It takes a separate value for each graphical
       element so that, for instance, the setting {\tt "Colour(title)=2"} causes
       the title to be drawn using colour index 2.  Standard X colour 
-      names, space separated floating point RGB triples, or 
+      names, space-separated floating-point RGB triples, or 
       \htmlref{HTML colour codes}{htmlcolour} 
       (optionally using a {\tt "@"} inplace of a {\tt "\#"} to avoid the code
       being interpreted as a comment within a style file) can also be 
@@ -13996,7 +13996,7 @@ KAPPA: \htmlref{ARDPLOT}{ARDPLOT},
          DEFPIX = \_LOGICAL (Read)
       }{
          If a {\tt TRUE} value is supplied for DEFPIX, then co-ordinates in 
-         the supplied ARD file will be assumed to be pixel coordinates.
+         the supplied ARD file will be assumed to be pixel co-ordinates.
          Otherwise, they are assumed to be in the current WCS co-ordinate 
          system of the supplied NDF.  {\tt [TRUE]}
       }
@@ -29316,31 +29316,40 @@ plot (10k).
       \sstsubsection{
          FRAME = LITERAL (Read)
       }{
-         Specifies the co-ordinate Frame of the positions supplied using
-         parameter POSITION or FILE.  The parameter value is interpreted
-         first as an HDS path containing a WCS FrameSet. If this is 
-         successful, the current Frame of the FrameSet is used. Otherwise, 
-         an attempt is made to interpret the parameter value as an NDF 
-         name. If this is successful, the current WCS coordinate frame in
-         the NDF is used. If this fails, and the parameter value ends 
-         with {\tt .FIT}, an attempt is made to interpret the parameter value
-         as the name of a FITS file. If successful, the primary WCS 
-         co-ordinate system from the primary HDU headers is used. If the 
-         above attempt fails, an attempt is made to interpret the parameter 
-         value as the name of a text file containing either an AST Frame 
-         dump (such as produced by commands in the ATOOLS package), or a 
-         set of FITS headers.
+         Specifies the co-ordinate Frame of the positions supplied through
+         Parameters POSITION or FILE.  There is a cascade of allowed
+         interpretations of this parameter value; the search for the 
+         co-ordinate Frame ends once there is a successful interpretation, 
+         otherwise the search moves on to the next possible meaning in 
+         the following order.
+         
+         \begin{enumerate}
+         \item An HDS path containing a WCS FrameSet, whose current 
+         Frame defines the co-ordinate Frame.
 
-         If all the above fails, and the parameter value looks like an 
-         IRAS90 \emph{Sky Co-ordinate System} (SCS) string
+         \item The name of an NDF, whose current WCS co-ordinate Frame
+         is used.
+
+         \item If the parameter value ends with {\tt .FIT}, an attempt is 
+         made to interpret the parameter value as the name of a FITS file. 
+         If successful, the primary WCS co-ordinate system from the primary 
+         HDU headers is used.  
+
+         \item A text file containing either an AST Frame dump (such as 
+         produced by commands in the ATOOLS package), or a set of FITS 
+         WCS headers.
+
+         \item An IRAS90 \emph{Sky Co-ordinate System} (SCS) string
          such as {\tt "EQUAT(J2000)"} (see \xref{SUN/163}{sun163}{}),
-         then the positions are assumed to be two-dimensional
-         celestial co-ordinates in the specified system.  Otherwise, the
-         given string is used as a Domain name without any interpretation. 
-         Any Domain name may be supplied, but normally one of the standard 
+         whereupon the positions are assumed to be two-dimensional
+         celestial co-ordinates in the specified system. 
+
+         \item Domain name without any interpretation.   Any Domain name may
+         be supplied, but normally one of the standard 
          \htmlref{Domain names}{se:domains}, such as 
          \htmlref{GRID, PIXEL, GRAPHICS}{se:resdoms}~ should be given.  
          Parameter DIM is used to determine the number of axes in the Frame.  
+         \end{enumerate}
 
          This parameter is only accessed if the parameter NDF is given a 
          null value.
