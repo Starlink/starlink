@@ -39,6 +39,14 @@
 *     such that the input data sets can be tracked into the output file
 *     (very important for data provenance tracking).
 
+*     Keywords that relate to state from the beginning and end of the
+*     observation are propogated explicitly to the merged header such
+*     that the values from the newest and oldest header are retained
+*     each time. This allows for DATE-OBS and DATE-END headers to be
+*     propogated correctly, in addition to headers describing the
+*     azimuth, and elevation, temperature and windspeed at the start
+*     and end of the combined header.
+
 *  Authors:
 *     TIMJ: Tim Jenness (JAC, Hawaii)
 *     DSB: David Berry (JAC, UCLan)
@@ -60,12 +68,15 @@
 *        Remove ASTWARN cards form the output header.
 *     2008-07-31 (TIMJ):
 *        Change getobsidss API to be thread-safe.
+*     2009-06-17 (TIMJ):
+*        Now correctly retain START and END FITS headers during merge
+*        so that we end up with a DATE-OBS and DATE-END (among others)
+*        in output maps/cubes.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2007 Particle Physics and Astronomy Research Council.
-*     Copyright (C) 2007 Science and Technology Facilities Council.
-*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2007-2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -92,7 +103,12 @@
 #include "smf.h"
 #include "sae_par.h"
 #include "ast.h"
+#include "mers.h"
 #include "star/atl.h"
+
+static void
+smf__fits_copy_items( AstFitsChan * fromfits, AstFitsChan * tofits,
+                      const char ** items, int * status );
 
 void smf_fits_outhdr( AstFitsChan * inhdr, AstFitsChan ** outhdr,
                       AstKeyMap ** obsidmap, int * status ) {
@@ -100,6 +116,55 @@ void smf_fits_outhdr( AstFitsChan * inhdr, AstFitsChan ** outhdr,
 /* Local Variables: */
    char obsidss[SZFITSCARD];     /* Somewhere to put the obsidss */
    AstFitsChan *temphdr = NULL;  /* FitsChan holding temporary FITS headers */
+
+/* List of BEGIN  headers that are retained even if different */
+   const char * begin_items[] = {
+     "DATE-OBS",
+     "DUT1",
+     "LOFREQS",
+     "AMSTART",
+     "AZSTART",
+     "ELSTART",
+     "HSTSTART",
+     "LSTSTART",
+     "TSPSTART",
+     "ATSTART",
+     "HUMSTART",
+     "BPSTART",
+     "WNDSPDST"
+     "WNDDIRST",
+     "TAU225ST",
+     "TAUDATST",
+     "WVMTAUST",
+     "WVMDATST",
+     "SEEINGST",
+     "FRLEGTST",
+     "BKLEGTST",
+     NULL
+   };
+   const char * end_items[] = {
+     "DATE-END",
+     "LOFREQE",
+     "AMEND",
+     "AZEND",
+     "ELEND",
+     "HSTEND",
+     "LSTEND",
+     "TSPEND",
+     "ATEND",
+     "HUMEND",
+     "BPEND",
+     "WNDSPDEN"
+     "WNDDIREN",
+     "TAU225EN",
+     "TAUDATEN",
+     "WVMTAUEN",
+     "WVMDATEN",
+     "SEEINGEN",
+     "FRLEGTEN",
+     "BKLEGTEN",
+     NULL
+   };
 
 /* Check inherited status. */
    if ( *status != SAI__OK ) return;
@@ -116,7 +181,52 @@ void smf_fits_outhdr( AstFitsChan * inhdr, AstFitsChan ** outhdr,
    output FITS extension that do not have identical values in the input
    FITS extension. */
    } else {
-      atlMgfts( 3, inhdr, *outhdr, &temphdr, status );
+     smfHead hdr;
+     double mjdnew = 0.0;
+     double mjdref = 0.0;
+     AstFitsChan * begfits = NULL;
+     AstFitsChan * endfits = NULL;
+
+     /* need to make sure that the merging will not remove headers that need
+      to be retained covering start and end state. This means that we take a copy
+      of the input header and manually synchronize END/START headers before calling
+      the ATL merge routine. */
+
+     /* Do not have access to smfData so need to set one up or duplicate code
+        in smf_find_dateobs */
+     hdr.allState = NULL;
+     hdr.fitshdr = inhdr;
+     smf_find_dateobs( &hdr, &mjdnew, NULL, status );
+     hdr.fitshdr = *outhdr;
+     smf_find_dateobs( &hdr, &mjdref, NULL, status );
+
+     if (mjdnew < mjdref) {
+       /* input header is older than merged header:
+          Copy beginfits from INPUT to MERGE
+          Copy endfits from MERGE to INPUT
+       */
+       begfits = astCopy( inhdr );
+       endfits = astCopy( *outhdr );
+     } else {
+       /* input header is newer than merged header:
+          Copy beginfits from MERGE to INPUT
+          Copy endfits from INPUT to MERGE
+
+          Do this even if dates are identical.
+        */
+       begfits = astCopy( *outhdr );
+       endfits = astCopy( inhdr );
+     }
+
+     /* oldfits gets the END items from newfits.
+        newfits gets the BEGIN items from oldfits*/
+     smf__fits_copy_items( begfits, endfits, begin_items, status );
+     smf__fits_copy_items( endfits, begfits, end_items, status );
+
+     /* now we can merge oldfits and newfits */
+      atlMgfts( 3, begfits, endfits, &temphdr, status );
+      (void) astAnnul( begfits );
+      (void) astAnnul( endfits );
       (void) astAnnul( *outhdr );
       *outhdr = temphdr;
    }
@@ -139,4 +249,40 @@ void smf_fits_outhdr( AstFitsChan * inhdr, AstFitsChan ** outhdr,
                                smf_getobsidss( inhdr, NULL, 0, obsidss,
                                                sizeof(obsidss), status ),
                                1, NULL );
+}
+
+
+/*
+  copy the cards with keywords listed in "items" from "fromfits"
+  to "tofits".
+ */
+
+static void
+smf__fits_copy_items( AstFitsChan * fromfits, AstFitsChan * tofits,
+                      const char ** items, int * status ) {
+  size_t i = 0;
+
+  if (*status != SAI__OK) return;
+
+  while ( items[i] != NULL ) {
+    char card[ 81 ];
+
+    /* reset the position each time since we can not be sure that
+       "items" is in order */
+    astClear( fromfits, "Card" );
+
+    /* Look in fromfits for the card */
+    if ( astFindFits( fromfits, items[i], card, 0  ) ) {
+
+      /* now look in tofits for the card */
+      astClear( tofits, "Card" );
+      if ( astFindFits( tofits, items[i], NULL, 0 ) ) {
+        /* and if we find it replace it */
+        astPutFits( tofits, card, 1 );
+      }
+    }
+
+    i++;
+  }
+
 }
