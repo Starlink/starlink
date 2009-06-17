@@ -795,7 +795,7 @@ void smf_fits_getS( const smfHead * hdr, const char * cardname,
                     char result[70], size_t len, int * status );
 
 void smf_fits_outhdr( AstFitsChan * inhdr, AstFitsChan ** outhdr,
-                      AstKeyMap ** obsidmap, int * status );
+                      int * status );
 
 int smf_fits_updateD( smfHead * hdr, const char * name, double value, 
                       const char * comment, int *status );

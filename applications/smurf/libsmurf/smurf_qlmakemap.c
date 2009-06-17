@@ -462,7 +462,7 @@ void smurf_qlmakemap( int *status ) {
     smf_check_units( i, data_units, data->hdr, status);
 
     /* Handle output FITS header creation */
-    smf_fits_outhdr( data->hdr->fitshdr, &fchan, NULL, status );
+    smf_fits_outhdr( data->hdr->fitshdr, &fchan, status );
 
     /* Synchronize bad values with QUALITY */
     smf_update_valbad( data, ~(SMF__Q_JUMP|SMF__Q_STAT), status );

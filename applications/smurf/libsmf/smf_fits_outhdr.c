@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_fits_outhdr( const AstFitsChan * inhdr, AstFitsChan ** outhdr,
-*                      AstKeyMap ** obsidmap, int * status );
+*                      int * status );
 
 *  Arguments:
 *     inhdr = const AstFitsChan * (Given)
@@ -23,10 +23,6 @@
 *        Output FITS header. *outhdr should be NULL for the first
 *        call to this routine (it will then be populated with a copy of
 *        the first inhdr).
-*     obsidmap = AstKeyMap ** (Given & Returned)
-*        Keymap for tracking OBSID information. *obsidmap should be NULL 
-*        for the first call to this routine. Also, the supplied pointer 
-*        itself may be NULL, in which case no KeyMap is created.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -34,10 +30,7 @@
 *     This function is used to build up an output FITS header (as a 
 *     FitsChan) by merging content from all the input FITS headers.
 *     Values in the FITS headers that differ are removed. It should be 
-*     called once for each input FITS header. Additionally, the routine 
-*     keeps track of all the OBSIDs present in the input FITS headers
-*     such that the input data sets can be tracked into the output file
-*     (very important for data provenance tracking).
+*     called once for each input FITS header.
 
 *     Keywords that relate to state from the beginning and end of the
 *     observation are propogated explicitly to the merged header such
@@ -72,6 +65,8 @@
 *        Now correctly retain START and END FITS headers during merge
 *        so that we end up with a DATE-OBS and DATE-END (among others)
 *        in output maps/cubes.
+*        Remove obsid map argument since provenance is now handled using
+*        NDG.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -111,10 +106,9 @@ smf__fits_copy_items( AstFitsChan * fromfits, AstFitsChan * tofits,
                       const char ** items, int * status );
 
 void smf_fits_outhdr( AstFitsChan * inhdr, AstFitsChan ** outhdr,
-                      AstKeyMap ** obsidmap, int * status ) {
+                      int * status ) {
 
 /* Local Variables: */
-   char obsidss[SZFITSCARD];     /* Somewhere to put the obsidss */
    AstFitsChan *temphdr = NULL;  /* FitsChan holding temporary FITS headers */
 
 /* List of BEGIN  headers that are retained even if different */
@@ -174,7 +168,6 @@ void smf_fits_outhdr( AstFitsChan * inhdr, AstFitsChan ** outhdr,
    header for the output NDF. Also create the output key map at this point. */
    if( *outhdr == NULL ) {
       *outhdr = astCopy( inhdr );
-      if( obsidmap ) *obsidmap = astKeyMap( " " );
 
 /* If this is not the first file, merge the input NDF's FITS extension
    into the output NDF's FITS extension by removing any headers from the
@@ -241,14 +234,6 @@ void smf_fits_outhdr( AstFitsChan * inhdr, AstFitsChan ** outhdr,
       astDelFits( *outhdr );
    }
 
-/* Work out the OBSID - note that we obtain the value from the input FITS
-   header so that we do not risk losing the value after merging of the
-   FITS headers. CADC require that it is OBSIDSS that is unique and the
-   thing that should be tracked. */
-   if( obsidmap ) astMapPut0I( *obsidmap, 
-                               smf_getobsidss( inhdr, NULL, 0, obsidss,
-                                               sizeof(obsidss), status ),
-                               1, NULL );
 }
 
 

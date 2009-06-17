@@ -992,7 +992,7 @@ void smurf_makemap( int *status ) {
 
           /* Handle output FITS header creation */
           if (*status == SAI__OK)
-            smf_fits_outhdr( data->hdr->fitshdr, &fchan, NULL, status );
+            smf_fits_outhdr( data->hdr->fitshdr, &fchan, status );
 
           /* Report the name of the input file. */
           if (data->file && data->file->name) {
@@ -1212,7 +1212,7 @@ void smurf_makemap( int *status ) {
 
       /* Handle output FITS header creation (since the file is open and
          the header is available) */
-      smf_fits_outhdr( data->hdr->fitshdr, &fchan, NULL, status );
+      smf_fits_outhdr( data->hdr->fitshdr, &fchan, status );
 
       /* close the input file */
       smf_close_file( &data, status );

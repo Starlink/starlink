@@ -1633,7 +1633,7 @@ void smurf_makecube( int *status ) {
                }
          
 /* Handle output FITS header creation/manipulation */
-               smf_fits_outhdr( data->hdr->fitshdr, &fchan, NULL, status );
+               smf_fits_outhdr( data->hdr->fitshdr, &fchan, status );
          
 /* Rebin the data into the output grid. */
                if( !sparse ) {
