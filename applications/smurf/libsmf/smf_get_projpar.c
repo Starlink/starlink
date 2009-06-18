@@ -225,7 +225,7 @@ void smf_get_projpar( AstSkyFrame *skyframe, const double skyref[2],
 
 /* If autogrid values were not found, use the following fixed default 
    values. */
-      if( !autogrid || autogrid && par[ 0 ] == AST__BAD ) {
+      if( !autogrid || ( autogrid && par[ 0 ] == AST__BAD ) ) {
          par[ 0 ] = 0.0;
          par[ 1 ] = 0.0;
          par[ 4 ] = (6.0/3600.0)*AST__DD2R;
