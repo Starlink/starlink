@@ -2385,7 +2385,7 @@ static void VerifyAttrs( AstDSBSpecFrame *this, const char *purp,
 *     - The attributes which define the transformation to or from topocentric 
 *     frequency should be assigned their correct values before accessing
 *     this attribute. These potentially include System, Unit, StdOfRest, 
-*     ObsLon, ObsLat, Epoch, RefRA, RefDec and RestFreq.
+*     ObsLon, ObsLat, ObsAlt, Epoch, RefRA, RefDec and RestFreq.
 
 *att--
 */

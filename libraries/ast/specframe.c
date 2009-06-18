@@ -1048,10 +1048,11 @@ static int EqualSor( AstSpecFrame *this, AstSpecFrame *that, int *status ) {
       } else if( sor == AST__GESOR || sor == AST__BYSOR || sor == AST__HLSOR ){
          if( !EQUAL( astGetEpoch( this ), astGetEpoch( that ) ) ) result = 0;
 
-/* For topocentric rest frame, the epoch and observer position must be the 
-   same */
+/* For topocentric rest frame, the epoch and position of the observer must be 
+   the same */
       } else if( sor == AST__TPSOR ){
          if( !EQUAL( astGetEpoch( this ), astGetEpoch( that ) ) ||
+             !EQUAL( astGetObsAlt( this ), astGetObsAlt( that ) ) ||
              !EQUAL( astGetObsLon( this ), astGetObsLon( that ) ) ||
              !EQUAL( astGetObsLat( this ), astGetObsLat( that ) ) ) result = 0;
       
@@ -4196,7 +4197,7 @@ static int SorConvert( AstSpecFrame *this, AstSpecFrame *that,
 */
 
 /* Local Constants: */
-#define MAX_ARGS 5               /* Max arguments for an SpecMap conversion */
+#define MAX_ARGS 7               /* Max arguments for an SpecMap conversion */
 
 /* Local Variables: */
    AstStdOfRestType from;        /* Input standard of rest */
@@ -4205,6 +4206,7 @@ static int SorConvert( AstSpecFrame *this, AstSpecFrame *that,
    double args[ MAX_ARGS ];      /* Conversion argument array */
    double dec;                   /* DEC of source (radians, FK5 J2000) */
    double epoch;                 /* Epoch of observation (MJD) */
+   double alt;                   /* Observers geodetic altitude (radians) */
    double lat;                   /* Observers geodetic latitude (radians) */
    double lon;                   /* Observers geodetic longitude (radians) */
    double ra;                    /* RA of source (radians, FK5 J2000) */
@@ -4235,12 +4237,13 @@ static int SorConvert( AstSpecFrame *this, AstSpecFrame *that,
         args[ 2 ] = arg2; \
         astSpecAdd( specmap, cvt, args );
 
-#define TRANSFORM_5(cvt,arg0,arg1,arg2,arg3,arg4) \
+#define TRANSFORM_6(cvt,arg0,arg1,arg2,arg3,arg4,arg5) \
         args[ 0 ] = arg0; \
         args[ 1 ] = arg1; \
         args[ 2 ] = arg2; \
         args[ 3 ] = arg3; \
         args[ 4 ] = arg4; \
+        args[ 5 ] = arg5; \
         astSpecAdd( specmap, cvt, args );
 
 /* A string for use in error messages. */
@@ -4252,6 +4255,7 @@ static int SorConvert( AstSpecFrame *this, AstSpecFrame *that,
       dec = astGetRefDec( this );
       lon = astGetObsLon( this );
       lat = astGetObsLat( this );
+      alt = astGetObsAlt( this );
       epoch = astGetEpoch( this );
 
 /* Verify that the reference RA and DEC can be used (they are needed by all 
@@ -4260,8 +4264,8 @@ static int SorConvert( AstSpecFrame *this, AstSpecFrame *that,
 
 /* Convert from the "this" rest frame to heliographic. */
       if( from == AST__TPSOR ) {
-         VerifyAttrs( this, vmess, "ObsLon ObsLat Epoch", "astMatch", status );
-         TRANSFORM_5( "TPF2HL", lon, lat, epoch, ra, dec )
+         VerifyAttrs( this, vmess, "ObsLon ObsLat ObsAlt Epoch", "astMatch", status );
+         TRANSFORM_6( "TPF2HL", lon, lat, alt, epoch, ra, dec )
       
       } else if( from == AST__GESOR ) {
          VerifyAttrs( this, vmess, "Epoch", "astMatch", status );
@@ -4294,12 +4298,13 @@ static int SorConvert( AstSpecFrame *this, AstSpecFrame *that,
       dec = astGetRefDec( that );
       lon = astGetObsLon( that );
       lat = astGetObsLat( that );
+      alt = astGetObsAlt( that );
       epoch = astGetEpoch( that );
       VerifyAttrs( that, vmess, "RefRA RefDec", "astMatch", status );
 
       if( to == AST__TPSOR ) {
-         VerifyAttrs( that, vmess, "ObsLon ObsLat Epoch", "astMatch", status );
-         TRANSFORM_5( "HLF2TP", lon, lat, epoch, ra, dec )
+         VerifyAttrs( that, vmess, "ObsLon ObsLat ObsAlt Epoch", "astMatch", status );
+         TRANSFORM_6( "HLF2TP", lon, lat, alt, epoch, ra, dec )
    
       } else if( to == AST__GESOR ) {
          VerifyAttrs( that, vmess, "Epoch", "astMatch", status );
@@ -4334,7 +4339,7 @@ static int SorConvert( AstSpecFrame *this, AstSpecFrame *that,
 #undef MAX_ARGS
 #undef TRANSFORM_2
 #undef TRANSFORM_3
-#undef TRANSFORM_5
+#undef TRANSFORM_6
 }
 
 static const char *SpecMapUnit( AstSystemType system, const char *method,
@@ -5603,11 +5608,15 @@ static void VerifyAttrs( AstSpecFrame *this, const char *purp,
 
                   if( !strncmp( "ObsLat", a, len ) ) {
                      set = astTestObsLat( this );
-                     desc = "observatory latitude";
+                     desc = "observer's latitude";
 
                   } else if( !strncmp( "ObsLon", a, len ) ) {
                      set = astTestObsLon( this );
-                     desc = "observatory longitude";
+                     desc = "observer's longitude";
+
+                  } else if( !strncmp( "ObsAlt", a, len ) ) {
+                     set = astTestObsAlt( this );
+                     desc = "observer's altitude";
 
                   } else if( !strncmp( "RefRA", a, len ) ) {
                      set = astTestRefRA( this );
@@ -5741,13 +5750,13 @@ f     When AST_FindFrame or AST_CONVERT is used on two SpecFrames (potentially
 *
 *     - Map these values from the target's standard of rest to the standard of
 *     rest specified by the AlignStdOfRest attribute, using the Epoch, ObsLat, 
-*     ObsLon, RefDec and RefRA attributes of the target to define the two
-*     standards of rest.
+*     ObsLon, ObsAlt, RefDec and RefRA attributes of the target to define the 
+*     two standards of rest.
 *
 *     - Map these values from the standard of rest specified by the 
 *     AlignStdOfRest attribute, to the template's standard of rest, using the 
-*     Epoch, ObsLat, ObsLon, RefDec and RefRA attributes of the template to 
-*     define the two standards of rest.
+*     Epoch, ObsLat, ObsLon, ObsAlt, RefDec and RefRA attributes of the 
+*     template to define the two standards of rest.
 *
 *     - Map these values from the system specified by the AlignSystem 
 *     attribute, to the system used by the template, using the template's 
@@ -6149,8 +6158,8 @@ astMAKE_SET(SpecFrame,SourceSys,AstSystemType,sourcesys,(
 *     to be on the surface of the earth). Spectra recorded in this standard of 
 *     rest suffer a Doppler shift which varies over the course of a day
 *     because of the rotation of the observer around the axis of the earth.
-*     This standard of rest must be qualified using the ObsLat, ObsLon, Epoch, 
-*     RefRA and RefDec attributes. 
+*     This standard of rest must be qualified using the ObsLat, ObsLon,
+*     ObsAlt, Epoch, RefRA and RefDec attributes. 
 *
 *     - "Geocentric", "Geocentr" or "Geo": The rest-frame of the earth centre. 
 *     Spectra recorded in this standard of rest suffer a Doppler shift which 

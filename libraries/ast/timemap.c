@@ -47,6 +47,8 @@ f     - AST_TIMEADD: Add a time coordinate conversion to an TimeMap
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
 *     Research Councils
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -89,6 +91,9 @@ f     - AST_TIMEADD: Add a time coordinate conversion to an TimeMap
 *        in Transform.
 *     20-MAY-2008 (DSB):
 *        Add conversions between Local Time and UTC (LTTOUTC and UTCTOLT).
+*     18-JUN-2009 (DSB):
+*        Add OBSALT to argument list for TTTOTDB and TDBTOTT. Change
+*        CLOCKLAT/LON to OBSLAT/LON for consistency with other classes.
 *class--
 */
 
@@ -130,7 +135,7 @@ f     - AST_TIMEADD: Add a time coordinate conversion to an TimeMap
 #define AST__UTCTOLT    27       /* UTC to Local Time */
 
 /* Maximum number of arguments required by a conversion. */
-#define MAX_ARGS 5
+#define MAX_ARGS 6
 
 /* The alphabet (used for generating keywords for arguments). */
 #define ALPHABET "abcdefghijklmnopqrstuvwxyz"
@@ -513,15 +518,15 @@ static void AddArgs( int cvttype, double *cvtargs, int *status ) {
       break;
 
    case AST__TTTOTDB:
-      palSlaGeoc( cvtargs[ 2 ], 0.0, &r, &z );      
-      cvtargs[ 3 ] = 0.001*r*AST__AU;
-      cvtargs[ 4 ] = 0.001*z*AST__AU;
+      palSlaGeoc( cvtargs[ 2 ], cvtargs[ 3 ], &r, &z );      
+      cvtargs[ 4 ] = 0.001*r*AST__AU;
+      cvtargs[ 5 ] = 0.001*z*AST__AU;
       break;
 
    case AST__TDBTOTT:
-      palSlaGeoc( cvtargs[ 2 ], 0.0, &r, &z );      
-      cvtargs[ 3 ] = 0.001*r*AST__AU;
-      cvtargs[ 4 ] = 0.001*z*AST__AU;
+      palSlaGeoc( cvtargs[ 2 ], cvtargs[ 3 ], &r, &z );      
+      cvtargs[ 4 ] = 0.001*r*AST__AU;
+      cvtargs[ 5 ] = 0.001*z*AST__AU;
       break;
 
    case AST__TDBTOTCB:
@@ -621,9 +626,9 @@ static void AddTimeCvt( AstTimeMap *this, int cvttype, const double *args, int *
 *           Convert a TAI MJD to a TT MJD.
 *        AST__TTTOTAI( MJDOFF )
 *           Convert a TT MJD to a TAI MJD.
-*        AST__TTTOTDB( MJDOFF, CLOCKLON, CLOCKLAT )
+*        AST__TTTOTDB( MJDOFF, OBSLON, OBSLAT, OBSALT )
 *           Convert a TT MJD to a TDB MJD.
-*        AST__TDBTOTT( MJDOFF, CLOCKLON, CLOCKLAT )
+*        AST__TDBTOTT( MJDOFF, OBSLON, OBSLAT, OBSALT )
 *           Convert a TDB MJD to a TT MJD.
 *        AST__TTTOTCG( MJDOFF )
 *           Convert a TT MJD to a TCG MJD.
@@ -637,13 +642,13 @@ static void AddTimeCvt( AstTimeMap *this, int cvttype, const double *args, int *
 *           Convert a UT MJD to a GMST MJD.
 *        AST__GMSTTOUT( MJDOFF )
 *           Convert a GMST MJD to a UT MJD.
-*        AST__GMSTTOLMST( MJDOFF, CLOCKLON, CLOCKLAT )
+*        AST__GMSTTOLMST( MJDOFF, OBSLON, OBSLAT )
 *           Convert a GMST MJD to a LMST MJD.
-*        AST__LMSTTOGMST( MJDOFF, CLOCKLON, CLOCKLAT )
+*        AST__LMSTTOGMST( MJDOFF, OBSLON, OBSLAT )
 *           Convert a LMST MJD to a GMST MJD.
-*        AST__LASTTOLMST( MJDOFF, CLOCKLON, CLOCKLAT )
+*        AST__LASTTOLMST( MJDOFF, OBSLON, OBSLAT )
 *           Convert a LAST MJD to a LMST MJD.
-*        AST__LMSTTOLAST( MJDOFF, CLOCKLON, CLOCKLAT )
+*        AST__LMSTTOLAST( MJDOFF, OBSLON, OBSLAT )
 *           Convert a LMST MJD to a LAST MJD.
 *        AST__UTTOUTC( DUT1 )
 *           Convert a UT1 MJD to a UTC MJD.
@@ -667,8 +672,9 @@ static void AddTimeCvt( AstTimeMap *this, int cvttype, const double *args, int *
 *     - JDOFF: Offset to be added to each JD value
 *     - JEPOFF: Offset to be added to each Julian epoch value
 *     - BEPOFF: Offset to be added to each Besselian epoch value
-*     - CLOCKLON: Clock longitude in radians (+ve westwards)
-*     - CLOCKLAT: Clock geodetic latitude in radians (+ve northwards)
+*     - OBSLON: Observer's longitude in radians (+ve westwards)
+*     - OBSLAT: Observer's geodetic latitude in radians (+ve northwards)
+*     - OBSALT: Observer's geodetic altitude in metres.
 *     - DUT1: The value of UT1-UTC
 *     - LTOFF: The offset between Local Time and UTC (in hours, positive 
 *     for time zones east of Greenwich).
@@ -1067,25 +1073,27 @@ static const char *CvtString( int cvt_code, const char **comment,
    case AST__TTTOTDB:
       *comment = "Convert TT to TDB";
       result = "TTTOTDB";
-      *nargs = 3;
-      *szargs = 5;
+      *nargs = 4;
+      *szargs = 6;
       arg[ 0 ] = "MJD offset";
-      arg[ 1 ] = "Clock longitude";
-      arg[ 2 ] = "Clock latitude";
-      arg[ 3 ] = "Distance from earth spin axis";
-      arg[ 4 ] = "Distance north of equatorial plane";
+      arg[ 1 ] = "Observer longitude";
+      arg[ 2 ] = "Observer latitude";
+      arg[ 3 ] = "Observer altitude";
+      arg[ 4 ] = "Distance from earth spin axis";
+      arg[ 5 ] = "Distance north of equatorial plane";
       break;
 
    case AST__TDBTOTT:
       *comment = "Convert TDB to TT";
       result = "TDBTOTT";
-      *nargs = 3;
-      *szargs = 5;
+      *nargs = 4;
+      *szargs = 6;
       arg[ 0 ] = "MJD offset";
-      arg[ 1 ] = "Clock longitude";
-      arg[ 2 ] = "Clock latitude";
-      arg[ 3 ] = "Distance from earth spin axis";
-      arg[ 4 ] = "Distance north of equatorial plane";
+      arg[ 1 ] = "Observer longitude";
+      arg[ 2 ] = "Observer latitude";
+      arg[ 3 ] = "Observer altitude";
+      arg[ 4 ] = "Distance from earth spin axis";
+      arg[ 5 ] = "Distance north of equatorial plane";
       break;
 
    case AST__TTTOTCG:
@@ -1146,8 +1154,8 @@ static const char *CvtString( int cvt_code, const char **comment,
       *nargs = 3;
       *szargs = 3;
       arg[ 0 ] = "MJD offset";
-      arg[ 1 ] = "Clock longitude";
-      arg[ 2 ] = "Clock latitude";
+      arg[ 1 ] = "Observer longitude";
+      arg[ 2 ] = "Observer latitude";
       break;
 
    case AST__LMSTTOGMST:
@@ -1156,8 +1164,8 @@ static const char *CvtString( int cvt_code, const char **comment,
       *nargs = 3;
       *szargs = 3;
       arg[ 0 ] = "MJD offset";
-      arg[ 1 ] = "Clock longitude";
-      arg[ 2 ] = "Clock latitude";
+      arg[ 1 ] = "Observer longitude";
+      arg[ 2 ] = "Observer latitude";
       break;
 
    case AST__LASTTOLMST:
@@ -1166,8 +1174,8 @@ static const char *CvtString( int cvt_code, const char **comment,
       *nargs = 3;
       *szargs = 3;
       arg[ 0 ] = "MJD offset";
-      arg[ 1 ] = "Clock longitude";
-      arg[ 2 ] = "Clock latitude";
+      arg[ 1 ] = "Observer longitude";
+      arg[ 2 ] = "Observer latitude";
       break;
 
    case AST__LMSTTOLAST:
@@ -1176,8 +1184,8 @@ static const char *CvtString( int cvt_code, const char **comment,
       *nargs = 3;
       *szargs = 3;
       arg[ 0 ] = "MJD offset";
-      arg[ 1 ] = "Clock longitude";
-      arg[ 2 ] = "Clock latitude";
+      arg[ 1 ] = "Observer longitude";
+      arg[ 2 ] = "Observer latitude";
       break;
 
    case AST__UTTOUTC:
@@ -2192,8 +2200,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                   keep = 0;
 
 /* Now check for conversions which have three user-supplied arguments. */
-               } else if( ( PAIR_CVT2( AST__TTTOTDB, AST__TDBTOTT ) ||
-                            PAIR_CVT2( AST__TDBTOTCB, AST__TCBTOTDB ) ||
+               } else if( ( PAIR_CVT2( AST__TDBTOTCB, AST__TCBTOTDB ) ||
                             PAIR_CVT2( AST__GMSTTOLMST, AST__LMSTTOGMST ) ||
                             PAIR_CVT2( AST__LASTTOLMST, AST__LMSTTOLAST ) ) &&
                           EQUAL( cvtargs[ istep ][ 0 ], 
@@ -2202,6 +2209,19 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                                  cvtargs[ istep + 1 ][ 1 ] ) &&
                           EQUAL( cvtargs[ istep ][ 2 ], 
                                  cvtargs[ istep + 1 ][ 2 ] ) ) {
+                  istep++;
+                  keep = 0;
+
+/* Now check for conversions which have four user-supplied arguments. */
+               } else if( ( PAIR_CVT2( AST__TTTOTDB, AST__TDBTOTT ) ) &&
+                          EQUAL( cvtargs[ istep ][ 0 ], 
+                                 cvtargs[ istep + 1 ][ 0 ] ) &&
+                          EQUAL( cvtargs[ istep ][ 1 ], 
+                                 cvtargs[ istep + 1 ][ 1 ] ) &&
+                          EQUAL( cvtargs[ istep ][ 2 ], 
+                                 cvtargs[ istep + 1 ][ 2 ] ) &&
+                          EQUAL( cvtargs[ istep ][ 3 ], 
+                                 cvtargs[ istep + 1 ][ 3 ] ) ) {
                   istep++;
                   keep = 0;
                }
@@ -2465,11 +2485,11 @@ static double Rcc( double tdb, double ut1, double wl, double u, double v, int *s
 *     ut1
 *        Universal time (only the fraction of the day is relevant)
 *     wl
-*        Clock longitude (radians west)
+*        Observer longitude (radians west)
 *     u
-*        Clock distance from Earth spin axis (km)
+*        Observer distance from Earth spin axis (km)
 *     v
-*        Clock distance north of Earth equatorial plane (km)
+*        Observer distance north of Earth equatorial plane (km)
 *     status
 *        Pointer to the inherited status variable.
 
@@ -3572,18 +3592,18 @@ f     these arguments should be given, via the ARGS array, in the
 *     - "UTCTOTAI" (MJDOFF): Convert a UTC MJD to a TAI MJD.
 *     - "TAITOTT"  (MJDOFF): Convert a TAI MJD to a TT MJD.
 *     - "TTTOTAI"  (MJDOFF): Convert a TT MJD to a TAI MJD.
-*     - "TTTOTDB"  (MJDOFF, CLOCKLON, CLOCKLAT): Convert a TT MJD to a TDB MJD.
-*     - "TDBTOTT"  (MJDOFF, CLOCKLON, CLOCKLAT): Convert a TDB MJD to a TT MJD.
+*     - "TTTOTDB"  (MJDOFF, OBSLON, OBSLAT, OBSALT): Convert a TT MJD to a TDB MJD.
+*     - "TDBTOTT"  (MJDOFF, OBSLON, OBSLAT, OBSALT): Convert a TDB MJD to a TT MJD.
 *     - "TTTOTCG"  (MJDOFF): Convert a TT MJD to a TCG MJD.
 *     - "TCGTOTT"  (MJDOFF): Convert a TCG MJD to a TT MJD.
 *     - "TDBTOTCB" (MJDOFF): Convert a TDB MJD to a TCB MJD.
 *     - "TCBTOTDB" (MJDOFF): Convert a TCB MJD to a TDB MJD.
 *     - "UTTOGMST" (MJDOFF): Convert a UT MJD to a GMST MJD.
 *     - "GMSTTOUT" (MJDOFF): Convert a GMST MJD to a UT MJD.
-*     - "GMSTTOLMST" (MJDOFF, CLOCKLON, CLOCKLAT): Convert a GMST MJD to a LMST MJD.
-*     - "LMSTTOGMST" (MJDOFF, CLOCKLON, CLOCKLAT): Convert a LMST MJD to a GMST MJD.
-*     - "LASTTOLMST" (MJDOFF, CLOCKLON, CLOCKLAT): Convert a GMST MJD to a LMST MJD.
-*     - "LMSTTOLAST" (MJDOFF, CLOCKLON, CLOCKLAT): Convert a LMST MJD to a GMST MJD.
+*     - "GMSTTOLMST" (MJDOFF, OBSLON, OBSLAT): Convert a GMST MJD to a LMST MJD.
+*     - "LMSTTOGMST" (MJDOFF, OBSLON, OBSLAT): Convert a LMST MJD to a GMST MJD.
+*     - "LASTTOLMST" (MJDOFF, OBSLON, OBSLAT): Convert a GMST MJD to a LMST MJD.
+*     - "LMSTTOLAST" (MJDOFF, OBSLON, OBSLAT): Convert a LMST MJD to a GMST MJD.
 *     - "UTTOUTC" (DUT1): Convert a UT1 MJD to a UTC MJD.
 *     - "UTCTOUT" (DUT1): Convert a UTC MJD to a UT1 MJD.
 *     - "LTTOUTC" (LTOFF): Convert a Local Time MJD to a UTC MJD.
@@ -3610,8 +3630,9 @@ f     AST_TRANSFORM
 *     - JDOFF: The zero-point being used with Julian Date values.
 *     - BEPOFF: The zero-point being used with Besselian epoch values.
 *     - JEPOFF: The zero-point being used with Julian epoch values.
-*     - CLOCKLON: Clock longitude in radians (+ve westwards).
-*     - CLOCKLAT: Clock geodetic latitude in radians (+ve northwards).
+*     - OBSLON: Observer longitude in radians (+ve westwards).
+*     - OBSLAT: Observer geodetic latitude (IAU 1975) in radians (+ve northwards).
+*     - OBSALT: Observer geodetic altitude (IAU 1975) in metres.
 *     - DUT1: The UT1-UTC value to use. 
 *     - LTOFF: The offset between Local Time and UTC (in hours, positive 
 *     for time zones east of Greenwich).
@@ -3985,8 +4006,8 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                         tt = time[ point ] + args[ 0 ];
                         tai = tt - (TTOFF/SPD);
                         utc = tai + astDat( tai, 0 )/SPD;
-                        time[ point ] += Rcc( tt, utc, args[ 1 ], args[ 3 ],
-                                              args[ 4 ], status )/SPD;
+                        time[ point ] += Rcc( tt, utc, args[ 1 ], args[ 4 ],
+                                              args[ 5 ], status )/SPD;
                      }
                   }
                } else {
@@ -3995,8 +4016,8 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                         tdb = time[ point ] + args[ 0 ];
                         tai = tdb - (TTOFF/SPD);
                         utc = tai + astDat( tai, 0 )/SPD;
-                        time[ point ] -= Rcc( tdb, utc, args[ 1 ], args[ 3 ],
-                                                args[ 4 ], status )/SPD;
+                        time[ point ] -= Rcc( tdb, utc, args[ 1 ], args[ 4 ],
+                                                args[ 5 ], status )/SPD;
                      }
                   }
                }
@@ -4013,8 +4034,8 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                         tdb = time[ point ] + args[ 0 ];
                         tai = tdb - (TTOFF/SPD);
                         utc = tai + astDat( tai, 0 )/SPD;
-                        time[ point ] -= Rcc( tdb, utc, args[ 1 ], args[ 3 ],
-                                                args[ 4 ], status )/SPD;
+                        time[ point ] -= Rcc( tdb, utc, args[ 1 ], args[ 4 ],
+                                                args[ 5 ], status )/SPD;
                      }
                   }
                } else {
@@ -4023,8 +4044,8 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                         tt = time[ point ] + args[ 0 ];
                         tai = tt - (TTOFF/SPD);
                         utc = tai + astDat( tai, 0 )/SPD;
-                        time[ point ] += Rcc( tt, utc, args[ 1 ], args[ 3 ],
-                                              args[ 4 ], status )/SPD;
+                        time[ point ] += Rcc( tt, utc, args[ 1 ], args[ 4 ],
+                                              args[ 5 ], status )/SPD;
                      }
                   }
                }

@@ -3110,13 +3110,14 @@ static AstMapping *MakeMap( AstTimeFrame *this, AstSystemType sys1,
       }
 
 /* All timescale conversions except UTTOUTC and UTCTOUT require the input (MJD)
-   offset as the first argument. In general, the clock longitude and latitude 
-   are also needed. The Frame class stores longitude values in a +ve
-   eastwards sense, but the TimeMap class needs +ve westwards, so negate 
+   offset as the first argument. In general, the observers longitude, latitude 
+   and altitude are also needed. The Frame class stores longitude values in a 
+   +ve eastwards sense, but the TimeMap class needs +ve westwards, so negate 
    the longitude. */
       args[ 0 ] = args[ 1 ];
       args[ 1 ] = this ? -astGetObsLon( this ) : 0.0;
       args[ 2 ] = this ? astGetObsLat( this ) : 0.0;
+      args[ 3 ] = this ? astGetObsAlt( this ) : 0.0;
 
 /* The UTTOUTC and UTCTOUT conversions required just the DUT1 value. */
       args_ut[ 0 ] = this ? astGetDut1( this ) : 0.0;
@@ -3390,20 +3391,21 @@ static int MakeTimeMapping( AstTimeFrame *target, AstTimeFrame *result,
 /* The main difference between this function and the MakeMap function is
    that this function takes account of the requested alignment frame. But
    the alignment Frame only makes a difference to the overall Mapping if
-   1) the clock positions are different in the target and result Frame,
+   1) the observer's positions are different in the target and result Frame,
    and 2) one or both of the Mappings to or from the alignment frame depends 
-   on the clock position. If either of these 2 conditions is not met,
+   on the observer's position. If either of these 2 conditions is not met,
    then the alignment frame can be ignored, and the simpler MakeMap function
-   can be called. See if the clock positions differ. */
+   can be called. See if the observer's positions differ. */
    clkdiff = ( astGetObsLon( target ) != astGetObsLon( result ) ||
-               astGetObsLat( target ) != astGetObsLat( result ) );
+               astGetObsLat( target ) != astGetObsLat( result ) ||
+               astGetObsAlt( target ) != astGetObsAlt( result ) );
 
-/* See if the Mapping from target to alignment frame depends on the clock
-   position. */
+/* See if the Mapping from target to alignment frame depends on the 
+   observer's position. */
    taclk = CLOCK_SCALE( ts1 ) || CLOCK_SCALE( align_ts );
 
-/* See if the Mapping from alignment to result frame depends on the clock
-   position. */
+/* See if the Mapping from alignment to result frame depends on the 
+   observer's position. */
    arclk = CLOCK_SCALE( align_ts ) || CLOCK_SCALE( ts2 );
 
 /* In addition, the alignment frame is significant if either of the Mappings 
@@ -5846,11 +5848,15 @@ static void VerifyAttrs( AstTimeFrame *this, const char *purp,
 
                   if( !strncmp( "ObsLat", a, len ) ) {
                      set = astTestObsLat( this );
-                     desc = "clock latitude";
+                     desc = "observer latitude";
 
                   } else if( !strncmp( "ObsLon", a, len ) ) {
                      set = astTestObsLon( this );
-                     desc = "clock longitude";
+                     desc = "observer longitude";
+
+                  } else if( !strncmp( "ObsAlt", a, len ) ) {
+                     set = astTestObsAlt( this );
+                     desc = "observer altitude";
 
                   } else if( !strncmp( "Dut1", a, len ) ) {
                      set = astTestDut1( this );

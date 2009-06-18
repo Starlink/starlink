@@ -180,6 +180,8 @@ f     - AST_SHOWMESH: Display a mesh of points on the surface of a Region
 *        Remove methods astGetEnclosure and astSetEnclosure.
 *     15-JUN-2009 (DSB):
 *        Modify MapRegion to use FrameSets properly.
+*     18-JUN-2009 (DSB):
+*        Override ObsAlt accessor methods.
 *class--
 
 *  Implementation Notes:
@@ -1019,6 +1021,11 @@ static double GetEpoch( AstFrame *, int * );
 static int TestEpoch( AstFrame *, int * );
 static void ClearEpoch( AstFrame *, int * );
 static void SetEpoch( AstFrame *, double, int * );
+
+static double GetObsAlt( AstFrame *, int * );
+static int TestObsAlt( AstFrame *, int * );
+static void ClearObsAlt( AstFrame *, int * );
+static void SetObsAlt( AstFrame *, double, int * );
 
 static double GetObsLat( AstFrame *, int * );
 static int TestObsLat( AstFrame *, int * );
@@ -4334,6 +4341,11 @@ void astInitRegionVtab_(  AstRegionVtab *vtab, const char *name, int *status ) {
    frame->SetEpoch = SetEpoch;
    frame->TestEpoch = TestEpoch;
    frame->ClearEpoch = ClearEpoch;
+
+   frame->ClearObsAlt = ClearObsAlt;
+   frame->TestObsAlt = TestObsAlt;
+   frame->GetObsAlt = GetObsAlt;
+   frame->SetObsAlt = SetObsAlt;
 
    frame->ClearObsLat = ClearObsLat;
    frame->TestObsLat = TestObsLat;
@@ -11161,6 +11173,11 @@ MAKE_GET(ObsLat,double)
 MAKE_SET(ObsLat,double,D)
 MAKE_TEST(ObsLat)
 MAKE_CLEAR(ObsLat)
+
+MAKE_GET(ObsAlt,double)
+MAKE_SET(ObsAlt,double,D)
+MAKE_TEST(ObsAlt)
+MAKE_CLEAR(ObsAlt)
 
 /* Clear, Get, Set and Test axis-dependent Frame attributes. */
 MAKE_CLEAR_AXIS(Direction)

@@ -532,6 +532,8 @@
 *        Added NormUnit attribute.
 *     14-JAN-2009 (DSB):
 *        Added astIntersect method.
+*     18-JUN-2009 (DSB):
+*        Added ObsAlt attribute.
 *-
 */
 
@@ -606,6 +608,7 @@ typedef struct AstFrame {
    double epoch;                 /* Epoch as Modified Julian Date */
    double obslat;                /* Geodetic latitude of observer */
    double obslon;                /* Geodetic longitude of observer */
+   double obsalt;                /* Height above reference spheroid (geodetic, metres) */
    double dut1;                  /* UT1-UTC in seconds */
    int *perm;                    /* Pointer to axis permutation array */
    int digits;                   /* Default digits of precision */
@@ -792,6 +795,11 @@ typedef struct AstFrameVtab {
    int (* TestObsLat)( AstFrame *, int * );
    void (* ClearObsLat)( AstFrame *, int * );
    void (* SetObsLat)( AstFrame *, double, int * );
+
+   double (* GetObsAlt)( AstFrame *, int * );
+   int (* TestObsAlt)( AstFrame *, int * );
+   void (* ClearObsAlt)( AstFrame *, int * );
+   void (* SetObsAlt)( AstFrame *, double, int * );
 
    double (* GetDut1)( AstFrame *, int * );
    int (* TestDut1)( AstFrame *, int * );
@@ -1014,6 +1022,11 @@ double astGetObsLat_( AstFrame *, int * );
 int astTestObsLat_( AstFrame *, int * );
 void astClearObsLat_( AstFrame *, int * );
 void astSetObsLat_( AstFrame *, double, int * );
+
+double astGetObsAlt_( AstFrame *, int * );
+int astTestObsAlt_( AstFrame *, int * );
+void astClearObsAlt_( AstFrame *, int * );
+void astSetObsAlt_( AstFrame *, double, int * );
 
 double astGetDut1_( AstFrame *, int * );
 int astTestDut1_( AstFrame *, int * );
@@ -1347,6 +1360,14 @@ astINVOKE(V,astClearObsLat_(astCheckFrame(this),STATUS_PTR))
 #define astSetObsLat(this,value) \
 astINVOKE(V,astSetObsLat_(astCheckFrame(this),value,STATUS_PTR))
 
+#define astGetObsAlt(this) \
+astINVOKE(V,astGetObsAlt_(astCheckFrame(this),STATUS_PTR))
+#define astTestObsAlt(this) \
+astINVOKE(V,astTestObsAlt_(astCheckFrame(this),STATUS_PTR))
+#define astClearObsAlt(this) \
+astINVOKE(V,astClearObsAlt_(astCheckFrame(this),STATUS_PTR))
+#define astSetObsAlt(this,value) \
+astINVOKE(V,astSetObsAlt_(astCheckFrame(this),value,STATUS_PTR))
 
 #define astClearDut1(this) \
 astINVOKE(V,astClearDut1_(astCheckFrame(this),STATUS_PTR))

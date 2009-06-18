@@ -245,6 +245,8 @@ f     The SkyFrame class does not define any new routines beyond those
 *        All sky coordinate systems currently supported by SkyFrame are
 *        left handed. So fix GetDirection method to return zero for all 
 *        longitude axes and 1 for all latitude axes.
+*     18-JUN-2009 (DSB):
+*        Incorporate the new ObsAlt attribute.
 *class--
 */
 
@@ -736,6 +738,7 @@ static void (* parent_clearattrib)( AstObject *, const char *, int * );
 static void (* parent_cleardut1)( AstFrame *, int * );
 static void (* parent_clearepoch)( AstFrame *, int * );
 static void (* parent_clearformat)( AstFrame *, int, int * );
+static void (* parent_clearobsalt)( AstFrame *, int * );
 static void (* parent_clearobslat)( AstFrame *, int * );
 static void (* parent_clearobslon)( AstFrame *, int * );
 static void (* parent_clearsystem)( AstFrame *, int * );
@@ -744,6 +747,7 @@ static void (* parent_setattrib)( AstObject *, const char *, int * );
 static void (* parent_setdut1)( AstFrame *, double, int * );
 static void (* parent_setepoch)( AstFrame *, double, int * );
 static void (* parent_setformat)( AstFrame *, int, const char *, int * );
+static void (* parent_setobsalt)( AstFrame *, double, int * );
 static void (* parent_setobslat)( AstFrame *, double, int * );
 static void (* parent_setobslon)( AstFrame *, double, int * );
 static void (* parent_setsystem)( AstFrame *, AstSystemType, int * );
@@ -849,7 +853,7 @@ static const char *GetTitle( AstFrame *, int * );
 static const char *GetUnit( AstFrame *, int, int * );
 static const char *SystemString( AstFrame *, AstSystemType, int * );
 static double Angle( AstFrame *, const double[], const double[], const double[], int * );
-static double CalcLAST( AstSkyFrame *, double, double, double, double, int * );
+static double CalcLAST( AstSkyFrame *, double, double, double, double, double, int * );
 static double Distance( AstFrame *, const double[], const double[], int * );
 static double Gap( AstFrame *, int, double, int *, int * );
 static double GetBottom( AstFrame *, int, int * );
@@ -887,6 +891,7 @@ static void ClearDut1( AstFrame *, int * );
 static void ClearEpoch( AstFrame *, int * );
 static void ClearEquinox( AstSkyFrame *, int * );
 static void ClearNegLon( AstSkyFrame *, int * );
+static void ClearObsAlt( AstFrame *, int * );
 static void ClearObsLat( AstFrame *, int * );
 static void ClearObsLon( AstFrame *, int * );
 static void ClearProjection( AstSkyFrame *, int * );
@@ -907,6 +912,7 @@ static void SetDut1( AstFrame *, double, int * );
 static void SetEpoch( AstFrame *, double, int * );
 static void SetEquinox( AstSkyFrame *, double, int * );
 static void SetNegLon( AstSkyFrame *, int, int * );
+static void SetObsAlt( AstFrame *, double, int * );
 static void SetObsLat( AstFrame *, double, int * );
 static void SetObsLon( AstFrame *, double, int * );
 static void SetProjection( AstSkyFrame *, const char *, int * );
@@ -1061,7 +1067,8 @@ static double Angle( AstFrame *this_frame, const double a[],
 }
 
 static double CalcLAST( AstSkyFrame *this, double epoch, double obslon,
-                        double obslat, double dut1, int *status ) {
+                        double obslat, double obsalt, double dut1, 
+                        int *status ) {
 /*
 *  Name:
 *     CalcLAST
@@ -1075,7 +1082,8 @@ static double CalcLAST( AstSkyFrame *this, double epoch, double obslon,
 *  Synopsis:
 *     #include "skyframe.h"
 *     double CalcLAST( AstSkyFrame *this, double epoch, double obslon,
-*                      double obslat, double dut1, int *status ) 
+*                      double obslat, double obsalt, double dut1, 
+*                      int *status ) 
 
 *  Class Membership:
 *     SkyFrame member function.
@@ -1093,6 +1101,8 @@ static double CalcLAST( AstSkyFrame *this, double epoch, double obslon,
 *        Observatory geodetic longitude (radians)
 *     obslat
 *        Observatory geodetic latitude (radians)
+*     obsalt
+*        Observatory geodetic altitude (metres)
 *     dut1 
 *        The UT1-UTC correction, in seconds.
 *     status
@@ -1141,6 +1151,9 @@ static double CalcLAST( AstSkyFrame *this, double epoch, double obslon,
 
    astSetObsLat( tdbframe, obslat );
    astSetObsLat( lastframe, obslat );
+
+   astSetObsAlt( tdbframe, obsalt );
+   astSetObsAlt( lastframe, obsalt );
 
 /* Store the DUT1 value. */
    astSetDut1( tdbframe, dut1 );
@@ -1439,6 +1452,55 @@ static void ClearEpoch( AstFrame *this_frame, int *status ) {
    will cause the new LAST to be calculated accurately and stored in the
    SkyFrame. */
    (void) GetLAST( this, status );
+}
+
+static void ClearObsAlt( AstFrame *this, int *status ) {
+/*
+*  Name:
+*     ClearObsAlt
+
+*  Purpose:
+*     Clear the value of the ObsAlt attribute for a SkyFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     void ClearObsAlt( AstFrame *this, int *status )
+
+*  Class Membership:
+*     SkyFrame member function (over-rides the astClearObsAlt method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function clears the ObsAlt value.
+
+*  Parameters:
+*     this
+*        Pointer to the SkyFrame.
+*     status
+*        Pointer to the inherited status variable.
+
+*/
+
+/* Local Variables: */
+   double orig;
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Note the original value */
+   orig = astGetObsAlt( this );
+
+/* Invoke the parent method to clear the Frame ObsAlt. */
+   (*parent_clearobsalt)( this, status );
+
+/* If the value has changed, indicate that the magnitude of the diurnal 
+   aberration vector needs to be re-calculated. */
+   if( orig != astGetObsAlt( this ) ) {
+      ( (AstSkyFrame *) this )->diurab = AST__BAD;
+   }
 }
 
 static void ClearObsLat( AstFrame *this, int *status ) {
@@ -3024,8 +3086,7 @@ static double GetDiurab( AstSkyFrame *this, int *status ) {
 
 *  Description:
 *     This function returns the  magnitude of the diurnal aberration
-*     vector. This value depends only on the observer's geodetic latitude 
-*     (ObsLat) since it assumes an observer altitude of zero.
+*     vector. 
 
 *  Parameters:
 *     this
@@ -3050,7 +3111,7 @@ static double GetDiurab( AstSkyFrame *this, int *status ) {
    value will be reset to AST__BAD if the ObsLat attribute value is 
    changed. This code is transliterated from SLA_AOPPA. */
    if( this->diurab == AST__BAD ) {
-      palSlaGeoc( astGetObsLat( this ), 0.0, &uau, &vau );
+      palSlaGeoc( astGetObsLat( this ), astGetObsAlt( this ), &uau, &vau );
       this->diurab = 2*AST__DPI*uau*SOLSID/C;
    } 
 
@@ -3131,8 +3192,8 @@ static double GetLAST( AstSkyFrame *this, int *status ) {
    the end of the current linear approxcimation period. */
          if( this->klast == AST__BAD ) {
             last1 = CalcLAST( this, this->eplast + 0.4, astGetObsLon( this ),
-                              astGetObsLat( this ), astGetDut1( this ),
-                              status );
+                              astGetObsLat( this ), astGetObsAlt( this ), 
+                              astGetDut1( this ), status );
 
 /* Ensure the change in LAST is positive so that we get a positive ratio. */
             dlast = last1 - this->last;
@@ -4086,6 +4147,9 @@ void astInitSkyFrameVtab_(  AstSkyFrameVtab *vtab, const char *name, int *status
    parent_gettop = frame->GetTop;
    frame->GetTop = GetTop;
 
+   parent_setobsalt = frame->SetObsAlt;
+   frame->SetObsAlt = SetObsAlt;
+
    parent_setobslat = frame->SetObsLat;
    frame->SetObsLat = SetObsLat;
 
@@ -4094,6 +4158,9 @@ void astInitSkyFrameVtab_(  AstSkyFrameVtab *vtab, const char *name, int *status
 
    parent_clearobslon = frame->ClearObsLon;
    frame->ClearObsLon = ClearObsLon;
+
+   parent_clearobsalt = frame->ClearObsAlt;
+   frame->ClearObsAlt = ClearObsAlt;
 
    parent_clearobslat = frame->ClearObsLat;
    frame->ClearObsLat = ClearObsLat;
@@ -7927,8 +7994,8 @@ static void SetLast( AstSkyFrame *this, int *status ) {
 
 /* Calculate the LAST value (in rads) and store in the SkyFrame structure. */
    this->last = CalcLAST( this, epoch, astGetObsLon( this ),
-                          astGetObsLat( this ), astGetDut1( this ),
-                          status );
+                          astGetObsLat( this ), astGetObsAlt( this ), 
+                          astGetDut1( this ), status );
 
 /* Save the TDB MJD to which this LAST corresponds. */
    this->eplast = epoch;
@@ -7938,6 +8005,58 @@ static void SetLast( AstSkyFrame *this, int *status ) {
    by using the ratio between solar and sidereal time. Indicate that
    getLAST should re-calculate the ratio by setting the ratio value bad. */
    this->klast = AST__BAD;
+}
+
+static void SetObsAlt( AstFrame *this, double val, int *status ) {
+/*
+*  Name:
+*     SetObsAlt
+
+*  Purpose:
+*     Set the value of the ObsAlt attribute for a SkyFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     void SetObsAlt( AstFrame *this, double val, int *status )
+
+*  Class Membership:
+*     SkyFrame member function (over-rides the astSetObsAlt method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function sets the ObsAlt value.
+
+*  Parameters:
+*     this
+*        Pointer to the SkyFrame.
+*     val
+*        New ObsAlt value.
+*     status
+*        Pointer to the inherited status variable.
+
+*/
+
+/* Local Variables: */
+   double orig;
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Note the original ObsAlt value. */
+   orig = astGetObsAlt( this );
+
+/* Invoke the parent method to set the Frame ObsAlt. */
+   (*parent_setobsalt)( this, val, status );
+
+/* If the value has changed, indicate that the magnitude of the diurnal 
+   aberration vector needs to be re-calculated. */
+   if( orig != astGetObsAlt( this ) ) {
+      ( (AstSkyFrame *) this )->diurab = AST__BAD;
+   }
+
 }
 
 static void SetObsLat( AstFrame *this, double val, int *status ) {
@@ -9484,6 +9603,11 @@ static void VerifyMSMAttrs( AstSkyFrame *target, AstSkyFrame *result,
                      set1 = astTestObsLat( target );
                      set2 = astTestObsLat( result );
                      desc = "latitude of observer";
+
+                  } else if( !strncmp( "ObsAlt", a, len ) ) {
+                     set1 = astTestObsAlt( target );
+                     set2 = astTestObsAlt( result );
+                     desc = "altitude of observer";
 
                   } else {
                      astError( AST__INTER, "VerifyMSMAttrs(SkyFrame): "

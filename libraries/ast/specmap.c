@@ -61,6 +61,8 @@ f     - AST_SPECADD: Add a spectral coordinate conversion to an SpecMap
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
 *     Research Councils
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -97,6 +99,10 @@ f     - AST_SPECADD: Add a spectral coordinate conversion to an SpecMap
 *     15-NOV-2006 (DSB):
 *        Guard against division by zero when converting freq to wave in
 *        SystemChange.
+*     18-JUN-2009 (DSB):
+*        Add OBSALT argument to TPF2HL and HLF2TP conversions.
+*        Change GEOLON/LAT to OBSLON/LAT for consistency with other
+*        classes.
 *class--
 */
 
@@ -145,7 +151,7 @@ f     - AST_SPECADD: Add a spectral coordinate conversion to an SpecMap
 #define AST__HLF2GL     34       /* Heliocentric to galactic frequency */
 
 /* Maximum number of arguments required by a conversion. */
-#define MAX_ARGS 6
+#define MAX_ARGS 7
 
 /* The alphabet (used for generating keywords for arguments). */
 #define ALPHABET "abcdefghijklmnopqrstuvwxyz"
@@ -234,8 +240,9 @@ static int class_init = 0;       /* Virtual function table initialised? */
 /* Structure to hold parameters and intermediate values describing a
    reference frame */
 typedef struct FrameDef {
-   double geolat;     /* Observers geodetic latitude (rads) */
-   double geolon;     /* Observers geodetic longitude (rads, +ve east) */
+   double obsalt;     /* Observers geodetic altitude (m) */
+   double obslat;     /* Observers geodetic latitude (rads) */
+   double obslon;     /* Observers geodetic longitude (rads, +ve east) */
    double epoch;      /* Julian epoch of observation */
    double refdec;     /* RA of reference point (FK5 J2000) */
    double refra;      /* DEC of reference point (FK5 J2000) */
@@ -266,6 +273,7 @@ static double LsrdVel( double, double, FrameDef *, int * );
 static double LsrkVel( double, double, FrameDef *, int * );
 static double Rate( AstMapping *, double *, int, int, int * );
 static double Refrac( double, int * );
+static double Rverot( double, double, double, double, double, int * );
 static double TopoVel( double, double, FrameDef *, int * );
 static double UserVel( double, double, FrameDef *, int * );
 static int CvtCode( const char *, int * );
@@ -563,9 +571,9 @@ static void AddSpecCvt( AstSpecMap *this, int cvttype, const double *args, int *
 *        AST__HLF2US( VOFF, RA, DEC )
 *           Convert frequency from heliocentric reference frame to 
 *           user-defined.
-*        AST__TPF2HL( GLON, GLAT, EPOCH, RA, DEC )
+*        AST__TPF2HL( OBSLON, OBSLAT, OBSALT, EPOCH, RA, DEC )
 *           Convert from Topocentric to heliocentric frequency
-*        AST__HLF2TP( GLON, GLAT, EPOCH, RA, DEC )
+*        AST__HLF2TP( OBSLON, OBSLAT, OBSALT, EPOCH, RA, DEC )
 *           Convert from Heliocentric to topocentric frequency.
 *        AST__GEF2HL( EPOCH, RA, DEC )
 *           Convert from Geocentric to heliocentric frequency.
@@ -604,8 +612,9 @@ static void AddSpecCvt( AstSpecMap *this, int cvttype, const double *args, int *
 *     The arguments used in the above conversions are as follows:
 *
 *     - RF: Rest frequency (Hz).
-*     - GLAT: Latitude of observer (radians, geodetic).
-*     - GLON: Longitude of observer (radians, positive eastwards).
+*     - OBSALT: Geodetic altitude of observer (IAU 1975, metres).
+*     - OBSLAT: Geodetic latitude of observer (IAU 1975, radians).
+*     - OBSLON: Longitude of observer (radians, positive eastwards).
 *     - EPOCH: Epoch of observation (UT1 expressed as a Modified Julian Date).
 *     - RA: Right Ascension of source (radians, FK5 J2000).
 *     - DEC: Declination of source (radians, FK5 J2000).
@@ -1171,31 +1180,33 @@ static const char *CvtString( int cvt_code, const char **comment,
    case AST__TPF2HL:
       *comment = "Convert from Topocentric to heliocentric frequency";
       result = "TPF2HL";
-      *argra = 3;
-      *argdec = 4;
-      *nargs = 5;
-      *szargs = 6;
+      *argra = 4;
+      *argdec = 5;
+      *nargs = 6;
+      *szargs = 7;
       arg[ 0 ] = "Longitude (positive eastwards, radians)";
       arg[ 1 ] = "Latitude (geodetic, radians)";
-      arg[ 2 ] = "UT1 epoch of observaton (Modified Julian Date)";
-      arg[ 3 ] = "RA of source (FK5 J2000, radians)";
-      arg[ 4 ] = "DEC of source (FK5 J2000, radians)";
-      arg[ 5 ] = "Frequency correction factor";
+      arg[ 2 ] = "Altitude (geodetic, metres)";
+      arg[ 3 ] = "UT1 epoch of observaton (Modified Julian Date)";
+      arg[ 4 ] = "RA of source (FK5 J2000, radians)";
+      arg[ 5 ] = "DEC of source (FK5 J2000, radians)";
+      arg[ 6 ] = "Frequency correction factor";
       break;
 
    case AST__HLF2TP:
       *comment = "Convert from Heliocentric to topocentric frequency";
       result = "HLF2TP";
-      *argra = 3;
-      *argdec = 4;
-      *nargs = 5;
-      *szargs = 6;
+      *argra = 4;
+      *argdec = 5;
+      *nargs = 6;
+      *szargs = 7;
       arg[ 0 ] = "Longitude (positive eastwards, radians)";
       arg[ 1 ] = "Latitude (geodetic, radians)";
-      arg[ 2 ] = "UT1 epoch of observaton (Modified Julian Date)";
-      arg[ 3 ] = "RA of source (FK5 J2000, radians)";
-      arg[ 4 ] = "DEC of source (FK5 J2000, radians)";
-      arg[ 5 ] = "Frequency correction factor";
+      arg[ 2 ] = "Altitude (geodetic, metres)";
+      arg[ 3 ] = "UT1 epoch of observaton (Modified Julian Date)";
+      arg[ 4 ] = "RA of source (FK5 J2000, radians)";
+      arg[ 5 ] = "DEC of source (FK5 J2000, radians)";
+      arg[ 6 ] = "Frequency correction factor";
       break;
 
    case AST__GEF2HL:
@@ -1450,8 +1461,9 @@ static int FrameChange( int cvt_code, int np, double *ra, double *dec, double *f
 
 /* Initialise a structure which stores parameters which define the
    transformation. */
-   def.geolat = AST__BAD;
-   def.geolon = AST__BAD;
+   def.obsalt = AST__BAD;
+   def.obslat = AST__BAD;
+   def.obslon = AST__BAD;
    def.epoch = AST__BAD;
    def.refdec = AST__BAD;
    def.refra = AST__BAD;
@@ -1486,23 +1498,25 @@ static int FrameChange( int cvt_code, int np, double *ra, double *dec, double *f
 
    case AST__TPF2HL:
       cvtFunc = TopoVel;
-      def.geolon = args[ 0 ];
-      def.geolat = args[ 1 ];
-      def.epoch = args[ 2 ];
-      def.refra = args[ 3 ];
-      def.refdec = args[ 4 ];
-      fcorr = args + 5;
+      def.obslon = args[ 0 ];
+      def.obslat = args[ 1 ];
+      def.obsalt = args[ 2 ];
+      def.epoch = args[ 3 ];
+      def.refra = args[ 4 ];
+      def.refdec = args[ 5 ];
+      fcorr = args + 6;
       sign = -1;
       break;
 
    case AST__HLF2TP:
       cvtFunc = TopoVel;
-      def.geolon = args[ 0 ];
-      def.geolat = args[ 1 ];
-      def.epoch = args[ 2 ];
-      def.refra = args[ 3 ];
-      def.refdec = args[ 4 ];
-      fcorr = args + 5;
+      def.obslon = args[ 0 ];
+      def.obslat = args[ 1 ];
+      def.obsalt = args[ 2 ];
+      def.epoch = args[ 3 ];
+      def.refra = args[ 4 ];
+      def.refdec = args[ 5 ];
+      fcorr = args + 6;
       sign = +1;
       break;
 
@@ -2370,7 +2384,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* Exchange transformation codes for their inverses, and reciprocate the
    frequency correction factor. */
-               SWAP_CODES2( AST__TPF2HL, AST__HLF2TP, 5 ) 
+               SWAP_CODES2( AST__TPF2HL, AST__HLF2TP, 6 ) 
                SWAP_CODES2( AST__USF2HL, AST__HLF2US, 3 ) 
                SWAP_CODES2( AST__GEF2HL, AST__HLF2GE, 3 ) 
                SWAP_CODES2( AST__BYF2HL, AST__HLF2BY, 3 ) 
@@ -2467,8 +2481,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                   istep++;
                   keep = 0;
 
-/* Now check for conversions which have five user-supplied arguments (currently
-   no conversions have four user-supplied arguments). */
+/* Now check for conversions which have six user-supplied arguments (currently
+   no conversions have four or five user-supplied arguments). */
                } else if( ( PAIR_CVT2( AST__TPF2HL, AST__HLF2TP ) ) && 
                           EQUAL( cvtargs[ istep ][ 0 ], 
                                  cvtargs[ istep + 1 ][ 0 ] ) &&
@@ -2479,7 +2493,9 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                           EQUAL( cvtargs[ istep ][ 3 ], 
                                  cvtargs[ istep + 1 ][ 3 ] ) &&
                           EQUAL( cvtargs[ istep ][ 4 ], 
-                                 cvtargs[ istep + 1 ][ 4 ] ) ) {
+                                 cvtargs[ istep + 1 ][ 4 ] ) &&
+                          EQUAL( cvtargs[ istep ][ 5 ], 
+                                 cvtargs[ istep + 1 ][ 5 ] ) ) {
                   istep++;
                   keep = 0;
 
@@ -2746,6 +2762,72 @@ static double Refrac( double wavelen, int *status ){
    return 1.0 + 1.0E-6*( 287.6155 + 1.62887*w2 + 0.01360*w2*w2 );
 }
 
+static double Rverot( double phi, double h, double ra, double da, 
+                      double st, int *status ) {
+/*
+*  Name:
+*     Rverot
+
+*  Purpose:
+*     Find the velocity component in a given direction due to Earth rotation. 
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "specmap.h"
+*     double Rverot( double phi, double h, double ra, double da, 
+*                    double st, int *status )
+
+*  Class Membership:
+*     SpecMap method.
+
+*  Description:
+*     This function is like slaRverot, except that it takes account of the
+*     observers height (h), and does all calculations in double precision.
+
+*  Parameters:
+*     phi
+*        The geodetic latitude of the observer (radians, IAU 1976).
+*     h
+*        The geodetic height above the reference spheroid of the observer 
+*        (metres, IAU 1976).
+*     ra 
+*        The geocentric apparent RA (rads) of the source.
+*     da
+*        The geocentric apparent Dec (rads) of the source.
+*     st
+*        The local apparent sidereal time (radians).
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returns:
+*     The component of the Earth rotation in direction [RA,DA] (km/s).
+*     The result is positive when the observer is receding from the
+*     given point on the sky. Zero is returned if an error has already 
+*     occurred.
+
+*/
+
+/* Local Variables: */
+   double pv[ 6 ];           /* Observer position and velocity */
+   double v[ 3 ];            /* Source direction vector */
+
+/* Check the global error status. */
+   if ( !astOK ) return 0.0;
+
+/* Get the Cartesian coordinates of the unit vector pointing towards the
+   given sky position. */
+   palSlaDcs2c( ra, da, v );
+
+/* Get velocity and position of the observer. */
+   palSlaPvobs( phi, h, st, pv );
+
+/* Return the component of the observer's velocity away from the sky
+   position, and convert from AU/s to km/s. */
+   return -palSlaDvdv( v, pv + 3 )*149.597870E6;
+}
+
 static void SpecAdd( AstSpecMap *this, const char *cvt, const double args[], int *status ) {
 /*
 *++
@@ -2869,9 +2951,9 @@ f     these arguments should be given, via the ARGS array, in the
 *     reference frame to heliocentric.
 *     - "HLF2US" (VOFF,RA,DEC): Convert frequency from heliocentric 
 *     reference frame to user-defined.
-*     - "TPF2HL" (GLON,GLAT,EPOCH,RA,DEC): Convert frequency from 
+*     - "TPF2HL" (OBSLON,OBSLAT,OBSALT,EPOCH,RA,DEC): Convert frequency from 
 *     topocentric reference frame to heliocentric.
-*     - "HLF2TP" (GLON,GLAT,EPOCH,RA,DEC): Convert frequency from 
+*     - "HLF2TP" (OBSLON,OBSLAT,OBSALT,EPOCH,RA,DEC): Convert frequency from 
 *     heliocentric reference frame to topocentric.
 *     - "GEF2HL" (EPOCH,RA,DEC): Convert frequency from geocentric 
 *     reference frame to heliocentric.
@@ -2911,8 +2993,9 @@ f     these arguments should be given, via the ARGS array, in the
 *     The arguments used in the above conversions are as follows:
 *
 *     - RF: Rest frequency (Hz).
-*     - GLAT: Geodetic latitude of observer (radians).
-*     - GLON: Geodetic longitude of observer (radians - positive eastwards).
+*     - OBSALT: Geodetic altitude of observer (IAU 1975, metres).
+*     - OBSLAT: Geodetic latitude of observer (IAU 1975, radians).
+*     - OBSLON: Longitude of observer (radians - positive eastwards).
 *     - EPOCH: Epoch of observation (UT1 expressed as a Modified Julian Date).
 *     - RA: Right Ascension of source (radians, FK5 J2000).
 *     - DEC: Declination of source (radians, FK5 J2000).
@@ -3468,12 +3551,12 @@ static double TopoVel( double ra, double dec, FrameDef *def, int *status ) {
    and store in the supplied frame definition structure. */
    if( def->last == AST__BAD ) def->last = palSlaGmst( def->epoch ) + 
                                            palSlaEqeqx( def->epoch ) +
-                                           def->geolon;
+                                           def->obslon;
 
 /* Get the component away from the source, of the velocity of the observer 
    relative to the centre of the earth (in m/s). */
-   vobs = 1000.0*palSlaRverot( (float) def->geolat, (float) raa, (float) deca, 
-                            (float) def->last );
+   vobs = 1000.0*Rverot( def->obslat, def->obsalt, raa, deca, def->last,
+                         status );
 
 /* Get the component away from the source, of the velocity of the earth's 
    centre relative to the Sun, in m/s. */

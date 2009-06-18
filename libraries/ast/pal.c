@@ -31,6 +31,9 @@
 **    31-AUG-2007 (DSB):
 **       Modify palSlaDe2h and palSlaDh2e to apply correction for diurnal 
 **       aberration.
+**    18-JUN-2009 (DSB):
+**       Added palSlaPvobs by translating the corresponding fortran routine
+**       into C (by hand).
 */
 
 #include "pal.h"
@@ -1126,6 +1129,11 @@ s2r=7.272205216643039903848712E-5; double r,d1,d2,t; if(Dt<uQ) { d1=Dt;
 d2=uQ; } else { d1=uQ; d2=Dt; } t=(d1+(d2-51544.5))/36525.0;
 r=palSlaDranrm(s2r*(24110.54841+ (8640184.812866+ (0.093104
 -6.2E-6*t)*t)*t +86400.0*(fmod(d1,1.0)+fmod(d2,1.0)))); return r; }
+
+void palSlaPvobs(double p,double h,double stl,double pv[6]){double
+r,z,s,c,v;double sr=7.292115855306589E-5;palSlaGeoc(p,h,&r,&z);
+s=sin(stl);c=cos(stl);v=sr*r;pv[0]=r*c;pv[1]=r*s;pv[2]=z;
+pv[3]=-v*s;pv[4]=v*c;pv[5]=0.0;}
 
 
 

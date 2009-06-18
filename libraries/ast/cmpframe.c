@@ -54,6 +54,8 @@ f     The CmpFrame class does not define any new routines beyond those
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
 *     Research Councils
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -169,6 +171,8 @@ f     The CmpFrame class does not define any new routines beyond those
 *        SkyAxis attribute such as AsTime will come out wrong since its
 *        value is managed by the SkyFrame class rather than the SkyAxis
 *        class.
+*     18-JUN-2009 (DSB):
+*        Override astSetObsAlt and astClearObsAlt.
 
 *class--
 */
@@ -576,6 +580,7 @@ static const char *(* parent_getdomain)( AstFrame *, int * );
 static const char *(* parent_gettitle)( AstFrame *, int * );
 static double (* parent_angle)( AstFrame *, const double[], const double[], const double[], int * );
 static double (* parent_getepoch)( AstFrame *, int * );
+static double (* parent_getobsalt)( AstFrame *, int * );
 static double (* parent_getobslat)( AstFrame *, int * );
 static double (* parent_getobslon)( AstFrame *, int * );
 static int (* parent_getactiveunit)( AstFrame *, int * );
@@ -583,6 +588,7 @@ static int (* parent_getusedefs)( AstObject *, int * );
 static int (* parent_testattrib)( AstObject *, const char *, int * );
 static void (* parent_clearattrib)( AstObject *, const char *, int * );
 static void (* parent_clearepoch)( AstFrame *, int * );
+static void (* parent_clearobsalt)( AstFrame *, int * );
 static void (* parent_clearobslat)( AstFrame *, int * );
 static void (* parent_clearobslon)( AstFrame *, int * );
 static void (* parent_overlay)( AstFrame *, const int *, AstFrame *, int * );
@@ -590,6 +596,7 @@ static void (* parent_setactiveunit)( AstFrame *, int, int * );
 static void (* parent_setframeflags)( AstFrame *, int, int * );
 static void (* parent_setattrib)( AstObject *, const char *, int * );
 static void (* parent_setepoch)( AstFrame *, double, int * );
+static void (* parent_setobsalt)( AstFrame *, double, int * );
 static void (* parent_setobslat)( AstFrame *, double, int * );
 static void (* parent_setobslon)( AstFrame *, double, int * );
 static void (* parent_setdut1)( AstFrame *, double, int * );
@@ -755,6 +762,10 @@ static void SetObsLon( AstFrame *, double, int * );
 static double GetObsLat( AstFrame *, int * );
 static void ClearObsLat( AstFrame *, int * );
 static void SetObsLat( AstFrame *, double, int * );
+
+static double GetObsAlt( AstFrame *, int * );
+static void ClearObsAlt( AstFrame *, int * );
+static void SetObsAlt( AstFrame *, double, int * );
 
 static void ClearAlignSystem( AstFrame *, int * );
 
@@ -1510,6 +1521,54 @@ static void ClearEpoch( AstFrame *this_frame, int *status ) {
 /* Now clear the Epoch attribute in the two component Frames. */
    astClearEpoch( this->frame1 );
    astClearEpoch( this->frame2 );
+}
+
+static void ClearObsAlt( AstFrame *this_frame, int *status ) {
+/*
+*  Name:
+*     ClearObsAlt
+
+*  Purpose:
+*     Clear the value of the ObsAlt attribute for a CmpFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     void ClearObsAlt( AstFrame *this, int *status )
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the astClearObsAlt method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function clears the ObsAlt value in the component Frames as
+*     well as this CmpFrame.
+
+*  Parameters:
+*     this
+*        Pointer to the CmpFrame.
+*     status
+*        Pointer to the inherited status variable.
+
+*/
+
+/* Local Variables: */
+   AstCmpFrame *this;            /* Pointer to the CmpFrame structure */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the CmpFrame structure. */
+   this = (AstCmpFrame *) this_frame;
+
+/* Invoke the parent method to clear the CmpFrame ObsAlt. */
+   (*parent_clearobsalt)( this_frame, status );
+
+/* Now clear the ObsAlt attribute in the two component Frames. */
+   astClearObsAlt( this->frame1 );
+   astClearObsAlt( this->frame2 );
 }
 
 static void ClearObsLat( AstFrame *this_frame, int *status ) {
@@ -3000,6 +3059,82 @@ static double GetEpoch( AstFrame *this_frame, int *status ) {
    return result;
 }
 
+static double GetObsAlt( AstFrame *this_frame, int *status ) {
+/*
+*  Name:
+*     GetObsAlt
+
+*  Purpose:
+*     Get a value for the ObsAlt attribute of a CmpFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     double GetObsAlt( AstFrame *this, int *status )
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the astGetObsAlt method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function returns a value for the ObsAlt attribute of a
+*     CmpFrame.  
+
+*  Parameters:
+*     this
+*        Pointer to the CmpFrame.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     The ObsAlt attribute value.
+
+*  Notes:
+*     - A value of AST__BAD will be returned if this function is invoked
+*     with the global error status set or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables: */
+   AstCmpFrame *this;            /* Pointer to the CmpFrame structure */
+   double result;                /* Result value to return */
+
+/* Initialise. */
+   result = AST__BAD;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the CmpFrame structure. */
+   this = (AstCmpFrame *) this_frame;
+
+/* If an ObsAlt attribute value has been set, invoke the parent method
+   to obtain it. */
+   if ( astTestObsAlt( this ) ) {
+      result = (*parent_getobsalt)( this_frame, status );
+
+/* Otherwise, if the ObsAlt value is set in the first component Frame,
+   return it. */
+   } else if( astTestObsAlt( this->frame1 ) ){
+      result = astGetObsAlt( this->frame1 );
+
+/* Otherwise, if the ObsAlt value is set in the second component Frame,
+   return it. */
+   } else if( astTestObsAlt( this->frame2 ) ){
+      result = astGetObsAlt( this->frame2 );
+
+/* Otherwise, return the default ObsAlt value from the first component
+   Frame. */
+   } else {
+      result = astGetObsAlt( this->frame1 );
+   }
+
+/* Return the result. */
+   return result;
+}
+
 static double GetObsLat( AstFrame *this_frame, int *status ) {
 /*
 *  Name:
@@ -3719,6 +3854,15 @@ void astInitCmpFrameVtab_(  AstCmpFrameVtab *vtab, const char *name, int *status
 
    parent_clearobslat = frame->ClearObsLat;
    frame->ClearObsLat = ClearObsLat;
+
+   parent_getobsalt = frame->GetObsAlt;
+   frame->GetObsAlt = GetObsAlt;
+
+   parent_setobsalt = frame->SetObsAlt;
+   frame->SetObsAlt = SetObsAlt;
+
+   parent_clearobsalt = frame->ClearObsAlt;
+   frame->ClearObsAlt = ClearObsAlt;
 
    parent_angle = frame->Angle;
    frame->Angle = Angle;
@@ -7454,6 +7598,56 @@ static void SetEpoch( AstFrame *this_frame, double val, int *status ) {
 /* Now set the Epoch attribute in the two component Frames. */
    astSetEpoch( this->frame1, val );
    astSetEpoch( this->frame2, val );
+}
+
+static void SetObsAlt( AstFrame *this_frame, double val, int *status ) {
+/*
+*  Name:
+*     SetObsAlt
+
+*  Purpose:
+*     Set the value of the ObsAlt attribute for a CmpFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     void SetObsAlt( AstFrame *this, double val, int *status )
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the astSetObsAlt method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function sets the ObsAlt value in the component Frames as
+*     well as this CmpFrame.
+
+*  Parameters:
+*     this
+*        Pointer to the CmpFrame.
+*     val
+*        New ObsAlt value.
+*     status
+*        Pointer to the inherited status variable.
+
+*/
+
+/* Local Variables: */
+   AstCmpFrame *this;            /* Pointer to the CmpFrame structure */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the CmpFrame structure. */
+   this = (AstCmpFrame *) this_frame;
+
+/* Invoke the parent method to set the CmpFrame ObsAlt. */
+   (*parent_setobsalt)( this_frame, val, status );
+
+/* Now set the ObsAlt attribute in the two component Frames. */
+   astSetObsAlt( this->frame1, val );
+   astSetObsAlt( this->frame2, val );
 }
 
 static void SetObsLat( AstFrame *this_frame, double val, int *status ) {

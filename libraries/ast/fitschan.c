@@ -870,6 +870,10 @@ f     - AST_TESTFITS: Test if a keyword has a defined value in a FitsChan
 *        ensure the source function has been called (the source function
 *        pointer in the FitsChan is then nullified to ensure it is not 
 *        called again).
+*     18-JUN-2009 (DSB):
+*        Include the effect of observer height (in the ObsAlt attribute)
+*        when creating OBSGEO-X/Y/Z headers, and store a value for
+*        ObsAlt when reading a set of OBSGEO-X/Y/Z headers.
 *class--
 */
 
@@ -23136,6 +23140,7 @@ static int SkySys( AstSkyFrame *skyfrm, int wcstype, FitsStore *store,
    const char *sys;         /* Celestal coordinate system */
    double ep;               /* Epoch of observation (MJD) */
    double eq;               /* Epoch of reference equinox (MJD) */
+   double h;                /* Geodetic altitude of observer (metres) */
    double geolat;           /* Geodetic latitude of observer (radians) */
    double geolon;           /* Geodetic longitude of observer (radians) */
    double r;                /* Distance (in AU) from earth axis */
@@ -23329,13 +23334,14 @@ static int SkySys( AstSkyFrame *skyfrm, int wcstype, FitsStore *store,
       SetItemC( &(store->wcsname), 0, s, (char *) astGetDomain( skyfrm ), status );
    }
 
-/* Store the observers position if set (needed for definition of AzEl
+/* Store the observer's position if set (needed for definition of AzEl
    systems). */
    if( astTestObsLon( skyfrm ) && astTestObsLat( skyfrm ) && s == ' ' ) {
       geolon = astGetObsLon( skyfrm );
       geolat = astGetObsLat( skyfrm );
-      if( geolat != AST__BAD && geolon != AST__BAD ) {
-         palSlaGeoc( geolat, 0.0, &r, &z );
+      h = astGetObsAlt( skyfrm );
+      if( geolat != AST__BAD && geolon != AST__BAD && h != AST__BAD ) {
+         palSlaGeoc( geolat, h, &r, &z );
          r *= AST__AU;
          SetItem( &(store->obsgeox), 0, 0, ' ', r*cos( geolon ), status );
          SetItem( &(store->obsgeoy), 0, 0, ' ', r*sin( geolon ), status );
@@ -23543,6 +23549,7 @@ static AstMapping *SpectralAxes( AstFrameSet *fs, double *dim, int *wperm,
    double crval;           /* The value for the FITS CRVAL keyword */
    double dgbyds;          /* Rate of change of grism parameter wrt "S" at ref. point */
    double dsbydx;          /* Rate of change of "S" wrt "X" at ref. point */
+   double h;               /* Geodetic altitude of observer (metres) */
    double geolat;          /* Geodetic latitude of observer (radians) */
    double geolon;          /* Geodetic longitude of observer (radians) */
    double gval;            /* Value of grism parameter at reference point  */
@@ -24007,8 +24014,9 @@ static AstMapping *SpectralAxes( AstFrameSet *fs, double *dim, int *wperm,
                    s == ' ' ) {
                   geolon = astGetObsLon( specfrm );
                   geolat = astGetObsLat( specfrm );
-                  if( geolat != AST__BAD && geolon != AST__BAD ) {
-                     palSlaGeoc( geolat, 0.0, &r, &z );
+                  h = astGetObsAlt( specfrm );
+                  if( geolat != AST__BAD && geolon != AST__BAD && h != AST__BAD ) {
+                     palSlaGeoc( geolat, h, &r, &z );
                      r *= AST__AU;
                      SetItem( &(store->obsgeox), 0, 0, ' ', r*cos( geolon ), status );
                      SetItem( &(store->obsgeoy), 0, 0, ' ', r*sin( geolon ), status );
@@ -29359,7 +29367,7 @@ static int WcsFromStore( AstFitsChan *this, FitsStore *store,
          SetValue( this, "IMAGFREQ", &val, AST__FLOAT, "[Hz] Image frequency", status );
       }      
 
-/* OBSGEO-X/Y/Z - observers geocentric coords. Note, these always refer
+/* OBSGEO-X/Y/Z - observer's geocentric coords. Note, these always refer
    to the primary axes. */
       if( s == ' ' ) {
          val = GetItem( &(store->obsgeox), 0, 0, s, NULL, method, class, status );
@@ -30980,11 +30988,11 @@ static AstSkyFrame *WcsSkyFrame( AstFitsChan *this, FitsStore *store, char s,
    char sym[10];                  /* Axis symbol */
    double eqmjd;                  /* MJD equivalent of equinox */
    double equinox;                /* EQUINOX value */
-   double geolat;                 /* Observers geodetic latitude */
-   double geolon;                 /* Observers geodetic longitude */
-   double h;                      /* Observers geodetic height */
+   double geolat;                 /* Observer's geodetic latitude */
+   double geolon;                 /* Observer's geodetic longitude */
+   double h;                      /* Observer's geodetic height */
    double mjdobs;                 /* MJD-OBS value */
-   double obsgeo[ 3 ];            /* Observers Cartesian position */
+   double obsgeo[ 3 ];            /* Observer's Cartesian position */
    int radesys;                   /* RADESYS value */
 
 /* Initialise. */
@@ -31222,8 +31230,7 @@ static AstSkyFrame *WcsSkyFrame( AstFitsChan *this, FitsStore *store, char s,
 
 /* Observer's position (from primary axis descriptions). Get the OBSGEO-X/Y/Z 
    keywords, convert to geodetic longitude and latitude and store as the 
-   SpecFrame's ObsLat and ObsLon attributes (we ignore the height of the 
-   observer above sea level ). */
+   SpecFrame's ObsLat, ObsLon and ObsAlt attributes. */
       obsgeo[ 0 ] = GetItem( &(store->obsgeox), 0, 0, ' ', NULL, method, class, status );
       obsgeo[ 1 ] = GetItem( &(store->obsgeoy), 0, 0, ' ', NULL, method, class, status );
       obsgeo[ 2 ] = GetItem( &(store->obsgeoz), 0, 0, ' ', NULL, method, class, status );
@@ -31233,6 +31240,7 @@ static AstSkyFrame *WcsSkyFrame( AstFitsChan *this, FitsStore *store, char s,
          Geod( obsgeo, &geolat, &h, &geolon, status );
          astSetObsLat( ret, geolat );
          astSetObsLon( ret, geolon );
+         astSetObsAlt( ret, h );
       }         
    }
 
@@ -31329,11 +31337,11 @@ static AstMapping *WcsSpectral( AstFitsChan *this, FitsStore *store, char s,
    const char *defunit;   /* Default unit string */
    const char *specsys;   /* Pointer to SPECSYS value */
    const char *ssyssrc;   /* Pointer to SSYSSRC value */
-   double geolat;         /* Observers geodetic latitude */
-   double geolon;         /* Observers geodetic longitude */
-   double h;              /* Observers geodetic height */
+   double geolat;         /* Observer's geodetic latitude */
+   double geolon;         /* Observer's geodetic longitude */
+   double h;              /* Observer's geodetic height */
    double mjd;            /* Modified Julian Date */
-   double obsgeo[ 3 ];    /* Observers Cartesian position */
+   double obsgeo[ 3 ];    /* Observer's Cartesian position */
    double restfrq;        /* RESTFRQ keyword value */
    double vsource;        /* Source velocity */
    int *axes;             /* Pointer to axis permutation array */
@@ -31412,7 +31420,7 @@ static AstMapping *WcsSpectral( AstFitsChan *this, FitsStore *store, char s,
 
 /* Observer's position (from primary axis descriptions). Get the OBSGEO-X/Y/Z 
    keywords, convert to geodetic longitude and latitude and store as the 
-   SpecFrame's ObsLat and ObsLon attributes (we ignore the height of the observer above sea level ). */
+   SpecFrame's ObsLat, ObsLon and ObsAlt attributes. */
             obsgeo[ 0 ] = GetItem( &(store->obsgeox), 0, 0, ' ', NULL, method, class, status );
             obsgeo[ 1 ] = GetItem( &(store->obsgeoy), 0, 0, ' ', NULL, method, class, status );
             obsgeo[ 2 ] = GetItem( &(store->obsgeoz), 0, 0, ' ', NULL, method, class, status );
@@ -31422,6 +31430,7 @@ static AstMapping *WcsSpectral( AstFitsChan *this, FitsStore *store, char s,
                Geod( obsgeo, &geolat, &h, &geolon, status );
                astSetObsLat( specfrm, geolat );
                astSetObsLon( specfrm, geolon );
+               astSetObsAlt( specfrm, h );
             }         
 
 /* Source velocity rest frame */
@@ -33461,8 +33470,9 @@ f     data will be written to the FitsChan and AST_WRITE will return
 *     values. These form a longitude/latitude pair of axes which describe
 *     azimuth and elevation. The geographic position of the observer
 *     should be supplied using the OBSGEO-X/Y/Z keywords described in FITS-WCS
-*     paper III. Currently, a simple model is used which ignores atmospheric 
-*     refraction, polar motion, etc. These may be added in a leter release.
+*     paper III. Currently, a simple model is used which includes diurnal
+*     aberration, but ignores atmospheric refraction, polar motion, etc. 
+*     These may be added in a leter release.
 *
 c     When reading a FITS-WCS encoded Object (using astRead), the FitsChan
 f     When reading a FITS-WCS encoded Object (using AST_READ), the FitsChan
@@ -33606,9 +33616,9 @@ f     no data will be written to the FitsChan and AST_WRITE will
 *     This encoding is similar to FITS-AIPS with the following restrictions:
 *
 *     - When a SpecFrame is created by reading a FITS-CLASS header, the 
-*       attributes describing the observers position (ObsLat and ObsLon)
-*       are left unset because the CLASS encoding does not specify these
-*       values. Conversions to or from the topocentric standard of rest 
+*       attributes describing the observer's position (ObsLat, ObsLon and
+*       ObsAlt) are left unset because the CLASS encoding does not specify 
+*       these values. Conversions to or from the topocentric standard of rest 
 *       will therefore be inaccurate (typically by up to about 0.5 km/s)
 *       unless suitable values are assigned to these attributes after the
 *       FrameSet has been created.

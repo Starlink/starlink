@@ -228,6 +228,8 @@ f     - AST_REMOVEFRAME: Remove a Frame from a FrameSet
 *        Correct parent class in invocation of astMAKE_ISA.
 *     14-JAN-2009 (DSB):
 *        Override the astIntersect method.
+*     18-JUN-2009 (DSB):
+*        Override ObsAlt accessor methods.
 *class--
 */
 
@@ -965,6 +967,11 @@ static double GetEpoch( AstFrame *, int * );
 static int TestEpoch( AstFrame *, int * );
 static void ClearEpoch( AstFrame *, int * );
 static void SetEpoch( AstFrame *, double, int * );
+
+static double GetObsAlt( AstFrame *, int * );
+static int TestObsAlt( AstFrame *, int * );
+static void ClearObsAlt( AstFrame *, int * );
+static void SetObsAlt( AstFrame *, double, int * );
 
 static double GetObsLat( AstFrame *, int * );
 static int TestObsLat( AstFrame *, int * );
@@ -5081,6 +5088,11 @@ void astInitFrameSetVtab_(  AstFrameSetVtab *vtab, const char *name, int *status
    frame->TestObsLat = TestObsLat;
    frame->GetObsLat = GetObsLat;
    frame->SetObsLat = SetObsLat;
+
+   frame->ClearObsAlt = ClearObsAlt;
+   frame->TestObsAlt = TestObsAlt;
+   frame->GetObsAlt = GetObsAlt;
+   frame->SetObsAlt = SetObsAlt;
 
    frame->ClearObsLon = ClearObsLon;
    frame->TestObsLon = TestObsLon;
@@ -9822,6 +9834,11 @@ MAKE_GET(ObsLat,double)
 MAKE_SET(ObsLat,double)
 MAKE_TEST(ObsLat)
 MAKE_CLEAR(ObsLat)
+
+MAKE_GET(ObsAlt,double)
+MAKE_SET(ObsAlt,double)
+MAKE_TEST(ObsAlt)
+MAKE_CLEAR(ObsAlt)
 
 /* Clear, Get, Set and Test axis-dependent Frame attributes. */
 MAKE_CLEAR_AXIS(Direction)

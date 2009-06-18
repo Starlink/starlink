@@ -50,6 +50,7 @@ f     AST_FRAME
 *     - MinAxes: Minimum number of Frame axes to match
 *     - Naxes: Number of Frame axes
 *     - NormUnit(axis): Normalised axis physical units
+*     - ObsAlt: Geodetic altitude of observer 
 *     - ObsLat: Geodetic latitude of observer
 *     - ObsLon: Geodetic longitude of observer
 *     - Permute: Permute axis order?
@@ -254,6 +255,8 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *        Added astIntersect.
 *     18-MAR-2009 (DSB):
 *        Fixed bug in LineCrossing.
+*     18-JUN-2000 (DSB):
+*        Added ObsAlt attribute.
 *class--
 */
 
@@ -852,6 +855,11 @@ static double GetObsLon( AstFrame *, int * );
 static int TestObsLon( AstFrame *, int * );
 static void ClearObsLon( AstFrame *, int * );
 static void SetObsLon( AstFrame *, double, int * );
+
+static double GetObsAlt( AstFrame *, int * );
+static int TestObsAlt( AstFrame *, int * );
+static void ClearObsAlt( AstFrame *, int * );
+static void SetObsAlt( AstFrame *, double, int * );
 
 static double GetDut1( AstFrame *, int * );
 static int TestDut1( AstFrame *, int * );
@@ -2021,6 +2029,11 @@ L1:
 /* ------- */
    } else if ( !strcmp( attrib, "obslon" ) ) {
       astClearObsLon( this );
+
+/* ObsAlt. */
+/* ------- */
+   } else if ( !strcmp( attrib, "obsalt" ) ) {
+      astClearObsAlt( this );
 
 /* Dut1 */
 /* --- */
@@ -4511,6 +4524,15 @@ L1:
 
       }
 
+/* ObsAlt. */
+/* ------- */
+   } else if ( !strcmp( attrib, "obsalt" ) ) {
+      dval = astGetObsAlt( this );
+      if ( astOK ) {
+         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         result = getattrib_buff;
+      }
+
 /* Dut1. */
 /* ---- */
    } else if ( !strcmp( attrib, "dut1" ) ) {
@@ -5402,6 +5424,11 @@ void astInitFrameVtab_(  AstFrameVtab *vtab, const char *name, int *status ) {
    vtab->TestObsLon = TestObsLon;
    vtab->GetObsLon = GetObsLon;
    vtab->SetObsLon = SetObsLon;
+
+   vtab->ClearObsAlt = ClearObsAlt;
+   vtab->TestObsAlt = TestObsAlt;
+   vtab->GetObsAlt = GetObsAlt;
+   vtab->SetObsAlt = SetObsAlt;
 
    vtab->ClearDut1 = ClearDut1;
    vtab->GetDut1 = GetDut1;
@@ -7140,6 +7167,7 @@ static void Overlay( AstFrame *template, const int *template_axes,
    OVERLAY(Title);
    OVERLAY(ObsLat)
    OVERLAY(ObsLon)
+   OVERLAY(ObsAlt)
 
 /* Transfer the ActiveUnit flag. */
    astSetActiveUnit( result, astGetActiveUnit( template ) );
@@ -8974,6 +9002,13 @@ L1:
                    setting + off );
       }
 
+/* ObsAlt. */
+/* ------- */
+   } else if ( nc = 0,
+        ( 1 == astSscanf( setting, "obsalt= %lg %n", &dval, &nc ) )
+        && ( nc >= len ) ) {
+      astSetObsAlt( this, dval );
+
 /* Dut1. */
 /* ---- */
    } else if ( nc = 0,
@@ -10059,6 +10094,11 @@ L1:
 /* ------- */
    } else if ( !strcmp( attrib, "obslon" ) ) {
       result = astTestObsLon( this );
+
+/* ObsAlt. */
+/* ------- */
+   } else if ( !strcmp( attrib, "obsalt" ) ) {
+      result = astTestObsAlt( this );
 
 /* Dut1. */
 /* ---- */
@@ -12268,10 +12308,10 @@ astMAKE_TEST(Frame,Title,( this->title != NULL ))
 
 *  Description:
 *     This attribute specifies the geodetic latitude of the observer, in
-*     degrees. The basic Frame class makes no use of this attribute, but
-*     specialised subclasses of Frame may use it. For instance, the
-*     SpecFrame, SkyFrame and TimeFrame classes use it. The default value
-*     is zero.
+*     degrees, relative to the IAU 1976 reference ellipsoid. The basic Frame 
+*     class makes no use of this attribute, but specialised subclasses of 
+*     Frame may use it. For instance, the SpecFrame, SkyFrame and TimeFrame 
+*     classes use it. The default value is zero.
 *
 *     The value is stored internally in radians, but is converted to and 
 *     from a degrees string for access. Some example input formats are: 
@@ -12304,6 +12344,52 @@ astMAKE_CLEAR(Frame,ObsLat,obslat,AST__BAD)
 astMAKE_GET(Frame,ObsLat,double,0.0,((this->obslat!=AST__BAD)?this->obslat:0.0))
 astMAKE_SET(Frame,ObsLat,double,obslat,value)
 astMAKE_TEST(Frame,ObsLat,(this->obslat!=AST__BAD))
+
+
+/*
+*att++
+*  Name:
+*     ObsAlt
+
+*  Purpose:
+*     The geodetic altitude of the observer 
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     String.
+
+*  Description:
+*     This attribute specifies the geodetic altitude of the observer, in
+*     metres, relative to the IAU 1976 reference ellipsoid. The basic Frame 
+*     class makes no use of this attribute, but specialised subclasses of 
+*     Frame may use it. For instance, the SpecFrame, SkyFrame and TimeFrame 
+*     classes use it. The default value is zero.
+
+*  Applicability:
+*     Frame
+*        All Frames have this attribute.
+*     SpecFrame
+*        Together with the ObsLon, Epoch, RefRA and RefDec attributes, 
+*        it defines the Doppler shift introduced by the observers diurnal 
+*        motion around the earths axis, which is needed when converting to 
+*        or from the topocentric standard of rest. The maximum velocity
+*        error which can be caused by an incorrect value is 0.5 km/s. The 
+*        default value for the attribute is zero.
+*     TimeFrame
+*        Together with the ObsLon attribute, it is used when converting
+*        between certain time scales (TDB, TCB, LMST, LAST)
+
+*att--
+*/
+/* The geodetic altitude of the observer (metres). Clear the ObsAlt value by 
+   setting it to AST__BAD, returning zero as the default value. Any value is 
+   acceptable. */
+astMAKE_CLEAR(Frame,ObsAlt,obsalt,AST__BAD)
+astMAKE_GET(Frame,ObsAlt,double,0.0,((this->obsalt!=AST__BAD)?this->obsalt:0.0))
+astMAKE_SET(Frame,ObsAlt,double,obsalt,value)
+astMAKE_TEST(Frame,ObsAlt,(this->obsalt!=AST__BAD))
 
 
 /*
@@ -12911,6 +12997,12 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
    dval = set ? GetObsLon( this, status ) : astGetObsLon( this );
    astWriteDouble( channel, "ObsLon", set, 0, dval, "Observers geodetic longitude (rads)" );
 
+/* ObsAlt. */
+/* ------- */
+   set = TestObsAlt( this, status );
+   dval = set ? GetObsAlt( this, status ) : astGetObsAlt( this );
+   astWriteDouble( channel, "ObsAlt", set, 0, dval, "Observers geodetic altitude (metres)" );
+
 /* Dut1*/
 /* ---- */
    set = TestDut1( this, status );
@@ -13202,6 +13294,7 @@ AstFrame *astInitFrame_( void *mem, size_t size, int init,
          new->system = AST__BADSYSTEM;
          new->alignsystem = AST__BADSYSTEM;
          new->active_unit = -INT_MAX;
+         new->obsalt = AST__BAD;
          new->obslat = AST__BAD;
          new->obslon = AST__BAD;
          new->dut1 = AST__BAD;
@@ -13555,6 +13648,11 @@ AstFrame *astLoadFrame_( void *mem, size_t size,
 /* ------- */
          new->obslon = astReadDouble( channel, "obslon", AST__BAD );
          if ( TestObsLon( new, status ) ) SetObsLon( new, new->obslon, status );
+
+/* ObsAlt. */
+/* ------- */
+         new->obsalt = astReadDouble( channel, "obsalt", AST__BAD );
+         if ( TestObsAlt( new, status ) ) SetObsAlt( new, new->obsalt, status );
 
 /* Dut1. */
 /* ---- */

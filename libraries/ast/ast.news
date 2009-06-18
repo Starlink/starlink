@@ -16,6 +16,19 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
+- A new attribute called ObsAlt has been added to the Frame class. It
+records the geodetic altitude of the observer, in metres. It defaults to
+zero. It is used when converting times to or from the TDB timescale, or
+converting spectral positions to or from the topocentric rest frame, or
+converting sky positions to or from horizon coordinates. The FitsChan
+class will include its effect when creating a set of values for the 
+OBSGEO-X/Y/Z keywords, and will also assign a value to it when reading a
+set of OBSGEO-X/Y/Z keyword values from a FITS header.
+
+- The TimeMap conversions "TTTOTDB" and "TDBTOTT", and the SpecMap
+conversions "TPF2HL" and "HLF2TP", now have an additional argument - 
+the observer's geodetic altitude.
+
 - The Polygon class has been modified to make it consistent with the
 IVOA STC definition of a Polygon. Specifically, the inside of a polygon
 is now the area to the left of each edge as the vertices are traversed in 
