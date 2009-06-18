@@ -303,7 +303,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
     steptime = VAL__BADD;
     smf_getfitsd( hdr, "STEPTIME", &steptime, status );
     if (*status == SMF__NOKWRD || ( *status == SAI__OK && 
-                                    steptime == VAL__BADD ) ) {
+                                    ( steptime == VAL__BADD || steptime < VAL__SMLD ) ) ) {
       if (*status != SAI__OK) errAnnul( status );
       /* Attempt to calculate it from adjacent entries - it will not
          be correct but it might be close. The problem occurs if the
