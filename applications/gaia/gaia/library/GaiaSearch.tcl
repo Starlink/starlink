@@ -282,6 +282,20 @@ itcl::class gaia::GaiaSearch {
       if { $allow_searches_ } {
          set_wcs_type
          AstroCat::search $args
+         restore_equinox_
+      }
+
+   }
+
+   #  Restore an old equinox catalogue setting, if needed. This is usually
+   #  required when using a catalogue with an explicit system, equinox and
+   #  epoch coordinate system. If the equinox is not temporarily set to
+   #  J2000 an internal transformation of the catalogue positions will be
+   #  made if the equinox is not J2000.
+   protected method restore_equinox_ {} {
+      if { $oldequinox_ != {} } {
+         $w_.cat setequinox $oldequinox_
+         set oldequinox_ {}
       }
    }
 
@@ -376,6 +390,7 @@ itcl::class gaia::GaiaSearch {
       if {[catch {$w_.cat imgplot $image_ $info_ $astref_ $headings_} msg]} {
          error_dialog $msg
       }
+      restore_equinox_
    }
 
    #  Get a WCS description for the catalogue and set its display format.
@@ -414,24 +429,38 @@ itcl::class gaia::GaiaSearch {
          }
       }
       if { $astref_ == 0 } {
-         #  Check for the system, equinox and epoch values of the
-         #  catalogue. These will be present for formerly VOTables.
+
+         #  Check for the system, equinox and epoch values of the catalogue.
+         #  These will be present for formerly VOTables.  Note we need a system
+         #  set, this make's sure we do not just use the defaults for
+         #  catalogues that do not set these values.
          set att {}
          set system [$w_.cat system]
          if { $system != {} } {
             append att "System=$system,"
+            set equinox [$w_.cat equinox]
+            if { $equinox != {} } {
+               append att "Equinox=$equinox,"
+            }
+            set epoch [$w_.cat epoch]
+            if { $epoch != {} } {
+               append att "Epoch=$epoch"
+            }
+            if { $att != {} } {
+               set astref_ [gaiautils::astskyframeset $att]
+            }
          }
-         set equinox [$w_.cat equinox]
-         if { $equinox != {} } {
-            append att "Equinox=$equinox,"
-         }
-         set epoch [$w_.cat epoch]
-         if { $epoch != {} } {
-            append att "Epoch=$epoch"
-         }
-         if { $att != {} } {
-            set astref_ [gaiautils::astskyframeset $att]
-         }
+      }
+
+      #  If AST frameset from the catalogue meta-data is being used, any
+      #  equinox values can be misused in the default Skycat behaviour
+      #  (where all catalogues are assumed to be in J2000) stop that.
+      #  Note use restore_equinox_ to recover after the search/query is
+      #  finished.
+      set oldequinox_ {}
+      if { $astref_ != 0 } {
+         $searchopts_ set_equinox {}
+         set oldequinox_ [$w_.cat setequinox J2000]
       }
       if { $astref_ == 0 } {
 
@@ -866,6 +895,8 @@ itcl::class gaia::GaiaSearch {
 
    #  Reference to the AST frameset describing the catalogue coordinates.
    protected variable astref_ 0
+
+   protected variable oldequinox_ {}
 
    #  Common variables (shared between all instances):
    #  ================================================

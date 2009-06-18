@@ -42,7 +42,8 @@
 
 #  Copyright:
 #     Copyright (C) 1998-2000 Central Laboratory of the Research Councils
-#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council
+#     Copyright (C) 2009 Science and Technology Facilities Council
 #     All Rights Reserved.
 
 #  Licence:
@@ -95,11 +96,11 @@ itcl::class gaia::GaiaQuery {
    constructor {args} {
       eval itk_initialize $args
    }
-   
+
    #  Method to set the maximum number of objects allowed. Returns -1
    #  if we couldn't do request, because not relevant to interface.
    public method set_maxobjs {value} {
-      if { [info exists maxnum_] && [winfo exists $maxnum_] } { 
+      if { [info exists maxnum_] && [winfo exists $maxnum_] } {
          $maxnum_ configure -value $value
          return 1
       }
@@ -113,16 +114,16 @@ itcl::class gaia::GaiaQuery {
    public method set_from_image {} {
       set iswcs [$astrocat iswcs]
       if {$iscat_} {
-         if { $iswcs } { 
-            set_pos_radius [get_image_center_radius $iswcs] 
+         if { $iswcs } {
+            set_pos_radius [get_image_center_radius $iswcs]
          } else {
             lassign [$astrocat origin] xo yo
             lassign [get_image_center_radius $iswcs] x y rad
             set_pos_radius [list [expr $x+$xo] [expr $y+$yo] $rad]
          }
       } else {
-         if { $iswcs } { 
-            set_pos_width_height [get_image_center_width_height $iswcs] 
+         if { $iswcs } {
+            set_pos_width_height [get_image_center_width_height $iswcs]
          } else {
             lassign [$astrocat origin] xo yo
             lassign [get_image_center_width_height $iswcs] x y w h
@@ -135,7 +136,7 @@ itcl::class gaia::GaiaQuery {
          return
       }
       if {$wcs_flag} {
-         # using world coords 
+         # using world coords
          set center [$image_ wcscenter]
          if {[llength $center] >= 2} {
             lassign $center ra dec equinox
@@ -169,7 +170,7 @@ itcl::class gaia::GaiaQuery {
          }
       } else {
          if { $iswcs } {
-            set_pos_width_height [select_image_area $iswcs] 
+            set_pos_width_height [select_image_area $iswcs]
          } else {
             lassign [$astrocat origin] xo yo
             lassign [select_image_area $iswcs] x y w h
@@ -231,7 +232,7 @@ itcl::class gaia::GaiaQuery {
                lappend cmd "-nrows" $maxnum
             }
             if {"[set sort_cols [$astrocat sortcols]]" != ""} {
-               lappend cmd "-sort" $sort_cols "-sortorder" [$astrocat sortorder] 
+               lappend cmd "-sort" $sort_cols "-sortorder" [$astrocat sortorder]
             }
          } else {
             if {"$width" != "" || "$height" != ""} {
@@ -266,7 +267,7 @@ itcl::class gaia::GaiaQuery {
             lappend cmd -searchcols $search_cols -minvalues $minvalues -maxvalues $maxvalues
          }
       }
-      
+
       if {"$itk_option(-feedbackcommand)" != ""} {
          eval $itk_option(-feedbackcommand) on
       }
@@ -282,9 +283,30 @@ itcl::class gaia::GaiaQuery {
 
    # Set the default values for the form entries.
    # Overridden to increase default number of objects from 1000 to
-   # 20000. 
+   # 20000.
    public method set_default_values {} {
       SkyQuery::set_default_values
+
+      # Use the given default equinox.
+      if { $default_equinox_ != "notset" } {
+         if { [info exists equinox_] } {
+            $equinox_ configure -value $default_equinox_
+         }
+      }
       set_maxobjs 20000
+
    }
+
+   #  Set the default equinox. If local catalogue with coordinate
+   #  system information then we do not want to assume J2000 or that
+   #  of the image as the catalogue positions will be transformed
+   #  as needed (in those cases the best default equinox is {}).
+   public method set_equinox {equinox} {
+      set default_equinox_ $equinox
+      if { [info exists equinox_] } {
+         $equinox_ configure -value $equinox
+      }
+   }
+
+   protected variable default_equinox_ "notset"
 }

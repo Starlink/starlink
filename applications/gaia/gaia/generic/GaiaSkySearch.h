@@ -109,6 +109,7 @@ class GaiaSkySearch : public SkySearch
     virtual int originCmd( int argc, char *argv[] );
     virtual int queryCmd( int argc, char* argv[] );
     virtual int saveCmd( int argc, char *argv[] );
+    virtual int setequinoxCmd( int argc, char *argv[] );
 };
 
 #endif // _GaiaSkySearch_h_

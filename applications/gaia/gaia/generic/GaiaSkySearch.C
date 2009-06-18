@@ -121,7 +121,8 @@ public:
     {"namesvr",    &GaiaSkySearch::namesvrCmd,      2,  2},
     {"open",       &GaiaSkySearch::openCmd,         1,  2},
     {"origin",     &GaiaSkySearch::originCmd,       0,  2},
-    {"save",       &GaiaSkySearch::saveCmd,         1,  5}
+    {"save",       &GaiaSkySearch::saveCmd,         1,  5},
+    {"setequinox", &GaiaSkySearch::setequinoxCmd,   1,  1}
 };
 
 /**
@@ -1443,13 +1444,13 @@ int gaiaGenAstroQuery(Tcl_Interp* interp, int argc, char* argv[],
     double radius1 = 0.0, radius2 = 0.0;
     double mag1 = 0.0, mag2 = 0.0;
     double width = 0.0, height = 0.0;
-    char* id = "";
-    char* nameServer = "simbad@eso";
+    const char* id = "";
+    const char* nameServer = "simbad@eso";
 
     // for sorting
     int numSortCols = 0;
     char** sortCols = NULL;
-    char* sortOrder = "increasing";
+    const char* sortOrder = "increasing";
     int nrows = 0;  // no default limit...
 
     // column selection
@@ -1674,3 +1675,40 @@ int gaiaGenAstroQuery(Tcl_Interp* interp, int argc, char* argv[],
 }
 
 
+/**
+ *  Set the catalogue equinox. Returns the current value as the result.
+ */
+int GaiaSkySearch::setequinoxCmd( int argc, char *argv[] )
+{
+    if ( !cat_ ) {
+        return error( "no catalog is currently open" );
+    }
+    char buf[32];
+    const char *prefix = cat_->equinoxprefix();
+    if ( prefix != NULL && prefix[0] != '\0' ) {
+        sprintf( buf, "%c%g", prefix[0], cat_->equinox() );
+    }
+    else {
+        sprintf( buf, "%g", cat_->equinox() );
+    }
+    set_result( buf );
+
+    //  Need to handle prefix and conversion to double.
+    double d;
+    const char *p = argv[0];
+    if ( p[0] == 'j' || p[0] == 'J' ) {
+        cat_->entry()->equinoxprefix( "J" );
+        p++;
+    }
+    else if ( p[0] == 'b' || p[0] == 'B' ) {
+        cat_->entry()->equinoxprefix( "B" );
+        p++;
+    }
+    else {
+        cat_->entry()->equinoxprefix( "" );
+    }
+    if ( sscanf( p, "%lf", &d ) == 1 ) {
+        cat_->entry()->equinox( d );
+    }
+    return TCL_OK;
+}
