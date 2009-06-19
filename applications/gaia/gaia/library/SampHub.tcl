@@ -94,7 +94,7 @@ itcl::class samp::SampHub {
       foreach hubcmd $hubcmds {
          set name [lindex $hubcmd 0]
          set params [lindex $hubcmd 1]
-         XMLRPC::create samp.hub.$name -proxy $hub_url_ -params $params
+         samp_xmlrpc_create_ samp.hub.$name -proxy $hub_url_ -params $params
       }
    }
 
@@ -145,6 +145,32 @@ itcl::class samp::SampHub {
          }
       }
       close $fid
+   }
+
+   #  Create a Tcl wrapper for an XMLRPC method call.  This is a thin
+   #  wrapper around SOAP::create, and has the same usage, but it
+   #  ensures that only SAMP-friendly types are passed to the hub
+   #  (i.e. it avoids elements like <int> and <double> which the XMLRPC
+   #  system would otherwise write for elements that looked like those
+   #  types).
+   proc samp_xmlrpc_create_ {args} {
+      set args [linsert $args 1 \
+              -wrapProc [namespace origin samp_xmlrpc_request_] \
+              -parseProc [namespace origin ::SOAP::parse_xmlrpc_response]]
+      return [uplevel 1 "SOAP::create $args"]
+   }
+
+   #  Postprocesses a chunk of XML, replacing non-SAMP-friendly tags
+   #  (<int>, <double> etc) with SAMP-friendly ones (<string>).
+   public proc samp_xmlrpc_request_ {procVarName args} {
+      upvar $procVarName procvar
+      set soap_invoke [list SOAP::xmlrpc_request $procVarName]
+      foreach arg $args {
+         lappend soap_invoke $arg
+      }
+      set result [eval $soap_invoke]
+      set tag_re {(</?)int|i4|boolean|double|dateTime\.iso8601|base64(>)}
+      return [regsub -all $tag_re $result {\1string\2}]
    }
 
    #  Private variables: (available to instance)
