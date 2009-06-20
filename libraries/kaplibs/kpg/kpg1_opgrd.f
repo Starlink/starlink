@@ -303,7 +303,7 @@
 
 *  Local Constants:
       DOUBLE PRECISION PIXSCL    ! Initial pixel scale (rads per pixel)
-      PARAMETER ( PIXSCL = 0.0003D0 )
+      PARAMETER ( PIXSCL = 0.0003D0 ) ! (about 1 arc-min per pixel)
 
 *  Local Variables:
       DOUBLE PRECISION ANG
@@ -508,12 +508,7 @@
      :                         PAR( 7 ) .EQ. AST__BAD ) ) THEN
          OK = .FALSE.
 
-
-
          pass = ichar( 'A' ) - 1
-
-
-
 
 *  If the positions are grouped into clusters of points, where each
 *  cluster represents a single sky position with errors, then the mean
@@ -528,6 +523,11 @@
          SPC = 0.0
          DO WHILE( MXWAVE .GT. 10.0*SPC .AND. STATUS .EQ. SAI__OK ) 
             pass = pass + 1
+
+c      write(*,*) ' '
+c      write(*,*) ' Cluster spacing: ',MXWAVE*pixscl*AST__DR2D*3600,
+c     :           ' sample spacing: ', spc*pixscl*AST__DR2D*3600,
+c     :           ' arcsec'
 
 *  Allocate a 1D work array which spans the circle enclosing the
 *  bounding box, but using smaller pixels (one fifth of the current
@@ -544,11 +544,9 @@
 *  correspond to the central position (XC,YC).
             SPC0 = DBLE( ( HISTSZ + 1 )/2 )
 
-
+c      write(*,*) ' Course scanning angles with sample spacing of ',
+c     :           spc*pixscl*AST__DR2D*3600,' arcsec'
 c      write(*,*) ' '
-c      write(*,*) ' Course scanning angles with grid spacing of ',spc
-c      write(*,*) ' '
-
 
 *  Imagine a line passing through the centre position (XC,YC). We step 
 *  through all orientations of this line in units of 3 degrees. Zero
@@ -1010,6 +1008,14 @@ c      write(*,*)
 *        values (SUM2) must be better than the previous maximum (MXAMP) for 
 *        the angle to be of any possible interest. This makes the algorithm 
 *        slightly less efficient, but more robust.
+*     20-JUN-2009 (DSB):
+*        - Only accept peaks in the autocorrelation function that occur 
+*        within the first third of the histogram width (i.e. that produce
+*        at least three wavelengths within the extent of the data).
+*        - When giving greater weight to longer wavelengths, only do this
+*        up to a certain point (a factor 1.5) in order to avoid accepting
+*        weak periodicities just because they have ridiculously large 
+*        wavelengths.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -1046,28 +1052,30 @@ c      write(*,*)
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      DOUBLE PRECISION LIMSUM
-      DOUBLE PRECISION NEWAMP
       DOUBLE PRECISION COSANG
-      DOUBLE PRECISION SUMINC
-      DOUBLE PRECISION SINANG
-      DOUBLE PRECISION LLLSUM2
       DOUBLE PRECISION D
-      DOUBLE PRECISION LSUM2
-      DOUBLE PRECISION MAXSUM
-      DOUBLE PRECISION FFBIN
-      DOUBLE PRECISION NEWWAV
-      DOUBLE PRECISION LLSUM2
-      DOUBLE PRECISION SUM2
       DOUBLE PRECISION DSUM
       DOUBLE PRECISION FBIN
+      DOUBLE PRECISION FFBIN
+      DOUBLE PRECISION LIMSUM
+      DOUBLE PRECISION LLLSUM2
+      DOUBLE PRECISION LLSUM2
+      DOUBLE PRECISION LSUM2
+      DOUBLE PRECISION MAXSUM
+      DOUBLE PRECISION MINSUM
+      DOUBLE PRECISION NEWAMP
+      DOUBLE PRECISION NEWWAV
+      DOUBLE PRECISION NEWWGT
+      DOUBLE PRECISION OLDWGT
+      DOUBLE PRECISION SINANG
+      DOUBLE PRECISION SUM2
+      DOUBLE PRECISION SUMINC
       DOUBLE PRECISION SUMW
-      DOUBLE PRECISION W
       DOUBLE PRECISION USUM
+      DOUBLE PRECISION W
       DOUBLE PRECISION WBIN
       DOUBLE PRECISION WBIN2
       DOUBLE PRECISION XSHIFT
-      DOUBLE PRECISION MINSUM
       INTEGER COUNT
       INTEGER I
       INTEGER IBIN
@@ -1078,7 +1086,8 @@ c      write(*,*)
       INTEGER MINSH
       INTEGER SHIFT
       LOGICAL MORE             
-      REAL OFFSET( 3 )
+      REAL OFFSET( 3 )          
+
 
       DATA OFFSET /-0.5, 0.0, 0.5 /
 *.
@@ -1119,7 +1128,7 @@ c      write(*,*)
 *  the histogram spacing. For instance, if a sample falls on or close
 *  to the edge of two histogram bins, it will be evenly divided between
 *  them, resulting in each bin having only half a sample contribution.
-*  One the other hand if a sampel falls in the middle of a histogram bin,
+*  One the other hand if a sample falls in the middle of a histogram bin,
 *  then the bin will receive the whole sample. Since the squared amplitude in
 *  each bin is important, this will unduly favour bins that receive the whole
 *  sample. To avoid this, we add the sample into the histogram several
@@ -1264,14 +1273,14 @@ c     :            0.5*mxamp
                   MORE = .FALSE.
 
 c      write(*,*) 'Found minimum ',minsum,' in auto-correlation '//
-c     :           'function at ',minsh
+c     :           'function at ',minsh, '(',minsum,')'
 
                END IF
 
             END IF
 
 *  Increment the shift and abort if we have reached the end of the
-* array.
+*  array.
             SHIFT = SHIFT + 1
             IF( SHIFT .EQ. HISTSZ ) MORE = .FALSE.
 
@@ -1282,9 +1291,6 @@ c     :           'function at ',minsh
 *  shift and is greater than the subsequent two values. In case no such
 *  point is found, we also record the largest value found, and the mean
 *  of all values (except for the first point at zero shift).
-
-c         write(*,*) 'Shift, histsz: ',shift, histsz
-
          IF( SHIFT .LT. HISTSZ ) THEN
 
             MAXSH = -1
@@ -1343,11 +1349,15 @@ c         write(*,*) 'Shift, histsz: ',shift, histsz
 
 *  If no peak was found that was more than half the value at zero shift,
 *  use the maximum value found so long as it is more than 10 times the 
-*  noise in the auto-correlation function. This noise is estimated as 
+*  noise in the auto-correlation function (this noise is estimated as 
 *  the weighted mean of the variation between adjacent auto-correlation
-*  values.
+*  values), and it is shorter than one third of the histogram length (i.e.
+*  we have at least 3 waves in the histogram).
             IF( SHIFT .EQ. HISTSZ .AND. MAXSH .NE. -1 ) THEN
-               IF( MAXSUM .GT. 10.0*(SUMINC/SUMW) ) SHIFT = MAXSH
+               IF( MAXSUM .GT. 10.0*(SUMINC/SUMW) .AND. 
+     :             MAXSH .LT. HISTSZ/3 ) THEN
+                  SHIFT = MAXSH
+               END IF
             END IF
 
          END IF
@@ -1367,25 +1377,41 @@ c         call opgrd_autodump( ang, histsz, hist, status )
 *  Convert the shift value to a wavelength in grid pixels.
             NEWWAV = XSHIFT*SPC
 
-c      write(*,*) '   new total: ',NEWAMP*(NEWWAV**0.7),
-c     :           ' old total: ',MXAMP*(MXWAVE**0.7)
-
 *  We use the new angle if the auto-correlation peak produces a greater
 *  value than the old angle. We include a weighting factor that gives
 *  priority to larger wavelengths. This seems to distinguish succesfully
 *  between the periodicity produced when viewing a grid parallel to an 
 *  axis and when viewing it at 45 degrees to an axis. However, the 
 *  exponent used in this weighting factor has been determined by trial
-*  and error and may not be suitable in all cases. Time will tell.
-            IF( NEWAMP*( NEWWAV**0.7 ) .GT. MXAMP*( MXWAVE**0.7 ) ) THEN
+*  and error and may not be suitable in all cases. Time will tell. Set up
+*  the weight for the old periodicity.
+            OLDWGT = MXWAVE**0.7
+
+*  Now set up the weight for the new periodicity. If the new periodicity
+*  is weaker than the old, only accept it if the wavelength is within a
+*  factor of 1.5 of the old wavelength. Rotation by 45 degrees will
+*  change the wavelength by a factor of sqrt(2)=1.414 so any ratio larger
+*  than this is unlikely to be ucased by a 45 degree rotation. 
+            IF( ( NEWAMP .LT. MXAMP  ) .AND.
+     :          ( NEWWAV .lT. MXWAVE/1.5 .OR.
+     :            NEWWAV .GT. MXWAVE*1.5 ) ) THEN
+               NEWWGT = 0.0
+            ELSE
+               NEWWGT = NEWWAV**0.7
+            END IF
+
+c      write(*,*) '   new total: ',NEWAMP*NEWWGT,
+c     :           '   old total: ',MXAMP*OLDWGT
+
+            IF( NEWAMP*NEWWGT .GT. MXAMP*OLDWGT ) THEN
+
 c      write(*,*) '   Using new total - setting MXAMP to ',NEWAMP
+
                MXANG = ANG
                MXAMP = NEWAMP
                MXWAVE = NEWWAV
             END IF
-         else
-c      write(*,*) 'No peak found  shift (',shift,') > histsz (',
-c     :           histsz,')'
+
          END IF
       END IF
 
