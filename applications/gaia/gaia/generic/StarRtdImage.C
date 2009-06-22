@@ -202,6 +202,8 @@
  *        Add -pixel_indices support.
  *     09-JUN-2009 (PWD):
  *        Add imagedataCmd.
+ *     19-JUN-2009 (PWD):
+ *        Add blankvalueCmd.
  *-
  */
 #if HAVE_CONFIG_H
@@ -250,6 +252,7 @@
 #include "gaiaNDF.h"
 #include "gaiaUtils.h"
 #include <star/slalib.h>
+#include "GaiaArray.h"
 
 // Include any foreign commands. These are processed by the "foreign"
 // member function when requested.
@@ -315,6 +318,7 @@ public:
     { "fullname",        &StarRtdImage::fullNameCmd,        0, 0 },
     { "gband",           &StarRtdImage::gbandCmd,           6, 6 },
     { "globalstats",     &StarRtdImage::globalstatsCmd,     2, 2 },
+    { "blankvalue",      &StarRtdImage::blankvalueCmd,      0, 1 },
     { "hdu",             &StarRtdImage::hduCmd,             0, 6 },
     { "imagedata",       &StarRtdImage::imageDataCmd,       0, 0 },
     { "iscompound",      &StarRtdImage::isCompoundCmd,      0, 0 },
@@ -6008,6 +6012,34 @@ int StarRtdImage::objectCmd( int argc, char *argv[] )
         return set_result( image_->object() );
     }
     image_->object( argv[0] );
+    return TCL_OK;
+}
+
+//+
+//   StarRtdImage::blankvalueCmd
+//
+//   Purpose:
+//      Set the blank pixel value for an image. This may be necessary
+//      if an image has BLANK values introduced. By default the NDF BAD
+//      value for the current data type is used. If not arguments are
+//      given the result is whether a blank value is already set or not.
+//-
+int StarRtdImage::blankvalueCmd( int argc, char *argv[] )
+{
+    if ( ! image_ ) {
+        return TCL_OK;
+    }
+
+    //  Request for is the blank value set?
+    if ( argc == 0 ) {
+        return set_result( image_->haveBlank() );
+    }
+
+    //  Set the override for the blank value used by the image.
+    image_->setBlank( gaiaArrayFITSBlankValue( image_->dataType() ) );
+
+    //  Reinitialise blank value.
+    image_->initBlankPixel();
     return TCL_OK;
 }
 

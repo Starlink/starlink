@@ -431,6 +431,10 @@ class StarRtdImage : public Skycat
        }
    };
 
+   // Set the blank pixel value to that appropriate for data type,
+   // or return if it is set.
+   int blankvalueCmd( int argc, char *argv[] );
+
  protected:
 
    //  Redefined from parent class to check configuration options.
