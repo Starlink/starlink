@@ -84,6 +84,13 @@
       requirements for processing cubes.  Additional efficiencies have
       be made for the 0-degree rotation special case.
 
+   o STATS
+      -  Can calculate accurate median and percentile values using
+      sorting by setting the new ORDER parameter to TRUE,
+      and optionally supplying percentiles through the new PERCENTILES
+      parameter.  There are corresponding results parameters---MEDIAN 
+      and PERVAL---to record these additional statistics.
+   
    o THRESH
       -  New result parameters NUMHI, NUMLO, NUMRANGE, and NUMSAME
       return the number of changed and unchanged pixels.

@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.35}
 \newcommand{\stardocnumber}    {95.35}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2009 June 10}
+\newcommand{\stardocdate}      {2009 June 20}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.10}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -46036,7 +46036,15 @@ KAPPA: \htmlref{REGRID}{REGRID},
          the number of pixels omitted.
 
       }
-      Iterative $\kappa$-sigma clipping may also be applied as an option.
+      Iterative $\kappa$-sigma clipping may also be applied as an option
+      (see Parameter CLIP).
+
+      Order statistics (median and percentiles) may optionally be 
+      derived and displayed (see Parameters ORDER and PERCENTILES).
+      Although this can be a relatively slow operation on large arrays,
+      unlike \htmlref{HISTAT}{HISTAT} the reported order statistics are
+      accurate, not approximations, irrespective of the distribution of values 
+      being analysed.
    }
    \sstusage{
       stats ndf [comp] [clip] [logfile]
@@ -46058,7 +46066,7 @@ KAPPA: \htmlref{REGRID}{REGRID},
          the first value
          supplied) and will then re-evaluate the statistics.  This
          rejection iteration is repeated in turn for each value in the
-         CLIP array.  A maximum of 5 values may be supplied, all of
+         CLIP array.  A maximum of five values may be supplied, all of
          which must be positive.  {\tt [!]}
       }
       \sstsubsection{
@@ -46083,6 +46091,21 @@ KAPPA: \htmlref{REGRID}{REGRID},
          NDF = NDF (Read)
       }{
          The NDF data structure to be analysed.
+      }
+      \sstsubsection{
+         ORDER = \_LOGICAL (Read)
+      }{
+        Whether or not to calculate order statistics.  If set {\tt TRUE}
+        the median and optionally percentiles are determined and
+        reported.  {\tt [FALSE]} 
+      }
+      \sstsubsection{
+         PERCENTILES( 100 ) = \_REAL (Read)
+      }{
+         A list of percentiles to be found.  None are computed if this
+         parameter is null ({\tt{!}}).  The percentiles must be in the range
+         0.0 to 100.0.  This parameter is ignored unless ORDER is {\tt TRUE.} 
+         {\tt [!]}
       }
    }
    \sstresparameters{
@@ -46117,6 +46140,12 @@ KAPPA: \htmlref{REGRID}{REGRID},
          MEAN = \_DOUBLE (Write)
       }{
          The mean value of all the valid pixels in the NDF array.
+      }
+      \sstsubsection{
+         MEDIAN = \_DOUBLE (Write)
+      }{
+        The median value of all the valid pixels in the NDF array when
+        ORDER is {\tt TRUE}.
       }
       \sstsubsection{
          MINCOORD( ) = \_DOUBLE (Write)
@@ -46163,6 +46192,13 @@ KAPPA: \htmlref{REGRID}{REGRID},
          The total number of pixels in the NDF (both good and bad).
       }
       \sstsubsection{
+         PERVAL() = \_DOUBLE (Write)
+      }{
+         The values of the percentiles of the good pixels in the NDF
+         array.  This parameter is only written when one or more
+         percentiles have been requested.
+      }
+      \sstsubsection{
          SIGMA = \_DOUBLE (Write)
       }{
          The standard deviation of the pixel values in the NDF array.
@@ -46179,6 +46215,12 @@ KAPPA: \htmlref{REGRID}{REGRID},
       }{
          Computes and displays simple statistics for the data array in
          the NDF called image.
+      }
+      \sstexamplesubsection{
+         stats image order percentiles=[25,75]
+      }{
+         As the previous example but it also reports the median, 25 and
+         75 percentiles.
       }
       \sstexamplesubsection{
          stats ndf=spectrum variance
@@ -55979,6 +56021,15 @@ The following applications have been modified:
          degrees and arbitrary angles that should greatly reduce the memory
          requirements for processing cubes.  Additional efficiencies have
          be made for the 0-degree rotation special case.
+      \end{itemize}
+
+   \item [\htmlref{STATS}{STATS}] \mbox{}
+      \begin{itemize}
+        \item Can calculate accurate median and percentile values using
+        sorting by setting the new ORDER parameter to {\tt TRUE},
+        and optionally supplying percentiles through the new PERCENTILES
+        parameter.  There are corresponding results parameters---MEDIAN 
+        and PERVAL---to record these additional statistics.
       \end{itemize}
 
    \item [\htmlref{THRESH}{THRESH}] \mbox{}

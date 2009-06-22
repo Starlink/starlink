@@ -32,7 +32,15 @@
 *     -  the number of pixels used in the statistics, and
 *     -  the number of pixels omitted.
 *
-*     Iterative K-sigma clipping may also be applied as an option.
+*     Iterative K-sigma clipping may also be applied as an option
+*     (see Parameter CLIP).
+*
+*     Order statistics (median and percentiles) may optionally be 
+*     derived and displayed (see Parameters ORDER and PERCENTILES).
+*     Although this can be a relatively slow operation on large arrays,
+*     unlike application HISTAT the reported order statistics are 
+*     accurate, not approximations, irrespective of the distribution of 
+*     values being analysed.
 
 *  Usage:
 *     stats ndf [comp] [clip] [logfile]
@@ -51,7 +59,7 @@
 *        standard deviations of the mean (where K is the first value
 *        supplied) and will then re-evaluate the statistics. This
 *        rejection iteration is repeated in turn for each value in the
-*        CLIP array.  A maximum of 5 values may be supplied, all of
+*        CLIP array.  A maximum of five values may be supplied, all of
 *        which must be positive. [!]
 *     COMP = LITERAL (Read)
 *        The name of the NDF array component for which statistics are
@@ -68,8 +76,8 @@
 *     MAXCOORD( ) = _DOUBLE (Write)
 *        A 1-dimensional array of values giving the WCS co-ordinates of
 *        the centre of the (first) maximum-valued pixel found in the
-*        NDF array.  The number of co-ordinates is equal to the number of
-*        NDF dimensions.
+*        NDF array.  The number of co-ordinates is equal to the number
+*        of NDF dimensions.
 *     MAXIMUM = _DOUBLE (Write)
 *        The maximum pixel value found in the NDF array.
 *     MAXPOS( ) = _INTEGER (Write)
@@ -77,10 +85,13 @@
 *        maximum-valued pixel found in the NDF array.  The number of
 *        indices is equal to the number of NDF dimensions.
 *     MAXWCS = LITERAL (Write)
-*        The formatted WCS co-ordinates at the maximum pixel value. The
+*        The formatted WCS co-ordinates at the maximum pixel value.  The
 *        individual axis values are comma separated.
 *     MEAN = _DOUBLE (Write)
 *        The mean value of all the valid pixels in the NDF array.
+*     MEDIAN = _DOUBLE (Write)
+*        The median value of all the valid pixels in the NDF array when
+*        ORDER is TRUE.
 *     MINCOORD( ) = _DOUBLE (Write)
 *        A 1-dimensional array of values giving the WCS co-ordinates of
 *        the centre of the (first) minimum-valued pixel found in the
@@ -93,7 +104,7 @@
 *        minimum-valued pixel found in the NDF array.  The number of
 *        indices is equal to the number of NDF dimensions.
 *     MINWCS = LITERAL (Write)
-*        The formatted WCS co-ordinates at the minimum pixel value. The
+*        The formatted WCS co-ordinates at the minimum pixel value.  The
 *        individual axis values are comma separated.
 *     NDF = NDF (Read)
 *        The NDF data structure to be analysed.
@@ -106,6 +117,19 @@
 *        computed statistics.
 *     NUMPIX = _INTEGER (Write)
 *        The total number of pixels in the NDF (both good and bad).
+*     ORDER = _LOGICAL (Read)
+*        Whether or not to calculate order statistics.  If set TRUE
+*        the median and optionally percentiles are determined and
+*        reported.  [FALSE]
+*     PERCENTILES( 100 ) = _REAL (Read)
+*         A list of percentiles to be found.  None are computed if this
+*         parameter is null (!).  The percentiles must be in the range
+*         0.0 to 100.0   This parameter is ignored unless ORDER is TRUE.
+*         [!]
+*     PERVAL() = _DOUBLE (Write)
+*         The values of the percentiles of the good pixels in the NDF
+*         array.  This parameter is only written when one or more
+*         percentiles have been requested.
 *     SIGMA = _DOUBLE (Write)
 *        The standard deviation of the pixel values in the NDF array.
 *     TOTAL = _DOUBLE (Write)
@@ -115,6 +139,9 @@
 *     stats image
 *        Computes and displays simple statistics for the data array in
 *        the NDF called image.
+*     stats image order percentiles=[25,75]
+*        As the previous example but it also reports the median, 25 and
+*        75 percentiles.
 *     stats ndf=spectrum variance
 *        Computes and displays simple statistics for the variance array
 *        in the NDF called spectrum.
@@ -151,13 +178,13 @@
 *  Copyright:
 *     Copyright (C) 1991-1992 Science & Engineering Research Council.
 *     Copyright (C) 2004 Central Laboratory of the Research Councils.
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007, 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -167,8 +194,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
@@ -189,9 +216,11 @@
 *     6-AUG-2004 (DSB):
 *        Display current Frame WCS coords at max and min pixel positions.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
 *     18-MAY-2007 (DSB):
 *        Added parameters MINWCS and MAXWCS.
+*     2009 June 19 (MJC):
+*        Added order statistics.
 *     {enter_further_changes_here}
 
 *-
@@ -214,11 +243,16 @@
       INTEGER MXCLIP             ! Max. number of clipping levels
       PARAMETER ( MXCLIP = 5 )
 
+      INTEGER NPRCTL             ! Maximum number of percentiles
+      PARAMETER( NPRCTL = 100 )
+
       INTEGER SZBUF              ! Size of text buffer
       PARAMETER ( SZBUF = 132 )
 
 *  Local Variables:
+      BYTE BQUANT( NPRCTL )      ! Byte quantile values
       CHARACTER * ( 8 ) COMP     ! Name of array component to analyse
+      CHARACTER * ( NDF__SZFTP ) DTYPE ! Data type for output components
       CHARACTER * ( 8 ) MCOMP    ! Component name for mapping arrays
       CHARACTER * ( NDF__SZTYP ) TYPE ! Numeric type for processing
       CHARACTER * ( SZBUF ) BUF  ! Text buffer
@@ -232,24 +266,28 @@
       DOUBLE PRECISION MAXCC( NDF__MXDIM ) ! Max. pixel coords (clipped)
       DOUBLE PRECISION MEAN      ! Mean of pixels in array
       DOUBLE PRECISION MEANC     ! Mean of pixels after clipping
-      DOUBLE PRECISION MEDIAN    ! Median of pixels in array (dummy)
+      DOUBLE PRECISION MEDIAN    ! Median of pixels in array
+      DOUBLE PRECISION MEDIUN    ! Median of even no. of pixels in array
       DOUBLE PRECISION MINC( NDF__MXDIM ) ! Co-ordinates of min. pixel
       DOUBLE PRECISION MINCC( NDF__MXDIM ) ! Min. pixel coords (clipped)
       DOUBLE PRECISION MODE      ! Mode of pixels in array (dummy)
-      REAL PERCNT( 1 )           ! Percentile level of pixels (dummy)
-      DOUBLE PRECISION PERVAL( 1 ) ! Percentile value of pixels (dummy)
+      DOUBLE PRECISION PERVAL( NPRCTL ) ! Values at the percentiles
       DOUBLE PRECISION STDEV     ! Standard devn. of pixels in array
       DOUBLE PRECISION STDEVC    ! Std. devn. of pixels after clipping
       DOUBLE PRECISION SUM       ! Sum of pixels in array
       DOUBLE PRECISION SUMC      ! Sum of pixels after clipping
+      INTEGER*2 WQUANT( NPRCTL ) ! Word quantile values
       INTEGER EL                 ! Number of array elements mapped
       INTEGER I                  ! Loop counter for NDF dimensions
       INTEGER ICLIP              ! Loop counter for clipping levels
+      INTEGER IERR               ! Index of conversion error
       INTEGER IFIL               ! File descriptor for logfile
       INTEGER IMAX( 1 )          ! Vector index of max. pixel
       INTEGER IMAXC( 1 )         ! Vector index of max. clipped pixel
       INTEGER IMIN( 1 )          ! Vector index of min. pixel
       INTEGER IMINC( 1 )         ! Vector index of min. clipped pixel
+      INTEGER IPNTR              ! Pointer to sorted index
+      INTEGER IQUANT( NPRCTL )   ! Integer quantile values
       INTEGER IWCS               ! Pointer to WCS FrameSet
       INTEGER LBND( NDF__MXDIM ) ! NDF lower bounds
       INTEGER MAXP( NDF__MXDIM ) ! Indices of maximum-valued pixel
@@ -260,15 +298,28 @@
       INTEGER NCLIP              ! Number of clipping iterations
       INTEGER NDF                ! NDF identifier
       INTEGER NDIM               ! Number of NDF dimensions
+      INTEGER NERR               ! Number of conversion errors
       INTEGER NGOOD              ! No. valid pixels in array
       INTEGER NGOODC             ! No. valid pixels after clipping
+      INTEGER NUMPER             ! Number of percentiles
       INTEGER NWCS               ! Number of WCS axes
+      INTEGER PERIND( NPRCTL )   ! Percentile indices in sorted array
       INTEGER PNTR( 1 )          ! Pointer to mapped NDF array
       INTEGER UBND( NDF__MXDIM ) ! NDF upper bounds
+      INTEGER UPERIN( NPRCTL )   ! Percentile indices in unsorted array
+      INTEGER WPNTR              ! Pointer to workspace
       LOGICAL BAD                ! Bad-pixel flag
+      LOGICAL DOPRCT             ! Percentiles have been supplied?
       LOGICAL LOGFIL             ! Log file required?
+      LOGICAL ORDER              ! Calculate order statistics?
       LOGICAL THERE              ! Array component exists?
       REAL CLIP( MXCLIP )        ! Array of clipping limits
+      REAL PERCNT( NPRCTL )      ! Percentiles
+      REAL RQUANT( NPRCTL )      ! Real quantile values
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! Declarations of conversion routines
+      INCLUDE 'NUM_DEF_CVT'      ! Definitions of conversion routines
 
 *.
 
@@ -309,7 +360,7 @@
      :                 'structure ^NDF', STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GO TO 99
-      
+
 *  Defer error reporting and obtain an array of clipping limits to be
 *  applied. Constrain the values to be positive.
       NCLIP = 0
@@ -325,9 +376,37 @@
       END IF
       CALL ERR_RLSE
 
+*  Are order statistics required?
+      DOPRCT = .FALSE.
+      ORDER = .FALSE.
+      CALL PAR_GET0L( 'ORDER', ORDER, STATUS )
+      IF ( ORDER ) THEN
+
+*  Defer error reporting and obtain an array of percentiles to be
+*  calculated.  Constrain the values to be between the minimum and
+*  maximum data values.
+         CALL ERR_MARK
+         CALL PAR_GDRVR( 'PERCENTILES', NPRCTL, 0.0, 100.0, PERCNT, 
+     :                   NUMPER, STATUS )
+         IF ( STATUS .NE. SAI__OK ) THEN
+
+*  Null is a valid response to say do not compute percentiles.  Make
+*  the number of percentiles one and flag the value, so that the
+*  display routines can handle and recognise there are no percentile
+*  values to report.
+            IF ( STATUS .EQ. PAR__NULL ) THEN
+               CALL ERR_ANNUL( STATUS )
+               NUMPER = 0
+            END IF
+
+         ELSE
+            DOPRCT = .TRUE.
+         END IF
+         CALL ERR_RLSE
+      END IF
+
 *  Obtain an optional file for logging the results. A null value,
 *  meaning no logfile is required, is handled invisibly.
-
       LOGFIL = .FALSE.
       CALL ERR_MARK
       CALL FIO_ASSOC( 'LOGFILE', 'WRITE', 'LIST', 132, IFIL, STATUS )
@@ -485,24 +564,320 @@
 
       END IF
 
-*  Assign undefined values to the ordered statistics.
+*  Assign undefined values to the ordered statistics so by default
+*  they are not reported.
       MEDIAN = VAL__BADD
+      IF ( .NOT. DOPRCT ) THEN
+         PERCNT( 1 ) = VAL__BADR
+         PERVAL( 1 ) = VAL__BADD
+      END IF
       MODE = VAL__BADD
-      PERCNT( 1 ) = VAL__BADR
-      PERVAL( 1 ) = VAL__BADD
+
+*  Calculate the ordered statistics.
+*  =================================
+      IF ( ORDER ) THEN
+
+*  Use a brute-force sort of the data.
+
+*  Obtain workspace for pointers and PDA routines that don't support
+*  byte and word data types.
+         CALL PSX_CALLOC( EL, '_INTEGER', IPNTR, STATUS )
+         IF ( TYPE .EQ. '_BYTE' .OR. TYPE .EQ. '_UBYTE' .OR.
+     :        TYPE .EQ. '_WORD' .OR. TYPE .EQ. '_UWORD' ) THEN
+            CALL PSX_CALLOC( EL, '_INTEGER', WPNTR, STATUS )
+         END IF
+
+*  Convert to indices within the sorted array.
+         DO I = 1, NUMPER
+            PERIND( I ) = NINT( PERCNT( I ) * 0.01 * REAL( EL ) )
+         END DO
+
+*  Call the appropriate routine to quicksort the array and then find the
+*  order statistics.
+         IF ( TYPE .EQ. '_BYTE' ) THEN
+            CALL VEC_BTOI( .TRUE., EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                     %VAL( CNF_PVAL( WPNTR ) ), IERR, NERR,
+     :                     STATUS )
+            CALL PDA_QSIAI( EL, %VAL( CNF_PVAL( WPNTR ) ), 
+     :                      %VAL( CNF_PVAL( IPNTR ) ) )
+            CALL PSX_FREE( WPNTR, STATUS )
+
+*  Extract the index of the median.
+            CALL KPG1_RETRI( EL, EL / 2 + 1, %VAL( CNF_PVAL( IPNTR ) ),
+     :                       UPERIN( 1 ), STATUS )
+
+*  Extract the median from the unsorted array.
+            CALL KPG1_RETRB( EL, UPERIN( 1 ),
+     :                       %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                       BQUANT( 1 ), STATUS )
+            MEDIAN = NUM_BTOD( BQUANT( 1 ) )
+
+*  Average the middle two of an even-numbered sample.
+            IF ( MOD( EL, 2 ) .EQ. 0 ) THEN
+               CALL KPG1_RETRI( EL, EL / 2, %VAL( CNF_PVAL( IPNTR ) ),
+     :                          UPERIN( 1 ), STATUS )
+               CALL KPG1_RETRB( EL, UPERIN( 1 ),
+     :                          %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                          BQUANT( 2 ), STATUS )
+               MEDIUN = NUM_BTOD( BQUANT( 2 ) )
+               MEDIAN = FLOOR( 0.5D0 * ( MEDIAN + MEDIUN ) )
+            END IF
+ 
+*  Extract the percentiles.
+            IF ( DOPRCT ) THEN
+               CALL KPG1_RETVI( EL, %VAL( CNF_PVAL( IPNTR ) ), NUMPER,
+     :                          PERIND, UPERIN, STATUS )
+               CALL KPG1_RETVB( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                          NUMPER, UPERIN, BQUANT, STATUS )
+               DO I = 1, NUMPER
+                  PERVAL( I ) = FLOOR( NUM_BTOD( BQUANT( I ) ) )
+               END DO
+            END IF
+
+
+         ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
+            CALL VEC_UBTOI( .TRUE., EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                      %VAL( CNF_PVAL( WPNTR ) ), IERR, NERR,
+     :                      STATUS )
+            CALL PDA_QSIAI( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                      %VAL( CNF_PVAL( IPNTR ) ) )
+            CALL PSX_FREE( WPNTR, STATUS )
+ 
+*  Extract the index of the median.
+            CALL KPG1_RETRI( EL, EL / 2 + 1, %VAL( CNF_PVAL( IPNTR ) ),
+     :                      UPERIN( 1 ), STATUS )
+
+*  Extract the median from the unsorted array.
+            CALL KPG1_RETRUB( EL, UPERIN( 1 ),
+     :                        %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                        BQUANT( 1 ), STATUS )
+            MEDIAN = NUM_UBTOD( BQUANT( 1 ) )
+
+*  Average the middle two of an even-numbered sample.
+            IF ( MOD( EL, 2 ) .EQ. 0 ) THEN
+               CALL KPG1_RETRI( EL, EL / 2, %VAL( CNF_PVAL( IPNTR ) ),
+     :                          UPERIN( 1 ), STATUS )
+               CALL KPG1_RETRUB( EL, UPERIN( 1 ),
+     :                           %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                           BQUANT( 2 ), STATUS )
+               MEDIUN = NUM_UBTOD( BQUANT( 2 ) )
+               MEDIAN = FLOOR( 0.5D0 * ( MEDIAN + MEDIUN ) )
+            END IF
+ 
+*  Extract the percentiles.
+            IF ( DOPRCT ) THEN
+               CALL KPG1_RETVI( EL, %VAL( CNF_PVAL( IPNTR ) ), NUMPER,
+     :                          PERIND, UPERIN, STATUS )
+               CALL KPG1_RETVUB( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                           NUMPER, UPERIN, BQUANT, STATUS )
+               DO I = 1, NUMPER
+                  PERVAL( I ) = FLOOR( NUM_UBTOD( BQUANT( I ) ) )
+               END DO
+            END IF
+
+
+         ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
+            CALL PDA_QSIAD( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                      %VAL( CNF_PVAL( IPNTR ) ) )
+
+*  Extract the index of the median.
+            CALL KPG1_RETRI( EL, EL / 2 + 1, %VAL( CNF_PVAL( IPNTR ) ),
+     :                       UPERIN( 1 ), STATUS )
+
+*  Extract the median from the unsorted array.
+            CALL KPG1_RETRD( EL, UPERIN( 1 ),
+     :                       %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                       MEDIAN, STATUS )
+
+*  Average the middle two of an even-numbered sample.
+            IF ( MOD( EL, 2 ) .EQ. 0 ) THEN
+               CALL KPG1_RETRI( EL, EL / 2, %VAL( CNF_PVAL( IPNTR ) ),
+     :                          UPERIN( 1 ), STATUS )
+               CALL KPG1_RETRD( EL, UPERIN( 1 ),
+     :                          %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                          MEDIUN, STATUS )
+               MEDIAN = 0.5D0 * ( MEDIAN + MEDIUN )
+            END IF
+
+*  Extract the percentiles.
+            IF ( DOPRCT ) THEN
+               CALL KPG1_RETVI( EL, %VAL( CNF_PVAL( IPNTR ) ), NUMPER,
+     :                          PERIND, UPERIN, STATUS )
+               CALL KPG1_RETVD( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                          NUMPER, UPERIN, PERVAL, STATUS )
+            END IF
+
+         ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
+            CALL PDA_QSIAI( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                      %VAL( CNF_PVAL( IPNTR ) ) )
+
+*  Extract the index of the median.
+            CALL KPG1_RETRI( EL, EL / 2 + 1, %VAL( CNF_PVAL( IPNTR ) ),
+     :                       UPERIN( 1 ), STATUS )
+
+*  Extract the median from the unsorted array.
+            CALL KPG1_RETRI( EL, UPERIN( 1 ),
+     :                       %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                       IQUANT( 1 ), STATUS )
+            MEDIAN = NUM_ITOD( IQUANT( 1 ) )
+
+*  Average the middle two of an even-numbered sample.
+            IF ( MOD( EL, 2 ) .EQ. 0 ) THEN
+               CALL KPG1_RETRI( EL, EL / 2, %VAL( CNF_PVAL( IPNTR ) ),
+     :                          UPERIN( 1 ), STATUS )
+               CALL KPG1_RETRI( EL, UPERIN( 1 ),
+     :                          %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                          IQUANT( 2 ), STATUS )
+               MEDIUN = NUM_ITOD( IQUANT( 2 ) )
+               MEDIAN = FLOOR( 0.5D0 * ( MEDIAN + MEDIUN ) )
+            END IF
+ 
+*  Extract the percentiles.
+            IF ( DOPRCT ) THEN
+               CALL KPG1_RETVI( EL, %VAL( CNF_PVAL( IPNTR ) ), NUMPER,
+     :                          PERIND, UPERIN, STATUS )
+               CALL KPG1_RETVI( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                          NUMPER, UPERIN, IQUANT, STATUS )
+               DO I = 1, NUMPER
+                  PERVAL( I ) = FLOOR( NUM_ITOD( IQUANT( I ) ) )
+               END DO
+            END IF
+
+
+         ELSE IF ( TYPE .EQ. '_REAL' ) THEN
+            CALL PDA_QSIAR( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                      %VAL( CNF_PVAL( IPNTR ) ) )
+ 
+*  Extract the index of the median.
+            CALL KPG1_RETRI( EL, EL / 2 + 1, %VAL( CNF_PVAL( IPNTR ) ),
+     :                       UPERIN( 1 ), STATUS )
+
+*  Extract the median from the unsorted array.
+            CALL KPG1_RETRR( EL, UPERIN( 1 ),
+     :                       %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                       RQUANT( 1 ), STATUS )
+            MEDIAN = DBLE( RQUANT( 1 ) )
+
+*  Average the middle two of an even-numbered sample.
+            IF ( MOD( EL, 2 ) .EQ. 0 ) THEN
+               CALL KPG1_RETRI( EL, EL / 2, %VAL( CNF_PVAL( IPNTR ) ),
+     :                          UPERIN( 1 ), STATUS )
+               CALL KPG1_RETRR( EL, UPERIN( 1 ),
+     :                          %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                          RQUANT( 2 ), STATUS )
+               MEDIUN = DBLE( RQUANT( 2 ) )
+               MEDIAN = 0.5D0 * ( MEDIAN + MEDIUN )
+            END IF
+ 
+*  Extract the percentiles.
+            IF ( DOPRCT ) THEN
+               CALL KPG1_RETVI( EL, %VAL( CNF_PVAL( IPNTR ) ), NUMPER,
+     :                          PERIND, UPERIN, STATUS )
+               CALL KPG1_RETVR( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                          NUMPER, UPERIN, RQUANT, STATUS )
+               DO I = 1, NUMPER
+                  PERVAL( I ) = DBLE( RQUANT( I ) )
+               END DO
+            END IF
+
+
+         ELSE IF ( TYPE .EQ. '_WORD' ) THEN
+            CALL VEC_WTOI( .TRUE., EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                     %VAL( CNF_PVAL( WPNTR ) ), IERR, NERR,
+     :                     STATUS )
+            CALL PDA_QSIAI( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                      %VAL( CNF_PVAL( IPNTR ) ) )
+            CALL PSX_FREE( WPNTR, STATUS )
+ 
+*  Extract the index of the median.
+            CALL KPG1_RETRI( EL, EL / 2 + 1, %VAL( CNF_PVAL( IPNTR ) ),
+     :                       UPERIN( 1 ), STATUS )
+
+*  Extract the median from the unsorted array.
+            CALL KPG1_RETRW( EL, UPERIN( 1 ),
+     :                       %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                       WQUANT( 1 ), STATUS )
+            MEDIAN = NUM_WTOD( WQUANT( 1 ) )
+
+*  Average the middle two of an even-numbered sample.
+            IF ( MOD( EL, 2 ) .EQ. 0 ) THEN
+               CALL KPG1_RETRI( EL, EL / 2, %VAL( CNF_PVAL( IPNTR ) ),
+     :                          UPERIN( 1 ), STATUS )
+               CALL KPG1_RETRW( EL, UPERIN( 1 ),
+     :                          %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                          WQUANT( 2 ), STATUS )
+               MEDIUN = NUM_WTOD( WQUANT( 2 ) )
+               MEDIAN = FLOOR( 0.5D0 * ( MEDIAN + MEDIUN ) )
+            END IF
+ 
+*  Extract the percentiles.
+            IF ( DOPRCT ) THEN
+               CALL KPG1_RETVI( EL, %VAL( CNF_PVAL( IPNTR ) ), NUMPER,
+     :                          PERIND, UPERIN, STATUS )
+               CALL KPG1_RETVW( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                          NUMPER, UPERIN, WQUANT, STATUS )
+               DO I = 1, NUMPER
+                  PERVAL( I ) = FLOOR( NUM_WTOD( WQUANT( I ) ) )
+               END DO
+            END IF
+
+
+         ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
+            CALL VEC_UWTOI( .TRUE., EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                      %VAL( CNF_PVAL( WPNTR ) ), IERR, NERR,
+     :                      STATUS )
+            CALL PDA_QSIAI( EL, %VAL( CNF_PVAL( WPNTR ) ), 
+     :                      %VAL( CNF_PVAL( IPNTR ) ) )
+            CALL PSX_FREE( WPNTR, STATUS )
+
+*  Extract the index of the median.
+            CALL KPG1_RETRI( EL, EL / 2 + 1, %VAL( CNF_PVAL( IPNTR ) ),
+     :                       UPERIN( 1 ), STATUS )
+
+*  Extract the median from the unsorted array.
+            CALL KPG1_RETRUW( EL, UPERIN( 1 ),
+     :                        %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                        WQUANT( 1 ), STATUS )
+            MEDIAN = NUM_UWTOD( WQUANT( 1 ) )
+
+*  Average the middle two of an even-numbered sample.
+            IF ( MOD( EL, 2 ) .EQ. 0 ) THEN
+               CALL KPG1_RETRI( EL, EL / 2, %VAL( CNF_PVAL( IPNTR ) ),
+     :                          UPERIN( 1 ), STATUS )
+               CALL KPG1_RETRUW( EL, UPERIN( 1 ),
+     :                           %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                           WQUANT( 2 ), STATUS )
+               MEDIUN = NUM_UWTOD( WQUANT( 2 ) )
+               MEDIAN = FLOOR( 0.5D0 * ( MEDIAN + MEDIUN ) )
+            END IF
+
+*  Extract the percentiles.
+            IF ( DOPRCT ) THEN
+               CALL KPG1_RETVI( EL, %VAL( CNF_PVAL( IPNTR ) ), NUMPER,
+     :                          PERIND, UPERIN, STATUS )
+               CALL KPG1_RETVUW( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                           NUMPER, UPERIN, WQUANT, STATUS )
+               DO I = 1, NUMPER
+                  PERVAL( I ) = FLOOR( NUM_UWTOD( WQUANT( I ) ) )
+               END DO
+            END IF
+
+            CALL PSX_FREE( IPNTR, STATUS )
+         END IF
+      END IF
 
 *  Display the statistics, using the most appropriate floating-point
 *  precision.
       IF ( TYPE .EQ. '_DOUBLE' ) THEN
          CALL KPG1_STDSD( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
      :                    DMAX, MAXP, MAXC, SUM, MEAN, STDEV,
-     :                    MEDIAN, MODE, 1, PERCNT, PERVAL, MAXWCS, 
-     :                    MINWCS, STATUS )
+     :                    MEDIAN, MODE, MAX( 1, NUMPER ), PERCNT, 
+     :                    PERVAL, MAXWCS, MINWCS, STATUS )
       ELSE
          CALL KPG1_STDSR( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
      :                    DMAX, MAXP, MAXC, SUM, MEAN, STDEV,
-     :                    MEDIAN, MODE, 1, PERCNT, PERVAL, MAXWCS,
-     :                    MINWCS, STATUS )
+     :                    MEDIAN, MODE, MAX( 1, NUMPER ), PERCNT,
+     :                    PERVAL, MAXWCS, MINWCS, STATUS )
       END IF
 
 *  Also write the statistics to the logfile, if used.
@@ -510,13 +885,13 @@
          IF ( TYPE .EQ. '_DOUBLE' ) THEN
             CALL KPG1_STFLD( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
      :                       DMAX, MAXP, MAXC, SUM, MEAN, STDEV,
-     :                       MEDIAN, MODE, 1, PERCNT, PERVAL,
-     :                       IFIL, STATUS )
+     :                       MEDIAN, MODE, MAX( 1, NUMPER ), PERCNT,
+     :                       PERVAL, IFIL, STATUS )
          ELSE
             CALL KPG1_STFLR( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
      :                       DMAX, MAXP, MAXC, SUM, MEAN, STDEV,
-     :                       MEDIAN, MODE, 1, PERCNT, PERVAL,
-     :                       IFIL, STATUS )
+     :                       MEDIAN, MODE, MAX( 1, NUMPER ), PERCNT,
+     :                       PERVAL, IFIL, STATUS )
          END IF
       END IF
 
@@ -550,16 +925,14 @@
          CALL MSG_OUT( 'CLIPDONE', BUF( : NC ), STATUS )
          IF ( TYPE .EQ. '_DOUBLE' ) THEN
             CALL KPG1_STDSD( IWCS, NDIM, EL, NGOODC, DMINC, MINPC, 
-     :                       MINCC,
-     :                       DMAXC, MAXPC, MAXCC, SUMC, MEANC, STDEVC,
-     :                       MEDIAN, MODE, 1, PERCNT, PERVAL, MAXWCS,
-     :                       MINWCS, STATUS )
+     :                       MINCC, DMAXC, MAXPC, MAXCC, SUMC, MEANC, 
+     :                       STDEVC, MEDIAN, MODE, MAX( 1, NUMPER ),
+     :                       PERCNT, PERVAL, MAXWCS, MINWCS, STATUS )
          ELSE
             CALL KPG1_STDSR( IWCS, NDIM, EL, NGOODC, DMINC, MINPC, 
-     :                       MINCC,
-     :                       DMAXC, MAXPC, MAXCC, SUMC, MEANC, STDEVC,
-     :                       MEDIAN, MODE, 1, PERCNT, PERVAL, MAXWCS,
-     :                       MINWCS, STATUS )
+     :                       MINCC, DMAXC, MAXPC, MAXCC, SUMC, MEANC,
+     :                       STDEVC, MEDIAN, MODE, MAX( 1, NUMPER ), 
+     :                       PERCNT, PERVAL, MAXWCS, MINWCS, STATUS )
          END IF
 
 *  Also write the statistics to the log file, if used.
@@ -568,13 +941,13 @@
             IF ( TYPE .EQ. '_DOUBLE' ) THEN
                CALL KPG1_STFLD( IWCS, NDIM, EL, NGOODC, DMINC, MINPC, 
      :                          MINCC, DMAXC, MAXPC, MAXCC, SUMC, MEANC,
-     :                          STDEVC, MEDIAN, MODE, 1, PERCNT, PERVAL,
-     :                          IFIL, STATUS )
+     :                          STDEVC, MEDIAN, MODE, MAX( 1, NUMPER ),
+     :                          PERCNT, PERVAL, IFIL, STATUS )
             ELSE
                CALL KPG1_STFLR( IWCS, NDIM, EL, NGOODC, DMINC, MINPC, 
      :                          MINCC, DMAXC, MAXPC, MAXCC, SUMC, MEANC,
-     :                          STDEVC, MEDIAN, MODE, 1, PERCNT, PERVAL,
-     :                          IFIL, STATUS )
+     :                          STDEVC, MEDIAN, MODE, MAX( 1, NUMPER ),
+     :                          PERCNT, PERVAL, IFIL, STATUS )
             END IF
          END IF
       END IF
@@ -594,6 +967,11 @@
       CALL PAR_PUT1D( 'MINCOORD', NWCS, MINCC, STATUS )
       CALL PAR_PUT1I( 'MAXPOS', NDIM, MAXPC, STATUS )
       CALL PAR_PUT1I( 'MINPOS', NDIM, MINPC, STATUS )
+      IF ( ORDER ) CALL PAR_PUT0D( 'MEDIAN', MEDIAN, STATUS )
+      
+*  Only write percentiles values if any percentiles were given.
+      IF ( DOPRCT ) CALL PAR_PUT1D( 'PERVAL', NUMPER, PERVAL, STATUS )
+
 
 *  Arrive here if an error occurs.
  99   CONTINUE     

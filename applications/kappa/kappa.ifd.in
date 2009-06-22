@@ -16293,6 +16293,14 @@ iraf! {
             helpkey *
           }
 
+         parameter median {
+            type _DOUBLE
+            access WRITE
+            vpath DEFAULT
+            default 0.0D0
+            helpkey *
+          }
+
          parameter mincoord {
             size *
             type _DOUBLE
@@ -16357,6 +16365,32 @@ iraf! {
             access WRITE
             vpath DEFAULT
             default 0
+            helpkey *
+          }
+
+         parameter order {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath DEFAULT
+            prompt {Report order statistics?}
+            default FALSE
+            helpkey *
+          }
+
+        parameter percentiles {
+            size *
+            type _REAL
+            vpath DEFAULT
+            prompt {List of percentiles}
+            default !
+            helpkey *
+          }
+
+         parameter perval {
+            size *
+            access WRITE
+            type _DOUBLE
+            vpath INTERNAL
             helpkey *
           }
 
