@@ -87,7 +87,7 @@ itcl::class samp::SampHub {
          { callAll {private_key string msg_tag string message struct} }
          { callAndWait {private_key string recipient_id string message struct
                         timeout string} }
-         { reply {private_key string respose struct} }
+         { reply {private_key string msg_id string response struct} }
          { setXmlrpcCallback {private_key string url string} }
          { ping {} }
       }
