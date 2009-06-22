@@ -1920,7 +1920,12 @@ itcl::class gaia::Gaia {
          $image_ reopen
       } else {
          #  Instead fully re-open the cube.
-         $itk_component(opencube) configure -cube $cube_name
+         if { [info exists itk_component(opencube)] } {
+            $itk_component(opencube) configure -cube $cube_name
+         } else {
+            #  No cube toolbox, so a volatile image.
+            $image_ reopen
+         }
       }
    }
 
