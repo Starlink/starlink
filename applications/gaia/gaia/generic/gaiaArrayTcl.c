@@ -53,6 +53,8 @@
 /* Local prototypes */
 static int gaiaArrayCopy( ClientData clientData, Tcl_Interp *interp,
                           int objc, Tcl_Obj *CONST objv[] );
+static int gaiaArrayCreate( ClientData clientData, Tcl_Interp *interp,
+                            int objc, Tcl_Obj *CONST objv[] );
 static int gaiaArrayImage( ClientData clientData, Tcl_Interp *interp,
                            int objc, Tcl_Obj *CONST objv[] );
 static int gaiaArrayInfo( ClientData clientData, Tcl_Interp *interp,
@@ -65,6 +67,8 @@ static int gaiaArrayRelease( ClientData clientData, Tcl_Interp *interp,
                              int objc, Tcl_Obj *CONST objv[] );
 static int gaiaArraySpectrum( ClientData clientData, Tcl_Interp *interp,
                               int objc, Tcl_Obj *CONST objv[] );
+static int gaiaArrayWrap( ClientData clientData, Tcl_Interp *interp,
+                          int objc, Tcl_Obj *CONST objv[] );
 
 /**
  * Register all the array commands.
@@ -72,6 +76,10 @@ static int gaiaArraySpectrum( ClientData clientData, Tcl_Interp *interp,
 int Array_Init( Tcl_Interp *interp )
 {
     Tcl_CreateObjCommand( interp, "array::copy", gaiaArrayCopy,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "array::create", gaiaArrayCreate,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
@@ -97,6 +105,10 @@ int Array_Init( Tcl_Interp *interp )
                           (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "array::release", gaiaArrayRelease,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "array::wrap", gaiaArrayWrap,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
@@ -453,6 +465,129 @@ static int gaiaArrayImage( ClientData clientData, Tcl_Interp *interp,
 
     /* Export result */
     Tcl_SetObjResult( interp, Tcl_NewLongObj( (long) imageArrayInfo ) );
+    return TCL_OK;
+}
+
+/**
+ * Create an array.
+ *
+ * The arguments are:
+ *
+ *   data type as a FITS bitpix
+ *   the number of elements in the array.
+ *
+ * The result is an ARRAYinfo struct.
+ */
+static int gaiaArrayCreate( ClientData clientData, Tcl_Interp *interp,
+                           int objc, Tcl_Obj *CONST objv[] )
+{
+    ARRAYinfo *arrayInfo;
+    int bitpix;
+    int type;
+    long el;
+    size_t nel;
+    void *ptr;
+
+    /* Check arguments */
+    if ( objc != 3 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "data_type nel" );
+        return TCL_ERROR;
+    }
+
+    /* Get data type. */
+    if ( Tcl_GetIntFromObj( interp, objv[1], &bitpix ) != TCL_OK ) {
+        Tcl_AppendResult( interp, ": failed to read bitpix",
+                          (char *) NULL );
+        return TCL_ERROR;
+    }
+    type = gaiaArrayFITSType( bitpix );
+    if ( type == HDS_UNKNOWN ) {
+        Tcl_SetResult( interp, "Unknown data type", TCL_VOLATILE );
+        return TCL_ERROR;
+    }
+
+    /* Number of elements */
+    if ( Tcl_GetLongFromObj( interp, objv[2], &el ) != TCL_OK ) {
+        Tcl_AppendResult( interp, ": failed to read number of elements",
+                          (char *) NULL );
+        return TCL_ERROR;
+    }
+
+    /* Get memory. */
+    nel = el * gaiaArraySizeOf( type );
+    gaiaAllocateMemory( GAIA_ARRAY_NEW, nel, &ptr );
+
+    /* Create the info struct. */
+    arrayInfo = gaiaArrayCreateInfo( ptr, type, el, 0, 1, 0, 1.0, 0.0,
+                                     GAIA_ARRAY_NEW );
+
+    /* Export */
+    Tcl_SetObjResult( interp, Tcl_NewLongObj( (long) arrayInfo ) );
+    return TCL_OK;
+}
+
+/**
+ * Create an array by wrapping some given memory.
+ *
+ * The arguments are:
+ *
+ *   the address of the memory to wrap
+ *   data type as a FITS bitpix
+ *   the number of elements in the array.
+ *
+ * The result is an ARRAYinfo struct. Note that the memory will never be
+ * freed, the caller must arrange that.
+ */
+static int gaiaArrayWrap( ClientData clientData, Tcl_Interp *interp,
+                          int objc, Tcl_Obj *CONST objv[] )
+{
+    ARRAYinfo *arrayInfo;
+    int bitpix;
+    int type;
+    long adr;
+    long el;
+    size_t nel;
+    void *ptr;
+
+    /* Check arguments */
+    if ( objc != 4 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "address data_type nel" );
+        return TCL_ERROR;
+    }
+
+    /* Get address of the data array. */
+    if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
+        Tcl_AppendResult( interp, ": failed to read memory address",
+                          (char *) NULL );
+        return TCL_ERROR;
+    }
+    ptr = (void *)adr;
+
+    /* Get data type. */
+    if ( Tcl_GetIntFromObj( interp, objv[2], &bitpix ) != TCL_OK ) {
+        Tcl_AppendResult( interp, ": failed to read bitpix",
+                          (char *) NULL );
+        return TCL_ERROR;
+    }
+    type = gaiaArrayFITSType( bitpix );
+    if ( type == HDS_UNKNOWN ) {
+        Tcl_SetResult( interp, "Unknown data type", TCL_VOLATILE );
+        return TCL_ERROR;
+    }
+
+    /* Number of elements */
+    if ( Tcl_GetLongFromObj( interp, objv[3], &el ) != TCL_OK ) {
+        Tcl_AppendResult( interp, ": failed to read number of elements",
+                          (char *) NULL );
+        return TCL_ERROR;
+    }
+
+    /* Create the info struct. */
+    arrayInfo = gaiaArrayCreateInfo( ptr, type, el, 1, 0, 0, 1.0, 0.0,
+                                     GAIA_ARRAY_NONE );
+
+    /* Export */
+    Tcl_SetObjResult( interp, Tcl_NewLongObj( (long) arrayInfo ) );
     return TCL_OK;
 }
 

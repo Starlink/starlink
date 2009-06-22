@@ -71,6 +71,12 @@ extern "C" {
     char const *gaiaArrayFullTypeToHDS( int intype, int isfits, double bscale, 
                                         double bzero );
 
+    /* Return a formatted version of an HDS bad value. */
+    char const *gaiaArrayHDSBlankValue( int type );
+
+    /* Return a formatted version of an HDS bad value. */
+    char const *gaiaArrayFITSBlankValue( int bitpix );
+
     /* Size in bytes of a local type */
     size_t gaiaArraySizeOf( int type );
 
@@ -95,6 +101,12 @@ extern "C" {
 
     /* Get strides for indexing an ND array */ 
     void gaiaArrayGetStrides( int ndims, int dims[], int strides[] );
+
+    /* Allocate memory using one of the supported schemes. */
+    void gaiaAllocateMemory( int memtype, size_t nel, void **ptr );
+
+    /* Free memory allocated using one the supported schemes. */
+    void gaiaFreeMemory( int memtype, void *ptr );
 
     /* Free memory held by an info struct that we've allocated */
     void gaiaArrayFree( ARRAYinfo *info );

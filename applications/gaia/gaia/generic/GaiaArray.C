@@ -112,10 +112,6 @@ static void RawCubeFromCube( ARRAYinfo *cubeinfo, int dims[], int lbnd[],
                              int ubnd[], void **outPtr, size_t *nel,
                              int memtype );
 
-
-static void AllocateMemory( int memtype, size_t nel, void **ptr );
-static void FreeMemory( int memtype, void *ptr );
-
 /**
  * Create an ARRAYinfo structure for a data array. If blank isn't set for your
  * data just set haveblank to 0. Note that NaN will be used for FITS floating
@@ -152,7 +148,7 @@ void gaiaArrayFreeInfo( ARRAYinfo *info )
 /**
  * Allocate memory using the required allocator.
  */
-void AllocateMemory( int memtype, size_t nel, void **ptr )
+void gaiaAllocateMemory( int memtype, size_t nel, void **ptr )
 {
     if ( memtype == GAIA_ARRAY_MALLOC ) {
         *ptr = malloc( nel );
@@ -166,9 +162,9 @@ void AllocateMemory( int memtype, size_t nel, void **ptr )
 }
 
 /**
- * Free memory allocated using using AllocateMemory.
+ * Free memory allocated using using gaiaAllocateMemory.
  */
-void FreeMemory( int memtype, void *ptr )
+void gaiaFreeMemory( int memtype, void *ptr )
 {
     if ( memtype == GAIA_ARRAY_MALLOC ) {
         free( ptr );
@@ -343,6 +339,56 @@ int gaiaArrayScaledType( int intype, int isfits, double bscale, double bzero )
         outtype = HDS_WORD;
     }
     return outtype;
+}
+
+/**
+ * Return an HDS type blank data value as a string. Note string can only
+ * be used until next call.
+ */
+char const *gaiaArrayHDSBlankValue( int type )
+{
+    static char buffer[32];
+    buffer[0] = '\0';
+    switch ( type )
+    {
+        case HDS_DOUBLE :
+            sprintf( buffer, "%.17g", VAL__BADD );
+        break;
+        case HDS_REAL :
+            sprintf( buffer, "%.9g", VAL__BADR );
+        break;
+
+        case HDS_INTEGER :
+            sprintf( buffer, "%d", VAL__BADI );
+        break;
+
+        case HDS_WORD :
+            sprintf( buffer, "%d", VAL__BADW );
+        break;
+
+        case HDS_UWORD :
+            sprintf( buffer, "%d", VAL__BADUW );
+        break;
+
+        case HDS_BYTE :
+            sprintf( buffer, "%d", VAL__BADB );
+        break;
+
+        case HDS_UBYTE :
+            sprintf( buffer, "%d", VAL__BADUB );
+        break;
+
+    }
+    return buffer;
+}
+
+/**
+ * Return an HDS type blank data value as a string. Note string can only
+ * be used until next call.
+ */
+char const *gaiaArrayFITSBlankValue( int bitpix )
+{
+    return gaiaArrayHDSBlankValue( gaiaArrayFITSType( bitpix ) );
 }
 
 /**
@@ -527,7 +573,7 @@ static void RawImageFromCube( ARRAYinfo *cubeinfo, int dims[3], int axis,
         length = (*nel) * gaiaArraySizeOf( type );
 
         if ( *outPtr == NULL ) {
-            AllocateMemory( memtype, length, outPtr );
+            gaiaAllocateMemory( memtype, length, outPtr );
         }
 
         /* Get the offset into cube of first pixel (in bytes). */
@@ -558,7 +604,7 @@ static void RawImageFromCube( ARRAYinfo *cubeinfo, int dims[3], int axis,
 
         /* Allocate the memory */
         if ( *outPtr == NULL ) {
-            AllocateMemory( memtype, length, outPtr );
+            gaiaAllocateMemory( memtype, length, outPtr );
         }
 
         /* Get the strides for stepping around dimensions */
@@ -653,7 +699,7 @@ static void RawSubImageFromCube( ARRAYinfo *cubeinfo, int dims[3], int axis,
     nbytes = gaiaArraySizeOf( type );
     length = (*nel) * nbytes;
     if ( *outPtr == NULL ) {
-        AllocateMemory( memtype, length, outPtr );
+        gaiaAllocateMemory( memtype, length, outPtr );
     }
 
     if ( axis == 2 ) {
@@ -877,7 +923,7 @@ static void RawCubeFromCube( ARRAYinfo *cubeinfo, int dims[3], int lbnd[3],
 
     /* Allocate the memory, if needed. */
     if ( *outPtr == NULL ) {
-        AllocateMemory( memtype, length, outPtr );
+        gaiaAllocateMemory( memtype, length, outPtr );
     }
 
     if ( lbnd[0] == 0 && ubnd[0] == dims[0] &&
@@ -1021,7 +1067,7 @@ void gaiaArraySpectrumFromCube( ARRAYinfo *info, int dims[3], int axis,
         *nel = upper - lower;
     }
     length = (*nel) * gaiaArraySizeOf( intype );
-    AllocateMemory( memtype, length, outPtr );
+    gaiaAllocateMemory( memtype, length, outPtr );
 
     /* Check bounds. */
     if ( index1 < 0 || index2 < 0 ) {
@@ -1247,7 +1293,7 @@ void gaiaArrayRegionSpectrumFromCube( ARRAYinfo *info, int dims[3], int axis,
         *nel = upper - lower;
     }
     length = (*nel) * gaiaArraySizeOf( *outtype );
-    AllocateMemory( memtype, length, outPtr );
+    gaiaAllocateMemory( memtype, length, outPtr );
 
     /* Generate the ARD mask */
     planeSize = 1;
@@ -1498,7 +1544,7 @@ void gaiaArrayGetStrides( int ndims, int dims[], int strides[] )
 void gaiaArrayFree( ARRAYinfo *info )
 {
     if ( info->ptr != NULL ) {
-        FreeMemory( info->memtype, info->ptr );
+        gaiaFreeMemory( info->memtype, info->ptr );
         info->ptr = NULL;
     }
     else {
@@ -1589,7 +1635,7 @@ static void DataNormalise( void *inPtr, int intype, int nel, int isfits,
     scaled = ( intype != (*outtype) );
     if ( scaled ) {
         length = nel * gaiaArraySizeOf( *outtype );
-        AllocateMemory( memtype, length, outPtr );
+        gaiaAllocateMemory( memtype, length, outPtr );
     }
     else {
         *outPtr = inPtr;
@@ -1856,7 +1902,7 @@ static void DataNormalise( void *inPtr, int intype, int nel, int isfits,
 
     /* Free the memory if we produced a scaled version and it's requested. */
     if ( scaled && freescaled ) {
-        FreeMemory( memtype, inPtr );
+        gaiaFreeMemory( memtype, inPtr );
     }
 }
 
@@ -2005,7 +2051,7 @@ static void DataNormaliseCopy( void *inPtr, int intype, int nel, int isfits,
     *outtype = gaiaArrayScaledType( intype, isfits, bscale, bzero );
     scaled = ( intype != (*outtype) );
     length = nel * gaiaArraySizeOf( *outtype );
-    AllocateMemory( memtype, length, outPtr );
+    gaiaAllocateMemory( memtype, length, outPtr );
 
     /* Out of memory, give up. */
     if ( outPtr == NULL ) {
@@ -2471,7 +2517,7 @@ unsigned char *gaiaArrayCreateUnsignedMask( ARRAYinfo *info, int memtype )
 
     /* Allocate the memory, will be released if not used, saves one scan of
      * the data, which may be better. */
-    AllocateMemory( memtype, nel, (void **) &mask );
+    gaiaAllocateMemory( memtype, nel, (void **) &mask );
 
     switch ( info->type )
     {
@@ -2576,7 +2622,7 @@ unsigned char *gaiaArrayCreateUnsignedMask( ARRAYinfo *info, int memtype )
 
     /* No bad pixels, so no mask needed */
     if ( nbad == 0 ) {
-        FreeMemory( memtype, (void *) mask );
+        gaiaFreeMemory( memtype, (void *) mask );
         mask = NULL;
     }
     return mask;
@@ -2609,7 +2655,7 @@ void gaiaArrayMaskData( ARRAYinfo *dataInfo, ARRAYinfo *maskInfo,
 
     /*  Allocate memory for the masked copy. */
     length = nel * gaiaArraySizeOf( dataInfo->type );
-    AllocateMemory( memtype, length, dstPtr );
+    gaiaAllocateMemory( memtype, length, dstPtr );
 
     /*  Note on swapping etc. We only test the mask value, which we know
      *  is integer, so that only requires swapping on little-endian machines
