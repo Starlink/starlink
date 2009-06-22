@@ -108,10 +108,13 @@ itcl::class gaia::GaiaMask {
       add_short_help $itk_component(menubar).help \
          {Help menu: get some help about this window}
 
+      set lwidth 12
+
       #  Name of input mask.
       itk_component add mask {
          LabelFileChooser $w_.mask \
             -text "Input mask:" \
+            -labelwidth $lwidth \
             -textvariable [scope itk_option(-mask)] \
             -filter_types $itk_option(-filter_types) \
             -chooser_title "Select mask"
@@ -119,6 +122,17 @@ itcl::class gaia::GaiaMask {
       pack $itk_component(mask) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(mask) \
          {Name of the input masked, integer data segmenting input image}
+
+      #  Select which regions to display from the mask. If not set all.
+      itk_component add values {
+         util::LabelEntry $w_.values \
+            -labelwidth $lwidth \
+            -text "Values:" \
+            -textvariable [scope values_]
+      }
+      pack $itk_component(values) -side top -fill x -ipadx 1m -ipady 2m
+      add_short_help $itk_component(values) \
+         {Values of masked regions to display, empty for all}
 
       #  Apply the mask.
       itk_component add apply {
@@ -267,7 +281,8 @@ itcl::class gaia::GaiaMask {
 
       #  Apply the mask to to the image and display, returns the masked
       #  copy as an array.
-      if { [catch {set adr [array::maskdata $image_adr_ $mask_adr_]} msg] } {
+      set range [get_values_]
+      if { [catch {set adr [array::maskdata $image_adr_ $mask_adr_ $range]} msg] } {
          error_dialog "Failed to mask data: $msg"
          return
       }
@@ -287,6 +302,38 @@ itcl::class gaia::GaiaMask {
 
       #  Update everything to make sure we don't get partial image refreshes.
       update idletasks
+   }
+
+   #  Get the values to be displayed in the mask. Expands any implicit ranges.
+   protected  method get_values_ {} {
+      if { $values_ == {} } {
+         return {}
+      }
+
+      #  Need lists of single values or pairs of values.
+      #  Clean up first, replace "," with space, remove multiple spaces
+      #  and trim.
+      set value [regsub -all -- {,} $values_ { }]
+      set value [regsub -all -- {\s+} $value { }]
+      set value [string trim $value]
+      set rangelist {}
+      foreach v $value {
+         #  Ranges are low-high and will need expanding.
+         lappend rangelist [regsub -all -- {-} $v { }]
+      }
+      set range {}
+      foreach l $rangelist {
+         if { [llength $l] > 1 } {
+            set low [lindex $l 0]
+            set high [lindex $l 1]
+            for {set i $low} {$i <= $high} {incr i} {
+               lappend range $i
+            }
+         } else {
+            lappend range $l
+         }
+      }
+      return $range
    }
 
    #  Configuration options: (public variables)
@@ -322,6 +369,9 @@ itcl::class gaia::GaiaMask {
 
    #  Name handling object.
    protected variable mask_namer_ {}
+
+   #  Mask values to display.
+   protected variable values_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------

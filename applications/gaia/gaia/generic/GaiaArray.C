@@ -2634,21 +2634,31 @@ unsigned char *gaiaArrayCreateUnsignedMask( ARRAYinfo *info, int memtype )
  *
  *  Purpose:
  *     Apply an integer mask to a given data array returning the result
- *     in a given array of the same data type as the data.
+ *     in a given array of the same data type as the data. If no values
+ *     are given all non-BAD values in the mask are selected.
  *
  *  Arguments:
  *     dataInfo
  *         Pointer to the data ARRAYinfo structure.
  *     maskInfo
  *         Pointer to the mask ARRAYinfo structure.
- *     destInfo
- *         Pointer to a memory region to get the masked data.
+ *     values
+ *         If non-NULL contains nvalues integer values to select in the mask.
+ *     nvalues
+ *         Number of values in values. If zero then all non-BAD values are
+ *         selected.
+ *     memtype
+ *         Type of memory to allocates.
+ *     dstPtr
+ *         The masked data memory pointer.
  */
 void gaiaArrayMaskData( ARRAYinfo *dataInfo, ARRAYinfo *maskInfo,
+                        int *values, int nvalues,
                         int memtype, void **dstPtr )
 {
     int *maskPtr = (int *)maskInfo->ptr;
     int i;
+    int j;
     int maskValue;
     int nel = dataInfo->el;
     size_t length;
@@ -2659,239 +2669,156 @@ void gaiaArrayMaskData( ARRAYinfo *dataInfo, ARRAYinfo *maskInfo,
 
     /*  Note on swapping etc. We only test the mask value, which we know
      *  is integer, so that only requires swapping on little-endian machines
-     *  if the mask data is FITS, the other data can just be copied. */
+     *  if the mask data is FITS, the other data can just be copied. 
+     *  Also the BAD value itself just needs assignment in the correct byte
+     *  order. */
     if ( maskInfo->isfits ) {
+
+#define SWAP_MASK_AND_COPY(type,badValue)                       \
+        {                                                       \
+            type *dataPtr = (type *)dataInfo->ptr;              \
+            type *destptr = (type *)*dstPtr;                    \
+            if ( nvalues == 0 ) {                               \
+                for ( i = 0; i < nel; i++ ) {                   \
+                    maskValue = SWAP_INT_( maskPtr[i] );        \
+                    if ( maskValue == VAL__BADI ) {             \
+                        destptr[i] = badValue;                  \
+                    }                                           \
+                    else {                                      \
+                        destptr[i] = dataPtr[i];                \
+                    }                                           \
+                }                                               \
+            }                                                   \
+            else {                                              \
+                for ( i = 0; i < nel; i++ ) {                   \
+                    maskValue = SWAP_INT_( maskPtr[i] );        \
+                    for ( j = 0; j < nvalues; j++ ) {           \
+                        if ( maskValue == values[j] ) {         \
+                            destptr[i] = dataPtr[i];            \
+                            break;                              \
+                        }                                       \
+                        else {                                  \
+                            destptr[i] = badValue;              \
+                        }                                       \
+                    }                                           \
+                }                                               \
+            }                                                   \
+        }
 
         /*  FITS mask, may need to handle swapping. */
         switch ( dataInfo->type )
         {
             case HDS_DOUBLE: {
-                double *dataPtr = (double *)dataInfo->ptr;
-                double *destptr = (double *)*dstPtr;
-                double bad = SWAP_DOUBLE_( VAL__BADD );
-                for ( i = 0; i < nel; i++ ) {
-                    maskValue = SWAP_INT_( maskPtr[i] );
-                    if ( maskValue == VAL__BADI ) {
-                        destptr[i] = bad;
-                    }
-                    else {
-                        destptr[i] = dataPtr[i];
-                    }
-                }
+                double badValue = SWAP_DOUBLE_( VAL__BADD );
+                SWAP_MASK_AND_COPY(double,badValue)
             }
             break;
 
             case HDS_REAL: {
-                float *dataPtr = (float *)dataInfo->ptr;
-                float *destptr = (float *)*dstPtr;
-                float bad = SWAP_FLOAT_( VAL__BADR );
-                for ( i = 0; i < nel; i++ ) {
-                    maskValue = SWAP_INT_( maskPtr[i] );
-                    if ( maskValue == VAL__BADI ) {
-                        destptr[i] = bad;
-                    }
-                    else {
-                        destptr[i] = dataPtr[i];
-                    }
-                }
+                float badValue = SWAP_FLOAT_( VAL__BADR );
+                SWAP_MASK_AND_COPY(float,badValue)
             }
             break;
 
             case HDS_INTEGER: {
-                int *dataPtr = (int *)dataInfo->ptr;
-                int *destptr = (int *)*dstPtr;
-                int bad = SWAP_INT_( VAL__BADI );
-                for ( i = 0; i < nel; i++ ) {
-                    maskValue = SWAP_INT_( maskPtr[i] );
-                    if ( maskValue == VAL__BADI ) {
-                        destptr[i] = bad;
-                    }
-                    else {
-                        destptr[i] = dataPtr[i];
-                    }
-                }
+                int badValue = SWAP_INT_( VAL__BADI );
+                SWAP_MASK_AND_COPY(int,badValue)
             }
             break;
 
             case HDS_WORD: {
-                short *dataPtr = (short *)dataInfo->ptr;
-                short *destptr = (short *)*dstPtr;
-                short bad = SWAP_SHORT_( VAL__BADW );
-                for ( i = 0; i < nel; i++ ) {
-                    maskValue = SWAP_INT_( maskPtr[i] );
-                    if ( maskValue == VAL__BADI ) {
-                        destptr[i] = bad;
-                    }
-                    else {
-                        destptr[i] = dataPtr[i];
-                    }
-                }
+                short badValue = SWAP_SHORT_( VAL__BADW );
+                SWAP_MASK_AND_COPY(short,badValue)
             }
             break;
 
             case HDS_UWORD: {
-                unsigned short *dataPtr = (unsigned short *)dataInfo->ptr;
-                unsigned short *destptr = (unsigned short *)*dstPtr;
-                unsigned short bad = SWAP_USHORT_( VAL__BADUW );
-                for ( i = 0; i < nel; i++ ) {
-                    maskValue = SWAP_INT_( maskPtr[i] );
-                    if ( maskValue == VAL__BADI ) {
-                        destptr[i] = bad;
-                    }
-                    else {
-                        destptr[i] = dataPtr[i];
-                    }
-                }
+                unsigned short badValue = SWAP_USHORT_( VAL__BADUW );
+                SWAP_MASK_AND_COPY(unsigned short,badValue)
             }
             break;
 
             case HDS_BYTE: {
-                char *dataPtr = (char *)dataInfo->ptr;
-                char *destptr = (char *)*dstPtr;
-                char bad = VAL__BADB;
-                for ( i = 0; i < nel; i++ ) {
-                    maskValue = SWAP_INT_( maskPtr[i] );
-                    if ( maskValue == VAL__BADI ) {
-                        destptr[i] = bad;
-                    }
-                    else {
-                        destptr[i] = dataPtr[i];
-                    }
-                }
+                char badValue = VAL__BADB;
+                SWAP_MASK_AND_COPY(char,badValue)
             }
             break;
 
             case HDS_UBYTE: {
-                unsigned char *dataPtr = (unsigned char *)dataInfo->ptr;
-                unsigned char *destptr = (unsigned char *)*dstPtr;
-                unsigned char bad = VAL__BADUB;
-                for ( i = 0; i < nel; i++ ) {
-                    maskValue = SWAP_INT_( maskPtr[i] );
-                    if ( maskValue == VAL__BADI ) {
-                        destptr[i] = bad;
-                    }
-                    else {
-                        destptr[i] = dataPtr[i];
-                    }
-                }
+                unsigned char badValue = VAL__BADUB;
+                SWAP_MASK_AND_COPY(unsigned char,badValue)
             }
             break;
         }
     }
     else {
+
         /* Non-FITS so no byte swapping needed. */
+#define MASK_AND_COPY(type,badValue)                            \
+        {                                                       \
+            type *dataPtr = (type *)dataInfo->ptr;              \
+            type *destptr = (type *)*dstPtr;                    \
+            if ( nvalues == 0 ) {                               \
+                for ( i = 0; i < nel; i++ ) {                   \
+                    maskValue = maskPtr[i];                     \
+                    if ( maskValue == VAL__BADI ) {             \
+                        destptr[i] = badValue;                  \
+                    }                                           \
+                    else {                                      \
+                        destptr[i] = dataPtr[i];                \
+                    }                                           \
+                }                                               \
+            }                                                   \
+            else {                                              \
+                for ( i = 0; i < nel; i++ ) {                   \
+                    maskValue = maskPtr[i];                     \
+                    for ( j = 0; j < nvalues; j++ ) {           \
+                        if ( maskValue == values[j] ) {         \
+                            destptr[i] = dataPtr[i];            \
+                            break;                              \
+                        }                                       \
+                        else {                                  \
+                            destptr[i] = badValue;              \
+                        }                                       \
+                    }                                           \
+                }                                               \
+            }                                                   \
+        }
 
         switch ( dataInfo->type )
         {
             case HDS_DOUBLE: {
-                double *dataPtr = (double *)dataInfo->ptr;
-                double *destptr = (double *)*dstPtr;
-                double bad = VAL__BADD;
-                for ( i = 0; i < nel; i++ ) {
-                    maskValue = maskPtr[i];
-                    if ( maskValue == VAL__BADI ) {
-                        destptr[i] = bad;
-                    }
-                    else {
-                        destptr[i] = dataPtr[i];
-                    }
-                }
+                MASK_AND_COPY(double,VAL__BADD)
             }
             break;
 
             case HDS_REAL: {
-                float *dataPtr = (float *)dataInfo->ptr;
-                float *destptr = (float *)*dstPtr;
-                float bad = VAL__BADR;
-                for ( i = 0; i < nel; i++ ) {
-                    maskValue = maskPtr[i];
-                    if ( maskValue == VAL__BADI ) {
-                        destptr[i] = bad;
-                    }
-                    else {
-                        destptr[i] = dataPtr[i];
-                    }
-                }
+                MASK_AND_COPY(float,VAL__BADR)
             }
             break;
 
             case HDS_INTEGER: {
-                int *dataPtr = (int *)dataInfo->ptr;
-                int *destptr = (int *)*dstPtr;
-                int bad = VAL__BADI;
-                for ( i = 0; i < nel; i++ ) {
-                    maskValue = maskPtr[i];
-                    if ( maskValue == VAL__BADI ) {
-                        destptr[i] = bad;
-                    }
-                    else {
-                        destptr[i] = dataPtr[i];
-                    }
-                }
+                MASK_AND_COPY(int,VAL__BADI)
             }
             break;
 
             case HDS_WORD: {
-                short *dataPtr = (short *)dataInfo->ptr;
-                short *destptr = (short *)*dstPtr;
-                short bad = VAL__BADW;
-                for ( i = 0; i < nel; i++ ) {
-                    maskValue = maskPtr[i];
-                    if ( maskValue == VAL__BADI ) {
-                        destptr[i] = bad;
-                    }
-                    else {
-                        destptr[i] = dataPtr[i];
-                    }
-                }
+                MASK_AND_COPY(short,VAL__BADW)
             }
             break;
 
             case HDS_UWORD: {
-                unsigned short *dataPtr = (unsigned short *)dataInfo->ptr;
-                unsigned short *destptr = (unsigned short *)*dstPtr;
-                unsigned short bad = VAL__BADUW;
-                for ( i = 0; i < nel; i++ ) {
-                    maskValue = maskPtr[i];
-                    if ( maskValue == VAL__BADI ) {
-                        destptr[i] = bad;
-                    }
-                    else {
-                        destptr[i] = dataPtr[i];
-                    }
-                }
+                MASK_AND_COPY(unsigned short,VAL__BADUW)
             }
             break;
 
             case HDS_BYTE: {
-                char *dataPtr = (char *)dataInfo->ptr;
-                char *destptr = (char *)*dstPtr;
-                char bad = VAL__BADB;
-                for ( i = 0; i < nel; i++ ) {
-                    maskValue = maskPtr[i];
-                    if ( maskValue == VAL__BADI ) {
-                        destptr[i] = bad;
-                    }
-                    else {
-                        destptr[i] = dataPtr[i];
-                    }
-                }
+                MASK_AND_COPY(char,VAL__BADB)
             }
             break;
 
             case HDS_UBYTE: {
-                unsigned char *dataPtr = (unsigned char *)dataInfo->ptr;
-                unsigned char *destptr = (unsigned char *)*dstPtr;
-                unsigned char bad = VAL__BADUB;
-                for ( i = 0; i < nel; i++ ) {
-                    maskValue =  maskPtr[i];
-                    if ( maskValue == VAL__BADI ) {
-                        destptr[i] = bad;
-                    }
-                    else {
-                        destptr[i] = dataPtr[i];
-                    }
-                }
+                MASK_AND_COPY(unsigned char,VAL__BADUB)
             }
             break;
         }

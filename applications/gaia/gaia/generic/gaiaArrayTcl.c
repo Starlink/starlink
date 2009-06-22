@@ -546,7 +546,6 @@ static int gaiaArrayWrap( ClientData clientData, Tcl_Interp *interp,
     int type;
     long adr;
     long el;
-    size_t nel;
     void *ptr;
 
     /* Check arguments */
@@ -727,7 +726,9 @@ static int gaiaArrayCopy( ClientData clientData, Tcl_Interp *interp,
 
 /**
  * Apply an integer mask to an ARRAYinfo struct copying the result
- * into a new array.
+ * into a new array. If given various values from the mask can be
+ * selected for application, otherwise all mask values, except BAD
+ * are applied.
  *
  * The result is a the memory address of a array struct.
  */
@@ -737,12 +738,16 @@ static int gaiaArrayMask( ClientData clientData, Tcl_Interp *interp,
     ARRAYinfo *dataInfo;
     ARRAYinfo *maskInfo;
     ARRAYinfo *outInfo;
+    Tcl_Obj **listObjv;
+    int *values = NULL;
+    int i;
+    int nvalues = 0;
     long adr;
     void *outPtr = NULL;
 
     /*  Check arguments */
-    if ( objc != 3 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, "data mask" );
+    if ( objc != 3 && objc != 4 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "data mask {v1 v2 ...}" );
         return TCL_ERROR;
     }
 
@@ -774,15 +779,35 @@ static int gaiaArrayMask( ClientData clientData, Tcl_Interp *interp,
         return TCL_ERROR;
     }
 
-    /*  Do the masking, just check for BAD data for now... That should
-     *  mean outside of the mask, i.e. all masked data. */
-    gaiaArrayMaskData( dataInfo, maskInfo, GAIA_ARRAY_MALLOC, &outPtr );
+    /*  Get the selected values, if given. */
+    if ( objc == 4 ) {
+        if ( Tcl_ListObjGetElements( interp, objv[3], &nvalues, &listObjv )
+             != TCL_OK ) {
+            return TCL_ERROR;
+        }
+        values = (int *) malloc( nvalues * sizeof( int ) );
+        for ( i = 0; i < nvalues; i++ ) {
+            if ( Tcl_GetIntFromObj( interp, listObjv[i], &values[i] )
+                 != TCL_OK ) {
+                free( values );
+                return TCL_ERROR;
+            }
+        }
+    }
+
+    /*  Do the masking, BAD data means outside of the mask, i.e. all
+     *  masked data, unless values is set to contain some mask integers. */
+    gaiaArrayMaskData( dataInfo, maskInfo, values, nvalues,
+                       GAIA_ARRAY_MALLOC, &outPtr );
 
     /*  Export the result. */
     outInfo = gaiaArrayCreateInfo( outPtr, dataInfo->type, dataInfo->el,
                                    0, 0, 0, 1.0, 0.0, GAIA_ARRAY_MALLOC );
     Tcl_SetObjResult( interp, Tcl_NewLongObj( (long) outInfo ) );
 
+    if ( values != NULL ) {
+        free( values );
+    }
     return TCL_OK;
 }
 
