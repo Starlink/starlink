@@ -1049,6 +1049,11 @@ const char * sc2ast_convert_system
 *     23-JUL-2008 (TIMJ):
 *        Copy from smf_convert_system (now deleted) so that the
 *        DA can do the conversion
+*     22-JUN-2009 (TIMJ):
+*        Old ACSIS data (<= 20061020) occassionally had MOUNT
+*        coordinates. Assume this is identical to AZEL (which
+*        is ordinarily not an issue because TCS_AZ_ACx always
+*        stores AZEL numbers so you can convert).
 */
 
 {
@@ -1060,7 +1065,8 @@ const char * sc2ast_convert_system
    if (*status != SAI__OK) return result;
 
 /* Compare the supplied labelwith each known type. */
-   if( !strncmp( label, "AZEL", 4 ) ) {
+   if( !strncmp( label, "AZEL", 4 ) ||
+       !strncmp( label, "MOUNT", 5 ) ) {
       result = "AZEL";
 
    } else if( !strncmp( label, "APP", 3 ) ) {
