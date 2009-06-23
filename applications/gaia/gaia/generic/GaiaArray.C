@@ -2657,11 +2657,28 @@ void gaiaArrayMaskData( ARRAYinfo *dataInfo, ARRAYinfo *maskInfo,
                         int memtype, void **dstPtr )
 {
     int *maskPtr = (int *)maskInfo->ptr;
+    int *vptr = NULL;
     int i;
-    int j;
     int maskValue;
+    int vlen = 0;
     int nel = dataInfo->el;
     size_t length;
+
+    /*  If we have values to select then do some work to speed up access.
+     *  Create a vector with indices 0-n, where n is the maximum mask value
+     *  given and set if the related value is set, using this we can test a
+     *  value by a simple index. */
+    if ( nvalues > 0 ) {
+        for ( i = 0; i < nvalues; i++ ) {
+            vlen = MAX( vlen, values[i] );
+        }
+        vlen++;
+        vptr = (int *) calloc( vlen, sizeof( int ) );
+        for ( i = 0; i < nvalues; i++ ) {
+            vptr[values[i]] = 1;
+        }
+    }
+
 
     /*  Allocate memory for the masked copy. */
     length = nel * gaiaArraySizeOf( dataInfo->type );
@@ -2669,40 +2686,42 @@ void gaiaArrayMaskData( ARRAYinfo *dataInfo, ARRAYinfo *maskInfo,
 
     /*  Note on swapping etc. We only test the mask value, which we know
      *  is integer, so that only requires swapping on little-endian machines
-     *  if the mask data is FITS, the other data can just be copied. 
+     *  if the mask data is FITS, the other data can just be copied.
      *  Also the BAD value itself just needs assignment in the correct byte
      *  order. */
     if ( maskInfo->isfits ) {
 
-#define SWAP_MASK_AND_COPY(type,badValue)                       \
-        {                                                       \
-            type *dataPtr = (type *)dataInfo->ptr;              \
-            type *destptr = (type *)*dstPtr;                    \
-            if ( nvalues == 0 ) {                               \
-                for ( i = 0; i < nel; i++ ) {                   \
-                    maskValue = SWAP_INT_( maskPtr[i] );        \
-                    if ( maskValue == VAL__BADI ) {             \
-                        destptr[i] = badValue;                  \
-                    }                                           \
-                    else {                                      \
-                        destptr[i] = dataPtr[i];                \
-                    }                                           \
-                }                                               \
-            }                                                   \
-            else {                                              \
-                for ( i = 0; i < nel; i++ ) {                   \
-                    maskValue = SWAP_INT_( maskPtr[i] );        \
-                    for ( j = 0; j < nvalues; j++ ) {           \
-                        if ( maskValue == values[j] ) {         \
-                            destptr[i] = dataPtr[i];            \
-                            break;                              \
-                        }                                       \
-                        else {                                  \
-                            destptr[i] = badValue;              \
-                        }                                       \
-                    }                                           \
-                }                                               \
-            }                                                   \
+#define SWAP_MASK_AND_COPY(type,badValue)                               \
+        {                                                               \
+            type *dataPtr = (type *)dataInfo->ptr;                      \
+            type *destptr = (type *)*dstPtr;                            \
+            if ( nvalues == 0 ) {                                       \
+                for ( i = 0; i < nel; i++ ) {                           \
+                    maskValue = SWAP_INT_( maskPtr[i] );                \
+                    if ( maskValue == VAL__BADI ) {                     \
+                        destptr[i] = badValue;                          \
+                    }                                                   \
+                    else {                                              \
+                        destptr[i] = dataPtr[i];                        \
+                    }                                                   \
+                }                                                       \
+            }                                                           \
+            else {                                                      \
+                for ( i = 0; i < nel; i++ ) {                           \
+                    maskValue = SWAP_INT_( maskPtr[i] );                \
+                    if ( maskValue != VAL__BADI && maskValue < vlen ) { \
+                        if ( vptr[maskValue] )  {                       \
+                            destptr[i] = dataPtr[i];                    \
+                        }                                               \
+                        else {                                          \
+                            destptr[i] = badValue;                      \
+                        }                                               \
+                    }                                                   \
+                    else {                                              \
+                        destptr[i] = badValue;                          \
+                    }                                                   \
+                }                                                       \
+            }                                                           \
         }
 
         /*  FITS mask, may need to handle swapping. */
@@ -2754,35 +2773,37 @@ void gaiaArrayMaskData( ARRAYinfo *dataInfo, ARRAYinfo *maskInfo,
     else {
 
         /* Non-FITS so no byte swapping needed. */
-#define MASK_AND_COPY(type,badValue)                            \
-        {                                                       \
-            type *dataPtr = (type *)dataInfo->ptr;              \
-            type *destptr = (type *)*dstPtr;                    \
-            if ( nvalues == 0 ) {                               \
-                for ( i = 0; i < nel; i++ ) {                   \
-                    maskValue = maskPtr[i];                     \
-                    if ( maskValue == VAL__BADI ) {             \
-                        destptr[i] = badValue;                  \
-                    }                                           \
-                    else {                                      \
-                        destptr[i] = dataPtr[i];                \
-                    }                                           \
-                }                                               \
-            }                                                   \
-            else {                                              \
-                for ( i = 0; i < nel; i++ ) {                   \
-                    maskValue = maskPtr[i];                     \
-                    for ( j = 0; j < nvalues; j++ ) {           \
-                        if ( maskValue == values[j] ) {         \
-                            destptr[i] = dataPtr[i];            \
-                            break;                              \
-                        }                                       \
-                        else {                                  \
-                            destptr[i] = badValue;              \
-                        }                                       \
-                    }                                           \
-                }                                               \
-            }                                                   \
+#define MASK_AND_COPY(type,badValue)                                    \
+        {                                                               \
+            type *dataPtr = (type *)dataInfo->ptr;                      \
+            type *destptr = (type *)*dstPtr;                            \
+            if ( nvalues == 0 ) {                                       \
+                for ( i = 0; i < nel; i++ ) {                           \
+                    maskValue = maskPtr[i];                             \
+                    if ( maskValue == VAL__BADI ) {                     \
+                        destptr[i] = badValue;                          \
+                    }                                                   \
+                    else {                                              \
+                        destptr[i] = dataPtr[i];                        \
+                    }                                                   \
+                }                                                       \
+            }                                                           \
+            else {                                                      \
+                for ( i = 0; i < nel; i++ ) {                           \
+                    maskValue = maskPtr[i];                             \
+                    if ( maskValue != VAL__BADI && maskValue < vlen ) { \
+                        if ( vptr[maskValue] )  {                       \
+                            destptr[i] = dataPtr[i];                    \
+                        }                                               \
+                        else {                                          \
+                            destptr[i] = badValue;                      \
+                        }                                               \
+                    }                                                   \
+                    else {                                              \
+                        destptr[i] = badValue;                          \
+                    }                                                   \
+                }                                                       \
+            }                                                           \
         }
 
         switch ( dataInfo->type )
@@ -2822,5 +2843,8 @@ void gaiaArrayMaskData( ARRAYinfo *dataInfo, ARRAYinfo *maskInfo,
             }
             break;
         }
+    }
+    if ( vptr != NULL ) {
+        free( vptr );
     }
 }
