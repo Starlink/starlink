@@ -93,6 +93,8 @@
 #        Original version, adapted from PlasticApp.tcl.
 #     {enter_further_changes_here}
 
+#-
+
 #  Import all the packages we need to support tclsoap.
 package require XMLRPC::Domain
 package require rpcvar
@@ -107,7 +109,7 @@ package require httpd::log
 
 #  Server files should be private to user.
 global Config
-# set Config(AuthDefaultFile) [utilGetConfigFilename .skycat tclhttpd.default]
+set Config(AuthDefaultFile) [utilGetConfigFilename .skycat tclhttpd.default]
 package require httpd::auth
 package require httpd::mtype
 
@@ -150,7 +152,7 @@ itcl::class samp::SampClient {
       #  Add a trailing string as a namespacing measure to ensure that
       #  this object does not receive messages intended for other
       #  clients.
-      set subname plastic[incr instance_count]
+      set subname samp[incr instance_count]
       set callable_url $server_url/$subname
 
       #  Prepare procedures which will handle incoming XML-RPC calls
@@ -159,18 +161,21 @@ itcl::class samp::SampClient {
       #  The procedures are in a namespace specific to this instance.
       set namespace ::samp::clients::$subname
       namespace eval ${namespace} {
-         XMLRPC::export receiveNotification
-         XMLRPC::export receiveCall
-         XMLRPC::export receiveResponse
+         XMLRPC::export samp.client.receiveNotification
+         XMLRPC::export samp.client.receiveCall
+         XMLRPC::export samp.client.receiveResponse
       }
-      proc ${namespace}::receiveNotification {sender_id message} "
-         $this client_receiveMessage \$sender_id \$message
+      proc ${namespace}::samp.client.receiveNotification \
+            {private_key sender_id message} "
+         $this client_receive_message \$sender_id \$message
       "
-      proc ${namespace}::receiveCall {sender_id msg_id message} "
-         set response \[$this client_receiveMessage \$sender_id \$message\]
-         $hub_ execute reply $private_key_ \$msg_id \$response
+      proc ${namespace}::samp.client.receiveCall \
+            {private_key sender_id msg_id message} "
+         set response \[$this client_receive_message \$sender_id \$message\]
+         $this client_reply \$msg_id \$response
       "
-      proc ${namespace}::receiveResponse {responder_id msg_tag response} {
+      proc ${namespace}::samp.client.receiveResponse \
+            {private_key responder_id msg_tag response} {
          error "Asynchronous calls not dispatched by this application"
       }
       XMLRPC::Domain::register -prefix /$subname -namespace $namespace
@@ -213,23 +218,24 @@ itcl::class samp::SampClient {
    #  This method is called when the hub sends a message (call or notify)
    #  which should be handled by this instance of the class.  Requests
    #  are handled by handing them off to an appropriate method of one of
-   #  the agents.  The return value is a SAMP response map, which may
-   #  indicate success or failure.
-   public method client_receiveMessage {sender_id message} {
+   #  the agents.  The return value is a SAMP response map (as a list),
+   #  which may indicate success or failure.
+   public method client_receive_message {sender_id message} {
 
       #  Handle the message and come up with a success or error result.
-      set status catch {
+      set status [catch {
 
          #  Decompose the message.
-         set mtype $message(samp.mtype)
-         set params $message(samp.params)
+         array set msg $message
+         set mtype $msg(samp.mtype)
+         set params $msg(samp.params)
 
          #  Check each agent to see if it represents a subscription to
          #  the MType in question and if so execute that with
          #  appropriate arguments.
-         foreach agent [get_all_agents] {
+         foreach agent [get_all_agents_] {
             if {[lsearch [$agent get_subscribed_mtypes] $mtype] >= 0} {
-               return [success_response [eval $agent $sender_id $params]]
+               return [eval [list $agent $mtype $sender_id $params]]
             }
          }
 
@@ -237,21 +243,28 @@ itcl::class samp::SampClient {
          #  be sending messages with MTypes we have previously identified as
          #  names of methods in one of the agents.
          error "No handler for MType $mtype"
-      } result info
+      } result]
 
       #  Translate the result into a SAMP response object.
-      if {$status == 0} {
+      if {$status == 0 || $status == 2} {
          set response(samp.status) samp.ok
          set response(samp.result) $result
       } {
          set response(samp.status) samp.error
          set response(samp.error) [rpcvar struct [list \
             samp.code $status \
-            samp.errortxt $result \
-            samp.debugtext $info(-errorinfo) \
-            tcl.line $info(-errorline) \
-         ]
+            samp.errortxt [regsub {\n.*} $result {}] \
+            samp.debugtxt $::errorInfo \
+            samp.code $::errorCode \
+         ]]
       }
+      return [array get response]
+   }
+
+   #  Invoked from samp.client.receiveCall to pass the reply back
+   #  asynchronously to the hub.
+   public method client_reply {msg_id response} {
+      $hub_ execute reply $private_key_ $msg_id $response
    }
 
    #  Sends a notification (message with no response reqired) to one
@@ -280,7 +293,7 @@ itcl::class samp::SampClient {
    #  Standard method to report MTypes served by this object it its
    #  capacity as an agent.
    public method get_subscribed_mtypes {} {
-      return {samp.hub.event.shutdown samp.app.ping test.echo}
+      return {samp.hub.event.shutdown samp.app.ping test.echo test.fail}
    }
 
    #  Implementation for samp.hub.event.shutdown MType.
@@ -296,6 +309,11 @@ itcl::class samp::SampClient {
    #  Implementation for test.echo MType.
    public method test.echo {sender_id params} {
       return [rpcvar struct $params]
+   }
+
+   #  Implementation for test.fail MType.
+   public method test.fail {sender_id params} {
+      error "Failed."
    }
 
    #  Returns a boolean value indicating whether the client is
@@ -324,9 +342,11 @@ itcl::class samp::SampClient {
    protected method set_reginfo_ {reginfo} {
       if {[string length $reginfo] == 0} {
          set private_key_ {}
+         set self_id_ {}
       } {
          upvar $reginfo rinfo
          set private_key_ $rinfo(samp.private-key)
+         set self_id_ $rinfo(samp.self-id)
       }
       inform_samp_reg_
    }
@@ -399,14 +419,14 @@ itcl::class samp::SampClient {
          set trapping_ 1
          set signals [list SIGHUP SIGINT SIGQUIT SIGTERM]
          signal trap $signals "
-            plastic::PlasticApp::stop_server
+            samp::SampClient::stop_server
             puts stderr \"GAIA aborts, signal: %S\"
             exit
          "
       }
 
       #  Log message.
-      puts "Started XML-RPC server for PLASTIC at $server_url_"
+      puts "Started XML-RPC server for SAMP at $server_url_"
    }
 
    #  Informs the SAMP hub that any instances of this class which
@@ -441,9 +461,10 @@ itcl::class samp::SampClient {
    #  Public variables:
    #  ----------------
    public variable client_tracker [code [samp::ClientTracker #auto]] {
-      $client_tracker configure -hub [code $hub_] -self $client_id_
+      $client_tracker configure -self_id $self_id_ \
+                                -private_key $private_key_
+      $client_tracker configure -hub [code $hub_]
    }
-   public variable client_tracker {}
    public variable metadata {samp.name gaia_app}
 
    #  Private variables: (available to instance)
@@ -451,6 +472,7 @@ itcl::class samp::SampClient {
    private variable hub_
    private variable user_agents_
    private variable private_key_ {}
+   private variable self_id_ {}
    private variable samp_reg_commands_ {}
 
    #  Common variables:
@@ -458,5 +480,5 @@ itcl::class samp::SampClient {
    private common server_url_
    private common trapping_ 0
    private common instance_count 0
-   public common default_port 8025
+   public common default_port 8029
 }
