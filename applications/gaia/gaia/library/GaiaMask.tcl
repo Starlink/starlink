@@ -261,11 +261,16 @@ itcl::class gaia::GaiaMask {
 
       #  Get access to the displayed image data and its type and size.
       #  Check that address hasn't changed, that will happen when the image
-      #  is renewed or changed.
+      #  is renewed or changed. But make sure this isn't the masked address
+      #  which it will be after a replacement.
       set adr [$itk_option(-rtdimage) imagedata]
       if { $image_adr_ != 0 } {
-         lassign [array::getinfo $adr] realadr nel type
-         if { $realadr != $adr } {
+         lassign [array::getinfo $image_adr_] iadr nel type
+         set madr 0
+         if { $last_adr_ != 0 } {
+            lassign [array::getinfo $last_adr_] madr nel type
+         }
+         if { $adr != $iadr && $adr != $madr } {
             array::release $image_adr_
             set image_adr_ 0
          }
