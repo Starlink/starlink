@@ -143,6 +143,10 @@ extern "C" {
     void gaiaArrayMaskData( ARRAYinfo *dataInfo, ARRAYinfo *maskInfo,
                             int *value, int nvalues, int memtype,
                             void **dstPtr );
+
+    /* Get minimum and maximum */
+    void gaiaArrayMinMax( ARRAYinfo *dataInfo, double *min, double *max );
+
 #ifdef __cplusplus
 }
 #endif

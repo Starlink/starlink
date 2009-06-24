@@ -430,7 +430,7 @@ size_t gaiaArraySizeOf( int type )
 void gaiaArrayToDouble( ARRAYinfo *info, double badValue, double *outPtr )
 {
     void *inPtr = info->ptr;
-    int nel = info->el;
+    long nel = info->el;
     int type = info->type;
 
     /* Define loop as macro to save typing and maintenance */
@@ -2512,7 +2512,7 @@ unsigned char *gaiaArrayCreateUnsignedMask( ARRAYinfo *info, int memtype )
     const int notvisible = 0;
     int i;
     int nbad = 0;
-    int nel = info->el;
+    long nel = info->el;
     unsigned char* mask = NULL;
 
     /* Allocate the memory, will be released if not used, saves one scan of
@@ -2661,7 +2661,7 @@ void gaiaArrayMaskData( ARRAYinfo *dataInfo, ARRAYinfo *maskInfo,
     int i;
     int maskValue;
     int vlen = 0;
-    int nel = dataInfo->el;
+    long nel = dataInfo->el;
     size_t length;
 
     /*  If we have values to select then do some work to speed up access.
@@ -2846,5 +2846,256 @@ void gaiaArrayMaskData( ARRAYinfo *dataInfo, ARRAYinfo *maskInfo,
     }
     if ( vptr != NULL ) {
         free( vptr );
+    }
+}
+
+/**
+ *  Name:
+ *     gaiaArrayMinMax
+ *
+ *  Purpose:
+ *     Get the minimum and maximum values in an array.
+ *
+ *  Arguments:
+ *     info
+ *         Pointer to the data ARRAYinfo structure.
+ *     min
+ *     max
+ *         The minimum and maximum values.
+ */
+void gaiaArrayMinMax( ARRAYinfo *info, double *min, double *max )
+{
+    double bscale = info->bscale;
+    double bzero = info->bzero;
+    int blank = info->blank;
+    int haveblank = info->haveblank;
+    int i;
+    int type = info->type;
+    long nel = info->el;
+    void *ptr = info->ptr;
+
+    /* Deal with NDFs first */
+    if ( ! info->isfits ) {
+
+        /*  No need for byte swapping */
+
+#define GET_MIN_AND_MAX(type,badFlag,typeMin,typeMax)    \
+        {                                                \
+            type *ip = (type *)ptr;                      \
+            type value;                                  \
+            type tmin = typeMax;                         \
+            type tmax = typeMin;                         \
+            for ( i = 0; i < nel; i++ ) {                \
+                value = ip[i];                           \
+                tmin = MIN( value, tmin );               \
+                tmax = MAX( value, tmax );               \
+            }                                            \
+            *min = (double) tmin;                        \
+            *max = (double) tmax;                        \
+        }
+
+        switch ( info->type )
+        {
+           case HDS_DOUBLE:
+               GET_MIN_AND_MAX(double,VAL__BADD,VAL__MIND,VAL__MAXD)
+           break;
+
+           case HDS_REAL:
+               GET_MIN_AND_MAX(float,VAL__BADR,VAL__MINR,VAL__MAXR)
+           break;
+
+           case HDS_INTEGER:
+               GET_MIN_AND_MAX(int,VAL__BADI,VAL__MINI,VAL__MAXI)
+           break;
+
+           case HDS_WORD:
+               GET_MIN_AND_MAX(short,VAL__BADW,VAL__MINW,VAL__MAXW)
+           break;
+
+           case HDS_UWORD:
+               GET_MIN_AND_MAX(unsigned short,VAL__BADUW,VAL__MINUW,VAL__MAXUW)
+           break;
+
+           case HDS_BYTE:
+               GET_MIN_AND_MAX(char,VAL__BADB,VAL__MINB,VAL__MAXB)
+           break;
+
+           case HDS_UBYTE:
+               GET_MIN_AND_MAX(unsigned char,VAL__BADUB,VAL__MINUB,VAL__MAXUB)
+           break;
+        }
+
+        /* Done */
+        return;
+    }
+
+    /* Deal with FITS */
+
+    switch ( type )
+    {
+        case HDS_DOUBLE: {
+            double *ip = (double *)ptr;
+            double value;
+            double tmin = VAL__MAXD;
+            double tmax = VAL__MIND;
+            for ( i = 0; i < nel; i++ ) {
+                value = SWAP_DOUBLE_( ip[i] );
+                if ( ! isnan( value ) ) {
+                    tmin = MIN( value * bscale + bzero, tmin );
+                    tmax = MAX( value * bscale + bzero, tmax );
+                }
+            }
+            *min = (double) tmin;
+            *max = (double) tmax;
+        }
+        break;
+
+        case HDS_REAL: {
+            float *ip = (float *)ptr;
+            float value;
+            float tmin = VAL__MAXR;
+            float tmax = VAL__MINR;
+            for ( i = 0; i < nel; i++ ) {
+                value = SWAP_FLOAT_( ip[i] );
+                if ( ! isnan( value ) ) {
+                    tmin = MIN( value * bscale + bzero, tmin );
+                    tmax = MAX( value * bscale + bzero, tmax );
+                }
+            }
+            *min = (double) tmin;
+            *max = (double) tmax;
+        }
+        break;
+
+        case HDS_INTEGER: {
+            int *ip = (int *)ptr;
+            int value;
+            int tmin = VAL__MAXI;
+            int tmax = VAL__MINI;
+            if ( haveblank ) {
+                for ( i = 0; i < nel; i++ ) {
+                    value = SWAP_INT_( ip[i] );
+                    if ( value != blank ) {
+                        tmin = MIN( value * bscale + bzero, tmin );
+                        tmax = MAX( value * bscale + bzero, tmax );
+                    }
+                }
+            }
+            else {
+                for ( i = 0; i < nel; i++ ) {
+                    value = SWAP_INT_( ip[i] );
+                    tmin = MIN( value * bscale + bzero, tmin );
+                    tmax = MAX( value * bscale + bzero, tmax );
+                }
+            }
+            *min = (double) tmin;
+            *max = (double) tmax;
+        }
+        break;
+
+        case HDS_WORD: {
+            short *ip = (short *)ptr;
+            short value;
+            short tmin = VAL__MAXW;
+            short tmax = VAL__MINW;
+            if ( haveblank ) {
+                for ( i = 0; i < nel; i++ ) {
+                    value = SWAP_SHORT_( ip[i] );
+                    if ( value != blank ) {
+                        tmin = MIN( value * bscale + bzero, tmin );
+                        tmax = MAX( value * bscale + bzero, tmax );
+                    }
+                }
+            }
+            else {
+                for ( i = 0; i < nel; i++ ) {
+                    value = SWAP_SHORT_( ip[i] );
+                    tmin = MIN( value * bscale + bzero, tmin );
+                    tmax = MAX( value * bscale + bzero, tmax );
+                }
+            }
+            *min = (double) tmin;
+            *max = (double) tmax;
+        }
+        break;
+
+        case HDS_UWORD: {
+            unsigned short *ip = (unsigned short *)ptr;
+            unsigned short value;
+            unsigned short tmin = VAL__MAXUW;
+            unsigned short tmax = VAL__MINUW;
+            if ( haveblank ) {
+                for ( i = 0; i < nel; i++ ) {
+                    value = SWAP_SHORT_( ip[i] );
+                    if ( value != blank ) {
+                        tmin = MIN( value * bscale + bzero, tmin );
+                        tmax = MAX( value * bscale + bzero, tmax );
+                    }
+                }
+            }
+            else {
+                for ( i = 0; i < nel; i++ ) {
+                    value = SWAP_SHORT_( ip[i] );
+                    tmin = MIN( value * bscale + bzero, tmin );
+                    tmax = MAX( value * bscale + bzero, tmax );
+                }
+            }
+            *min = (double) tmin;
+            *max = (double) tmax;
+        }
+        break;
+
+        case HDS_BYTE: {
+            char *ip = (char *)ptr;
+            char value;
+            char tmin = VAL__MAXB;
+            char tmax = VAL__MINB;
+            if ( haveblank ) {
+                for ( i = 0; i < nel; i++ ) {
+                    value = ip[i];
+                    if ( value != blank ) {
+                        tmin = MIN( value * bscale + bzero, tmin );
+                        tmax = MAX( value * bscale + bzero, tmax );
+                    }
+                }
+            }
+            else {
+                for ( i = 0; i < nel; i++ ) {
+                    value = ip[i];
+                    tmin = MIN( value * bscale + bzero, tmin );
+                    tmax = MAX( value * bscale + bzero, tmax );
+                }
+            }
+            *min = (double) tmin;
+            *max = (double) tmax;
+        }
+        break;
+
+
+        case HDS_UBYTE: {
+            unsigned char *ip = (unsigned char *)ptr;
+            unsigned char value;
+            unsigned char tmin = VAL__MAXUB;
+            unsigned char tmax = VAL__MINUB;
+            if ( haveblank ) {
+                for ( i = 0; i < nel; i++ ) {
+                    value = ip[i];
+                    if ( value != blank ) {
+                        tmin = MIN( value * bscale + bzero, tmin );
+                        tmax = MAX( value * bscale + bzero, tmax );
+                    }
+                }
+            }
+            else {
+                for ( i = 0; i < nel; i++ ) {
+                    value = ip[i];
+                    tmin = MIN( value * bscale + bzero, tmin );
+                    tmax = MAX( value * bscale + bzero, tmax );
+                }
+            }
+            *min = (double) tmin;
+            *max = (double) tmax;
+        }
+        break;
     }
 }

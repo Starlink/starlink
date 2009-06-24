@@ -55,6 +55,8 @@ static int gaiaArrayCopy( ClientData clientData, Tcl_Interp *interp,
                           int objc, Tcl_Obj *CONST objv[] );
 static int gaiaArrayCreate( ClientData clientData, Tcl_Interp *interp,
                             int objc, Tcl_Obj *CONST objv[] );
+static int gaiaArrayGetMinMax( ClientData clientData, Tcl_Interp *interp,
+                               int objc, Tcl_Obj *CONST objv[] );
 static int gaiaArrayImage( ClientData clientData, Tcl_Interp *interp,
                            int objc, Tcl_Obj *CONST objv[] );
 static int gaiaArrayInfo( ClientData clientData, Tcl_Interp *interp,
@@ -93,6 +95,10 @@ int Array_Init( Tcl_Interp *interp )
                           (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "array::getimage", gaiaArrayImage,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "array::getminmax", gaiaArrayGetMinMax,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
@@ -658,7 +664,7 @@ static int gaiaArrayInfo( ClientData clientData, Tcl_Interp *interp,
 
     Tcl_ListObjAppendElement( interp, resultObj,
                               Tcl_NewLongObj( (long) info->ptr ) );
-    Tcl_ListObjAppendElement( interp, resultObj, Tcl_NewIntObj( info->el ) );
+    Tcl_ListObjAppendElement( interp, resultObj, Tcl_NewLongObj( info->el ) );
 
     basictype = Tcl_NewStringObj( gaiaArrayTypeToHDS( info->type ), -1 );
     Tcl_ListObjAppendElement(interp, resultObj, basictype );
@@ -811,3 +817,39 @@ static int gaiaArrayMask( ClientData clientData, Tcl_Interp *interp,
     return TCL_OK;
 }
 
+/**
+ * Get the minimum and maximum value in an array.
+ */
+static int gaiaArrayGetMinMax( ClientData clientData, Tcl_Interp *interp,
+                               int objc, Tcl_Obj *CONST objv[] )
+{
+    ARRAYinfo *info;
+    Tcl_Obj *resultObj;
+    double max;
+    double min;
+    long adr;
+
+    /* Check arguments */
+    if ( objc != 2 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "array" );
+        return TCL_ERROR;
+    }
+
+    /* Get memory address */
+    if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
+        Tcl_AppendResult( interp, ": failed to read data pointer",
+                          (char *) NULL );
+        return TCL_ERROR;
+    }
+    info = (ARRAYinfo *) adr;
+
+    /* Get the min and max. */
+    gaiaArrayMinMax( info, &min, &max );
+
+    /* And report. */
+    resultObj = Tcl_GetObjResult( interp );
+    Tcl_ListObjAppendElement( interp, resultObj, Tcl_NewDoubleObj( min ) );
+    Tcl_ListObjAppendElement( interp, resultObj, Tcl_NewDoubleObj( max ) );
+
+    return TCL_OK;
+}
