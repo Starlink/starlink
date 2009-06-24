@@ -142,7 +142,7 @@ itcl::class gaia::PlasticSearch {
       #  structures available to this class.
       set row [lindex $all_rows_ $idx]
       set info_idx [lsearch $info_ $row]
-      if {$row >= 0} {
+      if {$info_idx >= 0} {
 
          #  Highlight the chosen row in the table viewer widget.
          $results_ select_row $info_idx
