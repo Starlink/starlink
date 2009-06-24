@@ -61,6 +61,8 @@
 *        Use new smf_obsmap_report API.
 *     2009-06-01 (EC):
 *        Need to include strings.h for strncasecmp
+*     2009-06-22 (TIMJ):
+*        Check OCS Config before flipping sign of instrument aperture
 
 *  Copyright:
 *     Copyright (C) 2009 Science & Technology Facilities Council.
@@ -444,11 +446,26 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
      See JCMT fault 20090330.009 */
   if (!has_dhsver && fitsvals.utdate < 20080508
       && ( fitsvals.instap_x != 0.0 || fitsvals.instap_y != 0.0) ) {
-    msgOutif( msglev, "", INDENT "Fixing instrument aperture sign convention.", status );
-    smf_fits_updateD( hdr, "INSTAP_X", -1.0 * fitsvals.instap_x, NULL, status );
-    smf_fits_updateD( hdr, "INSTAP_Y", -1.0 * fitsvals.instap_y, NULL, status );
-    have_fixed = 1;
+    int flip = 1; /* assume we are going to flip the sign */
+
+    /* there were some test observations done between 20080501 and 20080508 so for those
+       we have to dig a little deeper and look in the ocsconfig */
+    if ( fitsvals.utdate >= 20080501 && hdr->ocsconfig ) {
+      char * match = astChrSub( hdr->ocsconfig, "AXIS_XY.X_AS", NULL, 0 );
+      if (match) {
+        flip = 0;
+        match = astFree( match );
+      }
+    }
+
+    if (flip) {
+      msgOutif( msglev, "", INDENT "Fixing instrument aperture sign convention.", status );
+      smf_fits_updateD( hdr, "INSTAP_X", -1.0 * fitsvals.instap_x, NULL, status );
+      smf_fits_updateD( hdr, "INSTAP_Y", -1.0 * fitsvals.instap_y, NULL, status );
+      have_fixed = 1;
+    }
   }
+
   /* RxW data did some strange things to aperture */
   if ( fitsvals.utdate < 20090601 && strncasecmp( fitsvals.instrume, "RxW", 3 ) == 0 &&
        ( fitsvals.instap_x != 0.0 || fitsvals.instap_y != 0.0) ) {
