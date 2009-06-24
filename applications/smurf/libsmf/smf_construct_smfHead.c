@@ -22,7 +22,7 @@
 *              const double detpos[], const char *detname, int dpazel,
 *              const double tsys[], 
 *              const char title[], const char dlabel[], const char units[],
-*              const double telpos[], int * status );
+*              const double telpos[], char *ocsconfig, int * status );
 
 *  Arguments:
 *     tofill = smfHead* (Given)
@@ -76,6 +76,8 @@
 *        Data units.
 *     telpos = const double[] (Given)
 *        The telscope position.
+*     ocsconfig = char * (Given)
+*        OCS Configuration XML
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -140,6 +142,8 @@
 *        Add steptime
 *     2009-05-21 (TIMJ):
 *        Add switching mode.
+*     2009-06-23 (TIMJ):
+*        Add ocsconfig
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -197,7 +201,7 @@ smf_construct_smfHead( smfHead * tofill, inst_t instrument,
 		       double detpos[], char *detname, 
            int dpazel, double tsys[], const char title[],
 		       const char dlabel[], const char units[],
-		       const double telpos[], int * status ) {
+           const double telpos[], char * ocsconfig, int * status ) {
 
   smfHead * hdr = NULL;   /* Header components */
 
@@ -234,6 +238,7 @@ smf_construct_smfHead( smfHead * tofill, inst_t instrument,
     hdr->swmode = swmode;
     hdr->obstype = obstype;
     hdr->steptime= steptime;
+    hdr->ocsconfig = ocsconfig;
 
     /* Have to copy the string items in since the struct has a slot for them -
        we know these fit in the struct */

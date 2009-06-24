@@ -95,10 +95,12 @@
 *        Free dark squid information.
 *     2008-12-03 (DSB):
 *        Free caches used by smf_create_lutwcs and smf_detpos_wcs.
+*     2009-06-23 (TIMJ):
+*        Free ocsconfig
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2007-2008 Science and Technology Facilities Council.
+*     Copyright (C) 2007-2009 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -295,6 +297,7 @@ void smf_close_file( smfData ** data, int * status ) {
       if (hdr->detpos) hdr->detpos = smf_free( hdr->detpos, status );
       if (hdr->tsys) hdr->tsys = smf_free( hdr->tsys, status );
       if (hdr->detname) hdr->detname = smf_free( hdr->detname, status );
+      if (hdr->ocsconfig) hdr->ocsconfig = smf_free( hdr->ocsconfig, status );
     }
     hdr = smf_free( hdr, status );
   }

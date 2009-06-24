@@ -419,11 +419,11 @@ typedef struct smfHead {
   double instap[2];         /* instrument aperture (focal plane offsets)  */
   double telpos[3];         /* West LON/LAT/Alt of telescope (deg/deg/m) */
   double steptime;          /* Steptime in seconds */
+  char * ocsconfig;           /* Configuration XML */
   char units[SMF__CHARLABEL]; /* Data units */
   char dlabel[SMF__CHARLABEL];/* Label associated with data */
   char title[SMF__CHARLABEL]; /* Title associated with data */
   char obsidss[SZFITSCARD];   /* Unique observation subsys id */
-
 } smfHead;
 
 /* This structure contains ancilliary information obtained from a raw

@@ -606,7 +606,7 @@ smfHead *smf_construct_smfHead( smfHead * tofill, inst_t instrument,
                                 double fplaney[], double detpos[], 
                                 char *detname, int rpazel, double tsys[], 
                                 const char title[], const char dlabel[], 
-                                const char units[], const double telpos[], 
+                                const char units[], const double telpos[], char * ocsconfig,
                                 int * status );
 
 void smf_convert_bad( smfData *data, int *status );

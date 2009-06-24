@@ -46,9 +46,12 @@
 *        Check detname. 
 *     2007-02-23 (AGG):
 *        Check instap
+*     2009-06-23 (TIMJ):
+*        Check ocsconfig
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2009 Science and Technology Facilities Council.
 *     Copyright (C) 2006-2007 University of British Columbia. Particle
 *     Physics And Astronomy Research Council. All Rights Reserved.
 
@@ -254,6 +257,17 @@ void smf_check_smfHead( const smfData *idata, smfData *odata, int * status ) {
                 ihdr->ndet*( strlen( ohdr->detname ) + 1 ) );
       }
     }
+
+    /* OCS Config */
+    if (ohdr->ocsconfig == NULL ){
+      ohdr->ocsconfig = smf_malloc( ihdr->ndet,
+                                  ( strlen( ohdr->ocsconfig ) + 1 ), 0,
+                                  status );
+      if( ohdr->ocsconfig ) {
+        strcpy( ohdr->ocsconfig, ihdr->ocsconfig );
+      }
+    }
+
 
     ohdr->dpazel = ihdr->dpazel;
 

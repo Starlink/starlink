@@ -71,6 +71,8 @@
 *        Add rename cache as cache1, and add cache2 and cache3.
 *     2009-05-21 (TIMJ):
 *        Add switching mode.
+*     2009-06-23 (TIMJ):
+*        Add ocsconfig.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -162,6 +164,7 @@ smf_create_smfHead( int * status ) {
   hdr->obstype = SMF__TYP_NULL;
   hdr->swmode = SMF__SWM_NULL;
   hdr->steptime = VAL__BADD;
+  hdr->ocsconfig = NULL;
   (hdr->units)[0] = '\0';
   (hdr->dlabel)[0] = '\0';
   (hdr->title)[0] = '\0';

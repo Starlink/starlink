@@ -117,7 +117,7 @@ void smf_create_respfile( const Grp * rgrp, size_t index,
                                              refdata->hdr->steptime, refdata->hdr->obsmode,
                                              refdata->hdr->swmode, refdata->hdr->obstype, 0, NULL, NULL,
                                              NULL, NULL, 0, NULL, buffer, "Responsivity",
-                                             "Amps/Watt", refdata->hdr->telpos, status );
+                                             "Amps/Watt", refdata->hdr->telpos, NULL, status );
     smf_write_clabels( *respmap, status );
 
     /* create frame for focal plane coordinates. Should really extract it from the

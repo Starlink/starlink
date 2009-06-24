@@ -72,6 +72,8 @@
 *        Add steptime.
 *     2009-05-21 (TIMJ):
 *        smf_construct_smfHead API tweak
+*     2009-06-23 (TIMJ):
+*        ocsconfig added to smfHead
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -136,6 +138,7 @@ smf_deepcopy_smfHead( const smfHead *old, int * status ) {
   char *detname = NULL;            /* Receptor names */
   double *tsys = NULL;             /* System temperatures */
   double instap[2];                /* Instrument aperture (focal plane offsets) */
+  char *ocsconfig = NULL;          /* OCS configuration XML */
 
   if (*status != SAI__OK) return NULL;
 
@@ -202,13 +205,19 @@ smf_deepcopy_smfHead( const smfHead *old, int * status ) {
     if ( tsys ) memcpy( tsys, old->tsys, ndet*nframes*sizeof(*tsys) );
   }
 
+  /* Allocate ocsconfig - use smf_malloc so that we use our own malloc */
+  if (old->ocsconfig != NULL) {
+    ocsconfig = smf_malloc( 1, strlen( old->ocsconfig ) + 1, 0, status );
+    if (ocsconfig) strcpy( ocsconfig, old->ocsconfig );
+  }
+
   /* Insert elements into new smfHead */
   new = smf_construct_smfHead( new, instrument, wcs, tswcs, fitshdr,
                                allState, curframe, instap, nframes,
                                old->steptime, old->obsmode, old->swmode, old->obstype,ndet,
                                fplanex, fplaney, detpos,detname, old->dpazel,
                                tsys, old->title, old->dlabel, old->units,
-                               old->telpos, status );
+                               old->telpos, ocsconfig, status );
 
   /* set isCloned to 0 since we have allocated this memory */
   if (new) new->isCloned = 0;

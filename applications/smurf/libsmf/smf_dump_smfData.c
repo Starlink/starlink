@@ -50,6 +50,8 @@
 *        Add step time
 *     2009-05-21 (TIMJ):
 *        Add switching mode.
+*     2009-06-23 (TIMJ):
+*        Add ocsconfig presence indicator
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -291,6 +293,9 @@ void smf_dump_smfData( const smfData *data, int showflags, int *status) {
     /* Step time */
     msgSetd( "ST", hdr->steptime );
     msgOut(" ", "    step time = ^ST", status);
+
+    /* Ocs configuration */
+    msgOutf( " ","    ocsconfig = %s",status, (hdr->ocsconfig ? "present" : "missing" ));
 
     /* Flag to indicate whether we have control of overall state structure */
     msgSeti("I",hdr->isCloned);

@@ -242,6 +242,8 @@
 #include "libacsis/acsis.h"
 #include "libaztec/aztec.h"
 
+static char * smf__read_ocsconfig ( int ndfid, int *status);
+
 #define FUNC_NAME "smf_open_file"
 
 void smf_open_file( const Grp * igrp, size_t index, const char * mode,
@@ -588,6 +590,9 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
           /* Annul the locator in any case */
           if( xloc ) datAnnul( &xloc, status );
 
+          /* Read the OCS configuration xml */
+          hdr->ocsconfig = smf__read_ocsconfig( indf, status );
+
           /* Metadata corrections - hide the messages by default.
              Only correct time series data at the moment.
           */
@@ -635,6 +640,10 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
       if( hdr ) {
         ndfGtwcs( indf, &(hdr->tswcs), status );
       }
+
+      /* Read the OCS configuration xml whilst we have the file open */
+      if ( !(flags & SMF__NOCREATE_HEAD) ) hdr->ocsconfig = smf__read_ocsconfig( indf, status );
+
       /* OK, we have raw data. Close the NDF because
          sc2store_rdtstream will open it again */
       ndfAnnul( &indf, status );
@@ -914,3 +923,35 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
 
 }
 
+/* Private routine for opening up a file and reading the OCS config.
+   Returned value must be freed if non-NULL.
+ */
+
+static char * smf__read_ocsconfig ( int ndfid, int *status) {
+  char * ocscfg = NULL;
+  if (*status != SAI__OK) return ocscfg;
+
+  /* Read the OCS configuration XML if available */
+  if ( ndfid != NDF__NOID ) {
+    int isthere = 0;
+    ndfXstat( ndfid, "JCMTOCS", &isthere, status );
+    if (isthere) {
+      HDSLoc * jcmtocs = NULL;
+      HDSLoc * configloc = NULL;
+      size_t size;
+      size_t clen;
+      hdsdim dims[1];
+      ndfXloc( ndfid, "JCMTOCS", "READ", &jcmtocs, status );
+      datFind( jcmtocs, "CONFIG", &configloc, status );
+      datAnnul( &jcmtocs, status );
+      datSize( configloc, &size, status );
+      datClen( configloc, &clen, status );
+      ocscfg = smf_malloc( size, clen, 0, status );
+      ocscfg[0] = '\0'; /* just to make sure */
+      dims[0] = size;
+      datGetC( configloc, 1, dims, ocscfg, clen, status );
+      datAnnul( &configloc, status );
+    }
+  }
+  return ocscfg;
+}
