@@ -245,7 +245,7 @@
 #define FUNC_NAME "smf_open_file"
 
 void smf_open_file( const Grp * igrp, size_t index, const char * mode,
-                     int flags, smfData ** data, int *status) {
+                    int flags, smfData ** data, int *status) {
 
   char dtype[NDF__SZTYP+1];  /* String for DATA type */
   int indf;                  /* NDF identified for input file */
@@ -513,10 +513,10 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
 
       if ( !(flags & SMF__NOCREATE_HEAD) ) {
 
-	/* Read the units and data label */
-	ndfCget( indf, "UNITS", hdr->units, SMF__CHARLABEL, status );
-	ndfCget( indf, "LABEL", hdr->dlabel, SMF__CHARLABEL, status );
-	ndfCget( indf, "TITLE", hdr->title, SMF__CHARLABEL, status );
+        /* Read the units and data label */
+        ndfCget( indf, "UNITS", hdr->units, SMF__CHARLABEL, status );
+        ndfCget( indf, "LABEL", hdr->dlabel, SMF__CHARLABEL, status );
+        ndfCget( indf, "TITLE", hdr->title, SMF__CHARLABEL, status );
 
         /* Read the FITS headers */
         kpgGtfts( indf, &(hdr->fitshdr), status );
@@ -540,8 +540,8 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
           ndfGtwcs( indf, &(hdr->wcs), status);
           hdr->nframes = 1;
         } else {
-	  /* Get the time series WCS */
-	  ndfGtwcs( indf, &(hdr->tswcs), status );
+          /* Get the time series WCS */
+          ndfGtwcs( indf, &(hdr->tswcs), status );
 
           /* Get the obsidss */
           if( hdr->fitshdr ) {
@@ -590,7 +590,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
 
           /* Metadata corrections - hide the messages by default.
              Only correct time series data at the moment.
-           */
+          */
           if ( !(flags & SMF__NOFIX_METADATA) ) smf_fix_metadata( MSG__VERB, *data, status );
 
         }
@@ -633,7 +633,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
     } else {
       /* Get the time series WCS if header exists */
       if( hdr ) {
-    	ndfGtwcs( indf, &(hdr->tswcs), status );
+        ndfGtwcs( indf, &(hdr->tswcs), status );
       }
       /* OK, we have raw data. Close the NDF because
          sc2store_rdtstream will open it again */
@@ -651,13 +651,13 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
       tmpState = NULL;
 
       /* If access to the data is not required, pass NULL pointers to
-      sc2store_rdtstream. Otherwise, use pointers to the relavent buffers. */
+         sc2store_rdtstream. Otherwise, use pointers to the relavent buffers. */
       if ( flags & SMF__NOCREATE_DATA ) {
-         ptdata = NULL;
-         pdksquid = NULL;
+        ptdata = NULL;
+        pdksquid = NULL;
       } else {
-         ptdata = &rawts;
-         pdksquid = &dksquid;
+        ptdata = &rawts;
+        pdksquid = &dksquid;
       }
 
       /* Read time series data from file */
