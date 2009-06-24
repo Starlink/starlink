@@ -17,39 +17,39 @@
 
 #  Invocations:
 #
-#     SampClient object_name agents [configuration options]
+#     SampClient object_name [configuration options]
 #
 #  This creates an instance of a SampClient object.  The return is
 #  the name of the object.
-#
-#  The agents constructor argument provides the implementation
-#  of the supported MTypes.  This should contain a list of zero or
-#  more objects with methods whose names are the actual MTypes
-#  for messages which are or may be subscribed to.
-#  Such methods have two arguments:
-#     senderId (string)
-#     params (list of the form {key value key value ...})
-#  and the return value is the message Response in the form
-#  {key value key value ...}.  It should also provide a method
-#  get_subscribed_mtypes which lists the MType methods.
-#  For instance an agent which implements
-#  only an echo message might look like this:
-#
-#     itcl::class BasicSampAgent {
-#        public method test.echo {sender_id params} {
-#           array set param_array $params
-#           return [list text $param_array(text)]
-#        }
-#        public method get_subscribed_mtypes {} {
-#           return {test.echo}
-#        }
-#     }
 #
 #     object_name method arguments
 #
 #  Performs the given method on this object.
 
 #  Configuration options:
+#     -agents:
+#        A list of zero or more agents which respond to incoming messages.
+#        These operate in addition to the client_tracker agent.
+#        Each object listed here should have a method
+#        get_subscribed_mtypes which returns the supported MTypes, and
+#        for each one a method named after the MType with arguments:
+#           sender_id (string)
+#           param_list (list of the form {key value key value ...})
+#        with a return value giving the samp.result value for a
+#        successful message Response in the form {key value key value}.
+#        Such methods may (and should) throw Tcl errors in the case of
+#        failure.  An example agent implementation might look like this:
+#
+#           itcl::class EchoSampAgent {
+#              public method get_subscribed_mtypes {} {
+#                 return {test.echo}
+#              }
+#              public method test.echo {sender_id param_list} {
+#                 array set params $param_list
+#                 return [list text $params(text)]
+#              }
+#           }
+#
 #     -client_tracker:
 #        An agent which keeps track of the clients currently
 #        registered with the hub.  This should usually be a
@@ -124,8 +124,7 @@ itcl::class samp::SampClient {
 
    #  Constructor:
    #  ------------
-   constructor {agents args} {
-      set user_agents_ $agents
+   constructor {args} {
       eval configure $args
    }
 
@@ -191,12 +190,9 @@ itcl::class samp::SampClient {
       configure -client_tracker $client_tracker
 
       #  Inform hub of metadata and subscriptions.
-      $hub_ execute declareMetadata $private_key_ $metadata
       $hub_ execute setXmlrpcCallback $private_key_ $callable_url
-      if {[array exists subscriptions]} {
-         $hub_ execute declareSubscriptions $private_key_ \
-                                            [array get subscriptions]
-      }
+      update_metadata_
+      update_subscriptions_
 
       #  Log existence of server.
       puts "SAMP service at $callable_url"
@@ -272,7 +268,7 @@ itcl::class samp::SampClient {
    #  is sent to all other clients.
    public method notify {mtype paramsVar {recipient_id {}}} {
       upvar $paramsVar params
-      set msg [message $mtype [array get params]]
+      set msg [message_ $mtype [array get params]]
       if {[string length $recipient_id] > 0} {
          $hub_ execute notify $private_key_ $recipient_id $msg
       } {
@@ -285,7 +281,7 @@ itcl::class samp::SampClient {
    #  wait time for the response.
    public method call {mtype paramsVar recipient_id {timeout {0}}} {
       upvar $paramsVar params
-      set msg [message $mtype [rpcvar struct [array get params]]]
+      set msg [message_ $mtype [rpcvar struct [array get params]]]
       return [$hub_ execute callAndWait $private_key_ \
                     $recipient_id $msg $timeout]
    }
@@ -293,7 +289,10 @@ itcl::class samp::SampClient {
    #  Standard method to report MTypes served by this object it its
    #  capacity as an agent.
    public method get_subscribed_mtypes {} {
-      return {samp.hub.event.shutdown samp.app.ping test.echo test.fail}
+      return {
+         samp.hub.event.shutdown
+         samp.app.ping
+      }
    }
 
    #  Implementation for samp.hub.event.shutdown MType.
@@ -304,16 +303,6 @@ itcl::class samp::SampClient {
 
    #  Implementation for samp.app.ping MType.
    public method samp.app.ping {sender_id params} {
-   }
-
-   #  Implementation for test.echo MType.
-   public method test.echo {sender_id params} {
-      return [rpcvar struct $params]
-   }
-
-   #  Implementation for test.fail MType.
-   public method test.fail {sender_id params} {
-      error "Failed."
    }
 
    #  Returns a boolean value indicating whether the client is
@@ -358,14 +347,33 @@ itcl::class samp::SampClient {
       if {[string length $client_tracker] > 0} {
          lappend ags $client_tracker
       }
-      foreach ag $user_agents_ {
+      foreach ag $agents {
          lappend ags $ag
       }
       return $ags
    }
 
+   #  Informs the hub of this client's current subscriptions if registered.
+   private method update_subscriptions_ {} {
+      foreach agent [get_all_agents_] {
+         foreach mtype [$agent get_subscribed_mtypes] {
+            set subs($mtype) [rpcvar struct {}]
+         }
+      }
+      if {[is_registered]} {
+         $hub_ execute declareSubscriptions $private_key_ [array get subs]
+      }
+   }
+
+   #  Informs the hub of this client's current metadata if registered.
+   private method update_metadata_ {} {
+      if {[is_registered]} {
+         $hub_ execute declareMetadata $private_key_ $metadata
+      }
+   }
+
    #  Creates a message given the MType and parameters.
-   private method message {mtype params} {
+   private method message_ {mtype params} {
       set msg(samp.mtype) $mtype
       set msg(samp.params) $params
       return [array get msg]
@@ -465,12 +473,16 @@ itcl::class samp::SampClient {
                                 -private_key $private_key_
       $client_tracker configure -hub [code $hub_]
    }
-   public variable metadata {samp.name gaia_app}
+   public variable metadata {samp.name gaia_app} {
+      update_metadata_
+   }
+   public variable agents {} {
+      update_subscriptions_
+   }
 
    #  Private variables: (available to instance)
    #  -----------------
    private variable hub_
-   private variable user_agents_
    private variable private_key_ {}
    private variable self_id_ {}
    private variable samp_reg_commands_ {}
