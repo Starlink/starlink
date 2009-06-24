@@ -211,6 +211,7 @@
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -224,6 +225,8 @@
 *        Give only read access to the NDF when the MODE=Get.
 *     17-DEC-2007 (DSB):
 *        Added mode "MSet".
+*     24-JUN-2009 (TIMJ):
+*        Give only read access to the NDF when the MODE=Test.
 *     {enter_further_changes_here}
 
 *-
@@ -276,7 +279,7 @@
      :                MODE, STATUS )
 
 *  Obtain an identifier for the NDF to be modified.
-      IF ( MODE .EQ. 'GET' ) THEN
+      IF ( MODE .EQ. 'GET' .OR. MODE .EQ. 'TEST' ) THEN
          CALL LPG_ASSOC( 'NDF', 'READ', INDF, STATUS )
       ELSE
          CALL LPG_ASSOC( 'NDF', 'UPDATE', INDF, STATUS )
@@ -444,7 +447,7 @@
       END IF
 
 *  Save the FrameSet in the NDF if it may have been modified.
-      IF ( MODE .NE. 'GET' ) THEN
+      IF ( MODE .NE. 'GET' .AND. MODE .NE. 'TEST') THEN
          CALL NDF_PTWCS( IWCS, INDF, STATUS )
       END IF
 
