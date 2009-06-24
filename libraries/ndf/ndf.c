@@ -62,6 +62,8 @@
 *        or having zero or negative length.
 *     23-JAN-2009 (DSB):
 *        Added ndfHsdat.
+*     24-JUN-2009 (DSB):
+*        Fix memory allocation error in ndfHout_froutin.
 *     <{enter_further_changes_here}>
 *-
 */
@@ -1679,7 +1681,7 @@ static F77_SUBROUTINE(ndfHout_froutin)( INTEGER(fnlines),
    int i;
    
    F77_IMPORT_INTEGER( *fnlines, nlines );
-   text = (char **) malloc( (size_t) nlines );
+   text = (char **) malloc( ( (size_t) nlines )*sizeof( char * ) );
    for ( i = 0; i < nlines; i++ ) {
       text[ i ] = (char *) malloc( (size_t) ( ftext_length + 1 ) );
    }
