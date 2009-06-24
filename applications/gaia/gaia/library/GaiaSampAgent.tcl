@@ -6,7 +6,7 @@
 #     [incr Tcl] class
 
 #  Purpose:
-#    GAIA-specific implementation of SAMP MType support.
+#     GAIA-specific implementation of SAMP MType support.
 
 #  Description:
 #     An instance of this class does the actual work for responding to
@@ -48,18 +48,21 @@
 
 #-
 
-package require rpcvar
-namespace import -force rpcvar::*
-
 itcl::class gaia::GaiaSampAgent {
 
+   #  Standard method listing MTypes implemented by this class.
    public method get_subscribed_mtypes {} {
       return {
          image.load.fits
+         coord.pointAt.sky
+         gaia.execute.tcl
+         table.load.votable
+         table.select.rowList
+         table.highlight.row
       }
    }
 
-   #  Loads a FITS file specified as a URL into the display.
+   #  Load a FITS file specified as a URL into the display.
    public method image.load.fits {sender_id param_list} {
       array set params $param_list
       set img_url $params(url)
@@ -84,8 +87,145 @@ itcl::class gaia::GaiaSampAgent {
       }
    }
 
+   #  Point at a coordinate by drawing an identifier graphic, ra and dec
+   #  are both in decimal degrees.
+   public method coord.pointAt.sky {sender_id param_list} {
+      array set params $param_list
+      set ra $params(ra)
+      set dec $params(dec)
+      set basegaia [get_gaia_]
+      if { $basegaia != {} } {
+         $basegaia position_of_interest $ra $dec "deg J2000"
+      } else {
+         error "No GAIA window found for display"
+      }
+   }
+
+   #  Execute Tcl code within GAIA.  This is a non-standard MType specific
+   #  to GAIA.  Note that the MD5 checksum business used in the PLASTIC
+   #  implementation is no longer required, since the SAMP protocol,
+   #  unlike PLASTIC, contains defences against unauthorised attempts to
+   #  send messages to applications.
+   #
+   #  MType specification:
+   #     MType:
+   #        gaia.execute.tcl
+   #     Parameters:
+   #        script (string) - executable Tcl
+   #     Return values:
+   #        value (string) - return value of successfully executed script
+   #
+   #  If an error is encountered while executing the script, a SAMP error
+   #  response will result.
+   public method gaia.execute.tcl {sender_id param_list} {
+      array set params $param_list
+      set script $params(script)
+      set result(value) [eval $script]
+      return [array get result]
+   }
+
+   #  Load a VOTable as a catalogue.
+   public method table.load.votable {sender_id param_list} {
+      array set params $param_list
+      set url $params(url)
+      set table_id [get_param_ params table-id $url]
+      set table_name [get_param_ params name ""]
+
+      set tst_file [get_temp_file_ .TAB]
+      exec $::gaia_dir/vot2tab $url 0 $tst_file
+      if {! [file exists $tst_file]} {
+         error "VOTable conversion failed"
+      }
+
+      set window [display_table_ $tst_file $table_id]
+      set cat_windows_($table_id) $window
+   }
+
+   #  Display only a selection of the rows from a previously loaded catalogue.
+   public method table.select.rowList {sender_id param_list} {
+      array set params $param_list
+      set rows $params(row-list)
+      [get_cat_window_ params {table-id url}] select_indices $rows
+   }
+
+   #  Highlight a single row from a previously loaded catalogue.
+   public method table.highlight.row {sender_id param_list} {
+      array set params $param_list
+      set row $params(row)
+      [get_cat_window_ params {table-id url}] highlight_index $row
+   }
+
+   #  Protected methods:
+   #  ------------------
+
+   #  Download and display a file.
+   protected method display_file_ {filename type} {
+      set basegaia [get_gaia_]
+      if { $basegaia != {} } {
+         $basegaia open $filename
+      }
+      if { $urlget_ != {} } {
+         catch {delete object $urlget_}
+         set urlget_ {}
+      }
+   }
+
+   #  Displays a catalogue in TST format.
+   #  Returns the GaiaSearch widget which displays the catalogue.
+   protected method display_table_ {filename table_id} {
+      set images [skycat::SkyCat::get_skycat_images]
+      set ctrlwidget [lindex $images 0]
+      set gaia [winfo parent $ctrlwidget]
+      set window [::cat::AstroCat::open_catalog_window \
+                    $filename $ctrlwidget ::gaia::PlasticSearch 0 $gaia]
+      $window configure -table_id $table_id
+
+      #  Set symbol, after realization of window.
+      set next_symbol [next_symbol_spec_]
+      after idle "$window maybe_set_symbol $next_symbol"
+      return $window
+   }
+
+   #  Returns a window associated with a previously received table.
+   #  param_var is the name of an array, and key_list is a list of key
+   #  names in it.  Any value of one of these keys in the array
+   #  (in order of preference) will be used as an identifier for a
+   #  previously received window.  The window is returned; if none can
+   #  be found an error is thrown.
+   private method get_cat_window_ {param_var key_list} {
+      upvar $param_var params
+      set keys {}
+      set ident {}
+      foreach k $key_list {
+         if {[info exists params($k)]} {
+            lappend keys $params($k)
+            lappend ident "$k=$params($k)"
+         }
+      }
+      if {[llength $keys] == 0} {
+         error "No table identifier - none of $key_list"
+      }
+      foreach k $keys {
+         if {[info exists cat_windows_($k)]} {
+            return $cat_windows_($k)
+         }
+      }
+      error "Unknown table $ident"
+   }
+
    #  Utility procs:
    #  --------------
+
+   #  Returns a named value from an array, or a default if the value is
+   #  absent.
+   private proc get_param_ {params_name key default} {
+      upvar $params_name params
+      if {[info exists params($key)]} {
+         return $params($key)
+      } {
+         return $default
+      }
+   }
 
    #  Locate an instance of Gaia for displaying images.
    private proc get_gaia_ {} {
@@ -109,9 +249,65 @@ itcl::class gaia::GaiaSampAgent {
       }
    }
 
+   #  Get the name of a file it's OK to use for scratch space.
+   #  The exten argument gives a file extension (e.g. ".fits").
+   protected proc get_temp_file_ {exten} {
+      set tmpdir ""
+      if { [info exists ::env(GAIA_TEMP_DIR)] } {
+         set trydirs "$::env(GAIA_TEMP_DIR) /tmp /var/tmp ."
+      } else {
+         set trydirs "/tmp /var/tmp ."
+      }
+      foreach trydir $trydirs {
+         if {[file isdirectory $trydir] && [file writable $trydir]} {
+            set tmpdir $trydir
+            break
+         }
+      }
+      if { $tmpdir == "" } {
+         error "No temporary directory"
+      }
+
+      set basefile "${tmpdir}/gaia_temp_"
+      for { set ix 1 } { $ix < 100 } { incr ix } {
+         set tryfile "$tmpdir/gaia_temp_$ix$exten"
+         if {! [file exists $tryfile] } {
+            return $tryfile
+         }
+      }
+      error "No free files with name like $tryfile"
+   }
+
+   #  Provides a suitable value for the "symbol_id" column in a TST table.
+   #  This is what determines how plotted symbols will appear on the
+   #  image (unless changed).  This function endeavours to return a
+   #  different symbol each time it is called (though may repeat eventually).
+   protected proc next_symbol_spec_ {} {
+      set shapes {circle square plus cross diamond}
+      set colors {cyan yellow blue red grey50 green magenta}
+      set shape [lindex $shapes [expr $symbol_idx_ % [llength $shapes]]]
+      set color [lindex $colors [expr $symbol_idx_ % [llength $colors]]]
+      set size 6
+      incr symbol_idx_
+      return [list {} \
+                   [list $shape $color {} {} {} {}] \
+                   [list $size {}]]
+   }
+
+
    #  Instance variables:
    #  -------------------
 
    #  Name of the active instance of GaiaUrlGet.
    protected variable urlget_ {}
+
+   #  Class variables:
+   #  ----------------
+
+   #  Array of GaiaSearch windows which have been opened to display
+   #  SAMP-acquired tables.  The array is indexed by table_id.
+   protected common cat_windows_
+
+   #  Index of the last new symbol type used.
+   protected common symbol_idx_ 0
 }
