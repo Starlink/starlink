@@ -1644,7 +1644,7 @@ int gaiaNDFGtWcs( int ndfid, AstFrameSet **iwcs, char **error_mess )
                 /* Use PermMap to join FITS base frame to NDF base frame */
                 zero[0] = 0.0;
                 permMap = astPermMap( fitsaxes, inperm, ndfaxes, outperm,
-                                      zero, "" );
+                                      zero, " " );
 
                 ndfframes = astGetI( *iwcs, "Nframe" );
                 fitscurrent = astGetI( fitswcs, "Current" );
@@ -1793,7 +1793,7 @@ int gaiaNDFGetFitsChan( int ndfid, AstFitsChan **fitschan, char **error_mess )
         datAnnul( &fitsloc, &status );
     }
     else {
-        *fitschan = astFitsChan( NULL, NULL, "" );
+        *fitschan = astFitsChan( NULL, NULL, " " );
     }
     if ( status != SAI__OK ) {
         *error_mess = gaiaUtilsErrMessage();

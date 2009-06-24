@@ -56,6 +56,8 @@ void initFortran ( int argc, char *argv[] )
  * this function, but it is not available except when linked by g95.
  */
 #if HAVE_FC_MAIN
-int FC_MAIN() {}
+int FC_MAIN() {
+    return 0;
+}
 #endif
 

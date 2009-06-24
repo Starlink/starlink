@@ -155,7 +155,7 @@ int GaiaFITSGtWcs( StarFitsIO *fitsio, AstFrameSet **iwcs,
     size_t lheader = mem.size();
 
     // Read headers using a FITS channel.
-    AstFitsChan *fitschan = astFitsChan( NULL, NULL, "" );
+    AstFitsChan *fitschan = astFitsChan( NULL, NULL, " " );
     int ncard = (int) ( lheader / (size_t) FITSCARD );
     gaiaUtilsGtFitsChan( (char *) header, ncard, &fitschan );
 
@@ -199,8 +199,8 @@ int GaiaFITSGtWcs( StarFitsIO *fitsio, AstFrameSet **iwcs,
 
         AstFrame *f1 = astFrame( *ndims, "Domain=GRID" );
         AstFrame *f2 = astFrame( *ndims, "Domain=PIXEL" );
-        AstShiftMap *map = astShiftMap( *ndims, dlbnd, "" );
-        *iwcs = astFrameSet( f1, "" );
+        AstShiftMap *map = astShiftMap( *ndims, dlbnd, " " );
+        *iwcs = astFrameSet( f1, " " );
         astAddFrame( *iwcs, AST__BASE, map, f2 );
     }
 
@@ -291,7 +291,7 @@ int GaiaFITSCreate( const char* filename, void *data,
     /* Write WCS into a FITS channel. Attempt to write headers using a
      * FITS-WCS encoding, if that fails we use a Native encoding */
     if ( wcs != NULL ) {
-        AstFitsChan *chan = astFitsChan( NULL, NULL, "" );
+        AstFitsChan *chan = astFitsChan( NULL, NULL, " " );
         astSet( chan, "Encoding=FITS-WCS" );
         int nwrite = astWrite( chan, wcs );
         if ( !astOK || nwrite == 0 ) {

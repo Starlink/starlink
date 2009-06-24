@@ -465,10 +465,10 @@ static int SPCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
     if ( spPtr->framesets[0] == NULL ) {
         AstFrame *f1, *f2;
         astBegin;
-        f1 = astFrame( 1, "" );
-        f2 = astFrame( 1, "" );
-        spPtr->mapping = (AstMapping *) astUnitMap( 1, "" );
-        spPtr->framesets[0] = astFrameSet( f1, "" );
+        f1 = astFrame( 1, " " );
+        f2 = astFrame( 1, " " );
+        spPtr->mapping = (AstMapping *) astUnitMap( 1, " " );
+        spPtr->framesets[0] = astFrameSet( f1, " " );
         astAddFrame( spPtr->framesets[0], AST__BASE, spPtr->mapping, f2 );
 
         astExport( spPtr->framesets[0] );
@@ -1104,7 +1104,7 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
         current = astGetI( spPtr->framesets[1], "Current" );
         astSetI( spPtr->framesets[1], "Base", current );
         spPtr->plot = astPlot( spPtr->framesets[1], graphbox, basebox,
-                               (spPtr->options == NULL ? "" : spPtr->options));
+                               (spPtr->options == NULL ? " " : spPtr->options));
         astSetI( spPtr->framesets[1], "Base", base );
 
         if ( spPtr->plot == NULL ) {
@@ -1910,7 +1910,7 @@ static void MakeSpectral( SPItem *spPtr )
             lutcoords[i] = work[spPtr->axis - 1];
         }
         spPtr->mapping = (AstMapping *) astLutMap( spPtr->numPoints,
-                                                   lutcoords, 1.0, 1.0, "" );
+                                                   lutcoords, 1.0, 1.0, " " );
 
         free( grid );
         free( coords );
@@ -1918,10 +1918,10 @@ static void MakeSpectral( SPItem *spPtr )
     }
 
     /* The data units map onto themselves directly so use a unitmap. */
-    umap = astUnitMap( 1, "" );
+    umap = astUnitMap( 1, " " );
 
     /*  Create a compound of these two mappings. */
-    map = (AstMapping *) astCmpMap( spPtr->mapping, umap, 0, "" );
+    map = (AstMapping *) astCmpMap( spPtr->mapping, umap, 0, " " );
 
     /* Get a Frame representing the input coordinates, uses a GRID axis of
      * the base frame (any old one) and a default axis. */
@@ -1982,16 +1982,16 @@ static void MakeSpectral( SPItem *spPtr )
     }
     if ( f2 == NULL ) {
         havefluxframe = 0;
-        f2 = astFrame( 1, "" );
+        f2 = astFrame( 1, " " );
     }
 
     /* Create the full frame using the spectral frame and flux frame. */
     if ( havespecframe && havefluxframe ) {
         frm2 = (AstFrame *) astSpecFluxFrame( (AstSpecFrame *) f1,
-                                              (AstFluxFrame *) f2, "" );
+                                              (AstFluxFrame *) f2, " " );
     }
     else {
-        frm2 = (AstFrame *) astCmpFrame( f1, f2, "" );
+        frm2 = (AstFrame *) astCmpFrame( f1, f2, " " );
     }
 
     /* Clear digits and format, unless set in the input frameset. */
@@ -2023,7 +2023,7 @@ static void MakeSpectral( SPItem *spPtr )
 
     /* Now create the output frameset, which has frm2 as current
      * and frm1 as base. */
-    spPtr->framesets[1] = astFrameSet( frm1, "" );
+    spPtr->framesets[1] = astFrameSet( frm1, " " );
     astAddFrame( spPtr->framesets[1], AST__BASE, map, frm2 );
 
     /* Export the FrameSet and 1D mapping, and make sure everything else is
