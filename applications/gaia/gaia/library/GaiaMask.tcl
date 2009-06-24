@@ -128,11 +128,34 @@ itcl::class gaia::GaiaMask {
          util::LabelEntry $w_.values \
             -labelwidth $lwidth \
             -text "Values:" \
-            -textvariable [scope values_]
+            -textvariable [scope values_] \
+            -command [code $this apply]
       }
       pack $itk_component(values) -side top -fill x -ipadx 1m -ipady 2m
       add_short_help $itk_component(values) \
          {Values of masked regions to display, empty for all}
+
+      #  Or pick out individual values using a slider.
+      if { $itk_option(-show_slider) } {
+         itk_component add index {
+            LabelEntryScale $w_.index \
+               -text "Value:" \
+               -value 1 \
+               -labelwidth $lwidth \
+               -from 1 \
+               -to 2 \
+               -increment 1 \
+               -resolution 1 \
+               -show_arrows 1 \
+               -anchor w \
+               -delay 25 \
+               -fix_range 1 \
+               -command [code $this apply_value_]
+         }
+         pack $itk_component(index) -side top -fill x -ipadx 1m -ipady 2m
+         add_short_help $itk_component(index) \
+            {Value of mask region to display, if enabled}
+      }
 
       #  Apply the mask.
       itk_component add apply {
@@ -187,10 +210,16 @@ itcl::class gaia::GaiaMask {
    }
 
    #  Apply the mask.
-   public method apply {} {
+   public method apply {args} {
       if { [open] } {
          create_mask_
       }
+   }
+
+   #  Apply the single mask value.
+   protected method apply_value_ {value} {
+      set values_ $value
+      apply
    }
 
    #  Open the mask, if changed.
@@ -207,6 +236,12 @@ itcl::class gaia::GaiaMask {
          open_mask_
          load_mask_
          set last_mask_ $itk_option(-mask)
+
+         #  Set the range of values for this mask.
+         if { $itk_option(-show_slider) } {
+            lassign [array::getminmax $mask_adr_] min max
+            $itk_component(index) configure -to $max
+         }
       }
       return 1
    }
@@ -355,6 +390,9 @@ itcl::class gaia::GaiaMask {
 
    #  Filters for selecting files.
    itk_option define -filter_types filter_types Filter_types {}
+
+   #  Whether to show the slider.
+   itk_option define -show_slider show_slider Show_Slider 1
 
    #  Protected variables: (available to instance)
    #  --------------------
