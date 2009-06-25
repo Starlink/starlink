@@ -559,7 +559,8 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
     float off_time = 0.0;
     int utmax = 20070130;
 
-    if (fitsvals.utdate > utmax) {
+    /* on 20070507 obs #45 and #47 have bad exposure information */
+    if (fitsvals.utdate > utmax && fitsvals.utdate != 20070507) {
       *status = SAI__ERROR;
       errRepf( "", "ACS_*EXPOSURE missing or BAD but data are newer than expected (%d > %d)",
                status, fitsvals.utdate, utmax);
@@ -581,6 +582,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
         exp_time = steptime;
 
         if (hdr->swmode == SMF__SWM_PSSW) {
+          int nrefstep = fitsvals.nrefstep;
           /* off exposure time depends on the position of the spectrum
              in the row, and varies from 1 to 2 times the actual off time.
              This information is hard to obtain in the general case where a row
@@ -593,7 +595,11 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
              Note that in more recent observations the JOS calculates NREFSTEP
              dynamically for each row.
           */
-          off_time = 1.5 * fitsvals.nrefstep * steptime;
+          /* If nrefstep is 0 we make up a number. eg for 20070507. A 0.0 second
+             off time causes problems in the weighted coadd. */
+          if (nrefstep == 0) nrefstep = 5;
+
+          off_time = 1.5 * nrefstep * steptime;
           if (missing_off) {
             msgOutiff( MSG__QUIET, "", "WARNING: %d #%d: OFF exposure time has been estimated as %g sec",
                        status, fitsvals.utdate, fitsvals.obsnum, off_time );
