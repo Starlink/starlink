@@ -215,13 +215,13 @@
 *     Copyright (C) 1991, 1994 Science & Engineering Research Council.
 *     Copyright (C) 2000, 2004 Central Laboratory of the Research
 *     Councils. 
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007, 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -231,8 +231,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -254,13 +254,15 @@
 *        Display current Frame WCS coords at max and min pixel 
 *        positions.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
 *     18-MAY-2007 (DSB):
 *        Added parameters MINWCS and MAXWCS.
 *     2007 June 29 (MJC):
 *        Extend to calculate the mode from an optimally binned 
 *        histogram through new parameters METHOD and NUMBIN.  Added
 *        References.
+*     2009 June 25 (MJC):
+*        Initialise PERVAL for valgrind.
 *     {enter_further_changes_here}
 
 *-
@@ -429,6 +431,10 @@
       ELSE
          CALL NDF_BAD( NDF, COMP, .FALSE., BAD, STATUS )
       END IF
+
+      DO I = 1, NPRCTL
+         PERVAL(I) = VAL__BADD
+      END DO
 
 *  Call the appropriate routine to compute the histogram and hence the
 *  statistics.
