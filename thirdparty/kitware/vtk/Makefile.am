@@ -3,7 +3,7 @@
 @SET_MAKE@
 
 ##  Extension for shared libraries.
-SHLIB_EXT = @SHLIB_EXT@
+SHLIB_EXT = @TCL_SHLIB_EXT@
 
 ##  First build CMake, then use that to configure VTK and finall build it.
 ##  Note need a softlink so that include files are located using <vtk/>
@@ -27,6 +27,10 @@ all:
 	        -D CMAKE_INSTALL_PREFIX:PATH=$(prefix) \
 		-D CMAKE_LIBRARY_PATH:PATH=$(prefix)/lib \
 	        -D TCL_TCLSH:PATH=$(prefix)/bin/tclsh \
+	        -D TCL_INCLUDE_PATH:PATH=$(prefix)/include \
+	        -D TCL_LIBRARY:FILEPATH=$(prefix)/lib/libtcl8.4$(SHLIB_EXT) \
+	        -D TK_INCLUDE_PATH:PATH=$(prefix)/include \
+	        -D TK_LIBRARY:FILEPATH=$(prefix)/lib/libtk8.4$(SHLIB_EXT) \
 	        -D VTK_OPENGL_HAS_OSMESA:BOOL=OFF \
 	        -D VTK_USE_CARBON:BOOL=OFF \
 	        -D VTK_USE_COCOA:BOOL=OFF  \

@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision: 24276 $)
 
 dnl    Initialisation: package name and version number
-AC_INIT(vtk, 5.4.0, ussc@star.rl.ac.uk)
+AC_INIT(vtk, 5.4.2, ussc@star.rl.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -10,8 +10,21 @@ dnl    Require Starlink automake
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 
 dnl    Get extension for shared libraries.
-AC_LTDL_SHLIBEXT
-AC_SUBST([SHLIB_EXT],[$libltdl_cv_shlibext])
+dnl    Need to determine the suffix for shareable libraries, as used by
+dnl    Tcl, so we can link against the GAIA dynamic library.
+tcl_system=`uname -s`-`uname -r`
+case $tcl_system in
+   windows)
+      TCL_SHLIB_EXT='.dll'
+      ;;
+   Darwin-*)
+      TCL_SHLIB_EXT='.dylib'
+      ;;
+   *)
+      TCL_SHLIB_EXT='.so'
+      ;;
+esac
+AC_SUBST(TCL_SHLIB_EXT)
 
 dnl    Sanity-check: name a file in the source directory -- if this
 dnl    isn't found then configure will complain
