@@ -127,10 +127,11 @@
       CALL CHR_UCASE( EXPATH )
       IF ( INDEX( EXPATH, 'MORE' ) .EQ. 0 ) THEN
          STATUS = SAI__ERROR
+         CALL MSG_SETC( 'EN', EXPATH )
          CALL ERR_REP( 'COF_FI2NE_EXTMORE',
-     :     'EXTNAME keyword value does not contain the NDF extension '/
-     :     /'component.  Unable to recreate the NDF extension.',
-     :     STATUS )
+     :     'EXTNAME keyword value (^EN) does not contain the NDF '/
+     :     /'extension component.  Unable to recreate the NDF '/
+     :     /'extension.', STATUS )
          GOTO 999
       END IF
 
