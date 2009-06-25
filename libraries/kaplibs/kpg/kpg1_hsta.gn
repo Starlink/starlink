@@ -262,11 +262,11 @@
             END DO
 
 *  Obtain workspace for the clipped fractions.
-            CALL PSX_MALLOC( NUMPER * 4, FPNTR, STATUS )
+            CALL PSX_CALLOC( NUMPER, '_REAL', FPNTR, STATUS )
 
 *  Obtain the percentiles using a fine histogram, iterating the
 *  histogram limits if there are extreme outliers.
-            CALL KPG1_FRAC<T>( EL, DATA, NUMPER, PERCNT, BAD, 
+            CALL KPG1_FRAC<T>( EL, DATA, NUMPER, PERCNT, BAD2, 
      :                         %VAL( CNF_PVAL( FPNTR ) ), PERVAL, 
      :                         STATUS )
 
