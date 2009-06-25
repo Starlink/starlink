@@ -1,6 +1,6 @@
 [submodule "thirdparty/rit/match/match"]
 	path = thirdparty/rit/match/match
-	url = ../match
+	url = ../match.git
 [submodule "thirdparty/kitware/vtk/VTK"]
 	path = thirdparty/kitware/vtk/VTK
 	url = ../vtk.git
