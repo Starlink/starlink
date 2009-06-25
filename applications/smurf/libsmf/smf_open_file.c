@@ -946,10 +946,15 @@ static char * smf__read_ocsconfig ( int ndfid, int *status) {
       datAnnul( &jcmtocs, status );
       datSize( configloc, &size, status );
       datClen( configloc, &clen, status );
-      ocscfg = smf_malloc( size, clen, 0, status );
+      /* allocate it slightly bigger in case the config *just* fits
+         in SIZE * CLEN characters and we can't terminate it. Also
+         initialise it so that we can walk back from the end */
+      ocscfg = smf_malloc( size + 1, clen, 1, status );
       ocscfg[0] = '\0'; /* just to make sure */
       dims[0] = size;
       datGetC( configloc, 1, dims, ocscfg, clen, status );
+      /* _CHAR buffer will not be terminated */
+      cnfImprt( ocscfg, (size * clen) + 1, ocscfg );
       datAnnul( &configloc, status );
     }
   }
