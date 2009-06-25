@@ -116,6 +116,8 @@
 *        they may still be needed.
 *     9-FEB-2009 (DSB):
 *        Added astChr2Double.
+*     25-JUN-2009 (DSB):
+*        Fix handling of escape characters in astSplitC.
 */
 
 /* Configuration results. */
@@ -429,8 +431,8 @@ static int use_cache = 0;
 /* ================================= */
 static size_t SizeOfMemory( int * );
 static char *CheckTempStart( const char *, const char *, const char *, char *, int *, int *, int *, int *, int *, int *, int *, int * );
-static char *ChrMatcher( const char *, const char *, const char *, const char *[], int, int, int, char ***, int *, int * );
-static char *ChrSuber( const char *, const char *, const char *[], int, char ***, int *, int * );
+static char *ChrMatcher( const char *, const char *, const char *, const char *[], int, int, int, char ***, int *, const char **, int * );
+static char *ChrSuber( const char *, const char *, const char *[], int, int, char ***, int *, const char **, int * );
 
 #ifdef MEM_DEBUG
 static void Issue( Memory *, int * );
@@ -1154,14 +1156,14 @@ char **astChrSplitC_( const char *str, char c, int *n, int *status ) {
 /* Is this a delimiter character? */
       if( *p == c ) {
 
-/* The next character is not escaped. */
-         escaped = 0;
-
 /* If it is escaped, it does not mark the end of a word. Put it into the
    current output buffer instead, overwriting the escape character that
    preceeded it. */
          if( escaped ) {
             word[ wordlen - 1 ] = c;
+
+/* The next character is not escaped. */
+            escaped = 0;
 
 /* If the delimiter is not escaped, terminate the current word and store
    a pointer to it in the returned array. */
@@ -1181,9 +1183,16 @@ char **astChrSplitC_( const char *str, char c, int *n, int *status ) {
          word = astGrow( word, wordlen + 1, 1 );
          if( word ) word[ wordlen++ ] = *p;
 
-/* Is this character a backslash, set a flag indicating that the next
-   character is escaped. */
-         escaped = ( *p == '\\' );
+/* If the current character was escaped, indicate that the next character
+   is not escaped. */
+         if( escaped ) {
+            escaped = 0;
+
+/* If this character is a unescaped backslash, set a flag indicating that the 
+   next character is escaped. */
+         } else if( *p == '\\' ){
+            escaped = 1;
+         }
       }
 
 /* Move on to the next character. */
@@ -1202,21 +1211,23 @@ char **astChrSplitC_( const char *str, char c, int *n, int *status ) {
    return result;
 }
 
-char **astChrSplitRE_( const char *str, const char *regexp, int *n, int *status ) {
+char **astChrSplitRE_( const char *str, const char *regexp, int *n, 
+                       const char **matchend, int *status ) {
 /*
 *+
 *  Name:
 *     astChrSplitRE
 
 *  Purpose:
-*     Split a string using a specified regular expression.
+*     Extract sub-strings matching a specified regular expression.
 
 *  Type:
 *     Protected function.
 
 *  Synopsis:
 *     #include "memory.h"
-*     char **astChrSplitRE( const char *str, const char *regexp, int *n ) 
+*     char **astChrSplitRE( const char *str, const char *regexp, int *n,
+*                           const char **matchend ) 
 
 *  Description:
 *     This function compares the supplied string with the supplied 
@@ -1228,10 +1239,19 @@ char **astChrSplitRE_( const char *str, const char *regexp, int *n, int *status 
 *     str
 *        Pointer to the string to be split.
 *     regexp
-*        The regular expression.
+*        The regular expression. See "Template Syntax:" in the astChrSub
+*        prologue. Note, this function differs from astChrSub in that any 
+*        equals signs (=) in the regular expression are treated literally.
 *     n
 *        Address of an int in which to return the number of sub-strings 
 *        returned.
+*     matchend
+*        A pointer to a location at which to return a pointer to the
+*        character that follows the last character within the supplied test 
+*        string that matched any parenthesises sub-section of "regexp". A 
+*        NULL pointer is returned if no matches were found. A NULL pointer 
+*        may be supplied if the location of the last matching character is 
+*        not needed.
 
 *  Returned Value:
 *     A pointer to a dynamically allocated array containing "*n" elements.
@@ -1241,6 +1261,12 @@ char **astChrSplitRE_( const char *str, const char *regexp, int *n, int *status 
 *     using astFree when no longer needed.
 
 *  Notes:
+*     - If a parenthesised sub-string in the regular expression is matched
+*     by more than one sub-string within the test string, then only the
+*     first is returned. To return multiple matches, the regular
+*     expression should include multiple copies of the parenthesised
+*     sub-string (for instance, separated by ".+?" if the intervening
+*     string is immaterial).
 *     -  A NULL pointer is returned if this function is invoked with the
 *     global error status set or if it should fail for any reason, or if
 *     the supplied string contains no words.
@@ -1261,7 +1287,7 @@ char **astChrSplitRE_( const char *str, const char *regexp, int *n, int *status 
 
 /* Call ChrSuber to do the work, saving the matching parts of the test 
    string. */
-   temp = ChrSuber( str, regexp, NULL, 0, &result, n, status );
+   temp = ChrSuber( str, regexp, NULL, 0, 1, &result, n, matchend, status );
    if( temp ) {
       temp = astFree( temp );
 
@@ -1277,7 +1303,8 @@ char **astChrSplitRE_( const char *str, const char *regexp, int *n, int *status 
 }
 
 char *ChrSuber( const char *test, const char *pattern, const char *subs[],
-                int nsub, char ***parts, int *npart, int *status ){
+                int nsub, int ignore_equals, char ***parts, int *npart, 
+                const char **matchend, int *status ){
 /*
 *  Name:
 *     ChrSuber
@@ -1291,8 +1318,9 @@ char *ChrSuber( const char *test, const char *pattern, const char *subs[],
 *  Synopsis:
 *     #include "memory.h"
 *     char *ChrSuber( const char *test, const char *pattern, 
-*                     const char *subs[], int nsub, char ***parts,
-*                     int *npart, int *status )
+*                     const char *subs[], int nsub, int ignore_equals,
+*                     char ***parts, int *npart, const char **matchend, 
+*                     int *status )
 
 *  Description:
 *     This function performs the work for astChrSub and astChrSplitRE.
@@ -1310,10 +1338,15 @@ char *ChrSuber( const char *test, const char *pattern, const char *subs[],
 *        matches the first parenthesised sub-string in the template, etc.
 *
 *        If "nsub" is zero, then the "subs" pointer is ignored. In this
-*        case, substitution strings may be specified by appended them to 
-*        the end of the "pattern" string, separated by "=" characters.
+*        case, and if parameter "ignore_equals" is zero, substitution strings 
+*        may be specified by appended them to the end of the "pattern" string, 
+*        separated by "=" characters
 *     nsub
 *        The number of substitution strings supplied in array "subs".
+*     ignore_equals
+*        If non-zero, any equals signs in the supplied pattern are
+*        treated literally, rather than being used to split the template
+*        from any substitution strigs. 
 *     parts
 *        Address of a location at which to return a pointer to an array
 *        of character string pointers. The strings are the sub-sections
@@ -1322,6 +1355,13 @@ char *ChrSuber( const char *test, const char *pattern, const char *subs[],
 *     npart
 *        Address of a location at which to return the length of the
 *        "parts" array. Ignored if "parts" is NULL.
+*     matchend
+*        A pointer to a location at which to return a pointer to the
+*        character that follows the last character within the supplied test 
+*        string that matched any parenthesises sub-section of "regexp". A 
+*        NULL pointer is returned if no matches were found. A NULL pointer 
+*        may be supplied if the location of the last matching character is 
+*        not needed.
 *     status
 *        Pointer to the inherited status variable.
 
@@ -1342,6 +1382,7 @@ char *ChrSuber( const char *test, const char *pattern, const char *subs[],
 /* Local Variables: */
    char **sections;
    char **temps;
+   char *cptr;
    char *result;
    char *temp;
    char *template;
@@ -1357,14 +1398,25 @@ char *ChrSuber( const char *test, const char *pattern, const char *subs[],
 /* Check global status */
    if( !astOK ) return result;
 
-/* Split the total "pattern" string into sections, using (unescaped) "="
-   characters as the delimiter. The first section is the actual template,
-   and each subsequent section (if any) holds a substitution string. */
-   sections = astChrSplitC( pattern, '=', &nsec );
+/* If required, split the total "pattern" string into sections, using 
+   (unescaped) "=" characters as the delimiter. The first section is the 
+   actual template, and each subsequent section (if any) holds a 
+   substitution string. */
+   if( ! ignore_equals ) {
+      sections = astChrSplitC( pattern, '=', &nsec );
+
+/* If equals signs are being treated literally, just take a copy of the
+   supplied pattern. */
+   } else {
+      cptr = astStore( NULL, pattern, strlen( pattern ) + 1 );
+      sections = &cptr;
+      nsec = 1;
+   }
+
    if( sections ) {
 
 /* If the caller did not provide any substitution strings, use the ones
-   appended to the end of the pattern string. */
+   appended to the end of the pattern string (if any). */
       if( nsub == 0 ) {
          subs = (void *) ( sections + 1 );
          nsub = nsec - 1;
@@ -1436,7 +1488,7 @@ char *ChrSuber( const char *test, const char *pattern, const char *subs[],
 
 /* See if the test string matches the current template. */
       result = ChrMatcher( test, template, pattern, subs, nsub, 0, 1,
-                           parts, npart, status );
+                           parts, npart, matchend, status );
 
 /* Free resources. */
       template = astFree( template );
@@ -1449,7 +1501,7 @@ char *ChrSuber( const char *test, const char *pattern, const char *subs[],
 
    if( sections ) {
       for( i = 0; i < nsec; i++ ) sections[ i ] = astFree( sections[ i ] );
-      sections = astFree( sections );
+      if( ! ignore_equals ) sections = astFree( sections );
    }
 
 /* Return a NULL pointer if an error has occurred. */
@@ -1500,6 +1552,8 @@ f     PATTERN = CHARACTER * ( * ) (Given)
 *        If "nsub" is zero, then the "subs" pointer is ignored. In this
 *        case, substitution strings may be specified by appended them to 
 *        the end of the "pattern" string, separated by "=" characters.
+*        Note, if you need to include a literal "=" character in the
+*        pattern, preceed it by an escape "\" character.
 *     nsub
 *        The number of substitution strings supplied in array "subs".
 f     RESULT = CHARACTER * ( * ) (Returned)
@@ -1577,7 +1631,7 @@ c     the supplied test string does not match the template.
 
 /* Call ChrSuber to do the work, without saving the matching parts of the
    test string. */
-   return ChrSuber( test, pattern, subs, nsub, NULL, NULL, status );
+   return ChrSuber( test, pattern, subs, nsub, 0, NULL, NULL, NULL, status );
 }
 
 void *astFree_( void *ptr, int *status ) {
@@ -1962,7 +2016,8 @@ void *astMalloc_( size_t size, int *status ) {
 
 static char *ChrMatcher( const char *test, const char *template, 
                          const char *pattern, const char *subs[], int nsub, 
-                         int ignore, int expdoll, char ***mres, int *mlen, int *status ){
+                         int ignore, int expdoll, char ***mres, int *mlen, 
+                         const char **matchend, int *status ){
 /*
 *  Name:
 *     ChrMatcher
@@ -1977,7 +2032,8 @@ static char *ChrMatcher( const char *test, const char *template,
 *     #include "memory.h"
 *     char *ChrMatcher( const char *test, const char *template, 
 *                       const char *pattern, const char *subs[], int nsub, 
-*                       int ignore, int expdoll, char ***mres, int *mlen, int *status )
+*                       int ignore, int expdoll, char ***mres, int *mlen, 
+*                       const char **matchend, int *status )
 
 *  Description:
 *     This function is performs most of the work for astChrSub.
@@ -2009,6 +2065,13 @@ static char *ChrMatcher( const char *test, const char *template,
 *     mlen
 *        Address of a location at which to return the length of the
 *        returned "mres" array. Ignored if "mres" is NULL.
+*     matchend
+*        A pointer to a location at which to return a pointer to the
+*        character that follows the last character within the supplied test 
+*        string that matched any parenthesises sub-section of "regexp". A 
+*        NULL pointer is returned if no matches were found. A NULL pointer 
+*        may be supplied if the location of the last matching character is 
+*        not needed.
 *     status
 *        Pointer to the inherited status variable.
 
@@ -2061,6 +2124,7 @@ static char *ChrMatcher( const char *test, const char *template,
 /* Initialisation. */
    if( mres ) *mlen = 0;
    aaa = NULL;
+   if( matchend ) *matchend = NULL;
 
 /* Check the global error status. */
    if( !astOK ) return NULL;
@@ -2178,6 +2242,7 @@ static char *ChrMatcher( const char *test, const char *template,
                if( matches[ nmatch ] ) {
                   matches[ nmatch ][ matchlen ] = 0;
                   nmatch++;
+                  if( matchend ) *matchend = a + 1;
                }
             }        
 
@@ -2231,7 +2296,7 @@ static char *ChrMatcher( const char *test, const char *template,
             if( greedy ) {
                for( na = max_na; na >= min_na; na-- ) {
                   r = ChrMatcher( a + na, b, pattern, NULL, 0, 1, 0,
-                                  NULL, NULL, status );
+                                  NULL, NULL, NULL, status );
                   if( r ) {
                      match = 1;
                      r = astFree( r );
@@ -2246,7 +2311,7 @@ static char *ChrMatcher( const char *test, const char *template,
             } else {
                for( na = min_na; na <= max_na; na++ ) {
                   r = ChrMatcher( a + na, b, pattern, NULL, 0, 1, 0,
-                                  NULL, NULL, status );
+                                  NULL, NULL, NULL, status );
                   if( r ) {
                      match = 1;
                      r = astFree( r );
@@ -2287,6 +2352,7 @@ static char *ChrMatcher( const char *test, const char *template,
             if( matches[ nmatch ] ) {
                matches[ nmatch ][ matchlen ] = 0;
                nmatch++;
+               if( matchend ) *matchend = a + 1;
             }
          }        
 
@@ -2348,7 +2414,7 @@ static char *ChrMatcher( const char *test, const char *template,
                   sprintf( stemp, ".*($%d).*", dollar );
                   sres = ChrMatcher( stest, stemp, stemp,
                                      (void *) ( matches + dollar - 1 ),
-                                     1, 0, 0, NULL, NULL, status );
+                                     1, 0, 0, NULL, NULL, NULL, status );
                   if( sres ) {
                      (void) astFree( stest );
                      stest = sres;

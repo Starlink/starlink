@@ -190,7 +190,7 @@ void astInitMemoryGlobals_( AstMemoryGlobals * );
                                  /* language or graphics interfaces. */
 int astMemCaching_( int, int * );
 char **astChrSplit_( const char *, int *, int * );
-char **astChrSplitRE_( const char *, const char *, int *, int * );
+char **astChrSplitRE_( const char *, const char *, int *, const char **, int * );
 char **astChrSplitC_( const char *, char, int *, int * );
 int astChrMatch_( const char *, const char *, int * );
 int astChrMatchN_( const char *, const char *, size_t, int * );
@@ -256,7 +256,7 @@ void astEndPM_( int * );
 #endif
 #define astChrSplit(str,n) astERROR_INVOKE(astChrSplit_(str,n,STATUS_PTR))
 #define astChrSplitC(str,c,n) astERROR_INVOKE(astChrSplitC_(str,c,n,STATUS_PTR))
-#define astChrSplitRE(str,c,n) astERROR_INVOKE(astChrSplitRE_(str,c,n,STATUS_PTR))
+#define astChrSplitRE(str,c,n,m) astERROR_INVOKE(astChrSplitRE_(str,c,n,m,STATUS_PTR))
 
 /* Functions used for debugging memory leaks, etc */
 #ifdef MEM_DEBUG
