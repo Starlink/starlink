@@ -87,6 +87,7 @@
 *                   Councils.
 *     Copyright (C) 2005, 2006 Particle Physics & Astronomy Research
 *                   Council.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -158,6 +159,10 @@
 *        Change use of MIN to NUM_MIN<T> so that MIN(BYTE,BYTE) works.
 *     2006 February 24 (MJC):
 *        Added new CUMUL argument set to .FALSE. to KPG1_GHSTx call.
+*     2009 June 24 (MJC):
+*        Revised the sparseness checking iteration, and added a check
+*        that the number of bins is not too few otherwise the routine
+*        reports that it cannot handle such data.
 *     {enter_further_changes_here}
 
 *-
@@ -410,7 +415,7 @@
       IF ( UPPER .LT. LOWER ) GO TO 999
 
 *  Obtain the extreme fractions.  If only one supplied, make both
-*  limits the same.  Constrain to be in the range 0 to 1.
+*  limits the same.  Constrain to be in the range zero to one.
       FRALIM( 1 ) = MAX( FRAC( LOWER ), 0.0 )
       IF ( NFRAC .EQ. 1 ) THEN
          FRALIM( 2 ) = FRALIM( 1 )
@@ -419,7 +424,9 @@
       END IF
 
 *  Find number of elements corresponding to the initial limiting
-*  fractions.
+*  fractions.  Note that these are fractions nibbled from the ends of
+*  the distribution, whereas the FRAC quantiles are measured from zero
+*  to one.
       FRATOT( 1 ) = REAL( NUMVAL ) * FRALIM( 1 )
       FRATOT( 2 ) = REAL( NUMVAL ) * ( 1.0 - FRALIM( 2 ) )
 
@@ -468,6 +475,16 @@
      :                              AVESIZE ) ) ) )
             END IF
 
+*  Handle the case when the thinning for the sparseness has gone too far
+*  and the data are not suitable for the histogram method.
+            IF ( MAXBIN .LT. 2 ) THEN
+               STATUS = SAI__ERROR
+               CALL ERR_REP( 'KPG1_FRAC_SPARSE',
+     :                       'Unable to determine a quantile because '/
+     :                       /'the data are too sparse.', STATUS )
+               GOTO 999
+            END IF
+
 *  Set the number of bins.  This is adjusted because the clipping itself
 *  may make the histogram sparse artificially.  Set a reasonable
 *  minimum number of bins subject to the MAXBIN limit.
@@ -490,9 +507,13 @@
          CALL KPG1_NUMBI( .FALSE., .FALSE., .TRUE., CLNBIN, HIST, 0,
      :                    NUMBER, STATUS )
 
-*  Is the histogram too sparse, suggesting outliers.
+*  Is the histogram too sparse, suggesting outliers.  Watch for the case
+*  of a sparse histogram but no further outliers, i.e there is only one
+*  filled bin.  Indeed it could be a case of a few-valued array without
+*  genuine outliers and the quantiles lie in a single value.
          IF ( DNBIN .GT. 1 .AND.
-     :        DBLE( NUMBER ) / DNBIN .LT. FILLIM ) THEN
+     :        DBLE( NUMBER ) / DNBIN .LT. FILLIM .AND.
+     :        NUMBER .GT. 1 ) THEN
 
 *  Obtain the bin width for this iteration.
             BINSIZ = ( NUM_<T>TOD( DATLIM( 2 ) ) -
@@ -535,7 +556,8 @@
 *  ======================
 
 *  Can only trim the upper data limit if the larger fraction limit
-*  has not been reached.
+*  has not been reached.  Note we are measuring from the upper end
+*  inwards.
             IF ( ( 1.0 - FRALIM( 2 ) ) .GT. CLIPFR( 2 ) ) THEN
 
 *  Try to eliminate the outliers.  Sum the histogram bins skipped over
@@ -554,9 +576,10 @@
 
 *  Find the new limiting value for the finer-resolution histogram.
                DATLIM( 2 ) = NUM_SUB<T>( DATLIM( 2 ),
-     :                       NUM_DTO<T>( DBLE( CLNBIN - K ) * BINSIZ ) )
+     :                       NUM_DTO<T>( DBLE( CLNBIN - K ) * 
+     :                                   BINSIZ ) )
                IF ( NUM_LT<T>( DATLIM( 2 ), DATLIM( 1 ) ) )
-     :            DATLIM( 2 ) = DATLIM( 1 )
+     :           DATLIM( 2 ) = DATLIM( 1 )
                HISLIM( 2 ) = NUM_<T>TOD( DATLIM( 2 ) )
 
 *  Set new data limits.
@@ -589,7 +612,7 @@
 *  and the next interior value used, to narrow the dynamic range.
 *  In fact both limits could be at extreme outliers, but for now deal
 *  with one at a time.
-            IF ( .NOT. LOOP ) THEN
+            IF ( .NOT. LOOP .AND. UPPER .NE. LOWER ) THEN
 
 *  Determine which is the outlier.
 *  ===============================
@@ -676,6 +699,11 @@
 
             END IF
 
+*  Cannot trim any more.  This probably a dataset without true
+*  outliers, just quantised to a few values.  Prevent trimming beyond
+*  physical limits.
+            LOOP = LOOP .AND. LOWER .LT. UPPER
+
 *  Histogram is not too sparse so the histogram limits are satisfactory
 *  to compute the values corresponding to the clipped fractions.
          ELSE
@@ -695,8 +723,11 @@
  
 *  Estimate the values at the fractions of the distribution, excluding
 *  those outliers already derived (hence the offsets in the fractions
-*  passed and the values returned.  Protect against the bin limits being
-*  the same, although this should not occur.
+*  passed and the values returned).  Protect against the bin limits
+*  being the same, although this should not occur, except perhaps for
+*  arrays with a few distinct values and the quantiles required are
+*  contained within one or two of these values.  Note that even if a bin
+*  comprises a single value, there will be still some interpolation.
       IF ( HISLIM( 1 ) .NE. HISLIM( 2 ) ) THEN
          CALL KPG1_HSTFD( CLNBIN, HIST, HISLIM( 2 ), HISLIM( 1 ),
      :                    UPPER - LOWER + 1, CLFRAC( LOWER ),
