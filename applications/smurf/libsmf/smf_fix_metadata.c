@@ -307,29 +307,58 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
     if (*status == SMF__NOKWRD || ( *status == SAI__OK && 
                                     ( steptime == VAL__BADD || steptime < VAL__SMLD ) ) ) {
       if (*status != SAI__OK) errAnnul( status );
+      steptime = VAL__BADD; /* reset to fixed state */
+
+      /* First simply attempt to read it from the XML configuration file
+         if it is available */
+      if (hdr->ocsconfig) {
+        char ** result = NULL;
+        int n;
+        result = astChrSplitRE( hdr->ocsconfig, "STEP_TIME=\"([0123456789\\.]+)\"", &n, NULL );
+        if (n == 1) {
+          /* we have a match. Now need to convert it to a float
+             and since 0.0 is an error for steptime we do not have to get clever */
+          steptime = strtod( result[0], NULL );
+        }
+        for (i = 0; i < (size_t)n; i++) {
+          (void)astFree( result[i] );
+        }
+        if (result) astFree( result );
+        /* reset it on error */
+        if (steptime < VAL__SMLD) {
+          steptime = VAL__BADD;
+        } else {
+          msgOutiff( msglev, "", INDENT "Determined step time from OCS configuration to be %g sec",
+                     status, steptime);
+        }
+      }
+
       /* Attempt to calculate it from adjacent entries - it will not
          be correct but it might be close. The problem occurs if the
          state entries are derived from distinct sequences. Almost
          certainly to be the case for ACSIS in all cases except raster. */
-      if (hdr->nframes > 1 && tmpState[0].rts_end != VAL__BADD
-          && tmpState[1].rts_end != VAL__BADD) {
-        steptime = tmpState[1].rts_end - tmpState[0].rts_end;
-        steptime *= SPD;
-        /* Correct for actual number of steps */
-        steptime /= (tmpState[1].rts_num - tmpState[0].rts_num ); 
-        msgSetd("STP", steptime);
-        msgOutif(MSG__QUIET, " ", "WARNING: Determined step time to be ^STP"
-                 " by examining state information", status );
-
-        /* Update the FitsChan - the header should be present */
+      if (steptime == VAL__BADD) {
+        if (hdr->nframes > 1 && tmpState[0].rts_end != VAL__BADD
+            && tmpState[1].rts_end != VAL__BADD) {
+          steptime = tmpState[1].rts_end - tmpState[0].rts_end;
+          steptime *= SPD;
+          /* Correct for actual number of steps */
+          steptime /= (tmpState[1].rts_num - tmpState[0].rts_num );
+          msgSetd("STP", steptime);
+          msgOutif(MSG__QUIET, " ", "WARNING: Determined step time to be ^STP"
+                   " by examining state information", status );
+        } else {
+          /* no idea - make this fatal for now */
+          steptime = VAL__BADD;
+          *status = SAI__ERROR;
+          errRep( "", FUNC_NAME ": Unable to determine step time from header or "
+                  " from state information", status );
+        }
+      }
+      /* Update the FitsChan - the header should be present */
+      if (steptime != VAL__BADD) {
         smf_fits_updateD( hdr, "STEPTIME", steptime, NULL, status );
-
-      } else {
-        /* no idea - make this fatal for now */
-        steptime = VAL__BADD;
-        *status = SAI__ERROR;
-        errRep( "", FUNC_NAME ": Unable to determine step time from header or "
-                " from state information", status );
+        have_fixed = 1;
       }
     }
     if (*status == SAI__OK && steptime != VAL__BADD && steptime < VAL__SMLD) {
