@@ -408,7 +408,7 @@ itcl::class gaia::GaiaStartup {
          {Show the HDU chooser, by default, when loading multiextension images}
       pack $itk_component(hduchooser) -side top -fill x
 
-      #  Display the PLASTIC interop menu.
+      #  Display the SAMP interop menu.
       itk_component add interopmenu {
          StarLabelCheck $parent.interopmenu \
             -text "Show Interop menu:" \
@@ -417,7 +417,7 @@ itcl::class gaia::GaiaStartup {
             -variable [scope values_($this,interop_menu)]
       }
       add_short_help $itk_component(interopmenu) \
-         {Show the main Interop menu for PLASTIC interactions}
+         {Show the main Interop menu for SAMP interactions}
       pack $itk_component(interopmenu) -side top -fill x
 
       #  Minimum zoom scale.
