@@ -92,6 +92,7 @@ itcl::class samp::ClientTracker {
       if {[info exists subscriptions_($id)]} {
          unset subscriptions_($id)
       }
+      inform_client_change_
    }
 
    #  Invoked when a client declares its metadata to the hub.
@@ -99,6 +100,7 @@ itcl::class samp::ClientTracker {
       array set params $param_list
       set id $params(id)
       set metadata_($id) $params(metadata)
+      inform_client_change_
    }
 
    #  Invoked when a client declares its subscriptions to the hub.
@@ -106,6 +108,7 @@ itcl::class samp::ClientTracker {
       array set params $param_list
       set id $params(id)
       set subscriptions_($id) $params(subscriptions)
+      inform_client_change_
    }
 
    #  Returns a list of client IDs for clients (excluding self) which
@@ -140,6 +143,22 @@ itcl::class samp::ClientTracker {
       }
       append name {[} $client_id {]}
       return $name
+   }
+
+   #  Adds a callback command to be executed when the list of registered
+   #  clients changes.  An attempt will be made to execute the given
+   #  command when other applications register or unregister with the hub,
+   #  or when their metadata or subscriptions change.
+   public method client_change_command {cmd} {
+      lappend client_change_commands_ $cmd
+   }
+
+   #  Performs the requested callbacks when the set of registered clients
+   #  or their subscriptions or metadata may have changed.
+   private method inform_client_change_ {} {
+      foreach cmd $client_change_commands_ {
+         catch {eval $cmd}
+      }
    }
 
    #  Records the hub object which this tracker is to use.  It won't work
@@ -203,4 +222,5 @@ itcl::class samp::ClientTracker {
    private variable clients_
    private variable metadata_
    private variable subscriptions_
+   private variable client_change_commands_ {}
 }
