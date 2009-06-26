@@ -89,7 +89,7 @@
 #     {enter_new_authors_here}
 
 #  History:
-#     18-JUN-2009 (MBT)
+#     18-JUN-2009 (MBT):
 #        Original version, adapted from PlasticApp.tcl.
 #     {enter_further_changes_here}
 
@@ -174,9 +174,9 @@ itcl::class samp::SampClient {
          $this client_reply \$msg_id \$response
       "
       proc ${namespace}::samp.client.receiveResponse \
-            {private_key responder_id msg_tag response} {
-         error "Asynchronous calls not dispatched by this application"
-      }
+            {private_key responder_id msg_tag response} "
+         $this client_receive_response \$responder_id \$msg_tag \$response
+      "
       XMLRPC::Domain::register -prefix /$subname -namespace $namespace
 
       #  Register for communication with the remote hub.
@@ -263,12 +263,60 @@ itcl::class samp::SampClient {
       $hub_ execute reply $private_key_ $msg_id $response
    }
 
+   #  Invoked from samp.client.receiveResponse to perform actions in
+   #  response to a call which was dispatched asynchronously.
+   public method client_receive_response {responder_id msg_tag response_list} {
+      array set response $response_list
+      set responder_name [$client_tracker get_name $responder_id]
+      set status $response(samp.status)
+
+      #  Log response status if required.
+      if {$status == "samp.ok"} {
+         #  successful receipt
+      } else {
+         set status $response(samp.status)
+         set errortxt ""
+         set debugtxt ""
+         if {[info exists response(samp.error)]} {
+            set errinfo [array get response(samp.error)]
+            if {[info exists errinfo(samp.errortxt)]} {
+               set errortxt $errinfo(samp.errortxt)
+            }
+            if {[info exists errinfo(samp.debugtxt)]} {
+               set debugtxt $errinfo(samp.debugtxt)
+            }
+         }
+         puts "$status response from $responder_name: $errortxt"
+         if {$debugtxt != ""} {
+            puts $debugtxt
+         }
+      }
+
+      #  If there is a pending callback, handle it.  The callback code
+      #  ([lindex $done_commands_($msg_tag) 0]) is executed only when
+      #  responses from all the expected recipients have been received.
+      set command $done_commands_($msg_tag)
+      set responder_ids [lindex $command 0]
+      set code [lindex $command 1]
+      set rindex [lsearch -exact $responder_ids $responder_id]
+      if {$rindex >= 0} {
+         set responder_ids [lreplace $responder_ids $rindex $rindex]
+      } else {
+         puts "Response for unsent message??"
+      }
+      if {[llength $responder_ids] == 0} {
+         eval $code
+         array unset done_commmands $msg_tag
+      } else {
+         set done_commands_($msg_tag) [list $responder_ids $code]
+      }
+   }
+
    #  Sends a notification (message with no response reqired) to one
-   #  or all other clients.  If recipient_id is null, the message
+   #  or all other clients.  If recipient_id is empty, the message
    #  is sent to all other clients.
-   public method notify {mtype paramsVar {recipient_id {}}} {
-      upvar $paramsVar params
-      set msg [message_ $mtype [array get params]]
+   public method notify {mtype param_list {recipient_id {}}} {
+      set msg [message_ $mtype $param_list]
       if {[string length $recipient_id] > 0} {
          $hub_ execute notify $private_key_ $recipient_id $msg
       } {
@@ -276,12 +324,29 @@ itcl::class samp::SampClient {
       }
    }
 
-   #  Sends a call (message with response required) to another client.
-   #  If the optional timeout argument is given it indicates a maximum
-   #  wait time for the response.
-   public method call {mtype paramsVar recipient_id {timeout {0}}} {
-      upvar $paramsVar params
-      set msg [message_ $mtype [rpcvar struct [array get params]]]
+   #  Sends an asynchronous call (message with response required) to one
+   #  or all other clients.  If recipient_id is empty, the message is
+   #  sent to all other clients.  The code in done_command, if any,
+   #  is executed when all the responses have been received.
+   public method call {mtype param_list {recipient_id {}} {done_command {}}} {
+      set msg [message_ $mtype $param_list]
+      set tag [create_tag_]
+      if {$recipient_id != ""} {
+         $hub_ execute call $private_key_ $recipient_id $tag $msg
+         if {$done_command != ""} {
+            set done_commands_($tag) [list $recipient_id $done_command]
+         }
+      } {
+         set call_list [$hub_ execute callAll $private_key_ $tag $msg]
+         array set calls $call_list
+         set done_commands_($tag) [list [array names calls] $done_command]
+      }
+   }
+
+   #  Makes a synchronous call to another client.  If the optional timeout
+   #  argument is given it indicates a maximum wait time for the response.
+   public method callAndWait {mtype param_list recipient_id {timeout {0}}} {
+      set msg [message_ $mtype $param_list]
       return [$hub_ execute callAndWait $private_key_ \
                     $recipient_id $msg $timeout]
    }
@@ -315,14 +380,14 @@ itcl::class samp::SampClient {
    #  status changes.  An attempt will be made to execute the given command
    #  when this application registers or unregisters with a hub
    #  (or when that may have happened).
-   public method samp_reg_command {cmd} {
-      lappend samp_reg_commands_ $cmd
+   public method reg_change_command {cmd} {
+      lappend reg_change_commands_ $cmd
    }
 
    #  Performs the requested callbacks when the registration status
    #  may have changed.
    protected method inform_samp_reg_ {} {
-      foreach cmd $samp_reg_commands_ {
+      foreach cmd $reg_change_commands_ {
          catch {eval $cmd}
       }
    }
@@ -375,8 +440,13 @@ itcl::class samp::SampClient {
    #  Creates a message given the MType and parameters.
    private method message_ {mtype params} {
       set msg(samp.mtype) $mtype
-      set msg(samp.params) $params
+      set msg(samp.params) [rpcvar struct $params]
       return [array get msg]
+   }
+
+   #  Creates a unique message tag for SAMP calls.
+   private method create_tag_ {} {
+      return "$this-[incr tag_count_]"
    }
 
    #  Common Procedures:
@@ -485,7 +555,9 @@ itcl::class samp::SampClient {
    private variable hub_
    private variable private_key_ {}
    private variable self_id_ {}
-   private variable samp_reg_commands_ {}
+   private variable reg_change_commands_ {}
+   private variable tag_count_ 0
+   private variable done_commands_
 
    #  Common variables:
    #  -----------------
