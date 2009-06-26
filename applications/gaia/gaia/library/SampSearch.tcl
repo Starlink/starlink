@@ -172,18 +172,18 @@ itcl::class gaia::SampSearch {
    }
 
    #  Transmits the current selection to other SAMP clients.
-   public method transmit_selection { {recipient_id {}} } {
+   public method transmit_selection {recipient_id} {
       transmit_rows [$results_ get_selected] $recipient_id
    }
 
    #  Transmits the current search result to other SAMP clients.
-   public method transmit_info { {recipient_id {}} } {
+   public method transmit_info {recipient_id} {
       transmit_rows $info_ $recipient_id
    }
 
    #  Transmits a list of rows as a list of indices to be highlighted
    #  in other SAMP clients.
-   public method transmit_rows {rows {recipient_id {}}} {
+   public method transmit_rows {rows recipient_id} {
       if {[catch {
          set sender [gaia::Gaia::get_samp_sender]
          if {$sender != "" && $table_id != ""} {

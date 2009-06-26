@@ -65,7 +65,7 @@ itcl::class gaia::SampSender {
 
    #  Sends an image to one or all subscribed SAMP clients.
    #  The image_ctrl argument gives a GaiaImageCtrl object.
-   public method send_image {image_ctrl {recipient_id {}}} {
+   public method send_image {image_ctrl recipient_id} {
       check_client_
       set mtype "image.load.fits"
 
@@ -116,7 +116,7 @@ itcl::class gaia::SampSender {
    #  simple value (usually OBJECT) and "coordunit" and "dataunit" the units
    #  (SSAP/FITS standard).
    public method send_spectrum {spectrum shortname coordunit dataunit
-                                {recipient_id {}}} {
+                                recipient_id} {
       check_client_
       set mtype "spectrum.load.ssa-generic"
 
@@ -141,7 +141,7 @@ itcl::class gaia::SampSender {
    #  Identify a particular sky position as of interest and transmit it
    #  to other SAMP clients.  ra and dec are J2000 in either
    #  degrees or sexagesimal.
-   public method send_radec {ra dec {recipient_id {}}} {
+   public method send_radec {ra dec recipient_id} {
       check_client_
       set mtype "coord.pointAt.sky"
 
@@ -157,7 +157,7 @@ itcl::class gaia::SampSender {
 
    #  Identify a single row index within a SAMP-acquired table as of
    #  interest, and invite other clients to highlight it.
-   public method send_row {table_id idx {recipient_id {}}} {
+   public method send_row {table_id idx recipient_id} {
       check_client_
       set mtype "table.highlight.row"
       set params(table-id) $table_id
@@ -171,7 +171,7 @@ itcl::class gaia::SampSender {
    #  interest, and invite other clients to highlight this list.
    #  idx_list is a list of integer values giving 0-based indices of the
    #  rows to select, in terms of the table as original acquired.
-   public method send_selection {table_id idx_list {recipient_id {}}} {
+   public method send_selection {table_id idx_list recipient_id} {
       check_client_
       set mtype "table.select.rowList"
       if {[llength $idx_list] > 0} {

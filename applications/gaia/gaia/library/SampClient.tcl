@@ -278,7 +278,7 @@ itcl::class samp::SampClient {
          set errortxt ""
          set debugtxt ""
          if {[info exists response(samp.error)]} {
-            set errinfo [array get response(samp.error)]
+            array set errinfo $response(samp.error)
             if {[info exists errinfo(samp.errortxt)]} {
                set errortxt $errinfo(samp.errortxt)
             }
@@ -315,7 +315,7 @@ itcl::class samp::SampClient {
    #  Sends a notification (message with no response reqired) to one
    #  or all other clients.  If recipient_id is empty, the message
    #  is sent to all other clients.
-   public method notify {mtype param_list {recipient_id {}}} {
+   public method notify {mtype param_list recipient_id} {
       set msg [message_ $mtype $param_list]
       if {[string length $recipient_id] > 0} {
          $hub_ execute notify $private_key_ $recipient_id $msg
@@ -328,7 +328,7 @@ itcl::class samp::SampClient {
    #  or all other clients.  If recipient_id is empty, the message is
    #  sent to all other clients.  The code in done_command, if any,
    #  is executed when all the responses have been received.
-   public method call {mtype param_list {recipient_id {}} {done_command {}}} {
+   public method call {mtype param_list recipient_id {done_command {}}} {
       set msg [message_ $mtype $param_list]
       set tag [create_tag_]
       if {$recipient_id != ""} {
