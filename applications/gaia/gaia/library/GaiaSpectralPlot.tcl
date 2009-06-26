@@ -392,32 +392,32 @@ itcl::class gaia::GaiaSpectralPlot {
          $itk_option(-spec_coords) add_menu $SpectralCoords
       }
 
-      #  Interoperability. Send spectrum to other PLASTIC enabled
+      #  Interoperability. Send spectrum to other SAMP enabled
       #  applications, such as SPLAT.
-      set plastic_app_ [gaia::Gaia::get_plastic_app]
-      if { $plastic_app_ != {} } {
+      set samp_client_ [gaia::Gaia::get_samp_client]
+      if { $samp_client_ != {} } {
 
-         #  Add a new menu for PLASTIC-related activities.
+         #  Add a new menu for SAMP-related activities.
          set interopmenu_ [add_menubutton Interop]
          set m $interopmenu_
          add_short_help $itk_component(menubar).interop \
-            {Tool interoperability using PLASTIC}
+            {Tool interoperability using SAMP}
 
          set send_spectrum_menu [menu $m.send_spectrum]
          add_menuitem $m command "Broadcast spectrum" \
-            {Send spectrum to all registered PLASTIC-enabled applications} \
+            {Send spectrum to all registered SAMP-enabled applications} \
             -command [code $this send_spectrum {}]
          add_menuitem $m cascade "Send spectrum" \
-            {Send spectrum to a specific PLASTIC-enabled application} \
+            {Send spectrum to a specific SAMP-enabled application} \
             -menu $send_spectrum_menu
 
          #  Arrange for the menu to be kept up to date with the current state
-         #  of the PLASTIC connection.
-         $plastic_app_ plastic_reg_command [code $this plastic_reg_changed_]
-         plastic_reg_changed_
-         set tracker [$plastic_app_ cget -app_tracker]
-         $tracker plastic_apps_command [code $this plastic_apps_changed_]
-         plastic_apps_changed_
+         #  of the SAMP connection.
+         $samp_client_ reg_change_command [code $this samp_reg_changed_]
+         samp_reg_changed_
+         set tracker [$samp_client_ cget -client_tracker]
+         $tracker client_change_command [code $this samp_client_changed_]
+         samp_client_changed_
       }
 
       #  Create the canvas. Pack inside a frame so that we can get the resize
@@ -1315,17 +1315,17 @@ itcl::class gaia::GaiaSpectralPlot {
       return [winfo height $itk_component(canvasframe)]
    }
 
-   #  PLASTIC support.
+   #  SAMP support.
 
    #  Send spectrum to be displayed in another application.
-   public method send_spectrum {recipients} {
+   public method send_spectrum {recipient_id} {
       if { [catch {
-         set sender [gaia::Gaia::get_plastic_sender]
+         set sender [gaia::Gaia::get_samp_sender]
          if { $sender != {} && $itk_option(-spec_writer) != {} } {
 
             if { $temp_files_ == {} } {
                set temp_files_ [gaia::GaiaTempName \#auto \
-                                   -prefix "GaiaTempPlasticSpec" \
+                                   -prefix "GaiaTempSampSpec" \
                                    -type ".fits" -exists 0]
             }
             set filename [$temp_files_ get_name]
@@ -1341,20 +1341,20 @@ itcl::class gaia::GaiaSpectralPlot {
             set coordunit [gaiautils::astget $frameset "unit($axis)"]
 
             $sender send_spectrum $filename $shortname \
-               $coordunit $dataunit $recipients
+               $coordunit $dataunit $recipient_id
          }
       } msg]} {
          puts "selection send error: $msg"
       }
    }
 
-   #  Called when the PLASTIC connection goes up or down.
-   protected method plastic_reg_changed_ {} {
+   #  Called when the SAMP connection goes up or down.
+   protected method samp_reg_changed_ {} {
 
       #  Configure the menu items all enabled/disabled according to whether
-      #  there is a PLASTIC connection.
+      #  there is a SAMP connection.
       set state disabled
-      if { $plastic_app_ != {} && [$plastic_app_ is_registered] } {
+      if { $samp_client_ != {} && [$samp_client_ is_registered] } {
          set state normal
       }
       set nitem [$interopmenu_ index last]
@@ -1363,24 +1363,23 @@ itcl::class gaia::GaiaSpectralPlot {
       }
    }
 
-   #  Called when external applications register or unregister with PLASTIC.
-   protected method plastic_apps_changed_ {} {
+   #  Called when external applications register or unregister with SAMP.
+   protected method samp_client_changed_ {} {
 
       #  Configure specific application menu so that it has one entry for
-      #  each of the currently registered PLASTIC applications capable of
+      #  each of the currently registered SAMP applications capable of
       #  receiving spectra.
       set specific_menu $interopmenu_.send_spectrum
       $specific_menu delete 0 last
-      if { [$plastic_app_ is_registered] } {
-         set tracker [$plastic_app_ cget -app_tracker]
-         set msg_id "ivo://votech.org/spectrum/loadFromURL"
-         set msg_apps [$tracker get_supporting_apps $msg_id]
-         foreach app $msg_apps {
-            set appname [$app cget -name]
-            set appid [$app cget -id]
-            add_menuitem $specific_menu command "Send to $appname" \
-               "Send spectrum to $appname" \
-               -command [code $this send_spectrum $appid]
+      if { [$samp_client_ is_registered] } {
+         set tracker [$samp_client_ cget -client_tracker]
+         set mtype "spectrum.load.ssa-generic"
+         set subscribed_clients [$tracker get_subscribed_clients $mtype]
+         foreach client_id $subscribed_clients {
+            set client_name [$tracker get_name $client_id]
+            add_menuitem $specific_menu command "Send to $client_name" \
+               "Send spectrum to $client_name" \
+               -command [code $this send_spectrum $client_id]
          }
       }
    }
@@ -1569,8 +1568,8 @@ itcl::class gaia::GaiaSpectralPlot {
       17 "-adobe-helvetica-bold-r-*-*-20-120-*-*-*-*-*-*"      "large screen"
    }
 
-   #  PlasticApp object used for PLASTIC connections.
-   protected variable plastic_app_
+   #  SampClient object used for SAMP connections.
+   protected variable samp_client_
 
    #  Interoperability menu.
    protected variable interopmenu_
