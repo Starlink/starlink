@@ -124,7 +124,7 @@ itcl::class gaia::SampSender {
       if { [catch {
          set url [get_file_url_ $spectrum]
 
-         set ssameta(Access.Reference) string $url
+         set ssameta(Access.Reference) $url
          set ssameta(Access.Format) "application/fits"
          set ssameta(Target.Name) $shortname
          if { $dataunit != "" && $coordunit != "" } {
