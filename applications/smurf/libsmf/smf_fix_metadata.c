@@ -503,6 +503,28 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
     smf_fits_updateD( hdr, "INSTAP_Y", 0.0, NULL, status );
   }
 
+  /* Make BASEC1, BASEC2 and TRACKSYS available */
+  if (!astTestFits( fits, "TRACKSYS", NULL ) ) {
+    /* undef or missing makes no difference */
+    msgOutiff( msglev, "", INDENT "Missing TRACKSYS - setting to '%s'", status, tmpState[0].tcs_tr_sys);
+    smf_fits_updateS( hdr, "TRACKSYS", tmpState[0].tcs_tr_sys, "TCS Tracking coordinate system", status );
+    have_fixed = 1;
+  }
+  if (!astTestFits( fits, "BASEC1", NULL ) ) {
+    /* undef or missing makes no difference */
+    double basedeg = tmpState[0].tcs_tr_bc1 * AST__DR2D;
+    msgOutiff( msglev, "", INDENT "Missing BASEC1 - setting to %g deg", status, basedeg);
+    smf_fits_updateD( hdr, "BASEC1", basedeg, "[deg] TCS BASE position (longitude) in TRACKSYS", status );
+    have_fixed = 1;
+  }
+  if (!astTestFits( fits, "BASEC2", NULL ) ) {
+    /* undef or missing makes no difference */
+    double basedeg = tmpState[0].tcs_tr_bc2 * AST__DR2D;
+    msgOutiff( msglev, "", INDENT "Missing BASEC2 - setting to %g deg", status, basedeg);
+    smf_fits_updateD( hdr, "BASEC2", basedeg, "[deg] TCS BASE position (latitude) in TRACKSYS", status );
+    have_fixed = 1;
+  }
+
   /* JCMTSTATE fix ups */
 
   /* TCS_TAI is missing before 20061013 */
