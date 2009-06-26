@@ -140,9 +140,9 @@ itcl::class gaia::GaiaMask {
          itk_component add index {
             LabelEntryScale $w_.index \
                -text "Value:" \
-               -value 1 \
+               -value 0 \
                -labelwidth $lwidth \
-               -from 1 \
+               -from 0 \
                -to 2 \
                -increment 1 \
                -resolution 1 \
@@ -206,6 +206,8 @@ itcl::class gaia::GaiaMask {
 
    #  Close window.
    public method close {} {
+      #  Put the full image back. Don't want to lose that really.
+      reset
       wm withdraw $w_
    }
 
@@ -250,9 +252,17 @@ itcl::class gaia::GaiaMask {
    public method reset {} {
       if { $image_adr_ != 0 } {
          lassign [array::getinfo $image_adr_] realadr nel type
-         $itk_option(-rtdimage) replaceimagedata $realadr
-         $itk_option(-rtdimage) volatile 0
+         replaceimagedata $realadr
       }
+   }
+
+   #  Replace the image data pointer with a new one. Note always mark
+   #  this as not volatile so that the backing file is never changed, 
+   #  that would happen if the other toolboxes ran and thought this 
+   #  data volatile (which really means never defined, not just changed).
+   protected method replaceimagedata {adr} {
+      $itk_option(-rtdimage) replaceimagedata $adr
+      $itk_option(-rtdimage) volatile 0
    }
 
    #  Open the mask.
@@ -329,7 +339,7 @@ itcl::class gaia::GaiaMask {
 
       #  Replace the displayed data with the masked data.
       lassign [array::getinfo $adr] realadr nel type
-      $itk_option(-rtdimage) replaceimagedata $realadr
+      replaceimagedata $realadr
 
       #  Make sure blank pixels are shown.
       $itk_option(-rtdimage) blankvalue 1
