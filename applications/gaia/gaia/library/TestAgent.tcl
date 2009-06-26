@@ -54,12 +54,12 @@ itcl::class samp::TestAgent {
    }
 
    #  Implementation for test.echo MType.
-   public method test.echo {sender_id params} {
+   public method test.echo {sender_id param_list} {
       return [rpcvar struct $params]
    }
 
    #  Implementation for test.fail MType.
-   public method test.fail {sender_id params} {
+   public method test.fail {sender_id param_list} {
       error "Failed."
    }
 }
