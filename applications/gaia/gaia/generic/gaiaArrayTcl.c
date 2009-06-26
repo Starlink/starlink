@@ -804,11 +804,11 @@ static int gaiaArrayMask( ClientData clientData, Tcl_Interp *interp,
     /*  Do the masking, BAD data means outside of the mask, i.e. all
      *  masked data, unless values is set to contain some mask integers. */
     gaiaArrayMaskData( dataInfo, maskInfo, values, nvalues,
-                       GAIA_ARRAY_MALLOC, &outPtr );
+                       GAIA_ARRAY_CNFMALLOC, &outPtr );
 
     /*  Export the result. */
     outInfo = gaiaArrayCreateInfo( outPtr, dataInfo->type, dataInfo->el,
-                                   0, 0, 0, 1.0, 0.0, GAIA_ARRAY_MALLOC );
+                                   0, 0, 0, 1.0, 0.0, GAIA_ARRAY_CNFMALLOC );
     Tcl_SetObjResult( interp, Tcl_NewLongObj( (long) outInfo ) );
 
     if ( values != NULL ) {
