@@ -105,6 +105,8 @@
 *  History:
 *     2008 February 12 (MJC):
 *        Original version based upon COF_2DFIM.
+*     2009 June 26
+*        Restore correct logic for VARIANCE and QUALITY extensions.
 *     {enter__changes_here}
 
 *  Bugs:
@@ -415,30 +417,32 @@
                   COMP ='Data'
                END IF
 
-               IF ( COMP .EQ. 'Data' .AND. .NOT. EXNDF ) THEN
+               IF ( COMP .EQ. 'Data' ) THEN
+                  IF ( .NOT. EXNDF ) THEN
 
 *  Generate the name of the extension.  NPOS is updated so cannot be
 *  defined outside the FITS_extension loop.
-                  NPOS = 9
-                  CALL CHR_PUTI( NHDU - 1, EXTNAM, NPOS )
+                     NPOS = 9
+                     CALL CHR_PUTI( NHDU - 1, EXTNAM, NPOS )
 
 *  Create an extension of type NDF.
-                  CALL NDF_XNEW( NDF, EXTNAM, 'NDF', 0, 0, XLOC,
-     :                           STATUS )
+                     CALL NDF_XNEW( NDF, EXTNAM, 'NDF', 0, 0, XLOC,
+     :                              STATUS )
 
 *  Find the parent structure (i.e. .MORE).
-                  CALL DAT_PAREN( XLOC, ELOC, STATUS )
+                     CALL DAT_PAREN( XLOC, ELOC, STATUS )
 
 *  Create a new NDF in the extension via an NDF placeholder.  The data
 *  type and bounds will be changed below once they are known.
-                  CALL NDF_PLACE( ELOC, EXTNAM, PLACE, STATUS )
-                  CALL NDF_NEW( '_UBYTE', 1, 1, 1, PLACE, NDFE,
-     :                          STATUS )
+                     CALL NDF_PLACE( ELOC, EXTNAM, PLACE, STATUS )
+                     CALL NDF_NEW( '_UBYTE', 1, 1, 1, PLACE, NDFE,
+     :                             STATUS )
 
 *  Want to recreate the path if this IMAGE sub-file originally was an
 *  NDF within an NDF extension.
-               ELSE IF ( EXNDF ) THEN
-                  CALL COF_FI2NE( FUNIT, NDF, NDFE, STATUS )
+                  ELSE IF ( EXNDF ) THEN
+                     CALL COF_FI2NE( FUNIT, NDF, NDFE, STATUS )
+                  END IF
                END IF
             END IF
 
