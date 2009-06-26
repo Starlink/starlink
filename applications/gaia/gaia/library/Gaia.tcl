@@ -108,6 +108,8 @@
 #        Added plastic support.
 #     23-JUL-2008 (PWD):
 #        Start adding VO support.
+#     24-JUN-2009 (MBT):
+#        Replace PLASTIC support with SAMP support.
 #     {enter_changes_here}
 
 #-
@@ -180,7 +182,7 @@ Options:
  -geometry <wxh+x+y>      - geometry of the main window (default: last session).
  -hdu <n>                 - HDU to display (default: 1)
  -ident <string>          - identifying string that will be prefixed to the window title.
- -interop_menu <bool>     - reveal interop menu for PLASTIC interactions (default: 1).
+ -interop_menu <bool>     - reveal interop menu for SAMP interactions (default: 1).
  -isize <n>               - search box for centroiding (default: 9).
  -linear_cartesian <bool> - assuming CAR projections are a linear mapping (default: 1).
  -max_scale <n>           - maximum scale for magnification menu (default: 20).
@@ -248,11 +250,11 @@ itcl::class gaia::Gaia {
 
       #  If this is the final remaining instance of this class, do some
       #  application-wide clear up to clear any current registration with a
-      #  PLASTIC hub.
+      #  SAMP hub.
       if {"[itcl::find objects -class gaia::Gaia]" == "$this"} {
 
-         #  Inform the PLASTIC hub that we are ceasing operations.
-         stop_plastic_
+         #  Inform the SAMP hub that we are ceasing operations.
+         stop_samp_
 
          #  Delete cookie file.
          if {$cookie_ != ""} {
@@ -405,7 +407,7 @@ itcl::class gaia::Gaia {
       #  Initialise a cookie for remote control authentication.
       set cookie_ [gaia::GaiaCookie::get_instance]
 
-      #  Add the PLASTIC menu.
+      #  Add the SAMP menu.
       if {$itk_option(-interop_menu)} {
          add_interop_menu
       }
@@ -432,16 +434,16 @@ itcl::class gaia::Gaia {
          after 0 [code $this configure -autofit 1]
       }
 
-      #  Attempt to register as PLASTIC listener, adding callbacks to be
-      #  informed when the status of the PLASTIC connection changes.
+      #  Attempt to register as SAMP listener, adding callbacks to be
+      #  informed when the status of the SAMP connection changes.
       if {$itk_option(-interop_menu)} {
-         init_plastic_
-         if { $plastic_app_ != "" } {
-            $plastic_app_ plastic_reg_command [code $this plastic_reg_changed_]
-            plastic_reg_changed_
-            set tracker [$plastic_app_ cget -app_tracker]
-            $tracker plastic_apps_command [code $this plastic_apps_changed_]
-            plastic_apps_changed_
+         init_samp_
+         if { $samp_client_ != "" } {
+            $samp_client_ reg_change_command [code $this samp_reg_changed_]
+            samp_reg_changed_
+            set tracker [$samp_client_ cget -client_tracker]
+            $tracker client_change_command [code $this samp_client_changed_]
+            samp_client_changed_
          }
       }
 
@@ -2161,105 +2163,112 @@ window gives you access to this."
       $image_ configure -autofill $itk_option(-autofill)
    }
 
-   #  PLASTIC support
-   #  ---------------
+   #  SAMP support
+   #  ------------
 
-   #  Add a menubutton for PLASTIC activities.
+   #  Add a menubutton for SAMP activities.
    public method add_interop_menu {} {
 
       set interopmenu_ [add_menubutton Interop]
       set m $interopmenu_
       configure_menubutton Interop -underline 6
       add_short_help $itk_component(menubar).interop \
-         {Interop menu: control application interoperability with PLASTIC}
+         {Interop menu: control application interoperability using SAMP}
 
       add_menuitem $m command "Register" \
-         {Register GAIA with a running PLASTIC hub} \
-         -command [code start_plastic_]
+         {Register GAIA with a running SAMP hub} \
+         -command [code start_samp_]
       add_menuitem $m command "Unregister" \
-         {Unregister GAIA with the PLASTIC hub} \
-         -command [code stop_plastic_]
+         {Unregister GAIA with the SAMP hub} \
+         -command [code stop_samp_]
 
       $m add separator
 
-      set plastic_send_image_menu_ [menu $m.send_image]
+      set samp_send_image_menu_ [menu $m.send_image]
       add_menuitem $m command "Broadcast Image" \
-         {Send the current image to all PLASTIC-registered applications} \
-         -command [code $this plastic_send_image_]
+         {Send the current image to all SAMP-registered applications} \
+         -command [code $this samp_send_image_ {}]
       add_menuitem $m cascade "Send Image" \
-         {Send the current image to a selected PLASTIC-registered application} \
-         -menu $plastic_send_image_menu_
+         {Send the current image to a selected SAMP-registered application} \
+         -menu $samp_send_image_menu_
    }
 
-   #  Sends the currently displayed image via PLASTIC to other listening
-   #  applications.  If a non-empty recipients list is supplied, it gives
-   #  the IDs of applications to which th image will be sent.  Otherwise,
-   #  it will be broadcast to all.
-   public method plastic_send_image_ { {recipients {}} } {
-      if { [catch {
-         $plastic_sender_ send_image $image_ $recipients
-      } msg] } {
+   #  Sends the currently displayed image via SAMP to other subscribed
+   #  clients.  If no recipient is specified, it will be broadcast to all.
+   public method samp_send_image_ {recipient_id} {
+      if {[catch {
+         $samp_sender_ send_image $image_ $recipient_id
+      } msg]} {
          error_dialog "$msg"
       }
    }
 
-   #  Ensures that a PLASTIC listener object is in place for this class.
-   #  If no listener currently exists, create one.  If a hub is
+   #  Ensures that a SAMP client is in place for this class.
+   #  If no client currently exists, create one.  If a hub is
    #  apparently running, try connecting to it.
-   #  We could in principle have multiple PLASTIC listeners, one for each
+   #  We could in principle have multiple SAMP clients, one for each
    #  GAIA window, but for now use a common one for the whole application.
-   protected proc init_plastic_ {} {
-      if { $plastic_app_ == "" } {
+   protected proc init_samp_ {} {
+      if { $samp_client_ == "" } {
 
-         #  Construct the listener object and store it in a common variable.
-         set responder [gaia::GaiaPlastic \#auto]
-         set app [plastic::PlasticApp \#auto [list [itcl::code $responder]]]
+         #  Construct and configure the client object.
+         set meta(samp.name) "gaia"
+         set meta(samp.description.text) \
+                "Graphical Astronomy and Image Analysis tool"
+         set meta(samp.documentation.url) \
+                "http://astro.dur.ac.uk/~pdraper/gaia/gaia.html"
+         set meta(samp.icon.url) \
+                "http://astro.dur.ac.uk/~pdraper/gaia/gaiaicon.gif"
+         lappend agents [itcl::code [gaia::GaiaSampAgent \#auto]]
+         lappend agents [itcl::code [samp::UtilAgent \#auto]]
+       # lappend agents [itcl::code [samp::TestAgent \#auto]]
+         set client [samp::SampClient \#auto -agents $agents \
+                                             -metadata [array get meta]]
 
          #  If a hub appears to be running, have a go at registering with it.
-         if { [plastic::PlasticHub::is_hub_running] } {
+         if { [samp::SampHub::is_hub_running] } {
             if { [catch {
-               $app register
+               $client register
             } msg] } {
-               puts stderr "Failed to register with a PLASTIC hub: $msg"
+               puts stderr "Failed to register with a SAMP hub: $msg"
             }
          }
 
          #  Construct a sender object which works in tandem with the
-         #  PlasticApp object to make outgoing calls.
-         set plastic_sender_ \
-             [code [gaia::PlasticSender \#auto -plastic_app [code $app]]]
+         #  SampClient to make outgoing calls.
+         set samp_sender_ \
+             [code [gaia::SampSender \#auto -samp_client [code $client]]]
 
-         #  Store the listener in a common variable.
-         set plastic_app_ $app
+         #  Store the client object in a common variable.
+         set samp_client_ $client
       }
    }
 
-   #  Attempts to ensure that we are connected to a PLASTIC hub.
-   protected proc start_plastic_ {} {
-      if { ! $is_plastic_registered_ } {
+   #  Attempts to ensure that we are connected to a SAMP hub.
+   protected proc start_samp_ {} {
+      if { $samp_client_ == "" || ! [$samp_client_ is_registered] } {
          if {[catch {
-            $plastic_app_ register
+            $samp_client_ register
          } msg]} {
-            info_dialog "Failed to register with a PLASTIC hub: \n$msg"
+            info_dialog "Failed to register with a SAMP hub: \n$msg"
          }
       }
    }
 
-   #  Attempts to terminate any existing connection with a PLASTIC hub.
-   protected proc stop_plastic_ {} {
-      if { $is_plastic_registered_ } {
-         $plastic_app_ unregister
+   #  Attempts to terminate any existing connection with a SAMP hub.
+   protected proc stop_samp_ {} {
+      if {$samp_client_ != "" && [$samp_client_ is_registered]} {
+         $samp_client_ unregister
       }
    }
 
-   #  Invoked when we register or unregister with the PLASTIC hub.
-   protected method plastic_reg_changed_ {} {
-      if {$plastic_app_ != ""} {
-         set is_reg [$plastic_app_ is_registered]
+   #  Invoked when we register or unregister with the SAMP hub.
+   protected method samp_reg_changed_ {} {
+      if {$samp_client_ != ""} {
+         set is_reg [$samp_client_ is_registered]
       } else {
          set is_reg 0
       }
-      set is_plastic_registered_ $is_reg
       set when_reg [expr {$is_reg ? "normal" : "disabled"}]
       set when_unreg [expr {$is_reg ? "disabled" : "normal"}]
       $interopmenu_ entryconfigure Register -state $when_unreg
@@ -2268,21 +2277,22 @@ window gives you access to this."
       $interopmenu_ entryconfigure {Send Image} -state $when_reg
    }
 
-   #  Invoked when someone else registers or unregisters with the PLASTIC hub.
-   protected method plastic_apps_changed_ {} {
+   #  Invoked when the state (registration or configuration) of some
+   #  other client in the hub changes.
+   protected method samp_client_changed_ {} {
 
       #  Rebuild the Send Image submenu so that it contains an up-to-date
       #  list of all the applications that are prepared to receive images.
-      set m $plastic_send_image_menu_
+      set m $samp_send_image_menu_
       $m delete 0 last
-      if {[$plastic_app_ is_registered]} {
-         set send_id "ivo://votech.org/fits/image/loadFromURL"
-         set tracker [$plastic_app_ cget -app_tracker]
-         foreach app [$tracker get_supporting_apps $send_id] {
-            set appname [$app cget -name]
-            add_menuitem $m command "Send to $appname" \
-               "Send the current image to $appname" \
-               -command "$this plastic_send_image_ \[$app cget -id\]"
+      if {[$samp_client_ is_registered]} {
+         set send_mtype "image.load.fits"
+         set tracker [$samp_client_ cget -client_tracker]
+         foreach client_id [$tracker get_subscribed_clients $send_mtype] {
+            set client_name [$tracker get_name $client_id]
+            add_menuitem $m command "Send to $client_name" \
+               "Send the current image to $client_id" \
+               -command "$this samp_send_image_ $client_id"
          }
       }
    }
@@ -2354,14 +2364,14 @@ window gives you access to this."
       }
    }
 
-   #  Returns the PLASTIC sender object, if there is one.
-   public proc get_plastic_sender {} {
-      return [code $plastic_sender_]
+   #  Returns the SAMP sender object, if there is one.
+   public proc get_samp_sender {} {
+      return [code $samp_sender_]
    }
 
-   #  Returns the PLASTIC application object, if there is one.
-   public proc get_plastic_app {} {
-      return [code $plastic_app_]
+   #  Returns the SAMP client object, if there is one.
+   public proc get_samp_client {} {
+      return [code $samp_client_]
    }
 
    #  VO support
@@ -2706,8 +2716,8 @@ window gives you access to this."
    #  Name of menu for application interoperability.
    protected variable interopmenu_ {}
 
-   #  Name of submenu for sending images via PLASTIC.
-   protected variable plastic_send_image_menu_
+   #  Name of submenu for sending images view SAMP.
+   protected variable samp_send_image_menu_
 
    #  Canvas identifier of the position of interest.
    protected variable position_of_interest_ {}
@@ -2730,14 +2740,11 @@ window gives you access to this."
    #  Handler for catalogues.
    common astrocat_ [astrocat ::cat::.astrocat]
 
-   #  PLASTIC listener; takes care of communication with the hub.
-   common plastic_app_ {}
+   #  SAMP client; takes care of communication with the hub.
+   common samp_client_ {}
 
-   #  PLASTIC sender; sends messages via the hub to other applications.
-   common plastic_sender_ {}
-
-   #  Boolean variable which keeps track of whether we are registered with hub.
-   common is_plastic_registered_ 0
+   #  SAMP sender; sends message via the hub to other clients.
+   common samp_sender_ {}
 
 #  End of class definition.
 }
