@@ -67,11 +67,11 @@
 *        with the original alignment.
 *     2004 September 10 (TIMJ):
 *        Fix valgrind warning with uninitialised CARD on entry
-*        to fitsio routine
+*        to fitsio routine.
+*     2009 June 26 (MJC):
+*        UPDATE_MODE may now have leading blanks that must be trimmed to
+*        avoid an error from NDF when NDF accesses this component. 
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       
@@ -114,7 +114,7 @@
 *  Local Variables:
       INTEGER ALIGN              ! Alignment with respect to column 9
       CHARACTER * ( NDF__SZAPP ) APPN ! Application name
-      CHARACTER * ( 80 ) CARD    ! FITS header card
+      CHARACTER * 80 CARD        ! FITS header card
       CHARACTER * ( DAT__SZLOC ) CLOC ! Locator to a character component
       INTEGER CRCOL              ! Column where "Current record:" begins
       CHARACTER * ( NDF__SZHDT ) CREATD ! History creation date
@@ -127,11 +127,11 @@
       INTEGER FSTAT              ! FITSIO status
       LOGICAL HISPRE             ! HISTORY records may be present?
       CHARACTER * ( DAT__SZLOC ) HLOC ! Locator to HISTORY component
-      CHARACTER * ( 4 ) IC       ! Record number
+      CHARACTER * 4 IC           ! Record number
       INTEGER IREC               ! Loop counter for history records
       INTEGER JREC               ! Loop counter for text lines
       INTEGER KINDEX             ! Keyword index
-      CHARACTER * ( 8 ) KEYWRD   ! FITS keyword
+      CHARACTER * 8 KEYWRD       ! FITS keyword
       CHARACTER * ( DAT__SZLOC ) LOC ! Locator to NDF
       INTEGER LSTAT              ! Local status value
       LOGICAL MAKHIS             ! Make HISTORY structure?
@@ -140,7 +140,7 @@
       INTEGER NC                 ! Number of characters
       INTEGER NEXREC             ! Number of existing HISTORY records
       INTEGER NWORD              ! Number of words in HISTORY card
-      CHARACTER * ( 2048 ) PARAGR ! Paragraph of HISTORY text
+      CHARACTER * 2048 PARAGR    ! Paragraph of HISTORY text
       INTEGER PARCOL             ! Paragraph column where to append text
       LOGICAL PARSKP             ! There is a paragraph of text?
       CHARACTER * ( NDF__SZREF ) REFER ! Reference dataset
@@ -153,7 +153,7 @@
       LOGICAL VALID              ! Locator valid?
       INTEGER WIDTH              ! Width in characters of history
                                  ! text
-      CHARACTER * ( 20 ) WORDS( MAXWRD ) ! Words in a HISTORY card
+      CHARACTER * 20 WORDS( MAXWRD ) ! Words in a HISTORY card
 
 *.
 
@@ -175,7 +175,7 @@
 
 *  Loop until all the HISTORY records have been found.  Only continue
 *  search when there are untested headers remaining.
-  100 CONTINUE                 ! Star of DO WHILE loop
+  100 CONTINUE                 ! Start of DO WHILE loop
       IF ( HISPRE .AND. STATUS .EQ. SAI__OK .AND.
      :     KINDEX .LE. NHEAD ) THEN
 
@@ -254,6 +254,7 @@
 
 *  Obtain the update mode.
             MODE = CARD( 22 + ALIGN:NDF__SZHUM + 21 + ALIGN )
+            CALL CHR_LDBLK( MODE )
 
 *  Make the UPDATE_MODE component and assign it the update mode via a
 *  locator.
@@ -266,9 +267,9 @@
 *  Obtain the current record.
             CRCOL = INDEX( CARD, 'Current record:' )
 
-            IF( STATUS .EQ. SAI__OK ) THEN 
+            IF ( STATUS .EQ. SAI__OK ) THEN 
                CALL CHR_CTOI( CARD( CRCOL + 16: ), CURREC, STATUS )
-               IF( STATUS .NE. SAI__OK ) THEN
+               IF ( STATUS .NE. SAI__OK ) THEN
                   CALL MSG_SETC( 'C', CARD )
                   CALL MSG_SETC( 'F', CARD( CRCOL + 16: ) )
                   CALL ERR_REP( 'COF_CHISR_ERR1', 'Bad integer field '//
@@ -379,9 +380,9 @@
                CALL DAT_ANNUL( CLOC, STATUS )
 
 *  The width is the seventh word.
-               IF( STATUS .EQ. SAI__OK ) THEN 
+               IF ( STATUS .EQ. SAI__OK ) THEN 
                   CALL CHR_CTOI( WORDS( 7 ), WIDTH, STATUS )
-                  IF( STATUS .NE. SAI__OK ) THEN
+                  IF ( STATUS .NE. SAI__OK ) THEN
                      CALL MSG_SETC( 'C', CARD )
                      CALL MSG_SETC( 'F', WORDS( 7 ) )
                      CALL ERR_REP( 'COF_CHISR_ERR1', 'Bad integer '//
@@ -562,10 +563,10 @@
 
 *  If an error has occurred, issue a warning and flush the error, so that 
 *  we can continue to build the rest of the NDF.
-      IF( STATUS .NE. SAI__OK ) THEN
+      IF ( STATUS .NE. SAI__OK ) THEN
          CALL NDF_MSG( 'NDF', NDF )
-         CALL ERR_REP( 'COF_CHISR_ERR', 'The history information in '//
-     :                 'the output NDF ''^NDF'' may be corrupt.', 
+         CALL ERR_REP( 'COF_CHISR_ERR', 'The history information in '/
+     :                 /'the output NDF ''^NDF'' may be corrupt.', 
      :                 STATUS )
          CALL ERR_FLUSH( STATUS )
       END IF
