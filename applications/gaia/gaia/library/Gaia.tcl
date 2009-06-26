@@ -255,11 +255,6 @@ itcl::class gaia::Gaia {
 
          #  Inform the SAMP hub that we are ceasing operations.
          stop_samp_
-
-         #  Delete cookie file.
-         if {$cookie_ != ""} {
-            delete object $cookie_
-         }
       }
 
       #  Clear up the images list (this isn't done correctly in
@@ -403,9 +398,6 @@ itcl::class gaia::Gaia {
                    [code $image_] ::gaia::GaiaSearch $itk_option(-debug) $w_
          }
       }
-
-      #  Initialise a cookie for remote control authentication.
-      set cookie_ [gaia::GaiaCookie::get_instance]
 
       #  Add the SAMP menu.
       if {$itk_option(-interop_menu)} {
@@ -2724,9 +2716,6 @@ window gives you access to this."
 
    #  Last world coordinates of position of interest.
    protected variable last_position_of_interest_ {}
-
-   #  GaiaCookie object.
-   protected variable cookie_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------
