@@ -304,7 +304,7 @@ data-cubes and plotting spectra extracted from the third dimension. It can
 also display 3D visualisations of data-cubes using iso-surfaces and volume
 rendering.
 
-Interoperability with other PLASTIC enabled applications is provided so that
+Interoperability with other SAMP enabled applications is provided so that
 GAIA can be used as part of a integrated desktop (usually querying the
 Virtual Observatory).
 
@@ -817,22 +817,28 @@ note that this means that FITS files will now be accessed as foreign,
 \end{verbatim}
 \end{quote}
 
-\subsection{PLASTIC interoperability}
+\subsection{SAMP interoperability}
 
-PLASTIC stands for the PLatform for AStronomical Tool InterConnection.  It is
+SAMP stands for Simple Application Messaging Protocol. It is
 a protocol which allows tools on the desktop to communicate with each other.
 Very briefly, the way it works is that applications can send messages to a
 central \mytt{hub process} which will then pass them on to other applications
-which can respond to them in some appropriate way (GAIA supports image display
-and position tracking). You will require a hub, of somekind, to use this.
+which can respond to them in some appropriate way.
+GAIA can use SAMP to send and receive images, sky position information,
+and catalogues or identification of rows within them.  It can also
+send extracted spectra.  You will require a hub, either free-standing or
+integral to some other application, to use these capabilities.
 
 You can find more information about how it works, what applications
 are compatible, and how it can be useful at the
-\htmladdnormallinkfoot{PLASTIC}{http://plastic.sourceforge.net/} web site.
-You should note that PLASTIC is an evolving system, so future compatibility
-isn't guaranteed. To remove the \mytt{Interop} menu you can use the 
+\htmladdnormallinkfoot{SAMP}{http://www.ivoa.net/samp/} web page.
+To remove the \mytt{Interop} menu you can use the
 \mytt{Startup options...} window located in the \mytt{File} menu.
 
+SAMP is an evolution of the earlier similar protocol
+\htmladdnormallinkfoot{PLASTIC}{http://plastic.sourceforge.net/}.
+PLASTIC support, which was provided in earlier versions of GAIA,
+has now been withdrawn in favour of SAMP.
 
 \section{\xlabel{configuration_options}\label{configuration_options}Configuration options}
 
@@ -861,7 +867,7 @@ are best set using the \mytt{Startup options...} window located in the
  -font\_scale        &  A scale for non-pixel display fonts \\
  -geometry           &  A geometry for the main window \\
  -ident              &  A string to add to the window titles \\
- -interop\_menu      &  Reveal the Interop menu for PLASTIC interactions \\
+ -interop\_menu      &  Reveal the Interop menu for SAMP interactions \\
  -image\_background  &  Colour for the background of the main image \\
  -isize              &  Search box for centroiding (9) \\
  -linear\_cartesian  &  Assume CAR projections are a linear mapping \\
