@@ -228,6 +228,10 @@
 *        header.
 *     12-JUN-2008 (TIMJ):
 *        Fix valgrind warning.
+*     25-JUN-2009 (TIMJ):
+*        Use HDS_SPLIT to find whether we have an NDF inside an HDS container.
+*        This is more reliable than looking for a "." in the filename (since
+*        sometimes directories have "."s in them).
 *     {enter_further_changes_here}
 
 *-
@@ -311,6 +315,10 @@
                                  ! FITS extension
       INTEGER   I                ! Loop variable
       LOGICAL   ICKEY            ! Not a data-integrity header?
+      INTEGER   IF1              ! Char position for HDS_SPLIT
+      INTEGER   IF2              ! Char position for HDS_SPLIT
+      INTEGER   IP1              ! Char position for HDS_SPLIT
+      INTEGER   IP2              ! Char position for HDS_SPLIT
       INTEGER   IVALUE           ! Indexed header number
       LOGICAL   ISNUM            ! Sequence number present?
       INTEGER   J                ! Loop variable
@@ -464,12 +472,11 @@
 *  Obtain the NDF name.
          CALL NDF_MSG( 'NDF', NDFI )
          CALL MSG_LOAD( 'NDFNAME', '^NDF', NDFNAM, NCHAR, STATUS )
-         DOTPOS = 1
-         CALL CHR_FIND( NDFNAM, '.', .TRUE., DOTPOS )
+         CALL HDS_SPLIT( NDFNAM, IF1, IF2, IP1, IP2, STATUS )
 
 *  Set the component name.
-         IF ( DOTPOS .LT. NCHAR ) THEN
-            CALL FTPKYS( FUNIT, 'HDSNAME', NDFNAM( DOTPOS+1: ), 
+         IF ( IP1 .LT. IP2 ) THEN
+            CALL FTPKYS( FUNIT, 'HDSNAME', NDFNAM( IP1+1:IP2 ),
      :                   'Component name hierarchical structure', 
      :                   FSTAT )
          END IF
