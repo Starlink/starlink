@@ -337,6 +337,9 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Initialise whether or not the logfile is required.
+      LOGFIL = .FALSE.
+
 *  Obtain the NDF array component.
 *  ===============================
 
@@ -528,9 +531,6 @@
 
 *  Logging
 *  =======
-
-*  Initialise whether or not the logfile is required.
-      LOGFIL = .FALSE.
 
 *  Obtain an optional file for logging the results.  Start a new error
 *  context as null is a valid value.
