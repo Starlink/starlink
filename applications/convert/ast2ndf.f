@@ -2,22 +2,30 @@
 *+
 *  Name:
 *     AST2NDF
+
 *  Purpose:
 *     Converts an Asterix data cube into a simple NDF.
+
 *  Language:
 *     Fortran 77.
+
 *  Type of Module:
 *     ADAM A-task
+
 *  Invocation:
 *     CALL AST2NDF (STATUS)
+
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
+
 *  Description:
 *     This application converts an Asterix data cube into a standard
 *     NDF.  See Section 'Notes' (below) for details of the conversion.
+
 *  Usage:
 *     ast2ndf in out
+
 *  ADAM Parameters:
 *     IN  =  NDF (Read)
 *        The name of the input Asterix data cube.  The file extension
@@ -27,10 +35,12 @@
 *        The name of the output NDF containing the data cube written
 *        by the application.  The file extension ('.sdf') should not be
 *        included since it is appended automatically by the application.
+
 *  Examples:
 *     ast2ndf  ast_cube  ndf_cube
 *        This example generates data cube NDF ndf_cube (in file
 *        ndf_cube.sdf) from Asterix cube ast_cube (in file ast_cube.sdf).
+
 *  Notes:
 *     This application accepts data in the format used by the Asterix
 *     package (see SUN/98).  These data are cubes, with two axes
@@ -49,11 +59,7 @@
 *       standard ones.
 *
 *     - The order of the axes is rearranged.
-*  References:
-*     D.J. Allan and R.J. Vallance, 1995, in SUN/98: 'ASTERIX -- X-ray
-*       Data Processing System', Starlink.
-*  Related Applications:
-*     KAPPA:AXCONV
+
 *  Algorithm:
 *     Set the message reporting level.
 *     Start an NDF context.
@@ -87,13 +93,45 @@
 *       Report error getting input map.
 *     end if
 *     End the NDF context.
+
+*  References:
+*     D.J. Allan and R.J. Vallance, 1995, in SUN/98: 'ASTERIX -- X-ray
+*       Data Processing System', Starlink.
+
+*  Related Applications:
+*     KAPPA:AXCONV
+
+*  Copyright:
+*     Copyright (C) 1997-1998, 2004 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
 *  Authors:
 *     ACD: A C Davenhall (Edinburgh)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     {enter_new_authors_here}
+
 *  History:
 *     13/7/97 (ACD): Original version.
 *     8/1/98  (ACD): First stable version.
 *     9/9/04  (TIMJ): Use CNF_PVAL
+*     {enter_further_changes_here}
+
 *-
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing

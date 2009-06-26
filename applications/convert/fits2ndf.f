@@ -130,7 +130,7 @@
 *        in which case the value actually used is the first in the
 *        list for which corresponding keywords can be found in the FITS
 *        header.
-*        
+*
 *        A FITS header may contain keywords from more than one of these
 *        encodings, in which case it is possible for the encodings to
 *        be inconsistent with each other.  This may happen for instance
@@ -357,7 +357,7 @@
 *        OR, using modification elements to specify output NDF names
 *        based on the input filenames.  Indirection may be used if 
 *        required.
-*        
+*
 *        The simplest modification element is the asterisk "*", which
 *        means call the output NDF files the same name (without any
 *        directory specification) as the corresponding input FITS file,
@@ -517,7 +517,7 @@
 *        This will create a series of NDFs in the container file
 *        multifile.sdf according to the specifications in the
 *        EXTABLE-format file, table1.
-*
+
 *  Notes:
 *     -  Some sources of FITS files that require special conversion
 *     rules, particularly because they use binary tables, are
@@ -625,7 +625,7 @@
 *     data array and IMAGE extension containing the quality into an
 *     NDF.  Other FITS headers are used to create AXIS structures (SI
 *     products only), and character components.
-
+*
 *     -  Details of the conversion are:
 *        -  The primary data array of the FITS file becomes NDF main
 *        data array.  The value of Parameter FMTCNV controls whether
@@ -647,7 +647,7 @@
 *        available for the SILO and SIHI products.
 *        -  The primary headers may be written to the NDF's FITS
 *        extension when Parameter PROFITS is TRUE.
-*     
+*
 *     o  IUE Final Archive MXLO
 *
 *     -  This will usually be a single 1-dimensional NDF, however, if
@@ -671,7 +671,7 @@
 *        QUALITY                Quality array
 *        remaining columns      Component in IUE_MX extension (NET and
 *                               BACKGROUND are NDFs)
-
+*
 *     o  IUE Final Archive MXHI
 *
 *     -  This creates a series of NDFs within a single HDS container
@@ -705,7 +705,7 @@
 *     -  The Chebyshev coefficients, limits, and scale factor in
 *     columns 14 to 17 are omitted as the evaluated background fit is
 *     propagated in BACKGROUND.
-
+*
 *     o  IUE INES reduced spectra
 *
 *     -  This generates a single 1-dimensional NDF. 
@@ -783,9 +783,9 @@
 *        LSANWAVU               Axis errors (wavelength---dimension 3)
 *        LSANFILL               not copied
 *        remaining columns      column name in LWSAN extension
-
+*
 *     o ISO SWS auto-analysis (SWS AA)
-
+*
 *     -  The conversion from binary-table columns to NDF objects is as
 *     follows:
 *
@@ -854,9 +854,29 @@
 *     - There is no propagation of arbitrary FITS HISTORY headers to
 *     the NDF's history records.
 *     - There is no support for FITS World Co-ordinate Systems.
-*     [routine_deficiencies]...
 
-*  [optional_A_task_items]...
+*  Copyright:
+*     Copyright (C) 1994 Science & Engineering Research Council.
+*     Copyright (C) 1997-1998, 2000, 2002, 2004 Central Laboratory of
+*     the Research Councils. Copyright (C) 2006-2007 Particle Physics &
+*     Astronomy Research Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
@@ -928,9 +948,6 @@
 *     2007 January 3 (MJC):
 *        Allow for FMTCNV=Native.  Add examples using the TYPE parameter.       
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       

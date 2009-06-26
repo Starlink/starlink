@@ -103,7 +103,7 @@
 *                                  when Parameter CONFIG="KTCSTARE"
 *       .OBS.KTCB.DATA_ARRAY   ->  .DATA_ARRAY
 *                                  when Parameter CONFIG="KTCCHOP"
-
+*
 *       .OBS.DATA_LABEL        ->  .LABEL                      
 *       .OBS.DATA_UNITS        ->  .UNITS
 *       .OBS.TITLE             ->  .TITLE
@@ -128,7 +128,7 @@
 *       .OBS.x                 ->  .MORE.IRCAM.OBS.x
 *                                  This excludes the components of OBS
 *                                  already listed above and DATA_BLANK.
-
+*
 *     - The data types of the IRCAM GENERAL structures have not been
 *     propagated to the NDF IRCAM extensions, because it would violate
 *     the rules of SGP/38.  In the IRCAM file these all have the same
@@ -143,8 +143,8 @@
 *
 *     -  Upon completion the number of observations successfully
 *     converted to NDFs is reported.
-
-*  Bad-pixel Handling:
+*
+*     Bad-pixel Handling:
 *     Elements of the data array equal to the IRCAM component
 *     .OBS.DATA_BLANK are replaced by the standard bad value.
 
@@ -157,6 +157,28 @@
 *     - There is a hidden parameter called OUT which is used to make
 *     the output NDFs.  This will be removed once the NDF library
 *     supports access to NDFs without recourse to the parameter system.
+
+*  Copyright:
+*     Copyright (C) 1993 Science & Engineering Research Council.
+*     Copyright (C) 2004 Central Laboratory of the Research Councils.
+*     Copyright (C) 2008 Science & Technology Facilities Council. All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -173,9 +195,6 @@
 *     2008 June 18 (MJC):
 *        Trim trailing blanks from output NDF character components.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       

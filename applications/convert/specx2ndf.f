@@ -97,7 +97,7 @@
 *        (in file specx_map.sdf).  A text file containing a schematic
 *        of the map grid will be written to file map.grid.
 
-*  Input and output map formats:
+*  Input and Output Map Formats:
 *     SPECX map files are written by the SPECX package (see SUN/17) for
 *     reducing spectra observed with heterodyne receivers operating in
 *     the mm and sub-mm wavelength range of the electromagnetic
@@ -151,7 +151,7 @@
 *     however, that SPECX itself can read map files in earlier versions
 *     of the SPECX format and convert them to Version 4.2.
 
-*  Schematic of the map grid:
+*  Schematic of the Map Grid:
 *     SPECX2NDF has an optional facility to write a crude schematic of
 *     the grid of points observed on the sky to an ASCII text file
 *     suitable for printing or viewing on a terminal screen.  This
@@ -179,13 +179,13 @@
 *        +---------+
 *         123456789
 
-*  Auxiliary information:
+*  Auxiliary Information:
 *     SPECX2NDF copies all the auxiliary information present in the
 *     original map file to the output data cube.  However, the arrays
 *     holding the original spectra are not copied in order to save
 *     disk space. 
 
-*  Input and output spectra formats:
+*  Input and Output Spectra Formats:
 *     In addition to converting SPECX map files, this application can 
 *     also convert HDS files which hold an array of one-dimensional NDF
 *     structures, each being a single spectrum extracted by SPECX. 
@@ -202,6 +202,27 @@
 *     Inclusion of three-dimensional WCS information allows the
 *     individual spectra to be aligned on the sky (for instance using
 *     the KAPPA WCSALIGN task).
+
+*  Copyright:
+*     Copyright (C) 1997-1998, 2003-2004 Central Laboratory of the
+*     Research Councils. Copyright (C) 2008 Science & Technology
+*     Facilities Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     ACD: A C Davenhall (Edinburgh)
@@ -230,6 +251,7 @@
 *     21-APR-2008 (DSB):
 *        Add AXIS parameter.
 *     {enter_further_changes_here}
+
 *-
 
 *  Type Definitions:

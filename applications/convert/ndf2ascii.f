@@ -50,7 +50,7 @@
 *        of characters per value plus one (for a delimiting space),
 *        times the number of values per record given by parameter
 *        NOPEREC, up to a maximum of 512.
-
+*
 *        When FIXED is FALSE, data values are packed as efficiently as
 *        possible within each record.  The length of each record is
 *        given by Parameter RECLEN.  [FALSE]
@@ -166,6 +166,27 @@
 *     -  The value of bad pixels is not written to a FITS-like header
 *     record with keyword BLANK.
 
+*  Copyright:
+*     Copyright (C) 1991-1992 Science & Engineering Research Council.
+*     Copyright (C) 1996-1997, 2004 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -186,9 +207,6 @@
 *     2004 September 9 (TIMJ):
 *        Use CNF_PVAL
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       

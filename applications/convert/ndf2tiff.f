@@ -11,21 +11,25 @@
 
 *  Type of Module:
 *     ADAM A-task
-
-*  Invocation
+*
+*  Invocation:
 *     CALL NDF2TIFF( STATUS )
 
-*  Description: 
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
 *     This application converts an NDF to a Image File Format (TIFF).
 *     One- or two-dimensional arrays can be handled and various methods
 *     of scaling the data are provided.
-
+*
 *     The routine first finds the brightest and darkest pixel values
 *     required by the particular scaling method in use. It then uses
 *     these to determine suitable scaling factors and converts the image
 *     into an 8-bit representation which is then output to a simple
 *     greyscale TIFF-6.0 file.
-
+*
 *     If the 'high' scaling value is less than the 'low' value, the 
 *     output image will be a negative.  Bad values are set to 0 for 
 *     positives and 255 for negatives.
@@ -100,10 +104,6 @@
 *        two and the mean plus three standard deviations.  [3,-2] would 
 *        give the negative of that.
 
-*  Arguments:
-*     STATUS = INTEGER (Given and Returned)
-*        The global status.
-
 *  Examples:
 *     ndf2tiff old new
 *        This converts the NDF called old (in file old.sdf)
@@ -115,6 +115,27 @@
 
 *  Related Applications:
 *     TIFF2NDF
+
+*  Copyright:
+*     Copyright (C) 1995-1996, 1999, 2004 Central Laboratory of the
+*     Research Councils. Copyright (C) 2008 Science & Technology
+*     Facilities Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
@@ -135,9 +156,6 @@
 *     2008 March 15 (MJC):
 *        Use KAPLIBS routines instead of their cloned CON equivalents.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_new_bugs_here}
 
 *-
 

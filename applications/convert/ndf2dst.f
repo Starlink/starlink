@@ -9,7 +9,7 @@
 *  Language:
 *     Starlink Fortran 77
 
-*  Type of module:
+*  Type of Module:
 *     ADAM A-task
 
 *  Invocation:
@@ -80,14 +80,14 @@
 *             AXIS(1).MORE.FIGARO.xxx -> .X.xxx
 *          (Similarly for AXIS(2), ..., AXIS(6) which are renamed to
 *          .Y .T .U .V or .W) 
-*          
+*
 *          FIGARO extension:
 *          .MORE.FIGARO.MAGFLAG -> .Z.MAGFLAG
 *          .MORE.FIGARO.RANGE -> .Z.RANGE
 *          .MORE.FIGARO.SECZ  -> .OBS.SECZ
 *          .MORE.FIGARO.TIME  -> .OBS.TIME
 *          .MORE.FIGARO.xxx    -> .xxx   (recursively)
-*          
+*
 *          FITS extension:
 *          .MORE.FITS 
 *                   Items      -> .FITS.xxx
@@ -98,6 +98,27 @@
 
 *  Related Applications:
 *     CONVERT: DST2NDF.
+
+*  Copyright:
+*     Copyright (C) 1991-1992 Science & Engineering Research Council.
+*     Copyright (C) 1995-1997, 2004 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     JM: Jo Murray (STARLINK)
@@ -166,9 +187,6 @@
 *     2004 September 9 (TIMJ):
 *        Use CNF_PVAL
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
 *  Type definitions:

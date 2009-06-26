@@ -26,7 +26,7 @@
 *     file; and it uses binary tables to hold any NDF-extension data
 *     present, except for the FITS-airlock extension, which may be
 *     merged into the output FITS file's headers.
-
+*
 *     You can select which NDF array components to export to the FITS
 *     file, and choose the data type of the data and variance arrays.
 *     You can control whether or not to propagate extensions and
@@ -84,7 +84,7 @@
 *        is in the list, it will always be processed first into the
 *        FITS primary array.  The order of the variance and quality
 *        in COMP decides the order they will appear in the FITS file.
-
+*
 *        COMP may be a list of comma-separated values to be applied to
 *        each conversion in turn.  The list must be enclosed in double
 *        quotes.  An error results if more values than the number of
@@ -362,7 +362,7 @@
 *     See also the sections "Provenance" and "World Co-ordinate Systems"
 *     for details of headers used to describe the PROVENANCE extension 
 *     and WCS information respectively.
-
+*
 *     -  Extension information may be transferred to the FITS file when
 *     PROEXTS is TRUE.  The whole hierarchy of extensions is propagated
 *     in order.  This includes substructures, and arrays of extensions
@@ -382,7 +382,7 @@
 *     column and w is the width of an element) is used.  The EXTNAME,
 *     EXTTYPE, EXTSHAPE and EXTLEVEL keywords (see above) are written
 *     to the binary-table header.
-
+*
 *     There are additional rules if a multi-NDF container file is being
 *     converted (see Parameter CONTAINER).  This excludes the case where
 *     there are but two NDFs---one data and the other just 
@@ -537,7 +537,7 @@
 *
 *     Keywords for the extension level, name, and type appear in the
 *     binary-table header.
-
+*
 *     o JCMT SMURF
 *
 *     Standard processing is used except for the SMURF-type extension.
@@ -549,7 +549,7 @@
 *     path to the NDF, EXTLEVEL records the extension hierarchy level,
 *     and EXTTYPE is set to "NDF".  Any non-NDF components of the SMURF
 *     extension are written to a binary table in the normal fashion.
-*
+
 *  References:
 *     Bailey, J.A. 1997, 2dF Software Report 14, version 0.5.
 *     NASA Office of Standards and Technology, 1994, "A User's Guide
@@ -560,14 +560,35 @@
 *  Related Applications:
 *     CONVERT: FITS2NDF; KAPPA: FITSDIN, FITSIN.
 
-*  Implementation Deficiencies:
-*     - There is no support for FITS World Co-ordinate Systems.
-*     [routine_deficiencies]...
-
 *  Implementation Status:
 *     - All NDF data types are supported.
 
-*  [optional_A_task_items]...
+*  Implementation Deficiencies:
+*     - There is no support for FITS World Co-ordinate Systems.
+
+*  Copyright:
+*     Copyright (C) 1994 Science & Engineering Research Council.
+*     Copyright (C) 1996-2000, 2004 Central Laboratory of the Research
+*     Councils. Copyright (C) 2006 Particle Physics & Astronomy
+*     Research Council. Copyright (C) 2007-2008 Science & Technology
+*     Facilities Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
@@ -637,9 +658,6 @@
 *     2008 October 9 (MJC):
 *        Document the CADC-provenance PRODUCT keyword.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       

@@ -1,35 +1,35 @@
       SUBROUTINE DST2NDF( STATUS )
-*+ 
-*   Name:
+*+
+*  Name:
 *      DST2NDF
 
-*   Purpose:
+*  Purpose:
 *      Converts a Figaro (Version 2) DST file to an NDF.
 
-*   Language:
+*  Language:
 *      Starlink Fortran 77
 
-*   Type of module:
+*  Type of Module:
 *      ADAM A-task
 
-*   Invocation:
+*  Invocation:
 *      CALL DST2NDF( STATUS )
 
-*   Arguments:
+*  Arguments:
 *      STATUS = INTEGER (Given and Returned)
 *         The global status.
 
-*   Description:
+*  Description:
 *      This application converts a Figaro Version-2 DST file to a
 *      Version-3 file, i.e. to an NDF.  The rules for converting the
 *      various components of a DST are listed in the notes.  Since
 *      both are hierarchical formats most files can be be converted with
 *      little or no information lost.
 
-*   Usage:
+*  Usage:
 *      dst2ndf in out [form]
 
-*   ADAM Parameters:
+*  ADAM Parameters:
 *      FORM = LITERAL (Read)
 *         The storage form of the NDF's data and variance arrays.
 *         FORM = "Simple" gives the simple form, where the array of data
@@ -91,12 +91,12 @@
 *            .X.xxxx         ->   .AXIS(1).MORE.FIGARO.xxxx
 *            (Similarly for .Y .T .U .V or .W structures which are
 *             renamed to AXIS(2), ..., AXIS(6) in the NDF.) 
-
+*
 *            .OBS.OBJECT     ->   .TITLE
 *            .OBS.SECZ       ->   .MORE.FIGARO.SECZ
 *            .OBS.TIME       ->   .MORE.FIGARO.TIME
 *            .OBS.xxxx       ->   .MORE.FIGARO.OBS.xxxx
-
+*
 *            .FITS.xxxx      ->   .MORE.FITS(n)  (into value part of
 *                                                 the string)
 *            .COMMENTS.xxxx  ->   .MORE.FITS(n)  (into comment part of
@@ -108,12 +108,12 @@
 *            .FITS.xxxx.yyyy ->   .MORE.FITS(n)  (into blank-keyword
 *                                                 comment containing
 *                                                 yyyy=value)
-
+*
 *            .MORE.xxxx      ->   .MORE.xxxx
-
+*
 *            .TABLE          ->   .MORE.FIGARO.TABLE
 *            .xxxx           ->   .MORE.FIGARO.xxxx
-
+*
 *     -  Axis arrays with dimensionality greater than one are not
 *     supported by the NDF.  Therefore, if the application encounters
 *     such an axis array, it processes the array using the following
@@ -131,8 +131,8 @@
 *     (.FITS.xxxx.yyyy where yyyy is not DATA or DESCRIPTION), this set
 *     of related headers are bracketed by blank lines and a comment
 *     containing the name of the structure (i.e. xxxx).
-
-*  Bad-pixel handling:
+*
+*     Bad-pixel handling:
 *     The QUALITY array is only copied if the bad-pixel flag
 *     (.Z.FLAGGED) is false or absent.  A simple NDF with the bad-pixel
 *     flag set to false (meaning that there are no bad-pixels present)
@@ -143,6 +143,27 @@
 
 *  Implementation Status:
 *     -  The maximum number of dimensions is 6.
+
+*  Copyright:
+*     Copyright (C) 1989, 1992-1993 Science & Engineering Research
+*     Council. Copyright (C) 1995-1996 Central Laboratory of the
+*     Research Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     JM: Jo Murray (STARLINK)
@@ -211,10 +232,7 @@
 *        FITS structure contains non-standard structures.
 *     {enter_further_changes_here}
 
-*  Bugs:
-*     {note_any_bugs_here}
-
-*- 
+*-
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

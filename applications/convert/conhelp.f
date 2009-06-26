@@ -37,7 +37,7 @@
 *           of four levels.
 *        CONHELP SUMMARY
 *           This shows a one-line summary of each application.
-
+*
 *     Once in the help library, it can be navigated in the normal
 *     way.  CTRL/Z (on VMS) and CTRL/D (on UNIX) to exit from any level,
 *     and <CR> to move up a level in the hierarchy.
@@ -66,6 +66,27 @@
 *     -  Uses the portable help system.
 *     -  The help libraries are slightly different for VMS and UNIX.
 
+*  Copyright:
+*     Copyright (C) 1993 Science & Engineering Research Council.
+*     Copyright (C) 2004 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -76,10 +97,7 @@
 *        Original based on KAPHELP.
 *     2004 July 28 (TIMJ):
 *        Switch to SHL library
-*     {enter_any_changes_here}
-
-*  Bugs:
-*     {note_new_bugs_here}
+*     {enter_further_changes_here}
 
 *-
 
