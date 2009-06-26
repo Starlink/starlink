@@ -169,7 +169,7 @@ itcl::class samp::SampHub {
          lappend soap_invoke $arg
       }
       set result [eval $soap_invoke]
-      set tag_re {(</?)int|i4|boolean|double|dateTime\.iso8601|base64(>)}
+      set tag_re {(</?)int|i4|boolean|double|float|dateTime\.iso8601|base64(>)}
       return [regsub -all $tag_re $result {\1string\2}]
    }
 
