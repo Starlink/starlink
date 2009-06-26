@@ -28,8 +28,8 @@ if they will only result in default content.
 
 =item B<-copyright>
 
-Override the default copyright text (usually Starlink derived CLRC, SERC or PPARC)
-with the supplied value. It should be quoted.
+Override the default copyright text (usually Starlink derived CLRC, SERC, PPARC, 
+or STFC) with the supplied value. It should be quoted.
 
 =item B<-version>
 
@@ -84,6 +84,7 @@ my %COPYTEXT = (
 		SERC => "Science & Engineering Research Council",
 		CLRC => "Central Laboratory of the Research Councils",
 		PPARC => "Particle Physics & Astronomy Research Council",
+                STFC => "Science & Technology Facilities Council",
 	       );
 
 # add user override if required
@@ -168,6 +169,7 @@ sub _process {
 	  my @clrc;
 	  my @pparc;
 	  my @serc;
+          my @stfc;
           my @user;
           if (exists $COPYTEXT{USER} && defined $COPYTEXT{USER}) {
              # user is overriding copyright text
@@ -177,6 +179,8 @@ sub _process {
              for my $yr (sort @years) {
 	      if ($yr < 1995) {
 	        push(@serc, $yr);
+	      } elsif ($yr >= 2007) {
+	        push(@stfc, $yr);
 	      } elsif ($yr >= 2005) {
 	        push(@pparc, $yr);
 	      } else {
@@ -190,6 +194,7 @@ sub _process {
 	  $ctext .= _write_copyright( $COPYTEXT{SERC}, @serc );
 	  $ctext .= " "._write_copyright( $COPYTEXT{CLRC}, @clrc );
 	  $ctext .= " "._write_copyright( $COPYTEXT{PPARC}, @pparc );
+	  $ctext .= " "._write_copyright( $COPYTEXT{STFC}, @stfc );
 	  $ctext .= " "._write_copyright( $COPYTEXT{USER}, @user );
 	  if ($ctext) {
 	    $ctext .= " All Rights Reserved.";
@@ -315,7 +320,7 @@ All Rights Reserved.
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
-Foundation; either version 2 of the License, or (at your option) any later
+Foundation; either Version 2 of the License, or (at your option) any later
 version.
 
 This program is distributed in the hope that it will be useful,but WITHOUT ANY
@@ -324,7 +329,7 @@ PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
 this program; if not, write to the Free Software Foundation, Inc., 59 Temple
-Place,Suite 330, Boston, MA  02111-1307, USA
+Place, Suite 330, Boston, MA  02111-1307, USA.
 
 =cut
 
