@@ -337,14 +337,14 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Initialise whether or not the logfile is required.
-      LOGFIL = .FALSE.
-
 *  Obtain the NDF array component.
 *  ===============================
 
 *  Begin an NDF context.
       CALL NDF_BEGIN
+
+*  Initialise whether or not the logfile is required.
+      LOGFIL = .FALSE.
 
 *  Obtain the NDF to be analysed.
       CALL LPG_ASSOC( 'NDF', 'READ', NDF, STATUS )
