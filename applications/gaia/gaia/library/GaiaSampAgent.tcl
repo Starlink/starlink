@@ -177,7 +177,7 @@ itcl::class gaia::GaiaSampAgent {
       set ctrlwidget [lindex $images 0]
       set gaia [winfo parent $ctrlwidget]
       set window [::cat::AstroCat::open_catalog_window \
-                    $filename $ctrlwidget ::gaia::PlasticSearch 0 $gaia]
+                    $filename $ctrlwidget ::gaia::SampSearch 0 $gaia]
       $window configure -table_id $table_id
 
       #  Set symbol, after realization of window.
