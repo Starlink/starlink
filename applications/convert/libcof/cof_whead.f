@@ -302,6 +302,10 @@
       LOGICAL   CMPFND( NFLAGS ) ! True if certain special NDF
                                  ! components are present
       CHARACTER COMENT *( SZFITS ) ! Comment string in header
+      INTEGER   CPFE             ! Position of end of HDS file name
+      INTEGER   CPFS             ! Position of start of HDS file name
+      INTEGER   CPPE             ! Position of end of HDS path name
+      INTEGER   CPPS             ! Position of start of HDS path name
       CHARACTER CRPIX * ( SZKEY ) ! Keyword name of CRPIXn
       CHARACTER CRVAL * ( SZKEY ) ! Keyword name of CRVALn
       INTEGER   DIMS( NDF__MXDIM ) ! NDF dimensions (axis length)
@@ -315,10 +319,6 @@
                                  ! FITS extension
       INTEGER   I                ! Loop variable
       LOGICAL   ICKEY            ! Not a data-integrity header?
-      INTEGER   IF1              ! Char position for HDS_SPLIT
-      INTEGER   IF2              ! Char position for HDS_SPLIT
-      INTEGER   IP1              ! Char position for HDS_SPLIT
-      INTEGER   IP2              ! Char position for HDS_SPLIT
       INTEGER   IVALUE           ! Indexed header number
       LOGICAL   ISNUM            ! Sequence number present?
       INTEGER   J                ! Loop variable
@@ -472,11 +472,14 @@
 *  Obtain the NDF name.
          CALL NDF_MSG( 'NDF', NDFI )
          CALL MSG_LOAD( 'NDFNAME', '^NDF', NDFNAM, NCHAR, STATUS )
-         CALL HDS_SPLIT( NDFNAM, IF1, IF2, IP1, IP2, STATUS )
+         CALL HDS_SPLIT( NDFNAM, CPFS, CPFE, CPPS, CPPE, STATUS )
 
-*  Set the component name.
-         IF ( IP1 .LT. IP2 ) THEN
-            CALL FTPKYS( FUNIT, 'HDSNAME', NDFNAM( IP1+1:IP2 ),
+*  Set the component name, if one exists.  This indicated by the start
+*  character position of the HDS path name being before its
+*  corresponding end position.  Otherwise NDFNAM is just the container 
+*  file, and HDSNAM is not needed.
+         IF ( CPPS .LT. CPPE ) THEN
+            CALL FTPKYS( FUNIT, 'HDSNAME', NDFNAM( CPPS+1:CPPE ),
      :                   'Component name hierarchical structure', 
      :                   FSTAT )
          END IF
