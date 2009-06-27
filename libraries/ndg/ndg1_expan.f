@@ -70,7 +70,8 @@
 
 *  Copyright:
 *     Copyright (C) 1999 CLRC
-*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2005, 2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2009 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -130,6 +131,8 @@
 *        Turn off interpretation of shell metacharacters within HDS_FIND.
 *     27-APR-2006 (DSB):
 *        Do not escape spaces within NDF section strings.
+*     26-JUN-2009 (TIMJ):
+*        RPOS should be zero when using CHR_APPND otherwise you get a leading space.
 *     {enter_further_changes_here}
 
 *-
@@ -518,7 +521,7 @@
 *  and let HDS_FIND look for the path. If the TYP indicates that this is not
 *  a standard ".sdf" we quote the file path, else we do not include TYP so that
 *  HDS can deal with the fact that it will be present in REST.
-         RPOS = 1
+         RPOS = 0
          HDSPATH = ' '
          QUOTE = .FALSE.
          IF (TYP .NE. DAT__FLEXT) QUOTE = .TRUE.
