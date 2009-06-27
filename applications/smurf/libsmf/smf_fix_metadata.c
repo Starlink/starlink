@@ -95,12 +95,16 @@
 #include "mers.h"
 #include "prm_par.h"
 #include "mers.h"
+#include "star/one.h"
 
 #include "smf.h"
 #include "smf_err.h"
 
 #include <stdio.h>
 #include <strings.h>
+
+static int smf__pattern_extract ( const char * sourcestr, const char * pattern,
+                                  double *dresult, char * sresult, size_t szstr, int * status );
 
 /* Local struct containing header information that may be accessed multiple times
    without having to use many variables */
@@ -312,20 +316,11 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
       /* First simply attempt to read it from the XML configuration file
          if it is available */
       if (hdr->ocsconfig) {
-        char ** result = NULL;
-        int n;
-        result = astChrSplitRE( hdr->ocsconfig, "STEP_TIME=\"([0123456789\\.]+)\"", &n, NULL );
-        if (n == 1) {
-          /* we have a match. Now need to convert it to a float
-             and since 0.0 is an error for steptime we do not have to get clever */
-          steptime = strtod( result[0], NULL );
-        }
-        for (i = 0; i < (size_t)n; i++) {
-          (void)astFree( result[i] );
-        }
-        if (result) astFree( result );
+        int found;
+        found = smf__pattern_extract( hdr->ocsconfig, "STEP_TIME=\"([0123456789\\.]+)\"", &steptime,
+                                      NULL, 0, status );
         /* reset it on error */
-        if (steptime < VAL__SMLD) {
+        if (!found || steptime < VAL__SMLD) {
           steptime = VAL__BADD;
         } else {
           msgOutiff( msglev, "", INDENT "Determined step time from OCS configuration to be %g sec",
@@ -735,4 +730,55 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
   }
 
   return have_fixed;
+}
+
+
+/* internal routines to simplify pattern extraction */
+
+/* Wrapper around astChrSplitRE. Returns true if we found something or false if there was no
+   match. The result of the match is converted to a double if dresult is non-NULL and copied
+   into sresult if that is non-NULL. Pattern should only match one result.
+   szstr is allocated size of *sresult
+*/
+static int smf__pattern_extract ( const char * sourcestr, const char * pattern,
+                                  double *dresult, char * sresult, size_t szstr, int * status ) {
+
+  int i;
+  int retval = 0;
+  char ** result = NULL;
+  int n;
+
+  /* initialise */
+  if (dresult) *dresult = VAL__BADD;
+  if (sresult) strcpy( sresult, "" );
+
+  if (*status != SAI__OK) return retval;
+
+  result = astChrSplitRE( sourcestr, pattern, &n, NULL );
+  if (n == 1) {
+    retval = 1;
+    /* we have a match */
+
+    /* Now need to convert it to a float if required. We trap for bad conversion. */
+    if ( dresult ) {
+      char *endptr = NULL;
+      *dresult = strtod( result[0], &endptr );
+      if (*dresult == 0.0 && endptr == result[0]) {
+        *dresult = VAL__BADD;
+        if (*status == SAI__OK) {
+          *status = SAI__ERROR;
+          errRepf( " ", "Error converting '%s' to double", status, result[0]);
+        }
+      }
+    }
+    /* Copy to results buffer if required */
+    if ( sresult ) {
+      one_strlcpy( sresult, result[0], szstr, status );
+    }
+  }
+  for (i = 0; i < n; i++) {
+    (void)astFree( result[i] );
+  }
+  if (result) astFree( result );
+  return retval;
 }
