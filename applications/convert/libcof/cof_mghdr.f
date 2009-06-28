@@ -60,7 +60,7 @@
 *  History:
 *     2006 April 6 (MJC):
 *        Original version.
-*     {enter_further_changes_here}
+*     {enter_changes_here}
 
 *-
       

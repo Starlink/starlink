@@ -117,7 +117,7 @@
 *  History:
 *     1996 April 30 (MJC):
 *        Original version.
-*     {enter_further_changes_here}
+*     {enter_changes_here}
 
 *-
       

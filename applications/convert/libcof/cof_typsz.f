@@ -59,7 +59,7 @@
 *     1994 May 31 (MJC):
 *        Original version based on JM's CONVERT routine, but using a
 *        standard prologue and style.
-*     {enter_further_changes_here}
+*     {enter_changes_here}
 
 *-
 

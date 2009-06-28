@@ -30,8 +30,6 @@
 *  Notes:
 *     -  The argument list should not be changed.
 *     -  There is no error checking of the FITSIO status.
-*
-*     [optional_subroutine_items]...
 
 *  Prior Requirements:
 *     The NDF and the FITS file must already be open.  The current
@@ -65,7 +63,7 @@
 *  History:
 *     1997 January 13 (MJC):
 *        Original version.
-*     {enter_further_changes_here}
+*     {enter_changes_here}
 
 *-
       

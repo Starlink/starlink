@@ -40,8 +40,6 @@
 
 *  Prior Requirements:
 *     The Given FITS file must already be opened with the FITSIO library.
-*
-*     [optional_subroutine_items]...
 
 *  Copyright:
 *     Copyright (C) 2000, 2002 Central Laboratory of the Research

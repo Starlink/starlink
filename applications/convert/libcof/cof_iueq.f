@@ -28,8 +28,6 @@
 *        The NDF quality array.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
-*
-*     [optional_subroutine_items]...
 
 *  Copyright:
 *     Copyright (C) 1996 Central Laboratory of the Research Councils.
@@ -58,7 +56,7 @@
 *  History:
 *     1996 June 29 (MJC):
 *        Original version.
-*     {enter_further_changes_here}
+*     {enter_changes_here}
 
 *-
       

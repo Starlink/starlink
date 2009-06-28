@@ -33,8 +33,6 @@
 
 *  Prior Requirements:
 *     The FITS file must be open.
-*
-*     [optional_subroutine_items]...
 
 *  Copyright:
 *     Copyright (C) 1997, 2004 Central Laboratory of the Research
@@ -66,7 +64,7 @@
 *        Original version.
 *     2004 September 10 (TIMJ):
 *        Fix valgrind warning with uninitialised CARD on entry
-*        to fitsio routine
+*        to fitsio routine.
 *     {enter_further_changes_here}
 
 *-

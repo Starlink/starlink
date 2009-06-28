@@ -4,7 +4,7 @@
 *     COF_WCSDF
 
 *  Purpose:
-*     See if two FrameSets are different after being written to a 
+*     Sees if two FrameSets are different after being written to a 
 *     FitsChan.
 
 *  Language:
@@ -69,7 +69,7 @@
 *  History:
 *     26-NOV-1997 (DSB):
 *        Original version.
-*     {enter_further_changes_here}
+*     {enter_changes_here}
 
 *-
       

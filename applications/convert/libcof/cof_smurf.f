@@ -129,7 +129,7 @@
 *  History:
 *     2007 October 21 (MJC):
 *        Original version.
-*     {enter_further_changes_here}
+*     {enter_changes_here}
 
 *-
       

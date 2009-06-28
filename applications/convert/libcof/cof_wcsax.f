@@ -4,7 +4,7 @@
 *     COF_WCSAX
 
 *  Purpose:
-*     Re-create AXIS structures from a WCS component FrameSet.
+*     Re-creates AXIS structures from a WCS component FrameSet.
 
 *  Language:
 *     Starlink Fortran 77

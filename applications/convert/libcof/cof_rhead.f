@@ -15,14 +15,14 @@
 *  Description:
 *     This reads the FITSIO current headers of a FITS file into an
 *     array.  This is largely intended for dealing with datasets using
-*     the Green Bank convention, where the global informationin the
+*     the Green Bank convention, where the global information in the
 *     primary headers needs to be merged with columns in a binary table.
 *     of a series of observations.
 *
-*     array.  Following these, but before the END card, come FITS
-*     header cards containing the values of columns of the nominated
-*     row of the binary table that have been unused to form the NDF.
-*     These additional headers use the TTYPEn values as their keywords.
+*     Following these, but before the END card, come FITS header cards 
+*     containing the values of columns of the nominated row of the 
+*     binary table that have been unused to form the NDF.  These 
+*     additional headers use the TTYPEn values as their keywords.
 *     If the primary header array supplied already contains such
 *     keywords, the existing values are overwritten.  The headers are
 *     then copied verbatim to the extension.
@@ -44,8 +44,6 @@
 
 *  Prior Requirements:
 *     The FITS files must already be opened with the FITSIO library.
-*
-*     [optional_subroutine_items]...
 
 *  Copyright:
 *     Copyright (C) 1996 Central Laboratory of the Research Councils.
@@ -74,7 +72,7 @@
 *  History:
 *     1996 June 19 (MJC):
 *        Original version.
-*     {enter_further_changes_here}
+*     {enter_changes_here}
 
 *-
       

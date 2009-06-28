@@ -4,7 +4,7 @@
 *     COF_WCSUT
 
 *  Purpose:
-*     Remove the spurious copy of the AXIS Frame which is left in
+*     Removes the spurious copy of the AXIS Frame which is left in
 *     WCS component when using non-Native encodings.
 
 *  Language:

@@ -85,7 +85,7 @@
 *        Use COF_ASC2HT (new) not COF_BN2HT if it's an ASCII table so
 *          FITS format I -> _INTEGER not _WORD
 *     2004 September 9 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
 *     {enter_further_changes_here}
 
 *-

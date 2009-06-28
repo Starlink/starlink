@@ -26,8 +26,6 @@
 *        date and time, namely YYYY Mmm DD HH:MM:SS.SSS
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
-*
-*     [optional_subroutine_items]...
 
 *  Copyright:
 *     Copyright (C) 1997 Central Laboratory of the Research Councils.
@@ -56,7 +54,7 @@
 *  History:
 *     1997 January 13 (MJC):
 *        Original version rebadged from KPG1_FHDAT.
-*     {enter_further_changes_here}
+*     {enter_changes_here}
 
 *-
       

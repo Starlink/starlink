@@ -69,7 +69,7 @@
 *  History:
 *     2008 February 7 (MJC):
 *        Original version based upon COF_FT2NE.
-*     {enter_further_changes_here}
+*     {enter_changes_here}
 
 *-
       

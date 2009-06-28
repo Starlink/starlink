@@ -58,7 +58,7 @@
 *  History:
 *     11-NOV-1997 (DSB):
 *        Original version.
-*     {enter_further_changes_here}
+*     {enter_changes_here}
 
 *-
 

@@ -42,8 +42,6 @@
 *        The indices to the sorted wavelengths and errors.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
-*
-*     [optional_subroutine_items]...
 
 *  Copyright:
 *     Copyright (C) 1996 Central Laboratory of the Research Councils.
@@ -72,7 +70,7 @@
 *  History:
 *     1996 May 25 (MJC):
 *        Original version.
-*     {enter_further_changes_here}
+*     {enter_changes_here}
 
 *-
       

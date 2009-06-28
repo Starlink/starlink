@@ -90,7 +90,7 @@
 *  History:
 *     2008 February 5 (MJC):
 *        Original version, adapting some code from DSB's PROVSHOW.
-*     {enter_further_changes_here}
+*     {enter_changes_here}
 
 *-
       

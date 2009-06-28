@@ -85,9 +85,6 @@
 *     - There is no propagation of HISTORY cards in the FITS header to
 *     NDF history records.
 *     - There is no support for FITS World Co-ordinate Systems.
-*     [routine_deficiencies]...
-*
-*     [optional_subroutine_items]...
 
 *  Prior Requirements:
 *     -  The FITS file should already have been opened by FITSIO, and
@@ -127,7 +124,7 @@
 *     8-JAN-1999 (DSB):
 *        Added FMTCNV to argument list for COF_STYPE call.
 *     2004 September 9 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
 *     {enter_further_changes_here}
 
 *-

@@ -66,7 +66,7 @@
 *  History:
 *     1990 November 18 (MJC):
 *        Original version.
-*     {enter_further_changes_here}
+*     {enter_changes_here}
 
 *-
       
@@ -77,45 +77,35 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Arguments Given:
-      INTEGER
-     :  BITPIX
+      INTEGER BITPIX
 
-      LOGICAL
-     :  IEEE,
-     :  FMTCNV
-
+      LOGICAL IEEE
+      LOGICAL FMTCNV
 
 *  Arguments Returned:
-      INTEGER
-     :  BPV
-
-      CHARACTER * ( * )
-     :  FMTIN,
-     :  FMTOUT
+      INTEGER BPV
+      CHARACTER * ( * ) FMTIN
+      CHARACTER * ( * ) FMTOUT
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *.
 
-*    Check inherited global status.
-
+*  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*     Use BITPIX to determine the data format.
-*     ========================================
+*  Use BITPIX to determine the data format.
+*  ========================================
 
-*     Find the number of bytes per data value, note the absolute because
-*     BITPIX can be negative.
-
+*  Find the number of bytes per data value, note the absolute because
+*  BITPIX can be negative.
        BPV = ABS( BITPIX / 8 )
 
-*     Find the input format type.
-
+*  Find the input format type.
        IF ( IEEE ) THEN
 
-*        Firstly, the floating-point values.
-
+*  First, the floating-point values.
           IF ( BPV .EQ. 4 ) THEN
              FMTIN = '_REAL'
           ELSE IF ( BPV .EQ. 8 ) THEN
@@ -128,15 +118,14 @@
           END IF
        ELSE
 
-*        Secondly, the integer types.
-
+*  Second, the integer types.
           IF ( BPV .EQ. 1 ) THEN
              FMTIN = '_UBYTE'
           ELSE IF ( BPV .EQ. 2 ) THEN
              FMTIN = '_WORD'
           ELSE IF ( BPV .EQ. 4 ) THEN
              FMTIN = '_INTEGER'
-           ELSE
+          ELSE
              STATUS = SAI__ERROR
              CALL ERR_REP( 'INVTYP',
      :         'The FITS object has an invalid value for BITPIX.', 
@@ -144,9 +133,8 @@
           END IF
        END IF
 
-*     Find the output format.  Format conversion does not apply to
-*     floating point.
-
+*  Find the output format.  Format conversion does not apply to
+*  floating point.
        IF ( FMTCNV .AND. .NOT. IEEE ) THEN
           FMTOUT = '_REAL'
        ELSE
@@ -154,4 +142,3 @@
        END IF
 
        END
-

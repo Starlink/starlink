@@ -29,8 +29,6 @@
 *     The NDF and the FITS file must already be open.  The current
 *     HDU in the FITS file should be the primary and the other headers
 *     should have been written.
-*
-*     [optional_subroutine_items]...
 
 *  Copyright:
 *     Copyright (C) 1997 Central Laboratory of the Research Councils.
@@ -59,7 +57,7 @@
 *  History:
 *     1997 January 13 (MJC):
 *        Original version.
-*     {enter_further_changes_here}
+*     {enter_changes_here}
 
 *-
       
