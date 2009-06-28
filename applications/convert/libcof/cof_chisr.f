@@ -112,48 +112,48 @@
       PARAMETER( MAXWRD = 7 )
 
 *  Local Variables:
-      INTEGER ALIGN              ! Alignment with respect to column 9
-      CHARACTER * ( NDF__SZAPP ) APPN ! Application name
-      CHARACTER * 80 CARD        ! FITS header card
-      CHARACTER * ( DAT__SZLOC ) CLOC ! Locator to a character component
+      INTEGER ALIGN              ! Alignment with respect to Column 9
+      CHARACTER*( NDF__SZAPP ) APPN ! Application name
+      CHARACTER*80 CARD          ! FITS header card
+      CHARACTER*( DAT__SZLOC ) CLOC ! Locator to a character component
       INTEGER CRCOL              ! Column where "Current record:" begins
-      CHARACTER * ( NDF__SZHDT ) CREATD ! History creation date
+      CHARACTER*( NDF__SZHDT ) CREATD ! History creation date
       LOGICAL CRETEX             ! Create TEXT component in a record?
       INTEGER CSIZE              ! Width of a character component
       INTEGER CURREC             ! Current record number
-      CHARACTER * ( NDF__SZHDT ) DATE ! History record date
-      CHARACTER * ( DAT__SZLOC ) ELOC ! Locator to element of RECORDS
+      CHARACTER*( NDF__SZHDT ) DATE ! History record date
+      CHARACTER*( DAT__SZLOC ) ELOC ! Locator to element of RECORDS
       INTEGER END( MAXWRD )      ! End columns of words (not used)
       INTEGER FSTAT              ! FITSIO status
       LOGICAL HISPRE             ! HISTORY records may be present?
-      CHARACTER * ( DAT__SZLOC ) HLOC ! Locator to HISTORY component
-      CHARACTER * 4 IC           ! Record number
+      CHARACTER*( DAT__SZLOC ) HLOC ! Locator to HISTORY component
+      CHARACTER*4 IC             ! Record number
       INTEGER IREC               ! Loop counter for history records
       INTEGER JREC               ! Loop counter for text lines
       INTEGER KINDEX             ! Keyword index
-      CHARACTER * 8 KEYWRD       ! FITS keyword
-      CHARACTER * ( DAT__SZLOC ) LOC ! Locator to NDF
+      CHARACTER*8 KEYWRD         ! FITS keyword
+      CHARACTER*( DAT__SZLOC ) LOC ! Locator to NDF
       INTEGER LSTAT              ! Local status value
       LOGICAL MAKHIS             ! Make HISTORY structure?
-      CHARACTER * ( NDF__SZHUM ) MODE ! Update mode
+      CHARACTER*( NDF__SZHUM ) MODE ! Update mode
       LOGICAL MORTEX             ! More text lines to process?
       INTEGER NC                 ! Number of characters
       INTEGER NEXREC             ! Number of existing HISTORY records
       INTEGER NWORD              ! Number of words in HISTORY card
-      CHARACTER * 2048 PARAGR    ! Paragraph of HISTORY text
+      CHARACTER*2048 PARAGR      ! Paragraph of HISTORY text
       INTEGER PARCOL             ! Paragraph column where to append text
       LOGICAL PARSKP             ! There is a paragraph of text?
-      CHARACTER * ( NDF__SZREF ) REFER ! Reference dataset
-      CHARACTER * ( DAT__SZLOC ) RLOC ! Locator to RECORDS component
+      CHARACTER*( NDF__SZREF ) REFER ! Reference dataset
+      CHARACTER*( DAT__SZLOC ) RLOC ! Locator to RECORDS component
       INTEGER START( MAXWRD )    ! Start columns of words (not used)
-      CHARACTER * ( DAT__SZLOC ) TLOC ! Locator to TEXT component
-      CHARACTER * ( DAT__SZLOC ) TELOC ! Locator to element of TEXT
+      CHARACTER*( DAT__SZLOC ) TLOC ! Locator to TEXT component
+      CHARACTER*( DAT__SZLOC ) TELOC ! Locator to element of TEXT
       INTEGER TEXCOL             ! Line number in HISTORY-text paragraph
-      CHARACTER * ( MAXWID ) TEXT ! HISTORY text
+      CHARACTER*( MAXWID ) TEXT ! HISTORY text
       LOGICAL VALID              ! Locator valid?
       INTEGER WIDTH              ! Width in characters of history
                                  ! text
-      CHARACTER * 20 WORDS( MAXWRD ) ! Words in a HISTORY card
+      CHARACTER*20 WORDS( MAXWRD ) ! Words in a HISTORY card
 
 *.
 
@@ -199,9 +199,9 @@
                GOTO 100
             END IF
 
-* Alignment correction is with respect to column 9.  ALIGN would be 1
-* for column 9 when it should be zero.  The old alignment was to
-* column 11, so ALIGN would be 2.
+*  Alignment correction is with respect to column 9.  ALIGN would be 1
+*  for Column 9 when it should be zero.  The old alignment was to
+*  Column 11, so ALIGN would be 2.
             ALIGN = ALIGN - 1
 
 *  Create HISTORY structure.
@@ -264,7 +264,7 @@
             CALL DAT_PUT0C( CLOC, MODE, STATUS )
             CALL DAT_ANNUL( CLOC, STATUS )
 
-*  Obtain the current record.
+*  Obtain the current record.  Validate that it's an integer.
             CRCOL = INDEX( CARD, 'Current record:' )
 
             IF ( STATUS .EQ. SAI__OK ) THEN 

@@ -45,7 +45,12 @@
 *  History:
 *     1997 July 23 (MJC):
 *        Original version.
-*     {enter_changes_here}
+*     2009 June 26 (MJC):
+*        UPDATE_MODE may now have leading blanks that must be trimmed to
+*        avoid an error from NDF when NDF accesses this component. 
+*        Merged in most of the modifications made to its sister routine
+*        COF_CHISR.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -85,45 +90,47 @@
       PARAMETER( MAXWRD = 7 )
 
 *  Local Variables:
-      CHARACTER * ( NDF__SZAPP ) APPN ! Application name
-      CHARACTER * ( 80 ) CARD    ! IRAF header card
-      CHARACTER * ( DAT__SZLOC ) CLOC ! Locator to a character component
+      INTEGER ALIGN              ! Alignment with respect to Column 9
+      CHARACTER*( NDF__SZAPP ) APPN ! Application name
+      CHARACTER*80 CARD          ! IRAF header card
+      CHARACTER*( DAT__SZLOC ) CLOC ! Locator to a character component
       INTEGER CRCOL              ! Column where "Current record:" begins
-      CHARACTER * ( NDF__SZHDT ) CREATD ! History creation date
+      CHARACTER*( NDF__SZHDT ) CREATD ! History creation date
       LOGICAL CRETEX             ! Create TEXT component in a record?
       INTEGER CSIZE              ! Width of a character component
       INTEGER CURREC             ! Current record number
-      CHARACTER * ( NDF__SZHDT ) DATE ! History record date
-      CHARACTER * ( DAT__SZLOC ) ELOC ! Locator to element of RECORDS
+      CHARACTER*( NDF__SZHDT ) DATE ! History record date
+      CHARACTER*( DAT__SZLOC ) ELOC ! Locator to element of RECORDS
       INTEGER END( MAXWRD )      ! End columns of words (not used)
       LOGICAL HISPRE             ! HISTORY records may be present?
-      CHARACTER * ( DAT__SZLOC ) HLOC ! Locator to HISTORY component
-      CHARACTER * ( 4 ) IC       ! Record number
+      CHARACTER*( DAT__SZLOC ) HLOC ! Locator to HISTORY component
+      CHARACTER*4 IC             ! Record number
       INTEGER IREC               ! Loop counter for history records
       INTEGER JREC               ! Loop counter for text lines
       INTEGER KINDEX             ! Keyword index
-      CHARACTER * ( 8 ) KEYWRD   ! IRAF keyword
-      CHARACTER * ( DAT__SZLOC ) LOC ! Locator to NDF
+      CHARACTER*8 KEYWRD         ! IRAF keyword
+      CHARACTER*( DAT__SZLOC ) LOC ! Locator to NDF
+      INTEGER LSTAT              ! Local status value
       LOGICAL MAKHIS             ! Make HISTORY structure?
-      CHARACTER * ( NDF__SZHUM ) MODE ! Update mode
+      CHARACTER*( NDF__SZHUM ) MODE ! Update mode
       LOGICAL MORTEX             ! More text lines to process?
       INTEGER NC                 ! Number of characters
       INTEGER NEXREC             ! Number of existing HISTORY records
       INTEGER NWORD              ! Number of words in HISTORY card
-      CHARACTER * ( 2048 ) PARAGR ! Paragraph of HISTORY text
+      CHARACTER*2048 PARAGR      ! Paragraph of HISTORY text
       INTEGER PARCOL             ! Paragraph column where to append text
       LOGICAL PARSKP             ! There is a paragraph of text?
-      CHARACTER * ( NDF__SZREF ) REFER ! Reference dataset
-      CHARACTER * ( DAT__SZLOC ) RLOC ! Locator to RECORDS component
+      CHARACTER*( NDF__SZREF ) REFER ! Reference dataset
+      CHARACTER*( DAT__SZLOC ) RLOC ! Locator to RECORDS component
       INTEGER START( MAXWRD )    ! Start columns of words (not used)
-      CHARACTER * ( DAT__SZLOC ) TLOC ! Locator to TEXT component
-      CHARACTER * ( DAT__SZLOC ) TELOC ! Locator to element of TEXT
+      CHARACTER*( DAT__SZLOC ) TLOC ! Locator to TEXT component
+      CHARACTER*( DAT__SZLOC ) TELOC ! Locator to element of TEXT
       INTEGER TEXCOL             ! Line number in HISTORY-text paragraph
-      CHARACTER * ( MAXWID ) TEXT ! HISTORY text
+      CHARACTER*( MAXWID ) TEXT  ! HISTORY text
       LOGICAL VALID              ! Locator valid?
       INTEGER WIDTH              ! Width in characters of history
                                  ! text
-      CHARACTER * ( 20 ) WORDS( MAXWRD ) ! Words in a HISTORY card
+      CHARACTER*20 WORDS( MAXWRD ) ! Words in a HISTORY card
 
 *.
 
@@ -141,7 +148,7 @@
 
 *  Loop until all the HISTORY records have been found.  Only continue
 *  search when there are untested headers remaining.
-  100 CONTINUE                 ! Star of DO WHILE loop
+  100 CONTINUE                 ! Start of DO WHILE loop
       IF ( HISPRE .AND. STATUS .EQ. SAI__OK .AND.
      :     KINDEX .LE. NHEAD ) THEN
 
@@ -152,16 +159,23 @@
          IF ( HISPRE ) THEN
 
 *  Obtain the header card.
+            CARD = ' '
             CALL GETLIN( IMDESC, KINDEX, CARD )
 
 *  Was the HISTORY card written by COF_WHISR?  Need to find the heading.
 *  If this HISTORY card does not contain it, search for another HISTORY
-*  card, starting from the next card.
-            IF ( INDEX( CARD( 11:80 ), 'History structure' ) .NE. 1 )
-     :        THEN
+*  card, starting from the next card.  Search from the first possible
+*  location but allow for some formatting offset.
+            ALIGN = INDEX( CARD( 9:80 ), 'History structure' )
+            IF ( ALIGN .LT. 1 .OR. ALIGN .GT. 5 ) THEN
                KINDEX = KINDEX + 1
                GOTO 100
             END IF
+
+*  Alignment correction is with respect to column 9.  ALIGN would be 1
+*  for Column 9 when it should be zero.  The old alignment was to
+*  Column 11, so ALIGN would be 2.
+            ALIGN = ALIGN - 1
 
 *  Create HISTORY structure.
 *  =========================
@@ -178,7 +192,7 @@
             CALL DAT_ANNUL( LOC, STATUS )
 
 *  Extract the creation date from the header card.
-            CREATD = CARD( 37:60 )
+            CREATD = CARD( 35 + ALIGN:58 + ALIGN )
 
 *  Convert the date from the KAPPA-style to the NDF format.
             CALL COF_DATEH( CREATD, STATUS )
@@ -194,6 +208,15 @@
 *  Record that this card is not to be propagated to the FITS airlock.
             RETAIN( KINDEX ) = .FALSE.
 
+*  Obtain the previous header card from the first HISTORY record (if a
+*  previous card exists).  NDF HISTORY written by NDF2FITS is preceded
+*  by a blank line.  This line should be removed to restore the former
+*  appearance of the headers.
+            IF ( KINDEX .GT. 1 .AND. MAKHIS ) THEN
+               CALL GETLIN( IMDESC, KINDEX - 1, CARD )
+               IF ( CARD .EQ. ' ' ) RETAIN( KINDEX - 1 ) = .FALSE.
+            END IF
+
 *  Skip to the next header card.  Here we assume that these headers have
 *  not been tampered.
             KINDEX = KINDEX + 1
@@ -203,7 +226,8 @@
             RETAIN( KINDEX ) = .FALSE.
 
 *  Obtain the update mode.
-            MODE = CARD( 24:NDF__SZHUM+23 )
+            MODE = CARD( 22 + ALIGN:NDF__SZHUM + 21 + ALIGN )
+            CALL CHR_LDBLK( MODE )
 
 *  Make the UPDATE_MODE component and assign it the update mode via a
 *  locator.
@@ -213,9 +237,18 @@
             CALL DAT_PUT0C( CLOC, MODE, STATUS )
             CALL DAT_ANNUL( CLOC, STATUS )
 
-*  Obtain the current record.
+*  Obtain the current record.  Validate that it's an integer.
             CRCOL = INDEX( CARD, 'Current record:' )
-            CALL CHR_CTOI( CARD( CRCOL + 16: ), CURREC, STATUS )
+
+            IF ( STATUS .EQ. SAI__OK ) THEN 
+               CALL CHR_CTOI( CARD( CRCOL + 16: ), CURREC, STATUS )
+               IF ( STATUS .NE. SAI__OK ) THEN
+                  CALL MSG_SETC( 'C', CARD )
+                  CALL MSG_SETC( 'F', CARD( CRCOL + 16: ) )
+                  CALL ERR_REP( 'COI_CHISR_ERR1', 'Bad integer field '//
+     :                          '''^F'' in FITS card ''^C''.', STATUS )
+               END IF
+            END IF
 
 *  Make the CURRENT_RECORD component and assign it the record number
 *  via a locator.
@@ -300,7 +333,7 @@
 
 *  Break the line into words.
                CALL CHR_DCWRD( CARD, MAXWRD, NWORD, START, END, WORDS,
-     :                         STATUS )
+     :                         LSTAT )
 
 *  The username is the third word.  Make the USER component and assign
 *  it the username via a locator.
@@ -319,7 +352,17 @@
                CALL DAT_ANNUL( CLOC, STATUS )
 
 *  The width is the seventh word.
-               CALL CHR_CTOI( WORDS( 7 ), WIDTH, STATUS )
+               IF ( STATUS .EQ. SAI__OK ) THEN 
+                  CALL CHR_CTOI( WORDS( 7 ), WIDTH, STATUS )
+                  IF ( STATUS .NE. SAI__OK ) THEN
+                     CALL MSG_SETC( 'C', CARD )
+                     CALL MSG_SETC( 'F', WORDS( 7 ) )
+                     CALL ERR_REP( 'COF_CHISR_ERR1', 'Bad integer '//
+     :                             'field ''^F'' in FITS card ''^C''.', 
+     :                             STATUS )
+                  END IF
+               END IF
+
                WIDTH = MIN( MAXWID, WIDTH )
 
 *  Skip to the next header card.  We assume that these headers have
@@ -358,18 +401,19 @@
 *  Record that this card is not to be propagated to the FITS airlock,
 *  provided it is HISTORY.
                   KEYWRD = CARD( 1:8 )
-                  IF ( ( KEYWRD .EQ. 'COMMENT' .AND.
-     :                   CARD( 11: ) .EQ. ' ' ) .OR.
+                  IF ( CARD .EQ. ' '  .OR.
      :                 KEYWRD .EQ. 'HISTORY' ) THEN
                      RETAIN( KINDEX ) = .FALSE.
                   END IF
 
-*  See whether there is a blank card or the END card present, denoting
-*  the end of the HISTORY records.
+*  See if this is the end of a history text paragraph i.e blank HISTORY text
+*  or end of HISTORY record.
+*  Any non-HISTORY card will denote end of HISTORY record.
+
+*  Set PARSKP if end of paragraph within a history record
                   PARSKP = KEYWRD .EQ. 'HISTORY' .AND.
-     :                     CARD( 11: ) .EQ. ' ' 
-                  IF ( KEYWRD .EQ. 'COMMENT' .OR. KEYWRD .EQ. 'END' .OR.
-     :                 PARSKP ) THEN
+     :                     CARD( 9 + ALIGN: ) .EQ. ' ' 
+                  IF ( KEYWRD .NE. 'HISTORY' .OR. PARSKP ) THEN
 
 *  The END card is the last header card so end the search for further
 *  HISTORY cards.
@@ -393,7 +437,8 @@
 
 *  TEXCOL = 0 indicates that there are no more lines in the paragraph.
 *  increment the number of text lines.
-                        IF ( TEXCOL .NE. 0 ) THEN
+                        IF ( TEXCOL .NE. 0 .AND.
+     :                       STATUS .EQ. SAI__OK ) THEN
                            CALL CHR_PFORM( 1, PARAGR, .FALSE., TEXCOL,
      :                                     TEXT( :WIDTH ) )
 
@@ -436,12 +481,13 @@
                   ELSE 
 
 *  Append the current record to the paragraph buffer.
-                     CALL CHR_APPND( CARD( 11: ), PARAGR, PARCOL )
+                     CALL CHR_APPND( CARD( 9 + ALIGN: ), PARAGR, 
+     :                               PARCOL )
                      IF ( CARD( 80:80 ) .EQ. ' ' ) PARCOL = PARCOL + 1
                   END IF
 
 *  Are there more text records?
-                  MORTEX = KEYWRD .NE. 'COMMENT' .AND. KEYWRD .NE. 'END'
+                  MORTEX = KEYWRD .EQ. 'HISTORY'
 
 *  Return to start of DO WHILE loop.
                   GOTO 140
@@ -475,6 +521,16 @@
 *  
 *  Return to start of DO WHILE loop.
 *         GOTO 100
+      END IF
+
+*  If an error has occurred, issue a warning and flush the error, so that 
+*  we can continue to build the rest of the NDF.
+      IF ( STATUS .NE. SAI__OK ) THEN
+         CALL NDF_MSG( 'NDF', NDF )
+         CALL ERR_REP( 'COI_CHISR_ERR', 'The history information in '/
+     :                 /'the output NDF ''^NDF'' may be corrupt.', 
+     :                 STATUS )
+         CALL ERR_FLUSH( STATUS )
       END IF
 
       END
