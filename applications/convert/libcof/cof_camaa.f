@@ -69,12 +69,6 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
-*  Prior Requirements:
-*     -  The FITS file should already have been opened by FITSIO, and
-*     is in the HDU immediately prior to the BINTABLE extension that is
-*     going to define the NDF.
-*     [routine_prior_requirements]...
-
 *  Notes:
 *     -  The CAM AA FITS products have a binary table using the "Green
 *     Bank" convention, where rows of the table represent a series of
@@ -98,16 +92,44 @@
 *          NAXIS                  Number of dimensions
 *          NAXISn                 Dimension of axis n
 *          remaining columns      keyword in FITS extension
-
+*
 *          The creation of axis information and extensions does not
 *          occur for the error array, as these are already generated
 *          when the data-array row in the binary table is processed.
-
+*
 *          The BITPIX column is ignored as the data type is determined
 *          through the use the TFORMn keyword and the value of FMTCNV in
 *          conjunction with the BSCALE and BZERO columns.
+*
+*     [optional_subroutine_items]...
 
-*  [optional_subroutine_items]...
+*  Prior Requirements:
+*     -  The FITS file should already have been opened by FITSIO, and
+*     is in the HDU immediately prior to the BINTABLE extension that is
+*     going to define the NDF.
+*     [routine_prior_requirements]...
+
+*  Copyright:
+*     Copyright (C) 1996-1997, 2004 Central Laboratory of the Research
+*     Councils. Copyright (C) 2008 Science & Technology Facilities
+*     Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -125,9 +147,6 @@
 *     2008 June 18 (MJC):
 *        Trim trailing blanks from output NDF character components.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       

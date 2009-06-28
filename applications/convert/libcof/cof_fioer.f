@@ -27,7 +27,7 @@
 *     short translation of the error number, and if there is no
 *     translation, it reports the FITSIO error number and instruct the
 *     reader to consult the FITSIO User's Guide.
-
+*
 *     The global status is set to SAI__ERROR.  This routine attempts
 *     to work even if the global status is bad on entry.
 
@@ -52,8 +52,30 @@
 
 *  Notes:
 *     The error name for the FITSIO error messages is FITSIO_ERR.
+*
+*     [optional_subroutine_items]...
 
-*  [optional_subroutine_items]...
+*  Copyright:
+*     Copyright (C) 1994 Science & Engineering Research Council.
+*     Copyright (C) 1995, 1998, 2000 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
@@ -71,9 +93,6 @@
 *     1-FEB-2000 (DSB):
 *        Enclose MSG_LOAD call in a new error reporting environment.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       

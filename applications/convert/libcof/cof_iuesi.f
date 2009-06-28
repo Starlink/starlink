@@ -61,12 +61,6 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
-*  Prior Requirements:
-*     -  The FITS file should already have been opened by FITSIO, and
-*     is in the HDU immediately prior to the BINTABLE extension that is
-*     going to define the NDF.
-*     [routine_prior_requirements]...
-
 *  Notes:
 *     Details of the conversion are:
 *     -  The primary data array of the FITS file becomes NDF main data
@@ -92,8 +86,35 @@
 *     NDF history records.
 *     - There is no support for FITS World Co-ordinate Systems.
 *     [routine_deficiencies]...
+*
+*     [optional_subroutine_items]...
 
-*  [optional_subroutine_items]...
+*  Prior Requirements:
+*     -  The FITS file should already have been opened by FITSIO, and
+*     is in the HDU immediately prior to the BINTABLE extension that is
+*     going to define the NDF.
+*     [routine_prior_requirements]...
+
+*  Copyright:
+*     Copyright (C) 1996, 1999, 2004 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
@@ -107,10 +128,7 @@
 *        Added FMTCNV to argument list for COF_STYPE call.
 *     2004 September 9 (TIMJ):
 *        Use CNF_PVAL
-*     {enter_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
+*     {enter_further_changes_here}
 
 *-
       

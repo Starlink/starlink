@@ -1,7 +1,7 @@
       SUBROUTINE COF_FTOPR(
      :   FUNIT, FILNAM, SAVEP, BLOCSZ, EXTN, STATUS )
 *+
-* Name:
+*  Name:
 *     COF_FTOPR
 
 *  Purpose:
@@ -35,7 +35,7 @@
 *     If the routine fails, STATUS is set to SAI__ERROR and a suitable
 *     message displayed. FITSIO message stack is cancelled often to avoid
 *     confusion over the HDU number quoted.
-* 
+
 *  Arguments:
 *     FUNIT = INTEGER (Given)
 *        Logical unit number associated with a FITS file.
@@ -60,14 +60,17 @@
 *        EXTN is returned = 1
 *     [routine_example]...
 
-*  Pitfalls:
-*     -  HDU numbering from 0 for the Primary HDU is not the convention
-*        used by the FITSIO library.
-*     [pitfall_description]...
-
 *  Notes:
 *     -  {noted_item}
 *     [routine_notes]...
+
+*  References:
+*     -  {reference}
+*     [routine_references]...
+
+*  Implementation Deficiencies:
+*     -  {deficiency}
+*     [routine_deficiencies]...
 
 *  External Routines Used:
 *     CFITSIO
@@ -80,19 +83,32 @@
 *        {routine_used}...
 *     [facility_or_package]...
 
-*  Implementation Deficiencies:
-*     -  {deficiency}
-*     [routine_deficiencies]...
-
-*  References:
-*     -  {reference}
-*     [routine_references]...
-
 *  Keywords:
 *     {routine_keywords}...
 
+*  Pitfalls:
+*     -  HDU numbering from 0 for the Primary HDU is not the convention
+*        used by the FITSIO library.
+*     [pitfall_description]...
+
 *  Copyright:
 *     Copyright (C) 2000 Central Laboratory of the Research Councils
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     AJC: Alan Chipperfield (Starlink, RAL)

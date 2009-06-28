@@ -11,10 +11,6 @@
 
 *  Invocation:
 *     CALL COF_EXTAB( STATUS )
-*
-*  Arguments:
-*     STATUS = INTEGER ({status_access_mode})
-*        The global status.
 
 *  Description:
 *     Obtains a value for the EXTABLE parameter and if set, opens the
@@ -127,9 +123,9 @@
 *        as comments and ignored.  An exception is a record starting with
 *        '#END', which may optionally be used to terminate the file.
 
-*  Pitfalls:
-*     -  {pitfall}
-*     [pitfall_description]...
+*  Arguments:
+*     STATUS = INTEGER ({status_access_mode})
+*        The global status.
 
 *  Notes:
 *     -  extension specifiers are separated by comma unless in [] or quotes.
@@ -137,6 +133,11 @@
 *        (single or double).
 *     -  Double quotes may appear in single quotes and vice versa.
 *     [routine_notes]...
+
+*  Implementation Deficiencies:
+*     -  Doesn't check for the same number of extension specifiers on each
+*        line.
+*     [routine_deficiencies]...
 
 *  External Routines Used:
 *     FIO
@@ -157,16 +158,31 @@
 *        CHR_SIMLR
 *        CHR_UCASE
 
-*  Implementation Deficiencies:
-*     -  Doesn't check for the same number of extension specifiers on each
-*        line.
-*     [routine_deficiencies]...
-
 *  Keywords:
 *     {routine_keywords}...
 
+*  Pitfalls:
+*     -  {pitfall}
+*     [pitfall_description]...
+
 *  Copyright:
 *     Copyright (C) 2000 Central Laboratory of the Research Councils
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     AJC: Alan J. Chipperfield (Starlink, RAL)

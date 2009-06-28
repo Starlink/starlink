@@ -28,7 +28,7 @@
 *     errors will have its data array transferred to the NDF's VARIANCE
 *     (after being squared).  In addition, FITS2NDF can restore NDFs
 *     converted to FITS by the sister task NDF2FITS.
-
+*
 *     Details of the supported formats and rules for processing them,
 *     and the general-case processing rules are described below.
 
@@ -78,7 +78,7 @@
 *        Specifies the HDS primitive data type of the NDF data and 
 *        variance arrays.  It should be one of the HDS primitive types
 *        or " ".
-
+*
 *        A blank value requests that the type be propagated from the 
 *        FITS (using the BITPIX keyword); or if FMTCNV is "TRUE", the 
 *        type is either _REAL or _DOUBLE depending on the precision 
@@ -193,6 +193,13 @@
 *     files will be propagated, regardless of the value of PROEXTS.
 *     -  Compressed FITS may be supplied.
 
+*  Implementation Deficiencies:
+*     - There is no propagation of arbitrary HISTORY cards in the FITS
+*     header to NDF history records.
+*     [routine_deficiencies]...
+*
+*     [optional_subroutine_items]...
+
 *  Special Formats:
 *     o  Compressed
 *        It can process both external and internal compressed FITS 
@@ -236,7 +243,7 @@
 *        to a SMURF extension, with the original names and structure
 *        contents.  Thus the global HISTORY present in each sub-file is 
 *        not duplicated in each SMURF-extension NDF.
-
+*
 *     o  IUE Final Archive LILO, LIHI, SILO, SIHI
 *
 *        See routine COF_IUESI for details.
@@ -275,12 +282,29 @@
 *        provided by the EXTABLE system - See routine COF_EXTAB for
 *        details.
 
-*  Implementation Deficiencies:
-*     - There is no propagation of arbitrary HISTORY cards in the FITS
-*     header to NDF history records.
-*     [routine_deficiencies]...
+*  Copyright:
+*     Copyright (C) 1994 Science & Engineering Research Council.
+*     Copyright (C) 1997-2004 Central Laboratory of the Research
+*     Councils. Copyright (C) 2006 Particle Physics & Astronomy
+*     Research Council. Copyright (C) 2007-2008 Science & Technology
+*     Facilities Council. All Rights Reserved.
 
-*  [optional_subroutine_items]...
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
@@ -372,9 +396,6 @@
 *        Added support for reading SMURF MEF files, ignoring duplicated
 *        HISTORY and AXIS information.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       

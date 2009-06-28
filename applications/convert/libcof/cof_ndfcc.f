@@ -32,8 +32,30 @@
 *     The curreent header and data unit must either be primary or an
 *     IMAGE extension.  The routine aborts with an error status if this
 *     requirement is not satisfied.
+*
+*     [optional_subroutine_items]...
 
-*  [optional_subroutine_items]...
+*  Copyright:
+*     Copyright (C) 1996 Central Laboratory of the Research Councils.
+*     Copyright (C) 2007 Science & Technology Facilities Council. All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     PWD: Peter W. Draper (JAC, Durham University)
@@ -45,10 +67,7 @@
 *     2007 July 11 (PWD):
 *        When extension has a symbolic type of IMAGE use that
 *        to override the XTENSION value (for compressed images).
-*     {enter_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
+*     {enter_further_changes_here}
 
 *-
       

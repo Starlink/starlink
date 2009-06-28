@@ -27,30 +27,46 @@
 *        {routine_example_description}
 *     [routine_example]...
 
-*  Pitfalls:
-*     -  {pitfall}
-*     [pitfall_description]...
-
 *  Notes:
 *     -  {noted_item}
 *     [routine_notes]...
 
-*  Prior Requirements:
-*     -  All insignificant spaces should have been removed from the extension
-*        specifiers
-*     [routine_prior_requirements]...
+*  Implementation Deficiencies:
+*     -  {deficiency}
+*     [routine_deficiencies]...
 
 *  External Routines Used:
 *     MERS
 *        MSG_SETC
 *        MSG_OUTIF
 
-*  Implementation Deficiencies:
-*     -  {deficiency}
-*     [routine_deficiencies]...
+*  Pitfalls:
+*     -  {pitfall}
+*     [pitfall_description]...
+
+*  Prior Requirements:
+*     -  All insignificant spaces should have been removed from the extension
+*        specifiers
+*     [routine_prior_requirements]...
 
 *  Copyright:
 *     Copyright (C) 2000 Central Laboratory of the Research Councils
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     AJC: Alan Chipperfield (Starlink, RAL)
@@ -64,6 +80,7 @@
 *  Bugs:
 *     -  {description_of_bug}
 *     {note_new_bugs_here}
+
 *-
 
 *  Type Definitions:

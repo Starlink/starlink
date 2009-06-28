@@ -70,12 +70,6 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
-*  Prior requirements:
-*     -  The FITS file should already have been opened by FITSIO, and
-*     is in the primary HDU.  The NDF must also exist.
-*     -  The HISTORY propagation assumes that the FITS HISTORY cards
-*     created by routine COF_WHISR have not been tampered.
-
 *  Notes:
 *     Details of the conversion are:
 *        -  The primary data array becomes the NDF's data array.  Any
@@ -98,6 +92,32 @@
 *        to store the primary data unit's headers.  The airlock
 *        will not contain any NDF-style HISTORY headers.
 
+*  Prior Requirements:
+*     -  The FITS file should already have been opened by FITSIO, and
+*     is in the primary HDU.  The NDF must also exist.
+*     -  The HISTORY propagation assumes that the FITS HISTORY cards
+*     created by routine COF_WHISR have not been tampered.
+
+*  Copyright:
+*     Copyright (C) 2008-2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
@@ -107,10 +127,7 @@
 *        Original version based upon COF_2DFIM.
 *     2009 June 26
 *        Restore correct logic for VARIANCE and QUALITY extensions.
-*     {enter__changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
+*     {enter_further_changes_here}
 
 *-
       

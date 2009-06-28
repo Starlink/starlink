@@ -22,7 +22,7 @@
 *     then stored back in the NDF (the NDF library will automatically
 *     remove any PIXEL, GRID and AXIS Frames from the FrameSet as these
 *     are generated afresh each time NDF_GTWCS is called).
-*    
+*
 *     The supplied FitsChan may contain more than one description (or
 *     "encoding") of the FrameSet to be added to the NDF, each 
 *     encoding using a different set of header cards. These encodings
@@ -73,6 +73,26 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
+*  Copyright:
+*     Copyright (C) 1997-1998, 2000-2001, 2003-2004 Central Laboratory
+*     of the Research Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -94,10 +114,7 @@
 *        of AST__BAD.
 *     27-AUG-2004 (DSB):
 *        - Added FITS-CLASS encoding.
-*     {enter_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
+*     {enter_further_changes_here}
 
 *-
 

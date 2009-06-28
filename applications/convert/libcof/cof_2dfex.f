@@ -47,14 +47,36 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
-*  Prior requirements:
+*  References:
+*     Bailey, J.A. 1996,97, 2dF Software Report 14, versions 0.3, 0.5.
+*
+*     [optional_subroutine_items]...
+
+*  Prior Requirements:
 *     -  A primary HDU unit exists in the FITS file, and the file is
 *     open.
 
-*  References:
-*     Bailey, J.A. 1996,97, 2dF Software Report 14, versions 0.3, 0.5.
+*  Copyright:
+*     Copyright (C) 1997-1998, 2004 Central Laboratory of the Research
+*     Councils. Copyright (C) 2006 Particle Physics & Astronomy
+*     Research Council. All Rights Reserved.
 
-*  [optional_subroutine_items]...
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -87,9 +109,6 @@
 *        Added WLEN column and additional keyword WLNSUSD for standard 
 *        FIBRE table.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       
