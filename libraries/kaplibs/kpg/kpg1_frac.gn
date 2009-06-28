@@ -163,6 +163,9 @@
 *        Revised the sparseness checking iteration, and added a check
 *        that the number of bins is not too few otherwise the routine
 *        reports that it cannot handle such data.
+*     2009 June 28 (MJC):
+*        Constrain the integer-valued or integer spaced tests further
+*        to exclude absolute values below 2.
 *     {enter_further_changes_here}
 
 *-
@@ -202,11 +205,6 @@
 
       INTEGER NLIMIT           ! Number of limits
       PARAMETER( NLIMIT = 2 )
-
-      REAL STATIC              ! Minimum change allowed in cliiping
-      PARAMETER( STATIC = 4.0 * VAL__EPSR ) ! fraction (twice precision
-                               ! for the difference of a pair and twice
-                               ! because average value is 0.5, not 1)
 
 *  Local Variables:
       <LTYPE> AVELIM           ! Average of data limits
@@ -253,6 +251,7 @@
       <LTYPE> RANGE            ! Data range
       REAL SCALE               ! Fractional range after clipping
       DOUBLE PRECISION SUM     ! Sum of histogram count
+      DOUBLE PRECISION TOL     ! Tolerance for integer value/increment
       LOGICAL TRIMED( NLIMIT ) ! Trimmed the histogram at either end?
       INTEGER UPPER            ! Index of upper limiting fraction
 
@@ -289,65 +288,69 @@
 *  point).  First the trivial case for integer data types.
       IF ( VAL__EPS<T> .EQ. 1 ) THEN
          INTVAL = .TRUE.
-      ELSE
 
 *  The extreme values must not exceed the integer dynamic range.
-         IF ( MAXV .GT. NUM_ITO<T>( VAL__MAXI ) .OR. 
-     :        MINV .LT. NUM_ITO<T>( VAL__MINI ) ) THEN
-            INTVAL = .FALSE.
-         ELSE
+      ELSE IF ( MAXV .GT. NUM_ITO<T>( VAL__MAXI ) .OR. 
+     :          MINV .LT. NUM_ITO<T>( VAL__MINI ) .OR.
+
+*  The extreme values must be inside +/-3.  This is to cater for small
+*  +/- dynamic values, but also the the integer increments, hence the
+*  wider range.
+     :          ABS( MAXV - MINV ) .GT. 3<CONST> ) THEN
+         INTVAL = .FALSE.
+      ELSE
 
 *  Test the pixel values until any is not an integer.  The test in fact
 *  has a wide margin of tolerance.  We are just trying to ensure that
 *  the histogram is not artificially sparse.  Therefore the limiting
 *  sparseness fraction is adequate.  This does break down for real
 *  values greater than about +/-8dex6 to the integer-value limits.
-            INTVAL = .TRUE.
-            I = 0
-            IF ( BAD ) THEN
-               DO WHILE ( INTVAL .AND. I .LT. EL )
-                  I = I + 1
-                  IF ( ARRAY( I ) .NE. VAL__BAD<T> ) THEN
-                     INTVAL = NUM_<T>TOD( NUM_ABS<T>( ARRAY( I ) -
-     :                        NUM_NINT<T>( ARRAY( I ) ) ) ) .LT. FILLIM
+         INTVAL = .TRUE.
+         TOL = 10<CONST> * NUM_<T>TOD( VAL__EPS<T> )
+         I = 0
+         IF ( BAD ) THEN
+            DO WHILE ( INTVAL .AND. I .LT. EL )
+               I = I + 1
+               IF ( ARRAY( I ) .NE. VAL__BAD<T> ) THEN
+                  INTVAL = NUM_<T>TOD( NUM_ABS<T>( ARRAY( I ) -
+     :                     NUM_NINT<T>( ARRAY( I ) ) ) ) .LT. TOL
 
 *  Hunt for the next non-bad value to compare the increments.
-                     NEXT = I + 1
-                     DO WHILE ( NEXT .LE. EL .AND. ARRAY( MIN( NEXT,
-     :                          EL ) ) .EQ. VAL__BAD<T> )
-                         NEXT = NEXT + 1
-                     END DO
+                  NEXT = I + 1
+                  DO WHILE ( NEXT .LE. EL .AND.
+     :                       ARRAY( MIN( NEXT, EL ) ) .EQ. VAL__BAD<T> )
+                     NEXT = NEXT + 1
+                  END DO
 
 *  Test the pixel values until any is not an integer increment from
 *  its non-bad neighbour (to identify integer data with a real constant
 *  added).  As in the first test, this has a wide margin of tolerance.
-                     IF ( NEXT .LE. EL ) THEN
-                        INCR = NUM_<T>TOD( NUM_ABS<T>( ARRAY( I ) -
-     :                         ARRAY( NEXT ) ) )
-                        INTVAL = INTVAL .OR. ( ABS( INCR -
-     :                           NINT( INCR ) ) .LT. FILLIM )
+                  IF ( NEXT .LE. EL ) THEN
+                     INCR = NUM_<T>TOD( NUM_ABS<T>( ARRAY( I ) -
+     :                      ARRAY( NEXT ) ) )
+                     INTVAL = INTVAL .OR. ( ABS( INCR -
+     :                        NINT( INCR ) ) .LT. TOL )
 
 * When all previous tests have succeeded, do not fail because the
 * last pixel is bad.
-                     ELSE
-                        INTVAL = .TRUE.
-                     END IF
+                  ELSE
+                     INTVAL = .TRUE.
                   END IF
-               END DO
+               END IF
+            END DO
 
 *  Make the test for integer data or increments more efficient if there
 *  are no bad pixels present.
-            ELSE
-               DO WHILE ( INTVAL .AND. I .LT. EL )
-                  I = I + 1
-                  INTVAL = NUM_<T>TOD( NUM_ABS<T>( ARRAY( I ) -
-     :                     NUM_NINT<T>( ARRAY( I ) ) ) ) .LT. FILLIM
-                  INCR = NUM_<T>TOD( NUM_ABS<T>( ARRAY( I ) -
-     :                   ARRAY( MIN( I + 1, EL ) ) ) )
-                  INTVAL = INTVAL .OR.
-     :                     ( ABS( INCR - NINT( INCR ) ) .LT. FILLIM )
-               END DO
-            END IF
+         ELSE
+            DO WHILE ( INTVAL .AND. I .LT. EL )
+               I = I + 1
+               INTVAL = NUM_<T>TOD( NUM_ABS<T>( ARRAY( I ) -
+     :                  NUM_NINT<T>( ARRAY( I ) ) ) ) .LT. TOL
+               INCR = NUM_<T>TOD( NUM_ABS<T>( ARRAY( I ) -
+     :                ARRAY( MIN( I + 1, EL ) ) ) )
+               INTVAL = INTVAL .OR.
+     :                  ( ABS( INCR - NINT( INCR ) ) .LT. TOL )
+            END DO
          END IF
       END IF
 
