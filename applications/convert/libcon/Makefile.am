@@ -8,9 +8,9 @@ libcon_la_SOURCES = \
 F_ROUTINES = \
  con_afhir.f con_angdc.f con_bitpx.f con_btypc.f con_caux.f  \
  con_caxes.f con_ccpy.f  con_d2nft.f con_dst2n.f con_faind.f \
- con_fkeyc.f con_ffrmt.f con_fitax.f con_ftype.f con_gexch.f \
- con_gexrm.f con_gkeyc.f con_gslic.f con_laxis.f con_lnear.f \
- con_mandh.f con_move.f  con_ndfcm.f con_pcard.f con_pfith.f \
+ con_ffrmt.f con_fitax.f con_ftype.f con_gexch.f \
+ con_gexrm.f con_gslic.f con_laxis.f \
+ con_mandh.f con_ndfcm.f con_pcard.f con_pfith.f \
  con_rgasp.f con_raux.f  con_raxes.f con_rgndf.f con_rccc.f  \
  con_rcpy.f  con_saxis.f con_sphea.f con_spcpy.f con_sphst.f \
  con_trcha.f con_typsz.f con_vaxis.f con_vcorr.f con_wfman.f \
@@ -40,7 +40,7 @@ WR_GEN_ROUTINES = con_cd2ix.gwr con_ci2dx.f
 DIR_GEN_ROUTINES = con_iaffx.gdir con_oaffx.gdir con_trndx.gdir
 
 ##  Double, real, logical and integer.
-DRLI_GEN_ROUTINES = con_fkeyx.gdrli con_gkeyx.gdrli
+DRLI_GEN_ROUTINES =
 
 ##  All numeric types.
 N_GEN_ROUTINES = con_ifufx.gn con_iudax.gn con_ofufx.gn con_oudax.gn
