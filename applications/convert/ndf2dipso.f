@@ -107,7 +107,9 @@
 *     1992 September 22 (MJC):
 *        Added Notes and a section on how to create the input file.
 *     2004 September 9 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2009 June 29 (MJC):
+*        Used revised CON_DIPWR API.
 *     {enter_further_changes_here}
 
 *-
@@ -243,8 +245,7 @@
       CALL CON_DIPWR( UNIT, TITLE, NPTS, %VAL(CNF_PVAL(DATPTR)), 
      :                %VAL(CNF_PVAL(AXPTR)),
      :                %VAL(CNF_PVAL(FLXPTR)), %VAL(CNF_PVAL(WAVPTR)), 
-     :                BAD, BREAK, MAXBRK,
-     :                STATUS )
+     :                BAD, MAXBRK, BREAK, STATUS )
 
 *   Cancel the ADAM parameter OUT and deactivate FIO.
       CALL FIO_CANCL ('OUT', STATUS)
