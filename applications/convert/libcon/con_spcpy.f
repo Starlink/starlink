@@ -5,7 +5,7 @@
 *     CON_SPCPY
 
 *  Purpose:
-*     Copy the arrays of a SPECX map into a simple data cube.
+*     Copies the arrays of a SPECX map into a simple data cube.
 
 *  Language:
 *     Fortran 77.
@@ -41,9 +41,30 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
+*  Copyright:
+*     Copyright (C) 1997, 2003 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
 *  Authors:
 *     ACD: A C Davenhall (Edinburgh)
 *     DSB: David S Berry (STARLINK)
+*     {enter_new_authors_here}
 
 *  History:
 *     25-JUN-1997 (ACD): 
@@ -53,9 +74,8 @@
 *     27-FEB-2003 (DSB):
 *        Re-format. Flip the output vertically. Change axis ordering to 
 *        make the spectral axis the third axis in the output cube.
+*     {enter_further_changes_here}
 
-*  Bugs:
-*     None known
 *-
 
 *  Type Definitions:
@@ -80,31 +100,33 @@
       INTEGER STATUS            ! Global status
 
 *  Local Variables:
-      INTEGER CSPEC             ! Number of the current spectrum.
-      INTEGER LOOPS             ! Loop index in the current spectrum.
-      INTEGER LOOPX             ! X loop index in the map grid.
-      INTEGER LOOPY             ! Y  "     "   "   "   "   "  .
-      INTEGER OUTY              ! Y  "     "   "    output cube.
+      INTEGER CSPEC             ! Number of the current spectrum
+      INTEGER LOOPS             ! Loop index in the current spectrum
+      INTEGER LOOPX             ! X loop index in the map grid
+      INTEGER LOOPY             ! Y loop index in the map grid
+      INTEGER OUTY              ! Y loop index in the output cube
+
 *.
 
 *  Check the inherited status.
-      IF( STATUS .NE. SAI__OK ) RETURN
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Examine every point in the map grid and check whether there is a 
 *  spectrum there or not.
       DO LOOPY = 1, MAPY
 
 *  The SPECX map creation code has a bug which causes the rows to be
-*  flipped vertically. JACH prefer that SPECX2NDF should undo the effect
-*  of this bug, rather than fixing the bug within SPECX (presumably the SPECX 
-*  map reading code also undoes the effect of the bug). Store the row
-*  index within the output at which to store this input row.
+*  flipped vertically.  JACH prefer that SPECX2NDF should undo the
+*  effect of this bug, rather than fixing the bug within SPECX
+*  (presumably the SPECX map-reading code also undoes the effect of the
+*  bug).  Store the row index within the output at which to store this
+*  input row.
          OUTY = MAPY - LOOPY + 1
 
          DO LOOPX = 1, MAPX
             CSPEC = MAP( LOOPX, LOOPY )
 
-            IF( CSPEC .GE. 1  .AND.  CSPEC .LE. NSPEC ) THEN
+            IF ( CSPEC .GE. 1  .AND.  CSPEC .LE. NSPEC ) THEN
 
 *  There is a genuine spectrum; copy it to the cube.
                DO LOOPS = 1, SPSIZE

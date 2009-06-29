@@ -1,23 +1,28 @@
-      SUBROUTINE CON_VAXIS (SPECTM, DOPPLR, VCORR, FCEN, FINC, FREST,
-     :  NPTS, AXIS, STATUS)
+      SUBROUTINE CON_VAXIS( SPECTM, DOPPLR, VCORR, FCEN, FINC, FREST,
+     :                      NPTS, AXIS, STATUS)
 *+
 *  Name:
 *     CON_VAXIS
+
 *  Purpose:
-*     Compute the spectral axis.
+*     Fills the spectral axis.
+
 *  Language:
 *     Fortran 77.
+
 *  Invocation:
-*     CALL CON_VAXIS (SPECTM, DOPPLR, VCORR, FCEN, FINC, FREST, NPTS;
-*       AXIS; STATUS)
+*     CALL CON_VAXIS( SPECTM, DOPPLR, VCORR, FCEN, FINC, FREST, NPTS;
+*                     AXIS; STATUS)
+
 *  Description:
 *     Compute the spectral axis.
+
 *  Arguments:
 *     SPECTM  =  CHARACTER*(*) (Given)
 *        Flag indicating whether the spectral axis is to be expressed
 *        as a frequency or a radial velocity.  The options are:
 *        FREQUENCY  -  frequency in KHz,
-*        VELOCITY   -  radial velocity in Km/sec.
+*        VELOCITY   -  radial velocity in km/sec.
 *     DOPPLR  =  CHARACTER*(*) (Given)
 *        Flag indicating whether the radial velocity is to be computed
 *        using the classical or relativistic formula.  The options are:
@@ -27,7 +32,7 @@
 *        frequency.
 *     VCORR  =  REAL (Given)
 *        Computed radial velocity correction to the chosen standard of
-*        rest (Km/sec).  Positive values indicate recession.
+*        rest (km/sec).  Positive values indicate recession.
 *     FCEN  =  REAL (Given)
 *        Central frequency (Hz).
 *     FINC  =  REAL (Given)
@@ -37,9 +42,10 @@
 *     NPTS  =  INTEGER (Given)
 *        Number of points in the axis.
 *     AXIS(NPTS)  =  REAL (Returned)
-*        Central radial velocity of each point in the axis (Km/sec).
+*        Central radial velocity of each point in the axis (km/sec).
 *     STATUS  =  INTEGER (Given and Returned)
 *        The global status.
+
 *  Algorithm:
 *     Compute the start frequency.
 *     Compute the rest wavelength.
@@ -58,108 +64,122 @@
 *         the correction to the standard of rest.
 *       end if
 *     end for
+
+*  Copyright:
+*     Copyright (C) 1997 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
 *  Authors:
 *     ACD: A C Davenhall (Edinburgh)
+*     MJC: Malcolm J. Currie (Starlink)
+*     {enter_new_authors_here}
+
 *  History:
-*     27/6/97 (ACD): Original version.
-*     14/8/97 (ACD): First stable version.
-*  Bugs:
-*     None known
+*     27/6/97 (ACD):
+*        Original version.
+*     14/8/97 (ACD):
+*        First stable version.
+*     2009 June 29 (MJC):
+*        Used modern coding style.
+*     {enter_further_changes_here}
+
 *-
+
 *  Type Definitions:
       IMPLICIT NONE
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'           ! Standard Starlink constants.
+
 *  Arguments Given:
-      CHARACTER
-     :  SPECTM*(*),
-     :  DOPPLR*(*)
-      REAL
-     :  VCORR,
-     :  FCEN,
-     :  FINC,
-     :  FREST
-      INTEGER
-     :  NPTS
+      CHARACTER*(*) SPECTM
+      CHARACTER*(*) DOPPLR
+      REAL VCORR
+      REAL FCEN
+      REAL FINC
+      REAL FREST
+      INTEGER NPTS
+
 *  Arguments Returned:
-      REAL
-     :  AXIS(NPTS)
+      REAL AXIS( NPTS )
+
 *  Status:
-      INTEGER STATUS             ! Global status.
+      INTEGER STATUS             ! Global status
+
 *  Local Constants:
-      REAL C      ! Speed of light (m/sec).
+      REAL C                     ! Speed of light (m/sec)
       PARAMETER (C = 2.99792458E8)
+
 *  Local Variables:
-      INTEGER
-     :  LOOP      ! Loop index.
-      REAL
-     :  FSTART,   ! Start frequency.
-     :  WREST,    ! Rest wavelength of the line.
-     :  FPT,      ! Frequency of the current point.
-     :  WPT,      ! Wavelength of the current point.
-     :  VOBSPT    ! Observed radial velocity (Km/sec).
-      DOUBLE PRECISION
-     :  RWRST2,   ! Squared, reciprocal rest   wavelength.
-     :  RWOBS2    !    "         "      current    "     .
+      REAL FPT                   ! Frequency of the current point
+      REAL FSTART                ! Start frequency
+      INTEGER LOOP               ! Loop index
+      DOUBLE PRECISION RWOBS2    ! Squared, reciprocal current
+                                 ! wavelength
+      DOUBLE PRECISION RWRST2    ! Squared, reciprocal rest wavelength
+      REAL WPT                   ! Wavelength of the current point
+      REAL WREST                 ! Rest wavelength of the line
+      REAL VOBSPT                ! Observed radial velocity (kM/sec)
+
 *.
 
-      IF (STATUS .EQ. SAI__OK) THEN
+*  Check the global inherited status.
+      IF ( STATUS .EQ. SAI__OK ) THEN
 
-*
-*       Compute the start frequency.
+*  Compute the start frequency.
+         FSTART = FCEN - ( REAL( ( NPTS / 2 ) + 1 ) * FINC )
 
-         FSTART = FCEN - (REAL( (NPTS/2) + 1 ) * FINC)
-
-*
-*       Compute the rest wavelength.
-
+*  Compute the rest wavelength.
          WREST = C / FREST
 
-*
-*       Compute the value of each point in the axis.
-
+*  Compute the value of each point in the axis.
          DO LOOP = 1, NPTS
 
-*
-*          Compute the frequency of the point.
+*  Compute the frequency of the point.
+            FPT = FSTART +( REAL(LOOP) * FINC)
 
-            FPT = FSTART + (REAL(LOOP) * FINC)
-
-*
-*          If frequency units are required then set the axis value to
-*          the frequency just computed.  Otherwise compute the radial
-*          velocity.  In the former case the frequency is converted
-*          from Hz to KHz.
-
-            IF (SPECTM(1 : 1) .EQ. 'F') THEN
-               AXIS(LOOP) = FPT / 1.0E3
+*  If frequency units are required then set the axis value to the
+*  frequency just computed.  Otherwise compute the radial velocity.  In
+*  the former case the frequency is converted from Hz to KHz.
+            IF ( SPECTM(1 : 1) .EQ. 'F' ) THEN
+               AXIS( LOOP ) = FPT / 1.0E3
 
             ELSE
 
-*
-*             First compute the corresponding wavelength.
-
+*  First compute the corresponding wavelength.
                WPT = C / FPT
 
-*
-*             Compute the classical or relativistic radial velocity
-*             (remembering to convert it from m/sec to Km/sec.
-
-               IF (DOPPLR(1 : 1) .EQ. 'C') THEN
-                  VOBSPT = C * (WPT - WREST) / (WPT * 1.0E3)
+*  Compute the classical or relativistic radial velocity (remembering to
+*  convert it from m/sec to km/sec.
+               IF ( DOPPLR(1 : 1) .EQ. 'C' ) THEN
+                  VOBSPT = C * ( WPT - WREST ) / ( WPT * 1.0E3 )
                ELSE
-                  RWRST2 = 1.0D0 / (DBLE(WREST) * DBLE(WREST))
-                  RWOBS2 = 1.0D0 / (DBLE(WPT) * DBLE(WPT))
+                  RWRST2 = 1.0D0 / (DBLE( WREST ) * DBLE( WREST ) )
+                  RWOBS2 = 1.0D0 / (DBLE( WPT ) * DBLE( WPT ) )
 
-                  VOBSPT = C * SNGL( 
-     :              (RWRST2 - RWOBS2) / (RWRST2 + RWOBS2) ) / 1.0E3
+                  VOBSPT = C * SNGL( ( RWRST2 - RWOBS2 ) /
+     :                     ( RWRST2 + RWOBS2 ) ) / 1.0E3
                END IF
 
-*
-*             Set the axis value to the observed velocity correction
-*             minus the correction to the standard of rest.
-
-               AXIS(LOOP) = VOBSPT - VCORR
+*  Set the axis value to the observed velocity correction minus the
+*  correction to the standard of rest.
+               AXIS( LOOP ) = VOBSPT - VCORR
 
             END IF
 

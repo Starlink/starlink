@@ -32,9 +32,6 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
-*  Prior Requirements:
-*     The IRAF image file must be open for write access.
-
 *  External Routines Used:
 *     ADLINE() is a routine written in SPP, the IRAF programming
 *     language, which does the job of adding the header lines to the
@@ -44,9 +41,32 @@
 *
 *     This routine acts as a buffer for passing the array to the SPP
 *     routine.
-*     
+*
 *        adline()
 *     SPP program from NOAO.
+
+*  Prior Requirements:
+*     The IRAF image file must be open for write access.
+
+*  Copyright:
+*     Copyright (C) 1992 Science & Engineering Research Council. All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     RAHM: Rhys Morris (STARLINK, University of Wales, Cardiff)
@@ -60,9 +80,6 @@
 *        Renamed from ADDFITS to be moved to the CONVERT library.  Also
 *        made to adhere to SGP/16 rules.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       

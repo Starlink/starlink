@@ -20,7 +20,7 @@
 *     written as FITS-like headers in the ASCII or binary file using
 *     their corresponding FITS keywords.  A record of which items have
 *     been set is returned.
-*
+
 *  Arguments:
 *     NDF = INTEGER (Given)
 *        The identifier of the NDF.
@@ -55,7 +55,7 @@
 *        -  The standard order of the FITS keywords is preserved.
 *           No FITS comments are written following the values of the
 *           above exceptions.
-
+*
 *     -  An extra header record with keyword UNSIGNED and logical value
 *     T is added when the array data type is one of the HDS unsigned
 *     integer types.  This is done because standard FITS does not
@@ -65,6 +65,28 @@
 
 *  Prior Requirements:
 *     The ASCII file must be open for write access.
+
+*  Copyright:
+*     Copyright (C) 1992 Science & Engineering Research Council.
+*     Copyright (C) 1996, 2004 Central Laboratory of the Research
+*     Councils. Copyright (C) 2008 Science & Technology Facilities
+*     Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -82,9 +104,6 @@
 *     2008 March 15 (MJC):
 *        Use KAPLIBS routines instead of their cloned CON equivalents.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       

@@ -24,7 +24,6 @@
 *     the output NDF. See SUN/55 for details.
 
 *  Arguments:
-
 *     BDF = CHARACTER*(*) (Given)
 *        The input BDF parameter name.
 *     NDF = INTEGER (Given)
@@ -60,6 +59,26 @@
 *     Truncated logical and numeric descriptors have a comment string
 *     in the FITS card image indicating the fact.  Truncated characted
 *     strings are indicated by an ellipsis following the value.
+
+*  Copyright:
+*     Copyright (C) 1990-1992 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     JM: Jo Murray (STARLINK)
@@ -97,14 +116,14 @@
 *        Rotated axes are flagged as not being present, as these cannot
 *        be handled by the NDF in a standard way.
 *     {enter_further_changes_here}
-*
+
 *  Bugs:
 *     -  May give spurious error messages if running under ICL. This
 *     happens if a non-existent BDF is given as the input file.
 *     A subsequent invocation of the program may result in a repeat
 *     of the error message although the conversion is carried out
 *     correctly.
-*     {note_bugs_here}
+*     {note_new_bugs_here}
 
 *-
       

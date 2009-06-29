@@ -2,14 +2,19 @@
 *+
 *  Name:
 *     CON_LAXIS
+
 *  Purpose:
 *     Compute a linear axis.
+
 *  Language:
 *     Fortran 77.
+
 *  Invocation:
 *     CALL CON_LAXIS (ZEROPT, SCALE, NPTS; AXIS; STATUS)
+
 *  Description:
 *     Compute a linear axis, given a zero point and a scale factor.
+
 *  Arguments:
 *     ZEROPT  =  REAL (Given)
 *        Zero point.
@@ -18,19 +23,47 @@
 *     NPTS  =  INTEGER (Given)
 *        Number of points in the axis.
 *     AXIS(NPTS)  =  REAL (Returned)
-*        Central radial velocity of each point in the axis (Km/sec).
+*        Central radial velocity of each point in the axis (km/sec).
 *     STATUS  =  INTEGER (Given and Returned)
 *        The global status.
+
 *  Algorithm:
 *     For each point in the axis
 *       Compute the axis value.
 *     end for
+
+*  Copyright:
+*     Copyright (C) 1997 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
 *  Authors:
 *     ACD: A C Davenhall (Edinburgh)
+*     {enter_new_authors_here}
+
 *  History:
 *     3/9/97 (ACD): Original version.
+*     {enter_further_changes_here}
+
 *  Bugs:
 *     None known
+*     {note_new_bugs_here}
+
 *-
 *  Type Definitions:
       IMPLICIT NONE

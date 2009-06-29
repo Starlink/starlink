@@ -1,5 +1,5 @@
       SUBROUTINE CON_DST2N( FIGFIL, NDFFIL, FORM, NLEV, PATH, STATUS )
-*+ 
+*+
 *  Name:
 *     CON_DST2N
 
@@ -21,7 +21,7 @@
 *     appropriate object in the output file, whose format corresponds 
 *     to that described in SGP/38 and which is used by Version 3 of 
 *     Figaro.  
-
+*
 *     Non-standard objects will be copied to the .MORE.FIGARO extension.
 *     FITS items will be copied to the .MORE.FITS extension.  
 
@@ -49,8 +49,8 @@
 *        performed OK.  Non zero codes will be DSA package error codes.
 *        If an error occurs, this routine will have output a detailed
 *        description before returning.
-
-*  Format-conversion Rules:
+*
+*     Format-conversion Rules:
 *     .Z.DATA  ->        .DATA_ARRAY.DATA (when FORM = "SIMPLE")
 *     .Z.DATA  ->        .DATA_ARRAY (when FORM = "PRIMITIVE")
 *     .Z.ERRORS ->       .VARIANCE.DATA (after processing when
@@ -75,7 +75,7 @@
 *     .X.xxxx    ->      .AXIS[1].MORE.FIGARO.xxxx
 *     (Similarly for .Y .T .U .V or .W structures which are renamed to
 *     AXIS[2], ..., AXIS[6] in the NDF.)
-
+*
 *     .OBS.OBJECT   ->   .TITLE
 *     .OBS.SECZ    ->    .MORE.FIGARO.SECZ
 *     .OBS.TIME    ->    .MORE.FIGARO.TIME
@@ -87,12 +87,12 @@
 *     .FITS.xxxx.DESCRIPTION -> .MORE.FITS(n)
 *                                      ( "   comment "   "   "   "   )
 *     .FITS.xxxx.yyyy -> .MORE.FITS(n) (in blank-keyword hierarchical)
-
+*
 *     .MORE.xxxx    ->   .MORE.xxxx
-
+*
 *     .TABLE   ->        .MORE.FIGARO.TABLE
 *     .xxxx    ->        .MORE.FIGARO.xxxx
-
+*
 *     -  Axis arrays with dimensionality greater than one are not
 *     supported by the NDF.  Therefore, if the application encounters
 *     such an axis array, it processes the array using the following
@@ -104,25 +104,46 @@
 *     .X.ERRORS  ->      .AXIS[1].MORE.FIGARO.VARIANCE (after
 *                        processing)
 *     .X.WIDTH   ->      .AXIS[1].MORE.FIGARO.WIDTH
-
+*
 *     -  In addition to creating a blank-keyword NDF FITS-extension
 *     header for each component of a non-standard DST FITS structure
 *     (.FITS.xxxx.yyyy where yyyy is not DATA or DESCRIPTION), this set
 *     of related headers are bracketed by blank lines and a comment
 *     containing the name of the structure (i.e. xxxx).
-
-*  Bad-pixel handling:
+*
+*     Bad-pixel handling:
 *     The QUALITY array is only copied if the bad-pixel flag
 *     (.Z.FLAGGED) is false or absent.  A simple NDF with the bad-pixel
 *     flag set to false (meaning that there are no bad-pixels present)
 *     is created when .Z.FLAGGED is absent or false and FORM = "SIMPLE".
 
-*  Authors: 
+*  Copyright:
+*     Copyright (C) 1988, 1990-1993 Science & Engineering Research
+*     Council. Copyright (C) 1995-1996, 2004 Central Laboratory of the
+*     Research Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
+*  Authors:
 *     JM: Jo Murray (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
-     
+
 *  History:
 *     21st June 1988 (JM):
 *        Original version.
@@ -210,9 +231,6 @@
 *     2004 September 9 (TIMJ):
 *        Use CNF_PVAL.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       

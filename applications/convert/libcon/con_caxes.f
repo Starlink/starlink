@@ -4,7 +4,7 @@
 *     CON_CAXES
 
 *  Purpose:
-*     Construct the NDF axis components for a SPECX data cube.
+*     Constructs the NDF axis components for a SPECX data cube.
 
 *  Language:
 *     Fortran 77.
@@ -31,6 +31,27 @@
 *     STATUS  =  INTEGER( Given and Returned )
 *        The global status.
 
+*  Copyright:
+*     Copyright (C) 1997, 2003-2004 Central Laboratory of the Research
+*     Councils. Copyright (C) 2008 Science & Technology Facilities
+*     Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
 *  Authors:
 *     ACD: A C Davenhall (Edinburgh)
 *     DSB: David S. Berry (STARLINK)
@@ -38,9 +59,9 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     25/6/97( ACD ): 
+*     25/6/97 (ACD):
 *        Original version.
-*     14/8/97( ACD ): 
+*     14/8/97 (ACD):
 *        First stable version.
 *     17-FEB-2003 (DSB):
 *        Re-written to derived the AXIS values from the WCS component of
@@ -105,6 +126,7 @@
       REAL POSANG         ! Position angle of Y axis in input map
 
       DATA LA / 'LABEL(1)', 'LABEL(2)', 'LABEL(3)' /
+
 *.
 
 *  Check the inherited status.
@@ -234,15 +256,15 @@
 
 *  Now add units and initialise the starting text for the labels.
             INCSYM = .FALSE.
-            IF( I .EQ. 3 ) THEN
+            IF ( I .EQ. 3 ) THEN
                CALL NDF_ACPUT( 'GHz', INDF, 'UNITS', I, STATUS )
                TEXT = 'Frequency '
                IAT = 10
             ELSE 
                CALL NDF_ACPUT( 'arcsec', INDF, 'UNITS', I, STATUS )
-               IF( POSANG .NE. 0.0 ) THEN
+               IF ( POSANG .NE. 0.0 ) THEN
                   INCSYM = .TRUE.
-                  IF( I .EQ. 2 ) THEN
+                  IF ( I .EQ. 2 ) THEN
                      TEXT = 'X '
                      IAT = 2
                   ELSE
@@ -250,7 +272,7 @@
                      IAT = 2
                   END IF
                ELSE
-                  IF( I .EQ. 1 ) THEN
+                  IF ( I .EQ. 1 ) THEN
                      TEXT = 'RA '
                      IAT = 3
                   ELSE
@@ -265,7 +287,7 @@
             CALL CHR_APPND( 'offset from', TEXT, IAT )
             IAT = IAT + 1
 	    
-            IF( INCSYM ) THEN
+            IF ( INCSYM ) THEN
                CALL CHR_APPND( AST_GETC( IWCS, LA( I ), STATUS ),
      :                         TEXT, IAT )
                IAT = IAT + 1

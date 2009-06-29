@@ -3,21 +3,21 @@
 *+
 *  Name:
 *     CON_GHSTD
- 
+
 *  Purpose:
 *     Calculates the histogram of an array of data.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
-*  Invocation
+*
+*     Invocation
 *     CALL CON_GHSTD( BAD, DIM, ARRAY, NUMBIN, VALMAX, VALMIN, HIST,
-*    :                 STATUS )
- 
+*     :                 STATUS )
+
 *  Description:
 *     This routine calculates the truncated histogram of an array of
 *     data between defined limits and in a defined number of bins.
- 
+
 *  Arguments:
 *     BAD = LOGICAL (Given)
 *        If .TRUE., bad pixels will be processed.  This should not be
@@ -38,18 +38,39 @@
 *        Array containing the histogram.
 *     STATUS = INTEGER (Given and Returned)
 *        Global status value.
- 
+
 *  Algorithm:
 *     - Compute the scale factor
 *     - For all array elements, check whether the value is within the
 *     range of the histogram, and if it is compute its bin number. Check
 *     for bad pixels if requested.
- 
+
+*  Copyright:
+*     Copyright (C) 1990-1991 Science & Engineering Research Council.
+*     Copyright (C) 1996, 1999 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     AJC: Alan J. Chipperfield (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     1990 July 19 (MJC):
 *        Original version.
@@ -66,10 +87,7 @@
 *        Removed use of NUM_ conversions
 *        and IF on binsize calculation (as no longer generic)
 *     {enter_further_changes_here}
- 
-*  Bugs:
-*     {note_new_bugs_here}
- 
+
 *-
  
 *  Type Definitions:

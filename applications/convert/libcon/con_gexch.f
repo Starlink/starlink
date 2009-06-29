@@ -33,15 +33,37 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
+*  Implementation Deficiencies:
+*     -  This version uses the UNIX path delimiter explictely, until
+*     there is PSX routine to do this.
+*
+*     [optional_subroutine_items]...
+
 *  Prior Requirements:
 *     The output group must already exist; it is not created by this
 *     routine.
 
-*  Implementation Deficiencies:
-*     -  This version uses the UNIX path delimiter explictely, until
-*     there is PSX routine to do this.
+*  Copyright:
+*     Copyright (C) 1994 Science & Engineering Research Council.
+*     Copyright (C) 1995, 2000 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
 
-*  [optional_subroutine_items]...
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
@@ -55,9 +77,6 @@
 *     7-MAR-2000 (DSB):
 *        Set STATUS to SAI__ERROR when reporting new errors.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       

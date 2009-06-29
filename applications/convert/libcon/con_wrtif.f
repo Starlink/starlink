@@ -1,19 +1,19 @@
       SUBROUTINE CON_WRTIF( EL, IMAGE, DIMS, FLEN, FIOD, MINI, MAXI, 
      :                      OIMAGE, STATUS )
-*+ 
+*+
 *  Name:
 *     CON_WRTIF
- 
+
 *  Purpose:
 *     Writes the TIFF file.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL CON_WRTIF( EL, IMAGE, DIMS, FLEN, FIOD, MINI, MAXI,
 *                     OIMAGE, STATUS )
- 
+
 *  Description:
 *     This routine writes a TIFF file for NDF2TIFF.  Given the range
 *     of the data it generates a value to scale the data to the 0--255 
@@ -48,12 +48,32 @@
 *     STATUS = INTEGER ( Given and Returned )
 *        The global status.
 
+*  Copyright:
+*     Copyright (C) 1995-1996, 1999 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     AJC: Alan J. Chipperfield (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     22-NOV-1995 (GJP):
 *        Original version.
@@ -65,9 +85,6 @@
 *        Use 256 not 255 in calculating scale factor
 *     {enter_further_changes_here}
 
-*  Bugs:
-*     {note_any_bugs_here}
- 
 *-
  
 *  Type Definitions:

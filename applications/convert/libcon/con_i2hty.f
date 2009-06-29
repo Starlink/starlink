@@ -15,10 +15,6 @@
 *  Invocation:
 *     CALL CON_I2HTY( INTTYP, HDSTYP, STATUS )
 
-*  Description:
-*     Converts an Interim character data type, e.g. SW, to its HDS
-*     form, e.g. _WORD.
-
 *  Arguments:
 *     INTTYP = CHARACTER * 2 (Given)
 *        The Interim data type: SB, SW, SL, DP, R, UB, UW.  If it is
@@ -30,6 +26,30 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
+*  Description:
+*     Converts an Interim character data type, e.g. SW, to its HDS
+*     form, e.g. _WORD.
+
+*  Copyright:
+*     Copyright (C) 1992 Science & Engineering Research Council. All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
@@ -37,10 +57,7 @@
 *  History:
 *     1992 February 4 (MJC):
 *        Original version.
-*     {enter_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
+*     {enter_further_changes_here}
 
 *-
       

@@ -3,17 +3,17 @@
 *+
 *  Name:
 *     CON_HSTFx
- 
+
 *  Purpose:
 *     Finds values corresponding to specified fractions of an histogram.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL CON_HSTFx( NUMBIN, HISTOG, MAXMUM, MINMUM, NFRAC, FRAC,
 *                      VALUES, STATUS )
- 
+
 *  Description:
 *     This routine finds the values at defined fractions of an
 *     histogram.  Thus to find the lower-quartile value, the fraction
@@ -21,7 +21,7 @@
 *     sorting the whole array, the result may not be exactly correct.
 *     An histogram with a large number of bins, and the use of linear
 *     interpolation between bins in the routine reduce the error.
- 
+
 *  Arguments:
 *     NUMBIN = INTEGER (Given)
 *        The number of histogram bins.  The larger the number of bins
@@ -43,7 +43,7 @@
 *        the histogram.
 *     STATUS = INTEGER (Given & Returned)
 *        Global status value.
- 
+
 *  Algorithm:
 *     -  Compute number of points forming the histogram.  Sort the
 *     fractions. Decide whether to forward or reverse search.
@@ -58,12 +58,33 @@
 *        pixel sum.
 *        o Value corresponding to current point is stored in output
 *        array by evaluation of the histogram
- 
+
+*  Copyright:
+*     Copyright (C) 1991-1992, 1994 Science & Engineering Research
+*     Council. Copyright (C) 1995, 1999 Central Laboratory of the
+*     Research Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
 *     AJC: Alan J. Chipperfield (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     1991 November 13 (MJC):
 *        Original version based on HSTFR.  Uses double precision limits
@@ -85,10 +106,7 @@
 *        Copied and renamed from KAPPA KPG1_HSTFD
 *        Remove use of NUM_ conversion
 *     {enter_further_changes_here}
- 
-*  Bugs:
-*     {note_any_bugs_here}
- 
+
 *-
  
 *  Type Definitions:
