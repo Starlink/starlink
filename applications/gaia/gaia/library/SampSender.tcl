@@ -60,6 +60,12 @@ itcl::class gaia::SampSender {
       eval configure $args
    }
 
+   destructor {
+      if { $temp_files_ != {} } {
+         $temp_files_ clear
+      }
+   }
+
    #  Methods:
    #  --------
 
@@ -97,7 +103,12 @@ itcl::class gaia::SampSender {
          }
 
          #  Attempt the write and send.
-         set tmpfile [get_temp_file_ ".fits"]
+         if { $temp_files_ == {} } {
+            set temp_files_ [gaia::GaiaTempName \#auto \
+                                -prefix "GaiaTempImage" \
+                                -type ".fits" -exists 0]
+         }
+         set tmpfile [$temp_files_ get_name]
          set tidy_code "::file delete $tmpfile"
          if { [catch {
             $image dump $tmpfile FITS-WCS
@@ -211,38 +222,11 @@ itcl::class gaia::SampSender {
       return "file://localhost$file"
    }
 
-   #  Get the name of a file it's OK to use for scratch space.
-   #  The exten argument gives a file extension (e.g. ".fits").
-   protected proc get_temp_file_ {exten} {
-      set tmpdir ""
-      if { [info exists ::env(GAIA_TEMP_DIR)] } {
-         set trydirs "$::env(GAIA_TEMP_DIR) /tmp /usr/tmp ."
-      } else {
-         set trydirs "/tmp /usr/tmp ."
-      }
-      foreach trydir $trydirs {
-         if {[file isdirectory $trydir] && [file writable $trydir]} {
-            set tmpdir $trydir
-            break
-         }
-      }
-      if { $tmpdir == "" } {
-         error "No temporary directory"
-      }
-
-      set basefile "${tmpdir}/gaia_temp_"
-      for { set ix 1 } { $ix < 100 } { incr ix } {
-         set tryfile "$tmpdir/gaia_temp_$ix$exten"
-         if {! [file exists $tryfile] } {
-            return $tryfile
-         }
-      }
-      error "No free files with name like $tryfile"
-   }
-
    #  Instance Variables:
    #  -------------------
 
    #  Set this to a SampClient object to make this object ready for use.
    public variable samp_client {}
+
+   private variable temp_files_ {}
 }

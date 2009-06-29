@@ -50,6 +50,12 @@
 
 itcl::class gaia::GaiaSampAgent {
 
+   destructor {
+      if { $temp_files_ != {} } {
+         $temp_files_ clear
+      }
+   }
+
    #  Standard method listing MTypes implemented by this class.
    public method get_subscribed_mtypes {} {
       return {
@@ -131,7 +137,12 @@ itcl::class gaia::GaiaSampAgent {
       set table_id [get_param_ params table-id $url]
       set table_name [get_param_ params name ""]
 
-      set tst_file [get_temp_file_ .TAB]
+      if { $temp_files_ == {} } {
+         set temp_files_ [gaia::GaiaTempName \#auto \
+                             -prefix "GaiaTempTst" \
+                             -type ".TAB" -exists 0]
+      }
+      set tst_file [$temp_files_ get_name]
       exec $::gaia_dir/vot2tab $url 0 $tst_file
       if {! [file exists $tst_file]} {
          error "VOTable conversion failed"
@@ -249,35 +260,6 @@ itcl::class gaia::GaiaSampAgent {
       }
    }
 
-   #  Get the name of a file it's OK to use for scratch space.
-   #  The exten argument gives a file extension (e.g. ".fits").
-   protected proc get_temp_file_ {exten} {
-      set tmpdir ""
-      if { [info exists ::env(GAIA_TEMP_DIR)] } {
-         set trydirs "$::env(GAIA_TEMP_DIR) /tmp /var/tmp ."
-      } else {
-         set trydirs "/tmp /var/tmp ."
-      }
-      foreach trydir $trydirs {
-         if {[file isdirectory $trydir] && [file writable $trydir]} {
-            set tmpdir $trydir
-            break
-         }
-      }
-      if { $tmpdir == "" } {
-         error "No temporary directory"
-      }
-
-      set basefile "${tmpdir}/gaia_temp_"
-      for { set ix 1 } { $ix < 100 } { incr ix } {
-         set tryfile "$tmpdir/gaia_temp_$ix$exten"
-         if {! [file exists $tryfile] } {
-            return $tryfile
-         }
-      }
-      error "No free files with name like $tryfile"
-   }
-
    #  Provides a suitable value for the "symbol_id" column in a TST table.
    #  This is what determines how plotted symbols will appear on the
    #  image (unless changed).  This function endeavours to return a
@@ -300,6 +282,8 @@ itcl::class gaia::GaiaSampAgent {
 
    #  Name of the active instance of GaiaUrlGet.
    protected variable urlget_ {}
+
+   private variable temp_files_ {}
 
    #  Class variables:
    #  ----------------

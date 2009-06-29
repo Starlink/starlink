@@ -257,6 +257,18 @@ itcl::class gaia::Gaia {
          stop_samp_
       }
 
+      #  Delete temporary files used by SAMP components.
+      catch {
+         if { $samp_sender_ != {} } {
+            $samp_sender_ destructor
+         }
+      }
+      catch {
+         if { $samp_agent_ != {} } {
+            $samp_agent_ destructor
+         }
+      }
+
       #  Clear up the images list (this isn't done correctly in
       #  SkyCat, it uses $w_ instead of $image_).
       global ::skycat_images
@@ -2211,7 +2223,8 @@ window gives you access to this."
                 "http://astro.dur.ac.uk/~pdraper/gaia/gaia.html"
          set meta(samp.icon.url) \
                 "http://astro.dur.ac.uk/~pdraper/gaia/gaiaicon.gif"
-         lappend agents [itcl::code [gaia::GaiaSampAgent \#auto]]
+         set samp_agent_ [gaia::GaiaSampAgent \#auto]
+         lappend agents [itcl::code $samp_agent_]
          lappend agents [itcl::code [samp::UtilAgent \#auto]]
        # lappend agents [itcl::code [samp::TestAgent \#auto]]
          set client [samp::SampClient \#auto -agents $agents \
@@ -2734,6 +2747,9 @@ window gives you access to this."
 
    #  SAMP sender; sends message via the hub to other clients.
    common samp_sender_ {}
+
+   #  SAMP agent; handles GAIA-specific incoming SAMP messages.
+   common samp_agent_ {}
 
 #  End of class definition.
 }
