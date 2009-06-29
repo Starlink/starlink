@@ -96,7 +96,6 @@ lib*.dylib
 
 # Starconf and Starlink build and configure
 
-component.xml
 componentinfo.dtd
 componentset-extrainfo.xml
 dtask_applic.f
