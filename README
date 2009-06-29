@@ -282,8 +282,8 @@ Platform specific build notes
  need a copy of "g95" which is available from  "www.g95.org", or more a very
  recent version of gfortran (this can be checked by running gfortran -v).
 
- To make sure you use the "g95" compiler and not "gfortran" you need to
- define the environment variables "FC" and "F77":
+ To make sure you use the "g95" or "gfortran" compilers as required it is best
+ to define the environment variables "FC" and "F77":
 
       % setenv FC g95                     # csh
       % setenv F77 g95
@@ -291,8 +291,15 @@ Platform specific build notes
       % export FC=g95                     # sh
       % export F77=g95
 
-  before running "configure".
+   or
 
+      % setenv FC gfortran                # csh
+      % setenv F77 gfortran
+   or
+      % export FC=gfortran                # sh
+      % export F77=gfortran
+
+  before running "configure".
 
   - OS X
 
