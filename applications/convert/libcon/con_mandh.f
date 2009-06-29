@@ -96,6 +96,7 @@
 *  Copyright:
 *     Copyright (C) 1988-1992 Science & Engineering Research Council.
 *     Copyright (C) 2001 Central Laboratory of the Research Councils.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -120,16 +121,16 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     1988 Sep 16 (MJC):
+*     1988 September 16 (MJC):
 *        First version.
-*     1988 Sep 25 (MJC):
+*     1988 September 25 (MJC):
 *        Allow BITPIX, NAXIS and NAXISn to appear in any order in the
 *        header.
-*     1989 Jul 27 (MJC): Amended extension error message and minor bug
-*        fix.
-*     1989 Jul 29 (MJC):
+*     1989 July 27 (MJC):
+*        Amended extension error message and minor bug fix.
+*     1989 July 29 (MJC):
 *        Added card number to FITSG* calls.
-*     1989 Nov 22 (MJC):
+*     1989 November 22 (MJC):
 *        Added FIRST argument to check for extensions in multiple
 *        files.
 *     1990 November 19 (MJC):
@@ -142,71 +143,62 @@
 *        Renamed from FTS1_MANDH for CONVERT.  All FTS1_ calls replaced
 *        by CON_ equivalents.
 *     2001 August 29 (DSB):
-*        Correct CON-GKEYI arguments
+*        Correct CON_GKEYI arguments.
+*     2009 June 29 (MJC):
+*        Replace cloned CON_GKEYx with KAPLIBS FTS1_GKEYx.
 *     {enter_further_changes_here}
 
 *-
 
 *  Type Definitions:
-      IMPLICIT  NONE           ! no default typing allowed
+      IMPLICIT  NONE             ! no default typing allowed
 
 *  Global Constants:
-      INCLUDE  'SAE_PAR'       ! SSE global definitions
-      INCLUDE  'DAT_PAR'       ! Data-sytem constants
-      INCLUDE  'PRM_PAR'       ! Magic-value definitions
+      INCLUDE  'SAE_PAR'         ! SSE global definitions
+      INCLUDE  'DAT_PAR'         ! Data-sytem constants
+      INCLUDE  'PRM_PAR'         ! Magic-value definitions
 
 *  Arguments Given:
-      LOGICAL
-     :  FIRST
+      LOGICAL FIRST
 
-      INTEGER
-     :  NCARD,
-     :  SCARD
+      INTEGER NCARD
+      INTEGER SCARD
 
-      CHARACTER * 80
-     :  HEADER( NCARD )        ! FITS tape buffer
+      CHARACTER*80 HEADER( NCARD )
 
 *  Arguments Returned:
-      INTEGER
-     :  BITPIX,
-     :  NDIM,
-     :  SIZE,
-     :  AXIS(DAT__MXDIM)
+      INTEGER BITPIX
+      INTEGER NDIM
+      INTEGER SIZE
+      INTEGER AXIS( DAT__MXDIM )
 
-      LOGICAL
-     :  DARRAY,
-     :  NONSDA
+      LOGICAL DARRAY
+      LOGICAL NONSDA
 
 *  Status:
       INTEGER STATUS
 
 *  Local Variables:
-      LOGICAL                  ! True if:
-     :  THERE                  ! There is a card with the requested
-                               ! keyword in the header
+      LOGICAL THERE              ! Card with the requested keyword is in
+                                 ! the header
 
-      CHARACTER
-     :  COM*80,                ! Card comment
-     :  CNDIM*3,               ! Axis number
-     :  NAXNAM*8               ! NAXISn keyword name
-
-      INTEGER
-     :  N, NAX,                ! Loop counters
-     :  NC,                    ! Number of characters in axis number
-     :  NKC                    ! Number of a header card image that
-                               ! contains a specified keyword
+      CHARACTER*80 COM           ! Card comment
+      CHARACTER*3 CNDIM          ! Axis number
+      INTEGER N                  ! Loop counter
+      INTEGER NAX                ! Loop counters
+      CHARACTER*8 NAXNAM         ! NAXISn keyword name
+      INTEGER NC                 ! Number of characters in axis number
+      INTEGER NKC                ! Number of a header card image that
+                                 ! contains a specified keyword
 
 *.
 
-
-*    Check for error on entry.
-
+*  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
       IF ( FIRST ) THEN
 
-*    Check the tape is simple FITS.
-
+*  Check the tape is simple FITS.
          IF ( HEADER( 1 )( 1:6 ) .NE. 'SIMPLE' .OR.
      :        HEADER( 1 )( 30:30 ) .NE. 'T' ) THEN
             STATUS = SAI__ERROR
@@ -217,12 +209,10 @@
          END IF
       ELSE
 
-*    The first header record must be an extension name or
-*    SIMPLE = T.
-
+*  The first header record must be an extension name or SIMPLE = T.
          IF ( .NOT. ( HEADER( 1 )( 1:8 ) .EQ. 'XTENSION' .OR.
-     :      ( HEADER( 1 )( 1:6 ) .EQ. 'SIMPLE' .AND.
-     :        HEADER( 1 )( 30:30 ) .EQ. 'T' ) )  ) THEN
+     :              ( HEADER( 1 )( 1:6 ) .EQ. 'SIMPLE' .AND.
+     :                HEADER( 1 )( 30:30 ) .EQ. 'T' ) )  ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( 'CON_MANDH_NO1ST',
      :        'First keyword is not SIMPLE or XTENSION, '/
@@ -231,11 +221,10 @@
          END IF
       END IF
 
-*    Continue checking the mandatory descriptors... BITPIX is
-*    number of bits per pixel.
-
-      CALL CON_GKEYI( NCARD, HEADER, SCARD, 'BITPIX', 1, THERE, BITPIX,
-     :                COM, NKC, STATUS )
+*  Continue checking the mandatory descriptors... BITPIX is
+*  number of bits per pixel.
+      CALL FTS1_GKEYI( NCARD, HEADER, SCARD, 'BITPIX', 1, THERE, BITPIX,
+     :                 COM, NKC, STATUS )
 
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'CON_MANDH_FBITPI',
@@ -243,8 +232,7 @@
          GOTO 990
       END IF
 
-*    See if there was a BITPIX header card.
-
+*  See if there was a BITPIX header card.
       IF ( .NOT. THERE ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'CON_MANDH_BITPIX',
@@ -252,9 +240,8 @@
          GOTO 990
       END IF
 
-*    BITPIX can currently only have values of 8, 16 and 32. Later
-*    -32 will probably mean 32-bit floating point.
-
+*  BITPIX can currently only have values of 8, 16, and 32 for integer
+*  types; and -32 and -64 for floating-point.
       IF ( BITPIX .NE. 8 .AND. BITPIX .NE. 16 .AND.
      :     BITPIX .NE. 32  .AND. BITPIX .NE. -32 .AND.
      :     BITPIX .NE. -64 ) THEN
@@ -264,10 +251,9 @@
          GOTO 990
       END IF
 
-*    Now obtain the number of dimensions.
-
-      CALL CON_GKEYI( NCARD, HEADER, SCARD, 'NAXIS', 1, THERE, NDIM, 
-     :                COM, NKC, STATUS )
+*  Now obtain the number of dimensions.
+      CALL FTS1_GKEYI( NCARD, HEADER, SCARD, 'NAXIS', 1, THERE, NDIM,
+     :                 COM, NKC, STATUS )
 
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'CON_MANDH_INAXIS',
@@ -282,9 +268,8 @@
          GOTO 990
       END IF
 
-*    Zero dimension means there is no main data array.  Upper limit
-*    is imposed by the data system.
-
+*  Zero dimension means there is no main data array.  Upper limit
+*  is imposed by the data system.
       IF ( NDIM .LT. 0 .OR. NDIM .GT. DAT__MXDIM ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETI( 'NAXIS', NDIM )
@@ -296,28 +281,23 @@
       NONSDA = .FALSE.
       DARRAY = .TRUE.
 
-*    Decode NAXISn values.
-
+*  Decode NAXISn values.
       SIZE = 1
 
-*    Allow for the case when there is no data array.
-
+*  Allow for the case when there is no data array.
       IF ( NDIM .GT. 0 ) THEN
 
-*       For each dimension
-*       ==================
-
+*  For each dimension
+*  ==================
          DO N = 1, NDIM
 
-*          Generate name of the Nth axis dimension, NAXISn.
-
+*  Generate name of the Nth axis dimension, NAXISn.
             CALL CHR_ITOC( N, CNDIM, NC )
-            NAXNAM = 'NAXIS'//CNDIM( :NC )
+            NAXNAM = 'NAXIS' // CNDIM( :NC )
 
-*          Get value of NAXISn.
-
-            CALL CON_GKEYI( NCARD, HEADER, SCARD, NAXNAM, 1, THERE,
-     :                      AXIS( N ), COM, NKC, STATUS )
+*  Get value of NAXISn.
+            CALL FTS1_GKEYI( NCARD, HEADER, SCARD, NAXNAM, 1, THERE,
+     :                       AXIS( N ), COM, NKC, STATUS )
 
             IF ( STATUS .NE. SAI__OK ) THEN
                CALL MSG_SETI( 'AXN', N )
@@ -335,17 +315,14 @@
             END IF
 
 
-*          File may be in group format, where AXIS1=0.
-
+*  File may be in group format, where AXIS1=0.
             IF ( N .EQ. 1 .AND. AXIS( N ) .EQ. 0 ) THEN
 
-*             So there is a non-standard data-array structure present.
-
+*  So there is a non-standard data-array structure present.
                NONSDA = .TRUE.
             END IF
 
-*          Check that it is physical or does not have an integer value.
-
+*  Check that it is physical or does not have an integer value.
             IF ( AXIS( N ) .LT. 1 .AND. ( .NOT. NONSDA ) ) THEN
                CALL MSG_SETI( 'AXN', N )
                STATUS = SAI__ERROR
@@ -353,26 +330,22 @@
                CALL ERR_REP( 'CON_MANDH_AXISIZ',
      :           'Axis ^AXN has invalid dimension ^AXIS', STATUS )
 
-*             Abort.
-
+*  Abort.
                GOTO 990
             END IF
 
-*          Evaluate the number of pixels in the array.
-
+*  Evaluate the number of pixels in the array.
             IF ( AXIS ( N ) .GT. 0 ) SIZE = SIZE * AXIS( N )
          END DO
       ELSE
 
-*       No data array is present.
-
+*  No data array is present.
          DARRAY = .FALSE.
          AXIS( 1 ) = VAL__BADI
       END IF
 
-*    Occasionally higher dimensions may be set to one.
-*    Remove such useless dimensions.
-
+*  Occasionally higher dimensions may be set to one.  Remove such
+*  degenerate dimensions.
       IF ( NDIM .GT. 1 ) THEN
          DO NAX = NDIM, 1, -1
             IF ( AXIS( NAX ) .NE. 1 ) GOTO 950

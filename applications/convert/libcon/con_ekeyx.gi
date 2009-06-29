@@ -67,7 +67,8 @@
 
 *  Copyright:
 *     Copyright (C) 1997, 2004 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Councils.  2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -94,7 +95,9 @@
 *     1997 March 16 (MJC):
 *        Original version.
 *     2004 September 9 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2009 June 29 (MJC):
+*        Replace cloned CON_GKEYx with KAPLIBS FTS1_GKEYx.
 *     {enter_further_changes_here}
 
 *-
@@ -151,10 +154,10 @@
 
 *  Obtain the value and comment.
          SCARD = 1
-         CALL CON_GKEY<T>( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
-     :                     SCARD, NAME, NOCCUR,
-     :                     THERE, VALUE, COMENT, CARD, STATUS,
-     :                     %VAL( CNF_CVAL( LENGTH ) ) )
+         CALL FTS1_GKEY<T>( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                      SCARD, NAME, NOCCUR,
+     :                      THERE, VALUE, COMENT, CARD, STATUS,
+     :                      %VAL( CNF_CVAL( LENGTH ) ) )
 
 *  Unmap the array of FITS header cards and release the locator.
          CALL DAT_UNMAP( LOC, STATUS )

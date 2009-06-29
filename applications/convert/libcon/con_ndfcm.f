@@ -44,6 +44,7 @@
 *  Copyright:
 *     Copyright (C) 1992 Science & Engineering Research Council.
 *     Copyright (C) 2001 Central Laboratory of the Research Councils.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -71,7 +72,9 @@
 *     1992 September 17 (MJC):
 *        Original version based on FTS1_NDFCM. 
 *     2001 August 30 (AJC):
-*        Correct CON_GKEYC arguments
+*        Correct CON_GKEYC arguments.
+*     2009 June 29 (MJC):
+*        Replace cloned CON_GKEYx with KAPLIBS FTS1_GKEYx.
 *     {enter_further_changes_here}
 
 *-
@@ -124,8 +127,8 @@
 *  ==================================
 *
 *  First obtain the title from the TITLE keyword in the header.
-      CALL CON_GKEYC( NCARD, HEADER, SCARD, 'TITLE', 1, THERE, TITLE,
-     :                COM, NKC, STATUS )
+      CALL FTS1_GKEYC( NCARD, HEADER, SCARD, 'TITLE', 1, THERE, TITLE,
+     :                 COM, NKC, STATUS )
 
 *  If it is present set the NDF title, truncating unnecessary blanks.
       IF ( THERE .AND. TITLE .NE. ' ' ) THEN
@@ -134,8 +137,8 @@
       END IF
 
 *  Second obtain the units from the BUNIT keyword in the header.
-      CALL CON_GKEYC( NCARD, HEADER, SCARD, 'BUNIT', 1, THERE, UNITS,
-     :                COM,  NKC, STATUS )
+      CALL FTS1_GKEYC( NCARD, HEADER, SCARD, 'BUNIT', 1, THERE, UNITS,
+     :                 COM, NKC, STATUS )
 
 *  If it is present set the NDF units, truncating unnecessary blanks.
       IF ( THERE .AND. UNITS .NE. ' ' ) THEN
@@ -144,8 +147,8 @@
       END IF
 
 *  Third obtain the label from the LABEL keyword in the header.
-      CALL CON_GKEYC( NCARD, HEADER, SCARD, 'LABEL', 1, THERE, LABEL,
-     :                COM, NKC, STATUS )
+      CALL FTS1_GKEYC( NCARD, HEADER, SCARD, 'LABEL', 1, THERE, LABEL,
+     :                 COM, NKC, STATUS )
 
 *  If it is present set the NDF units, truncating unnecessary blanks.
       IF ( THERE .AND. LABEL .NE. ' ' ) THEN

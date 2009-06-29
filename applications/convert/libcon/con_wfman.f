@@ -36,7 +36,9 @@
 *  Copyright:
 *     Copyright (C) 1993 Science & Engineering Research Council.
 *     Copyright (C) 1997-1998 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Councils.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -68,6 +70,8 @@
 *        CON_FKEYx routines to create the FITS headers.
 *     1998 August 4 (AJC):
 *        Write DIMS(n) not n for NAXISn value.
+*     2009 June 29 (MJC):
+*        Replace cloned CON_FKEYx with KAPLIBS FTS1_WKEYx.
 *     {enter_further_changes_here}
 
 *-
@@ -122,8 +126,8 @@
 *  ========================
 
 *  Write the 'SIMPLE  = T' in the first line of the FITS headers.
-      CALL CON_FKEYL( 'SIMPLE', .TRUE., '/',  'Standard FITS',
-     :                FITSAR( 1 ), STATUS )
+      CALL FTS1_WKEYL( 'SIMPLE', .TRUE., '/',  'Standard FITS',
+     :                 FITSAR( 1 ), STATUS )
 
 *  Report the value in verbose mode.
       CALL MSG_OUTIF( MSG__VERB, ' ', FITSAR( 1 ), STATUS )
@@ -132,9 +136,9 @@
 *  ========================
 
 *  Write the BITPIX keyword.
-      CALL CON_FKEYI( 'BITPIX', BITPIX, '/',
-     :                'Data type (bits per element)', FITSAR( 2 ),
-     :                STATUS )
+      CALL FTS1_WKEYI( 'BITPIX', BITPIX, '/',
+     :                 'Data type (bits per element)', FITSAR( 2 ),
+     :                 STATUS )
 
 *  Report the value in verbose mode.
       CALL MSG_OUTIF( MSG__VERB, ' ', FITSAR( 2 ), STATUS )
@@ -143,8 +147,8 @@
 *  =======================
 
 *  Write the NAXIS keyword.
-      CALL CON_FKEYI( 'NAXIS', NDIM, '/', 'Number of dimensions',
-     :                FITSAR( 3 ), STATUS )
+      CALL FTS1_WKEYI( 'NAXIS', NDIM, '/', 'Number of dimensions',
+     :                 FITSAR( 3 ), STATUS )
 
 *  Report the value in verbose mode.
       CALL MSG_OUTIF( MSG__VERB, ' ', FITSAR( 3 ), STATUS )
@@ -163,8 +167,8 @@
          BUFFER = 'Dimension '//BUFDIM
 
 *  Write the NAXISn header.
-         CALL CON_FKEYI( KEYWRD, DIMS( IDIM ), '/', BUFFER, 
-     :                   FITSAR( LINENO ), STATUS )
+         CALL FTS1_WKEYI( KEYWRD, DIMS( IDIM ), '/', BUFFER,
+     :                    FITSAR( LINENO ), STATUS )
 
 *  Report the value in verbose mode.
          CALL MSG_OUTIF( MSG__VERB, ' ', FITSAR( LINENO ), STATUS )

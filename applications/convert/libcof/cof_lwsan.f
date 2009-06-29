@@ -76,7 +76,7 @@
 
 *  Copyright:
 *     Copyright (C) 1996, 2000 Central Laboratory of the Research
-*     Councils. Copyright (C) 2008 Science & Technology Facilities
+*     Councils. Copyright (C) 2008, 2009 Science & Technology Facilities
 *     Council. All Rights Reserved.
 
 *  Licence:
@@ -111,6 +111,8 @@
 *        Use KAPLIBS routine instead of its cloned CON equivalent.
 *     2008 June 18 (MJC):
 *        Trim trailing blanks from output NDF character components.
+*     2009 June 29 (MJC):
+*        Replaced deprecated CON_MOVE with KPG1_COPY from KAPLIBS.
 *     {enter_further_changes_here}
 
 *-
@@ -466,14 +468,9 @@
 
 *  Copy the wavelength values into the axis centres.  Call the
 *  appropriate routine for the chosen type.
-      IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL CON_MOVE( VAL__NBR * NWAVEL, %VAL( CNF_PVAL( RWPNTR ) ),
-     :                  %VAL( CNF_PVAL( APNTR(1) ) ), STATUS )
-      
-      ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL CON_MOVE( VAL__NBD * NWAVEL, %VAL( CNF_PVAL(RWPNTR) ),
-     :                  %VAL( CNF_PVAL( APNTR(1) ) ), STATUS )
-      
+      IF ( ITYPE .EQ. '_REAL' .OR. ITYPE .EQ. '_DOUBLE' ) THEN
+         CALL KPG1_COPY( ITYPE, NWAVEL, RWPNTR, APNTR( 1 ), STATUS )
+
       ELSE
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'IT', ITYPE )
@@ -498,15 +495,7 @@
 
 *  Copy the wavelength error values into the axis errors.  Call the
 *  appropriate routine for the chosen type.
-      IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL CON_MOVE( VAL__NBR * NWAVEL, %VAL( CNF_PVAL( REPNTR ) ),
-     :                  %VAL( CNF_PVAL( APNTR(1) ) ), STATUS )
-      
-      ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL CON_MOVE( VAL__NBD * NWAVEL, %VAL( CNF_PVAL( REPNTR ) ),
-     :                  %VAL( CNF_PVAL( APNTR(1) ) ), STATUS )
-
-      END IF
+      CALL KPG1_COPY( ITYPE, NWAVEL, REPNTR, APNTR( 1 ), STATUS )
 
 *  Unmap the variance array.
       CALL NDF_AUNMP( NDF, 'Variance', 3, STATUS )

@@ -70,6 +70,7 @@
 
 *  Copyright:
 *     Copyright (C) 1997 Central Laboratory of the Research Councils.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -95,7 +96,9 @@
 *  History:
 *     1997 March 25 (MJC):
 *        Original version based upon COI_WNDFH.
-*     {enter_changes_here}
+*     2009 June 29 (MJC):
+*        Replace cloned CON_FKEYx with KAPLIBS FTS1_WKEYx.
+*     {enter_further_changes_here}
 
 *-
       
@@ -284,9 +287,9 @@
 *  Write the LABEL card to the FITS header.  68 is the maximum number of
 *  characters that can be accommodated in a header card.
 *  Create the header (there is no comment) and append it to the headers.
-         CALL CON_FKEYC( KEYWRD, VALUE( :MIN( SZVAL, NCHAR ) ),
-     :                   'Label of the primary array', ' ', .FALSE.,
-     :                   HEADER, STATUS )
+         CALL FTS1_WKEYC( KEYWRD, VALUE( :MIN( SZVAL, NCHAR ) ),
+     :                    'Label of the primary array', ' ', .FALSE.,
+     :                    HEADER, STATUS )
          IF ( STATUS .EQ. SAI__OK ) CALL ADLINE( IMDESC, HEADER )
 
 *  Record the fact that the label has been written.
@@ -311,9 +314,9 @@
 
 *  Write the BUNIT card to the FITS header.  68 is the maximum number
 *  of characters that can be accommodated in a header card.
-         CALL CON_FKEYC( KEYWRD, VALUE( :MIN( SZVAL, NCHAR ) ),
-     :                   'Units of the primary array', ' ', .FALSE.,
-     :                   HEADER, STATUS )
+         CALL FTS1_WKEYC( KEYWRD, VALUE( :MIN( SZVAL, NCHAR ) ),
+     :                    'Units of the primary array', ' ', .FALSE.,
+     :                    HEADER, STATUS )
          IF ( STATUS .EQ. SAI__OK ) CALL ADLINE( IMDESC, HEADER )
 
 *  Record the fact that the title has been written.
@@ -346,8 +349,8 @@
             BLANK = VAL__BADUB
 
          END IF
-         CALL CON_FKEYI( 'BLANK', BLANK, '/', 'Bad value', HEADER,
-     :                   STATUS )
+         CALL FTS1_WKEYI( 'BLANK', BLANK, '/', 'Bad value', HEADER,
+     :                    STATUS )
          IF ( STATUS .EQ. SAI__OK ) CALL ADLINE( IMDESC, HEADER )
 
 *  Handle a bad status.  Negative values are reserved for non-fatal

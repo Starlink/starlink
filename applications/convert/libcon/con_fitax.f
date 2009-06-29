@@ -48,7 +48,7 @@
 *  Copyright:
 *     Copyright (C) 1990-1992 Science & Engineering Research Council.
 *     Copyright (C) 1996, 2001, 2004 Central Laboratory of the Research
-*     Councils. Copyright (C) 2008 Science & Technology Facilities
+*     Councils. Copyright (C) 2008, 2009 Science & Technology Facilities
 *     Council. All Rights Reserved.
 
 *  Licence:
@@ -93,6 +93,8 @@
 *        Use CNF_PVAL.
 *     2008 March 15 (MJC):
 *        Use KAPLIBS routines instead of their cloned CON equivalents.
+*     2009 June 29 (MJC):
+*        Replace cloned CON_GKEYx with KAPLIBS FTS1_GKEYx.
 *     {enter_further_changes_here}
 
 *-
@@ -108,7 +110,7 @@
 
 *  Arguments Given:
       INTEGER NCARD
-      CHARACTER * 80 HEADER( NCARD )
+      CHARACTER*80 HEADER( NCARD )
       INTEGER NDF
       INTEGER SCARD
 
@@ -127,15 +129,14 @@
       PARAMETER ( PRECF = 100.0D0 )
 
 *  Local Variables:
-      CHARACTER * ( 2 ) CNDIM    ! The axis number
-      DOUBLE PRECISION DELT      ! The co-ordinate increment between
-                                 ! pixels
-      INTEGER DIMS( DAT__MXDIM ) ! The dimensions of the NDF
+      CHARACTER*2 CNDIM          ! Axis number
+      CHARACTER*80 COM           ! Header comment
+      DOUBLE PRECISION DELT      ! Co-ordinate increment between pixels
+      INTEGER DIMS( DAT__MXDIM ) ! Dimensions of the NDF
       INTEGER EL                 ! Dimension of the current axis
       INTEGER I                  ! Loop counter
       CHARACTER * ( 70 ) LABEL   ! Axis type equated to LABEL component
-      LOGICAL LTHERE             ! The CTYPEn keyword is present
-                                 ! in the header?
+      LOGICAL LTHERE             ! CTYPEn keyword is present in header?
       INTEGER NC                 ! Number of characters
       INTEGER NDIM               ! Number of dimensions of the NDF
       INTEGER NKC                ! Number of the card where a FITS
@@ -146,12 +147,9 @@
       DOUBLE PRECISION RATIO     ! Ratio of increment to offset of axis
       DOUBLE PRECISION REFP      ! Pixel position of the reference pixel
       DOUBLE PRECISION REFV      ! Co-ordinate at the reference pixel
-      LOGICAL THERE              ! The nominated FITS keyword is present
-                                 ! in the header?
-      LOGICAL UTHERE             ! The CUNITn keyword is present
-                                 ! in the header?
-      CHARACTER * (80 ) COM      ! Header comment
-      CHARACTER * ( 70 ) UNITS   ! Axis units
+      LOGICAL THERE              ! Nominated FITS keyword is present?
+      CHARACTER*70 UNITS         ! Axis units
+      LOGICAL UTHERE             ! CUNITn keyword is present in header?
 
 *.
 
@@ -178,17 +176,17 @@
          CALL CHR_ITOC( I, CNDIM, NC )
 
 *  Obtain the value of the physical co-ordinate at the reference pixel.
-         CALL CON_GKEYD( NCARD, HEADER, SCARD, 'CRVAL'//CNDIM( :NC ),
-     :                   1, THERE, REFV, COM, NKC, STATUS )
+         CALL FTS1_GKEYD( NCARD, HEADER, SCARD, 'CRVAL'//CNDIM( :NC ),
+     :                    1, THERE, REFV, COM, NKC, STATUS )
 
 *  The co-ordinate must be present to make any sense of an axis
 *  structure.
          IF ( THERE ) THEN
 
 *  Obtain the value of the element number of the reference pixel.
-            CALL CON_GKEYD( NCARD, HEADER, SCARD, 'CRPIX'/
-     :                      /CNDIM( :NC ), 1, THERE, REFP, COM, NKC,
-     :                      STATUS )
+            CALL FTS1_GKEYD( NCARD, HEADER, SCARD, 'CRPIX'/
+     :                       /CNDIM( :NC ), 1, THERE, REFP, COM, NKC,
+     :                       STATUS )
 
 *  If the keyword is not present assume the reference pixel is the
 *  first along the axis.
@@ -196,9 +194,9 @@
 
 *  Obtain the increment of physical co-ordinate between adjacent
 *  pixels.
-            CALL CON_GKEYD( NCARD, HEADER, SCARD, 'CDELT'/
-     :                      /CNDIM( :NC ), 1, THERE, DELT, COM, NKC,
-     :                      STATUS )
+            CALL FTS1_GKEYD( NCARD, HEADER, SCARD, 'CDELT'/
+     :                       /CNDIM( :NC ), 1, THERE, DELT, COM, NKC,
+     :                       STATUS )
 
 *  If the keyword is not present assume unit increments.
             IF ( .NOT. THERE ) DELT = 1.0D0
@@ -207,12 +205,12 @@
 *  presence flag will only determine whether or not the axis label
 *  component is written.  Unfortunately, the units may only be defined
 *  in the comment of the CTYPEn keyword--- there is no CUNITn keyword.
-            CALL CON_GKEYC( NCARD, HEADER, SCARD, 'CTYPE'/
-     :                      /CNDIM( :NC ), LTHERE, LABEL, NKC, STATUS )
+            CALL FTS1_GKEYC( NCARD, HEADER, SCARD, 'CTYPE'/
+     :                       /CNDIM( :NC ), LTHERE, LABEL, NKC, STATUS )
 
 *  However, CUNITn looks to be used and is proposed in the WCS draft.
-            CALL CON_GKEYC( NCARD, HEADER, SCARD, 'CUNIT'/
-     :                      /CNDIM( :NC ), UTHERE, UNITS, NKC, STATUS )
+            CALL FTS1_GKEYC( NCARD, HEADER, SCARD, 'CUNIT'/
+     :                       /CNDIM( :NC ), UTHERE, UNITS, NKC, STATUS )
 
 
 *  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

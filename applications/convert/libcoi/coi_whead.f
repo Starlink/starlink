@@ -86,6 +86,7 @@
 
 *  Copyright:
 *     Copyright (C) 1997 Central Laboratory of the Research Councils.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -113,6 +114,8 @@
 *        Original version based upon COF_WHEAD.
 *     1997 November 14 (MJC):
 *        Filtered LBOUNDn keywords.
+*     2009 June 29 (MJC):
+*        Replace cloned CON_FKEYx with KAPLIBS FTS1_WKEYx.
 *     {enter_further_changes_here}
 
 *-
@@ -224,20 +227,21 @@
 
 *  Write classification and naming headers.
 *  ========================================
-      CALL CON_FKEYC( 'HDUCLAS1', 'NDF', '/',
-     :                'Starlink NDF (hierarchical n-dim format)',
-     :                .FALSE., FITSTR, STATUS )
+      CALL FTS1_WKEYC( 'HDUCLAS1', 'NDF', '/',
+     :                 'Starlink NDF (hierarchical n-dim format)',
+     :                 .FALSE., FITSTR, STATUS )
       IF ( STATUS .EQ. SAI__OK ) CALL ADLINE( IMDESC, FITSTR )
 
-      CALL CON_FKEYC( 'HDUCLAS2', COMP, '/', 'Array component subclass',
-     :                .FALSE., FITSTR, STATUS )
+      CALL FTS1_WKEYC( 'HDUCLAS2', COMP, '/',
+     :                  'Array component subclass',
+     :                  .FALSE., FITSTR, STATUS )
       IF ( STATUS .EQ. SAI__OK ) CALL ADLINE( IMDESC, FITSTR )
 
       IF ( COMP .NE. 'DATA' ) THEN
 
 *  Write the NDF's component name.
-        CALL CON_FKEYC( 'EXTNAME', COMP, '/', 'Array component',
-     :                  .FALSE., FITSTR, STATUS )
+        CALL FTS1_WKEYC( 'EXTNAME', COMP, '/', 'Array component',
+     :                   .FALSE., FITSTR, STATUS )
          IF ( STATUS .EQ. SAI__OK ) CALL ADLINE( IMDESC, FITSTR )
       END IF
 

@@ -35,8 +35,6 @@
 *        The length of SYSTEM must be at least 9 characters.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
-*
-*     [optional_subroutine_items]...
 
 *  Notes:
 *     The IRAF Mini World Co-ordinate System (MWCS) is used to
@@ -78,7 +76,7 @@
 *  Copyright:
 *     Copyright (C) 1997, 2004 Central Laboratory of the Research
 *     Councils. Copyright (C) 2006 Particle Physics & Astronomy
-*     Research Council. Copyright (C) 2008 Science & Technology
+*     Research Council. Copyright (C) 2008, 2009 Science & Technology
 *     Facilities Council. All Rights Reserved.
 
 *  Licence:
@@ -113,6 +111,8 @@
 *        Remove unused variables.
 *     2008 March 15 (MJC):
 *        Use KAPLIBS routines instead of their cloned CON equivalents.
+*     2009 June 29 (MJC):
+*        Replace cloned CON_FKEYx with KAPLIBS FTS1_WKEYx.
 *     {enter_further_changes_here}
 
 *-
@@ -441,7 +441,7 @@
 
 *  Create the WCS number of dimensions header, WCSDIM.  It has no
 *  comment.
-         CALL CON_FKEYI( 'WCSDIM', NDIM, ' ', ' ', HEADER, STATUS )
+         CALL FTS1_WKEYI( 'WCSDIM', NDIM, ' ', ' ', HEADER, STATUS )
          IF ( STATUS .EQ. SAI__OK ) CALL ADLINE( IMDESC, HEADER )
 
 *  Create the DC-FLAG header if there is a linear wavelength axis.  It
@@ -449,18 +449,18 @@
 *  non-linear axis.
          IF ( WAVEAX .GT. 0 ) THEN
             IF ( LINEAR( WAVEAX ) ) THEN
-               CALL CON_FKEYI( 'DC-FLAG', 0, ' ', ' ', HEADER, STATUS )
+               CALL FTS1_WKEYI( 'DC-FLAG', 0, ' ', ' ', HEADER, STATUS )
                IF ( STATUS .EQ. SAI__OK ) CALL ADLINE( IMDESC, HEADER )
             ELSE IF ( SYSTEM .NE. 'MULTISPEC' ) THEN
-               CALL CON_FKEYI( 'DC-FLAG', 2, ' ', ' ', HEADER, STATUS )
+               CALL FTS1_WKEYI( 'DC-FLAG', 2, ' ', ' ', HEADER, STATUS )
                IF ( STATUS .EQ. SAI__OK ) CALL ADLINE( IMDESC, HEADER )
             END IF
          END IF
 
 *  Specify the dimensional reduction card.
          IF ( SYSTEM .EQ. 'MULTISPEC' ) THEN
-            CALL CON_FKEYC( 'WAXMAP01', '1 0 0 1 ', ' ', ' ',
-     :                      .FALSE., HEADER, STATUS )
+            CALL FTS1_WKEYC( 'WAXMAP01', '1 0 0 1 ', ' ', ' ',
+     :                       .FALSE., HEADER, STATUS )
             IF ( STATUS .EQ. SAI__OK ) CALL ADLINE( IMDESC, HEADER )
          END IF
 
@@ -491,8 +491,8 @@
          IF ( SYSTEM .EQ. 'EQUISPEC' ) THEN
             DO I = 1, DIMS( 2 )
                CALL CHR_ITOC( I, CA, NCHAR )
-               CALL CON_FKEYC( 'APNUM'//CA, CA( :NCHAR )//' 1',
-     :                         ' ', ' ', .FALSE., HEADER, STATUS )
+               CALL FTS1_WKEYC( 'APNUM'//CA, CA( :NCHAR )//' 1',
+     :                          ' ', ' ', .FALSE., HEADER, STATUS )
                IF ( STATUS .EQ. SAI__OK ) CALL ADLINE( IMDESC, HEADER )
             END DO
          END IF
@@ -603,8 +603,8 @@
                KEYWRD = 'CTYPE'//C
 
 *  Create the header (there is no comment) and append it to the headers.
-               CALL CON_FKEYC( KEYWRD, 'LINEAR', ' ', ' ', .FALSE.,
-     :                         HEADER, STATUS )
+               CALL FTS1_WKEYC( KEYWRD, 'LINEAR', ' ', ' ', .FALSE.,
+     :                          HEADER, STATUS )
                IF ( STATUS .EQ. SAI__OK ) CALL ADLINE( IMDESC, HEADER )
 
 *  Write the start value to keyword CRVALn.
@@ -616,11 +616,11 @@
 *  Create the CRVALn header (there is no comment) and append it to the
 *  OIF headers using the appropriate data type.
                IF ( ATYPE( I ) .EQ. '_DOUBLE' ) THEN
-                  CALL CON_FKEYD( KEYWRD, DSTART( I ), ' ', ' ', HEADER,
-     :                            STATUS )
+                  CALL FTS1_WKEYD( KEYWRD, DSTART( I ), ' ', ' ',
+     :                             HEADER, STATUS )
                ELSE
-                  CALL CON_FKEYR( KEYWRD, START( I ), ' ', ' ', HEADER,
-     :                            STATUS )
+                  CALL FTS1_WKEYR( KEYWRD, START( I ), ' ', ' ', HEADER,
+     :                             STATUS )
                END IF
                IF ( STATUS .EQ. SAI__OK ) CALL ADLINE( IMDESC, HEADER )
 
@@ -633,11 +633,11 @@
 *  Create the CDELTn header (there is no comment) and append it to the
 *  OIF headers using the appropriate data type.
                IF ( ATYPE( I ) .EQ. '_DOUBLE' ) THEN
-                  CALL CON_FKEYD( KEYWRD, DINCRE( I ), ' ', ' ', HEADER,
-     :                            STATUS )
+                  CALL FTS1_WKEYD( KEYWRD, DINCRE( I ), ' ', ' ',
+     :                             HEADER, STATUS )
                ELSE
-                 CALL CON_FKEYR( KEYWRD, INCREM( I ), ' ', ' ', HEADER,
-     :                           STATUS )
+                 CALL FTS1_WKEYR( KEYWRD, INCREM( I ), ' ', ' ', HEADER,
+     :                            STATUS )
                END IF
                IF ( STATUS .EQ. SAI__OK ) CALL ADLINE( IMDESC, HEADER )
 
@@ -650,11 +650,11 @@
 *  Create the CDn_n header (there is no comment) and append it to the
 *  OIF headers using the appropriate data type.
                IF ( ATYPE( I ) .EQ. '_DOUBLE' ) THEN
-                  CALL CON_FKEYD( KEYWRD, DINCRE( I ), ' ', ' ', HEADER,
-     :                            STATUS )
+                  CALL FTS1_WKEYD( KEYWRD, DINCRE( I ), ' ', ' ',
+     :                             HEADER, STATUS )
                ELSE
-                  CALL CON_FKEYR( KEYWRD, INCREM( I ), ' ', ' ', HEADER,
-     :                            STATUS )
+                  CALL FTS1_WKEYR( KEYWRD, INCREM( I ), ' ', ' ',
+     :                             HEADER, STATUS )
                END IF
                IF ( STATUS .EQ. SAI__OK ) CALL ADLINE( IMDESC, HEADER )
 
@@ -667,11 +667,11 @@
 *  Create the CRPIXn header (there is no comment) and append it to the
 *  OIF headers using the appropriate data type.
                IF ( ATYPE( I ) .EQ. '_DOUBLE' ) THEN
-                  CALL CON_FKEYD( KEYWRD, 1.0D0, ' ', ' ', HEADER,
-     :                            STATUS )
+                  CALL FTS1_WKEYD( KEYWRD, 1.0D0, ' ', ' ', HEADER,
+     :                             STATUS )
                ELSE
-                  CALL CON_FKEYR( KEYWRD, 1.0, ' ', ' ', HEADER,
-     :                            STATUS )
+                  CALL FTS1_WKEYR( KEYWRD, 1.0, ' ', ' ', HEADER,
+     :                             STATUS )
                END IF
                IF ( STATUS .EQ. SAI__OK ) CALL ADLINE( IMDESC, HEADER )
 
@@ -813,8 +813,8 @@
                KEYWRD = 'CTYPE'//C
 
 *  Create the header (there is no comment) and append it to the headers.
-               CALL CON_FKEYC( KEYWRD, 'MULTISPE', ' ', ' ', .FALSE.,
-     :                         HEADER, STATUS )
+               CALL FTS1_WKEYC( KEYWRD, 'MULTISPE', ' ', ' ', .FALSE.,
+     :                          HEADER, STATUS )
                IF ( STATUS .EQ. SAI__OK ) CALL ADLINE( IMDESC, HEADER )
 
 *  Write the incremental value to keyword CDELTn.
@@ -826,11 +826,11 @@
 *  Create the CDELTn header (there is no comment) and append it to the
 *  OIF headers using the appropriate data type.
                IF ( ATYPE( I ) .EQ. '_DOUBLE' ) THEN
-                  CALL CON_FKEYD( KEYWRD, DINCRE( I ), ' ', ' ', HEADER,
-     :                            STATUS )
+                  CALL FTS1_WKEYD( KEYWRD, DINCRE( I ), ' ', ' ',
+     :                             HEADER, STATUS )
                ELSE
-                  CALL CON_FKEYR( KEYWRD, INCREM( I ), ' ', ' ', HEADER,
-     :                            STATUS )
+                  CALL FTS1_WKEYR( KEYWRD, INCREM( I ), ' ', ' ',
+     :                             HEADER, STATUS )
                END IF
                IF ( STATUS .EQ. SAI__OK ) CALL ADLINE( IMDESC, HEADER )
 
@@ -843,11 +843,11 @@
 *  Create the CDn_n header (there is no comment) and append it to the
 *  OIF headers using the appropriate data type.
                IF ( ATYPE( I ) .EQ. '_DOUBLE' ) THEN
-                  CALL CON_FKEYD( KEYWRD, 1.0D0, ' ', ' ', HEADER,
-     :                            STATUS )
+                  CALL FTS1_WKEYD( KEYWRD, 1.0D0, ' ', ' ', HEADER,
+     :                             STATUS )
                ELSE
-                  CALL CON_FKEYR( KEYWRD, 1.0, ' ', ' ', HEADER,
-     :                            STATUS )
+                  CALL FTS1_WKEYR( KEYWRD, 1.0, ' ', ' ', HEADER,
+     :                             STATUS )
                END IF
                IF ( STATUS .EQ. SAI__OK ) CALL ADLINE( IMDESC, HEADER )
             END IF

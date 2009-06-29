@@ -120,7 +120,8 @@
 *  Copyright:
 *     Copyright (C) 1988, 1990-1993 Science & Engineering Research
 *     Council. Copyright (C) 1995-1996, 2004 Central Laboratory of the
-*     Research Councils. All Rights Reserved.
+*     Research Councils.  2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -230,6 +231,8 @@
 *        count of the FITS extension's size accordingly.
 *     2004 September 9 (TIMJ):
 *        Use CNF_PVAL.
+*     2009 June 29 (MJC):
+*        Replaced deprecated CON_MOVE with KPG1_COPY from KAPLIBS.
 *     {enter_further_changes_here}
 
 *-
@@ -943,10 +946,8 @@
 
 *                     Copy the quality.
                         NBYTES = NDATA
-                        CALL CON_MOVE( NBYTES, 
-     :                                 %VAL( CNF_PVAL( INQPTR ) ),
-     :                                 %VAL( CNF_PVAL( OTQPTR ) ), 
-     :                                 STATUS )
+                        CALL KPG1_COPY( '_UBYTE', NDATA, INQPTR, OTQPTR,
+     :                                  STATUS )
 
 *                     Unmap the quality arrays.
                         CALL DTA_FRVAR( LEVEL2, DSTAT )

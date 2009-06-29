@@ -61,6 +61,7 @@
 *  Copyright:
 *     Copyright (C) 1992 Science & Engineering Research Council.
 *     Copyright (C) 2001 Central Laboratory of the Research Councils.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -89,6 +90,8 @@
 *        Original version based on FTS1_DTYPE.
 *     2001 August 30 (AJC):
 *        Correct CON_GKEYx arguments
+*     2009 June 29 (MJC):
+*        Replace cloned CON_GKEYx with KAPLIBS FTS1_GKEYx.
 *     {enter_further_changes_here}
 
 *-
@@ -104,7 +107,7 @@
       INTEGER SCARD
       INTEGER NCARD
 
-      CHARACTER * ( 80 ) HEADER( NCARD )
+      CHARACTER*80 HEADER( NCARD )
 
 *  Arguments Returned:
       INTEGER BLANK
@@ -119,16 +122,15 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
+      CHARACTER*80 COM           ! Header-card comment
       INTEGER DCARD              ! Header card number of BLANK
+      LOGICAL IEEE               ! Data type is floating?
       INTEGER NKC                ! Number of the header card containing
                                  ! the requested FITS keyword
+      REAL RBLANK                ! Floating-point data blank
+      LOGICAL THERE              ! Selected keyword is present in
+                                 ! FITS header?
 
-      REAL RBLANK                ! Floating-point data blank.
-
-      LOGICAL IEEE               ! True if the data type is floating
-      LOGICAL THERE              ! True if the selected keyword is
-                                 ! present in the FITS header
-      CHARACTER * ( 80 ) COM     ! Header card comment
 *.
 
 *  Check the inherited global status.
@@ -141,18 +143,18 @@
       IF ( BITPIX .GT. 0 ) THEN
 
 *  Get the UNSIGNED flag.
-         CALL CON_GKEYL( NCARD, HEADER, SCARD, 'UNSIGNED', 1, THERE,
-     :                   BSCALE, COM, NKC, STATUS )
+         CALL FTS1_GKEYL( NCARD, HEADER, SCARD, 'UNSIGNED', 1, THERE,
+     :                    BSCALE, COM, NKC, STATUS )
          IF ( .NOT. THERE ) UNSIGN = .FALSE.
 
 *  Get the BSCALE scale factor.
-         CALL CON_GKEYR( NCARD, HEADER, SCARD, 'BSCALE', 1, THERE,
-     :                   BSCALE, COM, NKC, STATUS )
+         CALL FTS1_GKEYR( NCARD, HEADER, SCARD, 'BSCALE', 1, THERE,
+     :                    BSCALE, COM, NKC, STATUS )
          IF ( .NOT. THERE ) BSCALE = 1.0
 
 *  Next the BZERO offset.
-         CALL CON_GKEYR( NCARD, HEADER, SCARD, 'BZERO', 1, THERE,
-     :                   BZERO, COM, NKC, STATUS )
+         CALL FTS1_GKEYR( NCARD, HEADER, SCARD, 'BZERO', 1, THERE,
+     :                    BZERO, COM, NKC, STATUS )
          IF ( .NOT. THERE ) BZERO = 0.0
       ELSE
 
@@ -172,8 +174,8 @@
          CALL ERR_MARK
 
 *  Now get the undefined pixel value, BLANK.
-         CALL CON_GKEYI( NCARD, HEADER, SCARD, 'BLANK', 1, BADPIX,
-     :                   BLANK, COM, NKC, STATUS )
+         CALL FTS1_GKEYI( NCARD, HEADER, SCARD, 'BLANK', 1, BADPIX,
+     :                    BLANK, COM, NKC, STATUS )
 
 *  Look for the non-standard case where the BLANK value has been given
 *  its original floating-point value rather than the integer value
@@ -190,8 +192,8 @@
                DCARD = NKC
 
 *  Read BLANK as floating-point value.
-               CALL CON_GKEYR( NCARD, HEADER, DCARD, 'BLANK', 1,
-     :                         BADPIX, RBLANK, COM, NKC, STATUS )
+               CALL FTS1_GKEYR( NCARD, HEADER, DCARD, 'BLANK', 1,
+     :                          BADPIX, RBLANK, COM, NKC, STATUS )
 
 *  If no problem this time apply scale and zero to derive the true
 *  integer value in the FITS file.
