@@ -61,7 +61,9 @@
 *  History:
 *     1992 February 4 (MJC):
 *        Original version.
-*     {enter_further_changes_here}
+*     2009 June 29 (MJC):
+*        Used modern coding style.
+*     {enter_changes_here}
 
 *-
       
@@ -72,37 +74,34 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Arguments Given:
-      CHARACTER * ( * )
-     :  INTTYP
+      CHARACTER*(*) INTTYP
 
 *  Arguments Returned:
-      INTEGER
-     :  ITCODE,
-     :  NBYTES
+      INTEGER ITCODE
+      INTEGER NBYTES
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Constants:
       INTEGER MAXTYP
-      PARAMETER( MAXTYP=7 )
+      PARAMETER( MAXTYP = 7 )
 
 *  Local Variables:
-      INTEGER
-     :  BDFSIZ( MAXTYP ),        ! Byte lengths for the various Interim
-                                 ! data types
-     :  I,                       ! Loop counter
-     :  TYPNUM( MAXTYP )         ! The table of Interim numeric data
-                                 ! types
-
-      CHARACTER * 2
-     :  TYPES( MAXTYP )          ! The table of Interim numeric data
-                                 ! types
+      INTEGER I                  ! Loop counter
 
 *  Local Data:
-      DATA TYPES/'SB', 'SW', 'SL',  'R', 'DP', 'UB', 'UW' /
-      DATA TYPNUM/101, 102,  104,  204,  208,  301,  302/
-      DATA BDFSIZ/1, 2, 4, 4, 8, 1, 2/
+      INTEGER BDFSIZ( MAXTYP )   ! Byte lengths for the various Interim
+                                 ! data types
+      DATA BDFSIZ/ 1, 2, 4, 4, 8, 1, 2 /
+
+      CHARACTER*2 TYPES( MAXTYP ) ! The table of Interim numeric data
+                                  ! types
+      DATA TYPES/ 'SB', 'SW', 'SL',  'R', 'DP', 'UB', 'UW' /
+
+      INTEGER TYPNUM( MAXTYP )   ! The table of Interim numeric data
+                                 ! types
+      DATA TYPNUM/ 101, 102,  104,  204,  208,  301,  302 /
 
 *.
 

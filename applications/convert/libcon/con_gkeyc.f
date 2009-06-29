@@ -98,7 +98,7 @@
 *  History:
 *     1997 March 16 (MJC):
 *        Original version rebadged from FTS1_GKEYx.
-*     {enter_further_changes_here}
+*     {enter_changes_here}
 
 *-
 

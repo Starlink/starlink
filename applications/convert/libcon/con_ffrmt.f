@@ -60,7 +60,7 @@
 *  History:
 *     1992 September 18 (MJC):
 *        Original version.
-*     {enter_further_changes_here}
+*     {enter_changes_here}
 
 *-
       

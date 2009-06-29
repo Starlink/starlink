@@ -4,7 +4,7 @@
 *     CON_FITAX
 
 *  Purpose:
-*     Create an axis structure within an NDF from FITS header
+*     Creates an axis structure within an NDF from FITS header
 *     information.
 
 *  Language:

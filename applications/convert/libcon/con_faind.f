@@ -1,5 +1,5 @@
       SUBROUTINE CON_FAIND( BAD, DIM1, DIM2, INARR, SIGRNG, 
-     :                        LOWER, UPPER, STATUS )
+     :                      LOWER, UPPER, STATUS )
 *+
 *  Name:
 *     CON_FAIND
@@ -11,8 +11,7 @@
 *  Language:
 *     Starlink Fortran 77
 *
-*     Invocation
-*
+*  Invocation:
 *     CALL CON_FAIND( BAD, DIM1, DIM2, INARR, SIGRNG, 
 *     :                 LOWER, UPPER, STATUS )
 
@@ -94,7 +93,7 @@
 *  History:
 *     04-FEB-1999 (AJC):
 *        Original version - based on KAPPA KPS1_FAIND
-*     {enter_further_changes_here}
+*     {enter_changes_here}
 
 *-
  

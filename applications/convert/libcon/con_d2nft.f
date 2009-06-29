@@ -53,8 +53,6 @@
 *        The number of FITS headers in the output NDF FITS extension.
 *     STATUS = INTEGER ({status_access_mode})
 *        The global status.
-*
-*     [optional_subroutine_items]...
 
 *  Copyright:
 *     Copyright (C) 1996 Central Laboratory of the Research Councils.
@@ -83,7 +81,7 @@
 *  History:
 *     1996 September 20 (MJC):
 *        Original version, based on code originally in CON_DST2N.
-*     {enter_further_changes_here}
+*     {enter_changes_here}
 
 *-
       

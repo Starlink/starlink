@@ -1,5 +1,5 @@
       SUBROUTINE CON_DIPWR( UNIT, TITLE, NPTS, FLUX, WAVE, FLUX1, WAVE1,
-     :                  BAD, BREAK, MAXBRK, STATUS )
+     :                      BAD, MAXBRK, BREAK, STATUS )
 *+
 *  Name:
 *     DIPWR
@@ -12,7 +12,7 @@
 
 *  Invocation:
 *     CALL DIPWR( UNIT, TITLE, NPTS, FLUX, WAVE, FLUX1, WAVE1, BAD, 
-*                 BREAK, MAXBRK, STATUS )
+*                 MAXBRK, BREAK, STATUS )
 
 *  Description:
 *     The routine writes the main data and axis(1) arrays from an NDF
@@ -36,10 +36,11 @@
 *     WAVE( NPTS ) = REAL (Returned)
 *        Wavelength array with bad elements removed.
 *     BAD = LOGICAL (Given)
-*        True if NDF data array  contained bad pixels.
-*     BREAK(MAXBRK) =
-*     MAXBRK
-*
+*        True if NDF data array contained bad pixels.
+*     MAXBRK = INTEGER (Given)
+*        Maximum number of break points.
+*     BREAK( MAXBRK ) = INTGEGR (Returned)
+*        Indices of break points.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -64,12 +65,17 @@
 *     02111-1307, USA.
 
 *  Authors:
-*     Jo Murray (STARLINK)
+*     JM: Jo Murray (STARLINK)
+*     MJC: Malcolm J. Currie (Starlink)
 *     {enter_new_authors_here}
 
 *  History:
-*     1990 August 20th(JM):
+*     1990 August 20th (JM):
 *        Original version.
+*     2009 June 29 (MJC):
+*        Used modern coding style and competed the prologue.  Reordered MAXBRK
+*        argument to standard order.  Checked bounds of MAXBRK are not
+*        exceeded.
 *     {enter_further_changes_here}
 
 *-
@@ -77,106 +83,113 @@
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
-      
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! Bad pixel values
 
-       
 *  Arguments Given:
+      INTEGER UNIT
       CHARACTER*(*) TITLE
-      INTEGER       NPTS
-      REAL          FLUX(NPTS) 
-      REAL          WAVE(NPTS)            ! Input wavelength array
-      REAL          FLUX1(NPTS)
-      REAL          WAVE1(NPTS)
-      LOGICAL       BAD                ! True if data array has bad pixels
-      INTEGER       STATUS             ! Global status
-      INTEGER       UNIT             ! Logical unit number for Dipso file
-
-*   Local variables.
+      INTEGER NPTS
+      REAL FLUX( NPTS )
+      REAL WAVE( NPTS )
+      REAL FLUX1( NPTS )
+      REAL WAVE1( NPTS )
+      LOGICAL BAD
       INTEGER MAXBRK
-      INTEGER NPTS1
-      INTEGER IOS
-      INTEGER NBREAK
-      REAL WORV
+      INTEGER BREAK( MAXBRK )
+
+*  Status:
+      INTEGER       STATUS       ! Global status
+
+* Local Variables:
+      LOGICAL BREAKCUR
       INTEGER I
-      INTEGER BREAK(MAXBRK)
-      INTEGER  KOUNT
-      LOGICAL       BREAKCUR
+      INTEGER IOS
+      INTEGER KOUNT
+      INTEGER NBREAK
+      INTEGER NPTS1
+      REAL WORV
 
 *  Check inherited global status.
-      
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-      
-       WORV=1.0
+      WORV = 1.0
 
 *  Work out breaks from bad pixels.
-      IF(.NOT.BAD)THEN
-*      No bad pixels
-         NBREAK=1
-      ELSE
-*      Check each value to find bad pixels.
-         NBREAK=0
-         KOUNT=0
-         BREAKCUR=.FALSE.
-         DO I=1,NPTS
-*         Good value
-            IF(FLUX(I).NE.VAL__BADR)THEN
-               KOUNT=KOUNT+1
-               FLUX1(KOUNT)=FLUX(I)
-               WAVE1(KOUNT)=WAVE(I)
-               BREAKCUR=.FALSE.
-            ELSE
-*         Bad value
-               IF(.NOT.BREAKCUR)THEN
-                  NBREAK=NBREAK+1
-                  BREAK(NBREAK)=KOUNT
-                  BREAKCUR=.TRUE.
-               ENDIF
-            ENDIF
-         ENDDO
-         NBREAK=NBREAK+1
-         BREAK(NBREAK)=KOUNT
-         NPTS1=KOUNT
-      ENDIF
+      IF ( .NOT. BAD ) THEN
 
+*  No bad pixels present.
+         NBREAK = 1
+      ELSE
+
+*  Check each value to find bad pixels.
+         NBREAK = 0
+         KOUNT = 0
+         BREAKCUR = .FALSE.
+         DO I = 1, NPTS
+
+*  Good value
+            IF ( FLUX( I ) .NE. VAL__BADR ) THEN
+               KOUNT = KOUNT + 1
+               FLUX1( KOUNT ) = FLUX( I )
+               WAVE1( KOUNT ) = WAVE( I )
+               BREAKCUR = .FALSE.
+            ELSE
+
+*  Bad value
+               IF ( .NOT. BREAKCUR ) THEN
+                  NBREAK = NBREAK + 1
+                  IF ( NBREAK .LT. MAXBRK ) THEN
+                     NBREAK = NBREAK + 1
+                     BREAK( NBREAK ) = KOUNT
+                  END IF
+                  BREAKCUR = .TRUE.
+               END IF
+            END IF
+         END DO
+         IF ( NBREAK .LT. MAXBRK ) THEN
+            NBREAK = NBREAK + 1
+            BREAK( NBREAK ) = KOUNT
+         END IF
+         NPTS1 = KOUNT
+      END IF
 
 *  Check the number of BREAKS does not exceed the DIPSO limit of 1000.
-      IF(NBREAK.GT.1000)THEN
-         STATUS=SAI__ERROR
-         CALL ERR_REP('NDF2DIPSO_TOO_MANY_BREAKS', 
-     :                'Too many breaks in data.',
-     :                 STATUS)
+      IF ( NBREAK .GT. 1000 ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'NDF2DIPSO_TOO_MANY_BREAKS',
+     :                 'Too many breaks in data.', STATUS)
          GOTO 999
-      ENDIF    
+      END IF
 
-*   Write data out in format suitable for DIPSO 'READ' command.
-      WRITE (UNIT, IOSTAT=IOS) TITLE
-      IF (IOS.EQ.0) THEN
-         WRITE (UNIT, IOSTAT=IOS) NBREAK, (BREAK(I),I=1,NBREAK)
-         IF (IOS.EQ.0) THEN
-            IF(.NOT.BAD)THEN
-               WRITE (UNIT, IOSTAT=IOS) 
-     :                  (WAVE(I),FLUX(I),I=1,NPTS)
+*  Write data out in format suitable for DIPSO 'READ' command.
+      WRITE( UNIT, IOSTAT = IOS ) TITLE
+      IF ( IOS.EQ.0 ) THEN
+         WRITE( UNIT, IOSTAT = IOS ) NBREAK,
+     :                               ( BREAK( I ), I = 1, NBREAK )
+         IF ( IOS.EQ.0 ) THEN
+            IF ( .NOT. BAD ) THEN
+               WRITE( UNIT, IOSTAT = IOS )
+     :                  ( WAVE( I ), FLUX( I ), I = 1, NPTS )
             ELSE
-               WRITE (UNIT, IOSTAT=IOS) 
-     :                   (WAVE1(I),FLUX1(I),I=1,NPTS1)
-            ENDIF
-            IF (IOS.EQ.0) THEN
-               WRITE (UNIT,  IOSTAT=IOS) WORV
-            ENDIF
-         ENDIF
-      ENDIF
+               WRITE( UNIT, IOSTAT = IOS )
+     :                   ( WAVE1( I ), FLUX1( I ), I = 1, NPTS1 )
+            END IF
+            IF ( IOS .EQ. 0 ) THEN
+               WRITE( UNIT, IOSTAT = IOS ) WORV
+            END IF
+         END IF
+      END IF
 
-*   If I/O error has occurred set STATUS.
-      IF (IOS.NE.0) THEN
-         STATUS=SAI__ERROR   
-*      Translate IOS into a message token and make an error report.
-         CALL ERR_FIOER ('MSG', IOS)
-         CALL ERR_REP ('DIPWR_IOERR', '^MSG', STATUS)         
-      ENDIF
+*  If I/O error has occurred set STATUS.
+      IF ( IOS.NE.0 ) THEN
+         STATUS = SAI__ERROR
+
+*  Translate IOS into a message token and make an error report.
+         CALL ERR_FIOER( 'MSG', IOS )
+         CALL ERR_REP( 'DIPWR_IOERR', '^MSG', STATUS )
+      END IF
 
 999   CONTINUE
 

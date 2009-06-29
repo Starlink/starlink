@@ -84,7 +84,7 @@
 *  History:
 *     1997 March 25 (MJC):
 *        Original version, rebadged from FTS1_WKEYC.
-*     {enter_further_changes_here}
+*     {enter_changes_here}
 
 *-
       
@@ -97,12 +97,12 @@
 *  Arguments Given:
       CHARACTER * ( * ) NAME
       CHARACTER * ( * ) VALUE
-      CHARACTER * ( 1 ) CMTBGN
+      CHARACTER * 1 CMTBGN
       CHARACTER * ( * ) COMNT
       LOGICAL COMCAR
 
 *  Arguments Returned:
-      CHARACTER * ( 80 ) HEADER
+      CHARACTER*80 HEADER
 
 *  Status:
       INTEGER STATUS             ! Global status

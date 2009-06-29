@@ -1,4 +1,4 @@
-      SUBROUTINE  CON_TYPSZ (TYPE, NBYTES, STATUS)         
+      SUBROUTINE CON_TYPSZ( TYPE, NBYTES, STATUS )
 *+
 *  Name:
 *     CON_TYPSZ
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL SUBROUTINE  CON_TYPSZ (TYPE, NBYTES, STATUS)         
+*     CALL CON_TYPSZ( TYPE, NBYTES, STATUS )
 
 *  Description:
 *     If the input TYPE is one of the HDS primitive numeric data types,
@@ -52,67 +52,67 @@
 
 *  Author:
 *     JM: Jo Murray (STARLINK)
+*     MJC: Malcolm J. Currie (Starlink)
 *     {enter_new_authors_here}
 
 *  History:
 *     1990 Aug 27 (JM):
 *        Original version.
+*     2009 June 29 (MJC):
+*        Used modern coding style.  Set missing token.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     None known.
-*     {note_new_bugs_here}
 
 *-
 
-*  Type Definitions.
-      IMPLICIT  NONE               ! No implicit typing.
+*  Type Definitions:
+      IMPLICIT  NONE               ! No implicit typing
 
-
-*  Global constants.
+*  Global Constants:
       INCLUDE  'SAE_PAR'           ! SSE global definitions
       INCLUDE  'PRM_PAR'           ! PRIMDAT symbolic constants
       INCLUDE  'NDF_PAR'           ! NDF symbolic constants
 
-*  External functions:
-      LOGICAL CHR_SIMLR            ! Compare character strings
-
 *  Arguments Given:
-      CHARACTER*(NDF__SZTYP) TYPE  ! Data type
+      CHARACTER*(NDF__SZTYP) TYPE
 
 *  Arguments Returned:
-      INTEGER   NBYTES             ! No. bytes required
+      INTEGER NBYTES
 
 *  Status:
-      INTEGER   STATUS             ! Global status
+      INTEGER STATUS               ! Global status
+
+*  External References:
+      LOGICAL CHR_SIMLR            ! Compare character strings
 
 *.
 
-*  Check inherited global status.
-      IF (STATUS.NE.SAI__OK) RETURN
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
-*   Assign number of BYTES appropriate for data type to NBYTES.
-      IF (CHR_SIMLR (TYPE, '_REAL') ) THEN
+*  Assign number of BYTES appropriate for data type to NBYTES.
+      IF ( CHR_SIMLR( TYPE, '_REAL' ) ) THEN
          NBYTES = VAL__NBR
-      ELSEIF (CHR_SIMLR (TYPE, '_DOUBLE') ) THEN
+      ELSE IF ( CHR_SIMLR( TYPE, '_DOUBLE' ) ) THEN
          NBYTES = VAL__NBD
-      ELSEIF (CHR_SIMLR (TYPE, '_INTEGER') ) THEN
+      ELSE IF ( CHR_SIMLR( TYPE, '_INTEGER' ) ) THEN
          NBYTES = VAL__NBI
-      ELSEIF (CHR_SIMLR (TYPE, '_WORD') ) THEN
+      ELSE IF ( CHR_SIMLR( TYPE, '_WORD' ) ) THEN
          NBYTES = VAL__NBW
-      ELSEIF (CHR_SIMLR (TYPE, '_UWORD') ) THEN
+      ELSE IF ( CHR_SIMLR( TYPE, '_UWORD' ) ) THEN
          NBYTES = VAL__NBUW
-      ELSEIF (CHR_SIMLR (TYPE, '_BYTE') ) THEN
+      ELSE IF ( CHR_SIMLR( TYPE, '_BYTE' ) ) THEN
          NBYTES = VAL__NBB
-      ELSEIF (CHR_SIMLR (TYPE, '_UBYTE') ) THEN
+      ELSE IF ( CHR_SIMLR( TYPE, '_UBYTE' ) ) THEN
          NBYTES = VAL__NBUB
       ELSE
-*       If type not recognised, report error.
+
+*  If type not recognised, report error.
          STATUS = SAI__ERROR
-         CALL ERR_REP ('CON_TYPSZ_INVTYP',
+         CALL MSG_SETC( 'TYPE', TYPE )
+         CALL ERR_REP( 'CON_TYPSZ_INVTYP',
      :                  '^TYPE is not a primitive numeric type.',
-     :                  STATUS)
-      ENDIF
+     :                  STATUS )
+      END IF
 
       END
 

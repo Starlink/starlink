@@ -50,7 +50,7 @@
 *        If an error occurs, this routine will have output a detailed
 *        description before returning.
 *
-*     Format-conversion Rules:
+*  Format-conversion Rules:
 *     .Z.DATA  ->        .DATA_ARRAY.DATA (when FORM = "SIMPLE")
 *     .Z.DATA  ->        .DATA_ARRAY (when FORM = "PRIMITIVE")
 *     .Z.ERRORS ->       .VARIANCE.DATA (after processing when
@@ -111,7 +111,7 @@
 *     of related headers are bracketed by blank lines and a comment
 *     containing the name of the structure (i.e. xxxx).
 *
-*     Bad-pixel handling:
+*  Bad-pixel Handling:
 *     The QUALITY array is only copied if the bad-pixel flag
 *     (.Z.FLAGGED) is false or absent.  A simple NDF with the bad-pixel
 *     flag set to false (meaning that there are no bad-pixels present)

@@ -1,4 +1,4 @@
-      SUBROUTINE CON_MOVE (NBYTES, FROM, TO, STATUS)
+      SUBROUTINE CON_MOVE( NBYTES, FROM, TO, STATUS )
 *+
 *  Name:
 *     CON_MOVE
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CON_MOVE (NBYTES, FROM, TO, STATUS)
+*     CALL CON_MOVE( NBYTES, FROM, TO, STATUS )
 
 *  Description:
 *     Simply moves bytes of data from one array to another.
@@ -18,9 +18,9 @@
 *  Arguments:
 *     NBYTES = INTEGER (Given)
 *        Number of bytes to be moved.
-*     FROM(NBYTES) = BYTE (Given)
+*     FROM( NBYTES ) = BYTE (Given)
 *        Source array for data.
-*     TO (NBYTES) = BYTE (Returned)
+*     TO ( NBYTES ) = BYTE (Returned)
 *        Destination array for data.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -52,7 +52,7 @@
 *  History:
 *     1991 Feb 8 (JM):
 *        Original version.
-*     {enter_further_changes_here}
+*     {enter_changes_here}
 
 *-
       
@@ -63,25 +63,26 @@
       INCLUDE    'SAE_PAR'       ! Standard SAE constants
 
 *  Arguments Given:
-      INTEGER    NBYTES          ! Number of bytes to be moved.
-      BYTE       FROM(NBYTES)    ! Source array.
+      INTEGER    NBYTES
+      BYTE       FROM( NBYTES )
 
-*  Arguments Reurned:
-      BYTE       TO(NBYTES)      ! Destination array.
+*  Arguments Reyurned:
+      BYTE       TO( NBYTES )
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local variable:
       INTEGER    I               ! Loop variable
+
 *.
 
-*    Check inherited global status.
+*  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Move the bytes.
-      DO I=1, NBYTES
-         TO(I) = FROM(I)
+      DO I = 1, NBYTES
+         TO( I ) = FROM( I )
       END DO
  
       END

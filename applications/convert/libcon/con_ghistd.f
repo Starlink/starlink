@@ -1,5 +1,5 @@
-      SUBROUTINE CON_GHSTD ( BAD, DIM, ARRAY, NUMBIN,
-     :                         VALMAX, VALMIN, HIST, STATUS )
+      SUBROUTINE CON_GHSTD( BAD, DIM, ARRAY, NUMBIN, VALMAX, VALMIN,
+     :                      HIST, STATUS )
 *+
 *  Name:
 *     CON_GHSTD
@@ -10,9 +10,9 @@
 *  Language:
 *     Starlink Fortran 77
 *
-*     Invocation
+*  Invocation:
 *     CALL CON_GHSTD( BAD, DIM, ARRAY, NUMBIN, VALMAX, VALMIN, HIST,
-*     :                 STATUS )
+*     :               STATUS )
 
 *  Description:
 *     This routine calculates the truncated histogram of an array of
@@ -83,9 +83,9 @@
 *     1996 July 3 (MJC):
 *        Made to cope with unsigned integer types.
 *     05-FEB-1999 (AJC):
-*        Copied and renamed from KAPPA KPG1_GHISTD
-*        Removed use of NUM_ conversions
-*        and IF on binsize calculation (as no longer generic)
+*        Copied and renamed from KAPPA KPG1_GHISTD.  Removed use of
+*        NUM_ conversions and IF on binsize calculation (as no longer
+*        generic)
 *     {enter_further_changes_here}
 
 *-

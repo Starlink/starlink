@@ -54,44 +54,45 @@
 
 *  Authors:
 *     ACD: A C Davenhall (Edinburgh)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
-*     3/9/97 (ACD): Original version.
+*     3/9/97 (ACD):
+*        Original version.
+*     2009 June 29 (MJC):
+*        Used modern coding style.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     None known
-*     {note_new_bugs_here}
 
 *-
 *  Type Definitions:
       IMPLICIT NONE
+
 *  Global Constants:
-      INCLUDE 'SAE_PAR'           ! Standard Starlink constants.
+      INCLUDE 'SAE_PAR'          ! Standard Starlink constants
+
 *  Arguments Given:
-      REAL
-     :  ZEROPT,
-     :  SCALE
-      INTEGER
-     :  NPTS
+      REAL ZEROPT
+      REAL SCALE
+      INTEGER NPTS
+
 *  Arguments Returned:
-      REAL
-     :  AXIS(NPTS)
+      REAL AXIS( NPTS )
+
 *  Status:
-      INTEGER STATUS             ! Global status.
+      INTEGER STATUS             ! Global status
+
 *  Local Variables:
-      INTEGER
-     :  LOOP      ! Loop index.
+      INTEGER LOOP               ! Loop index
+
 *.
 
-      IF (STATUS .EQ. SAI__OK) THEN
+*  Check the inherited status.
+      IF ( STATUS .EQ. SAI__OK ) THEN
 
-*
-*       Compute the value for each point along the axis.
-
+*  Compute the value for each point along the axis.
          DO LOOP = 1, NPTS
-            AXIS(LOOP) = ZEROPT + (REAL(LOOP-1) * SCALE)
+            AXIS( LOOP ) = ZEROPT + ( REAL( LOOP - 1 ) * SCALE )
          END DO
 
       END IF

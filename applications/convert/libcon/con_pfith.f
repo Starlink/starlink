@@ -74,7 +74,7 @@
 *  History:
 *     1992 September 17 (MJC):
 *        Original version.
-*     {enter_further_changes_here}
+*     {enter_changes_here}
 
 *-
 
