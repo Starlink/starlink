@@ -7,9 +7,10 @@
     catalogues. These new query toolboxes are located in the Data-Analysis
     menu.
 
-    Other significant changes are the introduction of support for the 
-    VOTable catalogue format, and various special catalogue types
-    created by the SMURF and KAPPA packages.
+    Other significant changes are the introduction of support for the
+    visualisation of 2D and 3D clumps detected by the CUPID package,
+    support for the VOTable catalogue format and various special
+    other catalogue types created by the SMURF and KAPPA packages.
 
     Catalogues with suitable descriptions will now have their coordinate
     systems matched to that of the displayed image. For instance

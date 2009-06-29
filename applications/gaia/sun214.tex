@@ -16,25 +16,25 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {214.36}
-\newcommand{\stardocauthors}   {Peter W. Draper, 
-                                Norman Gray, 
-                                David S. Berry \& 
+\newcommand{\stardocnumber}    {214.37}
+\newcommand{\stardocauthors}   {Peter W. Draper,
+                                Norman Gray,
+                                David S. Berry \&
                                 Mark Taylor }
-\newcommand{\stardocdate}      {31st March 2009}
-\newcommand{\stardoctitle}     {GAIA -- 
+\newcommand{\stardocdate}      {26th June 2009}
+\newcommand{\stardoctitle}     {GAIA --
                                 Graphical Astronomy and Image Analysis Tool}
 \newcommand{\stardocversion}   {4.3-0}
 \newcommand{\stardocmanual}    {User's Manual}
 
-\newcommand{\stardocabstract} {GAIA is an image and data-cube display 
+\newcommand{\stardocabstract} {GAIA is an image and data-cube display
 and analysis tool for astronomy. It provides the usual facilities of image
 display tools, plus more astronomically useful ones such as aperture \&
 optimal photometry, contouring, source detection, surface photometry,
 arbitrary region analysis, celestial coordinate readout, calibration
 and modification, grid overlays, blink comparison, defect patching and
-the ability to query on-line catalogues and image servers. It can 
-also display slices from data-cubes, extract and visualise spectra as 
+the ability to query on-line catalogues and image servers. It can
+also display slices from data-cubes, extract and visualise spectra as
 well as perform full 3D rendering.}
 
 % ? End of document identification
@@ -304,6 +304,10 @@ data-cubes and plotting spectra extracted from the third dimension. It can
 also display 3D visualisations of data-cubes using iso-surfaces and volume
 rendering.
 
+Specialised handling of data from the \xref{CUPID}{sun255}{} package provides
+the visualisation of clumps of emission in 2D and 3D, as ellipses, polygons
+and rectangles.
+
 Interoperability with other SAMP enabled applications is provided so that
 GAIA can be used as part of a integrated desktop (usually querying the
 Virtual Observatory).
@@ -331,8 +335,8 @@ coordinate information, although at the time of writing the astrometric
 calibration sections are now out of date with the arrival of the new toolboxes
 based on AUTOASTROM).
 
-The other main source of information about GAIA is the 
-\xref{on-line help system}{gaia}{regions}. 
+The other main source of information about GAIA is the
+\xref{on-line help system}{gaia}{regions}.
 This can be accessed after starting GAIA (just select the
 \mytt{Help} menus). Many windows also feature `short help'. This is a
 retangular region at the bottom of a window that may display a
@@ -373,7 +377,7 @@ You can also write to a specific window using the clone number:
 \begin{quote}
 \mytt{\% gaiadisp image\_name 2}
 \end{quote}
-This displays into the window with title \mytt{GAIA::SkyCat (2)}. 
+This displays into the window with title \mytt{GAIA::SkyCat (2)}.
 If this window doesn't exist it will be created.
 
 A list of images can be displayed in GAIA using the command:
@@ -386,28 +390,6 @@ can be applied using the \mytt{-p} option:
 \mytt{\% gaiadisp -p 98 image\_name1 image\_name2 image\_name3 ...}
 \end{quote}
 (works for the single image case too).
-
-% No longer available
-%\subsection{\xlabel{using_gaia_from_irafcl}Using GAIA from IRAF/CL}
-
-%GAIA can be used from the IRAF/CL command-line (providing it has been
-%installed on your system). Before you can actually run the main program
-%you first need to initialize the \mytt{gaia} package:
-%\begin{quote}
-%\mytt{cl> gaia}
-%\end{quote}
-%(you could do this once and for all in your \mytt{login.cl}
-%file). Next you need to use the \mytt{gaiadisp} command. This command
-%has two arguments, the name of the image to display and the plane
-%(\textit{i.e.} GAIA clone) that you want to display into. So for instance
-%if you wanted to display the default IRAF test image you'd use a
-%command like:
-%\begin{quote}
-%\mytt{cl> gaiadisp dev\$pix.imh 1}
-%\end{quote}
-%This will either display into an existing GAIA or start up a new
-%instance. Note that GAIA is not an IRAF image display and will
-%consequently not support any IRAF cursor commands.
 
 \section{\xlabel{what_does_it_actually_do}What does it actually do?}
 
@@ -465,6 +447,13 @@ GAIA provides the following normal ``image display tool'' features:
   SPLAT-VO program for analysis and additional inspection. Finally the
   spectral coordinates can be interactively transformed between various
   wavelength, frequency, energy and velocity systems.
+
+\item Selection of 2D or 3D regions using an integer mask. If you have a mask
+  that segments your image into regions based on some integer value you can
+  view only those parts of your image that correspond to some given values.
+  Such masks are produced by the \xref{EXTRACTOR/SExtractor}{sun226}{}
+  and \xref{CUPID}{sun255}{} applications.
+
 \end{itemize}
 
 \subsection{\xlabel{image_analysis_capabilities}Image analysis capabilities}
@@ -617,7 +606,7 @@ GAIA allows you to save remote catalogue queries to a local file. These
 can then be re-loaded and plotted as if on-line catalogues. This is very
 useful if you need to re-plot catalogues, but equally useful is the fact
 that local catalogues may be modified. So you can edit, sort, select and
-delete records (using a tool like 
+delete records (using a tool like
 \htmladdnormallinkfoot{TOPCAT}{http://www.starlink.ac.uk/topcat} or a
 simple editor if the facilities GAIA offers are not sufficient).
 
@@ -744,14 +733,50 @@ symbols you should consult the ESO document
 `Writing Catalogue and Image Servers for GAIA and CURSA '
 (\xref{SSN/75}{ssn75}{}).
 
-\subsubsection{FITS tables} Much of the above also applies to FITS tables
-that GAIA will read, \textit{i.e.} FITS keywords with the name
-\mytt{SYMBOL} will be interpreted correctly. Special parameter names that are
-longer than 8 characters (such as \mytt{search\_cols}, \mytt{sort\_order},
-\mytt{show\_cols} and \mytt{copyright}) should be truncated. Long symbol
-expressions can span more than one card by using the names: \mytt{SYMBOL1}
-through \mytt{SYMBOL9}. The columns used for world coordinates should have
-units of degrees or radians and have names like \mytt{RA} and \mytt{DEC}.
+\subsubsection{FITS tables}
+
+Much of the above also applies to FITS tables that GAIA will read,
+\textit{i.e.} FITS keywords with the name \mytt{SYMBOL} will be interpreted
+correctly. Special parameter names that are longer than 8 characters (such as
+\mytt{search\_cols}, \mytt{sort\_order}, \mytt{show\_cols} and
+\mytt{copyright}) should be truncated. Long symbol expressions can span more
+than one card by using the names: \mytt{SYMBOL1} through \mytt{SYMBOL9}. The
+columns used for world coordinates should have units of degrees or radians and
+have names like \mytt{RA} and \mytt{DEC}.
+
+\subsection{CUPID catalogues and masks}
+
+Catalogues produced by the \xref{CUPID}{sun255}{} application can be displayed
+in 2D or 3D and it's masks can be displayed or used to view regions.
+
+To display a 2D catalogue just open it as a local catalogue or import it
+using the \mytt{Import CUPID catalogue...} toolbox in the \mytt{Image-Analysis}
+\mytt{positions} menu. This latter option allows you to select which columns
+to use as RA and Dec and whether to use the special \mytt{Shape} column as the
+plotting symbol (STC-S ellipses and polygons are supported). If you choose not
+to use the STC-S shapes then rectangles based on the extents will be displayed.
+
+Displaying 3D catalogues should be done by importing them using the cube
+toolbox (\mytt{View} \mytt{Import CUPID catalogue}). When imported this way
+only regions that are in the current slice will be displayed. Note that if
+opened as a 2D catalogue all the regions will be displayed. 3D catalogues can
+also be viewed in a 3D scene as prisms, just select one of the 3D renderers in
+the \mytt{View} menu in the cube toolbox and click on the \mytt{CUPID} tab and
+select \mytt{Display catalogues:}. You can restrict the regions displayed to
+rows selected in the associated catalogue window by selecting \mytt{Only show
+selected rows:}.
+
+To use a 2D mask open it using the \mytt{Mask image...} toolbox in the 
+\mytt{Image-Analysis} menu. This can then be applied to the displayed image
+and individual or ranges of regions can be selected for display.
+
+To use a 3D mask look in the CUPID tab in the 3D rendering window and select
+your mask in the \mytt{Mask:} entry. To just display the mask select
+\mytt{Display:} and press \mytt{Draw}. To view individual regions or a 
+range enter some values into \mytt{Values:}. To apply these regions to the
+main cube and select the original flux you need to select \mytt{Apply mask:}
+and probably select \mytt{Display:} of the mask itself (although you can
+display both together, in that case you may want to change the opacity).
 
 \subsection{\xlabel{image_formats}Accessing images of differing formats}
 
@@ -775,7 +800,7 @@ routines (such as those used in the photometry toolbox) will still
 need to be able to convert these files into NDFs, using the on-the-fly
 facility, so if you define your own conversion facilities make sure
 that you include a FITS converter (note these doesn't apply to FITS
-data cubes, GAIA handles converting these into NDFs for the various 
+data cubes, GAIA handles converting these into NDFs for the various
 toolboxes directly).
 
 To display any of these images in GAIA just type the full disk-file
@@ -856,7 +881,7 @@ are best set using the \mytt{Startup options...} window located in the
  -always\_merge      &  Merge primary and extension headers \\
  -blank\_color       &  Colour for blank pixels \\
  -catalog            &  Open windows for the given catalogs on startup \\
- -check\_for\_cubes  &  Check input files to see if they are cubes (1) \\ 
+ -check\_for\_cubes  &  Check input files to see if they are cubes (1) \\
  -component          &  NDF component to display on startup \\
  -component          &  The NDF component (data, variance or quality) \\
  -default\_cmap      &  Change the default colour map \\
@@ -983,7 +1008,7 @@ iron out minor and major problems (in particular Tim Jenness, Tim
 Gledhill and Nigel Metcalfe) and all the users who have reported bugs
 and sent support since the early releases and continue to do so.
 
-The 3D facilities of GAIA make extensive use of the 
+The 3D facilities of GAIA make extensive use of the
 \htmladdnormallink{VTK}{http://www.kitware.com} library. Also a free
 library.
 

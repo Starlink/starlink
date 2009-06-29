@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>CUPID catalogues and masks</title>
+  </head>
+
+  <body>
+    <h2 align=center><font color=red>CUPID catalogues and masks</font></h2>
+    <p>
+      The CUPID package (SUN/255) analyzes images and cubes to identify
+      clumps of emission. This analysis results in the production of
+      catalogues that parameterize and quantify the clumps and masks that 
+      record which pixels are identified with a clump. There facilities in
+      GAIA for viewing both these data types in images and data-cubes.
+    </p>
+    
+    <h3>Emission in images</h3>
+    <p>
+      To display a 2D catalogue you can simply open it as a local catalogue
+      using the <tt>Data-Servers</tt> menu. This will display the STC-S shapes
+      described in the catalogue -- these will be ellipses or polygons. You
+      can use the positions and extents of the regions to display rectangles
+      instead of STC-S shapes by importing the catalogue using the <tt>Import
+      CUPID catalogue..."</tt> toolbox in the <tt>Image-Analysis</tt> menu.
+    </p>
+    <a href="cupidimport.html">Import CUPID catalogue</a>
+    <p>
+      Image masks can be displayed directly as images, or applied to the
+      displayed image using the <tt>Mask image..."</tt> toolbox in the
+      <tt>Image-Analysis</tt> menu.
+    </p>
+
+    <h3>Emission in data-cubes</h3>
+    <p>
+      To display a 3D catalogue you again have two options, open it as a local
+      catalogue, or import it using the <tt>Import CUPID catalogue...</tt>
+      option in the <tt>View</tt> menu of the cube toolbox.
+    </p>
+    <p>
+      If you import it using the cube toolbox then only clumps detected on the
+      current slice will be displayed. If opened as a normal local catalogue
+      the sky positions of all detected clumps will be displayed without any
+      regard to the coordinates of the slice.
+    </p>
+    <p>
+      To view 3D masks you need to do a full 3D rendering. Catalogues can also
+      be viewed in 3D.
+    </p>
+
+    <h3>3D rendering</h3>
+    <p>
+      When catalogues are imported using the cube toolbox they can be
+      displayed in 3D as well. In the isophotal and volume rendering toolboxes
+      (<tt>View->3D visualisation</tt>) there is a <tt>CUPID</tt> tab. Using
+      that you can request that the catalogue is rendering into the scene
+      (these are shown as <tt>prisms</tt>, i.e. 2D shapes protruded into the
+      3rd dimension).
+    </p>
+
+    <p>
+      As with imaging 3D masks can be viewed directly or used to select
+      regions from the displayed cube. 
+    </p>
+    <p>
+      Displaying masks directly is best done using the <tt>Mask &amp;
+      attributes</tt> section in the <tt>CUPID</tt> controls. To do that
+      select the mask, make sure <tt>Display:</tt> is selected and press
+      <tt>Draw</tt>. You can choose mask values to display by entering space
+      separated values in the <tt>Values:</tt> field, or by entering ranges:
+      </p>
+    <pre>
+    1-10 20-30
+    </pre>
+      <p>
+      etc.
+      </p>
+
+    </p>
+    <p>
+      To use the mask to view the associated emission in the data, do as
+      above, but deselect <tt>Display:</tt> and tick <tt>Apply mask:</tt>
+      in the main non-tab controls.
+    </p>
+  </p>
+  </body>
+</html>
