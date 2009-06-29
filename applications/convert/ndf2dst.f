@@ -102,7 +102,9 @@
 *  Copyright:
 *     Copyright (C) 1991-1992 Science & Engineering Research Council.
 *     Copyright (C) 1995-1997, 2004 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Councils.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -185,7 +187,10 @@
 *        RANGE (for Z) are present and are physically stored following
 *        their respective structure.
 *     2004 September 9 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2009 June 29 (MJC):
+*        Replaced deprecated CON_MOVE (and CON_TYPSZ) with KPG1_COPY
+*        from KAPLIBS.
 *     {enter_further_changes_here}
 
 *-
@@ -285,7 +290,6 @@
       LOGICAL                LVAL   ! Value of a logical FITS item
       CHARACTER*20           MFNAM  ! Name of item in Figaro extension
       INTEGER                NAXELM ! No elements in axis data structure
-      INTEGER                NBYTES ! Number of bytes
       INTEGER                NCOMP  ! Number of components 
       INTEGER                NCC    ! Column of FITS comment delimiter
       INTEGER                NCCOM  ! Number of characters in FITS
@@ -550,13 +554,8 @@
 *   Map .Z.DATA.
       CALL DAT_MAP( LFZD, TYPE, 'WRITE', NDIM, DIM, FDPTR, STATUS )
 
-*   Find the number of bytes per value for the data type.  Move data
-*   into the Figaro data array.
-      CALL CON_TYPSZ( TYPE, NBYTES, STATUS )
-      IF ( (STATUS .EQ. SAI__OK) .AND. (NBYTES .GT. 0) ) THEN
-         CALL CON_MOVE( NBYTES*NELM, %VAL(CNF_PVAL(NDPTR)), 
-     :                  %VAL(CNF_PVAL(FDPTR)), STATUS )
-      END IF
+*   Move data into the Figaro data array.
+      CALL KPG1_COPY( TYPE, NELM, NDPTR, FDPTR, STATUS )
 
 *   Unmap .Z.DATA.
       CALL DAT_ANNUL( LFZD, STATUS )
@@ -572,11 +571,7 @@
          CALL DAT_MAP( LFZI, TYPE, 'WRITE', NDIM, DIM, FIPTR, STATUS )
 
 *   Move imaginary data into the Figaro data array.
-         IF ( (STATUS .EQ. SAI__OK) .AND. (NBYTES .GT. 0) ) THEN
-            CALL CON_MOVE( NBYTES*NELM, %VAL(CNF_PVAL(NIPTR)), 
-     :                     %VAL(CNF_PVAL(FIPTR)),
-     :                     STATUS )
-         END IF
+         CALL KPG1_COPY( TYPE, NELM, NIPTR, FIPTR, STATUS )
 
 *   Unmap .Z.IMAGINARY
          CALL DAT_ANNUL( LFZI, STATUS )
@@ -845,13 +840,8 @@
      :                       FAXPTR, STATUS )
 
 *            Move the NDF axis data into Figaro axis data array.
-               CALL CON_TYPSZ( TYPE, NBYTES, STATUS )         
-               IF ( ( STATUS .EQ. SAI__OK ) .AND.
-     :              ( DIM( IAXIS ) .GT. 0 ) ) THEN
-                  CALL CON_MOVE( NBYTES * DIM( IAXIS ), 
-     :                           %VAL(CNF_PVAL(AXPTR)),
-     :                           %VAL(CNF_PVAL(FAXPTR)), STATUS )
-               END IF
+               CALL KPG1_COPY( TYPE, DIM( IAXIS ), AXPTR, FAXPTR,
+     :                         STATUS )
 
 *            Unmap Figaro axis data.
                CALL DAT_ANNUL( LFAXD, STATUS )
@@ -885,13 +875,8 @@
 
 *               Move the NDF axis variances into Figaro axis-variance
 *               array.
-                  CALL CON_TYPSZ( TYPE, NBYTES, STATUS )
-                  IF ( ( STATUS .EQ. SAI__OK ) .AND.
-     :                 ( DIM( IAXIS ) .GT. 0 ) ) THEN
-                     CALL CON_MOVE( NBYTES * DIM( IAXIS ), 
-     :                              %VAL(CNF_PVAL(AXPTR)),
-     :                              %VAL(CNF_PVAL(FAXPTR)), STATUS )
-                  END IF
+                  CALL KPG1_COPY( TYPE, DIM( IAXIS ), AXPTR, FAXPTR,
+     :                            STATUS )
 
 *                Unmap Figaro axis variances.
                   CALL DAT_ANNUL( LFAXV, STATUS )
@@ -945,13 +930,8 @@
      :                          FAXPTR, STATUS )
 
 *               Move the NDF axis widths into Figaro axis-width array.
-                  CALL CON_TYPSZ( TYPE, NBYTES, STATUS )
-                  IF ( ( STATUS .EQ. SAI__OK ) .AND.
-     :                 ( DIM( IAXIS ) .GT. 0 ) ) THEN
-                     CALL CON_MOVE( NBYTES * DIM( IAXIS ), 
-     :                              %VAL(CNF_PVAL(AXPTR)),
-     :                              %VAL(CNF_PVAL(FAXPTR)), STATUS )
-                  END IF
+                  CALL KPG1_COPY( TYPE, DIM( IAXIS ), AXPTR, FAXPTR,
+     :                            STATUS )
 
 *                Unmap Figaro axis widths.
                   CALL DAT_ANNUL( LFAXW, STATUS )

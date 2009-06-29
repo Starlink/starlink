@@ -158,6 +158,7 @@
 *  Copyright:
 *     Copyright (C) 1991-1993 Science & Engineering Research Council.
 *     Copyright (C) 2004 Central Laboratory of the Research Councils.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -209,7 +210,10 @@
 *        Fixed a bug that made it was possible not to write mandatory
 *        descriptors to the BDF.  Allowed lowercase Interim types.
 *     2004 September 9 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2009 June 29 (MJC):
+*        Replaced deprecated CON_MOVE (and CON_TYPSZ) with KPG1_COPY
+*        from KAPLIBS.
 *     {enter_further_changes_here}
 
 *-
@@ -281,7 +285,6 @@
       LOGICAL   LABFND              ! True if NDF LABEL found
       LOGICAL   LINEAR              ! True if an axis is linear
       INTEGER   NBPI                ! Number of bytes per item
-      INTEGER   NBYTES              ! No. of bytes
       INTEGER   NCHAR               ! Length of a character string
       INTEGER   NCOMP               ! No. of components
       INTEGER   NDF                 ! NDF identifier
@@ -453,11 +456,7 @@
       END IF
 
 *   Copy the data array to the BDF.
-      IF (STATUS .EQ. SAI__OK) THEN
-         NBYTES = NITEM * NBPI
-         CALL CON_MOVE (NBYTES, %VAL(CNF_PVAL(POINTR)), 
-     :                  %VAL(CNF_PVAL(IMAGEP)), STATUS)
-      END IF
+      CALL KPG1_COPY( HDSTYP, NITEM, POINTR, IMAGEP, STATUS )
 
       IF (STATUS.NE.SAI__OK) GO TO 995
 
