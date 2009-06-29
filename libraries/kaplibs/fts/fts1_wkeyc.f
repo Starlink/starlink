@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL FTS1_WKEYC( NAME, CMTBGN, VALUE, COMNT, COMCAR, HEADER, 
+*     CALL FTS1_WKEYC( NAME, VALUE, CMTBGN, COMNT, COMCAR, HEADER,
 *                      STATUS )
 
 *  Description:

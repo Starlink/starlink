@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL FTS1_WKEYx( NAME, CMTBGN, VALUE, COMNT, HEADER, STATUS )
+*     CALL FTS1_WKEYx( NAME, VALUE, CMTBGN, COMNT, HEADER, STATUS )
 
 *  Description:
 *     This routine writes a FITS-header card using the supplied
