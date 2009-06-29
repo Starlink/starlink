@@ -6,4 +6,5 @@ gaiavo_tcl
 *.fits
 *.sdf
 *.ASC
-
+#  Want this directory to be checked.
+!gaia.htx

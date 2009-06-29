@@ -1,0 +1,2 @@
+#  Don't exclude html files in this directory.
+!*.html
