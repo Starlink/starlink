@@ -35,8 +35,8 @@
 *        The length of SYSTEM must be at least 9 characters.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
-
-*  [optional_subroutine_items]...
+*
+*     [optional_subroutine_items]...
 
 *  Notes:
 *     The IRAF Mini World Co-ordinate System (MWCS) is used to
@@ -69,11 +69,33 @@
 *     CTYPEn is set to "MULTISPE'. WAT1_nnn contains wtype=multispec
 *     and any axis label and units.  WAT2__nnn contains the explicit
 *     wavelengths in multispec specN format.
-
+*
 *     LTVi and LTMi_i keywords are *not* written.  WCSDIM keyword is
 *     written, being set to two for multispec.  DC-FLAG is also written
 *     for non-multispec format.  Keyword WAXMAP01 is set to 1 0 0 1 "
 *     for multispec.
+
+*  Copyright:
+*     Copyright (C) 1997, 2004 Central Laboratory of the Research
+*     Councils. Copyright (C) 2006 Particle Physics & Astronomy
+*     Research Council. Copyright (C) 2008 Science & Technology
+*     Facilities Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -92,9 +114,6 @@
 *     2008 March 15 (MJC):
 *        Use KAPLIBS routines instead of their cloned CON equivalents.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       

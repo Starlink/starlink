@@ -49,7 +49,7 @@
 *        -  Linear spline
 *        -  Cubic spline
 *        -  Explicit array of values
-
+*
 *     Oonly the first (spec1) axis co-ordinates are transferred to the
 *     NDF AXIS centres.  Any spec2...specn co-ordinates, present when
 *     the data array is not one-dimensional or multiple fits have been
@@ -61,12 +61,34 @@
 *     The axis labels and units are also propagated, where present, to
 *     the NDF AXIS structure.  These components originate in the label
 *     and units parameters.
-
+*
 *     The redshift correction, when present, is applied to the axis
 *     co-ordinates.
 
 *  Deficiencies:
 *     Does not handle all of the ftypes.
+
+*  Copyright:
+*     Copyright (C) 1997, 2004 Central Laboratory of the Research
+*     Councils. Copyright (C) 2006 Particle Physics & Astronomy
+*     Research Council. Copyright (C) 2008 Science & Technology
+*     Facilities Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)

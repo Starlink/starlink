@@ -26,7 +26,7 @@
 *
 *     It is the same as CON_FKEYC, which writes FITS cards, except that
 *     any trailing blanks are included in the value.
-*
+
 *  Arguments:
 *     NAME = CHARACTER * ( * ) (Given)
 *        The name of the keyword to be written.  This may be a compound
@@ -61,6 +61,26 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
+*  Copyright:
+*     Copyright (C) 1997 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
@@ -69,9 +89,6 @@
 *     1997 March 25 (MJC):
 *        Original version, rebadged from FTS1_WKEYC.
 *     {enter_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       

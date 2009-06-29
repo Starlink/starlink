@@ -15,7 +15,7 @@
 *  Description:
 *     This routine creates the headers in the output IMFORT OIF file
 *     based upon information in an NDF.
-
+*
 *     There are two stages:
 *     a) Inquire of the NDF its shape, type, character components,
 *     and axis components; and write these to the header.
@@ -81,8 +81,29 @@
 *     PCOUNT, GCOUNT, BSCALE, BZERO, END, and any already created from
 *     standard components of the NDF listed above.
 *     -  All other NDF components are ignored.
+*
+*     [optional_subroutine_items]...
 
-*  [optional_subroutine_items]...
+*  Copyright:
+*     Copyright (C) 1997 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
@@ -93,9 +114,6 @@
 *     1997 November 14 (MJC):
 *        Filtered LBOUNDn keywords.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       
