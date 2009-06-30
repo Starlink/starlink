@@ -4,7 +4,7 @@
 *     COF_DOSCL
 
 *  Purpose:
-*     Set scaling requirements for FITS2NDF
+*     Sets scaling requirements for FITS2NDF
 
 *  Language:
 *     Starlink Fortran 77
@@ -47,11 +47,6 @@
 *        respectively, and TYPE is returned blank otherwise.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
-
-*  Implementation Deficiencies:
-*     [routine_deficiencies]...
-*
-*     [optional_subroutine_items]...
 
 *  Copyright:
 *     Copyright (C) 2000 Central Laboratory of the Research Councils.
