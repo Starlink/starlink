@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = @subdirs@ libcoi libcof libcon libaif iraf
+SUBDIRS = @subdirs@ libcoi libcof libcon iraf
 
 ## We need the internal Figaro libraries. These are not currently generally
 ## available so this separation is a reminder this dependency will generally
@@ -18,7 +18,6 @@ bin_MONOLITHS = convert_mon
 
 convert_mon_SOURCES = convert_mon.f $(TASKS:=.f) $(FPP_TASKS:=.F)
 convert_mon_LDADD = libcoi/libcoi.la libcof/libcof.la libcon/libcon.la \
-             libaif/libaif.la \
              iraf/libconspp.la $(FIGLIBS) `$(srcdir)/iraf_link` \
              `$(srcdir)/convert_link_adam`
 convert_mon_TASKS = $(TASKS) $(FPP_TASKS)

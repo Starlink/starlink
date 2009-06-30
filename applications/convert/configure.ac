@@ -103,7 +103,7 @@ dnl    Old test.
 dnl AC_CHECK_FILES([iraf/libimfort.a])
 
 dnl    Configure .in files.
-AC_CONFIG_FILES([Makefile component.xml iraf/Makefile libaif/Makefile
+AC_CONFIG_FILES([Makefile component.xml iraf/Makefile
                  libcof/Makefile libcoi/Makefile libcon/Makefile])
 
 AC_OUTPUT
