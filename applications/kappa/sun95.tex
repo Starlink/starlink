@@ -40709,9 +40709,9 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
          present.
 
          \sstitem
-         {\tt "History"} --- This is only displayed if parameter HISTORY is set
-         to a TRUE value. It contains information copied from the History
-         component of the ancestor NDF. See parameter HISTORY.
+         {\tt "History"} --- This is only displayed if Parameter HISTORY is 
+         set to a {\tt TRUE} value.  It contains information copied from the 
+         HISTORY component of the ancestor NDF.  See Parameter HISTORY.
       } 
 
       In addition, a text file can be created containing the paths for the
@@ -40723,20 +40723,20 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
    }
    \sstparameters{ 
       \sstsubsection{ 
-         HISTORY = _LOGICAL (Read)
+         HISTORY = \_LOGICAL (Read)
       }{ 
-        If TRUE, any history records stored with each ancestor are
-        included in the displayed information. Since the amount of
+        If {\tt TRUE}, any history records stored with each ancestor are
+        included in the displayed information.  Since the amount of
         history information displayed can be large, and thus swamp other 
         information, the default is not to display history information.
 
         When an existing NDF is used in the creation of a new NDF, the
-        provenance system will copy selected records from the History
+        provenance system will copy selected records from the HISTORY
         component of the existing NDF and store them with the provenance
-        information in the new NDF. The history records copied are those
+        information in the new NDF.  The history records copied are those
         that describe operations performed on the existing NDF itself.
         Inherited history records that describe operations performed on 
-        ancestors of the existing NDF are not copied. {\tt [FALSE]}
+        ancestors of the existing NDF are not copied.  {\tt [FALSE]}
       } 
       \sstsubsection{ 
          NDF = NDF (Read) 
@@ -56036,9 +56036,10 @@ The following applications have been modified:
          pixels.
       \end{itemize}
 
+   \goodbreak
    \item [\htmlref{PROVSHOW}{PROVSHOW}] \mbox{}
       \begin{itemize}
-        \item Has a new parameter called HISTORY that can be set to TRUE
+        \item Has a new parameter called HISTORY that can be set to {\tt TRUE}
         to display any history records stored in the provenance extension
         of each ancestor NDF.
       \end{itemize}

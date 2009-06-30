@@ -57,10 +57,10 @@
 *
 *       "History" -- This is only displayed if parameter HISTORY is set
 *       to a TRUE value. It contains information copied from the History
-*       component of the ancestor NDF. See parameter HISTORY.
+*       component of the ancestor NDF. See Parameter HISTORY.
 *
 *    In addition, a text file can be created containing the paths for the
-*    direct parents of the supplied NDF. See parameter PARENTS.
+*    direct parents of the supplied NDF. See Parameter PARENTS.
 
 *  Usage:
 *     provshow ndf [show]
@@ -73,7 +73,7 @@
 *        information, the default is not to display history information.
 *
 *        When an existing NDF is used in the creation of a new NDF, the
-*        provenance system will copy selected records from the History
+*        provenance system will copy selected records from the HISTORY
 *        component of the existing NDF and store them with the provenance
 *        information in the new NDF. The history records copied are those
 *        that describe operations performed on the existing NDF itself.
