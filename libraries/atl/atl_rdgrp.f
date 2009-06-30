@@ -13,7 +13,9 @@
 *     CALL ATL_RDGRP( IGRP, IAST, STATUS )
 
 *  Description:
-*     Read an AST Object from a GRP group.
+*     Read an AST Object from a GRP group. The text in the group can be
+*     either an AST Object dump, a set of FITS headers, or an STC-S 
+*     description.
 
 *  Arguments:
 *     IGRP = INTEGER (Given)
@@ -25,6 +27,7 @@
 
 *  Copyright:
 *     Copyright (C) 2001 Central Laboratory of the Research Councils.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -50,6 +53,8 @@
 *  History:
 *     12-JAN-2001 (DSB):
 *        Original version.
+*     30-JUN-2009 (DSB):
+*        Support reading Objects from STC-S descriptions.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -80,6 +85,7 @@
       INTEGER I
       INTEGER SIZE
       LOGICAL DUMP
+      LOGICAL FITSWCS
 *.
 
 *  Initialise.
@@ -93,14 +99,22 @@
 
 *  Determine the most likely format of the text in the group. If the
 *  group contains a line beginning with the word "Begin" it is probably a
-*  dump of an AST object produced by AST_SHOW.
+*  dump of an AST object produced by AST_SHOW. If it contains the string
+*  CRPIX, CRVAL or CTYPE it is probably a set of FITS_WCS headers.
       CALL GRP_GRPSZ( IGRP, SIZE, STATUS )
       DUMP = .FALSE.
+      FITSWCS = .FALSE.
       DO I = 1, SIZE
          CALL GRP_GET( IGRP, I, 1, TEXT, STATUS ) 
          CALL CHR_LDBLK( TEXT )
          IF( TEXT( : 6 ) .EQ. 'Begin ' ) THEN
             DUMP = .TRUE.
+            GO TO 10
+         ELSE IF( INDEX( TEXT, 'CRVAL' ) .NE. 0 .OR.
+     :            INDEX( TEXT, 'CRPIX' ) .NE. 0 .OR.
+     :            INDEX( TEXT, 'CTYPE' ) .NE. 0 ) THEN
+
+            FITSWCS = .TRUE.
             GO TO 10
          END IF
       END DO
@@ -110,22 +124,44 @@
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  If the file probably contains a dump of an AST object, try to read it
-*  first as a set of FITS headers, then as a object dump. This means 
-*  that any errors produced while reading it as an object dump will be
-*  reported to the user.
+*  first as a set of FITS headers, then as an STC-S description, then as 
+*  a object dump. This means that any errors produced while reading it as 
+*  an object dump will be reported to the user.
       IF( DUMP ) THEN
          CALL ATL_RDFCH( IGRP, IAST, STATUS )
+
+         IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
+         IF( IAST .EQ. AST__NULL ) CALL ATL_RDSTCS( IGRP, IAST, STATUS )
+
          IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
          IF( IAST .EQ. AST__NULL ) CALL ATL_RDCH( IGRP, IAST, STATUS )
          
 *  If the file probably contains FITS headers, try to read it
-*  first as an Object dump, then as a set of FITS headers. This means 
-*  that any errors produced while reading it as a FITS file will be
-*  reported to the user.
-      ELSE
+*  first as an Object dump, then as an STC-S description, then as a set 
+*  of FITS headers. This means that any errors produced while reading it as 
+*  a FITS file will be reported to the user.
+      ELSE IF( FITSWCS ) THEN
          CALL ATL_RDCH( IGRP, IAST, STATUS )
+
+         IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
+         IF( IAST .EQ. AST__NULL ) CALL ATL_RDSTCS( IGRP, IAST, STATUS )
+
          IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
          IF( IAST .EQ. AST__NULL ) CALL ATL_RDFCH( IGRP, IAST, STATUS )
+
+*  If not an AST dump or a set of FITS-WCS headers, the file may contains 
+*  an STC-S description. Try to read it first as an Object dump, then as a 
+*  set of FITS headers, then as an STC-S description. This means that any 
+*  errors produced while reading it as a FITS file will be reported to the 
+*  user.
+      ELSE 
+         CALL ATL_RDCH( IGRP, IAST, STATUS )
+
+         IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
+         IF( IAST .EQ. AST__NULL ) CALL ATL_RDFCH( IGRP, IAST, STATUS )
+
+         IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
+         IF( IAST .EQ. AST__NULL ) CALL ATL_RDSTCS( IGRP, IAST, STATUS )
 
       END IF
 
