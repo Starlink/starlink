@@ -88,6 +88,10 @@
     It is now possible to resize the 3D toolboxes during the first 
     rendering. Previously this could case the application to terminate.
 
+    The 3D scene now offers lighting controls.
+
+    A bug in the positioning of the 3D direction axes has been fixed.
+
   Lehuakona Release
   =================
 
