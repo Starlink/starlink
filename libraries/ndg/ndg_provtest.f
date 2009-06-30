@@ -55,7 +55,7 @@
 * Local Variables:
       INTEGER STATUS, INDF, IPROV, KEYMAP, N, I, KM, L, INDF2, PLACE,
      :        NANC, ISTAT, CHR_LEN, NVAL, IVALS(20)
-      CHARACTER TEXT*80, KEY*20, LOC*(DAT__SZLOC), MORE*(DAT__SZLOC)
+      CHARACTER TEXT*500, KEY*20, LOC*(DAT__SZLOC), MORE*(DAT__SZLOC)
       INTEGER IVEC(2), IVAL, NCOMP
       LOGICAL THERE
       REAL RVAL
@@ -106,8 +106,8 @@
 
       CHARACTER MORES( 14 )*60
       DATA MORES / ' ', ' ', 
-     :         'SMURF=<SMURF>, FITS=(TELESCOP= ''JCMT    ''    ',
-     :         ' ', ' ', ' ', ' ', '546', ' ', ' ', ' ', ' ', ' ', ' ' /
+     :         'DATA_ARRAY=<ARRAY>, LABEL=T%s60+%v30+A%^5',
+     :         ' ', ' ', ' ', ' ', '211', ' ', ' ', ' ', ' ', ' ', ' ' /
 
       DATA IVEC / 23, 34 /,
      :     DVEC /1.23D0 /,
@@ -165,16 +165,11 @@ c      call ast_watchmemory( 1 )
       DO I = 1, N
          KEY = AST_MAPKEY( KEYMAP, I, STATUS )
 
-c      write(*,*) 'Entry ',i,':   key: ',key
-
          IF( KEY .NE. KEYS( I ) ) CALL STOPIT( 4, STATUS)
 
          IF( AST_MAPGET0A( KEYMAP, KEY, KM, STATUS ) ) THEN
 
             IF( AST_MAPGET0C( KM, 'ID', TEXT, L, STATUS ) ) THEN
-
-c      write(*,*) '   ID: ',text(:l)
-
                IF( TEXT( : L ) .NE. IDS( I ) ) THEN
                   CALL STOPIT( 5, STATUS)
                ENDIF
@@ -183,9 +178,6 @@ c      write(*,*) '   ID: ',text(:l)
             END IF
 
             IF( AST_MAPGET0C( KM, 'PATH', TEXT, L, STATUS ) ) THEN
-
-c      write(*,*) '   PATH: ',text(:l)
-
                IF( PATHS( I ) .EQ. 'TEMP' ) THEN
                   IF( INDEX( TEXT( : L ), 'TEMP_1.NDF_1' ) .EQ. 0 .AND.
      :                INDEX( TEXT( : L ), 'fred' ) .EQ. 0 ) THEN
@@ -201,15 +193,13 @@ c      write(*,*) '   PATH: ',text(:l)
      :                  TEXT( : L ) .NE. PATHS( I )( : L ) ) THEN
                   CALL STOPIT( 9, STATUS)
                ENDIF
+
             ELSE IF( PATHS( I ) .NE. ' ' ) THEN
                CALL STOPIT( 10, STATUS)
             END IF
 
 
             IF( AST_MAPGET0C( KM, 'DATE', TEXT, L, STATUS ) ) THEN
-
-c      write(*,*) '   DATE: ',text(:l)
-
                IF( CHR_LEN( TEXT ) .NE. L .OR. 
      :             TEXT( : L ) .NE. DATES( I )( : L ) ) THEN
                   CALL STOPIT( 11, STATUS)
@@ -220,9 +210,6 @@ c      write(*,*) '   DATE: ',text(:l)
 
 
             IF( AST_MAPGET0C( KM, 'CREATOR', TEXT, L, STATUS ) ) THEN
-
-c      write(*,*) '   CREATOR: ',text(:l)
-
               IF( TEXT( : L ) .NE. CREATORS( I ) ) THEN
                   CALL STOPIT( 13, STATUS)
                ENDIF
@@ -231,9 +218,6 @@ c      write(*,*) '   CREATOR: ',text(:l)
             END IF
 
             IF( AST_MAPGET0C( KM, 'PARENTS', TEXT, L, STATUS ) ) THEN
-
-c      write(*,*) '   PARENTS: ',text(:l)
-
                IF( TEXT( : L ) .NE. PARENTSS( I ) ) THEN
                   CALL STOPIT( 15, STATUS)
                ENDIF
@@ -242,9 +226,6 @@ c      write(*,*) '   PARENTS: ',text(:l)
             END IF
 
             IF( AST_MAPGET0C( KM, 'MORE', TEXT, L, STATUS ) ) THEN
-
-c      write(*,*) '   MORE: ',text(:l)
-
                L = MIN( L, CHR_LEN( MORES( I ) ) )         
                IF( TEXT( : L ) .NE. MORES( I )( : L ) ) THEN
                   CALL STOPIT( 17, STATUS)
