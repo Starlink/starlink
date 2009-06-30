@@ -83,6 +83,8 @@ f     - AST_OUTLINE<X>: Create a Polygon outlining values in a pixel array
 *        Added astDownsize.
 *     29-MAY-2009 (DSB):
 *        Added astOutline<X>.
+*     30-JUN-2009 (DSB):
+*        Override astGetBounded.
 *class--
 */
 
@@ -282,6 +284,7 @@ static Segment *AddToChain( Segment *, Segment *, int * );
 static Segment *NewSegment( Segment *, int, int, int, int * );
 static Segment *RemoveFromChain( Segment *, Segment *, int * );
 static double Polywidth( AstFrame *, AstLineDef **, int, int, double[ 2 ], int * );
+static int GetBounded( AstRegion *, int * );
 static int IntCmp( const void *, const void * );
 static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int **, int * );
 static int RegTrace( AstRegion *, int, double *, double **, int * );
@@ -503,11 +506,15 @@ static void Cache( AstPolygon *this, int *status ){
 /* If no width was found it probably means that the polygon vertices were
    given in clockwise order, resulting in the above process probing the
    infinite extent outside the polygonal hole. In this case any point
-   outside the hole will do, so we use the current contents of the "polcen"
-   array. */
+   outside the hole will do, so we use the current contents of the
+   "polcen" array. Set a flag indicating if the vertices are stored in
+   anti-clockwise order. */
          if( maxwid < 0.0 ) {
             (this->in)[ 0 ] = polcen[ 0 ];                  
             (this->in)[ 1 ] = polcen[ 1 ];                  
+            this->acw = 0;
+         } else {
+            this->acw = 1;
          }
       }
    
@@ -1539,7 +1546,75 @@ static void FindMax( Segment *seg, AstFrame *frm, double *x, double *y,
       }
       pset1 = astAnnul( pset1 );
    }
+}
 
+static int GetBounded( AstRegion *this, int *status ) {
+/*
+*  Name:
+*     GetBounded
+
+*  Purpose:
+*     Is the Region bounded?
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "polygon.h"
+*     int GetBounded( AstRegion *this, int *status ) 
+
+*  Class Membership:
+*     Polygon method (over-rides the astGetBounded method inherited from
+*     the Region class).
+
+*  Description:
+*     This function returns a flag indicating if the Region is bounded.
+*     The implementation provided by the base Region class is suitable
+*     for Region sub-classes representing the inside of a single closed 
+*     curve (e.g. Circle, Interval, Box, etc). Other sub-classes (such as
+*     CmpRegion, PointList, etc ) may need to provide their own
+*     implementations.
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     Non-zero if the Region is bounded. Zero otherwise.
+
+*/
+
+/* Local Variables: */
+   int neg;                  /* Has the Polygon been negated? */
+   int result;               /* Returned result */
+
+/* Initialise */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Ensure cached information is available. */
+   Cache( (AstPolygon *) this, status );
+
+/* See if the Polygon has been negated. */
+   neg = astGetNegated( this );
+
+/* If the polygon vertices are stored in anti-clockwise order, then the
+   polygon is bounded if it has not been negated. */
+   if( ( (AstPolygon *) this)->acw ) {
+      result = (! neg );
+
+/* If the polygon vertices are stored in clockwise order, then the
+   polygon is bounded if it has been negated. */
+   } else {
+      result = neg;
+   }
+
+/* Return the result. */
+   return result;
 }
 
 void astInitPolygonVtab_(  AstPolygonVtab *vtab, const char *name, int *status ) {
@@ -1626,6 +1701,7 @@ void astInitPolygonVtab_(  AstPolygonVtab *vtab, const char *name, int *status )
    region->RegBaseMesh = RegBaseMesh;
    region->RegBaseBox = RegBaseBox;
    region->RegTrace = RegTrace;
+   region->GetBounded = GetBounded;
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
@@ -5134,6 +5210,7 @@ AstPolygon *astInitPolygon_( void *mem, size_t size, int init, AstPolygonVtab *v
          new->edges = NULL;
          new->startsat = NULL;
          new->totlen = 0.0;
+         new->acw = 1;
          new->stale = 1;
 
 /* If an error occurred, clean up by deleting the new Polygon. */
@@ -5286,6 +5363,7 @@ AstPolygon *astLoadPolygon_( void *mem, size_t size, AstPolygonVtab *vtab,
       new->edges = NULL;
       new->startsat = NULL;
       new->totlen = 0.0;
+      new->acw = 1;
       new->stale = 1;
 
 /* If the order in which the vertices were written used the old AST

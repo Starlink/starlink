@@ -109,13 +109,14 @@ typedef struct AstPolygon {
    AstRegion region;          /* Parent class structure */
 
 /* Attributes specific to objects in this class. */
-   double in[2];              /* A point which is inside the polygon */
-   double lbnd[2];            /* Lower axis limits of bounding box */
-   double ubnd[2];            /* Upper axis limits of bounding box */
-   AstLineDef **edges;        /* Cached description of edges */
-   double *startsat;          /* Perimeter distance to each vertex */
-   double totlen;             /* Total perimeter distance round polygon */
-   int stale;                 /* Is cached information stale? */
+   double in[2];           /* A point which is inside the polygon */
+   double lbnd[2];         /* Lower axis limits of bounding box */
+   double ubnd[2];         /* Upper axis limits of bounding box */
+   AstLineDef **edges;     /* Cached description of edges */
+   double *startsat;       /* Perimeter distance to each vertex */
+   double totlen;          /* Total perimeter distance round polygon */
+   int acw;                /* Are vertices stored in anti-clockwise order? */
+   int stale;              /* Is cached information stale? */
 } AstPolygon;
 
 /* Virtual function table. */
