@@ -17,6 +17,10 @@
     this means you can now query for catalogue positions in J2000 and plot
     over an image set to B1950 and vice versa.
 
+    Finally the GAIA has been updated to use the new SAMP protocol for
+    interoperating with other desktop applications (TOPCAT, SPLAT etc). 
+    This replaces PLASTIC support, which has been removed.
+
     Other changes include:
 
     The mean angles reported by the select positions toolbox are now
