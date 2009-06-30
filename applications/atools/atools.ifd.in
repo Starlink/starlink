@@ -646,6 +646,36 @@ iraf! {
           }
 
       }
+      action astoverlap {
+
+         helplib {$ATOOLS_HELP}
+
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The first Region}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+         parameter that {
+            position 2
+            type LITERAL
+            prompt {The second Region}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter result {
+            type _INTEGER
+            access WRITE
+            vpath DEFAULT
+            default 0
+            helpkey *
+          }
+      }
+
       action astfindframe {
 
          helplib {$ATOOLS_HELP}

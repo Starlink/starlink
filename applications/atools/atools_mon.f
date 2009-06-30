@@ -280,6 +280,8 @@
       ELSE IF ( NAME .EQ. 'ASTLINEARAPPROX' ) THEN
          CALL ASTLINEARAPPROX( STATUS )
  
+      ELSE IF ( NAME .EQ. 'ASTOVERLAP' ) THEN
+         CALL ASTOVERLAP( STATUS )
 
 *  If the action name is not recognised, then report an error.
       ELSE
