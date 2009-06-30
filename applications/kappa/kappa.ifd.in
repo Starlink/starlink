@@ -2731,6 +2731,16 @@ package kappa {
 
          helplib {$KAPPA_HELP}
 
+         parameter history {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Show history for each ancestor NDF?}
+            helpkey *
+          }
+
          parameter ndf {
             position 1
             type NDF

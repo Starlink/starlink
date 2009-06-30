@@ -75,31 +75,34 @@
 /* Need HDS dim type */
 #include "star/hds_types.h"
 
+/* Type Definitions: */
+/* ----------------- */
+typedef AstKeyMap NdgProvenance;
+
 /* Public function prototypes */
 /* -------------------------- */
+AstKeyMap *ndgGetProv( NdgProvenance *prov, int ianc, HDSLoc **more, int *status );
+AstKeyMap *ndgRootProv( NdgProvenance *prov, int *status );
+Grp *ndgCopy( const Grp *grp1, size_t indxlo, size_t indxhi, int reject, int *status );
+NdgProvenance *ndgFreeProv( NdgProvenance *prov, int *status );
+NdgProvenance *ndgReadProv( int indf, const char *creator, int *status );
+int ndgCountProv( NdgProvenance *prov, int *status );
+void ndgWriteProv( NdgProvenance *prov, int indf, int *status );
 void ndgAsexp( const char grpexp[], int verb, const Grp *igrp1, Grp **igrp2, size_t *size, int *flag, int *status );
 void ndgAssoc( const char *param, int verb, Grp **igrp, size_t *size, int *flag, int *status );
-void ndgCreat( const char *param, const Grp *igrp0, Grp **igrp, size_t *size, int *flag, int *status);
-void ndgNdfas( const Grp *igrp, size_t index, const char mode[], int *indf, int *status );
-void ndgNdfcr( const Grp *igrp, size_t index, const char ftype[], int ndim,
-	       const hdsdim lbnd[], const hdsdim ubnd[], int *indf, int *status );
-void ndgNdfpr( int indf1, const char clist[], const Grp *igrp, size_t index, int *indf2, int *status);
-void ndgGtsup( const Grp *grp, size_t i, char *const fields[6], size_t len, int *status );
-void ndgCpsup( const Grp *igrp1, size_t i, Grp *igrp2, int * status );
 void ndgBegpv( int *status );
+void ndgCpsup( const Grp *igrp1, size_t i, Grp *igrp2, int * status );
+void ndgCreat( const char *param, const Grp *igrp0, Grp **igrp, size_t *size, int *flag, int *status);
+void ndgCrexp( const char grpexp[], const Grp *igrp0, Grp **igrp, size_t *size, int *flag, int *status );
 void ndgEndpv( const char *creator, int *status );
-void ndgPtprv( int indf1, int indf2, HDSLoc *more, int isroot, const char *creator, int *status );
-void ndgCtprv( int indf, int *nanc, int *status );
-void ndgGtprv( int indf, int ianc, HDSLoc **prov, int *status );
-void ndgGtprvk( int indf, int ianc, AstKeyMap **prov, HDSLoc **more, int *status );
-void ndgMdprv( int indf, int ianc, HDSLoc *prov, int *status );
-void ndgRmprv( int indf, int ianc, int *status );
-void ndgRtprv( int indf, AstKeyMap **roots, int *status );
-void ndgFmprv( int indf, int base, AstKeyMap **keymap, int *status );
-Grp *ndgCopy( const Grp *grp1, size_t indxlo, size_t indxhi, int reject,
-	      int *status );
-void ndgCrexp( const char grpexp[], const Grp *igrp0, Grp **igrp, 
-               size_t *size, int *flag, int *status );
-void ndgRmprvs( int indf, int nanc, int *anc, int *status );
+void ndgFormatProv( NdgProvenance *prov, int base, AstKeyMap **keymap, int *status );
+void ndgGtsup( const Grp *grp, size_t i, char *const fields[6], size_t len, int *status );
+void ndgModifyProv( NdgProvenance *prov, int ianc, AstKeyMap *aprov, HDSLoc *more, int *status );
+void ndgNdfas( const Grp *igrp, size_t index, const char mode[], int *indf, int *status );
+void ndgNdfcr( const Grp *igrp, size_t index, const char ftype[], int ndim, const hdsdim lbnd[], const hdsdim ubnd[], int *indf, int *status );
+void ndgNdfpr( int indf1, const char clist[], const Grp *igrp, size_t index, int *indf2, int *status);
+void ndgPutProv( NdgProvenance *prov, int indf, HDSLoc *more, AstKeyMap *more2, int isroot, int *status );
+void ndgRemoveProv( NdgProvenance *prov, int nanc, int *anc, int *status );
+
 
 #endif

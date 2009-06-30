@@ -1,2 +1,2 @@
-echo -lndg `grp_link` `chr_link` `ndf_link` `one_link` \
+echo -lndg `grp_link` `chr_link` `ndf_link` `atl_link` `one_link` \
 | awk '{for(f=NF;f;f--)if(!w[$f]++)l=$f" "l;print l}'

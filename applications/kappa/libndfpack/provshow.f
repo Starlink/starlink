@@ -55,6 +55,10 @@
 *       the name of the NDF supplied for parameter "NDF".  If the NDF 
 *       has no extra information, this item will not be present.
 *
+*       "History" -- This is only displayed if parameter HISTORY is set
+*       to a TRUE value. It contains information copied from the History
+*       component of the ancestor NDF. See parameter HISTORY.
+*
 *    In addition, a text file can be created containing the paths for the
 *    direct parents of the supplied NDF. See parameter PARENTS.
 
@@ -62,6 +66,19 @@
 *     provshow ndf [show]
 
 *  ADAM Parameters:
+*     HISTORY = _LOGICAL (Read)
+*        If TRUE, any history records stored with each ancestor are
+*        included in the displayed information. Since the amount of
+*        history information displayed can be large, and thus swamp other 
+*        information, the default is not to display history information.
+*
+*        When an existing NDF is used in the creation of a new NDF, the
+*        provenance system will copy selected records from the History
+*        component of the existing NDF and store them with the provenance
+*        information in the new NDF. The history records copied are those
+*        that describe operations performed on the existing NDF itself.
+*        Inherited history records that describe operations performed on 
+*        ancestors of the existing NDF are not copied. [FALSE]
 *     NDF = NDF (Read)
 *        The NDF data structure.
 *     PARENTS = FILENAME (Read)
@@ -154,6 +171,8 @@
 *        Added parameter SHOW.
 *     16-APR-2009 (DSB):
 *        Corrected use of SHOW=ROOTS.
+*     25-JUN-2009 (DSB):
+*        Updated to use new provenance API. Added parameter HISTORY.
 *     {enter_further_changes_here}
 
 *-
@@ -176,32 +195,42 @@
       INTEGER MXPAR              ! Max number of direct parents
       PARAMETER( MXPAR = 200 )
 
+      INTEGER MXREC              ! Max number of history records
+      PARAMETER( MXREC = 100 )
+
 *  Local Variables:
-      CHARACTER CLOC*(DAT__SZLOC)! Locator to array cell
       CHARACTER ID*10            ! Integer index for the current NDF
       CHARACTER KEY*20           ! Key for entry within KeyMap
-      CHARACTER PLOC*(DAT__SZLOC)! Locator for PARENTS array
-      CHARACTER PROV*(DAT__SZLOC)! Locator for provenance information
-      CHARACTER PROVP*(DAT__SZLOC)! Locator for parent provenance info
-      CHARACTER SHOW*7           ! The ancestors to be displayed
+      CHARACTER MORE*(DAT__SZLOC)! Locator for MORE info
       CHARACTER PARIDS*255       ! Buffer for direct parent ID list
+      CHARACTER SHOW*7           ! The ancestors to be displayed
       CHARACTER VALUE*255        ! Buffer for one field value
       INTEGER DIRPAR( MXPAR )    ! Integer IDs for direct parents
       INTEGER FD                 ! File descriptor for parents file
+      INTEGER IEND               ! Index of word end
       INTEGER INDF               ! NDF identifier
       INTEGER INTID              ! Integer ID for the current ancestor
       INTEGER IPAR               ! Index into list of parent indices
+      INTEGER IPROV              ! Identifier for provenance structure
+      INTEGER IREC               ! Index of current history record
       INTEGER IROW               ! Row index
+      INTEGER ISTART             ! Index of word start
+      INTEGER KM                 ! KeyMap holding ancestor info
+      INTEGER KMHIST( MXREC )    ! KeyMaps holding history records
+      INTEGER KMP                ! KeyMap holding parent info
       INTEGER KYMAP1             ! AST KeyMap holding all prov info
       INTEGER KYMAP2             ! AST KeyMap holding field widths
+      INTEGER L                  ! Used length of returned string
       INTEGER NC                 ! String length
       INTEGER NPAR               ! Number of direct parents
+      INTEGER NREC               ! Number of history records
       INTEGER NROW               ! No. of lines to display
       INTEGER PARI               ! Index of current parent in ancestors
+      LOGICAL FIRST              ! Is this the first word?
+      LOGICAL HIST               ! Display history info?
       LOGICAL THERE              ! Does the named component exist?
       LOGICAL USE                ! Display the current ancestor?
 *.
-
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -216,9 +245,15 @@
       CALL PAR_CHOIC( 'SHOW', 'All', 'All,Roots,Parents', .FALSE., SHOW, 
      :                STATUS )
 
-*  Format the provenance information in the NDF. The resulting strings
-*  are returned in an AST KeyMap.
-      CALL NDG_FMPRV( INDF, .FALSE., KYMAP1, STATUS )
+*  See if history information is to be displayed.
+      CALL PAR_GET0L( 'HISTORY', HIST, STATUS )
+
+*  Read provenance information from the NDF.
+      CALL NDG_READPROV( INDF, ' ', IPROV, STATUS )
+
+*  Format the provenance information. The resulting strings are returned in 
+*  an AST KeyMap.
+      CALL NDG_FORMATPROV( IPROV, .FALSE., KYMAP1, STATUS )
 
 *  Get the number of entries in the returned keymap. This will be one
 *  more than the number of NDFs described in the displayed table.
@@ -235,8 +270,8 @@
             IF( STATUS .EQ. SAI__OK ) THEN
                CALL MSG_SETI( 'I', IROW )
                CALL ERR_REP( ' ', 'No "^I" entry found in KeyMap '//
-     :                       'returned by NDG_FMPRV (programming '//
-     :                       'error).', STATUS )
+     :                       'returned by NDG_FORMATPROV (programming'//
+     :                       ' error).', STATUS )
             END IF
             GO TO 999
          END IF
@@ -247,8 +282,8 @@
             IF( STATUS .EQ. SAI__OK ) THEN
                STATUS = SAI__ERROR
                CALL ERR_REP( ' ', 'No "ID" entry found in KeyMap '//
-     :                       'returned by NDG_FMPRV (programming '//
-     :                       'error).', STATUS )
+     :                       'returned by NDG_FORMATPROV (programming'//
+     :                       ' error).', STATUS )
             END IF
             GO TO 999
          END IF
@@ -343,6 +378,102 @@
                CALL MSG_OUT( ' ', '   More:  ^P', STATUS )
             END IF
 
+*  Next, display the history information (if required).
+            IF( HIST .AND. ID .NE. '0' ) THEN
+
+               IF( AST_MAPGET1A( KYMAP2, 'HISTORY', MXREC, NREC, 
+     :                           KMHIST, STATUS ) ) THEN
+                  CALL MSG_OUT( ' ', '   History:', STATUS )
+
+                  DO IREC = 1, NREC               
+                     VALUE = ' '
+	       
+                     IF( AST_MAPGET0C( KMHIST( IREC ), 'DATE', VALUE, 
+     :                                 NC, STATUS ) ) THEN
+                        CALL MSG_SETC( 'P', VALUE )
+                        CALL MSG_OUT( ' ', '      Date:  ^P', STATUS )
+                     END IF
+	       
+                     IF( AST_MAPGET0C( KMHIST( IREC ), 'COMMAND', VALUE, 
+     :                                 NC, STATUS ) ) THEN
+                        CALL MSG_SETC( 'P', VALUE )
+                        CALL MSG_OUT( ' ', '      Command:  ^P', 
+     :                                STATUS )
+                     END IF
+	       
+                     IF( AST_MAPGET0C( KMHIST( IREC ), 'USER', VALUE,
+     :                                 NC, STATUS ) ) THEN
+                        CALL MSG_SETC( 'P', VALUE )
+                        CALL MSG_OUT( ' ', '      User:  ^P', STATUS )
+                     END IF
+	       
+                     IF( AST_MAPGET0C( KMHIST( IREC ), 'TEXT', VALUE, 
+     :                                 NC, STATUS ) ) THEN
+
+*  Text written by the NDF library starts with 'Parameters: '. Use the
+*  colon-terminated words as the headers, and put a single word on each line.
+                        IF( VALUE( : 12 ) .EQ. 'Parameters: ' ) THEN
+                           FIRST = .TRUE.
+			   
+                           ISTART = 1
+                           DO WHILE( VALUE( ISTART:ISTART ) .EQ. ' ' 
+     :                               .AND. ISTART .LT. NC )
+                              ISTART = ISTART + 1
+                           END DO
+			   
+                           DO WHILE( ISTART .LT. NC ) 
+			   
+                              IEND = ISTART
+                              DO WHILE( VALUE( IEND:IEND ) .NE. ' ' 
+     :                                  .AND. IEND .LT. NC ) 
+                                 IEND = IEND + 1
+                              END DO
+
+                              IEND = IEND - 1
+                              IF( VALUE( IEND : IEND ) .EQ. ':' ) THEN
+                                 CALL MSG_SETC( 'V', 
+     :                                          VALUE( ISTART:IEND ) )
+                                 CALL MSG_OUT( ' ', '      ^V', STATUS )
+			   
+                              ELSE IF( FIRST ) THEN
+                                 CALL MSG_OUT( ' ', '      Text:', 
+     :                                         STATUS )
+			   
+                              ELSE
+                                 CALL MSG_SETC( 'V', 
+     :                                          VALUE( ISTART:IEND ) )
+                                 CALL MSG_OUT( ' ', '         ^V', 
+     :                                         STATUS )
+                              END IF
+			   
+                              ISTART = IEND + 1
+                              DO WHILE( VALUE( ISTART:ISTART ) .EQ. ' ' 
+     :                                  .AND. ISTART .LT. NC )
+                                 ISTART = ISTART + 1
+                              END DO
+			   
+                              FIRST = .FALSE.
+                           END DO                           
+
+*  If the text was not written by the NDF library, display it as a single
+*  string.
+                        ELSE
+                           CALL MSG_SETC( 'P', VALUE )
+                           CALL MSG_OUT( ' ', '      Text:  ^P', 
+     :                                   STATUS )
+                        END IF
+
+                     END IF
+	       
+                     CALL MSG_BLANK( STATUS )
+                     CALL AST_ANNUL( KMHIST( IREC ), STATUS )
+                  END DO
+
+               ELSE
+                  CALL MSG_OUT( ' ', '   History:  <unknown>', STATUS )
+               END IF
+            END IF
+
          END IF
 
 *  Annul the keymap holding details for this row.
@@ -363,61 +494,54 @@
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
 
-*  If a file is beign created, get the provenance information for the
+*  If a file is being created, get the provenance information for the
 *  supplied NDF. This includes the indices of the NDFs direct parents.
       ELSE
-         CALL NDG_GTPRV( INDF, 0, PROV, STATUS )
+         CALL NDG_GETPROV( IPROV, 0, KM, MORE, STATUS )
+         IF( MORE .NE. DAT__NOLOC ) CALL DAT_ANNUL( MORE, STATUS )
 
 *  Check that the NDF has some parents.
-         CALL DAT_THERE( PROV, 'PARENTS', THERE, STATUS )
-         IF( THERE ) THEN
+         IF( AST_MAPHASKEY( KM, 'PARENTS', STATUS ) ) THEN
 
 *  Loop round each integer index in the PARENTS component of the
 *  NDFs provenance information. These are the indices of the NDFs direct
 *  parents.
-            CALL DAT_FIND( PROV, 'PARENTS', PLOC, STATUS )
-            CALL DAT_SIZE( PLOC, NPAR, STATUS )
+            NPAR = AST_MAPLENGTH( KM, 'PARENTS', STATUS )
             DO IPAR = 1, NPAR
 
-*  Get a locator for the current cell of the PARENTS array, and ge the
-*  integer value in the cell.
-               CALL DAT_CELL( PLOC, 1, IPAR, CLOC, STATUS )
-               CALL DAT_GET0I( CLOC, PARI, STATUS )
+*  Get the next parent index.
+               THERE = AST_MAPGETELEMI( KM, 'PARENTS', IPAR, PARI, 
+     :                                  STATUS ) 
 
-*  Get the provenance information for the ancestor with the index read
-*  from the current cell of the PARENTS aray.
-               CALL NDG_GTPRV( INDF, PARI, PROVP, STATUS )
+*  Get the provenance information for the parent.
+               CALL NDG_GETPROV( IPROV, PARI, KMP, MORE, STATUS )
+               IF( MORE .NE. DAT__NOLOC ) CALL DAT_ANNUL( MORE, STATUS )
 
 *  Check the provenance information includes a path to the parent file.
 *  If so, get the path and write it to the output text file.
-               CALL DAT_THERE( PROVP, 'PATH', THERE, STATUS )
-               IF( THERE ) THEN
-                  CALL CMP_GET0C( PROVP, 'PATH', VALUE, STATUS )
-                  CALL FIO_WRITE( FD, VALUE( : CHR_LEN( VALUE ) ), 
-     :                            STATUS )
+               IF( AST_MAPGET0C( KMP, 'PATH', VALUE, L, STATUS ) ) THEN
+                  CALL FIO_WRITE( FD, VALUE( : L ), STATUS )
                END IF
 
-*  Free the locators to the parent's provenance information, and the
-*  current cell of the PARENTS array.
-               CALL DAT_ANNUL( PROVP, STATUS )
-               CALL DAT_ANNUL( CLOC, STATUS )
+*  Free resources. 
+               CALL AST_ANNUL( KMP, STATUS )
 
 *  Next parent.
             END DO
 
-*  Free the locator to the PARENTS array.
-            CALL DAT_ANNUL( PLOC, STATUS )
-
          END IF
 
-*  Free the locator to the NDFs provenance information, and close the
+*  Free the KeyMap holding the NDFs provenance information, and close the
 *  output text file.
-         CALL DAT_ANNUL( PROV, STATUS )
+         CALL AST_ANNUL( KM, STATUS )
          CALL FIO_ANNUL( FD, STATUS )
       END IF
 
 *  Arrive here if an error occurs.
  999  CONTINUE
+
+*  Free the Provenance information.
+      CALL NDG_FREEPROV( IPROV, STATUS )
 
 *  Annul the NDF identifier.
       CALL NDF_ANNUL( INDF, STATUS )

@@ -175,6 +175,8 @@
 *  History:
 *     29-FEB-2008 (DSB):
 *        Original version.
+*     25-JUN-2009 (DSB):
+*        Updated to use new provenance API.
 *     {enter_further_changes_here}
 
 *-
@@ -185,7 +187,8 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'CNF_PAR'          ! CNF constants and functions
       INCLUDE 'PAR_ERR'          ! PAR error constants 
-      INCLUDE 'AST_PAR'          ! AST constants and cuntions
+      INCLUDE 'AST_PAR'          ! AST constants and functions
+      INCLUDE 'NDG_PAR'          ! NDG constants 
       INCLUDE 'DAT_PAR'          ! HDS constants 
 
 *  Status:
@@ -199,23 +202,27 @@
       PARAMETER( MXANC = 100 )
 
 *  Local Variables:
+      CHARACTER AMORE*(DAT__SZLOC)! Locator for MORE in ancestor
       CHARACTER ANC*20           ! ANCESTOR parameter value
       CHARACTER ITEM*10          ! Item to check
       CHARACTER PAT*400          ! Pattern matching template
-      CHARACTER PROV*(DAT__SZLOC)! Locator for provenance store
       CHARACTER RESULT*400       ! Result of substitutions
       CHARACTER TEST*400         ! String to be tested
       INTEGER I                  ! Ancestor index
-      INTEGER J                  ! Ancestor index
       INTEGER IANC( MXANC )      ! Indices of selected ancestors
       INTEGER INDF               ! NDF identifier
+      INTEGER IPROV              ! Identifier for provenance structure
       INTEGER IPW1               ! Pointer to work space
+      INTEGER IR                 ! Index of next array element to read
+      INTEGER IW                 ! Index of next array element to write
+      INTEGER J                  ! Ancestor index
+      INTEGER KM                 ! KeyMap holding provenance info
+      INTEGER L                  ! Used length of returned string
       INTEGER NANC               ! Total number of ancestors
       INTEGER NREM               ! Number of ancestors removed
       LOGICAL REMOVE             ! Remove matching ancestors?
       LOGICAL THERE              ! Does component exist?
 *.
-
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -226,10 +233,14 @@
 *  Obtain an identifier for the NDF.
       CALL LPG_ASSOC( 'NDF', 'UPDATE', INDF, STATUS )
 
-*  Count the number of ancestors in the NDF.
-      CALL NDG_CTPRV( INDF, NANC, STATUS )
+*  Read provenance information from the NDF.
+      CALL NDG_READPROV( INDF, ' ', IPROV, STATUS )
 
-*  Initialise the number of ancestors removed.
+*  Get the number of ancestors described in the NDFs PROVENANCE 
+*  extension.
+      CALL NDG_COUNTPROV( IPROV, NANC, STATUS )
+
+*  Initialise the number of ancestors to be removed.
       NREM = 0
 
 *  See if specified ancestors are to be removed or retained.
@@ -248,38 +259,45 @@
          CALL PAR_CHOIC( 'ITEM', 'PATH', 'PATH,DATE,CREATOR', .TRUE., 
      :                    ITEM, STATUS )
 
-*  Loop round all ancestors.
-         I = 1
-         DO WHILE( I .LE. NANC - NREM )
+*  Allocate work space to hold the largest possible number of ancestor 
+*  indices to be removed.
+         CALL PSX_CALLOC( NANC, '_INTEGER', IPW1, STATUS )
 
-*  Get a locator for a temporary HDS structure holding information about
-*  the I'th ancestor.
-            CALL NDG_GTPRV( INDF, I, PROV, STATUS )
-            
+*  Loop round all ancestors.
+         DO I = 1, NANC
+
+*  Get an AST KeyMap holding the existing provenance information for 
+*  the specified ancestor.
+            CALL NDG_GETPROV( IPROV, I, KM, AMORE, STATUS )
+
 *  Get the required item of information from the ancestor, use a blank
 *  string if it is not there.
-            TEST = ' '
-            CALL DAT_THERE( PROV, ITEM, THERE, STATUS )
-            IF( THERE ) CALL CMP_GET0C( PROV, ITEM, TEST, STATUS )
+            THERE = AST_MAPGET0C( KM, ITEM, TEST, L, STATUS )
+            IF( .NOT. THERE ) TEST = ' '
 
-*  Annul the temporary HDS structure holding information about the I'th 
-*  ancestor.
-            CALL DAT_ANNUL( PROV, STATUS )
+*  Annul the KeyMap and locator holding information about the I'th ancestor.
+            CALL AST_ANNUL( KM, STATUS )
+            IF( AMORE .NE. DAT__NOLOC ) CALL DAT_ANNUL( AMORE, STATUS )
 
-*  See if the pattern matches the item.  If required, remove the
-*  ancestor.
+*  See if the pattern matches the item. If required, add the ancestor
+*  index to the list to be deleted.
             IF( REMOVE .EQV. 
      :          AST_CHRSUB( TEST, PAT, RESULT, STATUS ) ) THEN
-               CALL NDG_RMPRV( INDF, I, STATUS )
                NREM = NREM + 1
-
-*  If the ancestor was not removed, move on to check the ancestor with
-*  the next higher index.
-            ELSE
-               I = I + 1
+               CALL KPG1_STORI( NANC, NREM, I, %VAL( CNF_PVAL( IPW1 ) ),
+     :                          STATUS )
             END IF
 
          END DO
+
+*  Remove the required ancestors, and write the modified provenance back 
+*  to the NDF. 
+         CALL NDG_REMOVEPROV( IPROV, NREM, %VAL( CNF_PVAL( IPW1 ) ), 
+     :                        STATUS )
+         CALL NDG_WRITEPROV( IPROV, INDF, STATUS )
+
+*  Free the array holding the ancestor indices.
+         CALL PSX_FREE( IPW1, STATUS )
 
 *  Otherwise, we remove the ancestors specified by parameter ANCESTOR.
       ELSE
@@ -289,12 +307,13 @@
 *  parameter value directly to see if it set to "ALL".  If so, we just
 *  erase the provenance extension.
          IF( CHR_SIMLR( ANC, 'ALL' ) .OR. ANC .EQ. '*' ) THEN
-            CALL NDF_XSTAT( INDF, 'PROVENANCE', THERE, STATUS )
-            IF( THERE ) CALL NDF_XDEL( INDF, 'PROVENANCE', STATUS )
-            NREM = NANC
+            IF( REMOVE ) THEN
+               CALL NDF_XSTAT( INDF, 'PROVENANCE', THERE, STATUS )
+               IF( THERE ) CALL NDF_XDEL( INDF, 'PROVENANCE', STATUS )
+               NREM = NANC
+            END IF
 
-*  Otherwise, extract the list of ancestors to remove and remove each 
-*  one in turn.
+*  Otherwise, get the list of ancestors to remove.
          ELSE
             CALL PSX_CALLOC( NANC + 1, '_INTEGER', IPW1, STATUS )
             CALL KPG1_GILST( 0, NANC, MXANC, 'ANCESTOR', 
@@ -302,39 +321,48 @@
      :                       STATUS )
             CALL PSX_FREE( IPW1, STATUS )
 
-*  Sort the ancestor indices.
+*  Sort the ancestor indices into increasing order.
             CALL KPG1_QSRTI( NREM, 1, NREM, IANC, STATUS )
 
-*  If we are removing the specified ancestors, go through them in 
-*  reverse order, removing each one.
-            IF( REMOVE ) THEN 
-               DO I = NREM, 1, -1
-                  CALL NDG_RMPRV( INDF, IANC( I ), STATUS )
-               END DO
-
-*  If we are removing all except the specified ancestors, go through 
-*  them in reverse order, removing each one that is not in the list of
-*  specified ancestors.
-            ELSE
-               I = NANC
-               J = NREM
-               DO WHILE( I .GT. 0 )
-                  IF( I .GT. IANC( J ) ) THEN
-                     CALL NDG_RMPRV( INDF, I, STATUS )
+*  If we are removing all except the specified ancestors, change the
+*  contents of the list to be the unspecified indices.
+            IF( .NOT. REMOVE ) THEN
+               IR = NREM
+               DO IW = NANC, 1, -1
+                  IF( IW .EQ. IANC( IR ) ) THEN
+                     IANC( IW ) = 1
+                     IR = IR - 1
                   ELSE
-                     J = J - 1
+                     IANC( IW ) = 0
                   END IF
-
-                  I = I - 1
                END DO
+         
+               IW = 1
+               DO IR = 1,NANC
+                  IF( IANC( IR ) .EQ. 0 ) THEN
+                     IANC( IW ) = IR
+                     IW = IW + 1
+                  END IF
+               END DO
+
+               NREM = NANC - NREM
 
             END IF
 
+*  Remove the required ancestors, and write the modified provenance back to 
+*  the NDF. 
+            CALL NDG_REMOVEPROV( IPROV, NREM, IANC, STATUS )
+            CALL NDG_WRITEPROV( IPROV, INDF, STATUS )
+
          END IF
+
       END IF
 
 *  Arrive here if an error occurs.
  999  CONTINUE
+
+*  Free the Provenance information.
+      CALL NDG_FREEPROV( IPROV, STATUS )
 
 *  Report the number of ancestors removed.
       IF( NREM .EQ. 0 ) THEN

@@ -229,6 +229,8 @@
 *        substitution.
 *     29-APR-2008 (DSB):
 *        Added parameter MORETEXT.
+*     25-JUN-2009 (DSB):
+*        Updated to use new provenance API.
 *     {enter_further_changes_here}
 
 *-
@@ -239,8 +241,9 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'CNF_PAR'          ! CNF constants and functions
       INCLUDE 'PAR_ERR'          ! PAR error constants 
-      INCLUDE 'AST_PAR'          ! AST constants and cuntions
+      INCLUDE 'AST_PAR'          ! AST constants and functions
       INCLUDE 'DAT_PAR'          ! HDS constants 
+      INCLUDE 'NDG_PAR'          ! NDG constants 
 
 *  Status:
       INTEGER STATUS
@@ -254,26 +257,27 @@
       PARAMETER( MXANC = 100 )
 
 *  Local Variables:
+      CHARACTER AMORE*(DAT__SZLOC)! Locator for MORE info in ancestor
       CHARACTER ANC*20           ! ANCESTOR parameter value
       CHARACTER CRESUB*400       ! Substitution string
       CHARACTER DATSUB*400       ! Substitution string
-      CHARACTER LOC*(DAT__SZLOC) ! Locator for required component
       CHARACTER MORE*(DAT__SZLOC)! Locator for new MORE information
-      CHARACTER PROV*(DAT__SZLOC)! Locator for provenance store
       CHARACTER PTHSUB*400       ! Substitution string
       CHARACTER RESULT*400       ! result of substitutions
       CHARACTER TEST*400         ! String to be tested
       INTEGER I                  ! Ancestor index
       INTEGER IANC( MXANC )      ! Indices of selected ancestors
       INTEGER INDF               ! NDF identifier
+      INTEGER IPROV              ! Identifier for provenance structure
       INTEGER IPW1               ! Pointer to work space
       INTEGER J                  ! Ancestor count
       INTEGER K                  ! Substitution count
+      INTEGER KM                 ! KeyMap holding provenance info
       INTEGER L                  ! String len
       INTEGER MANC               ! Number of selected ancestors
       INTEGER NANC               ! Total number of ancestors
       LOGICAL DOALL              ! Modify all ancestors?
-      LOGICAL THERE              ! Does component exist?
+      LOGICAL CHANGED            ! Has the component changed?
 *.
 
 
@@ -286,9 +290,12 @@
 *  Obtain an identifier for the NDF.
       CALL LPG_ASSOC( 'NDF', 'UPDATE', INDF, STATUS )
 
+*  Read provenance information from the NDF.
+      CALL NDG_READPROV( INDF, ' ', IPROV, STATUS )
+
 *  Get the number of ancestors described in the NDFs PROVENANCE 
 *  extension.
-      CALL NDG_CTPRV( INDF, NANC, STATUS )
+      CALL NDG_COUNTPROV( IPROV, NANC, STATUS )
 
 *  Get the indices of the ancestors to be modified.  Since KPG1_GILST 
 *  limits the number of values that can be supplied, first check the
@@ -352,121 +359,122 @@
             I = IANC( J )        
          END IF
 
-*  Get a temporary HDS structure holding the existing provenance
-*  information for the specified ancestor.
-         CALL NDG_GTPRV( INDF, I, PROV, STATUS )
+*  Get an AST KeyMap holding the existing provenance information for 
+*  the specified ancestor.
+         CALL NDG_GETPROV( IPROV, I, KM, AMORE, STATUS )
 
-*  If required, replace the MORE component.
+*  If a new MORE structure has been specified, use its locator in place
+*  of the old one.
          IF( MORE .NE. DAT__NOLOC ) THEN     
-            CALL DAT_THERE( PROV, 'MORE', THERE, STATUS )
-            IF( THERE ) CALL DAT_ERASE( PROV, 'MORE', STATUS )
-            CALL DAT_COPY( MORE, PROV, 'MORE', STATUS )
-            CALL DAT_ANNUL( MORE, STATUS )
+            IF( AMORE .NE. DAT__NOLOC ) CALL DAT_ANNUL( AMORE, STATUS )
+            AMORE = MORE
+            MORE = DAT__NOLOC
          END IF
 
-*  Does the information for this ancestor include a CREATOR string? If
-*  so, get its value.
+*  Is the CREATOR string to be modified? 
          IF( CRESUB .NE. ' ' ) THEN
-            CALL DAT_THERE( PROV, 'CREATOR', THERE, STATUS )
-            IF( THERE ) THEN
-               CALL DAT_FIND( PROV, 'CREATOR', LOC, STATUS )
-               CALL DAT_GET0C( LOC, TEST, STATUS )
 
-*  If the specifier matches the CREATOR string, perform the 
-*  substitutions and use the resulting string in place of the current 
-*  CREATOR string.
-               IF( INDEX( CRESUB, '=' ) .EQ. 0 ) THEN
-                  TEST = CRESUB
+*  Assume for now the CREATOR value will not change.
+            CHANGED = .FALSE.
 
-               ELSE IF( AST_CHRSUB( TEST, CRESUB, RESULT, 
-     :                              STATUS ) ) THEN
+*  If the value given for the CREATOR parameter does not include an "="
+*  sign then it is an explicit new value to be stored in the provenance.
+            IF( INDEX( CRESUB, '=' ) .EQ. 0 ) THEN
+               TEST = CRESUB
+               CHANGED = .TRUE.
+
+*  Otherwise it specifies modifications to be applied to the existing
+*  CREATOR string (if any). Get any such string from the KeyMap, skipping
+*  over this bit if the KeyMap does not contain a CREATOR value. 
+            ELSE IF( AST_MAPGET0C( KM, 'CREATOR', TEST, L, 
+     :                             STATUS ) ) THEN
+
+*  If the specifier matches the CREATOR string, perform the substitutions 
+*  and use the resulting string in place of the current CREATOR string.
+               IF( AST_CHRSUB( TEST( : L ), CRESUB, RESULT, 
+     :                         STATUS ) ) THEN
                   TEST = RESULT
+                  CHANGED = .TRUE.
                END IF
+            END IF
 
-*  Put the modified string back into the HDS structure containing the
-*  information for the current ancestor.
-               CALL DAT_ANNUL( LOC, STATUS )
-               CALL DAT_ERASE( PROV, 'CREATOR', STATUS )
+*  If the CREATOR string has changed, put the new value in the KeyMap. 
+            IF( CHANGED ) THEN
                L = MAX( 1, CHR_LEN( TEST ) )
-               CALL DAT_NEW0C( PROV, 'CREATOR', L, STATUS )
-               CALL DAT_FIND( PROV, 'CREATOR', LOC, STATUS )
-   
-               CALL DAT_PUT0C( LOC, TEST( : L ), STATUS )
-               CALL DAT_ANNUL( LOC, STATUS )
+               CALL AST_MAPPUT0C( KM, 'CREATOR', TEST( : L ), ' ', 
+     :                            STATUS ) 
             END IF
          END IF
 
-*  Does the information for this ancestor include a DATE string? If
-*  so, get its value.
+*  Do the same for the DATE string.
          IF( DATSUB .NE. ' ' ) THEN
-            CALL DAT_THERE( PROV, 'DATE', THERE, STATUS )
-            IF( THERE ) THEN
-               CALL DAT_FIND( PROV, 'DATE', LOC, STATUS )
-               CALL DAT_GET0C( LOC, TEST, STATUS )
+            CHANGED = .FALSE.
 
-*  If the specifier matches the DATE string, perform the substitutions
-*  and use the resulting string in place of the current DATE string.
-               IF( INDEX( DATSUB, '=' ) .EQ. 0 ) THEN
-                  TEST = DATSUB
+            IF( INDEX( DATSUB, '=' ) .EQ. 0 ) THEN
+               TEST = DATSUB
+               CHANGED = .TRUE.
 
-               ELSE IF( AST_CHRSUB( TEST, DATSUB, RESULT, 
-     :                              STATUS ) ) THEN
+            ELSE IF( AST_MAPGET0C( KM, 'DATE', TEST, L, 
+     :                             STATUS ) ) THEN
+
+               IF( AST_CHRSUB( TEST( : L ), DATSUB, RESULT, 
+     :                         STATUS ) ) THEN
                   TEST = RESULT
+                  CHANGED = .TRUE.
                END IF
+            END IF
 
-*  Put the modified string back into the HDS structure containing the
-*  information for the current ancestor.
-               CALL DAT_ANNUL( LOC, STATUS )
-               CALL DAT_ERASE( PROV, 'DATE', STATUS )
+            IF( CHANGED ) THEN
                L = MAX( 1, CHR_LEN( TEST ) )
-               CALL DAT_NEW0C( PROV, 'DATE', L, STATUS )
-               CALL DAT_FIND( PROV, 'DATE', LOC, STATUS )
-   
-               CALL DAT_PUT0C( LOC, TEST( : L ), STATUS )
+               CALL AST_MAPPUT0C( KM, 'DATE', TEST( : L ), ' ', 
+     :                            STATUS ) 
             END IF
          END IF
 
-*  Does the information for this ancestor include a PATH string? If
-*  so, get its value.
+*  Do the same for the PATH string.
          IF( PTHSUB .NE. ' ' ) THEN
-            CALL DAT_THERE( PROV, 'PATH', THERE, STATUS )
-            IF( THERE ) THEN
-               CALL DAT_FIND( PROV, 'PATH', LOC, STATUS )
-               CALL DAT_GET0C( LOC, TEST, STATUS )
+            CHANGED = .FALSE.
 
-*  If the specifier matches the PATH string, perform the substitutions
-*  and use the resulting string in place of the current PATH string.
-               IF( INDEX( PTHSUB, '=' ) .EQ. 0 ) THEN
-                  TEST = PTHSUB
+            IF( INDEX( PTHSUB, '=' ) .EQ. 0 ) THEN
+               TEST = PTHSUB
+               CHANGED = .TRUE.
 
-               ELSE IF( AST_CHRSUB( TEST, PTHSUB, RESULT, 
-     :                              STATUS ) ) THEN
+            ELSE IF( AST_MAPGET0C( KM, 'PATH', TEST, L, 
+     :                             STATUS ) ) THEN
+
+               IF( AST_CHRSUB( TEST( : L ), PTHSUB, RESULT, 
+     :                         STATUS ) ) THEN
                   TEST = RESULT
+                  CHANGED = .TRUE.
                END IF
+            END IF
 
-*  Put the modified string back into the HDS structure containing the
-*  information for the current ancestor.
-               CALL DAT_ANNUL( LOC, STATUS )
-               CALL DAT_ERASE( PROV, 'PATH', STATUS )
+            IF( CHANGED ) THEN
                L = MAX( 1, CHR_LEN( TEST ) )
-               CALL DAT_NEW0C( PROV, 'PATH', L, STATUS )
-               CALL DAT_FIND( PROV, 'PATH', LOC, STATUS )
-   
-               CALL DAT_PUT0C( LOC, TEST( : L ), STATUS )
-               CALL DAT_ANNUL( LOC, STATUS )
+               CALL AST_MAPPUT0C( KM, 'PATH', TEST( : L ), ' ', 
+     :                            STATUS ) 
             END IF
          END IF
 
 *  Store the modified provenance information back in the NDF.
-         CALL NDG_MDPRV( INDF, I, PROV, STATUS )
+         CALL NDG_MODIFYPROV( IPROV, I, KM, AMORE, STATUS )
 
-*  Annul the locator for the ancestor information.
-         CALL DAT_ANNUL( PROV, STATUS )
+*  Annul any MORE HDS structure.
+         IF( AMORE .NE. DAT__NOLOC ) CALL DAT_ANNUL( AMORE, STATUS )
+
+*  Annul the KeyMap holding the ancestor information.
+         CALL AST_ANNUL( KM, STATUS )
 
       END DO
 
+*  Store the modified provenance information back in the NDF. 
+      CALL NDG_WRITEPROV( IPROV, INDF, STATUS )
+
 *  Arrive here if an error occurs.
  999  CONTINUE
+
+*  Free the Provenance information.
+      CALL NDG_FREEPROV( IPROV, STATUS )
 
 *  Annul the NDF identifier.
       CALL NDF_ANNUL( INDF, STATUS )

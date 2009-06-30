@@ -77,6 +77,11 @@
       TRUE, the output NDF is trimmed to exclude any border of bad
       pixels.
 
+   o PROVSHOW
+      -  Has a new parameter called HISTORY that can be set to TRUE
+      to display any history records stored in the provenance extension
+      of each ancestor NDF.
+
    o  ROTATE
 
       -  Efficiency improvements have been made for rotations of 180 

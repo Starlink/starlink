@@ -1,2 +1,2 @@
-echo -lndg_adam -lndg `grp_link_adam` `ndf_link_adam` `one_link_adam` \
+echo -lndg_adam -lndg `grp_link_adam` `ndf_link_adam` `atl_link_adam` `one_link_adam` \
 | awk '{for(f=NF;f;f--)if(!w[$f]++)l=$f" "l;print l}'

@@ -123,6 +123,8 @@
 *        Original version.
 *     29-APR-2008 (DSB):
 *        Added parameter MORETEXT.
+*     25-JUN-2009 (DSB):
+*        Updated to use new provenance API.
 *     {enter_further_changes_here}
 
 *-
@@ -134,6 +136,8 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! HDS public constants
       INCLUDE 'PAR_ERR'          ! PAR_ error codes
+      INCLUDE 'AST_PAR'          ! AST constants and functions
+      INCLUDE 'NDG_PAR'          ! NDG constants 
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -143,6 +147,7 @@
       CHARACTER MORE*(DAT__SZLOC) ! Locator for MORE structure
       INTEGER INDF1              ! Identifier for NDF being modified
       INTEGER INDF2              ! Identifier for parent NDF
+      INTEGER IPROV              ! Identifier for provenance info 
       LOGICAL CNCLMR             ! Cancel the MORE parameter on exit?
       LOGICAL ISROOT             ! Is the parent an orphan?
 *.
@@ -198,11 +203,22 @@
 *  Obtain the root flag.
       CALL PAR_GET0L( 'ISROOT', ISROOT, STATUS )
 
-*  Store the information in the provenance extension of INDF1.
-      CALL NDG_PTPRV( INDF1, INDF2, MORE, ISROOT, CREATR, STATUS )
+*  Read provenance information from the child NDF.
+      CALL NDG_READPROV( INDF1, CREATR, IPROV, STATUS )
+
+*  Read provenance information from the parent NDF and add it into the
+*  structure holding provenance information read from the child NDF.
+      CALL NDG_PUTPROV( IPROV, INDF2, MORE, AST__NULL, ISROOT, ' ', 
+     :                  STATUS )
+
+*  Store the modified provenance information in the child NDF. 
+      CALL NDG_WRITEPROV( IPROV, INDF1, STATUS )
 
 *  Arrive here if an error occurrs.
  999  CONTINUE
+
+*  Free the Provenance information.
+      CALL NDG_FREEPROV( IPROV, STATUS )
 
 *  Free the MORE structure locator.
       IF( MORE .NE. DAT__NOLOC ) THEN

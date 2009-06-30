@@ -139,9 +139,11 @@
 *        Original version.
 *     5-MAR-2008 (DSB):
 *        Allow multiple sky cubes to be supplied.
+*     29-JUN-2009 (DSB):
+*        Use new NDG provenance API.
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -222,6 +224,7 @@ void smurf_unmakecube( int *status ) {
    Grp *igrp1 = NULL;         /* Group of input sky cube files */
    Grp *igrp2 = NULL;         /* Group of input template files */
    Grp *ogrp = NULL;          /* Group containing output file */
+   NdgProvenance *oprov = NULL;/* Provenance for the output NDF */
    SkyCube *sky_cubes = NULL; /* Pointer to array of sky cube descriptions */
    SkyCube *skycube = NULL;   /* Pointer to next sky cube description */
    char *pname = NULL;        /* Name of currently opened data file */
@@ -233,17 +236,17 @@ void smurf_unmakecube( int *status ) {
    int ifile;                 /* Input file index */
    int interp = 0;            /* Pixel interpolation method */
    int iskycube;              /* Index of current sky cube */
-   size_t ndet;               /* Number of detectors supplied for "DETECTORS" */
    int nel;                   /* Number of elements in 3D array */
    int nparam = 0;            /* No. of parameters required for interpolation scheme */
-   size_t nskycube;           /* Number of supplied sky cubes */
    int ondf;                  /* Output time series NDF identifier */
    int outax[ 2 ];            /* Indices of corresponding output axes */
-   size_t outsize;            /* Number of files in output group */
    int overlap;               /* Does time series overlap sky cube? */
    int sdim[3];               /* Array of significant pixel axes */
-   size_t size;               /* Number of files in input group */
    int usedetpos;             /* Should the detpos array be used? */
+   size_t ndet;               /* Number of detectors supplied for "DETECTORS" */
+   size_t nskycube;           /* Number of supplied sky cubes */
+   size_t outsize;            /* Number of files in output group */
+   size_t size;               /* Number of files in input group */
    smfData *data = NULL;      /* Pointer to data struct */
    void *in_data = NULL;      /* Pointer to the input cube data array */
    void *out_data = NULL;     /* Pointer to the output cube data array */
@@ -469,10 +472,13 @@ void smurf_unmakecube( int *status ) {
          data->hdr->detpos = NULL;
       }
 
-/* Record details of the template in the provenance extension of the 
+/* Get a pointer to a structure holding provenance information for the
    output time series. */
-      ndgPtprv( ondf, data->file->ndfid, NULL, 0, "SMURF:UNMAKECUBE",
-                status );
+      oprov = ndgReadProv( ondf, "SMURF:UNMAKECUBE", status );
+
+/* Record details of the template in the provenance structure for the 
+   output time series. */
+      ndgPutProv( oprov, data->file->ndfid, NULL, NULL, 0, status );
 
 /* Loop round all input sky cubes. */
       for( iskycube = 0; iskycube < nskycube; iskycube++ ) {
@@ -480,8 +486,7 @@ void smurf_unmakecube( int *status ) {
 
 /* Record details of the input cube in the provenance extension of the 
    output time series. */
-         ndgPtprv( ondf, skycube->indf, NULL, 0, "SMURF:UNMAKECUBE", 
-                   status );
+         ndgPutProv( oprov, skycube->indf, NULL, NULL, 0, status );
 
 /* See if the current time series overlaps the current sky cube. */
          smf_resampcube( data, skycube->abskyfrm, 
@@ -512,6 +517,10 @@ void smurf_unmakecube( int *status ) {
             ndfUnmap( skycube->indf, "DATA", status );
          }            
       }
+
+/* Write the provenance structure to the output NDF, and then free it. */
+      ndgWriteProv( oprov, ondf, status );
+      oprov =ndgFreeProv( oprov, status );
 
 /* Close the input time series file. */
       if( data != NULL ) {

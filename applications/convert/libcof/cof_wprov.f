@@ -85,11 +85,14 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     2008 February 5 (MJC):
 *        Original version, adapting some code from DSB's PROVSHOW.
+*     29-JUN-2009 (DSB):
+*        Change to use NDG_READPROV and NDG_FREEPROV.
 *     {enter_changes_here}
 
 *-
@@ -122,6 +125,7 @@
       INTEGER FSTAT              ! FITSIO status
       CHARACTER*10 ID            ! Integer index for the current NDF
       INTEGER IDENT              ! Identifier undex for the current NDF
+      INTEGER IPROV              ! Identifier for provenance structure
       INTEGER IREC               ! Loop counter for provenance records
       CHARACTER*4 KEY            ! Current key in KeyMap of root anc.
       CHARACTER*8 KEYWRD         ! Header keyword
@@ -157,7 +161,9 @@
       
 *  Format the provenance information in the NDF.  The resulting strings
 *  are returned in an AST KeyMap.
-        CALL NDG_FMPRV( NDF, .FALSE., KYMAP1, STATUS )
+        CALL NDG_READPROV( NDF, ' ', IPROV, STATUS )
+        CALL NDG_FORMATPROV( IPROV, .FALSE., KYMAP1, STATUS )
+        CALL NDG_FREEPROV( IPROV, STATUS )
 
 *  Get the number of entries in the returned KeyMap.  This will be one
 *  more than the number of NDFs described in the displayed table.

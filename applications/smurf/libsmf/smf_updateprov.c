@@ -53,10 +53,12 @@
 *        the OBSIDSS value of the input NDF.
 *     31-JUL-2008 (TIMJ):
 *        Use thread-safe obsidss API.
+*     29-JUN-2009 (DSB):
+*        Use new NDG provenance API.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2007-2008 Science & Technology Facilities Council.
+*     Copyright (C) 2007-2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -82,7 +84,6 @@
 
 /* Starlink includes */
 #include "sae_par.h"
-#include "star/hds.h"
 #include "star/ndg.h"
 
 /* SMURF includes */
@@ -95,16 +96,16 @@ void smf_updateprov( int ondf, const smfData *data, int indf,
 
 /* Local Variables */
    AstFitsChan *fc = NULL;      /* AST FitsChan holding input FITS header */
-   HDSLoc *cloc = NULL;         /* Locator for HDS component */
-   HDSLoc *prov = NULL;         /* Locator for ancestor provenance info */
-   HDSLoc *tloc = NULL;         /* Locator for temp HDS storage */
-   char value[ 256 ];           /* Buffer for ancestor's OBSIDSS value */
-   char obsidssbuf[SZFITSCARD]; /* OBSIDSS value in input file */
+   AstKeyMap *anc = NULL;       /* KeyMap holding ancestor info */
+   AstKeyMap *tkm = NULL;       /* KeyMap holding contents of MORE */
+   NdgProvenance *oprov = NULL; /* Pointer to output provenance structure */
+   NdgProvenance *prov = NULL;  /* Pointer to input provenance structure */
    char *obsidss = NULL;        /* Pointer to OBSIDSS buffer */
+   char obsidssbuf[SZFITSCARD]; /* OBSIDSS value in input file */
+   const char *vptr = NULL;     /* Pointer to OBSIDSS string */
    int found;                   /* Was OBSIDSS value found in an input ancestor? */
    int ianc;                    /* Ancestor index */
    int isroot;                  /* Ignore any ancestors in the input NDF? */
-   int there;                   /* Was the required component found? */
 
 /* Check the inherited status */
    if( *status != SAI__OK ) return;
@@ -120,6 +121,9 @@ void smf_updateprov( int ondf, const smfData *data, int indf,
    if( data && data->file && 
        data->file->ndfid != NDF__NOID) indf = data->file->ndfid;
 
+/* Get a structure holding provenance information from indf. */
+   prov = ndgReadProv( indf, " ", status );
+
 /* Initially, assume that we should include details of ancestor NDFs. */
    isroot = 0;
 
@@ -132,33 +136,24 @@ void smf_updateprov( int ondf, const smfData *data, int indf,
    NDF itself) to see if any of them refer to the same OBSIDSS value. */
       found = 0;
       ianc = 0; 
-      ndgGtprv( indf, ianc, &prov, status );
-      while( prov ) {
-         datThere( prov, "MORE", &there, status );
-         if( there ) {
-            datFind( prov, "MORE", &tloc, status );
-            datThere( tloc, "OBSIDSS", &there, status );
-            if( there ) {
-               datFind( tloc, "OBSIDSS", &cloc, status );
-               datGet0C( cloc, value, 255, status );
-               found = !strcmp( obsidss, value );
-               datAnnul( &cloc, status );
+      anc = ndgGetProv( prov, ianc, NULL, status );
+      while( anc ) {
+         if( astMapGet0A( anc, "MORE", &tkm ) ) {
+            if( astMapGet0C( tkm, "OBSIDSS", &vptr ) ) {
+               found = !strcmp( obsidss, vptr );
             }
-            datAnnul( &tloc, status );
+            tkm = astAnnul( tkm );
          }
-         datAnnul( &prov, status );
-         if( ! found ) ndgGtprv( indf, ++ianc, &prov, status );
+         anc = astAnnul( anc );
+         if( ! found ) anc = ndgGetProv( prov, ++ianc, NULL, status );
       }
 
 /* If the OBSIDSS value was not found in any ancestor, then we add it
-   now. So put the OBSIDSS keyword value in an HDS structure that will be 
+   now. So put the OBSIDSS keyword value in an AST KeyMap that will be 
    stored with the output provenance information. */
       if( ! found ) {
-         datTemp( "MORE", 0, NULL, &tloc, status );
-         datNew0C( tloc, "OBSIDSS", strlen( obsidss ), status );
-         datFind( tloc, "OBSIDSS", &cloc, status );
-         datPut0C( cloc, obsidss, status );
-         datAnnul( &cloc, status );
+         tkm = astKeyMap( " " );
+         astMapPut0C( tkm, "OBSIDSS", obsidss, NULL );
 
 /* Ignore ancestor NDFs if none of them referred to the correct OBSIDSS. */
          isroot = 1;
@@ -168,10 +163,14 @@ void smf_updateprov( int ondf, const smfData *data, int indf,
 /* Update the provenance for the output NDF to include the input NDF as
    an ancestor. Indicate that each input NDF is a root NDF (i.e. has no 
    parents). */
-   ndgPtprv( ondf, indf, tloc, isroot, creator, status );
+   oprov = ndgReadProv( ondf, creator, status );
+   ndgPutProv( oprov, indf, NULL, tkm, isroot, status );
+   ndgWriteProv( oprov, ondf, status );
+   oprov = ndgFreeProv( oprov, status );
 
 /* Free resources. */
-   if( tloc ) datAnnul( &tloc, status );
+   if( prov ) prov = ndgFreeProv( prov, status );
+   if( tkm ) tkm = astAnnul( tkm );
    if( !data ) fc = astAnnul( fc );
 }
 

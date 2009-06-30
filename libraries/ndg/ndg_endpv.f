@@ -124,6 +124,7 @@
       CHARACTER WRNDF*512
       INTEGER INDF1
       INTEGER INDF2
+      INTEGER IPROV
       INTEGER IR
       INTEGER IW
       INTEGER NR
@@ -204,7 +205,7 @@
                      CALL NDF_XSTAT( INDF1, 'PROVENANCE', THERE, 
      :                               STATUS )
 
-*  If the NDF has a history component, set its histpry update mode to
+*  If the NDF has a history component, set its history update mode to
 *  SKIP. This means that no history record will be added to the NDF when
 *  it is closed, but the history update mode stored in the NDF structure
 *  on disk will not be changed.
@@ -215,7 +216,10 @@
 
 *  Only modify this output NDF if is exists and has no provenance
 *  extension.
-                  IF( .NOT. THERE .AND. INDF1 .NE. NDF__NOID ) THEN
+                  IF( INDF1 .NE. NDF__NOID .AND. .NOT. THERE ) THEN
+
+*  Read in the provenance information.
+                     CALL NDG_READPROV( INDF1, CREATR, IPROV, STATUS )
 
 *  Otherwise, loop round each input NDF, maintaining a flag that
 *  indicates if any input NDF had a PROVENANCE extension.
@@ -245,8 +249,9 @@
 *  INDF2 as a parent of INDF1. This also transfers all the ancestors 
 *  of INDF2 to INDF1.
                            ELSE
-                              CALL NDG_PTPRV( INDF1, INDF2, DAT__NOLOC,
-     :                                        .FALSE., CREATR, STATUS )
+                              CALL NDG_PUTPROV( IPROV, INDF2, 
+     :                                          DAT__NOLOC, AST__NULL, 
+     :                                          .FALSE., STATUS )
 
 *  Set the flag that indicates if any INPUT NDF had a provenance extension.
                               CALL NDF_XSTAT( INDF2, 'PROVENANCE', 
@@ -258,6 +263,9 @@
                            END IF
                         END IF
                      END DO
+
+*  Write out the modified provenance information to the output NDF.
+                     CALL NDG_WRITEPROV( IPROV, INDF1, STATUS )
 
 *  If none of the input NDFs had a provenance extension, delete the
 *  provenance extension from the output NDF unless AUTOPROV indicates that

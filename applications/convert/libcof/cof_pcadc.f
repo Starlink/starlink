@@ -87,6 +87,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     DSB: David S. Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -110,6 +111,8 @@
 *        Only record unique OBSIDSS values.
 *     2008 October 2 (MJC):
 *        Edit the PRODUCT keyowrd for extensions.
+*     29-JUN-2009 (DSB):
+*        Use new NDG provenance API.
 *     {enter_further_changes_here}
 
 *-
@@ -141,7 +144,7 @@
 
 *  Local Variables:
       CHARACTER*47 ANCCOM        ! Ancestor header comment
-      CHARACTER*( DAT__SZLOC ) ANCLOC ! Locator to an ancestor
+      INTEGER ANCKM              ! KeyMap describing an ancestor
       CHARACTER*80 CARD          ! FITS header card
       CHARACTER*47 COMENT        ! FITS header comment
       INTEGER CPOS               ! Current string position
@@ -153,11 +156,13 @@
       LOGICAL IDPRS              ! Index to root present?
       INTEGER ID                 ! Index to a root ancestor
       INTEGER IDP                ! Index to current parent
+      INTEGER IPROV              ! Identifier for provenance structure
       INTEGER IREC               ! Loop counter for provenance records
       CHARACTER*( AST__SZCHR ) KEY ! Current key in KeyMap of root anc.
       INTEGER KEYMAP             ! AST KeyMap of root ancestors
       CHARACTER*8 KEYWRD         ! Header keyword
       INTEGER KMIDSS             ! AST KeyMap of OBSIDSS
+      INTEGER L                  ! Used line length
       CHARACTER*( DAT__SZLOC ) MORLOC ! Locator to MORE component
       CHARACTER*68 NAME          ! Path to ancestor
       INTEGER NCNAME             ! Character length of the name
@@ -169,10 +174,9 @@
       CHARACTER*30 OBIDSS        ! MORE.OBSIDSS value
       LOGICAL OBIPRS             ! OBSIDSS present?
       CHARACTER*256 PATH         ! Path to ancestor
-      CHARACTER*( DAT__SZLOC ) PARLOC ! Locator to PARENTS component
       INTEGER PIPNTR             ! Pointer to indices of the parents
       CHARACTER*68 PRODUC        ! Value PRODUCT keyword
-      CHARACTER*( DAT__SZLOC ) PRVLOC ! Locator to PROVENANCE component
+      INTEGER PRVKM              ! KeyMap holding PROVENANCE info
       LOGICAL PRVPRS             ! PROVENANCE present?
       INTEGER SOE                ! Character position of file extension
       LOGICAL THERE              ! Component is present
@@ -195,24 +199,29 @@
       CALL NDF_XSTAT( NDF, 'PROVENANCE', PRVPRS, STATUS )
       IF ( PRVPRS ) THEN
 
+*  Get an identifier for a structure holding provenance info in the NDF.
+         CALL NDG_READPROV( NDF, ' ', IPROV, STATUS )
+
 *  Direct parents
 *  ==============
 
-*  Meet the direct parents.  There may not be any.
-         CALL NDG_GTPRV( NDF, 0, PRVLOC, STATUS )
-         CALL DAT_THERE( PRVLOC, 'PARENTS', THERE, STATUS )
-         IF ( THERE ) THEN
-            CALL DAT_FIND( PRVLOC, 'PARENTS', PARLOC, STATUS )
+*  Meet the direct parents.  There may not be any. Annul any MORE locator
+*  immediately since we do not need it.
+         MORLOC = DAT__NOLOC
+         CALL NDG_GETPROV( IPROV, 0, PRVKM, MORLOC, STATUS )
+         IF ( MORLOC .NE. DAT__NOLOC ) CALL DAT_ANNUL( MORLOC, STATUS )
+         IF ( AST_MAPHASKEY( PRVKM, 'PARENTS', STATUS ) ) THEN
 
 *  Find the number of parent NDFs.
-            CALL DAT_SIZE( PARLOC, NPAR, STATUS )
+            NPAR = AST_MAPLENGTH( PRVKM, 'PARENTS', STATUS )
 
 *  Obtain workspace for the indices.
             CALL PSX_CALLOC( NPAR, '_INTEGER', PIPNTR, STATUS )
 
 *  Obtain the array of parents' indices.
-            CALL DAT_GETVI( PARLOC, NPAR, %VAL( CNF_PVAL( PIPNTR ) ), 
-     :                      NIDS, STATUS )
+            THERE = AST_MAPGET1I( PRVKM, 'PARENTS', NPAR, NPAR, 
+     :                            %VAL( CNF_PVAL( PIPNTR ) ), 
+     :                            STATUS )
             IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  Write a blank header and a title for the block of provenance headers.
@@ -233,9 +242,21 @@
                CALL KPG1_RETRI( NPAR, IREC, %VAL( CNF_PVAL( PIPNTR ) ),
      :                          IDP, STATUS )
 
-*  Obtain the path of the current immediate ancestor.
-               CALL NDG_GTPRV( NDF, IDP, ANCLOC, STATUS )
-               CALL CMP_GET0C( ANCLOC, 'PATH', PATH, STATUS )
+*  Obtain the path of the current immediate ancestor. Annul any MORE 
+*  locator immediately since we do not need it.
+               CALL NDG_GETPROV( IPROV, IDP, ANCKM, MORLOC, STATUS )
+               IF ( MORLOC .NE. DAT__NOLOC ) CALL DAT_ANNUL( MORLOC, 
+     :                                                       STATUS )
+               IF ( .NOT. AST_MAPGET0C( ANCKM, 'PATH', PATH, L, 
+     :                                  STATUS ) ) THEN
+                  IF( STATUS .EQ. SAI__OK ) THEN
+                     STATUS = SAI__ERROR
+                     CALL MSG_SETI( 'I', IDP )
+                     CALL ERR_REP( ' ', 'No path found for ancestor '//
+     :                             '^I in provenance extension '//
+     :                             '(programming error).', STATUS )
+                  END IF
+               END IF
                IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  Extract the name excluding the file extension. 
@@ -264,21 +285,20 @@
                CALL FTPKYS( FUNIT, KEYWRD, NAME( :NCNAME ), 
      :                      ANCCOM( :CPOS ), FSTAT )
 
-*  Free the locator for the current parent.
-               CALL DAT_ANNUL( ANCLOC, STATUS )
+*  Free the information for the current parent.
+               CALL AST_ANNUL( ANCKM, STATUS )
             END DO
 
 *  Complete the tidying of resources.
             CALL PSX_FREE( PIPNTR, STATUS )
-            CALL DAT_ANNUL( PARLOC, STATUS )
          END IF
-         CALL DAT_ANNUL( PRVLOC, STATUS )
+         CALL AST_ANNUL( PRVKM, STATUS )
 
 *  Root ancestors
 *  ==============
 
 *  Obtain the root ancestors (ones with no parents) via an AST KeyMap.
-         CALL NDG_RTPRV( NDF, KEYMAP, STATUS )
+         CALL NDG_ROOTPROV( IPROV, KEYMAP, STATUS )
          NROOT = AST_MAPSIZE( KEYMAP, STATUS )
 
 *  Write the OBSCNT header with the expected value, so that it's in the
@@ -298,15 +318,11 @@
             IDPRS = AST_MAPGET0I( KEYMAP, KEY, ID, STATUS )
 
 *  Obtain the identifier of the current immediate ancestor.
-            CALL NDG_GTPRV( NDF, ID, ANCLOC, STATUS )
+            CALL NDG_GETPROV( IPROV, ID, ANCKM, MORLOC, STATUS )
 
 *  Attempt to find the .MORE.OBSIDSS component.
             OBIPRS = .FALSE.
-            CALL DAT_THERE( ANCLOC, 'MORE', THERE, STATUS )
-            IF ( STATUS .NE. SAI__OK ) GOTO 999
-
-            IF ( THERE ) THEN
-               CALL DAT_FIND( ANCLOC, 'MORE', MORLOC, STATUS )
+            IF ( MORLOC .NE. DAT__NOLOC ) THEN
                CALL DAT_THERE( MORLOC, 'OBSIDSS', THERE, STATUS )
 
                IF ( THERE ) THEN
@@ -353,10 +369,16 @@
             END IF
 
 *  Free the locator for the current parent.
-            CALL DAT_ANNUL( ANCLOC, STATUS )
+            CALL AST_ANNUL( ANCKM, STATUS )
 
          END DO
          CALL AST_ANNUL( KMIDSS, STATUS )
+
+*  Free the KeyMap holding root ancestor information.
+         CALL AST_ANNUL( KEYMAP, STATUS )
+
+*  Free the structure holding provenance information.
+         CALL NDG_FREEPROV( IPROV, STATUS )
 
 *  Correct the OBSCNT header value to allow for missing OBSIDSS values.
          IF ( NOBSID .LT. NROOT ) THEN
@@ -389,7 +411,7 @@
 *  PRODUCT header
 *  ==============
 
-*  The PRODUCT keyword retians its value in the primary HDU, but
+*  The PRODUCT keyword retains its value in the primary HDU, but
 *  has the extension name appended in extensions, of the form
 *  <PRODUCT>_<extname>, where <extname> is the value iof EXTNAM in
 *  lowercase.
@@ -410,7 +432,7 @@
          CALL CHR_APPND( EXTNAM, PRODUC, CPOS )
 
 *  Write the PRODUCT keyword's new value leaving the comment unchanged.
-*  A new keyword is written should the PRODUCT keywoerd not exist in
+*  A new keyword is written should the PRODUCT keyword not exist in
 *  the extension.
          CALL FTUKYS( FUNIT, 'PRODUCT', PRODUC( :CPOS ), COMENT, 
      :                 FSTAT )
