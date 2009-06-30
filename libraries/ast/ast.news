@@ -38,9 +38,6 @@ outside of the celestial sphere instead of the inside. Any Polygon saved
 using previous versions of AST will be identified and negated automatically 
 when read by AST V5.2.
 
-A new class of Channel, called StcsChan, has been added that allows
-conversion of suitable AST Objects to and from IVOA STC-S format.
-
 - A new class of Channel, called StcsChan, has been added that allows
 conversion of suitable AST Objects to and from IVOA STC-S format.
 
