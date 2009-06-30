@@ -110,7 +110,7 @@
 *     2008 August 6 (MJC):
 *        Only record unique OBSIDSS values.
 *     2008 October 2 (MJC):
-*        Edit the PRODUCT keyowrd for extensions.
+*        Edit the PRODUCT keyword for extensions.
 *     29-JUN-2009 (DSB):
 *        Use new NDG provenance API.
 *     {enter_further_changes_here}
@@ -205,8 +205,8 @@
 *  Direct parents
 *  ==============
 
-*  Meet the direct parents.  There may not be any. Annul any MORE locator
-*  immediately since we do not need it.
+*  Meet the direct parents.  There may not be any. Annul any MORE
+*  locator immediately since we do not need it.
          MORLOC = DAT__NOLOC
          CALL NDG_GETPROV( IPROV, 0, PRVKM, MORLOC, STATUS )
          IF ( MORLOC .NE. DAT__NOLOC ) CALL DAT_ANNUL( MORLOC, STATUS )

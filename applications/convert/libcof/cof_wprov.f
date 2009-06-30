@@ -53,7 +53,7 @@
 *     the maximum 68 characters allowed in a keyword character value.
 *     Therefore this routine uses the non-standard Long-string Keyword 
 *     Convention that permits long strings to continue over multiple 
-*     headers.  If any of the aforementioned keywords' values exceeds 68 
+*     headers.  If any of the aforementioned keywords' values exceeds 68
 *     characters, this routine adds a warning in some COMMENT headers
 *     and writes a LONGSTRN header, whose value is the version of the 
 *     convention being used.
