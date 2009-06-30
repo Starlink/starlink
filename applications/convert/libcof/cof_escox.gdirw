@@ -74,7 +74,9 @@
 *  History:
 *     1994 June 2 (MJC):
 *        Original version.
-*     {enter_changes_here}
+*     2009 June 30 (MJC):
+*        Replaced call to cloned routine with originals from KAPLIBS.
+*     {enter_further_changes_here}
 
 *-
       
@@ -115,7 +117,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Find the range of values in the input array.
-      CALL COF_MXMN<T>( BAD, EL, ARRAY, NINVAL, MAXV, MINV, MAXPOS,
+      CALL KPG1_MXMN<T>( BAD, EL, ARRAY, NINVAL, MAXV, MINV, MAXPOS,
      :                   MINPOS, STATUS )
 
       IF ( MAXV .NE. MINV ) THEN

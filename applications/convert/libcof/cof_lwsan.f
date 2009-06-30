@@ -113,6 +113,8 @@
 *        Trim trailing blanks from output NDF character components.
 *     2009 June 29 (MJC):
 *        Replaced deprecated CON_MOVE with KPG1_COPY from KAPLIBS.
+*     2009 June 30 (MJC):
+*        Replaced calls to cloned routine with original from KAPLIBS.
 *     {enter_further_changes_here}
 
 *-
@@ -315,8 +317,8 @@
       END IF
 
 *  Find the range of the x indices.
-      CALL COF_MXMNI( BAD, NOBS, %VAL( CNF_PVAL( XPNTR ) ), NINVAL,
-     :                UBND( 1 ), LBND( 1 ), MAXPOS, MINPOS, STATUS )
+      CALL KPG1_MXMNI( BAD, NOBS, %VAL( CNF_PVAL( XPNTR ) ), NINVAL,
+     :                 UBND( 1 ), LBND( 1 ), MAXPOS, MINPOS, STATUS )
 
 *  Obtain the y indices from this column.  There are 2 elements in each
 *  vector.
@@ -334,8 +336,8 @@
       END IF
 
 *  Find the range of the y indices.
-      CALL COF_MXMNI( BAD, NOBS, %VAL( CNF_PVAL( YPNTR ) ), NINVAL,
-     :                UBND( 2 ), LBND( 2 ), MAXPOS, MINPOS, STATUS )
+      CALL KPG1_MXMNI( BAD, NOBS, %VAL( CNF_PVAL( YPNTR ) ), NINVAL,
+     :                 UBND( 2 ), LBND( 2 ), MAXPOS, MINPOS, STATUS )
 
 *  Find the column number of the scan counter.
       CALL FTGCNO( FUNIT, .FALSE., 'LSANSCNT', COLNUM, FSTAT )
@@ -355,8 +357,8 @@
       END IF
 
 *  Find the range of the scan counts.
-      CALL COF_MXMNI( BAD, NOBS, %VAL( CNF_PVAL( SPNTR ) ), NINVAL,
-     :                UBND( 4 ), LBND( 4 ), MAXPOS, MINPOS, STATUS )
+      CALL KPG1_MXMNI( BAD, NOBS, %VAL( CNF_PVAL( SPNTR ) ), NINVAL,
+     :                 UBND( 4 ), LBND( 4 ), MAXPOS, MINPOS, STATUS )
 
 *  Temporarily set the bounds of the NDF.  This is need to enable the
 *  axis type along the third dimension to be set in the COF_ATYPC call.
