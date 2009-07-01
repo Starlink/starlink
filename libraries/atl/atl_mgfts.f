@@ -51,7 +51,7 @@
 *     comparing the formatted strings for exact equality.
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 *     Copyright (C) 2007 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -89,6 +89,9 @@
 *     4-DEC-2008 (TIMJ):
 *        Rewrite to use AST_TESTFITS now that AST_GETFITSS no longer
 *        allows undef values.
+*     30-JUN-2009 (TIMJ):
+*        The removal of contiguous blank fields was being overzealous in that
+*        it would remove the card following the two contiguous blank cards...
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -302,6 +305,12 @@
                IF( FLAG ) THEN
                   FLAG = .FALSE.
                ELSE
+*  The card we have just retrieved is BLANK and the one before it
+*  was also blank. Since AST_FINDFITS increments the Card we have
+*  to move it back one to delete that card.
+                  CALL AST_SETI( FC3, 'CARD',
+     :                           AST_GETI( FC3, 'CARD', STATUS ) - 1,
+     :                           STATUS )
                   CALL AST_DELFITS( FC3, STATUS )
                END IF
             ELSE
