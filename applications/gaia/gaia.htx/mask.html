@@ -5,7 +5,7 @@
   </head>
 
   <body>
-    <a name="xref_skycat"></a>
+    <a name="xref_masks"></a>
     <h2 align=center><font color=red>Visualizing Masks</font></h2>
     <p>
       Integer valued masks can be used to select out regions of the displayed
@@ -19,7 +19,7 @@
       positive non-zero values associated with them in the mask. To select a
       specific mask value either enter the value in the <tt>Values</tt> field
       and press <tt>Apply</tt>, or move to that value in the <tt>Value</tt>
-      slider.
+      slider. 
     </p>
     <p>
       To select a range of values enter these in the <tt>Values</tt> field
@@ -37,6 +37,12 @@
     <p>
       To get the unmasked image back just close the toolbox or press the
       <tt>Reset</tt> button.
-
+    </p>
+    <p>
+      To invert the mask, i.e. see all the parts of the image not
+      masked by an integer, just select the <tt>Invert:</tt> control and press
+      <tt>Apply</tt>. Note that some masks offer this not-masked facility
+      using the value 0 instead of BAD.
+    </p>
   </body>
 </html>
