@@ -103,8 +103,7 @@ $VERSION = '1.48';
                             cmp_shape cmp_size cmp_struc cmp_type cmp_unmap
                           /],
 
-                'ndg'=>[qw/ ndg_ctprv ndg_gtprv ndg_mdprv ndg_rmprv ndgGtprvk
-                            ndgRmprvs
+                'ndg'=>[qw/ ndgReadProv
                           /],
 
                 'misc'=>[qw/mem2string string2mem array2mem mem2array
@@ -275,20 +274,6 @@ sub ndfPtwcs {
   my $chan = new Starlink::AST::Channel( sink => sub { push(@buffer,$_[0]."\n")});
   $chan->Write( $wcs );
   ndfPtwcs_( \@buffer, $_[0], $_[1]);
-}
-
-# $keymap = ndfGtprvk( $indf, $ianc, $status );
-sub ndgGtprvk {
-  require Starlink::AST;
-  my $buffer = ndgGtprvk_( $_[0], $_[1], $_[2]);
-  return undef unless $_[2] == &NDF::SAI__OK;
-  my @strings = split(/\n/, $buffer);
-  my $chan = new Starlink::AST::Channel( 
-                                        source => sub { 
-                                          return shift(@strings); 
-                                        }
-                                       );
-  return $chan->Read();
 }
 
 # Now put in some general PERL sub routines
@@ -902,7 +887,36 @@ sub err_flush_to_string {
   return (wantarray() ? @errs : join("\n",@errs) );
 }
 
+# Helper routines for ndg
+
+package NdgProvenancePtr;
+
+# $keymap = $prov->GetProv( $ianc, $status );
+sub GetProv {
+  require Starlink::AST;
+  my $buffer = $_[0]->GetProv_( $_[1], $_[2]);
+  return undef unless $_[2] == &NDF::SAI__OK;
+  my @strings = split(/\n/, $buffer);
+  my $chan = new Starlink::AST::Channel(
+                                        source => sub {
+                                          return shift(@strings);
+                                        }
+                                       );
+  return $chan->Read();
+}
+
+# $prov->ModifyProv( $ianc, $AstKeyMap, $status );
+sub ModifyProv {
+  require Starlink::AST;
+  my $km = $_[2];
+  my @buffer;
+  my $chan = Starlink::AST::Channel->new( sink => sub { push(@buffer, $_[0]."\n")});
+  $chan->Write( $km );
+  $_[0]->ModifyProv_( $_[1], \@buffer, $_[3] );
+}
+
 1;
+
 __END__
 # This is the documentation
 
@@ -955,7 +969,9 @@ This imports most of the CMP_ functions
 
 =item :ndg
 
-NDG provenance routines.
+NDG provenance routines. The only routine exported is ndgReadProv. This
+returns a provenance object and all subsequent interaction with NDG provenance
+is through method calls ($prov->CountProv etc)
 
 =item :misc
 
@@ -1266,7 +1282,7 @@ cmp_type cmp_unmap
 
 =item :ndg
 
-ndg_gtprv ndg_mdprv ndg_ctprv
+ndgReadProv
 
 =item :misc
 

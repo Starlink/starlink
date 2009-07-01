@@ -4727,95 +4727,6 @@ errTune(param, value, status)
  OUTPUT:
   status
 
-############## NDG PROVENANCE ROUTINES ###########################
-
-# Note that these use the C interface for consitency with the
-# other NDF + HDS interface routines
-
-void
-ndg_ctprv( indf, nanc, status )
-  ndfint &indf
-  ndfint &nanc = NO_INIT
-  ndfint &status
- PROTOTYPE: $$$
- CODE:
-   ndg_ctprv_(&indf, &nanc, &status);
- OUTPUT:
-   nanc
-   status
-
-void
-ndg_gtprv( indf, ianc, prov, status )
-  ndfint &indf
-  ndfint &ianc
-  locator * prov = NO_INIT
-  ndfint &status
- PROTOTYPE: $$$$
- PREINIT:
-  locator floc[DAT__SZLOC];
- CODE:
-  prov = floc;
-  ndg_gtprv_(&indf, &ianc, prov, &status, DAT__SZLOC );
- OUTPUT:
-  prov
-  status
-
-# private version that returns string for object
-# Note that we do not handle MORE yet
-SV *
-ndgGtprvk_( indf, ianc, status )
-  ndfint &indf
-  ndfint &ianc
-  ndfint &status
- PROTOTYPE: $$$
- PREINIT:
-  AstKeyMap *km = NULL;
- CODE:
-  ndgGtprvk( indf, ianc, &km, NULL, &status );
-  RETVAL = _ast_to_SV( (AstObject*)km, &status );
- OUTPUT:
-  RETVAL
-  status
-
-void
-ndg_mdprv( indf, ianc, prov, status )
-  ndfint &indf
-  ndfint &ianc
-  locator * prov
-  ndfint &status
- PROTOTYPE: $$$$
- CODE:
-  ndg_mdprv_(&indf, &ianc, prov, &status, DAT__SZLOC );
- OUTPUT:
-  status
-
-void
-ndg_rmprv( indf, ianc, status )
-  ndfint &indf
-  ndfint &ianc
-  ndfint &status
- PROTOTYPE: $$$
- CODE:
-  ndg_rmprv_(&indf, &ianc, &status );
- OUTPUT:
-  status
-
-# Note that we do not ask the caller to specify the size
-# of the incoming array
-
-void
-ndgRmprvs( indf, anc, status )
-  ndfint &indf
-  ndfint * anc
-  ndfint &status
- PREINIT:
-  int nanc;
- CODE:
-  nanc = av_len( (AV*)SvRV( ST(1) ) ) + 1; /* av_len is equivalent of $#a */
-  ndgRmprvs( indf, nanc, anc, &status );
- OUTPUT:
-  status
-
 ########################################
 # Non Starlink stuff
 #  This is so we can handle the pointers used
@@ -4940,3 +4851,112 @@ byte_size(packtype)
  OUTPUT:
   RETVAL
 
+############## NDG PROVENANCE ROUTINES ###########################
+
+# Note that we do not implement the MORE HDS locator part of the
+# NDG provenance interface. This simplifies the wrapping because
+# the "prov" object is C and the rest of the perl NDF interface
+# treats HDS locators as fortran strings. To be consistent would
+# require that we use a mixed interface.
+
+# Note that the constructor is in the normal NDF namespace
+# but returns an object. All subsequent calls are methods.
+
+NdgProvenance *
+ndgReadProv( indf, creator, status )
+  ndfint &indf
+  char * creator
+  ndfint &status
+ PROTOTYPE: $$$
+ CODE:
+  RETVAL = ndgReadProv( indf, creator, &status);
+ OUTPUT:
+  status
+  RETVAL
+
+MODULE = NDF PACKAGE = NdgProvenancePtr PREFIX = NdgProvenance_
+
+void
+NdgProvenance_DESTROY( prov )
+  NdgProvenance * prov
+ PREINIT:
+  int status = SAI__OK;
+ CODE:
+  prov = ndgFreeProv( prov, &status );
+
+MODULE = NDF PACKAGE = NdgProvenancePtr PREFIX = ndg
+
+int
+ndgCountProv( prov, status )
+  NdgProvenance * prov
+  ndfint &status
+ PROTOTYPE: $$
+ CODE:
+   RETVAL = ndgCountProv( prov, &status );
+ OUTPUT:
+   status
+   RETVAL
+
+void
+ndgWriteProv( prov, indf, status )
+  NdgProvenance * prov
+  ndfint &indf
+  ndfint &status
+ PROTOTYPE: $$$
+ CODE:
+  ndgWriteProv( prov, indf, &status );
+ OUTPUT:
+  status
+
+# private version that returns string for object
+# Note that we do not handle MORE yet
+SV *
+ndgGetProv_( prov, ianc, status )
+  NdgProvenance * prov
+  ndfint &ianc
+  ndfint &status
+ PROTOTYPE: $$$
+ PREINIT:
+  AstKeyMap *km = NULL;
+ CODE:
+  km = ndgGetProv( prov, ianc, NULL, &status );
+  RETVAL = _ast_to_SV( (AstObject*)km, &status );
+  astAnnul( km ); /* no longer needed */
+ OUTPUT:
+  RETVAL
+  status
+
+# Note MORE is ignored for the time being
+# Perl layer must convert KeyMap to an array of strings
+
+void
+ndgModifyProv_( prov, ianc, akm, status )
+  NdgProvenance * prov
+  ndfint &ianc
+  AV * akm
+  ndfint &status
+ PROTOTYPE: $$$$
+ PREINIT:
+   AstKeyMap *km = NULL;
+ CODE:
+  km = (AstKeyMap*)AV_to_ast( akm, &status );
+  ndgModifyProv( prov, ianc, km, NULL, &status );
+  km = astAnnul( km );
+ OUTPUT:
+  status
+
+# Note that we do not ask the caller to specify the size
+# of the incoming array
+
+void
+ndgRemoveProv( prov, anc, status )
+  NdgProvenance * prov
+  ndfint * anc
+  ndfint &status
+ PREINIT:
+  int nanc;
+ CODE:
+  nanc = av_len( (AV*)SvRV( ST(1) ) ) + 1; /* av_len is equivalent of $#a */
+  ndgRemoveProv( prov, nanc, anc, &status );
+ OUTPUT:
+  status

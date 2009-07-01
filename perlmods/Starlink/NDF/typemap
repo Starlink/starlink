@@ -8,6 +8,7 @@ ndfdouble *     T_DOUBLEP
 ndfint          T_IV
 ndfdouble       T_DOUBLE
 int *           T_INTP
+NdgProvenance * T_PTROBJ
 
 INPUT 
 
