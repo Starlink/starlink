@@ -92,6 +92,9 @@
 
     A bug in the positioning of the 3D direction axes has been fixed.
 
+    The baseline subtraction tool in the cube toolbox now allows for the
+    output cube to be given a named prefix.
+
   Lehuakona Release
   =================
 

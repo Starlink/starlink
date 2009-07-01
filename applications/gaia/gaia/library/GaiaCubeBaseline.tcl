@@ -158,6 +158,29 @@ itcl::class gaia::GaiaCubeBaseline {
       add_short_help $itk_component(order) \
          {Order of polynomials to use in fits}
 
+      #  Prefix for name of output cube (auto-suggested until given a name).
+      itk_component add prefix {
+         LabelEntry $w_.prefix \
+            -text "Output prefix:" \
+            -value "GaiaTempCube" \
+            -labelwidth $itk_option(-labelwidth) \
+            -valuewidth $itk_option(-valuewidth)
+      }
+      pack $itk_component(prefix) -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(prefix) \
+         {Prefix for names of output cubes, will be appended by an integer}
+
+      itk_component add outputfile {
+         LabelValue $w_.outputfile \
+            -text "Output name:" \
+            -value "" \
+            -labelwidth $itk_option(-labelwidth) \
+            -valuewidth $itk_option(-valuewidth)
+      }
+      pack $itk_component(outputfile) -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(outputfile) \
+         {Name used for the last baselined cube}
+
       #  Put the main controls in a scrollframe to manage the real estate
       #  usage.
       itk_component add scrollframe {
@@ -185,7 +208,7 @@ itcl::class gaia::GaiaCubeBaseline {
       }
 
       #  If the min/max have changed, also reset the ranges (different axis or
-      #  unrelated cube). 
+      #  unrelated cube).
       if { $plane_min != $from || $plane_max != $to } {
          for {set i 0} {$i < $itk_option(-nranges)} {incr i} {
             $itk_component(bounds$i) configure -from $plane_min -to $plane_max
@@ -231,7 +254,8 @@ itcl::class gaia::GaiaCubeBaseline {
       #  Create a temporary file name.
       incr count_
       set tmpimage_ [gaia::GaiaTempName::make_name \
-                        "GaiaTempCube" $count_ ".sdf"]
+                        "[$itk_component(prefix) get]" $count_ ".sdf"]
+      $itk_component(outputfile) configure -value ""
 
       #  Need to determine ranges. Note handle case when coordinate system
       #  doesn't match the disk-file.
@@ -289,6 +313,9 @@ itcl::class gaia::GaiaCubeBaseline {
          if { $keep_system_ != {} } {
             $itk_option(-spec_coords) set_system $keep_system_ $keep_units_ 0
          }
+
+         #  Show name of results.
+         $itk_component(outputfile) configure -value "$file"
       }
       blt::busy release $w_
    }
