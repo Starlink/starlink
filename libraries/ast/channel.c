@@ -4967,7 +4967,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 
 /* Local Variables: */
    AstChannel *this;             /* Pointer to the Channel structure */
-   char *comment;                /* Pointer to comment string */
+   const char *comment;          /* Pointer to comment string */
    int ival;                     /* Integer value */
    int set;                      /* Attribute value set? */
 

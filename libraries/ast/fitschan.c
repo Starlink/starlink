@@ -1449,7 +1449,7 @@ static FitsStore *FreeStore( FitsStore *, int * );
 static FitsStore *FsetToStore( AstFitsChan *, AstFrameSet *, int, double *, const char *, const char *, int * );
 static char *CardComm( AstFitsChan *, int * );
 static char *CardName( AstFitsChan *, int * );
-static char *FormatKey( char *, int, int, char, int * );
+static char *FormatKey( const char *, int, int, char, int * );
 static char *GetItemC( char ****, int, char, char *, const char *method, const char *class, int * );
 static char *SourceWrap( const char *(*)( void ), int * );
 static char *UnPreQuote( const char *, int * );
@@ -1588,7 +1588,7 @@ static void SetFitsS( AstFitsChan *, const char *, const char *, const char *, i
 static void SetFitsU( AstFitsChan *, const char *, const char *, int, int * );
 static void SetItem( double ****, int, int, char, double, int * );
 static void SetItemC( char ****, int, char, const char *, int * );
-static void SetValue( AstFitsChan *, const char *, void *, int, char *, int * );
+static void SetValue( AstFitsChan *, const char *, void *, int, const char *, int * );
 static void SinkWrap( void (*)( const char * ), const char *, int * );
 static void SkyPole( AstWcsMap *, AstMapping *, int, int, int *, char, FitsStore *, const char *, const char *, int * );
 static void Warn( AstFitsChan *, const char *, const char *, const char *, const char *, int * );
@@ -2350,7 +2350,7 @@ static int AIPSFromStore( AstFitsChan *this, FitsStore *store,
 /* Local Variables: */
    char *comm;         /* Pointer to comment string */
    char *cval;         /* Pointer to string keyword value */
-   char *specunit;     /* Pointer to corrected spectral units string */
+   const char *specunit;/* Pointer to corrected spectral units string */
    char combuf[80];    /* Buffer for FITS card comment */
    char lattype[MXCTYPELEN];/* Latitude axis CTYPE */
    char lontype[MXCTYPELEN];/* Longitude axis CTYPE */
@@ -2912,7 +2912,7 @@ static int AIPSPPFromStore( AstFitsChan *this, FitsStore *store,
 /* Local Variables: */
    char *comm;         /* Pointer to comment string */
    char *cval;         /* Pointer to string keyword value */
-   char *specunit;     /* Pointer to corrected spectral units string */
+   const char *specunit;/* Pointer to corrected spectral units string */
    char combuf[80];    /* Buffer for FITS card comment */
    char lattype[MXCTYPELEN];/* Latitude axis CTYPE */
    char lontype[MXCTYPELEN];/* Longitude axis CTYPE */
@@ -6292,7 +6292,7 @@ static void CreateKeyword( AstFitsChan *this, const char *name,
 
 /* Local Variables: */
    astDECLARE_GLOBALS            /* Declare the thread specific global data */
-   char *seq_chars = SEQ_CHARS;  /* Pointer to characters used for encoding */
+   const char *seq_chars = SEQ_CHARS;/* Pointer to characters used for encoding */
    char seq_char;                /* The first sequence character */
    const char *class;            /* Object clas */
    int found;                    /* Keyword entry found in list? */
@@ -7077,9 +7077,9 @@ static int DSSFromStore( AstFitsChan *this, FitsStore *store,
 */
 
 /* Local Variables: */
-   char *comm;         /* Pointer to comment string */
+   const char *comm;   /* Pointer to comment string */
    char *cval;         /* Pointer to string keyword value */
-   char *pltdecsn;     /* PLTDECSN keyword value */
+   const char *pltdecsn;/* PLTDECSN keyword value */
    double amdx[20];    /* AMDXi keyword value */
    double amdy[20];    /* AMDYi keyword value */
    double cdelt;       /* CDELT element */
@@ -9485,7 +9485,7 @@ static FitsStore *FreeStore( FitsStore *store, int *status ){
    return (FitsStore *) astFree( (void *) store );
 }
 
-static char *FormatKey( char *key, int c1, int c2, char s, int *status ){
+static char *FormatKey( const char *key, int c1, int c2, char s, int *status ){
 /*
 *  Name:
 *     FormatKey
@@ -9497,7 +9497,7 @@ static char *FormatKey( char *key, int c1, int c2, char s, int *status ){
 *     Private function.
 
 *  Synopsis:
-*     char *FormatKey( char *key, int c1, int c2, char s, int *status )
+*     char *FormatKey( const char *key, int c1, int c2, char s, int *status )
 
 *  Class Membership:
 *     FitsChan
@@ -22330,7 +22330,7 @@ static void SetItemC( char ****item, int i, char s, const char *val, int *status
 }
 
 static void SetValue( AstFitsChan *this, const char *keyname, void *value, 
-                      int type, char *comment, int *status ){
+                      int type, const char *comment, int *status ){
 /*
 *  Name:
 *     SetValue
@@ -22344,7 +22344,7 @@ static void SetValue( AstFitsChan *this, const char *keyname, void *value,
 *  Synopsis:
 *     #include "fitschan.h"
 *     void SetValue( AstFitsChan *this, char *keyname, void *value, 
-*                    int type, char *comment, int *status )
+*                    int type, const char *comment, int *status )
 
 *  Class Membership:
 *     FitsChan
@@ -23537,7 +23537,7 @@ static AstMapping *SpectralAxes( AstFrameSet *fs, double *dim, int *wperm,
    AstMapping *tmap6;      /* A temporary Mapping */
    AstSpecFrame *specfrm;  /* The SpecFrame defining current WCS axis */
    char *cname;            /* Pointer to CNAME value */
-   char *x_sys[ 4 ];       /* Basic spectral systems */
+   const char *x_sys[ 4 ]; /* Basic spectral systems */
    char ctype[ MXCTYPELEN ]; /* The value for the FITS CTYPE keyword */
    char lin_unit[ 20 ];    /* Linear spectral Units being used */
    char orig_system[ 40 ]; /* Value of System attribute for current WCS axis */
@@ -24318,9 +24318,9 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 
 /* Arrays needed to convert the index of a TNX co-efficient into an index
    of a TAN projection parameter. */
-   static int abskip[] = {0,1,4,10,20,35,56,84};
-   static int nab[] = {1,3,6,10,15,21,28,36};
-   static int a[] = { 
+   static const int abskip[] = {0,1,4,10,20,35,56,84};
+   static const int nab[] = {1,3,6,10,15,21,28,36};
+   static const int a[] = {
 0,  
 0,1,2,
 0,1,4,2,5,6,
@@ -24330,7 +24330,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 0,1,4,7,12,17,24,2,5,8,13,18,25,6,9,14,19,26,10,15,20,27,16,21,28,22,29,30,
 0,1,4,7,12,17,24,31,2,5,8,13,18,25,32,6,9,14,19,26,33,10,15,20,27,34,16,21,28,35,22,29,36,30,37,38};
 
-   static int b[] = { 
+   static const int b[] = {
 0, 
 0,2,1,
 0,2,6,1,5,4,
