@@ -1523,6 +1523,7 @@ void smurf_timesort( int *status ) {
             grid = astFree( grid );
             tai = astFree( tai );
             good_dets = astFree( good_dets );
+            rts = astFree( rts );
 
 /* End the AST and NDF context. */
             ndfEnd( status );
