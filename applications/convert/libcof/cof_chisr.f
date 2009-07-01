@@ -92,6 +92,10 @@
 *     2009 June 26 (MJC):
 *        UPDATE_MODE may now have leading blanks that must be trimmed to
 *        avoid an error from NDF when NDF accesses this component. 
+*     2009 June 30 (MJC):
+*        Indent paragraphs of text after the first line except for
+*        Software, Arguments, and Parameters headings for which a new
+*        line is created.
 *     {enter_further_changes_here}
 
 *-
@@ -117,6 +121,9 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
+      EXTERNAL CHR_INDEX
+      INTEGER CHR_INDEX          ! Character position of a substring
+
       EXTERNAL CHR_LEN
       INTEGER CHR_LEN            ! Length of a string less trailing
                                  ! blanks
@@ -125,9 +132,12 @@
       INTEGER FITSOK             ! Good status for FITSIO library
       PARAMETER( FITSOK = 0 )
 
+      INTEGER INDENT             ! Paragraph indentation in characters
+      PARAMETER( INDENT = 3 )
+
       INTEGER MAXWID             ! Maximum number of characters in
                                  ! history additional text
-      PARAMETER( MAXWID = 80 )
+      PARAMETER( MAXWID = NDF__SZHMX )
 
       INTEGER MAXWRD             ! Maximum number of words in line
       PARAMETER( MAXWRD = 7 )
@@ -135,8 +145,11 @@
 *  Local Variables:
       INTEGER ALIGN              ! Alignment with respect to Column 9
       CHARACTER*( NDF__SZAPP ) APPN ! Application name
+      INTEGER BCOL               ! Column position in indentation buffer
+      CHARACTER*( MAXWID ) BUF   ! Buffer for paragraph indentation
       CHARACTER*80 CARD          ! FITS header card
       CHARACTER*( DAT__SZLOC ) CLOC ! Locator to a character component
+      INTEGER CPHEAD             ! Character position of heading
       INTEGER CRCOL              ! Column where "Current record:" begins
       CHARACTER*( NDF__SZHDT ) CREATD ! History creation date
       LOGICAL CRETEX             ! Create TEXT component in a record?
@@ -149,7 +162,10 @@
       LOGICAL HISPRE             ! HISTORY records may be present?
       CHARACTER*( DAT__SZLOC ) HLOC ! Locator to HISTORY component
       CHARACTER*4 IC             ! Record number
+      INTEGER IARG               ! Index of "Arguments:" heading
+      INTEGER IPAR               ! Index of "Parameters:" heading
       INTEGER IREC               ! Loop counter for history records
+      INTEGER ISOF               ! Index of "Software:" heading
       INTEGER JREC               ! Loop counter for text lines
       INTEGER KINDEX             ! Keyword index
       CHARACTER*8 KEYWRD         ! FITS keyword
@@ -489,8 +505,57 @@
 *  increment the number of text lines.
                         IF ( TEXCOL .NE. 0 .AND.
      :                       STATUS .EQ. SAI__OK ) THEN
-                           CALL CHR_PFORM( 1, PARAGR, .FALSE., TEXCOL,
-     :                                     TEXT( :WIDTH ) )
+
+*  Text in paragrapgh is indented, except for the first line of the
+*  paragraph, or for lines starting with a heading.
+                           BUF = PARAGR( TEXCOL:TEXCOL + WIDTH - 1 )
+                           IARG = CHR_INDEX( BUF, 'Arguments:' )
+                           IPAR = CHR_INDEX( BUF, 'Parameters:' )
+                           ISOF = CHR_INDEX( BUF, 'Software:' )
+
+*  First line of paragraph, hence no indentation.
+                           IF ( IREC .EQ. 0 ) THEN
+                              CALL CHR_PFORM( 1, PARAGR, .FALSE.,
+     :                                        TEXCOL, TEXT( :WIDTH ) )
+
+*  A heading would fit in the next output line.
+                           ELSE IF ( IARG .GT. 0 .OR. IPAR .GT. 0 .OR.
+     :                               ISOF .GT. 0 ) THEN
+                              CPHEAD = MAX( IARG, IPAR, ISOF )
+
+*  The heading is at the current paragraph position.  So treat it like
+*  the first line.
+                              IF ( CPHEAD .EQ. 1 ) THEN
+                                 CALL CHR_PFORM( 1, PARAGR, .FALSE., 
+     :                                           TEXCOL,
+     :                                           TEXT( :WIDTH ) )
+
+*  Just transfer up to but excluding the heading, indenting the regulation 
+*  three characters.  Shift the position within paragraph to be at the
+*  heading.  There may still be leading blanks present in the paragraph,
+*  so remove those first to give consistent alignment.  Note we need to
+*  set the paragraph position before this shift.
+                              ELSE
+                                 BCOL = INDENT
+                                 TEXT = ' '
+                                 TEXCOL = TEXCOL + CPHEAD - 1
+                                 CALL CHR_LDBLK( BUF )
+
+*  Obtain the new position of the heading.
+                                 IARG = CHR_INDEX( BUF, 'Arguments:' )
+                                 IPAR = CHR_INDEX( BUF, 'Parameters:' )
+                                 ISOF = CHR_INDEX( BUF, 'Software:' )
+                                 CPHEAD = MAX( IARG, IPAR, ISOF )
+                                 CALL CHR_APPND( BUF( :CPHEAD - 1 ),
+     :                                           TEXT, BCOL )
+                              END IF
+
+*  Paragraph lines not containing a heading are indented.
+                           ELSE
+                              TEXT = ' '
+                              CALL CHR_PFORM( 1, PARAGR, .FALSE.,
+     :                                        TEXCOL, TEXT( 4:WIDTH ) )
+                           END IF
 
 *  Increment the text line counter, and extend the TEXT component.
                            JREC = JREC + 1
