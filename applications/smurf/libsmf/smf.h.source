@@ -942,8 +942,9 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
 void smf_km2ext( int indf, const char *xname, AstKeyMap *keymap, 
                  int *timeout, int *status );
 
-void smf_kmmerge( const char *xname, AstKeyMap *keymap, int from, int into, 
-                  int ndet, int *mask, int nts, int rts_num, int *status );
+void smf_kmmerge( const char *xname, AstKeyMap *keymap, int *index,
+                  int ndet, int *mask, int nts, int *rts, int j0, int j1, 
+                  int *status );
 
 void smf_labelunit( Grp *igrp,  int size, smfData *odata, int *status );
 

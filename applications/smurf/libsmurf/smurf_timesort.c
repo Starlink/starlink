@@ -201,6 +201,9 @@
 *     16-JUN-2009 (DSB):
 *        The SIZELIMIT value was being mis-interpreted as bytes rather than
 *        megabytes when LIMITTYPE=FILESIZE.
+*     1-JUL-2009 (DSB):
+*        The merging of extension items (i.e. smf_kmmerge) is now outside the 
+*        time slice loop. This makes it much more efficient.
 
 *  Copyright:
 *     Copyright (C) 2007-2009 Science and Technology Facilities Council.
@@ -326,6 +329,7 @@ void smurf_timesort( int *status ) {
    int *file_index = NULL;
    int *first = NULL;         
    int *good_dets = NULL;         
+   int *good_det = NULL;         
    int *index = NULL;         
    int *itimeout = NULL;
    int *mask = NULL;
@@ -334,6 +338,7 @@ void smurf_timesort( int *status ) {
    int *rts = NULL;
    int axes[ 2 ];             
    int conform;              
+   int detbit;
    int detpurge;
    int dims[ 3 ];             
    int el;                    
@@ -357,6 +362,7 @@ void smurf_timesort( int *status ) {
    int isubscan;
    int isubsys;
    int j;
+   int j0;
    int jel;
    int k;
    int l;
@@ -1126,8 +1132,11 @@ void smurf_timesort( int *status ) {
             sysrts[ isubsys ] = astMalloc( sizeof( int )*nts_out );
 
 /* Allocate an array to hold flags indicating which detectors have any
-   good input data in a specific time slice. */
-            good_dets = astMalloc( sizeof( int )*ndet );
+   good input data in a specific time slice. There is one integer for
+   each time slice, and each integer is a bit mask in which the least
+   significant bit is set if detector 0 has any good data, etc. */
+            good_dets = astMalloc( sizeof( int )*nts_in );
+            good_det = good_dets;
 
 /* Initialise the number of output time slices created for this
    sub-system. */
@@ -1287,6 +1296,7 @@ void smurf_timesort( int *status ) {
    also the RTS_NUM value for the next output time slice. */
                i = index[ j ];
                rts_num = rts[ i ];
+               j0 = j;
       
 /* Loop round each output time slice. */
                for( k = 0; k < ubnd[ 2 ]  && *status == SAI__OK; k++ ) {
@@ -1352,12 +1362,13 @@ void smurf_timesort( int *status ) {
 /* Initialise the vector index of the next output element */
                      jel = 0;
 
-/* Loop round all detectors in the input NDF. */
-                     for( idet = 0; idet < ndet && *status == SAI__OK; idet++ ) {
+/* Initialise a flag to indicate that this time slice contains no good
+   data in for any detectors. */
+                     *good_det = 0;
 
-/* Initialise a flag to indicate that the spectrum from this input detector 
-   contains no good data values. */
-                        good_dets[ idet ] = 0;
+/* Loop round all detectors in the input NDF. */
+                     detbit = 1;
+                     for( idet = 0; idet < ndet && *status == SAI__OK; idet++ ) {
 
 /* Only copy this detector if we are not masking, or if the mask value
    for this detector is non-zero. */
@@ -1393,9 +1404,9 @@ void smurf_timesort( int *status ) {
                                     break;
                                  }
         
-/* Store a flag indicating that this input spectrum contains some good
-   data. */
-                                 good_dets[ idet ] = 1;
+/* Set the detector's bit in this time slice flag, indicating that this input 
+   spectrum contains some good data. */
+                                 *good_det |= detbit;
 
 /* If the input data value is bad, only copy it to the output if this is
    the first input time slice that contributes to the current output time
@@ -1408,13 +1419,32 @@ void smurf_timesort( int *status ) {
                               }
                            }
                         }
+
+/* Modify the bit mask so that it contains all zeros except for a 1 at
+   the bit corresponding to the next detector. */
+                        detbit <<= 1;
                      } 
       
 /* Annul the identifier for the current time slice in the input NDF. */
                      ndfAnnul( &indf1s, status );
       
-/* Merge the extension values stored for this input time slice with the
-   extension values for the first time slice that referred to the current
+/* Move on to the next input time slice. */
+                     if( ++j < nts_in ) {
+                        i = index[ j ];
+                        rts_num = rts[ i ];
+                        init = 0;
+                        good_det = good_dets + i;
+                     } else {
+                        break;
+                     }
+                  }
+      
+/* Annul the identifier for the current time slice in the output NDF. */
+                  ndfAnnul( &indf2s, status );
+               }
+      
+/* Merge the extension values stored for each input time slice with the
+   extension values for the first time slice that referred to the same
    RTS_NUM value. For most items the extension values should be the same
    for all input time slices that refer to the same RTS_NUM value. If any
    differences are found for these items, an error is reported. However,
@@ -1424,24 +1454,10 @@ void smurf_timesort( int *status ) {
    the last but one axis in the extension item (the last axis being the
    time slice axis). Extension items are set bad for any detector that
    has no good data values in its spectrum. */
-                     smf_kmmerge( "JCMTSTATE", km1, i, itimeout[ k ], ndet, 
-                                  good_dets, nts_in, rts_num0, status );
-                     smf_kmmerge( "ACSIS", km2, i, itimeout[ k ], ndet, 
-                                  good_dets, nts_in, rts_num0, status );
-      
-/* Move on to the next input time slice. */
-                     if( ++j < nts_in ) {
-                        i = index[ j ];
-                        rts_num = rts[ i ];
-                        init = 0;
-                     } else {
-                        break;
-                     }
-                  }
-      
-/* Annul the identifier for the current time slice in the output NDF. */
-                  ndfAnnul( &indf2s, status );
-               }
+               smf_kmmerge( "JCMTSTATE", km1, index, ndet, good_dets, nts_in, 
+                            rts, j0, j - 1, status );
+               smf_kmmerge( "ACSIS", km2, index, ndet, good_dets, nts_in, 
+                            rts, j0, j - 1, status );
       
 /* Copy input JCMTSTATE values to the current output NDF. */
                smf_km2ext( indf2, "JCMTSTATE", km1, itimeout, status );
@@ -1661,3 +1677,4 @@ void smurf_timesort( int *status ) {
       msgOutif( MSG__VERB, "", "TIMESORT failed.", status);
    }
 }
+
