@@ -2643,7 +2643,9 @@ unsigned char *gaiaArrayCreateUnsignedMask( ARRAYinfo *info, int memtype )
  *     maskInfo
  *         Pointer to the mask ARRAYinfo structure.
  *     values
- *         If non-NULL contains nvalues integer values to select in the mask.
+ *         If non-NULL contains nvalues postive integer values to select in
+ *         the mask. If has -1 as the single value then all BAD values
+ *         are selected.
  *     nvalues
  *         Number of values in values. If zero then all non-BAD values are
  *         selected.
@@ -2653,29 +2655,40 @@ unsigned char *gaiaArrayCreateUnsignedMask( ARRAYinfo *info, int memtype )
  *         The masked data memory pointer.
  */
 void gaiaArrayMaskData( ARRAYinfo *dataInfo, ARRAYinfo *maskInfo,
-                        int *values, int nvalues,
-                        int memtype, void **dstPtr )
+                        int *values, int nvalues, int memtype, void **dstPtr )
 {
     int *maskPtr = (int *)maskInfo->ptr;
     int *vptr = NULL;
     int i;
     int maskValue;
     int vlen = 0;
+    int seebad = 0;
     long nel = dataInfo->el;
     size_t length;
 
     /*  If we have values to select then do some work to speed up access.
      *  Create a vector with indices 0-n, where n is the maximum mask value
      *  given and set if the related value is set, using this we can test a
-     *  value by a simple index. */
+     *  value by a simple index lookup. 
+     *
+     *  Note if a single value of -1 is given that means invert the selection
+     *  of BAD values so that all non-masked regions are selected, some masks
+     *  achieve this by using the value 0.
+     */
     if ( nvalues > 0 ) {
-        for ( i = 0; i < nvalues; i++ ) {
-            vlen = MAX( vlen, values[i] );
+        if ( nvalues == 1 && values[0] == -1 ) {
+            seebad = 1;
+            nvalues = 0;
         }
-        vlen++;
-        vptr = (int *) calloc( vlen, sizeof( int ) );
-        for ( i = 0; i < nvalues; i++ ) {
-            vptr[values[i]] = 1;
+        else {
+            for ( i = 0; i < nvalues; i++ ) {
+                vlen = MAX( vlen, values[i] );
+            }
+            vlen++;
+            vptr = (int *) calloc( vlen, sizeof( int ) );
+            for ( i = 0; i < nvalues; i++ ) {
+                vptr[values[i]] = 1;
+            }
         }
     }
 
@@ -2699,10 +2712,20 @@ void gaiaArrayMaskData( ARRAYinfo *dataInfo, ARRAYinfo *maskInfo,
                 for ( i = 0; i < nel; i++ ) {                           \
                     maskValue = SWAP_INT_( maskPtr[i] );                \
                     if ( maskValue == VAL__BADI ) {                     \
-                        destptr[i] = badValue;                          \
+                        if ( seebad ) {                                 \
+                            destptr[i] = dataPtr[i];                    \
+                        }                                               \
+                        else {                                          \
+                            destptr[i] = badValue;                      \
+                        }                                               \
                     }                                                   \
                     else {                                              \
-                        destptr[i] = dataPtr[i];                        \
+                        if ( seebad ) {                                 \
+                            destptr[i] = badValue;                      \
+                        }                                               \
+                        else {                                          \
+                            destptr[i] = dataPtr[i];                    \
+                        }                                               \
                     }                                                   \
                 }                                                       \
             }                                                           \
@@ -2781,10 +2804,20 @@ void gaiaArrayMaskData( ARRAYinfo *dataInfo, ARRAYinfo *maskInfo,
                 for ( i = 0; i < nel; i++ ) {                           \
                     maskValue = maskPtr[i];                             \
                     if ( maskValue == VAL__BADI ) {                     \
-                        destptr[i] = badValue;                          \
+                        if ( seebad ) {                                 \
+                            destptr[i] = dataPtr[i];                    \
+                        }                                               \
+                        else {                                          \
+                            destptr[i] = badValue;                      \
+                        }                                               \
                     }                                                   \
                     else {                                              \
-                        destptr[i] = dataPtr[i];                        \
+                        if ( seebad ) {                                 \
+                            destptr[i] = badValue;                      \
+                        }                                               \
+                        else {                                          \
+                            destptr[i] = dataPtr[i];                    \
+                        }                                               \
                     }                                                   \
                 }                                                       \
             }                                                           \
@@ -2887,8 +2920,10 @@ void gaiaArrayMinMax( ARRAYinfo *info, double *min, double *max )
             type tmax = typeMin;                         \
             for ( i = 0; i < nel; i++ ) {                \
                 value = ip[i];                           \
-                tmin = MIN( value, tmin );               \
-                tmax = MAX( value, tmax );               \
+                if ( value != badFlag ) {                \
+                    tmin = MIN( value, tmin );           \
+                    tmax = MAX( value, tmax );           \
+                }                                        \
             }                                            \
             *min = (double) tmin;                        \
             *max = (double) tmax;                        \

@@ -103,6 +103,14 @@ itcl::class gaia::GaiaMask {
          -accelerator {Control-c}
       bind $w_ <Control-c> [code $this close]
 
+      #  Add a "Go" menu to select previously loaded masks. Shared
+      #  with general images.
+      set GoMenu [add_menubutton "Go" \
+                     "Go: menu with shortcuts to view previous images"]
+      configure_menubutton "Go" -underline 0
+      set history_ [GaiaHistory \#auto -gaiatoplevel $this]
+      $GoMenu config -postcommand [code $history_ update_history_menu $GoMenu]
+
       #  Add window help.
       add_help_button mask "On Window..."
       add_short_help $itk_component(menubar).help \
@@ -157,6 +165,19 @@ itcl::class gaia::GaiaMask {
             {Value of mask region to display, if enabled}
       }
 
+      #  Or just select all non-masked values.
+      itk_component add invert {
+         StarLabelCheck $w_.invert \
+            -text "Invert:" \
+            -onvalue 1 -offvalue 0 \
+            -labelwidth $lwidth \
+            -variable [scope invert_] \
+            -command [code $this toggle_invert_]
+      }
+      pack $itk_component(invert) -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(invert) \
+         {Invert sense and display all BAD parts of the mask}
+
       #  Apply the mask.
       itk_component add apply {
          button $w_.apply -text Apply \
@@ -198,6 +219,11 @@ itcl::class gaia::GaiaMask {
       #  Name handler.
       if { $mask_namer_ != {} } {
          catch {::delete object $mask_namer_}
+      }
+
+      #  History.
+      if { $history_ != {} } {
+         catch {::delete object $history_}
       }
    }
 
@@ -257,8 +283,8 @@ itcl::class gaia::GaiaMask {
    }
 
    #  Replace the image data pointer with a new one. Note always mark
-   #  this as not volatile so that the backing file is never changed, 
-   #  that would happen if the other toolboxes ran and thought this 
+   #  this as not volatile so that the backing file is never changed,
+   #  that would happen if the other toolboxes ran and thought this
    #  data volatile (which really means never defined, not just changed).
    protected method replaceimagedata {adr} {
       $itk_option(-rtdimage) replaceimagedata $adr
@@ -267,6 +293,9 @@ itcl::class gaia::GaiaMask {
 
    #  Open the mask.
    protected method open_mask_ {} {
+
+      #  Previous mask becomes "Back".
+      $history_ record_last
 
       if { $mask_namer_ == {} } {
          set mask_namer_ [GaiaImageName \#auto]
@@ -287,6 +316,9 @@ itcl::class gaia::GaiaMask {
          set maskaccessor_ [uplevel \#0 GaiaNDAccess \#auto]
       }
       $maskaccessor_ configure -dataset "$fullname"
+
+      #  Record this mask in Go menu.
+      $history_ add_history $itk_option(-mask)
    }
 
    #  Load the mask by mapping its data.
@@ -333,6 +365,7 @@ itcl::class gaia::GaiaMask {
       #  copy as an array.
       set range [get_values_]
       if { [catch {set adr [array::maskdata $image_adr_ $mask_adr_ $range]} msg] } {
+         $history_ clear_last
          error_dialog "Failed to mask data: $msg"
          return
       }
@@ -356,6 +389,13 @@ itcl::class gaia::GaiaMask {
 
    #  Get the values to be displayed in the mask. Expands any implicit ranges.
    protected  method get_values_ {} {
+
+      #  If inverting then just use -1 as the single value.
+      if { $invert_ } {
+         return "-1"
+      }
+
+      #  Not inverting and no values gets whole mask.
       if { $values_ == {} } {
          return {}
       }
@@ -383,7 +423,32 @@ itcl::class gaia::GaiaMask {
             lappend range $l
          }
       }
+
       return $range
+   }
+
+   #  Called when inversion is toggled. Need to change UI to stop
+   #  confusion over values.
+   protected method toggle_invert_ {} {
+      if { $invert_ } {
+         set state disabled
+      } else {
+         set state normal
+      }
+      $itk_component(values) configure -state $state
+      $itk_component(index) configure -state $state
+   }
+
+   #  GaiaHistory support methods.
+   public method get_accessor {} {
+      return $maskaccessor_
+   }
+   public method open_image {mask} {
+      configure -mask $mask
+      apply
+   }
+   public method get_image {} {
+      return $itk_option(-mask)
    }
 
    #  Configuration options: (public variables)
@@ -407,6 +472,9 @@ itcl::class gaia::GaiaMask {
    #  Protected variables: (available to instance)
    #  --------------------
 
+   #  Whether to invert the whole mask.
+   protected variable invert_ 0
+
    #  Data access objects for the mask.
    protected variable maskaccessor_ {}
 
@@ -425,6 +493,9 @@ itcl::class gaia::GaiaMask {
 
    #  Mask values to display.
    protected variable values_ {}
+
+   #  The GaiaHistory instance used for "Go" menu.
+   protected variable history_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------
