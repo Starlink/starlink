@@ -4122,6 +4122,7 @@ void astFlushMemory_( int leak, int *status ) {
 /* Local Variables: */
    Memory *next;
    int nact;
+   int istat;
 
 /* Empty the cache. */
    astMemCaching( astMemCaching( AST__TUNULL ) );
@@ -4138,10 +4139,18 @@ void astFlushMemory_( int leak, int *status ) {
       Active_List = next;
    } 
 
-/* Report an error if any active pointers remained. */
+/* Report an error if any active pointers remained. if an error has
+   already occurred, use the existing status value. */
    if( nact && leak ){
-      astError( AST__INTER, "astFlushMemory: %d AST memory blocks have not "
+
+      if( astOK ) {
+         istat = AST__INTER;
+      } else {
+         istat = astStatus;
+      }
+      astError( istat, "astFlushMemory: %d AST memory blocks have not "
                 "been released (programming error).", status, nact );
+
    } else {
       printf("astFlushMemory: All AST memory blocks were released correctly.\n" );
    }
