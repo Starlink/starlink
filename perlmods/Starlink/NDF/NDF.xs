@@ -386,6 +386,7 @@ SV* _ast_to_SV( AstObject * obj, int *status ) {
     chan = astChannelFor( NULL, NULL, (void (*)( const char * ))buffer,
                           astsink,"" );
     astWrite( chan, obj );
+    astAnnul( chan );
     if (!astOK) {
       *status = SAI__ERROR;
       errRep( "AST_ERR", "Error converting the FrameSet into string form",
@@ -396,6 +397,29 @@ SV* _ast_to_SV( AstObject * obj, int *status ) {
   return buffer;
 }
 
+/* Convert an AV* to an AST object */
+AstObject * AV_to_ast( AV* textarray, int *status ) {
+  AstChannel * chan;
+  AstObject * obj;
+  int ast_status_val = SAI__OK;
+  int *ast_status;
+  int *old_ast_status;
+
+  ast_status = &ast_status_val;
+  old_ast_status = astWatch( ast_status );
+  /* Create a output channel. Use a thread safe version that
+      takes the SV as argument */
+  chan = astChannelFor( (const char *(*)())textarray, astsource, NULL, NULL, "");
+  obj = astRead( chan );
+  chan = astAnnul( chan );
+  if (!astOK) {
+    *status = SAI__ERROR;
+    errRep( "AST_ERR", "Error converting the supplied stringified AST object into internal form",
+      status );
+  }
+  astWatch( old_ast_status );
+  return obj;
+}
 
  
 MODULE = NDF    PACKAGE = NDF
@@ -2117,6 +2141,7 @@ ndfGtwcs_(indf, status)
   /* Read the framset */
   ndfGtwcs(indf, &iwcs, &status);
   RETVAL = _ast_to_SV( (AstObject*)iwcs, &status );
+  iwcs = astAnnul( iwcs );
  OUTPUT:
   RETVAL
   status
@@ -2128,27 +2153,11 @@ ndfPtwcs_(wcsarr, indf, status)
   ndfint status
  PROTOTYPE: $$$
  PREINIT:
-  AstChannel * chan;
   AstFrameSet * iwcs;
-  int ast_status_val = SAI__OK;
-  int *ast_status;
-  int *old_ast_status;
  CODE:
-  /* Create a output channel. Use a thread safe version that 
-      takes the SV as argument */
-  ast_status = &ast_status_val;
-  old_ast_status = astWatch( ast_status );
-
-  chan = astChannelFor( (const char *(*)())wcsarr, astsource, NULL, NULL, "");
-  iwcs = astRead( chan );
-
-  if (!astOK) {
-    status = SAI__ERROR;
-    errRep( "AST_ERR", "Error converting the supplied FrameSet into internal form",
-      &status );
-  }
-  astWatch( old_ast_status );
+  iwcs = (AstFrameSet*)AV_to_ast( wcsarr, &status );
   ndfPtwcs(iwcs, indf, &status);
+  iwcs = astAnnul( iwcs );
  OUTPUT:
   status
 
