@@ -20,7 +20,6 @@ all:
 	  TCL_LIBRARY_PATH=$(prefix)/lib; export TCL_LIBRARY_PATH; \
 	  cd VTK && \
 	  cmake -Wno-dev \
-                -D CMAKE_BUILD_TYPE=Debug \
 	        -D BUILD_SHARED_LIBS:BOOL=ON \
 	        -D BUILD_TESTING:BOOL=OFF \
 		-D CMAKE_INCLUDE_PATH:PATH=$(prefix)/include \
