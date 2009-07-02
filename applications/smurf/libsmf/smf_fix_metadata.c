@@ -115,6 +115,7 @@ struct FitsHeaderStruct {
   double obsgeoz;
   double chop_thr;
   double chop_pa;
+  double rot_pa;
   int obsnum;
   int utdate;
   int jigl_cnt;
@@ -133,6 +134,7 @@ struct FitsHeaderStruct {
   double instap_y;
   char chop_crd[81];
   char instrume[81];
+  char rot_crd[81];
 };
 
 /* Struct defining dut1 information */
@@ -518,6 +520,82 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
     msgOutiff( msglev, "", INDENT "Missing BASEC2 - setting to %g deg", status, basedeg);
     smf_fits_updateD( hdr, "BASEC2", basedeg, "[deg] TCS BASE position (latitude) in TRACKSYS", status );
     have_fixed = 1;
+  }
+
+  /* HARP specific fixes */
+  if ( strncasecmp( fitsvals.instrume, "HARP", 4 ) == 0 ) {
+    /* ROT_CRD - released in 20080111 */
+    if (!astTestFits( fits, "ROT_CRD", NULL ) ) {
+      if (hdr->ocsconfig) {
+        int found;
+        found = smf__pattern_extract( hdr->ocsconfig, "ROTATOR SYSTEM=\"([AZELFIXEDTRACKING]+)\"",
+                                      NULL, fitsvals.rot_crd, sizeof(fitsvals.rot_crd), status );
+        if (found) {
+          smf_fits_updateS( hdr, "ROT_CRD", fitsvals.rot_crd, "K-mirror coordinate system", status );
+          msgOutiff( msglev, "", INDENT "Missing ROT_CRD - setting to '%s'", status, fitsvals.rot_crd );
+          have_fixed = 1;
+        } else {
+          msgOutif( msglev, "", INDENT "** Could not find ROT_CRD in XML configuration", status );
+        }
+      } else {
+        msgOutif( msglev, "", INDENT "** Could not determine ROT_CRD. No XML configuration available", status);
+      }
+    } else {
+      /* make sure we have ROT_CRD */
+      smf_getfitss( hdr, "ROT_CRD", fitsvals.rot_crd, sizeof(fitsvals.rot_crd), status );
+    }
+
+    /* ROT_PA was released in 20080111 but not fixed until much later */
+    if (!astTestFits( fits, "ROT_PA", NULL ) ) {
+      if (strlen( fitsvals.rot_crd ) ) {
+        if (strncmp( fitsvals.rot_crd, "TRACKING", 8 ) == 0 ||
+            strncmp( fitsvals.rot_crd, tmpState[0].tcs_tr_sys, sizeof(tmpState[0].tcs_tr_sys) ) == 0 ) {
+          /* mean angle. Note the sign convention to match current ROT_PA values */
+          fitsvals.rot_pa = -1.0 * AST__DR2D *
+            ( tmpState[0].tcs_tr_ang + tmpState[hdr->nframes - 1].tcs_tr_ang ) / 2.0;
+        } else if ( strncmp( fitsvals.rot_crd, "AZEL", 4 ) == 0) {
+          fitsvals.rot_pa = -1.0 * AST__DR2D *
+            ( tmpState[0].tcs_az_ang + tmpState[hdr->nframes - 1].tcs_az_ang ) / 2.0;
+        } else if ( strncmp( fitsvals.rot_crd, "FIXED", 5 ) == 0) {
+          /* need to look in the config */
+          if (hdr->ocsconfig) {
+            int found;
+            msgOutif( msglev, "", INDENT "** Examining OCSCONFIG", status );
+            found = smf__pattern_extract( hdr->ocsconfig, "<ROTATOR.*<PA>([0123456789\\.])</PA>.*</ROTATOR>",
+                                          &(fitsvals.rot_pa), NULL, 0, status );
+            if (!found) {
+              if ( hdr->obstype == SMF__TYP_SKYDIP ) {
+                /* that is fine. Skydips do not generaly have a ROT_PA */
+                smf_fits_updateU( hdr, "ROT_PA", "[deg] K-mirror angle", status );
+              } else {
+                *status = SAI__ERROR;
+                errRepf("", "Need to find a test for FIXED ROT_PA. Report this observation to software group", status);
+              }
+            }
+          } else {
+            /* sky dips tend not to have a PA specified - just using whatever it is at */
+            if (hdr->obstype != SMF__TYP_SKYDIP) {
+              msgOutif( msglev, "", INDENT "** Could not determine FIXED ROT_PA. No XML configuration available",
+                        status);
+            }
+          }
+        } else {
+          if (*status == SAI__OK) {
+            *status = SAI__ERROR;
+            errRepf( "", "Unrecognized rotator coordinate system ('%s')", status, fitsvals.rot_crd );
+          }
+        }
+        if (fitsvals.rot_pa != VAL__BADD) {
+          msgOutiff( msglev, "", INDENT "Missing ROT_PA - setting to %g deg", status, fitsvals.rot_pa );
+          smf_fits_updateD( hdr, "ROT_PA", fitsvals.rot_pa, "[deg] K-mirror angle", status );
+        }
+      }
+    }
+
+  } else {
+    /* Need to blank the ROT_CRD and ROT_PA headers */
+    smf_fits_updateU( hdr, "ROT_CRD",  "K-mirror coordinate system", status );
+    smf_fits_updateU( hdr, "ROT_PA", "[deg] K-mirror angle", status );
   }
 
   /* JCMTSTATE fix ups */
