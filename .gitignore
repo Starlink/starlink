@@ -87,6 +87,7 @@ ylwrap
 pm_to_blib
 blib
 Makefile.old
+const-*.inc
 
 # Mac specific
 

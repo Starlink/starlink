@@ -1,6 +1,7 @@
 use ExtUtils::MakeMaker;
 use ExtUtils::F77;
 use Config;
+use ExtUtils::Constant qw/ WriteConstants /;
 
 $osname = $Config{osname};
 
@@ -93,6 +94,43 @@ $libs = "$starlibs $ndflibs $cnfrtllibs $arrays $fortranlibs";
 
 # If cnfrtllibs is undefined, assume we have an old CNF
 $defines = "-DHAVE_OLD_CNF" if !$cnfrtllibs;
+
+WriteConstants(
+               NAME => "NDF",
+               DEFAULT_TYPE => "IV",
+               NAMES => [
+                         # These are all enums so we need to tell the routine
+                         # not to look use #ifdef
+                         { name => "DAT__MXDIM", macro => 1 },
+                         { name => "DAT__NOWLD", macro => 1 },
+                         { name => "DAT__SZGRP", macro => 1 },
+                         { name => "DAT__SZLOC", macro => 1 },
+                         { name => "DAT__SZMOD", macro => 1 },
+                         { name => "DAT__SZNAM", macro => 1 },
+                         { name => "DAT__SZTYP", macro => 1 },
+                         { name => "EMS__OPTER", macro => 1 },
+                         { name => "EMS__NOMSG", macro => 1 },
+                         { name => "EMS__UNSET", macro => 1 },
+                         { name => "EMS__BADOK", macro => 1 },
+                         { name => "EMS__NSTER", macro => 1 },
+                         { name => "EMS__BDKEY", macro => 1 },
+                         { name => "EMS__BTUNE", macro => 1 },
+                         { name => "EMS__NOENV", macro => 1 },
+                         { name => "EMS__EROVF", macro => 1 },
+                         { name => "EMS__CXOVF", macro => 1 },
+                         { name => "ERR__OPTER", macro => 1 },
+                         { name => "ERR__UNSET", macro => 1 },
+                         { name => "ERR__BADOK", macro => 1 },
+                         { name => "MSG__NORM", macro => 1 },
+                         { name => "MSG__QUIET", macro => 1 },
+                         { name => "MSG__SZMSG", macro => 1 },
+                         { name => "MSG__VERB", macro => 1 },
+                         { name => "NDF__SZHIS", macro => 1 },
+                         { name => "NDF__SZHMX", macro => 1 },
+                         { name => "SAI__OK", macro => 1 },
+                         { name => "SAI__WARN", macro => 1 },
+                         { name => "SAI__ERROR", macro => 1 },
+                        ]);
 
 WriteMakefile(
     'INSTALLBIN'=> $install,

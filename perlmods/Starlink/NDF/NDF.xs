@@ -156,126 +156,6 @@ int  arg_status = SAI__OK;
 /* max size of our strings */
 #define FCHAR 512       /* Size of Fortran character string */
 
-/* This stuff is from h2xs */
-
-static int
-not_here(s)
-char *s;
-{
-    croak("%s not implemented on this architecture", s);
-    return -1;
-}
-
-
-/* Do the compiler numeric constants */
-
-static int
-constant(name)
-char *name;
-{
-  errno = 0;
-  switch (*name) {
-
-  case 'D':
-    if (strEQ(name, "DAT__MXDIM")) return ((double)DAT__MXDIM);
-    if (strEQ(name, "DAT__NOWLD")) return ((double)DAT__NOWLD);
-    if (strEQ(name, "DAT__SZGRP")) return ((double)DAT__SZGRP);
-    if (strEQ(name, "DAT__SZLOC")) return ((double)DAT__SZLOC);
-    if (strEQ(name, "DAT__SZMOD")) return ((double)DAT__SZMOD);
-    if (strEQ(name, "DAT__SZNAM")) return ((double)DAT__SZNAM);
-    if (strEQ(name, "DAT__SZTYP")) return ((double)DAT__SZTYP);
-    break;
-
-  case 'E':
-
-    /* err_par.h - assume always available */
-
-    if (strEQ(name, "EMS__OPTER")) 
-      return ((double)EMS__OPTER);
-
-    if (strEQ(name, "EMS__NOMSG")) 
-      return ((double)EMS__NOMSG);
-
-    if (strEQ(name, "EMS__UNSET")) 
-      return ((double)EMS__UNSET);
-
-    if (strEQ(name, "EMS__BADOK")) 
-      return ((double)EMS__BADOK);
-
-    if (strEQ(name, "EMS__NSTER")) 
-      return ((double)EMS__NSTER);
-
-    if (strEQ(name, "EMS__BDKEY")) 
-      return ((double)EMS__BDKEY);
-
-    if (strEQ(name, "EMS__BTUNE")) 
-      return ((double)EMS__BTUNE);
-
-    if (strEQ(name, "EMS__NOENV")) 
-      return ((double)EMS__NOENV);
-
-    if (strEQ(name, "EMS__EROVF")) 
-      return ((double)EMS__EROVF);
-
-    if (strEQ(name, "EMS__CXOVF")) 
-      return ((double)EMS__CXOVF);
-
-      /*  err_par.h */
-
-    if (strEQ(name, "ERR__OPTER"))
-      return ((double)ERR__OPTER);
-
-    if (strEQ(name, "ERR__UNSET"))
-      return ((double)ERR__UNSET);
-
-    if (strEQ(name, "ERR__BADOK"))
-      return ((double)ERR__BADOK);
-
-      break;
-
-  case 'M':
-
-    if (strEQ(name, "MSG__NORM"))
-      return ((double)MSG__NORM);
-
-    if (strEQ(name, "MSG__QUIET"))
-      return ((double)MSG__QUIET);
-
-    if (strEQ(name, "MSG__SZMSG"))
-      return ((double)MSG__SZMSG);
-
-    if (strEQ(name, "MSG__VERB"))
-      return ((double)MSG__VERB);
-
-    break;
-
-  case 'N':
-
-    if (strEQ(name, "NDF__SZHIS"))
-      return ((double)NDF__SZHIS);
-
-    if (strEQ(name, "NDF__SZHMX"))
-      return ((double)NDF__SZHMX);
-
-    break;
-
-  case 'S':
-    if (strEQ(name, "SAI__OK"))    return ((double)SAI__OK);
-    if (strEQ(name, "SAI__WARN"))  return ((double)SAI__WARN);
-    if (strEQ(name, "SAI__ERROR")) return ((double)SAI__ERROR);
-    break;
-
-  }
-
-  errno = EINVAL;
-  return 0;
- 
-not_there:
-  errno = ENOENT;
-  return 0;
-}
-
-
 /* f77<>C string conversion routines - must be passed string
    and size (i.e. number of bytes allocated to it in storage)  */
 
@@ -421,7 +301,8 @@ AstObject * AV_to_ast( AV* textarray, int *status ) {
   return obj;
 }
 
- 
+#include "const-c.inc"
+
 MODULE = NDF    PACKAGE = NDF
 
 BOOT:
@@ -434,6 +315,9 @@ BOOT:
    cnfInitRTL(pargc, pargv);
 #endif
    ndfInit( pargc, pargv, &arg_status );
+
+
+INCLUDE: const-xs.inc
 
 # Locator constants
 
@@ -513,16 +397,6 @@ VAL__BADUB()
   RETVAL = VAL__BADUB;
  OUTPUT:
   RETVAL
-
-
-
-
-# Numeric constants (autoloaded)
-
-int
-constant(name)
-        char *          name
- PROTOTYPE: $
 
 # Alphabetical order....
 
