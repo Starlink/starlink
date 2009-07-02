@@ -24,4 +24,3 @@ t/xread.t
 t/xwrite.t
 test.sdf
 typemap
-ExtUtils/F77.pm
