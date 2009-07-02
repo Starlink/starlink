@@ -874,6 +874,8 @@ f     - AST_TESTFITS: Test if a keyword has a defined value in a FitsChan
 *        Include the effect of observer height (in the ObsAlt attribute)
 *        when creating OBSGEO-X/Y/Z headers, and store a value for
 *        ObsAlt when reading a set of OBSGEO-X/Y/Z headers.
+*     2-JUL-2009 (DSB):
+*        Check FitsChan is not empty at start of FindWcs.
 *class--
 */
 
@@ -2349,7 +2351,7 @@ static int AIPSFromStore( AstFitsChan *this, FitsStore *store,
 
 /* Local Variables: */
    char *comm;         /* Pointer to comment string */
-   char *cval;         /* Pointer to string keyword value */
+   const char *cval;   /* Pointer to string keyword value */
    const char *specunit;/* Pointer to corrected spectral units string */
    char combuf[80];    /* Buffer for FITS card comment */
    char lattype[MXCTYPELEN];/* Latitude axis CTYPE */
@@ -2911,7 +2913,7 @@ static int AIPSPPFromStore( AstFitsChan *this, FitsStore *store,
 
 /* Local Variables: */
    char *comm;         /* Pointer to comment string */
-   char *cval;         /* Pointer to string keyword value */
+   const char *cval;   /* Pointer to string keyword value */
    const char *specunit;/* Pointer to corrected spectral units string */
    char combuf[80];    /* Buffer for FITS card comment */
    char lattype[MXCTYPELEN];/* Latitude axis CTYPE */
@@ -8732,8 +8734,8 @@ static void FindWcs( AstFitsChan *this, int last, int all, int rewind,
    int nfld;                /* Number of fields in keyword template */
    int old_ignore_used;     /* Original value of variable ignore_used */
 
-/* Check the global status. */
-   if( !astOK ) return;
+/* Check the global status. Also check the FitsChan is not empty. */
+   if( !astOK || !this->head ) return;
 
 /* Get a pointer to the structure holding thread-specific global data. */   
    astGET_GLOBALS(this);
@@ -24292,7 +24294,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
    double restfreq;               /* Rest frequency (Hz) */
    double rowsum2;                /* Sum of squared CDi_j row elements */
    double sinrota;                /* Sin( CROTA ) */
-   int *mp;                       /* Pointer to next projection parameter index */
+   const int *mp;                 /* Pointer to next projection parameter index */
    int axlat;                     /* Index of latitude axis */
    int axlon;                     /* Index of longitude axis */
    int diag;                      /* Sign of diagonal CDi_j element */
