@@ -192,6 +192,12 @@ itcl::class ::gaia3d::Gaia3dVtkCubeData {
             $stencil_ SetStencil [$stencil_filter_ GetOutput]
             $stencil_ SetBackgroundValue 0.0
 
+            if { [$pixelmask invert 0] } {
+               $stencil_ ReverseStencilOn
+            } else {
+               $stencil_ ReverseStencilOff
+            }
+
             $pixelmask connect_stencil_filter 0 $stencil_filter_
          }
       } else {

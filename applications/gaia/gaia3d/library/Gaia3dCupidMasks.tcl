@@ -141,8 +141,8 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
    }
 
    #  Access and open all masks, renewing them as necessary. The target
-   #  coordinates (which connect to another cube) are defined by the 
-   #  supplied AST FrameSet. This method should be called before "render", 
+   #  coordinates (which connect to another cube) are defined by the
+   #  supplied AST FrameSet. This method should be called before "render",
    #  which is only needed if any cubes are to be actually displayed (they
    #  can also be used as stencils to segment the related cube).
    public method access {target_wcs} {
@@ -240,6 +240,7 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
    public method render {renwindow} {
       for { set i 0 } { $i < $itk_option(-maxcubes) } { incr i } {
          if { [info exists segmenter_($i)] } {
+            update_segmenter_ $i
             render_segmenter_ $i $renwindow
          }
       }
@@ -309,7 +310,7 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
       }
    }
 
-   #  Arrange for displayable segments to be rendered in the given 
+   #  Arrange for displayable segments to be rendered in the given
    #  window. Remove if not being displayed.
    protected method render_segmenter_ {i renwindow} {
 
@@ -428,6 +429,9 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
       #  Add controls for selecting cubes, and defining their attributes.
       for { set i 0 } { $i < $itk_option(-maxcubes) } { incr i } {
 
+         #  Values not changed.
+         set changed_($i) 0
+
          if { $itk_option(-maxcubes) != 1 } {
             itk_component add attrule$i {
                LabelRule $parent.attrule$i \
@@ -522,6 +526,22 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
          pack $itk_component(opacity$i) -side top -fill x -ipadx 1m -ipady 2m
          add_short_help $itk_component(opacity$i) \
             {Opacity of coloured regions}
+
+         #  Inverse when masking image.
+         set invert_($i) 0
+         itk_component add invert$i {
+            gaia::StarLabelCheck $parent.invert$i \
+               -text "Invert:" \
+               -onvalue 1 \
+               -offvalue 0 \
+               -labelwidth $lwidth_ \
+               -anchor w \
+               -command [code $this invert_toggled_ $i] \
+               -variable [scope invert_($i)]
+         }
+         pack $itk_component(invert$i) -side top -fill x -ipadx 1m
+         add_short_help $itk_component(invert$i) \
+            {Use an inverted mask when applying to main cube}
       }
    }
 
@@ -574,11 +594,17 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
       }
    }
 
-   #  Return if a segmenter has "changed". That means that the values
-   #  it is extracted are different.
+   #  Return if a segmenter has significantly "changed". That means that the
+   #  values it is extracting are different or have  been inverted.
    public method changed {i} {
       if { [info exists segmenter_($i)] } {
-         return [$segmenter_($i) changed]
+         if { [$segmenter_($i) changed] } {
+            return 1
+         }
+         if { $changed_($i) } {
+            set changed_($i) 0
+            return 1
+         }
       }
       return 0
    }
@@ -589,6 +615,19 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
          return 1
       }
       return 0
+   }
+
+   #  Return if a segmenter wants to invert.
+   public method invert {i} {
+      if { [info exists invert_($i)] } {
+         return $invert_($i)
+      }
+      return 0
+   }
+
+   #  Toggling of an invert value.
+   protected method invert_toggled_ {i} {
+      set changed_($i) 1
    }
 
    #  Configuration options: (public variables)
@@ -629,6 +668,9 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
    #  Whether named cube should be rendered.
    protected variable display_
 
+   #  Whether to invert the mask.
+   protected variable invert_
+
    #  Whether to match the cube coordinate systems.
    protected variable match_ 1
 
@@ -646,6 +688,10 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
 
    #  Opacity for each segmenter.
    protected variable opacity_
+
+   #  Whether some change in a significant value for external use has been
+   #  made.
+   protected variable changed_
 
    #  Usual labelwith.
    protected variable lwidth_ 7
