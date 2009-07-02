@@ -3,14 +3,13 @@ require 5.004;
 
 use strict;
 use Carp;
-use vars qw($VERSION @ISA $AUTOLOAD %EXPORT_TAGS);
+use vars qw($VERSION @ISA %EXPORT_TAGS);
 
 
 #grep "dat_.*(" NDF.xs | grep -v ';' | awk -F'(' '{print $1}' | grep -v '_r$' | sort | fmt -50
 
 require Exporter;
 require DynaLoader;
-require AutoLoader;
 
 @ISA = qw(Exporter DynaLoader);
 
@@ -115,28 +114,19 @@ $VERSION = '1.48';
 Exporter::export_tags('ndf','ary','msg','err','hds','dat','cmp','ndg','misc');
 
 # Autoload constants when required
-
+# We do not forward anything on to AutoLoader on failure. If we do not know
+# about it in here we don't want AutoLoader to start trying to dynamically load files.
 sub AUTOLOAD {
-  # This AUTOLOAD is used to 'autoload' constants from the constant()
-  # XS function.  If a constant is not found then control is passed
-  # to the AUTOLOAD in AutoLoader.
-
   my $constname;
+  our $AUTOLOAD;
   ($constname = $AUTOLOAD) =~ s/.*:://;
-  # Note that the default autoloader expects integer argument
-  # if @_ contains something (this can be @_ from the calling routine!)
-  # Since these routines only expect a single argument just pass a 0.
-  my $val = constant($constname);
-
-  if ($! != 0) {
-    if ($! =~ /Invalid/) {
-      $AutoLoader::AUTOLOAD = $AUTOLOAD;
-      goto &AutoLoader::AUTOLOAD;
-    } else {
-      croak "Your vendor has not defined NDF macro $constname";
-    }
+  croak "&NDF::constant not defined" if $constname eq 'constant';
+  my ($error, $val) = constant($constname);
+  if ($error) { croak $error; }
+  {
+    no strict 'refs';
+    *$AUTOLOAD = sub { $val };
   }
-  eval "sub $AUTOLOAD { $val }";
   goto &$AUTOLOAD;
 }
 
