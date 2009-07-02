@@ -176,6 +176,10 @@
 *        Normalise log and lin RMS values before comparing them, by
 *        converting them from an increment in data value (log or lin),
 *        to an increment in pixels.
+*     2-JUL-2009 (DSB):
+*        When choosing between log and lin axes, prefer linear if there is
+*        not much difference (since this allows points to be plotted at 
+*        negative axis values).
 *     {enter_further_changes_here}
 
 *-
@@ -404,8 +408,11 @@
                IF( M .NE. 0.0 ) RMSLOG = ABS( RMSLOG/M )
 
 *  Choose the mapping which gives the smallest rms (i.e. spreads the
-*  pixels out most evenly on the screen).
-               IF( RMSLOG .LT. RMSLIN ) THEN
+*  pixels out most evenly on the screen). If they both give small rms
+*  (for instance if the dynamic range of the axis is very small) we
+*  favour linear axes since log axes loose the negative part of the 
+*  axis.
+               IF( RMSLOG .LT. RMSLIN - DIM*0.01 ) THEN
                   XMAP = 'LOG'
                ELSE
                   XMAP = 'LINEAR'
@@ -466,8 +473,11 @@
                IF( M .NE. 0.0 ) RMSLOG = ABS( RMSLOG/M )
 
 *  Choose the mapping which gives the smallest rms (i.e. spreads the
-*  pixels out most evenly on the screen).
-               IF( RMSLOG .LT. RMSLIN ) THEN
+*  pixels out most evenly on the screen). If they both give small rms
+*  (for instance if the dynamic range of the axis is very small) we
+*  favour linear axes since log axes loose the negative part of the 
+*  axis.
+               IF( RMSLOG .LT. RMSLIN - DIM*0.01 ) THEN
                   XMAP = 'LOG'
                ELSE
                   XMAP = 'LINEAR'
