@@ -34,7 +34,7 @@
 *     be converted to an integer.
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -60,6 +60,8 @@
 *  History:
 *     12-SEP-2008 (TIMJ):
 *        Original version.
+*     01-JUL-2009 (TIMJ):
+*        Do not rely on errno when determining whether strod worked.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -77,7 +79,6 @@
 
 #include <stdlib.h>
 #include <ctype.h>
-#include <errno.h>
 
 int mers1Getenv( int usemsg, const char * param, int *status ) {
 
@@ -109,28 +110,23 @@ int mers1Getenv( int usemsg, const char * param, int *status ) {
 
   if (val) {
     /* Convert to an integer */
-    result = strtol( val, NULL, 10 );
+    char *endptr = NULL;
+    result = strtol( val, &endptr, 10 );
 
-    if (result == 0) {
-      if (errno == EINVAL || errno == ERANGE) {
-        if (usemsg) {
-          *status = MSG__BDENV;
-          emsSetc( "SYS", "msgTune");
-        } else {
-          *status = ERR__BDENV;
-          emsSetc( "SYS", "errTune");
-        }
-        emsSetc( "EV", envvar );
-        emsSetc( "VAL", val );
-
-        emsRep( "MERS_TUNE_BDENV",
-                "^SYS: Failed to convert environment variable "
-                "^EV (^VAL) to integer", status );
-
+    if (result == 0  && endptr == val) {
+      if (usemsg) {
+        *status = MSG__BDENV;
+        emsSetc( "SYS", "msgTune");
       } else {
-        /* assume that the 0 was real  */
-        retval = result;
+        *status = ERR__BDENV;
+        emsSetc( "SYS", "errTune");
       }
+      emsSetc( "EV", envvar );
+      emsSetc( "VAL", val );
+
+      emsRep( "MERS_TUNE_BDENV",
+              "^SYS: Failed to convert environment variable "
+              "^EV (^VAL) to integer", status );
     } else {
       retval = result;
     }
