@@ -392,6 +392,25 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
   /* Read some header values that are likely to be useful. Use a struct for the results
      to stop bloat of variable names. KeyMap or FitsChan are too cumbersone for multiple
      accesses.*/
+
+  fitsvals.obsnum = VAL__BADI;
+  fitsvals.utdate = VAL__BADI;
+  fitsvals.num_cyc = VAL__BADI;
+  fitsvals.jos_min = VAL__BADI;
+  fitsvals.nrefstep = VAL__BADI;
+  fitsvals.jigl_cnt = VAL__BADI;
+  fitsvals.obsgeox = VAL__BADD;
+  fitsvals.obsgeoy = VAL__BADD;
+  fitsvals.obsgeoz = VAL__BADD;
+  fitsvals.instap_x = VAL__BADD;
+  fitsvals.instap_y = VAL__BADD;
+  fitsvals.chop_thr = VAL__BADD;
+  fitsvals.chop_pa = VAL__BADD;
+  fitsvals.rot_pa = VAL__BADD;
+  strcpy( fitsvals.chop_crd, "" );
+  strcpy( fitsvals.rot_crd, "" );
+  strcpy( fitsvals.instrume, "" );
+
   smf_getfitsi( hdr, "OBSNUM", &(fitsvals.obsnum), status );
   smf_getfitsi( hdr, "UTDATE", &(fitsvals.utdate), status );
   smf_getfitsi( hdr, "NUM_CYC", &(fitsvals.num_cyc), status );
