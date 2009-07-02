@@ -13,24 +13,21 @@
       SAMP stands for Simple Application Messaging Protocol. It is a protocol
       which allows tools on the desktop to communicate with each other.  Very
       briefly, the way it works is that applications can send messages to a
-      central \mytt{hub process} which will then pass them on to other
+      central <em>hub process</em> which will then pass them on to other
       applications which can respond to them in some appropriate way.  GAIA
       can use SAMP to send and receive images, sky position information, and
       catalogues or identification of rows within them.  It can also send
-      extracted spectra.  You will require a hub, either free-standing or
+      extracted spectra.  You will require a SAMP hub, either free-standing or
       integral to some other application, to use these capabilities.
+    </p>
     <p>
-    <p>
-      Applications which currently talk SAMP include
-      <a href="http://www.starlink.ac.uk/topcat/">TOPCAT</a>,
-      <a href="http://aladin.u-strasbg.fr/aladin.gml">Aladin</a>
-      and various tools from the
-      <a href="http://software.astrogrid.org/">AstroGrid project</a>.
+      Applications which currently talk SAMP include TOPCAT, SPLAT and DS9,
+      amongst others.
     </p>
     <p>
       You can find more information about how it works, what applications are
-      compatible, and how it can be useful at the <a
-      herf="http://www.ivoa.net/samp">SAMP</a> web page.
+      compatible, and how it can be useful at the 
+      SAMP web page, <tt>http://www.ivoa.net/samp/</tt>.
     </p>
 
 
@@ -39,42 +36,46 @@
     <p>
       In order for SAMP communications to work, a SAMP hub must be running on
       your machine.  This is not part of GAIA and you will have to start it up
-      separately.  The recommended way to do this is currently to run the
-      <strong>AstroGrid Workbench</strong>, which can be started using Java
-      WebStart by following links on the 
-      <a href="http://software.astrogrid.org/">AstroGrid website</a>.
-      A SAMP hub can also be started from the TOPCAT application.
+      separately.  Several other applications include their own hubs,
+      which may be started automatically or by user request; these 
+      include the
+      AstroGrid Desktop, TOPCAT and Aladin.
+      Alternatively you can run a freestanding hub such as JSAMP or SAMPy.
+      See the SAMP web page for links to these.
     </p>
 
     <p>
       If the hub is running when GAIA starts up, GAIA will connect to it
       ("register") automatically.  If you start the hub while GAIA is already
-      running, you can connect to it by selecting the <tt>Register</tt> option
-      from GAIA's <tt>Interop</tt> menu.  When registered, GAIA will listen
+      running, you can connect to it by selecting the "Register" option
+      from GAIA's "Interop" menu.  When registered, GAIA will listen
       out for messages from other applications and act on them.  You will also
       be able to send messages to other applications.  If you want to stop
-      GAIA responding to any such messages, you can select <tt>Unregister</tt>
+      GAIA responding to any such messages, you can select "Unregister"
       from the same menu.
     </p>
 
     <p>
       In most cases, sending a SAMP message from GAIA is controlled using one
-      of its <tt>Interop</tt> menus.  For a given action these often have two
-      ways to transmit a given message: <tt>Broadcast ...</tt> and <tt>Send to
-      ...</tt>.  For <tt>Broadcast</tt>, all registered applications which
+      of its "Interop" menus.  For a given action these often have two
+      ways to transmit a given message: "Broadcast ..." and "Send to ...".
+      For "Broadcast", all registered applications which
       understand it are invited to do something with the message.  For
-      <tt>Send to</tt> there is a submenu which allows you to choose which
+      "Send to" there is a submenu which allows you to choose which
       single application to direct the message to.  Only applications which
-      claim to understand the particular message will appear on such submenus
-      (which means that this submenu may be empty, depending on what other
-      SAMP-aware tools you've got running).
+      claim to understand the particular message (in the jargon; which 
+      <em>subscribe</em> to the relevant <em>MType</em>) will appear 
+      on such submenus; this means that the "Send to ..." submenu 
+      may be empty, depending on what other SAMP-aware tools you've
+      got running.
     </p>
 
     <h3>What SAMP facilities does GAIA support?</h3>
 
     <p>
-      GAIA can both send and respond to messages in two general application
-      areas: image-related and catalogue-related.  The messages and how to use
+      GAIA can both send and respond to messages in three general application
+      areas: image-related, catalogue-related and spectrum-related.
+      The messages and how to use
       them are listed below; the <i>MTypes</i> (strings in parentheses) are
       the formal identifiers for these messages - if you are not an
       applications programmer you can ignore these.
@@ -108,7 +109,7 @@
       new <a href="query.html">catalogue query window</a> associated with
       GAIA's base image window.  Any positions it contains which are within
       the bounds of the current image will be plotted as symbols over the
-      image as symbols.  This window will have an <tt>Interop</tt> menu which
+      image as symbols.  This window will have an "Interop" menu which
       can be used for communicating information about one or more selected
       rows within the table between GAIA and other SAMP applications which
       have a copy of it.
@@ -121,16 +122,16 @@
       catalogue will change, both the rows visible in the query window and the
       symbols plotted on the image.  You can send a selection of points from
       the catalogue window to other applications displaying the same catalogue
-      using its <tt>Interop</tt> menu: the <tt>Broadcast/Send current
-      search</tt> options send all the visible rows, and <tt>Broadcast/Send
-      current selection</tt> send only the currently selected ones (rows
+      using its "Interop" menu: the "Broadcast/Send current search" 
+      options send all the visible rows, and "Broadcast/Send current selection"
+      send only the currently selected ones (rows
       highlighted in blue in the query window).
       </dd>
 
       <dt><b>Highlight Row</b> (<code>table.highlight.row</code>)</dt>
 
-      <dd>If the query window's Interop menu has the <tt>Selection broadcasts
-      row index</tt> checkbox ticked, then if you select a single row either
+      <dd>If the query window's Interop menu has the "Selection broadcasts
+      row index" checkbox ticked, then if you select a single row either
       by clicking on it in the query window or by clicking on its symbol in
       the image, this message will be sent to other applications to invite
       them to highlight that row.  Similarly, if other applications send
@@ -140,13 +141,26 @@
 
       <dt><b>Highlight Position</b> (<code>coord.pointAt.sky</code>)</dt>
 
-      <dd>If the query window's Interop menu has the <tt>Selection broadcasts
-      row position</tt> checkbox ticked, then the sky position associated with
+      <dd>If the query window's Interop menu has the "Selection broadcasts
+      row position" checkbox ticked, then the sky position associated with
       the row will be broadcast to other applications when a single row is
       selected.  They may respond by highlighting that position on their own
       sky images.  Note that unlike the other catalogue-related messages, this
       may have an effect for applications which don't have the same catalogue
       loaded.
+      </dd>
+    </dl>
+
+    <h4>Spectrum-related Facilities</h4>
+
+    <dl>
+      <dt><b>Send spectrum</b> (<code>spectrum.load.ssa-generic</code>)</dt>
+
+      <dd>
+        When you extract a spectrum from a data cube in GAIA, the
+        spectral plot window which appears has an "Interop" menu.
+        You can use this to send a spectrum to SAMP-aware spectral
+        viewing tools.
       </dd>
     </dl>
 
