@@ -633,6 +633,10 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
         if (fitsvals.rot_pa != VAL__BADD) {
           msgOutiff( msglev, "", INDENT "Missing ROT_PA - setting to %g deg", status, fitsvals.rot_pa );
           smf_fits_updateD( hdr, "ROT_PA", fitsvals.rot_pa, "[deg] K-mirror angle", status );
+          have_fixed = 1;
+        } else {
+          /* clear it but force it to exist */
+          smf_fits_updateU( hdr, "ROT_PA", "[deg] K-mirror angle", status );
         }
       }
     }
