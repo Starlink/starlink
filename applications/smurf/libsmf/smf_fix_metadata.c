@@ -308,10 +308,26 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
 
   /* Get the step time from the header if we have a hdr */
   if ( hdr->instrument!=INST__NONE  ) {
+    /* for a handful of observations, the STEPTIME seems to be a clone
+       of UEL header. These occur between 20080301 and 20090112
+       (specifically 20080301#3, 20080316#55, 20090104#30, 20090111#10 and
+       20090112#36 - the values on 20080726 seem to be okay).
+       This is an example of a generalt problem (fixed on 20090112) where
+       headers from a previous DRAMA get would arrive for the subsequent
+       DRAMA get. So UEL -> STEPTIME or CHOP_FRQ -> STEPTIME. The general
+       case of detecting shifted headers is tricky to code for since
+       it needs some detailed analysis. In some cases the entire block
+       of JOS headers (or END event CHOP_FRQ) are undef.
+    */
+    double uel = VAL__BADD;
     steptime = VAL__BADD;
+
+    smf_getfitsd( hdr, "UEL", &uel, status );
     smf_getfitsd( hdr, "STEPTIME", &steptime, status );
     if (*status == SMF__NOKWRD || ( *status == SAI__OK && 
-                                    ( steptime == VAL__BADD || steptime < VAL__SMLD ) ) ) {
+                                    ( steptime == VAL__BADD ||
+                                      steptime < VAL__SMLD ||
+                                      (uel != VAL__BADD && steptime == uel ) ) ) ) {
       if (*status != SAI__OK) errAnnul( status );
       steptime = VAL__BADD; /* reset to fixed state */
 
