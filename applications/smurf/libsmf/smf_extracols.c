@@ -106,11 +106,16 @@ void smf_extracols( smfHead *hdr, Grp *colgrp, void **cols_info,
 
 /* Local Variables */
    ExtraColsStore *store = NULL;
-   int maxcol;
+   Grp *mygrp = NULL;
+   Grp *newgrp = NULL;
+   char *pbuf = NULL;
+   const char *state_ptr;
+   char buf[ GRP__SZNAM + 1 ];
    int icol;
    int irow;
+   int maxcol;
+   int nrem;
    size_t size;
-   char *state_ptr;
 
 /* Check inherited status. Also check we have a group of column names. 
    If an error has occurred, we should still attempt to free the store
@@ -134,15 +139,20 @@ void smf_extracols( smfHead *hdr, Grp *colgrp, void **cols_info,
             if( *status == SAI__OK ) {
 
 /* Make sure the group is case insensitive. */
-               grpSetcs( colgrp, 0, status );
+               mygrp = colgrp;
+               grpSetcs( mygrp, 0, status );
 
 /* Define a macro that will check the supplied group for a given
    JCMTSTATE extension item, and if found, append the item to the list of
    extra columns. The value for an item within a JCMTState structure is 
-   found by storing its offset into the structure. */
+   found by storing its offset into the structure. We also create a new
+   group from which the used name has been removed. */
 
 #define CHECK_ITEM(Name,Type,Size,Comp) \
-               if( grpIndex( Name, colgrp, 1, status ) ) { \
+               if( grpIndex( Name, mygrp, 1, status ) ) { \
+                  newgrp = grpRemov( mygrp, Name, status ); \
+                  if( mygrp != colgrp ) grpDelet( &mygrp, status ); \
+                  mygrp = newgrp; \
                   (store->name)[ store->ncol ] = Name; \
                   (store->type)[ store->ncol ] = Type; \
                   (store->size)[ store->ncol ] = Size; \
@@ -211,6 +221,20 @@ void smf_extracols( smfHead *hdr, Grp *colgrp, void **cols_info,
 
 #undef CHECK_ITEM
 
+/* Report an error if the supplied group contained any unrecognised names. */
+               nrem = grpGrpsz( mygrp, status );
+               if( nrem ) {
+                  pbuf = buf;
+                  grpGet( mygrp, 1, 1, &pbuf, GRP__SZNAM, status );
+                  msgSetc( "N", pbuf );
+                  *status = SAI__ERROR;
+                  errRep( " ", "Unknown JCMTState item '^N' supplied for "
+                          "parameter EXTRACOLS", status );
+               }
+
+/* Delete the new group. */
+               if( mygrp != colgrp ) grpDelet( &mygrp, status ); \
+
 /* Return a pointer to the store. */
                *cols_info = store;
             }
@@ -224,7 +248,7 @@ void smf_extracols( smfHead *hdr, Grp *colgrp, void **cols_info,
 /* Get a "char *" pointer to the start of the JCMTState structure in the
    supplied header. Would like to use "void *" but pointer arithmetic is
    not allowed on "void *" pointers. */
-         state_ptr = (char *) ( hdr->state );
+         state_ptr = (const char *) ( hdr->state );
 
 /* Record the index of the row that is about to be stored, and then
    increment the number of rows. */
