@@ -49,35 +49,51 @@
 
 *  The PROVENANCE Extension:
 *     - The PROVENANCE extension in an NDF contains four components:
-*     "PARENTS", "ANCESTORS", "CREATOR" and "DATE". The DATE component is 
-*     a character string holding the date and time at which the information 
-*     in the provenance extension was last modified. The date is UTC
-*     formatted by PSX_ASCTIME. The ANCESTORS component is a 1D array
+*     "PARENTS", "ANCESTORS", "CREATOR", "DATE" and "HASH". The DATE 
+*     component is a character string holding the date and time at which the 
+*     information in the provenance extension was last modified. The date is 
+*     UTC formatted by PSX_ASCTIME. The ANCESTORS component is a 1D array
 *     of "PROV" structures (described below). Each element describes a
 *     single NDF that was used in the creation of the main NDF, either
 *     directly or indirectly. The PARENTS component is a 1D integer 
 *     array holding the indices within the ANCESTORS array of the NDFs
 *     that are the direct parents of the main NDF. The CREATOR component
 *     holds an arbitrary identifier for the software that created the
-*     main NDF.
+*     main NDF. The HASH component is an integer that identifies the
+*     contents of the current History record in the NDF at the time the 
+*     PROVENANCE extension was created. This is used to determine which
+*     history records to copy into the PROVENANCE extension if the main
+*     NDF is used in the creation of another NDF.
 *     - Each PROV structure describes a single NDF that was used in the
-*     creation of the main NDF, and contains up to four components; "PARENTS", 
-*     "DATE", "PATH", "CREATOR" and "MORE". If present, the PARENTS component 
-*     is a 1D integer array holding the the indices within the ANCESTORS array 
-*     of the direct parents of the ancestor NDF. If PARENTS is not present, 
-*     the ancestor NDF is a "root" NDF (that is, it has no known parents).
-*     If present, the DATE component is a string holding the formatted UTC 
-*     date at which the provenance information for the ancestor NDF was 
-*     determined. If this date is not known, the DATE component will not
-*     be present (this will be the case, for instance, for all root NDFs).
-*     The PATH component will always be present, and is a string holding
-*     the full path to the ancestor NDF. This includes any HDS path
-*     within the container file, but will not include any NDF or HDS section 
-*     specifier. Neither will it include the trailing ".sdf" suffix. If
-*     present, the MORE component is an arbitrary HDS structure in which 
+*     creation of the main NDF, and can contain the following components; 
+*     "PARENTS", "DATE", "PATH", "CREATOR", "HISTORY" and "MORE". If present, 
+*     the PARENTS component is a 1D integer array holding the the indices 
+*     within the ANCESTORS array of the direct parents of the ancestor NDF. 
+*     If PARENTS is not present, the ancestor NDF is a "root" NDF (that is, 
+*     it has no known parents). If present, the DATE component is a string 
+*     holding the formatted UTC date at which the provenance information for 
+*     the ancestor NDF was determined. If this date is not known, the DATE 
+*     component will not be present (this will be the case, for instance, for 
+*     all root NDFs). The PATH component will always be present, and is a 
+*     string holding the full path to the ancestor NDF. This includes any HDS 
+*     path within the container file, but will not include any NDF or HDS 
+*     section specifier. Neither will it include the trailing ".sdf" suffix. 
+*     If present, the MORE component is an arbitrary HDS structure in which 
 *     any extra information about the ancestor NDF can be stored. The
 *     CREATOR component holds an arbitrary identifier for the software that 
-*     created the ancestor NDF.
+*     created the ancestor NDF. The HISTORY component is an array of "HISREC" 
+*     structures, each containing a copy of a single History record from
+*     the NDF described by the PROV structure. Only History records that
+*     describe operations performed on the NDF itself are stored (including 
+*     the record that describes the creation of the NDF). That is, History 
+*     records inherited from the NDF's own parents are not included.
+*     - Each HISREC structure contains the following components (all
+*     taken from the corresponding items in the NDF History record):
+*     DATE, COMMAND, USER and TEXT. If the history record was created by
+*     the default NDF history writing mechanism, the TEXT component will
+*     contain a list of environment parameter values used by (or created
+*     by) the corresponding command, and another statement of the
+*     software that performed the action.
 
 *  Copyright:
 *     Copyright (C) 2009 Science & Technology Facilities Council.
