@@ -62,6 +62,8 @@
 *  History:
 *     18-AUG-1992 (DSB):
 *        Original version
+*     2-JUL-2009 (DSB):
+*        Honour the group case sensitivity flag.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -107,6 +109,7 @@
 
 *  External References:
       EXTERNAL GRP1_INIT         ! Initalise GRP common blocks.
+      LOGICAL CHR_SIMLR          ! Case-insensitive string comparison
 
 *  Local Variables:
       INTEGER DEPTH              ! Depth at which the retrieved element
@@ -177,7 +180,9 @@
 
 *  Copy the name to the output so long as it is not the same as the
 *  supplied name.
-         IF( ELEM .NE. LNAME ) THEN
+         IF( ( .NOT. CMN_UPPER( SLOT1 ) .AND. (ELEM .NE. LNAME ) ) .OR. 
+     :       ( CMN_UPPER( SLOT1 ) .AND. 
+     :        .NOT. CHR_SIMLR( ELEM, LNAME ) ) ) THEN
             CALL GRP1_PTELM( SLOT2, J, ELEM, DEPTH, IFILE, MODGRP,
      :                       MODIND, STATUS )
 
