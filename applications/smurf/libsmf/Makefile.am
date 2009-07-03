@@ -108,6 +108,7 @@ smf_dtype_sz.c \
 smf_dump_smfData.c \
 smf_expand_tilegroup.c \
 smf_ext2km.c \
+smf_extracols.c \
 smf_fft_cart2pol.c \
 smf_fft_data.c \
 smf_filter_edge.c \

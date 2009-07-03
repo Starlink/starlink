@@ -91,6 +91,10 @@
 *
 *     Also creates an output catalogue holding the sample positions. This
 *     uses environment parameter OUTCAT to get the name of the catalogue.
+*     In addition, the environment parameter EXTRACOLS can be used to
+*     specify a set of extra columsn to add to the catalogue. The
+*     parameter value should be a group of JCMTSTATE item names, and an
+*     extra column will be created for each one.
 
 *  Authors:
 *     David S Berry (JAC, UCLan)
@@ -185,6 +189,9 @@
 *     15-APR-2009 (DSB):
 *        Issue a warning if the REFCEPPOS and FPLANEX/Y positions are
 *        inconsistent.
+*     2-JUL-2009 (DSB):
+*        Add facility for adding extra columns to the output catalogue as
+*        specified by environment parameter EXTRACOLS.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -246,13 +253,15 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    AstFrame *skyin = NULL;    /* Sky Frame in input FrameSet */
    AstFrameSet *fs = NULL;    /* A general purpose FrameSet pointer */
    AstFrameSet *swcsin = NULL;/* FrameSet describing spatial input WCS */
+   AstKeyMap *cols_km = NULL; /* A KeyMap holding values for extra columns */
    AstMapping *azel2usesys = NULL; /* Mapping form AZEL to requested system */
    AstMapping *fsmap = NULL;  /* Mapping from the "fs" FrameSet */
-   Grp *labgrp = NULL;        /* GRP group holding used detector labels */
-   char *pname = NULL;        /* Name of currently opened data file */
-   char outcatnam[ 41 ];      /* Output catalogue name */
-   const char *lab = NULL;    /* Pointer to start of next detector name */
-   const double *tsys;        /* Pointer to Tsys value for first detector */
+   Grp *colgrp = NULL;   /* Group holding names of extra catalogue columns */
+   Grp *labgrp = NULL;   /* Group holding used detector labels */
+   char *pname = NULL;   /* Name of currently opened data file */
+   char outcatnam[ 41 ]; /* Output catalogue name */
+   const char *lab = NULL;/* Pointer to start of next detector name */
+   const double *tsys;   /* Pointer to Tsys value for first detector */
    double *allpos = NULL;/* Array of all sample positions */
    double *allpos2 = NULL;/* Array of all sample positions */
    double *p;            /* Pointer to next value */
@@ -281,9 +290,11 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    size_t irec;          /* Index of current input detector */
    size_t itime;         /* Index of current time slice */
    size_t ispec;         /* Index of current spectral sample */
+   size_t nexcol;        /* Number of extra columsn for catalogue */
    smfData *data = NULL; /* Pointer to data struct for current input file */
    smfFile *file = NULL; /* Pointer to file struct for current input file */
    smfHead *hdr = NULL;  /* Pointer to data header for this time slice */
+   void *cols_info;      /* Data used inside smf_extracols */
 
 /* Initialise the returned array to hold vad values. */
    if( par ) {
@@ -315,13 +326,19 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
 /* Initialise. */
    allpos = NULL;
    nallpos = 0;
+   cols_info = NULL;
 
 /* If we are creating an output catalogue, create a GRP group to hold the
-   labels to be associated with each position. */
-   if( outcat ) {
+   labels to be associated with each position, and get a group of extra
+   column names from the environment. */
+   if( outcat && *status == SAI__OK ) {
       labgrp = grpNew( "Detector labels", status );
+      kpg1Gtgrp( "EXTRACOLS", &colgrp, &nexcol, status );
+      if( *status == PAR__NULL ) errAnnul( status );
+      if( nexcol == 0 && colgrp ) grpDelet( &colgrp, status );
    } else {
       labgrp = NULL;
+      colgrp = NULL;
    }
 
 /* Loop round all the input NDFs. */
@@ -560,15 +577,20 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
                   }
                }         
 
-/* If it did, store it. Also, see if this detector has a good Tsys value. */
+/* If it did, store it. Also, see if this detector has a good Tsys value. 
+   Also, store any extra columns values requested for the outptu
+   catalogue. */
                if( good ) {
                   *(p++) = xout[ irec ];
                   *(p++) = yout[ irec ];
                   if( labgrp ) grpPut1( labgrp, lab, 0, status );
                   nallpos++;
+
                   rtsys = tsys ? (float) tsys[ irec ] : VAL__BADR;
                   if( rtsys <= 0.0 ) rtsys = VAL__BADR;
                   if( rtsys != VAL__BADR ) *gottsys = 1;
+
+                  smf_extracols( hdr, colgrp, &cols_info, NULL, status );
                }
 
 /* If this detector does not have a valid position, increment the data
@@ -621,10 +643,14 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
          *(py++) = *(p++);
       } 
 
+/* Create a KeyMap holding the values for any extra requested columns,
+   and free the resources used by cols_info. */
+      smf_extracols( NULL, colgrp, &cols_info, &cols_km, status );
+
 /* Create the catalogue. */
-      kpg1Wrtab( "OUTCAT", nallpos, nallpos, 2, allpos2, AST__CURRENT, 
-                       astFrameSet( *skyframe, " " ), "Detector positions", 1, 
-                       NULL, labgrp, NULL, 1, status );
+      kpg1Wrcat( "OUTCAT", nallpos, nallpos, 2, allpos2, AST__CURRENT, 
+                 astFrameSet( *skyframe, " " ), "Detector positions", 1, 
+                 NULL, cols_km, labgrp, NULL, 1, status );
 
 /* Free resources. */
       allpos2 = astFree( allpos2 );
@@ -637,6 +663,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    xout = astFree( xout );
    yout = astFree( yout );
    if( labgrp ) grpDelet( &labgrp, status );
+   if( colgrp ) grpDelet( &colgrp, status );
 
 /* If no error has occurred, export the returned SkyFrame pointer from the 
    current AST context so that it will not be annulled when the AST

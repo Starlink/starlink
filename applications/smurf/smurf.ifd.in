@@ -201,6 +201,8 @@
 #         Add CALCRESP
 #     2009-03-30 (TIMJ):
 #         Add OUTFILES to all routines.
+#     2-JUL-2009 (DSB):
+#         Added EXTRACOLS parameter to MAKECUBE
 #     {enter_changes_here}
 
 #  Bugs:
@@ -1488,6 +1490,16 @@ package @PACKAGE@ {
                 vpath DEFAULT 
                 ppath CURRENT DEFAULT
                 prompt {Names of detectors to be included}
+                default !
+                helpkey *
+            }
+
+            parameter extracols {
+                type LITERAL
+                access READ
+                vpath DEFAULT 
+                ppath CURRENT DEFAULT
+                prompt {JCMTState items to include in output catalogue}
                 default !
                 helpkey *
             }

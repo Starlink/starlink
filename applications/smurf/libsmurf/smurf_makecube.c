@@ -164,6 +164,20 @@
 *          are included from the output cube (all other detectors are 
 *          excluded). If a null (!) value is supplied, data from all detectors 
 *          will be used. [!]
+*     EXTRACOLS = LITERAL (Read)
+*          A group of names specifying extra columns to be added to the
+*          catalogue specified by parameter OUTCAT. Each name should be
+*          the name of a component in the JCMTState extension structure.
+*          For each name in the group, an extra column is added to the
+*          output catalogue containing the value of the named extension 
+*          item for every table row (i.e. for each data sample). These
+*          extra columns can be viewed and manipulated with general purpose
+*          FITS table tools such as TOPCAT, but will not be displayed by 
+*          the KAPPA:LISTSHOW command. One use for these extra columns is
+*          to allow the catalogue to be filtered (e.g. by TOPCAT) to
+*          remove samples that meet (or do not meet) some specified
+*          requirement specified by the JCMTState contents. No extra
+*          columns are added if a null (!) value is supplied. [!]
 *     FBL( ) = _DOUBLE (Write)
 *          Sky coordinates (radians) of the bottom left corner of the output cube
 *          (the corner with the smallest PIXEL dimension for axis 1 and the smallest
@@ -763,6 +777,8 @@
 *        Use smf_expand_tilegroup
 *     24-APR-2009 (TIMJ):
 *        Now summarizes the input observations.
+*     3-JUL-2009 (DSB):
+*        Added EXTRACOLS parameter.
 
 *  Copyright:
 *     Copyright (C) 2007-2009 Science and Technology Facilities Council.
