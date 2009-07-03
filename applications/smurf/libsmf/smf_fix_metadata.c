@@ -557,6 +557,16 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
     have_fixed = 1;
   }
 
+  /* New nomenclature for "raster". It is now a "scan" since 20080610. */
+  if (hdr->obsmode == SMF__OBS_SCAN && fitsvals.utdate <= 20080610) {
+    char sam_mode[81];
+    smf_getfitss( hdr, "SAM_MODE", sam_mode, sizeof(sam_mode), status );
+    if ( strncasecmp( "raster", sam_mode, 6 ) == 0 ) {
+      smf_fits_updateS( hdr, "SAM_MODE", "scan", NULL, status );
+      have_fixed = 1;
+    }
+  }
+
   /* HARP specific fixes */
   if ( strncasecmp( fitsvals.instrume, "HARP", 4 ) == 0 ) {
     /* ROT_CRD - released in 20080111 */
