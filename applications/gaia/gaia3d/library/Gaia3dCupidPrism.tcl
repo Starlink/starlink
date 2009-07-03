@@ -280,7 +280,7 @@ itcl::class ::gaia3d::Gaia3dCupidPrism {
             #  to the cube. If shape is used that represents an STC region.
             if { $tranwcs != 0 } {
 
-               #  Transform coordinates to grid positions, also do 
+               #  Transform coordinates to grid positions, also do
                #  radians to degrees (catalogue WCS is in degrees).
                set newcoords {}
                foreach {x y} $coords {
@@ -412,7 +412,7 @@ itcl::class ::gaia3d::Gaia3dCupidPrism {
          return [list $c1 $c2 $c3]
       }
       return [gaiautils::asttrann $wcs 0 "$x1 $x2 $x3 4 5 6 7 8 9 10 11 12"]
-    }
+   }
 
    #  Apply the current configuration to all objects.
    protected method apply_configuration_ {} {

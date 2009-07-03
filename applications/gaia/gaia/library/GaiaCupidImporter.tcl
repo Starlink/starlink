@@ -13,8 +13,6 @@
 #     Imports a CUPID catalogue allowing the selection of the RA and Dec
 #     axes columns and the columns that determine the extent of the
 #     clump.
-#
-#     XXX warning about non-RA and Dec systems when found.
 
 #  Invocations:
 #
@@ -192,6 +190,9 @@ itcl::class gaia::GaiaCupidImporter {
    #  Destructor:
    #  -----------
    destructor  {
+      if { [info exists tranwcs_] && $tranwcs_($catwin) != 0 } {
+         catch {gaiautils::astannul $tranwcs_($catwin)}
+      }
    }
 
    #  Methods:
@@ -321,9 +322,7 @@ itcl::class gaia::GaiaCupidImporter {
    }
 
    #  Define a basic symbol {COORD} is the coordinate of the current slice
-   #  when doing a 3D import.
-   #
-   #  XXX in the coordinates of the table, not the cube spectral axis XXX
+   #  when doing a 3D import. This should be in catalogue spectral coordinates.
    #
    #  {SCALE} is a scale factor (sizes are sigmas, so 2 + 3 should be typical).
    #  Sizes are in arcsec for celestial coordinates.
@@ -345,6 +344,10 @@ itcl::class gaia::GaiaCupidImporter {
             set symbol2 [list rectangle green {$Size2/$Size1} {} {} $cond]
             set symbol3 [list {$Size1/3600.0*$%%cupid(SCALE)} {deg 2000.0}]
          }
+
+         #  Attach coordinates for ::cupid(COORD) transforms.
+         attach_coord_ $catwin
+
       } else {
          if { $itk_option(-use_stc) && $have_stc_($catwin) } {
             set symbol1 [list PIDENT Shape Size1 Size2]
@@ -436,6 +439,77 @@ itcl::class gaia::GaiaCupidImporter {
       }
    }
 
+   #  Set the extraction coordinate. Use when working in 3D and want only
+   #  detections in the current slice shown.
+   public method set_coord {coord} {
+      if { $threed_ } {
+         foreach {name catwin} [array get catwin_] {
+            if { [winfo exists $catwin] && [wm state $catwin] != "withdrawn" &&
+                 [info exists tranwcs_] && [info exists tranwcs_($catwin)] } {
+               if { $tranwcs_($catwin) != 0 } {
+                  #  Transform the coordinate into catalogue coordinates.
+                  lassign [gaiautils::asttrann $tranwcs_($catwin) 1 \
+                              "1 1 $coord"] c1 c2 c3
+                  set coord $c3
+               }
+            }
+
+            #  XXX but this is shared by all catalogues... So just do one
+            #  or use another way.
+            set ::cupid(COORD) $coord
+         }
+      } else {
+         set ::cupid(COORD) $coord
+      }
+   }
+
+   #  Re-attach all the catalogue WCS's to the cube. This is used so that the
+   #  CUPID spectral coordinate can be set to match an extraction
+   #  position. See set_coord. This should be called for new cubes and when
+   #  cubes have their coordinate systems changed.
+   public method attach_coords {} {
+      if { $threed_ } {
+         foreach {name catwin} [array get catwin_] {
+            attach_coord_ $catwin
+         }
+      }
+   }
+
+   #  Attach the coordinates of a given catalogue window to that of the
+   #  cube displayed in the associated gaiacube.
+   protected method attach_coord_ {catwin} {
+
+      #  Get cube WCS.
+      set wcs [[$itk_option(-gaiacube) get_cubeaccessor] getwcs]
+      if { $wcs == 0 || $wcs == {} } {
+         return
+      }
+
+      if { [info exists tranwcs_] && $tranwcs_($catwin) != 0 } {
+         catch {gaiautils::astannul $tranwcs_($catwin)}
+      }
+      set comments [$catwin comments]
+      set tranwcs 0
+      if { $comments != {} } {
+         set astref [gaia::GaiaSearch::get_kaplibs_frameset $comments]
+         if { $astref != 0 } {
+            #  Want transformation from current coordinates of the catalogue
+            # to current coordinates of the cube. So we connect them, going
+            # ideally via SKY-DSBSPECTRUM or PIXEL coordinates.
+            set wcs_current [gaiautils::astget $wcs "Current"]
+            set wcs_base [gaiautils::astget $wcs "Base"]
+            set tranwcs [gaiautils::astconvert $wcs $astref \
+                            "SKY-DSBSPECTRUM,PIXEL,"]
+
+            #  Restore any changes made by astconvert.
+            gaiautils::astset $wcs "Current=$wcs_current"
+            gaiautils::astset $wcs "Base=$wcs_base"
+            gaiautils::astannul $astref
+         }
+      }
+      set tranwcs_($catwin) $tranwcs
+   }
+
    #  Configuration options: (public variables)
    #  ----------------------
 
@@ -479,6 +553,10 @@ itcl::class gaia::GaiaCupidImporter {
 
    #  Catalogue windows used for display.
    protected variable catwin_
+
+   #  AST references for framesets that transform from a given spectral
+   #  coordinate system to that of the catalogue.
+   protected variable tranwcs_
 
    #  Image display elements.
    protected variable gaia_ {}

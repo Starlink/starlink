@@ -817,6 +817,11 @@ itcl::class gaia::GaiaCube {
       set value $axis_
       incr axis_
       set_step_axis_ $value 0
+
+      #  Change catalogues to match coordinate system.
+      if { [winfo exists $w_.cupidimporter] } {
+         $w_.cupidimporter attach_coords
+      }
    }
 
    #  Get the plane being displayed.
@@ -970,11 +975,13 @@ itcl::class gaia::GaiaCube {
    public method set_cupid_coord {propagate} {
       if { [winfo exists $w_.cupidimporter] } {
 
-         #  XXX cupid(COORD) needs to be in the coordinate system of the
-         #  catalogue, not the cube. Or transform catalogue values...
+         #  Need the position of the slice in cube coordinates. That
+         #  coordinate system needs to be attached to the catalogue
+         #  and we need to transform into the coordinates of the
+         #  catalogue. Assumes importer has been told about any coordinate
+         #  system changes.
          set coord [get_plane_coord 0 0 0]
-
-         set ::cupid(COORD) $coord
+         set coord [$w_.cupidimporter set_coord $coord]
          if { $propagate } {
             $w_.cupidimporter replot
          }
