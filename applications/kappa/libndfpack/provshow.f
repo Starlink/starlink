@@ -173,6 +173,9 @@
 *        Corrected use of SHOW=ROOTS.
 *     25-JUN-2009 (DSB):
 *        Updated to use new provenance API. Added parameter HISTORY.
+*     3-JUL-2009 (DSB):
+*        Correct formatting of history info to avoid truncating the last
+*        character.
 *     {enter_further_changes_here}
 
 *-
@@ -421,11 +424,11 @@
                               ISTART = ISTART + 1
                            END DO
 			   
-                           DO WHILE( ISTART .LT. NC ) 
+                           DO WHILE( ISTART .LE. NC ) 
 			   
                               IEND = ISTART
                               DO WHILE( VALUE( IEND:IEND ) .NE. ' ' 
-     :                                  .AND. IEND .LT. NC ) 
+     :                                  .AND. IEND .LE. NC ) 
                                  IEND = IEND + 1
                               END DO
 
