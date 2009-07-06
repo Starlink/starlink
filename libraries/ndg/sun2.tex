@@ -2364,7 +2364,7 @@ another statement of the software that performed the action.
       hidden ancestors from the copy.
    }
    \sstinvocation{
-      CALL NDG\_COPYPROV( IPROV, CLENSE, IPROV2, STATUS )
+      CALL NDG\_COPYPROV( IPROV, CLEANSE, IPROV2, STATUS )
    }
    \sstarguments{
       \sstsubsection{
@@ -2374,7 +2374,7 @@ another statement of the software that performed the action.
          read from an NDF, as returned by NDG\_READPROV.
       }
       \sstsubsection{
-         CLENSE = LOGICAL (Given)
+         CLEANSE = LOGICAL (Given)
       }{
          If .TRUE., then any ancestors which have been hidden using
          NDG\_HIDEPROV are removed from the returned Provenance structure
@@ -2724,7 +2724,7 @@ another statement of the software that performed the action.
 }{
    \sstdescription{
       This function flags a specified ancestor as {\tt "}hidden{\tt "}. The only
-      affect this has is that the ancestor will not be included in
+      effect this has is that the ancestor will not be included in
       Provenance structures created by the NDG\_COPYPROV function.
    }
    \sstinvocation{
@@ -3183,7 +3183,7 @@ another statement of the software that performed the action.
       hidden ancestors from the copy. A pointer to the copy is returned.
    }
    \sstinvocation{
-      NdgProvenance $*$ndgCopyProv( NdgProvenance $*$prov, int clense,
+      NdgProvenance $*$ndgCopyProv( NdgProvenance $*$prov, int cleanse,
                                   int $*$status )
    }
    \sstarguments{
@@ -3193,7 +3193,7 @@ another statement of the software that performed the action.
          A pointer to the provenance information to be Copyd.
       }
       \sstsubsection{
-         clense
+         cleanse
       }{
          If non-zero, then any ancestors which have been hidden using
          ndgHideProv are removed from the returned Provenance structure
@@ -3608,7 +3608,7 @@ another statement of the software that performed the action.
 }{
    \sstdescription{
       This function flags a specified ancestor as {\tt "}hidden{\tt "}. The only
-      affect this has is that the ancestor will not be included in
+      effect this has is that the ancestor will not be included in
       Provenance structures created by the ndgCopyProv function.
    }
    \sstinvocation{

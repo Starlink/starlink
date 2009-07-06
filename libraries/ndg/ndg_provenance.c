@@ -294,7 +294,7 @@ static void ndg1WriteProvenanceExtension( Provenance *, int, int * );
 /* Public F77 wrapper functions. */
 /* ============================= */
 
-F77_SUBROUTINE(ndg_copyprov)( INTEGER(iprov), LOGICAL(clense), 
+F77_SUBROUTINE(ndg_copyprov)( INTEGER(iprov), LOGICAL(cleanse), 
                               INTEGER(iprov2), INTEGER(status) ){
 /*
 *+
@@ -319,7 +319,7 @@ F77_SUBROUTINE(ndg_copyprov)( INTEGER(iprov), LOGICAL(clense),
 *     IPROV = INTEGER (Given)
 *        An identifier for a structure holding the provenance information 
 *        read from an NDF, as returned by NDG_READPROV.
-*     CLENSE = LOGICAL (Given)
+*     CLEANSE = LOGICAL (Given)
 *        If .TRUE., then any ancestors which have been hidden using
 *        NDG_HIDEPROV are removed from the returned Provenance structure
 *        (see NDG_REMOVEPROV).
@@ -330,11 +330,11 @@ F77_SUBROUTINE(ndg_copyprov)( INTEGER(iprov), LOGICAL(clense),
 */
 
    GENPTR_INTEGER(iprov)
-   GENPTR_LOGICAL(clense)
+   GENPTR_LOGICAL(cleanse)
    GENPTR_INTEGER(iprov2)
    GENPTR_INTEGER(status)
    *iprov2 = astP2I( ndgCopyProv( (NdgProvenance *) astI2P( *iprov ), 
-                                  F77_ISTRUE( *clense ) ? 1 : 0, status ) );
+                                  F77_ISTRUE( *cleanse ) ? 1 : 0, status ) );
 }
 
 F77_SUBROUTINE(ndg_countprov)( INTEGER(iprov), INTEGER(count) , 
@@ -628,7 +628,7 @@ F77_SUBROUTINE(ndg_hideprov)( INTEGER(iprov), INTEGER(ianc),
 
 *  Description:
 *     This function flags a specified ancestor as "hidden". The only
-*     affect this has is that the ancestor will not be included in 
+*     effect this has is that the ancestor will not be included in 
 *     Provenance structures created by the NDG_COPYPROV function.
 
 *  Arguments:
@@ -1084,7 +1084,7 @@ F77_SUBROUTINE(ndg_writeprov)( INTEGER(iprov), INTEGER(indf), INTEGER(status) ){
 /* Public C functions. */
 /* =================== */
 
-NdgProvenance *ndgCopyProv( NdgProvenance *prov, int clense, int *status ){
+NdgProvenance *ndgCopyProv( NdgProvenance *prov, int cleanse, int *status ){
 /*
 *+
 *  Name:
@@ -1094,7 +1094,7 @@ NdgProvenance *ndgCopyProv( NdgProvenance *prov, int clense, int *status ){
 *     Copy a Provenance structure, optionally removing any hidden ancestors.
 
 *  Invocation:
-*     NdgProvenance *ndgCopyProv( NdgProvenance *prov, int clense, 
+*     NdgProvenance *ndgCopyProv( NdgProvenance *prov, int cleanse, 
 *                                 int *status )
 
 *  Description:
@@ -1105,7 +1105,7 @@ NdgProvenance *ndgCopyProv( NdgProvenance *prov, int clense, int *status ){
 *  Arguments:
 *     prov
 *        A pointer to the provenance information to be Copyd.
-*     clense
+*     cleanse
 *        If non-zero, then any ancestors which have been hidden using
 *        ndgHideProv are removed from the returned Provenance structure
 *        (see ndgRemoveProv).
@@ -1193,7 +1193,7 @@ NdgProvenance *ndgCopyProv( NdgProvenance *prov, int clense, int *status ){
          }      
 
 /* If required, remove hidden ancestors. */
-         if( clense ) {
+         if( cleanse ) {
 
 /* Work backwards through the ancestors list. */
             for( ianc = newprov->nprov - 1; ianc >= 0; ianc-- ) {
@@ -1671,7 +1671,7 @@ void ndgHideProv( NdgProvenance *prov, int ianc, int *status ){
 
 *  Description:
 *     This function flags a specified ancestor as "hidden". The only
-*     affect this has is that the ancestor will not be included in 
+*     effect this has is that the ancestor will not be included in 
 *     Provenance structures created by the ndgCopyProv function.
 
 *  Arguments:
