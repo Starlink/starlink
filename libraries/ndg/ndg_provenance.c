@@ -35,15 +35,19 @@
 *     "NDG" string (C and F77 versions are documented individually in 
 *     separate prologues below):
 *
+*     - ndgCopyProv: Create a deep copy of a provenance structure.
 *     - ndgCountProv: Return the number of ancestors in a provenance structure.
 *     - ndgFormatProv: Format all the information in a provenance structure.
 *     - ndgFreeProv: Free the resources used by a provenance structure.
 *     - ndgGetProv: Get information about a specific ancestor.
+*     - ndgHideProv: Hide a specific ancestor.
+*     - ndgIsHiddenProv: See if an ancestor is hidden.
 *     - ndgModifyProv: Modify information stored for a specific ancestor.
 *     - ndgPutProv: Add a new ancestor NDF into a provenance structure.
 *     - ndgReadProv: Create a new provenance structure by reading a given NDF.
 *     - ndgRemoveProv: Remove ancestors from a provenance structure.
 *     - ndgRootProv: Identify root ancestors in a provenance structure.
+*     - ndgUnhideProv: Ensure an ancestor is not hidden.
 *     - ndgWriteProv: Writes a provenance structure out to an NDF.
 
 *  The PROVENANCE Extension:
@@ -126,6 +130,9 @@
 *        MORE component). Also, each ancestor in the PROVENANCE extension
 *        now stores NDF history information that is speciifc to that
 *        ancestor.
+*     6-JUL-2009 (DSB):
+*        Added facility for flagging ancestors as hidden, and producing a
+*        deep copy of a Provenance structure.
 */
 
 
@@ -146,6 +153,7 @@
 #define COMMAND_NAME "COMMAND"
 #define USER_NAME "USER"
 #define TEXT_NAME "TEXT"
+#define HIDDEN_NAME "HIDDEN"
 
 /* HDS types for components used in the PROVENANCE extension of an NDF */
 #define TEMP_TYPE "STARLINK_PROV"
@@ -231,6 +239,7 @@ typedef struct Prov {
                                   stored in the ancestor. */
    HistRec *hist_recs;         /* Array of history records */
    int nhrec;                  /* Number of history records */
+   int hidden;                 /* Should the ancestor NDF be hidden? */
 } Prov;
 
 
@@ -252,13 +261,15 @@ static AstKeyMap *ndg1FormatProv( Provenance *, int, int, AstKeyMap *, int * );
 static HDSLoc *ndg1GtAnc( HDSLoc *, size_t *, int * );
 static HDSLoc *ndg1TCopy( HDSLoc *, int * );
 static NdgProvenance *ndg1Encode( Provenance *, int * );
+static Prov *ndg1CopyProv( Prov *, int * );
 static Prov *ndg1FreeProv( Prov *, int * );
-static Prov *ndg1MakeProv( int, const char *, const char *, const char *, int, HDSLoc *, AstKeyMap *, Provenance *, int * );
+static Prov *ndg1MakeProv( int, const char *, const char *, const char *, int, HDSLoc *, AstKeyMap *, Provenance *, int, int * );
 static Provenance *ndg1Decode( NdgProvenance *, const char *, int * );
 static Provenance *ndg1FreeProvenance( Provenance *, int, int * );
 static Provenance *ndg1MakeProvenance( Prov *, int * );
 static Provenance *ndg1ReadProvenanceExtension( int, HDSLoc *, AstKeyMap *, const char *, int, int * );
 static char *ndg1GetTextComp( HDSLoc *, const char *, char *, size_t, int * );
+static int ndg1GetLogicalComp( HDSLoc *, const char *, int, int * );
 static const char *ndg1Date( int * );
 static int *ndg1ParentIndicies( Prov *, Provenance *, int *, int *, int * );
 static int ndg1FindAncestorIndex( Prov *, Provenance *, int * );
@@ -282,6 +293,49 @@ static void ndg1WriteProvenanceExtension( Provenance *, int, int * );
 
 /* Public F77 wrapper functions. */
 /* ============================= */
+
+F77_SUBROUTINE(ndg_copyprov)( INTEGER(iprov), LOGICAL(clense), 
+                              INTEGER(iprov2), INTEGER(status) ){
+/*
+*+
+*  Name:
+*     NDG_COPYPROV
+
+*  Purpose:
+*     Copy a Provenance structure, optionally removing any hidden ancestors.
+
+*  Language:
+*     Starlink ANSI C (callable from Fortran)
+
+*  Invocation:
+*     CALL NDG_COPYPROV( IPROV, CLENSE, IPROV2, STATUS )
+
+*  Description:
+*     This routine produces a deep copy of the supplied Provenance 
+*     structure, and then optionally uses NDG_REMOVEPROV to remove any 
+*     hidden ancestors from the copy. 
+
+*  Arguments:
+*     IPROV = INTEGER (Given)
+*        An identifier for a structure holding the provenance information 
+*        read from an NDF, as returned by NDG_READPROV.
+*     CLENSE = LOGICAL (Given)
+*        If .TRUE., then any ancestors which have been hidden using
+*        NDG_HIDEPROV are removed from the returned Provenance structure
+*        (see NDG_REMOVEPROV).
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*-
+*/
+
+   GENPTR_INTEGER(iprov)
+   GENPTR_LOGICAL(clense)
+   GENPTR_INTEGER(iprov2)
+   GENPTR_INTEGER(status)
+   *iprov2 = astP2I( ndgCopyProv( (NdgProvenance *) astI2P( *iprov ), 
+                                  F77_ISTRUE( *clense ) ? 1 : 0, status ) );
+}
 
 F77_SUBROUTINE(ndg_countprov)( INTEGER(iprov), INTEGER(count) , 
                                INTEGER(status) ){
@@ -557,6 +611,85 @@ F77_SUBROUTINE(ndg_getprov)( INTEGER(iprov), INTEGER(ianc),
 
    *km = astP2I( ndgGetProv( astI2P( *iprov ), *ianc, &more, status ) );
    datExportFloc( &more, 0, fmore_length, fmore, status );
+}
+
+F77_SUBROUTINE(ndg_hideprov)( INTEGER(iprov), INTEGER(ianc), 
+                              INTEGER(status) ){
+/*
+*+
+*  Name:
+*     NDG_HIDEPROV
+
+*  Purpose:
+*     Hide an ancestor in a provenance structure.
+
+*  Invocation:
+*     CALL NDG_HIDEPROV( IPROV, IANC, STATUS )
+
+*  Description:
+*     This function flags a specified ancestor as "hidden". The only
+*     affect this has is that the ancestor will not be included in 
+*     Provenance structures created by the NDG_COPYPROV function.
+
+*  Arguments:
+*     IPROV = INTEGER (Given)
+*        An identifier for a structure holding the provenance information 
+*        read from an NDF, as returned by ndgReadProv
+*     IANC = INTEGER (Given)
+*        The index of the ancestor NDF to be hidden. The value is used as an 
+*        index into the ANCESTORS array. An error will be reported if the 
+*        value is too large, or is less than 1 (the main NDF cannot be
+*        hidden).
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+*-
+*/
+   GENPTR_INTEGER(iprov)
+   GENPTR_INTEGER(ianc)
+   GENPTR_INTEGER(status)
+   ndgHideProv( astI2P( *iprov ), *ianc, status );
+}
+
+F77_SUBROUTINE(ndg_ishiddenprov)( INTEGER(iprov), INTEGER(ianc), 
+                                  LOGICAL(hidden), INTEGER(status) ){
+/*
+*+
+*  Name:
+*     NDG_ISHIDDENPROV
+
+*  Purpose:
+*     See if an ancestor in a provenance structure is hidden.
+
+*  Language:
+*     Starlink ANSI C (callable from Fortran)
+
+*  Invocation:
+*     CALL NDG_ISHIDDENPROV( IPROV, IANC, HIDDEN, STATUS )
+
+*  Description:
+*     This function returns a TRUE. value for HIDDEN if the specified 
+*     ancestor has been hidden. See NDG_HIDEPROV and NDG_COPYPROV.
+
+*  Arguments:
+*     IPROV = INTEGER (Given)
+*        An identifier for a structure holding the provenance information 
+*        read from an NDF, as returned by NDG_READPROV.
+*     IANC = INTEGER (Given)
+*        The index of the ancestor NDF to be checked. The value is used as 
+*        an index into the ANCESTORS array. An error will be reported if the 
+*        value is too large, or is less than 0.
+*     HIDDEN = LOGICAL (Returned)
+*        .TRUE. if the ancestor is hidden.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+*-
+*/
+   GENPTR_INTEGER(iprov)
+   GENPTR_INTEGER(ianc)
+   GENPTR_LOGICAL(hidden)
+   GENPTR_INTEGER(status)
+   *hidden = ndgIsHiddenProv( astI2P( *iprov ), *ianc, status ) ? 
+             F77_TRUE : F77_FALSE;
 }
 
 F77_SUBROUTINE(ndg_modifyprov)( INTEGER(iprov), INTEGER(ianc), INTEGER(km),
@@ -867,6 +1000,45 @@ F77_SUBROUTINE(ndg_rootprov)( INTEGER(iprov), INTEGER(km), INTEGER(status) ){
    *km = astP2I( ndgRootProv( astI2P( *iprov ), status ) );
 }
 
+F77_SUBROUTINE(ndg_unhideprov)( INTEGER(iprov), INTEGER(ianc), 
+                                INTEGER(status) ){
+/*
+*+
+*  Name:
+*     NDG_UNHIDEPROV
+
+*  Purpose:
+*     Un-hide an ancestor in a provenance structure.
+
+*  Invocation:
+*     CALL NDG_UNHIDEPROV( IPROV, IANC, STATUS )
+
+*  Description:
+*     This function ensures that a given ancestor is not flagged as 
+*     "hidden". See NDG_HIDEPROV and NDG_COPYPROV.
+
+*  Arguments:
+*     IPROV = INTEGER (Given)
+*        An identifier for a structure holding the provenance information 
+*        read from an NDF, as returned by ndgReadProv
+*     IANC = INTEGER (Given)
+*        The index of the ancestor NDF to be un-hidden. The value is used as 
+*        an index into the ANCESTORS array. An error will be reported if the 
+*        value is too large, or is less than 0.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     - No error is reported if the specified ancestor is not currently
+*     hidden (in which case this function returns without action).
+*-
+*/
+   GENPTR_INTEGER(iprov)
+   GENPTR_INTEGER(ianc)
+   GENPTR_INTEGER(status)
+   ndgUnhideProv( astI2P( *iprov ), *ianc, status );
+}
+
 F77_SUBROUTINE(ndg_writeprov)( INTEGER(iprov), INTEGER(indf), INTEGER(status) ){
 /*
 *+
@@ -911,6 +1083,148 @@ F77_SUBROUTINE(ndg_writeprov)( INTEGER(iprov), INTEGER(indf), INTEGER(status) ){
 
 /* Public C functions. */
 /* =================== */
+
+NdgProvenance *ndgCopyProv( NdgProvenance *prov, int clense, int *status ){
+/*
+*+
+*  Name:
+*     ndgCopyProv
+
+*  Purpose:
+*     Copy a Provenance structure, optionally removing any hidden ancestors.
+
+*  Invocation:
+*     NdgProvenance *ndgCopyProv( NdgProvenance *prov, int clense, 
+*                                 int *status )
+
+*  Description:
+*     This function produces a deep copy of the supplied Provenance 
+*     structure, and then optionally uses ndgRemoveProv to remove any 
+*     hidden ancestors from the copy. A pointer to the copy is returned.
+
+*  Arguments:
+*     prov
+*        A pointer to the provenance information to be Copyd.
+*     clense
+*        If non-zero, then any ancestors which have been hidden using
+*        ndgHideProv are removed from the returned Provenance structure
+*        (see ndgRemoveProv).
+*     status
+*        The global status.
+
+*  Returned Value:
+*     A pointer to the new Provenance structure, which should be freed
+*     using ndgFreeProv when no longer needed.
+*-
+*/
+
+/* Local Variables: */
+   NdgProvenance *result = NULL;
+   Prov *prov1;
+   Prov *prov2;
+   Provenance *newprov;
+   Provenance *provenance;
+   int *old_status;
+   int i;              
+   int ianc;
+   int index;
+
+/* Check the inherited status. */
+   if( *status != SAI__OK ) return result;
+
+/* Ensure AST uses the supplied status variable. */
+   old_status = astWatch( status );
+
+/* Decode the supplied identifier to obtain a pointer to a Provenance
+   structure. */
+   provenance = ndg1Decode( prov, "ndgCopyProv", status );
+   if( provenance ) {
+
+/* Allocate memory and store a copy of the supplied provenance
+   structure in it. */
+      newprov = astStore( NULL, provenance, sizeof( Provenance ) );
+      if( *status == SAI__OK ){
+
+/* For safety, nullify all pointers in the new Provenance. */
+         newprov->main = NULL;
+         newprov->provs = NULL;
+
+/* Allocate an array to hold the Prov pointers. */
+         newprov->provs = astMalloc( sizeof( Prov * )*( newprov->nprov ) );
+
+/* Loop round each Prov structure . */
+         for( ianc = 0; ianc < newprov->nprov; ianc++ ) {
+
+/* Create a deep copy of the Prov structure. */
+            newprov->provs[ ianc ] = ndg1CopyProv( provenance->provs[ ianc ],
+                                                   status );
+
+/* If this Prov structure describes the main NDF, store a pointer to it
+   in the new Provenance structure. */
+            if( provenance->provs[ ianc ] == provenance->main ) {
+               newprov->main = newprov->provs[ ianc ];
+            }
+         }
+
+/* Now loop through each ancestor, storing pointers to the children and
+   parents in the new provenance structure. */
+         for( ianc = 0; ianc < newprov->nprov; ianc++ ) {
+
+/* Get pointers to the old and new Prov structures describing the ancestor 
+   with index "ianc". */
+            prov1 = provenance->provs[ ianc ];
+            prov2 = newprov->provs[ ianc ];
+
+/* For each child of the "prov1" ancestor,  find its index by searching
+   the old provenance for the same pointer. Then store a pointer to the 
+   corresponding Prov structure within the new provenance. */
+            for( i = 0; i < prov1->nchild; i++ ) {
+               index = ndg1FindAncestorIndex( prov1->children[ i ], 
+                                              provenance, status );
+               prov2->children[ i ] = newprov->provs[ index ];
+            }
+      
+/* Do the same for the parents. */
+            for( i = 0; i < prov1->nparent; i++ ) {
+               index = ndg1FindAncestorIndex( prov1->parents[ i ], 
+                                              provenance, status );
+               prov2->parents[ i ] = newprov->provs[ index ];
+            }
+         }      
+
+/* If required, remove hidden ancestors. */
+         if( clense ) {
+
+/* Work backwards through the ancestors list. */
+            for( ianc = newprov->nprov - 1; ianc >= 0; ianc-- ) {
+
+/* If the ancestor has been hidden, remove it. */         
+               if( newprov->provs[ ianc ]->hidden ) ndg1Rmprv( newprov, ianc, 
+                                                               status );
+            }
+
+/* Indicate that the indices of the parents of each prov structure needs
+   to be re-calculated to take account of the removal of the ancestors. */
+            ndg1ResetIndices( newprov, status );
+         }
+      }
+
+/* If no error has occurred, encode the pointer to the new Provenance into 
+   an AST KeyMap pointer to be returned. Otherwise free the new
+   Provenance structure. */
+      if( *status == SAI__OK ) {
+         result = ndg1Encode( newprov, status );
+      } else {
+         newprov = ndg1FreeProvenance( newprov, 1, status );
+      }
+   }
+
+/* Re-instate the original AST status variable. */
+   astWatch( old_status );
+
+/* Return the result. */
+   return result;
+}
 
 int ndgCountProv( NdgProvenance *prov, int *status ){
 /*
@@ -1341,6 +1655,147 @@ AstKeyMap *ndgGetProv( NdgProvenance *prov, int ianc, HDSLoc **more,
    astWatch( old_status );
 
    return result;
+}
+
+void ndgHideProv( NdgProvenance *prov, int ianc, int *status ){
+/*
+*+
+*  Name:
+*     ndgHideProv
+
+*  Purpose:
+*     Hide an ancestor in a provenance structure.
+
+*  Invocation:
+*     ndgHideProv( NdgProvenance *prov, int ianc, int *status )
+
+*  Description:
+*     This function flags a specified ancestor as "hidden". The only
+*     affect this has is that the ancestor will not be included in 
+*     Provenance structures created by the ndgCopyProv function.
+
+*  Arguments:
+*     prov
+*        An identifier for a structure holding the provenance information 
+*        read from an NDF, as returned by ndgReadProv
+*     ianc
+*        The index of the ancestor NDF to be hidden. The value is used as an 
+*        index into the ANCESTORS array. An error will be reported if the 
+*        value is too large, or is less than 1 (the main NDF cannot be
+*        hidden).
+*     status
+*        The global status.
+*-
+*/
+
+/* Local variables: */
+   Provenance *provenance = NULL;
+   int *old_status;
+
+/* Check the inherited status value. */
+   if( *status != SAI__OK ) return;
+
+/* Ensure AST uses the supplied status variable. */
+   old_status = astWatch( status );
+
+/* Report an error if "ianc" is zero. */
+   if( ianc == 0 ) {      
+      *status = SAI__ERROR;
+      errRep( " ", "ndgHideProv: Ancestor zero (the main NDF) cannot be "
+              "hidden.", status );
+   }
+
+/* Decode the supplied identifier to obtain a pointer to a Provenance
+   structure. */
+   provenance = ndg1Decode( prov, "ndgHideProv", status );
+   if( provenance ) {
+
+/* Report an error if "ianc" is out of bounds. */
+      if( ianc < 1 || ianc >= provenance->nprov ) {
+         *status = SAI__ERROR;
+         msgSeti( "I", ianc );
+         msgSeti( "N", provenance->nprov );
+         errRep( " ", "ndgHideProv: Ancestor index ^I is illegal: the NDF "
+                 "has ^N ancestor(s).", status );
+
+/* Otherwise, set the flag. */
+      } else {
+         provenance->provs[ ianc ]->hidden = 1;
+      }
+   }
+
+/* Re-instate the original AST status variable. */
+   astWatch( old_status );
+}
+
+int ndgIsHiddenProv( NdgProvenance *prov, int ianc, int *status ){
+/*
+*+
+*  Name:
+*     ndgIsHiddenProv
+
+*  Purpose:
+*     See if an ancestor in a provenance structure is hidden.
+
+*  Invocation:
+*     int ndgIsHiddenProv( NdgProvenance *prov, int ianc, int *status );
+
+*  Description:
+*     This function returns a non-zero value if the specified ancestor
+*     has been hidden. See ndgHideProv and ndgCopyProv.
+
+*  Arguments:
+*     prov
+*        An identifier for a structure holding the provenance information 
+*        read from an NDF, as returned by ndgReadProv
+*     ianc
+*        The index of the ancestor NDF to be checked. The value is used as 
+*        an index into the ANCESTORS array. An error will be reported if the 
+*        value is too large, or is less than 0.
+*     status
+*        The global status.
+*-
+*/
+
+/* Local variables: */
+   Provenance *provenance = NULL;
+   int *old_status;
+   int result;
+
+/* Initialise */
+   result = 0;
+
+/* Check the inherited status value. */
+   if( *status != SAI__OK ) return result;
+
+/* Ensure AST uses the supplied status variable. */
+   old_status = astWatch( status );
+
+/* Decode the supplied identifier to obtain a pointer to a Provenance
+   structure. */
+   provenance = ndg1Decode( prov, "ndgUnhideProv", status );
+   if( provenance ) {
+
+/* Report an error if "ianc" is out of bounds. */
+      if( ianc < 0 || ianc >= provenance->nprov ) {
+         *status = SAI__ERROR;
+         msgSeti( "I", ianc );
+         msgSeti( "N", provenance->nprov );
+         errRep( " ", "ndgIsHiddenProv: Ancestor index ^I is illegal: the NDF "
+                 "has ^N ancestor(s).", status );
+
+/* Otherwise, return the flag. */
+      } else {
+         result = provenance->provs[ ianc ]->hidden;
+      }
+   }
+
+/* Re-instate the original AST status variable. */
+   astWatch( old_status );
+
+/* Return the result. */
+   return result;
+
 }
 
 void ndgModifyProv( NdgProvenance *prov, int ianc, AstKeyMap *km, 
@@ -1881,6 +2336,72 @@ AstKeyMap *ndgRootProv( NdgProvenance *prov, int *status ){
    return result;
 }
 
+void ndgUnhideProv( NdgProvenance *prov, int ianc, int *status ){
+/*
+*+
+*  Name:
+*     ndgUnhideProv
+
+*  Purpose:
+*     Un-hide an ancestor in a provenance structure.
+
+*  Invocation:
+*     ndgUnhideProv( NdgProvenance *prov, int ianc, int *status )
+
+*  Description:
+*     This function ensures that a given ancestor is not flagged as 
+*     "hidden". See ndgHideProv and ndgCopyProv.
+
+*  Arguments:
+*     prov
+*        An identifier for a structure holding the provenance information 
+*        read from an NDF, as returned by ndgReadProv
+*     ianc
+*        The index of the ancestor NDF to be un-hidden. The value is used as 
+*        an index into the ANCESTORS array. An error will be reported if the 
+*        value is too large, or is less than 0.
+*     status
+*        The global status.
+
+*  Notes:
+*     - No error is reported if the specified ancestor is not currently
+*     hidden (in which case this function returns without action).
+*-
+*/
+
+/* Local variables: */
+   Provenance *provenance = NULL;
+   int *old_status;
+
+/* Check the inherited status value. */
+   if( *status != SAI__OK ) return;
+
+/* Ensure AST uses the supplied status variable. */
+   old_status = astWatch( status );
+
+/* Decode the supplied identifier to obtain a pointer to a Provenance
+   structure. */
+   provenance = ndg1Decode( prov, "ndgUnhideProv", status );
+   if( provenance ) {
+
+/* Report an error if "ianc" is out of bounds. */
+      if( ianc < 0 || ianc >= provenance->nprov ) {
+         *status = SAI__ERROR;
+         msgSeti( "I", ianc );
+         msgSeti( "N", provenance->nprov );
+         errRep( " ", "ndgUnhideProv: Ancestor index ^I is illegal: the NDF "
+                 "has ^N ancestor(s).", status );
+
+/* Otherwise, clear the flag. */
+      } else {
+         provenance->provs[ ianc ]->hidden = 0;
+      }
+   }
+
+/* Re-instate the original AST status variable. */
+   astWatch( old_status );
+}
+
 void ndgWriteProv( NdgProvenance *prov, int indf, int *status ){
 /*
 *+
@@ -2210,6 +2731,121 @@ static void ndg1CopyComps( HDSLoc *loc1, HDSLoc *loc2, int *status ){
 /* Annull the source component locator. */
       datAnnul( &loc, status );
    }
+}
+
+static Prov *ndg1CopyProv( Prov *prov, int *status ){
+/*
+*  Name:
+*     ndg1CopyProv
+
+*  Purpose:
+*     Make a deep copy of an existing Prov structure.
+
+*  Invocation:
+*     Prov *ndg1CopyProv( Prov *prov, int *status )
+
+*  Description:
+*     This function allocates dynamic memory holding a deep copy of the
+*     supplied Prov structure.
+
+*  Arguments:
+*     prov
+*        The Prov structure to be copied.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     Pointer to the new Prov structure. It should be freed using
+*     ndg1FreeProv when no longer needed.
+
+*/
+
+/* Local Variables: */
+   Prov *result;
+   size_t len;
+   int i;
+   HistRec *inrec;
+   HistRec *outrec;
+
+/* Initialise */
+   result = NULL;
+
+/* Check the inherited status value. */
+   if( *status != SAI__OK ) return result;
+
+/* Allocate memory and store a copy of the supplied Prov structure. */
+   result = astStore( NULL, prov, sizeof( Prov ) );
+   if( result ) {
+
+/* For safety, first nullify all pointers in the copy. */
+      result->path = NULL;             
+      result->date = NULL;             
+      result->creator = NULL;          
+      result->more = NULL;           
+      result->parents = NULL;  
+      result->children = NULL; 
+      result->hist_recs = NULL;     
+
+/* Produce copies of all the strings in the Prov structure. */
+      len = prov->path ? strlen( prov->path ) + 1 : 0;
+      result->path = astStore( NULL, prov->path, len*sizeof( char ) );
+
+      len = prov->date ? strlen( prov->date ) + 1 : 0;
+      result->date = astStore( NULL, prov->date, len*sizeof( char ) );
+
+      len = prov->creator ? strlen( prov->creator ) + 1 : 0;
+      result->creator = astStore( NULL, prov->creator, len*sizeof( char ) );
+
+/* Store a deep copy of the "more" structure in a temporary HDS object.
+   This copies all the top-level contents of "more" into the top-level
+   of the temporary HDS object. */
+      if( prov->more ) {
+         datTemp( TEMP_TYPE, 0, NULL, &( result->more ), status );
+         ndg1CopyComps( prov->more, result->more, status );
+      }
+
+/* Create arrays to hold the parent and children pointers, and fill them
+   with NULL pointers. */
+      result->parents = astMalloc( sizeof( Prov * )*( prov->nparent ) );
+      if( result->parents ) {
+         for( i = 0; i < prov->nparent; i++ ) result->parents[ i ] = NULL;
+      }
+
+      result->children = astMalloc( sizeof( Prov * )*( prov->nchild ) );
+      if( result->children ) {
+         for( i = 0; i < prov->nchild; i++ ) result->children[ i ] = NULL;
+      }
+
+/* Create an array of history records. */
+      result->hist_recs = astMalloc( sizeof( HistRec )*( prov->nhrec ) );
+      if( result->hist_recs ) {
+
+/* Now store copies of all the History records. */
+         outrec = result->hist_recs;
+         inrec = prov->hist_recs;
+         for( i = 0; i < prov->nhrec; i++, outrec++, inrec++ ) {
+         
+            len = inrec->date ? strlen( inrec->date ) + 1 : 0;
+            outrec->date = astStore( NULL, inrec->date, len*sizeof( char ) );
+      
+            len = inrec->command ? strlen( inrec->command ) + 1 : 0;
+            outrec->command = astStore( NULL, inrec->command, len*sizeof( char ) );
+      
+            len = inrec->text ? strlen( inrec->text ) + 1 : 0;
+            outrec->text = astStore( NULL, inrec->text, len*sizeof( char ) );
+      
+            len = inrec->user ? strlen( inrec->user ) + 1 : 0;
+            outrec->user = astStore( NULL, inrec->user, len*sizeof( char ) );
+         
+         }
+      }
+   }
+
+/* If anything went wrong attempt to free the new Prov structure. */
+   if( !astOK ) result = ndg1FreeProv( result, status );
+
+/* Return the result */
+   return result;
 }
 
 static const char *ndg1Date( int *status ){
@@ -3033,6 +3669,70 @@ static Provenance *ndg1FreeProvenance( Provenance *provenance,
    return astFree( provenance );
 }
 
+static int ndg1GetLogicalComp( HDSLoc *loc, const char *comp, int def, 
+                               int *status ){
+/*
+*  Name:
+*     ndg1GetLogicalComp
+
+*  Purpose:
+*     Return a pointer to a string holding the value of an HDS _CHAR component
+
+*  Invocation:
+*     int ndg1GetLogicalComp( HDSLoc *loc, const char *comp, int def, 
+*                             int *status )
+
+*  Description:
+*     This function reads the value of a named logical component in a
+*     supplied HDS structure. If the component exists its value is 
+*     returned. Otherwise, the supplied default value is returned (without 
+*     error).
+
+*  Arguments:
+*     loc
+*        Locator for the HDS structure.
+*     comp 
+*        The name of the component to read.
+*     def
+*        The default value to return, if the named component does not
+*        exist in the supplied HDS structure.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     The logical value; zero or non-zero.
+
+*/
+
+/* Local Variables: */
+   HDSLoc *cloc = NULL;
+   int there;
+   int result;
+
+/* Initialise */
+   result = def;
+
+/* Check the inherited status value. */
+   if( *status != SAI__OK ) return result;
+
+/* Does the component exist? If not return with the NULL result. */
+   datThere( loc, comp, &there, status );
+   if( there ) {
+
+/* If it is there, get a locator to it. */
+      datFind( loc, comp, &cloc, status );
+
+/* Read the value of the component into the results buffer. */
+      datGet0L( cloc, &result, status );
+
+/* Annul the component locator. */
+      datAnnul( &cloc, status ); 
+   }
+
+/* Return the result. */
+   return result;
+}
+
 static char *ndg1GetTextComp( HDSLoc *loc, const char *comp, char *buf, 
                               size_t buflen, int *status ){
 /*
@@ -3390,7 +4090,7 @@ static int ndg1IntCmp( const void *a, const void *b ){
 static Prov *ndg1MakeProv( int index, const char *path, const char *date, 
                            const char *creator, int hhash, HDSLoc *more, 
                            AstKeyMap *more2, Provenance *provenance, 
-                           int *status ){
+                           int hidden, int *status ){
 /*
 *  Name:
 *     ndg1MakeProv
@@ -3402,7 +4102,7 @@ static Prov *ndg1MakeProv( int index, const char *path, const char *date,
 *     Prov *ndg1MakeProv( int index, const char *path, const char *date, 
 *                         const char *creator, int hhash, HDSLoc *more, 
 *                         AstKeyMap *more2, Provenance *provenance, 
-*                         int *status )
+*                         int hidden, int *status )
 
 *  Description:
 *     This function allocates dynamic memory to hold a new Prov structure,
@@ -3443,6 +4143,8 @@ static Prov *ndg1MakeProv( int index, const char *path, const char *date,
 *     provenance
 *        Pointer to an existing Provenance structure to which the new
 *        Prov structure will be added, or NULL.
+*     hidden
+*        Should the ancestor be flagged as hidden?
 *     status
 *        Pointer to the inherited status variable.
 
@@ -3478,6 +4180,9 @@ static Prov *ndg1MakeProv( int index, const char *path, const char *date,
 
       len = creator ? strlen( creator ) + 1 : 0;
       result->creator = astStore( NULL, creator, len*sizeof( char ) );
+
+/* Store the "hidden" flag. */
+      result->hidden = hidden;
 
 /* Store a deep copy of the "more" structure in a temporary HDS object.
    This copies all the top-level contents of "more" into the top-level
@@ -4186,6 +4891,7 @@ static Provenance *ndg1ReadProvenanceExtension( int indf, HDSLoc *more,
    hdsdim  subs;
    int *parents = NULL;
    int hhash;
+   int hidden;
    int i;
    int irec;
    int j;
@@ -4234,7 +4940,7 @@ static Provenance *ndg1ReadProvenanceExtension( int indf, HDSLoc *more,
 
 /* Create a Prov structure to describe the main NDF. */
    main_prov = ndg1MakeProv( 0, path, date, creator, hhash, more, more2, 
-                             NULL, status );
+                             NULL, 0, status );
 
 /* Create the basic Provenance structure. As yet it only contains
    information about the main NDF. */
@@ -4250,13 +4956,14 @@ static Provenance *ndg1ReadProvenanceExtension( int indf, HDSLoc *more,
          dim[ 0 ] = i;
          datCell( aloc, 1, dim, &cloc, status );
 
-/* Get the PATH, DATE and CREATOR components. */
+/* Get the PATH, DATE, CREATOR and HIDDEN components. */
          date = ndg1GetTextComp( cloc, DATE_NAME, date_buf, 
                                  DATE_LEN, status );
          path = ndg1GetTextComp( cloc, PATH_NAME, path_buf,
                                  PATH_LEN, status );
          creator = ndg1GetTextComp( cloc, CREATOR_NAME, creator_buf,
                                  CREATOR_LEN, status );
+         hidden = ndg1GetLogicalComp( cloc, HIDDEN_NAME, 0, status );
 
 /* If the ancestor has a MORE structure, get a locator for it. */
          datThere( cloc, MORE_NAME, &there, status );
@@ -4269,7 +4976,7 @@ static Provenance *ndg1ReadProvenanceExtension( int indf, HDSLoc *more,
 /* Create a Prov structure to describe the current ancestor, and add it
    into the returned Provenance structure. */
          anc_prov = ndg1MakeProv( i, path, date, creator, 0, mloc, NULL,
-                                  result, status );
+                                  result, hidden, status );
 
 /* We now copy any History records from the ancestor into the Prov
    structure. */
@@ -4775,6 +5482,14 @@ static void ndg1WriteProvenanceExtension( Provenance *provenance, int indf,
          if( date ) {
             len = astChrLen( date );
             if( len ) ndg1PutTextComp( cloc, DATE_NAME, date, status );
+         }
+
+/* Store the hidden flag (but only if the ancestor is hidden). */
+         if( prov->hidden ) {
+            datNew0L( cloc, HIDDEN_NAME, status );
+            datFind( cloc, HIDDEN_NAME, &loc, status );
+            datPut0L( loc, 1, status );
+            datAnnul( &loc, status );
          }
 
 /* Store the creator (the same code for both main and ancestor NDFs). */

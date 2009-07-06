@@ -2260,17 +2260,21 @@ and inserting an underscore after the initial ``NDG'' string (C and F77
 versions are documented individually in separate prologues below):
 
 \begin{itemize}
+   \item  ndgCopyProv: Create a deep copy of a provenance structure.
    \item  ndgBegpv: Begin an NDF provenance block.
    \item  ndgCountProv: Return the number of ancestors in a provenance structure.
    \item  ndgFormatProv: Format all the information in a provenance structure.
    \item  ndgEndpv: End an NDF provenance block.
    \item  ndgFreeProv: Free the resources used by a provenance structure.
    \item  ndgGetProv: Get information about a specific ancestor.
+   \item  ndgHideProv: Hide a specific ancestor.
+   \item  ndgIsHiddenProv: See if an ancestor is hidden.
    \item  ndgModifyProv: Modify information stored for a specific ancestor.
    \item  ndgPutProv: Add a new ancestor NDF into a provenance structure.
    \item  ndgReadProv: Create a new provenance structure by reading a given NDF.
    \item  ndgRemoveProv: Remove ancestors from a provenance structure.
    \item  ndgRootProv: Identify root ancestors in a provenance structure.
+   \item  ndgUnhideProv: Ensure an ancestor is not hidden.
    \item  ndgWriteProv: Writes a provenance structure out to an NDF.
 \end{itemize}
 
@@ -2349,7 +2353,40 @@ another statement of the software that performed the action.
       }
    }
 }
-
+\sstroutine{
+   NDG\_COPYPROV
+}{
+   Copy a Provenance structure, optionally removing any hidden ancestors
+}{
+   \sstdescription{
+      This routine produces a deep copy of the supplied Provenance
+      structure, and then optionally uses NDG\_REMOVEPROV to remove any
+      hidden ancestors from the copy.
+   }
+   \sstinvocation{
+      CALL NDG\_COPYPROV( IPROV, CLENSE, IPROV2, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IPROV = INTEGER (Given)
+      }{
+         An identifier for a structure holding the provenance information
+         read from an NDF, as returned by NDG\_READPROV.
+      }
+      \sstsubsection{
+         CLENSE = LOGICAL (Given)
+      }{
+         If .TRUE., then any ancestors which have been hidden using
+         NDG\_HIDEPROV are removed from the returned Provenance structure
+         (see NDG\_REMOVEPROV).
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
 \sstroutine{
    NDG\_COUNTPROV
 }{
@@ -2381,7 +2418,6 @@ another statement of the software that performed the action.
       }
    }
 }
-
 \sstroutine{
    NDG\_ENDPV
 }{
@@ -2427,7 +2463,6 @@ another statement of the software that performed the action.
       }
    }
 }
-
 \sstroutine{
    NDG\_FORMATPROV
 }{
@@ -2674,6 +2709,79 @@ another statement of the software that performed the action.
          returned if the requested ancestor has no MORE component. Note,
          the returned object will be assigned an arbitrary HDS Name, which
          will not in general be {\tt "}MORE{\tt "}.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   NDG\_HIDEPROV
+}{
+   Hide an ancestor in a provenance structure
+}{
+   \sstdescription{
+      This function flags a specified ancestor as {\tt "}hidden{\tt "}. The only
+      affect this has is that the ancestor will not be included in
+      Provenance structures created by the NDG\_COPYPROV function.
+   }
+   \sstinvocation{
+      CALL NDG\_HIDEPROV( IPROV, IANC, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IPROV = INTEGER (Given)
+      }{
+         An identifier for a structure holding the provenance information
+         read from an NDF, as returned by ndgReadProv
+      }
+      \sstsubsection{
+         IANC = INTEGER (Given)
+      }{
+         The index of the ancestor NDF to be hidden. The value is used as an
+         index into the ANCESTORS array. An error will be reported if the
+         value is too large, or is less than 1 (the main NDF cannot be
+         hidden).
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   NDG\_ISHIDDENPROV
+}{
+   See if an ancestor in a provenance structure is hidden
+}{
+   \sstdescription{
+      This function returns a TRUE. value for HIDDEN if the specified
+      ancestor has been hidden. See NDG\_HIDEPROV and NDG\_COPYPROV.
+   }
+   \sstinvocation{
+      CALL NDG\_ISHIDDENPROV( IPROV, IANC, HIDDEN, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IPROV = INTEGER (Given)
+      }{
+         An identifier for a structure holding the provenance information
+         read from an NDF, as returned by NDG\_READPROV.
+      }
+      \sstsubsection{
+         IANC = INTEGER (Given)
+      }{
+         The index of the ancestor NDF to be checked. The value is used as
+         an index into the ANCESTORS array. An error will be reported if the
+         value is too large, or is less than 0.
+      }
+      \sstsubsection{
+         HIDDEN = LOGICAL (Returned)
+      }{
+         .TRUE. if the ancestor is hidden.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -2964,6 +3072,47 @@ another statement of the software that performed the action.
    }
 }
 \sstroutine{
+   NDG\_UNHIDEPROV
+}{
+   Un-hide an ancestor in a provenance structure
+}{
+   \sstdescription{
+      This function ensures that a given ancestor is not flagged as
+      {\tt "}hidden{\tt "}. See NDG\_HIDEPROV and NDG\_COPYPROV.
+   }
+   \sstinvocation{
+      CALL NDG\_UNHIDEPROV( IPROV, IANC, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IPROV = INTEGER (Given)
+      }{
+         An identifier for a structure holding the provenance information
+         read from an NDF, as returned by ndgReadProv
+      }
+      \sstsubsection{
+         IANC = INTEGER (Given)
+      }{
+         The index of the ancestor NDF to be un-hidden. The value is used as
+         an index into the ANCESTORS array. An error will be reported if the
+         value is too large, or is less than 0.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         No error is reported if the specified ancestor is not currently
+         hidden (in which case this function returns without action).
+      }
+   }
+}
+\sstroutine{
    NDG\_WRITEPROV
 }{
    Write provenance information to an NDF
@@ -2997,6 +3146,7 @@ another statement of the software that performed the action.
    }
 }
 
+
 \newpage
 \subsection{Full C Function Specifications}
 \sstroutine{
@@ -3022,7 +3172,50 @@ another statement of the software that performed the action.
       }
    }
 }
-
+\sstroutine{
+   ndgCopyProv
+}{
+   Copy a Provenance structure, optionally removing any hidden ancestors
+}{
+   \sstdescription{
+      This function produces a deep copy of the supplied Provenance
+      structure, and then optionally uses ndgRemoveProv to remove any
+      hidden ancestors from the copy. A pointer to the copy is returned.
+   }
+   \sstinvocation{
+      NdgProvenance $*$ndgCopyProv( NdgProvenance $*$prov, int clense,
+                                  int $*$status )
+   }
+   \sstarguments{
+      \sstsubsection{
+         prov
+      }{
+         A pointer to the provenance information to be Copyd.
+      }
+      \sstsubsection{
+         clense
+      }{
+         If non-zero, then any ancestors which have been hidden using
+         ndgHideProv are removed from the returned Provenance structure
+         (see ndgRemoveProv).
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         A pointer to the new Provenance structure, which should be freed
+      }{
+      }
+      \sstsubsection{
+         using ndgFreeProv when no longer needed.
+      }{
+      }
+   }
+}
 \sstroutine{
    ndgCountProv
 }{
@@ -3104,7 +3297,6 @@ another statement of the software that performed the action.
       }
    }
 }
-
 \sstroutine{
    ndgFormatProv
 }{
@@ -3406,6 +3598,74 @@ another statement of the software that performed the action.
       \sstsubsection{
          the current AST Object context).
       }{
+      }
+   }
+}
+\sstroutine{
+   ndgHideProv
+}{
+   Hide an ancestor in a provenance structure
+}{
+   \sstdescription{
+      This function flags a specified ancestor as {\tt "}hidden{\tt "}. The only
+      affect this has is that the ancestor will not be included in
+      Provenance structures created by the ndgCopyProv function.
+   }
+   \sstinvocation{
+      ndgHideProv( NdgProvenance $*$prov, int ianc, int $*$status )
+   }
+   \sstarguments{
+      \sstsubsection{
+         prov
+      }{
+         An identifier for a structure holding the provenance information
+         read from an NDF, as returned by ndgReadProv
+      }
+      \sstsubsection{
+         ianc
+      }{
+         The index of the ancestor NDF to be hidden. The value is used as an
+         index into the ANCESTORS array. An error will be reported if the
+         value is too large, or is less than 1 (the main NDF cannot be
+         hidden).
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   ndgIsHiddenProv
+}{
+   See if an ancestor in a provenance structure is hidden
+}{
+   \sstdescription{
+      This function returns a non-zero value if the specified ancestor
+      has been hidden. See ndgHideProv and ndgCopyProv.
+   }
+   \sstinvocation{
+      int ndgIsHiddenProv( NdgProvenance $*$prov, int ianc, int $*$status );
+   }
+   \sstarguments{
+      \sstsubsection{
+         prov
+      }{
+         An identifier for a structure holding the provenance information
+         read from an NDF, as returned by ndgReadProv
+      }
+      \sstsubsection{
+         ianc
+      }{
+         The index of the ancestor NDF to be checked. The value is used as
+         an index into the ANCESTORS array. An error will be reported if the
+         value is too large, or is less than 0.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
       }
    }
 }
@@ -3729,6 +3989,47 @@ another statement of the software that performed the action.
    }
 }
 \sstroutine{
+   ndgUnhideProv
+}{
+   Un-hide an ancestor in a provenance structure
+}{
+   \sstdescription{
+      This function ensures that a given ancestor is not flagged as
+      {\tt "}hidden{\tt "}. See ndgHideProv and ndgCopyProv.
+   }
+   \sstinvocation{
+      ndgUnhideProv( NdgProvenance $*$prov, int ianc, int $*$status )
+   }
+   \sstarguments{
+      \sstsubsection{
+         prov
+      }{
+         An identifier for a structure holding the provenance information
+         read from an NDF, as returned by ndgReadProv
+      }
+      \sstsubsection{
+         ianc
+      }{
+         The index of the ancestor NDF to be un-hidden. The value is used as
+         an index into the ANCESTORS array. An error will be reported if the
+         value is too large, or is less than 0.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         No error is reported if the specified ancestor is not currently
+         hidden (in which case this function returns without action).
+      }
+   }
+}
+\sstroutine{
    ndgWriteProv
 }{
    Write provenance information to an NDF
@@ -3760,9 +4061,6 @@ another statement of the software that performed the action.
       }
    }
 }
-
-
-
 
 \section{Changes Introduced in NDG Version 5.7}
 \begin{itemize}

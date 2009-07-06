@@ -1,5 +1,10 @@
 1 NDG_library
 
+Version 5.7
+   o The entire API for provenance handling has been re-written.
+
+   o Provenance can now store NDF history.
+
 Version 5.6
 
    o A new C function ndgRmprvs has been added, that removes multiple
