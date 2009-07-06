@@ -4760,6 +4760,17 @@ NdgProvenance_DESTROY( prov )
 
 MODULE = NDF PACKAGE = NdgProvenancePtr PREFIX = ndg
 
+NdgProvenance *
+ndgCopyProv( prov, cleanse, status )
+  NdgProvenance * prov
+  int cleanse
+  int status
+ CODE:
+  RETVAL = ndgCopyProv( prov, cleanse, &status );
+ OUTPUT:
+  status
+  RETVAL
+
 int
 ndgCountProv( prov, status )
   NdgProvenance * prov
@@ -4832,5 +4843,40 @@ ndgRemoveProv( prov, anc, status )
  CODE:
   nanc = av_len( (AV*)SvRV( ST(1) ) ) + 1; /* av_len is equivalent of $#a */
   ndgRemoveProv( prov, nanc, anc, &status );
+ OUTPUT:
+  status
+
+void
+ndgHideProv( prov, ianc, status )
+  NdgProvenance * prov
+  int ianc
+  int status
+ PROTOTYPE: $$$
+ CODE:
+  ndgHideProv( prov, ianc, &status );
+ OUTPUT:
+  status
+
+bool
+ndgIsHiddenProv( prov, ianc, status )
+  NdgProvenance * prov
+  int ianc
+  int status
+ PROTOTYPE: $$$
+ CODE:
+  RETVAL = ndgIsHiddenProv( prov, ianc, &status );
+ OUTPUT:
+  RETVAL
+  status
+
+
+void
+ndgUnhideProv( prov, ianc, status )
+  NdgProvenance * prov
+  int ianc
+  int status
+ PROTOTYPE: $$$
+ CODE:
+  ndgUnhideProv( prov, ianc, &status );
  OUTPUT:
   status
