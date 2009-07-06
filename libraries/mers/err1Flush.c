@@ -205,13 +205,13 @@ void err1Flush ( int usemsg, int * errbel, int * status ) {
     if (nomsg) {
       /* Check if any lines have been delivered. */
       if (opcnt == 0) {
-	/*  Check whether a bell character is to be delivered: if so,
-	 *  deliver it and reset the bell flag. */
-	if (!usemsg && *errbel) {
-	  err1Bell( &pstat );
-	  *errbel = 0;
-	}
-	emsAnnul( &istat );
+        /*  Check whether a bell character is to be delivered: if so,
+         *  deliver it and reset the bell flag. */
+        if (!usemsg && *errbel) {
+          err1Bell( &pstat );
+          *errbel = 0;
+        }
+        emsAnnul( &istat );
       }
 
       /* Repeat the loop. Next will be 'no more messages' but this is needed
@@ -236,7 +236,7 @@ void err1Flush ( int usemsg, int * errbel, int * status ) {
     } else {
 
       /* End of messages from emsEload */
-	break;
+      break;
     }
   }
 
