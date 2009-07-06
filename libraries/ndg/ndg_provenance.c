@@ -1,5 +1,4 @@
 /*
-*+
 *  Name:
 *     ndg_provenance.c
 
@@ -127,7 +126,6 @@
 *        MORE component). Also, each ancestor in the PROVENANCE extension
 *        now stores NDF history information that is speciifc to that
 *        ancestor.
-*-
 */
 
 
