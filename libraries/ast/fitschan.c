@@ -13190,9 +13190,9 @@ f     AST_SETFITSU
 c     first find the card describing the keyword using astFindFits, and
 c     then use one of the astSetFits<X> family to over-write the old value.
 f     first find the card describing the keyword using AST_FINDFITS, and
-f     then use one of the AST_FITSET<X> family to over-write the old value.
+f     then use one of the AST_SETFITS<X> family to over-write the old value.
 *     -  If, on exit, there are no cards following the card written by
-d     this function, then the current card is left pointing at the 
+c     this function, then the current card is left pointing at the 
 f     this routine, then the current card is left pointing at the 
 *     "end-of-file".
 *     -  An error will be reported if the keyword name does not conform
