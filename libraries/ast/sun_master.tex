@@ -24,7 +24,7 @@ f+
 \newcommand{\stardocnumber}    {210.26}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {27th April 2009}
+\newcommand{\stardocdate}      {7th July 2009}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -21722,6 +21722,16 @@ occurred in the AST library between versions V5.1 and V5.2 (the
 current version):
 
 \begin{enumerate}
+
+\item A new method called 
+c+
+astSetFitsCM 
+c-
+f+
+AST\_SETFITSCM
+f-
+has been added to the FitsChan class. It stores a pure comment card in a
+FitsChan (that is, a card with no keyword name or equals sign).
 
 \item A new attribute called ObsAlt has been added to the Frame class. It
 records the geodetic altitude of the observer, in metres. It defaults to

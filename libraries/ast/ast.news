@@ -16,6 +16,10 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
+- A new method called astSetFitsCM (AST_SETFITSCM) has been added to
+the FitsChan class. It stores a pure comment card in a FitsChan (that 
+is, a card with no keyword name or equals sign).
+
 - A new attribute called ObsAlt has been added to the Frame class. It
 records the geodetic altitude of the observer, in metres. It defaults to
 zero. It is used when converting times to or from the TDB timescale, or
