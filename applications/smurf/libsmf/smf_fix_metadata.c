@@ -63,6 +63,8 @@
 *        Need to include strings.h for strncasecmp
 *     2009-06-22 (TIMJ):
 *        Check OCS Config before flipping sign of instrument aperture
+*     2009-07-06 (TIMJ):
+*        Add ability to look up information in table indexed by OBSID.
 
 *  Copyright:
 *     Copyright (C) 2009 Science & Technology Facilities Council.
@@ -103,9 +105,6 @@
 #include <stdio.h>
 #include <strings.h>
 
-static int smf__pattern_extract ( const char * sourcestr, const char * pattern,
-                                  double *dresult, char * sresult, size_t szstr, int * status );
-
 /* Local struct containing header information that may be accessed multiple times
    without having to use many variables */
 
@@ -135,6 +134,7 @@ struct FitsHeaderStruct {
   char chop_crd[81];
   char instrume[81];
   char rot_crd[81];
+  char obsid[81];
 };
 
 /* Struct defining dut1 information */
@@ -143,6 +143,25 @@ typedef struct Dut1 {
   double dut1;
 } Dut1;
 
+/* Struct defining information based on OBSID. We can add to this if information
+   is needed to be updated rather than creating new similar structs each time.
+   Note that the utdate and observation number are there to minimize string
+   comparisons.
+ */
+typedef struct {
+  int utdate;           /* YYYYMMDD utdate */
+  int obsnum;           /* Observation number */
+  const char obsid[81]; /* OBSID */
+  int isrover;          /* This observation was a rover observation */
+} ObsIdLUT;
+
+/* Private routines */
+
+static int smf__pattern_extract ( const char * sourcestr, const char * pattern,
+                                  double *dresult, char * sresult, size_t szstr, int * status );
+
+static const ObsIdLUT * smf__find_obsidlut( const struct FitsHeaderStruct * fitsvals, int * status );
+
 #define FUNC_NAME "smf_fix_metadata"
 
 /* Indent for informational messages */
@@ -150,6 +169,8 @@ typedef struct Dut1 {
 
 int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
 
+  int cardisdef;             /* FITS card is defined */
+  int cardthere;             /* FITS card is present */
   double dateobs;            /* MJD UTC of observation start */
   AstFitsChan * fits = NULL; /* FITS header (FitsChan) */
   struct FitsHeaderStruct fitsvals; /* Quick access Fits header struct */
@@ -426,6 +447,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
   strcpy( fitsvals.chop_crd, "" );
   strcpy( fitsvals.rot_crd, "" );
   strcpy( fitsvals.instrume, "" );
+  strcpy( fitsvals.obsid, "" );
 
   smf_getfitsi( hdr, "OBSNUM", &(fitsvals.obsnum), status );
   smf_getfitsi( hdr, "UTDATE", &(fitsvals.utdate), status );
@@ -443,6 +465,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
   smf_getfitsd( hdr, "CHOP_PA", &(fitsvals.chop_pa), status );
   smf_getfitss( hdr, "CHOP_CRD", fitsvals.chop_crd, sizeof(fitsvals.chop_crd), status );
   smf_getfitss( hdr, "INSTRUME", fitsvals.instrume, sizeof(fitsvals.instrume), status );
+  smf_getobsidss( hdr->fitshdr, fitsvals.obsid, sizeof(fitsvals.obsid), NULL, 0, status );
 
   /* FITS header fix ups */
 
@@ -563,6 +586,59 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
     smf_getfitss( hdr, "SAM_MODE", sam_mode, sizeof(sam_mode), status );
     if ( strncasecmp( "raster", sam_mode, 6 ) == 0 ) {
       smf_fits_updateS( hdr, "SAM_MODE", "scan", NULL, status );
+      have_fixed = 1;
+    }
+  }
+
+  /* ROVER fix ups. For observations before 20090201 we sometimes
+     reported ROVER observations when there were no ROVER observations
+     occurring (see JCMT fault 20081119.001). There is a chance that
+     some eSMA observations will erroneously have their INBEAM
+     header nulled. Assume everything is fine after 20090201. */
+  cardisdef = astTestFits( fits, "INBEAM", &cardthere );
+  if ( fitsvals.utdate < 20080201 ) {
+    /* No known POL observations */
+    if ( !cardthere || cardisdef ) {
+      smf_fits_updateU( hdr, "INBEAM", "Hardware in the beam", status );
+      have_fixed = 1;
+    }
+  } else if ( fitsvals.utdate < 20090201 ) {
+    /* see if we have a matching LUT entry */
+    const ObsIdLUT * lut = smf__find_obsidlut( &fitsvals, status );
+    if (lut && lut->isrover) {
+      /* this is definitely a ROVER observation - we know during this period
+         that it will either say POL or it will be wrong. It will never be
+         multi-values.
+       */
+      char inbeam[81];
+      if (cardisdef) {
+        smf_getfitss( hdr, "INBEAM", inbeam, sizeof(inbeam), status );
+        msgSetc( "PREV", inbeam);
+      } else {
+        inbeam[0] = '\0';
+        msgSetc( "PREV", "blank");
+      }
+      if (strcmp( inbeam, "POL") != 0 ) {
+        msgOutif( msglev, "", INDENT "This is a POL observation. Updating INBEAM (was ^PREV).", status );
+        smf_fits_updateS( hdr, "INBEAM", "POL", "Hardware in the beam", status );
+        have_fixed = 1;
+      }
+    } else {
+      /* not a ROVER observation. So INBEAM should be undef. */
+      if ( !cardthere || cardisdef ) {
+        /* should be undef, not defined */
+        have_fixed = 1;
+        smf_fits_updateU( hdr, "INBEAM", "Hardware in the beam", status );
+        msgOutif( msglev, "",  INDENT "This is not a POL observation. Forcing INBEAM to undef.", status);
+      }
+    }
+
+  }
+  /* POL_CONN is deprecated so we should remove it completely */
+  if (astTestFits( fits, "POL_CONN", NULL ) ) {
+    astClear( fits, "Card" );
+    if (astFindFits( fits, "POL_CONN", NULL, 0 ) ) {
+      astDelFits( fits );
       have_fixed = 1;
     }
   }
@@ -908,4 +984,273 @@ static int smf__pattern_extract ( const char * sourcestr, const char * pattern,
   }
   if (result) astFree( result );
   return retval;
+}
+
+/* Observation lookups */
+
+/* OBSIDs relating to ROVER observations.
+   Could do with these being pre-copied into a static AstKeyMap once at startup
+   rather than continuing to walk through the array doing pattern matches. If it is
+   to slow we could create a struct that had the UT date as an integer and only check
+   the string if the integer matches.
+
+   These items are assumed to be sorted.
+
+ */
+const ObsIdLUT obsidlut[] = {
+    { 20080209,   18, "acsis_00018_20080209T055628", 1 },
+    { 20080209,   19, "acsis_00019_20080209T055938", 1 },
+    { 20080209,   20, "acsis_00020_20080209T060553", 1 },
+    { 20080209,   21, "acsis_00021_20080209T061339", 1 },
+    { 20080209,   22, "acsis_00022_20080209T062211", 1 },
+    { 20080209,   23, "acsis_00023_20080209T062538", 1 },
+    { 20080209,   24, "acsis_00024_20080209T062944", 1 },
+    { 20080209,   25, "acsis_00025_20080209T063340", 1 },
+    { 20080209,   26, "acsis_00026_20080209T064202", 1 },
+    { 20080209,   27, "acsis_00027_20080209T064542", 1 },
+    { 20080209,   28, "acsis_00028_20080209T064928", 1 },
+    { 20080209,   29, "acsis_00029_20080209T065315", 1 },
+    { 20080209,   30, "acsis_00030_20080209T070726", 1 },
+    { 20080209,   31, "acsis_00031_20080209T071031", 1 },
+    { 20080209,   32, "acsis_00032_20080209T072036", 1 },
+    { 20080209,   35, "acsis_00035_20080209T074918", 1 },
+    { 20080209,   36, "acsis_00036_20080209T075248", 1 },
+    { 20080209,   37, "acsis_00037_20080209T075628", 1 },
+    { 20080209,   38, "acsis_00038_20080209T075956", 1 },
+    { 20080209,   39, "acsis_00039_20080209T080335", 1 },
+    { 20080209,   40, "acsis_00040_20080209T080658", 1 },
+    { 20080209,   41, "acsis_00041_20080209T081005", 1 },
+    { 20081129,   55, "acsis_00055_20081129T131119", 1 },
+    { 20081129,   57, "acsis_00057_20081129T131651", 1 },
+    { 20081129,   58, "acsis_00058_20081129T131942", 1 },
+    { 20081129,   59, "acsis_00059_20081129T132243", 1 },
+    { 20081129,   60, "acsis_00060_20081129T132544", 1 },
+    { 20081129,   61, "acsis_00061_20081129T132849", 1 },
+    { 20081129,   62, "acsis_00062_20081129T133207", 1 },
+    { 20081129,   63, "acsis_00063_20081129T133459", 1 },
+    { 20081129,   64, "acsis_00064_20081129T133747", 1 },
+    { 20081129,   65, "acsis_00065_20081129T134034", 1 },
+    { 20081129,   66, "acsis_00066_20081129T134337", 1 },
+    { 20081129,   67, "acsis_00067_20081129T134658", 1 },
+    { 20081129,   68, "acsis_00068_20081129T135005", 1 },
+    { 20081129,   69, "acsis_00069_20081129T135306", 1 },
+    { 20081129,   70, "acsis_00070_20081129T135612", 1 },
+    { 20081129,   71, "acsis_00071_20081129T135903", 1 },
+    { 20081129,   72, "acsis_00072_20081129T140254", 1 },
+    { 20081129,   73, "acsis_00073_20081129T140558", 1 },
+    { 20081129,   74, "acsis_00074_20081129T140859", 1 },
+    { 20081129,   75, "acsis_00075_20081129T141202", 1 },
+    { 20081129,   76, "acsis_00076_20081129T141450", 1 },
+    { 20081129,   78, "acsis_00078_20081129T142017", 1 },
+    { 20081129,   80, "acsis_00080_20081129T142534", 1 },
+    { 20081129,   81, "acsis_00081_20081129T142834", 1 },
+    { 20081129,   82, "acsis_00082_20081129T143134", 1 },
+    { 20081129,   83, "acsis_00083_20081129T143421", 1 },
+    { 20081129,   84, "acsis_00084_20081129T143724", 1 },
+    { 20081129,   85, "acsis_00085_20081129T144044", 1 },
+    { 20081129,   86, "acsis_00086_20081129T144346", 1 },
+    { 20081129,   87, "acsis_00087_20081129T144637", 1 },
+    { 20081129,   88, "acsis_00088_20081129T144940", 1 },
+    { 20081129,   89, "acsis_00089_20081129T145244", 1 },
+    { 20081129,   90, "acsis_00090_20081129T150140", 1 },
+    { 20081129,   92, "acsis_00092_20081129T151236", 1 },
+    { 20081129,   93, "acsis_00093_20081129T151526", 1 },
+    { 20081129,   94, "acsis_00094_20081129T151812", 1 },
+    { 20081129,   95, "acsis_00095_20081129T152105", 1 },
+    { 20081129,   96, "acsis_00096_20081129T152408", 1 },
+    { 20081129,   97, "acsis_00097_20081129T152712", 1 },
+    { 20081129,   98, "acsis_00098_20081129T153014", 1 },
+    { 20081129,   99, "acsis_00099_20081129T153304", 1 },
+    { 20081129,  100, "acsis_00100_20081129T153610", 1 },
+    { 20081129,  101, "acsis_00101_20081129T153917", 1 },
+    { 20081130,   53, "acsis_00053_20081130T192229", 1 },
+    { 20081130,   54, "acsis_00054_20081130T193413", 1 },
+    { 20081130,   56, "acsis_00056_20081130T193902", 1 },
+    { 20081130,   57, "acsis_00057_20081130T194154", 1 },
+    { 20081130,   58, "acsis_00058_20081130T194444", 1 },
+    { 20081130,   59, "acsis_00059_20081130T194731", 1 },
+    { 20081130,   60, "acsis_00060_20081130T195023", 1 },
+    { 20081130,   61, "acsis_00061_20081130T195314", 1 },
+    { 20081130,   62, "acsis_00062_20081130T195618", 1 },
+    { 20081130,   63, "acsis_00063_20081130T195924", 1 },
+    { 20081130,   64, "acsis_00064_20081130T200227", 1 },
+    { 20081130,   65, "acsis_00065_20081130T200519", 1 },
+    { 20081130,   66, "acsis_00066_20081130T201728", 1 },
+    { 20081130,   67, "acsis_00067_20081130T202145", 1 },
+    { 20081130,   70, "acsis_00070_20081130T203902", 1 },
+    { 20081130,   71, "acsis_00071_20081130T204149", 1 },
+    { 20081130,   72, "acsis_00072_20081130T204516", 1 },
+    { 20081130,   73, "acsis_00073_20081130T204819", 1 },
+    { 20081130,   74, "acsis_00074_20081130T205121", 1 },
+    { 20081130,   75, "acsis_00075_20081130T205411", 1 },
+    { 20081130,   76, "acsis_00076_20081130T205715", 1 },
+    { 20081130,   77, "acsis_00077_20081130T210007", 1 },
+    { 20081130,   78, "acsis_00078_20081130T210309", 1 },
+    { 20081130,   79, "acsis_00079_20081130T210600", 1 },
+    { 20081130,   80, "acsis_00080_20081130T210854", 1 },
+    { 20081130,   81, "acsis_00081_20081130T211157", 1 },
+    { 20081130,   82, "acsis_00082_20081130T211504", 1 },
+    { 20081130,   83, "acsis_00083_20081130T211757", 1 },
+    { 20081130,   84, "acsis_00084_20081130T212059", 1 },
+    { 20081130,   85, "acsis_00085_20081130T212405", 1 },
+    { 20081130,   86, "acsis_00086_20081130T212704", 1 },
+    { 20081130,   87, "acsis_00087_20081130T212952", 1 },
+    { 20081130,   88, "acsis_00088_20081130T213253", 1 },
+    { 20081130,   89, "acsis_00089_20081130T213555", 1 },
+    { 20081130,   90, "acsis_00090_20081130T213923", 1 },
+    { 20081130,   91, "acsis_00091_20081130T214251", 1 },
+    { 20081130,   93, "acsis_00093_20081130T215544", 1 },
+    { 20081130,   94, "acsis_00094_20081130T215845", 1 },
+    { 20081130,   95, "acsis_00095_20081130T220146", 1 },
+    { 20081130,   96, "acsis_00096_20081130T220450", 1 },
+    { 20081130,   97, "acsis_00097_20081130T220753", 1 },
+    { 20081130,   98, "acsis_00098_20081130T221044", 1 },
+    { 20081130,   99, "acsis_00099_20081130T221406", 1 },
+    { 20081130,  100, "acsis_00100_20081130T221655", 1 },
+    { 20081130,  101, "acsis_00101_20081130T221956", 1 },
+    { 20081130,  102, "acsis_00102_20081130T222242", 1 },
+    { 20081216,   15, "acsis_00015_20081216T062623", 1 },
+    { 20081216,   16, "acsis_00016_20081216T064910", 1 },
+    { 20081216,   17, "acsis_00017_20081216T065138", 1 },
+    { 20081216,   18, "acsis_00018_20081216T065618", 1 },
+    { 20081216,   19, "acsis_00019_20081216T070106", 1 },
+    { 20081216,   21, "acsis_00021_20081216T070749", 1 },
+    { 20081216,   22, "acsis_00022_20081216T071132", 1 },
+    { 20081216,   25, "acsis_00025_20081216T073152", 1 },
+    { 20081216,   26, "acsis_00026_20081216T074509", 1 },
+    { 20081216,   27, "acsis_00027_20081216T074923", 1 },
+    { 20081216,   29, "acsis_00029_20081216T080853", 1 },
+    { 20081216,   31, "acsis_00031_20081216T081949", 1 },
+    { 20081216,   32, "acsis_00032_20081216T082927", 1 },
+    { 20081216,   33, "acsis_00033_20081216T084009", 1 },
+    { 20081216,   34, "acsis_00034_20081216T084227", 1 },
+    { 20081216,   35, "acsis_00035_20081216T085005", 1 },
+    { 20081216,   36, "acsis_00036_20081216T085247", 1 },
+    { 20081217,   18, "acsis_00018_20081217T073842", 1 },
+    { 20081217,   19, "acsis_00019_20081217T075010", 1 },
+    { 20081217,   20, "acsis_00020_20081217T075310", 1 },
+    { 20081217,   27, "acsis_00027_20081217T082940", 1 },
+    { 20081217,   28, "acsis_00028_20081217T083313", 1 },
+    { 20081217,   29, "acsis_00029_20081217T085358", 1 },
+    { 20081217,   30, "acsis_00030_20081217T085717", 1 },
+    { 20081217,   31, "acsis_00031_20081217T090148", 1 },
+    { 20081217,   32, "acsis_00032_20081217T090913", 1 },
+    { 20081217,   33, "acsis_00033_20081217T092017", 1 },
+    { 20081217,   35, "acsis_00035_20081217T093140", 1 },
+    { 20081217,   36, "acsis_00036_20081217T093406", 1 },
+    { 20081217,   37, "acsis_00037_20081217T093903", 1 },
+    { 20081217,   38, "acsis_00038_20081217T094541", 1 },
+    { 20081217,   39, "acsis_00039_20081217T095216", 1 },
+    { 20081217,   40, "acsis_00040_20081217T100800", 1 },
+    { 20081217,   41, "acsis_00041_20081217T101416", 1 },
+    { 20081217,   42, "acsis_00042_20081217T102432", 1 },
+    { 20081217,   43, "acsis_00043_20081217T113428", 1 },
+    { 20081217,   44, "acsis_00044_20081217T113736", 1 },
+    { 20081217,   45, "acsis_00045_20081217T124946", 1 },
+    { 20081217,   46, "acsis_00046_20081217T125535", 1 },
+    { 20081217,   47, "acsis_00047_20081217T130023", 1 },
+    { 20081217,   48, "acsis_00048_20081217T130501", 1 },
+    { 20081217,   49, "acsis_00049_20081217T143009", 1 },
+    { 20081217,   50, "acsis_00050_20081217T143458", 1 },
+    { 20081217,   51, "acsis_00051_20081217T155807", 1 },
+    { 20081217,   52, "acsis_00052_20081217T160444", 1 },
+    { 20081217,   53, "acsis_00053_20081217T161115", 1 },
+    { 20081217,   55, "acsis_00055_20081217T162159", 1 },
+    { 20081217,   56, "acsis_00056_20081217T162926", 1 },
+    { 20081217,   57, "acsis_00057_20081217T163932", 1 },
+    { 20081217,   58, "acsis_00058_20081217T164527", 1 },
+    { 20081217,   59, "acsis_00059_20081217T164955", 1 },
+    { 20081219,   39, "acsis_00039_20081219T150846", 1 },
+    { 20081219,   40, "acsis_00040_20081219T151201", 1 },
+    { 20081219,   41, "acsis_00041_20081219T151530", 1 },
+    { 20081219,   42, "acsis_00042_20081219T151841", 1 },
+    { 20081219,   43, "acsis_00043_20081219T152147", 1 },
+    { 20081219,   44, "acsis_00044_20081219T152520", 1 },
+    { 20081219,   45, "acsis_00045_20081219T152841", 1 },
+    { 20081219,   46, "acsis_00046_20081219T153201", 1 },
+    { 20081219,   47, "acsis_00047_20081219T153547", 1 },
+    { 20081219,   48, "acsis_00048_20081219T153918", 1 },
+    { 20081219,   49, "acsis_00049_20081219T154236", 1 },
+    { 20081219,   50, "acsis_00050_20081219T154557", 1 },
+    { 20081219,   51, "acsis_00051_20081219T154924", 1 },
+    { 20081219,   52, "acsis_00052_20081219T155319", 1 },
+    { 20081219,   53, "acsis_00053_20081219T155655", 1 },
+    { 20081219,   54, "acsis_00054_20081219T160024", 1 },
+    { 20081219,   55, "acsis_00055_20081219T160332", 1 },
+    { 20081219,   56, "acsis_00056_20081219T160641", 1 },
+    { 20081219,   57, "acsis_00057_20081219T160954", 1 },
+    { 20081219,   58, "acsis_00058_20081219T161301", 1 },
+    { 20081219,   59, "acsis_00059_20081219T161620", 1 },
+    { 20081219,   60, "acsis_00060_20081219T162057", 1 },
+    { 20081219,   61, "acsis_00061_20081219T162536", 1 },
+    { 20081219,   62, "acsis_00062_20081219T163012", 1 },
+    { 20081219,   63, "acsis_00063_20081219T163457", 1 },
+    { 20090130,   47, "acsis_00047_20090130T133241", 1 },
+    { 20090130,   48, "acsis_00048_20090130T133545", 1 },
+    { 20090130,   49, "acsis_00049_20090130T133847", 1 },
+    { 20090130,   50, "acsis_00050_20090130T134202", 1 },
+    { 20090130,   51, "acsis_00051_20090130T134509", 1 },
+    { 20090130,   52, "acsis_00052_20090130T134808", 1 },
+    { 20090130,   53, "acsis_00053_20090130T135123", 1 },
+    { 20090130,   54, "acsis_00054_20090130T140406", 1 },
+    { 20090130,   55, "acsis_00055_20090130T140722", 1 },
+    { 20090130,   56, "acsis_00056_20090130T141042", 1 },
+    { 20090130,   57, "acsis_00057_20090130T141357", 1 },
+    { 20090130,   58, "acsis_00058_20090130T141713", 1 },
+    { 20090130,   59, "acsis_00059_20090130T142024", 1 },
+    { 20090130,   60, "acsis_00060_20090130T142335", 1 },
+    { 20090130,   61, "acsis_00061_20090130T142637", 1 },
+    { 20090130,   62, "acsis_00062_20090130T142955", 1 },
+    { 20090130,   63, "acsis_00063_20090130T143327", 1 },
+    { 20090130,   64, "acsis_00064_20090130T143701", 1 },
+    { 20090130,   65, "acsis_00065_20090130T144014", 1 },
+    { 20090130,   66, "acsis_00066_20090130T144341", 1 },
+    { 20090130,   67, "acsis_00067_20090130T144721", 1 },
+    { 20090130,   68, "acsis_00068_20090130T145050", 1 },
+    { 20090130,   69, "acsis_00069_20090130T145407", 1 },
+    { 20090130,   70, "acsis_00070_20090130T145716", 1 },
+    { 20090130,   71, "acsis_00071_20090130T150051", 1 },
+    { 20090130,   72, "acsis_00072_20090130T150425", 1 },
+    /* make sure this UT date is stored in "maxut" if
+       and extra line is added */
+    { 20090130,   73, "acsis_00073_20090130T150726", 1 },
+    { VAL__BADI, VAL__BADI, "", VAL__BADI }
+};
+/* keep this value in sync with last line above */
+const int maxut = 20090130;
+
+/* looks through the LUT and finds the matchinf row. Returns null if nothing matches */
+
+static const ObsIdLUT * smf__find_obsidlut( const struct FitsHeaderStruct * fitsvals,
+                                            int *status ) {
+  int i;
+
+  if (*status != SAI__OK) return NULL;
+
+  /* drop out immediately if the most recent entry is too old to
+     be relevant. Do not bother to check the oldest since that
+     will be checked immediately in the while loop */
+  if (fitsvals->utdate > maxut ) return NULL;
+
+  /* now look at each entry */
+  i = 0;
+  while ( obsidlut[i].utdate != VAL__BADD ) {
+    if ( fitsvals->utdate < obsidlut[i].utdate ) {
+      /* this UT date is older than the current value being tested
+         so there is no match */
+      return NULL;
+    } else if (fitsvals->utdate > obsidlut[i].utdate ) {
+      /* this UT date is newer so try again */
+    } else {
+      /* have a match now compare obsnum */
+      if (fitsvals->obsnum == obsidlut[i].obsnum) {
+        /* match obsnum so confirm with OBSID match */
+        if ( strcmp( fitsvals->obsid, obsidlut[i].obsid ) == 0 ) {
+          return &(obsidlut[i]);
+        }
+      }
+    }
+    i++;
+  }
+  return NULL; /* no match */
 }
