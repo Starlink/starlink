@@ -876,6 +876,8 @@ f     - AST_TESTFITS: Test if a keyword has a defined value in a FitsChan
 *        ObsAlt when reading a set of OBSGEO-X/Y/Z headers.
 *     2-JUL-2009 (DSB):
 *        Check FitsChan is not empty at start of FindWcs.
+*     7-JUL-2009 (DSB):
+*        - Add new function astSetFitsCM.
 *class--
 */
 
@@ -1588,6 +1590,7 @@ static void SetFitsI( AstFitsChan *, const char *, int, const char *, int, int *
 static void SetFitsL( AstFitsChan *, const char *, int, const char *, int, int * );
 static void SetFitsS( AstFitsChan *, const char *, const char *, const char *, int, int * );
 static void SetFitsU( AstFitsChan *, const char *, const char *, int, int * );
+static void SetFitsCM( AstFitsChan *, const char *, int, int * );
 static void SetItem( double ****, int, int, char, double, int * );
 static void SetItemC( char ****, int, char, const char *, int * );
 static void SetValue( AstFitsChan *, const char *, void *, int, const char *, int * );
@@ -13182,10 +13185,15 @@ f     STATUS = INTEGER (Given and Returned)
 f        The global status.
 
 *  Notes:
-*     - The function
-c     astSetFitsU
-f     AST_SETFITSU
+*     - The 
+c     function astSetFitsU
+f     routine AST_SETFITSU
 *     can be used to indicate that no value is associated with a keyword.
+*     - The
+c     function astSetFitsCM
+f     routine AST_SETFITSCM
+*     can be used to store a pure comment card (i.e. a card with a blank 
+*     keyword).
 *     -  To assign a new value for an existing keyword within a FitsChan,
 c     first find the card describing the keyword using astFindFits, and
 c     then use one of the astSetFits<X> family to over-write the old value.
@@ -13405,6 +13413,73 @@ f        The global status.
    allocated within this function. */ 
    if( free_com ) com = (const char *) astFree( (void *) com ); 
 
+}
+
+static void SetFitsCM( AstFitsChan *this, const char *comment,
+                       int overwrite, int *status ) { 
+/*
+*++
+*  Name:
+c     astSetFitsCM
+f     AST_SETFITSCM
+
+*  Purpose:
+*     Store a comment card in a FitsChan.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "fitschan.h"
+c     void astSetFitsCM( AstFitsChan *this, const char *comment, 
+c                        int overwrite )
+       f     CALL AST_SETFITSCM( THIS, COMMENT, OVERWRITE, STATUS )
+
+*  Description:
+*     This 
+c     function 
+f     routine
+*     stores a comment card ( i.e. a card with no keyword name or equals
+*     sign) within a FitsChan at the current card position. The new card
+*     can either over-write an existing card, or can be inserted as a new 
+*     card into the FitsChan.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the FitsChan.
+c     comment
+f     COMMENT = CHARACTER * ( * ) (Given)
+c        A pointer to a null terminated string 
+f        A string 
+*        holding the text of the comment card.
+c        If a NULL pointer or 
+f        If 
+*        a blank string is supplied, then a totally blank card is produced.
+c     overwrite
+f     OVERWRITE = LOGICAL (Given)
+c        If non-zero, 
+f        If .TRUE.,
+*        the new card over-writes the current card, and the current card is 
+*        incremented to refer to the next card (see the "Card" attribute). If 
+c        zero, 
+f        .FALSE.,
+*        the new card is inserted in front of the current card and the current 
+*        card is left unchanged. In either case, if the current card on entry 
+*        points to the "end-of-file", the new card is appended to the end of 
+*        the list. 
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Notes:
+*     -  If, on exit, there are no cards following the card written by
+*     this function, then the current card is left pointing at the 
+*     "end-of-file".
+*--
+*/
+
+/* Just call astSetFitsCom with a blank keyword name. */
+   astSetFitsCom( this, "", comment, overwrite );
 }
 
 static void SetFitsCom( AstFitsChan *this, const char *name, 
@@ -15453,6 +15528,7 @@ void astInitFitsChanVtab_(  AstFitsChanVtab *vtab, const char *name, int *status
    vtab->SetFitsU = SetFitsU;
    vtab->SetFitsS = SetFitsS;
    vtab->SetFitsCN = SetFitsCN;
+   vtab->SetFitsCM = SetFitsCM;
    vtab->ClearCard = ClearCard;
    vtab->TestCard = TestCard;
    vtab->SetCard = SetCard;
@@ -35743,6 +35819,11 @@ void astSetFitsU_( AstFitsChan *this, const char *name, const char *comment,
                    int overwrite, int *status ) {
    if ( !astOK ) return;
    (**astMEMBER(this,FitsChan,SetFitsU))( this, name, comment, overwrite, status );
+}
+
+void astSetFitsCM_( AstFitsChan *this, const char *comment, int overwrite, int *status ) {
+   if ( !astOK ) return;
+   (**astMEMBER(this,FitsChan,SetFitsCM))( this, comment, overwrite, status );
 }
 
 void astClearCard_( AstFitsChan *this, int *status ){

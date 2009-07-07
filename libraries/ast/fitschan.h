@@ -229,6 +229,7 @@ typedef struct AstFitsChanVtab {
    void (* SetFitsU)( AstFitsChan *, const char *, const char *, int, int * );
    void (* SetFitsS)( AstFitsChan *, const char *, const char *, const char *, int, int * );
    void (* SetFitsCN)( AstFitsChan *, const char *, const char *, const char *, int, int * );
+   void (* SetFitsCM)( AstFitsChan *, const char *, int, int * );
    int (* GetCard)( AstFitsChan *, int * );
    int (* TestCard)( AstFitsChan *, int * );
    void (* SetCard)( AstFitsChan *, int, int * );
@@ -368,6 +369,7 @@ void astInitFitsChanGlobals_( AstFitsChanGlobals * );
    void astSetFitsL_( AstFitsChan *, const char *, int, const char *, int, int * );
    void astSetFitsU_( AstFitsChan *, const char *, const char *, int, int * );
    void astSetFitsS_( AstFitsChan *, const char *, const char *, const char *, int, int * );
+   void astSetFitsCM_( AstFitsChan *, const char *, int, int * );
    void astSetFitsCN_( AstFitsChan *, const char *, const char *, const char *, int, int * );
    int  astGetFitsCF_( AstFitsChan *, const char *, double *, int * );
    int  astGetFitsCI_( AstFitsChan *, const char *, int *, int * );
@@ -526,6 +528,9 @@ astINVOKE(V,astSetFitsL_(astCheckFitsChan(this),name,value,comment,overwrite,STA
 
 #define astSetFitsU(this,name,comment,overwrite) \
 astINVOKE(V,astSetFitsU_(astCheckFitsChan(this),name,comment,overwrite,STATUS_PTR))
+
+#define astSetFitsCM(this,comment,overwrite) \
+astINVOKE(V,astSetFitsCM_(astCheckFitsChan(this),comment,overwrite,STATUS_PTR))
 
 #define astGetFitsCF(this,name,value) \
 astINVOKE(V,astGetFitsCF_(astCheckFitsChan(this),name,value,STATUS_PTR))

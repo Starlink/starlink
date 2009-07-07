@@ -450,6 +450,26 @@ F77_SUBROUTINE(ast_setfitsu)( INTEGER(THIS),
    )
 }
 
+F77_SUBROUTINE(ast_setfitscm)( INTEGER(THIS),
+                               CHARACTER(COMMENT),
+                               LOGICAL(OVERWRITE),
+                               INTEGER(STATUS)
+                               TRAIL(COMMENT) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(COMMENT)
+   GENPTR_LOGICAL(OVERWRITE)
+   int overwrite;
+   char *comment;
+
+   astAt( "AST_SETFITSCM", NULL, 0 );
+   astWatchSTATUS(
+      comment = astString( COMMENT, COMMENT_length );
+      overwrite = F77_ISTRUE( *OVERWRITE );
+      astSetFitsCM( astI2P( *THIS ), comment, overwrite );   
+      (void) astFree( (void *) comment );
+   )
+}
+
 
 F77_SUBROUTINE(ast_setfitsi)( INTEGER(THIS),
                               CHARACTER(NAME),
