@@ -85,6 +85,15 @@
 *        Name of a new text file in which to put the paths to the direct
 *        parents of the supplied NDF. These are written one per line with
 *        no extra text. If null, no file is created. [!]
+*     HIDE = _LOGICAL (Read)
+*        If TRUE, then any ancestors which are flagged as "hidden" (for
+*        example, using PROVREM) are excluded from the display. If FALSE, 
+*        then all requested ancestors, whether hidden or not, are included 
+*        in the display (but hidden ancestors will be highlighted as such). 
+*        Note, choosing to exclude hidden ancestors may change the index 
+*        displayed for each ancestor. The default is to display hidden 
+*        ancestors if and only if history is being displayed (see parameter 
+*        HISTORY). []
 *     SHOW = LITERAL (Read)
 *        Determines which ancestors are displayed on the screen. It can
 *        take any of the following case-insensitive values (or any 
@@ -176,6 +185,8 @@
 *     3-JUL-2009 (DSB):
 *        Correct formatting of history info to avoid truncating the last
 *        character.
+*     7-JUL-2009 (DSB):
+*        Add the HIDE parameter.
 *     {enter_further_changes_here}
 
 *-
@@ -215,6 +226,7 @@
       INTEGER INTID              ! Integer ID for the current ancestor
       INTEGER IPAR               ! Index into list of parent indices
       INTEGER IPROV              ! Identifier for provenance structure
+      INTEGER IPROV2             ! Identifier for cleansed prov structure
       INTEGER IREC               ! Index of current history record
       INTEGER IROW               ! Row index
       INTEGER ISTART             ! Index of word start
@@ -230,6 +242,8 @@
       INTEGER NROW               ! No. of lines to display
       INTEGER PARI               ! Index of current parent in ancestors
       LOGICAL FIRST              ! Is this the first word?
+      LOGICAL HIDDEN             ! Is current ancestor hidden?
+      LOGICAL HIDE               ! Exclude hidden ancestors?
       LOGICAL HIST               ! Display history info?
       LOGICAL THERE              ! Does the named component exist?
       LOGICAL USE                ! Display the current ancestor?
@@ -253,6 +267,18 @@
 
 *  Read provenance information from the NDF.
       CALL NDG_READPROV( INDF, ' ', IPROV, STATUS )
+
+*  See if hidden ancestors are to be excluded from the display.
+      CALL PAR_DEF0L( 'HIDE', .NOT. HIST, STATUS )
+      CALL PAR_GET0L( 'HIDE', HIDE, STATUS )
+
+*  If we are excluding hidden ancestors create a copy of the provenance 
+*  structure from which all hidden ancestors have been removed.
+      IF( HIDE ) THEN
+         CALL NDG_COPYPROV( IPROV, .TRUE., IPROV2, STATUS )
+         CALL NDG_FREEPROV( IPROV, STATUS )
+         IPROV = IPROV2
+      END IF
 
 *  Format the provenance information. The resulting strings are returned in 
 *  an AST KeyMap.
@@ -291,6 +317,9 @@
             GO TO 999
          END IF
 
+* Convert teh ID to an integer (the ancestor index).
+         CALL CHR_CTOI( ID, INTID, STATUS )
+
 *  Get the list of direct parent ID values for this ancestor.
          PARIDS = ' '
          IF( .NOT. AST_MAPGET0C( KYMAP2, 'PARENTS', PARIDS, NC, 
@@ -317,10 +346,9 @@
                CALL KPG1_PRSAI( PARIDS, MXPAR, DIRPAR, NPAR, STATUS )
 
 *  If this is not the first row, we only display it if its integer ID
-*  value is in ther list od direct parent IDs obtained when checking the
+*  value is in the list of direct parent IDs obtained when checking the
 *  first row.
             ELSE
-               CALL CHR_CTOI( ID, INTID, STATUS )
                USE = .FALSE.
                DO IPAR = 1, NPAR
                   IF( DIRPAR( IPAR ) .EQ. INTID ) USE = .TRUE.
@@ -349,6 +377,14 @@
             CALL MSG_SETC( 'ID', ID )
             CALL MSG_SETC( 'P', VALUE )
             CALL MSG_OUT( ' ', '^ID: ^P', STATUS )
+
+*  Next, if hidden ancestors are being included in the display, indicate 
+*  if this ancestor is flagged as hidden.
+            IF( .NOT. HIDE ) THEN
+               CALL NDG_ISHIDDENPROV( IPROV, INTID, HIDDEN, STATUS )
+               IF( HIDDEN ) CALL MSG_OUT( ' ', '   (This ancestor '//
+     :                                    'has been hidden)', STATUS )
+            END IF
 
 *  Next line shows the list of identifiers for the immediate parent NDFs.
             CALL MSG_SETC( 'P', PARIDS )

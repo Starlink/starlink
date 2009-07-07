@@ -2683,6 +2683,16 @@ package kappa {
             helpkey *
           }
 
+         parameter hide {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            prompt {Hide the ancestors rather than deleting them?}
+            helpkey *
+          }
+
          parameter item {
             position 3
             type LITERAL
@@ -2730,6 +2740,16 @@ package kappa {
          alias {provsh(ow)}
 
          helplib {$KAPPA_HELP}
+
+         parameter hide {
+            type _LOGICAL
+            access READ
+            vpath DYNAMIC DEFAULT
+            ppath DYNAMIC DEFAULT
+            default TRUE
+            prompt {Exclude any hidden ancestors?}
+            helpkey *
+          }
 
          parameter history {
             type _LOGICAL

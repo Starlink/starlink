@@ -20,15 +20,20 @@
 *        The global status.
 
 *  Description:
-*     This application removes selected ancestors from the provenance
-*     information stored in a given NDF.  The `generation gap' caused by
-*     removing an ancestor is bridged by assigning all the direct 
-*     parents of the removed ancestor to each of the direct children of
-*     the ancestor.
+*     This application removes selected ancestors, either by hiding them,
+*     or deleting them from the provenance information stored in a given NDF.
+*     The `generation gap' caused by removing an ancestor is bridged by 
+*     assigning all the direct parents of the removed ancestor to each of 
+*     the direct children of the ancestor.
 *
 *     The ancestors to be removed can be specified either by giving 
 *     their indices (parameter ANCESTOR), or by comparing each ancestor 
 *     with a supplied pattern matching template (parameter PATTERN).
+*
+*     If an ancestor is hidden rather than deleted (see parameter HIDE),
+*     the ancestor is retained within the NDF, but a flag is set telling
+*     later applications to ignore the ancestor (exactly how the flag is
+*     used will depend on the particular application).
 
 *  Usage:
 *     provrem ndf pattern item
@@ -40,10 +45,15 @@
 *        removed are instead determined using the PATTERN parameter. 
 *        Each supplied index must be positive and refers to one of the 
 *        NDFs listed in the ANCESTORS table in the PROVENANCE extension
-*        of the NDF.  The maximum number of ancestors that can be 
-*        removed is limited to 100 unless "ALL", "*" or "!" is 
-*        specified.  The supplied parameter value can take any of the 
-*        following forms.
+*        of the NDF (including any hidden ancestors).  Note, if ancestor 
+*        indices are determined using the PROVSHOW command, then PROVSHOW
+*        should be run with the HIDE parameter set to FALSE - otherwise
+*        incorrect ancestor indices may be determined, resulting in the
+*        wrong ancestors being removed by PROVREM.
+*
+*        The maximum number of ancestors that can be removed is limited 
+*        to 100 unless "ALL", "*" or "!" is specified.  The supplied 
+*        parameter value can take any of the following forms.
 *
 *        - "ALL" or "*" --  All ancestors.
 *
@@ -57,6 +67,12 @@
 *
 *        - Any reasonable combination of above values separated by 
 *        commas.  [!]
+*     HIDE = _LOGICAL (Read)
+*        If TRUE, then the ancestors are not deleted, but instead have a 
+*        flag set indicating that they have been hidden. All information 
+*        about hidden ancestors is retained unchanged, and can be viewed
+*        using PROVSHOW if the HIDE parameter is set FALSE when running
+*        PROVSHOW. [FALSE]
 *     ITEM = LITERAL (Read)
 *        Specifies the item of provenance information that is checked 
 *        against the pattern matching template specified for parameter 
@@ -80,10 +96,10 @@
 *        This removes the first ancestor from the NDF called ff.
 *     provrem ff ancestor=all
 *        This erases all provenance information.
-*     provrem ff pattern='_xb$|_yb$'
-*        This removes all ancestors that have paths that end with "_xb"
-*        or "_yb".  Note, provenance paths do not include a trailing 
-*        ".sdf" string.
+*     provrem ff pattern='_xb$|_yb$' hide=yes
+*        This hides, but does not permanently delete, all ancestors that 
+*        have paths that end with "_xb" or "_yb".  Note, provenance paths 
+*        do not include a trailing ".sdf" string.
 *     provrem ff pattern='_ave'
 *        This removes all ancestors that have paths that contain the
 *        string "_ave" anywhere.
@@ -149,7 +165,7 @@
 *     KAPPA: PROVADD, PROVMOD, PROVSHOW.
 
 *  Copyright:
-*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2008-2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -177,6 +193,8 @@
 *        Original version.
 *     25-JUN-2009 (DSB):
 *        Updated to use new provenance API.
+*     7-JUL-2009 (DSB):
+*        Added parameter HIDE.
 *     {enter_further_changes_here}
 
 *-
@@ -220,6 +238,7 @@
       INTEGER L                  ! Used length of returned string
       INTEGER NANC               ! Total number of ancestors
       INTEGER NREM               ! Number of ancestors removed
+      LOGICAL HIDE               ! Hide the ancestors?
       LOGICAL REMOVE             ! Remove matching ancestors?
       LOGICAL THERE              ! Does component exist?
 *.
@@ -245,6 +264,9 @@
 
 *  See if specified ancestors are to be removed or retained.
       CALL PAR_GET0L( 'REMOVE', REMOVE, STATUS )
+
+*  See if removed ancestors should be deleted or hidden.
+      CALL PAR_GET0L( 'HIDE', HIDE, STATUS )
 
 *  Abort if an error has occurred or there is no provenance information.
       IF( STATUS .NE. SAI__OK .OR. NANC .EQ. 0 ) GO TO 999   
@@ -279,23 +301,31 @@
             CALL AST_ANNUL( KM, STATUS )
             IF( AMORE .NE. DAT__NOLOC ) CALL DAT_ANNUL( AMORE, STATUS )
 
-*  See if the pattern matches the item. If required, add the ancestor
-*  index to the list to be deleted.
+*  See if the pattern matches the item. If required, hide the ancestor, or
+*  add the ancestor index to the list to be deleted.
             IF( REMOVE .EQV. 
      :          AST_CHRSUB( TEST, PAT, RESULT, STATUS ) ) THEN
-               NREM = NREM + 1
-               CALL KPG1_STORI( NANC, NREM, I, %VAL( CNF_PVAL( IPW1 ) ),
-     :                          STATUS )
-            END IF
 
+               NREM = NREM + 1
+
+               IF( HIDE ) THEN
+                  CALL NDG_HIDEPROV( IPROV, I, STATUS )
+               ELSE
+                  CALL KPG1_STORI( NANC, NREM, I, 
+     :                             %VAL( CNF_PVAL( IPW1 ) ), STATUS )
+               END IF
+
+            END IF
          END DO
 
-*  Remove the required ancestors, and write the modified provenance back 
-*  to the NDF. 
-         CALL NDG_REMOVEPROV( IPROV, NREM, %VAL( CNF_PVAL( IPW1 ) ), 
-     :                        STATUS )
-         CALL NDG_WRITEPROV( IPROV, INDF, STATUS )
+*  Remove the required ancestors.
+         IF( .NOT. HIDE ) CALL NDG_REMOVEPROV( IPROV, NREM, 
+     :                                         %VAL( CNF_PVAL( IPW1 ) ),
+     :                                         STATUS )
 
+*  write the modified provenance back to the NDF. 
+         CALL NDG_WRITEPROV( IPROV, INDF, STATUS )
+     
 *  Free the array holding the ancestor indices.
          CALL PSX_FREE( IPW1, STATUS )
 
@@ -305,11 +335,19 @@
 *  Get the indices of the ancestors to be modified.  Since KPG1_GILST 
 *  limits the number of values that can be supplied, first check the
 *  parameter value directly to see if it set to "ALL".  If so, we just
-*  erase the provenance extension.
+*  hide all ancestors, or erase the provenance extension.
          IF( CHR_SIMLR( ANC, 'ALL' ) .OR. ANC .EQ. '*' ) THEN
             IF( REMOVE ) THEN
-               CALL NDF_XSTAT( INDF, 'PROVENANCE', THERE, STATUS )
-               IF( THERE ) CALL NDF_XDEL( INDF, 'PROVENANCE', STATUS )
+               IF( HIDE ) THEN 
+                  DO I = 1, NANC
+                     CALL NDG_HIDEPROV( IPROV, I, STATUS )
+                  END DO
+                  CALL NDG_WRITEPROV( IPROV, INDF, STATUS )
+               ELSE
+                  CALL NDF_XSTAT( INDF, 'PROVENANCE', THERE, STATUS )
+                  IF( THERE ) CALL NDF_XDEL( INDF, 'PROVENANCE', 
+     :                                       STATUS )
+               END IF
                NREM = NANC
             END IF
 
@@ -349,13 +387,21 @@
 
             END IF
 
-*  Remove the required ancestors, and write the modified provenance back to 
-*  the NDF. 
-            CALL NDG_REMOVEPROV( IPROV, NREM, IANC, STATUS )
-            CALL NDG_WRITEPROV( IPROV, INDF, STATUS )
+*  Hide or delete the required ancestors.
+            IF( NREM .GT. 0 ) THEN
+               IF( HIDE ) THEN
+                  DO I = 1, NREM
+                     CALL NDG_HIDEPROV( IPROV, IANC( I ), STATUS )
+                  END DO
+               ELSE 
+                  CALL NDG_REMOVEPROV( IPROV, NREM, IANC, STATUS )
+               END IF
+
+*  Write the modified provenance back to the NDF. 
+               CALL NDG_WRITEPROV( IPROV, INDF, STATUS )
+            END IF
 
          END IF
-
       END IF
 
 *  Arrive here if an error occurs.
@@ -365,15 +411,21 @@
       CALL NDG_FREEPROV( IPROV, STATUS )
 
 *  Report the number of ancestors removed.
+      IF( HIDE ) THEN
+         CALL MSG_SETC( 'W', 'hidden' )
+      ELSE
+         CALL MSG_SETC( 'W', 'deleted' )
+      END IF
+
       IF( NREM .EQ. 0 ) THEN
-         CALL MSG_OUT( ' ', '   No ancestors removed', STATUS )
+         CALL MSG_OUT( ' ', '   No ancestors ^W', STATUS )
 
       ELSE IF( NREM .EQ. 1 ) THEN
-         CALL MSG_OUT( ' ', '   1 ancestor removed', STATUS )
+         CALL MSG_OUT( ' ', '   1 ancestor ^W', STATUS )
 
       ELSE
          CALL MSG_SETI( 'N', NREM )
-         CALL MSG_OUT( ' ', '   ^N ancestors removed', STATUS )
+         CALL MSG_OUT( ' ', '   ^N ancestors ^W', STATUS )
       END IF
 
       CALL MSG_BLANK( STATUS )

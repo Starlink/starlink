@@ -40723,6 +40723,18 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
    }
    \sstparameters{ 
       \sstsubsection{ 
+         HIDE = \_LOGICAL (Read)
+      }{ 
+        If {\tt TRUE}, then any ancestors which are flagged as ``hidden'' 
+        (for example, using PROVREM) are excluded from the display. If
+        {\tt FALSE}, then all requested ancestors, whether hidden or not, 
+        are included in the display (but hidden ancestors will be 
+        highlighted as such). Note, choosing to exclude hidden ancestors 
+        may change the index displayed for each ancestor. The default is 
+        to display hidden ancestors if and only if history is being 
+        displayed (see parameter HISTORY). []
+      }
+      \sstsubsection{ 
          HISTORY = \_LOGICAL (Read)
       }{ 
         If {\tt TRUE}, any history records stored with each ancestor are
@@ -56037,11 +56049,24 @@ The following applications have been modified:
       \end{itemize}
 
    \goodbreak
+   \item [\htmlref{PROVREM}{PROVREM}] \mbox{}
+      \begin{itemize}
+        \item Has a new parameter called HIDE that can be set to {\tt TRUE}
+        to hide the selected ancestors rather than permanently deleting
+        them. Hidden ancestors in an NDF PROVENANCE extension will in 
+        general be ignored by subsequent applications, but all the provenance 
+        information for hidden ancestors is retained unchanged in the 
+        PROVENANCE extension.
+      \end{itemize}
+
    \item [\htmlref{PROVSHOW}{PROVSHOW}] \mbox{}
       \begin{itemize}
         \item Has a new parameter called HISTORY that can be set to {\tt TRUE}
         to display any history records stored in the provenance extension
         of each ancestor NDF.
+        \item Has a new parameter called HIDE that can be set to {\tt TRUE}
+        to include ``hidden'' ancestors in the display. Ancestors can be
+        hidden using PROVREM.
       \end{itemize}
 
    \item [\htmlref{ROTATE}{ROTATE}] \mbox{}
