@@ -4,7 +4,7 @@
 
 package ifneeded xml::c       3.1 [list load   [file join $dir libTclxml3.1.so]]
 package ifneeded xml::tcl     3.1 [list source [file join $dir xml__tcl.tcl]]
-package ifneeded sgmlparser   1.1       [list source [file join $dir sgmlparser.tcl]]
+package ifneeded sgmlparser   1.0       [list source [file join $dir sgmlparser.tcl]]
 package ifneeded xpath        1.0       [list source [file join $dir xpath.tcl]]
 package ifneeded xmldep       1.0       [list source [file join $dir xmldep.tcl]]
 
