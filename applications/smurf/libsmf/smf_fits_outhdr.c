@@ -67,6 +67,9 @@
 *        in output maps/cubes.
 *        Remove obsid map argument since provenance is now handled using
 *        NDG.
+*     2009-07-06 (TIMJ):
+*        Call atlRmblft to remove contiguous blank lines on input header.
+*        This will be called by atlMgfts but only if we are merging headers.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -165,9 +168,10 @@ void smf_fits_outhdr( AstFitsChan * inhdr, AstFitsChan ** outhdr,
 
 /* If this is the first file, get a copy of the input NDFs FITS extension
    (held in a FitsChan). This FitsChan will be used to hold the FITS
-   header for the output NDF. Also create the output key map at this point. */
+   header for the output NDF. Also remove contiguous blank lines. */
    if( *outhdr == NULL ) {
       *outhdr = astCopy( inhdr );
+      atlRmblft( *outhdr, status );
 
 /* If this is not the first file, merge the input NDF's FITS extension
    into the output NDF's FITS extension by removing any headers from the

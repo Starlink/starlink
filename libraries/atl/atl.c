@@ -27,9 +27,12 @@
 *        Add atlPtftr
 *     8-MAR-2007 (BC):
 *        Add atlPtfti, atlPtfts
+*     6-JUL-2009 (TIMJ):
+*        Add atlRmblft
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2009 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -397,6 +400,25 @@ void atlPtfts( AstFitsChan *this, const char *name,
    F77_IMPORT_INTEGER( STATUS, *status );
 
    return;
+}
+
+F77_SUBROUTINE(atl_rmblft)( INTEGER(FC),
+                            INTEGER(STATUS) );
+
+void atlRmblft(  AstFitsChan * this, int *status ) {
+  DECLARE_INTEGER(THIS);
+  DECLARE_INTEGER(STATUS);
+
+  F77_EXPORT_INTEGER( astP2I( this ), THIS );
+
+  if( !astOK ) return;
+
+  F77_EXPORT_INTEGER( *status, STATUS );
+
+  F77_CALL(atl_rmblft)( INTEGER_ARG(&THIS),
+                        INTEGER_ARG(&STATUS) );
+
+  F77_IMPORT_INTEGER( STATUS, *status );
 }
 
 

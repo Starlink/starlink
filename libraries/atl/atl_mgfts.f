@@ -92,6 +92,8 @@
 *     30-JUN-2009 (TIMJ):
 *        The removal of contiguous blank fields was being overzealous in that
 *        it would remove the card following the two contiguous blank cards...
+*     6-JUL-2009 (TIMJ):
+*        Move contiguous blank removal code to new ATL function ATL_RMBLFT
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -295,32 +297,11 @@
      :                 STATUS )
       END IF
 
-*  If a FitsChan is being returned, replace each contuguous group of 
-*  blank headers with a single blank header.
-      IF( FC3 .NE. AST__NULL ) THEN
-         FLAG = .FALSE.
-         CALL AST_CLEAR( FC3, 'CARD', STATUS )
-         DO WHILE( AST_FINDFITS( FC3, '%f', CARD, .TRUE., STATUS ) )
-            IF( CARD .EQ. ' ' ) THEN
-               IF( FLAG ) THEN
-                  FLAG = .FALSE.
-               ELSE
-*  The card we have just retrieved is BLANK and the one before it
-*  was also blank. Since AST_FINDFITS increments the Card we have
-*  to move it back one to delete that card.
-                  CALL AST_SETI( FC3, 'CARD',
-     :                           AST_GETI( FC3, 'CARD', STATUS ) - 1,
-     :                           STATUS )
-                  CALL AST_DELFITS( FC3, STATUS )
-               END IF
-            ELSE
-               FLAG = .TRUE.
-            END IF      
-         END DO
-      END IF
+*  Remove contiguous blank lines
+      CALL ATL_RMBLFT( FC3, STATUS )
 
 *  Re-instate the original current Card of the two supplied FitsChans,
-*  and re-dinw the retruend FitsChan (if any).
+*  and re-wind the returned FitsChan (if any).
       CALL AST_SETI( FC1, 'CARD', ICARD1, STATUS )
       CALL AST_SETI( FC2, 'CARD', ICARD2, STATUS )
       IF( FC3 .NE. AST__NULL ) CALL AST_CLEAR( FC3, 'CARD', STATUS )
