@@ -51,6 +51,8 @@
 *        Store SIMULATE information
 *     2009-05-27 (TIMJ):
 *        Store MJD-OBS to enable sorting.
+*     2009-07-08 (TIMJ):
+*        Include INBEAM in report.
 
 *  Copyright:
 *     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
@@ -104,6 +106,7 @@ void smf_obsmap_fill( const smfData * data, AstKeyMap * obsmap, AstKeyMap * objm
   double dateobs = 0.0;    /* MJD UTC of start of observation */
   char object[SZFITSCARD]; /* Object name */
   char obsid[SZFITSCARD]; /* Observation ID */
+  char inbeam[SZFITSCARD]; /* Anything in beam */
   AstKeyMap * obsinfo = NULL; /* observation information */
 
 
@@ -136,6 +139,12 @@ void smf_obsmap_fill( const smfData * data, AstKeyMap * obsmap, AstKeyMap * objm
       astMapPut0I( obsinfo, "UTDATE", itemp, NULL );
       smf_fits_getL( data->hdr, "SIMULATE", &itemp, status );
       astMapPut0I( obsinfo, "SIMULATE", itemp, NULL );
+
+      /* anything in the beam */
+      inbeam[0] = '\0';
+      smf_getfitss( data->hdr, "INBEAM", inbeam, sizeof(inbeam),
+                    status );
+      if (strlen(inbeam)) astMapPut0C( obsinfo, "INBEAM", inbeam, NULL );
 
       /* store the MJD of observation for sorting purposes */
       smf_find_dateobs( data->hdr, &dateobs, NULL, status );
