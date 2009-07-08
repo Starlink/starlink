@@ -1867,6 +1867,13 @@ void smurf_makecube( int *status ) {
             }
          }
 
+/* Put a separator in the output fits header to make it clear which headers
+   have been added by the data processing.
+   Wind to end of the fitschan first. */
+         astSetI( fchan, "CARD", astGetI( fchan, "NCard" ) + 1 );
+         astSetFitsCM( fchan, " ", 0 );
+         astSetFitsCM( fchan, "---- Data Processing ----", 0 );
+
 /* If we created an output Variance component, store the median system 
    temperature as keyword TSYS in the FitsChan. */
          if( tsys_array ) {

@@ -1075,6 +1075,12 @@ void smurf_makemap( int *status ) {
       one_strlcat(data_units, "**-2", sizeof(data_units), status);
       ndfCput(data_units, wndf, "UNITS", status);
 
+      /* Put a separator in the output fits header to make it clear which headers
+         have been added by the data processing.
+         Wind to end of the fitschan first. */
+      astSetI( fchan, "CARD", astGetI( fchan, "NCard" ) + 1 );
+      astSetFitsCM( fchan, " ", 0 );
+      astSetFitsCM( fchan, "---- Data Processing ----", 0 );
 
       /* Calculate median exposure time - use faster histogram-based
          method which should be accurate enough for our purposes */
@@ -1256,6 +1262,11 @@ void smurf_makemap( int *status ) {
               status );
     histogram = smf_find_median( NULL, exp_time, nxy, NULL, &medtexp, status );
     if ( medtexp != VAL__BADR ) {
+      /* if we add more FITS cards we should move the separator accordingly */
+      astSetI( fchan, "CARD", astGetI( fchan, "NCard" ) + 1 );
+      astSetFitsCM( fchan, " ", 0 );
+      astSetFitsCM( fchan, "---- Data Processing ----", 0 );
+
       atlPtftr(fchan, "EXP_TIME", medtexp, "[s] Median MAKEMAP exposure time", status);
     }
     histogram = astFree( histogram );
