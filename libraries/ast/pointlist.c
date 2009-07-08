@@ -70,6 +70,8 @@ f     The PointList class does not define any new routines beyond those
 *        Over-ride astMapMerge.
 *     9-FEB-2009 (DSB):
 *        Move methods astGetEnclosure and astSetEnclosure to Region class.
+*     8-JUL-2009 (DSB):
+*        In Transform, use "ptr2", not "ptr", if we are creating a mask.
 *class--
 
 *  Implementation Deficiencies:
@@ -1979,7 +1981,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 
 /* Initialise the mask elements on the basis of the first axis values */
             result = 1;
-            p = ptr[ 0 ];
+            p = ptr2[ 0 ];
             for( ip = 0; ip < np; ip++ ) {
                if( *(p++) == AST__BAD ) {
                   result = 0;
@@ -1991,7 +1993,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 
 /* Now check for bad values on other axes. */
             for( ic = 1; ic < nc; ic++ ) {
-               p = ptr[ ic ];
+               p = ptr2[ ic ];
                for( ip = 0; ip < np; ip++ ) {
                   if( *(p++) == AST__BAD ) {
                      result = 0;
