@@ -468,7 +468,7 @@
       END DO
 
 *  Store the modified provenance information back in the NDF. 
-      CALL NDG_WRITEPROV( IPROV, INDF, STATUS )
+      CALL NDG_WRITEPROV( IPROV, INDF, .FALSE., STATUS )
 
 *  Arrive here if an error occurs.
  999  CONTINUE

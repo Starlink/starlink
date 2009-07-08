@@ -212,7 +212,7 @@
      :                  STATUS )
 
 *  Store the modified provenance information in the child NDF. 
-      CALL NDG_WRITEPROV( IPROV, INDF1, STATUS )
+      CALL NDG_WRITEPROV( IPROV, INDF1, .FALSE., STATUS )
 
 *  Arrive here if an error occurrs.
  999  CONTINUE

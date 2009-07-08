@@ -218,7 +218,7 @@
       CHARACTER MORE*(DAT__SZLOC)! Locator for MORE info
       CHARACTER PARIDS*255       ! Buffer for direct parent ID list
       CHARACTER SHOW*7           ! The ancestors to be displayed
-      CHARACTER VALUE*255        ! Buffer for one field value
+      CHARACTER VALUE*1024       ! Buffer for one field value
       INTEGER DIRPAR( MXPAR )    ! Integer IDs for direct parents
       INTEGER FD                 ! File descriptor for parents file
       INTEGER IEND               ! Index of word end
@@ -245,6 +245,7 @@
       LOGICAL HIDDEN             ! Is current ancestor hidden?
       LOGICAL HIDE               ! Exclude hidden ancestors?
       LOGICAL HIST               ! Display history info?
+      LOGICAL QUOTED             ! Is character inside single quotes?
       LOGICAL THERE              ! Does the named component exist?
       LOGICAL USE                ! Display the current ancestor?
 *.
@@ -461,10 +462,16 @@
                            END DO
 			   
                            DO WHILE( ISTART .LE. NC ) 
-			   
+
+                              QUOTED = .FALSE.
                               IEND = ISTART
-                              DO WHILE( VALUE( IEND:IEND ) .NE. ' ' 
+                              DO WHILE( ( QUOTED .OR. 
+     :                                    VALUE( IEND:IEND ) .NE. ' ' )
      :                                  .AND. IEND .LE. NC ) 
+
+                                 IF( VALUE( IEND:IEND ) .EQ. '''' ) 
+     :                                             QUOTED = .NOT. QUOTED
+
                                  IEND = IEND + 1
                               END DO
 

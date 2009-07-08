@@ -165,7 +165,7 @@ void smf_updateprov( int ondf, const smfData *data, int indf,
    parents). */
    oprov = ndgReadProv( ondf, creator, status );
    ndgPutProv( oprov, indf, NULL, tkm, isroot, status );
-   ndgWriteProv( oprov, ondf, status );
+   ndgWriteProv( oprov, ondf, 1, status );
    oprov = ndgFreeProv( oprov, status );
 
 /* Free resources. */

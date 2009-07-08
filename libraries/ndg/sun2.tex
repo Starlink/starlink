@@ -3123,7 +3123,7 @@ another statement of the software that performed the action.
       information in the NDF.
    }
    \sstinvocation{
-      CALL NDG\_WRITEPROV( IPROV, INDF, STATUS )
+      CALL NDG\_WRITEPROV( IPROV, INDF, WHDEF, STATUS )
    }
    \sstarguments{
       \sstsubsection{
@@ -3139,13 +3139,37 @@ another statement of the software that performed the action.
          information.
       }
       \sstsubsection{
+         WHDEF = INTEGER (Given)
+      }{
+         The correct recording of history information within the
+         PROVENANCE extension requires that the current history record
+         within the supplied NDF at the time this function is called,
+         describes the creation of the NDF. Very often, an application
+         will not itself add any history to the NDF, but will instead
+         rely on the automatic recording of default history provided by
+         the NDF library. Normally, default history is recorded when the
+         NDF is released from the NDF system (e.g. using NDF\_ANNUL or
+         NDF\_END). So if this function is called prior to the release of
+         the NDF (which it normally will be), then the default history
+         information will not yet have been recorded, resulting in
+         incorrect information being stored in the PROVENANCE extension.
+         For this reason, the WHDEF argument is supplied. If it is set
+         to .TRUE., a check is made to see if default history has already
+         been stored in the NDF. If .FALSE., default history is stored
+         in the NDF before going on to create the PROVENANCE extension.
+         Applications that do not use the default history recording
+         mechanism, but instead store their own history information,
+         should supply .FALSE. for WHDEF, and should also ensure that
+         history information has been stored in the NDF before calling
+         this routine.
+      }
+      \sstsubsection{
          STATUS = INTEGER (Given and Returned)
       }{
          The global status.
       }
    }
 }
-
 
 \newpage
 \subsection{Full C Function Specifications}
@@ -4040,7 +4064,8 @@ another statement of the software that performed the action.
       information in the NDF.
    }
    \sstinvocation{
-      void ndgWriteProv( NdgProvenance $*$prov, int indf, int $*$status )
+      void ndgWriteProv( NdgProvenance $*$prov, int indf, int whdef,
+                         int $*$status )
    }
    \sstarguments{
       \sstsubsection{
@@ -4053,6 +4078,31 @@ another statement of the software that performed the action.
       }{
          Identifier for the NDF in which to store the provenance
          information.
+      }
+      \sstsubsection{
+         whdef
+      }{
+         The correct recording of history information within the
+         PROVENANCE extension requires that the current history record
+         within the supplied NDF at the time this function is called,
+         describes the creation of the NDF. Very often, an application
+         will not itself add any history to the NDF, but will instead
+         rely on the automatic recording of default history provided by
+         the NDF library. Normally, default history is recorded when the
+         NDF is released from the NDF system (e.g. using ndfAnnul or
+         ndfEnd). So if this function is called prior to the release of
+         the NDF (which it normally will be), then the default history
+         information will not yet have been recorded, resulting in
+         incorrect information being stored in the PROVENANCE extension.
+         For this reason, the {\tt "}whdef{\tt "} argument is supplied. If it is set
+         to a non-zero value, a check is made to see if default history
+         has already been stored in the NDF. If not, default history is
+         stored in the NDF before going on to create the PROVENANCE
+         extension. Applications that do not use the default history
+         recording mechanism, but instead store their own history
+         information, should supply a zero value for {\tt "}whdef{\tt "} and should
+         also ensure that history information has been stored in the NDF
+         before calling this function.
       }
       \sstsubsection{
          status

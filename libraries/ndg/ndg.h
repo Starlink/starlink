@@ -106,7 +106,7 @@ void ndgNdfpr( int indf1, const char clist[], const Grp *igrp, size_t index, int
 void ndgPutProv( NdgProvenance *prov, int indf, HDSLoc *more, AstKeyMap *more2, int isroot, int *status );
 void ndgRemoveProv( NdgProvenance *prov, int nanc, int *anc, int *status );
 void ndgUnhideProv( NdgProvenance *, int, int * );
-void ndgWriteProv( NdgProvenance *prov, int indf, int *status );
+void ndgWriteProv( NdgProvenance *prov, int indf, int whdef, int *status );
 
 
 #endif

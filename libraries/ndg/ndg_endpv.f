@@ -265,7 +265,7 @@
                      END DO
 
 *  Write out the modified provenance information to the output NDF.
-                     CALL NDG_WRITEPROV( IPROV, INDF1, STATUS )
+                     CALL NDG_WRITEPROV( IPROV, INDF1, .FALSE., STATUS )
 
 *  If none of the input NDFs had a provenance extension, delete the
 *  provenance extension from the output NDF unless AUTOPROV indicates that

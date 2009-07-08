@@ -519,7 +519,7 @@ void smurf_unmakecube( int *status ) {
       }
 
 /* Write the provenance structure to the output NDF, and then free it. */
-      ndgWriteProv( oprov, ondf, status );
+      ndgWriteProv( oprov, ondf, 1, status );
       oprov =ndgFreeProv( oprov, status );
 
 /* Close the input time series file. */

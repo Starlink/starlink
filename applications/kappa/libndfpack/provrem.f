@@ -324,7 +324,7 @@
      :                                         STATUS )
 
 *  write the modified provenance back to the NDF. 
-         CALL NDG_WRITEPROV( IPROV, INDF, STATUS )
+         CALL NDG_WRITEPROV( IPROV, INDF, .FALSE., STATUS )
      
 *  Free the array holding the ancestor indices.
          CALL PSX_FREE( IPW1, STATUS )
@@ -342,7 +342,7 @@
                   DO I = 1, NANC
                      CALL NDG_HIDEPROV( IPROV, I, STATUS )
                   END DO
-                  CALL NDG_WRITEPROV( IPROV, INDF, STATUS )
+                  CALL NDG_WRITEPROV( IPROV, INDF, .FALSE., STATUS )
                ELSE
                   CALL NDF_XSTAT( INDF, 'PROVENANCE', THERE, STATUS )
                   IF( THERE ) CALL NDF_XDEL( INDF, 'PROVENANCE', 
@@ -398,7 +398,7 @@
                END IF
 
 *  Write the modified provenance back to the NDF. 
-               CALL NDG_WRITEPROV( IPROV, INDF, STATUS )
+               CALL NDG_WRITEPROV( IPROV, INDF, .FALSE., STATUS )
             END IF
 
          END IF

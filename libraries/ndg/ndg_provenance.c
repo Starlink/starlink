@@ -289,7 +289,7 @@ static void ndg1PutTextComp( HDSLoc *, const char *, const char *, int * );
 static void ndg1ReadHistRec( Prov *, int, int, int *, int * );
 static void ndg1ResetIndices( Provenance *, int * );
 static void ndg1Rmprv( Provenance *, int, int * );
-static void ndg1WriteProvenanceExtension( Provenance *, int, int * );
+static void ndg1WriteProvenanceExtension( Provenance *, int, int, int * );
 
 /* Public F77 wrapper functions. */
 /* ============================= */
@@ -1039,7 +1039,8 @@ F77_SUBROUTINE(ndg_unhideprov)( INTEGER(iprov), INTEGER(ianc),
    ndgUnhideProv( astI2P( *iprov ), *ianc, status );
 }
 
-F77_SUBROUTINE(ndg_writeprov)( INTEGER(iprov), INTEGER(indf), INTEGER(status) ){
+F77_SUBROUTINE(ndg_writeprov)( INTEGER(iprov), INTEGER(indf), INTEGER(whdef),
+                               INTEGER(status) ){
 /*
 *+
 *  Name:
@@ -1052,7 +1053,7 @@ F77_SUBROUTINE(ndg_writeprov)( INTEGER(iprov), INTEGER(indf), INTEGER(status) ){
 *     Starlink ANSI C (callable from Fortran)
 
 *  Invocation:
-*     CALL NDG_WRITEPROV( IPROV, INDF, STATUS )
+*     CALL NDG_WRITEPROV( IPROV, INDF, WHDEF, STATUS )
 
 *  Description:
 *     This routine writes the contents of the supplied provenance
@@ -1066,15 +1067,37 @@ F77_SUBROUTINE(ndg_writeprov)( INTEGER(iprov), INTEGER(indf), INTEGER(status) ){
 *     INDF = INTEGER (Given)
 *        Identifier for the NDF in which to store the provenance
 *        information.
+*     WHDEF = INTEGER (Given)
+*        The correct recording of history information within the
+*        PROVENANCE extension requires that the current history record
+*        within the supplied NDF at the time this function is called,
+*        describes the creation of the NDF. Very often, an application
+*        will not itself add any history to the NDF, but will instead
+*        rely on the automatic recording of default history provided by
+*        the NDF library. Normally, default history is recorded when the
+*        NDF is released from the NDF system (e.g. using NDF_ANNUL or
+*        NDF_END). So if this function is called prior to the release of
+*        the NDF (which it normally will be), then the default history
+*        information will not yet have been recorded, resulting in
+*        incorrect information being stored in the PROVENANCE extension.
+*        For this reason, the WHDEF argument is supplied. If it is set
+*        to .TRUE., a check is made to see if default history has already 
+*        been stored in the NDF. If .FALSE., default history is stored 
+*        in the NDF before going on to create the PROVENANCE extension. 
+*        Applications that do not use the default history recording 
+*        mechanism, but instead store their own history information, 
+*        should supply .FALSE. for WHDEF, and should also ensure that 
+*        history information has been stored in the NDF before calling 
+*        this routine.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 *-
 */
-
    GENPTR_INTEGER(iprov)
    GENPTR_INTEGER(indf)
+   GENPTR_INTEGER(whdef)
    GENPTR_INTEGER(status)
-   ndgWriteProv( astI2P( *iprov ), *indf, status );
+   ndgWriteProv( astI2P( *iprov ), *indf, *whdef,  status );
 }
 
 
@@ -2076,7 +2099,7 @@ void ndgPutProv( NdgProvenance *prov, int indf, HDSLoc *more,
    no hash code. */
          ndfState( indf, "History", &there, status ); 
          hhash = prov2->main->hhash;
-         if( there && hhash ) {
+         if( there && ( hhash || isroot ) ) {
             ndfHnrec( indf, &irec, status );
             ph = isroot ? NULL : &hash;
             prov2->main->hhash = 0;
@@ -2402,7 +2425,7 @@ void ndgUnhideProv( NdgProvenance *prov, int ianc, int *status ){
    astWatch( old_status );
 }
 
-void ndgWriteProv( NdgProvenance *prov, int indf, int *status ){
+void ndgWriteProv( NdgProvenance *prov, int indf, int whdef, int *status ){
 /*
 *+
 *  Name:
@@ -2412,7 +2435,8 @@ void ndgWriteProv( NdgProvenance *prov, int indf, int *status ){
 *     Write provenance information to an NDF.
 
 *  Invocation:
-*     void ndgWriteProv( NdgProvenance *prov, int indf, int *status )
+*     void ndgWriteProv( NdgProvenance *prov, int indf, int whdef, 
+*                        int *status )
 
 *  Description:
 *     This function writes the contents of the supplied provenance
@@ -2425,6 +2449,28 @@ void ndgWriteProv( NdgProvenance *prov, int indf, int *status ){
 *     indf
 *        Identifier for the NDF in which to store the provenance
 *        information.
+*     whdef
+*        The correct recording of history information within the
+*        PROVENANCE extension requires that the current history record
+*        within the supplied NDF at the time this function is called,
+*        describes the creation of the NDF. Very often, an application
+*        will not itself add any history to the NDF, but will instead
+*        rely on the automatic recording of default history provided by
+*        the NDF library. Normally, default history is recorded when the
+*        NDF is released from the NDF system (e.g. using ndfAnnul or
+*        ndfEnd). So if this function is called prior to the release of
+*        the NDF (which it normally will be), then the default history
+*        information will not yet have been recorded, resulting in
+*        incorrect information being stored in the PROVENANCE extension.
+*        For this reason, the "whdef" argument is supplied. If it is set
+*        to a non-zero value, a check is made to see if default history
+*        has already been stored in the NDF. If not, default history is
+*        stored in the NDF before going on to create the PROVENANCE
+*        extension. Applications that do not use the default history
+*        recording mechanism, but instead store their own history
+*        information, should supply a zero value for "whdef" and should
+*        also ensure that history information has been stored in the NDF
+*        before calling this function.
 *     status
 *        The global status.
 *-
@@ -2446,7 +2492,7 @@ void ndgWriteProv( NdgProvenance *prov, int indf, int *status ){
    if( provenance ) {
 
 /* Attempt to write the provenance information to the NDF. */
-      ndg1WriteProvenanceExtension( provenance, indf, status );
+      ndg1WriteProvenanceExtension( provenance, indf, whdef, status );
    }
 
 /* Re-instate the original AST status variable. */
@@ -5364,7 +5410,7 @@ static int ndg1TheSame( Prov *prov1, Prov *prov2, int *status ) {
 
 
 static void ndg1WriteProvenanceExtension( Provenance *provenance, int indf, 
-                                          int *status ){
+                                          int whdef, int *status ){
 /*
 *  Name:
 *     ndg1WriteProvenanceExtension
@@ -5374,7 +5420,7 @@ static void ndg1WriteProvenanceExtension( Provenance *provenance, int indf,
 
 *  Invocation:
 *     void ndg1WriteProvenanceExtension( Provenance *provenance, int indf, 
-*                                        int *status )
+*                                        int whdef, int *status )
 
 *  Description:
 *     This function erases any existing PROVENANCE extension within the
@@ -5386,6 +5432,28 @@ static void ndg1WriteProvenanceExtension( Provenance *provenance, int indf,
 *        The Provenance structure.
 *     indf
 *        The NDF identifier.
+*     whdef
+*        The correct recording of history information within the
+*        PROVENANCE extension requires that the current history record
+*        within the supplied NDF at the time this function is called,
+*        describes the creation of the NDF. Very often, an application
+*        will not itself add any history to the NDF, but will instead
+*        rely on the automatic recording of default history provided by
+*        the NDF library. Normally, default history is recorded when the
+*        NDF is released from the NDF system (e.g. using ndfAnnul or
+*        ndfEnd). So if this function is called prior to the release of
+*        the NDF (which it normally will be), then the default history
+*        information will not yet have been recorded, resulting in
+*        incorrect information being stored in the PROVENANCE extension.
+*        For this reason, the "whdef" argument is supplied. If it is set
+*        to a non-zero value, a check is made to see if default history
+*        has already been stored in the NDF. If not, default history is
+*        stored in the NDF before going on to create the PROVENANCE
+*        extension. Applications that do not use the default history
+*        recording mechanism, but instead store their own history
+*        information, should supply a zero value for "whdef" and should
+*        also ensure that history information has been stored in the NDF
+*        before calling this function.
 *     status
 *        Pointer to the inherited status variable.
 
@@ -5508,6 +5576,7 @@ static void ndg1WriteProvenanceExtension( Provenance *provenance, int indf,
             if( prov->hhash == 0 ) {
                ndfState( indf, "History", &there, status ); 
                if( there ) {
+                  if( whdef ) ndfHdef( indf, "", status );
                   ndfHnrec( indf, &irec, status );
                   if( irec ) ndg1ReadHistRec( NULL, indf, irec, 
                                               &(prov->hhash), status );
