@@ -18,6 +18,7 @@
  *  Copyright:
  *     Copyright (C) 1996-2005 Central Laboratory of the Research Councils.
  *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+ *     Copyright (C) 2009 Science and Technology Facilities Council.
  *     All Rights Reserved.
 
  *  Licence:
@@ -59,6 +60,9 @@
 #include "ImageIO.h"
 #include "gaiaNDF.h"
 
+// Length of COMPONENT name.
+static const int COMPONENT_LENGTH = 64;
+
 class NDFIO : public ImageIORep {
 
 private:
@@ -73,7 +77,7 @@ protected:
    int ndfid_;
 
    //  Current NDF data component.
-   char component_[20];
+   char component_[COMPONENT_LENGTH];
 
    //  Information structure for NDF displayables.
    void *NDFinfo_;

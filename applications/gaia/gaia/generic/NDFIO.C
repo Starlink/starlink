@@ -18,6 +18,7 @@
  *  Copyright:
  *     Copyright (C) 1997-2005 Central Laboratory of the Research Councils
  *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+ *     Copyright (C) 2009 Science and Technology Facilities Council.
  *     All Rights Reserved.
 
  *  Licence:
@@ -104,21 +105,21 @@ extern "C" {
 }
 
 //  Length of a FITS header card.
-#define FITSCARD 80
+static const int FITSCARD = 80;
 
 //+
 //  Constructor.
 //-
 NDFIO::NDFIO( void *NDFinfo, int curd, const char *component,
               int ndfid, int width, int height, int bitpix, double bzero,
-	      double bscale, const Mem& header, const Mem& data )
+              double bscale, const Mem& header, const Mem& data )
    : ImageIORep( width, height, bitpix, bzero, bscale, header, data ),
      ndfid_( ndfid ),
      NDFinfo_( NDFinfo ),
      curd_( curd )
 {
    //  Record the component type.
-   strncpy( component_, (char *) component, 20 );
+   strncpy( component_, (char *) component, COMPONENT_LENGTH );
 
    //  We don't byte swap, so usingNetBO_ value only depends on BIGENDIAN.
    usingNetBO( BIGENDIAN );
@@ -201,7 +202,7 @@ NDFIO *NDFIO::read( const char *filename, const char *component,
 
             //  Create a Mem object to hold the displayable data.
             size_t tsize = (size_t) width * (size_t) height *
-	                   (size_t) ( abs( bitpix ) / 8 );
+                           (size_t) ( abs( bitpix ) / 8 );
 
             // Now map the data and initialise with this pointer.
             if ( gaiaGetMNDF( NDFinfo, 1, component, &indata, &error_mess ) ) {
@@ -526,7 +527,10 @@ int NDFIO::makeDisplayable( int index, const char *component )
 
          //  This is now the current NDF and component.
          curd_ = index;
-         memmove( component_, component, 20 );
+         int l = strlen( component );
+         if ( l > COMPONENT_LENGTH ) l = COMPONENT_LENGTH - 1;
+         memmove( component_, component, l );
+         component_[COMPONENT_LENGTH-1] = '\0';
          ndfid_ = ndfid;
       }
       else {
