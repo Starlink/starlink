@@ -55,6 +55,7 @@
 *        The global status.
 
 *  Notes:
+*     - Ancestors that have been flagged as "hidden" are ignored.
 *     - A warning is issued if the OBSIDSS component cannot be found
 *     for a root ancestor.  The value of OBSCNT gives the number of
 *     ancestors with an OBSIDSS value.
@@ -65,7 +66,7 @@
 *     headers should have been written.
 
 *  Copyright:
-*     Copyright (C) 2008 Science & Technology Facilities Council. All
+*     Copyright (C) 2008-2009 Science & Technology Facilities Council. All
 *     Rights Reserved.
 
 *  Licence:
@@ -113,6 +114,8 @@
 *        Edit the PRODUCT keyword for extensions.
 *     29-JUN-2009 (DSB):
 *        Use new NDG provenance API.
+*     7-JUL-2009 (DSB):
+*        Ignore hidden ancestors.
 *     {enter_further_changes_here}
 
 *-
@@ -157,6 +160,7 @@
       INTEGER ID                 ! Index to a root ancestor
       INTEGER IDP                ! Index to current parent
       INTEGER IPROV              ! Identifier for provenance structure
+      INTEGER IPROV2             ! Id. for cleansed provenance structure
       INTEGER IREC               ! Loop counter for provenance records
       CHARACTER*( AST__SZCHR ) KEY ! Current key in KeyMap of root anc.
       INTEGER KEYMAP             ! AST KeyMap of root ancestors
@@ -201,6 +205,14 @@
 
 *  Get an identifier for a structure holding provenance info in the NDF.
          CALL NDG_READPROV( NDF, ' ', IPROV, STATUS )
+
+*  Get a copy of the provenance info excluding hidden ancestors.
+         CALL NDG_COPYPROV( IPROV, .TRUE., IPROV2, STATUS )
+
+*  Free the original provenance structure, and use the cleansed structure
+*  instead.
+         CALL NDG_FREEPROV( IPROV, STATUS )
+         IPROV = IPROV2         
 
 *  Direct parents
 *  ==============
