@@ -123,9 +123,11 @@
 *        Fix compiler warnings.
 *     2008-12-02 (DSB):
 *        Use astSetFitsU to set undefined values.
+*     2009-07-08 (TIMJ):
+*        Use astSetFitsCM instead of astSetFitsCN
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -472,7 +474,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 
 
   /* OMP and ORAC-DR Specific */
-  astSetFitsCN ( fitschan, "COMMENT", "", 
+  astSetFitsCM ( fitschan,
                  "---- OMP and ORAC-DR Specific ----", 0 );
 
   astSetFitsS ( fitschan, "PROJECT", gsdVars->project, 
@@ -496,7 +498,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 
 
   /* Obs Id, Date, Pointing Info */
-  astSetFitsCN ( fitschan, "COMMENT", "", 
+  astSetFitsCM ( fitschan,
                  "---- Obs Id, Date, pointing Info ----", 0 );
 
   astSetFitsS ( fitschan, "OBJECT", object, 
@@ -568,7 +570,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
                 "LST at end of observation", 0 );
 
   /* Integration time related. */
-  astSetFitsCN ( fitschan, "COMMENT", "", 
+  astSetFitsCM ( fitschan,
                  "---- Integration time related ----", 0 );
 
   astSetFitsF ( fitschan, "INT_TIME", intTime,
@@ -576,7 +578,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 
 
   /* ACSIS Specific. */
-  astSetFitsCN ( fitschan, "COMMENT", "", 
+  astSetFitsCM ( fitschan,
                  "---- ACSIS Specific ----", 0 );
 
   astSetFitsS ( fitschan, "BACKEND", backend,
@@ -639,7 +641,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 
 
   /* FE Specific. */
-  astSetFitsCN ( fitschan, "COMMENT", "", 
+  astSetFitsCM ( fitschan,
                  "---- FE Specific ----", 0 );
 
   astSetFitsS ( fitschan, "INSTRUME", instrume, 
@@ -688,7 +690,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 
 
   /* Environmental data. */
-  astSetFitsCN ( fitschan, "COMMENT", "", 
+  astSetFitsCM ( fitschan,
                  "---- Environmental Data ----", 0 );
 
   astSetFitsF ( fitschan, "ATSTART", gsdVars->tamb, 
@@ -762,7 +764,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 
 
   /* Switching and Map setup for the observation. */
-  astSetFitsCN ( fitschan, "COMMENT", "", 
+  astSetFitsCM ( fitschan,
                  "---- Switching and Map setup for the observationi ----", 0 );
 
   astSetFitsS ( fitschan, "SAM_MODE", samMode, 
@@ -881,7 +883,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 
 
   /* SMU */
-  astSetFitsCN ( fitschan, "COMMENT", "", 
+  astSetFitsCM ( fitschan,
                  "---- SMU ----", 0 );
 
   astSetFitsF ( fitschan, "ALIGN_DX", gsdVars->smuDX, 
@@ -907,7 +909,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 
 
   /* JOS parameters */
-  astSetFitsCN ( fitschan, "COMMENT", "", 
+  astSetFitsCM ( fitschan,
                  "---- JOS parameters ----", 0 );
 
   astSetFitsF ( fitschan, "STEPTIME", stepTime, 
@@ -948,7 +950,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 
 
   /* Miscellaneous parameters */
-  astSetFitsCN ( fitschan, "COMMENT", "", 
+  astSetFitsCM ( fitschan,
                  "---- Miscellaneous ----", 0 );
 
   astSetFitsU ( fitschan, "OCSCFG", "OCS config filename", 0 );
@@ -976,7 +978,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 
 
   /* Rover=specific parameters */
-  astSetFitsCN ( fitschan, "COMMENT", "", 
+  astSetFitsCM ( fitschan,
                  "---- ROVER Specific ----", 0 );
 
   astSetFitsL ( fitschan, "POL_CONN", 0,
