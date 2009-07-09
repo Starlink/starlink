@@ -142,9 +142,11 @@ void smf_obsmap_fill( const smfData * data, AstKeyMap * obsmap, AstKeyMap * objm
 
       /* anything in the beam */
       inbeam[0] = '\0';
-      smf_getfitss( data->hdr, "INBEAM", inbeam, sizeof(inbeam),
-                    status );
-      if (strlen(inbeam)) astMapPut0C( obsinfo, "INBEAM", inbeam, NULL );
+      if (astTestFits( data->hdr->fitshdr, "INBEAM", NULL ) ) {
+        smf_getfitss( data->hdr, "INBEAM", inbeam, sizeof(inbeam),
+                      status );
+        if (strlen(inbeam)) astMapPut0C( obsinfo, "INBEAM", inbeam, NULL );
+      }
 
       /* store the MJD of observation for sorting purposes */
       smf_find_dateobs( data->hdr, &dateobs, NULL, status );
