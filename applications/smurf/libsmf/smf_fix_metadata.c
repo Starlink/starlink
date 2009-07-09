@@ -668,6 +668,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
     if (astFindFits( fits, "POL_CONN", NULL, 0 ) ) {
       astDelFits( fits );
       have_fixed = 1;
+      ncards--;  /* Adjust the target number of cards */
     }
   }
 
@@ -965,7 +966,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
      that we do not try to add new cards into their "proper" positions in the header
      when we fix it. */
   if (ncards < astGetI( fits, "NCard" ) ) {
-    astSetI( fits, "Card", ncards );
+    astSetI( fits, "Card", ncards+1 );
     astSetFitsCM( fits, "---- Metadata Fixups ----", 0 );
   }
 
