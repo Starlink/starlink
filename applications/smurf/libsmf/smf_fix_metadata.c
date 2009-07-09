@@ -407,16 +407,6 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
   /* Only do something for ACSIS data - SCUBA-2 data is currently "perfect" */
   if (hdr->instrument != INST__ACSIS) return have_fixed;
 
-  /* Print out summary of this observation - this may get repetitive if multiple files come
-     from the same observation in one invocation but it seems better to describe each fix up
-     separately and in context. */
-  obsmap = astKeyMap( " " );
-  objmap = astKeyMap( " " );
-  smf_obsmap_fill( data, obsmap, objmap, status );
-  smf_obsmap_report( msglev, obsmap, objmap, status );
-  obsmap = astAnnul( obsmap );
-  objmap = astAnnul( objmap );
-
   /* Get the MJD of the observation. Does not need to be accurate so do not care whether
      it is from DATE-OBS or JCMTSTATE */
   smf_find_dateobs( hdr, &dateobs, NULL, status );
@@ -466,6 +456,63 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
   smf_getfitss( hdr, "CHOP_CRD", fitsvals.chop_crd, sizeof(fitsvals.chop_crd), status );
   smf_getfitss( hdr, "INSTRUME", fitsvals.instrume, sizeof(fitsvals.instrume), status );
   smf_getobsidss( hdr->fitshdr, fitsvals.obsid, sizeof(fitsvals.obsid), NULL, 0, status );
+
+  /* Do ROVER before printing out the obs description */
+
+  /* ROVER fix ups. For observations before 20090201 we sometimes
+     reported ROVER observations when there were no ROVER observations
+     occurring (see JCMT fault 20081119.001). There is a chance that
+     some eSMA observations will erroneously have their INBEAM
+     header nulled. Assume everything is fine after 20090201. */
+  cardisdef = astTestFits( fits, "INBEAM", &cardthere );
+  if ( fitsvals.utdate < 20080201 ) {
+    /* No known POL observations */
+    if ( !cardthere || cardisdef ) {
+      smf_fits_updateU( hdr, "INBEAM", "Hardware in the beam", status );
+      have_fixed = 1;
+    }
+  } else if ( fitsvals.utdate < 20090201 ) {
+    /* see if we have a matching LUT entry */
+    const ObsIdLUT * lut = smf__find_obsidlut( &fitsvals, status );
+    if (lut && lut->isrover) {
+      /* this is definitely a ROVER observation - we know during this period
+         that it will either say POL or it will be wrong. It will never be
+         multi-values.
+       */
+      char inbeam[81];
+      if (cardisdef) {
+        smf_getfitss( hdr, "INBEAM", inbeam, sizeof(inbeam), status );
+        msgSetc( "PREV", inbeam);
+      } else {
+        inbeam[0] = '\0';
+        msgSetc( "PREV", "blank");
+      }
+      if (strcmp( inbeam, "POL") != 0 ) {
+        msgOutif( msglev, "", INDENT "This is a POL observation. Updating INBEAM (was ^PREV).", status );
+        smf_fits_updateS( hdr, "INBEAM", "POL", "Hardware in the beam", status );
+        have_fixed = 1;
+      }
+    } else {
+      /* not a ROVER observation. So INBEAM should be undef. */
+      if ( !cardthere || cardisdef ) {
+        /* should be undef, not defined */
+        have_fixed = 1;
+        smf_fits_updateU( hdr, "INBEAM", "Hardware in the beam", status );
+        msgOutif( msglev, "",  INDENT "This is not a POL observation. Forcing INBEAM to undef.", status);
+      }
+    }
+
+  }
+
+  /* Print out summary of this observation - this may get repetitive if multiple files come
+     from the same observation in one invocation but it seems better to describe each fix up
+     separately and in context. */
+  obsmap = astKeyMap( " " );
+  objmap = astKeyMap( " " );
+  smf_obsmap_fill( data, obsmap, objmap, status );
+  smf_obsmap_report( msglev, obsmap, objmap, status );
+  obsmap = astAnnul( obsmap );
+  objmap = astAnnul( objmap );
 
   /* FITS header fix ups */
 
@@ -590,50 +637,6 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
     }
   }
 
-  /* ROVER fix ups. For observations before 20090201 we sometimes
-     reported ROVER observations when there were no ROVER observations
-     occurring (see JCMT fault 20081119.001). There is a chance that
-     some eSMA observations will erroneously have their INBEAM
-     header nulled. Assume everything is fine after 20090201. */
-  cardisdef = astTestFits( fits, "INBEAM", &cardthere );
-  if ( fitsvals.utdate < 20080201 ) {
-    /* No known POL observations */
-    if ( !cardthere || cardisdef ) {
-      smf_fits_updateU( hdr, "INBEAM", "Hardware in the beam", status );
-      have_fixed = 1;
-    }
-  } else if ( fitsvals.utdate < 20090201 ) {
-    /* see if we have a matching LUT entry */
-    const ObsIdLUT * lut = smf__find_obsidlut( &fitsvals, status );
-    if (lut && lut->isrover) {
-      /* this is definitely a ROVER observation - we know during this period
-         that it will either say POL or it will be wrong. It will never be
-         multi-values.
-       */
-      char inbeam[81];
-      if (cardisdef) {
-        smf_getfitss( hdr, "INBEAM", inbeam, sizeof(inbeam), status );
-        msgSetc( "PREV", inbeam);
-      } else {
-        inbeam[0] = '\0';
-        msgSetc( "PREV", "blank");
-      }
-      if (strcmp( inbeam, "POL") != 0 ) {
-        msgOutif( msglev, "", INDENT "This is a POL observation. Updating INBEAM (was ^PREV).", status );
-        smf_fits_updateS( hdr, "INBEAM", "POL", "Hardware in the beam", status );
-        have_fixed = 1;
-      }
-    } else {
-      /* not a ROVER observation. So INBEAM should be undef. */
-      if ( !cardthere || cardisdef ) {
-        /* should be undef, not defined */
-        have_fixed = 1;
-        smf_fits_updateU( hdr, "INBEAM", "Hardware in the beam", status );
-        msgOutif( msglev, "",  INDENT "This is not a POL observation. Forcing INBEAM to undef.", status);
-      }
-    }
-
-  }
   /* POL_CONN is deprecated so we should remove it completely */
   if (astTestFits( fits, "POL_CONN", NULL ) ) {
     astClear( fits, "Card" );
