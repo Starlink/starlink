@@ -30,11 +30,13 @@
 *        Originally added as part of smf_cubegrid
 *     3-JUN-2008 (TIMJ):
 *        Factored out into separate function.
+*     9-JUL-2009 (TIMJ):
+*        Increase reported accuracy of base position.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
-*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2008-2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -67,6 +69,8 @@
 void
 smf_display_projpars( AstSkyFrame * skyframe, double par[ 7 ],
                       int * status) {
+  int curdigits;           /* current value of digits() for frameset */
+  const int ndigits = 9;   /* Number of digits to use to format position */
 
   if (*status != SAI__OK) return;
 
@@ -77,11 +81,17 @@ smf_display_projpars( AstSkyFrame * skyframe, double par[ 7 ],
   msgSetd( "V", par[ 1 ] );
   msgOutif( MSG__NORM, " ", "      CRPIX2 = ^V", status );
   msgSetd( "V", par[ 2 ]*AST__DR2D );
+  curdigits = astGetI( skyframe, "digits(1)" );
+  astSetI( skyframe, "digits(1)", ndigits );
   msgSetc( "V2", astFormat( skyframe, 1, par[ 2 ] ) );
+  astSetI( skyframe, "digits(1)", curdigits );
   msgSetc( "S", astGetC( skyframe, "Symbol(1)" ) );
   msgOutif( MSG__NORM, " ", "      CRVAL1 = ^V ( ^S = ^V2 )", status );
   msgSetd( "V", par[ 3 ]*AST__DR2D );
+  curdigits = astGetI( skyframe, "digits(2)" );
+  astSetI( skyframe, "digits(2)", ndigits );
   msgSetc( "V2", astFormat( skyframe, 2, par[ 3 ] ) );
+  astSetI( skyframe, "digits(2)", curdigits );
   msgSetc( "S", astGetC( skyframe, "Symbol(2)" ) );
   msgOutif( MSG__NORM, " ", "      CRVAL2 = ^V ( ^S = ^V2 )", status );
   msgSetd( "V", par[ 4 ]*AST__DR2D );
