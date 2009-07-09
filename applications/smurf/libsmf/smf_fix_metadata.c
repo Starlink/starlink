@@ -710,8 +710,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
           /* need to look in the config */
           if (hdr->ocsconfig) {
             int found;
-            msgOutif( msglev, "", INDENT "** Examining OCSCONFIG", status );
-            found = smf__pattern_extract( hdr->ocsconfig, "<ROTATOR.*<PA>([0123456789\\.])</PA>.*</ROTATOR>",
+            found = smf__pattern_extract( hdr->ocsconfig, "<ROTATOR.*<PA>([0123456789\\.]+)</PA>.*</ROTATOR>",
                                           &(fitsvals.rot_pa), NULL, 0, status );
             if (!found) {
               if ( hdr->obstype == SMF__TYP_SKYDIP ) {
