@@ -208,7 +208,7 @@
 
 *  Read provenance information from the parent NDF and add it into the
 *  structure holding provenance information read from the child NDF.
-      CALL NDG_PUTPROV( IPROV, INDF2, MORE, AST__NULL, ISROOT, ' ', 
+      CALL NDG_PUTPROV( IPROV, INDF2, MORE, AST__NULL, ISROOT,
      :                  STATUS )
 
 *  Store the modified provenance information in the child NDF. 
