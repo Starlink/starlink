@@ -224,7 +224,7 @@ int smf_check_detpos( smfData *data, int report, int *status ){
                         msgSetc( "FILE", data->file->name );
                         msgSetr( "MAX", (float)( max_dist*AST__DR2D*3600.0) );
                         msgSeti( "T", itime + 1 );
-                        msgOutif( MSG__NORM, " ", "   WARNING: The detector "
+                        msgOutif( MSG__QUIET, " ", "   WARNING: The detector "
                                   "positions implied by the RECEPPOS and FPLANEX/Y "
                                   "values within '^FILE' (time slice ^T) differ "
                                   "by up to ^MAX arc-seconds.", status );
