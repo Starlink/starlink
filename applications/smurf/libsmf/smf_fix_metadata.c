@@ -180,6 +180,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
   size_t i;
   int missing_exp = 0;       /* Are we missing ACS_EXPOSURE? */
   int missing_off = 0;       /* Are we missing ACS_OFFEXPOSURE? */
+  int ncards;                /* number of cards in FitsChan on entry */
   AstKeyMap * obsmap = NULL; /* Info from all observations */
   AstKeyMap * objmap = NULL; /* All the object names used */
   double steptime = 0.0;     /* Step time */
@@ -326,6 +327,9 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
 
   fits = hdr->fitshdr;
   tmpState = hdr->allState;
+
+  /* find out where the FITS header currently ends */
+  ncards = astGetI( fits, "NCard" );
 
   /* Get the step time from the header if we have a hdr */
   if ( hdr->instrument!=INST__NONE  ) {
@@ -933,6 +937,15 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
   if (have_fixed) {
     /* need to include date and consider not overwriting previous value */
     smf_fits_updateS( hdr, "DHSVER", "MOD", "Data Handling Version", status );
+  }
+
+  /* Get the number of cards in the header now. And if the header has grown we
+     add a comment card indicating what the new block represent. This all assumes
+     that we do not try to add new cards into their "proper" positions in the header
+     when we fix it. */
+  if (ncards < astGetI( fits, "NCard" ) ) {
+    astSetI( fits, "Card", ncards );
+    astSetFitsCM( fits, "---- Metadata Fixups ----", 0 );
   }
 
   return have_fixed;
