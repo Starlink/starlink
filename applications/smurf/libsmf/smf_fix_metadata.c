@@ -641,6 +641,27 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
     }
   }
 
+  /* JIG_SCAL */
+  if ( hdr->obsmode == SMF__OBS_JIGGLE ) {
+    if (!astTestFits(fits, "JIG_SCAL", NULL) ) {
+      if (hdr->ocsconfig) {
+        double jigscal = VAL__BADD;
+        int found;
+        found = smf__pattern_extract( hdr->ocsconfig,
+                                      "<JIGGLE .*SCALE=\"([0123456789\\.]+)\"", &jigscal, NULL, 0, status );
+        if (found) {
+          smf_fits_updateD( hdr, "JIG_SCAL", jigscal, "[arcsec] Scale of jiggle pattern", status );
+          msgOutiff( msglev, "", INDENT "Missing JIG_SCAL - setting to %10g arcsec", status, jigscal );
+          have_fixed = 1;
+        } else {
+          msgOutiff( msglev, "", INDENT "** Could not determine JIG_SCAL in XML configuration", status );
+        }
+      } else {
+        msgOutiff( msglev, "", INDENT "** Could not determine JIG_SCAL. No XML configuration available", status );
+      }
+    }
+  }
+
   /* POL_CONN is deprecated so we should remove it completely */
   if (astTestFits( fits, "POL_CONN", NULL ) ) {
     astClear( fits, "Card" );
