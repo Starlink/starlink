@@ -124,9 +124,6 @@ void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
 
   if (*status != SAI__OK) return;
 
-  /* create something for INBEAM */
-  beaminfo = astKeyMap( " " );
-
   /* Now report the details of the observations */
   nobj = astMapSize( objmap );
   nobs = astMapSize( obsmap );
@@ -160,6 +157,9 @@ void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
       }
     }
     qsort( obslist, nobs, sizeof(*obslist), sortbytime );
+
+    /* create something for INBEAM */
+    beaminfo = astKeyMap( " " );
 
     /* Now do the actual summarizing */
     msgOutif(msglev, " ", "Processing data ^OBJ from the following observation^S :", status);
@@ -251,6 +251,8 @@ void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
                 status );
       msgBlankif( msglev, status );
     }
+
+    beaminfo = astAnnul(beaminfo);
 
   }
 
