@@ -27,10 +27,10 @@
 *     the direct children of the ancestor.
 *
 *     The ancestors to be removed can be specified either by giving 
-*     their indices (parameter ANCESTOR), or by comparing each ancestor 
-*     with a supplied pattern matching template (parameter PATTERN).
+*     their indices (Parameter ANCESTOR), or by comparing each ancestor 
+*     with a supplied pattern matching template (Parameter PATTERN).
 *
-*     If an ancestor is hidden rather than deleted (see parameter HIDE),
+*     If an ancestor is hidden rather than deleted (see Parameter HIDE),
 *     the ancestor is retained within the NDF, but a flag is set telling
 *     later applications to ignore the ancestor (exactly how the flag is
 *     used will depend on the particular application).
@@ -85,9 +85,9 @@
 *        listed in the PROVENANCE extension of the NDF is compared with 
 *        this template, and each ancestor that matches is removed.  The 
 *        item of provenance information to be compared to the pattern is
-*        specified by parameter ITEM. 
+*        specified by Parameter ITEM. 
 *     REMOVE = _LOGICAL (Read)
-*        If TRUE, then the ancestors specified by parameter PATTERN or
+*        If TRUE, then the ancestors specified by Parameter PATTERN or
 *        ANCESTORS are removed.  Otherwise, these ancestors are retained
 *        and all other ancestors are removed.  [TRUE]
 
@@ -194,7 +194,7 @@
 *     25-JUN-2009 (DSB):
 *        Updated to use new provenance API.
 *     7-JUL-2009 (DSB):
-*        Added parameter HIDE.
+*        Added Parameter HIDE.
 *     {enter_further_changes_here}
 
 *-

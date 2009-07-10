@@ -92,7 +92,7 @@
 *        in the display (but hidden ancestors will be highlighted as such). 
 *        Note, choosing to exclude hidden ancestors may change the index 
 *        displayed for each ancestor. The default is to display hidden 
-*        ancestors if and only if history is being displayed (see parameter 
+*        ancestors if and only if history is being displayed (see Parameter 
 *        HISTORY). []
 *     SHOW = LITERAL (Read)
 *        Determines which ancestors are displayed on the screen. It can
@@ -175,13 +175,13 @@
 *     9-JAN-2008 (DSB):
 *        Original version.
 *     7-FEB-2008 (DSB):
-*        Added parameter PARENTS.
+*        Added Parameter PARENTS.
 *     12-AUG-2008 (DSB):
-*        Added parameter SHOW.
+*        Added Parameter SHOW.
 *     16-APR-2009 (DSB):
 *        Corrected use of SHOW=ROOTS.
 *     25-JUN-2009 (DSB):
-*        Updated to use new provenance API. Added parameter HISTORY.
+*        Updated to use new provenance API. Added Parameter HISTORY.
 *     3-JUL-2009 (DSB):
 *        Correct formatting of history info to avoid truncating the last
 *        character.

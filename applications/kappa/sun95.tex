@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.35}
 \newcommand{\stardocnumber}    {95.35}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2009 June 20}
+\newcommand{\stardocdate}      {2009 July 7}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.10}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -40409,15 +40409,20 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
    Removes selected provenance information from an NDF
 }{
    \sstdescription{
-      This application removes selected ancestors from the provenance
-      information stored in a given NDF.  The `generation gap' caused by
-      removing an ancestor is bridged by assigning all the direct
-      parents of the removed ancestor to each of the direct children of
-      the ancestor.
-
-      The ancestors to be removed can be specified either by giving
-      their indices (Parameter ANCESTOR), or by comparing each ancestor
+      This application removes selected ancestors, either by hiding them,
+      or deleting them from the provenance information stored in a given NDF.
+      The `generation gap' caused by removing an ancestor is bridged by 
+      assigning all the direct parents of the removed ancestor to each of 
+      the direct children of the ancestor.
+ 
+      The ancestors to be removed can be specified either by giving 
+      their indices (Parameter ANCESTOR), or by comparing each ancestor 
       with a supplied pattern matching template (Parameter PATTERN).
+
+      If an ancestor is hidden rather than deleted (see Parameter HIDE),
+      the ancestor is retained within the NDF, but a flag is set telling
+      later applications to ignore the ancestor (exactly how the flag is
+      used will depend on the particular application).
    }
    \sstusage{
       provrem ndf pattern item
@@ -40431,10 +40436,15 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
          removed are instead determined using the PATTERN parameter.
          Each supplied index must be positive and refers to one of the
          NDFs listed in the ANCESTORS table in the PROVENANCE extension
-         of the NDF.  The maximum number of ancestors that can be
-         removed is limited to 100 unless {\tt "LL"}, {\tt "*"} or {\tt !} is
-         specified.  The supplied parameter value can take any of the
-         following forms.
+         of the NDF (including any hidden ancestors).  Note, if ancestor 
+         indices are determined using the PROVSHOW command, then PROVSHOW
+         should be run with the HIDE parameter set to {\tt FALSE}; otherwise
+         incorrect ancestor indices may be determined, resulting in the
+         wrong ancestors being removed by PROVREM.
+         
+         The maximum number of ancestors that can be removed is limited to 
+         100 unless {\tt "LL"}, {\tt "*"} or {\tt !} is specified.  The 
+         supplied parameter value can take any of the following forms.
 
          \ssthitemlist{
 
@@ -40454,6 +40464,15 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
             Any reasonable combination of above values separated by
             commas.  {\tt [!]}
          }
+      }
+      \sstsubsection{
+         HIDE = \_LOGICAL (Read)
+      }{
+         If {\tt TRUE}, then the ancestors are not deleted, but instead have a 
+         flag set indicating that they have been hidden.  All information 
+         about hidden ancestors is retained unchanged, and can be viewed
+         using \htmlref{PROVSHOW}{PROVSHOW} if the HIDE parameter is set 
+         {\tt FALSE} when running PROVSHOW.  {\tt [FALSE]}
       }
       \sstsubsection{
          ITEM = \htmlref{LITERAL}{se:parmenu} (Read)
@@ -40499,11 +40518,11 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
          This erases all provenance information.
       }
       \sstexamplesubsection{
-         provrem ff pattern='\_xb\$|\_yb\$'
-      }{
-         This removes all ancestors that have paths that end with {\tt "\_xb"}
-         or {\tt "\_yb"}.  Note, provenance paths do not include a trailing
-         {\tt ".sdf"} string.
+          provrem ff pattern='\_xb\$|\_yb\$' hide
+       }{
+          This hides, but does not permanently delete, all ancestors that 
+          have paths that end with {\tt "\_xb"} or {\tt "\_yb"}.  Note, 
+          provenance paths do not include a trailing {\tt ".sdf"} string.
       }
       \sstexamplesubsection{
          provrem ff pattern='\_ave'
@@ -40725,14 +40744,14 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
       \sstsubsection{ 
          HIDE = \_LOGICAL (Read)
       }{ 
-        If {\tt TRUE}, then any ancestors which are flagged as ``hidden'' 
-        (for example, using PROVREM) are excluded from the display. If
-        {\tt FALSE}, then all requested ancestors, whether hidden or not, 
-        are included in the display (but hidden ancestors will be 
-        highlighted as such). Note, choosing to exclude hidden ancestors 
-        may change the index displayed for each ancestor. The default is 
+        If {\tt TRUE}, then any ancestors which are flagged as `hidden' 
+        (for example, using \htmlref{PROVREM}{PROVREM}) are excluded from 
+        the display.  If {\tt FALSE}, then all requested ancestors, whether 
+        hidden or not, are included in the display (but hidden ancestors will
+        be highlighted as such).  Note, choosing to exclude hidden ancestors 
+        may change the index displayed for each ancestor.  The default is 
         to display hidden ancestors if and only if history is being 
-        displayed (see parameter HISTORY). []
+        displayed (see Parameter HISTORY).  []
       }
       \sstsubsection{ 
          HISTORY = \_LOGICAL (Read)
@@ -56053,7 +56072,7 @@ The following applications have been modified:
       \begin{itemize}
         \item Has a new parameter called HIDE that can be set to {\tt TRUE}
         to hide the selected ancestors rather than permanently deleting
-        them. Hidden ancestors in an NDF PROVENANCE extension will in 
+        them.  Hidden ancestors in an NDF PROVENANCE extension will in 
         general be ignored by subsequent applications, but all the provenance 
         information for hidden ancestors is retained unchanged in the 
         PROVENANCE extension.
@@ -56065,8 +56084,8 @@ The following applications have been modified:
         to display any history records stored in the provenance extension
         of each ancestor NDF.
         \item Has a new parameter called HIDE that can be set to {\tt TRUE}
-        to include ``hidden'' ancestors in the display. Ancestors can be
-        hidden using PROVREM.
+        to include ``hidden'' ancestors in the display.  Ancestors can be
+        hidden using \htmlref{PROVREM}{PROVREM}.
       \end{itemize}
 
    \item [\htmlref{ROTATE}{ROTATE}] \mbox{}

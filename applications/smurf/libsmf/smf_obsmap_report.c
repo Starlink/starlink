@@ -47,6 +47,8 @@
 *        Add message level argument.
 *     2009-05-27 (TIMJ):
 *        Sort observations into date order.
+*     2009-07-08 (TIMJ):
+*        Include INBEAM in report.
 
 *  Copyright:
 *     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
@@ -112,6 +114,7 @@ static int sortbytime( const void *in1, const void *in2);
 void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
                       int * status ) {
 
+  AstKeyMap * beaminfo = NULL; /* inbeam information */
   size_t i;
   size_t nobs;        /* number of distinct observations */
   size_t nobj;        /* number of distinct objects */
@@ -120,6 +123,9 @@ void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
   smfSortInfo * obslist = NULL; /* Sorted struct array */
 
   if (*status != SAI__OK) return;
+
+  /* create something for INBEAM */
+  beaminfo = astKeyMap( " " );
 
   /* Now report the details of the observations */
   nobj = astMapSize( objmap );
@@ -205,13 +211,25 @@ void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
           msgSetc( "SIM", "" );
         }
 
+        /* What is in the beam */
+        if ( astMapHasKey( obsinfo, "INBEAM" ) ) {
+          astMapGet0C( obsinfo, "INBEAM", &ctemp );
+          astMapPut0I( beaminfo, ctemp, 0, NULL );
+          msgSetc( "IB", "/" );
+          msgSetc( "IB", ctemp );
+        } else {
+          astMapPut0I( beaminfo, "none", 0, NULL );
+          msgSetc( "IB", "" );
+        }
+
+
         astMapGet0I( obsinfo, "OBSMODE", &itemp );
         msgSetc( "OM", smf_obsmode_str( itemp, status) );
         astMapGet0I( obsinfo, "OBSNUM", &itemp );
         msgSeti( "ON", itemp);
         astMapGet0I( obsinfo, "UTDATE", &itemp );
         msgSeti( "UT", itemp);
-        msgOutif(msglev, "", "  ^UT #^ON ^OM^SW ^OBJ ^OT ^SIM", status);
+        msgOutif(msglev, "", "  ^UT #^ON ^OM^SW^IB ^OBJ ^OT ^SIM", status);
 
         obsinfo = astAnnul( obsinfo );
       }
@@ -223,6 +241,13 @@ void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
     /* Warn if we seem to have a mix of simulated and non-simulated data */
     if (nsim != 0 && nsim != nobs) {
       msgOutif( MSG__QUIET, "", "WARNING: Mixing simulated and observational data",
+                status );
+      msgBlankif( msglev, status );
+    }
+
+    /* Warn if we are mixing observations with different INBEAM settings */
+    if ( astMapSize(beaminfo) > 1) {
+      msgOutif( MSG__QUIET, "", "WARNING: Mixing observations with different hardware in beam",
                 status );
       msgBlankif( msglev, status );
     }

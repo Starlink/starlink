@@ -4783,13 +4783,14 @@ ndgCountProv( prov, status )
    RETVAL
 
 void
-ndgWriteProv( prov, indf, status )
+ndgWriteProv( prov, indf, whdef, status )
   NdgProvenance * prov
   ndfint &indf
+  bool   whdef
   ndfint &status
  PROTOTYPE: $$$
  CODE:
-  ndgWriteProv( prov, indf, &status );
+  ndgWriteProv( prov, indf, whdef, &status );
  OUTPUT:
   status
 

@@ -28,7 +28,8 @@
 
 *  Returned Value:
 *     Returns int indicating whether the meta data were modified. 0 indicates
-*     no modifications were made.
+*     no modifications were made. Bits corresponding to the smf_metadata_fixups
+*     enum will be used to indicate which parts of the meta data were modified.
 
 *  Description:
 *     Analyzes the smfData struct and determines whether meta data
@@ -135,6 +136,7 @@ struct FitsHeaderStruct {
   char instrume[81];
   char rot_crd[81];
   char obsid[81];
+  char obsidss[81];
 };
 
 /* Struct defining dut1 information */
@@ -180,6 +182,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
   size_t i;
   int missing_exp = 0;       /* Are we missing ACS_EXPOSURE? */
   int missing_off = 0;       /* Are we missing ACS_OFFEXPOSURE? */
+  int ncards;                /* number of cards in FitsChan on entry */
   AstKeyMap * obsmap = NULL; /* Info from all observations */
   AstKeyMap * objmap = NULL; /* All the object names used */
   double steptime = 0.0;     /* Step time */
@@ -327,6 +330,9 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
   fits = hdr->fitshdr;
   tmpState = hdr->allState;
 
+  /* find out where the FITS header currently ends */
+  ncards = astGetI( fits, "NCard" );
+
   /* Get the step time from the header if we have a hdr */
   if ( hdr->instrument!=INST__NONE  ) {
     /* for a handful of observations, the STEPTIME seems to be a clone
@@ -392,7 +398,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
       /* Update the FitsChan - the header should be present */
       if (steptime != VAL__BADD) {
         smf_fits_updateD( hdr, "STEPTIME", steptime, NULL, status );
-        have_fixed = 1;
+        have_fixed |= SMF__FIXED_FITSHDR;
       }
     }
     if (*status == SAI__OK && steptime != VAL__BADD && steptime < VAL__SMLD) {
@@ -406,16 +412,6 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
 
   /* Only do something for ACSIS data - SCUBA-2 data is currently "perfect" */
   if (hdr->instrument != INST__ACSIS) return have_fixed;
-
-  /* Print out summary of this observation - this may get repetitive if multiple files come
-     from the same observation in one invocation but it seems better to describe each fix up
-     separately and in context. */
-  obsmap = astKeyMap( " " );
-  objmap = astKeyMap( " " );
-  smf_obsmap_fill( data, obsmap, objmap, status );
-  smf_obsmap_report( msglev, obsmap, objmap, status );
-  obsmap = astAnnul( obsmap );
-  objmap = astAnnul( objmap );
 
   /* Get the MJD of the observation. Does not need to be accurate so do not care whether
      it is from DATE-OBS or JCMTSTATE */
@@ -448,6 +444,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
   strcpy( fitsvals.rot_crd, "" );
   strcpy( fitsvals.instrume, "" );
   strcpy( fitsvals.obsid, "" );
+  strcpy( fitsvals.obsidss, "" );
 
   smf_getfitsi( hdr, "OBSNUM", &(fitsvals.obsnum), status );
   smf_getfitsi( hdr, "UTDATE", &(fitsvals.utdate), status );
@@ -465,7 +462,65 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
   smf_getfitsd( hdr, "CHOP_PA", &(fitsvals.chop_pa), status );
   smf_getfitss( hdr, "CHOP_CRD", fitsvals.chop_crd, sizeof(fitsvals.chop_crd), status );
   smf_getfitss( hdr, "INSTRUME", fitsvals.instrume, sizeof(fitsvals.instrume), status );
-  smf_getobsidss( hdr->fitshdr, fitsvals.obsid, sizeof(fitsvals.obsid), NULL, 0, status );
+  smf_getobsidss( hdr->fitshdr, fitsvals.obsid, sizeof(fitsvals.obsid), fitsvals.obsidss,
+                  sizeof(fitsvals.obsidss), status );
+
+  /* Do ROVER before printing out the obs description */
+
+  /* ROVER fix ups. For observations before 20090201 we sometimes
+     reported ROVER observations when there were no ROVER observations
+     occurring (see JCMT fault 20081119.001). There is a chance that
+     some eSMA observations will erroneously have their INBEAM
+     header nulled. Assume everything is fine after 20090201. */
+  cardisdef = astTestFits( fits, "INBEAM", &cardthere );
+  if ( fitsvals.utdate < 20080201 ) {
+    /* No known POL observations */
+    if ( !cardthere || cardisdef ) {
+      smf_fits_updateU( hdr, "INBEAM", "Hardware in the beam", status );
+      have_fixed |= SMF__FIXED_FITSHDR;
+    }
+  } else if ( fitsvals.utdate < 20090201 ) {
+    /* see if we have a matching LUT entry */
+    const ObsIdLUT * lut = smf__find_obsidlut( &fitsvals, status );
+    if (lut && lut->isrover) {
+      /* this is definitely a ROVER observation - we know during this period
+         that it will either say POL or it will be wrong. It will never be
+         multi-values.
+       */
+      char inbeam[81];
+      if (cardisdef) {
+        smf_getfitss( hdr, "INBEAM", inbeam, sizeof(inbeam), status );
+        msgSetc( "PREV", inbeam);
+      } else {
+        inbeam[0] = '\0';
+        msgSetc( "PREV", "blank");
+      }
+      if (strcmp( inbeam, "POL") != 0 ) {
+        msgOutif( msglev, "", INDENT "This is a POL observation. Updating INBEAM (was ^PREV).", status );
+        smf_fits_updateS( hdr, "INBEAM", "POL", "Hardware in the beam", status );
+        have_fixed |= SMF__FIXED_FITSHDR;
+      }
+    } else {
+      /* not a ROVER observation. So INBEAM should be undef. */
+      if ( !cardthere || cardisdef ) {
+        /* should be undef, not defined */
+        have_fixed |= SMF__FIXED_FITSHDR;
+        smf_fits_updateU( hdr, "INBEAM", "Hardware in the beam", status );
+        msgOutif( msglev, "",  INDENT "This is not a POL observation. Forcing INBEAM to undef.", status);
+      }
+    }
+
+  }
+
+  /* Print out summary of this observation - this may get repetitive if multiple files come
+     from the same observation in one invocation but it seems better to describe each fix up
+     separately and in context. */
+  obsmap = astKeyMap( " " );
+  objmap = astKeyMap( " " );
+  smf_obsmap_fill( data, obsmap, objmap, status );
+  smf_obsmap_report( msglev, obsmap, objmap, status );
+  obsmap = astAnnul( obsmap );
+  objmap = astAnnul( objmap );
 
   /* FITS header fix ups */
 
@@ -474,13 +529,13 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
   if (!astTestFits( fits, "LOFREQS", NULL ) ) {
     /* undef or missing makes no difference */
     smf_fits_updateD( hdr, "LOFREQS", tmpState[0].fe_lofreq, "[GHz] LO Frequency at start of obs.", status );
-    have_fixed = 1;
+    have_fixed |= SMF__FIXED_FITSHDR;
   }
   if (!astTestFits( fits, "LOFREQE", NULL ) ) {
     /* undef or missing makes no difference */
     smf_fits_updateD( hdr, "LOFREQE", tmpState[hdr->nframes - 1].fe_lofreq,
                       "[GHz] LO Frequency at end of obs.", status );
-    have_fixed = 1;
+    have_fixed |= SMF__FIXED_FITSHDR;
   }
 
   /* DUT1 */
@@ -492,7 +547,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
       if (dateobs > dut1[i].mjd && dateobs < dut1[i+1].mjd) {
         smf_fits_updateD( hdr, "DUT1", dut1[i].dut1 / SPD,
                           "[d] UT1-UTC correction", status );
-        have_fixed = 1;
+        have_fixed |= SMF__FIXED_FITSHDR;
         found = 1;
       }
       i++;
@@ -522,7 +577,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
       smf_fits_updateD( hdr, "OBSGEO-Z", 2150964.058506, NULL, status );
       smf_fits_updateD( hdr, "LONG-OBS", 19.82583335521, NULL, status );
       smf_fits_updateD( hdr, "LAT-OBS", -155.4797222301, NULL, status );
-      have_fixed = 1;
+      have_fixed |= SMF__FIXED_FITSHDR;
     }
   }
 
@@ -546,7 +601,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
       msgOutif( msglev, "", INDENT "Fixing instrument aperture sign convention.", status );
       smf_fits_updateD( hdr, "INSTAP_X", -1.0 * fitsvals.instap_x, NULL, status );
       smf_fits_updateD( hdr, "INSTAP_Y", -1.0 * fitsvals.instap_y, NULL, status );
-      have_fixed = 1;
+      have_fixed |= SMF__FIXED_FITSHDR;
     }
   }
 
@@ -558,26 +613,32 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
     smf_fits_updateD( hdr, "INSTAP_Y", 0.0, NULL, status );
   }
 
+  /* Store OBSIDSS */
+  if (!astTestFits( fits, "OBSIDSS", NULL ) ) {
+    smf_fits_updateS( hdr, "OBSIDSS", fitsvals.obsidss, "Unique observation subsys identifier", status );
+    have_fixed |= SMF__FIXED_FITSHDR;
+  }
+
   /* Make BASEC1, BASEC2 and TRACKSYS available */
   if (!astTestFits( fits, "TRACKSYS", NULL ) ) {
     /* undef or missing makes no difference */
     msgOutiff( msglev, "", INDENT "Missing TRACKSYS - setting to '%s'", status, tmpState[0].tcs_tr_sys);
     smf_fits_updateS( hdr, "TRACKSYS", tmpState[0].tcs_tr_sys, "TCS Tracking coordinate system", status );
-    have_fixed = 1;
+    have_fixed |= SMF__FIXED_FITSHDR;
   }
   if (!astTestFits( fits, "BASEC1", NULL ) ) {
     /* undef or missing makes no difference */
     double basedeg = tmpState[0].tcs_tr_bc1 * AST__DR2D;
     msgOutiff( msglev, "", INDENT "Missing BASEC1 - setting to %g deg", status, basedeg);
     smf_fits_updateD( hdr, "BASEC1", basedeg, "[deg] TCS BASE position (longitude) in TRACKSYS", status );
-    have_fixed = 1;
+    have_fixed |= SMF__FIXED_FITSHDR;
   }
   if (!astTestFits( fits, "BASEC2", NULL ) ) {
     /* undef or missing makes no difference */
     double basedeg = tmpState[0].tcs_tr_bc2 * AST__DR2D;
     msgOutiff( msglev, "", INDENT "Missing BASEC2 - setting to %g deg", status, basedeg);
     smf_fits_updateD( hdr, "BASEC2", basedeg, "[deg] TCS BASE position (latitude) in TRACKSYS", status );
-    have_fixed = 1;
+    have_fixed |= SMF__FIXED_FITSHDR;
   }
 
   /* New nomenclature for "raster". It is now a "scan" since 20080610. */
@@ -586,60 +647,38 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
     smf_getfitss( hdr, "SAM_MODE", sam_mode, sizeof(sam_mode), status );
     if ( strncasecmp( "raster", sam_mode, 6 ) == 0 ) {
       smf_fits_updateS( hdr, "SAM_MODE", "scan", NULL, status );
-      have_fixed = 1;
+      have_fixed |= SMF__FIXED_FITSHDR;
     }
   }
 
-  /* ROVER fix ups. For observations before 20090201 we sometimes
-     reported ROVER observations when there were no ROVER observations
-     occurring (see JCMT fault 20081119.001). There is a chance that
-     some eSMA observations will erroneously have their INBEAM
-     header nulled. Assume everything is fine after 20090201. */
-  cardisdef = astTestFits( fits, "INBEAM", &cardthere );
-  if ( fitsvals.utdate < 20080201 ) {
-    /* No known POL observations */
-    if ( !cardthere || cardisdef ) {
-      smf_fits_updateU( hdr, "INBEAM", "Hardware in the beam", status );
-      have_fixed = 1;
-    }
-  } else if ( fitsvals.utdate < 20090201 ) {
-    /* see if we have a matching LUT entry */
-    const ObsIdLUT * lut = smf__find_obsidlut( &fitsvals, status );
-    if (lut && lut->isrover) {
-      /* this is definitely a ROVER observation - we know during this period
-         that it will either say POL or it will be wrong. It will never be
-         multi-values.
-       */
-      char inbeam[81];
-      if (cardisdef) {
-        smf_getfitss( hdr, "INBEAM", inbeam, sizeof(inbeam), status );
-        msgSetc( "PREV", inbeam);
+  /* JIG_SCAL */
+  if ( hdr->obsmode == SMF__OBS_JIGGLE ) {
+    if (!astTestFits(fits, "JIG_SCAL", NULL) ) {
+      if (hdr->ocsconfig) {
+        double jigscal = VAL__BADD;
+        int found;
+        found = smf__pattern_extract( hdr->ocsconfig,
+                                      "<JIGGLE .*SCALE=\"([0123456789\\.]+)\"", &jigscal, NULL, 0, status );
+        if (found) {
+          smf_fits_updateD( hdr, "JIG_SCAL", jigscal, "[arcsec] Scale of jiggle pattern", status );
+          msgOutiff( msglev, "", INDENT "Missing JIG_SCAL - setting to %10g arcsec", status, jigscal );
+          have_fixed |= SMF__FIXED_FITSHDR;
+        } else {
+          msgOutiff( msglev, "", INDENT "** Could not determine JIG_SCAL in XML configuration", status );
+        }
       } else {
-        inbeam[0] = '\0';
-        msgSetc( "PREV", "blank");
-      }
-      if (strcmp( inbeam, "POL") != 0 ) {
-        msgOutif( msglev, "", INDENT "This is a POL observation. Updating INBEAM (was ^PREV).", status );
-        smf_fits_updateS( hdr, "INBEAM", "POL", "Hardware in the beam", status );
-        have_fixed = 1;
-      }
-    } else {
-      /* not a ROVER observation. So INBEAM should be undef. */
-      if ( !cardthere || cardisdef ) {
-        /* should be undef, not defined */
-        have_fixed = 1;
-        smf_fits_updateU( hdr, "INBEAM", "Hardware in the beam", status );
-        msgOutif( msglev, "",  INDENT "This is not a POL observation. Forcing INBEAM to undef.", status);
+        msgOutiff( msglev, "", INDENT "** Could not determine JIG_SCAL. No XML configuration available", status );
       }
     }
-
   }
+
   /* POL_CONN is deprecated so we should remove it completely */
   if (astTestFits( fits, "POL_CONN", NULL ) ) {
     astClear( fits, "Card" );
     if (astFindFits( fits, "POL_CONN", NULL, 0 ) ) {
       astDelFits( fits );
-      have_fixed = 1;
+      have_fixed |= SMF__FIXED_FITSHDR;
+      ncards--;  /* Adjust the target number of cards */
     }
   }
 
@@ -654,7 +693,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
         if (found) {
           smf_fits_updateS( hdr, "ROT_CRD", fitsvals.rot_crd, "K-mirror coordinate system", status );
           msgOutiff( msglev, "", INDENT "Missing ROT_CRD - setting to '%s'", status, fitsvals.rot_crd );
-          have_fixed = 1;
+          have_fixed |= SMF__FIXED_FITSHDR;
         } else {
           msgOutif( msglev, "", INDENT "** Could not find ROT_CRD in XML configuration", status );
         }
@@ -681,8 +720,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
           /* need to look in the config */
           if (hdr->ocsconfig) {
             int found;
-            msgOutif( msglev, "", INDENT "** Examining OCSCONFIG", status );
-            found = smf__pattern_extract( hdr->ocsconfig, "<ROTATOR.*<PA>([0123456789\\.])</PA>.*</ROTATOR>",
+            found = smf__pattern_extract( hdr->ocsconfig, "<ROTATOR.*<PA>([0123456789\\.]+)</PA>.*</ROTATOR>",
                                           &(fitsvals.rot_pa), NULL, 0, status );
             if (!found) {
               if ( hdr->obstype == SMF__TYP_SKYDIP ) {
@@ -709,7 +747,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
         if (fitsvals.rot_pa != VAL__BADD) {
           msgOutiff( msglev, "", INDENT "Missing ROT_PA - setting to %g deg", status, fitsvals.rot_pa );
           smf_fits_updateD( hdr, "ROT_PA", fitsvals.rot_pa, "[deg] K-mirror angle", status );
-          have_fixed = 1;
+          have_fixed |= SMF__FIXED_FITSHDR;
         } else {
           /* clear it but force it to exist */
           smf_fits_updateU( hdr, "ROT_PA", "[deg] K-mirror angle", status );
@@ -747,7 +785,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
           tmpState[i].tcs_tai = tmpState[i].rts_end - step;
         }
       }
-      have_fixed = 1;
+      have_fixed |= SMF__FIXED_JCMTSTATE;
     }
   }
 
@@ -767,7 +805,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
         if (tmpState[i].smu_az_chop_x == VAL__BADD) tmpState[i].smu_az_chop_x = chop_x;
         if (tmpState[i].smu_az_chop_y == VAL__BADD) tmpState[i].smu_az_chop_y = chop_y;
       }
-      have_fixed = 1;
+      have_fixed |= SMF__FIXED_JCMTSTATE;
     } else {
       *status = SAI__ERROR;
       errRepf( "", "Missing SMU_AZ_CHOP entry but not yet able to fix for %s chop coordinate system",
@@ -921,7 +959,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
       if (missing_exp) tmpState[i].acs_exposure = exp_time;
       if (missing_off) tmpState[i].acs_offexposure = off_time;
     }
-    have_fixed = 1;
+    have_fixed |= SMF__FIXED_JCMTSTATE;
 
   }
 
@@ -930,6 +968,15 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
   if (have_fixed) {
     /* need to include date and consider not overwriting previous value */
     smf_fits_updateS( hdr, "DHSVER", "MOD", "Data Handling Version", status );
+  }
+
+  /* Get the number of cards in the header now. And if the header has grown we
+     add a comment card indicating what the new block represent. This all assumes
+     that we do not try to add new cards into their "proper" positions in the header
+     when we fix it. */
+  if (ncards < astGetI( fits, "NCard" ) ) {
+    astSetI( fits, "Card", ncards+1 );
+    astSetFitsCM( fits, "---- Metadata Fixups ----", 0 );
   }
 
   return have_fixed;

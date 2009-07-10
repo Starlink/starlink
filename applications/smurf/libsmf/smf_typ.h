@@ -302,6 +302,13 @@ typedef enum smf_bpm_meth {
   SMF__BPM_QQUAL=4        /* Apply mask to first slice of quality array */
 } smf_bpm_meth;
 
+/* Parts of a header that can have their metadata fixed */
+typedef enum smf_metadata_fixups {
+  SMF__FIXED_FITSHDR=1,   /* Updated FITS header */
+  SMF__FIXED_JCMTSTATE=2, /* Updated JCMTSTATE information */
+  SMF__FIXED_ACSIS=4,     /* Updated ACSIS extension information */
+} smf_metadata_fixups;
+
 /* Indicate a bad array index */
 static const size_t SMF__BADIDX = (size_t)-1;
 

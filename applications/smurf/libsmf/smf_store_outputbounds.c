@@ -60,6 +60,8 @@
 *        Parameter update is now optional.
 *     28-MAY-2009 (TIMJ):
 *        Remove some code duplication by using a loop.
+*     9-JUL-2009 (TIMJ):
+*        Increase reported accuracy of map extent.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -143,6 +145,12 @@ smf_store_outputbounds (int updatepars, const int lbnd_out[3],
 
    astNorm( wcsout, wcslbnd_out );
    astNorm( wcsout, wcsubnd_out );
+
+   /* adjust resolution of output frameset since in some cases we are interested in
+      sub-arcsec resolution when comparing positions with different arguments
+      (especially with RxA and using very small pixel sizes. Use digits() rather
+      than format() so that we do not have to worry about hms vs dms */
+   astSet( (AstFrameSet*)wcsout, "digits(1)=9,digits(2)=9" );
 
    if (ndims == 3) {
      msgOutif( MSG__NORM, "WCS_WBND1",
