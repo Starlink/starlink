@@ -1,10 +1,10 @@
-      SUBROUTINE KPS1_CLPS<T>( AXIS, LO, HI, VAR, METH, WLIM, NEL2, 
-     :                       NDIM1, LBND1, UBND1, DIN, VIN, CIN, NDIM2,
-     :                       LBND2, UBND2, USEWRK, NFLAG, DOUT, VOUT, 
-     :                       WOUT, WORK1, WORK2, WORK3, STATUS )
+      SUBROUTINE KPS1_CLPS<T>( AXIS, LO, HI, VAR, METH, WLIM, CLIP, 
+     :                       NEL2, NDIM1, LBND1, UBND1, DIN, VIN, CIN,
+     :                       NDIM2, LBND2, UBND2, USEWRK, NFLAG, DOUT, 
+     :                       VOUT, WOUT, WORK1, WORK2, WORK3, STATUS )
 *+
 *  Name:
-*     KPS1_CLPS<T>
+*     KPS1_CLPSx
 
 *  Purpose:
 *     Collapse one axis of an N-dimensional array using one of a
@@ -14,7 +14,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_CLPS<T>( AXIS, LO, HI, VAR, METH, WLIM, NEL2, NDIM1, 
+*     CALL KPS1_CLPSx( AXIS, LO, HI, VAR, METH, WLIM, CLIP, NEL2, NDIM1,
 *                      LBND1, UBND1, DIN, VIN, CIN, NDIM2, LBND2,
 *                      UBND2, USEWRK, NFLAG, DOUT, VOUT, WOUT, WORK1, 
 *                      WORK2, WORK3, STATUS )
@@ -36,11 +36,15 @@
 *        Process variances?
 *     METH = CHARACTER * ( * ) (Given)
 *        Estimator: 'MEAN', 'WMEAN', 'MODE', 'MEDIAN', 'SUM', 'SIGMA', 
-*        'INTEG', 'IWC', 'IWD', 'RMS', 'ABSDEV', 'MAX', 'MIN', 'COMAX',
-*        or 'COMIN'.  See the COLLAPSE documentation for details.
+*        'CMEAN', 'CSIGMA', 'INTEG', 'IWC', 'IWD', 'RMS', 'ABSDEV',
+*        'MAX', 'MIN', 'COMAX', or 'COMIN'.  See the COLLAPSE 
+*        documentation for details.
 *     WLIM = REAL (Given)
 *        Fraction of pixels which must be good to create a good output
 *        pixel.
+*     CLIP = REAL (Given)
+*        The number of standard deviations about the mean to clip 
+*        outliers to form the  'MODE', 'CMEAN', or 'CSIGMA' statistics.
 *     NEL2 = INTEGER (Given)
 *        Total number of elements in the output array (i.e. the product
 *        of the output dimension sizes).
@@ -50,12 +54,12 @@
 *        The lower pixel index bounds of the input array.
 *     UBND1( NDIM1 ) = INTEGER (Given)
 *        The upper pixel index bounds of the input array.
-*     DIN( * ) = <TYPE> (Given)
+*     DIN( * ) = ? (Given)
 *        The input data values.
-*     VIN( * ) = <TYPE> (Given)
+*     VIN( * ) = ? (Given)
 *        The input variance values.  It is only accessed if VAR is
 *        .TRUE.
-*     CIN( * ) = <TYPE> (Given)
+*     CIN( * ) = ? (Given)
 *        The co-ordinates along the collapse axis, starting at index LO,
 *        for each pixel.  It is only accessed if METH is one of 'INTEG',
 *        'IWC', 'IWD', 'COMAX', or 'COMIN'.
@@ -75,22 +79,24 @@
 *        The count excludes those lines where there are no good values.
 *        NFLAG  should be initialised to zero before any subdivision of
 *        the collapse by chunking.
-*     DOUT( * ) = <TYPE> (Returned)
+*     DOUT( * ) = ? (Returned)
 *        The output data values.
-*     VOUT( * ) = <TYPE> (Returned)
+*     VOUT( * ) = ? (Returned)
 *        The output variance values.  It is only accessed if VAR is
-*        .TRUE.
-*     WOUT( * ) = <TYPE> (Returned)
+*        .TRUE., and if the number of elements to collapse for each
+*        output is no more than 300 for METH='CMEAN', 'CSIGMA', or
+*        'MODE'.
+*     WOUT( * ) = ? (Returned)
 *        The pixel widths along the collapse axis, starting at index LO.
 *        It is only accessed if METH is 'INTEG'
-*     WORK1( NEL2, * ) = <TYPE> (Returned)
+*     WORK1( NEL2, * ) = ? (Returned)
 *        Work array.  The second axis should have at least (HI-LO+1) 
 *        elements. It is nly accessed if AXIS is not equal to NDIM1.
-*     WORK2( NEL2, * ) = <TYPE> (Returned)
+*     WORK2( NEL2, * ) = ? (Returned)
 *        Work array.  The second axis should have at least (HI-LO+1)
 *        elements.  It is only accessed if VAR is .TRUE., and AXIS is
 *        not equal to NDIM1.
-*     WORK3( NEL2, * ) = <TYPE> (Returned)
+*     WORK3( NEL2, * ) = ? (Returned)
 *        Work array.  The second axis should have at least (HI-LO+1)
 *        elements.  It is only accessed if METH is one of 'INTEG',
 *        'IWC', 'IWD', 'COMAX', 'COMIN'; and AXIS is not equal to NDIM1.
@@ -99,8 +105,11 @@
 
 *  Copyright:
 *     Copyright (C) 2000-2001, 2003-2004 Central Laboratory of the
-*     Research Councils. Copyright (C) 2005-2006 Particle Physics &
-*     Astronomy Research Council. All Rights Reserved.
+*     Research Councils. 
+*     Copyright (C) 2005-2006 Particle Physics & Astronomy Research 
+*     Council. 
+*     Copyright (C) 2007-2009 Science & Technology Facilities Council. 
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -184,8 +193,18 @@
 *        Bug fix: reorder the co-ordinate array for INTEG.
 *     2007 December 10 (MJC);
 *        Add NFLAG argument.
-*     2008 October 5 (MJC);
+*     2008 September 9 (MJC);
+*        Add Method 14 (CSIGMA).
+*     2008 October 5 (MJC):
 *        Allowed for non-trimmed data.
+*     2009 July 2 (MJC):
+*        Add Method 6 (CMEAN).  Switch to non-variance mode for the
+*        methods that use covariance when variance selected and the
+*        number of pixels along the collapse axis is too large (300).
+*        Added commentary to explain this.  Use new CCG routines.
+*        Increment NFLAG.
+*     2009 July 9 (MJC):
+*        Added CLIP argument.
 *     {enter_further_changes_here}
 
 *-
@@ -197,6 +216,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'PRM_PAR'          ! VAL constants
+      INCLUDE 'MSG_PAR'          ! MSG__ constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
@@ -206,6 +226,7 @@
       LOGICAL VAR
       CHARACTER METH*(*)
       REAL WLIM
+      REAL CLIP
       INTEGER NEL2
       INTEGER NDIM1
       INTEGER LBND1( NDIM1 )
@@ -232,6 +253,10 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  Local Constants:
+      INTEGER MAXVAR             ! Maximum no. of pixels along collapsed
+      PARAMETER( MAXVAR = 300 )  ! axis for median, mode, clipped stats
+
 *  Local Variables:
       LOGICAL CARRY              ! Increment next axis?
       INTEGER DIM1( NDF__MXDIM ) ! Input dimension sizes
@@ -241,6 +266,7 @@
       INTEGER IAX2               ! Output axis index
       INTEGER IEL1               ! Index into input data vectors
       INTEGER IEL2               ! Index into output data vectors
+      INTEGER IFLAG              ! Supplied NFLAG
       INTEGER IMETH              ! Combination method
       INTEGER IPCOIN             ! Pointer to workspace, co-ord indices
       INTEGER IPCOV              ! Pointer to workspace
@@ -268,55 +294,61 @@
 *.
 
 *  Check the inherited global status.
-      IF( STATUS .NE. SAI__OK ) RETURN
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check the supplied METH value.
-      IF( METH .EQ. 'MEAN' ) THEN
+      IF ( METH .EQ. 'MEAN' ) THEN
          IMETH = 1
 
-      ELSE IF( METH .EQ. 'WMEAN' ) THEN
+      ELSE IF ( METH .EQ. 'WMEAN' ) THEN
          IMETH = 2
 
-      ELSE IF( METH .EQ. 'MEDIAN' ) THEN
+      ELSE IF ( METH .EQ. 'MEDIAN' ) THEN
          IMETH = 3
 
-      ELSE IF( METH .EQ. 'MODE' ) THEN
+      ELSE IF ( METH .EQ. 'MODE' ) THEN
          IMETH = 5
 
-      ELSE IF( METH .EQ. 'SUM' ) THEN
+      ELSE IF ( METH .EQ. 'CMEAN' ) THEN
+         IMETH = 6
+
+      ELSE IF ( METH .EQ. 'SUM' ) THEN
          IMETH = 12
 
-      ELSE IF( METH .EQ. 'SIGMA' ) THEN
+      ELSE IF ( METH .EQ. 'SIGMA' ) THEN
          IMETH = 13
 
-      ELSE IF( METH .EQ. 'INTEG' ) THEN
+      ELSE IF ( METH .EQ. 'CSIGMA' ) THEN
+         IMETH = 14
+
+      ELSE IF ( METH .EQ. 'INTEG' ) THEN
          IMETH = 21
 
-      ELSE IF( METH .EQ. 'IWC' ) THEN
+      ELSE IF ( METH .EQ. 'IWC' ) THEN
          IMETH = 22
 
-      ELSE IF( METH .EQ. 'IWD' ) THEN
+      ELSE IF ( METH .EQ. 'IWD' ) THEN
          IMETH = 23
 
-      ELSE IF( METH .EQ. 'RMS' ) THEN
+      ELSE IF ( METH .EQ. 'RMS' ) THEN
          IMETH = 24
 
-      ELSE IF( METH .EQ. 'ABSDEV' ) THEN
+      ELSE IF ( METH .EQ. 'ABSDEV' ) THEN
          IMETH = 25
 
-      ELSE IF( METH .EQ. 'MAX' ) THEN
+      ELSE IF ( METH .EQ. 'MAX' ) THEN
          IMETH = 31
 
-      ELSE IF( METH .EQ. 'MIN' ) THEN
+      ELSE IF ( METH .EQ. 'MIN' ) THEN
          IMETH = 32
 
-      ELSE IF( METH .EQ. 'COMAX' ) THEN
+      ELSE IF ( METH .EQ. 'COMAX' ) THEN
          IMETH = 33
 
-      ELSE IF( METH .EQ. 'COMIN' ) THEN
+      ELSE IF ( METH .EQ. 'COMIN' ) THEN
          IMETH = 34
 
-      ELSE IF( STATUS .EQ. SAI__OK ) THEN
+      ELSE IF ( STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'M', METH )
          CALL ERR_REP( 'KPS1_CLPS<T>_ERR1', 'KPS1_CLPS<T>: '//
@@ -330,7 +362,7 @@
       USEIND = IMETH .GE. 31 .AND. IMETH .LE. 34
       USECO = IMETH .EQ. 22 .OR. IMETH .EQ. 23 .OR. IMETH .EQ. 33 .OR.
      :        IMETH .EQ. 34
-      USECV = IMETH .GE. 3 .AND. IMETH .LE. 11
+      USECV = IMETH .GE. 3 .AND. IMETH .LE. 11 .OR. IMETH .EQ. 14
       USEWID = IMETH .EQ. 21
 
 *  Decide whether the WLIM pertains to the method.
@@ -359,7 +391,7 @@
 *  combination routines used at the end of this routine can access them
 *  in "natural" order.
       START = 1
-      IF( .NOT. USEWRK ) THEN
+      IF ( .NOT. USEWRK ) THEN
 
 *  Note the index of the first element of the first plane to be included
 *  in the output array.
@@ -378,9 +410,9 @@
 *  Find the pixel indices of the first input pixel to contribute to
 *  the current output pixel.
             DO IAX1 = 1, NDIM1
-               IF( IAX1 .LT. AXIS ) THEN 
+               IF ( IAX1 .LT. AXIS ) THEN 
                   POS1( IAX1 ) = POS2( IAX1 )
-               ELSE IF( IAX1 .EQ. AXIS ) THEN
+               ELSE IF ( IAX1 .EQ. AXIS ) THEN
                   POS1( IAX1 ) = LO
                ELSE IF ( TRIM ) THEN
                   POS1( IAX1 ) = POS2( IAX1 - 1 )
@@ -419,12 +451,12 @@
             IAX2 = 1
             DO WHILE( CARRY )
                POS2( IAX2 ) = POS2( IAX2 ) + 1
-               IF( POS2( IAX2 ) .LE. UBND2( IAX2 ) ) THEN
+               IF ( POS2( IAX2 ) .LE. UBND2( IAX2 ) ) THEN
                   CARRY = .FALSE.
                ELSE
                   POS2( IAX2 ) = LBND2( IAX2 )
                   IAX2 = IAX2 + 1
-                  IF( IAX2 .GT. NDIM2 ) CARRY = .FALSE.
+                  IF ( IAX2 .GT. NDIM2 ) CARRY = .FALSE.
                END IF
             END DO            
 
@@ -450,15 +482,48 @@
 
 *  Get workspace if co-ordinates are to be derived, otherwise
 *  use a valid pointer.
+
+*  There's no need to allocate allocate memory for the pixel indices
+*  of the maximum or minimum values, or the intensity-weight 
+*  co-ordinate or dispersion, as we can use the IPPNT array.
       IF ( USEIND ) THEN
          CALL PSX_CALLOC( NEL2, '_INTEGER', IPCOIN, STATUS )
       ELSE
          IPCOIN = IPPNT
       END IF
 
-*  There's no need to allocate allocate memory for the pixel indices
-*  of the maximum or minimum values, or the intensity-weight 
-*  co-ordinate or dispersion, as we can use the IPPNT array.
+*  Some of the CCDPACK combination routines use a covariance matrix.
+*  This has dimensions roughly half of the collapsed axis length 
+*  cubed.  While this was practical when combining a few to a few 
+*  tens of CCD images, here the collapse is along an axis
+*  potenitally containing thousands of elements, it can easily exceed
+*  the address space and virtual memory to process what might be a
+*  relatively small array.  Therefore we cannot use the actual
+*  variances for these methods once the number of pixels extends
+*  beyond the intended range for those CCDPACK routines.  We choose
+*  three-hundred pixels along the collapse axis as the the threshold.
+*  Below that the variances and covariances are used.  Above that
+*  equal weighting is adopted.
+
+*  For the statistics supported here that use covariance, the median
+*  has special code via IMETH=300 (see below).  For the others we 
+*  pretend that there is no variance.
+      IF ( NLIN .GT. MAXVAR .AND. ( IMETH .GT. 3 .AND. IMETH .LE. 11 
+     :                              .OR. IMETH .EQ. 14 ) ) THEN
+         IF ( VAR ) THEN
+            CALL MSG_SETI( 'ML', MAXVAR )
+            CALL MSG_OUTIF( MSG__VERB, ' ',
+     :         'Unable to use variance to weight because the axis to '/
+     :         /'be collapsed contains more than ^ML elements.  Using '/
+     :         /'equal weights.  Output variances are lost.', STATUS )
+           VAR = .FALSE.
+        END IF
+      END IF
+
+*  Statistics routines only work on the current block for a large
+*  dataset, so record the supplied cumulative number of flagged output
+*  values.
+      IFLAG = NFLAG
 
 *  First deal with cases where input variances are available.
 *  Output variances are generated based on these input variances.
@@ -487,34 +552,36 @@
 *  If the axis along which the input array was collapsed was not the
 *  last axis, we need to use the re-ordered data in the work arrays.
          IF ( USEWRK ) THEN
-            CALL CCG1_CM1<T><T>( WORK1, NEL2, NLIN, WORK2, WORK3, IMETH,
-     :                           MAX( 1, NINT( WLIM * REAL( NLIN ) ) ),
-     :                           7, 4.0, 0.0, 0.0, 0.0, DOUT, VOUT, 
-     :                           WOUT, %VAL( CNF_PVAL( IPCOIN ) ), 
-     :                           %VAL( CNF_PVAL( IPWRK1 ) ), 
-     :                           %VAL( CNF_PVAL( IPWRK2 ) ),
-     :                           %VAL( CNF_PVAL( IPPP ) ), 
-     :                           %VAL( CNF_PVAL( IPCOV ) ), NMAT,
-     :                           %VAL( CNF_PVAL( IPNCON ) ), 
-     :                           %VAL( CNF_PVAL( IPPNT ) ),
-     :                           %VAL( CNF_PVAL( IPUSED ) ), 
-     :                           NFLAG, STATUS )
+            CALL CCG_COMB1<T>( NEL2, NLIN, WORK1, WORK2, WORK3, IMETH,
+     :                         MAX( 1, NINT( WLIM * REAL( NLIN ) ) ),
+     :                         7, CLIP, 0.0, 0.0, 0.0, NMAT, 
+     :                         DOUT, VOUT, WOUT, 
+     :                         %VAL( CNF_PVAL( IPCOIN ) ), 
+     :                         %VAL( CNF_PVAL( IPWRK1 ) ), 
+     :                         %VAL( CNF_PVAL( IPWRK2 ) ),
+     :                         %VAL( CNF_PVAL( IPPP ) ), 
+     :                         %VAL( CNF_PVAL( IPCOV ) ),
+     :                         %VAL( CNF_PVAL( IPPNT ) ),
+     :                         %VAL( CNF_PVAL( IPUSED ) ), 
+     :                         %VAL( CNF_PVAL( IPNCON ) ), 
+     :                         NFLAG, STATUS )
 
 *  If the collapse axis is the last axis, we can use the original input
          ELSE 
-            CALL CCG1_CM1<T><T>( DIN( START ), NEL2, NLIN, VIN( START ),
-     :                           CIN, IMETH, 
-     :                           MAX( 1, NINT( WLIM * REAL( NLIN ) ) ),
-     :                           7, 4.0, 0.0, 0.0, 0.0, DOUT, VOUT,
-     :                           WOUT, %VAL( CNF_PVAL( IPCOIN ) ), 
-     :                           %VAL( CNF_PVAL( IPWRK1 ) ), 
-     :                           %VAL( CNF_PVAL( IPWRK2 ) ),
-     :                           %VAL( CNF_PVAL( IPPP ) ), 
-     :                           %VAL( CNF_PVAL( IPCOV ) ), NMAT,
-     :                           %VAL( CNF_PVAL( IPNCON ) ), 
-     :                           %VAL( CNF_PVAL( IPPNT ) ),
-     :                           %VAL( CNF_PVAL( IPUSED ) ),
-     :                           NFLAG, STATUS )
+            CALL CCG_COMB1<T>( NEL2, NLIN, DIN( START ), VIN( START ),
+     :                         CIN, IMETH, 
+     :                         MAX( 1, NINT( WLIM * REAL( NLIN ) ) ),
+     :                         7, CLIP, 0.0, 0.0, 0.0, NMAT,
+     :                         DOUT, VOUT, WOUT,
+     :                         %VAL( CNF_PVAL( IPCOIN ) ), 
+     :                         %VAL( CNF_PVAL( IPWRK1 ) ), 
+     :                         %VAL( CNF_PVAL( IPWRK2 ) ),
+     :                         %VAL( CNF_PVAL( IPPP ) ), 
+     :                         %VAL( CNF_PVAL( IPCOV ) ),
+     :                         %VAL( CNF_PVAL( IPPNT ) ),
+     :                         %VAL( CNF_PVAL( IPUSED ) ),
+     :                         %VAL( CNF_PVAL( IPNCON ) ), 
+     :                         NFLAG, STATUS )
          END IF
 
          CALL PSX_FREE( IPPP, STATUS )
@@ -523,45 +590,47 @@
 *  Now deal with cases where input variances are not available.  No
 *  output variances will be created.
       ELSE
-         CALL PSX_CALLOC( NLIN, '_DOUBLE', IPVAR, STATUS )
-         CALL KPG1_FILLD( 1.0D0, NLIN, %VAL( CNF_PVAL( IPVAR ) ), 
+         CALL PSX_CALLOC( NLIN, '<HTYPE>', IPVAR, STATUS )
+         CALL KPG1_FILL<T>( 1<CONST>, NLIN, %VAL( CNF_PVAL( IPVAR ) ), 
      :                    STATUS )
 
 *  If the axis along which the input array was collapsed was not the
 *  last axis, we need to use the re-ordered data in the work arrays.
          IF ( USEWRK ) THEN   
-            CALL CCG1_CM3<T><T>( WORK1, NEL2, NLIN, 
-     :                           %VAL( CNF_PVAL( IPVAR ) ), WORK3,
-     :                           IMETH,
-     :                           MAX( 1, NINT( WLIM * REAL( NLIN ) ) ),
-     :                           7, 4.0, 0.0, 0.0, 0.0,
-     :                           DOUT, WOUT, %VAL( CNF_PVAL( IPCOIN ) ), 
-     :                           %VAL( CNF_PVAL( IPWRK1 ) ),
-     :                           %VAL( CNF_PVAL( IPWRK2 ) ),
-     :                           %VAL( CNF_PVAL( IPNCON ) ), 
-     :                           %VAL( CNF_PVAL( IPPNT ) ),
-     :                           %VAL( CNF_PVAL( IPUSED ) ),
-     :                           NFLAG, STATUS )
+            CALL CCG_COMB3<T>( NEL2, NLIN, WORK1, 
+     :                         %VAL( CNF_PVAL( IPVAR ) ), WORK3, IMETH,
+     :                         MAX( 1, NINT( WLIM * REAL( NLIN ) ) ),
+     :                         7, CLIP, 0.0, 0.0, 0.0,
+     :                         DOUT, WOUT, %VAL( CNF_PVAL( IPCOIN ) ), 
+     :                         %VAL( CNF_PVAL( IPWRK1 ) ),
+     :                         %VAL( CNF_PVAL( IPWRK2 ) ),
+     :                         %VAL( CNF_PVAL( IPPNT ) ),
+     :                         %VAL( CNF_PVAL( IPUSED ) ),
+     :                         %VAL( CNF_PVAL( IPNCON ) ), 
+     :                         NFLAG, STATUS )
 
 *  If the collapse axis is the last axis, we can use the original input
 *  data.
          ELSE 
-            CALL CCG1_CM3<T><T>( DIN( START ), NEL2, NLIN, 
-     :                           %VAL( CNF_PVAL( IPVAR ) ), CIN, IMETH, 
-     :                           MAX( 1, NINT( WLIM * REAL( NLIN ) ) ),
-     :                           7, 4.0, 0.0, 0.0, 0.0,
-     :                           DOUT, WOUT, %VAL( CNF_PVAL( IPCOIN ) ),
-     :                           %VAL( CNF_PVAL( IPWRK1 ) ),
-     :                           %VAL( CNF_PVAL( IPWRK2 ) ),
-     :                           %VAL( CNF_PVAL( IPNCON ) ), 
-     :                           %VAL( CNF_PVAL( IPPNT ) ),
-     :                           %VAL( CNF_PVAL( IPUSED ) ),
-     :                           NFLAG, STATUS )
+            CALL CCG_COMB3<T>( NEL2, NLIN, DIN( START ), 
+     :                         %VAL( CNF_PVAL( IPVAR ) ), CIN, IMETH, 
+     :                         MAX( 1, NINT( WLIM * REAL( NLIN ) ) ),
+     :                         7, CLIP, 0.0, 0.0, 0.0,
+     :                         DOUT, WOUT, %VAL( CNF_PVAL( IPCOIN ) ),
+     :                         %VAL( CNF_PVAL( IPWRK1 ) ),
+     :                         %VAL( CNF_PVAL( IPWRK2 ) ),
+     :                         %VAL( CNF_PVAL( IPPNT ) ),
+     :                         %VAL( CNF_PVAL( IPUSED ) ),
+     :                         %VAL( CNF_PVAL( IPNCON ) ), 
+     :                         NFLAG, STATUS )
          END IF
 
          CALL PSX_FREE( IPVAR, STATUS )
 
       END IF
+
+*  Add to cumulative number of bad output values for the current block.
+      NFLAG = IFLAG + NFLAG
 
 *  Free the remaining work space.
       CALL PSX_FREE( IPWRK1, STATUS )

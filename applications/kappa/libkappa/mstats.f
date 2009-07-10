@@ -59,6 +59,17 @@
 *        the range 0 to 255).  In cases other than "Data", which is 
 *        always present, a missing component will be treated as having 
 *        all pixels set to the `bad' value.  ["Data"]
+*     CLIP = _REAL (Read)
+*        The number of standard deviations about the mean at which to
+*        clip outliers for the "Mode", "Cmean" and "Csigma" statistics 
+*        (see Parameter ESTIMATOR).  The application first computes 
+*        statistics using all the available pixels.  It then rejects
+*        all those pixels whose values lie beyond CLIP standard
+*        deviations from the mean and will then re-evaluate the 
+*        statistics.   For "Cmean" and "Csigma" there is currently only
+*        one iteration , but up to seven for "Mode".
+
+*        The value must be positive.  [3.0]
 *     ESTIMATOR = LITERAL (Read)
 *        The method to use for estimating the output pixel values from
 *        the multiple input pixels at each pixel index.  It
@@ -71,6 +82,8 @@
 *                      and CPU intensive for large datasets; use with 
 *                      care!  If strange things happen, use "Mean".
 *          "Absdev" -- Mean absolute deviation from the unweighted mean.
+*          "Cmean"  -- Sigma-clipped mean.
+*          "Csigma" -- Sigma-clipped standard deviation.
 *          "Comax"  -- Co-ordinate of the maximum value.
 *          "Comin"  -- Co-ordinate of the minimum value.
 *          "Integ"  -- Integrated value, being the sum of the products 
@@ -260,7 +273,7 @@
 *     Councils. 
 *     Copyright (C) 2006 Particle Physics & Astronomy Research 
 *     Council.
-*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2008, 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -301,6 +314,9 @@
 *        blocking.
 *     2008 May 4 (MJC):
 *        Support estimators that use the co-ordinate.
+*     2009 July 5 (MJC):
+*        Added Cmean and Csigma estimators and an associated CLIP
+*        parameter. 
 *     {enter_further_changes_here}
 
 *-
@@ -315,6 +331,7 @@
       INCLUDE  'DAT_PAR'         ! HDS system constants
       INCLUDE  'CNF_PAR'         ! For CNF_PVAL function
       INCLUDE  'MSG_PAR'         ! Message-system constants
+      INCLUDE  'PRM_PAR'         ! PRIMDAT constants
 
 *  Status:
       INTEGER STATUS
@@ -323,11 +340,15 @@
       INTEGER CHR_LEN            ! Significant length of a string
 
 *  Local Constants:
+      REAL CLPDEF                ! Default no. of standard deviations to
+      PARAMETER( CLPDEF = 3.0 )  ! clip for mode, clipped mean & std dev
+
       INTEGER MAXPIX 
       PARAMETER ( MAXPIX = 8388608 ) ! Guestimate a size: 8 megapixels
 
 *  Local Variables:
       INTEGER CAXIS              ! Index of collapse axis
+      REAL CLIP                  ! Value of CLIP parameter
       CHARACTER*( DAT__SZNAM ) COMP ! Name of NDF component for stats
       DOUBLE PRECISION DATUM     ! Value of pixel
       INTEGER D                  ! A dimension size
@@ -548,6 +569,16 @@
             STRIM = 'PAD'
          END IF
 
+*  For now obtain just a single number of standard deviations at which
+*  to clip.
+         IF ( ESTIMO .EQ. 'MODE' .OR. ESTIMO .EQ. 'CMEAN' .OR.
+     :        ESTIMO .EQ. 'CSIGMA' ) THEN
+            CALL PAR_GDR0R( 'CLIP', CLPDEF, VAL__SMLR, VAL__MAXR,
+     :                      .FALSE., CLIP, STATUS )
+         ELSE
+            CLIP = CLPDEF  
+         END IF
+
 *  Obtain NDF identifiers and bounds.
 *  ----------------------------------
 *  Allocate some work space.
@@ -712,8 +743,8 @@
 
 *  Now do the work, using a routine appropriate to the numeric type.
             IF ( ITYPE .EQ. '_REAL' ) THEN
-               CALL KPS1_CLPSR( CAXIS, 1, NNDF, PVAR, ESTIM, WLIM, EL,
-     :                          NDIM, LBNDS, UBNDS, 
+               CALL KPS1_CLPSR( CAXIS, 1, NNDF, PVAR, ESTIM, WLIM,
+     :                          CLIP, EL, NDIM, LBNDS, UBNDS, 
      :                          %VAL( CNF_PVAL( IPIN( 1 ) ) ),
      :                          %VAL( CNF_PVAL( IPIN( 2 ) ) ), 
      :                          %VAL( CNF_PVAL( IPCO ) ),
@@ -726,8 +757,8 @@
      :                          %VAL( CNF_PVAL( IPW3 ) ), STATUS )
 
             ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-               CALL KPS1_CLPSD( CAXIS, 1, NNDF, PVAR, ESTIM, WLIM, EL,
-     :                          NDIM, LBNDS, UBNDS, 
+               CALL KPS1_CLPSD( CAXIS, 1, NNDF, PVAR, ESTIM, WLIM,
+     :                          CLIP, EL, NDIM, LBNDS, UBNDS, 
      :                          %VAL( CNF_PVAL( IPIN( 1 ) ) ),
      :                          %VAL( CNF_PVAL( IPIN( 2 ) ) ), 
      :                          %VAL( CNF_PVAL( IPCO ) ),

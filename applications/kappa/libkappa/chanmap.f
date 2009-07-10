@@ -58,6 +58,17 @@
 *        supplied.  If the axes of the current Frame are not parallel to
 *        the NDF pixel axes, then the pixel axis which is most nearly 
 *        parallel to the specified current Frame axis will be used.
+*     CLIP = _REAL (Read)
+*        The number of standard deviations about the mean at which to
+*        clip outliers for the "Mode", "Cmean" and "Csigma" statistics 
+*        (see Parameter ESTIMATOR).  The application first computes 
+*        statistics using all the available pixels.  It then rejects
+*        all those pixels whose values lie beyond CLIP standard
+*        deviations from the mean and will then re-evaluate the 
+*        statistics.  For "Cmean" and "Csigma" there is currently only
+*        one iteration, but up to seven for "Mode".
+
+*        The value must be positive.  [3.0]
 *     ESTIMATOR = LITERAL (Read)
 *        The method to use for estimating the output pixel values.  It
 *        can be one of the following options. 
@@ -69,6 +80,8 @@
 *                      and CPU intensive for large datasets; use with 
 *                      care!  If strange things happen, use "Mean".
 *          "Absdev" -- Mean absolute deviation from the unweighted mean.
+*          "Cmean"  -- Sigma-clipped mean.
+*          "Csigma" -- Sigma-clipped standard deviation.
 *          "Comax"  -- Co-ordinate of the maximum value.
 *          "Comin"  -- Co-ordinate of the minimum value.
 *          "Integ"  -- Integrated value, being the sum of the products 
@@ -258,7 +271,7 @@
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
 *     Copyright (C) 2007 Science & Technology Facilities Council.
-*     Copyright (C) 2008 Science and Technology Faciities Council.
+*     Copyright (C) 2008, 2009 Science and Technology Faciities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -327,6 +340,9 @@
 *        Newly revised KPS1_CLPSx API.
 *     2008 June 17 (MJC):
 *        Trim trailing blanks from output NDF character components.
+*     2009 July 5 (MJC):
+*        Added Cmean and Csigma estimators and an associated CLIP
+*        parameter. 
 *     {enter_further_changes_here}
 
 *-
@@ -342,6 +358,7 @@
       INCLUDE  'AST_PAR'         ! AST constants and functions
       INCLUDE  'CNF_PAR'         ! For CNF_PVAL function
       INCLUDE  'MSG_PAR'         ! Message-system reporting levels
+      INCLUDE  'PRM_PAR'         ! PRIMDAT constants
 
 *  Status:
       INTEGER STATUS
@@ -354,6 +371,9 @@
                                  ! real
 
 *  Local Constants:
+      REAL CLPDEF                ! Default no. of standard deviations to
+      PARAMETER( CLPDEF = 3.0 )  ! clip for mode, clipped mean & std dev
+
       INTEGER MAXPIX 
       PARAMETER ( MAXPIX = 8388608 ) ! Guestimate a size: 8 mega
 
@@ -379,12 +399,13 @@
       INTEGER CBLSIZ( NDIM )     ! Channel-image sizes for processing 
                                  ! large datasets in blocks
       INTEGER CDIMS( NDF__MXDIM ) ! Channel image dimensions
+      INTEGER CFRM               ! Original Current Frame pointer
       DOUBLE PRECISION CHAVER    ! Average channel PIXEL co-ordinate
       INTEGER CHDIMS( NDIM - 1 ) ! Dimensions of an unblocked channel
                                  ! image
       INTEGER CHIND( NDIM - 1 )  ! Channel image indices within output
                                  ! array
-      INTEGER CFRM               ! Original Current Frame pointer
+      REAL CLIP                  ! Value of CLIP parameter
       CHARACTER COMP * ( 13 )    ! List of components to process
       DOUBLE PRECISION CURPOS( NDIM ) ! Valid current Frame position
       INTEGER D                  ! A dimension size
@@ -851,6 +872,16 @@
 
       CALL PAR_GDR0R( 'WLIM', 0.3, 0.0, 1.0, .FALSE., WLIM, STATUS )
 
+*  For now obtain just a single number of standard deviations at which
+*  to clip.
+      IF ( ESTIMO .EQ. 'MODE' .OR. ESTIMO .EQ. 'CMEAN' .OR.
+     :     ESTIMO .EQ. 'CSIGMA' ) THEN
+         CALL PAR_GDR0R( 'CLIP', CLPDEF, VAL__SMLR, VAL__MAXR, .FALSE., 
+     :                   CLIP, STATUS )
+      ELSE
+         CLIP = CLPDEF  
+      END IF
+
 *  Redefine the data units.
 *  ========================
       IF ( ESTIM .EQ. 'COMAX' .OR. ESTIM .EQ. 'COMIN' .OR.
@@ -1097,8 +1128,9 @@
 *  Now do the work, using a routine appropriate to the numeric type.
             IF ( ITYPE .EQ. '_REAL' ) THEN
                CALL KPS1_CLPSR( JAXIS, LBNDS( JAXIS ), UBNDS( JAXIS ),
-     :                          VAR, ESTIM, WLIM, ELC, NDIM, LBNDBI, 
-     :                          UBNDBI, %VAL( CNF_PVAL( IPIN( 1 ) ) ),
+     :                          VAR, ESTIM, WLIM, CLIP,
+     :                          ELC, NDIM, LBNDBI, UBNDBI,
+     :                          %VAL( CNF_PVAL( IPIN( 1 ) ) ),
      :                          %VAL( CNF_PVAL( IPIN( 2 ) ) ), 
      :                          %VAL( CNF_PVAL( IPCO ) ),
      :                          NDIMO, LBNDBO, UBNDBO, HIGHER, NFLAG,
@@ -1111,8 +1143,9 @@
 
             ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
                CALL KPS1_CLPSD( JAXIS, LBNDS( JAXIS ), UBNDS( JAXIS ),
-     :                          VAR, ESTIM, WLIM, ELC, NDIM, LBNDBI, 
-     :                          UBNDBI, %VAL( CNF_PVAL( IPIN( 1 ) ) ),
+     :                          VAR, ESTIM, WLIM, CLIP, 
+     :                          ELC, NDIM, LBNDBI, UBNDBI,
+     :                          %VAL( CNF_PVAL( IPIN( 1 ) ) ),
      :                          %VAL( CNF_PVAL( IPIN( 2 ) ) ), 
      :                          %VAL( CNF_PVAL( IPCO ) ),
      :                          NDIMO, LBNDBO, UBNDBO, HIGHER, NFLAG,
