@@ -762,6 +762,15 @@ applications/tsp/tsp.csh
 applications/tsp/tsp.icl
 applications/tsp/tsp.sh
 
+applications/obsolete/starbench/bch_cfp
+applications/obsolete/starbench/bch_fft
+applications/obsolete/starbench/bch_sysinfo
+applications/obsolete/starbench/kps1_fofo.f
+applications/obsolete/starbench/kps1_fopr.f
+applications/obsolete/starbench/starbench.csh
+applications/obsolete/starbench/starbench.icl
+applications/obsolete/starbench/starbench.sh
+
 docs/sc/003/sc3-scripts.tex
 docs/sc/005/sc5.htx_tar.extras
 docs/sc/013/VERSION
