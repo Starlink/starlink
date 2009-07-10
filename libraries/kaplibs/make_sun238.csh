@@ -3,7 +3,7 @@
 # Create file "documented_files" in each subdirectory containing the
 # names of the files to be documented.
 
-foreach dir (aif ctg fts ira irq kpg lpg)
+foreach dir (aif ccg ctg fts ira irq kpg lpg)
    cd $dir
 
 # Get a basic list of files. For IRQ and IRA, only document IRQ_ and IRA_
@@ -67,7 +67,7 @@ end
 cp sun_head.tex sun238.tex
 
 # Add a noteroutine for each documented file
-foreach dir (aif ctg fts ira irq kpg lpg)
+foreach dir (aif ccg ctg fts ira irq kpg lpg)
    cd $dir
    rm -f notes >& /dev/null
    ../make_noteroutines.pl > notes
@@ -84,7 +84,7 @@ end
 cat sun_mid.tex >> sun238.tex
 
 # Add an sstroutine for each documented file
-foreach dir (aif ctg fts ira irq kpg lpg)
+foreach dir (aif ccg ctg fts ira irq kpg lpg)
    cd $dir
 
    foreach file ( `cat documented_files`)

@@ -1,6 +1,6 @@
 dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
-AC_INIT(kaplibs, 2.8-2, ussc@star.rl.ac.uk)
+AC_INIT(kaplibs, 3.0, ussc@star.rl.ac.uk)
 AC_PREREQ(2.50)
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 
@@ -41,7 +41,8 @@ dnl    declaration.  List of subdirectories must match SUBDIRS in Makefile.am
 AC_CONFIG_FILES([Makefile component.xml
     aif/Makefile  ira/Makefile     kgs/Makefile
     ctg/Makefile  irq/Makefile     kpg/Makefile
-    fts/Makefile  kapgrf/Makefile  lpg/Makefile])
+    fts/Makefile  kapgrf/Makefile  lpg/Makefile
+    ccg/Makefile])
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT
