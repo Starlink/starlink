@@ -135,6 +135,7 @@ struct FitsHeaderStruct {
   char instrume[81];
   char rot_crd[81];
   char obsid[81];
+  char obsidss[81];
 };
 
 /* Struct defining dut1 information */
@@ -442,6 +443,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
   strcpy( fitsvals.rot_crd, "" );
   strcpy( fitsvals.instrume, "" );
   strcpy( fitsvals.obsid, "" );
+  strcpy( fitsvals.obsidss, "" );
 
   smf_getfitsi( hdr, "OBSNUM", &(fitsvals.obsnum), status );
   smf_getfitsi( hdr, "UTDATE", &(fitsvals.utdate), status );
@@ -459,7 +461,8 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
   smf_getfitsd( hdr, "CHOP_PA", &(fitsvals.chop_pa), status );
   smf_getfitss( hdr, "CHOP_CRD", fitsvals.chop_crd, sizeof(fitsvals.chop_crd), status );
   smf_getfitss( hdr, "INSTRUME", fitsvals.instrume, sizeof(fitsvals.instrume), status );
-  smf_getobsidss( hdr->fitshdr, fitsvals.obsid, sizeof(fitsvals.obsid), NULL, 0, status );
+  smf_getobsidss( hdr->fitshdr, fitsvals.obsid, sizeof(fitsvals.obsid), fitsvals.obsidss,
+                  sizeof(fitsvals.obsidss), status );
 
   /* Do ROVER before printing out the obs description */
 
@@ -607,6 +610,12 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
     msgOutiff( msglev, "", INDENT "Fixing instrument aperture to 0,0 for %s.", status, fitsvals.instrume );
     smf_fits_updateD( hdr, "INSTAP_X", 0.0, NULL, status );
     smf_fits_updateD( hdr, "INSTAP_Y", 0.0, NULL, status );
+  }
+
+  /* Store OBSIDSS */
+  if (!astTestFits( fits, "OBSIDSS", NULL ) ) {
+    smf_fits_updateS( hdr, "OBSIDSS", fitsvals.obsidss, "Unique observation subsys identifier", status );
+    have_fixed = 1;
   }
 
   /* Make BASEC1, BASEC2 and TRACKSYS available */
