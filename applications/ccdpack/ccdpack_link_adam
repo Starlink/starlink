@@ -60,6 +60,8 @@
 #        flags for graphics system selection.
 #     29-AUG-2004 (TIMJ):
 #        Add one_link_adam
+#     10-JUL-2009 (TIMJ):
+#        Add kaplibs. Do not include graphics components.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -115,7 +117,7 @@
       echo "`img_link_adam` `fio_link_adam` `trn_link_adam` \
             `chr_link_adam` `prm_link_adam` `psx_link_adam` \
             `ard_link_adam` `ndg_link_adam` `grp_link_adam` \
-            `one_link_adam` \
+            `one_link_adam` `kaplibs_link_adam -nogrf` \
             $graphargs -lpda" \
           | awk 'BEGIN{RS=" ";FS="\n"}
                         {f[i++]=$1}

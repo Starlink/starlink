@@ -68,11 +68,10 @@ GENSRC = ccg1_add.gen ccg1_bext.gen ccg1_bl.gen ccg1_bmd1.gen \
  ccg1_tmd2.gen ccg1_tmd3.gen ccg1_tmn2.gen ccg1_tmn3.gen \
  ccg1_tmr1.gen ccg1_tmr2.gen ccg1_tmr3.gen ccg1_trm2.gen \
  ccg1_trm3.gen ccg1_wmd2.gen ccg1_wmd3.gen ccg1_wmnl.gen \
- ccg1_wtm2.gen ccg1_wtm3.gen kpg1_cadd.gen kpg1_csub.gen \
+ ccg1_wtm2.gen ccg1_wtm3.gen \
  ccg1_cen.gen ccg1_dcn.gen ccg1_is4.gen ccg1_lapn.gen \
  ccg1_mdif.gen ccg1_mkhi.gen ccg1_mnmx.gen ccg1_nab.gen \
- ccg1_renp.gen kpg1_ainb.gen kpg1_iscl.gen kpg1_past.gen \
- kpg1_vasv.gen kpg1_tdli.gen ccg1_qsrt.gen ccg1_smd1.gen \
+ ccg1_renp.gen ccg1_qsrt.gen ccg1_smd1.gen \
  ccg1_wtm4.gen ccg1_smr1.gen ccg1_smd2.gen ccg1_smr2.gen \
  ccg1_smd3.gen ccg1_smr3.gen ccg1_fmr1.gen ccg1_fmr2.gen \
  ccg1_fmr3.gen ccg1_fmd1.gen ccg1_fmd2.gen ccg1_fmd3.gen \
@@ -80,11 +79,10 @@ GENSRC = ccg1_add.gen ccg1_bext.gen ccg1_bl.gen ccg1_bmd1.gen \
  ccg1_ghst.gen ccg1_iblk.gen ccg1_ord.gen
 
 #  Routines which may be real or double precision
-GENRDSRC = ccg1_ffrj.grd kpg1_bloc.grd ccg1_axin.grd \
- kpg1_mdet.grd kpg1_litn.grd kpg1_trbo.grd kpg1_trpi.grd \
+GENRDSRC = ccg1_ffrj.grd ccg1_axin.grd \
  ccg1_irhg.grd ccg1_irhl.grd ccg1_cmpr.grd ccg1_crdt.grd \
  ccg1_mvdt.grd ccg1_ptbd.grd ccg1_qntl.grd ccg1_skys.grd \
- kpg1_ludc.grd ccg1_evar.grd ccg1_aspi.grd
+ ccg1_evar.grd ccg1_aspi.grd
 
 #  Routines which may be logical,real,double,integer or character (storage)
 GENLRDICSRC = ccg1_fch0.glrdic ccg1_sto0.glrdic ccg1_fch1.glrdic \

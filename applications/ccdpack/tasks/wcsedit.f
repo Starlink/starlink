@@ -412,7 +412,7 @@
          IF ( STATUS .NE. SAI__OK ) GO TO 99
          IF ( FRAME .NE. ' ' ) THEN
             CALL KPG1_ASFRM( 'FRAME', 'EPOCH', IWCS, ' ', ' ', .FALSE.,
-     :                       STATUS )
+     :                       ' ', STATUS )
          END IF
          JTARG = AST_GETI( IWCS, 'Current', STATUS )
          DMTARG = AST_GETC( IWCS, 'Domain', STATUS )
