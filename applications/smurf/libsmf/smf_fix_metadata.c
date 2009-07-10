@@ -28,7 +28,8 @@
 
 *  Returned Value:
 *     Returns int indicating whether the meta data were modified. 0 indicates
-*     no modifications were made.
+*     no modifications were made. Bits corresponding to the smf_metadata_fixups
+*     enum will be used to indicate which parts of the meta data were modified.
 
 *  Description:
 *     Analyzes the smfData struct and determines whether meta data
@@ -397,7 +398,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
       /* Update the FitsChan - the header should be present */
       if (steptime != VAL__BADD) {
         smf_fits_updateD( hdr, "STEPTIME", steptime, NULL, status );
-        have_fixed = 1;
+        have_fixed |= SMF__FIXED_FITSHDR;
       }
     }
     if (*status == SAI__OK && steptime != VAL__BADD && steptime < VAL__SMLD) {
@@ -476,7 +477,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
     /* No known POL observations */
     if ( !cardthere || cardisdef ) {
       smf_fits_updateU( hdr, "INBEAM", "Hardware in the beam", status );
-      have_fixed = 1;
+      have_fixed |= SMF__FIXED_FITSHDR;
     }
   } else if ( fitsvals.utdate < 20090201 ) {
     /* see if we have a matching LUT entry */
@@ -497,13 +498,13 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
       if (strcmp( inbeam, "POL") != 0 ) {
         msgOutif( msglev, "", INDENT "This is a POL observation. Updating INBEAM (was ^PREV).", status );
         smf_fits_updateS( hdr, "INBEAM", "POL", "Hardware in the beam", status );
-        have_fixed = 1;
+        have_fixed |= SMF__FIXED_FITSHDR;
       }
     } else {
       /* not a ROVER observation. So INBEAM should be undef. */
       if ( !cardthere || cardisdef ) {
         /* should be undef, not defined */
-        have_fixed = 1;
+        have_fixed |= SMF__FIXED_FITSHDR;
         smf_fits_updateU( hdr, "INBEAM", "Hardware in the beam", status );
         msgOutif( msglev, "",  INDENT "This is not a POL observation. Forcing INBEAM to undef.", status);
       }
@@ -528,13 +529,13 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
   if (!astTestFits( fits, "LOFREQS", NULL ) ) {
     /* undef or missing makes no difference */
     smf_fits_updateD( hdr, "LOFREQS", tmpState[0].fe_lofreq, "[GHz] LO Frequency at start of obs.", status );
-    have_fixed = 1;
+    have_fixed |= SMF__FIXED_FITSHDR;
   }
   if (!astTestFits( fits, "LOFREQE", NULL ) ) {
     /* undef or missing makes no difference */
     smf_fits_updateD( hdr, "LOFREQE", tmpState[hdr->nframes - 1].fe_lofreq,
                       "[GHz] LO Frequency at end of obs.", status );
-    have_fixed = 1;
+    have_fixed |= SMF__FIXED_FITSHDR;
   }
 
   /* DUT1 */
@@ -546,7 +547,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
       if (dateobs > dut1[i].mjd && dateobs < dut1[i+1].mjd) {
         smf_fits_updateD( hdr, "DUT1", dut1[i].dut1 / SPD,
                           "[d] UT1-UTC correction", status );
-        have_fixed = 1;
+        have_fixed |= SMF__FIXED_FITSHDR;
         found = 1;
       }
       i++;
@@ -576,7 +577,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
       smf_fits_updateD( hdr, "OBSGEO-Z", 2150964.058506, NULL, status );
       smf_fits_updateD( hdr, "LONG-OBS", 19.82583335521, NULL, status );
       smf_fits_updateD( hdr, "LAT-OBS", -155.4797222301, NULL, status );
-      have_fixed = 1;
+      have_fixed |= SMF__FIXED_FITSHDR;
     }
   }
 
@@ -600,7 +601,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
       msgOutif( msglev, "", INDENT "Fixing instrument aperture sign convention.", status );
       smf_fits_updateD( hdr, "INSTAP_X", -1.0 * fitsvals.instap_x, NULL, status );
       smf_fits_updateD( hdr, "INSTAP_Y", -1.0 * fitsvals.instap_y, NULL, status );
-      have_fixed = 1;
+      have_fixed |= SMF__FIXED_FITSHDR;
     }
   }
 
@@ -615,7 +616,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
   /* Store OBSIDSS */
   if (!astTestFits( fits, "OBSIDSS", NULL ) ) {
     smf_fits_updateS( hdr, "OBSIDSS", fitsvals.obsidss, "Unique observation subsys identifier", status );
-    have_fixed = 1;
+    have_fixed |= SMF__FIXED_FITSHDR;
   }
 
   /* Make BASEC1, BASEC2 and TRACKSYS available */
@@ -623,21 +624,21 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
     /* undef or missing makes no difference */
     msgOutiff( msglev, "", INDENT "Missing TRACKSYS - setting to '%s'", status, tmpState[0].tcs_tr_sys);
     smf_fits_updateS( hdr, "TRACKSYS", tmpState[0].tcs_tr_sys, "TCS Tracking coordinate system", status );
-    have_fixed = 1;
+    have_fixed |= SMF__FIXED_FITSHDR;
   }
   if (!astTestFits( fits, "BASEC1", NULL ) ) {
     /* undef or missing makes no difference */
     double basedeg = tmpState[0].tcs_tr_bc1 * AST__DR2D;
     msgOutiff( msglev, "", INDENT "Missing BASEC1 - setting to %g deg", status, basedeg);
     smf_fits_updateD( hdr, "BASEC1", basedeg, "[deg] TCS BASE position (longitude) in TRACKSYS", status );
-    have_fixed = 1;
+    have_fixed |= SMF__FIXED_FITSHDR;
   }
   if (!astTestFits( fits, "BASEC2", NULL ) ) {
     /* undef or missing makes no difference */
     double basedeg = tmpState[0].tcs_tr_bc2 * AST__DR2D;
     msgOutiff( msglev, "", INDENT "Missing BASEC2 - setting to %g deg", status, basedeg);
     smf_fits_updateD( hdr, "BASEC2", basedeg, "[deg] TCS BASE position (latitude) in TRACKSYS", status );
-    have_fixed = 1;
+    have_fixed |= SMF__FIXED_FITSHDR;
   }
 
   /* New nomenclature for "raster". It is now a "scan" since 20080610. */
@@ -646,7 +647,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
     smf_getfitss( hdr, "SAM_MODE", sam_mode, sizeof(sam_mode), status );
     if ( strncasecmp( "raster", sam_mode, 6 ) == 0 ) {
       smf_fits_updateS( hdr, "SAM_MODE", "scan", NULL, status );
-      have_fixed = 1;
+      have_fixed |= SMF__FIXED_FITSHDR;
     }
   }
 
@@ -661,7 +662,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
         if (found) {
           smf_fits_updateD( hdr, "JIG_SCAL", jigscal, "[arcsec] Scale of jiggle pattern", status );
           msgOutiff( msglev, "", INDENT "Missing JIG_SCAL - setting to %10g arcsec", status, jigscal );
-          have_fixed = 1;
+          have_fixed |= SMF__FIXED_FITSHDR;
         } else {
           msgOutiff( msglev, "", INDENT "** Could not determine JIG_SCAL in XML configuration", status );
         }
@@ -676,7 +677,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
     astClear( fits, "Card" );
     if (astFindFits( fits, "POL_CONN", NULL, 0 ) ) {
       astDelFits( fits );
-      have_fixed = 1;
+      have_fixed |= SMF__FIXED_FITSHDR;
       ncards--;  /* Adjust the target number of cards */
     }
   }
@@ -692,7 +693,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
         if (found) {
           smf_fits_updateS( hdr, "ROT_CRD", fitsvals.rot_crd, "K-mirror coordinate system", status );
           msgOutiff( msglev, "", INDENT "Missing ROT_CRD - setting to '%s'", status, fitsvals.rot_crd );
-          have_fixed = 1;
+          have_fixed |= SMF__FIXED_FITSHDR;
         } else {
           msgOutif( msglev, "", INDENT "** Could not find ROT_CRD in XML configuration", status );
         }
@@ -746,7 +747,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
         if (fitsvals.rot_pa != VAL__BADD) {
           msgOutiff( msglev, "", INDENT "Missing ROT_PA - setting to %g deg", status, fitsvals.rot_pa );
           smf_fits_updateD( hdr, "ROT_PA", fitsvals.rot_pa, "[deg] K-mirror angle", status );
-          have_fixed = 1;
+          have_fixed |= SMF__FIXED_FITSHDR;
         } else {
           /* clear it but force it to exist */
           smf_fits_updateU( hdr, "ROT_PA", "[deg] K-mirror angle", status );
@@ -784,7 +785,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
           tmpState[i].tcs_tai = tmpState[i].rts_end - step;
         }
       }
-      have_fixed = 1;
+      have_fixed |= SMF__FIXED_JCMTSTATE;
     }
   }
 
@@ -804,7 +805,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
         if (tmpState[i].smu_az_chop_x == VAL__BADD) tmpState[i].smu_az_chop_x = chop_x;
         if (tmpState[i].smu_az_chop_y == VAL__BADD) tmpState[i].smu_az_chop_y = chop_y;
       }
-      have_fixed = 1;
+      have_fixed |= SMF__FIXED_JCMTSTATE;
     } else {
       *status = SAI__ERROR;
       errRepf( "", "Missing SMU_AZ_CHOP entry but not yet able to fix for %s chop coordinate system",
@@ -958,7 +959,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
       if (missing_exp) tmpState[i].acs_exposure = exp_time;
       if (missing_off) tmpState[i].acs_offexposure = off_time;
     }
-    have_fixed = 1;
+    have_fixed |= SMF__FIXED_JCMTSTATE;
 
   }
 
