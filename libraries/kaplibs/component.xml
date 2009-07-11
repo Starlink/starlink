@@ -8,7 +8,7 @@
   <description>KAPLIBS - Internal subroutines used within the KAPPA package.</description>
   <abstract><p>KAPLIBS is a package of Fortran subroutine 
 libraries which were originally written as part of the KAPPA package (a
-package of general purpose image processing and visualization tools).
+package of general-purpose image-processing and visualization tools).
 KAPLIBS provides software developers with access to many of the internal
 KAPPA routines, so that KAPPA-like applications can be written and built
 independently of KAPPA.</p></abstract>
@@ -19,7 +19,13 @@ independently of KAPPA.</p></abstract>
     <person>
       <name>D.S. Berry</name>
       <uname>dsb</uname>
-      <email>dsb@ast.man.ac.uk</email>
+      <email>d.berry@jach.hawaii.edu</email>
+      <role>owner</role>
+    </person>
+    <person>
+      <name>Malcolm J. Currie</name>
+      <uname>mjc</uname>
+      <email>mjc@star.rl.ac.uk</email>
       <role>owner</role>
     </person>
   </developers>
