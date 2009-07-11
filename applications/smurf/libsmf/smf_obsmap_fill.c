@@ -53,6 +53,8 @@
 *        Store MJD-OBS to enable sorting.
 *     2009-07-08 (TIMJ):
 *        Include INBEAM in report.
+*     2009-07-10 (TIMJ):
+*        Include instrument information in report.
 
 *  Copyright:
 *     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
@@ -107,6 +109,7 @@ void smf_obsmap_fill( const smfData * data, AstKeyMap * obsmap, AstKeyMap * objm
   char object[SZFITSCARD]; /* Object name */
   char obsid[SZFITSCARD]; /* Observation ID */
   char inbeam[SZFITSCARD]; /* Anything in beam */
+  char instrume[SZFITSCARD]; /* instrument name */
   AstKeyMap * obsinfo = NULL; /* observation information */
 
 
@@ -139,6 +142,9 @@ void smf_obsmap_fill( const smfData * data, AstKeyMap * obsmap, AstKeyMap * objm
       astMapPut0I( obsinfo, "UTDATE", itemp, NULL );
       smf_fits_getL( data->hdr, "SIMULATE", &itemp, status );
       astMapPut0I( obsinfo, "SIMULATE", itemp, NULL );
+      smf_getfitss( data->hdr, "INSTRUME", instrume, sizeof(instrume),
+                    status);
+      astMapPut0C( obsinfo, "INSTRUME", instrume, NULL );
 
       /* anything in the beam */
       inbeam[0] = '\0';
