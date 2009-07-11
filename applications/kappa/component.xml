@@ -7,7 +7,7 @@
   <path>applications/kappa</path>
   <description>KAPPA - Kernel Application Package</description>
   <abstract><p>
-KAPPA is an applications package comprising about 190
+KAPPA is an applications package comprising about 200
 general-purpose commands for image processing, data visualisation, and
 manipulation of the standard Starlink data format---the NDF.  It is
 intended to work in conjunction with Starlink's various specialised
@@ -20,12 +20,14 @@ packages.
     <person>
       <name>David Berry</name>
       <uname>dsb</uname>
-      <email>dsb@ast.man.ac.uk</email>
+      <email>d.berry@jach.hawaii.edu</email>
       <role>owner</role>
     </person>
     <person>
-      <name>Malcolm Currie</name>
+      <name>Malcolm J. Currie</name>
       <uname>mjc</uname>
+      <email>mjc@star.rl.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
   <documentation> sun95 sun221</documentation>
