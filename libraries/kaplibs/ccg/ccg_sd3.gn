@@ -61,7 +61,9 @@
 *     2009 July 4 (MJC):
 *         Made NCON Returned and therefore it is initialised.
 *     2009 July 10 (TIMJ):
-*         Initialise STDEV to 0.0D0
+*         Initialise STDEV to 0.0D0.
+*     2009 July 11 (MJC):
+*         Revise the previous fix to the intended code.
 *     {enter_further_changes_here}
 
 *-
@@ -167,7 +169,6 @@
 *  deviation value of zero.
             VARNCE = SUMSQ - ( MEAN * MEAN * DBLE( NGOOD ) )
             IF ( ( NGOOD .EQ. 1 ) .OR. ( VARNCE .LT. 0.0D0 ) ) THEN
-               RESULT( I ) = 0.0D0
                STDEV = 0.0D0
 
 *  Otherwise, calculate the standard deviation normally.
