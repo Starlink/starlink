@@ -3,18 +3,18 @@
 *+
 *  Name:
 *     CCG_I2WCx
- 
+
 *  Purpose:
 *     Assigns world co-ordinates to an output array from an input list
 *     of indices.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL CCG_I2WCx( NPIX, NLINES, INDICE, COORDS, RESULT, NBAD, 
 *                    STATUS )
- 
+
 *  Description:
 *     This routine assigns world co-ordinates to an output vector 
 *     from an input two-dimensional array, corresponding to a
@@ -23,7 +23,7 @@
 *     vector, there being one index per output value.  A bad value or
 *     a value outside the bounds of the array in the list of indices
 *     causes a bad value to be assigned to the output array.
- 
+
 *  Arguments:
 *     NPIX = INTEGER (Given)
 *        The number of pixels in a line of data.
@@ -41,25 +41,41 @@
 *        The number of bad values in the output array.
 *     STATUS = INTEGER (Given)
 *        The global status.
- 
+
 *  Notes:
 *     -  There is a routine for real and double-precision: replace "x"
 *     in the routine name by D or R as appropriate.  The COORDS and
 *     RESULT supplied to the routine must have the data type specified.
- 
-*  [optional_subroutine_items]...
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     2006 January 27 (MJC):
 *        Original version.
-*     {enter_changes_here}
- 
-*  Bugs:
-*     {note_any_bugs_here}
- 
+*     {enter_further_changes_here}
+
 *-
  
 *  Type Definitions:
