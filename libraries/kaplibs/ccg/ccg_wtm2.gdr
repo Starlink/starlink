@@ -111,6 +111,9 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Avoid confusing the optimiser.
+      WTINC = 0.0D0
+
 *  Sum the weights.
       TOTWT = 0.0D0
       DO 1 I = 1, EL

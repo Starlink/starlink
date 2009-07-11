@@ -1,6 +1,6 @@
       SUBROUTINE CCG_FM1<T>( NPIX, NLINES, STACK, VARS, MINPIX, 
      :                       NMAT, COVEC, RESULT, RESVAR, WRK1, WRK2, 
-     :                       POINT, USED, NCON, NBAD, STATUS )
+     :                       POINT, NCON, NBAD, STATUS )
 *+
 *  Name:
 *     CCG_FM1x
@@ -13,8 +13,8 @@
 
 *  Invocation:
 *     CALL CCG_FM1x( NPIX, NLINES, STACK, VARS, MINPIX, NMAT, COVEC, 
-*                    RESULT, RESVAR, WRK1, WRK2, POINT, USED, 
-*                    NCON, NBAD, STATUS )
+*                    RESULT, RESVAR, WRK1, WRK2, POINT, NCON, NBAD, 
+*                    STATUS )
 
 *  Description:
 *     This routine accepts an array consisting a series of (vectorised)
@@ -58,9 +58,6 @@
 *     POINT( NLINES ) = INTEGER (Returned)
 *        Workspace to hold pointers to the original positions of the
 *        data before extraction and conversion in to the WRK1 array.
-*     USED( NLINES ) = LOGICAL (Returned)
-*        Workspace used to indicate which values have been used in
-*        estimating a resultant value.
 *     NCON( NLINES ) = DOUBLE PRECISION (Returned)
 *        The actual number of contributing pixels from each input line
 *        to the output line.
@@ -118,7 +115,6 @@
       <TYPE> WRK1( NLINES )
       <TYPE> WRK2( NLINES )
       INTEGER POINT( NLINES )
-      LOGICAL USED( NLINES )
       DOUBLE PRECISION NCON( NLINES )
       INTEGER NBAD
 
@@ -163,6 +159,10 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Avoid confusing the optimiser.
+      MEDIAN = 0.0D0
+      VAR = 0.0D0
+      
 *  Set the numeric error and set error flag value.
       CALL NUM_HANDL( NUM_TRAP )
 

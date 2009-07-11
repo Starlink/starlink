@@ -140,12 +140,15 @@
 *.
 
 *  Initialise returned values.
-         DO 5 I = 1, EL
-            USED( I ) = .FALSE.
-    5    CONTINUE
+      DO 5 I = 1, EL
+         USED( I ) = .FALSE.
+    5 CONTINUE
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Avoid confusing the optimiser.
+      WTINC = 0.0D0
 
 *  If only one input value has been given, do things quickly. Note
 *  we are ignoring LBND and UBND in the case of EL = 1.

@@ -1,4 +1,4 @@
-      SUBROUTINE CCG_UM3<T>( NPIX, NLINES, STACK, VARS, MINPIX,
+      SUBROUTINE CCG_UM3<T>( NPIX, NLINES, STACK, MINPIX,
      :                       RESULT, NCON, NBAD, STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCG_UM3x( NPIX, NLINES, STACK, VARS, MINPIX, RESULT, NCON,
+*     CALL CCG_UM3x( NPIX, NLINES, STACK, MINPIX, RESULT, NCON,
 *                    NBAD, STATUS )
 
 *  Description:
@@ -27,8 +27,6 @@
 *        The number of lines of data in the stack.
 *     STACK( NPIX, NLINES ) = ? (Given)
 *        The array of lines which are to be combined into a single line.
-*     VARS( NLINES ) = ? (Given)
-*        Unused.
 *     MINPIX = INTEGER (Given)
 *        The minimum number of pixels required to contribute to an
 *        output pixel.
@@ -67,6 +65,9 @@
 *         standard order in the API.
 *     2009 July 4 (MJC):
 *         Made NCON Returned and therefore it is initialised.
+*     2009 July 11 (MJC)
+*         VARS argument was unused so remove it, despite being
+*         documented as unused.
 *     {enter_further_changes_here}
 
 *-

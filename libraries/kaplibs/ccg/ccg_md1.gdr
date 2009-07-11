@@ -93,6 +93,8 @@
 *        Converted to generic and renamed from CCG_MD1x.  Added NBAD
 *        argument.  Moved STACK, NMAT, and NCON to the normal order in
 *        the API.  Made NCON Returned and therefore it is initialised.
+*     2009 July 11 (MJC):
+*        Use revised CCG_WTM3 API.
 *     {enter_further_changes_here}
 
 *-
@@ -208,11 +210,12 @@
 
 *  Find the weighted median.
             IF ( CALCMV ) THEN
-               CALL CCG_WTM3<T>( CALCMV, NGOOD, WRK1, WRK2, SVAR, USED,
-     :                         COVEC( 1, NGOOD ), VAL, VAR, STATUS )
+               CALL CCG_WTM3<T>( CALCMV, NGOOD, WRK1, WRK2, SVAR,
+     :                         COVEC( 1, NGOOD ), USED, VAL, VAR,
+     :                         STATUS )
             ELSE
-               CALL CCG_WTM3<T>( CALCMV, NGOOD, WRK1, WRK2, SVAR, USED,
-     :                         COVEC, VAL, VAR, STATUS )
+               CALL CCG_WTM3<T>( CALCMV, NGOOD, WRK1, WRK2, SVAR,
+     :                         COVEC, USED, VAL, VAR, STATUS )
             END IF
 
 *  Update the used line counters.

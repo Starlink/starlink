@@ -184,7 +184,9 @@
 *         before the NFLAG argument so it is the same as the statistics
 *         routines.  Use revised APIs for invoked subroutines.
 *     2009 July 9 (MJC):
-*         Use revised APIS for maxima and minima routines.
+*         Use revised APIs for maxima and minima routines.
+*     2009 July 11 (MJC):
+*         Use revised API for CCG_UM3.
 *     {enter_further_changes_here}
 
 *-
@@ -238,7 +240,7 @@
       IF ( IMETH .EQ. 1 ) THEN
 
 *  Forming the unweighted mean.
-         CALL CCG_UM3<T>( NPIX, NLINES, STACK, VARS, MINPIX,
+         CALL CCG_UM3<T>( NPIX, NLINES, STACK, MINPIX,
      :                  RESULT, NCON, NBAD, STATUS )
 
       ELSE IF ( IMETH .EQ. 2 ) THEN

@@ -1,5 +1,5 @@
-      SUBROUTINE CCG_WTM3<T>( CALCMV, EL, ORDDAT, WEIGHT, VAR, USED, 
-     :                      COVAR, RESULT, RESVAR, STATUS )
+      SUBROUTINE CCG_WTM3<T>( CALCMV, EL, ORDDAT, WEIGHT, VAR, 
+     :                      USED, COVAR, RESULT, RESVAR, STATUS )
 *+
 *  Name:
 *     CCG_WTM3x
@@ -13,7 +13,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*      CALL CCG_WTM3x( CALCMV, EL, ORDDAT, WEIGHT, VAR, USED, COVAR,
+*      CALL CCG_WTM3x( CALCMV, EL, ORDDAT, WEIGHT, VAR, COVAR, USED,
 *                      RESULT, RESVAR, STATUS )
 
 *  Description:
@@ -47,12 +47,12 @@
 *        The weights of the values.
 *     VAR = DOUBLE PRECISION (Given)
 *        The variance of the unordered sample now ordered in ARR.
-*     USED( EL ) = LOGICAL (Returned)
-*        If a value contributes to the median value it is flagged as
-*        true in this array, otherwise the array is set to false.
 *     COVAR( * ) = DOUBLE PRECISION (Given)
 *        The packed variance-covariance matrix of the order statistics
 *        from a normal distribution of size EL. Not used if CALCMV is .FALSE.
+*     USED( EL ) = LOGICAL (Returned)
+*        If a value contributes to the median value it is flagged as
+*        true in this array, otherwise the array is set to false.
 *     RESULT = DOUBLE PRECISION (Returned)
 *        The weighted median
 *     RESVAR = DOUBLE PRECISION (Returned)
@@ -94,6 +94,9 @@
 *         Converted to generic and renamed from CCG1_WTM3R.  Moved EL 
 *         (after renaming from NENT) to the normal order in the API.
 *         Corrected which arguments are arrays or not in the prologue.
+*     2009 July 11 (MJC):
+*         Swapped COVAR and USED in the API to achieve the standard
+*         order.
 *     {enter_further_changes_here}
 
 *-
@@ -149,12 +152,15 @@
 *.
 
 *  Initialise returned values.
-         DO 5 I = 1, EL
-            USED( I ) = .FALSE.
-    5    CONTINUE
+      DO 5 I = 1, EL
+         USED( I ) = .FALSE.
+    5 CONTINUE
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Avoid confusing the optimiser.
+      WTINC = 0.0D0
 
 *  If only one input value has been given, do thing quickly.
       IF ( EL .EQ. 1 ) THEN

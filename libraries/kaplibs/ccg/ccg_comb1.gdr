@@ -212,7 +212,9 @@
 *         routines.  Use revised APIs for invoked subroutines.
 *         Use revised APIs for invoked subroutines.
 *     2009 July 9 (MJC):
-*         Use revised APIS for maxima and minima routines.
+*         Use revised APIs for maxima and minima routines.
+*     2009 July 11 (MJC):
+*         Use revised API for CCG_FM1.
 *     {enter_further_changes_here}
 
 *-
@@ -352,7 +354,7 @@
 *  Forming fast median (no weights).
          CALL CCG_FM1<T>( NPIX, NLINES, STACK, VARS, MINPIX, NMAT,
      :                  COVEC, RESULT, RESVAR, WRK1, WRK2, POINT,
-     :                  USED, NCON, NBAD, STATUS )
+     :                  NCON, NBAD, STATUS )
 
       ELSE IF ( IMETH .EQ. 12 ) THEN
 

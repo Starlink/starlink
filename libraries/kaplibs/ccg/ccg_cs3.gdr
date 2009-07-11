@@ -148,6 +148,9 @@
          NCON( I ) = 0.0D0
       END DO
 
+*  Avoid confusing the optimiser.
+      VAR = 0.0D0
+      
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 

@@ -139,6 +139,9 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Avoid confusing the optimiser.
+      MEDIAN = 0.0D0
+      
 *  Set the numeric error and set error flag value.
       CALL NUM_HANDL( NUM_TRAP )
 
