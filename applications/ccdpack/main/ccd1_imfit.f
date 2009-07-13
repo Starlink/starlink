@@ -394,7 +394,7 @@
                   NOWAT = 0
                   FITVAL = ' '
  9                CONTINUE
-                  CALL CCD1_NXWRD( EXTFUN( :LENFUN ), IAT, FIRST,
+                  CALL KPG_NXWRD( EXTFUN( :LENFUN ), IAT, FIRST,
      :                             LAST, NOTFND, STATUS )
                   IAT = LAST + 1
                   IF ( .NOT. NOTFND ) THEN
@@ -436,7 +436,7 @@
                ELSE
 
 *  Now look for the first word (must exist).
-                  CALL CCD1_NXWRD( EXTFUN( :LENFUN ), 1, FIRST, LAST,
+                  CALL KPG_NXWRD( EXTFUN( :LENFUN ), 1, FIRST, LAST,
      :                             NOTFND, STATUS )
 
 *  If this is the only word and the string is not a concatenation
@@ -491,7 +491,7 @@
 *  for '=', which should be next character or next word.
                               IAT = LAST + IAT + NCHAR
                               IF ( EXTFUN( IAT: IAT ) .NE. '=' ) THEN
-                                 CALL CCD1_NXWRD( EXTFUN, IAT, FIRST,
+                                 CALL KPG_NXWRD( EXTFUN, IAT, FIRST,
      :                                            LAST, NOTFND, STATUS )
                                  IF ( NOTFND ) THEN
 
@@ -504,7 +504,7 @@
      :                                   '=' ) THEN
 
 *  Next word is the actual value.
-                                       CALL CCD1_NXWRD( EXTFUN,
+                                       CALL KPG_NXWRD( EXTFUN,
      :                                                  FIRST + 1,FIRST,
      :                                                  LAST, NOTFND,
      :                                                  STATUS )
@@ -526,7 +526,7 @@
                               ELSE
 
 *  No space next word is translation.
-                                 CALL CCD1_NXWRD( EXTFUN, IAT + 1,
+                                 CALL KPG_NXWRD( EXTFUN, IAT + 1,
      :                                            FIRST, LAST, NOTFND,
      :                                            STATUS )
                                  IF ( .NOT. NOTFND ) THEN
@@ -592,7 +592,7 @@
             ELSE
 
 *  Look for word in function.
-            CALL CCD1_NXWRD( EXTFUN ( : LENFUN ), 1, FIRST, LAST,
+            CALL KPG_NXWRD( EXTFUN ( : LENFUN ), 1, FIRST, LAST,
      :                       NOTFND, STATUS )
 
 *  Is this the only word or do other exist? This should be the only

@@ -221,6 +221,7 @@ kpg1_naptc.f \
 kpg1_ndfnm.f \
 kpg1_nmcol.f \
 kpg1_numfl.f \
+kpg_nxwrd.f \
 kpg1_opgrd.f \
 kpg1_orvar.f \
 kpg1_pgesc.f \

@@ -1,8 +1,8 @@
-      SUBROUTINE CCD1_NXWRD( STRING, OFFSET, FIRST, LAST, NOTFND,
+      SUBROUTINE KPG_NXWRD( STRING, OFFSET, FIRST, LAST, NOTFND,
      :                       STATUS )
 *+
 *  Name:
-*     CCD1_NXWRD
+*     KPG_NXWRD
 
 *  Purpose:
 *     To find the next word in a string
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCD1_NXWRD( STRING, OFFSET, FIRST, LAST, NOTFND, STATUS )
+*     CALL KPG_NXWRD( STRING, OFFSET, FIRST, LAST, NOTFND, STATUS )
 
 *  Description:
 *     The routine looks for the start of the next word, after OFFSET
@@ -43,11 +43,31 @@
 *     equal to one.
 
 *  Copyright:
-*     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+*     Copyright (C) 1991-1992 Science & Engineering Research Council.
+*     Copyright (C) 1997 Central Laboratory of the Research Councils.
+*     Copyright (C) 2009 Science and Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -55,16 +75,21 @@
 *        Original version.
 *     5-FEB-1992 (PDRAPER):
 *        Changed to CCD1_ routine from ARD original.
+*     12-SEP-1997 (PDRAPER):
+*        Modified to return a word that extends to the end of
+*        the string correctly.
 *     15-APR-1998 (DSB):
 *        Changed so that words which end at the end of the string are
 *        found without error.
+*     12-JUL-2009 (TIMJ):
+*        Merge ccdpack and polpack versions and place in kaplibs.
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -84,31 +109,33 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*.
+
 *  Initialise returned values.
+*  Word is not found by default.
       NOTFND = .TRUE.
       FIRST = 1
       LAST = 1
-*.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Look for the first character of the word - first non delimiter.
-      FIRST = OFFSET 
+      FIRST = OFFSET
       CALL CHR_FIWS( STRING, FIRST, STATUS )
 
 *  If no more words remain in the string, annul the error and set the
 *  returned flag to indicate this.
-      IF ( STATUS .EQ. CHR__WNOTF ) THEN
+      IF ( STATUS .EQ. CHR__EOSNT .OR. STATUS .EQ. CHR__WNOTF ) THEN
          CALL ERR_ANNUL( STATUS )
          NOTFND = .TRUE.
 
-*  If a word start was found, indicate a word has been found and find the 
+*  If a word start was found, indicate a word has been found and find the
 *  word end.
       ELSE IF( STATUS .EQ. SAI__OK ) THEN
          NOTFND = .FALSE.
 
-         LAST = FIRST 
+         LAST = FIRST
          CALL CHR_FIWE( STRING, LAST, STATUS )
 
 *  An error will be reported if the word end does not occur before the end
@@ -122,6 +149,9 @@
          NOTFND = .TRUE.
          FIRST = 1
          LAST = 1
+
+         CALL ERR_REP( ' ', 'Error finding next word in string',
+     :        STATUS )
       END IF
 
-      END 
+      END

@@ -43,7 +43,7 @@ SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adfrm.f ccd1_adkey.f \
  ccd1_ndfmi.f ccd1_ndfpl.f \
  ccd1_ndfpg.f ccd1_ndfpr.f ccd1_ngdel.f \
  ccd1_nglis.f ccd1_nlmap.f ccd1_nmid.f ccd1_nrmed.f \
- ccd1_nxwrd.f ccd1_objs.f ccd1_opfio.f ccd1_orvar.f \
+ ccd1_objs.f ccd1_opfio.f ccd1_orvar.f \
  ccd1_ovcom.f ccd1_ovlap.f ccd1_plof.f ccd1_plsty.f ccd1_pnply.f ccd1_prmin.f \
  ccd1_prndf.f ccd1_proff.f ccd1_prsel.f ccd1_psize.f ccd1_prune.f \
  ccd1_ptbad.f ccd1_pthmp.f ccd1_ptins.f ccd1_putr.f ccd1_rbia.f ccd1_rcal.f \

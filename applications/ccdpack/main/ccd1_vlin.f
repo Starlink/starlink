@@ -171,7 +171,7 @@
       STATE = ' '
 
 *  See if the line starts with an integer (a Set Index key value).
-      CALL CCD1_NXWRD( LINE, 1, FIRST, LAST, NOTFND, STATUS )
+      CALL KPG_NXWRD( LINE, 1, FIRST, LAST, NOTFND, STATUS )
       IF ( NOTFND ) THEN
 
 *  No text.  Report this and exit.
@@ -216,7 +216,7 @@
       IF ( LINE1( 1 : 4 ) .EQ. 'MASK' ) THEN
 
 *  Extract name of MASK file.
-         CALL CCD1_NXWRD( LINE1, 5, FIRST, LAST, NOTFND, STATUS )
+         CALL KPG_NXWRD( LINE1, 5, FIRST, LAST, NOTFND, STATUS )
          IF ( NOTFND ) THEN
 
 *  Must be an error.. report this and exit.
@@ -239,7 +239,7 @@
       ELSE IF ( LINE1 ( 1 : 3 ) .EQ. 'ADC' ) THEN
 
 *  Extract value.
-         CALL CCD1_NXWRD( LINE1, 4, FIRST, LAST, NOTFND, STATUS )
+         CALL KPG_NXWRD( LINE1, 4, FIRST, LAST, NOTFND, STATUS )
          IF ( NOTFND ) THEN
 
 *  Must be an error.. report this and exit.
@@ -270,7 +270,7 @@
       ELSE IF ( LINE1 ( 1 : 6 ) .EQ. 'RNOISE' ) THEN
 
 *  Extract value.
-         CALL CCD1_NXWRD( LINE1, 7, FIRST, LAST, NOTFND, STATUS )
+         CALL KPG_NXWRD( LINE1, 7, FIRST, LAST, NOTFND, STATUS )
          IF ( NOTFND ) THEN
 
 *  Must be an error.. report this and exit.
@@ -344,7 +344,7 @@
       ELSE IF ( LINE1 ( 1 : 8 ) .EQ. 'DEFERRED' ) THEN
 
 *  Extract value.
-         CALL CCD1_NXWRD( LINE1, 9, FIRST, LAST, NOTFND, STATUS )
+         CALL KPG_NXWRD( LINE1, 9, FIRST, LAST, NOTFND, STATUS )
          IF ( NOTFND ) THEN
 
 *  Must be an error.. report this and exit.
@@ -376,7 +376,7 @@
       ELSE IF ( LINE1 ( 1 : 9 ) .EQ. 'DIRECTION' ) THEN
 
 *  Extract value.
-         CALL CCD1_NXWRD( LINE1, 10, FIRST, LAST, NOTFND, STATUS )
+         CALL KPG_NXWRD( LINE1, 10, FIRST, LAST, NOTFND, STATUS )
          IF ( NOTFND ) THEN
 
 *  Must be an error.. report this and exit.
@@ -443,7 +443,7 @@
       ELSE IF ( LINE1( 1 : 8 ) .EQ. 'SATURATE' ) THEN
 
 *  Extract value.
-         CALL CCD1_NXWRD( LINE1, 9, FIRST, LAST, NOTFND, STATUS )
+         CALL KPG_NXWRD( LINE1, 9, FIRST, LAST, NOTFND, STATUS )
          IF ( NOTFND ) THEN
 
 *  Must be an error.. report this and exit.
@@ -470,7 +470,7 @@
       ELSE IF ( LINE1( 1 : 10 ) .EQ. 'SATURATION' ) THEN
 
 *  Extract value.
-         CALL CCD1_NXWRD( LINE1, 11, FIRST, LAST, NOTFND, STATUS )
+         CALL KPG_NXWRD( LINE1, 11, FIRST, LAST, NOTFND, STATUS )
          IF ( NOTFND ) THEN
 
 *  Must be an error.. report this and exit.
@@ -502,7 +502,7 @@
       ELSE IF ( LINE1( 1 : 6 ) .EQ. 'SETSAT' ) THEN
 
 *  Extract value.
-         CALL CCD1_NXWRD( LINE1, 7, FIRST, LAST, NOTFND, STATUS )
+         CALL KPG_NXWRD( LINE1, 7, FIRST, LAST, NOTFND, STATUS )
          IF ( NOTFND ) THEN
 
 *  Must be an error.. report this and exit.
@@ -529,7 +529,7 @@
       ELSE IF ( LINE1( 1 : 8 ) .EQ. 'PRESERVE' ) THEN
 
 *  Extract value.
-         CALL CCD1_NXWRD( LINE1, 9, FIRST, LAST, NOTFND, STATUS )
+         CALL KPG_NXWRD( LINE1, 9, FIRST, LAST, NOTFND, STATUS )
          IF ( NOTFND ) THEN
 
 *  Must be an error.. report this and exit.
@@ -556,7 +556,7 @@
       ELSE IF ( LINE1( 1 : 6 ) .EQ. 'GENVAR' ) THEN
 
 *  Extract value.
-         CALL CCD1_NXWRD( LINE1, 7, FIRST, LAST, NOTFND, STATUS )
+         CALL KPG_NXWRD( LINE1, 7, FIRST, LAST, NOTFND, STATUS )
          IF ( NOTFND ) THEN
 
 *  Must be an error.. report this and exit.
@@ -584,7 +584,7 @@
       ELSE IF ( LINE1( 1 : 8 ) .EQ. 'NDFNAMES' ) THEN
 
 *  Extract value.
-         CALL CCD1_NXWRD( LINE1, 9, FIRST, LAST, NOTFND, STATUS )
+         CALL KPG_NXWRD( LINE1, 9, FIRST, LAST, NOTFND, STATUS )
          IF ( NOTFND ) THEN
 
 *  Must be an error.. report this and exit.
@@ -612,7 +612,7 @@
       ELSE IF ( LINE1( 1 : 6 ) .EQ. 'USESET' ) THEN
 
 *  Extract value.
-         CALL CCD1_NXWRD( LINE1, 7, FIRST, LAST, NOTFND, STATUS )
+         CALL KPG_NXWRD( LINE1, 7, FIRST, LAST, NOTFND, STATUS )
          IF ( NOTFND ) THEN
 
 *  Must be an error.. report this and exit.
@@ -641,7 +641,7 @@
       ELSE IF ( LINE1 ( 1 : 5 ) .EQ. 'LOGTO' ) THEN
 
 *  Extract value.
-         CALL CCD1_NXWRD( LINE1, 6, FIRST, LAST, NOTFND, STATUS )
+         CALL KPG_NXWRD( LINE1, 6, FIRST, LAST, NOTFND, STATUS )
          IF ( NOTFND ) THEN
 
 *  Must be an error.. report this and exit.
@@ -660,7 +660,7 @@
       ELSE IF ( LINE1( 1 : 7 ) .EQ. 'LOGFILE' ) THEN
 
 *  Extract value.
-         CALL CCD1_NXWRD( LINE1, 8, FIRST, LAST, NOTFND, STATUS )
+         CALL KPG_NXWRD( LINE1, 8, FIRST, LAST, NOTFND, STATUS )
          IF ( NOTFND ) THEN
 
 *  Must be an error.. report this and exit.
