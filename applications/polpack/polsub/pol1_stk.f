@@ -43,7 +43,7 @@
 *     VOUT( * ) = REAL (Returned)
 *        The output variance values. This should have NPIX*NROW elements.
 *        Only used if VAR is .TRUE.
-*     VARS( * ) = DOUBLE PRECISION (Returned)
+*     VARS( * ) = REAL (Returned)
 *        An array of BOX(1)*BOX(2) elements which will be set to the
 *        value 1.0 on return.
 *     TR( 4 ) = DOUBLE PRECISION (Returned)
@@ -58,6 +58,8 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
  
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -66,6 +68,8 @@
 *  History:
 *     13-JAN-1998 (DSB):
 *        Original version.
+*     13-JUL-2009 (DSB):
+*        Changed VARS form DOUBLE PRECISION to REAL.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -91,7 +95,7 @@
 *  Arguments Returned:
       REAL DOUT( * )
       REAL VOUT( * )
-      DOUBLE PRECISION VARS( * )
+      REAL VARS( * )
       DOUBLE PRECISION TR( 4 )
 
 *  Status:

@@ -147,6 +147,8 @@
 
 *  Copyright:
 *     Copyright (C) 2001 Central Laboratory of the Research Councils
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
  
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -173,6 +175,8 @@
 *        Corrected use of CNF_PVAL
 *     1-OCT-2008 (DSB):
 *        Correct binning of pixel coords.
+*     13-JUL-2009 (DSB):
+*        Changed IPVAR array from DOUBLE PRECISION to REAL.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -799,9 +803,9 @@
 
 *  Allocate an array to hold the variance to use for each line of data, 
 *  and set each element to 1.0 (i.e. give all input values equal weight).
-            CALL PSX_CALLOC( MXCNT, '_DOUBLE', IPVAR, STATUS )
+            CALL PSX_CALLOC( MXCNT, '_REAL', IPVAR, STATUS )
             IF( STATUS .NE. SAI__OK ) GO TO 999
-            CALL POL1_SETD( MXCNT, 1.0D0, %VAL( CNF_PVAL( IPVAR ) ), 
+            CALL POL1_SETR( MXCNT, 1.0, %VAL( CNF_PVAL( IPVAR ) ), 
      :                      STATUS )
 
 *  Bin the data values.

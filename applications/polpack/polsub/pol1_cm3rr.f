@@ -34,7 +34,7 @@
 *        The number of pixels in a line of data.
 *     NLINES = INTEGER (Given)
 *        The number of lines of data in the stack.
-*     VARS( NLINES ) = DOUBLE PRECISION (Given)
+*     VARS( NLINES ) = REAL (Given)
 *        The variance to to used for each line of data.
 *     METH = CHARACTER * ( * ) (Given)
 *        The method to use in combining the lines. One of 'MEAN', 'MEDIAN',
@@ -50,7 +50,7 @@
 *        Workspace for calculations.
 *     WRK2( NLINES ) = REAL (Given and Returned)
 *        Workspace for calculations.
-*     NCON( NLINES ) = DOUBLE PRECISION (Given and Returned)
+*     NCON( NLINES ) = DOUBLE PRECISION (Returned)
 *        The actual number of contributing pixels from each input line
 *        to the output line.
 *     POINT( NLINES ) = INTEGER (Given and Returned)
@@ -67,6 +67,8 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
  
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
@@ -79,6 +81,9 @@
 *        routine structure to increase efficiency.
 *     21-JAN-1998 (DSB):
 *        Copied from CCDPACK and modified to provide fewer stacking methods.
+*     13-JUL-2009 (DSB):
+*        Argument VARS changed from DOUBLE PRECISION to REAL. Use KAPLIBS
+*        CCG_ routines.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -98,22 +103,24 @@
       CHARACTER * ( * ) METH
       INTEGER MINPIX
       REAL STACK( NPIX, NLINES )
-      DOUBLE PRECISION VARS( NLINES )
+      REAL VARS( NLINES )
       REAL NSIGMA
 
 *  Arguments Given and Returned:
-      DOUBLE PRECISION NCON( NLINES )
       INTEGER POINT( NLINES )
       LOGICAL USED( NLINES )
       REAL WRK1( NLINES )
       REAL WRK2( NLINES )
 
 *  Arguments Returned:
+      DOUBLE PRECISION NCON( NLINES )
       REAL RESULT( NPIX )
 
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  Local Variables: 
+      INTEGER NBAD
 *.
 
 *  Check inherited global status.
@@ -123,20 +130,20 @@
 
 *  Weighted mean...
       IF ( METH .EQ. 'MEAN' ) THEN
-         CALL CCG1_MER3R( STACK, NPIX, NLINES, VARS, MINPIX,
-     :                    RESULT, NCON, STATUS )
+         CALL CCG_ME3R( NPIX, NLINES, STACK, VARS, MINPIX,
+     :                  RESULT, NCON, NBAD, STATUS )
 
 *  Weighted median...
       ELSE IF ( METH .EQ. 'MEDIAN' ) THEN
-         CALL CCG1_MDR3R( STACK, NPIX, NLINES, VARS, MINPIX,
-     :                    RESULT, WRK1, WRK2, NCON, POINT, USED,
-     :                    STATUS )
+         CALL CCG_MD3R( NPIX, NLINES, STACK, VARS, MINPIX,
+     :                  RESULT, WRK1, WRK2, POINT, USED,
+     :                  NCON, NBAD, STATUS )
 
 *  Sigma clipped mean...
       ELSE IF ( METH .EQ. 'SIGMA' ) THEN
-         CALL CCG1_SCR3R( NSIGMA, STACK, NPIX, NLINES, VARS, MINPIX,
-     :                    RESULT, WRK1, WRK2, NCON, POINT, USED,
-     :                    STATUS )
+         CALL CCG_SC3R( NSIGMA, NPIX, NLINES, STACK, VARS, MINPIX,
+     :                  RESULT, WRK1, WRK2, POINT, USED, NCON, NBAD, 
+     :                  STATUS )
 
 *  Report an error if the method is not recognised.
       ELSE IF( STATUS .EQ. SAI__OK ) THEN

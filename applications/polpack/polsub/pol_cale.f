@@ -85,7 +85,7 @@
 *        F factor
 *     ETOL = REAL (Given)
 *        Convergence criterion for E factors.
-*     WEIGHT( NPAIR ) = DOUBLE PRECISION (Given)
+*     WEIGHT( NPAIR ) = REAL (Given)
 *        Weights used when combining the total intensity images.
 *     IPDOU( 8, NSET ) = INTEGER (Returned)
 *        Pointers to the output data, corrected for E and F factors.
@@ -108,10 +108,10 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
-*  [optional_subroutine_items]...
-*
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
  
 *  Authors:
 *     TMG: Tim Gledhill (STARLINK)
@@ -142,6 +142,9 @@
 *        Continue processing if the image inter-comparisons fail to converge.
 *     22-SEP-2004 (TIMJ):
 *        Use CNF_PVAL
+*     13-JUL-2009 (DSB):
+*        Make WEIGHT argument REAL, not DOUBLE PRECISION. Use kaplibs 
+*        CCG_MD3R instead of CCDPACK CCG1_MDR3R.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -177,7 +180,7 @@
       INTEGER IPVIN( 8, NSET )
       CHARACTER * ( * ) ID( NPAIR )
       CHARACTER * ( * ) IMGID( 4, NSET )
-      DOUBLE PRECISION WEIGHT( NPAIR )
+      REAL WEIGHT( NPAIR )
       INTEGER ILEVEL
       
 *  Arguments Given and Returned:
@@ -207,6 +210,7 @@
      :        IPWRK8, IPWRK9     ! memory pointers to workspace
       INTEGER IPMED              ! pointer to median image
       INTEGER IPAIR, IPOS, ISET  ! loop counters
+      INTEGER NBAD               ! Number of bad pixels created
       INTEGER NTOT               ! total pixel count
       INTEGER IERR, NERR         ! PRM error information
       INTEGER ITER               ! iteration count in convergence loop
@@ -309,7 +313,7 @@
 * estimates.
 
       DO IPAIR = 1, NPAIR 
-         WEIGHT( IPAIR ) = 1.0D0
+         WEIGHT( IPAIR ) = 1.0
          EEST( IPAIR ) = 1.0
          ZEST( IPAIR ) = 0.0
       ENDDO
@@ -332,12 +336,11 @@
 * Insist on at least two pixels being valid so that different images are
 * intercompared.
 
-         CALL CCG1_MDR3R( TI2, NEL, NPAIR, WEIGHT, 2, 
-     :                    %VAL( CNF_PVAL( IPMED ) ),
+         CALL CCG_MD3R( NEL, NPAIR, TI2, WEIGHT, 2, 
+     :        %VAL( CNF_PVAL( IPMED ) ),
      :        %VAL( CNF_PVAL( IPWRK5 ) ), %VAL( CNF_PVAL( IPWRK6 ) ), 
-     :        %VAL( CNF_PVAL( IPWRK7 ) ),
      :        %VAL( CNF_PVAL( IPWRK8 ) ), %VAL( CNF_PVAL( IPWRK9 ) ), 
-     :        STATUS )
+     :        %VAL( CNF_PVAL( IPWRK7 ) ), NBAD, STATUS )
         
 * Loop through the intensity images to compare them with the median and
 * form estimates of the scale factors and zero shifts. Variance

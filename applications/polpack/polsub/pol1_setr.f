@@ -1,16 +1,16 @@
-      SUBROUTINE POL1_SETD( N, VAL, DATA, STATUS )
+      SUBROUTINE POL1_SETR( N, VAL, DATA, STATUS )
 *+
 *  Name:
-*     POL1_SETD
+*     POL1_SETR
 
 *  Purpose:
-*     Square the supplied array.
+*     Fill the supplied array with a constant value.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_SETD( N, VAL, DATA, STATUS )
+*     CALL POL1_SETR( N, VAL, DATA, STATUS )
 
 *  Description:
 *     This routine stores a given constant value in every element of an
@@ -19,15 +19,17 @@
 *  Arguments:
 *     N = INTEGER (Given)
 *        The number of points in DATA.
-*     VAL = DOUBLE PRECISION (Given)
+*     VAL = REAL (Given)
 *        The value to store.
-*     DATA( N ) = DOUBLE PRECISION (Returned)
+*     DATA( N ) = REAL (Returned)
 *        The array.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
  
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -36,6 +38,8 @@
 *  History:
 *     31-MAR-1998 (DSB):
 *        Original version.
+*     13-JUL-2009 (DSB):
+*        Renamed as POL1_SETR and made single precision.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -51,10 +55,10 @@
 
 *  Arguments Given:
       INTEGER N
-      DOUBLE PRECISION VAL
+      REAL VAL
 
 *  Arguments Given and Returned:
-      DOUBLE PRECISION DATA( N )
+      REAL DATA( N )
 
 *  Status:
       INTEGER STATUS             ! Global status

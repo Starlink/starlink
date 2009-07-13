@@ -63,7 +63,7 @@
 *     VUEST( NEL, NPAIR ) = REAL (Given and Returned)
 *        Array to hold estimates of the variance on U. Only used when
 *        VAR is TRUE
-*     WEIGHT( NPAIR ) = DOUBLE PRECISION (Given and Returned)
+*     WEIGHT( NPAIR ) = REAL (Given and Returned)
 *        Array to hold weights for median stacking. This is only used
 *        when VAR is FALSE.
 *     OUT( NEL, * ) = REAL (Returned)
@@ -84,6 +84,8 @@
 *
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
  
 *  Authors:
 *     TMG: Tim Gledhill (STARLINK)
@@ -104,6 +106,10 @@
 *        used by dual-beam data the same as for single-beam data.
 *     22-SEP-2004 (TIMJ):
 *        Use CNF_PVAL
+*     13-JUL-2009 (DSB):
+*        Make WEIGHT argument REAL, not DOUBLE PRECISION. Use kaplibs 
+*        CCG_MD3R and CCG_MD1R instead of CCDPACK CCG1_MDR3R and 
+*        CCG1_MDR1R.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -137,7 +143,7 @@
       REAL VQEST( NEL, NPAIR )
       REAL UEST( NEL, NPAIR )
       REAL VUEST( NEL, NPAIR )
-      DOUBLE PRECISION WEIGHT( NPAIR )
+      REAL WEIGHT( NPAIR )
 
 *  Arguments Returned:
       REAL OUT( NEL, * )
@@ -154,6 +160,7 @@
       INTEGER NMAT               ! covariance matrix dimension
       INTEGER IPCOV, IPWRK1, IPWRK2, IPWRK3, IPWRK4, IPWRK5
                                  ! workspace pointers
+      INTEGER NBAD               ! Number of bad pixels
       LOGICAL BAD                ! bad pixel flag
       
       REAL Q, U                  ! Stokes parameters
@@ -327,12 +334,12 @@
      :                    STATUS )
 
 *  Get the median total intensity data, and variances.
-         CALL CCG1_MDR1R( IEST, NEL, NI, VIEST, 1, 
-     :        %VAL( CNF_PVAL( IPCOV ) ), NMAT, OUT( 1, 1 ),
+         CALL CCG_MD1R( .TRUE., NEL, NI, IEST, VIEST, 1, 
+     :        NMAT, %VAL( CNF_PVAL( IPCOV ) ), OUT( 1, 1 ),
      :        VOUT( 1, 1 ), %VAL( CNF_PVAL( IPWRK1 ) ), 
-     :        %VAL( CNF_PVAL( IPWRK2 ) ),
-     :        %VAL( CNF_PVAL( IPWRK3 ) ), %VAL( CNF_PVAL( IPWRK4 ) ), 
-     :        %VAL( CNF_PVAL( IPWRK5 ) ), STATUS )
+     :        %VAL( CNF_PVAL( IPWRK2 ) ), %VAL( CNF_PVAL( IPWRK4 ) ), 
+     :        %VAL( CNF_PVAL( IPWRK5 ) ), %VAL( CNF_PVAL( IPWRK3 ) ), 
+     :        NBAD, STATUS )
 
 *  Now do Q.
          IF ( NQ .GT. 0 ) THEN
@@ -345,13 +352,12 @@
      :                       STATUS )
 
 *  Get the median Q data, and variances.
-            CALL CCG1_MDR1R( QEST, NEL, NQ, VQEST, 1, 
-     :           %VAL( CNF_PVAL( IPCOV ) ),
-     :           NMAT, OUT( 1, 2 ), VOUT( 1, 2 ), 
-     :           %VAL( CNF_PVAL( IPWRK1 ) ),
-     :           %VAL( CNF_PVAL( IPWRK2 ) ), %VAL( CNF_PVAL( IPWRK3 ) ), 
-     :           %VAL( CNF_PVAL( IPWRK4 ) ),
-     :           %VAL( CNF_PVAL( IPWRK5 ) ), STATUS )
+            CALL CCG_MD1R( .TRUE., NEL, NQ, QEST, VQEST, 1, 
+     :           NMAT, %VAL( CNF_PVAL( IPCOV ) ), OUT( 1, 2 ), 
+     :           VOUT( 1, 2 ), %VAL( CNF_PVAL( IPWRK1 ) ),
+     :           %VAL( CNF_PVAL( IPWRK2 ) ), %VAL( CNF_PVAL( IPWRK4 ) ),
+     :           %VAL( CNF_PVAL( IPWRK5 ) ), %VAL( CNF_PVAL( IPWRK3 ) ), 
+     :           NBAD, STATUS )
 
          ENDIF
 
@@ -366,39 +372,35 @@
      :                       STATUS )
 
 *  Get the median U data, and variances.
-            CALL CCG1_MDR1R( UEST, NEL, NU, VUEST, 1, 
-     :           %VAL( CNF_PVAL( IPCOV ) ),
-     :           NMAT, OUT( 1, 3 ), VOUT( 1, 3 ), 
-     :           %VAL( CNF_PVAL( IPWRK1 ) ),
-     :           %VAL( CNF_PVAL( IPWRK2 ) ), %VAL( CNF_PVAL( IPWRK3 ) ), 
-     :           %VAL( CNF_PVAL( IPWRK4 ) ),
-     :           %VAL( CNF_PVAL( IPWRK5 ) ), STATUS )
+            CALL CCG_MD1R( .TRUE., NEL, NU, UEST, VUEST, 1, 
+     :           NMAT, %VAL( CNF_PVAL( IPCOV ) ), OUT( 1, 3 ), 
+     :           VOUT( 1, 3 ), %VAL( CNF_PVAL( IPWRK1 ) ),
+     :           %VAL( CNF_PVAL( IPWRK2 ) ), %VAL( CNF_PVAL( IPWRK4 ) ),
+     :           %VAL( CNF_PVAL( IPWRK5 ) ), %VAL( CNF_PVAL( IPWRK3 ) ), 
+     :           NBAD, STATUS )
          ENDIF
 
 * If variance information is not required then asign uniform weights to
 * the input images and calculate the median stokes images.
       ELSE
          DO I = 1, NI
-            WEIGHT( I ) = 1.0D0
+            WEIGHT( I ) = 1.0
          ENDDO
-         CALL CCG1_MDR3R( IEST, NEL, NI, WEIGHT, 1, OUT( 1, 1 ),
+         CALL CCG_MD3R( NEL, NI, IEST, WEIGHT, 1, OUT( 1, 1 ),
      :           %VAL( CNF_PVAL( IPWRK1 ) ), %VAL( CNF_PVAL( IPWRK2 ) ), 
-     :           %VAL( CNF_PVAL( IPWRK3 ) ),
      :           %VAL( CNF_PVAL( IPWRK4 ) ), %VAL( CNF_PVAL( IPWRK5 ) ), 
-     :           STATUS )
+     :           %VAL( CNF_PVAL( IPWRK3 ) ), NBAD, STATUS )
          IF ( NQ .GT. 0 ) THEN
-            CALL CCG1_MDR3R( QEST, NEL, NQ, WEIGHT, 1, OUT( 1, 2 ),
+            CALL CCG_MD3R( NEL, NQ, QEST, WEIGHT, 1, OUT( 1, 2 ),
      :           %VAL( CNF_PVAL( IPWRK1 ) ), %VAL( CNF_PVAL( IPWRK2 ) ), 
-     :           %VAL( CNF_PVAL( IPWRK3 ) ),
      :           %VAL( CNF_PVAL( IPWRK4 ) ), %VAL( CNF_PVAL( IPWRK5 ) ), 
-     :           STATUS )
+     :           %VAL( CNF_PVAL( IPWRK3 ) ), NBAD, STATUS )
          ENDIF
          IF ( NU .GT. 0 ) THEN
-            CALL CCG1_MDR3R( UEST, NEL, NU, WEIGHT, 1, OUT( 1, 3 ),
+            CALL CCG_MD3R( NEL, NU, UEST, WEIGHT, 1, OUT( 1, 3 ),
      :           %VAL( CNF_PVAL( IPWRK1 ) ), %VAL( CNF_PVAL( IPWRK2 ) ), 
-     :           %VAL( CNF_PVAL( IPWRK3 ) ),
      :           %VAL( CNF_PVAL( IPWRK4 ) ), %VAL( CNF_PVAL( IPWRK5 ) ), 
-     :           STATUS )
+     :           %VAL( CNF_PVAL( IPWRK3 ) ), NBAD, STATUS )
          ENDIF
       ENDIF
 

@@ -98,6 +98,8 @@
 
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
  
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -130,6 +132,8 @@
 *        Use CNF_PVAL
 *     14-JUN-2006 (DSB):
 *        Propagate NDF units.
+*     13-JUL-2009 (DSB):
+*        WEIGHT array changed from DOUBLE PRECISION to REAL.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -858,7 +862,7 @@
          CALL PSX_CALLOC( NPAIR, '_REAL', IPEEST, STATUS )
          CALL PSX_CALLOC( NPAIR, '_REAL', IPZEST, STATUS )
          CALL PSX_CALLOC( NPAIR, '_REAL', IPDE, STATUS )
-         CALL PSX_CALLOC( NPAIR, '_DOUBLE', IPWEIGHT, STATUS )
+         CALL PSX_CALLOC( NPAIR, '_REAL', IPWEIGHT, STATUS )
          IF ( VAR ) THEN
             CALL PSX_CALLOC( NPAIR, '_REAL', IPVEEST, STATUS )
             CALL PSX_CALLOC( NPAIR, '_REAL', IPVZEST, STATUS )

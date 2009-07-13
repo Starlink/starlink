@@ -63,6 +63,8 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
  
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -74,6 +76,8 @@
 *        Original version.
 *     22-SEP-2004 (TIMJ):
 *        Use CNF_PVAL
+*     13-JUL-2009 (DSB):
+*        Change IPVAR array from double to single precision.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -144,15 +148,13 @@
 
       IF( VAR ) THEN
          CALL PSX_CALLOC( NBIN*BINSZ, '_REAL', IPSTVI, STATUS )
-         IPVAR = IPPP
-
          CALL PSX_CALLOC( BINSZ, '_DOUBLE', IPPP, STATUS )
          NMAT = BINSZ*( BINSZ + 1 )/2 
          CALL PSX_CALLOC( BINSZ*NMAT, '_DOUBLE', IPCOV, STATUS )
 
       ELSE
          IPSTVI = IPSTDI
-         CALL PSX_CALLOC( BINSZ, '_DOUBLE', IPVAR, STATUS )
+         CALL PSX_CALLOC( BINSZ, '_REAL', IPVAR, STATUS )
       END IF
 
 *  Abort if an error has occurred.

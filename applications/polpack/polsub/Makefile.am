@@ -22,7 +22,7 @@ pol1_cm1rr.f  pol1_gtcol.f  pol1_put0d.f  pol1_squar.f \
 pol1_cm3rr.f  pol1_gtcta.f  pol1_put0r.f  pol1_srtim.f \
 pol1_cnews.f  pol1_gtctc.f  pol1_rdtcl.f  pol1_stats.f \
 pol1_cnfig.f  pol1_gtctw.f  pol1_rmbnd.f  pol1_stbin.f \
-pol1_colnm.f  pol1_gtvrc.f  pol1_setd.f   pol1_stftr.f \
+pol1_colnm.f  pol1_gtvrc.f  pol1_setr.f   pol1_stftr.f \
 pol1_cpctd.f  pol1_gtvrs.f  pol1_setft.f  pol1_stk2.f \
 pol1_cpctr.f  pol1_gtwcs.f  pol1_simcl.f  pol1_stk.f
 
