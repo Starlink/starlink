@@ -18,7 +18,7 @@
     over an image set to B1950 and vice versa.
 
     Finally the GAIA has been updated to use the new SAMP protocol for
-    interoperating with other desktop applications (TOPCAT, SPLAT etc). 
+    interoperating with other desktop applications (TOPCAT, SPLAT etc).
     This replaces PLASTIC support, which has been removed.
 
     Other changes include:
@@ -60,7 +60,7 @@
 
     The contour toolbox now detects cubes displayed in other windows and
     will step through the slices of the cube contouring each in turn over
-    the displayed image. See the help in the contour toolbox for how 
+    the displayed image. See the help in the contour toolbox for how
     to use this.
 
     A bug in the operation of the patch toolbox has been fixed. Previously
@@ -69,7 +69,7 @@
     A bug in the handling of temporary images created by the regions toolbox
     has been fixed. Previously if more than one instance of this toolbox
     was in use the names of the temporary files could clash.
- 
+
     The gaiadisp command now uses the RTD_REMOTE_DIR environment variable
     to locate the .rtd-remote file (GAIA already did this).
 
@@ -81,11 +81,11 @@
     This was introduced when dashed lines were offered as an option for
     contouring.
 
-    A bug tracking coordinates using the arrow keys and the "Show all 
-    coordinates" toolbox has been fixed. Previously the reported Y 
+    A bug tracking coordinates using the arrow keys and the "Show all
+    coordinates" toolbox has been fixed. Previously the reported Y
     coordinates were those of the last position, not the current one.
 
-    It is now possible to resize the 3D toolboxes during the first 
+    It is now possible to resize the 3D toolboxes during the first
     rendering. Previously this could case the application to terminate.
 
     The 3D scene now offers lighting controls.
@@ -95,13 +95,15 @@
     The baseline subtraction tool in the cube toolbox now allows for the
     output cube to be given a named prefix.
 
+    The default celestial coordinate system for FITS files is now FK5/J2000.
+
   Lehuakona Release
   =================
 
     Version 4.2-2
     =============
 
-    A snapshot feature that captures the main window display to a graphics 
+    A snapshot feature that captures the main window display to a graphics
     file has been added.  Supported formats are GIF, JPEG, PNG and TIFF.
 
     The pick object toolbox will now report the FWHM in arcseconds as well
@@ -117,7 +119,7 @@
     The VARIANCE component of an NDF can now be displayed in standard
     deviations using the component name ERROR. ERROR is also selectable
     in the NDF chooser dialog.
- 
+
     NDFs stored in the extensions of an NDF will now be offered for display
     in the various chooser and browser dialogs.
 
@@ -130,24 +132,24 @@
 
     A new command-line and startup option -pixel_indices is available.
     This changes the X and Y continuous readout displays to show NDF
-    pixel indices, not grid coordinates. NDF pixel indices are like 
+    pixel indices, not grid coordinates. NDF pixel indices are like
     grid coordinates, but they include the NDF origin and are integer
     values.
 
-    An experimental "autofill" option has been introduced. This works 
+    An experimental "autofill" option has been introduced. This works
     like "autoscale", but allows the X and Y scale factors to differ
     so that the image fills the main display. This option has several
-    known issues, like graphics overlays will not always be drawn 
+    known issues, like graphics overlays will not always be drawn
     correctly and you cannot interchange the X and Y axes, but should
-    be useful for long thin images and cube planes as coordinates readout 
-    and spectral extraction will work. Enable this using the  
+    be useful for long thin images and cube planes as coordinates readout
+    and spectral extraction will work. Enable this using the
     "Options->Auto fill" item or by using the "-autofill 1" command-line
     option.
 
-    Contour and grid overlay lines can now be drawn in dotted and 
+    Contour and grid overlay lines can now be drawn in dotted and
     dashed styles.
 
-    Contour levels can now include missing values (previously 
+    Contour levels can now include missing values (previously
     attempting this caused a Tcl error).
 
     The AXIS component of an NDF cube will now be propagated with any
@@ -160,7 +162,7 @@
     in the container. Local catalogues can now also have the HDU number given
     as part of their name (previously this effect could only be acheieved by
     opening the FITS MEF as an image, selecting the catalogue using the HDU
-    chooser and then loading the actual image). 
+    chooser and then loading the actual image).
 
     Cubes which at the same level as the currently accessed cube can now be
     selected using a chooser like that already available for images
@@ -188,7 +190,7 @@
     The cube toolbox can now display the data variances as standard
     deviations (ERROR component).
 
-    When creating a channel map from a cube some of the combination 
+    When creating a channel map from a cube some of the combination
     estimators require more than one channel to operate (median for
     instance), this problem is now reported avoiding an uninformative
     error message.
@@ -197,8 +199,8 @@
     of all overlapping windows. This requirement is now reported as
     a warning rather than a generic "too many colors" error messages.
 
-    A bug handling integer images has been fixed. Previously contouring, 
-    XY extraction and region stats was broken for this data type 
+    A bug handling integer images has been fixed. Previously contouring,
+    XY extraction and region stats was broken for this data type
     (since version 4.0).
 
     The blink toolbox should now handle the case when RA and Dec
@@ -226,7 +228,7 @@
     of GAIA will now be ignored. Previously this caused a fatal error and
     it was necessary to remove the properties files from $HOME/.skycat.
     This change will only work for future changes, so using different versions
-    of GAIA sharing the same properties file will continue with this issue 
+    of GAIA sharing the same properties file will continue with this issue
     until after all your versions are at least as new as this release.
 
     A bug in the calculations of the offsets for extracted spectra has been
@@ -250,10 +252,10 @@
 
     A bug in the 3D toolboxes that meant reloading a cube with the same
     name under certain circumstances would fail. This issue should now
-    be resolved (although re-using files with the same name remains 
+    be resolved (although re-using files with the same name remains
     unsupported).
 
-    A problem reading coordinates from FITS tables has been fixed. These 
+    A problem reading coordinates from FITS tables has been fixed. These
     where being read without enough precision leading to alignment errors
     when displayed.
 
@@ -264,8 +266,8 @@
     when Dec was the first axis and RA the second).
 
     Typing <return> in the low: and high: entry fields has always fixed
-    the display limits. This fact is now made clear by changing the 
-    labels of these two fields to display in blue. Several issues 
+    the display limits. This fact is now made clear by changing the
+    labels of these two fields to display in blue. Several issues
     have also been fixed that should make this work more reliably.
 
     When a new astrometry has been created by the GAIA fit to reference

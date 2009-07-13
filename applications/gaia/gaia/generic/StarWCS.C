@@ -15,7 +15,7 @@
  *  Copyright:
  *     Copyright (C) 1997-1999 Central Laboratory of the Research Councils
  *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
- *     Copyright (C) 2007-2008 Science and Technology Facilities Council.
+ *     Copyright (C) 2007-2009 Science and Technology Facilities Council.
  *     All Rights Reserved.
 
  *  Licence:
@@ -260,18 +260,26 @@ StarWCS::StarWCS( const char *header, const size_t lheader )
             //  CAR projections are sometimes incorrect and what is
             //  required in a linear transformation. This is
             //  controlled by the static member carlin_.
-	    astSetI( fitschan, "CarLin", carlin_ );
+            astSetI( fitschan, "CarLin", carlin_ );
 
             //  Establish which error conditions we'd like to see mentioned
             //  in the ASTWARN cards. These should be shown to the user when
             //  convenient.
             astSet( fitschan, "Warnings=%s", astGetC(fitschan, "AllWarnings"));
 
+            //   If the encoding is FITS-anything, then we effectively
+            //   default to FK5/J2000 (really ICRS) when values like
+            //   RADESYS etc. are not defined. In 2009 this is probably
+            //   more likely to be true.
+            char const *default_encoding = astGetC( fitschan, "Encoding" );
+            if ( strncmp( "FITS-", default_encoding, 5 ) == 0 ) {
+                astSet( fitschan, "DefB1950=0" );
+            }
+
             // Now try to read in the FITS headers to create a frameset
             // (this contains frames for the image pixels and how to map
             // to the world coordinate systems available).
             astClear( fitschan, "Card" );
-            char const *default_encoding = astGetC( fitschan, "Encoding" );
             AstFrameSet *fitsset = (AstFrameSet *) astRead( fitschan );
             if ( fitsset == AST__NULL ) {
                 astClearStatus;
