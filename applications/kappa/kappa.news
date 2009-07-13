@@ -6,6 +6,12 @@
 
 2 Modified_applications
 
+   o  CHANMAP
+
+      -  There are new estimators for clipped mean and clipped 
+      standard deviation and associated new CLIP parameter for 
+      controlling the clip level.
+
    o  CLINPLOT
 
       -  New MODE and MARKER parameters permit different ways to 
@@ -17,6 +23,19 @@
    
       -  Parameter BADCOL has the additional option of an HTML 
       colour code.
+
+   o  COLLAPSE
+
+      -  There are new estimators for clipped mean and clipped 
+      standard deviation and associated new CLIP parameter for 
+      controlling the clip level.
+
+      - There is an improved WLIM-related WARNING message.  The
+      calculations used to decide whether or not to issue a
+      warning and the reported fractions of bad values therein
+      have been corrected.  These fractions had been in terms of 
+      elements along the collapse axis, not the number of elements
+      in the output NDF.
 
    o  CONVOLVE
 
@@ -62,6 +81,12 @@
       -  A new option "WLIST" has been added to the FORMAT parameter.
       This produces a list in which each row contains the WCS
       co-ordinates of a pixel follwoed by the pixel value.
+
+   o  MSTATS
+
+      -  There are new estimators for clipped mean and clipped 
+      standard deviation and associated new CLIP parameter for 
+      controlling the clip level.
 
    o  NDFCOPY
 

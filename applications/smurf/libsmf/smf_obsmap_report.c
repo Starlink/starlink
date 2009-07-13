@@ -49,6 +49,8 @@
 *        Sort observations into date order.
 *     2009-07-08 (TIMJ):
 *        Include INBEAM in report.
+*     2009-07-10 (TIMJ):
+*        Include instrument information in report.
 
 *  Copyright:
 *     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
@@ -116,6 +118,8 @@ void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
 
   AstKeyMap * beaminfo = NULL; /* inbeam information */
   size_t i;
+  AstKeyMap * instmap = NULL; /* instrument information */
+  size_t ninst;       /* number of instruments */
   size_t nobs;        /* number of distinct observations */
   size_t nobj;        /* number of distinct objects */
   size_t nsim = 0;    /* number of simulated observations */
@@ -123,9 +127,6 @@ void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
   smfSortInfo * obslist = NULL; /* Sorted struct array */
 
   if (*status != SAI__OK) return;
-
-  /* create something for INBEAM */
-  beaminfo = astKeyMap( " " );
 
   /* Now report the details of the observations */
   nobj = astMapSize( objmap );
@@ -145,24 +146,44 @@ void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
       msgSetc( "OBJ", " ");
     }
 
+    /* See if we have more than one instrument */
+    instmap = astKeyMap( " " );
+
     /* Sort everything into order - this takes additional time since we have to read the
        KeyMap twice, but makes the output more amenable to scrutiny */
     obslist = smf_malloc( nobs, sizeof(*obslist), 1, status );
     for (i = 0; i < nobs; i++) {
       AstObject * ao = NULL;
+      const char * instrume = NULL;
       if (astMapGet0A( obsmap, astMapKey(obsmap, i ), &ao )) {
         double dateobs;
         obsinfo = (AstKeyMap*)ao;  /* strict-aliasing warning avoidance in astMapGet0A */
         astMapGet0D( obsinfo, "MJD-OBS", &dateobs );
         obslist[i].index = i;
         obslist[i].utc = dateobs;
+
+        /* since we are looping already, extract INSTRUME information so that we can count it */
+        astMapGet0C( obsinfo, "INSTRUME", &instrume );
+        astMapPut0I( instmap, instrume, 0, NULL );
+
         obsinfo = astAnnul( obsinfo );
       }
     }
     qsort( obslist, nobs, sizeof(*obslist), sortbytime );
 
+    /* See how many instruments we have */
+    ninst = astMapSize( instmap );
+    if (ninst == 1) {
+      msgFmt( "INST", "from instrument '%s'", astMapKey( instmap, 0 ) );
+    } else {
+      msgSetc( "INST", "" );
+    }
+
+    /* create something for INBEAM */
+    beaminfo = astKeyMap( " " );
+
     /* Now do the actual summarizing */
-    msgOutif(msglev, " ", "Processing data ^OBJ from the following observation^S :", status);
+    msgOutif(msglev, " ", "Processing data ^INST ^OBJ from the following observation^S :", status);
     for (i = 0; i < nobs; i++) {
       AstObject * ao = NULL;
       int mapindex;
@@ -180,6 +201,15 @@ void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
           msgSetc( "OBJ", ctemp);
         } else {
           msgSetc( "OBJ", " ");
+        }
+
+        /* only display instrument if we have not already done so */
+        if (ninst > 1 ) {
+          astMapGet0C( obsinfo, "INSTRUME", &ctemp );
+          msgSetc( "INS", "/" );
+          msgSetc( "INS", ctemp );
+        } else {
+          msgSetc( "INS", "" );
         }
 
         /* do not display "SCIENCE" as it is the default */
@@ -229,7 +259,7 @@ void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
         msgSeti( "ON", itemp);
         astMapGet0I( obsinfo, "UTDATE", &itemp );
         msgSeti( "UT", itemp);
-        msgOutif(msglev, "", "  ^UT #^ON ^OM^SW^IB ^OBJ ^OT ^SIM", status);
+        msgOutif(msglev, "", "  ^UT #^ON ^OM^SW^INS^IB ^OBJ ^OT ^SIM", status);
 
         obsinfo = astAnnul( obsinfo );
       }
@@ -251,6 +281,8 @@ void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
                 status );
       msgBlankif( msglev, status );
     }
+
+    beaminfo = astAnnul(beaminfo);
 
   }
 

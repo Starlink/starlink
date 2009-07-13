@@ -43,7 +43,7 @@ SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adfrm.f ccd1_adkey.f \
  ccd1_ndfmi.f ccd1_ndfpl.f \
  ccd1_ndfpg.f ccd1_ndfpr.f ccd1_ngdel.f \
  ccd1_nglis.f ccd1_nlmap.f ccd1_nmid.f ccd1_nrmed.f \
- ccd1_nxwrd.f ccd1_objs.f ccd1_opfio.f ccd1_orvar.f \
+ ccd1_objs.f ccd1_opfio.f ccd1_orvar.f \
  ccd1_ovcom.f ccd1_ovlap.f ccd1_plof.f ccd1_plsty.f ccd1_pnply.f ccd1_prmin.f \
  ccd1_prndf.f ccd1_proff.f ccd1_prsel.f ccd1_psize.f ccd1_prune.f \
  ccd1_ptbad.f ccd1_pthmp.f ccd1_ptins.f ccd1_putr.f ccd1_rbia.f ccd1_rcal.f \
@@ -73,8 +73,6 @@ SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adfrm.f ccd1_adkey.f \
  ccd1_dqeds.f ccd1_entrn.f ccd1_hdrrn.f ccd1_setex.f \
  ccd1_sethd.f ccd1_setrd.f ccd1_setsp.f ccd1_setsw.f ccd1_setwr.f \
  ccd1_cat.f ccd1_ggeom.f ccd1_sdect.f ccd1_setpa.f ccd1_wrtpa.f \
- kpg1_asfrm.f kpg1_asffr.f kpg1_isscs.f kpg1_assir.f \
- ira1_chscs.f ira_seteq.f ira_iscs.f \
  ccd1_box.f ccd1_gsrt.f ccd1_gszff.f ccd1_sgare.f ccd1_ordg.f ccd1_tran.f \
  ccd1_fspec.f ccd1_slice.f ccd1_grdel.f \
  ccd1_getarg.f ccd1_iargc.f

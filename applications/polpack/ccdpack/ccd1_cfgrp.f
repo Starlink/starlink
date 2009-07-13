@@ -146,7 +146,7 @@
 *  Parse looking for words up to NWORD-1.
                IAT = 1
                DO 3 I = 1, NWORDS - 1
-                  CALL CCD1_NXWRD( BUFFER, IAT, FIRST, LAST, NOTFND,
+                  CALL KPG_NXWRD( BUFFER, IAT, FIRST, LAST, NOTFND,
      :                             STATUS )
                   IF ( NOTFND .AND. I .LT. MINWRD
      :                 .AND. STATUS .EQ. SAI__OK ) THEN

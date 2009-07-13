@@ -624,7 +624,7 @@
 *  BASEFRAME parameter.
          IF ( STATUS .NE. SAI__OK ) GO TO 99
          CALL KPG1_ASFRM( 'BASEFRAME', 'BASEEPOCH', IWCS, ' ', ' ',
-     :                    .FALSE., STATUS )
+     :                    .FALSE., ' ', STATUS )
          JBAS = AST_GETI( IWCS, 'Current', STATUS )
 
 *  Report an error if a suitable Base domain cannot be found.

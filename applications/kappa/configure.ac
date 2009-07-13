@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(kappa, 1.10-9, ussc@star.rl.ac.uk)
+AC_INIT(kappa, 1.10-10, ussc@star.rl.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -55,8 +55,8 @@ STAR_MESSGEN(kap_err.msg)
 
 AC_CONFIG_FILES([Makefile component.xml 
     kappa_mon.f ndfpack_mon.f kapview_mon.f kappa.ifd
-    kapsub/Makefile    libkapview/Makefile
-    ccdpack/Makefile  libkappa/Makefile  libndfpack/Makefile])
+    kapsub/Makefile     libkapview/Makefile 
+    libkappa/Makefile   libndfpack/Makefile])
 AC_CONFIG_FILES(kappa_link_adam,  [chmod +x kappa_link_adam])
 AC_CONFIG_FILES(lutedit.tcl,      [chmod +x lutedit.tcl])
 AC_CONFIG_FILES(stardemo.tcl,     [chmod +x stardemo.tcl])

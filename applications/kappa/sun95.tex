@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.35}
 \newcommand{\stardocnumber}    {95.35}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2009 July 7}
+\newcommand{\stardocdate}      {2009 July 9}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.10}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -16427,6 +16427,20 @@ KAPPA: \htmlref{PASTE}{PASTE},
          be used.
       }
       \sstsubsection{
+         CLIP = \_REAL (Read)
+      }{
+         The number of standard deviations about the mean at which to
+         clip outliers for the {\tt "Mode"}, {\tt "Cmean"} and {\tt "Csigma"}
+         statistics (see Parameter ESTIMATOR).  The application first computes 
+         statistics using all the available pixels.  It then rejects
+         all those pixels whose values lie beyond CLIP standard
+         deviations from the mean and will then re-evaluate the 
+         statistics.  For {\tt "Cmean"} and {\tt "Csigma"} there is currently 
+         only one iteration, but up to seven for {\tt "Mode"}.
+
+         The value must be positive.  {\tt [3.0]}
+      }
+      \sstsubsection{
          ESTIMATOR = \htmlref{LITERAL}{se:parmenu} (Read)
       }{
          The method to use for estimating the output pixel values.  It
@@ -16452,6 +16466,12 @@ KAPPA: \htmlref{PASTE}{PASTE},
             \sstitem
             {\tt "Absdev"} --- Mean absolute deviation from the unweighted mean.
 
+           \sstitem
+            {\tt "Cmean"}  --- Sigma-clipped mean.
+
+            \sstitem
+            {\tt "Csigma"} --- Sigma-clipped standard deviation.
+ 
             \sstitem
             {\tt "Comax"}  --- Co-ordinate of the maximum value.
 
@@ -17861,6 +17881,21 @@ XV; PBMPLUS; NETPBM.
          be used.
       }
       \sstsubsection{
+         CLIP = \_REAL (Read)
+      }{
+         The number of standard deviations about the mean at which to
+         clip outliers for the {\tt "Mode"}, {\tt "Cmean"} and {\tt "Csigma"}
+         statistics (see Parameter ESTIMATOR).  The application first computes 
+         statistics using all the available pixels.  It then rejects
+         all those pixels whose values lie beyond CLIP standard
+         deviations from the mean and will then re-evaluate the 
+         statistics.  For {\tt "Cmean"} and {\tt "Csigma"} there is currently 
+         only one iteration, but up to seven for {\tt "Mode"}.
+
+         The value must be positive.  {\tt [3.0]}
+      }
+
+      \sstsubsection{
          COMP = LITERAL (Read)
       }{
          The name of the NDF array component for which statistics are
@@ -17901,6 +17936,12 @@ XV; PBMPLUS; NETPBM.
 
             \sstitem
             {\tt "Absdev"} --- Mean absolute deviation from the unweighted mean.
+
+           \sstitem
+            {\tt "Cmean"}  --- Sigma-clipped mean.
+
+            \sstitem
+            {\tt "Csigma"} --- Sigma-clipped standard deviation.
 
             \sstitem
             {\tt "Comax"}  --- Co-ordinate of the maximum value.
@@ -18013,7 +18054,15 @@ XV; PBMPLUS; NETPBM.
          and the NDF contains a variance array, this array will be
          used to define the weights, otherwise all the weights will be
          set equal.  By definition this parameter is set to FALSE when 
-         COMP is {\tt "Variance"} or {\tt "Error"}.  {\tt [TRUE]}
+         COMP is {\tt "Variance"} or {\tt "Error"}. 
+         
+         The VARIANCE parameter is ignored and set to FALSE when there 
+         are more than 300 pixels along the collapse axis and
+         ESTIMATOR is {\tt "Median"}, {\tt "Mode"}, {\tt "Cmean"}, or 
+         {\tt "Csigma"}.  This prevents the covariance matrix from being 
+         huge.  For {\tt "Median"} estimates of variance come from 
+         mean variance instead.  The other affected estimators switch to 
+         use equal weighting. {\tt [TRUE]}
       }
       \sstsubsection{
          WCSATTS = GROUP (Read)
@@ -34769,6 +34818,21 @@ plot (9k).
    }
    \sstparameters{
       \sstsubsection{
+         CLIP = \_REAL (Read)
+      }{
+         The number of standard deviations about the mean at which to
+         clip outliers for the {\tt "Mode"}, {\tt "Cmean"} and {\tt "Csigma"}
+         statistics (see Parameter ESTIMATOR).  The application first computes 
+         statistics using all the available pixels.  It then rejects
+         all those pixels whose values lie beyond CLIP standard
+         deviations from the mean and will then re-evaluate the 
+         statistics.  For {\tt "Cmean"} and {\tt "Csigma"} there is currently 
+         only one iteration, but up to seven for "Mode".
+
+         The value must be positive.  {\tt [3.0]}
+      }
+
+      \sstsubsection{
          COMP = \htmlref{LITERAL}{se:parmenu} (Read)
       }{
          The NDF array component to be analysed.  It may be {\tt "Data"},
@@ -34807,6 +34871,12 @@ plot (9k).
 
             \sstitem
             {\tt "Absdev"} --- Mean absolute deviation from the unweighted mean.
+
+            \sstitem
+            {\tt "Cmean"}  --- Sigma-clipped mean.
+
+            \sstitem
+            {\tt "Csigma"} --- Sigma-clipped standard deviation.
 
             \sstitem
             {\tt "Comax"}  --- Co-ordinate of the maximum value.
@@ -55985,6 +56055,14 @@ The following applications have been modified:
 
 \begin{description}
 
+   \item [\htmlref{CHANMAP}{CHANMAP}] \mbox{}
+      \begin{itemize}
+         \item There are new estimators for clipped mean and clipped standard
+         deviation and associated new CLIP parameter for controlling
+         the clip level.
+      \end{itemize}
+
+   \goodbreak
    \item [\htmlref{CLINPLOT}{CLINPLOT}] \mbox{}
       \begin{itemize}
          \item New MODE and MARKER parameters permit different ways to 
@@ -55997,6 +56075,18 @@ The following applications have been modified:
       \begin{itemize}
          \item Parameter BADCOL has the additional option of an 
          \htmlref{HTML colour code}{htmlcolour}.
+      \end{itemize}
+
+   \item [\htmlref{COLLAPSE}{COLLAPSE}] \mbox{}
+      \begin{itemize}
+         \item There are new estimators for clipped mean and clipped standard
+         deviation and associated new CLIP parameter for controlling
+         the clip level.
+         \item There is an improved WLIM-related {\tt WARNING} message.  The
+         calculations used to decide whether or not to issue a warning and the 
+         reported fractions of bad values therein have been corrected.
+         These fractions had been in terms of elements along the collapse 
+         axis, not the number of elements in the output NDF.
       \end{itemize}
 
    \item [\htmlref{CONVOLVE}{CONVOLVE}] \mbox{}
@@ -56049,6 +56139,13 @@ The following applications have been modified:
          \item A new option ``WLIST'' has been added to the FORMAT parameter.
          This produces a list in which each row contains the WCS
          co-ordinates of a pixel follwoed by the pixel value.
+      \end{itemize}
+
+   \item [\htmlref{MSTATS}{MSTATS}] \mbox{}
+      \begin{itemize}
+         \item There are new estimators for clipped mean and clipped standard
+         deviation and associated new CLIP parameter for controlling
+         the clip level. 
       \end{itemize}
 
    \item [\htmlref{NDFCOPY}{NDFCOPY}] \mbox{}

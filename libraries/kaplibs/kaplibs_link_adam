@@ -31,7 +31,7 @@
       if test "${nogrf}" = 'y'; then 
 #   No graphics
          echo -lkpg_adam -lkpg -lira_adam -lira -lirq_adam -lirq -llpg \
-           -lctg -lfts_adam -lfts -laif_adam -laif \
+           -lctg -lfts_adam -lfts -laif_adam -laif -lccg \
            `atl_link_adam` \
            `cat_link_adam` `ndg_link_adam` \
            `ndf_link_adam` `ast_link_adam` \
@@ -47,7 +47,7 @@
 #  Form list of graphics libraries.
          echo -lkpg_grf_adam -lkpg_adam -lkpg_grf -lkpg \
            -lira_adam -lira -lirq_adam -lirq -llpg \
-           -lctg -lfts_adam -lfts -laif_adam -laif -lkapgrf \
+           -lctg -lfts_adam -lfts -laif_adam -laif -lccg -lkapgrf \
            `atl_link_adam` \
            `cat_link_adam` `ndg_link_adam` \
            `ndf_link_adam` `ast_link_adam -grf` \
@@ -62,7 +62,7 @@
       else
          echo -lkgs_adam -lkgs -lkpg_grf_adam -lkpg_adam -lkpg_grf -lkpg \
            -lira_adam -lira -lirq_adam -lirq -llpg \
-           -lctg -lfts_adam -lfts -laif_adam -laif -lkapgrf \
+           -lctg -lfts_adam -lfts -laif_adam -laif -lccg -lkapgrf \
            `atl_link_adam` \
            `cat_link_adam` `snx_link_adam -user` \
            `sgs_link_adam` `ndg_link_adam` \

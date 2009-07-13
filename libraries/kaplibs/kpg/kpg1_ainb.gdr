@@ -79,11 +79,15 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     PWD: Peter W. Draper (STARLINK)
 *     {enter_new_authors_here}
  
 *  History:
 *     1993 March 24 (MJC):
 *        Original version based on KPG1_AINDX.
+*     1997 June 27 (PWD):
+*        Ensure that the AXIS bounds are not exceeded. Originally applied to
+*        CCDPACK.
 *     {enter_changes_here}
  
 *  Bugs:
@@ -221,7 +225,7 @@
 *  due to rounding), where the average slope is used to interpolate
 *  rather than the difference in axis values.
                IF ( RESID / SLOPE .LT. 0.0D0 ) THEN
-                  UB = MAX( LBND, MIN( CINDEX + 1, UBND ) )
+                  UB = MAX( LBND + 1, MIN( CINDEX + 1, UBND ) )
                   DIFF = NUM_<T>TOD( AXIS( UB - 1 ) - AXIS( UB ) )
                   IF ( ABS( DIFF ) .LT. NUM_<T>TOD( VAL__EPS<T> ) ) THEN
                      DIFF = SLOPE
@@ -241,7 +245,7 @@
 *  due to rounding), where the average slope is used to interpolate
 *  rather than the difference in axis values.
                ELSE
-                  LB = MIN( UBND, MAX( CINDEX, LBND ) )
+                  LB = MIN( UBND - 1, MAX( CINDEX, LBND ) )
                   DIFF = NUM_<T>TOD( AXIS( LB + 1 ) - AXIS( LB ) )
                   IF ( ABS( DIFF ) .LT. NUM_<T>TOD( VAL__EPS<T> ) ) THEN
                      DIFF = SLOPE

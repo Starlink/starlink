@@ -72,6 +72,7 @@
 *        The global status.
 
 *  Copyright:
+*     Copyright (C) 2009 Science and Technology Facilities Council.
 *     Copyright (C) 1993 Science & Engineering Research Council. All
 *     Rights Reserved.
 
@@ -100,6 +101,9 @@
 *        Original version.
 *     26-MAR-1993 (PDRAPER):
 *        Added number of reserved pens.
+*     10-JUL-2009 (TIMJ):
+*        KAPLIBS version requires the UPPER and LOWER ranges to be
+*        the same type as the data array.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -150,6 +154,9 @@
       INTEGER IPHIST             ! Pointer to histogram workspace
       INTEGER IPTEMP             ! Pointer to temporary workspace
                                  
+*  Internal References:
+      INCLUDE 'NUM_DEC'          ! NUM declarations
+      INCLUDE 'NUM_DEF'          ! NUM definitions
 
 *.
 
@@ -241,28 +248,28 @@
 *  And finally rescale it.
       IF ( ITYPE .EQ. '_BYTE' ) THEN
          CALL KPG1_ISCLB( BAD, XDIMW, YDIMW, %VAL( CNF_PVAL( IPTEMP ) ), 
-     :                    .FALSE.,
-     :                    LOWVAL, UPVAL, NRES, 255, 0, OUTPUT, STATUS )
+     :                    .FALSE., NUM_DTOB(LOWVAL), NUM_DTOB(UPVAL),
+     :                    NRES, 255, 0, OUTPUT, STATUS )
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN   
-         CALL KPG1_ISCLUB( BAD, XDIMW, YDIMW, 
-     :                     %VAL( CNF_PVAL( IPTEMP ) ), .FALSE.,
-     :                     LOWVAL, UPVAL, NRES, 255, 0, OUTPUT, STATUS )
+         CALL KPG1_ISCLUB( BAD, XDIMW, YDIMW, %VAL( CNF_PVAL( IPTEMP )),
+     :                     .FALSE., NUM_DTOUB(LOWVAL), NUM_DTOUB(UPVAL),
+     :                     NRES, 255, 0, OUTPUT, STATUS )
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN     
          CALL KPG1_ISCLW( BAD, XDIMW, YDIMW, %VAL( CNF_PVAL( IPTEMP ) ), 
-     :                    .FALSE.,
-     :                    LOWVAL, UPVAL, NRES, 255, 0, OUTPUT, STATUS )
+     :                    .FALSE., NUM_DTOW(LOWVAL), NUM_DTOW(UPVAL),
+     :                    NRES, 255, 0, OUTPUT, STATUS )
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN   
-         CALL KPG1_ISCLUW( BAD, XDIMW, YDIMW, 
-     :                     %VAL( CNF_PVAL( IPTEMP ) ), .FALSE.,
-     :                     LOWVAL, UPVAL, NRES, 255, 0, OUTPUT, STATUS )
+         CALL KPG1_ISCLUW( BAD, XDIMW, YDIMW, %VAL( CNF_PVAL( IPTEMP )),
+     :                     .FALSE., NUM_DTOUW(LOWVAL), NUM_DTOUW(UPVAL),
+     :                     NRES, 255, 0, OUTPUT, STATUS )
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN  
          CALL KPG1_ISCLI( BAD, XDIMW, YDIMW, %VAL( CNF_PVAL( IPTEMP ) ), 
-     :                    .FALSE.,
-     :                    LOWVAL, UPVAL, NRES, 255, 0, OUTPUT, STATUS )
+     :                    .FALSE., NUM_DTOI(LOWVAL), NUM_DTOI(UPVAL),
+     :                    NRES, 255, 0, OUTPUT, STATUS )
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN     
          CALL KPG1_ISCLR( BAD, XDIMW, YDIMW, %VAL( CNF_PVAL( IPTEMP ) ), 
-     :                    .FALSE.,
-     :                    LOWVAL, UPVAL, NRES, 255, 0, OUTPUT, STATUS )
+     :                    .FALSE., NUM_DTOR(LOWVAL), NUM_DTOR(UPVAL),
+     :                    NRES, 255, 0, OUTPUT, STATUS )
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN  
          CALL KPG1_ISCLD( BAD, XDIMW, YDIMW, %VAL( CNF_PVAL( IPTEMP ) ), 
      :                    .FALSE.,

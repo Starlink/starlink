@@ -902,7 +902,7 @@
 
 *  Get the index of the source frame.
                   CALL KPG1_ASFRM( 'FRAMEIN', 'EPOCHIN', IWCS, ' ', ' ',
-     :                             .FALSE., STATUS )
+     :                             .FALSE., ' ', STATUS )
                   JFROM = AST_GETI( IWCS, 'Current', STATUS )
 
 *  Set the WCS frameset Current frame to the destination frame (if

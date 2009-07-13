@@ -1,0 +1,111 @@
+      SUBROUTINE CCG_CLIP<T>( VMIN, VMAX, EL, ARRAY, NGOOD, STATUS )
+*+
+*  Name:
+*     CCG_CLIPx
+
+*  Purpose:
+*     Sets any data outside a given value range BAD
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG_CLIPR( VMIN, VMAX, EL, ARRAY, NGOOD, STATUS )
+
+*  Description:
+*     This generic routine loops over all entries in RA. If any values
+*     are outside the range RMIN to VMAX then they are set BAD.
+
+*  Arguments:
+*     VMIN = ? (Given)
+*        The minimum allowed value.  All values below this are set BAD.
+*     VMAX = ? (Given)
+*        The maximum allowed value.  All values above this are set BAD.
+*     EL = INTEGER (Given)
+*        The number of entries in ARRAY.
+*     ARRAY( EL ) = ? (Given and Returned)
+*        The list of values to be clipped within the given range.  On
+*        output this contains the clipped list.
+*     NGOOD = INTEGER (Returned)
+*        The number of values left after rejection.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for real and double-precision: replace "x"
+*     in the routine name by D or R as appropriate.  The ARRAY, VMIN,
+*     and VMAX arguments supplied to the routine must have the data type
+*     specified.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     4-APR-1991 (PDRAPER):
+*        Original version.
+*     15-MAR-1999 (MBT):
+*        Modified to use PRIMDAT properly.
+*     2009 July 2 (MJC):
+*        Converted to generic and renamed from CCG1_CLIPR.  Moved EL
+*        (after renaming from NENT) to the normal order in the API.
+*     {enter_further_changes_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! BAD values
+
+*  Arguments Given:
+      <TYPE> VMIN
+      <TYPE> VMAX
+      INTEGER EL
+
+*  Arguments Given and Returned:
+      <TYPE> ARRAY( EL )
+
+*  Arguments Returned:
+      INTEGER NGOOD
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER I                  ! Loop variable
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! PRIMDAT generic declarations
+      INCLUDE 'NUM_DEC_<T>'      ! PRIMDAT declarations for type REAL
+      INCLUDE 'NUM_DEF_CVT'      ! PRIMDAT generic definitions
+      INCLUDE 'NUM_DEF_<T>'      ! PRIMDAT definitions for type REAL
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Loop for all input values
+      NGOOD = EL
+      DO 1 I = 1, EL
+
+*  If this value is not BAD then test it.
+         IF ( ARRAY( I ) .NE. VAL__BAD<T> ) THEN
+            IF ( NUM_LT<T>( ARRAY( I ), VMIN ) .OR.
+     :           NUM_GT<T>( ARRAY( I ), VMAX ) ) THEN
+
+*  Set it BAD.
+               ARRAY( I ) = VAL__BAD<T>
+
+*  Decrement the valid values counter.
+               NGOOD = NGOOD - 1
+            END IF
+         END IF
+    1 CONTINUE
+
+      END

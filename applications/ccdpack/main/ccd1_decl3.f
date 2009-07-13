@@ -121,7 +121,7 @@
 
 *  Look for index.
       IAT = 1
-      CALL CCD1_NXWRD( LINE, IAT, FIRST, LAST, NOTFND, STATUS )
+      CALL KPG_NXWRD( LINE, IAT, FIRST, LAST, NOTFND, STATUS )
       IF ( NOTFND .OR. STATUS .NE. SAI__OK ) THEN
 
 *  No index - in fact nothing. Issue an error message and abort.
@@ -154,7 +154,7 @@
 *  Loop while STATUS is ok and a word has been found
  1    CONTINUE                ! Start of 'DO WHILE' loop
       IF ( STATUS .EQ. SAI__OK .AND. .NOT. NOTFND ) THEN
-         CALL CCD1_NXWRD( LINE, IAT, FIRST, LAST, NOTFND, STATUS )
+         CALL KPG_NXWRD( LINE, IAT, FIRST, LAST, NOTFND, STATUS )
 
 *  Change search to new position for next time around.
          IAT = LAST + 1

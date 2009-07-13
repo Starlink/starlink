@@ -60,6 +60,17 @@
 *        supplied.  If the axes of the current Frame are not parallel to
 *        the NDF pixel axes, then the pixel axis which is most nearly 
 *        parallel to the specified current Frame axis will be used.
+*     CLIP = _REAL (Read)
+*        The number of standard deviations about the mean at which to
+*        clip outliers for the "Mode", "Cmean" and "Csigma" statistics 
+*        (see Parameter ESTIMATOR).  The application first computes 
+*        statistics using all the available pixels.  It then rejects
+*        all those pixels whose values lie beyond CLIP standard
+*        deviations from the mean and will then re-evaluate the 
+*        statistics.   For "Cmean" and "Csigma" there is currently only
+*        one iteration , but up to seven for "Mode".
+
+*        The value must be positive.  [3.0]
 *     COMP = LITERAL (Read)
 *        The name of the NDF array component for which statistics are
 *        required: "Data", "Error", "Quality" or "Variance" (where
@@ -84,6 +95,8 @@
 *                      care!  If strange things happen, use "Mean".
 *
 *          "Absdev" -- Mean absolute deviation from the unweighted mean.
+*          "Cmean"  -- Sigma-clipped mean.
+*          "Csigma" -- Sigma-clipped standard deviation.
 *          "Comax"  -- Co-ordinate of the maximum value.
 *          "Comin"  -- Co-ordinate of the minimum value.
 *          "Integ"  -- Integrated value, being the sum of the products 
@@ -154,7 +167,15 @@
 *        and the NDF contains a variance array, this array will be
 *        used to define the weights, otherwise all the weights will be
 *        set equal.  By definition this parameter is set to FALSE when 
-*        COMP is "Variance" or "Error".  [TRUE]
+*        COMP is "Variance" or "Error".  
+*
+*        The VARIANCE parameter is ignored and set to FALSE when there 
+*        are more than 300 pixels along the collapse axis and
+*        ESTIMATOR is "Median", "Mode", "Cmean", or "Csigma".  This
+*        prevents the covariance matrix from being huge.  For "Median"
+*        estimates of variance come from mean variance instead.  The
+*        other affected estimators switch to use equal weighting.  
+*        [TRUE]
 *     WCSATTS = GROUP (Read)
 *        A group of attribute settings which will be used to make 
 *        temporary changes to the properties of the current co-ordinate 
@@ -276,7 +297,7 @@
 *  Copyright:
 *     Copyright (C) 2000-2001, 2004 Central Laboratory of the Research
 *     Councils. Copyright (C) 2005-2006 Particle Physics & Astronomy
-*     Research Council.  Copyright (C) 2007-2008 Science and Technology 
+*     Research Council.  Copyright (C) 2007-2009 Science and Technology 
 *     Facilities Council.  All Rights Reserved.
 
 *  Licence:
@@ -405,6 +426,14 @@
 *        Trim trailing blanks from output NDF character components.
 *     2008 September 11 (MJC):
 *        Add COMP parameter.
+*     2008 September 24 (MJC):
+*        Add Csigma estimator.
+*     2009 July 2 (MJC):
+*        Add Cmean estimator.
+*     2009 July 5 (MJC):
+*        Added CLIP parameter.  Improve a WLIM-related WARNING message
+*        and fix bug in calculations used to decide whether or not to
+*        issue either warning and the reported fractions of bad values.
 *     {enter_further_changes_here}
 
 *-
@@ -420,6 +449,7 @@
       INCLUDE  'AST_PAR'         ! AST constants and functions
       INCLUDE  'CNF_PAR'         ! For CNF_PVAL function
       INCLUDE  'MSG_PAR'         ! Message-system constants
+      INCLUDE  'PRM_PAR'         ! PRIMDAT constants
 
 *  Status:
       INTEGER STATUS
@@ -432,6 +462,9 @@
                                  ! real
 
 *  Local Constants:
+      REAL CLPDEF                ! Default no. of standard deviations to
+      PARAMETER( CLPDEF = 3.0 )  ! clip for mode, clipped mean & std dev
+
       INTEGER MAXPIX 
       PARAMETER ( MAXPIX = 8388608 ) ! Guestimate a size: 8 mega
 
@@ -548,6 +581,7 @@
       LOGICAL USEVAR             ! Allow weights to be derived from the
                                  ! NDF's variance array (if present)
       LOGICAL VAR                ! Process variances?
+      REAL CLIP                  ! Value of CLIP parameter
       REAL WLIM                  ! Value of WLIM parameter
 
 *.
@@ -931,14 +965,26 @@
       IF ( PROVAR ) THEN
          CALL PAR_CHOIC( 'ESTIMATOR', 'Mean','Mean,Mode,Median,Max,'/
      :                   /'Min,Comax,Comin,Absdev,RMS,Sigma,Sum,Iwc,'/
-     :                   /'Iwd,Integ', .FALSE., ESTIM, STATUS )
+     :                   /'Iwd,Integ,Cmean,Csigma', .FALSE., ESTIM,
+     :                   STATUS )
       ELSE
          CALL PAR_CHOIC( 'ESTIMATOR', 'Mean','Mean,WMean,Mode,Median,'/
      :                   /'Max,Min,Comax,Comin,Absdev,RMS,Sigma,Sum,'/
-     :                   /'Iwc,Iwd,Integ', .FALSE., ESTIM, STATUS )
+     :                   /'Iwc,Iwd,Integ,Cmean,Csigma', .FALSE., ESTIM,
+     :                   STATUS )
       END IF
 
       CALL PAR_GDR0R( 'WLIM', 0.3, 0.0, 1.0, .FALSE., WLIM, STATUS )
+
+*  For now obtain just a single number of standard deviations at which
+*  to clip.
+      IF ( ESTIM .EQ. 'MODE' .OR. ESTIM .EQ. 'CMEAN' .OR.
+     :     ESTIM .EQ. 'CSIGMA' ) THEN
+         CALL PAR_GDR0R( 'CLIP', CLPDEF, VAL__SMLR, VAL__MAXR, .FALSE., 
+     :                   CLIP, STATUS )
+      ELSE
+         CLIP = CLPDEF  
+      END IF
 
 *  Redefine the data units.
 *  ========================
@@ -1149,8 +1195,8 @@
 
 *  Now do the work, using a routine appropriate to the numeric type.
          IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL KPS1_CLPSR( JAXIS, JLO, JHI, VAR, ESTIM, WLIM, EL2,
-     :                       NDIM, LBNDS, UBNDS, 
+            CALL KPS1_CLPSR( JAXIS, JLO, JHI, VAR, ESTIM, WLIM, CLIP,
+     :                       EL2, NDIM, LBNDS, UBNDS, 
      :                       %VAL( CNF_PVAL( IPIN( 1 ) ) ),
      :                       %VAL( CNF_PVAL( IPIN( 2 ) ) ), 
      :                       %VAL( CNF_PVAL( IPCO ) ),
@@ -1163,8 +1209,8 @@
      :                       %VAL( CNF_PVAL( IPW3 ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPS1_CLPSD( JAXIS, JLO, JHI, VAR, ESTIM, WLIM, EL2,
-     :                       NDIM, LBNDS, UBNDS, 
+            CALL KPS1_CLPSD( JAXIS, JLO, JHI, VAR, ESTIM, WLIM, CLIP,
+     :                       EL2, NDIM, LBNDS, UBNDS, 
      :                       %VAL( CNF_PVAL( IPIN( 1 ) ) ),
      :                       %VAL( CNF_PVAL( IPIN( 2 ) ) ), 
      :                       %VAL( CNF_PVAL( IPCO ) ),
@@ -1217,22 +1263,24 @@
 *  flagged by the WLIM threshold at the normal reporting level.
        IF ( NFLAG .GT. 0 ) THEN
          CALL MSG_FMTR( 'WLIM', 'F6.4', WLIM )
-         IF ( NFLAG .EQ. AEL ) THEN
+         IF ( NFLAG .EQ. EL2 ) THEN
             CALL MSG_OUTIF( MSG__NORM, '',
      :        'WARNING: All of the output pixels are set bad due to '/
-     :        /'an excessive number of bad values along the axis of '/
-     :        /'axis of collapse.  If this is undesired, decrease the '/
-     :        /'fraction of good values required with parameter WLIM '/
+     :        /'an excessive number of bad values along the collapse '/
+     :        /'axis.  To obtain good values, try decreasing the '/
+     :        /'fraction of good values required with Parameter WLIM '/
      :        /'(currently ^WLIM).', STATUS )
 
-*  The FRAC token is directly comparable with WLIM.
-         ELSE IF ( MAX( 1, NINT( WLIM * REAL( AEL ) ) ) .NE. 1 ) THEN
-            CALL MSG_FMTR( 'FRAC', 'F6.4', REAL( NFLAG ) / REAL( AEL ) )
+*  The FRAC token is not directly comparable with WLIM.  Report the
+*  fraction of bad pixels.  Note this includes cases where all the input
+*  pixels along the collapse axis were bad for a given output pixel.
+         ELSE
+            CALL MSG_FMTR( 'FRAC', 'F6.4', REAL( NFLAG ) / REAL( EL2 ) )
             CALL MSG_OUTIF( MSG__NORM, '',
      :        'WARNING: ^FRAC of the output pixels are set bad due to '/
      :        /'an excessive number of bad values along the collapse '/
      :        /'axis.  If this is undesired, decrease the fraction of '/
-     :        /'good values required with parameter WLIM (currently '/
+     :        /'good values required with Parameter WLIM (currently '/
      :        /'^WLIM).', STATUS )
             END IF
          END IF

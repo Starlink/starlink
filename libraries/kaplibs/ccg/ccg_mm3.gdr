@@ -1,0 +1,204 @@
+      SUBROUTINE CCG_MM3<T>( NPIX, NLINES, STACK, MINPIX, RESULT,
+     :                     WRK1, POINT, USED, NCON, NBAD, STATUS )
+*+
+*  Name:
+*     CCG_MM3x
+
+*  Purpose:
+*     Combines data lines using a min-max exclusion trimmed mean.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG_MM3x( NPIX, NLINES, STACK, MINPIX, RESULT,
+*                    WRK1, POINT, USED, NCON, NBAD, STATUS )
+
+*  Description:
+*     This routine accepts an array consisting a series of (vectorised)
+*     lines of data.  The data values in the lines are then combined to
+*     form an trimmed mean in which the minimum and maximum values are
+*     excluded. The output means are returned in the array RESULT.
+
+*  Arguments:
+*     NPIX = INTEGER (Given)
+*        The number of pixels in a line of data.
+*     NLINES = INTEGER (Given)
+*        The number of lines of data in the stack.
+*     STACK( NPIX, NLINES ) = ? (Given)
+*        The array of lines which are to be combined into a single line.
+*     MINPIX = INTEGER (Given)
+*        The minimum number of pixels required to contribute to an
+*        output pixel.
+*     RESULT( NPIX ) = ? (Returned)
+*        The output line of data.
+*     WRK1( NLINES ) = ? (Returned)
+*        Workspace for calculations.
+*     POINT( NLINES ) = INTEGER (Returned)
+*        Workspace to hold pointers to the original positions of the
+*        data before extraction and conversion in to the WRK1 array.
+*     USED( NLINES ) = LOGICAL (Returned)
+*        Workspace used to indicate which values have been used in
+*        estimating a resultant value.
+*     NCON( NLINES ) = DOUBLE PRECISION (Returned)
+*        The actual number of contributing pixels from each input line
+*        to the output line.
+*     NBAD = INTEGER (Returned)
+*        The number of bad values in the output array.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for real and double-precision: replace "x"
+*     in the routine name by D or R as appropriate.  The STACK, RESULT, 
+*     and WRK1 arguments supplied to the routine must have the data type
+*     specified.
+
+*  Notes:
+*     -  There is a routine for real and double-precision: replace "x"
+*     in the routine name by D or R as appropriate.  The STACK, VARS,
+*     RESULT, RESVAR, WRK1, and WRK2 arguments supplied to the routine
+*     must have the data type specified.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     BRADC: Brad Cavanagh (JAC)
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     19-MAY-1992 (PDRAPER):
+*        Original version.
+*     11-OCT-2004 (BRADC):
+*        No longer use NUM_CMN.
+*     2009 July 3 (MJC):
+*        Converted to generic and renamed from CCG_MMR3R.  Added NBAD 
+*        argument.  Moved STACK to the normal order in the API.
+*     2009 July 4 (MJC):
+*         Made NCON Returned and therefore it is initialised.  Move NCON
+*         to just before NBAD in API for consistency.
+*     {enter_further_changes_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT constants
+
+*  Arguments Given:
+      INTEGER NPIX
+      INTEGER NLINES
+      <TYPE> STACK( NPIX, NLINES )
+      INTEGER MINPIX
+
+*  Arguments Returned:
+      <TYPE> RESULT( NPIX )
+      <TYPE> WRK1( NLINES )
+      INTEGER POINT( NLINES )
+      LOGICAL USED( NLINES )
+      DOUBLE PRECISION NCON( NLINES )
+      INTEGER NBAD
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  External References:
+      EXTERNAL NUM_WASOK
+      LOGICAL NUM_WASOK          ! Was numeric operation OK?
+
+      EXTERNAL NUM_TRAP
+      INTEGER NUM_TRAP           ! Numerical error handler
+
+*  Local Variables:
+      INTEGER I                  ! Loop variable
+      INTEGER J                  ! Loop variable
+      INTEGER NGOOD              ! Number of good pixels
+      DOUBLE PRECISION VAL       ! Weighted median
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! NUM_ type conversion functions
+      INCLUDE 'NUM_DEF_CVT'      ! Define functions...
+
+*.
+
+*  Initialise returned values.
+      NBAD = 0
+      DO I = 1, NLINES
+         NCON( I ) = 0.0D0
+      END DO
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Establish the numeric error handler.
+      CALL NUM_HANDL( NUM_TRAP )
+
+*  Loop over for all possible output pixels.
+      DO 1 I = 1, NPIX
+         NGOOD = 0
+         CALL NUM_CLEARERR()
+
+*  Loop over all possible contributing pixels.
+         DO 2 J = 1, NLINES
+            IF ( STACK( I, J ) .NE. VAL__BAD<T> ) THEN
+
+*  Increment good value counter.
+               NGOOD = NGOOD + 1
+
+*  Update the pointers to the positions of the unextracted data.
+               POINT( NGOOD ) = J
+
+*  Copy data into work buffer, so we can process a line at a time.
+               WRK1( NGOOD ) = STACK( I, J )
+
+*  Trap conversion failures.
+               IF ( .NOT. NUM_WASOK() ) THEN
+
+*  Decrement NGOOD, do not let it go below zero.
+                  NGOOD = MAX( 0, NGOOD - 1 )
+                  CALL NUM_CLEARERR()
+               END IF
+            END IF
+    2    CONTINUE
+
+*  Continue if more than one good value.
+         IF ( NGOOD .GT. 0 ) THEN
+
+*  Sort these values into increasing order.
+            CALL CCG_IS2<T>( NGOOD, WRK1, POINT, STATUS )
+
+*  Find the min-max trimmed mean.
+            CALL CCG_TMN3<T>( 1, NGOOD, WRK1, USED, VAL, STATUS )
+
+*  Update the used line counters.
+            DO 3 J = 1, NGOOD
+               IF ( USED ( J ) ) THEN
+                  NCON( POINT( J ) ) = NCON( POINT( J ) ) + 1.0D0
+               END IF
+    3       CONTINUE
+         END IF
+
+*  If there are sufficient good pixels output the result.
+         IF ( NGOOD .GE. MINPIX ) THEN
+            RESULT( I ) = NUM_DTO<T>( VAL )
+
+*  Trap all numeric errors.
+            IF ( .NOT. NUM_WASOK() ) THEN
+               RESULT( I ) = VAL__BAD<T>
+               NBAD = NBAD + 1
+            END IF
+         ELSE
+
+*  Not enough contributing pixels, set output invalid.
+            RESULT( I ) = VAL__BAD<T>
+            NBAD = NBAD + 1
+         END IF
+    1 CONTINUE
+
+*  Remove the numerical error handler.
+      CALL NUM_REVRT
+
+      END
