@@ -1274,16 +1274,29 @@
 *  The FRAC token is not directly comparable with WLIM.  Report the
 *  fraction of bad pixels.  Note this includes cases where all the input
 *  pixels along the collapse axis were bad for a given output pixel.
-         ELSE
-            CALL MSG_FMTR( 'FRAC', 'F6.4', REAL( NFLAG ) / REAL( EL2 ) )
+         ELSE IF ( NFLAG .LT. EL2 ) THEN
+            CALL MSG_FMTR( 'FRAC', 'F6.4',
+     :           100.0 *REAL( NFLAG ) / REAL( EL2 ) )
+            CALL MSG_SETI( 'NF', NFLAG )
+            CALL MSG_SETI( 'NEL', EL2 )
             CALL MSG_OUTIF( MSG__NORM, '',
-     :        'WARNING: ^FRAC of the output pixels are set bad due to '/
+     :        'WARNING: ^FRAC % of the output pixels (^NF/^NEL) '/
+     :        /'are set bad due to '/
      :        /'an excessive number of bad values along the collapse '/
      :        /'axis.  If this is undesired, decrease the fraction of '/
      :        /'good values required with Parameter WLIM (currently '/
      :        /'^WLIM).', STATUS )
+         ELSE
+            IF (STATUS .EQ. SAI__OK) THEN
+               STATUS = SAI__ERROR
+               CALL MSG_SETI( 'NF', NFLAG )
+               CALL MSG_SETI( 'NEL', EL2 )
+               CALL ERR_REP( ' ', 'Number of flagged pixels (^NF) '/
+     :           /'exceeds the total number of pixels in data (^NEL)'/
+     :           /' (possible programming error)', STATUS )
             END IF
          END IF
+       END IF
 
 *  Alter the WCS FrameSet.
 *  =======================
