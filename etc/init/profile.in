@@ -764,6 +764,18 @@ else
 fi
 
 #
+#  Unset local shell variables to prevent them from leaking out
+unset exec_prefix
+unset bindir
+unset staretcdir
+unset starhelpdir
+unset libdir
+unset sharelibdir
+unset datadir
+unset mandir
+unset starjavadir
+
+#
 #  ADAM_ABBRV environment variable to allow abbreviated parameters.
 export ADAM_ABBRV=1
 
