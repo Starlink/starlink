@@ -1,5 +1,5 @@
-      SUBROUTINE CCG_WTM3<T>( CALCMV, EL, ORDDAT, WEIGHT, VAR, 
-     :                      USED, COVAR, RESULT, RESVAR, STATUS )
+      SUBROUTINE CCG_WTM3<T>( CALCMV, EL, ORDDAT, WEIGHT, VAR,
+     :                      COVAR, USED, RESULT, RESVAR, STATUS )
 *+
 *  Name:
 *     CCG_WTM3x
