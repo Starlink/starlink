@@ -143,6 +143,9 @@
 *        The third element of an array is is [ 2 ], not [ 3 ].
 *     24-JUL-2008 (TIMJ):
 *        Trap moving coordinates (or at least offset coordinate systems).
+*     14-JUL-2009 (DSBJ):
+*        Exclude edge tiles that are contained completely within the
+*        border region added onto their neighbouring tiles.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -332,8 +335,11 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
          numtile[ i ] = 1;
 
 /* Decrease the lower pixel bounds by a tile size until the whole output
-   array is encompassed. */
-         while( plbnd[ i ] > tlbnd[ i ] ) {
+   array is encompassed. Take account of the fact that the lowest tile
+   will extend the coverage of the tile ensemble by one border width, so
+   we can exclude the last tile if it is contained completely within the
+   border added onto the last-but-one tile. */
+         while( plbnd[ i ] > tlbnd[ i ] + border ) {
             plbnd[ i ] -= tile_size[ i ];
             numtile[ i ]++;
          }
@@ -342,22 +348,21 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
    to exclude tiles that are off the edge. So increase the lower pixel 
    bounds by a tile size until the upper bound of the corresponding tile
    is inside the full sized output array. */
-         while( plbnd[ i ] + tile_size[ i ] - 1 < tlbnd[ i ] ) {
+         while( plbnd[ i ] + tile_size[ i ] - 1 < tlbnd[ i ] + border ) {
             plbnd[ i ] += tile_size[ i ];
             numtile[ i ]--;
          }
 
 /* Now modify the upper bounds in the same way. */
-         while( pubnd[ i ] < tubnd[ i ] ) {
+         while( pubnd[ i ] < tubnd[ i ] - border ) {
             pubnd[ i ] += tile_size[ i ];
             numtile[ i ]++;
          }
 
-         while( pubnd[ i ] - tile_size[ i ] + 1 > tubnd[ i ] ) {
+         while( pubnd[ i ] - tile_size[ i ] + 1 > tubnd[ i ] - border ) {
             pubnd[ i ] -= tile_size[ i ];
             numtile[ i ]--;
          }
-
       }
 
 /* Determine the constant width border by which the basic tile area is to be
