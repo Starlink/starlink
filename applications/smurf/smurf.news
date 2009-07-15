@@ -1,4 +1,129 @@
-1 SMURF_Version_0.3-1
+1 SMURF_Version_0.5-2_(Nanahope)
+
+ o A summary of input observations is now presented.
+
+ o If an output file is derived from multiple observations the
+   output FITS header will now include start and end information
+   (such as date and airmass from the oldest observation and
+   date and airmass from the newest observation).
+
+ o MAKECUBE can now fix up most issues associated with older ACSIS
+   data from 2006 and 2007.
+
+ o MAKECUBE now reports if the positions calculated using USEDETPOS
+   do not agree with those calculated with USEDETPOS=NO.
+
+ o MAKECUBE output catalogues can now contain additional JCMTSTATE
+   information by using the EXTRACOLS parameter.
+
+ o TIMESORT is now significantly faster.
+
+ o MAKECUBE, MAKEMAP and QLMAKEMAP are now multi-threaded by default
+   on multi-processor machines.
+
+ o Many enhancements to SCUBA-2 functionality including support for
+   bad pixel masks and interpolated darks.
+
+ o jcmtstate2cat now reports AZ and EL as well as DAZ and DEL.
+
+ o TIMESORT can now handle single time-slice data cubes.
+
+ o Coordinate calculations are now much faster.
+
+2 Bug_Fixes
+
+ o A problem with astrometry calculations for data after mid-2008
+   when using the USEDETPOS=NO option has been fixed. 
+
+ o Fixed a problem with tiling when a tile was 1 pixel wide.
+
+ o Fixed a problem in TIMESORT with the LIMITTYPE=FILESIZE option.
+
+ o MAKECUBE formerly mis-interpreted non-zero instrument aperture
+   (INSTAP) values in recent ACSIS data.
+
+ o MAKECUBE now ignores input data values that have negative input Tsys values.
+
+ o TIMESORT now sets the correct pixel origin in the output NDFs.
+
+1 SMURF_Version_Lehuakona
+
+ o New command UNMAKECUBE added, which creates simulated time-series
+   data from a given sky cube, using existing time-series data as
+   templates.
+
+ o The TIMESORT command can now sort data across multiple sub-scans,
+   and can also remove dead detectors.  Refined support for polarisation
+   data in MAKECUBE (analyser angle for each bin is now displayed, WCS
+   handling improved, all output polarisation data now placed ina single
+   container file).
+
+ o MAKECUBE now uses the size of the Airy disk to determine whether
+   spectra are spatially co-incident.
+
+ o MAKECUBE now uses the MAP_PA FITS header to determine a default
+   value for the CROTA parameter, rather than using a fixed default
+   value of zero.
+
+ o MAKECUBE has a new parameter called OUTFILES which is the name of a
+   text file into which MAKECUBE writes the names of the output NDFs.
+
+ o MAKECUBE (in verbose mode) now gives a continuously updated display
+   of "percentage done" when processing large files.
+
+ o TIMESORT can now merge data from two or more sub-scans.
+
+ o TIMESORT now has an option to fill the variance arrays in the
+   output NDFs with values derived from the Tsys values in the input
+   NDFs.
+
+ o TIMESORT now has an option to exclude or include data from a specified set of detectors.
+
+ o TIMESORT now has an option to purge dead detectors from the output NDFs.
+
+ o TIMESORT has a new parameter called OUTFILES which is the name of a
+   text file into which TIMESORT writes the names of the output NDFs.
+
+ o MAKECUBE can now be asked to share out the work between different
+   cores on a multi-core processor, thus reducing the overall
+   run-time. MAKEMAP also benefits from these options if run with
+   METHOD=REBIN. Multi-threaded mode is experimental (please email
+   stardev@jach.hawaii.edu with any problems or concerns) and is enabled
+   by setting the SMURF_THREADS environment variable to the number of
+   threads you wish to use. This mode is turned off by default.
+
+1 SMURF_Version_Humu
+
+ o A new application called TIMESORT can re-order time slices in a raw
+   data cube into increasing time.
+
+ o The output cube from MAKECUBE can be divided up into tiles of a
+   given spatial size.
+
+ o Polarisation data can now be handled by MAKECUBE, producing
+   separate output cubes for data in different analyser angle ranges.
+
+ o The output cube from MAKECUBE can now be aligned with a reference
+   cube, image or spectrum.
+
+ o The output NDFs from MAKECUBE now contain provenance information in
+   a form that can be displayed using KAPPA:PROVSHOW.
+
+ o Input data for MAKECUBE can now optionally be aligned in the
+   celestial coordinate system of the output cube, whatever it may be,
+   instead of ICRS.
+
+ o The list of detectors to use by MAKECUBE can now be specified by
+   exclusion as well as inclusion.
+
+ o The extent of the output cube from MAKECUBE can now be specified in
+   pixel indices.
+
+ o The default spectral range for the output cube from MAKECUBE can
+   now be either the union or the intersection of the input spectral
+   ranges.
+
+1 SMURF_Version_0.3-1_(Puana)
 
  o MAKECUBE now uses input variances as weights when combining input data.
  o Add BADMASK parameter to MAKECUBE
