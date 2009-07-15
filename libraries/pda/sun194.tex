@@ -5,7 +5,8 @@
 % reviewing the document look out for these:
 % \newpage % <<<---
 
-\documentstyle[11pt,epsf,twoside]{article}
+\documentclass[11pt,twoside]{article}
+\usepackage{graphicx}
 \pagestyle{myheadings}
 
 % -----------------------------------------------------------------------------
@@ -427,7 +428,7 @@
 
 % ? Title figure
    \begin{center}
-   \leavevmode\epsfysize=300pt\epsfbox{sun194_1.eps}
+   \includegraphics[width=2.0in]{sun194_1.eps}
    \end{center}
 
 % ? Heading for abstract if used.
@@ -450,7 +451,7 @@
 
 % ? Add picture here if required.
    \begin{figure}[h]
-   \epsffile{sun194_1.eps}
+      \includegraphics[width=2.0in]{sun194_1.eps}
    \end{figure}
 % ? End of picture
 
