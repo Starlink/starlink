@@ -13433,7 +13433,7 @@ f     AST_SETFITSCM
 c     #include "fitschan.h"
 c     void astSetFitsCM( AstFitsChan *this, const char *comment, 
 c                        int overwrite )
-       f     CALL AST_SETFITSCM( THIS, COMMENT, OVERWRITE, STATUS )
+f     CALL AST_SETFITSCM( THIS, COMMENT, OVERWRITE, STATUS )
 
 *  Description:
 *     This 
