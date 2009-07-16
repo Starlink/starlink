@@ -246,6 +246,10 @@ void findclumps( int *status ) {
 *        - Peak: The peak value in the clump.
 *        - Volume: The total number of pixels falling within the clump.
 *
+*        There is also an optional column called "Shape" containing an 
+*        STC-S description of the spatial coverage of each clump. See 
+*        parameter SHAPE.
+*
 *        The coordinate system used to describe the peak and centroid
 *        positions is determined by the value supplied for parameter 
 *        WCSPAR. If WCSPAR is FALSE, then positions are specified in the
@@ -288,7 +292,9 @@ void findclumps( int *status ) {
 *        instance, the command "listshow fred plot=mark" will draw
 *        markers identifying the positions of the clumps described in 
 *        file fred.FIT, overlaying the markers on top of the currently
-*        displayed image. [!]
+*        displayed image. Specifying "plot=STCS" instead of "plot=mark"
+*        will cause the spatial outline of the clump to be drawn if it is
+*        present in the catalogue (see parameter SHAPE). [!]
 *     PERSPECTRUM = _LOGICAL (Read)
 *        This parameter is ignored unless the supplied input NDF is
 *        3-dimensional and includes a spectral axis. If so, then a TRUE
@@ -321,6 +327,42 @@ void findclumps( int *status ) {
 *        being too low. The value supplied for this parameter will be ignored 
 *        if the RMS noise level is also given in the configuration file 
 *        specified by parameter CONFIG.
+*     SHAPE = LITERAL (Read)
+*        Specifies the shape that should be used to describe the spatial
+*        coverage of each clump in the output catalogue. It can be set to
+*        "None", "Polygon" or "Ellipse". If it is set to "None", the
+*        spatial shape of each clump is not recorded in the output
+*        catalogue. Otherwise, the catalogue will have an extra column 
+*        named "Shape" holding an STC-S description of the spatial coverage 
+*        of each clump. "STC-S" is a textual format developed by the IVOA 
+*        for describing regions within a WCS - see
+*        http://www.ivoa.net/Documents/latest/STC-S.html for details.
+*        These STC-S desriptions can be displayed by the KAPPA:LISTSHOW 
+*        command, or using GAIA. Since STC-S cannot describe regions within 
+*        a pixel array, it is necessary to set parameter WCSPAR to TRUE if 
+*        using this option. An error will be reported if WCSPAR is FALSE. An 
+*        error will also be reported if the WCS in the input data does not 
+*        contain a pair of scelestial sky axes. 
+*
+*        - Polygon: Each polygon will have, at most, 15 vertices. If the data 
+*        is 2-dimensional, the polygon is a fit to the clump's outer boundary
+*        (the region containing all godo data values). If the data is 
+*        3-dimensional, the spatial footprint of each clump is determined
+*        by rejecting the least significant 10% of spatial pixels, where 
+*        "significance" is measured by the number of spectral channels that 
+*        contribute to the spatial pixel. The polygon is then a fit to
+*        the outer boundary of the remaining spatial pixels.
+*
+*        - Ellipse: All data values in the clump are projected onto the
+*        spatial plane and "size" of the collapsed clump at four different 
+*        position angles - all separated by 45 degrees - is found (see the 
+*        OUTCAT parameter for a description of clump "size"). The ellipse 
+*        that generates the same sizes at the four position angles is then 
+*        found and used as the clump shape. 
+*
+*        In general, "Ellipse" will outline the brighter, inner regions
+*        of each clump, and "Polygon" will include the fainter outer
+*        regions. ["None"]
 *     WCSPAR = _LOGICAL (Read)
 *        If a TRUE value is supplied, then the clump parameters stored in
 *        the output catalogue and in the CUPID extension of the output NDF,
@@ -769,6 +811,8 @@ void findclumps( int *status ) {
 *        Tweak to GRP C API.
 *     14-JAN-2009 (TIMJ):
 *        Use MERS for message filtering.
+*     16-JUL-2009 (DSB):
+*        Added SHAPE parameter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -815,7 +859,7 @@ void findclumps( int *status ) {
    char logfilename[ GRP__SZNAM + 1 ]; /* Log file name */ 
    char method[ 15 ];           /* Algorithm string supplied by user */
    char ndfname[GRP__SZNAM+1];  /* Input NDF name, derived from GRP */
-   char voshape[ 10 ];          /* Shape for STC-S regions in VO output */
+   char shape[ 10 ];            /* Shape for spatial STC-S regions */
    const char *dom;             /* Axis domain */
    const char *lab;             /* AST Label attribute for an axis */
    const char *sys;             /* AST System attribute for an axis */
@@ -825,6 +869,7 @@ void findclumps( int *status ) {
    double sum;                  /* Sum of variances */
    float *rmask;                /* Pointer to cump mask array */
    int backoff;                 /* Remove background when finding clump sizes? */
+   int confpar;                 /* Is this line a config parameter setting? */
    int deconv;                  /* Should clump parameters be deconvolved? */
    int dim[ NDF__MXDIM ];       /* Pixel axis dimensions */
    int dims[3];                 /* Pointer to array of array dimensions */
@@ -835,6 +880,7 @@ void findclumps( int *status ) {
    int indf2;                   /* Identifier for main output NDF */
    int indf3;                   /* Identifier for Quality output NDF */
    int indf;                    /* Identifier for input NDF */
+   int ishape;                  /* STC-S shape for spatial coverage */
    int n;                       /* Number of values summed in "sum" */
    int nclumps;                 /* Number of clumps stored in output NDF */
    int ndim;                    /* Total number of pixel axes */
@@ -845,8 +891,6 @@ void findclumps( int *status ) {
    int perspectrum;             /* Process spectra independently? */
    int repconf;                 /* Report configuration? */
    int sdim[ NDF__MXDIM ];      /* The indices of the significant pixel axes */
-   size_t size;                 /* Size of a group */
-   int confpar;                 /* Is this line a config parameter setting? */
    int skip[3];                 /* Pointer to array of axis skips */
    int slbnd[ NDF__MXDIM ];     /* The lower bounds of the significant pixel axes */
    int subnd[ NDF__MXDIM ];     /* The upper bounds of the significant pixel axes */
@@ -856,7 +900,7 @@ void findclumps( int *status ) {
    int var;                     /* Does the i/p NDF have a Variance component? */
    int vax;                     /* Index of the velocity WCS axis (if any) */
    int velax;                   /* Index of the velocity pixel axis (if any) */
-   int vo;                      /* Use VO catalogue format? */
+   size_t size;                 /* Size of a group */
    void *ipd;                   /* Pointer to Data array */
    void *ipo;                   /* Pointer to output Data array */
 
@@ -970,33 +1014,36 @@ void findclumps( int *status ) {
              status );
    parGet0l( "WCSPAR", &usewcs, status );
 
-/* See if "Virtual Observatory" catalogue format is required. */
-   parGet0l( "VO", &vo, status );
-
-/* If producing VO format, see what STC-S shape should be used to
-   describe each spatial clump. */
-   if( vo ) {
-      parChoic( "VOSHAPE", "POLYGON", "Ellipse,Polygon", 1, voshape, 10,  
-                status );
-      if( *status == SAI__OK ) {
-         if( !strcmp( voshape, "POLYGON" ) ) {
-            vo = 2;
-         } else {
-            vo = 1;
-         }
+/* See what STC-S shape should be used to describe each spatial clump. */
+   parChoic( "SHAPE", "None", "Ellipse,Polygon,None", 1, shape, 10,  
+             status );
+   if( *status == SAI__OK ) {
+      if( !strcmp( shape, "POLYGON" ) ) {
+         ishape = 2;
+      } else if( !strcmp( shape, "ELLIPSE" ) ) {
+         ishape = 1;
+      } else {
+         ishape = 0;
       }
    }
 
-/* Report an error if an attempt is made to produce a VO table using
-   pixel coords. */
-   if( vo && *status == SAI__OK ) {
+/* Report an error if an attempt is made to produce STC-S descriptions of
+   the spatial coverage of each clump using pixel coords. */
+   if( ishape && *status == SAI__OK ) {
       if( nskyax < 2 ) {
+         msgSetc( "S", shape );
+         msgSetc( "S", "s" );
          *status = SAI__ERROR;
-         errRep( " ", "VO output requires that the current WCS frame in "
-                 "the input contains a pair of celestial sky axes.", status );
+         errRep( " ", "Cannot produce STC-S ^S: the current WCS frame in "
+                 "the input does not contain a pair of celestial sky axes.", 
+                 status );
+
       } else if( !usewcs ) {
+         msgSetc( "S", shape );
+         msgSetc( "S", "s" );
          *status = SAI__ERROR;
-         errRep( " ", "VO output requires that WCSPAR=TRUE be used.", status );
+         errRep( " ", "Cannot produce STC-S ^S: the WCSPAR parameter "
+                 "must be set TRUE to produce spatial regions.", status );
       }
    }
 
@@ -1277,7 +1324,7 @@ void findclumps( int *status ) {
    (if needed). This may reject further clumps (such clumps will have the
    "Unit" component set to "BAD"). */
       ndfState( indf, "WCS", &gotwcs, status );
-      cupidStoreClumps( "OUTCAT", xloc, ndfs, nsig, deconv, backoff, vo,
+      cupidStoreClumps( "OUTCAT", xloc, ndfs, nsig, deconv, backoff, ishape,
                         velax, beamcorr, "Output from CUPID:FINDCLUMPS", 
                         usewcs, gotwcs ? iwcs : NULL, dataunits, 
                         confgrp, logfile, &nclumps, status );
