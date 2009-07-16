@@ -139,6 +139,8 @@ f     The MatrixMap class does not define any new routines beyond those
 *        MapSplit: Only create the returned Mapping if it would have some 
 *        outputs. Also, do not create the returned Mapping if any output
 *        depends on a mixture of selected and unselected inputs.
+*     16-JUL-2009 (DSB):
+*        MatPerm: Fix memory leak (mm2 was not being annulled).
 *class--
 */
 
@@ -2484,9 +2486,10 @@ static AstMatrixMap *MatPerm( AstMatrixMap *mm, AstPermMap *pm, int minv,
          result = astMtrMult( mm2, mm );
       }
 
+/* Free everything. */
+      mm2 = astAnnul( mm2 ) ;
    }
 
-/* Free everything. */
    pset2 = astAnnul( pset2 );
    pset1 = astAnnul( pset1 );
    matrix = (double *) astFree( (void *) matrix );
