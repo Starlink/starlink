@@ -97,6 +97,11 @@
 
     The default celestial coordinate system for FITS files is now FK5/J2000.
 
+    The cube animation controls now allow the reversal of the order of
+    slices displayed by interchanging the lower and upper limits. Previously
+    the animation always ran from the least index to the higher one regardless
+    of the given order.
+
   Lehuakona Release
   =================
 

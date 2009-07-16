@@ -280,7 +280,7 @@ itcl::class gaia::GaiaCubeAnimation {
    public method get_set_limits {} {
       set from [$itk_component(bounds) cget -from]
       set to [$itk_component(bounds) cget -to]
-      if { $from != $itk_option(-lower_limit) || 
+      if { $from != $itk_option(-lower_limit) ||
            $to != $itk_option(-upper_limit) } {
          return [list $itk_option(-lower_limit) $itk_option(-upper_limit)]
       }
@@ -325,11 +325,10 @@ itcl::class gaia::GaiaCubeAnimation {
       set initial_seconds_ [clock clicks -milliseconds]
       if { $afterId_ == {} } {
          if { $itk_option(-lower_limit) > $itk_option(-upper_limit) } {
-            set temp $itk_option(-lower_limit)
-            set itk_option(-lower_limit) $itk_option(-upper_limit)
-            set itk_option(-upper_limit) $temp
+            set step_ [expr -1*$itk_option(-step)]
+         } else {
+            set step_ $itk_option(-step)
          }
-         set step_ $itk_option(-step)
          set plane_ $itk_option(-lower_limit)
          $itk_option(-gaiacube) set_display_plane $itk_option(-lower_limit) 0
          increment_
@@ -369,10 +368,26 @@ itcl::class gaia::GaiaCubeAnimation {
       configure -step $step
    }
 
+   #  Check if plane_ is inside the limits. Handles lower being higher
+   #  than upper, which just means run in the different direction.
+   protected method inside_ {} {
+      if { $itk_option(-lower_limit) > $itk_option(-upper_limit) } {
+         if { $plane_ > $itk_option(-upper_limit) &&
+              $plane_ <= $itk_option(-lower_limit) } {
+            return 1
+         }
+      } else {
+         if { $plane_ >= $itk_option(-lower_limit) &&
+              $plane_ < $itk_option(-upper_limit) } {
+            return 1
+         }
+      }
+      return 0
+   }
+
    #  Increment the displayed section by one.
    protected method increment_ {} {
-      if { $plane_ >= $itk_option(-lower_limit) &&
-           $plane_ < $itk_option(-upper_limit) } {
+      if { [inside_] } {
          set plane_ [expr ${plane_}+$step_]
          $itk_option(-gaiacube) set_display_plane $plane_ 0
 
@@ -409,18 +424,34 @@ itcl::class gaia::GaiaCubeAnimation {
             if { $loop_ != "off" } {
                if { $loop_ != "on" } {
                   #  Rock 'n roll, switch direction.
-                  if { $step_ >= 1 } {
-                     # Going up.
-                     set plane_ [expr $itk_option(-upper_limit) - 1]
+                  if { $itk_option(-lower_limit) >
+                       $itk_option(-upper_limit) } {
+                     if { $step_ >= 1 } {
+                        # Going down.
+                        set plane_ $itk_option(-lower_limit)
+                     } else {
+                        # Going up.
+                        set plane_ [expr $itk_option(-upper_limit) + 1]
+                     }
                   } else {
-                     # Going down.
-                     set plane_ $itk_option(-lower_limit)
+                     if { $step_ >= 1 } {
+                        # Going up.
+                        set plane_ $itk_option(-lower_limit)
+                     } else {
+                        # Going down.
+                        set plane_ [expr $itk_option(-upper_limit) - 1]
+                     }
                   }
                   set step_ [expr -1*$step_]
                } else {
+                  #  Standard loop.
+                  if { $itk_option(-lower_limit) >
+                       $itk_option(-upper_limit) } {
+                     set step_ [expr -1*abs($step_)]
+                  } else {
+                     set step_ [expr abs($step_)]
+                  }
                   set plane_ $itk_option(-lower_limit)
-                  #  Increment is always positive, put may be changed on fly.
-                  set step_ [expr abs($step_)]
                }
                increment_
             } else {
@@ -444,7 +475,7 @@ itcl::class gaia::GaiaCubeAnimation {
       #  This can fail if the window is obscured. Trap and complain.
       if { [catch {$image write $gif -format gif} msg ] } {
          if { $msg == "too many colors" } {
-            info_dialog "The image display window must not be obscured, 
+            info_dialog "The image display window must not be obscured,
 move any overlapping windows and try again"
             ::image delete $image
             return 0
