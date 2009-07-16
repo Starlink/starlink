@@ -6,6 +6,18 @@
  and  analyse clumps of emission within 2- or 3- dimensional 
  data arrays.
 
+Changes introduced at V1.0
+
+   - The time has come to recognise that CUPID is no longer an
+     experimental concept, and so the format of the version number
+     has been changed.
+
+   - FINDCLUMPS has a new parameter called SHAPE that allows an optional
+     column holding a textual description of the spatial shape of each 
+     clump to be added to the output catalogue. The format for this
+     description is the STC-S format developed by the IVOA. These shapes
+     can be plotted using either KAPPA:LISTSHOW or GAIA.
+
 Changes introduced at V0.0-39:
 
    - The message filtering system has been modified to use the standard

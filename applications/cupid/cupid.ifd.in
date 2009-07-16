@@ -413,23 +413,13 @@ package cupid {
             helpkey *
           }
 
-         parameter vo {
-            type _LOGICAL
-            access READ
-            vpath DEFAULT
-            ppath CURRENT,DEFAULT
-            prompt {Produce VO format catalogue?}
-            default FALSE
-            helpkey *
-          }
-
-         parameter voshape {
+         parameter shape {
             type LITERAL
             access READ
             vpath DEFAULT
             ppath CURRENT,DEFAULT
-            prompt {Spatial clump shape in VO coutput}
-            default Polygon
+            prompt {Spatial clump shape in output catalogue}
+            default None
             helpkey *
           }
       }
