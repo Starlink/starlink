@@ -46,6 +46,11 @@ dnl   Starlink set.
 
 common_built_drivers="exdriv.lo pgdriv.lo cadriv.lo hgdriv.lo lxdriv.lo ppdriv.lo vtdriv.lo gidriv.lo hidriv.lo psdriv.lo ttdriv.lo cwdriv.lo gldriv.lo nedriv.lo wddriv.lo hpdriv.lo lsdriv.lo nudriv.lo qmdriv.lo vadriv.lo cgdriv.lo nexsup.lo rvdriv.lo x2driv.lo xmdriv.lo figdisp_comm.lo pgxwin.lo tkdriv.lo pkdriv.lo xadriv.lo"
 
+dnl   Make sure that X libs are included in tests.
+dnl   Apple puts libpng in the X11 distribution
+LIBS="$LIBS $X_LIBS"
+CPPFLAGS="$CPPFLAGS $X_CFLAGS"
+
 dnl   Add the png driver if the PNG header and library are available.
 AC_CHECK_HEADER(png.h,
                 AC_CHECK_LIB(png, png_info_init,
@@ -58,9 +63,6 @@ STAR_BUILT_DRIVERS="$common_built_drivers star_xwdriv.lo gwmdriv.lo"
 
 AC_SUBST(BUILT_DRIVERS)
 AC_SUBST(STAR_BUILT_DRIVERS)
-
-# See if we have X
-AC_PATH_XTRA
 
 dnl    Stuff required for xathena
 have_athena="yes"
@@ -84,8 +86,6 @@ AC_ARG_WITH([athena],
 dnl    Hack and slash for the Mac. This should only add goodness to 
 dnl    non-Mac builds in the case where whoever did their filesystem 
 dnl    have done something as wierd as Apple.
-LIBS="$LIBS $X_LIBS"
-CPPFLAGS="$CPPFLAGS $X_CFLAGS"
 if test "$have_athena" = "yes"; then
   AC_CHECK_HEADER([X11/Xaw3d/Simple.h], have_xa3dheader=yes ) 
   AC_CHECK_LIB(Xaw3d, XawInitializeWidgetSet, have_xa3dlib=yes )
