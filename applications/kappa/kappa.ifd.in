@@ -3719,6 +3719,15 @@ package kappa {
 
          helplib {$KAPPA_HELP}
 
+         parameter align {
+            type _LOGICAL
+            vpath DYNAMIC DEFAULT
+            ppath DYNAMIC DEFAULT
+            prompt {Align the spectra with an existing picture?}
+            default FALSE
+            helpkey *
+         }
+
          parameter axes {
             type _LOGICAL
             vpath DYNAMIC DEFAULT
@@ -3876,6 +3885,15 @@ package kappa {
             vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
             default FALSE
+            helpkey *
+         }
+
+         parameter specaxes {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Produce spectral axes?}
             helpkey *
          }
 

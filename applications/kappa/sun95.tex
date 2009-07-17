@@ -16968,6 +16968,21 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
    }
    \sstparameters{
       \sstsubsection{
+         ALIGN = \_LOGICAL (Read)
+      }{
+         Controls whether or not the spectra should be aligned spatially
+         with an existing data plot.  If ALIGN is {\tt TRUE}, each spectrum
+         will be drawn in a rectangular cell that is centred on the
+         corresponding point on the sky.  This may potentially cause the
+         spectra to overlap, depending on their spatial separation.  If
+         ALIGN is {\tt FALSE}, then the spectra are drawn in a regular grid 
+         of equal-sized cells that cover the entire picture.  This may cause
+         them to be drawn at spatial positions that do not correspond to
+         their actual spatial positions within the supplied cube.  The
+         dynamic default is {\tt TRUE} if parameter CLEAR is {\tt TRUE} and 
+         there is an existing DATA picture on the graphics device.  {\tt []}
+      }
+      \sstsubsection{
          AXES = \_LOGICAL (Read)
       }{
          {\tt TRUE} if labelled and annotated axes describing the spatial
@@ -17235,6 +17250,13 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
          describing the two axes.  Note, due to the small size of the
          line plot, such text may be too small to read on some
          graphics devices.  {\tt [}current value{\tt{]}}
+      }
+      \sstsubsection{
+         SPECAXES = \_LOGICAL (Read)
+      }{
+         {\tt TRUE} if axes are to be drawn around each spectrum. The
+         appearance of the axes can be controlled using the SPECSTYLE
+         parameter.  {\tt [TRUE]}
       }
       \sstsubsection{
          SPECSTYLE = LITERAL (Read)
@@ -56069,6 +56091,10 @@ The following applications have been modified:
          show the loci of data values including the histogram
          `staircase', dots or markers at each point, and lines connecting 
          data points (the only available mode previously).
+         \item New SPECAXES parameter can be used to suppress the drawing of
+         axes around each spectrum.
+         \item New ALIGN parameter controls whether to align the spectra
+         spatially with an existing picture.
       \end{itemize}
 
    \item [\htmlref{COLCOMP}{COLCOMP}] \mbox{}
