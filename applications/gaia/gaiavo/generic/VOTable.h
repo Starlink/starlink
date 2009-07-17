@@ -42,6 +42,10 @@
 #ifndef VOTABLE_H
 #define VOTABLE_H
 
+//  Hack for OS X 10.4 include file problem. Redefines these if not set.
+#define MAX MAX
+#define MIN MIN
+
 //  Includes that are used in this file.
 #include <AstroCatalog.h>
 #include "VOTable1.1.hxx"
