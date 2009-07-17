@@ -17,7 +17,7 @@
  *     C++ .
 
  *  Copyright:
- *     Copyright (C) 2008 Science and Technology Facilities Council.
+ *     Copyright (C) 2008-2009 Science and Technology Facilities Council.
  *     All Rights Reserved.
 
  *  Licence:
@@ -164,8 +164,14 @@ namespace gaia {
         else if ( system == "geocentric" ) {
             system = "geo_app";
         }
+        else {
+            system = "eq_FK5";
+            equinox = "J2000";
+        }
         coosys.system( system );
-        coosys.equinox( equinox );
+        if ( equinox != "" ) {
+            coosys.equinox( equinox );
+        }
 
         //  Pick out equinox and epoch, if set.
         ostringstream oss;
