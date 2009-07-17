@@ -431,7 +431,7 @@ static int use_cache = 0;
 /* ================================= */
 static size_t SizeOfMemory( int * );
 static char *CheckTempStart( const char *, const char *, const char *, char *, int *, int *, int *, int *, int *, int *, int *, int * );
-static char *ChrMatcher( const char *, const char *, const char *, const char *[], int, int, int, char ***, int *, const char **, int * );
+static char *ChrMatcher( const char *, const char *, const char *, const char *, const char *[], int, int, int, char ***, int *, const char **, int * );
 static char *ChrSuber( const char *, const char *, const char *[], int, int, char ***, int *, const char **, int * );
 
 #ifdef MEM_DEBUG
@@ -1487,8 +1487,8 @@ char *ChrSuber( const char *test, const char *pattern, const char *subs[],
       template[ tlen ] = 0;
 
 /* See if the test string matches the current template. */
-      result = ChrMatcher( test, template, pattern, subs, nsub, 0, 1,
-                           parts, npart, matchend, status );
+      result = ChrMatcher( test, test + strlen( test ), template, pattern, 
+                           subs, nsub, 0, 1, parts, npart, matchend, status );
 
 /* Free resources. */
       template = astFree( template );
@@ -2014,7 +2014,7 @@ void *astMalloc_( size_t size, int *status ) {
 }
 #undef ERRBUF_LEN
 
-static char *ChrMatcher( const char *test, const char *template, 
+static char *ChrMatcher( const char *test, const char *end, const char *template, 
                          const char *pattern, const char *subs[], int nsub, 
                          int ignore, int expdoll, char ***mres, int *mlen, 
                          const char **matchend, int *status ){
@@ -2030,7 +2030,7 @@ static char *ChrMatcher( const char *test, const char *template,
 
 *  Synopsis:
 *     #include "memory.h"
-*     char *ChrMatcher( const char *test, const char *template, 
+*     char *ChrMatcher( const char *test, const char *end, const char *template, 
 *                       const char *pattern, const char *subs[], int nsub, 
 *                       int ignore, int expdoll, char ***mres, int *mlen, 
 *                       const char **matchend, int *status )
@@ -2041,6 +2041,8 @@ static char *ChrMatcher( const char *test, const char *template,
 *  Parameters:
 *     test
 *        The string to be tested.
+*     end
+*        Pointer to the terminating null character at the end of "test".
 *     template
 *        The template string. See astChrSub for details.
 *     pattern
@@ -2120,6 +2122,7 @@ static char *ChrMatcher( const char *test, const char *template,
    int partlen;
    int reslen;      
    int start_sub;
+   size_t stl;
 
 /* Initialisation. */
    if( mres ) *mlen = 0;
@@ -2295,7 +2298,7 @@ static char *ChrMatcher( const char *test, const char *template,
    to be matched. */
             if( greedy ) {
                for( na = max_na; na >= min_na; na-- ) {
-                  r = ChrMatcher( a + na, b, pattern, NULL, 0, 1, 0,
+                  r = ChrMatcher( a + na, end, b, pattern, NULL, 0, 1, 0,
                                   NULL, NULL, NULL, status );
                   if( r ) {
                      match = 1;
@@ -2310,7 +2313,7 @@ static char *ChrMatcher( const char *test, const char *template,
    to be matched. */
             } else {
                for( na = min_na; na <= max_na; na++ ) {
-                  r = ChrMatcher( a + na, b, pattern, NULL, 0, 1, 0,
+                  r = ChrMatcher( a + na, end, b, pattern, NULL, 0, 1, 0,
                                   NULL, NULL, NULL, status );
                   if( r ) {
                      match = 1;
@@ -2323,6 +2326,7 @@ static char *ChrMatcher( const char *test, const char *template,
 
 /* Increment the the pointer to the next test character. */
          a += na;
+         if( a > end ) a = end;
       }
    }
 
@@ -2409,10 +2413,11 @@ static char *ChrMatcher( const char *test, const char *template,
          newsubs = astMalloc( sizeof( char * )*nsub );
          if( newsubs ) {
             for( i = 0; i < nsub; i++ ) {
-               stest = astStore( NULL, subs[ i ], strlen( subs[ i ] ) + 1 );
+               stl = strlen( subs[ i ] );
+               stest = astStore( NULL, subs[ i ], stl + 1 );
                for( dollar = 1; dollar <= nsub; dollar++ ) {
                   sprintf( stemp, ".*($%d).*", dollar );
-                  sres = ChrMatcher( stest, stemp, stemp,
+                  sres = ChrMatcher( stest, stest + stl, stemp, stemp,
                                      (void *) ( matches + dollar - 1 ),
                                      1, 0, 0, NULL, NULL, NULL, status );
                   if( sres ) {
