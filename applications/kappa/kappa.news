@@ -19,6 +19,12 @@
       `staircase', dots or markers at each point, and lines 
       connecting data points (the only available mode previously).
 
+      -  New SPECAXES parameter can be used to suppress the drawing of
+      axes around each spectrum.
+
+      -  New ALIGN parameter controls whether to align the spectra
+      spatially with an existing picture.
+
    o  COLCOMP
    
       -  Parameter BADCOL has the additional option of an HTML 

@@ -78,6 +78,18 @@
 *     clinplot ndf [useaxis] [device] [nx] [ny]
 
 *  ADAM Parameters:
+*     ALIGN = _LOGICAL (Read)
+*        Controls whether or not the spectra should be aligned spatially
+*        with an existing data plot.  If ALIGN is TRUE, each spectrum
+*        will be drawn in a rectangular cell that is centred on the
+*        corresponding point on the sky.  This may potentially cause the
+*        spectra to overlap, depending on their spatial separation.  If
+*        ALIGN is FALSE, then the spectra are drawn in a regular grid of
+*        equal-sized cells that cover the entire picture.  This may cause
+*        them to be drawn at spatial positions that do not correspond to
+*        their actual spatial positions within the supplied cube.  The
+*        dynamic default is TRUE if parameter CLEAR is TRUE and there is
+*        an existing DATA picture on the graphics device. []
 *     AXES = _LOGICAL (Read)
 *        TRUE if labelled and annotated axes describing the spatial
 *        are to be drawn around the outer edges of the plot. The
@@ -278,6 +290,10 @@
 *        describing the two axes. Note, due to the small size of the
 *        line plot, such text may be too small to read on some
 *        graphics devices.  [current value]
+*     SPECAXES = _LOGICAL (Read)
+*        TRUE if axes are to be drawn around each spectrum. The
+*        appearance of the axes can be controlled using the SPECSTYLE
+*        parameter. [TRUE]
 *     SPECSTYLE = LITERAL (Read)
 *        A group of attribute settings describing the plotting style
 *        to use when drawing the axes and data values in the spectrum
@@ -455,6 +471,8 @@
 *        Added MODE and MARKER parameters, and mention SPECSTYLE in the 
 *        Description.  This required the viewport and window limits to
 *        be set for each cell.
+*     17-JUL-2009 (DSB):
+*        Added ALIGN and SPECAXES parameters.
 *     {enter_further_changes_here}
 
 *-
@@ -499,10 +517,14 @@
       DOUBLE PRECISION BBOX( 4 ) ! Bounds in base Frame of new Plot
       DOUBLE PRECISION BOX( 4 )  ! Bounds of image in pixel co-ordinates
       DOUBLE PRECISION CON( 2 )  ! Constants for axis permutations
+      DOUBLE PRECISION DCGX      ! X GRID coord at spectrum
+      DOUBLE PRECISION DCGY      ! Y GRID coord at spectrum
       DOUBLE PRECISION DGLB( 2 ) ! Lower bounds of GRAPHICS region
       DOUBLE PRECISION DGUB( 2 ) ! Upper bounds of GRAPHICS region
       DOUBLE PRECISION DX        ! Width of each spectrum cell in mm
       DOUBLE PRECISION DY        ! Height of each spectrum cell in mm
+      DOUBLE PRECISION GRX       ! X GRAPHICS coord at spectrum
+      DOUBLE PRECISION GRY       ! Y GRAPHICS coord at spectrum
       DOUBLE PRECISION IN( 2 )   ! GRID coords
       DOUBLE PRECISION INA( 2 )  ! Corner A of window in input coords
       DOUBLE PRECISION INB( 2 )  ! Corner B of window in input coords
@@ -514,6 +536,7 @@
       INTEGER BFRM               ! Pointer to base Frame in Plot
       INTEGER CBMAP              ! Pointer to current->base Mapping
       INTEGER CFRM               ! Pointer to current Frame in Plot
+      INTEGER CGTOGR             ! NDF GRID to GRAPHICS Mapping
       INTEGER CGX                ! X GRID index at spectrum
       INTEGER CGY                ! Y GRID index at spectrum
       INTEGER CMAP( MXSPEC*MXSPEC )! GRAPHICS->GRID Mapping for a cell
@@ -592,20 +615,27 @@
       INTEGER WCM                ! Final Mapping
       INTEGER WM                 ! A WinMap
       LOGICAL ALIGN              ! DATA pic aligned with a previous pic?
-      LOGICAL AXES               ! Annotated axes are to be drawn?
+      LOGICAL AXES               ! Draw annotated spatial axes?
       LOGICAL BLEDGE             ! Leaves edge spec plots bare?
       LOGICAL CGOOD( MXSPEC, MXSPEC )! Was a spectrum drawn in the cell?
       LOGICAL CLEAR              ! Is screen to be cleared on opening?
       LOGICAL FIRST              ! Is first cell yet to be annotated?
       LOGICAL KEY                ! Make a key of the grid co-ordinates?
       LOGICAL REFLAB             ! Draw labels around first spectrum?
+      LOGICAL SPAXES             ! Draw annotated spectral axes?
       REAL ASPECT                ! Aspect ratio of the input array
+      REAL AX                    ! GRAPHICS->NDC slope (X)
+      REAL AY                    ! GRAPHICS->NDC slope (Y)
+      REAL BX                    ! GRAPHICS->NDC offset (X)
+      REAL BY                    ! GRAPHICS->NDC offset (Y)
       REAL DUMMY                 ! Un-required argument value
       REAL DX1                   ! Unused
       REAL DX2                   ! Width of viewport in device pixels
       REAL DY1                   ! Unused
       REAL DY2                   ! Height of viewport in device pixels
       REAL GBOX( 4 )             ! Bounds in GRAPHICS Frame of new Plot
+      REAL GBOXFX                ! Lower X GRAPHICS bound of first cell 
+      REAL GBOXFY                ! Lower Y GRAPHICS bound of first cell 
       REAL GLB( 2 )              ! Lower bounds of GRAPHICS region
       REAL GUB( 2 )              ! Upper bounds of GRAPHICS region
       REAL KEYOFF                ! Offset to top of key 
@@ -619,8 +649,6 @@
       REAL SMARGY                ! Y margin used by spectral annotation
       REAL TL                    ! MajTickLen value
       REAL VBOX( 4 )             ! Bounds in NDC of new Plot
-      REAL VDX                   ! Width of each spectrum cell in NDC
-      REAL VDY                   ! Height of each spectrum cell in NDC
       REAL VX1                   ! NDC X at left hand of current cell
       REAL VX2                   ! NDC X at right hand of current cell
       REAL VY1                   ! NDC Y at bottom of current cell
@@ -787,9 +815,12 @@
 *  See if the screen will be cleared.
       CALL PAR_GET0L( 'CLEAR', CLEAR, STATUS )
 
-*  See if annotated spatial AXES are need.
+*  See if annotated spatial axes are need.
       CALL PAR_DEF0L( 'AXES', CLEAR, STATUS )
       CALL PAR_GET0L( 'AXES', AXES, STATUS )
+
+*  See if annotated spectral axes are need.
+      CALL PAR_GET0L( 'SPECAXES', SPAXES, STATUS )
 
 *  See if a key to vector length is required.
       CALL PAR_GET0L( 'KEY', KEY, STATUS )
@@ -922,6 +953,16 @@
 
       END IF
 
+*  See if the cells of the plot should be aligned spatially with an
+*  existing data plot. Otherwise, they form a regular grid covering the
+*  whole picture.
+      CALL PAR_DEF0L( 'ALIGN', ALIGN, STATUS )
+      CALL PAR_GET0L( 'ALIGN', ALIGN, STATUS )
+
+*  Get the Mapping from spatial GRID coords in the NDF to GRAPHICS coords in 
+*  the Plot.
+      CGTOGR = AST_GETMAPPING( IPLOT, 1 + NFRM, AST__BASE, STATUS )
+
 *  Ensure the Title attribute of the Plot has a useful value.
       CALL KPG1_ASTTL( IPLOT, SKWCS, INDF, STATUS )
  
@@ -949,9 +990,12 @@
 *  Obtain the viewport bounds in NDC.
          CALL PGQVP( 0, VX1, VX2, VY1, VY2 )
 
-*  Find the width and height of each spectrum's cell in NDC.
-         VDX = ( VX2 - VX1 ) / REAL( NX )
-         VDY = ( VY2 - VY1 ) / REAL( NY )
+*  Find the constants that connect GRAPHICS coords to NDC.
+         AX = ( VX1 - VX2 )/( X1 - X2 )
+         BX = ( VX1*X2 - VX2*X1 )/( X2 - X1 )
+
+         AY = ( VY1 - VY2 )/( Y1 - Y2 )
+         BY = ( VY1*Y2 - VY2*Y1 )/( Y2 - Y1 )
 
 *  Note the minimum dimension of the plotting area.
          MINDIM = X2 - X1
@@ -1016,30 +1060,50 @@
          DO IY = 1, NY
             CGY = NINT( 0.5 + ( REAL( IY ) - 0.5 )*
      :                        REAL( DIM( 2 ) )/REAL( NY ) ) 
-            INA( 2 ) = DBLE( Y1 + ( IY - 1 )*DY )
-
-*  Get the Y bounds of the cell in GRAPHICS co-ordinates.
-            GBOX( 2 ) = Y1 + REAL( IY - 1 ) * REAL( DY )
-            GBOX( 4 ) = GBOX( 2 ) + REAL( DY )
-
-*  Get the Y bounds of the cell in NDC.
-            VBOX( 2 ) = VY1 + REAL( IY - 1 ) * REAL( VDY )
-            VBOX( 4 ) = VBOX( 2 ) + REAL( VDY )
 
             CALL PGBBUF
 
             DO IX = 1, NX
                CGX = NINT( 0.5 + ( REAL( IX ) - 0.5 )*
      :                           REAL( DIM( 1 ) )/REAL( NX ) )
-               INA( 1 ) = DBLE( X1 + ( IX - 1 )*DX )
 
-*  Get the X bounds of the cell in GRAPHICS co-ordinates.
-               GBOX( 1 ) = X1 + REAL( IX - 1 ) * REAL( DX )
-               GBOX( 3 ) = GBOX( 1 ) + REAL( DX )
+*  If the spectra are being aligned spatially with an existing data plot...
+               IF( ALIGN ) THEN
 
-*  Get the X bounds of the cell in NDC.
-               VBOX( 1 ) = VX1 + REAL( IX - 1 ) * REAL( VDX )
-               VBOX( 3 ) = VBOX( 1 ) + REAL( VDX )
+*  Transform the spatial grid (x,y) for the spectrum into graphics coords.
+                  DCGX = DBLE( CGX ) 
+                  DCGY = DBLE( CGY ) 
+                  CALL AST_TRAN2( CGTOGR, 1, DCGX, DCGY, .TRUE., GRX,
+     :                            GRY, STATUS ) 
+
+*  Get the bounds of the spectrum's cell in GRAPHICS coords. The cell is
+*  centred on the spectrum position found above.
+                  GBOX( 1 ) = REAL( GRX - 0.5D0*DX )
+                  GBOX( 2 ) = REAL( GRY - 0.5D0*DY )
+                  GBOX( 3 ) = GBOX( 1 ) + REAL( DX )
+                  GBOX( 4 ) = GBOX( 2 ) + REAL( DY )
+
+*  If the spectra are being placed on a regular grid covering the data
+*  picture, the GRAPHICS bounds of the cell are formed by linear
+*  subdivision of the plotting region.
+               ELSE
+                  GBOX( 1 ) = X1 + REAL( IX - 1 ) * REAL( DX )
+                  GBOX( 2 ) = Y1 + REAL( IY - 1 ) * REAL( DY )
+                  GBOX( 3 ) = GBOX( 1 ) + REAL( DX )
+                  GBOX( 4 ) = GBOX( 2 ) + REAL( DY )
+               END IF
+
+*  Get the double precision version of the cell bounds.
+               INA( 1 ) = DBLE( GBOX( 1 ) )
+               INA( 2 ) = DBLE( GBOX( 2 ) )
+               INB( 1 ) = INA( 1 ) + DX
+               INB( 2 ) = INA( 2 ) + DY
+
+*  Get the bounds of the cell in NDC.
+               VBOX( 1 ) = AX*GBOX( 1 ) + BX
+               VBOX( 2 ) = AY*GBOX( 2 ) + BY
+               VBOX( 3 ) = AX*GBOX( 3 ) + BX
+               VBOX( 4 ) = AY*GBOX( 4 ) + BY
 
 *  KPG1_PLTLN assumes that it is dealing with the full viewport and
 *  corresponding GRAPHICS co-ordinates.  So we have to reset the
@@ -1075,8 +1139,6 @@
 *  picture in the AGI database. First, produce a WinMap that maps the 
 *  GRAPHICS co-ordinate box covered by this cell on to the corresponding
 *  ranges of GRID co-ordinates (on the SPBAX axis) and data value.
-                  INB( 1 ) = INA( 1 ) + DX
-                  INB( 2 ) = INA( 2 ) + DY
                   OUTA( 1 ) = 0.5D0
                   OUTA( 2 ) = YBOT
                   OUTB( 1 ) = DIM( 3 ) + 0.5D0
@@ -1171,24 +1233,53 @@
 *  Indicate we have not yet draw a spectrum.
          FIRST = .TRUE.   
 
-*  Loop round each spectrum cell.
+*  Loop round each spectrum cell. CGX and CGY are the spatial GRID indices 
+*  of the spectrum in the supplied cube.
          DO IX = 1, NX
+            CGX = NINT( 0.5 + ( REAL( IX ) - 0.5 )*
+     :                       REAL( DIM( 1 ) )/REAL( NX ) )
             CALL PGBBUF
             DO IY = 1, NY
 
 *  Skip if no spectrum was drawn in this cell. 
                IF( CGOOD( IX, IY ) ) THEN
+                  CGY = NINT( 0.5 + ( REAL( IY ) - 0.5 )*
+     :                        REAL( DIM( 2 ) )/REAL( NY ) ) 
+
+*  If the spectra are being aligned spatially with an existing data plot...
+                  IF( ALIGN ) THEN
+
+*  Transform the spatial grid (x,y) for the spectrum into graphics coords.
+                     DCGX = DBLE( CGX ) 
+                     DCGY = DBLE( CGY ) 
+                     CALL AST_TRAN2( CGTOGR, 1, DCGX, DCGY, .TRUE., GRX,
+     :                               GRY, STATUS ) 
+
+*  Get the bounds of the spectrum's cell in GRAPHICS coords. The cell is
+*  centred on the spectrum position found above.
+                     GBOX( 1 ) = REAL( GRX - 0.5D0*DX )
+                     GBOX( 2 ) = REAL( GRY - 0.5D0*DY )
+                     GBOX( 3 ) = GBOX( 1 ) + REAL( DX )
+                     GBOX( 4 ) = GBOX( 2 ) + REAL( DY )
+
+*  If the spectra are being placed on a regular grid covering the data
+*  picture, the GRAPHICS bounds of the cell are formed by linear
+*  subdivision of the plotting region.
+                  ELSE
+                     GBOX( 1 ) = X1 + REAL( IX - 1 ) * REAL( DX )
+                     GBOX( 2 ) = Y1 + REAL( IY - 1 ) * REAL( DY )
+                     GBOX( 3 ) = GBOX( 1 ) + REAL( DX )
+                     GBOX( 4 ) = GBOX( 2 ) + REAL( DY )
+                  END IF
 
 *  If this is the first spectrum, we draw a grid around it using 
 *  AST_GRID.
                   IF( FIRST ) THEN
                      FIRST = .FALSE.              
 
-*  Get the bounds of the cell in GRAPHICS co-ordinates.
-                     GBOX( 1 ) = X1 + ( IX - 1 )*DX
-                     GBOX( 2 ) = Y1 + ( IY - 1 )*DY
-                     GBOX( 3 ) = GBOX( 1 ) + DX
-                     GBOX( 4 ) = GBOX( 2 ) + DY
+*  Record the bounds of the first cell in GRAPHICS co-ordinates.
+                     GBOXFX = GBOX( 1 )
+                     GBOXFY = GBOX( 2 )
 
 *  Create a new Plot covering just the current cell.
                      IPLOT2 = AST_PLOT( FS, GBOX, BBOX, ' ', STATUS )
@@ -1243,8 +1334,9 @@
 *  edge.
                      CALL KPG1_SETASTDSB( .FALSE. )
 
-*  Draw the grid.
-                     CALL KPG1_ASGRD( IPLOT2, IPICF, .TRUE., STATUS )
+*  Draw the grid if required.
+                     IF( SPAXES ) CALL KPG1_ASGRD( IPLOT2, IPICF, 
+     :                                             .TRUE., STATUS )
 
 *  Get the bounding box of the graphics produced by the above call to
 *  AST_GRID.
@@ -1286,12 +1378,12 @@
 *  For subsequent cells, draw the tick marks by translating the 
 *  polylines stored in TICKMAP from the first cell to the current cell. 
 *  This is faster than drawing the ticks using AST_GRID.
-                  ELSE
+                  ELSE IF( SPAXES ) THEN
 
 *  Find the offset in graphics co-ordinates from the bottom-left corner 
 *  of the first cell to be annotated to the current cell.
-                     OFFX = X1 + ( IX - 1 )*DX - GBOX( 1 )
-                     OFFY = Y1 + ( IY - 1 )*DY - GBOX( 2 )
+                     OFFX = GBOX( 1 ) - GBOXFX
+                     OFFY = GBOX( 2 ) - GBOXFY
 
 *  Draw the tick marks for this cell.
                      CALL KPS1_CLPTM( BLEDGE, OFFX, OFFY, NPOLY, 
