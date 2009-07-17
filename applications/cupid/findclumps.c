@@ -1015,6 +1015,7 @@ void findclumps( int *status ) {
    parGet0l( "WCSPAR", &usewcs, status );
 
 /* See what STC-S shape should be used to describe each spatial clump. */
+   ishape = 0;
    parChoic( "SHAPE", "None", "Ellipse,Polygon,None", 1, shape, 10,  
              status );
    if( *status == SAI__OK ) {
@@ -1022,8 +1023,6 @@ void findclumps( int *status ) {
          ishape = 2;
       } else if( !strcmp( shape, "ELLIPSE" ) ) {
          ishape = 1;
-      } else {
-         ishape = 0;
       }
    }
 

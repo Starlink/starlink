@@ -728,7 +728,7 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
          if( shape == 1 ) {
             sig[ 0 ] = ret[ 2*ndim + space_axes[ 0 ] ];
             sig[ 2 ] = ret[ 2*ndim + space_axes[ 1 ] ];
-            reg = cupidEllipseDesc( pixel_frm, space_axes, beamcorr, ndim, 
+            reg = cupidEllipseDesc( pixel_frm, space_axes, beamcorr, 
                                     su/sd, su2/sd, sv2/sd, sv/sd, 
                                     ret[ ndim + space_axes[ 0 ] ], 
                                     ret[ ndim + space_axes[ 1 ] ],
