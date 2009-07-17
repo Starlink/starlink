@@ -1,6 +1,7 @@
 #include "sae_par.h"
 #include "prm_par.h"
 #include "ast.h"
+#include "cupid.h"
 #include <string.h>
 
 AstRegion *cupidPolygonDesc( double *ipd, int velax, double *peak,
@@ -105,7 +106,6 @@ AstRegion *cupidPolygonDesc( double *ipd, int velax, double *peak,
 
 /* Local Variables: */
    AstPolygon *polygon;     /* Returned Polygon */
-   AstRegion *new;          /* Mapped Polygon */
    double *pd;              /* Point to next input mask value */ 
    double *px;              /* Pointer to next vertex X axis value */
    double *py;              /* Pointer to next vertex Y axis value */

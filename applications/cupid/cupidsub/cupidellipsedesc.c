@@ -1,12 +1,13 @@
 #include <math.h>
 #include "sae_par.h"
 #include "star/kaplibs.h"
+#include "cupid.h"
 
 /* The square root of two. */
 #define ROOT_TWO 1.4142136
 
 AstRegion *cupidEllipseDesc( AstFrame *pixel_frm, int space_axes[ 2 ],
-                             double beamcorr[ 3 ], int ndim, double cu, 
+                             double beamcorr[ 3 ], double cu, 
                              double cu2, double cv2, double cv, double cx, 
                              double cy, float sig[ 4 ], int deconv, int *ok, 
                              AstMapping *wcsmap, AstFrame *space_frm, 
@@ -24,7 +25,7 @@ AstRegion *cupidEllipseDesc( AstFrame *pixel_frm, int space_axes[ 2 ],
 
 *  Synopsis:
 *     AstRegion *cupidEllipseDesc( AstFrame *pixel_frm, int space_axes[ 2 ],
-*                                  double beamcorr[ 3 ], int ndim, double cu, 
+*                                  double beamcorr[ 3 ], double cu, 
 *                                  double cu2, double cv2, double cv, double cx,
 *                                  double cy, float sig[ 4 ], int deconv, int *ok, 
 *                                  AstMapping *wcsmap, AstFrame *space_frm, 
@@ -50,8 +51,6 @@ AstRegion *cupidEllipseDesc( AstFrame *pixel_frm, int space_axes[ 2 ],
 *        smoothing along each pixel axis. If "deconv" is non-zero, the clump 
 *        widths and peak values stored in the output catalogue are modified
 *        to correct for this smoothing.
-*     ndim
-*        Number of pixel axes.
 *     cu
 *        Ellipse centre on the U axis (in pixels).
 *     cu2
