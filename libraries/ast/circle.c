@@ -2879,8 +2879,8 @@ AstCircle *astLoadCircle_( void *mem, size_t size, AstCircleVtab *vtab,
 void astCirclePars_( AstCircle *this, double *centre, double *radius,
                      double *p1, int *status ){
    if ( !astOK ) return;
-   return (**astMEMBER(this,Circle,CirclePars))( this, centre, radius,
-                                                 p1, status );
+   (**astMEMBER(this,Circle,CirclePars))( this, centre, radius,
+                                          p1, status );
 }
 
 
