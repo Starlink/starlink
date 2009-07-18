@@ -3030,8 +3030,8 @@ void astEllipsePars_( AstEllipse *this, double centre[2], double *a,
                       double *b, double *angle, double p1[2], double p2[2],
                       int *status ){
    if ( !astOK ) return;
-   return (**astMEMBER(this,Ellipse,EllipsePars))( this, centre, a, b,
-                                                   angle, p1, p2, status );
+   (**astMEMBER(this,Ellipse,EllipsePars))( this, centre, a, b,
+                                            angle, p1, p2, status );
 }
 
 
