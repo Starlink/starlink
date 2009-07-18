@@ -108,12 +108,19 @@ int smf_get_nthread( int *status ){
       msgOutiff( MSG__VERB, "", "Using %d threads obtained from environment variable",
                  status, result );
 
+   } else {
+#ifdef _SC_NPROCESSORS_ONLN
 /* Otherwise, use sysconf. This is fairly portable (Tru64, Linux, OSX, Solaris)
    and supposedly POSIX compliant. */
-   } else {
       result = sysconf(_SC_NPROCESSORS_ONLN);
       msgOutiff( MSG__VERB, "", "Using %d threads derived from number of CPU cores",
                  status, result );
+#else
+/* Otherwise, default the number of threads to 1. */
+      result = 1;
+      msgOutiff( MSG__VERB, "", "Could not determine number of thread to use; using one thread",
+                 status, result );
+#endif
    }
 
 /* Ensure we have at least one thread. */
