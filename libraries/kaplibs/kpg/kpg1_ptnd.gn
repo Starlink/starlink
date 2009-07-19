@@ -5,7 +5,7 @@
 *     KPG1_PTNDx
 
 *  Purpose:
-*     Paste a section of an n-dimensional array into another array.
+*     Pastes a section of an n-dimensional array into another array.
 
 *  Language:
 *     Starlink Fortran 77
@@ -15,8 +15,8 @@
 *                      OUT, EL, STATUS )
 
 *  Description:
-*     This routine pastes a specified section of the supplied n-dimensional 
-*     array (IN) into an output array (OUT).
+*     This routine pastes a specified section of the supplied 
+*     n-dimensional array (IN) into an output array (OUT).
 
 *  Arguments:
 *     NDIM = INTEGER (Given) 
@@ -36,7 +36,7 @@
 *     BAD = LOGICAL (Given)
 *        If .TRUE., then any sections of the output array that fall
 *        outside the input array are filled with bad values. Otherwise, 
-*        the the supplied values in such output array sections are left 
+*        the supplied values in such output array sections are left 
 *        unchanged.
 *     OUT( * ) = ? (Given and Returned)
 *        The output array. Bounds given by LBNDO and UBNDO.
@@ -84,9 +84,6 @@
 *        Fix loop termination condition to prevent accessing
 *        uninitialised entries in CUBND and PIX arrays.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       
@@ -204,11 +201,11 @@
             CDIM( J ) = CUBND( J ) - CLBND( J ) + 1 
          END DO
 
-*  Find the index within the input vectorised array corresponding to the
+*  Find the index within the input vectorised array corresponding to
 *  the first pixel within the section to be copied. Also, find the 
-*  index within the output vectorised array corresponding to the the 
-*  first pixel within the section to be copied. Also, store the indices
-*  of the first pixel to be copied.
+*  index within the output vectorised array corresponding to the first
+*  pixel within the section to be copied. Also, store the indices of
+*  the first pixel to be copied.
          IIN = 1
          IOUT = 1
          DO J = 1, NDIM
@@ -252,7 +249,8 @@
 *  If there are no more axes to increment, we have reached the end of 
 *  the array, so leave the loops.  Also avoid accessing outside the
 *  bounds of the PIX and CUBND arrays for an NDF__MXDIM-dimensional
-*  array.
+*  array, or uninitialised PIX( NDIM + 1  and CUBND( NDIM + 1 ) for
+*  NDIM < NDF__MXDIM.
                IF( J .GT. NDIM ) THEN
                   MORE = .FALSE.
                   J = J - 1
