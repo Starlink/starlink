@@ -26,7 +26,7 @@
 
  *  Copyright:
  *     Copyright (C) 2006-2007 Particle Physics & Astronomy Research Council.
- *     Copyright (C) 2008 Science and Technology Facilities Council.
+ *     Copyright (C) 2008-2009 Science and Technology Facilities Council.
  *     All Rights Reserved.
 
  *  Licence:
@@ -912,7 +912,6 @@ static int SPConfigure( Tcl_Interp *interp, Tk_Canvas canvas,
 {
     SPItem *spPtr = (SPItem *) itemPtr;
     Tk_Window tkwin;
-    Tk_ConfigSpec *specPtr;
 
 #if DEBUG
     fprintf( stderr, "SPConfigure() \n" );
@@ -928,12 +927,9 @@ static int SPConfigure( Tcl_Interp *interp, Tk_Canvas canvas,
 
     /* Check if any options that require the plot to be regenerated
      * were set. */
-    for ( specPtr = configSpecs; specPtr->type != TK_CONFIG_END; specPtr++ ) {
-        if ( specPtr->specFlags & TK_CONFIG_OPTION_SPECIFIED ) {
-            /* All will do for now! */
-            spPtr->newplot = 1;
-            break;
-        }
+    if ( objc > 1 ) {
+        /*  Any new flags mean regenerate. */
+        spPtr->newplot = 1;
     }
     ComputeBBox( canvas, spPtr );
     return TCL_OK;
