@@ -78,7 +78,7 @@ using namespace std;
 int main( int argc, char* argv[] )
 {
     if ( argc != 4 ) {
-        cerr << "usage: " << argv[0] << " votable ncol tab_table" << endl;
+        cerr << "usage: " << argv[0] << " votable ntab tab_table" << endl;
         return 1;
     }
 
@@ -89,9 +89,9 @@ int main( int argc, char* argv[] )
     if ( table->open( argv[1] ) ) {
 
         /*  Table index. */
-        int ncol;
-        if ( gaia::from_string( string( argv[2] ), ncol ) ) {
-            if ( table->saveAsTST( ncol, argv[3] ) ) {
+        int ntab;
+        if ( gaia::from_string( string( argv[2] ), ntab ) ) {
+            if ( table->saveAsTST( ntab, argv[3] ) ) {
                 return 0;
             }
             cerr << "Failed to extract table to file " << argv[3] << endl;
