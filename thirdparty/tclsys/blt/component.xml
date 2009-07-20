@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="blt" support="U">
-  <version>2.4z</version>
+  <version>3.0a</version>
   <path>thirdparty/tclsys/blt</path>
   <description>BLT</description>
   <!-- <abstract><p></p></abstract> -->
