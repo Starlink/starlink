@@ -8,7 +8,6 @@ if { [lsearch -exact $auto_path $gaiavo_library] == -1 } {
 
 #  Packages that we depend on. Name these upfront.
 package require Gaia
-package require dict
 package require tdom
 package require http
 package require log

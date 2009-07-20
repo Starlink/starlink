@@ -1,7 +1,6 @@
 lappend auto_path [pwd]
 
 package require WS::Client
-package require dict
 package require Tclx
 
 ::http::config -proxyhost wwwcache.dur.ac.uk
