@@ -107,6 +107,14 @@ void ndgPutProv( NdgProvenance *prov, int indf, HDSLoc *more, AstKeyMap *more2, 
 void ndgRemoveProv( NdgProvenance *prov, int nanc, int *anc, int *status );
 void ndgUnhideProv( NdgProvenance *, int, int * );
 void ndgWriteProv( NdgProvenance *prov, int indf, int whdef, int *status );
+NdgProvenance *ndgReadVotProv( const char *xml, const char *path, const char *creator, int *status );
+const char *ndgWriteVotProv( NdgProvenance *prov, int *status );
 
+AstXmlElement *ndgHds2vot( const HDSLoc *loc, AstXmlElement *elem, int *status );
+AstXmlElement *ndgPutParam0( AstXmlElement *elem, const char *name, const char *datatype, const char *value, int *status );
+AstXmlElement *ndgPutParam( AstXmlElement *elem, const char *name, int ndim, int *dim, const char *datatype, const char *values, int *status );
+AstXmlElement *ndgPutGroup( AstXmlElement *elem, const char *name, int *status );
+HDSLoc *ndgVot2hds( AstXmlElement *elem, HDSLoc *ploc, int *status );
+const char *ndgGetAttrib( AstXmlElement *elem, const char *name, const char *method, int *status );
 
 #endif
