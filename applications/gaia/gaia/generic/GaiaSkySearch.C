@@ -925,6 +925,7 @@ int GaiaSkySearch::contentCmd( int argc, char *argv[] )
     char* s;
 
     Tcl_ResetResult( interp_ );
+    Tcl_Obj *result = Tcl_GetObjResult( interp_ );
     if ( cat_->isWcs() ) {
         GaiaWorldCoords pos;
         char dec_buf[32];
@@ -941,39 +942,45 @@ int GaiaSkySearch::contentCmd( int argc, char *argv[] )
             pos.format( ra_buf, dec_buf, equinoxStr_ );
 
             //  Put the column values in a list.
-            Tcl_AppendResult( interp_, " {", NULL );
+            Tcl_Obj *list = Tcl_NewListObj( 0, NULL );
             for ( int j = 0; j < ncols; j++ ) {
                 if ( j == ra_col ) {
-                    Tcl_AppendElement( interp_, ra_buf );
+                    Tcl_ListObjAppendElement( interp_, list,
+                                              Tcl_NewStringObj(ra_buf, -1) );
                 }
                 else if ( j == dec_col ) {
-                    Tcl_AppendElement( interp_, dec_buf );
+                    Tcl_ListObjAppendElement( interp_, list,
+                                              Tcl_NewStringObj(dec_buf, -1) );
                 }
                 else {
                     if ( qr->get( i, j, s ) == 0 ) {
-                        Tcl_AppendElement( interp_, s );
+                        Tcl_ListObjAppendElement( interp_, list,
+                                                  Tcl_NewStringObj( s, -1 ) );
                     }
                     else {
-                        Tcl_AppendElement( interp_, "" );
+                        Tcl_ListObjAppendElement( interp_, list,
+                                                  Tcl_NewStringObj( "", -1 ) );
                     }
                 }
             }
-            Tcl_AppendResult(interp_, "}", NULL);
+            Tcl_ListObjAppendElement( interp_, result, list );
         }
     }
     else {
         // Image coords or no coords - no special formatting needed.
         for ( int i = 0; i < nrows; i++ ) {
-            Tcl_AppendResult( interp_, " {", NULL );
+            Tcl_Obj *list = Tcl_NewListObj( 0, NULL );
             for ( int j = 0; j < ncols; j++) {
                 if ( qr->get( i, j, s ) == 0 ) {
-                    Tcl_AppendElement( interp_, s );
+                    Tcl_ListObjAppendElement( interp_, list,
+                                              Tcl_NewStringObj( s, -1 ) );
                 }
                 else {
-                    Tcl_AppendElement( interp_, "" );
+                    Tcl_ListObjAppendElement( interp_, list,
+                                              Tcl_NewStringObj( "", -1 ) );
                 }
             }
-            Tcl_AppendResult(interp_, "}", NULL);
+            Tcl_ListObjAppendElement( interp_, result, list );
         }
     }
     return TCL_OK;
@@ -1367,11 +1374,12 @@ int GaiaSkySearch::queryCmd(int argc, char* argv[])
 
     if (nrows >= 0) {
         Tcl_ResetResult(interp_);
+        Tcl_Obj *result = Tcl_GetObjResult( interp_ );
 
         for (i = 0; i < nrows; i++) {
 
             // start a row
-            Tcl_AppendResult(interp_, " {", NULL);
+            Tcl_Obj *list = Tcl_NewListObj( 0, NULL );
 
             if (cat_->isWcs()) { // include formatted world coords
                 GaiaWorldCoords pos;
@@ -1388,11 +1396,14 @@ int GaiaSkySearch::queryCmd(int argc, char* argv[])
                     if (result_->get(i, j, s) != 0)
                         s = (char *) "";
                     if (j == ra_col)
-                        Tcl_AppendElement(interp_, ra_buf) ;
+                        Tcl_ListObjAppendElement
+                            ( interp_, list, Tcl_NewStringObj(ra_buf, -1) );
                     else if (j == dec_col)
-                        Tcl_AppendElement(interp_, dec_buf) ;
+                        Tcl_ListObjAppendElement
+                            ( interp_, list, Tcl_NewStringObj(dec_buf, -1) );
                     else
-                        Tcl_AppendElement(interp_, s) ;
+                        Tcl_ListObjAppendElement
+                            ( interp_, list, Tcl_NewStringObj(s, -1) );
                 }
             }
             else {  // image coords - no special formatting needed
@@ -1400,12 +1411,13 @@ int GaiaSkySearch::queryCmd(int argc, char* argv[])
                 for (j = 0; j < ncols; j++) {
                     if (result_->get(i, j, s) != 0)
                         s = (char *) "";
-                    Tcl_AppendElement(interp_, s) ;
+                    Tcl_ListObjAppendElement
+                        ( interp_, list, Tcl_NewStringObj( s, -1 ) );
                 }
             }
 
             // end a row
-            Tcl_AppendResult(interp_, "}", NULL);
+            Tcl_ListObjAppendElement( interp_, result, list );
         }
 
         return TCL_OK;
