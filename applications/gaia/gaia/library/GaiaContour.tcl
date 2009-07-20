@@ -1577,7 +1577,7 @@ itcl::class gaia::GaiaContour {
          {Font of all text in key}
 
       #  Now add all the fonts.
-      foreach {font sname} $fontmap_ {
+      foreach {index font sname} $fontmap_ {
          $itk_component(keyfont) add \
             -label $sname \
             -value $font \
@@ -1983,25 +1983,7 @@ itcl::class gaia::GaiaContour {
    protected variable child_
 
    #  Fonts for text in key, plus short description.
-   protected variable fontmap_ {
-      "-adobe-helvetica-medium-r-normal--*-140-*-*-*-*-*-*" "medium"
-      "-adobe-helvetica-medium-o-normal--*-140-*-*-*-*-*-*" "medium"
-      "-adobe-helvetica-bold-r-normal--*-140-*-*-*-*-*-*"   "bold"
-      "-adobe-helvetica-bold-o-normal--*-140-*-*-*-*-*-*"   "bold"
-      "-adobe-helvetica-medium-r-normal--*-120-*-*-*-*-*-*" "medium"
-      "-adobe-helvetica-medium-o-normal--*-120-*-*-*-*-*-*" "medium"
-      "-adobe-helvetica-bold-r-normal--*-120-*-*-*-*-*-*"   "bold"
-      "-adobe-helvetica-bold-o-normal--*-120-*-*-*-*-*-*"   "bold"
-      "-adobe-times-medium-r-normal--*-120-*-*-*-*-*-*"     "medium"
-      "-adobe-times-medium-i-normal--*-120-*-*-*-*-*-*"     "medium"
-      "-adobe-times-bold-r-normal--*-120-*-*-*-*-*-*"       "bold"
-      "-adobe-times-bold-i-normal--*-120-*-*-*-*-*-*"       "bold"
-      "-adobe-courier-medium-r-*-*-*-120-*-*-*-*-*-*"       "fixed-width"
-      "-adobe-courier-medium-o-*-*-*-120-*-*-*-*-*-*"       "fixed-width"
-      "-adobe-courier-bold-r-*-*-*-120-*-*-*-*-*-*"         "fixed-width"
-      "-adobe-courier-bold-o-*-*-*-120-*-*-*-*-*-*"         "fixed-width"
-      "-adobe-helvetica-bold-r-*-*-20-120-*-*-*-*-*-*"      "large screen"
-   }
+   protected variable fontmap_ $::gaia::astfontmap
 
    #  Name of rtdimage used to access external files.
    protected variable image_rtd_ {}

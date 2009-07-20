@@ -1970,26 +1970,7 @@ itcl::class gaia::GaiaAstGrid {
 
    #  Names of the fonts that we will use and their AST indices.
    #  A text string to very briefly describe the font is also set.
-   protected variable fontmap_ {
-      0  "-adobe-helvetica-medium-r-normal--*-140-*-*-*-*-*-*" "medium"
-      1  "-adobe-helvetica-medium-o-normal--*-140-*-*-*-*-*-*" "medium"
-      2  "-adobe-helvetica-bold-r-normal--*-140-*-*-*-*-*-*"   "bold"
-      3  "-adobe-helvetica-bold-o-normal--*-140-*-*-*-*-*-*"   "bold"
-      4  "-adobe-helvetica-medium-r-normal--*-120-*-*-*-*-*-*" "medium"
-      5  "-adobe-helvetica-medium-o-normal--*-120-*-*-*-*-*-*" "medium"
-      6  "-adobe-helvetica-bold-r-normal--*-120-*-*-*-*-*-*"   "bold"
-      7  "-adobe-helvetica-bold-o-normal--*-120-*-*-*-*-*-*"   "bold"
-      8  "-adobe-times-medium-r-normal--*-120-*-*-*-*-*-*"     "medium"
-      9  "-adobe-times-medium-i-normal--*-120-*-*-*-*-*-*"     "medium"
-      10 "-adobe-times-bold-r-normal--*-120-*-*-*-*-*-*"       "bold"
-      11 "-adobe-times-bold-i-normal--*-120-*-*-*-*-*-*"       "bold"
-      12 "-adobe-courier-medium-r-*-*-*-120-*-*-*-*-*-*"       "fixed-width"
-      13 "-adobe-courier-medium-o-*-*-*-120-*-*-*-*-*-*"       "fixed-width"
-      14 "-adobe-courier-bold-r-*-*-*-120-*-*-*-*-*-*"         "fixed-width"
-      15 "-adobe-courier-bold-o-*-*-*-120-*-*-*-*-*-*"         "fixed-width"
-      16 "-adobe-symbol-medium-r-normal-*-*-120-*-*-*-*-*-*"   "symbol"
-      17 "-adobe-helvetica-bold-r-*-*-20-120-*-*-*-*-*-*"      "large screen"
-   }
+   protected variable fontmap_ $::gaia::astfontmap
 
    #  Names of all the possible systems we can plot in and their
    #  need for epoch and equinox qualifiers.

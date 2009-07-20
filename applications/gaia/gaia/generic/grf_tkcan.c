@@ -13,10 +13,10 @@
  *     customized standard and GAIA extended Tk canvas items.
 
  *  Implementation notes:
- *     - This module requires that the "rtd_mark", "rtd_word",
- *       "rtd_segment" and "rtd_polyline" canvas items are available
- *       in the Tcl interpreter (these are distributed as part of GAIA
- *       and built into its standard wish).
+ *     - This module requires that the "rtd_mark", "rtd_segment" and
+ *       "rtd_polyline" canvas items are available in the Tcl interpreter
+ *       (these are distributed as part of GAIA and built into its standard
+ *       wish). Also requires a rotatable text item (Tk 8.6 or backport).
  *
  *     - Before using any AST plotting routines you must invoke the
  *       "astTk_Init" function. This establishes the names of the Tcl
@@ -33,7 +33,7 @@
  *  Copyright:
  *     Copyright (C) 1997-2004 Central Laboratory of the Research Councils
  *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
- *     Copyright (C) 2007-2008 Science and Technology Facilities Council.
+ *     Copyright (C) 2007-2009 Science and Technology Facilities Council.
  *     All Rights Reserved.
 
  *  Licence:
@@ -68,6 +68,9 @@
  *        Added facility to change the colour list.
  *     09-FEB-2004 (PWD):
  *        Added GCap and renamed GAxScale to GScales for AST 3.2 Grf mods.
+ *     11-JUL-2009 (PWD):
+ *        Removed use of rtd_word canvas text item. Use standard text item
+ *        instead (requires Tk 8.6 or backport of code).
  *     {enter_changes_here}
  *-
  */
@@ -108,6 +111,11 @@
 #undef R2D
 #endif
 #define R2D 57.29578             /* Radians to degrees factor */
+#ifdef D2R
+#undef D2R
+#endif
+#define D2R (1.0/57.29578)       /* Degrees to radians factor */
+
 #define CMDLEN 512               /* Maximum length of Tcl message string */
 #define TAGLEN 32                /* Maximum length of a canvas tag */
 #define WIDLEN 132               /* Maximum length of widget name */
@@ -157,31 +165,30 @@ typedef struct configInfo {
 
 static configInfo ConfigInfo;
 
-/*  Define a list of possible fonts. These are typical fonts; variable
- *  width, fixed width and a symbol font. The slants are normal and
- *  slanted (r and o/i). The final fonts are just a gratuitously big
- *  one and the fixed font.
+/*  Define a list of possible fonts. Keep in sync with script values in 
+ *  gaia_defaults.tcl.
  */
-static char *Fonts[19] = {
-    "-adobe-helvetica-medium-r-normal--*-140-*-*-*-*-*-*",
-    "-adobe-helvetica-medium-o-normal--*-140-*-*-*-*-*-*",
-    "-adobe-helvetica-bold-r-normal--*-140-*-*-*-*-*-*",
-    "-adobe-helvetica-bold-o-normal--*-140-*-*-*-*-*-*",
-    "-adobe-helvetica-medium-r-normal--*-120-*-*-*-*-*-*",
-    "-adobe-helvetica-medium-o-normal--*-120-*-*-*-*-*-*",
-    "-adobe-helvetica-bold-r-normal--*-120-*-*-*-*-*-*",
-    "-adobe-helvetica-bold-o-normal--*-120-*-*-*-*-*-*",
-    "-adobe-times-medium-r-normal--*-120-*-*-*-*-*-*",
-    "-adobe-times-medium-i-normal--*-120-*-*-*-*-*-*",
-    "-adobe-times-bold-r-normal--*-120-*-*-*-*-*-*",
-    "-adobe-times-bold-i-normal--*-120-*-*-*-*-*-*",
-    "-adobe-courier-medium-r-*-*-*-120-*-*-*-*-*-*",
-    "-adobe-courier-medium-o-*-*-*-120-*-*-*-*-*-*",
-    "-adobe-courier-bold-r-*-*-*-120-*-*-*-*-*-*",
-    "-adobe-courier-bold-o-*-*-*-120-*-*-*-*-*-*",
-    "-adobe-symbol-medium-r-normal-*-*-120-*-*-*-*-*-*",
-    "-adobe-helvetica-bold-r-*-*-20-120-*-*-*-*-*-*",
-    "fixed"
+static char *Fonts[20] = {
+    "{TkDefaultFont}",
+    "{TkHeadingFont}",
+    "{TkFixedFont}",
+    "{Helvetica -14 normal}",
+    "{Helvetica -14 italic}",
+    "{Helvetica -14 bold}",
+    "{Helvetica -14 bold italic}",
+    "{Helvetica -12 normal}",
+    "{Helvetica -12 italic}",
+    "{Helvetica -12 bold}",
+    "{Helvetica -12 bold italic}",
+    "{Times -12 normal}",
+    "{Times -12 italic}",
+    "{Times -12 bold}",
+    "{Times -12 bold italic}",
+    "{Fixed -14 normal}",
+    "{Fixed -14 normal italic}",
+    "{Fixed -14 bold}",
+    "{Fixed -14 bold italic}",
+    "{Helvetica -24 bold}"
 };
 
 /*  Define a list of possible colours in Tcl format (this is more or
@@ -282,7 +289,7 @@ int astTk_Init( Tcl_Interp *theinterp, const char *thecanvas ) {
     ConfigInfo.font = 0;
     ConfigInfo.colour = 0;
     ConfigInfo.smooth = 0;
-    (void) strcpy( ConfigInfo.tag, "ast_element ");
+    (void) strcpy( ConfigInfo.tag, "ast_element " );
 
     /*  Set the default colormap (this can be overwritten and
         extended, but is only initialised once) */
@@ -309,8 +316,8 @@ int astTk_Init( Tcl_Interp *theinterp, const char *thecanvas ) {
  *     int astTk_SetCanvas( const char *thecanvas )
 
  *  Description:
- *      This routine sets the name of the canvas used to draw and 
- *      display the graphics. It may be invoked after astTk_Init 
+ *      This routine sets the name of the canvas used to draw and
+ *      display the graphics. It may be invoked after astTk_Init
  *      to change the canvas used to draw graphics.
 
  *  Parameters:
@@ -375,7 +382,7 @@ void astTk_Tag( const char *newtag ) {
     } else {
         (void) strcpy( ConfigInfo.tag, "ast_element " );
     }
-    
+
     /*  Need a line segment item. */
     NewSegment = 1;
 }
@@ -385,7 +392,7 @@ void astTk_InitColours() {
  *+
  *  Name:
  *     astTk_InitColours
- 
+
  *  Purpose:
  *     Initialise the standard colours.
 
@@ -421,7 +428,7 @@ void astTk_AddColour( const int index, const char *colour ) {
  *+
  *  Name:
  *     astTk_AddColour
- 
+
  *  Purpose:
  *     Add an indexed Tcl colour to the colour list.
 
@@ -495,7 +502,7 @@ void astTk_LineType( int segments, int smooth ) {
  *-
  */
     ConfigInfo.smooth = smooth;
-    
+
     if ( segments ) {
         LineType = SEGMENTS;
     } else {
@@ -627,19 +634,19 @@ int astGLine( int n, const float *x, const float *y ) {
     int npoints;
     int i;
     int j;
-    
+
     if ( Interp == NULL ) {
         astError( AST__GRFER, "astGLine: Tk graphics system not initialised\n");
         return 0;
     }
-    
+
     /*  If we have some data points. */
     if( n > 1 && x && y ) {
         if ( LineType == SEGMENTS ) {
-            
+
             /*  Use line segments */
             /*  ================= */
-            
+
             /*  Convert input coordinates into a line-segment based format for
                 passing to RtdSegmentSetCoords. */
             npoints = ( 2 * n ) - 2;
@@ -651,54 +658,54 @@ int astGLine( int n, const float *x, const float *y ) {
                 ylines[j]   = y[i];
                 ylines[j+1] = y[i+1];
             }
-            
+
             /*  If using an existing segment then add these new values,
                 otherwise create a new segment and record its tag. */
             if ( NewSegment ) {
                 Plotted = 0;
-                
+
                 /*  Configure the command by adding the canvas name and all the
                     required options. */
                 (void) sprintf( buffer, " -fill %s -width %f -tag {%s} -style %d\n",
                                 Colours[ConfigInfo.colour], ConfigInfo.width,
                                 ConfigInfo.tag, (int) ConfigInfo.style );
-                if ( Tcl_VarEval( Interp, Canvas, " create rtd_segment ", 
+                if ( Tcl_VarEval( Interp, Canvas, " create rtd_segment ",
                                   coords, buffer, (char *) NULL ) != TCL_OK ) {
-                    
+
                     /*  Failed in creation attempt, so issue an error,
                         release the workspace and make sure that a new
                         segment item is created next time. */
-                    astError( AST__GRFER, 
+                    astError( AST__GRFER,
                               "astGLine: failed to create line (%s)",
                               Interp->result );
                     free( xlines );
                     free( ylines );
                     NewSegment = 1;
                     return 0;
-                    
+
                 } else {
-                    
+
                     /*  Now send coordinates (which may be a very long
                         list making it worth avoiding the conversion to
                         a string and back again) */
                     RtdSegmentSetCoords( Interp, 0, xlines, ylines, npoints );
-                    
+
                     /*  Record the name of the item we have just created. */
                     (void) strncpy( Segment, Interp->result, TAGLEN - 1 );
                     NewSegment = 0;
                 }
             } else {
-                
+
                 /*  Use the existing segment. Do a dummy command to make sure
                     context for new positions is correct */
                 if ( Tcl_VarEval( Interp, Canvas, " coords ", Segment,
-                                  " null ", coords, (char *) NULL ) 
+                                  " null ", coords, (char *) NULL )
                      != TCL_OK ) {
 
                     /*  Failed in creation attempt, so issue an error,
                         release the workspace and make sure that a new
                         segment item is created next time. */
-                    astError( AST__GRFER, 
+                    astError( AST__GRFER,
                               "astGLine: failed to append line segments (%s)",
                               Interp->result );
                     free( xlines );
@@ -706,14 +713,14 @@ int astGLine( int n, const float *x, const float *y ) {
                     NewSegment = 1;
                     return 0;
                 } else {
-                    
+
                     /*  Append new coordinates */
                     RtdSegmentSetCoords( Interp, 1, xlines, ylines, npoints );
                 }
             }
             free( xlines );
             free( ylines );
-            
+
             /*  If number of segments exceeds the maximum number allowed per
                 item, then start a new Segment next time */
             Plotted += n;
@@ -721,10 +728,10 @@ int astGLine( int n, const float *x, const float *y ) {
                 NewSegment = 1;
             }
         } else {
-            
+
             /*  Use a single polyline. */
             /*  =====================  */
-            
+
             /*  Convert input coordinates into doubles */
             xlines = malloc( sizeof( double ) * n );
             ylines = malloc( sizeof( double ) * n );
@@ -732,17 +739,17 @@ int astGLine( int n, const float *x, const float *y ) {
                 xlines[i] = x[i];
                 ylines[i] = y[i];
             }
-            
+
             /*  Configure the command by adding the canvas name and all the
                 required options. */
-            (void) sprintf( buffer, 
+            (void) sprintf( buffer,
                             " -fill %s -width %f -tag {%s} -smooth %d -style %d\n",
                             Colours[ConfigInfo.colour], ConfigInfo.width,
-                            ConfigInfo.tag, ConfigInfo.smooth, 
+                            ConfigInfo.tag, ConfigInfo.smooth,
                             (int) ConfigInfo.style );
             if ( Tcl_VarEval( Interp, Canvas, " create rtd_polyline ",
                               coords, buffer, (char *) NULL ) != TCL_OK ) {
-                
+
                 /*  Failed in creation attempt, so issue an error,
                     release the workspace and make sure that a new
                     segment item is created next time. */
@@ -751,9 +758,9 @@ int astGLine( int n, const float *x, const float *y ) {
                 free( xlines );
                 free( ylines );
                 return 0;
-                
+
             } else {
-                
+
                 /*  Now send coordinates (which may be a very long
                     list making it worth avoiding the conversion to a
                     string and back again) */
@@ -819,15 +826,15 @@ int astGMark( int n, const float *x, const float *y, int type ) {
     char *shape;
     char buffer[CMDLEN];
     int i;
-    
+
     if ( Interp == NULL ) {
-        astError( AST__GRFER, 
+        astError( AST__GRFER,
                   "astGMark: Tk graphics system not initialised\n");
         return 0;
     }
-    
+
     if( n > 0 && x && y ) {
-        
+
         /* Convert marker type into one known to the rtd_mark item. If
            the value is out of range then the user gets a circle. */
         switch (type) {
@@ -855,12 +862,12 @@ int astGMark( int n, const float *x, const float *y, int type ) {
         default:
             shape = "circle";
         }
-        
+
         /* Fill the string buffer with the rtd_mark creation and
            configuration command. The evaluate it to create the canvas
            item. */
         for ( i = 0; i < n; i++ ) {
-            (void) sprintf( buffer, 
+            (void) sprintf( buffer,
                             "%s create rtd_mark %f %f -type %s -size %d "
                             " -width %d -outline %s -fill %s -tag {%s}\n",
                             Canvas, (double) x[i], (double) y[i], shape,
@@ -897,9 +904,8 @@ int astGText( const char *text, float x, float y, const char *just,
  *     This function displays a character string at a given position
  *     using a specified justification and up-vector (orientation).
  *
- *     The "rtd_word" canvas item is used so that the strings may be
- *     drawn at any angle and with different scale factors (these
- *     facilities are not available in the standard Tk text item).
+ *     The "text" canvas item is used so that the strings may be
+ *     drawn at any angle.
 
  *  Parameters:
  *     const char *text
@@ -947,40 +953,38 @@ int astGText( const char *text, float x, float y, const char *just,
     char anchor[3];
     char buffer[CMDLEN];
     float angle;
-    
+
     if ( Interp == NULL ) {
-        astError( AST__GRFER, 
+        astError( AST__GRFER,
                   "astGText: Tk graphics system not initialised\n");
         return 0;
     }
-    
-    
+
+
     /* Check that there is something to draw. */
     if( text && text[ 0 ] != 0 ){
-        
+
         /* Translate the justification string into a Tk anchor string. */
         if ( ! textAnchor( just, anchor ) ) {
             return 0;
         }
-        
+
         /* Get the angle between the text base-line and horizontal. */
         angle = atan2( -(double) upx, (double) upy ) * R2D;
-        
+
         /* Now display the text. */
-        (void) sprintf ( buffer, 
-                         "%s create rtd_word %f %f -word {%s} -angle %f "
-                         "-anchor %s -scale %f -font %s -fill %s -tag {%s} "
-                         "-resize %d \n",
+        (void) sprintf ( buffer,
+                         "%s create text %f %f -text {%s} -angle %f "
+                         "-anchor %s -font %s -fill %s -tag {%s} \n",
                          Canvas, (double) x, (double) y, text, angle, anchor,
-                         ConfigInfo.size, Fonts[ConfigInfo.font],
-                         Colours[ConfigInfo.colour],
-                         ConfigInfo.tag, ConfigInfo.resize );
+                         Fonts[ConfigInfo.font], Colours[ConfigInfo.colour],
+                         ConfigInfo.tag );
         if ( Tcl_Eval( Interp, buffer ) != TCL_OK ) {
             astError( AST__GRFER, "astGText: Failed to draw text." );
             return 0;
         }
     }
-    
+
     /* Return. */
     return 1;
 }
@@ -991,10 +995,10 @@ int astGTxExt( const char *text, float x, float y, const char *just,
  *+
  *  Name:
  *     astGTxExt
- 
+
  *  Purpose:
  *     Get the extent of a character string.
- 
+
  *  Synopsis:
  *     #include "grf.h"
  *     int astGTxExt( const char *text, float x, float y, const char *just,
@@ -1049,37 +1053,37 @@ int astGTxExt( const char *text, float x, float y, const char *just,
     char anchor[3];
     float angle;
     int i;
-    
+
     if ( Interp == NULL ) {
-        astError( AST__GRFER, 
+        astError( AST__GRFER,
                   "astGTxExt: Tk graphics system not initialised\n");
         return 0;
     }
-    
+
     /* Initialise the returned values to indicate no box available. */
     for( i = 0; i < 4; i++ ){
         xb[i] = 0.0f;
         yb[i] = 0.0f;
     }
-    
+
     /* Check that there is something to draw. */
     if( text && text[ 0 ] != 0 ){
-        
+
         /* Translate the justification string into a Tk anchor string. */
         if ( ! textAnchor( just, anchor ) ) {
             return 0;
         }
-        
+
         /* Get the angle between the text base-line and horizontal. */
         angle = atan2( -(double) upx, (double) upy ) * R2D;
-        
+
         /* Now get the bounding box. */
         if ( ! textBBox ( (double) x, (double) y, text, anchor,
                           (double) angle, xb, yb ) ) {
             return 0;
         }
     }
-    
+
     /* Return. */
     return 1;
 }
@@ -1120,12 +1124,12 @@ int astGQch( float *chv, float *chh ){
 
     /* Local Variables: */
     float xbox[4], ybox[4];
-    
+
     if ( Interp == NULL ) {
         astError( AST__GRFER, "astGQch: Tk graphics system not initialised\n");
         return 0;
     }
-    
+
     /* Get the bounding box for a horizontal text string with good up
        and down span. */
     if ( ! textBBox ( 0.0, 0.0, "ABCD", "c", 0.0, xbox, ybox ) ) {
@@ -1134,7 +1138,7 @@ int astGQch( float *chv, float *chh ){
         *chh = ybox[3] - ybox[0];
         if ( *chh < 0 ) *chh = -(*chh);
     }
-    
+
     /* Same for vertical text. */
     if ( ! textBBox ( 0.0, 0.0, "ABCD", "c", 90.0, xbox, ybox ) ) {
         return 0;
@@ -1142,7 +1146,7 @@ int astGQch( float *chv, float *chh ){
         *chv = xbox[3] - xbox[0];
         if ( *chv < 0 ) *chv = -(*chv);
     }
-    
+
     /* Return. */
     return 1;
 }
@@ -1198,74 +1202,75 @@ int astGAttr( int attr, double value, double *old_value, int prim ){
  */
     int ival;
     double dval;
-    
+
     if ( Interp == NULL ) {
-        astError( AST__GRFER, 
+        astError( AST__GRFER,
                   "astGAttr: Tk graphics system not initialised\n" );
         return 0;
     }
-    
+
     /* If required retrieve the current line style, and set a new line
        style. This can be 0, 1, 2 or 3. */
     if ( attr == GRF__STYLE ) {
         if ( old_value ) *old_value = ConfigInfo.style;
-        
+
         if ( value != AST__BAD ) {
-            
+
             /* Need a new segment item if the value has changed. */
             if ( value != ConfigInfo.style ) {
                 NewSegment = 1;
             }
             ConfigInfo.style = MAX( 0.0, MIN( value, 3.0 ) );
         }
-    } 
+    }
     else if ( attr == GRF__WIDTH ) {
-        
+
         /* If required retrieve the current line width, and set a new
            line width.  Line width is scaled betwen 0.0 (minimum
            thickness) and 1.0 (maximum thickness). */
         if ( old_value ) *old_value = ConfigInfo.width / 200.0;
-        
+
         if( value != AST__BAD ){
             dval = MAX( 0.0, MIN( 200.0, ( value * 200.0 ) ) );
-            
+
             /* Need a new segment item if the value has changed. */
             if ( dval != ConfigInfo.width ) {
                 NewSegment = 1;
             }
             ConfigInfo.width = MAX( 0.0, MIN( 200.0, ( value * 200.0 ) ) );
         }
-        
+
     } else if( attr == GRF__SIZE ){
-        
+
         /* If required retrieve the current character size, and set a
            new size.  The attribute value should be a factor by which
            to multiply the default character size. */
         if( old_value ) *old_value = ConfigInfo.size;
-        
+
         if( value != AST__BAD ){
             ConfigInfo.size = value;
         }
-        
+
     } else if( attr == GRF__FONT ){
-        
+
         /* If required retrieve the current character font, and set a
            new font. */
         if( old_value ) *old_value = (double) ConfigInfo.font;
-        
+
         if( value != AST__BAD ) {
-            ConfigInfo.font = MAX( 0, MIN( 18, (int) value ) );
+            ConfigInfo.font = MAX( 0, MIN( sizeof( Fonts ) / sizeof( char * ) - 1,
+                                           (int) value ) );
         }
-        
+
     } else if( attr == GRF__COLOUR ){
-        
+
         /* If required retrieve the current colour index, and set a
            new colour index. */
         if( old_value ) *old_value = (double) ConfigInfo.colour;
-        
+
         if( value != AST__BAD ){
             ival = MAX( 0, MIN( MAXCOLOURS - 1, (int) value ) );
-            
+
             /* Need a new segment item if the value has changed. */
             if ( ival != ConfigInfo.colour ) {
                 NewSegment = 1;
@@ -1273,13 +1278,13 @@ int astGAttr( int attr, double value, double *old_value, int prim ){
             ConfigInfo.colour = ival;
         }
     } else {
-        
+
         /* Give an error message for any other attribute value. */
         astError( AST__GRFER, "astGAttr: Unknown graphics attribute '%d' "
                   "requested.", attr );
         return 0;
     }
-    
+
     /* Return. */
     return 1;
 }
@@ -1332,35 +1337,35 @@ int astGCap( int cap, int value ){
  *+
  *  Name:
  *     astGCap
- 
+
  *  Purpose:
  *     Indicate if this grf module has a given capability.
- 
+
  *  Synopsis:
  *     #include "grf.h"
  *     int astGCap( int cap, int value )
- 
+
  *  Description:
  *     This function is called by the AST Plot class to determine if the
  *     grf module has a given capability, as indicated by the "cap"
  *     argument.
- 
+
  *  Parameters:
  *     cap
  *        The capability being inquired about. This will be one of the
  *        following constants defined in grf.h:
- *        
- *        GRF__SCALES: This function should return a non-zero value if 
- *        it implements the astGScales function, and zero otherwise. The 
+ *
+ *        GRF__SCALES: This function should return a non-zero value if
+ *        it implements the astGScales function, and zero otherwise. The
  *        supplied "value" argument should be ignored.
  *
- *        GRF__MJUST: This function should return a non-zero value if 
- *        the astGText and astGTxExt functions recognise "M" as a 
+ *        GRF__MJUST: This function should return a non-zero value if
+ *        the astGText and astGTxExt functions recognise "M" as a
  *        character in the justification string. If the first character of
  *        a justification string is "M", then the text should be justified
- *        with the given reference point at the bottom of the bounding box. 
+ *        with the given reference point at the bottom of the bounding box.
  *        This is different to "B" justification, which requests that the
- *        reference point be put on the baseline of the text, since some 
+ *        reference point be put on the baseline of the text, since some
  *        characters hang down below the baseline. If the astGText or
  *        astGTxExt function cannot differentiate between "M" and "B",
  *        then this function should return zero, in which case "M"
@@ -1370,22 +1375,22 @@ int astGCap( int cap, int value ){
  *        GRF__ESC: This function should return a non-zero value if the
  *        astGText and astGTxExt functions can recognise and interpret
  *        graphics escape sequences within the supplied string. These
- *        escape sequences are described below. Zero should be returned 
+ *        escape sequences are described below. Zero should be returned
  *        if escape sequences cannot be interpreted (in which case the
  *        Plot class will interpret them itself if needed). The supplied
- *        "value" argument should be ignored only if escape sequences cannot 
+ *        "value" argument should be ignored only if escape sequences cannot
  *        be interpreted by astGText and astGTxExt. Otherwise, "value"
  *        indicates whether astGText and astGTxExt should interpret escape
  *        sequences in subsequent calls. If "value" is non-zero then
  *        escape sequences should be interpreted by astGText and
  *        astGTxExt. Otherwise, they should be drawn as literal text.
- 
+
  *  Returned Value:
  *     The return value, as described above. Zero should be returned if
  *     the supplied capability is not recognised.
- 
+
  *  The escape sequences etc. are documented in AST SUN/211.
- 
+
  *-
  */
     if ( cap == GRF__SCALES ) {
@@ -1427,7 +1432,7 @@ static int textBBox( double x, double y, const char *text,
  *     const char *anchor
  *        The Tk text anchor.
  *     double angle
- *        Postion angle of text (as used by rtd_word).
+ *        Postion angle of text.
  *     float *xb
  *        Pointer to an array of four floats. These will be set to the
  *        x bounding box positions on exit.
@@ -1441,35 +1446,102 @@ static int textBBox( double x, double y, const char *text,
  */
 
     /*  Local Variables. */
+    Tcl_Obj **lbbox;
+    Tcl_Obj *res;
+    Tk_Anchor tkanchor;
     char buffer[CMDLEN];
+    double cosa;
+    double dx = 0.0;
+    double dy = 0.0;
+    double sina;
     double xbd[4];
     double ybd[4];
-    
+    int i;
+    int nbbox;
+
     /*  First display the text using the current configuration
         options, as well as the position and angle. Note we use an
         unlikely canvas tag to arrange control of the item. */
-    (void) sprintf ( buffer, "%s create rtd_word %f %f -word {%s} -angle %f "
-                     "-anchor %s -scale %f -font %s -resize %d "
-                     "-tag grf_word_temp \n",
-                     Canvas, x, y, text, angle, anchor, ConfigInfo.size,
-                     Fonts[ConfigInfo.font], ConfigInfo.resize );
+    (void) sprintf ( buffer, "%s create text %f %f -text {%s} "
+                     "-anchor %s -font %s -tag grf_word_temp",
+                     Canvas, x, y, text, anchor, Fonts[ConfigInfo.font] );
+
     if ( Tcl_Eval( Interp, buffer ) == TCL_OK ) {
-        
-        /*  Now get the bounding box of the text and then remove it (note
-            we use a special function of the rtd_word item directly to get
-            this, as Tk only returns the axis aligned box). */
+
+        /*  Now get the bounding box of the text and then remove it. */
         (void) sprintf ( buffer, "%s bbox %s \n", Canvas, Interp->result );
         if ( Tcl_Eval( Interp, buffer ) == TCL_OK ) {
-            RtdWordLastBBox( xbd, ybd );
-            xb[0] = (float) xbd[0];
-            xb[1] = (float) xbd[1];
-            xb[2] = (float) xbd[2];
-            xb[3] = (float) xbd[3];
-            yb[0] = (float) ybd[0];
-            yb[1] = (float) ybd[1];
-            yb[2] = (float) ybd[2];
-            yb[3] = (float) ybd[3];
-            
+
+            /*  Get the unrotated bounding box and create the other corner
+             * positions. */
+            res = Tcl_GetObjResult( Interp );
+            Tcl_ListObjGetElements( Interp, res, &nbbox, &lbbox );
+            Tcl_GetDoubleFromObj( Interp, lbbox[0], &xbd[0] );
+            Tcl_GetDoubleFromObj( Interp, lbbox[1], &ybd[0] );
+            Tcl_GetDoubleFromObj( Interp, lbbox[2], &xbd[2] );
+            Tcl_GetDoubleFromObj( Interp, lbbox[3], &ybd[2] );
+
+            xbd[1] = xbd[2];
+            ybd[1] = ybd[0];
+            xbd[3] = xbd[0];
+            ybd[3] = ybd[2];
+
+            /*  Rotate text bounding box to get the real corners. Need to
+             *  move to anchor position, rotate and then translate back. */
+            Tk_GetAnchor( Interp, anchor, &tkanchor );
+            switch ( tkanchor ) {
+                case TK_ANCHOR_NW:
+                case TK_ANCHOR_N:
+                case TK_ANCHOR_NE:
+                    dy = ybd[0];
+                    break;
+
+                case TK_ANCHOR_W:
+                case TK_ANCHOR_CENTER:
+                case TK_ANCHOR_E:
+                    dy = 0.5 * ( ybd[2] + ybd[0] );
+                    break;
+
+                case TK_ANCHOR_SW:
+                case TK_ANCHOR_S:
+                case TK_ANCHOR_SE:
+                    dy = ybd[1];
+                    break;
+            }
+
+            switch ( tkanchor ) {
+                case TK_ANCHOR_NW:
+                case TK_ANCHOR_W:
+                case TK_ANCHOR_SW:
+                    dx = xbd[0];
+                    break;
+
+                case TK_ANCHOR_N:
+                case TK_ANCHOR_CENTER:
+                case TK_ANCHOR_S:
+                    dx = 0.5 * ( xbd[1] + xbd[0] );
+                    break;
+
+                case TK_ANCHOR_NE:
+                case TK_ANCHOR_E:
+                case TK_ANCHOR_SE:
+                    dx = xbd[1];
+                    break;
+            }
+
+
+            cosa = cos( angle * D2R );
+            sina = sin( angle * D2R );
+
+            for( i = 0; i < 4; i++ ) {
+                xb[i] = dx +
+                    ( ( xbd[i] - dx ) * cosa ) +
+                    ( ( ybd[i] - dy ) * sina );
+                yb[i] = dy +
+                    ( ( xbd[i] - dx ) * -sina ) +
+                    ( ( ybd[i] - dy ) *  cosa );
+            }
+
             /*  Remove the word. */
             (void) sprintf ( buffer, "%s delete grf_word_temp \n", Canvas );
             (void) Tcl_Eval( Interp, buffer );
@@ -1498,13 +1570,13 @@ static int textAnchor ( const char *just, char *anchor ) {
 
  *  Description:
  *     This routine takes an AST justification string and converts it
- *     into the equivalent rtd_word anchor string.
+ *     into the equivalent text anchor string.
 
  *  Parameters:
  *     const char *just
  *        The AST standard justification string.
  *     char *anchor
- *        Pointer to a string for the rtd_word anchor postion.
+ *        Pointer to a string for the text anchor postion.
 
  *  Return value:
  *     1 for success, 0 otherwise.
@@ -1515,43 +1587,47 @@ static int textAnchor ( const char *just, char *anchor ) {
 
  */
 
-    anchor[0] = ' ', anchor[1] = ' ', anchor[2] = '\0';
+    anchor[0] = ' ', anchor[1] = '\0', anchor[2] = '\0';
     if( just ) {
+
         switch ( just[0] ) {
-        case 'T':
-            anchor[0] = 's'; break;
-        case 'C':
-            anchor[0] = 'c'; break;
-        case 'B':
-            anchor[0] = 'n'; break;
+            case 'T':
+                anchor[0] = 'n'; break;
+            case 'C':
+                anchor[0] = 'c'; break;
+            case 'B':
+                anchor[0] = 's'; break;
         }
-        
+
         switch ( just[1] ) {
-        case 'L':
-            if ( anchor[0] == 'c' ) {
-                anchor[0] = 'e';
-            } else {
+            case 'L':
+                if ( anchor[0] == 'c' ) {
+                    anchor[0] = 'w';
+                } else {
+                    anchor[1] = 'w';
+                }
+                break;
+            case 'R':
+                if ( anchor[0] == 'c' ) {
+                    anchor[0] = 'e';
+                } else {
                 anchor[1] = 'e';
+                }
+                break;
+            case 'C':
+                break;
+            default: {
+                astError( AST__GRFER, "astGText: Justification string '%s' is "
+                          "invalid.", just );
+                return 0;
             }
-            break;
-        case 'R':
-            if ( anchor[0] == 'c' ) {
-                anchor[0] = 'w';
-            } else {
-                anchor[1] = 'w';
-            }
-            break;
-        case 'C':
-            break;
-        default:
-            astError( AST__GRFER, "astGText: Justification string '%s' is "
-                      "invalid.", just );
-            return 0;
+
         }
     } else {
-        
+
         /*  NULL string equates to a center anchor. */
         anchor[0] = 'c';
     }
+
     return 1;
 }
