@@ -239,6 +239,10 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  External References:
+      INTEGER KPG1_FLOOR         ! Most positive integer .LE. a given
+                                 ! real
+
 *  Local Constants:
       INTEGER MXCLIP             ! Max. number of clipping levels
       PARAMETER ( MXCLIP = 5 )
@@ -620,7 +624,7 @@
      :                          %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                          BQUANT( 2 ), STATUS )
                MEDIUN = NUM_BTOD( BQUANT( 2 ) )
-               MEDIAN = FLOOR( 0.5D0 * ( MEDIAN + MEDIUN ) )
+               MEDIAN = KPG1_FLOOR( 0.5D0 * ( MEDIAN + MEDIUN ) )
             END IF
  
 *  Extract the percentiles.
@@ -630,7 +634,7 @@
                CALL KPG1_RETVB( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                          NUMPER, UPERIN, BQUANT, STATUS )
                DO I = 1, NUMPER
-                  PERVAL( I ) = FLOOR( NUM_BTOD( BQUANT( I ) ) )
+                  PERVAL( I ) = KPG1_FLOOR( NUM_BTOD( BQUANT( I ) ) )
                END DO
             END IF
 
@@ -661,7 +665,7 @@
      :                           %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                           BQUANT( 2 ), STATUS )
                MEDIUN = NUM_UBTOD( BQUANT( 2 ) )
-               MEDIAN = FLOOR( 0.5D0 * ( MEDIAN + MEDIUN ) )
+               MEDIAN = KPG1_FLOOR( 0.5D0 * ( MEDIAN + MEDIUN ) )
             END IF
  
 *  Extract the percentiles.
@@ -671,7 +675,7 @@
                CALL KPG1_RETVUB( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                           NUMPER, UPERIN, BQUANT, STATUS )
                DO I = 1, NUMPER
-                  PERVAL( I ) = FLOOR( NUM_UBTOD( BQUANT( I ) ) )
+                  PERVAL( I ) = KPG1_FLOOR( NUM_UBTOD( BQUANT( I ) ) )
                END DO
             END IF
 
@@ -729,7 +733,7 @@
      :                          %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                          IQUANT( 2 ), STATUS )
                MEDIUN = NUM_ITOD( IQUANT( 2 ) )
-               MEDIAN = FLOOR( 0.5D0 * ( MEDIAN + MEDIUN ) )
+               MEDIAN = KPG1_FLOOR( 0.5D0 * ( MEDIAN + MEDIUN ) )
             END IF
  
 *  Extract the percentiles.
@@ -739,7 +743,7 @@
                CALL KPG1_RETVI( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                          NUMPER, UPERIN, IQUANT, STATUS )
                DO I = 1, NUMPER
-                  PERVAL( I ) = FLOOR( NUM_ITOD( IQUANT( I ) ) )
+                  PERVAL( I ) = KPG1_FLOOR( NUM_ITOD( IQUANT( I ) ) )
                END DO
             END IF
 
@@ -807,7 +811,7 @@
      :                          %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                          WQUANT( 2 ), STATUS )
                MEDIUN = NUM_WTOD( WQUANT( 2 ) )
-               MEDIAN = FLOOR( 0.5D0 * ( MEDIAN + MEDIUN ) )
+               MEDIAN = KPG1_FLOOR( 0.5D0 * ( MEDIAN + MEDIUN ) )
             END IF
  
 *  Extract the percentiles.
@@ -817,7 +821,7 @@
                CALL KPG1_RETVW( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                          NUMPER, UPERIN, WQUANT, STATUS )
                DO I = 1, NUMPER
-                  PERVAL( I ) = FLOOR( NUM_WTOD( WQUANT( I ) ) )
+                  PERVAL( I ) = KPG1_FLOOR( NUM_WTOD( WQUANT( I ) ) )
                END DO
             END IF
 
@@ -848,7 +852,7 @@
      :                           %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                           WQUANT( 2 ), STATUS )
                MEDIUN = NUM_UWTOD( WQUANT( 2 ) )
-               MEDIAN = FLOOR( 0.5D0 * ( MEDIAN + MEDIUN ) )
+               MEDIAN = KPG1_FLOOR( 0.5D0 * ( MEDIAN + MEDIUN ) )
             END IF
 
 *  Extract the percentiles.
@@ -858,7 +862,7 @@
                CALL KPG1_RETVUW( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                           NUMPER, UPERIN, WQUANT, STATUS )
                DO I = 1, NUMPER
-                  PERVAL( I ) = FLOOR( NUM_UWTOD( WQUANT( I ) ) )
+                  PERVAL( I ) = KPG1_FLOOR( NUM_UWTOD( WQUANT( I ) ) )
                END DO
             END IF
 
