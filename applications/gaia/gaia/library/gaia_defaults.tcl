@@ -43,22 +43,23 @@ proc gaia::setXdefaults {} {
     #  Overrides of other defaults (cat/skycat/rtd/util).
     option add *LabelMenu.relief raised
 
-    #  Use three main fonts for the UI. One for labels, monospaced text
-    #  and the special symbols.
+    #  Use three main fonts for the UI. One for labels and monospaced text.
+    #  Special symbols are now handled using unicode symbols, so use 
+    #  same font as labels. Still separate in UI.
     if { [info exists ::gaia_fonts(labelfont)] } {
        set labelFont $::gaia_fonts(labelfont)
     } else {
-       set labelFont variable
+       set labelFont TkDefaultFont
     }
     if { [info exists ::gaia_fonts(textfont)] } {
        set textFont $::gaia_fonts(textfont)
     } else {
-       set textFont fixed
+       set textFont TkFixedFont
     }
-    if { [info exists ::gaia_fonts(wcsfont)] } {
-       set wcsFont $::gaia_fonts(wcsfont)
+    if { [info exists ::gaia_fonts(labelfont)] } {
+       set wcsFont $::gaia_fonts(labelfont)
     } else {
-       set wcsFont "-*-symbol-*-*-*-*-*-140-*-*-*-*-*-*"
+       set wcsFont TkDefaultFont
     }
 
     option add *Font        $labelFont
@@ -67,6 +68,11 @@ proc gaia::setXdefaults {} {
     option add *valueFont   $textFont
     option add *wcsFont     $wcsFont
     option add *titleFont   $labelFont
+
+    #  For BLT graph axes, nothing else works.
+    option add *Axis.tickFont  TkHeadingFont
+    option add *Axis.titleFont TkHeadingFont
+    option add *Graph.font     TkHeadingFont
 
     option add *Button.Font              $labelFont
     option add *Checkbutton.Font         $labelFont
@@ -121,12 +127,14 @@ proc gaia::setXdefaults {} {
     option add *LabelEntryMenu.buttonrelief raised
     option add *LabelEntryMenu.indicatorOn  1
 
-    option add *LabelFileChooser.anchor w
+    option add *LabelFileChooser.anchor       w
     option add *LabelFileChooser.buttonRelief raised
+
     option add *LabelFontChooser.anchor w
 
-    option add *LabelCubeFileChooser.anchor w
+    option add *LabelCubeFileChooser.anchor       w
     option add *LabelCubeFileChooser.buttonRelief raised
+
     option add *LabelCubeFontChooser.anchor w
 
     option add *LabelScale.anchor w
@@ -175,9 +183,8 @@ proc gaia::setXdefaults {} {
        -*-times-bold-r-*-*-*-240-*-*-*-*-*-*
     }
 
-    #  Stop fixed font being used in on Canvas (this doesn't print).
-    option add *StarCanvasDraw.textFont -adobe-courier-medium-r-*-*-*-120-*-*-*-*-*-*
-    option add *CanvasDraw.textFont -adobe-courier-medium-r-*-*-*-120-*-*-*-*-*-*
+    option add *StarCanvasDraw.textFont $textFont
+    option add *CanvasDraw.textFont $textFont
 
     #  OptionDialog
     option add *OptionDialog.messageWidth 5i 
@@ -195,4 +202,29 @@ proc gaia::setXdefaults {} {
     bind Listbox <4> "%W yview scroll -1 units"
     bind Listbox <5> "%W yview scroll 1 units"
 
+    #  Fonts available in the AST interface. These should match those 
+    #  defined in grf_tkcan.c.
+    global ::gaia::astfontmap 
+    set ::gaia::astfontmap {
+       0  "TkDefaultFont"             "default"
+       1  "TkHeadingFont"             "label"
+       2  "TkFixedFont"               "fixed"
+       3  "Helvetica -14 normal"      "medium"
+       4  "Helvetica -14 italic"      "medium"
+       5  "Helvetica -14 bold"        "bold"
+       6  "Helvetica -14 bold italic" "bold"
+       7  "Helvetica -12 normal"      "medium"
+       8  "Helvetica -12 italic"      "medium"
+       9  "Helvetica -12 bold"        "bold"
+       10 "Helvetica -12 bold italic" "bold"
+       11 "Times -12 normal"          "medium"
+       12 "Times -12 italic"          "medium"
+       13 "Times -12 bold"            "bold"
+       14 "Times -12 bold italic"     "bold"
+       15 "Fixed -14 normal"          "fixed"
+       16 "Fixed -14 normal italic"   "fixed"
+       17 "Fixed -14 bold"            "fixed"
+       18 "Fixed -14 bold italic"     "fixed"
+       19 "Helvetica -24 bold"         "large"
+    }
 }

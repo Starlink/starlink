@@ -212,7 +212,6 @@ itcl::class gaia::GaiaStartup {
    public method close {} {
       $itk_component(labelfont) withdraw
       $itk_component(textfont) withdraw
-      $itk_component(wcsfont) withdraw
       wm withdraw $w_
    }
 
@@ -254,9 +253,8 @@ itcl::class gaia::GaiaStartup {
       set values_($this,autofit) 0
       set values_($this,pixel_indices) 0
 
-      set values_($this,labelfont) variable
-      set values_($this,textfont) fixed
-      set values_($this,wcsfont) "-*-symbol-*-*-*-*-*-140-*-*-*-*-*-*"
+      set values_($this,labelfont) TkDefaultFont
+      set values_($this,textfont) TkFixedFont
       set values_($this,font_scale) 0.0
 
       set values_($this,blank_color) black
@@ -753,7 +751,7 @@ itcl::class gaia::GaiaStartup {
    #  Add "font" controls.
    protected method add_font_controls_ {parent} {
 
-      #  Fonts, label, text and WCS.
+      #  Fonts, label and text.
       itk_component add labelfont {
          LabelFontChooser $parent.labelfont \
             -text "Label font:" \
@@ -778,18 +776,6 @@ itcl::class gaia::GaiaStartup {
       add_short_help $itk_component(textfont) \
          {Font used for fixed width text (requires restart)}
       pack $itk_component(textfont) -side top -fill x -expand 0
-
-      itk_component add wcsfont {
-         LabelFontChooser $parent.wcsfont \
-            -text "WCS font:" \
-            -chooser_title "WCS font" \
-            -labelwidth 10 \
-            -value $values_($this,wcsfont) \
-            -textvariable [scope values_($this,wcsfont)]
-      }
-      add_short_help $itk_component(wcsfont) \
-         {Font used for WCS labels (requires restart)}
-      pack $itk_component(wcsfont) -side top -fill x -expand 0
 
       #  Font scale. Only scales non-pixel fonts, but adjusts padding anyway.
       itk_component add fontscale {
@@ -890,7 +876,6 @@ itcl::class gaia::GaiaStartup {
       textfont
       transient_spectralplot
       transient_tools
-      wcsfont
       with_colorramp
       with_pan_window
       with_zoom_window

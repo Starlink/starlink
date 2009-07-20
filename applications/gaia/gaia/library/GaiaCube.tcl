@@ -1917,10 +1917,9 @@ itcl::class gaia::GaiaCube {
    }
 
    #  Font of the coordinate label in the main window.
-   itk_option define -labelfont labelfont LabelFont \
-      {-adobe-courier-bold-r-*-*-*-120-*-*-*-*-*-*} {
-         toggle_show_coord_label_
-      }
+   itk_option define -labelfont labelfont LabelFont TkDefaultFont {
+      toggle_show_coord_label_
+   }
 
    #  Protected variables: (available to instance)
    #  --------------------

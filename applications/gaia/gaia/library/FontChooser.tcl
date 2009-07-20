@@ -48,7 +48,7 @@
 #     util::TopLevelWidget
 
 #  Copyright:
-#     Copyright (C) 2008 Science and Technology Facilities Council.
+#     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -97,8 +97,7 @@ itcl::class gaia::FontChooser {
       #  Platform fonts.
       set fonts_ [lsort -dictionary [font families]]
 
-      #  Pick a default font, style and size based on the current font
-      #  for an entry widget.
+      #  Pick a default font, style and size based on the TkDefaultFont.
       set_default_font ""
 
       #  Evaluate any options.
@@ -108,8 +107,8 @@ itcl::class gaia::FontChooser {
       if { $itk_option(-fixed_width) } {
          set fixed_fonts ""
          foreach f $fonts_ {
-            set fa [font create "$f"]
-            if { [font metrics "$fa" -fixed] } {
+            set fa [font create -family "$f"]
+            if { [font metrics $fa -fixed] } {
                lappend fixed_fonts $f
             }
          }
@@ -257,11 +256,12 @@ itcl::class gaia::FontChooser {
             -relief sunken
       }
       itk_component add sample {
-         label $itk_component(sampleouter).sample \
+         entry $itk_component(sampleouter).sample \
             -bd 2 \
             -relief flat \
             -width 30 \
-            -text "AaBbYyZz"
+            -justify c \
+            -textvariable [scope sampletext_]
       }
       pack $itk_component(sampleframe) -side top -fill x -expand 1 -padx 4 -ipadx 5m
       pack $itk_component(sampleouter) -side top -fill both -expand 1 -padx 10 -pady 10
@@ -281,6 +281,9 @@ itcl::class gaia::FontChooser {
       }
       pack $itk_component(ok) -side left -expand 1 -padx 4 -ipadx 1m
       pack $itk_component(cancel) -side left -expand 1 -padx 4 -ipadx 1m
+
+      #  Initialise.
+      update_
    }
 
    #  Update after new font is selected.
@@ -351,8 +354,7 @@ itcl::class gaia::FontChooser {
    #  the default will be set to that displayed in an entry widget.
    public method set_default_font {font} {
       if { $font == {} } {
-         set font [[entry $w_.test] cget -font]
-         destroy $w_.test
+         set font TkDefaultFont
       }
       array set default_font [font actual $font]
       
@@ -409,6 +411,9 @@ itcl::class gaia::FontChooser {
 
    #  Underline.
    protected variable underline_ 0
+
+   #  Sample text.
+   protected variable sampletext_ "AaBbYyZz\u03b1\u03b2\u03b3\u03b4"
 
    #  Common variables: (shared by all instances)
    #  -----------------

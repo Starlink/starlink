@@ -167,8 +167,8 @@
 
       <li><b>Label font (-labelfont)</b><br> The font used in the many labels
       in the GAIA interface. You may need to change this if your
-      <tt>variable</tt> font doesn't match the expected size (usually 12
-      pixel). Any font reported by the <tt>xlsfonts</tt> or selected by the
+      <tt>TkDefaultFont</tt> font doesn't match the expected size (usually 12
+      pixels). Any font reported by the <tt>xlsfonts</tt> or selected by the
       <tt>xfontsel</tt> commands can be used, as can Tcl generic fonts
       (see the section <tt>n</tt> font man page, a good default may be
       </tt>"Helvetica -12 bold"</tt>).
@@ -176,21 +176,11 @@
 
       <li><b>Text font (-textfont)</b><br> The font used in the many text
       reports in the GAIA interface. You may need to change this if your
-      <tt>fixed</tt> font doesn't match the expected size (usually 12
+      <tt>TkFixedFont</tt> font doesn't match the expected size (usually 12
       pixel). Any font reported by the <tt>xlsfonts</tt> or selected by the
       <tt>xfontsel</tt> commands can be used, as can Tcl generic fonts (see
       the section <tt>n</tt> font man page, a good default may be
       </tt>"Fixed -12"</tt>).
-      </li>
-
-      <li><b>WCS font (-labelfont)</b><br> The font used in the labels showing
-      alpha and delta as symbols in the GAIA interface. You may need to change
-      this if the default font doesn't match the expected size (usually 14
-      pixel). Any font reported by the <tt>xlsfonts</tt> or selected by the
-      <tt>xfontsel</tt> commands can be used, as can Tcl generic fonts, but
-      the alpha and delta labels should be the <tt>a</tt> and <tt>d</tt>
-      characters (see the section <tt>n</tt> font man page, a good default may
-      be </tt>"Symbol -14"</tt>).
       </li>
 
       <li><b>Font scale (-font_scale)</b><br> A scaling factor for non-pixel

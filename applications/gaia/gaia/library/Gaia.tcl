@@ -2726,18 +2726,17 @@ window gives you access to this."
    }
 
    #  A font used for labels.
-   itk_option define -labelfont labelfont LabelFont variable {
+   itk_option define -labelfont labelfont LabelFont TkDefaultFont {
       set ::gaia_fonts(labelfont) $itk_option(-labelfont)
    }
 
    #  A font used for fixed width text.
-   itk_option define -textfont textfont TextFont fixed {
+   itk_option define -textfont textfont TextFont TkFixedFont {
       set ::gaia_fonts(textfont) $itk_option(-textfont)
    }
 
    #  A font used for labels that require symbols (alpha & delta).
-   itk_option define -wcsfont wcsfont WcsFont \
-      "-*-symbol-*-*-*-*-*-140-*-*-*-*-*-*" {
+   itk_option define -wcsfont wcsfont WcsFont TkDefaultFont {
       set ::gaia_fonts(wcsfont) $itk_option(-wcsfont)
    }
 

@@ -200,7 +200,7 @@ itcl::class gaia::GaiaImageMBand {
     itk_option define -text_color text_color Text_color {blue}
 
     # font to use for labels
-    itk_option define -text_font text_font Text_font {-*-courier-bold-r-*-*-*-100-*-*-*-*-*-*}
+    itk_option define -text_font text_font Text_font TkDefaultFont
 
     # default cursor when drawing
     itk_option define -cursor cursor Cursor {draft_small}

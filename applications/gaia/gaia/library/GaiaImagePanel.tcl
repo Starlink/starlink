@@ -201,7 +201,7 @@ itcl::class gaia::GaiaImagePanel {
       if {$itk_option(-showwcs)} {
          itk_component add ra {
             util::LabelValue $w_.ra \
-               -text "a:" \
+               -text "\u03b1:" \
                -textvariable ${var}(RA) \
                -labelfont $itk_option(-wcsfont) \
                -valuefont $itk_option(-valuefont) \
@@ -212,7 +212,7 @@ itcl::class gaia::GaiaImagePanel {
          }
          itk_component add dec {
             util::LabelValue $w_.dec \
-               -text "d:" \
+               -text "\u03b4:" \
                -textvariable ${var}(DEC) \
                -labelfont $itk_option(-wcsfont) \
                -valuefont $itk_option(-valuefont) \
@@ -754,8 +754,8 @@ itcl::class gaia::GaiaImagePanel {
 
    #   Define the fonts as the RtdImagePanel ones are not available on
    #   all Linux systems.
-   itk_option define -labelfont labelFont LabelFont -adobe-helvetica-bold-r-normal-*-12*
-   itk_option define -valuefont valueFont ValueFont -adobe-helvetica-medium-r-normal-*-12*
+   itk_option define -labelfont labelFont LabelFont TkDefaultFont
+   itk_option define -valuefont valueFont ValueFont TkDefaultFont
 
    #  Define whether we need to show the UKIRT quick look part of the
    #  panel.

@@ -439,11 +439,11 @@ itcl::class gaia::GaiaPolUSpec {
 
 #  Create a new font for the units labels.
          set oldfont [[$itk_component(za).val component label] cget -font]
-         eval font create ufont [font actual $oldfont]
-         set newsize [expr [font configure ufont -size] - 2]
-         font configure ufont -size $newsize -weight normal
-         $itk_component(zc).unit configure -font ufont
-         $itk_component(za).unit configure -font ufont
+         eval font create polfont [font actual $oldfont]
+         set newsize [expr [font configure polfont -size] - 2]
+         font configure polfont -size $newsize -weight normal
+         $itk_component(zc).unit configure -font polfont
+         $itk_component(za).unit configure -font polfont
 
       }
    }

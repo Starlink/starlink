@@ -679,7 +679,7 @@ itcl::class gaia::GaiaDemo {
       $itk_option(-canvas) create text 260 332 \
 	-anchor w \
 	-fill cyan \
-	-font -adobe-courier-bold-r-*-*-*-140-*-*-*-*-*-* \
+	-font TkCaptionFont \
 	-justify left \
 	-stipple pat0 \
 	-tags objects \
@@ -688,7 +688,7 @@ itcl::class gaia::GaiaDemo {
       $itk_option(-canvas) create text 179 119 \
 	-anchor w \
 	-fill cyan \
-	-font -adobe-courier-bold-r-*-*-*-140-*-*-*-*-*-* \
+	-font TkCaptionFont \
 	-justify left \
 	-stipple pat0 \
 	-tags objects \
@@ -697,7 +697,7 @@ itcl::class gaia::GaiaDemo {
       $itk_option(-canvas) create text 572 208 \
 	-anchor w \
 	-fill cyan \
-	-font -adobe-courier-bold-r-*-*-*-140-*-*-*-*-*-* \
+	-font TkCaptionFont \
 	-justify left \
 	-stipple pat0 \
 	-tags objects \
@@ -706,7 +706,7 @@ itcl::class gaia::GaiaDemo {
       $itk_option(-canvas) create text 620 402 \
 	-anchor w \
 	-fill cyan \
-	-font -adobe-courier-bold-r-*-*-*-140-*-*-*-*-*-* \
+	-font TkCaptionFont \
 	-justify left \
 	-stipple pat0 \
 	-tags objects \
@@ -715,7 +715,7 @@ itcl::class gaia::GaiaDemo {
       $itk_option(-canvas) create text 490 34 \
 	-anchor w \
 	-fill cyan \
-	-font -adobe-courier-bold-r-*-*-*-140-*-*-*-*-*-* \
+	-font TkCaptionFont \
 	-justify left \
 	-stipple pat0 \
 	-tags objects \
@@ -724,7 +724,7 @@ itcl::class gaia::GaiaDemo {
       $itk_option(-canvas) create text 354 400 \
 	-anchor w \
 	-fill cyan \
-	-font -adobe-courier-bold-r-*-*-*-140-*-*-*-*-*-* \
+	-font TkCaptionFont \
 	-justify left \
 	-stipple pat0 \
 	-tags objects \

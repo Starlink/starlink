@@ -1578,13 +1578,12 @@ itcl::class gaia::GaiaAstTable {
    itk_option define -bind_enters bind_enters Bind_enters 0
 
    #  Default font used in canvas to mark objects
-   itk_option define -textfont textFont TextFont \
-      {-adobe-courier-bold-r-*-*-*-120-*-*-*-*-*-*} {
-         if { $going_ } {
-            $itk_option(-canvas) itemconfigure ${this}_label \
-               -font $itk_option(-textfont)
-         }
+   itk_option define -textfont textFont TextFont TkFixedFont {
+      if { $going_ } {
+         $itk_option(-canvas) itemconfigure ${this}_label \
+            -font $itk_option(-textfont)
       }
+   }
 
    #  Possible fonts for drawing labels.
    itk_option define -fonts fonts Fonts {
