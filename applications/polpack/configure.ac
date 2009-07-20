@@ -26,7 +26,7 @@ STAR_CHECK_PROGS(prohlp,sst)
 STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl    Look for tck/tk system
-STAR_PATH_TCLTK(8.4, [tcl])
+STAR_PATH_TCLTK(8.5, [tcl])
 
 dnl POLPACK source files depend on include files from the following components  
 STAR_DECLARE_DEPENDENCIES([build], [ast cat chr cnf hds fio grp mers ndf ndg par prm sae startcl tcl trn ifd])

@@ -27,9 +27,9 @@ all:
 		-D CMAKE_LIBRARY_PATH:PATH=$(prefix)/lib \
 	        -D TCL_TCLSH:PATH=$(prefix)/bin/tclsh \
 	        -D TCL_INCLUDE_PATH:PATH=$(prefix)/include \
-	        -D TCL_LIBRARY:FILEPATH=$(prefix)/lib/libtcl8.4$(SHLIB_EXT) \
+	        -D TCL_LIBRARY:FILEPATH=$(prefix)/lib/libtcl8.5$(SHLIB_EXT) \
 	        -D TK_INCLUDE_PATH:PATH=$(prefix)/include \
-	        -D TK_LIBRARY:FILEPATH=$(prefix)/lib/libtk8.4$(SHLIB_EXT) \
+	        -D TK_LIBRARY:FILEPATH=$(prefix)/lib/libtk8.5$(SHLIB_EXT) \
 	        -D VTK_OPENGL_HAS_OSMESA:BOOL=OFF \
 	        -D VTK_USE_CARBON:BOOL=OFF \
 	        -D VTK_USE_COCOA:BOOL=OFF  \

@@ -101,7 +101,7 @@ dnl    xtk & ptk, use the Starlink version of Tcl/Tk, so don't need to check
 dnl    for it (declared as a build dependency). To keep the various 
 dnl    sub-components happy we need to define HAVE_TK as a conditional.
 dnl    This will always be true.
-STAR_PATH_TCLTK(8.4,[tk])
+STAR_PATH_TCLTK(8.5,[tk])
 AM_CONDITIONAL( HAVE_TK, : )
 
 dnl    xmotif

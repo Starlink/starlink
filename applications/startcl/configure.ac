@@ -36,7 +36,7 @@ STAR_DECLARE_DEPENDENCIES(configure, [jpeg tcl tk])
 STAR_LATEX_DOCUMENTATION([sun186 sun219])
 
 dnl    Locate the tclsh and wish binaries and associated libraries
-STAR_PATH_TCLTK(8.4,[tk])
+STAR_PATH_TCLTK(8.5,[tk])
 
 dnl    How to link to X.
 AC_PATH_XTRA
