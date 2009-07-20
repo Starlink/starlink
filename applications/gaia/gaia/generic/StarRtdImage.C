@@ -232,6 +232,7 @@
 #include <tcl.h>
 #include <tk.h>
 #include <blt.h>
+#include <bltVector.h>
 #include <netinet/in.h>
 
 #include "define.h"

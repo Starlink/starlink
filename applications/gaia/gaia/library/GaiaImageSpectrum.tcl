@@ -111,7 +111,6 @@ itcl::class gaia::GaiaImageSpectrum {
 
    #  Destructor - clean up when deleted.
    destructor {
-      global ::tcl_version _
       blt::vector destroy $vVector_ $iVector_ $xVector_ $yVector_
 
       #  Trap RtdImageSpectrum destructor as vector names do not seem
@@ -127,7 +126,6 @@ itcl::class gaia::GaiaImageSpectrum {
    #  add a widget to display the data value (so we get X,Y and data value of
    #  position in the image).
    method make_graph {} {
-      global ::tcl_version
 
       #  Add the graph
       itk_component add graph {
@@ -139,8 +137,7 @@ itcl::class gaia::GaiaImageSpectrum {
 	      -title "Pixel Values"
       } {}
       set graph_ $itk_component(graph)
-      pack $itk_component(graph) \
-         -fill both -expand 1 -padx 1m -pady 1m
+      pack $itk_component(graph) -fill both -expand 1 -padx 1m -pady 1m
 
       add_short_help $itk_component(graph) \
          {Graph: plot image pixel values along line, {bitmap dragb1} = zoom, {bitmap b2} = restore}
@@ -178,7 +175,7 @@ itcl::class gaia::GaiaImageSpectrum {
 
       # Tk frame for X,Y positions.
       itk_component add fpos {
-         frame $w_.fpos -relief flat -padx 10
+         frame $w_.fpos
       }
 
       # Tk label for X position.
@@ -262,7 +259,8 @@ itcl::class gaia::GaiaImageSpectrum {
       button $b.print -text "Print..." -command [code $this print]
       button $b.save -text "Save as..." -command [code $this save_as]
       button $b.close -text "Close" -command [code $this quit]
-      pack $b.print $b.save $b.close -side left -expand 1 -padx 2m -pady 2m
+      pack $b.print $b.save $b.close -side left -fill x -expand 1 \
+         -padx 2m -pady 2m
    }
 
    # This method is called whenever the spectrum line is moved, resized
@@ -270,6 +268,7 @@ itcl::class gaia::GaiaImageSpectrum {
    # It updates the graph to show the image values along the line.
 
    method notify_cmd {{op update}} {
+
       if {"$op" == "delete"} {
          destroy $w_
          return 0
@@ -284,7 +283,16 @@ itcl::class gaia::GaiaImageSpectrum {
          error_dialog "$msg"
          return 0
       }
-      $graph_ xaxis configure -max $numValues_
+      $graph_ xaxis configure -min 1 -max $numValues_
+
+      #  Needs a kick to set the initial range, but we want autoscaling.
+      if { $op == "update" } {
+         $vVector_ variable vec
+         set ymin $vec(min)
+         set ymax $vec(max)
+         $graph_ yaxis configure -min $ymin -max $ymax
+      }
+      $graph_ yaxis configure -min {} -max {}
       return 0
    }
 
@@ -295,8 +303,8 @@ itcl::class gaia::GaiaImageSpectrum {
       $graph_ crosshairs configure -position @$x,$y
 
       #  Now update the readout.
-      set ret 0
-      if { ![$graph_ element closest $x $y "" -interpolate 1 -halo 10000]} {
+      set ret [$graph_ element closest $x $y -interpolate 1 -halo 10000]
+      if { $ret == {} } {
          return
       }
       lassign [$graph_ invtransform $x $y] index value

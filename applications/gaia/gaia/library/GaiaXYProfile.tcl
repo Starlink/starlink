@@ -712,18 +712,22 @@ itcl::class gaia::GaiaXYProfile {
 
          #  Find the closest position and hence the current data value.
          #  If off the graph then do nothing.
-         if { ![$w element closest $x $y result -interpolate no -halo 2i -along x]} {
+         set ret [$w element closest $x $y -interpolate no -halo 2i -along x]
+         if { $ret == {} } {
             return
          }
+         ::array set result $ret
          $itk_component(uppercoord) config -value "$result(x)"
          $itk_component(uppervalue) config -value "$result(y)"
       } else {
 
          #  Find the closest position and hence the current data value.
          #  If off the graph then do nothing.
-         if { ![$w element closest $x $y result -interpolate no -halo 2i -along y]} {
+         set ret [$w element closest $x $y -interpolate no -halo 2i -along y]
+         if { $ret == {} } {
             return
          }
+         ::array set result $ret
          $itk_component(lowercoord) config -value "$result(y)"
          $itk_component(lowervalue) config -value "$result(x)"
       }
@@ -1160,10 +1164,8 @@ itcl::class gaia::GaiaXYProfile {
    itk_option define -show_peak_lines show_peak_lines Show_Peak_Lines 0
 
    #  Fonts used
-   itk_option define -labelfont labelFont LabelFont \
-      -Adobe-helvetica-bold-r-normal-*-12*
-   itk_option define -valuefont valueFont ValueFont \
-      -Adobe-helvetica-medium-r-normal-*-12*
+   itk_option define -labelfont labelFont LabelFont TkDefaultFont
+   itk_option define -valuefont valueFont ValueFont TkDefaultFont
 
    #  Colour for the profiles.
    itk_option define -profile_colour profile_colour Profile_Colour blue
