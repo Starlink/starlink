@@ -899,9 +899,15 @@
 
 #
 #  Obtain the required catalogue and attempt to open it.
+#  Use command-line argument if given.
 
-    GetCatalogue
-
+    global argv
+    if { [llength $argv] == 0 } {
+        GetCatalogue
+    } else {
+        global catalogueName
+        set catalogueName [lindex $argv 0]
+    }
     if {$catalogueName != ""} then {
        OpenCat none
 
