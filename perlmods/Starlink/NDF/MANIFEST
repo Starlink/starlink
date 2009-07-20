@@ -9,6 +9,7 @@ README.dec_osf
 INSTALL
 ChangeLog
 getarg.c
+ndffitswcs
 arrays/README
 arrays/arrays.c
 arrays/arrays.h
