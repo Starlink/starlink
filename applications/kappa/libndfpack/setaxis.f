@@ -254,6 +254,8 @@
 *        Moved CNF_PAR to declaration section.
 *     2008 June 17 (MJC):
 *        Trim trailing blanks from output NDF character components.
+*     20-JUL-2009 (DSB):
+*        Use correct constants array when creating PMAP1 in WCS mode.
 *     {enter_further_changes_here}
 
 *-
@@ -882,7 +884,7 @@
                CONST( I ) = 0.5D0*( UBND( I ) - LBND( I ) + 1 )
             END DO
             OUTPRM( IAXIS ) = 1
-            PMAP1 = AST_PERMMAP( 1, INPRM, NIN, OUTPRM, 1.0D0, ' ',
+            PMAP1 = AST_PERMMAP( 1, INPRM, NIN, OUTPRM, CONST, ' ',
      :                           STATUS )
 
 *  Create an AST PermMap which will extract values for the selected output
