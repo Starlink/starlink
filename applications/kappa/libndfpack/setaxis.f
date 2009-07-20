@@ -255,7 +255,8 @@
 *     2008 June 17 (MJC):
 *        Trim trailing blanks from output NDF character components.
 *     20-JUL-2009 (DSB):
-*        Use correct constants array when creating PMAP1 in WCS mode.
+*        - Use correct constants array when creating PMAP1 in WCS mode.
+*        - In WCS mode, PNTRW only needs "EL" elements, not "NIN*EL".
 *     {enter_further_changes_here}
 
 *-
@@ -910,7 +911,7 @@
             EL = UBND( IAXIS ) - LBND( IAXIS ) + 1
 
 *  Get some workspace for the grid centres.
-            CALL PSX_CALLOC( NIN*EL, '_DOUBLE', PNTRW, STATUS )
+            CALL PSX_CALLOC( EL, '_DOUBLE', PNTRW, STATUS )
 
 *  Fill the first EL elements with the grid coordinate at the centre of
 *  each pixel.
