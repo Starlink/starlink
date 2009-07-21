@@ -165,8 +165,9 @@
 \newcommand{\KAPPAref}{\xref{\KAPPA}{sun95}{}}
 \newcommand{\SMURF}{\textsc{smurf}}
 \newcommand{\SMURFcook}{\xref{\SMURF}{sc19}{}}
-\newcommand{\ADAM}{\textsc{Adam}}
-\newcommand{\AST}{\textsc{Ast}}
+\newcommand{\ADAM}{\xref{ADAM}{sg4}}
+\newcommand{\AST}{\xref{AST}{sun210}}
+\newcommand{\ndf}{\xref{NDF}{sun33}{}}
 
 % Application tasks
 \newcommand{\task}[1]{\textsf{#1}}
@@ -672,7 +673,7 @@ convenient overview of the parameter system used by \SMURF.
 All \SMURF\ commands support the ``message filter'' parameter
 (\verb+msg_filter+), which controls the number of messages \SMURF\
 writes to the screen during routines. The default setting for the
-message filter is \verb+normal+. Table \ref{????}  lists the available
+message filter is \verb+normal+. Table \ref{tab:msgfilter}  lists the available
 values for \verb+msg_filter+. Be aware that specifying \verb+verbose+
 or \verb+debug+ will slow down execution due to the (potentially vast)
 number of messages written to the terminal.
@@ -682,12 +683,15 @@ number of messages written to the terminal.
 \hline
 Option  & Description \\
 \hline
-quiet   & No messages \\
+none   & No messages \\
+quiet   & Limited messages \\
 normal  & Very few messages \\
 verbose & Full messages \\
-debug   & Full message with debugging information (useful for programmers) \\
+debug   & Some debugging messages (useful for programmers) \\
+all & All messages regardless of debug level \\
 \hline
 \end{tabular}
+\label{tab:msgfilter}
 \end{table}
 
 \subsubsection{Working with Data Files}
@@ -728,7 +732,7 @@ from the input as the contents are overwritten!
 \subsection{Data File Structure}
 
 Data files for both ACSIS and SCUBA-2 use the Starlink N-Dimensional
-data format (NDF - REF HERE), a hierarchical format which allows
+data format (\ndf), a hierarchical format which allows
 additional data and metadata to be stored within a single file. Raw
 files contain a number of NDF components which store
 observation-specific data necessary for subsequent processing. The
@@ -786,8 +790,9 @@ WCS attributes to set...
 
 Be aware that the raw data files from both instruments may be large
 (tens to hundreds of megabytes). Subsequent processing of raw SCUBA-2
-time-series data produces output files which are a factor of 4 larger
-due to the conversion from \verb+_INTEGER+ to \verb+_DOUBLE+. \SMURF\
+time-series data produces output files which are larger
+due to the conversion from integer\footnote{Data can be written in either \texttt{\_WORD} or \texttt{\_INTEGER} format so the uncompression factor can vary from 2 to 4. The \rawunpress\ command can be used to uncompress the \texttt{\_WORD} data to \texttt{\_INTEGER} format prior to running \flatfield.}
+to \verb+_DOUBLE+. \SMURF\
 mapping tasks have the ability to restrict the size of output data
 files for manipulation on 32-bit operating systems. See the sections
 on \qlmakemap, \makemap\ and \makecube\ for further
