@@ -39,7 +39,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -49,8 +49,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
@@ -87,42 +87,43 @@
 *        Use ERR_MARK/RLSE and annul status if HDS_INFOI fails for any
 *        reason.
 *     2-NOV-2007 (DSB):
-*        Use NDG_BEGPV/ENDPV to provide automatic provenance propagation.
+*        Use NDG_BEGPV/ENDPV to provide automatic provenance 
+*        propagation.
+*     2009 July 21 (MJC):
+*        Use MSG_FILTER environment variable to set reporting level.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
 
 *  Type Definitions:
-      IMPLICIT  NONE              ! no implicit typing allowed
+      IMPLICIT  NONE             ! no implicit typing allowed
 
 *  Global Constants:
-      INCLUDE  'SAE_PAR'          ! SSE global definitions
-      INCLUDE  'GRP_PAR'          ! GRP definitions
-      INCLUDE  'DAT_PAR'          ! DAT definitions
+      INCLUDE  'SAE_PAR'         ! SSE global definitions
+      INCLUDE  'GRP_PAR'         ! GRP definitions
+      INCLUDE  'DAT_PAR'         ! DAT definitions
 
 *  Status:
       INTEGER  STATUS
 
 *  External References:
-      LOGICAL LPG_AGAIN           ! Invoke the application again?
-      INTEGER CHR_LEN             ! Length of string
+      LOGICAL LPG_AGAIN          ! Invoke the application again?
+      INTEGER CHR_LEN            ! Length of string
 
 *  Local Variables:
-      CHARACTER FILTER*(60)       ! HDS_INFOI filter string
-      CHARACTER NAME * ( 15 )     ! Task name from the command
-      INTEGER IPOSN               ! Position in string
-      INTEGER LSTAT               ! Local status
-      INTEGER NGRP0               ! Number of active GRP groups on entry
-      INTEGER NGRP1               ! Number of active GRP groups on exit
-      INTEGER NLOC0               ! Number of active locators on entry
-      INTEGER NLOC1               ! Number of active locators on exit
-      LOGICAL DISAB               ! Disable looping?
-      LOGICAL REPL                ! Replace input NDFs?
-      LOGICAL VERB                ! Run in verbose mode?
-      REAL DELAY                  ! Delay between loops in seconds
+      REAL DELAY                 ! Delay between loops in seconds
+      LOGICAL DISAB              ! Disable looping?
+      CHARACTER*60 FILTER        ! HDS_INFOI filter string
+      INTEGER IPOSN              ! Position in string
+      INTEGER LSTAT              ! Local status
+      INTEGER MSGLEV             ! Message level
+      CHARACTER*15 NAME          ! Task name from the command
+      INTEGER NGRP0              ! Number of active GRP groups on entry
+      INTEGER NGRP1              ! Number of active GRP groups on exit
+      INTEGER NLOC0              ! Number of active locators on entry
+      INTEGER NLOC1              ! Number of active locators on exit
+      LOGICAL REPL               ! Replace input NDFs?
+      LOGICAL VERB               ! Run in verbose mode?
 
 *.
 
@@ -141,12 +142,16 @@
 *  excluded. Also seem to need HDS_SCRATCH excluded.
       FILTER = '!KAPVIEW_MON,!HDS_SCRATCH,!GLOBAL,!'
       IPOSN = CHR_LEN( FILTER )
-      CALL CHR_APPND(NAME, FILTER, IPOSN)
+      CALL CHR_APPND( NAME, FILTER, IPOSN )
 
 *  Note the current number of active locators (excluding parameter
 *  system
       CALL HDS_INFOI( DAT__NOLOC, 'LOCATORS', FILTER,
-     :     NLOC0, STATUS )
+     :                NLOC0, STATUS )
+
+*  Set the message-reporting level.
+*  ================================
+      CALL KPG_MSGLV( MSGLEV, STATUS )
 
 *  Identify and execute the task.
 *  ==============================
@@ -163,7 +168,7 @@
       CALL KPG1_ENVDF( 'KAPPA_REPORT_NAMES', VERB, STATUS )
 
 *  If not, see if verbose reporting is required.
-      IF( .NOT. VERB ) CALL KPG1_VERB( VERB, 'KAPPA', STATUS )      
+      IF ( .NOT. VERB ) CALL KPG1_VERB( VERB, 'KAPPA', STATUS )      
 
 *  See if looping should be disabled.
       CALL KPG1_ENVDF( 'KAPPA_LOOP_DISABLE', DISAB, STATUS )
@@ -176,7 +181,7 @@
 *  applications to process lists of NDFs.
       CALL LPG_START( VERB, DELAY, DISAB, STATUS )
 
-*  See if input NDFs are allowed to be over-written by output NDFs.
+*  See if input NDFs are allowed to be overwritten by output NDFs.
       CALL KPG1_ENVDF( 'KAPPA_REPLACE', REPL, STATUS )
       CALL LPG_REPLA( REPL, STATUS )
 
@@ -186,13 +191,13 @@
 
 *  Begin a provenance block. This causes event handlers to be registered
 *  with the NDF library so that a handler routine in NDG is called every
-*  time an NDF is opened. This handler routine keeps a record of all NDFs 
-*  that are opened for input or output, until the block is closed by 
-*  calling NDG_ENDPV.
+*  time an NDF is opened. This handler routine keeps a record of all 
+*  NDFs that are opened for input or output, until the block is closed 
+*  by calling NDG_ENDPV.
          CALL NDG_BEGPV( STATUS )
 
 *  Check the string against valid A-task names---if matched then call
-*  the relevant A-task
+*  the relevant A-task.
 
 *  Plot the boundary of an ARD description.
          IF ( NAME .EQ. 'ARDPLOT' ) THEN
@@ -207,7 +212,7 @@
          ELSE IF ( NAME .EQ. 'COLCOMP' ) THEN
             CALL COLCOMP ( STATUS )
 
-*  Contours a 2-d NDF.
+*  Contours a two-dimensional NDF.
          ELSE IF ( NAME .EQ. 'CONTOUR' ) THEN
             CALL CONTOUR ( STATUS )
 
@@ -216,7 +221,7 @@
          ELSE IF ( NAME .EQ. 'CURSOR' ) THEN
             CALL CURSOR ( STATUS )
 
-*  Displays a 2-d NDF.
+*  Displays a two-dimensional NDF.
          ELSE IF ( NAME .EQ. 'DISPLAY' ) THEN
             CALL DISPLAY( STATUS )
 
@@ -228,7 +233,7 @@
          ELSE IF ( NAME .EQ. 'DRAWSIG' ) THEN
             CALL DRAWSIG( STATUS )
 
-*  Creates a radial or azimuthal profile of a 2-dimensional image.
+*  Creates a radial or azimuthal profile of a two-dimensional image.
          ELSE IF ( NAME .EQ. 'ELPROF' ) THEN
             CALL ELPROF ( STATUS )
 
@@ -248,8 +253,8 @@
          ELSE IF ( NAME .EQ. 'GDSTATE' ) THEN
             CALL GDSTATE( STATUS )
 
-*  Draws a line plot of a 1-d NDF's data values against their axis
-*  co-ordinates.
+*  Draws a line plot of a one-dimensional NDF's data values against
+*  their axis co-ordinates.
          ELSE IF ( NAME .EQ. 'LINPLOT' ) THEN
             CALL LINPLOT ( STATUS )
 
@@ -269,8 +274,8 @@
          ELSE IF ( NAME .EQ. 'LUTVIEW' ) THEN
             CALL LUTVIEW ( STATUS )
 
-*  Draws a multi-line plot of a 2-d NDF's data values against their axis
-*  co-ordinates.
+*  Draws a multi-line plot of a two-dimensional NDF's data values
+*  against their axis co-ordinates.
          ELSE IF ( NAME .EQ. 'MLINPLOT' ) THEN
             CALL MLINPLOT ( STATUS )
 
@@ -332,11 +337,11 @@
          ELSE IF ( NAME .EQ. 'PICVIS' ) THEN
             CALL PICVIS( STATUS )
 
-*  Produces a scatter plot between 2 N-d NDFs.
+*  Produces a scatter plot between two N-dimensional NDFs.
          ELSE IF ( NAME .EQ. 'SCATTER' ) THEN
             CALL SCATTER( STATUS )
 
-*  Plots a 2-dimensional vector map.
+*  Plots a two-dimensional vector map.
          ELSE IF ( NAME .EQ. 'VECPLOT' ) THEN
             CALL VECPLOT ( STATUS )
 
@@ -354,9 +359,9 @@
 *  given a provenance extension containing a record of the input NDFs
 *  that the application accessed in order to create the output NDF. Any
 *  output NDF that already contains a provenance extension is left
-*  unchanged (so individual application can over-ride this automatic
-*  provenance handling by adding a provenance extension to the output NDF
-*  itself).
+*  unchanged (so individual application can override this automatic
+*  provenance handling by adding a provenance extension to the output 
+*  NDF itself).
          CALL NDG_ENDPV( 'KAPPA:'//NAME, STATUS )
 
       END DO
@@ -370,7 +375,7 @@
 *  If there are more active groups now than there were on entry, there
 *  must be a problem (GRP identifiers are not being freed somewhere). So
 *  report it.
-      IF( STATUS .EQ. SAI__OK .AND. NGRP1 .GT. NGRP0 ) THEN
+      IF ( STATUS .EQ. SAI__OK .AND. NGRP1 .GT. NGRP0 ) THEN
          CALL MSG_BLANK( STATUS )
          CALL MSG_SETC( 'NAME', NAME )
          CALL MSG_SETI( 'NGRP0', NGRP0 )
@@ -395,7 +400,7 @@
 *  If there are more active locators now than there were on entry, there
 *  must be a problem (HDS locators are not being freed somewhere). So
 *  report it.
-      IF( LSTAT .EQ. SAI__OK .AND. NLOC1 .GT. NLOC0 ) THEN
+      IF ( LSTAT .EQ. SAI__OK .AND. NLOC1 .GT. NLOC0 ) THEN
          CALL MSG_BLANK( LSTAT )
          CALL MSG_SETC( 'NAME', NAME )
          CALL MSG_SETI( 'NLOC0', NLOC0 )
@@ -406,7 +411,7 @@
      :             'error).', LSTAT )
          CALL MSG_BLANK( LSTAT )
       END IF
-      IF (LSTAT .NE. SAI__OK) CALL ERR_ANNUL( LSTAT )
+      IF ( LSTAT .NE. SAI__OK ) CALL ERR_ANNUL( LSTAT )
 
       CALL ERR_RLSE
 

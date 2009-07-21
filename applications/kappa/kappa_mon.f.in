@@ -106,7 +106,10 @@
 *     2007 July 18 (MJC):
 *        Added PLUCK.
 *     2-NOV-2007 (DSB):
-*        Use NDG_BEGPV/ENDPV to provide automatic provenance propagation.
+*        Use NDG_BEGPV/ENDPV to provide automatic provenance
+*        propagation.
+*     2009 July 21 (MJC):
+*        Use MSG_FILTER environment variable to set reporting level.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -131,19 +134,21 @@
       INTEGER CHR_LEN             ! Length of string
 
 *  Local Variables:
-      CHARACTER FILTER*( 60 )     ! HDS_INFOI filter string
-      CHARACTER NAME * ( 15 )     ! Task name from the command
-      INTEGER IPOSN               ! Position in string
-      INTEGER LSTAT               ! Local status
-      INTEGER MEMCACHE            ! Previous state of AST memory cache
-      INTEGER NGRP0               ! Number of active GRP groups on entry
-      INTEGER NGRP1               ! Number of active GRP groups on exit
-      INTEGER NLOC0               ! Number of active locators on entry
-      INTEGER NLOC1               ! Number of active locators on exit
-      LOGICAL DISAB               ! Disable looping?
-      LOGICAL VERB                ! Run in verbose mode?
-      LOGICAL REPL                ! Replace input NDFs?
-      REAL DELAY                  ! Delay between loops in seconds
+      REAL DELAY                 ! Delay between loops in seconds
+      LOGICAL DISAB              ! Disable looping?
+      CHARACTER*60 FILTER        ! HDS_INFOI filter string
+      INTEGER IPOSN              ! Position in string
+      INTEGER LSTAT              ! Local status
+      INTEGER MEMCACHE           ! Previous state of AST memory cache
+      INTEGER MSGLEV             ! Message level
+      CHARACTER*15 NAME          ! Task name from the command
+      INTEGER NGRP0              ! Number of active GRP groups on entry
+      INTEGER NGRP1              ! Number of active GRP groups on exit
+      INTEGER NLOC0              ! Number of active locators on entry
+      INTEGER NLOC1              ! Number of active locators on exit
+      LOGICAL REPL               ! Replace input NDFs?
+      LOGICAL VERB               ! Run in verbose mode?
+
 *.
 
 *  Check the inherited status.
@@ -164,12 +169,16 @@
 *  excluded. Also seem to need HDS_SCRATCH excluded.
       FILTER = '!KAPPA_MON,!HDS_SCRATCH,!GLOBAL,!'
       IPOSN = CHR_LEN( FILTER )
-      CALL CHR_APPND(NAME, FILTER, IPOSN)
+      CALL CHR_APPND( NAME, FILTER, IPOSN )
 
 *  Note the current number of active locators (excluding parameter
 *  system
       CALL HDS_INFOI( DAT__NOLOC, 'LOCATORS', FILTER,
-     :     NLOC0, STATUS )
+     :                NLOC0, STATUS )
+
+*  Set the message-reporting level.
+*  ================================
+      CALL KPG_MSGLV( MSGLEV, STATUS )
 
 *  Identify and execute the task.
 *  ==============================
@@ -186,7 +195,7 @@
       CALL KPG1_ENVDF( 'KAPPA_REPORT_NAMES', VERB, STATUS )
 
 *  If not, see if verbose reporting is required.
-      IF( .NOT. VERB ) CALL KPG1_VERB( VERB, 'KAPPA', STATUS )      
+      IF ( .NOT. VERB ) CALL KPG1_VERB( VERB, 'KAPPA', STATUS )      
 
 *  See if looping should be disabled.
       CALL KPG1_ENVDF( 'KAPPA_LOOP_DISABLE', DISAB, STATUS )
@@ -199,7 +208,7 @@
 *  applications to process lists of NDFs.
       CALL LPG_START( VERB, DELAY, DISAB, STATUS )
 
-*  See if input NDFs are allowed to be over-written by output NDFs.
+*  See if input NDFs are allowed to be overwritten by output NDFs.
       CALL KPG1_ENVDF( 'KAPPA_REPLACE', REPL, STATUS )
       CALL LPG_REPLA( REPL, STATUS )
 
@@ -209,20 +218,20 @@
 
 *  Begin a provenance block. This causes event handlers to be registered
 *  with the NDF library so that a handler routine in NDG is called every
-*  time an NDF is opened. This handler routine keeps a record of all NDFs 
-*  that are opened for input or output, until the block is closed by 
-*  calling NDG_ENDPV.
+*  time an NDF is opened. This handler routine keeps a record of all 
+*  NDFs that are opened for input or output, until the block is closed 
+*  by calling NDG_ENDPV.
          CALL NDG_BEGPV( STATUS )
 
 *  Check the string against valid A-task names---if matched then call
-*  the relevant A-task
+*  the relevant A-task.
 
 *  Adds two NDF data structures.
          IF ( NAME .EQ. 'ADD' ) THEN
             CALL ADD ( STATUS )
 
-*  Derives statistics of pixels within a specified circle of a 2-d
-*  data array.
+*  Derives statistics of pixels within a specified circle of a
+*  two-dimensional data array.
          ELSE IF ( NAME .EQ. 'APERADD' ) THEN
             CALL APERADD ( STATUS )
 
@@ -238,7 +247,7 @@
          ELSE IF ( NAME .EQ. 'BEAMFIT' ) THEN
             CALL BEAMFIT ( STATUS )
 
-*  Smooths a 1- or 2-dimensional image using a square or rectangular
+*  Smooths a one- or two-dimensional image using a square or rectangular
 *  box filter.
          ELSE IF ( NAME .EQ. 'BLOCK' ) THEN
             CALL BLOCK ( STATUS )
@@ -292,7 +301,7 @@
          ELSE IF ( NAME .EQ. 'COMPICK' ) THEN
             CALL COMPICK ( STATUS )
 
-*  Convolves a pair of 1- or 2-dimensional NDFs together.
+*  Convolves a pair of one- or two-dimensional NDFs together.
          ELSE IF ( NAME .EQ. 'CONVOLVE' ) THEN
             CALL CONVOLVE ( STATUS )
 
@@ -300,7 +309,8 @@
          ELSE IF ( NAME .EQ. 'COPYBAD' ) THEN
             CALL COPYBAD ( STATUS )
 
-*  Generate a test 2-d data array from a selection of several types.
+*  Generate a test two-dimensional data array from a selection of
+*  several types.
          ELSE IF ( NAME .EQ. 'CREFRAME' ) THEN
             CALL CREFRAME ( STATUS )
 
@@ -324,11 +334,11 @@
          ELSE IF ( NAME .EQ. 'EXPON' ) THEN
             CALL EXPON ( STATUS )
 
-*  Removes defects from a substantially flat 2-dimensional NDF.
+*  Removes defects from a substantially flat two-dimensional NDF.
          ELSE IF ( NAME .EQ. 'FFCLEAN' ) THEN
             CALL FFCLEAN ( STATUS )
 
-*  Removes regions of bad values from a 2-dimensional NDF.
+*  Removes regions of bad values from a two-dimensional NDF.
          ELSE IF ( NAME .EQ. 'FILLBAD' ) THEN
             CALL FILLBAD ( STATUS )
 
@@ -341,15 +351,16 @@
             CALL FLIP ( STATUS )
 
 *  Performs forward and inverse Fourier transforms of 1- or
-*  2-dimensional NDFs.
+*  two-dimensional NDFs.
          ELSE IF ( NAME .EQ. 'FOURIER' ) THEN
             CALL FOURIER ( STATUS )
 
-*  Smooths a 1- or 2-dimensional image using a Gaussian filter.
+*  Smooths a one- or two-dimensional image using a Gaussian filter.
          ELSE IF ( NAME .EQ. 'GAUSMOOTH' ) THEN
             CALL GAUSMOOTH ( STATUS )
 
-*  Replaces bad pixels in a 2-d data array with the local median.
+*  Replaces bad pixels in a two-dimensional data array with the local
+*  median.
          ELSE IF ( NAME .EQ. 'GLITCH' ) THEN
             CALL GLITCH ( STATUS )
 
@@ -385,8 +396,8 @@
          ELSE IF ( NAME .EQ. 'KSTEST' ) THEN
             CALL KSTEST ( STATUS )
 
-*  Performs a Laplacian convolution as an edge detector in a 2-d data
-*  array.
+*  Performs a Laplacian convolution as an edge detector in a 
+*  two-dimensional data array.
          ELSE IF ( NAME .EQ. 'LAPLACE' ) THEN
             CALL LAPLACE ( STATUS )
 
@@ -402,12 +413,12 @@
          ELSE IF ( NAME .EQ. 'LOGAR' ) THEN
             CALL LOGAR ( STATUS )
 
-*  Outputs the values of a sub-array of a 2-d data array to the
-*  screen or an ASCII file.
+*  Outputs the values of a sub-array of a two-dimensional data array to
+*  the screen or an ASCII file.
          ELSE IF ( NAME .EQ. 'LOOK' ) THEN
             CALL LOOK ( STATUS )
 
-*  Performs a Richardson-Lucy deconvolution of a 1- or 2-dimensional
+*  Performs a Richardson-Lucy deconvolution of a one- or two-dimensional
 *  array.
          ELSE IF ( NAME .EQ. 'LUCY' ) THEN
             CALL LUCY ( STATUS )
@@ -416,7 +427,7 @@
          ELSE IF ( NAME .EQ. 'MAKESNR' ) THEN
             CALL MAKESNR ( STATUS )
 
-*   Creates a 2-dimensional NDF from the coefficients of a polynomial
+*   Creates a two-dimensional NDF from the coefficients of a polynomial
 *   surface.
          ELSE IF ( NAME .EQ. 'MAKESURFACE' ) THEN
             CALL MAKESURFACE ( STATUS )
@@ -430,7 +441,7 @@
          ELSE IF ( NAME .EQ. 'MATHS' ) THEN
             CALL MATHS ( STATUS )
 
-*  Smooths a 2-dimensional data array using a weighted median filter.
+*  Smooths a two-dimensional data array using a weighted median filter.
          ELSE IF ( NAME .EQ. 'MEDIAN' ) THEN
             CALL MEDIAN ( STATUS )
 
@@ -438,8 +449,8 @@
          ELSE IF ( NAME .EQ. 'MFITTREND' ) THEN
             CALL MFITTREND ( STATUS )
 
-*  Does cumulative statistics on a 2-d sub-array over a sequence of
-*  2-d data arrays.
+*  Does cumulative statistics on a two-dimensional sub-array over a 
+*  sequence of two-dimensional data arrays.
          ELSE IF ( NAME .EQ. 'MSTATS' ) THEN
             CALL MSTATS ( STATUS )
 
@@ -470,8 +481,8 @@
          ELSE IF ( NAME .EQ. 'ODDEVEN' ) THEN
             CALL ODDEVEN ( STATUS )
 
-*  Sets pixels outside a specified circle in a 2-d data array
-*  to a specified value.
+*  Sets pixels outside a specified circle in a two-dimensional data 
+*  array to a specified value.
          ELSE IF ( NAME .EQ. 'OUTSET' ) THEN
             CALL OUTSET ( STATUS )
 
@@ -499,12 +510,12 @@
          ELSE IF ( NAME .EQ. 'POW' ) THEN
             CALL KAP_POW ( STATUS )
 
-*  Create a 1-d profile through an N-d NDF.
+*  Create a one-dimensional profile through an N-dimensional NDF.
          ELSE IF ( NAME .EQ. 'PROFILE' ) THEN
             CALL PROFILE ( STATUS )
 
 *  Determines the parameters of a model star profile by fitting
-*  star images in a 2-dimensional NDF.
+*  star images in a two-dimensional NDF.
          ELSE IF ( NAME .EQ. 'PSF' ) THEN
             CALL PSF ( STATUS )
 
@@ -521,11 +532,12 @@
          ELSE IF ( NAME .EQ. 'RIFT' ) THEN
             CALL RIFT ( STATUS )
 
-*  Rotates a 2-d data array through any angle.
+*  Rotates a two-dimensional data array through any angle.
          ELSE IF ( NAME .EQ. 'ROTATE' ) THEN
             CALL ROTATE ( STATUS )
 
-*  Copies polygonal segments from one 2-d data array to another.
+*  Copies polygonal segments from one two-dimensional data array to 
+*  another.
          ELSE IF ( NAME .EQ. 'SEGMENT' ) THEN
             CALL SEGMENT ( STATUS )
 
@@ -534,15 +546,16 @@
          ELSE IF ( NAME .EQ. 'SETMAGIC' ) THEN
             CALL SETMAGIC ( STATUS )
 
-*  Enhances edges in a 2-dimensional NDF using a shadow effect.
+*  Enhances edges in a two-dimensional NDF using a shadow effect.
          ELSE IF ( NAME .EQ. 'SHADOW' ) THEN
             CALL SHADOW ( STATUS )
 
-*  Realigns a 2-d data array via an x-y shift.
+*  Realigns a two-dimensional data array via an x-y shift.
          ELSE IF ( NAME .EQ. 'SLIDE' ) THEN
             CALL SLIDE ( STATUS )
 
-*  Squashes or stretches a 2-d data array in either or both axes.
+*  Squashes or stretches a two-dimensional data array in either or both 
+*  axes.
          ELSE IF ( NAME .EQ. 'SQORST' ) THEN
             CALL SQORST ( STATUS )
 
@@ -559,7 +572,7 @@
          ELSE IF ( NAME .EQ. 'SUBSTITUTE' ) THEN
             CALL SUBSTITUTE ( STATUS )
 
-*  Fits a polynomial or spline surface to 2-d data array.
+*  Fits a polynomial or spline surface to two-dimensional data array.
          ELSE IF ( NAME .EQ. 'SURFIT' ) THEN
             CALL SURFIT ( STATUS )
 
@@ -592,12 +605,12 @@
          ELSE IF ( NAME .EQ. 'WCSSLIDE' ) THEN
             CALL WCSSLIDE ( STATUS )
 
-*  Applies a Wiener filter to a 1- or 2-dimensional array.
+*  Applies a Wiener filter to a one- or two-dimensional array.
          ELSE IF ( NAME .EQ. 'WIENER' ) THEN
             CALL WIENER ( STATUS )
 
-*  Replaces regions in a 2-d data array by bad values or by linear
-*  interpolation.
+*  Replaces regions in a two-dimensional data array by bad values or by
+*  linear interpolation.
          ELSE IF ( NAME .EQ. 'ZAPLIN' ) THEN
             CALL ZAPLIN ( STATUS )
 
@@ -615,13 +628,12 @@
 *  given a provenance extension containing a record of the input NDFs
 *  that the application accessed in order to create the output NDF. Any
 *  output NDF that already contains a provenance extension is left
-*  unchanged (so individual application can over-ride this automatic
-*  provenance handling by adding a provenance extension to the output NDF
-*  itself).
+*  unchanged (so individual application can override this automatic
+*  provenance handling by adding a provenance extension to the output 
+*  NDF itself).
          CALL NDG_ENDPV( 'KAPPA:'//NAME, STATUS )
 
       END DO
-
 
 *  Note the current number of active GRP identifiers. Do this in a new
 *  error reporting context so that we get the correct value even if an
@@ -632,7 +644,7 @@
 *  If there are more active groups now than there were on entry, there
 *  must be a problem (GRP identifiers are not being freed somewhere). So
 *  report it.
-      IF( STATUS .EQ. SAI__OK .AND. NGRP1 .GT. NGRP0 ) THEN
+      IF ( STATUS .EQ. SAI__OK .AND. NGRP1 .GT. NGRP0 ) THEN
          CALL MSG_BLANK( STATUS )
          CALL MSG_SETC( 'NAME', NAME )
          CALL MSG_SETI( 'NGRP0', NGRP0 )
@@ -656,7 +668,7 @@
 *  If there are more active locators now than there were on entry, there
 *  must be a problem (HDS locators are not being freed somewhere). So
 *  report it.
-      IF( LSTAT .EQ. SAI__OK .AND. NLOC1 .GT. NLOC0 ) THEN
+      IF ( LSTAT .EQ. SAI__OK .AND. NLOC1 .GT. NLOC0 ) THEN
          CALL MSG_BLANK( LSTAT )
          CALL MSG_SETC( 'NAME', NAME )
          CALL MSG_SETI( 'NLOC0', NLOC0 )
@@ -667,7 +679,7 @@
      :             'error).', LSTAT )
          CALL MSG_BLANK( LSTAT )
       END IF
-      IF (LSTAT .NE. SAI__OK) CALL ERR_ANNUL( LSTAT )
+      IF ( LSTAT .NE. SAI__OK ) CALL ERR_ANNUL( LSTAT )
 
       CALL ERR_RLSE
 

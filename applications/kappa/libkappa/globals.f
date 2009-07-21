@@ -31,12 +31,13 @@
 *  Copyright:
 *     Copyright (C) 1991-1992 Science & Engineering Research Council.
 *     Copyright (C) 1995, 2001 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Copyright (C) 2009 Science & Technology Facilities Council. 
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -46,8 +47,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -66,6 +67,9 @@
 *        apply to foreign formats too.
 *     4-DEC-2001 (DSB):
 *        Removed image display and image overlay globals.
+*     2009 July 21 (MJC):
+*        Reports the message-reporting level, and its own reports
+*        use MSG_OUTIF at the QUIET level.
 *     {enter_further_changes_here}
 
 *-
@@ -77,32 +81,30 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Data-system constants
       INCLUDE 'DAT_ERR'          ! HDS error definitions
+      INCLUDE 'MSG_PAR'          ! Message-system constants 
+      INCLUDE 'PSX_ERR'          ! PSX error constants
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  External References:
       INTEGER CHR_LEN            ! Length of character string ignoring
-                                 ! trialing blanks
+                                 ! trailing blanks
 
 *  Local Variables:
-      CHARACTER * ( DAT__SZLOC )
-     :  LOC,                     ! Locator to the global file.
-     :  PLOC                     ! Locator to the parameter-system
+      CHARACTER*132 GLOVAL       ! Global variable
+      CHARACTER*( DAT__SZLOC ) LOC ! Locator to the global file
+      CHARACTER*24 MACHIN        ! Machine name
+      INTEGER NC                 ! Number of characters
+      CHARACTER*20 NODE          ! Node name
+      CHARACTER*132 PATH         ! Path name of ADAM_USER
+      CHARACTER*( DAT__SZLOC ) PLOC ! Locator to the parameter-system
                                  ! structure containing the file and
                                  ! device names
+      CHARACTER*10 RELEAS        ! Release of operating system
+      CHARACTER*10 SYSNAM        ! Operating system
+      CHARACTER*10 VERSIO        ! Sub-version of operating system
 
-      CHARACTER
-     :  GLOVAL * ( 132 ),        ! Global variable
-     :  MACHIN * ( 24 ),         ! Machine name
-     :  NODE * ( 20 ),           ! Node name
-     :  PATH * ( 132 ),          ! Path name of ADAM_USER
-     :  RELEAS * ( 10 ),         ! Release of operating system
-     :  SYSNAM * ( 10 ),         ! Operating system
-     :  VERSIO * ( 10 )          ! Sub-version of operating system
-
-      INTEGER
-     :  NC                       ! Number of characters
 *.
 
 *  Check the inherited global status.
@@ -173,12 +175,12 @@
          CALL MSG_SETC( 'GLOVAL', GLOVAL )
       END IF
 
-*    Report the current global value.
-      CALL MSG_OUT( 'GLOBAL1',
+*  Report the current global value.
+      CALL MSG_OUTIF( MSG__QUIET, 'GLOBAL1',
      :  'The current data file is             : ^GLOVAL', STATUS )
       CALL ERR_RLSE
 
-*    The graphics device.
+*  The graphics device.
       CALL ERR_MARK
       PLOC = ' '
       CALL DAT_FIND( LOC, 'GRAPHICS_DEVICE', PLOC, STATUS )
@@ -189,11 +191,11 @@
       ELSE
          CALL MSG_SETC( 'GLOVAL', GLOVAL )
       END IF
-      CALL MSG_OUT( 'GLOBAL2',
+      CALL MSG_OUTIF( MSG__QUIET, 'GLOBAL2',
      :  'The current graphics device is       : ^GLOVAL', STATUS )
       CALL ERR_RLSE
 
-*    The lookup table.
+*  The lookup table.
       CALL ERR_MARK
       PLOC = ' '
       CALL DAT_FIND( LOC, 'LUT', PLOC, STATUS )
@@ -204,11 +206,11 @@
       ELSE
          CALL MSG_SETC( 'GLOVAL', GLOVAL )
       END IF
-      CALL MSG_OUT( 'GLOBAL5',
+      CALL MSG_OUTIF( MSG__QUIET, 'GLOBAL5',
      :  'The current lookup table file is     : ^GLOVAL', STATUS )
       CALL ERR_RLSE
 
-*    The transformation.
+*  The transformation.
       CALL ERR_MARK
       PLOC = ' '
       CALL DAT_FIND( LOC, 'TRANSFORM', PLOC, STATUS )
@@ -219,11 +221,11 @@
       ELSE
          CALL MSG_SETC( 'GLOVAL', GLOVAL )
       END IF
-      CALL MSG_OUT( 'GLOBAL6',
+      CALL MSG_OUTIF( MSG__QUIET, 'GLOBAL6',
      :  'The current transformation is        : ^GLOVAL', STATUS )
       CALL ERR_RLSE
 
-*    The interaction mode.
+*  The interaction mode.
       CALL ERR_MARK
       CALL CMP_GET0C( LOC, 'INTERACTIONMODE', GLOVAL, STATUS )
       IF ( STATUS .EQ. DAT__OBJNF ) THEN
@@ -232,8 +234,34 @@
       ELSE
          CALL MSG_SETC( 'GLOVAL', GLOVAL )
       END IF
-      CALL MSG_OUT( 'GLOBAL7',
+      CALL MSG_OUTIF( MSG__QUIET, 'GLOBAL7',
      :  'The current interaction mode is      : ^GLOVAL', STATUS )
+      CALL ERR_RLSE
+
+*  The message-reporting level.  Note this comes not from the global
+*  parameter file, but from the environment variable MSG_FILTER.  This 
+*  avoids having a parameter in every application to control this.
+      CALL ERR_MARK
+      CALL KPG_ENV0C( 'MSG_FILTER', GLOVAL, STATUS )
+      IF ( STATUS .EQ. PSX__NOENV ) THEN
+         CALL ERR_ANNUL( STATUS )
+         CALL MSG_SETC( 'GLOVAL', 'NORMAL' )
+      ELSE
+
+*  Translate abbreviations to standard form.
+         CALL CHR_UCASE( GLOVAL )
+         IF ( GLOVAL( 1:1 ) .EQ. 'V' ) THEN
+            GLOVAL = 'VERBOSE'
+         ELSE IF ( GLOVAL( 1:1 ) .EQ. 'Q' ) THEN
+            GLOVAL = 'QUIET'
+         ELSE
+            GLOVAL = 'NORMAL'
+         END IF
+
+         CALL MSG_SETC( 'GLOVAL', GLOVAL )
+      END IF
+      CALL MSG_OUTIF( MSG__QUIET, 'GLOBAL8',
+     :  'The current message-report level is  : ^GLOVAL', STATUS )
       CALL ERR_RLSE
 
 *  Close the global file.
