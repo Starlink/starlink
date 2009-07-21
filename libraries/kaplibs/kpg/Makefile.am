@@ -140,6 +140,8 @@ dimlst.f \
 exparr.f \
 icmmm.f \
 inset.f \
+kpg_env0c.f \
+kpg_msglv.f \
 kpg1_abset.f \
 kpg1_arcol.f \
 kpg1_asapa.f \
