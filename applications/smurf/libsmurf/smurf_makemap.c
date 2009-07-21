@@ -24,92 +24,102 @@
 
 *  ADAM Parameters:
 *     ALIGNSYS = _LOGICAL (Read)
-*        If TRUE, then the spatial positions of the input data are
-*        aligned in the co-ordinate system specified by parameter
-*        SYSTEM. Otherwise, they are aligned in the ICRS co-ordinate
-*        system. For instance, if the output co-ordinate system is
-*        AZEL, then setting ALIGNSYS to TRUE will result in the AZEL
-*        values of the input data positions being compared directly,
-*        disregarding the fact that a given AZEL will correspond to
-*        different positions on the sky at different times. [FALSE]
+*          If TRUE, then the spatial positions of the input data are
+*          aligned in the co-ordinate system specified by parameter
+*          SYSTEM. Otherwise, they are aligned in the ICRS co-ordinate
+*          system. For instance, if the output co-ordinate system is
+*          AZEL, then setting ALIGNSYS to TRUE will result in the AZEL
+*          values of the input data positions being compared directly,
+*          disregarding the fact that a given AZEL will correspond to
+*          different positions on the sky at different times. [FALSE]
 *     BPM = NDF (Read)
 *          Group of files to be used as bad pixel masks. Each data file
-*          specified with the IN parameter will be masked. The corresponding
-*          previous mask for a subarray will be used. If there is no previous
-*          mask the closest following will be used. It is not an error for
-*          no mask to match. A NULL parameter indicates no mask files to be
-*          supplied. [!]
+*          specified with the IN parameter will be masked. The
+*          corresponding previous mask for a subarray will be used. If
+*          there is no previous mask the closest following will be
+*          used. It is not an error for no mask to match. A NULL
+*          parameter indicates no mask files to be supplied. [!]
 *     CONFIG = GROUP (Read) 
-*        Specifies values for the configuration parameters used by the
-*        iterative map maker (METHOD=ITERATE). If the string "def"
-*        (case-insensitive) or a null (!) value is supplied, a set of
-*        default configuration parameter values will be used.
+*          Specifies values for the configuration parameters used by the
+*          iterative map maker (METHOD=ITERATE). If the string "def"
+*          (case-insensitive) or a null (!) value is supplied, a set of
+*          default configuration parameter values will be used.
 *
-*        The supplied value should be either a comma-separated list of strings 
-*        or the name of a text file preceded by an up-arrow character
-*        "^", containing one or more comma-separated list of strings. Each
-*        string is either a "keyword=value" setting, or the name of a text 
-*        file preceded by an up-arrow character "^". Such text files should
-*        contain further comma-separated lists which will be read and 
-*        interpreted in the same manner (any blank lines or lines beginning 
-*        with "#" are ignored). Within a text file, newlines can be used
-*        as delimiters as well as commas. Settings are applied in the order 
-*        in which they occur within the list, with later settings over-riding 
-*        any earlier settings given for the same keyword.
+*          The supplied value should be either a comma-separated list of
+*          strings or the name of a text file preceded by an up-arrow
+*          character "^", containing one or more comma-separated list of
+*          strings. Each string is either a "keyword=value" setting, or
+*          the name of a text file preceded by an up-arrow character
+*          "^". Such text files should contain further comma-separated
+*          lists which will be read and interpreted in the same manner
+*          (any blank lines or lines beginning with "#" are
+*          ignored). Within a text file, newlines can be used as
+*          delimiters as well as commas. Settings are applied in the
+*          order in which they occur within the list, with later
+*          settings over-riding any earlier settings given for the same
+*          keyword.
 *
-*        Each individual setting should be of the form:
+*          Each individual setting should be of the form:
 *
-*           <keyword>=<value>
+*             <keyword>=<value>
 *        
-*        The parameters available for are listed in the "Configuration
-*        Parameters" sections below. Default values will be used for
-*        any unspecified parameters. Unrecognised options are ignored
-*        (that is, no error is reported). [current value]
+*          The parameters available for are listed in the "Configuration
+*          Parameters" sections below. Default values will be used for
+*          any unspecified parameters. Unrecognised options are ignored
+*          (that is, no error is reported). [current value]
 *     CROTA = _REAL (Read)
 *          Only accessed if a null value is supplied for parameter REF.
 *          The angle, in degrees, from north through east (in the
-*          coordinate system specified by the SYSTEM parameter) to the second
-*          pixel axis in the output cube. 
+*          coordinate system specified by the SYSTEM parameter) to the
+*          second pixel axis in the output cube.
 *     FBL( ) = _DOUBLE (Write)
-*          Sky coordinates (radians) of the bottom left corner of the output map
-*          (the corner with the smallest PIXEL dimension for axis 1 and the smallest
-*          pixel dimension for axis 2). No check is made that the pixel corresponds
-*          valid data. Note that the position is reported for the centre of the pixel.
+*          Sky coordinates (radians) of the bottom left corner of the
+*          output map (the corner with the smallest PIXEL dimension for
+*          axis 1 and the smallest pixel dimension for axis 2). No check
+*          is made that the pixel corresponds valid data. Note that the
+*          position is reported for the centre of the pixel.
 *     FBR( ) = _DOUBLE (Write)
-*          Sky coordinates (radians) of the bottom right corner of the output map
-*          (the corner with the largest PIXEL dimension for axis 1 and the smallest
-*          pixel dimension for axis 2). No check is made that the pixel corresponds
-*          valid data. Note that the position is reported for the centre of the pixel.
+*          Sky coordinates (radians) of the bottom right corner of the
+*          output map (the corner with the largest PIXEL dimension for
+*          axis 1 and the smallest pixel dimension for axis 2). No check
+*          is made that the pixel corresponds valid data. Note that the
+*          position is reported for the centre of the pixel.
 *     FLBND( ) = _DOUBLE (Write)
-*          The lower bounds of the bounding box enclosing the output map in the
-*          selected output WCS Frame. The values are calculated even if no output
-*          cube is created. Celestial axis values will be in units of radians.
-*          The parameter is named to be consistent with KAPPA NDFTRACE output.
+*          The lower bounds of the bounding box enclosing the output map
+*          in the selected output WCS Frame. The values are calculated
+*          even if no output cube is created. Celestial axis values will
+*          be in units of radians.  The parameter is named to be
+*          consistent with KAPPA NDFTRACE output.
 *     FUBND( ) = _DOUBLE (Write)
-*          The upper bounds of the bounding box enclosing the output map in the
-*          selected output WCS Frame. The values are calculated even if no output
-*          cube is created. Celestial axis values will be in units of radians.
-*          The parameter is named to be consistent with KAPPA NDFTRACE output.
+*          The upper bounds of the bounding box enclosing the output map
+*          in the selected output WCS Frame. The values are calculated
+*          even if no output cube is created. Celestial axis values will
+*          be in units of radians.  The parameter is named to be
+*          consistent with KAPPA NDFTRACE output.
 *     FTL( ) = _DOUBLE (Write)
-*          Sky coordinates (radians) of the top left corner of the output map
-*          (the corner with the smallest PIXEL dimension for axis 1 and the largest
-*          pixel dimension for axis 2). No check is made that the pixel corresponds
-*          valid data. Note that the position is reported for the centre of the pixel.
+*          Sky coordinates (radians) of the top left corner of the
+*          output map (the corner with the smallest PIXEL dimension for
+*          axis 1 and the largest pixel dimension for axis 2). No check
+*          is made that the pixel corresponds valid data. Note that the
+*          position is reported for the centre of the pixel.
 *     FTR( ) = _DOUBLE (Write)
-*          Sky coordinates (radians) of the top right corner of the output map
-*          (the corner with the largest PIXEL dimension for axis 1 and the largest
-*          pixel dimension for axis 2). No check is made that the pixel corresponds
-*          valid data. Note that the position is reported for the centre of the pixel.
+*          Sky coordinates (radians) of the top right corner of the
+*          output map (the corner with the largest PIXEL dimension for
+*          axis 1 and the largest pixel dimension for axis 2). No check
+*          is made that the pixel corresponds valid data. Note that the
+*          position is reported for the centre of the pixel.
 *     IN = NDF (Read)
 *          Input file(s)
 *     LBND( 2 ) = _INTEGER (Read)
-*        An array of values giving the lower pixel index bound on each
-*        spatial axis of the output NDF. The suggested default values 
-*        encompass all the input spatial information. []
+*          An array of values giving the lower pixel index bound on each
+*          spatial axis of the output NDF. The suggested default values 
+*          encompass all the input spatial information. []
 *     LBOUND( 2 ) = _INTEGER (Write)
 *          The lower pixel bounds of the output NDF. Note, values will be
 *          written to this output parameter even if a null value is supplied 
 *          for parameter OUT.
+*     MAXMEM = _INTEGER (Read)
+*          Maximum memory available for map-making in Mb
 *     METHOD = LITERAL (Read)
 *          Specify which map maker should be used to construct the map. The
 *          parameter can take the following values:
@@ -122,7 +132,8 @@
 *          - "ITERATE" -- Use the iterative map maker. This map maker
 *          is much slower than the REBIN algorithm because it
 *          continually makes a map, constructs models for different
-*          data components (common-mode, spikes etc).
+*          data components (common-mode, spikes etc) See CONFIG for parameters
+*          controlling the iterative map maker.
 *     NTILE = _INTEGER (Write)
 *          The number of output tiles used to hold the entire output
 *          array (see parameter TILEDIMS). If no input data falls within
@@ -167,8 +178,8 @@
 *          An existing NDF that is to be used to define the output grid.
 *          If supplied, the output grid will be aligned with the supplied 
 *          reference NDF. The reference can be either 2D or 3D and the spatial
-*          frame will be extracted. If a null (!) value is supplied then the output
-*          grid is determined by parameters REFLON, REFLAT, etc. [!]
+*          frame will be extracted. If a null (!) value is supplied then the 
+*          output grid is determined by parameters REFLON, REFLAT, etc. [!]
 *     REFLAT = LITERAL (Read)
 *          The formatted celestial latitude value at the tangent point of 
 *          the spatial projection in the output cube. This should be provided 
@@ -239,13 +250,6 @@
 *          had for the first time slice. For any other system, no such 
 *          shifts are applied, even if the base telescope position is
 *          changing through the observation. [TRACKING]
-*     TRIMTILES = _LOGICAL (Read)
-*          Only accessed if the output is being split up into more than
-*          one spatial tile (see parameter TILEDIMS). If TRUE, then the 
-*          tiles around the border will be trimmed to exclude areas that 
-*          fall outside the bounds of the full sized output array. This
-*          will result in the border tiles being smaller than the central 
-*          tiles. [FALSE]
 *     TILEBORDER = _INTEGER (Read)
 *          Only accessed if a non-null value is supplied for parameter
 *          TILEDIMS. It gives the width, in pixels, of a border to add to
@@ -281,14 +285,153 @@
 *          entire output array is created as a single tile and stored in 
 *          a single output NDF with the name given by parameter OUT 
 *          (without any "_<N>" appendix). [!]
+*     TRIMTILES = _LOGICAL (Read)
+*          Only accessed if the output is being split up into more than
+*          one spatial tile (see parameter TILEDIMS). If TRUE, then the 
+*          tiles around the border will be trimmed to exclude areas that 
+*          fall outside the bounds of the full sized output array. This
+*          will result in the border tiles being smaller than the central 
+*          tiles. [FALSE]
 *     UBND( 2 ) = _INTEGER (Read)
-*        An array of values giving the upper pixel index bound on each
-*        spatial axis of the output NDF. The suggested default values 
-*        encompass all the input spatial information. []
+*          An array of values giving the upper pixel index bound on each
+*          spatial axis of the output NDF. The suggested default values 
+*          encompass all the input spatial information. []
 *     UBOUND( 2 ) = _INTEGER (Write)
 *          The upper pixel bounds of the output NDF. Note, values will be
 *          written to this output parameter even if a null value is supplied 
 *          for parameter OUT.
+
+* Configuration Parameters:
+*
+*     *** General parameters controlling iterative map-maker ***
+*
+*     NUMITER = INTEGER
+*       A positive value if a set number of iterations are desired. A 
+*       negative number indicates the maximum number of iterations allowed if
+*       CHITOL is being used for the stopping criterion.
+*     CHITOL = REAL
+*       Maximum difference in chi^2 between subsequent iterations required
+*       to stop if NUMITER is negative.
+*     MEMITER = LOGICAL
+*       If 1, load data and perform iterations entirely in memory
+*       (limited by MAXMEM ADAM parameter, and MAXLEN Config
+*       parameter). Otherwise visit each file on disk for each
+*       iteration. This latter choice is not memory limited, but much
+*       slower, and will not produce as good of a final map since
+*       discontinuities exist at each file boundary (since, for
+*       example, operations like FFT filtering will pad part of the
+*       boundary around file edges).
+*     DELDIMM = LOGICAL
+*       If 1 delete temporary files produced by the dynamic iterative map maker
+*       (with a ".dimm" extension).
+*     MAXLEN = REAL
+*       Maximum number of seconds of data to be loaded at once if MEMITER=1.
+*     MODELORDER( ) = STRING
+*       An ordered list of model components to be fit by the iterative 
+*       map-maker, e.g. "(com,gai,ext,ast,flt,noi)". Each component has a
+*       three-character abbreviation. The following components may be 
+*       specified:
+*         dks = fit and remove dark squid for the column
+*         com = remove common-mode signal
+*         gai = if com specified, fit gain/offset of common mode
+*         ext = apply extinction correction
+*         ast = estimate the map and astronomical signal
+*         flt = apply filter to time streams
+*         noi = estimate time-domain variance
+*       If MEMITER=0 files will be produced of the form "[input
+*       filename]_[model component].dimm", but will be deleted upon
+*       completion of the map if DELDIMM is set. Set EXPORTNDF if you
+*       wish to produce Starlink ".ndf" files that can be viewed using
+*       tools such as Kappa and Gaia regardless of the value of MEMITER.
+*     EXPORTNDF( ) = STRING
+*       Export model components to Starlink ".ndf" files. Specify 1 or
+*       0 to export all or none of the components respectively. One
+*       can also specify an array of components to export using the
+*       same format as modelorder. Note that you can specify
+*       additional components 'res' (residual signal upon removal of
+*       all model components) and 'qua' (quality component) to what
+*       may be provided to modelorder. Exportation of 'res' is implied
+*       if either 'noi' or 'qua' are specified as they become the
+*       variance and quality components of the resulting NDF for 'res'
+*       respectively.
+*
+*     *** The following parameters control pre-iteration data-cleaning steps ***
+*
+*     PADSTART = INTEGER
+*       Number of samples of padding to add to start before filtering.
+*     PADEND = INTEGER
+*       Number of samples of padding to add to end before filtering.
+*     APOD = INTEGER
+*       Apodize signals (smoothly roll-off) using sine/cosine functions at
+*       start and end of the signal across this many samples.
+*     ORDER = INTEGER
+*       Subtract a fitted baseline polynomial of this order (0 to remove mean)
+*     BADFRAC = REAL
+*       Flag entire bolometer as dead if at least this fraction of the samples
+*       in a detector time series were flagged as bad by the DA system.
+*     FLAGSTAT = REAL
+*       Flag data taken while the telescope was stationary so that it
+*       is ignored in the final map. The value given is a threshold
+*       slew velocity (arcsec/sec) measured in tracking coordinates
+*       below which the telescope is considered to be stationary.
+*     DCTHRESH = REAL
+*       Threshold S/N to detect and flag DC (baseline steps).
+*     DCBOX = REAL
+*       Number of samples (box size) in which the signal RMS is measured for
+*       the DC step finder.
+*     SPIKETHRESH = REAL
+*       Threshold S/N to flag spikes using sigma-clipper.
+*     SPIKEITER = INTEGER
+*       Number of iterations for sigma-clipper (0=repeat to convergence).
+*     FILT_EDGEHIGH = REAL
+*       Hard-edge high-pass frequency-domain filter (Hz).
+*     FILT_EDGELOW = REAL
+*       Hard-edge low-pass frequency-domain filter (Hz).
+*     FILT_NOTCHHIGH( ) = REAL
+*       Hard-edge band-cut frequency-domain notch filters. FILT_NOTCHHIGH is
+*       an array of upper-edge frequencies (Hz).
+*     FILT_NOTCHLOW( ) = REAL
+*       Array of lower-edge frequencies corresponding to FILT_NOTCHHIGH.
+*
+*     *** The following parameters control calculation of model components ***
+*
+*     COM.BOXCAR = INTEGER
+*       If COM model component specified, boxcar smooth by this number of 
+*       samples before removing it.
+*     COM.BOXFACT = REAL
+*       If specified, reduce length of boxcar filter after each iteration by
+*       this factor.
+*     COM.BOXMIN = INTEGER
+*       If COM.BOXFACT specified, this value is the minimum boxcar filter length
+*       in samples.
+*     DKS.BOXCAR = INTEGER
+*       If DKS (dark squid) model component requested, boxcar dark squid 
+*       signal by this many samples before fitting/removing from each detector
+*       in the same column.
+*     NOI.SPIKETHRESH = REAL
+*       If NOI specified, flag new spikes in the residual after each iteration
+*       before measuring noise. This is the S/N threshold for detecting
+*       spikes with sigma-clipper.
+*     NOI.SPIKEITER = INTEGER
+*       If NOI specified, flag new spikes in the residual after each iteration
+*       before measuring noise. This value gives the number of iterations for
+*       the sigma clipper, or 0 to iterate to convergence.
+*     FLT.FILT_EDGEHIGH = REAL
+*       If FLT specified, perform filtering as an iterative component, rather
+*       than doing it once at the beginning as a pre-processing step. See
+*       FILT_EDGEHIGH.
+*     FLT.FILT_EDGELOW = REAL
+*       If FLT specified, perform filtering as an iterative component, rather
+*       than doing it once at the beginning as a pre-processing step. See
+*       FILT_EDGELOW.
+*     FLT.FILT_NOTCHHIGH( ) = REAL
+*       If FLT specified, perform filtering as an iterative component, rather
+*       than doing it once at the beginning as a pre-processing step. See
+*       FILT_ NOTCHHIGH.
+*     FLT.FILT_NOTCHLOW( ) = REAL
+*       If FLT specified, perform filtering as an iterative component, rather
+*       than doing it once at the beginning as a pre-processing step. See
+*       FILT_ NOTCHLOW.
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
@@ -458,11 +601,16 @@
 *        Factor out WCS check for moving sources to smf_set_moving
 *     2008-12-12 (TIMJ):
 *        Add BPM parameter.
+*     2009-07-21 (EC)
+*        Updated header comments:
+*        - re-tabbed some sections to fit into 80 columns
+*        - define MAXMEM ADAM parameter
+*        - Added "Configuration Parameters" section
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
-*     Council. Copyright (C) 2005-2008 University of British Columbia.
+*     Council. Copyright (C) 2005-2009 University of British Columbia.
 *     Copyright (C) 2007-2008 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
