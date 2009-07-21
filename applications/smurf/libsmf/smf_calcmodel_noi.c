@@ -71,7 +71,9 @@
 *     2008-05-02 (EC)
 *        - Use different levels of verbosity in messages
 *     2009-04-17 (EC)
-*        - switch to subkeymap notation in config file 
+*        - switch to subkeymap notation in config file
+*     2009-07-21 (EC)
+*        - Remove NOISAMP/NOICHUNK related parameters since they aren't used
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -133,12 +135,8 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   double *model_data=NULL;      /* Pointer to DATA component of model */
   dim_t nbolo;                  /* Number of bolometers */
   size_t nchisq;                /* Number of data points in chisq calc */
-  dim_t nchunk=10;              /* Number of spots to measure white level */
-  int nchunk_s;                 /* Signed version of nchunk */
   dim_t ndata;                  /* Total number of data points */
   size_t nflag;                 /* Number of new flags */
-  dim_t nsamp=1000;             /* Length of window to measure white level */
-  int nsamp_s;                  /* Signed version of nsamp */
   dim_t ntslice;                /* Number of time slices */
   smfArray *qua=NULL;           /* Pointer to RES at chunk */
   unsigned char *qua_data=NULL; /* Pointer to RES at chunk */
@@ -185,29 +183,6 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         errRep("", FUNC_NAME ": NOI.SPIKEITER cannot be < 0.", status );
       } else {
         spikeiter = (size_t) spikeiter_s;
-      }
-    }
-    
-    /* Obtain parameters for the noise measurement */
-    if( !astMapGet0I( kmap, "SAMP", &nsamp_s ) ) {
-      nsamp = 1000;  /* Number of samples to measure white level */
-    } else {
-      if( nsamp_s <= 0 ) {
-        *status = SAI__ERROR;
-        errRep( "", FUNC_NAME ": NOI.SAMP must be > 0.", status );
-      } else {
-        nsamp = (dim_t) nsamp_s;
-      }
-    }
-
-    if( !astMapGet0I( kmap, "CHUNK", &nchunk_s ) ) {
-      nchunk = 10;  /* Number of locations from which to measure samples */
-    } else {
-      if( nchunk_s <= 0 ) {
-        *status = SAI__ERROR;
-        errRep( "", FUNC_NAME ": NOI.CHUNK must be > 0.", status );
-      } else {
-        nchunk = (dim_t) nchunk_s;
       }
     }
   }

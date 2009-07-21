@@ -128,8 +128,6 @@ dks.boxcar = 10
 # additional despiking after each iteration within noi calculation
 #noi.spikethresh = 10
 #noi.spikeiter = 0
-#noi.samp = 1000
-#noi.chunk = 10
 
 # iterative filter.
 flt.filt_edgehigh = 0.2
