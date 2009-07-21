@@ -32,7 +32,7 @@
   <bugreports>@PACKAGE_BUGREPORT@</bugreports>
   <copyright>
     <year></year>
-    <name>Council for the Central Laboratory of the Research Councils</name>
+    <name>Science and Technology Facilities Council</name>
   </copyright>
   <notes><p>Starlink customised wrapper around latex2html</p></notes>
 </component>
