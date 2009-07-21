@@ -50,6 +50,7 @@
 #include <AstroCatalog.h>
 #include "VOTable1.1.hxx"
 #include "VOTable1.1_dns.hxx"
+#include "VOTable1.2.hxx"
 
 using namespace std;
 
@@ -68,6 +69,13 @@ namespace gaia
         //  Open a VOTable 1.1.
         votable_11::VOTABLE *votable2_;
         votable_11::VOTABLE *openVOTable2( istream *in );
+
+        //  Open a VOTable 1.2.
+        votable_12::VOTABLE *votable3_;
+        votable_12::VOTABLE *openVOTable3( istream *in );
+
+        //  Note for above. VOTABLE classes are not derived, so cannot
+        //  simply use an array.
 
         // Whether Xerces has been initialized.
         static bool initialized;
@@ -112,22 +120,26 @@ namespace gaia
 
         //  Create namespace qualified versions of VOTable members for the
         //  differing Schema (in this case version 1.1. with and without XML
-        //  namespace qualifications, dns means everything in the default
-        //  namespace). These read a VOTable and write a tab table. Defined
-        //  in VOTableWriteFunctions.C.
-#define NS votable_11_dns
+        //  namespace qualifications and 1.2, dns means everything in the
+        //  default namespace). These read a VOTable and write a tab
+        //  table. Defined in VOTableWriteFunctions.C.
+#define NS ::votable_11_dns
 #include "VOTableWriteFunctions.h"
 #undef NS
-        
-#define NS votable_11
+
+#define NS ::votable_11
+#include "VOTableWriteFunctions.h"
+#undef NS
+
+#define NS ::votable_12
 #include "VOTableWriteFunctions.h"
 #undef NS
 
         //  Similar functions for reading a tab table and writing a VOTable.
-        //  Only support writing in the VOTable namespace so no need for
+        //  Only support writing in the VOTable 1.1 namespace so no need for
         //  macro funnies. Defined in VOTableReadFunctions.C.
         int votable_read( AstroCatalog *cat, votable_11::VOTABLE &votable );
-        void resource_coosys( votable_11::RESOURCE &resource, 
+        void resource_coosys( votable_11::RESOURCE &resource,
                               AstroCatalog *cat );
         void table_params( votable_11::TABLE &table, AstroCatalog *cat );
         void table_data( votable_11::TABLE &table, AstroCatalog *cat );

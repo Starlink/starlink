@@ -8,7 +8,7 @@
  *  Description:
  *     These functions make use of the codesynthesis classes generated using
  *     the VOTable 1.1 schema to read a VOTable and write it out as a
- *     tab table. 
+ *     tab table.
  *
  *     There are two fundamental versions of theses schema derived classes
  *     (sadly not derived from each other, so no common interface, which is
@@ -68,6 +68,7 @@
 #include <string>
 #include <iomanip>
 #include <fcntl.h>
+#include <typeinfo>
 
 #include <xercesc/dom/DOM.hpp>
 
@@ -81,6 +82,7 @@
 /*  Local includes. */
 #include "VOTable1.1_dns.hxx"
 #include "VOTable1.1.hxx"
+#include "VOTable1.2.hxx"
 #include "VOTable.h"
 #include "VOTableStream.h"
 #include "GaiaUtils.h"
@@ -98,9 +100,13 @@ namespace gaia {
 #define NS votable_11_dns
 #include "VOTableWriteFunctions.icc"
 #undef NS
-    
+
 #define NS votable_11
 #include "VOTableWriteFunctions.icc"
 #undef NS
-    
+
+#define NS votable_12
+#include "VOTableWriteFunctions.icc"
+#undef NS
+
 }

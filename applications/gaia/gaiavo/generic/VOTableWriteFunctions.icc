@@ -465,11 +465,19 @@ int VOTable::table_data( const NS::TABLE& table, ofstream& out )
                 //  Look up the ref to get at the IDREF object.
                 if ( fiter->ref() ) {
                     if ( fiter->ref().get() ) {
-                        COOSYS const& coosys(dynamic_cast<COOSYS const&>(*(fiter->ref()).get()));
-                        table_coosys( coosys, out );
+                        try {
+                            COOSYS const& coosys(dynamic_cast<COOSYS const&>(*(fiter->ref()).get()));
+                            table_coosys( coosys, out );
 
-                        //  Only do this once. Assumes RA and Dec are in same system.
-                        havecoosys = true;
+                            //  Only do this once. Assumes RA and Dec are in
+                            //  same system. 
+                            havecoosys = true;
+                        }
+                        catch (bad_cast) {
+                            //  No COOSYS at IDREF. Must be another
+                            //  implementation, like STC.
+                            cerr << "Missing COOSYS for reference: " << fiter->ref() << endl;
+                        }
                     }
                     else {
                         cerr << "Missing COOSYS for reference: " << fiter->ref() << endl;

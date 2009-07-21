@@ -85,7 +85,8 @@ namespace gaia {
     /**
      *  Namespace qualifiers for checking XML declaration.
      */
-    const char *VOTABLE_NS ="http://www.ivoa.net/xml/VOTable/v1.1";
+    const char *VOTABLE_NS11 ="http://www.ivoa.net/xml/VOTable/v1.1";
+    const char *VOTABLE_NS12 ="http://www.ivoa.net/xml/VOTable/v1.2";
 
     /**  Static member initializations. */
     bool VOTable::initialized = false;
@@ -97,7 +98,8 @@ namespace gaia {
      */
     VOTable::VOTable() :
         votable1_(NULL),
-        votable2_(NULL)
+        votable2_(NULL),
+        votable3_(NULL)
     {
         // Initialise Xerces runtime
         if ( !VOTable::initialized ) {
@@ -173,6 +175,10 @@ namespace gaia {
             delete votable2_;
             votable2_ = NULL;
         }
+        if ( votable3_ ) {
+            delete votable3_;
+            votable3_ = NULL;
+        }
 
         //  Open the VOTable using the correct parsing classes. Currently this
         //  just scans for the namespace qualifying string in the first 2048
@@ -184,18 +190,24 @@ namespace gaia {
         in->seekg( 0, ios::beg );
 
         //   Now look for namespace signifier.
-        if ( strstr( line, VOTABLE_NS ) == NULL ) {
+        if ( strstr( line, VOTABLE_NS11 ) == NULL && 
+             strstr( line, VOTABLE_NS12 ) == NULL ) {
 
             //  No namespace.
             votable1_ = openVOTable1( in );
         }
         else {
             //  Namespace.
-            votable2_ = openVOTable2( in );
+            if ( strstr( line, VOTABLE_NS11 ) == NULL ) {
+                votable3_ = openVOTable3( in );
+            }
+            else {
+                votable2_ = openVOTable2( in );
+            }
         }
 
         //  If we have a table, that's OK.
-        if ( votable1_ || votable2_ ) {
+        if ( votable1_ || votable2_ || votable3_ ) {
             return 1;
         }
         return 0;
@@ -218,6 +230,10 @@ namespace gaia {
             delete votable2_;
             votable2_ = NULL;
         }
+        if ( votable3_ ) {
+            delete votable3_;
+            votable3_ = NULL;
+        }
 
         //  Create new instance.
         votable2_ = new VOTABLE();
@@ -237,6 +253,16 @@ namespace gaia {
             votable2_->version( "1.1" );
             VOTABLE_write( out, *votable2_, map );
         }
+
+        using namespace votable_12;
+        if ( votable3_ != NULL ) {
+            ofstream out( file, ios::out );
+            xml_schema::namespace_infomap map;
+            map[""].name = "http://www.ivoa.net/xml/VOTable/v1.2";
+            map[""].schema = "VOTable1.2.xsd";
+            votable3_->version( "1.2" );
+            VOTABLE_write( out, *votable3_, map );
+        }
     }
 
     /**
@@ -249,6 +275,9 @@ namespace gaia {
         }
         if ( votable2_ ) {
             delete votable2_;
+        }
+        if ( votable3_ ) {
+            delete votable3_;
         }
     }
 
@@ -364,6 +393,31 @@ namespace gaia {
     }
 
     /**
+     *  Read stream for a VOTable version 1.2 using fully qualified
+     *  namespace.
+     */
+    votable_12::VOTABLE *VOTable::openVOTable3( istream *in )
+    {
+        using namespace votable_12;
+        try {
+            auto_ptr<VOTABLE> table =
+                VOTABLE_read( *in,
+                              xml_schema::flags::dont_validate |
+                              xml_schema::flags::dont_initialize |
+                              xml_schema::flags::keep_dom );
+            return table.release();
+        }
+        catch ( const xml_schema::exception &e ) {
+            //  Basic report to terminal.
+            cerr << "open_votable: ";
+            cerr << e << endl;
+        }
+
+        //  Open failed.
+        return NULL;
+    }
+
+    /**
      *  Simple listing of VOTable contents.
      */
     void VOTable::list( ostream& str )
@@ -373,6 +427,9 @@ namespace gaia {
         }
         else if ( votable2_ ) {
             votable_enum( *votable2_, str );
+        }
+        else if ( votable3_ ) {
+            votable_enum( *votable3_, str );
         }
     }
 
@@ -386,6 +443,9 @@ namespace gaia {
         }
         else if ( votable2_ ) {
             return votable_count( *votable2_ );
+        }
+        else if ( votable3_ ) {
+            return votable_count( *votable3_ );
         }
         return 0;
     }
@@ -408,6 +468,9 @@ namespace gaia {
         }
         else if ( votable2_ ) {
             result = votable_write( *votable2_, index, out );
+        }
+        else if ( votable3_ ) {
+            result = votable_write( *votable3_, index, out );
         }
         out.close();
 
@@ -440,6 +503,9 @@ namespace gaia {
         }
         else if ( votable2_ ) {
             return votable_info_value( *votable2_, name, value, content );
+        }
+        else if ( votable3_ ) {
+            return votable_info_value( *votable3_, name, value, content );
         }
         return 0;
     }
