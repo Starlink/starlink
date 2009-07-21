@@ -12,6 +12,12 @@
       or VARIANCE components to become the DATA_ARRAY in the output
       NDF.
 
+   o  SETAXIS
+
+      - If MODE is "WCS" and the selected axis is a celestial
+        longitude or latitude axis, the axis units are now converted
+        correctly from radians to degrees.
+
 
 1 KAPPA_Version_1.10
 

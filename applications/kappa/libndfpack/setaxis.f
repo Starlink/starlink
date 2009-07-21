@@ -257,6 +257,8 @@
 *     20-JUL-2009 (DSB):
 *        - Use correct constants array when creating PMAP1 in WCS mode.
 *        - In WCS mode, PNTRW only needs "EL" elements, not "NIN*EL".
+*     21-JUL-2009 (DSB):
+*        Scale SKY axes from radians to degrees in WCS mode.
 *     {enter_further_changes_here}
 
 *-
@@ -300,6 +302,7 @@
       CHARACTER MODE*10          ! Mode of the modification
       CHARACTER SUGDEF*4         ! Suggested default
       CHARACTER TYPE*( NDF__SZTYP )  ! Numeric type for processing
+      CHARACTER UNIT*50          ! Units for new axis
       DOUBLE PRECISION CONST( NDF__MXDIM )! Constant axis values
       DOUBLE PRECISION DVALUE    ! Replacement value for d.p. data
       INTEGER ACTVAL             ! State of parameter NEWVAL
@@ -898,28 +901,50 @@
             PMAP2 = AST_PERMMAP( NOUT, INPRM, 1, OUTPRM, 0.0D0, ' ',
      :                           STATUS )
 
-*  Combine the Mappings together to get a Mapping within 1 input and 1
+*  Combine the Mappings together to get a Mapping with 1 input and 1
 *  output.
-            MAP = AST_SIMPLIFY( AST_CMPMAP( PMAP1, 
-     :                                      AST_CMPMAP( MAP0, PMAP2, 
-     :                                                  .TRUE., ' ', 
-     :                                                  STATUS ),
-     :                                      .TRUE., ' ', STATUS ),
-     :                          STATUS )
-           
+            MAP = AST_CMPMAP( PMAP1, AST_CMPMAP( MAP0, PMAP2, .TRUE.,
+     :                                           ' ', STATUS ),
+     :                        .TRUE., ' ', STATUS )
+
+*  If the selected axis is a SkyAxis, add in a mapping that will scale 
+*  the axis values from radians to degrees.
+            ATTR = 'Domain('
+            IAT = 7
+            CALL CHR_PUTI( IAXIS, ATTR, IAT )
+            CALL CHR_APPND( ')', ATTR, IAT )
+            IF( AST_GETC( IWCS, ATTR, STATUS ) .EQ. 'SKY' ) THEN
+               MAP = AST_CMPMAP( MAP, AST_ZOOMMAP( 1, AST__DR2D, ' ', 
+     :                                             STATUS ),
+     :                           .TRUE., ' ', STATUS )
+               UNIT = 'deg'
+
+*  If this is not a sky axis, get its unit from the current Frame of the
+*  WCS FrameSet.
+            ELSE
+               ATTR = 'UNIT('
+               IAT = 6
+               CALL CHR_PUTI( IAXIS, ATTR, IAT )
+               CALL CHR_APPND( ')', ATTR, IAT )
+               UNIT = AST_GETC( IWCS, ATTR( : IAT ), STATUS )
+            END IF
+
+*  Simplify the Mapping.
+            MAP = AST_SIMPLIFY( MAP, STATUS )
+
 *  Obtain the number of elements.
             EL = UBND( IAXIS ) - LBND( IAXIS ) + 1
 
 *  Get some workspace for the grid centres.
             CALL PSX_CALLOC( EL, '_DOUBLE', PNTRW, STATUS )
 
-*  Fill the first EL elements with the grid coordinate at the centre of
-*  each pixel.
+*  Fill the workspace with the grid coordinate at the centre of each 
+*  pixel.
             CALL KPG1_ELNMD( 1, EL, EL, %VAL( CNF_PVAL( PNTRW ) ), 
      :                       STATUS )
 
-*  Calculate new AXIS centres by transforming the grid centre values into
-*  the current Frame.
+*  Calculate new AXIS centres by transforming the grid centre values 
+*  into the current Frame.
             CALL AST_TRAN1( MAP, EL, %VAL( CNF_PVAL( PNTRW ) ), .TRUE.,
      :                      %VAL( CNF_PVAL( PNTRW ) ), STATUS )
 
@@ -966,14 +991,9 @@
      :                            STATUS )
                END IF
 
-               ATTR = 'UNIT('
-               IAT = 6
-               CALL CHR_PUTI( IAXIS, ATTR, IAT )
-               CALL CHR_APPND( ')', ATTR, IAT )
-               CVAL = AST_GETC( IWCS, ATTR( : IAT ), STATUS )
-               IF ( CVAL .NE. ' ' ) THEN
-                  NC = CHR_LEN( CVAL )
-                  CALL NDF_ACPUT( CVAL( :NC ), NDF, 'UNITS', IAXIS,
+               IF ( UNIT .NE. ' ' ) THEN
+                  NC = CHR_LEN( UNIT )
+                  CALL NDF_ACPUT( UNIT( :NC ), NDF, 'UNITS', IAXIS,
      :                            STATUS )
                END IF
 
