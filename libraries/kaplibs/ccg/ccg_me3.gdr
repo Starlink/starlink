@@ -39,7 +39,9 @@
 *        The actual number of contributing pixels from each input line
 *        to the output line.
 *     NBAD = INTEGER (Returned)
-*        The number of bad values in the output array.
+*        The number of bad values in the output array created while
+*        forming the statistics.  It excludes those bad values whose
+*        corresponding values along the collapse axis are all bad.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -93,6 +95,9 @@
 *         standard order in the API.
 *     2009 July 4 (MJC):
 *         Made NCON Returned and therefore it is initialised.
+*     2009 July 17 (MJC):
+*        Do not include collapsed data comprising only bad values
+*        in argument NBAD.
 *     {enter_further_changes_here}
 
 *-
@@ -201,9 +206,10 @@
             END IF
          ELSE
 
-*  Not enough contributing pixels, set output invalid.
+*  Not enough contributing pixels, set output invalid unless all of them
+*  are bad.
             RESULT( I ) = VAL__BAD<T>
-            NBAD = NBAD + 1
+            IF ( NGOOD .GT. 0 ) NBAD = NBAD + 1
          END IF
 
     1 CONTINUE

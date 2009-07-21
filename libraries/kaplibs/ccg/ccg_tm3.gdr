@@ -218,9 +218,10 @@
             END IF
          ELSE
 
-*  Not enough contributing pixels, set output invalid.
+*  Not enough contributing pixels, set output invalid unless all of them
+*  are bad.
             RESULT( I ) = VAL__BAD<T>
-            NBAD = NBAD + 1
+            IF ( NGOOD .GT. 0 ) NBAD = NBAD + 1
          END IF
     1 CONTINUE
 

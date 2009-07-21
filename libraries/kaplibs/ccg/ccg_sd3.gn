@@ -37,7 +37,9 @@
 *        The actual number of contributing pixels from each input line
 *        to the output line.
 *     NBAD = INTEGER (Returned)
-*        The number of bad values in the output array.
+*        The number of bad values in the output array created while
+*        forming the statistics.  It excludes those bad values whose
+*        corresponding values along the collapse axis are all bad.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -85,6 +87,9 @@
 *         Initialise STDEV to 0.0D0.
 *     2009 July 11 (MJC):
 *         Revise the previous fix to the intended code.
+*     2009 July 17 (MJC):
+*        Do not include collapsed data comprising only bad values
+*        in argument NBAD.
 *     {enter_further_changes_here}
 
 *-

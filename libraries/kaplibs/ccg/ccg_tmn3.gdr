@@ -79,6 +79,9 @@
 *     2009 July 3 (MJC):
 *        Converted to generic and renamed from CCG1_TMN3R.  Moved EL 
 *        (after renaming from NSET) to the normal order in the API.
+*     2009 July 17 (MJC):
+*        Do not include collapsed data comprising only bad values
+*        in argument NBAD.
 *     {enter_further_changes_here}
 
 *-
