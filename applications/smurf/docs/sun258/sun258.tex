@@ -14,7 +14,7 @@
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardoccopyright} 
-{Copyright \copyright\ 2009 University of British Columbia}
+{Copyright \copyright\ 2009 University of British Columbia, Science \& Technology Facilities Council}
 
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {258.1}
@@ -165,6 +165,8 @@
 \newcommand{\KAPPAref}{\xref{\KAPPA}{sun95}{}}
 \newcommand{\SMURF}{\textsc{smurf}}
 \newcommand{\SMURFcook}{\xref{\SMURF}{sc19}{}}
+\newcommand{\ADAM}{\textsc{Adam}}
+\newcommand{\AST}{\textsc{Ast}}
 
 % Application tasks
 \newcommand{\task}[1]{\textsf{#1}}
@@ -179,7 +181,7 @@
 \newcommand{\calcresp}{\xref{\task{calcresp}}{sun258}{CALCRESP}}
 \newcommand{\dreamsolve}{\xref{\task{dreamsolve}}{sun258}{DREAMSOLVE}}
 \newcommand{\dreamweights}{\xref{\task{dreamweights}}{sun258}{DREAMWEIGHTS}}
-\newcommand{\gsd2acsis}{\xref{\task{gsd2acsis}}{sun258}{GSD2ACSIS}}
+\newcommand{\gsdtoacsis}{\xref{\task{gsd2acsis}}{sun258}{GSD2ACSIS}}
 \newcommand{\gsdshow}{\xref{\task{gsdshow}}{sun258}{GSDSHOW}}
 \newcommand{\smurfhelp}{\xref{\task{smurfhelp}}{sun258}{SMURFHELP}}
 \newcommand{\impaztec}{\xref{\task{impaztec}}{sun258}{IMPAZTEC}}
@@ -187,8 +189,8 @@
 \newcommand{\qlmakemap}{\xref{\task{qlmakemap}}{sun258}{QLMAKEMAP}}
 \newcommand{\rawunpress}{\xref{\task{rawunpress}}{sun258}{RAWUNPRESS}}
 \newcommand{\rawfixmeta}{\xref{\task{rawfixmeta}}{sun258}{RAWFIXMETA}}
-\newcommand{\sc2sim}{\xref{\task{sc2sim}}{sun258}{SC2SIM}}
-\newcommand{\sc2threadtest}{\xref{\task{sc2threadtest}}{sun258}{SC2THREADTEST}}
+\newcommand{\sctwosim}{\xref{\task{sc2sim}}{sun258}{SC2SIM}}
+\newcommand{\sctwothreadtest}{\xref{\task{sc2threadtest}}{sun258}{SC2THREADTEST}}
 \newcommand{\scanfit}{\xref{\task{scanfit}}{sun258}{SCANFIT}}
 \newcommand{\skynoise}{\xref{\task{skynoise}}{sun258}{SKYNOISE}}
 \newcommand{\smurfcopy}{\xref{\task{smurfcopy}}{sun258}{SMURFCOPY}}
@@ -494,9 +496,9 @@
 %  Latex document header.
 %  ======================
 \begin{latexonly}
-   CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
+   \textsc{University of British Columbia} / \textsc{Joint Astronomy Centre} \hfill \textbf{\stardocname}\\
+   {\large Science \& Technology Facilities Council}\\
+   {\large Starlink Software Collection\\}
    {\large \stardoccategory\ \stardocnumber}
    \begin{flushright}
    \stardocauthors\\
@@ -543,15 +545,17 @@
    \stardocauthors \\
    \stardocdate
    \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC / Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+      \htmladdnormallink{University of British Columbia}
+                        {http://www.ubc.ca} \\
+      \htmladdnormallink{Joint Astronomy Centre}
+                        {http://www.jach.hawaii.edu}\\
+      \htmladdnormallink{Science \& Technology Facilities Council}
                         {http://www.pparc.ac.uk} \\
    \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.rl.ac.uk/}
+      \htmladdnormallink{Starlink Software Collection}{http://starlink.jach.hawaii.edu/}
    \begin{rawhtml} </H2> \end{rawhtml}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+      {http://starlink.jach.hawaii.edu/cgi-bin/hcserver?\stardocsource}\\
 
 %  HTML document table of contents. 
 %  ================================
