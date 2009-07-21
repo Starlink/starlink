@@ -162,7 +162,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -172,8 +172,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     TIMJ: T. Jenness (JACH)
@@ -196,7 +196,7 @@
 *        Changed (irg based) KPG1_NWILD call to (ndg based) KPG1_RGNDF.
 *        Also changed to display the NDF name if the NDF Title is blank.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
 *     {enter_further_changes_here}
 
 *-
@@ -365,6 +365,7 @@
 
 *  Find which array component to use.
 *  ==================================
+*
 *  Inquire which arrays are available and form a comma-separated list
 *  of them.  The required component must be present in all the datasets.
             IF ( I .EQ. 1 ) THEN
@@ -411,12 +412,12 @@
      :                       INPTR, EL, STATUS )
                USEVAR = .TRUE.
 
-*  otherwise just set the VARIANCE array to 0 (if a further NDF might
+*  Otherwise just set the VARIANCE array to 0 (if a further NDF might
 *  have a variance array).  Note that need to supply a zero-filled
 *  array for KPG1_KGODR.
             ELSE
 
-* Map the data array (as a REAL array regardless of actual type).
+*  Map the data array (as a REAL array regardless of actual type).
                CALL KPG1_MAP( NDFI, MCOMP, '_REAL', 'READ', 
      :                       INPTR, EL, STATUS )
             END IF
@@ -434,7 +435,7 @@
      :                       %VAL( CNF_PVAL( GVPTR( I ) ) ),
      :                       STATUS )
 
-* Write out some information.
+*  Write out some information.
             IF( TITLE .NE. ' ' ) THEN
                CALL MSG_SETC( 'TITLE', TITLE )
             ELSE
@@ -477,7 +478,7 @@
 * Set up the scratch output dummy arrays (for sorted data).
       CALL PSX_MALLOC( NTOTAL * VAL__NBR, WPTR, STATUS )
 
-* Loop round
+*  Loop around.
       NFAIL = 0
       DO I = 2, NFILES
 
@@ -486,7 +487,7 @@
 *  Set up the scratch (sorted) output array.
          CALL PSX_MALLOC( NPTS * VAL__NBR, WNPTR, STATUS )
 
-* Now compare the two samples.
+*  Now compare the two samples.
          CALL KPS1_KS2TR( NKEPT, NPTS, %VAL( CNF_PVAL( KSDPTR ) ),
      :                    %VAL( CNF_PVAL( GDPTR( I ) ) ), 
      :                    D( I - 1 ), PROB( I - 1 ),
@@ -497,15 +498,13 @@
          IF ( PROB( I - 1 ) .GT. LIMIT ) THEN
             CALL VEC_RTOR( .FALSE., NPTS, 
      :                     %VAL( CNF_PVAL( GDPTR( I ) ) ),
-     :                     
-     :   %VAL( CNF_PVAL( KSDPTR + NKEPT * VAL__NBR ) ),
+     :                    %VAL( CNF_PVAL( KSDPTR + NKEPT * VAL__NBR ) ),
      :                     IERR, NERR, STATUS )
 
             IF ( USEVAR ) THEN
                CALL VEC_RTOR( .FALSE., NPTS, 
      :                        %VAL( CNF_PVAL( GVPTR( I ) ) ),
-     :                        
-     :   %VAL( CNF_PVAL( KSVPTR + NKEPT * VAL__NBR ) ),
+     :                    %VAL( CNF_PVAL( KSVPTR + NKEPT * VAL__NBR ) ),
      :                        IERR, NERR, STATUS )
             END IF
 
@@ -528,7 +527,7 @@
      :        /'--------', STATUS )
          END IF
 
-*  Keep or reject (this must be dobne here since the MSG_OUTIF above
+*  Keep or reject (this must be done here since the MSG_OUTIF above
 *  annuls the KEEP message token if it is put in the previous IF
 *  (PROB...) THEN.
          IF ( PROB( I - 1 ) .GT. LIMIT ) THEN
@@ -561,7 +560,7 @@
       CALL PAR_PUT1R( 'PROB', NFILES - 1, PROB, STATUS )
       CALL PAR_PUT1R( 'DIST', NFILES - 1, D, STATUS )
 
-* Let's be friendly and tell the user something.
+*  Let's be friendly and tell the user something.
       CALL MSG_BLANKIF( MSG__NORM, STATUS )
       IF ( NFAIL .EQ. NFILES - 1 ) THEN
          CALL MSG_OUTIF( MSG__NORM, 'FINAL',
@@ -656,7 +655,7 @@
          CALL ERR_RLSE
       END IF
 
-* Tidy up.
+*  Tidy up.
       CALL PSX_FREE( WPTR, STATUS )
 
       DO I = 1, NFILES
