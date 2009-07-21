@@ -688,12 +688,14 @@ applications/sgmlkit/misc/bindocs.sgml
 applications/sgmlkit/misc/libdocs.sgml
 applications/sgmlkit/misc/misc.stamp
 
+applications/smurf/docs/sun258/sun258.pdf
 applications/smurf/libsmf/make_h
 applications/smurf/libsmf/smf.h
 applications/smurf/libsmf/smf_average_data.c
 applications/smurf/libsmf/smf_boxcar1.c
 applications/smurf/libsmf/smf_sort.c
 applications/smurf/libsmf/smf_templateFit1.c
+applications/smurf/libsmurf/smurfmon.tex
 applications/smurf/smurf.csh
 applications/smurf/smurf.icl
 applications/smurf/smurf.sh

@@ -30,6 +30,7 @@ STAR_MONOLITHS
 STAR_CHECK_PROGS( ifd2star )
 STAR_CHECK_PROGS( hlib )
 STAR_CHECK_PROGS(prohlp,sst)
+STAR_CHECK_PROGS(prolat,sst)
 STAR_CHECK_PROGS(perl)
 
 dnl    Variable sizes - needed for specwriter
@@ -103,7 +104,7 @@ dnl    Includes: fio, par, sae;
 dnl    links to: chr, mers, fio, psx, task.
 STAR_DECLARE_DEPENDENCIES([build], [ast sae pcs mers ndf shl gsl ndg fftw ard kaplibs pda gsd])
 STAR_DECLARE_DEPENDENCIES([link], [ndf ast hlp ndg shl pda gsd])
-dnl We use the sst package to build documentation (prohlp)
+dnl We use the sst package to build documentation (prohlp and prolat)
 STAR_DECLARE_DEPENDENCIES([sourceset], [sst])
 
 dnl    No use dependencies

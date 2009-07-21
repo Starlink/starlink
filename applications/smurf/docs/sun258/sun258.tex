@@ -210,6 +210,42 @@
 \newcommand{\fft}{\xref{\task{sc2fft}}{sun258}{SC2FFT}}
 \newcommand{\fts}{\xref{\task{sc2fts}}{sun258}{SC2FTS}}
 
+%% Definitions imported from SUN/95
+
+% A kind of list item, like description, but with an easily adjustable
+% item separation.  Note that the paragraph and fount-size change are
+% needed to make the revised \baselinestretch work.
+\newlength{\menuwidth}
+\newlength{\menuindent}
+\newcommand{\menuitem}[2]
+  {{\bf #1} \settowidth{\menuwidth}{{\bf #1} }
+  \setlength{\menuindent}{-0.5em}
+  \addtolength{\menuwidth}{-2\menuwidth}
+  \addtolength{\menuwidth}{\textwidth}
+  \addtolength{\menuwidth}{\menuindent}
+  \hspace{\menuindent}\parbox[t]{\menuwidth}{
+  \renewcommand{\baselinestretch}{0.75}\small
+  #2 \par \vspace{1.0ex}
+  \renewcommand{\baselinestretch}{1.0}\normalsize} \\ }
+\begin{htmlonly}
+\newcommand{\menuitem}[2]
+  {\item [\htmlref{#1}{#1}] #2}
+\end{htmlonly}
+
+\newcommand{\classitem}[1]{\item [\htmlref{#1}{#1}]}
+
+% an environment for references (for the SST sstdiytopic command).
+\newenvironment{refs}{\vspace{-4ex} % normally 3ex
+                      \begin{list}{}{\setlength{\topsep}{0mm}
+                                     \setlength{\partopsep}{0mm}
+                                     \setlength{\itemsep}{0mm}
+                                     \setlength{\parsep}{0mm}
+                                     \setlength{\leftmargin}{1.5em}
+                                     \setlength{\itemindent}{-\leftmargin}
+                                     \setlength{\labelsep}{0mm}
+                                     \setlength{\labelwidth}{0mm}}
+                    }{\end{list}}
+
 %+
 %  Name:
 %     SST.TEX
@@ -1651,6 +1687,202 @@ on which this SUN is based.
   \item makemap
 \end{itemize}
 
+\newpage
+\appendix
+\begin{small}
+\section{\xlabel{ap_summary}An Alphabetical Summary of SMURF Commands
+\label{ap:summary}}
+\begin{htmlonly}
+\begin{description}
+\end{htmlonly}
+
+\menuitem{BADBOLOS}{
+  Generate a map of random dead bolometers and add it as an NDF extension to the input file.}
+\menuitem{CALCDARK}{
+ Calculate the 2d dark frame from a dark observation.}
+\menuitem{CALCFLAT}{
+ Calculate a flatfield solution}
+\menuitem{CALCRESP}{
+ Calculate bolometer responsivity from stored flatfield solution.}
+\menuitem{DREAMSOLVE}{
+ DREAM solver.}
+\menuitem{DREAMWEIGHTS}{
+ DREAM weight matrix generation.}
+\menuitem{dumpocscfg}{
+Retrieve OCS XML configuration used to generate the raw data.}
+\menuitem{EXTINCTION}{
+ Extinction correct SCUBA-2 data.}
+\menuitem{FLATFIELD}{
+ Flatfield SCUBA-2 data.}
+\menuitem{GSD2ACSIS}{
+ Convert a GSD format DAS data file to an ACSIS format NDF. (beta test)}
+\menuitem{GSDSHOW}{
+ Display the contens of a GSD file's headers and arrays.}
+\menuitem{IMPAZTEC}{
+  Import AzTEC NETCDF files and produce SCUBA-2 format data files. (untested)}
+\menuitem{jcmtstate2cat}{
+Dump JCMTSTATE information to ASCII table.}
+\menuitem{MAKECUBE}{
+ Regrid ACSIS spectra into a data cube.}
+\menuitem{MAKEMAP}{
+ Regrid SCUBA-2 data into a map.}
+\menuitem{QLMAKEMAP}{
+  Quick-Look SCUBA-2 map maker.}
+\menuitem{RAWUNPRESS}{
+  Uncompress raw SCUBA-2 data.}
+\menuitem{RAWFIXMETA}{
+ Report metadata issues with ACSIS data files.}
+\menuitem{REMSKY}{
+  Remove Sky signal from SCUBA-2 observations.}
+\menuitem{SC2CLEAN}{
+ Clean-up SCUBA-2 time series.}
+\menuitem{SC2CONCAT}{
+ Concatenate files from a single observation into a single file.}
+\menuitem{SC2FFT}{
+ Perform an forward or inverse FFT on SCUBA-2 data.}
+\menuitem{SC2FTS}{
+ FTS-2 data processing (disabled).}
+\menuitem{SC2SIM}{
+SCUBA-2 simulator.}
+\menuitem{SCANFIT}{
+  Fit a sky signal to each SCUBA-2 scan.}
+\menuitem{SKYNOISE}{
+ Generate a simulated sky background.}
+\menuitem{SMURFCOPY}{
+Copy a 2d image out of a time series file.}
+\menuitem{SMURFHELP}{
+Gives help about SMURF.}
+\menuitem{STARECALC}{
+ Calculate a map from a Stare-mode observation.}
+\menuitem{TIMESORT}{
+ Re-order time slices in a raw data cube into increasing time.}
+\menuitem{UNMAKECUBE}{
+ Produce simulated time series data from a regridded ACSIS data cube.}
+\begin{htmlonly}
+\end{description}
+\end{htmlonly}
+
+\newpage
+\section{\xlabel{ap_classified}Classified SMURF commands
+\label{ap:classified}}
+
+\SMURF\ applications may be classified in terms of their
+functions as follows.
+
+{\large
+\begin{center}
+{\bf General Purpose}
+\end{center}
+}
+
+\begin{description}
+\classitem{dumpocscfg}{
+Retrieve OCS XML configuration used to generate the raw data.}
+\classitem{jcmtstate2cat}{
+Dump JCMTSTATE information to ASCII table.}
+\classitem{SMURFHELP}{
+Gives help about SMURF.}
+\end{description}
+
+{\large
+\begin{center}
+{\bf SCUBA-2 Data Processing}
+\end{center}
+}
+
+\begin{description}
+\classitem{CALCDARK}{
+ Calculate the 2d dark frame from a dark observation.}
+\classitem{CALCFLAT}{
+ Calculate a flatfield solution}
+\classitem{CALCRESP}{
+ Calculate bolometer responsivity from stored flatfield solution.}
+\classitem{DREAMSOLVE}{
+ DREAM solver.}
+\classitem{DREAMWEIGHTS}{
+ DREAM weight matrix generation.}
+\classitem{EXTINCTION}{
+ Extinction correct SCUBA-2 data.}
+\classitem{FLATFIELD}{
+ Flatfield SCUBA-2 data.}
+\classitem{MAKEMAP}{
+ Regrid SCUBA-2 data into a map.}
+\classitem{QLMAKEMAP}{
+  Quick-Look SCUBA-2 map maker.}
+\classitem{RAWUNPRESS}{
+  Uncompress raw SCUBA-2 data.}
+\classitem{REMSKY}{
+  Remove Sky signal from SCUBA-2 observations.}
+\classitem{SC2CLEAN}{
+ Clean-up SCUBA-2 time series.}
+\classitem{SC2CONCAT}{
+ Concatenate files from a single observation into a single file.}
+\classitem{SC2FFT}{
+ Perform an forward or inverse FFT on SCUBA-2 data.}
+\classitem{SC2FTS}{
+ FTS-2 data processing (disabled).}
+\classitem{SCANFIT}{
+  Fit a sky signal to each SCUBA-2 scan.}
+\classitem{SMURFCOPY}{
+Copy a 2d image out of a time series file.}
+\classitem{STARECALC}{
+ Calculate a map from a Stare-mode observation.}
+\end{description}
+
+{\large
+\begin{center}
+{\bf ACSIS Data Processing}
+\end{center}
+}
+
+\begin{description}
+\classitem{MAKECUBE}{
+ Regrid ACSIS spectra into a data cube.}
+\classitem{RAWFIXMETA}{
+ Report metadata issues with ACSIS data files.}
+\classitem{TIMESORT}{
+ Re-order time slices in a raw data cube into increasing time.}
+\classitem{UNMAKECUBE}{
+ Produce simulated time series data from a regridded ACSIS data cube.}
+\end{description}
+
+{\large
+\begin{center}
+{\bf Data Import}
+\end{center}
+}
+
+\begin{description}
+\classitem{GSD2ACSIS}{
+ Convert a GSD format DAS data file to an ACSIS format NDF. (beta test)}
+\classitem{GSDSHOW}{
+ Display the contens of a GSD file's headers and arrays.}
+\classitem{IMPAZTEC}{
+  Import AzTEC NETCDF files and produce SCUBA-2 format data files. (untested)}
+\end{description}
+
+{\large
+\begin{center}
+{\bf SCUBA-2 Simulations}
+\end{center}
+}
+
+\begin{description}
+\classitem{BADBOLOS}{
+ Generate a map of random dead bolometers and add it as an NDF extension to the input file.}
+\classitem{SC2SIM}{
+SCUBA-2 simulator.}
+\classitem{SKYNOISE}{
+ Generate a simulated sky background.}
+\end{description}
+
+\end{small}
+
+\section{\xlabel{ap_full}Specifications of SMURF applications\label{ap:full}}
+
+The following pages describe all the SMURF commands in detail.
+
+\input{../../libsmurf/smurfmon}
 
 \end{document}
 
