@@ -46,7 +46,7 @@ STAR_DECLARE_DEPENDENCIES([sourceset], [sst])
 
 dnl    No use dependencies
 
-STAR_LATEX_DOCUMENTATION(sun95 sun221)
+STAR_LATEX_DOCUMENTATION(sun95)
 
 dnl    There is a .msg file in this directory, and this adds Makefile
 dnl    rules to generate the xxx_ERR, xxx_err.h and fac_nnn_err files

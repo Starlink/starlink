@@ -30,7 +30,7 @@ packages.
       <role>owner</role>
     </person>
   </developers>
-  <documentation> sun95 sun221</documentation>
+  <documentation> sun95</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
