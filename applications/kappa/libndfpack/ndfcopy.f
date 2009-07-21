@@ -36,6 +36,22 @@
 *     ndfcopy in out
 
 *  ADAM Parameters:
+*     COMP = LITERAL (Read)
+*        The name of an array component in the input NDF (specified by
+*        Parameter IN) that will become the DATA_ARRAY in the output NDF
+*        (specified by Parameter OUT).  It has the following options.
+*
+*          "Data"     -- Each array component present is propagated to
+*                        its counterpart.
+*          "Variance" -- The VARIANCE component in the input NDF becomes
+*                        the DATA_ARRAY in the output NDF and retains
+*                        its data type.  The original DATA_ARRAY is not 
+*                        copied.
+*          "Quality" --  The QUALITY component in the input NDF becomes 
+*                        the DATA_ARRAY in the output NDF and will be
+*                        data type _UBYTE.  The original DATA_ARRAY and 
+*                        VARIANCE components are not copied.
+*        ["Data"]
 *     EXTEN = _LOGICAL (Read)
 *        If set to FALSE (the default), any NDFs contained within
 *        extensions of the input NDF are copied to equivalent places 
@@ -134,6 +150,9 @@
 *        Copies the contents of the NDF structure infile to the new
 *        structure outfile.  Any unused space will be eliminated during
 *        the copying operation.
+*     ndfcopy infile outfile comp=var
+*        As the previous example except that the VARIANCE component of
+*        NDF infile becomes the DATA_ARRAY of NDF outfile.
 *     ndfcopy in=data1(3:40,-3:17) out=data2 title="Extracted section"
 *        Copies the section (3:40,-3:17) of the NDF called data1 to a
 *        new NDF called data2.  The output NDF is assigned the new title
@@ -230,11 +249,13 @@
 *        Report an error if TRIM is true but there are no significant
 *        output pixel axes.
 *     26-JAN-2009 (DSB):
-*        Added parameter LIKEWCS.
+*        Added Parameter LIKEWCS.
 *     11-FEB-2009 (DSB):
-*        Added parameter EXTEN. Most of the work moved to KPG1_NDFCP.
+*        Added Parameter EXTEN. Most of the work moved to KPG1_NDFCP.
 *     9-MAR-2009 (DSB):
-*        Added parameter TRIMBAD.
+*        Added Parameter TRIMBAD.
+*     2009 July 17 (MJC):
+*        Added Parameter COMP.
 *     {enter_further_changes_here}
 
 *-
@@ -253,6 +274,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
+      CHARACTER COMP*8           ! NDF array component to read
       CHARACTER LOC*(DAT__SZLOC) ! Locator for output extension NDF
       CHARACTER NAME*(DAT__SZNAM)! Name for output extension NDF
       CHARACTER PLOC*(DAT__SZLOC)! Locator for LOC's parent
@@ -284,7 +306,8 @@
       LOGICAL EXTEN              ! Truncate outptu extension NDFs?
       LOGICAL LIKWCS             ! Match WCS bounds with template?
       LOGICAL SAME               ! Extension NDF same as base NDF?
-      LOGICAL TRIM               ! Remove insignificant piel axes?
+      LOGICAL THERE              ! Array component is present?
+      LOGICAL TRIM               ! Remove insignificant pixel axes?
       LOGICAL TRMBAD             ! Remove any boundary of bad pixels?
       LOGICAL TRMWCS             ! Remove corresponding WCS axes?
 *.
@@ -300,6 +323,24 @@
 
 *  Obtain the input NDF.
       CALL LPG_ASSOC( 'IN', 'READ', NDF1, STATUS )
+
+*  Determine which array component is to be copied.
+      CALL PAR_CHOIC( 'COMP', 'Data', 'Data,Variance,Quality', 
+     :                .FALSE., COMP, STATUS )
+
+*  Check that the required component exists and report an error if it
+*  does not.
+      IF ( STATUS .EQ. SAI__OK ) THEN
+         CALL NDF_STATE( NDF1, COMP, THERE, STATUS )
+         IF ( .NOT. THERE ) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETC( 'COMP', COMP )
+            CALL NDF_MSG( 'NDF', NDF1 )
+            CALL ERR_REP( 'NDFCOPY_NOCOMP', 'The ^COMP component is '/
+     :                    /'undefined in the NDF structure ^NDF',
+     :                    STATUS )
+         END IF
+      END IF
 
 *  See if the output NDF is to be trimmed to exclude any border of bad
 *  pixels.
@@ -348,7 +389,7 @@
 
 *  Copy the input NDF to the output location.
       PLACE = NDF__NOPL
-      CALL KPS1_NDFCP( NDF1, TRIM, TRMWCS, 'OUT', PLACE, NDF3,
+      CALL KPS1_NDFCP( NDF1, COMP, TRIM, TRMWCS, 'OUT', PLACE, NDF3,
      :                 STATUS )
 
 *  See if we are to copy equivalent sections of any NDFs contained in the
@@ -431,8 +472,8 @@
 
 *  Copy the input extension NDF section to the output, using the above
 *  placeholder to indicate where the new NDF should be placed.
-               CALL KPS1_NDFCP( NDF5, TRIM, TRMWCS, ' ', PLACE, NDF6,
-     :                          STATUS )
+               CALL KPS1_NDFCP( NDF5, COMP, TRIM, TRMWCS, ' ', PLACE, 
+     :                          NDF6, STATUS )
 
 *  Free resources.
                CALL NDF_ANNUL( NDF5, STATUS )

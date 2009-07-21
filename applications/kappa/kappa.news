@@ -1,3 +1,18 @@
+1 KAPPA_Version_1.11
+
+   A new release of KAPPA (V1.11) is under development.  The main 
+   changes so far are listed below.  For complete details of all 
+   changes, see the "Release Notes" appendix in SUN/95.
+
+2 Modified_applications
+
+   o  NDFCOPY
+
+      -  There is a new COMP parameter that permits the QUALITY
+      or VARIANCE components to become the DATA_ARRAY in the output
+      NDF.
+
+
 1 KAPPA_Version_1.10
 
    A new release of KAPPA (V1.10-10) is available.  The main 

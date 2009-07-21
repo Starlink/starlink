@@ -15,9 +15,9 @@
 \newcommand{\stardocsource}    {sun95.36}
 \newcommand{\stardocnumber}    {95.36}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2009 July 9}
+\newcommand{\stardocdate}      {2009 July 19}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {1.10}
+\newcommand{\stardocversion}   {1.11}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -35474,6 +35474,33 @@ KAPPA: \htmlref{ADD}{ADD},
    }
    \sstparameters{
       \sstsubsection{
+         COMP = LITERAL (Read)
+      }{
+         The name of an array component in the input NDF (specified by
+         Parameter IN) that will become the DATA\_ARRAY in the output NDF
+         (specified by Parameter OUT).  It has the following options.
+
+         \ssthitemlist{
+
+            \sstitem
+            {\tt "Data"}  --- Each array component present is propagated to
+            its counterpart.
+
+            \sstitem
+            {\tt "Variance"} --- The VARIANCE component in the input NDF 
+            becomes the \linebreak
+            DATA\_ARRAY in the output NDF and retains
+            its data type.  The original DATA\_ARRAY is not copied.
+
+            \sstitem
+            {\tt "Quality"} ---  The QUALITY component in the input NDF
+            becomes the \linebreak DATA\_ARRAY in the output NDF and will be data type
+            \_UBYTE.  The original DATA\_ARRAY and VARIANCE components are
+            not copied.
+         }
+         {\tt ["Data"]}
+      }
+      \sstsubsection{
          EXTEN = \_LOGICAL (Read)
       }{
          If set to {\tt FALSE} (the default), any NDFs contained within
@@ -35609,6 +35636,12 @@ KAPPA: \htmlref{ADD}{ADD},
          Copies the contents of the NDF structure infile to the new
          structure outfile.  Any unused space will be eliminated during
          the copying operation.
+      }
+      \sstexamplesubsection{
+         ndfcopy infile outfile comp=var
+      }{
+         As the previous example except that the VARIANCE component of
+         NDF infile becomes the DATA\_ARRAY of NDF outfile.
       }
       \sstexamplesubsection{
          ndfcopy in=data1(3:40,-3:17) out=data2 title="Extracted section"
@@ -56070,7 +56103,7 @@ The following applications have been modified:
 
 \end{itemize}
 
-\section{\xlabel{se_changes}Release Notes---V1.10\label{se:changes}}
+\section{Release Notes---V1.10}
 
 \subsection{Modified Commands}
 The following applications have been modified:
@@ -56206,6 +56239,7 @@ The following applications have been modified:
         \item Has a new parameter called HISTORY that can be set to {\tt TRUE}
         to display any history records stored in the provenance extension
         of each ancestor NDF.
+
         \item Has a new parameter called HIDE that can be set to {\tt TRUE}
         to include ``hidden'' ancestors in the display.  Ancestors can be
         hidden using \htmlref{PROVREM}{PROVREM}.
@@ -56214,9 +56248,9 @@ The following applications have been modified:
    \item [\htmlref{ROTATE}{ROTATE}] \mbox{}
       \begin{itemize}
         \item Efficiency improvements have been made for rotations of 180 
-         degrees and arbitrary angles that should greatly reduce the memory
-         requirements for processing cubes.  Additional efficiencies have
-         be made for the 0-degree rotation special case.
+        degrees and arbitrary angles that should greatly reduce the memory
+        requirements for processing cubes.  Additional efficiencies have
+        be made for the 0-degree rotation special case.
       \end{itemize}
 
    \item [\htmlref{STATS}{STATS}] \mbox{}
@@ -56231,7 +56265,29 @@ The following applications have been modified:
    \item [\htmlref{THRESH}{THRESH}] \mbox{}
       \begin{itemize}
         \item New result parameters NUMHI, NUMLO, NUMRANGE, and NUMSAME
-         return the number of changed and unchanged pixels.
+        return the number of changed and unchanged pixels.
+      \end{itemize}
+
+\end{description}
+
+% Exhausted the 26 Appendices.
+\setcounter{section}{0}
+\renewcommand{\thesection}{A\Alph{section}}
+%\renewcommand{\thesubsection}{\section.\arabic{subsection}}
+
+\section{\xlabel{se_changes}Release Notes---V1.11\label{se:changes}}
+
+\subsection{Modified Commands}
+The following applications have been modified:
+
+\begin{description}
+
+   \item [\htmlref{NDFCOPY}{NDFCOPY}] \mbox{}
+      \begin{itemize}
+        \item There is a new COMP parameter that permits the
+        \htmlref{QUALITY}{apndf:quality} or 
+        \htmlref{VARIANCE}{apndf:variance} components to become the 
+        DATA\_ARRAY in the output NDF.               
       \end{itemize}
 
 \end{description}

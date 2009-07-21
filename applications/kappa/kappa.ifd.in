@@ -1108,6 +1108,15 @@ package kappa {
 
          helplib {$KAPPA_HELP}
 
+         parameter comp {
+            type LITERAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default DATA
+            prompt {Array component containing data values}
+            helpkey *
+         }
+
          parameter exten {
             type _LOGICAL
             access READ
