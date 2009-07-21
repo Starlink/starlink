@@ -641,11 +641,11 @@ prompt. The welcome message will appear as shown below:
 
 \end{verbatim}
 This defines aliases for each \SMURF\ command, shows the help command
-and version number. You can now use SMURF routines or ask for help.
+and version number. You can now use \SMURF\ routines or ask for help.
 
 \subsubsection{Getting Help}
 
-Access the SMURF online help system as follows:
+Access the \SMURF\ online help system as follows:
 \begin{enumerate}
 \item At the prompt, type \verb+smurfhelp+. The welcome message is
   displayed along with a list of available topics.
@@ -679,6 +679,7 @@ or \verb+debug+ will slow down execution due to the (potentially vast)
 number of messages written to the terminal.
 
 \begin{table}
+\centering
 \begin{tabular}{|c|l|}
 \hline
 Option  & Description \\
@@ -728,6 +729,21 @@ Note that the output filenames should be listed in the same order as
 the input filenames otherwise the processed data will be written under
 the wrong filenames. Take care to supply a different output file name
 from the input as the contents are overwritten!
+
+\subsection{Document conventions}
+
+Observing modes are denoted by all upper case body text (e.g.\
+FLATFIELD).
+
+Starlink package names are shown in small caps (e.g.\ \textsc{smurf}).
+
+NDF extensions and components are shown in upper case fixed-width type
+(e.g.\ \texttt{HISTORY}). Content listings are shown in fixed-width type.
+
+Text relating to filenames, key presses or entries typed at the
+command line are denoted by fixed-width type (e.g.\ \texttt{\% smurf}).
+
+%\section{ACSIS and SCUBA-2 Data}
 
 \subsection{Data File Structure}
 
@@ -780,11 +796,16 @@ provshow to list the contents.
 \subsection{Supported coordinate systems}
 
 \SMURF\ uses \AST\ for its astrometry and thus any coordinate system
-supported by \AST\ may be used when creating images/cubes.
+supported by \AST\ may be used when creating images/cubes. The default
+behaviour is to use the same system in which the observations were
+made (known as \texttt{TRACKING}).
 
 \subsubsection{Moving sources}
 
 WCS attributes to set...
+
+The mapping tasks \qlmakemap, \makemap\ and \makecube\ automatically
+deal with moving sources.
 
 \subsection{File sizes and disk space}
 
