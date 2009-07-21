@@ -1,6 +1,6 @@
 
 noinst_LTLIBRARIES = libsmurf.la
-noinst_DATA = smurfmon.hlp
+noinst_DATA = smurfmon.hlp smurfmon.tex
 
 libsmurf_la_SOURCES = $(C_ROUTINES)
 
@@ -44,4 +44,12 @@ smurfmon.hlp: $(C_ROUTINES)
 	cat $(C_ROUTINES) > all.c
 	PATH="$(PATH):$(STARLINK)/bin/sst"; export PATH; \
 	@PROHLP@ in=all.c out=smurfmon.hlp single=no
+	-rm all.c
+
+# Generate LaTeX include file for sun258
+smurfmon.tex: $(C_ROUTINES)
+	-rm -f smurfmon.tex
+	cat $(C_ROUTINES) > all.c
+	PATH="$(PATH):$(STARLINK)/bin/sst"; export PATH; \
+	@PROLAT@ in=all.c out=smurfmon.tex single=no page=yes atask=yes document=no
 	-rm all.c
