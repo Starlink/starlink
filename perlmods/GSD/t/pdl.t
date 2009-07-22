@@ -1,52 +1,50 @@
-
+#!perl
 # Test the PDL subclassing
 
 use strict;
-use Test;
+use Test::More;
 
-BEGIN { plan tests => 10 }
-
-eval { require GSD::PDL; 1; };
-if ($@) {
-  foreach (1..10) {
-    skip("Skip PDL not installed. Skipping",$_);
-  }
-  exit;
+my $loaded = eval { require PDL::LiteF; 1; };
+if (!$loaded) {
+    print "***********************\n";
+    plan skip_all => "PDL not installed";
+} else {
+    plan tests => 10;
 }
 
-ok(1);
+use_ok( "GSD::PDL" );
 
 my $filename = "t/obs_das_0141";
 
 my $gsd = new GSD::PDL( $filename );
 
-ok(defined $gsd);
+isa_ok($gsd, "GSD::PDL");
 
-ok(sprintf("%4.2f", $gsd->version), '5.30');
-ok($gsd->nitems, 167);
+is(sprintf("%4.2f", $gsd->version), '5.30', "Version check");
+is($gsd->nitems, 167, "Count items");
 
 # Get some scalars
 
-ok( $gsd->GetByName('C4LSC'), 'AZ' );
+is( $gsd->GetByName('C4LSC'), 'AZ', "Check C4LSC" );
 
-ok( $gsd->GetByNum(2), 'm94bu22' );
+is( $gsd->GetByNum(2), 'm94bu22', "Check item 2" );
 
 # Get an PDL array
 
 my $data = $gsd->GetByName('C7VRADIAL');
 
-ok( UNIVERSAL::isa($data, 'PDL'));
+isa_ok( $data, "PDL" );
 
-ok( $data->at(2), 49583.9539769676);
+is( $data->at(2), 49583.9539769676, "Check C7VRADIAL");
 
 # A 2-d PDL array
 
 $data = $gsd->GetByName('C11PHA');
 
-ok( $data->at(0,1), 1800);
+is( $data->at(0,1), 1800, "Check C11PHA");
 
 # A 3d array
 
 $data = $gsd->GetByNum($gsd->nitems);
 
-ok( $data->at(3,0,0), 9999);
+is( $data->at(3,0,0), 9999, "Get last item");

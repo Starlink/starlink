@@ -3,13 +3,9 @@
 # Test the pure library interface
 use strict;
 no strict 'refs';
-use Test;
+use Test::More tests => 6;
 
-BEGIN { plan tests => 6 }
-
-use GSD;
-
-ok(1);
+BEGIN { use_ok( "GSD" ); }
 
 my ($version, $label, $no_items, $fptr, $file_dsc, $item_dsc, $data_ptr);
 
@@ -23,16 +19,12 @@ my $status = gsdOpenRead($filename,$version,$label,$no_items,$fptr,$file_dsc,
 $label =~ s/\s+$//g;
 
 if ($status != 0) {
-  ok(0);
-  exit;
+  BAIL_OUT( "Failed to open the file so can not continue testing" );
 } else {
-  ok(1);
+  is($status, 0, "Open status");
 }
 
-ok($label =~ /JCMT/);
-
-#($label =~ /JCMT/) && (print "ok\n") || (print "not ok\n");
-
+like($label, qr/JCMT/, "Is this a JCMT file");
 
 my $nm = "c1long";
 my ($unit, $type, $array, $item);
@@ -42,7 +34,7 @@ my $newdata;
 my $call = "gsdGet$array\l$type";
 $status = &{$call}($file_dsc,$item_dsc,$data_ptr,$item,$newdata);
 
-ok($newdata - 155.479721069336  < 1e-10);
+ok($newdata - 155.479721069336  < 1e-10, "Compare C1LONG");
 
 my $i  = 10;
 $status = gsdItem($file_dsc,$item_dsc,$i,$nm,$unit,$type,$array);
@@ -50,11 +42,11 @@ $call = "gsdGet$array\l$type";
 $status = &{$call}($file_dsc,$item_dsc,$data_ptr,$i,$newdata);
 
 
-ok($newdata =~ /BESSELIAN/);
+like($newdata, qr/BESSELIAN/, "Besselian epoch?");
 
 $status = gsdClose($fptr,$file_dsc,$item_dsc,$data_ptr);
 print "# Close status: $status\n";
-ok($status == 0);
+is($status, 0, "Closing file");
 
 exit;
 
