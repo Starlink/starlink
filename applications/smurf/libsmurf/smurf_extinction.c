@@ -33,13 +33,13 @@
 *          supplied. [!]
 *     CSOTAU = REAL (Read)
 *          Value of the 225 GHz zenith optical depth. Only used if
-*          METHOD = CSOTAU. If a null (!) value is given, the task
+*          TAUSRC equals "CSOTAU". If a null (!) value is given, the task
 *          will use the value from the FITS header for each
 *          file. Note that if a value is entered by the user, that
 *          value is used for all input files.
 *     FILTERTAU = REAL (Read)
 *          Value of the zenith optical depth for the current
-*          wavelength. Only used if METHOD = FILTERTAU. Note that no
+*          wavelength. Only used if TAUSRC equals "FILTERTAU". Note that no
 *          check is made to ensure that all the input files share the same
 *          filter.
 *     HASSKYREM = LOGICAL (Read)
@@ -50,6 +50,14 @@
 *     IN = NDF (Read)
 *          Input file(s). The input data must have had the sky signal
 *          removed
+*     METHOD = CHAR (Read)
+*          Method to use for airmass calculation. Options are:
+*          - ADAPTIVE  - Determine whether to use QUICK or FULL
+*          based on the elevation of the source and the opacity.
+*          - FULL      - Calculate the airmass of each bolometer.
+*          - QUICK     - Use a single airmass for each time slice.
+*
+*          [ADAPTIVE]
 *     MSG_FILTER = _CHAR (Read)
 *          Control the verbosity of the application. Values can be
 *          NONE (no messages), QUIET (minimal messages), NORMAL,
@@ -64,9 +72,9 @@
 *          Flag for applying the Quick method.
 *     TAUSRC = CHAR (Read)
 *          Source of optical depth data. Options are:
-*             WVMRAW    - use the water vapour monitor time series data
-*             CSOTAU    - use a single 225GHz tau value
-*             FILTERTAU - use a single tau value for this wavelength
+*          - WVMRAW    - use the water vapour monitor time series data
+*          - CSOTAU    - use a single 225GHz tau value
+*          - FILTERTAU - use a single tau value for this wavelength
 
 *  Notes:
 *     - The iterative map-maker will extinction correct the data itself
