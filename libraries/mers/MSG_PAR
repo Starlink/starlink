@@ -53,6 +53,10 @@
 *        MSG_SZMSG 200->300
 *     02-MAY-2008 (TIMJ):
 *        Add MSG__DEBUG
+*     22-JUL-2009 (TIMJ):
+*        Add extended range to sync with C interface.
+*        MSG__NONE and MSG__ALL are not part of the Fortran interface as they
+*        can not be used in MSG_OUTIF and comparisons should use MSG_IFLEVOK
 *     {enter_further_changes_here}
 
 *-
@@ -72,5 +76,65 @@
 
       INTEGER MSG__DEBUG                ! Debug conditional message output level
       PARAMETER ( MSG__DEBUG = 4 )
+
+      INTEGER MSG__DEBUG1               ! Numbered debug levels for flexibility
+      PARAMETER ( MSG__DEBUG1 = 5 )
+
+      INTEGER MSG__DEBUG2
+      PARAMETER ( MSG__DEBUG2 = 6 )
+
+      INTEGER MSG__DEBUG3
+      PARAMETER ( MSG__DEBUG3 = 7 )
+
+      INTEGER MSG__DEBUG4
+      PARAMETER ( MSG__DEBUG4 = 8 )
+
+      INTEGER MSG__DEBUG5
+      PARAMETER ( MSG__DEBUG5 = 9 )
+
+      INTEGER MSG__DEBUG6
+      PARAMETER ( MSG__DEBUG6 = 10 )
+
+      INTEGER MSG__DEBUG7
+      PARAMETER ( MSG__DEBUG7 = 11 )
+
+      INTEGER MSG__DEBUG8
+      PARAMETER ( MSG__DEBUG8 = 12 )
+
+      INTEGER MSG__DEBUG9
+      PARAMETER ( MSG__DEBUG9 = 13 )
+
+      INTEGER MSG__DEBUG10
+      PARAMETER ( MSG__DEBUG10 = 14 )
+
+      INTEGER MSG__DEBUG11
+      PARAMETER ( MSG__DEBUG11 = 15 )
+
+      INTEGER MSG__DEBUG12
+      PARAMETER ( MSG__DEBUG12 = 16 )
+
+      INTEGER MSG__DEBUG13
+      PARAMETER ( MSG__DEBUG13 = 17 )
+
+      INTEGER MSG__DEBUG14
+      PARAMETER ( MSG__DEBUG14 = 18 )
+
+      INTEGER MSG__DEBUG15
+      PARAMETER ( MSG__DEBUG15 = 19 )
+
+      INTEGER MSG__DEBUG16
+      PARAMETER ( MSG__DEBUG16 = 20 )
+
+      INTEGER MSG__DEBUG17
+      PARAMETER ( MSG__DEBUG17 = 21 )
+
+      INTEGER MSG__DEBUG18
+      PARAMETER ( MSG__DEBUG18 = 22 )
+
+      INTEGER MSG__DEBUG19
+      PARAMETER ( MSG__DEBUG19 = 23 )
+
+      INTEGER MSG__DEBUG20
+      PARAMETER ( MSG__DEBUG20 = 24 )
 
 *.
