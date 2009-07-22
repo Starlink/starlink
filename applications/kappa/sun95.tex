@@ -2102,7 +2102,7 @@ Current values of parameters are stored in a {\em parameter file}, and
 so they persist between sessions.  For tasks run from the shell, this
 is an \HDSref\ file {\tt \$ADAM\_USER/}{\it $<$application$>$}{\tt .sdf},
 where {\it $<$application$>$} is the name of the application. (If the
-environment variable {\tt \$ADAM\_USER} is not defined the parameter
+environment variable {\tt ADAM\_USER} is not defined the parameter
 file is situated in {\tt \$HOME/adam}).
 
 Unfortunately, tasks invoked from \ICLref\ \normalsize use a monolith parameter
@@ -2135,7 +2135,7 @@ updated.
 
 All global parameters are stored in the HDS file {\tt
 \$ADAM\_USER/GLOBAL.sdf}, or {\tt \$HOME/adam/GLOBAL.sdf} if the {\tt
-\$ADAM\_USER} environment variable is not defined.  The full list is
+ADAM\_USER} environment variable is not defined.  The full list is
 given below.
 \newline
 \newline
@@ -2167,12 +2167,23 @@ The values of all global parameters may be inspected with the
      The current lookup table file is     : @$KAPPA_DIR/spectrum_lut
      The current transformation is        : @/home/dro/deform/warpit
      The current interaction mode is      : <undefined>
+     The current message-report level is  : NORMAL
 \end{verbatim}
 \latex{\normalsize}
 In the above example no interaction mode is defined.  The next time
 you call an application which uses the interaction mode you
 would be prompted for a value.  (Under normal circumstances you will not
 have to enter the {\tt @} prefix yourself.) 
+
+Note that the message-reporting level is not a global parameter, but
+is defined by the {\tt MSG\_FILTER} environment variable.  It controls
+the verbosity of informational messages.  Since it applies to all
+tasks that report such messages, it is convenient to allow GLOBALS to
+show its value.  Further details are in \hyperref{Verbosity of
+Messages}{Section }{}{se:msglev} for details.  Since it is not a
+parameter as such, the message-reporting level is not unset by
+\htmlref{NOGLOBALS}{NOGLOBALS}.
+
 
 \subsection{\xlabel{se_parstrings}Strings\label{se:parstrings}}
 
@@ -2344,7 +2355,7 @@ Appendix~\ref{ap:full}.}{\htmlref{application specifications}{ap:full}.}
 \subsection{\xlabel{se_envvar}Environment Variables\label{se:envvar}}
 
 Environment variables operate both on the command line and prompts,
-and both from the shell and \ICLref\@.  Thus if IMAGEDIR is
+and both from the shell and \ICLref\@.  Thus if {\tt IMAGEDIR} is
 an environment variable pointing to a directory containing the
 NDF called ngc1365, you could access it at a prompt as shown
 below.
@@ -3131,6 +3142,31 @@ value.  It is strongly recommended that you just accept the default
 (normally zero) so that the values are written to their parameter
 file, and hence permits \htmlref{PARGET}{PARGET} to work.
 
+\section{\xlabel{se_msglev}Verbosity of Messages\label{se:msglev}}
+
+Informational messages (as opposed to error messages) are tagged with a
+reporting level that permits some control in the detail and quantity of
+messages you see.  Three levels are supported in \KAPPA.
+\begin{description}
+\item [NORMAL] the normal reporting level, that aims to give a balanced,
+`Goldilocks' level of reporting.  However, for historical reasons
+most messages are set to this level, although that is gradually changing.
+It excludes messages tagged as verbose.
+
+\item [VERBOSE] reports additional information, such as instructions
+or warnings for new users to a task, progress reports in a
+long-running command, and detailed analysis.
+
+\item [QUIET] reports only the most important messages that you would
+not want to miss, but eliminates the messages at normal and verbose
+levels.
+\end{description}
+
+The chosen level is set through environment variable {\tt MSG\_FILTER}.
+Abbreviations may be used such as {\tt "N"}, {\tt "v"}, {\tt "Qu"} for
+normal, verbose, or quit reporting respectively.  The normal mode is the
+default if you do not define {\tt MSG\_FILTER}.
+
 \newpage
 \section{\xlabel{se_graphdev}Graphics Devices and Files\label{se:graphdev}}
 
@@ -3231,7 +3267,7 @@ software.  You either use the \xref{{\tt xdisplay}}{sun129}{} command
     % xdisplay myterm.mysite.mydomain.mycountry
 \end{verbatim}
 \latex{\normalsize}
-or set the DISPLAY environment variable to point to the address of
+or set the {\tt DISPLAY} environment variable to point to the address of
 your screen.
 
 \latex{\small}
@@ -6432,7 +6468,7 @@ again depends on the application.
 \subsection{\xlabel{se_agitidy}The Graphics Database File\label{se:agitidy}}
 
 The location of the graphics database file can be controlled by setting the
-environment variable AGI\_USER to the desired location.  If AGI\_USER
+environment variable {\tt AGI\_USER} to the desired location.  If {\tt AGI\_USER}
 is undefined, the database file is placed in your home directory.
 Thus by default the file is {\tt \$HOME/agi\_}{\it $<$node$>$}{\tt{.sdf}},
 where you substitute your computer's node name for {\it
@@ -10957,7 +10993,7 @@ A safer bet for a hand-crafted FITS extension is to edit an existing
 FITS extension to change a value, or use existing lines as templates
 for any new keywords you wish to add.  \htmlref{FITSEDIT}{FITSEDIT}
 lets you do this with your favourite text editor.  Define the
-environment variable EDITOR to your editor, say
+environment variable {\tt EDITOR} to your editor, say
 
 \latex{\small}
 \begin{verbatim}
@@ -11095,7 +11131,7 @@ It would be tedious to have to load lots of individual procedures, but
 you don't. If you have related procedures that you regularly require
 they can be concatenated into a single file which you load.  Better
 still is to add definitions for each of the procedures in your \ICL\ 
-login file.  This is defined as the value of the ICL\_LOGIN
+login file.  This is defined as the value of the {\tt ICL\_LOGIN}
 environment variable.  A reasonable place is in your home directory
 and you'd define it like this.
 
@@ -11599,7 +11635,7 @@ then moves to the fourth file,
 \end{verbatim}
 \latex{\normalsize}
 moves back two files on the default tape drive (defined by the
-environment variable TAPE), and
+environment variable {\tt TAPE}), and
 
 \latex{\small}
 \begin{verbatim}
@@ -11667,7 +11703,7 @@ to write to a file at the same time.
 
 If you want to process simultaneously from different sessions---say
 one interactive and another in batch---it is wise to redefine the
-environment variables \$ADAM\_USER, and \$AGI\_USER if you want
+environment variables {\tt ADAM\_USER}, and {\tt AGI\_USER} if you want
 graphics on the same machine.  The environment variables should point
 to a separate existing directory for each additional session.  This
 will keep the \htmlref{global}{se:parglobals} and
@@ -11864,7 +11900,7 @@ the shell's {\tt \$HOME/.login}, \ICL\ has a {\em login file}.
 each time you activate \ICL\ these abbreviations will be
 available to you without further typing.  What you should do is to
 create a {\tt login.icl} in a convenient directory, and assign the
-environment variable ICL\_LOGIN to that directory in your {\tt
+environment variable {\tt ICL\_LOGIN} to that directory in your {\tt
 \$HOME/.login} file.
 
 It is possible to have several \ICL\ login files, each for
@@ -24175,7 +24211,7 @@ KAPPA: \htmlref{FITSHEAD}{FITSHEAD},
          fitsin mt=\$TAPE files=$*$ auto prefix=ccd fmtcnv logfile=jkt.log
       }{
          This reads all the files from the FITS tape on the device
-         assigned to the environment variable TAPE.  The output files
+         assigned to the environment variable {\tt TAPE}.  The output files
          begin with a prefix {\tt "ccd"}.  Integer data
          arrays are converted to real using the scale and zero
          found in the FITS header.  A record of the headers and the
@@ -40978,14 +41014,14 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
          output NDF, the output NDF may or may not contain provenance
          information depending on two things: 1) whether any of the input
          NDFs already contain provenance information, and 2) the value of
-         the AUTOPROV environment variable.  It is usually necessary to
-         set the AUTOPROV variable to {\tt "1"} in order to create output
+         the {\tt AUTOPROV} environment variable.  It is usually necessary to
+         set the {\tt AUTOPROV} variable to {\tt "1"} in order to create output
          NDFs that contain provenance information.  The exception to this
          if you are supplied with NDFs from another source that already
          contain provenance.  If such NDFs are used as inputs to \KAPPA\ 
          applications, then the output NDFs will contain provenance even
-         if the AUTOPROV variable is unset.  However, setting AUTOPROV to
-         {\tt "0"} will always prevent provenance information being
+         if the {\tt AUTOPROV} variable is unset.  However, setting {\tt AUTOPROV}
+         to {\tt "0"} will always prevent provenance information being
          stored in the output NDFs.
    
          \sstitem
@@ -52135,9 +52171,9 @@ creation epoch, the software that generated the ancestor, and indices
 to its parent NDFs (if any exist) within the PROVENANCE extension.
 There is also a MORE component within PROVENANCE that can be filled
 with arbitrary additional information.  Provenance recording is
-controlled through the AUTOPROV environment variable: set it to {\tt
+controlled through the {\tt AUTOPROV} environment variable: set it to {\tt
 1} to enable recording, and set it to any other value to disable
-recording.  When AUTOPROV is undefined, then an output NDF will
+recording.  When {\tt AUTOPROV} is undefined, then an output NDF will
 have provenance only if at least one of the input NDFs has provenance.
 You can examine provenance with
 \htmlref{PROVSHOW}{PROVSHOW}, and modify it with
@@ -56280,6 +56316,14 @@ The following applications have been modified:
 %\renewcommand{\thesubsection}{\section.\arabic{subsection}}
 
 \section{\xlabel{se_changes}Release Notes---V1.11\label{se:changes}}
+
+\subsection{Global changes}
+
+\begin{itemize}
+  \item  Control of the verbosity of informational messages is now 
+  possible through the environment variable {\tt MSG\_FILTER}.  See
+  \hyperref{Verbosity of Messages}{Section }{}{se:msglev} for details.
+\end{itemize}
 
 \subsection{Modified Commands}
 The following applications have been modified:

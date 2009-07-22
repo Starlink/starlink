@@ -4,6 +4,10 @@
    changes so far are listed below.  For complete details of all 
    changes, see the "Release Notes" appendix in SUN/95.
 
+2 Global_changes
+   o  Control of the verbosity of informational messages is now
+   possible through the environment variable MSG_FILTER.
+
 2 Modified_applications
 
    o  NDFCOPY
