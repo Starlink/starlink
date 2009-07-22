@@ -761,14 +761,20 @@ int VOTable::data_tabledata( const NS::TABLE& table, const NS::TABLEDATA& tdata,
     TABLEDATA::TR_const_iterator triter( tdata.TR().begin() );
     TABLEDATA::TR_const_iterator trend( tdata.TR().end() );
     int nrow = 0;
+    string cell;
     for ( ; triter != trend; ++triter ) {
         TR::TD_const_iterator tditer( triter->TD().begin() );
         TR::TD_const_iterator tdend( triter->TD().end() );
 
         for ( int ncol = 0; tditer != tdend; ++tditer, ncol++ ) {
 
+            //  Clean string of newlines. Should be trivial formatting
+            //  within a cell.
+            cell = *tditer;
+            replace( cell.begin(), cell.end(), '\n', ' ' );
+
             //  Test if this is the null value (usually "" for tabledata).
-            if ( *tditer == nullvalues[ncol] ) {
+            if ( cell == nullvalues[ncol] ) {
                 out << " \t";
             }
             else if ( ncol == ra_index || ncol == dec_index ) {
@@ -776,7 +782,7 @@ int VOTable::data_tabledata( const NS::TABLE& table, const NS::TABLEDATA& tdata,
 
                     //  RA and Dec in radians, need degrees.
                     double rad;
-                    if ( from_string( *tditer, rad, scientific ) ) {
+                    if ( from_string( cell, rad, scientific ) ) {
                         rad *= R2D;
                         out << scientific << rad << '\t';
                     }
@@ -791,7 +797,7 @@ int VOTable::data_tabledata( const NS::TABLE& table, const NS::TABLEDATA& tdata,
 
                     //  Check we have hh:mm:ss.ss and dd:mm:ss.ss, if not try
                     //  to normalize.
-                    istringstream hms( *tditer );
+                    istringstream hms( cell );
                     string tmp;
                     string norm;
                     if ( hms.str().find( ':' ) == string::npos ) {
@@ -808,15 +814,15 @@ int VOTable::data_tabledata( const NS::TABLE& table, const NS::TABLEDATA& tdata,
                         out << norm << '\t';
                     }
                     else {
-                        out << *tditer << '\t';
+                        out << cell << '\t';
                     }
                 }
                 else {
-                    out << *tditer << '\t';
+                    out << cell << '\t';
                 }
             }
             else {
-                out << *tditer << '\t';
+                out << cell << '\t';
             }
         }
         if ( id_index == -1 ) {

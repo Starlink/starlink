@@ -69,6 +69,7 @@
 #include <iomanip>
 #include <fcntl.h>
 #include <typeinfo>
+#include <algorithm>
 
 #include <xercesc/dom/DOM.hpp>
 
