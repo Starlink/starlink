@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     skynoise
+*     SKYNOISE
 
 *  Purpose:
 *     Generate a simulated sky background with spatial noise
@@ -51,10 +51,14 @@
 *          below.  The default values will be used for any unspecified
 *          parameters.  Unregnized parameters are ignored (i.e. no
 *          error is reported).
-*
-*          lambda (double) : 0.85e-3 (metres)
-*            Wavelength of observation.
-*
+*     MSG_FILTER = _CHAR (Read)
+*          Control the verbosity of the application. Values can be
+*          NONE (no messages), QUIET (minimal messages), NORMAL,
+*          VERBOSE, DEBUG or ALL. [NORMAL]
+*     SEED = INTEGER (Read)
+*          Seed for random number generator.  If a seed
+*          is not specified, the clock time in milliseconds
+*          is used.
 *     SIMFILE = GROUP (Read)
 *          Specifies values for the simulation parameters.  See 
 *          the description for OBSFILE for the file format.
@@ -63,26 +67,29 @@
 *          below.  The default values will be used for any unspecified
 *          parameters.  Unrecognized parameters are ignored (i.e. no
 *          error is reported).
-*
-*          aomega (double) : 0,179
-*            Coupling factor (0.179 for 850 microns,
-*            0.721 for 450 microns).
-*          atmname (char[]) : ""
-*            Name of the file containing atmospheric
-*            sky image.
-*          atmrefnu (double) : 0.5 (Hz)
-*            Atm reference corner frequency.
-*          atmrefvel (double) : 15.0 (m/sec)
-*            Atm reference velocity.
-*          bandGHz (double) : 35.0 (GHz)
-*            Bandwidth in GHz.
-*          tauzen (double) : 0.052583
-*            Optical depth at 225 GHz at the zenith.
-*
-*     SEED = INTEGER (Read)
-*          Seed for random number generator.  If a seed
-*          is not specified, the clock time in milliseconds
-*          is used.
+
+*  Observation Parameters:
+*     lambda (double) : 0.85e-3 (metres)
+*          Wavelength of observation.
+
+*  Simulation Parameters:
+*     aomega (double) : 0,179
+*         Coupling factor (0.179 for 850 microns,
+*         0.721 for 450 microns).
+*     atmname (char[]) : ""
+*         Name of the file containing atmospheric
+*         sky image.
+*     atmrefnu (double) : 0.5 (Hz)
+*         Atm reference corner frequency.
+*     atmrefvel (double) : 15.0 (m/sec)
+*         Atm reference velocity.
+*     bandGHz (double) : 35.0 (GHz)
+*         Bandwidth in GHz.
+*     tauzen (double) : 0.052583
+*         Optical depth at 225 GHz at the zenith.
+
+*  Related Applications:
+*     SMURF: SC2SIM
 
 *  Authors:
 *     B.D.Kelly (ROE)

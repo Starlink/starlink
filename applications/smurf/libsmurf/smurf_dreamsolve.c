@@ -4,7 +4,7 @@
 *     DREAMSOLVE
 
 *  Purpose:
-*     Top-level DREAM solver
+*     Solve DREAM observations and generate 2-D image.
 
 *  Language:
 *     Starlink ANSI C
@@ -20,14 +20,25 @@
 *        Pointer to global status.
 
 *  Description:
-*     This is the main routine for reconstructing 2-D images from
-*     DREAM observations
+*     This command reconstructs a series of 2-D images from
+*     DREAM observations.
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
-*          Name of input data file
+*          Name of input data files.
+*     MSG_FILTER = _CHAR (Read)
+*          Control the verbosity of the application. Values can be
+*          NONE (no messages), QUIET (minimal messages), NORMAL,
+*          VERBOSE, DEBUG or ALL. [NORMAL]
 *     OUT = NDF (Write)
-*          Name of output file containing DREAM images
+*          Name of output files containing DREAM images. The DREAM images
+*          will be written to extensions to match that in use by the SCUBA-2
+*          data acquisition system.
+
+*  Related Applications:
+*     SMURF: DREAMWEIGHTS, STARECALC;
+*     KAPPA: WCSMOSAIC;
+*     CCDPACK: MAKEMOS
 
 *  Authors:
 *     Andy Gibb (UBC)

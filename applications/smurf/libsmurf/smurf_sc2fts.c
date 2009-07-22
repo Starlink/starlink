@@ -4,7 +4,7 @@
 *     SC2FTS
 
 *  Purpose:
-*     Top-level FTS-2 implementation
+*     Fourier Transform Spectrometer specialist routines (incomplete)
 
 *  Language:
 *     Starlink ANSI C
@@ -20,17 +20,26 @@
 *        Pointer to global status.
 
 *  Description:
-*     This is the main routine for implementing FTS-2 processing
+*     This command can be used to process Fourier Transform Spectrometer
+*     data for SCUBA-2. The commands are incomplete and should not be used
+*     at this time and it may look very different when finally released.
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
 *          Name of input data file
+*     MSG_FILTER = _CHAR (Read)
+*          Control the verbosity of the application. Values can be
+*          NONE (no messages), QUIET (minimal messages), NORMAL,
+*          VERBOSE, DEBUG or ALL. [NORMAL]
 *     OUT = NDF (Write)
 *          Name of processed output file
 
 *  Authors:
 *     Baoshe Zhang (UoL)
 *     {enter_new_authors_here}
+
+*  Notes:
+*      Do not use this command.
 
 *  History:
 *     2008-03-16 (BZ):

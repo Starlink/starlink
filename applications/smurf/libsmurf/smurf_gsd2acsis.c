@@ -25,12 +25,35 @@
 *     writes out ACSIS formatted files converted from the GSD input file.
 
 *  ADAM Parameters:
+*     DIRECTORY = CHAR (Read)
+*          Directory for output ACSIS files. A NULL value will use the
+*          current working directory. This command will create a subdir
+*          in this directory named after the observation number.
 *     IN = CHAR (Read)
 *          Name of the input GSD file to be converted.
-*     DIRECTORY = CHAR (Read)
-*          Directory for output ACSIS files.
+*     MSG_FILTER = _CHAR (Read)
+*          Control the verbosity of the application. Values can be
+*          NONE (no messages), QUIET (minimal messages), NORMAL,
+*          VERBOSE, DEBUG or ALL. [NORMAL]
 *     OBSNUM = INT (Read)
-*          Observation number for files prior to Feb 03.
+*          Observation number for files prior to Feb 03. For newer observations
+*          this parameter is not required. Default value will be the observation
+*          number read from the file but prior to Feb 03 this number was the number
+*          within the project rather than the number from the night and may lead
+*          to name clashes since ACSIS data are numbered for a UT date.
+
+*  Related Applications:
+*     SMURF: MAKECUBE, GSDSHOW;
+*     CONVERT: SPECX2NDF;
+*     SPECX;
+*     GSDPRINT;
+*     JCMTDR
+
+*  Notes:
+*     - Whilst this command does a reasonable job of converting common data to ACSIS
+*     format it still has to undergo extensive testing to ensure that it is always
+*     doing the correct thing. Testing of this command and comparing its results with
+*     SPECX maps will be welcomed.
 
 *  Authors:
 *     Jen Balfour (JAC, UBC)

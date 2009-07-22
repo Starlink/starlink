@@ -39,7 +39,8 @@
 *          dark observations and a combination of sub-arrays.
 *     MSG_FILTER = _CHAR (Read)
 *          Control the verbosity of the application. Values can be
-*          QUIET (minimal messages), NORMAL, VERBOSE or DEBUG [NORMAL]
+*          NONE (no messages), QUIET (minimal messages), NORMAL,
+*          VERBOSE, DEBUG or ALL. [NORMAL]
 *     NGOOD() = _INTEGER (Write)
 *          Number of bolometers with good responsivities. Integer array, one
 *          entry for each input file.
@@ -47,6 +48,9 @@
 *          Output responsivity images.  If the input files were each taken with
 *          the same stored FLATFIELD solution the output responsivity images
 *          will be identical.
+
+*  Related Applications:
+*     SMURF: FLATFIELD, CALCFLAT
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)

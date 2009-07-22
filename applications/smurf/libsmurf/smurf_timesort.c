@@ -4,7 +4,7 @@
 *     TIMESORT
 
 *  Purpose:
-*     Re-order the time slices in a raw data cube into increasing time.
+*     Re-order the time slices in a raw ACSIS data cube into increasing time.
 
 *  Language:
 *     Starlink ANSI C
@@ -20,7 +20,7 @@
 *        Pointer to global status.
 
 *  Description:
-*     This routine accepts as input one or more raw data cubes, spanned
+*     This routine accepts as input one or more raw ACSIS data cubes, spanned
 *     by (frequency, detector number, time) axes. It sorts the time slices 
 *     into monotonically increasing time value and writes the resulting 
 *     data to a one or more new output NDFs. The ACSIS and JCMTSTATE 
@@ -30,7 +30,8 @@
 *     The main reason for using this routine is to ensure that data has a
 *     defined transformation from WCS coordinates to pixel coordinates.
 *     It can also be used to reduce the size of data files by excluding dead
-*     detectors (see parameter DETPURGE).
+*     detectors (see parameter DETPURGE). This command should be run before
+*     attempting to merge multi-subsystem data.
 *
 *     There are two main modes, selected by parameter MERGE. If MERGE 
 *     is FALSE, then the time slices in each input NDF are sorted
@@ -110,6 +111,10 @@
 *          The dynamic default for this parameter is TRUE if two or more 
 *          of the input NDFs refer to the same observation and sub-system
 *          number, and FALSE otherwise. []
+*     MSG_FILTER = _CHAR (Read)
+*          Control the verbosity of the application. Values can be
+*          NONE (no messages), QUIET (minimal messages), NORMAL,
+*          VERBOSE, DEBUG or ALL. [NORMAL]
 *     NOUT = _INTEGER (Write)
 *          An output parameter in which is stored the total number of output 
 *          NDFs created.
@@ -149,6 +154,13 @@
 *          same as the number of input NDFs, and all output NDFs will have the
 *          same size. If a negative or zero value is supplied, then a single 
 *          output NDF will be created holding all the input data. [!]
+
+*  Related Applications:
+*     SMURF: MAKECUBE
+
+*  Notes:
+*     - This command runs on ACSIS raw data files. SCUBA-2 files are guaranteed
+*     to be in time order.
 
 *  Authors:
 *     DSB: David Berry (JAC, UCLan)

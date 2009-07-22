@@ -30,12 +30,6 @@
 *     description for the bad bolometer mask.
 
 *  ADAM Parameters:
-*     IN = NDF (Read)
-*          Input NDF file.  If the supplied file already has a bad
-*          bolometer mask, it will be overwritten by this routine.
-*     METHOD = STRING (Read)
-*          Bad Bolo Generation Method (either random, or from an 
-*          ARD description)
 *     ARD = ARD Description (Read)
 *          ARD Description of bad bolometer mask.  In the case that
 *          the user selects the ARD method of bad bolometer 
@@ -43,6 +37,10 @@
 *          to be supplied.  The ARD description is treated as a 
 *          one-to-one correspondence between its values and the 
 *          rows/columns of bolometers in a subarray.
+*     BAD_BOLOS = INTEGER (Read)
+*          If the user selects the random generation of bad
+*          bolometers, this value indicates the desired number of
+*          dead bolometers IN EXCESS of those flagged as bad.
 *     BAD_COLUMNS = INTEGER (Read)
 *          If the user selects the random generation of bad
 *          bolometers, this value indicates the desired number of 
@@ -51,15 +49,30 @@
 *          If the user selects the random generation of bad
 *          bolometers, this value indicates the desired number of 
 *          dead rows of bolometers to be randomly generated.
-*     BAD_BOLOS = INTEGER (Read)
-*          If the user selects the random generation of bad
-*          bolometers, this value indicates the desired number of 
-*          dead bolometers IN EXCESS of those flagged as bad 
+*     IN = NDF (Read)
+*          Input NDF file.  If the supplied file already has a bad
+*          bolometer mask, it will be overwritten by this routine.
+*          Only a single file can be given and it is modified in place.
+*     METHOD = STRING (Read)
+*          Bad Bolo Generation Method (either random, or from an
+*          ARD description)
 *          as part of the BAD_ROWS and BAD_COLUMNS.
+*     MSG_FILTER = _CHAR (Read)
+*          Control the verbosity of the application. Values can be
+*          NONE (no messages), QUIET (minimal messages), NORMAL,
+*          VERBOSE, DEBUG or ALL. [NORMAL]
 *     SEED = INTEGER (Read)
 *          Seed for random number generator.  If a seed
 *          is not specified, the clock time in milliseconds
 *          is used.
+
+*  Notes:
+*      This application is designed to be used in conjunction with the
+*      simulator to mask bolometers. It does not currently function correctly
+*      and is deprecated.
+
+*  Related Applications:
+*      SMURF: SC2SIM
 
 *  Authors:
 *     Jen Balfour (UBC)
@@ -79,7 +92,7 @@
 *        Change name from BPM to BBM - Bad Bolometer Mask
 
 *  Copyright:
-*     Copyright (C) 2006-8 University of British Columbia. All Rights
+*     Copyright (C) 2006-2008 University of British Columbia. All Rights
 *     Reserved.
 
 *  Licence:
@@ -99,8 +112,7 @@
 *     MA 02111-1307, USA
 
 *  Bugs:
-*
-*     (Report bugs here).
+*     {note_any_bugs_here}
 *-
 */
 

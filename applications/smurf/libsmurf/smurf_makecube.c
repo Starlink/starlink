@@ -256,6 +256,10 @@
 *          The lower pixel bounds of the output NDF. Note, values will be
 *          written to this output parameter even if a null value is supplied 
 *          for parameter OUT.
+*     MSG_FILTER = _CHAR (Read)
+*          Control the verbosity of the application. Values can be
+*          NONE (no messages), QUIET (minimal messages), NORMAL,
+*          VERBOSE, DEBUG or ALL. [NORMAL]
 *     NTILE = _INTEGER (Write)
 *          The number of output tiles used to hold the entire output
 *          array (see parameter TILEDIMS). If no input data falls within
@@ -575,7 +579,8 @@
 *     that are common to all input NDFs. To be included in the output
 *     FITS extension, a FITS keyword must be present in the NDF extension
 *     of every input NDF, and it must have the same value in all input
-*     NDFs.
+*     NDFs. In addition, certain headers that relate to start and end
+*     events are propogated from the oldest and newest file respectively.
 *     - The output NDF will contain an extension named "SMURF" containing
 *     two NDFs named "EXP_TIME" and "EFF_TIME". In addition, if parameter
 *     SPREAD is set to "Nearest", a third NDF called "TSYS" will be created. 
@@ -600,6 +605,9 @@
 *     header. These are the number of tiles used to hold the output data,
 *     and the index of the NDF containing the header, in the range 1 to
 *     NUMTILES. See parameter TILEDIMS.
+
+*  Related Applications:
+*     SMURF: TIMESORT
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)

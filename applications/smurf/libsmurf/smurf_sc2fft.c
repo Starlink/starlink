@@ -4,7 +4,7 @@
 *     SC2FFT
 
 *  Purpose:
-*     Top-level SCUBA-2 data ffting routine
+*     Fourier Transform SCUBA-2 time-series data
 
 *  Language:
 *     Starlink ANSI C
@@ -36,16 +36,23 @@
 *          Input files to be transformed
 *     INVERSE = _LOGICAL (Read)
 *          If true perform inverse transform
-*     POLAR = _LOGICAL (Read)
-*          If true use polar representation (amplitude,argument) of FFT
-*     POWER = _LOGICAL (Read)
-*          If set use polar representation of FFT with squared amplitudes
+*     MSG_FILTER = _CHAR (Read)
+*          Control the verbosity of the application. Values can be
+*          NONE (no messages), QUIET (minimal messages), NORMAL,
+*          VERBOSE, DEBUG or ALL. [NORMAL]
 *     OUT = NDF (Write)
 *          Output files
 *     OUTFILES = LITERAL (Write)
 *          The name of text file to create, in which to put the names of
 *          all the output NDFs created by this application (one per
 *          line). If a null (!) value is supplied no file is created. [!]
+*     POLAR = _LOGICAL (Read)
+*          If true use polar representation (amplitude,argument) of FFT
+*     POWER = _LOGICAL (Read)
+*          If set use polar representation of FFT with squared amplitudes
+
+*  Related Applications:
+*     SMURF: SC2CONCAT, SC2CLEAN
 
 *  Authors:
 *     Edward Chapin (UBC)

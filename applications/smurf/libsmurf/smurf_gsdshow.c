@@ -21,16 +21,26 @@
 
 *  Description:
 *     Opens a GSD file for reading, and checks the version (currently
-*     gsd2acsis only supports GSD version 5.3).  gsd2show then
+*     gsd2acsis only supports GSD version 5.3).  gsdshow then
 *     displays the contents of the file's headers and arrays.
 
 *  ADAM Parameters:
-*     IN = CHAR (Read)
-*          Name of the input GSD file to be converted.  
 *     DESCRIPTIONS = LOGICAL (Read)
 *          Flag for showing header descriptions.
+*     IN = CHAR (Read)
+*          Name of the input GSD file to be listed.
+*     MSG_FILTER = _CHAR (Read)
+*          Control the verbosity of the application. Values can be
+*          NONE (no messages), QUIET (minimal messages), NORMAL,
+*          VERBOSE, DEBUG or ALL. [NORMAL]
 *     SHOWDATA = LOCICAL (Read)
 *          Flag for showing data array.
+
+*  Related Applications:
+*     SMURF: GSD2ACSIS;
+*     GSDPRINT;
+*     SPECX;
+*     JCMTDR
 
 *  Authors:
 *     Jen Balfour (JAC, UBC)

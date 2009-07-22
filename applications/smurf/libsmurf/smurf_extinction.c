@@ -4,7 +4,7 @@
 *     EXTINCTION
 
 *  Purpose:
-*     Top-level EXTINCTION implementation
+*     Extinction correct SCUBA-2 data.
 
 *  Language:
 *     Starlink ANSI C
@@ -20,7 +20,8 @@
 *        Pointer to global status.
 
 *  Description:
-*     This is the main routine implementing the EXTINCTION task.
+*     This application can be used to extinction correct data in a number
+*     of ways.
 
 *  ADAM Parameters:
 *     BPM = NDF (Read)
@@ -30,15 +31,6 @@
 *          mask the closest following will be used. It is not an error for
 *          no mask to match. A NULL parameter indicates no mask files to be
 *          supplied. [!]
-*     IN = NDF (Read)
-*          Input file(s)
-*     TAUSRC = CHAR (Read)
-*          Source of optical depth data. Options are:
-*             WVMRAW    - use the water vapour monitor time series data
-*             CSOTAU    - use a single 225GHz tau value
-*             FILTERTAU - use a single tau value for this wavelength
-*     QUICK = LOGICAL (Read)
-*          Flag for applying the Quick method
 *     CSOTAU = REAL (Read)
 *          Value of the 225 GHz zenith optical depth. Only used if
 *          METHOD = CSOTAU. If a null (!) value is given, the task
@@ -50,17 +42,40 @@
 *          wavelength. Only used if METHOD = FILTERTAU. Note that no
 *          check is made to ensure that all the input files share the same
 *          filter.
+*     HASSKYREM = LOGICAL (Read)
+*          Indicate that the data have been sky removed even if the
+*          fact can not be verified. This is useful for the case where you
+*          have removed the sky background using an application
+*          other than SMURF REMSKY. Default is false.
+*     IN = NDF (Read)
+*          Input file(s). The input data must have had the sky signal
+*          removed
+*     MSG_FILTER = _CHAR (Read)
+*          Control the verbosity of the application. Values can be
+*          NONE (no messages), QUIET (minimal messages), NORMAL,
+*          VERBOSE, DEBUG or ALL. [NORMAL]
 *     OUT = NDF (Write)
 *          Output file(s)
 *     OUTFILES = LITERAL (Write)
 *          The name of text file to create, in which to put the names of
 *          all the output NDFs created by this application (one per
 *          line). If a null (!) value is supplied no file is created. [!]
-*     HASSKYREM = LOGICAL (Read)
-*          Indicate that the data have been sky removed even if the
-*          fact can not be verified. This is useful for the case where you
-*          have removed the sky background using an application
-*          other than SMURF REMSKY. Default is false.
+*     QUICK = LOGICAL (Read)
+*          Flag for applying the Quick method.
+*     TAUSRC = CHAR (Read)
+*          Source of optical depth data. Options are:
+*             WVMRAW    - use the water vapour monitor time series data
+*             CSOTAU    - use a single 225GHz tau value
+*             FILTERTAU - use a single tau value for this wavelength
+
+*  Notes:
+*     - The iterative map-maker will extinction correct the data itself
+*     and this command will not be necessary.
+*     - QLMAKEMAP automatically applies an extinction correction.
+
+*  Related Applications:
+*     SMURF: REMSKY, MAKEMAP;
+*     SURF: EXTINCTION
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
@@ -122,8 +137,6 @@
 *     2009-03-30 (TIMJ):
 *        Add OUTFILES parameter.
 *     {enter_further_changes_here}
-
-*  Notes:
 
 *  Copyright:
 *     Copyright (C) 2008-2009 Science and Technology Facilities Council.

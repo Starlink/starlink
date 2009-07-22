@@ -4,7 +4,7 @@
 *     SCANFIT
 
 *  Purpose:
-*     Top-level SCANFIT implementation
+*     Fit DC level to each bolometer
 
 *  Language:
 *     Starlink ANSI C
@@ -35,6 +35,10 @@
 *     IN = NDF (Read)
 *          Input file(s). Can include darks. If relevant darks are located
 *          they will be subtracted from the non-dark observations.
+*     MSG_FILTER = _CHAR (Read)
+*          Control the verbosity of the application. Values can be
+*          NONE (no messages), QUIET (minimal messages), NORMAL,
+*          VERBOSE, DEBUG or ALL. [NORMAL]
 *     ORDER = INTEGER (Read)
 *          Order of the polynomial to fit. Default 1 (linear).
 *     OUT = NDF (Write)
@@ -43,6 +47,13 @@
 *          The name of text file to create, in which to put the names of
 *          all the output NDFs created by this application (one per
 *          line). If a null (!) value is supplied no file is created. [!]
+
+*  Notes:
+*     This routine should not be used for the iterative map-maker but can be
+*     used for QLMAKEMAP and the simple rebinning map-maker.
+
+*  Related Applications:
+*     SMURF: QLMAKEMAP, MAKEMAP
 
 *  Authors:
 *     Andy Gibb (UBC)

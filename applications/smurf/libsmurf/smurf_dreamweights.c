@@ -4,7 +4,7 @@
 *     DREAMWEIGHTS
 
 *  Purpose:
-*     Top-level DREAM weight matrix generation
+*     Generate DREAM weights matrix
 
 *  Language:
 *     Starlink ANSI C
@@ -26,7 +26,10 @@
 *  Notes:
 *     - Raw data MUST be passed in at present (this is due to a 
 *       limitation in smf_open_file)
-*     - Should allow for a list of bad (dead) bolometers
+*     - Should allow for a list of bad (dead) bolometers.
+*     - This application interface is not finalised. Please do not rely on this
+*     command in scripts.
+
 
 *  ADAM Parameters:
 *     NDF = NDF (Read)
@@ -34,8 +37,15 @@
 *     CONFIG = Literal (Read)
 *          Name of config file. If CONFIG=! some default parameters will be
 *          used.
+*     MSG_FILTER = _CHAR (Read)
+*          Control the verbosity of the application. Values can be
+*          NONE (no messages), QUIET (minimal messages), NORMAL,
+*          VERBOSE, DEBUG or ALL. [NORMAL]
 *     OUT = NDF (Write)
 *          Output weights file(s)
+
+*  Related Applications:
+*     SMURF: DREAMSOLVE
 
 *  Authors:
 *     Andy Gibb (UBC)

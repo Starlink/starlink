@@ -4,7 +4,7 @@
 *     REMSKY
 
 *  Purpose:
-*     Top-level SKY removal implementation
+*     Remove sky background from SCUBA-2 data
 
 *  Language:
 *     Starlink ANSI C
@@ -20,7 +20,8 @@
 *        Pointer to global status.
 
 *  Description:
-*     This is the main routine implementing the sky removal task.
+*     This command can be used to investigate the sky signal from a SCUBA-2 time
+*     series file.
 
 *  ADAM Parameters:
 *     BPM = NDF (Read)
@@ -30,23 +31,35 @@
 *          mask the closest following will be used. It is not an error for
 *          no mask to match. A NULL parameter indicates no mask files to be
 *          supplied. [!]
-*     IN = NDF (Read)
-*          Input file(s)
-*     METHOD = CHAR (Read)
-*          Sky removal method, either POLY or PLANE
-*     GROUP = LOGICAL (Read)
-*          If true, group related files together for processing as a
-*          single data set, else process each file independently
 *     FIT = CHAR (Read)
 *          Type of fit to be carried out for the PLANE sky removal
 *          method. Choices are Mean, Slope (to fit in elevation only)
 *          or Plane
+*     GROUP = LOGICAL (Read)
+*          If true, group related files together for processing as a
+*          single data set, else process each file independently
+*     IN = NDF (Read)
+*          Input file(s)
+*     METHOD = CHAR (Read)
+*          Sky removal method, either POLY or PLANE
+*     MSG_FILTER = _CHAR (Read)
+*          Control the verbosity of the application. Values can be
+*          NONE (no messages), QUIET (minimal messages), NORMAL,
+*          VERBOSE, DEBUG or ALL. [NORMAL]
 *     OUT = NDF (Write)
 *          Output file(s)
 *     OUTFILES = LITERAL (Write)
 *          The name of text file to create, in which to put the names of
 *          all the output NDFs created by this application (one per
 *          line). If a null (!) value is supplied no file is created. [!]
+
+*  Related Applications:
+*     SMURF: EXTINCTION, MAKEMAP;
+*     SURF: REMSKY
+
+*  Notes:
+*     - The iterative map-maker will calculate the sky signal itself and this
+*     command should not be used if that variant of the map-maker is to be used.
 
 *  Authors:
 *     Andy Gibb (UBC)
