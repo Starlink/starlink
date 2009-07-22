@@ -154,6 +154,21 @@
 %  generally otherwise).
 \renewcommand{\_}{\texttt{\symbol{95}}}
 
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+
 % Shorthand and HTML references for other Starlink tasks
 \newcommand{\CCDPACK}{\textsc{ccdpack}}
 \newcommand{\CCDPACKref}{\xref{\CCDPACK}{sun139}{}}
@@ -282,6 +297,9 @@
 %        Added support for the usage section and adjusted various spacings.
 %     8-DEC-1994 (PDRAPER):
 %        Added support for simplified formatting using LaTeX2html.
+%     21-JUL-2009 (TIMJ):
+%        Added \sstdiylist{}{} as used when a Parameters section is located that
+%        is not "ADAM Parameters".
 %     {enter_further_changes_here}
 
 %  Bugs:
@@ -517,20 +535,6 @@
 
 
 
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
@@ -1952,12 +1956,12 @@ functions as follows.
 }
 
 \begin{description}
-\classitem{dumpocscfg}{
-Retrieve OCS XML configuration used to generate the raw data.}
-\classitem{jcmtstate2cat}{
-Dump JCMTSTATE information to ASCII table.}
-\classitem{SMURFHELP}{
-Gives help about SMURF.}
+\classitem{dumpocscfg}
+Retrieve OCS XML configuration used to generate the raw data.
+\classitem{jcmtstate2cat}
+Dump JCMTSTATE information to ASCII table.
+\classitem{SMURFHELP}
+Gives help about SMURF.
 \end{description}
 
 {\large
@@ -1967,42 +1971,42 @@ Gives help about SMURF.}
 }
 
 \begin{description}
-\classitem{CALCDARK}{
- Calculate the 2d dark frame from a dark observation.}
-\classitem{CALCFLAT}{
- Calculate a flatfield solution}
-\classitem{CALCRESP}{
- Calculate bolometer responsivity from stored flatfield solution.}
-\classitem{DREAMSOLVE}{
- DREAM solver.}
-\classitem{DREAMWEIGHTS}{
- DREAM weight matrix generation.}
-\classitem{EXTINCTION}{
- Extinction correct SCUBA-2 data.}
-\classitem{FLATFIELD}{
- Flatfield SCUBA-2 data.}
-\classitem{MAKEMAP}{
- Regrid SCUBA-2 data into a map.}
-\classitem{QLMAKEMAP}{
-  Quick-Look SCUBA-2 map maker.}
-\classitem{RAWUNPRESS}{
-  Uncompress raw SCUBA-2 data.}
-\classitem{REMSKY}{
-  Remove Sky signal from SCUBA-2 observations.}
-\classitem{SC2CLEAN}{
- Clean-up SCUBA-2 time series.}
-\classitem{SC2CONCAT}{
- Concatenate files from a single observation into a single file.}
-\classitem{SC2FFT}{
- Perform an forward or inverse FFT on SCUBA-2 data.}
-\classitem{SC2FTS}{
- FTS-2 data processing (disabled).}
-\classitem{SCANFIT}{
-  Fit a sky signal to each SCUBA-2 scan.}
-\classitem{SMURFCOPY}{
-Copy a 2d image out of a time series file.}
-\classitem{STARECALC}{
- Calculate a map from a Stare-mode observation.}
+\classitem{CALCDARK}
+ Calculate the 2d dark frame from a dark observation.
+\classitem{CALCFLAT}
+ Calculate a flatfield solution
+\classitem{CALCRESP}
+ Calculate bolometer responsivity from stored flatfield solution.
+\classitem{DREAMSOLVE}
+ DREAM solver.
+\classitem{DREAMWEIGHTS}
+ DREAM weight matrix generation.
+\classitem{EXTINCTION}
+ Extinction correct SCUBA-2 data.
+\classitem{FLATFIELD}
+ Flatfield SCUBA-2 data.
+\classitem{MAKEMAP}
+ Regrid SCUBA-2 data into a map.
+\classitem{QLMAKEMAP}
+  Quick-Look SCUBA-2 map maker.
+\classitem{RAWUNPRESS}
+  Uncompress raw SCUBA-2 data.
+\classitem{REMSKY}
+  Remove Sky signal from SCUBA-2 observations.
+\classitem{SC2CLEAN}
+ Clean-up SCUBA-2 time series.
+\classitem{SC2CONCAT}
+ Concatenate files from a single observation into a single file.
+\classitem{SC2FFT}
+ Perform an forward or inverse FFT on SCUBA-2 data.
+\classitem{SC2FTS}
+ FTS-2 data processing (disabled).
+\classitem{SCANFIT}
+  Fit a sky signal to each SCUBA-2 scan.
+\classitem{SMURFCOPY}
+Copy a 2d image out of a time series file.
+\classitem{STARECALC}
+ Calculate a map from a Stare-mode observation.
 \end{description}
 
 {\large
@@ -2012,14 +2016,14 @@ Copy a 2d image out of a time series file.}
 }
 
 \begin{description}
-\classitem{MAKECUBE}{
- Regrid ACSIS spectra into a data cube.}
-\classitem{RAWFIXMETA}{
- Report metadata issues with ACSIS data files.}
-\classitem{TIMESORT}{
- Re-order time slices in a raw data cube into increasing time.}
-\classitem{UNMAKECUBE}{
- Produce simulated time series data from a regridded ACSIS data cube.}
+\classitem{MAKECUBE}
+ Regrid ACSIS spectra into a data cube.
+\classitem{RAWFIXMETA}
+ Report metadata issues with ACSIS data files.
+\classitem{TIMESORT}
+ Re-order time slices in a raw data cube into increasing time.
+\classitem{UNMAKECUBE}
+ Produce simulated time series data from a regridded ACSIS data cube.
 \end{description}
 
 {\large
@@ -2029,12 +2033,12 @@ Copy a 2d image out of a time series file.}
 }
 
 \begin{description}
-\classitem{GSD2ACSIS}{
- Convert a GSD format DAS data file to an ACSIS format NDF. (beta test)}
-\classitem{GSDSHOW}{
- Display the contens of a GSD file's headers and arrays.}
-\classitem{IMPAZTEC}{
-  Import AzTEC NETCDF files and produce SCUBA-2 format data files. (untested)}
+\classitem{GSD2ACSIS}
+ Convert a GSD format DAS data file to an ACSIS format NDF. (beta test)
+\classitem{GSDSHOW}
+ Display the contens of a GSD file's headers and arrays.
+\classitem{IMPAZTEC}
+  Import AzTEC NETCDF files and produce SCUBA-2 format data files. (untested)
 \end{description}
 
 {\large
@@ -2044,12 +2048,12 @@ Copy a 2d image out of a time series file.}
 }
 
 \begin{description}
-\classitem{BADBOLOS}{
- Generate a map of random dead bolometers and add it as an NDF extension to the input file.}
-\classitem{SC2SIM}{
-SCUBA-2 simulator.}
-\classitem{SKYNOISE}{
- Generate a simulated sky background.}
+\classitem{BADBOLOS}
+ Generate a map of random dead bolometers and add it as an NDF extension to the input file.
+\classitem{SC2SIM}
+SCUBA-2 simulator.
+\classitem{SKYNOISE}
+ Generate a simulated sky background.
 \end{description}
 
 \end{small}
