@@ -312,6 +312,15 @@
 \newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
 \mbox{} \\[1.3ex] #2}
 
+%  Format the a generic section as a list
+\newcommand{\sstdiylist}[2]{
+   \item[#1:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #2
+   \end{description}
+}
+
 %  Format the implementation status section.
 \newcommand{\sstimplementationstatus}[1]{
    \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
