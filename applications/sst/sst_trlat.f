@@ -51,6 +51,7 @@
 *     PDRAPER: Peter Draper (STARLINK - Durham University)
 *     DSB: David S. Berry 
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -76,6 +77,10 @@
 *        Ignored "Synopsis" sections.
 *     2006 July 12 (MJC):
 *        Ignore "Licence" and "Copyright" sections.
+*     21-JUL-2009 (TIMJ):
+*        If an unrecognized section includes the string "Parameters" treat
+*        it as a formatted subsection similar to "ADAM Parameters". Uses the
+*        new sstdiylist LaTeX command.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -113,6 +118,7 @@
       INTEGER HEADER             ! Section header line number
       INTEGER LAST               ! Last line number in section body
       INTEGER NC                 ! Number of characters in line
+      LOGICAL ISLIST             ! Is the DIY topic a list?
 
 *.
 
@@ -373,12 +379,28 @@
             TOPIC( NC : NC ) = ' '
          END IF
 
+*  See if the TOPIC contains the word "Parameters". If it is a parameter
+*  section we treat it similarly to ADAM Parameters and use a subsection.
+         IF ( INDEX( TOPIC( : NC ), "Parameters" ) .NE. 0 ) THEN
+            ISLIST = .TRUE.
+         ELSE
+            ISLIST = .FALSE.
+         END IF
+
 *  Output the heading, followed by the body of the section in paragraph
 *  mode.
-         CALL SST_PUT( 3, SST__BKSLH // 'sstdiytopic{', STATUS )
+         IF ( ISLIST ) THEN
+            CALL SST_PUT( 3, SST__BKSLH // 'sstdiylist{', STATUS )
+         ELSE
+            CALL SST_PUT( 3, SST__BKSLH // 'sstdiytopic{', STATUS )
+         END IF
          CALL SST_LAT( 6, TOPIC( : NC ), STATUS )
          CALL SST_PUT( 3, '}{', STATUS )
-         CALL SST_LATP( 6, FIRST, LAST, STATUS )
+         IF ( ISLIST ) THEN
+            CALL SST_LATS( 6, 3, .TRUE., FIRST, LAST, STATUS )
+         ELSE
+            CALL SST_LATP( 6, FIRST, LAST, STATUS )
+         END IF
          CALL SST_PUT( 3, '}', STATUS )
          GO TO 1
       END IF
