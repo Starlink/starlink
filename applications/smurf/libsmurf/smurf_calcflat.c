@@ -20,7 +20,7 @@
 *        Pointer to global status.
 
 *  Description:
-*     This routine can alculate flatfield solution from a flatfield observation.
+*     This routine can calculate a flatfield solution from a flatfield observation.
 *
 *     The flatfield observation consists of a series of dark measurements taken at 
 *     various pixel heater settings. One standard SCUBA-2 raw data file is stored for
@@ -39,7 +39,8 @@
 *          observation and the same subarray.
 *     MSG_FILTER = _CHAR (Read)
 *          Control the verbosity of the application. Values can be
-*          QUIET (minimal messages), NORMAL, VERBOSE or DEBUG [NORMAL]
+*          NONE (no messages), QUIET (minimal messages), NORMAL,
+*          VERBOSE, DEBUG or ALL. [NORMAL]
 *     NGOOD = _INTEGER (Write)
 *          Number of bolometers with good responsivities.
 *     OUT = NDF (Write)
@@ -60,6 +61,9 @@
 *     RESPMASK = _LOGICAL (Read)
 *          If true, responsivity data will be used to mask bolometer data
 *          when calculating the flatfield [TRUE]
+
+*  Related Applications:
+*     SMURF: CALCRESP, FLATFIELD
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)

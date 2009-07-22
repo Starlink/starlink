@@ -20,19 +20,21 @@
 *        Pointer to global status.
 
 *  Description:
-*     Fix metadata associated with a partocular raw data file. Not all problems can be
-*     fixed but attempts to correct for date-related problems and uses heuristics or
-*     configuration XML whenever possible.
+*     Report any issues associated the metadata of a particular file. In most
+*     cases SMURF applications will automatically apply these corrections but the
+*     command can be used to investigate issues prior to making a map.
 
 *  Notes:
-*     * Supports ACSIS raw data files
+*     - Supports ACSIS raw data files
+*     - In the future this command may gain the ability to fix the data files.
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
 *          Input files to be checked.
-*     OUTDIR = NDF (Read)
-*          Directory to receive modified files. "." indicates that the file will be modified
-*          in place.
+*     MSG_FILTER = _CHAR (Read)
+*          Control the verbosity of the application. Values can be
+*          NONE (no messages), QUIET (minimal messages), NORMAL,
+*          VERBOSE, DEBUG or ALL. [NORMAL]
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)

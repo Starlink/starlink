@@ -21,9 +21,13 @@
 
 *  Description:
 *     This routine tests schemes for visiting large quantities of
-*     SCUBA-2 data using multiple threads.
+*     SCUBA-2 data using multiple threads. This is a developer tool.
 
 *  ADAM Parameters:
+*     MSG_FILTER = _CHAR (Read)
+*          Control the verbosity of the application. Values can be
+*          NONE (no messages), QUIET (minimal messages), NORMAL,
+*          VERBOSE, DEBUG or ALL. [NORMAL]
 *     NTHREAD = NDF (Read)
 *          Number of threads to use
 

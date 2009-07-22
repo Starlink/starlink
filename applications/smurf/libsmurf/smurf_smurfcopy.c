@@ -33,12 +33,16 @@
 *     IN = NDF (Read)
 *          Input file. Can not be a DARK frame. If the input file is
 *          raw data, it will not be flatfielded but will be uncompressed.
+*     MSG_FILTER = _CHAR (Read)
+*          Control the verbosity of the application. Values can be
+*          NONE (no messages), QUIET (minimal messages), NORMAL,
+*          VERBOSE, DEBUG or ALL. [NORMAL]
+*     OUT = NDF (Write)
+*          Output file. Extensions are not propagated.
 *     SLICE = _INTEGER (Read)
 *          Index of time axis (GRID coordinates). 0 can be used to specify
 *          the last slice in the file without having to know how many
 *          slices are in the file.
-*     OUT = NDF (Write)
-*          Output file. Extensions are not propagated.
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
@@ -50,12 +54,13 @@
 *     {enter_further_changes_here}
 
 *  Notes:
-*     Currently, this routine can not support multiple input files
+*     - Currently, this routine can not support multiple input files
 *     or multiple indices from a single input file. Once extracted the
 *     output file can no longer be processed by SMURF routines.
+*     - Currently only understands SCUBA-2 data.
 
 *  Related Applications:
-*     KAPPA: CONTOUR, OUTLINE
+*     KAPPA: CONTOUR, OUTLINE;
 *     SMURF: jcmtstate2cat
 
 *  Copyright:

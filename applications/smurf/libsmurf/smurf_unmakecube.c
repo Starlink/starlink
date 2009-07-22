@@ -93,6 +93,10 @@
 *          scheme is similar to the "SincCos" scheme.
 *	   
 *          [current value]
+*     MSG_FILTER = _CHAR (Read)
+*          Control the verbosity of the application. Values can be
+*          NONE (no messages), QUIET (minimal messages), NORMAL,
+*          VERBOSE, DEBUG or ALL. [NORMAL]
 *     OUT = NDF (Write)
 *          A group of output NDFs into which the simulated time series data 
 *          will be written.
@@ -129,6 +133,9 @@
 *          Otherwise, the detector positions are calculated on the basis
 *          of the FPLANEX/Y arrays. Both methods should (in the absence 
 *          of bugs) result in identical cubes. [TRUE]
+
+*  Related Applications:
+*     SMURF: MAKECUBE
 
 *  Authors:
 *     David Berry (JAC, UCLan)

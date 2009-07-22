@@ -20,21 +20,29 @@
 *        Pointer to global status.
 
 *  Description:
-*     Use the netcdf library to import raw AzTEC data files and save
+*     Uses the netcdf library to import raw AzTEC data files and save
 *     to NDF files in a format approximating the SCUBA2 ICD so that they
 *     may subsequently be read by other SMURF routines to make maps.
 
 *  Notes:
-*     No base coordinates were stored in netcdf files.
-*     Time is presently inaccurate and requires an optimization routine
+*     - No base coordinates were stored in netcdf files.
+*     - Time is presently inaccurate and requires an optimization routine
 *     to calculate the time that makes Az/El and RA/Dec consistent.
+*     - This command is untested and probably does not work.
 
 *  ADAM Parameters:
 *     IN = CHAR (Read)
 *          Name of the input NetCDF file to be converted.  This name
 *          should include the .nc extension.
+*     MSG_FILTER = _CHAR (Read)
+*          Control the verbosity of the application. Values can be
+*          NONE (no messages), QUIET (minimal messages), NORMAL,
+*          VERBOSE, DEBUG or ALL. [NORMAL]
 *     OUT = CHAR (Read)
 *          Output NDF file.
+
+*  Related Applications:
+*     SMURF: MAKEMAP
 
 *  Authors:
 *     Mitch Crowe (UBC)

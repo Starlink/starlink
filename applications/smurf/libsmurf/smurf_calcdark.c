@@ -21,9 +21,12 @@
 
 *  Description:
 *     Given a set of dark observations, calculate the dark frame from each.
-*     Does not flatfield.
+*     A bad pixel mask can be supplied to remove known bad pixels. Does not flatfield.
 
 *  Notes:
+*     Dark files will be subtracted from raw data during the flatfielding step.
+*     Commands that flatfield data can use either raw dark files or the output from
+*     CALCDARK.
 
 *  ADAM Parameters:
 *     BPM = NDF (Read)
@@ -35,8 +38,17 @@
 *          supplied. [!]
 *     IN = NDF (Read)
 *          Input files to be processed. Non-darks will be filtered out.
+*     MSG_FILTER = _CHAR (Read)
+*          Control the verbosity of the application. Values can be
+*          NONE (no messages), QUIET (minimal messages), NORMAL,
+*          VERBOSE, DEBUG or ALL. [NORMAL]
 *     OUT = NDF (Write)
-*          Output dark files.
+*          Output dark files. These can be used as bad pixel masks in
+*          subsequent processing steps via the BPM parameter in other
+*          SCUBA-2 SMURF commands.
+
+*  Related Applications:
+*     SMURF: FLATFIELD, MAKEMAP
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)

@@ -4,7 +4,7 @@
 *     MAKEMAP
 
 *  Purpose:
-*     Top-level MAKEMAP implementation
+*     Make a map from SCUBA-2 data
 
 *  Language:
 *     Starlink ANSI C
@@ -20,7 +20,20 @@
 *        Pointer to global status.
 
 *  Description:
-*     This is the main routine implementing the MAKEMAP task.
+*     This command is used to create a map from SCUBA-2 data. Two techniques
+*     are provided and can be selected using the METHOD parameter.
+*
+*     The "REBIN" method can be used to make a map by coadding all the samples
+*     in the correct location using a number of different convolution
+*     techniques. This is useful when the time series have been processed
+*     independently of the map-maker and the map should be made "as-is".
+*     Raw data will be flatfielded but this method will not apply any
+*     extinction correction, sky removal or filtering. It is assumed that
+*     this has been handled by other tasks prior to making the map.
+
+*     The "ITERATE" method takes a holistic approach to map making and
+*     will attempt to do all that can be done to make a map. Details
+*     of the map making can be controlled using the CONFIG file.
 
 *  ADAM Parameters:
 *     ALIGNSYS = _LOGICAL (Read)
@@ -134,6 +147,10 @@
 *          continually makes a map, constructs models for different
 *          data components (common-mode, spikes etc) See CONFIG for parameters
 *          controlling the iterative map maker.
+*     MSG_FILTER = _CHAR (Read)
+*          Control the verbosity of the application. Values can be
+*          NONE (no messages), QUIET (minimal messages), NORMAL,
+*          VERBOSE, DEBUG or ALL. [NORMAL]
 *     NTILE = _INTEGER (Write)
 *          The number of output tiles used to hold the entire output
 *          array (see parameter TILEDIMS). If no input data falls within
@@ -301,7 +318,7 @@
 *          written to this output parameter even if a null value is supplied 
 *          for parameter OUT.
 
-* Configuration Parameters:
+*  Configuration Parameters:
 *
 *     *** General parameters controlling iterative map-maker ***
 *
@@ -341,10 +358,10 @@
 *       If MEMITER=0 files will be produced of the form "[input
 *       filename]_[model component].dimm", but will be deleted upon
 *       completion of the map if DELDIMM is set. Set EXPORTNDF if you
-*       wish to produce Starlink ".ndf" files that can be viewed using
+*       wish to produce Starlink ".sdf" files that can be viewed using
 *       tools such as Kappa and Gaia regardless of the value of MEMITER.
 *     EXPORTNDF( ) = STRING
-*       Export model components to Starlink ".ndf" files. Specify 1 or
+*       Export model components to Starlink ".sdf" files. Specify 1 or
 *       0 to export all or none of the components respectively. One
 *       can also specify an array of components to export using the
 *       same format as modelorder. Note that you can specify
@@ -432,6 +449,29 @@
 *       If FLT specified, perform filtering as an iterative component, rather
 *       than doing it once at the beginning as a pre-processing step. See
 *       FILT_ NOTCHLOW.
+
+*  Related Applications:
+*     SMURF: QLMAKEMAP
+
+*  Notes:
+*     - A FITS extension is added to the output NDF containing any keywords
+*     that are common to all input NDFs. To be included in the output
+*     FITS extension, a FITS keyword must be present in the NDF extension
+*     of every input NDF, and it must have the same value in all input
+*     NDFs. In addition, certain headers that relate to start and end
+*     events are propogated from the oldest and newest file respectively.
+*     - The output NDF will contain an extension named "SMURF" containing
+*     an NDF named "EXP_TIME" containing the exposure time associated with
+*     each pixel.
+*     - The FITS keyword EXP_TIME is added to the output
+*     FITS extension. This header contains the median
+*     value of the EXP_TIME array (stored in the SMURF extension
+*     of the output NDF).
+*     corresponding FITS keyword is assigned a blank value.
+*     - FITS keywords NUMTILES and TILENUM are added to the output FITS
+*     header. These are the number of tiles used to hold the output data,
+*     and the index of the NDF containing the header, in the range 1 to
+*     NUMTILES. See parameter TILEDIMS.
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)

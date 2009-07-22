@@ -4,7 +4,7 @@
 *     SC2SIM
 
 *  Purpose:
-*     Top-level SIMULATE implementation
+*     SCUBA-2 Simulator
 
 *  Language:
 *     Starlink ANSI C
@@ -20,7 +20,7 @@
 *        Pointer to global status.
 
 *  Description:
-*     This is the main routine implementing the SIMULATE task.  This
+*     This command
 *     attempts to simulate the data taken by a SCUBA-2 subarray when
 *     observing an astronomical image plus atmospheric background
 *     while driving the JCMT. The simulation includes photon and 1/f
@@ -42,6 +42,12 @@
 *     for example : s8aheat20060301_00001.sdf.
 
 *  ADAM Parameters:
+*     MAXWRITE = INTEGER (Read)
+*          Number of samples to write in output file.
+*     MSG_FILTER = _CHAR (Read)
+*          Control the verbosity of the application. Values can be
+*          NONE (no messages), QUIET (minimal messages), NORMAL,
+*          VERBOSE, DEBUG or ALL. [NORMAL]
 *     OBSPAR = GROUP (Read)
 *          Specifies values for the observation parameters used by 
 *          simulation.  
@@ -69,231 +75,14 @@
 *          below.  The default values will be used for any unspecified
 *          parameters.  Unregnized parameters are ignored (i.e. no
 *          error is reported).
-*
-*          bol_distx (double) : 6.28 (arcseconds)
-*            Average bolometer distance in the x-direction.
-*          bol_disty (double) : 6.28 (arcseconds)
-*            Average bolometer distance in the y-direction.
-*          bous_angle (double) : 0.0 (radians)
-*            For the Boustrophedon obsmode, this parameter specifies 
-*            the angle of the pattern relative to the telescope
-*            axes in radians anticlockwise.
-*          bous_width (double) : 2000.0 (arcseconds)
-*            For the Boustrophedon obsmode, this parameter specifies
-*            the width of the bous pattern in arcseconds.  This width
-*            is the width of each of back-and-forth sweeps across
-*            the sky, and is measured from the centre of the array.
-*          bous_height (double) : 2000.0 (arcseconds)
-*            For the Boustrophedon obsmode, this parameter specifies
-*            the height of the bous pattern in arcseconds.  This 
-*            height is the height of the stack of back-and-forth sweeps
-*            across the sky, and is measured from the centre of the 
-*            array.
-*          bous_spacing (double) : 240.0 (arcseconds)
-*            For the Boustrophedon obsmode, this parameter specifies
-*            the spacing of the bous pattern in arcseconds.  This
-*            spacing is the distance between the parallel horizontal
-*            sweeps across the sky, and is measured from the centre of
-*            the array.
-*          bous_vmax (double) : 200.0 (arcseconds/second)
-*            For the Boustrophedon obsmode, this parameter specifies
-*            the maximum telescope velocity.
-*          conv_shape (int) : 1
-*            Flag for the possible convolution functions where
-*               0 - Gaussian
-*               1 - sinc(dx).sinc(dy)
-*               2 - sinc(dx).sinc(dy) tapered
-*               3 - sinc(dx).sinc(dy) after first 1.0
-*               4 - bessel tapered
-*          conv_sig (double) : 1.0
-*            Convolution function parameter.
-*          coordframe (char[]) : RADEC
-*            Map coordinate frame, ether NASMYTH, AZEL, or RADEC.
-*          dec (char[]) : 0:0:0.0 O (degrees:minutes:seconds)
-*            Sexagesimal string representation of the Declination
-*            of the observation.
-*          distfac (double) : 0.0
-*            Distortion factor, where 0 = no distortion.
-*          flatname (char[]) : ""
-*            Name of flatfield correction technique.
-*          grid_max_x (integer) : 1
-*            Reconstruction grid max x.
-*          grid_max_x (integer) : 1
-*            Reconstruction grid max y.
-*          grid_min_x (integer) : 1
-*            Reconstruction grid min x.
-*          grid_min_x (integer) : 1
-*            Reconstruction grid min y.
-*          grid_step_x (double) : 6.28 (arcseconds)
-*            Grid step in X direction.
-*          grid_step_y (double) : 6.28 (arcseconds)
-*            Grid step in Y direction.
-*          heatnum (int) : 1
-*            Number of heater settings.
-*          heatstart (double) : 0.0 (pW)
-*            Initial heater setting.
-*          heatstep (double) : 0.0 (pW)
-*            Increment of heater setting.
-*          jig_step_x (double) : 6.28 (arcseconds)
-*            The step size in the x-direction between
-*            jiggle positions. 
-*          jig_step_y (double) : 6.28 (arcseconds)
-*            The step size in the y-direction between
-*            jiggle positions.
-*          jig_pos.x (char[]) : "0;-1;1;-1;0;1;-1;1"
-*            Array with relative vertex coordinates
-*            for the x-direction, in units of pixel
-*            distance.  This parameter value should
-*            be a semicolon-separated list of integer
-*            values.  The number of values must be the
-*            same as the number of values in the 
-*            jig_pos.y array. 
-*          jig_pos.y (char[]) : "1;-1;0;1;-1;1;0;-1"
-*            Array with relative vertex coordinates
-*            for the y-direction, in units of pixel
-*            distance.  This parameter value should
-*            be a semicolon-separated list of integer
-*            values.  The number of values must be the
-*            same as the number of values in the 
-*            jig_pos.x array.
-*          lambda (double) : 0.85e-3 (metres)
-*            Wavelength of observation.
-*          liss_angle (double) : 0.0 (radians)
-*            For the LISS obsmode, this parameter specifies 
-*            the angle of the pattern relative to the telescope
-*            axes in radians anticlockwise.
-*          liss_width (double) : 2000.0 (arcseconds)
-*            For the LISS obsmode, this parameter specifies
-*            the width of the Lissajous pattern in arcseconds.  
-*          liss_height (double) : 2000.0 (arcseconds)
-*            For the LISS obsmode, this parameter specifies
-*            the height of the Lissajous pattern in arcseconds.  
-*          liss_spacing (double) : 240.0 (arcseconds)
-*            For the LISS obsmode, this parameter specifies
-*            the spacing of the Lissajous pattern in arcseconds.  
-*            This spacing is the distance between the parallel 
-*            sweeps across the sky, and is measured from the 
-*            centre of the array.
-*          liss_vmax (double) : 200.0 (arcseconds/second)
-*            For the LISS obsmode, this parameter specifies
-*            the maximum telescope velocity.
-*          liss_nmaps (integer) : 1 
-*            The number of times the Lissajous pattern should
-*            repeat.
-*          mjdaystart (double) : 53795.0
-*            Modified julian date at start of observation.
-*          nbolx (integer) : 40
-*            Number of bolometers in x direction.  This
-*            is the number of bolometers in a "row", 
-*            and this is the total number of "columns".
-*          nboly (integer) : 32
-*            Number of bolometers in x direction.  This
-*            is the number of bolometers in a "column", 
-*            and this is the total number of "rows".
-*          numsamples (integer) : 128
-*            For the Stare obsmode, this is the number of
-*            samples.
-*          nvert (integer) : 8
-*            The number of vertices in the Jiggle pattern.
-*          obsmode (char[]) : PONG
-*            The observation mode, which can be any of 
-*            the following :
-*               STARE : Simulates a simple point-and-shoot 
-*                       observation mode in which the camera 
-*                       stares at at a specified area of sky 
-*                       for a period of time.
-*               DREAM : (Dutch REal-time Acquisition Mode)
-*                       Simulates an observition in which the
-*                       Secondary Mirror unit moves rapidly 
-*                       in a star-like pattern such that each
-*                       bolometer observes multiple points
-*                       on the sky.
-*               SINGLESCAN : Simulates moving the array in 
-*                            a straight path across the sky.
-*               BOUS : Simulates mapping a rectangular area of
-*                      sky using a simple Boustrophedon or
-*                      raster pattern.
-*               PONG : Simulates mapping a rectangular area of
-*                      sky by filling the box with a orthogonally
-*                      cross-linked pattern by "bouncing" off the
-*                      sides of the box.  There are two 
-*                      subcategories of PONG, either Straight
-*                      Pong (straight lines between vertices) or
-*                      Curve Pong (slightly wiggly lines between
-*                      vertices - pattern is a Fourier expanded
-*                      Lissajous).
-*               LISS : Simulates mapping a rectangular area of
-*                      sky by filling the box with a Lissajous
-*                      pattern.
-*          platenum (integer) : 1
-*            The number of waveplate rotations.
-*          platerev (double) : 2.0
-*            The waveplate rotation in revolutions/second.
-*          pong_angle (double) : 0.0 (radians)
-*            For the PONG obsmode, this parameter specifies 
-*            the angle of the pattern relative to the telescope
-*            axes in radians anticlockwise.
-*          pong_width (double) : 2000.0 (arcseconds)
-*            For the PONG obsmode, this parameter specifies
-*            the width of the Pong pattern in arcseconds.  
-*          pong_height (double) : 2000.0 (arcseconds)
-*            For the PONG obsmode, this parameter specifies
-*            the height of the Pong pattern in arcseconds.  
-*          pong_spacing (double) : 240.0 (arcseconds)
-*            For the PONG obsmode, this parameter specifies
-*            the spacing of the Pong pattern in arcseconds.  
-*            This spacing is the distance between the parallel 
-*            sweeps across the sky, and is measured from the 
-*            centre of the array.
-*          pong_type (char[]) : STRAIGHT
-*            Specifies the type of Pong simulation (straight or
-*            curve.
-*          pong_vmax (double) : 200.0 (arcseconds/second)
-*            For the PONG obsmode, this parameter specifies
-*            the maximum telescope velocity.
-*          pong_nmaps (integer) : 1 
-*            The number of times the Pong pattern should
-*            repeat.
-*          ra (char[]) : 0:0:0.0 O (hours:minutes:seconds)
-*            Sexagesimal string representation of the Right 
-*            ascension of the observation.
-*          steptime (double) : 0.005 (sec)
-*            Sample interval time.
-*          scan_angle (double) : 0.0 (radians)
-*            For the SINGLESCAN obsmode, this parameter specifies 
-*            the angle of the pattern relative to the telescope
-*            axes in radians anticlockwise.
-*          scan_pa8thlength (double) : 2000.0 (arcseconds)
-*            For the SINGLESCAN obsmode, this parameter specifies
-*            the width of the scan path in arcseconds.  
-*          scan_vmax (double) : 200.0 (arcseconds/second)
-*            For the SINGLESCAN obsmode, this parameter specifies
-*            the maximum telescope velocity.
-*          smu_move (integer) : 8 
-*            Code for the SMU move algorithm.  The possible codes 
-*            are :
-*               0 : Block wave.
-*               1 : 2 term not damped.
-*               2 : 3 term not damped.
-*               3 : 4 term not damped.
-*               4 : 2 term flat end.
-*               5 : 3 term flat end.
-*               6 : 4 term flat end.
-*               7 : ScubaWave -  After 1 Ms 0.098. After 8 Ms 
-*                   0.913. After 9 Ms 1.000. popepi points is 
-*                   equivalent with 64 Ms.
-*               8 : This is an experimental wave form, which may 
-*                   change often.  Now it is a cosine waveform 
-*                   from 0 to 1 in the full time.
-*          smu_offset (double) : 0.0
-*            SMU phase shift.
-*          smu_samples (integer) : 1
-*            Number of samples per jiggle vertex .
-*          subsysnr (integer) : 1
-*            Subsystem number.
-*          targetpow (double) : 25.0 (pW)
-*            Target bolometer power input.
-*
+*     OVERWRITE = LOGICAL (Read)
+*          Flag to specify whether existing files are
+*          overwritten. Setting this to FALSE increments the `group'
+*          counter in the output file names. Default is TRUE.
+*     SEED = INTEGER (Read)
+*          Seed for random number generator.  If a seed
+*          is not specified, the clock time in milliseconds
+*          is used.
 *     SIMPAR = GROUP (Read)
 *          Specifies values for the simulation parameters.  See 
 *          the description for OBSPAR for the file format.
@@ -302,102 +91,6 @@
 *          below.  The default values will be used for any unspecified
 *          parameters.  Unregnized parameters are ignored (i.e. no
 *          error is reported).
-*
-*          add_atm (integer) : 0
-*            Flag for adding atmospheric emission.
-*          add_fnoise (integer) : 0
-*            Flag for adding 1/f noise.
-*          add_hnoise (integer) : 0
-*            Flag for adding heater noise.
-*          add_pns (integer) : 0
-*            Flag for adding photon noise.
-*          airmass (double) : 1.2
-*            Airmass of simulated observation.
-*          anang (double) : 0.0 (degrees)
-*            Polarisation angle of analyser.
-*          anpol (double) : 100.0 (percent)
-*            Polarisation of analyser.
-*          antrans (double) : 100.0 (percent)
-*            Transmission of analyser.
-*          aomega (double) : 0,179
-*            Coupling factor (0.179 for 850 microns,
-*            0.721 for 450 microns).
-*          astname (char[]) : ""
-*            Name 8of the file containing astronomical
-*            sky image.
-*          astpol (double) : 10.0 (percent)
-*            Polarisation of source.
-*          atmname (char[]) : ""
-*            Name of the file containing atmospheric
-*            sky image.
-*          atend (double) : 5.0 (Degrees Celsius)
-*            Ambient temperature at end.
-*          atmxvel (double) : 5000.0 (arcsec/sec)
-*            Atm background velocity in X.
-*          atmyvel (double) : 0.0 (arcsec/sec)
-*            Atm background velocity in Y.
-*          atmzerox (double) : 5000.0 (arcsec)
-*            Atm background offset in X.
-*          atmzeroy (double) : 50000.0 (arcsec)
-*            Atm background offset in Y.
-*          atstart (double) : 5.0 (Degrees Celsius)
-*            Ambient temperature at start.
-*          bandGHz (double) : 35.0 (GHz)
-*            Bandwidth in GHz.
-*          blindang (double) : 10.0 (Degrees)
-*            Polarisation angle of blind.
-*          blindpol (double) : 1.0 (Percent)
-*            Polarisation of blind.
-*          blindtrans (double) : 93.0 (Percent)
-*            Transmission of blind.
-*          cassang (double) : 135.0 (Degrees)
-*            Polarisatio nangle of Cass optics.
-*          casspol (double) : 1.0 (Percent)
-*            Polarisation of Cass optics.
-*          casstrans (double) : 98.0 (Percent)
-*            Transmission of Cass optics.
-*          flux2cur (integer) : 1 
-*            Flag to indicate to convert power 
-*            from flux to current.
-*          meanatm (double) : 7.0 (pW)
-*            Mean expeected atmospheric signal.
-*          nasang (double) : 90.0 (Degrees)
-*            Polarisation angle of Nasmyth optics.
-*          naspol (double) : 1.0 (Percent)
-*            Polarisation of Nasmyth optics.
-*          nastrans (double) : 98.0 (Percent)
-*            Transmissio nof Nasmyth optics.
-*          ncycle (integer) : 1
-*            Number of cycles through the DREAM
-*            pattern.
-*          smu_terr (double) : 0.0
-*            SMU timing error.
-*          subname (char[]) : s8a
-*            Semi-colon-separated list of subarray
-*            names for the simulation.  Any number
-*            of subarrays can be selected in any
-*            order, and should be separated by
-*            semi-colons (with no spaces) e.g.
-*            s8a;s8b;s8d
-*          telemission (double) : 4.0 (pW)
-*            Telescope background pW per pixel.
-*          tauzen (double) : 0.052583
-*            Optical depth at 225 GHz at the zenith.
-*          xpoint (double) : 20.0 (arcsec)
-*            X pointing offset on sky.
-*          ypoint (double) : 20.0 (arcsec)
-*            Y pointing offset on sky.
-*
-*     SEED = INTEGER (Read)
-*          Seed for random number generator.  If a seed
-*          is not specified, the clock time in milliseconds
-*          is used.
-*     MAXWRITE = INTEGER (Read)
-*          Number of samples to write in output file.
-*     OVERWRITE = LOGICAL (Read)
-*          Flag to specify whether existing files are
-*          overwritten. Setting this to FALSE increments the `group'
-*          counter in the output file names. Default is TRUE.
 *     SIMSTATS = LOGICAL (Read)
 *          Flag to specify whether to report the properties of the
 *          current simulation given the parameters specified in
@@ -412,6 +105,320 @@
 *          less time than for a 'full' simulation and may be used to
 *          predict the rate of sampling across a mapped area for a
 *          given observation.
+
+*  Observation Parameters:
+*     bol_distx (double) : 6.28 (arcseconds)
+*          Average bolometer distance in the x-direction.
+*     bol_disty (double) : 6.28 (arcseconds)
+*          Average bolometer distance in the y-direction.
+*     bous_angle (double) : 0.0 (radians)
+*       For the Boustrophedon obsmode, this parameter specifies
+*       the angle of the pattern relative to the telescope
+*       axes in radians anticlockwise.
+*     bous_width (double) : 2000.0 (arcseconds)
+*       For the Boustrophedon obsmode, this parameter specifies
+*       the width of the bous pattern in arcseconds.  This width
+*       is the width of each of back-and-forth sweeps across
+*       the sky, and is measured from the centre of the array.
+*     bous_height (double) : 2000.0 (arcseconds)
+*       For the Boustrophedon obsmode, this parameter specifies
+*       the height of the bous pattern in arcseconds.  This
+*       height is the height of the stack of back-and-forth sweeps
+*       across the sky, and is measured from the centre of the
+*       array.
+*     bous_spacing (double) : 240.0 (arcseconds)
+*       For the Boustrophedon obsmode, this parameter specifies
+*       the spacing of the bous pattern in arcseconds.  This
+*       spacing is the distance between the parallel horizontal
+*       sweeps across the sky, and is measured from the centre of
+*       the array.
+*     bous_vmax (double) : 200.0 (arcseconds/second)
+*       For the Boustrophedon obsmode, this parameter specifies
+*       the maximum telescope velocity.
+*     conv_shape (int) : 1
+*       Flag for the possible convolution functions where
+*          0 - Gaussian
+*          1 - sinc(dx).sinc(dy)
+*          2 - sinc(dx).sinc(dy) tapered
+*          3 - sinc(dx).sinc(dy) after first 1.0
+*          4 - bessel tapered
+*     conv_sig (double) : 1.0
+*       Convolution function parameter.
+*     coordframe (char[]) : RADEC
+*       Map coordinate frame, ether NASMYTH, AZEL, or RADEC.
+*     dec (char[]) : 0:0:0.0 O (degrees:minutes:seconds)
+*       Sexagesimal string representation of the Declination
+*       of the observation.
+*     distfac (double) : 0.0
+*       Distortion factor, where 0 = no distortion.
+*     flatname (char[]) : ""
+*       Name of flatfield correction technique.
+*     grid_max_x (integer) : 1
+*       Reconstruction grid max x.
+*     grid_max_x (integer) : 1
+*       Reconstruction grid max y.
+*     grid_min_x (integer) : 1
+*       Reconstruction grid min x.
+*     grid_min_x (integer) : 1
+*       Reconstruction grid min y.
+*     grid_step_x (double) : 6.28 (arcseconds)
+*       Grid step in X direction.
+*     grid_step_y (double) : 6.28 (arcseconds)
+*       Grid step in Y direction.
+*     heatnum (int) : 1
+*       Number of heater settings.
+*     heatstart (double) : 0.0 (pW)
+*       Initial heater setting.
+*     heatstep (double) : 0.0 (pW)
+*       Increment of heater setting.
+*     jig_step_x (double) : 6.28 (arcseconds)
+*       The step size in the x-direction between
+*       jiggle positions.
+*     jig_step_y (double) : 6.28 (arcseconds)
+*       The step size in the y-direction between
+*       jiggle positions.
+*     jig_pos.x (char[]) : "0;-1;1;-1;0;1;-1;1"
+*       Array with relative vertex coordinates
+*       for the x-direction, in units of pixel
+*       distance.  This parameter value should
+*       be a semicolon-separated list of integer
+*       values.  The number of values must be the
+*       same as the number of values in the
+*       jig_pos.y array.
+*     jig_pos.y (char[]) : "1;-1;0;1;-1;1;0;-1"
+*       Array with relative vertex coordinates
+*       for the y-direction, in units of pixel
+*       distance.  This parameter value should
+*       be a semicolon-separated list of integer
+*       values.  The number of values must be the
+*       same as the number of values in the
+*       jig_pos.x array.
+*     lambda (double) : 0.85e-3 (metres)
+*       Wavelength of observation.
+*     liss_angle (double) : 0.0 (radians)
+*       For the LISS obsmode, this parameter specifies
+*       the angle of the pattern relative to the telescope
+*       axes in radians anticlockwise.
+*     liss_width (double) : 2000.0 (arcseconds)
+*       For the LISS obsmode, this parameter specifies
+*       the width of the Lissajous pattern in arcseconds.
+*     liss_height (double) : 2000.0 (arcseconds)
+*       For the LISS obsmode, this parameter specifies
+*       the height of the Lissajous pattern in arcseconds.
+*     liss_spacing (double) : 240.0 (arcseconds)
+*       For the LISS obsmode, this parameter specifies
+*       the spacing of the Lissajous pattern in arcseconds.
+*       This spacing is the distance between the parallel
+*       sweeps across the sky, and is measured from the
+*       centre of the array.
+*     liss_vmax (double) : 200.0 (arcseconds/second)
+*       For the LISS obsmode, this parameter specifies
+*       the maximum telescope velocity.
+*     liss_nmaps (integer) : 1
+*       The number of times the Lissajous pattern should
+*       repeat.
+*     mjdaystart (double) : 53795.0
+*       Modified julian date at start of observation.
+*     nbolx (integer) : 40
+*       Number of bolometers in x direction.  This
+*       is the number of bolometers in a "row",
+*       and this is the total number of "columns".
+*     nboly (integer) : 32
+*       Number of bolometers in x direction.  This
+*       is the number of bolometers in a "column",
+*       and this is the total number of "rows".
+*     numsamples (integer) : 128
+*       For the Stare obsmode, this is the number of
+*       samples.
+*     nvert (integer) : 8
+*       The number of vertices in the Jiggle pattern.
+*     obsmode (char[]) : PONG
+*       The observation mode, which can be any of
+*       the following :
+*       -   STARE : Simulates a simple point-and-shoot
+*                  observation mode in which the camera
+*                  stares at at a specified area of sky
+*                  for a period of time.
+*       -   DREAM : (Dutch REal-time Acquisition Mode)
+*                  Simulates an observition in which the
+*                  Secondary Mirror unit moves rapidly
+*                  in a star-like pattern such that each
+*                  bolometer observes multiple points
+*                  on the sky.
+*       -   SINGLESCAN : Simulates moving the array in
+*                       a straight path across the sky.
+*       -   BOUS : Simulates mapping a rectangular area of
+*                 sky using a simple Boustrophedon or
+*                 raster pattern.
+*       -   PONG : Simulates mapping a rectangular area of
+*                 sky by filling the box with a orthogonally
+*                 cross-linked pattern by "bouncing" off the
+*                 sides of the box.  There are two
+*                 subcategories of PONG, either Straight
+*                 Pong (straight lines between vertices) or
+*                 Curve Pong (slightly wiggly lines between
+*                 vertices - pattern is a Fourier expanded
+*                 Lissajous).
+*       -   LISS : Simulates mapping a rectangular area of
+*                 sky by filling the box with a Lissajous
+*                 pattern.
+*     platenum (integer) : 1
+*       The number of waveplate rotations.
+*     platerev (double) : 2.0
+*       The waveplate rotation in revolutions/second.
+*     pong_angle (double) : 0.0 (radians)
+*       For the PONG obsmode, this parameter specifies
+*       the angle of the pattern relative to the telescope
+*       axes in radians anticlockwise.
+*     pong_width (double) : 2000.0 (arcseconds)
+*       For the PONG obsmode, this parameter specifies
+*       the width of the Pong pattern in arcseconds.
+*     pong_height (double) : 2000.0 (arcseconds)
+*       For the PONG obsmode, this parameter specifies
+*       the height of the Pong pattern in arcseconds.
+*     pong_spacing (double) : 240.0 (arcseconds)
+*       For the PONG obsmode, this parameter specifies
+*       the spacing of the Pong pattern in arcseconds.
+*       This spacing is the distance between the parallel
+*       sweeps across the sky, and is measured from the
+*       centre of the array.
+*     pong_type (char[]) : STRAIGHT
+*       Specifies the type of Pong simulation (straight or
+*       curve.
+*     pong_vmax (double) : 200.0 (arcseconds/second)
+*       For the PONG obsmode, this parameter specifies
+*       the maximum telescope velocity.
+*     pong_nmaps (integer) : 1
+*       The number of times the Pong pattern should
+*       repeat.
+*     ra (char[]) : 0:0:0.0 O (hours:minutes:seconds)
+*       Sexagesimal string representation of the Right
+*       ascension of the observation.
+*     steptime (double) : 0.005 (sec)
+*       Sample interval time.
+*     scan_angle (double) : 0.0 (radians)
+*       For the SINGLESCAN obsmode, this parameter specifies
+*       the angle of the pattern relative to the telescope
+*       axes in radians anticlockwise.
+*     scan_pa8thlength (double) : 2000.0 (arcseconds)
+*       For the SINGLESCAN obsmode, this parameter specifies
+*       the width of the scan path in arcseconds.
+*     scan_vmax (double) : 200.0 (arcseconds/second)
+*       For the SINGLESCAN obsmode, this parameter specifies
+*       the maximum telescope velocity.
+*     smu_move (integer) : 8
+*       Code for the SMU move algorithm.  The possible codes
+*       are :
+*       -   0 : Block wave.
+*       -   1 : 2 term not damped.
+*       -   2 : 3 term not damped.
+*       -   3 : 4 term not damped.
+*       -   4 : 2 term flat end.
+*       -   5 : 3 term flat end.
+*       -   6 : 4 term flat end.
+*       -   7 : ScubaWave -  After 1 Ms 0.098. After 8 Ms
+*              0.913. After 9 Ms 1.000. popepi points is
+*              equivalent with 64 Ms.
+*       -   8 : This is an experimental wave form, which may
+*              change often.  Now it is a cosine waveform
+*              from 0 to 1 in the full time.
+*     smu_offset (double) : 0.0
+*       SMU phase shift.
+*     smu_samples (integer) : 1
+*       Number of samples per jiggle vertex .
+*     subsysnr (integer) : 1
+*       Subsystem number.
+*     targetpow (double) : 25.0 (pW)
+*       Target bolometer power input.
+
+*  Simulation Parameters:
+*     add_atm (integer) : 0
+*       Flag for adding atmospheric emission.
+*     add_fnoise (integer) : 0
+*       Flag for adding 1/f noise.
+*     add_hnoise (integer) : 0
+*       Flag for adding heater noise.
+*     add_pns (integer) : 0
+*       Flag for adding photon noise.
+*     airmass (double) : 1.2
+*       Airmass of simulated observation.
+*     anang (double) : 0.0 (degrees)
+*       Polarisation angle of analyser.
+*     anpol (double) : 100.0 (percent)
+*       Polarisation of analyser.
+*     antrans (double) : 100.0 (percent)
+*       Transmission of analyser.
+*     aomega (double) : 0,179
+*       Coupling factor (0.179 for 850 microns,
+*       0.721 for 450 microns).
+*     astname (char[]) : ""
+*       Name 8of the file containing astronomical
+*       sky image.
+*     astpol (double) : 10.0 (percent)
+*       Polarisation of source.
+*     atmname (char[]) : ""
+*       Name of the file containing atmospheric
+*       sky image.
+*     atend (double) : 5.0 (Degrees Celsius)
+*       Ambient temperature at end.
+*     atmxvel (double) : 5000.0 (arcsec/sec)
+*       Atm background velocity in X.
+*     atmyvel (double) : 0.0 (arcsec/sec)
+*       Atm background velocity in Y.
+*     atmzerox (double) : 5000.0 (arcsec)
+*       Atm background offset in X.
+*     atmzeroy (double) : 50000.0 (arcsec)
+*       Atm background offset in Y.
+*     atstart (double) : 5.0 (Degrees Celsius)
+*       Ambient temperature at start.
+*     bandGHz (double) : 35.0 (GHz)
+*       Bandwidth in GHz.
+*     blindang (double) : 10.0 (Degrees)
+*       Polarisation angle of blind.
+*     blindpol (double) : 1.0 (Percent)
+*       Polarisation of blind.
+*     blindtrans (double) : 93.0 (Percent)
+*       Transmission of blind.
+*     cassang (double) : 135.0 (Degrees)
+*       Polarisatio nangle of Cass optics.
+*     casspol (double) : 1.0 (Percent)
+*       Polarisation of Cass optics.
+*     casstrans (double) : 98.0 (Percent)
+*       Transmission of Cass optics.
+*     flux2cur (integer) : 1
+*       Flag to indicate to convert power
+*       from flux to current.
+*     meanatm (double) : 7.0 (pW)
+*       Mean expeected atmospheric signal.
+*     nasang (double) : 90.0 (Degrees)
+*       Polarisation angle of Nasmyth optics.
+*     naspol (double) : 1.0 (Percent)
+*       Polarisation of Nasmyth optics.
+*     nastrans (double) : 98.0 (Percent)
+*       Transmissio nof Nasmyth optics.
+*     ncycle (integer) : 1
+*       Number of cycles through the DREAM
+*       pattern.
+*     smu_terr (double) : 0.0
+*       SMU timing error.
+*     subname (char[]) : s8a
+*       Semi-colon-separated list of subarray
+*       names for the simulation.  Any number
+*       of subarrays can be selected in any
+*       order, and should be separated by
+*       semi-colons (with no spaces) e.g.
+*       s8a;s8b;s8d
+*     telemission (double) : 4.0 (pW)
+*       Telescope background pW per pixel.
+*     tauzen (double) : 0.052583
+*       Optical depth at 225 GHz at the zenith.
+*     xpoint (double) : 20.0 (arcsec)
+*       X pointing offset on sky.
+*     ypoint (double) : 20.0 (arcsec)
+*       Y pointing offset on sky.
+
+*  Related Applications:
+*     SMURF: SKYNOISE
 
 *  Authors:
 *     Andy Gibb (UBC)

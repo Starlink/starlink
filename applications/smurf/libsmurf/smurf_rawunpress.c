@@ -21,15 +21,21 @@
 
 *  Description:
 *     Uncompress the raw time series data from 16-bit to 32-bit integers.
-*     Does not flatfield
-
-*  Notes:
+*     Does not flatfield and so the data are still in integer format. If the
+*     data are not compressed they will be copied without change.
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
-*          Input files to be uncompressed
+*          Input files to be uncompressed.
+*     MSG_FILTER = _CHAR (Read)
+*          Control the verbosity of the application. Values can be
+*          NONE (no messages), QUIET (minimal messages), NORMAL,
+*          VERBOSE, DEBUG or ALL. [NORMAL]
 *     OUT = NDF (Write)
 *          Output file
+
+*  Related Applications:
+*     SMURF: FLATFIELD
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)

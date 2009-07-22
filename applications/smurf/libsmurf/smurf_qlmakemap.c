@@ -4,7 +4,7 @@
 *     QLMAKEMAP
 
 *  Purpose:
-*     Top-level QUICK-LOOK MAKEMAP implementation
+*     QUICK-LOOK map-maker
 
 *  Language:
 *     Starlink ANSI C
@@ -30,6 +30,10 @@
 *     per time slice and then the data are extinction corrected using
 *     the MEANWVM tau value (at 225 GHz) from the FITS header.
 
+*     The quick bounds determination implies that this routine should
+*     not be used for multi-observation mosaics. The intent of this command
+*     is to reduce a single observation as quickly as possible.
+
 *  ADAM Parameters:
 *     BPM = NDF (Read)
 *          Group of files to be used as bad pixel masks. Each data file
@@ -44,6 +48,12 @@
 *          variances are not generated. [FALSE]
 *     IN = NDF (Read)
 *          Input file(s)
+*     MSG_FILTER = _CHAR (Read)
+*          Control the verbosity of the application. Values can be
+*          NONE (no messages), QUIET (minimal messages), NORMAL,
+*          VERBOSE, DEBUG or ALL. [NORMAL]
+*     OUT = NDF (Write)
+*          Output file.
 *     PARAMS( 2 ) = _DOUBLE (Read)
 *          An optional array which consists of additional parameters
 *          required by the Sinc, SincSinc, SincCos, SincGauss, Somb,
@@ -118,9 +128,10 @@
 *          For further details of these schemes, see the descriptions of 
 *          routine AST_REBINx in SUN/211. ["Nearest"]
 *     SYSTEM = LITERAL (Read)
-*          The celestial coordinate system for the output map
-*     OUT = NDF (Write)
-*          Output file
+*          The celestial coordinate system for the output map/
+
+*  Related Applications:
+*     SMURF: MAKEMAP
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)

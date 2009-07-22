@@ -4,7 +4,7 @@
 *     FLATFIELD
 
 *  Purpose:
-*     Top-level FLATFIELD implementation
+*     Flatfield SCUBA-2 data
 
 *  Language:
 *     Starlink ANSI C
@@ -20,14 +20,15 @@
 *        Pointer to global status.
 
 *  Description:
-*     This is the main routine implementing the FLATFIELD task. Each
+*     This routine flatfields SCUBA-2 data. Each
 *     input file is propagated to a corresponding output file which is
 *     identical but contains flatfielded data. If the input data are
 *     already flatfielded, the user will be informed and no action
 *     will be performed on the data.
 
 *  Notes:
-*     At the moment an output file is propagated regardless of whether
+*     - Darks will be subtracted prior to flatfielding.
+*     - At the moment an output file is propagated regardless of whether
 *     the input data are already flatfield or not. This is a waste of
 *     disk space :)
 
@@ -40,13 +41,21 @@
 *          no mask to match. A NULL parameter indicates no mask files to be
 *          supplied. [!]
 *     IN = NDF (Read)
-*          Input files to be uncompressed and flatfielded.
+*          Input files to be uncompressed and flatfielded. Any darks provided
+*          will be subtracted prior to flatfielding.
+*     MSG_FILTER = _CHAR (Read)
+*          Control the verbosity of the application. Values can be
+*          NONE (no messages), QUIET (minimal messages), NORMAL,
+*          VERBOSE, DEBUG or ALL. [NORMAL]
 *     OUT = NDF (Write)
 *          Output file(s).
 *     OUTFILES = LITERAL (Write)
 *          The name of text file to create, in which to put the names of
 *          all the output NDFs created by this application (one per
 *          line). If a null (!) value is supplied no file is created. [!]
+
+*  Related Applications:
+*     SMURF: CALCFLAT, RAWUNPRESS
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)

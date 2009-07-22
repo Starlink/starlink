@@ -4,7 +4,7 @@
 *     STARECALC
 
 *  Purpose:
-*     Top-level STARE image generator
+*     Calculate image for SCUBA-2 STARE observations
 
 *  Language:
 *     Starlink ANSI C
@@ -20,7 +20,7 @@
 *        Pointer to global status.
 
 *  Description:
-*     This is the main routine for reconstructing 2-D images from
+*     This command is used for reconstructing 2-D images from
 *     STARE observations. Files containing data not taken in STARE
 *     mode are ignored. The user has the option to specify the number
 *     of frames to be averaged together, but the default is to
@@ -36,17 +36,26 @@
 *          supplied. [!]
 *     IN = NDF (Read)
 *          Name of input data files
+*     MSG_FILTER = _CHAR (Read)
+*          Control the verbosity of the application. Values can be
+*          NONE (no messages), QUIET (minimal messages), NORMAL,
+*          VERBOSE, DEBUG or ALL. [NORMAL]
+*     NAVER = _INTEGER (Read)
+*          Number of frames to average together in output images. If a
+*          NULL value is given, NAVER is calculated dynamically for
+*          each input file to give output images which are 1-second
+*          averages. [!]
 *     OUT = NDF (Write)
 *          Name of output file containing STARE images
 *     OUTFILES = LITERAL (Write)
 *          The name of text file to create, in which to put the names of
 *          all the output NDFs created by this application (one per
 *          line). If a null (!) value is supplied no file is created. [!]
-*     NAVER = _INTEGER (Read)
-*          Number of frames to average together in output images. If a
-*          NULL value is given, NAVER is calculated dynamically for
-*          each input file to give output images which are 1-second
-*          averages. [!]
+
+*  Related Applications:
+*     SMURF: DREAMSOLVE;
+*     KAPPA: WCSMOSAIC;
+*     CCDPACK: MAKEMOS
 
 *  Authors:
 *     Andy Gibb (UBC)

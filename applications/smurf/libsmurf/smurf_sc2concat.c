@@ -4,7 +4,7 @@
 *     SC2CONCAT
 
 *  Purpose:
-*     Top-level SC2CONCAT implementation
+*     Concatenate files into a larger file.
 
 *  Language:
 *     Starlink ANSI C
@@ -22,17 +22,21 @@
 *  Description:
 *     Given a list of input files this task concatenates them into larger
 *     files. The rules it follows are: 
-*       o data files are grouped by subarray
-*       o files are only concatenated if they are continuous in time 
-*       o the longest a concatenated file may be is given by MAXLEN (in sec.)
-*       o for each continuous chunk of data, shorter than MAXLEN, a file
-*         is generated on disk for each subarray. The file name is determined
-*         as the name of the first input file for the chunk, with a suffix
-*         "_con". The can be modified using the parameter OUT.
+*     - data files are grouped by subarray
+*     - files are only concatenated if they are continuous in time
+*     - the longest a concatenated file may be is given by MAXLEN (in sec.)
+*     - for each continuous chunk of data, shorter than MAXLEN, a file
+*     is generated on disk for each subarray. The file name is determined
+*     as the name of the first input file for the chunk, with a suffix
+*     "_con". The can be modified using the parameter OUT.
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
 *          Input file(s)
+*     MSG_FILTER = _CHAR (Read)
+*          Control the verbosity of the application. Values can be
+*          NONE (no messages), QUIET (minimal messages), NORMAL,
+*          VERBOSE, DEBUG or ALL. [NORMAL]
 *     OUT = NDF (Write)
 *          Output concatenated files
 *     OUTFILES = LITERAL (Write)
@@ -45,6 +49,9 @@
 *          Number of samples to pad at start.
 *     MAXLEN = _DOUBLE (Read)
 *          Maximum length (in seconds) concatenated file).
+
+*  Related Applications:
+*     SMURF: SC2FFT, SC2CLEAN
 
 *  Authors:
 *     Edward Chapin (UBC)
