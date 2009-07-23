@@ -230,7 +230,7 @@
 
 % Other tasks
 \newcommand{\makemos}{\xref{\task{makemos}}{sun139}{MAKEMOS}}
-
+\newcommand{\csub}{\xref{\task{csub}}{sun95}{CSUB}}
 \newcommand{\fitsedit}{\xref{\task{fitsedit}}{sun95}{FITSEDIT}}
 \newcommand{\kapdiv}{\xref{\task{div}}{sun95}{DIV}}
 \newcommand{\ndfcopy}{\xref{\task{ndfcopy}}{sun95}{NDFCOPY}}
@@ -974,6 +974,10 @@ bolometer mask is as follows:
   bad-bolometer mask.
 \end{itemize}
 
+Bad bolometer masks are supported by the \flatfield, \extinction,
+\remsky, \qlmakemap\ and \makemap\ tasks through the \texttt{BPM}
+parameter.
+
 \subsection{\xlabel{dsworkflow}DREAM/STARE Data Reduction Workflow\label{se:dsworkflow}}
 
 The DREAM/STARE observing modes are designed for mapping compact
@@ -1039,7 +1043,7 @@ drifts. Note that only flatfielded data (non-dark) files are written
 out, and that the naming scheme will change. The list of output files
 given is truncated at the appropriate number. The list of files
 actually written to disk is obtained via the \texttt{OUTFILES}
-parameter.
+parameter if specified.
 
 \subsubsection{\xlabel{skysub}Removing the atmosphere\label{se:skysub}}
 
@@ -1103,8 +1107,8 @@ You can fit the atmospheric signal in the following ways:
 \item Fit a plane of arbitrary orientation.
 \end{itemize}
 Furthermore, \remsky\ can make use of the data from all available
-subarrays to make a better estimate of the atmospheric emission (see
-the \texttt{GROUP} parameter).
+subarrays simultaneously to make a better estimate of the atmospheric
+emission (see the \texttt{GROUP} parameter).
 
 For simple cases, subtracting a mean value may be sufficient, though
 it is not recommended for bright sources as the mean will be biassed
@@ -1152,10 +1156,10 @@ follows:
 \label{eq:tau}
 \end{equation}
 
-\begin{figure}
+%\begin{figure}
 %\includegraphics{extinction.eps}
-\caption{Atmospheric extinction as a function of airmass.}
-\end{figure}
+%\caption{Atmospheric extinction as a function of airmass.}
+%\end{figure}
 
 Using Equation \ref{eq:tau}, rewrite Equation \ref{eq:iobs} as:
 \begin{equation}
@@ -1182,9 +1186,9 @@ The zenith optical depth can be obtained via three methods:
     zenith}$ every 10 minutes and values are stored in the FITS
   headers corresponding to the start and end timestamps of the file
   (\texttt{TAU225ST} and \texttt{TAU225EN}). \SMURF\ converts CSO
-  $\tau_{\rm zenith}$ to $\tau_{\rm zenith}$ at 450, or 850 $\mu$m,
+  $\tau_{\rm zenith}$ to $\tau_{\rm zenith}$ at 450 or 850 $\mu$m,
   relying on an empirical relationship between $\tau_{\rm zenith}$ at
-  225 GHz and $\tau_{\rm zenith}$ at 450, or 850 $\mu$m.
+  225 GHz and $\tau_{\rm zenith}$ at 450 or 850 $\mu$m.
 
 \item JCMT Water Vapour Monitor: The JCMT Water Vapour Monitor (WVM)
   provides measurements of $\tau_{\rm zenith}$ every 1.2 seconds. It
@@ -1201,7 +1205,26 @@ giving sufficiently-frequent readings.
 The \SMURF\ routine that corrects for atmospheric extinction is called
 \extinction. The \extinction\ routine can use $\tau_{\rm zenith}$
 determined by all of the above methods, and obtains values
-automatically from the FITS headers for the WVM and CSO cases.
+automatically from the FITS headers for the WVM and CSO cases or uses
+the raw WVM data if desired.
+
+The user can choose how accurate a correction they wish to apply using
+the \texttt{METHOD} parameter. By default, \extinction\ will assess
+the magnitude of the correction and if it does not change
+significantly across the field of view, then a single value is used
+(corresponding to the elevation of the tracking position). If there is
+a significant variation, then \extinction\ will apply a correction to
+each bolometer using the elevation of that bolometer. It is possible
+to enforce either of these options by setting \texttt{METHOD} to
+\texttt{QUICK} or \texttt{FULL} respectively.
+
+Note that sky subtraction must take place before the extinction
+correction is applied. \extinction\ checks the history to see if
+\remsky\ has been run and exits with an error if not. However, if an
+alternative method of sky subtraction has been used (such as using
+\KAPPA\ \csub\ to subtract a mean or median value) then the
+\texttt{HASSKYREM} may be set to \texttt{TRUE} to override the history
+check by \extinction.
 
 \subsubsection{\xlabel{dsimages}Calculating images from time-series data\label{se:dsimages}}
 
@@ -1255,12 +1278,12 @@ require the inverse matrix to be re-calculated. The task for doing
 this is called \dreamweights\ which allows the user to specify
 different output grid parameters. The calculation of the inverse is
 moderately time-consuming (compared with calculating the images) and
-takes of order 5-10 minutes on current hardware. The output file from
+takes of order 5--10 minutes on current hardware. The output file from
 \dreamweights\ is the weights file required by \dreamsolve. \KAPPA\
 \fitsedit\ may be used to specify weights files which differ in name
 from the default. Note that this process must be repeated for each
-subarray for which data exists and that data will are to be combined
-should all use the same grid.
+subarray for which data exists and that data are to be combined should
+all use the same grid.
 
 \subsection{\xlabel{scanworkflow}SCAN Data Reduction Workflow\label{se:scanworkflow}}
 
@@ -1801,8 +1824,9 @@ maxlen            &   If performing the iterations in memory, this is the maximu
 the \sctwosim\ task. The simulator requires an input astronomical sky
 image and a model of the atmosphere. Suitable model atmospheres may be
 generated with \skynoise. Output files are written in the same format
-as real data from SCUBA-2 with complete flatfield and state structure
-information and can be processed with other \SMURF\ tasks.
+as real data from SCUBA-2 with complete flatfield, WVM, WCS and JCMT
+state structure information. These files can be processed with other
+\SMURF\ tasks.
 
 The simulator supports the primary observing modes: DREAM, STARE, SCAN
 along with FLATFIELD, POINTING and FOCUS observations. Rudimentary
@@ -1889,17 +1913,38 @@ question). These are specified using the \texttt{SIMPAR} and
 parameters are stored in plain text files and are passed in using the
 \verb+^+ scheme mentioned above (ref...).
 
+The main observation parameters (\texttt{OBSPAR}) of interest are the
+RA/Dec of the source, wavelength, observing mode, observation date and
+duration of observation (which in the case of SCAN observations, is
+determined by the size of the area to map). Planets may be specified
+by name. If the source is not above the horizon, the simulator will
+exit with a message.
+
+The main simulation parameters (\texttt{SIMPAR}) are the subarrays to
+simulate data for, the names of the atmosphere model and astronomical
+source files and the zenith opacity (at 225\,GHz). The zenith opacty
+is converted to a value at the observing wavelength using the
+empirical relations derived for SCUBA by Archibald et al. (proper ref
+needed here). Similar relations for SCUBA-2 do not yet exist.
+
+Data for all subarrays (at the chosen wavelength) may be generated in
+a single run. The size of the output files is governed by the
+\texttt{MAXWRITE} parameter for \sctwosim\ which specifies the number
+of samples to write per file. Multiple observations may be simulated
+by setting the \texttt{OVERWRITE} parameter to \texttt{FALSE}.
+
 Since the data output from the simulator mimics the real instrument,
 it is possible to generate many GB of data which may take many minutes
 to hours of CPU time. The \sctwosim\ parameter \texttt{SIMSTATS}
 provides an estimate of the simulation properties including the
-quantity of data, memory requirements and CPU time.
+duration of the simulation, quantity of data, memory requirements and
+CPU time.
 
 \section{Acknowledgments}
 
 The SCUBA-2 simulator code was originally written as a standalone
 application by Dennis Kelly at the UK Astronomy Technology Centre and
-re-written as a \SMURF\ task by Jen Balfour. The authors are grateful
+implemented as a \SMURF\ task by Jen Balfour. The authors are grateful
 for the documentation written by Maria Kelly on which this SUN is
 based, and Christa van Laerhoven for an earlier version.
 
