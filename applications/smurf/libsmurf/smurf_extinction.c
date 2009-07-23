@@ -68,8 +68,6 @@
 *          The name of text file to create, in which to put the names of
 *          all the output NDFs created by this application (one per
 *          line). If a null (!) value is supplied no file is created. [!]
-*     QUICK = LOGICAL (Read)
-*          Flag for applying the Quick method.
 *     TAUSRC = CHAR (Read)
 *          Source of optical depth data. Options are:
 *          - WVMRAW    - use the water vapour monitor time series data
