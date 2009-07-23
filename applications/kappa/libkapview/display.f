@@ -23,17 +23,17 @@
 *     This application displays a one- or two-dimensional NDF as an 
 *     image on the current image-display device.  The minimum and 
 *     maximum data values to be displayed can be selected in several 
-*     ways (see parameter MODE).  Data values outside these limits are
+*     ways (see Parameter MODE).  Data values outside these limits are
 *     displayed with the colour of the nearest limit.  A key showing the
 *     relationship between colour and data value can be displayed (see
-*     parameter KEY).
+*     Parameter KEY).
 *
 *     Annotated axes or a simple border can be drawn around the image
 *     (see  parameters AXES and BORDER).  The appearance of these may be
 *     controlled in detail (see parameters STYLE and BORSTYLE).  
 *
 *     A specified colour lookup table may optionally be loaded prior to 
-*     displaying the image (see parameter LUT). For devices which reset 
+*     displaying the image (see Parameter LUT). For devices which reset 
 *     the colour table when opened (such as postscript files), this may
 *     be the only way of controlling the colour table.
 *
@@ -56,9 +56,9 @@
 *        TRUE if labelled and annotated axes are to be drawn around the
 *        image.  These display co-ordinates in the current co-ordinate 
 *        Frame of the supplied NDF, and may be changed using application
-*        WCSFRAME (see also parameter USEAXIS).  The width of the 
+*        WCSFRAME (see also Parameter USEAXIS).  The width of the 
 *        margins left for the annotation may be controlled using 
-*        parameter MARGIN.  The appearance of the axes (colours, founts, 
+*        Parameter MARGIN.  The appearance of the axes (colours, founts, 
 *        etc.) can be controlled using the STYLE parameter. 
 *        [current value]
 *     BADCOL = LITERAL (Read)
@@ -96,11 +96,11 @@
 *        simple box would have been drawn containing the whole image.
 *        This is because every pixel has a defined position in pixel
 *        co-ordinates.  The appearance of the border (colour, width,
-*        etc.) can be controlled using parameter BORSTYLE. 
+*        etc.) can be controlled using Parameter BORSTYLE. 
 *        [current value]
 *     BORSTYLE = GROUP (Read)
 *        A group of attribute settings describing the plotting style to
-*        use for the border (see parameter BORDER). 
+*        use for the border (see Parameter BORDER). 
 *
 *        A comma-separated list of strings should be given in which each
 *        string is either an attribute setting, or the name of a text
@@ -128,7 +128,7 @@
 *        (supplying a colon ":" will display details of the current
 *        co-ordinate Frame).  The position should be supplied as a list 
 *        of formatted axis values separated by spaces or commas.  See 
-*        also parameter USEAXIS.  A null (!) value causes the centre of 
+*        also Parameter USEAXIS.  A null (!) value causes the centre of 
 *        the image to be used.  [!]
 *     CLEAR = _LOGICAL (Read)
 *        TRUE if the current picture is to be cleared before the image 
@@ -167,21 +167,21 @@
 *        right of the display.  This can take the form of a colour ramp,
 *        a coloured histogram of pen indices, or graphs of RGB
 *        intensities, all annotated with data value.  The form and 
-*        appearance of this key can be controlled using parameter 
+*        appearance of this key can be controlled using Parameter 
 *        KEYSTYLE, and its horizontal position can be controlled using 
-*        parameter KEYPOS.  If the key is required in a different 
+*        Parameter KEYPOS.  If the key is required in a different 
 *        location, set KEY=NO and use application LUTVIEW after 
 *        displaying the image.  [TRUE]
 *     KEYPOS = _REAL (Read)
 *        A value giving the gap between the right-hand edge of the
 *        display and the left-hand edge of the key, given as a fraction
 *        of the width of the current picture.  If a key is produced, 
-*        then the right-hand margin specified by parameter MARGIN is 
+*        then the right-hand margin specified by Parameter MARGIN is 
 *        ignored, and the value supplied for KEYPOS is used instead.
 *        [current value]
 *     KEYSTYLE = GROUP (Read)
 *        A group of attribute settings describing the plotting style to 
-*        use for the key (see parameter KEY). 
+*        use for the key (see Parameter KEY). 
 *
 *        A comma-separated list of strings should be given in which each
 *        string is either an attribute setting, or the name of a text 
@@ -243,7 +243,7 @@
 *        axis being 3, and the second being arbitrary.  The method used 
 *        to compress or expand the colour table if the second dimension
 *        is different from the number of unreserved colour indices is
-*        controlled by parameter NN.  Also the LUT's values must lie in 
+*        controlled by Parameter NN.  Also the LUT's values must lie in 
 *        the range 0.0--1.0. [!]
 *     MARGIN( 4 ) = _REAL (Read)
 *        The widths of the margins to leave around the image for axis 
@@ -314,13 +314,13 @@
 *        when there is  no scaling the highest colour index is returned.
 *     SCALE = _LOGICAL (Read)
 *        If TRUE the input data are to be scaled according to the value
-*        of parameter MODE.  If it is FALSE, MODE is ignored, and the
+*        of Parameter MODE.  If it is FALSE, MODE is ignored, and the
 *        input data are displayed as is (i.e. the data values are simply
 *        converted to integer type and used as indices into the colour
 *        table).  A value of zero refers to the first pen following the 
 *        palette.  A FALSE value is intended to be used with data 
 *        previously scaled by this or similar applications which have 
-*        already performed the required scaling (see parameter OUT).  It
+*        already performed the required scaling (see Parameter OUT).  It
 *        provides the quickest method of image display within this
 *        application. [TRUE]
 *     SCALOW = _DOUBLE (Write)
@@ -342,7 +342,7 @@
 *        pixels original aspect ratio at the centre of the image. [current value]
 *     STYLE = GROUP (Read)
 *        A group of attribute settings describing the plotting style to
-*        use for the annotated axes (see parameter AXES). 
+*        use for the annotated axes (see Parameter AXES). 
 *
 *        A comma-separated list of strings should be given in which each
 *        string is either an attribute setting, or the name of a text 
@@ -391,17 +391,17 @@
 *        the image fills the available space in at least one dimension.
 *        A value larger than 1.0 makes each data pixel wider.  If this
 *        results in the image being wider than the available space then
-*        the the image will be clipped to display fewer pixels.  See
-*        also parameters YMAGN, CENTRE, SQRPIX, and FILL.  [1.0]
+*        the image will be clipped to display fewer pixels.  See
+*        also Parameters YMAGN, CENTRE, SQRPIX, and FILL.  [1.0]
 *     YMAGN = _REAL (Read)
 *        The vertical magnification for the image.  A value of 1.0 
 *        corresponds to 'normal' magnification in which the image fills 
 *        the available space in at least one dimension.  A value larger 
 *        than 1.0 makes each data pixel taller.  If this results in the
 *        image being taller than the available space then the image will 
-*        be clipped to display fewer pixels.  See also parameters XMAGN, 
+*        be clipped to display fewer pixels.  See also Parameters XMAGN, 
 *        CENTRE, and FILL.  If a null (!) value is supplied, the default 
-*        value used depends on parameter SQRPIX.  If SQRPIX is TRUE,
+*        value used depends on Parameter SQRPIX.  If SQRPIX is TRUE,
 *        the default YMAGN value used is the value supplied for XMAGN. 
 *        This will result in each pixel occupying a square area on the 
 *        screen.  If SQRPIX is FALSE, then the default value for YMAGN
@@ -475,7 +475,7 @@
 *     annotated axes, the image area, and the border; a DATA picture 
 *     containing just the image area.  Note, the FRAME picture is only
 *     created if annotated axes or a border have been drawn, or if
-*     non-zero margins were specified using parameter MARGIN.  The world
+*     non-zero margins were specified using Parameter MARGIN.  The world
 *     co-ordinates in the DATA picture will be pixel co-ordinates.  A
 *     reference to the supplied NDF, together with a copy of the WCS 
 *     information in the NDF are stored in the DATA picture.  On exit 
@@ -1019,7 +1019,7 @@
          ELSE 
             CALL ERR_REP( 'DISPLAY_ERR2', 'No room left for the DATA '//
      :                    'picture (try reducing the size of the '//
-     :                    'margins - see parameter MARGIN).', STATUS )
+     :                    'margins - see Parameter MARGIN).', STATUS )
          END IF
 
          GO TO 999
@@ -1196,7 +1196,7 @@
      :           STATE .EQ. PAR__ACTIVE ) THEN
 
 *  Obtain the Current Frame co-ordinates (returned in CC) to put at the 
-*  centre of the picture using parameter CENTRE.  Use the Current Frame 
+*  centre of the picture using Parameter CENTRE.  Use the Current Frame 
 *  co-ordinates at the centre of the image as the dynamic default (they 
 *  will be ignored if they are bad).  KPG1_GTPOS loops until 
 *  co-ordinates are obtained that are valid in the Base Frame (i.e. 
@@ -1286,7 +1286,7 @@
 *  ==========================
 
 *  If the array being displayed is one-dimensional, set a dynamic
-*  default of TRUE for parameter FILL.
+*  default of TRUE for Parameter FILL.
       IF( WDIM( 1 ) .EQ. 1 .OR. WDIM( 2 ) .EQ. 1 ) THEN
          CALL PAR_DEF0L( 'FILL', .TRUE., STATUS )
       ELSE

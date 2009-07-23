@@ -78,7 +78,7 @@
 *
 *        - "Histogram" -- This finds the peak of an optimally binned 
 *        histogram, the mode being the central value of that bin.  The 
-*        number of bins may be altered given through parameter NUMBIN,
+*        number of bins may be altered given through Parameter NUMBIN,
 *        however it is recommended to use the optimal binsize derived 
 *        from the prescription of Freedman & Diatonis.
 *
@@ -113,7 +113,7 @@
 *        individual axis values are comma separated.
 *     MODE = _DOUBLE (Write)
 *        The modal value of all the valid pixels in the NDF array.
-*        The method used to obtain the mode is governed by parameter 
+*        The method used to obtain the mode is governed by Parameter 
 *        METHOD.
 *     NDF = NDF (Read)
 *        The NDF data structure to be analysed.
@@ -151,7 +151,7 @@
 *        Computes and displays simple ordered statistics for the data
 *        array in the NDF called image.
 *     histat image method=his
-*        As above but the the mode is the centre of peak bin in the 
+*        As above but the mode is the centre of peak bin in the 
 *        optimally distributed histogram rather than sub-bin 
 *        interpolated using neighbouring bins.
 *     histat ndf=spectrum variance
@@ -490,7 +490,7 @@
 *  Call the appropriate routine to compute the histogram and hence the
 *  derive the mode.  The optimum bin width is derived from which the
 *  optimum number of bins is derived but the user is allowed to modify
-*  that through parameter NUMBIN.
+*  that through Parameter NUMBIN.
          IF ( TYPE .EQ. '_BYTE' ) THEN
              CALL KPS1_HSMOB( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                        'NUMBIN', METHOD, DMAX, DMIN, NGOOD, 

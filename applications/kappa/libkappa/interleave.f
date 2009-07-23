@@ -90,7 +90,7 @@
 *     interleave "vector1,vector2" weave 2
 *        This interleaves the 1one-dimensional NDFs called vector1 and
 *        vector2 and stores the result in NDF weave.  Only the
-*        intersection of the the two input NDFs is used.
+*        intersection of the two input NDFs is used.
 *     interleave 'image*' weave [3,2] title="Interlaced image"
 *        This interleaves the two-dimensional NDFs with names beginning
 *        with "image" into an NDF called weave.  The interleaving has

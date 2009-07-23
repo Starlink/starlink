@@ -28,24 +28,24 @@
 *     vectors in the plot is kept to a manageable value by only
 *     plotting vectors for pixels on a sparse regular matrix.  The
 *     increment (in pixels) between plotted vectors is given by
-*     parameter STEP.  Zero orientation may be fixed at any position
+*     Parameter STEP.  Zero orientation may be fixed at any position
 *     angle within the plot by specifying an appropriate value for
-*     parameter ANGROT.  Each vector may be represented either by an
-*     arrow or by a simple line, as selected by parameter ARROW.
+*     Parameter ANGROT.  Each vector may be represented either by an
+*     arrow or by a simple line, as selected by Parameter ARROW.
 *
 *     The plot is produced within the current graphics database picture,
 *     and may be aligned with an existing DATA picture if the existing
 *     picture contains suitable co-ordinate Frame information (see 
-*     parameter CLEAR). 
+*     Parameter CLEAR). 
 *
-*     Annotated axes can be produced (see parameter AXES), and the 
-*     appearance of these can be controlled in detail using parameter 
+*     Annotated axes can be produced (see Parameter AXES), and the 
+*     appearance of these can be controlled in detail using Parameter 
 *     STYLE.  The axes show co-ordinates in the current co-ordinate 
 *     Frame of NDF1.
 *
 *     A key to the vector scale can be displayed to the right of the 
-*     vector map (see parameter KEY).  The appearance and position of 
-*     this key may be controlled using parameters KEYSTYLE and KEYPOS.
+*     vector map (see Parameter KEY).  The appearance and position of 
+*     this key may be controlled using Parameters KEYSTYLE and KEYPOS.
 
 *  Usage:
 *     vecplot ndf1 ndf2 [comp] [step] [vscale] [arrow] [just] [device]
@@ -53,7 +53,7 @@
 *  ADAM Parameters:
 *     ANGROT = _REAL (Read)
 *        A rotation angle in degrees to be added to each vector
-*        orientation before plotting the vectors (see parameter NDF2).
+*        orientation before plotting the vectors (see Parameter NDF2).
 *        It should be in the range 0--360.  [0.0]
 *     ARROW = LITERAL (Read)
 *        Vectors are drawn as arrows, with the size of the arrow head
@@ -65,9 +65,9 @@
 *        TRUE if labelled and annotated axes are to be drawn around the
 *        vector map.  These display co-ordinates in the current 
 *        co-ordinate Frame NDF1, which may be changed using application 
-*        WCSFRAME (see also parameter USEAXIS).  The width of the 
+*        WCSFRAME (see also Parameter USEAXIS).  The width of the 
 *        margins left for the annotation may be controlled using 
-*        parameter MARGIN.  The appearance of the axes (colours, founts,
+*        Parameter MARGIN.  The appearance of the axes (colours, founts,
 *        etc.) can be controlled using the STYLE parameter.  [TRUE]
 *     CLEAR = _LOGICAL (Read)
 *        TRUE if the graphics device is to be cleared before displaying
@@ -126,11 +126,11 @@
 *        lowest).  If the second value is not given, the top of the key
 *        is placed level with the top of the vector map.  Both values
 *        should be in the range 0.0 to 1.0.  If a key is produced, then
-*        the right-hand margin specified by parameter MARGIN is 
+*        the right-hand margin specified by Parameter MARGIN is 
 *        ignored.  [current value]
 *     KEYSTYLE = GROUP (Read)
 *        A group of attribute settings describing the plotting style to 
-*        use for the key (see parameter KEY). 
+*        use for the key (see Parameter KEY). 
 *
 *        A comma-separated list of strings should be given in which each
 *        string is either an attribute setting, or the name of a text 
@@ -188,12 +188,12 @@
 *        these margins are too narrow any axis annotation may be 
 *        clipped.  If a null (!) value is supplied, the value used is
 *        0.15 (for all edges) if annotated axes are being produced, and
-*        zero otherwise.  See also parameter KEYPOS.  [current value]
+*        zero otherwise.  See also Parameter KEYPOS.  [current value]
 *     NDF1 = NDF (Read)
-*        NDF structure containing the 2-dimensional image giving the
+*        NDF structure containing the two-dimensional image giving the
 *        vector magnitudes.
 *     NDF2 = NDF (Read)
-*        NDF structure containing the 2-dimensional image giving the
+*        NDF structure containing the two-dimensional image giving the
 *        vector orientations.  The values are considered to be in units
 *        of degrees unless the UNITS component of the NDF has the value
 *        "Radians" (case insensitive).  The positive y pixel axis 
@@ -271,7 +271,7 @@
 *        (as defined by the value zero in the NDF polang) is at the
 *        position angle 23.4 degrees (measured anti-clockwise from the
 *        positive y axis) in the displayed map.  The map is drawn over 
-*        the top of the the previously drawn DATA picture, aligned in a
+*        the top of the previously drawn DATA picture, aligned in a
 *        suitable co-ordinate Frame.
 *     vecplot stack(,,2) stack(,,1) arrow=0.1 just=start nokey
 *        Produces a vector map in which the vectors are defined by two
@@ -294,7 +294,7 @@
 *     the key if present; and a DATA picture containing just the 
 *     vectors.  Note, the FRAME picture is only created if annotated
 *     axes or a key has been drawn, or if non-zero margins were
-*     specified using parameter MARGIN.  The world co-ordinates in the
+*     specified using Parameter MARGIN.  The world co-ordinates in the
 *     DATA picture will be pixel co-ordinates.  A reference to NDF1,
 *     together with a copy of the WCS information in the NDF are stored 
 *     in the DATA picture.  On exit the current database picture for the
@@ -352,7 +352,7 @@
 *        Used modern-style variable declarations.  Added headings to
 *        the commentary.
 *     30-AUG-1999 (DSB):
-*        Do not cancel the DEVICE Parameter when closing the graphics
+*        Do not cancel the DEVICE parameter when closing the graphics
 *        system.
 *     4-OCT-1999 (DSB):
 *        Modified to use AST/PGPLOT.
@@ -825,7 +825,7 @@
          CALL KPG1_PGSTY( IPLOT, 'NUMLAB', .FALSE., ATTRS, STATUS )
 
 *  If no value was supplied for the vertical position of the KEY using 
-*  parameter KEYPOS, find the value which puts the top of the key level 
+*  Parameter KEYPOS, find the value which puts the top of the key level 
 *  with the top of the DATA picture.
          IF( NKP .LT. 2 ) THEN
 
@@ -846,7 +846,7 @@
             CALL PGQVP( 2, DUMMY, DUMMY, Y1, Y2 )
             KEYOFF = ( KEYOFF - Y1 )/( Y2 - Y1 )
 
-*  If the horizontal positions was given using parameter KEYPOS, just 
+*  If the horizontal positions was given using Parameter KEYPOS, just 
 *  activate the KEY picture.  This returns a pointer to an AST Plot
 *  which can be used to draw in the KEY picture.
          ELSE
