@@ -230,6 +230,11 @@
 
 % Other tasks
 \newcommand{\makemos}{\xref{\task{makemos}}{sun139}{MAKEMOS}}
+
+\newcommand{\fitsedit}{\xref{\task{fitsedit}}{sun95}{FITSEDIT}}
+\newcommand{\kapdiv}{\xref{\task{div}}{sun95}{DIV}}
+\newcommand{\ndfcopy}{\xref{\task{ndfcopy}}{sun95}{NDFCOPY}}
+\newcommand{\thresh}{\xref{\task{thresh}}{sun95}{THRESH}}
 \newcommand{\wcsmosaic}{\xref{\task{wcsmosaic}}{sun95}{WCSMOSAIC}}
 \newcommand{\wcsalign}{\xref{\task{wcsalign}}{sun95}{WCSALIGN}}
 
@@ -961,7 +966,7 @@ generated. There is no single \SMURF\ command that processes NOISE
 observations in this way but the procedure for creating a bad
 bolometer mask is as follows:
 \begin{itemize}
-\item Calculate the power spectrum with \SMURF\ \sctwofft;
+\item Calculate the power spectrum with \SMURF\ \fft;
 \item Select data at the two chosen frequencies with \KAPPA\ \ndfcopy\
   (collapsing if necessary);
 \item Form the ratio of those two files with \KAPPA\ \kapdiv;
@@ -1103,10 +1108,10 @@ the \texttt{GROUP} parameter).
 
 For simple cases, subtracting a mean value may be sufficient, though
 it is not recommended for bright sources as the mean will be biassed
-by the presence of the source. A more sophisticated solution may be
-obtained by fitting a plane to the data. The plane may have arbitrary
-orientation (in azimuth and elevation) or may be fixed so that the
-slope is in elevation only.
+high by the presence of the source. A more sophisticated solution may
+be obtained by fitting a plane to the data. The plane may have
+arbitrary orientation (in azimuth and elevation) or may be fixed so
+that the slope is in elevation only.
 
 \subsubsection{\xlabel{extinction}Correcting for atmospheric extinction\label{se:extinction}}
 
@@ -1340,7 +1345,7 @@ to the raw data, assuming that the observed signal is composed of:
 \item White noise from the instrument and the atmosphere
 \end{itemize}
 The theory behind the iterative map-maker is described in more detail
-in the following section \ref{dimm}.
+in the following section \ref{se:dimm}.
 
 The top panel of Figure 7 shows the observed signal from a single
 bolometer during one subscan. The lower three panels shows how the
@@ -1362,7 +1367,7 @@ subtraction.
   astronomical source and white noise.}
 \end{figure}
 
-\subsubsection{\xlabel{rebin}Rebin method\label{se:rebin}}
+\subsubsection{\xlabel{rebinmap}Rebin method\label{se:rebinmap}}
 
 The rebinning algorithm shares the observed signal from a single
 bolometer between neighbouring output map pixels, as determined by the
@@ -1792,15 +1797,111 @@ maxlen            &   If performing the iterations in memory, this is the maximu
 
 \section{\xlabel{simulator}SCUBA-2 simulator\label{se:sc2sim}}
 
-Stuff about the simulator goes here...
+\SMURF\ has the capability to produce simulated data from SCUBA-2 with
+the \sctwosim\ task. The simulator requires an input astronomical sky
+image and a model of the atmosphere. Suitable model atmospheres may be
+generated with \skynoise. Output files are written in the same format
+as real data from SCUBA-2 with complete flatfield and state structure
+information and can be processed with other \SMURF\ tasks.
+
+The simulator supports the primary observing modes: DREAM, STARE, SCAN
+along with FLATFIELD, POINTING and FOCUS observations. Rudimentary
+support exists for the SCUBA-2 polarimeter though this is
+untested. Instrument apertures may be set (offsets which adjust the
+tracking position to a specific subarray) and microsteps (small
+offsets from the tracking position) are fully supported. Simulating
+the motion of the major Solar System bodies (Venus, the Moon, Mars,
+Jupiter, Saturn, Uranus and Neptune) is supported.
+
+For SCAN observations, the simulator has two modes controlled by the
+\texttt{SIMTYPE} parameter. A \texttt{FULL} simulation generates
+simulated complete astronomical data including the effect of the
+atmosphere. A \texttt{WEIGHTS} simulation generates data which may be
+used to assess areal coverage and ``hit'' density (i.e.\ the number of
+times a point on the sky is observed) for different mapping strategies
+or the impact of non-working bolometers.
+
+\subsection{\xlabel{simuse}Simulator workflow\label{se:simuse}}
+
+The simulator requires some preparatory work before data can be
+simulated. The basic procedure is outlined below:
+\begin{itemize}
+\item Obtain an astronomical sky image;
+\item Calculate a model atmosphere;
+\item Calculate a flatfield solution;
+\item Decide on simulation parameters;
+\item Run simulation.
+\end{itemize}
+It is not necessary to recalculate a model atmosphere or flatfield
+solution for every simulation, even for different input sky images. 
+
+Example files are installed as part of \SMURF\ and may be found in the
+\texttt{\$STARLINK\_DIR/share/smurf} directory. An explanation may be
+found in the \texttt{README} file in that directory.
+
+\subsubsection{Astronomical image}
+
+The astronomical image may be any suitable image, provided it has WCS
+information. The WCS is used unless the source is a moving object
+(listed above). The image must be an NDF. It is recommended that the
+image pixel scale be set to be much less than the likely output map
+pixel spacing (typically 3 arcsec at 850\,$\mu$m, 1 arcsec at
+450\,$\mu$m) to avoid imaging and sampling artefacts.
+
+\subsubsection{Model atmosphere}
+
+The model atmosphere is calculated with the \skynoise\ task. The
+atmosphere is modelled as a Kolmogorov turbulent thin-screen (refs)
+with a characteristic turnover frequency and scaling law. Different
+models may be generated for the same parameters using a random number
+seed (specified or calculated internally using the system clock). The
+parameters may be modified though the user should be familiar with the
+details of this model of the atmosphere before exploring the parameter
+space too widely.
+
+The model atmosphere calculated is generic and may be used for
+simulations at both 850\,$\mu$m and 450\,$\mu$m. The model is scaled
+at the time of simulation according to the particular wavelength.
+
+\subsubsection{Flatfield simulation}
+
+Before a data simulation can take place, the flatfield solution for
+each subarray must be calculated. This is achieved by specifying a
+special observing mode called \texttt{heatrun} and running a
+simulation. The flatfield solution is written to a file using a naming
+scheme which follows that for raw data. The convention is
+\verb+s[4|8][a-d]heatYYYYMMDD_NNNNN.sdf+ where \verb+s[4|8][a-d]+ is
+the subarray name (e.g.\ \verb+s8a+), \verb+heat+ indicates a
+flatfield observation, \verb+YYYYMMDD+ is the date of observation and
+\verb+NNNNN+ is a zero-padded, 5-digit observation number.
+
+The simulator relies on this naming scheme for reading the flatfield
+information, and the files must be present in the current directory.
+
+\subsubsection{Running the simulator}
+
+The simulator has a large number of parameters which may be freely
+adjusted. The list of parameters is divided between two groups:
+simulation parameters (usually telescope- and instrument-specific) and
+observation parameters (properties of the observation in
+question). These are specified using the \texttt{SIMPAR} and
+\texttt{OBSPAR} ADAM parameters to \sctwosim. For convenience, the
+parameters are stored in plain text files and are passed in using the
+\verb+^+ scheme mentioned above (ref...).
+
+Since the data output from the simulator mimics the real instrument,
+it is possible to generate many GB of data which may take many minutes
+to hours of CPU time. The \sctwosim\ parameter \texttt{SIMSTATS}
+provides an estimate of the simulation properties including the
+quantity of data, memory requirements and CPU time.
 
 \section{Acknowledgments}
 
 The SCUBA-2 simulator code was originally written as a standalone
 application by Dennis Kelly at the UK Astronomy Technology Centre and
 re-written as a \SMURF\ task by Jen Balfour. The authors are grateful
-to the documentation written by Maria Kelly and Christa van Laerhoven
-on which this SUN is based.
+for the documentation written by Maria Kelly on which this SUN is
+based, and Christa van Laerhoven for an earlier version.
 
 % End of main text
 
