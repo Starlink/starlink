@@ -513,7 +513,7 @@ array (s4d) that was operational at the time.
 \Kappa\ tasks such as \fitslist\ and \ndftrace\ can be used to see the
 FITS headers and dimensions of the data. In this example, the first
 and last two files are dark observations, and the second and third
-files are observations of Jupiter. The main data arrays of each files
+files are observations of Jupiter. The main data arrays of each file
 are cubes, with the first two dimensions enumerating rows and columns,
 and the third time slices.
 
@@ -538,8 +538,9 @@ flatfield the data internally as needed.
 \section{\xlabel{time_series}Visualizing data}
 
 In this section several procedures are described for looking at
-SCUBA-2 data. If you are interested in making maps using a single command,
-go immediately to ...
+SCUBA-2 data, as well as minimal data reduction steps that can be run
+seperately. If you are interested in making maps using a single
+command, go immediately to Section~\ref{sec:maps}.
 
 \subsection{\xlabel{concat}Concatenating data} 
 
@@ -558,8 +559,8 @@ combines all of the files associated with observation 7 for the s4d
 array into a single file called
 s4d20090107\_00007\_0002\_concat.sdf. \concat\ will automatically
 filter out files 1, and 4-5 which are dark measurements, so that the
-concatenated file contains only the science data from the scan across
-Jupiter. 
+concatenated file contains only the data taken during the scan across
+Jupiter with the shutter open.
 
 \subsection{\xlabel{display_scan}Displaying scan patterns}
 
@@ -595,7 +596,7 @@ information into a simple ASCII tab separated table:
 \end{center}
 \end{figure}
 
-The easiest way to visualize the time series data is to use
+The easiest way to visualize the detector time series data is to use
 \gaia. Loading in the concatenated file above produces two windows
 (Fig.~\ref{fig:gaia_main}). The main window shows a map of detector
 values at a given instant in time. The second window can be used to
@@ -701,10 +702,10 @@ image sections of a cube' dialogue, switch from the `Spectrum' to the
 `Animation' tab approximately half-way down.  Set `Delay' to 10
 milliseconds (the smallest value), `Step' to 5 such that it only shows
 1 in every 5 frames, and click on the `On' button next to
-Looping. Finally, click on `Start', and an animation of the data cube
-will be shown in the main \gaia\ window. In addition to the motion of
-Jupiter across the array, there will also be a very apparent gradual
-fluctuation in the average value of all of the detectors in
+`Looping'. Finally, click on `Start', and an animation of the data
+cube will be shown in the main \gaia\ window. In addition to the
+motion of Jupiter across the array, there will also be a very apparent
+gradual fluctuation in the average value of all of the detectors in
 unison. The {\em common mode} signal is produced through a combination
 of sky noise and telescope motion.
 
@@ -728,12 +729,12 @@ beginning and end, and then apodize and filter the single large file.
   Coords$\rightarrow$Change Coordinates, and choosing `Pixel' for
   system. The high-pass filtering has suppressed much of the
   low-frequency noise so that the Jupiter crossings are now more
-  significant. {\bf bottom:} a map produced from these filtered
-  data. There is still significant noise, but now Jupiter is
-  visible. Several noisy bolometers produce the large streaks that
-  trace out the scan pattern (a curvy pong). There is also an imprint
-  of the array shape caused by the beginning of the scan before the
-  telescope started moving.}
+  significant relative to the baseline noise. {\bf bottom:} a map
+  produced from these filtered data. There is still significant noise,
+  but now Jupiter is visible. Several noisy bolometers produce the
+  large streaks that trace out the scan pattern (a curvy pong). There
+  is also an imprint of the array shape caused by the beginning of the
+  scan before the telescope started moving.}
 \label{fig:highpass}
 \end{center}
 \end{figure}
@@ -790,16 +791,19 @@ SC2FFT: power spectrum requested so setting POLAR=TRUE
 
 As in the previous examples we have concatenated the data with padding
 and used \clean\ to apodize the data (to suppress ringing when we take
-the FFT). However, we omit the high-pass filtering. There is no
-\starlink\ standard format for storing complex values. \fft\ therefore
-uses its own format: a 4-dimensional array, with the first two axes
-indicating detector row and column, the third axis frequency, and the
-final axis contains the real and imaginary parts of each Fourier
-coefficient. By using the power=true switch it switches to polar form,
-with the first component being the square of the amplitudes, and the
-second components the argument. As with the time series data, \gaia\
-may then be used to view the data cube consisting of the first 3
-dimensions:
+the FFT). However, we omit the high-pass filtering since the goal is
+to see what the bolometer noise looks like. There is no \starlink\
+standard format for storing complex values. \fft\ therefore uses its
+own format: a 4-dimensional array, with the first two axes indicating
+detector row and column, the third axis frequency, and the final axis
+contains the real and imaginary parts of each Fourier coefficient. By
+setting power=true it switches to polar form, such that the first
+components store the square of the amplitudes, and the second
+components the arguments (phases) of each Fourier coefficient. As with
+the time series data, \gaia\ may then be used to view the data
+cube. The difference is that we now specify a subset of the data so
+that the third axis of the cube is the array of squared Fourier
+amplitudes for each detector, and ignore the phases:
 
 \begin{myquote}
 \begin{verbatim}
@@ -808,10 +812,8 @@ dimensions:
 \end{myquote}
 
 It is then possible to click on each detector to display its power
-spectrum. Note that in 
-
-Once the `Spectral plot' window has been spawned, it will also be
-necessary to modify the axis displays. Select
+spectrum. Once the `Spectral plot' window has been spawned, it will
+also be necessary to modify the axis displays. Select
 Options$\rightarrow$Positive~Y~Only, and
 Options$\rightarrow$Log~Y~Axis.  There are also similar options to
 produce a logarithmically scaled x-axis (frequency) if
@@ -854,12 +856,12 @@ Processing data for object 'JUPITER' from the following observation  :
 \end{verbatim}
 \end{myquote}
 
-This example shows that 629760 samples in total were flagged `{\texttt
-  STAT}' while the telescope was stationary. Since there are
+This example shows that 629760 samples in total were flagged
+`\texttt{STAT}' while the telescope was stationary. Since there are
 $40\times32=1280$ detectors, this corresponds to $629760/1280=492$
 samples in time. In addition, a number of detectors were known to be
-bad by the data acquisition system, so that all of their samples are
-given a `{\texttt BADSAM}' flag.
+bad at the time of data acquisition, so that all of their samples are
+given a `\texttt{BADSAM}' flag.
 
 During map-making flagged samples will not get used. However, for
 visualization purposes the \Kappa\ task \qualtobad\ may be used to
@@ -875,14 +877,16 @@ convert samples with given quality bits to a {\em magic\/} or {\em
 If badmasked is subsequently viewed with \gaia, for example, none of
 the data taken while the telescope was stationary will appear.
 
-\section{\xlabel{maps}Iterative Map-Making} 
+\section{\xlabel{maps}Dynamic Iterative Map-Making} 
+\label{sec:maps}
 
 Rather than manually cleaning the data by hand and then re-gridding it
 all at the end, we can instead do everything in one go using the
-\smurf\ iterative map-maker. 
+\smurf\ Dynamic Iterative Map-Maker (DIMM).
 
-In the following example we will use all of the default settings to
-produce a map of Jupiter:
+The DIMM is enabled using the \texttt{method=iterate} switch to the
+\makemap\ task. In the following example we will use default settings
+for the DIMM to produce a map of Jupiter:
 
 \begin{myquote}
 \begin{verbatim}
@@ -950,13 +954,12 @@ smf_iteratemap: ****** Completed in 5 iterations
 \end{verbatim}
 \end{myquote}
 
-The \smurf\ task \makemap\ needs to know that it will use the
-iterative algorithm with `{\texttt method=iterate}', and then all of
-the additional parameters that it requires are stored in the config
-file `{\texttt dimmconfig.lis}'. In this example we have used the
-default config file that is installed in the \starlink\ tree, which is
-quite well documented. A local copy can be made and altered if
-desired. Fig.~\ref{fig:itermap} shows the resulting image.
+All of the parameters that controll the DIMM are stored in the
+configuration file `\texttt{dimmconfig.lis}'. In this example we have
+used the default configuration file that is installed in the
+\starlink\ tree, which is quite well documented. A local copy can be
+made and altered if desired. Fig.~\ref{fig:itermap} shows the
+resulting image.
 
 \begin{figure}
 \begin{center}
@@ -974,7 +977,7 @@ desired. Fig.~\ref{fig:itermap} shows the resulting image.
 
 The iterative map-maker estimates several components of the bolometer
 signal simultaneously with the map. The particular components that it
-fits are given by {\texttt modelorder} given in the config file:
+fits are given by \texttt{modelorder} given in the configuration file:
 
 \begin{myquote}
 \begin{verbatim}
@@ -994,7 +997,7 @@ modelorder = (com,gai,ext,ast,flt,noi)
 \end{myquote}
 
 By default, the final values of these fitted models are not written to
-files. However, this can be modified by setting {\texttt exportndf} to
+files. However, this can be modified by setting \texttt{exportndf} to
 the list of models that you wish to view, such as
 
 \begin{myquote}
@@ -1013,8 +1016,8 @@ exportndf = (com,ast,flt,res,noi,qua)
 \end{verbatim}
 \end{myquote}
 
-Re-running the iterative map-maker with this modified {\texttt
-  dimmconfig.lis} produces several new files at the end:
+Re-running the iterative map-maker with this modified
+\texttt{dimmconfig.lis} produces several new files at the end:
 
 \begin{myquote}
 \begin{verbatim}
@@ -1029,21 +1032,21 @@ Note that the quality and variance model components become VARIANCE
 and QUALITY components of the residual file.
 
 As with the input data, these are all standard \starlink\ NDF files
-and can be examined using all of the existing tools, manipulated by
-\smurf\ cleaning routines etc. The base of the filenames are the first
-input files that went into the maps, and the `{\texttt con}' suffix
-indicates that several data files may have been concatenated
-together. Finally, `{\texttt *ast.sdf}' is the time-domain projection
-of the astronomical signal as estimated in the final map (same
-dimensions as the input bolometer data), `{\texttt *com.sdf}' is a
-1-dimensional NDF containing the estimate of the common-mode signal
-(predominantly sky emission), `{\texttt *flt.sdf}' is low-frequency
-noise that was filtered out of each detector (same dimensions as the
-input bolometer data, primarily independent detector drift), and
-finally `{\texttt *res.sdf}' is the residual bolometer signal once the
-other components have been subtracted from the original data, and
-should look predominantly like symmetric white noise (same dimensions
-as the input bolometer data).
+and can be examined using all of the existing tools, and can
+manipulated by other \smurf\ routines. The base of the filenames are
+the first input files that went into the maps, and the `\texttt{con}'
+suffix indicates that several data files may have been concatenated
+together. `\texttt{*ast.sdf}' is the time-domain projection of the
+astronomical signal as estimated in the final map (same dimensions as
+the input bolometer data), `\texttt{*com.sdf}' is a 1-dimensional NDF
+containing the estimate of the common-mode signal (predominantly sky
+emission), `\texttt{*flt.sdf}' is low-frequency noise that was
+filtered out of each detector (same dimensions as the input bolometer
+data, primarily independent detector drift), and finally
+`\texttt{*res.sdf}' is the residual bolometer signal once the other
+components have been subtracted from the original data, and should
+look predominantly like symmetric white noise (same dimensions as the
+input bolometer data).
 
 \begin{figure}
 \begin{center}
