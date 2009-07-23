@@ -7,7 +7,8 @@
 *     KPS1_CFF2x
 
 *  Purpose:
-*     Rejects iteratively defects in a substantially smooth 2-d array.
+*     Rejects iteratively defects in a substantially smooth
+*     two-dimensional array.
 
 *  Language:
 *     Starlink Fortran 77
@@ -19,11 +20,11 @@
 *                      STATUS )
 
 *  Description:
-*     This routine sets pixels in a 2-d array to be invalid if they
-*     deviate too far from 'local mean' and lie within a nominated range
-*     of values.  The local mean is obtained by a rectangular
-*     neighbourhood block-average smooth of the input array.  An
-*     iterative procedure is followed where the cleaned array becomes
+*     This routine sets pixels in a two-dimensional array to be invalid
+*     if they deviate too far from 'local mean' and lie within a 
+*     nominated range of values.  The local mean is obtained by a 
+*     rectangular neighbourhood block-average smooth of the input array.
+*     An iterative procedure is followed where the cleaned array becomes
 *     the new array to be cleaned at another threshold, and is itself
 *     smoothed to find whether its pixels deviate from their smoothed
 *     counterparts.  A pixel that does deviate is set to the bad value,
@@ -41,8 +42,8 @@
 *        The input array containing the image from which the pixels
 *        with large deviation will be rejected.
 *     VAR = LOGICAL (Given)
-*        The state of the variance component of the input NDF.  If the
-*        variance component exists it is true.
+*        The state of the VARIANCE component of the input NDF.  If the
+*        VARIANCE component exists it is true.
 *     NVAR = INTEGER (Given)
 *        The number of elements of the variance array.
 *     INVAR( NVAR ) = ? (Given)
@@ -58,7 +59,7 @@
 *        threshold at each iteration.
 *     LIMITS( 2 ) = ? (Given)
 *        The thresholds outside which any pixel data value will not be
-*        cleaned. The order is not important.
+*        cleaned.  The order is not important.
 *     ILEVEL = INTEGER (Given)
 *        The interaction level.  If it is greater than one, the
 *        intermediate result of each iteration will be reported to the
@@ -67,14 +68,14 @@
 *        If a .TRUE. value is given for this argument, then bad input
 *        pixels will be propagated to the output image unchanged during
 *        smoothing (a smoothed output value will be calculated for all
-*        other pixels). If a .FALSE. value is given, then the NLIM
+*        other pixels).  If a .FALSE. value is given, then the NLIM
 *        argument determines whether an output pixel is good or bad.
 *        The value of SAMBAD is not relevant if BAD is .FALSE..
 *     NLIM = INTEGER (Given)
 *        Minimum number of good pixels which must be present in the
 *        smoothing box in order to calculate a smoothed output pixel.
 *        If this minimum number is not satisfied, then a bad output
-*        pixel will result. A value between 1 and the total number of
+*        pixel will result.  A value between 1 and the total number of
 *        pixels in the smoothing box should be supplied.
 *     CINARR( NX, NY ) = REAL (Given)
 *        Work array for containing the latest cleaned iteration,
@@ -86,7 +87,7 @@
 *     OUTVAR( NVAR ) = ? (Returned)
 *        The variance of the output array.
 *     NGOOD = INTEGER (Returned)
-*        The valid pixels in the output array. If input array has no
+*        The valid pixels in the output array.  If input array has no
 *        valid pixel at all, it will be set to -1.
 *     SIGMA = DOUBLE PRECISION (Returned)
 *        The estimate of the RMS noise per pixel in the output image.
@@ -101,7 +102,28 @@
 *     -  There is a routine for processing single- and double-precision
 *     arrays; replace "x" in the routine name by R or D as appropriate.
 *     The data type of the INARR, OUTARR, LIMITS, CINARR, INVAR,
-*     OUTVAR and ASUM arguments must match the routine used.
+*     OUTVAR, and ASUM arguments must match the routine used.
+
+*  Copyright:
+*     Copyright (C) 1981, 1990-1992 Science & Engineering Research
+*     Council.  2009 Science & Technology Facilities Council.  All 
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     RFWS: R. F. Warren-Smith (STARLINK)
@@ -115,97 +137,80 @@
 *     7-OCT-1990 (WG):
 *        Convert to KAPPA/ADAM version
 *     1991 June 30 (MJC):
-*        Revised the calling sequence for just 2-d usage, removed FRACT
-*        and replaced by SAMBAD and NLIM, ditto DIMS( 2 ) by NX and NY.
-*        Added error reporting.  Renamed from REJCT and made generic.
-*        Added range limits.
+*        Revised the calling sequence for just two-dimensional usage, 
+*        removed FRACT and replaced by SAMBAD and NLIM, ditto DIMS( 2 )
+*        by NX and NY.  Added error reporting.  Renamed from REJCT and 
+*        made generic.  Added range limits.
 *     1992 December 17 (MJC):
 *        Fixed bug that caused the variance array to be accessed when it
 *        did not exist.
 *     {enter_further_changes_here}
 
-*  Bugs:
-*     {note_any_bugs_here}
-
 *-
-
+      
 *  Type Definitions:
-      IMPLICIT NONE              ! No implicit typing.
+      IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'          ! Standard SAE constants.
-      INCLUDE 'PRM_PAR'          ! Magic-value constants.
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! Magic-value constants
 
 *  Arguments Given:
-      INTEGER
-     :  NX,
-     :  NY,
-     :  NVAR,
-     :  BOXSZ( 2 ),
-     :  NITER,
-     :  ILEVEL,
-     :  NLIM
-
-      <TYPE>
-     :  INARR( NX * NY ),
-     :  LIMITS( 2 ),
-     :  CINARR( NX * NY ),
-     :  INVAR( NVAR )
-
-      REAL
-     :  CLIP( NITER )
-
-      LOGICAL
-     :  SAMBAD,
-     :  VAR
+      INTEGER NX
+      INTEGER NY
+      <TYPE> INARR( NX * NY )
+      LOGICAL VAR
+      INTEGER NVAR
+      <TYPE> INVAR( NVAR )
+      INTEGER BOXSZ( 2 )
+      INTEGER NITER
+      REAL CLIP( NITER )
+      <TYPE> LIMITS( 2 )
+      INTEGER ILEVEL
+      LOGICAL SAMBAD
+      INTEGER NLIM
+      <TYPE> CINARR( NX * NY )
 
 *  Arguments Returned:
-      INTEGER
-     :  NGOOD,
-     :  NSUM( NX )
-
-      <TYPE>
-     :  OUTARR( NX * NY ),
-     :  OUTVAR( NVAR ),
-     :  ASUM( NX )
-
-      DOUBLE PRECISION
-     :  SIGMA
+      <TYPE> OUTARR( NX * NY )
+      <TYPE> OUTVAR( NVAR )
+      INTEGER NGOOD
+      DOUBLE PRECISION SIGMA
+      <TYPE> ASUM( NX )
+      INTEGER NSUM( NX )
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Constants:
       INTEGER NDIM               ! Max. dimension of image the routine
-                                 ! can handle.
+                                 ! can handle
       PARAMETER ( NDIM = 2 )
-      <LTYPE> Q0                 ! Minimum variance of a pixel can take.
+      <LTYPE> Q0                 ! Minimum variance of a pixel can take
       PARAMETER ( Q0 = 0.0 )     ! Set as the quantisation error
-                                 ! variance.
+                                 ! variance
 
 *  Local Variables:
+      LOGICAL BAD                ! Bad-pixel flag of the smoothed image
+      <LTYPE> CLIPSQ             ! Squared clipping threshold
+      <LTYPE> DIFF               ! Image difference
+      <LTYPE> DIFF2              ! Square of image difference
       INTEGER I                  ! Loop index
       INTEGER IBOX( NDIM )       ! Half size of the smoothing box
-      INTEGER OBOX( NDIM )       ! Odd size of the smoothing box
       INTEGER ITER               ! Iteration loop index
       INTEGER NBOX               ! Number of pixels in the box
       INTEGER NEL                ! Number of pixels in the array
-      INTEGER NREJ               ! Number of rejected pixels in total
-      INTEGER NSTART             ! Number of valid pixels in input array
       INTEGER NEXCL              ! Number of excluded (outside value
                                  ! limits) pixels in total
-
-      <LTYPE> DIFF               ! Image difference
-      <LTYPE> DIFF2              ! Square of image difference
-      <LTYPE> CLIPSQ             ! Squared clipping threshold
+      INTEGER NREJ               ! Number of rejected pixels in total
+      INTEGER NSTART             ! Number of valid pixels in input array
+      INTEGER OBOX( NDIM )       ! Odd size of the smoothing box
       <LTYPE> RANGE( 2 )         ! Ordered limits between which a
                                  ! pixel's data value must lie if has a
                                  ! chance of being rejected
       <LTYPE> SIG                ! Sum of squared difference of images
       <LTYPE> THRESH             ! Threshold for rejecting algorithm
-      <LTYPE> VARNCE             ! Estimated Variance of the image
-
-      LOGICAL BAD                ! Bad-pixel flag of the smoothed image
+      <LTYPE> VARNCE             ! Estimated variance of the image
 
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM_ type conversion functions
@@ -242,7 +247,7 @@
 *  If interaction level is high, report the number of valid pixels.
       IF ( ILEVEL .GE. 2 ) THEN
          CALL MSG_SETI( 'NSTART', NSTART )
-         CALL MSG_OUT( ' ',
+         CALL MSG_OUT( ' ', 
      :     'Input image initially has ^NSTART valid pixels.', STATUS )
       END IF
 
@@ -258,7 +263,7 @@
 *  Perform the rejection iteration.
       DO 20 ITER = 1, NITER
 
-*  Smooth the 2-d dimensional image using a block average of the
+*  Smooth the two-dimensional image using a block average of the
 *  rectangular neighbourhood.
          CALL KPG1_BLOC<T>( .TRUE., SAMBAD, .FALSE., NX, NY, CINARR,
      :                      IBOX( 1 ), IBOX( 2 ), NLIM, OUTARR, BAD,
@@ -319,7 +324,7 @@
                   IF ( CINARR( I ) .GE. RANGE( 1 ) .AND.
      :                 CINARR( I ) .LE. RANGE( 2 ) ) THEN
 
-*  If the variance component exists and the value corresponding to the
+*  If the VARIANCE component exists and the value corresponding to the
 *  pixel is valid, set threshold according to it.  Note that these tests
 *  cannot be combined because the input variance array would be accessed
 *  whether or not it existed.
@@ -350,7 +355,7 @@
                      ELSE
 
 *  Set those pixels invalid which deviating from its local-mean by more
-*  that the threshold.
+*  than the threshold.
                         OUTARR( I ) = VAL__BAD<T>
                      END IF
                   ELSE
@@ -418,7 +423,7 @@
       END IF
 
 *  Propagate the variance from the input image to the output, if the
-*  variance component exists.
+*  VARIANCE component exists.
       IF ( VAR ) THEN
          DO 50 I = 1, NEL
             IF ( OUTARR( I )  .NE.  VAL__BAD<T> .AND.
@@ -435,7 +440,5 @@
       END IF
 
   999 CONTINUE
-
-*  End the routine.
 
       END
