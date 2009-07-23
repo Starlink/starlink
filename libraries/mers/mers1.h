@@ -82,6 +82,7 @@ void err1TuneEms( MersTune * ems, int * status );
 void msg1Form ( const char * param, const char * text, int clean,
                 int useformat, size_t msglen, char * msgstr, int * status );
 int msg1Genv( const char * param, char *msgstr, size_t msglen );
+void msg1Ifget( const char * levstr, int * status );
 int msg1Gref( const char * param, char *refstr, size_t reflen );
 int msg1Gkey( const char * param, char *keystr, size_t keylen );
 

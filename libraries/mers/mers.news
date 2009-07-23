@@ -1,5 +1,9 @@
-Version 2.0-7
--------------
+Version 2.1
+-----------
+
+ o Add msgIfgetenv for reading and setting the message reporting level
+   from an environment variable in a similar way to msgIfget works
+   from an ADAM parameter.
 
  o Add MSG_FLEVOK to Fortran interface
 

@@ -1,26 +1,22 @@
 /*
 *+
 *  Name:
-*     msgIfget
+*     msg1Ifget
 
 *  Purpose:
-*     Get the filter level for conditional message output from the ADAM
-*     parameter system.
+*     Get the filter level for conditional message output from a string
 
 *  Language:
 *     Starlink ANSI C
 
 *  Invocation:
-*     msgIfget( const char * pname, int * status );
+*     msg1Ifget( const char * levstr, int * status );
 
 *  Description:
-*     Translate the given parameter name into a value for the filter
+*     Translate the given string into a value for the filter
 *     level for conditional message output. The translation accepts
 *     abbreviations. This value is then used to set the informational
-*     filtering level. It is recommended that one parameter name is
-*     used universally for this purpose, namely MSG_FILTER, in order to
-*     clarify the interface file entries.  The acceptable strings
-*     for MSG_FILTER are
+*     filtering level. The acceptable strings are
 *
 *        -  NONE  -- representing MSG__NONE;
 *        -  QUIET -- representing MSG__QUIET;
@@ -31,15 +27,13 @@
 *        -  ALL -- representing MSG__ALL
 *        
 *
-*     msgIfget accepts abbreviations of these strings; any other value
+*     msg1Ifget accepts abbreviations of these strings; any other value
 *     will result in an error report and the status value being
-*     returned set to MSG__INVIF. If an error occurs getting the
-*     parameter value, the status value is returned and an additional
-*     error report is made.
+*     returned set to MSG__INVIF.
 
 *  Arguments:
-*     pname = const char * (Given)
-*        The filtering level parameter name.
+*     levstr = const char * (Given)
+*        The filter level string
 *     status = int * (Given and Returned)
 *        The global status.
 
@@ -96,7 +90,8 @@
 *     09-JAN-2009 (TIMJ):
 *        Add new message levels. Recognize an integer as a valid level.
 *     22-JUL-2009 (TIMJ):
-*        Now calls msg1Ifget for the bulk of the work.
+*        Move string parsing into separate routine to allow msgIfgetenv
+*        to be written.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -106,51 +101,82 @@
 */
 
 #include "sae_par.h"
-#include "msg_par.h"
 #include "msg_err.h"
 #include "msg_par.h"
 #include "mers1.h"
 
 #include "merswrap.h"
-#include "star/subpar.h"
 #include "ems.h"
 
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 
-void msgIfget( const char * pname, int * status ) {
+void msg1Ifget( const char * levstr, int * status ) {
 
-  size_t namcod;        /* SUBPAR pointer to parameter */
-  char fname[8];        /* Name of message filtering level */
+  /* we will assume that the index into this array corresponds to
+     the actual constant msglev_t value */
+  const char * slevels[] = {
+    "NONE", "QUIET", "NORMAL", "VERBOSE", "DEBUG",
+    "DEBUG1", "DEBUG2", "DEBUG3", "DEBUG4", "DEBUG5",
+    "DEBUG6", "DEBUG7", "DEBUG8", "DEBUG9", "DEBUG10",
+    "DEBUG11", "DEBUG12", "DEBUG13", "DEBUG14", "DEBUG15",
+    "DEBUG16", "DEBUG17", "DEBUG18", "DEBUG19", "DEBUG20",
+    "ALL", NULL
+  };
+
+  unsigned long strint; /* string as integer */
+  size_t i;             /* Loop counter */
+  msglev_t filter;      /* Message filtering level */
+  size_t flen;          /* length of supplied string */
+  const msglev_t badlev = -1; /* indicate that we did not match a level */
+  char *endptr = NULL;  /* position in strong after finding number */
 
   /*  Check inherited global status. */
   if (*status != SAI__OK) return;
 
-  /*  Mark a new error reporting context. */
-  emsMark();
+  filter = badlev;  /* initialise so that we can see if we set it */
 
-  /*  Get the message filtering level from the parameter system. */
-  subParFindpar( pname, &namcod, status );
-  subParGet0c( namcod, fname, sizeof(fname), status );
+  /* See if we have an integer rather than a string */
+  errno = 0;
+  strint = strtoul( levstr, &endptr, 10 );
 
-  /*  Check the returned status. */
-  if (*status != SAI__OK) {
+  /* Trapping failure seems to be non-portable to we ask for endptr so
+     that we can compare it with levstr as well as looking at errno. */
+  if ( ( strint == 0 && errno != 0) || ( endptr == levstr ) ) {
+    /* was not an integer so treat as string */
 
-    /*     A parameter system error has occured: set the returned status,
-     *     report the error and abort. */
-    emsRep( "MSG_GETIF_NOPAR",
-            "msgIfget: Unable to get the informational filtering "
-            "level from the parameter system.", status );
+    i = 0;
+    flen = strlen( levstr );
 
+    while ( slevels[i] != NULL ) {
+      /* compare case insensitive. Assume that we are passed
+	 a terminated string */
+      if (strncasecmp( slevels[i], levstr, flen ) == 0 ) {
+
+	/* we have a match */
+	filter = i;
+	break;
+      }
+      i++;
+    }
   } else {
-
-    /* Translate this string to a message level and set it */
-    msg1Ifget( fname, status );
-
+    /* was a valid match */
+    filter = strint;
   }
 
-  /*  Release the current error reporting context. */
-  emsRlse();
+  /*     Set the message filtering level. */
+  if (filter != badlev) {
+    msgIfset( filter, status );
+  } else {
+
+    /*        An invalid filter name has been used, so report an error. */
+    *status = MSG__INVIF;
+    emsSetc( "FILTER", levstr );
+    emsRep( "MSG_IFGET_INVIF",
+	    "MSG_IFGET: Invalid message filtering level: ^FILTER",
+	    status );
+  }
+
 }
 

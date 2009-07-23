@@ -121,6 +121,8 @@ int main ( void ) {
 
   errRlse();
 
+  msgIfgetenv( "MSG_FILTER", &status );
+
   return exstat;
 }
 
