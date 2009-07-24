@@ -15,20 +15,20 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {104.11}
+\newcommand{\stardocnumber}    {104.12}
 \newcommand{\stardocauthors}   {P C T Rees \\
-                                A J Chipperfield}
-\newcommand{\stardocdate}      {22 October 2001}
+                                A J Chipperfield \\
+                                T Jenness}
+\newcommand{\stardocdate}      {23 July 2009}
 \newcommand{\stardoctitle}     {MERS (MSG and ERR)\\ [1ex]
                                 Message and Error Reporting Systems}
-\newcommand{\stardocversion}   {Version 1.7}
+\newcommand{\stardocversion}   {Version 2.1}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 \newcommand{\stardocabstract}  {
-This document describes two Fortran subroutine libraries, MSG and ERR, which 
+This document describes two C subroutine libraries, MSG and ERR, which 
 can be used to provide informational text to the user from any application 
 program.
-It also describes a preliminary C interface for the two libraries --
-this may be subject to change in the light of experience.
+It also describes the Fortran interface for the two libraries.
 \par
 The Message Reporting System, MSG, is used for reporting non-error information
 and the Error Reporting System, ERR, is used specifically for reporting error
@@ -188,6 +188,49 @@ software for use on Starlink.
 \begin{htmlonly}
   \newcommand{\listline}{}
 \end{htmlonly}
+
+\newcommand{\func}[1]{\texttt{#1}}
+\newcommand{\farg}[1]{\textit{#1}}
+\newcommand{\const}[1]{\texttt{#1}}
+\newcommand{\fname}[1]{\textit{#1}}
+
+\newcommand{\saiok}{\const{SAI\_\_OK}}
+\newcommand{\saierr}{\const{SAI\_\_ERROR}}
+\newcommand{\msgszmsg}{\const{MSG\_\_SZMSG}}
+\newcommand{\msgnone}{\const{MSG\_\_NONE}}
+\newcommand{\msgall}{\const{MSG\_\_ALL}}
+\newcommand{\msgnorm}{\const{MSG\_\_NORM}}
+\newcommand{\msgverb}{\const{MSG\_\_VERB}}
+\newcommand{\msgquiet}{\const{MSG\_\_QUIET}}
+\newcommand{\msgdebug}{\const{MSG\_\_DEBUG}}
+
+\newcommand{\msgblank}{\func{msgBlank}}
+\newcommand{\msgblankif}{\func{msgBlankif}}
+\newcommand{\msgflevok}{\func{msgFlevok}}
+\newcommand{\msgfmt}{\func{msgFmt}}
+\newcommand{\msgifget}{\htmlref{\func{msgIfget}}{msgIfget}}
+\newcommand{\msgifgetenv}{\htmlref{\func{msgIfgetenv}}{msgIfgetenv}}
+\newcommand{\msgiflev}{\func{msgIflev}}
+\newcommand{\msgifset}{\func{msgIfset}}
+\newcommand{\msgload}{\func{msgLoad}}
+\newcommand{\msgout}{\func{msgOut}}
+\newcommand{\msgoutf}{\func{msgOutf}}
+\newcommand{\msgoutif}{\func{msgOutif}}
+\newcommand{\msgoutiff}{\func{msgOutiff}}
+\newcommand{\msgoutifv}{\func{msgOutifv}}
+\newcommand{\msgrenew}{\func{msgRenew}}
+\newcommand{\msgsetr}{\func{msgSetr}}
+\newcommand{\msgsetd}{\func{msgSetd}}
+\newcommand{\msgseti}{\func{msgSeti}}
+\newcommand{\msgsetl}{\func{msgSetl}}
+\newcommand{\msgsetc}{\func{msgSetc}}
+\newcommand{\msgtune}{\htmlref{\func{msgTune}}{msgTune}}
+
+\newcommand{\fmsgsetc}{\func{MSG\_SETC}}
+
+
+% ""
+
 %+
 %  Name:
 %     SST.TEX
@@ -468,9 +511,9 @@ software for use on Starlink.
 %  Latex document header.
 %  ======================
 \begin{latexonly}
-   CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
+   \textsc{Joint Astronomy Centre} \hfill \textbf{\stardocname}\\
+   {\large Science \& Technology Facilties Council}\\
+   {\large Starlink Software Collection\\}
    {\large \stardoccategory\ \stardocnumber}
    \begin{flushright}
    \stardocauthors\\
@@ -517,16 +560,15 @@ software for use on Starlink.
    \stardocauthors \\
    \stardocdate
    \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
+      \htmladdnormallink{Joint Astronomy Centre}
+                        {http://www.jach.hawaii.edu} \\
+      \htmladdnormallink{Science \& Technology Facilties Council}
+                        {http://www.scitech.ac.uk} \\
    \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.rl.ac.uk/}
+      \htmladdnormallink{Starlink Project}{http://starlink.jach.hawaii.edu/}
    \begin{rawhtml} </H2> \end{rawhtml}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+      {http://starlink.jach.hawaii.edu/cgi-bin/hcserver?\stardocsource}\\
 
 %  HTML document table of contents. 
 %  ================================
@@ -611,7 +653,8 @@ Its use in ADAM applications is essentially the same but there are some
 \subsection{\xlabel{overview}Overview}
 
 The most obvious way of producing informational messages from within 
-Fortran application programs is through formatted WRITE and PRINT 
+Fortran or C application programs is through formatted \func{printf},
+\func{WRITE} and \func{PRINT}
 statements.
 However:
 \begin{itemize}
@@ -632,38 +675,44 @@ The Message System subroutines have names of the form
 \begin {quote}
 \begin {small}
 \begin{verbatim}
-MSG_name
+msgName      [C]
+MSG_name     [Fortran]
 \end{verbatim}
 \end {small}
 \end {quote}
 
-where \texttt{name} indicates what the subroutine does.
-
+where \farg{name} indicates what the subroutine does and follows the
+standard Starlink naming convention for C and Fortran. This document will
+provide examples in both languages, but subroutine names in the text
+will use the C naming convention.
 
 \subsection{\xlabel{reporting_messages}Reporting messages}
 
-The primary message reporting subroutine is MSG\_OUT. 
+The primary message reporting subroutine is \msgout.
 It has a calling sequence of the form:
 
 \begin {small}
 \begin{verbatim}
+      msgOut( param, text, status );
+
       CALL MSG_OUT( PARAM, TEXT, STATUS )
 \end{verbatim}
 \end {small}
 
-where the argument PARAM is a character string giving the name of the message,
-TEXT is a character string giving the message text, and STATUS is the
-integer subroutine status value. 
-MSG\_OUT sends the message string, TEXT, to the standard output stream which
-will normally be the user's terminal.
+where the argument \farg{param} is a character string giving the name of the message,
+\farg{text} is a character string giving the message text, and \farg{status} is the
+integer subroutine status value (a pointer to an int in C). 
+\msgout\ sends the message string, \farg{text}, to the
+standard output stream which will normally be the user's terminal.
 
-The subroutine MSG\_OUT uses the Starlink convention of 
+The subroutine \msgout\ uses the Starlink convention of 
 \htmlref{inherited status}{inherited_status}. 
-This means that calls to MSG\_OUT will not output the message unless the 
-given value of STATUS is equal to SAI\_\_OK.
-If an error is encountered within the subroutine, then STATUS is returned
+This means that calls to \msgout\ will not output the message unless the 
+given value of \farg{status} is equal to \saiok.
+If an error is encountered within the subroutine, then \farg{status} is returned
 set to an error value. 
-(The global constant SAI\_\_OK is defined in the include file SAE\_PAR. 
+(The global constant \saiok\ is defined in the include file
+\fname{sae\_par.h} (\fname{SAE\_PAR} for Fortran). 
 \latex{The use of this global constant and of inherited status are discussed in detail
 in \S\ref{inherited_status}.}) 
 
@@ -677,37 +726,43 @@ The maximum output line size can be altered using
 \htmlref{tuning parameters}{tuning}\latex{ (see \S\ref{tuning})}.
 
 It is recommended that,
-within the application, the message name, PARAM, should be a unique identifier 
-for the message string, TEXT. 
+within the application, the message name, \farg{param}, should be a unique identifier 
+for the message string, \farg{text}. 
 However, the message name serves no useful purpose within a stand-alone 
 application and is often given as a blank string.
 In ADAM applications the message name has a
 \htmlref
 {specific purpose}{mespar_sect}\latex{ which is discussed in detail in Appendix \ref{adam_msg}}.
 
-Here is an example of using MSG\_OUT:
+Here is an example of using \msgout:
 \begin {small}
 \begin{verbatim}
+      msgOut( "EXAMPLE_MSGOUT", "An example of msgOut", status );
+
       CALL MSG_OUT( 'EXAMPLE_MSGOUT', 'An example of MSG_OUT.', STATUS )
 \end{verbatim}
 \end {small}
 It is sometimes useful to intersperse blank lines amongst lines of textual
 output for clarity.
-This could be done using calls to MSG\_OUT, \textit{e.g.}
+This could be done using calls to \msgout, \textit{e.g.}
 \begin {small}
 \begin{verbatim}
+      msgOut( "MSG_BLANK", "", status );
+
       CALL MSG_OUT( 'MSG_BLANK', ' ', STATUS )
 \end{verbatim}
 \end {small}
-For convenience, the subroutine MSG\_BLANK has been provided for this 
+For convenience, the subroutine \msgblank\ has been provided for this 
 purpose, \textit{e.g.}
 \begin {small}
 \begin{verbatim}
+      msgBlank( status );
+
       CALL MSG_BLANK( STATUS )
 \end{verbatim}
 \end {small}
-The status argument in MSG\_BLANK behaves in the same way as the status 
-argument in MSG\_OUT.
+The status argument in \msgblank\ behaves in the same way as the status 
+argument in \msgout.
 
 
 \subsection{\xlabel{conditional_message_reporting}Conditional message reporting}
@@ -724,65 +779,73 @@ an application is run in batch mode, or within a command procedure;
 request, say from within an iterative procedure.
 \end {itemize}
 Conditional message output is achieved explicitly in the Message Reporting
-System using the subroutine MSG\_OUTIF to assign a ``priority'' to the
+System using the subroutine \msgoutif\ to assign a ``priority'' to the
 message, \textit{e.g.}
 \begin {small}
 \begin{verbatim}
+      msgOutif( MSG__NORM, "", "A conditional message", status );
+
       CALL MSG_OUTIF( MSG__NORM, ' ', 'A conditional message', STATUS )
 \end{verbatim}
 \end {small}
 Here, the first argument is the ``priority'' associated with the 
-message and can be any one of three levels which are 
+message and can be any one of twenty four levels which are 
 represented by symbolic constants defined in the include file 
 \htmlref
-{MSG\_PAR}{compiling_and_linking}\latex{ (see \S\ref{compiling_and_linking})}:
+{\fname{msg\_par.h} (\fname{MSG\_PAR})}{compiling_and_linking}\latex{ (see \S\ref{compiling_and_linking})}:
 \begin {quote}
 \begin {description}
-\item [MSG\_\_QUIET] -- quiet mode, high priority;
-\item [MSG\_\_NORM] -- normal mode, normal priority (default);
-\item [MSG\_\_VERB] -- verbose mode, low priority.
-\item [MSG\_\_DEBUG] -- debug mode, lowest priority
-\item [MSG\_\_DEBUGnn] -- multiple debug modes. 1 to 20.
+\item [\msgquiet] -- quiet mode, high priority;
+\item [\msgnorm] -- normal mode, normal priority (default);
+\item [\msgverb] -- verbose mode, low priority.
+\item [\msgdebug] -- debug mode, lowest priority
+\item [\const{MSG\_\_DEBUGnn}] -- multiple debug modes. 1 to 20.
 \end {description}
 \end {quote}
 Whether or not the message will be output depends upon the ``conditional
-message output filter'' which may be set using the subroutine MSG\_IFSET.
+message output filter'' which may be set using the subroutine \msgifset.
 \textit{e.g.}
 \begin {small}
 \begin{verbatim}
+      msgIfset( MSG__QUIET, status );
+
       CALL MSG_IFSET( MSG__QUIET, STATUS )
 \end{verbatim}
 \end {small}
-The first argument of MSG\_IFSET is the required conditional output filter
-level -- it may take the same values as the message priority with the addition of MSG\_\_NONE and MSG\_\_ALL; by default it is set to MSG\_\_NORM.
+The first argument of \msgifset\ is the required conditional output filter
+level -- it may take the same values as the message priority with the
+addition of \msgnone\ and \msgall; by default it is set to \msgnorm.
 The current conditional output filtering level may be inquired using
-subroutine MSG\_IFLEV. NONE and ALL allow every message to be hidden or all messages to be displayed respectively. These levels can not be used with
-MSG\_OUTIF.
+subroutine \msgiflev\ or compared against using
+\msgflevok. \msgnone\ and \msgall\ allow every message to be
+hidden or all messages to be displayed respectively. These levels can
+not be used with \msgoutif.
 
-See also
-\htmlref{MSG\_TUNE}{MSG_TUNE}
-which allows the filter level to be set by an environment variable, and
-\htmlref{MSG\_IFGET}{MSG_IFGET}
+See also \msgtune\ and \msgifgetenv\
+that allows the filter level to be set by an environment variable, and
+\msgifget\
 which allows ADAM programs to obtain the filter level from an ADAM parameter.
 
-The action of MSG\_OUTIF resulting from each of the defined priority values is 
+The action of \msgoutif\ resulting from each of the defined priority values is 
 as follows:
 \begin {quote}
 \begin {description}
-\item [MSG\_\_QUIET] -- always output given the message, regardless of output
-filter setting;
-\item [MSG\_\_NORM] -- output the given message if the current output filter is
-set to either MSG\_\_NORM, MSG\_\_VERB or MSG\_\_DEBUG;
-\item [MSG\_\_VERB] -- output the given message only if the current output
-filter is set to MSG\_\_VERB or MSG\_\_DEBUG.
-\item [MSG\_\_VERB] -- output the given message only if the current output
-filter is set to MSG\_\_DEBUG.
+\item [\msgquiet] -- output the given messsage unless the current
+output filter is set to \msgnone;
+\item [\msgnorm] -- output the given message if the current output filter is
+set to either \msgnorm, \msgverb, \msgdebug (and related constants) or
+\msgall;
+\item [\msgverb] -- output the given message only if the current output
+filter is set to \msgverb,r \msgdebug (and related constants) or \msgall.
+\item [\msgverb] -- output the given message only if the current output
+filter is set to \msgdebug (and related constants) or \msgall.
 
 \end {description}
 \end {quote}
-In this scheme, messages given the priority MSG\_\_QUIET could never be 
-turned off and would therefore be the most most important messages being
-output by an application.
+In this scheme, messages given the priority \msgquiet\ 
+the most important messages being
+output by an application and can only be turned off if the user is
+forcing all output to be disabled.
 
 Here is an example of how conditional message output might be used 
 in an application using interactive graphics with differing levels of 
@@ -807,21 +870,49 @@ informational messages to match how familiar the user is with the application:
      :               STATUS )
 \end{verbatim}
 \end {small}
+\begin {small}
+\begin{verbatim}
+/*  Use the cursor to enter the approximate positions of stars on the 
+ *  displayed image to be fitted. */
+      msgOut( "", "Use the cursor to enter star positions", status );
 
-\subsection{\xlabel{conditional_message_reporting_and_msg_out}Conditional Message Reporting and MSG\_OUT}
+/*  Explain the positioning of the cursor. */
+      msgOutif( MSG__NORM, "",
+                "The graphics cursor should be positioned "
+                "close to the centre of each star image", status );
+
+/*  Explain the cursor keys to new user. */
+      msgOutif( MSG__VERB, "", "Cursor keys: 1 add entry", status );
+      msgOutif( MSG__VERB, "", "             2 reject last entry", status );
+      msgOutif( MSG__VERB, "", "             3 entry complete", status );
+\end{verbatim}
+\end {small}
+
+The \msgblankif\ function works in much the same way as \msgoutif\ to
+allow a blank line to be output conditionally.
+
+\begin{small}
+\begin{verbatim}
+      msgBlankif( MSG__VERB, status );
+
+      CALL MSG_BLANKIF( MSG__VERB, STATUS )
+\end{verbatim}
+\end{small}
+
+\subsection{\xlabel{conditional_message_reporting_and_msg_out}Conditional Message Reporting and \msgout}
 
 Although conditional message reporting may be handled explicitly by calling
-MSG\_OUTIF, calls to MSG\_OUT and MSG\_BLANK also have conditional message
+\msgoutif, calls to \msgout\ and \msgblank\ also have conditional message
 reporting built in.
-Their output has priority MSG\_\_NORM associated with it and will therefore
-only be output when the conditional output filter is set to MSG\_\_NORM (the 
-default) or MSG\_\_VERB.
+Their output has priority \msgnorm\ associated with it and will therefore
+only be output when the conditional output filter is set to \msgnorm\ (the 
+default), \msgverb or greater.
 
 \subsection{\xlabel{message_tokens}Message tokens}
-In the previous examples of MSG\_OUT and MSG\_OUTIF, the message text is 
+In the previous examples of \msgout\ and \msgoutif, the message text is 
 ``constant'' in the sense that it does not refer to any variable items, 
 \textit{e.g.}\ file names or numeric values. 
-However, very often, applications need to include the values of Fortran 
+However, very often, applications need to include the values of
 variables within output messages. 
 This is done in the Message System using tokens embedded within the message
 text.
@@ -830,6 +921,10 @@ a spectrum can output its result by:
 
 \begin {small}
 \begin{verbatim}
+      msgSetr( "FLUX", flux );
+      msgOut( "EXAMPLE_RESULT",
+              "Emission flux is ^FLUX (erg/cm2/A/s).", status);
+
       CALL MSG_SETR( 'FLUX', FLUX )
       CALL MSG_OUT( 'EXAMPLE_RESULT', 
      :             'Emission flux is ^FLUX (erg/cm2/A/s).',
@@ -837,8 +932,8 @@ a spectrum can output its result by:
 \end{verbatim}
 \end {small}
 
-Here, the subroutine MSG\_SETR is called to define a token named ``FLUX''
-and assign to it the value of the REAL variable FLUX encoded as a character 
+Here, the subroutine \msgsetr\ is called to define a token named ``FLUX''
+and assign to it the value of the \texttt{REAL} or \texttt{float} variable FLUX encoded as a character 
 string.
 The token name, immediately preceded by the up-arrow, ``$^\wedge$'', escape 
 character is then included in the given message text. 
@@ -856,7 +951,7 @@ Emission flux is 2.4 (erg/cm2/A/s).
 \end {small}
 \end {quote}
 
-There is a set of MSG\_SET\textit{x} subroutines, one subroutine for each of five
+There is a set of \func{msgSet}\textit{x} subroutines, one subroutine for each of five
 standard Fortran 77 data types (the Fortran type COMPLEX has not been provided
 for).
 Here, \textit{x} corresponds to the Fortran data type of the value to be assigned
@@ -867,11 +962,11 @@ to the named message token:
 \hline
 \textit{x} & \textit{Fortran Type}\\
 \hline
-D & DOUBLE PRECISION\\
-R & REAL\\
-I & INTEGER\\
-L & LOGICAL\\
-C & CHARACTER\\
+d & DOUBLE PRECISION\\
+r & REAL\\
+i & INTEGER\\
+l & LOGICAL\\
+c & CHARACTER\\
 \hline
 \end {tabular}
 \end {center}
@@ -880,28 +975,39 @@ In each case, the calling sequence is of the form:
 
 \begin {small}
 \begin{verbatim}
+      msgSetx( token, value );
+
       CALL MSG_SETx( TOKEN, VALUE )
 \end{verbatim}
 \end {small}
 
-where TOKEN is a character string giving the name chosen by the user and VALUE
+where \farg{token} is a character string giving the name chosen by the user and \farg{value}
 is a variable or constant of the appropriate type.
-The numeric subroutines, MSG\_SETD, MSG\_SETR and MSG\_SETI, adopt the most
+The numeric subroutines, \msgsetd, \msgsetr, and \msgseti, adopt the most
 concise format that will represent the value by removing trailing zeros,
 leading and trailing blanks, and by avoiding the use of exponential notation
 unless it is necessary. 
-MSG\_SETL uses \texttt{TRUE} or \texttt{FALSE} according to the value it is
-given. MSG\_SETC removes trailing blanks from the character string; leading
+\msgsetl\ uses \texttt{TRUE} or \texttt{FALSE} according to the value it is
+given. \msgsetc\ removes trailing blanks from the character string; leading
 blanks are not removed.
 
-An additional feature of the MSG\_SET\textit{x} routines is that calls to these 
+An additional feature of the \func{msgSet}\textit{x} routines is that calls to these 
 routines using an existing token will result in the value being appended 
 to the previously assigned token string.
 Here is the previous example written to exploit this feature of the 
-MSG\_SET\textit{x} routines:
+\func{msgSet}\textit{x} routines:
 
 \begin {small}
 \begin{verbatim}
+/* Local Constants: */
+      const char *funits = " erg/cm2/A/s";
+      ...
+
+      msgSetr( "FLUX", flux );
+      msgSetc( "FLUX", funits );
+      msgOut( "EXAMPLE_RESULT",
+              "Emission flux is ^FLUX", status );
+
 *  Local Constants:
       CHARACTER FUNITS * 12
       PARAMETER( FUNITS = ' erg/cm2/A/s' )
@@ -915,10 +1021,10 @@ MSG\_SET\textit{x} routines:
 \end{verbatim}
 \end {small}
 
-where the CHARACTER variable FUNITS has been assigned the value of an 
+where the CHARACTER variable \farg{funits} has been assigned the value of an 
 appropriate unit of flux (\textit{e.g.}\ erg/cm2/A/s) earlier in the program.
-Note that repeated calls to the MSG\_SET\textit{x} routines will append values 
-to the token string with no separator, hence a leading space in the FUNITS 
+Note that repeated calls to the \func{msgSet}\textit{x} routines will append values 
+to the token string with no separator, hence a leading space in the \farg{funits}
 string is needed to separate the flux value and its units in the expanded 
 message.
 
@@ -931,18 +1037,57 @@ A maximum of 64 uniquely named message tokens may be included in any output
 message. 
 
 No message tokens are defined initially and
-after each call to MSG\_OUT, MSG\_OUTIF or MSG\_LOAD (or 
+after each call to \msgout, \msgoutif\ or \msgload\ (or 
 \htmlref{a corresponding ERR 
 routine}{report_sect}\latex{, see \S\ref{report_sect}}) 
 all existing tokens are left undefined. 
 
-\subsection{\xlabel{formatted_tokens}Formatted tokens}
-The MSG\_SET\textit{x} subroutines encode numeric values in the most concise 
-format that will describe the supplied value. 
-This is normally what is wanted for a simple message. 
+\subsection{\xlabel{c_formatted_tokens}Formatted tokens from C}
+
+The \func{msgSet}\textit{x} functions encode numeric values in the
+most concise format that will describe the supplied value.
 Sometimes, however, a specific format is required; for example, the message
-may form part of a table. 
-More precise numeric formats could be achieved using the Fortran WRITE
+may form part of a table.  More precise control can be obtained by
+using the \msgfmt\ function to provide all the standard sprintf()
+formats available from the standard C library.
+
+\begin{small}
+\begin{verbatim}
+      msgFmt( token, format, ... );
+\end{verbatim}
+\end{small}
+
+and the previous example could be written as:
+
+\begin{small}
+\begin{verbatim}
+      msgFmt( "FLUX", "%5.2f", flux );
+      msgSetc( "FLUX", funits );
+      msgOut( "EXAMPLE_RESULT",
+              "Emission flux is ^FLUX", status );
+\end{verbatim}
+\end{small}
+
+There is no restriction on the number of formats that can be included
+in a single call so the above example can be simplified further:
+
+\begin{small}
+\begin{verbatim}
+      msgFmt( "FLUX", "%5.2f %s", flux, funits );
+      msgOut( "EXAMPLE_RESULT",
+              "Emission flux is ^FLUX", status );
+\end{verbatim}
+\end{small}
+
+\subsection{\xlabel{fortran_formatted_tokens}Formatted tokens from Fortran}
+
+The Fortran \func{MSG\_SET}\textit{x} subroutines encode numeric values in the most concise 
+format that will describe the supplied value. 
+This is normally what is wanted for a simple message. The Fortran
+interface provides an API similar to that for the C library but using
+standard Fortran format conventions. 
+
+More precise numeric formats could be achieved using the Fortran \func{WRITE}
 statement with the Message System, \textit{e.g.}
 
 \begin {small}
@@ -975,11 +1120,11 @@ Emission flux is  2.40000E+00 (erg/cm2/A/s).
 \end {small}
 \end {quote}
 
-In this case, the first call to MSG\_SETC assigns the supplied character 
-string VALUE to the named token ``FLUX''.
+In this case, the first call to \fmsgsetc\ assigns the supplied character 
+string \farg{VALUE} to the named token ``FLUX''.
 
-Since this sequence of a formatted internal WRITE followed by a call to
-MSG\_SETC is of general use, it is provided in a set of subroutines of the
+Since this sequence of a formatted internal \func{WRITE} followed by a call to
+\fmsgsetc\ is of general use, it is provided in a set of subroutines of the
 form:
 
 \begin {small}
@@ -988,12 +1133,12 @@ form:
 \end{verbatim}
 \end {small}
 
-where FORMAT is a valid Fortran 77 format string which can be used to
-encode the supplied value, VALUE.
-As for MSG\_SET\textit{x}, \textit{x} corresponds to one of the five standard
+where \farg{FORMAT} is a valid Fortran 77 format string which can be used to
+encode the supplied value, \farg{VALUE}.
+As for \func{MSG\_SET}\textit{x}, \textit{x} corresponds to one of the five standard
 Fortran data types -- \textit{D}, \textit{R}, \textit{I}, \textit{L} and \textit{C}.
 
-Using MSG\_FMT\textit{x}, the example given above can be performed by:
+Using \func{MSG\_FMT}\textit{x}, the example given above can be performed by:
 
 \begin {small}
 \begin{verbatim}
@@ -1005,21 +1150,50 @@ Using MSG\_FMT\textit{x}, the example given above can be performed by:
 \end{verbatim}
 \end {small}
 
-The use of the MSG\_FMT\textit{x} routines along with their ability to append 
+The use of the \func{MSG\_FMT}\textit{x} routines along with their ability to append 
 values of any type to existing tokens is a very powerful tool for constructing 
 tabular output from applications software.
 
+\subsection{\xlabel{direct_formatted_message_output}Direct formatted message
+output with \msgout}
+
+The C interface provides variants to the standard \msgout\ and
+\msgoutif\ functions that can handle sprintf() style format
+strings. This can lead to a significant reduction in the number of
+lines spent setting up tokens by embedding the formatting directly
+in the required string. The example from the previous section can
+simply be written as:
+
+\begin{small}
+\begin{verbatim}
+      msgOutf( "EXAMPLE_RESULT",
+              "Emission flux is %5.2f %s", status, flux, funits );
+\end{verbatim}
+\end{small}
+
+\msgoutf\ and \msgoutiff\ act like \func{printf()} whereas \msgoutifv\
+is a variant of \msgoutif\ that takes a \farg{va\_list} argument rather
+than variadic ''$\ldots$'' arguments. The ``\%'' character is special
+in this context and the \htmlref{ADAM
+definition}{parameter_references}
+\latex{(See Appendix \ref{parameter_references})} is not available. A literal ``\%''
+is obtained by doubling up the symbol (``\%\%'') as would be used in
+\func{printf()} and described in the next section.
 
 \subsection{\xlabel{including_escape_characters_in_messages}Including escape characters in messages}
 Sometimes it is necessary to include the message token escape character,
 ``$^\wedge$'', literally in a message. 
 When the message token escape character is immediately followed by a blank
-space, or is at the end of the MSG\_OUT text, it is included literally. 
+space, or is at the end of the \msgout\ text, it is included literally. 
 If this is not the case, then it can be included literally by duplicating it.
 So, for example:
 
 \begin {small}
 \begin{verbatim}
+      msgSetc( "TOKEN", "message token" );
+      msgOut( "EXAM_UPARROW",
+              "Up-arrow, ^^, is the ^TOKEN escape character.", status);
+
       CALL MSG_SETC( 'TOKEN', 'message token' )
       CALL MSG_OUT( 'EXAM_UPARROW', 
      :             'Up-arrow, ^^, is the ^TOKEN escape character.', 
@@ -1048,6 +1222,9 @@ Thus,
 
 \begin {small}
 \begin {verbatim}
+      msgSetc( "TEXT", value );
+      msgOut( "EXAMPLE_OK", "^TEXT", status );
+
       CALL MSG_SETC( 'TEXT', VALUE )
       CALL MSG_OUT( 'EXAMPLE_OK', '^TEXT', STATUS )
 \end{verbatim}
@@ -1057,6 +1234,8 @@ will output the contents of VALUE literally, whereas
 
 \begin {small}
 \begin{verbatim}
+      msgOut( "EXAMPLE_BAD", value, status );
+
       CALL MSG_OUT( 'EXAMPLE_BAD', VALUE, STATUS )
 \end{verbatim}
 \end {small}
@@ -1074,50 +1253,52 @@ defined\latex{ (see Appendix \ref{adam_msg})}.
 It may sometimes be convenient within an application to write the text of a 
 message, complete with decoded message tokens, to a character variable 
 instead of the standard output stream.
-The Message System provides subroutine MSG\_LOAD to do this.
-MSG\_LOAD has the calling sequence:
+The Message System provides subroutine \msgload\ to do this.
+\msgload\ has the calling sequence:
 
 \begin {small}
 \begin{verbatim}
+      msgLoad( param, text, opstr, opstr_len, oplen, status );
       CALL MSG_LOAD( PARAM, TEXT, OPSTR, OPLEN, STATUS )
 \end{verbatim}
 \end {small}
 
-Here, the arguments PARAM, TEXT and STATUS are identical to those for MSG\_OUT.
-The behaviour of MSG\_LOAD is also the same as MSG\_OUT except that, instead of
-sending the expanded message text to the standard output stream, MSG\_LOAD
-returns it in the character variable OPSTR (regardless the output filtering
+Here, the arguments \farg{param}, \farg{text} and \farg{status} are identical to those for \msgout.
+The behaviour of \msgload\ is also the same as \msgout\ except that, instead of
+sending the expanded message text to the standard output stream, \msgload\
+returns it in the character variable \farg{optstr} (regardless the output filtering
 level).
-OPLEN returns the length of the message in OPSTR.
-If the message text is longer than the declared length of OPSTR, then the
+\farg{oplen} returns the length of the message in \farg{opstr}.
+If the message text is longer than the declared length of \farg{opstr} (as
+specified in \farg{opstr\_len} in the C interface), then the
 message is truncated with an ellipsis, \textit{i.e.}\ ``\ldots'', but no error 
 results.
 
-The symbolic constant MSG\_\_SZMSG is provided for defining the length of 
+The symbolic constant \msgszmsg\ is provided for defining the length of 
 character variables which are to hold such messages.
-This constant is defined in the include file 
+This constant is defined in the include files
 \htmlref
-{MSG\_PAR}{compiling_and_linking}\latex{ (see \S\ref{compiling_and_linking})}.
+{\fname{msg\_par.h} and \fname{MSG\_PAR}}{compiling_and_linking}\latex{ (see \S\ref{compiling_and_linking})}.
 
 
 \subsection{\xlabel{renewing_annulled_message_tokens}Renewing annulled message tokens}
 
-Each call to MSG\_OUT, MSG\_OUTIF or MSG\_LOAD will annul any defined message 
+Each call to \msgout, \msgoutif\ or \msgload\ will annul any defined message 
 tokens, regardless of the success of the call.
 This feature of the Message Reporting System ensures that message token names
-can be re-used with safety in a series of calls to, say, MSG\_OUT (\textit{e.g.}\ 
+can be re-used with safety in a series of calls to, say, \msgout\ (\textit{e.g.}\ 
 in order to output a table of values line by line).
 However, under certain circumstances it is useful to be able to restore, or 
 renew, the values of any message tokens set prior to the call to the output
-routine. This can be done using the subroutine MSG\_RENEW.
-In order to be effective, MSG\_RENEW must be called after the call
+routine. This can be done using the subroutine \msgrenew.
+In order to be effective, \msgrenew\ must be called after the call
 which annulled the required message tokens and prior to any further message
-token  definitions (\textit{e.g.}\ using the MSG\_SET\textit{x} and MSG\_FMT\textit{x} 
+token  definitions (\textit{e.g.}\ using the \func{msgSet}\textit{x} and \func{MSG\_FMT}\textit{x} 
 routines). 
-If MSG\_RENEW is called with existing message tokens defined, no action is
+If \msgrenew\ is called with existing message tokens defined, no action is
 taken.
 
-Here is an example of the use of MSG\_RENEW where a table of values is being
+Here is a Fortran example of the use of \msgrenew\ where a table of values is being
 output to the user and to a log file:
 
 \begin {small}
@@ -1151,8 +1332,8 @@ output to the user and to a log file:
 
 \subsection{\xlabel{resilience}Resilience}
 
-Other than MSG\_OUT, MSG\_OUTIF, MSG\_BLANK and MSG\_LOAD, the Message System 
-subroutines do not use a STATUS argument. 
+Other than \msgout, \msgoutif, \msgblank, \msgblankif\ and \msgload, the Message System 
+subroutines do not use a \farg{status} argument. 
 This is because they are intended to be very robust.
 In order to construct a message for output to the user, they will attempt to 
 recover from any internal failure. 
@@ -1160,8 +1341,8 @@ The STATUS argument in the ``output'' routines conforms to the Starlink
 convention for 
 \htmlref
 {inherited status}{inherited_status}\latex{ (see \S\ref{inherited_status})}.
-This means that an application can contain sequences of MSG\_SET\textit{x}, 
-MSG\_FMT\textit{x} and MSG\_OUT calls, and only needs to check the status at the 
+This means that an application can contain sequences of \func{msgSet}\textit{x}, 
+\func{MSG\_FMT}\textit{x} and \msgout\ calls, and only needs to check the status at the 
 end.
 
 There are two kinds of ``failure'' that can occur within the Message
@@ -1175,6 +1356,9 @@ This syntax is illustrated for the text resulting from the call:
 
 \begin {small}
 \begin{verbatim}
+      msgOut( "EXAMPLE_FLUX",  "Emission flux is ^FLUX (erg/cm2/s).",
+              status ); 
+
       CALL MSG_OUT( 'EXAMPLE_FLUX', 
      :             'Emission flux is ^FLUX (erg/cm2/s).', STATUS )
 \end{verbatim}
@@ -1193,14 +1377,14 @@ Emission flux is ^<FLUX> (erg/cm2/s).
 There are several reasons why a token may be undefined:
 
 \begin {itemize}
-\item It has not been defined using MSG\_SET\textit{x} \textit{etc}.
+\item It has not been defined using \func{msgSet}\textit{x} \textit{etc}.
 
-\item It has been annulled by a previous call to MSG\_OUT, MSG\_OUTIF 
-or MSG\_LOAD (or a corresponding ERR routine).
+\item It has been annulled by a previous call to \msgout, \msgoutif
+or \msgload\ (or a corresponding ERR routine).
 
 \item An attempt has been made to define more than 64 message tokens.
 
-\item An error has been made in a call to one of the MSG\_FMT\textit{x} 
+\item An error has been made in a call to one of the \func{MSG\_FMT}\textit{x} 
 subroutines. 
 This error could be either a syntax error in the FORMAT argument, or the
 result of specifying a field width which is too small (referred to 
@@ -1211,7 +1395,7 @@ Errors in message construction which result from undefined tokens are \emph{not}
 considered fatal and STATUS is not set as a result.
 
 \item Message Output -- If an error occurs when
-MSG\_OUT, MSG\_OUTIF or MSG\_BLANK attempt to output the message, then the 
+\msgout, \msgoutif, \msgblank\ or \msgblankif\ attempt to output the message, then the 
 STATUS argument will be set to an error value and an  error message will be 
 \htmlref{reported}{report_sect}\latex{ (see \S\ref{report_sect})}.
 Errors writing the message text to the standard output stream may occur for a
@@ -1305,7 +1489,7 @@ The principle is as follows:
 
 \begin {itemize}
 \item The subroutine returns without action if the given value of STATUS is 
-not SAI\_\_OK. 
+not \saiok. 
 
 \item The subroutine leaves STATUS unchanged if it completes successfully.
 
@@ -1335,7 +1519,7 @@ Here is an example of the use of inherited status within a simple subroutine:
 \end {small}
 
 If an error occurs within the ``application code'' of such a subroutine, then
-STATUS is set to a value which is not SAI\_\_OK, an error is reported (see
+STATUS is set to a value which is not \saiok, an error is reported (see
 below) and the subroutine aborts. 
 
 Note that it is often useful to use a status argument and inherited status
@@ -1353,7 +1537,7 @@ of this\latex{ in \S\ref{convert_sect}}).
 
 \subsection{\xlabel{setting_and_defining_status_values}Setting and defining status values \label{def_sect}}
 
-The use of the global constants SAI\_\_OK and SAI\_\_ERROR for setting
+The use of the global constants \saiok and \saierr\ for setting
 status values is recommended in general applications. 
 These global constants may be defined in each subroutine by including the
 file SAE\_PAR at the beginning of the subroutine, prior to the declaration
@@ -1391,7 +1575,7 @@ subroutine which requires them, prior to the declaration of any subroutine
 arguments or local variables. 
 
 The purpose of error codes is to enable the status argument to indicate that an 
-error has occurred by having a value which is not equal to SAI\_\_OK.
+error has occurred by having a value which is not equal to \saiok.
 By using a set of predefined error codes the calling module is 
 able to test the returned status to distinguish between error conditions 
 which may require different action.
@@ -1531,7 +1715,7 @@ On exit from ERR\_REP the value of STATUS remains unchanged, with three
 exceptions:
 
 \begin{itemize}
-\item If ERR\_REP is called with STATUS set to SAI\_\_OK -- in this case an
+\item If ERR\_REP is called with STATUS set to \saiok\ -- in this case an
 additional error message 
 to this effect is stacked for output to the user and STATUS is returned set
 to ERR\_\_BADOK.
@@ -1880,7 +2064,7 @@ HELPED can then handle the error condition itself in one of two ways:
 \begin {itemize}
 \item By calling ERR\_ANNUL( STATUS ), which ``annuls'' the error, deleting 
 any deferred error messages in the current context and resetting STATUS to 
-SAI\_\_OK.
+\saiok.
 This effectively causes the error condition to be ignored.
 For instance, it might be used if an ``end of file'' condition was expected, 
 but was to be ignored and some appropriate action taken instead.
@@ -1890,7 +2074,7 @@ not often done.)
 
 \item By calling ERR\_FLUSH( STATUS ), which ``flushes out'' the error, 
 sending any deferred error messages in the current context to the user and
-resetting STATUS to SAI\_\_OK. 
+resetting STATUS to \saiok. 
 This notifies the user that a problem has occurred, but allows the 
 application to continue anyway.
 For instance, it might be used if a series of files were being read: if one
@@ -2078,7 +2262,7 @@ checking must usually be performed.
 The deferral of error messages may also be involved.
 
 Normally, the effect required is that a cleaning-up routine called with 
-its status argument set to SAI\_\_OK will behave like any other routine, 
+its status argument set to \saiok\ will behave like any other routine, 
 setting the status value and reporting an error if it fails.
 However, if the value of status has been set to an error condition because of 
 a previous error, it must still attempt to execute, even if there is a
@@ -2159,14 +2343,14 @@ Two routines are provided to ``wrap up'' these clean-up calls: ERR\_BEGIN and
 ERR\_END, which begin and end what is effectively a new error reporting
 environment.
 ERR\_BEGIN will begin a new error context and return the 
-status value set to SAI\_\_OK. 
+status value set to \saiok. 
 A call to ERR\_END will annul the current error context if the previous
 context contains undelivered error messages.
 It will then release the current error context.
 ERR\_END returns the status of the last reported error message pending
 delivery to the user after the current error context has been released.
 If there are no error messages pending output, then the status is
-returned set to SAI\_\_OK.
+returned set to \saiok.
 This behaviour is exactly that represented by the code in the previous example.
 Here is the previous example re-written using calls to ERR\_BEGIN and
 ERR\_END:
@@ -2240,11 +2424,11 @@ the error message in OPSTR.
 
 The status associated with the returned message is returned in STATUS
 until there are no more messages to return -- then STATUS is set to
-SAI\_\_OK, PARAM and OPSTR are set to blanks and PARLEN and OPLEN to 1.
+\saiok, PARAM and OPSTR are set to blanks and PARLEN and OPLEN to 1.
 As for ERR\_FLUSH, a warning message is generated if there are no messages
 initially. The status returned with the warning message is EMS\_\_NOMSG.
 
-After STATUS has been returned SAI\_\_OK, the whole process is repeated
+After STATUS has been returned \saiok, the whole process is repeated
 for subsequent calls.
 
 The symbolic constants ERR\_\_SZPAR and ERR\_\_SZMSG are provided for 
@@ -2841,17 +3025,17 @@ code is described in the section on
 \begin {description}
 \item [SAE\_PAR] Defines the non-specific status codes for Starlink.
 \begin{description}
-\item \textbf{SAI\_\_ERROR} -- Error encountered.
-\item \textbf{SAI\_\_OK} -- No error.
+\item \textbf{\saierr} -- Error encountered.
+\item \textbf{\saiok} -- No error.
 \item \textbf{SAI\_\_WARN} -- Warning.
 \end {description}
 \item [MSG\_PAR] Defines the public Message System constants.
 \begin{description}
-\item \textbf{MSG\_\_NORM} -- Normal conditional message output level.
-\item \textbf{MSG\_\_QUIET} -- Quiet (few messages) conditional message output 
+\item \textbf{\msgnorm} -- Normal conditional message output level.
+\item \textbf{\msgquiet} -- Quiet (few messages) conditional message output 
 level.
 \item \textbf{MSG\_\_SZMSG} -- Maximum length of message text.
-\item \textbf{MSG\_\_VERB} -- Verbose (abundant messages) conditional message
+\item \textbf{\msgverb} -- Verbose (abundant messages) conditional message
 output level.
 \item \textbf{MSG\_\_DEBUG} -- Debug (many many messages) conditional message output level.
 \end {description}
@@ -2872,7 +3056,7 @@ output level.
 \end{description}
 \item [ERR\_ERR] Defines the Error Reporting System errors.
 \begin{description}
-\item \textbf{ERR\_\_BADOK} -- Status set to SAI\_\_OK in call to ERR\_REP 
+\item \textbf{ERR\_\_BADOK} -- Status set to \saiok\ in call to ERR\_REP 
 (improper use of ERR\_REP).
 \item \textbf{ERR\_\_BDPAR} -- Invalid tuning parameter name 
 (improper use of ERR\_TUNE).
@@ -4172,7 +4356,7 @@ message parameter imparts essentially the same information as the text used
 within the program code, even if they are in different languages. 
 
 
-\subsubsection{\xlabel{parameter_references}Parameter references}
+\subsubsection{\xlabel{parameter_reefrences}Parameter references\label{parameter_references}}
 
 It is often necessary to refer to an ADAM program parameter in a message. 
 There are two kinds of reference required: 
@@ -4302,10 +4486,10 @@ The three acceptable strings for MSG\_FILTER are:
 
 \begin {quote}
 \begin {description}
-\item [QUIET] -- representing MSG\_\_QUIET;
-\item [NORMAL] -- representing MSG\_\_NORM;
-\item [VERBOSE] -- representing MSG\_\_VERB.
-\item [DEBUG] -- representing MSG\_\_DEBUG
+\item [QUIET] -- representing \msgquiet;
+\item [NORMAL] -- representing \msgnorm;
+\item [VERBOSE] -- representing \msgverb.
+\item [DEBUG] -- representing \msgdebug\
 \end {description}
 \end {quote}
 Abbreviations are accepted but
