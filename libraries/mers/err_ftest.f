@@ -131,7 +131,7 @@
       CALL MSG_OUT( ' ','Should be ABCDE - ^D', STATUS)
 
       CALL MSG_IFSET( MSG__VERB, STATUS )
-      CALL MSG_IFLEV( LEVEL )
+      CALL MSG_IFLEV( LEVEL, ' ', STATUS )
       CALL MSG_OUTIF( MSG__DEBUG, ' ', 'Message should not be seen',
      :     STATUS )
 
