@@ -56,10 +56,15 @@
 *     22-JUL-2009 (TIMJ):
 *        Add extended range to sync with C interface.
 *        MSG__NONE and MSG__ALL are not part of the Fortran interface as they
-*        can not be used in MSG_OUTIF and comparisons should use MSG_IFLEVOK
+*        can not be used in MSG_OUTIF and comparisons should use MSG_FLEVOK
+*     23-JUL-2009 (TIMJ):
+*        Need to declare MSG_FLEVOK
 *     {enter_further_changes_here}
 
 *-
+
+*  External References:
+      LOGICAL MSG_FLEVOK                ! Will messages appear at this level.
 
 *  Global Constants:
       INTEGER MSG__NORM                 ! Normal conditional message output level
