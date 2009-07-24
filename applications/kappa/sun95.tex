@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.36}
 \newcommand{\stardocnumber}    {95.36}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2009 July 19}
+\newcommand{\stardocdate}      {2009 July 24}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.11}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -14803,13 +14803,6 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          only accessed when BEAMS exceeds 1.
       }
       \sstsubsection{
-         QUIET = \_LOGICAL (Read)
-      }{
-         If {\tt TRUE} then the fit parameters are not displayed on the
-         screen.  Output parameters and files are still created.
-         {\tt [FALSE]}
-      }
-      \sstsubsection{
          REFPOS = LITERAL (Read)
       }{
          The reference position.  This is often the desired position for
@@ -15052,6 +15045,12 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          The uncertainty in the positions are estimated iteratively
          using the curvature matrix derived from the Jacobian, itself
          determined by a forward-difference approximation.
+
+         \sstitem
+         The fit parameters are not displayed on the screen when the
+         message filter environemnt variable MSG\_FILTER is set to 
+         {\tt QUIET}.
+
       }
    }
    \sstdiytopic{
@@ -56329,6 +56328,13 @@ The following applications have been modified:
 The following applications have been modified:
 
 \begin{description}
+
+   \item [\htmlref{BEAMFIT}{BEAMFIT}]\mbox{}
+      \begin{itemize}
+        \item Parameter QUIET has been withdrawn.  Instead set the
+        MSG\_FILTER environment variable to {\tt QUIET} to suppress display
+        of the fit parameters.
+      \end{itemize}
 
    \item [\htmlref{FFCLEAN}{FFCLEAN}]\mbox{}
       \begin{itemize}

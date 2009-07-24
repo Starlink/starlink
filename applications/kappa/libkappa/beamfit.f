@@ -325,13 +325,9 @@
 *        The parameter name increments by 1 for each subsequent beam 
 *        feature.  Thus POS2 applies to the first secondary beam
 *        (second position in all), POS3 is for the second secondary 
-*        beam, and so on.  As the total number of parameters required is 
+*        beam, and so on.  As the total number of parameters required is
 *        one fewer than the value of Parameter BEAMS, POS2--POS5 are 
 *        only accessed when BEAMS exceeds 1.
-*     QUIET = _LOGICAL (Read)
-*        If TRUE then the fit parameters are not displayed on the 
-*        screen.  Output parameters and files are still created.  
-*        [FALSE]
 *     REFOFF( 2 ) = LITERAL (Write)
 *        The formatted offset followed by its error of the primary
 *        beam's location with respect to the reference position (see
@@ -451,6 +447,8 @@
 *     -  The uncertainty in the positions are estimated iteratively
 *     using the curvature matrix derived from the Jacobian, itself
 *     determined by a forward-difference approximation.
+*     -  The fit parameters are not displayed on the screen when the
+*     message filter environment variable MSG_FILTER is set to QUIET.
 
 *  Related Applications:
 *     KAPPA: PSF, CENTROID, CURSOR, LISTSHOW, LISTMAKE; ESP: GAUFIT;
@@ -524,6 +522,9 @@
 *     2009 January 31 (MJC):
 *        Clarify some of the parameter descriptions.  Flag that we
 *        have a reference position for SkyRefIs=Origin.
+*     2009 July 22 (MJC):
+*        Remove QUIET parameter and use the current reporting level
+*        instead (set by the global MSG_FILTER environment variable).
 *     {enter_further_changes_here}
 
 *-
@@ -669,15 +670,9 @@
 *  Begin an NDF context.
       CALL NDF_BEGIN
 
-*  See if we are to run quietly.
-      CALL PAR_GET0L( 'QUIET', QUIET, STATUS )
-
-*  Abort if an error occurred.
-      IF ( STATUS .NE. SAI__OK ) GO TO 999
-
-*  Silent running, but first record the existing reporting level.
-      CALL MSG_IFLEV( MSGFIL, ' ', STATUS )
-      IF ( QUIET ) CALL MSG_IFSET( MSG__QUIET, STATUS )
+*  See whether quiet mode is required, i.e not at NORMAL or lower
+*  priority.
+      QUIET = .NOT. MSG_FLEVOK( MSG__NORM, STATUS )
 
 *  Attempt to open a log file to store the results for human readers.  
       CALL FIO_ASSOC( 'LOGFILE', 'WRITE', 'LIST', 80, FDL, STATUS )
@@ -1283,9 +1278,6 @@
 *  Tidy up.
 *  ========
  999  CONTINUE
-
-*  Return to previous reporting level.
-      IF ( QUIET ) CALL MSG_IFSET( MSGFIL, STATUS )
 
 *  Close any open files.
       IF ( LOGF ) CALL FIO_ANNUL( FDL, STATUS )

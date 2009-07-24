@@ -10,6 +10,12 @@
 
 2 Modified_applications
 
+   o  BEAMFIT
+
+      -  Parameter QUIET has been withdrawn.  Instead set the
+      MSG_FILTER environment variable to QUIET to suppress display
+      of the fit parameters.
+
    o  FFCLEAN, MSTATS, WCSMOSAIC
 
       -  Parameter ILEVEL has been withdrawn.  Instead use the 
@@ -23,9 +29,9 @@
 
    o  SETAXIS
 
-      - If MODE is "WCS" and the selected axis is a celestial
-        longitude or latitude axis, the axis units are now converted
-        correctly from radians to degrees.
+      -  If MODE is "WCS" and the selected axis is a celestial
+      longitude or latitude axis, the axis units are now converted
+      correctly from radians to degrees.
 
 
 1 KAPPA_Version_1.10

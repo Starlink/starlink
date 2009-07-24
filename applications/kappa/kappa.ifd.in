@@ -7956,15 +7956,6 @@ package kappa {
             helpkey *
          }
 
-         parameter quiet {
-            type _LOGICAL
-            ppath DEFAULT
-            vpath DEFAULT
-            default FALSE
-            prompt {Suppress screen output?}
-            helpkey *
-         }
-
          parameter refoff {
             size *
             access WRITE
