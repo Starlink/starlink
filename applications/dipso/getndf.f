@@ -54,12 +54,15 @@
       
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     {original_version_entry}
 *     13-DEC-1995 (DSB):
 *        Use NDF_OPEN instead of HDS_OPEN, and remove LOC argument.
+*     23-JUL-2009 (TIMJ):
+*        Use MSG_FLEVOK rather than MSG_IFLEV
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -99,8 +102,10 @@
      :        TITLE*80           ! NDF title
       
       INTEGER
-     :        IFLEV,             ! MSG message filtering level
      :        PLACE              ! A dummy NDF place holder (NDF__NOPL)      
+
+      LOGICAL
+     :        ISVERB             ! Is VERBOSE or DEBUG
 *.
 
 *  Ensure a null NDF identifier get returned if an error has 
@@ -113,8 +118,8 @@
 *  Defer the reporting of errors.
       CALL ERR_MARK
 
-*  Save the MSG message filtering level.
-      CALL MSG_IFLEV( IFLEV )      
+*  Check the MSG message filtering level.
+      ISVERB = MSG_FLEVOK( MSG__VERB, STATUS )
 
 *  Establish the shell used to expand shell meta-characters within HDS. 
 *  This will be the first available in the list: tcsh,csh,sh.
@@ -142,7 +147,7 @@
 
 *  If the MSG message filtering level is verbose flush all the error
 *  messages. Otherwise, annul them.
-         IF( IFLEV .EQ. MSG__VERB ) THEN     
+         IF( ISVERB ) THEN
             CALL ERR_FLUSH( STATUS )
          ELSE
             CALL ERR_ANNUL( STATUS )

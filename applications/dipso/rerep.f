@@ -13,12 +13,10 @@
 *     CALL REREP( COMM, REP, STATUS )
 
 *  Description:
-*     If the current message filtering level is verbose, the supplied
+*     If the current message filtering level is verbose or higher, the supplied
 *     report is added to the error stack as a context message. If the
-*     filter level is normal, the current error is annulled and then
-*     re-reported using the supplied report. If the filter level is
-*     quiet, the current error is annulled and then re-reported using a
-*     blank report.
+*     filter level is normal or quiet, the current error is annulled and
+*     then re-reported using a blank report.
 
 *  Arguments:
 *     COMM = CHARACTER * ( * ) (Given)
@@ -30,11 +28,14 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     6-SEP-1994 (DSB):
 *        Original version.
+*     23-JUL-2009 (TIMJ):
+*        Use MSG_FLEVOK rather than MSG_IFLEV
 *     {enter_changes_here}
 
 *  Bugs:
@@ -58,9 +59,9 @@
 
 *  Local Variables:
       INTEGER
-     :     FILTER,               ! Current message filtering level
      :     OSTAT                 ! The original STATUS value
-      
+      LOGICAL
+     :     ISVERB                ! Is VERBOSE or DEBUG
 *.
 
 *  Return if no error has occurred.
@@ -75,18 +76,18 @@
 
 *  Issue the supplied message.
       CALL MSGOUT( COMM, REP, .TRUE., STATUS )
+
+*  Check message reporting level
+      ISVERB = MSG_FLEVOK( MSG__VERB, STATUS )
       
 *  Reinstate the original error context with its active error status.
       CALL ERR_END( STATUS )      
-
-*  Get the current message filtering level.
-      CALL MSG_IFLEV( FILTER )
 
 *  If the current filter level is verbose, return as we are (i.e. leave
 *  the current error report stack in tact).  For normal or quiet
 *  filtering, save the current status value, annul the error and then
 *  re-report it using a blank error report.
-      IF( FILTER .NE. MSG__VERB ) THEN
+      IF( .NOT. ISVERB ) THEN
          OSTAT = STATUS
          CALL ERR_ANNUL( STATUS )      
          STATUS = OSTAT

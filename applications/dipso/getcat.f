@@ -50,11 +50,14 @@
       
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     10-JUL-1998 (DSB):
 *        Original version.
+*     23-JUL-2009 (TIMJ):
+*        Use MSG_FLEVOK rather than MSG_IFLEV
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -90,8 +93,8 @@
       CHARACTER
      :        NAME*80            ! Catalogue title
       
-      INTEGER
-     :        IFLEV              ! MSG message filtering level
+      LOGICAL
+     :        ISVERB             ! Is VERBOSE or DEBUG
 *.
 
 *  Ensure a null identifier gets returned if an error has already occurred.
@@ -103,8 +106,8 @@
 *  Defer the reporting of errors.
       CALL ERR_MARK
 
-*  Save the MSG message filtering level.
-      CALL MSG_IFLEV( IFLEV )      
+*  Check the MSG message filtering level.
+      ISVERB = MSG_FLEVOK( MSG__VERB, STATUS )
 
 *  Get the catalogue name.
       CALL GET0C( PARAMS, POS, OPT, COMM, PROMPT, DEFVAL, FILE,
@@ -124,7 +127,7 @@
 
 *  If the MSG message filtering level is verbose flush all the error
 *  messages. Otherwise, annul them.
-         IF( IFLEV .EQ. MSG__VERB ) THEN     
+         IF( ISVERB ) THEN
             CALL ERR_FLUSH( STATUS )
          ELSE
             CALL ERR_ANNUL( STATUS )

@@ -130,6 +130,7 @@
  
 
 *  Copyright:
+*     Copyright (C) 2009 Science and Technology Facilities Council.
 *     Copyright (C) 1995-2002 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
@@ -181,6 +182,9 @@
 *     Revision 1.10  1997/11/04 23:28:10  timj
 *     Remove clipping.
 *
+*     23-JUL-2009 (TIMJ):
+*        Use MSG_FLEVOK rather than MSG_IFLEV. Only
+*        worked previously when exactly VERBOSE.
 *     {enter_further_changes_here}
  
 *  Bugs:
@@ -641,9 +645,7 @@
 *     construct a string of the bolometer names
 *     Otherwise it is a waste of time
 
-            CALL MSG_IFLEV(MSG_LEV)
-
-            IF (MSG_LEV .EQ. MSG__VERB) THEN
+            IF ( MSG_FLEVOK( MSG__VERB, STATUS ) ) THEN
 
                CALL MSG_SETC('PKG',PACKAGE)
                CALL MSG_OUTIF(MSG__VERB, ' ', 
