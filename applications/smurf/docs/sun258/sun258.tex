@@ -245,6 +245,7 @@
 % macros for typesetting parameters
 \newcommand{\aparam}[1]{\texttt{#1}}     % ADAM parameter
 \newcommand{\cparam}[1]{\texttt{#1}}     % CONFIG parameter
+\newcommand{\ndfcomp}[1]{\texttt{#1}}
 
 %% Definitions imported from SUN/95
 
@@ -770,7 +771,7 @@ all & All messages regardless of debug level \\
 \label{tab:msgfilter}
 \end{table}
 
-\subsubsection{Working with Data Files}
+\subsubsection{\xlabel{files}Working with Data Files\label{se:files}}
 
 \SMURF\ does not itself enforce a naming scheme on files. However, raw
 data from ACSIS and SCUBA-2 obey a well-defined naming scheme. The
@@ -815,11 +816,11 @@ Starlink package names are shown in small caps (e.g.\ \SMURF);
 individual task names are shown in sans-serif (e.g.\ \makemap).
 
 NDF extensions and components are shown in upper case fixed-width type
-(e.g.\ \texttt{HISTORY}). Content listings are shown in fixed-width type.
+(e.g.\ \ndfcomp{HISTORY}). Content listings are shown in fixed-width type.
 
 Text relating to filenames, key presses or entries typed at the
 command line are denoted by fixed-width type (e.g.\ \texttt{\%
-  smurf}), as are parameters for tasks (e.g.\ \texttt{METHOD}).
+  smurf}), as are parameters for tasks (e.g.\ \aparam{METHOD}).
 
 Parameters are displayed in caps using a fixed-width type (e.g.\
 \aparam{PIXSIZE}).
@@ -870,7 +871,7 @@ ACSIS files contain information about the receptors used.
 Output files created by \SMURF\ may contain some or all of these plus
 new components with information about the output data. These are noted
 in the description of specific applications. All output files contain
-contain a \texttt{PROVENANCE} extension which contains a detailed
+contain a \ndfcomp{PROVENANCE} extension which contains a detailed
 record of the data processing history. Use the \KAPPA\ command
 provshow to list the contents.
 
@@ -879,7 +880,7 @@ provshow to list the contents.
 \SMURF\ uses \AST\ for its astrometry and thus any coordinate system
 supported by \AST\ may be used when creating images/cubes. The default
 behaviour is to use the same system in which the observations were
-made (known as \texttt{TRACKING}).
+made (known as \aparam{TRACKING}).
 
 \subsubsection{Moving sources}
 
@@ -978,8 +979,8 @@ dark-subtracted measurements for each heater setting ($N_{\rm
 In addition to generating the flatfield solution, \calcflat\ can also
 create a responsivity image for the current subarray. The
 \aparam{RESP} parameter may be specified to store the
-responsivity. The responsivity has units of A\,W$^{-1}$. [WHAT ELSE
-CAN WE SAY ABOUT THE RESPONSIVITY?]
+responsivity. The responsivity has units of A/W.
+%WHAT ELSE CAN WE SAY ABOUT THE RESPONSIVITY?
 
 \paragraph{NOISE} \ \\
 
@@ -1326,10 +1327,10 @@ both of which can make maps via the \rebin method.
 
 See Figure \ref{flow} for a flowchart showing the SCAN DR workflow.
 
-\begin{figure}
+%\begin{figure}
 %\includegraphics....
-\caption{Flowchart\label{flow}}
-\end{figure}
+%\caption{Flowchart\label{flow}}
+%\end{figure}
 
 For bright compact sources, or sources with structure on scales
 smaller than eight arcmin:
@@ -1367,12 +1368,30 @@ quickly, but it does not fully correct for systematic noise. The
 \iterate\ method produces more accurate maps, with better sky
 subtraction.
 
-\begin{figure}
-%\includegraphics{signal-components.eps}
-\caption{The top panel shows the observed signal, with subsequent
-  panels showing the relative contributions from the atmosphere, the
-  astronomical source and white noise.}
-\end{figure}
+\begin{latexonly}
+   \begin{figure}[hbt]
+   \begin{center}
+     \includegraphics[width=150mm]{sun258_signalcpts.eps}
+     \caption{Simulation of bolometer time-series showing the various
+       components that make up the total signal. The top panel shows
+       the observed signal, with subsequent panels showing the
+       relative contributions from the atmosphere, the astronomical
+       source and white noise.}
+     \label{fig:comps}
+   \end{center}
+   \end{figure}
+\end{latexonly}
+\begin{htmlonly}
+   \label{fig:signal}
+   \htmladdimg{sun258_signalcpts.gif}
+
+   Figure ??: Simulation of bolometer time-series showing the various
+   components that make up the total signal. The top panel shows the
+   observed signal, with subsequent panels showing the relative
+   contributions from the atmosphere, the astronomical source and
+   white noise.
+
+\end{htmlonly}
 
 \paragraph{\xlabel{rebinmap}Rebin method\label{se:rebinmap}} \ \\
 
@@ -1442,7 +1461,7 @@ Iterate& iterate   &    See    &              &                  &  Nearest   & 
 \label{tab:makemap}
 \end{table}
 
-\subsection{\xlabel{dimm}Dynamic Iterative Map-Maker\label{se:dimm}}
+\section{\xlabel{dimm}SCUBA-2 Dynamic Iterative Map-Maker\label{se:dimm}}
 
 The Dynamic Iterative Map-Maker (DIMM) is the preferred tool for
 producing maps of SCUBA-2 total power data obtained in SCAN
@@ -1452,7 +1471,7 @@ of the data pre-processing steps, as well as iteratively solving for
 multiple signal components (including the image of the astronomical
 sky) using a single call to the \makemap\ task.
 
-\subsubsection{Signal model}
+\subsection{Signal model}
 
 We first develop the model used by the DIMM for time-varying bolometer
 signals as a linear combination of several components:
@@ -1532,7 +1551,7 @@ algorithm runs until it reaches a pre-set number of iterations or
 until the difference between the model and the real data ($\chi^2$) is
 no longer changing significantly.
 
-\subsubsection{Detailed Operation\label{se:dimmdetails}}
+\subsection{Detailed Operation\label{se:dimmdetails}}
 
 \begin{figure}
 \begin{center}
@@ -1655,7 +1674,7 @@ below:
 
 \end{description}
 
-\paragraph{Model components} \ \\
+\subsubsection{Model components} \ \\
 
 See Table \ref{tab:dimm_components} for a list of model components and
 their definitions. It may be necessary to add more model components
@@ -1684,7 +1703,7 @@ $NOI$ & Estimates the time-domain variance to establish relative detector \\
 \label{tab:dimm_components}
 \end{table}
 
-\paragraph{Processing time} \ \\
+\subsubsection{Processing time} \ \\
 
 The memiter parameter (Table \ref{tab:dimmconfig}) influences the time
 it takes the iterative algorithm to generate a solution. It determines
@@ -1731,7 +1750,7 @@ with the map created from the same observations using the Rebin method
 disappeared and the cosmic ray spikes have been removed.
 
 
-\paragraph{Using the iterate method} \ \\
+\subsubsection{Using the iterate method} \ \\
 
 When using \makemap\ with the iterate option, you need to apply the
 following parameters and options:
@@ -1757,7 +1776,7 @@ makemap in=^input.lis out=mapname method=iterate config=^config.lis \
 \end{verbatim}
 
 
-\paragraph{Configuration parameters} \ \\
+\subsubsection{Configuration parameters} \ \\
 
 Table \ref{tab:dimmconfig} summarizes the configuration parameters
 available for the model components used by the DIMM (see also detailed
@@ -1841,21 +1860,22 @@ flt.filt\_notchlow   &                                                          
 \section{\xlabel{simulator}SCUBA-2 simulator\label{se:sc2sim}}
 
 \SMURF\ has the capability to produce simulated data from SCUBA-2 with
-the \sctwosim\ task. The simulator requires an input astronomical sky
-image and a model of the atmosphere. Suitable model atmospheres may be
-generated with \skynoise. Output files are written in the same format
-as real data from SCUBA-2 with complete flatfield, WVM, WCS and JCMT
-state structure information. These files can be processed with other
-\SMURF\ tasks.
+the \sctwosim\ task. The simulator samples an input astronomical image
+in the presence of a model atmosphere and other sources of noise.
+Output files are written in the same format as real data from SCUBA-2
+with complete flatfield, WVM, WCS and JCMT state structure
+information. These files can be processed with other \SMURF\
+tasks. Model atmospheres may be generated with the \skynoise\ task.
 
-The simulator supports the primary observing modes: DREAM, STARE, SCAN
-along with FLATFIELD, POINTING and FOCUS observations. Rudimentary
-support exists for the SCUBA-2 polarimeter though this is
-untested. Instrument apertures may be set (offsets which adjust the
-tracking position to a specific subarray) and microsteps (small
-offsets from the tracking position) are fully supported. Simulating
-the motion of the major Solar System bodies (Venus, the Moon, Mars,
-Jupiter, Saturn, Uranus and Neptune) is supported.
+The simulator supports the primary observing modes: DREAM, STARE and
+SCAN along with FLATFIELD, POINTING and FOCUS
+observations. Rudimentary support exists for the SCUBA-2 polarimeter
+though this is untested. Instrument apertures may be set (offsets
+which adjust the tracking position to a specific subarray) and
+microsteps (small offsets from the tracking position) are fully
+supported. Simulating the motion of the major Solar System bodies
+(Venus, the Moon, Mars, Jupiter, Saturn, Uranus and Neptune) is
+supported.
 
 For SCAN observations, the simulator has two modes controlled by the
 \texttt{SIMTYPE} parameter. A \texttt{FULL} simulation generates
@@ -1863,7 +1883,10 @@ simulated complete astronomical data including the effect of the
 atmosphere. A \texttt{WEIGHTS} simulation generates data which may be
 used to assess areal coverage and ``hit'' density (i.e.\ the number of
 times a point on the sky is observed) for different mapping strategies
-or the impact of non-working bolometers.
+or the impact of non-working bolometers. Several different scanning
+models are supported: boustrophedon (conventional back-and-forth
+raster scan), two variations of ``pong'' (or box-scan) with either
+sharp or gentle turnarounds and a lissajous pattern.
 
 \subsection{\xlabel{simuse}Simulator workflow\label{se:simuse}}
 
@@ -1881,16 +1904,17 @@ solution for every simulation, even for different input sky images.
 
 Example files are installed as part of \SMURF\ and may be found in the
 \texttt{\$STARLINK\_DIR/share/smurf} directory. An explanation may be
-found in the \texttt{README} file in that directory.
+found in the \texttt{README} file in that directory. 
 
 \subsubsection{Astronomical image}
 
 The astronomical image may be any suitable image, provided it has WCS
-information. The WCS is used unless the source is a moving object
-(listed above). The image must be an NDF. It is recommended that the
-image pixel scale be set to be much less than the likely output map
-pixel spacing (typically 3 arcsec at 850\,$\mu$m, 1 arcsec at
-450\,$\mu$m) to avoid imaging and sampling artefacts.
+information. It should be as large as the size of the map to be
+made. The WCS is used unless the source is a moving object (listed
+above). The image must be an NDF. It is recommended that the image
+pixel scale be set to be much less than the likely output map pixel
+spacing (typically 3 arcsec at 850 $\mu$m, 1 arcsec at 450 $\mu$m) to
+avoid imaging and sampling artefacts.
 
 \subsubsection{Model atmosphere}
 
@@ -1904,7 +1928,7 @@ details of this model of the atmosphere before exploring the parameter
 space too widely.
 
 The model atmosphere calculated is generic and may be used for
-simulations at both 850\,$\mu$m and 450\,$\mu$m. The model is scaled
+simulations at both 850 $\mu$m and 450 $\mu$m. The model is scaled
 at the time of simulation according to the particular wavelength.
 
 \subsubsection{Flatfield simulation}
@@ -1912,8 +1936,10 @@ at the time of simulation according to the particular wavelength.
 Before a data simulation can take place, the flatfield solution for
 each subarray must be calculated. This is achieved by specifying a
 special observing mode called \texttt{heatrun} and running a
-simulation. The flatfield solution is written to a file using a naming
-scheme which follows that for raw data. The convention is
+simulation. 
+
+The flatfield solution is written to a file using a naming scheme
+which follows that for raw data. The convention is
 \verb+s[4|8][a-d]heatYYYYMMDD_NNNNN.sdf+ where \verb+s[4|8][a-d]+ is
 the subarray name (e.g.\ \verb+s8a+), \verb+heat+ indicates a
 flatfield observation, \verb+YYYYMMDD+ is the date of observation and
@@ -1931,34 +1957,62 @@ observation parameters (properties of the observation in
 question). These are specified using the \texttt{SIMPAR} and
 \texttt{OBSPAR} ADAM parameters to \sctwosim. For convenience, the
 parameters are stored in plain text files and are passed in using the
-\verb+^+ scheme mentioned above (ref...).
+\verb+^+ scheme mentioned above in Section \ref{se:files}. Example
+input files for all major observing modes may be found in the
+\texttt{\$STARLINK\_DIR/share/smurf} directory.
 
 The main observation parameters (\texttt{OBSPAR}) of interest are the
-RA/Dec of the source, wavelength, observing mode, observation date and
-duration of observation (which in the case of SCAN observations, is
-determined by the size of the area to map). Planets may be specified
-by name. If the source is not above the horizon, the simulator will
-exit with a message.
+RA/Dec of the source, wavelength, observing mode (\texttt{obsmode}),
+observation date and duration of observation (which in the case of
+SCAN observations, is determined by the size of the area to
+map). Planets may be specified by name. The RA/Dec must match that in
+the astronomical image. If the source is not above the horizon, the
+simulator will exit with an error message. The date must be specified
+as a UT modified Julian day number. As a point of reference,
+20090701T00:00:00 corresponds to MJD 55013.
 
 The main simulation parameters (\texttt{SIMPAR}) are the subarrays to
 simulate data for, the names of the atmosphere model and astronomical
-source files and the zenith opacity (at 225\,GHz). The zenith opacty
-is converted to a value at the observing wavelength using the
-empirical relations derived for SCUBA by Archibald et al. (proper ref
-needed here). Similar relations for SCUBA-2 do not yet exist.
+source files and the zenith opacity (at 225 GHz). The zenith opacty is
+converted to a value at the appropriate wavelength using the empirical
+relations derived for SCUBA by Archibald et al. (2002). Similar
+relations for SCUBA-2 do not yet exist.
 
-Data for all subarrays (at the chosen wavelength) may be generated in
-a single run. The size of the output files is governed by the
+Data for all subarrays (at the specified wavelength) may be generated
+in a single run. The size of the output files is governed by the
 \texttt{MAXWRITE} parameter for \sctwosim\ which specifies the number
 of samples to write per file. Multiple observations may be simulated
-by setting the \texttt{OVERWRITE} parameter to \texttt{FALSE}.
+by setting the \texttt{OVERWRITE} parameter to \texttt{FALSE} (the
+default behaviour is to overwrite existing files).
 
 Since the data output from the simulator mimics the real instrument,
 it is possible to generate many GB of data which may take many minutes
-to hours of CPU time. The \sctwosim\ parameter \texttt{SIMSTATS}
-provides an estimate of the simulation properties including the
-duration of the simulation, quantity of data, memory requirements and
-CPU time.
+tor hours of CPU time. The \sctwosim\ parameter \texttt{SIMSTATS}
+tells the simulator to estimate the properties of the simulation
+including the duration of the simulation, quantity of data, memory
+requirements and CPU time. The results are printed to the screen and
+\sctwosim\ exits, allowing the user to modify the simulation
+parameters if necessary.
+
+\subsubsection{\xlabel{dreamsim}A note on DREAM simulations\label{se:dreamsim}}
+
+For STARE simulations, the images are calculated at 1-second intervals
+at the time the simulator is run and written to the output files. For
+DREAM the images must be reconstructed after the simulation has
+run. This means that the DREAM weights file must be calculated using
+\dreamweights\ as desribed in Section \ref{se:dream}. Likewise, the
+images are calculated using \dreamsolve.
+
+\subsection{\xlabel{simdr}Processing simulated data\label{se:simdr}}
+
+The processing of simulated data proceeds exactly as for real SCUBA-2
+data and depends on the observing mode. See the respective workflows
+in Sections \ref{se:dsworkflow} and \ref{se:scanworkflow} above. Note
+that dark frames are not produced by the simulator.
+
+FOCUS observations are designed to be processed by the ORAC-DR
+pipeline rather than \SMURF\ as their analysis involves multiple
+steps.
 
 \section{Acknowledgments}
 
@@ -1969,6 +2023,29 @@ for the documentation written by Maria Kelly on which this SUN is
 based, and Christa van Laerhoven for an earlier version.
 
 % End of main text
+
+\begin{thebibliography}{}
+\addcontentsline{toc}{section}{References}
+
+\bibitem{archibald}
+Archibald~E.~N., et~al., 2002, MNRAS, 336, 1
+
+\bibitem{smurf}
+Chapin~E.~L., et~al., 2009, \textit{SMURF -- Sub-Millimetre User Reduction
+Facility},
+\xref{Starlink User Note 258}{sun258}{} 
+
+\bibitem{kappa}
+Currie~M.~J., 1997, {\it KAPPA --- Kernel Application Package},
+\xref{Starlink User Note 95}{sun95}{}
+
+\bibitem{gaia}
+Draper~P.~W., 1997, {\it GAIA -- Graphical Astronomy and Image 
+Analysis Tool},
+\xref{Starlink User Note 214}{sun214}{}
+
+\end{thebibliography}
+ 
 
 \section{Release Notes---V0.1}
 
