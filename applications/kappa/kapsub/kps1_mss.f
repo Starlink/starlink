@@ -1,5 +1,4 @@
-      SUBROUTINE KPS1_MSS( IGRP, NNDF, COMP, ILEVEL, NGOOD, PIXS, 
-     :                     STATUS )
+      SUBROUTINE KPS1_MSS( IGRP, NNDF, COMP, NGOOD, PIXS, STATUS )
 *+
 *  Name:
 *     KPS1_MSS
@@ -11,11 +10,11 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     KPS1_MSS( IGRP, NNDF, COMP, ILEVEL, NGOOD, PIXS, STATUS )
+*     KPS1_MSS( IGRP, NNDF, COMP, NGOOD, PIXS, STATUS )
 
 *  Description:
-*     The user is asked for the coordinates of a point in the current
-*     coordinate systems of a group of NDFs.  For each NDF in a given 
+*     The user is asked for the co-ordinates of a point in the current
+*     co-ordinate systems of a group of NDFs.  For each NDF in a given 
 *     group which contains this point, the pixel value at that point
 *     is returned in an array.
 
@@ -26,10 +25,7 @@
 *        The number of NDFs in the group (size of IGRP).
 *     COMP = CHARACTER * ( * ) (Given)
 *        The component of the NDFs which is to be interrogated.  May
-*        be Data, Variance, Error or Quality. 
-*     ILEVEL = INTEGER (Given)
-*        If 1 nothing is printed. If 2 print statistics. If 3, print 
-*        statistics and pixel values.
+*        be 'DATA', 'VARIANCE', 'ERROR' or 'QUALITY'. 
 *     NGOOD = INTEGER (Returned)
 *        The number of good pixels found.
 *     PIXS( * ) = DOUBLE PRECISION (Returned)
@@ -38,14 +34,20 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
+*  Notes:
+*     ILEVEL = INTEGER (Given)
+*        If 1 nothing is printed. If 2 print statistics. If 3, print 
+*        statistics and pixel values.
+
 *  Copyright:
 *     Copyright (C) 2001, 2004 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Councils.  Copyright (C) 2009 Science & Technology Facilities 
+*     Council.  All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -55,8 +57,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MBT: Mark Taylor (Starlink)
@@ -67,7 +69,10 @@
 *     4-DEC-2001 (MBT):
 *        Original version.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2009 July 22 (MJC):
+*        Remove ILEVEL argument and use the current reporting level
+*        instead (set by the global MSG_FILTER environment variable).
 *     {enter_further_changes_here}
 
 *-
@@ -82,12 +87,12 @@
       INCLUDE 'NDF_PAR'          ! NDF system constants
       INCLUDE 'PRM_PAR'          ! VAL__BADx constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
-      
+      INCLUDE  'MSG_PAR'         ! Message-system constants
+
 *  Arguments Given:
       INTEGER IGRP
       INTEGER NNDF
       CHARACTER COMP * ( * )
-      INTEGER ILEVEL
 
 *  Arguments Returned:
       INTEGER NGOOD
@@ -153,47 +158,46 @@
       CALL KPG1_GTPOS( 'POS', IFRM0, .FALSE., CPOS, 0.0D0, STATUS )
 
 *  Write an introductory message, if necessary.
-      IF( ILEVEL .GT. 1 ) THEN
-         CALL MSG_BLANK( STATUS )
-         BUF = ' '
-         IAT = 0
-         CALL CHR_APPND( '(', BUF, IAT )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
+      BUF = ' '
+      IAT = 0
+      CALL CHR_APPND( '(', BUF, IAT )
+      IAT = IAT + 1
+      DO I = 1, NCDIM0
+         CALL CHR_APPND( AST_FORMAT( IFRM0, I, CPOS( I ), STATUS ),
+     :                   BUF, IAT )
+         IF ( I .LT. NCDIM0 ) THEN
+            CALL CHR_APPND( ',', BUF, IAT )
+         END IF
          IAT = IAT + 1
-         DO I = 1, NCDIM0
-            CALL CHR_APPND( AST_FORMAT( IFRM0, I, CPOS( I ), STATUS ),
-     :                      BUF, IAT )
-            IF ( I .LT. NCDIM0 ) THEN
-               CALL CHR_APPND( ',', BUF, IAT )
-            END IF
-            IAT = IAT + 1
-         END DO
-         CALL CHR_APPND( ')', BUF, IAT )
-         CALL MSG_SETC( 'POS', BUF( 1:IAT ) )
-         CALL MSG_OUT( ' ', ' Pixel statistics at position ^POS ' //
-     :                 'in current Frame.', STATUS )
-      END IF
+      END DO
+      CALL CHR_APPND( ')', BUF, IAT )
+      CALL MSG_SETC( 'POS', BUF( 1:IAT ) )
+      CALL MSG_OUTIF( MSG__NORM, ' ',
+     :                ' Pixel statistics at position ^POS ' //
+     :                'in current Frame.', STATUS )
 
 *  Write headings if necessary.
-      IF ( ILEVEL .GE. 3 ) THEN
-         CALL MSG_BLANK( STATUS )
-         BUF = ' '
-         BUF( 5: ) = 'NDF'
-         BUF( 30: ) = 'Domain'
-         BUF( 50: ) = 'Pixel value'
-         CALL MSG_OUT( ' ', BUF, STATUS )
-         BUF = ' '
-         BUF( 5: ) = '---'
-         BUF( 30: ) = '------'
-         BUF( 50: ) = '-----------'
-         CALL MSG_OUT( ' ', BUF, STATUS )
-      END IF
+      CALL MSG_BLANKIF( MSG__VERB, STATUS )
+      BUF = ' '
+      BUF( 5: ) = 'NDF'
+      BUF( 30: ) = 'Domain'
+      BUF( 50: ) = 'Pixel value'
+      CALL MSG_OUTIF( MSG__VERB, ' ', BUF, STATUS )
+
+      BUF = ' '
+      BUF( 5: ) = '---'
+      BUF( 30: ) = '------'
+      BUF( 50: ) = '-----------'
+      CALL MSG_OUTIF( MSG__VERB, ' ', BUF, STATUS )
 
 *  Loop over each NDF getting the value for the selected position for 
 *  each one.
       NGOOD = 0
       DO I = 1, NNDF
 
-*  Open the NDF (unless it is the first one, which we have already opened).
+*  Open the NDF (unless it is the first one, which we have already
+*  opened).
          IF ( I .EQ. 1 ) THEN
             INDF = INDF0
          ELSE
@@ -219,9 +223,8 @@
             CALL MSG_SETC( 'NDF2', NAME )
             STATUS = SAI__ERROR 
             CALL ERR_REP( 'KPS1_MSS_ERR1:', 
-     :                    'Current Frames of ^NDF1 ' //
-     :                    'and ^NDF2 have different ' //
-     :                    'dimensionalities.', STATUS )
+     :                    'Current Frames of ^NDF1 and ^NDF2 have ' //
+     :                    'different dimensionalities.', STATUS )
             GO TO 999
          END IF
 
@@ -240,8 +243,8 @@
      :              .AND. PPOS( J ) .LE. UBND( J )
          END DO
 
-*  If the point is within the bounds of the NDF, we will want to retrieve
-*  and store its value.
+*  If the point is within the bounds of the NDF, we will want to
+*  retrieve and store its value.
          IF ( OK ) THEN
 
 *  Create an NDF section containing just this one pixel.
@@ -253,8 +256,7 @@
 
 *  Extract the single pixel value.
             CALL KPG1_RETRD( EL, 1, %VAL( CNF_PVAL( IPCOMP ) ), 
-     :                       PIXS( NGOOD + 1 ),
-     :                       STATUS )
+     :                       PIXS( NGOOD + 1 ), STATUS )
 
 *  Check if this pixel is good.
             IF ( PIXS( NGOOD + 1 ) .NE. VAL__BADD ) THEN
@@ -280,27 +282,21 @@
          END IF
 
 *  Log to user if required.
-         IF ( ILEVEL .GE. 3 ) THEN
-            BUF = ' '
-            CALL GRP_GET( IGRP, I, 1, BUF( 5: ), STATUS )
-            BUF( 29: ) = ' ' // AST_GETC( IWCS, 'DOMAIN', STATUS )
-            CALL MSG_LOAD( ' ', ' ^VALUE', BUF( 49: ), IAT, STATUS )
-            CALL MSG_OUT( ' ', BUF, STATUS )
-         END IF
+         BUF = ' '
+         CALL GRP_GET( IGRP, I, 1, BUF( 5: ), STATUS )
+         BUF( 29: ) = ' ' // AST_GETC( IWCS, 'DOMAIN', STATUS )
+         CALL MSG_LOAD( ' ', ' ^VALUE', BUF( 49: ), IAT, STATUS )
+         CALL MSG_OUTIF( MSG__VERB, ' ', BUF, STATUS )
         
       END DO
 
 *  Write summary information.
-      IF ( ILEVEL .GE. 3 ) THEN
-         CALL MSG_BLANK( STATUS )
-      END IF
+      CALL MSG_BLANKIF( MSG__VERB, STATUS )
 
-      IF( ILEVEL .GE. 2 ) THEN
-         CALL MSG_SETI( 'NGOOD', NGOOD )
-         CALL MSG_OUT( ' ', ' Number of non-bad pixels:  ^NGOOD',
-     :                 STATUS )
-         CALL MSG_BLANK( STATUS )
-      END IF
+      CALL MSG_SETI( 'NGOOD', NGOOD )
+      CALL MSG_OUTIF( MSG__NORM, ' ', 
+     :                ' Number of non-bad pixels:  ^NGOOD', STATUS )
+      CALL MSG_BLANKIF( MSG__VERB, STATUS )
 
 *  Error exit label.
   999 CONTINUE

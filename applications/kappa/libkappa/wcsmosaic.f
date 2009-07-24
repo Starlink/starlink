@@ -29,7 +29,7 @@
 *     For instance, this means that WCSMOSAIC can process data in which 
 *     the WCS position of each input pixel is defined via a look-up
 *     table rather than an analytical expression.  Note however, that 
-*     the WCS information in the reference NDF (see parameter REF) must
+*     the WCS information in the reference NDF (see Parameter REF) must
 *     have a defined inverse transformation.
 *
 *     The WCSMOSAIC algorithm proceeds as follows.  First, the output 
@@ -51,7 +51,7 @@
 *     rebinned into the output NDF in this way, the algorithm proceeds 
 *     to rebin the next input NDF in the same way.  Once all input NDFs
 *     have been processed, output pixels which have a weight less than 
-*     the value given by parameter WLIM are set bad.  The mean value in 
+*     the value given by Parameter WLIM are set bad.  The mean value in 
 *     the weights array (excluding those values less than WLIM) is then
 *     found.  The output NDF is then normalised by dividing it by the
 *     weights array.  This normalisation of the output NDF takes account
@@ -62,8 +62,8 @@
 *     If the input NDFs contain variances, then these are propagated to
 *     the output.  Alternatively, output variances can be generated from
 *     the spread of input values contributing to each output pixel (see
-*     parameter GENVAR). Any input variances can also be used to weight
-*     the input data (see parameter VARIANCE). By default, all input
+*     Parameter GENVAR). Any input variances can also be used to weight
+*     the input data (see Parameter VARIANCE). By default, all input
 *     data is given equal weight.
 *
 *     The transformations needed to produce alignment are derived from
@@ -110,12 +110,6 @@
 *        null (!) value is supplied, then a value of FALSE is adopted if 
 *        and only if all the input NDFs have variance components (TRUE is
 *        used otherwise). [FALSE]
-*     ILEVEL = _INTEGER (Read)
-*        Controls the amount of information displayed on the screen. If
-*        set to 1, no information will be displayed while the command
-*        is executing. If set to 2, the interpolation method being used 
-*        will be displayed. If set to 3, the name of each input NDF will
-*        also be displayed as it is processed.  [2]
 *     IN = NDF (Read)
 *        A group of input NDFs (of any dimensionality).  This should be
 *        given as a comma-separated list, in which each list element
@@ -144,7 +138,7 @@
 *     LBOUND() = _INTEGER (Write)
 *        The lower pixel bounds of the output NDF. Note, values will be
 *        written to this output parameter even if a null value is supplied 
-*        for parameter OUT.
+*        for Parameter OUT.
 *     MAXPIX = _INTEGER (Read)
 *        A value which specifies an initial scale size in pixels for the
 *        adaptive algorithm which approximates non-linear Mappings with
@@ -185,7 +179,7 @@
 *        - "SincGauss" -- Uses the sinc(pi*x)exp(-k*x*x) kernel.  Good 
 *        results can be obtained by matching the FWHM of the
 *        envelope function to the point-spread function of the
-*        input data (see parameter PARAMS).
+*        input data (see Parameter PARAMS).
 *
 *        - "Somb" -- Uses the somb(pi*x) kernel, where
 *        somb(z)=2*J1(z)/z  (J1 is the first-order Bessel function of
@@ -195,7 +189,7 @@
 *        scheme is similar to the "SincCos" scheme.
 *
 *        - "Gauss" -- Uses the exp(-k*x*x) kernel.  The FWHM of the
-*        Gaussian is given by parameter PARAMS(2), and the point at
+*        Gaussian is given by Parameter PARAMS(2), and the point at
 *        which to truncate the Gaussian to zero is given by parameter
 *        PARAMS(1).
 *
@@ -246,7 +240,7 @@
 *     REF = NDF (Read)
 *        The NDF to which all the input NDFs are to be aligned.  If a
 *        null value is supplied for this parameter, the first NDF
-*        supplied for parameter IN is used.  The WCS information in this
+*        supplied for Parameter IN is used.  The WCS information in this
 *        NDF must have a defined inverse transformation (from WCS
 *        co-ordinates to pixel co-ordinates).  [!]
 *     UBND() = _INTEGER (Read)
@@ -257,7 +251,7 @@
 *     UBOUND() = _INTEGER (Write)
 *        The upper pixel bounds of the output NDF. Note, values will be
 *        written to this output parameter even if a null value is supplied 
-*        for parameter OUT.
+*        for Parameter OUT.
 *     VARIANCE = _LOGICAL (Read)
 *        If TRUE, then any input VARIANCE components in the input NDFs
 *        are used to weight the input data (the weight used for each
@@ -291,6 +285,13 @@
 *     information is propagated form the first input NDF.
 *     -  The QUALITY and AXIS components are not propagated from input 
 *     to output.
+*     -  There are different facts reported, their verbosity depending
+*     on the current message-reporting level set by environment variable
+*     MSG_FILTER.  If this is set to QUIET, no information will be 
+*     displayed while the command is executing.  When the filtering 
+*     level is at least as verbose as NORMAL, the interpolation method 
+*     being used will be displayed.  If set to VERBOSE, the name of each
+*     input NDF will also be displayed as it is processed.
 
 *  Related Applications:
 *     KAPPA: WCSFRAME, WCSALIGN, REGRID; CCDPACK: TRANNDF.
@@ -308,7 +309,7 @@
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics & Astronomy Research Council. 
-*     Copyright (C) 2007-2008 Science & Technology Facilities Council.
+*     Copyright (C) 2007-2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -347,9 +348,9 @@
 *     13-FEB-2007 (DSB):
 *        Remove C-like semi-colon line terminators.
 *     13-MAR-2007 (DSB):
-*        Add parameter VARWGT.
+*        Add Parameter VARWGT.
 *     29-MAR-2007 (DSB):
-*        Renamed parameter VARWGT as USEVAR. Internally, the flag is
+*        Renamed Parameter VARWGT as USEVAR. Internally, the flag is
 *        still refered to as varwgt for consistency with AST (which has
 *        both AST__USEVAR and AST__VARWGT flags).
 *     2007 April 4 (MJC):
@@ -357,11 +358,15 @@
 *     4-MAY-2007 (DSB):
 *        Add new argument NUSED to calls to AST_REBINSEQ.
 *     19-JUN-2007 (DSB):
-*        New output parameters FLBND and FUBND.
+*        New output Parameters FLBND and FUBND.
 *     4-FEB-2008 (DSB):
-*        Allow a null value to be supplied for parameter GENVAR.
+*        Allow a null value to be supplied for Parameter GENVAR.
 *     23-JUN-2008 (DSB):
-*        Propagate from the first input NDF rather than the reference NDF.
+*        Propagate from the first input NDF rather than the reference 
+*        NDF.
+*     2009 July 22 (MJC):
+*        Remove ILEVEL parameter and use the current reporting level
+*        instead (set by the global MSG_FILTER environment variable).
 *     {enter_further_changes_here}
 
 *-
@@ -377,6 +382,7 @@
       INCLUDE 'NDF_PAR'      ! NDF constants
       INCLUDE 'CNF_PAR'      ! CNF constants
       INCLUDE 'AST_PAR'      ! AST constants
+      INCLUDE 'MSG_PAR'      ! Message-system constants
 
 *  Status:
       INTEGER STATUS         ! Global status
@@ -399,7 +405,6 @@
       INTEGER FLAGS          ! Flags for AST_REBINSEQ
       INTEGER I              ! Index into input and output groups
       INTEGER IGRP1          ! GRP id. for group holding input NDFs
-      INTEGER ILEVEL         ! Information level
       INTEGER INDF0          ! NDF id. for the first input NDF
       INTEGER INDF1          ! NDF id. for the input NDF
       INTEGER INDF2          ! NDF id. for the output NDF
@@ -455,9 +460,6 @@
 
 *  Get an identifier for the fiorst input NDF.
       CALL NDG_NDFAS( IGRP1, 1, 'READ', INDF0, STATUS )
-
-*  Get the level of screen information to display.
-      CALL PAR_GDR0I( 'ILEVEL', 2, 1, 3, .TRUE., ILEVEL, STATUS )
 
 *  Abort if an error has occurred.
       IF ( STATUS .NE. SAI__OK ) GO TO 999
@@ -590,9 +592,7 @@
 
       END IF
 
-      IF( ILEVEL .GE. 2 ) THEN 
-         CALL MSG_OUT( 'WCSMOSAIC_MSG1', MESS, STATUS )
-      END IF
+      CALL MSG_OUTIF( MSG__NORM, 'WCSMOSAIC_MSG1', MESS, STATUS )
 
 *  If required, set the dynamic defaults for PARAMS, then get new 
 *  values.
@@ -739,12 +739,10 @@
 
 *  If required, tell the user which input NDF is currently being
 *  processed.
-         IF( ILEVEL .GE. 3 ) THEN
-            CALL MSG_BLANK( STATUS )
-            CALL NDF_MSG( 'NDF', INDF1 )
-            CALL MSG_OUT( 'WCSMOSAIC_MSG2', '  Processing ^NDF...', 
-     :                    STATUS )
-         END IF
+         CALL MSG_BLANKIF( MSG__VERB, STATUS )
+         CALL NDF_MSG( 'NDF', INDF1 )
+         CALL MSG_OUTIF( MSG__VERB, 'WCSMOSAIC_MSG2', 
+     :                   '  Processing ^NDF...', STATUS )
 
 *  Set the AST_REBINSEQ flags for this input.
          FLAGS = 0
@@ -826,7 +824,7 @@
       END DO
 
 *  Display a blank line.
-      IF( ILEVEL .GE. 3 ) CALL MSG_BLANK( STATUS )
+      CALL MSG_BLANKIF( MSG__VERB, STATUS )
 
 *  Set the bad pixel flags for the output DATA and VARIANCE arrays.
       CALL NDF_SBAD( .TRUE., INDF2, 'DATA', STATUS )

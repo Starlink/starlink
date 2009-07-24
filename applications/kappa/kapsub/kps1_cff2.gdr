@@ -1,5 +1,5 @@
       SUBROUTINE KPS1_CFF2<T>( NX, NY, INARR, VAR, NVAR, INVAR, BOXSZ,
-     :                         NITER, CLIP, LIMITS, ILEVEL, SAMBAD,
+     :                         NITER, CLIP, LIMITS, SAMBAD,
      :                         NLIM, CINARR, OUTARR, OUTVAR, NGOOD,
      :                         SIGMA, ASUM, NSUM, STATUS )
 *+
@@ -15,9 +15,8 @@
 
 *  Invocation:
 *     CALL KPS1_CFF2x( NX, NY, INARR, VAR, NVAR, INVAR, BOXSZ, NITER,
-*                      CLIP, LIMITS, ILEVEL, SAMBAD, NLIM, CINARR,
-*                      OUTARR, OUTVAR, NGOOD, SIGMA, ASUM, NSUM,
-*                      STATUS )
+*                      CLIP, LIMITS, SAMBAD, NLIM, CINARR, OUTARR,
+*                      OUTVAR, NGOOD, SIGMA, ASUM, NSUM, STATUS )
 
 *  Description:
 *     This routine sets pixels in a two-dimensional array to be invalid
@@ -60,10 +59,6 @@
 *     LIMITS( 2 ) = ? (Given)
 *        The thresholds outside which any pixel data value will not be
 *        cleaned.  The order is not important.
-*     ILEVEL = INTEGER (Given)
-*        The interaction level.  If it is greater than one, the
-*        intermediate result of each iteration will be reported to the
-*        user.
 *     SAMBAD = LOGICAL (Given)
 *        If a .TRUE. value is given for this argument, then bad input
 *        pixels will be propagated to the output image unchanged during
@@ -103,6 +98,10 @@
 *     arrays; replace "x" in the routine name by R or D as appropriate.
 *     The data type of the INARR, OUTARR, LIMITS, CINARR, INVAR,
 *     OUTVAR, and ASUM arguments must match the routine used.
+*     ILEVEL = INTEGER (Given)
+*        The interaction level.  If it is greater than one, the
+*        intermediate result of each iteration will be reported to the
+*        user.
 
 *  Copyright:
 *     Copyright (C) 1981, 1990-1992 Science & Engineering Research
@@ -144,6 +143,9 @@
 *     1992 December 17 (MJC):
 *        Fixed bug that caused the variance array to be accessed when it
 *        did not exist.
+*     2009 July 22 (MJC):
+*        Remove ILEVEL argument and use the current reporting level
+*        instead (set by the global MSG_FILTER environment variable).
 *     {enter_further_changes_here}
 
 *-
@@ -154,6 +156,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! Magic-value constants
+      INCLUDE 'MSG_PAR'          ! Message-system constants
 
 *  Arguments Given:
       INTEGER NX
@@ -166,7 +169,6 @@
       INTEGER NITER
       REAL CLIP( NITER )
       <TYPE> LIMITS( 2 )
-      INTEGER ILEVEL
       LOGICAL SAMBAD
       INTEGER NLIM
       <TYPE> CINARR( NX * NY )
@@ -245,11 +247,9 @@
    10 CONTINUE
 
 *  If interaction level is high, report the number of valid pixels.
-      IF ( ILEVEL .GE. 2 ) THEN
-         CALL MSG_SETI( 'NSTART', NSTART )
-         CALL MSG_OUT( ' ', 
+      CALL MSG_SETI( 'NSTART', NSTART )
+      CALL MSG_OUTIF( MSG__NORM, ' ', 
      :     'Input image initially has ^NSTART valid pixels.', STATUS )
-      END IF
 
 *  If there is no valid pixel, set NGOOD to -1 and exit.
       IF ( NSTART .EQ. 0 ) THEN
@@ -386,15 +386,13 @@
          SIGMA = SQRT( NUM_<T>TOD( VARNCE ) * DBLE( NBOX ) /
      :           DBLE( MAX( 1, NBOX-1 ) ) )
 
-*  If interaction level is high, report the progress of the iteration.
-         IF ( ILEVEL .GE. 2 ) THEN
-            CALL MSG_SET<T>( 'SIGMA', NUM_DTO<T>( SIGMA ) )
-            CALL MSG_SETI( 'VALID', NGOOD + NEXCL )
-            CALL MSG_SETI( 'ITER', ITER )
-            CALL MSG_OUT( ' ',
+*  Report the progress of the iteration.
+         CALL MSG_SET<T>( 'SIGMA', NUM_DTO<T>( SIGMA ) )
+         CALL MSG_SETI( 'VALID', NGOOD + NEXCL )
+         CALL MSG_SETI( 'ITER', ITER )
+         CALL MSG_OUTIF( MSG__NORM, ' ',
      :        'Iteration ^ITER has ^VALID valid pixels left and '/
      :        /'SIGMA = ^SIGMA.', STATUS )
-         END IF
 
 *  If all pixels has been rejected, exit.
          IF ( NGOOD .LE. 0 ) THEN
@@ -415,12 +413,10 @@
 
 *  If interaction level is high, report to user how many pixels were
 *  rejected after all iterations are complete.
-      IF ( ILEVEL .GE. 2 ) THEN
-         NREJ = NSTART - NGOOD - NEXCL
-         CALL MSG_SETI( 'NREJ', NREJ )
-         CALL MSG_OUT( 'REJECTED',
-     :     ' ^NREJ pixels were rejected in total.', STATUS )
-      END IF
+      NREJ = NSTART - NGOOD - NEXCL
+      CALL MSG_SETI( 'NREJ', NREJ )
+      CALL MSG_OUTIF( MSG__NORM, 'REJECTED',
+     :  ' ^NREJ pixels were rejected in total.', STATUS )
 
 *  Propagate the variance from the input image to the output, if the
 *  VARIANCE component exists.

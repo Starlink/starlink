@@ -43,8 +43,9 @@
 *     co-ordinate Frame of all the NDFs is given, and the value at
 *     the pixel covering this point in each of the input NDFs is
 *     accumulated to form the results that comprise the mean, variance,
-*     and median.  These statistics, and if ILEVEL=3, the value of each 
-*     contributing pixel, is reported directly to the user.
+*     and median.  These statistics, and if environment variable
+*     MSG_FILTER is set to VERBOSE, the value of each contributing
+*     pixel, is reported directly to you.
 
 *  Usage:
 *     mstats in out [estimator]
@@ -75,8 +76,9 @@
 *        the multiple input pixels at each pixel index.  It
 *        can be one of the following options. 
 *          "Mean"   -- Mean value
-*          "WMean"  -- Weighted mean in wich each data value is weighted
-*                      by the reciprocal of the associated variance.  
+*          "WMean"  -- Weighted mean in which each data value is 
+*                      weighted by the reciprocal of the associated 
+*                      variance.  
 *          "Mode"   -- Modal value
 *          "Median" -- Median value.  Note that this is extremely memory
 *                      and CPU intensive for large datasets; use with 
@@ -114,12 +116,6 @@
 *        "Sigma" and "Iwd" are meaningless for combining only two NDFs.
 *        If you supply an unavailable option, you will be informed,
 *        and presented with the available options.   ["Mean"]
-*     ILEVEL = _INTEGER (Read)
-*        The interactive level of the routine (only used if 
-*        SINGLE=TRUE).  If it is 1, nothing is reported on the screen. 
-*        If is is 2 or 3, the  statistics are reported.  If is is 3, 
-*        the individual pixel values are also reported.  It should lie 
-*        between 1 and 3.  [2]
 *     IN = GROUP (Read)
 *        A group of input NDFs.  They may have different shapes, but 
 *        must all have the same number of dimensions.  This should 
@@ -228,14 +224,13 @@
 *     mstats m31* single=true pos="0:42:38,40:52:20" 
 *        This example is analysing the pixel brightness at the indicated
 *        sky position in a number of NDFs whose name start with "m31",
-*        which all have SKY as their current co-ordinate Frame.
-*        The mean and variance of the pixels at that position in all
-*        the NDFs are printed to the screen.
-*     mstats m31* single pos="0:42:38,40:52:20" ilevel=3
-*        This does the same as the previous example, but also prints
-*        out the value of the sampled pixel in each of the NDFs.
-*        For those in which the pixel at the selected position is
-*        bad or falls outside the NDF, this is also indicated.
+*        which all have SKY as their current co-ordinate Frame.  The 
+*        mean and variance of the pixels at that position in all the
+*        NDFs are printed to the screen.  If the reporting level is
+*        verbose, the command also prints the value of the sampled pixel
+*        in each of the NDFs.  For those in which the pixel at the
+*        selected position is bad or falls outside the NDF, this is also
+*        indicated.
 *     mstats in="arr1,arr2,arr3" out=middle estimator=median wlim=1.0
 *        This example calculates the medians of the DATA components of
 *        the three named NDFs and writes them into a new NDF called
@@ -251,6 +246,12 @@
 *     No warning is given when parameter WLIM=0.  Input data containing 
 *     only bad values are not counted in the flagged fraction, since no 
 *     potential good output value has been lost.
+*
+*     - For SINGLE=TRUE the value of the MSG_FILTER environment
+*     variable is used to output messages.  If it is QUIET, nothing is
+*     reported on the screen.  If it is undefined, NORMAL or VERBOSE, 
+*     the statistics are reported.  If it is VERBOSE, the individual 
+*     pixel values are also reported. 
 
 *  Related Applications:
 *     CCDPACK: MAKEMOS, MAKECAL, MAKEFLAT.
@@ -321,6 +322,9 @@
 *        Revise tests regarding the fraction of bad pixels created
 *        whilst forming statistics.  This is arises because of the
 *        changed calculations within the statistics routines.
+*     2009 July 22 (MJC):
+*        Remove ILEVEL parameter and use the current reporting level
+*        instead (set by the global MSG_FILTER environment variable).
 *     {enter_further_changes_here}
 
 *-
@@ -371,7 +375,6 @@
       INTEGER IBLSIZ( NDF__MXDIM ) ! Input-NDF sizes for processing 
                                  ! large datasets in blocks
       INTEGER IGRP               ! GRP identifier for input-NDFs group
-      INTEGER ILEVEL             ! The interaction level
       INTEGER IPCO               ! Pointers to mapped co-ordinate array
       INTEGER IPDAT              ! Pointer to data array
       INTEGER IPIN( 2 )          ! Pointers to mapped input arrays
@@ -460,11 +463,8 @@
 *  Allocate some work space.
          CALL PSX_CALLOC( NNDF, '_DOUBLE', IPDAT, STATUS )
 
-*  Get interaction level for rejection algorithm.
-         CALL PAR_GDR0I( 'ILEVEL', 2, 1, 3, .TRUE., ILEVEL, STATUS )
-
 *  Get the pixels from which to calculate the statistics.
-         CALL KPS1_MSS( IGRP, NNDF, COMP, ILEVEL, NGOOD, 
+         CALL KPS1_MSS( IGRP, NNDF, COMP, NGOOD, 
      :                  %VAL( CNF_PVAL( IPDAT ) ),
      :                  STATUS )
          IF ( STATUS .NE. SAI__OK ) GO TO 999
@@ -493,18 +493,16 @@
             VAR = SUM2 / DBLE( NGOOD ) - MEAN * MEAN
 
 *  Output the results, if required.
-            IF ( ILEVEL .GT. 1 ) THEN
-               CALL MSG_SETD( 'MED', MED )
-               CALL MSG_OUT( ' ', '    Pixel median:      ^MED',
-     :                       STATUS )
-               CALL MSG_SETD( 'MEAN', MEAN )
-               CALL MSG_OUT( ' ', '    Pixel mean:        ^MEAN',
-     :                       STATUS )
-               CALL MSG_SETD( 'VAR', VAR )
-               CALL MSG_OUT( ' ', '    Pixel variance:    ^VAR',
-     :                       STATUS )
-               CALL MSG_BLANK( STATUS )
-            END IF
+            CALL MSG_SETD( 'MED', MED )
+            CALL MSG_OUTIF( MSG__NORM, ' ', 
+     :                      '    Pixel median:      ^MED', STATUS )
+            CALL MSG_SETD( 'MEAN', MEAN )
+            CALL MSG_OUTIF( MSG__NORM, ' ',
+     :                      '    Pixel mean:        ^MEAN', STATUS )
+            CALL MSG_SETD( 'VAR', VAR )
+            CALL MSG_OUTIF( MSG__NORM, ' ',
+     :                      '    Pixel variance:    ^VAR', STATUS )
+            CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  Write them to output parameters.
             CALL PAR_PUT0D( 'MEDIAN', MED, STATUS )

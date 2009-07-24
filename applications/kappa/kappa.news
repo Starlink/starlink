@@ -1,6 +1,6 @@
 1 KAPPA_Version_1.11
 
-   A new release of KAPPA (V1.11) is under development.  The main 
+   A new release of KAPPA (V1.11-2) is under development.  The main 
    changes so far are listed below.  For complete details of all 
    changes, see the "Release Notes" appendix in SUN/95.
 
@@ -9,6 +9,11 @@
    possible through the environment variable MSG_FILTER.
 
 2 Modified_applications
+
+   o  FFCLEAN, MSTATS, WCSMOSAIC
+
+      -  Parameter ILEVEL has been withdrawn.  Instead use the 
+      MSG_FILTER environment variable to control the output messages.
 
    o  NDFCOPY
 

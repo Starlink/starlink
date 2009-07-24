@@ -10371,16 +10371,6 @@ package kappa {
             helpkey *
          }
 
-         parameter ilevel {
-            position 7
-            type _INTEGER
-            vpath DYNAMIC
-            ppath DYNAMIC
-            prompt {Interaction level}
-            default 2
-            helpkey *
-         }
-   
          parameter sigma {
             access WRITE
             type _DOUBLE
@@ -13702,16 +13692,6 @@ iraf! {
             prompt {Method for estimating collapsed pixel values}
             ppath CURRENT DEFAULT
             default Mean
-            helpkey *
-        }
-
-         parameter ilevel {
-            type _INTEGER
-            access READ
-            vpath DEFAULT
-            prompt {Interaction level}
-            ppath CURRENT DEFAULT
-            default 2
             helpkey *
         }
 
@@ -17927,14 +17907,6 @@ iraf! {
             helpkey *
          }
 
-         parameter ilevel {
-            type _INTEGER
-            vpath DEFAULT
-            prompt {Information level}
-            default 2
-            helpkey *
-         }
-   
          parameter in {
             position 1
             type NDF

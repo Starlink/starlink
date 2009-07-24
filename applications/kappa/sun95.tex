@@ -9395,7 +9395,7 @@ regions (the union) are selected.
 
 Where a keyword (such as CIRCLE, RECT, POLYGON) defines an area or
 volume a pixel is deemed to be part of that region if its
-\emph{centre} lies on or within the the boundary of the region.  For
+\emph{centre} lies on or within the boundary of the region.  For
 regions of zero volume (such as keywords PIXEL, LINE, COLUMN), the
 pixel is regarded as part of the region when the locus of the region
 passes through that pixel.  So for example, a PIXEL region will be the
@@ -16423,7 +16423,7 @@ KAPPA: \htmlref{PASTE}{PASTE},
       NCHAN and SHAPE.
 
       For each output pixel, all corresponding input pixel values
-      between the channel bounds of the the nominated axis to be
+      between the channel bounds of the nominated axis to be
       collapsed are combined together using one of a selection of
       estimators, including a mean, mode, or median, to produce the
       output pixel value.
@@ -16489,7 +16489,7 @@ KAPPA: \htmlref{PASTE}{PASTE},
             {\tt "Mean"}  --- Mean value
 
             \sstitem
-            {\tt "WMean"}  --- Weighted mean in wich each data value is weighted
+            {\tt "WMean"}  --- Weighted mean in which each data value is weighted
                         by the reciprocal of the associated variance.  
 
             \sstitem
@@ -16715,7 +16715,7 @@ KAPPA: \htmlref{PASTE}{PASTE},
          This command assumes that the zcube NDF has a current
          co-ordinate system where the first axis is radial velocity
          (perhaps selected using WCSFRAME and \htmlref{WCSATTRIB}{WCSATTRIB}), 
-         and the the second and third axes are {\tt "RA"}, and {\tt "DEC"}. 
+         and the second and third axes are {\tt "RA"}, and {\tt "DEC"}. 
          It extracts seven velocity slabs of the input cube between $-30$ and
          $+$40~km/s, and collapses each slab, into a single two-dimensional 
          array with RA and DEC axes forming a channel image.  Each channel
@@ -17892,7 +17892,7 @@ XV; PBMPLUS; NETPBM.
       (see Parameters LOW and HIGH).
 
       For each output pixel, all corresponding input pixel values 
-      between the specified bounds of the the nominated axis to be
+      between the specified bounds of the nominated axis to be
       collapsed are combined together using one of a selection of
       estimators, including a mean, mode, or median, to produce the
       output pixel value.
@@ -21160,7 +21160,7 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
          the image fills the available space in at least one dimension.
          A value larger than 1.0 makes each data pixel wider.  If this
          results in the image being wider than the available space then
-         the the image will be clipped to display fewer pixels.  See also
+         the image will be clipped to display fewer pixels.  See also
          Parameters YMAGN, CENTRE, SQRPIX, and FILL. [1.0]
       }
       \sstsubsection{
@@ -22605,7 +22605,7 @@ KAPPA: \htmlref{LOG10}{LOG10},
       data array.
    }
    \sstusage{
-      ffclean in out clip box [thresh] [wlim] [ilevel]
+      ffclean in out clip box [thresh] [wlim]
    }
    \sstparameters{
       \sstsubsection{
@@ -22657,23 +22657,10 @@ KAPPA: \htmlref{LOG10}{LOG10},
          value over the whole NDF (or over each section of the NDF if the
          NDF is being processed in sections---see Parameter AXES).  This 
          constant noise level is also displayed on the screen if 
-         Parameter ILEVEL is set to {\tt 2}.  If GENVAR is {\tt FALSE},
-         then the output variances will be copied from the input
-         variances (if the input NDF has no variances, then the output
-         NDF will not have any variances either).  {\tt [FALSE]}
-      }
-      \sstsubsection{
-         ILEVEL = \_INTEGER (Read)
-      }{
-         The interactive level of the routine.  When it is greater or
-         equal to two, the application will report the intermediate
-         results after each iteration during processing.  In addition,
-         it will report the section of the input NDF currently being 
-         processed (but only if the NDF is being processed in
-         sections---see Parameter AXES).  It should lie between 1 and 3.
-         The dynamic default is {\tt 2} if the supplied NDF is being 
-         cleaned as a single array, and {\tt 1} if it is being cleaned 
-         in sections (see Parameter AXES).  {\tt []}
+         the current message-reporting level is at least {\tt NORMAL}.  If 
+         GENVAR is {\tt FALSE}, then the output variances will be copied from
+         the input variances (if the input NDF has no variances, then 
+         the output NDF will not have any variances either).   ).  {\tt [FALSE]}
       }
       \sstsubsection{
          IN = NDF (Read)
@@ -22761,6 +22748,20 @@ KAPPA: \htmlref{LOG10}{LOG10},
          smoothed version of poxy are rejected.  The smoothing is an
          average of a 5-by-5-pixel neighbourhood.
          The filtered NDF is called dazed.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There are different facts reported, their verbosity depending
+         on the current message-reporting level set by environment variable
+         MSG\_FILTER.  When the filtering level is at least as verbose as
+         NORMAL, the application will report the intermediate results after
+         each iteration during processing.  In addition, it will report the
+         section of the input NDF currently being processed (but only if
+         the NDF is being processed in sections---see Parameter AXES).
+
       }
    }
    \sstdiytopic{
@@ -27326,7 +27327,7 @@ KAPPA: \htmlref{HISCOM}{HISCOM},
       \sstexamplesubsection{
          histat image method=his
       }{
-         As above but the the mode is the centre of peak bin in the 
+         As above but the mode is the centre of peak bin in the 
          optimally distributed histogram rather than sub-bin 
          interpolated using neighbouring bins.
       }
@@ -27966,7 +27967,7 @@ plot (6k).
       }{
          This interleaves the one-dimensional NDFs called vector1 and
          vector2 and stores the result in NDF weave.  Only the
-         intersection of the the two input NDFs is used.
+         intersection of the two input NDFs is used.
       }
       \sstexamplesubsection{
          interleave 'image$*$' weave [3,2] title="Interlaced image"
@@ -34872,8 +34873,9 @@ plot (9k).
       co-ordinate Frame of all the NDFs is given, and the value at
       the pixel covering this point in each of the input NDFs is
       accumulated to form the results that comprise the mean, variance,
-      and median.  These statistics, and if ILEVEL={\tt 3}, the value of
-      each contributing pixel, is reported directly to the user.
+      and median.  These statistics, and if environment variable
+      MSG\_FILTER is set to {\tt VERBOSE}, the value of each contributing
+      pixel, is reported directly to you.
    }
    \sstusage{
       mstats in out [estimator]
@@ -34920,7 +34922,7 @@ plot (9k).
             {\tt "Mean"} --- Mean value
 
             \sstitem
-            {\tt "WMean"}  --- Weighted mean in wich each data value is weighted
+            {\tt "WMean"}  --- Weighted mean in which each data value is weighted
                         by the reciprocal of the associated variance.  
 
             \sstitem
@@ -34990,15 +34992,6 @@ plot (9k).
           and {\tt "Iwd"} are meaningless for combining only two NDFs.
           If you supply an unavailable option, you will be informed,
           and presented with the available options.  {\tt ["Mean"]}
-      }
-      \sstsubsection{
-         ILEVEL = \_INTEGER (Read)
-      }{
-         The interactive level of the routine (only used if SINGLE={\tt TRUE}).
-         If it is {\tt 1}, nothing is reported on the screen.  If is is 
-         {\tt 2} or {\tt 3}, the statistics are reported.  If is is {\tt 3}, 
-         the individual pixel values are also reported.  It should lie between 
-         1 and 3.  {\tt [2]}
       }
       \sstsubsection{
          IN = \htmlref{GROUP}{se:groups} (Read)
@@ -35153,15 +35146,11 @@ plot (9k).
          sky position in a number of NDFs whose name start with {\tt "m31"},
          which all have SKY as their current co-ordinate Frame.
          The mean and variance of the pixels at that position in all
-         the NDFs are printed to the screen.
-      }
-      \sstexamplesubsection{
-         mstats m31$*$ single pos="0:42:38,40:52:20" ilevel=3
-      }{
-         This does the same as the previous example, but also prints
-         out the value of the sampled pixel in each of the NDFs.
-         For those in which the pixel at the selected position is
-         bad or falls outside the NDF, this is also indicated.
+         the NDFs are printed to the screen.  If the reporting level is
+         verbose, the command also prints the value of the sampled pixel
+         in each of the NDFs.  For those in which the pixel at the
+         selected position is bad or falls outside the NDF, this is also
+         indicated.
       }
       \sstexamplesubsection{
          mstats in="arr1,arr2,arr3" out=middle estimator=median wlim=1.0
@@ -35185,6 +35174,14 @@ plot (9k).
          No warning is given when Parameter WLIM={\tt 0}.  Input data 
          containing only bad values are not counted in the flagged 
          fraction, since no potential good output value has been lost.
+
+         \sstitem
+         For SINGLE={\tt TRUE} the value of the MSG\_FILTER environment
+         variable is used to output messages.  If it is {\tt QUIET}, nothing 
+         is reported on the screen.  If it is undefined, {\tt NORMAL} or 
+         {\tt VERBOSE}, the statistics are reported.  If it is {\tt VERBOSE}, 
+         the individual pixel values are also reported.
+
       }
    }
    \sstdiytopic{
@@ -47925,7 +47922,7 @@ KAPPA: \htmlref{ADD}{ADD},
          (as defined by the value zero in the NDF polang) is at the
          position angle 23.4 degrees (measured anti-clockwise from the
          positive \textit{y} axis) in the displayed map.  The map is drawn over the
-         top of the the previously drawn DATA picture, aligned in a
+         top of the previously drawn DATA picture, aligned in a
          suitable co-ordinate Frame.
       }
       \sstexamplesubsection{
@@ -49597,15 +49594,6 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          components ({\tt TRUE} is used otherwise).  {\tt [FALSE]}
       }
       \sstsubsection{
-         ILEVEL = \_INTEGER (Read)
-      }{
-        Controls the amount of information displayed on the screen. If
-        set to 1, no information will be displayed while the command
-        is executing. If set to 2, the interpolation method being used 
-        will be displayed. If set to 3, the name of each input NDF will
-        also be displayed as it is processed.  {\tt [2]}
-      }
-      \sstsubsection{
          IN = NDF (Read)
       }{
          A group of input NDFs (of any dimensionality).  This should be
@@ -49863,6 +49851,16 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
 
          \sstitem
          \htmlref{QUALITY}{apndf:quality} is not propagated from input to output.
+
+         \sstitem
+         There are different facts reported, their verbosity depending
+         on the current message-reporting level set by environment variable
+         MSG\_FILTER.  If this is set to {\tt QUIET}, no information will be 
+         displayed while the command is executing.  When the filtering 
+         level is at least as verbose as {\tt NORMAL}, the interpolation method 
+         being used will be displayed.  If set to {\tt VERBOSE}, the name of each
+         input NDF will also be displayed as it is processed.
+
       }
    }
    \sstdiytopic{
@@ -56321,14 +56319,28 @@ The following applications have been modified:
 
 \begin{itemize}
   \item  Control of the verbosity of informational messages is now 
-  possible through the environment variable {\tt MSG\_FILTER}.  See
+  possible through the environment variable {\tt MSG\_FILTER}.  ILEVEL
+  parameters are no longer used.  See
   \hyperref{Verbosity of Messages}{Section }{}{se:msglev} for details.
+  
 \end{itemize}
 
 \subsection{Modified Commands}
 The following applications have been modified:
 
 \begin{description}
+
+   \item [\htmlref{FFCLEAN}{FFCLEAN}]\mbox{}
+      \begin{itemize}
+        \item Parameter ILEVEL has been withdrawn.  Instead use the 
+        MSG\_FILTER environment variable to control the output messages.
+      \end{itemize}
+
+   \item [\htmlref{MSTATS}{MSTATS}] \mbox{}
+      \begin{itemize}
+        \item Parameter ILEVEL has been withdrawn.  Instead use the 
+        MSG\_FILTER environment variable to control the output messages.
+      \end{itemize}
 
    \item [\htmlref{NDFCOPY}{NDFCOPY}] \mbox{}
       \begin{itemize}
@@ -56344,6 +56356,13 @@ The following applications have been modified:
         longitude or latitude axis, the axis units are now converted
         correctly from radians to degrees.
       \end{itemize}
+
+   \item [\htmlref{WCSMOSAIC}{WCSMOSAIC}] \mbox{}
+      \begin{itemize}
+        \item Parameter ILEVEL has been withdrawn.  Instead use the 
+        MSG\_FILTER environment variable to control the output messages.
+      \end{itemize}
+
 
 \end{description}
 

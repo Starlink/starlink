@@ -38,7 +38,7 @@
 *     outliers from the image.
 
 *  Usage:
-*     ffclean in out clip box [thresh] [wlim] [ilevel]
+*     ffclean in out clip box [thresh] [wlim]
 
 *  ADAM Parameters:
 *     AXES( 2 ) = _INTEGER (Read)
@@ -78,22 +78,12 @@
 *        local mean over the supplied box size are stored in the output
 *        VARIANCE component.  This noise level has a constant value over
 *        the whole NDF (or over each section of the NDF if the NDF is 
-*        being processed in sections---see parameter AXES).  This 
-*        constant noise level is also displayed on the screen if 
-*        parameter ILEVEL is set to 2.  If GENVAR is FALSE, then the 
-*        output variances will be copied from the input variances (if 
-*        the input NDF has no variances, then the output NDF will not 
-*        have any variances either).  [FALSE]
-*     ILEVEL = _INTEGER (Read)
-*        The interactive level of the routine.  When it is greater or
-*        equal to two, the application will report the intermediate
-*        results after each iteration during processing.  In addition,
-*        it will report the section of the input NDF currently being 
-*        processed (but only if the NDF is being processed in 
-*        sections---see parameter AXES).  It should lie between 1 and 3.
-*        The dynamic default is 2 if the supplied NDF is being cleaned 
-*        as a single array, and 1 if it is being cleaned in sections 
-*        (see parameter AXES).  []
+*        being processed in sections---see Parameter AXES).  This 
+*        constant noise level is also displayed on the screen if
+*        the current message-reporting level is at least NORMAL.  If 
+*        GENVAR is FALSE, then the output variances will be copied from
+*        the input variances (if the input NDF has no variances, then 
+*        the output NDF will not have any variances either).  [FALSE]
 *     IN = NDF (Read)
 *        The one- or two-dimensional NDF containing the input image to 
 *        be cleaned.
@@ -155,6 +145,15 @@
 *       average of a 5-by-5-pixel neighbourhood.  The filtered NDF is
 *       called dazed.
 
+*  Notes:
+*     -  There are different facts reported, their verbosity depending
+*     on the current message-reporting level set by environment variable
+*     MSG_FILTER.  When the filtering level is at least as verbose as
+*     NORMAL, the application will report the intermediate results after
+*     each iteration during processing.  In addition, it will report the
+*     section of the input NDF currently being processed (but only if
+*     the NDF is being processed in sections---see Parameter AXES).
+
 *  Related Applications:
 *     KAPPA: CHPIX, FILLBAD, GLITCH, MEDIAN, MSTATS, ZAPLIN;
 *     Figaro: BCLEAN, COSREJ, CLEAN, ISEDIT, MEDFILT, MEDSKY, TIPPEX.
@@ -173,7 +172,7 @@
 *     Copyright (C) 1981, 1990-1992 Science & Engineering Research
 *     Council. Copyright (C) 1995, 2004 Central Laboratory of the
 *     Research Councils. 
-*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2008, 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -228,6 +227,9 @@
 *        Use CNF_PVAL.
 *     4-FEB-2008 (DSB):
 *        Added parameters AXES and GENVAR.
+*     2009 July 22 (MJC):
+*        Remove ILEVEL parameter and use the current reporting level
+*        instead (set by the global MSG_FILTER environment variable).
 *     {enter_further_changes_here}
 
 *-
@@ -241,6 +243,7 @@
       INCLUDE 'PRM_PAR'          ! PRM public constants
       INCLUDE 'PAR_ERR'          ! Parameter-system error constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
+      INCLUDE 'MSG_PAR'          ! Message-system constants
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -263,7 +266,6 @@
       INTEGER IBOX( 2 )          ! Smoothing box half-size
       INTEGER IL1                ! Grid index on first looping axis
       INTEGER IL2                ! Grid index on second looping axis
-      INTEGER ILEVEL             ! Interaction level
       INTEGER IPVIN              ! Pointer to input variance array
       INTEGER IPDIN              ! Pointer to input data array
       INTEGER IPVOUT             ! Pointer to output variance array
@@ -646,14 +648,6 @@
 *  iteration.
       CALL PAR_GET1R( 'CLIP', MXCLIP, CLIP, NCLIP, STATUS )
 
-*  Get interaction level for rejection algorithm.
-      IF ( LNEL .EQ. 1 ) THEN
-         ILEVEL = 2
-      ELSE
-         ILEVEL = 1
-      END IF
-      CALL PAR_GDR0I( 'ILEVEL', ILEVEL, 1, 3, .TRUE., ILEVEL, STATUS )
-
 *  Obtain the minimum fraction of good pixels which should be used to
 *  calculate an output pixel value.  Test if a null value is specified
 *  and set SAMBAD appropriately, annulling the error.
@@ -679,6 +673,8 @@
       IF ( ITYPE .EQ. '_DOUBLE' )THEN
          DTHDEF( 1 ) = VAL__BADD
          DTHDEF( 2 ) = VAL__BADD
+         DTHRES( 1 ) = VAL__MIND
+         DTHRES( 2 ) = VAL__MAXD
          CALL PAR_GDR1D( 'THRESH', 2, DTHDEF, VAL__MIND, VAL__MAXD,
      :                   .FALSE., DTHRES, STATUS )
          IF ( STATUS .EQ. PAR__NULL ) THEN
@@ -689,6 +685,8 @@
       ELSE
          THRDEF( 1 ) = VAL__BADR
          THRDEF( 2 ) = VAL__BADR
+         THRESH( 1 ) = VAL__MINR
+         THRESH( 2 ) = VAL__MAXR
          CALL PAR_GDR1R( 'THRESH', 2, THRDEF, VAL__MINR, VAL__MAXR,
      :                   .FALSE., THRESH, STATUS )
          IF ( STATUS .EQ. PAR__NULL ) THEN
@@ -763,7 +761,7 @@
             END IF
 
 *  If required, report the section being processed.
-            IF ( LNEL .GT. 1 .AND. ILEVEL .EQ. 2 ) THEN
+            IF ( LNEL .GT. 1 ) THEN
 
                J = 1
                DO I = 1, NDIMS 
@@ -782,8 +780,9 @@
                END DO
 
                CALL MSG_BLANK( STATUS )
-               CALL MSG_OUT( ' ', '   Processing section (^SEC)...', 
-     :                       STATUS )
+               CALL MSG_OUTIF( MSG__NORM, ' ', 
+     :                         '   Processing section (^SEC)...', 
+     :                         STATUS )
 
             END IF
 
@@ -845,8 +844,7 @@
                CALL KPS1_CFF2R( PDIM( 1 ), PDIM( 2 ), 
      :                          %VAL( CNF_PVAL( IPDIN ) + OFF ), VAR,
      :                          NVAR, %VAL( CNF_PVAL( IPVIN ) + OFF ), 
-     :                          BOX, NCLIP, CLIP,
-     :                          THRESH, ILEVEL, SAMBAD, NLIM, 
+     :                          BOX, NCLIP, CLIP, THRESH, SAMBAD, NLIM, 
      :                          %VAL( CNF_PVAL( PNTINW ) ),
      :                          %VAL( CNF_PVAL( IPDOUT ) + OFF ), 
      :                          %VAL( CNF_PVAL( IPVOUT ) + OFF ), NGOOD,
@@ -857,8 +855,7 @@
                CALL KPS1_CFF2D( PDIM( 1 ), PDIM( 2 ), 
      :                          %VAL( CNF_PVAL( IPDIN ) + OFF ), VAR,
      :                          NVAR, %VAL( CNF_PVAL( IPVIN ) + OFF ), 
-     :                          BOX, NCLIP, CLIP,
-     :                          DTHRES, ILEVEL, SAMBAD, NLIM, 
+     :                          BOX, NCLIP, CLIP, DTHRES, SAMBAD, NLIM, 
      :                          %VAL( CNF_PVAL( PNTINW ) ),
      :                          %VAL( CNF_PVAL( IPDOUT ) + OFF ), 
      :                          %VAL( CNF_PVAL( IPVOUT ) + OFF ), NGOOD,
