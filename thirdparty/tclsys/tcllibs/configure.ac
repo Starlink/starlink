@@ -22,8 +22,6 @@ STAR_DECLARE_DEPENDENCIES([build], [tcl])
 dnl    We may want to invoke make recursively
 AC_PROG_MAKE_SET
 
-AC_ARG_WITH(tcl, [  --with-tcl              directory containing tcl configuration (tclConfig.sh)], with_tclconfig=${withval})
-
 STAR_SPECIAL_INSTALL_COMMAND([
    ( cd tcllibs; $(MAKE) DESTDIR=$$DESTDIR install );
 ])

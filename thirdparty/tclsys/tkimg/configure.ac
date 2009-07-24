@@ -13,19 +13,30 @@ dnl    Sanity-check: name a file in the source directory -- if this
 dnl    isn't found then configure will complain
 AC_CONFIG_SRCDIR([tkimg/configure.in])
 
+dnl    We may want to invoke make recursively
+AC_PROG_MAKE_SET
+
 dnl    Include defaults for Starlink configurations
 STAR_DEFAULTS
 
 STAR_DECLARE_DEPENDENCIES([build], [tcl tk])
 
-dnl    Locate a suitable Tcl/Tk
-STAR_CHECK_PROGS(tcl, Tcl_AppInit )
-STAR_CHECK_PROGS(tk, Tk_Init)
+dnl    Locate a suitable Starlink Tcl/Tk for this build.
+STAR_PATH_TCLTK(8.5, tk)
 
-dnl    We may want to invoke make recursively
-AC_PROG_MAKE_SET
-AC_ARG_WITH(tcl, [  --with-tcl  directory containing tcl configuration (tclConfig.sh)], with_tclconfig=${withval})
-AC_ARG_WITH(tk,  [  --with-tk   directory containing tk configuration (tkConfig.sh)], with_tkconfig=${withval})
+dnl    Allow user control over Tcl and Tk.
+AC_ARG_WITH(tcl, [  --with-tcl              directory containing tcl configuration (tclConfig.sh)],
+            with_tclconfig=${withval})
+AC_ARG_WITH(tk, [  --with-tk              directory containing tk configuration (tkConfig.sh)],
+            with_tkconfig=${withval})
+
+dnl    If no Tcl/Tk given explicitly use the Starlink versions.
+if test "$with_tcl" == ""; then
+   with_tcl="$TCL_PREFIX/lib"
+fi
+if test "$with_tk" == ""; then
+   with_tk="$TCL_PREFIX/lib"
+fi
 
 dnl    To configure TkImg, run ./configure in the subdirectory, passing on any
 dnl    command-line values. 
@@ -34,6 +45,8 @@ dnl    command-line values.
    cmd="./configure --prefix=$prefix \
                     --srcdir=. \
                     --cache-file=../../config.cache \
+                    --with-tcl=$with_tcl \
+                    --with-tk=$with_tk \
                     $ac_configure_args"; \
    echo $cmd; \
    eval $cmd; \

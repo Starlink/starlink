@@ -8,7 +8,7 @@
   <description>TclX</description>
   <!-- <abstract><p></p></abstract> -->
   <dependencies >
-    <build>tcl</build><build>tk</build>
+    <build>tcl</build>
   </dependencies>
   <developers>
     <!-- TclX is maintained on sourceforge, but we take the call first-->
