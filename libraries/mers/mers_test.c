@@ -49,12 +49,13 @@
 #include "sae_par.h"
 
 #include <stdlib.h>
-
+#include <stdio.h>
 
 int main ( void ) {
   int exstat = EXIT_SUCCESS;
   int status = SAI__OK;
   int perc = 0;
+  char curlev[MSG__SZLEV];
 
   /* msgOut */
   msgBell( &status );
@@ -90,8 +91,12 @@ int main ( void ) {
   msgOutiff( MSG__VERB, "", "%3d %% done", &status, perc);
 
   msgIfset( MSG__NONE, &status );
+  (void)msgIflev( curlev, &status );
+  printf( "Current level= %s\n", curlev );
   msgOutif( MSG__QUIET, " ", "Should not see this message", &status );
   msgIfset( MSG__ALL, &status );
+  (void)msgIflev( curlev, &status );
+  printf( "Current level= %s\n", curlev );
   msgOutif( MSG__DEBUG20," ", "Should see this message", &status );
 
 

@@ -89,7 +89,7 @@ err1Print.c mers1Blk.c err1Flush.c errFlush.c errFlbel.c errRep.c err1Rep.c \
 msgLoad.c msgOutif.c msgOutifv.c msg1Print.c msgOut.c msgBlank.c errOut.c errLoad.c \
 msgIflev.c msgIfset.c mers1Getenv.c errTune.c msgTune.c msgFmt.c msgBlankif.c \
 errRepf.c msg1Outif.c msgOutiff.c msgOutf.c msgFlusherr.c msgFlevok.c \
-msg1Ifget.c msgIfgetenv.c
+msg1Ifget.c msgIfgetenv.c msg1Levstr.c
 
 C_INTERFACE_ADAM = 
 

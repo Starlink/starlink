@@ -128,7 +128,7 @@ void msgIfget( const char *pname,
 void msgIfgetenv( const char * ename,
                    int * status );
 
-void msgIflev( msglev_t *filter );
+msglev_t msgIflev( char * filstr, int * status );
 
 void msgIfset( msglev_t filter,
                int *status );

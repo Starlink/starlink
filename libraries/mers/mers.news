@@ -5,6 +5,10 @@ Version 2.1
    from an environment variable in a similar way to msgIfget works
    from an ADAM parameter.
 
+ o Modify msgIflev interface to also return a string representation
+   of the messaging level. API has changed for both Fortran and C
+   interfaces.
+
  o Add MSG_FLEVOK to Fortran interface
 
  o Add MSG_DEBUGx to Fortran MSG_PAR file

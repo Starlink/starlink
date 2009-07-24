@@ -11,4 +11,5 @@ INVIF	<Invalid conditional message filter value.>
 BDPAR	<Invalid tuning parameter name (improper use of MSG_TUNE).>
 BTUNE	<Bad tuning value (improper use of MSG_TUNE).>
 BDENV	<Bad MSG environment variable value.>
+FATAL <Fatal internal error.>
 .END

@@ -97,7 +97,7 @@ void cupidGCListClump( int iclump, int ndim, double *par, double chisq,
    }
 
 /* Report information to standard output if requested. */
-   msgIflev( &curlev );
+   curlev = msgIflev( NULL, status );
    if( curlev == MSG__VERB || curlev == MSG__DEBUG ) {
      msgBlankif( MSG__DEBUG, status );
      msgSeti( "N", iclump );

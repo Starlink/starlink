@@ -59,6 +59,7 @@
 *        can not be used in MSG_OUTIF and comparisons should use MSG_FLEVOK
 *     23-JUL-2009 (TIMJ):
 *        Need to declare MSG_FLEVOK
+*        Add MSG__SZLEV
 *     {enter_further_changes_here}
 
 *-
@@ -72,6 +73,9 @@
 
       INTEGER MSG__QUIET                ! Quiet conditional message output level
       PARAMETER ( MSG__QUIET = 1 )
+
+      INTEGER MSG__SZLEV                ! Size of buffer for MSG_IFLEV
+      PARAMETER ( MSG__SZLEV = 8 )
 
       INTEGER MSG__SZMSG                ! Maximum length of message text
       PARAMETER ( MSG__SZMSG = 300 )

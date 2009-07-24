@@ -75,7 +75,7 @@
 
 *  Set up an integer value representing the current filter level. This
 *  will be used as the default when prompting the user.
-      CALL MSG_IFLEV( FILTER )
+      CALL MSG_IFLEV( FILTER, ' ', STATUS )
       IF( FILTER .EQ. MSG__QUIET ) THEN
          DEFIND = 0
      

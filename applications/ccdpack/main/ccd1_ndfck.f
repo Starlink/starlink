@@ -885,7 +885,7 @@
 
 *  Try for values from the environment. Switch off message about the
 *  size of the NDF. This is not usually needed in this routine.
-                     CALL MSG_IFLEV( MSGLEV )
+                     CALL MSG_IFLEV( MSGLEV, ' ', STATUS )
                      CALL MSG_IFSET( MSG__QUIET, STATUS )
                      CALL CCD1_GTSEC( .FALSE., NDFID, LBND, UBND,
      :                                LBND2, UBND2, OK, STATUS )

@@ -52,6 +52,8 @@
 *        msglev_t is an enum rather than #define
 *     9-JAN-2009 (TIMJ):
 *        Add new message levels for DSB
+*     23-JUL-2009 (TIMJ):
+*        Add MSG__SZLEV
 *     {enter_changes_here}
 
 *-
@@ -93,6 +95,9 @@ typedef enum msglev_t {
 
 /*   Maximum length of message text */
 #define MSG__SZMSG 300 
+
+/*   Minimum length of buffer to contain message level string */
+#define MSG__SZLEV 8
 
 /*. */
 #endif  /* MSG_PAR_DEFINED */

@@ -10,18 +10,28 @@
 *     Starlink ANSI C
 
 *  Invocation:
-*     msgIflev( msglev_t * filter );
+*     msglev_t msgIflev( char * filstr, int * status );
 
 *  Description:
 *     The value of the current filtering level set for conditional
-*     message output is returned.
+*     message output is returned as both a string and as a msglev_t
+*     integer.
 
 *  Arguments:
-*     filter = msglev_t * (Returned)
-*        The current message filtering level.
+*     filstr = char * (Given & Returned)
+*        Buffer to receive the string version of the current message
+*        reporting level. Can be a NULL pointer. If present should be
+*        at least MSG__SZLEV characters (including terminator).
+*     status = int * (Given & Returned)
+*        Inherited global status. Buffer is not touched if status is bad.
+
+*  Returned Value:
+*     msglev_t msgIflev
+*        The current message filtering level. Will be returned even if
+*        status is bad.
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 *     Copyright (C) 1991 Science & Engineering Research Council.
 *     All Rights Reserved.
 
@@ -55,6 +65,8 @@
 *        Rewrite in C
 *     23-DEC-2008 (TIMJ):
 *        Use msglev_t rather than simple integer.
+*     23-JUL-2009 (TIMJ):
+*        Rearrange API to include a string representation.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -63,10 +75,37 @@
 *-
 */
 
+#include "sae_par.h"
 #include "mers1.h"
 #include "merswrap.h"
+#include "msg_err.h"
 
-void msgIflev( msglev_t * filter ) {
+#include <string.h>
+
+msglev_t msgIflev( char * filstr, int * status ) {
   /*  Return the current value of the message output filter level. */
-  *filter = msg1Gtinf();
+  msglev_t filter;              /* Current filter level */
+  const char * match = NULL;    /* Matching string */
+
+  /* This will work even if status is bad */
+  filter = msg1Gtinf();
+
+  if (*status != SAI__OK) return filter;
+
+  /* see if we have to fill in the buffer */
+  if ( filstr ) {
+    match = msg1Levstr( filter );
+    if (match) {
+      /* hope it is the right size */
+      strcpy( filstr, match );
+    } else {
+      /* should not be possible */
+      strcpy( filstr, "ERROR" );
+      *status = MSG__FATAL;
+      errRepf( "", "Internal error trying to convert a messaging level of %d to a string",
+               status, filter );
+    }
+  }
+
+  return filter;
 }

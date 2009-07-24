@@ -676,7 +676,7 @@
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Silent running, but first record the existing reporting level.
-      CALL MSG_IFLEV( MSGFIL )
+      CALL MSG_IFLEV( MSGFIL, ' ', STATUS )
       IF ( QUIET ) CALL MSG_IFSET( MSG__QUIET, STATUS )
 
 *  Attempt to open a log file to store the results for human readers.  

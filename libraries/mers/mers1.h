@@ -10,7 +10,7 @@
 *     This include file is for internal C definitions only.
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council
+*     Copyright (C) 2008-2009 Science and Technology Facilities Council
 *     All Rights Reserved.
 
 *  Licence:
@@ -37,6 +37,8 @@
 *        Initial version.
 *     23-DEC-2008 (TIMJ):
 *        Use msglev_t rather than simple integer.
+*     23-JUL-2009 (TIMJ):
+*        Add msg1Levstr
 
 *-
 */
@@ -87,6 +89,7 @@ int msg1Gref( const char * param, char *refstr, size_t reflen );
 int msg1Gkey( const char * param, char *keystr, size_t keylen );
 
 void msg1Ktok ( void );
+const char * msg1Levstr( msglev_t filter );
 void msg1Outif( msglev_t prior, const char * param, const char * text,
                 int useformat, va_list args, int *status );
 void msg1Prtln( const char * text, int * status );
