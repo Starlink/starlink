@@ -21,6 +21,8 @@
 %        Original version, borrowing from SC11
 %     2009-06-04 (EC):
 %        Changed to SC19 from SC18 to avoid conflict with X-ray cookbook
+%     2009-07-24 (EC):
+%        Updated metadata, set version to 0.5, removed .eps from filenames
 %     {Add further history here}
 %
 % -
@@ -46,14 +48,20 @@
 \newcommand{\stardoccategory}  {Starlink Cookbook}
 \newcommand{\stardocinitials}  {SC}
 \newcommand{\stardocsource}    {sc\stardocnumber}
+\newcommand{\stardoccopyright} 
+{Copyright \copyright\ 2009 University of British Columbia}
 \newcommand{\stardocnumber}    {19.01}
-\newcommand{\stardocauthors}   {E. Chapin \\ 
-University of British Columbia}
-\newcommand{\stardocdate}      {22 May 2009}
+\newcommand{\stardocauthors}   {Edward Chapin}
+\newcommand{\stardocdate}      {24 July 2009}
 \newcommand{\stardoctitle}     {The SMURF SCUBA-2 data analysis cookbook}
-\newcommand{\stardocversion}   {\ }
+\newcommand{\stardocversion}   {0.5}
 \newcommand{\stardocmanual}    {\ }
-\newcommand{\stardocabstract}  {[Text of abstract]}
+\newcommand{\stardocabstract}  {
+
+  This guide provides a short introduction to \starlink\ facilities
+  for displaying SCUBA-2 total power data, and producing maps.
+
+}
 % ? End of document identification
  
 % A new environment for quoting verbatim
@@ -69,7 +77,7 @@ University of British Columbia}
 
  
 % Starlink Package names
-\newcommand{\starlink}{\htmladdnormallink{Starlink}{http://star-www.rl.ac.uk/}} 
+\newcommand{\starlink}{\htmladdnormallink{Starlink}{http://starlink.jach.hawaii.edu}} 
 
 % set up some common package names
 \newcommand{\Kappa}{\xref{\textsc{Kappa}}{sun95}{}}
@@ -368,9 +376,9 @@ University of British Columbia}
 %  Latex document header.
 %  ======================
 \begin{latexonly}
-   CCLRC / {\textsc Rutherford Appleton Laboratory} \hfill {\textbf 
+   \textsc{University of British Columbia} \hfill {\textbf 
 \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large  Science \& Technology Facilities Council}\\
    {\large Starlink Project\\}
    {\large \stardoccategory\ \stardocnumber}
    \begin{flushright}
@@ -390,7 +398,7 @@ University of British Columbia}
 % ? Add picture here if required for the LaTeX version.
 %   e.g. \includegraphics[scale=0.3]{filename.ps}
 \begin{center}
-\hspace{1.3in}\includegraphics[width=4.0in]{sc19_logo.eps}
+\hspace{1.3in}\includegraphics[scale=0.3]{sc19_logo}
 \end{center}
 % ? End of picture
 
@@ -414,7 +422,7 @@ University of British Columbia}
 
 % ? Add picture here if required for the hypertext version.
 %   e.g. \includegraphics[scale=0.7]{filename.ps}
-\includegraphics[width=2.0in]{sc19_logo.eps}
+\includegraphics[width=2.0in]{sc19_logo}
 % ? End of picture
 
    \begin{rawhtml} <P> <I> \end{rawhtml}
@@ -457,7 +465,7 @@ Council}
 
 % ? Document Abstract. (if used)
 %  ==================
-%\stardocabstract
+\stardocabstract
 % ? End of document abstract
 % ------------------------------------------------------------------------
 
@@ -581,8 +589,8 @@ information into a simple ASCII tab separated table:
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=0.61\linewidth]{gaia_main.eps}\hspace{0.03\linewidth}
-\includegraphics[width=0.33\linewidth]{gaia_sections.eps}
+\includegraphics[width=0.61\linewidth]{gaia_main}\hspace{0.03\linewidth}
+\includegraphics[width=0.33\linewidth]{gaia_sections}
 \caption{Initial \gaia\ windows displayed upon loading a data
   cube. {\bf left:} The main window, after hitting the `Z' button a
   number of times to zoom-in, shows a map of the detector values at a
@@ -616,7 +624,7 @@ detector are similar, their mean levels are quite different.
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=0.7\linewidth]{gaia_spec.eps}
+\includegraphics[width=0.7\linewidth]{gaia_spec}
 \caption{The `Spectral Plot' window is spawned automatically once you
   click on a detector in the main window, displaying its time-varying
   signal. The vertical red line indicates the time slice that is
@@ -649,7 +657,7 @@ nothing can be seen in the resulting image with \gaia.
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=0.5\linewidth]{rawmap.eps}
+\includegraphics[width=0.5\linewidth]{rawmap}
 \caption{Map produced from raw data of a scan across Jupiter. The
   image is completely dominated by noise in the relative signal
   offsets of each bolometer, and no astronomical signal can be seen.}
@@ -677,7 +685,7 @@ detector time stream, storing the cleaned data in a file called clean.sdf:
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=0.5\linewidth]{array_mean.eps}
+\includegraphics[width=0.5\linewidth]{array_mean}
 \caption{\gaia\ plot of the array signal at time slice 3401 after
   using \clean\ to remove the mean of each detector signal. The LOW
   and HIGH data values for the intensity plot are $-1\times10^{-13}$
@@ -720,9 +728,9 @@ beginning and end, and then apodize and filter the single large file.
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=\linewidth]{spec_filt.eps} \\
+\includegraphics[width=\linewidth]{spec_filt} \\
 \vspace{0.3in}
-\includegraphics[width=0.5\linewidth]{map_highpass.eps}
+\includegraphics[width=0.5\linewidth]{map_highpass}
 \caption{High-pass filtered data. {\bf top:} The time series for a
   single detector. The x-axis units have been changed to Pixels in the
   `Display image sections of a cube' dialogue by selecting
@@ -822,7 +830,7 @@ detector, with a $1/f$ knee apparent at about 3\,Hz.
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=\linewidth]{pspec.eps}
+\includegraphics[width=\linewidth]{pspec}
 \caption{The power spectrum of a single bolometer produced by the
   \smurf\ task \fft.}
 \label{fig:pspec}
@@ -963,7 +971,7 @@ resulting image.
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=0.5\linewidth]{map_iterate.eps}
+\includegraphics[width=0.5\linewidth]{map_iterate}
 \caption{Map of Jupiter produced with the \smurf\ task \makemap\ using
   the iterative algorithm with default parameters. Most of the noise
   using simpler reductions has been reduced. The extended structures
@@ -1050,11 +1058,11 @@ input bolometer data).
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=0.9\linewidth]{iter_ast.eps} \\
-\includegraphics[width=0.9\linewidth]{iter_com.eps} \\
-\includegraphics[width=0.9\linewidth]{iter_flt.eps} \\
-\includegraphics[width=0.9\linewidth]{iter_res.eps} \\
-\includegraphics[width=0.9\linewidth]{iter_qua.eps} \\
+\includegraphics[width=0.9\linewidth]{iter_ast} \\
+\includegraphics[width=0.9\linewidth]{iter_com} \\
+\includegraphics[width=0.9\linewidth]{iter_flt} \\
+\includegraphics[width=0.9\linewidth]{iter_res} \\
+\includegraphics[width=0.9\linewidth]{iter_qua} \\
 \caption{Time-domain components of the iterative solution. From top to
   bottom: ASTronomical signal, COMmon mode, FiLTered, RESidual, and
   QUAlity. All of the figures (with the exception of the 1-d
