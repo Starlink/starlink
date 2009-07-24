@@ -64,10 +64,12 @@
 *     2008-12-09 (TIMJ):
 *        Only set system to AZEL if it is not already AZEL. Do not reset
 *        system.
+*     2009-07-23 (TIMJ):
+*        Use msgFlevok rather than msgIflev
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 *     Copyright (C) 2006-2008 University of British Columbia.
 *     All Rights Reserved.
 
@@ -122,7 +124,6 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky,
   gsl_matrix *azelmatx = NULL; /* Matrix of input positions */
   size_t base;             /* Starting point for index into arrays */
   double chisq;            /* Chi-squared from the linear regression fit */
-  msglev_t curlevel;       /* Current messaging level */
   smfData *data = NULL;    /* Pointer to current smfData */
   double dskyaz;           /* Sky power fit - azimuth gradient */
   double dskyel;           /* Sky power fit - elev gradient */
@@ -251,8 +252,7 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky,
       }
       *meansky = sky0;
       /* Debugging info */
-      msgIflev( &curlevel );
-      if (curlevel >= MSG__DEBUG) {
+      if (msgFlevok( MSG__DEBUG, status )) {
         msgSeti("K",k+1);
         msgSetc("F",fittype);
         msgOutif(MSG__DEBUG," ", 
@@ -393,8 +393,7 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky,
       *meansky /= (double)numgood;
 
       /* Debugging info */
-      msgIflev( &curlevel );
-      if (curlevel >= MSG__DEBUG) {
+      if (msgFlevok( MSG__DEBUG, status )) {
         msgSeti("K",k+1);
         msgSetc("F",fittype);
         msgOutif(MSG__DEBUG," ", 

@@ -44,6 +44,7 @@
 
 *  Authors:
 *     Edward Chapin (UBC)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -55,9 +56,12 @@
 *     2008-10-16 (EC):
 *        - remove wrapping at ends of bolo data
 *        - option to flag bolo as bad if steps detected
+*     2009-07-23 (TIMJ):
+*        Use msgFlevok rather than msgIflev
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2009 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
 *     University of British Columbia.
 *     All Rights Reserved.
@@ -109,7 +113,6 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
   double *alljump=NULL;         /* Buffer containing DC jumps */
   dim_t base;                   /* Index to starting point of bolo */
   double baseline;              /* Current baseline estimate  */
-  msglev_t curlevel;            /* Current messaging level */
   double *dat=NULL;             /* Pointer to bolo data */
   double dcstep;                /* Size of DC steps to detect */
   dim_t i;                      /* Loop Counter */
@@ -281,7 +284,6 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
 	  /* calculate the new corrected baseline if requested */
           if( !flagbolo ) {
             baseline = 0;
-            msgIflev( &curlevel );
             for( j=1; j<ntslice; j++ ) {
               if( alljump[j] ) {
 
@@ -291,7 +293,7 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
                 /* Flag the jump in QUALITY */
                 qua[base+j] |= SMF__Q_JUMP;
 
-                if( curlevel >= MSG__DEBUG ) {
+                if( msgFlevok( MSG__DEBUG, status ) ) {
                   msgSeti( "BOL", i );
                   msgSeti( "T", j );
                   msgSetd( "STEP", alljump[j] );

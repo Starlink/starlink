@@ -62,6 +62,7 @@
 
 *  Authors:
 *     Ed Chapin (UBC)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -76,8 +77,11 @@
 *        -flag bolo as bad if fit failed
 *     2009-01-06 (EC):
 *        Stride-ify
+*     2009-07-23 (TIMJ):
+*        Use msgFlevok rather than msgIflev
 
 *  Copyright:
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     Copyright (C) 2008-2009 University of British Columbia.
 *     All Rights Reserved.
 
@@ -124,7 +128,6 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
   size_t bstride;         /* Bolometer index stride */
   double corr;            /* Linear correlation coefficient */
   double *corrbuf=NULL;   /* Array of correlation coeffs all bolos this col */
-  msglev_t curlevel;      /* Current messaging level */
   int needDA=0;           /* Do we need dksquids from the DA? */ 
   int dkgood;             /* Flag for non-constant dark squid */ 
   double *dksquid=NULL;   /* Buffer for smoothed dark squid */
@@ -290,11 +293,10 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
                   status );
         }
        
-        msgIflev( &curlevel );
         if( *status == SMF__INSMP ) {
           /* Annul SMF__INSMP as it was probably due to a bad bolometer */
           errAnnul( status );
-          if( curlevel >= MSG__DEBUG ) {
+          if( msgFlevok( MSG__DEBUG, status) ) {
             msgSeti( "COL", i );
             msgSeti( "ROW", j );
             msgOutif( MSG__DEBUG, "", FUNC_NAME
@@ -316,7 +318,7 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
             corrbuf[j] = corr;
           }
 
-          if( curlevel >= MSG__DEBUG ) {
+          if( msgFlevok( MSG__DEBUG, status ) ) {
             msgSeti( "COL", i );
             msgSeti( "ROW", j );
             msgSetd( "GAI", gain );

@@ -97,10 +97,12 @@
 *        Return mean sky level subtracted
 *     2008-12-09 (TIMJ):
 *        Remove astSet calls that are not needed.
-*     {enter_further_changes_here}
+*     2009-07-23 (TIMJ):
+*        Use msgFlevok rather than msgIflev
+*     {enter_further_changes_here} 
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 *     Copyright (C) 2006-2007 University of British Columbia.
 *     Copyright (C) 2006-2007 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
@@ -164,7 +166,6 @@ void smf_subtract_plane1( smfData *data, const char *fittype, double *meansky,
   double c[2];              /* Coordinates for point C (zenith) */
   double chisq = 0;         /* Chi-squared from the linear regression fit */
   double cosalpha;          /* Cosine alpha */
-  msglev_t curlevel;        /* Current messaging level */
   double dalpha;            /* Change in focal plane angle (radians) */
   double delta;             /* Change in angle */
   double dskyaz;            /* Sky power fit - azimuth gradient */
@@ -448,8 +449,7 @@ void smf_subtract_plane1( smfData *data, const char *fittype, double *meansky,
 
     /* Debugging info - do not set all the tokens unless we
        actually need to print them out */
-    msgIflev( &curlevel );
-    if (curlevel >= MSG__DEBUG) {
+    if (msgFlevok( MSG__DEBUG, status )) {
       msgSeti("K",k+1);
       msgSetc("F",fittype);
       msgOutif(MSG__DEBUG," ", 
