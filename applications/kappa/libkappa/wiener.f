@@ -20,13 +20,13 @@
 *        The global status.
 
 *  Description:
-*     This application filters the supplied 1- or 2-dimensional array
-*     using a Wiener filter.  It takes an array holding observed data
-*     and another holding a Point-Spread Function as input and produces
-*     an output restored array with potentially higher resolution and
-*     lower noise.  Generally superior results can be obtained using
-*     applications MEM2D or LUCY, but at the cost of much more
-*     processing time.
+*     This application filters the supplied one- or two-dimensional 
+*     array using a Wiener filter.  It takes an array holding observed 
+*     data and another holding a Point-Spread Function as input and 
+*     produces an output restored array with potentially higher
+*     resolution and lower noise.  Generally superior results can be 
+*     obtained using applications MEM2D or LUCY, but at the cost of 
+*     much more processing time.
 *
 *     The Wiener filter attempts to minimise the mean squared
 *     difference between the undegraded image and the restored image.
@@ -73,7 +73,7 @@
 *     where H is the Fourier transform of the supplied Point-Spread
 *     Function, Pn is the noise power, Pg is the power in the model
 *     image, and the asterisk represents complex conjugation.  If the
-*     supplied model includes noise (as indicated by parameter QUIET)
+*     supplied model includes noise (as indicated by Parameter QUIET)
 *     then Pn is subtracted from Pg before evaluating the above
 *     expression.
 
@@ -95,11 +95,11 @@
 *        spectrum of the restored image.  Any bad values in this image
 *        are replaced by the mean of the good values.  If a null value
 *        is supplied then the model power spectrum is taken to be
-*        uniform with a value specified by parameter PMODEL. [!]
+*        uniform with a value specified by Parameter PMODEL. [!]
 *     OUT = NDF (Write)
 *        The restored output array.  An extension named WIENER is added
 *        to the output NDF to indicate that the image was created by
-*        this application (see parameter QUIET). 
+*        this application (see Parameter QUIET). 
 *     PMODEL = _REAL (Read)
 *        The mean power per pixel in the model image.  This parameter
 *        is only accessed if a null value is supplied for parameter
@@ -124,12 +124,12 @@
 *        the supplied NDF.
 *     QUIET = _LOGICAL (Read)
 *        This specifies whether or not the image given for parameter
-*        MODEL (or the value given for parameter PMODEL), includes
+*        MODEL (or the value given for Parameter PMODEL), includes
 *        noise.  If the model does not include any noise then a TRUE
 *        value should be supplied for QUIET.  If there is any noise in
 *        the model then QUIET should be supplied FALSE.  If a null (!) 
 *        value is supplied, the value used is FALSE, unless the image 
-*        given for parameter MODEL was created by a previous run of WIENER 
+*        given for Parameter MODEL was created by a previous run of WIENER 
 *        (as indicated by the presence of a WIENER extension in the NDF), 
 *        in which case the run time default is TRUE (i.e. the previous 
 *        run of WIENER is assumed to have removed the noise). [!]
@@ -189,7 +189,7 @@
 *        except that the power spectrum of the restored image is
 *        modelled on that of NDF theory, which may for instance
 *        contain a theoretical model of the object in NDF cenA,
-*        together with a simulated star field.  The parameter QUIET is
+*        together with a simulated star field.  The Parameter QUIET is
 *        set to a TRUE value to indicate that the theoretical model
 *        contains no noise.
 
@@ -199,7 +199,7 @@
 *     array is extended by a margin along each edge to avoid problems
 *     of wrap-around between opposite edges of the array.  The width of
 *     this margin is about equal to the width of the significant part
-*     of the PSF (as determined by parameter THRESH).  The application
+*     of the PSF (as determined by Parameter THRESH).  The application
 *     displays the width of these margins.  The margins are filled by
 *     replicating the edge pixels from the supplied input NDFs.
 
@@ -222,7 +222,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -232,8 +232,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -252,7 +252,7 @@
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
 *     {enter_further_changes_here}
 
 *-

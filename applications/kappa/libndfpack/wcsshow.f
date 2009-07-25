@@ -4,7 +4,7 @@
 *     WCSSHOW
 
 *  Purpose:
-*     Examine the internal structure of an AST Object.
+*     Examines the internal structure of an AST Object.
 
 *  Language:
 *     Starlink Fortran 77
@@ -23,9 +23,9 @@
 *     This application allows you to examine an AST Object stored in a
 *     specified NDF or HDS object, or a catalogue. The structure can be 
 *     dumped to a text file, or a Graphical User Interface can be used 
-*     to navigate through the structure (see parameter LOGFILE). A new 
+*     to navigate through the structure (see Parameter LOGFILE). A new 
 *     FrameSet can also be stored in the WCS component of an NDF (see 
-*     parameter NEWWCS). This allows an NDF WCS component to be dumped 
+*     Parameter NEWWCS). This allows an NDF WCS component to be dumped 
 *     to a text file, edited, and then restored to the NDF.
 *
 *     The GUI main window contains the attribute values of the supplied AST 
@@ -47,7 +47,7 @@
 *        A catalogue containing a positions list such as produced by 
 *        applications LISTMAKE, CURSOR, etc. If supplied, the WCS
 *        Information in the catalogue is displayed. If a null (!) is
-*        supplied, the WCS information in the NDF specified by parameter 
+*        supplied, the WCS information in the NDF specified by Parameter 
 *        NDF is displayed. [!]
 *     FULL = _INTEGER (Read)
 *        This parameter is a three-state flag and takes values of -1, 0 or
@@ -65,17 +65,17 @@
 *        is not produced. [!]
 *     NDF = NDF (Read or Update)
 *        If an NDF is supplied, then its WCS FrameSet is displayed. If a
-*        null (!) value is supplied, then the parameter OBJECT is used to
+*        null (!) value is supplied, then the Parameter OBJECT is used to
 *        specify the AST Object to display. Update access is required to
-*        the NDF if a value is given for parameter NEWWCS. Otherwise, only
+*        the NDF if a value is given for Parameter NEWWCS. Otherwise, only
 *        read access is required. Only accessed if a null (!) value is 
 *        supplied for CAT.
 *     NEWWCS = GROUP (Read)
 *        A group expression giving a dump of an AST FrameSet which
-*        is to be stored as the WCS component in the NDF given by parameter 
+*        is to be stored as the WCS component in the NDF given by Parameter 
 *        NDF. The existing WCS component is unchanged if a null value is
 *        supplied. The value supplied for this parameter is ignored if a 
-*        null value is supplied for parameter NDF. The Base Frame in the 
+*        null value is supplied for Parameter NDF. The Base Frame in the 
 *        FrameSet is assumed to be the GRID Frame. If a value is given for 
 *        this parameter, then the log file or Tk browser will display the 
 *        new FrameSet (after being stored in the NDF and retrieved). [!]
@@ -88,7 +88,7 @@
 *        If TRUE, then the structure of the AST Object is not displayed
 *        (using the Tk GUI). Other functions are unaffected. If a null (!) 
 *        value is supplied, the value used is TRUE if a non-null value is 
-*        supplied for parameter LOGFILE or parameter NEWWCS, and FALSE 
+*        supplied for Parameter LOGFILE or Parameter NEWWCS, and FALSE 
 *        otherwise. [!]
 
 *  Examples:
@@ -137,9 +137,9 @@
 *     2-APR-1998 (DSB):
 *        Original version.
 *     5-OCT-1998 (DSB):
-*        Added parameter NDF.
+*        Added Parameter NDF.
 *     22-JUN-1999 (DSB):
-*        Added parameter CAT.
+*        Added Parameter CAT.
 *     1-OCT-2004 (TIMJ):
 *        Access to KPG_AST restricted to libkpg. Use setter functions.
 *     4-OCT-2004 (TIMJ):
@@ -197,7 +197,7 @@
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
-*  Attempt to get a group expression using parameter NEWWCS.
+*  Attempt to get a group expression using Parameter NEWWCS.
       IGRP = GRP__NOID
       CALL KPG1_GTGRP( 'NEWWCS', IGRP, SIZE, STATUS )
 
@@ -296,7 +296,7 @@
                   CALL MSG_SETC( 'CLASS', AST_GETC( IAST, 'CLASS', 
      :                                              STATUS ) )
                   CALL ERR_REP( 'WCSSHOW_ERR', 'An AST ^CLASS has '//
-     :                          'been supplied using parameter '//
+     :                          'been supplied using Parameter '//
      :                          '%NEWWCS. A FrameSet must be supplied.',
      :                          STATUS )
                END IF
@@ -308,7 +308,7 @@
             ELSE IF( STATUS .EQ. SAI__OK ) THEN
                STATUS = SAI__ERROR
                CALL ERR_REP( 'WCSSHOW_ERR', 'Could not read an AST '//
-     :                       'Object using parameter %NEWWCS.', STATUS )
+     :                       'Object using Parameter %NEWWCS.', STATUS )
             END IF
 
 *  Delete the group.
@@ -326,7 +326,7 @@
          CALL NDF_ANNUL( INDF, STATUS )
 
 *  If no NDF or catalogue was supplied, annull any PAR__NULL error and use
-*  parameter OBJECT to get the AST Object to display.
+*  Parameter OBJECT to get the AST Object to display.
       ELSE IF( IAST .EQ. AST__NULL ) THEN      
          IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
 
