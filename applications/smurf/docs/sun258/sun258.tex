@@ -184,8 +184,8 @@
 \newcommand{\KAPPAref}{\xref{\KAPPA}{sun95}{}}
 \newcommand{\SMURF}{\textsc{smurf}}
 \newcommand{\SMURFcook}{\xref{\SMURF\ SCUBA-2 Cookbook}{sc19}{}}
-\newcommand{\ADAM}{\xref{ADAM}{sg4}}
-\newcommand{\AST}{\xref{AST}{sun210}}
+\newcommand{\ADAM}{\xref{ADAM}{sg4}{}}
+\newcommand{\AST}{\xref{AST}{sun210}{}}
 \newcommand{\ndf}{\xref{NDF}{sun33}{}}
 
 % Application tasks
@@ -241,6 +241,7 @@
 \newcommand{\thresh}{\xref{\task{thresh}}{sun95}{THRESH}}
 \newcommand{\wcsmosaic}{\xref{\task{wcsmosaic}}{sun95}{WCSMOSAIC}}
 \newcommand{\wcsalign}{\xref{\task{wcsalign}}{sun95}{WCSALIGN}}
+\newcommand{\wcsattrib}{\xref{\task{wcsattrib}}{sun95}{WCSATTRIB}}
 
 % macros for typesetting parameters
 \newcommand{\aparam}[1]{\texttt{#1}}     % ADAM parameter
@@ -760,12 +761,12 @@ number of messages written to the terminal.
 \hline
 Option  & Description \\
 \hline
-none   & No messages \\
+none    & No messages \\
 quiet   & Limited messages \\
 normal  & Very few messages \\
 verbose & Full messages \\
 debug   & Some debugging messages (useful for programmers) \\
-all & All messages regardless of debug level \\
+all     & All messages regardless of debug level \\
 \hline
 \end{tabular}
 \label{tab:msgfilter}
@@ -825,8 +826,6 @@ command line are denoted by fixed-width type (e.g.\ \texttt{\%
 Parameters are displayed in caps using a fixed-width type (e.g.\
 \aparam{PIXSIZE}).
 
-%\section{ACSIS and SCUBA-2 Data}
-
 \subsection{Data File Structure}
 
 Data files for both ACSIS and SCUBA-2 use the Starlink N-Dimensional
@@ -884,10 +883,13 @@ made (known as \aparam{TRACKING}).
 
 \subsubsection{Moving sources}
 
-WCS attributes to set...
-
 The mapping tasks \qlmakemap, \makemap\ and \makecube\ automatically
-deal with moving sources.
+deal with moving sources. There is no need to deal with moving sources
+explicitly for any processing with \SMURF. However, mosaicking of
+DREAM and STARE images of moving sources will require the WCS
+attributes \verb+AlignOffset+ and \verb+SkyRefIs+ to be changed to 1
+and ``origin'' respectively. Use the \KAPPA\ task \wcsattrib\ to
+modify these attributes.
 
 \subsection{File sizes and disk space}
 
@@ -930,22 +932,20 @@ searching for the FITS keyword \texttt{SHUTTER}, which is 0 for dark
 frames.
 
 Two general approaches may be taken to data reduction. The first,
-outlined by the steps in Section \ref{se:multistep}, performs all of
-the data reduction tasks using a range of individual calls to \SMURF\
-tasks (with the exception of \qlmakemap\ which encapsulates the most
-important of these operations in a single command). This method is
-useful if the user wishes to interact and view each step of the
-reduction, although the final maps are generally not of ``science
-grade'' quality. A second approach is to use the Dynamic Iterative Map
-Maker, described in Section \ref{se:dimm}. All of the data
-pre-processing steps, as well as an iterated solution for the final
-map are handled using a single command. While the processing time may
-be larger, the reduced maps are of superior quality.
+outlined by the steps in Section \ref{se:dsworkflow} and
+\ref{se:rebin}, performs all of the data reduction tasks using a range
+of individual calls to \SMURF\ tasks (with the exception of
+\qlmakemap\ which encapsulates the most important of these operations
+in a single command). This method is useful if the user wishes to
+interact and view each step of the reduction, although the final maps
+are generally not of ``science grade'' quality. A second approach is
+to use the Dynamic Iterative Map Maker, described in Section
+\ref{se:dimm}. All of the data pre-processing steps, as well as an
+iterated solution for the final map are handled using a single
+command. While the processing time may be larger, the reduced maps are
+of superior quality.
 
-\subsection{\xlabel{multistep}\label{se:multistep}Reducing data one
-  step at a time}
-
-\subsubsection{\xlabel{arraycal}Array Calibration and Characterization Data\label{se:arraycal}}
+\subsection{\xlabel{arraycal}Array Calibration and Characterization Data\label{se:arraycal}}
 
 Data from array calibration observations (such as FLATFIELD and NOISE)
 are processed with \SMURF. NOISE observations are used to identify
@@ -955,7 +955,7 @@ they are included here for completeness. Note that for both
 observation types the data are all ``dark'', i.e.\ the value of
 \texttt{SHUTTER} is 0.
 
-\paragraph{\xlabel{flatcal}FLATFIELD\label{se:flatcal}} \ \\
+\subsubsection{\xlabel{flatcal}FLATFIELD\label{se:flatcal}}
 
 FLATFIELD observations are processed with the \calcflat\ command. The
 input data must be from the same observation and the same
@@ -982,7 +982,7 @@ create a responsivity image for the current subarray. The
 responsivity. The responsivity has units of A/W.
 %WHAT ELSE CAN WE SAY ABOUT THE RESPONSIVITY?
 
-\paragraph{NOISE} \ \\
+\subsubsection{NOISE}
 
 NOISE observations are designed to check that the bolometers are
 operating within spec. This is achieved by calculating the power
@@ -1004,7 +1004,7 @@ Bad bolometer masks are supported by the \flatfield, \extinction,
 \remsky, \qlmakemap\ and \makemap\ tasks through the \aparam{BPM}
 parameter.
 
-\subsubsection{\xlabel{dsworkflow}DREAM/STARE Data Reduction Workflow\label{se:dsworkflow}}
+\subsection{\xlabel{dsworkflow}DREAM/STARE Data Reduction Workflow\label{se:dsworkflow}}
 
 The DREAM/STARE observing modes are designed for mapping compact
 sources, i.e.\ those which are smaller than the field of view of
@@ -1025,7 +1025,7 @@ The workflow proceeds as follows:
 \item Combine images to create output mosaic.
 \end{enumerate}
 
-\paragraph{DA images} \ \\
+\subsubsection{DA images}
 
 The images calculated by the DA are stored as NDF extensions in the
 raw data files under \texttt{.MORE.SCU2RED.In} where \texttt{n} is an
@@ -1035,7 +1035,7 @@ samples remain if the duration of the file is not an integer number of
 seconds. Each image has its own FITS header associated with it which
 contains values which vary between images.
 
-\paragraph{\xlabel{flatfield}Applying the Flatfield Correction\label{se:flatfield}} \ \\
+\subsubsection{\xlabel{flatfield}Applying the Flatfield Correction\label{se:flatfield}}
 
 This section describes how to apply the flatfield solution to raw
 data. This step is not necessary for the simplified workflow.
@@ -1071,7 +1071,7 @@ given is truncated at the appropriate number. The list of files
 actually written to disk is obtained via the \aparam{OUTFILES}
 parameter if specified.
 
-\paragraph{\xlabel{skysub}Removing the atmosphere\label{se:skysub}} \ \\
+\subsubsection{\xlabel{skysub}Removing the atmosphere\label{se:skysub}}
 
 This section describes how to subtract the signal from the atmosphere
 (or sky) from your observations. This step is required for both the
@@ -1090,7 +1090,7 @@ SCUBA-2 field of view which enables simple sky removal techniques to
 be used effectively.
 
 \begin{latexonly}
-   \begin{figure}[hbt]
+   \begin{figure}[htb]
    \begin{center}
      \includegraphics[width=150mm]{sun258_submmsignal}
      \caption{Illustration of the relative magnitudes of atmospheric
@@ -1143,7 +1143,7 @@ be obtained by fitting a plane to the data. The plane may have
 arbitrary orientation (in azimuth and elevation) or may be fixed so
 that the slope is in elevation only.
 
-\paragraph{\xlabel{extinction}Correcting for atmospheric extinction\label{se:extinction}} \ \\
+\subsubsection{\xlabel{extinction}Correcting for atmospheric extinction\label{se:extinction}}
 
 This section describes how to correct your data for atmospheric
 extinction, the loss of radiation from the source as it travels
@@ -1182,18 +1182,13 @@ follows:
 \label{eq:tau}
 \end{equation}
 
-%\begin{figure}
-%\includegraphics{extinction.eps}
-%\caption{Atmospheric extinction as a function of airmass.}
-%\end{figure}
-
 Using Equation \ref{eq:tau}, rewrite Equation \ref{eq:iobs} as:
 \begin{equation}
 I_{\rm obs} = I_{\rm atm} + I_{\rm src} \exp \left( 
 \frac{-\tau_{\rm zenith}}{\cos(90-\phi)}\right)
 \end{equation}
-The top graph in Figure ??? shows how the observed signal varies with elevation
-and airmass.
+%The top graph in Figure ??? shows how the observed signal varies with elevation
+%and airmass.
 
 The elevation angle of each bolometer can be calculated and given
 $\tau_{\rm zenith}$ \remsky\ calculates the $\tau_{\rm obs}$ at the
@@ -1252,7 +1247,7 @@ alternative method of sky subtraction has been used (such as using
 \aparam{HASSKYREM} may be set to \texttt{TRUE} to override the history
 check by \extinction.
 
-\paragraph{\xlabel{dsimages}Calculating images from time-series data\label{se:dsimages}} \ \\
+\subsubsection{\xlabel{dsimages}Calculating images from time-series data\label{se:dsimages}}
 
 This step is not required for the simplified workflow.
 
@@ -1269,7 +1264,7 @@ directory. Data from each subarray require a corresponding weights
 file. See section \ref{se:dream} below for details on calculating
 alternative weights files.
 
-\paragraph{\xlabel{mosaic}Combining the images\label{se:mosaic}} \ \\
+\subsubsection{\xlabel{mosaic}Combining the images\label{se:mosaic}}
 
 \SMURF\ does not have any image mosaicking tasks itself. This step is
 handled by routines in \KAPPA\ and \CCDPACK. Suitable tasks are
@@ -1280,7 +1275,7 @@ align all the images to a common coordinate frame) followed by
 See the \SMURFcook\ (SC/19) for more detailed information about
 mosaicking SCUBA-2 images.
 
-\paragraph{\xlabel{dream}Using alternative DREAM solutions\label{se:dream}} \ \\
+\subsubsection{\xlabel{dream}Using alternative DREAM solutions\label{se:dream}}
 
 This step is not usually necessary for either workflow but is included
 for completeness.
@@ -1311,67 +1306,138 @@ from the default. Note that this process must be repeated for each
 subarray for which data exists and that data are to be combined should
 all use the same grid.
 
-\subsubsection{\xlabel{scanworkflow}SCAN Data Reduction Workflow\label{se:scanworkflow}}
+\subsection{\xlabel{scanworkflow}SCAN Data Reduction Workflow\label{se:scanworkflow}}
 
-The dynamic iterative map maker (Section \ref{se:dimm}) will
-generally give superior results. However, there are cases, such as for
-bright compact sources (bright enough to be detected in one sample and
-smaller than the field of view of the array), when the \rebin\ method
-described here may allow for adequate processing. The \rebin\ method
-is also suitable for obtaining a ``quick-look'' image.
+Processing SCAN data is more complicated than DREAM and STARE data.
+The challenge is to make an image when the data taken at each
+bolometer position does not line up exactly with the output map
+pixels. \SMURF\ supports two methods of creating a map:
+\begin{enumerate}
+\item A simple rebinning algorithm to assign data to output map pixels;
+\item An iterative method which solves for a succession of model
+  components assumed to represent the raw data.
+\end{enumerate}
 
-\SMURF\ provides two map-making routines: \qlmakemap\ and \makemap,
-both of which can make maps via the \rebin method.
+The rebinning method may be adequate for bright compact sources
+(bright enough to be detected in one sample and smaller than the field
+of view of the array). The rebin method is also suitable for obtaining
+a ``quick-look'' image. The \SMURF\ tasks \qlmakemap\ and \makemap\
+support this map-making method.
 
-\paragraph{\xlabel{rebin}Rebinning map-maker\label{se:rebin}} \ \\
+In practice, the dynamic iterative map maker (DIMM; see Section
+\ref{se:dimm}) will generally give superior results, though it is more
+computationally intensive. \makemap\ supports the DIMM.
 
-See Figure \ref{flow} for a flowchart showing the SCAN DR workflow.
+\subsubsection{\xlabel{rebin}Rebinning map-maker\label{se:rebin}}
 
-%\begin{figure}
-%\includegraphics....
-%\caption{Flowchart\label{flow}}
-%\end{figure}
+The processing of SCAN data using the rebin method may proceed in two
+different ways:
+\begin{enumerate}
+\item a multi-step approach following the method listed above for
+  DREAM and STARE data (\makemap);
+\item a single-step approach which applies of the necessary
+  corrections internally while the data are loaded in memory
+  (\qlmakemap).
+\end{enumerate}
+In both cases a one-pass rebinning algorithm is applied to the data,
+which regrids the signal from each bolometer onto a map in the desired
+co-ordinate system. 
 
-For bright compact sources, or sources with structure on scales
-smaller than eight arcmin:
+As outlined in \ref{se:dsworkflow}, the procedure for processing
+SCUBA-2 data follows these steps:
 \begin{enumerate}
 \item Apply the flatfield correction (see Section \ref{se:flatfield}).
 \item Remove the contribution of atmosphere to the signal (see Section \ref{se:skysub}).
-\item Correct for atmospheric extinction (See Section \ref{se:extinction}).
-\item Make a map using the Rebin method (see Section \ref{se:rebin}).
+\item Correct for atmospheric extinction (see Section \ref{se:extinction}).
+\item Make a map using the rebin method.
 \end{enumerate}
 
-\subsubsection{\xlabel{imaging}Making an image\label{se:imaging}}
+The rebinning algorithm shares the observed signal from a single
+bolometer between neighbouring output map pixels, as determined by the
+pixel-spreading function. The value of each pixel in the map is the
+sum of the signal from every bolometer that observed at that position.
 
-This section describes how to create a map of your source from raw
-time-series data. The challenge is to make an image when the data
-taken at each bolometer position does not line up exactly with the
-output map pixels.
+There are many options for the pixel spreading scheme (see Table ???
+for a summary). The fastest option is to use the nearest-neighbour
+pixel spreading scheme (Nearest), which assigns the whole signal from
+one bolometer to the nearest map pixel. This option does not always
+produce smooth maps, but it produces a robust estimate of the noise.
 
-\paragraph{Introduction} \ \\
+For smoother maps, use the Linear scheme to share the input signal
+equally among the four nearest map pixels. There are more complicated
+options available, e.g., Sinc-type functions, or Gaussian
+distributions. These methods produce aesthetically pleasing maps, at
+the risk of introducing correlations into the noise.
 
-For SCUBA-2, the distance between bolometers, as projected on the sky,
-is 5.8 arcsec. For mapping, the output pixel size is usually set at 1
-arcsec for observations at 450 $\mu$m and 3 arcsec at 850 $\mu$m.
 
-Data from the SCAN observing mode can be converted into a
-two-dimensional (2-D) map using a routine called \makemap\ using the
-\rebin\ method.  The \rebin\ method is the final step in the workflow
-for bright point sources, or sources with structure on scales less
-than eight arcmin (see Section ??? and Figure ???). This method
-applies a one-pass rebinning algorithm to the data, which regrids the
-signal from each bolometer onto a map in the desired co-ordinate
-system.
+Figure \ref{fig:rebinmap} shows an example map created from simulated
+observations of an extended source with bright features. It was
+created using the rebin method and the nearest-neighbour pixel
+spreading scheme.
 
-The \rebin\ method is a good option if you want to produce an image
-quickly, but it does not fully correct for systematic noise. The
-\iterate\ method produces more accurate maps, with better sky
-subtraction.
+Note the dark regions around the bright sources. They are negative
+bowls introduced by the sky subtraction method (Section
+\ref{se:skysub}). The random dots are cosmic ray spikes which are not
+removed by this workflow.
 
 \begin{latexonly}
-   \begin{figure}[hbt]
+   \begin{figure}[htb]
    \begin{center}
-     \includegraphics[width=150mm]{sun258_signalcpts.eps}
+     \includegraphics[width=150mm]{sun258_rebinmap}
+     \caption{Image reconstructed from simulated data using the
+       \aparam{REBIN} method. Note the deep wells around bright
+       sources and the numerous spikes.}
+     \label{fig:rebinmap}
+   \end{center}
+   \end{figure}
+\end{latexonly}
+\begin{htmlonly}
+   \label{fig:rebinmap}
+   \htmladdimg{sun258_rebinmap.gif}
+
+   Figure ??: Image reconstructed from simulated data using the
+   \aparam{REBIN} method. Note the deep wells around bright sources
+   and the numerous spikes.
+
+\end{htmlonly}
+
+\subsubsection{\xlabel{iter}Iterative map-maker\label{se:iter}}
+
+The iterative map-maker is described more fully below in Section
+\ref{se:dimm}.
+
+
+\section{\xlabel{dimm}SCUBA-2 Dynamic Iterative Map-Maker\label{se:dimm}}
+
+The Dynamic Iterative Map-Maker (DIMM) is the preferred tool for
+producing maps of SCUBA-2 total power data obtained in SCAN
+mode. Rather than executing each of the steps described in Section
+\ref{se:rebin} separately, the DIMM is capable of performing all
+of the data pre-processing steps, as well as iteratively solving for
+multiple signal components (including the image of the astronomical
+sky) using a single call to the \makemap\ task.
+
+\subsection{Signal model}
+
+We first develop the model used by the DIMM for time-varying bolometer
+signals as a linear combination of several components:
+%
+\begin{equation}
+I^i_{\mathrm{obs}}(t) = [G_C^i COM(t) + O_C^i] + [G_D^i DKS^j(t) + O_D^i] +
+                      EXT^i(t) AST^i(t) + N^i(t).
+\end{equation}
+%
+Here $I^i_{\mathrm{obs}}(t)$ is the total power delivered to the $i$th
+detector in pW as a function of time. The actual data written to disk
+has some arbitrary digital units that are proportional to pW. The
+conversion to pW is accomplished by flatfield measurements described
+in Section \ref{se:flatcal}. Figure \ref{fig:comps} shows a pictorial
+representation of some of the components.
+
+\begin{latexonly}
+   \begin{figure}[htb]
+   \begin{center}
+     \includegraphics[width=150mm]{sun258_signalcpts}
      \caption{Simulation of bolometer time-series showing the various
        components that make up the total signal. The top panel shows
        the observed signal, with subsequent panels showing the
@@ -1392,100 +1458,6 @@ subtraction.
    white noise.
 
 \end{htmlonly}
-
-\paragraph{\xlabel{rebinmap}Rebin method\label{se:rebinmap}} \ \\
-
-The rebinning algorithm shares the observed signal from a single
-bolometer between neighbouring output map pixels, as determined by the
-pixel-spreading function. The value of each pixel in the map is the
-sum of the signal from every bolometer that observed at that position.
-
-There are many options for the pixel spreading scheme (see Table ???
-for a summary). The fastest option is to use the nearest-neighbour
-pixel spreading scheme (Nearest), which assigns the whole signal from
-one bolometer to the nearest map pixel. This option does not always
-produce smooth maps, but it produces a robust estimate of the noise.
-
-For smoother maps, use the Linear scheme to share the input signal
-equally among the four nearest map pixels. There are more complicated
-options available, e.g., Sinc-type functions, or Gaussian
-distributions. These methods produce aesthetically pleasing maps, at
-the risk of introducing correlations into the noise.
-
-Figure ??? shows an example map created from simulated observations of
-an extended source with bright features. It was created using the
-Rebin method and the nearest-neighbour pixel spreading scheme.
-
-Note the dark regions around the bright sources. They are negative
-bowls introduced by the sky subtraction method (Section ???). The
-random dots are cosmic ray spikes which are not removed by this
-workflow.
-
-\begin{figure}
-%\includegraphics...
-\caption{Example map}
-\end{figure}
-
-
-\subsubsection{Quick reference}
-
-Table \ref{tab:makemap} summarizes options available for each of the
-parameters passed to the Makemap routine.
-
-\begin{table}
-\begin{tabular}{lccccccc}
-\hline
-        & \multicolumn{4}{c}{Required Parameters}           & \multicolumn{3}{c}{Optional Parameter} \\
-Method & method    &  config   &    pixsize   &   system         &  spread    & params(1) & params(2) \\
-       &           &           &   (arcsec)   &  (co-ordinates)  &            &           & \\
-\hline
-Rebin  & rebin     &  --       &              &                  &  Linear,   &   --      & -- \\
-       &           &           &              &                  &  Nearest   &     --       & \\
-       &           &           &              &                  &  Sinc,     &              &   -- \\
-       &           &           &              &                  &  Somb      &              & \\
-       &           &           &              &   ICRS, GAPPT,   &            &              & \\
-       &           &           &              &   FK5, FK4,      &  SincSinc, &  Usually 2   &  Default: 2\\
-       &           &           &              &                  &  SincCos,  &  Minimum:1   &  Minimum: 1\\
-       &           &           &      3 or 1  &   FK4-NO-E,      &  SombCos   & Auto $\leq$0 & \\
-       &           &           &              &   AZEL,          &            &              & \\
-       &           &           &              &   GALACTIC,      &  Gauss,    &              &   Default: 1\\
-       &           &           &              &   ECLIPTIC       &  SincGauss &              &   Minimum:\\
-       &           &           &              &                  &            &              &           0.1\\
-\hline
-Iterate& iterate   &    See    &              &                  &  Nearest   &     --       &   -- \\
-       &           &    Section&              &                  &            &              & \\
-       &           &\ref{se:dimmdetails}&    &                  &            &              & \\
-\hline
-\end{tabular}
-\caption{For further information about spread, params(1) and params(2), see Table ???.}
-\label{tab:makemap}
-\end{table}
-
-\section{\xlabel{dimm}SCUBA-2 Dynamic Iterative Map-Maker\label{se:dimm}}
-
-The Dynamic Iterative Map-Maker (DIMM) is the preferred tool for
-producing maps of SCUBA-2 total power data obtained in SCAN
-mode. Rather than executing each of the steps described in Section
-\ref{se:multistep} separately, the DIMM is capable of performing all
-of the data pre-processing steps, as well as iteratively solving for
-multiple signal components (including the image of the astronomical
-sky) using a single call to the \makemap\ task.
-
-\subsection{Signal model}
-
-We first develop the model used by the DIMM for time-varying bolometer
-signals as a linear combination of several components:
-%
-\begin{equation}
-I^i_{\mathrm{obs}}(t) = [G_C^i COM(t) + O_C^i] + [G_D^i DKS^j(t) + O_D^i] +
-                      EXT^i(t) AST^i(t) + N^i(t).
-\end{equation}
-%
-Here $I^i_{\mathrm{obs}}(t)$ is the total power delivered to the $i$th
-detector in pW as a function of time. The actual data written to disk
-has some arbitrary digital units that are proportional to pW. The
-conversion to pW is accomplished by flatfield measurements described
-in Section \ref{se:flatcal}.
 
 There is a dominant signal seen almost equally by all of the
 detectors. This ``common-mode'' component, $COM$, is a mixture of
@@ -1674,7 +1646,7 @@ below:
 
 \end{description}
 
-\subsubsection{Model components} \ \\
+\subsubsection{Model components}
 
 See Table \ref{tab:dimm_components} for a list of model components and
 their definitions. It may be necessary to add more model components
@@ -1703,7 +1675,7 @@ $NOI$ & Estimates the time-domain variance to establish relative detector \\
 \label{tab:dimm_components}
 \end{table}
 
-\subsubsection{Processing time} \ \\
+\subsubsection{Processing time}
 
 The memiter parameter (Table \ref{tab:dimmconfig}) influences the time
 it takes the iterative algorithm to generate a solution. It determines
@@ -1736,12 +1708,28 @@ allow the iterative algorithm to process as much data as
 possible. However, you can still limit the size of the continuous
 chunk using the \makemap\ parameter \aparam{MAXMEM}.
 
-\paragraph{Example image} \ \\
+\subsubsection{Example image}
 
-\begin{figure}
-%\includegraphics...
-\caption{Example figure processed with the iterative mapmaker}
-\end{figure}
+\begin{latexonly}
+   \begin{figure}[htb]
+   \begin{center}
+     \includegraphics[width=150mm]{sun258_itermap}
+     \caption{Image reconstructed from simulated data using the
+       \aparam{ITERATE} method. Note how the deep wells around bright
+       sources are no longer present, and there are no spikes.}
+     \label{fig:itermap}
+   \end{center}
+   \end{figure}
+\end{latexonly}
+\begin{htmlonly}
+   \label{fig:rebinmap}
+   \htmladdimg{sun258_itermap.gif}
+
+   Figure ??: Image reconstructed from simulated data using the
+   \aparam{ITERATE} method. Note how the deep wells around bright
+   sources are no longer present, and there are no spikes.
+
+\end{htmlonly}
 
 Figure ??? shows an example of a map created from simulated observations
 of an extended source using the Iterate method. Compare this image
@@ -1750,7 +1738,7 @@ with the map created from the same observations using the Rebin method
 disappeared and the cosmic ray spikes have been removed.
 
 
-\subsubsection{Using the iterate method} \ \\
+\subsubsection{Using the iterate method}
 
 When using \makemap\ with the iterate option, you need to apply the
 following parameters and options:
@@ -1776,7 +1764,7 @@ makemap in=^input.lis out=mapname method=iterate config=^config.lis \
 \end{verbatim}
 
 
-\subsubsection{Configuration parameters} \ \\
+\subsubsection{Configuration parameters}
 
 Table \ref{tab:dimmconfig} summarizes the configuration parameters
 available for the model components used by the DIMM (see also detailed
@@ -2012,7 +2000,8 @@ that dark frames are not produced by the simulator.
 
 FOCUS observations are designed to be processed by the ORAC-DR
 pipeline rather than \SMURF\ as their analysis involves multiple
-steps.
+steps. POINTING observations are equivalent to short science
+observations and should be processed in the same way.
 
 \section{Acknowledgments}
 
@@ -2047,7 +2036,7 @@ Analysis Tool},
 \end{thebibliography}
  
 
-\section{Release Notes---V0.1}
+\section{Release Notes---V0.5.2}
 
 \subsection{Global changes}
 \begin{itemize}
@@ -2263,4 +2252,3 @@ The following pages describe all the SMURF commands in detail.
 
 \end{document}
 
-\paragraph{}
