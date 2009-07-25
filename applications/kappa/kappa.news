@@ -1,25 +1,29 @@
 1 KAPPA_Version_1.11
 
-   A new release of KAPPA (V1.11-2) is under development.  The main 
+   A new release of KAPPA (V1.11-3) is under development.  The main 
    changes so far are listed below.  For complete details of all 
    changes, see the "Release Notes" appendix in SUN/95.
 
 2 Global_changes
    o  Control of the verbosity of informational messages is now
-   possible through the environment variable MSG_FILTER.
-
+   possible through the environment variable MSG_FILTER.  ILEVEL
+   and QUIET parameters that previously controlled messaging are no 
+   longer used.  See Modified_applications for details.
+  
 2 Modified_applications
 
-   o  BEAMFIT
+   o  APERADD, BEAMFIT, CENTROID, CREFRAME, CURSOR, LISTSHOW,
+      LOOK, NDFTRACE, PICCUR, PICTRANS, WCSTRAN
 
       -  Parameter QUIET has been withdrawn.  Instead set the
-      MSG_FILTER environment variable to QUIET to suppress display
-      of the fit parameters.
+      MSG_FILTER environment variable to QUIET to control the
+      output messaging.
 
    o  FFCLEAN, MSTATS, WCSMOSAIC
 
       -  Parameter ILEVEL has been withdrawn.  Instead use the 
-      MSG_FILTER environment variable to control the output messages.
+      MSG_FILTER environment variable to control the output
+      messaging.
 
    o  NDFCOPY
 

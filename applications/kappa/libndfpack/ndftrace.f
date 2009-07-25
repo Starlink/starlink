@@ -173,10 +173,6 @@
 *        and FTITLE.  Set to zero if WCS is FALSE. 
 *     QUALITY = _LOGICAL (Write)
 *        Whether or not the NDF contains a QUALITY array.
-*     QUIET = _LOGICAL (Read)
-*        A TRUE value suppresses the reporting of the NDF's attributes.
-*        It is intended for procedures and scripts where only the
-*        output parameters are needed. [FALSE]
 *     SCALE = _DOUBLE (Write)
 *        The scale factor associated with the data array. This will be
 *        1.0 unless the Data array is stored in SCALED form. See also
@@ -215,9 +211,9 @@
 *     ndftrace ndf=r106 fullaxis
 *        Displays information about the NDF structure r106, including
 *        full details of any axis arrays present.
-*     ndftrace mydata quiet ndim=(mdim)
+*     ndftrace mydata ndim=(mdim)
 *        Passes the number of dimensions of the NDF called mydata
-*        into the ICL variable mdim.  No information is displayed.
+*        into the ICL variable mdim.
 
 *  Notes:
 *     -  If the WCS component of the NDF is undefined, then an attempt 
@@ -227,6 +223,11 @@
 *     displayed in the same way as the NDF WCS component.  Other KAPPA
 *     applications will use this WCS information as if it were stored in
 *     the WCS component.
+*     -  The reporting of NDF attributes is suppressed when the message
+*     filter environment variable MSG_FILTER is set to QUIET.  It
+*     benefits procedures and scripts where only the output parameters 
+*     are needed.  The creation of output parameters is unaffected
+*     by MSG_FILTER.
 
 *  Related Applications:
 *     KAPPA: WCSFRAME; HDSTRACE
@@ -235,12 +236,15 @@
 *     Copyright (C) 1990-1994 Science & Engineering Research Council.
 *     Copyright (C) 1995, 1997, 1999-2000, 2003-2004 Central Laboratory
 *     of the Research Councils. Copyright (C) 2005-2006 Particle
-*     Physics & Astronomy Research Council. All Rights Reserved.
+*     Physics & Astronomy Research Council.
+*     Copyright (C) 2009 Science and Technology Facilities Council. 
+*     All Rights Reserved.
+
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -250,8 +254,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
@@ -316,6 +320,9 @@
 *        call is being made from NDFTRACE. This causes extra output
 *        parameters to be written within KPG1_DSFRM. Specifically, the
 *        WCS pixel scales are written to the new output parameter FPIXSCALE.
+*     2009 July 24 (MJC):
+*        Remove QUIET parameter and use the current reporting level
+*        instead (set by the global MSG_FILTER environment variable).
 *     {enter_further_changes_here}
 
 *-
@@ -330,6 +337,7 @@
       INCLUDE 'PRM_PAR'          ! PRIMDAT primitive data constants
       INCLUDE 'AST_PAR'          ! AST_ public constants
       INCLUDE 'CNF_PAR'          ! CNF functions
+      INCLUDE 'MSG_PAR'          ! Message-system constants
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -419,7 +427,6 @@
       LOGICAL FULLWC             ! Display full WCS information?
       LOGICAL MONOTO( NDF__MXDIM ) ! Axis monotonic flags
       LOGICAL NORM( NDF__MXDIM ) ! Axis normalisation flags
-      LOGICAL QUIET              ! Do not report the trace?
       LOGICAL REPORT             ! Report the trace?
       LOGICAL THERE              ! NDF component is defined?
       LOGICAL WIDTH( NDF__MXDIM ) ! NDF axis-width components defined?
@@ -427,6 +434,7 @@
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM_ type conversion routines
       INCLUDE 'NUM_DEF_CVT'
+
 *.
 
 *  Check the inherited global status.
@@ -444,9 +452,8 @@
 *  See if WCS Frames are to be displayed in fully, or in breif.
       CALL PAR_GET0L( 'FULLFRAME', FULLFR, STATUS )
 
-*  See if any information is to be displayed.
-      CALL PAR_GET0L( 'QUIET', QUIET, STATUS )
-      REPORT = .NOT. QUIET
+*  See if we are to report attributes, i.e not at NORMAL or higher priority.
+      REPORT =  MSG_FLEVOK( MSG__NORM, STATUS )
 
 *  Display the NDF's name.
       IF ( REPORT ) THEN

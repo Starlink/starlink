@@ -99,9 +99,6 @@
 *        co-ordinate Frame specified by parameter FRAMEOUT. The position
 *        will be stored as a list of formatted axis values separated by 
 *        spaces. 
-*     QUIET = _LOGICAL (Read)
-*        If TRUE, the transformed position is not written to the screen
-*        (it is still written to the output parameter OUTPOS).  [FALSE]
 
 *  Examples:
 *     pictrans "100.3,-20.1" framein=pixel
@@ -145,13 +142,20 @@
 *     co-ordinates of (0,0), and the top right corner has CURNDC
 *     co-ordinates (1,1).
 
+*     -  The transformed position is not written to the screen when the 
+*     message filter environment variable MSG_FILTER is set to QUIET.
+*     The creation of the output Parameter POSOUT is unaffected
+*     by MSG_FILTER.
+
 *  Related Applications:
 *     KAPPA: GDSTATE, PICIN, PICXY.
 
 *  Copyright:
 *     Copyright (C) 1993 Science & Engineering Research Council.
 *     Copyright (C) 2001-2002, 2004 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Councils.
+*     Copyright (C) 2009 Science and Technology Facilities Council. 
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -172,6 +176,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -183,6 +188,9 @@
 *        Added CURNDC Frame.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL.
+*     2009 July 24 (MJC):
+*        Remove QUIET parameter and use the current reporting level
+*        instead (set by the global MSG_FILTER environment variable).
 *     {enter_further_changes_here}
 
 *-
@@ -193,6 +201,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF constants 
       INCLUDE 'AST_PAR'          ! AST constants and functions
+      INCLUDE 'MSG_PAR'          ! Message-system constants
 
 *  Status:
       INTEGER STATUS
@@ -213,7 +222,7 @@
       INTEGER NIN                ! Number of input axes
       INTEGER NOUT               ! Number of output axes
       LOGICAL BOUND              ! Point is within the picture's bounds
-      LOGICAL QUIET              ! Suppress screen output?
+      LOGICAL REPORT             ! Report results to screen?
 
 *.
 
@@ -270,13 +279,14 @@
       CALL AST_TRANN( MAP, 1, NIN, 1, POSIN, .TRUE., NOUT, 1, POSOUT, 
      :                STATUS )
 
-*  See if the results are to be displayed on the screen.
-      CALL PAR_GET0l( 'QUIET', QUIET, STATUS )
-      IF( .NOT. QUIET ) THEN
+*  See if we are to report the results, i.e at NORMAL or higher priority.
+      REPORT = MSG_FLEVOK( MSG__NORM, STATUS )
+
+      IF ( REPORT ) THEN
 
 *  If so, format the input position including axis symbols.
          TEXT = ' '
-         IAT =  0
+         IAT = 0
          
          CALL KPG1_ASPTP( FRMIN, NIN, POSIN, .TRUE., '  ', TEXT, IAT, 
      :                    STATUS )

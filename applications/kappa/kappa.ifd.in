@@ -1429,7 +1429,7 @@ package kappa {
             vpath DEFAULT
             ppath CURRENT DEFAULT
             default FALSE
-            prompt {Display full coordinate Frame information?}
+            prompt {Display full co-ordinate Frame information?}
             helpkey *
          }
 
@@ -1514,15 +1514,6 @@ package kappa {
             access WRITE
             vpath DEFAULT
             default FALSE
-            helpkey *
-         }
-
-         parameter quiet {
-            type _LOGICAL
-            vpath DEFAULT
-            ppath DEFAULT
-            default FALSE
-            prompt {Display no NDF information?}
             helpkey *
          }
 
@@ -4363,7 +4354,7 @@ package kappa {
             type LITERAL
             ppath DEFAULT
             vpath DEFAULT
-            prompt {Output catalogue coordinate Frame}
+            prompt {Output catalogue co-ordinate Frame}
             helpkey *
             default !
         }
@@ -4423,7 +4414,7 @@ package kappa {
             type LITERAL
             ppath DEFAULT
             vpath DEFAULT
-            prompt {Required coordinate Frame}
+            prompt {Required co-ordinate Frame}
             helpkey *
             default !
          }
@@ -4559,15 +4550,6 @@ package kappa {
             helpkey *
          }
 
-         parameter quiet {
-            type _LOGICAL
-            prompt {Suppress the display of positions on the screen?}
-            vpath DEFAULT
-            ppath CURRENT DEFAULT
-            default FALSE
-            helpkey *
-         }
-
          parameter showdata {
             type _LOGICAL
             prompt {Also report pixel values?}
@@ -4657,7 +4639,7 @@ package kappa {
          parameter frame {
             type LITERAL
             vpath DEFAULT
-            prompt {Coordinate Frame for arrows}
+            prompt {Co-ordinate Frame for arrows}
             ppath CURRENT DEFAULT
             default !
             helpkey *
@@ -4676,7 +4658,7 @@ package kappa {
          parameter oframe {
             type LITERAL
             vpath DEFAULT
-            prompt {Coordinate Frame for origin}
+            prompt {Co-ordinate Frame for origin}
             ppath CURRENT DEFAULT
             default CURNDC
             helpkey *
@@ -5912,7 +5894,7 @@ package kappa {
          parameter frame {
             type LITERAL
             vpath DEFAULT
-            prompt {Required coordinate Frame}
+            prompt {Required co-ordinate Frame}
             ppath DEFAULT
             default BASEPIC
             helpkey *
@@ -6425,15 +6407,6 @@ package kappa {
             helpkey *
         }
 
-         parameter quiet {
-            type _LOGICAL
-            vpath DEFAULT
-            ppath CURRENT DEFAULT
-            default FALSE
-            prompt {Suppress screen output?}
-            helpkey *
-        }
-
          parameter single {
             type _LOGICAL
             vpath DEFAULT
@@ -6932,15 +6905,6 @@ package kappa {
             helpkey *
         }
 
-         parameter quiet {
-            type _LOGICAL
-            vpath DEFAULT
-            ppath DEFAULT
-            default FALSE
-            prompt {Suppress screen output?}
-            helpkey *
-        }
-
       }
 
       action picvis {
@@ -7381,6 +7345,7 @@ package kappa {
             association <->GLOBAL.ARDFILE
             helpkey *
          }
+
          parameter centre {
             position 2
             type LITERAL
@@ -7388,6 +7353,7 @@ package kappa {
             ppath CURRENT
             helpkey *
          }
+
          parameter diam {
             position 3
             type LITERAL
@@ -7395,6 +7361,7 @@ package kappa {
             ppath CURRENT
             helpkey *
          }
+
          parameter logfile {
             type FILENAME
             access READ
@@ -7404,6 +7371,7 @@ package kappa {
             default !
             helpkey *
          }
+
          parameter mean {
             type _DOUBLE
             access WRITE
@@ -7411,6 +7379,7 @@ package kappa {
             default 0.0D0
             helpkey *
          }
+
          parameter ndf {
             position 1
             type NDF
@@ -7421,6 +7390,7 @@ package kappa {
             association <->GLOBAL.DATA_ARRAY
             helpkey *
          }
+
          parameter ngood {
             type _INTEGER
             access WRITE
@@ -7428,6 +7398,7 @@ package kappa {
             default 0
             helpkey *
          }
+
          parameter numpix {
             type _INTEGER
             access WRITE
@@ -7435,14 +7406,7 @@ package kappa {
             default 0
             helpkey *
          }
-         parameter quiet {
-            type _LOGICAL
-            vpath DEFAULT
-            prompt {Is screen output to be suppressed?}
-            ppath CURRENT DEFAULT
-            default FALSE
-            helpkey *
-         }
+
          parameter sigma {
             type _DOUBLE
             access WRITE
@@ -7457,6 +7421,7 @@ package kappa {
             default 0.0D0
             helpkey *
          }
+
          parameter sigtotal {
             type _DOUBLE
             access WRITE
@@ -7464,6 +7429,7 @@ package kappa {
             default 0.0D0
             helpkey *
          }
+
          parameter total {
             type _DOUBLE
             access WRITE
@@ -7471,6 +7437,7 @@ package kappa {
             default 0.0D0
             helpkey *
          }
+
          parameter useaxis {
             type LITERAL
             vpath DEFAULT
@@ -7479,6 +7446,7 @@ package kappa {
             default !
             helpkey *
          }
+
          parameter weight {
             type _LOGICAL
             vpath DEFAULT
@@ -8778,7 +8746,7 @@ package kappa {
             type LITERAL
             ppath DEFAULT
             vpath DEFAULT
-            prompt {Output catalogue coordinate Frame}
+            prompt {Output catalogue co-ordinate Frame}
             helpkey *
             default !
         }
@@ -8982,15 +8950,6 @@ package kappa {
             vpath DEFAULT
             default TRUE
             prompt {Array features positive}
-            helpkey *
-         }
-
-         parameter quiet {
-            type _LOGICAL
-            ppath DEFAULT
-            vpath DEFAULT
-            default FALSE
-            prompt {Suppress screen output?}
             helpkey *
          }
 
@@ -10017,16 +9976,6 @@ package kappa {
             ppath CURRENT DEFAULT
             default !
             association ->GLOBAL.CATALOGUE
-            helpkey *
-         }
-
-         parameter quiet {
-            type _LOGICAL
-            access READ
-            vpath DEFAULT
-            ppath CURRENT DEFAULT
-            prompt {Suppress reporting of Gaussian parameters to the screen?}
-            default TRUE
             helpkey *
          }
 
@@ -11910,15 +11859,6 @@ iraf! {
             prompt {NDF to examine}
             ppath GLOBAL
             association <->GLOBAL.DATA_ARRAY
-            helpkey *
-         }
-
-         parameter quiet {
-            type _LOGICAL
-            vpath DEFAULT
-            prompt {Is screen output to be suppressed?}
-            ppath CURRENT DEFAULT
-            default FALSE
             helpkey *
          }
 
@@ -17400,7 +17340,7 @@ iraf! {
             type LITERAL
             ppath DEFAULT
             vpath DEFAULT
-            prompt {Output catalogue coordinate Frame}
+            prompt {Output catalogue co-ordinate Frame}
             helpkey *
             default !
         }
@@ -17520,7 +17460,7 @@ iraf! {
             type LITERAL
             ppath DEFAULT
             vpath DEFAULT
-            prompt {Output catalogue coordinate Frame}
+            prompt {Output catalogue co-ordinate Frame}
             helpkey *
             default !
         }
@@ -17591,7 +17531,7 @@ iraf! {
             type LITERAL
             ppath DEFAULT
             vpath DEFAULT
-            prompt {Required coordinate Frame}
+            prompt {Required co-ordinate Frame}
             helpkey *
             default !
          }
@@ -17717,15 +17657,6 @@ iraf! {
             helpkey *
          }
 
-         parameter quiet {
-            type _LOGICAL
-            prompt {Is screen output to be suppressed?}
-            vpath DEFAULT
-            ppath DYNAMIC DEFAULT
-            default !
-            helpkey *
-         }
-
          parameter stcscol {
             type LITERAL
             vpath CURRENT DEFAULT
@@ -17763,7 +17694,7 @@ iraf! {
             type LITERAL
             ppath DEFAULT
             vpath DEFAULT
-            prompt {Output catalogue coordinate Frame}
+            prompt {Output catalogue co-ordinate Frame}
             helpkey *
             default !
         }
@@ -18271,15 +18202,6 @@ iraf! {
             access WRITE
             vpath DEFAULT
             default { }
-            helpkey *
-         }
-
-         parameter quiet {
-            type _LOGICAL
-            vpath DEFAULT
-            ppath DEFAULT
-            default FALSE
-            prompt {Suppress screen output?}
             helpkey *
          }
 

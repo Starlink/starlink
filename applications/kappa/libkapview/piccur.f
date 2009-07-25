@@ -47,9 +47,6 @@
 *        then the user can supply multiple positions. Once all positions
 *        have been supplied, a button is pressed to indicate that no more
 *        positions are required. [FALSE]
-*     QUIET = _LOGICAL (Read)
-*        If TRUE, nothing is displayed on the screen while running.
-*        [FALSE]
 
 *  Examples:
 *     piccur
@@ -60,18 +57,24 @@
 *        This is like the previous example, but only DATA pictures can be
 *        selected. 
 
+*  Notes:
+*     -  Nothing is displayed on the screen when the message filter 
+*     environment variable MSG_FILTER is set to QUIET.
+
 *  Related Applications:
 *     KAPPA: CURSOR, PICBASE, PICDATA, PICEMPTY, PICENTIRE, PICFRAME,
 *     PICLIST, PICSEL, PICVIS.
 
 *  Copyright:
 *     Copyright (C) 2001, 2004 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Councils.
+*     Copyright (C) 2009 Science and Technology Facilities Council. 
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -81,18 +84,22 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     27-SEP-2001 (DSB):
 *        Re-write for AST/PGPLOT.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2009 July 24 (MJC):
+*        Remove QUIET parameter and use the current reporting level
+*        instead (set by the global MSG_FILTER environment variable).
 *     {enter_further_changes_here}
 
 *-
@@ -106,6 +113,7 @@
       INCLUDE 'AST_PAR'          ! AST constants
       INCLUDE 'PAR_ERR'          ! Parameter-system errors
       INCLUDE 'AGI_ERR'          ! AGI error constants
+      INCLUDE 'MSG_PAR'          ! Message-system constants
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -146,6 +154,7 @@
       REAL Y1                    ! PGPLOT Y world coord at bottom left
       REAL Y2                    ! PGPLOT Y world coord at top right
       REAL YC                    ! PGPLOT Y world coord at current cursor posn
+
 *.
 
 *  Check the inherited global status.
@@ -157,8 +166,8 @@
 *  See if only one position is to be supplied.
       CALL PAR_GET0L( 'SINGLE', SINGLE, STATUS )
 
-*  See if picture details are to be reported.
-      CALL PAR_GET0L( 'QUIET', QUIET, STATUS )
+*  See if we are to run quietly, i.e not at NORMAL or lower priority.
+      QUIET = .NOT. MSG_FLEVOK( MSG__NORM, STATUS )
 
 *  Get the NAME parameter.  A null value is made equivalent to a blank
 *  string, i.e. all pictures of any name may be selected.  

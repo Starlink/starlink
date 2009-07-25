@@ -103,9 +103,6 @@
 *        The number of good pixels within the aperture.
 *     NUMPIX = _INTEGER (Write)
 *        The total number of pixels within the aperture.
-*     QUIET = LOGICAL (Read)
-*        If TRUE then the statistics are not displayed on the screen. 
-*        Output parameters and log files are still created.  [FALSE]
 *     SIGMA = _DOUBLE (Write)
 *        The standard deviation of the pixel values within the
 *        aperture.
@@ -169,12 +166,17 @@
 *        neb1 is a SKY Frame describing RA and DEC, the aperture is centred 
 *        at RA 15:23:43.2 and DEC -22:23:34.2, and has a diameter of 10
 *        arcminutes.
-*     aperadd ndf=neb1 ardfile=outline.dat quiet logfile=obj1
+*     aperadd ndf=neb1 ardfile=outline.dat logfile=obj1
 *        This calculates the statistics of the pixels within an aperture 
 *        of NDF neb1 described within the file "outline.dat". The file
 *        contains an ARD description of the required aperture. The results
-*        are written to the log file "obj1", but are not displayed on the
-*        screen.
+*        are written to the log file "obj1".
+
+*  Notes:
+*     -  The statistics are not displayed on the screen when the
+*     message filter environment variable MSG_FILTER is set to QUIET.
+*     The creation of output parameters and the log file is unaffected
+*     by MSG_FILTER.
 
 *  ASCII-region-definition Descriptors:
 *     The ARD file may be created by ARDGEN or written manually.  In the
@@ -196,12 +198,14 @@
 
 *  Copyright:
 *     Copyright (C) 2001, 2003-2004 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Councils.
+*     Copyright (C) 2009 Science and Technology Facilities Council. 
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -211,12 +215,13 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -225,7 +230,10 @@
 *     24-NOV-2003 (DSB):
 *        Use 0.5*DIAM to create the ARD circle (previously used DIAM).
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2009 July 24 (MJC):
+*        Remove QUIET parameter and use the current reporting level
+*        instead (set by the global MSG_FILTER environment variable).
 *     {enter_further_changes_here}
 
 *-
@@ -241,6 +249,7 @@
       INCLUDE 'AST_PAR'          ! AST constants and functions
       INCLUDE 'PAR_ERR'          ! PAR error constants 
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
+      INCLUDE 'MSG_PAR'          ! Message-system constants
                
 *  Status:     
       INTEGER STATUS             ! Global status
@@ -292,6 +301,7 @@
       LOGICAL VAR                ! Are variances availab le?
       LOGICAL WEIGHT             ! Weight pixels?
       REAL TRCOEF( ( NDF__MXDIM + 1 ) * NDF__MXDIM ) ! Data to world co-ordinate conversions
+
 *.
 
 *  Check the inherited global status.
@@ -497,8 +507,8 @@
          LOG = .TRUE.
       END IF
 
-*  See if we are to run quietly.
-      CALL PAR_GET0L( 'QUIET', QUIET, STATUS )
+*  See if we are to run quietly, i.e not at NORMAL or lower priority.
+      QUIET = .NOT. MSG_FLEVOK( MSG__NORM, STATUS )
 
 *  Display a blank line.
       CALL KPG1_REPRT( ' ', QUIET, LOG, FDL, STATUS )

@@ -32,7 +32,7 @@
 *  ADAM Parameters:
 *     EPOCHIN = _DOUBLE (Read)
 *        If a "Sky Co-ordinate System" specification is supplied (using 
-*        parameter FRAMEIN) for a celestial co-ordinate system, then an epoch 
+*        Parameter FRAMEIN) for a celestial co-ordinate system, then an epoch 
 *        value is needed to qualify it. This is the epoch at which the 
 *        supplied sky position was determined. It should be given as a 
 *        decimal years value, with or without decimal places  ("1996.8" for 
@@ -40,7 +40,7 @@
 *        than 1984.0 and as a Julian epoch otherwise. 
 *     EPOCHOUT = _DOUBLE (Read)
 *        If a "Sky Co-ordinate System" specification is supplied (using 
-*        parameter FRAMEOUT) for a celestial co-ordinate system, then an epoch 
+*        Parameter FRAMEOUT) for a celestial co-ordinate system, then an epoch 
 *        value is needed to qualify it. This is the epoch at which the 
 *        transformed sky position is required. It should be given as a 
 *        decimal years value, with or without decimal places  ("1996.8" for 
@@ -48,7 +48,7 @@
 *        than 1984.0 and as a Julian epoch otherwise. 
 *     FRAMEIN = LITERAL (Read)
 *        A string specifying the co-ordinate Frame in which the input
-*        position is supplied (see parameter POSIN). If a null parameter 
+*        position is supplied (see Parameter POSIN). If a null parameter 
 *        value is supplied, then the current Frame in the NDF is used. The 
 *        string can be one of the following:
 *
@@ -84,45 +84,49 @@
 *        The NDF data structure containing the required co-ordinate Frames.
 *     POSIN = LITERAL (Read)
 *        The co-ordinates of the position to be transformed, in the 
-*        co-ordinate Frame specified by parameter FRAMEIN (supplying 
+*        co-ordinate Frame specified by Parameter FRAMEIN (supplying 
 *        a colon ":" will display details of the required co-ordinate Frame). 
 *        The position should be supplied as a list of formatted axis values 
 *        separated by spaces or commas. 
 *     POSOUT = LITERAL (Write)
 *        The formatted co-ordinates of the transformed position, in the 
-*        co-ordinate Frame specified by parameter FRAMEOUT. The position
+*        co-ordinate Frame specified by Parameter FRAMEOUT. The position
 *        will be stored as a list of formatted axis values separated by 
 *        spaces or commas. 
-*     QUIET = _LOGICAL (Read)
-*        If TRUE, the transformed position is not written to the screen
-*        (it is still written to the output parameter OUTPOS). [FALSE]
 
 *  Examples:
 *     wcstran m51 "100.1 21.5" pixel
 *        This transforms the pixel position "100.1 21.5" into the current
 *        co-ordinate Frame of the NDF m51. The results are displayed on
-*        the screen and written to the output parameter POSOUT.
-*     wcstran m51 "1:00:00 -12:30" equ(B1950) pixel quiet
+*        the screen and written to the output Parameter POSOUT.
+*     wcstran m51 "1:00:00 -12:30" equ(B1950) pixel
 *        This transforms the RA/DEC position "1:00:00 -12:30" (referred
 *        to the J2000 equinox) into pixel co-ordinates within the NDF m51. 
-*        The results are written to the output parameter POSOUT, but are
-*        not displayed on the screen.
-*     wcstran m51 "1:00:00 -12:30" equ(B1950) equ(j2000) quiet
+*        The results are written to the output Parameter POSOUT.
+*     wcstran m51 "1:00:00 -12:30" equ(B1950) equ(j2000)
 *        This is like the previous example except that the position is
 *        transformed into RA/DEC referred to the B1950 equinox, instead of
 *        pixel co-ordinates.
+
+*  Notes:
+*     -  The transformed position is not written to the screen when the 
+*     message filter environment variable MSG_FILTER is set to QUIET.
+*     The creation of the output Parameter POSOUT is unaffected
+*     by MSG_FILTER.
 
 *  Related Applications:
 *     KAPPA: LISTMAKE, LISTSHOW, WCSFRAME, NDFTRACE, WCSATTRIB
 
 *  Copyright:
 *     Copyright (C) 1998-1999 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Councils.
+*     Copyright (C) 2009 Science and Technology Facilities Council. 
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -132,11 +136,12 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -146,6 +151,9 @@
 *        Add TOKEN arg in call to KPG1_ASFRM
 *     3-SEP-1999 (DSB):
 *        Added NULL argument to KPG1_GTPOS call.
+*     2009 July 24 (MJC):
+*        Remove QUIET parameter and use the current reporting level
+*        instead (set by the global MSG_FILTER environment variable).
 *     {enter_further_changes_here}
 
 *-
@@ -156,6 +164,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF constants 
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
+      INCLUDE 'MSG_PAR'          ! Message-system constants
 
 *  Status:
       INTEGER STATUS
@@ -174,7 +183,8 @@
       INTEGER NGRID              ! No. of GRID axes
       INTEGER NIN                ! No. of input axes
       INTEGER NOUT               ! No. of output axes
-      LOGICAL QUIET              ! Suppress screen output?
+      LOGICAL REPORT             ! Report results to screen?
+
 *.
 
 *  Check the inherited global status.
@@ -196,7 +206,7 @@
       ICURR = AST_GETI( IWCS, 'CURRENT', STATUS )
 
 *  Set the current Frame to be the required input Frame specified by 
-*  parameter FRAMEIN. If "WORLD" co-ordinates are requested, use PIXEL. 
+*  Parameter FRAMEIN. If "WORLD" co-ordinates are requested, use PIXEL. 
 *  If "DATA" co-ordinates are requested, use "AXIS".
       CALL NDF_MSG( 'NDF', INDF )
       CALL KPG1_ASFRM( 'FRAMEIN', 'EPOCHIN', IWCS, 'PIXEL', 'AXIS',
@@ -220,7 +230,7 @@
       CALL AST_SETI( IWCS, 'CURRENT', ICURR, STATUS )
 
 *  Set the current Frame to be the required output Frame specified by 
-*  parameter FRAMEOUT. If "WORLD" co-ordinates are requested, use PIXEL. 
+*  Parameter FRAMEOUT. If "WORLD" co-ordinates are requested, use PIXEL. 
 *  If "DATA" co-ordinates are requested, use "AXIS".
       CALL NDF_MSG( 'NDF', INDF )
       CALL KPG1_ASFRM( 'FRAMEOUT', 'EPOCHOUT', IWCS, 'PIXEL', 'AXIS',
@@ -236,9 +246,10 @@
       CALL AST_TRANN( IWCS, 1, NGRID, 1, GRID, .TRUE., NOUT, 1, POSOUT, 
      :                STATUS )
 
-*  See if the results are to be displayed on the screen.
-      CALL PAR_GET0l( 'QUIET', QUIET, STATUS )
-      IF( .NOT. QUIET ) THEN
+*  See if we are to report the results, i.e at NORMAL or higher priority.
+      REPORT = MSG_FLEVOK( MSG__NORM, STATUS )
+
+      IF ( REPORT ) THEN
 
 *  If so, format the input position including axis symbols.
          TEXT = ' '

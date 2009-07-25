@@ -22,14 +22,14 @@
 *  Description:
 *     This application lists pixel values within a region of a 
 *     two-dimensional NDF. The listing may be displayed on the screen
-*     and logged in a text file (see parameters QUIET and LOGFILE). The
-*     region to be listed can be specified either by giving its centre
-*     and size or its corners, or by giving an `ARD Description' for the
-*     region (see parameter MODE). The top-right pixel value is also
-*     written to an output parameter (VALUE). The listing may be
-*     produced in several different formats (see parameter FORMAT), and
+*     and logged in a text file (see Parameter LOGFILE).  The region
+*     to be listed can be specified either by giving its centre and
+*     size or its corners, or by giving an `ARD Description' for the
+*     region (see Parameter MODE). The top-right pixel value is also
+*     written to an output Parameter (VALUE). The listing may be
+*     produced in several different formats (see Parameter FORMAT), and
 *     the format of each individual displayed data value can be
-*     controlled using parameter STYLE.
+*     controlled using Parameter STYLE.
 
 *  Usage:
 *     look ndf centre [size] [logfile] [format] [comp] [mode]
@@ -67,7 +67,7 @@
 *        (supplying a colon ":" will display details of the current
 *        co-ordinate Frame).  The position should be supplied as a list
 *        of formatted axis values separated by spaces or commas. See 
-*        also parameter USEAXIS. CENTRE is only acessed if MODE is
+*        also Parameter USEAXIS. CENTRE is only acessed if MODE is
 *        "Centre".
 *     COMP = LITERAL (Read)
 *        The NDF array component to be displayed.  It may be "Data",
@@ -121,7 +121,7 @@
 *        NDF (supplying a colon ":" will display details of the current 
 *        co-ordinate Frame). The position should be supplied as a list
 *        of  formatted axis values separated by spaces or commas. See
-*        also parameter USEAXIS.  A null (!) value causes the
+*        also Parameter USEAXIS.  A null (!) value causes the
 *        bottom-left corner of the supplied NDF to be used.  LBOUND is
 *        only accessed if MODE is "Bounds".
 *     LOGFILE = FILENAME (Write)
@@ -142,20 +142,17 @@
 *        parameters LBOUND and UBOUND.
 *
 *        - "ARDFile" -- The region is given by an `ARD Description' 
-*        supplied within a text file specified using parameter ARDFILE.
+*        supplied within a text file specified using Parameter ARDFILE.
 *        Pixels outside the ARD region are represented by the string
 *        "OUT". 
 *
 *        - "ARD" -- The region is given using an ARD description 
-*        supplied directly using parameter ARDDESC. Pixels outside the 
+*        supplied directly using Parameter ARDDESC. Pixels outside the 
 *        ARD region are represented by the string "OUT". 
 *
 *        ["Centre"]
 *     NDF = NDF (Read)
 *        The input NDF structure containing the data to be displayed.
-*     QUIET = LOGICAL (Read)
-*        If TRUE then output is not displayed on the screen. The log
-*        file and output parameter values are still created. [FALSE]
 *     SIZE( 2 ) = _INTEGER (Read)
 *        The dimensions of the rectangular area to be displayed, in
 *        pixels. If a single value is given, it is used for both axes.
@@ -194,7 +191,7 @@
 *        the NDF (supplying a colon ":" will display details of the
 *        current co-ordinate Frame). The position should be supplied as
 *        a list of formatted axis values separated by spaces or commas.
-*        See also parameter USEAXIS.  A null (!) value causes the
+*        See also Parameter USEAXIS.  A null (!) value causes the
 *        top-right corner of the supplied NDF to be used.  UBOUND is
 *        only accessed if MODE is "Bounds".
 *     USEAXIS = GROUP (Read)
@@ -222,21 +219,20 @@
 *        top-right pixel in the displayed rectangle.
 
 *  Examples:
-*     look ngc6872 "1:27:23 -22:41:12" quiet logfile=log
+*     look ngc6872 "1:27:23 -22:41:12" logfile=log
 *        Lists a 7x7 block of pixel values centred on RA/DEC 1:27:23,
 *        -22:41:12 (this assumes that the current co-ordinate Frame in
 *        the NDF is an RA/DEC Frame). The listing is written to the
-*        text file "log" but is not displayed on the screen.
+*        text file "log".
 *     look m57 mode=bo lbound="18 20" ubound="203 241"
 *        Lists the pixel values in an NDF called m57, within a
 *        rectangular region from pixel (18,20) to (203,241) (this
 *        assumes that the current co-ordinate Frame in the NDF is pixel
 *        co-ordinates). The listing is displayed on the screen only.
-*     look ngc6872 "10 11" 1 quiet 
+*     look ngc6872 "10 11" 1
 *        Stores the value of pixel (10,11) in output parameter VALUE,
-*        but does not display it on the screen or store it in a log
-*        file. This assumes that the current co-ordinate Frame in the
-*        NDF is pixel co-ordinates. 
+*        but does not store it in a log file. This assumes that the 
+*        current co-ordinate Frame in the NDF is pixel co-ordinates. 
 *     look ngc6872 mode=ard arddesc="circle(1:27:23,-22:41:12,0:0:10)"
 *        Lists the pixel values within a circle of radius 10 arcseconds,
 *        centred on RA=1:27:23 DEC=-22:41:12. This assumes that the 
@@ -260,6 +256,10 @@
 *     indicate that positions are specified in RA/DEC (FK5,J2000). If
 *     no such statements are included, then a default co-ordinate system
 *     is used as specified in the parameter description above.
+*     -  Output messages are not displayed on the screen when the
+*     message filter environment variable MSG_FILTER is set to QUIET.
+*     The creation of output parameters and the log file is unaffected
+*     by MSG_FILTER.
 
 *  Related Applications:
 *     KAPPA: TRANDAT, ARDGEN, ARDMASK, ARDPLOT.
@@ -296,6 +296,7 @@
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -307,6 +308,9 @@
 *        Added CGlist format.
 *     5-MAY-2009 (DSB):
 *        Added Wlist format.
+*     2009 July 24 (MJC):
+*        Remove QUIET parameter and use the current reporting level
+*        instead (set by the global MSG_FILTER environment variable).
 *     {enter_further_changes_here}
 
 *-
@@ -321,6 +325,7 @@
       INCLUDE 'GRP_PAR'        ! GRP constants 
       INCLUDE 'NDF_PAR'        ! NDF constants 
       INCLUDE 'CNF_PAR'        ! For CNF_PVAL function
+      INCLUDE 'MSG_PAR'        ! Message-system constants
 
 *  Status:
       INTEGER STATUS
@@ -367,6 +372,7 @@
       LOGICAL CONT             ! ARD description to continue?
       LOGICAL LOG              ! Write to log file?
       LOGICAL QUIET            ! Suppress screen output?
+
 *.
 
 *  Check the inherited global status.
@@ -464,8 +470,8 @@
 
       END IF
 
-*  See if we are to run quietly.
-      CALL PAR_GET0L( 'QUIET', QUIET, STATUS )
+*  See if we are to run quietly, i.e not at NORMAL or lower priority.
+      QUIET = .NOT. MSG_FLEVOK( MSG__NORM, STATUS )
 
 *  Obtain the formatting method to use.
       CALL PAR_CHOIC( 'FORMAT', 'strips', 'Strips,Clist,Vlist,'//
@@ -477,7 +483,7 @@
          IF( NAX .GT. 2 ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( ' ', 'Current WCS co-ordinate frame has '//
-     :                    'more than 2 axes.', STATUS )
+     :                    'more than two axes.', STATUS )
          ELSE IF( NAX .GT. 2 ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( ' ', 'Current WCS co-ordinate frame has '//
@@ -498,7 +504,7 @@
          IF( MODE .EQ. 'CENTRE' ) THEN
 
 *  Obtain the Current Frame co-ordinates (returned in CC) to put at the 
-*  centre of the listing, using parameter CENTRE. 
+*  centre of the listing, using Parameter CENTRE. 
             CALL KPG1_GTPOS( 'CENTRE', IWCS, .FALSE., CC, GC, STATUS )
 
 *  Get the box size in pixel.

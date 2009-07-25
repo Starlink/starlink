@@ -13460,12 +13460,6 @@ KAPPA: \htmlref{CADD}{CADD},
          The total number of pixels within the aperture.
       }
       \sstsubsection{
-         QUIET = LOGICAL (Read)
-      }{
-         If {\tt TRUE} then the statistics are not displayed on the screen.
-         Output parameters and log files are still created.  {\tt [FALSE]}
-      }
-      \sstsubsection{
          SIGMA = \_DOUBLE (Write)
       }{
          The standard deviation of the pixel values within the
@@ -13562,13 +13556,23 @@ KAPPA: \htmlref{CADD}{CADD},
          arcminutes.
       }
       \sstexamplesubsection{
-         aperadd ndf=neb1 ardfile=outline.dat quiet logfile=obj1
+         aperadd ndf=neb1 ardfile=outline.dat logfile=obj1
       }{
          This calculates the statistics of the pixels within an aperture
          of NDF neb1 described within the file {\tt outline.dat}.  The file
          contains an ARD description of the required aperture.  The results
-         are written to the log file {\tt obj1}, but are not displayed on the
-         screen.
+         are written to the log file {\tt obj1}.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The statistics are not displayed on the screen when the
+         message filter environment variable MSG\_FILTER is set to {\tt QUIET}.
+         The creation of output parameters and the log file is unaffected 
+         by MSG\_FILTER.
+
       }
    }
    \sstdiytopic{
@@ -13579,6 +13583,7 @@ KAPPA: \htmlref{CADD}{CADD},
       descriptors and syntax; however, much may be learnt from looking
       at the ARD files created by ARDGEN and the ARDGEN documentation.
       There is also a \hyperref{summary with examples}{in Section~}{}{se:ardwork}.
+
    }
    \sstdiytopic{
       Related Applications
@@ -15048,7 +15053,7 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
 
          \sstitem
          The fit parameters are not displayed on the screen when the
-         message filter environemnt variable MSG\_FILTER is set to 
+         message filter environment variable MSG\_FILTER is set to 
          {\tt QUIET}.
 
       }
@@ -16135,12 +16140,6 @@ KAPPA: \htmlref{ADD}{ADD},
          background.  {\tt [TRUE]}
       }
       \sstsubsection{
-         QUIET = \_LOGICAL (Read)
-      }{
-         If {\tt TRUE} then the centroid positions are not displayed on the
-         screen.  Output parameters and files are still created.  {\tt [FALSE]}
-      }
-      \sstsubsection{
          SEARCH() = \_INTEGER (Read)
       }{
          Size in pixels of the search box to be used.  If only a single
@@ -16271,6 +16270,12 @@ KAPPA: \htmlref{ADD}{ADD},
          In Cursor or Interface mode, only the first 200 supplied positions
          will be stored in the output catalogue.  Any further positions will be
          displayed on the screen but not stored in the output catalogue.
+
+         \sstitem
+         The centroid positions are not displayed on the screen when the
+         message filter environment variable MSG\_FILTER is set to {\tt QUIET}.
+         The creation of output parameters and files is unaffected by MSG\_FILTER.
+
       }
    }
    \sstdiytopic{
@@ -19934,12 +19939,6 @@ KAPPA: \htmlref{SUBSTITUTE}{SUBSTITUTE},
          supplied, no output positions list is produced.  {\tt [!]}
       }
       \sstsubsection{
-         QUIET = \_LOGICAL  (Read)
-      }{
-         If FALSE, the Gaussian parameters are reported to you on the
-         screen (GS mode) {\tt [TRUE]}
-      }
-      \sstsubsection{
          SEEING = \_REAL (Read)
       }{
          Seeing (FWHM) in pixels (not the same as the standard deviation)
@@ -19978,6 +19977,15 @@ KAPPA: \htmlref{SUBSTITUTE}{SUBSTITUTE},
          Produces a 128$\times$128 pixel data array with 5 gaussians with peak
          values of 200 counts and a background of 20 counts.  There will
          be two bad columns added to the resulting data.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The Gaussian parameters (GS mode) are not displayed when the 
+         message filter environment variable MSG\_FILTER is set to {\tt QUIET}.
+
       }
    }
    \sstimplementationstatus{
@@ -20182,7 +20190,7 @@ KAPPA: \htmlref{HISTOGRAM}{HISTOGRAM}.
 
       Restrictions can be made on the number of positions to be given (see
       Parameters MAXPOS and MINPOS), and screen output can be suppressed
-      (see Parameter QUIET).
+      (see the \htmlref{Notes}{notes:cursor}).
    }
    \sstusage{
       cursor [mode] [name] [outcat] [device]
@@ -20318,8 +20326,8 @@ KAPPA: \htmlref{HISTOGRAM}{HISTOGRAM}.
       }{
          If {\tt TRUE}, then messages are displayed describing the use of the
          mouse prior to obtaining the first position.  Note, these
-         informational messages are not suppressed by setting Parameter
-         QUIET to {\tt TRUE}.  {\tt [TRUE]}
+         informational messages are not suppressed by setting MSG\_FILTER
+        environment variable to {\tt QUIET}.  {\tt [TRUE]}
       }
       \sstsubsection{
          JUST = LITERAL (Read)
@@ -20476,14 +20484,6 @@ KAPPA: \htmlref{HISTOGRAM}{HISTOGRAM}.
          {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
-         QUIET = \_LOGICAL (Read)
-      }{
-         If {\tt TRUE} then positions are not reported on the screen.  Output
-         parameters and files are still created.  The display of informational
-         messages describing the use of the cursor is controlled by the
-         Parameter INFO.  {\tt [FALSE]}
-      }
-      \sstsubsection{
          SHOWDATA = \_LOGICAL (Read)
       }{
          If {\tt TRUE}, the pixel value within the displayed NDF is
@@ -20616,12 +20616,12 @@ KAPPA: \htmlref{HISTOGRAM}{HISTOGRAM}.
          red and are twice the default size.
       }
       \sstexamplesubsection{
-         cursor current maxpos=2 minpos=2 plot=poly quiet outcat=slice
+         cursor current maxpos=2 minpos=2 plot=poly outcat=slice
       }{
          Exactly two positions are obtained within the current picture,
          and are joined with a straight line.  The positions are written to
-         a FITS binary catalogue called {\tt slice.FIT} but are not displayed on
-         the screen.  The catalogue may be used to communicate the positions
+         a FITS binary catalogue called {\tt slice.FIT}.
+         The catalogue may be used to communicate the positions
          to later applications (LISTSHOW, PROFILE, \emph{etc.}).
       }
       \sstexamplesubsection{
@@ -20647,6 +20647,7 @@ KAPPA: \htmlref{HISTOGRAM}{HISTOGRAM}.
          the background is not cleared before drawing the text.
       }
    }
+   \label{notes:cursor}
    \sstnotes{
       \sstitemlist{
 
@@ -20677,6 +20678,14 @@ KAPPA: \htmlref{HISTOGRAM}{HISTOGRAM}.
          are being used to mark the positions, then removed positions will
          be highlighted by drawing a marker of type 8 (a circle containing a
          cross) over the removed positions in a different colour.
+
+         \sstitem
+         The positions are not displayed on the screen when the
+         message filter environment variable MSG\_FILTER is set to {\tt QUIET}.
+         The creation of output parameters and files is unaffected by MSG\_FILTER.
+         The display of informational messages describing the use of the cursor 
+         is controlled by the Parameter INFO.
+
       }
    }
    \sstdiytopic{
@@ -29924,7 +29933,7 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
             the graphics device is drawn between each pair of positions.
 
             \sstitem
-            {\tt "Vline"} --- A vertial line is drawn through each position,
+            {\tt "Vline"} --- A vertical line is drawn through each position,
             extending the entire height of the selected picture.
 
             \sstitem
@@ -29936,7 +29945,7 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
 
             \sstitem
             {\tt "STCS"} --- Indicates that each position should be
-            marked using the 2-dimensional STC-S shape read from the 
+            marked using the two-dimensional STC-S shape read from the 
             catalogue column specified by parameter STCSCOL. 
 
             \sstitem
@@ -29962,8 +29971,8 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
          The unformatted co-ordinates of the positions selected by
          Parameters FIRST and LAST, in the co-ordinate Frame selected by
          FRAME.  The axis values are stored as a one-dimensional vector.  All
-         the axis-1 values for the selected positions are stored first,
-         followed by the axis-2 values, \emph{etc}.  The number of positions in
+         the Axis-1 values for the selected positions are stored first,
+         followed by the Axis-2 values, \emph{etc}.  The number of positions in
          the vector is written to the output Parameter NUMBER, and the
          number of axes per position is written to the output Parameter
          DIM.  The axis values may not be in the same units as the
@@ -29971,19 +29980,10 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
          celestial co-ordinate values are stored in units of radians.
       }
       \sstsubsection{
-         QUIET = \_LOGICAL (Read)
-      }{
-         If {\tt TRUE} then the positions are not displayed on the screen while
-         the application is running.  Output parameters and files are still
-         created.  If a null ({\tt{!}}) value is supplied, the value used is {\tt TRUE}
-         if any graphics or labels are being plotted (see Parameters PLOT
-         and LABEL), and {\tt FALSE} otherwise.  {\tt [!]}
-      }
-      \sstsubsection{
          STCSCOL = LITERAL (Read)
       }{
          The name of a catalogue column containing an STC-S description of
-         a 2-dimensional spatial shape associated with each position. The 
+         a two-dimensional spatial shape associated with each position. The 
          STC-S format is an IVOA proposal for describing regions of space,
          time and spectral position. For further details, see the STC-S
          document on the IVOA web site 
@@ -30074,31 +30074,30 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
       }{
          This displays the pixel co-ordinates of all the positions
          stored in the FITS binary catalogue {\tt stars.fit}.  They are all written
-         to the output Parameter POSNS as well as to the screen.
+         to the output Parameter POSNS.
       }
       \sstexamplesubsection{
-         listshow star outcat=star-gal catframe=gal quiet
+         listshow star outcat=star-gal catframe=gal
       }{
          This copies a position list from catalogue {\tt star} to a new
          catalogue called {\tt star-gal}.  The positions are stored in galactic
-         co-ordinates in the output catalogue.  Nothing is displayed on
-         the screen.
+         co-ordinates in the output catalogue.
       }
       \sstexamplesubsection{
-         listshow stars.fit equat(J2010) first=3 last=3 quiet
+         listshow stars.fit equat(J2010) first=3 last=3
       }{
-         This extracts position 3 from the catalogue {\tt stars.fit} transforming
+         This extracts Position 3 from the catalogue {\tt stars.fit} transforming
          it into FK5 equatorial RA/DEC co-ordinates (referenced to the
          J2010 equinox), if possible.  The RA/DEC values (in radians) are
-         written to the output Parameter POSNS, but not to the screen.
+         written to the output Parameter POSNS.
       }
       \sstexamplesubsection{
          listshow stars\_2.txt style="digits(1)=5,digits(2)=7"
       }{
          This lists the positions in the STL format catalogue contained
          in text file {\tt stars\_2.txt} in their original co-ordinate Frame.  By
-         default, five digits are used to format axis-1 values, and seven to format 
-         axis-2 values.  These defaults are overridden if the attributes
+         default, five digits are used to format Axis-1 values, and seven to format 
+         Axis-2 values.  These defaults are overridden if the attributes
          \htmlattref{Format(1)}{Format(axis)}~ and/or {\att Format(2)} are assigned 
          values in the description of the current Frame stored in the positions list.
       }
@@ -30106,10 +30105,10 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
          listshow s.txt plot=marker marker=3 style="colour(marker)=red,size=2"
       }{
          This marks the positions in {\tt s.txt} on the currently selected graphics
-         device using \PGPLOT\  marker 3 (an asterisk).  The positions are aligned
+         device using \PGPLOT\  Marker 3 (an asterisk).  The positions are aligned
          with the most recent DATA picture in the current picture.  The markers
-         are red and are twice the default size.  The positions are not
-         reported on the screen.
+         are red and are twice the default size.  The positions are likely not
+         to be reported on the screen.
       }
    }
    \sstnotes{
@@ -30122,6 +30121,15 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
          binary table.  If a file type of .txt is given, then the catalogue is
          assumed to be stored in a text file in \emph{Small Text List} (STL) format.
          If no file type is given, then {\tt .fit} is assumed.
+
+         \sstitem
+         The positions are not displayed on the screen when either the
+         message filter environment variable MSG\_FILTER is set to {\tt NORMAL}
+         and any graphics or labels are being plotted (see Parameters PLOT 
+         and LABEL); or when MSG\_FILTER is set to {\tt QUIET} and no graphics
+         are produced.  The creation of output parameters and files is 
+         unaffected by MSG\_FILTER.
+
       }
    }
    \sstdiytopic{
@@ -30382,8 +30390,8 @@ KAPPA: \htmlref{LOG10}{LOG10},
 }{
    \sstdescription{
       This application lists pixel values within a region of
-      a two-dimensional \NDFref{NDF}.  The listing may be displayed on the screen and logged in
-      a text file (see Parameters QUIET and LOGFILE).  The region
+      a two-dimensional \NDFref{NDF}.  The listing may be displayed on the screen 
+      and logged in a text file (see Parameter LOGFILE).  The region
       to be listed can be specified either by giving its centre and size or
       its corners, or by giving an `ARD Description' for the region (see
       Parameter MODE).  The top-right pixel value is also written to an output
@@ -30566,12 +30574,6 @@ KAPPA: \htmlref{LOG10}{LOG10},
          The input NDF structure containing the data to be displayed.
       }
       \sstsubsection{
-         QUIET = \_LOGICAL (Read)
-      }{
-         If {\tt TRUE} then output is not displayed on the screen.  The log file
-         and output parameter values are still created.  {\tt [FALSE]}
-      }
-      \sstsubsection{
          SIZE( 2 ) = \_INTEGER (Read)
       }{
          The dimensions of the rectangular area to be displayed, in pixels.
@@ -30663,12 +30665,12 @@ KAPPA: \htmlref{LOG10}{LOG10},
    }
    \sstexamples{
       \sstexamplesubsection{
-         look ngc6872 "1:27:23 -22:41:12" quiet logfile=log
+         look ngc6872 "1:27:23 -22:41:12" logfile=log
       }{
          Lists a 7$\times$7 block of pixel values centred on RA/DEC 1:27:23,
          $-$22:41:12 (this assumes that the current co-ordinate Frame in
          the NDF is an RA/DEC Frame).  The listing is written to the text
-         file {\tt log} but is not displayed on the screen.
+         file {\tt log}.
       }
       \sstexamplesubsection{
          look m57 mode=bo lbound="18 20" ubound="203 241"
@@ -30679,12 +30681,11 @@ KAPPA: \htmlref{LOG10}{LOG10},
          co-ordinates).  The listing is displayed on the screen only.
       }
       \sstexamplesubsection{
-         look ngc6872 "10 11" 1 quiet
+         look ngc6872 "10 11" 1
       }{
          Stores the value of pixel (10,~11) in output Parameter VALUE, but
-         does not display it on the screen or store it in a log file.  This
-         assumes that the current co-ordinate Frame in the NDF is pixel
-         co-ordinates.
+         does not store it in a log file.  This assumes that the current 
+         co-ordinate Frame in the NDF is pixel co-ordinates.
       }
       \sstexamplesubsection{
          look ngc6872 mode=ard arddesc="circle(1:27:23,-22:41:12,0:0:10)"
@@ -30721,6 +30722,13 @@ KAPPA: \htmlref{LOG10}{LOG10},
          indicate that positions are specified in RA/DEC (FK5,J2000).  If
          no such statements are included, then a default co-ordinate system
          is used as specified in the parameter description above.
+
+         \sstitem
+         Output messages are not displayed on the screen when the
+         message filter environment variable MSG\_FILTER is set to {\tt QUIET}.
+         The creation of output parameters and the log file is unaffected
+         by MSG\_FILTER.
+
       }
    }
    \sstdiytopic{
@@ -35811,13 +35819,6 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
       }{
          The NDF data structure whose attributes are to be displayed.
       }
-      \sstsubsection{
-         QUIET = \_LOGICAL (Read)
-      }{
-         A {\tt TRUE} value suppresses the reporting of the NDF's attributes.
-         It is intended for procedures and scripts where only the
-         output parameters are needed.  {\tt [FALSE]}
-      }
    }
    \sstresparameters{
       \sstsubsection{
@@ -36068,10 +36069,10 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
          full details of any axis arrays present.
       }
       \sstexamplesubsection{
-         ndftrace mydata quiet ndim=(mdim)
+         ndftrace mydata ndim=(mdim)
       }{
          Passes the number of dimensions of the NDF called mydata
-         into the {\ICLref}~ variable mdim.  No information is displayed.
+         into the {\ICLref}~ variable mdim.
       }
    }
    \sstnotes{
@@ -36086,6 +36087,14 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
          displayed in the same way as the NDF WCS component.  Other 
          \KAPPA\ applications will use this WCS information as if it were
          stored in the WCS component.
+
+         \sstitem
+         The reporting of NDF attributes is suppressed when the message
+         filter environment variable MSG\_FILTER is set to {\tt QUIET}.  It
+         benefits procedures and scripts where only the output parameters 
+         are needed.  The creation of output parameters is unaffected
+         by MSG\_FILTER.
+
       }
    }
    \sstdiytopic{
@@ -37816,12 +37825,6 @@ KAPPA: \htmlref{PICCUR}{PICCUR},
          have been supplied, a button is pressed to indicate that no more
          positions are required.  {\tt [FALSE]}
       }
-      \sstsubsection{
-         QUIET = \_LOGICAL (Read)
-      }{
-         If {\tt TRUE}, nothing is displayed on the screen while running.
-         {\tt [FALSE]}
-      }
    }
    \sstexamples{
       \sstexamplesubsection{
@@ -37836,6 +37839,14 @@ KAPPA: \htmlref{PICCUR}{PICCUR},
       }{
          This is like the previous example, but only DATA pictures can be
          selected.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Nothing is displayed on the screen when the message filter 
+         environment variable MSG\_FILTER is set to {\tt QUIET}.
       }
    }
    \sstdiytopic{
@@ -39058,12 +39069,6 @@ KAPPA: \htmlref{PICDATA}{PICDATA},
          \xref{formatted axis values}{sun210}{AST_UNFORMAT}
          separated by spaces or commas.
       }
-      \sstsubsection{
-         QUIET = \_LOGICAL (Read)
-      }{
-         If {\tt TRUE}, the transformed position is not written to the screen
-         (it is still written to the output Parameter OUTPOS).  {\tt [FALSE]}
-      }
    }
    \sstresparameters{
       \sstsubsection{
@@ -39105,31 +39110,38 @@ KAPPA: \htmlref{PICDATA}{PICDATA},
          lower-left corner of the graphics device), into BASEPIC
          co-ordinates.
       }
-      \sstnotes{
+   }
+   \sstnotes{
 
-         \ssthitemlist{
+      \ssthitemlist{
 
-            \sstitem
-            BASEPIC co-ordinates locate a position within the entire graphics
-            device.  The bottom-left corner of the device screen has BASEPIC
-            co-ordinates of (0,~0).  The shorter dimension of the screen has
-            length 1.0, and the other axis has a length greater than 1.0.
+         \sstitem
+         BASEPIC co-ordinates locate a position within the entire graphics
+         device.  The bottom-left corner of the device screen has BASEPIC
+         co-ordinates of (0,~0).  The shorter dimension of the screen has
+         length 1.0, and the other axis has a length greater than 1.0.
 
-            \sstitem
-            NDC co-ordinates are like BASEPIC co-ordinates except that
-            the top-right corner of the screen has NDC co-ordinates 
-            of (1,~1).  That is, both axes of the screen have unit length.
+         \sstitem
+         NDC co-ordinates are like BASEPIC co-ordinates except that
+         the top-right corner of the screen has NDC co-ordinates 
+         of (1,~1).  That is, both axes of the screen have unit length.
 
-            \sstitem
-            GRAPHICS co-ordinates also span the entire graphics device but
-            are measured in millimetres from the bottom-left corner.
+         \sstitem
+         GRAPHICS co-ordinates also span the entire graphics device but
+         are measured in millimetres from the bottom-left corner.
 
-            \sstitem
-            CURPIC co-ordinates locate a point within the current picture.  The
-            bottom-left corner of the current picture has CURPIC co-ordinates of
-            (0,~0).  The shorter dimension of the current picture has length 1.0, and
-            the other axis has a length greater than 1.0.
-         }
+         \sstitem
+         CURPIC co-ordinates locate a point within the current picture.  The
+         bottom-left corner of the current picture has CURPIC co-ordinates of
+         (0,~0).  The shorter dimension of the current picture has length 1.0, and
+         the other axis has a length greater than 1.0.
+
+         \sstitem
+         The transformed position is not written to the screen when the 
+         message filter environment variable MSG\_FILTER is set to {\tt QUIET}.
+         The creation of the output Parameter POSOUT is unaffected
+         by MSG\_FILTER.
+
       }
    }
    \sstdiytopic{
@@ -50317,12 +50329,29 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          the screen and written to the output Parameter POSOUT.
       }
       \sstexamplesubsection{
-         wcstran m51 "1:00:00 -12:30" equ(B1950) pixel quiet
+         wcstran m51 "1:00:00 -12:30" equ(B1950) pixel
       }{
          This transforms the RA/DEC position {\tt "1:00:00 -12:30"} (referred
          to the J2000 equinox) into pixel co-ordinates within the NDF m51.
-         The results are written to the output Parameter POSOUT, but are
-         not displayed on the screen.
+         The results are written to the output Parameter POSOUT.
+      }
+      \sstexamplesubsection{
+         wcstran m51 "1:00:00 -12:30" equ(B1950) equ(j2000)
+      }{
+         This is like the previous example except that the position is
+         transformed into RA/DEC referred to the B1950 equinox, instead of
+         pixel co-ordinates.
+      }
+   }
+   \sstnotes{
+       \ssthitemlist{
+
+          \sstitem
+          The transformed position is not written to the screen when the 
+          message filter environment variable MSG\_FILTER is set to {\tt QUIET}.
+          The creation of the output Parameter POSOUT is unaffected
+          by MSG\_FILTER.
+
       }
    }
    \sstdiytopic{
@@ -56319,7 +56348,8 @@ The following applications have been modified:
 \begin{itemize}
   \item  Control of the verbosity of informational messages is now 
   possible through the environment variable {\tt MSG\_FILTER}.  ILEVEL
-  parameters are no longer used.  See
+  and QUIET parameters that previously controlled messaging are no 
+  longer used.  See
   \hyperref{Verbosity of Messages}{Section }{}{se:msglev} for details.
   
 \end{itemize}
@@ -56329,6 +56359,13 @@ The following applications have been modified:
 
 \begin{description}
 
+   \item [\htmlref{APERADD}{APERADD}]\mbox{}
+      \begin{itemize}
+        \item Parameter QUIET has been withdrawn.  Instead set the
+        MSG\_FILTER environment variable to {\tt QUIET} to suppress display
+        of the statistics.
+      \end{itemize}
+
    \item [\htmlref{BEAMFIT}{BEAMFIT}]\mbox{}
       \begin{itemize}
         \item Parameter QUIET has been withdrawn.  Instead set the
@@ -56336,10 +56373,45 @@ The following applications have been modified:
         of the fit parameters.
       \end{itemize}
 
+   \item [\htmlref{CENTROID}{CENTROID}]\mbox{}
+      \begin{itemize}
+        \item Parameter QUIET has been withdrawn.  Instead set the
+        MSG\_FILTER environment variable to {\tt QUIET} to suppress display
+        of the centroid positions.
+      \end{itemize}
+
+   \item [\htmlref{CREFRAME}{CREFRAME}]\mbox{}
+      \begin{itemize}
+        \item Parameter QUIET has been withdrawn.  Instead set the
+        MSG\_FILTER environment variable to {\tt QUIET} to suppress display
+        of the Gaussian parameters in GS mode.
+      \end{itemize}
+
+   \item [\htmlref{CURSOR}{CURSOR}]\mbox{}
+      \begin{itemize}
+        \item Parameter QUIET has been withdrawn.  Instead set the
+        MSG\_FILTER environment variable to {\tt QUIET} to suppress display
+        of the positions.
+      \end{itemize}
+
    \item [\htmlref{FFCLEAN}{FFCLEAN}]\mbox{}
       \begin{itemize}
         \item Parameter ILEVEL has been withdrawn.  Instead use the 
         MSG\_FILTER environment variable to control the output messages.
+      \end{itemize}
+
+   \item [\htmlref{LISTSHOW}{LISTSHOW}]\mbox{}
+      \begin{itemize}
+        \item Parameter QUIET has been withdrawn.  Instead set the
+        MSG\_FILTER environment variable to {\tt QUIET} to suppress display
+        of the positions.
+      \end{itemize}
+
+   \item [\htmlref{LOOK}{LOOK}]\mbox{}
+      \begin{itemize}
+        \item Parameter QUIET has been withdrawn.  Instead set the
+        MSG\_FILTER environment variable to {\tt QUIET} to suppress
+        output messages.
       \end{itemize}
 
    \item [\htmlref{MSTATS}{MSTATS}] \mbox{}
@@ -56356,6 +56428,27 @@ The following applications have been modified:
         DATA\_ARRAY in the output NDF.               
       \end{itemize}
 
+   \item [\htmlref{NDFTRACE}{NDFTRACE}]\mbox{}
+      \begin{itemize}
+        \item Parameter QUIET has been withdrawn.  Instead set the
+        MSG\_FILTER environment variable to {\tt QUIET} to suppress display
+        of the NDF's attributes.
+      \end{itemize}
+
+   \item [\htmlref{PICCUR}{PICCUR}]\mbox{}
+      \begin{itemize}
+        \item Parameter QUIET has been withdrawn.  Instead set the
+        MSG\_FILTER environment variable to {\tt QUIET} to suppress
+        output messages.
+      \end{itemize}
+
+   \item [\htmlref{PICTRANS}{PICTRANS}]\mbox{}
+      \begin{itemize}
+        \item Parameter QUIET has been withdrawn.  Instead set the
+        MSG\_FILTER environment variable to {\tt QUIET} to suppress display
+        of the transformed positions.
+      \end{itemize}
+
    \item [\htmlref{SETAXIS}{SETAXIS}] \mbox{}
       \begin{itemize}
         \item If MODE is {\tt WCS} and the selected axis is a celestial
@@ -56367,6 +56460,13 @@ The following applications have been modified:
       \begin{itemize}
         \item Parameter ILEVEL has been withdrawn.  Instead use the 
         MSG\_FILTER environment variable to control the output messages.
+      \end{itemize}
+
+   \item [\htmlref{WCSTRAN}{WCSTRAN}]\mbox{}
+      \begin{itemize}
+        \item Parameter QUIET has been withdrawn.  Instead set the
+        MSG\_FILTER environment variable to {\tt QUIET} to suppress display
+        of the transformed positions.
       \end{itemize}
 
 

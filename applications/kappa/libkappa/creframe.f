@@ -22,10 +22,10 @@
 
 *  Description:
 *     This application creates a two-dimensional output NDF containing
-*     artificial data of various forms (see parameter MODE).  The output
+*     artificial data of various forms (see Parameter MODE).  The output
 *     NDF can, optionally, have a VARIANCE component describing the 
-*     noise in the data array (see parameter VARIANCE), and additionally
-*     a randomly generated pattern of bad pixels (see parameter BADPIX).
+*     noise in the data array (see Parameter VARIANCE), and additionally
+*     a randomly generated pattern of bad pixels (see Parameter BADPIX).
 *     Bad columns or rows of pixels can also be generated.
 
 *  Usage:
@@ -34,7 +34,7 @@
 *         { background=? distrib=? max=? min=? ngauss=? seeing=?
 *         { mean=? sigma=?
 *         { high=? low=?
-*         mode                                       
+*         mode
 
 *  ADAM Parameters:
 *     BACKGROUND = _REAL (Read)
@@ -69,7 +69,7 @@
 *        High value used in the generated data array (RA and RL modes).
 *     LBOUND( 2 ) = _INTEGER (Read)
 *        Lower pixel bounds of the output NDF.  Only accessed if 
-*        parameter LIKE is set to null (!). 
+*        Parameter LIKE is set to null (!). 
 *     LIKE = NDF (Read)
 *        An optional template NDF which, if specified, will be used to
 *        define the bounds for the output NDF.  If a null value (!) is 
@@ -120,9 +120,6 @@
 *        An output catalogue in which to store the pixel co-ordinates
 *        of the Gausians in the output NDF (GS mode).  If a null value 
 *        is supplied, no output positions list is produced.  [!]
-*     QUIET = _LOGICAL  (Read)
-*         If FALSE, the Gaussian parameters are reported to you on the
-*         screen (GS mode) [TRUE]
 *     SEEING = _REAL (Read)
 *        Seeing (FWHM) in pixels (not the same as the standard 
 *        deviation) (GS mode). 
@@ -133,7 +130,7 @@
 *        Title for the output NDF.  ["KAPPA - Creframe"]
 *     UBOUND( 2 ) = _INTEGER (Read)
 *        Upper pixel bounds of the output NDF. Only accessed if
-*        parameter LIKE is set to null (!). 
+*        Parameter LIKE is set to null (!). 
 *     VARIANCE = _LOGICAL (Read)
 *        If TRUE, a VARIANCE component is added to the output NDF
 *        representing the noise added to the field.  If a null (!) 
@@ -148,6 +145,10 @@
 *        values of 200 counts and a background of 20 counts.  There will
 *        be two bad columns added to the resulting data.  
 
+*  Notes:
+*     -  The Gaussian parameters (GS mode) are not displayed when the 
+*     message filter environment variable MSG_FILTER is set to QUIET.
+
 *  Implementation Status:
 *     - The DATA and VARIANCE components of the output NDF have a 
 *     numerical type of "_REAL" (single-precision floating point).
@@ -157,12 +158,14 @@
 *  Copyright:
 *     Copyright (C) 2001, 2004 Central Laboratory of the Research
 *     Councils. Copyright (C) 2006 Particle Physics & Astronomy
-*     Research Council. All Rights Reserved.
+*     Research Council.
+*     Copyright (C) 2009 Science and Technology Facilities Council. 
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -172,8 +175,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJM: Mark McCaughrean 
@@ -195,10 +198,12 @@
 *     2006 April 12 (MJC):
 *        Remove unused variables, correct punctuation, and wrapped long 
 *        lines.
+*     2009 July 24 (MJC):
+*        Remove QUIET parameter and use the current reporting level
+*        instead (set by the global MSG_FILTER environment variable).
 *     {enter_further_changes_here}
 
 *-
-
 
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing allowed
@@ -209,6 +214,7 @@
       INCLUDE 'PAR_ERR'           ! Parameter system errors
       INCLUDE 'PRM_PAR'           ! VAL__ constants
       INCLUDE 'CNF_PAR'           ! For CNF_PVAL function
+      INCLUDE 'MSG_PAR'           ! Message-system constants
 
 *  Status:
       INTEGER  STATUS
@@ -334,8 +340,8 @@
 *  Find whether a bad row is to be included.
          CALL PAR_GET0I( 'BADROW', BADROW, STATUS )
             
-*  Find out whether the display is wanted on the screen.
-         CALL PAR_GET0L( 'QUIET', QUIET, STATUS )
+*  See if we are to run quietly., i.e not at NORMAL or lower priority.
+         QUIET = .NOT. MSG_FLEVOK( MSG__NORM, STATUS )
 
 *  Mode RR: Random between 0 and 1
       ELSE IF ( MODE .EQ. 'RR' .AND. STATUS .EQ. SAI__OK ) THEN

@@ -24,13 +24,13 @@
 *     using a cursor and displays them on your terminal. The selected
 *     positions may be marked in various ways on the device (see parameter
 *     PLOT), and can be written to an output positions list so that subsequent
-*     applications can make use of them (see parameter OUTCAT). The format 
-*     of the displayed positions may be controlled using parameter STYLE.
+*     applications can make use of them (see Parameter OUTCAT). The format 
+*     of the displayed positions may be controlled using Parameter STYLE.
 *     The pixel data value in any associated NDF can also be displayed
-*     (see parameter SHOWDATA).
+*     (see Parameter SHOWDATA).
 *
 *     Positions may be reported in several different co-ordinate Frames
-*     (see parameter FRAME). Optionally, the corresponding pixel 
+*     (see Parameter FRAME). Optionally, the corresponding pixel 
 *     co-ordinates at each position may also be reported (see parameter
 *     SHOWPIXEL).
 *
@@ -39,7 +39,7 @@
 *
 *     Restrictions can be made on the number of positions to be given (see
 *     parameters MAXPOS and MINPOS), and screen output can be suppressed
-*     (see parameter QUIET).
+*     (see the Notes).
 
 *  Usage:
 *     cursor [mode] [name] [outcat] [device]
@@ -73,11 +73,11 @@
 *        Such values are interpreted as a Besselian epoch if less than 
 *        1984.0 and as a Julian epoch otherwise. 
 *     CLOSE = _LOGICAL (Read)
-*        This parameter is only accessed if parameter PLOT is set to
+*        This parameter is only accessed if Parameter PLOT is set to
 *        "Chain" or "Poly". If TRUE, polygons will be closed by joining 
 *        the first position to the last position. [current value]
 *     COMP = LITERAL (Read)
-*        The NDF array component to be displayed if parameter SHOWDATA is
+*        The NDF array component to be displayed if Parameter SHOWDATA is
 *        set TRUE..  It may be "Data", "Quality", "Variance", or "Error" 
 *        (where "Error" is an alternative to "Variance" and causes the 
 *        square root of the variance values to be displayed).  If "Quality" 
@@ -92,7 +92,7 @@
 *        interaction. [current graphics device]
 *     EPOCH = _DOUBLE (Read)
 *        If a "Sky Co-ordinate System" specification is supplied (using 
-*        parameter FRAME) for a celestial co-ordinate system, then an 
+*        Parameter FRAME) for a celestial co-ordinate system, then an 
 *        epoch value is needed to qualify it. This is the epoch at 
 *        which the supplied sky positions were determined. It should be
 *        given as a decimal years value, with or without decimal places 
@@ -122,7 +122,7 @@
 *        co-ordinate Frame which was current when the picture was created. 
 *        [!]
 *     GEODESIC = _LOGICAL (Read)
-*        This parameter is only accessed if parameter PLOT is set to
+*        This parameter is only accessed if Parameter PLOT is set to
 *        "Chain" or "Poly". It specifies whether the curves drawn between
 *        positions should be straight lines, or should be geodesic curves.
 *        In many co-ordinate Frames geodesic curves will be simple straight 
@@ -132,33 +132,33 @@
 *        projection. [FALSE]
 *     INFO = _LOGICAL (Read)
 *        If TRUE then messages are displayed describing the use of the
-*        mouse prior to obtaining the first position. Note, these
-*        informational messages are not suppressed by setting parameter 
-*        QUIET to TRUE. [TRUE]
+*        mouse prior to obtaining the first position.  Note, these
+*        informational messages are not suppressed by setting MSG_FILTER
+*        environment variable to QUIET.  [TRUE]
 *     JUST = LITERAL (Read)
 *        A string specifying the justification to be used when displaying 
 *        text strings at the supplied cursor positions. This parameter is 
-*        only accessed if parameter PLOT is set to "Text". The supplied
+*        only accessed if Parameter PLOT is set to "Text". The supplied
 *        string should contain two characters; the first should be "B",
 *        "C" or "T", meaning bottom, centre or top. The second should be
 *        "L", "C" or "R", meaning left, centre or right. The text is
 *        displayed so that the supplied position is at the specified 
 *        point within the displayed text string. [CC]
 *     LASTDIM = _INTEGER (Write)
-*        The number of axis values written to parameter LASTPOS.
+*        The number of axis values written to Parameter LASTPOS.
 *     LASTPOS() = _DOUBLE (Write)
 *        The unformatted co-ordinates of the last valid position selected 
 *        with the cursor, in the co-ordinate Frame which was used to
 *        report the position. The number of axis values is written to output
-*        parameter LASTDIM. 
+*        Parameter LASTDIM. 
 *     LOGFILE = FILENAME (Write)
 *        The name of the text file in which the formatted co-ordinates of 
 *        positions selected with the cursor may be stored. This is intended
 *        primarily for recording the screen output, and not for communicating 
-*        positions to subsequent applications (use parameter OUTCAT for this 
+*        positions to subsequent applications (use Parameter OUTCAT for this 
 *        purpose). A null string (!) means that no file is created.  [!]
 *     MARKER = _INTEGER (Read)
-*        This parameter is only accessed if parameter PLOT is set to
+*        This parameter is only accessed if Parameter PLOT is set to
 *        "Chain" or "Mark". It specifies the symbol with which each
 *        position should be marked, and should be given as an integer 
 *        PGPLOT marker type. For instance, 0 gives a box, 1 gives a dot, 
@@ -171,7 +171,7 @@
 *     MINPOS = _INTEGER (Read)
 *        The minimum number of positions which may be supplied. The user
 *        is asked to supply more if necessary. The number must be in the
-*        range 0 to the value of parameter MAXPOS. [0]
+*        range 0 to the value of Parameter MAXPOS. [0]
 *     MODE = LITERAL (Read)
 *        The method used to select the pictures in which cursor positions are 
 *        to be reported. There are three options:
@@ -210,7 +210,7 @@
 *        is stored in a text file in "Small Text List" (STL) format. If no 
 *        file type is given, then ".fit" is assumed. If a null value is 
 *        supplied, no output positions list is produced. See also
-*        parameter CATFRAME. [!]
+*        Parameter CATFRAME. [!]
 *     PLOT = LITERAL (Read)
 *        The type of graphics to be used to mark the selected positions 
 *        which have valid co-ordinates.  The appearance of these graphics
@@ -220,13 +220,13 @@
 *        - "None" -- No graphics are produced.
 *
 *        - "Mark" -- Each position is marked by the symbol specified
-*        by parameter MARKER.
+*        by Parameter MARKER.
 *
 *        - "Poly" -- Causes each position to be joined by a line to the 
 *        previous position.  These lines may be simple straight lines or
-*        geodesic curves (see parameter GEODESIC). The polygons may
+*        geodesic curves (see Parameter GEODESIC). The polygons may
 *        optionally be closed by joining the last position to the first (see
-*        parameter CLOSE).
+*        Parameter CLOSE).
 *
 *        - "Chain" -- This is a combination of "Mark" and "Poly". Each 
 *        position is marked by a symbol and joined by a line to the previous 
@@ -247,31 +247,26 @@
 *        - "Cross" -- A combination of "Vline" and "Hline".
 *
 *        - "Text" -- A text string is used to mark each position. The string 
-*        is drawn horizontally with the justification specified by parameter 
+*        is drawn horizontally with the justification specified by Parameter 
 *        JUST.  The strings to use for each position are specified using 
-*        parameter STRINGS.
+*        Parameter STRINGS.
 *
 *        [current value]
-*     QUIET = _LOGICAL (Read)
-*        If TRUE then positions are not reported on the screen. Output 
-*        parameters and files are still created. The display of informational 
-*        messages describing the use of the cursor is controlled by the 
-*        parameter INFO. [FALSE]
 *     SHOWDATA = _LOGICAL (Read)
 *        If TRUE, the pixel value within the displayed NDF is reported for 
 *        each selected position. This is only possible if the picture
 *        within which position are being selected contains a reference to 
 *        an existing NDF. The NDF array component to be displayed is
-*        selected via parameter COMP. [FALSE]
+*        selected via Parameter COMP. [FALSE]
 *     SHOWPIXEL = _LOGICAL (Read)
 *        If TRUE, the pixel co-ordinates of each selected position are
 *        shown on a separate line, following the co-ordinates requested 
-*        using parameter FRAME. If pixel co-ordinates are being displayed
-*        anyway (see parameter FRAME) then a value of FALSE is used for. 
+*        using Parameter FRAME. If pixel co-ordinates are being displayed
+*        anyway (see Parameter FRAME) then a value of FALSE is used for. 
 *        SHOWPIXEL. [current value]
 *     STRINGS = LITERAL (Read)
 *        A group of text strings which are used to mark the supplied positions 
-*        if parameter PLOT is set to "TEXT". The first string in the
+*        if Parameter PLOT is set to "TEXT". The first string in the
 *        group is used to mark the first position, the second string is
 *        used to mark the second position, etc. If more positions are
 *        given than there are strings in the group, then the extra
@@ -288,7 +283,7 @@
 *        new lines as well as commas.
 *     STYLE = LITERAL (Read)
 *        A group of attribute settings describing the plotting style to use 
-*        when drawing the graphics specified by parameter PLOT. The format 
+*        when drawing the graphics specified by Parameter PLOT. The format 
 *        of the positions reported on the screen may also be controlled.
 *
 *        A comma-separated list of strings should be given in which each
@@ -341,12 +336,12 @@
 *        Frames are described as they are used. Each selected point is
 *        marked with PGPLOT marker 3 (an asterisk). The markers are 
 *        red and are twice the default size.
-*     cursor current maxpos=2 minpos=2 plot=poly quiet outcat=slice 
+*     cursor current maxpos=2 minpos=2 plot=poly outcat=slice 
 *        Exactly two positions are obtained within the current picture, 
 *        and are joined with a straight line. The positions are written to 
-*        a FITS binary catalogue called slice.FIT but are not displayed on 
-*        the screen. The catalogue may be used to communicate the positions 
-*        to later applications (LISTSHOW, PROFILE, etc).
+*        a FITS binary catalogue called slice.FIT.  The catalogue may be
+*        used to communicate the positions to later applications 
+*        (LISTSHOW, PROFILE, etc).
 *     cursor name=data style="^mystyle,digits(1)=5,digits(2)=7"
 *        This obtains co-ordinates within any visible DATA picture on
 *        the current graphics device.  The style to use is read from
@@ -362,7 +357,7 @@
 *        the background is not cleared before drawing the text.
 
 *  Notes:
-*     -  The unformatted values stored in the output parameter LASTPOS, 
+*     -  The unformatted values stored in the output Parameter LASTPOS, 
 *     may not be in the same units as the formatted values shown on
 *     the screen and logged to the log file. For instance, unformatted 
 *     celestial co-ordinate values are stored in radians. 
@@ -380,6 +375,11 @@
 *     are being used to mark the positions, then removed positions will
 *     be highlighted by drawing a marker of type 8 (a circle containing a
 *     cross) over the removed positions in a different colour.
+*     -  The positions are not displayed on the screen when the
+*     message filter environment variable MSG_FILTER is set to QUIET.
+*     The creation of output parameters and files is unaffected
+*     by MSG_FILTER.  The display of informational messages describing
+*     the use of the cursor is controlled by the Parameter INFO.
 
 *  Related Applications:
 *     KAPPA: LISTSHOW, LISTMAKE, PICCUR; Figaro: ICUR, IGCUR.
@@ -388,12 +388,14 @@
 *     Copyright (C) 1989-1993 Science & Engineering Research Council.
 *     Copyright (C) 1995-2001 Central Laboratory of the Research
 *     Councils. Copyright (C) 2006 Particle Physics & Astronomy
-*     Research Council. All Rights Reserved.
+*     Research Council.
+*     Copyright (C) 2009 Science and Technology Facilities Council. 
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -403,8 +405,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     JM: Jo Murray  (STARLINK)
@@ -466,13 +468,13 @@
 *        uniform size, and plotting can occur outside the current
 *        SGS picture in ANCHOR and CURRENT modes.
 *     1997 March 11 (MJC):
-*        Fixed initialisation bug for parameter NUMBER, and hence XP and
+*        Fixed initialisation bug for Parameter NUMBER, and hence XP and
 *        YP.  Fixed bug where SGS pen was being set when PLOT="None".
 *     28-AUG-1998 (DSB):
 *        Radical changes to use PGPLOT and AST for graphics and
 *        co-ordinate handling.
 *     14-DEC-1998 (DSB):
-*        Added parameter JUST.
+*        Added Parameter JUST.
 *     25-AUG-1999 (DSB):
 *        Add TOKEN arg in call to KPG1_ASFRM.
 *     15-FEB-2000 (DSB):
@@ -494,6 +496,9 @@
 *        pictures should have defined WCS.
 *     20-MAY-2009 (DSB):
 *        Add REGION argument to KPG1_MKPOS.
+*     2009 July 24 (MJC):
+*        Remove QUIET parameter and use the current reporting level
+*        instead (set by the global MSG_FILTER environment variable).
 *     {enter_further_changes_here}
 
 *-
@@ -511,6 +516,7 @@
       INCLUDE 'PRM_PAR'       ! VAL__ constants
       INCLUDE 'PAR_ERR'       ! Parameter-system errors
       INCLUDE 'AGI_ERR'       ! AGI error constants
+      INCLUDE 'MSG_PAR'       ! Message-system constants
 
 *  Status:
       INTEGER STATUS          ! Global status
@@ -669,8 +675,8 @@
 *  See if PIXEL co-ords are to be displayed on a separate line.
       CALL PAR_GET0L( 'SHOWPIXEL', SHPIX, STATUS )
 
-*  See if we are to supress display all information on the screen.
-      CALL PAR_GET0L( 'QUIET', QUIET, STATUS )
+*  See if we are to suppress display of all information on the screen.
+      QUIET = .NOT. MSG_FLEVOK( MSG__NORM, STATUS )
 
 *  See what type of graphics are required. 
       CALL PAR_CHOIC( 'PLOT', 'None', 'Poly,Mark,Chain,Box,None,'//
@@ -1340,7 +1346,7 @@
                   END IF
                END IF                        
 
-*  Mark the GRAPHICS position in the manner specified by parameter PLOT.
+*  Mark the GRAPHICS position in the manner specified by Parameter PLOT.
                GXY( 1 ) = DBLE( XC )
                GXY( 2 ) = DBLE( YC )
                CALL KPG1_MKPOS( 2, GXY, IPLOT, .FALSE., PLOT, IMARK, 
@@ -1506,7 +1512,7 @@
 *  applications.
       IF( NP .GT. 0 ) THEN
 
-*  Store the final position in the output parameter LAST.
+*  Store the final position in the output Parameter LAST.
          DO I = 1, NAX
             CXY( I ) = XY( NP, I )
          END DO

@@ -229,10 +229,6 @@
 *     POSITIVE = _LOGICAL (Read)
 *        TRUE, if array features are positive above the background. 
 *        [TRUE]
-*     QUIET = LOGICAL (Read)
-*        If TRUE then the centroid positions are not displayed on the 
-*        screen.  Output parameters and files are still created.
-*        [FALSE]
 *     SEARCH() = _INTEGER (Read)
 *        Size in pixels of the search box to be used. If only a single
 *        value is given, then it will be duplicated to all dimensions
@@ -307,6 +303,10 @@
 *     positions will be stored in the output catalogue.  Any further 
 *     positions will be displayed on the screen but not stored in the
 *     output catalogue.
+*     -  The centroid positions are not displayed on the screen when the
+*     message filter environment variable MSG_FILTER is set to QUIET.
+*     The creation of output parameters and files is unaffected by 
+*     MSG_FILTER.
 
 *  Related Applications:
 *     KAPPA: PSF, CURSOR, LISTSHOW, LISTMAKE.
@@ -345,7 +345,9 @@
 *     Copyright (C) 1991, 1992, 1998-2001 Central Laboratory of 
 *         the Research Councils
 *     Copyright (C) 2004-2006 Particle Physics and Astronomy Research
-*     Council.  All Rights Reserved.
+*     Council.
+*     Copyright (C) 2009 Science and Technology Facilities Council. 
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -388,27 +390,31 @@
 *     13-DEC-2001 (DSB):
 *        Added parameters CATFRAME and CATEPOCH.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
 *     27-DEC-2005 (TIMJ):
-*        Use KPG1_NDFNAM
+*        Use KPG1_NDFNAM.
 *     03-MAY-2006 (TIMJ):
 *        Protect some sections if status is bad. Prevents SEGV.
 *        Initialise some variables.
+*     2009 July 24 (MJC):
+*        Remove QUIET parameter and use the current reporting level
+*        instead (set by the global MSG_FILTER environment variable).
 *     {enter_further_changes_here}
 
 *-
 
 *  Type Definitions:
-      IMPLICIT  NONE           ! No implicit typing allowed
+      IMPLICIT  NONE            ! No implicit typing allowed
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'        ! SSE global definitions
-      INCLUDE 'DAT_PAR'        ! Data-system constants
-      INCLUDE 'AST_PAR'        ! AST constants and functions
-      INCLUDE 'NDF_PAR'        ! NDF definitions
-      INCLUDE 'SUBPAR_PAR'     ! SUBPAR constants
-      INCLUDE 'PAR_ERR'        ! Parameter-system errors
-      INCLUDE 'CNF_PAR'        ! For CNF_PVAL function
+      INCLUDE 'SAE_PAR'         ! SSE global definitions
+      INCLUDE 'DAT_PAR'         ! Data-system constants
+      INCLUDE 'AST_PAR'         ! AST constants and functions
+      INCLUDE 'NDF_PAR'         ! NDF definitions
+      INCLUDE 'SUBPAR_PAR'      ! SUBPAR constants
+      INCLUDE 'PAR_ERR'         ! Parameter-system errors
+      INCLUDE 'CNF_PAR'         ! For CNF_PVAL function
+      INCLUDE 'MSG_PAR'         ! Message-system constants
 
 *  Status:
       INTEGER  STATUS
@@ -433,7 +439,7 @@
       INTEGER I                 ! Loop counter
       INTEGER ID0               ! Identifier for first output position
       INTEGER IMARK             ! PGPLOT marker type
-      INTEGER INDF              ! INput NDF identifier
+      INTEGER INDF              ! Input NDF identifier
       INTEGER IPIC              ! AGI identifier for last data picture
       INTEGER IPIC0             ! AGI id. for original current picture
       INTEGER IPID              ! Pointer to array of pos'n identifiers
@@ -508,8 +514,8 @@
 *  Begin an NDF context.
       CALL NDF_BEGIN
 
-*  See if we are to run quietly.
-      CALL PAR_GET0L( 'QUIET', QUIET, STATUS )
+*  See if we are to run quietly., i.e not at NORMAL or lower priority.
+      QUIET = .NOT. MSG_FLEVOK( MSG__NORM, STATUS )
 
 *  Abort if an error occured.
       IF( STATUS .NE. SAI__OK ) GO TO 999
