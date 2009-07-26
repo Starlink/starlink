@@ -3489,27 +3489,29 @@ c        The original value of the tuning parameter. A default value will
 *        be returned if no value has been set for the parameter.
 
 *  Tuning Parameters:
-*     - ObjectCaching: A boolean flag which indicates what should happen 
-*     to the memory occupied by an AST Object when the Object is deleted 
-*     (i.e. when its reference count falls to zero or it is deleted using 
-c     astDelete). 
-f     AST_DELETE).
-*     If this is zero, the memory is simply freed using the systems "free" 
-*     function. If it is non-zero, the memory is not freed. Instead a pointer 
-*     to it is stored in a pool of such pointers, all of which refer to 
-*     allocated but currently unused blocks of memory. This allows AST to
-*     speed up subsequent Object creation by re-using previously
-*     allocated memory blocks rather than allocating new memory using the
-*     systems malloc function. The default value for this parameter is
-*     zero. Setting it to a non-zero value will result in Object memory
-*     being cached in future. Setting it back to zero causes any memory
-*     blocks currently in the pool to be freed. Note, this tuning parameter 
-*     only controls the caching of memory used to store AST Objects. To 
-*     cache other memory blocks allocated by AST, use MemoryCaching.
-*     - MemoryCaching: A boolean flag similar to ObjectCaching except
-*     that it controls caching of all memory blocks of less than 300 bytes
-*     allocated by AST (whether for internal or external use), not just 
-*     memory used to store AST Objects. 
+*     ObjectCaching
+*        A boolean flag which indicates what should happen
+*        to the memory occupied by an AST Object when the Object is deleted
+*        (i.e. when its reference count falls to zero or it is deleted using
+c        astDelete).
+f        AST_DELETE).
+*        If this is zero, the memory is simply freed using the systems "free"
+*        function. If it is non-zero, the memory is not freed. Instead a
+*        pointer to it is stored in a pool of such pointers, all of which
+*        refer to allocated but currently unused blocks of memory. This allows
+*        AST to speed up subsequent Object creation by re-using previously
+*        allocated memory blocks rather than allocating new memory using the
+*        systems malloc function. The default value for this parameter is
+*        zero. Setting it to a non-zero value will result in Object memory
+*        being cached in future. Setting it back to zero causes any memory
+*        blocks currently in the pool to be freed. Note, this tuning parameter
+*        only controls the caching of memory used to store AST Objects. To
+*        cache other memory blocks allocated by AST, use MemoryCaching.
+*     MemoryCaching
+*        A boolean flag similar to ObjectCaching except
+*        that it controls caching of all memory blocks of less than 300 bytes
+*        allocated by AST (whether for internal or external use), not just
+*        memory used to store AST Objects.
 
 *  Notes:
 c     - This function attempts to execute even if the AST error
