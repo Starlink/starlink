@@ -66,6 +66,7 @@
 
 *  External References:
       LOGICAL MSG_FLEVOK                ! Will messages appear at this level.
+      EXTERNAL MSG_FLEVOK
 
 *  Global Constants:
       INTEGER MSG__NORM                 ! Normal conditional message output level
