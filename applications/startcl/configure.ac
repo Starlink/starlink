@@ -22,6 +22,8 @@ AC_FC_MAIN
 
 STAR_CNF_COMPATIBLE_SYMBOLS
 
+dnl    round() is in libm
+AC_CHECK_LIB([m],[round])
 AC_CHECK_FUNCS(round)
 
 dnl    Just check we have the JPEG headers for sanity. This is a build
