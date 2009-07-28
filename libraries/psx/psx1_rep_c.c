@@ -1,7 +1,7 @@
 #include "ems.h"		 /* EMS function prototypes		    */
+#include "psx1.h"
 
-
-void psx1_rep_c( char *param, char *text, int *status )
+void psx1_rep_c( const char *param, const char *text, int *status )
 
 /*
 *+
