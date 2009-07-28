@@ -11,15 +11,15 @@
 *     Starlink ANSI C (Callable from Fortran)
 
 *  Invocation:
-*     CALL MSG_IFGETENV( ENAME, STATUS )
+*     CALL MSG_IFGETENV( STATUS )
 
 *  Description:
-*     Translate the given environment variable into a value for the filter
+*     Translate the MSG_FILTER environment variable into a value for the filter
 *     level for conditional message output. The translation accepts
 *     abbreviations. This value is then used to set the informational
-*     filtering level. It is recommended that one environment variable name is
-*     used universally for this purpose, namely MSG_FILTER, in order to
-*     clarify usage amongst applications. The acceptable strings are
+*     filtering level. The name is chosen internally to match that used
+*     for msgTune when using the "ENVIRONMENT" to tune. The acceptable
+*     strings for MSG_FILTER are
 *
 *        -  NONE  -- representing MSG__NONE;
 *        -  QUIET -- representing MSG__QUIET;
@@ -39,10 +39,13 @@
 *     will remain unchanged (defaulting to NORMAL).
 
 *  Arguments:
-*     ENAME = CHARACTER * ( * ) (Given)
-*        The filtering level environment variable name.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
+
+*  Notes:
+*     This routine provides a more controlled interface to reading
+*     the MSG_FILTER environment variable rather than msgTune that
+*     will attempt to read all MSG_ related variables.
 
 *  Copyright:
 *     Copyright (C) 2009 Science and Technology Facilities Council.
@@ -71,6 +74,9 @@
 *  History:
 *     22-JUL-2009 (TIMJ):
 *        Wrapper for msgIfgetenv
+*     27-JUL-2009 (TIMJ):
+*        Remove environment name from API to promote a single
+*        usage.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -84,16 +90,9 @@
 #include "mers_f77.h"
 #include "star/mem.h"
 
-F77_SUBROUTINE(msg_ifgetenv)( CHARACTER(ENAME),
-                              INTEGER(STATUS)
-                              TRAIL(ENAME) ) {
+F77_SUBROUTINE(msg_ifgetenv)( INTEGER(STATUS) ) {
   int status;
-  char *ename;
-
-  ename = starMallocAtomic( ENAME_length + 1 );
-  F77_IMPORT_CHARACTER( ENAME, ENAME_length, ename );
   F77_IMPORT_INTEGER( *STATUS, status );
-  msgIfgetenv( ename, &status );
+  msgIfgetenv( &status );
   F77_EXPORT_INTEGER( status, *STATUS );
-  starFree( ename );
 }

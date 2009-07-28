@@ -11,15 +11,14 @@
 *     Starlink ANSI C
 
 *  Invocation:
-*     msgIfgetenv( const char * ename, int * status );
+*     msgIfgetenv( int * status );
 
 *  Description:
-*     Translate the given environment variable name into a value for the
+*     Translate the MSG_FILTER environment variable name into a value for the
 *     filter level for conditional message output. The translation accepts
 *     abbreviations. This value is then used to set the informational
-*     filtering level. It is recommended that one environment variable is
-*     used universally for this purpose, namely MSG_FILTER, in order to
-*     promote a generic interface amongst all applications.  The acceptable
+*     filtering level. The name is chosen internally to match that used
+*     for msgTune when using the "ENVIRONMENT" to tune. The acceptable
 *     strings for MSG_FILTER are
 *
 *        -  NONE  -- representing MSG__NONE;
@@ -41,10 +40,13 @@
 *     will remain unchanged (defaulting to NORMAL).
 
 *  Arguments:
-*     ename = const char * (Given)
-*        The filtering level environment variable name.
 *     status = int * (Given and Returned)
 *        The global status.
+
+*  Notes:
+*     This routine provides a more controlled interface to reading
+*     the MSG_FILTER environment variable rather than msgTune that
+*     will attempt to read all MSG_ related variables.
 
 *  Copyright:
 *     Copyright (C) 2009 Science and Technology Facilities Council.
@@ -73,6 +75,9 @@
 *  History:
 *     22-JUL-2009 (TIMJ):
 *        New routine based on msgIfget_adam
+*     27-JUL-2009 (TIMJ):
+*        Remove environment name from API to promote a single
+*        usage.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -93,8 +98,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-void msgIfgetenv( const char * ename, int * status ) {
+void msgIfgetenv( int * status ) {
 
+  const char ename[] = "MSG_FILTER";
   char *fname = NULL;   /* Name of message filtering level */
 
   /*  Check inherited global status. */

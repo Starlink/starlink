@@ -125,8 +125,7 @@ void msgFmt( const char *token,
 void msgIfget( const char *pname,
                int *status );
 
-void msgIfgetenv( const char * ename,
-                   int * status );
+void msgIfgetenv( int * status );
 
 msglev_t msgIflev( char * filstr, int * status );
 

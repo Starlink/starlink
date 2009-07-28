@@ -92,6 +92,8 @@
 *        propagation.
 *     2009 July 21 (MJC):
 *        Use MSG_FILTER environment variable to set reporting level.
+*     27-JUL-2009 (TIMJ):
+*        Change API for MSG_IFGETENV
 *     {enter_further_changes_here}
 
 *-
@@ -152,7 +154,7 @@
 
 *  Set the message-reporting level.
 *  ================================
-      CALL MSG_IFGETENV( 'MSG_FILTER', STATUS )
+      CALL MSG_IFGETENV( STATUS )
 
 *  Identify and execute the task.
 *  ==============================

@@ -114,9 +114,7 @@ F77_SUBROUTINE(msg_ifget)( CHARACTER(pname),
                            INTEGER(status)
                            TRAIL(pname) );
 
-F77_SUBROUTINE(msg_ifgetenv)( CHARACTER(ENAME),
-                              INTEGER(STATUS)
-                              TRAIL(ENAME) );
+F77_SUBROUTINE(msg_ifgetenv)( INTEGER(STATUS) );
 
 F77_SUBROUTINE(msg_iflev)( INTEGER(FILTER), CHARACTER(STRING),
                            INTEGER(STATUS) TRAIL(STRING) );
