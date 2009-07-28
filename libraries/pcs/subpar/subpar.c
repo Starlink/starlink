@@ -183,6 +183,26 @@ int subParGref( size_t namecode, char * refstr, size_t reflen ) {
   return retval;
 }
 
+F77_SUBROUTINE(subpar_state)( INTEGER(NAMECODE), INTEGER(STATE), INTEGER(STATUS) );
+
+void subParState( size_t namecode, int * state, int * status ) {
+  DECLARE_INTEGER(NAMECODE);
+  DECLARE_INTEGER(STATE);
+  DECLARE_INTEGER(STATUS);
+
+  LOCK_MUTEX;
+  F77_EXPORT_INTEGER( namecode, NAMECODE );
+  F77_EXPORT_INTEGER( *status, STATUS );
+
+  F77_CALL(subpar_state)( INTEGER_ARG(&NAMECODE),
+			  INTEGER_ARG(&STATE),
+			  INTEGER_ARG(&STATUS) );
+
+  F77_IMPORT_INTEGER( STATE, *state );
+  F77_IMPORT_INTEGER( STATUS, *status );
+  UNLOCK_MUTEX;
+}
+
 F77_SUBROUTINE(subpar_sync)(INTEGER(STATUS));
 
 void subParSync( int * status ) {
