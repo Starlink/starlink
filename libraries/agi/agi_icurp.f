@@ -72,6 +72,7 @@
 *.
 
 *   Check status on entry
+      PICID = 0
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *   If the current picture identifier is valid then return it

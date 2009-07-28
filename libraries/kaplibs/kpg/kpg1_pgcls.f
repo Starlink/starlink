@@ -93,6 +93,8 @@
       ISTAT = STATUS
       STATUS = SAI__OK
 
+      IPIC = 0
+
 *  Create a new error context.
       CALL ERR_MARK
 
