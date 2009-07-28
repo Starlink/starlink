@@ -70,6 +70,11 @@
 *         Use first component of node name only.
 *     Jul 1992 (NE):
 *         Get node name from AGI_NODE if defined
+*     28-JUL-2009 (TIMJ):
+*         Use CHR_LEN to find the length of the directory AGI_USER.
+*         If the buffer has been filled it will not end in a space
+*         so INDEX will return 0. Trap case when we can not fit the
+*         string into the FNAME return buffer.
 *-
 
 *  Type Definitions :
@@ -77,6 +82,8 @@
 
 *  Global constants :
       INCLUDE 'SAE_PAR'
+      INCLUDE 'AGI_ERR'
+      INCLUDE 'AGI1_PAR'
 
 *  Arguments Returned :
       CHARACTER * ( * ) FNAME
@@ -85,10 +92,16 @@
 *  Status :
       INTEGER STATUS
 
+*  External References :
+      INTEGER CHR_LEN
+      EXTERNAL CHR_LEN
+
 *  Local variables :
-      CHARACTER * 64 MSTR, NSTR, RSTR, SSTR, TSTR, VSTR
+      CHARACTER * ( AGI1__MAXPATH ) TSTR
+      CHARACTER * 32 MSTR, NSTR, RSTR, SSTR, VSTR
 
       INTEGER NLEN
+      INTEGER ALEN
 *-
 
 *   Check status on entry
@@ -107,10 +120,10 @@
          ENDIF
 
          IF ( STATUS .EQ. SAI__OK ) THEN
-             LNAME = INDEX( TSTR, ' ' ) - 1
+             ALEN = CHR_LEN( TSTR )
          ELSE
              TSTR = ' '
-             LNAME = 1
+             ALEN = 1
              CALL ERR_ANNUL( STATUS )
          ENDIF
 
@@ -134,19 +147,32 @@
             ENDIF
          ENDIF
 
-*   Get the length of the node string (up to the first .)
+*   Get the length of the node string (up to the first '.')
          NLEN = INDEX( NSTR, '.' ) - 1
-         IF ( NLEN .LE. 0 ) NLEN = INDEX( NSTR, ' ' ) - 1
-
-*   Construct full file name
-         FNAME = TSTR( 1 : LNAME ) // '/agi_' // NSTR( 1 : NLEN )
-         LNAME = LNAME + NLEN + 5
+         IF ( NLEN .LE. 0 ) NLEN = CHR_LEN( NSTR )
 
 *   End the error context
          CALL ERR_RLSE
-      ENDIF
 
-  99  CONTINUE
+*   Construct full file name
+         LNAME = ALEN + NLEN + 5
+         IF (LNAME .LE. LEN(FNAME)) THEN
+            FNAME = TSTR( 1 : ALEN ) // '/agi_' // NSTR( 1 : NLEN )
+         ELSE
+            CALL MSG_SETI( 'L', LEN(FNAME) )
+            CALL MSG_SETI( 'A', LNAME )
+            CALL MSG_SETC( 'PATH',
+     :           TSTR( 1 : ALEN ) // '/agi_' // NSTR( 1 : NLEN ) )
+            STATUS = AGI__TRUNC
+            CALL ERR_REP( 'AGI_USER_TRUN',
+     :           'AGI file name too long. '/
+     :           /'Will be truncated from ^A to ^L characters. '/
+     :           /'Consider shortening AGI_USER or AGI_NODE '/
+     :           /'environment variables. '/
+     :           /'(possible programming error)',
+     :           STATUS )
+         END IF
+      ENDIF
 
       END
 

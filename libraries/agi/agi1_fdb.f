@@ -89,7 +89,7 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'agi_nam'
-
+      INCLUDE 'AGI1_PAR'
 
 *  Arguments Returned:
 *    Flag to indicate if database has been found.
@@ -107,7 +107,7 @@
 *  Local Variables:
       LOGICAL FIRST, STATE
 
-      CHARACTER FNAME * 64
+      CHARACTER FNAME * ( AGI1__MAXPATH )
 
       INTEGER LEXT, LNAME
 

@@ -92,6 +92,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
+      INCLUDE 'AGI1_PAR'
       INCLUDE 'agi_nam'
 
 
@@ -106,7 +107,7 @@
 *  Local Variables:
       LOGICAL FOUND
 
-      CHARACTER FNAME * 64
+      CHARACTER FNAME * ( AGI1__MAXPATH )
 
       INTEGER LEXT, LNAME
 
