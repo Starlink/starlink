@@ -55,7 +55,8 @@
 *            the environment variables associated with all the true tuning 
 *            parameters to be used if set. If the environment variable is 
 *            not set, the tuning parameter is not altered. The VALUE argument
-*            is not used.
+*            is not used. The MSG_FILTER will be read using msgIfgetenv
+*            to allow symbolic names for messaging levels.
 *
 *     2. The tuning parameters for MSG and ERR operate partially at the EMS
 *        level and may conflict in their requirements of EMS.
@@ -111,6 +112,9 @@
 *     09-JAN-2009 (TIMJ):
 *        FILTER values can now be MSG__NONE to MSG__ALL and assume that the
 *        integer argument is one of type msglev_t.
+*     27-JUL-2009 (TIMJ):
+*        Use msgIfgetenv when reading MSG_FILTER environment variable since
+*        that routine is much more flexible and can handle a string.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -132,7 +136,7 @@
 
 void msgTune( const char * param, int value, int * status ) {
 
-  const char * parnames[] = { "SZOUT", "STREAM", "FILTER", NULL };
+  const char * parnames[] = { "SZOUT", "STREAM", NULL };
   const char * thispar = NULL;   /* Selected parameter */
 
   int i;
@@ -154,6 +158,17 @@ void msgTune( const char * param, int value, int * status ) {
     while ( parnames[npars] ) {
       npars++;
     }
+
+    /* MSG_FILTER is special-cased because it can be
+       a string. Override status to indicate a tuning error. */
+    msgIfgetenv( status );
+
+    if (*status != SAI__OK) {
+      *status = MSG__BTUNE;
+      emsRep( "MSG_TUNE_INV",
+	      "msgTune: FILTER invalid value from environment variable", status );
+    }
+
   } else {
     env = 0;
     npars = 1;

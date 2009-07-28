@@ -126,7 +126,7 @@ int main ( void ) {
 
   errRlse();
 
-  msgIfgetenv( &status );
+  msgTune( "ENVIRONMENT", 0, &status );
 
   return exstat;
 }
