@@ -16,6 +16,9 @@
 *     The routine tries to get the translation of the environment
 *     variable NAME. If it succeeds, it returns the translation in
 *     TRANS. If it fails, it sets STATUS to PSX__NOENV and reports an error.
+*
+*     If the value of the environment variable does not fit in TRANS
+*     it is truncated and STATUS is set to PSX__TRUNC.
 
 *  Arguments:
 *     NAME = CHARACTER * ( * ) (Given)
@@ -85,6 +88,8 @@
 *        malloc library.
 *     23-FEB-2006 (TIMJ):
 *        Use starMalloc
+*     28-JUL-2009 (TIMJ):
+*        Report an error if the environment value won't fit in the return buffer.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -99,6 +104,7 @@
 
 #include <stdlib.h>		 /* Standard library			    */
 #include <string.h>		 /* String handling library		    */
+#include <stdio.h>
 #include "f77.h"		 /* C - Fortran interface		    */
 #include "psx_err.h"		 /* PSX error values			    */
 #include "psx1.h"		 /* Internal PSX routines		    */
@@ -124,16 +130,16 @@ F77_SUBROUTINE(psx_getenv)( CHARACTER(name),
    char *temp_name;     	 /* Pointer to local copy of name 	    */
    char *ptr;			 /* Pointer to environment variable	    */
    char *errmsg_p;		 /* Pointer to complete error message	    */
+   char errmsg_buff[64];  /* Buffer to build up for error message */
 #if defined(vms)
    char errmsg1[] = "There is no translation for logical name or symbol ";
-#elif defined(sun)
-   char errmsg1[] = "There is no translation for environment variable ";
 #else
-   char *errmsg1; errmsg1 = "There is no translation for environment variable ";
+   const char errmsg1[] = "There is no translation for environment variable ";
 #endif
 
 /* Check inherited global status.					    */
 
+   cnfExprt( " ", trans, trans_length ); /* defensive initialisation */
    if( *status != SAI__OK ) return;
 
 /* If this is a VMS system, initialize the VAX C run time library.	    */
@@ -154,9 +160,18 @@ F77_SUBROUTINE(psx_getenv)( CHARACTER(name),
    {
 
 /* Export the translation of the environment variable to the Fortran string */
-/* trans.								    */
+/* trans. Checking for truncation. */
 
       cnfExprt( ptr, trans, trans_length );
+      if ( cnfLenc(ptr) > trans_length ) {
+
+          *status = PSX__TRUNC;
+          sprintf( errmsg_buff, "Unable to copy environment variable into Fortran buffer. "
+                   "Requires %d characters but return string only has %d",
+                   cnfLenc(ptr), trans_length);
+          psx1_rep_c( "PSX_GETENV_TRUNC", errmsg_buff, status );
+
+     }
 
 /* Free the temporary space.						    */
 
