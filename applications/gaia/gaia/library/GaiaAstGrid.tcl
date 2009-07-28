@@ -244,14 +244,6 @@ itcl::class gaia::GaiaAstGrid {
          -onvalue 1 \
          -offvalue 0
 
-      #  Add resize fonts option.
-      set font_resize_($this) 0
-      $Options add checkbutton  -label {Resize-fonts} \
-         -variable [scope font_resize_($this)] \
-         -onvalue 1 \
-         -offvalue 0 \
-         -command [code $this set_font_resize_]
-
       #  Normal or channel map defaults. Start with normal.
       $Options add checkbutton  -label {Chanmap defaults} \
          -variable [scope chanmap_defaults_] \
@@ -492,12 +484,6 @@ itcl::class gaia::GaiaAstGrid {
       }
    }
 
-   #  Set the font resizing option. Re-draw on change.
-   protected method set_font_resize_ {args} {
-      gaiautils::grffontresize $font_resize_($this)
-      draw_grid_
-   }
-
    #  Convert state into an AST options list.
    protected method gen_options_ {} {
       set options ""
@@ -535,13 +521,9 @@ itcl::class gaia::GaiaAstGrid {
          }
       }
       
-      #  Add scaling options, which may be scaled to image zoom...
-      set xs 1.0
-      if { $font_resize_($this) } {
-         lassign [$itk_option(-rtdimage) scale] xs ys
-      }
+      #  Add scaling options.
       foreach {sname lname deffont defsize} $fontattrib_ {
-         lappend options "size($sname)=[expr $size_($sname)*$xs]"
+         lappend options "size($sname)=$size_($sname)"
       }
       foreach {sname lname default} $widthattrib_ {
          lappend options "width($sname)=[expr $width_($sname)/200.0]"
@@ -2043,9 +2025,6 @@ itcl::class gaia::GaiaAstGrid {
 
    #  True for auto redraw of grid when elements are changed.
    common auto_redraw_
-
-   #  True for font resizing with canvas.
-   common font_resize_
 
    #  Number of grids on display.
    common grid_count_ 0

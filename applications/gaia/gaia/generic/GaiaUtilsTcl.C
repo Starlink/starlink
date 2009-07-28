@@ -128,8 +128,6 @@ static int GaiaUtilsFrameIsA( ClientData clientData, Tcl_Interp *interp,
                               int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsGrfAddColour( ClientData clientData, Tcl_Interp *interp,
                                   int objc, Tcl_Obj *CONST objv[] );
-static int GaiaUtilsGrfFontResize( ClientData clientData, Tcl_Interp *interp,
-                                   int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsGt2DWcs( ClientData clientData, Tcl_Interp *interp,
                              int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsGtAxis( ClientData clientData, Tcl_Interp *interp,
@@ -240,10 +238,6 @@ int GaiaUtils_Init( Tcl_Interp *interp )
 
     Tcl_CreateObjCommand( interp, "gaiautils::grfaddcolour",
                           GaiaUtilsGrfAddColour, (ClientData) NULL,
-                          (Tcl_CmdDeleteProc *) NULL );
-
-    Tcl_CreateObjCommand( interp, "gaiautils::grffontresize",
-                          GaiaUtilsGrfFontResize, (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::get2dwcs", GaiaUtilsGt2DWcs,
@@ -2078,28 +2072,6 @@ static int GaiaUtilsGrfAddColour( ClientData clientData, Tcl_Interp *interp,
     /* Make sure that default colours are established and add new one. */
     astTk_InitColours();
     astTk_AddColour( index, Tcl_GetString( objv[2] ) );
-    return TCL_OK;
-}
-
-/*
- * Set whether GRF controlled fonts are resized as the canvas is scaled.
- *
- * One argument a boolean.
- */
-static int GaiaUtilsGrfFontResize( ClientData clientData, Tcl_Interp *interp,
-                                   int objc, Tcl_Obj *CONST objv[] )
-{
-    /* Check arguments, only allow one. */
-    if ( objc != 2 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, "do_resize" );
-        return TCL_ERROR;
-    }
-
-    int resize = 0;
-    if ( Tcl_GetBooleanFromObj( interp, objv[1], &resize ) != TCL_OK ) {
-        return TCL_ERROR;
-    }
-    astTk_ResizeFonts( resize );
     return TCL_OK;
 }
 

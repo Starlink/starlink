@@ -71,6 +71,9 @@
  *     11-JUL-2009 (PWD):
  *        Removed use of rtd_word canvas text item. Use standard text item
  *        instead (requires Tk 8.6 or backport of code).
+ *     28-JUL-2009 (PWD):
+ *        Change the way that font scaling works. Broken by previous change.
+ *        Remove the resizing concept, that is no longer applicable.
  *     {enter_changes_here}
  *-
  */
@@ -160,35 +163,42 @@ typedef struct configInfo {
     int colour;
     char tag[TAGLEN+14];
     int smooth;
-    int resize;
 } configInfo;
 
 static configInfo ConfigInfo;
 
-/*  Define a list of possible fonts. Keep in sync with script values in 
- *  gaia_defaults.tcl.
+/*  Define a list of possible fonts. Keep in sync with script values in
+ *  gaia_defaults.tcl. Note these must be defined in points, not pixels
+ *  otherwise they will not scale.
+ *
+ *  Historical note: tried named fonts which would be a better method, but the
+ *  propagation of configuration changes through the whole application caused
+ *  unwanted side effects.
  */
-static char *Fonts[20] = {
-    "{TkDefaultFont}",
-    "{TkHeadingFont}",
-    "{TkFixedFont}",
-    "{Helvetica -14 normal}",
-    "{Helvetica -14 italic}",
-    "{Helvetica -14 bold}",
-    "{Helvetica -14 bold italic}",
-    "{Helvetica -12 normal}",
-    "{Helvetica -12 italic}",
-    "{Helvetica -12 bold}",
-    "{Helvetica -12 bold italic}",
-    "{Times -12 normal}",
-    "{Times -12 italic}",
-    "{Times -12 bold}",
-    "{Times -12 bold italic}",
-    "{Fixed -14 normal}",
-    "{Fixed -14 normal italic}",
-    "{Fixed -14 bold}",
-    "{Fixed -14 bold italic}",
-    "{Helvetica -24 bold}"
+typedef struct fontInfo {
+    const char *family;
+    int size;
+    const char *style;
+} fontInfo;
+
+static const fontInfo Fonts[] = {
+    {"Helvetica",   8, "normal"},
+    {"Helvetica",   8, "italic"},
+    {"Helvetica",   8, "bold"},
+    {"Helvetica",   8, "bold italic"},
+    {"Helvetica",  10, "normal"},
+    {"Helvetica",  10, "italic"},
+    {"Helvetica",  10, "bold"},
+    {"Helvetica",  10, "bold italic"},
+    {"Times",       8, "normal"},
+    {"Times",       8, "italic"},
+    {"Times",       8, "bold"},
+    {"Times",       8, "bold italic"},
+    {"Courier",     8, "normal"},
+    {"Courier",     8, "italic"},
+    {"Courier",     8, "bold"},
+    {"Courier",     8, "bold italic"},
+    {"Helvetica",  18, "bold"},
 };
 
 /*  Define a list of possible colours in Tcl format (this is more or
@@ -508,32 +518,6 @@ void astTk_LineType( int segments, int smooth ) {
     } else {
         LineType = POLYLINE;
     }
-}
-
-void astTk_ResizeFonts( int resize ) {
-/*
- *+
- *  Name:
- *     astTk_ResizeFonts
-
- *  Purpose:
- *     Sets whether fonts are resized.
-
- *  Synopsis:
- *     include "grf_tkcan.h"
- *     void astTk_ResizeFonts( int resize )
-
- *  Description:
- *     When fonts are drawn onto a canvas they can either be made to resize
- *     themselves to match any scale changes or not. This function allows you
- *     to configure this behaviour. By default resizing is switched off.
-
- *  Parameters:
- *     int resize
- *        Whether fonts are resized or not, 0 for false, 1 for true.
- *-
- */
-    ConfigInfo.resize = resize;
 }
 
 int astGFlush( void ){
@@ -953,6 +937,8 @@ int astGText( const char *text, float x, float y, const char *just,
     char anchor[3];
     char buffer[CMDLEN];
     float angle;
+    fontInfo finfo;
+    int size;
 
     if ( Interp == NULL ) {
         astError( AST__GRFER,
@@ -972,13 +958,16 @@ int astGText( const char *text, float x, float y, const char *just,
         /* Get the angle between the text base-line and horizontal. */
         angle = atan2( -(double) upx, (double) upy ) * R2D;
 
-        /* Now display the text. */
+        /* Now display the text at the current size. */
+        finfo = Fonts[ConfigInfo.font];
+        size = (int)( (double)finfo.size * ConfigInfo.size );
         (void) sprintf ( buffer,
                          "%s create text %f %f -text {%s} -angle %f "
-                         "-anchor %s -font %s -fill %s -tag {%s} \n",
+                         "-anchor %s -font {%s %d %s} -fill %s -tag {%s} \n",
                          Canvas, (double) x, (double) y, text, angle, anchor,
-                         Fonts[ConfigInfo.font], Colours[ConfigInfo.colour],
-                         ConfigInfo.tag );
+                         finfo.family, size, finfo.style, 
+                         Colours[ConfigInfo.colour], ConfigInfo.tag );
+
         if ( Tcl_Eval( Interp, buffer ) != TCL_OK ) {
             astError( AST__GRFER, "astGText: Failed to draw text." );
             return 0;
@@ -1456,15 +1445,20 @@ static int textBBox( double x, double y, const char *text,
     double sina;
     double xbd[4];
     double ybd[4];
+    fontInfo finfo;
     int i;
     int nbbox;
+    int size;
 
     /*  First display the text using the current configuration
         options, as well as the position and angle. Note we use an
         unlikely canvas tag to arrange control of the item. */
+    finfo = Fonts[ConfigInfo.font];
+    size = (int)( (double)finfo.size * ConfigInfo.size );
     (void) sprintf ( buffer, "%s create text %f %f -text {%s} "
-                     "-anchor %s -font %s -tag grf_word_temp",
-                     Canvas, x, y, text, anchor, Fonts[ConfigInfo.font] );
+                     "-anchor %s -font {%s %d %s} -tag grf_word_temp",
+                     Canvas, x, y, text, anchor, finfo.family, size, 
+                     finfo.style );
 
     if ( Tcl_Eval( Interp, buffer ) == TCL_OK ) {
 

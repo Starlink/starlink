@@ -44,7 +44,7 @@ proc gaia::setXdefaults {} {
     option add *LabelMenu.relief raised
 
     #  Use three main fonts for the UI. One for labels and monospaced text.
-    #  Special symbols are now handled using unicode symbols, so use 
+    #  Special symbols are now handled using unicode symbols, so use
     #  same font as labels. Still separate in UI.
     if { [info exists ::gaia_fonts(labelfont)] } {
        set labelFont $::gaia_fonts(labelfont)
@@ -148,7 +148,7 @@ proc gaia::setXdefaults {} {
 
     option add *GaiaTabStops.textFont        $textFont
 
-    option add *FITSLabelEntry.anchor w 
+    option add *FITSLabelEntry.anchor w
 
     #  Stop ugly tearoff menus and post using "flush", as in Tk4.2.
     option add *TearOff  0 userDefault
@@ -187,7 +187,7 @@ proc gaia::setXdefaults {} {
     option add *CanvasDraw.textFont $textFont
 
     #  OptionDialog
-    option add *OptionDialog.messageWidth 5i 
+    option add *OptionDialog.messageWidth 5i
     option add *OptionDialog.messageFont $labelFont
 
     #  DialogWidget
@@ -202,29 +202,26 @@ proc gaia::setXdefaults {} {
     bind Listbox <4> "%W yview scroll -1 units"
     bind Listbox <5> "%W yview scroll 1 units"
 
-    #  Fonts available in the AST interface. These should match those 
+    #  Fonts available in the AST interface. These should match those
     #  defined in grf_tkcan.c.
-    global ::gaia::astfontmap 
+    global ::gaia::astfontmap
     set ::gaia::astfontmap {
-       0  "TkDefaultFont"             "default"
-       1  "TkHeadingFont"             "label"
-       2  "TkFixedFont"               "fixed"
-       3  "Helvetica -14 normal"      "medium"
-       4  "Helvetica -14 italic"      "medium"
-       5  "Helvetica -14 bold"        "bold"
-       6  "Helvetica -14 bold italic" "bold"
-       7  "Helvetica -12 normal"      "medium"
-       8  "Helvetica -12 italic"      "medium"
-       9  "Helvetica -12 bold"        "bold"
-       10 "Helvetica -12 bold italic" "bold"
-       11 "Times -12 normal"          "medium"
-       12 "Times -12 italic"          "medium"
-       13 "Times -12 bold"            "bold"
-       14 "Times -12 bold italic"     "bold"
-       15 "Fixed -14 normal"          "fixed"
-       16 "Fixed -14 normal italic"   "fixed"
-       17 "Fixed -14 bold"            "fixed"
-       18 "Fixed -14 bold italic"     "fixed"
-       19 "Helvetica -24 bold"         "large"
+       0  "Helvetica 8 normal"       "normal"
+       1  "Helvetica 8 italic"       "italic"
+       2  "Helvetica 8 bold"         "bold"
+       3  "Helvetica 8 bold italic"  "bold italic"
+       4  "Helvetica 10 normal"      "normal"
+       5  "Helvetica 10 italic"      "italic"
+       6  "Helvetica 10 bold"        "bold"
+       7  "Helvetica 10 bold italic" "bold italic"
+       8  "Times 8 normal"           "normal"
+       9  "Times 8 italic"           "italic"
+       10 "Times 8 bold"             "bold"
+       11 "Times 8 bold italic"      "bold italic"
+       12 "Courier 8 normal"         "normal"
+       13 "Courier 8 italic"         "italic"
+       14 "Courier 8 bold"           "bold"
+       15 "Courier 8 bold italic"    "bold italic"
+       16 "Helvetica 18 bold"        "bold"
     }
 }
