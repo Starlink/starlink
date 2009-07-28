@@ -1,3 +1,4 @@
+#include "psx1.h"
 void psx1_init_rtl( void )
 
 /*
