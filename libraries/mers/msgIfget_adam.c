@@ -43,6 +43,9 @@
 *     status = int * (Given and Returned)
 *        The global status.
 
+*  Related Functions:
+*     msgIfgetenv, msgTune
+
 *  Copyright:
 *     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
 *     Copyright (C) 1991, 1992 Science & Engineering Research Council.

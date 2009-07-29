@@ -48,6 +48,9 @@
 *     the MSG_FILTER environment variable rather than msgTune that
 *     will attempt to read all MSG_ related variables.
 
+*  Related Functions:
+*     msgIfget, msgTune
+
 *  Copyright:
 *     Copyright (C) 2009 Science and Technology Facilities Council.
 *     All Rights Reserved.
