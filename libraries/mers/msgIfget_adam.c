@@ -34,8 +34,13 @@
 *     msgIfget accepts abbreviations of these strings; any other value
 *     will result in an error report and the status value being
 *     returned set to MSG__INVIF. If an error occurs getting the
-*     parameter value, the status value is returned and an additional
-*     error report is made.
+*     parameter value, the routine will fall back to reading the
+*     MSG_FILTER environment variable. Supplying "!" (PAR__NULL)
+*     to the parameter will force the environment variable to be read.
+*     If the environment variable can not be read the message filtering
+*     level will be set to "NORM". If the environment variable exists
+*     and does not contain a recognized string there will be an error
+*     report and status will be returned set to MSG__INVIF.
 
 *  Arguments:
 *     pname = const char * (Given)
@@ -100,6 +105,8 @@
 *        Add new message levels. Recognize an integer as a valid level.
 *     22-JUL-2009 (TIMJ):
 *        Now calls msg1Ifget for the bulk of the work.
+*     29-JUL-2009 (TIMJ):
+*        Fall back to reading the environment variable on error.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -140,16 +147,26 @@ void msgIfget( const char * pname, int * status ) {
   /*  Check the returned status. */
   if (*status != SAI__OK) {
 
-    /*     A parameter system error has occured: set the returned status,
-     *     report the error and abort. */
-    emsRep( "MSG_GETIF_NOPAR",
-            "msgIfget: Unable to get the informational filtering "
-            "level from the parameter system.", status );
+    /*     Any failure to read the parameter (even if PAR__NULL is used)
+     *     will force a read of the environment instead */
+    emsAnnul( status );
+
+    /* Force to NORM before we enter the routine */
+    msgIfset( MSG__NORM, status );
+    msgIfgetenv( status );
 
   } else {
 
     /* Translate this string to a message level and set it */
     msg1Ifget( fname, status );
+
+    /* Report that we had a problem with the value originating
+       from the parameter */
+    if (*status != SAI__OK) {
+      emsRep( "MSG_GETIF_NOPAR",
+              "msgIfget: Unable to get the informational filtering "
+              "level from the parameter system.", status );
+    }
 
   }
 
