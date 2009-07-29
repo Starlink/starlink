@@ -1,8 +1,14 @@
 Version 2.1
 -----------
 
+ o Modify msgIfget to fallback to using the MSG_FILTER environment
+   variable if the parameter can not be obtained or has been set to null.
+   All applications using MSG_FILTER parameters have been modified to
+   default to NULL rather than NORM (and msgIfget will now default to
+   NORM internally).
+
  o Add msgIfgetenv for reading and setting the message reporting level
-   from an environment variable in a similar way to msgIfget works
+   from the MSG_FILTER environment variable in a similar way to msgIfget works
    from an ADAM parameter.
 
  o Modify msgIflev interface to also return a string representation
