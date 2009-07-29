@@ -289,3 +289,5 @@ void cupidhelp( int * );
 void makeclumps( int * );
 void extractclumps( int * );
 void clumpinfo( int * );
+
+void cupid_mon( int * );
