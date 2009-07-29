@@ -70,6 +70,9 @@
 #include <fcntl.h>
 #include <typeinfo>
 #include <algorithm>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #include <xercesc/dom/DOM.hpp>
 
