@@ -52,6 +52,8 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -70,6 +72,8 @@
 *     2009 July 21 (MJC):
 *        Reports the message-reporting level, and its own reports
 *        use MSG_OUTIF at the QUIET level.
+*     29-JUL-2009 (TIMJ):
+*        Use MSG_IFLEV to obtain the message filtering level string.
 *     {enter_further_changes_here}
 
 *-
@@ -95,6 +99,7 @@
       CHARACTER*132 GLOVAL       ! Global variable
       CHARACTER*( DAT__SZLOC ) LOC ! Locator to the global file
       CHARACTER*24 MACHIN        ! Machine name
+      INTEGER FILTER             ! Message filter level
       INTEGER NC                 ! Number of characters
       CHARACTER*20 NODE          ! Node name
       CHARACTER*132 PATH         ! Path name of ADAM_USER
@@ -241,25 +246,11 @@
 *  The message-reporting level.  Note this comes not from the global
 *  parameter file, but from the environment variable MSG_FILTER.  This 
 *  avoids having a parameter in every application to control this.
+*  MSG_IFLEV should always work given that MSG_IFGETENV is called
+*  earlier.
       CALL ERR_MARK
-      CALL KPG_ENV0C( 'MSG_FILTER', GLOVAL, STATUS )
-      IF ( STATUS .EQ. PSX__NOENV ) THEN
-         CALL ERR_ANNUL( STATUS )
-         CALL MSG_SETC( 'GLOVAL', 'NORMAL' )
-      ELSE
-
-*  Translate abbreviations to standard form.
-         CALL CHR_UCASE( GLOVAL )
-         IF ( GLOVAL( 1:1 ) .EQ. 'V' ) THEN
-            GLOVAL = 'VERBOSE'
-         ELSE IF ( GLOVAL( 1:1 ) .EQ. 'Q' ) THEN
-            GLOVAL = 'QUIET'
-         ELSE
-            GLOVAL = 'NORMAL'
-         END IF
-
-         CALL MSG_SETC( 'GLOVAL', GLOVAL )
-      END IF
+      CALL MSG_IFLEV( FILTER, GLOVAL, STATUS )
+      CALL MSG_SETC( 'GLOVAL', GLOVAL )
       CALL MSG_OUTIF( MSG__QUIET, 'GLOBAL8',
      :  'The current message-report level is  : ^GLOVAL', STATUS )
       CALL ERR_RLSE
