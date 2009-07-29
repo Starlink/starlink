@@ -1,7 +1,9 @@
 #include "sae_par.h"
 #include "f77.h"                 
 #include "mers.h"
+#include "ndf.h"
 #include "star/task_adam.h"
+#include "par_par.h"
 #include "cupid.h"
 #include <string.h>
 
@@ -74,6 +76,7 @@ void cupid_mon( int *status ) {
 *        Original version.
 *     29-JUL-2009 (TIMJ):
 *        Call taskGetName rather than Fortran.
+*        Add CUPID and version number to NDF history.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -83,7 +86,8 @@ void cupid_mon( int *status ) {
 */
 
 /* Local variables: */
-   char name[16];                 /* C character variable to hold name */
+   char appname[NDF__SZAPP+1];    /* Application name for NDF History */
+   char name[PAR__SZNAM+1];       /* C character variable to hold name */
    int ast_caching;               /* Initial value of AST MemoryCaching tuning parameter */
 
 /* Check the inherited status. */
@@ -91,6 +95,12 @@ void cupid_mon( int *status ) {
 
 /* Obtain the command from the environment.  This returns uppercase names. */
    taskGetName( name, sizeof(name), status );
+
+/* Update the application name in the NDF history recording
+   to include the version number of the application */
+   snprintf( appname, NDF__SZAPP, "%-*s (%s V%s)", PAR__SZNAM,
+             name, PACKAGE_UPCASE, PACKAGE_VERSION);
+   ndfHappn( appname, status );
 
 /* Make AST use the same variable for its inherited status. */
    astWatch( status );

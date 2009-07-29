@@ -3,6 +3,10 @@ AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
 AC_INIT(cupid, 1.1, ussc@star.rl.ac.uk)
+PACKAGE_UPCASE='CUPID'
+AC_DEFINE( [PACKAGE_UPCASE], "CUPID", [Upper cased package name] )
+AC_SUBST(PACKAGE_UPCASE)
+
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
