@@ -12,10 +12,6 @@
 CupidPixelSet **cupid_ps_cache = NULL;
 int cupid_ps_cache_size = 0;
 
-
-extern F77_SUBROUTINE(task_get_name)( CHARACTER(name), INTEGER(status) TRAIL(name) );
-
-
 void cupid_mon( int *status ) {
 /*
 *+
