@@ -203,6 +203,9 @@
 #         Add OUTFILES to all routines.
 #     2-JUL-2009 (DSB):
 #         Added EXTRACOLS parameter to MAKECUBE
+#     29-JUL-2009 (TIMJ):
+#         Change MSG_FILTER defaulting from NORM to ! to support
+#         new msgIfget behaviour.
 #     {enter_changes_here}
 
 #  Bugs:
@@ -262,7 +265,7 @@ package @PACKAGE@ {
             parameter msg_filter {
                 type _CHAR
                 prompt {Message level}
-                default NORM
+                default !
                 vpath DEFAULT
                 helpkey *
             }
@@ -356,7 +359,7 @@ package @PACKAGE@ {
             parameter msg_filter {
                 type _CHAR
                 prompt {Message level}
-                default NORM
+                default !
                 vpath DEFAULT	
                 helpkey *
             }
@@ -638,7 +641,7 @@ package @PACKAGE@ {
                 type _CHAR
                 prompt {Message level}
                 vpath DEFAULT
-                default NORM
+                default !
                 helpkey *
             }
 
@@ -771,7 +774,7 @@ package @PACKAGE@ {
             parameter msg_filter {
                 type _CHAR
                 prompt {Message level}
-                default NORM
+                default !
                 vpath DEFAULT	
                 helpkey *
             }
@@ -824,7 +827,7 @@ package @PACKAGE@ {
             parameter msg_filter {
                 type _CHAR
                 prompt {Message level}
-                default NORM
+                default !
                 vpath DEFAULT	
                 helpkey *
             }
@@ -857,7 +860,7 @@ package @PACKAGE@ {
             parameter msg_filter {
                 type _CHAR
                 prompt {Message level}
-                default NORM
+                default !
                 vpath DEFAULT	
                 helpkey *
             }
@@ -890,7 +893,7 @@ package @PACKAGE@ {
             parameter msg_filter {
                 type _CHAR
                 prompt {Message level}
-                default NORM
+                default !
                 vpath DEFAULT
                 helpkey *
             }
@@ -949,7 +952,7 @@ package @PACKAGE@ {
             parameter msg_filter {
                 type _CHAR
                 prompt {Message level}
-                default NORM
+                default !
                 vpath DEFAULT	
                 helpkey *
             }
@@ -1025,7 +1028,7 @@ package @PACKAGE@ {
             parameter msg_filter {
                 type _CHAR
                 prompt {Message level}
-                default NORM
+                default !
                 vpath DEFAULT	
                 helpkey *
             }
@@ -1068,7 +1071,7 @@ package @PACKAGE@ {
             parameter msg_filter {
                 type _CHAR
                 prompt {Message level}
-                default NORM
+                default !
                 vpath DEFAULT	
                 helpkey *
             }
@@ -1102,7 +1105,7 @@ package @PACKAGE@ {
             parameter msg_filter {
                 type _CHAR
                 prompt {Message level}
-                default NORM
+                default !
                 vpath DEFAULT	
                 helpkey *
             }
@@ -1183,7 +1186,7 @@ package @PACKAGE@ {
             parameter msg_filter {
                 type _CHAR
                 prompt {Message level}
-                default NORM
+                default !
                 vpath DEFAULT
                 helpkey *
             }
@@ -1238,7 +1241,7 @@ package @PACKAGE@ {
             parameter msg_filter {
                 type _CHAR
                 prompt {Message level}
-                default NORM
+                default !
                 vpath DEFAULT	
                 helpkey *
             }
@@ -1271,7 +1274,7 @@ package @PACKAGE@ {
             parameter msg_filter {
                 type _CHAR
                 prompt {Message level}
-                default NORM
+                default !
                 vpath DEFAULT	
                 helpkey *
             }
@@ -1334,7 +1337,7 @@ package @PACKAGE@ {
             parameter msg_filter {
                 type _CHAR
                 prompt {Message level}
-                default NORM
+                default !
                 vpath DEFAULT	
                 helpkey *
             }
@@ -1423,7 +1426,7 @@ package @PACKAGE@ {
                 type _CHAR
                 prompt {Message level}
                 vpath DEFAULT
-                default NORM
+                default !
                 helpkey *
             }
 
@@ -1658,7 +1661,7 @@ package @PACKAGE@ {
             parameter msg_filter {
                 type _CHAR
                 prompt {Message level}
-                default NORM
+                default !
                 vpath DEFAULT	
                 helpkey *
             }
@@ -1893,7 +1896,7 @@ package @PACKAGE@ {
             parameter msg_filter {
                 type _CHAR
                 prompt {Message level}
-                default NORM
+                default !
                 vpath DEFAULT	
                 helpkey *
             }
@@ -1948,7 +1951,7 @@ package @PACKAGE@ {
                 type _CHAR
                 prompt {Message level}
                 vpath DEFAULT
-                default NORM
+                default !
                 helpkey *
             }
         }
@@ -2022,7 +2025,7 @@ package @PACKAGE@ {
                 type _CHAR
                 prompt {Message level}
                 vpath DEFAULT
-                default NORM
+                default !
                 helpkey *
             }
         }
@@ -2078,7 +2081,7 @@ package @PACKAGE@ {
                 type _CHAR
                 prompt {Message level}
                 vpath DEFAULT
-                default NORM
+                default !
                 helpkey *
             }
 
@@ -2145,7 +2148,7 @@ package @PACKAGE@ {
             parameter msg_filter {
                 type _CHAR
                 prompt {Message level}
-                default NORM
+                default !
                 vpath DEFAULT
                 helpkey *
             }
@@ -2227,7 +2230,7 @@ package @PACKAGE@ {
                 type _CHAR
                 prompt {Message level}
                 vpath DEFAULT
-                default NORM
+                default !
                 helpkey *
             }
         }
@@ -2246,7 +2249,7 @@ package @PACKAGE@ {
             parameter msg_filter {
                 type _CHAR
                 prompt {Message level}
-                default NORM
+                default !
                 vpath DEFAULT
                 helpkey *
             }
@@ -2283,7 +2286,7 @@ package @PACKAGE@ {
             parameter msg_filter {
                 type _CHAR
                 prompt {Message level}
-                default NORM
+                default !
                 vpath DEFAULT
                 helpkey *
             }
@@ -2421,7 +2424,7 @@ package @PACKAGE@ {
             parameter msg_filter {
                 type _CHAR
                 prompt {Message level}
-                default NORM
+                default !
                 vpath DEFAULT
                 helpkey *
             }
@@ -2462,7 +2465,7 @@ package @PACKAGE@ {
                 type _CHAR
                 prompt {Message level}
                 vpath DEFAULT
-                default NORM
+                default !
                 helpkey *
             }
         }
@@ -2535,7 +2538,7 @@ package @PACKAGE@ {
             parameter msg_filter {
                 type _CHAR
                 prompt {Message level}
-                default NORM
+                default !
                 vpath DEFAULT	
                 helpkey *
             }
@@ -2606,7 +2609,7 @@ package @PACKAGE@ {
             parameter msg_filter {
                 type _CHAR
                 prompt {Message level}
-                default NORM
+                default !
                 vpath DEFAULT	
                 helpkey *
             }
@@ -2657,7 +2660,7 @@ package @PACKAGE@ {
             parameter msg_filter {
                 type _CHAR
                 prompt {Message level}
-                default NORM
+                default !
                 vpath DEFAULT	
                 helpkey *
             }
@@ -2703,7 +2706,7 @@ package @PACKAGE@ {
             parameter msg_filter {
                 type _CHAR
                 prompt {Message level}
-                default NORM
+                default !
                 vpath DEFAULT	
                 helpkey *
             }

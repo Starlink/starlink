@@ -22,6 +22,8 @@
 #     17-SEP-1998 (TIMJ):
 #        Add MSG_FILTER
 #        Add SEMI_DIAM and SOLID_ANG
+#     29-JUL-2009 (TIMJ):
+#        Change default value for MSG_FILTER to !
 #     {enter_changes_here}
 
 #-    
@@ -31,7 +33,7 @@ interface FLUXES
     PARAMETER MSG_FILTER
         TYPE     '_CHAR'
         PROMPT   'Messaging level'
-        DEFAULT  'NORM'
+        DEFAULT  !
         VPATH    'DEFAULT'
         HELPKEY  '*'
       ENDPARAMETER

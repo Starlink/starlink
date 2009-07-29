@@ -1,3 +1,5 @@
+# -*- tcl -*-
+
 package surf {
 
    version @PACKAGE_VERSION@
@@ -61,6 +63,9 @@ package surf {
 #        Add TRIM
 #     1999 May 28 (TIMJ)
 #       Add REFPIX
+#     29-JUL-2009 (TIMJ):
+#         Change MSG_FILTER defaulting from NORM to ! to support
+#         new msgIfget behaviour.
 #     {enter_further_changes_here}
 
 #-
@@ -110,7 +115,7 @@ package surf {
          parameter msg_filter {
             type _CHAR
             prompt {Messaging level}
-            default NORM
+            default !
             vpath DEFAULT
             helpkey *
           }
@@ -415,7 +420,7 @@ package surf {
          parameter msg_filter {
             type _CHAR
             prompt {Messaging level}
-            default NORM
+            default !
             vpath DEFAULT
             helpkey *
           }
@@ -526,7 +531,7 @@ package surf {
          parameter msg_filter {
             type _CHAR
             prompt {Messaging level}
-            default NORM
+            default !
             vpath DEFAULT
             helpkey *
           }
@@ -612,7 +617,7 @@ package surf {
          parameter msg_filter {
             type _CHAR
             prompt {Messaging level}
-            default NORM
+            default !
             vpath DEFAULT
             helpkey *
           }
@@ -686,7 +691,7 @@ package surf {
          parameter msg_filter {
             type _CHAR
             prompt {Messaging level}
-            default NORM
+            default !
             vpath DEFAULT
             helpkey *
           }
@@ -778,7 +783,7 @@ package surf {
          parameter msg_filter {
             type _CHAR
             prompt {Messaging level}
-            default NORM
+            default !
             vpath DEFAULT
             helpkey *
           }
@@ -937,7 +942,7 @@ package surf {
          parameter msg_filter {
             type _CHAR
             prompt {Messaging level}
-            default NORM
+            default !
             vpath DEFAULT
             helpkey *
           }
@@ -1077,7 +1082,7 @@ package surf {
          parameter msg_filter {
             type _CHAR
             prompt {Messaging level}
-            default NORM
+            default !
             vpath DEFAULT
             helpkey *
           }
@@ -1169,7 +1174,7 @@ package surf {
          parameter msg_filter {
             type _CHAR
             prompt {Messaging level}
-            default NORM
+            default !
             vpath DEFAULT
             helpkey *
           }
@@ -1301,7 +1306,7 @@ package surf {
          parameter msg_filter {
             type _CHAR
             prompt {Messaging level}
-            default NORM
+            default !
             vpath DEFAULT
             helpkey *
           }
@@ -1396,7 +1401,7 @@ package surf {
          parameter msg_filter {
             type _CHAR
             prompt {Messaging level}
-            default NORM
+            default !
             vpath DEFAULT
             helpkey *
           }
@@ -1460,7 +1465,7 @@ package surf {
          parameter msg_filter {
             type _CHAR
             prompt {Messaging level}
-            default NORM
+            default !
             vpath DEFAULT
             helpkey *
           }
@@ -1583,7 +1588,7 @@ package surf {
          parameter msg_filter {
             type _CHAR
             prompt {Messaging level}
-            default NORM
+            default !
             vpath DEFAULT
             helpkey *
           }
@@ -1841,7 +1846,7 @@ package surf {
          parameter msg_filter {
             type _CHAR
             prompt {Messaging level}
-            default NORM
+            default !
             vpath DEFAULT
             helpkey *
           }
@@ -2045,7 +2050,7 @@ package surf {
          parameter msg_filter {
             type _CHAR
             prompt {Messaging level}
-            default NORM
+            default !
             vpath DEFAULT
             helpkey *
           }
@@ -2176,7 +2181,7 @@ package surf {
          parameter msg_filter {
             type _CHAR
             prompt {Messaging level}
-            default NORM
+            default !
             vpath DEFAULT
             helpkey *
           }
@@ -2263,7 +2268,7 @@ package surf {
          parameter msg_filter {
             type _CHAR
             prompt {Messaging level}
-            default NORM
+            default !
             vpath DEFAULT
             helpkey *
           }
@@ -2344,7 +2349,7 @@ package surf {
          parameter msg_filter {
             type _CHAR
             prompt {Messaging level}
-            default NORM
+            default !
             vpath DEFAULT
             helpkey *
           }
@@ -2446,7 +2451,7 @@ package surf {
          parameter msg_filter {
             type _CHAR
             prompt {Messaging level}
-            default NORM
+            default !
             vpath DEFAULT
             helpkey *
           }
@@ -2529,7 +2534,7 @@ package surf {
          parameter msg_filter {
             type _CHAR
             prompt {Messaging level}
-            default NORM
+            default !
             vpath DEFAULT
             helpkey *
           }
@@ -2716,7 +2721,7 @@ package surf {
          parameter msg_filter {
             type _CHAR
             prompt {Messaging level}
-            default NORM
+            default !
             vpath DEFAULT
             helpkey *
           }
@@ -2829,7 +2834,7 @@ package surf {
          parameter msg_filter {
             type _CHAR
             prompt {Messaging level}
-            default NORM
+            default !
             vpath DEFAULT
             helpkey *
           }
@@ -3002,7 +3007,7 @@ package surf {
          parameter msg_filter {
             type _CHAR
             prompt {Messaging level}
-            default NORM
+            default !
             vpath DEFAULT
             helpkey *
           }
@@ -3150,7 +3155,7 @@ package surf {
          parameter msg_filter {
             type _CHAR
             prompt {Messaging level}
-            default NORM
+            default !
             vpath DEFAULT
             helpkey *
           }
@@ -3219,7 +3224,7 @@ package surf {
          parameter msg_filter {
             type _CHAR
             prompt {Messaging level}
-            default NORM
+            default !
             vpath DEFAULT
             helpkey *
           }
@@ -3351,7 +3356,7 @@ package surf {
          parameter msg_filter {
             type _CHAR
             prompt {Messaging level}
-            default NORM
+            default !
             vpath DEFAULT
             helpkey *
           }
@@ -3407,7 +3412,7 @@ package surf {
          parameter msg_filter {
             type _CHAR
             prompt {Messaging level}
-            default NORM
+            default !
             vpath DEFAULT
             helpkey *
           }
@@ -3503,7 +3508,7 @@ package surf {
          parameter msg_filter {
             type _CHAR
             prompt {Messaging level}
-            default NORM
+            default !
             vpath DEFAULT
             helpkey *
           }
@@ -3571,7 +3576,7 @@ package surf {
          parameter msg_filter {
             type _CHAR
             prompt {Messaging level}
-            default NORM
+            default !
             vpath DEFAULT
             helpkey *
           }

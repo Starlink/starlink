@@ -207,7 +207,7 @@ package cupid {
             access READ
             type _CHAR
             prompt {Information level}
-            default NORM
+            default !
             vpath DEFAULT
             ppath CURRENT DEFAULT
             helpkey *
@@ -300,7 +300,7 @@ package cupid {
          parameter ilevel {
             type _CHAR
             prompt {Information level}
-            default NORM
+            default !
             vpath DEFAULT
             ppath CURRENT DEFAULT
             access READ

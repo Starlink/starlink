@@ -1,3 +1,5 @@
+# -*- tcl -*-
+
 package iras90 {
    version 1.1-2
    prefix iras90
@@ -69,7 +71,7 @@ package iras90 {
             vpath GLOBAL {DEFAULT }
             ppath GLOBAL DEFAULT
             association <->GLOBAL.MSG_FILTER
-            default NORMAL
+            default !
             prompt {Level of information to be displayed on the screen}
             helpkey *
           }
@@ -286,7 +288,7 @@ package iras90 {
             vpath GLOBAL {DEFAULT }
             ppath GLOBAL DEFAULT
             association <->GLOBAL.MSG_FILTER
-            default NORMAL
+            default !
             prompt {Level of information to be displayed on the screen}
             helpkey *
           }
@@ -437,7 +439,7 @@ package iras90 {
             vpath GLOBAL {DEFAULT }
             ppath GLOBAL DEFAULT
             association <->GLOBAL.MSG_FILTER
-            default NORMAL
+            default !
             prompt {Level of information to be displayed on the screen}
             helpkey *
           }
@@ -562,7 +564,7 @@ package iras90 {
             vpath GLOBAL {DEFAULT }
             ppath GLOBAL DEFAULT
             association <->GLOBAL.MSG_FILTER
-            default NORMAL
+            default !
             prompt {Level of information to be displayed on the screen}
             helpkey *
           }
@@ -723,7 +725,7 @@ package iras90 {
             vpath GLOBAL {DEFAULT }
             ppath GLOBAL DEFAULT
             association <->GLOBAL.MSG_FILTER
-            default NORMAL
+            default !
             prompt {Level of information to be displayed on the screen}
             helpkey *
           }
@@ -906,7 +908,7 @@ package iras90 {
             vpath GLOBAL {DEFAULT }
             ppath GLOBAL DEFAULT
             association <->GLOBAL.MSG_FILTER
-            default NORMAL
+            default !
             prompt {Level of information to be displayed on the screen}
             helpkey *
           }
@@ -1481,7 +1483,7 @@ package iras90 {
             vpath GLOBAL {DEFAULT }
             ppath GLOBAL DEFAULT
             association <->GLOBAL.MSG_FILTER
-            default NORMAL
+            default !
             prompt {Level of information to be displayed on the screen}
             helpkey *
           }
@@ -1720,7 +1722,7 @@ package iras90 {
             vpath GLOBAL {DEFAULT }
             ppath GLOBAL DEFAULT
             association <->GLOBAL.MSG_FILTER
-            default NORMAL
+            default !
             prompt {Level of information to be displayed on the screen}
             helpkey *
           }
@@ -1980,7 +1982,7 @@ package iras90 {
             vpath GLOBAL {DEFAULT }
             ppath GLOBAL DEFAULT
             association <->GLOBAL.MSG_FILTER
-            default NORMAL
+            default !
             prompt {Level of information to be displayed on the screen}
             helpkey *
           }
@@ -2152,7 +2154,7 @@ package iras90 {
             vpath GLOBAL {DEFAULT }
             ppath GLOBAL DEFAULT
             association <->GLOBAL.MSG_FILTER
-            default NORMAL
+            default !
             prompt {Level of information to be displayed on the screen}
             helpkey *
           }
@@ -2287,7 +2289,7 @@ package iras90 {
             vpath GLOBAL {DEFAULT }
             ppath GLOBAL DEFAULT
             association <->GLOBAL.MSG_FILTER
-            default NORMAL
+            default !
             prompt {Level of information to be displayed on the screen}
             helpkey *
           }
@@ -2495,7 +2497,7 @@ package iras90 {
             vpath GLOBAL {DEFAULT }
             ppath GLOBAL DEFAULT
             association <->GLOBAL.MSG_FILTER
-            default NORMAL
+            default !
             prompt {Level of information to be displayed on the screen}
             helpkey *
           }
@@ -2629,7 +2631,7 @@ package iras90 {
             vpath GLOBAL {DEFAULT }
             ppath GLOBAL DEFAULT
             association <->GLOBAL.MSG_FILTER
-            default NORMAL
+            default !
             prompt {Level of information to be displayed on the screen}
             helpkey *
           }
@@ -2752,7 +2754,7 @@ package iras90 {
             vpath GLOBAL {DEFAULT }
             ppath GLOBAL DEFAULT
             association <->GLOBAL.MSG_FILTER
-            default NORMAL
+            default !
             prompt {Level of information to be displayed on the screen}
             helpkey *
           }
@@ -2834,7 +2836,7 @@ package iras90 {
             vpath GLOBAL {DEFAULT }
             ppath GLOBAL DEFAULT
             association <->GLOBAL.MSG_FILTER
-            default NORMAL
+            default !
             prompt {Level of information to be displayed on the screen}
             helpkey *
           }
@@ -2937,7 +2939,7 @@ package iras90 {
             vpath GLOBAL {DEFAULT }
             ppath GLOBAL DEFAULT
             association <->GLOBAL.MSG_FILTER
-            default NORMAL
+            default !
             prompt {Level of information to be displayed on the screen}
             helpkey *
           }
@@ -3061,7 +3063,7 @@ package iras90 {
             vpath GLOBAL {DEFAULT }
             ppath GLOBAL DEFAULT
             association <->GLOBAL.MSG_FILTER
-            default NORMAL
+            default !
             prompt {Level of information to be displayed on the screen}
             helpkey *
           }
@@ -3186,7 +3188,7 @@ package iras90 {
             vpath GLOBAL {DEFAULT }
             ppath GLOBAL DEFAULT
             association <->GLOBAL.MSG_FILTER
-            default NORMAL
+            default !
             prompt {Level of information to be displayed on the screen}
             helpkey *
           }
@@ -3257,7 +3259,7 @@ package iras90 {
             vpath GLOBAL {DEFAULT }
             ppath GLOBAL DEFAULT
             association <->GLOBAL.MSG_FILTER
-            default NORMAL
+            default !
             prompt {Level of information to be displayed on the screen}
             helpkey *
           }
@@ -3422,7 +3424,7 @@ package iras90 {
             vpath GLOBAL {DEFAULT }
             ppath GLOBAL DEFAULT
             association <->GLOBAL.MSG_FILTER
-            default NORMAL
+            default !
             prompt {Level of information to be displayed on the screen}
             helpkey *
           }
@@ -3683,7 +3685,7 @@ package iras90 {
             vpath GLOBAL {DEFAULT }
             ppath GLOBAL DEFAULT
             association <->GLOBAL.MSG_FILTER
-            default NORMAL
+            default !
             prompt {Level of information to be displayed on the screen}
             helpkey *
           }
@@ -3916,7 +3918,7 @@ package iras90 {
             vpath GLOBAL {DEFAULT }
             ppath GLOBAL DEFAULT
             association <->GLOBAL.MSG_FILTER
-            default NORMAL
+            default !
             prompt {Level of information to be displayed on the screen}
             helpkey *
           }
@@ -4147,7 +4149,7 @@ package iras90 {
             vpath GLOBAL {DEFAULT }
             ppath GLOBAL DEFAULT
             association <->GLOBAL.MSG_FILTER
-            default NORMAL
+            default !
             prompt {Level of information to be displayed on the screen}
             helpkey *
           }
@@ -4338,7 +4340,7 @@ package iras90 {
             vpath GLOBAL {DEFAULT }
             ppath GLOBAL DEFAULT
             association <->GLOBAL.MSG_FILTER
-            default NORMAL
+            default !
             prompt {Level of information to be displayed on the screen}
             helpkey *
           }
@@ -4548,7 +4550,7 @@ package iras90 {
             vpath GLOBAL {DEFAULT }
             ppath GLOBAL DEFAULT
             association <->GLOBAL.MSG_FILTER
-            default NORMAL
+            default !
             prompt {Level of information to be displayed on the screen}
             helpkey *
           }
@@ -4800,7 +4802,7 @@ package iras90 {
             vpath GLOBAL {DEFAULT }
             ppath GLOBAL DEFAULT
             association <->GLOBAL.MSG_FILTER
-            default NORMAL
+            default !
             prompt {Level of information to be displayed on the screen}
             helpkey *
           }
@@ -5098,7 +5100,7 @@ package iras90 {
             vpath GLOBAL {DEFAULT }
             ppath GLOBAL DEFAULT
             association <->GLOBAL.MSG_FILTER
-            default NORMAL
+            default !
             prompt {Level of information to be displayed on the screen}
             helpkey *
           }
@@ -5284,7 +5286,7 @@ package iras90 {
             vpath GLOBAL {DEFAULT }
             ppath GLOBAL DEFAULT
             association <->GLOBAL.MSG_FILTER
-            default NORMAL
+            default !
             prompt {Level of information to be displayed on the screen}
             helpkey *
           }

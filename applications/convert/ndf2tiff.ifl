@@ -11,6 +11,7 @@
 #     GJP: Grant Privett (STARLINK)
 #     MJC: Malcolm J. Currie (STARLINK)
 #     AJC: Alan J. Chipperfield (STARLINK)
+#     TIMJ: Tim Jenness (JAC, Hawaii)
 #     {enter_new_authors_here}
 
 #  History:
@@ -23,6 +24,8 @@
 #	 function banner.
 #      4-FEB-1999 (AJC):
 #        Added Scaling parameters
+#      29-JUL-2009 (TIMJ):
+#        MSG_FILTER now defaults to NULL
 #     {enter_further_changes_here}
 
 #-    
@@ -131,7 +134,7 @@ interface NDF2TIFF
       keyword     'MSG_FILTER'
       type        'LITERAL'
       vpath       'DEFAULT'
-      default     'NORMAL'
+      default     !
       prompt      'Message filtering level'
       helpkey     '*'
    endparameter
