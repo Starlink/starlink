@@ -202,7 +202,7 @@ package cupid {
             helpkey *
           }
 
-         parameter ilevel {
+         parameter msg_filter {
             position 4
             access READ
             type _CHAR
@@ -297,7 +297,7 @@ package cupid {
             helpkey *
           }
 
-         parameter ilevel {
+         parameter msg_filter {
             type _CHAR
             prompt {Information level}
             default !

@@ -79,7 +79,7 @@ void findback( int *status ){
 *        supplied, then the same value will be used for the both the first 
 *        and second pixel axes (a value of 1 will be assumed for the third 
 *        axis if the input array is 3-dimensional).
-*     ILEVEL = _CHAR (Read)
+*     MSG_FILTER = _CHAR (Read)
 *        Controls the amount of diagnostic information reported. This is the
 *        standard messaging level. The default messaging level is NORM (2).
 *        A value of NONE or 0 will suppress all screen output. VERB (3) will
@@ -142,6 +142,8 @@ void findback( int *status ){
 *        - Use generic data type handling as in FINDCLUMPS.
 *     14-JAN-2009 (TIMJ):
 *        Use MERS for message filtering.
+*     29-JUL-2009 (TIMJ):
+*        Rename ILEVEL to MSG_FILTER
 *     {enter_further_changes_here}
 
 *-
@@ -203,7 +205,7 @@ void findback( int *status ){
    wb = NULL;
 
 /* Get the interaction level. */
-   msgIfget( "ILEVEL", status );
+   msgIfget( "MSG_FILTER", status );
 
 /* Get an identifier for the input NDF. We use NDG (via kpg1_Rgndf)
    instead of calling ndfAssoc directly since NDF/HDS has problems with

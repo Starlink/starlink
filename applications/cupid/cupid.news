@@ -6,6 +6,11 @@
  and  analyse clumps of emission within 2- or 3- dimensional 
  data arrays.
 
+Changes introduced at V1.1
+
+   - For consistency with other Starlink applications the ILEVEL
+     parameter has been renamed MSG_FILTER.
+
 Changes introduced at V1.0
 
    - The time has come to recognise that CUPID is no longer an

@@ -172,7 +172,7 @@ void findclumps( int *status ) {
 *        values are stored in the output catalogue and NDF. Note, the filter 
 *        to remove clumps smaller than the beam width is still applied, even
 *        if DECONV is FALSE. [TRUE]
-*     ILEVEL = _CHAR (Read)
+*     MSG_FILTER = _CHAR (Read)
 *        Controls the amount of diagnostic information reported. It
 *        uses the standard message filtering system. It should be in
 *        the range 0 to 6 (NONE, QUIET, NORM, VERB, DEBUG,
@@ -850,6 +850,8 @@ void findclumps( int *status ) {
 *        Use MERS for message filtering.
 *     16-JUL-2009 (DSB):
 *        Added SHAPE parameter.
+*     29-JUL-2009 (TIMJ):
+*        Rename ILEVEL to MSG_FILTER
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -962,7 +964,7 @@ void findclumps( int *status ) {
    ndfBegin();
 
 /* Get the interaction level. */
-   msgIfget( "ILEVEL", status );
+   msgIfget( "MSG_FILTER", status );
 
 /* Get an identifier for the input NDF. We use NDG (via kpg1_Rgndf)
    instead of calling ndfAssoc directly since NDF/HDS has problems with
