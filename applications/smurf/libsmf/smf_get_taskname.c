@@ -40,10 +40,12 @@
 *  History:
 *     2008-05-23 (TIMJ):
 *        First version.
+*     29-JUL-2009 (TIMJ):
+*        Use official C interface to taskGetName
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -79,6 +81,7 @@
 
 #include "par.h"
 #include "f77.h"
+#include "star/task_adam.h"
 #include "sae_par.h"
 
 /* No proper C interface */
@@ -101,10 +104,7 @@ smf_get_taskname( char * intaskname, char * prvname, int * status ) {
   }
 
   /* initialise buffers and get the task name*/
-  memset( taskname, ' ', PAR__SZNAM );
-  taskname[PAR__SZNAM] = '\0';
-  F77_CALL(task_get_name)(taskname,  status, PAR__SZNAM);
-  cnfImprt( taskname, PAR__SZNAM, taskname);
+  taskGetName( taskname, PAR__SZNAM+1, status );
 
   /* Now the provenance name if needed */
   if (prvname) {

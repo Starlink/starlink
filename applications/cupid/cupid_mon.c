@@ -1,6 +1,7 @@
 #include "sae_par.h"
 #include "f77.h"                 
 #include "mers.h"
+#include "star/task_adam.h"
 #include "cupid.h"
 #include <string.h>
 
@@ -47,6 +48,7 @@ void cupid_mon( int *status ) {
 *     void cupid_mon( int *status );
 
 *  Copyright:
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -68,11 +70,14 @@ void cupid_mon( int *status ) {
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     28-SEP-2005 (DSB):
 *        Original version.
+*     29-JUL-2009 (TIMJ):
+*        Call taskGetName rather than Fortran.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -82,8 +87,6 @@ void cupid_mon( int *status ) {
 */
 
 /* Local variables: */
-   DECLARE_INTEGER(fstatus);      /* Fortran status variable */
-   DECLARE_CHARACTER_DYN(fname);  /* Fortran character variable to hold name */
    char name[16];                 /* C character variable to hold name */
    int ast_caching;               /* Initial value of AST MemoryCaching tuning parameter */
 
@@ -91,13 +94,7 @@ void cupid_mon( int *status ) {
    if( *status != SAI__OK ) return;
 
 /* Obtain the command from the environment.  This returns uppercase names. */
-   F77_EXPORT_INTEGER( SAI__OK, fstatus );
-   F77_CREATE_CHARACTER( fname, 15 );
-   F77_CALL(task_get_name) ( CHARACTER_ARG(fname), INTEGER_ARG(&fstatus)
-                             TRAIL_ARG(fname) );
-   cnfImprt( fname, fname_length, name );
-   F77_FREE_CHARACTER(fname);
-   F77_IMPORT_INTEGER( &fstatus, status );
+   taskGetName( name, sizeof(name), status );
 
 /* Make AST use the same variable for its inherited status. */
    astWatch( status );
