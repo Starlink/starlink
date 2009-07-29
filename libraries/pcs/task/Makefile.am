@@ -6,7 +6,9 @@ lib_LTLIBRARIES = libtask_adam.la
 
 libtask_adam_la_SOURCES = \
 	$(F_ROUTINES) \
+	$(C_ROUTINES) \
 	$(PUBLIC_INCLUDES) \
+	$(PUBLIC_C_INCLUDES) \
 	$(include_MESSAGES) \
 	$(PRIVATE_INCLUDES)
 # We use includes from other PCS directories
@@ -15,6 +17,10 @@ AM_FCFLAGS = -I../subpar -I../messys -I../adam -I../dtask
 include_HEADERS = $(PUBLIC_INCLUDES)
 include_MESSAGES = TASK_ERR
 
+cincludedir = $(includedir)/star
+cinclude_HEADERS = $(PUBLIC_C_INCLUDES)
+
+PUBLIC_C_INCLUDES = task_adam.h
 PUBLIC_INCLUDES = TASK_PAR
 PRIVATE_INCLUDES = TASK_CMN
 
@@ -97,6 +103,8 @@ F_ROUTINES = tsk_add_msinf.f \
              tsk_valni.f \
              tsk_valnl.f \
              tsk_valnr.f
+
+C_ROUTINES = task_adam.c
 
 BUILT_SOURCES = $(include_MESSAGES)
 
