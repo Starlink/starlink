@@ -1012,7 +1012,7 @@ static void *smf_run_worker( void *wf_ptr ) {
 
 /* Local Variables: */
    int i;
-   int job_status;
+   int job_status = SAI__OK;
    int jobs_available;
    int run;         
    int status;
