@@ -123,6 +123,7 @@
 
 #include "merswrap.h"
 #include "star/subpar.h"
+#include "star/par_err.h"
 #include "ems.h"
 
 #include <errno.h>
@@ -147,14 +148,15 @@ void msgIfget( const char * pname, int * status ) {
   /*  Check the returned status. */
   if (*status != SAI__OK) {
 
-    /*     Any failure to read the parameter (even if PAR__NULL is used)
-     *     will force a read of the environment instead */
-    emsAnnul( status );
+    if (*status != PAR__ABORT) {
+      /*     Any failure to read the parameter (even if PAR__NULL is used)
+       *     will force a read of the environment instead */
+      emsAnnul( status );
 
-    /* Force to NORM before we enter the routine */
-    msgIfset( MSG__NORM, status );
-    msgIfgetenv( status );
-
+      /* Force to NORM before we enter the routine */
+      msgIfset( MSG__NORM, status );
+      msgIfgetenv( status );
+    }
   } else {
 
     /* Translate this string to a message level and set it */
