@@ -1176,10 +1176,10 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
               }
 	    
               /* Rebin the residual + astronomical signal into a map */
-              smf_rebinmap1( res_data, var_data, lut_data, qua_data, mask,
-                             dsize, varmapmethod, rebinflags, thismap, 
-                             thisweight, thishits, thisvar, msize, 
-                             status );
+              smf_rebinmap1( res[i]->sdata[idx], dat.noi[i]->sdata[idx], 
+                             lut_data, qua_data, mask, varmapmethod, 
+                             rebinflags, thismap, thisweight, thishits, 
+                             thisvar, msize, status );
             }
 
             /*** TIMER ***/
