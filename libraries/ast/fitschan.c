@@ -877,7 +877,9 @@ f     - AST_TESTFITS: Test if a keyword has a defined value in a FitsChan
 *     2-JUL-2009 (DSB):
 *        Check FitsChan is not empty at start of FindWcs.
 *     7-JUL-2009 (DSB):
-*        - Add new function astSetFitsCM.
+*        Add new function astSetFitsCM.
+*     30-JUL-2009 (DSB):
+*        Fix axis numbering in SkyPole.
 *class--
 */
 
@@ -23027,7 +23029,8 @@ static void SkyPole( AstWcsMap *map2, AstMapping *map3, int ilon, int ilat,
    int fits_ilat;           /* FITS WCS axis index for latitude axis */
    int fits_ilon;           /* FITS WCS axis index for longitude axis */
    int iax;                 /* Axis index */
-   int nax;                 /* Number of axes */
+   int nax;                 /* Number of IWC axes */
+   int nax2;                /* Number of WCS axes */
 
 /* Check the inherited status. */
    if( !astOK ) return;
@@ -23069,14 +23072,16 @@ static void SkyPole( AstWcsMap *map2, AstMapping *map3, int ilon, int ilat,
       nax = astGetNin( map2 );
       pset1 = astPointSet( 1, nax, "", status );
       ptr1 = astGetPoints( pset1 );
-      pset2 = astPointSet( 1, nax, "", status );
+
+      nax2 = astGetNout( map3 );
+      pset2 = astPointSet( 1, nax2, "", status );
       ptr2 = astGetPoints( pset2 );
       if( astOK ) {
 
 /* Calculate the longitude and latitude of the celestial north pole 
    in native spherical coordinates (using the inverse of map3). These 
    values correspond to the LONPOLE and LATPOLE keywords. */
-         for( iax = 0; iax < nax; iax++ ) ptr2[ iax ][ 0 ] = 0.0;
+         for( iax = 0; iax < nax2; iax++ ) ptr2[ iax ][ 0 ] = 0.0;
          ptr2[ ilat ][ 0 ] = AST__DPIBY2;
          (void) astTransform( map3, pset2, 0, pset1 );
 
