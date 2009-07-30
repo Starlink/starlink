@@ -444,6 +444,7 @@ ifelse(__SCRIPTNAME, alink,
 *     07.06.1991:  change NAMECODE to ACTCODE (REVAD::BDK)
 *     22.08.1991:  add REQUEST (REVAD::BDK)
 *     14.05.1993:  UNIX version for substituting PROGNAME (RLVAD::AJC)
+*     29.07.2009:  Set message filter level (JAC::TIMJ)
 *    endhistory
 *    Type definitions :
       IMPLICIT NONE
@@ -475,6 +476,10 @@ ifelse(__SCRIPTNAME, alink,
 *
       CALL TASK_PUT_CURRINFO ( ACTPTR, CONTEXT, ACTCODE, ANAME, SEQ,
      :  VALUE, ACT__END, STATUS )
+*
+*   Set the message filtering level
+*
+      CALL MSG_IFGET( 'MSG_FILTER', STATUS )
 *
 *   Call the application routine.
 *
