@@ -66,6 +66,11 @@
 *     provshow ndf [show]
 
 *  ADAM Parameters:
+*     DOTFILE = FILENAME (Read)
+*        Name of a new text file in which to store a description of the
+*        provenance tree using the "dot" format. This file can be
+*        visualised using third-party tools such as Graphviz, ZGRViewer,
+*        etc.
 *     HISTORY = _LOGICAL (Read)
 *        If TRUE, any history records stored with each ancestor are
 *        included in the displayed information. Since the amount of
@@ -187,6 +192,8 @@
 *        character.
 *     7-JUL-2009 (DSB):
 *        Add the HIDE parameter.
+*     30-JUL-2009 (DSB):
+*        Add the DOTFILE parameter.
 *     {enter_further_changes_here}
 
 *-
@@ -218,9 +225,13 @@
       CHARACTER MORE*(DAT__SZLOC)! Locator for MORE info
       CHARACTER PARIDS*255       ! Buffer for direct parent ID list
       CHARACTER SHOW*7           ! The ancestors to be displayed
+      CHARACTER TEXT*255         ! Text for output dot file
       CHARACTER VALUE*1024       ! Buffer for one field value
+      INTEGER COMMA              ! Index of next comma
       INTEGER DIRPAR( MXPAR )    ! Integer IDs for direct parents
+      INTEGER DOTFD              ! File descriptor for dot file
       INTEGER FD                 ! File descriptor for parents file
+      INTEGER IAT                ! Used length of string
       INTEGER IEND               ! Index of word end
       INTEGER INDF               ! NDF identifier
       INTEGER INTID              ! Integer ID for the current ancestor
@@ -241,6 +252,8 @@
       INTEGER NREC               ! Number of history records
       INTEGER NROW               ! No. of lines to display
       INTEGER PARI               ! Index of current parent in ancestors
+      INTEGER START              ! Index of start of next parent id
+      LOGICAL DOT                ! Produce an output dot file?
       LOGICAL FIRST              ! Is this the first word?
       LOGICAL HIDDEN             ! Is current ancestor hidden?
       LOGICAL HIDE               ! Exclude hidden ancestors?
@@ -288,6 +301,22 @@
 *  Get the number of entries in the returned keymap. This will be one
 *  more than the number of NDFs described in the displayed table.
       NROW = AST_MAPSIZE( KYMAP1, STATUS ) - 1
+
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  See if the provenance should be written out to a text file as a
+*  directed acyclic graph (DAG) using the "dot" language. If so, write
+*  out the preamble.
+      CALL FIO_ASSOC( 'DOTFILE', 'WRITE', 'LIST', 255, DOTFD, STATUS )
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         DOT = .FALSE.
+      ELSE
+         CALL FIO_WRITE( DOTFD, 'digraph provenance {', STATUS )
+         CALL FIO_WRITE( DOTFD, '   edge [dir=back]', STATUS )
+         DOT = .TRUE.
+      END IF
 
 *  Loop round each NDF to be described.
       DO IROW = 1, NROW 
@@ -379,12 +408,30 @@
             CALL MSG_SETC( 'P', VALUE )
             CALL MSG_OUT( ' ', '^ID: ^P', STATUS )
 
+*  If producing a dot description of the provenance, create a text string
+*  that declares a graph node with the name "A<id>" and assigns it a
+*  label containing (initially) the NDF path. 
+            IF( DOT ) THEN
+               TEXT = ' '
+               IAT = 3
+               CALL CHR_APPND( 'A', TEXT, IAT )
+               CALL CHR_APPND( ID, TEXT, IAT )
+               CALL CHR_APPND( ' [label="', TEXT, IAT )
+               CALL CHR_APPND( VALUE, TEXT, IAT )
+               CALL CHR_APPND( '"', TEXT, IAT )
+               CALL FIO_WRITE( DOTFD, TEXT( : IAT ), STATUS )
+            END IF
+
 *  Next, if hidden ancestors are being included in the display, indicate 
 *  if this ancestor is flagged as hidden.
             IF( .NOT. HIDE ) THEN
                CALL NDG_ISHIDDENPROV( IPROV, INTID, HIDDEN, STATUS )
-               IF( HIDDEN ) CALL MSG_OUT( ' ', '   (This ancestor '//
-     :                                    'has been hidden)', STATUS )
+               IF( HIDDEN ) THEN
+                  CALL MSG_OUT( ' ', '   (This ancestor '//
+     :                          'has been hidden)', STATUS )
+               END IF
+            ELSE
+               HIDDEN = .FALSE.
             END IF
 
 *  Next line shows the list of identifiers for the immediate parent NDFs.
@@ -410,6 +457,15 @@
 	    
             CALL MSG_SETC( 'P', VALUE )
             CALL MSG_OUT( ' ', '   Creator:  ^P', STATUS )
+
+            IF( DOT ) THEN
+               TEXT = ' '
+               IAT = 12
+               CALL CHR_APPND( '+"\\n', TEXT, IAT )
+               CALL CHR_APPND( VALUE, TEXT, IAT )
+               CALL CHR_APPND( '"', TEXT, IAT )
+               CALL FIO_WRITE( DOTFD, TEXT( : IAT ), STATUS )
+            END IF
 
 *  Next line shows a summary of any extra info describing the NDF.
             VALUE = ' '
@@ -518,6 +574,47 @@
                ELSE
                   CALL MSG_OUT( ' ', '   History:  <unknown>', STATUS )
                END IF
+
+            END IF
+
+*  Finish of the node description in any dot file.
+            IF( DOT ) THEN
+
+*  Complete the node attributes by specifying a box shape if the node is
+*  hidden.
+               IF( HIDDEN ) CALL FIO_WRITE( DOTFD, '          shape='//
+     :                                      '"rect"', STATUS )
+               CALL FIO_WRITE( DOTFD, '   ]', STATUS )
+
+*  Write out the edge specificiations.
+               IF( PARIDS .NE. '<unknown>' .AND. PARIDS .NE. ' ' ) THEN
+                  START = 1
+                  COMMA = INDEX( PARIDS, ',' )
+                  DO WHILE( COMMA .NE. 0 ) 
+                     COMMA = COMMA + START - 1
+                     TEXT = ' '
+                     IAT = 3
+                     CALL CHR_APPND( 'A', TEXT, IAT )
+                     CALL CHR_APPND( ID, TEXT, IAT )
+                     CALL CHR_APPND( ' -> A', TEXT, IAT )
+                     CALL CHR_APPND( PARIDS( START : COMMA - 1 ),
+     :                                TEXT, IAT )
+                     CALL FIO_WRITE( DOTFD, TEXT( : IAT ), STATUS )
+                     START = COMMA + 1                                    
+                     COMMA = INDEX( PARIDS( START : ), ',' )
+                  END DO
+	          
+                  TEXT = ' '
+                  IAT = 3
+                  CALL CHR_APPND( 'A', TEXT, IAT )
+                  CALL CHR_APPND( ID, TEXT, IAT )
+                  CALL CHR_APPND( ' -> A', TEXT, IAT )
+                  CALL CHR_APPND( PARIDS( START : ), TEXT, IAT )
+                  CALL FIO_WRITE( DOTFD, TEXT( : IAT ), STATUS )
+               END IF
+
+               CALL FIO_WRITE( DOTFD, ' ', STATUS )
+
             END IF
 
          END IF
@@ -529,6 +626,13 @@
 
 *  A final blank line.
       CALL MSG_BLANK( STATUS )
+
+*  If the provenance is being written out to a text file using the "dot" 
+*  language, write out the closing brace and close the file.
+      IF( DOT ) THEN
+         CALL FIO_WRITE( DOTFD, '}', STATUS )
+         CALL FIO_ANNUL( DOTFD, STATUS )
+      END IF
 
 *  If required, create a text file containing the paths to the direct
 *  parents of the supplied NDF.

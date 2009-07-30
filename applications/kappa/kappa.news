@@ -31,6 +31,13 @@
       or VARIANCE components to become the DATA_ARRAY in the output
       NDF.
 
+   o  PROVSHOW
+
+      -  There is a new DOTFILE parameter that permits a summary of the
+      provenance tree to be written to a text file in "dot" format,
+      suitable for visualising with third-party tools such as Graphviz or 
+      ZGRViewer.
+
    o  SETAXIS
 
       -  If MODE is "WCS" and the selected axis is a celestial

@@ -2753,6 +2753,16 @@ package kappa {
 
          helplib {$KAPPA_HELP}
 
+         parameter dotfile {
+            type FILENAME
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Filename in which to store graph in dot format}
+            default !
+            helpkey *
+         }
+
          parameter hide {
             type _LOGICAL
             access READ

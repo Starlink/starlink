@@ -40915,6 +40915,14 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
    }
    \sstparameters{ 
       \sstsubsection{ 
+         DOTFILE = FILENAME (Read)
+      }{ 
+         Name of a new text file in which to store a description of the
+         provenance tree using the ``dot'' format. This file can be
+         visualised using third-party tools such as Graphviz, ZGRViewer,
+         \emph{etc.}
+      }
+      \sstsubsection{ 
          HIDE = \_LOGICAL (Read)
       }{ 
         If {\tt TRUE}, then any ancestors which are flagged as `hidden' 
@@ -56447,6 +56455,14 @@ The following applications have been modified:
         \item Parameter QUIET has been withdrawn.  Instead set the
         MSG\_FILTER environment variable to {\tt QUIET} to suppress display
         of the transformed positions.
+      \end{itemize}
+
+   \item [\htmlref{PROVSHOW}{PROVSHOW}]\mbox{}
+      \begin{itemize}
+        \item There is a new DOTFILE parameter that permits a summary of the
+         provenance tree to be written to a text file in ``dot'' format,
+         suitable for visualising with third-party tools such as Graphviz or 
+         ZGRViewer.
       \end{itemize}
 
    \item [\htmlref{SETAXIS}{SETAXIS}] \mbox{}
