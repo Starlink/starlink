@@ -98,7 +98,7 @@ The RTD_REMOTE_DIR directory: $env(RTD_REMOTE_DIR), does not exist."
       if { $needed && $tries == 0 } {
          set created_instance 1
          puts stderr "Failed to connect to GAIA, starting new instance..."
-         exec $env(GAIA_DIR)/gaia.csh &
+         exec $env(GAIA_DIR)/gaia.sh &
       }
 
       #  Now either wait and try again or give up if waited too long.

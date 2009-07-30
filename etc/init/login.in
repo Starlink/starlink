@@ -352,7 +352,7 @@ endif
 
 #
 #  GAIA
-if ( -e ${bindir}/gaia/gaia.csh ) then
+if ( -e ${bindir}/gaia/gaia.sh ) then
    setenv GAIA_DIR ${bindir}/gaia
 endif
 

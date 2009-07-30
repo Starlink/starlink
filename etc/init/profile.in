@@ -271,7 +271,7 @@ fi
 
 #  GAIA
 
-if test -f ${bindir}/gaia/gaia.csh; then
+if test -f ${bindir}/gaia/gaia.sh; then
    export GAIA_DIR=${bindir}/gaia
 fi
 
@@ -574,7 +574,7 @@ fi
 #   Gaia
 #
 
-if test -f ${bindir}/gaia/gaia.csh; then
+if test -f ${bindir}/gaia/gaia.sh; then
    gaia () { $GAIA_DIR/gaia.sh ${1+"$@"}; }
    gaiadisp () { $GAIA_DIR/gaiadisp.sh ${1+"$@"}; }
 else

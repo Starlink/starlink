@@ -24,7 +24,7 @@
 #  Copyright:
 #     Copyright (C) 1996-2005 Central Laboratory of the Research Councils.
 #     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
-#     Copyright (C) 2007 Science and Technology Facilities Council.
+#     Copyright (C) 2007-2009 Science and Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -57,7 +57,7 @@
 #     08-MAY-2007 (PWD):
 #        Updated for Skycat 3.0.1. Now works without GAIA_DIR pre-defined
 #        and doesn't need to be wrapped by a C-shell script to initialise
-#        CONVERT (currenly bash only).
+#        CONVERT.
 #     {enter_further_changes_here}
 
 #  Bugs:

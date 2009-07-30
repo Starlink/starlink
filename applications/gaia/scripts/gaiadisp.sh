@@ -13,7 +13,7 @@
 #     gaiadisp.sh --help for options
 
 #  Copyright:
-#     Copyright (C) 2007 Science and Technology Facilities Council.
+#     Copyright (C) 2007-2009 Science and Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -62,13 +62,10 @@ if test "$GAIA_DIR" = ""; then
    export GAIA_DIR
 fi
 
-#  Initialise the CONVERT package if not already done so. Note bash specific,
-#  so don't do this unless in bash.
+#  Initialise the CONVERT package if not already done so.
 if test "$CONVERT_DIR" != "" -a "$NDF_FORMATS_IN" = ""; then
-   if test "$BASH" != ""; then
-      . $CONVERT_DIR/convert.sh > /dev/null
-      export CONVERT_DIR
-   fi
+   . $CONVERT_DIR/convert.sh > /dev/null
+   export CONVERT_DIR
 fi
 
 #  Now start up the application proper. 

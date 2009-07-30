@@ -332,9 +332,9 @@ endif
 #   Gaia
 #
 
-if ( -e ${bindir}/gaia/gaia.csh ) then
-   alias gaia '${GAIA_DIR}/gaia.csh'
-   alias gaiadisp '${GAIA_DIR}/gaiadisp.csh'
+if ( -e ${bindir}/gaia/gaia.sh ) then
+   alias gaia '${GAIA_DIR}/gaia.sh'
+   alias gaiadisp '${GAIA_DIR}/gaiadisp.sh'
 else
    alias gaia ${staretcdir}/notinst gaia
    alias gaiadisp ${staretcdir}/notinst gaiadisp

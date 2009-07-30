@@ -54,7 +54,7 @@
 #     08-MAY-2007 (PWD):
 #        Updated for Skycat 3.0.1. Now works without GAIA_DIR pre-defined
 #        and doesn't need to be wrapped by a C-shell script to initialise
-#        CONVERT (currenly bash only).
+#        CONVERT.
 #     {enter_further_changes_here}
 
 #  Bugs:

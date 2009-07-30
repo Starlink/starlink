@@ -2,9 +2,9 @@
 dist_bin_SCRIPTS = $(SCRIPTS_GAIA)
 
 ##  GAIA top-level scripts.
-SCRIPTS_GAIA = displaycat displaypolcat gaia.csh gaiacmap.sh gaiacut \
-               gaiadisp gaiadisp.csh gaiadisp.sh gaiaremote.sh gaia.sh \
-               gaia_standalone.csh gaiawcs2tab pix2wcs tabbedgaia.csh \
+SCRIPTS_GAIA = displaycat displaypolcat gaiacmap.sh gaiacut \
+               gaiadisp gaiadisp.sh gaiaremote.sh gaia.sh \
+               gaia_standalone.csh gaiawcs2tab pix2wcs \
                tabbedgaia.sh wcs2pix zoomcutandflip connect_to_gaia.tcl \
                querysiap ftpget querycone queryreg
 
