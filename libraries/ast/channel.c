@@ -1283,6 +1283,7 @@ static char *GetNextText( AstChannel *this, int *status ) {
 
 /* Local Variables: */
    char errbuf[ ERRBUF_LEN ];    /* Buffer for system error message */
+   char *errstat;                /* Pointer for system error message */
    char *line;                   /* Pointer to line data to be returned */
    int c;                        /* Input character */
    int len;                      /* Length of input line */
@@ -1347,7 +1348,12 @@ static char *GetNextText( AstChannel *this, int *status ) {
    "errno" value (but only if one was set). */
       if ( astOK && ( c == EOF ) && ferror( stdin ) ) {
          if ( readstat ) {
+#if HAVE_STRERROR_R
             strerror_r( readstat, errbuf, ERRBUF_LEN );
+            errstat = errbuf;
+#else
+            errstat = strerror( readstat );
+#endif
             astError( AST__RDERR,
                       "astRead(%s): Read error on standard input - %s.", status,
                       astGetClass( this ), errbuf );

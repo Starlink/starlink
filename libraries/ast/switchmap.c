@@ -140,6 +140,7 @@ f     The SwitchMap class does not define any new routines beyond those
 #include "unitmap.h"             /* Unit Mappings */
 #include "channel.h"             /* I/O channels */
 #include "switchmap.h"           /* Interface definition for this class */
+#include "frame.h"               /* Frames */
 
 /* Error code definitions. */
 /* ----------------------- */

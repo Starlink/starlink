@@ -93,6 +93,7 @@ f     The RateMap class does not define any new routines beyond those
 #include "channel.h"             /* I/O channels */
 #include "ratemap.h"             /* Interface definition for this class */
 #include "unitmap.h"             /* Unit Mappings */
+#include "frame.h"               /* Frames */
 
 /* Error code definitions. */
 /* ----------------------- */

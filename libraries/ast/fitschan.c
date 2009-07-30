@@ -14069,7 +14069,11 @@ static int FullForm( const char *list, const char *test, int abbrev, int *status
 /* Compare the supplied test option against each of the known options in 
    turn. Count the number of matches. */
       nmatch = 0;
+#if HAVE_STRTOK_R
       option = strtok_r( llist, " ", &context );
+#else
+      option = strtok( llist, " " );
+#endif
       i = 0;
       while( option ){
       
@@ -14085,7 +14089,11 @@ static int FullForm( const char *list, const char *test, int abbrev, int *status
          }
 
 /* Get a pointer to the next option. */
+#if HAVE_STRTOK_R
          option = strtok_r( NULL, " ", &context );
+#else
+         option = strtok( NULL, " " );
+#endif
          i++;
       }
 

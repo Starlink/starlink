@@ -70,6 +70,9 @@ AC_CHECK_HEADERS(stdarg.h varargs.h, break)
 AC_CHECK_HEADERS([execinfo.h])
 AC_CHECK_FUNCS([backtrace])
 
+# Do we have reentrant strerror and strtok?
+AC_CHECK_FUNCS([strerror_r strtok_r])
+
 #  See if we have long doubles (used by the Mapping and Region classes)
 AC_CHECK_TYPES([long double])
 

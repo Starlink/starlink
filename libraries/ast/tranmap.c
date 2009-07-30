@@ -96,6 +96,7 @@ f     The TranMap class does not define any new routines beyond those
 #include "cmpmap.h"              /* Compound Mappings */
 #include "unitmap.h"             /* Unit Mappings */
 #include "tranmap.h"             /* Interface definition for this class */
+#include "frame.h"               /* Frames */
 
 /* Error code definitions. */
 /* ----------------------- */

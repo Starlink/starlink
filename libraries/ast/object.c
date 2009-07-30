@@ -3634,6 +3634,7 @@ static void VSet( AstObject *this, const char *settings, char **text,
 
 /* Local Variables: */
    char errbuf[ ERRBUF_LEN ];    /* Buffer for system error message */
+   char *errstat;                /* Pointer to error message */
    char *assign;                 /* Pointer to assigment substring */
    char *assign_end;             /* Pointer to null at end of assignment */
    char *buff1;                  /* Pointer to temporary string buffer */
@@ -3708,14 +3709,20 @@ static void VSet( AstObject *this, const char *settings, char **text,
                   stat = errno;
    
                   if( stat ) {
+#if HAVE_STRERROR_R
                      strerror_r( stat, errbuf, ERRBUF_LEN );
+                     errstat = errbuf;
+#else
+                     errstat = strerror( stat );
+#endif
                   } else {
                      *errbuf = 0;
+                     errstat = errbuf;
                   }
    
                   astError( AST__ATSER, "astVSet(%s): Error formatting an "
                             "attribute setting%s%s.", status, astGetClass( this ),
-                            stat? " - " : "", errbuf );
+                            stat? " - " : "", errstat );
                   astError( AST__ATSER, "The setting string was \"%s\".", status,
                             settings );
                }

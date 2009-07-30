@@ -1938,6 +1938,7 @@ void *astMalloc_( size_t size, int *status ) {
 /* Local Variables: */
    astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    char errbuf[ ERRBUF_LEN ];    /* Buffer for system error message */
+   char *errstat;                /* Pointer to system error message */
    Memory *mem;                  /* Pointer to space allocated by malloc */
    void *result;                 /* Returned pointer */
 
@@ -1976,8 +1977,14 @@ void *astMalloc_( size_t size, int *status ) {
 
 /* Report an error if malloc failed. */
          if ( !mem ) {
+
+#if HAVE_STRERROR_R
             strerror_r( errno, errbuf, ERRBUF_LEN );
-            astError( AST__NOMEM, "malloc: %s", status, errbuf );
+            errstat = errbuf;
+#else
+            errstat = strerror( errno );
+#endif
+            astError( AST__NOMEM, "malloc: %s", status, errstat );
             astError( AST__NOMEM, "Failed to allocate %lu bytes of memory.", status,
                       (unsigned long) size );
 
@@ -2702,6 +2709,7 @@ void *astRealloc_( void *ptr, size_t size, int *status ) {
 /* Local Variables: */
    astDECLARE_GLOBALS            
    char errbuf[ ERRBUF_LEN ];    /* Buffer for system error message */
+   char *errstat;                /* Pointer to system error message */
    int isdynamic;                /* Was memory allocated dynamically? */
    void *result;                 /* Returned pointer */
    Memory *mem;                  /* Pointer to memory header */
@@ -2778,8 +2786,13 @@ void *astRealloc_( void *ptr, size_t size, int *status ) {
 /* If this failed, report an error and return the original pointer
    value. */
                   if ( !mem ) {
+#if HAVE_STRERROR_R
                      strerror_r( errno, errbuf, ERRBUF_LEN );
-                     astError( AST__NOMEM, "realloc: %s", status, errbuf );
+                     errstat = errbuf;
+#else
+                     errstat = strerror( errno );
+#endif
+                     astError( AST__NOMEM, "realloc: %s", status, errstat );
                      astError( AST__NOMEM, "Failed to reallocate a block of "
                                "memory to %ld bytes.", status, (long) size );
    

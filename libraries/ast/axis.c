@@ -666,6 +666,7 @@ static const char *AxisFormat( AstAxis *this, double value, int *status ) {
 /* Local Variables: */
    astDECLARE_GLOBALS           /* Pointer to thread-specific global data */
    char errbuf[ ERRBUF_LEN ];   /* Buffer for system error message */
+   char *errstat;               /* Pointer for system error message */
    const char *fmt0;            /* Pointer to original Format string */
    const char *fmt;             /* Pointer to parsed Format string */
    const char *result;          /* Pointer to formatted value */
@@ -779,13 +780,19 @@ static const char *AxisFormat( AstAxis *this, double value, int *status ) {
          if ( ncc < 0 ) {
             stat = errno;
             if( stat ) {
+#if HAVE_STRERROR_R
                strerror_r( stat, errbuf, ERRBUF_LEN );
+               errstat = errbuf;
+#else
+               errstat = strerror( stat );
+#endif
             } else {
                *errbuf = 0;
+               errstat = errbuf;
             }
             astError( AST__FMTER, "astAxisFormat(%s): Error formatting a "
                       "coordinate value of %1.*G%s%s.", status, astGetClass( this ),
-                      DBL_DIG, value, stat? " - " : "", errbuf );
+                      DBL_DIG, value, stat? " - " : "", errstat );
             astError( AST__FMTER, "The format string was \"%s\".", status, fmt );
 
 /* Also check that the result buffer did not overflow. If it did, memory will
