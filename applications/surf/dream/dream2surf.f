@@ -201,11 +201,6 @@
 
       IF (STATUS .NE. SAI__OK) RETURN
 
-*     Set the MSG output level (for use with MSG_OUTIF)
- 
-      CALL MSG_IFGET('MSG_FILTER', STATUS)
-
-
 *     Read in the DREAM file (currently assume that 
 *     user will supply full path or use $DREAM_OUT
 

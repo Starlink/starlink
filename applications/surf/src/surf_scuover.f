@@ -401,8 +401,8 @@
 *     Initialise PLOTNAME logical
       PLOTNAME = .TRUE.
 
-*     Set the MSG output level (for use with MSG_OUTIF)
-      CALL MSG_IFGET('MSG_FILTER', STATUS)
+
+
 
 *     Begin an AST Context.
       CALL AST_BEGIN( STATUS )

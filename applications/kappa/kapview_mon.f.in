@@ -94,6 +94,8 @@
 *        Use MSG_FILTER environment variable to set reporting level.
 *     27-JUL-2009 (TIMJ):
 *        Change API for MSG_IFGETENV
+*     29-JUL-2009 (TIMJ):
+*        MSG_IFGET now called in fixed part.
 *     {enter_further_changes_here}
 
 *-
@@ -151,10 +153,6 @@
 *  system
       CALL HDS_INFOI( DAT__NOLOC, 'LOCATORS', FILTER,
      :                NLOC0, STATUS )
-
-*  Set the message-reporting level.
-*  ================================
-      CALL MSG_IFGETENV( STATUS )
 
 *  Identify and execute the task.
 *  ==============================

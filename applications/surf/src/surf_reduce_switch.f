@@ -428,8 +428,8 @@ c
          BEAM_WEIGHT(I) = 0
       END DO
 
-*     Set the MSG output level (for use with MSG_OUTIF)
-      CALL MSG_IFGET('MSG_FILTER', STATUS)
+
+
 
 *  start up the NDF system and read in the demodulated data file
 

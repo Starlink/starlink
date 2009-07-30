@@ -521,8 +521,8 @@ c
       RESW = .FALSE.
       NFILES = 0
 
-*     Set the MSG output level (for use with MSG_OUTIF)
-      CALL MSG_IFGET('MSG_FILTER', STATUS)
+
+
 
 * Start up the NDF system and read in some data
 

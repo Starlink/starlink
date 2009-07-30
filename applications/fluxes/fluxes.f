@@ -250,10 +250,6 @@ C For the time
 *   Check the inherited global status.
       IF (STATUS.NE.SAI__OK) RETURN   
 
-*     Set the MSG output level (for use with MSG_OUTIF)
-      CALL MSG_IFGET('MSG_FILTER', STATUS)
-
-
 *   Initialise values.      
       NF =8
       RAD=PI/180.0D0

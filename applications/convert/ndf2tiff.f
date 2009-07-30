@@ -243,9 +243,6 @@
 *  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
-*  Determine the MSG Filter level
-      CALL MSG_IFGET( 'MSG_FILTER', STATUS )
-
 *  Obtain and validate the input NDF.
 *  ==================================
 

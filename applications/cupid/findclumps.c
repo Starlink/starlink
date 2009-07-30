@@ -963,9 +963,6 @@ void findclumps( int *status ) {
 /* Start an NDF context */
    ndfBegin();
 
-/* Get the interaction level. */
-   msgIfget( "MSG_FILTER", status );
-
 /* Get an identifier for the input NDF. We use NDG (via kpg1_Rgndf)
    instead of calling ndfAssoc directly since NDF/HDS has problems with
    file names containing spaces, which NDG does not have. */

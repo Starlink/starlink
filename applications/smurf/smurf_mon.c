@@ -218,7 +218,6 @@ void smurf_mon( int * status ) {
   snprintf( appname, NDF__SZAPP, "%-*s (%s V%s)", PAR__SZNAM,
 	    taskname, PACKAGE_UPCASE, PACKAGE_VERSION);
   ndfHappn( appname, status );
-  msgIfget("MSG_FILTER", status);
 
   /* Call the subroutine associated with the requested task */
   if (strcmp( taskname, "EXTINCTION" ) == 0 ) {

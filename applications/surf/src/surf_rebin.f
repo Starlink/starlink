@@ -872,8 +872,8 @@ c
          QMF = .FALSE.
       END IF
 
-*     Set the MSG output level (for use with MSG_OUTIF)
-      CALL MSG_IFGET('MSG_FILTER', STATUS)
+
+
 
 * Read in the rebin method if necessary
 

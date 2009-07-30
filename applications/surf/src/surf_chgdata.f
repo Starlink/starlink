@@ -250,8 +250,8 @@
 
       IF (STATUS .NE. SAI__OK) RETURN
 
-*     Set the MSG output level (for use with MSG_OUTIF)
-      CALL MSG_IFGET('MSG_FILTER', STATUS)
+
+
 
 *     initialise some flags and locators
 

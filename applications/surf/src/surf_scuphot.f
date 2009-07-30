@@ -559,8 +559,8 @@ c
       USEFILE = .TRUE.
       PARABOLA = .TRUE.   ! Assume I can fit a parabola
 
-*     Set the MSG output level (for use with MSG_OUTIF)
-      CALL MSG_IFGET('MSG_FILTER', STATUS)
+
+
 
 *     start up the NDF system and read in the input demodulated file
 

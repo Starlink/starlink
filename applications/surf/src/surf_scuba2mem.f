@@ -307,8 +307,8 @@
       LST_PTR(1) = 0
       LST_PTR(2) = 0
  
-*     Set the MSG output level (for use with MSG_OUTIF)
-      CALL MSG_IFGET('MSG_FILTER', STATUS)
+
+
 
 *     start up the NDF system
       CALL NDF_BEGIN
