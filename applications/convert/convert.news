@@ -1,3 +1,7 @@
+1 CONVERT_Version_1.5-17
+ The bash CONVERT initialisation script has been changed so that it
+ now works from any Bourne compatible shell.
+
 1 CONVERT_Version_1.5-15
 
  The CADC provenance processing now also modifies the PRODUCT 
