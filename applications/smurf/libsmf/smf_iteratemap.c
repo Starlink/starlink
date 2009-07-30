@@ -1245,7 +1245,6 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
                 converged=0;
               }
 
-
               /* Update lastchisquared */
               lastchisquared[i] = chisquared[i];
 
@@ -1268,10 +1267,6 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
               if( haveext ) {
                 smf_open_related_model( modelgroups[whichext], i, "UPDATE", 
                                         &model[whichext][i], status );
-              }
-              if( havegai ) {
-                smf_open_related_model( modelgroups[whichgai], i, "UPDATE", 
-                                        &model[whichgai][i], status );
               }
 
               /*** TIMER ***/
@@ -1316,9 +1311,6 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
               smf_close_related( &qua[i], status );
               if( haveext ) {
                 smf_close_related( &model[whichext][i], status );
-              }
-              if( havegai ) {
-                smf_close_related( &model[whichgai][i], status );
               }
 
               /*** TIMER ***/
