@@ -329,6 +329,11 @@
 *     CHITOL = REAL
 *       Maximum difference in chi^2 between subsequent iterations required
 *       to stop if NUMITER is negative.
+*     VARMAPMETHOD = LOGICAL
+*       Method of estimating variance map. If 0 calculate theoretical
+*       uncertainties propagated from the time-domain noise measurements. If
+*       1 calculate the weighted sample variance of data points that land in
+*       each pixel of the map.
 *     MEMITER = LOGICAL
 *       If 1, load data and perform iterations entirely in memory
 *       (limited by MAXMEM ADAM parameter, and MAXLEN Config
