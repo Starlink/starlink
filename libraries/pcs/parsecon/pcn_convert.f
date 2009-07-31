@@ -215,9 +215,10 @@
 *        Any other string syntax is illegal here.
             ELSE
                STATUS = PARSE__VALSYN
+               CALL EMS_SETC('TEXT', STRING(START:END) )
                CALL EMS_REP ( 'PCN_CONVERT3',
-     :         'PARSECON: Token here may only be constant or name',
-     :          STATUS )
+     :         'PARSECON: Token here may only be constant or name'/
+     :         /' not "^TEXT"', STATUS )
 
             ENDIF
 

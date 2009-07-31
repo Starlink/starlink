@@ -153,8 +153,10 @@
             IF ( NAMCOD .NE. 0 ) THEN
 
                 STATUS = PARSE__OLDPAR
+                CALL EMS_SETC( 'PAR', STRING(1:NAMLEN) )
                 CALL EMS_REP ( 'PCN_NEWPAR2',
-     :          'PARSECON: Parameter name already defined', STATUS )
+     :             'PARSECON: Parameter name "^PAR" already defined',
+     :             STATUS )
 
             ELSE
 *
