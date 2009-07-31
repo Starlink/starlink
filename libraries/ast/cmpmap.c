@@ -129,6 +129,9 @@ f     The CmpMap class does not define any new routines beyond those
 *     12-MAR-2008 (DSB):
 *        Modify MapSplit so that attempts to split the inverse
 *        transformation if it cannot split the forward transformation.
+*     30-JUL-2009 (DSB):
+*        Ensure the PermMap has equal number of inputs and outputs when
+*        swapping a PermMap and a CmpMap in astMapMerge.
 *class--
 */
 
@@ -1741,7 +1744,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    one-to-one correspondance between inputs and outputs in the PermMap.
    Check that the first block of nin2a PermMap outputs are copied from
    the last block of nin2a PermMap inputs (and vica-versa) or are constant. */
-         canswap = 1;
+         canswap = ( npin == npout );
          aconstants = ( outperm[ 0 ] < 0 );
 
          for( i = 0, j = npin - nin2a; i < nin2a; i++, j++ ) {
