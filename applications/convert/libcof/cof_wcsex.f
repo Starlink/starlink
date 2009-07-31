@@ -107,6 +107,11 @@
 *     14-MAR-2007 (DSB):
 *        Added support for modifiers at the end of the encoding name
 *        (currently just the "(CD)" modifier).
+*     30-JUL-2009 (DSB):
+*        Do not annull errors produced by AST_WRITE (inappropriate
+*        FrameSets should result in a a function value of zero being
+*        returned by AST_WRITE but no error being reported - any errors 
+*        indicate serious failure within AST).
 *     {enter_further_changes_here}
 
 *-
@@ -532,10 +537,6 @@
                   COF_WCSEX = COF_WCSEX + 1
                   GO TO 10
                END IF
-
-*  Annull any error that occurred in AST_WRITE so that we can continue to
-*  try the next encoding.
-               IF( STATUS .NE. SAI__OK) CALL ERR_ANNUL( STATUS )
 
             END IF
 
