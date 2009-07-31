@@ -237,12 +237,12 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 	for( i=0; i<nbolo; i++ ) if( !(qua_data[i*ntslice]&SMF__Q_BADB) ) {
             /* Loop over time and store the variance for each sample */
             for( j=0; j<mntslice; j++ ) {
-              model_data[i*mbstride+j*mtstride] = var[i];
+              model_data[i*mbstride+(j%mntslice)*mtstride] = var[i];
             }
           }
       } else {
         for( i=0; i<nbolo; i++ ) {
-          var[i] = model_data[i*bstride];
+          var[i] = model_data[i*mbstride];
         }
       }
 
@@ -266,8 +266,8 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
         for( i=0; i<nbolo; i++ ) if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {
           for( j=0; j<ntslice; j++ ) {
-            id = i*bstride+j*tstride;   /* index in data array */
-            im = i*mbstride+j*mtstride; /* index in NOI model array */
+            id = i*bstride+j*tstride;              /* index in data array */
+            im = i*mbstride+(j%mntslice)*mtstride; /* index in NOI array */
             if(model_data[im]>0 && !(qua_data[id]&mask) ) {
               dat->chisquared[chunk] += res_data[id]*res_data[id] / 
                 model_data[im];

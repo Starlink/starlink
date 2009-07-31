@@ -156,6 +156,8 @@
 *        Add SMF__FLT
 *     2009-04-20 (EC):
 *        Add flagstat to interface
+*     2009-07-31 (EC):
+*        Switch to 2d variance array (one value for each bolometer)
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -431,25 +433,21 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
         smf_dataOrder( idata, isTordered, status );
 
         /* Check that the template is time-varying data */
-
         if( *status == SAI__OK ) {
           if( idata->ndims != 3 ) {
             *status = SAI__ERROR;
             errRep(FUNC_NAME, "Template data is not time-varying!", 
                    status);      
-          }
-	
+          }	
         }
       
         if( *status == SAI__OK ) {
 	  
           /* initialize the header */
-	  
           memset( &head, 0, sizeof(head) );
           head.data.dtype=SMF__NULL;
 
-          /* Determine dimensions of model component */
-	  
+          /* Determine dimensions of model component */	  
           switch( mtype ) {
 	    
           case SMF__CUM: /* Cumulative model */
@@ -484,11 +482,19 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
             break;
 	
           case SMF__NOI: /* Noise model */
+            /* Currently just one variance for each bolometer */
             head.data.dtype = SMF__DOUBLE;
             head.data.ndims = 3;
-            head.data.dims[0] = (idata->dims)[0];
-            head.data.dims[1] = (idata->dims)[1];
-            head.data.dims[2] = (idata->dims)[2];
+
+            if( isTordered )  { /* T is 3rd axis if time-ordered */
+              head.data.dims[0] = (idata->dims)[0];
+              head.data.dims[1] = (idata->dims)[1];
+              head.data.dims[2] = 1; 
+            } else {           /* T is 1st axis if bolo-ordered */
+              head.data.dims[0] = 1;
+              head.data.dims[1] = (idata->dims)[1];
+              head.data.dims[2] = (idata->dims)[2]; 
+            }
             break;
 
           case SMF__EXT: /* Extinction correction - gain for each bolo/time */

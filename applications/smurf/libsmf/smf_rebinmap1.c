@@ -189,7 +189,7 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
                   &vtstride, status );
 
     /* Check that the variance dimensions are compatible with data */
-    if( (vnbolo != nbolo) || ( vntslice && (vntslice!=ntslice) ) ) {
+    if( (vnbolo != nbolo) || ( (vntslice>1) && (vntslice!=ntslice) ) ) {
       *status = SAI__ERROR;
       errRep(" ", FUNC_NAME ": variance dimensions incompatible with data", 
              status ); 
@@ -215,7 +215,7 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
           if( !(qual[i*dbstride]&SMF__Q_BADB) ) for( j=0; j<ntslice; j++ ) {
 
             di = i*dbstride + j*dtstride;
-            vi = i*vbstride + j*vtstride;
+            vi = i*vbstride + (j%vntslice)*vtstride;
 
             /* Check that the LUT, data and variance values are valid */
             if( (lut[di] != VAL__BADI) && !(qual[di]&mask) && (var[vi] != 0) ){
@@ -234,7 +234,7 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
           for( j=0; j<ntslice; j++ ) {
 
             di = i*dbstride + j*dtstride;
-            vi = i*vbstride + j*vtstride;
+            vi = i*vbstride + (j%vntslice)*vtstride;
 
             /* Check that the LUT, data and variance values are valid */
             if( (lut[di] != VAL__BADI) && (dat[di] != VAL__BADD) && 
@@ -260,7 +260,7 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
           if( !(qual[i*dbstride]&SMF__Q_BADB) ) for( j=0; j<ntslice; j++ ) {
 
             di = i*dbstride + j*dtstride;
-            vi = i*vbstride + j*vtstride;
+            vi = i*vbstride + (j%vntslice)*vtstride;
 
             /* Check that the LUT, data and variance values are valid */
             if( (lut[di] != VAL__BADI) && !(qual[di]&mask) && (var[vi] != 0) ){
@@ -276,7 +276,7 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
           for( j=0; j<ntslice; j++ ) {
 
             di = i*dbstride + j*dtstride;
-            vi = i*vbstride + j*vtstride;
+            vi = i*vbstride + (j%vntslice)*vtstride;
 
             /* Check that the LUT, data and variance values are valid */
             if( (lut[di] != VAL__BADI) && (dat[di] != VAL__BADD) && 

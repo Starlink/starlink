@@ -178,11 +178,11 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
     if( variance ) {
       var = variance->pntr[0];
 
-      smf_get_dims( data, NULL, NULL, &vnbolo, &vntslice, NULL, &vbstride, 
+      smf_get_dims( variance, NULL, NULL, &vnbolo, &vntslice, NULL, &vbstride, 
                     &vtstride, status );
       
       /* Check that the variance dimensions are compatible with data */
-      if( (vnbolo != nbolo) || ( vntslice && (vntslice!=ntslice) ) ) {
+      if( (vnbolo != nbolo) || ( (vntslice>1) && (vntslice!=ntslice) ) ) {
         *status = SAI__ERROR;
         errRep(" ", FUNC_NAME ": variance dimensions incompatible with data", 
                status ); 
@@ -243,7 +243,8 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
         outvar = (outdata->pntr)[1];
         for( i=0; i<nbolo; i++ ) {
           for( j=0; j<ntslice; j++ ) {
-            outvar[i*dbstride+j*dtstride] = var[i*vbstride+j*vtstride];
+            outvar[i*dbstride+j*dtstride] = var[i*vbstride+
+                                                (j%vntslice)*vtstride];
           }
         }
       }
