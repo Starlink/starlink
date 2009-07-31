@@ -10,7 +10,7 @@
  *     Starlink ANSI C
 
  *  Copyright:
- *     Copyright (C) 2008 Science and Technology Facilities Council.
+ *     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
  *     All Rights Reserved.
 
  *  Licence:
@@ -40,6 +40,8 @@
  *     27-NOV-2008 (DSB):
  *        Use a mutex to prevent more than one Fortran routine being run
  *        at any one time.
+ *     31-JUL-2009 (TIMJ):
+ *        Add subParGet0l
 
  *  Bugs:
  *     {note_any_bugs_here}
@@ -119,6 +121,31 @@ void subParGet0c( size_t namecode, char *cvalue, size_t cvalue_length,
 
   F77_IMPORT_CHARACTER( CVALUE, CVALUE_length, cvalue );
   F77_FREE_CHARACTER( CVALUE );
+  F77_IMPORT_INTEGER( STATUS, *status );
+
+  UNLOCK_MUTEX;
+
+  return;
+}
+
+F77_SUBROUTINE(subpar_get0l)( INTEGER(NAMECODE), LOGICAL(LVALUE),
+			      INTEGER(STATUS) );
+
+
+void subParGet0l( size_t namecode, int *lvalue, int * status ) {
+  DECLARE_INTEGER(NAMECODE);
+  DECLARE_LOGICAL(LVALUE);
+  DECLARE_INTEGER(STATUS);
+
+  LOCK_MUTEX;
+
+  F77_EXPORT_INTEGER( namecode, NAMECODE );
+  F77_EXPORT_INTEGER( *status, STATUS );
+
+  F77_CALL(subpar_get0l)( INTEGER_ARG(&NAMECODE), LOGICAL_ARG(&LVALUE),
+			  INTEGER_ARG(&STATUS) );
+
+  F77_IMPORT_LOGICAL( LVALUE, *lvalue );
   F77_IMPORT_INTEGER( STATUS, *status );
 
   UNLOCK_MUTEX;
