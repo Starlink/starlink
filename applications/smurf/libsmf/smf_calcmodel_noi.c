@@ -74,6 +74,8 @@
 *        - switch to subkeymap notation in config file
 *     2009-07-21 (EC)
 *        - Remove NOISAMP/NOICHUNK related parameters since they aren't used
+*     2009-07-31 (EC)
+*        - handle 2d variance arrays
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -122,15 +124,18 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
   /* Local Variables */
   size_t aiter;                 /* Actual iterations of sigma clipper */
-  dim_t base;                   /* Base index of bolometer */
   size_t bstride;               /* bolometer stride */
   dim_t i;                      /* Loop counter */
+  dim_t id;                     /* Loop counter */
   dim_t idx=0;                  /* Index within subgroup */
+  dim_t im;                     /* Loop counter */
   dim_t j;                      /* Loop counter */
-  dim_t k;                      /* Loop counter */
   AstKeyMap *kmap=NULL;         /* Local keymap */
   unsigned char mask;           /* Bitmask for quality */
   unsigned char mask_spike;     /* Bitmask for quality */
+  size_t mbstride;              /* model bolometer stride */
+  dim_t mntslice;               /* Number of model time slices */
+  size_t mtstride;              /* model time slice stride */
   smfArray *model=NULL;         /* Pointer to model at chunk */
   double *model_data=NULL;      /* Pointer to DATA component of model */
   dim_t nbolo;                  /* Number of bolometers */
@@ -214,6 +219,10 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
       smf_get_dims( res->sdata[idx], NULL, NULL, &nbolo, &ntslice, &ndata, 
                     &bstride, &tstride, status );
 
+      /* NOI model dimensions */      
+      smf_get_dims( model->sdata[idx], NULL, NULL, NULL, &mntslice, NULL, 
+                    &mbstride, &mtstride, status );
+
       /* Only estimate the white noise level once at the beginning - the
 	 reason for this is to make measurements of the convergence 
 	 easier. */
@@ -227,15 +236,13 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         
 	for( i=0; i<nbolo; i++ ) if( !(qua_data[i*ntslice]&SMF__Q_BADB) ) {
             /* Loop over time and store the variance for each sample */
-            base = i*ntslice; 
-            for( j=0; j<ntslice; j++ ) {
-              model_data[base+j] = var[i];
+            for( j=0; j<mntslice; j++ ) {
+              model_data[i*mbstride+j*mtstride] = var[i];
             }
           }
       } else {
         for( i=0; i<nbolo; i++ ) {
-          base = i*ntslice;
-          var[i] = model_data[base];
+          var[i] = model_data[i*bstride];
         }
       }
 
@@ -259,9 +266,11 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
         for( i=0; i<nbolo; i++ ) if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {
           for( j=0; j<ntslice; j++ ) {
-            k = i*bstride+j*tstride;
-            if(model_data[k]>0 && !(qua_data[k]&mask) ) {
-              dat->chisquared[chunk] += res_data[k]*res_data[k]/model_data[k];
+            id = i*bstride+j*tstride;   /* index in data array */
+            im = i*mbstride+j*mtstride; /* index in NOI model array */
+            if(model_data[im]>0 && !(qua_data[id]&mask) ) {
+              dat->chisquared[chunk] += res_data[id]*res_data[id] / 
+                model_data[im];
               nchisq++;
             }
           }
@@ -278,6 +287,3 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   /* Clean Up */
   if( var ) var = smf_free(var, status);
 }
-
-
-
