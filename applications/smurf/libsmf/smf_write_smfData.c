@@ -13,7 +13,7 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_write_smfData ( const smfData * data, void *variance,
+*     smf_write_smfData ( const smfData *data, const smfData *variance,
 *                        unsigned char *quality, const char * filename,
 *                        int provid, int * status );
 
@@ -22,7 +22,10 @@
 *        Pointer to smfData to dump to disk file. Returns without action
 *        if NULL pointer.
 *     variance = void * (Given)
-*        If set, use this buffer instead of VARIANCE associated with data.
+*        Override VARIANCE component of data with variance stored as the
+*        main data array of a second smfData called variance. variance
+*        can have the length of the time dimension be 0 in which case it
+*        is replicated at each time slice in the output file.
 *     quality = unsigned char * (Given)
 *        If set, use this buffer instead of QUALITY associated with data.
 *     filename = const char * (Given)
@@ -58,11 +61,13 @@
 *        - write WCS information
 *        - write JCMT State array
 *        - add variance and quality overrides
+*     2009-07-31 (EC):
+*        - enable 2d variance arrays, supply external variance with smfData
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
-*     University of British Columbia.
+*     Copyright (C) 2008,2009 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -111,53 +116,97 @@
 
 #define FUNC_NAME "smf_write_smfData"
 
-void smf_write_smfData ( const smfData * data, void *variance,
-                         unsigned char *quality, const char * filename,
-                         int provid, int * status ) {
+void smf_write_smfData( const smfData *data, const smfData *variance,
+                        unsigned char *quality, const char * filename,
+                        int provid, int * status ) {
 
+  size_t dbstride;              /* bolo stride of data */
+  size_t dtstride;              /* tstride of data */
   size_t i;                     /* Loop counter */
   int flags = 0;                /* Flags for open file */
+  size_t j;                     /* Loop counter */
   HDSLoc *jcmtstateloc=NULL;    /* HDS Locator for JCMT headers */
   int lbnd[NDF__MXDIM];         /* Lower pixel bounds */
+  dim_t nbolo;                  /* number of bolos */
+  dim_t nelem;                  /* total number of elements in data array */
   dim_t ntslice=0;              /* Number of time slices */
   Grp * ogrp = NULL;            /* Small group for output filename */
   smfData * outdata = NULL;     /* Mapped output file */
+  double *outvar = NULL;        /* pointer to output variance component */
   char prvname[2*PAR__SZNAM+1]; /* provenance ID string */
   unsigned char *qual=NULL;     /* Pointer to QUALITY buffer */
   int ubnd[NDF__MXDIM];         /* Upper pixel bounds */
-  void *var=NULL;               /* Pointer to VARIANCE buffer */
+  double *var=NULL;             /* Pointer to VARIANCE buffer */
+  size_t vbstride;              /* bolo stride of variance */
+  dim_t vnbolo;                 /* number of bolos in variance */
+  dim_t vntslice;               /* number of bolos in variance */
+  size_t vtstride;              /* tstride of variance */
 
   if (*status != SAI__OK) return;
-  if (data == NULL) return;
+  if (!data) return;
 
-  /* Check for VARIANCE and QUALITY components, and header */
-  if( variance ) var = variance;
-  else var = (data->pntr)[1];    
-
-  if( quality ) qual = quality;
-  else qual = (data->pntr)[2];
-  
-  /* see if we need to write variance and quality */
-  if ( var ) flags |= SMF__MAP_VAR;
-  if ( qual ) flags |= SMF__MAP_QUAL;
- 
   /* create a group so that we can reuse smf_open_newfile interface */
   ogrp = grpNew( "", status );
   grpPut1( ogrp, filename, 0, status );
 
+  /* Check for QUALITY components, and header */
+  if( quality ) qual = quality;
+  else qual = (data->pntr)[2];
+
+  /* see if we need to write quality */
+  if ( qual ) flags |= SMF__MAP_QUAL;
+   
   /* Calculate bounds */
   for (i = 0; i < data->ndims; i++) {
     lbnd[i] = 1;
     ubnd[i] = lbnd[i] + (data->dims)[i] - 1;
   }
-
-  /* Get ntslice -- assume ICD ordered data, and only handle 1 & 3-d data */
+  
   if( data->ndims == 1 ) {
+    /* Dimensions for 1-d data */
     ntslice = data->dims[0];
-  }
+    nelem = ntslice;
+    nbolo = 1;
+    dbstride = 0;
+    dtstride = 1;
+  } else if( data->ndims == 3 ) {
+    /* Dimensions for 3-d data */
+    smf_get_dims( data, NULL, NULL, &nbolo, &ntslice, &nelem, &dbstride, 
+                  &dtstride, status );
 
-  if( data->ndims == 3 ) {
-    ntslice = data->dims[2];
+    /* Only handle variance for 3d data */
+    if( variance ) {
+      var = variance->pntr[0];
+
+      smf_get_dims( data, NULL, NULL, &vnbolo, &vntslice, NULL, &vbstride, 
+                    &vtstride, status );
+      
+      /* Check that the variance dimensions are compatible with data */
+      if( (vnbolo != nbolo) || ( vntslice && (vntslice!=ntslice) ) ) {
+        *status = SAI__ERROR;
+        errRep(" ", FUNC_NAME ": variance dimensions incompatible with data", 
+               status ); 
+        return;
+      }
+      
+      /* We've assumed that var is double precision... need to check */
+      if( variance->dtype != SMF__DOUBLE ) {
+        *status = SAI__ERROR;
+        errRep(" ", FUNC_NAME ": variance array is not double precision", 
+               status ); 
+        return;        
+      }
+
+    } else {
+      var = (data->pntr)[1];    
+    } 
+
+    if( var ) flags |= SMF__MAP_VAR;
+  } else {
+    *status = SAI__ERROR;
+    errRep(" ", FUNC_NAME ": can only handle 1-d or 3-d data", 
+           status ); 
+    return;
   }
 
   msgSetc( "NAME", filename );
@@ -171,7 +220,6 @@ void smf_write_smfData ( const smfData * data, void *variance,
     smfFile * outfile = outdata->file;
     smfHead * inhdr = data->hdr;
     size_t nbperel = 0;
-    size_t nelem = 1;
 
     /* provenance propagation - but only if we have provenance to propagate */
     if ( (data->file && data->file->ndfid && data->file->ndfid != NDF__NOID) ||
@@ -183,18 +231,23 @@ void smf_write_smfData ( const smfData * data, void *variance,
     /* number of bytes per element */
     nbperel = smf_dtype_size( data, status );
 
-    /* Calculate how many elements to copy */
-    for (i = 0; i< data->ndims; i++) {
-      nelem *= (data->dims)[i];
-    }
-
     /* Copy the data and variance and quality */
     if (*status == SAI__OK) {
 
       if( (data->pntr)[0] ) memcpy( (outdata->pntr)[0], (data->pntr)[0],
                                     nelem * nbperel );
 
-      if( var ) memcpy( (outdata->pntr)[1], var, nelem * nbperel );
+      /* Do variance on a timeslice basis in case we are repeating a 2-d
+         variance array over time slice */
+      if( var ) {
+        outvar = (outdata->pntr)[1];
+        for( i=0; i<nbolo; i++ ) {
+          for( j=0; j<ntslice; j++ ) {
+            outvar[i*dbstride+j*dtstride] = var[i*vbstride+j*vtstride];
+          }
+        }
+      }
+
       if( qual ) memcpy( (outdata->pntr)[2], qual, nelem * 1 );
     }
 

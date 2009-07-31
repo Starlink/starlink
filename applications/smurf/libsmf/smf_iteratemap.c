@@ -1448,8 +1448,8 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
                     one_strlcat( name, "_res", SMF_PATH_MAX+1, status );
                   }
 
-                  smf_write_smfData( res[i]->sdata[idx], var_data, qua_data, 
-                                     name, NDF__NOID, status );
+                  smf_write_smfData( res[i]->sdata[idx], dat.noi[i]->sdata[idx],
+                                     qua_data, name, NDF__NOID, status );
                 } else {
                   msgOut( " ", 
                           "SMF__ITERATEMAP: Can't export RES -- NULL filename",
