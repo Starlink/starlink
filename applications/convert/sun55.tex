@@ -17,16 +17,16 @@
 {Copyright \copyright\ 2005 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {55.24}
+\newcommand{\stardocnumber}    {55.25}
 \newcommand{\stardocauthors}   {Malcolm J. Currie\\
                                 G.J.Privett\\
                                 A.J.Chipperfield\\
                                 D.S.Berry\\
                                 A.C.Davenhall}
-\newcommand{\stardocdate}      {2008 October 9}
+\newcommand{\stardocdate}      {2009 July 30}
 \newcommand{\stardoctitle}     {CONVERT\\
                                 A Format-conversion Package}
-\newcommand{\stardocversion}   {Version 1.5-15}
+\newcommand{\stardocversion}   {Version 1.5-17}
 \newcommand{\stardocmanual}    {User's Manual}
 \newcommand{\stardocabstract}  {
 The \CONVERT\ package contains utilities for converting data files
@@ -275,6 +275,8 @@ procedures for handling NDFs from within IDL.}
 \newcommand{\IRAFref}{\htmladdnormallink{\IRAF}{\IRAFURL}}
 \newcommand{\KAPPA}{{\footnotesize KAPPA}}
 \newcommand{\KAPPAref}{\xref{\KAPPA}{sun95}{}}
+\newcommand{\KAPLIBS}{{\footnotesize KAPLIBS}}
+\newcommand{\KAPLIBSref}{\xref{\KAPLIBS}{sun238}{}}
 \newcommand{\IDLURL}{http://www.rsinc.com/idl/}
 \newcommand{\IDLref}{\htmladdnormallink{IDL}{\IDLURL}}
 \newcommand{\IDLAULURL}{http://idlastro.gsfc.nasa.gov/homepage.html}
@@ -7366,5 +7368,30 @@ The CADC provenance processing now also modifies the PRODUCT keyword's
 value in FITS extensions to the original PRODUCT string followed by 
 underscore and the extension name in lowercase.  Also the CADC 
 provenance now only records unique OBSIDD values.
+
+\section{Release Notes -- V1.5-16}
+
+The FITS converters use the new NDG provenance system that inherits
+history records too.  \htmlref{NDF2FITS}{NDF2FITS} also ignores hidden
+ancestors.
+
+NDF2FITS can now handle files names with multiple fullstops in the 
+path.
+
+The formatting of history records written by FITSNDF has been
+improved, in particular the indentation after the first line. This
+preserves the formatting after an NDF$\rightarrow$FITS$\rightarrow$NDF cycle.
+
+Various internal improvements were made, particularly to reuse
+\KAPLIBSref\ equivalents of \CONVERT\ subroutines.
+
+Correct a bug in \htmlref{FITS2NDF}{FITS2NDF} affecting the import of
+SMURF data containing VARIANCE or QUALITY that was formerly in an NDF.
+
+\section{Release Notes -- V1.5-17}
+
+The bash \CONVERT\ initialisation script has been changed so that it
+now works from any Bourne-compatible shell.
+
 
 \end{document}

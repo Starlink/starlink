@@ -1,6 +1,19 @@
 1 CONVERT_Version_1.5-17
+
  The bash CONVERT initialisation script has been changed so that it
- now works from any Bourne compatible shell.
+ now works from any Bourne-compatible shell.
+
+1 CONVERT_Version_1.5-16
+
+ The FITS converters use the new NDG provenance system that inherits
+ history records too.  NDF2FITS also ignores hidden ancestors.
+
+ NDF2FITS can now handle files names with multiple fullstops in the 
+ path.
+
+ The formatting of history records written by FITSNDF has been
+ improved, in particular the indentation after the first line.
+ This preserves the formatting after an NDF->FITS->NDF cycle.
 
 1 CONVERT_Version_1.5-15
 
