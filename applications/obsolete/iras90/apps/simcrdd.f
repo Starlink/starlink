@@ -199,7 +199,7 @@
 
 *  Get a value for parameter MSG_FILTER, and use it to establish the
 *  conditional message filter level.
-      CALL MSG_IFGET( 'MSG_FILTER', STATUS )
+      CALL MSG_IFGET( STATUS )
 
 *  Begin an NDF context.
       CALL NDF_BEGIN

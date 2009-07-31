@@ -276,7 +276,7 @@
       BAND0 = 0
 
 *  Set the filter level for conditional message output.
-      CALL MSG_IFGET( 'MSG_FILTER', STATUS )
+      CALL MSG_IFGET( STATUS )
 
 *  Get a quality expression giving the quality of input CRDD samples
 *  which are to be included in the calculation of the background model.

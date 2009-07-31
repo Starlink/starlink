@@ -146,7 +146,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Get MSG filter level
-      CALL MSG_IFGET( 'MSG_FILTER', STATUS )
+      CALL MSG_IFGET( STATUS )
 
 *  Obtain an integer scalar.
       CALL PAR_GET0I( 'A', A, STATUS )

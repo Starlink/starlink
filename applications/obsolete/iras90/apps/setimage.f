@@ -129,7 +129,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Set the filter level for conditional message output.
-      CALL MSG_IFGET( 'MSG_FILTER', STATUS )
+      CALL MSG_IFGET( STATUS )
 
 *  Get a group containing the names of the NDFs to be modified.
       CALL IRM_RDNDF( 'NDF', 0, 1, '  Give more NDF names...', 

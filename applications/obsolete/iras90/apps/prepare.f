@@ -413,7 +413,7 @@
 
 *  Establish the conditional message filter level using parameter
 *  MSG_LEVEL.
-      CALL MSG_IFGET( 'MSG_FILTER', STATUS )
+      CALL MSG_IFGET( STATUS )
 
 *  Get a value for parameter COORDS. The system in which parameters 
 *  FIELDLON and FIELDLAT are specified. Also, if the input image if of 

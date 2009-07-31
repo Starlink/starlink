@@ -224,7 +224,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Set the filter level for conditional message output.
-      CALL MSG_IFGET( 'MSG_FILTER', STATUS )
+      CALL MSG_IFGET( STATUS )
 
 *  Start a new NDF context.
       CALL NDF_BEGIN

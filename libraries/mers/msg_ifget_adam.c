@@ -11,36 +11,53 @@
 *     Starlink ANSI C (Callable from Fortran)
 
 *  Invocation:
-*     CALL MSG_IFGET( PNAME, STATUS )
+*     CALL MSG_IFGET( STATUS )
 
 *  Description:
-*     Translate the given parameter name into a value for the filter
-*     level for conditional message output. The translation accepts
-*     abbreviations. This value is then used to set the informational
-*     filtering level. It is recommended that one parameter name is
-*     used universally for this purpose, namely MSG_FILTER, in order to
-*     clarify the interface file entries.  The three acceptable strings
-*     for MSG_FILTER are
+*     Controls the messaging filter level using a variety of
+*     techniques. The messaging filter level can be read from the
+*     QUIET parameter, the MSG_FILTER parameter or MSG_FILTER
+*     environment variable. The QUIET parameter can be used to quickly
+*     turn messaging off with minimum of typing whereas the MSG_FILTER
+*     parameter and environment variable provide more detailed control
+*     over the filtering level. The MSG_FILTER parameter is read first
+*     and if a value is available it will be used (see below for
+*     definitions). The QUICK parameter will be read next and compared
+*     with MSG_FILTER for consistency, generating an error if they are
+*     inconsistent. If the MSG_FILTER parameter has not been read, or
+*     returns a NULL value the QUICK parameter will be used to control
+*     the filter level. An explicit true value will set the filter
+*     level to QUIET and an explicit false will set it to NORM.
 *
+*     If neither parameter returned a value the MSG_FILTER environment
+*     variable will be read and parsed in a similar way to the
+*     MSG_FILTER parameter.
+*
+*     The acceptable strings for MSG_FILTER parameter and environment
+*     variables are:
+*
+*        -  NONE  -- representing MSG__NONE;
 *        -  QUIET -- representing MSG__QUIET;
 *        -  NORMAL -- representing MSG__NORM;
-*        -  VERBOSE -- representing MSG__VERB.
-*        -  DEBUG -- representing MSG__DEBUG
+*        -  VERBOSE -- representing MSG__VERB;
+*        -  DEBUG -- representing MSG__DEBUG;
+*        -  DEBUG1 to DEBUG20 -- representing MSG__DEBUGnn;
+*        -  ALL -- representing MSG__ALL
 *
-*     MSG_IFGET accepts abbreviations of these strings; any other value
+*     msgIfget accepts abbreviations of these strings; any other value
 *     will result in an error report and the status value being
-*     returned set to MSG__INVIF. If an error occurs getting the
-*     parameter value, the status value is returned and an additional
-*     error report is made.
+*     returned set to MSG__INVIF.
+*
+*     Any use of abort (!!) when reading the parmaeterswill be
+*     recognized and the routine will return without reading the
+*     environment variable.
 
 *  Arguments:
-*     PNAME = CHARACTER * ( * ) (Given)
-*        The filtering level parameter name.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
 *     Copyright (C) 1991, 1992 Science & Engineering Research Council.
 *     Copyright (C) 1996, 1999, 2004 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
@@ -87,6 +104,8 @@
 *        (which are initialised in a different shared library).
 *     02-MAY-2008 (TIMJ):
 *        Add MSG__DEBUG
+*     31-JUL-2009 (TIMJ):
+*        Remove parameter name from argument list
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -100,16 +119,10 @@
 #include "mers_f77.h"
 #include "star/mem.h"
 
-F77_SUBROUTINE(msg_ifget)( CHARACTER(PNAME),
-                           INTEGER(STATUS)
-                           TRAIL(PNAME) ) {
+F77_SUBROUTINE(msg_ifget)( INTEGER(STATUS) ) {
   int status;
-  char *pname;
 
-  pname = starMallocAtomic( PNAME_length + 1 );
-  F77_IMPORT_CHARACTER( PNAME, PNAME_length, pname );
   F77_IMPORT_INTEGER( *STATUS, status );
-  msgIfget( pname, &status );
+  msgIfget( &status );
   F77_EXPORT_INTEGER( status, *STATUS );
-  starFree( pname );
 }

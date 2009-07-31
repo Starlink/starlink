@@ -11,16 +11,30 @@
 *     Starlink ANSI C
 
 *  Invocation:
-*     msgIfget( const char * pname, int * status );
+*     msgIfget( int * status );
 
 *  Description:
-*     Translate the given parameter name into a value for the filter
-*     level for conditional message output. The translation accepts
-*     abbreviations. This value is then used to set the informational
-*     filtering level. It is recommended that one parameter name is
-*     used universally for this purpose, namely MSG_FILTER, in order to
-*     clarify the interface file entries.  The acceptable strings
-*     for MSG_FILTER are
+*     Controls the messaging filter level using a variety of
+*     techniques. The messaging filter level can be read from the
+*     QUIET parameter, the MSG_FILTER parameter or MSG_FILTER
+*     environment variable. The QUIET parameter can be used to quickly
+*     turn messaging off with minimum of typing whereas the MSG_FILTER
+*     parameter and environment variable provide more detailed control
+*     over the filtering level. The MSG_FILTER parameter is read first
+*     and if a value is available it will be used (see below for
+*     definitions). The QUICK parameter will be read next and compared
+*     with MSG_FILTER for consistency, generating an error if they are
+*     inconsistent. If the MSG_FILTER parameter has not been read, or
+*     returns a NULL value the QUICK parameter will be used to control
+*     the filter level. An explicit true value will set the filter
+*     level to QUIET and an explicit false will set it to NORM.
+*
+*     If neither parameter returned a value the MSG_FILTER environment
+*     variable will be read and parsed in a similar way to the
+*     MSG_FILTER parameter.
+*
+*     The acceptable strings for MSG_FILTER parameter and environment
+*     variables are:
 *
 *        -  NONE  -- representing MSG__NONE;
 *        -  QUIET -- representing MSG__QUIET;
@@ -29,22 +43,16 @@
 *        -  DEBUG -- representing MSG__DEBUG;
 *        -  DEBUG1 to DEBUG20 -- representing MSG__DEBUGnn;
 *        -  ALL -- representing MSG__ALL
-*        
 *
 *     msgIfget accepts abbreviations of these strings; any other value
 *     will result in an error report and the status value being
-*     returned set to MSG__INVIF. If an error occurs getting the
-*     parameter value, the routine will fall back to reading the
-*     MSG_FILTER environment variable. Supplying "!" (PAR__NULL)
-*     to the parameter will force the environment variable to be read.
-*     If the environment variable can not be read the message filtering
-*     level will be set to "NORM". If the environment variable exists
-*     and does not contain a recognized string there will be an error
-*     report and status will be returned set to MSG__INVIF.
+*     returned set to MSG__INVIF.
+*
+*     Any use of abort (!!) when reading the parmaeterswill be
+*     recognized and the routine will return without reading the
+*     environment variable.
 
 *  Arguments:
-*     pname = const char * (Given)
-*        The filtering level parameter name.
 *     status = int * (Given and Returned)
 *        The global status.
 
@@ -107,6 +115,9 @@
 *        Now calls msg1Ifget for the bulk of the work.
 *     29-JUL-2009 (TIMJ):
 *        Fall back to reading the environment variable on error.
+*     31-JUL-2009 (TIMJ):
+*        - Remove parameter name from argument list
+*        - Read MSG_FILTER and QUIET parameters
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -130,10 +141,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-void msgIfget( const char * pname, int * status ) {
+void msgIfget( int * status ) {
 
   size_t namcod;        /* SUBPAR pointer to parameter */
   char fname[8];        /* Name of message filtering level */
+  int hasq = 0;         /* Valid QUIET param? */
+  int hasm = 0;         /* Valid MSG_FILTER param? */
+  int quiet;            /*  boolean for QUIET */
 
   /*  Check inherited global status. */
   if (*status != SAI__OK) return;
@@ -142,36 +156,86 @@ void msgIfget( const char * pname, int * status ) {
   emsMark();
 
   /*  Get the message filtering level from the parameter system. */
-  subParFindpar( pname, &namcod, status );
+  subParFindpar( "MSG_FILTER", &namcod, status );
   subParGet0c( namcod, fname, sizeof(fname), status );
+  if (*status == PAR__ABORT) {
+    return;
+  } else if (*status == SAI__OK) {
+    hasm = 1;
+  } else {
+    emsAnnul( status );
+    hasm = 0;
+  }
 
-  /*  Check the returned status. */
-  if (*status != SAI__OK) {
+  /* Also get the QUIET parameter */
+  subParFindpar( "QUIET", &namcod, status );
+  subParGet0l( namcod, &quiet, status );
+  if (*status == PAR__ABORT) {
+    return;
+  } else if (*status == SAI__OK) {
+    hasq = 1;
+  } else {
+    emsAnnul( status );
+    hasq = 0;
+  }
 
-    if (*status != PAR__ABORT) {
-      /*     Any failure to read the parameter (even if PAR__NULL is used)
-       *     will force a read of the environment instead */
-      emsAnnul( status );
+  /* Force to NORM before we enter the routine */
+  msgIfset( MSG__NORM, status );
 
-      /* Force to NORM before we enter the routine */
-      msgIfset( MSG__NORM, status );
+  /* Use environment if we read neither parameter */
+  if (!hasm && !hasq) {
       msgIfgetenv( status );
-    }
   } else {
 
-    /* Translate this string to a message level and set it */
-    msg1Ifget( fname, status );
+    if (hasm) {
+      /* Translate the parameter string to a message level and set it */
+      msg1Ifget( fname, status );
 
-    /* Report that we had a problem with the value originating
-       from the parameter */
-    if (*status != SAI__OK) {
-      emsRep( "MSG_GETIF_NOPAR",
-              "msgIfget: Unable to get the informational filtering "
-              "level from the parameter system.", status );
+      /* Report that we had a problem with the value originating
+         from the parameter */
+      if (*status != SAI__OK) {
+        emsRep( "MSG_GETIF_NOPAR",
+                "msgIfget: Unable to get the informational filtering "
+                "level from the parameter system.", status );
+      }
+
+      /* compare with QUIET setting */
+      if (hasq && *status == SAI__OK) {
+        msglev_t curlev;
+        char curfil[MSG__SZLEV];
+        curlev = msgIflev( curfil, status );
+
+        if ( quiet && curlev > MSG__QUIET) {
+          *status = MSG__INVIF;
+          emsRepf( "MSG_GETIF_QINC",
+                  "Inconsistent usage of MSG_FILTER and QUIET parameters: "
+                  "QUIET is true but MSG_FILTER was '%s'",
+                  status, curfil );
+        } else if ( !quiet && msgIflev( NULL, status ) < MSG__NORM) {
+          *status = MSG__INVIF;
+          emsRepf( "MSG_GETIF_QINC",
+                  "Inconsistent usage of MSG_FILTER and QUIET parameters: "
+                  "QUIET was false but MSG_FILTER was '%s'",
+                   status, curfil );
+        }
+      }
+
+    } else if (hasq) {
+      /* Just have quiet. Already set to NORM */
+      if (quiet) {
+        msgIfset( MSG__QUIET, status );
+      }
+
+    } else {
+      if (*status == SAI__OK) {
+        *status = SAI__ERROR;
+        emsRep( "MSG_GETIF_ARGH",
+                "msgIfget: Complete logic breadkdown. Should not be here",
+                status );
+      }
     }
 
   }
-
   /*  Release the current error reporting context. */
   emsRlse();
 }

@@ -1,6 +1,12 @@
 Version 2.1
 -----------
 
+ o Remove the parameter name from msgIfget. Enforce standard usage
+   by enforcing standard parameter name.
+
+ o msgIfget will now read MSG_FILTER and QUIET parameters and act
+   accordingly.
+
  o Modify msgIfget to fallback to using the MSG_FILTER environment
    variable if the parameter can not be obtained or has been set to null.
    All applications using MSG_FILTER parameters have been modified to
@@ -9,7 +15,8 @@ Version 2.1
 
  o Add msgIfgetenv for reading and setting the message reporting level
    from the MSG_FILTER environment variable in a similar way to msgIfget works
-   from an ADAM parameter.
+   from an ADAM parameter. msgTune has been modified to understand the
+   same values as msgIfgetenv.
 
  o Modify msgIflev interface to also return a string representation
    of the messaging level. API has changed for both Fortran and C

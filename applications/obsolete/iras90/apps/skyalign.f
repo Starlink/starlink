@@ -272,7 +272,7 @@
 
 *  Establish the conditional message filter level using parameter
 *  MSG_LEVEL.
-      CALL MSG_IFGET( 'MSG_FILTER', STATUS )
+      CALL MSG_IFGET( STATUS )
 
 *  Get a group containing the names of the NDFs to be processed.
       CALL IRM_RDNDF( 'IN', 0, 1, '  Give more NDF names...', 

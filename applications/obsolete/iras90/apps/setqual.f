@@ -322,7 +322,7 @@
 
 *  Establish the conditional message filter level using parameter
 *  MSG_LEVEL.
-      CALL MSG_IFGET( 'MSG_FILTER', STATUS )
+      CALL MSG_IFGET( STATUS )
 
 *  Abort if an error has occured.
       IF ( STATUS .NE. SAI__OK ) GO TO 999

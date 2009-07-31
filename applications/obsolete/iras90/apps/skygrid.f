@@ -267,7 +267,7 @@
 
 *  Get a value for parameter MSG_FILTER, and use it to establish the
 *  conditional message filter level.
-      CALL MSG_IFGET( 'MSG_FILTER', STATUS )
+      CALL MSG_IFGET( STATUS )
 
 *  Open the graphic database and start up SGS on the requested graphics
 *  device. Do not clear the display. 

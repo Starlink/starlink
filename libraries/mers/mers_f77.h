@@ -110,9 +110,7 @@ F77_SUBROUTINE(msg_fmtr)( CHARACTER(token),
                           TRAIL(token)
                           TRAIL(format) );
 
-F77_SUBROUTINE(msg_ifget)( CHARACTER(pname),
-                           INTEGER(status)
-                           TRAIL(pname) );
+F77_SUBROUTINE(msg_ifget)( INTEGER(status) );
 
 F77_SUBROUTINE(msg_ifgetenv)( INTEGER(STATUS) );
 

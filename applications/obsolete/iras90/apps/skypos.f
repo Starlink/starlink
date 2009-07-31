@@ -345,7 +345,7 @@
 
 *  Establish the conditional message filter level using parameter
 *  MSG_LEVEL.
-      CALL MSG_IFGET( 'MSG_FILTER', STATUS )
+      CALL MSG_IFGET( STATUS )
 
 *  See where the input coordinates should be read from; cursor, file or
 *  keyboard.

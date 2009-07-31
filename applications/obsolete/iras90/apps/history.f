@@ -224,7 +224,7 @@
 
 *  Establish the conditional message filter level using parameter
 *  MSG_LEVEL.
-      CALL MSG_IFGET( 'MSG_FILTER', STATUS )
+      CALL MSG_IFGET( STATUS )
 
 *  Get a value for parameter LOOP.
       CALL PAR_GET0L( 'LOOP', LOOP, STATUS )

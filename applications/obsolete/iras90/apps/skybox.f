@@ -262,7 +262,7 @@
 
 *  Get the level of message reporting and set the report filtering
 *  level accordingly.
-      CALL MSG_IFGET( 'MSG_FILTER', STATUS )
+      CALL MSG_IFGET( STATUS )
 
 *  See if the cursor is to be used.
       CALL PAR_GET0L( 'CURSOR', CURSOR, STATUS )

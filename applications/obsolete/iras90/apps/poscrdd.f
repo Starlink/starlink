@@ -166,7 +166,7 @@
 
 *  Establish the conditional message filter level using parameter
 *  MSG_LEVEL.
-      CALL MSG_IFGET( 'MSG_FILTER', STATUS )
+      CALL MSG_IFGET( STATUS )
 
 *  Get a GRP identifier for a group of NDFs containing the input CRDD.
       CALL IRM_RDNDF( 'IN', 0, 1, 'Give more CRDD file names',

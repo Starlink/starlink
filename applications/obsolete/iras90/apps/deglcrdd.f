@@ -228,7 +228,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Establish the conditional message filter level.
-      CALL MSG_IFGET( 'MSG_FILTER', STATUS )
+      CALL MSG_IFGET( STATUS )
 
 *  See what to do about the samples in the detected glitches. 
       CALL PAR_GET0L( 'SETBAD', SETBAD, STATUS )

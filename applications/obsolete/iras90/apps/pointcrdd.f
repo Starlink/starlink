@@ -345,7 +345,7 @@
       INTLBD = 0
 
 *  Initialisation
-      CALL POINA0( 'AUTOMATIC', 'LOGFILE', 'MSG_FILTER', 
+      CALL POINA0( 'AUTOMATIC', 'LOGFILE', 
      :             AUTO, BANDLU, LOGFID, LOGREQ, STATUS )
 
 *  Obtain parameters such as coordinate system, thresholds, and local noise size

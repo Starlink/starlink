@@ -151,7 +151,7 @@
 
 *  Establish the conditional message filter level using parameter
 *  MSG_LEVEL.
-      CALL MSG_IFGET( 'MSG_FILTER', STATUS )
+      CALL MSG_IFGET( STATUS )
 
 *  Get a syntactically correct quality expression from the environment.
       CALL IRM_GETQX( 'QEXP', QEXP, STATUS )

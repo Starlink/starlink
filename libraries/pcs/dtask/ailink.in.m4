@@ -479,7 +479,7 @@ ifelse(__SCRIPTNAME, alink,
 *
 *   Set the message filtering level
 *
-      CALL MSG_IFGET( 'MSG_FILTER', STATUS )
+      CALL MSG_IFGET( STATUS )
 *
 *   Call the application routine.
 *

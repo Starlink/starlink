@@ -1,4 +1,4 @@
-      SUBROUTINE POINA0( PAUTO, PLOGFI, PMSGFL, 
+      SUBROUTINE POINA0( PAUTO, PLOGFI, 
      :                   AUTO, BANDLU, LOGFID, LOGREQ, STATUS )
 *+
 *  Name:
@@ -28,8 +28,6 @@
 *         The name of the parameter used to obtain the Automatic flag.
 *     PLOGFI = CHARACTER (Given)
 *         The name of the parameter used to obtain the logfile identity.
-*     PMSGFL = CHARACTER (Given)
-*         The name of the parameter used to obtain the msg_filter level
 *     AUTO = LOGICAL (Returned)
 *        TRUE when application is required to run in automatic mode.
 *     BANDLU = INTEGER (Returned)
@@ -83,9 +81,8 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Establish the conditional message filter level using parameter
-*  MSG_FILTER
-      CALL MSG_IFGET( PMSGFL, STATUS )
+*  Establish the conditional message filter level
+      CALL MSG_IFGET( STATUS )
 
 *  Begin an NDF context.
       CALL NDF_BEGIN

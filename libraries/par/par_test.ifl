@@ -10,6 +10,7 @@
 #  Authors:
 #     MJC: Malcolm J. Currie (STARLINK)
 #     AJC: Alan J. Chipperfield (STARLINK)
+#     TIMJ: Tim Jenness (JAC, Hawaii)
 #     {enter_new_authors_here}
 
 #  History:
@@ -18,6 +19,8 @@
 #     1999 September 17 (AJC):
 #        Add MSG_FILTER
 #        Change G to vpath DEFAULT, default !
+#     2009 July 31 (TIMJ):
+#        No need for MSG_FILTER.
 #     {enter_changes_here}
 
 #-
@@ -110,13 +113,6 @@ interface PAR_TEST
       access      WRITE
       vpath       'DEFAULT'
       default     0.0
-   endparameter
-
-   parameter      MSG_FILTER
-      type        LITERAL
-      access      READ
-      vpath       'DEFAULT'
-      default     'NORM'
    endparameter
 
 endinterface

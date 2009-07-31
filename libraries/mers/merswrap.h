@@ -122,8 +122,7 @@ void msgFmt( const char *token,
              const char *format,
              ...) __attribute__((format (printf, 2, 3 )));
 
-void msgIfget( const char *pname,
-               int *status );
+void msgIfget( int *status );
 
 void msgIfgetenv( int * status );
 

@@ -381,7 +381,7 @@
 
 *  Get the level of message reporting and set the report filtering
 *  levevl accordingly.
-      CALL MSG_IFGET( 'MSG_FILTER', STATUS )
+      CALL MSG_IFGET( STATUS )
             
 *  See if the user wants to loop round, performing multiple operations.
       CALL PAR_GET0L( 'LOOP', LOOP, STATUS )

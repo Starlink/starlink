@@ -403,7 +403,7 @@
 
 *  Establish the conditional message filter level using parameter
 *  MSG_LEVEL.
-      CALL MSG_IFGET( 'MSG_FILTER', STATUS )
+      CALL MSG_IFGET( STATUS )
 
 *  Get a value for parameter AUTOMATIC from the environment.
       CALL PAR_GET0L( 'AUTOMATIC', AUTO, STATUS )

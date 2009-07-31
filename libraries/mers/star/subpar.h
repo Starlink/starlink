@@ -14,7 +14,7 @@
  *     Starlink ANSI C
 
  *  Copyright:
- *     Copyright (C) 2008 Science and Technology Facilities Council.
+ *     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
  *     All Rights Reserved.
 
  *  Licence:
@@ -40,6 +40,8 @@
  *  History:
  *     19-JUL-2008 (TIMJ):
  *        Initial version.
+ *     31-JUL-2009 (TIMJ):
+ *        Add subParGet0l
 
  *  Bugs:
  *     {note_any_bugs_here}
@@ -53,6 +55,7 @@
 void subParFindpar( const char * name, size_t * namecode, int * status );
 void subParGet0c( size_t namecode, char *cvalue, size_t cvalue_length,
 		  int * status );
+void subParGet0l( size_t namecode, int *lvalue, int * status );
 void subParGetkey( size_t namecode, char *keyword, size_t keyword_length,
 		   int * status);
 int subParGref( size_t namecode, char * refstr, size_t reflen );

@@ -125,7 +125,7 @@
 
 *  Establish the conditional message filter level using parameter
 *  MSG_LEVEL, and store it in common.
-      CALL MSG_IFGET( 'MSG_FILTER', STATUS )
+      CALL MSG_IFGET( STATUS )
       CALL MSG_IFLEV( TRA_FILT )
 
 *  Get a group containing the names of the NDFs to be processed.
