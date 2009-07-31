@@ -42,13 +42,13 @@
 *        -  VERBOSE -- representing MSG__VERB;
 *        -  DEBUG -- representing MSG__DEBUG;
 *        -  DEBUG1 to DEBUG20 -- representing MSG__DEBUGnn;
-*        -  ALL -- representing MSG__ALL
+*        -  ALL -- representing MSG__ALL.
 *
 *     msgIfget accepts abbreviations of these strings; any other value
 *     will result in an error report and the status value being
 *     returned set to MSG__INVIF.
 *
-*     Any use of abort (!!) when reading the parmaeterswill be
+*     Any use of abort (!!) when reading the parameters will be
 *     recognized and the routine will return without reading the
 *     environment variable.
 
