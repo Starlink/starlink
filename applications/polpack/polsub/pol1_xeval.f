@@ -1,4 +1,4 @@
-      SUBROUTINE POL1_XEVAL( ITEM, EXPR, TYPE, XLOC, FCHAN, QUIET,
+      SUBROUTINE POL1_XEVAL( ITEM, EXPR, TYPE, XLOC, FCHAN,
      :                       IGRP1, IGRP2, STATUS )
 *+
 *  Name:
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_XEVAL( ITEM, EXPR, TYPE, XLOC, FCHAN, QUIET,
+*     CALL POL1_XEVAL( ITEM, EXPR, TYPE, XLOC, FCHAN,
 *                      IGRP1, IGRP2, STATUS )
 
 *  Description:
@@ -32,11 +32,6 @@
 *     FCHAN = INTEGER (Given)
 *        An AST FitsChan containing the FITS header cards to be used when
 *        resolving references to FITS keywords contained in EXPR.
-*     QUIET = LOGICAL (Given)
-*        If .FALSE. a message is given each time a value is assigned to a 
-*        POLPACK extension item. The message includes the item name and
-*        the value assigned to it. Otherwise, these messages are not 
-*        displayed.
 *     IGRP1 = INTEGER (Given)
 *        A GRP identifier for a group holding HDS data types. Ignored
 *        if either IGRP1 or IGRP2 is GRP__NOID.
@@ -68,15 +63,20 @@
 *     item before being stored.
 
 *  Copyright:
-*     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+*     Copyright (C) 1999 Central Laboratory of the Research Councils
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     23-APR-1999 (DSB):
 *        Original version.
+*     31-JUL-2009 (TIMJ):
+*        QUIET handling is done via MSG_IFGET now.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -99,7 +99,6 @@
       CHARACTER TYPE*(*)
       CHARACTER XLOC*(*)
       INTEGER FCHAN
-      LOGICAL QUIET
       INTEGER IGRP1
       INTEGER IGRP2
 
@@ -219,7 +218,7 @@
 *  Tell the user it is being stored in the extension (if requested).
 *  The FILTER item is reported later when the final contents of the
 *  extension are known (in POL1_CHKEX).
-            IF( .NOT. QUIET .AND. ITEM( : LITEM ) .NE. 'FILTER' ) THEN
+            IF( ITEM( : LITEM ) .NE. 'FILTER' ) THEN
                CALL MSG_SETC( 'ITEM', ITEM( : LITEM ) )
                CALL MSG_OUT( 'POL1_XEVAL_MSG1','     Setting ^ITEM to'//
      :                       ' ^VALUE', STATUS )
@@ -381,11 +380,9 @@
             END IF
 
 *  Tell the user it is being stored in the extension (if requested).
-            IF( .NOT. QUIET  ) THEN
-               CALL MSG_SETC( 'ITEM', ITEM( : LITEM ) )
-               CALL MSG_OUT( 'POL1_XEVAL_MSG2','     Setting ^ITEM to'//
-     :                       ' ^VALUE', STATUS )
-            END IF
+            CALL MSG_SETC( 'ITEM', ITEM( : LITEM ) )
+            CALL MSG_OUT( 'POL1_XEVAL_MSG2','     Setting ^ITEM to'//
+     :           ' ^VALUE', STATUS )
 
          END IF
 

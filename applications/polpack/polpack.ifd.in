@@ -523,16 +523,6 @@ package polpack {
             helpkey *
           }
 
-         parameter quiet {
-            type _LOGICAL
-            access READ
-            vpath DEFAULT
-            ppath DEFAULT
-            default FALSE
-            prompt {Should all screen output be suppressed?}
-            helpkey *
-          }
-
       }
 #+
 #  Name:
@@ -666,16 +656,6 @@ package polpack {
             ppath DEFAULT
             default !
             prompt {File to contain a list of the NDFs}
-            helpkey *
-          }
-
-         parameter quiet {
-            type _LOGICAL
-            access READ
-            vpath DEFAULT
-            ppath DEFAULT
-            default FALSE
-            prompt {Should all screen output be suppressed?}
             helpkey *
           }
 
@@ -1075,16 +1055,6 @@ package polpack {
             ppath DEFAULT
             default !
             prompt {File to contain a list of the NDFs}
-            helpkey *
-          }
-
-         parameter quiet {
-            type _LOGICAL
-            access READ
-            vpath DEFAULT
-            ppath DEFAULT
-            default FALSE
-            prompt {Should all screen output be suppressed?}
             helpkey *
           }
 
@@ -1864,16 +1834,6 @@ package polpack {
             vpath {PROMPT }
             association ->GLOBAL.DATA_ARRAY
             prompt {Output intensity images}
-            helpkey *
-          }
-
-         parameter quiet {
-            type _LOGICAL
-            access READ
-            vpath DEFAULT
-            ppath DEFAULT
-            default FALSE
-            prompt {Should all screen output be suppressed?}
             helpkey *
           }
 

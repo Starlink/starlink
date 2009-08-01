@@ -42,9 +42,6 @@
 *        processed NDFs. This file can be used when specifying the input 
 *        NDFs for subsequent applications. No file is created if a null
 *        (!) value is given. [!]
-*     QUIET = _LOGICAL (Read)
-*        If FALSE, then each NDF is listed as it is processed. Otherwise,
-*        nothing is written to the screen. [FALSE] 
 
 *  FITS Keywords:
 *     The following FITS keywords are created. The POLPACK extension item
@@ -68,7 +65,9 @@
 *        each is exported to the FITS extension.
 
 *  Copyright:
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
+*     All Rights Reserved.
  
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -82,6 +81,8 @@
 *        Added VERSION.
 *     22-SEP-2004 (TIMJ):
 *        Use CNF_PVAL
+*     31-JUL-2009 (TIMJ):
+*        QUIET handling is done via MSG_IFGET now.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -128,7 +129,6 @@
       INTEGER NNDF               ! Number of input NDFs
       INTEGER UCARD              ! No. of cards in final FITS extension
       LOGICAL NEW                ! Was a new card added?
-      LOGICAL QUIET              ! Run silently?
       LOGICAL THERE              ! Does FITS extension exist?
       REAL    ANGROT             ! ACW angle from X axis to ref dir. in degrees
 
@@ -155,9 +155,6 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  See if we are running quietly.
-      CALL PAR_GET0L( 'QUIET', QUIET, STATUS )
-
 *  Access a group of NDFs for processing.
       CALL NDF_BEGIN
       CALL KPG1_RGNDF( 'IN', 0, 1, '  Give more image names...', IGRP1, 
@@ -168,19 +165,17 @@
       CALL GRP_NEW( 'Good NDFs', IGRP2, STATUS )
 
 *  Tell the user how many NDFs there are to process.
-      IF( .NOT. QUIET ) THEN
-         IF( NNDF .GT. 1 ) THEN
-            CALL MSG_SETI( 'N', NNDF )
-            CALL MSG_OUT( ' ', '  ^N input images to process... ',
-     :                    STATUS )
-         ELSE IF( NNDF .EQ. 1 ) THEN
-            CALL MSG_OUT( ' ', '  1 input image to process... ',STATUS )
-         ELSE
-            CALL MSG_OUT( ' ', '  No input images to process. ',STATUS )
-         END IF
-   
-         CALL MSG_BLANK( STATUS )
+      IF( NNDF .GT. 1 ) THEN
+         CALL MSG_SETI( 'N', NNDF )
+         CALL MSG_OUT( ' ', '  ^N input images to process... ',
+     :        STATUS )
+      ELSE IF( NNDF .EQ. 1 ) THEN
+         CALL MSG_OUT( ' ', '  1 input image to process... ',STATUS )
+      ELSE
+         CALL MSG_OUT( ' ', '  No input images to process. ',STATUS )
       END IF
+
+      CALL MSG_BLANK( STATUS )
 
 *  Check that everything is ok so far.
       IF ( STATUS .NE. SAI__OK ) GO TO 99
@@ -192,11 +187,9 @@
          CALL GRP_GET( IGRP1, I, 1, NDFNAM, STATUS )
 
 *  Write out name of this NDF.
-         IF( .NOT. QUIET ) THEN
-            CALL MSG_SETC( 'CURRENT_NDF', NDFNAM )
-            CALL MSG_OUT( ' ', '  Processing ''^CURRENT_NDF''',
-     :                     STATUS )
-         END IF
+         CALL MSG_SETC( 'CURRENT_NDF', NDFNAM )
+         CALL MSG_OUT( ' ', '  Processing ''^CURRENT_NDF''',
+     :        STATUS )
 
 *  Get the input NDF identifier
          CALL NDG_NDFAS( IGRP1, I, 'UPDATE', INDF, STATUS )
@@ -350,7 +343,7 @@
             CALL GRP_PUT( IGRP2, 1, NDFNAM, 0, STATUS )
          END IF
 
-         IF( .NOT. QUIET ) CALL MSG_BLANK( STATUS )
+         CALL MSG_BLANK( STATUS )
 
  100  CONTINUE
 

@@ -62,9 +62,6 @@
 *        processed data files. This file can be used when specifying the input 
 *        data files for subsequent applications. No file is created if a null
 *        (!) value is given. [!]
-*     QUIET = _LOGICAL (Read)
-*        If FALSE, then the values stored in each data file are listed as it is 
-*        processed. Otherwise, nothing is written to the screen. [FALSE] 
 *     TABLE = LITERAL (Read)
 *        The name of the file containing the table describing how FITS
 *        keyword values are to be translated into POLPACK extension
@@ -317,16 +314,12 @@
       INTEGER NGOOD              ! No. of NDF's processed successfully
       INTEGER NNDF               ! Number of input NDFs
       LOGICAL ABORT              ! Abort if any NDF cannot be processed?
-      LOGICAL QUIET              ! Run silently?
       LOGICAL THERE              ! Object exists
       LOGICAL TOPEN              ! Translation table is open
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-
-*  See if we are running quietly.
-      CALL PAR_GET0L( 'QUIET', QUIET, STATUS )
 
 *  Input table is not open.
       TOPEN = .FALSE.
@@ -353,19 +346,17 @@
       CALL GRP_NEW( 'Good NDFs', IGRP2, STATUS )
 
 *  Tell the user how many NDFs there are to process.
-      IF( .NOT. QUIET ) THEN
-         IF( NNDF .GT. 1 ) THEN
-            CALL MSG_SETI( 'N', NNDF )
-            CALL MSG_OUT( ' ', '  ^N input images to process... ',
-     :                    STATUS )
-         ELSE IF( NNDF .EQ. 1 ) THEN
-            CALL MSG_OUT( ' ', '  1 input image to process... ',STATUS )
-         ELSE
-            CALL MSG_OUT( ' ', '  NO input images to process. ',STATUS )
-         END IF
-   
-         CALL MSG_BLANK( STATUS )
+      IF( NNDF .GT. 1 ) THEN
+         CALL MSG_SETI( 'N', NNDF )
+         CALL MSG_OUT( ' ', '  ^N input images to process... ',
+     :        STATUS )
+      ELSE IF( NNDF .EQ. 1 ) THEN
+         CALL MSG_OUT( ' ', '  1 input image to process... ',STATUS )
+      ELSE
+         CALL MSG_OUT( ' ', '  NO input images to process. ',STATUS )
       END IF
+
+      CALL MSG_BLANK( STATUS )
 
 *  See if we should abort if an error occurs.
       CALL PAR_DEF0L( 'ABORT', ( NNDF .EQ. 1 ), STATUS )
@@ -384,11 +375,9 @@
          CALL GRP_GET( IGRP1, INDEX, 1, NDFNAM, STATUS )
 
 *  Write out name of this NDF.
-         IF( .NOT. QUIET ) THEN
-            CALL MSG_SETC( 'CURRENT_NDF', NDFNAM )
-            CALL MSG_OUT( ' ', '  Processing ''^CURRENT_NDF''',
-     :                     STATUS )
-         END IF
+         CALL MSG_SETC( 'CURRENT_NDF', NDFNAM )
+         CALL MSG_OUT( ' ', '  Processing ''^CURRENT_NDF''',
+     :        STATUS )
 
 *  Get the input NDF identifier
          CALL NDG_NDFAS( IGRP1, INDEX, 'UPDATE', INDF, STATUS )
@@ -424,12 +413,12 @@
          IF ( STATUS .EQ. SAI__OK ) THEN
             CALL POL1_IMPRT(  FITLEN, %VAL( CNF_PVAL( IPFIT )), 
      :                        FDIN, FNAME,
-     :                        POLLOC, QUIET, STATUS, 
+     :                        POLLOC, STATUS,
      :                        %VAL( CNF_CVAL( 80 ) ) )
          END IF
 
 *  Check the values in the POLPACK extension are usable.
-         CALL POL1_CHKEX( INDF, POLLOC, IGRP3, QUIET, STATUS )
+         CALL POL1_CHKEX( INDF, POLLOC, IGRP3, STATUS )
 
 *  Unmap FITS block.
          CALL DAT_UNMAP( FITLOC, STATUS )
@@ -466,7 +455,7 @@
          IF( TOPEN ) CALL FIO_RWIND( FDIN, STATUS )
 
 *  Space the screen output.
-         IF( .NOT. QUIET ) CALL MSG_BLANK( STATUS )
+         CALL MSG_BLANK( STATUS )
 
 *  End of input NDF loop.
  100  CONTINUE

@@ -45,9 +45,6 @@
 *        CUBE.
 *     OUT = NDF (Read)
 *        A group specifying the names of the output intensity NDFs. 
-*     QUIET = _LOGICAL (Read)
-*        If FALSE, then the name of each input NDF will be displayed as it
-*        is processed. Otherwise, nothing is written to the screen. [FALSE] 
 
 *  Examples:
 *     polsim cube "*_A" "*_sim"
@@ -61,8 +58,10 @@
 *        appended.
 
 *  Copyright:
-*     Copyright (C) 2001 Central Laboratory of the Research Councils
- 
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     Copyright (C) 1999, 2001 Central Laboratory of the Research Councils
+*     All Rights Reserved.
+
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -75,6 +74,8 @@
 *        Modified to support 3D data.
 *     22-SEP-2004 (TIMJ):
 *        Use CNF_PVAL
+*     31-JUL-2009 (TIMJ):
+*        QUIET handling is done via MSG_IFGET now.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -122,7 +123,6 @@
       INTEGER NNDF               ! No. of input images to process      
       INTEGER SIZEO              ! No. of output NDFs ( = NNDF )
       INTEGER UBND( 4 )          ! Upper bounds of input cube
-      LOGICAL QUIET              ! Suppress screen output?
       LOGICAL THERE              ! Does item exists?
       LOGICAL VAR                ! Variances required flag
       REAL ALPHA                 ! Angle from analyser to PRD
@@ -139,9 +139,6 @@
 
 *  Start an NDF context.
       CALL NDF_BEGIN
-
-*  See if we are running quietly.
-      CALL PAR_GET0L( 'QUIET', QUIET, STATUS )
 
 *  Get the input NDF holding the Stokes parameters.
       CALL NDF_ASSOC( 'CUBE', 'READ', INDF1, STATUS )
@@ -211,19 +208,17 @@
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Tell the user how many NDFs there are to process.
-      IF( .NOT. QUIET ) THEN
-         IF( NNDF .GT. 1 ) THEN
-            CALL MSG_SETI( 'N', NNDF )
-            CALL MSG_OUT( ' ', '  ^N input images to process... ',
-     :                    STATUS )
-         ELSE IF( NNDF .EQ. 1 ) THEN
-            CALL MSG_OUT( ' ', '  1 input image to process... ',STATUS )
-         ELSE
-            CALL MSG_OUT( ' ', '  NO input images to process. ',STATUS )
-         END IF
-   
-         CALL MSG_BLANK( STATUS )
+      IF( NNDF .GT. 1 ) THEN
+         CALL MSG_SETI( 'N', NNDF )
+         CALL MSG_OUT( ' ', '  ^N input images to process... ',
+     :        STATUS )
+      ELSE IF( NNDF .EQ. 1 ) THEN
+         CALL MSG_OUT( ' ', '  1 input image to process... ',STATUS )
+      ELSE
+         CALL MSG_OUT( ' ', '  NO input images to process. ',STATUS )
       END IF
+
+      CALL MSG_BLANK( STATUS )
 
 *  Check that everything is ok so far.
       IF ( STATUS .NE. SAI__OK ) GO TO 999
@@ -235,11 +230,9 @@
          CALL GRP_GET( IGRP1, INDEX, 1, NDFNAM, STATUS )
 
 *  Write out name of this NDF.
-         IF( .NOT. QUIET ) THEN
-            CALL MSG_SETC( 'CURRENT_NDF', NDFNAM )
-            CALL MSG_OUT( ' ', '  Processing ''^CURRENT_NDF''',
-     :                     STATUS )
-         END IF
+         CALL MSG_SETC( 'CURRENT_NDF', NDFNAM )
+         CALL MSG_OUT( ' ', '  Processing ''^CURRENT_NDF''',
+     :        STATUS )
 
 *  Start an NDF context.
          CALL NDF_BEGIN
@@ -365,7 +358,7 @@
          IF( STATUS .NE. SAI__OK ) CALL ERR_FLUSH( STATUS )
 
 *  Space the screen output.
-         IF( .NOT. QUIET ) CALL MSG_BLANK( STATUS )
+         CALL MSG_BLANK( STATUS )
 
       END DO     
 

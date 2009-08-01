@@ -114,10 +114,6 @@
 *        processed data files. This file can be used when specifying the input 
 *        data files for subsequent applications. No file is created if a null
 *        (!) value is given. [!]
-*     QUIET = _LOGICAL (Read)
-*        If FALSE, then the contents of the POLPACK extension in each data 
-*        file are listed before being modified. Otherwise, nothing is written 
-*        to the screen. [FALSE] 
 *     RAY = LITERAL (Read)
 *        You should use this parameter only if the images contain either O
 *        or E ray images obtained by a dual-beam polarimeter. You should
@@ -202,10 +198,13 @@
 *     is illegal in any way.
 
 *  Copyright:
-*     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     Copyright (C) 1997-1999 Central Laboratory of the Research Councils
+*     All Rights Reserved.
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -219,6 +218,8 @@
 *        Fixed bug which prevented IMGID being changed.
 *     12-MAY-1999 (DSB):
 *        Added parameter STOKES, and output parameters.
+*     31-JUL-2009 (TIMJ):
+*        QUIET handling is done via MSG_IFGET now.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -235,6 +236,7 @@
       INCLUDE 'GRP_PAR'          ! GRP parameters
       INCLUDE 'PAR_ERR'          ! PAR error constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
+      INCLUDE 'MSG_PAR'          ! MSG__ constants
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -292,7 +294,6 @@
       LOGICAL GOTSTO             ! Was a STOKES value given?
       LOGICAL GOTT               ! Was a T value given?
       LOGICAL GOTWPL             ! Was a WPLATE value given?
-      LOGICAL QUIET              ! Run silently?
       LOGICAL RDONLY             ! Read-only access required?
       REAL ANA                   ! The ANLANG value to store
       REAL ANG                   ! The ANGROT value to store
@@ -309,9 +310,6 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  See if we are running quietly.
-      CALL PAR_GET0L( 'QUIET', QUIET, STATUS )
-
 *  Begin an NDF context.
       CALL NDF_BEGIN
 
@@ -320,23 +318,20 @@
      :            NNDF, STATUS )
 
 *  Tell the user how many NDFs there are to process.
-      IF( .NOT. QUIET ) THEN
-         IF( NNDF .GT. 1 ) THEN
-            CALL MSG_SETI( 'N', NNDF )
-            CALL MSG_OUT( 'POLEXT_MSG1', '  ^N input images to '//
-     :                    'process... ', STATUS )
-         ELSE IF( NNDF .EQ. 1 ) THEN
-            CALL MSG_OUT( 'POLEXT_MSG2', '  1 input image to '//
-     :                    'process... ',STATUS )
-         ELSE
-            CALL MSG_OUT( 'POLEXT_MSG3', '  NO input images to '//
-     :                    'process. ',STATUS )
-            GO TO 999
-         END IF
-   
-         CALL MSG_BLANK( STATUS )
-
+      IF( NNDF .GT. 1 ) THEN
+         CALL MSG_SETI( 'N', NNDF )
+         CALL MSG_OUT( 'POLEXT_MSG1', '  ^N input images to '//
+     :        'process... ', STATUS )
+      ELSE IF( NNDF .EQ. 1 ) THEN
+         CALL MSG_OUT( 'POLEXT_MSG2', '  1 input image to '//
+     :        'process... ',STATUS )
+      ELSE
+         CALL MSG_OUT( 'POLEXT_MSG3', '  NO input images to '//
+     :        'process. ',STATUS )
+         GO TO 999
       END IF
+
+      CALL MSG_BLANK( STATUS )
 
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
@@ -537,11 +532,9 @@
          LNDF = CHR_LEN( NDFNAM ) 
 
 *  Write out name of this NDF.
-         IF( .NOT. QUIET ) THEN
-            CALL MSG_SETC( 'CURRENT_NDF', NDFNAM )
-            CALL MSG_OUT( 'POLEXT_MSG4', '  Processing '//
-     :                    '''^CURRENT_NDF''', STATUS )
-         END IF
+         CALL MSG_SETC( 'CURRENT_NDF', NDFNAM )
+         CALL MSG_OUT( 'POLEXT_MSG4', '  Processing '//
+     :        '''^CURRENT_NDF''', STATUS )
 
 *  Get the input NDF identifier
          IF( RDONLY ) THEN
@@ -698,7 +691,7 @@
      :                                      .TRUE., STATUS )
 
 *  If required, display the contents of the POLPACK extension. 
-         IF( .NOT. QUIET ) THEN
+         IF( MSG_FLEVOK( MSG__NORM, STATUS ) ) THEN
             CALL ERR_BEGIN( STATUS )
 
 *  Obtain and display the ANGROT value.
@@ -795,7 +788,7 @@
             CALL GRP_PUT( IGRP2, 1, NDFNAM, 0, STATUS )
          END IF
 
-         IF( .NOT. QUIET ) CALL MSG_BLANK( STATUS )
+         CALL MSG_BLANK( STATUS )
 
 *  Release the NDF.
          CALL NDF_ANNUL( INDF, STATUS )

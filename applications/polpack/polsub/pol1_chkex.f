@@ -1,4 +1,4 @@
-      SUBROUTINE POL1_CHKEX( INDF, LOC, IGRP, QUIET, STATUS )
+      SUBROUTINE POL1_CHKEX( INDF, LOC, IGRP, STATUS )
 *+
 *  Name:
 *     POL1_CHKEX
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_CHKEX( INDF, LOC, IGRP, QUIET, STATUS )
+*     CALL POL1_CHKEX( INDF, LOC, IGRP, STATUS )
 
 *  Description:
 *     The routine does the following:
@@ -43,14 +43,14 @@
 *        Identifier for a GRP group holding the used IMGID values. If
 *        this is supplied equal to GRP__NOID, then a new group is created
 *        and its identifier is returned.
-*     QUIET = LOGICAL (Given)
-*        Supress screen output - except for warnings and errors?
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Copyright:
 *     Copyright (C) 1997 - 1999 Central Laboratory of the Research Councils
-*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2005 Particle Physics and Astronomy Research Council
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -87,6 +87,8 @@
 *        blank).
 *     27-DEC-2005 (TIMJ):
 *        Use KPG1_NDFNM rather than hand rolled NDF_MSG/CHR_LASTO.
+*     31-JUL-2009 (TIMJ):
+*        QUIET handling is done via MSG_IFGET now.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -105,7 +107,6 @@
 *  Arguments Given:
       INTEGER INDF
       CHARACTER * ( * ) LOC
-      LOGICAL QUIET
 
 *  Arguments Given and Returned:
       INTEGER IGRP
@@ -204,11 +205,9 @@
             CALL KPG1_NDFNM( INDF, NDFNAM, LC, STATUS )
 
 *  Tell the user what is happening.
-            IF( .NOT. QUIET ) THEN
-               CALL MSG_SETC( 'IMGID', IMGID )
-               CALL MSG_OUT( ' ', '     Setting IMGID to ''^IMGID''', 
-     :                       STATUS )
-            END IF
+            CALL MSG_SETC( 'IMGID', IMGID )
+            CALL MSG_OUT( ' ', '     Setting IMGID to ''^IMGID''',
+     :           STATUS )
 
 *  Create ther IMGID component and store the NDF basename as its value.
             CALL DAT_NEW0C( LOC, 'IMGID', MAX( 1, CHR_LEN( IMGID ) ), 
@@ -266,11 +265,10 @@
          END IF
 
 *  Store the new FILTER value.
-         IF( .NOT. QUIET ) THEN
-            CALL MSG_SETC( 'VL', FILTER( : IAT ) )
-            CALL MSG_OUT( ' ', '     Setting FILTER to ''^VL''', 
-     :                    STATUS )
-         END IF
+         CALL MSG_SETC( 'VL', FILTER( : IAT ) )
+         CALL MSG_OUT( ' ', '     Setting FILTER to ''^VL''',
+     :        STATUS )
+
          CALL DAT_ERASE( LOC, 'FILTER', STATUS )
          CALL DAT_NEW0C( LOC, 'FILTER', MAX( 1, IAT ), STATUS ) 
          CALL CMP_PUT0C( LOC, 'FILTER', FILTER( : IAT ), STATUS ) 

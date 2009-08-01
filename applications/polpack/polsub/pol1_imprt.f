@@ -1,4 +1,4 @@
-      SUBROUTINE POL1_IMPRT( NFITS, FITS, FD, FNAME, XLOC, QUIET, 
+      SUBROUTINE POL1_IMPRT( NFITS, FITS, FD, FNAME, XLOC,
      :                       STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_IMPRT( NFITS, FITS, FD, FNAME, XLOC, QUIET, STATUS )
+*     CALL POL1_IMPRT( NFITS, FITS, FD, FNAME, XLOC, STATUS )
 
 *  Description:
 *   This routine reads and interprets the contents of the import control 
@@ -34,24 +34,24 @@
 *        The name of the control table.
 *     XLOC = CHARACTER * ( * ) (Given)
 *        The locator for the POLPACK extension.
-*     QUIET = LOGICAL (Given)
-*        If .FALSE. a message is given each time a value is assigned to a 
-*        POLPACK extension item. The message includes the item name and
-*        the value assigned to it. Otherwise, these messages are not 
-*        displayed.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+*     Copyright (C) 1999 Central Laboratory of the Research Councils
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     23-APR-1999 (DSB):
 *        Original version.
+*     31-JUL-2009 (TIMJ):
+*        QUIET handling is done via MSG_IFGET now.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -74,7 +74,6 @@
       INTEGER FD
       CHARACTER FNAME*(*)
       CHARACTER XLOC*(*)
-      LOGICAL QUIET
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -166,7 +165,7 @@
                IF( OK ) THEN
                   CALL POL1_XEVAL( BUFFER( : SPACE - 1 ), 
      :                             BUFFER( SPACE + 1 : BUFLEN ),
-     :                             TYPE, XLOC, FCHAN, QUIET, IGRP1,
+     :                             TYPE, XLOC, FCHAN, IGRP1,
      :                             IGRP2, STATUS )
 
 *  Delete any groups holding explicit FITS keyword declarations for the
