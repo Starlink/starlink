@@ -26,6 +26,7 @@
 *     Set ACNAME to blank.
 
 *  Copyright:
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     Copyright (C) 1192, 1990, 1991, 1993 Science & Engineering Research Council.
 *     All Rights Reserved.
 
@@ -48,6 +49,7 @@
 *  Authors:
 *     A.J.Chipperfield
 *     A J Chipperfield (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -55,6 +57,10 @@
 *     20.11.1991: Add check on contiguous position nos. (RLVAD::AJC)
 *        6.03.1192: Correct above checking (RLVAD::AJC)
 *     24.03.1993:  Add DAT_PAR for SUBPAR_CMN
+*     2009-JUL-31 (TIMJ):
+*        Force every interface entry to define MSG_FILTER and QUIET
+*        parameters. This allows every application to have a standardised
+*        parameter definition without forcing every IFL file to include it.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -90,6 +96,45 @@
 
 
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*     Add additional default parameter definitions that are to be supported
+*     by all interface entries.
+
+*     Global message filtering in MERS
+      CALL PARSECON_NEWPAR( 'MSG_FILTER', STATUS )
+      IF (STATUS .EQ. PARSE__OLDPAR ) THEN
+*     If the parameter is already defined we do nothing
+         CALL EMS_ANNUL ( STATUS )
+      ELSE
+         CALL PARSECON_SETTYP( '_CHAR', STATUS )
+         CALL PARSECON_SETACC( 'READ', STATUS )
+         CALL PARSECON_SETPROM( 'Message level', STATUS )
+         CALL PARSECON_SETVP( 'DEFAULT', STATUS )
+         CALL PARSECON_SETHEL(
+     :        'Selects the message filtering level. NONE, QUIET, '/
+     :        /'NORMAL, VERBOSE, DEBUG or ALL. Or numeric equivalent.'
+     :        STATUS )
+         CALL PARSECON_SETDEF( '!', STATUS )
+         CALL PARSECON_PAREND( STATUS )
+      END IF
+
+*     Global control of message output using a logical. QUIET=TRUE
+*     will cause message filtering level to be "QUIET".
+      CALL PARSECON_NEWPAR( 'QUIET', STATUS )
+      IF (STATUS .EQ. PARSE__OLDPAR ) THEN
+*     If the parameter is already defined we do nothing
+         CALL EMS_ANNUL ( STATUS )
+      ELSE
+         CALL PARSECON_SETTYP( '_LOGICAL', STATUS )
+         CALL PARSECON_SETACC( 'READ', STATUS )
+         CALL PARSECON_SETPROM( 'Force message filter level to QUIET?',
+     :        STATUS )
+         CALL PARSECON_SETVP( 'DEFAULT', STATUS )
+         CALL PARSECON_SETHEL( 'A true value suppresses output by'/
+     :        /' using the QUIET message filtering level', STATUS )
+         CALL PARSECON_SETDEF( '!', STATUS )
+         CALL PARSECON_PAREND( STATUS )
+      END IF
 
       IF ( HIPOS .GT. PARPTR ) THEN
 *     Position storage for task overflowed
