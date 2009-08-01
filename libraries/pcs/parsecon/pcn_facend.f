@@ -112,7 +112,7 @@
          CALL PARSECON_SETVP( 'DEFAULT', STATUS )
          CALL PARSECON_SETHEL(
      :        'Selects the message filtering level. NONE, QUIET, '/
-     :        /'NORMAL, VERBOSE, DEBUG or ALL. Or numeric equivalent.'
+     :        /'NORMAL, VERBOSE, DEBUG or ALL. Or numeric equivalent.',
      :        STATUS )
          CALL PARSECON_SETDEF( '!', STATUS )
          CALL PARSECON_PAREND( STATUS )
