@@ -1,4 +1,4 @@
-      SUBROUTINE POL1_SNGMN( EL, NIN, MNFRAC, NOUT, ILEVEL, DOUT,
+      SUBROUTINE POL1_SNGMN( EL, NIN, MNFRAC, NOUT, DOUT,
      :                       VOUT, COUT, STATUS )
 *+
 *  Name:
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_SNGMN( EL, NIN, MNFRAC, NOUT, ILEVEL, DOUT, VOUT, COUT, 
+*     CALL POL1_SNGMN( EL, NIN, MNFRAC, NOUT, DOUT, VOUT, COUT,
 *                      STATUS )
 
 *  Description:
@@ -34,8 +34,6 @@
 *        An array in which each element gives the number of input images
 *        which had good values at the corresponding element, AFTER any
 *        bad data has been rejected from the input images.
-*     ILEVEL = INTEGER (Given)
-*        The level of information to display on the screen.
 *     DOUT( EL, 3 ) = REAL (Given and Returned)
 *        The output Stokes vectors. Plane 1 holds I, plane 2 holds Q
 *        and plane 3 holds U.
@@ -48,14 +46,19 @@
 
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
  
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     13-MAY-1999 (DSB):
 *        Original version.
+*     31-JUL-2009 (TIMJ):
+*        Remove ILEVEL. Use MSG filtering.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -69,13 +72,13 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
+      INCLUDE 'MSG_PAR'          ! MSG__ constants
 
 *  Arguments Given:
       INTEGER EL
       INTEGER NIN( EL )
       REAL MNFRAC
       REAL NOUT( EL )
-      INTEGER ILEVEL
 
 *  Arguments Given and Returned:
       REAL DOUT( EL, 3 )
@@ -119,23 +122,23 @@
       END DO
 
 *  If required display the number of rjected pixels.
-      IF( ILEVEL .GT. 1 ) THEN
-         CALL MSG_BLANK( STATUS )
+      CALL MSG_BLANKIF( MSG__VERB, STATUS )
 
-         IF( NREJ .GT. 0 ) THEN
-            WRITE( BUF, '(F5.1)' ) 100*REAL( NREJ )/REAL( EL )
-            CALL CHR_LDBLK( BUF )
-            CALL MSG_SETC( 'PERC', BUF )
-            CALL MSG_OUT( 'POL1_SNGMN_MSG1', ' ^PERC % of the output '//
-     :                    'pixels failed the test specified by '//
-     :                    'parameter MINFRAC.', STATUS )
-         ELSE
-            CALL MSG_OUT( 'POL1_SNGMN_MSG1', ' None of the output '//
-     :                    'pixels failed the test specified by '//
-     :                    'parameter MINFRAC.', STATUS )
-         END IF
-
-         CALL MSG_BLANK( STATUS )
+      IF( NREJ .GT. 0 ) THEN
+         WRITE( BUF, '(F5.1)' ) 100*REAL( NREJ )/REAL( EL )
+         CALL CHR_LDBLK( BUF )
+         CALL MSG_SETC( 'PERC', BUF )
+         CALL MSG_OUTIF( MSG__VERB, 'POL1_SNGMN_MSG1',
+     :        ' ^PERC % of the output '//
+     :        'pixels failed the test specified by '//
+     :        'parameter MINFRAC.', STATUS )
+      ELSE
+         CALL MSG_OUTIF( MSG__VERB, 'POL1_SNGMN_MSG1',
+     :        ' None of the output '//
+     :        'pixels failed the test specified by '//
+     :        'parameter MINFRAC.', STATUS )
       END IF
+
+      CALL MSG_BLANKIF( MSG__VERB, STATUS )
 
       END

@@ -1,4 +1,4 @@
-      SUBROUTINE POL1_SNGBM( IGRP1, IVAR, ILEVEL, STATUS )
+      SUBROUTINE POL1_SNGBM( IGRP1, IVAR, STATUS )
 *+
 *  Name:
 *     POL1_SNGBM
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_SNGBM( IGRP1, IVAR, ILEVEL, STATUS )
+*     CALL POL1_SNGBM( IGRP1, IVAR, STATUS )
 
 *  Description:
 *     This routine creates a 3D NDF holding Stokes vectors calculated from 
@@ -25,9 +25,6 @@
 *        then output variances are not required. If zero, then output 
 *        variances will be created if possible, but no error is reported
 *        otherwise.
-*     ILEVEL = INTEGER (Given)
-*        The amount of information to display on the screen; 0 for none;
-*        1 for some; 2 for lots.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -105,8 +102,11 @@
 *     current version number of the POLPACK package.
 
 *  Copyright:
-*     Copyright (C) 2000 Central Laboratory of the Research Councils
- 
+*     Copyright (C) 1999-2001 Central Laboratory of the Research Councils.
+*     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -127,6 +127,8 @@
 *        Use CNF_PVAL
 *     14-JUN-2006 (DSB):(TIMJ):
 *        Propagate NDF units.
+*     31-JUL-2009 (TIMJ):
+*        Remove ILEVEL. Use MSG filtering.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -147,7 +149,6 @@
 *  Arguments Given:
       INTEGER IGRP1
       INTEGER IVAR
-      INTEGER ILEVEL
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -454,7 +455,7 @@
      :                 %VAL( CNF_PVAL( IPEPS ) ),
      :                 %VAL( CNF_PVAL( IPTVAR ) ), 
      :                 %VAL( CNF_PVAL( IPNREJ ) ), IGRP2, TOL,
-     :                 TRIM, INDFO, INDFC, MAXIT, NSIGMA, ILEVEL, 
+     :                 TRIM, INDFO, INDFC, MAXIT, NSIGMA,
      :                 SMBOX/2, SETVAR, MNFRAC, DEZERO, 
      :                 %VAL( CNF_PVAL( IPZERO ) ),
      :                 STATUS )

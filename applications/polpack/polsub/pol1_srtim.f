@@ -1,4 +1,4 @@
-      SUBROUTINE POL1_SRTIM( ILEVEL, RANGE, MININ, IGRP1, NNDF, NBIN, 
+      SUBROUTINE POL1_SRTIM( RANGE, MININ, IGRP1, NNDF, NBIN,
      :                       ORIGIN, BIN, ANGRT, WORK, NOUT, PHI, NDIMO,
      :                       LBND, UBND, STATUS )
 *+
@@ -13,7 +13,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_SRTIM( ILEVEL, RANGE, MININ, IGRP1, NNDF, NBIN, ORIGIN, 
+*     CALL POL1_SRTIM( RANGE, MININ, IGRP1, NNDF, NBIN, ORIGIN,
 *                      BIN, ANGRT, WORK, NOUT, PHI, NDIMO, LBND, UBND, 
 *                      STATUS )
 
@@ -23,8 +23,6 @@
 *     include in each output NDF.
 
 *  Arguments:
-*     ILEVEL = INTEGER (Given)
-*        If 2 or more, details of each input NDF are displayed.
 *     RANGE = REAL (Given)
 *        The binning range. Should be either 180.0 or 360.0.
 *     MININ = INTEGER (Given)
@@ -71,9 +69,12 @@
 
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
- 
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -85,6 +86,8 @@
 *        Added ORIGIN and ILEVEL arguments.
 *     19-FEB-2001 (DSB):
 *        Modified to support 3D data.
+*     31-JUL-2009 (TIMJ):
+*        Remove ILEVEL. Use MSG filtering.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -100,9 +103,9 @@
       INCLUDE 'DAT_PAR'          ! HDS constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'GRP_PAR'          ! GRP constants
+      INCLUDE 'MSG_PAR'          ! MSG__ constants
 
 *  Arguments Given:
-      INTEGER ILEVEL
       REAL RANGE
       INTEGER MININ
       INTEGER IGRP1
@@ -174,7 +177,7 @@
       UBND( 4 ) = VAL__MINI
 
 *  Display a blank line if details of the input NDFs are to be displayed.
-      IF( ILEVEL .GT. 1 ) CALL MSG_BLANK( STATUS )
+      CALL MSG_BLANKIF( MSG__VERB, STATUS )
 
 *  Initialise the number of NDFs which were not included in a bin.
       IGNORE = 0
@@ -234,7 +237,7 @@
 *  Get the half-wave plate position in degrees (if it exists).
          CALL DAT_THERE( XLOC, 'WPLATE', THERE, STATUS )
          IF( THERE ) THEN
-            CALL CMP_GET0R( XLOC, 'WPLATE', H, STATUS ) 
+            CALL CMP_GET0R( XLOC, 'WPLATE', H, STATUS )
 
 *  Store the effective analyser angle for this NDF. This is the ACW angle
 *  between the o/p ref. direction and a pretend analyser (with no
@@ -285,15 +288,14 @@
      :       STATUS .EQ. SAI__OK ) THEN
 
 *  Display details of this input NDF if required.
-            IF( ILEVEL .GT. 1 ) THEN
-               CALL GRP_GET( IGRP1, I, 1, NDFNAM, STATUS ) 
-               CALL MSG_SETC( 'NDF', NDFNAM )
-               CALL MSG_SETI( 'I', I )
-               CALL MSG_SETR( 'PHI', PHI( I ) )
-               CALL MSG_SETI( 'BIN', IBIN )
-               CALL MSG_OUT( ' ', '  Image ^I:  angle=^PHI  bin=^BIN '//
-     :                       ' (^NDF)', STATUS )
-            END IF
+            CALL GRP_GET( IGRP1, I, 1, NDFNAM, STATUS )
+            CALL MSG_SETC( 'NDF', NDFNAM )
+            CALL MSG_SETI( 'I', I )
+            CALL MSG_SETR( 'PHI', PHI( I ) )
+            CALL MSG_SETI( 'BIN', IBIN )
+            CALL MSG_OUTIF( MSG__VERB, ' ',
+     :                      '  Image ^I:  angle=^PHI  bin=^BIN '//
+     :                      ' (^NDF)', STATUS )
 
 *  Increment the number of input images in this bin.
             NIN = WORK( IBIN, 0 ) + 1
@@ -325,14 +327,13 @@
             IGNORE = IGNORE + 1
 
 *  Display details of this input NDF if required.
-            IF( ILEVEL .GT. 1 ) THEN
-               CALL NDF_MSG( 'NDF', INDF )
-               CALL MSG_SETI( 'I', I )
-               CALL MSG_SETR( 'PHI', PHI( I ) )
-               CALL MSG_SETI( 'BIN', IBIN )
-               CALL MSG_OUT( ' ', '  Image ^I:  angle=^PHI  <not '//
-     :                       'included>  (^NDF)', STATUS )
-            END IF
+            CALL NDF_MSG( 'NDF', INDF )
+            CALL MSG_SETI( 'I', I )
+            CALL MSG_SETR( 'PHI', PHI( I ) )
+            CALL MSG_SETI( 'BIN', IBIN )
+            CALL MSG_OUT( MSG__VERB,' ',
+     :                    '  Image ^I:  angle=^PHI  <not '//
+     :                    'included>  (^NDF)', STATUS )
 
          END IF
 
@@ -350,7 +351,7 @@
 
       END DO
 
-      IF( ILEVEL .GT. 1 ) CALL MSG_BLANK( STATUS )
+      CALL MSG_BLANKIF( MSG__VERB, STATUS )
 
 *  See how many bins contain sufficient input images.
       DO I = 1, NBIN

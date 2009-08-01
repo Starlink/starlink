@@ -1,4 +1,4 @@
-      SUBROUTINE POL1_SNGVN( NNDF, IGRP, ILEVEL, T, PHI, EPS, EL, HW,
+      SUBROUTINE POL1_SNGVN( NNDF, IGRP, T, PHI, EPS, EL, HW,
      :                       DEZERO, DIMST, STOKES, NDIMI, LBNDI, UBNDI, 
      :                       WORK, TVAR, VEST, WORK2, ZERO, STATUS )
 *+
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_SNGVN( NNDF, IGRP, ILEVEL, T, PHI, EPS, EL, HW, DEZERO,
+*     CALL POL1_SNGVN( NNDF, IGRP, T, PHI, EPS, EL, HW, DEZERO,
 *                      DIMST, STOKES, NDIMI, LBNDI, UBNDI, WORK, TVAR, 
 *                      VEST, WORK2, ZERO, STATUS )
 
@@ -33,8 +33,6 @@
 *        The number of input NDFs in the supplied group.
 *     IGRP = INTEGER (Given)
 *        A GRP identifier for the group containing the input NDF names. 
-*     ILEVEL = INTEGER (Given)
-*        The information level. 
 *     T( NNDF ) = REAL (Given)
 *        The analyser transmission factor for each input NDF. 
 *     PHI( NNDF ) = REAL (Given)
@@ -79,7 +77,9 @@
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 1999 Central Laboratory of the Research Councils
+*     Copyright (C) 1999, 2001 Central Laboratory of the Research Councils.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
  
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -93,6 +93,8 @@
 *        Modified to support 3D data.
 *     22-SEP-2004 (TIMJ):
 *        Use CNF_PVAL
+*     31-JUL-2009 (TIMJ):
+*        Remove ILEVEL. Use MSG filtering.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -111,7 +113,6 @@
 *  Arguments Given:
       INTEGER NNDF
       INTEGER IGRP
-      INTEGER ILEVEL
       REAL T( NNDF )
       REAL PHI( NNDF )
       REAL EPS( NNDF )

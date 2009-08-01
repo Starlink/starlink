@@ -1,4 +1,4 @@
-      SUBROUTINE POL1_SNGCT( INDF, ILEVEL, ITER, NEL, DIN, VIN, T, PHI,
+      SUBROUTINE POL1_SNGCT( INDF, ITER, NEL, DIN, VIN, T, PHI,
      :                       EPS, ZERO, DIMST, STOKES, NSIGMA, TVAR, 
      :                       TOL, DEZERO, CONV, NREJ, DOUT, STATUS )
 *+
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_SNGCT( INDF, ILEVEL, ITER, NEL, DIN, VIN, T, PHI, EPS, 
+*     CALL POL1_SNGCT( INDF, ITER, NEL, DIN, VIN, T, PHI, EPS, 
 *                      ZERO, DIMST, STOKES, NSIGMA, TVAR, TOL, DEZERO, 
 *                      CONV, NREJ, DOUT, STATUS )
 
@@ -26,8 +26,6 @@
 *  Arguments:
 *     INDF = INTEGER (Given)
 *        NDF identifier for current input NDF.
-*     ILEVEL = INTEGER (Given)
-*        Information reporting level.
 *     ITER = INTEGER (Given)
 *        Current iteration number.
 *     NEL = INTEGER (Given)
@@ -62,7 +60,7 @@
 *        iteration (as supplied in NREJ) is less than TOL, then the NDF
 *        is presumed to have converged.
 *     DEZERO = LOGICAL (Given)
-*        Should the zero point correction be displayed at ILEVEL > 2?
+*        Should the zero point correction be displayed at DEBUG message level?
 *     CONV = LOGICAL (Given and Returned)
 *        Return .FALSE. if this NDF has not yet converged. Unchanged
 *        otherwise. Supplied value is ignored if ITER is zero.
@@ -80,6 +78,8 @@
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
 *     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2009 Science and Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -107,6 +107,8 @@
 *        Original version
 *     27-DEC-2005 (TIMJ):
 *        Use KPG1_NDFNM rather than hand rolled NDF_MSG/CHR_LASTO.
+*     31-JUL-2009 (TIMJ):
+*        Remove ILEVEL. Use MSG filtering.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -120,10 +122,10 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
+      INCLUDE 'MSG_PAR'          ! MSG__ constants
 
 *  Arguments Given:
       INTEGER INDF
-      INTEGER ILEVEL
       INTEGER ITER
       INTEGER NEL
       REAL DIN( NEL )
@@ -235,32 +237,36 @@
              
 *  If required, tell the user how many pixels were rejected from this NDF
 *  during this iteration.
-         IF( ILEVEL .GT. 2 ) THEN
-            CALL MSG_BLANK( STATUS )
+         IF( MSG_FLEVOK( MSG__DEBUG, STATUS ) ) THEN
+            CALL MSG_BLANKIF( MSG__DEBUG, STATUS )
    
             CALL MSG_SETC( 'NDF', PATH( : LPATH ) )
             CALL MSG_SETI( 'ITER', ITER )
-            CALL MSG_OUT( 'POL1_SNGCT_MSG1', '   ''^NDF''', STATUS )
+            CALL MSG_OUTIF( MSG__DEBUG,'POL1_SNGCT_MSG1', '   ''^NDF''',
+     :           STATUS )
 
             CALL MSG_SETI( 'NREJ', NREJ )
             CALL MSG_SETI( 'NGOOD', NGOOD )
-            CALL MSG_OUT( 'POL1_SNGCT_MSG2', '      Pixels rejected: '//
+            CALL MSG_OUTIF( MSG__DEBUG,'POL1_SNGCT_MSG2',
+     :                     '      Pixels rejected: '//
      :                     '^NREJ   Pixels remaining: ^NGOOD', STATUS )
 
             IF( TVAR .GE. 0.0 .AND. TVAR .NE. VAL__BADR ) THEN
                CALL MSG_SETR( 'NOISE', SQRT( TVAR ) )
-               CALL MSG_OUT( 'POL1_SNGFL_MSG3', '      RMS '//
-     :                       'noise estimate: ^NOISE', STATUS )
+               CALL MSG_OUTIF( MSG__DEBUG,'POL1_SNGFL_MSG3',
+     :                         '      RMS noise estimate: ^NOISE',
+     :                         STATUS )
             END IF
 
             IF( DEZERO ) THEN
                CALL MSG_SETR( 'ZERO', ZERO )
-               CALL MSG_OUT( 'POL1_SNGFL_MSG3b', '      Zero-point '//
-     :                       'correction: ^ZERO', STATUS )
+               CALL MSG_OUTIF( MSG__DEBUG, 'POL1_SNGFL_MSG3b',
+     :                        '      Zero-point correction: ^ZERO',
+     :                        STATUS )
             END IF
 
 *  If required, warn the user if no good pixels remain in this NDF.
-         ELSE IF( ILEVEL .GT. 0 .AND. NGOOD .EQ. 0 ) THEN
+         ELSE IF( NGOOD .EQ. 0 ) THEN
             CALL MSG_SETC( 'NDF', PATH( : LPATH ) )
             CALL MSG_SETI( 'ITER', ITER )
             CALL MSG_OUT( 'POL1_SNGCT_MSG3', '   WARNING: No usable '//

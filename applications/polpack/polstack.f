@@ -73,13 +73,13 @@
 *        The size of each analysis angle bin, in degrees. The run-time
 *        default is the current value, or 10 degrees if there is no
 *        current value. []
-*     ILEVEL = _INTEGER (Read)
+*     MSG_FILTER = _CHAR (Read)
 *        Controls the amount of information displayed on the screen while
-*        the program is executing. A value of zero suppresses all
-*        information. A value of one results in a summary of each
-*        output image being displayed. A value of two additionally gives
+*        the program is executing. A value of QUIET suppresses all
+*        information. A value of NORM results in a summary of each
+*        output image being displayed. A value of DEBUG additionally gives
 *        details of the input images, and further details of each output
-*        image. [1]
+*        image. [NORM]
 *     IN = NDF (Read)
 *        A group specifying the names of the input intensity images or cubes.
 *        This may take the form of a comma separated list, or any of the other 
@@ -130,8 +130,10 @@
 *        etc.
 
 *  Copyright:
-*     Copyright (C) 2001 Central Laboratory of the Research Councils
- 
+*     Copyright (C) 1999, 2001 Central Laboratory of the Research Councils
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -148,6 +150,8 @@
 *        Modified to support 3D data.
 *     22-SEP-2004 (TIMJ):
 *        Use CNF_PVAL
+*     31-JUL-2009 (TIMJ):
+*        Remove ILEVEL. Use MSG filtering.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -172,7 +176,6 @@
       INTEGER IGRP1              ! GRP identifier for input images group      
       INTEGER IGRP2              ! GRP identifier foR sequence number group
       INTEGER IGRP3              ! GRP identifier for output images group      
-      INTEGER ILEVEL             ! Information level
       INTEGER INDEX              ! Index of current intensity image
       INTEGER INDF               ! Identifier for output stack
       INTEGER IOUT               ! No. of output images created so far
@@ -200,28 +203,23 @@
 *  Start an NDF context.
       CALL NDF_BEGIN
 
-*  Get the information level
-      CALL PAR_GET0I( 'ILEVEL', ILEVEL, STATUS )
-
 *  Get a group containing the names of the template intensity frames to be 
 *  used.
       CALL KPG1_RGNDF( 'IN', 0, 1, '  Give more image names...', 
      :            IGRP1, NNDF, STATUS )
 
 *  Tell the user how many NDFs there are to process.
-      IF( ILEVEL .GT. 0 ) THEN
-         IF( NNDF .GT. 1 ) THEN
-            CALL MSG_SETI( 'N', NNDF )
-            CALL MSG_OUT( ' ', '  ^N input images to process... ',
-     :                    STATUS )
-         ELSE IF( NNDF .EQ. 1 ) THEN
-            CALL MSG_OUT( ' ', '  1 input image to process... ',STATUS )
-         ELSE
-            CALL MSG_OUT( ' ', '  NO input images to process. ',STATUS )
-         END IF
-   
-         CALL MSG_BLANK( STATUS )
+      IF( NNDF .GT. 1 ) THEN
+         CALL MSG_SETI( 'N', NNDF )
+         CALL MSG_OUT( ' ', '  ^N input images to process... ',
+     :        STATUS )
+      ELSE IF( NNDF .EQ. 1 ) THEN
+         CALL MSG_OUT( ' ', '  1 input image to process... ',STATUS )
+      ELSE
+         CALL MSG_OUT( ' ', '  NO input images to process. ',STATUS )
       END IF
+
+      CALL MSG_BLANK( STATUS )
 
 *  Get the minimum number of input images for an output image.
       CALL PAR_GDR0I( 'MININ', 3, 1, NNDF, .FALSE., MININ, STATUS )
@@ -236,20 +234,16 @@
 
 *  Get the analysis angle at the start of the first bin. 
       CALL PAR_GET0R( 'ORIGIN', ORIGIN, STATUS )
-      IF( ILEVEL .GT. 0 ) THEN
-         CALL MSG_SETR( 'ORG', ORIGIN )
-         CALL MSG_OUT( ' ', '  Using origin of ^ORG degrees',
-     :                 STATUS )
-      END IF
+      CALL MSG_SETR( 'ORG', ORIGIN )
+      CALL MSG_OUT( ' ', '  Using origin of ^ORG degrees',
+     :     STATUS )
 
 *  Get the bin size.
       CALL PAR_GET0R( 'BIN', BIN, STATUS )
       BIN = MAX( 1.0, MIN( RANGE, ABS( BIN ) ) )
-      IF( ILEVEL .GT. 0 ) THEN
-         CALL MSG_SETR( 'BIN', BIN )
-         CALL MSG_OUT( ' ', '  Using bin size of ^BIN degrees',
-     :                 STATUS )
-      END IF
+      CALL MSG_SETR( 'BIN', BIN )
+      CALL MSG_OUT( ' ', '  Using bin size of ^BIN degrees',
+     :     STATUS )
 
 *  Store number of bins.
       NBIN = INT( RANGE / BIN )
@@ -264,7 +258,7 @@
 
 *  Fill this array, and find the number of output NDFs required and the
 *  output reference direction.
-      CALL POL1_SRTIM( ILEVEL, RANGE, MININ, IGRP1, NNDF, NBIN, ORIGIN,
+      CALL POL1_SRTIM( RANGE, MININ, IGRP1, NNDF, NBIN, ORIGIN,
      :                 BIN, ANGRT, %VAL( CNF_PVAL( IPW1 ) ), NOUT, 
      :                 %VAL( CNF_PVAL( IPPHI )),
      :                 NDIMO, LBND, UBND, STATUS )
@@ -278,11 +272,9 @@
       END IF
 
 *  Tell the user how many output images there are.
-      IF( ILEVEL .GT. 0 ) THEN
-         CALL MSG_SETI( 'NOUT', NOUT )
-         CALL MSG_OUT( ' ', '  ^NOUT output images will '//
-     :                 'be created.', STATUS )
-      END IF
+      CALL MSG_SETI( 'NOUT', NOUT )
+      CALL MSG_OUT( ' ', '  ^NOUT output images will '//
+     :              'be created.', STATUS )
 
 *  Create a group holding the sequence numbers for the output images.
       CALL GRP_NEW( 'Sequence numbers', IGRP2, STATUS )
@@ -296,7 +288,7 @@
      :            'names...', IGRP3, NOUT, STATUS )
 
 *  Space the screen output.
-      IF( ILEVEL .GT. 0 ) CALL MSG_BLANK( STATUS )
+      CALL MSG_BLANK( STATUS )
 
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
@@ -332,7 +324,7 @@
             CALL POL1_STKIM( MININ, ANGRT, IGRP1, IGRP3, INDEX, INDF,
      :                       NBIN, NNDF, %VAL( CNF_PVAL( IPW1 ) ), 
      :                       %VAL( CNF_PVAL( IPPHI ) ),
-     :                       ILEVEL, ( INDEX - 1 )*BIN + ORIGIN, 
+     :                       ( INDEX - 1 )*BIN + ORIGIN,
      :                       INDEX*BIN + ORIGIN, NDIMO - 1, IOUT, 
      :                       %VAL( CNF_PVAL( IPSAX ) ), STATUS )
          END IF

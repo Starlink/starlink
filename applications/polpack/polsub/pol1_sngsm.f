@@ -1,4 +1,4 @@
-      SUBROUTINE POL1_SNGSM( ILEVEL, HW, NPIX, NROW, NZ, NP, VAR, DATA, 
+      SUBROUTINE POL1_SNGSM( HW, NPIX, NROW, NZ, NP, VAR, DATA,
      :                       WORK, WGT, X4, X3Y, X2Y2, XY3, X3, X2Y,
      :                       XY2, STATUS )
 *+
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_SNGSM( ILEVEL, HW, NPIX, NROW, NZ, NP, VAR, DATA, WORK, WGT, 
+*     CALL POL1_SNGSM( HW, NPIX, NROW, NZ, NP, VAR, DATA, WORK, WGT,
 *                      X4, X3Y, X2Y2, XY3, X3, X2Y, XY2, STATUS )
 
 *  Description:
@@ -22,11 +22,12 @@
 *     turn. The size of the box is specified by HW. The central pixel value 
 *     is replaced by the value of the fitted surface at the central pixel. 
 
+*  Notes:
+*     The level of information to display on the screen uses MSG_FILTER.
+*     Values above VERBOSE result in a message being displayed indicating which images
+*     (I,Q, or U) are being smoothed.
+
 *  Arguments:
-*     ILEVEL = INTEGER (Given)
-*        The level of information to display on the screen. Values above 2
-*        result in a message being displayed indicating which images
-*        (I,Q, or U) are being smoothed.
 *     HW = INTEGER (Given)
 *        The half size of the smoothing box in pixels. The full size
 *        used is 2*HW + 1.
@@ -65,9 +66,12 @@
 
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
- 
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -75,6 +79,8 @@
 *        Original version.
 *     29-FEB-2001 (DSB):
 *        Modified to support 3D data.
+*     31-JUL-2009 (TIMJ):
+*        Remove ILEVEL. Use MSG filtering.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -88,9 +94,9 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
+      INCLUDE 'MSG_PAR'          ! MSG__ constants
 
 *  Arguments Given:
-      INTEGER ILEVEL
       INTEGER HW
       INTEGER NPIX
       INTEGER NROW
@@ -195,20 +201,17 @@
 
 *  Tell the user what is happening since this routine can take a long
 *  time to run.
-         IF( ILEVEL .GT. 2 ) THEN
 
-            IF( ISTOKE .EQ. 1 ) THEN
-               CALL MSG_SETC( 'S', 'I' ) 
-            ELSE IF( ISTOKE .EQ. 2 ) THEN
-               CALL MSG_SETC( 'S', 'Q' ) 
-            ELSE IF( ISTOKE .EQ. 3 ) THEN
-               CALL MSG_SETC( 'S', 'U' ) 
-            END IF            
-
-            CALL MSG_OUT( 'POL1_SNGSM_MSG1', '   Reducing noise in '//
-     :                    'the ^S image.', STATUS )
-
+         IF( ISTOKE .EQ. 1 ) THEN
+            CALL MSG_SETC( 'S', 'I' )
+         ELSE IF( ISTOKE .EQ. 2 ) THEN
+            CALL MSG_SETC( 'S', 'Q' )
+         ELSE IF( ISTOKE .EQ. 3 ) THEN
+            CALL MSG_SETC( 'S', 'U' )
          END IF
+
+         CALL MSG_OUTIF( MSG__DEBUG, 'POL1_SNGSM_MSG1',
+     :        '   Reducing noise in the ^S image.', STATUS )
 
 *  Smooth each spatial plane separately.
          DO IZ = 1, NZ

@@ -1,5 +1,5 @@
       SUBROUTINE POL1_STKIM( MININ, ANGRT, IGRP1, IGRP2, IBIN, INDFT,
-     :                       NBIN, NNDF, WORK, PHI, ILEVEL, BL, BH, 
+     :                       NBIN, NNDF, WORK, PHI, BL, BH,
      :                       NAX, IOUT, SAXIS, STATUS )
 *+
 *  Name:
@@ -13,7 +13,7 @@
 
 *  Invocation:
 *     CALL POL1_STKIM( MININ, ANGRT, IGRP1, IGRP2, IBIN, INDFT, NBIN, NNDF, 
-*                      WORK, PHI, ILEVEL, BL, BH, NAX, IOUT, SAXIS, STATUS )
+*                      WORK, PHI, BL, BH, NAX, IOUT, SAXIS, STATUS )
 
 *  Description:
 *     This routine creates an output intensity image by stacking the 
@@ -49,8 +49,6 @@
 *     PHI( NNDF ) = INTEGER (Given)
 *        The acw angle from +ve X axis to the effective analyser position
 *        in each input NDF, in degrees.
-*     ILEVEL = INTEGER (Given)
-*        Screen information level. 
 *     BL = REAL (Given)
 *        The lower analysis angle bound of the bin, in degrees.
 *     BH = REAL (Given)
@@ -67,8 +65,10 @@
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 1999 Central Laboratory of the Research Councils
- 
+*     Copyright (C) 1999, 2001 Central Laboratory of the Research Councils
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -88,6 +88,8 @@
 *        Modified to support 3D data.
 *     22-SEP-2004 (TIMJ):
 *        Use CNF_PVAL
+*     31-JUL-2009 (TIMJ):
+*        Remove ILEVEL. Use MSG filtering.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -105,6 +107,7 @@
       INCLUDE 'DAT_PAR'          ! HDS constants
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
+      INCLUDE 'MSG_PAR'          ! MSG__ constants
 
 *  Arguments Given:
       INTEGER MININ
@@ -117,7 +120,6 @@
       INTEGER NNDF
       INTEGER WORK( NBIN, -6 : NNDF )
       REAL PHI( NNDF )
-      INTEGER ILEVEL
       REAL BL
       REAL BH
       INTEGER NAX
@@ -176,11 +178,9 @@
          CALL GRP_GET( IGRP2, IOUT, 1, NDFNAM, STATUS )
 
 *  Write out the name of this NDF.
-         IF( ILEVEL .GT. 0 ) THEN
-            CALL MSG_SETC( 'CURRENT_NDF', NDFNAM )
-            CALL MSG_OUT( ' ', '   Creating ''^CURRENT_NDF''',
-     :                     STATUS )
-         END IF
+         CALL MSG_SETC( 'CURRENT_NDF', NDFNAM )
+         CALL MSG_OUT( ' ', '   Creating ''^CURRENT_NDF''',
+     :                 STATUS )
 
 
 *  Get an identifier for the first input NDF contributing to this output
@@ -303,7 +303,44 @@
          CALL DAT_ANNUL( LOC, STATUS )
 
 *  If required, describe the output NDF.
-         IF( ILEVEL .EQ. 1 ) THEN
+*  Note that we output slightly different formatting in verbose mode.
+         IF( MSG_FLEVOK( MSG__VERB, STATUS ) ) THEN
+
+            CALL MSG_SETR( 'BL', BL )
+            CALL MSG_SETR( 'BH', BH )
+            CALL MSG_OUTIF( MSG__VERB, ' ',
+     :                    '      Analysis angle range     '//
+     :                    ': ^BL to ^BH degrees', STATUS )
+
+            CALL MSG_SETC( 'L', INLIST( : IAT ) )
+            IF( NIN .GT. 1 ) THEN
+               CALL MSG_OUTIF( MSG__VERB, ' ',
+     :                    '      Contributing input '//
+     :                    'images: ^L', STATUS )
+            ELSE
+               CALL MSG_OUTIF( MSG__VERB, ' ',
+     :                    '      Contributing input '//
+     :                    'image : ^L', STATUS )
+            END IF
+
+            CALL MSG_SETR( 'A', ANLANG )
+            CALL MSG_OUTIF( MSG__VERB, ' ',
+     :                    '      Effective analysis angle '//
+     :                    ': ^A degrees', STATUS )
+
+            IF( ME .NE. VAL__BADR ) THEN
+               CALL MSG_SETR( 'ME', ME )
+            ELSE
+              CALL MSG_SETC( 'ME', '<undefined>' )
+            END IF
+ 
+            CALL MSG_OUTIF( MSG__VERB, ' ',
+     :                    '      Mean error               '//
+     :                    ': ^ME', STATUS )
+
+            CALL MSG_BLANKIF( MSG__VERB, STATUS )
+
+         ELSE IF( MSG_FLEVOK( MSG__NORM, STATUS ) ) THEN
 
             CALL MSG_SETR( 'BL', BL )
             CALL MSG_SETR( 'BH', BH )
@@ -326,37 +363,6 @@
  
             CALL MSG_OUT( ' ', '      Mean error                '//
      :                    '      : ^ME', STATUS )
-
-            CALL MSG_BLANK( STATUS )
-
-         ELSE IF( ILEVEL .GT. 1  ) THEN
-
-            CALL MSG_SETR( 'BL', BL )
-            CALL MSG_SETR( 'BH', BH )
-            CALL MSG_OUT( ' ', '      Analysis angle range     '//
-     :                    ': ^BL to ^BH degrees', STATUS )
-
-            CALL MSG_SETC( 'L', INLIST( : IAT ) )
-            IF( NIN .GT. 1 ) THEN
-               CALL MSG_OUT( ' ', '      Contributing input '//
-     :                    'images: ^L', STATUS )
-            ELSE
-               CALL MSG_OUT( ' ', '      Contributing input '//
-     :                    'image : ^L', STATUS )
-            END IF
-
-            CALL MSG_SETR( 'A', ANLANG )
-            CALL MSG_OUT( ' ', '      Effective analysis angle '//
-     :                    ': ^A degrees', STATUS )
-
-            IF( ME .NE. VAL__BADR ) THEN
-               CALL MSG_SETR( 'ME', ME )
-            ELSE
-              CALL MSG_SETC( 'ME', '<undefined>' )
-            END IF
- 
-            CALL MSG_OUT( ' ', '      Mean error               '//
-     :                    ': ^ME', STATUS )
 
             CALL MSG_BLANK( STATUS )
 

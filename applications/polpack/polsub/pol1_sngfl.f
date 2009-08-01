@@ -1,4 +1,4 @@
-      SUBROUTINE POL1_SNGFL( INDF, ITER, VSCH, ILEVEL, T, PHI,
+      SUBROUTINE POL1_SNGFL( INDF, ITER, VSCH, T, PHI,
      :                       EPS, DIM1, DIM2, DIM3, STOKES, 
      :                       WORK, NSIGMA, IPDIN, IPVIN, FRDIN, FRVIN, 
      :                       STATUS )
@@ -13,7 +13,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_SNGFL( INDF, ITER, VSCH, ILEVEL, T, PHI, EPS, 
+*     CALL POL1_SNGFL( INDF, ITER, VSCH, T, PHI, EPS,
 *                      DIM1, DIM2, DIM3, STOKES, WORK, NSIGMA, IPDIN, 
 *                      IPVIN, FRDIN, FRVIN, STATUS )
 
@@ -43,8 +43,6 @@
 *        4 - Return a constant variance of 1.0 for all input images. Any 
 *        variances supplied with the input images are ignored. 
 *
-*     ILEVEL = INTEGER (Given)
-*        Amount of information to display on the screen. 
 *     T = REAL (Given)
 *        The analyser transmission factor for the supplied array.
 *     PHI = REAL (Given)
@@ -82,6 +80,8 @@
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
 *     Copyright (C) 2004 - 2005 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -111,6 +111,8 @@
 *        Use CNF_PVAL
 *     27-DEC-2005 (TIMJ):
 *        Use KPG1_NDFNM rather than hand rolled NDF_MSG/CHR_LASTO.
+*     31-JUL-2009 (TIMJ):
+*        Remove ILEVEL. Use MSG filtering.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -124,12 +126,12 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
+      INCLUDE 'MSG_PAR'          ! MSG__ constants
 
 *  Arguments Given:
       INTEGER INDF
       INTEGER ITER
       INTEGER VSCH
-      INTEGER ILEVEL
       REAL T
       REAL PHI
       REAL EPS
@@ -290,27 +292,30 @@
              
 *  If required, tell the user how many pixels were rejected from this NDF
 *  during this iteration.
-         IF( ILEVEL .GT. 1 ) THEN
-            CALL MSG_BLANK( STATUS )
+         IF( MSG_FLEVOK( MSG__VERB, STATUS ) ) THEN
+            CALL MSG_BLANKIF( MSG__VERB, STATUS )
 
             CALL MSG_SETC( 'NDF', PATH( : LPATH ) )
             CALL MSG_SETI( 'ITER', ITER )
-            CALL MSG_OUT( 'POL1_SNGFL_MSG1', '   Iteration: ^ITER  --'//
+            CALL MSG_OUTIF( MSG__VERB,'POL1_SNGFL_MSG1',
+     :                    '   Iteration: ^ITER  --'//
      :                    ' ''^NDF''', STATUS )
 
             CALL MSG_SETI( 'NREJ', NREJ )
             CALL MSG_SETI( 'NGOOD', NGOOD )
-            CALL MSG_OUT( 'POL1_SNGFL_MSG2', '      Pixels rejected: '//
+            CALL MSG_OUTIF( MSG__VERB, 'POL1_SNGFL_MSG2',
+     :                    '      Pixels rejected: '//
      :                    '^NREJ   Pixels remaining: ^NGOOD', STATUS )
 
             IF( FRVIN ) THEN
                CALL MSG_SETR( 'NOISE', NOISE )
-               CALL MSG_OUT( 'POL1_SNGFL_MSG3', '      Background '//
+               CALL MSG_OUTIF( MSG__VERB, 'POL1_SNGFL_MSG3',
+     :                       '      Background '//
      :                       'noise estimate: ^NOISE', STATUS )
             END IF
 
 *  If required, warn the user if no good pixels remain in this NDF.
-         ELSE IF( ILEVEL .GT. 0 .AND. NGOOD .EQ. 0 ) THEN
+         ELSE IF( NGOOD .EQ. 0 ) THEN
             CALL MSG_SETC( 'NDF', PATH( : LPATH ) )
             CALL MSG_SETI( 'ITER', ITER )
             CALL MSG_OUT( 'POL1_SNGFL_MSG4', '   WARNING: No usable '//

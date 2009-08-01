@@ -62,7 +62,7 @@
 *        value used for each input array is chosen so that the residuals
 *        between the input array and the corresponding intensity values
 *        implied by the Stokes vectors produced on the previous iteration, 
-*        have a mean value of zero. Set ILEVEL to 3 or more to see the
+*        have a mean value of zero. Set MSG_FILTER to DEBUG or ALL to see the
 *        values used. Selecting the DEZERO option can reduce the variances 
 *        in the output cube, but usually slows down convergence of the 
 *        iterative procedure. Thus you may have to give a larger value 
@@ -88,15 +88,15 @@
 *        E-factor produced by an iteration is less than the value supplied 
 *        for ETOL, or the maximum number of iterations specified by parameter 
 *        MAXIT is reached. [0.01]
-*     ILEVEL = _INTEGER (Read)
+*     MSG_FILTER = _CHAR (Read)
 *        Specifies the amount of information to display on the screen.
-*        Zero suppresses all output. A value of 1 produces minimal output
+*        QUIET suppresses all output. A value of NORM produces minimal output
 *        describing such things as warnings and the E and F factors
-*        adopted (in dual-beam mode). A value of 2 produces more verbose 
+*        adopted (in dual-beam mode). A value of VERBOSE produces more verbose
 *        output including details of each iteration in the iterative
 *        processes used by both dual and single-beam modes. A value of
-*        3 produces additional details about each individual input image in
-*        single-beam mode. [1]
+*        DEBUG produces additional details about each individual input image in
+*        single-beam mode. [NORM]
 *     IN = NDF (Update)
 *        A group specifying the names of the input intensity images or
 *        cubes. This may take the form of a comma separated list, or any of 
@@ -137,8 +137,8 @@
 *        required to form a good output value at a particular pixel is 
 *        equal to this fraction multiplied by the number of input NDFs 
 *        which have good values for the pixel. The number is rounded to 
-*        the nearest integer and limited to at least 3. If ILEVEL is
-*        greater than 1, then the percentage of output pixels which fail 
+*        the nearest integer and limited to at least 3. If MSG_FILTER is
+*        greater than NORM, then the percentage of output pixels which fail
 *        this test is displayed. [0.0]
 *     NSIGMA = _REAL (Read)
 *        This parameter is only accessed by the single-beam algorithm. It
@@ -437,11 +437,14 @@
 *     input image to the output cube. 
 
 *  Copyright:
-*     Copyright (C) 2001 Central Laboratory of the Research Councils
- 
+*     Copyright (C) 1998-2001 Central Laboratory of the Research Councils
+*     Copyright (C) 2009 Science and Technology Facilities Council.
+*     All Rights Reserved.
+
 *  Authors:
 *     TMG: Tim Gledhill (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -462,6 +465,8 @@
 *        The TRIMBAD parameter added.
 *     2-FEB-2001 (DSB):
 *        Prologue changed to include reference to 3D input arrays.
+*     31-JUL-2009 (TIMJ):
+*        Remove ILEVEL. Use MSG filtering.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -481,7 +486,6 @@
 
 *  Local Variables:
       INTEGER IGRP               ! GRP identifier for input images group      
-      INTEGER ILEVEL             ! Screen information level
       INTEGER NNDF               ! No. of input images to process      
       INTEGER VAR                ! Variances required flag
       LOGICAL DBEAM              ! Use dual-beam mode?
@@ -497,9 +501,6 @@
 *  Get a group containing the names of the object frames to be used.
       CALL KPG1_RGNDF( 'IN', 0, 1, '  Give more image names...', 
      :            IGRP, NNDF, STATUS )
-
-*  Get the amount of information to be displayed on the screen.
-      CALL PAR_GET0I( 'ILEVEL', ILEVEL, STATUS )
 
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
@@ -538,23 +539,21 @@
       END IF
 
 *  Report the mode, and number of NDFs found to the user.
-      IF( ILEVEL .GT. 0 ) THEN
-         CALL MSG_SETI( 'NNDF', NNDF )
-         IF( DBEAM ) THEN
-            CALL MSG_OUT( 'POLCAL_MSG1', '   Processing ^NNDF images '//
-     :                    'in dual-beam mode...', STATUS )
-         ELSE
-            CALL MSG_OUT( 'POLCAL_MSG1', '   Processing ^NNDF images '//
-     :                    'in single-beam mode...', STATUS )
-         END IF
-         CALL MSG_BLANK( STATUS )
+      CALL MSG_SETI( 'NNDF', NNDF )
+      IF( DBEAM ) THEN
+         CALL MSG_OUT( 'POLCAL_MSG1', '   Processing ^NNDF images '//
+     :        'in dual-beam mode...', STATUS )
+      ELSE
+         CALL MSG_OUT( 'POLCAL_MSG1', '   Processing ^NNDF images '//
+     :        'in single-beam mode...', STATUS )
       END IF
+      CALL MSG_BLANK( STATUS )
 
 *  Process the data using dual or single-beam mode.
       IF( DBEAM ) THEN
-         CALL POL1_DULBM( IGRP, VAR, ILEVEL, STATUS )
+         CALL POL1_DULBM( IGRP, VAR, STATUS )
       ELSE
-         CALL POL1_SNGBM( IGRP, VAR, ILEVEL, STATUS )
+         CALL POL1_SNGBM( IGRP, VAR, STATUS )
       END IF
 
 * Tidy up.

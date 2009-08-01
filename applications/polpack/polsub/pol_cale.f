@@ -1,6 +1,6 @@
       SUBROUTINE POL_CALE( NEL, NSET, NPOS, NPAIR, IPDIN, IPVIN,
      :                     NSTATE, VAR, TOLS, TOLZ, MAXIT, SKYSUP,
-     :                     ID, IMGID, ILEVEL, F, ETOL, WEIGHT,  IPDOU,
+     :                     ID, IMGID, F, ETOL, WEIGHT,  IPDOU,
      :                     IPVOU, EEST, ZEST, VE, VZ, DE, TI1, TI2,
      :                     STATUS )
 *+
@@ -16,7 +16,7 @@
 
 *  Invocation:
 *     CALL POL_CALE( NEL, NSET, NPOS, NPAIR, IPDIN, IPVIN, NSTATE, VAR,
-*                    TOLS, TOLZ,  MAXIT, SKYSUP, ID, IMGID, ILEVEL, F, 
+*                    TOLS, TOLZ,  MAXIT, SKYSUP, ID, IMGID, F,
 *                    ETOL, WEIGHT, IPDOU, IPVOU, EEST, ZEST, VE, VZ, DE, 
 *                    TI1, TI2, STATUS )
 
@@ -77,10 +77,6 @@
 *        Image Identifiers.
 *     IMGID( 4, NSET ) = CHARACTER * ( * ) (Given)
 *        Image identifiers.
-*     ILEVEL = INTEGER (Given)
-*        Specifies the level of information to be output.
-*        ILEVEL=0 (no output); ILEVEL=1 (normal output); ILEVEL=2
-*        (diagnostic output).
 *     F = REAL (Given)
 *        F factor
 *     ETOL = REAL (Given)
@@ -145,6 +141,8 @@
 *     13-JUL-2009 (DSB):
 *        Make WEIGHT argument REAL, not DOUBLE PRECISION. Use kaplibs 
 *        CCG_MD3R instead of CCDPACK CCG1_MDR3R.
+*     31-JUL-2009 (TIMJ):
+*        Remove ILEVEL. Use MSG filtering.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -159,7 +157,8 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
-      
+      INCLUDE 'MSG_PAR'          ! MSG__ constants
+
 *  Global Variables:
 *      {include_global_variables}...
       
@@ -181,7 +180,6 @@
       CHARACTER * ( * ) ID( NPAIR )
       CHARACTER * ( * ) IMGID( 4, NSET )
       REAL WEIGHT( NPAIR )
-      INTEGER ILEVEL
       
 *  Arguments Given and Returned:
       REAL EEST( NPAIR )
@@ -222,7 +220,8 @@
       
       LOGICAL GETS, GETZ, BAD    ! logical flags
       LOGICAL CONVERGED          ! convergence flag
-      
+      LOGICAL FLUSHING           ! If we are in verbose mode and flushing
+
       DOUBLE PRECISION SENSL, SENSR, SENS2L, SENS2R ! sensitivity corrections
       DOUBLE PRECISION RE        ! local estimate of 1/E
       DOUBLE PRECISION SCALE, DSCALE ! scale factor and standard error
@@ -237,7 +236,10 @@
 * Check inherited global status.
 
       IF ( STATUS .NE. SAI__OK ) GO TO 99
-      
+
+* Determine whether errors are flushed
+      FLUSHING = MSG_FLEVOK( MSG__VERB, STATUS )
+
 * Assume BAD pixel values are present in all images. 
 
       BAD = .TRUE.
@@ -361,9 +363,9 @@
 
 *  SAI__ERROR report will be made by CCD1_CMPRR. In this case, the
 *  resulting approximate solution will probably be OK, so just annul (or
-*  flush if ILEVEL is 2) the error and carry on.
+*  flush if verbose) the error and carry on.
             IF( STATUS .EQ. SAI__ERROR .AND. NITER .EQ. MAXIT ) THEN 
-               IF( ILEVEL .GE. 2 ) THEN
+               IF( FLUSHING ) THEN
                   CALL ERR_REP( ' ', 'The above error probably '//
      :                       'does not matter and so is being '//
      :                       'ignored... The E factors may only '//
@@ -445,18 +447,18 @@
 * If diagnostic information is required then print some headings for the
 * estimates on each iteration.
 
-         IF ( ILEVEL .GT. 1 ) THEN
-            CALL MSG_BLANK( STATUS )
+         IF ( MSG_FLEVOK( MSG__VERB, STATUS ) ) THEN
+            CALL MSG_BLANKIF( MSG__VERB, STATUS )
             CALL MSG_SETI( 'ITER', ITER )
-            CALL MSG_OUT( ' ', ' Iteration: ^ITER', STATUS )
-            CALL MSG_BLANK( STATUS )
+            CALL MSG_OUTIF( MSG__VERB, ' ', ' Iteration: ^ITER', STATUS)
+            CALL MSG_BLANKIF( MSG__VERB, STATUS )
             WRITE( STRING,
      :         '( 5X, ''Image Pair     Scale    Zero  '' )' )
-            CALL MSG_OUT( ' ', STRING, STATUS )
+            CALL MSG_OUTIF( MSG__VERB, ' ', STRING, STATUS )
             WRITE( STRING,
      :         '( 5X, ''------------------------------'' )' )
-            CALL MSG_OUT( ' ', STRING, STATUS )
-            CALL MSG_BLANK( STATUS )
+            CALL MSG_OUTIF( MSG__VERB, ' ', STRING, STATUS )
+            CALL MSG_BLANKIF( MSG__VERB, STATUS )
 
 * Write out the estimates on this iteration for each image pair.
 
@@ -464,7 +466,7 @@
               WRITE( STRING,
      :           '( 5X, A, 5X, F6.4, 4X, F6.4 )' )
      :           ID( IPAIR ), EEST( IPAIR ), ZEST( IPAIR )
-              CALL MSG_OUT( ' ', STRING, STATUS )
+              CALL MSG_OUTIF( MSG__VERB, ' ', STRING, STATUS )
             ENDDO
 
 * Write out the maximum change on this iteration.
@@ -483,42 +485,38 @@
 
 * Print out messages...
 
-      IF ( ILEVEL .GT. 0 ) CALL MSG_BLANK( STATUS )
+      CALL MSG_BLANK( STATUS )
 
-      IF ( ILEVEL .GT. 1 ) THEN
-         IF ( CONVERGED ) THEN
-            WRITE( STRING,
-     :      '( '' Convergence in '', I3, '' iterations.'' )' ) ITER
-            CALL MSG_OUT( ' ', STRING, STATUS )
-         ELSE
-            WRITE( STRING,
-     :      '( '' *** FAILED to converge in '', I3, ''iterations '' )' )
-     :      ITER
-            CALL MSG_OUT( ' ', STRING, STATUS )
-         ENDIF
+      IF ( CONVERGED ) THEN
+         WRITE( STRING,
+     :        '( '' Convergence in '', I3, '' iterations.'' )' ) ITER
+         CALL MSG_OUTIF( MSG__VERB, ' ', STRING, STATUS )
+      ELSE
+         WRITE( STRING,
+     :       '( '' *** FAILED to converge in '', I3, ''iterations '' )')
+     :        ITER
+         CALL MSG_OUTIF( MSG__VERB, ' ', STRING, STATUS )
       ENDIF
          
-      IF ( ILEVEL .EQ. 1 ) THEN
-         IF ( CONVERGED ) THEN
-            WRITE( STRING, '( 3X, ''Image       E-factor'' )' )
-            CALL MSG_OUT( ' ', STRING, STATUS )
-            WRITE( STRING, '( 3X, ''-----       --------'' )' )
-            CALL MSG_OUT( ' ', STRING, STATUS )
-   
-            DO IPAIR = 1, NPAIR
-               WRITE( STRING, '( 3X, A, 2X, F6.4 )' )
-     :                ID( IPAIR ), EEST( IPAIR )
-               CALL MSG_OUT( ' ', STRING, STATUS )
-            ENDDO
-         ELSE
-            WRITE( STRING,
-     :      '( '' *** FAILED to converge in '', I3, ''iterations '' )' )
-     :      ITER
-            CALL MSG_OUT( ' ', STRING, STATUS )
-         END IF
-      ENDIF
+      IF ( CONVERGED ) THEN
+         WRITE( STRING, '( 3X, ''Image       E-factor'' )' )
+         CALL MSG_OUT( ' ', STRING, STATUS )
+         WRITE( STRING, '( 3X, ''-----       --------'' )' )
+         CALL MSG_OUT( ' ', STRING, STATUS )
 
-      IF ( ILEVEL .GT. 0 ) CALL MSG_BLANK( STATUS )
+         DO IPAIR = 1, NPAIR
+            WRITE( STRING, '( 3X, A, 2X, F6.4 )' )
+     :           ID( IPAIR ), EEST( IPAIR )
+            CALL MSG_OUT( ' ', STRING, STATUS )
+         ENDDO
+      ELSE
+         WRITE( STRING,
+     :      '( '' *** FAILED to converge in '', I3, ''iterations '' )' )
+     :        ITER
+         CALL MSG_OUT( ' ', STRING, STATUS )
+      END IF
+
+      CALL MSG_BLANK( STATUS )
          
 * Loop through the input images again to apply the left and right
 * channel sensitivity factors to the input data and put the result in

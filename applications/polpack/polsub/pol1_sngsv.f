@@ -1,6 +1,6 @@
       SUBROUTINE POL1_SNGSV( IGRP1, NNDF, WSCH, OUTVAR, PHI, ANLIND, T, 
      :                       EPS, TVAR, NREJ, IGRP2, TOL, TRIM, INDFO, 
-     :                       INDFC, MAXIT, NSIGMA, ILEVEL, HW, SETVAR, 
+     :                       INDFC, MAXIT, NSIGMA, HW, SETVAR,
      :                       MNFRAC, DEZERO, ZERO, STATUS )
 *+
 *  Name:
@@ -15,7 +15,7 @@
 *  Invocation:
 *     CALL POL1_SNGSV( IGRP1, NNDF, WSCH, OUTVAR, PHI, ANLIND, T, EPS, 
 *                      TVAR, NREJ, IGRP2, TOL, INDFO, INDFC, MAXIT, NSIGMA,
-*                      ILEVEL, HW, SETVAR, MNFRAC, DEZERO, ZERO, STATUS )
+*                      HW, SETVAR, MNFRAC, DEZERO, ZERO, STATUS )
 
 *  Description:
 *     This routine calculates Stokes vectors from a set of single-beam 
@@ -104,10 +104,6 @@
 *     NSIGMA = REAL (Given)
 *        The number of standard deviations at which input data points are
 *        rejected when iterating. Ignored if MAXIT is zero.
-*     ILEVEL = INTEGER (Given)
-*        The information level. Zero produces no screen output; 1 gives
-*        brief details of each iteration; 2 gives some details of each
-*        iteration; 3 gives full details of each iteration.
 *     HW = INTEGER (Given)
 *        The half size of the box to use when applying spatial smoothing to
 *        Stokes vectors prior to estimating input variances (in pixels). The 
@@ -133,8 +129,10 @@
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 2000 Central Laboratory of the Research Councils
- 
+*     Copyright (C) 1999-2001 Central Laboratory of the Research Councils
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -151,6 +149,8 @@
 *        Correct expresion for DIMZ.
 *     22-SEP-2004 (TIMJ):
 *        Use CNF_PVAL
+*     31-JUL-2009 (TIMJ):
+*        Remove ILEVEL. Use MSG filtering.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -166,6 +166,7 @@
       INCLUDE 'GRP_PAR'          ! GRP constants
       INCLUDE 'PRM_PAR'          ! VAL constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
+      INCLUDE 'MSG_PAR'          ! MSG__ constants
 
 *  Arguments Given:
       INTEGER IGRP1
@@ -185,7 +186,6 @@
       INTEGER INDFC
       INTEGER MAXIT
       REAL NSIGMA
-      INTEGER ILEVEL
       INTEGER HW
       LOGICAL SETVAR
       REAL MNFRAC
@@ -359,7 +359,7 @@
 *  fitting a least squares quadratic surface to the data within a small 
 *  fitting box.
       IF( ITER .GT. 0 ) THEN 
-         CALL POL1_SNGSM( ILEVEL, HW, DIMX, DIMY, DIMZ, DIMST, 
+         CALL POL1_SNGSM( HW, DIMX, DIMY, DIMZ, DIMST,
      :                    %VAL( CNF_PVAL( IPVOUT ) ), 
      :                    %VAL( CNF_PVAL( IPDOUT ) ),
      :                    %VAL( CNF_PVAL( IPCOUT ) ), 
@@ -377,7 +377,7 @@
 *  the same variance at any given pixel position. IPIE1 and IPIE2 are used 
 *  as temporary work space.
          IF( WSCH .EQ. 2 ) THEN 
-            CALL POL1_SNGVN( NNDF, IGRP1, ILEVEL, T, PHI, EPS, EL, HW,
+            CALL POL1_SNGVN( NNDF, IGRP1, T, PHI, EPS, EL, HW,
      :                       DEZERO, DIMST, %VAL( CNF_PVAL( IPDOUT ) ), 
      :                       NDIMI,
      :                       LBNDI, UBNDI, %VAL( CNF_PVAL( IPIE1 ) ), 
@@ -388,12 +388,10 @@
          END IF
 
 *  Display the iteration number of required.
-         IF( ILEVEL .GT. 1 ) THEN
-            CALL MSG_BLANK( STATUS )
-            CALL MSG_SETI( 'ITER', ITER )
-            CALL MSG_OUT( 'POL1_SNGSV_MSG1', ' Iteration: ^ITER...',
-     :                    STATUS )
-         END IF
+         CALL MSG_BLANKIF( MSG__VERB, STATUS )
+         CALL MSG_SETI( 'ITER', ITER )
+         CALL MSG_OUTIF( MSG__VERB,'POL1_SNGSV_MSG1',
+     :        ' Iteration: ^ITER...', STATUS )
 
 *  On the zeroth iteration, initialise the variance estimate array to hold 
 *  1.0 at every pixel. Do not do this if variances in the input NDFs will
@@ -456,7 +454,7 @@
 *  from the intensity values implied by the current smoothed Stokes vectors. 
 *  On the zeroth iteration (when no Stokes vectors are available), all 
 *  intensity values are accepted.
-         CALL POL1_SNGCT( INDF, ILEVEL, ITER, EL, 
+         CALL POL1_SNGCT( INDF, ITER, EL,
      :                    %VAL( CNF_PVAL( IPDIN ) ),
      :                    %VAL( CNF_PVAL( IPVIN ) ), 
      :                    T( I ), PHI( I ), EPS( I ),
@@ -491,10 +489,11 @@
 
 *  Report the total number of pixels rejected (except for the zeroth
 *  iteration).
-      IF( ITER .GT. 0 .AND. ILEVEL .GT. 1 ) THEN
-         IF( ILEVEL .GT. 2 ) CALL MSG_BLANK( STATUS )
+      IF( ITER .GT. 0 ) THEN
+         CALL MSG_BLANKIF( MSG__DEBUG, STATUS )
          CALL MSG_SETI( 'TOTREJ', TOTREJ )
-         CALL MSG_OUT( 'POL1_SNGSV_MSG2', '   Total number of '//
+         CALL MSG_OUTIF( MSG__VERB, 'POL1_SNGSV_MSG2',
+     :                 '   Total number of '//
      :                 'aberrant input pixels rejected: ^TOTREJ',
      :                 STATUS )
       END IF
@@ -525,7 +524,7 @@
      :                                                   
      :                 %VAL( CNF_PVAL( IPMT33 ) ),
      :                 %VAL( CNF_PVAL( IPN ) ), 
-     :                 %VAL( CNF_PVAL( IPDOUT ) ), 
+     :                 %VAL( CNF_PVAL( IPDOUT ) ),
      :                 %VAL( CNF_PVAL( IPVOUT ) ),
      :                 %VAL( CNF_PVAL( IPCOUT ) ), STATUS )
 
@@ -535,18 +534,18 @@
       IF( STATUS .EQ. SAI__OK .AND. ITER .LT. MAXIT .AND. 
      :    .NOT. CONV ) THEN
          ITER = ITER + 1
-         IF( ILEVEL .GT. 2 ) CALL MSG_BLANK( STATUS )
+         CALL MSG_BLANKIF( MSG__DEBUG, STATUS )
          GO TO 10
       END IF
 
 *  Warn the user if convergence was not reached.
-      IF( .NOT. CONV .AND. ITER .EQ. MAXIT .AND. MAXIT .GT. 0 .AND. 
-     :     ILEVEL .GT. 1 ) THEN
-         CALL MSG_BLANK( STATUS )
+      IF( .NOT. CONV .AND. ITER .EQ. MAXIT .AND. MAXIT .GT. 0 ) THEN
+         CALL MSG_BLANKIF( MSG__VERB, STATUS )
          CALL MSG_SETI( 'MAXIT', MAXIT )
-         CALL MSG_OUT( 'POL1_SNGSV_MSG0', ' Failed to reached '//
+         CALL MSG_OUTIF( MSG__VERB, 'POL1_SNGSV_MSG0',
+     :                 ' Failed to reached '//
      :                 'convergence in ^MAXIT iteration.', STATUS )
-         CALL MSG_BLANK( STATUS )
+         CALL MSG_BLANKIF( MSG__VERB, STATUS )
       END IF
 
 *  Set bad any output pixels which were contributed to by fewer than the
@@ -554,7 +553,7 @@
       IF( MAXIT .GT. 0 ) THEN
          CALL POL1_SNGMN( EL, %VAL( CNF_PVAL( IPNIN ) ), MNFRAC, 
      :                    %VAL( CNF_PVAL( IPN ) ),
-     :                    ILEVEL, %VAL( CNF_PVAL( IPDOUT ) ), 
+     :                    %VAL( CNF_PVAL( IPDOUT ) ),
      :                    %VAL( CNF_PVAL( IPVOUT ) ),
      :                    %VAL( CNF_PVAL( IPCOUT ) ), STATUS )
       END IF
@@ -563,7 +562,7 @@
 *  variance found above.
       IF( SETVAR .AND. WSCH .EQ. 2 .AND. STATUS .EQ. SAI__OK ) THEN
 
-         IF( ILEVEL .GT. 0 ) CALL MSG_OUT( 'POL1_SNGSV_MSG1', 
+         CALL MSG_OUT( 'POL1_SNGSV_MSG1',
      :           ' Storing constant VARIANCE values in the input NDFs:', 
      :                                      STATUS )
 
@@ -574,7 +573,7 @@
             CALL NDF_ISACC( INDF, 'WRITE', CANDO, STATUS ) 
 
             IF( .NOT. CANDO ) THEN
-               IF( ILEVEL .GT. 0 ) CALL MSG_OUT( 'POL1_SNGSV_MSG2', 
+               CALL MSG_OUT( 'POL1_SNGSV_MSG2',
      :                    '   ^NDF : (NDF is write protected)', STATUS )
 
             ELSE IF( TVAR( I ) .GT. 0.0 .AND. 
@@ -582,14 +581,14 @@
                CALL NDF_MAP( INDF, 'VARIANCE', '_REAL', 'WRITE', IPVIN, 
      :                       EL, STATUS )
                CALL MSG_SETR( 'VAR', TVAR( I ) )
-               IF( ILEVEL .GT. 0 ) CALL MSG_OUT( 'POL1_SNGSV_MSG3', 
+               CALL MSG_OUT( 'POL1_SNGSV_MSG3',
      :                    '   ^NDF : ^VAR', STATUS )
                CALL POL1_FILLR( TVAR( I ), EL, 
      :                          %VAL( CNF_PVAL( IPVIN ) ), STATUS )
 
             ELSE
                CALL NDF_RESET( INDF, 'VARIANCE', STATUS )
-               IF( ILEVEL .GT. 0 ) CALL MSG_OUT( 'POL1_SNGSV_MSG4', 
+               CALL MSG_OUT( 'POL1_SNGSV_MSG4',
      :                    '   ^NDF : (undefined)', STATUS )
 
             END IF

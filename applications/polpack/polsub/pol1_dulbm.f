@@ -1,4 +1,4 @@
-      SUBROUTINE POL1_DULBM( IGRP, IVAR, ILEVEL, STATUS )
+      SUBROUTINE POL1_DULBM( IGRP, IVAR, STATUS )
 *+
 *  Name:
 *     POL1_DULBM
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_DULBM( IGRP1, IVAR, ILEVEL, STATUS )
+*     CALL POL1_DULBM( IGRP1, IVAR, STATUS )
 
 *  Description:
 *     This routine creates a 3D NDF holding Stokes vectors calculated from 
@@ -25,8 +25,6 @@
 *        then output variances are not required, and any input variances
 *        will be ignored. If zero, then output variances will be created
 *        if and only if all the input NDFs have variances.
-*     ILEVEL = INTEGER (Given)
-*        The amount of information to display on the screen.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -134,6 +132,8 @@
 *        Propagate NDF units.
 *     13-JUL-2009 (DSB):
 *        WEIGHT array changed from DOUBLE PRECISION to REAL.
+*     31-JUL-2009 (TIMJ):
+*        Remove ILEVEL.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -155,7 +155,6 @@
 *  Arguments Given:
       INTEGER IGRP
       INTEGER IVAR
-      INTEGER ILEVEL
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -247,7 +246,7 @@
                                  ! Image ray identifer.
       CHARACTER * ( IDLEN ) ID( 4, MAXSET )
                                  ! Image ID string
-      CHARACTER * ( 40 ) TITLE   ! Title for output NDF
+      CHARACTER * ( 50 ) TITLE   ! Title for output NDF
       CHARACTER * ( 40 ) LABEL   ! Label for output NDF
       CHARACTER * ( 3 ) PLANES   ! Quantities stored in output planes
       CHARACTER * ( DAT__SZLOC ) XLOC ! Locator for output POLPACK extension
@@ -513,14 +512,12 @@
       
 *  If user information is required, print out the number of input and
 *  validated images.
-      IF ( ILEVEL .GT. 0 ) THEN
-         CALL MSG_BLANK( STATUS )
-         CALL MSG_SETI( 'NIM', NIM )
-         CALL MSG_OUT( ' ', '   ^NIM input NDFs accessed.', STATUS )
-         CALL MSG_SETI( 'NVAL', NVAL )
-         CALL MSG_OUT( ' ', '   ^NVAL input NDFs validated.',
-     :                 STATUS )
-      ENDIF
+      CALL MSG_BLANK( STATUS )
+      CALL MSG_SETI( 'NIM', NIM )
+      CALL MSG_OUT( ' ', '   ^NIM input NDFs accessed.', STATUS )
+      CALL MSG_SETI( 'NVAL', NVAL )
+      CALL MSG_OUT( ' ', '   ^NVAL input NDFs validated.',
+     :     STATUS )
             
 *  The images are now sorted into groups from which the polarisation
 *  parameters can be calculated. For linear polarimetry this corresponds
@@ -760,10 +757,8 @@
 *  above corresponding to this Z plane.
          ELSE
 
-            IF( ILEVEL .GT. 0 ) THEN 
-               CALL MSG_SETI( 'Z', Z )
-               CALL MSG_OUT( ' ', 'Doing frequency plane ^Z', STATUS )
-            END IF
+            CALL MSG_SETI( 'Z', Z )
+            CALL MSG_OUT( ' ', 'Doing frequency plane ^Z', STATUS )
 
             LBND( 3 ) = Z
             UBND( 3 ) = Z
@@ -838,7 +833,7 @@
 *  factor). This gives the relative efficiency of the right hand
 *  polarimeter channel relative to the left hand channel.
          CALL POL_CALF( NEL, NSET, NPOS, IPDIN, IPVIN, NSTATE, VAR, 
-     :                  TOLS, TOLZ, MAXIT, SKYSUP, ID, ILEVEL, 
+     :                  TOLS, TOLZ, MAXIT, SKYSUP, ID,
      :                  %VAL( CNF_PVAL( IPFEST ) ), 
      :                  %VAL( CNF_PVAL( IPVFEST ) ), F, VF,
      :                  STATUS )
@@ -879,8 +874,7 @@
 *  This routine also produces E and F factor corrected output images.
          CALL POL_CALE( NEL, NSET, NPOS, NPAIR,  IPDIN, IPVIN, NSTATE,
      :               VAR, TOLS, TOLZ, MAXIT, SKYSUP, 
-     :               %VAL( CNF_PVAL( IPID ) ), ID,
-     :               ILEVEL, F,
+     :               %VAL( CNF_PVAL( IPID ) ), ID, F,
      :               ETOL, %VAL( CNF_PVAL( IPWEIGHT ) ), IPDCOR, IPVCOR,
      :               %VAL( CNF_PVAL( IPEEST ) ), 
      :               %VAL( CNF_PVAL( IPZEST ) ), 

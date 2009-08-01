@@ -1,5 +1,5 @@
       SUBROUTINE POL_CALF( NEL, NSET, NPOS, IPDIN, IPVIN, NSTATE, VAR,
-     :                     TOLS, TOLZ, MAXIT, SKYSUP, IMGID, ILEVEL,
+     :                     TOLS, TOLZ, MAXIT, SKYSUP, IMGID,
      :                     FEST, VFEST, F,  VF, STATUS )
 *+
 * Name:
@@ -13,7 +13,7 @@
 
 *  Invocation:
 *     CALL POL_CALF(  NEL, NSET, NPOS, IPDIN, IPVIN, NSTATE, VAR,
-*                     TOLS, TOLZ, MAXIT, SKYSUP, IMGID, ILEVEL,
+*                     TOLS, TOLZ, MAXIT, SKYSUP, IMGID,
 *                     FEST, VFEST, F,  VF, STATUS )
 
 *  Description:
@@ -31,9 +31,9 @@
 *     factor estimate is made by forming the mean of the individual
 *     estimates weighted by their variances.
 *
-*     Various degrees of informational output can be requested via the
-*     ILEVEL variable, ranging from none (ILEVEL=0) to diagnostic
-*     (ILEVEL=2).
+*     Various degrees of informational output can be requested via
+*     MSG message filtering, ranging from none (QUIET) to diagnostic
+*     (DEBUG).
 
 *  Arguments:
 *     NEL = INTEGER (Given)
@@ -69,10 +69,6 @@
 *        intercomparisons.
 *     IMGID( 4, NSET ) = CHARACTER * ( * ) (Given)
 *        Image identifiers.
-*     ILEVEL = INTEGER (Given)
-*        Specifies the level of information to be output.
-*        ILEVEL=0 (no output); ILEVEL=1 (normal output); ILEVEL=2
-*        (diagnostic output).
 *     FEST( 2 * NSET ) = REAL (Given and Returned)
 *        F factor estimates.
 *     VFEST( 2 * NSET ) = REAL (Given and Returned)
@@ -85,8 +81,10 @@
 *        The global status.
 
 *  Copyright:
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+*     All Rights Reserved.
+
 *  Authors:
 *     TMG: Tim Gledhill (STARLINK)
 *     DSB: David S. Berry (STARLINK)
@@ -111,6 +109,8 @@
 *        less than 2.
 *     22-SEP-2004 (TIMJ):
 *        Use CNF_PVAL
+*     31-JUL-2009 (TIMJ):
+*        Remove ILEVEL. Use MSG filtering.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -125,6 +125,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
+      INCLUDE 'MSG_PAR'          ! For MSG__ constants
       
 *  Global Variables:
 *      {include_global_variables}...
@@ -142,7 +143,6 @@
       INTEGER MAXIT
       REAL SKYSUP
       CHARACTER * ( * ) IMGID( 4, NSET )
-      INTEGER ILEVEL
       
 *  Arguments Given and Returned:
 
@@ -172,6 +172,7 @@
                                  ! variance
       
       LOGICAL GETS, GETZ, BAD    ! logical flags
+      LOGICAL FLUSHING           ! If we are in verbose mode and flushing
 
       DOUBLE PRECISION SCALE, DSCALE ! scale factor and standard error
       DOUBLE PRECISION ZERO, DZERO   ! zero shift and standard error
@@ -185,6 +186,9 @@
 * Check inherited global status.
 
       IF ( STATUS .NE. SAI__OK ) GO TO 99
+
+* Determine whether errors are flushed
+      FLUSHING = MSG_FLEVOK( MSG__VERB, STATUS )
 
 * Both scale and zero offsets should be calculated when performing the
 * image intercomparisons so that the scale factor relating the two
@@ -255,10 +259,10 @@
 
 *  If the iteration limit was reached before convergence was achieved, an
 *  SAI__ERROR report will be made by CCD1_CMPRR. In this case, the
-*  resulting approximate solution will probably be OK, so just annur (or
-*  flush if ILEVEL is 2) the error and carry on.
+*  resulting approximate solution will probably be OK, so just annul (or
+*  flush if verbose mode) the error and carry on.
             IF( STATUS .EQ. SAI__ERROR .AND. NITER .EQ. MAXIT ) THEN 
-               IF( ILEVEL .GE. 2 ) THEN
+               IF( FLUSHING ) THEN
                   CALL ERR_REP( ' ', 'The above error probably '//
      :                       'does not matter and so is being '//
      :                       'ignored... The F factors may only '//
@@ -289,7 +293,7 @@
      :                       %VAL( CNF_PVAL( IPWRK4 ) ), STATUS )
 
             IF( STATUS .EQ. SAI__ERROR .AND. NITER .EQ. MAXIT ) THEN 
-               IF( ILEVEL .GE. 2 ) THEN
+               IF( FLUSHING ) THEN
                   CALL ERR_REP( ' ', 'The above error probably '//
      :                       'does not matter and so is being '//
      :                       'ignored... The F factors may only '//
@@ -317,33 +321,33 @@
 * If diagnostic information is required then print out the F factor
 * estimates.
 
-               IF ( ILEVEL .GT. 1 ) THEN
-                  CALL MSG_BLANK( STATUS )
+               IF ( MSG_FLEVOK( MSG__VERB, STATUS ) ) THEN
+                  CALL MSG_BLANKIF( MSG__VERB, STATUS )
                   WRITE( STRING,
      :         '( 5X, ''Image             Ratio      F       DF '' )' )
-                  CALL MSG_OUT( ' ', STRING, STATUS )
+                  CALL MSG_OUTIF( MSG__VERB, ' ', STRING, STATUS )
                   WRITE( STRING,
      :         '( 5X, ''---------------------------------------'' )' )
-                  CALL MSG_OUT( ' ', STRING, STATUS )
-                  CALL MSG_BLANK( STATUS )
+                  CALL MSG_OUTIF( MSG__VERB, ' ', STRING, STATUS )
+                  CALL MSG_BLANKIF( MSG__VERB, STATUS )
                   WRITE( STRING, '( 5X, A, ''(E)'' )' )
      :                 IMGID( 2, ISET )
-                  CALL MSG_OUT( ' ', STRING , STATUS )
+                  CALL MSG_OUTIF( MSG__VERB, ' ', STRING , STATUS )
                   WRITE( STRING,
      :               '( 5X, A, ''(O)'', 4X, F6.3 )' )
      :                 IMGID( 1, ISET ), F1
-                  CALL MSG_OUT( ' ', STRING, STATUS )
+                  CALL MSG_OUTIF( MSG__VERB, ' ', STRING, STATUS )
                   WRITE( STRING, '( 5X, A, ''(E)'' )' )
      :                 IMGID( 1, ISET )
-                  CALL MSG_OUT( ' ', STRING , STATUS )
+                  CALL MSG_OUTIF( MSG__VERB, ' ', STRING , STATUS )
                   WRITE( STRING,
      :            '( 5X, A, ''(O)'', 4X, F6.3, 4X, F6.3, 2X, '//
      :              'E8.3 )' ), IMGID( 2, ISET ), F2, FEST( NEST ),
      :                          VFEST( NEST )
-                  CALL MSG_OUT( ' ', STRING, STATUS )
+                  CALL MSG_OUTIF( MSG__VERB, ' ', STRING, STATUS )
                ENDIF
             ELSE
-               IF( ILEVEL .GE. 2 ) THEN
+               IF( FLUSHING ) THEN
                   CALL ERR_REP( ' ', 'The above error probably '//
      :                       'does not matter and so is being '//
      :                       'ignored...', STATUS )
@@ -375,7 +379,7 @@
      :                       %VAL( CNF_PVAL( IPWRK4 ) ), STATUS )
 
             IF( STATUS .EQ. SAI__ERROR .AND. NITER .EQ. MAXIT ) THEN 
-               IF( ILEVEL .GE. 2 ) THEN
+               IF( FLUSHING ) THEN
                   CALL ERR_REP( ' ', 'The above error probably '//
      :                       'does not matter and so is being '//
      :                       'ignored... The F factors may only '//
@@ -406,7 +410,7 @@
      :                       %VAL( CNF_PVAL( IPWRK4 ) ), STATUS )
 
             IF( STATUS .EQ. SAI__ERROR .AND. NITER .EQ. MAXIT ) THEN 
-               IF( ILEVEL .GE. 2 ) THEN
+               IF( FLUSHING ) THEN
                   CALL ERR_REP( ' ', 'The above error probably '//
      :                       'does not matter and so is being '//
      :                       'ignored... The F factors may only '//
@@ -434,25 +438,25 @@
 * If diagnostic information is required then print out the F factor
 * estimates.
 
-               IF ( ILEVEL .GT. 1 ) THEN
+               IF ( MSG_FLEVOK( MSG__VERB, STATUS ) ) THEN
                   WRITE( STRING, '( 5X, A, ''(E)'' )' )
      :                 IMGID( 4, ISET )
-                  CALL MSG_OUT( ' ', STRING , STATUS )
+                  CALL MSG_OUTIF( MSG__VERB, ' ', STRING , STATUS )
                   WRITE( STRING,
      :               '( 5X, A, ''(O)'', 4X, F6.3 )' )
      :                 IMGID( 3, ISET ), F1
-                  CALL MSG_OUT( ' ', STRING, STATUS )
+                  CALL MSG_OUTIF( MSG__VERB, ' ', STRING, STATUS )
                   WRITE( STRING, '( 5X, A, ''(E)'' )' )
      :                 IMGID( 3, ISET )
-                  CALL MSG_OUT( ' ', STRING , STATUS )
+                  CALL MSG_OUTIF( MSG__VERB, ' ', STRING , STATUS )
                   WRITE( STRING,
      :            '( 5X, A, ''(O)'', 4X, F6.3, 4X, F6.3, 2X, '//
      :              'E8.3 )' ) IMGID( 4, ISET ), F2, FEST( NEST ),
      :                         VFEST( NEST )
-                  CALL MSG_OUT( ' ', STRING, STATUS )
+                  CALL MSG_OUTIF( MSG__VERB, ' ', STRING, STATUS )
                ENDIF
             ELSE
-               IF( ILEVEL .GE. 2 ) THEN
+               IF( FLUSHING ) THEN
                   CALL ERR_REP( ' ', 'The above error probably '//
      :                       'does not matter and so is being '//
      :                       'ignored...', STATUS )
@@ -479,13 +483,11 @@
 
 * If user information is required then print out the mean F factor.
 
-         IF ( ILEVEL .GT. 0 ) THEN
-            CALL MSG_BLANK( STATUS )
-            WRITE( STRING,
-     :      '( ''   Mean F factor,'', I3, '' estimates: '', F6.3 )' )
-     :       NEST, F
-            CALL MSG_OUT( ' ', STRING, STATUS )
-         ENDIF
+         CALL MSG_BLANK( STATUS )
+         WRITE( STRING,
+     :        '( ''   Mean F factor,'', I3, '' estimates: '', F6.3 )' )
+     :        NEST, F
+         CALL MSG_OUT( ' ', STRING, STATUS )
          
 * If no estimates were possible then exit with an error and add context.
 
