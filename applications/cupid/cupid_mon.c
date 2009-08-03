@@ -3,6 +3,7 @@
 #include "mers.h"
 #include "ndf.h"
 #include "star/task_adam.h"
+#include "star/ndg.h"
 #include "par_par.h"
 #include "cupid.h"
 #include <string.h>
@@ -77,6 +78,8 @@ void cupid_mon( int *status ) {
 *     29-JUL-2009 (TIMJ):
 *        Call taskGetName rather than Fortran.
 *        Add CUPID and version number to NDF history.
+*     31-JUL-2009 (DSB):
+*        Use ndgBegpv/Endpv to provide automatic provenance propagation.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -87,6 +90,7 @@ void cupid_mon( int *status ) {
 
 /* Local variables: */
    char appname[NDF__SZAPP+1];    /* Application name for NDF History */
+   char buff[PAR__SZNAM+7];       /* Application name for provenance handling */
    char name[PAR__SZNAM+1];       /* C character variable to hold name */
    int ast_caching;               /* Initial value of AST MemoryCaching tuning parameter */
 
@@ -107,6 +111,13 @@ void cupid_mon( int *status ) {
 
 /* Tell AST to re-cycle memory when possible. */
    ast_caching = astTune( "MemoryCaching", 1 );
+
+/* Begin a provenance block. This causes event handlers to be registered
+   with the NDF library so that a handler routine in NDG is called every
+   time an NDF is opened. This handler routine keeps a record of all 
+   NDFs that are opened for input or output, until the block is closed 
+   by calling ndgEndpv. */
+   ndgBegpv( status );
 
 /* Check the string against valid A-task names---if matched then call
    the relevant A-task. */
@@ -140,6 +151,16 @@ void cupid_mon( int *status ) {
       *status = SAI__ERROR;
       errRep( "CUPID_MON_NOCOM", "CUPID: No such command ^CMD.", status );
    }
+
+/* End the provenance block. This will result in every output NDF being
+   given a provenance extension containing a record of the input NDFs
+   that the application accessed in order to create the output NDF. Any
+   output NDF that already contains a provenance extension is left
+   unchanged (so individual application can override this automatic
+   provenance handling by adding a provenance extension to the output 
+   NDF itself). */
+   sprintf( buff, "CUPID:%s", name );
+   ndgEndpv( buff, status );
 
 /* Re-instate the original value of the AST ObjectCaching tuning
    parameter. */
