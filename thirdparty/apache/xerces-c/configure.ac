@@ -30,6 +30,10 @@ for ac_arg in $ac_configure_args; do
       ;;
    esac
 done
+
+dnl  CURL never seems to be picked up from the right place
+dnl  or version, so dispense with it.
+star_extra_items="$star_extra_items --disable-netaccessor-curl"
 export star_extra_items
 (
    cd xerces-c; \
