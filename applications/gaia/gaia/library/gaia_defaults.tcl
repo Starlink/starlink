@@ -154,33 +154,28 @@ proc gaia::setXdefaults {} {
     option add *TearOff  0 userDefault
     option add *Menubutton*direction flush
 
-    #  Fonts for canvas draw (used here as work around to modifying
-    #  code, these are the Solaris Xsun optimised names).
+    #  Fonts for canvas draw.
     option add *Fonts {
-       -adobe-courier-medium-r-*-*-*-120-*-*-*-*-*-*
-       -*-times-medium-r-*-*-*-120-*-*-*-*-*-*
-       -adobe-courier-medium-o-*-*-*-120-*-*-*-*-*-*
-       -*-times-medium-o-*-*-*-120-*-*-*-*-*-*
-       -adobe-courier-bold-r-*-*-*-120-*-*-*-*-*-*
-       -*-times-bold-r-*-*-*-120-*-*-*-*-*-*
-       -adobe-courier-medium-r-*-*-*-140-*-*-*-*-*-*
-       -*-times-medium-r-*-*-*-140-*-*-*-*-*-*
-       -adobe-courier-medium-o-*-*-*-140-*-*-*-*-*-*
-       -*-times-medium-o-*-*-*-140-*-*-*-*-*-*
-       -adobe-courier-bold-r-*-*-*-140-*-*-*-*-*-*
-       -*-times-bold-r-*-*-*-140-*-*-*-*-*-*
-       -adobe-courier-medium-r-*-*-*-180-*-*-*-*-*-*
-       -*-times-medium-r-*-*-*-180-*-*-*-*-*-*
-       -adobe-courier-medium-o-*-*-*-180-*-*-*-*-*-*
-       -*-times-medium-o-*-*-*-180-*-*-*-*-*-*
-       -adobe-courier-bold-r-*-*-*-180-*-*-*-*-*-*
-       -*-times-bold-r-*-*-*-180-*-*-*-*-*-*
-       -adobe-courier-medium-r-*-*-*-240-*-*-*-*-*-*
-       -*-times-medium-r-*-*-*-240-*-*-*-*-*-*
-       -adobe-courier-medium-o-*-*-*-240-*-*-*-*-*-*
-       -*-times-medium-o-*-*-*-240-*-*-*-*-*-*
-       -adobe-courier-bold-r-*-*-*-240-*-*-*-*-*-*
-       -*-times-bold-r-*-*-*-240-*-*-*-*-*-*
+       "Helvetica 8 normal"
+       "Helvetica 8 italic"
+       "Helvetica 8 bold"
+       "Helvetica 8 bold italic"
+       "Helvetica 14 normal"
+       "Helvetica 14 italic"
+       "Helvetica 14 bold"
+       "Helvetica 14 bold italic"
+       "Times 10 normal"
+       "Times 10 italic"
+       "Times 10 bold"
+       "Times 10 bold italic"
+       "Courier 10 normal"
+       "Courier 10 italic"
+       "Courier 10 bold"
+       "Courier 10 bold italic"
+       "Helvetica 18 normal"
+       "Helvetica 18 italic"
+       "Helvetica 18 bold"
+       "Helvetica 18 bold italic"
     }
 
     option add *StarCanvasDraw.textFont $textFont
