@@ -41,6 +41,12 @@ AC_CHECK_SIZEOF(int)
 dnl    Library functions - needed for specwriter
 AC_CHECK_FUNCS([mkstemp mkstemps])
 
+dnl    SMURF requires C99 features, so unless we have GCC attempt
+dnl    to enable that in the compiler.
+if test "$GCC" != "yes"; then
+   AC_PROG_CC_C99
+fi
+
 dnl    Check for GCC, so we can add SMURF compiler warning flags. 
 dnl    Would like to include -fstack-protector, but not all GCC versions 
 dnl    support that, so need to check that. SMURF is using C99 features

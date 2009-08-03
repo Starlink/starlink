@@ -19,6 +19,14 @@ STAR_DEFAULTS
 dnl    We may want to invoke make recursively
 AC_PROG_MAKE_SET
 
+dnl    GSL likes a C99 compiler to handle the inlining of functions.
+dnl    When we have a C99 compiler that isn't GCC we need to define
+dnl    GSL_C99_INLINE to make this work.
+AC_PROG_CC_C99
+if test "$ac_cv_prog_cc_c99" != "no" -a "$GCC" != "yes"; then
+   CC="$CC -DGSL_C99_INLINE"
+fi
+
 dnl    To configure gsl, run ./configure in the subdirectory.
 
 #  Look for --disable-shared and pass it on.
