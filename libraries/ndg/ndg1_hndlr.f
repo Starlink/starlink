@@ -59,6 +59,8 @@
 *        names, which can be very slow for large numbers of NDFs).
 *     1-SEP-2008 (DSB):
 *        Record each input NDF that is mapped for read or update access.
+*     3-AUG-2009 (DSB):
+*        Ensure a re-opened output NDF is not treated as an input NDF.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -96,14 +98,23 @@
 *  subsequent invocations of this routine with the same NDF will overwrite
 *  the earlier KeyMap entry, rather than creating an extra KeyMap entry.
 *  Arbitrarily store zero as the value for the KeyMap entry.
+*
+*  If an application creates an output NDF, closes it, and then re-opens
+*  it before the application terminates, we do not want the NDF to be
+*  included in the list of input NDFs, so do not add the NDF into the
+*  RDKMP keymap if it is already in the WRKMP keymap.
       IF( EVNAME .EQ. 'READ_EXISTING_NDF' .OR. 
      :    EVNAME .EQ. 'UPDATE_EXISTING_NDF' ) THEN
-         CALL AST_MAPPUT0I( RDKMP, EVTEXT, 0, ' ', STATUS )
+
+         IF( .NOT. AST_MAPHASKEY( WRKMP, EVTEXT, STATUS ) ) THEN
+            CALL AST_MAPPUT0I( RDKMP, EVTEXT, 0, ' ', STATUS )
+         ENDIF
+
       END IF
 
 *  If the event was the opening of an output NDF( i.e. an existing NDF 
 *  opened for UPDATE mode or a new NDF opened), add the path to the NDF 
-*  to the RDKMP KeyMap.
+*  to the WRKMP KeyMap.
       IF( EVNAME .EQ. 'UPDATE_EXISTING_NDF' .OR. 
      :    EVNAME .EQ. 'OPEN_NEW_NDF' ) THEN
          CALL AST_MAPPUT0I( WRKMP, EVTEXT, 0, ' ', STATUS )
