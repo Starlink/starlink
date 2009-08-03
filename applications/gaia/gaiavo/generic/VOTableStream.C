@@ -261,8 +261,11 @@ namespace gaia {
         char b = in_->sbumpc();
         if ( b != EOF ) {
             bitset<8> bs( b );
+#if HAVE_BROKEN_BIT_SET
+            value = bs.to_string();
+#else
             value = bs.to_string< char,char_traits<char>,allocator<char> >();
-            //value = bs.to_string();
+#endif
             return true;
         }
         return false;

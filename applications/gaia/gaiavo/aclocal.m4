@@ -78,13 +78,14 @@ CFLAGS=`eval echo "$CFLAGS"`
 
 #------------------------------------------------------------------------
 #  Check if we require additional libraries to support C++ shareable
-#  libraries.
+#  libraries. Solaris also has a broken bit_set to_string() function.
 system=`uname -s`-`uname -r`
 SHLIB_LD_CXX_LIBS=""
 export SHLIB_LD_CXX_LIBS
 case $system in
    SunOS-5*)
       SHLIB_LD_CXX_LIBS="-lCrun -lCstd"
+      AC_DEFINE([HAVE_BROKEN_BIT_SET], 1, [Have Solaris bit_set broken headers])
    ;;
    OSF*)
       SHLIB_LD_CXX_LIBS="-lcxx -lcxxstd"
