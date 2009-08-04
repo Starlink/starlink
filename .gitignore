@@ -505,6 +505,7 @@ applications/ifd/ifl2ifd
 
 applications/kappa/kappa.csh
 applications/kappa/kappa.icl
+applications/kappa/kappa.news
 applications/kappa/kappa.sh
 applications/kappa/kappa_link_adam
 applications/kappa/kappa_mon.f
