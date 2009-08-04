@@ -41,6 +41,8 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -60,6 +62,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     DSB: David Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -69,6 +72,8 @@
 *        Changed terminology for data grid title and axes.
 *     4-NOV-1998 (RFWS):
 *        Set explicit format for coordinates that represent pixels.
+*     4-AUG-2009 (DSB):
+*        Add FRACTION as a standard Frame.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -116,6 +121,8 @@
 *  Local Constants:
       CHARACTER * ( 5 ) PIXFMT   ! Default format for pixel cordinates
       PARAMETER ( PIXFMT = '%3.1f' )
+      CHARACTER * ( 5 ) FRAFMT   ! Default format for FRACTION cordinates
+      PARAMETER ( FRAFMT = '%5.4f' )
       INTEGER SZFMT              ! Max. characters in formatted value
       PARAMETER ( SZFMT = 2 * VAL__SZD )
 
@@ -380,6 +387,37 @@
      :                        'a' // AXIS( : NC ), STATUS )
             END IF
  4       CONTINUE
+
+*  Normalised pixel coordinate system.
+*  -----------------------------------
+      ELSE IF ( DOMAIN .EQ. 'FRACTION' ) THEN
+
+*  Set up a suitable Frame title.
+         IF ( NAXES .EQ. 1 ) THEN
+            CALL AST_SETC( IWCS, 'Title',
+     :                     'Normalised pixel coordinate; first pixel'//
+     :                     ' at '//COSTR( : NC ), STATUS ) 
+         ELSE
+            CALL AST_SETC( IWCS, 'Title',
+     :                     'Normalised pixel coordinates; first pixel'//
+     :                     ' at '//COSTR( : NC ), STATUS ) 
+         END IF
+
+*  For each axis, set up a format, label, symbol and unit value.
+         DO 5 IAXIS = 1, NAXES
+            NC = 0
+            CALL CHR_PUTI( IAXIS, AXIS, NC )
+            CALL AST_SETC( IWCS, 'Format(' // AXIS( : NC ) // ')',
+     :                     FRAFMT, STATUS )
+            CALL AST_SETC( IWCS, 'Label(' // AXIS( : NC ) // ')',
+     :                     'Normalised pixel coordinate ' // 
+     :                     AXIS( : NC ), STATUS )
+            CALL AST_SETC( IWCS, 'Symbol(' // AXIS( : NC ) // ')',
+     :                     'f' // AXIS( : NC ), STATUS )
+            CALL AST_SETC( IWCS, 'Unit(' // AXIS( : NC ) // ')',
+     :                     ' ', STATUS )
+ 5       CONTINUE
+
       END IF
       
 *  Call error tracing routine and exit.

@@ -14,11 +14,11 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardocnumber}    {33.9}
 \newcommand{\stardocauthors}   {R.F.~Warren-Smith \& D.S.~Berry}
-\newcommand{\stardocdate}      {23rd January 2009}
+\newcommand{\stardocdate}      {4th August 2009}
 \newcommand{\stardoctitle}     {NDF \\ [\latex{1ex}]
                                 Routines for Accessing the\\
                                 Extensible N-Dimensional Data Format}
-\newcommand{\stardocversion}   {Version 1.8}
+\newcommand{\stardocversion}   {Version 1.9}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -19021,10 +19021,24 @@ propagation of named NDF extensions by NDF\_PROP and NDF\_SCOPY. See
 
 \end{enumerate}
 
-\subsection{\xlabel{list_of_most_recent_changes}Changes Introduced in V1.8}
+\subsection{\xlabel{list_of_most_recent_changes}Changes Introduced in V1.9}
 
 The following describes the most significant changes which occurred in
-the NDF\_ system between versions V1.7 and V1.8 (the current version):
+the NDF\_ system between versions V1.8 and V1.9 (the current version):
+
+\begin{enumerate}
+   \item A new standard WCS Frame called FRACTION has been introduced,
+   This Frame is created automatically by the NDF library in the same
+   that the GRID, PIXEL and AXIS Frames are created. The FRACTION Frame
+   represents normalised pixel coordinates within the array - each pixel
+   axis spans the range 0.0 to 1.0 in the FRACTION Frame.
+\end{enumerate}
+
+
+\subsection{Changes Introduced in V1.8}
+
+The following describes the most significant changes which occurred in
+the NDF\_ system between versions V1.7 and V1.8:
 
 \begin{enumerate}
 \item The routine NDF\_HSDAT has been added. This allows history records

@@ -27,6 +27,8 @@
 
 *  Copyright:
 *     Copyright (C) 1997 Rutherford Appleton Laboratory
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -46,6 +48,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     DSB: David S Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -53,6 +56,8 @@
 *        Original version.
 *     14-JUL-1997 (RFWS):
 *        Use AST_EXEMPT.
+*     4-AUG-2009 (DSB):
+*        Use NDF1_VWCS.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -102,6 +107,7 @@
       INTEGER CHAN               ! Pointer to AST_ Channel
       INTEGER CLEN               ! Character string length
       INTEGER DIM( DAT__MXDIM )  ! HDS object dimensions
+      INTEGER IWCS               ! Pointer for original NDF
       INTEGER NDIM               ! Number of HDS object dimensions
       LOGICAL THERE              ! HDS component exists?
 
@@ -247,8 +253,7 @@
 *  store the resulting AST_ pointer in the DCB. Exempt this pointer
 *  from AST_ context handling (so it is not annulled if AST_END is
 *  called).
-                        DCB_IWCS( IDCB ) = AST_READ( CHAN, STATUS )
-                        CALL AST_EXEMPT( DCB_IWCS( IDCB ), STATUS )
+                        IWCS = AST_READ( CHAN, STATUS )
 
 *  If an error occurred during data transfer, report a contextual error
 *  message.
@@ -258,6 +263,18 @@
      :                          'Error while reading AST_ data from ' //
      :                          'the HDS object ^OBJECT.', STATUS )
                         END IF
+
+*  Validate the FrameSet and ensure it contains all the standard dummy 
+*  Frames expected by the NDF library.
+                        CALL NDF1_VWCS( 0, IWCS, DCB_IWCS( IDCB ), 
+     :                                  STATUS )
+
+*  Annul the original FrameSet pointer.
+                        CALL AST_ANNUL( IWCS, STATUS )
+
+*  Exempt this pointer from AST_ context handling (so it is not annulled if 
+*  AST_END is called).
+                        CALL AST_EXEMPT( DCB_IWCS( IDCB ), STATUS )
 
 *  Annul the Channel pointer, thus deleting the Channel.
                         CALL AST_ANNUL( CHAN, STATUS )

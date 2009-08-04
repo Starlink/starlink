@@ -4,6 +4,13 @@ NDF Library
    Subsecond accuracy has been restored to history recording
    (was lost in the switch to Unix)
 
+V1.9
+   - A new standard WCS Frame called FRACTION has been introduced, This
+   Frame is created automatically by the NDF library in the same that the
+   GRID, PIXEL and AXIS Frames are created. The FRACTION Frame represents
+   normalised pixel coordinates within the array - each pixel axis spans
+   the range 0.0 to 1.0 in the FRACTION Frame.
+
 V1.8
    - New routine NDF_HSDAT allows history records to be created with a
    given date and time.

@@ -38,6 +38,8 @@
 
 *  Copyright:
 *     Copyright (C) 1997 Rutherford Appleton Laboratory
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -57,6 +59,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     DSB: David S Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -65,6 +68,8 @@
 *     14-JAN-1998 (RFWS):
 *        Sorted out how to handle pixel-index shifts when the number of
 *        dimensions changes.
+*     4-AUG-2009 (DSB):
+*        Add FRACTION Frame.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -118,7 +123,7 @@
       
 *  Local Constants:
       INTEGER NSTD               ! No. standard NDF coordinate systems
-      PARAMETER ( NSTD = 3 )
+      PARAMETER ( NSTD = 4 )
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -131,11 +136,14 @@
       DOUBLE PRECISION IAB( NDF__MXDIM ) ! Index in ACB array, 2nd point
       DOUBLE PRECISION IDA( NDF__MXDIM ) ! Index in DCB array, 1st point
       DOUBLE PRECISION IDB( NDF__MXDIM ) ! Index in DCB array, 2nd point
+      DOUBLE PRECISION NPCA( NDF__MXDIM ) ! Normalised Pix. coord., 1st point
+      DOUBLE PRECISION NPCB( NDF__MXDIM ) ! Normalised Pix. coord., 2nd point
       DOUBLE PRECISION PCA( NDF__MXDIM ) ! Pixel coordinate, 1st point
       DOUBLE PRECISION PCB( NDF__MXDIM ) ! Pixel coordinate, 2nd point
       INTEGER AXMAP              ! Mapping pointer for NDF axis
       INTEGER EL                 ! Number of mapped values
       INTEGER FRAME              ! Pointer to Frame
+      INTEGER I                  ! Loop index
       INTEGER IACBT              ! Index of temporary ACB entry
       INTEGER IARY               ! ID of temporary array
       INTEGER IBASE              ! Index of base Frame
@@ -227,6 +235,13 @@
             CALL AST_ADDFRAME( IWCS, AST__BASE, UNIT, FRAME, STATUS )
             CALL AST_ANNUL( FRAME, STATUS )
 
+*  Add a fourth Frame to represent normalised pixel coordinates (each
+*  pixel axis spans a range 0.0 to 1.0 in this Frame). Again, use a 
+*  UnitMap.
+            FRAME = AST_FRAME( NDIMD, 'Domain=FRACTION', STATUS )
+            CALL AST_ADDFRAME( IWCS, AST__BASE, UNIT, FRAME, STATUS )
+            CALL AST_ANNUL( FRAME, STATUS )
+
 *  Annul the UnitMap pointer.
             CALL AST_ANNUL( UNIT, STATUS )
 
@@ -260,6 +275,11 @@
 
 *  Similarly, add a Frame to represent axis coordinates.
             FRAME = AST_FRAME( NDIMA, 'Domain=AXIS', STATUS )
+            CALL AST_ADDFRAME( NEW, AST__BASE, UNIT, FRAME, STATUS )
+            CALL AST_ANNUL( FRAME, STATUS )
+
+*  Similarly, add a Frame to represent normalised pixel coordinates.
+            FRAME = AST_FRAME( NDIMA, 'Domain=FRACTION', STATUS )
             CALL AST_ADDFRAME( NEW, AST__BASE, UNIT, FRAME, STATUS )
             CALL AST_ANNUL( FRAME, STATUS )
 
@@ -327,12 +347,12 @@
             CALL AST_ANNUL( IWCS, STATUS )
             IWCS = NEW
 
-*  Remove the first three Frames from the original FrameSet (allowing
+*  Remove the standard Frames from the original IWCS FrameSet (allowing
 *  for their new indices in the new FrameSet), as these have now been
 *  replaced.
-            CALL AST_REMOVEFRAME( IWCS, IBASE + NSTD, STATUS )
-            CALL AST_REMOVEFRAME( IWCS, IBASE + NSTD, STATUS )
-            CALL AST_REMOVEFRAME( IWCS, IBASE + NSTD, STATUS )
+            DO I = 1, NSTD
+               CALL AST_REMOVEFRAME( IWCS, IBASE + NSTD, STATUS )
+            END DO
 
 *  Re-select the original current Frame index (which may now correspond
 *  to one of the new Frames).
@@ -518,6 +538,24 @@
             CALL AST_REMAPFRAME( IWCS, 3, MAP, STATUS )
             CALL AST_ANNUL( MAP, STATUS )
          END IF
+
+*  Set up normalised pixel coordinate system.
+*  ------------------------------------------
+*  Set up a Mapping which converts from grid indices in the base NDF
+*  (the coordinate system to which the pixel coordinate Frame is still
+*  attached) and pixel coordinates corresponding with the ACB entry.
+         DO 5 IDIM = 1, NDIMA
+            IAA( IDIM ) = DBLE( LBNDA( IDIM ) ) - 0.5D0
+            IAB( IDIM ) = DBLE( UBNDA( IDIM ) ) + 0.5D0
+            NPCA( IDIM ) = 0.0D0
+            NPCB( IDIM ) = 1.0D0
+ 5       CONTINUE
+
+*  Use this Mapping to remap the fourth Frame to define the normalised
+*  pixel coordinate system.
+         MAP = AST_WINMAP( NDIMA, IAA, IAB, NPCA, NPCB, ' ', STATUS )
+         CALL AST_REMAPFRAME( IWCS, 4, MAP, STATUS )
+                  
       END IF
 
 *  Set up Frame attributes.
@@ -527,10 +565,10 @@
 *  Frames (this sets up its title, axis labels, etc.). Restore the
 *  original current Frame afterwards.
       ICURR = AST_GETI( IWCS, 'Current', STATUS )
-      DO 5 IFRAME = 1, NSTD
+      DO 6 IFRAME = 1, NSTD
          CALL AST_SETI( IWCS, 'Current', IFRAME, STATUS )
          CALL NDF1_INIFR( IACB, IWCS, STATUS )
- 5    CONTINUE
+ 6    CONTINUE
       CALL AST_SETI( IWCS, 'Current', ICURR, STATUS )
 
 *  Simplify the resulting FrameSet.

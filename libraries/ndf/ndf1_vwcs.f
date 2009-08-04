@@ -44,6 +44,8 @@
 
 *  Copyright:
 *     Copyright (C) 1997 Rutherford Appleton Laboratory
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -63,11 +65,14 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     DSB: David S Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     11-JUL-1997 (RFWS):
 *        Original version.
+*     4-AUG-2009 (DSB):
+*        Added FRACTION Frame. Allow IACB to be zero.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -101,7 +106,7 @@
 
 *  Local Constants:
       INTEGER NSTD               ! No. standard NDF coordinate systems
-      PARAMETER ( NSTD = 3 )
+      PARAMETER ( NSTD = 4 )
       
 *  Local Variables:
       CHARACTER * ( AST__SZCHR ) CLASS ! Object Class string
@@ -163,29 +168,32 @@
          END IF
       END IF
  
-*  If OK, obtain the number of base Frame axes. Also obtain the bounds
-*  and number of dimensions of the NDF.
+*  If OK, obtain the number of base Frame axes. If an ACB indesx has been
+*  supplied, also obtain the bounds and number of dimensions of the NDF.
       IF ( STATUS .EQ. SAI__OK ) THEN
          FRAME = AST_GETFRAME( IWCS2, AST__BASE, STATUS )
          NAXES = AST_GETI( FRAME, 'Naxes', STATUS )
          CALL AST_ANNUL( FRAME, STATUS )
-         CALL ARY_BOUND( ACB_DID( IACB ), NDF__MXDIM, LBND, UBND,
-     :                   NDIM, STATUS )
+
+         IF( IACB .NE. 0 ) THEN
+            CALL ARY_BOUND( ACB_DID( IACB ), NDF__MXDIM, LBND, UBND,
+     :                      NDIM, STATUS )
 
 *  Check that the number of axes matches the number of NDF dimensions.
 *  Report an error if it does not.
-         IF ( STATUS .EQ. SAI__OK ) THEN
-            IF ( NAXES .NE. NDIM ) THEN
-               STATUS = NDF__NAXIN
-               CALL MSG_SETI( 'NAXES', NAXES )
-               CALL MSG_SETI( 'NDIM', NDIM )
-               CALL ERR_REP( 'NDF1_VWCS_NAXES',
-     :              'The base Frame of the FrameSet supplied has ' //
-     :              '^NAXES axes; this does not match the number of ' //
-     :              'NDF dimensions, ^NDIM (possible programming ' //
-     :              'error).', STATUS )
+            IF ( STATUS .EQ. SAI__OK ) THEN
+               IF ( NAXES .NE. NDIM ) THEN
+                  STATUS = NDF__NAXIN
+                  CALL MSG_SETI( 'NAXES', NAXES )
+                  CALL MSG_SETI( 'NDIM', NDIM )
+                  CALL ERR_REP( 'NDF1_VWCS_NAXES',
+     :                 'The base Frame of the FrameSet supplied has ' //
+     :                 '^NAXES axes; this does not match the number ' //
+     :                 'of NDF dimensions, ^NDIM (possible ' //
+     :                 'programming error).', STATUS )
+               END IF
             END IF
-         END IF
+         ENDIF
       END IF
 
 *  Strip away unwanted information.
@@ -195,27 +203,33 @@
 *  this can be re-generated from other NDF information when required.
 *  However, we must still have Frames present to represent these
 *  coordinate systems, so they can be selected as current. To allow
-*  this, we remove all the redundant information, but replace it with 3
+*  this, we remove all the redundant information, but replace it with 4
 *  dummy Frames, all inter-related by null Mappings (UnitMaps).
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Start building a new FrameSet containing a base Frame which is a
 *  placeholder for the data grid coordinate system. We do not set any
 *  unnecessary attributes for it, since we do not want to store these.
-         FRAME = AST_FRAME( NDIM, 'Domain=GRID', STATUS )
+         FRAME = AST_FRAME( NAXES, 'Domain=GRID', STATUS )
          NEW = AST_FRAMESET( FRAME, ' ', STATUS )
          CALL AST_ANNUL( FRAME, STATUS )
 
 *  Add a second Frame as a placeholder for the pixel coordinate system,
 *  related to the base Frame by a UnitMap.
-         UNIT = AST_UNITMAP( NDIM, ' ', STATUS )
-         FRAME = AST_FRAME( NDIM, 'Domain=PIXEL', STATUS )
+         UNIT = AST_UNITMAP( NAXES, ' ', STATUS )
+         FRAME = AST_FRAME( NAXES, 'Domain=PIXEL', STATUS )
          CALL AST_ADDFRAME( NEW, AST__BASE, UNIT, FRAME, STATUS )
          CALL AST_ANNUL( FRAME, STATUS )
 
 *  Similarly, add a third Frame as a placeholder for the axis
 *  coordinate system.
-         FRAME = AST_FRAME( NDIM, 'Domain=AXIS', STATUS )
+         FRAME = AST_FRAME( NAXES, 'Domain=AXIS', STATUS )
+         CALL AST_ADDFRAME( NEW, AST__BASE, UNIT, FRAME, STATUS )
+         CALL AST_ANNUL( FRAME, STATUS )
+
+*  Similarly, add a fourth Frame as a placeholder for the normalised
+*  pixel coordinate system.
+         FRAME = AST_FRAME( NAXES, 'Domain=FRACTION', STATUS )
          CALL AST_ADDFRAME( NEW, AST__BASE, UNIT, FRAME, STATUS )
          CALL AST_ANNUL( FRAME, STATUS )
 
@@ -251,6 +265,8 @@
             CALL AST_SET( IWCS2, 'Current=2', STATUS )
          ELSE IF ( DOMAIN .EQ. 'AXIS' ) THEN
             CALL AST_SET( IWCS2, 'Current=3', STATUS )
+         ELSE IF ( DOMAIN .EQ. 'FRACTION' ) THEN
+            CALL AST_SET( IWCS2, 'Current=4', STATUS )
          END IF
 
 *  Loop through all the Frames acquired from the original FrameSet.
@@ -270,7 +286,8 @@
 *  this shouldn't normally happen).
             IF ( ( DOMAIN .EQ. 'GRID' ) .OR.
      :           ( DOMAIN .EQ. 'PIXEL' ) .OR.
-     :           ( DOMAIN .EQ. 'AXIS' ) ) THEN
+     :           ( DOMAIN .EQ. 'AXIS' ) .OR.
+     :           ( DOMAIN .EQ. 'FRACTION' ) ) THEN
                CALL AST_REMOVEFRAME( IWCS2, IFRAME, STATUS )
                NFRAME = NFRAME - 1
 
