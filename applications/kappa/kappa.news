@@ -25,6 +25,13 @@
       MSG_FILTER environment variable to control the output
       messaging.
 
+   o  FITSLIST
+
+      -  New parameters ENCODING and FULLWCS have been added.  These allow
+      the list of displayed FITS cards to include cards derived from the
+      NDF WCS component, in addition to those read from the FITS
+      extension.
+
    o  NDFCOPY
 
       -  There is a new COMP parameter that permits the QUALITY

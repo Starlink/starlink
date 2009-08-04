@@ -665,6 +665,24 @@ package kappa {
 
          helplib {$KAPPA_HELP}
 
+         parameter encoding {
+            type LITERAL
+            vpath DEFAULT
+            ppath CURRENT,DEFAULT
+            prompt {Encoding for WCS keywords}
+            default !
+            helpkey *
+         }
+
+         parameter fullwcs {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Include headers for all WCS frames?}
+            helpkey *
+         }
+
          parameter in {
             position 1
             type NDF

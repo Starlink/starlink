@@ -24324,12 +24324,39 @@ KAPPA: \htmlref{FITSDIN}{FITSDIN},
    \sstdescription{
       This application lists the \FITSref\ ~header stored in an \NDFref{NDF} 
       \htmlref{FITS extension}{se:fitsairlock}.  The list may either be reported directly to you,
-      or written to a text file.
+      or written to a text file.  The displayed list of headers can
+      be augmented, if required, by the inclusion of FITS headers 
+      representing the current World Coordinate System defined by the 
+      WCS component in the NDF (see parameter ENCODING).
    }
    \sstusage{
       fitslist in [logfile]
    }
    \sstparameters{
+      \sstsubsection{
+         ENCODING = LITERAL (Read)
+      }{
+         If a non-null value is supplied, the NDF WCS component is used
+         to generate a set of FITS headers describing the WCS, and these 
+         headers are added into the displayed list of headers (any WCS
+         headers inherited from the FITS extension are first removed). The 
+         value supplied for ENCODING controls the FITS keywords which will 
+         be used to represent the WCS. The value supplied should be one of 
+         the encodings listed in the ``World Co-ordinate Systems'' section 
+         below.  An error is reported if the WCS cannot be represented using 
+         the supplied encoding. A trailing minus sign can be appended to the 
+         end of the encoding to indicate that only the WCS headers should be 
+         displayed (that is, the contents of the FITS extension are not 
+         displayed if the encoding ends with a minus sign). Also see the
+         FULLWCS parameter. {\tt [!]}
+      }
+      \sstsubsection{
+         FULLWCS = \_LOGICAL (Read)
+      }{
+         Only accessed if ENCODING is non-null. If {\tt TRUE} then all 
+         co-ordinate frames in the WCS component are written out.
+         Otherwise, only the current Frame is written out. {\tt [FALSE]}
+      }
       \sstsubsection{
          IN = NDF (Read)
       }{
@@ -56406,6 +56433,14 @@ The following applications have been modified:
       \begin{itemize}
         \item Parameter ILEVEL has been withdrawn.  Instead use the 
         MSG\_FILTER environment variable to control the output messages.
+      \end{itemize}
+
+   \item [\htmlref{FITSLIST}{FITSLIST}]\mbox{}
+      \begin{itemize}
+        \item New parameters ENCODING and FULLWCS have been added.  These
+        allow the list of displayed FITS cards to include cards derived from 
+        the NDF WCS component, in addition to those read from the FITS
+        extension.
       \end{itemize}
 
    \item [\htmlref{LISTSHOW}{LISTSHOW}]\mbox{}
