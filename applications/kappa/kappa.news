@@ -1,6 +1,6 @@
 1 KAPPA_Version_1.11
 
-   A new release of KAPPA (V1.11-3) is under development.  The main 
+   A new release of KAPPA (V1.11-4) is under development.  The main
    changes so far are listed below.  For complete details of all 
    changes, see the "Release Notes" appendix in SUN/95.
 
@@ -9,7 +9,7 @@
    possible through the environment variable MSG_FILTER.  ILEVEL
    and QUIET parameters that previously controlled messaging are no 
    longer used.  See Modified_applications for details.
-  
+
 2 Modified_applications
 
    o  APERADD, BEAMFIT, CENTROID, CREFRAME, CURSOR, LISTSHOW,
@@ -27,10 +27,9 @@
 
    o  FITSLIST
 
-      -  New parameters ENCODING and FULLWCS have been added.  These allow
-      the list of displayed FITS cards to include cards derived from the
-      NDF WCS component, in addition to those read from the FITS
-      extension.
+      -  New Parameters ENCODING and FULLWCS allow the list of 
+      displayed FITS cards to include cards derived from the NDF WCS 
+      component, in addition to those read from the FITS extension.
 
    o  NDFCOPY
 
