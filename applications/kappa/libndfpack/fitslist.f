@@ -22,10 +22,10 @@
 *  Description:
 *     This application lists the FITS header stored in an NDF FITS
 *     extension.  The list may either be reported directly to you,
-*     or written to a text file. The displayed list of headers can
+*     or written to a text file.  The displayed list of headers can
 *     be augmented, if required, by the inclusion of FITS headers 
 *     representing the current World Coordinate System defined by the 
-*     WCS component in the NDF (see parameter ENCODING).
+*     WCS component in the NDF (see Parameter ENCODING).
 
 *  Usage:
 *     fitslist in [logfile]
@@ -33,33 +33,41 @@
 *  ADAM Parameters:
 *     ENCODING = LITERAL (Read)
 *        If a non-null value is supplied, the NDF WCS component is used
-*        to generate a set of FITS headers describing the WCS, and these 
+*        to generate a set of FITS headers describing the WCS, and these
 *        headers are added into the displayed list of headers (any WCS
-*        headers inherited from the FITS extension are first removed). The 
-*        value supplied for ENCODING controls the FITS keywords which will 
-*        be used to represent the WCS. The value supplied should be one of 
-*        the encodings listed in the "World Co-ordinate Systems" section 
-*        below.  An error is reported if the WCS cannot be represented using 
-*        the supplied encoding. A trailing minus sign can be appended to the 
-*        end of the encoding to indicate that only the WCS headers should be 
-*        displayed (that is, the contents of the FITS extension are not 
-*        displayed if the encoding ends with a minus sign). Also see the
-*        FULLWCS parameter. [!]
+*        headers inherited from the FITS extension are first removed). 
+*        The value supplied for ENCODING controls the FITS keywords 
+*        that will be used to represent the WCS.  The value supplied 
+*        should be one of the encodings listed in the "World Co-ordinate
+*        Systems" section below.  An error is reported if the WCS cannot
+*        be represented using the supplied encoding.  A trailing minus 
+*        sign appended to the encoding indicates that only the WCS 
+*        headers should be displayed (that is, the contents of the FITS 
+*        extension are not displayed if the encoding ends with a minus 
+*        sign).  Also see the FULLWCS parameter.  [!]
 *     FULLWCS = _LOGICAL (Read)
-*        Only accessed if ENCODING is non-null. If TRUE, then all 
+*        Only accessed if ENCODING is non-null.  If TRUE, then all 
 *        co-ordinate frames in the WCS component are written out.
-*        Otherwise, only the current Frame is written out. [FALSE]
+*        Otherwise, only the current Frame is written out.  [FALSE]
 *     IN = NDF (Read)
 *        The NDF whose FITS extension is to be listed.
 *     LOGFILE = FILENAME (Read)
 *        The name of the text file to store a list of the FITS
 *        extension.  If it is null (!) the list of the FITS extension
-*        is reported directly to you. [!]
+*        is reported directly to you.  [!]
 
 *  Examples:
 *     fitslist saturn
 *        The contents of the FITS extension in NDF saturn are
 *        reported to you.
+*     fitslist saturn fullwcs encoding=fits-wcs
+*        As above but it also lists the standard FITS world-co-ordinate
+*        headers derived from saturn's WCS component, provided such 
+*        information exists.
+*     fitslist saturn fullwcs encoding=fits-wcs-
+*        As the previous example except that it only lists the standard 
+*        FITS world-co-ordinate headers derived from saturn's WCS 
+*        component.  The headers in the FITS extension are not listed.
 *     fitslist ngc205 logfile=ngcfits.lis
 *        The contents of the FITS extension in NDF ngc205 are
 *        written to the text file ngcfits.lis.
@@ -69,7 +77,7 @@
 *     exit unless the value supplied for ENCODING ends with a minus sign.
 
 *  World Co-ordinate Systems:
-*     The ENCODING parameter can take any of the following values:
+*     The ENCODING parameter can take any of the following values.
 *
 *        "FITS-IRAF" --- This uses keywords CRVALi CRPIXi, CDi_j, and
 *        the system commonly used by IRAF.  It is described in the
@@ -108,8 +116,8 @@
 *
 *        "FITS-CLASS" --- This uses the conventions of the CLASS 
 *        project.  CLASS is a software package for reducing single-dish
-*        radio and sub-mm spectroscopic data.  It supports double 
-*        sideband spectra.  See 
+*        radio and sub-mm spectroscopic data.  It supports 
+*        double-sideband spectra.  See 
 *        http://www.iram.fr/IRAMFR/GILDAS/doc/html/class-html/class.html.
 *
 *        "DSS" --- This is the system used by the Digital Sky Survey,
@@ -127,14 +135,14 @@
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
 *     Copyright (C) 2004 Central Laboratory of the Research Councils.
-*     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
 *     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -144,8 +152,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)

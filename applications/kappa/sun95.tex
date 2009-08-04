@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.36}
 \newcommand{\stardocnumber}    {95.36}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2009 July 24}
+\newcommand{\stardocdate}      {2009 August 3}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.11}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -23174,7 +23174,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
             fits.cv.nrao.edu {\tt /fits/documents/wcs/wcs88.ps.Z}.
 
          \sstitem
-            {\tt "FITS-WCS"} --- This is the proposed FITS standard WCS 
+            {\tt "FITS-WCS"} --- This is the FITS standard WCS 
             encoding scheme described in the paper ``Representation of
             celestial coordinates in FITS'' \newline
             (\htmladdnormallink{{\tt{http://www.cv.nrao.edu/fits/documents/wcs/wcs.html}}}
@@ -23610,8 +23610,8 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
 
          \sstitem
          To be sure that the resultant FITS extension is what you
-         desired, you should inspect it using the command fitslist before
-         exporting the data.  If there is something wrong, you may find it
+         desired, you should inspect it using the command \htmlref{FITSLIST}{FITSLIST} 
+         before exporting the data.  If there is something wrong, you may find it
          convenient to use command fitsedit to make minor corrections.
       }
    }
@@ -24041,17 +24041,14 @@ KAPPA: \htmlref{FITSHEAD}{FITSHEAD},
             fits.cv.nrao.edu {\tt /fits/documents/wcs/wcs88.ps.Z}.
 
          \sstitem
-            {\tt "FITS-WCS"} --- This is the proposed FITS standard WCS 
+            {\tt "FITS-WCS"} --- This is the FITS standard WCS 
             encoding scheme described in the paper ``Representation of
             celestial coordinates in FITS'' \newline
             (\htmladdnormallink{{\tt{http://www.cv.nrao.edu/fits/documents/wcs/wcs.html}}}
             {http://www.cv.nrao.edu/fits/documents/wcs/wcs.html}). \newline
 
             It is very similar to FITS-IRAF but supports a wider range of
-            projections and co-ordinate systems.  Once the standard has
-            been agreed, this encoding should be understood by any
-            FITS-WCS compliant software and it is likely to be adopted
-            widely for FITS data in future.
+            projections and co-ordinate systems.
 
          \sstitem
             {\tt "FITS-PC"} --- This uses keywords CRVAL\textit{i}, 
@@ -24323,11 +24320,11 @@ KAPPA: \htmlref{FITSDIN}{FITSDIN},
 }{
    \sstdescription{
       This application lists the \FITSref\ ~header stored in an \NDFref{NDF} 
-      \htmlref{FITS extension}{se:fitsairlock}.  The list may either be reported directly to you,
-      or written to a text file.  The displayed list of headers can
-      be augmented, if required, by the inclusion of FITS headers 
-      representing the current World Coordinate System defined by the 
-      WCS component in the NDF (see parameter ENCODING).
+      \htmlref{FITS extension}{se:fitsairlock}.  The list may either be reported 
+      directly to you, or written to a text file.  The displayed list of headers
+      can be augmented, if required, by the inclusion of FITS headers 
+      representing the current World Co-ordinate System defined by the 
+      WCS component in the NDF (see Parameter ENCODING).
    }
    \sstusage{
       fitslist in [logfile]
@@ -24339,15 +24336,15 @@ KAPPA: \htmlref{FITSDIN}{FITSDIN},
          If a non-null value is supplied, the NDF WCS component is used
          to generate a set of FITS headers describing the WCS, and these 
          headers are added into the displayed list of headers (any WCS
-         headers inherited from the FITS extension are first removed). The 
-         value supplied for ENCODING controls the FITS keywords which will 
-         be used to represent the WCS. The value supplied should be one of 
+         headers inherited from the FITS extension are first removed).  The 
+         value supplied for ENCODING controls the FITS keywords that will 
+         be used to represent the WCS.  The value supplied should be one of 
          the encodings listed in the ``World Co-ordinate Systems'' section 
          below.  An error is reported if the WCS cannot be represented using 
-         the supplied encoding. A trailing minus sign can be appended to the 
-         end of the encoding to indicate that only the WCS headers should be 
+         the supplied encoding.  A trailing minus sign appended to the 
+         end of the encoding indicates that only the WCS headers should be 
          displayed (that is, the contents of the FITS extension are not 
-         displayed if the encoding ends with a minus sign). Also see the
+         displayed if the encoding ends with a minus sign).  Also see the
          FULLWCS parameter. {\tt [!]}
       }
       \sstsubsection{
@@ -24378,6 +24375,20 @@ KAPPA: \htmlref{FITSDIN}{FITSDIN},
          reported to you.
       }
       \sstexamplesubsection{
+         fitslist saturn fullwcs encoding=fits-wcs
+      }{
+         As above but it also lists the standard FITS world-co-ordinate
+         headers derived from saturn's WCS component, provided such 
+         information exists.
+      }
+      \sstexamplesubsection{
+         fitslist saturn fullwcs encoding=fits-wcs-
+      }{
+         As the previous example except that it only lists the standard 
+         FITS world-co-ordinate headers derived from saturn's WCS 
+         component.  The headers in the FITS extension are not listed.
+      }
+      \sstexamplesubsection{
          fitslist ngc205 logfile=ngcfits.lis
       }{
          The contents of the FITS extension in NDF ngc205 are
@@ -24390,6 +24401,80 @@ KAPPA: \htmlref{FITSDIN}{FITSDIN},
          \sstitem
          If the NDF does not have a FITS extension the application will
          exit.
+      }
+   }
+   \sstdiytopic{
+      World Co-ordinate Systems
+   }{
+      The ENCODING parameter can take any of the following values.
+
+      \ssthitemlist{
+
+         \sstitem
+            {\tt "FITS-IRAF"} --- This uses keywords CRVAL\textit{i}
+            CRPIX\textit{i}, CD\textit{i\_j}, and is the system commonly
+            used by IRAF.  It is described in the document ``World
+            Coordinate Systems Representations Within the FITS Format''
+            by R.J.~Hanisch and D.G.~Wells, 1988, available by ftp from
+            fits.cv.nrao.edu {\tt /fits/documents/wcs/wcs88.ps.Z}.
+
+         \sstitem
+            {\tt "FITS-WCS"} --- This is the FITS standard WCS 
+            encoding scheme described in the paper ``Representation of
+            celestial coordinates in FITS'' \newline
+            (\htmladdnormallink{{\tt{http://www.cv.nrao.edu/fits/documents/wcs/wcs.html}}}
+            {http://www.cv.nrao.edu/fits/documents/wcs/wcs.html}).
+
+            It is very similar to {\tt "FITS-IRAF"} but supports a wider range of
+            projections and co-ordinate systems.
+
+         \sstitem
+            {\tt "FITS-WCS(CD)"} --- This is the same as {\tt "FITS-WCS"} except
+            that the scaling and rotation of the data array is described by
+            CD matrix instead of a PC matrix with associated CDELT values.
+
+         \sstitem
+            {\tt "FITS-PC"} --- This uses keywords CRVAL\textit{i}, 
+            CDELT\textit{i}, CRPIX\textit{i}, PC\textit{iiijjj}, \emph{etc}, 
+            as in a previous (now superseded) draft of the above
+            FITS world co-ordinate system paper by E.W.~Greisen and
+            M.~Calabretta.
+
+         \sstitem
+            {\tt "FITS-AIPS"} --- This uses conventions described in the 
+            document ``Non-linear Coordinate Systems in AIPS'' by Eric W.
+            Greisen (revised 9th September, 1994), available by ftp from
+            fits.cv.nrao.edu {\tt /fits/documents/wcs/aips27.ps.Z}.  It is
+            currently employed by the AIPS data analysis facility, so its
+            use will facilitate data exchange with AIPS.  This encoding
+            uses CROTA\textit{i} and CDELT\textit{i} keywords to describe 
+            axis rotation and scaling.
+
+         \sstitem
+            {\tt "FITS-AIPS++"} --- This is an extension to {\tt "FITS-AIPS"} that
+            allows the use of a wider range of celestial projections, and is
+            used by the AIPS++ project.
+
+         \sstitem
+            {\tt "FITS-CLASS"} --- This uses the conventions of the CLASS 
+            project.  CLASS is a software package for reducing single-dish
+            radio and sub-mm spectroscopic data.  It supports double-sideband 
+            spectra.
+
+            See \htmladdnormallink{{\tt{http://www.iram.fr/IRAMFR/GILDAS/doc/html/class-html/class.html}}}
+            {http://www.iram.fr/IRAMFR/GILDAS/doc/html/class-html/class.html}.
+
+         \sstitem
+            {\tt "DSS"} --- This is the system used by the Digital Sky Survey,
+            and uses keywords AMDX\textit{n}, AMDY\textit{n}, PLTRAH, 
+            \emph{etc}.
+
+         \sstitem
+            {\tt "Native"} --- This is the native system used by the AST 
+            library (see \xref{SUN/210}{sun210}{}), and provides a loss-free 
+            method for transferring WCS information between AST-based 
+            application.  It allows more complicated WCS information to be 
+            stored and retrieved than any of the other encodings.
       }
    }
    \sstdiytopic{
@@ -56437,10 +56522,9 @@ The following applications have been modified:
 
    \item [\htmlref{FITSLIST}{FITSLIST}]\mbox{}
       \begin{itemize}
-        \item New parameters ENCODING and FULLWCS have been added.  These
-        allow the list of displayed FITS cards to include cards derived from 
-        the NDF WCS component, in addition to those read from the FITS
-        extension.
+        \item New Parameters ENCODING and FULLWCS allow the list of displayed 
+        FITS cards to include cards derived from the NDF WCS component, in 
+        addition to those read from the FITS extension.
       \end{itemize}
 
    \item [\htmlref{LISTSHOW}{LISTSHOW}]\mbox{}
