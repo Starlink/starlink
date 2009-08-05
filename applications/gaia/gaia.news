@@ -5,6 +5,10 @@
     all been replaced with sh scripts. Any personal aliases etc. based
     on the old scripts will need to be changed to use the sh replacements.
 
+    When extracting regions using the regions toolbox the default action
+    is now to also autocrop the result removing any surrounding blank
+    areas.
+
 
     Version 4.3-0
     =============

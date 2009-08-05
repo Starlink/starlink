@@ -129,7 +129,8 @@
 
 #  Copyright:
 #     Copyright (C) 1998 Central Laboratory of the Research Councils
-#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council
+#     Copyright (C) 2009 Science and Technology Facilities Council
 #     All Rights Reserved.
 
 #  Licence:
@@ -169,7 +170,7 @@
 #        Finished prologue.
 #     24-Mar-1998 (ALLAN)
 #        Changed "rect" to "rectangle", to resolve conflict with rtd bitmap
-#        name. 
+#        name.
 #     24-APR-1998 (ALLAN)
 #        Pass command line arguments to "clone" rather than use "after 500".
 #     12-NOV-1998 (PWD):
@@ -241,7 +242,7 @@ itcl::class gaia::GaiaArd {
       bind $w_ <Control-s> [code $this save_file]
       $short_help_win_ add_menu_short_help $File \
          {Save ARD description...} \
-	 {Save the current ARD regions to a file}
+         {Save the current ARD regions to a file}
 
       #  Read measurements from a file.
       $File add command \
@@ -251,7 +252,7 @@ itcl::class gaia::GaiaArd {
       bind $w_ <Control-r> [code $this read_file]
       $short_help_win_ add_menu_short_help $File \
          {Read ARD description...} \
-	 {Read a simple ARD description from a file}
+         {Read a simple ARD description from a file}
 
       #  Set the exit menu item.
       $File add command -label Exit \
@@ -271,6 +272,13 @@ itcl::class gaia::GaiaArd {
          -onvalue 1 \
          -offvalue 0 \
          -command [code $this replace_changed_]
+
+      #  Auto crop extracted region images.
+      $Options add checkbutton \
+         -label {Autocrop extracted images} \
+         -variable [scope autoautocrop_] \
+         -onvalue 1 \
+         -offvalue 0 \
 
       #  Labels for toolbox.
       itk_component add label {frame $w_.labels}
@@ -300,7 +308,7 @@ itcl::class gaia::GaiaArd {
             -command [code $this close]
       }
       add_short_help $itk_component(close) \
-	 {Close window}
+         {Close window}
 
       #  Create buttons for creating regions interactively (this
       #  cannot be recognised as an itk component widget, so just keep
@@ -315,35 +323,35 @@ itcl::class gaia::GaiaArd {
             -command [code $this stats all]
       }
       add_short_help $itk_component(wholestats) \
-	 {Get stats for all regions}
+         {Get stats for all regions}
       itk_component add selectedstats {
          button $itk_component(action).selected \
             -text {Stats selected} \
             -command [code $this stats selected]
       }
       add_short_help $itk_component(selectedstats) \
-	 {Get stats for just the selected regions}
+         {Get stats for just the selected regions}
       itk_component add clearstats {
          button $itk_component(action).clear \
             -text {Clear stats} \
             -command [code $this stats clear]
       }
       add_short_help $itk_component(clearstats) \
-	 {Clear the stats results window}
+         {Clear the stats results window}
       itk_component add savestats {
          button $itk_component(action).save \
             -text {Save stats} \
             -command [code $this save_stats_]
       }
       add_short_help $itk_component(savestats) \
-	 {Save the stats results to the named file}
+         {Save the stats results to the named file}
 
       #  Add an entry widget to display the results.
       itk_component add statsresults {
          Scrollbox $w_.statsresults -exportselection 1 -singleselect 0
       }
       add_short_help $itk_component(statsresults) \
-	 {Results of stats measurements}
+         {Results of stats measurements}
 
       #  And a file for saving the results.
       itk_component add logfile {
@@ -351,10 +359,10 @@ itcl::class gaia::GaiaArd {
             -labelwidth 14 \
             -text "Stats results file:" \
             -textvariable [scope logfile_] \
-	    -value "$logfile_"
+            -value "$logfile_"
       }
       add_short_help $itk_component(logfile) \
-	 {File name for saving contents of stats window}
+         {File name for saving contents of stats window}
 
 
       #  Add buttons for extracting and masking out the current
@@ -365,40 +373,40 @@ itcl::class gaia::GaiaArd {
             -command [code $this extract all]
       }
       add_short_help $itk_component(extractwhole) \
-	 {Extract all regions into a new image}
+         {Extract all regions into a new image}
       itk_component add extractselected {
          button $itk_component(action).exselect \
             -text {Extract selected} \
             -command [code $this extract selected]
       }
       add_short_help $itk_component(extractselected) \
-	 {Extract select regions into a new image}
+         {Extract select regions into a new image}
       itk_component add maskwhole {
          button $itk_component(action).maskwhole \
             -text {Blank all} \
             -command [code $this blank all]
       }
       add_short_help $itk_component(maskwhole) \
-	 {Create a new image with all regions blanked}
+         {Create a new image with all regions blanked}
       itk_component add maskselected {
          button $itk_component(action).maskselect \
             -text {Blank selected} \
             -command [code $this blank selected]
       }
       add_short_help $itk_component(maskselected) \
-	 {Create a new image with selected regions blanked}
+         {Create a new image with selected regions blanked}
       itk_component add autocrop {
          button $itk_component(action).autocrop \
             -text {Auto crop} \
             -command [code $this crop]
       }
       add_short_help $itk_component(autocrop) \
-	 {Create a new image with all blank edge regions removed}
+         {Create a new image with all blank edge regions removed}
 
       #  Pack everything into place.
       pack $itk_component(lrect) $itk_component(lcircle) \
-	      $itk_component(ltext) $itk_component(lpoly) \
-	      $itk_component(lellipse) -side left -fill x -expand 1
+              $itk_component(ltext) $itk_component(lpoly) \
+              $itk_component(lellipse) -side left -fill x -expand 1
       pack $itk_component(label) -side top -fill x -pady 5 -padx 5
       pack $Buttonbox_ -side top -fill x -pady 5 -padx 5
       pack $itk_component(action) -side bottom -fill x -pady 5 -padx 5
@@ -440,7 +448,7 @@ itcl::class gaia::GaiaArd {
          set autocrop_ {}
       }
       if { $namer_ != {} } {
-	 catch {delete object $namer_}
+         catch {delete object $namer_}
       }
 
       #  Remove all temporary files (non-image).
@@ -509,18 +517,18 @@ itcl::class gaia::GaiaArd {
    #  Save ARD description to a file.
    public method save_file {{filename ""}} {
       if { $filename == "" } {
-	 $Toolbox_ save_file
+         $Toolbox_ save_file
       } else {
-	 $Toolbox_ save_description $filename
+         $Toolbox_ save_description $filename
       }
    }
 
    #  Read an ARD description (in LessARD format) from a file.
    public method read_file {{filename ""}} {
       if { $filename == "" } {
-	 $Toolbox_ read_file
+         $Toolbox_ read_file
       } else {
-	 $Toolbox_ read_description $filename
+         $Toolbox_ read_description $filename
       }
    }
 
@@ -552,13 +560,13 @@ itcl::class gaia::GaiaArd {
          #  Get the name of the current image.
          set image [$itk_option(-rtdimage) fullname]
          if { $image != "" } {
-	    $namer_ configure -imagename $image
-	    set image [$namer_ ndfname]
+            $namer_ configure -imagename $image
+            set image [$namer_ ndfname]
 
-	    #  Set command to run on completion.
-	    if { $args != "" } {
-	       set complete_cmd_ $args
-	    }
+            #  Set command to run on completion.
+            if { $args != "" } {
+               set complete_cmd_ $args
+            }
 
             #  Make sure that the disk image is up to date.
             save_if_volatile
@@ -574,7 +582,7 @@ itcl::class gaia::GaiaArd {
          }
       } else {
          if { $mode == "all" } {
-	       error_dialog "No regions are defined"
+               error_dialog "No regions are defined"
          } else {
             error_dialog "No regions are selected"
          }
@@ -590,8 +598,8 @@ itcl::class gaia::GaiaArd {
 
       #  If necessary do the completion command.
       if { $complete_cmd_ != {} } {
-	 eval $complete_cmd_
-	 set complete_cmd_ {}
+         eval $complete_cmd_
+         set complete_cmd_ {}
       }
    }
 
@@ -602,12 +610,12 @@ itcl::class gaia::GaiaArd {
             set fid [::open $logfile_ w]
             puts $fid "\# GAIA ARD region stats file."
             puts $fid "\#"
-	    set size [$itk_component(statsresults) size]
-	    for {set i 0} {$i < $size} {incr i} {
-	       puts $fid [$itk_component(statsresults) get $i]
-	    }
-	    ::close $fid
-	 }
+            set size [$itk_component(statsresults) size]
+            for {set i 0} {$i < $size} {incr i} {
+               puts $fid [$itk_component(statsresults) get $i]
+            }
+            ::close $fid
+         }
       }
    }
 
@@ -635,16 +643,16 @@ itcl::class gaia::GaiaArd {
          #  Get the name of the current image.
          set image [$itk_option(-rtdimage) fullname]
          if { $image != "" } {
-	    $namer_ configure -imagename $image
-	    set image [$namer_ ndfname]
+            $namer_ configure -imagename $image
+            set image [$namer_ ndfname]
 
             #  Create a temporary file name.
             set tmpimage_ [make_tmpimage_]
 
-	    #  Set command to run on completion.
-	    if { $args != "" } {
-	       set complete_cmd_ $args
-	    }
+            #  Set command to run on completion.
+            if { $args != "" } {
+               set complete_cmd_ $args
+            }
 
             #  Make sure that the disk image is up to date.
             save_if_volatile
@@ -677,28 +685,28 @@ itcl::class gaia::GaiaArd {
       if { $ok } {
 
          #  Need to invert the sense of the ARD region for extraction.
-	   set f [::open $tmpfile r]
-	   set contents [::read $f]
-	   ::close $f
-	   set f [::open $tmpfile w]
-	   puts -nonewline $f {.NOT.(}
+           set f [::open $tmpfile r]
+           set contents [::read $f]
+           ::close $f
+           set f [::open $tmpfile w]
+           puts -nonewline $f {.NOT.(}
            puts -nonewline $f $contents
            puts $f {)}
-	   ::close $f
+           ::close $f
 
-	   #  Now startup the Ardmask application.
-	   if { $ardmask_ == {} } {
+           #  Now startup the Ardmask application.
+           if { $ardmask_ == {} } {
               global env
               set ardmask_ [GaiaApp \#auto -application \
                                $env(KAPPA_DIR)/ardmask \
-                               -notify [code $this modified_image_]]
-	   }
+                               -notify [code $this maybe_autocrop_image_]]
+           }
 
-	   #  Get the name of the current image.
-	   set image [$itk_option(-rtdimage) fullname]
-	   if { $image != "" } {
-	      $namer_ configure -imagename $image
-	      set image [$namer_ ndfname]
+           #  Get the name of the current image.
+           set image [$itk_option(-rtdimage) fullname]
+           if { $image != "" } {
+              $namer_ configure -imagename $image
+              set image [$namer_ ndfname]
 
               #  Create a temporary file name.
               set tmpimage_ [make_tmpimage_]
@@ -709,16 +717,53 @@ itcl::class gaia::GaiaArd {
               #  And run ARDMASK on the image and file.
               blt::busy hold $w_
               $ardmask_ runwiths "in=$image ardfile=$tmpfile out=$tmpimage_"
-	   } else {
+           } else {
               error_dialog "No image is displayed"
-	   }
+           }
         } else {
-	   if { $mode == "all" } {
+           if { $mode == "all" } {
               error_dialog "No regions are defined"
-	   } else {
+           } else {
               error_dialog "No regions are selected"
-	   }
+           }
         }
+   }
+
+   #  Autocrop the given temporary image, if autocrop automatically.
+   private method maybe_autocrop_image_ {} {
+
+      if { ! $autoautocrop_ } {
+         modified_image_
+         return
+      }
+
+      #  Check that extracted image is available.
+      set file ""
+      if { ! [file readable $tmpimage_] } {
+         if { ! [file readable ${tmpimage_}.sdf] } {
+            blt::busy release $w_
+            return
+         }
+         set file ${tmpimage_}.sdf
+      } else {
+         set file $tmpimage_
+      }
+
+      #  And crop that before display.
+      if { $autocrop_ == {} } {
+         global gaia_dir
+         set autocrop_ [GaiaApp \#auto -application \
+                           $gaia_dir/autocrop \
+                           -notify [code $this modified_image_]]
+      }
+
+      #  Create a second temporary file name.
+      set tmpimage_ [make_tmpimage_]
+
+      #  And run autocrop.
+      blt::busy hold $w_
+      set disposeimage_ $file
+      $autocrop_ runwiths "in=$file out=$tmpimage_"
    }
 
    #  Crop the displayed image removing any padding pixels.
@@ -735,8 +780,8 @@ itcl::class gaia::GaiaArd {
       #  Get the name of the current image.
       set image [$itk_option(-rtdimage) fullname]
       if { $image != "" } {
-	 $namer_ configure -imagename $image
-	 set image [$namer_ ndfname]
+         $namer_ configure -imagename $image
+         set image [$namer_ ndfname]
 
          #  Create a temporary file name.
          set tmpimage_ [make_tmpimage_]
@@ -755,6 +800,13 @@ itcl::class gaia::GaiaArd {
    #  Display the extracted/blanked image. This is either in a clone
    #  or in the existing display.
    private method modified_image_ {} {
+
+      #  If a file for disposal is named, do that.
+      if { $disposeimage_ != {} } {
+         catch {::file delete $disposeimage_}
+         set disposeimage_ {}
+      }
+
       set file ""
       if { ! [file readable $tmpimage_] } {
          if { ! [file readable ${tmpimage_}.sdf] } {
@@ -780,8 +832,8 @@ itcl::class gaia::GaiaArd {
 
       #  If given do the completed command.
       if { $complete_cmd_ != {} } {
-	 eval $complete_cmd_
-	 set complete_cmd_ {}
+         eval $complete_cmd_
+         set complete_cmd_ {}
       }
       blt::busy release $w_
    }
@@ -851,6 +903,13 @@ itcl::class gaia::GaiaArd {
 
    #  Name of image name control object.
    protected variable namer_ {}
+
+   #  Whether to autocrop extracted images.
+   protected variable autoautocrop_ 1
+
+   #  An image that requires disposal when calling modified_image_
+   #  (an intermediary temporary file).
+   protected variable disposeimage_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------
