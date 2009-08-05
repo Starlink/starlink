@@ -245,11 +245,14 @@
 *  Annul the UnitMap pointer.
             CALL AST_ANNUL( UNIT, STATUS )
 
-*  The AXIS Frame will now be current in our dummy FrameSet. If the
-*  NDF's AXIS component is undefined, change this to make the pixel
-*  coordinate Frame current instead.
+*  The FRACTION Frame will now be current in our dummy FrameSet. If the
+*  NDF's AXIS component is defined, change this to make the AXIS 
+*  coordinate Frame current instead. Otherwise, change it to make the
+*  pixel coordinate Frame current.
             IF ( .NOT. AXSTAT ) THEN
                CALL AST_SETI( IWCS, 'Current', 2, STATUS )
+            ELSE
+               CALL AST_SETI( IWCS, 'Current', 3, STATUS )
             END IF
          END IF
 
