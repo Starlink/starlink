@@ -1,3 +1,4 @@
+/* -*- mode: c++ -*- */
 /*+
  *  Name:
  *     VOTableWriteFunctions
@@ -203,11 +204,11 @@ int VOTable::votable_info_value( NS::VOTABLE& votable, const char *namevalue,
         int n = nodes->getLength();
         for ( int i = 0; i < n; i++ ) {
             DOMElement *element = static_cast<DOMElement*>( nodes->item( i ) );
-            
+
             //  Check value of name attribute against the given value.
             if ( XMLString::compareString( element->getAttribute( namestr ),
                                            namevaluestr ) == 0 ) {
-                
+
                 //  Get value of the value attribute.
                 const XMLCh *attribute = element->getAttribute( valuestr );
                 value = XMLString::transcode( attribute );
@@ -221,7 +222,7 @@ int VOTable::votable_info_value( NS::VOTABLE& votable, const char *namevalue,
                 break;
             }
         }
-    } 
+    }
     else {
         //  No element, sadly many tables are incomplete, so not an error.
         value = "OK";
@@ -400,7 +401,8 @@ int VOTable::table_data( const NS::TABLE& table, ofstream& out )
         TABLE::FIELD_const_iterator fiter( table.FIELD().begin() );
         TABLE::FIELD_const_iterator fend( table.FIELD().end() );
 
-        //  When an RA or Dec is discovered look for the related COOSYS.
+        //  When an RA or Dec is discovered look for the related coordinate
+        //  system.
         bool checkcoosys = false;
         bool havecoosys = false;
 
@@ -437,7 +439,8 @@ int VOTable::table_data( const NS::TABLE& table, ofstream& out )
             if ( id_index == -1 && gaia::matches_id( name, ucd, utype ) ) {
                 id_index = ncol;
             }
-            else if ( ra_index == -1 && gaia::matches_ra( name, ucd, unit, utype ) ) {
+            else if ( ra_index == -1 &&
+                      gaia::matches_ra( name, ucd, unit, utype ) ) {
                 ra_index = ncol;
                 ra_unit = unit;
                 if ( unit.find( "rad" ) == 0 ) {
@@ -445,7 +448,8 @@ int VOTable::table_data( const NS::TABLE& table, ofstream& out )
                 }
                 checkcoosys = true;
             }
-            else if ( dec_index == -1 && gaia::matches_dec( name, ucd, unit, utype ) ) {
+            else if ( dec_index == -1 &&
+                      gaia::matches_dec( name, ucd, unit, utype ) ) {
                 dec_index = ncol;
                 dec_unit = unit;
                 if ( unit.find( "rad" ) == 0 ) {
@@ -466,21 +470,34 @@ int VOTable::table_data( const NS::TABLE& table, ofstream& out )
                 if ( fiter->ref() ) {
                     if ( fiter->ref().get() ) {
                         try {
-                            COOSYS const& coosys(dynamic_cast<COOSYS const&>(*(fiter->ref()).get()));
+                            COOSYS const& coosys
+                                ( dynamic_cast<COOSYS const&>
+                                  ( *(fiter->ref().get()) ) );
                             table_coosys( coosys, out );
 
                             //  Only do this once. Assumes RA and Dec are in
-                            //  same system. 
+                            //  same system.
                             havecoosys = true;
                         }
                         catch (bad_cast) {
-                            //  No COOSYS at IDREF. Must be another
-                            //  implementation, like STC.
-                            cerr << "Missing COOSYS for reference: " << fiter->ref() << endl;
+                            //  Could be STC which starts with a GROUP.
+                            try {
+                                GROUP const& group
+                                    ( dynamic_cast<GROUP const&>
+                                      ( *(fiter->ref().get()) ) );
+                                table_stc( group, out );
+                                out << '\n';
+                                havecoosys = true;
+                            }
+                            catch (bad_cast) {
+                                cerr << "Bad coordinate system for reference: "
+                                     << fiter->ref() << endl;
+                            }
                         }
                     }
                     else {
-                        cerr << "Missing COOSYS for reference: " << fiter->ref() << endl;
+                        cerr << "Missing target for reference: "
+                             << fiter->ref() << endl;
                     }
                 }
             }
@@ -612,8 +629,65 @@ int VOTable::table_data( const NS::TABLE& table, ofstream& out )
 }
 
 /**
- *  Write a COOSYS element as table parameters. Transforms the VOTable
- *  system values into AST compatible systems (as best as I can determine).
+ *  Look at a GROUP that defines the STC coordinates of a FIELD and convert
+ *  into a standard system, equinox and epoch if possible.
+ */
+void VOTable::table_stc( const NS::GROUP& group, ofstream& out )
+{
+    using namespace NS;
+
+    //  Look for a ref to the a related coordinate system (CUPID style).
+    //  Should be in another GROUP.
+    try {
+        const NS::GROUP *gp = &group;
+        const xml_schema::idref& ref( *(gp->ref()) );
+        if ( &ref != 0 ) {
+            GROUP const& fgroup(dynamic_cast<GROUP const&>( *ref ) );
+            table_stc( fgroup, out );
+        }
+    }
+    catch (bad_cast) {
+        cerr << "Failed to get ID for group: " << group.ref() << endl;
+        //  Just ignore, this group is the end of the chain.
+    }
+
+    //  Could also contain a series of GROUPS.
+    GROUP::GROUP1_const_iterator giter( group.GROUP1().begin() );
+    GROUP::GROUP1_const_iterator gend( group.GROUP1().end() );
+    for ( ; giter != gend; ++giter ) {
+        table_stc( *giter, out );
+    }
+
+    //  Finally down to PARAMs of this GROUP.
+    GROUP::PARAM_const_iterator piter( group.PARAM().begin() );
+    GROUP::PARAM_const_iterator pend( group.PARAM().end() );
+    string name;
+    string value;
+    for ( ; piter != pend; ++piter ) {
+        if ( piter->name() ) {
+            to_lower( piter->name().get(), name );
+            const PARAM::value_optional ov( piter->value() );
+            to_lower( ov.get(), value );
+            if ( name == "spaceframe"  ) {
+                out << "system: " << value << '\n';
+                if ( value == "fk5" ) {
+                    out << "equinox: 2000.0\n";
+                }
+                else if ( value == "fk4" ) {
+                    out << "equinox: 1950.0\n";
+                }
+            }
+            if ( name == "jepoch" ) {
+                out << "epoch: " << value << '\n';
+            }
+        }
+    }
+}
+
+/**
+ *  Write a version 1.1 COOSYS element as table parameters. Transforms the
+ *  VOTable system values into AST compatible systems (as best as I can
+ *  determine).
  */
 void VOTable::table_coosys( const NS::COOSYS& coosys, ofstream& out )
 {

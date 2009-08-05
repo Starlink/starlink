@@ -3,7 +3,7 @@
  *     VOTableFunctions
 
  *  Purpose:
- *     Define VOTable members that require namespace qualification 
+ *     Define VOTable members that require namespace qualification
  *     support through macros. The namespace (votable_11 or votable11_dns)
  *     should be defined using the NS macro before including this file.
 
@@ -56,9 +56,11 @@ int table_params( const NS::TABLE& table, ofstream& out );
 
 int table_data( const NS::TABLE& table, ofstream& out );
 
-int table_columns( const NS::TABLE& table, ofstream& out, int& id_index, 
+int table_columns( const NS::TABLE& table, ofstream& out, int& id_index,
                    int& ra_index, bool& ra_radians, string& ra_unit,
-                   int& dec_index, bool& dec_radians, string& dec_unit  ); 
+                   int& dec_index, bool& dec_radians, string& dec_unit  );
+
+void table_stc( const NS::GROUP& group, ofstream& out );
 
 void table_coosys( const NS::COOSYS& coosys, ofstream& out );
 
@@ -67,8 +69,8 @@ int table_nfields( NS::TABLE& table );
 void table_description( NS::TABLE& table, string& description );
 
 int data_tabledata( const NS::TABLE& table, const NS::TABLEDATA& tdata,
-                    ofstream& out, int& id_index, 
-                    int& ra_index, bool& ra_radians, string& ra_unit, 
+                    ofstream& out, int& id_index,
+                    int& ra_index, bool& ra_radians, string& ra_unit,
                     int& dec_index, bool& dec_radians, string& dec_unit );
 
 int data_binarydata( const NS::TABLE& table, const NS::BINARY& bdata,

@@ -1772,22 +1772,28 @@ namespace votable_12
   // PARAM
   // 
 
-  const PARAM::value_type& PARAM::
+  const PARAM::value_optional& PARAM::
   value () const
   {
-    return this->value_.get ();
+    return this->value_;
   }
 
-  PARAM::value_type& PARAM::
+  PARAM::value_optional& PARAM::
   value ()
   {
-    return this->value_.get ();
+    return this->value_;
   }
 
   void PARAM::
   value (const value_type& x)
   {
     this->value_.set (x);
+  }
+
+  void PARAM::
+  value (const value_optional& x)
+  {
+    this->value_ = x;
   }
 
   void PARAM::
@@ -5823,9 +5829,9 @@ namespace votable_12
   //
 
   PARAM::
-  PARAM (const value_type& value)
+  PARAM ()
   : ::votable_12::FIELD (),
-    value_ (value, ::xml_schema::flags (), this)
+    value_ (::xml_schema::flags (), this)
   {
   }
 
@@ -5874,13 +5880,6 @@ namespace votable_12
         this->value_.set (r);
         continue;
       }
-    }
-
-    if (!value_.present ())
-    {
-      throw ::xsd::cxx::tree::expected_attribute< char > (
-        "value",
-        "");
     }
   }
 
@@ -9400,13 +9399,14 @@ namespace votable_12
 
     // value
     //
+    if (i.value ())
     {
       ::xercesc::DOMAttr& a (
         ::xsd::cxx::xml::dom::create_attribute (
           "value",
           e));
 
-      a << i.value ();
+      a << *i.value ();
     }
   }
 

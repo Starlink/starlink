@@ -2133,23 +2133,27 @@ namespace votable_12
     // value
     // 
     typedef ::xml_schema::string value_type;
+    typedef ::xsd::cxx::tree::optional< value_type > value_optional;
     typedef ::xsd::cxx::tree::traits< value_type, char > value_traits;
 
-    const value_type&
+    const value_optional&
     value () const;
 
-    value_type&
+    value_optional&
     value ();
 
     void
     value (const value_type& x);
 
     void
+    value (const value_optional& x);
+
+    void
     value (::std::auto_ptr< value_type > p);
 
     // Constructors.
     //
-    PARAM (const value_type&);
+    PARAM ();
 
     PARAM (const ::xercesc::DOMElement& e,
            ::xml_schema::flags f = 0,
@@ -2174,7 +2178,7 @@ namespace votable_12
            ::xml_schema::flags);
 
     protected:
-    ::xsd::cxx::tree::one< value_type > value_;
+    value_optional value_;
   };
 
   class GROUP: public ::xml_schema::type

@@ -282,7 +282,7 @@
 <xs:complexType name="PARAM">
   <xs:complexContent>
     <xs:extension base="FIELD">
-      <xs:attribute name="value" type="xs:string" use="required"/>
+      <xs:attribute name="value" type="xs:string"/>
     </xs:extension>
   </xs:complexContent>
 </xs:complexType>
