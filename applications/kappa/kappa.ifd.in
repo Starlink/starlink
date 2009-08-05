@@ -18233,6 +18233,15 @@ iraf! {
             helpkey *
          }
 
+         parameter skydeg {
+            type _integer
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {No. of decimal places for formatted sky axis degree values}
+            default 0
+            helpkey *
+         }
+
       }
 
    }

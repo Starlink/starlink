@@ -93,6 +93,14 @@
 *        co-ordinate Frame specified by Parameter FRAMEOUT. The position
 *        will be stored as a list of formatted axis values separated by 
 *        spaces or commas. 
+*     SKYDEG = _INTEGER (Read)
+*        If greater than zero, the values for any celestial longitude or 
+*        latitude axes are formatted as decimal degrees, irrespective of 
+*        the Format attributes in the NDF WCS component. The supplied 
+*        integer value indicates the number of decimal places required. 
+*        If the SKYDEG value is less than or equal to zero, the formats 
+*        specified by the Format attributes in the WCS component are 
+*        honoured. [0]
 
 *  Examples:
 *     wcstran m51 "100.1 21.5" pixel
@@ -154,6 +162,8 @@
 *     2009 July 24 (MJC):
 *        Remove QUIET parameter and use the current reporting level
 *        instead (set by the global MSG_FILTER environment variable).
+*     5-AUG-2009 (DSB):
+*        Added SKYDEG parameter.
 *     {enter_further_changes_here}
 
 *-
@@ -170,12 +180,15 @@
       INTEGER STATUS
 
 *  Local Variables:
+      CHARACTER ATTR*15          ! Attribute setting or name
+      CHARACTER DOM*15           ! Axis Domain value
       CHARACTER TEXT*128         ! Formatted text
       DOUBLE PRECISION GRID( NDF__MXDIM )  ! GRID Frame position
       DOUBLE PRECISION POSIN( NDF__MXDIM ) ! Input position
       DOUBLE PRECISION POSOUT( NDF__MXDIM )! Output position
       INTEGER FRMIN              ! Pointer to requested input Frame
       INTEGER FRMOUT             ! Pointer to requested output Frame
+      INTEGER I                  ! Loop index
       INTEGER IAT                ! No. of characters in the TEXT variable
       INTEGER ICURR              ! Index of original NDF current Frame
       INTEGER INDF               ! NDF identifier
@@ -183,6 +196,7 @@
       INTEGER NGRID              ! No. of GRID axes
       INTEGER NIN                ! No. of input axes
       INTEGER NOUT               ! No. of output axes
+      INTEGER SKYDEG             ! Value of SKYDEG parameter
       LOGICAL REPORT             ! Report results to screen?
 
 *.
@@ -245,6 +259,27 @@
 *  Transform the GRID position into the output Frame.
       CALL AST_TRANN( IWCS, 1, NGRID, 1, GRID, .TRUE., NOUT, 1, POSOUT, 
      :                STATUS )
+
+*  See if SKYFRAME axes are top be formatted as decimal degrees.
+      CALL PAR_GET0I( 'SKYDEG', SKYDEG, STATUS )
+
+*  If so, set search for any SKYFRAME axes and set appropriate Format
+*  values for them.
+      IF( SKYDEG .GT. 0 ) THEN
+         DO I = 1, NOUT
+            ATTR = 'Domain('
+            IAT = 7
+            CALL CHR_PUTI( I, ATTR, IAT )
+            CALL CHR_APPND( ')', ATTR, IAT )
+            DOM = AST_GETC( FRMOUT, ATTR, STATUS )
+            IF( DOM .EQ. 'SKY' ) THEN
+               ATTR( : 6 ) = 'Format'
+               CALL CHR_APPND( '=d.', ATTR, IAT )
+               CALL CHR_PUTI( SKYDEG, ATTR, IAT )
+               CALL AST_SET( FRMOUT, ATTR, STATUS )
+            END IF
+         END DO
+      END IF
 
 *  See if we are to report the results, i.e at NORMAL or higher priority.
       REPORT = MSG_FLEVOK( MSG__NORM, STATUS )

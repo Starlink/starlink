@@ -50504,6 +50504,17 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          If {\tt TRUE}, the transformed position is not written to the screen
          (it is still written to the output Parameter POSOUT).  {\tt [FALSE]}
       }
+      \sstsubsection{
+         SKYDEG = \_INTEGER (Read)
+      }{
+         If greater than zero, the values for any celestial longitude or 
+         latitude axes are formatted as decimal degrees, irrespective of 
+         the Format attributes in the NDF WCS component. The supplied 
+         integer value indicates the number of decimal places required. 
+         If the SKYDEG value is less than or equal to zero, the formats 
+         specified by the Format attributes in the WCS component are 
+         honoured. {\tt [0] }
+      }
    }
    \sstresparameters{
       \sstsubsection{
@@ -56681,6 +56692,10 @@ The following applications have been modified:
         \item Parameter QUIET has been withdrawn.  Instead set the
         MSG\_FILTER environment variable to {\tt QUIET} to suppress display
         of the transformed positions.
+        \item There is a new SKYDEG parameter that can be used to force
+        celestial longitude and latitude axis values to be formatted as 
+        decimal degrees, regardless of the setting of the Format attributes
+        for the axes.
       \end{itemize}
 
 
