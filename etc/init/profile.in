@@ -497,9 +497,9 @@ fi
 #  DATACUBE
 
 if test -f ${bindir}/datacube/datacube.sh; then
-   datacube () { . ${bindir}/datacube/datacube.sh; }
-   datacubestart () { . ${bindir}/datacube/datacube.sh; }
-   datacubesetup () { . ${bindir}/datacube/datacube.sh; }
+   datacube () { . $DATACUBE_DIR/datacube.sh; }
+   datacubestart () { . $DATACUBE_DIR/datacube.sh; }
+   datacubesetup () { . $DATACUBE_DIR/datacube.sh; }
 else
    datacube () { ${staretcdir}/notinst datacube; }
    datacubestart () { ${staretcdir}/notinst datacubestart; }
@@ -509,8 +509,9 @@ fi
 # DIPSO
 
 if test -f ${bindir}/dipso/dipsosetup.sh; then
-  dipsosetup () { . ${bindir}/dipso/dipsosetup.sh; }
-  dipso () { . ${bindir}/dipso/dipsosetup.sh; }
+  export DIPSODIR=${bindir}/dipso
+  dipsosetup () { . $DIPSODIR/dipsosetup.sh; }
+  dipso () { . $DIPSODIR/dipsosetup.sh; }
 else
   dipsosetup () { ${staretcdir}/notinst dipsosetup; }
   dipso () { ${staretcdir}/notinst dipso; }
@@ -531,10 +532,10 @@ fi
 #
 
 if test -f ${bindir}/extractor/extractor.sh; then 
-   extractorsetup () { . ${bindir}/extractor/extractor.sh; }
-   extractsetup () { . ${bindir}/extractor/extractor.sh; }
-   extractor () { . ${bindir}/extractor/extractor.sh; }
-   extract () { . ${bindir}/extractor/extractor.sh; }
+   extractorsetup () { . $EXTRACTOR_DIR/extractor.sh; }
+   extractsetup () { . $EXTRACTOR_DIR/extractor.sh; }
+   extractor () { . $EXTRACTOR_DIR/extractor.sh; }
+   extract () { . $EXTRACTOR_DIR/extractor.sh; }
 else
    extractorsetup () { ${staretcdir}/notinst extractorsetup; }
    extractsetup () { ${staretcdir}/notinst extractsetup; }
@@ -545,12 +546,12 @@ fi
 #  FIGARO
 
 if test -f ${bindir}/figaro/figaro.sh; then
-   figaro () { . ${bindir}/figaro/figaro.sh; }
-   figarosetup () { . ${bindir}/figaro/figaro.sh; }
-   specdre () { . ${bindir}/figaro/specdre.sh; }
-   specdresetup () { . ${bindir}/figaro/specdre.sh; }
-   twodspec () { . ${bindir}/figaro/twodspec.sh; }
-   twodspecsetup () { . ${bindir}/figaro/twodspec.sh; }
+   figaro () { . $FIG_DIR/figaro.sh; }
+   figarosetup () { . $FIG_DIR/figaro.sh; }
+   specdre () { . $FIG_DIR/specdre.sh; }
+   specdresetup () { . $FIG_DIR/specdre.sh; }
+   twodspec () { . $FIG_DIR/twodspec.sh; }
+   twodspecsetup () { . $FIG_DIR/twodspec.sh; }
 else
    figaro () { ${staretcdir}/notinst figaro; }
    figarosetup () { ${staretcdir}/notinst figarosetup; }
