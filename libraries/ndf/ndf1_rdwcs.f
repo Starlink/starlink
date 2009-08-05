@@ -141,6 +141,7 @@
       DOUBLE PRECISION PCA( NDF__MXDIM ) ! Pixel coordinate, 1st point
       DOUBLE PRECISION PCB( NDF__MXDIM ) ! Pixel coordinate, 2nd point
       INTEGER AXMAP              ! Mapping pointer for NDF axis
+      INTEGER CMPMAP             ! Base GRID to section FRACTION Mapping
       INTEGER EL                 ! Number of mapped values
       INTEGER FRAME              ! Pointer to Frame
       INTEGER I                  ! Loop index
@@ -154,6 +155,7 @@
       INTEGER IFRAME             ! Loop counter for Frame indices
       INTEGER LBNDA( NDF__MXDIM ) ! Lower pixel index bound (ACB entry)
       INTEGER LBNDD( NDF__MXDIM ) ! Lower pixel index bound (DCB entry)
+      INTEGER MAP0               ! Pointer to base->section GRID Mapping
       INTEGER MAP                ! Pointer to Mapping
       INTEGER NCONST             ! Number of PermMap constants
       INTEGER NDIMA              ! No. NDF dimensions (ACB entry)
@@ -384,13 +386,12 @@
             IAB( IDIM ) = DBLE( LBNDD( IDIM ) - LBNDA( IDIM ) +
      :                          SHIFT( IDIM ) ) + 1.5D0
  2       CONTINUE
-         MAP = AST_WINMAP( NDIMA, IDA, IDB, IAA, IAB, ' ', STATUS )
+         MAP0 = AST_WINMAP( NDIMA, IDA, IDB, IAA, IAB, ' ', STATUS )
 
 *  Remap the base Frame to reflect the change of data grid origin (so
 *  that all other coordinate systems described by the FrameSet remain
-*  attached to the same actual data pixels). Then annul the Mapping.
-         CALL AST_REMAPFRAME( IWCS, AST__BASE, MAP, STATUS )
-         CALL AST_ANNUL( MAP, STATUS )
+*  attached to the same actual data pixels). 
+         CALL AST_REMAPFRAME( IWCS, AST__BASE, MAP0, STATUS )
 
 *  Set up pixel coordinate system.
 *  -------------------------------
@@ -544,21 +545,32 @@
 
 *  Set up normalised pixel coordinate system.
 *  ------------------------------------------
-*  Set up a Mapping which converts from grid indices in the base NDF
-*  (the coordinate system to which the pixel coordinate Frame is still
-*  attached) and pixel coordinates corresponding with the ACB entry.
+*  Set up a Mapping which converts from grid indices in the section (note
+*  section, not base) NDF and pixel coordinates corresponding with the ACB 
+*  entry.
          DO 5 IDIM = 1, NDIMA
-            IAA( IDIM ) = DBLE( LBNDA( IDIM ) ) - 0.5D0
-            IAB( IDIM ) = DBLE( UBNDA( IDIM ) ) + 0.5D0
+            IAA( IDIM ) = 0.5D0
+            IAB( IDIM ) = DBLE( UBNDA( IDIM ) - LBNDA( IDIM ) ) + 1.5D0
             NPCA( IDIM ) = 0.0D0
             NPCB( IDIM ) = 1.0D0
  5       CONTINUE
+         MAP = AST_WINMAP( NDIMA, IAA, IAB, NPCA, NPCB, ' ', STATUS )
+
+*  In order to remap the FRACTION frame, we need the mapping from the
+*  base NDF (base, not section) to the FRACTION Frame. This Mapping is 
+*  the formed by applying the Mapping from base to section (MAP0),
+*  followed by the Mapping from section to FRACTION (MAP).
+         CMPMAP = AST_CMPMAP( MAP0, MAP, .TRUE., ' ', STATUS )
 
 *  Use this Mapping to remap the fourth Frame to define the normalised
 *  pixel coordinate system.
-         MAP = AST_WINMAP( NDIMA, IAA, IAB, NPCA, NPCB, ' ', STATUS )
-         CALL AST_REMAPFRAME( IWCS, 4, MAP, STATUS )
+         CALL AST_REMAPFRAME( IWCS, 4, CMPMAP, STATUS )
                   
+*  Free remaining resource.
+         CALL AST_ANNUL( MAP, STATUS )
+         CALL AST_ANNUL( CMPMAP, STATUS )
+         CALL AST_ANNUL( MAP0, STATUS )
+
       END IF
 
 *  Set up Frame attributes.
