@@ -44,8 +44,8 @@
 *     -  clear an attribute value; and
 *     -  test the state of an attribute.
 *
-*     Note, the attributes of the PIXEL, GRID and AXIS Frames are 
-*     managed internally by the NDF library.  They may be examined 
+*     Note, the attributes of the PIXEL, FRACTION, GRID and AXIS Frames 
+*     are managed internally by the NDF library.  They may be examined 
 *     using this application, but an error is reported if any attempt 
 *     is made to change them.  The exception to this is that the DOMAIN
 *     attribute may be changed, resulting in a copy of the Frame being
@@ -177,9 +177,9 @@
 *  Notes:
 *     -  An error is reported if an attempt is made to set or clear the
 *     Base Frame in the WCS component.
-*     -  The Domain names GRID, AXIS and PIXEL are reserved for use by
-*     the NDF library and an error will be reported if an attempt is 
-*     made to assign one of these values to any Frame.
+*     -  The Domain names GRID, FRACTION, AXIS and PIXEL are reserved for 
+*     use by the NDF library and an error will be reported if an attempt 
+*     is made to assign one of these values to any Frame.
 
 *  Related Applications:
 *     KAPPA: NDFTRACE, WCSFRAME, WCSREMOVE, WCSCOPY, WCSADD, AXLABEL, 
@@ -227,6 +227,8 @@
 *        Added mode "MSet".
 *     24-JUN-2009 (TIMJ):
 *        Give only read access to the NDF when the MODE=Test.
+*     4-AUG-2009 (DSB):
+*        Add FRACTION frame.
 *     {enter_further_changes_here}
 
 *-
@@ -262,7 +264,7 @@
 
 *  Local Functions:
       RDONLY( DOM ) = ( DOM .EQ. 'GRID' .OR. DOM .EQ. 'PIXEL' .OR. 
-     :                  DOM .EQ. 'AXIS' ) 
+     :                  DOM .EQ. 'AXIS' .OR. DOM .EQ. 'FRACTION' ) 
 *.
 
 *  Check the inherited global status.

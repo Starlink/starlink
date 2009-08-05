@@ -344,6 +344,8 @@
 *     2009 July 5 (MJC):
 *        Added Cmean and Csigma estimators and an associated CLIP
 *        parameter. 
+*     4-AUG-2009 (DSB):
+*        Add FRACTION Frame.
 *     {enter_further_changes_here}
 
 *-
@@ -579,15 +581,15 @@
       NAXC = AST_GETI( CFRM, 'NAXES', STATUS )
       TTLC = AST_GETC( CFRM, 'TITLE', STATUS )
 
-*  While the NDF system makes GRID, AXIS, and PIXEL Frames accessible,
-*  even if there is no WCS component in the suppled NDF, NDF_PTWCS 
-*  (called later) strips out any Frames with Domain names GRID, AXIS, or
-*  PIXEL, regardless of how many axes those Frames have.  We must
-*  therefore add a new Frame with a different Domain name to preserve 
+*  While the NDF system makes GRID, FRACTION, AXIS, and PIXEL Frames 
+*  accessible, even if there is no WCS component in the suppled NDF, 
+*  NDF_PTWCS (called later) strips out any Frames with Domain names GRID, 
+*  FRACTION, AXIS, or PIXEL, regardless of how many axes those Frames have.  
+*  We must therefore add a new Frame with a different Domain name to preserve 
 *  the three-dimensional information in the two-dimensional NDF.
       DOM = AST_GETC( CFRM, 'Domain', STATUS )
       IF ( DOM .EQ. 'GRID' .OR. DOM .EQ. 'AXIS' .OR. 
-     :     DOM .EQ. 'PIXEL' ) THEN
+     :     DOM .EQ. 'PIXEL' .OR. DOM .EQ. 'FRACTION' ) THEN
          NEWDOM = '3D'
          IAT = 2
          CALL CHR_APPND( DOM, NEWDOM, IAT )

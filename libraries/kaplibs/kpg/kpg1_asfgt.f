@@ -91,6 +91,8 @@
 *     8-JUN-2009 (DSB):
 *        Extend options for interpreting the parameter value by calling
 *        KPG1_GTOBJ.
+*     4-AUG-2009 (DSB):
+*        Add FRACTION Frame.
 *     {enter_further_changes_here}
 
 *-
@@ -213,6 +215,25 @@
      :                        'p' // TEXT( : IAT ), STATUS )
                   CALL AST_SETC( FRM, 'Unit(' // TEXT( : IAT ) // ')',
      :                        'pixel', STATUS )
+               END DO
+   
+*  Normalised pixel co-ordinates...
+            ELSE IF( DOM .EQ. 'FRACTION' ) THEN
+   
+*  Do not set a title since the title produced by the NDF library includes 
+*  the pixel origin which we do not know here. 
+   
+*  For each axis, set up a label, symbol and unit value.
+               DO I = 1, NAX
+                  IAT = 0
+                  CALL CHR_PUTI( I, TEXT, IAT )
+                  CALL AST_SETC( FRM, 'Label(' // TEXT( : IAT ) // ')',
+     :                        'Normalised pixel coordinate ' // 
+     :                        TEXT( : IAT ), STATUS )
+                  CALL AST_SETC( FRM, 'Symbol(' // TEXT( : IAT ) // ')',
+     :                        'f' // TEXT( : IAT ), STATUS )
+                  CALL AST_SETC( FRM, 'Unit(' // TEXT( : IAT ) // ')',
+     :                        ' ', STATUS )
                END DO
    
 *  Data grid co-ordinates...
