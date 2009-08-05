@@ -101,8 +101,8 @@
 *        should be taken to ensure that domain names are used
 *        consistently. This will usually mean avoiding any domain names
 *        that are already in use within the WCS component, particularly
-*        the standard domain names such as GRID, PIXEL, AXIS and
-*        GRAPHICS. The supplied value is stripped of spaces, and
+*        the standard domain names such as GRID, FRACTION, PIXEL, AXIS,
+*        and GRAPHICS. The supplied value is stripped of spaces, and
 *        converted to upper case before being used.
 *     EPOCH = _DOUBLE (Read)
 *        If the basis Frame is specified using a "Sky Co-ordinate

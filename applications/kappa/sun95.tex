@@ -5081,7 +5081,8 @@ follows
 \latex{\normalsize}
 
 where `{\tt p}$\sim${\tt q}', `{\tt r}$\sim${\tt s}', (\emph{etc.})
-specify the centre and extent.  Thus, 
+specify the centre and extent respectively.  The extent must be positive.
+Thus, 
 
 \latex{\small}
 \begin{quote}
@@ -5286,6 +5287,64 @@ would select a 21-pixel-wide region of the spectrum centred on
 5500~{\AA}ngstroms.
 
 
+\subsection{\xlabel{se_ndfsec-fraext}Specifying Fractional Extents
+\label{se:ndfsec-fraext}}
+
+A further form for the subscript expression involves specifying
+a fractional position along each dimension as a percentage, as follows
+
+\latex{\small}
+\begin{quote}
+\begin{center}
+{\tt name( p\%}$\sim${\tt q\%, r\%:s\%, ... )}
+\end{center}
+\end{quote}
+\latex{\normalsize}
+
+where `{\tt p\%}$\sim${\tt q\%}' specifies the centre and extent as
+percentages, and `{\tt r\%:s\%}' specifies a percentage range. Thus, 
+
+\latex{\small}
+\begin{quote}
+\begin{center}
+{\tt image(25\%:75\%,50\%:}$\sim${\tt 50\%)}
+\end{center}
+\end{quote}
+\latex{\normalsize}
+
+would refer to the central quarter of the image.  Both sections
+are equivalent.  The percentages are converted to the nearest pixel
+centre to decide the centre and extents of the sections.
+
+The \htmlref{rules}{se:ndfsec-cenext} concerning omitted values before
+or after the delimiting $\sim$ apply. Thus, 
+
+\latex{\small}
+\begin{quote}
+\begin{center}
+{\tt image(40\%}$\sim${\tt, }$\sim${\tt 50\%)}
+\end{center}
+\end{quote}
+\latex{\normalsize}
+
+could be used to refer to a full-width, half-height section centred at
+the (40\%, 50\%) fractional position.
+
+A percentage value is not limited to the range 0--100\%.  In such
+circumstances the areas beyond the bounds of the NDF are set to bad.
+For example, 
+
+\latex{\small}
+\begin{quote}
+\begin{center}
+{\tt image(}$\sim${\tt 110\%, -5\%:105\%)}
+\end{center}
+\end{quote}
+\latex{\normalsize}
+
+would give an enclosing border of bad pixels, extending 5\% of the original
+dimensions.  Both sections are equivalent.
+
 \subsection{\xlabel{se_ndfsec-dim}Changing Dimensionality
 \label{se:ndfsec-dim}}
 
@@ -5346,6 +5405,7 @@ sections
 \texttt{ndf(}$\sim$\texttt{5,6}$\sim$\texttt{)}\\
 \texttt{ndf(}$\sim$\texttt{,:)}\\
 \texttt{ndf(5500.0}$\sim$\texttt{150,)}\\
+\texttt{ndf(2.137}$\sim$\texttt{10\%)}\\
 \texttt{ndf(3.0}$\sim$\texttt{1.5,-78.06D-3:13.0545,,,,)}\\
 \end{tabular}
 \end{center}
@@ -5890,7 +5950,7 @@ which was current when the NDF was displayed (RA/DEC in this case),
 but other co-ordinate Frames may be requested using the FRAME
 parameter (\emph{e.g.} {\tt FRAME=PIXEL} displays pixel co-ordinates).
 In addition to the co-ordinate Frames inherited from the NDF, there
-are also three extra Frames available:
+are also four extra Frames available.
 
 \begin{description}
 
@@ -7104,9 +7164,9 @@ The file {\tt total.eps} is displayed in Figure~ \latexhtml{\ref{fi:agi9}}{9}.
 
 \subsection{\xlabel{se_pixgrd}Pixel Indices, Pixel Co-ordinates, and Grid
 Co-ordinates\label{se:pixgrd}}
-In this sub-section we will look at the definition of the three basic
+In this sub-section we will look at the definition of the four basic
 co-ordinate systems available in all NDFs---pixel indices, pixel
-co-ordinates, and grid co-ordinates.
+co-ordinates, grid co-ordinates, and normalised co-ordinates.
 
 \emph{Pixel indices} are integer values which are used to count the
 pixels along each axis of an NDF.  The first pixel can be given any
@@ -7134,7 +7194,7 @@ indices (see Figure~\latexhtml{\ref{fi:pixind}}{10}).
 \end{htmlonly}
 
 
-\emph{Pixel co-ordinates} are floating point values which allow positions
+\emph{Pixel co-ordinates} are floating-point values which allow positions
 to be specified with sub-pixel accuracy.  They are related to pixel indices
 as indicated in Figure~\latexhtml{\ref{fi:pixco}}{11}). 
 
@@ -7157,7 +7217,7 @@ as indicated in Figure~\latexhtml{\ref{fi:pixco}}{11}).
 \end{htmlonly}
 
 
-\emph{Grid co-ordinates} are floating point values which are similar to
+\emph{Grid co-ordinates} are floating-point values which are similar to
 pixel co-ordinates except that the origin is fixed so that the first
 pixel on an axis is centred at a grid co-ordinate value of 1.0, no matter
 what the pixel origin is.  This corresponds to the FITS idea of `pixel 
@@ -7171,7 +7231,7 @@ Figure~\latexhtml{\ref{fi:gridco}}{12}).
    \begin{figure}[hbt]
    \begin{center}
    \includegraphics[clip,height=76mm]{sun95_gridco.eps}
-   \caption{Grid co-ordinates.}
+   \caption{Grid co-ordinates.  The final co-ordinate should read 5.5}
    \label{fi:gridco}
    \end{center}
    \end{figure}
@@ -7184,6 +7244,13 @@ Figure~\latexhtml{\ref{fi:gridco}}{12}).
    Figure 12: Grid co-ordinates.
 
 \end{htmlonly}
+
+\emph{Fraction co-ordinates} are floating-point values are normalised
+pixel or grid co-ordinates such that each axis extends from zero to one.
+Thus in Figure~\latexhtml{\ref{fi:gridco}}{12} pixel co-ordinate 2.0 or 
+grid co-ordinate 0.5 becomes 0.0 in fraction co-ordinates, and pixel
+co-ordinate 7.0 or grid co-ordinate 5.5 becomes 1.0 in fraction
+co-ordinates.
 
 \subsection{\xlabel{se_domains}Co-ordinate Frames, Axes and Domains\label{se:domains}}
 
@@ -7223,6 +7290,9 @@ NDF, no matter how the NDF is created.
 
 \item[PIXEL] --- Corresponds to pixel co-ordinates.
 
+\item[FRACTION] --- Corresponds to normalised pixel or grid
+co-ordinates where each scaled pixel axis spans the range zero to one.
+
 \item[AXIS] --- Corresponds to the co-ordinate system defined by the
 \htmlref{AXIS}{apndf:axis}~ structures within the NDF.
 
@@ -7240,25 +7310,27 @@ instance, celestial co-ordinates cannot (in general) be described using
 AXIS structures because celestial longitude and latitude may both vary
 along any given row or column of an NDF.\footnote{For this and other
 reasons, new applications will avoid using AXIS structures, and make use
-of the more versatile \htmlref{WCS component}{apndf:wcs}~ instead.} If an application is used
-which renders the AXIS structures in an NDF invalid, then the AXIS
-structures will not be copied to the output NDF.  For instance, if
-\htmlref{ROTATE}{ROTATE} is used to rotate an NDF by an angle which is
-not a multiple of 90\dgs, then the output NDF will not have any AXIS
-structures, and so the AXIS Frame will default to pixel co-ordinates.
+of the more versatile \htmlref{WCS component}{apndf:wcs}~ instead.}  If
+an application is used which renders the AXIS structures in an NDF
+invalid, then the AXIS structures will not be copied to the output
+NDF.  For instance, if \htmlref{ROTATE}{ROTATE} is used to rotate an
+NDF by an angle which is not a multiple of 90\dgs, then the output NDF
+will not have any AXIS structures, and so the AXIS Frame will default
+to pixel co-ordinates.
 
 \end{description}
 
 The dimensionality of each of these Frames is equal to that of the NDF
-(\emph{e.g.} a two-dimensional NDF will have two-dimensional PIXEL, GRID and AXIS
-Frames).  Axes within a Frame are identified by an integer index in the
-range 1 to the number of axes in the Frame.  The above Frames are not
-stored permanently in the NDF, but are generated automatically by the NDF
-access library each time a reference is made to them.
+(\emph{e.g.} a two-dimensional NDF will have two-dimensional PIXEL,
+FRACTION, GRID, and AXIS Frames).  Axes within a Frame are identified 
+by an integer index in the range 1 to the number of axes in the Frame.
+The above Frames are not stored permanently in the NDF, but are
+generated automatically by the NDF access library each time a
+reference is made to them.
 
-In addition to the PIXEL, AXIS and GRID Frames, an NDF may also contain any
-number of additional co-ordinates Frames.  Descriptions of these extra
-Frames, together with recipes for converting positions between
+In addition to the PIXEL, FRACTION, AXIS, and GRID Frames, an NDF may 
+also contain any number of additional co-ordinates Frames.  Descriptions 
+of these extra Frames, together with recipes for converting positions between
 them, are stored permanently in the NDFs WCS component which may be
 examined using the \htmlref{NDFTRACE}{NDFTRACE} command.  Application
 \htmlref{WCSADD}{WCSADD} allows new Frames to be added to the WCS
@@ -7287,8 +7359,8 @@ co-ordinates of stars with known celestial co-ordinates (see
 \htmlref{SETSKY}{SETSKY} and \GAIAref\ ).
 
 \subsection{\xlabel{se_curframe}FrameSets, and the Current Frame\label{se:curframe}}
-Any co-ordinate Frames described in the \htmlref{WCS
-component}{apndf:wcs}, together with the standard GRID, PIXEL and AXIS
+Any co-ordinate Frames described in the \htmlref{WCS component}{apndf:wcs}, 
+together with the standard GRID, FRACTION, PIXEL, and AXIS
 \xref{Frames}{sun210}{Frame}, form a collection of inter-related Frames called a
 \emph{\xref{FrameSet}{sun210}{FrameSet}}.  A FrameSet contains
 descriptions of each Frame, plus recipes (called
@@ -7297,7 +7369,7 @@ positions from one Frame to another.\footnote{A Mapping need not
 necessarily be defined in both directions.  For instance, a Mapping
 which goes from a three-dimensional Frame to a two-dimensional Frame
 (maybe by simply throwing away one of the axis values) may not be
-defined in the other direction.  KAPPA applications will report an
+defined in the other direction.  \KAPPA\ applications will report an
 error if a Mapping is not defined in the required direction.  Another
 common example of a uni-directional Mapping is that between the GRID
 and AXIS Frames in cases where the AXIS structures are non-monotonic.}
@@ -7320,7 +7392,7 @@ position to be given within the current co-ordinate Frame of the NDF,
 
 The contents of the WCS component of an an NDF can be examined using
 NDFTRACE.  By default, this just shows the number of
-co-ordinates Frames defined within the NDF (including the three standard
+co-ordinates Frames defined within the NDF (including the four standard
 ones), and the {\tt Title} and {\tt Domain} of the current co-ordinate Frame.  More
 detail can be obtained using the keywords FULLWCS and FULLFRAME.  The
 first causes the {\tt Title}, index and {\tt Domain} of all Frames to be displayed,
@@ -7376,6 +7448,8 @@ pixels).
 \item [PIXEL] --- Reserved to represent pixel co-ordinates (in units of
 pixels).
 \item [AXIS] --- Reserved to represent AXIS co-ordinates (in arbitrary units).
+\item [FRACTION] --- Reserved to represent normalised pixel/grid
+co-ordinates from zero to one (unitless).
 \item [SKY] --- Reserved to represent celestial longitude and latitude (in
 any suitable system, but always stored internally in units of radians).
 \item [SPECTRUM] --- Reserved to represent position within an
@@ -7507,8 +7581,8 @@ of the input NDF (\emph{e.g.} \htmlref{FOURIER}{FOURIER}).
 
 The output NDFs produced by such applications will contain no 
 \htmlref{WCS component}{apndf:wcs}~
-(but they will still have the three \htmlref{standard Frames}{se:resdoms}---GRID, 
-PIXEL and AXIS---albeit the AXIS Frame will probably just describe 
+(but they will still have the four \htmlref{standard Frames}{se:resdoms}---GRID, 
+FRACTION, PIXEL and AXIS---albeit the AXIS Frame will probably just describe 
 \htmlref{pixel co-ordinates}{se:pixgrd} since these applications will not 
 usually copy the AXIS structures either).
 
@@ -7529,8 +7603,8 @@ other locations, in the following order:
 
 \item If an IRAS90 astrometry structure (see \xref{SUN/163}{sun163}{}) is
 present within the NDF, then WCS information will be read from it, and
-added to the \xref{FrameSet}{sun210}{FrameSet}~ holding the GRID,
-PIXEL and AXIS Frames.  IRAS90 astrometry structures have been used by
+added to the \xref{FrameSet}{sun210}{FrameSet}~ holding the GRID, FRACTION,
+PIXEL, and AXIS Frames.  IRAS90 astrometry structures have been used by
 several applications packages in the past for storing astrometry
 information.  \KAPPA\ contains the \htmlref{SETSKY}{SETSKY}
 application which can be used to create such a structure, either by
@@ -7907,7 +7981,8 @@ attribute of the sky Frame, we could say:
       same {\att Domain} value can be aligned with it. 
 
       Some Frames are given standard {\att Domain} values when they are created
-      (\emph{e.g.} GRID, PIXEL, AXIS, SKY, SPECTRUM, CURPIC, NDC, BASEPIC, GRAPHICS). 
+      (\emph{e.g.} GRID, FRACTION, PIXEL, AXIS, SKY, SPECTRUM, CURPIC, NDC, 
+      BASEPIC, GRAPHICS). 
       Frames created by the user (for instance, using \htmlref{WCSADD}{WCSADD})
       can have any {\att Domain} value, but the standard {\att Domain} names should be
       avoided unless the standard meanings are appropriate for the Frame
@@ -20379,7 +20454,7 @@ KAPPA: \htmlref{HISTOGRAM}{HISTOGRAM}.
          MODE = \htmlref{LITERAL}{se:parmenu} (Read)
       }{
          The method used to select the pictures in which cursor positions are
-         to be reported.  There are three options:
+         to be reported.  There are three options.
 
          \ssthitemlist{
 
@@ -26876,7 +26951,7 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
 \sstroutine{
    GLOBALS
 }{
-   Displays the values of the KAPPA global parameters
+   Displays the values of the \KAPPA\ global parameters
 }{
    \sstdescription{
       This procedure lists the meanings and values of the \KAPPA\ ~global
@@ -36220,7 +36295,7 @@ KAPPA: \htmlref{FITSLIST}{FITSLIST},
 \sstroutine{
    NOGLOBALS
 }{
-   Resets the KAPPA global parameters
+   Resets the \KAPPA\ global parameters
 }{
    \sstdescription{
       This application resets the {\KAPPA}~ \htmlref{global parameters}{se:parglobals},
@@ -38595,8 +38670,9 @@ KAPPA: \htmlref{PICBASE}{PICBASE},
    }{
 KAPPA: \htmlref{PICCUR}{PICCUR},
 \htmlref{PICDEF}{PICDEF},
-\htmlref{PICGRID}{PICGRID},
-\htmlref{PICSEL}{PICSEL}.
+\htmlref{PICLABEL}{PICLABEL},
+\htmlref{PICSEL}{PICSEL},
+\htmlref{PICXY}{PICXY}.
    }
 }
 \sstroutine{
@@ -40372,8 +40448,7 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
    }
    \sstnotes{
       Provenance information is stored in an NDF extension called
-      PROVENANCE, and is propagated automatically by all KAPPA
-      applications.
+      PROVENANCE, and is propagated automatically by all \KAPPA\ applications.
    }
    \sstdiytopic{
       Related Applications
@@ -48218,7 +48293,7 @@ plot (7k).
          will usually mean avoiding any domain names that are already in
          use within the WCS component, particularly the 
          \htmlref{standard domain names}{se:domains}~
-         such as GRID, PIXEL, AXIS and GRAPHICS.  The supplied value is
+         such as GRID, FRACTION, PIXEL, AXIS and GRAPHICS.  The supplied value is
          stripped of spaces, and converted to upper case before being used.
       }
       \sstsubsection{
@@ -49299,7 +49374,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          Base Frame in the WCS component.
 
          \sstitem
-         The Domain names GRID, AXIS and PIXEL are reserved for use by
+         The Domain names GRID, FRACTION, AXIS, and PIXEL are reserved for use by
          the NDF library and an error will be reported if an attempt is made
          to assign one of these values to any Frame.
       }
@@ -52254,17 +52329,18 @@ other axes).  This means for instance that axes cannot be rotated (other
 than by multiples of 90\dgs), and cannot be used to describe celestial
 co-ordinates over a large field, or near a pole.  The WCS component
 overcomes these restrictions.  It contains descriptions of an arbitrary
-number of different \htmlref{co-ordinate Frames}{se:domains}, together with the mappings
-required to convert positions between these Frames.  All NDFs have three
-default Frames available; these are known as the GRID, PIXEL and AXIS
-Frames.  The PIXEL Frame corresponds to pixel co-ordinates.  The AXIS
-Frame corresponds to the co-ordinate Frame implied by the NDF AXIS 
-structures.  The GRID Frame is similar to the PIXEL Frame, the main
-difference being that it has a different origin; the centre of the first 
-(`bottom left') pixel is always $(1.0,1.0)$ in the GRID Frame regardless 
-of the pixel origin of the NDF.  Other Frames can be added to the WCS
-component in various ways, for instance, by importing them from
-appropriate FITS headers (\htmlref{FITSIN}{FITSIN},
+number of different \htmlref{co-ordinate Frames}{se:domains}, together 
+with the mappings required to convert positions between these Frames.  All 
+NDFs have four default Frames available; these are known as the GRID, 
+FRACTION, PIXEL, and AXIS Frames.  The PIXEL Frame corresponds to pixel 
+co-ordinates.  The AXIS Frame corresponds to the co-ordinate Frame implied 
+by the NDF AXIS structures.  The GRID Frame is similar to the PIXEL Frame,
+the main difference being that it has a different origin; the centre of the
+first (`bottom left') pixel is always $(1.0,1.0)$ in the GRID Frame regardless 
+of the pixel origin of the NDF.  The FRACTION Frame corresponds to normalised 
+PIXEL or GRID co-ordinates, scaled from zero to one. Other Frames can
+be added to the WCS component in various ways, for instance, by importing
+them from appropriate FITS headers (\htmlref{FITSIN}{FITSIN},
 \htmlref{FITSDIN}{FITSDIN}), or using an appropriate application to 
 create them from scratch (\emph{e.g.} \htmlref{WCSADD}{WCSADD},
 \htmlref{SETSKY}{SETSKY} or \GAIAref).  See \hyperref{Using World
@@ -54815,7 +54891,7 @@ The following applications have been modified:
          \item WCSATTRIB now reports an error if an attempt is made to
                change attribute values in any of the Frames which are
                managed internally by the NDF library (that is, Frames
-               with Domains PIXEL, AXIS and GRID).  The exception to this
+               with Domains PIXEL, AXIS, and GRID).  The exception to this
                is that the \htmlattref{Domain}{Domain}~ attribute itself may 
                be changed, thereby adding a new Frame to the WCS component.
       \end{itemize}
@@ -56471,7 +56547,10 @@ The following applications have been modified:
   and QUIET parameters that previously controlled messaging are no 
   longer used.  See
   \hyperref{Verbosity of Messages}{Section }{}{se:msglev} for details.
-  
+
+  \item Added support and documentation for the new FRACTION Frame supplied 
+  with every NDF.  Documented how NDF sections can now be defined by 
+  percentages along each dimension. 
 \end{itemize}
 
 \subsection{Modified Commands}

@@ -10,6 +10,10 @@
    and QUIET parameters that previously controlled messaging are no 
    longer used.  See Modified_applications for details.
 
+   o  Added support and documentation for the new FRACTION Frame
+   supplied with every NDF. Documented how NDF sections can now be
+   defined by percentages along each dimension.
+
 2 Modified_applications
 
    o  APERADD, BEAMFIT, CENTROID, CREFRAME, CURSOR, LISTSHOW,
