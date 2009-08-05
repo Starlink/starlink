@@ -153,14 +153,13 @@ int tkgwmItemCreate(Tcl_Interp* interp, Tk_Canvas canvas, Tk_Item* itemPtr,
 int tkgwmItemConfigure(Tcl_Interp* interp, Tk_Canvas canvas, Tk_Item* itemPtr,
    int argc, char** argv, int flags)
 {
-    GwmItem* gwmItemPtr = (GwmItem*)itemPtr;
-    Tk_Window tkwin;
     Atom atom;
-    const char *colour;
+    GwmItem* gwmItemPtr = (GwmItem*)itemPtr;
+    Tk_ConfigSpec *p;
+    Tk_Window tkwin;
     XColor col;
-#if 0
+    const char *colour;
     int i;
-#endif
 
 /*
    Parse argv and update the itemSpecs structure
@@ -169,6 +168,21 @@ int tkgwmItemConfigure(Tcl_Interp* interp, Tk_Canvas canvas, Tk_Item* itemPtr,
     if (Tk_ConfigureWidget(interp, tkwin, itemSpecs, argc, (const char **)argv,
             (char *) gwmItemPtr, flags) != TCL_OK) {
         return TCL_ERROR;
+    }
+
+    /* Set config flags (TK_CONFIG_OPTION_SPECIFIED not supported in Tk8.5) */
+    for ( p = itemSpecs; p->type != TK_CONFIG_END; p++ ) {
+
+        /*  Default is cleared. */
+        p->specFlags &= ~TK_CONFIG_OPTION_SPECIFIED;
+
+        for ( i = 0; i < argc; i +=2 ) {
+            if ( strcmp( argv[i], p->argvName ) == 0 ) {
+                /*  Option in list, so set. */
+                p->specFlags |= TK_CONFIG_OPTION_SPECIFIED;
+                break;
+            }
+        }
     }
 
 /*

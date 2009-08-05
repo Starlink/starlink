@@ -1126,7 +1126,7 @@ int StarRtdImage::configureImage(int argc, char* argv[], int flags)
     // the option is specified. We use the OFFSET macro defined above
     // as an efficient way to compare options)
     for ( Tk_ConfigSpec* p=configSpecs_; p->type != TK_CONFIG_END; p++ ) {
-        if ( p->specFlags & TK_CONFIG_OPTION_SPECIFIED ) {
+        if ( optionModified( argc, argv, p->argvName ) ) {
             switch(p->offset) {
 
             case RTD_OPTION(usexshm):

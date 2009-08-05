@@ -4,6 +4,7 @@
  *	This module implements "Gwm" widgets.  (See SUN/130)
  *
  * Copyright (c) 1994  Daresbury & Rutherford Appleton Laboratories
+ * Copyright (c) 2009  Science and Technology Facilities Council
  * All rights reserved.
  *
  */
@@ -687,17 +688,33 @@ GwmConfigure(interp, gwmPtr, argc, argv, flags)
     int flags;				/* Flags to pass to
 					 * Tk_ConfigureWidget. */
 {
-    XColor color;
     Atom atom;
-    int i;
+    Tk_ConfigSpec *p;
+    XColor color;
     XEvent event;
-    int status;
     const char *colname;
+    int i;
+    int status;
 
     if (Tk_ConfigureWidget(interp, gwmPtr->tkwin, configSpecs,
                            argc, (const char **)argv, 
                            (char *) gwmPtr, flags) != TCL_OK) {
 	return TCL_ERROR;
+    }
+
+    /* Set config flags (TK_CONFIG_OPTION_SPECIFIED not supported in Tk8.5) */
+    for ( p = configSpecs; p->type != TK_CONFIG_END; p++ ) {
+
+        /*  Default is cleared. */
+        p->specFlags &= ~TK_CONFIG_OPTION_SPECIFIED;
+
+        for ( i = 0; i < argc; i +=2 ) {
+            if ( strcmp( argv[i], p->argvName ) == 0 ) {
+                /*  Option in list, so set. */
+                p->specFlags |= TK_CONFIG_OPTION_SPECIFIED;
+                break;
+            }
+        }
     }
 
     if (Tk_WindowId(gwmPtr->tkwin)) {

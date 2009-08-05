@@ -6,7 +6,8 @@
   *
   * Copyright (c) 1991-1994 The Regents of the University of California.
   * Copyright (c) 1994-1995 Sun Microsystems, Inc.
-  * Copyright (c) 1996-2001 Central Laboratory of the Research Councils (U.K.).
+  * Copyright (c) 1996-2001 Central Laboratory of the Research Councils.
+  * Copyright (c) 2009 Science and Technology Facilities Council.
   *
   * See the Tcl distribution file "license.terms" for information on usage and
   * redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES.
@@ -47,6 +48,7 @@
 #include <math.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define UCHAR(c) ((unsigned char) (c))
 
@@ -98,53 +100,53 @@ typedef struct BoxEllItem  {
  */
 
 static Tk_CustomOption tagsOption = {
-    Tk_CanvasTagsParseProc, Tk_CanvasTagsPrintProc, (ClientData) NULL
+     Tk_CanvasTagsParseProc, Tk_CanvasTagsPrintProc, (ClientData) NULL
 };
 
 static Tk_ConfigSpec configSpecs[] = {
-    
+
     {TK_CONFIG_COLOR, "-fill", (char *) NULL, (char *) NULL,
      (char *) NULL, Tk_Offset(BoxEllItem, fillColor), TK_CONFIG_NULL_OK},
-    
+
     {TK_CONFIG_COLOR, "-outline", (char *) NULL, (char *) NULL,
      "black", Tk_Offset(BoxEllItem, outlineColor), TK_CONFIG_NULL_OK},
-    
+
     {TK_CONFIG_BITMAP, "-stipple", (char *) NULL, (char *) NULL,
      (char *) NULL, Tk_Offset(BoxEllItem, fillStipple), TK_CONFIG_NULL_OK},
-    
+
     {TK_CONFIG_CUSTOM, "-tags", (char *) NULL, (char *) NULL,
      (char *) NULL, 0, TK_CONFIG_NULL_OK, &tagsOption},
-    
+
     {TK_CONFIG_PIXELS, "-width", (char *) NULL, (char *) NULL,
      "1", Tk_Offset(BoxEllItem, width), TK_CONFIG_DONT_SET_DEFAULT},
-    
+
     {TK_CONFIG_DOUBLE, "-angle", (char *) NULL, (char *) NULL,
      "1", Tk_Offset(BoxEllItem, angle), TK_CONFIG_DONT_SET_DEFAULT},
-    
+
     {TK_CONFIG_DOUBLE, "-semimajor", (char *) NULL, (char *) NULL,
      "1", Tk_Offset(BoxEllItem, semiMajor), TK_CONFIG_DONT_SET_DEFAULT},
-    
+
     {TK_CONFIG_DOUBLE, "-semiminor", (char *) NULL, (char *) NULL,
      "1", Tk_Offset(BoxEllItem, semiMinor), TK_CONFIG_DONT_SET_DEFAULT},
-    
+
     {TK_CONFIG_DOUBLE, "-semimajorx", (char *) NULL, (char *) NULL,
      "1", Tk_Offset(BoxEllItem, semiMajorX), TK_CONFIG_DONT_SET_DEFAULT},
-    
+
     {TK_CONFIG_DOUBLE, "-semiminorx", (char *) NULL, (char *) NULL,
      "1", Tk_Offset(BoxEllItem, semiMinorX), TK_CONFIG_DONT_SET_DEFAULT},
-    
+
     {TK_CONFIG_DOUBLE, "-semimajory", (char *) NULL, (char *) NULL,
      "1", Tk_Offset(BoxEllItem, semiMajorY), TK_CONFIG_DONT_SET_DEFAULT},
-    
+
     {TK_CONFIG_DOUBLE, "-semiminory", (char *) NULL, (char *) NULL,
      "1", Tk_Offset(BoxEllItem, semiMinorY), TK_CONFIG_DONT_SET_DEFAULT},
-    
+
     {TK_CONFIG_DOUBLE, "-xcenter", (char *) NULL, (char *) NULL,
      "1", Tk_Offset(BoxEllItem, centerX), TK_CONFIG_DONT_SET_DEFAULT},
-    
+
     {TK_CONFIG_DOUBLE, "-ycenter", (char *) NULL, (char *) NULL,
      "1", Tk_Offset(BoxEllItem, centerY), TK_CONFIG_DONT_SET_DEFAULT},
-    
+
     {TK_CONFIG_END, (char *) NULL, (char *) NULL, (char *) NULL,
      (char *) NULL, 0, 0}
 };
@@ -156,7 +158,7 @@ static Tk_ConfigSpec configSpecs[] = {
 static void   ComputeBoxEllBbox _ANSI_ARGS_((Tk_Canvas canvas,
                                              BoxEllItem *boxellPtr));
 static int    ConfigureBoxEll _ANSI_ARGS_((Tcl_Interp *interp,
-                                           Tk_Canvas canvas, Tk_Item *itemPtr, 
+                                           Tk_Canvas canvas, Tk_Item *itemPtr,
                                            int argc, char **argv, int flags));
 static int    CreateBoxEll _ANSI_ARGS_((Tcl_Interp *interp,
                                         Tk_Canvas canvas, struct Tk_Item *itemPtr,
@@ -319,7 +321,7 @@ CreateBoxEll(interp, canvas, itemPtr, argc, argv)
     BoxEllItem *boxellPtr = (BoxEllItem *) itemPtr;
     int i;
     int npoint;
-    
+
     if (argc < 2 ) {
         Tcl_AppendResult(interp, "wrong # args:  should be \"",
                          Tk_PathName(Tk_CanvasTkwin(canvas)), "\" create ",
@@ -328,19 +330,19 @@ CreateBoxEll(interp, canvas, itemPtr, argc, argv)
                          (char *) NULL);
         return TCL_ERROR;
     }
-    
+
     /*
      * Carry out initialization that is needed in order to clean
      * up after errors during the the remainder of this procedure.
      */
-    
+
     boxellPtr->width = 1;
     boxellPtr->outlineColor = NULL;
     boxellPtr->fillColor = NULL;
     boxellPtr->fillStipple = None;
     boxellPtr->outlineGC = None;
     boxellPtr->fillGC = None;
-    
+
     boxellPtr->centerX = boxellPtr->coords[0] = 10.0;
     boxellPtr->centerY = boxellPtr->coords[1] = 10.0;
     boxellPtr->semiMajorX = boxellPtr->coords[2] = 10.0;
@@ -351,8 +353,8 @@ CreateBoxEll(interp, canvas, itemPtr, argc, argv)
     boxellPtr->semiMinor = 10.0;
     boxellPtr->angle = 0;
     boxellPtr->newCoords = 0;
-    
-    
+
+
     /*
      * Count the number of points supplied. Leading arguments are
      * assumed to be points if they start with a digit or a minus sign
@@ -372,11 +374,11 @@ CreateBoxEll(interp, canvas, itemPtr, argc, argv)
             return TCL_ERROR;
         }
     }
-    
+
     /*  And configure using any remaining options */
     boxellPtr->newCoords = npoint;
     if (ConfigureBoxEll(interp, canvas, itemPtr, argc-npoint,
-                        argv+npoint, 0) != TCL_OK) { 
+                        argv+npoint, 0) != TCL_OK) {
         DeleteBoxEll(canvas, itemPtr, Tk_Display(Tk_CanvasTkwin(canvas)));
         return TCL_ERROR;
     }
@@ -415,11 +417,11 @@ BoxEllCoords(interp, canvas, itemPtr, argc, argv)
 {
     BoxEllItem *boxellPtr = (BoxEllItem *) itemPtr;
     int i;
-    
+
     char c0[TCL_DOUBLE_SPACE], c1[TCL_DOUBLE_SPACE];
     char c2[TCL_DOUBLE_SPACE], c3[TCL_DOUBLE_SPACE];
     char c4[TCL_DOUBLE_SPACE], c5[TCL_DOUBLE_SPACE];
-    
+
     if (argc == 0) {
         Tcl_PrintDouble(interp, boxellPtr->coords[0], c0);
         Tcl_PrintDouble(interp, boxellPtr->coords[1], c1);
@@ -477,22 +479,39 @@ ConfigureBoxEll(interp, canvas, itemPtr, argc, argv, flags)
     int flags;                    /* Flags to pass to Tk_ConfigureWidget. */
 {
     BoxEllItem *boxellPtr = (BoxEllItem *) itemPtr;
-    XGCValues gcValues;
     GC newGC;
-    unsigned long mask;
+    Tk_ConfigSpec *p;
     Tk_Window tkwin;
-    
+    XGCValues gcValues;
+    int i;
+    unsigned long mask;
+
     tkwin = Tk_CanvasTkwin(canvas);
     if (Tk_ConfigureWidget(interp, tkwin, configSpecs, argc, argv,
                            (char *) boxellPtr, flags) != TCL_OK) {
         return TCL_ERROR;
     }
-    
+
+    /* Set config flags (TK_CONFIG_OPTION_SPECIFIED not supported in Tk8.5) */
+    for ( p = configSpecs; p->type != TK_CONFIG_END; p++ ) {
+
+        /*  Default is cleared. */
+        p->specFlags &= ~TK_CONFIG_OPTION_SPECIFIED;
+
+        for ( i = 0; i < argc; i +=2 ) {
+            if ( strcmp( argv[i], p->argvName ) == 0 ) {
+                /*  Option in list, so set. */
+                p->specFlags |= TK_CONFIG_OPTION_SPECIFIED;
+                break;
+            }
+        }
+    }
+
     /*
      * A few of the options require additional processing, such as
      * graphics contexts.
      */
-    
+
     if (boxellPtr->width < 1) {
         boxellPtr->width = 1;
     }
@@ -509,7 +528,7 @@ ConfigureBoxEll(interp, canvas, itemPtr, argc, argv, flags)
         Tk_FreeGC(Tk_Display(tkwin), boxellPtr->outlineGC);
     }
     boxellPtr->outlineGC = newGC;
-    
+
     if (boxellPtr->fillColor == NULL) {
         newGC = None;
     } else {
@@ -527,7 +546,7 @@ ConfigureBoxEll(interp, canvas, itemPtr, argc, argv, flags)
         Tk_FreeGC(Tk_Display(tkwin), boxellPtr->fillGC);
     }
     boxellPtr->fillGC = newGC;
-    
+
     /*  Now deal with the ellipse geometry changes. */
     ComputeBoxEllGeom(canvas, boxellPtr);
     return TCL_OK;
@@ -560,7 +579,7 @@ DeleteBoxEll(canvas, itemPtr, display)
                                          * canvas. */
 {
     BoxEllItem *boxellPtr = (BoxEllItem *) itemPtr;
-    
+
     if (boxellPtr->outlineColor != NULL) {
         Tk_FreeColor(boxellPtr->outlineColor);
     }
@@ -612,35 +631,35 @@ ComputeBoxEllBbox(canvas, boxellPtr)
     double cosThetaX, sinThetaX;
     double cosThetaY, sinThetaY;
     int i;
-    
+
     /* The bounding box used is approximate and corresponds to a
      * rotation of the bounding box of an unrotated ellipse. Which is
      * correct for a rotbox, but slightly too much for an ellipse.
      */
-    
+
     cosTheta = cos( boxellPtr->angle * D2R );
     sinTheta = sin( boxellPtr->angle * D2R );
     cosThetaX = boxellPtr->semiMajor * cosTheta;
     sinThetaX = boxellPtr->semiMajor * sinTheta;
     cosThetaY = boxellPtr->semiMinor * cosTheta;
     sinThetaY = boxellPtr->semiMinor * sinTheta;
-    
+
     x[0] = cosThetaX - sinThetaY;
     y[0] = sinThetaX + cosThetaY;
-    
+
     x[1] = cosThetaX + sinThetaY;
     y[1] = sinThetaX - cosThetaY;
-    
+
     x[2] = -cosThetaX + sinThetaY;
     y[2] = -sinThetaX - cosThetaY;
-    
+
     x[3] = -cosThetaX - sinThetaY;
     y[3] = -sinThetaX + cosThetaY;
-    
+
     /*
      * Now pick out the bounding box.
      */
-    
+
     boxellPtr->bbox[0] = x[0];
     boxellPtr->bbox[1] = y[0];
     boxellPtr->bbox[2] = x[1];
@@ -659,13 +678,13 @@ ComputeBoxEllBbox(canvas, boxellPtr)
             boxellPtr->bbox[3] = y[i];
         }
     }
-    
+
     /* And add origin */
     boxellPtr->bbox[0] += boxellPtr->centerX;
     boxellPtr->bbox[1] += boxellPtr->centerY;
     boxellPtr->bbox[2] += boxellPtr->centerX;
     boxellPtr->bbox[3] += boxellPtr->centerY;
-    
+
     if (boxellPtr->outlineColor == NULL) {
         bloat = 0;
     } else {
@@ -731,20 +750,20 @@ DisplayBoxEll(canvas, itemPtr, display, drawable, x, y, width, height)
                               boxellPtr->semiMajor, boxellPtr->semiMinor,
                               boxellPtr->angle );
     } else {
-        
+
         /* Generate the points for the rotbox */
         nPoints = GenRotBox( pointPtr, (double)xc, (double)yc,
                              boxellPtr->semiMajor, boxellPtr->semiMinor,
                              boxellPtr->angle );
     }
-    
+
     /*
      * Display filled part first (if wanted), then outline.  If we're
      * stippling, then modify the stipple offset in the GC.  Be sure to
      * reset the offset when done, since the GC is supposed to be
      * read-only.
      */
-    
+
     if (boxellPtr->fillGC != None) {
         if (boxellPtr->fillStipple != None) {
             Tk_CanvasSetStippleOrigin(canvas, boxellPtr->fillGC);
@@ -799,33 +818,33 @@ EllipseToPoint(canvas, itemPtr, pointPtr)
     double cosTheta, sinTheta;
     int filled;
     double  x, y;
-    
+
     width = boxellPtr->width;
     filled = boxellPtr->fillGC != None;
     if (boxellPtr->outlineGC == None) {
         width = 0.0;
         filled = 1;
     }
-    
-    
+
+
     /*  This works by making use of the normal Tk Oval routines. The
      *  slight of hand is is to rotate our current coordinate system
      *  into a oval based one (all axes aligned) and then perform
      *  the test.
      */
-    
+
     cosTheta = cos( boxellPtr->angle * D2R );
     sinTheta = sin( boxellPtr->angle * D2R );
     x = pointPtr[0] - boxellPtr->centerX;
     y = pointPtr[1] - boxellPtr->centerY;
     newpoint[0] = x * cosTheta + y * sinTheta;
     newpoint[1] = -x * sinTheta + y * cosTheta;
-    
+
     newbbox[0] = -boxellPtr->semiMajor;
     newbbox[1] = -boxellPtr->semiMinor;
     newbbox[2] = boxellPtr->semiMajor;
     newbbox[3] = boxellPtr->semiMinor;
-    
+
     return TkOvalToPoint( newbbox, width, filled, newpoint);
 }
 
@@ -867,28 +886,28 @@ RotBoxToPoint(canvas, itemPtr, pointPtr)
     double newbbox[4];
     double cosTheta, sinTheta;
     double  x, y;
-    
+
     /*  Rotate our current coordinate system into a rectangular based
      *  one (all axes aligned) and then perform the test.
      */
-    
+
     cosTheta = cos( boxellPtr->angle * D2R );
     sinTheta = sin( boxellPtr->angle * D2R );
     x = pointPtr[0] - boxellPtr->centerX;
     y = pointPtr[1] - boxellPtr->centerY;
     newpoint[0] = x * cosTheta + y * sinTheta;
     newpoint[1] = -x * sinTheta + y * cosTheta;
-    
+
     newbbox[0] = -boxellPtr->semiMajor;
     newbbox[1] = -boxellPtr->semiMinor;
     newbbox[2] = boxellPtr->semiMajor;
     newbbox[3] = boxellPtr->semiMinor;
-    
+
     /*
      * Generate a new larger rectangle that includes the border
      * width, if there is one.
      */
-    
+
     x1 = newbbox[0];
     y1 = newbbox[1];
     x2 = newbbox[2];
@@ -900,14 +919,14 @@ RotBoxToPoint(canvas, itemPtr, pointPtr)
         x2 += inc;
         y2 += inc;
     }
-    
+
     /*
      * If the point is inside the rectangle, handle specially:
      * distance is 0 if rectangle is filled, otherwise compute
      * distance to nearest edge of rectangle and subtract width
      * of edge.
      */
-    
+
     if ((newpoint[0] >= x1) && (newpoint[0] < x2)
         && (newpoint[1] >= y1) && (newpoint[1] < y2)) {
         if ((boxellPtr->fillGC != None) || (boxellPtr->outlineGC == None)) {
@@ -932,11 +951,11 @@ RotBoxToPoint(canvas, itemPtr, pointPtr)
         }
         return xDiff;
     }
-    
+
     /*
      * Point is outside rectangle.
      */
-    
+
     if (newpoint[0] < x1) {
         xDiff = x1 - newpoint[0];
     } else if (newpoint[0] > x2)  {
@@ -944,7 +963,7 @@ RotBoxToPoint(canvas, itemPtr, pointPtr)
     } else {
         xDiff = 0;
     }
-    
+
     if (newpoint[1] < y1) {
         yDiff = y1 - newpoint[1];
     } else if (newpoint[1] > y2)  {
@@ -952,7 +971,7 @@ RotBoxToPoint(canvas, itemPtr, pointPtr)
     } else {
         yDiff = 0;
     }
-    
+
     return hypot(xDiff, yDiff);
 }
 
@@ -992,34 +1011,34 @@ EllipseToArea(canvas, itemPtr, areaPtr)
     double cosTheta, sinTheta;
     double x, y;
     int result;
-    
+
     /*  This works by making use of the normal Tk Oval routine. The
      *  slight of hand is is to rotate our current coordinate system
      *  into a oval based one (all axes aligned) and then perform the test.
      */
-    
+
     cosTheta = cos( -boxellPtr->angle * D2R );
     sinTheta = sin( -boxellPtr->angle * D2R );
-    
+
     x = areaPtr[0] - boxellPtr->centerX;
     y = areaPtr[1] - boxellPtr->centerY;
     newArea[0] = x * cosTheta + y * sinTheta;
     newArea[1] = -x * sinTheta + y * cosTheta;
-    
+
     x = areaPtr[2] - boxellPtr->centerX;
     y = areaPtr[3] - boxellPtr->centerY;
     newArea[0] = x * cosTheta + y * sinTheta;
     newArea[1] = -x * sinTheta + y * cosTheta;
-    
+
     newBbox[0] = - boxellPtr->semiMajor;
     newBbox[1] = - boxellPtr->semiMinor;
     newBbox[2] = boxellPtr->semiMajor;
     newBbox[3] = boxellPtr->semiMinor;
-    
+
     /*
      * Expand the ellipse to include the width of the outline, if any.
      */
-    
+
     halfWidth = boxellPtr->width/2.0;
     if (boxellPtr->outlineGC == None) {
         halfWidth = 0.0;
@@ -1028,22 +1047,22 @@ EllipseToArea(canvas, itemPtr, areaPtr)
     oval[1] = newBbox[1] - halfWidth;
     oval[2] = newBbox[2] + halfWidth;
     oval[3] = newBbox[3] + halfWidth;
-    
+
     result = TkOvalToArea(oval, newArea);
-    
-    
+
+
     /*
      * If the rectangle appears to overlap the oval and the oval
      * isn't filled, do one more check to see if perhaps all four
      * of the rectangle's corners are totally inside the oval's
      * unfilled center, in which case we should return "outside".
      */
-    
+
     if ((result == 0) && (boxellPtr->outlineGC != None)
         && (boxellPtr->fillGC == None)) {
         double centerX, centerY, width, height;
         double xDelta1, yDelta1, xDelta2, yDelta2;
-        
+
         centerX = boxellPtr->centerX;
         centerY = boxellPtr->centerY;
         width = (newBbox[2] - newBbox[0])/2.0 - halfWidth;
@@ -1102,34 +1121,34 @@ RotBoxToArea(canvas, itemPtr, areaPtr)
     double newArea[4];
     double cosTheta, sinTheta;
     double x, y;
-    
+
     /*  Rotate our current coordinate system into a rectangular based
      *  one (all axes aligned) and then perform the test.
      */
-    
+
     cosTheta = cos( -boxellPtr->angle * D2R );
     sinTheta = sin( -boxellPtr->angle * D2R );
-    
+
     x = areaPtr[0] - boxellPtr->centerX;
     y = areaPtr[1] - boxellPtr->centerY;
     newArea[0] = x * cosTheta + y * sinTheta;
     newArea[1] = -x * sinTheta + y * cosTheta;
-    
+
     x = areaPtr[2] - boxellPtr->centerX;
     y = areaPtr[3] - boxellPtr->centerY;
     newArea[0] = x * cosTheta + y * sinTheta;
     newArea[1] = -x * sinTheta + y * cosTheta;
-    
+
     newBbox[0] = - boxellPtr->semiMajor;
     newBbox[1] = - boxellPtr->semiMinor;
     newBbox[2] = boxellPtr->semiMajor;
     newBbox[3] = boxellPtr->semiMinor;
-    
+
     halfWidth = boxellPtr->width/2.0;
     if (boxellPtr->outlineGC == None) {
         halfWidth = 0.0;
     }
-    
+
     if ((newArea[2] <= (newBbox[0] - halfWidth))
         || (newArea[0] >= (newBbox[2] + halfWidth))
         || (newArea[3] <= (newBbox[1] - halfWidth))
@@ -1185,24 +1204,24 @@ ScaleBoxEll(canvas, itemPtr, originX, originY, scaleX, scaleY)
     double xmaj, ymaj;
     double xmin, ymin;
     BoxEllItem *boxellPtr = (BoxEllItem *) itemPtr;
-    
+
     /* Scale all coordinates and set their related values */
-    
+
     xc = originX + scaleX*(boxellPtr->centerX - originX);
     yc = originY + scaleY*(boxellPtr->centerY - originY);
     boxellPtr->coords[0] = xc;
     boxellPtr->coords[1] = yc;
-    
+
     xmaj = originX + scaleX*(boxellPtr->semiMajorX - originX);
     ymaj = originY + scaleY*(boxellPtr->semiMajorY - originY);
     boxellPtr->coords[2] = xmaj;
     boxellPtr->coords[3] = ymaj;
-    
+
     xmin = originX + scaleX*(boxellPtr->semiMinorX - originX);
     ymin = originY + scaleY*(boxellPtr->semiMinorY - originY);
     boxellPtr->coords[4] = xmin;
     boxellPtr->coords[5] = ymin;
-    
+
     boxellPtr->newCoords = 6;
     ComputeBoxEllGeom(canvas, boxellPtr);
 }
@@ -1233,7 +1252,7 @@ TranslateBoxEll(canvas, itemPtr, deltaX, deltaY)
                                            * moved. */
 {
     BoxEllItem *boxellPtr = (BoxEllItem *) itemPtr;
-    
+
     boxellPtr->coords[0] += deltaX;
     boxellPtr->coords[1] += deltaY;
     boxellPtr->coords[2] += deltaX;
@@ -1278,14 +1297,14 @@ EllipseToPostscript(interp, canvas, itemPtr, prepass)
     char pathCmd[500], string[100];
     BoxEllItem *boxellPtr = (BoxEllItem *) itemPtr;
     double centerY;
-    
+
     centerY = Tk_CanvasPsY(canvas, boxellPtr->centerY);
-    
+
     /*
      * Generate a string that creates a path for the ellipse.
      * May need to check absolute position.
      */
-    
+
     sprintf(pathCmd, "matrix currentmatrix\n"
             "   %.15g %.15g translate \n"
             "   %.15g rotate \n"
@@ -1296,11 +1315,11 @@ EllipseToPostscript(interp, canvas, itemPtr, prepass)
             boxellPtr->centerX, centerY,
             -boxellPtr->angle,
             boxellPtr->semiMajor, boxellPtr->semiMinor );
-    
+
     /*
      * First draw the filled area of the ellipse.
      */
-    
+
     if (boxellPtr->fillColor != NULL) {
         Tcl_AppendResult(interp, pathCmd, (char *) NULL);
         if (Tk_CanvasPsColor(interp, canvas, boxellPtr->fillColor)
@@ -1320,11 +1339,11 @@ EllipseToPostscript(interp, canvas, itemPtr, prepass)
             Tcl_AppendResult(interp, "fill\n", (char *) NULL);
         }
     }
-    
+
     /*
      * Now draw the outline, if there is one.
      */
-    
+
     if (boxellPtr->outlineColor != NULL) {
         Tcl_AppendResult(interp, pathCmd, (char *) NULL);
         sprintf(string, "%d setlinewidth", boxellPtr->width);
@@ -1394,11 +1413,11 @@ RotBoxToPostscript(interp, canvas, itemPtr, prepass)
         coords[j] = (double)points[i].y;
         j++;
     }
-    
+
     /*
      * Fill the area of the polygon.
      */
-    
+
     if (boxellPtr->fillColor != NULL) {
         Tk_CanvasPsPath(interp, canvas, coords, nPoints);
         if (Tk_CanvasPsColor(interp, canvas, boxellPtr->fillColor) != TCL_OK) {
@@ -1417,11 +1436,11 @@ RotBoxToPostscript(interp, canvas, itemPtr, prepass)
             Tcl_AppendResult(interp, "eofill\n", (char *) NULL);
         }
     }
-    
+
     /*
      * Now draw the outline, if there is one.
      */
-    
+
     if (boxellPtr->outlineColor != NULL) {
         Tk_CanvasPsPath(interp, canvas, coords, nPoints);
         sprintf(string, "%d setlinewidth\n", boxellPtr->width);
@@ -1463,7 +1482,7 @@ GenEllipse( XPoint *ellipse, double centerX, double centerY,
     double cosRpa, sinRpa;
     double cosTheta, sinTheta;
     double theta;
-    
+
 
     /* Step is the increment in angle about the centre of the ellipse.
      * theta is angle subtended from the locus to the centre of the
@@ -1491,8 +1510,8 @@ GenEllipse( XPoint *ellipse, double centerX, double centerY,
          * by angle radians and parametisation of x,y coordinates to
          * semiMajor, semiMinor, theta.
          */
-        ellipse[i].x = centerX + semiMajor * cosRpa * cosTheta - 
-                                 semiMinor * sinRpa * sinTheta; 
+        ellipse[i].x = centerX + semiMajor * cosRpa * cosTheta -
+                                 semiMinor * sinRpa * sinTheta;
         ellipse[i].y = centerY + semiMajor * sinRpa * cosTheta +
                                  semiMinor * cosRpa * sinTheta;
     }
@@ -1522,33 +1541,33 @@ GenRotBox( XPoint *rotbox, double centerX, double centerY,
 {
     double cosTheta, sinTheta;
     double x[4], y[4];
-    
+
     /* Generate useful constants */
     cosTheta = cos( angle * D2R );
     sinTheta = sin( angle * D2R );
-    
+
     /* Generate coordinates of centered, unrotated box */
     x[0] = x[3] = semiMajor;
     x[1] = x[2] = -semiMajor;
     y[0] = y[1] = semiMinor;
     y[2] = y[3] = -semiMinor;
-    
+
     /* Now Apply rotation and offset */
     rotbox[0].x = (short)( centerX + ( x[0]*cosTheta ) - ( y[0]*sinTheta ));
     rotbox[0].y = (short)( centerY + ( x[0]*sinTheta ) + ( y[0]*cosTheta ));
-    
+
     rotbox[1].x = (short)( centerX + ( x[1]*cosTheta ) - ( y[1]*sinTheta ));
     rotbox[1].y = (short)( centerY + ( x[1]*sinTheta ) + ( y[1]*cosTheta ));
-    
+
     rotbox[2].x = (short)( centerX + ( x[2]*cosTheta ) - ( y[2]*sinTheta ));
     rotbox[2].y = (short)( centerY + ( x[2]*sinTheta ) + ( y[2]*cosTheta ));
-    
+
     rotbox[3].x = (short)( centerX + ( x[3]*cosTheta ) - ( y[3]*sinTheta ));
     rotbox[3].y = (short)( centerY + ( x[3]*sinTheta ) + ( y[3]*cosTheta ));
-    
+
     rotbox[4].x = rotbox[0].x;
     rotbox[4].y = rotbox[0].y;
-    
+
     /*  Return number of points generated */
     return 5;
 }
@@ -1575,12 +1594,12 @@ ComputeBoxEllGeom (canvas, boxellPtr)
     Tk_Canvas canvas;
     BoxEllItem *boxellPtr;
 {
+    Tk_ConfigSpec *p;
     double cosTheta, sinTheta;
     double xdiff, ydiff;
-    int i;
     double x, y;
     double xc, yc;
-    
+
     /* If the coords are changed then update the necessary configuration
      * items to keep these in sync. Process config changes separately.
      * If we're processing coords then any configs are ignored.
@@ -1589,7 +1608,7 @@ ComputeBoxEllGeom (canvas, boxellPtr)
         xc = boxellPtr->centerX = boxellPtr->coords[0];
         yc = boxellPtr->centerY = boxellPtr->coords[1];
         if ( boxellPtr->newCoords == 2 ) {
-            
+
             /* No end points supplied, so create them from the existing
                information. */
             cosTheta = cos( boxellPtr->angle * D2R );
@@ -1598,7 +1617,7 @@ ComputeBoxEllGeom (canvas, boxellPtr)
             boxellPtr->coords[3] = boxellPtr->semiMajorY = yc + boxellPtr->semiMajor * sinTheta;
             boxellPtr->coords[4] = boxellPtr->semiMinorX = xc - boxellPtr->semiMinor * sinTheta;
             boxellPtr->coords[5] = boxellPtr->semiMinorY = yc + boxellPtr->semiMinor * cosTheta;
-            
+
         } else {
             /* Given end-points, so derive all other information about the
                object */
@@ -1606,24 +1625,24 @@ ComputeBoxEllGeom (canvas, boxellPtr)
             boxellPtr->semiMajorY = boxellPtr->coords[3];
             boxellPtr->semiMinorX = boxellPtr->coords[4];
             boxellPtr->semiMinorY = boxellPtr->coords[5];
-            
+
             xdiff = boxellPtr->semiMajorX - xc;
             ydiff = boxellPtr->semiMajorY - yc;
             boxellPtr->semiMajor = sqrt( xdiff * xdiff + ydiff * ydiff );
             boxellPtr->angle = atan2( ydiff, xdiff ) * R2D;
-            
+
             xdiff = xc - boxellPtr->semiMinorX;
             ydiff = boxellPtr->semiMinorY - yc;
             boxellPtr->semiMinor = sqrt( xdiff * xdiff + ydiff * ydiff );
         }
         boxellPtr->newCoords = 0;
-        
+
     } else {
-        
+
         /* Now compute the semiMajor axis. This can change by a process of
          * rotation or by setting the position of the end point. Process
          * these in order minor-major-angle */
-        
+
         if ( ( configSpecs[9].specFlags & TK_CONFIG_OPTION_SPECIFIED ) ||
              ( configSpecs[11].specFlags & TK_CONFIG_OPTION_SPECIFIED ) ) {
             /* Minor axis end point changed so recompute angle and axis length
@@ -1632,41 +1651,41 @@ ComputeBoxEllGeom (canvas, boxellPtr)
             yc = boxellPtr->centerY;
             x = boxellPtr->semiMinorX;
             y = boxellPtr->semiMinorY;
-            
+
             xdiff = xc -x;
             ydiff = y - yc;
             boxellPtr->semiMinor = sqrt( xdiff * xdiff + ydiff * ydiff );
             boxellPtr->angle = atan2( xdiff, ydiff ) *R2D;
-            
+
             cosTheta = cos( boxellPtr->angle * D2R );
             sinTheta = sin( boxellPtr->angle * D2R );
             boxellPtr->semiMajorX = xc + boxellPtr->semiMajor * cosTheta;
             boxellPtr->semiMajorY = yc + boxellPtr->semiMajor * sinTheta;
         }
-        
+
         if ( ( configSpecs[8].specFlags & TK_CONFIG_OPTION_SPECIFIED ) ||
              ( configSpecs[10].specFlags & TK_CONFIG_OPTION_SPECIFIED ) ) {
-            
+
             /* Major axis end point changed so recompute angle and axis length
              * and minor end point */
             xc = boxellPtr->centerX;
             yc = boxellPtr->centerY;
             x = boxellPtr->semiMajorX;
             y = boxellPtr->semiMajorY;
-            
+
             xdiff = x - xc;
             ydiff = y - yc;
             boxellPtr->semiMajor = sqrt( xdiff * xdiff + ydiff * ydiff );
             boxellPtr->angle = atan2( ydiff, xdiff ) *R2D;
-            
+
             cosTheta = cos( boxellPtr->angle * D2R );
             sinTheta = sin( boxellPtr->angle * D2R );
             boxellPtr->semiMinorX = xc - boxellPtr->semiMinor * sinTheta;
             boxellPtr->semiMinorY = yc + boxellPtr->semiMinor * cosTheta;
         }
-        
+
         if ( configSpecs[6].specFlags & TK_CONFIG_OPTION_SPECIFIED ) {
-            
+
             /* Major axis changed in length. Recompute the end points. */
             xc = boxellPtr->centerX;
             yc = boxellPtr->centerY;
@@ -1675,9 +1694,9 @@ ComputeBoxEllGeom (canvas, boxellPtr)
             boxellPtr->semiMajorX = xc + boxellPtr->semiMajor * cosTheta;
             boxellPtr->semiMajorY = yc + boxellPtr->semiMajor * sinTheta;
         }
-        
+
         if ( configSpecs[7].specFlags & TK_CONFIG_OPTION_SPECIFIED ) {
-            
+
             /* Minor axis changed in length. Recompute the end points. */
             xc = boxellPtr->centerX;
             yc = boxellPtr->centerY;
@@ -1686,9 +1705,9 @@ ComputeBoxEllGeom (canvas, boxellPtr)
             boxellPtr->semiMinorX = xc - boxellPtr->semiMinor * sinTheta;
             boxellPtr->semiMinorY = yc + boxellPtr->semiMinor * cosTheta;
         }
-        
+
         if ( configSpecs[5].specFlags & TK_CONFIG_OPTION_SPECIFIED ) {
-            
+
             /* Angle changed so recompute axes end points */
             xc = boxellPtr->centerX;
             yc = boxellPtr->centerY;
@@ -1699,7 +1718,7 @@ ComputeBoxEllGeom (canvas, boxellPtr)
             boxellPtr->semiMinorX = xc - boxellPtr->semiMinor * sinTheta;
             boxellPtr->semiMinorY = yc + boxellPtr->semiMinor * cosTheta;
         }
-        
+
         /* Set the coords to the current values */
         boxellPtr->coords[0] = boxellPtr->centerX;
         boxellPtr->coords[1] = boxellPtr->centerY;
@@ -1707,13 +1726,13 @@ ComputeBoxEllGeom (canvas, boxellPtr)
         boxellPtr->coords[3] = boxellPtr->semiMajorY;
         boxellPtr->coords[4] = boxellPtr->semiMinorX;
         boxellPtr->coords[5] = boxellPtr->semiMinorY;
-        
+
         /* Clear config flags */
-        for ( i = 0; i < 13; i++ ) {
-            configSpecs[i].specFlags = configSpecs[i].specFlags & ~TK_CONFIG_OPTION_SPECIFIED;
+        for ( p = configSpecs; p->type != TK_CONFIG_END; p++ ) {
+            p->specFlags &= ~TK_CONFIG_OPTION_SPECIFIED;
         }
     }
-    
-  /* And recompute the bounding box. */
+
+    /* And recompute the bounding box. */
     ComputeBoxEllBbox( canvas, boxellPtr);
 }
