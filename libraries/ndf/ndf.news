@@ -11,6 +11,11 @@ V1.9
    normalised pixel coordinates within the array - each pixel axis spans
    the range 0.0 to 1.0 in the FRACTION Frame.
 
+   - NDF sections specifiers can now use the "%" character to indicate
+   that a value is a percentage of the entire pixel axis. Thus 'm31(~50%,)'
+   will create a section covering the central 50 percent of the NDF on
+   the first pixel axis.
+
 V1.8
    - New routine NDF_HSDAT allows history records to be created with a
    given date and time.

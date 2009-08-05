@@ -1,5 +1,5 @@
       SUBROUTINE NDF1_PSNDF( STR, LBND, UBND, AXIS, IWCS, WCSSEC, 
-     :                       VALUE1, VALUE2, ISPIX1, ISPIX2, ISBND, 
+     :                       VALUE1, VALUE2, FRAME1, FRAME2, ISBND, 
      :                       ISDEF1, ISDEF2, STATUS )
 *+
 *  Name:
@@ -13,7 +13,7 @@
 
 *  Invocation:
 *     CALL NDF1_PSNDF( STR, LBND, UBND, AXIS, IWCS, WCSSEC, VALUE1, 
-*                      VALUE2, ISPIX1, ISPIX2, ISBND, ISDEF1, ISDEF2, 
+*                      VALUE2, FRAME1, FRAME2, ISBND, ISDEF1, ISDEF2, 
 *                      STATUS )
 
 *  Description:
@@ -62,12 +62,12 @@
 *        First value specifying the dimension bounds.
 *     VALUE2 = DOUBLE PRECISION (Returned)
 *        Second value specifying the dimension bounds.
-*     ISPIX1 = LOGICAL (Returned)
-*        Whether VALUE1 is a pixel index (as opposed to a WCS or axis 
-*        value).
-*     ISPIX2 = LOGICAL (Returned)
-*        Whether VALUE2 is a pixel index (as opposed to a WCS or axis 
-*        value).
+*     FRAME1 = INTEGER (Returned)
+*        0 ==> VALUE1 is to be interpreted as a WCS or axis coordinate 
+*        value, 1 ==> it is a pixel index, 2 ==> it is a FRACTION value.
+*     FRAME2 = INTEGER (Returned)
+*        0 ==> VALUE2 is to be interpreted as a WCS or axis coordinate 
+*        value, 1 ==> it is a pixel index, 2 ==> it is a FRACTION value.
 *     ISBND = LOGICAL (Returned)
 *        Whether VALUE1 and VALUE2 specify the lower and upper bounds
 *        directly (i.e. .TRUE. ==> a ':' separator was given or
@@ -125,6 +125,9 @@
 *        Add support for sections given in terms of WCS coords.
 *     6-JUN-2007 (DSB):
 *        Allow zero increments on a WCS axis.
+*     4-AUG-2009 (DSB):
+*        Logical ISPIX1/2 arguments changed to integer FRAME1/2, and
+*        support include for bounds specified as FRACTION values.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -152,8 +155,8 @@
 *  Arguments Returned:
       DOUBLE PRECISION VALUE1
       DOUBLE PRECISION VALUE2
-      LOGICAL ISPIX1
-      LOGICAL ISPIX2
+      INTEGER FRAME1
+      INTEGER FRAME2
       LOGICAL ISBND
       LOGICAL ISDEF1
       LOGICAL ISDEF2
@@ -182,8 +185,15 @@
       IF ( F .GT. L ) THEN
          VALUE1 = LBND
          VALUE2 = UBND
-         ISPIX1 = ( .NOT. WCSSEC )
-         ISPIX2 = ( .NOT. WCSSEC )
+
+         IF( WCSSEC ) THEN 
+            FRAME1 = 0
+            FRAME2 = 0
+         ELSE
+            FRAME1 = 1
+            FRAME2 = 1
+         END IF
+
          ISBND = .TRUE.
          ISDEF1 = .TRUE.
          ISDEF2 = .TRUE.
@@ -226,35 +236,47 @@
 *  value.
          IF ( ISEP .LE. F ) THEN
             VALUE1 = DEF1
-            ISPIX1 = ( .NOT. WCSSEC )
+
+            IF( WCSSEC ) THEN 
+               FRAME1 = 0
+            ELSE
+               FRAME1 = 1
+            END IF
+
             ISDEF1 = .TRUE.
 
 *  Otherwise, parse the string in front of the separator to obtain the
 *  first bound, supplying the appropriate default.
          ELSE
             CALL NDF1_PSNDB( STR( F : ISEP - 1 ), DEF1, AXIS, IWCS, 
-     :                       WCSSEC, VALUE1, ISPIX1, ISDEF1, STATUS )
+     :                       WCSSEC, VALUE1, FRAME1, ISDEF1, STATUS )
          END IF
 
 *  If there is no separator present, then the second value equals the
 *  first value.
          IF ( ISEP .GT. L ) THEN
             VALUE2 = VALUE1
-            ISPIX2 = ISPIX1
+            FRAME2 = FRAME1
             ISDEF2 = ISDEF1
 
 *  Otherwise, if the separator appears at the end of the string, then
 *  use the default second value.
          ELSE IF ( ISEP .EQ. L ) THEN
             VALUE2 = DEF2
-            ISPIX2 = ( .NOT. WCSSEC )
+
+            IF( WCSSEC ) THEN 
+               FRAME2 = 0
+            ELSE
+               FRAME2 = 1
+            END IF
+
             ISDEF2 = .TRUE.
 
 *  Otherwise, parse the string which follows the separator to determine
 *  the second value.
          ELSE
             CALL NDF1_PSNDB( STR( ISEP + 1 : L ), DEF2, AXIS, IWCS, 
-     :                       WCSSEC, VALUE2, ISPIX2, ISDEF2, STATUS )
+     :                       WCSSEC, VALUE2, FRAME2, ISDEF2, STATUS )
          END IF
       END IF
 
@@ -266,7 +288,7 @@
 
 *  If the extent is in pixels, then the nearest integer value must be 
 *  positive.
-            IF ( ISPIX2 .AND. NINT( VALUE2 ) .LE. 0 ) THEN
+            IF ( FRAME2 .EQ. 1 .AND. NINT( VALUE2 ) .LE. 0 ) THEN
                STATUS = NDF__BNDIN
                CALL ERR_REP( 'NDF1_PSNDF_PEXT',
      :                       'Invalid dimension extent specified; ' //
@@ -292,7 +314,7 @@
 
 *  If the extent is in axis units, then we can also allow a value of
 *  zero (which translates into an extent of one pixel).
-            ELSE IF ( ( .NOT. ISPIX2 ) .AND.
+            ELSE IF ( ( FRAME2 .EQ. 0 ) .AND.
      :                ( VALUE2 .LT. 0.0D0 ) ) THEN
                STATUS = NDF__BNDIN
                CALL ERR_REP( 'NDF1_PSNDF_AEXT',

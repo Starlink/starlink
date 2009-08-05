@@ -129,6 +129,8 @@
       DOUBLE PRECISION XL( NDF__MXDIM ) ! GRID coords at min WCS axis value
       DOUBLE PRECISION XU( NDF__MXDIM ) ! GRID coords at max WCS axis value
       INTEGER F                  ! First non-blank character position
+      INTEGER FRAME1( NDF__MXDIM )! Frame used by VALUE1 
+      INTEGER FRAME2( NDF__MXDIM )! Frame used by VALUE2
       INTEGER I                  ! Loop counter for dimensions
       INTEGER IDCB               ! Index to data object entry in the DCB
       INTEGER IWCS               ! AST pointer to WCS FrameSet
@@ -142,10 +144,8 @@
       INTEGER UBNDD( NDF__MXDIM )! NDF upper pixel bounds
       INTEGER WCSMAP             ! AST pointer to WCS Mapping
       LOGICAL ISBND( NDF__MXDIM )! Are VALUEs explicit bounds?
-      LOGICAL ISDEF1( NDF__MXDIM ) ! Is VALUE1 a defalut value?
-      LOGICAL ISDEF2( NDF__MXDIM ) ! Is VALUE2 a defalut value?
-      LOGICAL ISPIX1( NDF__MXDIM ) ! Is VALUE1 a pixel index?
-      LOGICAL ISPIX2( NDF__MXDIM ) ! Is VALUE2 a pixel index?
+      LOGICAL ISDEF1( NDF__MXDIM )! Is VALUE1 a defalut value?
+      LOGICAL ISDEF2( NDF__MXDIM )! Is VALUE2 a defalut value?
       LOGICAL WCSSEC             ! Use WCS section syntax?
       LOGICAL USEWCS             ! Use WCS instead of AXIS?
 *.
@@ -176,7 +176,7 @@
      :                 'the NDF ^NDF -- enclosing parenthesis ' //
      :                 'missing.', STATUS )
 
-*  Otherwise, decide if the section is given in terms of pixe/axis
+*  Otherwise, decide if the section is given in terms of pixel/axis
 *  coordinates or WCS coordinates.
       ELSE
 
@@ -248,13 +248,13 @@
      :           WCSSEC .AND. STR( F : L ) .EQ. '*)' ) THEN
                CALL NDF1_PSNDE( ' ', NAX, DFLBND, DFUBND, IWCS,
      :                          WCSSEC, VALUE1, VALUE2, NDIM,
-     :                          ISPIX1, ISPIX2, ISBND, ISDEF1, ISDEF2,
+     :                          FRAME1, FRAME2, ISBND, ISDEF1, ISDEF2,
      :                          STATUS )
             ELSE
                CALL NDF1_PSNDE( STR( F + 1 : L - 1 ),
      :                          NAX, DFLBND, DFUBND, IWCS,
      :                          WCSSEC, VALUE1, VALUE2, NDIM,
-     :                          ISPIX1, ISPIX2, ISBND, ISDEF1, ISDEF2,
+     :                          FRAME1, FRAME2, ISBND, ISDEF1, ISDEF2,
      :                          STATUS )
             END IF
 
@@ -269,6 +269,10 @@
 *  dimension in pixels.
             ELSE
 
+*  Convert any FRACTION values into corresponding pixel indices.
+               CALL NDF1_FR2PX( NDIM, NDIMD, LBNDD, UBNDD, VALUE1, 
+     :                          VALUE2, FRAME1, FRAME2, STATUS )
+
 *  If we are using WCS syntax, we do all axes together,
                IF( WCSSEC ) THEN
                   CALL NDF1_WCLIM( IWCS, NDIM, NDIMD, LBNDD, UBNDD,
@@ -281,8 +285,8 @@
 
                   DO 1 I = 1, NDIM
                      CALL NDF1_AXLIM( I, IACB1, VALUE1( I ), 
-     :                                VALUE2( I ), ISPIX1( I ), 
-     :                                ISPIX2( I ), ISBND( I ), 
+     :                                VALUE2( I ), FRAME1( I ), 
+     :                                FRAME2( I ), ISBND( I ), 
      :                                LBND( I ), UBND( I ), STATUS )
 
 *  If an error occurs, then report context information and quit.
@@ -303,7 +307,7 @@
 *  interpretde as WCS values...
                ELSE
                   CALL NDF1_WPLIM( IWCS, NDIM, LBNDD, UBNDD, VALUE1, 
-     :                             VALUE2, ISPIX1, ISPIX2, ISBND, 
+     :                             VALUE2, FRAME1, FRAME2, ISBND, 
      :                             ISDEF1, ISDEF2, LBND, UBND, STATUS )
                END IF
 

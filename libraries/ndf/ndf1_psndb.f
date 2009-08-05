@@ -1,4 +1,4 @@
-      SUBROUTINE NDF1_PSNDB( STR, DEF, AXIS, IWCS, WCSSEC, VALUE, ISPIX, 
+      SUBROUTINE NDF1_PSNDB( STR, DEF, AXIS, IWCS, WCSSEC, VALUE, FRAME, 
      :                       ISDEF, STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL NDF1_PSNDB( STR, DEF, AXIS, IWCS, WCSSEC, VALUE, ISPIX, 
+*     CALL NDF1_PSNDB( STR, DEF, AXIS, IWCS, WCSSEC, VALUE, FRAME, 
 *                      ISDEF, STATUS )
 
 *  Description:
@@ -44,12 +44,9 @@
 *        pixel indices (integers), or WCS values (non-integers). 
 *     VALUE = DOUBLE PRECISION (Returned)
 *        Dimension bound value.
-*     ISPIX = LOGICAL (Returned)
-*        Whether the value returned is to be interpreted as a
-*        pixel-index or an axis coordinate value; .TRUE. ==> pixel
-*        index, .FALSE. ==> axis value. (The value is returned .TRUE.
-*        if an integer format number is found and .TRUE. if floating
-*        point. A value of .TRUE. is returned if the string is blank.)
+*     FRAME = LOGICAL (Returned)
+*        0 ==> VALUE is to be interpreted as a WCS or axis coordinate 
+*        value, 1 ==> it is a pixel index, 2 ==> it is a FRACTION value.
 *     ISDEF = LOGICAL (Returned)
 *        .TRUE. ==> the VALUE value is a default value and was not 
 *        specified in the supplied string. .FALSE. ==> VALUE was 
@@ -88,6 +85,9 @@
 *        Original version.
 *     21-MAY-2007 (DSB):
 *        Add support for sections given in terms of WCS coords.
+*     4-AUG-2009 (DSB):
+*        Logical ISPIX arguments changed to integer FRAME, and
+*        support include for bounds specified as FRACTION values.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -113,7 +113,7 @@
 
 *  Arguments Returned:
       DOUBLE PRECISION VALUE
-      LOGICAL ISPIX
+      INTEGER FRAME
       LOGICAL ISDEF
 
 *  Status:
@@ -137,36 +137,60 @@
       ISDEF = ( F .GT. L )
       IF ( ISDEF ) THEN
          VALUE = DEF
-         ISPIX = ( .NOT. WCSSEC )
+
+         IF( WCSSEC ) THEN
+            FRAME = 0
+         ELSE
+            FRAME = 1
+         END IF
 
       ELSE
 
 *  If we are using the old pixel/axis syntax, see if the supplied value is 
 *  an integer, in which case it is assumed to be a pixel index.
-         ISPIX = .FALSE.
+         FRAME = 0
          IF( .NOT. WCSSEC ) THEN
 
-*  First see if it is numerical. STATUS will be set but no error will be
-*  reported if not.
-            CALL CHR_CTOD( STR( F : L ), VALUE, STATUS )
+*  If the last character is a percent sign, the value is a FRACTION.
+*  Remove the %, convert the remaining percentage value to a fraction and
+*  flag the value as a FRACTION value.
+            IF( STR( L : L ) .EQ. '%' ) THEN
+               FRAME = 2
+               CALL CHR_CTOD( STR( F : L - 1 ), VALUE, STATUS )
+               IF( STATUS .NE. SAI__OK ) THEN
+                  STATUS = NDF__BNDIN
+                  CALL MSG_SETC( 'BADBOUND', STR( F : L ) )
+                  CALL ERR_REP( 'NDF1_PSNDB_SYN', 'Invalid FRACTION ' //
+     :                          'bound ''^BADBOUND'' specified; bad '//
+     :                          'syntax.', STATUS )
+               ELSE
+                  VALUE = 0.01D0*VALUE
+               END IF
+
+*  Otherwise, first see if it is numerical. STATUS will be set but no error 
+*  will be reported if not.
+            ELSE 
+               CALL CHR_CTOD( STR( F : L ), VALUE, STATUS )
 
 *  If it is not numerical, clear the status value.
-            IF( STATUS .NE. SAI__OK ) THEN
-               STATUS = SAI__OK
+               IF( STATUS .NE. SAI__OK ) THEN
+                  STATUS = SAI__OK
 
 *  If it is numerical, see if it is integer.
-            ELSE IF( ( INDEX( STR( F : L ), '.' ) .EQ. 0 ) .AND.
-     :               ( INDEX( STR( F : L ), 'E' ) .EQ. 0 ) .AND.
-     :               ( INDEX( STR( F : L ), 'e' ) .EQ. 0 ) .AND.
-     :               ( INDEX( STR( F : L ), 'D' ) .EQ. 0 ) .AND.
-     :               ( INDEX( STR( F : L ), 'd' ) .EQ. 0 ) ) THEN
-               ISPIX = .TRUE.
+               ELSE IF( ( INDEX( STR( F : L ), '.' ) .EQ. 0 ) .AND.
+     :                  ( INDEX( STR( F : L ), 'E' ) .EQ. 0 ) .AND.
+     :                  ( INDEX( STR( F : L ), 'e' ) .EQ. 0 ) .AND.
+     :                  ( INDEX( STR( F : L ), 'D' ) .EQ. 0 ) .AND.
+     :                  ( INDEX( STR( F : L ), 'd' ) .EQ. 0 ) ) THEN
+                  FRAME = 1
+               END IF
             END IF
          END IF
 
-*  If the value is not a pixel index, we interpret the string using the
-*  AST_UNFORMAT method of the supplied FrameSet.
-         IF( .NOT. ISPIX ) THEN
+*  If the value is not a pixel index, and is not a FRACTION value, we 
+*  interpret the string using the AST_UNFORMAT method of the supplied 
+*  FrameSet.
+         IF( FRAME .EQ. 0 ) THEN
 
 *  Now read the value from the formatted text.
             NCUSED = AST_UNFORMAT( IWCS, AXIS, STR, VALUE, STATUS )

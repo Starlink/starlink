@@ -1,5 +1,5 @@
       SUBROUTINE NDF1_PSNDE( STR, NAX, LBND, UBND, IWCS, WCSSEC, VALUE1, 
-     :                       VALUE2, NVAL, ISPIX1, ISPIX2, ISBND, 
+     :                       VALUE2, NVAL, FRAME1, FRAME2, ISBND, 
      :                       ISDEF1, ISDEF2, STATUS )
 *+
 *  Name:
@@ -13,7 +13,7 @@
 
 *  Invocation:
 *     CALL NDF1_PSNDE( STR, NAX, LBND, UBND, IWCS, WCSSEC, VALUE1, 
-*                      VALUE2, NVAL, ISPIX1, ISPIX2, ISBND, ISDEF1, 
+*                      VALUE2, NVAL, FRAME1, FRAME2, ISBND, ISDEF1, 
 *                      ISDEF2, STATUS )
 
 *  Description:
@@ -58,14 +58,14 @@
 *     NVAL = INTEGER (Returned)
 *        Number of axes for which values are returned (cannot exceed 
 *        NDF__MXDIM).
-*     ISPIX1( NDF__MXDIM ) = LOGICAL (Returned)
-*        .FALSE. ==> the corresponding VALUE1 value is to be
-*        interpreted as a WCS or axis coordinate value, .TRUE. ==> it 
-*        is a pixel index.
-*     ISPIX2( NDF__MXDIM ) = LOGICAL (Returned)
-*        .FALSE. ==> the corresponding VALUE2 value is to be
-*        interpreted as a WCS or axis coordinate value, .TRUE. ==> it 
-*        is a pixel index.
+*     FRAME1( NDF__MXDIM ) = INTEGER (Returned)
+*        0 ==> the corresponding VALUE1 value is to be interpreted as a 
+*        WCS or axis coordinate value, 1 ==> it is a pixel index, 2 ==> it
+*        is a FRACTION value.
+*     FRAME2( NDF__MXDIM ) = LOGICAL (Returned)
+*        0 ==> the corresponding VALUE2 value is to be interpreted as a 
+*        WCS or axis coordinate value, 1 ==> it is a pixel index, 2 ==> it
+*        is a FRACTION value.
 *     ISBND( NDF__MXDIM ) = LOGICAL (Returned)
 *        .TRUE. ==> the corresponding VALUE1 and VALUE2 values specify
 *        the lower and upper bounds of the section directly, .FALSE.
@@ -120,6 +120,9 @@
 *        Original version.
 *     21-MAY-2007 (DSB):
 *        Add support for sections given in terms of WCS coords.
+*     4-AUG-2009 (DSB):
+*        Logical ISPX1/2 arguments changed to integer FRAME1/2, and
+*        support include for bounds specified as FRACTION values.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -149,8 +152,8 @@
       DOUBLE PRECISION VALUE1( NDF__MXDIM )
       DOUBLE PRECISION VALUE2( NDF__MXDIM )
       INTEGER NVAL
-      LOGICAL ISPIX1( NDF__MXDIM )
-      LOGICAL ISPIX2( NDF__MXDIM )
+      INTEGER FRAME1( NDF__MXDIM )
+      INTEGER FRAME2( NDF__MXDIM )
       LOGICAL ISBND( NDF__MXDIM )
       LOGICAL ISDEF1( NDF__MXDIM )
       LOGICAL ISDEF2( NDF__MXDIM )
@@ -241,8 +244,15 @@
             IF ( I1 .GT. I2 ) THEN
                VALUE1( NVAL ) = LBND0
                VALUE2( NVAL ) = UBND0
-               ISPIX1( NVAL ) = ( .NOT. WCSSEC )
-               ISPIX2( NVAL ) = ( .NOT. WCSSEC )
+
+               IF( WCSSEC ) THEN 
+                  FRAME1( NVAL ) = 0
+                  FRAME2( NVAL ) = 0
+               ELSE
+                  FRAME1( NVAL ) = 1
+                  FRAME2( NVAL ) = 1
+               END IF
+
                ISBND( NVAL ) = .TRUE.
                ISDEF1( NVAL ) = .TRUE.
                ISDEF2( NVAL ) = .TRUE.
@@ -256,8 +266,15 @@
                IF ( F .GT. L ) THEN
                   VALUE1( NVAL ) = LBND0
                   VALUE2( NVAL ) = UBND0
-                  ISPIX1( NVAL ) = ( .NOT. WCSSEC )
-                  ISPIX2( NVAL ) = ( .NOT. WCSSEC )
+
+                  IF( WCSSEC ) THEN 
+                     FRAME1( NVAL ) = 0
+                     FRAME2( NVAL ) = 0
+                  ELSE
+                     FRAME1( NVAL ) = 1
+                     FRAME2( NVAL ) = 1
+                  END IF
+
                   ISBND( NVAL ) = .TRUE.
                   ISDEF1( NVAL ) = .TRUE.
                   ISDEF2( NVAL ) = .TRUE.
@@ -269,8 +286,8 @@
                   L = L + I1 - 1
                   CALL NDF1_PSNDF( STR( F : L ), LBND0, UBND0, NVAL, 
      :                             IWCS, WCSSEC, VALUE1( NVAL ), 
-     :                             VALUE2( NVAL ), ISPIX1( NVAL ), 
-     :                             ISPIX2( NVAL ), ISBND( NVAL ), 
+     :                             VALUE2( NVAL ), FRAME1( NVAL ), 
+     :                             FRAME2( NVAL ), ISBND( NVAL ), 
      :                             ISDEF1( NVAL ), ISDEF2( NVAL ), 
      :                             STATUS )
 
