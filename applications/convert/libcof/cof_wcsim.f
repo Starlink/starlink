@@ -20,8 +20,8 @@
 *     the base Frames of the two FrameSets with a UnitMap (on the
 *     assumption that they are equivalent). The modified FrameSet is
 *     then stored back in the NDF (the NDF library will automatically
-*     remove any PIXEL, GRID and AXIS Frames from the FrameSet as these
-*     are generated afresh each time NDF_GTWCS is called).
+*     remove any PIXEL, FRACTION, GRID and AXIS Frames from the FrameSet 
+*     as these are generated afresh each time NDF_GTWCS is called).
 *
 *     The supplied FitsChan may contain more than one description (or
 *     "encoding") of the FrameSet to be added to the NDF, each 
@@ -329,7 +329,7 @@
          TMPF = AST_FRAME( NDIM, ' ', STATUS )
 
 *  Get the current NDF FrameSet. This will contain Frames generated
-*  automatically for the GRID, AXIS and PIXEL domains.
+*  automatically for the GRID, FRACTION, AXIS and PIXEL domains.
          CALL NDF_GTWCS( INDF, IWCS, STATUS )
 
 *  Remove the AXIS Frame from the FrameSet. This is done to ensure that the
@@ -422,7 +422,7 @@
          END IF
 
 *  Save the modified FrameSet in the NDF. Any duplicate copies of the AXIS,
-*  PIXEL and GRID Frames are removed by the NDF library.
+*  FRACTION, PIXEL and GRID Frames are removed by the NDF library.
          CALL NDF_PTWCS( IWCS, INDF, STATUS )
          CALL AST_ANNUL( IWCS, STATUS )
 
