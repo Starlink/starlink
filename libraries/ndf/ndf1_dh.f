@@ -65,6 +65,8 @@
 *     5-AUG-2009 (TIMJ):
 *        Remove the CNF_PVAL code and simplify by reading the UPDATE_MODE
 *        and VARIANTS into local buffers rather than mapping them.
+*        Strip leading space from history update mode on read. At some
+*        point two leading spaces were being added.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -519,6 +521,7 @@
 
 *  Read the UPDATE_MODE component and determine its length.
                      CALL DAT_GET0C( LOC, BUFFER, STATUS )
+                     CALL CHR_RMBLK( BUFFER )
                      IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Check it against each recognised value in turn, setting the

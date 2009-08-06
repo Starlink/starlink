@@ -28,7 +28,7 @@
 *     - An error is reported if the NDF has no HISTORY component.
 
 *  Copyright:
-*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2008, 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -49,11 +49,15 @@
 
 *  Authors:
 *     DSB: David S Berry (JAC, UCLan)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     4-JUL-2008 (DSB):
 *        Original version.
+*     5-AUG-2009 (TIMJ):
+*        Strip leading spaces from UPDATE_MODE. At some point two
+*        spaces were being inserted.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -126,6 +130,7 @@
                IF( THERE ) THEN
                   CALL CMP_GET0C( DCB_HLOC( IDCB ), 'UPDATE_MODE', 
      :                            HMODE, STATUS )
+                  CALL CHR_RMBLK( HMODE )
                ELSE
                   HMODE = 'NORMAL'
                END IF
