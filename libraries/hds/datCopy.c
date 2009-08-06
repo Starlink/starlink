@@ -96,6 +96,10 @@ datCopy(const HDSLoc * locator1,
 *     15-NOV-2005 (TIMJ):
 *        Use dat1_import_loc
 *        Use HDSLoc in API
+*     7-AUG-2009 (TIMJ):
+*        Do not flush the output FCB unless status is good. If this is
+*        not done there is a segv when HDS_MAP is set to 0 and datCopy
+*        attempts to enable mapping.
 *     {enter_further_changes_here}
 *
 *  Bugs:
@@ -210,7 +214,7 @@ error).",
    hds_gl_map = ( HDS__MAPSEQ && HDS__CANMAP );
 
 /* Flush the output FCB                                                    */
-      if( save_map != hds_gl_map )
+      if( _ok(hds_gl_status) && save_map != hds_gl_map )
          fflush( rec_ga_fcv[data2->han.slot].write );
 
 /* Locate the Structure Record Vector entry which contains the ID of the    */
@@ -333,7 +337,7 @@ the output structure (possible programming error).",
 
 /* Restore the value of the global mapping flag - after ensuring that the   */
 /* output FCB is flushed if mapping has ben altered.                        */
-   if( save_map != hds_gl_map )
+   if( _ok(hds_gl_status) && save_map != hds_gl_map )
       fflush( rec_ga_fcv[data2->han.slot].write );
    hds_gl_map = save_map;
 
