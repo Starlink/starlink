@@ -55,6 +55,8 @@
 %        Significant updates in time for Nanahope Starlink release
 %     2009-07-24 (EC):
 %        Updated DIMM section, removed .eps from filenames, other cleanup
+%     2009-08-06 (EC):
+%        Move/re-size some figures, address some comments from Per Friberg
 %     {Add further history here}
 %
 % -
@@ -242,6 +244,7 @@
 \newcommand{\wcsmosaic}{\xref{\task{wcsmosaic}}{sun95}{WCSMOSAIC}}
 \newcommand{\wcsalign}{\xref{\task{wcsalign}}{sun95}{WCSALIGN}}
 \newcommand{\wcsattrib}{\xref{\task{wcsattrib}}{sun95}{WCSATTRIB}}
+\newcommand{\fitslist}{\xref{\task{fitslist}}{sun95}{FITSLIST}}
 
 % macros for typesetting parameters
 \newcommand{\aparam}[1]{\texttt{#1}}     % ADAM parameter
@@ -859,8 +862,10 @@ instruments are stored:
 \end{itemize}
 The FITS header is used to store information that either does not
 change or changes by a small amount during the course of an
-observation. The FITS header may be viewed with the \KAPPA\ fitslist
-command.
+observation. We note that in the particular case of SCUBA-2 data a
+portion of the FITS header will change for each subscan (i.e. file) of
+a single observation. The FITS header may be viewed with the \KAPPA\
+\fitslist\ command.
 
 Each instrument has further specific components. SCUBA-2 files contain
 dark squid data, the current flatfield solution and a polynomial fit
@@ -1212,12 +1217,16 @@ The zenith optical depth can be obtained via three methods:
   225 GHz and $\tau_{\rm zenith}$ at 450 or 850 $\mu$m.
 
 \item JCMT Water Vapour Monitor: The JCMT Water Vapour Monitor (WVM)
-  provides measurements of $\tau_{\rm zenith}$ every 1.2 seconds. It
-  measures $\tau_{\rm zenith}$ at 183 GHz which is converted to
-  $\tau_{\rm zenith}$ at 225 GHz. The raw WVM data are stored in the
-  JCMT state structure, though the values at times corresponding to
-  the start and end of the file are stored in the FITS headers
-  (\texttt{WVMTAUST} and \texttt{WVMTAUEN}).
+  provides opacity estimates every 1.2 seconds by measuring the
+  spectral shape of the 183 GHz water line along the telescope
+  line-of-site, and then converting this to an effective $\tau_{\rm
+    zenith}$ at 225 GHz. Since the measurement is aligned with the
+  submillimetre beam this method circumvents the need to apply the
+  plane parallel approximation (which breaks down at the horizon). The
+  raw WVM data are stored in the JCMT state structure, though the
+  values at times corresponding to the start and end of the file are
+  stored in the FITS headers (\texttt{WVMTAUST} and
+  \texttt{WVMTAUEN}).
 \end{enumerate}
 Optical depth measurements derived from the WVM are most useful in
 variable atmospheric conditions where the CSO radiometer may not be
@@ -1383,7 +1392,7 @@ removed by this workflow.
 \begin{latexonly}
    \begin{figure}[htb]
    \begin{center}
-     \includegraphics[width=150mm]{sun258_rebinmap}
+     \includegraphics[width=0.7\linewidth]{sun258_rebinmap}
      \caption{Image reconstructed from simulated data using the
        \aparam{REBIN} method. Note the deep wells around bright
        sources and the numerous spikes.}
@@ -1432,13 +1441,37 @@ detector in pW as a function of time. The actual data written to disk
 has some arbitrary digital units that are proportional to pW. The
 conversion to pW is accomplished by flatfield measurements described
 in Section \ref{se:flatcal}. Figure \ref{fig:comps} shows a pictorial
-representation of some of the components.
+representation of some of the components, and they are also described
+in Table~\ref{tab:dimm_components}.
+
+\begin{table}
+\begin{tabular}{cl}
+ Model Component & Definition \\
+\hline
+$COM$ & Removes common-mode signal, i.e., the signal seen by all \\
+      & bolometers. This is the removal of the atmosphere. In addition \\
+      & bad detectors are also flagged if there signal does not resemble \\
+      & the common mode measured by the other detectors. \\
+$GAI$ & If $COM$ specified, a gain and offset is used to fit $COM$ to each \\
+      & detector before removal. \\
+$DKS$ & Fits gain and offset to remove signal recorded by dark squids. \\  
+$EXT$ & Applies the extinction correction. \\
+$AST$ & Triggers map estimation, and removal of astronomical signal from \\
+      & time-series. \\
+$FLT$ & Applied frequency domain filter. \\
+$NOI$ & Estimates the time-domain variance to establish relative detector \\ 
+      & weights for map estimated, and for chi-squared ($\chi^2$) tolerance. \\
+\hline
+\end{tabular}
+\caption{Model Components for Iterative Mapmaking}
+\label{tab:dimm_components}
+\end{table}
 
 \begin{latexonly}
    \begin{figure}[htb]
    \begin{center}
-     \includegraphics[width=150mm]{sun258_signalcpts}
-     \caption{Simulation of bolometer time-series showing the various
+     \includegraphics[width=0.76\linewidth]{sun258_signalcpts}
+     \caption{Simulation of bolometer time-series showing some of the
        components that make up the total signal. The top panel shows
        the observed signal, with subsequent panels showing the
        relative contributions from the atmosphere, the astronomical
@@ -1451,7 +1484,7 @@ representation of some of the components.
    \label{fig:signal}
    \htmladdimg{sun258_signalcpts.gif}
 
-   Figure ??: Simulation of bolometer time-series showing the various
+   Figure ??: Simulation of bolometer time-series showing some of the
    components that make up the total signal. The top panel shows the
    observed signal, with subsequent panels showing the relative
    contributions from the atmosphere, the astronomical source and
@@ -1646,35 +1679,6 @@ below:
 
 \end{description}
 
-\subsubsection{Model components}
-
-See Table \ref{tab:dimm_components} for a list of model components and
-their definitions. It may be necessary to add more model components
-during the commissioning of SCUBA-2.
-
-\begin{table}
-\begin{tabular}{cl}
- Model Component & Definition \\
-\hline
-$COM$ & Removes common-mode signal, i.e., the signal seen by all \\
-      & bolometers. This is the removal of the atmosphere. In addition \\
-      & bad detectors are also flagged if there signal does not resemble \\
-      & the common mode measured by the other detectors. \\
-$GAI$ & If $COM$ specified, a gain and offset is used to fit $COM$ to each \\
-      & detector before removal. \\
-$DKS$ & Fits gain and offset to remove signal recorded by dark squids. \\  
-$EXT$ & Applies the extinction correction. \\
-$AST$ & Triggers map estimation, and removal of astronomical signal from \\
-      & time-series. \\
-$FLT$ & Applied frequency domain filter. \\
-$NOI$ & Estimates the time-domain variance to establish relative detector \\ 
-      & weights for map estimated, and for chi-squared ($\chi^2$) tolerance. \\
-\hline
-\end{tabular}
-\caption{Model Components for Iterative Mapmaking}
-\label{tab:dimm_components}
-\end{table}
-
 \subsubsection{Processing time}
 
 The memiter parameter (Table \ref{tab:dimmconfig}) influences the time
@@ -1713,7 +1717,7 @@ chunk using the \makemap\ parameter \aparam{MAXMEM}.
 \begin{latexonly}
    \begin{figure}[htb]
    \begin{center}
-     \includegraphics[width=150mm]{sun258_itermap}
+     \includegraphics[width=0.7\linewidth]{sun258_itermap}
      \caption{Image reconstructed from simulated data using the
        \aparam{ITERATE} method. Note how the deep wells around bright
        sources are no longer present, and there are no spikes.}
