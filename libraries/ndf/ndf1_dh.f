@@ -28,6 +28,8 @@
 
 *  Copyright:
 *     Copyright (C) 1993 Science & Engineering Research Council
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -47,6 +49,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -59,6 +62,9 @@
 *     4-AUG-1993 (RFWS):
 *        Chaged to ensure locators are annulled at the correct point
 *        under error conditions.
+*     5-AUG-2009 (TIMJ):
+*        Remove the CNF_PVAL code and simplify by reading the UPDATE_MODE
+*        and VARIANTS into local buffers rather than mapping them.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -71,7 +77,6 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
       INCLUDE 'NDF_PAR'          ! NDF_ public constants      
       INCLUDE 'NDF_CONST'        ! NDF_ private constants      
@@ -105,13 +110,12 @@
       LOGICAL CHR_SIMLR          ! Case insensitive string comparison
 
 *  Local Variables:
+      CHARACTER * ( 128 ) BUFFER ! Buffer for temporary strings
       CHARACTER * ( DAT__SZLOC ) LOC ! Component locator
       CHARACTER * ( DAT__SZTYP ) TYPE ! Component data type
-      INTEGER CLEN               ! Length of mapped character string
       INTEGER DIM( DAT__MXDIM )  ! Component dimension sizes
       INTEGER MXREC              ! Size of the RECORDS array
       INTEGER NDIM               ! Number of component dimensions
-      INTEGER PNTR               ! Pointer to mapped character string
       LOGICAL THERE              ! Is component present?
 
 *.
@@ -217,21 +221,15 @@
                         END IF
                      END IF
 
-*  Map the VARIANT component and determine its length.
-                     CALL DAT_MAPC( LOC, 'READ', 0, DIM, PNTR, STATUS )
-                     CALL DAT_CLEN( LOC, CLEN, STATUS )
+*  Read the VARIANT component and determine its length.
+                     CALL DAT_GET0C( LOC, BUFFER, STATUS )
                      IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Test its value. Report an error if it is not 'SIMPLE'.
-                        IF ( .NOT. CHR_SIMLR( %VAL( CNF_PVAL( PNTR ) ),
-     :                                        'SIMPLE',
-     :                                     %VAL( CNF_CVAL( CLEN ) ) ) ) 
-     :                  THEN
+                        IF ( .NOT. CHR_SIMLR( BUFFER, 'SIMPLE' ) ) THEN
                            STATUS = NDF__VARIN
                            CALL DAT_MSG( 'HIST', DCB_HLOC( IDCB ) )
-                           CALL NDF1_SETC( %VAL( CNF_PVAL( PNTR ) ),
-     :                                     'BADVAR', 
-     :                                     %VAL( CNF_CVAL( CLEN ) ) )
+                           CALL NDF1_SETC( BUFFER, 'BADVAR' )
                            CALL ERR_REP( 'NDF1_DH_VAR',
      :                     'The VARIANT component in the NDF ' //
      :                     'history structure ^HIST has an invalid ' //
@@ -519,41 +517,26 @@
                         END IF
                      END IF
 
-*  Map the UPDATE_MODE component and determine its length.
-                     CALL DAT_MAPC( LOC, 'READ', 0, DIM, PNTR, STATUS )
-                     CALL DAT_CLEN( LOC, CLEN, STATUS )
+*  Read the UPDATE_MODE component and determine its length.
+                     CALL DAT_GET0C( LOC, BUFFER, STATUS )
                      IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Check it against each recognised value in turn, setting the
 *  appropriate update mode in the DCB.
-                        IF ( CHR_SIMLR( %VAL( CNF_PVAL( PNTR ) ),
-     :                                  'DISABLED',
-     :                                  %VAL( CNF_CVAL( CLEN ) ) ) ) 
-     :                  THEN
+                        IF ( CHR_SIMLR( BUFFER, 'DISABLED'  ) ) THEN
                            DCB_HUMOD( IDCB ) = NDF__HDISA
-                        ELSE IF ( CHR_SIMLR( %VAL( CNF_PVAL( PNTR ) ),
-     :                                       'QUIET',
-     :                                      %VAL( CNF_CVAL( CLEN ) ) ) )
-     :                  THEN
+                        ELSE IF ( CHR_SIMLR( BUFFER, 'QUIET' ) ) THEN
                            DCB_HUMOD( IDCB ) = NDF__HQUIE
-                        ELSE IF ( CHR_SIMLR( %VAL( CNF_PVAL( PNTR ) ),
-     :                                       'NORMAL',
-     :                                      %VAL( CNF_CVAL( CLEN ) ) ) )
-     :                  THEN
+                        ELSE IF ( CHR_SIMLR( BUFFER, 'NORMAL' ) ) THEN
                            DCB_HUMOD( IDCB ) = NDF__HNORM
-                        ELSE IF ( CHR_SIMLR( %VAL( CNF_PVAL( PNTR ) ),
-     :                                       'VERBOSE',
-     :                                      %VAL( CNF_CVAL( CLEN ) ) ) )
-     :                  THEN
+                        ELSE IF ( CHR_SIMLR( BUFFER, 'VERBOSE' ) ) THEN
                            DCB_HUMOD( IDCB ) = NDF__HVERB
 
 *  If the UPDATE_MODE value was not recognised, then report an error.
                         ELSE
                            STATUS = NDF__HUMIN
                            CALL DAT_MSG( 'HIST', DCB_HLOC( IDCB ) )
-                           CALL NDF1_SETC( %VAL( CNF_PVAL( PNTR ) ),
-     :                                     'BADUMODE',
-     :                                     %VAL( CNF_CVAL( CLEN ) ) )
+                           CALL NDF1_SETC( BUFFER, 'BADUMODE' )
                            CALL ERR_REP( 'NDF1_DH_UMODE',
      :                                   'The UPDATE_MODE component ' //
      :                                   'in the NDF history ' //
