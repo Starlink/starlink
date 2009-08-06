@@ -270,8 +270,8 @@
             ELSE
 
 *  Convert any FRACTION values into corresponding pixel indices.
-               CALL NDF1_FR2PX( NDIM, NDIMD, LBNDD, UBNDD, VALUE1, 
-     :                          VALUE2, FRAME1, FRAME2, STATUS )
+               CALL NDF1_FR2PX( NDIM, NDIMD, LBNDD, UBNDD, ISBND,
+     :                          VALUE1, VALUE2, FRAME1, FRAME2, STATUS )
 
 *  If we are using WCS syntax, we do all axes together,
                IF( WCSSEC ) THEN

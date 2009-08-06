@@ -1,5 +1,5 @@
-      SUBROUTINE NDF1_FR2PX( NAX, NDIM, NLBND, NUBND, VALUE1, VALUE2, 
-     :                       FRAME1, FRAME2, STATUS )
+      SUBROUTINE NDF1_FR2PX( NAX, NDIM, NLBND, NUBND, ISBND, VALUE1, 
+     :                       VALUE2, FRAME1, FRAME2, STATUS )
 *+
 *  Name:
 *     NDF1_FR2PX
@@ -11,8 +11,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL NDF1_FR2PX( NAX, NDIM, NLBND, NUBND, VALUE1, VALUE2, FRAME1, 
-*                      FRAME2, STATUS )
+*     CALL NDF1_FR2PX( NAX, NDIM, NLBND, NUBND, ISBND, VALUE1, VALUE2, 
+*                      FRAME1, FRAME2, STATUS )
 
 *  Description:
 *     This routine converts any supplied FRACTION values to corresponding
@@ -27,6 +27,10 @@
 *        The NDF lower pixel bounds.
 *     NUBND( NDIM ) = INTEGER (Given)
 *        The NDF upper pixel bounds.
+*     ISBND( NDIM ) = LOGICAL (Given)
+*        Whether VALUE1 and VALUE2 specify the lower and upper bounds
+*        directly (i.e. .TRUE. ==> a ':' separator was given or
+*        implied, whereas .FALSE. ==> a '~' separator was given).
 *     VALUE1( NAX ) = DOUBLE PRECISION (Given and returned)
 *        First value specifying the bound on each axis. 
 *     VALUE2( NAX ) = DOUBLE PRECISION (Given and returned)
@@ -88,6 +92,7 @@
       INTEGER NDIM
       INTEGER NLBND( NDIM )
       INTEGER NUBND( NDIM )
+      LOGICAL ISBND( NDIM )
 
 *  Arguments Given and Returned:
       DOUBLE PRECISION VALUE1( NAX )
@@ -127,9 +132,16 @@
             FRAME1( I ) = 1
          END IF
 
-*  Check the second bound in the same way.
+*  Check the second bound in the same way if it is a bound. If it is a
+*  range, convert using an appropriate scaling.
          IF( FRAME2( I ) .EQ. 2 ) THEN
-            VALUE2( I ) = NINT( 0.5D0 + VALUE2( I )*A + B )
+            IF( ISBND( I ) ) THEN
+               VALUE2( I ) = NINT( 0.5D0 + VALUE2( I )*A + B )
+            ELSE
+               VALUE2( I ) = NINT( VALUE2( I )*
+     :                             DBLE( NUBND( I ) - NLBND( I ) + 1 ) )
+               IF( VALUE2( I ) .LT. 1 ) VALUE2( I ) = 1
+            END IF
             FRAME2( I ) = 1
          END IF
 
