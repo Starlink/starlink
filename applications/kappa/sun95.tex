@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.36}
 \newcommand{\stardocnumber}    {95.36}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2009 August 3}
+\newcommand{\stardocdate}      {2009 August 5}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.11}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -7193,7 +7193,6 @@ indices (see Figure~\latexhtml{\ref{fi:pixind}}{10}).
 
 \end{htmlonly}
 
-
 \emph{Pixel co-ordinates} are floating-point values which allow positions
 to be specified with sub-pixel accuracy.  They are related to pixel indices
 as indicated in Figure~\latexhtml{\ref{fi:pixco}}{11}). 
@@ -7216,7 +7215,6 @@ as indicated in Figure~\latexhtml{\ref{fi:pixco}}{11}).
 
 \end{htmlonly}
 
-
 \emph{Grid co-ordinates} are floating-point values which are similar to
 pixel co-ordinates except that the origin is fixed so that the first
 pixel on an axis is centred at a grid co-ordinate value of 1.0, no matter
@@ -7231,7 +7229,7 @@ Figure~\latexhtml{\ref{fi:gridco}}{12}).
    \begin{figure}[hbt]
    \begin{center}
    \includegraphics[clip,height=76mm]{sun95_gridco.eps}
-   \caption{Grid co-ordinates.  The final co-ordinate should read 5.5}
+   \caption{Grid co-ordinates.}
    \label{fi:gridco}
    \end{center}
    \end{figure}
@@ -7245,12 +7243,30 @@ Figure~\latexhtml{\ref{fi:gridco}}{12}).
 
 \end{htmlonly}
 
-\emph{Fraction co-ordinates} are floating-point values are normalised
+\emph{Fraction co-ordinates} are floating-point values that are normalised
 pixel or grid co-ordinates such that each axis extends from zero to one.
-Thus in Figure~\latexhtml{\ref{fi:gridco}}{12} pixel co-ordinate 2.0 or 
+Thus in Figure~\latexhtml{\ref{fi:fraco}}{13} pixel co-ordinate 2.0 or 
 grid co-ordinate 0.5 becomes 0.0 in fraction co-ordinates, and pixel
 co-ordinate 7.0 or grid co-ordinate 5.5 becomes 1.0 in fraction
 co-ordinates.
+
+\begin{latexonly}
+   \begin{figure}[hbt]
+   \begin{center}
+   \includegraphics[clip,height=76mm]{sun95_fraco.eps}
+   \caption{Fraction co-ordinates.}
+   \label{fi:fraco}
+   \end{center}
+   \end{figure}
+\end{latexonly}
+
+\begin{htmlonly}
+   \label{fi:fraco}
+   \htmladdimg{sun95_fraco.gif}
+
+   Figure 13: Fraction co-ordinates.
+
+\end{htmlonly}
 
 \subsection{\xlabel{se_domains}Co-ordinate Frames, Axes and Domains\label{se:domains}}
 
