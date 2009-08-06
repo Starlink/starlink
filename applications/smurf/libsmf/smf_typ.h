@@ -208,7 +208,7 @@
 #define SMF__MINCHUNKSAMP 100
 
 /* Minimum number of samples for meaningful stats (like sample variance) */
-#define SMF__MINSTATSAMP 3
+#define SMF__MINSTATSAMP 5
 
 /* Define the size of strings defining NDF char components (Units, label) */
 #define SMF__CHARLABEL  80

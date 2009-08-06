@@ -17,7 +17,8 @@
 *                    unsigned char *qual, unsigned char mask,
 *                    int sampvar, int flags, double *map,
 *                    double *mapweight, unsigned int *hitsmap,
-*                    double *mapvar, dim_t msize, int *status ) {
+*                    double *mapvar, dim_t msize, double *scalevariance,
+*                    int *status )
 
 *  Arguments:
 *     data = smfData* (Given)
@@ -53,6 +54,11 @@
 *        Variance of each pixel in map 
 *     msize = dim_t (Given)
 *        Number of pixels in map
+*     scalevariance = double* (Returned)
+*        If sampvar set, calculate average scale factor to be applied
+*        to input variances such that error propagation would give the
+*        same variance as that calculated from the sample scatter in
+*        each pixel.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -99,7 +105,7 @@
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
-*     Copyright (C) 2006-2008 University of British Columbia
+*     Copyright (C) 2006-2009 University of British Columbia
 *     All Rights Reserved.
 
 *  Licence:
@@ -142,7 +148,8 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
                     unsigned char *qual, unsigned char mask, 
                     int sampvar, int flags, double *map, 
                     double *mapweight, unsigned int *hitsmap, 
-                    double *mapvar, dim_t msize, int *status ) {
+                    double *mapvar, dim_t msize, double *scalevariance, 
+                    int *status ) {
 
   /* Local Variables */
   double *dat=NULL;          /* Pointer to data array */
@@ -154,6 +161,8 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
   size_t j;                  /* Loop counter */
   dim_t nbolo;               /* number of bolos */
   dim_t ntslice;             /* number of time slices */
+  double scalevar;           /* variance scale factor */
+  double scaleweight;        /* weights for calculating scalevar */
   double thisweight;         /* The weight at this point */
   double *var=NULL;          /* Pointer to variance array */
   size_t vbstride;           /* bolo stride of variance */
@@ -327,6 +336,9 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
     if( sampvar || !var ) {
       /* Variance also needs re-normalization in sampvar case */
       
+      scaleweight=0;
+      scalevar=0;
+
       for( i=0; i<msize; i++ ) {      
         if( !mapweight[i] ) {
           /* If 0 weight set pixels to bad */
@@ -341,11 +353,30 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
           /* variance only reliable if we had enough samples */
           if( hitsmap[i] >= SMF__MINSTATSAMP ) {
             mapvar[i] = (mapvar[i]*thisweight - map[i]*map[i])/hitsmap[i];
+
+            /* Work out average scale factor so that supplied weights
+               would produce the same map variance estimate as the
+               sample variance calculation that we just did. The average
+               value is weighted by number of hits in the pixel to weight
+               well-sampled pixels more heavily */
+
+            scalevar += hitsmap[i]*mapvar[i]*mapweight[i];
+            scaleweight += hitsmap[i];
           } else {
             mapvar[i] = VAL__BADD;
           }
 	}
       }
+
+      /* Re-normalize scalevar */
+      if( scaleweight ) {
+        scalevar /= scaleweight;
+        
+        if( scalevariance ) {
+          *scalevariance = scalevar;
+        }
+      }
+
     } else {
       /* Re-normalization for error propagation case */
 

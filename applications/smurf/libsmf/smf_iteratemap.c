@@ -334,6 +334,7 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
   smfArray **res=NULL;          /* Residual signal */
   double *res_data=NULL;        /* Pointer to DATA component of res */
   smfGroup *resgroup=NULL;      /* smfGroup of model residual files */
+  double scalevar=0;            /* scale factor for variance */
   size_t spikeiter=0;           /* Number of iter for spike detection */
   double spikethresh;           /* Threshold for spike detection */
   double steptime;              /* Length of a sample in seconds */
@@ -1179,7 +1180,7 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
               smf_rebinmap1( res[i]->sdata[idx], dat.noi[i]->sdata[idx], 
                              lut_data, qua_data, mask, varmapmethod, 
                              rebinflags, thismap, thisweight, thishits, 
-                             thisvar, msize, status );
+                             thisvar, msize, &scalevar, status );
             }
 
             /*** TIMER ***/
