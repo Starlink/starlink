@@ -96,6 +96,10 @@ AstRegion *cupidPolygonDesc( double *ipd, int velax, double *peak,
 *  History:
 *     25-MAY-2009 (DSB):
 *        Original version.
+*     7-AUG-2009 (DSB):
+*        For 3D data, use the largest pixel in the mask as the inside point, 
+*        not the peak (since the peak can get trimmed of if it is at the 
+*        edge of the clump, causing astOutline to fail).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -124,12 +128,14 @@ AstRegion *cupidPolygonDesc( double *ipd, int velax, double *peak,
    int j;                   /* Pixel index on 2nd pixel axis */
    int k;                   /* Pixel index on 3rd pixel axis */
    int lo;                  /* Lowest no. of  spectral channels in 2D mask */
+   int max;                 /* Maximum mask value */
    int nel;                 /* Number of elements in 2D mask */
    int nvert;               /* Number of vertices in Polygon */
    int nx;                  /* X dimension of 2D mask */
    int ny;                  /* Y dimension of 2D mask */
    int target;              /* Threshold for no. of spectral channels */
    int tot;                 /* Total no. of  spectral channels in 2D mask */
+   int v;                   /* Current mask value */
 
 /* Abort if an error has already occurred, or if the data is
    one-dimensional. */
@@ -164,6 +170,10 @@ AstRegion *cupidPolygonDesc( double *ipd, int velax, double *peak,
             if( *pd != VAL__BADD ) *pm = 1;
          }
 
+/* Store the pixel indices of the clump peak. */
+         inside[ 0 ] = (int)( peak[ space_axes[ 0 ] ] + 1.0 );
+         inside[ 1 ] = (int)( peak[ space_axes[ 1 ] ] + 1.0 );
+
 /* If the data is 3D, we need to collapse the supplied 3D mask array along 
    the spectral axis to get a 2D mask. */
       } else if( ndim == 3 ) {
@@ -183,17 +193,30 @@ AstRegion *cupidPolygonDesc( double *ipd, int velax, double *peak,
          }
 
 /* Loop round every element of the supplied 3D mask array. */
+         max = -1;
          pd = ipd;
          for( k = 0; k < dim[ 2 ]; k++ ) {
             for( j = 0; j < dim[ 1 ]; j++ ) {
                for( i = 0; i < dim[ 0 ]; i++,pd++ ) {
 
 /* If the 3D mask element is not bad, increment the count in the
-   corresponding 2D mask. */
-                  if( *pd != VAL__BADD ) ipm[ *pix + nx*( *piy ) ]++;
+   corresponding 2D mask. Also note the spatial indices of the largest
+   mask value. */
+                  if( *pd != VAL__BADD ) {
+                     v = ++ipm[ *pix + nx*( *piy ) ];
+                     if( v > max ) {
+                        max = v;
+                        inside[ 0 ] = *pix;
+                        inside[ 1 ] = *piy;
+                     }
+                  }
                }
             }
          }
+
+/* Adjust the pixel origin of the inside point */
+         inside[ 0 ] += lbnd[ space_axes[ 0 ] ];
+         inside[ 1 ] += lbnd[ space_axes[ 1 ] ];
 
 /* We need to trim the 2D mask to exclude pixels around the edge of the
    clump that are only present in a very small number of spectral channels.
@@ -249,10 +272,6 @@ AstRegion *cupidPolygonDesc( double *ipd, int velax, double *peak,
 /* Free resources */
          iph = astFree( iph );
       }
-
-/* Store the pixel indices of the clump peak. */
-      inside[ 0 ] = (int)( peak[ space_axes[ 0 ] ] + 1.0 );
-      inside[ 1 ] = (int)( peak[ space_axes[ 1 ] ] + 1.0 );
 
 /* Create a Polygon with up to 15 vertices, enclosing the non-zero pixels
    around the clump peak. */
