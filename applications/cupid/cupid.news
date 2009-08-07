@@ -11,6 +11,14 @@ Changes introduced at V1.1
    - For consistency with other Starlink applications the ILEVEL
      parameter has been renamed MSG_FILTER.
 
+   - The MaxBad configuration parameter should now be given as a fraction 
+     of the total number of pixels in the clump. Previously, MaxBad 
+     was given as an absolute number of pixels, but this unfairly
+     discriminates against large clumps that by their nature tend to
+     include more bad pixels. This was particularly noticable with the
+     FellWalker algorithm which tends to produce larger clumps than (say)
+     ClumpFind.
+
 Changes introduced at V1.0
 
    - The time has come to recognise that CUPID is no longer an

@@ -462,7 +462,8 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
          i = igood[ j ];
          ret = cupidNdfClump( type, ipd, ipa, el, ndim, dims, skip, slbnd, 
                               i, clbnd + 3*i, cubnd + 3*i, NULL, ret,
-                              cupidConfigI( fwconfig, "MAXBAD", 4, status ), status );
+                              cupidConfigD( fwconfig, "MAXBAD", 0.05, status ),
+                              status );
       }
 
 /* Free resources */

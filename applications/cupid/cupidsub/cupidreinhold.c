@@ -431,7 +431,8 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
          i = igood[ j ];
          ret = cupidNdfClump( type, ipd, m1, el, ndim, dims, skip, slbnd, 
                               i, clbnd + 3*i, cubnd + 3*i, NULL, ret,
-                              cupidConfigI( rconfig, "MAXBAD", 4, status ), status );
+                              cupidConfigD( rconfig, "MAXBAD", 0.05, status ),
+                              status );
       }
 
 /* Free resources */

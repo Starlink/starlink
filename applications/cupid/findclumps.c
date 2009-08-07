@@ -463,9 +463,9 @@ void findclumps( int *status ) {
 *        FwhmBeam is zero), the initial guess at the clump size is based on
 *        the local profile around the pixel with peak value. []
 *     GaussClumps.MaxBad:
-*        The maximum number of bad pixels which may be
-*        included in a clump. Clumps will not be excluded if they contain
-*        more bad pixels than this value [4]
+*        The maximum fraction of bad pixels which may be included in a clump. 
+*        Clumps will be excluded if they contain more bad pixels than this 
+*        value [0.05]
 *     GaussClumps.MaxClumps:
 *        Specifies a termination criterion for
 *        the GaussClumps algorithm. The algorithm will terminate when
@@ -601,11 +601,11 @@ void findclumps( int *status ) {
 *        as absolute data values, or as mutliples of the RMS noise using the
 *        syntax "[x]*RMS", where "[x]" is a numerical value (e.g. "3.2*RMS").[]
 *     ClumpFind.MaxBad:
-*        The maximum number of pixels in a clump that
-*        are allowed to be adjacent to a bad pixel. If the number of clump
-*        pixels adjacent to a bad pixel exceeds this value, the clump is
-*        excluded. If a direct comparison with other implementations of the
-*        ClumpFind algorithm is required, a very large value should be used. [4]
+*        The maximum fraction of pixels in a clump that are allowed to be 
+*        adjacent to a bad pixel. If the fraction of clump pixels adjacent to 
+*        a bad pixel exceeds this value, the clump is excluded. If a direct 
+*        comparison with other implementations of the ClumpFind algorithm is 
+*        required, a value of 1.0 should be used. [0.05]
 *     ClumpFind.MinPix:
 *        The lowest number of pixel which a clump can
 *        contain. If a candidate clump has fewer than this number of pixels,
@@ -662,10 +662,9 @@ void findclumps( int *status ) {
 *        application paremeter DECONV is set TRUE, the clump widths written to
 *        the output catalogue are reduced (in quadrature) by this amount. [2.0]
 *     ReinholdClumps.MaxBad:
-*        The maximum number of pixels in a clump that
-*        are allowed to be adjacent to a bad pixel. If the number of clump
-*        pixels adjacent to a bad pixel exceeds this value, the clump is
-*        excluded. [4]
+*        The maximum fraction of pixels in a clump that are allowed to be 
+*        adjacent to a bad pixel. If the fraction of clump pixels adjacent 
+*        to a bad pixel exceeds this value, the clump is excluded. [0.05]
 *     Reinhold.MinLen:
 *        The minimum number of pixels spanned by a peak
 *        along any one dimension in order for the peak to be considered
@@ -752,10 +751,9 @@ void findclumps( int *status ) {
 *        application paremeter DECONV is set TRUE, the clump widths written to
 *        the output catalogue are reduced (in quadrature) by this amount. [2.0]
 *     FellWalker.MaxBad:
-*        The maximum number of pixels in a clump that
-*        are allowed to be adjacent to a bad pixel. If the number of clump
-*        pixels adjacent to a bad pixel exceeds this value, the clump is
-*        excluded. [4]
+*        The maximum fraction of pixels in a clump that are allowed to be 
+*        adjacent to a bad pixel. If the fraction of clump pixels adjacent 
+*        to a bad pixel exceeds this value, the clump is excluded. [0.05]
 *     FellWalker.MinDip:
 *        If the dip between two adjacent peaks is less
 *        than this value, then the peaks are considered to be part of the
@@ -852,6 +850,8 @@ void findclumps( int *status ) {
 *        Added SHAPE parameter.
 *     29-JUL-2009 (TIMJ):
 *        Rename ILEVEL to MSG_FILTER
+*     7-AUG-2009 (DSB):
+*        Change MaxBad from an absolute number of pixels to a fraction.
 *     {enter_further_changes_here}
 
 *  Bugs:

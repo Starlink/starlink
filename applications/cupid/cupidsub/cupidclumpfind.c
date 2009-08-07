@@ -440,7 +440,8 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
          ret = cupidNdfClump( type, ipd, ipa, el, ndim, dims,
                               skip, slbnd, ps->index, ps->lbnd,
                               ps->ubnd, NULL, ret, 
-                              cupidConfigI( cfconfig, "MAXBAD", 4, status ), status );
+                              cupidConfigD( cfconfig, "MAXBAD", 0.05, status ),
+                              status );
       }
 
 /* Free resources */

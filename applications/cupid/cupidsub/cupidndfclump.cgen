@@ -10,7 +10,7 @@ HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, int nel,
                                   int ndim, int dims[ 3 ], int skip[ 3 ], 
                                   int slbnd[ 3 ], int index, int clbnd[ 3 ], 
                                   int cubnd[ 3 ], AstKeyMap *extra,
-                                  HDSLoc *obj, int maxbad, int *status ){
+                                  HDSLoc *obj, double maxbad, int *status ){
 /*
 *+
 *  Name:
@@ -26,7 +26,7 @@ HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, int nel,
 *     HDSLoc *cupidNdfClump<X>( CGEN_TYPE *ipd, int *ipa, int nel, int ndim, 
 *                            int dims[ 3 ], int skip[ 3 ], int slbnd[ 3 ], 
 *                            int index, int clbnd[ 3 ], int cubnd[ 3 ], 
-*                            AstKeyMap *extra, HDSLoc *obj, int maxbad,
+*                            AstKeyMap *extra, HDSLoc *obj, double maxbad,
 *                            int *status )
 
 *  Description:
@@ -79,8 +79,8 @@ HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, int nel,
 *        extended to accomodate the new NDF. If NULL is supplied a new
 *        temporary HDS object is created.
 *     maxbad
-*        The maximum number of clump pixels which can border an area of
-*        bad pixels. If this number is exceeded the Unit component of the
+*        The maximum fraction of clump pixels which can border an area of
+*        bad pixels. If this fraction is exceeded the Unit component of the
 *        returned NDF is set to "BAD".
 *     status
 *        Pointer to the inherited status value.
@@ -148,6 +148,7 @@ HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, int nel,
    double *out;              /* Pointer to output NDF Data array */
    double *pout;             /* Pointer to next output pixel */
    double dval;              /* Double value to store */
+   int area;                 /* Total number of pixels in clump */
    int bad;                  /* Does the clump touch any areas of bad pixels?*/
    int el;                   /* Number of elements mapped */
    int i;                    /* KeyMap index */
@@ -219,6 +220,9 @@ HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, int nel,
 /* Assume the clump does not touch any areas of bad pixels. */
       bad = 0;
 
+/* Initialise count of pixels in the clump */
+      area = 0;
+
 /* Step round every pixel within the clump bounding box. (ix,iy,iz)
    represent GRID indices within the input array. */
       for( iz = clbnd[ 2 ]; iz <= cubnd[ 2 ]; iz++ ) {
@@ -227,9 +231,10 @@ HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, int nel,
             ivinx = iviny;
             for( ix = clbnd[ 0 ]; ix <= cubnd[ 0 ]; ix++ ) {
 
-/* If this pixel is in the clump, store the input data (if good) in the 
-   output.*/
+/* If this pixel is in the clump, increment the number of pixels in the
+   clump and store the input data (if good) in the output.*/
                if( ipa[ ivinx ] == index ) {
+                  area++;
 
                   if( ipd[ ivinx ] == CGEN_BAD ) {
                      *pout = VAL__BADD;
@@ -272,7 +277,7 @@ HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, int nel,
 
 /* If the number of contacts between the clump and any areas of bad
    pixels is too high, set the NDFs Unit component to "BAD". */
-      if( bad > maxbad ) {
+      if( bad > maxbad*area ) {
          ndfCput( "BAD", indf, "Unit", status );
       }
    }

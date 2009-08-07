@@ -21,7 +21,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
                                          double mlim, int imax,
                                          int *lbnd, HDSLoc **ndfs, int iclump, 
                                          int excols, double mean_peak, 
-                                         int maxbad, int *area, double *sumclumps,
+                                         double maxbad, int *area, double *sumclumps,
                                          int *status ){
 /*
 *+
@@ -40,7 +40,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 *                                  double rms, double mlim, int imax, 
 *                                  int *lbnd, HDSLoc **ndfs, 
 *                                  int iclump, int excols, double mean_peak,
-*                                  int maxbad, int *area, double *sumclumps,
+*                                  double maxbad, int *area, double *sumclumps,
 *                                  int *status )
 
 *  Description:
@@ -93,7 +93,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 *     mean_peak
 *        The mean value of the most recent fitted peak values.
 *     maxbad
-*        Largest allowed number of bad pixels in a clump.
+*        Largest allowed fraction of bad pixels in a clump.
 *     area
 *        Pointer to an int in which to store the number of pixels
 *        contributing to the clump.
@@ -421,7 +421,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
    if( area_off ) {
      msgOutif( MSG__DEBUG1, "",
                "   (the clump overlaps the edge of the data array)", status );
-   } else if( bad > maxbad ) {
+   } else if( bad > maxbad*( *area ) ) {
      msgOutif( MSG__DEBUG1, "",
                "   (the clump contains too many bad pixels)", status );
    }
@@ -510,7 +510,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 /* Create the NDF. */
       cupidGCNdfClump( ndfs, sum, excols ? par : NULL, rms, ndim, lbox, ubox, 
                        list_size, mlist, plist, lbnd, iclump, cupidGC.dax, 
-                       extra, ( bad > maxbad ), status );
+                       extra, ( bad > maxbad*( *area ) ), status );
 
 /* Free resources */
       if( extra ) extra = astAnnul( extra );
