@@ -548,6 +548,10 @@ typedef struct smfTile {
   int size;
   AstMapping *map2d;
   AstMapping *map3d;
+  int qxl;
+  int qxu;
+  int qyl;
+  int qyu;
 } smfTile;
 
 /* Structure to encapsulate frequency-domain filters implemented with FFTW. */

@@ -45,6 +45,9 @@
 *        Added argument "trim".
 *     15-JAN-2008 (DSB):
 *        Removed argument "trim".
+*     8-AUG-2009 (DSB):
+*        Only assign BORDER quality to pixels that are covered by another
+*        tile.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -124,10 +127,10 @@ void smf_reshapendf( smfData **data, smfTile *tile, int *status ){
 /* If the output NDF includes a border area, update the quality array to 
    include a quality flag indicating the border pixels. We assume that the 
    output NDF currently has no quality information. */
-         if( tile->lbnd[ 0 ] < tile->qlbnd[ 0 ] ||
-             tile->lbnd[ 1 ] < tile->qlbnd[ 1 ] ||
-             tile->ubnd[ 0 ] > tile->qubnd[ 0 ] ||
-             tile->ubnd[ 1 ] > tile->qubnd[ 1 ] ){
+         if( ( ( tile->lbnd[ 0 ] < tile->qlbnd[ 0 ] ) && tile->qxl ) ||
+             ( ( tile->lbnd[ 1 ] < tile->qlbnd[ 1 ] ) && tile->qyl ) ||
+             ( ( tile->ubnd[ 0 ] > tile->qubnd[ 0 ] ) && tile->qxu ) ||
+             ( ( tile->ubnd[ 1 ] > tile->qubnd[ 1 ] ) && tile->qyu ) ){
 
 /* Do not store quality info in sub-NDFs such as TSYS, etc. These are
    distinguished by the fact that they do not already have a SMURF
@@ -161,8 +164,10 @@ void smf_reshapendf( smfData **data, smfTile *tile, int *status ){
                   for( iz = tile->lbnd[ 2 ]; iz <= tile->ubnd[ 2 ]; iz++ ) {
                      for( iy = tile->lbnd[ 1 ]; iy <= tile->ubnd[ 1 ]; iy++ ) {
                         for( ix = tile->lbnd[ 0 ]; ix <= tile->ubnd[ 0 ]; ix++ ) {
-                           if( ix < tile->qlbnd[ 0 ] || ix > tile->qubnd[ 0 ] || 
-                               iy < tile->qlbnd[ 1 ] || iy > tile->qubnd[ 1 ] ){
+                           if( ( ( ix < tile->qlbnd[ 0 ] ) && tile->qxl ) || 
+                               ( ( ix > tile->qubnd[ 0 ] ) && tile->qxu ) || 
+                               ( ( iy < tile->qlbnd[ 1 ] ) && tile->qyl ) || 
+                               ( ( iy > tile->qubnd[ 1 ] ) && tile->qyu ) ){
                               *(q++) = qval;
                            } else {
                               *(q++) = 0;

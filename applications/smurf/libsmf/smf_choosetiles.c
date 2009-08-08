@@ -105,6 +105,8 @@
 *        in the group described in the previous point.
 *        - An AST Mapping that describes the shift in origin of the GRID
 *        coordinate system from the full sized output array to the tile.
+*        - Flags indicating if the four edges of the tile should be
+*        flagged using the BORDER quality.
 
 *  Authors:
 *     DSB: David S Berry (JAC, UCLan)
@@ -143,13 +145,16 @@
 *        The third element of an array is is [ 2 ], not [ 3 ].
 *     24-JUL-2008 (TIMJ):
 *        Trap moving coordinates (or at least offset coordinate systems).
-*     14-JUL-2009 (DSBJ):
+*     14-JUL-2009 (DSB):
 *        Exclude edge tiles that are contained completely within the
 *        border region added onto their neighbouring tiles.
+*     8-AUG-2009 (DSB):
+*        Added qxl/qxu/qyl/qyu tile items to indicate if boundary tiles
+*        need to be flagged using the BORDER quality.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2007, 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2007-2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -363,6 +368,7 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
             pubnd[ i ] -= tile_size[ i ];
             numtile[ i ]--;
          }
+
       }
 
 /* Determine the constant width border by which the basic tile area is to be
@@ -494,6 +500,17 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
                   }
                }
             }
+
+/* Store flags indicating if the borders should be flagged with the BORDER
+   quality. */
+            tile->qxu = 1;
+            if( ix == 0 ) tile->qxl = ( plbnd[ 0 ] < tlbnd[ 0 ] );
+            if( ix == numtile[ 0 ] - 1 ) tile->qxu = ( pubnd[ 0 ] > tubnd[ 0 ] );
+
+            tile->qyu = 1;
+            if( iy == 0 ) tile->qyl = ( plbnd[ 1 ] < tlbnd[ 1 ] );
+            if( iy == numtile[ 1 ] - 1 ) tile->qyu = ( pubnd[ 1 ] > tubnd[ 1 ] );
+
          }
       }
    }
