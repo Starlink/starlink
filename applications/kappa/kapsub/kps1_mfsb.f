@@ -54,7 +54,7 @@
 *  Notes:
 
 *  Copyright:
-*     Copyright (C) 2007 Science & Technology Facilities Council
+*     Copyright (C) 2007, 2009 Science & Technology Facilities Council
 *     All Rights Reserved.
 
 *  Licence:
@@ -84,6 +84,8 @@
 *        Use NDF in read mode and create a mask in new argument MASK.
 *     2007 October 2 (MJC):
 *        Add ALL argument.
+*     2009 August 7 (MJC):
+*        Allow for revised KPS1_MFEBx API.
 *     {enter_changes_here}
 
 *-
@@ -266,12 +268,12 @@
 *  Transfer the bad pixels from the binned to the unbinned mask
 *  array.
       IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL KPS1_MFEBR( COMPRS, IDIMS, %VAL( CNF_PVAL( IPAL ) ),
-     :                    MASK, STATUS )
+         CALL KPS1_MFEBR( COMPRS, IDIMS, ODIMS, 
+     :                    %VAL( CNF_PVAL( IPAL ) ), MASK, STATUS )
 
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPS1_MFEBD( COMPRS, IDIMS, %VAL( CNF_PVAL( IPAL ) ), 
-     :                    MASK, STATUS )
+         CALL KPS1_MFEBD( COMPRS, IDIMS, ODIMS,
+     :                    %VAL( CNF_PVAL( IPAL ) ), MASK, STATUS )
       END IF
 
 *  We have finished with the averaged line.
