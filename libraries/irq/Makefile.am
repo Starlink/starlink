@@ -17,6 +17,8 @@ PUBLIC_INCLUDES = IRQ_PAR
 PRIVATE_INCLUDES = IRQ_CMO IRQ_COM IRQ_OPC IRQ_PAO
 BLOCK_DATA_FILES = irq1_opcin.f
 
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+
 F_ROUTINES = \
 irq1_add.f irq1_altrp.f irq1_antmp.f irq1_check.f irq1_cmqm.f \
 irq1_count.f irq1_evstk.f irq1_get.f irq1_gtidq.f irq1_iannu.f \
