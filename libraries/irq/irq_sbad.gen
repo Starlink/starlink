@@ -2,7 +2,7 @@
      :                     STATUS )
 *+
 *  Name:
-*     IRQ_SBAD<T>
+*     IRQ_SBADx
 
 *  Purpose:
 *     Set pixels `bad' which satisfy a given quality expression.
@@ -11,13 +11,13 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL IRQ_SBAD<T>( IDQ, HELD, SIZE, VEC, ALLBAD, NOBAD, STATUS )
+*     CALL IRQ_SBADx( IDQ, HELD, SIZE, VEC, ALLBAD, NOBAD, STATUS )
 
 *  Description:
 *     IRQ_COMP should be called before this routine to produce the
 *     compiled quality expression identified by IDQ. The QUALITY
 *     component of the NDF to which the quality expression refers (see
-*     IRQ_COMP argument LOCS) is mapped as a one dimensional vector.
+*     IRQ_COMP argument LOCS) is mapped as a one-dimensional vector.
 *     The supplied array VEC must correspond pixel-for-pixel with the
 *     mapped QUALITY vector.  All pixels which hold a QUALITY
 *     satisfying the quality expression are found. If HELD is true,
@@ -43,7 +43,7 @@
 *        The total number of pixels in VEC. An error is reported if
 *        this is not the same as the total number of pixels in the NDF
 *        determined by IDQ.
-*     VEC( SIZE ) = <TYPE> (Given and Returned)
+*     VEC( SIZE ) = ? (Given and Returned)
 *        The data to be set `bad', depending on the corresponding
 *        quality values stored in the NDF. It must be the same size as
 *        the NDF, and must correspond pixel-for-pixel with the
@@ -57,6 +57,12 @@
 *        values. False if any `bad' pixel values are returned.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
+
+*  Notes:
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by D, R, I, W, UW, B or UB as appropriate.  The
+*     VEC array supplied to the routine must have the data type
+*     specified.
 
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
