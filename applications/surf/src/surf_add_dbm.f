@@ -98,10 +98,15 @@
 
 
 *  Copyright:
+*     Copyright (C) 2009 Science and Technology Facilities Council.
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
 *  History:
+*     2009-AUG-10 (TIMJ):
+*       Fix problems with D vs R FITS reading variants.
+*       Pass variance into SURFLIB_CALC_CHOPPED_IMAGES. Previously
+*       was given the DATA_ARRAY.
 *     $Log$
 *     Revision 1.9  2004/09/08 02:03:33  timj
 *     Add CNF_PVAL where appropriate
@@ -300,13 +305,16 @@
      :        IN_VARIANCE_PTR, ITEMP, STATUS)
          CALL NDF_MAP(OUTNDF, 'VARIANCE', '_REAL', 'WRITE',
      :        OUT_VARIANCE_PTR, ITEMP, STATUS)
+      ELSE
+         IN_VARIANCE_PTR = 0
+         OUT_VARIANCE_PTR = 0
       END IF
 
 *     Call the dual beam subroutine
       CALL SURFLIB_CALC_CHOPPED_IMAGE(NBEAMS, CHOP_THROW, CHOP_PA, 
      :     DIM(1), DIM(2), %VAL(CNF_PVAL(IN_DATA_PTR)), 
      :     %VAL(CNF_PVAL(OUT_DATA_PTR)),
-     :     STATE, %VAL(CNF_PVAL(IN_DATA_PTR)), 
+     :     STATE, %VAL(CNF_PVAL(IN_VARIANCE_PTR)),
      :     %VAL(CNF_PVAL(OUT_VARIANCE_PTR)),
      :     STATUS)
 
@@ -374,6 +382,7 @@
             CALL SCULIB_PUT_FITS_D(SCUBA__MAX_FITS, N_FITS, FITS,
      :           'SCUPIXSZ', DBLE(PIXSIZE), 
      :           'Pixel size (arcsec)', STATUS)
+
          END IF
 
       END IF
@@ -384,7 +393,7 @@
 
 *     CHOP POSITION ANGLE
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL SCULIB_GET_FITS_D( SCUBA__MAX_FITS, N_FITS, FITS,
+         CALL SCULIB_GET_FITS_R( SCUBA__MAX_FITS, N_FITS, FITS,
      :        'CHOP_PA', RTEMP, STATUS)
 
          IF (STATUS .EQ. SAI__OK) THEN
@@ -404,7 +413,7 @@
 
 *     CHOP THROW
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL SCULIB_GET_FITS_D( SCUBA__MAX_FITS, N_FITS, FITS,
+         CALL SCULIB_GET_FITS_R( SCUBA__MAX_FITS, N_FITS, FITS,
      :        'CHOP_THR', RTEMP, STATUS)
 
          IF (STATUS .EQ. SAI__OK) THEN
