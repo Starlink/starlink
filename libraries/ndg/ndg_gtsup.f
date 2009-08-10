@@ -35,8 +35,8 @@
 *
 *        This information is obtained from a set of groups associated with 
 *        the supplied group IGRP by means of a chain of GRP "owner-slave"
-*        relationships. If any of these groups do not exist, the correponding
-*        elements of the above array are returned blank. Note, element 6,
+*        relationships. If any of these groups do not exist, the corresponding
+*        elements of the above array are returned blank. Note, Element 6,
 *        the full NDF specification, is obtained directly from the supplied 
 *        group IGRP.
 *     STATUS = INTEGER (Given and Returned)

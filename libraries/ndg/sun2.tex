@@ -207,7 +207,7 @@ library for accessing groups of NDF data objects.
 %     This file defines LaTeX commands which allow routine documentation
 %     produced by the SST application PROLAT to be processed by LaTeX and
 %     by LaTeX2html. The contents of this file should be included in the
-%     source prior to any statements that make of the sst commnds.
+%     source prior to any statements that make use of the sst commands.
 
 %  Notes:
 %     The style file html.sty provided with LaTeX2html needs to be used.
@@ -720,7 +720,7 @@ used within an ADAM task.
 \end{quote}
 When this program is compiled and run, the user is asked for 
 two ADAM parameters, IN and OUT.  Each NDF in the list specified
-by the IN parameter is simply copied to the corresponding naem in the 
+by the IN parameter is simply copied to the corresponding name in the 
 list specified by the OUT parameter.  For instance, running
 \begin{quote}
 \latexonly{\small}
@@ -835,7 +835,7 @@ to add further members.
 \noteroutine{
       CALL NDG\_PTSUP( IGRP, I, FIELDS, STATUS )
 }{
-   Store suplemental information for an NDF
+   Store supplemental information for an NDF
 }
 \noteroutine{
       CALL NDG\_SETSZ( IGRP, SIZE, STATUS )
@@ -895,7 +895,7 @@ to add further members.
          IGRP1 = INTEGER (Given)
       }{
          The identifier of a group to which the names of any
-         inaccessable NDFs will be appended. The group should already
+         inaccessible NDFs will be appended. The group should already
          have been created by a call to GRP\_NEW, and should be deleted
          when no longer needed by a call to GRP\_DELET. If IGRP1 is
          supplied equal to symbolic constant GRP\_\_NOID, then no
@@ -931,9 +931,9 @@ to add further members.
 
          \sstitem
          Any file names containing wildcards are expanded into a list of NDF
-         names. The supplied strings are intepreted by a shell (/bin/tcsh if
+         names. The supplied strings are interpreted by a shell (/bin/tcsh if
          it exists, otherwise /bin/csh, otherwise /bin/sh), and so may
-         contain shell meta-characters (eg twiddle, \$HOME, even command
+         contain shell meta-characters (e.g. twiddle, \$HOME, even command
          substitution and pipes - but pipe characters {\tt "}$|${\tt "} need to be escaped
          using a backslash {\tt "}$\backslash${\tt "} to avoid them being interpreted as GRP
          editing characters).
@@ -1140,9 +1140,9 @@ to add further members.
          \sstitem
          Any file names containing wildcards or "[..]" globbing patterns
 	 are expanded into a list of NDF names. The supplied strings are
-	 intepreted by a shell (/bin/tcsh if it exists, otherwise
+	 interpreted by a shell (/bin/tcsh if it exists, otherwise
 	 /bin/csh, otherwise /bin/sh), and so may contain shell
-	 meta-characters (eg twiddle, \$HOME, even command substitution
+	 meta-characters (e.g. twiddle, \$HOME, even command substitution
 	 and pipes - but pipe characters {\tt "}$|${\tt "} need to be
 	 escaped using a backslash {\tt "}$\backslash${\tt "} to avoid
 	 them being interpreted as GRP editing characters).
@@ -1188,7 +1188,7 @@ to add further members.
 	 match any existing files, then the trailing {\tt "}[..]{\tt "}
 	 string is next interpreted as a foreign extension specifier.
 	 Thus if fred.fit is a multi-extension FITS file, {\tt
-	 "}fred[12]{\tt "} would be interpreted as the twelth image
+	 "}fred[12]{\tt "} would be interpreted as the twelfth image
 	 extension in fred.fit only if files cannot be found with
 	 basenames {\tt "}fred1{\tt "} or {\tt "}fred2{\tt "}.
 
@@ -1700,8 +1700,8 @@ to add further members.
 
          This information is obtained from a set of groups associated with
          the supplied group IGRP by means of a chain of GRP {\tt "}owner-slave{\tt "}
-         relationships. If any of these groups do not exist, the correponding
-         elements of the above array are returned blank. Note, element 6,
+         relationships. If any of these groups do not exist, the corresponding
+         elements of the above array are returned blank. Note, Element 6,
          the full NDF specification, is obtained directly from the supplied
          group IGRP.
       }
@@ -1807,7 +1807,7 @@ to add further members.
          IGRP = INTEGER (Given)
       }{
          A GRP identifier for a group holding the names of NDFs. This
-         will often be creted using NDG\_ASSOC, but groups created {\tt "}by
+         will often be created using NDG\_ASSOC, but groups created {\tt "}by
          hand{\tt "} using GRP directly (i.e. without the supplemental groups
          created by NDG\_ASSOC) can also be used.
       }
@@ -1870,7 +1870,7 @@ to add further members.
          IGRP = INTEGER (Given)
       }{
          A GRP identifier for a group holding the names of NDFs. This
-         will often be creted using NDG\_ASSOC, but groups created {\tt "}by
+         will often be created using NDG\_ASSOC, but groups created {\tt "}by
          hand{\tt "} using GRP directly (i.e. without the supplemental groups
          created by NDG\_ASSOC) can also be used.
       }
@@ -1922,7 +1922,7 @@ to add further members.
          IGRP = INTEGER (Given)
       }{
          A GRP identifier for a group holding the names of NDFs. This
-         will often be creted using NDG\_ASSOC, but groups created {\tt "}by
+         will often be created using NDG\_ASSOC, but groups created {\tt "}by
          hand{\tt "} using GRP directly (i.e. without the supplemental groups
          created by NDG\_ASSOC) can also be used.
       }
@@ -1981,7 +1981,7 @@ to add further members.
          IGRP = INTEGER (Given)
       }{
          A GRP identifier for a group holding the names of NDFs. This
-         will often be creted using NDG\_CREAT, but groups created {\tt "}by
+         will often be created using NDG\_CREAT, but groups created {\tt "}by
          hand{\tt "} using GRP directly can also be used.
       }
       \sstsubsection{
@@ -2056,7 +2056,7 @@ to add further members.
          IGRP = INTEGER (Given)
       }{
          A GRP identifier for a group holding the names of NDFs. This
-         will often be creted using NDG\_ASSOC, but groups created {\tt "}by
+         will often be created using NDG\_ASSOC, but groups created {\tt "}by
          hand{\tt "} using GRP directly (i.e. without the supplemental groups
          created by NDG\_ASSOC) can also be used.
       }
@@ -2146,14 +2146,14 @@ to add further members.
 \sstroutine{
    NDG\_PTSUP
 }{
-   Store suplemental information for an NDF
+   Store supplemental information for an NDF
 }{
    \sstdescription{
       Stores the supplied items of supplemental information for a given
       entry in an NDG group. The GRP groups needed to store this
       supplemental information are created if they do not already exist,
       and associated with the supplied group by means of a chain of GRP
-      {\tt "}owner-slave{\tt "} relationships. They will be deleted automaticaly when
+      {\tt "}owner-slave{\tt "} relationships. They will be deleted automatically when
       the supplied group is deleted using GRP\_DELET.
    }
    \sstinvocation{
@@ -2203,7 +2203,7 @@ to add further members.
    \sstdescription{
       This routine should be used instead of GRP\_SETSZ to set the size of
       a group created by NDG. It sets the size of the supplied group, and
-      also sets the size of each of the aupplemental groups associated with
+      also sets the size of each of the supplemental groups associated with
       the supplied group.
    }
    \sstinvocation{
@@ -2239,8 +2239,8 @@ modifying and querying provenance information in an NDF.
 
 The provenance information in an NDF encapsulates details of all the
 other NDFs that were used in the creation of the NDF. The information is
-heirarchical and includes parents, grand parents, great grand parents,
-etc, all the way back to ``root ancestors'' (a root ancestor is an ancestor
+hierarchical and includes parents, grandparents, great-grandparents,
+etc., all the way back to ``root ancestors'' (a root ancestor is an ancestor
 NDF that has no recorded parents).
 
 On disk, the provenance information is stored in an NDF extension called
@@ -2490,7 +2490,7 @@ another statement of the software that performed the action.
 
       {\tt "}CREATOR{\tt "} - The software item that created the NDF.
 
-      {\tt "}PARENTS{\tt "} - A comma separated list of indicies into the ancestors
+      {\tt "}PARENTS{\tt "} - A comma-separated list of indices into the ancestors
              array that identifies the direct parents of the NDF.
 
       {\tt "}MORE{\tt "} - A summary of the contents of the MORE structure associated
@@ -2504,8 +2504,8 @@ another statement of the software that performed the action.
              earlier KeyMaps in the vector describe any subsequent actions
              performed on the ancestor NDF prior to it being used in the
              creation of its parent. Each KeyMap contains the following
-             scalar character enties (all taken from the corresonding
-             record in the NDF History component):
+             scalar character entries (all taken from the corresponding
+             record in the NDF HISTORY component):
 
       \sstitemlist{
 
@@ -2666,8 +2666,8 @@ another statement of the software that performed the action.
               earlier KeyMaps in the vector describe any subsequent actions
               performed on the ancestor NDF prior to it being used in the
               creation of its parent. Each KeyMap contains the following
-              scalar character enties (all taken from the corresonding
-              record in the NDF History component):
+              scalar character entries (all taken from the corresponding
+              record in the NDF HISTORY component):
 
             \sstitem
               {\tt "}DATE{\tt "}: The date and time of the action (e.g. {\tt "}2009-JUN-24
@@ -3214,7 +3214,7 @@ another statement of the software that performed the action.
       \sstsubsection{
          prov
       }{
-         A pointer to the provenance information to be Copyd.
+         A pointer to the provenance information to be Copied.
       }
       \sstsubsection{
          cleanse
@@ -3348,7 +3348,7 @@ another statement of the software that performed the action.
 
       {\tt "}CREATOR{\tt "} - The software item that created the NDF.
 
-      {\tt "}PARENTS{\tt "} - A comma separated list of indicies into the ancestors
+      {\tt "}PARENTS{\tt "} - A comma-separated list of indices into the ancestors
              array that identifies the direct parents of the NDF.
 
       {\tt "}MORE{\tt "} - A summary of the contents of the MORE structure associated
@@ -3362,8 +3362,8 @@ another statement of the software that performed the action.
              earlier KeyMaps in the vector describe any subsequent actions
              performed on the ancestor NDF prior to it being used in the
              creation of its parent. Each KeyMap contains the following
-             scalar character enties (all taken from the corresonding
-             record in the NDF History component):
+             scalar character entries (all taken from the corresponding
+             record in the NDF HISTORY component):
 
       \sstitemlist{
 
@@ -3557,8 +3557,8 @@ another statement of the software that performed the action.
          earlier KeyMaps in the vector describe any subsequent actions
          performed on the ancestor NDF prior to it being used in the
          creation of its parent. Each KeyMap contains the following
-         scalar character enties (all taken from the corresonding
-         record in the NDF History component):
+         scalar character entries (all taken from the corresponding
+         record in the NDF HISTORY component):
          \sstitemlist{
 
             \sstitem
@@ -4131,7 +4131,7 @@ another statement of the software that performed the action.
 
 \section{Changes Introduced in NDG Version 5.5}
 \begin{itemize}
-   \item A new routine NDG\_MOREG has been added which searchs the
+   \item A new routine NDG\_MOREG has been added which searches the
          extensions of a supplied NDF for encapsulated NDFs, appending
          the paths to such NDFs to a supplied GRP group.
 \end{itemize}

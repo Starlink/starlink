@@ -15,7 +15,7 @@
 *  Description:
 *     This routine should be used instead of GRP_SETSZ to set the size of
 *     a group created by NDG. It sets the size of the supplied group, and
-*     also sets the size of each of the aupplemental groups associated with
+*     also sets the size of each of the supplemental groups associated with
 *     the supplied group.
 
 *  Arguments:

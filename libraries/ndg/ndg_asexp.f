@@ -60,7 +60,7 @@
 *     -  Any file names containing wildcards are expanded into a list of NDF 
 *     names. The supplied strings are intepreted by a shell (/bin/tcsh if
 *     it exists, otherwise /bin/csh, otherwise /bin/sh), and so may
-*     contain shell meta-characters (eg twiddle, $HOME, even command
+*     contain shell meta-characters (e.g. twiddle, $HOME, even command
 *     substitution and pipes - but pipe characters "|" need to be escaped
 *     using a backslash "\" to avoid them being interpreted as GRP
 *     editing characters).
@@ -239,7 +239,7 @@
       END IF
 
 *  Check the names added to the group as a result of the above call. 
-*  Each name may potentially be expanded into a list of names (eg because
+*  Each name may potentially be expanded into a list of names (e.g. because
 *  of wild-cards, etc). These are appended to the end of the group and the
 *  original name deleted. An error is reported if no accessable NDFs can
 *  be found matching any one of the supplied names.

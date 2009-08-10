@@ -4,7 +4,7 @@
 *     NDG_PTSUP
 
 *  Purpose:
-*     Store suplemental information for an NDF.
+*     Store supplemental information for an NDF.
 
 *  Language:
 *     Starlink Fortran 77

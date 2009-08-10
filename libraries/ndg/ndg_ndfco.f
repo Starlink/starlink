@@ -24,7 +24,7 @@
 *        template.
 *     IGRP = INTEGER (Given)
 *        A GRP identifier for a group holding the names of NDFs. This
-*        will often be creted using NDG_CREAT, but groups created "by 
+*        will often be created using NDG_CREAT, but groups created "by 
 *        hand" using GRP directly can also be used.
 *     INDEX = INTEGER (Given)
 *        The index within the group at which the name of the NDF to be

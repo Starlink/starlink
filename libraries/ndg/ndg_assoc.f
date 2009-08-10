@@ -48,7 +48,7 @@
 *     -  Any file names containing wildcards or "[..]" globbing patterns are 
 *     expanded into a list of NDF names. The supplied strings are intepreted 
 *     by a shell (/bin/tcsh if it exists, otherwise /bin/csh, otherwise 
-*     /bin/sh), and so may contain shell meta-characters (eg twiddle, $HOME, 
+*     /bin/sh), and so may contain shell meta-characters (e.g. twiddle, $HOME, 
 *     even command substitution and pipes - but pipe characters "|" need to 
 *     be escaped using a backslash "\" to avoid them being interpreted as GRP
 *     editing characters).

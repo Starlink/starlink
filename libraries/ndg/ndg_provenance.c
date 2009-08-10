@@ -14,8 +14,8 @@
 *
 *     The provenance information in an NDF encapsulates details of all 
 *     the other NDFs that were used in the creation of the NDF. The
-*     information is heirarchical and includes parents, grand parents, 
-*     great grand parents, etc, all the way back to "root ancestors" (a
+*     information is heirarchical and includes parents, grandparents, 
+*     great-grandparents, etc., all the way back to "root ancestors" (a
 *     root ancestor is an ancestor NDF that has no recorded parents).
 *
 *     On disk, the provenance information is stored in an NDF extension
@@ -411,7 +411,7 @@ F77_SUBROUTINE(ndg_formatprov)( INTEGER(iprov), LOGICAL(base), INTEGER(fkeymap),
 *
 *     "CREATOR" - The software item that created the NDF.
 *
-*     "PARENTS" - A comma separated list of indicies into the ancestors
+*     "PARENTS" - A comma-separated list of indices into the ancestors
 *            array that identifies the direct parents of the NDF.
 *
 *     "MORE" - A summary of the contents of the MORE structure associated
@@ -425,8 +425,8 @@ F77_SUBROUTINE(ndg_formatprov)( INTEGER(iprov), LOGICAL(base), INTEGER(fkeymap),
 *            earlier KeyMaps in the vector describe any subsequent actions
 *            performed on the ancestor NDF prior to it being used in the 
 *            creation of its parent. Each KeyMap contains the following
-*            scalar character enties (all taken from the corresonding 
-*            record in the NDF History component):
+*            scalar character entries (all taken from the corresponding 
+*            record in the NDF HISTORY component):
 *
 *            - "DATE": The date and time of the action (e.g. "2009-JUN-24
 *                      14:00:53.752" ).
@@ -566,8 +566,8 @@ F77_SUBROUTINE(ndg_getprov)( INTEGER(iprov), INTEGER(ianc),
 *          earlier KeyMaps in the vector describe any subsequent actions 
 *          performed on the ancestor NDF prior to it being used in the 
 *          creation of its parent. Each KeyMap contains the following
-*          scalar character enties (all taken from the corresonding 
-*          record in the NDF History component):
+*          scalar character entries (all taken from the corresponding 
+*          record in the NDF HISTORY component):
 *          - "DATE": The date and time of the action (e.g. "2009-JUN-24
 *            14:00:53.752" ).
 *          - "COMMAND": An indication of the command that performed the
@@ -1346,7 +1346,7 @@ void ndgFormatProv( NdgProvenance *prov, int base, AstKeyMap **keymap,
 *
 *     "CREATOR" - The software item that created the NDF.
 *
-*     "PARENTS" - A comma separated list of indicies into the ancestors
+*     "PARENTS" - A comma-separated list of indices into the ancestors
 *            array that identifies the direct parents of the NDF.
 *
 *     "MORE" - A summary of the contents of the MORE structure associated
@@ -1360,8 +1360,8 @@ void ndgFormatProv( NdgProvenance *prov, int base, AstKeyMap **keymap,
 *            earlier KeyMaps in the vector describe any subsequent actions
 *            performed on the ancestor NDF prior to it being used in the 
 *            creation of its parent. Each KeyMap contains the following
-*            scalar character enties (all taken from the corresonding 
-*            record in the NDF History component):
+*            scalar character entries (all taken from the corresponding 
+*            record in the NDF HISTORY component):
 *
 *            - "DATE": The date and time of the action (e.g. "2009-JUN-24
 *                      14:00:53.752" ).
@@ -1576,8 +1576,8 @@ AstKeyMap *ndgGetProv( NdgProvenance *prov, int ianc, HDSLoc **more,
 *       earlier KeyMaps in the vector describe any subsequent actions 
 *       performed on the ancestor NDF prior to it being used in the 
 *       creation of its parent. Each KeyMap contains the following
-*       scalar character enties (all taken from the corresonding 
-*       record in the NDF History component):
+*       scalar character entries (all taken from the corresponding 
+*       record in the NDF HISTORY component):
 *       - "DATE": The date and time of the action (e.g. "2009-JUN-24
 *         14:00:53.752" ).
 *       - "COMMAND": An indication of the command that performed the
@@ -1638,7 +1638,7 @@ AstKeyMap *ndgGetProv( NdgProvenance *prov, int ianc, HDSLoc **more,
 /* Create the returned (empty) KeyMap. */
          result = astKeyMap( " " );
 
-/* Get an array holding the indicies of the direct parents of the NDF. */
+/* Get an array holding the indices of the direct parents of the NDF. */
          parents = ndg1ParentIndicies( prov1, provenance, NULL, &npar, 
                                        status );
 
@@ -2081,7 +2081,7 @@ void ndgPutProv( NdgProvenance *prov, int indf, HDSLoc *more,
       if( astOK ) {
 
 
-/* Copy history records from the NDF History component into the main 
+/* Copy history records from the NDF HISTORY component into the main 
    Prov structure in "prov2". We do not copy records that were 
    propagated to the NDF from input NDFs since such records will already
    be present in the other Prov structures in "prov2". Thus, the only
@@ -2089,7 +2089,7 @@ void ndgPutProv( NdgProvenance *prov, int indf, HDSLoc *more,
    made to the NDF since it was created (e.g. changing a WCS attribute,
    changing a value in the FITS extension, etc), plus the record that
    describes the creation of the NDF. So we work backwards through the 
-   History component, from youngest to oldest history record, until the 
+   HISTORY component, from youngest to oldest history record, until the 
    record is reached that describes the creation of the NDF (as 
    indicated by the fact that its hash code matches the hash code 
    stored when provenance information was added to the NDF, i.e. at
@@ -3235,7 +3235,7 @@ static AstKeyMap *ndg1FormatProv( Provenance *provenance, int i, int base,
 *        
 *        "CREATOR" - The software item that created the NDF.
 *        
-*        "PARENTS" - A comma separated list of indicies into the ancestors
+*        "PARENTS" - A comma-separated list of indices into the ancestors
 *                    array that identifies the direct parents of the NDF.
 *        
 *        "MORE" - A summary of the contents of the MORE structure associated
@@ -3249,8 +3249,8 @@ static AstKeyMap *ndg1FormatProv( Provenance *provenance, int i, int base,
 *               Any earlier KeyMaps in the vector describe any subsequent 
 *               actions performed on the ancestor NDF prior to it being 
 *               used in the creation of its parent. Each KeyMap contains 
-*               the following scalar character enties (all taken from the 
-*               corresonding record in the NDF History component):
+*               the following scalar character entries (all taken from the 
+*               corresponding record in the NDF HISTORY component):
 *        
 *               - "DATE": The date and time of the action 
 *                         (e.g. "2009-JUN-24 14:00:53.752" ).
@@ -3390,12 +3390,12 @@ static AstKeyMap *ndg1FormatProv( Provenance *provenance, int i, int base,
    }
    astMapPut0I( mxlenkey, CREATOR_NAME, mxlen, NULL );
 
-/* Initialise a pointer to a dynamic string holding the comma separated
+/* Initialise a pointer to a dynamic string holding the comma-separated
    list of parent indices. */
    list = NULL;
    nc = 0;
 
-/* If the supplied Prov structure has any parents, store a comma separated
+/* If the supplied Prov structure has any parents, store a comma-separated
    list of the corresponding ANCESTOR indices in the returned KeyMap, and 
    update the maximum length of the "PARENTS" field. */
    if( prov->nparent > 0 ) {
@@ -3407,7 +3407,7 @@ static AstKeyMap *ndg1FormatProv( Provenance *provenance, int i, int base,
          sprintf( buf, "%d", ndg1FindAncestorIndex( prov->parents[ k ], 
                                                      provenance, status ) );
 
-/* Append this string to the end of the comma separated list, preceeding
+/* Append this string to the end of the comma-separated list, preceeding
    it with a comma unless it is the first value. */
          if( k > 0 ) list = astAppendString( list, &nc, "," );
          list = astAppendString( list, &nc, buf );
@@ -4479,7 +4479,7 @@ static int *ndg1ParentIndicies( Prov *prov, Provenance *provenance,
 *                              int *array, int *npar, int *status )
 
 *  Description:
-*     This function returns the indicies of the direct parents of a
+*     This function returns the indices of the direct parents of a
 *     specified ancestor. The values can be stored in a supplied array,
 *     or a new array can be allocated to hold them.
 
@@ -4736,8 +4736,7 @@ static void ndg1ReadHistRec( Prov *prov, int indf, int irec, int *hash,
 *                           int *status )
 
 *  Description:
-*     This function reads a specified record from the History component 
-*     of the given NDF. It then optionally creates a new empty HistRec 
+*     This function reads a specified record from the HISTORY *     of the given NDF. It then optionally creates a new empty HistRec 
 *     structure by extending the "hist_recs" array in the supplied Prov 
 *     structure and copies the history record into it. Additionally,
 *     if "hash" is not NULL, it computes a hash code for the history 
@@ -5624,7 +5623,7 @@ static void ndg1WriteProvenanceExtension( Provenance *provenance, int indf,
             dim[ 0 ] = prov->nparent;
             datMapI( loc, "WRITE", 1, dim, &parents, status );
 
-/* Put the indicies of the direct parents of the ancestor into the mapped
+/* Put the indices of the direct parents of the ancestor into the mapped
    array. */
             (void) ndg1ParentIndicies( prov, provenance, parents, NULL, 
                                        status );
