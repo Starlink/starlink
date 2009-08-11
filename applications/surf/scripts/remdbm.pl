@@ -226,8 +226,10 @@ foreach $frame ($Grp->members) {
 
   print "Chop: PA=$chop_pa THROW=$chop_thr\n";
 
-  $outwt = 'wt_' . $chop_pa . '_' . $chop_thr;
-  $outft = 'ft_' . $chop_pa . '_' . $chop_thr;
+  my $thrpa_file_suffix = $chop_pa . '_' . $chop_thr;
+  $thrpa_file_suffix =~ s/\./p/; # protect against "." in number
+  $outwt = 'wt_' . $thrpa_file_suffix;
+  $outft = 'ft_' . $thrp_file_suffix;
 
 
   # Make it LIKE the current image so that the origin information
@@ -267,8 +269,8 @@ foreach $frame ($Grp->members) {
     $string = "in=".$frame->file;
   }
 
-  $realout = "re_" . $chop_pa . '_' . $chop_thr;
-  $imout = "im_" . $chop_pa . '_' . $chop_thr;
+  $realout = "re_" . $thrpa_file_suffix;
+  $imout = "im_" . $thrpa_file_suffix;
 
   $status = $Mon{kappa_mon}->obeyw("fourier","$string realout=$realout imagout=$imout hermout=! reset");
   check_status($status);
