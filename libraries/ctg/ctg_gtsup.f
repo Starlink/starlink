@@ -26,7 +26,7 @@
 *        The supplemental information associated with the entry specified
 *        by I. Each element of the returned array contains the following:
 *
-*           1 - FITS extension specification (eg "{3}") if any
+*           1 - FITS extension specification (e.g. "{3}") if any
 *           2 - File type
 *           3 - Base file name
 *           4 - Directory path
@@ -35,7 +35,7 @@
 *        This information is obtained from a set of groups associated with 
 *        the supplied group IGRP by means of a chain of GRP "owner-slave"
 *        relationships. If any of these groups do not exist, the correponding
-*        elements of the above array are returned blank. Note, element 5,
+*        elements of the above array are returned blank. Note, Element 5,
 *        the full catalogue specification, is obtained directly from the 
 *        supplied group IGRP.
 *     STATUS = INTEGER (Given and Returned)

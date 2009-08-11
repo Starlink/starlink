@@ -17,7 +17,7 @@
 *     of the new catalogue is held at a given index within a given group. 
 *     It is equivalent to CAT_CREAT, except that any existing catalogue
 *     with the specified name is first deleted (unless the catalogue
-*     specification includes a FITS extension specifier).
+*     specification includes a FITS-extension specifier).
 
 *  Arguments:
 *     IGRP = INTEGER (Given)

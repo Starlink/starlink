@@ -29,7 +29,7 @@
 *     VERB = LOGICAL (Given)
 *        If TRUE then errors which occur whilst accessing supplied catalogues 
 *        are flushed so that the user can see them before re-prompting for
-*        a new catalogue ("verbose" mode). Otherwise, they are annulled and 
+*        a new catalogue (`verbose' mode). Otherwise, they are annulled and 
 *        a general "Cannot access file xyz" message is displayed before 
 *        re-prompting.
 *     IGRP = INTEGER (Given and Returned)
@@ -40,8 +40,8 @@
 *        The total number of catalogue names in the returned group.
 *     FLAG = LOGICAL (Returned)
 *        If the group expression was terminated by the GRP "flag
-*        character", then FLAG is returned true. Otherwise it is
-*        returned false. Returned .FALSE. if an error occurs.
+*        character", then FLAG is returned .TRUE.. Otherwise it is
+*        returned .FALSE..  Returned .FALSE. if an error occurs.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -49,7 +49,7 @@
 *     - Any file names containing wildcards are expanded into a list of
 *     catalogue names. The supplied strings are intepreted by a shell
 *     (/bin/tcsh if it exists, otherwise /bin/csh, otherwise /bin/sh),
-*     and so may contain shell meta-characters (eg twiddle, $HOME, even
+*     and so may contain shell meta-characters (e.g. twiddle, $HOME, even
 *     command substitution and pipes - but pipe characters "|" need to be
 *     escaped using a backslash "\" to avoid them being interpreted as
 *     GRP editing characters).
@@ -63,9 +63,9 @@
 *     type is used.
 *
 *     - Names of catalogues stored in FITS format may include an FITS
-*     extension number. For instance, "/home/dsb/mydata.fit{3} refers to
+*     extension number. For instance, "/home/dsb/mydata.fit{3}" refers to
 *     a catalogue stored in the third extension of the FITS file
-*     myadata.fit.
+*     mydata.fit.
 *
 *     - Catalogues stored in HDS format must be stored as the top level
 *     object within the .sdf file.

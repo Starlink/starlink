@@ -4,7 +4,7 @@
 *     CTG_CREAT
 
 *  Purpose:
-*     Obtain the names of a group of catalogue to be created from the
+*     Obtain the names of a group of catalogues to be created from the
 *     environment.
 
 *  Language:
@@ -41,7 +41,7 @@
 *
 *        - the basis token (an asterisk) is replaced by the file basename 
 *        associated with the corresponding element of the basis group (the
-*        "basis catalogue"). 
+*        "basis catalogue"); else
 *
 *        - if no directory specification is included in the group expression, 
 *        the directory specification associated with the basis catalogue is 
@@ -61,8 +61,8 @@
 *        The total number of file names in the returned group.
 *     FLAG = LOGICAL (Returned)
 *        If the group expression was terminated by the GRP "flag"
-*        character, then FLAG is returned .TRUE. Otherwise it is
-*        returned .FALSE. Returned .FALSE. if an error occurs.
+*        character, then FLAG is returned .TRUE.. Otherwise it is
+*        returned .FALSE.. Returned .FALSE. if an error occurs.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 

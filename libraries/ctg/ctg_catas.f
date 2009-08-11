@@ -20,7 +20,7 @@
 *  Arguments:
 *     IGRP = INTEGER (Given)
 *        A GRP identifier for a group holding the names of catalogues. This
-*        will often be creted using CTG_ASSOC, but groups created "by 
+*        will often be created using CTG_ASSOC, but groups created "by 
 *        hand" using GRP directly (i.e. without the supplemental groups
 *        created by CTG_ASSOC) can also be used.
 *     INDEX = INTEGER (Given)

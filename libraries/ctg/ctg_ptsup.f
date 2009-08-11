@@ -30,7 +30,7 @@
 *        The supplemental information to be stored with the entry specified
 *        by I. Each element of the supplied array should contain the 
 *        following:
-*           1 - FITS extension (eg "{3}") if any
+*           1 - FITS extension (e.g. "{3}") if any
 *           2 - File type
 *           3 - Base file name
 *           4 - Directory path
