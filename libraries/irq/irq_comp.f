@@ -18,8 +18,8 @@
 *     All the quality names referenced in the given quality expression
 *     (QEXP) are identified. If all quality names referenced in QEXP
 *     are defined within the NDF specified in LOCS, then the quality
-*     expression is `compiled', i.e.  converted into a form which can
-*     be used by IRQ_SBAD. The compiled quality expression is
+*     expression is `compiled', i.e. converted into a form that can
+*     be used by IRQ_SBADx. The compiled quality expression is
 *     identified by the returned IRQ identifier which should be
 *     released using IRQ_ANNUL when no longer needed. If any error is
 *     reported, then IRQ is returned set to the value IRQ__NOID.
@@ -40,7 +40,7 @@
 
 *  Arguments:
 *     LOCS(5) = CHARACTER * ( * ) (Given)
-*        An array of 5 HDS locators. These locators identify the NDF
+*        An array of five HDS locators. These locators identify the NDF
 *        and the associated quality name information.  They should have
 *        been obtained using routine IRQ_FIND or routine IRQ_NEW.
 *     SIZE = INTEGER (Given)
@@ -72,7 +72,7 @@
 *        above STATUS values occur.
 *     IDQ = INTEGER (Returned)
 *        An IRQ identifier for the compiled quality expression. This
-*        identifier can be passed to IRQ_SBAD. This identifier should
+*        identifier can be passed to IRQ_SBADx. This identifier should
 *        be annulled using routine IRQ_ANNUL or IRQ_CLOSE when it is no
 *        longer needed.  If an error is reported, then an invalid
 *        identifier (equal to IRQ__NOID) is returned.

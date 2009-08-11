@@ -17,10 +17,10 @@
 *     An HDS object (named QUALITY_NAMES) is created to hold quality
 *     name information within the specified NDF extension. An error is
 *     reported if the NDF extension does not exist. If the extension does
-*     exist, an array of 5 HDS locators is returned which is needed
+*     exist, an array of five HDS locators is returned which is needed
 *     when calling other IRQ routines. The first locator points to a
 *     temporary object which holds a cloned identifier for the NDF,
-*     the other 4 point to components of the QUALITY_NAMES structure
+*     the other four point to components of the QUALITY_NAMES structure
 *     contained in the NDF. IRQ_RLSE should be called to annul these
 *     locators (and the NDF identifier) when no further access to the
 *     NDFs quality names information is required.
@@ -51,7 +51,7 @@
 *        A set of HDS locators as described above.  The character
 *        variables supplied for this argument should have a declared
 *        length equal to symbolic constant DAT__SZLOC. These locator
-*        are annuled by calling IRQ_RLSE.
+*        are annulled by calling IRQ_RLSE.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 

@@ -4,7 +4,7 @@
 *     IRQ_DELET
 
 *  Purpose:
-*     Delete all quality name information from an NDF.
+*     Delete all quality-name information from an NDF.
 
 *  Language:
 *     Starlink Fortran 77
@@ -14,8 +14,8 @@
 
 *  Description:
 *     A search is made through the extensions contained within the
-*     supplied NDF for an HDS structure containing quality name
-*     information. If found, the QUALITY_NAMES structure containing the 
+*     supplied NDF for an HDS structure containing quality-name
+*     information. If found, the QUALITY_NAMES structure containing the
 *     quality names is deleted.
 
 *  Arguments:
@@ -64,9 +64,8 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT__ constants
-      INCLUDE 'IRQ_PAR'          ! IRQ constants.
-      INCLUDE 'IRQ_ERR'          ! IRQ error values.
-
+      INCLUDE 'IRQ_PAR'          ! IRQ constants
+      INCLUDE 'IRQ_ERR'          ! IRQ error values
 
 *  Arguments Given:
       INTEGER INDF
@@ -77,10 +76,10 @@
 *  Local Variables:
       INTEGER I                  ! Loop index.
       LOGICAL THERE              ! True if QUALITY_NAMES structure was
-                                 ! found in the current extension.
-      CHARACTER XLOC*(DAT__SZLOC)! Locator to current extension.
-      CHARACTER XN*(DAT__SZNAM)  ! Current extension name.
-      INTEGER XNUMB              ! No. of extensions in the NDF.
+                                 ! found in the current extension
+      CHARACTER XLOC*(DAT__SZLOC)! Locator to current extension
+      CHARACTER XN*(DAT__SZNAM)  ! Current extension name
+      INTEGER XNUMB              ! No. of extensions in the NDF
 
 *.
 

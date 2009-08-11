@@ -20,7 +20,7 @@
 *     quality expression, see ID6 appendix E), a pointer to the
 *     approximate position of the error within the quality expression
 *     is returned in ERRPNT.  Note, in order for a quality expression
-*     to compile successfully (using IRQ_COM), it must not only contain
+*     to compile successfully (using IRQ_COMP), it must not only contain
 *     no syntax errors, but must also contain no undefined quality
 *     names. IRQ_SYNTX cannot check for undefined quality names.
 *

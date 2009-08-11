@@ -23,7 +23,7 @@
 *
 *  Arguments:
 *     LOCS(5) = CHARACTER * ( * ) (Given)
-*        An array of 5 HDS locators. These locators identify the NDF
+*        An array of five HDS locators. These locators identify the NDF
 *        and the associated quality name information.  They should have
 *        been obtained using routine IRQ_FIND or routine IRQ_NEW.
 *     QNAME = CHARACTER * ( * ) (Given)
@@ -32,7 +32,7 @@
 *        using routine IRQ_ADDQN.
 *     BIT = INTEGER (Returned)
 *        The bit number used by the quality name within the quality
-*        array. Note, the least significant bit is bit 1, not bit 0.
+*        array. Note, the least-significant bit is Bit 1, not Bit 0.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 

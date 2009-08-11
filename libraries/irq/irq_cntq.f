@@ -27,7 +27,7 @@
 *
 *  Arguments:
 *     LOCS(5) = CHARACTER * ( * ) (Given)
-*        An array of 5 HDS locators. These locators identify the NDF
+*        An array of five HDS locators. These locators identify the NDF
 *        and the associated quality name information.  They should have
 *        been obtained using routine IRQ_FIND or routine IRQ_NEW.
 *     SIZE = INTEGER (Given)
@@ -35,7 +35,7 @@
 *        required.
 *     SET( SIZE ) = INTEGER (Returned)
 *        The number of pixels holding the corresponding quality in each
-*        of bit planes 1 to SIZE. The least significant bit is bit 1.
+*        of bit planes 1 to SIZE. The least-significant bit is Bit 1.
 *        If SIZE is larger than the number of bit planes in the QUALITY
 *        component, the unused elements are set to zero.
 *     STATUS = INTEGER (Given and Returned)

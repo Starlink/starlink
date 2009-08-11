@@ -124,7 +124,7 @@
 *  4) If the value is not fixed, but varies from pixel to pixel, then a
 *  bit must be reserved in the QUALITY component of the NDF to represent
 *  the quality name. An integer value is created to hold the bit number
-*  (least significant bit is called bit 1).
+*  (least-significant bit is called Bit 1).
       CALL DAT_NEW0I( QCLOC, IRQ__BTNAM, STATUS )
 
 *  5) A character string which holds a comment describing the quality

@@ -43,7 +43,7 @@
 *        false, then VALUE is indeterminate.
 *     BIT = INTEGER (Returned)
 *        BIT holds the corresponding bit number in the QUALITY component. 
-*        The least significant bit is called bit 1 (not bit 0). A value
+*        The least-significant bit is called Bit 1 (not Bit 0). A value
 *        of zero is returned if the quality has no associated bit in the 
 *        quality array. In this case, the FIXED argument will indicate if 
 *        all pixel do, or do not, hold the quality.

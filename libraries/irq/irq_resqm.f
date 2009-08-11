@@ -15,7 +15,7 @@
 
 *  Description:
 *     The quality specified by QNAME is removed from all NDF pixels
-*     which either do (or, if BAD is false,  do not) correspond to `bad'
+*     which either do (or, if BAD is false, do not) correspond to `bad'
 *     pixels in the input mask array.  The quality of all other pixels
 *     is left unchanged.  The quality name must be defined in the NDF
 *     specified by LOCS (LOCS should be obtained either by calling
@@ -28,7 +28,7 @@
 *
 *  Arguments:
 *     LOCS(5) = CHARACTER * ( * ) (Given)
-*        An array of 5 HDS locators. These locators identify the NDF
+*        An array of five HDS locators. These locators identify the NDF
 *        and the associated quality name information.  They should have
 *        been obtained using routine IRQ_FIND or routine IRQ_NEW.
 *     BAD = LOGICAL (Given)

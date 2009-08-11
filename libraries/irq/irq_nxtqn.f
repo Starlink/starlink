@@ -41,19 +41,19 @@
 *        If true, then the quality is either held by all pixels, or by
 *        no pixels. In this case the quality may not have a
 *        corresponding bit in the QUALITY component. If false, then
-*        some pixels have the quality and some don't, as indicated by
+*        some pixels have the quality and some do not, as indicated by
 *        the corresponding bit in the QUALITY component.
 *     VALUE = LOGICAL (Returned)
 *        If FIXED is true, then VALUE specifies whether all pixels hold
-*        the quality ( VALUE = .TRUE. ), or whether no pixels hold the
-*        quality ( VALUE = .FALSE. ). If FIXED is false, then VALUE is
+*        the quality (VALUE = .TRUE.), or whether no pixels hold the
+*        quality (VALUE = .FALSE.). If FIXED is false, then VALUE is
 *        indeterminate.
 *     BIT = INTEGER (Returned)
 *        BIT holds the corresponding bit number in the QUALITY component. 
-*        The least significant bit is called bit 1 (not bit 0). A value
+*        The least-significant bit is called Bit 1 (not Bit 0). A value
 *        of zero is returned if the quality has no associated bit in the 
 *        quality array. In this case, the FIXED argument will indicate if 
-*        all pixel do, or do not, hold the quality.
+*        all pixels do, or do not, hold the quality.
 *     COMMNT = CHARACTER * ( * ) (Returned)
 *        The descriptive comment which was stored with the quality name.
 *        The supplied character variable should have a declared length

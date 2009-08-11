@@ -18,7 +18,7 @@
 *     qualities, but this routine allows the calling application to specify
 *     which bit is to be used for a given quality.
 *
-*     By default, a QUALITY array bit is associated with a quality name
+*     By default, a QUALITY-array bit is associated with a quality name
 *     only if some pixels hold the quality and some do not hold the
 *     quality (i.e. there is a mix of values). Otherwise, a flag is stored
 *     in the QUALITY_NAMES structure indicating this, and any quality bit
@@ -35,7 +35,7 @@
 
 *  Arguments:
 *     LOCS(5) = CHARACTER * ( * ) (Given)
-*        An array of 5 HDS locators. These locators identify the NDF
+*        An array of five HDS locators. These locators identify the NDF
 *        and the associated quality name information.  They should have
 *        been obtained using routine IRQ_FIND or routine IRQ_NEW.
 *     QNAME = CHARACTER * ( * ) (Given)
@@ -44,12 +44,12 @@
 *        quality names is given by symbolic constant IRQ__SZQNM which
 *        currently has the value of 15.
 *     BIT = INTEGER (Given)
-*        The bit number to use. The least significant bit is bit 1, not
-*        bit 0. If value below 0 or above 8 is supplied, the properties
-*        of the quality name are left unchanged, but the FIXBIT value is 
-*        still returned.
+*        The bit number to use. The least significant bit is Bit 1, not
+*        Bit 0. If a value below 0 or above 8 is supplied, the 
+*        properties of the quality name are left unchanged, but the 
+*        FIXBIT value is still returned.
 *     FIXBIT = LOGICAL (Returned)
-*        Returned .TRUE. if the specified qualit name had a fixed bit
+*        Returned .TRUE. if the specified quality name had a fixed bit
 *        number on entry to this routine, and .FALSE. otherwise.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -94,7 +94,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT__ constants
-      INCLUDE 'IRQ_PAR'          ! IRQ constants.
+      INCLUDE 'IRQ_PAR'          ! IRQ constants
 
 *  Arguments Given:
       CHARACTER LOCS(5)*(*)
@@ -110,13 +110,13 @@
 *  Local Variables:
       INTEGER FIRST              ! Position of first non-blank character
       INTEGER INDF               ! Identifier for the NDF containing the
-                                 ! quality names information.
-      INTEGER LAST               ! Position of last non-blank character.
-      CHARACTER LQNAME*(IRQ__SZQNM) ! Upper case copy of quality name.
-      CHARACTER OLDNAM*(IRQ__SZQNM) ! Existing quality name.
+                                 ! quality names information
+      INTEGER LAST               ! Position of last non-blank character
+      CHARACTER LQNAME*(IRQ__SZQNM) ! Upper case copy of quality name
+      CHARACTER OLDNAM*(IRQ__SZQNM) ! Existing quality name
       LOGICAL RDONLY             ! Original read-only flag
       INTEGER SLOT               ! Index into the QUAL structure at
-                                 ! which the name was found.
+                                 ! which the name was found
       LOGICAL FIXED
       LOGICAL VALUE
       INTEGER OLDBIT

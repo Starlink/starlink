@@ -21,10 +21,10 @@
 *     IRQ__NOQNI is returned (if more than one such object is found,
 *     an error is reported and the status IRQ__MULT is returned).  The
 *     name of the NDF extension in which the object was found is
-*     returned in XNAME. An array of 5 HDS locators is returned which
+*     returned in XNAME. An array of five HDS locators is returned which
 *     is needed when calling other IRQ routines. The first locator
 *     points to a temporary object which holds a cloned identifier for
-*     the NDF, the other 4 point to components of the QUALITY_NAMES
+*     the NDF, the other four point to components of the QUALITY_NAMES
 *     structure contained in the NDF.  IRQ_RLSE should be called to
 *     annul these locators (and the NDF identifier) when no further
 *     access to the NDFs quality names information is required.

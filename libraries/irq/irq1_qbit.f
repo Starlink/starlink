@@ -20,7 +20,7 @@
 
 *  Arguments:
 *     LOCS( 5 ) = CHARACTER * ( * ) (Given)
-*        A set of 5 HDS locators. LOCS( 1 ) locates a temporary
+*        A set of five HDS locators. LOCS( 1 ) locates a temporary
 *        structure holding a cloned NDF identifier. LOCS(2) locates the
 *        QUAL array. LOCS(3) locates the LAST_USED value, holding the
 *        index of the last used slot in the QUAL array. LOCS(4) locates
