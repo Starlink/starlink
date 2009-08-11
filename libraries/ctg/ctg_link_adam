@@ -1,0 +1,3 @@
+echo -lctg_adam -lctg `grp_link_adam` `cat_link_adam` `one_link_adam` \
+                      `chr_link_adam` `psx_link_adam`\
+| awk '{for(f=NF;f;f--)if(!w[$f]++)l=$f" "l;print l}'
