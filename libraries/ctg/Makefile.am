@@ -1,13 +1,12 @@
 ## Process this file with automake to produce Makefile.in
 
-lib_LTLIBRARIES = libctg.la libctg_adam.la
+lib_LTLIBRARIES = libctg.la
 
 libctg_la_SOURCES = \
 	$(PRIVATE_INCLUDES) \
 	$(PUBLIC_INCLUDES) \
-	$(F_ROUTINES)
-
-libctg_adam_la_SOURCES = $(ADAM_F_ROUTINES)
+	$(F_ROUTINES) \
+        $(ADAM_F_ROUTINES)
 
 PRIVATE_INCLUDES = CTG_CONST
 include_HEADERS = $(PUBLIC_INCLUDES)
