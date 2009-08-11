@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@" support="U">
+  <version>@PACKAGE_VERSION@</version>
+  <path>libraries/irq</path>
+  <description>Library to manage NDF QUALITY information textually</description>
+  <abstract><p> This library is a set of Fortran routines that permit
+  management and use of textual names representing bits in the NDF QUALITY 
+  component.
+    </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>David Berry</name>
+      <uname>dsb</uname>
+    </person>
+    <person>
+      <name>Malcolm J. Currie</name>
+      <uname>mjc</uname>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
