@@ -950,6 +950,9 @@ libraries/kaplibs/ccg/ccg_wtm2.f
 libraries/kaplibs/ccg/ccg_wtm3.f
 libraries/kaplibs/ccg/ccg_wtm4.f
 
+libraries/irq/irq1_sbad1.f
+libraries/irq/irq_sbad.f
+
 libraries/kaplibs/fts/fts1_chva.f
 libraries/kaplibs/fts/fts1_gkeyx.f
 libraries/kaplibs/fts/fts1_ukeyx.f
