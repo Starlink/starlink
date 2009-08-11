@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@" support="U">
+  <version>@PACKAGE_VERSION@</version>
+  <path>libraries/ctg</path>
+  <description>Library to access groups of catalogues.</description>
+  <abstract><p> 
+     CTG provides routines for accessing groups of catalogues through
+     a single parameter using wild-cards, and lists in text files.  This is 
+     analogous to the way the NDG library accesses groups of NDFs using a 
+     single parameter.
+  </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>David Berry</name>
+      <uname>dsb</uname>
+    </person>
+    <person>
+      <name>Malcolm J. Currie</name>
+      <uname>mjc</uname>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
