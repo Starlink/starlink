@@ -19,7 +19,7 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {262.1}
 \newcommand{\stardocauthors}   {D.S.\ Berry \\ Malcolm J. Currie}
-\newcommand{\stardocdate}      {2009 August 9}
+\newcommand{\stardocdate}      {2009 August 11}
 \newcommand{\stardoctitle}     {CTG --- Accessing Groups of catalogues}
 \newcommand{\stardocversion}   {Version 3.0}
 \newcommand{\stardocmanual}    {Programmer's Manual}
@@ -745,6 +745,36 @@ STATUS testing.  Additionally, no action is taken when the FLAG
 character is given at the end of a group 
 specification---conventionally this would indicate that the user
 should be allowed to add further members.
+
+\section {Compiling and Linking with CTG}
+
+This section describes how to compile and link applications which use
+CTG subroutines, on UNIX systems. It is assumed that the CTG library
+is installed as part of the Starlink Software Collection.
+
+The library only has an ADAM interface to obtain the groups of
+catalogues.
+
+\subsection{\label{ss:buildingadamapplications}ADAM Applications}
+Users of the \xref{ADAM}{sg4}{} programming environment
+\latex{(SG/4)} should use
+the \xref{{\bf alink}}{sun144}{ADAM_link_scripts} command
+(\xref{SUN/144}{sun144}{}) to compile and link applications, and can
+access the CTG\_ library by including execution of the command
+{\tt ctg\_link} on the command line, as follows:
+
+\small
+\begin{verbatim}
+   % alink prog.f `ctg_link`
+\end{verbatim}
+\normalsize
+
+where {\tt prog.f} is the Fortran source file for the A-TASK. Again
+note the use of opening apostrophies (`) instead of the more usual
+closing apostrophy (') in the above {\bf alink} command.
+
+To build a program written in C (instead of Fortran), simply name the
+source file {\tt prog.c}, instead of {\tt prog.f}.
 
 \appendix
 
