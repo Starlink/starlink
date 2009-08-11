@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="irq" support="U">
+  <version>3.0</version>
+  <path>libraries/irq</path>
+  <description>Library to manage NDF QUALITY information textually</description>
+  <abstract><p> This library is a set of Fortran routines that permit
+  management and use of textual names representing bits in the NDF QUALITY 
+  component.
+    </p></abstract>
+  <dependencies >
+    <build>chr</build><build>generic</build><build>hds</build><build>kaplibs</build><build>mers</build><build>ndf</build><build>par</build><build>pcs</build><build>prm</build><build>sae</build><link>chr</link><link>hds</link><link>kaplibs</link><link>mers</link><link>ndf</link><link>par</link><link>pcs</link><link>prm</link><sourceset>htx</sourceset><sourceset>sst</sourceset><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>David Berry</name>
+      <uname>dsb</uname>
+    </person>
+    <person>
+      <name>Malcolm J. Currie</name>
+      <uname>mjc</uname>
+    </person>
+  </developers>
+  <documentation> sun261</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
