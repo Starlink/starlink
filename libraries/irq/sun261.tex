@@ -303,10 +303,10 @@ within an NDF.
 \\ #2 }
 
 %  Format the notes section.
-\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
+\newcommand{\sstnotes}[1]{\goodbreak\item[Notes:] \mbox{} \\[1.3ex] #1}
 
 %  Provide a general-purpose format for additional (DIY) sections.
-\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
+\newcommand{\sstdiytopic}[2]{\goodbreak\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
 \mbox{} \\[1.3ex] #2}
 
 %  Format the implementation status section.
@@ -338,6 +338,7 @@ within an NDF.
       \begin{description}
          #3
       \end{description}
+      \\
    }
 
 %  sstdescription
@@ -935,7 +936,7 @@ supplied to IRQ\_SBAD must be the same shape and size as the NDF section,
 {\em not} the base NDF. 
 
 Up to ten compiled quality expressions can be active at once. The
-identifiers for each compiled quality expression should be annuled
+identifiers for each compiled quality expression should be annulled
 when it is no longer needed by calling
 \htmlref{IRQ\_ANNUL}{IRQ_ANNUL}. \htmlref{IRQ\_CLOSE}{IRQ_CLOSE}
 should be called when all compiled quality expressions have been
@@ -1003,16 +1004,24 @@ source file {\tt adamprog.c}, instead of {\tt adamprog.f}.
    {Count the number of pixels with each bit set in the QUALITY component.}
 \noteroutine{IRQ\_COMP( LOCS, SIZE, INFO, QEXP, UNDEF, NUNDEF, ERRPNT, IDQ, STATUS )}
    {Compile a quality expression.}
+\noteroutine{CALL IRQ\_DELET( INDF, STATUS )}
+   {Delete all quality-name information from an NDF.}
 \noteroutine{IRQ\_FIND( INDF, LOCS, XNAME, STATUS )}
    {Find a structure containing quality names information.}
+\noteroutine{IRQ\_FXBIT( LOCS, QNAME, BIT, SET, FIXBIT, STATUS )}
+   {Assign a fixed bit number to a quality name.}
 \noteroutine{IRQ\_GETQN( LOCS, QNAME, FIXED, VALUE, BIT, COMMNT, STATUS )}
    {Get information about a specified quality name.}
+\noteroutine{CALL IRQ\_GETQX( PARAM, QEXP, STATUS )}
+   {Get a quality expression from the user and check for syntax errors.}
 \noteroutine{IRQ\_NEW( INDF, XNAME, LOCS, STATUS )}
    {Create a structure to hold quality names information.}
 \noteroutine{IRQ\_NUMQN( LOCS, NAMES, STATUS )}
    {Return the number of defined quality names.}
 \noteroutine{IRQ\_NXTQN( LOCS, CONTXT, QNAME, FIXED, VALUE, BIT, COMMNT, DONE, STATUS )}
    {Return information about the next defined quality name.}
+\noteroutine{IRQ\_RBIT( LOCS, QNAME, BIT, STATUS )}
+   {Reserve a bit number for a given quality name.}
 \noteroutine{IRQ\_REMQN( LOCS, QNAME, STATUS )}
    {Remove the definition of a quality name.}
 \noteroutine{IRQ\_RESQ( LOCS, QNAME, STATUS )}
@@ -1025,7 +1034,7 @@ source file {\tt adamprog.c}, instead of {\tt adamprog.f}.
    {Release the resource used to locate quality name information.}
 \noteroutine{IRQ\_RWQN( LOCS, QNAME, SET, NEWVAL, OLDVAL, STATUS )}
    {Get and/or set the read-only flag for a quality name.}
-\noteroutine{IRQ\_SBAD( IDQ, HELD, SIZE, VEC, ALLBAD, NOBAD, STATUS )}
+\noteroutine{IRQ\_SBADx( IDQ, HELD, SIZE, VEC, ALLBAD, NOBAD, STATUS )}
    {Set pixels bad which satisfy a given quality expression.}
 \noteroutine{IRQ\_SETQ( LOCS, QNAME, STATUS )}
    {Ensure all pixels hold a specified quality.}
@@ -1053,12 +1062,18 @@ STATUS~)}
    {Define a new quality name.}
 \noteroutine{IRQ\_CHKQN( LOCS, QNAME, THERE, STATUS )}
    {Check that a specified quality name is defined.}
+\noteroutine{CALL IRQ\_DELET( INDF, STATUS )}
+   {Delete all quality-name information from an NDF}
+\noteroutine{IRQ\_FXBIT( LOCS, QNAME, BIT, SET, FIXBIT, STATUS )}
+   {Assign a fixed bit number to a quality name.}
 \noteroutine{IRQ\_GETQN( LOCS, QNAME, FIXED, VALUE, BIT, COMMNT, STATUS )}
    {Get information about a specified quality name.}
 \noteroutine{IRQ\_NUMQN( LOCS, NAMES, STATUS )}
    {Return the number of defined quality names.}
 \noteroutine{IRQ\_NXTQN( LOCS, CONTXT, QNAME, FIXED, VALUE, BIT, COMMNT, DONE, STATUS )}
    {Return information about the next defined quality name.}
+\noteroutine{IRQ\_RBIT( LOCS, QNAME, BIT, STATUS )}
+   {Reserve a bit number for a given quality name.}
 \noteroutine{IRQ\_REMQN( LOCS, QNAME, STATUS )}
    {Remove the definition of a quality name.}
 \noteroutine{IRQ\_RWQN( LOCS, QNAME, SET, NEWVAL, OLDVAL, STATUS )}
@@ -1071,7 +1086,9 @@ STATUS~)}
    {Close down the compiled quality expression identifier system.}
 \noteroutine{IRQ\_COMP( LOCS, SIZE, INFO, QEXP, UNDEF, NUNDEF, ERRPNT, IDQ, STATUS )}
    {Compile a quality expression.}
-\noteroutine{IRQ\_SBAD( IDQ, HELD, SIZE, VEC, ALLBAD, NOBAD, STATUS )}
+\noteroutine{IRQ\_GETQN( LOCS, QNAME, FIXED, VALUE, BIT, COMMNT, STATUS )}
+   {Get information about a specified quality name.}
+\noteroutine{IRQ\_SBADx( IDQ, HELD, SIZE, VEC, ALLBAD, NOBAD, STATUS )}
    {Set pixels bad which satisfy a given quality expression.}
 \noteroutine{IRQ\_SYNTX( QEXP, ERRPNT, STATUS )}
    {Check a quality expression for syntax errors.}
@@ -1125,14 +1142,14 @@ STATUS~)}
    }
    \sstarguments{
       \sstsubsection{
-         LOCS(5) = CHARACTER (Given)
+         LOCS(5) = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         An array of 5 HDS locators. These locators identify the NDF
+         An array of five HDS locators. These locators identify the NDF
          and the associated quality name information.  They should have
          been obtained using routine IRQ\_FIND or routine IRQ\_NEW.
       }
       \sstsubsection{
-         QNAME = CHARACTER (Given)
+         QNAME = CHARACTER $*$ ( $*$ ) (Given)
       }{
          The new quality name to store. The maximum length of this
          string is given by symbolic constant IRQ\_\_SZQNM which currently
@@ -1147,7 +1164,7 @@ STATUS~)}
          no pixels hold the quality.
       }
       \sstsubsection{
-         COMMNT = CHARACTER (Given)
+         COMMNT = CHARACTER $*$ ( $*$ ) (Given)
       }{
          A descriptive comment to store with the quality name. The
          maximum length of this string is given by symbolic constant
@@ -1205,7 +1222,7 @@ STATUS~)}
    }
    \sstarguments{
       \sstsubsection{
-         LOCS(5) = CHARACTER (Given)
+         LOCS(5) = CHARACTER $*$ ( $*$ ) (Given)
       }{
          An array of five HDS locators. These locators identify the NDF
          and the associated quality name information.  They should have
@@ -1213,7 +1230,7 @@ STATUS~)}
          routine \htmlref{IRQ\_NEW}{IRQ_NEW}.
       }
       \sstsubsection{
-         QNAME = CHARACTER (Given)
+         QNAME = CHARACTER $*$ ( $*$ ) (Given)
       }{
          The quality name to search for. Leading blanks are ignored and
          the search is case-insensitive. The maximum allowed length for
@@ -1287,7 +1304,7 @@ STATUS~)}
    }
    \sstarguments{
       \sstsubsection{
-         LOCS(5) = CHARACTER (Given)
+         LOCS(5) = CHARACTER $*$ ( $*$ ) (Given)
       }{
          An array of five HDS locators. These locators identify the NDF
          and the associated quality name information.  They should have
@@ -1304,7 +1321,7 @@ STATUS~)}
          SET( SIZE ) = INTEGER (Returned)
       }{
          The number of pixels holding the corresponding quality in each
-         of bit planes 1 to SIZE. The least significant bit is Bit 1.
+         of bit planes 1 to SIZE. The least-significant bit is Bit 1.
          If SIZE is larger than the number of bit planes in the QUALITY
          component, the unused elements are set to zero.
       }
@@ -1322,13 +1339,14 @@ STATUS~)}
 }{
    \sstdescription{
       All the quality names referenced in the given quality expression
-      (QEXP) are identified. If all quality names referenced in QEXP
-      are defined within the NDF specified in LOCS, then the quality
+      (QEXP) are identified. If all quality names referenced in QEXP are
+      defined within the NDF specified in LOCS, then the quality
       expression is \emph{compiled}, \emph{i.e.} converted into a form
-      that can be used by IRQ\_SBAD. The compiled quality expression is
-      identified by the returned IRQ identifier which should be
-      released using \htmlref{IRQ\_ANNUL}{IRQ_ANNUL} when no longer needed. If any error is
-      reported, then IRQ is returned set to the value IRQ\_\_NOID.
+      that can be used by \\htmlref{IRQ\_SBADx}{IRQ\_SBADx}. The compiled
+      quality expression is identified by the returned IRQ identifier
+      which should be released using \htmlref{IRQ\_ANNUL}{IRQ_ANNUL} when
+      no longer needed. If any error is reported, then IRQ is returned
+      set to the value IRQ\_\_NOID.
 
       If any quality names referenced in the quality expression are not
       defined in the NDF specified by LOCS, they are returned in UNDEF,
@@ -1350,7 +1368,7 @@ STATUS~)}
    }
    \sstarguments{
       \sstsubsection{
-         LOCS(5) = CHARACTER (Given)
+         LOCS(5) = CHARACTER $*$ ( $*$ ) (Given)
       }{
          An array of five HDS locators. These locators identify the NDF
          and the associated quality name information.  They should have
@@ -1379,7 +1397,7 @@ STATUS~)}
 	 leading blanks are removed.
       }
       \sstsubsection{
-         UNDEF( SIZE ) = CHARACTER (Returned)
+         UNDEF( SIZE ) = CHARACTER $*$ ( $*$ ) (Returned)
       }{
          An array holding any undefined quality names referenced in the
          quality expression. The array should have at least IRQ\_\_QNREF
@@ -1408,10 +1426,39 @@ STATUS~)}
          IDQ = INTEGER (Returned)
       }{
          An IRQ identifier for the compiled quality expression. This
-         identifier can be passed to IRQ\_SBAD. This identifier should
-         be annulled using routine \htmlref{IRQ\_ANNUL}{IRQ_ANNUL} or IRQ\_CLOSE when it is no
+         identifier can be passed to IRQ\_SBADx. This identifier should
+         be annulled using routine \htmlref{IRQ\_ANNUL}{IRQ_ANNUL} or 
+         \htmlref{IRQ\_CLOSE}{IRQ_CLOSE} when it is no
          longer needed.  If an error is reported, then an invalid
          identifier (equal to IRQ\_\_NOID) is returned.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   IRQ\_DELET
+}{
+   Delete all quality-name information from an NDF
+}{
+   \sstdescription{
+      A search is made through the extensions contained within the
+      supplied NDF for an HDS structure containing quality name
+      information. If found, the QUALITY\_NAMES structure containing the
+      quality names is deleted.
+   }
+   \sstinvocation{
+      CALL IRQ\_DELET( INDF, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         INDF = INTEGER (Given)
+      }{
+         The input NDF.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -1435,9 +1482,9 @@ STATUS~)}
       more than one such object is found, an error is reported and the
       status IRQ\_\_MULT is returned).  The name of the NDF extension
       in which the object was found is returned in XNAME. An array of
-      5 HDS locators is returned which is needed when calling other
+      five HDS locators is returned which is needed when calling other
       IRQ routines. The first locator points to a temporary object
-      which holds a cloned identifier for the NDF, the other 4 point
+      which holds a cloned identifier for the NDF, the other four point
       to components of the QUALITY\_NAMES structure contained in the
       NDF.  \htmlref{IRQ\_RLSE}{IRQ_RLSE} should be called to annul
       these locators (and the NDF identifier) when no further access
@@ -1461,20 +1508,87 @@ STATUS~)}
          The input NDF.
       }
       \sstsubsection{
-         LOCS(5) = CHARACTER (Returned)
+         LOCS(5) = CHARACTER $*$ ( $*$ ) (Returned)
       }{
          A set of HDS locators as described above.  The character
          variables supplied for this argument should have a declared
          length equal to symbolic constant DAT\_\_SZLOC. These locator
-         are annuled by calling \htmlref{IRQ\_RLSE}{IRQ_RLSE}.
+         are annulled by calling \htmlref{IRQ\_RLSE}{IRQ_RLSE}.
       }
       \sstsubsection{
-         XNAME = CHARACTER (Returned)
+         XNAME = CHARACTER $*$ ( $*$ ) (Returned)
       }{
          The name of the NDF extension in which the quality name
          information was found. The character variable supplied for
          this argument should have a declared length equal to symbolic
          constant DAT\_\_SZNAM.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   IRQ\_FXBIT
+}{
+   Assign a fixed bit number to a quality name
+}{
+   \sstdescription{
+      This routine associates a fixed bit number with a specified quality
+      name. Normally, IRQ manages the allocation of bit numbers to named
+      qualities, but this routine allows the calling application to specify
+      which bit is to be used for a given quality.
+
+      By default, a QUALITY-array bit is associated with a quality name
+      only if some pixels hold the quality and some do not hold the
+      quality (\emph{i.e.} there is a mix of values). Otherwise, a flag is stored
+      in the QUALITY\_NAMES structure indicating this, and any quality bit
+      previously associated with the quality name is released for re-use.
+
+      This default behaviour is changed by calling this routine. The
+      specified bit number will continue to be associated with the quality
+      name even if all pixels do, or do not, hold the quality.
+
+      An error will be returned if the named quality is already associated
+      with a different bit number when this routine is called. An error
+      will also be reported if the specified bit number is already associated
+      with a different quality name.
+   }
+   \sstinvocation{
+      CALL IRQ\_FXBIT( LOCS, QNAME, BIT, SET, FIXBIT, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         LOCS(5) = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         An array of five HDS locators. These locators identify the NDF
+         and the associated quality name information.  They should have
+         been obtained using routine \htmlref{IRQ\_FIND}{IRQ_FIND} or 
+         routine \htmlref{IRQ\_NEW}{IRQ_NEW}.
+      }
+      \sstsubsection{
+         QNAME = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The quality name to use. Leading blanks are ignored and
+         the search is case-insensitive. The maximum allowed length for
+         quality names is given by symbolic constant IRQ\_\_SZQNM which
+         currently has the value of 15.
+      }
+      \sstsubsection{
+         BIT = INTEGER (Given)
+      }{
+         The bit number to use. The least-significant bit is Bit 1, not
+         Bit 0. If value below 0 or above 8 is supplied, the properties
+         of the quality name are left unchanged, but the FIXBIT value is
+         still returned.
+      }
+      \sstsubsection{
+         FIXBIT = LOGICAL (Returned)
+      }{
+         Returned {\tt .TRUE.} if the specified quality name had a fixed bit
+         number on entry to this routine, and {\tt .FALSE.} otherwise.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -1499,7 +1613,7 @@ STATUS~)}
    }
    \sstarguments{
       \sstsubsection{
-         LOCS(5) = CHARACTER (Given)
+         LOCS(5) = CHARACTER $*$ ( $*$ ) (Given)
       }{
          An array of five HDS locators. These locators identify the NDF
          and the associated quality name information.  They should have
@@ -1507,7 +1621,7 @@ STATUS~)}
          routine \htmlref{IRQ\_NEW}{IRQ_NEW}.
       }
       \sstsubsection{
-         QNAME = CHARACTER (Given)
+         QNAME = CHARACTER $*$ ( $*$ ) (Given)
       }{
          The quality name to search for. Leading blanks are ignored and
          the search is case-insensitive. The maximum allowed length for
@@ -1518,7 +1632,7 @@ STATUS~)}
          FIXED = LOGICAL (Returned)
       }{
          If {\tt true}, then the quality is either held by all pixels, or by
-         no pixels. In this case the quality does not have a
+         no pixels. In this case the quality may not have a
          corresponding bit in the QUALITY component. If {\tt false}, then
          some pixels have the quality and some do not, as indicated by
          the corresponding bit in the QUALITY component.
@@ -1534,17 +1648,55 @@ STATUS~)}
       \sstsubsection{
          BIT = INTEGER (Returned)
       }{
-         If FIXED is {\tt false}, then BIT holds the corresponding bit number
-         in the QUALITY component. The least significant bit is called
-         Bit 1 (not Bit 0). If FIXED is {\tt true}, then BIT is
-         indeterminate.
+         BIT holds the corresponding bit number in the QUALITY component.
+         The least-significant bit is called Bit 1 (not Bit 0). If there
+         is no corresponding bit, a value of zero is returned, and FIXED
+         is returned {\tt .TRUE.}.
       }
       \sstsubsection{
-         COMMNT = CHARACTER (Returned)
+         COMMNT = CHARACTER $*$ ( $*$ ) (Returned)
       }{
          The descriptive comment which was stored with the quality name.
          The supplied character variable should have a declared length
          given by symbolic constant IRQ\_\_SZCOM.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   IRQ\_GETQX
+}{
+   Get a quality expression from the user and check for syntax errors
+}{
+   \sstdescription{
+      A string is obtained from the environment using the supplied ADAM
+      parameter. This string is check to see if it has correct syntax
+      for a quality expression (no checks are made to ensure that the
+      quality names referenced within the expression are defined within
+      any specific NDF). If a syntax error is detected, the quality
+      expression is displayed with an exclamation mark under the
+      position at which the syntax error was detected. If any problem is
+      found with the supplied expression, a new value is obtained from
+      the environment. The returned string is converted to upper case
+      and leading blanks are removed.
+   }
+   \sstinvocation{
+      CALL IRQ\_GETQX( PARAM, QEXP, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The name of an ADAM parameter of type LITERAL.
+      }
+      \sstsubsection{
+         QEXP = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The returned quality expression.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -1596,19 +1748,19 @@ STATUS~)}
          The NDF identifier.
       }
       \sstsubsection{
-         XNAME = CHARACTER (Given)
+         XNAME = CHARACTER $*$ ( $*$ ) (Given)
       }{
          The name of the NDF extension in which the quality name
          information is to be stored. If this extension does not exist
          then an error is reported.
       }
       \sstsubsection{
-         LOCS(5) = CHARACTER (Returned)
+         LOCS(5) = CHARACTER $*$ ( $*$ ) (Returned)
       }{
          A set of HDS locators as described above.  The character
          variables supplied for this argument should have a declared
          length equal to symbolic constant DAT\_\_SZLOC. These locator
-         are annuled by calling \htmlref{IRQ\_RLSE}{IRQ_RLSE}.
+         are annulled by calling \htmlref{IRQ\_RLSE}{IRQ_RLSE}.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -1631,7 +1783,7 @@ STATUS~)}
    }
    \sstarguments{
       \sstsubsection{
-         LOCS(5) = CHARACTER (Given)
+         LOCS(5) = CHARACTER $*$ ( $*$ ) (Given)
       }{
          An array of five HDS locators. These locators identify the NDF
          and the associated quality name information.  They should have
@@ -1672,7 +1824,7 @@ STATUS~)}
    }
    \sstarguments{
       \sstsubsection{
-         LOCS(5) = CHARACTER (Given)
+         LOCS(5) = CHARACTER $*$ ( $*$ ) (Given)
       }{
          An array of five HDS locators. These locators identify the NDF
          and the associated quality name information.  They should have
@@ -1687,7 +1839,7 @@ STATUS~)}
          between subsequent calls.
       }
       \sstsubsection{
-         QNAME = CHARACTER (Returned)
+         QNAME = CHARACTER $*$ ( $*$ ) (Returned)
       }{
          The next quality name. The character variable supplied for this
          argument should have a declared length equal to the symbolic
@@ -1697,7 +1849,7 @@ STATUS~)}
          FIXED = LOGICAL (Returned)
       }{
          If {\tt true}, then the quality is either held by all pixels, or by
-         no pixels. In this case the quality does not have a
+         no pixels. In this case the quality may not have a
          corresponding bit in the QUALITY component. If {\tt false}, then
          some pixels have the quality and some do not, as indicated by
          the corresponding bit in the QUALITY component.
@@ -1713,13 +1865,14 @@ STATUS~)}
       \sstsubsection{
          BIT = INTEGER (Returned)
       }{
-         If FIXED is {\tt false}, then BIT holds the corresponding bit number
-         in the QUALITY component. The least significant bit is called
-         Bit 1 (not Bit 0). If FIXED is {\tt true}, then BIT is
-         indeterminate.
+         BIT holds the corresponding bit number in the QUALITY component.
+         The least-significant bit is called Bit 1 (not Bit 0).  A value
+         of zero is returned if the quality has no associated bit in the
+         quality array. In this case, the FIXED argument will indicate if
+         all pixels do, or do not, hold the quality.
       }
       \sstsubsection{
-         COMMNT = CHARACTER (Returned)
+         COMMNT = CHARACTER $*$ ( $*$ ) (Returned)
       }{
          The descriptive comment which was stored with the quality name.
          The supplied character variable should have a declared length
@@ -1730,6 +1883,52 @@ STATUS~)}
       }{
          Returned true if this routine is called when no more names
          remain to be returned.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   IRQ\_RBIT
+}{
+   Reserve a bit number for a given quality name
+}{
+   \sstdescription{
+      If the supplied quality name already has a bit number associated
+      with it, the bit number is returned. Otherwise, the next available
+      plane in the quality array is asigned to the quality name, and its
+      bit number is returned.
+
+      Note, write or update access must be available for the NDF (as
+      set up by routine \xref{LPG\_ASSOC}{sun263}{LPG_ASSOC} for instance).
+   }
+   \sstinvocation{
+      CALL IRQ\_RBIT( LOCS, QNAME, BIT, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         LOCS(5) = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         An array of five HDS locators. These locators identify the NDF
+         and the associated quality name information.  They should have
+         been obtained using routine \htmlref{IRQ\_FIND}{IRQ_FIND} or
+         routine \htmlref{IRQ\_NEW}{IRQ_NEW}.
+      }
+      \sstsubsection{
+         QNAME = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The quality name. This quality name must be defined in the NDF
+         specified by LOCS. Name definitions can be added to the NDF
+         using routine \htmlref{IRQ\_ADDQN}{IRQ_ADDQN}.
+      }
+      \sstsubsection{
+         BIT = INTEGER (Returned)
+      }{
+         The bit number used by the quality name within the quality
+         array. Note, the least-significant bit is Bit 1, not Bit 0.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -1759,7 +1958,7 @@ STATUS~)}
    }
    \sstarguments{
       \sstsubsection{
-         LOCS(5) = CHARACTER (Given)
+         LOCS(5) = CHARACTER $*$ ( $*$ ) (Given)
       }{
          An array of five HDS locators. These locators identify the NDF
          and the associated quality name information.  They should have
@@ -1767,7 +1966,7 @@ STATUS~)}
          routine \htmlref{IRQ\_NEW}{IRQ_NEW}.
       }
       \sstsubsection{
-         QNAME = CHARACTER (Given)
+         QNAME = CHARACTER $*$ ( $*$ ) (Given)
       }{
          The quality name to remove, or {\tt 'ANY'} if all quality names are
          to be removed.
@@ -1798,14 +1997,14 @@ STATUS~)}
    }
    \sstarguments{
       \sstsubsection{
-         LOCS(5) = CHARACTER (Given)
+         LOCS(5) = CHARACTER $*$ ( $*$ ) (Given)
       }{
          An array of five HDS locators. These locators identify the NDF
          and the associated quality name information.  They should have
          been obtained using routine IRQ\_FIND or routine IRQ\_NEW.
       }
       \sstsubsection{
-         QNAME = CHARACTER (Given)
+         QNAME = CHARACTER $*$ ( $*$ ) (Given)
       }{
          The quality name to be removed from all pixels in the NDF. This
          quality name must be defined in the NDF specified by LOC. Name
@@ -1844,7 +2043,7 @@ STATUS~)}
    }
    \sstarguments{
       \sstsubsection{
-         LOCS(5) = CHARACTER (Given)
+         LOCS(5) = CHARACTER $*$ ( $*$ ) (Given)
       }{
          An array of five HDS locators. These locators identify the NDF
          and the associated quality name information.  They should have
@@ -1858,7 +2057,7 @@ STATUS~)}
          removed from all pixels not included in the list given by LIST.
       }
       \sstsubsection{
-         QNAME = CHARACTER (Given)
+         QNAME = CHARACTER $*$ ( $*$ ) (Given)
       }{
          The quality name to be removed from the selected pixels. This
          quality name must be defined in the NDF specified by LOC. Name
@@ -1894,6 +2093,7 @@ STATUS~)}
       }
    }
 }
+\newpage
 \sstroutine{
    IRQ\_RESQM
 }{
@@ -1919,7 +2119,7 @@ STATUS~)}
    }
    \sstarguments{
       \sstsubsection{
-         LOCS(5) = CHARACTER (Given)
+         LOCS(5) = CHARACTER $*$ ( $*$ ) (Given)
       }{
          An array of five HDS locators. These locators identify the NDF
          and the associated quality name information.  They should have
@@ -1934,7 +2134,7 @@ STATUS~)}
          which are not `bad' in the mask.
       }
       \sstsubsection{
-         QNAME = CHARACTER (Given)
+         QNAME = CHARACTER $*$ ( $*$ ) (Given)
       }{
          The quality name to be removed from the selected pixels. This
          quality name must be defined in the NDF specified by LOC. Name
@@ -1989,7 +2189,7 @@ STATUS~)}
    }
    \sstarguments{
       \sstsubsection{
-         LOCS(5) = CHARACTER (Given)
+         LOCS(5) = CHARACTER $*$ ( $*$ ) (Given)
       }{
          An array of five HDS locators. These locators identify the NDF
          and the associated quality name information.  They should have
@@ -2002,7 +2202,6 @@ STATUS~)}
       }
    }
 }
-\newpage
 \sstroutine{
    IRQ\_RWQN
 }{
@@ -2066,7 +2265,7 @@ STATUS~)}
    }
 }
 \sstroutine{
-   IRQ\_SBAD
+   IRQ\_SBADx
 }{
    Set pixels `bad' which satisfy a given quality expression
 }{
@@ -2089,7 +2288,7 @@ STATUS~)}
       UPDATE access on entry to this routine, an error is reported.
    }
    \sstinvocation{
-      CALL IRQ\_SBAD( IDQ, HELD, SIZE, VEC, ALLBAD, NOBAD, STATUS )
+      CALL IRQ\_SBADx( IDQ, HELD, SIZE, VEC, ALLBAD, NOBAD, STATUS )
    }
    \sstarguments{
       \sstsubsection{
@@ -2102,7 +2301,7 @@ STATUS~)}
       \sstsubsection{
          HELD = LOGICAL (Given)
       }{
-         If true then those VEC pixels which hold a quality satisfying
+         If {\tt true} then those VEC pixels that hold a quality satisfying
          the supplied quality expression are set `bad'. Otherwise, those
          pixels which do not hold such a quality are set `bad'.
       }
@@ -2114,7 +2313,7 @@ STATUS~)}
          determined by IDQ.
       }
       \sstsubsection{
-         VEC( SIZE ) = REAL (Given and Returned)
+         VEC( SIZE ) = ? (Given and Returned)
       }{
          The data to be set `bad', depending on the corresponding
          quality values stored in the NDF. It must be the same size as
@@ -2140,6 +2339,15 @@ STATUS~)}
          The global status.
       }
    }
+   \sstnotes{
+      \sstitemlist{
+         \sstitem
+         There is a routine for each numeric data type: replace {\tt "x"} in
+         the routine name by D, R, I, W, UW, B or UB as appropriate.  The
+         VEC array supplied to the routine must have the data type
+         specified.
+      }
+   }
 }
 \sstroutine{
    IRQ\_SETQ
@@ -2160,14 +2368,14 @@ STATUS~)}
    }
    \sstarguments{
       \sstsubsection{
-         LOCS(5) = CHARACTER (Given)
+         LOCS(5) = CHARACTER $*$ ( $*$ ) (Given)
       }{
          An array of five HDS locators. These locators identify the NDF
          and the associated quality name information.  They should have
          been obtained using routine IRQ\_FIND or routine IRQ\_NEW.
       }
       \sstsubsection{
-         QNAME = CHARACTER (Given)
+         QNAME = CHARACTER $*$ ( $*$ ) (Given)
       }{
          The quality name to assign to all pixels in the NDF. This
          quality name must be defined in the NDF specified by LOC. Name
@@ -2206,7 +2414,7 @@ STATUS~)}
    }
    \sstarguments{
       \sstsubsection{
-         LOCS(5) = CHARACTER (Given)
+         LOCS(5) = CHARACTER $*$ ( $*$ ) (Given)
       }{
          An array of five HDS locators. These locators identify the NDF
          and the associated quality name information.  They should have
@@ -2220,7 +2428,7 @@ STATUS~)}
          assigned to all pixels not included in the list given by LIST.
       }
       \sstsubsection{
-         QNAME = CHARACTER (Given)
+         QNAME = CHARACTER $*$ ( $*$ ) (Given)
       }{
          The quality name to assign to the selected pixels. This quality
          name must be defined in the NDF specified by LOC. Name
@@ -2279,7 +2487,7 @@ STATUS~)}
    }
    \sstarguments{
       \sstsubsection{
-         LOCS(5) = CHARACTER (Given)
+         LOCS(5) = CHARACTER $*$ ( $*$ ) (Given)
       }{
          An array of five HDS locators. These locators identify the NDF
          and the associated quality name information.  They should have
@@ -2294,7 +2502,7 @@ STATUS~)}
          which are not `bad' in the mask.
       }
       \sstsubsection{
-         QNAME = CHARACTER (Given)
+         QNAME = CHARACTER $*$ ( $*$ ) (Given)
       }{
          The quality name to assign to the selected pixels. This quality
          name must be defined in the NDF specified by LOC. Name
@@ -2329,7 +2537,7 @@ STATUS~)}
 \sstroutine{
    IRQ\_SYNTX
 }{
-   Compile a quality expression
+   Check the syntax of a quality expression
 }{
    \sstdescription{
       The syntax of the supplied quality expression is checked, and an
@@ -2340,7 +2548,7 @@ STATUS~)}
       here}{APP:ERRORS}}), a pointer to the
       approximate position of the error within the quality expression
       is returned in ERRPNT.  Note, in order for a quality expression
-      to compile succesfully (using \htmlref{IRQ\_COM}{IRQ_COM}), it must not 
+      to compile successfully (using \htmlref{IRQ\_COMP}{IRQ_COMP}), it must not 
       only contain no syntax errors, but must also contain no undefined quality
       names. IRQ\_SYNTX cannot check for undefined quality names.
    }
@@ -2380,16 +2588,20 @@ STATUS~)}
 
 \newpage
 \section {HDS Data Structures}
-The IRQ package uses several different HDS data structures. These are described 
-in this appendix. HDS {\em names} are indicated by being placed within
-square brackets ({[} {]}), and HDS {\em types} are indicated by being placed 
-within angled brackets ($<$ $>$).
+
+The IRQ package uses several different HDS data structures. These are
+described in this appendix. HDS {\em names} are indicated by being
+placed within square brackets ({[} {]}), and HDS {\em types} are
+indicated by being placed within angled brackets ($<$ $>$).
+
 \subsection{Quality names information stored in an NDF}
-Information describing the quality names which are defined within an NDF is
-stored in a structure called {[}{\bf QUALITY\_NAMES}{]}, with HDS {\em type} 
-$<${\bf QUALITY\_NAMES}$>$. This structure can be stored in any extension 
-within the NDF. The components of this structure are shown in 
-\latexhtml{Table~\ref {TAB:QN}}{the table below}.
+
+Information describing the quality names which are defined within an
+NDF is stored in a structure called {[}{\bf QUALITY\_NAMES}{]}, with
+HDS {\em type} $<${\bf QUALITY\_NAMES}$>$. This structure can be
+stored in any extension within the NDF. The components of this
+structure are shown in \latexhtml{Table~\ref {TAB:QN}}{the table
+below}.
 
 \begin{table}[htb]
 \centering
@@ -2421,11 +2633,12 @@ particular, {[}{\bf FREE}{]} is a vector which holds the indices of
 all unused cells within {[}{\bf QUAL}{]}. These indices may appear in
 any order within in {[}{\bf FREE}{]}. 
 
-The set of five HDS locators returned by routines \htmlref{IRQ\_NEW}{IRQ_NEW}
-and \htmlref{IRQ\_FIND}{IRQ_FIND} include
-locators to each of the four components of the {[}{\bf QUALITY\_NAMES}{]}
-structure, together with a locator for a temporary HDS structure holding a
-single $<${\bf \_INTEGER}$>$ scalar used to store the cloned NDF identifier. 
+The set of five HDS locators returned by routines
+\htmlref{IRQ\_NEW}{IRQ_NEW} and \htmlref{IRQ\_FIND}{IRQ_FIND} include
+locators to each of the four components of the {[}{\bf
+QUALITY\_NAMES}{]} structure, together with a locator for a temporary
+HDS structure holding a single $<${\bf \_INTEGER}$>$ scalar used to
+store the cloned NDF identifier. 
 
 The information describing each individual quality name is stored in a single
 cell of the {[}{\bf QUAL}{]} vector. The components within each cell of this 
@@ -2453,27 +2666,30 @@ quality\\
 \end{tabular}
 \end{table}
 
-If {\em all} pixels hold a given quality, or if {\em no} pixels hold the
-quality, then a true value is stored for {[}{\bf FIXED}{]}. A true value is
-stored for {[}{\bf VALUE}{]} if {\em all} pixels hold the quality, and a false
-value if {\em no} pixels hold the quality. In either case, {[}{\bf BIT}{]} is
-ignored since no QUALITY bit needs to be reserved for the quality name, thus
-allowing more than eight quality names to be defined simultaneously. 
+If {\em all} pixels hold a given quality, or if {\em no} pixels hold
+the quality, then a true value is stored for {[}{\bf FIXED}{]}. A true
+value is stored for {[}{\bf VALUE}{]} if {\em all} pixels hold the
+quality, and a false value if {\em no} pixels hold the quality. In
+either case, {[}{\bf BIT}{]} is ignored since no QUALITY bit needs to
+be reserved for the quality name, thus allowing more than eight
+quality names to be defined simultaneously. 
 
-If some pixels {\em do} hold the quality but some {\em do not}, then a false 
-value is stored for {[}{\bf FIXED}{]} and {[}{\bf VALUE}{]} is ignored. In this 
-case, a QUALITY bit is reserved to represent the quality and its bit number (in 
-the range 1 to 8) is stored in {[}{\bf BIT}{]}.
+If some pixels {\em do} hold the quality but some {\em do not}, then a
+false value is stored for {[}{\bf FIXED}{]} and {[}{\bf VALUE}{]} is
+ignored. In this case, a QUALITY bit is reserved to represent the
+quality and its bit number (in the range 1 to 8) is stored in {[}{\bf
+BIT}{]}.
 
-\subsection{Temporary structures used to hold compiled quality expressions}
-When routine IRQ\_COMP is called to compile a quality expression, the resulting
-information (known as a `compiled quality expression') is stored in a
-temporary HDS structure. Up to ten compiled quality expressions can exist
-simultaneously, each being stored in one cell of an array of temporary
-structures. The identifier returned by IRQ\_COMP is just an index within this
-array. Each cell of the array has an HDS {\em name} of {[}{\bf QEXP}{]} and an
-HDS {\em type} of $<${\bf QEXP}$>$, and contains the components listed in 
-\latexhtml{Table~\ref {TAB:QEXP}}{Table 3}. 
+\subsection{Temporary structures used to hold compiled quality
+expressions} When routine \htmlref{IRQ\_COMP}{IRQ_COMP} is called to
+compile a quality expression, the resulting information (known as a
+`compiled quality expression') is stored in a temporary HDS structure.
+Up to ten compiled quality expressions can exist simultaneously, each
+being stored in one cell of an array of temporary structures. The
+identifier returned by IRQ\_COMP is just an index within this array.
+Each cell of the array has an HDS {\em name} of {[}{\bf QEXP}{]} and
+an HDS {\em type} of $<${\bf QEXP}$>$, and contains the components
+listed in \latexhtml{Table~\ref {TAB:QEXP}}{Table 3}. 
 
 \begin{table}[htb]
 \centering
