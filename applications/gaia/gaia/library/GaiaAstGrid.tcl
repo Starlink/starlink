@@ -497,17 +497,17 @@ itcl::class gaia::GaiaAstGrid {
       }
       if { $position_($this,labelat1) != "" } {
          lappend options \
-            "labelat(1)=[radec_to_radian_ 1 $position_($this,labelat1)]"
+            "labelat(1)=[radec_to_radian_ 2 $position_($this,labelat1)]"
       }
       if { $position_($this,labelat2) != "" } {
          lappend options \
-            "labelat(2)=[radec_to_radian_ 2 $position_($this,labelat2)]"
+            "labelat(2)=[radec_to_radian_ 1 $position_($this,labelat2)]"
       }
 
       lappend options "labelup(1)=$position_($this,labelup1)"
       lappend options "labelup(2)=$position_($this,labelup2)"
       lappend options "labelling=$position_($this,labelling)"
-      
+
       #  Add spacing options.
       foreach {sname lname default} $scaleattrib_ {
          lappend options "$sname=$spacing_($sname)"
@@ -520,7 +520,7 @@ itcl::class gaia::GaiaAstGrid {
             lappend options "$sname=[expr int($spacing_($sname))]"
          }
       }
-      
+
       #  Add scaling options.
       foreach {sname lname deffont defsize} $fontattrib_ {
          lappend options "size($sname)=$size_($sname)"
@@ -536,17 +536,17 @@ itcl::class gaia::GaiaAstGrid {
       foreach {sname lname default} $styleattrib_ {
          lappend options "style($sname)=[expr int($style_($sname))]"
       }
-      
+
       #  Add the elements options.
       foreach {sname lname default} $elementattrib_ {
          lappend options "$sname=$element_($this,$sname)"
       }
-      
+
       #  Add the colour options.
       foreach {sname lname default} $colourattrib_ {
          lappend options "colour($sname)=$colour_($sname)"
       }
-      
+
       #  Add the font options.
       foreach {sname lname deffont defsize} $fontattrib_ {
          lappend options "font($sname)=$font_($sname)"
@@ -568,10 +568,10 @@ itcl::class gaia::GaiaAstGrid {
       if { $system_(equinox) != "default" } {
          lappend options "equinox=$system_(equinox)"
       }
-      
+
       #  Add any new labels. Note these are formatted so that
       #  non-keyboard characters can be used (i.e. \000 type
-      #  numbers). AST formatting may also be present and introduce 
+      #  numbers). AST formatting may also be present and introduce
       #  percent characters. These should be protected.
       foreach {sname lname} $labelattrib_ {
          if { $label_($this,$sname) != "" } {
@@ -586,7 +586,7 @@ itcl::class gaia::GaiaAstGrid {
             lappend options "$sname=$value"
          }
       }
-      
+
       #  And set the axes number formatting to be used. Note this is
       #  quite different for SkyFrames and ordinary Frames.
       if { ! $format_($this,noformat) } {
@@ -613,7 +613,7 @@ itcl::class gaia::GaiaAstGrid {
       }
       return $options
    }
-   
+
    #  Draw the grid (really).
    protected method draw_grid_ {} {
       busy {
@@ -631,12 +631,12 @@ itcl::class gaia::GaiaAstGrid {
          set options [gen_options_]
 
          #  Set the grid tags, ast_tag for general control, grid_tag_
-	 #  for this particular grid.
+         #  for this particular grid.
          $itk_option(-rtdimage) configure -ast_tag \
-	    "$itk_option(-ast_tag) $grid_tag_"
+            "$itk_option(-ast_tag) $grid_tag_"
 
          #  If requested just display over the visible canvas +/- a little.
-         if { ! $gridsize_($this,whole) } { 
+         if { ! $gridsize_($this,whole) } {
             set xf [expr 0.5*(1.0-$gridsize_($this,xfrac))]
             set yf [expr 0.5*(1.0-$gridsize_($this,yfrac))]
             set w [winfo width $itk_option(-canvas)]
@@ -771,7 +771,7 @@ itcl::class gaia::GaiaAstGrid {
             puts $fid "set Xformat_(\$this,.) $Xformat_($this,.)"
             puts $fid "set Yformat_(\$this,.) $Yformat_($this,.)"
             puts $fid "set format_(\$this,noformat) $format_($this,noformat)"
-            ::close $fid 
+            ::close $fid
          }
       }
    }
@@ -1148,8 +1148,8 @@ itcl::class gaia::GaiaAstGrid {
          pack $itk_component(Length$sname) -side top -fill x -ipadx 1m -ipady 1m
       }
 
-      #  Control what area the plot covers. This can be the whole just 
-      #  or just the part that is displayed. 
+      #  Control what area the plot covers. This can be the whole just
+      #  or just the part that is displayed.
       itk_component add scale4 {
          LabelRule $parent.scale4 -text "Grid size:"
       }
@@ -1228,7 +1228,7 @@ itcl::class gaia::GaiaAstGrid {
 
    #  Disable the display fraction widget if not allowed.
    protected method set_whole_ {} {
-      if { $gridsize_($this,whole) } { 
+      if { $gridsize_($this,whole) } {
          $itk_component(Xfrac) configure -state disabled
          $itk_component(Yfrac) configure -state disabled
       } else {
@@ -1237,9 +1237,9 @@ itcl::class gaia::GaiaAstGrid {
       }
       redraw_
    }
-   
+
    #  Set the value of gridsize element.
-   protected method set_gridsize_config_ {name value} { 
+   protected method set_gridsize_config_ {name value} {
       set gridsize_($this,$name) $value
       redraw_
    }
@@ -1790,22 +1790,12 @@ itcl::class gaia::GaiaAstGrid {
       #  hopefully sensible places.
       set newvalue 0.0
       if { [string match {*:*:*} $value] } {
-         $itk_option(-rtdimage) convert coords 1.0 1.0 image ra dec wcs
-         switch $axis {
-            1 {
-               set res [catch {$itk_option(-rtdimage) convert coords \
-                                  $ra $value wcs dummy newvalue deg} error]
-            }
-            2 {
-               set res [catch {$itk_option(-rtdimage) convert coords \
-                                  $value $dec wcs newvalue dummy deg} error]
-            }
+         set adr [$itk_option(-rtdimage) astgetclone]
+         if { [catch {gaiautils::astunformat $adr $axis $value} newvalue ] } {
+            warning_dialog "Cannot interpret \"$value\" as a valid HH:MM:SS or DD:MM:SS string ($newvalue)"
+            set newvalue $value
          }
-         if { $res } {
-            warning_dialog "Cannot interpret \"$value\" as a valid HH:MM:SS or DD:MM:SS string ($error)"
-         } else {
-            set newvalue [expr $newvalue*0.017453293]
-         }
+         gaiautils::astannul $adr
       } else {
          if { [catch {expr $value*1.0}] } {
             warning_dialog "Cannot interpret \"$value\""
@@ -1875,7 +1865,7 @@ itcl::class gaia::GaiaAstGrid {
    #  Short and long names of elements that can be plotted and their
    #  defaults.
    protected variable elementannounce_ {Display elements:}
-   protected variable elementattrib_ {} 
+   protected variable elementattrib_ {}
 
    #  Variation on elements for normal grids and those for channel maps.
    protected variable normalelementattrib_ {
@@ -2003,7 +1993,7 @@ itcl::class gaia::GaiaAstGrid {
    #  protected variable xname_ X
    #  protected variable yname_ Y
 
-   #  Unique tag for this grid. 
+   #  Unique tag for this grid.
    protected variable grid_tag_ {}
 
    #  Whether to configure to channel map defaults, or not.

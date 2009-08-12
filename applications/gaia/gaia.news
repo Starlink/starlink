@@ -9,6 +9,10 @@
     is now to also autocrop the result removing any surrounding blank
     areas.
 
+    A bug in the positioning of the grid axes when the image has 
+    swapped RA and Dec axes has been fixed. Previously an attempt to 
+    explicitly position the axes failed.
+
 
     Version 4.3-0
     =============

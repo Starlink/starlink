@@ -246,6 +246,9 @@ class StarRtdImage : public Skycat
    //  Replace the existing WCS FrameSet.
    int astreplaceCmd( int argc, char *argv[] );
 
+   //  Return a clone of the main AstFrameSet.
+   int astgetcloneCmd( int argc, char *argv[] );
+
    //  Restore an old WCS FrameSet.
    int astrestoreCmd( int argc, char *argv[] );
 
