@@ -256,6 +256,9 @@ SUN                            STARLINK USER NOTES                           SUN
 258.01  2008-MM-DD            SMURF
 259.01  2008-04-09 JB    ??   GSD2ACSIS - Programmer's Guide (SMURF)
 260.01  2008-06-20 BC    ??   ORAC-DR - ACSIS pipeline data reduction
+261.01  2009-08-08 DSB   ??   IRQ - Handling of QUALITY in NDFs
+262.01  2009-08-09 MJC   ??   CTG - Accessing Groups of Catalogues
+263.01  2009-08-11 MJC   ??   LPG - Processing in a loop a set of NDFs or catalogues
 
 AUTHORS                          AUTHORS                                AUTHORS
                                      (Site code)
