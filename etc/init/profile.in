@@ -452,16 +452,16 @@ if test -f ${bindir}/atools/atools.sh; then
   atools () { . $ATOOLS_DIR/atools.sh; }
   atools () { . $ATOOLS_DIR/atools.sh; }
 else
-  atools () { ${staretcdir}/notinst atools; }
-  atoolssetup () { ${staretcdir}/notinst atools; }
+  atools () { ${STARLINK_DIR}/etc/notinst atools; }
+  atoolssetup () { ${STARLINK_DIR}/etc/notinst atools; }
 fi
 
 # AUTOASTROM
 
 if test -f ${exec_prefix}/Perl/bin/autoastrom; then
-  autoastrom () { ${exec_prefix}/Perl/bin/perl $AUTOASTROM_DIR/autoastrom; }
+  autoastrom () { ${STARLINK_DIR}/Perl/bin/perl $AUTOASTROM_DIR/autoastrom; }
 else
-  autoastrom () { ${staretcdir}/notinst autoastrom; }
+  autoastrom () { ${STARLINK_DIR}/etc/notinst autoastrom; }
 fi
 
 # CCDPACK
@@ -470,8 +470,8 @@ if test -f ${bindir}/ccdpack/ccdpack.sh; then
   ccdpack () { . $CCDPACK_DIR/ccdpack.sh; }
   ccdpacksetup () { . $CCDPACK_DIR/ccdpack.sh; }
 else
-  ccdpack () { ${staretcdir}/notinst ccdpack; }
-  ccdpacksetup () { ${staretcdir}/notinst ccdpack; }
+  ccdpack () { ${STARLINK_DIR}/etc/notinst ccdpack; }
+  ccdpacksetup () { ${STARLINK_DIR}/etc/notinst ccdpack; }
 fi
 
 # CONVERT
@@ -480,8 +480,8 @@ if test -f ${bindir}/convert/convert.sh; then
   convert () { . $CONVERT_DIR/convert.sh; }
   convertsetup () { . $CONVERT_DIR/convert.sh; }
 else
-  convert () { ${staretcdir}/notinst convert; }
-  convertsetup () { ${staretcdir}/notinst convert; }
+  convert () { ${STARLINK_DIR}/etc/notinst convert; }
+  convertsetup () { ${STARLINK_DIR}/etc/notinst convert; }
 fi
 
 # CUPID
@@ -490,8 +490,8 @@ if test -f ${bindir}/cupid/cupid.sh; then
   cupid () { . $CUPID_DIR/cupid.sh; }
   cupidsetup () { . $CUPID_DIR/cupid.sh; }
 else
-  cupid () { ${staretcdir}/notinst cupid; }
-  cupidsetup () { ${staretcdir}/notinst cupid; }
+  cupid () { ${STARLINK_DIR}/etc/notinst cupid; }
+  cupidsetup () { ${STARLINK_DIR}/etc/notinst cupid; }
 fi
 
 #  DATACUBE
@@ -501,9 +501,9 @@ if test -f ${bindir}/datacube/datacube.sh; then
    datacubestart () { . $DATACUBE_DIR/datacube.sh; }
    datacubesetup () { . $DATACUBE_DIR/datacube.sh; }
 else
-   datacube () { ${staretcdir}/notinst datacube; }
-   datacubestart () { ${staretcdir}/notinst datacubestart; }
-   datacubesetup () { ${staretcdir}/notinst datacubesetup; }
+   datacube () { ${STARLINK_DIR}/etc/notinst datacube; }
+   datacubestart () { ${STARLINK_DIR}/etc/notinst datacubestart; }
+   datacubesetup () { ${STARLINK_DIR}/etc/notinst datacubesetup; }
 fi
 
 # DIPSO
@@ -513,8 +513,8 @@ if test -f ${bindir}/dipso/dipsosetup.sh; then
   dipsosetup () { . $DIPSODIR/dipsosetup.sh; }
   dipso () { . $DIPSODIR/dipsosetup.sh; }
 else
-  dipsosetup () { ${staretcdir}/notinst dipsosetup; }
-  dipso () { ${staretcdir}/notinst dipso; }
+  dipsosetup () { ${STARLINK_DIR}/etc/notinst dipsosetup; }
+  dipso () { ${STARLINK_DIR}/etc/notinst dipso; }
 fi
 
 # ESP
@@ -523,8 +523,8 @@ if test -f ${bindir}/esp/esp.sh; then
  esp () { . $ESP_DIR/esp.sh; }
  espsetup () { . $ESP_DIR/esp.sh; }
 else
- esp () { ${staretcdir}/notinst esp; }
- espsetup () { ${staretcdir}/notinst esp; }
+ esp () { ${STARLINK_DIR}/etc/notinst esp; }
+ espsetup () { ${STARLINK_DIR}/etc/notinst esp; }
 fi
 
 #
@@ -537,10 +537,10 @@ if test -f ${bindir}/extractor/extractor.sh; then
    extractor () { . $EXTRACTOR_DIR/extractor.sh; }
    extract () { . $EXTRACTOR_DIR/extractor.sh; }
 else
-   extractorsetup () { ${staretcdir}/notinst extractorsetup; }
-   extractsetup () { ${staretcdir}/notinst extractsetup; }
-   extractor () { ${staretcdir}/notinst extractor; }
-   extract () { ${staretcdir}/notinst extract; }
+   extractorsetup () { ${STARLINK_DIR}/etc/notinst extractorsetup; }
+   extractsetup () { ${STARLINK_DIR}/etc/notinst extractsetup; }
+   extractor () { ${STARLINK_DIR}/etc/notinst extractor; }
+   extract () { ${STARLINK_DIR}/etc/notinst extract; }
 fi
 
 #  FIGARO
@@ -553,12 +553,12 @@ if test -f ${bindir}/figaro/figaro.sh; then
    twodspec () { . $FIG_DIR/twodspec.sh; }
    twodspecsetup () { . $FIG_DIR/twodspec.sh; }
 else
-   figaro () { ${staretcdir}/notinst figaro; }
-   figarosetup () { ${staretcdir}/notinst figarosetup; }
-   specdre () { ${staretcdir}/notinst specdre; }
-   specdresetup () { ${staretcdir}/notinst specdresetup; }
-   twodspec () { ${staretcdir}/notinst twodspec; }
-   twodspecsetup () { ${staretcdir}/notinst twodspecsetup; }
+   figaro () { ${STARLINK_DIR}/etc/notinst figaro; }
+   figarosetup () { ${STARLINK_DIR}/etc/notinst figarosetup; }
+   specdre () { ${STARLINK_DIR}/etc/notinst specdre; }
+   specdresetup () { ${STARLINK_DIR}/etc/notinst specdresetup; }
+   twodspec () { ${STARLINK_DIR}/etc/notinst twodspec; }
+   twodspecsetup () { ${STARLINK_DIR}/etc/notinst twodspecsetup; }
 fi
 
 # Fluxes
@@ -567,8 +567,8 @@ if test -f ${bindir}/fluxes/fluxes; then
   fluxes () { $FLUXES_DIR/fluxes.csh; }
   fluxnow () { $FLUXES_DIR/fluxnow.csh; }
 else
-  fluxes () { ${staretcdir}/notinst fluxes; }
-  fluxnow () { ${staretcdir}/notinst fluxnow; }
+  fluxes () { ${STARLINK_DIR}/etc/notinst fluxes; }
+  fluxnow () { ${STARLINK_DIR}/etc/notinst fluxnow; }
 fi
 
 #
@@ -579,8 +579,8 @@ if test -f ${bindir}/gaia/gaia.sh; then
    gaia () { $GAIA_DIR/gaia.sh ${1+"$@"}; }
    gaiadisp () { $GAIA_DIR/gaiadisp.sh ${1+"$@"}; }
 else
-   gaia () { ${staretcdir}/notinst gaia; }
-   gaiadisp () { ${staretcdir}/notinst gaiadisp; }
+   gaia () { ${STARLINK_DIR}/etc/notinst gaia; }
+   gaiadisp () { ${STARLINK_DIR}/etc/notinst gaiadisp; }
 fi
 
 # Kappa
@@ -589,8 +589,8 @@ if test -f ${bindir}/kappa/kappa.sh; then
   kappa () { . $KAPPA_DIR/kappa.sh; }
   kappasetup () { . $KAPPA_DIR/kappa.sh; }
 else
-  kappa () { ${staretcdir}/notinst kappa; }
-  kappasetup () { ${staretcdir}/notinst kappa; }
+  kappa () { ${STARLINK_DIR}/etc/notinst kappa; }
+  kappasetup () { ${STARLINK_DIR}/etc/notinst kappa; }
 fi
 
 # Kappa Retirement Home (KAPRH)
@@ -599,8 +599,8 @@ if test -f ${bindir}/kaprh/kaprh.sh; then
   kaprh () { . $KAPRH_DIR/kaprh.sh; }
   kaprhsetup () { . $KAPRH_DIR/kaprh.sh; }
 else
-  kaprh () { ${staretcdir}/notinst kaprh; }
-  kaprhsetup () { ${staretcdir}/notinst kaprh; }
+  kaprh () { ${STARLINK_DIR}/etc/notinst kaprh; }
+  kaprhsetup () { ${STARLINK_DIR}/etc/notinst kaprh; }
 fi
 
 # HDSTOOLS
@@ -609,8 +609,8 @@ if test -f ${bindir}/hdstools/hdstools.sh; then
   hdstools () { . $HDSTOOLS_DIR/hdstools.sh; }
   hdstoolssetup () { . $HDSTOOLS_DIR/hdstools.sh; }
 else
-  hdstools () { ${staretcdir}/notinst hdstools; }
-  hdstoolssetup () { ${staretcdir}/notinst hdstools; }
+  hdstools () { ${STARLINK_DIR}/etc/notinst hdstools; }
+  hdstoolssetup () { ${STARLINK_DIR}/etc/notinst hdstools; }
 fi
 
 # ORAC-DR
@@ -621,34 +621,34 @@ else
   if test -f ${bindir}/oracdr/etc/profile; then
     source ${bindir}/oracdr/etc/profile
   else
-    oracdr_acsis () { ${staretcdir}/notinst oracdr_acsis; }
-    oracdr_cgs4 () { ${staretcdir}/notinst oracdr_cgs4; }
-    oracdr_classiccam () { ${staretcdir}/notinst oracdr_classiccam; }
-    oracdr_gmos () { ${staretcdir}/notinst oracdr_gmos; }
-    oracdr_ingrid () { ${staretcdir}/notinst oracdr_ingrid; }
-    oracdr_ircam () { ${staretcdir}/notinst oracdr_ircam; }
-    oracdr_ircam_old () { ${staretcdir}/notinst oracdr_ircam_old; }
-    oracdr_iris2 () { ${staretcdir}/notinst oracdr_iris2; }
-    oracdr_isaac () { ${staretcdir}/notinst oracdr_isaac; }
-    oracdr_michelle () { ${staretcdir}/notinst oracdr_michelle; }
-    oracdr_naco () { ${staretcdir}/notinst oracdr_naco; }
-    oracdr_niri () { ${staretcdir}/notinst oracdr_niri; }
-    oracdr_scuba () { ${staretcdir}/notinst oracdr_scuba; }
-    oracdr_scuba2l () { ${staretcdir}/notinst oracdr_scuba2l; }
-    oracdr_scuba2s () { ${staretcdir}/notinst oracdr_scuba2s; }
-    oracdr_scuba2lq () { ${staretcdir}/notinst oracdr_scuba2lq; }
-    oracdr_scuba2sq () { ${staretcdir}/notinst oracdr_scuba2sq; }
-    oracdr_sofi () { ${staretcdir}/notinst oracdr_sofi; }
-    oracdr_spex () { ${staretcdir}/notinst oracdr_spex; }
-    oracdr_swfcam () { ${staretcdir}/notinst oracdr_swfcam; }
-    oracdr_swfcam1 () { ${staretcdir}/notinst oracdr_swfcam1; }
-    oracdr_swfcam2 () { ${staretcdir}/notinst oracdr_swfcam2; }
-    oracdr_swfcam3 () { ${staretcdir}/notinst oracdr_swfcam3; }
-    oracdr_swfcam4 () { ${staretcdir}/notinst oracdr_swfcam4; }
-    oracdr_ufti () { ${staretcdir}/notinst oracdr_ufti; }
-    oracdr_ufti_old () { ${staretcdir}/notinst oracdr_ufti_old; }
-    oracdr_uist () { ${staretcdir}/notinst oracdr_uist; }
-    xoracdr () { ${staretcdir}/notinst xoracdr; }
+    oracdr_acsis () { ${STARLINK_DIR}/etc/notinst oracdr_acsis; }
+    oracdr_cgs4 () { ${STARLINK_DIR}/etc/notinst oracdr_cgs4; }
+    oracdr_classiccam () { ${STARLINK_DIR}/etc/notinst oracdr_classiccam; }
+    oracdr_gmos () { ${STARLINK_DIR}/etc/notinst oracdr_gmos; }
+    oracdr_ingrid () { ${STARLINK_DIR}/etc/notinst oracdr_ingrid; }
+    oracdr_ircam () { ${STARLINK_DIR}/etc/notinst oracdr_ircam; }
+    oracdr_ircam_old () { ${STARLINK_DIR}/etc/notinst oracdr_ircam_old; }
+    oracdr_iris2 () { ${STARLINK_DIR}/etc/notinst oracdr_iris2; }
+    oracdr_isaac () { ${STARLINK_DIR}/etc/notinst oracdr_isaac; }
+    oracdr_michelle () { ${STARLINK_DIR}/etc/notinst oracdr_michelle; }
+    oracdr_naco () { ${STARLINK_DIR}/etc/notinst oracdr_naco; }
+    oracdr_niri () { ${STARLINK_DIR}/etc/notinst oracdr_niri; }
+    oracdr_scuba () { ${STARLINK_DIR}/etc/notinst oracdr_scuba; }
+    oracdr_scuba2l () { ${STARLINK_DIR}/etc/notinst oracdr_scuba2l; }
+    oracdr_scuba2s () { ${STARLINK_DIR}/etc/notinst oracdr_scuba2s; }
+    oracdr_scuba2lq () { ${STARLINK_DIR}/etc/notinst oracdr_scuba2lq; }
+    oracdr_scuba2sq () { ${STARLINK_DIR}/etc/notinst oracdr_scuba2sq; }
+    oracdr_sofi () { ${STARLINK_DIR}/etc/notinst oracdr_sofi; }
+    oracdr_spex () { ${STARLINK_DIR}/etc/notinst oracdr_spex; }
+    oracdr_swfcam () { ${STARLINK_DIR}/etc/notinst oracdr_swfcam; }
+    oracdr_swfcam1 () { ${STARLINK_DIR}/etc/notinst oracdr_swfcam1; }
+    oracdr_swfcam2 () { ${STARLINK_DIR}/etc/notinst oracdr_swfcam2; }
+    oracdr_swfcam3 () { ${STARLINK_DIR}/etc/notinst oracdr_swfcam3; }
+    oracdr_swfcam4 () { ${STARLINK_DIR}/etc/notinst oracdr_swfcam4; }
+    oracdr_ufti () { ${STARLINK_DIR}/etc/notinst oracdr_ufti; }
+    oracdr_ufti_old () { ${STARLINK_DIR}/etc/notinst oracdr_ufti_old; }
+    oracdr_uist () { ${STARLINK_DIR}/etc/notinst oracdr_uist; }
+    xoracdr () { ${STARLINK_DIR}/etc/notinst xoracdr; }
   fi
 fi
 
@@ -658,8 +658,8 @@ if test -f ${bindir}/polpack/polpack.sh; then
   polpack () { . $POLPACK_DIR/polpack.sh; }
   polpacksetup () { . $POLPACK_DIR/polpack.sh; }
 else
-  polpack () { ${staretcdir}/notinst polpack; }
-  polpacksetup () { ${staretcdir}/notinst polpack; }
+  polpack () { ${STARLINK_DIR}/etc/notinst polpack; }
+  polpacksetup () { ${STARLINK_DIR}/etc/notinst polpack; }
 fi
 
 #
@@ -671,9 +671,9 @@ if test -f ${bindir}/photom/photom.sh; then
    photom () { . $PHOTOM_DIR/photom.sh; }
    photomsetup () { . $PHOTOM_DIR/photom.sh; }
 else
-   photomstart () { ${staretcdir}/notinst photomstart; }
-   photom () { ${staretcdir}/notinst photom; }
-   photomsetup () { ${staretcdir}/notinst photomsetup; }
+   photomstart () { ${STARLINK_DIR}/etc/notinst photomstart; }
+   photom () { ${STARLINK_DIR}/etc/notinst photom; }
+   photomsetup () { ${STARLINK_DIR}/etc/notinst photomsetup; }
 fi
 
 #
@@ -683,7 +683,7 @@ fi
 if test -f ${bindir}/pongo/pongo.icl; then
    pongo () { icl $PONGO_BIN/pongo; }
 else
-   pongo () { ${staretcdir}/notinst pongo; }
+   pongo () { ${STARLINK_DIR}/etc/notinst pongo; }
 fi
 
 # SMURF - SCUBA-2 SURF
@@ -692,8 +692,8 @@ if test -f ${bindir}/smurf/smurf.sh; then
   smurf () { . $SMURF_DIR/smurf.sh; }
   smurfsetup () { . $SMURF_DIR/smurf.sh; }
 else
-  smurf () { ${staretcdir}/notinst smurf; }
-  smurfsetup () { ${staretcdir}/notinst smurf; }
+  smurf () { ${STARLINK_DIR}/etc/notinst smurf; }
+  smurfsetup () { ${STARLINK_DIR}/etc/notinst smurf; }
 fi
 
 #
@@ -705,9 +705,9 @@ if test -f ${datadir}/specx/specxstart.sh; then
   specxsetup () { . $SYS_SPECX/specxstart.sh; }
   specxstart () { . $SYS_SPECX/specxstart.sh; }
 else
-  specx () { ${staretcdir}/notinst specx; }
-  specxsetup () { ${staretcdir}/notinst specxsetup; }
-  specxstart () { ${staretcdir}/notinst specxstart; }
+  specx () { ${STARLINK_DIR}/etc/notinst specx; }
+  specxsetup () { ${STARLINK_DIR}/etc/notinst specxsetup; }
+  specxstart () { ${STARLINK_DIR}/etc/notinst specxstart; }
 fi
 
 # SPLAT
@@ -717,9 +717,9 @@ if test -f ${starjavadir}/bin/splat/splat; then
   splatdisp () { $SPLAT_DIR/splatdisp ${1+"$@"}; }
   splatdispmany () { $SPLAT_DIR/splatdispmany ${1+"$@"}; }
 else
-  splat () { ${staretcdir}/notinst splat; }
-  splatdisp () { ${staretcdir}/notinst splat; }
-  splatdispmany () { ${staretcdir}/notinst splat; }
+  splat () { ${STARLINK_DIR}/etc/notinst splat; }
+  splatdisp () { ${STARLINK_DIR}/etc/notinst splat; }
+  splatdispmany () { ${STARLINK_DIR}/etc/notinst splat; }
 fi
 
 # SST
@@ -728,8 +728,8 @@ if test -f ${bindir}/sst/sst.sh; then
   sst () { . $SST_DIR/sst.sh; }
   sstsetup () { . $SST_DIR/sst.sh; }
 else
-  sst () { ${staretcdir}/notinst sst; }
-  sstsetup () { ${staretcdir}/notinst sst; }
+  sst () { ${STARLINK_DIR}/etc/notinst sst; }
+  sstsetup () { ${STARLINK_DIR}/etc/notinst sst; }
 fi
 
 # STARBENCH
@@ -737,7 +737,7 @@ fi
 if test -f ${bindir}/starbench/starbench.sh; then
   starbench () { . $BENCH_DIR/starbench.sh; }
 else
-  starbench () { ${staretcdir}/notinst starbench; }
+  starbench () { ${STARLINK_DIR}/etc/notinst starbench; }
 fi
 
 # STARMAN
@@ -746,8 +746,8 @@ if test -f ${bindir}/starman/starman.sh; then
   starman () { . $STARMAN_DIR/starman.sh; }
   starmansetup () { . $STARMAN_DIR/starman.sh; }
 else
-  starman () { ${staretcdir}/notinst starman; }
-  starmansetup () { ${staretcdir}/notinst starman; }
+  starman () { ${STARLINK_DIR}/etc/notinst starman; }
+  starmansetup () { ${STARLINK_DIR}/etc/notinst starman; }
 fi
 
 # SURF
@@ -756,8 +756,8 @@ if test -f ${bindir}/surf/surf.sh; then
   surf () { . $SURF_DIR/surf.sh; }
   surfsetup () { . $SURF_DIR/surf.sh; }
 else
-  surf () { ${staretcdir}/notinst surf; }
-  surfsetup () { ${staretcdir}/notinst surf; }
+  surf () { ${STARLINK_DIR}/etc/notinst surf; }
+  surfsetup () { ${STARLINK_DIR}/etc/notinst surf; }
 fi
 
 # TSP
@@ -766,8 +766,8 @@ if test -f ${bindir}/tsp/tsp.sh; then
   tsp () { . $TSP_DIR/tsp.sh; }
   tspsetup () { . $TSP_DIR/tsp.sh; }
 else
-  tsp () { ${staretcdir}/notinst tsp; }
-  tspsetup () { ${staretcdir}/notinst tsp; }
+  tsp () { ${STARLINK_DIR}/etc/notinst tsp; }
+  tspsetup () { ${STARLINK_DIR}/etc/notinst tsp; }
 fi
 
 #
