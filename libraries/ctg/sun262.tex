@@ -778,60 +778,26 @@ source file {\tt prog.c}, instead of {\tt prog.f}.
 
 \appendix
 
-\begin{latexonly}
-\latexonlysection{List of Routines}
+\section{List of Routines}
 
-\noteroutine{
-      CALL CTG\_ASSO1( PARAM, VERB, MODE, CI, FIELDS, STATUS )
-}{
-   Obtain an identifier for a single existing catalogue using a specified
-   parameter
-}
-\noteroutine{
-      CALL CTG\_ASSOC( PARAM, VERB, IGRP, SIZE, FLAG, STATUS )
-}{
-   Store names of existing cataloguess specified through the environment
-}
-\noteroutine{
-      CALL CTG\_CATAS( IGRP, INDEX, MODE, CI, STATUS )
-}{
-   Obtain a CAT identifier for an existing catalogue
-}
-\noteroutine{
-      CALL CTG\_CATCR( IGRP, INDEX, CI, STATUS )
-}{
-   Obtain a CAT identifier for a new catalogue
-}
-\noteroutine{
-      CALL CTG\_CREA1( PARAM, FTYPE, NDIM, LBND, UBND, CI, NAME,
-                      STATUS )
-}{
-   Create a single new catalogue using a specified parameter
-}
-\noteroutine{
-      CALL CTG\_CREAT( PARAM, IGRP0, IGRP, SIZE, FLAG, STATUS )
-}{
-   Obtain the names of a group of catalogues to be created from the
-   environment
-}
-\noteroutine{
-      CALL CTG\_GTSUP( IGRP, I, FIELDS, STATUS )
-}{
-   Get supplemental information for a catalogue
-}
-\noteroutine{
-      CALL CTG\_PTSUP( IGRP, I, FIELDS, STATUS )
-}{
-   Store suplemental information for a catalogue
-}
-\noteroutine{
-      CALL CTG\_SETSZ( IGRP, SIZE, STATUS )
-}{
-   Reduces the size of an CTG group
-}
-
-\end{latexonly}
-
+\noteroutine{CALL CTG\_ASSO1( PARAM, VERB, MODE, CI, FIELDS, STATUS )}
+   {Obtain an identifier for a single existing catalogue using a specified parameter.}
+\noteroutine{CALL CTG\_ASSOC( PARAM, VERB, IGRP, SIZE, FLAG, STATUS )}
+   {Store names of existing catalogues specified through the environment.}
+\noteroutine{CALL CTG\_CATAS( IGRP, INDEX, MODE, CI, STATUS )}
+   {Obtain a CAT identifier for an existing catalogue.}
+\noteroutine{CALL CTG\_CATCR( IGRP, INDEX, CI, STATUS )}
+   {Obtain a CAT identifier for a new catalogue.}
+\noteroutine{CALL CTG\_CREA1( PARAM, FTYPE, NDIM, LBND, UBND, CI, NAME, STATUS~)}
+   {Create a single new catalogue using a specified parameter.}
+\noteroutine{CALL CTG\_CREAT( PARAM, IGRP0, IGRP, SIZE, FLAG, STATUS )}
+   {Obtain the names of a group of catalogues to be created from the environment.}
+\noteroutine{CALL CTG\_GTSUP( IGRP, I, FIELDS, STATUS )}
+   {Get supplemental information for a catalogue.}
+\noteroutine{CALL CTG\_PTSUP( IGRP, I, FIELDS, STATUS )}
+   {Store suplemental information for a catalogue.}
+\noteroutine{CALL CTG\_SETSZ( IGRP, SIZE, STATUS )}
+   {Reduces the size of an CTG group.}
 
 \section{Full Fortran Routine Specifications}
 \label {SEC:FULLSPEC}
