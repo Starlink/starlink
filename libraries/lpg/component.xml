@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="lpg" support="U">
+  <version>3.0</version>
+  <path>libraries/lpg</path>
+  <description>Library to manage NDF QUALITY information textually
+  </description>
+  <abstract><p> 
+     This library is a set of Fortran routines that provides looping of 
+     tasks within a monolith, in order to allow a command to be invoked 
+     repeatedly until all supplied data files (catalogues or NDFs) have 
+     been processed.  Thus it can be used to enable lists of files
+     including wildcards to be processed in a single command.
+  </p></abstract>
+  <dependencies >
+    <build>cat</build><build>grp</build><build>hds</build><build>ndf</build><build>par</build><build>pcs</build><build>sae</build><link>cat</link><link>chr</link><link>grp</link><link>mers</link><link>ndf</link><link>ndg</link><link>par</link><link>pcs</link><link>psx</link><sourceset>htx</sourceset><sourceset>sst</sourceset><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>David Berry</name>
+      <uname>dsb</uname>
+    </person>
+    <person>
+      <name>Malcolm J. Currie</name>
+      <uname>mjc</uname>
+    </person>
+  </developers>
+  <documentation> sun263</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
