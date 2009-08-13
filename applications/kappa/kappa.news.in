@@ -54,6 +54,12 @@
       longitude or latitude axis, the axis units are now converted
       correctly from radians to degrees.
 
+   o  WCSTRAN
+
+      - There is a new SKYDEG parameter that can be used to force
+      celestial longitude and latitude axis values to be formatted as
+      decimal degrees, regardless of the setting of the Format
+      attributes for the axes.
 
 1 KAPPA_Version_1.10
 
