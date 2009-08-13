@@ -15,9 +15,9 @@
 
 *  Description:
 *     This routine should be called in place of CAT_ASSOC within
-*     applications which process groups of catalogues.
+*     applications that process groups of catalogues.
 *
-*     On the first invocation of the applicaton, a group of names of 
+*     On the first invocation of the application, a group of names of 
 *     existing catalogues will be obtained from the environment using the 
 *     specified parameter, and a CAT identifier for the first one 
 *     will be returned. If more than one catalogue was supplied for the 
@@ -31,7 +31,7 @@
 *
 *     The monolith routine should arrange to invoke the application 
 *     repeatedly until one or more of its catalogue parameters have been 
-*     exhausted (i.e. all its values used). See CAT_AGAIN.
+*     exhausted (i.e. all its values used). See LPG_AGAIN.
 
 *  Arguments:
 *     PARAM = CHARACTER * ( * ) (Given)
@@ -39,7 +39,7 @@
 *     MODE = CHARACTER * ( * ) (Given)
 *        Type of catalogue access required: 'READ', or 'WRITE'.
 *     CI = INTEGER (Returned)
-*        catalogue identifier.
+*        The catalogue identifier.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 

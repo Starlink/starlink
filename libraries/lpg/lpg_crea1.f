@@ -17,7 +17,7 @@
 *  Description:
 *     This routine is equivalent to NDF_CREAT except that it allows the 
 *     NDF to be specified using a GRP group expression (for instance, its
-*     name may be given within a text file, etc). The first NDF in the 
+*     name may be given within a text file, etc.). The first NDF in the 
 *     group expression is returned. Any other names in the group
 *     expression are ignored. Any modification elements in the supplied 
 *     group expression will be treated literally. 

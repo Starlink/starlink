@@ -25,7 +25,7 @@
 *           IF( ACTION .EQ. 'ADD' ) THEN
 *              CALL ADD( STATUS )
 *           ELSE IF( ACTION .EQ. 'SUB' ) THEN
-*              CALL SUB( SATUS )
+*              CALL SUB( STATUS )
 *           ELSE IF...
 *           ...
 *           END IF
@@ -34,9 +34,10 @@
 *     The application corresponding to the required action will always be
 *     invoked once. The applications should use the routines LPG_ASSOC,
 *     LPG_PROP, LPG_CREAT and LPG_CREP to get identifier for NDFs, in 
-*     place of the usual routines from the NDF library. For catalogues,
-*     routines LPG_CATASSOC and LPG_CATCREAT should be used in place of
-*     CAT_ASSOC and CAT_CREAT.
+*     place of the corresponding routines from the NDF library. 
+*
+*     For catalogues, routines LPG_CATASSOC and LPG_CATCREAT should be
+*     used in place of CAT_ASSOC and CAT_CREAT.
 *
 *     LPG_AGAIN returns a .TRUE. value until a group of data files is
 *     exhausted, where-upon it deletes all its groups and returns a 
@@ -58,14 +59,14 @@
 *     default calculated on the first invocation will then be re-used for
 *     all subsequent invocations, which may be inappropriate. A better
 *     scheme is to have "VPATH=DEFAULT", "PPATH=DYNAMIC" and "DEFAULT=!".
-*     The code should then annull any PAR__NULL status after accessing
+*     The code should then annul any PAR__NULL status after accessing
 *     the parameter, and use the previously calculated dynamic default
 *     value for the parameter. With this scheme, the parameter value is
 *     "!" at the end of the first invocation, and so retains this value
 *     for all subsequent invocations, resulting in appropriate dynamic
 *     defaults being used.
 *
-*     A situation in which the above suggestion doesn't work is if an
+*     A situation in which the above suggestion does not work is if an
 *     application sometimes sets a dynamic default, and sometimes doesn't.
 *     In this case, you do not want to have VPATH=DEFAULT,DEFAULT=! because
 *     this would require the application to abort in the cases where there
@@ -75,17 +76,17 @@
 *     defaulted.
 *
 *     Some applications test to see if a parameter was specified on the
-*     command line, and vary their behaviour accordingly. This is done by
-*     checking the state of the parameter before accessing it, a state of
-*     SUBPAR__ACTIVE indicating that the parameter already has a value.
-*     This is OK on the first invocation, but not on subsequent
-*     invocations because the first invocation may have set a parameter
-*     value, resulting in subsequent invocations thinking that the
-*     parameter was given on the command line. To avoid this,
-*     applications should use LPG_STATE in place of PAR_STATE. LPG_STATE
-*     remembers the state of the parameter on the first invocation, and
-*     returns that state, rather than the current parameter state, on
-*     subsequent invocations.
+*     command line, and vary their behaviour accordingly. This is done
+*     by checking the state of the parameter before accessing it, a 
+*     state of PAR__ACTIVE (or SUBPAR__ACTIVE) indicating that the 
+*     parameter already has a value. This is correct on the first
+*     invocation, but not on subsequent invocations because the first 
+*     invocation may have set a parameter value, resulting in subsequent
+*     invocations thinking that the parameter was given on the command 
+*     line. To avoid this, applications should use LPG_STATE in place of 
+*     PAR_STATE. LPG_STATE remembers the state of the parameter on the 
+*     first invocation, and returns that state, rather than the current
+*     parameter state, on subsequent invocations.
 
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)

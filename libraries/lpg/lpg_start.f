@@ -18,20 +18,20 @@
 *  Arguments:
 *     VERBO = LOGICAL (Given)
 *        If .TRUE. then the name of the data file being used for each
-*	 parameter will be displayed on each invocation of the
-*	 application at the point where the parameter is accessed.
-*	 Parameters which are not multi-valued (i.e. which are associated
-*	 with the same data file on all invocations) are not displayed.
-*	 In addition, a blank line will be displayed on the screen
-*	 between each invocation of the application. No text is displayed
-*	 if VERB is .FALSE.
+*        parameter will be displayed on each invocation of the
+*        application at the point where the parameter is accessed.
+*        Parameters which are not multi-valued (i.e. that are associated
+*        with the same data file on all invocations) are not displayed.
+*        In addition, a blank line will be displayed on the screen
+*        between each invocation of the application. No text is displayed
+*        if VERB is .FALSE..
 *     DELAYO = REAL (Given)
 *        Put a delay of DELAY seconds between invocations.
 *     DISABO = LOGICAL (Given)
-*        If .TRUE. the looping facilities are disabled. LPG_AGAIN returns
-*        .TRUE. only on the first invocation, and LPG_ASSOC, LPG_CREAT,
-*        LPG_PROP, LPG_CREP, LPG_CATASSOC and LPG_CATCREAT make simple
-*        calls to the corresponding NDF or CAT routine.
+*        If .TRUE., the looping facilities are disabled. LPG_AGAIN 
+*        returns .TRUE. only on the first invocation, and LPG_ASSOC, 
+*        LPG_CREAT, LPG_PROP, LPG_CREP, LPG_CATASSOC and LPG_CATCREAT 
+*        make simple calls to the corresponding NDF or CAT routine.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 

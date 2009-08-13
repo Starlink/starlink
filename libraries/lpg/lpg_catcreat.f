@@ -14,9 +14,9 @@
 
 *  Description:
 *     This routine should be called in place of CAT_CREAT within
-*     applications which process lists of catalogues.
+*     applications that process lists of catalogues.
 *
-*     On the first invocation of the applicaton, a group of names for
+*     On the first invocation of the application, a group of names for
 *     some new catalogues will be obtained from the environment using the 
 *     specified parameter. The first name will be used to create an catalogue 
 *     with the requested attributes, and an identifier for the new catalogue
@@ -38,13 +38,13 @@
 *
 *     The monolith routine should arrange to invoke the application 
 *     repeatedly until one or more of its catalogue parameters have been 
-*     exhausted (i.e. all its values used). See CAT_AGAIN.
+*     exhausted (i.e. all its values used). See LPG_AGAIN.
 
 *  Arguments:
 *     PARAM = CHARACTER * ( * ) (Given)
 *        Name of the parameter.
 *     CI = INTEGER (Returned)
-*        catalogue identifier.
+*        The catalogue identifier.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 

@@ -15,7 +15,7 @@
 *  Description:
 *     This routine is equivalent to NDF_PROP except that it allows the 
 *     NDF to be specified using a GRP group expression (for instance, its
-*     name may be given within a text file, etc). The first NDF in the 
+*     name may be given within a text file, etc.). The first NDF in the 
 *     group expression is returned. Any other names in the group
 *     expression are ignored. Modification elements use the name of the 
 *     supplied NDF as the basis name.
@@ -28,7 +28,8 @@
 *        A comma-separated list of the NDF components which are to be
 *        propagated to the new data structure. By default, the HISTORY,
 *        LABEL and TITLE components and all extensions are propagated.
-*        See the "Component Propagation" section for further details.
+*        See the "Component Propagation" section in the documentation
+*        for routine NDF_PROP within SUN/33 for further details.
 *     PARAM = CHARACTER * ( * ) (Given)
 *        Name of the ADAM parameter for the new NDF.
 *     INDF2 = INTEGER (Returned)

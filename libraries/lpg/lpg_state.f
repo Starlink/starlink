@@ -13,7 +13,7 @@
 *     CALL LPG_STATE( PARAM, STATE, STATUS )
 
 *  Description:
-*     On the first invocation of the application, this routines returns
+*     On the first invocation of the application, this routine returns
 *     the current PAR state of specified parameter and stores it in 
 *     common. On subsequent invocations, the stored state is returned
 *     rather than the current state.

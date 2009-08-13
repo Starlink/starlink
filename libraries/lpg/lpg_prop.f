@@ -15,7 +15,7 @@
 
 *  Description:
 *     This routine should be called in place of NDF_PROP within
-*     applications which process groups of NDFs.
+*     applications that process groups of NDFs.
 *
 *     On the first invocation of the applicaton, a group of names for
 *     some new NDFs will be obtained from the environment using the 

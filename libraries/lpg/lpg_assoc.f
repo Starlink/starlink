@@ -14,9 +14,9 @@
 
 *  Description:
 *     This routine should be called in place of NDF_ASSOC within
-*     applications which process groups of NDFs.
+*     applications that process groups of NDFs.
 *
-*     On the first invocation of the applicaton, a group of names of 
+*     On the first invocation of the application, a group of names of 
 *     existing NDFs will be obtained from the environment using the 
 *     specified parameter, and an NDF identifier for the first one 
 *     will be returned. If more than one NDF was supplied for the 
@@ -30,7 +30,7 @@
 *
 *     The monolith routine should arrange to invoke the application 
 *     repeatedly until one or more of its NDF parameters have been 
-*     exhausted (i.e. all its values used). See NDF_AGAIN.
+*     exhausted (i.e. all its values used). See LPG_AGAIN.
 
 *  Arguments:
 *     PARAM = CHARACTER * ( * ) (Given)

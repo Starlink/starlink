@@ -14,9 +14,9 @@
 
 *  Description:
 *     This routine should be called in place of NDF_CREP within
-*     applications which process lists of NDFs.
+*     applications that process lists of NDFs.
 *
-*     On the first invocation of the applicaton, a group of names for
+*     On the first invocation of the application, a group of names for
 *     some new NDFs will be obtained from the environment using the 
 *     specified parameter. The first name will be used to create an NDF 
 *     with the requested attributes, and an identifier for the new NDF will 
@@ -38,7 +38,7 @@
 *
 *     The monolith routine should arrange to invoke the application 
 *     repeatedly until one or more of its NDF parameters have been 
-*     exhausted (i.e. all its values used). See NDF_AGAIN.
+*     exhausted (i.e. all its values used). See LPG_AGAIN.
 
 *  Arguments:
 *     PARAM = CHARACTER * ( * ) (Given)
