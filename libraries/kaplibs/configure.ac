@@ -24,7 +24,7 @@ STAR_PRM_COMPATIBLE_SYMBOLS
 STAR_MONOLITHS
 
 dnl    Declare the build and use dependencies for this package
-STAR_DECLARE_DEPENDENCIES(build, [agi ast atl cat chr cnf fio generic gks gns grp hds idi mag mers ndf ndg par pcs prm psx sae snx trn])
+STAR_DECLARE_DEPENDENCIES(build, [agi ast atl cat chr cnf fio generic gks gns grp hds idi lpg mag mers ndf ndg par pcs prm psx sae snx trn])
 STAR_DECLARE_DEPENDENCIES(link, [agi ast atl cat fio grp mag mers ndf ndg pcs pda pgplot prm psx psx snx trn])
 STAR_DECLARE_DEPENDENCIES(sourceset, [htx sst])
 
@@ -40,8 +40,7 @@ dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.  List of subdirectories must match SUBDIRS in Makefile.am
 AC_CONFIG_FILES([Makefile component.xml
     aif/Makefile  ira/Makefile     kgs/Makefile
-    ctg/Makefile  irq/Makefile     kpg/Makefile
-    fts/Makefile  kapgrf/Makefile  lpg/Makefile
+    kpg/Makefile  fts/Makefile  kapgrf/Makefile
     ccg/Makefile])
 
 dnl    This is the bit that does the actual work

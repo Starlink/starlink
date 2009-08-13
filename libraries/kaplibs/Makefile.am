@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = aif ccg fts ira irq ctg lpg kpg kgs kapgrf
+SUBDIRS = aif ccg fts ira kpg kgs kapgrf
 
 dist_bin_SCRIPTS = kaplibs_link_adam kaplibs_link
 dist_noinst_SCRIPTS = kaplibs_test_link kaplibs_noadam_test_link
