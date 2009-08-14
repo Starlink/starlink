@@ -360,12 +360,19 @@
 %        Added the implementation status section.
 %     12-SEP-1990 (RFWS):
 %        Added support for the usage section and adjusted various spacings.
+%     1994 (MJC):
+%        Add sstresparameters for output results parameters.
+%     1994 May 25 (MJC):
+%        Made sstnotes, sstditopic, and sstimplementationstatus use
+%        description environment for each sections text.
 %     8-DEC-1994 (PDRAPER):
 %        Added support for simplified formatting using LaTeX2html.
 %     1995 October 4 (MJC):
 %        Added goodbreaks and pagebreak[3] in various places to improve
 %        pages breaking before headings, not immediately after.
 %        Corrected banner width.
+%     1996 March 7 (MJC):
+%        Mark document name on both sides of an sstroutine.
 %     2-DEC-1998 (DSB):
 %        Added sstattributetype (copied from sun210.tex).
 %     2004 August 6 (MJC):
@@ -412,8 +419,6 @@
 
 %  Define a command to produce an attribute header, including its name,
 %  a purpose description and the rest of the routine's documentation.
-%  Define a command to produce a routine header, including its name,
-%  a purpose description and the rest of the routine's documentation.
 \newcommand{\sstattribute}[3]{
    \goodbreak
    \markboth{{\stardocname}~ --- #1}{{\stardocname}~ --- #1}
@@ -446,10 +451,7 @@
 \newcommand{\sstinvocation}[1]{\sloppy \item[Invocation:]\hspace{0.4em}{\tt #1}}
 
 %  Format the attribute data type section.
-\newcommand{\sstattributetype}[1]{
-   \item[Type:] \mbox{} \\
-      #1
-}
+\newcommand{\sstattributetype}[1]{\item[Type:] \mbox{} #1}
 
 %  Format the arguments section.
 \newcommand{\sstarguments}[1]{
@@ -489,18 +491,9 @@
    \end{description}
 }
 
-%  Format the graphics style parameters section (for an application).
-\newcommand{\sstgraphparameters}[1]{
-   \goodbreak 
-   \item[Graphics-style Parameters:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
 %  Format the applicability section.
 \newcommand{\sstapplicability}[1]{
+   \goodbreak
    \item[Clas\mbox{}s Applicability:] \mbox{} \\
    \vspace{-3.5ex}
    \begin{description}
@@ -522,14 +515,7 @@
 \newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
 
 %  Define the format of a subsection in the examples section.
-%\newcommand{\sstexamplesubsection}[2]{\sloppy
-%\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \\ #2 }
 \newcommand{\sstexamplesubsection}[2]{\sloppy \item{\ssttt #1} \mbox{} \\ #2 }
-
-%  Define the format of a long-example subsection in the examples section.
-%\newcommand{\sstlongexamplesubsection}[3]{\sloppy
-%\item[\ssttt \hspace{-0.5em}#1] {\ssttt #2} \mbox{} \\ #3}
-\newcommand{\sstlongexamplesubsection}[3]{\sloppy \item{\ssttt #1} {\ssttt #2} \mbox{} \\ #3}
 
 %  Format the notes section.
 \newcommand{\sstnotes}[1]{\pagebreak[3] \item[Notes:] \mbox{} \\[1.3ex] #1}
@@ -537,9 +523,19 @@
 %  Provide a general-purpose format for additional (DIY) sections.
 \newcommand{\sstdiytopic}[2]{\goodbreak \item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
 
+%  Format the a generic section as a list
+\newcommand{\sstdiylist}[2]{
+   \item[#1:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #2
+   \end{description}
+   \\
+}
+
 %  Format the implementation status section.
 \newcommand{\sstimplementationstatus}[1]{
-   \pagebreak[3] \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
+   \goodbreak \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
 
 %  Format the bugs section.
 \newcommand{\sstbugs}[1]{\item[Bugs:] #1}
@@ -597,17 +593,31 @@
       \end{description}
    }
 
+%  sstattributetype. Use a kludge of any empty description to 
+%  obtain the line break.
+   \newcommand{\sstattributetype}[1]{\item[Type:]
+      #1
+       \begin{description}
+       \end{description}
+       \\
+   }
+
 %  sstdescription
    \newcommand{\sstdescription}[1]{\item[Description:]
       \begin{description}
          #1
       \end{description}
+      \\
    }
 
-%  sstusage
+%  sstusage.  Use a kludge of any empty description to  
+%  obtain the line break.
    \newcommand{\sstusage}[1]{%
       \item[\htmlref{Usage:}{ap:usage}] \mbox{}
-      {\ssttt #1}\smallskip%
+      {\ssttt #1}
+      \begin{description}
+      \end{description}
+      \\
    }
 
 %  sstinvocation
@@ -639,6 +649,7 @@
       \begin{description}
          #1
       \end{description}
+      \\
    }
 
 %  sstresparameters
@@ -647,6 +658,16 @@
       \begin{description}
          #1
       \end{description}
+      \\
+   }
+
+%  sstapplicability
+   \newcommand{\sstapplicability}[1]{%
+      \item[Class Applicability:]
+       \begin{description}
+         #1
+      \end{description}
+      \\
    }
 
 %  sstexamples
@@ -655,6 +676,7 @@
       \begin{description}
          #1
       \end{description}
+      \\
    }
 
 %  sstsubsection
@@ -663,7 +685,7 @@
 %  sstexamplesubsection
    \newcommand{\sstexamplesubsection}[2]{%
       \item[{\ssttt #1}]
-      #2\smallskip%
+      #2\\
    }
 
 %  sstnotes
@@ -671,6 +693,7 @@
       \begin{description}
          #1
       \end{description}
+      \\
    }
 
 %  sstdiytopic
@@ -678,6 +701,7 @@
       \begin{description}
          #2
       \end{description}
+      \\
    }
 
 %  sstimplementationstatus
@@ -685,6 +709,7 @@
       \begin{description}
          #1
       \end{description}
+      \\
    }
 
 %  sstitemlist
@@ -692,6 +717,7 @@
       \begin{itemize}
          #1
       \end{itemize}
+      \\
    }
 \end{htmlonly}
 
