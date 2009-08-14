@@ -13,7 +13,7 @@ registration, sky subtraction, calculation of Stokes parameters, and
 display of vector maps.  
 </p></abstract>
   <dependencies >
-    <build>pcs</build><build>ast</build><build>cat</build><build>chr</build><build>cnf</build><build>hds</build><build>fio</build><build>grp</build><build>mers</build><build>ndf</build><build>ndg</build><build>par</build><build>prm</build><build>sae</build><build>startcl</build><build>tcl</build><build>trn</build><build>ifd</build><build option='link'>sla</build><build option='link'>kaplibs</build><build option='link'>shl</build><build option='link'>tcl</build><use>kappa</use><use>ccdpack</use><use>tcl</use><use>tk</use><use>startcl</use><sourceset>star2html</sourceset>
+    <build>pcs</build><build>ast</build><build>cat</build><build>chr</build><build>cnf</build><build>hds</build><build>fio</build><build>grp</build><build>mers</build><build>ndf</build><build>ndg</build><build>par</build><build>prm</build><build>sae</build><build>startcl</build><build>tcl</build><build>trn</build><build>ifd</build><build option='link'>sla</build><build option='link'>kaplibs</build><build option='link'>ctg</build><build option='link'>shl</build><build option='link'>tcl</build><use>kappa</use><use>ccdpack</use><use>tcl</use><use>tk</use><use>startcl</use><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
