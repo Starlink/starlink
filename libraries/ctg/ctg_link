@@ -1,2 +1,70 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     ctg_link
+
+#  Purpose:
+#     Generate linker (ld) arguments for linking against the ADAM version
+#     of the CTG library.
+
+#  Type of Module:
+#     Shell script.
+
+#  Description:
+#     This script should be invoked by those building ADAM applications
+#     that use the CTG library in order to generate the correct arguments
+#     for the compiler (or ld) command.  The arguments generated are written
+#     to the standard output.
+#
+#     Note that there is no ctg_link_adam.
+
+#  Invocation:
+#     The script may be invoked as part of a command such as:
+#
+#        alink program.f -L/star/lib `ctg_link`
+
+#  Copyright:
+#     Copyright (C) 1994 Science & Engineering Research Council.
+#     Copyright (C) 2009 Science & Technology Facilities Council.
+#     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     2-JUN-1994 (RFWS):
+#        Original template.
+#     2009 August 9 (MJC):
+#        Initial CTG version.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Echo the CTG library reference, followed by the list of options for
+#  packages on which the CTG library depends.  Pass the result through an
+#  awk script to remove duplicate library references.
 echo -lctg `grp_link` `cat_link` `one_link` `chr_link` `psx_link` \
 | awk '{for(f=NF;f;f--)if(!w[$f]++)l=$f" "l;print l}'
+
+#  End of script.
