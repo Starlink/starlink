@@ -1375,7 +1375,7 @@ registration, sky subtraction, calculation of Stokes parameters, and
 display of vector maps.  
 </p></abstract>
   <dependencies >
-    <build>pcs</build><build>ast</build><build>cat</build><build>chr</build><build>cnf</build><build>hds</build><build>fio</build><build>grp</build><build>mers</build><build>ndf</build><build>ndg</build><build>par</build><build>prm</build><build>sae</build><build>startcl</build><build>tcl</build><build>trn</build><build>ifd</build><build option='link'>sla</build><build option='link'>kaplibs</build><build option='link'>shl</build><build option='link'>tcl</build><use>kappa</use><use>ccdpack</use><use>tcl</use><use>tk</use><use>startcl</use><sourceset>star2html</sourceset>
+    <build>pcs</build><build>ast</build><build>cat</build><build>chr</build><build>cnf</build><build>hds</build><build>fio</build><build>grp</build><build>mers</build><build>ndf</build><build>ndg</build><build>par</build><build>prm</build><build>sae</build><build>startcl</build><build>tcl</build><build>trn</build><build>ifd</build><build option='link'>sla</build><build option='link'>kaplibs</build><build option='link'>ctg</build><build option='link'>shl</build><build option='link'>tcl</build><use>kappa</use><use>ccdpack</use><use>tcl</use><use>tk</use><use>startcl</use><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -5011,6 +5011,33 @@ No longer under active control.
   </copyright>
 </component>
 
+<component id="ctg" support="U">
+  <version>3.0</version>
+  <path>libraries/ctg</path>
+  <description>Library to access groups of catalogues.</description>
+  <abstract><p> 
+     CTG provides routines for accessing groups of catalogues through
+     a single parameter using wild-cards, and lists in text files.  This is 
+     analogous to the way the NDG library accesses groups of NDFs using a 
+     single parameter.
+  </p></abstract>
+  <dependencies >
+    <build>cat</build><build>grp</build><build>one</build><build>prm</build><build>psx</build><build>sae</build><link>cat</link><link>chr</link><link>grp</link><link>mers</link><link>one</link><link>par</link><link>pcs</link><link>prm</link><link>psx</link><sourceset>htx</sourceset><sourceset>sst</sourceset><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>David Berry</name>
+      <uname>dsb</uname>
+    </person>
+    <person>
+      <name>Malcolm J. Currie</name>
+      <uname>mjc</uname>
+    </person>
+  </developers>
+  <documentation> sun262</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+</component>
+
 <component id="ems" support="S">
   <version>2.3-0</version>
   <path>libraries/ems</path>
@@ -5388,6 +5415,31 @@ understand.
   </copyright>
 </component>
 
+<component id="irq" support="U">
+  <version>3.0</version>
+  <path>libraries/irq</path>
+  <description>Library to manage NDF QUALITY information textually</description>
+  <abstract><p> This library is a set of Fortran routines that permit
+  management and use of textual names representing bits in the NDF QUALITY 
+  component.
+    </p></abstract>
+  <dependencies >
+    <build>chr</build><build>generic</build><build>hds</build><build>kaplibs</build><build>mers</build><build>ndf</build><build>par</build><build>pcs</build><build>prm</build><build>sae</build><link>chr</link><link>hds</link><link>kaplibs</link><link>mers</link><link>ndf</link><link>par</link><link>pcs</link><link>prm</link><sourceset>htx</sourceset><sourceset>sst</sourceset><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>David Berry</name>
+      <uname>dsb</uname>
+    </person>
+    <person>
+      <name>Malcolm J. Currie</name>
+      <uname>mjc</uname>
+    </person>
+  </developers>
+  <documentation> sun261</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+</component>
+
 <component id="jpl" support="S">
   <version>2.0-2</version>
   <path>libraries/jpl</path>
@@ -5425,7 +5477,7 @@ KAPLIBS provides software developers with access to many of the internal
 KAPPA routines, so that KAPPA-like applications can be written and built
 independently of KAPPA.</p></abstract>
   <dependencies >
-    <build>pcs</build><build>agi</build><build>ast</build><build>atl</build><build>cat</build><build>chr</build><build>cnf</build><build>fio</build><build>generic</build><build>gks</build><build>gns</build><build>grp</build><build>hds</build><build>idi</build><build>mag</build><build>mers</build><build>ndf</build><build>ndg</build><build>par</build><build>pcs</build><build>prm</build><build>psx</build><build>sae</build><build>snx</build><build>trn</build><link>agi</link><link>ast</link><link>atl</link><link>cat</link><link>fio</link><link>grp</link><link>mag</link><link>mers</link><link>ndf</link><link>ndg</link><link>pcs</link><link>pda</link><link>pgplot</link><link>prm</link><link>psx</link><link>psx</link><link>snx</link><link>trn</link><sourceset>htx</sourceset><sourceset>sst</sourceset><sourceset>messgen</sourceset><sourceset>star2html</sourceset>
+    <build>pcs</build><build>agi</build><build>ast</build><build>atl</build><build>cat</build><build>chr</build><build>cnf</build><build>fio</build><build>generic</build><build>gks</build><build>gns</build><build>grp</build><build>hds</build><build>idi</build><build>lpg</build><build>mag</build><build>mers</build><build>ndf</build><build>ndg</build><build>par</build><build>pcs</build><build>prm</build><build>psx</build><build>sae</build><build>snx</build><build>trn</build><link>agi</link><link>ast</link><link>atl</link><link>cat</link><link>fio</link><link>grp</link><link>mag</link><link>mers</link><link>ndf</link><link>ndg</link><link>pcs</link><link>pda</link><link>pgplot</link><link>prm</link><link>psx</link><link>psx</link><link>snx</link><link>trn</link><sourceset>htx</sourceset><sourceset>sst</sourceset><sourceset>messgen</sourceset><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -5442,6 +5494,35 @@ independently of KAPPA.</p></abstract>
     </person>
   </developers>
   <documentation> sun238</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+</component>
+
+<component id="lpg" support="U">
+  <version>3.0</version>
+  <path>libraries/lpg</path>
+  <description>Library to manage NDF QUALITY information textually
+  </description>
+  <abstract><p> 
+     This library is a set of Fortran routines that provides looping of 
+     tasks within a monolith, in order to allow a command to be invoked 
+     repeatedly until all supplied data files (catalogues or NDFs) have 
+     been processed.  Thus it can be used to enable lists of files
+     including wildcards to be processed in a single command.
+  </p></abstract>
+  <dependencies >
+    <build>cat</build><build>grp</build><build>hds</build><build>ndf</build><build>par</build><build>pcs</build><build>sae</build><link>cat</link><link>chr</link><link>ctg</link><link>grp</link><link>mers</link><link>ndf</link><link>ndg</link><link>par</link><link>pcs</link><link>psx</link><sourceset>htx</sourceset><sourceset>sst</sourceset><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>David Berry</name>
+      <uname>dsb</uname>
+    </person>
+    <person>
+      <name>Malcolm J. Currie</name>
+      <uname>mjc</uname>
+    </person>
+  </developers>
+  <documentation> sun263</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
