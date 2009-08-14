@@ -7670,7 +7670,7 @@ if astrometry information is being read from an IRAS90 or FITS extension.
 These extensions can be deleted if necessary, using the \htmlref{ERASE}{ERASE}
 command.  For instance:
 
-\small
+\latex{\small}
 \begin{verbatim}
    % erase m31.more.iras90
    % erase m31.more.fits
@@ -7864,7 +7864,6 @@ erroneously, thought to be a frequency value).  So here you would do:
     % wcsattrib fred remap=no set System wave
 \end{verbatim}
 \latex{\normalsize}
-
 
 
 \subsection{\xlabel{se_frmatt}Frame Attributes\label{se:frmatt}}
@@ -25758,7 +25757,6 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
          This writes the FITS keyword BSCALE just before the end of the
          FITS extension, which is located within the NDF called abc.  It
          assigns BSCALE a value of 1.234.  There is no inline comment.
-
       }
       \sstexamplesubsection{
          fitswrite @100 airmass value=1.456 comment="Airmass at mid-observation"
