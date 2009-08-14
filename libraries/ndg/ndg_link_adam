@@ -1,2 +1,73 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     ndg_link_adam
+
+#  Purpose:
+#     Generate linker (ld) arguments for linking against the ADAM version
+#     of the NDG library.
+
+#  Type of Module:
+#     Shell script.
+
+#  Description:
+#     This script should be invoked by those building ADAM applications
+#     that use the NDG library in order to generate the correct arguments
+#     for the compiler (or ld) command.  The arguments generated are written
+#     to the standard output.
+
+#  Invocation:
+#     The script may be invoked as part of a command such as:
+#
+#        alink program.f -L/star/lib `ndg_link_adam`
+
+#  Copyright:
+#     Copyright (C) 1994 Science & Engineering Research Council.
+#     Copyright (C) 1997 Central Laboratory of the Research Councils.
+#     Copyright (C) 2004 Particle Physics & Astronomy Research Council.
+#     Copyright (C) 2009 Science & Technology Research Council.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     2-JUN-1994 (RFWS):
+#        Original version.
+#     14-JUL-1997 (RFWS)
+#        Added AST_ linking and improved "awk" script.
+#     14-SEP-1999 (DSB)
+#        Initial NDG version.
+#     3-SEP-2004 (TIMJ):
+#        Add one_link_adam (after replacing ndg1_wild with one_find_file in 
+#        the code).
+#     30-JUN-2009 (DSB):
+#        Add atl_link_adam for new provenance.
+#     {enter_further_changes_here}
+
+#-
+
+#  Echo the NDG library reference, followed by the list of options for
+#  packages on which the NDG library depends.  Pass the result through an
+#  awk script to remove duplicate library references.
 echo -lndg_adam -lndg `grp_link_adam` `ndf_link_adam` `atl_link_adam` `one_link_adam` \
 | awk '{for(f=NF;f;f--)if(!w[$f]++)l=$f" "l;print l}'
+
+#  End of script.

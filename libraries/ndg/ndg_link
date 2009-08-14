@@ -13,8 +13,8 @@
 
 #  Description:
 #     This script should be invoked by those building standalone
-#     applications which use the NDG library in order to generate the
-#     correct arguments for the compiler (or ld) command. The arguments
+#     applications that use the NDG library in order to generate the
+#     correct arguments for the compiler (or ld) command.  The arguments
 #     generated are written to the standard output.
 
 #  Invocation:
@@ -27,35 +27,62 @@
 #     to the ndf_link command.
 
 #  Copyright:
-#     Copyright (C) 2008-2009 Science and Technology Facilities Council.
-#     Copyright (C) 2004 Particle Physics and Astronomy Research Council.
-#     Copyright (C) 1999 Rutherford Appleton Laboratory
+#     Copyright (C) 1994 Science & Engineering Research Council.
+#     Copyright (C) 1997, 1999 Central Laboratory of the Research Councils.
+#     Copyright (C) 2004 Particle Physics & Astronomy Research Council.
+#     Copyright (C) 2009 Science & Technology Research Council.
 #     All Rights Reserved.
 
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
 #  Authors:
-#     DSB: David Berry (Starlink)
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     DSB: David Berry (STARLINK)
+#     MJC: Malcolm J. Currie (STARLINK)
 #     TIMJ: Tim Jenness (JAC, Hawaii)
 #     {enter_new_authors_here}
 
 #  History:
-#     14-SEP-1999 (DSB):
-#        Original version.
+#     2-JUN-1994 (RFWS):
+#        Original template.
+#     14-JUL-1997 (RFWS)
+#        Added AST_ linking and improved "awk" script.
+#     14-SEP-1999 (DSB)
+#        Initial NDG version.
 #     3-SEP-2004 (TIMJ):
-#        Add one_link
-#     30-JUN-2008 (DSB):
-#        Provenance requires ATL
+#        Add one_link (after replacing ndg1_wild with one_find_file in 
+#        the code).
+#     30-JUN-2009 (DSB):
+#        Add atl_link for new provenance.
+#     2009 August 13 (MJC):
+#        Added prologue and comments.
 #     18-AUG-2009 (TIMJ):
 #        Added ndf_switches handling to pass on any AST linker options.
 #     {enter_further_changes_here}
 
-#  Bugs:
-#     {note_any_bugs_here}
-
 #-
-
-#.
 
 #  All command-line switches are assumed to be for NDF.
 ndf_options=${1+"$@"}
+
+#  Echo the NDG library reference, followed by the list of options for
+#  packages on which the NDG library depends.  Pass the result through an
+#  awk script to remove duplicate library references.
 echo -lndg `grp_link` `chr_link` `ndf_link $ndf_options` `atl_link` `one_link` \
 | awk '{for(f=NF;f;f--)if(!w[$f]++)l=$f" "l;print l}'
+
+#  End of script.
