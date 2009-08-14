@@ -1,3 +1,20 @@
+    Version 4.4-0
+    =============
+
+    GAIA and Skycat have been updated to use Tcl/Tk 8.5 and most of the
+    associated packages have also been updated. The major visible changes
+    are the arrival of anti-aliased fonts and the updating of some widgets.
+
+    The font used for displaying symbols (the alpha and delta symbols shown in
+    the main panel) is no longer required as unicode fonts are now used by
+    default. This also means that unicode symbols can be drawn in overlay
+    text. The font handling for the astrometry grid overlay has also been
+    changed to use anti-aliased fonts and unicode.
+
+    During this update the ability to get the grid overlay fonts to scale
+    with the zoom factor has been removed. Hopefully now that rotated text
+    is clearer this will not be needed.
+
     Version 4.3-1
     =============
 

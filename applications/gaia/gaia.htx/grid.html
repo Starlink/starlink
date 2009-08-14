@@ -3,7 +3,7 @@
   <head>
     <title>Grid Overlay Toolbox</title>
   </head>
-  
+
   <body>
     <a name="xref_grid"></a>
     <h2 align=center><font color=red>Grid Overlay Toolbox</font></h2>
@@ -21,7 +21,7 @@
       Just select the <tt>System</tt> tab, now select the <tt>System:</tt>
       menu and choose the option <tt>pixels</tt>.
     </p>
-    
+
     <h3>Drawing a grid showing celestial coordinates</h3>
     <p>
       If your image doesn't show celestial coordinates then it doesn't have a
@@ -48,8 +48,8 @@
       pick the one that you want. If appropriate you'll also be able to set
       the epoch and equinox of the system.
     </p>
-      
-    <h3>Changing the separation between the grid lines</h3> 
+
+    <h3>Changing the separation between the grid lines</h3>
     <p>
       Press the <tt>Spacing</tt> tab and the fields headed <tt>Relative Grid
       Spacing:</tt> will appear. To decrease the separation between the grid
@@ -91,15 +91,31 @@
     </p>
 
     <p>
-      A symbol font is also available. You can view all the characters
-      available in this using the command:
+      It is also possible to display an extended sequence of characters
+      using their unicode values. For instance alpha is \u03B1 and delta
+      \u03B4. Full lists of uncode symbols are at:
     </p>
     <pre>
-   %  xfd -fn "*symbol*"
+      <a href="http://www.unicode.org/charts">http://www.unicode.org/charts</a>
     </pre>
     <p>
-      One thing to note before getting carried away is that you can only use a
-      single font at a time, so the range of options is very limited.
+      Note you can also get some mathematical and subscripted characters
+      using unicode, for instance \u2070 is a superscripted zero and
+      \u00B1 is a plus/minus sign.
+    </p>
+
+    <p>
+      Finally you can also use special "AST" escape sequences to get effects
+      like sub and superscripts. For instance "Hello%s200+\u03B1" would
+      draw Hello with an alpha scaled by 200%. To see the list of available
+      AST escape sequences do:
+    </p>
+    <pre>
+    showme sun211 Escape
+    </pre>
+    <p>
+      In a console window. Note these comments also apply to the X and Y axes
+      labels.
     </p>
 
     <h3>Saving the options for another day</h3>
