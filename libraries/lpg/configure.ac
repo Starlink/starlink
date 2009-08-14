@@ -23,7 +23,7 @@ AC_PROG_LIBTOOL
 
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES([build], [cat grp hds ndf par pcs sae])
-STAR_DECLARE_DEPENDENCIES([link], [cat chr grp mers ndf ndg par pcs psx] )
+STAR_DECLARE_DEPENDENCIES([link], [cat chr ctg grp mers ndf ndg par pcs psx] )
 STAR_DECLARE_DEPENDENCIES(sourceset, [htx sst])
  
 dnl    List the sun/ssn/... numbers which document this package and

@@ -15,7 +15,7 @@
      including wildcards to be processed in a single command.
   </p></abstract>
   <dependencies >
-    <build>cat</build><build>grp</build><build>hds</build><build>ndf</build><build>par</build><build>pcs</build><build>sae</build><link>cat</link><link>chr</link><link>grp</link><link>mers</link><link>ndf</link><link>ndg</link><link>par</link><link>pcs</link><link>psx</link><sourceset>htx</sourceset><sourceset>sst</sourceset><sourceset>star2html</sourceset>
+    <build>cat</build><build>grp</build><build>hds</build><build>ndf</build><build>par</build><build>pcs</build><build>sae</build><link>cat</link><link>chr</link><link>ctg</link><link>grp</link><link>mers</link><link>ndf</link><link>ndg</link><link>par</link><link>pcs</link><link>psx</link><sourceset>htx</sourceset><sourceset>sst</sourceset><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
