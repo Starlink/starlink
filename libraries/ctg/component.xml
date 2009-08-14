@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="irq" support="U">
+<component id="ctg" support="U">
   <version>3.0</version>
   <path>libraries/ctg</path>
   <description>Library to access groups of catalogues.</description>
