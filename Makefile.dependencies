@@ -962,7 +962,6 @@ $(MANIFESTS)/gaia: \
 		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
-		$(MANIFESTS)/tcldict \
 		$(MANIFESTS)/tcllibs \
 		$(MANIFESTS)/tclx \
 		$(MANIFESTS)/tdom \
@@ -2842,8 +2841,7 @@ $(MANIFESTS)/tcllibs: \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/tclx: \
-		$(MANIFESTS)/tcl \
-		$(MANIFESTS)/tk
+		$(MANIFESTS)/tcl
 	cd thirdparty/tclsys/tclx \
 	  && $(MAKE_CPT)
 

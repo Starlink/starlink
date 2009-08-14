@@ -36,7 +36,7 @@
 </component>
 
 <component id="atools" support="S">
-  <version>1.9-4</version>
+  <version>1.9-5</version>
   <path>applications/atools</path>
   <description>ATOOLS - AST applications</description>
   <abstract><p>
@@ -66,7 +66,7 @@ high-level interface to the AST library.
 </component>
 
 <component id="ccdpack" support="S">
-  <version>4.0-22</version>
+  <version>4.0-23</version>
   <path>applications/ccdpack</path>
   <description>CCD data reduction package</description>
   <abstract>
@@ -138,7 +138,7 @@ system are supported.
 </component>
 
 <component id="convert" support="S">
-  <version>1.5-15</version>
+  <version>1.5-17</version>
   <path>applications/convert</path>
   <description>CONVERT -- format-conversion package</description>
   <abstract><p>
@@ -176,7 +176,7 @@ Starlink applications, and a number of other common data formats.
 </component>
 
 <component id="cupid" support="S">
-  <version>0.0-39</version>
+  <version>1.1</version>
   <path>applications/cupid</path>
   <description>CUPID - AST applications</description>
   <abstract><p>
@@ -534,7 +534,7 @@ variety of formats.
 </component>
 
 <component id="figaro" support="S">
-  <version>5.6-5</version>
+  <version>5.6-6</version>
   <path>applications/figaro</path>
   <description>FIGARO general data-reduction system</description>
   <abstract><p>
@@ -597,7 +597,7 @@ wide range of images and spectra.
 </component>
 
 <component id="findcoords" support="U">
-  <version>1.0-1</version>
+  <version>1.0-2</version>
   <path>applications/findcoords</path>
   <description>Find the coordinates of a named object</description>
   <abstract><p>
@@ -658,7 +658,7 @@ JCMT telescope based on Mauna Kea, Hawaii.
 </component>
 
 <component id="gaia" support="S">
-  <version>4.3-0</version>
+  <version>4.4-0</version>
   <path>applications/gaia</path>
   <description>GAIA - Graphical Astronomy and Image Analysis</description>
   <abstract><p>
@@ -670,7 +670,7 @@ calibration and modification, grid overlays, blink comparison, defect patching
 and the ability to query on-line (WWW) catalogues.
 </p></abstract>
   <dependencies >
-    <build>pcs</build><build option='link'>ard</build><build option='link'>atl</build><build option='link'>ast</build><build option='link'>blt</build><build option='link'>cat</build><build option='link'>cfitsio</build><build option='link'>generic</build><build option='link'>fio</build><build option='link'>img</build><build option='link'>itcl</build><build option='link'>pcs</build><build option='link'>pda</build><build option='link'>sae</build><build option='link'>skycat</build><build option='link'>startcl</build><build option='link'>sla</build><build option='link'>tcl</build><build option='link'>tclx</build><build option='link'>tk</build><build option='link'>tcllibs</build><build option='link'>vtk</build><build option='link'>xerces-c</build><build option='link'>tcldict</build><build option='link'>tdom</build><sourceset>star2html</sourceset><configure>tcl</configure><configure>tk</configure><configure>blt</configure><configure>itcl</configure><use>convert</use><use>esp</use><use>extractor</use><use>kappa</use><use>photom</use><use>polpack</use><use>startcl</use><use>tcl</use><use>tk</use><use>blt</use><use>tclx</use><use>tcllibs</use><use>skycat</use><use>tkimg</use><sourceset>star2html</sourceset>
+    <build>pcs</build><build option='link'>ard</build><build option='link'>atl</build><build option='link'>ast</build><build option='link'>blt</build><build option='link'>cat</build><build option='link'>cfitsio</build><build option='link'>generic</build><build option='link'>fio</build><build option='link'>img</build><build option='link'>itcl</build><build option='link'>pcs</build><build option='link'>pda</build><build option='link'>sae</build><build option='link'>skycat</build><build option='link'>startcl</build><build option='link'>sla</build><build option='link'>tcl</build><build option='link'>tclx</build><build option='link'>tk</build><build option='link'>tcllibs</build><build option='link'>vtk</build><build option='link'>xerces-c</build><build option='link'>tdom</build><sourceset>star2html</sourceset><configure>tcl</configure><configure>tk</configure><configure>blt</configure><configure>itcl</configure><use>convert</use><use>esp</use><use>extractor</use><use>kappa</use><use>photom</use><use>polpack</use><use>startcl</use><use>tcl</use><use>tk</use><use>blt</use><use>tclx</use><use>tcllibs</use><use>skycat</use><use>tkimg</use><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -866,11 +866,11 @@ Traces an HDS file
 </component>
 
 <component id="kappa" support="S">
-  <version>1.10-5</version>
+  <version>1.11-4</version>
   <path>applications/kappa</path>
   <description>KAPPA - Kernel Application Package</description>
   <abstract><p>
-KAPPA is an applications package comprising about 190
+KAPPA is an applications package comprising about 200
 general-purpose commands for image processing, data visualisation, and
 manipulation of the standard Starlink data format---the NDF.  It is
 intended to work in conjunction with Starlink's various specialised
@@ -883,15 +883,17 @@ packages.
     <person>
       <name>David Berry</name>
       <uname>dsb</uname>
-      <email>dsb@ast.man.ac.uk</email>
+      <email>d.berry@jach.hawaii.edu</email>
       <role>owner</role>
     </person>
     <person>
-      <name>Malcolm Currie</name>
+      <name>Malcolm J. Currie</name>
       <uname>mjc</uname>
+      <email>mjc@star.rl.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
-  <documentation> sun95 sun221</documentation>
+  <documentation> sun95</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
@@ -1363,7 +1365,7 @@ A software package designed to search for periodicities in data.
 </component>
 
 <component id="polpack" support="S">
-  <version>3.1-3</version>
+  <version>3.1-4</version>
   <path>applications/polpack</path>
   <description>POLPACK - An Imaging Polarimetry Reduction Package</description>
   <abstract><p>
@@ -1556,7 +1558,7 @@ package.
 </component>
 
 <component id="smurf">
-  <version>0.5.0</version>
+  <version>0.5.2</version>
   <path>applications/smurf</path>
   <description>SURF2 - SCUBA-2 User Reduction Facility</description>
   <abstract><p>
@@ -1574,7 +1576,7 @@ reduce your SCUBA-2 data.
       <uname>timj</uname>
     </person>
   </developers>
-  <documentation> sun258 sun259</documentation>
+  <documentation> sun258 sun259 sc19</documentation>
   <bugreports>t.jenness@jach.hawaii.edu</bugreports>
 </component>
 
@@ -1735,7 +1737,7 @@ UNIX).
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <copyright>
     <year></year>
-    <name>Council for the Central Laboratory of the Research Councils</name>
+    <name>Science and Technology Facilities Council</name>
   </copyright>
   <notes><p>Starlink customised wrapper around latex2html</p></notes>
 </component>
@@ -2192,7 +2194,7 @@ to handle data from a variety of different instruments.
 
 <component id="sc14">
   <version>2</version>
-  <path>docs/sc/012</path>
+  <path>docs/sc/014</path>
   <description>The Fibre Spectroscopy Cookbook</description>
   <abstract><p>
       This cookbook is an introduction to fibre spectroscopy and, in
@@ -4869,7 +4871,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="atl" support="S">
-  <version>1.0</version>
+  <version>1.1</version>
   <path>libraries/atl</path>
   <description>ATL - A Library of AST Utility Routines</description>
   <abstract><p>ATL provides routines that perform high-level AST-related 
@@ -5413,12 +5415,12 @@ understand.
 </component>
 
 <component id="kaplibs" support="S">
-  <version>2.8-2</version>
+  <version>3.0</version>
   <path>libraries/kaplibs</path>
   <description>KAPLIBS - Internal subroutines used within the KAPPA package.</description>
   <abstract><p>KAPLIBS is a package of Fortran subroutine 
 libraries which were originally written as part of the KAPPA package (a
-package of general purpose image processing and visualization tools).
+package of general-purpose image-processing and visualization tools).
 KAPLIBS provides software developers with access to many of the internal
 KAPPA routines, so that KAPPA-like applications can be written and built
 independently of KAPPA.</p></abstract>
@@ -5429,7 +5431,13 @@ independently of KAPPA.</p></abstract>
     <person>
       <name>D.S. Berry</name>
       <uname>dsb</uname>
-      <email>dsb@ast.man.ac.uk</email>
+      <email>d.berry@jach.hawaii.edu</email>
+      <role>owner</role>
+    </person>
+    <person>
+      <name>Malcolm J. Currie</name>
+      <uname>mjc</uname>
+      <email>mjc@star.rl.ac.uk</email>
       <role>owner</role>
     </person>
   </developers>
@@ -5480,7 +5488,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="mers" support="U">
-  <version>2.0-6</version>
+  <version>2.1-0</version>
   <path>libraries/mers</path>
   <description>Message and Error Reporting Systems</description>
   <abstract><p>This package contains two Fortran subroutine libraries,
@@ -5539,7 +5547,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="ndf" support="S">
-  <version>1.8</version>
+  <version>1.9</version>
   <path>libraries/ndf</path>
   <description>NDF - Routines for Accessing the Extensible N-Dimensional Data Format</description>
   <abstract><p>The Extensible N-Dimensional Data Format (NDF) is a
@@ -5575,7 +5583,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="ndg" support="S">
-  <version>5.6</version>
+  <version>5.7</version>
   <path>libraries/ndg</path>
   <description>NDG - Routines for Accessing Groups of NDFs</description>
   <abstract><p>NDG provides facilities for handling groups of NDFs.
@@ -5679,7 +5687,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="pcs" support="S">
-  <version>4.1-2</version>
+  <version>4.1-3</version>
   <path>libraries/pcs</path>
   <description>PCS -- Parameter and Communication Subsystems</description>
   <abstract>
@@ -6283,7 +6291,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="skycat" support="U">
-  <version>3.0.1</version>
+  <version>3.0.2</version>
   <path>thirdparty/eso/skycat</path>
   <description>The main skycat component</description>
   <dependencies >
@@ -6477,7 +6485,7 @@ Pence for giving his permission for CFITSIO to be released on Starlink.
 </component>
 
 <component id="vtk" support="U">
-  <version>5.0.3</version>
+  <version>5.4.2</version>
   <path>thirdparty/kitware/vtk</path>
   <description>VTK/CMAKE</description>
   <dependencies >
@@ -6647,7 +6655,7 @@ and some distortion.
 </component>
 
 <component id="blt" support="U">
-  <version>2.4z</version>
+  <version>3.0a</version>
   <path>thirdparty/tclsys/blt</path>
   <description>BLT</description>
   <dependencies >
@@ -6665,7 +6673,7 @@ and some distortion.
 </component>
 
 <component id="itcl" support="U">
-  <version>3.3</version>
+  <version>3.4</version>
   <path>thirdparty/tclsys/itcl</path>
   <description>[incr Tcl]</description>
   <dependencies >
@@ -6745,7 +6753,7 @@ and some distortion.
   <path>thirdparty/tclsys/tclx</path>
   <description>TclX</description>
   <dependencies >
-    <build>tcl</build><build>tk</build>
+    <build>tcl</build>
   </dependencies>
   <developers>
     <person>
@@ -6759,7 +6767,7 @@ and some distortion.
 </component>
 
 <component id="tdom" support="U">
-  <version>0.8.2</version>
+  <version>0.8.3</version>
   <path>thirdparty/tclsys/tdom</path>
   <description>tDOM</description>
   <dependencies >
