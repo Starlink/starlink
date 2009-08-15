@@ -4252,19 +4252,18 @@ msgBlank(status)
 OUTPUT:
   status
 
-void
-msgIflev(filter)
-  ndfint &filter = NO_INIT
+int
+msgIflev(filter, status)
+  char * filter = NO_INIT
+  ndfint &status
  ALIAS:
   NDF::msg_iflev = 2
- PROTOTYPE: $
- PREINIT:
-   msglev_t filt;
+ PROTOTYPE: $$
  CODE:
-  msgIflev(&filt);
-  filter = filt;
+  RETVAL = msgIflev(filter,&status);
  OUTPUT:
-  filter
+  RETVAL
+  status
 
 void
 msgIfset(filter, status)
