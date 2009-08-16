@@ -652,6 +652,14 @@ else
   fi
 fi
 
+# Period
+
+if test -f ${bindir}/period/period; then
+   period () { ${PERIOD_DIR}/period; }
+else
+   period () { ${STARLINK_DIR}/etc/notinst period; }
+fi
+
 # Polpack
 
 if test -f ${bindir}/polpack/polpack.sh; then
