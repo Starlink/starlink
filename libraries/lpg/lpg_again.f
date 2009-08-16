@@ -20,11 +20,11 @@
 *     application should be invoked again. A typical way to use this
 *     routine within a monolith is as follows:
 
-*        CALL LPG_START( STATUS )
-*        DO WHILE( LPG_AGAIN( STATUS ) )
-*           IF( ACTION .EQ. 'ADD' ) THEN
+*        CALL LPG_START( VERB, DELAY, DISAB, STATUS )
+*        DO WHILE ( LPG_AGAIN( STATUS ) )
+*           IF ( ACTION .EQ. 'ADD' ) THEN
 *              CALL ADD( STATUS )
-*           ELSE IF( ACTION .EQ. 'SUB' ) THEN
+*           ELSE IF ( ACTION .EQ. 'SUB' ) THEN
 *              CALL SUB( STATUS )
 *           ELSE IF...
 *           ...
@@ -46,7 +46,7 @@
 *     On the first invocation of the application, groups of data files are 
 *     obtained whenever one of the above LPG routines is used to get an NDF 
 *     or CAT identifier, and an identifier corresponding to the first name in 
-*     each group is returned to the application. On subsequent invocation, 
+*     each group is returned to the application. On subsequent invocations, 
 *     the names in the groups obtained during the first invocation are used
 *     without obtaining new parameter values from the environment. The
 *     index of the returned data file within each group is increment by 1
@@ -54,8 +54,8 @@
 *
 *     If an application is invoked more than once, all other parameters
 *     retain the values they had at the end of the first invocation.
-*     Applications which use this scheme should avoid having parameters
-*     with "VPATH=DYNAMIC" in the interace file, since the dynamic
+*     Applications that use this scheme should avoid having parameters
+*     with "VPATH=DYNAMIC" in the interface file, since the dynamic
 *     default calculated on the first invocation will then be re-used for
 *     all subsequent invocations, which may be inappropriate. A better
 *     scheme is to have "VPATH=DEFAULT", "PPATH=DYNAMIC" and "DEFAULT=!".
@@ -72,7 +72,7 @@
 *     this would require the application to abort in the cases where there
 *     is no dynamic default available. It is probably better in these
 *     cases to have VPATH=PROMPT,PPATH=DYNAMIC and accept the fact that 
-*     the user will be prompted for a parameter which was previously
+*     the user will be prompted for a parameter that was previously
 *     defaulted.
 *
 *     Some applications test to see if a parameter was specified on the
