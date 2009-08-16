@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL LPG_START( VERBO, DELAYO, DISABO, REPLA0, STATUS )
+*     CALL LPG_START( VERBO, DELAYO, DISABO, STATUS )
 
 *  Description:
 *     Initialises the global variables used by LPG. See LPG_AGAIN.
@@ -143,7 +143,6 @@
       LOGICAL VERBO
       REAL DELAYO
       LOGICAL DISABO
-      LOGICAL REPLA0
 
 *  Status:
       INTEGER STATUS             ! Global status
