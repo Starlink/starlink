@@ -144,7 +144,7 @@ HtmlImage *HtmlGetImage(HtmlWidget *htmlPtr, HtmlElement *p){
   char *zWidth;
   char *zHeight;
   char *zSrc;
-  char *zImageName;
+  const char *zImageName;
   HtmlImage *pImage;
   int result;
   Tcl_DString cmd;

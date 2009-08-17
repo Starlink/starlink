@@ -364,7 +364,7 @@ char *HtmlResolveUri(HtmlWidget *htmlPtr, char *zUri){
   result = HtmlCallResolver(htmlPtr, azSeq);
   if( HtmlUnlock(htmlPtr) ) return 0;
   if( result==TCL_OK ){
-   char result = Tcl_GetStringResult(htmlPtr->interp);
+    const char *result = Tcl_GetStringResult(htmlPtr->interp);
     zSrc = HtmlAlloc( strlen(result) + 1 );
     if( zSrc ) strcpy(zSrc, result);
   }else{
