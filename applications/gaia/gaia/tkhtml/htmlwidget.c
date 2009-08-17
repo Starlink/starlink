@@ -1324,7 +1324,7 @@ Tk_Font HtmlGetFont(
               "\n    (-fontcommand callback of HTML widget)");
         Tcl_BackgroundError(htmlPtr->interp);
       }else{
-        sprintf(name,"%.100s", htmlPtr->interp->result);
+        sprintf(name,"%.100s", Tcl_GetStringResult(htmlPtr->interp));
       }
       Tcl_ResetResult(htmlPtr->interp);
     }
@@ -1915,7 +1915,7 @@ static int HtmlCommand(
     if (ConfigureHtmlWidget(interp, htmlPtr, argc-2, argv+2, 0, 1) != TCL_OK) {
        goto error;
     }
-    interp->result = Tk_PathName(htmlPtr->tkwin);
+    Tcl_SetResult(interp, Tk_PathName(htmlPtr->tkwin), TCL_VOLATILE);
     return TCL_OK;
 
     error:

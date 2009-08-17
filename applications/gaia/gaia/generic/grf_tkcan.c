@@ -554,7 +554,7 @@ int astGFlush( void ){
         return 1;
     } else {
         astError( AST__GRFER, "astGFlush: Failed to flush graphics (%s)\n",
-                  Interp->result );
+                  Tcl_GetStringResult( Interp ) );
         return 0;
     }
 }
@@ -661,7 +661,7 @@ int astGLine( int n, const float *x, const float *y ) {
                         segment item is created next time. */
                     astError( AST__GRFER,
                               "astGLine: failed to create line (%s)",
-                              Interp->result );
+                              Tcl_GetStringResult( Interp ) );
                     free( xlines );
                     free( ylines );
                     NewSegment = 1;
@@ -675,7 +675,8 @@ int astGLine( int n, const float *x, const float *y ) {
                     RtdSegmentSetCoords( Interp, 0, xlines, ylines, npoints );
 
                     /*  Record the name of the item we have just created. */
-                    (void) strncpy( Segment, Interp->result, TAGLEN - 1 );
+                    (void) strncpy( Segment, Tcl_GetStringResult( Interp ), 
+                                    TAGLEN - 1 );
                     NewSegment = 0;
                 }
             } else {
@@ -691,7 +692,7 @@ int astGLine( int n, const float *x, const float *y ) {
                         segment item is created next time. */
                     astError( AST__GRFER,
                               "astGLine: failed to append line segments (%s)",
-                              Interp->result );
+                              Tcl_GetStringResult( Interp ) );
                     free( xlines );
                     free( ylines );
                     NewSegment = 1;
@@ -738,7 +739,7 @@ int astGLine( int n, const float *x, const float *y ) {
                     release the workspace and make sure that a new
                     segment item is created next time. */
                 astError( AST__GRFER, "astGLine: failed to create line (%s)",
-                          Interp->result );
+                          Tcl_GetStringResult( Interp ) );
                 free( xlines );
                 free( ylines );
                 return 0;
@@ -861,7 +862,7 @@ int astGMark( int n, const float *x, const float *y, int type ) {
                             ConfigInfo.tag );
             if ( Tcl_Eval( Interp, buffer ) != TCL_OK ) {
                 astError( AST__GRFER, "astGLine: failed to create mark (%s)",
-                          Interp->result );
+                          Tcl_GetStringResult( Interp ) );
                 return 0;
             }
         }
@@ -1463,7 +1464,8 @@ static int textBBox( double x, double y, const char *text,
     if ( Tcl_Eval( Interp, buffer ) == TCL_OK ) {
 
         /*  Now get the bounding box of the text and then remove it. */
-        (void) sprintf ( buffer, "%s bbox %s \n", Canvas, Interp->result );
+        (void) sprintf ( buffer, "%s bbox %s \n", Canvas, 
+                         Tcl_GetStringResult( Interp ) );
         if ( Tcl_Eval( Interp, buffer ) == TCL_OK ) {
 
             /*  Get the unrotated bounding box and create the other corner

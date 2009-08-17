@@ -221,7 +221,7 @@ int HtmlXviewCmd(
   char **argv            /* List of all arguments */
 ){
   if( argc==2 ){
-    HtmlComputeHorizontalPosition(htmlPtr,interp->result);
+      HtmlComputeHorizontalPosition(htmlPtr,Tcl_GetStringResult(interp));
     TestPoint(0);
   }else{
     int count;
@@ -279,7 +279,7 @@ int HtmlYviewCmd(
   char **argv            /* List of all arguments */
 ){
   if( argc==2 ){
-    HtmlComputeVerticalPosition(htmlPtr,interp->result);
+    HtmlComputeVerticalPosition(htmlPtr,Tcl_GetStringResult(interp));
     TestPoint(0);
   }else if( argc==3 ){
     char *z;
@@ -356,7 +356,7 @@ int HtmlTokenHandlerCmd(
   }
   if( argc==4 ){
     if( htmlPtr->zHandler[type]!=0 ){
-      interp->result = htmlPtr->zHandler[type];
+      Tcl_SetResult(interp, htmlPtr->zHandler[type], TCL_VOLATILE);
     }
   }else{
     if( htmlPtr->zHandler[type]!=0 ){
@@ -391,7 +391,9 @@ int HtmlIndexCmd(
     return TCL_ERROR;
   }
   if( !HtmlUnlock(htmlPtr) && p ){
-    sprintf(interp->result, "%d.%d", HtmlTokenNumber(p), i);
+    char buffer[80];
+    sprintf(buffer, "%d.%d", HtmlTokenNumber(p), i);
+    Tcl_SetResult(interp, buffer, TCL_VOLATILE);
     TestPoint(0);
   }else{
     TestPoint(0);

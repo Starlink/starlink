@@ -186,7 +186,7 @@ HtmlImage *HtmlGetImage(HtmlWidget *htmlPtr, HtmlElement *p){
   if( HtmlUnlock(htmlPtr) ){
     HtmlFree(zSrc);
   }
-  zImageName = htmlPtr->interp->result;
+  zImageName = Tcl_GetStringResult(htmlPtr->interp);
   lenSrc = strlen(zSrc);
   lenW = strlen(zWidth);
   lenH = strlen(zHeight);

@@ -441,8 +441,10 @@ BoxEllCoords(interp, canvas, itemPtr, argc, argv)
         boxellPtr->newCoords = argc;
         ComputeBoxEllGeom(canvas, boxellPtr);
     } else {
-        sprintf(interp->result,
+        char buffer[80];
+        sprintf(buffer,
                 "wrong # coordinates:  expected 0, 2 or 6, got %d", argc);
+        Tcl_SetResult(interp, buffer, TCL_VOLATILE);
         return TCL_ERROR;
     }
     return TCL_OK;

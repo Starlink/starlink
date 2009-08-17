@@ -204,8 +204,6 @@
  *        Add imagedataCmd.
  *     19-JUN-2009 (PWD):
  *        Add blankvalueCmd.
- *     12-JUL-2009 (PWD):
- *        Add astgetcloneCmd
  *-
  */
 #if HAVE_CONFIG_H
@@ -296,7 +294,6 @@ public:
     { "astdomains",      &StarRtdImage::astdomainsCmd,      0, 1 },
     { "astfix",          &StarRtdImage::astfixCmd,          0, 0 },
     { "astget",          &StarRtdImage::astgetCmd,          1, 1 },
-    { "astgetclone",     &StarRtdImage::astgetcloneCmd,     0, 0 },
     { "astmilli",        &StarRtdImage::astmilliCmd,        1, 1 },
     { "astpix2cur",      &StarRtdImage::astpix2curCmd,      2, 2 },
     { "astpix2wcs",      &StarRtdImage::astpix2wcsCmd,      2, 4 },
@@ -2175,36 +2172,6 @@ int StarRtdImage::astreplaceCmd( int argc, char *argv[] )
     else {
         return TCL_OK;
     }
-}
-
-//+
-//  StarRtdImage::astgetcloneCmd
-//
-//  Purpose:
-//     Returns a clone of the current AST frameset. 
-//     Annul this after use.
-//-
-int StarRtdImage::astgetcloneCmd( int argc, char *argv[] )
-{
-#ifdef _DEBUG_
-    cout << "Called StarRtdImage::astgetwcsCmd" << std::endl;
-#endif
-    if ( !image_ ) {
-        return error( "no image loaded" );
-    }
-
-    //  Get a pointer to the internal Starlink version of the WCS class.
-    StarWCS* wcsp = getStarWCSPtr();
-    if ( !wcsp ) {
-        return TCL_ERROR;
-    }
-
-    //  Get a clone of the WCS.
-    AstFrameSet *frmset = wcsp->astWCSClone();
-
-    //  And export it.
-    Tcl_SetObjResult( interp_, Tcl_NewLongObj( (long) frmset ) );
-    return TCL_OK;
 }
 
 //+
@@ -5746,7 +5713,7 @@ int StarRtdImage::gbandCmd( int argc, char *argv[] )
     Tcl_Eval( interp_, buf );
 
     double rx0, ry0, rx1, ry1;
-    if ( sscanf( interp_->result, "%lf %lf %lf %lf",
+    if ( sscanf( Tcl_GetStringResult( interp_ ), "%lf %lf %lf %lf",
                  &rx0, &ry0, &rx1, &ry1) != 4 ) {
         return TCL_OK;
     }
@@ -5772,7 +5739,7 @@ int StarRtdImage::gbandCmd( int argc, char *argv[] )
         sprintf(buf, "%s bbox mband_width_text\n", canvas);
         Tcl_Eval(interp_, buf);
 
-        if (sscanf(interp_->result, "%lf %lf %lf %lf", &rx0, &ry0, &rx1, &ry1) != 4)
+        if (sscanf( Tcl_GetStringResult( interp_ ), "%lf %lf %lf %lf", &rx0, &ry0, &rx1, &ry1) != 4)
             return TCL_OK;
         sprintf(buf, "%s coords mband_width_rect %g %g %g %g\n",
                 canvas,  rx0, ry0, rx1, ry1);
@@ -5789,7 +5756,7 @@ int StarRtdImage::gbandCmd( int argc, char *argv[] )
         sprintf(buf, "%s bbox mband_height_text\n", canvas);
         Tcl_Eval(interp_, buf);
 
-        if (sscanf(interp_->result, "%lf %lf %lf %lf", &rx0, &ry0, &rx1, &ry1) != 4)
+        if (sscanf(Tcl_GetStringResult( interp_ ), "%lf %lf %lf %lf", &rx0, &ry0, &rx1, &ry1) != 4)
             return TCL_OK;
         sprintf(buf, "%s coords mband_height_rect %g %g %g %g\n",
                 canvas,  rx0, ry0, rx1, ry1);

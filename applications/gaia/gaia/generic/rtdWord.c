@@ -302,8 +302,10 @@ static int WordCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
         ComputeWordBbox( canvas, wordPtr );
     }
     else {
-        sprintf( interp->result,
+        char buffer[80];
+        sprintf( buffer,
                  "wrong # coordinates:  expected 0 or 2, got %d", objc );
+        Tcl_SetResult( interp, buffer, TCL_VOLATILE );
         return TCL_ERROR;
     }
     return TCL_OK;

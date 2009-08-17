@@ -313,7 +313,7 @@ int GaiaLocalCatalog::convertTo()
         sprintf( buf, "%s to %s %s", convertTable_, realname_, filename_ );
         if ( Tcl_Eval( interp_, buf ) != TCL_OK ) {
             cerr << buf << endl;
-            cerr << "command failed:" << interp_->result << endl;
+            cerr << "command failed:" << Tcl_GetStringResult(interp_) << endl;
             return 0;
         }
     }
@@ -340,7 +340,7 @@ int GaiaLocalCatalog::convertFrom()
         char buf[1024];
         sprintf( buf, "%s from %s %s", convertTable_, filename_, realname_ );
         if ( Tcl_Eval( interp_, buf ) != TCL_OK ) {
-            cerr << "command failed:" << interp_->result << endl;
+            cerr << "command failed:" << Tcl_GetStringResult(interp_) << endl;
             return 0;
         }
     }
@@ -366,7 +366,7 @@ int GaiaLocalCatalog::startConvert()
             convertTable_[0] = '\0';
         }
         else {
-            if ( strcmp( interp_->result, "0" ) == 0 ) {
+            if ( strcmp( Tcl_GetStringResult( interp_ ), "0" ) == 0 ) {
                 convertTable_[0] = '\0';
             }
         }
@@ -376,11 +376,12 @@ int GaiaLocalCatalog::startConvert()
             return 0;
         }
         else {
-            if ( Tcl_VarEval( interp_, "code ", interp_->result,
+            if ( Tcl_VarEval( interp_, "code ", Tcl_GetStringResult( interp_ ),
                               (char *) NULL ) != TCL_OK ) {
                 return 0;
             }
-            (void) strncpy( convertTable_, interp_->result, NAMELEN - 1 );
+            (void) strncpy( convertTable_, Tcl_GetStringResult( interp_ ),
+                            NAMELEN - 1 );
         }
     }
     return 1;
