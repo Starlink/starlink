@@ -71,6 +71,8 @@
  *        Added updateImageCmd and volatility marking.
  *     02-OCT-2008 (PWD):
  *        Added autosetcutlevelsCmd.
+ *     17-AUG-2009 (PWD):
+ *        Added astgetcloneCmd.
  *-
  */
 
