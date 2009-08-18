@@ -172,6 +172,8 @@ F77_SUBROUTINE(ndf1_farg)( INTEGER(IARG), CHARACTER(ARG) TRAIL(ARG) );
       int i;			 /* Loop counter for characters		    */
       int iarg;                  /* Argument index */
       int len;			 /* Length of result string		    */
+      int ndf1_argc = -1;       /* Number of command-line arguments from ndfInit */
+      char *const *ndf1_argv = NULL; /* Command-line arguments from ndfInit */
 
 /*.									    */
 
@@ -184,6 +186,7 @@ F77_SUBROUTINE(ndf1_farg)( INTEGER(IARG), CHARACTER(ARG) TRAIL(ARG) );
 /* See if ndfInit has been used to initialise an argument list. If so,
    we use this in preference to any other source of argument
    information. */
+      ndf1_argv = ndf1_getargvc( &ndf1_argc, STATUS );
       if ( ndf1_argc > -1 ) {
 
 /* Obtain a pointer to the required argument string. */

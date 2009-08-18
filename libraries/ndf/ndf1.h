@@ -71,8 +71,8 @@
 /* Command line argument information for use when the main routine of
    the currently executing program is written in C. These values must
    be set under these circumstances by the user invoking ndfInit. */
-extern int ndf1_argc;
-extern const char *const *ndf1_argv;
+void ndf1_setargvc( int argc, char *const argv[], int * status);
+char * const* ndf1_getargvc( int *argc, int * status);
 
 /* Function prototypes. */
 /* ==================== */

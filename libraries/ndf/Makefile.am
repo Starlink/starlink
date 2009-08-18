@@ -129,7 +129,7 @@ ndf_exist.f ndf_prop.f ndf1_getap_a.f ndf1_hwenv_a.f
 BASIC_C_ROUTINES = \
 ndf1_docmd.c ndf1_expfn.c ndf1_filac.c ndf1_gtarg.c ndf1_gtfil.c \
 ndf1_gtime.c ndf1_tilde.c ndf1.c ndf.c ndfinit.c ndf_hndlr.c \
-ndf1_time.c ndf1_mjd2t.c
+ndf1_time.c ndf1_mjd2t.c ndf1_argvc.c
 
 #  Additional C routines required for the standalone library.
 

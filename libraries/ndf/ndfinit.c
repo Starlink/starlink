@@ -12,13 +12,6 @@
 /* Internal header files. */
 #include "ndf1.h"                /* NDF private interface */
 
-/* Global variables. */
-/* ================= */
-/* Define global variables to hold command line argument information. */
-int ndf1_argc = -1;
-const char *const *ndf1_argv = NULL;
-
-
 /* Function definitions. */
 /* ===================== */
 void ndfInit( int argc, char *const argv[], int *status ) {
@@ -85,6 +78,8 @@ void ndfInit( int argc, char *const argv[], int *status ) {
 *         Import and autoconf.
 *     26-JAN-2005 (PWD):
 *         Portability fixes.
+*     17-AUG-2009 (TIMJ):
+*         Use ndf1_setargvc instead of a global.
 
 *  Notes:
 *     - The actual arguments supplied for "argv" and "argc" should
@@ -148,8 +143,7 @@ void ndfInit( int argc, char *const argv[], int *status ) {
 /* If OK, store the argument count and argument vector pointer in
    global variables for use by ndf1_gtarg. */
    if ( *status == SAI__OK ) {
-      ndf1_argc = argc;
-      ndf1_argv = (const char **const) argv;
+      ndf1_setargvc( argc, argv, status );
 
 /* Otherwise, report context information and call the error tracing
    function. */
