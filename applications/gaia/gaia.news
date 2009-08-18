@@ -11,6 +11,13 @@
     text. The font handling for the astrometry grid overlay has also been
     changed to use anti-aliased fonts and unicode.
 
+    Note if you have saved your startup options you will see a message:
+    
+      "Warning: rejected incompatible session persistent option: -wcsfont"
+
+    when GAIA starts up. To get rid of this just re-apply the options in
+    the startup options window (File menu).
+
     During this update the ability to get the grid overlay fonts to scale
     with the zoom factor has been removed. Hopefully now that rotated text
     is clearer this will not be needed.
