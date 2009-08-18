@@ -1,2 +1,5 @@
-echo -lndg `grp_link` `chr_link` `ndf_link` `atl_link` `one_link` \
+
+#  All command-line switches are assumed to be for NDF.
+ndf_options=${1+"$@"}
+echo -lndg `grp_link` `chr_link` `ndf_link $ndf_options` `atl_link` `one_link` \
 | awk '{for(f=NF;f;f--)if(!w[$f]++)l=$f" "l;print l}'
