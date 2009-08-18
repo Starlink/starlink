@@ -1,4 +1,60 @@
 
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     ndg_link
+
+#  Purpose:
+#     Generate linker (ld) arguments for linking against the standalone
+#     NDG library.
+
+#  Type of Module:
+#     Shell script.
+
+#  Description:
+#     This script should be invoked by those building standalone
+#     applications which use the NDG library in order to generate the
+#     correct arguments for the compiler (or ld) command. The arguments
+#     generated are written to the standard output.
+
+#  Invocation:
+#     The script is normally invoked as part of a compiler command line,
+#     such as:
+#
+#        f77 -o program -L/star/lib `ndg_link [ndf_switches]` program.f
+#
+#     The possible values for [ndf_switches] are the same as those available
+#     to the ndf_link command.
+
+#  Copyright:
+#     Copyright (C) 2008-2009 Science and Technology Facilities Council.
+#     Copyright (C) 2004 Particle Physics and Astronomy Research Council.
+#     Copyright (C) 1999 Rutherford Appleton Laboratory
+#     All Rights Reserved.
+
+#  Authors:
+#     DSB: David Berry (Starlink)
+#     TIMJ: Tim Jenness (JAC, Hawaii)
+#     {enter_new_authors_here}
+
+#  History:
+#     14-SEP-1999 (DSB):
+#        Original version.
+#     3-SEP-2004 (TIMJ):
+#        Add one_link
+#     30-JUN-2008 (DSB):
+#        Provenance requires ATL
+#     18-AUG-2009 (TIMJ):
+#        Added ndf_switches handling to pass on any AST linker options.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#.
+
 #  All command-line switches are assumed to be for NDF.
 ndf_options=${1+"$@"}
 echo -lndg `grp_link` `chr_link` `ndf_link $ndf_options` `atl_link` `one_link` \
