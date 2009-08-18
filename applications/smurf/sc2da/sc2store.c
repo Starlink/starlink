@@ -92,7 +92,13 @@ static double sc2store_wrbscale = 1.0;       /* write data compression divisor *
 static int sc2store_zindf = NDF__NOID;       /* NDF identifier for compression zero 
                                                 offsets */
 
-
+/* Control history writing. Do not want this to happen when SMURF
+   is used so we key on a definition that SMURF will have but the
+   DA will not. Choose an application name. */
+#define APPNAME "SCUBA-2 DA"
+#ifndef PACKAGE_UPCASE
+#  define SC2STORE_WRITE_HISTORY
+#endif
 
 /*+ sc2store_compress - compress frame of integers to unsigned short */
 
@@ -237,6 +243,7 @@ int *status              /* global status (given and returned) */
     23Oct2007 : rename structure for per-frame data to SCUBA2 (bdk)
     09Nov2007 : store global BSCALE (bdk)
     12Nov2007 : make main data array short rather than unsigned short (bdk)
+    17Aug2009 : Write explicit history message (timj)
 */
 
 {
@@ -245,6 +252,9 @@ int *status              /* global status (given and returned) */
    int place;                  /* NDF placeholder */
    int tdims[1];               /* temporary dimension store */
    int ubnd[3];                /* upper dimension bounds */
+#ifdef SC2STORE_WRITE_HISTORY
+   const char * const history[1] = { "Create raw data file." };
+#endif
 
    if ( *status != SAI__OK ) return;
 
@@ -270,6 +280,10 @@ int *status              /* global status (given and returned) */
 
    ndfNew ( "_WORD", 3, lbnd, ubnd, &place, &sc2store_indf, status );
    ndfHcre ( sc2store_indf, status );
+#ifdef SC2STORE_WRITE_HISTORY
+   ndfHput( "NORMAL", APPNAME, 1, 1, (char *const*) history,
+            0, 0, 0, sc2store_indf, status );
+#endif
 
 /* Map the data array */
 
@@ -1664,6 +1678,7 @@ int *status              /* global status (given and returned) */
     31Oct2007 : change name nfits to nrec (bdk)
     06Dec2007 : restore call to ndfHcre for main NDF (bdk)
     28Mar2008 : call sc2store_creimages to create the containing structure (bdk)
+    17Aug2009 : Write explicit history message (timj)
 */
 {
 
@@ -1680,6 +1695,9 @@ int *status              /* global status (given and returned) */
    int strnum;             /* structure element number */
    int uindf;              /* NDF identifier */
    int ubnd[7];            /* upper dimension bounds */
+#ifdef SC2STORE_WRITE_HISTORY
+   const char * const history[1] = { "Write reconstructed image." };
+#endif
 
    if ( *status != SAI__OK ) return;
 
@@ -1705,6 +1723,10 @@ int *status              /* global status (given and returned) */
       ndfPlace ( sc2store_scu2redloc, imname, &place, status );
       ndfNew ( "_DOUBLE", ndim, lbnd, ubnd, &place, &uindf, status );
       ndfHcre ( uindf, status );
+#ifdef SC2STORE_WRITE_HISTORY
+      ndfHput( "NORMAL", APPNAME, 1, 1, (char * const*)history,
+               0, 0, 0, uindf, status );
+#endif
 
 /* Map the data array */
 
@@ -3327,6 +3349,7 @@ int *status              /* global status (given and returned) */
     23Oct2007 : rename structure for per-frame data to SCUBA2 (bdk)
     09Nov2007 : store global BSCALE (bdk)
     12Nov2007 : make main data array short rather than unsigned short (bdk)
+    17Aug2009 : Write explicit history message (timj)
 */
 
 {
@@ -3347,6 +3370,9 @@ int *status              /* global status (given and returned) */
    int *stackz;                /* pointer to subtracted frame */
    int tdims[1];               /* temporary dimension store */
    int ubnd[3];                /* upper dimension bounds */
+#ifdef SC2STORE_WRITE_HISTORY
+   const char * const history[1] = { "Write raw data." };
+#endif
 
 
 
@@ -3479,6 +3505,12 @@ int *status              /* global status (given and returned) */
         &el, status );
       memcpy ( idata, dbuf, el*sizeof(int) );
    }
+
+/* Write history entry */
+#ifdef SC2STORE_WRITE_HISTORY
+   ndfHput( "NORMAL", APPNAME, 1, 1, (char *const*) history,
+            0, 0, 0, sc2store_indf, status );
+#endif
 
 /* Dark SQUID values for each frame */
 
@@ -3906,10 +3938,14 @@ static double sc2store_tzoffset( void ) {
 
 static void sc2store_initialise ( int * status ) {
 
+  static const char *const argv[] = {
+    APPNAME
+  };
+
    if ( sc2store_initialised == 0 )
    {
       errBegin ( status );
-      ndfInit ( 0, NULL, status );
+      ndfInit ( 1, (char * const *)argv, status );
       sc2store_initialised = 1;
    }
 
