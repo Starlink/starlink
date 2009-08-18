@@ -67,10 +67,12 @@
 *        Remove unnecessary HDS locator variable 
 *     2008-07-18 (TIMJ):
 *        Use smf_find_subarray
+*     2009-08-18 (TIMJ):
+*        Add provenance to constructed images.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 *     Copyright (C) 2006-2007 University of British Columbia. All Rights
 *     Reserved.
 
@@ -107,6 +109,7 @@
 #include "ast.h"
 #include "mers.h"
 #include "prm_par.h"
+#include "par_par.h"
 #include "dat_par.h"
 #include "star/hds.h"
 #include "star/kaplibs.h"
@@ -146,6 +149,7 @@ void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim,
   int nboly;                       /* Number of bolometers in the Y direction */
   int ntot;                        /* Total number of elements */
   int place;                       /* NDF placeholder */
+  char prvname[2*PAR__SZNAM +1];   /* Provenance creator */
   int seqend;                      /* End index */
   int seqstart;                    /* Starting index */
   int slice;                       /* Index of current time slice */
@@ -207,6 +211,10 @@ void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim,
   /* This should probably be a user-option but ICRS is probably a safe
      assumption */
   sc2ast_set_output_system( hdr->state->tcs_tr_sys, wcs, status );
+
+  /* Sort out provenance. */
+  smf_get_taskname( NULL, prvname, status );
+  smf_updateprov( uindf, data, NDF__NOID, prvname, status );
 
   /* Store world coordinate transformations */
   ndfPtwcs ( wcs, uindf, status );

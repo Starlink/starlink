@@ -230,6 +230,8 @@
 *          routine deals with moving sources too
 *     2009-07-08 (TIMJ):
 *        Use astSetFitsCM instead of astSetFitsCN
+*     2009-08-18 (TIMJ):
+*        Use new API for sc2store_putimage that supports provenance
 
 *  Copyright:
 *     Copyright (C) 2007-2009 Science and Technology Facilities Council.
@@ -268,6 +270,7 @@
 #include "mers.h"
 #include "sae_par.h"
 #include "prm_par.h"
+#include "par_par.h"
 #include "star/one.h"
 
 /* SC2SIM includes */
@@ -355,6 +358,7 @@ int *status              /* Global status (given and returned) */
    double obsgeo[3];               /* Cartesian geodetic observatory coords. */
    char obsidss[84];               /* OBSID + wavelength */
    double *poly;                   /* Pointer to polynomial fit solution */
+   char prvname[2*PAR__SZNAM+1];   /* Name to use for provenance */
    double *rdata;                  /* Pointer to flatfielded data */
    char recipe[30];                /* Name of default ORAC-DR recipe */
    SC2STORETelpar telpar;          /* Struct for telescope info */
@@ -849,8 +853,9 @@ int *status              /* Global status (given and returned) */
        smf_fits_export2DA ( fitschan, &nrec, fitsrec, status );
 
        /* Store image */
-       sc2store_putimage ( k, wcs, ndim, dims, seqstart, seqend, inx->nbolx, 
-			   inx->nboly, coadd, zero, fitsrec, nrec, status );
+       smf_get_taskname( NULL, prvname, status );
+       sc2store_putimage ( k, wcs, ndim, dims, inx->nbolx,
+                           inx->nboly, coadd, zero, obsidss, prvname, fitsrec, nrec, status );
      }
    }
 

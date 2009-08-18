@@ -38,6 +38,7 @@
 #include "star/kaplibs.h"
 #include "ast.h"
 #include "ndf.h"
+#include "star/ndg.h"
 #include "mers.h"
 #include "f77.h"
 #include "Dits_Err.h"
@@ -1644,12 +1645,12 @@ int frame,               /* frame index (given) */
 const AstFrameSet *fset, /* World coordinate transformations (given) */
 int ndim,                /* dimensionality of image (given) */
 const int dims[],        /* dimensions of image (given) */
-int seqstart,            /* first sequence number used in image (given) */
-int seqend,              /* last sequence number used in image (given) */
 size_t nbolx,            /* number of bolometers in X (given) */
 size_t nboly,            /* number of bolometers in Y (given) */
 const double *image,     /* constructed image (given) */
 const double *zero,      /* bolometer zero values (given) */
+const char * obsidss,    /* OBSIDSS string for provenance (given) */
+const char * creator,    /* Creator application for provenance (given) */
 const char *fitshd,      /* string of concatenated FITS header records to
                             write (given) */
 size_t nrec,             /* Number of FITS records */
@@ -1692,6 +1693,8 @@ int *status              /* global status (given and returned) */
    int lbnd[7];            /* lower dimension bounds */
    int ntot;               /* total number of elements */
    int place;              /* NDF placeholder */
+   AstKeyMap *pkm = NULL;  /* KeyMap holding provenance contents of MORE */
+   NdgProvenance *prov = NULL;  /* Pointer to provenance structure */
    int strnum;             /* structure element number */
    int uindf;              /* NDF identifier */
    int ubnd[7];            /* upper dimension bounds */
@@ -1707,6 +1710,10 @@ int *status              /* global status (given and returned) */
 
    if ( *status == SAI__OK )
    {
+
+/* Pre-fill the provenance keymap */
+     pkm = astKeyMap( " " );
+     if (obsidss) astMapPut0C( pkm, "OBSIDSS", obsidss, NULL );
 
 /* Get structure for nth constructed image */
 
@@ -1742,6 +1749,12 @@ int *status              /* global status (given and returned) */
             imptr[j] = image[j];
          }
       }
+
+/* Sort out provenance. This is by definition a root of the provenance tree */
+      prov = ndgReadProv( uindf, creator, status );
+      ndgPutProv( prov, sc2store_indf, NULL, pkm, 1, status );
+      ndgWriteProv( prov, uindf, 0, status );
+      prov = ndgFreeProv( prov, status );
 
 /* Store world coordinate transformations */
 
@@ -1798,6 +1811,7 @@ int *status              /* global status (given and returned) */
       datAnnul ( &bz_imloc, status );
    }
 
+   if (pkm) pkm = astAnnul( pkm );
    sc2store_errconv ( status );
 
 }

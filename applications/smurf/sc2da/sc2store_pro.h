@@ -216,12 +216,12 @@ int frame,               /* frame index (given) */
 const AstFrameSet *fset, /* World coordinate transformations (given) */
 int ndim,                /* dimensionality of image (given) */
 const int dims[],        /* dimensions of image (given) */
-int seqstart,            /* first sequence number used in image (given) */
-int seqend,              /* last sequence number used in image (given) */
 size_t nbolx,            /* number of bolometers in X (given) */
 size_t nboly,            /* number of bolometers in Y (given) */
 const double *image,     /* constructed image (given) */
 const double *zero,      /* bolometer zero values (given) */
+const char * obsidss,    /* OBSIDSS string for provenance (given) */
+const char * creator,    /* Creator application for provenance (given) */
 const char *fitshd,      /* string of concatenated FITS header records to
                             write (given) */
 size_t nrec,             /* Number of FITS records */
