@@ -95,6 +95,9 @@ void ndfInit( int argc, char *const argv[], int *status ) {
 *     the memory associated with "argv" should not be freed until NDF
 *     has been shut down. NDF does not copy the arguments. If you do free
 *     the arguments, expect a core dump when history writing is enabled.
+*     - Do not pass in a stack variable that can be reused when the
+*     calling routine ends unless the calling routine finishes with
+*     NDF before it returns.
 *     - If these arguments are not available, then an "argc" value of
 *     zero should be given (whereupon the "argv" value will be
 *     ignored).
