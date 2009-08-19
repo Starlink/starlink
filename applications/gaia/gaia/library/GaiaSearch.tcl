@@ -874,6 +874,71 @@ itcl::class gaia::GaiaSearch {
       return 0
    }
 
+   #  Called when the "Filter" button is pressed. The usual behaviour for
+   #  that function is to remove any undrawn objects from the list (the
+   #  wording implies that generally includes off-image objects, but that
+   #  isn't true, or has become untrue at some point), so if all objects
+   #  are retained (i.e. drawn) we try to honour that here. To do that we
+   #  need image positions for all rows, not the world coordinates, so we
+   #  get the image extent in canvas coordinates and check each objects
+   #  canvas coordinates against that.
+   public method filter_query_results {} {
+      $w_.progress config -text "Filtering out off-image objects..."
+      set new_info {}
+      set n 0
+      busy {
+         foreach row $info_ {
+            set id [lindex $row [$w_.cat id_col]]
+            if {[llength [$canvas_ find withtag cat$id]]} {
+               lappend new_info $row
+               incr n
+            }
+         }
+         set t [$results_ total_rows]
+         if {$n != $t} {
+            $results_ config \
+               -info [set info_ $new_info] \
+               -title "Search Results ($n*)"
+            plot
+            $w_.progress config -text "Removed [expr $t-$n] objects from the list."
+         } else {
+
+            #  No undrawn objects, so remove any off image ones.
+            #  Get position of image in canvas coordinates.
+            $image_ convert coords 1 1 image cx0 cy0 canvas
+            $image_ convert coords [$image_ width] [$image_ height] image \
+               cx1 cy1 canvas
+
+            set x0 [expr int(min($cx0,$cx1))]
+            set y0 [expr int(min($cy0,$cy1))]
+            set x1 [expr int(max($cx0,$cx1))]
+            set y1 [expr int(max($cy0,$cy1))]
+
+            #  And check this against the drawn graphics coordinates.
+            set new_info {}
+            set n 0
+            foreach row $info_ {
+               set id [lindex $row [$w_.cat id_col]]
+               lassign [$canvas_ coords cat$id] cx cy
+               if { $cx > $x0 && $cx < $x1 && $cy > $y0 && $cy < $y1 } {
+                  lappend new_info $row
+                  incr n
+               }
+            }
+            if {$n != $t} {
+               $results_ config \
+                  -info [set info_ $new_info] \
+                  -title "Search Results ($n*)"
+               plot
+               $w_.progress config -text \
+                  "Removed [expr $t-$n] objects from the list."
+            } else {
+               $w_.progress config -text "No change."
+            }
+         }
+      }
+   }
+
    #  Configuration options (public variables):
    #  =========================================
 
