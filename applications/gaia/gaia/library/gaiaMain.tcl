@@ -156,6 +156,7 @@ foreach fullname [$props get_named_keys Gaia] {
       set argv [linsert $argv 0 "-$option" "$value"]
    } else {
       puts stderr "Warning: rejected incompatible session persistent option: -$option $value"
+      $props unset_property $fullname
    }
 }
 
