@@ -52,8 +52,8 @@ struct smfJob {
    int flags;                  /* Job control flags */
    void *data;                 /* Structure holding data for the worker */
    void (*func)(void *, int *);/* The function to be run by the worker */
-   int (*checker)( smfJob *, smfWorkForce *, int *);/* Function that checks 
-                                                       if the job can run */
+   int (*checker)( int, smfWorkForce *, int *);/* Function that checks if 
+                                  the job can run */
    int nwaiting;               /* Length of "waiting" array */
    smfJob **waiting;           /* Array of jobs waiting on this one */
    smfJob *next;               /* Next job in list */   
@@ -93,9 +93,9 @@ smfWorkForce *smf_destroy_workforce( smfWorkForce *workforce );
 void smf_wait( smfWorkForce *workforce, int *status );
 int smf_add_job( smfWorkForce *workforce, int flags, void *data, 
                   void (*func)( void *, int * ), 
-                  int (*checker)( smfJob *, smfWorkForce *, int * ), 
+                  int (*checker)( int, smfWorkForce *, int * ), 
                   int *status );
-void smf_wait_on_job( smfJob *job1, smfJob *job2, int *status );
+void smf_wait_on_job( smfWorkForce *workforce, int ijob1, int ijob2, int *status );
 int smf_job_wait( smfWorkForce *workforce, int *status );
 
 #endif

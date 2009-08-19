@@ -39,7 +39,7 @@
 *       been completed.
 
 *  Copyright:
-*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2008-2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -74,6 +74,9 @@
 *        thread that did not hold the job-desk mutex.
 *        - Correct releasing of the job-desk mutex in smf_run_worker when 
 *        the worker thread is killed.
+*     19-AUG-2009 (DSB):
+*        Changed interface to smf_wait_on_job, and checker function
+*        passed to smf_add_job.
 */
 
 
@@ -88,6 +91,7 @@
 #include "ast.h"
 #include "sae_par.h"
 #include "ems.h"
+#include "mers.h"
 
 /* Definition of the public interface of this module */
 #include "smf_threads.h"
@@ -113,6 +117,7 @@ static void *smf_run_worker( void *worker_ptr );
 static void smf_remove_from_list( smfJob *job, smfJob **head, int *status );
 static void smf_push_list_head( smfJob *job, smfJob **head, int *status );
 static void smf_push_list_foot( smfJob *job, smfJob **head, int *status );
+static smfJob *smf_find_job( smfJob *head, int ijob, int *status );
 static smfJob *smf_pop_list_head( smfJob **head, int *status );
 static void smf_thread_log_( const char *text, const char *colour, int ijob );
 
@@ -122,7 +127,7 @@ static void smf_thread_log_( const char *text, const char *colour, int ijob );
 
 int smf_add_job( smfWorkForce *workforce, int flags, void *data, 
                   void (*func)( void *, int * ), 
-                  int (*checker)( smfJob *, smfWorkForce *, int * ), 
+                  int (*checker)( int, smfWorkForce *, int * ), 
                   int *status ){
 /*
 *  Name:
@@ -141,7 +146,7 @@ int smf_add_job( smfWorkForce *workforce, int flags, void *data,
 *     #include "smf_threads.h"
 *     int smf_add_job( smfWorkForce *workforce, int flags, void *data, 
 *                       void (*func)( void *, int * ), 
-*                       int (*checker)( smfJob *, smfWorkForce *, int * ), 
+*                       int (*checker)( int, smfWorkForce *, int * ), 
 *                       int *status ){
 
 *  Arguments:
@@ -166,10 +171,10 @@ int smf_add_job( smfWorkForce *workforce, int flags, void *data,
 *        zero is returned, the checker MUST use the smf_wait_on_job function 
 *        to indicate which jobs have to be completed before this job can run. 
 *        The job will then be postponed until those jobs have completed. The
-*        arguments supplied to the checker are 1) a pointer to the job
-*        being checked, 2) a pointer to the workforce, and 3) an inherited 
-*        status pointer. The function should return a non-zero value if an 
-*        error occurs. If a NULL pointer is supplied for "checker", the 
+*        arguments supplied to the checker are 1) the integer identifier for 
+*        the job being checked, 2) a pointer to the workforce, and 3) an 
+*        inherited status pointer. The function should return a non-zero value 
+*        if an error occurs. If a NULL pointer is supplied for "checker", the 
 *        job will start as soon as a worker is available to carry it out.
 *     status
 *        Pointer to the inherited status value.
@@ -683,8 +688,8 @@ void smf_wait( smfWorkForce *workforce, int *status ) {
    emsEnd( status );
 }
 
-
-void smf_wait_on_job( smfJob *job1, smfJob *job2, int *status ){
+void smf_wait_on_job( smfWorkForce *workforce, int ijob1, int ijob2, 
+                      int *status ){
 /*
 *  Name:
 *     smf_wait_on_job
@@ -700,13 +705,16 @@ void smf_wait_on_job( smfJob *job1, smfJob *job2, int *status ){
 
 *  Invocation:
 *     #include "smf_threads.h"
-*     void smf_wait_on_job( smfJob *job1, smfJob *job2, int *status );
+*     void smf_wait_on_job( smfWorkforce *workforce, int ijob1, int ijob2, 
+*                           int *status );
 
 *  Arguments:
-*     job1
-*        Pointer to the first job description.
-*     job2
-*        Pointer to the second job description.
+*     workforce
+*        Pointer to the workforce performing the jobs.
+*     ijob1
+*        Identifier for the first job.
+*     ijob2
+*        Identifier for the second job.
 *     status
 *        Pointer to the inherited status value.
 
@@ -720,9 +728,39 @@ void smf_wait_on_job( smfJob *job1, smfJob *job2, int *status ){
 
 */
 
+
+/* Local Variables: */
+   smfJob *job1;
+   smfJob *job2;
+
 /* Check inherited status */
    if( *status != SAI__OK ) return;
 
+/* Get a pointer to the structure describing the first job. Search each
+   list of jobs in turn. Report an error if the job is not found. */
+   job1 = smf_find_job( workforce->available_jobs, ijob1, status );
+   if( !job1 ) job1 = smf_find_job( workforce->finished_jobs, ijob1, status );
+   if( !job1 ) job1 = smf_find_job( workforce->waiting_jobs, ijob1, status );
+   if( !job1 ) job1 = smf_find_job( workforce->active_jobs, ijob1, status );
+   if( !job1 && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      msgSeti( "I", ijob1 );
+      emsRep( "", "smf_wait_on_job: No job with given 'job1' identifier "
+              "(^I) found.", status );
+   }
+      
+/* Likewise, get a pointer to the structure describing the second job. */
+   job2 = smf_find_job( workforce->available_jobs, ijob2, status );
+   if( !job2 ) job2 = smf_find_job( workforce->finished_jobs, ijob2, status );
+   if( !job2 ) job2 = smf_find_job( workforce->waiting_jobs, ijob2, status );
+   if( !job2 ) job2 = smf_find_job( workforce->active_jobs, ijob2, status );
+   if( !job2 && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      msgSeti( "I", ijob2 );
+      emsRep( "", "smf_wait_on_job: No job with given 'job2' identifier "
+              "(^I) found.", status );
+   }
+      
 /* Add job1 to the list of jobs to be moved onto the available jobs list
    when job2 completes. */
    job2->waiting = astGrow( job2->waiting, job2->nwaiting + 1, 
@@ -735,6 +773,70 @@ void smf_wait_on_job( smfJob *job1, smfJob *job2, int *status ){
 
 /* Private workforce-related functions */
 /* ----------------------------------- */
+
+static smfJob *smf_find_job( smfJob *head, int ijob, int *status ){
+/*
+*  Name:
+*     smf_find_job
+
+*  Purpose:
+*     Find the job that has a given ideentifier and return a pointer to it.
+
+*  Language:
+*     Starlink ANSI C
+
+*  Type of Module:
+*     C function
+
+*  Invocation:
+*     #include "smf_threads.h"
+*     smfJob *smf_find_job( smfJob *head, int ijob, int *status )
+
+*  Arguments:
+*     head
+*        Pointer to the job at the head of the list to be searched.
+*     ijob
+*        The integer identifier for the job.
+*     status
+*        Pointer to the inherited status value.
+
+*  Returned Value:
+*     Pointer to the smfJob that has the given identifier, or NULL if no
+*     job is found.
+
+*  Description:
+*     This function searches the given lists of jobs for a job that has a 
+*     given identifier. If found, a pointer to the job structure is returned. 
+*     Otherwise a NULL pointer is returned (without error).
+
+*/
+
+/* Local Variables; */
+   smfJob *result = NULL;
+
+/* Check inherited status and check list is not empty.*/
+   if( *status != SAI__OK || !head ) return result;
+
+/* Check the supplied head job first. */
+   result = head;
+
+/* Loop until we find a job with the given identifier. */
+   while( result->ijob != ijob ) {
+
+/* Move on to the next job in the list. */
+      result = result->next;
+
+/* If we are back at the head, set the returned pointer to NULL and 
+   leave the loop. */
+      if( result == head ) {
+         result = NULL;
+         break;
+      }
+   }
+
+/* Return the pointer to the job structure. */
+   return result;
+}
 
 static smfJob *smf_pop_list_head( smfJob **head, int *status ){
 /*
@@ -1113,7 +1215,7 @@ static void *smf_run_worker( void *wf_ptr ) {
    checker decided that the job cannot be run until one of the currently
    active jobs completes, the checker should add the job to the list of
    jobs waiting for the completion of the active job. */
-         run = job->checker ? (*job->checker)( job, wf, &status ) : 1;
+         run = job->checker ? (*job->checker)( job->ijob, wf, &status ) : 1;
 
 /* If not, add it to the list of waiting jobs, and loop to get a new job
    off the list of available jobs. */
