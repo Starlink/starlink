@@ -85,8 +85,8 @@ kpg1_nthm.gn kpg1_numb.gn kpg1_past.gn kpg1_pois.gn \
 kpg1_pxdp.gn kpg1_retr.gn kpg1_rmap.gn kpg1_stat.gn \
 kpg1_stor.gn kpg1_tdli.gn kpg1_thrs.gn kpg1_trli.gn \
 kpg1_trsp.gn kpg1_vasv.gn kpg1_wmod.gn kpg1_mvbd.gn \
-kpg1_sclb.gn kpg1_scli.gn kpg1_scluw.gn \
-kpg1_sclub.gn kpg1_sclw.gn kpg1_ptnd.gn kpg1_bbox.gn
+kpg1_sclb.gn kpg1_scli.gn kpg1_scluw.gn kpg1_sclub.gn \
+kpg1_sclw.gn kpg_stos.gn kpg1_ptnd.gn kpg1_bbox.gn
 
 
 # All except logical (include char)

@@ -9,6 +9,9 @@ applications (see SUN/238).
 Version 3.0
    - KPG1_MVBDx added. It modifies an array index (such as produced by
      PDA_QSIAx) to exclude indices that refer to bad data values.
+   - KPG_STOSx added.  It calculates accurate order statistics by
+     sorting an array by means of an index, returning the median and 
+     optionally percentiles.
 
 Version 2.8
    - KPG1_ELGAU added from KAPPA routine KPS1_ELGAU. It finds ellipse
