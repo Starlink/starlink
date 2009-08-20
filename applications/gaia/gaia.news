@@ -29,6 +29,10 @@
     are not plotted, in which case it removes them (this was the old
     behaviour).
 
+    It is now possible to select a colour and font for labelling objects
+    displayed by a Skycat catalogue window. Previously this could only
+    be done using the graphics toolbox facilities.
+
     Version 4.3-1
     =============
 

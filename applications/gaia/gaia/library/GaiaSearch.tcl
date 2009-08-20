@@ -118,8 +118,8 @@ itcl::class gaia::GaiaSearch {
 
       #  Use our Open dialog so we can browse for HDUs.
       if { $iscat_ } {
-         $m entryconfigure "Open" -command [code GaiaSearch::get_local_catalog \
-                                               $itk_option(-id) $w_]
+         $m entryconfigure "Open" -command \
+            [code GaiaSearch::get_local_catalog $itk_option(-id) $w_]
       }
 
       #  Remove <Enter> binding as this slows down the zoom window a lot.
@@ -149,6 +149,31 @@ itcl::class gaia::GaiaSearch {
          add_menuitem $m command "Label all objects" \
             {Label all objects displayed on image (same as double clicking on all rows)} \
             -command [code $this label_all_objects]
+
+         #  Select a font for labelling objects.
+         add_menuitem $m cascade "Label Font" \
+            {Select a font for labelling objects} \
+            -menu [menu $m.font]
+         foreach i $itk_option(-fonts) {
+            $m.font add radiobutton \
+               -value $i \
+               -label {abc} \
+               -command [code $this configure -canvasfont $i] \
+               -variable [scope itk_option(-canvasfont)] \
+               -font $i
+         }
+
+         #  Select colour for labelling objects.
+         add_menuitem $m cascade "Label Colour" \
+            {Select a colour for labelling objects} \
+            -menu [menu $m.labelcolour]
+         foreach i $itk_option(-colors) {
+            $m.labelcolour add radiobutton \
+               -value $i \
+               -command [code $this configure -labelcolour $i] \
+               -variable [scope itk_option(-labelcolour)] \
+               -background $i
+         }
 
          #  Add interpret X and Y coordinates as pixel coordinate option.
          $m add checkbutton  -label {Use NDF origins} \
@@ -539,6 +564,24 @@ itcl::class gaia::GaiaSearch {
       }
    }
 
+   #  Insert the id for the given object in the image near the object
+   #  and return a string containing status info. Name identifies the
+   #  source catalog (short_name). Override to use configured colour.
+   public method label_object_in_image {id name} {
+      if { $canvas_ == {} } {
+         return
+      }
+
+      if { [llength [set box [$canvas_ bbox cat$id]]] } {
+         lassign $box x0 y0 x1 y1
+         make_label $name $id [expr ($x1+$x0)/2.0] [expr ($y1+$y0)/2.0] \
+            canvas $id $itk_option(-labelcolour)
+         return "labeled object '$id' in image"
+      } else {
+         return "object '$id' is not visible"
+      }
+   }
+
    #  This member procedure is used to open a window for the named
    #  local catalogue, or reuse the existing one for the catalog, if it
    #  is already open. It assumes that the local catalogue exists.
@@ -900,7 +943,8 @@ itcl::class gaia::GaiaSearch {
                -info [set info_ $new_info] \
                -title "Search Results ($n*)"
             plot
-            $w_.progress config -text "Removed [expr $t-$n] objects from the list."
+            $w_.progress config -text \
+               "Removed [expr $t-$n] objects from the list."
          } else {
 
             #  No undrawn objects, so remove any off image ones.
@@ -954,6 +998,33 @@ itcl::class gaia::GaiaSearch {
 
    #  A command that will be called just after the catalogue is opened.
    itk_option define -open_cmd open_cmd Open_Cmd {}
+
+   #  Possible fonts for drawing labels.
+   itk_option define -fonts fonts Fonts {
+      -adobe-courier-medium-r-*-*-*-120-*-*-*-*-*-*
+      -adobe-courier-medium-o-*-*-*-120-*-*-*-*-*-*
+      -adobe-courier-bold-r-*-*-*-120-*-*-*-*-*-*
+      -adobe-courier-medium-r-*-*-*-140-*-*-*-*-*-*
+      -adobe-courier-medium-o-*-*-*-140-*-*-*-*-*-*
+      -adobe-courier-bold-r-*-*-*-140-*-*-*-*-*-*
+      -adobe-courier-medium-r-*-*-*-180-*-*-*-*-*-*
+      -adobe-courier-medium-o-*-*-*-180-*-*-*-*-*-*
+      -adobe-courier-bold-r-*-*-*-180-*-*-*-*-*-*
+      -adobe-courier-medium-r-*-*-*-240-*-*-*-*-*-*
+      -adobe-courier-medium-o-*-*-*-240-*-*-*-*-*-*
+      -adobe-courier-bold-r-*-*-*-240-*-*-*-*-*-*
+   }
+
+   #  Colour for labelling objects.
+   itk_option define -labelcolour labelcolour LabelColour white
+
+   #  Possible colours for labelling objects.
+   itk_option define -colors colors Colors {
+      white
+      grey90 grey80 grey70 grey60 grey50 grey40 grey30 grey20 grey10
+      black
+      red green blue cyan magenta yellow
+   }
 
    #  Protected variables: (available to instance):
    #  =============================================
