@@ -1273,6 +1273,5705 @@ from one graphical element to another.
    }
 }
 \sstroutine{
+   CCG\_ORVAR
+}{
+   Returns the variances and covariances of the order statistics
+   from n to 1, assuming an initially normal distribution
+}{
+   \sstdescription{
+      The routine returns the variances and covariances of the order
+      statistics, assuming an initial (pre-ordered) normal distribution
+      of mean 0 and standard deviation 1. The routine returns all
+      variance/covariances in an array with the terms vectorised - that
+      is following on after each row. This uses the symmetric nature of
+      the matrix to compress the data storage, but remember to double
+      the covariance components if summing in quadrature. The variances
+      \sstitemlist{
+
+         \sstitem
+         covariances are returned for all statistics from n to 1. The
+         special case of n = 1 returns the variance of 2/pi (median).
+      }
+   }
+   \sstinvocation{
+      CALL CCG\_ORVAR( EL, NBIG, PP, VEC, MATRIX, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         EL = INTEGER (Given)
+      }{
+         Number of members in ordered set.
+      }
+      \sstsubsection{
+         NBIG = INTEGER (Given)
+      }{
+         Maximum number of entries in covariance array row.
+         equal to EL$*$(EL$+$1)/2).
+      }
+      \sstsubsection{
+         PP( EL ) = DOUBLE PRECISION (Given)
+      }{
+         Workspace for storing expected values of order statistics.
+      }
+      \sstsubsection{
+         VEC( NBIG, EL ) = DOUBLE PRECISION (Returned)
+      }{
+         The upper triangles of the nset by nset variance-covariance
+         matrix packed by columns.  Each triangle is packed into a
+         single row.  For each row element Vij is stored in
+         VEC(i$+$j$*$(j-1)/2), for 1 $<$= i $<$= j $<$= nset.
+      }
+      \sstsubsection{
+         MATRIX( EL, EL ) = DOUBLE PRECISION (Returned)
+      }{
+         Work space.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Data are returned as above to save on repeated calls (which are
+         too slow).  To obtain the actual variance of the data of order n
+         you need to sum all the variances and twice the covariances and
+         use these to modify the actual variance of the (unordered) data.
+      }
+   }
+}
+\sstroutine{
+   CCG1\_AD1x
+}{
+   Combines data lines using absolute deviations from an unweighted
+   mean
+}{
+   \sstdescription{
+      This routine accepts an array consisting of a series of
+      (vectorised) lines of data. The data values in the lines are then
+      combined to form an unweighted mean, and then the absolute mean
+      deviation from the mean.  The output means are returned in the
+      array RESULT.  The output variances are standard-error values and
+      are returned in RESVAR.
+   }
+   \sstinvocation{
+      CALL CCG1\_AD1x( NPIX, NLINES, STACK, MINPIX,
+                      RESULT, RESVAR, NCON, NBAD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         MINPIX = INTEGER (Given)
+      }{
+         The minimum number of pixels required to contribute to an
+         output pixel.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data.
+      }
+      \sstsubsection{
+         RESVAR( NPIX ) = ? (Returned)
+      }{
+         The output variances.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels from each input line
+         to the output line.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output RESULT array created while
+         forming the statistics.  It excludes those bad values whose
+         corresponding values along the collapse axis are all bad.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   CCG\_AD3x
+}{
+   Combines data lines using absolute deviations from an unweighted
+   mean
+}{
+   \sstdescription{
+      This routine accepts an array consisting of a series of
+      (vectorised) lines of data.  The data values in the lines are then
+      combined to form an unweighted mean, and then the absolute mean
+      deviation from the mean.  The output means are returned in the
+      array RESULT.
+   }
+   \sstinvocation{
+      CALL CCG\_AD3x( NPIX, NLINES, STACK, MINPIX,
+                     RESULT, NCON, NBAD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         MINPIX = INTEGER (Given)
+      }{
+         The minimum number of pixels required to contribute to an
+         output pixel.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels from each input line
+         to the output line.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output RESULT array created while
+         forming the statistics.  It excludes those bad values whose
+         corresponding values along the collapse axis are all bad.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   CCG\_BM1x
+}{
+   Combines data lines using a broadened median
+}{
+   \sstdescription{
+      This routine accepts an array consisting a series of (vectorised)
+      lines of data.  The data values in the lines are then combined to
+      form an broadened medium line.  The broadened median is similar to
+      a trimmed mean, except that the trimming fraction changes with
+      the number of values (and is equivalent to a median for fewer than
+      five values).  The output means are returned in the array RESULT.
+      The variances are propagation through the combination process and
+      returned in the RESVAR array.
+   }
+   \sstinvocation{
+      CALL CCG\_BM1x( NPIX, NLINES, STACK, VARS, MINPIX, NMAT, COVEC,
+                     RESULT, RESVAR, WRK1, POINT, USED, NCON, NBAD,
+                     STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         VARS( NPIX, NLINES ) = ? (Given)
+      }{
+         The variances of the data.
+      }
+      \sstsubsection{
+         MINPIX = INTEGER (Given)
+      }{
+         The minimum number of pixels required to contribute to an
+         output pixel.
+      }
+      \sstsubsection{
+         NMAT = INTEGER (Given)
+      }{
+         Size of the first dimension of COVEC.
+      }
+      \sstsubsection{
+         COVEC( NMAT, NLINES ) = DOUBLE PRECISION (Given)
+      }{
+         The packed variance-covariance matrix of the order statistics
+         from a normal distribution of sizes up to NLINES, produced by
+         CCD1\_ORVAR.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data.
+      }
+      \sstsubsection{
+         RESVAR( NPIX ) = ? (Returned)
+      }{
+         The output variances.
+      }
+      \sstsubsection{
+         WRK1( NLINES ) = ? (Returned)
+      }{
+         Workspace for calculations.
+      }
+      \sstsubsection{
+         POINT( NLINES ) = INTEGER (Returned)
+      }{
+         Workspace to hold pointers to the original positions of the
+         data before extraction and conversion in to the WRK1 array.
+      }
+      \sstsubsection{
+         USED( NLINES ) = LOGICAL (Returned)
+      }{
+         Workspace used to indicate which values have been used in
+         estimating a resultant value.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels from each input line
+         to the output line.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output array created while
+         forming the statistics.  It excludes those bad values whose
+         corresponding values along the collapse axis are all bad.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for real and double-precision: replace {\tt "}x{\tt "}
+         in the routine name by D or R as appropriate.  The STACK, VARS,
+         RESULT, RESVAR, and WRK1 arguments supplied to the routine must
+         have the data type specified.
+      }
+   }
+}
+\sstroutine{
+   CCG\_BM3x
+}{
+   Combines data lines using a broadened median
+}{
+   \sstdescription{
+      This routine accepts an array consisting a series of (vectorised)
+      lines of data.  The data values in the lines are then combined to
+      form an broadened medium line.  The broadened median is similar to
+      a trimmed mean, except that the trimming fraction changes with
+      the number of values (and is equivalent to a median for fewer than
+      five values).  The output means are returned in the array RESULT.
+   }
+   \sstinvocation{
+      CALL CCG\_BM3x( NPIX, NLINES, STACK, MINPIX, RESULT,
+                     WRK1, POINT, USED, NCON, NBAD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         MINPIX = INTEGER (Given)
+      }{
+         The minimum number of pixels required to contribute to an
+         output pixel.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data.
+      }
+      \sstsubsection{
+         WRK1( NLINES ) = ? (Returned)
+      }{
+         Workspace for calculations.
+      }
+      \sstsubsection{
+         POINT( NLINES ) = INTEGER (Returned)
+      }{
+         Workspace to hold pointers to the original positions of the
+         data before extraction and conversion in to the WRK1 array.
+      }
+      \sstsubsection{
+         USED( NLINES ) = LOGICAL (Returned)
+      }{
+         Workspace used to indicate which values have been used in
+         estimating a resultant value.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels from each input line
+         to the output line.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output array created while
+         forming the statistics.  It excludes those bad values whose
+         corresponding values along the collapse axis are all bad.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for real and double-precision: replace {\tt "}x{\tt "}
+         in the routine name by D or R as appropriate.  The STACK, RESULT,
+         and WRK1 arguments supplied to the routine must have the data type
+         specified.
+      }
+   }
+}
+\sstroutine{
+   CCG\_CLIPx
+}{
+   Sets any data outside a given value range BAD
+}{
+   \sstdescription{
+      This generic routine loops over all entries in RA. If any values
+      are outside the range RMIN to VMAX then they are set BAD.
+   }
+   \sstinvocation{
+      CALL CCG\_CLIPR( VMIN, VMAX, EL, ARRAY, NGOOD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         VMIN = ? (Given)
+      }{
+         The minimum allowed value.  All values below this are set BAD.
+      }
+      \sstsubsection{
+         VMAX = ? (Given)
+      }{
+         The maximum allowed value.  All values above this are set BAD.
+      }
+      \sstsubsection{
+         EL = INTEGER (Given)
+      }{
+         The number of entries in ARRAY.
+      }
+      \sstsubsection{
+         ARRAY( EL ) = ? (Given and Returned)
+      }{
+         The list of values to be clipped within the given range.  On
+         output this contains the clipped list.
+      }
+      \sstsubsection{
+         NGOOD = INTEGER (Returned)
+      }{
+         The number of values left after rejection.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for real and double-precision: replace {\tt "}x{\tt "}
+         in the routine name by D or R as appropriate.  The ARRAY, VMIN,
+         and VMAX arguments supplied to the routine must have the data type
+         specified.
+      }
+   }
+}
+\sstroutine{
+   CCG\_COMB1x
+}{
+   Combines a stack of array lines into one line, using a variety of
+   methods
+}{
+   \sstdescription{
+      The routine works along each line of the input stack of lines,
+      combining the data.  This variant uses a complete variance array
+      propagates them.
+
+      The array NCON holds the actual numbers of pixels that were used in
+      deriving the output value plus any values already present in the
+      array; thus a cumulative sum of contributing pixel numbers may be
+      kept.
+   }
+   \sstinvocation{
+      CALL CCG\_COMB1x( NPIX, NLINES, STACK, VARS, COORDS, IMETH, MINPIX,
+                       NITER, NSIGMA, ALPHA, RMIN, RMAX, NMAT, RESULT,
+                       RESVAR, WIDTHS, COIND, WRK1, WRK2, PP, COVEC,
+                       POINT, USED, NCON, NFLAG, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         VARS( NPIX, NLINES ) = ? (Given)
+      }{
+         The data variances.
+      }
+      \sstsubsection{
+         COORDS( NPIX, NLINES ) = ? (Given)
+      }{
+         The co-ordinates along the collapse axis for each pixel.
+         It is accessed only for IMETH = 22, 23, 33, 34.
+      }
+      \sstsubsection{
+         IMETH = INTEGER (Given)
+      }{
+         The method to use in combining the lines.  It has a code of 1
+         to 300 which represent the following statistics.
+         1  = Mean
+         2  = Weighted mean
+         3  = Median
+         4  = Trimmed mean
+         5  = Mode
+         6  = Sigma-clipped mean
+         7  = Threshold exclusion mean
+         8  = Minmax mean
+         9  = Broadened median
+         10 = Sigma-clipped median
+         11 = Fast median
+         12 = Sum
+         13 = Standard deviation about the mean
+         14 = Sigma-clipped standard deviation about the mean
+         21 = Integrated value (sum of pixel co-ordinate width times
+              value)
+         22 = Intensity-weighted co-ordinate
+         23 = Intensity-weighted dispersion of the co-ordinate
+         24 = Root mean square
+         25 = Absolute mean deviation
+         31 = Maximum
+         32 = Minimum
+         33 = Co-ordinate of maximum
+         34 = Co-ordinate of minimum
+         300 = Median, but estimating variance from mean variance
+      }
+      \sstsubsection{
+         MINPIX = INTEGER (Given)
+      }{
+         The minimum number of pixels required to contribute to an
+         output pixel.
+      }
+      \sstsubsection{
+         NITER = INTEGER (Given)
+      }{
+         The maximum number of iterations (IMETH = 5).
+      }
+      \sstsubsection{
+         NSIGMA = REAL (Given)
+      }{
+         The number of sigmas to clip the data at (IMETH = 5 and 6).
+      }
+      \sstsubsection{
+         ALPHA = REAL (Given)
+      }{
+         The fraction of data values to remove from data (IMETH = 4).
+      }
+      \sstsubsection{
+         RMIN = REAL (Given)
+      }{
+         The minimum allowed data value (IMETH = 7).
+      }
+      \sstsubsection{
+         RMAX = REAL (Given)
+      }{
+         The maximum allowed data value (IMETH = 7).
+      }
+      \sstsubsection{
+         NMAT = INTEGER (Given)
+      }{
+         Number of columns in covariance matrix.   It should be at
+         least NLINES $*$ ( NLINES $+$ 1 )/ 2.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data.
+      }
+      \sstsubsection{
+         RESVAR( NPIX ) = ? (Returned)
+      }{
+         The output variances.
+      }
+      \sstsubsection{
+         WIDTHS( NPIX, NLINES ) = ? (Returned)
+      }{
+         The widths along the collapse axis for each pixel.  It is
+         calculated only for IMETH = 21.
+      }
+      \sstsubsection{
+         COIND( NPIX ) = INTEGER (Returned)
+      }{
+         Workspace to hold co-ordinate indices.
+      }
+      \sstsubsection{
+         WRK1( NLINES ) = ? (Returned)
+      }{
+         Workspace for calculations.
+      }
+      \sstsubsection{
+         WRK2( NLINES ) = ? (Returned)
+      }{
+         Workspace for calculations.
+      }
+      \sstsubsection{
+         PP( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         Workspace for order statistics calculations.
+      }
+      \sstsubsection{
+         COVEC( NMAT, NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         Workspace for storing ordered statistics variance-covariance
+         matrix.  Used for IMETHs 3 to 11, and 14.
+      }
+      \sstsubsection{
+         POINT( NLINES ) = INTEGER (Returned)
+      }{
+         Workspace to hold pointers to the original positions of the
+         data before extraction and conversion in to the WRK1 array.
+      }
+      \sstsubsection{
+         USED( NLINES ) = LOGICAL (Returned)
+      }{
+         Workspace used to indicate which values have been used in
+         estimating a resultant value.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels from each input line
+         to the output line.
+      }
+      \sstsubsection{
+         NFLAG = INTEGER (Returned)
+      }{
+         Number of output pixels set to bad because insufficient pixels
+         were present to form the statistic for the collapsed axis,
+         provided the minimum number of contributing data values is one.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for real and double-precision: replace {\tt "}x{\tt "}
+         in the routine name by D or R as appropriate.  The STACK, VARS,
+         COORDS, RESULT, RESVAR, WIDTHS, WRK1, and WRK2 arguments supplied
+         to the routine must have the data type specified.
+
+         \sstitem
+         Various of the options are simply variations on a theme.  The
+         Broadened median is just a trimmed mean with a variable trimming
+         fraction. The Mode is an iteratively carried out version of the
+         sigma clipping (or more precisely the reverse).  The minmax and
+         threshold mean are also just trimmed means, but require their own
+         mechanisms.
+
+         \sstitem
+         The {\tt '}propagation{\tt '} of the input variances assumes that the input
+         data are fairly represented by a normal distribution.  This fact
+         is used together with the {\tt '}order statistics{\tt '} of a normal
+         population to form a new variance estimate.  The order statistics
+         are not independent so have non-zero covariances (off diagonal
+         components of the variance-covariance matrix).  All {\tt '}trimmed
+         means{\tt '} of any description use the order of the values to
+         estimate which values are corrupt.  This applies to all the
+         methods supported here except the mean which rejects no data. The
+         variance used to represent the input normal population is the
+         reciprocal of the sum of the reciprocal variances.  We have no
+         other estimate of this value except from the population itself.
+
+         \sstitem
+         Calculations are performed in double precision.
+      }
+   }
+}
+\sstroutine{
+   CCG\_COMB3x
+}{
+   Combines a stack of array lines into one line, using a variety
+   of methods
+}{
+   \sstdescription{
+      The routine works along each line of the input stack of lines,
+      combining the data.  This variant uses a single variance for each
+      line and and does NOT propagate it.
+
+      The array NCON holds the actual numbers of pixels which were used
+      in deriving the output value plus any values already present in
+      the array; thus a cumulative sum of contributing pixel numbers may
+      be kept.
+   }
+   \sstinvocation{
+      CALL CCG\_COMB3x( NPIX, NLINES, STACK, VARS, COORDS, IMETH, MINPIX,
+                       NITER, NSIGMA, ALPHA, RMIN, RMAX, RESULT, WIDTHS,
+                       COIND, WRK1, WRK2, POINT, USED, NCON, NFLAG,
+                       STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         VARS( NLINES ) = ? (Given)
+      }{
+         The variance to to used for each line of data.
+      }
+      \sstsubsection{
+         COORDS( NPIX, NLINES ) = ? (Given)
+      }{
+         The co-ordinates along the collapse axis for each pixel.
+         It is accessed only for IMETH = 22, 23, 33, 34.
+      }
+      \sstsubsection{
+         IMETH = INTEGER (Given)
+      }{
+         The method to use in combining the lines.  It has a code of 1
+         to 300 which represent the following statistics.
+         1  = Mean
+         2  = Weighted mean
+         3  = Median
+         4  = Trimmed mean
+         5  = Mode
+         6  = Sigma-clipped mean
+         7  = Threshold exclusion mean
+         8  = Minmax mean
+         9  = Broadened median
+         10 = Sigma-clipped median
+         11 = Fast median
+         12 = Sum
+         13 = Standard deviation about the mean
+         14 = Sigma-clipped standard deviation about the mean
+         21 = Integrated value (sum of pixel co-ordinate width times
+              value)
+         22 = Intensity-weighted co-ordinate
+         23 = Intensity-weighted dispersion of the co-ordinate
+         24 = Root mean square
+         25 = Absolute mean deviation
+         31 = Maximum
+         32 = Minimum
+         33 = Co-ordinate of maximum
+         34 = Co-ordinate of minimum
+         300 = Median, but estimating variance from mean variance
+      }
+      \sstsubsection{
+         MINPIX = INTEGER (Given)
+      }{
+         The minimum number of pixels required to contribute to an
+         output pixel.
+      }
+      \sstsubsection{
+         NITER = INTEGER (Given)
+      }{
+         The maximum number of iterations (IMETH = 5).
+      }
+      \sstsubsection{
+         NSIGMA = REAL (Given)
+      }{
+         The number of sigmas to clip the data at (IMETH = 5 and 6).
+      }
+      \sstsubsection{
+         ALPHA = REAL (Given)
+      }{
+         The fraction of data values to remove from data (IMETH = 4).
+      }
+      \sstsubsection{
+         RMIN = REAL (Given)
+      }{
+         The minimum allowed data value (IMETH = 7).
+      }
+      \sstsubsection{
+         RMAX = REAL (Given)
+      }{
+         The maximum allowed data value (IMETH = 7).
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data.
+      }
+      \sstsubsection{
+         WIDTHS( NPIX, NLINES ) = ? (Returned)
+      }{
+         The widths along the collapse axis for each pixel.  It is
+         calculated only for IMETH = 21.
+      }
+      \sstsubsection{
+         COIND( NPIX ) = INTEGER (Returned)
+      }{
+         Workspace to hold co-ordinate indices.
+      }
+      \sstsubsection{
+         WRK1( NLINES ) = ? (Returned)
+      }{
+         Workspace for calculations.
+      }
+      \sstsubsection{
+         WRK2( NLINES ) = ? (Returned)
+      }{
+         Workspace for calculations.
+      }
+      \sstsubsection{
+         POINT( NLINES ) = INTEGER (Returned)
+      }{
+         Workspace to hold pointers to the original positions of the
+         data before extraction and conversion in to the WRK1 array.
+      }
+      \sstsubsection{
+         USED( NLINES ) = LOGICAL (Returned)
+      }{
+         Workspace used to indicate which values have been used in
+         estimating a resultant value.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels from each input line
+         to the output line.
+      }
+      \sstsubsection{
+         NFLAG = INTEGER (Returned)
+      }{
+         Number of output pixels set to bad because insufficient pixels
+         were present to form the statistic for the collapsed axis,
+         provided the minimum number of contributing data values is one.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for real and double-precision: replace {\tt "}x{\tt "}
+         in the routine name by D or R as appropriate.  The STACK, VARS,
+         COORDS, RESULT, WIDTHS, WRK1, and WRK2 arguments supplied to the
+         routine must have the data type specified.
+
+         \sstitem
+         Various of the options are simply variations on a theme.  The
+         Broadened median is just a trimmed mean with a variable trimming
+         fraction.  The Mode is an iteratively carried out version of the
+         sigma clipping (or more precisely the reverse).  The minmax and
+         threshold mean are also just trimmed means, but require their own
+         mechanisms.
+
+         \sstitem
+         No propagation of variances is performed using this routine.
+
+         \sstitem
+         Calculations are performed in double precision.
+      }
+   }
+}
+\sstroutine{
+   CCG\_CS1x
+}{
+   Combines data lines using a sigma-clipped standard deviation
+}{
+   \sstdescription{
+      This routine accepts an array consisting a series of (vectorised)
+      lines of data.  The weighted mean and standard deviation of each
+      input column in STACK is then used to estimate the range of
+      values which represent the required sigma clipping.  Values
+      outside of this range are then rejected and the resulting output
+      variance values are returned in the array RESULT.  The variances
+      are propagated through the combination process and returned in the
+      RESVAR array.
+   }
+   \sstinvocation{
+      CALL CCG\_CS1x( NSIGMA, NPIX, NLINES, STACK, VARS, MINPIX, NMAT,
+                      COVEC, RESULT, RESVAR, WRK1, WRK2, POINT, USED,
+                      NCON, NBAD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NSIGMA = REAL (Given)
+      }{
+         The number of sigma at which to reject data values.
+      }
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         VARS( NPIX, NLINES ) = ? (Given)
+      }{
+         The data variances.
+      }
+      \sstsubsection{
+         MINPIX = INTEGER (Given)
+      }{
+         The minimum number of pixels required to contribute to an
+         output pixel.
+      }
+      \sstsubsection{
+         NMAT = INTEGER (Given)
+      }{
+         Size of the first dimension of COVEC.
+      }
+      \sstsubsection{
+         COVEC( NMAT, NLINES ) = DOUBLE PRECISION (Given)
+      }{
+         The packed variance-covariance matrix of the order statistics
+         from a normal distribution of sizes up to NLINES, produced by
+         CCD1\_ORVAR.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data, i.e. the clipped variances.
+      }
+      \sstsubsection{
+         RESVAR( NPIX ) = ? (Returned)
+      }{
+         The output variances of the clipped variances.
+      }
+      \sstsubsection{
+         WRK1( NLINES ) = ? (Returned)
+      }{
+         Workspace for calculations.
+      }
+      \sstsubsection{
+         WRK2( NLINES ) = ? (Returned)
+      }{
+         Workspace for calculations.
+      }
+      \sstsubsection{
+         POINT( NLINES ) = INTEGER (Returned)
+      }{
+         Workspace to hold pointers to the original positions of the
+         data before extraction and conversion in to the WRK1 array.
+      }
+      \sstsubsection{
+         USED( NLINES ) = LOGICAL (Returned)
+      }{
+         Workspace used to indicate which values have been used in
+         estimating a resultant value.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels from each input line
+         to the output line.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output array created while
+         forming the statistics.  It excludes those bad values whose
+         corresponding values along the collapse axis are all bad.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for real and double-precision: replace {\tt "}x{\tt "}
+         in the routine name by D or R as appropriate.  The STACK, VARS,
+         RESULT, RESVAR, WRK1, and WRK2 arguments supplied to the routine
+         must have the data type specified.
+      }
+   }
+}
+\sstroutine{
+   CCG\_CS3x
+}{
+   Combines data lines using a sigma-clipped standard deviation
+}{
+   \sstdescription{
+      This routine accepts an array consisting a series of (vectorised)
+      lines of data.  The weighted mean and standard deviation of each
+      input column in STACK is then used to estimate the range of values
+      that represent the required sigma clipping.  The standard
+      deviation is derived from the population of values at each
+      position along the lines (cf. each image pixel).  Values outside
+      of this range are then rejected and the resulting output
+      standard-deviation values are returned in the array RESULT.
+
+      Note that clipping will not be used when only two or three
+      values are available (unless in the case of three values NSIGMA
+      is less than 1.0).
+   }
+   \sstinvocation{
+      CALL CCG\_CS3x( NSIGMA, NPIX, NLINES, STACK, VARS, MINPIX,
+                     RESULT, WRK1, WRK2, POINT, USED, NCON, NBAD,
+                     STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NSIGMA = REAL (Given)
+      }{
+         The number of sigma at which to reject data values.
+      }
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         VARS( NLINES ) = ? (Given)
+      }{
+         The variance to to used for each line of data. These are
+         used as inverse weights when forming the mean and do not
+         need to be real variances, as they are not propagated.
+      }
+      \sstsubsection{
+         MINPIX = INTEGER (Given)
+      }{
+         The minimum number of pixels required to contribute to an
+         output pixel.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data.
+      }
+      \sstsubsection{
+         WRK1( NLINES ) = ? (Returned)
+      }{
+         Workspace for calculations.
+      }
+      \sstsubsection{
+         WRK2( NLINES ) = ? (Returned)
+      }{
+         Workspace for calculations.
+      }
+      \sstsubsection{
+         POINT( NLINES ) = INTEGER (Returned)
+      }{
+         Workspace to hold pointers to the original positions of the
+         data before extraction and conversion in to the WRK1 array.
+      }
+      \sstsubsection{
+         USED( NLINES ) = LOGICAL (Returned)
+      }{
+         Workspace used to indicate which values have been used in
+         estimating a resultant value.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels from each input line
+         to the output line.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output array created while
+         forming the statistics.  It excludes those bad values whose
+         corresponding values along the collapse axis are all bad.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for real and double-precision: replace {\tt "}x{\tt "}
+         in the routine name by D or R as appropriate.  The STACK, VARS,
+         RESULT, WRK1, and WRK2 arguments supplied to the routine must
+         have the data type specified.
+      }
+   }
+}
+\sstroutine{
+   CCG\_FLX1x
+}{
+   Combines data lines using the integrated value
+}{
+   \sstdescription{
+      This routine accepts an array consisting of a series of
+      (vectorised) lines of data.  It forms the sum of the data values
+      multiplied by its pixel width lines are then summed, i.e a flux.
+      The output integrated values are returned in the array RESULT.
+      The output variances are estimated from the VARS values and are
+      returned in RESVAR; this assumes no errors in the widths.
+   }
+   \sstinvocation{
+      CALL CCG\_FLX1x( NPIX, NLINES, STACK, VARS, WIDTHS, MINPIX,
+                       RESULT, RESVAR, NCON, NBAD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         VARS( NPIX, NLINES ) = ? (Given)
+      }{
+         The data variances.
+      }
+      \sstsubsection{
+         WIDTHS( NPIX, NLINES ) = ? (Given)
+      }{
+         The pixel widths in world co-ordinates.
+      }
+      \sstsubsection{
+         MINPIX = INTEGER (Given)
+      }{
+         The minimum number of pixels required to contribute to an
+         output pixel.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = $<$TYPE$>$ (Returned)
+      }{
+         The output line of data.
+      }
+      \sstsubsection{
+         RESVAR( NPIX ) = $<$TYPE$>$ (Returned)
+      }{
+         The output variances.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels from each input line
+         to the output line.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output RESULT array created while
+         forming the statistics.  It excludes those bad values whose
+         corresponding values along the collapse axis are all bad.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each numeric data type: replace {\tt "}x{\tt "} in
+         the routine name by D or R as appropriate.  The STACK, VARS,
+         RESULT, and RESVAR arguments supplied to the routine must have the
+         data type specified.
+      }
+   }
+}
+\sstroutine{
+   CCG\_FLX3x
+}{
+   Combines data lines using the integrated value
+}{
+   \sstdescription{
+      This routine accepts an array consisting of a series of
+      (vectorised) lines of data.  It forms the sum of the data values
+      multiplied by its pixel width lines are then summed, i.e a flux.
+      The output integrated values are returned in the array RESULT.
+   }
+   \sstinvocation{
+      CALL CCG\_FLX3x( NPIX, NLINES, STACK, WIDTHS, MINPIX, RESULT,
+                      NCON, NBAD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         WIDTHS( NPIX, NLINES ) = ? (Given)
+      }{
+         The pixel widths in world co-ordinates.
+      }
+      \sstsubsection{
+         MINPIX = INTEGER (Given)
+      }{
+         The minimum number of pixels required to contribute to an
+         output pixel.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels from each input line
+         to the output line.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output array created while
+         forming the statistics.  It excludes those bad values whose
+         corresponding values along the collapse axis are all bad.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each numeric data type: replace {\tt "}x{\tt "} in
+         the routine name by D or R as appropriate.  The STACK and RESULT
+         arguments supplied to the routine must have the data type
+         specified.
+      }
+   }
+}
+\sstroutine{
+   CCG\_FM1x
+}{
+   Combines data lines using a fast median
+}{
+   \sstdescription{
+      This routine accepts an array consisting a series of (vectorised)
+      lines of data.  The data values in the lines are then combined to
+      form a (fast) median line.  This method uses no weights and
+      returns the estimated variances based on order stats for the
+      population sizes used at each output pixel.
+
+      The method used is based on Wirth{\tt '}s algorithm for selecting the
+      Kth value, which is very fast compared to a full sort.
+
+      The output medians are returned in the array RESULT.
+   }
+   \sstinvocation{
+      CALL CCG\_FM1x( NPIX, NLINES, STACK, VARS, MINPIX, NMAT, COVEC,
+                     RESULT, RESVAR, WRK1, WRK2, POINT, NCON, NBAD,
+                     STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         VARS( NPIX, NLINES ) = ? (Given)
+      }{
+         The data variances.
+      }
+      \sstsubsection{
+         MINPIX = INTEGER (Given)
+      }{
+         The minimum number of pixels required to contribute to an
+         output pixel.
+      }
+      \sstsubsection{
+         NMAT = INTEGER (Given)
+      }{
+         Size of the first dimension of COVEC.
+      }
+      \sstsubsection{
+         COVEC( NMAT, NLINES ) = DOUBLE PRECISION (Given)
+      }{
+         The packed variance-covariance matrix of the order statistics
+         from a normal distribution of sizes up to NLINES, produced by
+         CCD1\_ORVAR. This is only used when median is derived from
+         the central-2 values.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data.
+      }
+      \sstsubsection{
+         RESVAR( NPIX ) = ? (Returned)
+      }{
+         The output variance.
+      }
+      \sstsubsection{
+         WRK1( NLINES ) = ? (Returned)
+      }{
+         Workspace for calculations.
+      }
+      \sstsubsection{
+         WRK2( NLINES ) = ? (Returned)
+      }{
+         Workspace for calculations.
+      }
+      \sstsubsection{
+         POINT( NLINES ) = INTEGER (Returned)
+      }{
+         Workspace to hold pointers to the original positions of the
+         data before extraction and conversion in to the WRK1 array.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels from each input line
+         to the output line.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output array created while
+         forming the statistics.  It excludes those bad values whose
+         corresponding values along the collapse axis are all bad.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for real and double-precision: replace {\tt "}x{\tt "}
+         in the routine name by D or R as appropriate.  The STACK, VARS,
+         RESULT, RESVAR, WRK1, and WRK2 arguments supplied to the routine
+         must have the data type specified.
+      }
+   }
+}
+\sstroutine{
+   CCG\_FM3x
+}{
+   Combines data lines using a fast median
+}{
+   \sstdescription{
+      This routine accepts an array consisting a series of (vectorised)
+      lines of data. The data values in the lines are then combined to
+      form a (fast) median line.  This method uses no weights and
+      returns no variances.
+
+      The method used is based on Wirth{\tt '}s algorithm for selecting the
+      Kth value, which is very fast compared to a full sort.
+
+      The output medians are returned in the array RESULT.
+   }
+   \sstinvocation{
+      CALL CCG\_FM3x( NPIX, NLINES, STACK, MINPIX, RESULT, WRK1, NCON,
+                     POINT, USED, NCON, NBAD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         MINPIX = INTEGER (Given)
+      }{
+         The minimum number of pixels required to contribute to an
+         output pixel.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data.
+      }
+      \sstsubsection{
+         WRK1( NLINES ) = ? (Returned)
+      }{
+         Workspace for calculations.
+      }
+      \sstsubsection{
+         POINT( NLINES ) = INTEGER (Returned)
+      }{
+         Workspace to hold pointers to the original positions of the
+         data before extraction and conversion in to the WRK1 array.
+      }
+      \sstsubsection{
+         USED( NLINES ) = LOGICAL (Returned)
+      }{
+         Workspace used to indicate which values have been used in
+         estimating a resultant value.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels from each input line
+         to the output line.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output array created while
+         forming the statistics.  It excludes those bad values whose
+         corresponding values along the collapse axis are all bad.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for real and double-precision: replace {\tt "}x{\tt "}
+         in the routine name by D or R as appropriate.  The STACK, RESULT,
+         and WRK1 arguments supplied to the routine must have the data type
+         specified.
+      }
+   }
+}
+\sstroutine{
+   CCG\_I2WCx
+}{
+   Assigns world co-ordinates to an output array from an input list
+   of indices
+}{
+   \sstdescription{
+      This routine assigns world co-ordinates to an output vector
+      from an input two-dimensional array, corresponding to a
+      a vector for each output element.  The world co-ordinates are
+      selected using a list of indices in each world-co-ordinate
+      vector, there being one index per output value.  A bad value or
+      a value outside the bounds of the array in the list of indices
+      causes a bad value to be assigned to the output array.
+   }
+   \sstinvocation{
+      CALL CCG\_I2WCx( NPIX, NLINES, INDICE, COORDS, RESULT, NBAD,
+                     STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data.
+      }
+      \sstsubsection{
+         INDICE( NPIX ) = INTEGER (Given)
+      }{
+         The indices in the input array that point to the values to be
+         assigned to the output vector.
+      }
+      \sstsubsection{
+         COORDS( NPIX, NLINES ) = ? (Given)
+      }{
+         The world co-ordinates.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The vector containing values copied from the input COORDS
+         array.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output array.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for real and double-precision: replace {\tt "}x{\tt "}
+         in the routine name by D or R as appropriate.  The COORDS and
+         RESULT supplied to the routine must have the data type specified.
+      }
+   }
+}
+\sstroutine{
+   CCG\_IS2x
+}{
+   Sorts a list of data into increasing order, and applies the
+   corresponding shuffle to an ancillary list
+}{
+   \sstdescription{
+      The routine uses an insert-sort method.  This has proven itself
+      the quickest for sorting small sets of data lots of times, as in
+      image stacking using ordered statistics.  The method looks at the
+      second value, compares this with the first if swaps if necessary,
+      then it looks at the third, looks at the previous values swaps
+      with the lowest (or not at all) and so on until all values have
+      been passed.  It is fast (for the case above) simply because of
+      the very few lines of operation.  The sort is extended to the
+      ancillary data ANCDAT, this maintains its correspondence with the
+      ORDDAT dataset on exit.
+   }
+   \sstinvocation{
+      CALL CCG\_IS2x( EL, ORDDAT, ANCDAT, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         EL = INTEGER (Given)
+      }{
+         The number of entries in ORDDAT.
+      }
+      \sstsubsection{
+         ORDDAT( EL ) = ? (Given and Returned)
+      }{
+         The data to order. On output it contains the data in increasing
+         order.
+      }
+      \sstsubsection{
+         ANCDAT( EL ) = INTEGER (Given and Returned)
+      }{
+         A list of data associated with ORDDAT which needs to retain its
+         correspondence with the items in ORDDAT (probably pointers).
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for real and double-precision: replace {\tt "}x{\tt "}
+         in the routine name by D or R as appropriate.  The ORDDAT
+         argument supplied to the routine must have the data type
+         specified.
+      }
+   }
+}
+\sstroutine{
+   CCG\_IS3x
+}{
+   Sorts a list of data into increasing order, and applies the
+   corresponding shuffle to two ancillary lists
+}{
+   \sstdescription{
+      The routine uses an insert sort method.  This has proven itself
+      the quickest for sorting small sets of data lots of times, as in
+      image stacking using ordered statistics.  The method looks at the
+      second value, compares this with the first if swaps if necessary,
+      then it looks at the third, looks at the previous values swaps
+      with the lowest (or not at all) and so on until all values have
+      been passed. It is fast (for the case above ) simply because of
+      the very few lines of operation.  The sort is extended to the
+      ancillary data RDAT and PDAT that maintain their correspondence
+      with the ORDDAT dataset on exit.
+   }
+   \sstinvocation{
+      CALL CCG\_IS3x( EL, ORDDAT, RDAT, PDAT, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         EL = INTEGER (Given)
+      }{
+         The number of entries in ORDDAT.
+      }
+      \sstsubsection{
+         ORDDAT( EL ) = ? (Given and Returned)
+      }{
+         The data to order. On output it contains the data in increasing
+         order.
+      }
+      \sstsubsection{
+         RDAT( EL ) = ? (Given and Returned)
+      }{
+         A list of data associated with ORDDAT which needs to retain its
+         correspondence with the items in ORDDAT.
+      }
+      \sstsubsection{
+         PDAT( EL ) = INTEGER (Given and Returned)
+      }{
+         A list of data associated with ORDDAT which needs to retain its
+         correspondence with the items in ORDDAT (probably pointers).
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for real and double-precision: replace {\tt "}x{\tt "}
+         in the routine name by D or R as appropriate.  The ORDDAT and RDAT
+         arguments supplied to the routine must have the data type
+         specified.
+      }
+   }
+}
+\sstroutine{
+   CCG\_IWC1$<$T$>$
+}{
+   Combines data lines using the intensity-weighted co-ordinate
+}{
+   \sstdescription{
+      This routine accepts an array consisting of a series of
+      (vectorised) lines of data and their co-ordinates.  For each
+      pixel the subroutine forms a weighted mean co-ordinate and
+      variance along a line of data.  The weights are the product of
+      the data values and their inverse variance.  The output weighted
+      co-ordinates are returned in the array RESULT.  The output
+      weighted variances are returned in RESVAR; this assumes no
+      errors in the co-ordinates.
+   }
+   \sstinvocation{
+      CALL CCG\_IWC1x( NPIX, NLINES, STACK, VARS, COORDS, MINPIX,
+                       RESULT, RESVAR, NCON, NBAD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         VARS( NPIX, NLINES ) = ? (Given)
+      }{
+         The data variances.
+      }
+      \sstsubsection{
+         COORDS( NPIX, NLINES ) = ? (Given)
+      }{
+         The world co-ordinates.
+      }
+      \sstsubsection{
+         MINPIX = INTEGER (Given)
+      }{
+         The minimum number of pixels required to contribute to an
+         output pixel.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data.
+      }
+      \sstsubsection{
+         RESVAR( NPIX ) = ? (Returned)
+      }{
+         The output variances.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels from each input line
+         to the output line.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output RESULT array created while
+         forming the statistics.  It excludes those bad values whose
+         corresponding values along the collapse axis are all bad.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each numeric data type: replace {\tt "}x{\tt "} in
+         the routine name by D or R as appropriate.  The STACK, VARS,
+         COORDS, RESULT, and RESVAR arguments supplied to the routine must
+         have the data type specified.
+      }
+   }
+}
+\sstroutine{
+   CCG\_IWC3x
+}{
+   Combines data lines using the intensity-weighted co-ordinate
+}{
+   \sstdescription{
+      This routine accepts an array consisting of a series of
+      (vectorised) lines of data and their co-ordinates.  For each
+      pixel the subroutine forms a weighted mean co-ordinate along a
+      line of data.  The weights are the data values.  The output
+      weighted co-ordinates are returned in the array RESULT.
+   }
+   \sstinvocation{
+      CALL CCG\_IWC3x( NPIX, NLINES, STACK, COORDS, MINPIX,
+                       RESULT, NCON, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         COORDS( NPIX, NLINES ) = ? (Given)
+      }{
+         The world co-ordinates.
+      }
+      \sstsubsection{
+         MINPIX = INTEGER (Given)
+      }{
+         The minimum number of pixels required to contribute to an
+         output pixel.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels from each input line
+         to the output line.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output array created while
+         forming the statistics.  It excludes those bad values whose
+         corresponding values along the collapse axis are all bad.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each numeric data type: replace {\tt "}x{\tt "} in
+         the routine name by D or R as appropriate.  The STACK, COORDS, and
+         RESULT arguments supplied to the routine must have the data type
+         specified.
+      }
+   }
+}
+\sstroutine{
+   CCG\_IWD1x
+}{
+   Combines data lines using the dispersion of the intensity-weighted
+   co-ordinate
+}{
+   \sstdescription{
+      This routine accepts an array consisting of a series of
+      (vectorised) lines of data and their co-ordinates.  For each
+      pixel the subroutine forms the weighted dispersion of the
+      co-ordinate and an estimated variance along a line of data.  The
+      weights are the data values and their inverse variances.  The
+      output co-ordinate dispersions are returned in the array RESULT.
+      The output variances in RESVAR are the standard error of RESULT.
+   }
+   \sstinvocation{
+      CALL CCG\_IWD1x( NPIX, NLINES, STACK, VARS, COORDS, MINPIX,
+                       RESULT, RESVAR, NCON, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         VARS( NPIX, NLINES ) = ? (Given)
+      }{
+         The data variances.
+      }
+      \sstsubsection{
+         COORDS( NPIX, NLINES ) = ? (Given)
+      }{
+         The world co-ordinates.
+      }
+      \sstsubsection{
+         MINPIX = INTEGER (Given)
+      }{
+         The minimum number of pixels required to contribute to an
+         output pixel.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data.
+      }
+      \sstsubsection{
+         RESVAR( NPIX ) = ? (Returned)
+      }{
+         The output variances.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels from each input line
+         to the output line.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output RESULT array created while
+         forming the statistics.  It excludes those bad values whose
+         corresponding values along the collapse axis are all bad.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each numeric data type: replace {\tt "}x{\tt "} in
+         the routine name by D or R as appropriate.  The STACK, VARS,
+         COORDS, RESULT, and RESVAR arguments supplied to the routine must
+         have the data type specified.
+
+         \sstitem
+         It uses the corrected two-pass algorithm of Chan, T.F.,
+         Golub, G.H., \& LeVeque, R.J. (1983). {\tt "}Algorithms for computing the
+         sample variance: Analysis and recommendations{\tt "}, American
+         Statistician, 37(3), 242-247.
+      }
+   }
+}
+\sstroutine{
+   CCG\_IWD3x
+}{
+   Combines data lines using the dispersion of the intensity-weighted
+   co-ordinate
+}{
+   \sstdescription{
+      This routine accepts an array consisting of a series of
+      (vectorised) lines of data and their co-ordinates.  For each
+      pixel the subroutine forms the weighted dispersion of the
+      co-ordinate along a line of data.  The weights are the data
+      values.  The output co-ordinate dispersions are returned in the
+      array RESULT.
+   }
+   \sstinvocation{
+      CALL CCG\_IWD3x( NPIX, NLINES, STACK, COORDS, MINPIX,
+                       RESULT, RESVAR, NCON, NBAD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         COORDS( NPIX, NLINES ) = ? (Given)
+      }{
+         The world co-ordinates.
+      }
+      \sstsubsection{
+         MINPIX = INTEGER (Given)
+      }{
+         The minimum number of pixels required to contribute to an
+         output pixel.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels from each input line
+         to the output line.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output RESULT array created while
+         forming the statistics.  It excludes those bad values whose
+         corresponding values along the collapse axis are all bad.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each numeric data type: replace {\tt "}x{\tt "} in
+         the routine name by D or R as appropriate.  The STACK, COORDS,
+         and RESULT arguments supplied to the routine must have the data
+         type specified.
+
+         \sstitem
+         It uses the corrected two-pass algorithm of Chan, T.F.,
+         Golub, G.H., \& LeVeque, R.J. (1983). {\tt "}Algorithms for computing the
+         sample variance: Analysis and recommendations{\tt "}, American
+         Statistician, 37(3), 242--247.
+      }
+   }
+}
+\sstroutine{
+   CCG\_KTHx
+}{
+   Returns the Kth smallest value in an array
+}{
+   \sstdescription{
+      This routine returns the value of the Kth smallest element in the
+      given array.  It is an implementation of an algorithm of Niklaus
+      Wirth from the book {\tt "}Algorithms $+$ data structures = programs{\tt "}.
+   }
+   \sstinvocation{
+      CALL CCG\_KTHx( EL, K, ARRAY, ANCDAT, VALUE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         EL = INTEGER (Given)
+      }{
+         The number of elements in the input array.
+      }
+      \sstsubsection{
+         K = INTEGER (Given and Returned)
+      }{
+         On entry the ordered value to be returned, on exit index of
+         ARRAY that contain the Kth smallest value.
+      }
+      \sstsubsection{
+         ARRAY( EL ) = ? (Given and Returned)
+      }{
+         The array of values to be processed. Note this is modified on
+         exit.
+      }
+      \sstsubsection{
+         ANCDAT( EL ) = INTEGER (Given and Returned)
+      }{
+         Array of data whose association with ARRAY is to be preserved
+         (such as a list of pointers to the original positions within
+         ARRAY).
+      }
+      \sstsubsection{
+         VALUE = ? (Returned)
+      }{
+         The Kth smallest value in the input array.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   CCG\_MD1x
+}{
+   Combines data lines using a weighted median
+}{
+   \sstdescription{
+      This routine accepts an array consisting a series of (vectorised)
+      lines of data.  The data values in the lines are then combined to
+      form a weighted median line.  The weights used are one-per-line
+      and are the reciprocal of values given in the array VARS.  The
+      output means are returned in the array RESULT.
+   }
+   \sstinvocation{
+      CALL CCG\_MD1x( CALCMV, NPIX, NLINES, STACK, VARS, MINPIX,
+                     NMAT, COVEC, RESULT, RESVAR, WRK1, WRK2,
+                     POINT, USED, NCON, NBAD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         CALCMV = LOGICAL (Given)
+      }{
+         If .FALSE. then the output variances are estimated by scaling
+         the variance on the weighted mean (rather than the weighted
+         median) by Pi/2.  Otherwise, the output variances are
+         calculated using the COVEC array.
+      }
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         VARS( NPIX, NLINES ) = ? (Given)
+      }{
+         The data variances.
+      }
+      \sstsubsection{
+         MINPIX = INTEGER (Given)
+      }{
+         The minimum number of pixels required to contribute to an
+         output pixel.
+      }
+      \sstsubsection{
+         NMAT = INTEGER (Given)
+      }{
+         Size of the first dimension of COVEC.
+      }
+      \sstsubsection{
+         COVEC( NMAT, NLINES ) = DOUBLE PRECISION (Given)
+      }{
+         The packed variance-covariance matrix of the order statistics
+         from a normal distribution of sizes up to NLINES, produced by
+         CCD1\_ORVAR. Not used if CALCMV is .FALSE.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data.
+      }
+      \sstsubsection{
+         RESVAR( NPIX ) = ? (Returned)
+      }{
+         The output variance.
+      }
+      \sstsubsection{
+         WRK1( NLINES ) = ? (Returned)
+      }{
+         Workspace for calculations.
+      }
+      \sstsubsection{
+         WRK2( NLINES ) = ? (Returned)
+      }{
+         Workspace for calculations.
+      }
+      \sstsubsection{
+         POINT( NLINES ) = INTEGER (Returned)
+      }{
+         Workspace to hold pointers to the original positions of the
+         data before extraction and conversion in to the WRK1 array.
+      }
+      \sstsubsection{
+         USED( NLINES ) = LOGICAL (Returned)
+      }{
+         Workspace used to indicate which values have been used in
+         estimating a resultant value.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels from each input line
+         to the output line.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output array created while
+         forming the statistics.  It excludes those bad values whose
+         corresponding values along the collapse axis are all bad.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for real and double-precision: replace {\tt "}x{\tt "}
+         in the routine name by D or R as appropriate.  The STACK, VARS,
+         RESULT, RESVAR, WRK1, and WRK2 arguments supplied to the routine
+         must have the data type specified.
+      }
+   }
+}
+\sstroutine{
+   CCG\_MDR3x
+}{
+   Combines data lines using a weighted median
+}{
+   \sstdescription{
+      This routine accepts an array consisting a series of (vectorised)
+      lines of data. The data values in the lines are then combined to
+      form a weighted median line.  The weights used are one-per-line
+      and are the reciprocal of values given in the array VARS.  The
+      output medians are returned in the array RESULT.
+   }
+   \sstinvocation{
+      CALL CCG\_MD3x( NPIX, NLINES, STACK, VARS, MINPIX, RESULT,
+                      WRK1, WRK2, POINT, USED, NCON, NBAD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         VARS( NLINES ) = ? (Given)
+      }{
+         The variance to to used for each line of data.
+      }
+      \sstsubsection{
+         MINPIX = INTEGER (Given)
+      }{
+         The minimum number of pixels required to contribute to an
+         output pixel.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data.
+      }
+      \sstsubsection{
+         WRK1( NLINES ) = ? (Returned)
+      }{
+         Workspace for calculations.
+      }
+      \sstsubsection{
+         WRK2( NLINES ) = ? (Returned)
+      }{
+         Workspace for calculations.
+      }
+      \sstsubsection{
+         POINT( NLINES ) = INTEGER (Returned)
+      }{
+         Workspace to hold pointers to the original positions of the
+         data before extraction and conversion in to the WRK1 array.
+      }
+      \sstsubsection{
+         USED( NLINES ) = LOGICAL (Returned)
+      }{
+         Workspace used to indicate which values have been used in
+         estimating a resultant value.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels from each input line
+         to the output line.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output array created while
+         forming the statistics.  It excludes those bad values whose
+         corresponding values along the collapse axis are all bad.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for real and double-precision: replace {\tt "}x{\tt "}
+         in the routine name by D or R as appropriate.  The STACK, VARS,
+         RESULT, WRK1, and WRK2 arguments supplied to the routine must
+         have the data type specified.
+      }
+   }
+}
+\sstroutine{
+   CCG\_ME1x
+}{
+   Combines data lines using a weighted mean
+}{
+   \sstdescription{
+      This routine accepts an array consisting of a series of
+      (vectorised) lines of data.  The data values in the lines are then
+      combined to form a weighted mean. The weights used are are the
+      reciprocal of values given in the array VARS.  The output means
+      are returned in the array RESULT.  The output variances are
+      estimated from the VARS values and are returned in RESVAR.
+   }
+   \sstinvocation{
+      CALL CCG\_ME1x( NPIX, NLINES, STACK, VARS, MINPIX,
+                     RESULT, RESVAR, NCON, NBAD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         VARS( NPIX, NLINES ) = ? (Given)
+      }{
+         The data variances.
+      }
+      \sstsubsection{
+         MINPIX = INTEGER (Given)
+      }{
+         The minimum number of pixels required to contribute to an
+         output pixel.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data.
+      }
+      \sstsubsection{
+         RESVAR( NPIX ) = ? (Returned)
+      }{
+         The output variances.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels from each input line
+         to the output line.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output array created while
+         forming the statistics.  It excludes those bad values whose
+         corresponding values along the collapse axis are all bad.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for real and double-precision: replace {\tt "}x{\tt "}
+         in the routine name by D or R as appropriate.  The STACK, VARS,
+         RESULT, and RESVAR arguments supplied to the routine must have
+         the data type specified.
+
+         \sstitem
+         This routine performs its work in double precision.
+      }
+   }
+}
+\sstroutine{
+   CCG\_ME3x
+}{
+   Combines data lines using a weighted mean
+}{
+   \sstdescription{
+      This routine accepts an array consisting a series of (vectorised)
+      lines of data.  The data values in the lines are then combined to
+      form a weighted mean.  The weights used are one-per-line and are
+      the reciprocal of values given in the array VARS.  The output
+      means are returned in the array RESULT.
+   }
+   \sstinvocation{
+      CALL CCG\_ME3x( NPIX, NLINES, STACK, VARS, MINPIX, RESULT, NCON,
+                    NBAD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         VARS( NLINES ) = ? (Given)
+      }{
+         The variance to to used for each line of data.
+      }
+      \sstsubsection{
+         MINPIX = INTEGER (Given)
+      }{
+         The minimum number of pixels required to contribute to an
+         output pixel.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels from each input line
+         to the output line.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output array created while
+         forming the statistics.  It excludes those bad values whose
+         corresponding values along the collapse axis are all bad.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for real and double-precision: replace {\tt "}x{\tt "}
+         in the routine name by D or R as appropriate.  The STACK, VARS,
+         and RESULT arguments supplied to the routine must have the data
+         type specified.
+
+         \sstitem
+         This routine performs its work in double precision.
+      }
+   }
+}
+\sstroutine{
+   CCG\_MM1x
+}{
+   Combines data lines using a min-max exclusion trimmed mean
+}{
+   \sstdescription{
+      This routine accepts an array consisting a series of (vectorised)
+      lines of data.  The data values in the lines are then combined to
+      form an trimmed mean in which the minimum and maximum values are
+      excluded.  The output means are returned in the array RESULT.  The
+      output variances are propagated from the inverse weights given in
+      array VARS and are returned in the array RESVAR.
+   }
+   \sstinvocation{
+      CALL CCG\_MM1x( NPIX, NLINES, STACK, VARS, MINPIX, NMAT, COVEC,
+                     RESULT, RESVAR, WRK1, POINT, USED, NCON, NBAD,
+                     STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         VARS( NPIX, NLINES ) = ? (Given)
+      }{
+         The data variances.
+      }
+      \sstsubsection{
+         MINPIX = INTEGER (Given)
+      }{
+         The minimum number of pixels required to contribute to an
+         output pixel.
+      }
+      \sstsubsection{
+         NMAT = INTEGER (Given)
+      }{
+         Size of the first dimension of COVEC.
+      }
+      \sstsubsection{
+         COVEC( NMAT, NLINES ) = DOUBLE PRECISION (Given)
+      }{
+         The packed variance-covariance matrix of the order statistics
+         from a normal distribution of sizes up to NLINES, produced by
+         CCD1\_ORVAR.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data.
+      }
+      \sstsubsection{
+         RESVAR( NPIX ) = ? (Returned)
+      }{
+         The output variances.
+      }
+      \sstsubsection{
+         WRK1( NLINES ) = ? (Returned)
+      }{
+         Workspace for calculations.
+      }
+      \sstsubsection{
+         POINT( NLINES ) = INTEGER (Returned)
+      }{
+         Workspace to hold pointers to the original positions of the
+         data before extraction and conversion in to the WRK1 array.
+      }
+      \sstsubsection{
+         USED( NLINES ) = LOGICAL (Returned)
+      }{
+         Workspace used to indicate which values have been used in
+         estimating a resultant value.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output array created while
+         forming the statistics.  It excludes those bad values whose
+         corresponding values along the collapse axis are all bad.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for real and double-precision: replace {\tt "}x{\tt "}
+         in the routine name by D or R as appropriate.  The STACK, VARS,
+         RESULT, RESVAR, and WRK1 arguments supplied to the routine
+         must have the data type specified.
+      }
+   }
+}
+\sstroutine{
+   CCG\_MM3x
+}{
+   Combines data lines using a min-max exclusion trimmed mean
+}{
+   \sstdescription{
+      This routine accepts an array consisting a series of (vectorised)
+      lines of data.  The data values in the lines are then combined to
+      form an trimmed mean in which the minimum and maximum values are
+      excluded. The output means are returned in the array RESULT.
+   }
+   \sstinvocation{
+      CALL CCG\_MM3x( NPIX, NLINES, STACK, MINPIX, RESULT,
+                     WRK1, POINT, USED, NCON, NBAD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         MINPIX = INTEGER (Given)
+      }{
+         The minimum number of pixels required to contribute to an
+         output pixel.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data.
+      }
+      \sstsubsection{
+         WRK1( NLINES ) = ? (Returned)
+      }{
+         Workspace for calculations.
+      }
+      \sstsubsection{
+         POINT( NLINES ) = INTEGER (Returned)
+      }{
+         Workspace to hold pointers to the original positions of the
+         data before extraction and conversion in to the WRK1 array.
+      }
+      \sstsubsection{
+         USED( NLINES ) = LOGICAL (Returned)
+      }{
+         Workspace used to indicate which values have been used in
+         estimating a resultant value.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels from each input line
+         to the output line.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output array created while
+         forming the statistics.  It excludes those bad values whose
+         corresponding values along the collapse axis are all bad.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for real and double-precision: replace {\tt "}x{\tt "}
+         in the routine name by D or R as appropriate.  The STACK, VARS,
+         RESULT, RESVAR, WRK1, and WRK2 arguments supplied to the routine
+         must have the data type specified.
+      }
+   }
+}
+\sstroutine{
+   CCG\_MN1x
+}{
+   Combines data lines using the minimum value
+}{
+   \sstdescription{
+      This routine accepts an array consisting a series of (vectorised)
+      lines of data.  The data values in the lines are then collapsed
+      to the minimum value in each line.  The output minima are
+      returned in the array RESULT.  Each output variance value is the
+      corresponding variance of the minimum data value, propagated from
+      the input variances given in array VARNCE and are returned in the
+      array RESVAR.  The vectorised pixel indices corresponding to the
+      minima are also returned in POSIND.
+   }
+   \sstinvocation{
+      CALL CCG\_MN1x( BAD, NPIX, NLINES, STACK, VARNCE, RESULT, RESVAR,
+                     POSIND, WRK1, NCON, NBAD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         BAD = LOGICAL (Given)
+      }{
+         If true, there may be bad pixels present in the array.  If
+         false, it is safe not to check for bad values.
+      }
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         VARNCE( NPIX, NLINES ) = ? (Given)
+      }{
+         The data variances.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data.
+      }
+      \sstsubsection{
+         RESVAR( NPIX ) = ? (Returned)
+      }{
+         The output variances.
+      }
+      \sstsubsection{
+         POSIND( NPIX ) = INTEGER (Returned)
+      }{
+         The pixel indices of the minima in each output pixel.
+      }
+      \sstsubsection{
+         WRK1( NLINES ) = ? (Returned)
+      }{
+         Workspace for calculations.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels from each input line
+         to the output line.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output array created while
+         forming the statistics.  It excludes those bad values whose
+         corresponding values along the collapse axis are all bad.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each numeric data type: replace {\tt "}x{\tt "} in
+         the routine name by D, R, I, W, UW, B or UB as appropriate.  The
+         STACK, VARNCE, RESULT, RESVAR, and WRK1 arguments supplied to the
+         routine must have the data type specified.
+      }
+   }
+}
+\sstroutine{
+   CCG\_MN3x
+}{
+   Combines data lines using the minimum value
+}{
+   \sstdescription{
+      This routine accepts an array consisting a series of (vectorised)
+      lines of data.  The data values in the lines are then collapsed
+      to the minimum value in each line.  The output minima are
+      returned in the array RESULT.  The vectorised pixel indices
+      corresponding to the minima are also returned in POSIND.
+   }
+   \sstinvocation{
+      CALL CCG\_MN3x( BAD, NPIX, NLINES, STACK, RESULT,
+                     POSIND, WRK1, NCON, NBAD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         BAD = LOGICAL (Given)
+      }{
+         If true, there may be bad pixels present in the array.  If
+         false, it is safe not to check for bad values.
+      }
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = $<$TYPE$>$ (Returned)
+      }{
+         The output line of data.
+      }
+      \sstsubsection{
+         POSIND( NPIX ) = INTEGER (Returned)
+      }{
+         The pixel indices of the minima in each output pixel.
+      }
+      \sstsubsection{
+         WRK1( NLINES ) = ? (Returned)
+      }{
+         Workspace for calculations.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels from each input line
+         to the output line.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output array created while
+         forming the statistics.  It excludes those bad values whose
+         corresponding values along the collapse axis are all bad.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each numeric data type: replace {\tt "}x{\tt "} in
+         the routine name by D, R, I, W, UW, B or UB as appropriate.  The
+         STACK, RESULT, and WRK1 arguments supplied to the routine must
+         have the data type specified.
+      }
+   }
+}
+\sstroutine{
+   CCG\_MO1x
+}{
+   Combines data lines using a mode
+}{
+   \sstdescription{
+      This routine accepts an array consisting a series of (vectorised)
+      lines of data.  The data values in the lines are then combined to
+      form an output mode line.  The output modal values are returned in
+      the array RESULT. The variances are propagated through the
+      combination process and returned in RESVAR.
+   }
+   \sstinvocation{
+      CALL CCG\_MO1x( NSIGMA, NITER, NPIX, NLINES, STACK, VARS, MINPIX,
+                     NMAT, COVEC, RESULT, RESVAR, WRK1, WRK2, POINT,
+                     USED, NCON, NBAD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NSIGMA = REAL (Given)
+      }{
+         The number of sigma at which to reject data values.
+      }
+      \sstsubsection{
+         NITER = INTEGER (Given)
+      }{
+         Maximum number of refining iterations.
+      }
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         VARS( NPIX, NLINES ) = ? (Given)
+      }{
+         The data variances.
+      }
+      \sstsubsection{
+         MINPIX = INTEGER (Given)
+      }{
+         The minimum number of pixels required to contribute to an
+         output pixel.
+      }
+      \sstsubsection{
+         NMAT = INTEGER (Given)
+      }{
+         Size of the first dimension of COVEC.
+      }
+      \sstsubsection{
+         COVEC( NMAT, NLINES ) = DOUBLE PRECISION (Given)
+      }{
+         The packed variance-covariance matrix of the order statistics
+         from a normal distribution of sizes up to NLINES, produced by
+         CCD1\_ORVAR.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data.
+      }
+      \sstsubsection{
+         RESVAR( NPIX ) = ? (Returned)
+      }{
+         The output variances.
+      }
+      \sstsubsection{
+         WRK1( NLINES ) = ? (Returned)
+      }{
+         Workspace for calculations.
+      }
+      \sstsubsection{
+         WRK2( NLINES ) = ? (Returned)
+      }{
+         Workspace for calculations.
+      }
+      \sstsubsection{
+         POINT( NLINES ) = INTEGER (Returned)
+      }{
+         Workspace to hold pointers to the original positions of the
+         data before extraction and conversion in to the WRK1 array.
+      }
+      \sstsubsection{
+         USED( NLINES ) = LOGICAL (Returned)
+      }{
+         Workspace used to indicate which values have been used in
+         estimating a resultant value.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels from each input line
+         to the output line.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output array created while
+         forming the statistics.  It excludes those bad values whose
+         corresponding values along the collapse axis are all bad.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for real and double-precision: replace {\tt "}x{\tt "}
+         in the routine name by D or R as appropriate.  The STACK, VARS,
+         RESULT, RESVAR, WRK1, and WRK2 arguments supplied to the routine
+         must have the data type specified.
+      }
+   }
+}
+\sstroutine{
+   CCG\_MOR3x
+}{
+   Combines data lines using a mode
+}{
+   \sstdescription{
+      This routine accepts an array consisting a series of (vectorised)
+      lines of data. The data values in the lines are then combined to
+      form an output mode line. The output modal values are returned in
+      the array RESULT.
+   }
+   \sstinvocation{
+      CALL CCG\_MOR3x( NSIGMA, NITER, NPIX, NLINES, STACK, VARS, MINPIX,
+                       RESULT, WRK1, WRK2, POINT, USED, NCON, NBAD,
+                       STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NSIGMA = REAL (Given)
+      }{
+         The number of sigma at which to reject data values.
+      }
+      \sstsubsection{
+         NITER = INTEGER (Given)
+      }{
+         Maximum number of refining iterations.
+      }
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         VARS( NLINES ) = ? (Given)
+      }{
+         The variance to to used for each line of data.
+      }
+      \sstsubsection{
+         MINPIX = INTEGER (Given)
+      }{
+         The minimum number of pixels required to contribute to an
+         output pixel.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data.
+      }
+      \sstsubsection{
+         WRK1( NLINES ) = ? (Returned)
+      }{
+         Workspace for calculations.
+      }
+      \sstsubsection{
+         WRK2( NLINES ) = ? (Returned)
+      }{
+         Workspace for calculations.
+      }
+      \sstsubsection{
+         POINT( NLINES ) = INTEGER (Returned)
+      }{
+         Workspace to hold pointers to the original positions of the
+         data before extraction and conversion in to the WRK1 array.
+      }
+      \sstsubsection{
+         USED( NLINES ) = LOGICAL (Returned)
+      }{
+         Workspace used to indicate which values have been used in
+         estimating a resultant value.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels from each input line
+         to the output line.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output array created while
+         forming the statistics.  It excludes those bad values whose
+         corresponding values along the collapse axis are all bad.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for real and double-precision: replace {\tt "}x{\tt "}
+         in the routine name by D or R as appropriate.  The STACK, VARS,
+         RESULT, WRK1, and WRK2 arguments supplied to the routine must
+         have the data type specified.
+      }
+   }
+}
+\sstroutine{
+   CCG\_MX1x
+}{
+   Combines data lines using the maximum value
+}{
+   \sstdescription{
+      This routine accepts an array consisting a series of (vectorised)
+      lines of data.  The data values in the lines are then collapsed
+      to the maximum value in each line.  The output maxima are
+      returned in the array RESULT.  Each output variance value is the
+      corresponding variance of the maximum data value, propagated from
+      the input variances given in array VARNCE and are returned in the
+      array RESVAR.  The vectorised pixel indices corresponding to the
+      maxima are also returned in POSIND.
+   }
+   \sstinvocation{
+      CALL CCG\_MX1x( BAD, NPIX, NLINES, STACK, VARNCE, RESULT, RESVAR,
+                     POSIND, WRK1, NCON, NBAD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         BAD = LOGICAL (Given)
+      }{
+         If true, there may be bad pixels present in the array.  If
+         false, it is safe not to check for bad values.
+      }
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         VARNCE( NPIX, NLINES ) = ? (Given)
+      }{
+         The data variances.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data.
+      }
+      \sstsubsection{
+         RESVAR( NPIX ) = ? (Returned)
+      }{
+         The output variances.
+      }
+      \sstsubsection{
+         POSIND( NPIX ) = INTEGER (Returned)
+      }{
+         The pixel indices of the maxima in each output pixel.
+      }
+      \sstsubsection{
+         WRK1( NLINES ) = ? (Returned)
+      }{
+         Workspace for calculations.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels from each input line
+         to the output line.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output RESULT array created while
+         forming the statistics.  It excludes those bad values whose
+         corresponding values along the collapse axis are all bad.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each numeric data type: replace {\tt "}x{\tt "} in
+         the routine name by D, R, I, W, UW, B or UB as appropriate.  The
+         STACK, VARNCE, RESULT, RESVAR, and WRK1 arguments supplied to the
+         routine must have the data type specified.
+      }
+   }
+}
+\sstroutine{
+   CCG\_MX3x
+}{
+   Combines data lines using the maximum value
+}{
+   \sstdescription{
+      This routine accepts an array consisting a series of (vectorised)
+      lines of data.  The data values in the lines are then collapsed
+      to the maximum value in each line.  The output maxima are
+      returned in the array RESULT.  The vectorised pixel indices
+      corresponding to the maxima are also returned in POSIND.
+   }
+   \sstinvocation{
+      CALL CCG\_MX3x( BAD, NPIX, NLINES, STACK, RESULT, POSIND, WRK1,
+                     NBAD, NCON, NBAD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         BAD = LOGICAL (Given)
+      }{
+         If true, there may be bad pixels present in the array.  If
+         false, it is safe not to check for bad values.
+      }
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data.
+      }
+      \sstsubsection{
+         POSIND( NPIX ) = INTEGER (Returned)
+      }{
+         The pixel indices of the maxima in each output pixel.
+      }
+      \sstsubsection{
+         WRK1( NLINES ) = ? (Returned)
+      }{
+         Workspace for calculations.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels from each input line
+         to the output line.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output array created while
+         forming the statistics.  It excludes those bad values whose
+         corresponding values along the collapse axis are all bad.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each numeric data type: replace {\tt "}x{\tt "} in
+         the routine name by D, R, I, W, UW, B or UB as appropriate.  The
+         STACK, RESULT, and WRK1 arguments supplied to the routine must
+         have the data type specified.
+      }
+   }
+}
+\sstroutine{
+   CCG\_RMS1x
+}{
+   Combines data lines using the root mean square
+}{
+   \sstdescription{
+      This routine accepts an array consisting a series of (vectorised)
+      lines of data.  The data values in each lines are then combined to
+      form the roor mean square of the values.  The output rot mean
+      squares are returned in the array RESULT.  The squared
+      standard error of the variance is returned in RESVAR.
+   }
+   \sstinvocation{
+      CALL CCG\_RMS1x( NPIX, NLINES, STACK, MINPIX, RESULT, RESVAR,
+                      NCON, NBAD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         MINPIX = INTEGER (Given)
+      }{
+         The minimum number of pixels required to contribute to an
+         output pixel.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data.
+      }
+      \sstsubsection{
+         RESVAR( NPIX ) = ? (Returned)
+      }{
+         The output variances.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels from each input line
+         to the output line.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output array created while
+         forming the statistics.  It excludes those bad values whose
+         corresponding values along the collapse axis are all bad.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This routine performs its work in double precision.
+
+         \sstitem
+         There is a routine for each numeric data type: replace {\tt "}x{\tt "} in
+         the routine name by D, R, I, W, UW, B or UB as appropriate.  The
+         STACK, RESULT, and RESVAR arguments supplied to the routine must
+         have the data type specified.
+      }
+   }
+}
+\sstroutine{
+   CCG\_RMS3x
+}{
+   Combines data lines using the root mean square
+}{
+   \sstdescription{
+      This routine accepts an array consisting a series of (vectorised)
+      lines of data.  The data values in each lines are then combined to
+      form the roor mean square of the values.  The output rot mean
+      squares are returned in the array RESULT.
+   }
+   \sstinvocation{
+      CALL CCG\_RMS3x( NPIX, NLINES, STACK, MINPIX, RESULT, RESVAR,
+                      NCON, NBAD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         MINPIX = INTEGER (Given)
+      }{
+         The minimum number of pixels required to contribute to an
+         output pixel.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels from each input line
+         to the output line.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output array created while
+         forming the statistics.  It excludes those bad values whose
+         corresponding values along the collapse axis are all bad.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This routine performs its work in double precision.
+
+         \sstitem
+         There is a routine for each numeric data type: replace {\tt "}x{\tt "} in
+         the routine name by D, R, I, W, UW, B or UB as appropriate.  The
+         STACK and RESULT arguments supplied to the routine must
+         have the data type specified.
+      }
+   }
+}
+\sstroutine{
+   CCG\_SCR1
+}{
+   Combines data lines using a sigma clipped mean
+}{
+   \sstdescription{
+      This routine accepts an array consisting a series of (vectorised)
+      lines of data.  The weighted mean and standard deviation of each
+      input column in STACK is then used to estimate the range of
+      values which represent the required sigma clipping.  Values
+      outside of this range are then rejected and  the resulting output
+      mean values are returned in the array RESULT.  The variances are
+      propagated through the combination process and returned in the
+      RESVAR array.
+   }
+   \sstinvocation{
+      CALL CCG\_SCR1( NSIGMA, NPIX, NLINES, STACK, VARS, MINPIX, NMAT,
+                     COVEC, RESULT, RESVAR, WRK1, WRK2, POINT, USED,
+                     NCON, NBAD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NSIGMA = REAL (Given)
+      }{
+         The number of sigma at which to reject data values.
+      }
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         VARS( NPIX, NLINES ) = ? (Given)
+      }{
+         The data variances.
+      }
+      \sstsubsection{
+         MINPIX = INTEGER (Given)
+      }{
+         The minimum number of pixels required to contribute to an
+         output pixel.
+      }
+      \sstsubsection{
+         NMAT = INTEGER (Given)
+      }{
+         Size of the first dimension of COVEC.
+      }
+      \sstsubsection{
+         COVEC( NMAT, NLINES ) = DOUBLE PRECISION (Given)
+      }{
+         The packed variance-covariance matrix of the order statistics
+         from a normal distribution of sizes up to NLINES, produced by
+         CCD1\_ORVAR.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data.
+      }
+      \sstsubsection{
+         RESVAR( NPIX ) = ? (Returned)
+      }{
+         The output variances.
+      }
+      \sstsubsection{
+         WRK1( NLINES ) = ? (Returned)
+      }{
+         Workspace for calculations.
+      }
+      \sstsubsection{
+         WRK2( NLINES ) = ? (Returned)
+      }{
+         Workspace for calculations.
+      }
+      \sstsubsection{
+         POINT( NLINES ) = INTEGER (Returned)
+      }{
+         Workspace to hold pointers to the original positions of the
+         data before extraction and conversion in to the WRK1 array.
+      }
+      \sstsubsection{
+         USED( NLINES ) = LOGICAL (Returned)
+      }{
+         Workspace used to indicate which values have been used in
+         estimating a resultant value.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels from each input line
+         to the output line.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output array created while
+         forming the statistics.  It excludes those bad values whose
+         corresponding values along the collapse axis are all bad.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for real and double-precision: replace {\tt "}x{\tt "}
+         in the routine name by D or R as appropriate.  The STACK, VARS,
+         RESULT, RESVAR, WRK1, and WRK2 arguments supplied to the routine
+         must have the data type specified.
+      }
+   }
+}
+\sstroutine{
+   CCG\_SC3x
+}{
+   Combines data lines using a sigma clipped mean
+}{
+   \sstdescription{
+      This routine accepts an array consisting a series of
+      (vectorised) lines of data.  The weighted mean and standard
+      deviation of each input column in STACK is then used to estimate
+      the range of values which represent the required sigma
+      clipping.  The standard deviation is derived from the population
+      of values at each position along the lines (cf. each image
+      pixel).  Values outside of this range are then rejected and the
+      resulting output mean values are returned in the array RESULT.
+
+      Note that clipping will not be used when only two or three
+      values are available (unless in the case of three values NSIGMA
+      is less than 1.0).
+   }
+   \sstinvocation{
+      CALL CCG\_SC3x( NSIGMA, NPIX, NLINES, STACK, VARS, MINPIX, RESULT,
+                     WRK1, WRK2, POINT, USED, NCON, NBAD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NSIGMA = REAL (Given)
+      }{
+         The number of sigma at which to reject data values.
+      }
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         VARS( NLINES ) = ? (Given)
+      }{
+         The variance to to used for each line of data. These are
+         used as inverse weights when forming the mean and do not
+         need to be real variances, as they are not propagated.
+      }
+      \sstsubsection{
+         MINPIX = INTEGER (Given)
+      }{
+         The minimum number of pixels required to contribute to an
+         output pixel.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data.
+      }
+      \sstsubsection{
+         WRK1( NLINES ) = ? (Returned)
+      }{
+         Workspace for calculations.
+      }
+      \sstsubsection{
+         WRK2( NLINES ) = ? (Returned)
+      }{
+         Workspace for calculations.
+      }
+      \sstsubsection{
+         POINT( NLINES ) = INTEGER (Returned)
+      }{
+         Workspace to hold pointers to the original positions of the
+         data before extraction and conversion in to the WRK1 array.
+      }
+      \sstsubsection{
+         USED( NLINES ) = LOGICAL (Returned)
+      }{
+         Workspace used to indicate which values have been used in
+         estimating a resultant value.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels from each input line
+         to the output line.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output array created while
+         forming the statistics.  It excludes those bad values whose
+         corresponding values along the collapse axis are all bad.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for real and double-precision: replace {\tt "}x{\tt "}
+         in the routine name by D or R as appropriate.  The STACK, VARS,
+         RESULT, WRK1, and WRK2 arguments supplied to the routine must
+         have the data type specified.
+      }
+   }
+}
+\sstroutine{
+   CCG\_SD1x
+}{
+   Combines data lines using an unweighted standard deviation
+}{
+   \sstdescription{
+      This routine accepts an array consisting a series of (vectorised)
+      lines of data.  The data values in each lines are then combined to
+      form an unweighted standard deviation.  The output standard
+      deviations are returned in the array RESULT.  The squared
+      standard error of the variance is returned in RESVAR.
+   }
+   \sstinvocation{
+      CALL CCG\_SD1x( NPIX, NLINES, STACK, MINPIX, RESULT, RESVAR,
+                     NCON, NBAD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         MINPIX = INTEGER (Given)
+      }{
+         The minimum number of pixels required to contribute to an
+         output pixel.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data.
+      }
+      \sstsubsection{
+         RESVAR( NPIX ) = ? (Returned)
+      }{
+         The output variances.
+         to the output line.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels from each input line
+         to the output line.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output array created while
+         forming the statistics.  It excludes those bad values whose
+         corresponding values along the collapse axis are all bad.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each numeric data type: replace {\tt "}x{\tt "} in
+         the routine name by D, R, I, W, UW, B or UB as appropriate.  The
+         STACK, RESULT, and RESVAR arguments supplied to the routine must
+         have the data type specified.
+
+         \sstitem
+         This routine performs its work in double precision.
+      }
+   }
+}
+\sstroutine{
+   CCG\_SD3x
+}{
+   Combines data lines using an unweighted standard deviation
+}{
+   \sstdescription{
+      This routine accepts an array consisting a series of (vectorised)
+      lines of data.  The data values in each lines are then combined to
+      form an unweighted standard deviation.  The output standard
+      deviations are returned in the array RESULT.
+   }
+   \sstinvocation{
+      CALL CCG\_SD3x( NPIX, NLINES, STACK, MINPIX, RESULT, NCON,
+                     NBAD, NCON, NBAD, NCON, NBAD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         MINPIX = INTEGER (Given)
+      }{
+         The minimum number of pixels required to contribute to an
+         output pixel.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data.
+         to the output line.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels from each input line
+         to the output line.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output array created while
+         forming the statistics.  It excludes those bad values whose
+         corresponding values along the collapse axis are all bad.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This routine performs its work in double precision.
+
+         \sstitem
+         There is a routine for each numeric data type: replace {\tt "}x{\tt "} in
+         the routine name by D, R, I, W, UW, B or UB as appropriate.  The
+         STACK and RESULT arguments supplied to the routine must have the
+         data type specified.
+      }
+   }
+}
+\sstroutine{
+   CCG\_SM1x
+}{
+   Combines data lines using a sigma clipped median
+}{
+   \sstdescription{
+      This routine accepts an array consisting a series of (vectorised)
+      lines of data.  The weighted mean and standard deviation of each
+      input column in STACK is then used to estimate the range of
+      values which represent the required sigma clipping.  Values
+      outside of this range are then rejected and then the median
+      of the remaining values is returned in the array RESULT.  The
+      variances are propagated through the combination processand
+      returned in the RESVAR array.
+   }
+   \sstinvocation{
+      CALL CCG\_SM1x( NSIGMA, NPIX, NLINES, STACK, VARS, MINPIX, COVEC,
+                     NMAT, RESULT, RESVAR, WRK1, WRK2, POINT, USED,
+                     NCON, NBAD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NSIGMA = REAL (Given)
+      }{
+         The number of sigma at which to reject data values.
+      }
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         VARS( NPIX, NLINES ) = ? (Given)
+      }{
+         The data variances.
+      }
+      \sstsubsection{
+         MINPIX = INTEGER (Given)
+      }{
+         The minimum number of pixels required to contribute to an
+         output pixel.
+      }
+      \sstsubsection{
+         NMAT = INTEGER (Given)
+      }{
+         Size of the first dimension of COVEC.
+      }
+      \sstsubsection{
+         COVEC( NMAT, NLINES ) = DOUBLE PRECISION (Given)
+      }{
+         The packed variance-covariance matrix of the order statistics
+         from a normal distribution of sizes up to NLINES, produced by
+         CCD1\_ORVAR.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data.
+      }
+      \sstsubsection{
+         RESVAR( NPIX ) = ? (Returned)
+      }{
+         The output variances.
+      }
+      \sstsubsection{
+         WRK1( NLINES ) = ? (Returned)
+      }{
+         Workspace for calculations.
+      }
+      \sstsubsection{
+         WRK2( NLINES ) = ? (Returned)
+      }{
+         Workspace for calculations.
+      }
+      \sstsubsection{
+         POINT( NLINES ) = INTEGER (Returned)
+      }{
+         Workspace to hold pointers to the original positions of the
+         data before extraction and conversion in to the WRK1 array.
+      }
+      \sstsubsection{
+         USED( NLINES ) = LOGICAL (Returned)
+      }{
+         Workspace used to indicate which values have been used in
+         estimating a resultant value.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Given and Returned)
+      }{
+         The actual number of contributing pixels.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output array created while
+         forming the statistics.  It excludes those bad values whose
+         corresponding values along the collapse axis are all bad.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for real and double-precision: replace {\tt "}x{\tt "}
+         in the routine name by D or R as appropriate.  The STACK, VARS,
+         RESULT, RESVAR, WRK1, and WRK2 arguments supplied to the routine
+         must have the data type specified.
+      }
+   }
+}
+\sstroutine{
+   CCG\_SM3x
+}{
+   Combines data lines using a sigma clipped median
+}{
+   \sstdescription{
+      This routine accepts an array consisting a series of
+      (vectorised) lines of data.  The weighted mean and standard
+      deviation of each input column in STACK is then used to estimate
+      the range of values which represent the required sigma
+      clipping.  The standard deviation is derived from the population
+      of values at each position along the lines (cf. each image
+      pixel).  Values outside of this range are then rejected and the
+      resulting output mean values are returned in the array RESULT.
+
+      Note that clipping will not be used when only two or three
+      values are available (unless in the case of 3 values NSIGMA
+      is less than 1.0).
+   }
+   \sstinvocation{
+      CALL CCG\_SM3x( NSIGMA, NPIX, NLINES, STACK, VARS, MINPIX,
+                      RESULT, WRK1, WRK2, POINT, USED, NCON, NBAD,
+                      STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NSIGMA = REAL (Given)
+      }{
+         The number of sigma at which to reject data values.
+      }
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         VARS( NLINES ) = ? (Given)
+      }{
+         The variance to to used for each line of data. These are
+         used as inverse weights when forming the mean and do not
+         need to be real variances, as they are not propagated.
+      }
+      \sstsubsection{
+         MINPIX = INTEGER (Given)
+      }{
+         The minimum number of pixels required to contribute to an
+         output pixel.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data.
+      }
+      \sstsubsection{
+         WRK1( NLINES ) = ? (Returned)
+      }{
+         Workspace for calculations.
+      }
+      \sstsubsection{
+         WRK2( NLINES ) = ? (Returned)
+      }{
+         Workspace for calculations.
+      }
+      \sstsubsection{
+         POINT( NLINES ) = INTEGER (Returned)
+      }{
+         Workspace to hold pointers to the original positions of the
+         data before extraction and conversion in to the WRK1 array.
+      }
+      \sstsubsection{
+         USED( NLINES ) = LOGICAL (Returned)
+      }{
+         Workspace used to indicate which values have been used in
+         estimating a resultant value.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels from each input line
+         to the output line.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output array created while
+         forming the statistics.  It excludes those bad values whose
+         corresponding values along the collapse axis are all bad.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for real and double-precision: replace {\tt "}x{\tt "}
+         in the routine name by D or R as appropriate.  The STACK, VARS,
+         RESULT, WRK1, and WRK2 arguments supplied to the routine must
+         have the data type specified.
+      }
+   }
+}
+\sstroutine{
+   CCG\_SUM1x
+}{
+   Combines data lines using the sum of values
+}{
+   \sstdescription{
+      This routine accepts an array consisting of a series of
+      (vectorised) lines of data.  The data values in the lines are then
+      summed.  The output sums are returned in the array RESULT.  The
+      output variances are estimated from the VARS values and are
+      returned in RESVAR.
+   }
+   \sstinvocation{
+      CALL CCG\_SUM1x( NPIX, NLINES, STACK, VARS, MINPIX,
+                       RESULT, RESVAR, NCON, NBAD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         VARS( NPIX, NLINES ) = ? (Given)
+      }{
+         The data variances.
+      }
+      \sstsubsection{
+         MINPIX = INTEGER (Given)
+      }{
+         The minimum number of pixels required to contribute to an
+         output pixel.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data.
+      }
+      \sstsubsection{
+         RESVAR( NPIX ) = ? (Returned)
+      }{
+         The output variances.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels from each input line
+         to the output line.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output RESULT array created while
+         forming the statistics.  It excludes those bad values whose
+         corresponding values along the collapse axis are all bad.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each numeric data type: replace {\tt "}x{\tt "} in
+         the routine name by D, R, I, W, UW, B or UB as appropriate.  The
+         STACK, VARS, RESULT, and RESVAR arguments supplied to the
+         routine must have the data type specified.  It is not wise to
+         choose an integer type as the chances of overflow are high.
+      }
+   }
+}
+\sstroutine{
+   CCG\_SUM3x
+}{
+   Combines data lines using the sum of values
+}{
+   \sstdescription{
+      This routine accepts an array consisting of a series of
+      (vectorised) lines of data.  The data values in the lines are then
+      summed.  The output sums are returned in the array RESULT.
+   }
+   \sstinvocation{
+      CALL CCG\_SUM3x( NPIX, NLINES, STACK, MINPIX,
+                      RESULT, NCON, NBAD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         MINPIX = INTEGER (Given)
+      }{
+         The minimum number of pixels required to contribute to an
+         output pixel.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels from each input line
+         to the output line.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output array created while
+         forming the statistics.  It excludes those bad values whose
+         corresponding values along the collapse axis are all bad.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each numeric data type: replace {\tt "}x{\tt "} in
+         the routine name by D, R, I, W, UW, B or UB as appropriate.  The
+         STACK and RESULT arguments supplied to the routine must have the
+         data type specified.  It is not wise to choose an integer type
+         as the chances of overflow are high.
+      }
+   }
+}
+\sstroutine{
+   CCG\_TC1x
+}{
+   Combines data lines using a threshold clipped mean
+}{
+   \sstdescription{
+      This routine accepts an array consisting a series of (vectorised)
+      lines of data. All values outside of the range VMIN to VMAX are
+      rejected before a estimate of the (weighted) mean is made. The
+      output mean values are returned in the array RESULT.  The
+      variances are propagation through the combination process and
+      returned in the RESVAR array.
+   }
+   \sstinvocation{
+      CALL CCG\_TC1x( VMIN, VMAX, NPIX, NLINES, STACK, VARS, MINPIX,
+                     COVEC, NMAT, RESULT, RESVAR, WRK1, WRK2, POINT,
+                     USED, NCON, NBAD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         VMIN = ? (Given)
+      }{
+         Minimum allowed value.
+      }
+      \sstsubsection{
+         VMAX = ? (Given)
+      }{
+         Maximum allowed value.
+      }
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         VARS( NPIX, NLINES ) = ? (Given)
+      }{
+         The data variances.
+      }
+      \sstsubsection{
+         MINPIX = INTEGER (Given)
+      }{
+         The minimum number of pixels required to contribute to an
+         output pixel.
+      }
+      \sstsubsection{
+         NMAT = INTEGER (Given)
+      }{
+         Size of the first dimension of COVEC.
+      }
+      \sstsubsection{
+         COVEC( NMAT, NLINES ) = DOUBLE PRECISION (Given)
+      }{
+         The packed variance-covariance matrix of the order statistics
+         from a normal distribution of sizes up to NLINES, produced by
+         CCD1\_ORVAR.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data.
+      }
+      \sstsubsection{
+         RESVAR( NPIX ) = ? (Returned)
+      }{
+         The output variance.
+      }
+      \sstsubsection{
+         WRK1( NLINES ) = ? (Returned)
+      }{
+         Workspace for calculations.
+      }
+      \sstsubsection{
+         WRK2( NLINES ) = ? (Returned)
+      }{
+         Workspace for calculations.
+      }
+      \sstsubsection{
+         POINT( NLINES ) = INTEGER (Returned)
+      }{
+         Workspace to hold pointers to the original positions of the
+         data before extraction and conversion in to the WRK1 array.
+      }
+      \sstsubsection{
+         USED( NLINES ) = LOGICAL (Returned)
+      }{
+         Workspace used to indicate which values have been used in
+         estimating a resultant value.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output array created while
+         forming the statistics.  It excludes those bad values whose
+         corresponding values along the collapse axis are all bad.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for real and double-precision: replace {\tt "}x{\tt "}
+         in the routine name by D or R as appropriate.  The VMIN, VMAX,
+         STACK, VARS, RESULT, RESVAR, WRK1, and WRK2 arguments supplied to
+         the routine must have the data type specified.
+      }
+   }
+}
+\sstroutine{
+   CCG\_TCR3x
+}{
+   Combines data lines using a threshold clipped mean
+}{
+   \sstdescription{
+      This routine accepts an array consisting a series of (vectorised)
+      lines of data.  All values outside of the range VMIN to VMAX are
+      rejected before a estimate of the (weighted) mean is made.  The
+      output mean values are returned in the array RESULT.
+   }
+   \sstinvocation{
+      CALL CCG\_TCR3x( VMIN, VMAX, NPIX, NLINES, STACK, VARS, MINPIX,
+                      RESULT, WRK1, WRK2, POINT, USED, NCON, NBAD,
+                      STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         VMIN = ? (Given)
+      }{
+         Minimum allowed value.
+      }
+      \sstsubsection{
+         VMAX = ? (Given)
+      }{
+         Maximum allowed value.
+      }
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         VARS( NLINES ) = ? (Given)
+      }{
+         The variance to to used for each line of data.
+      }
+      \sstsubsection{
+         MINPIX = INTEGER (Given)
+      }{
+         The minimum number of pixels required to contribute to an
+         output pixel.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data.
+      }
+      \sstsubsection{
+         WRK1( NLINES ) = ? (Returned)
+      }{
+         Workspace for calculations.
+      }
+      \sstsubsection{
+         WRK2( NLINES ) = ? (Returned)
+      }{
+         Workspace for calculations.
+      }
+      \sstsubsection{
+         POINT( NLINES ) = INTEGER (Returned)
+      }{
+         Workspace to hold pointers to the original positions of the
+         data before extraction and conversion in to the WRK1 array.
+      }
+      \sstsubsection{
+         USED( NLINES ) = LOGICAL (Returned)
+      }{
+         Workspace used to indicate which values have been used in
+         estimating a resultant value.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels from each input line
+         to the output line.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for real and double-precision: replace {\tt "}x{\tt "}
+         in the routine name by D or R as appropriate.  The VMIN, VMAX,
+         STACK, VARS, RESULT, WRK1, and WRK2 arguments supplied to the
+         routine must have the data type specified.
+      }
+   }
+}
+\sstroutine{
+   CCG\_TM1x
+}{
+   Combines data lines using a trimmed mean
+}{
+   \sstdescription{
+      This routine accepts an array consisting a series of (vectorised)
+      lines of data.  The data values in the lines are then combined to
+      form an alpha trimmed mean line.  The output means are returned in
+      the array RESULT.  The variances are propagated through the
+      combination process and returned in the RESVAR array.
+   }
+   \sstinvocation{
+      CALL CCG\_TM1x( ALPHA, NPIX, NLINES, STACK, VARS, MINPIX, NMAT,
+                     COVEC, RESULT, RESVAR, WRK1, POINT, USED,
+                     NCON, NBAD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         ALPHA = REAL (Given)
+      }{
+         The fraction of data to trim from upper and lower orders.
+         It must be greater than 0.0 and less than 0.5.
+      }
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         VARS( NPIX, NLINES ) = ? (Given)
+      }{
+         The data variances.
+      }
+      \sstsubsection{
+         MINPIX = INTEGER (Given)
+      }{
+         The minimum number of pixels required to contribute to an
+         output pixel.
+      }
+      \sstsubsection{
+         NMAT = INTEGER (Given)
+      }{
+         Size of the first dimension of COVEC.
+      }
+      \sstsubsection{
+         COVEC( NMAT, NLINES ) = DOUBLE PRECISION (Given)
+      }{
+         The packed variance-covariance matrix of the order statistics
+         from a normal distribution of sizes up to NLINES, produced by
+         CCD1\_ORVAR.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data.
+      }
+      \sstsubsection{
+         RESVAR( NPIX ) = ? (Returned)
+      }{
+         The output variance.
+      }
+      \sstsubsection{
+         WRK1( NLINES ) = ? (Returned)
+      }{
+         Workspace for calculations.
+      }
+      \sstsubsection{
+         POINT( NLINES ) = INTEGER (Returned)
+      }{
+         Workspace to hold pointers to the original positions of the
+         data before extraction and conversion in to the WRK1 array.
+      }
+      \sstsubsection{
+         USED( NLINES ) = LOGICAL (Returned)
+      }{
+         Workspace used to indicate which values have been used in
+         estimating a resultant value.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels from each input line
+         to the output line.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output array created while
+         forming the statistics.  It excludes those bad values whose
+         corresponding values along the collapse axis are all bad.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for real and double-precision: replace {\tt "}x{\tt "}
+         in the routine name by D or R as appropriate.  The STACK, VARS,
+         RESULT, RESVAR, WRK1, and WRK2 arguments supplied to the routine
+         must have the data type specified.
+      }
+   }
+}
+\sstroutine{
+   CCG\_TM3x
+}{
+   Combines data lines using a trimmed mean
+}{
+   \sstdescription{
+      This routine accepts an array consisting a series of (vectorised)
+      lines of data.  The data values in the lines are then combined to
+      form an alpha trimmed mean line.  The output means are returned in
+      the array RESULT.
+   }
+   \sstinvocation{
+      CALL CCG\_TM3x( ALPHA, NPIX, NLINES, STACK, MINPIX, RESULT,
+                     WRK1, POINT, USED, NCON, NBAD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         ALPHA = REAL (Given)
+      }{
+         The fraction of data to trim from upper and lower orders.
+         It must be greater than 0.0 and less 0.5.
+      }
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         MINPIX = INTEGER (Given)
+      }{
+         The minimum number of pixels required to contribute to an
+         output pixel.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data.
+      }
+      \sstsubsection{
+         WRK1( NLINES ) = ? (Returned)
+      }{
+         Workspace for calculations.
+      }
+      \sstsubsection{
+         POINT( NLINES ) = INTEGER (Returned)
+      }{
+         Workspace to hold pointers to the original positions of the
+         data before extraction and conversion in to the WRK1 array.
+      }
+      \sstsubsection{
+         USED( NLINES ) = LOGICAL (Returned)
+      }{
+         Workspace used to indicate which values have been used in
+         estimating a resultant value.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output array.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for real and double-precision: replace {\tt "}x{\tt "}
+         in the routine name by D or R as appropriate.  The STACK, RESULT,
+         and WRK1 arguments supplied to the routine must have the data type
+         specified.
+      }
+   }
+}
+\sstroutine{
+   CCG\_TMN2x
+}{
+   Forms the n-trimmed mean of the given set of ordered data
+}{
+   \sstdescription{
+      The routine forms the trimmed mean of the given dataset. The
+      IGNORE upper and lower ordered values are removed from
+      consideration.  Then the remaining values are added and averaged.
+      The SVAR value is a (given) best estimate of the original
+      un-ordered population variance. The variance of the output value
+      is formed assuming that the original dataset was normal in
+      distribution, and is now fairly represented by the ordered
+      statistics variances-covariances supplied in packed form in
+      COVAR. The values not rejected are indicated by setting the flags
+      in array used.
+   }
+   \sstinvocation{
+      CALL CCG\_TMN2x( IGNORE, ORDDAT, ORDVAR, EL, USED, COVAR, TMEAN,
+                      TVAR, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IGNORE = INTEGER (Given)
+      }{
+         The number of values to ignore from the upper and lower orders.
+      }
+      \sstsubsection{
+         EL = INTEGER (Given)
+      }{
+         The number of entries in ORDDAT.
+      }
+      \sstsubsection{
+         ORDDAT( EL ) = ? (Given)
+      }{
+         The set of ordered data for which a trimmed mean is required.
+      }
+      \sstsubsection{
+         SVAR = DOUBLE PRECISION (Given)
+      }{
+         The variance of the unordered sample now ordered in ORDDAT.
+      }
+      \sstsubsection{
+         USED( EL ) = LOGICAL (Returned)
+      }{
+         Flags showing which values have not been rejected.
+      }
+      \sstsubsection{
+         COVAR( $*$ ) = DOUBLE PRECISION (Given)
+      }{
+         The packed variance-covariance matrix of the order statistics
+         from a normal distribution of size EL.
+      }
+      \sstsubsection{
+         TMEAN = DOUBLE PRECISION (Returned)
+      }{
+         The trimmed mean.
+      }
+      \sstsubsection{
+         TVAR = DOUBLE PRECISION (Returned)
+      }{
+         A variance estimate of the trimmed mean.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for real and double-precision: replace {\tt "}x{\tt "}
+         in the routine name by D or R as appropriate.  The ORDDAT
+         argument supplied to the routine must have the data type
+         specified.
+      }
+   }
+   \sstdiytopic{
+      Prior Requirements
+   }{
+      \sstitemlist{
+
+         \sstitem
+         The variance-covariance array must have been generated in a
+         fashion similar to that of ORDVAR.
+      }
+   }
+}
+\sstroutine{
+   CCG\_TMN3x
+}{
+   Forms the n-trimmed mean of the given set of ordered data.
+   This variant does not process variances
+}{
+   \sstdescription{
+      The routine forms the trimmed mean of the given dataset.  The
+      IGNORE upper and lower ordered values are removed from
+      consideration.  Then the remaining values are added and averaged.
+      The values not rejected are indicated by setting the flags
+      in array used.
+   }
+   \sstinvocation{
+      CALL CCG1\_TMN3x( IGNORE, EL, ORDDAT, USED, TMEAN, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         EL = INTEGER (Given)
+      }{
+         The number of entries in ORDDAT.
+      }
+      \sstsubsection{
+         IGNORE = INTEGER (Given)
+      }{
+         The number of values to ignore from the upper and lower orders.
+      }
+      \sstsubsection{
+         ORDDAT( EL ) = ? (Given)
+      }{
+         The set of ordered data for which a trimmed mean is required.
+      }
+      \sstsubsection{
+         USED( EL ) = LOGICAL (Returned)
+      }{
+         Flags showing which values have not been rejected.
+      }
+      \sstsubsection{
+         TMEAN = DOUBLE PRECISION (Returned)
+      }{
+         The trimmed mean.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for real and double-precision: replace {\tt "}x{\tt "}
+         in the routine name by D or R as appropriate.  The ORDDAT
+         argument supplied to the routine must have the data type
+         specified.
+      }
+   }
+}
+\sstroutine{
+   CCG\_TRM2x
+}{
+   Forms the trimmed mean of the given set of ordered data,
+   returning flags showing which values are used
+}{
+   \sstdescription{
+      The routine forms the trimmed mean of the given dataset. The
+      alpha (as a fraction) upper and lower ordered values are removed
+      from consideration.  Then the remaining values are added and
+      averaged. The SVAR value is a (given) best estimate of the
+      original un-ordered population variance. The variance of the
+      output value is formed assuming that the original dataset was
+      normal in distribution, and is now fairly represented by the
+      ordered statistics variances-covariances supplied in packed form
+      in COVAR. The elements of the input array which actually
+      contribute to the final value are flagged in the used array.
+   }
+   \sstinvocation{
+      CALL CCG\_TRM2x( ALPHA, EL, ORDDAT, ORDVAR, USED, COVAR,
+                      TMEAN, TVAR, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         ALPHA = REAL (Given)
+      }{
+         The fraction of data to trim from upper and lower orders.
+         (MUST BE GREATER THAN 0.0 AND LESS 0.5)
+      }
+      \sstsubsection{
+         EL = INTEGER (Given)
+      }{
+         The number of entries in ORDDAT.
+      }
+      \sstsubsection{
+         ORDDAT( EL ) = ? (Given)
+      }{
+         The set of ordered data for which a trimmed mean is required.
+      }
+      \sstsubsection{
+         SVAR = DOUBLE PRECISION (Given)
+      }{
+         The variance of the unordered sample now ordered in ORDDAT.
+      }
+      \sstsubsection{
+         USED( EL ) = LOGICAL (Returned)
+      }{
+         If the corresponding value in ORDDAT contributes to the final
+         value then this is set true.
+      }
+      \sstsubsection{
+         COVAR( $*$ ) = DOUBLE PRECISION (Given)
+      }{
+         The packed variance-covariance matrix of the order statistics
+         from a normal distribution of size EL.
+      }
+      \sstsubsection{
+         TMEAN = DOUBLE PRECISION (Returned)
+      }{
+         The trimmed mean.
+      }
+      \sstsubsection{
+         TVAR = DOUBLE PRECISION (Returned)
+      }{
+         A variance estimate of the trimmed mean.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstdiytopic{
+      Prior Requirements
+   }{
+      \sstitemlist{
+
+         \sstitem
+         The variance-covariance array must have been generated in a
+         fashion similar to that of ORDVAR.
+      }
+   }
+}
+\sstroutine{
+   CCG\_TRM3x
+}{
+   To form the trimmed mean of the given set of ordered data,
+   returning flags showing which values are used. This variant does
+   not process variances
+}{
+   \sstdescription{
+      The routine forms the trimmed mean of the given dataset. The
+      alpha (as a fraction) upper and lower ordered values are removed
+      from consideration.  Then the remaining values are added and
+      averaged. The elements of the input array which actually
+      contribute to the final value are flagged in the used array.
+   }
+   \sstinvocation{
+      CALL CCG\_TRM3x( ALPHA, EL, ORDDAT, USED, TMEAN, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         ALPHA = REAL (Given)
+      }{
+         The fraction of data to trim from upper and lower orders.
+         It must be greater than 0.0 and less than 0.5.
+      }
+      \sstsubsection{
+         EL = INTEGER (Given)
+      }{
+         The number of entries in ORDDAT.
+      }
+      \sstsubsection{
+         ORDDAT( EL ) = ? (Given)
+      }{
+         The set of ordered data for which a trimmed mean is required.
+      }
+      \sstsubsection{
+         USED( EL ) = LOGICAL (Returned)
+      }{
+         If the corresponding value in ORDDAT contributes to the final
+         value then this is set true.
+      }
+      \sstsubsection{
+         TMEAN = DOUBLE PRECISION (Returned)
+      }{
+         The trimmed mean.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   CCG\_UM1x
+}{
+   Combines data lines using an unweighted mean
+}{
+   \sstdescription{
+      This routine accepts an array consisting of a series of
+      (vectorised) lines of data.  The data values in the lines are then
+      combined to form an unweighted mean.  The output means
+      are returned in the array RESULT.  The output variances are
+      estimated from the VARS values and are returned in RESVAR.
+   }
+   \sstinvocation{
+      CALL CCG\_UM1x( NPIX, NLINES, STACK, VARS, MINPIX,
+                     RESULT, RESVAR, NCON, NBAD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         VARS( NPIX, NLINES ) = ? (Given)
+      }{
+         The data variances.
+      }
+      \sstsubsection{
+         MINPIX = INTEGER (Given)
+      }{
+         The minimum number of pixels required to contribute to an
+         output pixel or variance.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data.
+      }
+      \sstsubsection{
+         RESVAR( NPIX ) = ? (Returned)
+      }{
+         The output variances.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels from each input line
+         to the output line.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output array created while
+         forming the statistics.  It excludes those bad values whose
+         corresponding values along the collapse axis are all bad.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for real and double-precision: replace {\tt "}x{\tt "}
+         in the routine name by D or R as appropriate.  The STACK, VARS,
+         RESULT, and RESVAR arguments supplied to the routine must have the
+         data type specified.
+
+         \sstitem
+         This routine performs its work in double precision.
+      }
+   }
+}
+\sstroutine{
+   CCG\_UM3x
+}{
+   Combines data lines using an unweighted mean
+}{
+   \sstdescription{
+      This routine accepts an array consisting a series of (vectorised)
+      lines of data.  The data values in the lines are then combined to
+      form an unweighted mean.  The output means are returned in the
+      array RESULT.
+   }
+   \sstinvocation{
+      CALL CCG\_UM3x( NPIX, NLINES, STACK, MINPIX, RESULT, NCON,
+                     NBAD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         MINPIX = INTEGER (Given)
+      }{
+         The minimum number of pixels required to contribute to an
+         output pixel.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data.
+         to the output line.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels from each input line
+         to the output line.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output array created while
+         forming the statistics.  It excludes those bad values whose
+         corresponding values along the collapse axis are all bad.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for real and double-precision: replace {\tt "}x{\tt "}
+         in the routine name by D or R as appropriate.  The STACK, VARS,
+         and RESULT arguments supplied to the routine must have the data
+         type specified.
+
+         \sstitem
+         This routine performs its work in double precision.
+      }
+   }
+}
+\sstroutine{
+   CCG\_WCWIx
+}{
+   Creates a channel-width array from the channel co-ordinates
+}{
+   \sstdescription{
+      This routine accepts an array consisting of a series of
+      (vectorised) lines of co-ordinates.  For each pixel the
+      subroutine forms a channel width by halving the difference
+      of neighbouring co-ordinates along a line of data, i.e.
+      it assumes that therre are no gaps.  The widths for first and
+      last pixels are the difference with its interior neighbour.
+   }
+   \sstinvocation{
+      CALL CCG\_WCWIx( NPIX, NLINES, COORDS, WIDTHS, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         COORDS( NPIX, NLINES ) = ? (Given)
+      }{
+         The world co-ordinates.
+      }
+      \sstsubsection{
+         WIDTHS( NPIX, NLINES ) = ? (Given)
+      }{
+         The chanel widths.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each numeric data type: replace {\tt "}x{\tt "} in
+         the routine name by D or R as appropriate.  The COORDS and WIDTHS
+         arguments supplied to the routine must have the data type
+         specified.
+      }
+   }
+}
+\sstroutine{
+   CCG\_WMD2x
+}{
+   Estimates the mean of a number of normally distributed data
+   values, some of which may be corrupt
+}{
+   \sstdescription{
+      Not available. Remember to look in EDRS.
+   }
+   \sstinvocation{
+      CALL CCG\_WMD2x( EL, X, W, PBAD, NITER, TOLL, NSIGMA, XMODE,
+                      SIGMA, USED, NUSED, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         EL = INTEGER (Given)
+      }{
+         The number of data values.
+      }
+      \sstsubsection{
+         X( EL ) = ? (Given)
+      }{
+         An array of data values.
+      }
+      \sstsubsection{
+         W( EL ) = ? (Given)
+      }{
+         An array of data weights for each data value.  The weights are
+         inversely proportional to the square of the relative errors on
+         each data point.
+      }
+      \sstsubsection{
+         PBAD = REAL (Given)
+      }{
+         An estimate of the probability that any one data point will be
+         corrupt.  (This value is not critical.)
+      }
+      \sstsubsection{
+         NITER = INTEGER (Given)
+      }{
+         The maximum number of iterations required.
+      }
+      \sstsubsection{
+         TOLL = REAL (Given)
+      }{
+         The absolute accuracy required in the estimate of the
+         mean.  Iterations cease when two successive estimates
+         differ by less than this amount.
+      }
+      \sstsubsection{
+         NSIGMA = REAL (Given)
+      }{
+         The sigma level to reject data values at.
+      }
+      \sstsubsection{
+         XMODE = DOUBLE PRECISION (Returned)
+      }{
+         The estimate of the uncorrupted mean.
+      }
+      \sstsubsection{
+         SIGMA = DOUBLE PRECISION (Returned)
+      }{
+         An estimate of the uncorrupted normalised standard deviation of
+         the data points.  An estimate of the standard deviation of any
+         one point is:  SIGMA / SQRT( W ) where W is its weight.
+      }
+      \sstsubsection{
+         USED( EL ) = LOGICAL (Returned)
+      }{
+         If a value is not rejected then its corresponding used element
+         will be set true.
+      }
+      \sstsubsection{
+         NUSED = INTEGER (Returned)
+      }{
+         Number of the input data values which are actually used.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for real and double-precision: replace {\tt "}x{\tt "}
+         in the routine name by D or R as appropriate.  The X and W
+         arguments supplied to the routine must have the data type
+         specified.
+      }
+   }
+}
+\sstroutine{
+   CCG\_WMD3x
+}{
+   Estimates the mean of a number of normally distributed data
+   values, some of which may be corrupt
+}{
+   \sstdescription{
+      This routine is based on maximising the likelyhood function for
+      a statistical model in which any of the data points has a
+      constant probability of being corrupt. A weighted mean is formed
+      with weights chosen according to the deviation of each data
+      point from the current estimate of the mean. The weights are
+      derived from the relative probability of being invalid or
+      corrupt. A sequence of these iterations converges to a
+      stationary point in the likelyhood function. The routine
+      approximates to a k-sigma clipping algorithm for a large number
+      of points and to a mode estimating algorithm for fewer data
+      points.  Different weighting for each data point are allowed to
+      accomodate known different intrinsic errors in the input data.
+
+      The variance of the input population is determined from the
+      whole population and a new variance is computed, after the
+      rejection passes, using the order statistics of a trimmed sample
+      with the derived weights and initial numbers. Thus the input data
+      should be ordered (either increasing or decreasing) so that means
+      which are outliers (due to unstabilities from overly small sigma
+      clipping) can have their variance properly estimated.
+   }
+   \sstinvocation{
+      CALL CCG\_WMD3x( EL, ORDDAT, WEIGHT, PBAD, NITER, TOLL, NSIGMA,
+                      COVEC, XMODE, FVAR, USED, NUSED, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         EL = INTEGER (Given)
+      }{
+         The number of data values.
+      }
+      \sstsubsection{
+         ORDDAT( EL ) = REAL (Given)
+      }{
+         An ordered (increasing or decreasing) array of data values.
+      }
+      \sstsubsection{
+         WEIGHT( EL ) = REAL (Given)
+      }{
+         An array of data weights for each data value.  The weights
+         should be the inverse variance of each data point. They are
+         used to directly estimate the input population variance.
+      }
+      \sstsubsection{
+         PBAD = REAL (Given)
+      }{
+         An estimate of the probability that any one data point will be
+         corrupt.  (This value is not critical.)
+      }
+      \sstsubsection{
+         NITER = INTEGER (Given)
+      }{
+         The maximum number of iterations required.
+      }
+      \sstsubsection{
+         TOLL = REAL (Given)
+      }{
+         The absolute accuracy required in the estimate of the
+         mean.  Iterations cease when two successive estimates
+         differ by less than this amount.
+      }
+      \sstsubsection{
+         NSIGMA = REAL (Given)
+      }{
+         The sigma level to reject data values at.
+      }
+      \sstsubsection{
+         COVEC( $*$ ) = DOUBLE PRECISION (Given)
+      }{
+         The packed variance-covariance matrix of the order statistics
+         from a normal distribution of size EL, produced by
+         CCD1\_ORVAR.
+      }
+      \sstsubsection{
+         XMODE = DOUBLE PRECISION (Returned)
+      }{
+         The estimate of the uncorrupted mean.
+      }
+      \sstsubsection{
+         FVAR = DOUBLE PRECISION (Returned)
+      }{
+         An estimate of the uncorrupted variance of the data points.
+      }
+      \sstsubsection{
+         USED( EL ) = LOGICAL (Returned)
+      }{
+         If a value is not rejected then its corresponding used element
+         will be set true.
+      }
+      \sstsubsection{
+         NUSED = INTEGER (Returned)
+      }{
+         Number of the input data values which are actually used when
+         forming the estimate of the mean. This value will be zero or
+         less if all values are rejected.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for real and double-precision: replace {\tt "}x{\tt "}
+         in the routine name by D or R as appropriate.  The X and W
+         arguments supplied to the routine must have the data type
+         specified.
+
+         \sstitem
+          The input data must be sorted.  The output variances are only
+          accurate if the input data values have a normal distribution.
+      }
+   }
+}
+\sstroutine{
+   CCG\_WTM2x
+}{
+   Forms the weighted median of a list of ordered data values.
+   Incrementing the contributing pixel buffers
+}{
+   \sstdescription{
+      This routine finds a value which can be associated with the half-
+      weight value.  It sums all weights then finds a value for the
+      half-weight.  The comparison with the half-weight value proceeds
+      in halves of the weights for each data point (half of the first
+      weight, then the second half of the first weight and the first
+      half of the second weight etc.) until the half weight is exceeded.
+      The data values around this half weight position are then found
+      and a linear interpolation of these values is the wtdmdn. The
+      values which contribute to the result are flagged and passed
+      through the USED array.
+   }
+   \sstinvocation{
+      CALL CCG\_WTM2x( EL. ORDDAT, WEIGHT, USED, RESULT, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         EL = INTEGER (Given)
+      }{
+         The number of entries in the data array.
+      }
+      \sstsubsection{
+         ORDDAT( EL ) = ? (Given)
+      }{
+         The list of ordered data for which the weighted median is
+         required
+      }
+      \sstsubsection{
+         WEIGHT( EL ) = ? (Given)
+      }{
+         The weights of the values.
+      }
+      \sstsubsection{
+         USED = LOGICAL (Returned)
+      }{
+         If a value contributes to the median value it is flagged as
+         true in this array, otherwise the array is set to false.
+      }
+      \sstsubsection{
+         RESULT = DOUBLE PRECISION (Returned)
+      }{
+         The weighted median
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for real and double-precision: replace {\tt "}x{\tt "}
+         in the routine name by D or R as appropriate.  The ORDDAT and
+         WEIGHT arguments supplied to the routine must have the data type
+         specified.
+      }
+   }
+   \sstdiytopic{
+      Prior Requirements
+   }{
+      \sstitemlist{
+
+         \sstitem
+         The input data must be ordered increasing.  No BAD values may be
+         present.
+      }
+   }
+}
+\sstroutine{
+   CCG\_WTM3x
+}{
+   Forms the weighted median of a list of ordered data values.
+   Incrementing the contributing pixel buffers and estimating the
+   variance change
+}{
+   \sstdescription{
+      This routine finds a value which can be associated with the half-
+      weight value.  It sums all weights then finds a value for the
+      half-weight.  The comparison with the half-weight value proceeds
+      in halves of the weights for each data point (half of the first
+      weight, then the second half of the first weight and the first
+      half of the second weight etc.) until the half weight is
+      exceeded. The data values around this half weight position are
+      then found and a linear interpolation of these values is the
+      weighted median.  The values which contribute to the result are
+      flagged and passed through the USED array.  This routine also
+      uses the order statistic covariance array (for a population EL
+      big) to estimate the change in the variance from a optimal
+      measurement from the given population, returning the adjusted
+      variance.
+   }
+   \sstinvocation{
+      CALL CCG\_WTM3x( CALCMV, EL, ORDDAT, WEIGHT, VAR, COVAR, USED,
+                      RESULT, RESVAR, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         CALCMV = LOGICAL (Given)
+      }{
+         If .FALSE. then the output variances are estimated by scaling
+         the variance on the weighted mean (rather than the weighted
+         median) by pi/2.  Otherwise, the output variances are
+         calculated using the COVEC array.
+      }
+      \sstsubsection{
+         EL = INTEGER (Given)
+      }{
+         The number of entries in the data array.
+      }
+      \sstsubsection{
+         ARR( EL ) = ? (Given)
+      }{
+         The list of ordered data for which the weighted median is
+         required
+      }
+      \sstsubsection{
+         WEIGHT( EL ) = ? (Given)
+      }{
+         The weights of the values.
+      }
+      \sstsubsection{
+         VAR = DOUBLE PRECISION (Given)
+      }{
+         The variance of the unordered sample now ordered in ARR.
+      }
+      \sstsubsection{
+         COVAR( $*$ ) = DOUBLE PRECISION (Given)
+      }{
+         The packed variance-covariance matrix of the order statistics
+         from a normal distribution of size EL. Not used if CALCMV is .FALSE.
+      }
+      \sstsubsection{
+         USED( EL ) = LOGICAL (Returned)
+      }{
+         If a value contributes to the median value it is flagged as
+         true in this array, otherwise the array is set to false.
+      }
+      \sstsubsection{
+         RESULT = DOUBLE PRECISION (Returned)
+      }{
+         The weighted median
+      }
+      \sstsubsection{
+         RESVAR = DOUBLE PRECISION (Returned)
+      }{
+         The variance of result.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output array.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for real and double-precision: replace {\tt "}x{\tt "}
+         in the routine name by D or R as appropriate.  The ORDDAT and
+         WEIGHT arguments supplied to the routine must have the data type
+         specified.
+      }
+   }
+   \sstdiytopic{
+      Prior Requirements
+   }{
+      \sstitemlist{
+
+         \sstitem
+         The input data must be ordered increasing. No BAD values may be
+         present.
+      }
+   }
+}
+\sstroutine{
+   CCG\_WTM4x
+}{
+   Forms the weighted median of a list of ordered data values.
+   Incrementing the contributing pixel buffers and estimating the
+   variance change
+}{
+   \sstdescription{
+      This routine finds a value which can be associated with the half-
+      weight value.  It sums all weights then finds a value for the
+      half-weight.  The comparison with the half-weight value proceeds
+      in halves of the weights for each data point (half of the first
+      weight, then the second half of the first weight and the first
+      half of the second weight etc.) until the half weight is
+      exceeded.  The data values around this half weight position are
+      then found and a linear interpolation of these values is the
+      weighted median.  The values which contribute to the result are
+      flagged and passed through the USED array.  This routine also
+      uses the order statistic covariance array (for a population EL
+      big) to estimate the change in the variance from a optimal
+      measurement from the given population, returning the adjusted
+      variance.
+
+      This version is specialised to accept bounds for the values that
+      can be used in ARR, these are from ARR(LBND:UBND). It is designed
+      for use when some outliers of the population have already been
+      flagged for removal (say by some clipping algorithm and the
+      variance still needs to be determined from the original population
+      size).
+   }
+   \sstinvocation{
+      CALL CCG\_WTM4x( EL, ORDDAT, WEIGHT, VAR, LBND, UBND, COVAR,
+                      USED, RESULT, RESVAR, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         EL = INTEGER (Given)
+      }{
+         The number of entries in the data array.
+      }
+      \sstsubsection{
+         ARR( EL ) = ? (Given)
+      }{
+         The list of ordered data for which the weighted median is
+         required
+      }
+      \sstsubsection{
+         WEIGHT( EL ) = ? (Given)
+      }{
+         The weights of the values.
+      }
+      \sstsubsection{
+         VAR = DOUBLE PRECISION (Given)
+      }{
+         The variance of the unordered sample now ordered in ARR.
+      }
+      \sstsubsection{
+         LBND = INTEGER (Given)
+      }{
+         Lower bound of data to be considered in ARR.
+      }
+      \sstsubsection{
+         UBND = INTEGER (Given)
+      }{
+         Upper bound of data to be considered in ARR.
+      }
+      \sstsubsection{
+         COVAR( $*$ ) = DOUBLE PRECISION (Given)
+      }{
+         The packed variance-covariance matrix of the order statistics
+         from a normal distribution of size EL.
+      }
+      \sstsubsection{
+         USED( EL ) = LOGICAL (Returned)
+      }{
+         If a value contributes to the median value it is flagged as
+         true in this array, otherwise the array element is set to
+         false.
+      }
+      \sstsubsection{
+         RESULT = DOUBLE PRECISION (Returned)
+      }{
+         The weighted median
+      }
+      \sstsubsection{
+         RESVAR = DOUBLE PRECISION (Returned)
+      }{
+         The variance of result.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for real and double-precision: replace {\tt "}x{\tt "}
+         in the routine name by D or R as appropriate.  The ORDDAT and
+         WEIGHT arguments supplied to the routine must have the data type
+         specified.
+      }
+   }
+   \sstdiytopic{
+      Prior Requirements
+   }{
+      \sstitemlist{
+
+         \sstitem
+         The input data must be ordered increasing. No BAD values may be
+         present, although you may restrict the range (LBND, UBND).
+      }
+   }
+}
+\sstroutine{
    CTG1\_APPEN
 }{
    Append matching files to a group
@@ -6603,7 +12302,7 @@ from one graphical element to another.
       writing of hierarchical keywords.
    }
    \sstinvocation{
-      CALL FTS1\_WKEYC( NAME, CMTBGN, VALUE, COMNT, COMCAR, HEADER,
+      CALL FTS1\_WKEYC( NAME, VALUE, CMTBGN, COMNT, COMCAR, HEADER,
                        STATUS )
    }
    \sstarguments{
@@ -6953,7 +12652,7 @@ from one graphical element to another.
       of hierarchical keywords.
    }
    \sstinvocation{
-      CALL FTS1\_WKEYx( NAME, CMTBGN, VALUE, COMNT, HEADER, STATUS )
+      CALL FTS1\_WKEYx( NAME, VALUE, CMTBGN, COMNT, HEADER, STATUS )
    }
    \sstarguments{
       \sstsubsection{
@@ -11722,13 +17421,20 @@ from one graphical element to another.
          as the NDF TITLE is not blank or undefined).
       }
    }
-   \sstdiytopic{
+   \sstdiylist{
       Parameters
    }{
-      The name of the following environment parameter(s) are hard-wired
-      into this subroutine in order to ensure conformity between application.
-
-      USEAXIS = LITERAL (Read)
+      \sstsubsection{
+         The name of the following environment parameter(s) are hard-wired
+      }{
+      }
+      \sstsubsection{
+         into this subroutine in order to ensure conformity between application.
+      }{
+      }
+      \sstsubsection{
+         USEAXIS = LITERAL (Read)
+      }{
          A set of NDIM axes to be selected from the Current Frame. Each
          axis can be specified either by giving its index within the Current
          Frame in the range 1 to the number of axes in the Frame, or by
@@ -11737,6 +17443,7 @@ from one graphical element to another.
          too many axes. The dynamic default selects the axes with the same
          indices as the selected NDF axes. The value should be given as a
          GRP group expression, with default control characters.
+      }
    }
 }
 \sstroutine{
@@ -13356,13 +19063,20 @@ from one graphical element to another.
          The global status.
       }
    }
-   \sstdiytopic{
+   \sstdiylist{
       Parameters
    }{
-      The name of the following environment parameter(s) are hard-wired
-      into this subroutine in order to ensure conformity between application.
-
-      USEAXIS = LITERAL (Read)
+      \sstsubsection{
+         The name of the following environment parameter(s) are hard-wired
+      }{
+      }
+      \sstsubsection{
+         into this subroutine in order to ensure conformity between application.
+      }{
+      }
+      \sstsubsection{
+         USEAXIS = LITERAL (Read)
+      }{
          A set of NDIM axes to be selected from the current Frame. Each
          axis can be specified either by giving its index within the current
          Frame in the range 1 to the number of axes in the Frame, or by
@@ -13370,6 +19084,7 @@ from one graphical element to another.
          current Frame in the supplied FrameSet has too many axes. The value
          should be given as a GRP group expression, with default control
          characters.
+      }
    }
 }
 \sstroutine{
@@ -15746,15 +21461,18 @@ from one graphical element to another.
          or if the picture cannot be created.
       }
    }
-   \sstdiytopic{
+   \sstdiylist{
       Environment Parameters
    }{
-      FILL = \_LOGICAL (Read)
+      \sstsubsection{
+         FILL = \_LOGICAL (Read)
+      }{
          TRUE if the supplied aspect ratio (SASPEC) is to be ignored,
          creating the largest possible DATA picture within the current
          picture.  When FILL is FALSE, the DATA picture is created with
          the supplied aspect ratio. Not accessed if argument SASPEC is
          supplied equal to zero (i.e. (SASPEC .EQ. 0.0) implies FILL=YES)
+      }
    }
 }
 \sstroutine{
@@ -16644,12 +22362,21 @@ from one graphical element to another.
          to AST\_\_NULL, and PGPLOT is shut down.
       }
    }
-   \sstdiytopic{
+   \sstdiylist{
       Environment Parameters
    }{
-      Various envirnment parameter names are used by this routine,
-      to encourage uniformity in parameter naming, and behaviour.
-      See KPG1\_GRPHW for details.
+      \sstsubsection{
+         Various envirnment parameter names are used by this routine,
+      }{
+      }
+      \sstsubsection{
+         to encourage uniformity in parameter naming, and behaviour.
+      }{
+      }
+      \sstsubsection{
+         See KPG1\_GRPHW for details.
+      }{
+      }
    }
 }
 \sstroutine{
@@ -17202,12 +22929,16 @@ from one graphical element to another.
          to AST\_\_NULL, and PGPLOT is shut down.
       }
    }
-   \sstdiytopic{
+   \sstdiylist{
       Environment Parameters
    }{
-      The following envirnment parameter names are used by this routine,
-      to encourage uniformity in parameter naming, and behaviour:
-
+      \sstsubsection{
+         The following envirnment parameter names are used by this routine,
+      }{
+      }
+      \sstsubsection{
+         to encourage uniformity in parameter naming, and behaviour:
+      }{
          AXES = \_LOGICAL (Read)
             TRUE if annotated axes are to be produced.
          CLEAR = \_LOGICAL (Read)
@@ -17221,18 +22952,18 @@ from one graphical element to another.
             mode is always used. This parameter can take the following
             values:
 
-      \sstitemlist{
+         \sstitemlist{
 
-         \sstitem
+            \sstitem
                {\tt "}Range{\tt "} -- The lowest and highest supplied data values are
                used (including error bars).
 
-         \sstitem
+            \sstitem
                {\tt "}Extended{\tt "} -- The lowest and highest supplied data values
                are used (including error bars), extended to give a margin of
                2.5\% of the total data range at each end.
 
-         \sstitem
+            \sstitem
                {\tt "}Extended,10,5{\tt "} -- Like {\tt "}Extended{\tt "}, except the margins at the
                two ends are specified as a pair of numerical value in the second
                and third elements of the array. These values are percentages of
@@ -17242,7 +22973,7 @@ from one graphical element to another.
                If no value is given, both limits default to 2.5. {\tt "}Range{\tt "} is
                equivalent to {\tt "}Extended,0,0{\tt "}.
 
-         \sstitem
+            \sstitem
                {\tt "}Percentiles,5,95{\tt "} -- The second and third elements of the array
                are interpreted as percentiles. For instance, {\tt "}Perc,5,95{\tt "} causes
                5\% of the data points (ignoring error bars) to be below YBOT, and
@@ -17250,7 +22981,7 @@ from one graphical element to another.
                other one, p2, defaults to (100 - p1). If no values are supplied,
                p1 and p2 default to 5 and 95.
 
-         \sstitem
+            \sstitem
                {\tt "}Sigma,2,3{\tt "} -- The second and third elements of the array are
                interpreted as multiples of the standard deviation of the data
                values (ignoring error bars). For instance, {\tt "}S,2,3{\tt "} causes the
@@ -17259,7 +22990,7 @@ from one graphical element to another.
                same value is used for both limits. If no values are supplied,
                both values default to 3.0.
 
-      }
+         }
          The above strings can be abbreviated to one character.
          MARGIN( 4 ) = \_REAL (Read)
             The widths of the margins to leave for axis annotation, given
@@ -17302,6 +23033,7 @@ from one graphical element to another.
             The dynamic default is specified by argument YT. The value
             supplied may be greater than or less than the value supplied
             for YBOT.
+      }
    }
 }
 \sstroutine{
@@ -21619,14 +27351,20 @@ from one graphical element to another.
          Close down AGI and PGPLOT using KPG1\_PGCLS.
       }
    }
-   \sstdiytopic{
+   \sstdiylist{
       Parameters
    }{
-      CLEAR = \_LOGICAL (Read)
+      \sstsubsection{
+         CLEAR = \_LOGICAL (Read)
+      }{
          TRUE if the graphics device is to be cleared on opening. See
          argument STAT.
-      DEVICE = DEVICE (Read)
+      }
+      \sstsubsection{
+         DEVICE = DEVICE (Read)
+      }{
          The plotting device.
+      }
    }
 }
 \sstroutine{
@@ -21863,25 +27601,37 @@ from one graphical element to another.
                CALL KPG1\_PGCLS( {\tt '}DEVICE{\tt '}, .FALSE., STATUS )
       }
    }
-   \sstdiytopic{
+   \sstdiylist{
       Parameters
    }{
-      CLEAR = \_LOGICAL (Read)
+      \sstsubsection{
+         CLEAR = \_LOGICAL (Read)
+      }{
          TRUE if the graphics device is to be cleared on opening. See
          argument STAT.
-      DEVICE = DEVICE (Read)
+      }
+      \sstsubsection{
+         DEVICE = DEVICE (Read)
+      }{
          The plotting device.
-      FILL = \_LOGICAL (Read)
+      }
+      \sstsubsection{
+         FILL = \_LOGICAL (Read)
+      }{
          TRUE if the supplied aspect ratio is to be ignored, creating the
          largest possible DATA picture within the current picture.  When
          FILL is FALSE, the DATA picture is created with the supplied
          aspect ratio. Only used when creating a new DATA picture.
-      STYLE = GROUP (Read)
+      }
+      \sstsubsection{
+         STYLE = GROUP (Read)
+      }{
          A description of the plotting style required. This the name of a
          text file containing an AST attribute setting on each line, of
          form {\tt "}name=value{\tt "}, where {\tt "}name{\tt "} is an AST Plot attribute name
          (or synonym recognised by this application - see KPG1\_ASPSY), and
          {\tt "}value{\tt "} is the value to assign to the attribute.
+      }
    }
 }
 \sstroutine{
@@ -22102,14 +27852,17 @@ from one graphical element to another.
          be created (eg due to lack of room within the current picture).
       }
    }
-   \sstdiytopic{
+   \sstdiylist{
       Parameters
    }{
-      FILL = \_LOGICAL (Read)
+      \sstsubsection{
+         FILL = \_LOGICAL (Read)
+      }{
          TRUE if the supplied aspect ratio is to be ignored, creating the
          largest possible DATA picture within the current picture.  When
          FILL is FALSE, the DATA picture is created with the supplied
          aspect ratio. Only used when creating a new DATA picture.
+      }
    }
 }
 \sstroutine{
@@ -25173,6 +30926,99 @@ from one graphical element to another.
 
       where PIXEL is a pixel co-ordinate for the I{\tt '}th dimension, and
       DATA is the corresponding axis co-ordinate.
+   }
+}
+\sstroutine{
+   KPG\_ENV0C
+}{
+   Reads a string value from an environment variable, using a
+   default value if the variable is undefined
+}{
+   \sstdescription{
+      This routine reads a string value of up to forty characters from
+      a specified environment variable.  No error occurs should the
+      environment variable not be defined, and the supplied value is
+      returned unchanged.
+   }
+   \sstinvocation{
+      CALL KPG\_ENV0C( VARNAM, CVAL, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         VARNAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The environment variable to check.
+      }
+      \sstsubsection{
+         CVAL = CHARACTER $*$ ( $*$ ) (Given and Returned)
+      }{
+         The string.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   KPG\_NXWRD
+}{
+   To find the next word in a string
+}{
+   \sstdescription{
+      The routine looks for the start of the next word, after OFFSET
+      characters, in the given string. Words are assumed to be
+      delimetered by spaces, commas or tabs. The routine is really a
+      wrap round calls to CHR\_FIWE and CHR\_FIWS trapping any status
+      returns.
+   }
+   \sstinvocation{
+      CALL KPG\_NXWRD( STRING, OFFSET, FIRST, LAST, NOTFND, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The string to be searched for a {\tt '}word{\tt '}. The word is looked for
+         in STRING(OFFSET:).
+      }
+      \sstsubsection{
+         OFFSET = INTEGER (Given)
+      }{
+         The offset into the given string after which the word is to
+         located.
+      }
+      \sstsubsection{
+         FIRST = INTEGER (Returned)
+      }{
+         First character of the located word. Offset into STRING.
+      }
+      \sstsubsection{
+         LAST = INTEGER (Returned)
+      }{
+         Last character of the located word. Offset into STRING.
+      }
+      \sstsubsection{
+         NOTFND = LOGICAL (Returned)
+      }{
+         If a next word is not located then this is set true, otherwise
+         it is set false.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If an error has already occurred, or if an error occurs during this
+         routine, NOTFND is returned .FALSE., and FIRST and LAST are returned
+         equal to one.
+      }
    }
 }
 \sstroutine{
@@ -31829,6 +37675,68 @@ from one graphical element to another.
    }
 }
 \sstroutine{
+   KPG1\_MVBDx
+}{
+   Move bad data values to the end of an index of array values
+}{
+   \sstdescription{
+      This routine modifies the supplied index array by removing indicies
+      of all bad data values and shuffling indicies for good data values
+      down to fill the gaps.
+   }
+   \sstinvocation{
+      CALL KPG1\_MVBD$<$T$>$( ELA, ARRAY, ELI, INDX, NGOOD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         ELA = INTEGER (Given)
+      }{
+         The size of the data array.
+      }
+      \sstsubsection{
+         ARRAY( ELA ) = ? (Given)
+      }{
+         The array containing the data values.
+      }
+      \sstsubsection{
+         ELI = INTEGER (Given)
+      }{
+         The size of the index array.
+      }
+      \sstsubsection{
+         INDX( ELI ) = INTEGER (Given and Returned)
+      }{
+         Each element of this array is an index into the ARRAY array. On
+         exit, the contents of INDX are re-arranged so that indices that
+         refer to bad data values are removed and indices that refer to
+         good data values are shuffled down to fill the gaps. Any indicies
+         which are outside the bounds of the data array are treated as if
+         they referred to bad data values (i.e. they are removed).
+      }
+      \sstsubsection{
+         NGOOD = INTEGER (Returned)
+      }{
+         The number of indices within INDX that refer to good data values.
+         On exit, the first NGOOD elements of INDX will contain the
+         indices of the good data values within ARRAY. Any remaining
+         values of INDX will retain their original values.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each numeric data type: replace {\tt "}x{\tt "} in
+         the routine name by D, R, I, W, UW, B or UB as appropriate.
+      }
+   }
+}
+\sstroutine{
    KPG1\_MXMEx
 }{
    Returns the maximum and minimum values between thresholds of an
@@ -32647,11 +38555,11 @@ from one graphical element to another.
 \sstroutine{
    KPG1\_PTNDx
 }{
-   Paste a section of an n-dimensional array into another array
+   Pastes a section of an n-dimensional array into another array
 }{
    \sstdescription{
-      This routine pastes a specified section of the supplied n-dimensional
-      array (IN) into an output array (OUT).
+      This routine pastes a specified section of the supplied
+      n-dimensional array (IN) into an output array (OUT).
    }
    \sstinvocation{
       CALL KPG1\_PTNDx( NDIM, LBNDI, UBNDI, IN, LBNDO, UBNDO, BAD,
@@ -32695,7 +38603,7 @@ from one graphical element to another.
       }{
          If .TRUE., then any sections of the output array that fall
          outside the input array are filled with bad values. Otherwise,
-         the the supplied values in such output array sections are left
+         the supplied values in such output array sections are left
          unchanged.
       }
       \sstsubsection{

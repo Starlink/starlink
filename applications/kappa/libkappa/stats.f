@@ -221,6 +221,8 @@
 *        Added parameters MINWCS and MAXWCS.
 *     2009 June 19 (MJC):
 *        Added order statistics.
+*     20-AUG-2009 (DSB):
+*        Changed calculation of order statistics to ignore bad pixels.
 *     {enter_further_changes_here}
 
 *-
@@ -591,9 +593,9 @@
             CALL PSX_CALLOC( EL, '_INTEGER', WPNTR, STATUS )
          END IF
 
-*  Convert to indices within the sorted array.
+*  Convert to indices within the sorted array of good data values.
          DO I = 1, NUMPER
-            PERIND( I ) = NINT( PERCNT( I ) * 0.01 * REAL( EL ) )
+            PERIND( I ) = NINT( PERCNT( I ) * 0.01 * REAL( NGOOD ) )
          END DO
 
 *  Call the appropriate routine to quicksort the array and then find the
@@ -606,9 +608,16 @@
      :                      %VAL( CNF_PVAL( IPNTR ) ) )
             CALL PSX_FREE( WPNTR, STATUS )
 
-*  Extract the index of the median.
-            CALL KPG1_RETRI( EL, EL / 2 + 1, %VAL( CNF_PVAL( IPNTR ) ),
-     :                       UPERIN( 1 ), STATUS )
+*  Remove indices for any bad data values from the index array. Indices for 
+*  good data values are shuffled down towards the start of the index array 
+*  to fill the gaps. The order of the good data values is unchanged by this.
+            CALL KPG1_MVBDB( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), EL, 
+     :                       %VAL( CNF_PVAL( IPNTR ) ), NGOOD, STATUS )
+
+*  Extract the index of the median good value.
+            CALL KPG1_RETRI( EL, NGOOD/2 + 1, 
+     :                       %VAL( CNF_PVAL( IPNTR ) ), UPERIN( 1 ), 
+     :                       STATUS )
 
 *  Extract the median from the unsorted array.
             CALL KPG1_RETRB( EL, UPERIN( 1 ),
@@ -617,8 +626,8 @@
             MEDIAN = NUM_BTOD( BQUANT( 1 ) )
 
 *  Average the middle two of an even-numbered sample.
-            IF ( MOD( EL, 2 ) .EQ. 0 ) THEN
-               CALL KPG1_RETRI( EL, EL / 2, %VAL( CNF_PVAL( IPNTR ) ),
+            IF ( MOD( NGOOD, 2 ) .EQ. 0 ) THEN
+               CALL KPG1_RETRI( EL, NGOOD/2, %VAL( CNF_PVAL( IPNTR ) ),
      :                          UPERIN( 1 ), STATUS )
                CALL KPG1_RETRB( EL, UPERIN( 1 ),
      :                          %VAL( CNF_PVAL( PNTR( 1 ) ) ),
@@ -643,13 +652,19 @@
             CALL VEC_UBTOI( .TRUE., EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                      %VAL( CNF_PVAL( WPNTR ) ), IERR, NERR,
      :                      STATUS )
-            CALL PDA_QSIAI( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+            CALL PDA_QSIAI( EL, %VAL( CNF_PVAL( WPNTR ) ), 
      :                      %VAL( CNF_PVAL( IPNTR ) ) )
             CALL PSX_FREE( WPNTR, STATUS )
  
-*  Extract the index of the median.
-            CALL KPG1_RETRI( EL, EL / 2 + 1, %VAL( CNF_PVAL( IPNTR ) ),
-     :                      UPERIN( 1 ), STATUS )
+*  Remove indices for any bad data values from the index array. Indices for 
+*  good data values are shuffled down towards the start of the index array 
+*  to fill the gaps. The order of the good data values is unchanged by this.
+            CALL KPG1_MVBDUB( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), EL, 
+     :                        %VAL( CNF_PVAL( IPNTR ) ), NGOOD, STATUS )
+
+*  Extract the index of the median good value.
+            CALL KPG1_RETRI( EL, NGOOD/2 + 1, %VAL( CNF_PVAL( IPNTR ) ),
+     :                       UPERIN( 1 ), STATUS )
 
 *  Extract the median from the unsorted array.
             CALL KPG1_RETRUB( EL, UPERIN( 1 ),
@@ -658,8 +673,8 @@
             MEDIAN = NUM_UBTOD( BQUANT( 1 ) )
 
 *  Average the middle two of an even-numbered sample.
-            IF ( MOD( EL, 2 ) .EQ. 0 ) THEN
-               CALL KPG1_RETRI( EL, EL / 2, %VAL( CNF_PVAL( IPNTR ) ),
+            IF ( MOD( NGOOD, 2 ) .EQ. 0 ) THEN
+               CALL KPG1_RETRI( EL, NGOOD/2, %VAL( CNF_PVAL( IPNTR ) ),
      :                          UPERIN( 1 ), STATUS )
                CALL KPG1_RETRUB( EL, UPERIN( 1 ),
      :                           %VAL( CNF_PVAL( PNTR( 1 ) ) ),
@@ -684,8 +699,14 @@
             CALL PDA_QSIAD( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
      :                      %VAL( CNF_PVAL( IPNTR ) ) )
 
-*  Extract the index of the median.
-            CALL KPG1_RETRI( EL, EL / 2 + 1, %VAL( CNF_PVAL( IPNTR ) ),
+*  Remove indices for any bad data values from the index array. Indices for 
+*  good data values are shuffled down towards the start of the index array 
+*  to fill the gaps. The order of the good data values is unchanged by this.
+            CALL KPG1_MVBDD( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), EL, 
+     :                       %VAL( CNF_PVAL( IPNTR ) ), NGOOD, STATUS )
+
+*  Extract the index of the median good value.
+            CALL KPG1_RETRI( EL, NGOOD/2 + 1, %VAL( CNF_PVAL( IPNTR ) ),
      :                       UPERIN( 1 ), STATUS )
 
 *  Extract the median from the unsorted array.
@@ -694,8 +715,8 @@
      :                       MEDIAN, STATUS )
 
 *  Average the middle two of an even-numbered sample.
-            IF ( MOD( EL, 2 ) .EQ. 0 ) THEN
-               CALL KPG1_RETRI( EL, EL / 2, %VAL( CNF_PVAL( IPNTR ) ),
+            IF ( MOD( NGOOD, 2 ) .EQ. 0 ) THEN
+               CALL KPG1_RETRI( EL, NGOOD/2, %VAL( CNF_PVAL( IPNTR ) ),
      :                          UPERIN( 1 ), STATUS )
                CALL KPG1_RETRD( EL, UPERIN( 1 ),
      :                          %VAL( CNF_PVAL( PNTR( 1 ) ) ),
@@ -715,8 +736,14 @@
             CALL PDA_QSIAI( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
      :                      %VAL( CNF_PVAL( IPNTR ) ) )
 
-*  Extract the index of the median.
-            CALL KPG1_RETRI( EL, EL / 2 + 1, %VAL( CNF_PVAL( IPNTR ) ),
+*  Remove indices for any bad data values from the index array. Indices for 
+*  good data values are shuffled down towards the start of the index array 
+*  to fill the gaps. The order of the good data values is unchanged by this.
+            CALL KPG1_MVBDI( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), EL, 
+     :                       %VAL( CNF_PVAL( IPNTR ) ), NGOOD, STATUS )
+
+*  Extract the index of the median good value.
+            CALL KPG1_RETRI( EL, NGOOD/2 + 1, %VAL( CNF_PVAL( IPNTR ) ),
      :                       UPERIN( 1 ), STATUS )
 
 *  Extract the median from the unsorted array.
@@ -726,8 +753,8 @@
             MEDIAN = NUM_ITOD( IQUANT( 1 ) )
 
 *  Average the middle two of an even-numbered sample.
-            IF ( MOD( EL, 2 ) .EQ. 0 ) THEN
-               CALL KPG1_RETRI( EL, EL / 2, %VAL( CNF_PVAL( IPNTR ) ),
+            IF ( MOD( NGOOD, 2 ) .EQ. 0 ) THEN
+               CALL KPG1_RETRI( EL, NGOOD/2, %VAL( CNF_PVAL( IPNTR ) ),
      :                          UPERIN( 1 ), STATUS )
                CALL KPG1_RETRI( EL, UPERIN( 1 ),
      :                          %VAL( CNF_PVAL( PNTR( 1 ) ) ),
@@ -752,8 +779,14 @@
             CALL PDA_QSIAR( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
      :                      %VAL( CNF_PVAL( IPNTR ) ) )
  
-*  Extract the index of the median.
-            CALL KPG1_RETRI( EL, EL / 2 + 1, %VAL( CNF_PVAL( IPNTR ) ),
+*  Remove indices for any bad data values from the index array. Indices for 
+*  good data values are shuffled down towards the start of the index array 
+*  to fill the gaps. The order of the good data values is unchanged by this.
+            CALL KPG1_MVBDR( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), EL, 
+     :                       %VAL( CNF_PVAL( IPNTR ) ), NGOOD, STATUS )
+
+*  Extract the index of the median good value.
+            CALL KPG1_RETRI( EL, NGOOD/2 + 1, %VAL( CNF_PVAL( IPNTR ) ),
      :                       UPERIN( 1 ), STATUS )
 
 *  Extract the median from the unsorted array.
@@ -763,8 +796,8 @@
             MEDIAN = DBLE( RQUANT( 1 ) )
 
 *  Average the middle two of an even-numbered sample.
-            IF ( MOD( EL, 2 ) .EQ. 0 ) THEN
-               CALL KPG1_RETRI( EL, EL / 2, %VAL( CNF_PVAL( IPNTR ) ),
+            IF ( MOD( NGOOD, 2 ) .EQ. 0 ) THEN
+               CALL KPG1_RETRI( EL, NGOOD/2, %VAL( CNF_PVAL( IPNTR ) ),
      :                          UPERIN( 1 ), STATUS )
                CALL KPG1_RETRR( EL, UPERIN( 1 ),
      :                          %VAL( CNF_PVAL( PNTR( 1 ) ) ),
@@ -789,12 +822,18 @@
             CALL VEC_WTOI( .TRUE., EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                     %VAL( CNF_PVAL( WPNTR ) ), IERR, NERR,
      :                     STATUS )
-            CALL PDA_QSIAI( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+            CALL PDA_QSIAI( EL, %VAL( CNF_PVAL( WPNTR ) ), 
      :                      %VAL( CNF_PVAL( IPNTR ) ) )
             CALL PSX_FREE( WPNTR, STATUS )
  
-*  Extract the index of the median.
-            CALL KPG1_RETRI( EL, EL / 2 + 1, %VAL( CNF_PVAL( IPNTR ) ),
+*  Remove indices for any bad data values from the index array. Indices for 
+*  good data values are shuffled down towards the start of the index array 
+*  to fill the gaps. The order of the good data values is unchanged by this.
+            CALL KPG1_MVBDW( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), EL, 
+     :                       %VAL( CNF_PVAL( IPNTR ) ), NGOOD, STATUS )
+
+*  Extract the index of the median good value.
+            CALL KPG1_RETRI( EL, NGOOD/2 + 1, %VAL( CNF_PVAL( IPNTR ) ),
      :                       UPERIN( 1 ), STATUS )
 
 *  Extract the median from the unsorted array.
@@ -804,8 +843,8 @@
             MEDIAN = NUM_WTOD( WQUANT( 1 ) )
 
 *  Average the middle two of an even-numbered sample.
-            IF ( MOD( EL, 2 ) .EQ. 0 ) THEN
-               CALL KPG1_RETRI( EL, EL / 2, %VAL( CNF_PVAL( IPNTR ) ),
+            IF ( MOD( NGOOD, 2 ) .EQ. 0 ) THEN
+               CALL KPG1_RETRI( EL, NGOOD/2, %VAL( CNF_PVAL( IPNTR ) ),
      :                          UPERIN( 1 ), STATUS )
                CALL KPG1_RETRW( EL, UPERIN( 1 ),
      :                          %VAL( CNF_PVAL( PNTR( 1 ) ) ),
@@ -834,8 +873,14 @@
      :                      %VAL( CNF_PVAL( IPNTR ) ) )
             CALL PSX_FREE( WPNTR, STATUS )
 
-*  Extract the index of the median.
-            CALL KPG1_RETRI( EL, EL / 2 + 1, %VAL( CNF_PVAL( IPNTR ) ),
+*  Remove indices for any bad data values from the index array. Indices for 
+*  good data values are shuffled down towards the start of the index array 
+*  to fill the gaps. The order of the good data values is unchanged by this.
+            CALL KPG1_MVBDUW( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), EL, 
+     :                       %VAL( CNF_PVAL( IPNTR ) ), NGOOD, STATUS )
+
+*  Extract the index of the median good value.
+            CALL KPG1_RETRI( EL, NGOOD/2 + 1, %VAL( CNF_PVAL( IPNTR ) ),
      :                       UPERIN( 1 ), STATUS )
 
 *  Extract the median from the unsorted array.
@@ -845,8 +890,8 @@
             MEDIAN = NUM_UWTOD( WQUANT( 1 ) )
 
 *  Average the middle two of an even-numbered sample.
-            IF ( MOD( EL, 2 ) .EQ. 0 ) THEN
-               CALL KPG1_RETRI( EL, EL / 2, %VAL( CNF_PVAL( IPNTR ) ),
+            IF ( MOD( NGOOD, 2 ) .EQ. 0 ) THEN
+               CALL KPG1_RETRI( EL, NGOOD/2, %VAL( CNF_PVAL( IPNTR ) ),
      :                          UPERIN( 1 ), STATUS )
                CALL KPG1_RETRUW( EL, UPERIN( 1 ),
      :                           %VAL( CNF_PVAL( PNTR( 1 ) ) ),
