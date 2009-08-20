@@ -21,7 +21,7 @@ Version 2.8
      specified via an AST KeyMap.
    - KPG1_BADBX added. It returns an NDF identifier for the smallest section 
      of a supplied NDF that encloses all the good data values in the NDF.
-   - KPG1_BBOX<T> added. It obtains the pixel bounding box of a given value
+   - KPG1_BBOXx added. It obtains the pixel bounding box of a given value
      within an N-dimensional data array.
    - KPG1_LIKE added. It obtains a section of an NDF that matches either
      the pixel or WCS shape of a given template NDF.
@@ -31,19 +31,19 @@ Version 2.8
      existing generic KPG1_MXMN<T> routines.
    - Added KPG1_CGET, which returns the value of an NDF character 
      component removing any AST or PGPLOT escape sequences.
-   - kaplibs_link script now works without attempting to load ADAM
-     symbols
-   - Can now be built as a shared library
-   - Added kpg1_astcmn to provide access to KPG_AST private common block
+   - The kaplibs_link script now works without attempting to load ADAM
+     symbols.
+   - Can now be built as a shared library.
+   - Added KPG1_ASTCMN to provide access to KPG_AST private common block
    - The HLP helper routines are no longer part of kaplibs. Use SHL
      library instead.
-   - kpg1_scrsz no longer present. Please use one_scrsz instead.
+   - KPG1_SCRSZ no longer present.  Please use ONE_SCRSZ instead.
    - now released under the GPL
    - kpgGtfts and kpgPtfts can now be used to read and write
      AST FitsChan objects from/to an NDF
-   - kaplibs no longer links against Tk (the one Tk routine has been
+   - KAPLIBS no longer links against Tk (the one Tk routine has been
      removed from kaplibs)
-   - kaplibs now has a public C interface (but not for all routines)
+   - KAPLIBS now has a public C interface (but not for all routines)
 
 Version 2.7. includes the following changes:
 
