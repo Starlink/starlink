@@ -223,6 +223,8 @@
 *        Added order statistics.
 *     20-AUG-2009 (DSB):
 *        Changed calculation of order statistics to ignore bad pixels.
+*     2009 August 20 (MJC):
+*        Call new KPG_STOSx subroutine to evaluate order statistics.
 *     {enter_further_changes_here}
 
 *-
@@ -240,10 +242,6 @@
 
 *  Status:
       INTEGER STATUS             ! Global status
-
-*  External References:
-      INTEGER KPG1_FLOOR         ! Most positive integer .LE. a given
-                                 ! real
 
 *  Local Constants:
       INTEGER MXCLIP             ! Max. number of clipping levels
@@ -273,7 +271,6 @@
       DOUBLE PRECISION MEAN      ! Mean of pixels in array
       DOUBLE PRECISION MEANC     ! Mean of pixels after clipping
       DOUBLE PRECISION MEDIAN    ! Median of pixels in array
-      DOUBLE PRECISION MEDIUN    ! Median of even no. of pixels in array
       DOUBLE PRECISION MINC( NDF__MXDIM ) ! Co-ordinates of min. pixel
       DOUBLE PRECISION MINCC( NDF__MXDIM ) ! Min. pixel coords (clipped)
       DOUBLE PRECISION MODE      ! Mode of pixels in array (dummy)
@@ -286,13 +283,11 @@
       INTEGER EL                 ! Number of array elements mapped
       INTEGER I                  ! Loop counter for NDF dimensions
       INTEGER ICLIP              ! Loop counter for clipping levels
-      INTEGER IERR               ! Index of conversion error
       INTEGER IFIL               ! File descriptor for logfile
       INTEGER IMAX( 1 )          ! Vector index of max. pixel
       INTEGER IMAXC( 1 )         ! Vector index of max. clipped pixel
       INTEGER IMIN( 1 )          ! Vector index of min. pixel
       INTEGER IMINC( 1 )         ! Vector index of min. clipped pixel
-      INTEGER IPNTR              ! Pointer to sorted index
       INTEGER IQUANT( NPRCTL )   ! Integer quantile values
       INTEGER IWCS               ! Pointer to WCS FrameSet
       INTEGER LBND( NDF__MXDIM ) ! NDF lower bounds
@@ -304,7 +299,6 @@
       INTEGER NCLIP              ! Number of clipping iterations
       INTEGER NDF                ! NDF identifier
       INTEGER NDIM               ! Number of NDF dimensions
-      INTEGER NERR               ! Number of conversion errors
       INTEGER NGOOD              ! No. valid pixels in array
       INTEGER NGOODC             ! No. valid pixels after clipping
       INTEGER NUMPER             ! Number of percentiles
@@ -312,8 +306,6 @@
       INTEGER PERIND( NPRCTL )   ! Percentile indices in sorted array
       INTEGER PNTR( 1 )          ! Pointer to mapped NDF array
       INTEGER UBND( NDF__MXDIM ) ! NDF upper bounds
-      INTEGER UPERIN( NPRCTL )   ! Percentile indices in unsorted array
-      INTEGER WPNTR              ! Pointer to workspace
       LOGICAL BAD                ! Bad-pixel flag
       LOGICAL DOPRCT             ! Percentiles have been supplied?
       LOGICAL LOGFIL             ! Log file required?
@@ -398,11 +390,11 @@
 
 *  Null is a valid response to say do not compute percentiles.  Make
 *  the number of percentiles one and flag the value, so that the
-*  display routines can handle and recognise there are no percentile
-*  values to report.
+*  calculation and display routines can handle and recognise that 
+*  there are no percentile values to calculate and report.
             IF ( STATUS .EQ. PAR__NULL ) THEN
                CALL ERR_ANNUL( STATUS )
-               NUMPER = 0
+               NUMPER = 1
             END IF
 
          ELSE
@@ -585,333 +577,36 @@
 
 *  Use a brute-force sort of the data.
 
-*  Obtain workspace for pointers and PDA routines that don't support
-*  byte and word data types.
-         CALL PSX_CALLOC( EL, '_INTEGER', IPNTR, STATUS )
-         IF ( TYPE .EQ. '_BYTE' .OR. TYPE .EQ. '_UBYTE' .OR.
-     :        TYPE .EQ. '_WORD' .OR. TYPE .EQ. '_UWORD' ) THEN
-            CALL PSX_CALLOC( EL, '_INTEGER', WPNTR, STATUS )
-         END IF
-
-*  Convert to indices within the sorted array of good data values.
-         DO I = 1, NUMPER
-            PERIND( I ) = NINT( PERCNT( I ) * 0.01 * REAL( NGOOD ) )
-         END DO
-
 *  Call the appropriate routine to quicksort the array and then find the
 *  order statistics.
          IF ( TYPE .EQ. '_BYTE' ) THEN
-            CALL VEC_BTOI( .TRUE., EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                     %VAL( CNF_PVAL( WPNTR ) ), IERR, NERR,
-     :                     STATUS )
-            CALL PDA_QSIAI( EL, %VAL( CNF_PVAL( WPNTR ) ), 
-     :                      %VAL( CNF_PVAL( IPNTR ) ) )
-            CALL PSX_FREE( WPNTR, STATUS )
-
-*  Remove indices for any bad data values from the index array. Indices for 
-*  good data values are shuffled down towards the start of the index array 
-*  to fill the gaps. The order of the good data values is unchanged by this.
-            CALL KPG1_MVBDB( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), EL, 
-     :                       %VAL( CNF_PVAL( IPNTR ) ), NGOOD, STATUS )
-
-*  Extract the index of the median good value.
-            CALL KPG1_RETRI( EL, NGOOD/2 + 1, 
-     :                       %VAL( CNF_PVAL( IPNTR ) ), UPERIN( 1 ), 
-     :                       STATUS )
-
-*  Extract the median from the unsorted array.
-            CALL KPG1_RETRB( EL, UPERIN( 1 ),
-     :                       %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                       BQUANT( 1 ), STATUS )
-            MEDIAN = NUM_BTOD( BQUANT( 1 ) )
-
-*  Average the middle two of an even-numbered sample.
-            IF ( MOD( NGOOD, 2 ) .EQ. 0 ) THEN
-               CALL KPG1_RETRI( EL, NGOOD/2, %VAL( CNF_PVAL( IPNTR ) ),
-     :                          UPERIN( 1 ), STATUS )
-               CALL KPG1_RETRB( EL, UPERIN( 1 ),
-     :                          %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                          BQUANT( 2 ), STATUS )
-               MEDIUN = NUM_BTOD( BQUANT( 2 ) )
-               MEDIAN = KPG1_FLOOR( 0.5D0 * ( MEDIAN + MEDIUN ) )
-            END IF
- 
-*  Extract the percentiles.
-            IF ( DOPRCT ) THEN
-               CALL KPG1_RETVI( EL, %VAL( CNF_PVAL( IPNTR ) ), NUMPER,
-     :                          PERIND, UPERIN, STATUS )
-               CALL KPG1_RETVB( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                          NUMPER, UPERIN, BQUANT, STATUS )
-               DO I = 1, NUMPER
-                  PERVAL( I ) = KPG1_FLOOR( NUM_BTOD( BQUANT( I ) ) )
-               END DO
-            END IF
-
+            CALL KPG_STOSB( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), NGOOD,
+     :                      NUMPER, PERCNT, MEDIAN, PERVAL, STATUS )
 
          ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-            CALL VEC_UBTOI( .TRUE., EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                      %VAL( CNF_PVAL( WPNTR ) ), IERR, NERR,
-     :                      STATUS )
-            CALL PDA_QSIAI( EL, %VAL( CNF_PVAL( WPNTR ) ), 
-     :                      %VAL( CNF_PVAL( IPNTR ) ) )
-            CALL PSX_FREE( WPNTR, STATUS )
- 
-*  Remove indices for any bad data values from the index array. Indices for 
-*  good data values are shuffled down towards the start of the index array 
-*  to fill the gaps. The order of the good data values is unchanged by this.
-            CALL KPG1_MVBDUB( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), EL, 
-     :                        %VAL( CNF_PVAL( IPNTR ) ), NGOOD, STATUS )
-
-*  Extract the index of the median good value.
-            CALL KPG1_RETRI( EL, NGOOD/2 + 1, %VAL( CNF_PVAL( IPNTR ) ),
-     :                       UPERIN( 1 ), STATUS )
-
-*  Extract the median from the unsorted array.
-            CALL KPG1_RETRUB( EL, UPERIN( 1 ),
-     :                        %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                        BQUANT( 1 ), STATUS )
-            MEDIAN = NUM_UBTOD( BQUANT( 1 ) )
-
-*  Average the middle two of an even-numbered sample.
-            IF ( MOD( NGOOD, 2 ) .EQ. 0 ) THEN
-               CALL KPG1_RETRI( EL, NGOOD/2, %VAL( CNF_PVAL( IPNTR ) ),
-     :                          UPERIN( 1 ), STATUS )
-               CALL KPG1_RETRUB( EL, UPERIN( 1 ),
-     :                           %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                           BQUANT( 2 ), STATUS )
-               MEDIUN = NUM_UBTOD( BQUANT( 2 ) )
-               MEDIAN = KPG1_FLOOR( 0.5D0 * ( MEDIAN + MEDIUN ) )
-            END IF
- 
-*  Extract the percentiles.
-            IF ( DOPRCT ) THEN
-               CALL KPG1_RETVI( EL, %VAL( CNF_PVAL( IPNTR ) ), NUMPER,
-     :                          PERIND, UPERIN, STATUS )
-               CALL KPG1_RETVUB( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                           NUMPER, UPERIN, BQUANT, STATUS )
-               DO I = 1, NUMPER
-                  PERVAL( I ) = KPG1_FLOOR( NUM_UBTOD( BQUANT( I ) ) )
-               END DO
-            END IF
-
+            CALL KPG_STOSUB( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), NGOOD,
+     :                       NUMPER, PERCNT, MEDIAN, PERVAL, STATUS )
 
          ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-            CALL PDA_QSIAD( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
-     :                      %VAL( CNF_PVAL( IPNTR ) ) )
-
-*  Remove indices for any bad data values from the index array. Indices for 
-*  good data values are shuffled down towards the start of the index array 
-*  to fill the gaps. The order of the good data values is unchanged by this.
-            CALL KPG1_MVBDD( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), EL, 
-     :                       %VAL( CNF_PVAL( IPNTR ) ), NGOOD, STATUS )
-
-*  Extract the index of the median good value.
-            CALL KPG1_RETRI( EL, NGOOD/2 + 1, %VAL( CNF_PVAL( IPNTR ) ),
-     :                       UPERIN( 1 ), STATUS )
-
-*  Extract the median from the unsorted array.
-            CALL KPG1_RETRD( EL, UPERIN( 1 ),
-     :                       %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                       MEDIAN, STATUS )
-
-*  Average the middle two of an even-numbered sample.
-            IF ( MOD( NGOOD, 2 ) .EQ. 0 ) THEN
-               CALL KPG1_RETRI( EL, NGOOD/2, %VAL( CNF_PVAL( IPNTR ) ),
-     :                          UPERIN( 1 ), STATUS )
-               CALL KPG1_RETRD( EL, UPERIN( 1 ),
-     :                          %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                          MEDIUN, STATUS )
-               MEDIAN = 0.5D0 * ( MEDIAN + MEDIUN )
-            END IF
-
-*  Extract the percentiles.
-            IF ( DOPRCT ) THEN
-               CALL KPG1_RETVI( EL, %VAL( CNF_PVAL( IPNTR ) ), NUMPER,
-     :                          PERIND, UPERIN, STATUS )
-               CALL KPG1_RETVD( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                          NUMPER, UPERIN, PERVAL, STATUS )
-            END IF
+            CALL KPG_STOSD( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), NGOOD,
+     :                      NUMPER, PERCNT, MEDIAN, PERVAL, STATUS )
 
          ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-            CALL PDA_QSIAI( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
-     :                      %VAL( CNF_PVAL( IPNTR ) ) )
-
-*  Remove indices for any bad data values from the index array. Indices for 
-*  good data values are shuffled down towards the start of the index array 
-*  to fill the gaps. The order of the good data values is unchanged by this.
-            CALL KPG1_MVBDI( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), EL, 
-     :                       %VAL( CNF_PVAL( IPNTR ) ), NGOOD, STATUS )
-
-*  Extract the index of the median good value.
-            CALL KPG1_RETRI( EL, NGOOD/2 + 1, %VAL( CNF_PVAL( IPNTR ) ),
-     :                       UPERIN( 1 ), STATUS )
-
-*  Extract the median from the unsorted array.
-            CALL KPG1_RETRI( EL, UPERIN( 1 ),
-     :                       %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                       IQUANT( 1 ), STATUS )
-            MEDIAN = NUM_ITOD( IQUANT( 1 ) )
-
-*  Average the middle two of an even-numbered sample.
-            IF ( MOD( NGOOD, 2 ) .EQ. 0 ) THEN
-               CALL KPG1_RETRI( EL, NGOOD/2, %VAL( CNF_PVAL( IPNTR ) ),
-     :                          UPERIN( 1 ), STATUS )
-               CALL KPG1_RETRI( EL, UPERIN( 1 ),
-     :                          %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                          IQUANT( 2 ), STATUS )
-               MEDIUN = NUM_ITOD( IQUANT( 2 ) )
-               MEDIAN = KPG1_FLOOR( 0.5D0 * ( MEDIAN + MEDIUN ) )
-            END IF
- 
-*  Extract the percentiles.
-            IF ( DOPRCT ) THEN
-               CALL KPG1_RETVI( EL, %VAL( CNF_PVAL( IPNTR ) ), NUMPER,
-     :                          PERIND, UPERIN, STATUS )
-               CALL KPG1_RETVI( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                          NUMPER, UPERIN, IQUANT, STATUS )
-               DO I = 1, NUMPER
-                  PERVAL( I ) = KPG1_FLOOR( NUM_ITOD( IQUANT( I ) ) )
-               END DO
-            END IF
-
+            CALL KPG_STOSI( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), NGOOD,
+     :                      NUMPER, PERCNT, MEDIAN, PERVAL, STATUS )
 
          ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-            CALL PDA_QSIAR( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
-     :                      %VAL( CNF_PVAL( IPNTR ) ) )
- 
-*  Remove indices for any bad data values from the index array. Indices for 
-*  good data values are shuffled down towards the start of the index array 
-*  to fill the gaps. The order of the good data values is unchanged by this.
-            CALL KPG1_MVBDR( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), EL, 
-     :                       %VAL( CNF_PVAL( IPNTR ) ), NGOOD, STATUS )
-
-*  Extract the index of the median good value.
-            CALL KPG1_RETRI( EL, NGOOD/2 + 1, %VAL( CNF_PVAL( IPNTR ) ),
-     :                       UPERIN( 1 ), STATUS )
-
-*  Extract the median from the unsorted array.
-            CALL KPG1_RETRR( EL, UPERIN( 1 ),
-     :                       %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                       RQUANT( 1 ), STATUS )
-            MEDIAN = DBLE( RQUANT( 1 ) )
-
-*  Average the middle two of an even-numbered sample.
-            IF ( MOD( NGOOD, 2 ) .EQ. 0 ) THEN
-               CALL KPG1_RETRI( EL, NGOOD/2, %VAL( CNF_PVAL( IPNTR ) ),
-     :                          UPERIN( 1 ), STATUS )
-               CALL KPG1_RETRR( EL, UPERIN( 1 ),
-     :                          %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                          RQUANT( 2 ), STATUS )
-               MEDIUN = DBLE( RQUANT( 2 ) )
-               MEDIAN = 0.5D0 * ( MEDIAN + MEDIUN )
-            END IF
- 
-*  Extract the percentiles.
-            IF ( DOPRCT ) THEN
-               CALL KPG1_RETVI( EL, %VAL( CNF_PVAL( IPNTR ) ), NUMPER,
-     :                          PERIND, UPERIN, STATUS )
-               CALL KPG1_RETVR( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                          NUMPER, UPERIN, RQUANT, STATUS )
-               DO I = 1, NUMPER
-                  PERVAL( I ) = DBLE( RQUANT( I ) )
-               END DO
-            END IF
-
+            CALL KPG_STOSR( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), NGOOD,
+     :                      NUMPER, PERCNT, MEDIAN, PERVAL, STATUS )
 
          ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-            CALL VEC_WTOI( .TRUE., EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                     %VAL( CNF_PVAL( WPNTR ) ), IERR, NERR,
-     :                     STATUS )
-            CALL PDA_QSIAI( EL, %VAL( CNF_PVAL( WPNTR ) ), 
-     :                      %VAL( CNF_PVAL( IPNTR ) ) )
-            CALL PSX_FREE( WPNTR, STATUS )
- 
-*  Remove indices for any bad data values from the index array. Indices for 
-*  good data values are shuffled down towards the start of the index array 
-*  to fill the gaps. The order of the good data values is unchanged by this.
-            CALL KPG1_MVBDW( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), EL, 
-     :                       %VAL( CNF_PVAL( IPNTR ) ), NGOOD, STATUS )
-
-*  Extract the index of the median good value.
-            CALL KPG1_RETRI( EL, NGOOD/2 + 1, %VAL( CNF_PVAL( IPNTR ) ),
-     :                       UPERIN( 1 ), STATUS )
-
-*  Extract the median from the unsorted array.
-            CALL KPG1_RETRW( EL, UPERIN( 1 ),
-     :                       %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                       WQUANT( 1 ), STATUS )
-            MEDIAN = NUM_WTOD( WQUANT( 1 ) )
-
-*  Average the middle two of an even-numbered sample.
-            IF ( MOD( NGOOD, 2 ) .EQ. 0 ) THEN
-               CALL KPG1_RETRI( EL, NGOOD/2, %VAL( CNF_PVAL( IPNTR ) ),
-     :                          UPERIN( 1 ), STATUS )
-               CALL KPG1_RETRW( EL, UPERIN( 1 ),
-     :                          %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                          WQUANT( 2 ), STATUS )
-               MEDIUN = NUM_WTOD( WQUANT( 2 ) )
-               MEDIAN = KPG1_FLOOR( 0.5D0 * ( MEDIAN + MEDIUN ) )
-            END IF
- 
-*  Extract the percentiles.
-            IF ( DOPRCT ) THEN
-               CALL KPG1_RETVI( EL, %VAL( CNF_PVAL( IPNTR ) ), NUMPER,
-     :                          PERIND, UPERIN, STATUS )
-               CALL KPG1_RETVW( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                          NUMPER, UPERIN, WQUANT, STATUS )
-               DO I = 1, NUMPER
-                  PERVAL( I ) = KPG1_FLOOR( NUM_WTOD( WQUANT( I ) ) )
-               END DO
-            END IF
-
+            CALL KPG_STOSW( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), NGOOD,
+     :                      NUMPER, PERCNT, MEDIAN, PERVAL, STATUS )
 
          ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-            CALL VEC_UWTOI( .TRUE., EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                      %VAL( CNF_PVAL( WPNTR ) ), IERR, NERR,
-     :                      STATUS )
-            CALL PDA_QSIAI( EL, %VAL( CNF_PVAL( WPNTR ) ), 
-     :                      %VAL( CNF_PVAL( IPNTR ) ) )
-            CALL PSX_FREE( WPNTR, STATUS )
+            CALL KPG_STOSUW( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), NGOOD,
+     :                       NUMPER, PERCNT, MEDIAN, PERVAL, STATUS )
 
-*  Remove indices for any bad data values from the index array. Indices for 
-*  good data values are shuffled down towards the start of the index array 
-*  to fill the gaps. The order of the good data values is unchanged by this.
-            CALL KPG1_MVBDUW( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), EL, 
-     :                       %VAL( CNF_PVAL( IPNTR ) ), NGOOD, STATUS )
-
-*  Extract the index of the median good value.
-            CALL KPG1_RETRI( EL, NGOOD/2 + 1, %VAL( CNF_PVAL( IPNTR ) ),
-     :                       UPERIN( 1 ), STATUS )
-
-*  Extract the median from the unsorted array.
-            CALL KPG1_RETRUW( EL, UPERIN( 1 ),
-     :                        %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                        WQUANT( 1 ), STATUS )
-            MEDIAN = NUM_UWTOD( WQUANT( 1 ) )
-
-*  Average the middle two of an even-numbered sample.
-            IF ( MOD( NGOOD, 2 ) .EQ. 0 ) THEN
-               CALL KPG1_RETRI( EL, NGOOD/2, %VAL( CNF_PVAL( IPNTR ) ),
-     :                          UPERIN( 1 ), STATUS )
-               CALL KPG1_RETRUW( EL, UPERIN( 1 ),
-     :                           %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                           WQUANT( 2 ), STATUS )
-               MEDIUN = NUM_UWTOD( WQUANT( 2 ) )
-               MEDIAN = KPG1_FLOOR( 0.5D0 * ( MEDIAN + MEDIUN ) )
-            END IF
-
-*  Extract the percentiles.
-            IF ( DOPRCT ) THEN
-               CALL KPG1_RETVI( EL, %VAL( CNF_PVAL( IPNTR ) ), NUMPER,
-     :                          PERIND, UPERIN, STATUS )
-               CALL KPG1_RETVUW( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                           NUMPER, UPERIN, WQUANT, STATUS )
-               DO I = 1, NUMPER
-                  PERVAL( I ) = KPG1_FLOOR( NUM_UWTOD( WQUANT( I ) ) )
-               END DO
-            END IF
-
-            CALL PSX_FREE( IPNTR, STATUS )
          END IF
       END IF
 
