@@ -514,7 +514,9 @@ int *status                 /* global status (given and returned) */
 
 void sc2store_force_initialised
 (
-int * status                /* global status (given and returned) */
+int *status                 /* global status (given and returned) */
 );
+
+ 
  
 #endif
