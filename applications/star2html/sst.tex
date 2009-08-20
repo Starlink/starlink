@@ -18,12 +18,18 @@
 %     source prior to any statements that make of the sst commnds.
 
 %  Notes:
-%     The style file html.sty provided with LaTeX2html needs to be used.
-%     This must be before this file.
+%     The commands defined in the style file html.sty provided with LaTeX2html 
+%     are used. These should either be made available by using the appropriate
+%     sun.tex (with hypertext extensions) or by putting the file html.sty 
+%     on your TEXINPUTS path (and including the name as part of the  
+%     documentstyle declaration).
 
 %  Authors:
 %     RFWS: R.F. Warren-Smith (STARLINK)
 %     PDRAPER: P.W. Draper (Starlink - Durham University)
+%     MJC: Malcolm J. Currie (STARLINK)
+%     DSB: David Berry (STARLINK)
+%     TIMJ: Tim Jenness (JAC)
 
 %  History:
 %     10-SEP-1990 (RFWS):
@@ -34,6 +40,16 @@
 %        Added support for the usage section and adjusted various spacings.
 %     8-DEC-1994 (PDRAPER):
 %        Added support for simplified formatting using LaTeX2html.
+%     1995 October 4 (MJC):
+%        Added goodbreaks and pagebreak[3] in various places to improve
+%        pages breaking before headings, not immediately after.
+%        Corrected banner width.
+%     1996 March 7 (MJC):
+%        Mark document name on both sides of an sstroutine.
+%     2-DEC-1998 (DSB):
+%        Added sstattributetype (copied from sun210.tex).
+%     2004 August 6 (MJC):
+%        Added sstattribute.
 %     21-JUL-2009 (TIMJ):
 %        Added \sstdiylist{}{} as used when a Parameters section is located that
 %        is not "ADAM Parameters".
@@ -58,6 +74,7 @@
 %  a purpose description and the rest of the routine's documentation.
 \newcommand{\sstroutine}[3]{
    \goodbreak
+   \markboth{{\stardocname}~ --- #1}{{\stardocname}~ --- #1}
    \rule{\textwidth}{0.5mm}
    \vspace{-7ex}
    \newline
@@ -77,15 +94,56 @@
    \end{description}
 }
 
+% Frame attributes fount.  Need to find a way for these to stand out.
+% San serif doesn't work by default.  Also without the \rm the
+% san serif continues after \sstatt hyperlinks.  Extra braces
+% failed to prevent \sstattribute from using roman fount for its 
+% headings.  The current lash up appears to work, but needs further 
+% investigation or a TeX wizard.
+\newcommand{\sstatt}[1]{\sf #1}
+\begin{htmlonly}
+  \newcommand{\sstatt}[1]{\large{\tt #1}}
+\end{htmlonly}
+
+%  Define a command to produce an attribute header, including its name,
+%  a purpose description and the rest of the routine's documentation.
+\newcommand{\sstattribute}[3]{
+   \goodbreak
+   \markboth{{\stardocname}~ --- #1}{{\stardocname}~ --- #1}
+   \rule{\textwidth}{0.5mm}
+   \vspace{-7ex}
+   \newline
+   \settowidth{\sstbannerlength}{{\Large {\sstatt #1}}}
+   \setlength{\sstcaptionlength}{\textwidth}
+   \setlength{\sstexampleslength}{\textwidth}
+   \addtolength{\sstbannerlength}{0.5em}
+   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
+   \addtolength{\sstcaptionlength}{-4.9pt}
+   \settowidth{\sstexampleswidth}{{\bf Examples:}}
+   \addtolength{\sstexampleslength}{-\sstexampleswidth}
+   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\sstatt #1}}}
+   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
+   \parbox[t]{\sstbannerlength}{\flushright{\Large {\sstatt #1}}}
+   \begin{description}
+      #3
+   \end{description}
+}
+
 %  Format the description section.
 \newcommand{\sstdescription}[1]{\item[Description:] #1}
 
 %  Format the usage section.
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
+\newcommand{\sstusage}[1]{\goodbreak \item[Usage:] \mbox{}
 \\[1.3ex]{\raggedright \ssttt #1}}
 
 %  Format the invocation section.
 \newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
+
+%  Format the attribute data type section.
+\newcommand{\sstattributetype}[1]{
+   \item[Type:] \mbox{} \\
+      #1
+}
 
 %  Format the arguments section.
 \newcommand{\sstarguments}[1]{
@@ -107,7 +165,17 @@
 
 %  Format the parameters section (for an application).
 \newcommand{\sstparameters}[1]{
+   \goodbreak 
    \item[Parameters:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the applicability section.
+\newcommand{\sstapplicability}[1]{
+   \item[Class Applicability:] \mbox{} \\
    \vspace{-3.5ex}
    \begin{description}
       #1
@@ -116,6 +184,7 @@
 
 %  Format the examples section.
 \newcommand{\sstexamples}[1]{
+   \goodbreak
    \item[Examples:] \mbox{} \\
    \vspace{-3.5ex}
    \begin{description}
@@ -132,7 +201,7 @@
 \\ #2 }
 
 %  Format the notes section.
-\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
+\newcommand{\sstnotes}[1]{\goodbreak \item[Notes:] \mbox{} \\[1.3ex] #1}
 
 %  Provide a general-purpose format for additional (DIY) sections.
 \newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
@@ -145,6 +214,7 @@
    \begin{description}
       #2
    \end{description}
+   \\
 }
 
 %  Format the implementation status section.
@@ -166,7 +236,7 @@
 %  Define the format of an item.
 \newcommand{\sstitem}{\item}
 
-%% Now define html equivalents of those already set. These are used by
+%  Now define html equivalents of those already set. These are used by
 %  latex2html and are defined in the html.sty files.
 \begin{htmlonly}
 
@@ -176,6 +246,15 @@
       \begin{description}
          #3
       \end{description}
+   }
+
+%  sstattribute. Note the further level of subsectioning.
+   \newcommand{\sstattribute}[3]{
+      \subsubsection{#1\xlabel{#1}-\label{#1}#2}
+      \begin{description}
+         #3
+      \end{description}
+      \\
    }
 
 %  sstdescription
@@ -229,6 +308,15 @@
       \\
    }
 
+%  sstapplicability
+   \newcommand{\sstapplicability}[1]{%
+      \item[Class Applicability:]
+       \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
 %  sstexamples
    \newcommand{\sstexamples}[1]{
       \item[Examples:] \\
@@ -242,7 +330,7 @@
    \newcommand{\sstsubsection}[1]{\item[{#1}]}
 
 %  sstexamplesubsection
-   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2}
+   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2\\}
 
 %  sstnotes
    \newcommand{\sstnotes}[1]{\item[Notes:] #1 }
@@ -267,6 +355,6 @@
 
 \end{htmlonly}
 
-%  End of "sst.tex" layout definitions.
+%  End of sst.tex layout definitions.
 %.
 
