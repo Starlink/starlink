@@ -862,6 +862,7 @@ and alphabetical summaries.
 \section{\xlabel{se_kappaintro}Introduction\label{se:kappaintro}}
 
 \subsection{Background}
+
 It is Starlink's aim to provide {\em maintainable\/}, {\em
 portable\/}, and {\em extensible\/} applications packages that work in
 harmony by sharing a common infrastructure toolkit, standards,
@@ -914,6 +915,7 @@ best of the relevant tools from both systems to get the job done.
 \subsection{Functionality of KAPPA}
 
 \subsubsection{Applications}
+
 Currently, \KAPPA\ has over 200 commands that are available
 both from the UNIX C-shell and from the \ICLref\ command language.
 They provide the following facilities for data processing:
@@ -982,7 +984,9 @@ through an image; \htmlref{vector plot}{VECPLOT} of an image.
 to individual needs and stored within \htmlref{`style files'}{se:style}.
 \end{itemize} 
 
-\subsubsection{General} \KAPPA\ handles \htmlref{bad pixels, and
+\subsubsection{General}
+
+\KAPPA\ handles \htmlref{bad pixels, and
 processes quality}{se:masking}, variance, \htmlref{World Co-ordinate
 System}{se:wcsuse} (WCS), and other information stored within NDFs
 \latex{(SUN/33 and Section~\ref{se:datastr})}.  In order to achieve
@@ -1015,6 +1019,7 @@ in response to a prompt or within a text file.
 
 
 \subsection{This document}
+
 This document is arranged as follows.  First are two annotated \KAPPA\ tutorials
 to give you a quick summary of basic usage.  The main
 text follows, which amplifies the points sketched in the demonstrations,
@@ -1297,6 +1302,7 @@ manipulating and viewing colour tables.
 \latex{\normalsize}
 
 \subsection{From ICL}
+
 \ICLref\ is a command language designed for use with Starlink applications,
 such as \KAPPA.  It is now of some antiquity but is still in use.  The
 main advantages for the \KAPPA\ user are that shell metacharacters
@@ -1557,6 +1563,7 @@ help topic.
 \section{Getting started}
 
 \subsection{Running KAPPA}
+
 \KAPPA\ runs from the C-shell and variants, and also from the
 interactive command language---\ICLref\@.  Both run
 monolithic programmes for efficiency.  Both have their advantages and
@@ -1630,6 +1637,7 @@ is a \htmlref{classified list}{ap:classified} of the same commands.
 Many examples are given in subsequent sections.
 
 \subsection{Issuing Commands}
+
 To run an application you then can just give its name---you will be
 prompted for any required parameters.  Alternatively, you may enter
 parameter values on the command line specified by position or by
@@ -1732,6 +1740,7 @@ or enter
 to learn more about the {\tt findme} and {\tt showme} commands.
 
 \subsubsection{Entering the Help System}
+
 To access the \KAPPA\ help use \htmlref{KAPHELP}{KAPHELP}.
 
 \latex{\small}
@@ -1786,6 +1795,7 @@ list of the options available at prompts inside the help system, and
 the rules for wildcarding and abbreviating topics.
 
 \subsubsection{Help on KAPPA commands}
+
 Help on an individual \KAPPA\ application is simply achieved by
 entering {\tt kaphelp} followed by the command name, for example
 
@@ -1836,6 +1846,7 @@ directly via the command
 \latex{\normalsize}
 
 \subsection{Changing the Current Directory in ICL}
+
 You should change default directories in \ICLref\ using its
 DEFAULT command, and not {\bf cd}.  Thus
 
@@ -2721,6 +2732,7 @@ objects are the names of data files, then \htmlref{wild-card
 characters}{SEC:NDF} are allowed in the supplied values.
 
 \subsubsection{\label{SEC:IND}Indirection}
+
 It is sometimes convenient to store the strings specifying the objects to
 be used within a text file.  The name of the text file can then be given
 in response to a prompt for a group expression, rather than giving a long
@@ -2750,6 +2762,7 @@ must be in column 1 (any blanks in front of the \verb+#+ character are
 considered to be significant).
 
 \subsubsection{\label{SEC:GRPEDIT}Editing}
+
 A group expression can contain a request to edit the supplied strings
 before passing them to the application.  The editing facilities provided
 are fairly simple.  You can:
@@ -2798,6 +2811,7 @@ strings will then have {\tt "A"} added at the start, and {\tt "B"} added at the
 end.
 
 \subsubsection{\label{SEC:MOD}Modification}
+
 A group of objects can be given by specifying some editing to
 apply to another already existing group of objects.  For instance,
 if the string \verb+new_*b|_ds|_im|+ was given in response to a request
@@ -2820,6 +2834,7 @@ the parameter description identifies an existing group which will be used
 as the basis for the modified strings.
 
 \subsubsection{Ignoring Syntax Characters}
+
 You can see from the above that several characters have special meanings 
 within group expressions.  Examples are \verb+^+ \verb+|+ \verb+-+.  
 This may sometimes cause a problem if you want to include
@@ -2907,6 +2922,7 @@ therefore contain the 16 output NDFs in components \verb+I1+ to
 \verb+I16+.
 
 \subsubsection{Examples}
+
 \begin{itemize}
 \item If an application asks for a group of input data files, the following 
 are all possible responses:
@@ -3568,7 +3584,9 @@ parameter.  KEYSTYLE is used to specify the plotting style for the key,
 whereas STYLE is used to specify the plotting style for the main plot.
 
 \subsection{Specifying a Plotting Style}
+
 \subsubsection{Group Expressions}
+
 The application parameters which are used to access plotting styles
 (STYLE, KEYSTYLE, \emph{etc.}) expect a group
 of attribute setting strings to be supplied for the parameter.  These
@@ -3682,6 +3700,7 @@ contents of {\tt style2.dat}, over-writing any settings for the same
 attributes included in {\tt style.dat}.
 
 \subsubsection{Synonyms for Attribute Names}
+
 The available plotting attributes and their names are defined by the
 AST subroutine library (see \xref{SUN/210}{}{sun210}) upon which 
 \KAPPA\ graphics are based (together with \PGPLOT\ ).
@@ -3742,6 +3761,7 @@ blue.  This is because CONTOUR will process both lines in the order
 supplied, ending up with blue contours.
 
 \subsubsection{\xlabel{se_colour_attributes}Colour Attributes\label{se:colattr}}
+
 The {\att Colour} attribute can be used to specify the colours of various
 components of a plot.  The value assigned to the attribute can be one
 of the following options.
@@ -4944,6 +4964,7 @@ components with the {\tt \htmlref{setext}{SETEXT} option=get} command.
 extensions.
 
 \subsection{Editing the Data Structures}
+
 There are facilities for editing \HDSref\ components, though these should be
 used with care, lest you invalidate the file.  For instance, if you
 were to erase the DATA\_ARRAY component of an \NDFref{NDF}, the file would no
@@ -6386,6 +6407,7 @@ The final X-window should look now look like Figure~
 \end{htmlonly}
 
 \subsection{\xlabel{se_agiother}Other Graphics Database Facilities \label{se:agiother}}
+
 Various other facilities related to the graphics database exist as well
 as those described in the previous section.  This section gives a brief
 description of a few more:
@@ -6577,6 +6599,7 @@ again will often cure the problem.
 
 
 \subsection{\xlabel{se_psfiles}Working With PostScript Files\label{se:psfiles}}
+
 Having produced a pretty picture in an X-window, how do we get it on to a
 piece of paper? There are basically two ways.  The simplest way is to copy
 the pixel values from the X-window into a PostScript file, and then print
@@ -6599,6 +6622,7 @@ document.  We will look at this method in more detail in the rest of
 this section.
 
 \subsubsection{The Choice of Graphics Device}
+
 If you want to combine the results of several applications into a single
 plot, you need to specify an \emph{encapsulated} PostScript device.
 These differ from normal PostScript files in that they contain information 
@@ -6646,6 +6670,7 @@ output to file {\tt contour.ps}.}
 \end{quote}
 
 \subsubsection{Combining the Files into a Single File}
+
 Once all applications have been run, you will have a potentially long
 list of PostScript files in your current directory.  These need to be
 stacked together to produce a single PostScript file which can either be
@@ -7190,6 +7215,7 @@ The file {\tt total.eps} is displayed in Figure~ \latexhtml{\ref{fi:agi9}}{9}.
 
 \subsection{\xlabel{se_pixgrd}Pixel Indices, Pixel Co-ordinates, and Grid
 Co-ordinates\label{se:pixgrd}}
+
 In this sub-section we will look at the definition of the four basic
 co-ordinate systems available in all NDFs---pixel indices, pixel
 co-ordinates, grid co-ordinates, and normalised co-ordinates.
@@ -7401,6 +7427,7 @@ co-ordinates of stars with known celestial co-ordinates (see
 \htmlref{SETSKY}{SETSKY} and \GAIAref\ ).
 
 \subsection{\xlabel{se_curframe}FrameSets, and the Current Frame\label{se:curframe}}
+
 Any co-ordinate Frames described in the \htmlref{WCS component}{apndf:wcs}, 
 together with the standard GRID, FRACTION, PIXEL, and AXIS
 \xref{Frames}{sun210}{Frame}, form a collection of inter-related Frames called a
@@ -7476,6 +7503,7 @@ that the current Frame in \verb+myspectrum+ is a
 SpecFrame supports these particular attribute values).
 
 \subsection{\xlabel{se_resdoms}Reserved Domain Names\label{se:resdoms}}
+
 New co-ordinates Frames can be created and added into an NDF using 
 \htmlref{WCSADD}{WCSADD}.  When you create a new Frame you should give it
 a meaningful {\tt Domain} name which indicates the sort of co-ordinates which it
@@ -7522,6 +7550,7 @@ names listed above.
 
 
 \subsection{\xlabel{se_scs}Specifying a Co-ordinate Frame\label{se:scs}}
+
 Several applications (\htmlref{WCSFRAME}{WCSFRAME},
 \htmlref{CURSOR}{CURSOR}, \htmlref{LISTMAKE}{LISTMAKE}, \emph{etc.}) have
 parameters which are used to select a co-ordinate
@@ -7602,6 +7631,7 @@ describe positions within the domain covered by the Frame.  The main
 attributes relevant to Frames are described \hyperref{here}{in Section~}{}{se:frmatt}.
 
 \subsection{Propagation of WCS Information}
+
 \KAPPA\ applications which create an output NDF on the
 basis of a given input NDF usually copy the contents of the
 \htmlref{WCS component}{apndf:wcs}~
@@ -7680,6 +7710,7 @@ command.  For instance:
 will erase the IRAS90 and FITS extensions from the NDF \verb+m31+.
 
 \subsection{Using SETSKY to Add a Celestial Co-ordinate Frame to an NDF}
+
 As mentioned in the previous section, the \htmlref{SETSKY}{SETSKY}
 application stores astrometry information within an NDF in the form of
 either a WCS component or an IRAS90 astrometry structure. 
@@ -7744,6 +7775,7 @@ use the facilities of GAIA (see \xref{SUN/214}{sun214}{}).  This provides
 much more sophisticated facilities.
 
 \subsection{Converting an AXIS structure to a SpecFrame}
+
 For many years, the calibration of spectral axes has been recorded in the
 form of AXIS structures within the NDF.  As mentioned above, each pixel
 axis in an NDF has an associated AXIS structure which is a one-dimensional 
@@ -7878,6 +7910,7 @@ of an NDF, and change the values of those which are not read-only.
 
 
 \subsubsection{Specifying Attributes for sub-Frames within Compound Frames}
+
 Let's say you have a spectral cube in which the WCS axes are wavelength,
 RA and Dec.  In this case, the current co-ordinate Frame will actually be
 a `compound' Frame containing two `component' Frames; a one-dimensional
@@ -10011,6 +10044,7 @@ The dataset old is a copy of dataset new, except in the 22-pixel region
 \section{\xlabel{se_qnames}Using Quality Names\label{se:qnames}}
 
 \subsection{Introduction}
+
 As described in \hyperref{``Masking, Bad Values, and Quality''}{Section~}{}
 {se:masking}, an NDF may optionally contain a component called
 \htmlref{QUALITY}{apndf:quality}.  If this component exists, it will be an 
@@ -10062,6 +10096,7 @@ hold neither of the qualities {\tt SOURCE\_A} and/or {\tt SOURCE\_B}.  These
 sort of strings are known as {\em quality expressions}. 
 
 \subsection{Quality Names}
+
 Quality names are names by which the user refers to particular flags
 stored  in the \htmlref{QUALITY}{apndf:quality}~ component of the NDF.  They
 must not be longer than 15 characters.  Leading blanks are ignored, and
@@ -10072,6 +10107,7 @@ are three reserved names which cannot be used; these are {\tt ANY},
 {\tt IRQ\_BAD\_SLOT} and {\tt IRQ\_FREE\_SLOT}. 
 
 \subsection{Quality Expressions}
+
 Quality names may be combined together using Boolean operators
 into complex {\em quality expressions}.  The quality expression is
 evaluated at each element within the NDF by substituting a value
@@ -10122,6 +10158,7 @@ true, or A is false and B is false.
 
 \newpage
 \section{\xlabel{se_multinvoc}Processing Groups of Data Files\label{se:multinvoc}}
+
 When a \KAPPA\ application requests an input or output data
 file (either an NDF or a positions list), you may optionally give a 
 group of several data files rather than just one. In this case, the 
@@ -10217,6 +10254,7 @@ means {\em replace all occurrences of 1 with 3}, thus giving the final NDF
 names \verb+a3+ and \verb+b3+.
 
 \subsection{Applications which Process Groups of NDFs}
+
 The majority of applications with NDF parameters use each NDF parameter
 to access a \emph{single} NDF, and supplying more than one NDF will
 result in the application being re-run as described above.  The
@@ -10231,6 +10269,7 @@ above, such parameters are not considered to be `NDF' parameters, and
 will not cause the application to be re-run.
 
 \subsection{What about the other Parameters?}
+
 When an application is re-run to process multiple data files, all the
 parameters not associated with NDFs or positions lists retain their
 values from one invocation to the next.  So, for instance, the assignment
@@ -10275,6 +10314,7 @@ the command line, for instance:
 \latex{\normalsize}
 
 \subsection{Output Parameters}
+
 If you tried out the examples at the start of this section, you may be
 wondering what happened about the output parameters for STATS.  The
 \htmlref{STATS}{STATS} application writes the various statistics it
@@ -10285,6 +10325,7 @@ parameters will be the values created on the \emph{last} invocation of the
 application.
 
 \subsection{What Happens if an Error Occurs?}
+
 If an application fails to execute successfully, the error report will be 
 displayed, and then cancelled.\footnote{This is called `flushing' the error.}
 This means that any remaining NDFs will continued to be processed normally.
@@ -10294,6 +10335,7 @@ The exception to this is that if the error is an `abort request'
 the loop exits immediately.  That is, no remaining NDFs are processed.
 
 \subsection{What about Applications which Re-use Parameters?}
+
 Some applications use a single parameter to obtain a series of values from
 the user. Examples are the INIT parameter of \htmlref{CENTROID}{CENTROID}
 and the OPTION parameter of \htmlref{SETEXT}{SETEXT}. Remembering that
@@ -10329,6 +10371,7 @@ parameters should not be accessed more than once.  The reference
 documentation for each command should be consulted for details.
 
 \subsection{Introducing a Pause Between Invocations}
+
 Sometimes you may want to slow down the speed at which data files are
 processed. For instance, if you display several small images using a
 single DISPLAY command, you may want time to examine each image before
@@ -10354,6 +10397,7 @@ In C-shell:
 \latex{\normalsize}
 
 \subsection{Reporting the Data Files being Processed}
+
 When processing a single data file, some applications report the name of 
 the file and some do not. Normally, no extra information is given
 when processing groups of data files.  This means that sometimes you get
@@ -10440,6 +10484,7 @@ follow. Note, native NDF files always have the highest priority and will
 be used (if they exist) in preference to all other files types.
 
 \subsection{Disabling Multiple Invocations of Applications}
+
 In certain circumstances, you may possibly want to disable the automatic
 re-invocation of \KAPPA\ applications to process groups of 
 data files.  This can be done by setting the environment variable 
@@ -11474,6 +11519,7 @@ parenthesis is essential.
 \newpage
 \section{\xlabel{se_probpage}Problems Problems\label{se:probpage}}
 \subsection{Errors}
+
 A detailed list of error codes and their meanings is not available.
 \KAPPA\ produces descriptive contextual error messages, which
 are usually straightforward to comprehend.  Some of these originate in
@@ -11595,6 +11641,7 @@ will inspect the NDF called myndf.  The command \htmlref{PICIN}{PICIN} will
 show the last DATA picture and its associated NDF.
 
 \subsection{Unable to Store a Picture in the Graphics Database}
+
 You may receive an error message, which says failed to store
 such-and-such picture in the \htmlref{graphics database}{se:agitate}.
 For some reason the database was corrupted due to reasons external to
@@ -11606,6 +11653,7 @@ system's node name for {\it $<$node$>$}).  You will need to redraw the
 last plot if you still require it, say for interaction.
 
 \subsection{Line Graphics are Invisible on an Graphics Device}
+
 The reason for invisible line graphics on your graphics device is
 because it is drawn in black or a dark grey.  Most likely is that some
 person has been using other software on your graphics device or that is
@@ -11621,6 +11669,7 @@ white.  Alternatively,
 will normally suffice.
 
 \subsection{Error Obtaining a Locator to a Slice of an HDS array}
+
 If the above error appears from DAT\_SLICE and you are (re)prompted
 for an \NDFref{NDF}, the most likely cause is that you have asked an
 \htmlref{IMAGE}{ap:IMAGE-format} application to process an
@@ -11629,6 +11678,7 @@ make a subset before running the application in question, or process
 the whole NDF.
 
 \subsection{Badly placed ()'s}
+
 This means that you have forgotten to `escape' parentheses, probably when
 defining an \htmlref{NDF section}{se:ndfsect} in the UNIX shell.
 Try inserting a backslash before each parenthesis or enclosing all the
@@ -11644,6 +11694,7 @@ special characters inside {\tt " "} quotes.
 
 \subsection{Attempt to use 'positional' parameter value ({\tt{x}}) in an 
 unallocated position}
+
 Check the usage of the application you are running.  One way of
 adding positional parameters unintentionally, is to forget to escape
 the {\tt{"}} from the shell when supplying a string with spaces or
@@ -11665,6 +11716,7 @@ which protects all special characters between the single quotes.
 
 \subsection{The choice {\tt x} is not in the menu.  The options
 are\ldots}
+
 You have either made an incorrect selection, or you have forgotten
 to escape a metacharacter.  For the former, you can select a new
 value from the list of valid values presented in the error message.
@@ -11690,6 +11742,7 @@ the {\tt{"}} to cure the problem.
 \latex{\normalsize}
 
 \subsection{Annotated axes show the wrong co-ordinate system}
+
 Each NDF has an associated {\em current co-ordinate system} which is used
 when reporting positions within the NDF, or when obtaining positions from
 the user. If you want to either see, or give, positions in a {\em
