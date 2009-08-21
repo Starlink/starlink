@@ -1437,7 +1437,7 @@ pictures, side by side.  They are labelled 1 and 2 in the database.
 Picture 1 is the current picture, in which future pictures are drawn,
 unless we select a new current picture.
 
-Thus in picture 1 we display an image of Comet West around which we
+Thus in Picture~1 we display an image of Comet West around which we
 draw annotated axes.  The backslash causes the current scaling method
 to be used.
 
@@ -2208,7 +2208,7 @@ The values of all global parameters may be inspected with the
 \end{verbatim}
 \latex{\normalsize}
 In the above example no interaction mode is defined.  The next time
-you call an application which uses the interaction mode you
+you call an application that uses the interaction mode you
 would be prompted for a value.  (Under normal circumstances you will not
 have to enter the {\tt @} prefix yourself.) 
 
@@ -2556,7 +2556,7 @@ if it becomes too boring.
 The ACCEPT keyword forces the parameter system to accept the suggested
 default values either for every application parameter if the keyword
 appears on the command line, or all subsequent parameters if it is
-supplied to a prompt.  In other words, those parameters which would
+supplied to a prompt.  In other words, those parameters that would
 normally be prompted with a value between {\tt / /} delimiters take
 the value between those delimiters, {\emph{e.g.}}\ XDIM we saw in
 \latexhtml{Section~\ref{se:defaults}}{\htmlref{parameter
@@ -2704,7 +2704,7 @@ following ways:
      ``\htmlref{Modification}{SEC:MOD}'').
 \end{itemize}
 
-A typical group expression will often include characters which are of
+A typical group expression will often include characters that are of
 significance to the shell.  If the group expression is supplied on the
 command line it may be necessary to place quotes around the string to
 prevent the shell from removing these characters.  Two lots of quotes are
@@ -2725,7 +2725,7 @@ If the supplied group expression is terminated with a hyphen, the
 user is re-prompted for another group expression (using the same
 parameter).  The objects specified by this second group expression are
 added to those specified by the first.  This re-prompting continues until
-a group expression is supplied which does not end with a hyphen.
+a group expression is supplied that does not end with a hyphen.
 
 Certain classes of objects have additional features, for instance if the
 objects are the names of data files, then \htmlref{wild-card
@@ -2876,7 +2876,7 @@ you can escape commas within text strings using this method.
 
 If a group expression is used to specify a list of input data files
 (\xref{NDFs}{sun33}{overview_of_an_ndf} or positions lists), then file
-names may be specified which contain wild card characters
+names may be specified that contain wild card characters
 (\verb+"*"+ and {\tt "?"} -- character classes can also be matched using
 strings such as {\tt "[0-9]"}, {\tt "[abcd]"}).  These will be
 expanded into a list of explicit file names before returning the group
@@ -2904,8 +2904,8 @@ expression, using the same parameter.
 If an HDS container file\footnote{HDS container files can usually be 
 identified by the fact they have a file type of {\tt .sdf}.  They can be 
 used to store one or more standard Starlink NDF structures.} is supplied
-which contains two or more NDF structures, then each NDF within the
-container file is processed as a separate image.  NDFs which are contained
+that contains two or more NDF structures, then each NDF within the
+container file is processed as a separate image.  NDFs that are contained
 within an extension of another NDF are not included.
 
 If a group of native output NDFs are created by modification of a group
@@ -3060,7 +3060,7 @@ append \verb+_A+ to the end of each one''.
 
 The string is enclosed in back quotes (\verb+`+) which causes the string
 to be executed as a shell command, and the resulting output to be used as
-the group expression.  Thus this example means ``Use all FITS files which
+the group expression.  Thus this example means ``Use all FITS files that
 contain an OBJECT keyword equal to {\tt 'm57'}''.
 
 
@@ -3235,7 +3235,7 @@ device-dependent value is used (for instance, \verb+pgplot.ps+ for
 postscipt files and \verb+xwindows+ for X-windows).
 
 \item [GNS] For compatibility with previous versions of \KAPPA\ 
-graphics devices may also be specified using a scheme which approximates
+graphics devices may also be specified using a scheme that approximates
 closely to that of the Starlink Graphics workstation Name Service (GNS)
 library (see \xref{SUN/57}{sun57}{GKSWorkstationNames}).  In this scheme a complete
 workstation specification is of the form \verb+<type>;<file>+.  This is
@@ -3438,7 +3438,7 @@ of which can be specified individually for different components of a plot
 Each aspect of a plot is controlled by a \emph{plotting attribute}. 
 A plotting attribute has a \emph{name} and a \emph{value}.
 
-Strings which assign new values to particular plotting attributes are
+Strings that assign new values to particular plotting attributes are
 called attribute setting strings.  For instance:
 
 \latex{\small}
@@ -3501,9 +3501,9 @@ parentheses after the attribute name.  For instance:
 assigns the value {\tt 2} to the {\att Colour} attribute for the plot border,
 and assigns the value {\tt left} to the {\att Edge} attribute for the second
 axis.  The full description of each attribute describes what happens if
-you omit the qualifier.  Attribute names which end in {\tt "(axis)"} in
+you omit the qualifier.  Attribute names that end in {\tt "(axis)"} in
 the above list can be qualified by an integer axis index to refer to a
-particular plot axis.  Attribute names which end in {\tt "(element)"} in
+particular plot axis.  Attribute names that end in {\tt "(element)"} in
 the above list can be qualified by any of the following strings to refer to 
 a particular component of the plot (the qualifiers are case-insensitive and
 unambiguous abbreviations may be used):
@@ -3515,11 +3515,11 @@ non-zero value.  Values set using {\att Axes} are
 only only used if axis-specific values have not been set using {\att Axis1}
 or {\att Axis2}.  Thus, {\att Axes} provides default values for {\att Axis1} and
 {\att Axis2}. \\
-{\att Axis1}: An axis line drawn through tick marks on axis 1 within the 
+{\att Axis1}: An axis line drawn through tick marks on Axis~1 within the 
 plotting area, drawn if attribute {\att DrawAxes} is given a
 non-zero value.  Values specified using {\att Axis1} override any supplied
 using {\att Axes}. \\
-{\att Axis2}: An axis line drawn through tick marks on axis 2 within the 
+{\att Axis2}: An axis line drawn through tick marks on Axis~2 within the 
 plotting area, drawn if attribute {\att DrawAxes} is given a
 non-zero value.  Values specified using {\att Axis2} override any supplied
 using {\att Axes}. \\
@@ -3529,10 +3529,10 @@ using {\att Axes}. \\
 Values set using {\att Grid} are only only used if axis-specific values have not been
 set using {\att Grid1} or {\att Grid2}.  Thus, {\att Grid} provides default values 
 for {\att Grid1} and {\att Grid2}. \\
-{\att Grid1}: Grid lines which cross axis 1, drawn if attribute {\att Grid} 
+{\att Grid1}: Grid lines that cross Axis~1, drawn if attribute {\att Grid} 
 is given a non-zero value.  Values specified using {\att Grid1} override any 
 supplied using {\att Grid}. \\
-{\att Grid2}: Grid lines which cross axis 2, drawn if attribute {\att Grid} 
+{\att Grid2}: Grid lines that cross Axis~2, drawn if attribute {\att Grid} 
 is given a non-zero value.  Values specified using {\att Grid2} override any 
 supplied using {\att Grid}. \\
 {\att Markers}: Graphical markers (symbols) drawn over a plot.\\
@@ -3541,9 +3541,9 @@ Values set using {\att NumLab} are
 only only used if axis-specific values have not been set using {\att NumLab1}
 or {\att NumLab2}.  Thus, {\att NumLab} provides default values for {\att NumLab1} 
 and {\att NumLab2}. \\
-{\att NumLab1}: Numerical labels drawn along axis 1.  Values specified using 
+{\att NumLab1}: Numerical labels drawn along Axis~1.  Values specified using 
 {\att NumLab1} override any supplied using {\att NumLab}. \\
-{\att NumLab2}: Numerical labels drawn along axis 2.  Values specified using 
+{\att NumLab2}: Numerical labels drawn along Axis~2.  Values specified using 
 {\att NumLab2} override any supplied using {\att NumLab}. \\
 {\att Strings}: Text strings drawn over a plot (except for axis labels and plot title).\\
 {\att TextLab}: Descriptive axis labels drawn around annotated axes.
@@ -3551,25 +3551,25 @@ Values set using {\att TextLab} are
 only only used if axis-specific values have not been set using {\att TextLab1}
 or {\att TextLab2}.  Thus, {\att TextLab} provides default values
 for {\att TextLab1} and {\att TextLab2}. \\
-{\att TextLab1}: Descriptive label for axis 1.  Values specified using 
+{\att TextLab1}: Descriptive label for Axis~1.  Values specified using 
 {\att TextLab1} override any supplied using {\att TextLab}. \\
-{\att TextLab2}: Descriptive label for axis 2.  Values specified using 
+{\att TextLab2}: Descriptive label for Axis~2.  Values specified using 
 {\att TextLab2} override any supplied using {\att TextLab}. \\
 {\att Ticks}: Tick marks (both major and minor) drawn along annotated axes.
 Values set using {\att Ticks} are
 only only used if axis-specific values have not been set using {\att Ticks1}
 or {\att Ticks2}.  Thus, {\att Ticks} provides default values for
 {\att Ticks1}  and {\att Ticks2}. \\
-{\att Ticks1}: Tick marks (both major and minor) drawn along axis 1.
+{\att Ticks1}: Tick marks (both major and minor) drawn along Axis~1.
 Values specified using {\att Ticks1} override any supplied using {\att Ticks}. \\
-{\att Ticks2}: Tick marks (both major and minor) drawn along axis 2.
+{\att Ticks2}: Tick marks (both major and minor) drawn along Axis~2.
 Values specified using {\att Ticks2} override any supplied using {\att Ticks}. \\
 \label{plotel:Title}
 {\att Title}: The title drawn at the top of a plot.
 \end{verse}
 
 A collection of attribute settings is called a \emph{plotting style}.
-Attributes which are not specified in a plotting style take on default
+Attributes that are not specified in a plotting style take on default
 values as described later.  An example of a plotting style is contained in
 the file {\tt \$KAPPA\_DIR/kappa\_style.def}.  This file defines the default
 style used by \KAPPA.
@@ -3578,7 +3578,7 @@ In general each graphical application will determine the plotting style
 to be used when drawing line graphics by accessing a parameter called 
 STYLE.  Some applications have more than one style parameter.  For instance, 
 applications such as \htmlref{CONTOUR}{CONTOUR} and
-\htmlref{LINPLOT}{LINPLOT} which produce keys to the content of the plot
+\htmlref{LINPLOT}{LINPLOT} that produce keys to the content of the plot
 have a parameter called KEYSTYLE, in addition to the normal STYLE
 parameter.  KEYSTYLE is used to specify the plotting style for the key,
 whereas STYLE is used to specify the plotting style for the main plot.
@@ -3587,18 +3587,18 @@ whereas STYLE is used to specify the plotting style for the main plot.
 
 \subsubsection{Group Expressions}
 
-The application parameters which are used to access plotting styles
+The application parameters that are used to access plotting styles
 (STYLE, KEYSTYLE, \emph{etc.}) expect a group
 of attribute setting strings to be supplied for the parameter.  These
 should be supplied in the form of a \emph{group expression}.\footnote{The
 complete group expression syntax is described in \xref{SUN/150}{}{sun150}. 
-This is the documentation for the GRP subroutine library which provides 
+This is the documentation for the GRP subroutine library, which provides 
 a programming interface for obtaining groups of strings.}
 
 A group expression is a character string containing a list of one or more
 sub-strings separated by some specified delimiter.  The usual delimiter
 used when accessing plotting style parameters is a comma (although other
-parameters which require group expressions for other purposes may use a
+parameters that require group expressions for other purposes may use a
 different delimiter).  Each sub-string is known as a group \emph{element}.
 Each group element must be either:
 
@@ -3613,14 +3613,14 @@ further group elements from the specified file.  Each
 line in the file is interpreted as a group expression in its own right,
 using exactly the same rules as described above.  In particular,
 references to text files can be nested (\emph{i.e.} a text file can
-include a group element which refers to another text file).  Blank lines
+include a group element that refers to another text file).  Blank lines
 and lines in which the first non-blank character is a hash (\verb+"#"+)
 are ignored and can be used to add textual comments to a text file.
 
 Attribute settings are used in the order in which they occur in the group
 expression.  If a group expression includes more than one setting string for 
-a given attribute, then the value which occurs nearest to the end of the
-group expression will over-write any earlier values.
+a given attribute, then the value that occurs nearest to the end of the
+group expression will overwrite any earlier values.
 
 All this means that there are several ways in which plotting styles can be
 supplied.  The simplest method is probably to store all your attribute
@@ -3733,8 +3733,8 @@ setting overrides the first one.
 
 Any particular synonym will only be recognised by certain applications.
 Thus, {\att Contours} is only recognised as a synonym for {\att Curves} when 
-running CONTOUR.  Applications ignore attributes (or synonyms) which they
-do not recognise, without reporting an error.  Thus if the file containing 
+running CONTOUR.  Applications ignore attributes (or synonyms) that they
+do not recognise without reporting an error.  Thus if the file containing 
 your default plotting style (used by all applications---see later)
 contains the two lines:
 
@@ -3770,7 +3770,7 @@ of the following options.
 \item An integer colour index.  Colour indices can be thought of as `pen 
 numbers'.  For instance, the string {\tt "Colour(border)=3"} says ``Draw the 
 border using pen number 3''.  The resulting colour depends on the colour of 
-pen 3, which can be set using \htmlref{PALENTRY}{PALENTRY}. 
+Pen~3, which can be set using \htmlref{PALENTRY}{PALENTRY}. 
 
 \item A standard X colour name, \emph{e.g.} {\tt "Colour(border)=red"}.
 
@@ -3795,7 +3795,7 @@ colour, then you should use PALENTRY first to set one of the available
 pens to the required colour.
 
 Note, if you produce a plot on an X-window and then change the representation 
-of pens using PALENTRY, then any components of the existing plot which were
+of pens using PALENTRY, then any components of the existing plot that were
 drawn with the modified pens will change colour immediately \emph{if and
 only if} your X window is set to 256 colours (\emph{i.e.} if you have an 8 bit
 pseudo-colour visual).  If you have a 16- or 24-bit display, then changes
@@ -3805,7 +3805,7 @@ to pen colours will only affect subsequently drawn graphics.
 
 When an application needs a plotting style, it uses a style parameter
 to get a group of attribute settings.  But what values are used for
-attributes which are not included in this group?
+attributes that are not included in this group?
 
 Obviously, if an attribute has been assigned an explicit value using the
 parameter then that value is used, but you should note that most styles
@@ -3826,7 +3826,7 @@ value is used for the attribute, determined as follows:
 
 \begin{enumerate}
 \item If the plot is being overlayed on another existing plot, then the
-      value which was used for the attribute when the existing plot was
+      value that was used for the attribute when the existing plot was
       created is used (but only if it was set to an explicit value).
 
 \item Otherwise, the attribute value specified in a \emph{defaults file} is
@@ -3957,12 +3957,12 @@ digits):
            the stack is empty, `normal' attribute values are restored.
 \end{itemize}
 
-\PGPLOT\  escape sequences may also be included in strings which are to be drawn.
+\PGPLOT\  escape sequences may also be included in strings that are to be drawn.
 
 \subsection{\xlabel{se_plotting_attr}Descriptions of Plotting Attributes\label{se:plotting_attr}}
 
 This section lists the available plotting attributes.  Note, the default
-value included in each description is the value which will be used if no
+value included in each description is the value that will be used if no
 other default value is supplied (for instance within a defaults file).
 In particular, the standard \KAPPA\ default style files
 contained in {\tt \$KAPPA\_DIR} include alternative default values for several
@@ -4018,7 +4018,7 @@ It is often useful to specify values for some of the attributes of the current
       the requested colour is not currently in the palette. 
 
       The default behaviour is for all graphical elements to be drawn
-      using Pen 1.
+      using Pen~1.
    }
    \sstattributetype{
       Integer.
@@ -4303,7 +4303,7 @@ It is often useful to specify values for some of the attributes of the current
       For each axis, the {\att LabelAt} value gives the value on the other
       axis at which numerical labels and tick marks should be placed.
       For example, in a celestial (right ascension, declination) co-ordinate
-      system, {\att LabelAt(1)} gives a declination value which defines a line (of
+      system, {\att LabelAt(1)} gives a declination value that defines a line (of
       constant declination) along which the numerical right-ascension labels and their
       associated tick marks will be drawn.  Similarly, {\att LabelAt(2)} gives
       the right-ascension value at which the declination labels and ticks will be drawn.
@@ -4632,7 +4632,7 @@ It is often useful to specify values for some of the attributes of the current
       element of graphical output.  It takes a
       separate value for each graphical element so that, for instance,
       the setting {\tt "Style(border)=2"}~ causes the border to be drawn
-      using line style 2 (which results in a dashed line).
+      using line Style~2 (which results in a dashed line).
 
       The range of integer line styles available and their appearance
       is determined by the \PGPLOT\  graphics system, but includes the
@@ -4860,7 +4860,7 @@ It is often useful to specify values for some of the attributes of the current
       separate value for each graphical element so that, for instance,
       the setting {\tt "Width(border)=2.0"}~ causes the border to be
       drawn using a line width of 2.0.  A value of 1.0 results in a
-      line thickness which is approximately 0.0005 times the length of
+      line thickness that is approximately 0.0005 times the length of
       the diagonal of the entire display surface.
    }
    \sstattributetype{
@@ -4948,11 +4948,11 @@ will be prompted for an alternative value.
 
 However, \KAPPA\ does allow you to `live on the edge' if
 you prefer---if you define the environment variable {\tt KAPPA\_REPLACE} before
-running a command, then \KAPPA\ will happily over-write the
+running a command, then \KAPPA\ will happily overwrite the
 input data structure if requested to do so.  You can assign any value you
 like to this environment variable, since its mere existence is the trigger
 for this optional behaviour.  Note, this facility is only available in
-those commands which access the input data structures \emph{before} the
+those commands that access the input data structures \emph{before} the
 output data structures (the vast majority).
 
 \subsection{Looking at the Data Structures}
@@ -5167,7 +5167,7 @@ centrally within an image, while
 \end{quote}
 \latex{\normalsize}
 
-would specify a section which is the same size as the original image, but
+would specify a section that is the same size as the original image, but
 displaced so that it is centred on pixel (10,~20).
 
 \subsection{\xlabel{se_ndfsec-wcs}Using World or Axis Co-ordinates to Specify
@@ -5513,7 +5513,7 @@ The default is {\tt "Normal"}, thus here the command
 \latex{\normalsize}
 switches normal history recording on for NDF hr1068.  Thereafter
 whenever you alter this NDF, or create another NDF from it,
-the task automatically records the name of the application which was
+the task automatically records the name of the application that was
 run, the date and time, a reference name that identifies the NDF, your
 username, and some text comprising the command-line parameters and the
 full path of the application.  In \KAPPA\ the package 
@@ -5664,11 +5664,11 @@ wasteful and inflexible.  The second is to store information about
 `pictures' in a database that can be accessed by subsequent graphics
 programmes.  This is the technique used by \KAPPA.
 
-Each graphics application which creates a display on a graphics device,
+Each graphics application that creates a display on a graphics device,
 also stores information describing the display in the \emph{graphics
-database}.  This is a file which usually resides in the user's home
+database}.  This is a file, which usually resides in the user's home
 directory, and is often referred to as the \emph{AGI
-database.}\footnote{``AGI'' is the name of the subroutine library which
+database.}\footnote{``AGI'' is the name of the subroutine library that
 provides access to the graphics database.  AGI stands for ``Applications Graphics
 Interface'', and is documented in \xref{SUN/48}{sun48}{}.}  Displays are
 described in terms of \emph{pictures}.  A picture is basically a
@@ -5728,7 +5728,7 @@ introduce the idea of the \emph{current picture}.
 
 At any time, one of the pictures stored within the graphics database is
 nominated as the current picture.  All graphical applications are
-written so that the graphical output which they create is scaled to fit
+written so that the graphical output that they create is scaled to fit
 within the current picture.  Thus, the plotting area used by a graphics
 application can be controlled by selecting a suitable current picture
 before running the application.  Since we have just cleared the database,
@@ -5807,8 +5807,8 @@ picture on entry to be retained.
 
 The above use of \htmlref{DISPLAY}{DISPLAY} illustrates an important 
 rule regarding the behaviour of most graphical applications; {\em the
-current picture is not changed by applications which produce graphical
-output}.\footnote{This rule does not apply to applications which 
+current picture is not changed by applications that produce graphical
+output}.\footnote{This rule does not apply to applications that
 manage the database itself rather than producing graphical output.  Thus,
 for instance, it is legal for PICLIST to change the current picture if
 you request such a change.  Also, an uncontrolled exit from an application,
@@ -5993,7 +5993,7 @@ graphics database.  When \htmlref{CURSOR}{CURSOR} subsequently reports
 a position, it uses this saved WCS information to convert the graphics
 co-ordinates at the cursor into any of the available co-ordinate
 Frames.  By default, CURSOR reports positions in the co-ordinate Frame
-which was current when the NDF was displayed (RA/DEC in this case),
+that was current when the NDF was displayed (RA/DEC in this case),
 but other co-ordinate Frames may be requested using the FRAME
 parameter (\emph{e.g.} {\tt FRAME=PIXEL} displays pixel co-ordinates).
 In addition to the co-ordinate Frames inherited from the NDF, there
@@ -6033,7 +6033,7 @@ indices $(1,1)$ covers a range of pixel co-ordinates between $0.0$ and
 $1.0$ on each axis, with its centre at pixel co-ordinates $(0.5,0.5)$.}
 The second parameter ({\tt PLOT=BOX}) causes a box to be drawn on the
 screen between each pair of positions.  There are several other allowed
-values for the PLOT parameter which mark the positions in different ways
+values for the PLOT parameter, which mark the positions in different ways
 (markers, poly-lines, chains, text, \emph{etc.}).  The last parameter
 ({\tt MAXPOS=2}) 
 is purely a convenience, and causes the application to
@@ -6187,7 +6187,7 @@ Since we produced no annotated axes, a title string was added using the text
 drawing abilities of CURSOR.  The pointer was positioned above the contour
 plot, and the left button clicked.  The specified text string was drawn
 centred at this cursor position.  Note, the string \verb+\gm+ is a
-`\PGPLOT\  escape sequence' which represents the Greek letter mu
+`\PGPLOT\  escape sequence' that represents the Greek letter mu
 ({\tt "$\mu$"}).  See the \PGPLOT\  manual for a detailed description of the
 available escape sequences.
 
@@ -6312,7 +6312,7 @@ Instead, the new line plot is drawn within the same axes as any
 existing line plot within the current picture.  By default, the new
 line plot would adopt the bounds of the two existing axes.  This would
 be inappropriate in this case since the two images have very different
-data scales.  To prevent this, we specify the NOALIGN keyword which
+data scales.  To prevent this, we specify the NOALIGN keyword, which
 causes the default bounds for the new axes to be determined from the
 supplied data instead of the existing line plot.  The STYLE parameter
 is similar to the previous line plot except that the data values are
@@ -6533,14 +6533,14 @@ left corner of the graphics device.
 \item [BASEPIC] --- This gives positions within a normalised co-ordinate
 system spanning the BASE picture (\emph{i.e.} the entire graphics device).  The 
 units on both axes are set so that either the width or the
-height of the graphics device, which-ever is smaller, is set to 1.0
+height of the graphics device, whichever is smaller, is set to 1.0
 (put another way, a unit square would fit in the picture and span the
 shorter axis).  The bottom-left corner of the graphics device is (0,~0).
 
 \item [NDC] --- Normalised Device Co-ordinates, which are similar to BASEPIC
 but specifies positions in a normalised co-ordinate system in which
-the bottom left corner has co-ordinates (0,~0) and the top-right corner
-has co-ordinates (1,~1). Thus, for a non-square device the scales on
+the bottom-left corner has co-ordinates (0,~0) and the top-right corner
+has co-ordinates (1,~1).  Thus, for a non-square device the scales on
 the two axes will be different.
 
 \item [CURPIC] --- similar to BASEPIC except that it covers only the
@@ -6553,12 +6553,12 @@ DATA pictures have additional co-ordinate
 \xref{Frames}{sun210}{Frame}~ inherited from the
 \hyperref{WCS information}{WCS information (see Section~}{)}{se:wcsuse}
 associated with the displayed data.  The details of the available Frames
-will depend on the application which created the picture and the nature
+will depend on the application that created the picture and the nature
 of the data.  For instance, if an image is displayed in which the current
 Frame is a SKY Frame (calibrated in RA/DEC for instance), then the
 Domains GRID, PIXEL, AXIS and SKY will also be available.
 
-Pictures created by older applications which do not yet support WCS 
+Pictures created by older applications that do not yet support WCS 
 information will not have all of these Frames.  They will still have
 GRAPHICS, BASEPIC, NDC and CURPIC Frames, but the only additional Frames 
 will be:
@@ -6569,7 +6569,7 @@ will be:
 \end{description}
 
 The interpretation of both these Frames will depend on the application
-which created the picture, and should be described in the associated
+that created the picture, and should be described in the associated
 documentation.  Note, the AGI\_DATA Frame may not always be present.  This
 again depends on the application.
 
@@ -6617,7 +6617,7 @@ device instead of the X-windows device used earlier in this chapter.
 Each application will then write its graphical output to one or more disk
 files.  Once all applications have been run, you combine all these
 files together using \PSMERGEref\ to create a single PostScript file
-containing the entire plot which can be printed or included in another
+containing the entire plot, which can be printed or included in another
 document.  We will look at this method in more detail in the rest of
 this section.
 
@@ -6659,7 +6659,7 @@ examined without needing to be printed by using the {\tt ghostview}
 program.  By default, the output file will be called {\tt pgplot.ps}. 
 
 \begin{quote}
-\emph{ Note, subsequent graphics commands will over-write any file
+\emph{ Note, subsequent graphics commands will overwrite any file
 created by earlier graphics commands.  For this reason you should 
 rename the output file after running each graphics command.  An
 alternative approach is to assign a unique value to the DEVICE parameter 
@@ -6676,7 +6676,7 @@ list of PostScript files in your current directory.  These need to be
 stacked together to produce a single PostScript file which can either be
 printed or included in a document.  To do this, we use 
 \PSMERGEref\  as follows\footnote{You can include all the PostScript files,
-including any which do not contain any actual drawing commands.}:
+including any that do not contain any actual drawing commands.}:
 
 \latex{\small}
 \begin{verbatim}
@@ -6737,7 +6737,7 @@ drawing commands again specifying a suitable PostScript device instead.
 If you choose to do this, it can be a big help to ensure that the X-window
 you are using has the same shape as your selected PostScript device.  This 
 prevents you accidentally drawing things within regions of the X-window
-which are not available in PostScript.  To find the require aspect ratio,
+that are not available in PostScript.  To find the require aspect ratio,
 do:
 
 \latex{\small}
@@ -6877,8 +6877,8 @@ optical image within it, including annotated axes:
 
 Note, we are using a monochrome PostScript device, and so the colour of
 all annotation produced by \htmlref{DISPLAY}{DISPLAY} was set to black using the STYLE
-parameter.  This is done for all applications which produce graphical
-output.  We also request text which 0.6 of the default size.  We specified
+parameter.  This is done for all applications that produce graphical
+output.  We also request text 0.6 of the default size.  We specified
 the MARGIN parameter when running DISPLAY in order to reduce the margin
 on the right hand side of the image.  By default, DISPLAY leaves a
 margin equal to 0.2 of the width of the DATA picture.  We reduced this to
@@ -6968,7 +6968,7 @@ LISTMAKE to create the positions list.  The JUST parameter is set to {\tt
 bc} so that the title string is displayed with its bottom centre at the
 supplied position.
 
-We now draw the line marking the path of the profiles which will be
+We now draw the line marking the path of the profiles that will be
 displayed later.  We draw them in white so that they show up against 
 the predominantly dark background of the image:
 
@@ -7042,7 +7042,7 @@ The file {\tt style2} contains the following attribute settings:
 
 Now comes the complicated bit---the warp lines! The problem is that we
 used the cursor to define the start and end of these lines when
-prototyping.  This was good enough for an X-window which has relatively
+prototyping.  This was good enough for an X-window that has relatively
 low resolution, but will not do for PostScript.  We cannot place the
 cursor accurately enough to ensure that there is no visible gap between
 the end of the line and the corresponding box corner when using
@@ -7220,7 +7220,7 @@ In this sub-section we will look at the definition of the four basic
 co-ordinate systems available in all NDFs---pixel indices, pixel
 co-ordinates, grid co-ordinates, and normalised co-ordinates.
 
-\emph{Pixel indices} are integer values which are used to count the
+\emph{Pixel indices} are integer values that are used to count the
 pixels along each axis of an NDF.  The first pixel can be given any
 arbitrary pixel index, and this value is known as the \emph{pixel origin}.
 When a section is extracted from an NDF, the pixel origin in the
@@ -7245,7 +7245,7 @@ indices (see Figure~\latexhtml{\ref{fi:pixind}}{10}).
 
 \end{htmlonly}
 
-\emph{Pixel co-ordinates} are floating-point values which allow positions
+\emph{Pixel co-ordinates} are floating-point values that allow positions
 to be specified with sub-pixel accuracy.  They are related to pixel indices
 as indicated in Figure~\latexhtml{\ref{fi:pixco}}{11}). 
 
@@ -7267,7 +7267,7 @@ as indicated in Figure~\latexhtml{\ref{fi:pixco}}{11}).
 
 \end{htmlonly}
 
-\emph{Grid co-ordinates} are floating-point values which are similar to
+\emph{Grid co-ordinates} are floating-point values that are similar to
 pixel co-ordinates except that the origin is fixed so that the first
 pixel on an axis is centred at a grid co-ordinate value of 1.0, no matter
 what the pixel origin is.  This corresponds to the FITS idea of `pixel 
@@ -7333,7 +7333,7 @@ briefly below (full descriptions of these attributes are included
 \begin{verse}
 {\att Digits}: Number of digits of precision\\
 {\att Domain}: Physical domain described by the co-ordinate system\\
-{\att Epoch}: A date \& time which defines the co-ordinate system\\
+{\att Epoch}: A date \& time that defines the co-ordinate system\\
 {\att Format(axis)}: Format specification for axis values\\
 {\att Label(axis)}: Axis label\\
 {\att Naxes}: Number of Frame axes\\
@@ -7364,7 +7364,7 @@ co-ordinates where each scaled pixel axis spans the range zero to one.
 \item[AXIS] --- Corresponds to the co-ordinate system defined by the
 \htmlref{AXIS}{apndf:axis}~ structures within the NDF.
 
-An AXIS structure is a one-dimensional array which maps pixel index along a
+An AXIS structure is a one-dimensional array that maps pixel index along a
 given axis on to another related co-ordinate axis (\emph{e.g.} wavelength)
 -- the values on the other axes are assumed to be constant.  Each
 dimension in the NDF should have an associated AXIS structure.  Such
@@ -7379,10 +7379,10 @@ AXIS structures because celestial longitude and latitude may both vary
 along any given row or column of an NDF.\footnote{For this and other
 reasons, new applications will avoid using AXIS structures, and make use
 of the more versatile \htmlref{WCS component}{apndf:wcs}~ instead.}  If
-an application is used which renders the AXIS structures in an NDF
+an application is used that renders the AXIS structures in an NDF
 invalid, then the AXIS structures will not be copied to the output
 NDF.  For instance, if \htmlref{ROTATE}{ROTATE} is used to rotate an
-NDF by an angle which is not a multiple of 90\dgs, then the output NDF
+NDF by an angle that is not a multiple of 90\dgs, then the output NDF
 will not have any AXIS structures, and so the AXIS Frame will default
 to pixel co-ordinates.
 
@@ -7409,10 +7409,10 @@ supported types of \xref{Mapping}{sun210}{Mapping}).
 component.
 
 Two common additional Frame {\tt Domains} are SKY and SPECTRUM.  SKY
-is reserved to refer to two-dimensional Frames which describe
+is reserved to refer to two-dimensional Frames that describe
 celestial longitude and latitude (known as
 \xref{`SkyFrames'}{sun210}{SkyFrame}). SPECTRUM is reserved to refer
-to one-dimensional Frames which describe position within a spectrum
+to one-dimensional Frames that describe position within a spectrum
 (known as \xref{`SpecFrames'}{sun210}{SpecFrame}).  These sub-classes of
 Frame have additional attributes indicating the particular celestial
 or spectral co-ordinate system in use (\emph{e.g.} equatorial,
@@ -7436,7 +7436,7 @@ descriptions of each Frame, plus recipes (called
 \emph{\xref{Mappings}{sun210}{Mapping}}) describing how to convert
 positions from one Frame to another.\footnote{A Mapping need not
 necessarily be defined in both directions.  For instance, a Mapping
-which goes from a three-dimensional Frame to a two-dimensional Frame
+that goes from a three-dimensional Frame to a two-dimensional Frame
 (maybe by simply throwing away one of the axis values) may not be
 defined in the other direction.  KAPPA applications will report an
 error if a Mapping is not defined in the required direction.  Another
@@ -7447,7 +7447,7 @@ Frames within a FrameSet are distinguished by their attribute values,
 primarily their {\tt Domain} value.  In addition, each Frame has an integer
 \emph{Frame index}.  These indices are (in general) allocated sequentially
 in chronological order as Frames are added into the FrameSet.
-Applications which require the user to specify a Frame will usually allow
+Applications that require the user to specify a Frame will usually allow
 the Frame to be specified either by {\tt Domain} name, or by index.  Frame indices
 can be examined using \htmlref{NDFTRACE}{NDFTRACE} (see below).
 
@@ -7506,7 +7506,8 @@ SpecFrame supports these particular attribute values).
 
 New co-ordinates Frames can be created and added into an NDF using 
 \htmlref{WCSADD}{WCSADD}.  When you create a new Frame you should give it
-a meaningful {\tt Domain} name which indicates the sort of co-ordinates which it
+a meaningful {\tt Domain} name which indicates the sort of
+co-ordinates that it
 represents.  You are free to choose any name you like (white space is removed, 
 and lower case characters are converted to upper case before using the
 supplied {\tt Domain} string), but you should usually avoid the following reserved 
@@ -7544,7 +7545,7 @@ co-ordinate space of higher dimensionality, the default Domain name for
 the compound Frame is formed from the individual Domain names, separated
 by a hyphen. For instance, the WCS FrameSet associated with a spectral
 cube will often contain a (compound) Frame with the Domain name
-``SKY-SPECTRUM''. Thus you should also avoid Domain names which contain 
+``SKY-SPECTRUM''. Thus you should also avoid Domain names that contain 
 a hyphen, particularly if they also contain any of the reserved Domain
 names listed above.
 
@@ -7553,8 +7554,7 @@ names listed above.
 
 Several applications (\htmlref{WCSFRAME}{WCSFRAME},
 \htmlref{CURSOR}{CURSOR}, \htmlref{LISTMAKE}{LISTMAKE}, \emph{etc.}) have
-parameters which are used to select a co-ordinate
-\xref{Frame}{sun210}{Frame}.
+parameters that are used to select a co-ordinate \xref{Frame}{sun210}{Frame}.
 These parameters are usually called FRAME.  When selecting a Frame from an
 existing \xref{FrameSet}{sun210}{FrameSet}~ (\emph{e.g.} read from the \htmlref{WCS
 component}{apndf:wcs}~ of an NDF),
@@ -7573,7 +7573,7 @@ has been inherited from the IRAS90 package (see \xref{SUN/163}{sun163{}}),
 and can be used to indicate a specific celestial co-ordinate system.
 Simply specifying the {\tt Domain} name SKY will select any
 \xref{SkyFrame}{sun210}{SkyFrame}~ that is present, irrespective of the
-particular celestial co-ordinate system which
+particular celestial co-ordinate system that
 the SkyFrame represents.  If you want to request a particular celestial
 co-ordinate system (\emph{e.g.} galactic, equatorial, ecliptic, \emph{etc.}), then use an
 SCS specification.  If the requested system is not present, but a related
@@ -7621,7 +7621,7 @@ specification, but you cannot give a Frame index.  Any string may be used
 as a {\tt Domain} name, and you will usually be required to specify
 the number of axes in the Frame.  The exception to this is if you specify
 one of the {\tt Domain} names SKY, GRAPHICS, NDC, CURPIC or BASEPIC, in which 
-case a two dimensional Frame is always created.
+case a two-dimensional Frame is always created.
 
 The nature of the current Frame can also be changed using
 \htmlref{WCSATTRIB}{WCSATTRIB}, which allows new values to be assigned to
@@ -7632,7 +7632,7 @@ attributes relevant to Frames are described \hyperref{here}{in Section~}{}{se:fr
 
 \subsection{Propagation of WCS Information}
 
-\KAPPA\ applications which create an output NDF on the
+\KAPPA\ applications that create an output NDF on the
 basis of a given input NDF usually copy the contents of the
 \htmlref{WCS component}{apndf:wcs}~
 from the input to the output, modifying it as appropriate to take account
@@ -7661,7 +7661,7 @@ usually copy the AXIS structures either).
 The application \htmlref{WCSCOPY}{WCSCOPY} can be used to copy the WCS
 component from one NDF to another, optionally introducing a linear
 transformation of pixel co-ordinates in the process.  This can be used to
-add WCS information back into an NDF which has been stripped of WCS
+add WCS information back into an NDF that has been stripped of WCS
 information by one of the above applications. 
 
 \subsection{Reading WCS Information Stored in Other Forms}
@@ -7766,7 +7766,7 @@ Note the up-arrow character (\verb+"^"+) before the file name
 gnomonic (or \emph{tangent plane}) projection was requested using the
 PROJTYPE parameter.  If no projection type is specified then SETSKY will
 try four different projections (gnomonic, Aitoff, Lambert equivalent
-cylindrical, and orthographic) in turn, and choose the one which gives
+cylindrical, and orthographic) in turn, and choose the one that gives
 the smallest RMS position error.
 
 An alternative way to add a celestial co-ordinate
@@ -7778,13 +7778,13 @@ much more sophisticated facilities.
 
 For many years, the calibration of spectral axes has been recorded in the
 form of AXIS structures within the NDF.  As mentioned above, each pixel
-axis in an NDF has an associated AXIS structure which is a one-dimensional 
+axis in an NDF has an associated AXIS structure, which is a one-dimensional 
 array containing an element for each pixel on the associated axis.
 The value of each element gives the `axis' value for the pixel.
 
 Spectral axis calibration can now also be recorded in the form of a
 \xref{`SpecFrame'}{sun210}{SpecFrame}~ within the WCS component.  A
-SpecFrame is a \xref{Frame}{sun210}{Frame}~ which can
+SpecFrame is a \xref{Frame}{sun210}{Frame}~ that can
 describe spectral axes in many different forms (wavelength, frequency,
 various forms of velocity, \emph{etc.}), with many different units, and
 measured in various rest frames.  A SpecFrame `knows' how to convert
@@ -7807,7 +7807,7 @@ the Doppler shift caused by the differing standards of rest used by the
 two spectra.
 
 So the question arises; ``How can I add a SpecFrame to my existing NDFs
-which only have an AXIS structure?''.  This is simple to do using the 
+that only have an AXIS structure?''.  This is simple to do using the 
 \htmlref{WCSADD}{WCSADD} command.  Let's assume you have a one-dimensional 
 NDF called {\tt fred} containing an AXIS structure holding the frequency
 at the centre of each pixel in units of GHz.  The following command will add
@@ -7832,7 +7832,7 @@ within the AXIS structure are identical to the frequency values described
 by the SpecFrame.
 
 The above setting for the ATTRS parameter gives the bare minimum of
-information---there are several other items of information which
+information---there are several other items of information that
 \emph{could} have been given.  For instance, the above command does not
 indicate the standard of rest to which the frequency values refer.
 Neither does it indicate the source position, date of observation, 
@@ -7860,7 +7860,7 @@ Frame of NDF {\tt fred}.  These attributes are described
 is important: it tells the command to change the Frame attribute
 \emph{ without} changing the \xref{Mappings}{sun210}{Mapping}~ between
 Frames accordingly.  If the default value of {\tt "remap=yes"} were
-used, the Mappings which connect the
+used, the Mappings that connect the
 \xref{SpecFrame}{sun210}{SpecFrame}~
 to the other Frames within the WCS \xref{FrameSet}{sun210}{FrameSet}~
 would be modified in order to ensure that the position of each pixel
@@ -7881,9 +7881,9 @@ will modify the Mapping between the pixel Frame and the SpecFrame using
 the relationship ``wavelength = speed of light/frequency''. 
 
 However, if you have a partially or incorrectly specified SpecFrame you
-should usually use {\tt "remap=no"}.  For instance, of the above SpecFrame
-which gives the frequency at each pixel was discovered to be 
-incorrect, in that the AXIS values were actually wavelength values and
+should usually use {\tt "remap=no"}.  For instance, of the above
+SpecFrame, which gives the frequency at each pixel, was discovered to be 
+incorrect in that the AXIS values were actually wavelength values and
 not frequency at all, then you would want to \emph{correct} the WCS
 component by changing the System attribute of the SpecFrame from 
 {\tt "freq"} to {\tt "wave"}.  In this situation you want to leave the Mapping
@@ -7900,13 +7900,13 @@ erroneously, thought to be a frequency value).  So here you would do:
 
 \subsection{\xlabel{se_frmatt}Frame Attributes\label{se:frmatt}}
 
-Each co-ordinate Frame has several \emph{attributes} which determine
+Each co-ordinate Frame has several \emph{attributes} that determine
 its properties.  This section lists the most important of these.  See
 \xref{SUN/210}{sun210}{} for a complete description of the properties of
 \xref{Frames}{sun210}{Frame}~ and their attributes.  The application
 \htmlref{WCSATTRIB}{WCSATTRIB} 
 can be used to examine attribute values associated with the current Frame
-of an NDF, and change the values of those which are not read-only.
+of an NDF, and change the values of those that are not read-only.
 
 
 \subsubsection{Specifying Attributes for sub-Frames within Compound Frames}
@@ -8046,7 +8046,7 @@ attribute of the sky Frame, we could say:
    Co-ordinate system domain
 }{
    \sstdescription{
-      This attribute contains a string which identifies the physical
+      This attribute contains a string that identifies the physical
       domain of the co-ordinate system that a
       \xref{Frame}{sun210}{Frame}~ describes.
 
@@ -8074,7 +8074,7 @@ attribute of the sky Frame, we could say:
          PIXEL Frame, then this command takes a `snap-shot' of the PIXEL 
          Frame and stores it as a new Frame with Domain OLDPIXEL in the WCS 
          component.  Subsequent changes to the PIXEL Frame (for instance,
-         produced by applications which rotate, or move the contents of
+         produced by applications that rotate, or move the contents of
          the NDF) will not effect the OLDPIXEL Frame, which will thus 
          provide a `frozen' record of the original PIXEL Frame.
       }
@@ -8188,8 +8188,8 @@ attribute of the sky Frame, we could say:
 
       When enquiring {\att Epoch} values, the format used is the
       ``Year'' format described under \htmlref{``Input
-      Formats''}{epoch:input}.  This is a value in decimal years which
-      will be a Besselian epoch if less than 1984.0 and a Julian epoch
+      Formats''}{epoch:input}.  This is a value in decimal years, which
+      will be a Besselian epoch if less than 1984.0, and a Julian epoch
       otherwise.
    }
 }
@@ -8210,7 +8210,7 @@ attribute of the sky Frame, we could say:
       ecliptic and/or equator are used instead.  These, together with
       the point on the sky that defines the co-ordinate origin (the
       intersection of the two planes termed the `mean equinox') move
-      with time according to some model which removes the more rapid
+      with time according to some models that remove the more-rapid
       fluctuations.  The SkyFrame class supports both the old FK4 and
       the current FK5 models.
 
@@ -8220,7 +8220,7 @@ attribute of the sky Frame, we could say:
       the source).  Such co-ordinate systems must therefore be
       qualified by a moment in time (the `epoch of the mean equinox'
       or `equinox' for short) which allows the position of the model
-      co-ordinate system on the sky to be determined.  This is the role
+      co-ordinate system on the sky to be determined.  This is the r\^{o}le
       of the {\att Equinox} attribute.
 
       The {\att Equinox} attribute is stored as a Modified Julian Date, but
@@ -8237,7 +8237,7 @@ attribute of the sky Frame, we could say:
          \sstitem
          Care must be taken to distinguish the {\att Equinox} value, which
          relates to the definition of a time-dependent co-ordinate system
-         (based on solar system reference planes which are in motion),
+         (based on solar-system reference planes which are in motion),
          from the superficially similar {\att Epoch} value. 
          The latter is used to qualify co-ordinate systems where the
          positions of sources change with time (or appear to do so)
@@ -8409,8 +8409,8 @@ attribute of the sky Frame, we could say:
       shift introduced by the observers diurnal motion around the
       Earth's axis, which is needed when converting
       \xref{SpecFrames}{sun210}{SpecFrame}~ to or from the topocentric
-      standard of rest.  The maximum velocity error which can be
-      caused by an incorrect value is 0.5~km/s.  The default value for
+      standard of rest.  The maximum velocity error, which can be
+      caused by an incorrect value, is 0.5~km/s.  The default value for
       the attribute is zero.
 
       The value is stored internally in radians, but is converted to
@@ -8512,7 +8512,7 @@ attribute of the sky Frame, we could say:
    \sstdescription{
       This is a read-only attribute giving the number of axes in a
       Frame (\emph{i.e.} the number of dimensions of the 
-      co-ordinate space which the Frame describes).  This value is determined 
+      co-ordinate space that the Frame describes).  This value is determined 
       when the Frame is created.
    }
    \sstattributetype{
@@ -8613,7 +8613,7 @@ attribute of the sky Frame, we could say:
       This attribute (together with \htmlattref{SourceVRF}{SourceVRF},
       \htmlattref{RefRA}{RefRA}, and \htmlattref{RefDec}{RefDec})
       defines the `Source' standard of rest (see attribute
-      \htmlattref{StdOfRest}{StdOfRest}).  This is a rest frame which
+      \htmlattref{StdOfRest}{StdOfRest}).  This is a rest frame that
       is moving towards the position given by {\att RefRA} and {\att
       RefDec} at a velocity given by SourceVel (in km/s).  When
       setting a value for \htmlattref{SourceVel}{SourceVel}~ using
@@ -8649,7 +8649,7 @@ attribute of the sky Frame, we could say:
       If the value of {\att SourceVRF} is changed, the value stored for
       {\att SourceVel} will be converted from the old to the new rest frame.
 
-      The values which can be supplied are the same as for the
+      The values that can be supplied are the same as for the
       \htmlattref{StdOfRest}{StdOfRest}~ attribute (except that {\att
       SourceVRF} cannot be set to {\tt "Source"}).  The default value
       is {\tt "Helio"}.
@@ -8956,8 +8956,8 @@ attribute of the sky Frame, we could say:
    Frame title
 }{
    \sstdescription{
-      This attribute holds a string which is used as a title in (\emph{e.g.})
-      graphical output to describe the co-ordinate system which a 
+      This attribute holds a string that is used as a title in (\emph{e.g.})
+      graphical output to describe the co-ordinate system that a 
       Frame represents.  Examples might be {\tt "Detector Co-ordinates"} or
       {\tt "Galactic Co-ordinates"}.
 
@@ -9012,7 +9012,7 @@ attribute of the sky Frame, we could say:
       For most classes, the {\att Unit} attribute is a purely descriptive
       comment intended for human readers and makes no difference to
       the operation of the software.  However, there are some classes
-      which have \emph{active} {\att Unit} attributes.  Changing the {\att Unit}
+      that have \emph{active} {\att Unit} attributes.  Changing the {\att Unit}
       attribute for such classes will result in the
       \xref{Mappings}{sun210}{Mapping}~ within the WCS
       \xref{FrameSet}{sun210}{FrameSet}~ being modified in order 
@@ -9170,10 +9170,10 @@ Such co-ordinate files can also be created interactively with images by
 \section{\xlabel{se_coltab}Graphics Device Colour Table and Palette
 \label{se:coltab}}
 
-The \PGPLOT\ ref\ graphics package which is used by \KAPPA\ 
+The \PGPLOT\ ref\ graphics package, which is used by \KAPPA\ ,
 draws images and line graphics using a set of `pens'.  The number of pens 
 available is limited to 256, even on 16- or 24-bit graphics devices which
-nominally have `millions' of colours.  On 8 bit graphics devices, the
+nominally have `millions' of colours.  On 8-bit graphics devices, the
 number of available pens may be fewer than 256 if any other applications
 have `grabbed' colours for their own use\footnote{Netscape is notorious 
 for this.  If you have problems allocating sufficient colours, try killing
@@ -9192,10 +9192,10 @@ bits to the green intensity.  This means that red and blue can only be set
 accurate to 1 part in 32 on these devices, which may result in colours
 not being exactly as you want them.
 
-On an 8-bit device, any changes which you make to the colour table are
+On an 8-bit device, any changes thatyou make to the colour table are
 immediately reflected in the visual appearance of the display.  For
-instance, if you set pen 1 to red, then draw something using pen 1, it
-will appear red on the screen.  If you then change pen 1 to blue, the
+instance, if you set Pen~1 to red, then draw something using Pen~1, it
+will appear red on the screen.  If you then change Pen~1 to blue, the
 previously drawn graphics will immediately change colour without you
 needing to re-draw them.  This is \emph{not} usually true for 16- and 24-bit
 devices.  That is, changing pen colours will usually have no effect on
@@ -9208,9 +9208,9 @@ annotate images with captions or axes, plot coloured borders about
 images, plot graphs \emph{etc}, yet simultaneously display images with
 certain colour tables, there may be conflict of interests.  For instance,
 a linear grey-scale colour table's first few pens will be almost
-black.  By default, these same pens, particularly pen 1, are used by
+black.  By default, these same pens, particularly Pen~1, are used by
 the graphics system for line graphics, thus any plots will be invisible.
-If you reset colour pen 1 to white, the appearance of your image
+If you reset colour Pen~1 to white, the appearance of your image
 alters.  Whenever you alter the colour table to enhance the look of your
 image, it will affect the line graphics.
 
@@ -9222,7 +9222,7 @@ number of pens.  In \KAPPA\ the remainder of the pens
 is called the {\em colour table}.  It is easy to confuse this use of the
 term `colour table', with the \PGPLOT\  colour table described above.  To
 sumarize again, in \KAPPA\ the `colour table' is that
-part of the \PGPLOT\  colour table which has not been reserved for annotation
+part of the \PGPLOT\  colour table that has not been reserved for annotation
 (\emph{i.e.} the whole colour table minus the first 16 pens which form the
 annotation \emph{palette}).  The context should usually make it obvious
 which understanding of the phrase `colour table' is being used.
@@ -9364,10 +9364,10 @@ and then run TRANDAT to make the NDF called collut6.
 
 There is an interactive task called \htmlref{LUTEDIT}{LUTEDIT} for
 creating and editing lookup tables.  The LUTEDIT command fires up a
-complete graphical-user-interface, which includes its own help system 
+complete graphical-user-interface.  This includes its own help system 
 via a "short help" window at the bottom of the interface which describes
 the control currently under the pointer, and also via the usual "Help"
-button at the right hand end of the menu bar.
+button at the right-hand end of the menu bar.
 
  
 \subsection{\xlabel{se_palette}Palette\label{se:palette}}
@@ -9471,7 +9471,7 @@ Bad pixels are flagged with the Starlink standard values (see
 Section~5 of \xref{SUN/39}{sun39}{}), which for
 \htmlref{\_REAL}{ap:HDStypes} is the most-negative value possible.
 
-In addition to tasks which routinely create bad values in the output
+In addition to tasks that routinely create bad values in the output
 value is undefined, \KAPPA\ offers many applications for
 flagging pixels with certain properties or locations.
 
@@ -9715,11 +9715,11 @@ this ellipse, by combining with the {\tt NOT} operator.
 \end{verbatim}
 \latex{\normalsize}
 
-This removes the original region 2, decrements the region numbers of
-the other regions following 2 by one, so that region 3 becomes 2, 4
-becomes 3, and so on.  A new region 7 is the inverted ellipse.  The
+This removes the original Region~2, decrements the region numbers of
+the other regions following 2 by one, so that Region~3 becomes 2, 4
+becomes 3, and so on.  A new Region~7 is the inverted ellipse.  The
 renumbering makes it worth listing the regions before combining
-regions.  The second stage is to combine it with region 1, using the
+regions.  The second stage is to combine it with Region~1, using the
 {\tt AND} operator.  This includes pixels if they are in both regions.
 In this example, that means all the pixels outside the second ellipse
 but which lie within the first.
@@ -9943,7 +9943,7 @@ the mask unaltered, whereas the second switches off the same bits.
 
 Now remembering which bit corresponds to which could be a strain on
 the memory.  It would be better if some meaning was attached to each
-bit through a name.  There are four general tasks which address this. 
+bit through a name.  There are four general tasks that address this. 
 \htmlref{SETQUAL}{SETQUAL} sets quality values and names;
 \htmlref{SHOWQUAL}{SHOWQUAL} lists the named qualities;
 \htmlref{REMQUAL}{REMQUAL} removes named qualities; and 
@@ -10049,7 +10049,7 @@ As described in \hyperref{``Masking, Bad Values, and Quality''}{Section~}{}
 {se:masking}, an NDF may optionally contain a component called
 \htmlref{QUALITY}{apndf:quality}.  If this component exists, it will be an 
 array with the same bounds as the main DATA array.  Each element in the
-QUALITY array can be used to store several flags which are associated
+QUALITY array can be used to store several flags that are associated
 with the corresponding element in the DATA array.  These flags may be used
 to indicate that the DATA value holds some specified property.  For
 instance, one of the flags may be used to indicate if the corresponding
@@ -10060,17 +10060,17 @@ You are free to use the flags in whatever way seems most suited to the
 particular process being performed.  You can set (or reset) any of the
 flags within any sub-region of the NDF using application
 \htmlref{SETQUAL}{SETQUAL}.  Each of the flags is referred to by a
-{\em Quality Name} specified by the user. Names which reflect the nature of
+{\em Quality Name} specified by the user.  Names that reflect the nature of
 the quality should be used, \emph{e.g.} the quality name {\tt SATURATED} could be
 used to flag saturated data values.  These quality names get stored within
 the NDF and can be used to refer to the quality flag when running later
 applications.  The terminology adopted here is that an element of the DATA
 array `holds' the quality {\tt SATURATED} (for instance) if the flag
-which is associated with the quality name {\tt SATURATED} is set for the
+that is associated with the quality name {\tt SATURATED} is set for the
 corresponding element within the QUALITY array.
 
-The number of quality names which can be stored within an NDF is limited
-and therefore it may become necessary to remove quality names which are
+The number of quality names that can be stored within an NDF is limited,
+and therefore it may become necessary to remove quality names that are
 no longer needed to make room for new ones.  The applications
 \htmlref{SHOWQUAL}{SHOWQUAL} and \htmlref{REMQUAL}{REMQUAL} allow you
 to do this. SHOWQUAL displays a list of the quality names currently
@@ -10078,7 +10078,7 @@ defined within an NDF, and REMQUAL removes specified quality
 names from an NDF.
 
 Some applications have a Parameter QEXP, which may be used to
-specify that the application is only to use data values which hold a
+specify that the application is only to use data values that hold a
 specified selection of qualities.  As an example, when running 
 \htmlref{QUALTOBAD}{QUALTOBAD} you could (for instance) specify a value of
 {\tt BACKGROUND} for the QEXP parameter.  This means that only
@@ -10091,7 +10091,7 @@ The specification of the data values to be used by an application
 can be more complex than this, and can depend on several
 qualities combined together using `Boolean' operators. For
 instance, assigning the value {\tt .NOT. (SOURCE\_A .OR. SOURCE\_B) }
-would cause the application to use only those data values which
+would cause the application to use only those data values that
 hold neither of the qualities {\tt SOURCE\_A} and/or {\tt SOURCE\_B}.  These
 sort of strings are known as {\em quality expressions}. 
 
@@ -10103,7 +10103,7 @@ must not be longer than 15 characters.  Leading blanks are ignored, and
 they are always stored in upper case, even if they are supplied by the
 user in lower case.  Embedded blanks are considered to  be significant.
 Quality names must not contain any fullstops ({\tt{"."}}), and there
-are three reserved names which cannot be used; these are {\tt ANY}, 
+are three reserved names that cannot be used; these are {\tt ANY}, 
 {\tt IRQ\_BAD\_SLOT} and {\tt IRQ\_FREE\_SLOT}. 
 
 \subsection{Quality Expressions}
@@ -10253,15 +10253,15 @@ NDF parameter to be accessed (IN1).  The following string, \verb+|1|3|+,
 means {\em replace all occurrences of 1 with 3}, thus giving the final NDF
 names \verb+a3+ and \verb+b3+.
 
-\subsection{Applications which Process Groups of NDFs}
+\subsection{Applications that Process Groups of NDFs}
 
 The majority of applications with NDF parameters use each NDF parameter
 to access a \emph{single} NDF, and supplying more than one NDF will
 result in the application being re-run as described above.  The
 application then accesses a single NDF on each invocation. Some
-applications, however, have NDF parameters which are explicitly described
+applications, however, have NDF parameters that are explicitly described
 in the reference section of this document as being associated with a
-\emph{group} of NDFs.  An example is WCSALIGN which has a Parameter IN
+\emph{group} of NDFs.  An example is WCSALIGN that has a Parameter IN
 to read a \emph{group} of NDFs that are to be aligned with each
 other.  Such applications process all the specified NDFs in a single
 invocation.  For the purposes of the multiple invocation scheme described
@@ -10318,7 +10318,7 @@ the command line, for instance:
 If you tried out the examples at the start of this section, you may be
 wondering what happened about the output parameters for STATS.  The
 \htmlref{STATS}{STATS} application writes the various statistics it
-calculates to lots of output parameters which can be used by subsequent
+calculates to lots of output parameters, which can be used by subsequent
 applications.  If an application is re-run several times to process
 different data files then the values left in the application's output
 parameters will be the values created on the \emph{last} invocation of the
@@ -10334,12 +10334,12 @@ The exception to this is that if the error is an `abort request'
 (caused by supplying two exclamation marks for a parameter), then 
 the loop exits immediately.  That is, no remaining NDFs are processed.
 
-\subsection{What about Applications which Re-use Parameters?}
+\subsection{What about Applications that Re-use Parameters?}
 
 Some applications use a single parameter to obtain a series of values from
 the user. Examples are the INIT parameter of \htmlref{CENTROID}{CENTROID}
 and the OPTION parameter of \htmlref{SETEXT}{SETEXT}. Remembering that
-parameters which are not associated with either an NDF or a positions
+parameters that are not associated with either an NDF or a positions
 list retain their values between invocations, it is not surprising that
 care is needed when using such application to process groups of NDFs. 
 For instance, when using CENTROID you supply a null parameter value
@@ -10362,11 +10362,11 @@ NDF.\footnote{If this is a problem, you can always put the INIT values
 into a file or positions list, using a different value for the MODE
 parameter.}
 
-Most applications which re-use one or more parameters during a single
+Most applications that re-use one or more parameters during a single
 invocation have some similar means of indicating that you do not want to
 be prompted for a new value.  For some (like CENTROID), putting the
 parameter value on the command line accomplishes this.  Some others (such
-as SETEXT) have a LOOP parameter which can be set FALSE to indicate that
+as SETEXT) have a LOOP parameter that can be set FALSE to indicate that
 parameters should not be accessed more than once.  The reference
 documentation for each command should be consulted for details.
 
@@ -10441,10 +10441,10 @@ A group of output data files may be specified by modifying the names of a
 corresponding set of input data files.  This is easy enough when the
 application only has one parameter for input data files, but what happens
 if more than one parameter is associated with a group of input data
-files? Which parameter is used to define the group of input data files on
-which the names of the output data files are based? The answer is ``the
+files?  Which parameter is used to define the group of input data files on
+which the names of the output data files are based?  The answer is ``the
 first one to be accessed''.  For instance, \htmlref{ADD}{ADD} takes two
-input NDFs, adds them together and produces a single output NDF. When
+input NDFs, adds them together and produces a single output NDF.  When
 running ADD, you are prompted first for Parameter IN1, and then for
 Parameter IN2, and finally for Parameter OUT.  Thus, if you give the
 string \verb+"a_"*+ for OUT, the names of the output NDFs will be
@@ -10456,12 +10456,12 @@ based, no significance is attached to whether the input and output file
 types match.  That is, the first input parameter to be accessed if used,
 irrespective of whether it is associated with an NDF or a positions list.
 
-A feature which may sometimes be useful is the facility for providing a
+A feature that may sometimes be useful is the facility for providing a
 shell command in response to a prompt for a group of data files.  To do
 this, enclose the command within the usual backward quotes (\verb+`+), as
 you would when substituting the output from a command into another shell 
 command.  The command should generate a set of explicit file names, with
-file types. Note, you will need to escape any characters which are
+file types.  Note, you will need to escape any characters that are
 normally interpreted as part of the syntax of a group expression, such as
 \verb+"|"+ or \verb+","+, by preceding them with a backslash
 \verb+"\"+.
@@ -10479,7 +10479,7 @@ priority file type amongst all files with the specified base name will be
 used.  The priority of a file type is determined by its position within the 
 list of file types given by \htmlref{{\tt{NDF\_FORMATS\_IN}}}{se_autoconvert} 
 environment variable \latex{(see Section~\ref{se:autoconvert})}. File 
-types near the start of the list have higher priority than those which
+types near the start of the list have higher priority than those that
 follow. Note, native NDF files always have the highest priority and will
 be used (if they exist) in preference to all other files types.
 
@@ -10639,7 +10639,7 @@ list.
      % setenv NDF_FORMATS_OUT '*,.,FITS(.fit),IRAF(.imh),FIGARO(.dst)'
 \end{verbatim}
 \latex{\normalsize}
-This only affects applications which create a dataset using information
+This only affects applications that create a dataset using information
 propagated from an existing dataset.  For instance, if the above
 {\tt NDF\_FORMATS\_OUT} were defined,
 
@@ -10656,7 +10656,7 @@ You can retain the scratch NDF by setting the environment variable
 and will save the conversion each time you access the dataset.
 
 The {\tt convert} command, which sets up definitions for the \CONVERT\ 
-package defines the lists of input and output formats as follows.
+package, defines the lists of input and output formats as follows.
 
 \latex{\small}
 \begin{verbatim}
@@ -11021,7 +11021,7 @@ into another data format.
 
 \KAPPA\ offers two simple tools for the importing and exporting
 of extension information: \htmlref{FITSIMP}{FITSIMP} and
-\htmlref{FITSEXP}{FITSEXP}.  They both use a text file which acts as a
+\htmlref{FITSEXP}{FITSEXP}.  They both use a text file, which acts as a
 translation table between the FITS keyword and extension components.
 Starting with FITSIMP, its translation table might look like this.
 
@@ -11443,7 +11443,7 @@ required but it's included for pedagogical reasons).
 \end{verbatim}
 \latex{\normalsize}
 Some \KAPPA\ applications, particularly the statistical ones,
-produce output parameters which can be passed between applications via
+produce output parameters, which can be passed between applications via
 \ICL\ variables.  Here is an example to draw a
 contour plot centred about a star in a nominated data array
 from only the star's approximate position.  The region about the star is
@@ -11940,7 +11940,7 @@ the help source, shell scripts, \ICL\ procedures, and test data
 are in {\tt kappa\_source.tar}.  There is also a Starlink standard
 {\tt makefile} and {\tt mk} script.
 
-Many of the general purpose subroutines which previously formed part of
+Many of the general-purpose subroutines which previously formed part of
 \KAPPA\ have now been moved into a separate software item
 called \KAPLIBS\ (see \xref{SUN/238}{sun238}{}).
 \KAPPA\ itself now links against the libraries
@@ -12139,7 +12139,7 @@ Mike Lawden helped produce the quick-reference card.
 
 \section{Acknowledging this Software}
 Please acknowledge the use of this software in any publications arising
-from research in which it has played a significant role.  Please also
+from research in which it has played a significant r\^{o}le.  Please also
 acknowledge the use of any other Starlink software in such publications. 
 The following is suggested as a suitable form of words:
 
@@ -13359,7 +13359,7 @@ MODE.  If the mode is to nominate a list of contour heights, HEIGHTS
 will be needed (MODE~=~{\tt "Free"}); alternatively, if the mode requires a
 start height and spacing between contours FIRSTCNT and STEPCNT should be
 specified (MODE~=~{\tt "Linear"} or {\tt "Magnitude"}).  Note that there
-are other modes which do not require additional information, and hence no
+are other modes that do not require additional information, and hence no
 more parameters. 
 
 There is also an {\em Examples\/} section. \label{ap:example}  This
@@ -15533,7 +15533,7 @@ KAPPA: \htmlref{ADD}{ADD},
 }{
    \sstdescription{
       This task evaluates an arithmetic expression and reports the
-      result.  It main role is to perform floating-point arithmetic in
+      result.  It main r\^{o}le is to perform floating-point arithmetic in
       scripts.  A value {\tt "Bad"} is reported if there was an error
       during the calculation, such as a divide by zero.
    }
@@ -55262,7 +55262,7 @@ given either in the native \\PGPLOT\  style (\emph{e.g.} {\tt "/CPS"} for
 landscape colour encapsulated PostScript) or in the equivalent
 traditional Starlink style (\emph{e.g.} {\tt "epsfcol\_l"}).  Note, PostScript
 output is now written to a file called \verb+pgplot.ps+ by default, and
-each graphics command will over-write any existing file with this name.
+each graphics command will overwrite any existing file with this name.
 That is, no sequence number is added to the end of the file name as used
 to be the case with the GKS version of \PGPLOT\ .  In order to avoid
 over-writing previous graphics files, you can specify an alternative 
@@ -55408,7 +55408,7 @@ The following applications have been modified:
          \item If a PostScript device is selected, GDSET now reports the name of the 
           file to which PostScript output will be written, together with
           a warning to the effect that each subsequent graphics command will
-          over-write this file.
+          overwrite this file.
       \end{itemize}
 
     \item [\htmlref{GDSTATE}{GDSTATE}] \mbox{}
