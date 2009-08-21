@@ -2527,7 +2527,7 @@ astAddFrame( this, iframe, map, frame)
 
 
 AstFrame *
-astGetFrame( this, iframe )
+ast_GetFrame( this, iframe )
   AstFrameSet * this
   int iframe
  CODE:

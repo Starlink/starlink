@@ -505,6 +505,16 @@ use base qw/ Starlink::AST::Frame /;
 package Starlink::AST::FrameSet;
 use base qw/ Starlink::AST::Frame /;
 
+# Convert to proper class
+
+sub GetFrame {
+  my $self = shift;
+  my $obj = $self->_GetFrame( $_[0] );
+  if (defined $obj) {
+    return $obj->_rebless();
+  }
+}
+
 # This routine used to be called FindFrame and clashed with the AST
 # native astFindFrame method. Renamed until we can work out what it
 # was meant to be used for.
