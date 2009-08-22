@@ -48,10 +48,10 @@
 *        The global status.
  
 *  Notes:
-*     -  There is a routine for all numeric data types: replace "x" in 
-*     the routine name by D, R, I, W, UW, B, or UB as appropriate.  The
-*     data type of the ARRAY argument must match the particular routine
-*     used.
+*     -  There is a routine for double-precision, integer, and real data
+*     types: replace "x" in the routine name by D, I, or R as 
+*     appropriate.  The data type of the ARRAY argument must match the 
+*     particular routine used.
 *     -  If the value of NGOOD is not at least two, then this routine 
 *     will reported an error and abort.  The median and percentiles will
 *     have the bad value.
@@ -85,6 +85,9 @@
 *  History:
 *     2009 August 20 (MJC):
 *        Original version adapted from KAPPA STATS.
+*     2009 August 21 (MJC):
+*        Exclude one- and two-byte integer types as sorting code
+*        does not support them.  Fix pasting bug involving KPG1_FLOOR.
 *     {enter_further_changes_here}
  
 *-
@@ -120,18 +123,15 @@
       PARAMETER( NPRCTL = 100 )
 
 *  Local Variables:
-      LOGICAL BW                 ! One- or two-byte integer data?
       LOGICAL DOPRCT             ! Calculate percentiles?
       INTEGER I                  ! Loop counter
-      INTEGER IERR               ! Index of conversion error
+      LOGICAL INTYPE             ! Integer data type?
       INTEGER IPNTR              ! Pointer to sorted index
       DOUBLE PRECISION MEDIUN    ! Median of even no. of pixels in array
-      INTEGER NERR               ! Number of conversion errors
       INTEGER NPERC              ! Constrained number of percentiles
       INTEGER PERIND( NPRCTL )   ! Percentile indices in sorted array
       <TYPE> QUANT( NPRCTL )     ! Quantiles
       INTEGER UPERIN( NPRCTL )   ! Percentile indices in unsorted array
-      INTEGER WPNTR              ! Pointer to workspace
 
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! Declarations of conversion routines
@@ -172,15 +172,9 @@
 *  Use a brute-force sort of the data.
 *  ===================================
 
-*  Obtain workspace for pointers and PDA routines that don't support
-*  byte and word data types.
+*  Obtain workspace for pointers.
       CALL PSX_CALLOC( EL, '_INTEGER', IPNTR, STATUS )
-      BW =  '<T>' .EQ. 'B' .OR. '<T>' .EQ. 'UB' .OR.
-     :      '<T>' .EQ. 'W' .OR. '<T>' .EQ. 'UW'
-
-      IF ( BW ) THEN
-         CALL PSX_CALLOC( EL, '_INTEGER', WPNTR, STATUS )
-      END IF
+      INTYPE = '<T>' .EQ. 'I'
 
 *  Convert to indices within the sorted array of good data values.
 *  First check that percentiles have been supplied.
@@ -193,15 +187,7 @@
 
 *  Call the appropriate routine to quicksort the array and then find the
 *  order statistics.
-      IF ( BW ) THEN
-         CALL VEC_<T>TOI( .TRUE., EL, ARRAY, %VAL( CNF_PVAL( WPNTR ) ), 
-     :                    IERR, NERR, STATUS )
-         CALL PDA_QSIAI( EL, ARRAY, %VAL( CNF_PVAL( IPNTR ) ) )
-         CALL PSX_FREE( WPNTR, STATUS )
-
-      ELSE
-         CALL PDA_QSIA<T>( EL, ARRAY, %VAL( CNF_PVAL( IPNTR ) ) )
-      END IF
+      CALL PDA_QSIA<T>( EL, ARRAY, %VAL( CNF_PVAL( IPNTR ) ) )
 
 *  Obtain median
 *  =============
@@ -228,7 +214,11 @@
          CALL KPG1_RETR<T>( EL, UPERIN( 1 ), ARRAY, QUANT( 2 ), STATUS )
 
          MEDIUN = NUM_<T>TOD( QUANT( 2 ) )
-         MEDIAN = KPG1_FLOOR( 0.5D0 * ( MEDIAN + MEDIUN ) )
+         MEDIAN = 0.5D0 * ( MEDIAN + MEDIUN )
+
+         IF ( INTYPE ) THEN
+            MEDIAN = DBLE( KPG1_FLOOR( REAL( MEDIAN ) ) )
+         END IF
       END IF
  
 *  Extract the percentiles.
@@ -242,9 +232,10 @@
 
 *  Convert to a whole number value in the double-precision PERVAL array
 *  for an integer data array.
-         IF ( BW .OR. '<T>' .EQ. 'I' ) THEN
+         IF ( INTYPE ) THEN
             DO I = 1, NPERC
-               PERVAL( I ) = KPG1_FLOOR( NUM_<T>TOD( QUANT( I ) ) )
+               PERVAL( I ) = DBLE( 
+     :                       KPG1_FLOOR( NUM_<T>TOR( QUANT( I ) ) ) )
             END DO
          ELSE
             DO I = 1, NPERC

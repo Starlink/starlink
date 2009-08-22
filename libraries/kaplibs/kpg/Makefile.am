@@ -86,7 +86,7 @@ kpg1_pxdp.gn kpg1_retr.gn kpg1_rmap.gn kpg1_stat.gn \
 kpg1_stor.gn kpg1_tdli.gn kpg1_thrs.gn kpg1_trli.gn \
 kpg1_trsp.gn kpg1_vasv.gn kpg1_wmod.gn kpg1_mvbd.gn \
 kpg1_sclb.gn kpg1_scli.gn kpg1_scluw.gn kpg1_sclub.gn \
-kpg1_sclw.gn kpg_stos.gn kpg1_ptnd.gn kpg1_bbox.gn
+kpg1_sclw.gn kpg1_ptnd.gn kpg1_bbox.gn
 
 
 # All except logical (include char)
@@ -96,7 +96,8 @@ KPG_XL_GEN = kpg1_qsrt.gxl
 KPG_XC_GEN = kpg1_retv.gxc
 
 # All except unsigned types
-KPG_BDIRW_GEN = kpg1_iscl.gbdirw kpg1_flas.gbdirw
+KPG_BDIRW_GEN = kpg1_iscl.gbdirw kpg1_flas.gbdirw \
+                kpg_stos.gbdirw
 
 # All except unsigned types and double
 KPG_BIRW_GEN = chval.gbirw
@@ -121,7 +122,7 @@ kpg1_xyzw.gdr kpg1_ker1.gdr
 KPG_DI_GEN = kpg1_ctcp.gdi
 
 KPG_DIR_GEN = copa.gdir kpg1_chel.gdir kpg1_figr.gdir \
-kpg1_prsa.gdir kpg1_mul.gdir kpg1_sqsu.gdir 
+kpg1_prsa.gdir kpg1_mul.gdir kpg1_sqsu.gdir
 
 KPG_IR_GEN = elnmb.gir
 
