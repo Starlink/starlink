@@ -21,13 +21,11 @@
  Full details of the release are given in the updated Starlink 
  User Note SUN/194.2.
 
- V0.5-1
+2 V0.5-3
+   * Made PDA_QSIAx and PDA_QSIDx generic and now supporting all
+     numeric data types.
 
-   * import PDA_DRANN and PDA_DRANS from CCDPACK and PISA
-     [double precision random number generator and seed]
-   * Add PDA_R1MACH to complement PDA_D1MACH
-
- V0.5-2
+2 V0.5-2
 
    * Start adding a C interface to some routines. See pda.c.
 
@@ -35,3 +33,10 @@
    
    * Add new routine PDA_LMERR to estimate errors in a non-linear
      least square fit.
+
+2 V0.5-1
+
+   * import PDA_DRANN and PDA_DRANS from CCDPACK and PISA
+     [double precision random number generator and seed]
+   * Add PDA_R1MACH to complement PDA_D1MACH
+

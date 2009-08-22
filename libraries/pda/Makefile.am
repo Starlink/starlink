@@ -11,6 +11,7 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ sun194_1.eps
 libpda_la_SOURCES = \
         $(PUBLIC_INCLUDES) \
 	$(F_ROUTINES) \
+        $(GEN_F_ROUTINES) \
 	$(C_ROUTINES)
 
 include_HEADERS = $(PUBLIC_F_INCLUDES)
@@ -29,19 +30,19 @@ pda_qsdi.f pda_rfftf1.f pda_side2.f pda_calcc.f pda_dbknot.f	       \
 pda_dcsevl.f pda_dnfftf.f pda_dqrfac.f pda_dvout.f pda_hokdrd.f	       \
 pda_lmsci.f pda_passf3.f pda_qsdr.f pda_rffti.f pda_simplx.f	       \
 pda_cfftb.f pda_dbndac.f pda_ddot.f pda_dnls1.f pda_dqrslv.f	       \
-pda_dwupdt.f pda_hokstd.f pda_lmscr.f pda_passf4.f pda_qsiad.f	       \
+pda_dwupdt.f pda_hokstd.f pda_lmscr.f pda_passf4.f       	       \
 pda_rffti1.f pda_sndfdd.f pda_cfftb1.f pda_dbndsl.f pda_defc.f	       \
 pda_dnls1e.f pda_dr2nag.f pda_enorm.f pda_hschkd.f pda_lnsrcd.f	       \
-pda_passf5.f pda_qsiai.f pda_rinpd.f pda_sortd.f pda_cfftf.f	       \
+pda_passf5.f pda_rinpd.f pda_sortd.f pda_cfftf.f	               \
 pda_dbnfac.f pda_defcmn.f pda_dnrm2.f pda_dradb2.f pda_evalf.f	       \
-pda_hsnntd.f pda_lsqr.f pda_ppnd16.f pda_qsiar.f pda_rinpi.f	       \
+pda_hsnntd.f pda_lsqr.f pda_ppnd16.f pda_rinpi.f	               \
 pda_spdt.f pda_cfftf1.f pda_dbnslv.f pda_denorm.f pda_dp1vlu.f	       \
 pda_dradb3.f pda_exprep.f pda_idamax.f pda_mvmlld.f pda_prt1.f	       \
-pda_qsidd.f pda_rinpr.f pda_splder.f pda_cffti.f pda_dbocls.f	       \
+pda_rinpr.f pda_splder.f pda_cffti.f pda_dbocls.f	               \
 pda_der.f pda_dpcoef.f pda_dradb4.f pda_fdjac2.f pda_idbvip.f	       \
-pda_mvmlsd.f pda_prt10.f pda_qsidi.f pda_rmarin.f pda_splev.f	       \
+pda_mvmlsd.f pda_prt10.f pda_rmarin.f pda_splev.f	               \
 pda_cffti1.f pda_dbols.f pda_derf.f pda_dplint.f pda_dradb5.f	       \
-pda_forsld.f pda_idcldp.f pda_mvmlud.f pda_prt2.f pda_qsidr.f	       \
+pda_forsld.f pda_idcldp.f pda_mvmlud.f pda_prt2.f                      \
 pda_rnexp.f pda_splint.f pda_che2d.f pda_dbolsm.f pda_derfc.f	       \
 pda_dpmpar.f pda_dradbg.f pda_fpback.f pda_idgrid.f pda_nag2c.f	       \
 pda_prt3.f pda_r2nag.f pda_rngam.f pda_start.f pda_che2r.f	       \
@@ -75,7 +76,7 @@ pda_dist.f pda_dpssf4.f pda_drot.f pda_fprota.f pda_lmdif1.f	       \
 pda_passb2.f pda_qrupdd.f pda_ranmar.f pda_sclmld.f pda_daxpy.f	       \
 pda_dcftf1.f pda_dmout.f pda_dpssf5.f pda_drotg.f pda_fpsurf.f	       \
 pda_lmpar.f pda_passb3.f pda_qsad.f pda_resltd.f pda_secfcd.f	       \
-pda_i1mach.f pda_drann.f pda_r1mach.f pda_imdcon.f	       \
+pda_i1mach.f pda_drann.f pda_r1mach.f pda_imdcon.f	               \
 pda_lvmul.f pda_slvmul.f pda_vaxpy.f pda_dbdog.f pda_itsum.f 	       \
 pda_parck.f pda_smsno.f pda_vcopy.f pda_deflt.f pda_litvmu.f 	       \
 pda_qdrtf.f pda_snoit.f pda_vdflt.f pda_dotprd.f pda_livmul.f 	       \
@@ -87,10 +88,20 @@ pda_assst.f pda_lmerr.f
 
 C_ROUTINES = pda.c pdaD1mach.c
 
+GEN_F_ROUTINES = $(PDA_BDIRW_GEN:.gbdirw=.f)
+
+# Need to make sure that a maintainer clean really removes the
+# output of generic
+MAINTAINERCLEANFILES = $(GEN_F_ROUTINES)
+
+PDA_BDIRW_GEN = pda_qsia.gbdirw pda_qsid.gbdirw
 
 PUBLIC_F_INCLUDES = 
 PUBLIC_C_INCLUDES = pda.h
 PUBLIC_INCLUDES = $(PUBLIC_F_INCLUDES) $(PUBLIC_C_INCLUDES)
+
+.gbdirw.f:
+	$(FGENERIC) $(<)
 
 # Testing
 

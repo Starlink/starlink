@@ -1,33 +1,39 @@
-      SUBROUTINE PDA_QSIDR( EL, X, IP )
+      SUBROUTINE PDA_QSID<T>( EL, X, IP )
 *+
 *  Name:
-*     PDA_QSIDR
+*     PDA_QSIDx
 
 *  Purpose:
-*     Sort an array of pointers to access a REAL array in descending order.
+*     Sort an array of pointers to access an array in descending order.
 
 *  Language:
 *     Fortran 77
 
 *  Invocation:
-*     CALL PDA_QSIDR( EL, X, IP )
+*     CALL PDA_QSIDx( EL, X, IP )
 
 *  Description:
-*     The routine uses the QUICKSORT algorithm to permute an array of
+*     The routine uses the Quicksort algorithm to permute an array of
 *     pointers so that they access an associated array of values in
-*     descending order. The "median of three" modification is included
+*     descending order.  The "median of three" modification is included
 *     to reduce the likelihood of encountering the worst-case behaviour
-*     of QUICKSORT.
+*     of Quicksort.
 
 *  Arguments:
 *     EL = INTEGER (Given)
 *        The number of pointers to be permuted.
-*     X( EL ) = REAL (Given)
+*     X( EL ) = ? (Given)
 *        The array to be sorted.
 *     IP( EL ) = INTEGER (Given and Returned)
 *        The indices of the elements of X in sorted order (i.e. IP( 1 )
 *        gives the index into X of the highest value).
 
+*  Notes:
+*     -  There is a routine for all numeric data types except unsigned
+*     byte and word: replace "x" in the routine name by D, R, I, W, or B
+*     as appropriate.  The data type of the X argument must match the 
+*     particular routine used.
+  
 *  References:
 *     -  Sedgwick, R., 1988, "Algorithms" (Addison-Wesley).
 
@@ -36,7 +42,10 @@
 *     The worst-case time goes as N**2.
 
 *  Copyright:
-*     Copyright (C) 1992 Science & Engineering Research Council
+*     Copyright (C) 1991, 1992 Science & Engineering Research Council.
+*     Copyright (C) 1995 Central Laboratory of the Research Councils.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -61,43 +70,42 @@
 *        Renamed to PDA_QSIA (Quick Sort Indexed Descending) and
 *        modified to return a descending order for the PDA library.
 *        Now returns the index of the first 1..N elements of X.
+*     2009 August 21 (MJC):
+*        Made generic.
 *     {enter_further_changes_here}
 
-*  Bugs:
-*     {note_any_bugs_here}
-
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Arguments Given:
       INTEGER EL
-      REAL X( EL )
+      <TYPE> X( EL )
 
 *  Arguments Returned:
       INTEGER IP( EL )
 
 *  Local Constants:
-      INTEGER MXSTK             ! Size of the recursion stack (log
-                                ! base 2 of the maximum number of
-                                ! elements to be sorted)
+      INTEGER MXSTK              ! Size of the recursion stack (log
+                                 ! base 2 of the maximum number of
+                                 ! elements to be sorted)
       PARAMETER ( MXSTK = 64 )
 
 *  Local Variables:
-      REAL XPART                ! Partition value
-      INTEGER I                 ! Index to pointer array
-      INTEGER I1                ! Pointer index of partition value?
-      INTEGER I2                ! Pointer index of partition value?
-      INTEGER I3                ! Pointer index of partition value?
-      INTEGER ITMP              ! Temporary store to swap pointers
-      INTEGER J                 ! Index to pointer array
-      INTEGER L                 ! Left hand pointer element in sub-file
-      INTEGER LL( MXSTK )       ! Stack for left sub-file limits
-      INTEGER R                 ! Right pointer element in sub-file
-      INTEGER RR( MXSTK )       ! Stack for right sub-file limits
-      INTEGER STK               ! Recursion stack pointer
-      
+      <LTYPE> XPART              ! Partition value
+      INTEGER I                  ! Index to pointer array
+      INTEGER I1                 ! Pointer index of partition value?
+      INTEGER I2                 ! Pointer index of partition value?
+      INTEGER I3                 ! Pointer index of partition value?
+      INTEGER ITMP               ! Temporary store to swap pointers
+      INTEGER J                  ! Index to pointer array
+      INTEGER L                  ! Left-hand pointer element in sub-file
+      INTEGER LL( MXSTK )        ! Stack for left sub-file limits
+      INTEGER R                  ! Right pointer element in sub-file
+      INTEGER RR( MXSTK )        ! Stack for right sub-file limits
+      INTEGER STK                ! Recursion stack pointer
+
 *.
 
 *  Initialise.
@@ -201,5 +209,5 @@
 *  Iterate until the stack is empty.
          GO TO 1
       END IF
+
       END
-* @(#)pda_qsidr.f   1.2   95/11/10 10:03:28   95/11/10 10:03:52

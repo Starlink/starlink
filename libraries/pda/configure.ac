@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
  
 dnl    Initialisation: package name and version number
-AC_INIT(pda, 0.5-2, ussc@star.rl.ac.uk)
+AC_INIT(pda, 0.5-3, ussc@star.rl.ac.uk)
  
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -21,10 +21,11 @@ dnl    Find required versions of the programs we need for configuration
 AC_PROG_FC
 AC_PROG_LIBTOOL
 
+STAR_CHECK_PROGS([fgeneric])
 STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl    Declare the build and use dependencies for this package
-STAR_DECLARE_DEPENDENCIES([build], [sae cnf])
+STAR_DECLARE_DEPENDENCIES([build], [sae cnf generic])
 STAR_DECLARE_DEPENDENCIES([link],  [ems cnf])
 
 dnl    List the sun/ssn/... numbers which document this package and

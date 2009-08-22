@@ -1,33 +1,39 @@
-      SUBROUTINE PDA_QSIAR( EL, X, IP )
+      SUBROUTINE PDA_QSIA<T>( EL, X, IP )
 *+
 *  Name:
-*     PDA_QSIAR
+*     PDA_QSIAx
 
 *  Purpose:
-*     Sort an array of pointers to access a REAL array in ascending order.
+*     Sort an array of pointers to access an array in ascending order.
 
 *  Language:
 *     Fortran 77
 
 *  Invocation:
-*     CALL PDA_QSIAR( EL, X, IP )
+*     CALL PDA_QSIAx( EL, X, IP )
 
 *  Description:
-*     The routine uses the QUICKSORT algorithm to permute an array of
+*     The routine uses the Quicksort algorithm to permute an array of
 *     pointers so that they access an associated array of values in
-*     ascending order. The "median of three" modification is included
+*     ascending order.  The "median of three" modification is included
 *     to reduce the likelihood of encountering the worst-case behaviour
-*     of QUICKSORT.
+*     of Quicksort.
 
 *  Arguments:
 *     EL = INTEGER (Given)
 *        The number of elements of X to sort.
-*     X( EL ) = REAL (Given)
+*     X( EL ) = ? (Given)
 *        The array to be sorted.
 *     IP( EL ) = INTEGER (Returned)
 *        The indices of the elements of X in sorted order (i.e. IP( 1 )
 *        gives the index into X of the lowest value).
 
+*  Notes:
+*     -  There is a routine for all numeric data types except unsigned
+*     byte and word: replace "x" in the routine name by D, R, I, W, or B
+*     as appropriate.  The data type of the X argument must match the 
+*     particular routine used.
+  
 *  References:
 *     -  Sedgwick, R., 1988, "Algorithms" (Addison-Wesley).
 
@@ -36,7 +42,26 @@
 *     The worst-case time goes as N**2.
 
 *  Copyright:
-*     Copyright (C) 1992 Science & Engineering Research Council
+*     Copyright (C) 1991, 1992 Science & Engineering Research Council.
+*     Copyright (C) 1995 Central Laboratory of the Research Councils.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*                                     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -61,43 +86,42 @@
 *        Renamed to PDA_QSIA (Quick Sort Indexed Ascending) for 
 *        the PDA library. Now returns the index of the first 1..N
 *        elements of X.
+*     2009 August 21 (MJC):
+*        Made generic.
 *     {enter_further_changes_here}
 
-*  Bugs:
-*     {note_any_bugs_here}
-
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Arguments Given:
       INTEGER EL
-      REAL X( EL )
+      <TYPE> X( EL )
 
 *  Arguments Returned:
       INTEGER IP( EL )
 
 *  Local Constants:
-      INTEGER MXSTK             ! Size of the recursion stack (log
-                                ! base 2 of the maximum number of
-                                ! elements to be sorted)
+      INTEGER MXSTK              ! Size of the recursion stack (log
+                                 ! base 2 of the maximum number of
+                                 ! elements to be sorted)
       PARAMETER ( MXSTK = 64 )
 
 *  Local Variables:
-      REAL XPART                ! Partition value
-      INTEGER I                 ! Index to pointer array
-      INTEGER I1                ! Pointer index of partition value?
-      INTEGER I2                ! Pointer index of partition value?
-      INTEGER I3                ! Pointer index of partition value?
-      INTEGER ITMP              ! Temporary store to swap pointers
-      INTEGER J                 ! Index to pointer array
-      INTEGER L                 ! Left hand pointer element in sub-file
-      INTEGER LL( MXSTK )       ! Stack for left sub-file limits
-      INTEGER R                 ! Right pointer element in sub-file
-      INTEGER RR( MXSTK )       ! Stack for right sub-file limits
-      INTEGER STK               ! Recursion stack pointer
-      
+      <LTYPE> XPART              ! Partition value
+      INTEGER I                  ! Index to pointer array
+      INTEGER I1                 ! Pointer index of partition value?
+      INTEGER I2                 ! Pointer index of partition value?
+      INTEGER I3                 ! Pointer index of partition value?
+      INTEGER ITMP               ! Temporary store to swap pointers
+      INTEGER J                  ! Index to pointer array
+      INTEGER L                  ! Left-hand pointer element in sub-file
+      INTEGER LL( MXSTK )        ! Stack for left sub-file limits
+      INTEGER R                  ! Right pointer element in sub-file
+      INTEGER RR( MXSTK )        ! Stack for right sub-file limits
+      INTEGER STK                ! Recursion stack pointer
+
 *.
 
 *  Initialise.
@@ -203,4 +227,3 @@
       END IF
 
       END
-* @(#)pda_qsiar.f   1.2   95/11/10 10:03:25   95/11/10 10:03:52
