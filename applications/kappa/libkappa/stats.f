@@ -225,6 +225,10 @@
 *        Changed calculation of order statistics to ignore bad pixels.
 *     2009 August 20 (MJC):
 *        Call new KPG_STOSx subroutine to evaluate order statistics.
+*     2009 August 21 (MJC):
+*        Do not map signed integer types directly to enable the ordered
+*        statistics to be calculated with KPG_STOSx now restricted to
+*        BDIRW instantiations.
 *     {enter_further_changes_here}
 
 *-
@@ -459,7 +463,8 @@
      :                            STATUS )
 
 *  Obtain the numeric type of the NDF array component to be analysed.
-      CALL NDF_TYPE( NDF, COMP, TYPE, STATUS )
+      CALL NDF_MTYPE( '_BYTE,_WORD,_INTEGER,_REAL,_DOUBLE', NDF, NDF, 
+     :                COMP, TYPE, DTYPE, STATUS )
 
 *  Map the array using this numeric type and see whether there may be
 *  bad pixels present.
@@ -478,15 +483,7 @@
      :                    DMAX, SUM, MEAN, STDEV, NGOODC,
      :                    IMINC( 1 ), DMINC, IMAXC( 1 ), DMAXC, SUMC,
      :                    MEANC, STDEVC, STATUS )
- 
-      ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-         CALL KPG1_STATUB( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
-     :                     NCLIP, CLIP,
-     :                     NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ),
-     :                     DMAX, SUM, MEAN, STDEV, NGOODC,
-     :                     IMINC( 1 ), DMINC, IMAXC( 1 ), DMAXC, SUMC,
-     :                     MEANC, STDEVC, STATUS )
- 
+
       ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
          CALL KPG1_STATD( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
      :                    NCLIP, CLIP,
@@ -513,19 +510,11 @@
  
       ELSE IF ( TYPE .EQ. '_WORD' ) THEN
          CALL KPG1_STATW( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
-     :                    NCLIP, CLIP,
+     :                    NCLIP, CLIP, 
      :                    NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ),
      :                    DMAX, SUM, MEAN, STDEV, NGOODC,
      :                    IMINC( 1 ), DMINC, IMAXC( 1 ), DMAXC, SUMC,
      :                    MEANC, STDEVC, STATUS )
- 
-      ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-         CALL KPG1_STATUW( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
-     :                     NCLIP, CLIP,
-     :                     NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ),
-     :                     DMAX, SUM, MEAN, STDEV, NGOODC,
-     :                     IMINC( 1 ), DMINC, IMAXC( 1 ), DMAXC, SUMC,
-     :                     MEANC, STDEVC, STATUS )
       END IF
 
 *  Obtain the NDF bounds and initialise the indices of the minimum and
@@ -583,10 +572,6 @@
             CALL KPG_STOSB( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), NGOOD,
      :                      NUMPER, PERCNT, MEDIAN, PERVAL, STATUS )
 
-         ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-            CALL KPG_STOSUB( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), NGOOD,
-     :                       NUMPER, PERCNT, MEDIAN, PERVAL, STATUS )
-
          ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
             CALL KPG_STOSD( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), NGOOD,
      :                      NUMPER, PERCNT, MEDIAN, PERVAL, STATUS )
@@ -602,10 +587,6 @@
          ELSE IF ( TYPE .EQ. '_WORD' ) THEN
             CALL KPG_STOSW( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), NGOOD,
      :                      NUMPER, PERCNT, MEDIAN, PERVAL, STATUS )
-
-         ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-            CALL KPG_STOSUW( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), NGOOD,
-     :                       NUMPER, PERCNT, MEDIAN, PERVAL, STATUS )
 
          END IF
       END IF
