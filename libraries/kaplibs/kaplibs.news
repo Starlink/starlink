@@ -7,6 +7,9 @@ and which may be of use to anyone developing their own KAPPA-like
 applications (see SUN/238).
 
 Version 3.0
+   - CTG, IRQ, and LPG libraries are no longer in KAPLIBS.  They are 
+     autonomous libraries each with its own documentation and link
+     scripts.
    - KPG1_MVBDx added. It modifies an array index (such as produced by
      PDA_QSIAx) to exclude indices that refer to bad data values.
    - KPG_STOSx added.  It calculates accurate order statistics by

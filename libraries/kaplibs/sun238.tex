@@ -705,79 +705,93 @@ removed by the \verb+kaplibs_dev remove+ command.
 
 \subsection{Linking with Native PGPLOT}
 The commands described above will link the application with the Starlink
-GKS version of the PGPLOT graphics library. If you wish to link with the
-{\em native} version of PGPLOT, then include the switch ``-nogks'' as follows:
+GKS version of the \xref{PGPLOT graphics library}{sun15}{}. If you wish 
+to link with the {\em native} version of PGPLOT, then include the switch
+``-nogks'' as follows:
 
 \small
 \begin{verbatim}
-      % kaplibs_dev
       % alink adamprog.f `kaplibs_link_adam -nogks`
-      % kaplibs_dev remove
 \end{verbatim}
 \normalsize
 
 This will include native PGPLOT in the link list, and cause all GKS and IDI
 related items to be removed.
 
+\appendix
 
+\section{Changes in Version 3.0}
+\begin{itemize}
+\item \xref{CTG}{sun262}{}, \xref{IRQ}{sun261}{}, and \xref{LPG}{sun263}{} 
+      libraries are no longer in KAPLIBS.  They are autonomous
+      libraries each with its own documentation and link scripts.
+\item KPG1\_MVBDx added. It modifies an array index (such as produced by
+      \xref{PDA\_QSIAx}{sun194}{PDA_QSIAx}) to exclude indices that refer 
+      to bad data values.
+\item KPG\_STOSx added.  It calculates accurate order statistics by
+      sorting an array by means of an index, returning the median and
+      optionally percentiles.
+\end{itemize}
 
 \section{Changes in Version 2.8}
 \begin{itemize}
 
 \item KPG1\_BADBX added. It returns an NDF identifier for the smallest section 
-     of a supplied NDF that encloses all the good data values in the NDF.
-\item KPG1\_BBOX$<$T$>$ added. It obtains the pixel bounding box of a given value
-     within an N-dimensional data array.
+      of a supplied NDF that encloses all the good data values in the NDF.
+\item KPG1\_BBOX$<$T$>$ added. It obtains the pixel bounding box of a given 
+     value within an $N$-dimensional data array.
 \item KPG1\_LIKE added. It obtains a section of an NDF that matches either
-     the pixel or WCS shape of a given template NDF.
+      the pixel or WCS shape of a given template NDF.
 \item KPG1\_KYMAP can read vectors as well as scalars from a GRP
-     group into an AST keyMap.
-\item kaplibs\_link script now works without attempting to load ADAM
-     symbols
-\item Can now be built as a shared library
-\item Added kpg1\_astcmn to provide access to KPG\_AST private common block
-\item The HLP helper routines are no longer part of kaplibs. Use SHL
-     library instead.
-\item kpg1\_scrsz no longer present. Please use one\_scrsz instead.
-\item now released under the GPL
+      group into an AST keyMap.
+\item {\tt kaplibs\_link} script now works without attempting to load ADAM
+      symbols.
+\item Can now be built as a shared library.
+\item Added KPG1\_ASTCMN to provide access to KPG\_AST private common block
+\item The \xref{HLP}{sun124}{} helper routines are no longer part of kaplibs.
+      Use the SHL library instead.
+\item KPG1\_SCRSZ is no longer present. Please use
+      \xref{ONE\_SCRSZ}{sun234}{ONE\_SCRSZ} instead.
+\item Now released under the GPL.
 \item kpgGtfts and kpgPtfts can now be used to read and write
-     AST FitsChan objects from/to an NDF
-\item kaplibs no longer links against Tk (the one Tk routine has been
-     removed from kaplibs)
-\item kaplibs now has a public C interface (but not for all routines)
+      AST FitsChan objects from/to an NDF.
+\item KAPLIBS no longer links against Tk (the one Tk routine has been
+      removed from KAPLIBS).
+\item KAPLIBS now has a public C interface (but not for all routines).
 \item Added KPG1\_CGET, which returns the value of an NDF character
-     component removing any AST or PGPLOT escape sequences.
+      component removing any AST or PGPLOT escape sequences.
 \item Added KPG1\_MXMNX, which provides a single interface to the
-      existing generic KPG1\_MXMN$<$T$>$ routines.
+      existing generic KPG1\_MXMNx routines.
 \item Added KPG1\_SCALX, which provides a single interface to the
-      new doubly generic KPG1\_SCL$<$T$>$$<$T$>$ routines, for scaling
+      new doubly generic KPG1\_SCLxx routines, for scaling
       and shifting data values.
 \end{itemize}
 
 \section{Changes in Version 2.7}
 \begin{itemize}
 \item A new routine LPG\_REPLA has been added. It controls a new option
-   which allows a single NDF to be used as both input and output for an adam task.
-   The default is for this option to be disabled.
+      which allows a single NDF to be used as both input and output for an 
+      ADAM task.  The default is for this option to be disabled.
 \end{itemize}
 
 \section{Changes in Version 2.6}
 \begin{itemize}
 \item The GRF module (grf\_kaplibs.c) has been upgraded to include the
-extra functions needed by AST V3.2.
+      extra functions needed by AST V3.2.
 \end{itemize}
 
 \section{Changes in Version 2.5}
 \begin{itemize}
 \item The KPG1\_FFT... routines have been made significantly faster (at
-the expendse of using slightly more memory). For instance, a speed gain
-of a factor 10 is typical for an array of 150000 points.
+      the expense of using slightly more memory). For instance, a speed gain
+      of a factor 10 is typical for an array of 150000 points.
 \end{itemize}
 
 \section{Changes in Version 2.4}
 \begin{itemize}
 \item The KPG1\_WRLST routine now normalises the supplied positions (using
-AST\_NORM) before writing them to the output catalogue.
+      \xref{AST\_NORM}{sun210}{AST_NORM}) before writing them to the output
+      catalogue.
 \end{itemize}
 
 \section{Changes in Version 2.3}
@@ -788,38 +802,36 @@ AST\_NORM) before writing them to the output catalogue.
 \section{Changes in Version 2.2}
 \begin{itemize}
 \item Script \verb+kaplibs_link+ has been added to enable linking of standalone
-applications.
+      applications.
 \item The routine KPG1\_DSFRM has been modified to include details of AST
-SpecFrames. \emph{The argument list has also been changed.}
+      SpecFrames. \emph{The argument list has also been changed.}
 \item The routine KPG1\_ASMRG has been modified to attempt alignment in
-Domain SPECTRAL.
-\end{itemize}
-
-\section{Changes in Version 2.0}
-\begin{itemize}
-\item The ``-nogks'' switch has been added to the
-\verb#kaplibs_link_adam# command, allowing applications to be linked with
-native PGPLOT instead of the Starlink GKS-based PGPLOT.
-\item The routine KPG1\_WRLST now allows the user to choose the
-co-ordinate system in which the positions are stored in the catalogue
-columns. This is done using two ADAM parameters called COLFRAME and
-COLEPOCH (these names are hard-wired into the routine to encourage
-conformity). Consequently, applications which use this routine should add
-definitions for these two parameters to their IFL files.
-\item The routine KPG1\_RDLST can now read positions from catalogues which
-do not contain a WCS FrameSet, in certain special cases. That is, if the
-catalogue contains columsn called RA and DEC, or X and Y.
-\item The IRAS90 IRQ library has been included. IRQ is used to manage
-textual representations of NDF Quality bits.
+      Domain SPECTRAL.
 \end{itemize}
 
 \section{Changes in Version 2.1}
 \begin{itemize}
 \item The KPG1\_CPSTY routine has been added to copy AST Plotting styles
-from one graphical element to another.
+      from one graphical element to another.
 \end{itemize}
 
-\appendix
+\section{Changes in Version 2.0}
+\begin{itemize}
+\item The ``-nogks'' switch has been added to the
+      \verb#kaplibs_link_adam# command, allowing applications to be linked with
+      native PGPLOT instead of the Starlink GKS-based PGPLOT.
+\item The routine KPG1\_WRLST now allows the user to choose the
+      co-ordinate system in which the positions are stored in the catalogue
+      columns. This is done using two ADAM parameters called COLFRAME and
+      COLEPOCH (these names are hard-wired into the routine to encourage
+      conformity). Consequently, applications which use this routine should add
+      definitions for these two parameters to their IFL files.
+\item The routine KPG1\_RDLST can now read positions from catalogues which
+      do not contain a WCS FrameSet, in certain special cases. That is, if the
+      catalogue contains columsn called RA and DEC, or X and Y.
+\item The IRAS90 IRQ library has been included. IRQ is used to manage
+      textual representations of NDF Quality bits.
+\end{itemize}
 
 \begin{latexonly}
   \newpage
