@@ -2,7 +2,7 @@
      :                        PERVAL, STATUS )
 *+
 *  Name:
-*     KPG1_STOSx
+*     KPG_STOSx
  
 *  Purpose:
 *     Calculates accurate order statistics by sorting an array
