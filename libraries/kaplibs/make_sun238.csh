@@ -3,17 +3,17 @@
 # Create file "documented_files" in each subdirectory containing the
 # names of the files to be documented.
 
-foreach dir (aif ccg ctg fts ira irq kpg lpg)
+foreach dir (aif ccg fts ira kpg)
    cd $dir
 
-# Get a basic list of files. For IRQ and IRA, only document IRQ_ and IRA_
-# routines (not IRQ1_ or IRA1_). C files are only included if they are
-# designed to be called from Fortran (as indicated by the presence of the
-# string "F77_" somewhere int he file).
+# Get a basic list of files. For IRA, only document IRA_ routines 
+# (not IRA1_). C files are only included if they are designed to be
+# called from Fortran (as indicated by the presence of the string 
+# "F77_" somewhere in the file).
    rm -f temp-files >& /dev/null
    touch temp-files
 
-   if( $dir != "irq" && $dir != "ira" ) then 
+   if( $dir != "ira" ) then 
       foreach file (*.f *.g* *.c)
          if( $file != "kaplibs.c" && $file != "kaplibs_adam.c" ) then
 
@@ -67,7 +67,7 @@ end
 cp sun_head.tex sun238.tex
 
 # Add a noteroutine for each documented file
-foreach dir (aif ccg ctg fts ira irq kpg lpg)
+foreach dir (aif ccg fts ira kpg)
    cd $dir
    rm -f notes >& /dev/null
    ../make_noteroutines.pl > notes
@@ -84,7 +84,7 @@ end
 cat sun_mid.tex >> sun238.tex
 
 # Add an sstroutine for each documented file
-foreach dir (aif ccg ctg fts ira irq kpg lpg)
+foreach dir (aif ccg fts ira kpg)
    cd $dir
 
    foreach file ( `cat documented_files`)
