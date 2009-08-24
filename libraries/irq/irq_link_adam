@@ -47,7 +47,7 @@
 
 #-
 
-      echo -lirq `ndf_link_adam` `chr_link_adanm` `prm_link_adam` \
+      echo -lirq `ndf_link_adam` `chr_link_adam` `prm_link_adam` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
