@@ -6,17 +6,16 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardocnumber}    {238.5}
-\newcommand{\stardocauthors}   {D.S. Berry}
+\newcommand{\stardocnumber}    {238.6}
+\newcommand{\stardocauthors}   {D.S. Berry \\Malcolm J. Currie}
 \newcommand{\stardocdate}      {9th March 2009}
-\newcommand{\stardoctitle}     {KAPLIBS \\ [1ex]
-                                Internal subroutines used within
+\newcommand{\stardoctitle}     {KAPLIBS -- Internal subroutines used within
                                 the KAPPA package.}
-\newcommand{\stardocversion}   {Version 2.8-2}
+\newcommand{\stardocversion}   {Version 3.0}
 \newcommand{\stardocmanual}    {Programmer's Reference}
 \newcommand{\stardocabstract}  {KAPLIBS is a package of Fortran subroutine
 libraries which were originally written as part of the KAPPA package (a
-package of general purpose image processing and visualization tools).
+package of general-purpose image-processing and visualization tools).
 KAPLIBS provides software developers with access to many of the internal
 KAPPA routines, so that KAPPA-like applications can be written and built
 independently of KAPPA.}
@@ -185,12 +184,18 @@ independently of KAPPA.}
 %     source prior to any statements that make of the sst commnds.
 
 %  Notes:
-%     The style file html.sty provided with LaTeX2html needs to be used.
-%     This must be before this file.
+%     The commands defined in the style file html.sty provided with LaTeX2html 
+%     are used. These should either be made available by using the appropriate
+%     sun.tex (with hypertext extensions) or by putting the file html.sty 
+%     on your TEXINPUTS path (and including the name as part of the  
+%     documentstyle declaration).
 
 %  Authors:
 %     RFWS: R.F. Warren-Smith (STARLINK)
 %     PDRAPER: P.W. Draper (Starlink - Durham University)
+%     MJC: Malcolm J. Currie (STARLINK)
+%     DSB: David Berry (STARLINK)
+%     TIMJ: Tim Jenness (JAC)
 
 %  History:
 %     10-SEP-1990 (RFWS):
@@ -201,6 +206,19 @@ independently of KAPPA.}
 %        Added support for the usage section and adjusted various spacings.
 %     8-DEC-1994 (PDRAPER):
 %        Added support for simplified formatting using LaTeX2html.
+%     1995 October 4 (MJC):
+%        Added goodbreaks and pagebreak[3] in various places to improve
+%        pages breaking before headings, not immediately after.
+%        Corrected banner width.
+%     1996 March 7 (MJC):
+%        Mark document name on both sides of an sstroutine.
+%     2-DEC-1998 (DSB):
+%        Added sstattributetype (copied from sun210.tex).
+%     2004 August 6 (MJC):
+%        Added sstattribute.
+%     21-JUL-2009 (TIMJ):
+%        Added \sstdiylist{}{} as used when a Parameters section is located that
+%        is not "ADAM Parameters".
 %     {enter_further_changes_here}
 
 %  Bugs:
@@ -222,6 +240,7 @@ independently of KAPPA.}
 %  a purpose description and the rest of the routine's documentation.
 \newcommand{\sstroutine}[3]{
    \goodbreak
+   \markboth{{\stardocname}~ --- #1}{{\stardocname}~ --- #1}
    \rule{\textwidth}{0.5mm}
    \vspace{-7ex}
    \newline
@@ -241,15 +260,56 @@ independently of KAPPA.}
    \end{description}
 }
 
+% Frame attributes fount.  Need to find a way for these to stand out.
+% San serif doesn't work by default.  Also without the \rm the
+% san serif continues after \sstatt hyperlinks.  Extra braces
+% failed to prevent \sstattribute from using roman fount for its 
+% headings.  The current lash up appears to work, but needs further 
+% investigation or a TeX wizard.
+\newcommand{\sstatt}[1]{\sf #1}
+\begin{htmlonly}
+  \newcommand{\sstatt}[1]{\large{\tt #1}}
+\end{htmlonly}
+
+%  Define a command to produce an attribute header, including its name,
+%  a purpose description and the rest of the routine's documentation.
+\newcommand{\sstattribute}[3]{
+   \goodbreak
+   \markboth{{\stardocname}~ --- #1}{{\stardocname}~ --- #1}
+   \rule{\textwidth}{0.5mm}
+   \vspace{-7ex}
+   \newline
+   \settowidth{\sstbannerlength}{{\Large {\sstatt #1}}}
+   \setlength{\sstcaptionlength}{\textwidth}
+   \setlength{\sstexampleslength}{\textwidth}
+   \addtolength{\sstbannerlength}{0.5em}
+   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
+   \addtolength{\sstcaptionlength}{-4.9pt}
+   \settowidth{\sstexampleswidth}{{\bf Examples:}}
+   \addtolength{\sstexampleslength}{-\sstexampleswidth}
+   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\sstatt #1}}}
+   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
+   \parbox[t]{\sstbannerlength}{\flushright{\Large {\sstatt #1}}}
+   \begin{description}
+      #3
+   \end{description}
+}
+
 %  Format the description section.
 \newcommand{\sstdescription}[1]{\item[Description:] #1}
 
 %  Format the usage section.
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
+\newcommand{\sstusage}[1]{\goodbreak \item[Usage:] \mbox{}
 \\[1.3ex]{\raggedright \ssttt #1}}
 
 %  Format the invocation section.
 \newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
+
+%  Format the attribute data type section.
+\newcommand{\sstattributetype}[1]{
+   \item[Type:] \mbox{} \\
+      #1
+}
 
 %  Format the arguments section.
 \newcommand{\sstarguments}[1]{
@@ -271,7 +331,17 @@ independently of KAPPA.}
 
 %  Format the parameters section (for an application).
 \newcommand{\sstparameters}[1]{
+   \goodbreak 
    \item[Parameters:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the applicability section.
+\newcommand{\sstapplicability}[1]{
+   \item[Class Applicability:] \mbox{} \\
    \vspace{-3.5ex}
    \begin{description}
       #1
@@ -280,6 +350,7 @@ independently of KAPPA.}
 
 %  Format the examples section.
 \newcommand{\sstexamples}[1]{
+   \goodbreak
    \item[Examples:] \mbox{} \\
    \vspace{-3.5ex}
    \begin{description}
@@ -296,11 +367,20 @@ independently of KAPPA.}
 \\ #2 }
 
 %  Format the notes section.
-\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
+\newcommand{\sstnotes}[1]{\goodbreak \item[Notes:] \mbox{} \\[1.3ex] #1}
 
 %  Provide a general-purpose format for additional (DIY) sections.
 \newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
 \mbox{} \\[1.3ex] #2}
+
+%  Format the a generic section as a list
+\newcommand{\sstdiylist}[2]{
+   \item[#1:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #2
+   \end{description}
+}
 
 %  Format the implementation status section.
 \newcommand{\sstimplementationstatus}[1]{
@@ -321,7 +401,7 @@ independently of KAPPA.}
 %  Define the format of an item.
 \newcommand{\sstitem}{\item}
 
-%% Now define html equivalents of those already set. These are used by
+%  Now define html equivalents of those already set. These are used by
 %  latex2html and are defined in the html.sty files.
 \begin{htmlonly}
 
@@ -331,6 +411,15 @@ independently of KAPPA.}
       \begin{description}
          #3
       \end{description}
+   }
+
+%  sstattribute. Note the further level of subsectioning.
+   \newcommand{\sstattribute}[3]{
+      \subsubsection{#1\xlabel{#1}-\label{#1}#2}
+      \begin{description}
+         #3
+      \end{description}
+      \\
    }
 
 %  sstdescription
@@ -384,6 +473,15 @@ independently of KAPPA.}
       \\
    }
 
+%  sstapplicability
+   \newcommand{\sstapplicability}[1]{%
+      \item[Class Applicability:]
+       \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
 %  sstexamples
    \newcommand{\sstexamples}[1]{
       \item[Examples:] \\
@@ -397,7 +495,7 @@ independently of KAPPA.}
    \newcommand{\sstsubsection}[1]{\item[{#1}]}
 
 %  sstexamplesubsection
-   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2}
+   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2\\}
 
 %  sstnotes
    \newcommand{\sstnotes}[1]{\item[Notes:] #1 }
@@ -422,9 +520,8 @@ independently of KAPPA.}
 
 \end{htmlonly}
 
-%  End of "sst.tex" layout definitions.
+%  End of sst.tex layout definitions.
 %.
-
 
 
 % ? End of document specific commands
@@ -534,14 +631,14 @@ independently of KAPPA.}
 
 \section {Introduction}
 
-KAPPA is package of general purpose astronomical image processing and
+KAPPA is package of general-purpose astronomical image-processing and
 visualization commands. It is documented in \xref{SUN/95}{sun95}{}. Over
 the long history of the KAPPA package, many internal Fortran subroutines
 have been written to provide facilities within KAPPA which have
-subsequently proved to be of more general use outside KAPPA. In order to
+subsequently proved to be of more-general use outside KAPPA. In order to
 gain the benefit of these internal KAPPA facilities, software developers
 have in the past taken copies of the relevant routines and included them
-in their own projects. The disadvantages of this are obvious - it is easy
+in their own projects. The disadvantages of this are obvious---it is easy
 to end up with many, potentially different, copies of the same routines
 within a large software suite such as the Starlink Software Collection,
 and bug fixes need to be implemented in many different places, rather
@@ -560,7 +657,7 @@ build your software, not the much larger KAPPA.
 There are a large number of routines in KAPLIBS, making it potentially
 difficult to find the routines you want. To ease this problem, a search
 tool is provided which allows the contents of this document to be
-searched (see \hyperref{here}{section }{}{SEC:SEARCH}).
+searched (see \hyperref{here}{Section~}{}{SEC:SEARCH}).
 
 \subsection{Stability of the KAPLIBS Interface}
 KAPLIBS was created as a pragmatic solution to the problem of
@@ -590,7 +687,8 @@ Software Librarian, {\tt ussc@star.rl.ac.uk}.
 
 Applications within KAPPA are split up into several groups (called
 ``monoliths'), with names such as {\tt kapview}, {\tt ndfpack} and
-(rather confusingly) {\tt kappa}. The top-level routines for the
+(rather confusingly but at one time the only KAPPA monolith) 
+{\tt kappa}. The top-level routines for the
 applications in monolith {\tt xyz} are in the tar file {\tt
 \$KAPPA\_DIR/xyz\_sub.tar}. Each application may use some
 application-specific subroutines (\emph{i.e.} subroutines which are so
@@ -609,19 +707,6 @@ within KAPLIBS:
 
 \begin{description}
 
-\item [CTG\_] These are routines for accessing groups of catalogues through
-a single parameter using wild-cards, \emph{etc.}. This is analogous to
-the way the NDG library (see \xref{SUN/95}{sun95}{}) accesses groups
-of NDFs using a single parameter.
-
-\item [LPG\_] These are routines which are used to implement looping
-within a monolith in order to allow a command to be repeatedly invoked
-until all supplied data files (catalogues or NDFs) have been processed.
-See the KAPPA monolith routines such as {\tt kapview\_mon.f}, {\tt
-ndfpack\_mon.f} and {\tt kappa\_mon.f}. LPG routines should be used instead
-of NDF or CAT routines to access NDFs or catalogues within applications
-if this looping behaviour is required.
-
 \item [AIF\_] These are old routines which were used to access parameter
 values or temporary work space. They are gradually being replaced within
 KAPPA by more modern routines provided by the PAR and PSX libraries.
@@ -632,15 +717,10 @@ KAPPA's own {\tt fitsio}.
 \item [IRA\_] These routines were initially part of the IRAS90 Astrometry
 library (hence the IRA acronym). They are used to gain access to WCS
 information stored within NDFs in the form of IRAS90 Astrometry extension.
-This form of WCS is now deprecated in favour of the NDF WCS component.
+This form of WCS is now deprecated in favour of the NDF WCS component,
+accessed through the \xref{AST}{sun210}{} library.
 
-\item [IRQ\_] These routines were initially part of the IRAS90 Astrometry
-library (hence the IRQ acronym). They are used to manage and use textual
-names representing bits in the NDF Quality component. Further information
-about IRQ is available in the document id6.tex which is part of the
-KAPLIBS source distribution.
-
-\item [KPG1\_] These are other general purpose routines which do not fall
+\item [KPG1\_] These are other general-purpose routines which do not fall
 into such obvious groups.  Even within this library, though, there are
 loose associations of routines, usually indicated by some common element
 within the routine name. The following are some of the more significant
@@ -660,22 +740,22 @@ have names which start ``{\tt KPG1\_AS}''.
 Within all these groups, some routines have different versions for
 processing data with different numerical types. The names of such
 routines are identical except for the trailing one or two characters
-which indicate the numerical type processed. These one or two character
+which indicate the data type processed. These one- or two-character
 codes are:
 
 \begin{description}
-\item [d] - Double precision floating point
-\item [r] - Single precision floating point
+\item [d] - Double-precision floating point
+\item [r] - Single-precision floating point
 \item [c] - Character
-\item [i] - Single precision integer
-\item [w] - Word (usually 2 bytes integers)
-\item [uw] - Unsigned word (usually 2 bytes unsigned integers)
-\item [bw] - Byte (usually 1 byte integers)
-\item [ub] - Unsigned byte (usually 1 byte unsigned integers)
+\item [i] - Single-precision integer
+\item [w] - Word (usually two-byte integers)
+\item [uw] - Unsigned word (usually two-byte unsigned integers)
+\item [bw] - Byte (usually one-byte integers)
+\item [ub] - Unsigned byte (usually one-byte unsigned integers)
 \item [l] - Logical
 \end{description}
 
-Sometimes, routine names are documented as ending with a lower case
+Sometimes, routine names are documented as ending with a lower-case
 ``x''. This indicates that routines exist for various of the above
 numerical types. The \emph{actual} routines names will not include the trailing
 ``x'', but will have one of the above codes in place of the ``x''.
@@ -686,9 +766,7 @@ commands should be used (see \xref{SUN/144}{sun144}{}):
 
 \small
 \begin{verbatim}
-      % kaplibs_dev
       % alink adamprog.f `kaplibs_link_adam`
-      % kaplibs_dev remove
 \end{verbatim}
 \normalsize
 
@@ -718,6 +796,7 @@ to link with the {\em native} version of PGPLOT, then include the switch
 This will include native PGPLOT in the link list, and cause all GKS and IDI
 related items to be removed.
 
+\newpage
 \appendix
 
 \section{Changes in Version 3.0}

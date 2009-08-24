@@ -6,17 +6,16 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardocnumber}    {238.5}
-\newcommand{\stardocauthors}   {D.S. Berry}
+\newcommand{\stardocnumber}    {238.6}
+\newcommand{\stardocauthors}   {D.S. Berry \\Malcolm J. Currie}
 \newcommand{\stardocdate}      {9th March 2009}
-\newcommand{\stardoctitle}     {KAPLIBS \\ [1ex]
-                                Internal subroutines used within
+\newcommand{\stardoctitle}     {KAPLIBS -- Internal subroutines used within
                                 the KAPPA package.}
-\newcommand{\stardocversion}   {Version 2.8-2}
+\newcommand{\stardocversion}   {Version 3.0}
 \newcommand{\stardocmanual}    {Programmer's Reference}
 \newcommand{\stardocabstract}  {KAPLIBS is a package of Fortran subroutine
 libraries which were originally written as part of the KAPPA package (a
-package of general purpose image processing and visualization tools).
+package of general-purpose image-processing and visualization tools).
 KAPLIBS provides software developers with access to many of the internal
 KAPPA routines, so that KAPPA-like applications can be written and built
 independently of KAPPA.}
@@ -185,12 +184,18 @@ independently of KAPPA.}
 %     source prior to any statements that make of the sst commnds.
 
 %  Notes:
-%     The style file html.sty provided with LaTeX2html needs to be used.
-%     This must be before this file.
+%     The commands defined in the style file html.sty provided with LaTeX2html 
+%     are used. These should either be made available by using the appropriate
+%     sun.tex (with hypertext extensions) or by putting the file html.sty 
+%     on your TEXINPUTS path (and including the name as part of the  
+%     documentstyle declaration).
 
 %  Authors:
 %     RFWS: R.F. Warren-Smith (STARLINK)
 %     PDRAPER: P.W. Draper (Starlink - Durham University)
+%     MJC: Malcolm J. Currie (STARLINK)
+%     DSB: David Berry (STARLINK)
+%     TIMJ: Tim Jenness (JAC)
 
 %  History:
 %     10-SEP-1990 (RFWS):
@@ -201,6 +206,19 @@ independently of KAPPA.}
 %        Added support for the usage section and adjusted various spacings.
 %     8-DEC-1994 (PDRAPER):
 %        Added support for simplified formatting using LaTeX2html.
+%     1995 October 4 (MJC):
+%        Added goodbreaks and pagebreak[3] in various places to improve
+%        pages breaking before headings, not immediately after.
+%        Corrected banner width.
+%     1996 March 7 (MJC):
+%        Mark document name on both sides of an sstroutine.
+%     2-DEC-1998 (DSB):
+%        Added sstattributetype (copied from sun210.tex).
+%     2004 August 6 (MJC):
+%        Added sstattribute.
+%     21-JUL-2009 (TIMJ):
+%        Added \sstdiylist{}{} as used when a Parameters section is located that
+%        is not "ADAM Parameters".
 %     {enter_further_changes_here}
 
 %  Bugs:
@@ -222,6 +240,7 @@ independently of KAPPA.}
 %  a purpose description and the rest of the routine's documentation.
 \newcommand{\sstroutine}[3]{
    \goodbreak
+   \markboth{{\stardocname}~ --- #1}{{\stardocname}~ --- #1}
    \rule{\textwidth}{0.5mm}
    \vspace{-7ex}
    \newline
@@ -241,15 +260,56 @@ independently of KAPPA.}
    \end{description}
 }
 
+% Frame attributes fount.  Need to find a way for these to stand out.
+% San serif doesn't work by default.  Also without the \rm the
+% san serif continues after \sstatt hyperlinks.  Extra braces
+% failed to prevent \sstattribute from using roman fount for its 
+% headings.  The current lash up appears to work, but needs further 
+% investigation or a TeX wizard.
+\newcommand{\sstatt}[1]{\sf #1}
+\begin{htmlonly}
+  \newcommand{\sstatt}[1]{\large{\tt #1}}
+\end{htmlonly}
+
+%  Define a command to produce an attribute header, including its name,
+%  a purpose description and the rest of the routine's documentation.
+\newcommand{\sstattribute}[3]{
+   \goodbreak
+   \markboth{{\stardocname}~ --- #1}{{\stardocname}~ --- #1}
+   \rule{\textwidth}{0.5mm}
+   \vspace{-7ex}
+   \newline
+   \settowidth{\sstbannerlength}{{\Large {\sstatt #1}}}
+   \setlength{\sstcaptionlength}{\textwidth}
+   \setlength{\sstexampleslength}{\textwidth}
+   \addtolength{\sstbannerlength}{0.5em}
+   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
+   \addtolength{\sstcaptionlength}{-4.9pt}
+   \settowidth{\sstexampleswidth}{{\bf Examples:}}
+   \addtolength{\sstexampleslength}{-\sstexampleswidth}
+   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\sstatt #1}}}
+   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
+   \parbox[t]{\sstbannerlength}{\flushright{\Large {\sstatt #1}}}
+   \begin{description}
+      #3
+   \end{description}
+}
+
 %  Format the description section.
 \newcommand{\sstdescription}[1]{\item[Description:] #1}
 
 %  Format the usage section.
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
+\newcommand{\sstusage}[1]{\goodbreak \item[Usage:] \mbox{}
 \\[1.3ex]{\raggedright \ssttt #1}}
 
 %  Format the invocation section.
 \newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
+
+%  Format the attribute data type section.
+\newcommand{\sstattributetype}[1]{
+   \item[Type:] \mbox{} \\
+      #1
+}
 
 %  Format the arguments section.
 \newcommand{\sstarguments}[1]{
@@ -271,7 +331,17 @@ independently of KAPPA.}
 
 %  Format the parameters section (for an application).
 \newcommand{\sstparameters}[1]{
+   \goodbreak 
    \item[Parameters:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the applicability section.
+\newcommand{\sstapplicability}[1]{
+   \item[Class Applicability:] \mbox{} \\
    \vspace{-3.5ex}
    \begin{description}
       #1
@@ -280,6 +350,7 @@ independently of KAPPA.}
 
 %  Format the examples section.
 \newcommand{\sstexamples}[1]{
+   \goodbreak
    \item[Examples:] \mbox{} \\
    \vspace{-3.5ex}
    \begin{description}
@@ -296,11 +367,20 @@ independently of KAPPA.}
 \\ #2 }
 
 %  Format the notes section.
-\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
+\newcommand{\sstnotes}[1]{\goodbreak \item[Notes:] \mbox{} \\[1.3ex] #1}
 
 %  Provide a general-purpose format for additional (DIY) sections.
 \newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
 \mbox{} \\[1.3ex] #2}
+
+%  Format the a generic section as a list
+\newcommand{\sstdiylist}[2]{
+   \item[#1:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #2
+   \end{description}
+}
 
 %  Format the implementation status section.
 \newcommand{\sstimplementationstatus}[1]{
@@ -321,7 +401,7 @@ independently of KAPPA.}
 %  Define the format of an item.
 \newcommand{\sstitem}{\item}
 
-%% Now define html equivalents of those already set. These are used by
+%  Now define html equivalents of those already set. These are used by
 %  latex2html and are defined in the html.sty files.
 \begin{htmlonly}
 
@@ -331,6 +411,15 @@ independently of KAPPA.}
       \begin{description}
          #3
       \end{description}
+   }
+
+%  sstattribute. Note the further level of subsectioning.
+   \newcommand{\sstattribute}[3]{
+      \subsubsection{#1\xlabel{#1}-\label{#1}#2}
+      \begin{description}
+         #3
+      \end{description}
+      \\
    }
 
 %  sstdescription
@@ -384,6 +473,15 @@ independently of KAPPA.}
       \\
    }
 
+%  sstapplicability
+   \newcommand{\sstapplicability}[1]{%
+      \item[Class Applicability:]
+       \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
 %  sstexamples
    \newcommand{\sstexamples}[1]{
       \item[Examples:] \\
@@ -397,7 +495,7 @@ independently of KAPPA.}
    \newcommand{\sstsubsection}[1]{\item[{#1}]}
 
 %  sstexamplesubsection
-   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2}
+   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2\\}
 
 %  sstnotes
    \newcommand{\sstnotes}[1]{\item[Notes:] #1 }
@@ -422,9 +520,8 @@ independently of KAPPA.}
 
 \end{htmlonly}
 
-%  End of "sst.tex" layout definitions.
+%  End of sst.tex layout definitions.
 %.
-
 
 
 % ? End of document specific commands
@@ -534,14 +631,14 @@ independently of KAPPA.}
 
 \section {Introduction}
 
-KAPPA is package of general purpose astronomical image processing and
+KAPPA is package of general-purpose astronomical image-processing and
 visualization commands. It is documented in \xref{SUN/95}{sun95}{}. Over
 the long history of the KAPPA package, many internal Fortran subroutines
 have been written to provide facilities within KAPPA which have
-subsequently proved to be of more general use outside KAPPA. In order to
+subsequently proved to be of more-general use outside KAPPA. In order to
 gain the benefit of these internal KAPPA facilities, software developers
 have in the past taken copies of the relevant routines and included them
-in their own projects. The disadvantages of this are obvious - it is easy
+in their own projects. The disadvantages of this are obvious---it is easy
 to end up with many, potentially different, copies of the same routines
 within a large software suite such as the Starlink Software Collection,
 and bug fixes need to be implemented in many different places, rather
@@ -560,7 +657,7 @@ build your software, not the much larger KAPPA.
 There are a large number of routines in KAPLIBS, making it potentially
 difficult to find the routines you want. To ease this problem, a search
 tool is provided which allows the contents of this document to be
-searched (see \hyperref{here}{section }{}{SEC:SEARCH}).
+searched (see \hyperref{here}{Section~}{}{SEC:SEARCH}).
 
 \subsection{Stability of the KAPLIBS Interface}
 KAPLIBS was created as a pragmatic solution to the problem of
@@ -590,7 +687,8 @@ Software Librarian, {\tt ussc@star.rl.ac.uk}.
 
 Applications within KAPPA are split up into several groups (called
 ``monoliths'), with names such as {\tt kapview}, {\tt ndfpack} and
-(rather confusingly) {\tt kappa}. The top-level routines for the
+(rather confusingly but at one time the only KAPPA monolith) 
+{\tt kappa}. The top-level routines for the
 applications in monolith {\tt xyz} are in the tar file {\tt
 \$KAPPA\_DIR/xyz\_sub.tar}. Each application may use some
 application-specific subroutines (\emph{i.e.} subroutines which are so
@@ -609,19 +707,6 @@ within KAPLIBS:
 
 \begin{description}
 
-\item [CTG\_] These are routines for accessing groups of catalogues through
-a single parameter using wild-cards, \emph{etc.}. This is analogous to
-the way the NDG library (see \xref{SUN/95}{sun95}{}) accesses groups
-of NDFs using a single parameter.
-
-\item [LPG\_] These are routines which are used to implement looping
-within a monolith in order to allow a command to be repeatedly invoked
-until all supplied data files (catalogues or NDFs) have been processed.
-See the KAPPA monolith routines such as {\tt kapview\_mon.f}, {\tt
-ndfpack\_mon.f} and {\tt kappa\_mon.f}. LPG routines should be used instead
-of NDF or CAT routines to access NDFs or catalogues within applications
-if this looping behaviour is required.
-
 \item [AIF\_] These are old routines which were used to access parameter
 values or temporary work space. They are gradually being replaced within
 KAPPA by more modern routines provided by the PAR and PSX libraries.
@@ -632,15 +717,10 @@ KAPPA's own {\tt fitsio}.
 \item [IRA\_] These routines were initially part of the IRAS90 Astrometry
 library (hence the IRA acronym). They are used to gain access to WCS
 information stored within NDFs in the form of IRAS90 Astrometry extension.
-This form of WCS is now deprecated in favour of the NDF WCS component.
+This form of WCS is now deprecated in favour of the NDF WCS component,
+accessed through the \xref{AST}{sun210}{} library.
 
-\item [IRQ\_] These routines were initially part of the IRAS90 Astrometry
-library (hence the IRQ acronym). They are used to manage and use textual
-names representing bits in the NDF Quality component. Further information
-about IRQ is available in the document id6.tex which is part of the
-KAPLIBS source distribution.
-
-\item [KPG1\_] These are other general purpose routines which do not fall
+\item [KPG1\_] These are other general-purpose routines which do not fall
 into such obvious groups.  Even within this library, though, there are
 loose associations of routines, usually indicated by some common element
 within the routine name. The following are some of the more significant
@@ -660,22 +740,22 @@ have names which start ``{\tt KPG1\_AS}''.
 Within all these groups, some routines have different versions for
 processing data with different numerical types. The names of such
 routines are identical except for the trailing one or two characters
-which indicate the numerical type processed. These one or two character
+which indicate the data type processed. These one- or two-character
 codes are:
 
 \begin{description}
-\item [d] - Double precision floating point
-\item [r] - Single precision floating point
+\item [d] - Double-precision floating point
+\item [r] - Single-precision floating point
 \item [c] - Character
-\item [i] - Single precision integer
-\item [w] - Word (usually 2 bytes integers)
-\item [uw] - Unsigned word (usually 2 bytes unsigned integers)
-\item [bw] - Byte (usually 1 byte integers)
-\item [ub] - Unsigned byte (usually 1 byte unsigned integers)
+\item [i] - Single-precision integer
+\item [w] - Word (usually two-byte integers)
+\item [uw] - Unsigned word (usually two-byte unsigned integers)
+\item [bw] - Byte (usually one-byte integers)
+\item [ub] - Unsigned byte (usually one-byte unsigned integers)
 \item [l] - Logical
 \end{description}
 
-Sometimes, routine names are documented as ending with a lower case
+Sometimes, routine names are documented as ending with a lower-case
 ``x''. This indicates that routines exist for various of the above
 numerical types. The \emph{actual} routines names will not include the trailing
 ``x'', but will have one of the above codes in place of the ``x''.
@@ -686,9 +766,7 @@ commands should be used (see \xref{SUN/144}{sun144}{}):
 
 \small
 \begin{verbatim}
-      % kaplibs_dev
       % alink adamprog.f `kaplibs_link_adam`
-      % kaplibs_dev remove
 \end{verbatim}
 \normalsize
 
@@ -6984,1171 +7062,6 @@ related items to be removed.
    }
 }
 \sstroutine{
-   CTG1\_APPEN
-}{
-   Append matching files to a group
-}{
-   \sstdescription{
-      All files matching the supplied file template are appended to IGRP1.
-      For each such file appended to IGRP1, a copy of REST is also appended
-      to IGRP2.
-   }
-   \sstinvocation{
-      CALL CTG1\_APPEN( IGRP1, IGRP2, TEMPLT, REST, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         IGRP1 = INTEGER (Given)
-      }{
-         An identifier for the group to which the matching file names should
-         be appended.
-      }
-      \sstsubsection{
-         IGRP2 = INTEGER (Given)
-      }{
-         An identifier for the group to which copies of REST should
-         be appended.
-      }
-      \sstsubsection{
-         TEMPLT = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         The wild card file template.
-      }
-      \sstsubsection{
-         REST = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         Text to be added to IGRP2 for each matching file.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   CTG1\_ASEXP
-}{
-   Store names of existing catalogues supplied as a group expression
-}{
-   \sstdescription{
-      The supplied group expression is parsed (using the facilities of
-      the GRP routine GRP\_GROUP, see SUN/150) to produce a list of
-      explicit names for existing catalogues which are appended to the
-      end of the supplied group (a new group is created if none is
-      supplied). catalogue identifiers for particular members of the
-      group can be obtained using CTG\_CATAS.
-
-      If any of the catalogues specified by the group expression cannot
-      be accessed, an error is reported and STATUS is returned equal to
-      CTG\_\_NOFIL. If this happens strings holding the name of each bad
-      catalogue are appended to the group identified by IGRP1 (so long as
-      IGRP1 is not equal to GRP\_\_NOID).
-   }
-   \sstinvocation{
-      CALL CTG1\_ASEXP( GRPEXP, VERB, IGRP1, IGRP2, SIZE, FLAG, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         GRPEXP = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         The group expression specifying the catalogue names to be stored
-         in the group.
-      }
-      \sstsubsection{
-         VERB = LOGICAL (Given)
-      }{
-         If TRUE then errors which occur whilst accessing supplied catalogues
-         are flushed so that the user can see them before re-prompting for
-         a new catalogue ({\tt "}verbose{\tt "} mode). Otherwise, they are annulled and
-         a general {\tt "}Cannot access file xyz{\tt "} message is displayed before
-         re-prompting.
-      }
-      \sstsubsection{
-         IGRP1 = INTEGER (Given)
-      }{
-         The identifier of a group to which the names of any
-         inaccessable catalogues will be appended. The group should already
-         have been created by a call to GRP\_NEW, and should be deleted
-         when no longer needed by a call to GRP\_DELET. If IGRP1 is
-         supplied equal to symbolic constant GRP\_\_NOID, then no
-         information is stored describing the bad catalogues.
-      }
-      \sstsubsection{
-         IGRP2 = INTEGER (Given and Returned)
-      }{
-         The identifier of the group in which the catalogue names are to be
-         stored. A new group is created if the supplied value is GRP\_\_NOID.
-         It should be deleted when no longer needed using GRP\_DELET.
-      }
-      \sstsubsection{
-         SIZE = INTEGER (Returned)
-      }{
-         The total number of catalogue names in the returned group IGRP2.
-      }
-      \sstsubsection{
-         FLAG = LOGICAL (Returned)
-      }{
-         If the group expression was terminated by the GRP {\tt "}flag
-         character{\tt "}, then FLAG is returned .TRUE. Otherwise it is
-         returned .FALSE. Returned .FALSE. if an error occurs.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   CTG1\_CATCH
-}{
-   Expand wild card templates, etc, and check all catalogues exist
-}{
-   \sstdescription{
-      Names stored in the supplied group with indices greater than or
-      equal to START are expanded into a list of explicit file names
-      which can be accessed as catalogues using the CAT library. The
-      expanded set of names are appended to the end of the group, and
-      the original names are deleted.
-
-      If any of the files in the group cannot be accessed, an error is
-      reported and STATUS is returned equal to CAT\_\_NOFIL. If this
-      happens the name of each bad file is stoed in IGRP2.
-   }
-   \sstinvocation{
-      CALL CTG1\_CATCH( VERB, IGRP1, START, IGRP2, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         VERB = LOGICAL (Given)
-      }{
-         If TRUE then errors which occur whilst accessing supplied catalogues
-         are flushed so that the user can see them before re-prompting for
-         a new catalogue ({\tt "}verbose{\tt "} mode). Otherwise, they are annulled and
-         a general {\tt "}Cannot access file xyz{\tt "} message is displayed before
-         re-prompting.
-      }
-      \sstsubsection{
-         IGRP1 = INTEGER (Given)
-      }{
-         An identifier for the group containing the catalogue names
-         (potentially containing wild cards).
-      }
-      \sstsubsection{
-         START = INTEGER (Given)
-      }{
-         The index of the first name to be expanded into a list of catalogue
-         files.
-      }
-      \sstsubsection{
-         IGRP2 = INTEGER (Given)
-      }{
-         An identifier for a group in which to store any supplied names
-         for which no corresponding catalogues could be found. This may be
-         GRP\_\_NOID in which case the names of bad catalogues are discarded.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         The order of the names is preserved.
-
-         \sstitem
-         If an input name contained a FITS extension number, it is copied to
-         all related output file names.
-      }
-   }
-}
-\sstroutine{
-   CTG1\_CREXP
-}{
-   Store the names of a specified group of catalogue to be created
-}{
-   \sstdescription{
-      The supplied group expression is parsed (using the facilities of
-      the GRP routine GRP\_GROUP, see SUN/150) to produce a list of
-      explicit catalogue names. No check is made to see if these catalogues
-      exist or not, and any wild-cards in the catalogue names are ignored.
-      The names are appended to the group identified by IGRP. If IGRP has
-      the value GRP\_\_NOID on entry, then a new group is created and IGRP
-      is returned holding the new group identifier.
-
-      If IGRP0 holds a valid group identifier on entry, then the group
-      identified by IGRP0 is used as the basis for any modification
-      element contained in the supplied group expression. If IGRP0 holds
-      an invalid identifier (such as GRP\_\_NOID) on entry then
-      modification elements are included literally in the output group.
-   }
-   \sstinvocation{
-      CALL CTG1\_CREXP( GRPEXP, IGRP0, IGRP, SIZE, FLAG, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         GRPEXP = CHARACTER$*$($*$) (Given)
-      }{
-         The group expression specifying the catalogue names to be stored in
-         the group.
-      }
-      \sstsubsection{
-         IGRP0 = INTEGER (Given)
-      }{
-         The GRP identifier for the group to be used as the basis for
-         any modification elements.
-      }
-      \sstsubsection{
-         IGRP = INTEGER (Given and Returned)
-      }{
-         The GRP identifier for the group to which the supplied catalogue
-         names are to be appended.
-      }
-      \sstsubsection{
-         SIZE = INTEGER (Returned)
-      }{
-         The total number of catalogue names in the returned group.
-      }
-      \sstsubsection{
-         FLAG = LOGICAL (Returned)
-      }{
-         If the group expression was terminated by the GRP {\tt "}flag{\tt "}
-         character, then FLAG is returned .TRUE. Otherwise it is
-         returned .FALSE. Retuned .FALSE. if an error occurs.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   CTG1\_EXPAN
-}{
-   Expands a wild card template
-}{
-   \sstdescription{
-      The supplied wild-card template is expanded into a list of file
-      names, which are appended to the supplied group. If the supplied
-      template matches files with the same directory/basename but with
-      different file types, then only the file with the highest priority
-      file type is returned (i.e. the file type which is closest to
-      the start of CAT\_FORMATS\_IN).
-   }
-   \sstinvocation{
-      CALL CTG1\_EXPAN( VERB, TEMPLT, IGRP, NFMT, FMT, FOUND, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         VERB = LOGICAL (Given)
-      }{
-         If TRUE then errors which occur whilst accessing supplied catalogues
-         are flushed so that the user can see them before re-prompting for
-         a new catalogue ({\tt "}verbose{\tt "} mode). Otherwise, they are annulled and
-         a general {\tt "}Cannot access file xyz{\tt "} message is displayed before
-         re-prompting.
-      }
-      \sstsubsection{
-         TEMPLT = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         The wild card template.
-      }
-      \sstsubsection{
-         IGRP = INTEGER (Given)
-      }{
-         An identifier for the group to which the expanded names should
-         be appended. On exit, this group is at the end of a chain of
-         groups connected by a GRP {\tt "}owner-slave{\tt "} relationship. The other
-         groups is the chain hold individual fields  from the full catalogue
-         specification. The full chain (starting from the head) is as
-         follows:
-
-                  1) FITS extension specification
-                  2) File types
-                  3) Base file names
-                  4) Directory paths
-                  5) Full catalogue specification (this is the returned group - IGRP)
-
-         The other groups in the chain are deleted automatically by GRP
-         when the returned group (IGRP) is deleted.
-      }
-      \sstsubsection{
-         NFMT = INTEGER (Given)
-      }{
-         The number of catalogue file types stored in FMT. May be zero.
-      }
-      \sstsubsection{
-         FMT( NFMT ) = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         An array of known catalogue file types.
-      }
-      \sstsubsection{
-         FOUND = LOGICAL (Returned)
-      }{
-         Returned .TRUE. if one or more files were found matching the
-         supplied template. Returned .FALSE. otherwise.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   CTG1\_FPARS
-}{
-   Extracts fields from a full catalogue specification
-}{
-   \sstdescription{
-      This routine extracts and returned fields from the supplied
-      catalogue specification.
-   }
-   \sstinvocation{
-      CALL CTG1\_FPARS( SPEC, DIR, BN, SUF, EXT, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         SPEC = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         The full catalogue file spec.
-      }
-      \sstsubsection{
-         DIR = CHARACTER $*$ ( $*$ ) (Returned)
-      }{
-         The directory path (ending at the final {\tt "}$\backslash${\tt "} in the spec).
-      }
-      \sstsubsection{
-         BN = CHARACTER $*$ ( $*$ ) (Returned)
-      }{
-         The file base name. Ends with the character preceeding the first
-         {\tt "}.{\tt "} or {\tt "}({\tt "} following the directory path.
-      }
-      \sstsubsection{
-         SUF = CHARACTER $*$ ( $*$ ) (Returned)
-      }{
-         Any string following the file base name, and preceeding any
-         opening parenthesis. SUF will either be blank, or begin with a
-         dot.
-      }
-      \sstsubsection{
-         EXT = CHARACTER $*$ ( $*$ ) (Returned)
-      }{
-         Any string enclosed in curly braces following the suffix.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   CTG1\_GTYPS
-}{
-   Get file types from a catalogue file types list
-}{
-   \sstdescription{
-      This routine extracts the file types (including leading dots) from
-      a string representing a set of cataologue types, in the same format
-      as the NDF\_FORMATS\_IN or NDF\_FORMATS\_OUT environment variable.
-   }
-   \sstinvocation{
-      CALL CTG1\_GTYPS( MXTYP, STRING, NTYP, TYP, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         MXTYP = INTEGER (Given)
-      }{
-         The maximum number of types allowed.
-      }
-      \sstsubsection{
-         STRING = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         The value of {\tt "}CAT\_FORMATS\_IN{\tt "} or {\tt "}CAT\_FORMATS\_OUT{\tt "}.
-      }
-      \sstsubsection{
-         NTYP = INTEGER (Returned)
-      }{
-         The number of file types returned in TYP.
-      }
-      \sstsubsection{
-         TYP( MXTYP ) = CHARACTER $*$ ( $*$ ) (Returned)
-      }{
-         The file types extracted from STRING, in elements 1 to NTYP.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   CTG\_MATCH
-}{
-   See if a given string matches a wild-card template
-}{
-   \sstdescription{
-      This routine returns .TRUE. if the supplied test string matches the
-      supplied wild-card template.
-   }
-   \sstinvocation{
-      MATCH = CTG1\_MATCH( TEMPLT, TEST, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         TEMPLT = CHARACTER$*$($*$) (Given)
-      }{
-         The wild-card template.
-      }
-      \sstsubsection{
-         TEST = CHARACTER$*$($*$) (Given)
-      }{
-         The test string to be compared to the template.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-   \sstreturnedvalue{
-      \sstsubsection{
-         CTG1\_MATCH = LOGICAL
-      }{
-         .TRUE. if the test string matches the template.
-      }
-   }
-}
-\sstroutine{
-   CTG1\_SORT
-}{
-   Sort file matches and remove redundant files
-}{
-   \sstdescription{
-      The specified section of the supplied groups is checked for sets
-      of matching catalogues (i.e. catalogues with the same basename and
-      directory). Only one catalogue out of each such set is retained, all
-      the others are removed from the groups. The retained catalogue is
-      the one with the highest priority file type (i.e. the file type which
-      is closest to the start of CAT\_FORMATS\_IN).
-   }
-   \sstinvocation{
-      CALL CTG1\_SORT( IGRP1, IGRPD, IGRPB, IGRPT, IGRPH, FIRST, NFMT,
-                      FMT, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         IGRP = INTEGER (Given)
-      }{
-         An identifier for the group containing the catalogue paths.
-      }
-      \sstsubsection{
-         IGRPD = INTEGER (Given)
-      }{
-         An identifier for the group containing the directory field for each
-         catalogue found.
-      }
-      \sstsubsection{
-         IGRPB = INTEGER (Given)
-      }{
-         An identifier for the group containing the file base name for each
-         catalogue found.
-      }
-      \sstsubsection{
-         IGRPT = INTEGER (Given)
-      }{
-         An identifier for the group containing the file type for each
-         catalogue found.
-      }
-      \sstsubsection{
-         IGRPH = INTEGER (Given)
-      }{
-         An identifier for the group containing the FITS extension
-         specified for each catalogue found.
-      }
-      \sstsubsection{
-         FIRST = INTEGER (Given)
-      }{
-         The index of the first catalogue to check.
-      }
-      \sstsubsection{
-         NFMT = INTEGER (Given)
-      }{
-         The number of file types stored in FMT. May be zero.
-      }
-      \sstsubsection{
-         FMT( NFMT ) = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         An array of known file types. Not accessed if NFMT is zero (in which
-         case the groups are returned unchanged).
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   CTG1\_SUBST
-}{
-   Substitute one substring for another
-}{
-   \sstdescription{
-      This routine copies the input string to the output string,
-      replacing occurrences of a given substring with another given
-      string. The substitution is case sensitive.
-   }
-   \sstinvocation{
-      CALL CTG1\_SUBST( INSTR, OLD, NEW, ALL, OUTSTR, NSUB, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         INSTR = CHARACTER$*$($*$) (Given)
-      }{
-         The input string.
-      }
-      \sstsubsection{
-         OLD = CHARACTER$*$($*$) (Given)
-      }{
-         The substring which is to be replaced. All blanks (including
-         trailing blanks) must be matched for a substitution to be made.
-      }
-      \sstsubsection{
-         NEW = CHARACTER$*$($*$) (Given)
-      }{
-         The string which is to replace the substring specified by OLD.
-         NEW an OLD need not be the same length. Any trailing blanks
-         are included in the substitution.
-      }
-      \sstsubsection{
-         ALL = LOGICAL (Given)
-      }{
-         If true, then all occurrences of OLD will be replaced.
-         Otherwise, only the first occurrence will be replaced.
-      }
-      \sstsubsection{
-         OUTSTR = CHARACTER$*$($*$) (Returned)
-      }{
-         The output string. A copy of INSTR, but with the required
-         substitutions made.
-      }
-      \sstsubsection{
-         NSUB = INTEGER (Returned)
-      }{
-         The number of substitutions actually made. If OUTSTR is filled
-         before the end of INSTR has been reached, then NSUB may be less
-         than the total number of occurrences of OLD within INSTR. If ALL
-         is false, then NSUB will always be less than or equal to one.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   CTG\_ASSO1
-}{
-   Obtain an identifier for a single existing catalogue using a
-   specified parameter
-}{
-   \sstdescription{
-      This routine is equivalent to CAT\_ASSOC except that it allows the
-      catalogue to be specified using a GRP group expression (for instance,
-      its name may be given within a text file, etc). The first catalogue in
-      the group expression is returned. Any other names in the group
-      expression are ignored. Supplemental information describing the
-      separate fields in the catalogue specification are also returned.
-   }
-   \sstinvocation{
-      CALL CTG\_ASSO1( PARAM, VERB, MODE, CI, FIELDS, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         PARAM = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         Name of the ADAM parameter.
-      }
-      \sstsubsection{
-         VERB = LOGICAL (Given)
-      }{
-         If TRUE then errors which occur whilst accessing supplied catalogues
-         are flushed so that the user can see them before re-prompting for
-         a new catalogue ({\tt "}verbose{\tt "} mode). Otherwise, they are annulled and
-         a general {\tt "}Cannot access file xyz{\tt "} message is displayed before
-         re-prompting.
-      }
-      \sstsubsection{
-         MODE = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         Type of catalogue access required: {\tt '}READ{\tt '}, {\tt '}UPDATE{\tt '} or {\tt '}WRITE{\tt '}.
-      }
-      \sstsubsection{
-         CI = INTEGER (Returned)
-      }{
-         catalogue identifier.
-      }
-      \sstsubsection{
-         FIELDS( 5 ) = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         Each element contains the following on exit:
-
-            1 - FITS extension specification (eg {\tt "}\{3\}{\tt "}) if any
-            2 - File type
-            3 - Base file name
-            4 - Directory path
-            5 - Full catalogue specification
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   CTG\_ASSOC
-}{
-   Store names of existing catalogues specified through the environment
-}{
-   \sstdescription{
-      A group expression is obtained from the environment using the
-      supplied parameter. The expression is parsed (using the facilities
-      of the GRP routine GRP\_GROUP, see SUN/150) to produce a list of
-      explicit names for existing catalogues which are appended to the
-      end of the supplied group (a new group is created if none is
-      supplied). If an error occurs while parsing the group expression,
-      the user is re-prompted for a new group expression. CAT identifiers
-      for particular members of the group can be obtained using
-      CTG\_CATAS.
-   }
-   \sstinvocation{
-      CALL CTG\_ASSOC( PARAM, VERB, IGRP, SIZE, FLAG, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         PARAM = CHARACTER$*$($*$) (Given)
-      }{
-         The parameter with which to associate the group expression.
-      }
-      \sstsubsection{
-         VERB = LOGICAL (Given)
-      }{
-         If TRUE then errors which occur whilst accessing supplied catalogues
-         are flushed so that the user can see them before re-prompting for
-         a new catalogue ({\tt "}verbose{\tt "} mode). Otherwise, they are annulled and
-         a general {\tt "}Cannot access file xyz{\tt "} message is displayed before
-         re-prompting.
-      }
-      \sstsubsection{
-         IGRP = INTEGER (Given and Returned)
-      }{
-         The identifier of the group in which the catalogue names are to be
-         stored. A new group is created if the supplied value is GRP\_\_NOID.
-         It should be deleted when no longer needed using GRP\_DELET.
-      }
-      \sstsubsection{
-         SIZE = INTEGER (Returned)
-      }{
-         The total number of catalogue names in the returned group.
-      }
-      \sstsubsection{
-         FLAG = LOGICAL (Returned)
-      }{
-         If the group expression was terminated by the GRP {\tt "}flag
-         character{\tt "}, then FLAG is returned true. Otherwise it is
-         returned false. Returned .FALSE. if an error occurs.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         Any file names containing wildcards are expanded into a list of
-         catalogue names. The supplied strings are intepreted by a shell
-         (/bin/tcsh if it exists, otherwise /bin/csh, otherwise /bin/sh),
-         and so may contain shell meta-characters (eg twiddle, \$HOME, even
-         command substitution and pipes - but pipe characters {\tt "}$|${\tt "} need to be
-         escaped using a backslash {\tt "}$\backslash${\tt "} to avoid them being interpreted as
-         GRP editing characters).
-
-         \sstitem
-         Only the highest priority file with any give file name is included
-         in the returned group. The priority of a file is determined by its
-         file type. Priority decreases along the following list of file
-         types: .FIT, .fit, .FITS, .fits, .GSC, .gsc, .TXT, .txt, .Txt, .sdf.
-         If no file type is given by the user, the highest priority available
-         file type is used. If an explicit file type is given, then that file
-         type is used.
-
-         \sstitem
-         Names of catalogues stored in FITS format may include an FITS
-         extension number. For instance, {\tt "}/home/dsb/mydata.fit\{3\} refers to
-         a catalogue stored in the third extension of the FITS file
-         myadata.fit.
-
-         \sstitem
-         Catalogues stored in HDS format must be stored as the top level
-         object within the .sdf file.
-
-         \sstitem
-         All matching files are opened in order to ensure that they are
-         valid catalogues. The user is notified if there are no valid
-         catalogues matching a supplied name, and they are asked to supply a
-         replacement parameter value.
-
-         \sstitem
-         Each element in the returned group contains a full specification
-         for a catalogue. Several other groups are created by this routine,
-         and are associated with the returned group by means of a GRP
-         {\tt "}owner-slave{\tt "} relationship. These supplemental groups are
-         automatically deleted when the returned group is deleted using
-         GRP\_DELET. The returned group should not be altered using GRP
-         directly because corresponding changes may need to be made to the
-         supplemental groups. Routines CTG\_SETSZ, CTG\_GTSUP and CTG\_PTSUP
-         are provided to manipulate the entire chain of groups. The full
-         chain (starting from the head) is as follows:
-
-         \sstitem
-            FITS extension numbers (if any)
-
-         \sstitem
-            File types
-
-         \sstitem
-            Base file names
-
-         \sstitem
-            Directory paths
-
-         \sstitem
-            Full catalogue specification (this is the returned group IGRP)
-
-         \sstitem
-         If an error is reported the group is returned unaltered. If no
-         group is supplied, an empty group is returned.
-
-         \sstitem
-         A null value (!) can be given for the parameter to indicate that
-         no more catalogues are to be specified. The corresponding error is
-         annulled before returning unless no catalogues have been added to
-         the group.
-
-         \sstitem
-         If the last character in the supplied group expression is a colon
-         (:), a list of the catalogues represented by the group expression
-         (minus the colon) is displayed, but none are actually added to the
-         group. The user is then re-prompted for a new group expression.
-      }
-   }
-}
-\sstroutine{
-   CTG\_CATAS
-}{
-   Obtain a CAT identifier for an existing catalogue
-}{
-   \sstdescription{
-      The routine returns a CAT identifier for an existing catalogue. The
-      name of the catalogue is held at a given index within a given group.
-      It is equivalent to CAT\_ASSOC.
-   }
-   \sstinvocation{
-      CALL CTG\_CATAS( IGRP, INDEX, MODE, CI, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         IGRP = INTEGER (Given)
-      }{
-         A GRP identifier for a group holding the names of catalogues. This
-         will often be creted using CTG\_ASSOC, but groups created {\tt "}by
-         hand{\tt "} using GRP directly (i.e. without the supplemental groups
-         created by CTG\_ASSOC) can also be used.
-      }
-      \sstsubsection{
-         INDEX = INTEGER (Given)
-      }{
-         The index within the group at which the name of the catalogue to be
-         accessed is stored.
-      }
-      \sstsubsection{
-         MODE = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         Type of catalogue access required: {\tt '}READ{\tt '}, or {\tt '}WRITE{\tt '}.
-      }
-      \sstsubsection{
-         CI = INTEGER (Returned)
-      }{
-         catalogue identifier.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         If this routine is called with STATUS set, then a value of
-         CAT\_\_NOID will be returned for the CI argument, although no
-         further processing will occur. The same value will also be
-         returned if the routine should fail for any reason. The CAT\_\_NOID
-         constant is defined in the include file CAT\_PAR.
-      }
-   }
-}
-\sstroutine{
-   CTG\_CATCR
-}{
-   Obtain a CAT identifier for a new catalogue
-}{
-   \sstdescription{
-      The routine returns a CAT identifier for a new catalogue. The name
-      of the new catalogue is held at a given index within a given group.
-      It is equivalent to CAT\_CREAT, except that any existing catalogue
-      with the specified name is first deleted (unless the catalogue
-      specification includes a FITS extension specifier).
-   }
-   \sstinvocation{
-      CALL CTG\_CATCR( IGRP, INDEX, CI, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         IGRP = INTEGER (Given)
-      }{
-         A GRP identifier for a group holding the names of catalogues. This
-         will often be created using CTG\_CREAT, but groups created {\tt "}by
-         hand{\tt "} using GRP directly can also be used.
-      }
-      \sstsubsection{
-         INDEX = INTEGER (Given)
-      }{
-         The index within the group at which the name of the catalogue to be
-         created is stored.
-      }
-      \sstsubsection{
-         CI = INTEGER (Returned)
-      }{
-         Catalogue identifier.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   CTG\_CREA1
-}{
-   Create a single new catalogue using a specified parameter
-}{
-   \sstdescription{
-      This routine is equivalent to CAT\_CREAT except that it allows the
-      catalogue to be specified using a GRP group expression (for
-      instance, its name may be given within a text file, etc), and it
-      also ensures that any existing catalogue with the same name is
-      deleted before the new one is created (so long as no FITS extension
-      number is included in the catalogue specification). The first
-      catalogue in the group expression is returned. Any other names in
-      the group expression are ignored. Any modification elements in the
-      supplied group expression will be treated literally.
-   }
-   \sstinvocation{
-      CALL CTG\_CREA1( PARAM, CI, NAME, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         PARAM = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         Name of the ADAM parameter.
-      }
-      \sstsubsection{
-         CI = INTEGER (Returned)
-      }{
-         Catalogue identifier.
-      }
-      \sstsubsection{
-         NAME = CHARACTER $*$ ( $*$ ) (Returned)
-      }{
-         The file specification for the catalogue.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   CTG\_CREAT
-}{
-   Obtain the names of a group of catalogue to be created from the
-   environment
-}{
-   \sstdescription{
-      A group expression is obtained from the environment using the
-      supplied parameter. The expression is parsed (using the
-      facilities of the GRP routine GRP\_GROUP, see SUN/150) to produce
-      a list of explicit catalogue names. These names are appended
-      to the group identified by IGRP. The user is re-prompted if an
-      error occurs while parsing the group expression. If IGRP has the
-      value GRP\_\_NOID on entry, then a new group is created and IGRP is
-      returned holding the new group identifier.
-
-      If IGRP0 holds a valid group identifier on entry, then the group
-      identified by IGRP0 is used as the basis for any modification
-      element contained in the group expression obtained from the
-      environment. If IGRP0 holds an invalid identifier (such as
-      GRP\_\_NOID) on entry then modification elements are included
-      literally in the output group.
-   }
-   \sstinvocation{
-      CALL CTG\_CREAT( PARAM, IGRP0, IGRP, SIZE, FLAG, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         PARAM = CHARACTER$*$($*$) (Given)
-      }{
-         The parameter with which to associate the group.
-      }
-      \sstsubsection{
-         IGRP0 = INTEGER (Given)
-      }{
-         The GRP identifier for the group to be used as the basis for
-         any modification elements. If a valid GRP identifier is
-         supplied, and if the supplied group expression contains a
-         modification element, then:
-
-         \sstitemlist{
-
-            \sstitem
-            the basis token (an asterisk) is replaced by the file basename
-            associated with the corresponding element of the basis group (the
-            {\tt "}basis catalogue{\tt "}).
-
-            \sstitem
-            if no directory specification is included in the group expression,
-            the directory specification associated with the basis catalogue is
-            used.
-
-         }
-         The supplied group will often be created by CTG\_ASSOC, but
-         groups created {\tt "}by hand{\tt "} using GRP directly can also be used
-         (i.e. without the supplemental groups created by CTG). In
-         this case, there are no defaults for directory path or file type,
-         and the basis token ({\tt "}$*${\tt "}) in the group expression represents the
-         full basis file specification supplied in IGRP0, not just the file
-         basename.
-      }
-      \sstsubsection{
-         IGRP = INTEGER (Given and Returned)
-      }{
-         The GRP identifier for the group to which the supplied
-         files are to be appended.
-      }
-      \sstsubsection{
-         SIZE = INTEGER (Returned)
-      }{
-         The total number of file names in the returned group.
-      }
-      \sstsubsection{
-         FLAG = LOGICAL (Returned)
-      }{
-         If the group expression was terminated by the GRP {\tt "}flag{\tt "}
-         character, then FLAG is returned .TRUE. Otherwise it is
-         returned .FALSE. Returned .FALSE. if an error occurs.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         Any FITS extensions specified in the group expression are ignored.
-
-         \sstitem
-         If an error is reported the group is returned unaltered.
-
-         \sstitem
-         A null value (!) can be given for the parameter to indicate
-         that no more catalogues are to be specified. The corresponding error
-         is annulled before returning unless no catalogues have been added to
-         the group.
-
-         \sstitem
-         If no file type is supplied in the group expression, then the first
-         file type listed in the current value of the CAT\_FORMATS\_OUT environment
-         variable is used. If this is {\tt "}$*${\tt "} then the file type is copied from the
-         corresponding input file if a modification element was used to specify
-         the output file name (if the catalogue was not specified by a
-         modification element, the second file type in CAT\_FORMATS\_OUT is
-         used).
-
-         \sstitem
-         If the last character in the supplied group expression is
-         a colon (:), a list of the catalogues represented by the group
-         expression (minus the colon) is displayed, but none are
-         actually added to the group. The user is then re-prompted for
-         a new group expression.
-
-         \sstitem
-         The returned group has no associated groups holding supplemental
-         information (unlike the group returned by CTG\_ASSOC).
-      }
-   }
-}
-\sstroutine{
-   CTG\_GTSUP
-}{
-   Get supplemental information for a catalogue
-}{
-   \sstdescription{
-      Returns the supplemental information associated with a given entry
-      in a CTG group.
-   }
-   \sstinvocation{
-      CALL CTG\_GTSUP( IGRP, I, FIELDS, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         IGRP = INTEGER (Given)
-      }{
-         The CTG group as returned by CTG\_ASSOC, etc. This should be the last
-         group in a GRP owner-slave chain.
-      }
-      \sstsubsection{
-         I = INTEGER (Given)
-      }{
-         The index of the required entry.
-      }
-      \sstsubsection{
-         FIELDS( 5 ) = CHARACTER $*$ ( $*$ ) (Returned)
-      }{
-         The supplemental information associated with the entry specified
-         by I. Each element of the returned array contains the following:
-
-            1 - FITS extension specification (eg {\tt "}\{3\}{\tt "}) if any
-            2 - File type
-            3 - Base file name
-            4 - Directory path
-            5 - Full catalogue specification
-
-         This information is obtained from a set of groups associated with
-         the supplied group IGRP by means of a chain of GRP {\tt "}owner-slave{\tt "}
-         relationships. If any of these groups do not exist, the correponding
-         elements of the above array are returned blank. Note, element 5,
-         the full catalogue specification, is obtained directly from the
-         supplied group IGRP.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   CTG\_PTSUP
-}{
-   Store suplemental information for an catalogue
-}{
-   \sstdescription{
-      Stores the supplied items of supplemental information for a given
-      entry in a CTG group. The GRP groups needed to store this
-      supplemental information are created if they do not already exist,
-      and associated with the supplied group by means of a chain of GRP
-      {\tt "}owner-slave{\tt "} relationships. They will be deleted automaticaly when
-      the supplied group is deleted using GRP\_DELET.
-   }
-   \sstinvocation{
-      CALL CTG\_PTSUP( IGRP, I, FIELDS, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         IGRP = INTEGER (Given)
-      }{
-         The CTG group as returned by CTG\_ASSOC, etc. This should be the last
-         group in a GRP owner-slave chain.
-      }
-      \sstsubsection{
-         I = INTEGER (Given)
-      }{
-         The index of the required entry.
-      }
-      \sstsubsection{
-         FIELDS( 5 ) = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         The supplemental information to be stored with the entry specified
-         by I. Each element of the supplied array should contain the
-         following:
-            1 - FITS extension (eg {\tt "}\{3\}{\tt "}) if any
-            2 - File type
-            3 - Base file name
-            4 - Directory path
-            5 - Full catalogue specification
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   CTG\_SETSZ
-}{
-   Reduces the size of a CTG group
-}{
-   \sstdescription{
-      This routine should be used instead of GRP\_SETSZ to set the size of
-      a group created by CTG. It sets the size of the supplied group, and
-      also sets the size of each of the supplemental groups associated with
-      the supplied group.
-   }
-   \sstinvocation{
-      CALL CTG\_SETSZ( IGRP, SIZE, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         IGRP = INTEGER (Given)
-      }{
-         The CTG group as returned by CTG\_ASSOC, etc. This should be the last
-         group in a GRP owner-slave chain.
-      }
-      \sstsubsection{
-         SIZE = INTEGER (Given)
-      }{
-         The new group size. Must be less than or equal to the size of the
-         smallest group in the chain.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
    FTS1\_ASTWN
 }{
    Displays any AST warning messages stored in the supplied FitsChan
@@ -10061,71 +8974,6 @@ related items to be removed.
    }
 }
 \sstroutine{
-   FTS1\_NDFCM
-}{
-   Create the title, units, axes, wcs, and FITS extension in an NDF
-   from the FITS headers
-}{
-   \sstdescription{
-      This routine adds the character components, axis structure, WCS
-      component and FITS extension to an NDF.  It searches a buffer
-      containing the FITS header card images for the OBJECT keyword
-      whose value, if present, becomes the NDF title.  Similarly BUNIT
-      is mapped to the NDF units.  The supplied header structure is
-      copied to the FITS extension.
-   }
-   \sstinvocation{
-      CALL FTS1\_NDFCM( NCARD, HEADER, SCARD, NDF, NENCOD, ENCODS,
-                       STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         NCARD = INTEGER (Given)
-      }{
-         The number of cards in the array of headers, from the start of
-         the first header section to the end of the current one.
-      }
-      \sstsubsection{
-         HEADER( NCARD ) = CHARACTER $*$ 80 (Given)
-      }{
-         The buffer containing the header card images.
-      }
-      \sstsubsection{
-         SCARD = INTEGER (Given)
-      }{
-         The number of the card from where searches will begin, and
-         copying of the headers to the FITS extension.   Therefore
-         NCARD - SCARD $+$ 1 headers will appear in the extension. This
-         argument is needed because the headers make contain a dummy
-         header prior to an extension.
-      }
-      \sstsubsection{
-         NDF = INTEGER (Given)
-      }{
-         Identifier of the NDF to which to write the additional
-         components and the FITS extension.
-      }
-      \sstsubsection{
-         NENCOD = INTEGER (Given)
-      }{
-         The number of AST encodings supplied in ENCODS.
-      }
-      \sstsubsection{
-         ENCODS( NENCOD ) = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         The user{\tt '}s preferred AST encodings.  If NENCOD is zero, then
-         this is ignored, and an intelligent guess is made as to which
-         encoding to use.  The encoding determines which FITS headers
-         are used to create the NDF WCS component.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given)
-      }{
-         Global status value.
-      }
-   }
-}
-\sstroutine{
    FTS1\_NDF
 }{
    Makes an NDF from a simple or group-format FITS file
@@ -10426,6 +9274,71 @@ related items to be removed.
       }
       \sstsubsection{
          STATUS  = INTEGER (Given and Returned)
+      }{
+         Global status value.
+      }
+   }
+}
+\sstroutine{
+   FTS1\_NDFCM
+}{
+   Create the title, units, axes, wcs, and FITS extension in an NDF
+   from the FITS headers
+}{
+   \sstdescription{
+      This routine adds the character components, axis structure, WCS
+      component and FITS extension to an NDF.  It searches a buffer
+      containing the FITS header card images for the OBJECT keyword
+      whose value, if present, becomes the NDF title.  Similarly BUNIT
+      is mapped to the NDF units.  The supplied header structure is
+      copied to the FITS extension.
+   }
+   \sstinvocation{
+      CALL FTS1\_NDFCM( NCARD, HEADER, SCARD, NDF, NENCOD, ENCODS,
+                       STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NCARD = INTEGER (Given)
+      }{
+         The number of cards in the array of headers, from the start of
+         the first header section to the end of the current one.
+      }
+      \sstsubsection{
+         HEADER( NCARD ) = CHARACTER $*$ 80 (Given)
+      }{
+         The buffer containing the header card images.
+      }
+      \sstsubsection{
+         SCARD = INTEGER (Given)
+      }{
+         The number of the card from where searches will begin, and
+         copying of the headers to the FITS extension.   Therefore
+         NCARD - SCARD $+$ 1 headers will appear in the extension. This
+         argument is needed because the headers make contain a dummy
+         header prior to an extension.
+      }
+      \sstsubsection{
+         NDF = INTEGER (Given)
+      }{
+         Identifier of the NDF to which to write the additional
+         components and the FITS extension.
+      }
+      \sstsubsection{
+         NENCOD = INTEGER (Given)
+      }{
+         The number of AST encodings supplied in ENCODS.
+      }
+      \sstsubsection{
+         ENCODS( NENCOD ) = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The user{\tt '}s preferred AST encodings.  If NENCOD is zero, then
+         this is ignored, and an intelligent guess is made as to which
+         encoding to use.  The encoding determines which FITS headers
+         are used to create the NDF WCS component.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given)
       }{
          Global status value.
       }
@@ -13071,64 +11984,6 @@ related items to be removed.
    }
 }
 \sstroutine{
-   IRA\_CTOD1
-}{
-   Converts a single formatted sky coordinate value into a double
-   precision value
-}{
-   \sstdescription{
-      The input string is presumed to hold a sky coordinate value in
-      character form. If NC is 1, the string is interpreted as a
-      longitude value. If NC is 2, the string is interpreted as a
-      latitude value.  This routine reads the string and produces a
-      double precision value holding the coordinate value in radians.
-      The value is not shifted into the first order range (eg if an
-      angular value equivalent to 3$*$PI is given, the value 3$*$PI will be
-      returned, not 1$*$PI). If the input string is blank the output
-      value is set to the Starlink {\tt "}BAD{\tt "} value (VAL\_\_BADD). Refer to
-      IRA\_CTOD for details of the allowed format for the input string.
-   }
-   \sstinvocation{
-      CALL IRA\_CTOD1( TEXT, SCS, NC, VALUE, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         TEXT = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         The string containing the formatted version of the sky
-         coordinate value. If this string is blank, VALUE is returned
-         with the {\tt "}BAD{\tt "} value (VAL\_\_BADD), but no error report is
-         made.
-      }
-      \sstsubsection{
-         SCS = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         The sky coordinate system (see ID2 section {\tt "}Sky Coordinates{\tt "}).
-         Any unambiguous abbreviation will do.
-      }
-      \sstsubsection{
-         NC = INTEGER (Given)
-      }{
-         Determines which sky coordinate is to be used. If a value of 1
-         is supplied, the string is interpreted as a longitude value
-         (eg RA if an equatorial system is being used). If a value of 2
-         is supplied, the string is interpreted as a latitude value.
-         Any other value results in an error being reported.
-      }
-      \sstsubsection{
-         VALUE = DOUBLE PRECISION (Returned)
-      }{
-         The numerical value of the sky coordinate represented by the
-         string in TEXT. The value is in radians.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
    IRA\_CTOD
 }{
    Converts formatted sky coordinate values into double precision
@@ -13243,64 +12098,55 @@ related items to be removed.
    }
 }
 \sstroutine{
-   IRA\_DTOC1
+   IRA\_CTOD1
 }{
-   Convert a single floating point sky coordinate value to
-   character form
+   Converts a single formatted sky coordinate value into a double
+   precision value
 }{
    \sstdescription{
-      This routine creates a text string containing a formatted version
-      of the given sky coordinate value. The value is assumed to be a
-      longitude value if NC is 1, and a latitude if NC is 2. The
-      formats of the output string are as described in routine
-      IRA\_DTOC. Longitude values are shifted into the range 0 - 2$*$PI
-      before being used.  Latitude values are shifted into the range
-      $+$/- PI before being used. An error is reported if a latitude
-      value then has an absolute value greater than PI/2 (this differs
-      from the behaviour of IRA\_NORM which always reduces the latitude
-      value to $+$/- PI/2).
+      The input string is presumed to hold a sky coordinate value in
+      character form. If NC is 1, the string is interpreted as a
+      longitude value. If NC is 2, the string is interpreted as a
+      latitude value.  This routine reads the string and produces a
+      double precision value holding the coordinate value in radians.
+      The value is not shifted into the first order range (eg if an
+      angular value equivalent to 3$*$PI is given, the value 3$*$PI will be
+      returned, not 1$*$PI). If the input string is blank the output
+      value is set to the Starlink {\tt "}BAD{\tt "} value (VAL\_\_BADD). Refer to
+      IRA\_CTOD for details of the allowed format for the input string.
    }
    \sstinvocation{
-      CALL IRA\_DTOC1( VALUE, SCS, NC, STYLE, TEXT, STATUS )
+      CALL IRA\_CTOD1( TEXT, SCS, NC, VALUE, STATUS )
    }
    \sstarguments{
       \sstsubsection{
-         VALUE = DOUBLE PRECISION (Given)
+         TEXT = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         The value of the sky coordinate to be formatted, in radians.
-         If VALUE has the Starlink {\tt "}BAD{\tt "} value (VAL\_\_BADD) then the
-         output string TEXT is set blank.
+         The string containing the formatted version of the sky
+         coordinate value. If this string is blank, VALUE is returned
+         with the {\tt "}BAD{\tt "} value (VAL\_\_BADD), but no error report is
+         made.
       }
       \sstsubsection{
          SCS = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         The sky coordinate system in use (see ID2 section {\tt "}Sky
-         Coordinates{\tt "}). Any unambiguous abbreviation will do.
+         The sky coordinate system (see ID2 section {\tt "}Sky Coordinates{\tt "}).
+         Any unambiguous abbreviation will do.
       }
       \sstsubsection{
          NC = INTEGER (Given)
       }{
-         Determines which sky coordinate is given. If a value of 1 is
-         supplied, VALUE is interpreted as a longitude value (eg RA if
-         an equatorial system is being used).  If a value of 2 is
-         supplied, VALUE is interpreted as a latitude value. Any other
-         value causes an error to be reported.
+         Determines which sky coordinate is to be used. If a value of 1
+         is supplied, the string is interpreted as a longitude value
+         (eg RA if an equatorial system is being used). If a value of 2
+         is supplied, the string is interpreted as a latitude value.
+         Any other value results in an error being reported.
       }
       \sstsubsection{
-         STYLE = INTEGER (Given)
+         VALUE = DOUBLE PRECISION (Returned)
       }{
-         A value in the range 1 to 5 which specifies the style of
-         output formatting required. In addition a value of zero can be
-         specified which causes a default style to be used dependant on
-         the value of SCS. See routine IRA\_DTOC for a description of
-         the styles and defaults.
-      }
-      \sstsubsection{
-         TEXT = CHARACTER $*$ ( $*$ ) (Returned)
-      }{
-         The string containing the formatted description of the sky
-         coordinate value. The variable supplied for TEXT should have a
-         declared length equal to the value of parameter IRA\_\_SZFSC.
+         The numerical value of the sky coordinate represented by the
+         string in TEXT. The value is in radians.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -13463,6 +12309,73 @@ related items to be removed.
 
             {\tt "}12.050006{\tt "} and {\tt "}-33.383333{\tt "} (eg fractional values in
                                          degrees )
+   }
+}
+\sstroutine{
+   IRA\_DTOC1
+}{
+   Convert a single floating point sky coordinate value to
+   character form
+}{
+   \sstdescription{
+      This routine creates a text string containing a formatted version
+      of the given sky coordinate value. The value is assumed to be a
+      longitude value if NC is 1, and a latitude if NC is 2. The
+      formats of the output string are as described in routine
+      IRA\_DTOC. Longitude values are shifted into the range 0 - 2$*$PI
+      before being used.  Latitude values are shifted into the range
+      $+$/- PI before being used. An error is reported if a latitude
+      value then has an absolute value greater than PI/2 (this differs
+      from the behaviour of IRA\_NORM which always reduces the latitude
+      value to $+$/- PI/2).
+   }
+   \sstinvocation{
+      CALL IRA\_DTOC1( VALUE, SCS, NC, STYLE, TEXT, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         VALUE = DOUBLE PRECISION (Given)
+      }{
+         The value of the sky coordinate to be formatted, in radians.
+         If VALUE has the Starlink {\tt "}BAD{\tt "} value (VAL\_\_BADD) then the
+         output string TEXT is set blank.
+      }
+      \sstsubsection{
+         SCS = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The sky coordinate system in use (see ID2 section {\tt "}Sky
+         Coordinates{\tt "}). Any unambiguous abbreviation will do.
+      }
+      \sstsubsection{
+         NC = INTEGER (Given)
+      }{
+         Determines which sky coordinate is given. If a value of 1 is
+         supplied, VALUE is interpreted as a longitude value (eg RA if
+         an equatorial system is being used).  If a value of 2 is
+         supplied, VALUE is interpreted as a latitude value. Any other
+         value causes an error to be reported.
+      }
+      \sstsubsection{
+         STYLE = INTEGER (Given)
+      }{
+         A value in the range 1 to 5 which specifies the style of
+         output formatting required. In addition a value of zero can be
+         specified which causes a default style to be used dependant on
+         the value of SCS. See routine IRA\_DTOC for a description of
+         the styles and defaults.
+      }
+      \sstsubsection{
+         TEXT = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The string containing the formatted description of the sky
+         coordinate value. The variable supplied for TEXT should have a
+         declared length equal to the value of parameter IRA\_\_SZFSC.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
    }
 }
 \sstroutine{
@@ -14397,1432 +13310,6 @@ related items to be removed.
       }{
          A locator to the object to which the astrometry information is
          to be written.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   IRQ\_ADDQN
-}{
-   Define a new quality name
-}{
-   \sstdescription{
-      This routine adds the quality name specified by QNAME to the NDF
-      specified by LOCS. LOCS must previously have been assigned values
-      by one of the routines IRQ\_FIND or IRQ\_NEW. If the quality name
-      is already defined, an error is reported. Note, this routine does
-      not reserve a bit in the QUALITY component for the new quality
-      name, it mearly established a default value for the quality which
-      will be used for all pixels in the NDF if no subsequent call to
-      IRQ\_SETQC is made. Note, the string ANY cannot be used as a
-      quality name. Also, quality names may not contain any full stops.
-
-      An error is reported if only READ access is available to the NDF.
-   }
-   \sstinvocation{
-      CALL IRQ\_ADDQN( LOCS, QNAME, DEFLT, COMMNT, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         LOCS(5) = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         An array of 5 HDS locators. These locators identify the NDF
-         and the associated quality name information.  They should have
-         been obtained using routine IRQ\_FIND or routine IRQ\_NEW.
-      }
-      \sstsubsection{
-         QNAME = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         The new quality name to store. The maximum length of this
-         string is given by symbolic constant IRQ\_\_SZQNM which currently
-         has the value 15. Leading spaces are ignored, and the stored
-         name is converted to upper case.
-      }
-      \sstsubsection{
-         DEFLT = LOGICAL (Given)
-      }{
-         If true, then by default all pixels are assumed to hold the
-         quality specified by QNAME. If false, then it is assumed that
-         no pixels hold the quality.
-      }
-      \sstsubsection{
-         COMMNT = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         A descriptive comment to store with the quality name. The
-         maximum length of this string is given by symbolic constant
-         IRQ\_\_SZCOM, which currently has the value 50. Any characters
-         beyond this length are ignored.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   IRQ\_ANNUL
-}{
-   Release an IRQ identifier
-}{
-   \sstdescription{
-      All internal resources used by the specified compiled quality
-      expression identifier (created by IRQ\_COMP) are released.
-
-      This routine attempts to execute even if STATUS is bad on entry,
-      although no further error report will be made if it subsequently
-      fails under these circumstances.
-   }
-   \sstinvocation{
-      CALL IRQ\_ANNUL( IDQ, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         IDQ = INTEGER (Given)
-      }{
-         An IRQ identifier for a compiled quality expression.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   IRQ\_CHKQN
-}{
-   Check a specified quality name to see if it is defined
-}{
-   \sstdescription{
-      This routine searches for a specified quality name in the quality
-      name specified by LOCS. If it is found, THERE is returned true.
-      Otherwise THERE is returned false.
-   }
-   \sstinvocation{
-      CALL IRQ\_CHKQN( LOCS, QNAME, THERE, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         LOCS(5) = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         An array of 5 HDS locators. These locators identify the NDF
-         and the associated quality name information.  They should have
-         been obtained using routine IRQ\_FIND or routine IRQ\_NEW.
-      }
-      \sstsubsection{
-         QNAME = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         The quality name to search for. Leading blanks are ignored and
-         the search is case-insensitive. The maximum allowed length for
-         quality names is given by symbolic constant IRQ\_\_SZQNM which
-         currently has the value of 15.
-      }
-      \sstsubsection{
-         THERE = LOGICAL (Returned)
-      }{
-         If true, then the quality name is defined within the NDF
-         specified by LOCS. If false, then the quality name is
-         undefined.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   IRQ\_CLOSE
-}{
-   Close down the IRQ identifier system
-}{
-   \sstdescription{
-      This routine must be called once all use of compiled quality
-      expression identifiers (as generated by IRQ\_COMP) has been
-      completed.  All internal resources used by any such identifiers
-      currently in use are released. Note, this routine does not
-      release the locators created by IRQ\_NEW or IRQ\_FIND. IRQ\_RLSE
-      must be called to release these locators.
-
-      This routine attempts to execute even if STATUS is bad on entry,
-      although no further error report will be made if it subsequently
-      fails under these circumstances.
-   }
-   \sstinvocation{
-      CALL IRQ\_CLOSE( STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   IRQ\_CNTQ
-}{
-   Count the number of pixels which are set in each bit-plane of the
-   QUALITY component
-}{
-   \sstdescription{
-      Each bit plane of the NDF QUALITY component corresponds to a
-      different quality, described by a name stored in the quality
-      names information structure in an NDF extension.  A pixel is set
-      in a bit plane of the QUALITY component if the pixel has the
-      quality associated with the bit plane. This routine counts the
-      number of such pixels in each bit plane.
-
-      Note, write or update access must be available for the NDF (as
-      set up by routine LPG\_ASSOC for instance), and the QUALITY
-      component of the NDF must not be mapped on entry to this routine.
-   }
-   \sstinvocation{
-      CALL IRQ\_CNTQ( LOCS, SIZE, SET, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         LOCS(5) = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         An array of 5 HDS locators. These locators identify the NDF
-         and the associated quality name information.  They should have
-         been obtained using routine IRQ\_FIND or routine IRQ\_NEW.
-      }
-      \sstsubsection{
-         SIZE = INTEGER (Given)
-      }{
-         The number of bit planes for which a count of set pixels is
-         required.
-      }
-      \sstsubsection{
-         SET( SIZE ) = INTEGER (Returned)
-      }{
-         The number of pixels holding the corresponding quality in each
-         of bit planes 1 to SIZE. The least significant bit is bit 1.
-         If SIZE is larger than the number of bit planes in the QUALITY
-         component, the unused elements are set to zero.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   IRQ\_COMP
-}{
-   Compile a quality expression
-}{
-   \sstdescription{
-      All the quality names referenced in the given quality expression
-      (QEXP) are identified. If all quality names referenced in QEXP
-      are defined within the NDF specified in LOCS, then the quality
-      expression is `compiled{\tt '}, i.e.  converted into a form which can
-      be used by IRQ\_SBAD. The compiled quality expression is
-      identified by the returned IRQ identifier which should be
-      released using IRQ\_ANNUL when no longer needed. If any error is
-      reported, then IRQ is returned set to the value IRQ\_\_NOID.
-
-      If any quality names referenced in the quality expression are not
-      defined in the NDF specified by LOCS, they are returned in UNDEF,
-      the number of such undefined quality names is returned in NUNDEF,
-      an error is reported and STATUS is returned with value
-      IRQ\_\_NOQNM. Additionally, if INFO is true, then a message is
-      generated identifying each undefined quality name.
-
-      If any of the STATUS values IRQ\_\_BADSY, IRQ\_\_MSOPT or IRQ\_\_MSOPD
-      are returned (all of which correspond to various forms of syntax
-      error in the quality expression, see ID6 appendix E), a pointer
-      to the approximate position of the error within the quality
-      expression is returned in ERRPNT.
-   }
-   \sstinvocation{
-      CALL IRQ\_COMP( LOCS, SIZE, INFO, QEXP, UNDEF, NUNDEF, ERRPNT,
-                     IDQ, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         LOCS(5) = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         An array of 5 HDS locators. These locators identify the NDF
-         and the associated quality name information.  They should have
-         been obtained using routine IRQ\_FIND or routine IRQ\_NEW.
-      }
-      \sstsubsection{
-         SIZE = INTEGER (Given)
-      }{
-         The size of the UNDEF array. This should be at least equal to
-         the value of the symbolic constant IRQ\_\_QNREF
-      }
-      \sstsubsection{
-         INFO = LOGICAL (Given)
-      }{
-         If set to .TRUE., then messages are produced identifying any
-         undefined quality names.
-      }
-      \sstsubsection{
-         QEXP = CHARACTER$*$($*$) (Given and Returned)
-      }{
-         A quality expression. See ID6 section 5 for details of the
-         allowed formats for quality expressions. On exit, the string is
-         converted to upper case and any leading blanks are removed.
-      }
-      \sstsubsection{
-         UNDEF( SIZE ) = CHARACTER $*$ ( $*$ ) (Returned)
-      }{
-         An array holding any undefined quality names referenced in the
-         quality expression. The array should have at least IRQ\_\_QNREF
-         elements, each element being a string of length IRQ\_\_SZQNM.
-      }
-      \sstsubsection{
-         NUNDEF = INTEGER (Returned)
-      }{
-         The number of undefined quality names referenced in the quality
-         expression.
-      }
-      \sstsubsection{
-         ERRPNT = INTEGER (Returned)
-      }{
-         If any of the STATUS values IRQ\_\_BADSY( {\tt "}Unrecognised logical
-         operator or constant{\tt "}), IRQ\_\_MSOPT ( {\tt "}Missing operator{\tt "}) or
-         IRQ\_\_MSOPD ( {\tt "}Missing operand{\tt "}) are returned, then ERRPNT
-         returns the offset within the quality expression at which the
-         error was detected. Note, the offset refers to the returned
-         form of QEXP, not the given form. These will be different if
-         the given form of QEXP has any leading blanks. An offset of
-         zero is returned if none of the errors associated with the
-         above STATUS values occur.
-      }
-      \sstsubsection{
-         IDQ = INTEGER (Returned)
-      }{
-         An IRQ identifier for the compiled quality expression. This
-         identifier can be passed to IRQ\_SBAD. This identifier should
-         be annulled using routine IRQ\_ANNUL or IRQ\_CLOSE when it is no
-         longer needed.  If an error is reported, then an invalid
-         identifier (equal to IRQ\_\_NOID) is returned.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   IRQ\_DELET
-}{
-   Delete all quality name information from an NDF
-}{
-   \sstdescription{
-      A search is made through the extensions contained within the
-      supplied NDF for an HDS structure containing quality name
-      information. If found, the QUALITY\_NAMES structure containing the
-      quality names is deleted.
-   }
-   \sstinvocation{
-      CALL IRQ\_DELET( INDF, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         INDF = INTEGER (Given)
-      }{
-         The input NDF.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   IRQ\_FIND
-}{
-   Find quality name information within an NDF
-}{
-   \sstdescription{
-      A search is made through the extensions contained within the
-      supplied NDF for an HDS structure containing quality name
-      information. Such information is held in an HDS object named
-      QUALITY\_NAMES (these objects can be created using IRQ\_NEW).  If
-      no such object is found, an error is reported and the status
-      IRQ\_\_NOQNI is returned (if more than one such object is found,
-      an error is reported and the status IRQ\_\_MULT is returned).  The
-      name of the NDF extension in which the object was found is
-      returned in XNAME. An array of 5 HDS locators is returned which
-      is needed when calling other IRQ routines. The first locator
-      points to a temporary object which holds a cloned identifier for
-      the NDF, the other 4 point to components of the QUALITY\_NAMES
-      structure contained in the NDF.  IRQ\_RLSE should be called to
-      annul these locators (and the NDF identifier) when no further
-      access to the NDFs quality names information is required.
-
-      The LOCS argument returned by this routine specifies the NDF
-      which will be operated on by subsequent IRQ routines.
-      Specifically, LOCS determines the bounds of the NDF. Care should
-      therefore be taken that subsequent calls to IRQ routines refer to
-      the NDF specified by the INDF argument to this routine, and not
-      for instance to a section of the NDF which will in general have
-      different bounds.
-   }
-   \sstinvocation{
-      CALL IRQ\_FIND( INDF, LOCS, XNAME, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         INDF = INTEGER (Given)
-      }{
-         The input NDF.
-      }
-      \sstsubsection{
-         LOCS(5) = CHARACTER $*$ ( $*$ ) (Returned)
-      }{
-         A set of HDS locators as described above.  The character
-         variables supplied for this argument should have a declared
-         length equal to symbolic constant DAT\_\_SZLOC. These locator
-         are annuled by calling IRQ\_RLSE.
-      }
-      \sstsubsection{
-         XNAME = CHARACTER $*$ ( $*$ ) (Returned)
-      }{
-         The name of the NDF extension in which the quality name
-         information was found. The character variable supplied for
-         this argument should have a declared length equal to symbolic
-         constant DAT\_\_SZNAM.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   IRQ\_FXBIT
-}{
-   Assign a fixed bit number to a quality name
-}{
-   \sstdescription{
-      This routine associates a fixed bit number with a specified quality
-      name. Normally, IRQ manages the allocation of bit numbers to named
-      qualities, but this routine allows the calling application to specify
-      which bit is to be used for a given quality.
-
-      By default, a QUALITY array bit is associated with a quality name
-      only if some pixels hold the quality and some do not hold the
-      quality (i.e. there is a mix of values). Otherwise, a flag is stored
-      in the QUALITY\_NAMES structure indicating this, and any quality bit
-      previously associated with the quality name is released for re-use.
-
-      This default behaviour is changed by calling this routine. The
-      specified bit number will continue to be associated with the quality
-      name even if all pixels do, or do not, hold the quality.
-
-      An error will be returned if the named quality is already associated
-      with a different bit number when this routine is called. An error
-      will also be reported if the specified bit number is already associated
-      with a different quality name.
-   }
-   \sstinvocation{
-      CALL IRQ\_FXBIT( LOCS, QNAME, BIT, SET, FIXBIT, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         LOCS(5) = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         An array of 5 HDS locators. These locators identify the NDF
-         and the associated quality name information.  They should have
-         been obtained using routine IRQ\_FIND or routine IRQ\_NEW.
-      }
-      \sstsubsection{
-         QNAME = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         The quality name to use. Leading blanks are ignored and
-         the search is case-insensitive. The maximum allowed length for
-         quality names is given by symbolic constant IRQ\_\_SZQNM which
-         currently has the value of 15.
-      }
-      \sstsubsection{
-         BIT = INTEGER (Given)
-      }{
-         The bit number to use. The least significant bit is bit 1, not
-         bit 0. If value below 0 or above 8 is supplied, the properties
-         of the quality name are left unchanged, but the FIXBIT value is
-         still returned.
-      }
-      \sstsubsection{
-         FIXBIT = LOGICAL (Returned)
-      }{
-         Returned .TRUE. if the specified qualit name had a fixed bit
-         number on entry to this routine, and .FALSE. otherwise.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   IRQ\_GETQN
-}{
-   Search for a specified quality name
-}{
-   \sstdescription{
-      This routine searches for a specified quality name in the quality
-      name specified by LOCS, and returns information related to the
-      quality name. If the quality name is not defined then an error is
-      reported and STATUS returned equal to IRQ\_\_NOQNM.
-   }
-   \sstinvocation{
-      CALL IRQ\_GETQN( LOCS, QNAME, FIXED, VALUE, BIT, COMMNT, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         LOCS(5) = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         An array of 5 HDS locators. These locators identify the NDF
-         and the associated quality name information.  They should have
-         been obtained using routine IRQ\_FIND or routine IRQ\_NEW.
-      }
-      \sstsubsection{
-         QNAME = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         The quality name to search for. Leading blanks are ignored and
-         the search is case-insensitive. The maximum allowed length for
-         quality names is given by symbolic constant IRQ\_\_SZQNM which
-         currently has the value of 15.
-      }
-      \sstsubsection{
-         FIXED = LOGICAL (Returned)
-      }{
-         If true, then the quality is either held by all pixels, or by
-         no pixels. In this case the quality may not have a
-         corresponding bit in the QUALITY component. If false, then
-         some pixels have the quality and some don{\tt '}t, as indicated by
-         the corresponding bit in the QUALITY component.
-      }
-      \sstsubsection{
-         VALUE = LOGICAL (Returned)
-      }{
-         If FIXED is true, then VALUE specifies whether all pixels hold
-         the quality ( VALUE = .TRUE. ), or whether no pixels hold the
-         quality ( VALUE = .FALSE. ). If FIXED is false, then VALUE is
-         indeterminate.
-      }
-      \sstsubsection{
-         BIT = INTEGER (Returned)
-      }{
-         BIT holds the corresponding bit number in the QUALITY component.
-         The least significant bit is called bit 1 (not bit 0). If there
-         is no corresponding bit, a value of zero is returned, and FIXED
-         is returned .TRUE.
-      }
-      \sstsubsection{
-         COMMNT = CHARACTER $*$ ( $*$ ) (Returned)
-      }{
-         The descriptive comment which was stored with the quality name.
-         The supplied character variable should have a declared length
-         given by symbolic constant IRQ\_\_SZCOM.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   IRQ\_GETQX
-}{
-   Get a quality expression from the user and check for syntax
-   errors
-}{
-   \sstdescription{
-      A string is obtained from the environment using the supplied ADAM
-      parameter. This string is check to see if it has correct syntax
-      for a quality expression (no checks are made to ensure that the
-      quality names referenced within the expression are defined within
-      any specific NDF). If a syntax error is detected, the quality
-      expression is displayed with an exclamation mark under the
-      position at which the syntax error was detected. If any problem is
-      found with the supplied expression, a new value is obtained from
-      the environment. The returned string is converted to upper case
-      and leading blanks are removed.
-   }
-   \sstinvocation{
-      CALL IRQ\_GETQX( PARAM, QEXP, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         PARAM = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         The name of an ADAM parameter of type LITERAL.
-      }
-      \sstsubsection{
-         QEXP = CHARACTER $*$ ( $*$ ) (Returned)
-      }{
-         The returned quality expression.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   IRQ\_NEW
-}{
-   Create a new structure to hold quality name information within an
-   NDF extension
-}{
-   \sstdescription{
-      An HDS object (named QUALITY\_NAMES) is created to hold quality
-      name information within the specified NDF extension. An error is
-      reported if the NDF extension does not exist. If the extension does
-      exist, an array of 5 HDS locators is returned which is needed
-      when calling other IRQ routines. The first locator points to a
-      temporary object which holds a cloned identifier for the NDF,
-      the other 4 point to components of the QUALITY\_NAMES structure
-      contained in the NDF. IRQ\_RLSE should be called to annul these
-      locators (and the NDF identifier) when no further access to the
-      NDFs quality names information is required.
-
-      The QUALITY component of the NDF is reset to an undefined state by
-      this routine. Therefore, the QUALITY component should not be mapped
-      for access prior to calling this routine.
-
-      The LOCS argument returned by this routine specifies the NDF
-      which will be operated on by subsequent IRQ routines.
-      Specifically, LOCS determines the bounds of the NDF. Care should
-      therefore be taken that subsequent calls to IRQ routines refer to
-      the NDF specified by the INDF argument to this routine, and not
-      for instance to a section of the NDF which will in general have
-      different bounds.
-
-      Note, an error is reported if only READ access is available to the
-      NDF.
-   }
-   \sstinvocation{
-      CALL IRQ\_NEW( INDF, XNAME, LOCS, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         INDF = INTEGER (Given)
-      }{
-         The NDF identifier.
-      }
-      \sstsubsection{
-         XNAME = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         The name of the NDF extension in which the quality name
-         information is to be stored. If this extension does not exist
-         then an error is reported.
-      }
-      \sstsubsection{
-         LOCS(5) = CHARACTER $*$ ( $*$ ) (Returned)
-      }{
-         A set of HDS locators as described above.  The character
-         variables supplied for this argument should have a declared
-         length equal to symbolic constant DAT\_\_SZLOC. These locator
-         are annuled by calling IRQ\_RLSE.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   IRQ\_NUMQN
-}{
-   Return number of defined quality names
-}{
-   \sstdescription{
-      The number of quality names defined in the NDF specified by
-      LOCS is returned.
-   }
-   \sstinvocation{
-      CALL IRQ\_NUMQN( LOCS, NAMES, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         LOCS(5) = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         An array of 5 HDS locators. These locators identify the NDF
-         and the associated quality name information.  They should have
-         been obtained using routine IRQ\_FIND or routine IRQ\_NEW.
-      }
-      \sstsubsection{
-         NAMES = INTEGER (Returned)
-      }{
-         The number of quality names defined in the structure located by
-         LOCS.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   IRQ\_NXTQN
-}{
-   Return the next quality name
-}{
-   \sstdescription{
-      This routine returns the next quality name defined in the NDF
-      specified by LOCS, together with supplementary information.  The
-      next quality name is determined by the value of CONTXT. If CONTXT
-      is zero on entry then the first quality name is returned.  On
-      exit, CONTXT is set to a value which indicates where the next
-      quality name is stored within the NDF. This value can be passed
-      to a subsequent call to this routine to retrieve information
-      about the next quality name.
-   }
-   \sstinvocation{
-      CALL IRQ\_NXTQN( LOCS, CONTXT, QNAME, FIXED, VALUE, BIT,
-                      COMMNT, DONE, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         LOCS(5) = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         An array of 5 HDS locators. These locators identify the NDF
-         and the associated quality name information.  They should have
-         been obtained using routine IRQ\_FIND or routine IRQ\_NEW.
-      }
-      \sstsubsection{
-         CONTXT = INTEGER (Given and Returned)
-      }{
-         The context of the current call. This should be set to zero
-         before the first call to this routine, and then left unchanged
-         between subsequent calls.
-      }
-      \sstsubsection{
-         QNAME = CHARACTER $*$ ( $*$ ) (Returned)
-      }{
-         The next quality name. The character variable supplied for this
-         argument should have a declared length equal to the symbolic
-         constant IRQ\_\_SZQNM.
-      }
-      \sstsubsection{
-         FIXED = LOGICAL (Returned)
-      }{
-         If true, then the quality is either held by all pixels, or by
-         no pixels. In this case the quality may not have a
-         corresponding bit in the QUALITY component. If false, then
-         some pixels have the quality and some don{\tt '}t, as indicated by
-         the corresponding bit in the QUALITY component.
-      }
-      \sstsubsection{
-         VALUE = LOGICAL (Returned)
-      }{
-         If FIXED is true, then VALUE specifies whether all pixels hold
-         the quality ( VALUE = .TRUE. ), or whether no pixels hold the
-         quality ( VALUE = .FALSE. ). If FIXED is false, then VALUE is
-         indeterminate.
-      }
-      \sstsubsection{
-         BIT = INTEGER (Returned)
-      }{
-         BIT holds the corresponding bit number in the QUALITY component.
-         The least significant bit is called bit 1 (not bit 0). A value
-         of zero is returned if the quality has no associated bit in the
-         quality array. In this case, the FIXED argument will indicate if
-         all pixel do, or do not, hold the quality.
-      }
-      \sstsubsection{
-         COMMNT = CHARACTER $*$ ( $*$ ) (Returned)
-      }{
-         The descriptive comment which was stored with the quality name.
-         The supplied character variable should have a declared length
-         given by symbolic constant IRQ\_\_SZCOM.
-      }
-      \sstsubsection{
-         DONE = LOGICAL (Returned)
-      }{
-         Returned true if this routine is called when no more names
-         remain to be returned.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   IRQ\_RBIT
-}{
-   Reserve a bit number for a given quality name
-}{
-   \sstdescription{
-      If the supplied quality name already has a bit number associated
-      with it, the bit number is returned. Otherwise, the next available
-      plane in the quality array is asigned to the quality name, and its
-      bit number is returned.
-
-      Note, write or update access must be available for the NDF (as
-      set up by routine LPG\_ASSOC for instance).
-   }
-   \sstinvocation{
-      CALL IRQ\_RBIT( LOCS, QNAME, BIT, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         LOCS(5) = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         An array of 5 HDS locators. These locators identify the NDF
-         and the associated quality name information.  They should have
-         been obtained using routine IRQ\_FIND or routine IRQ\_NEW.
-      }
-      \sstsubsection{
-         QNAME = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         The quality name. This quality name must be defined in the NDF
-         specified by LOCS. Name definitions can be added to the NDF
-         using routine IRQ\_ADDQN.
-      }
-      \sstsubsection{
-         BIT = INTEGER (Returned)
-      }{
-         The bit number used by the quality name within the quality
-         array. Note, the least significant bit is bit 1, not bit 0.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   IRQ\_REMQN
-}{
-   Remove the definition of a specified quality name
-}{
-   \sstdescription{
-      The specified quality name is removed from the NDF specified
-      by LOCS. Any associated bit in the QUALITY array is freed for
-      future use. If the name is not defined an error is reported.
-      A value of ANY for the quality names causes all defined quality
-      names to be removed.
-
-      Note, an error is reported if only read access is available to the
-      NDF, or if the quality name has been flagged as read-only using
-      routine IRQ\_RWQN.
-   }
-   \sstinvocation{
-      CALL IRQ\_REMQN( LOCS, QNAME, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         LOCS(5) = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         An array of 5 HDS locators. These locators identify the NDF
-         and the associated quality name information.  They should have
-         been obtained using routine IRQ\_FIND or routine IRQ\_NEW.
-      }
-      \sstsubsection{
-         QNAME = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         The quality name to remove, or {\tt '}ANY{\tt '} if all quality names are
-         to be removed.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   IRQ\_RESQ
-}{
-   Remove a given quality from all pixels in the NDF
-}{
-   \sstdescription{
-      The quality specified by QNAME is removed from all pixels in the
-      NDF specified by LOCS (LOCS should be obtained either by calling
-      IRQ\_FIND or IRQ\_NEW). An error is reported if the quality name is
-      undefined within the NDF.
-
-      Note, write or update access must be available for the NDF (as
-      set up by routine LPG\_ASSOC for instance).
-   }
-   \sstinvocation{
-      CALL IRQ\_RESQ( LOCS, QNAME, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         LOCS(5) = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         An array of 5 HDS locators. These locators identify the NDF
-         and the associated quality name information.  They should have
-         been obtained using routine IRQ\_FIND or routine IRQ\_NEW.
-      }
-      \sstsubsection{
-         QNAME = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         The quality name to be removed from all pixels in the NDF. This
-         quality name must be defined in the NDF specified by LOC. Name
-         definitions can be added to the NDF using routine IRQ\_ADDQN.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   IRQ\_RESQL
-}{
-   Remove a quality from a list of pixels, leaving unlisted pixels
-   unchanged
-}{
-   \sstdescription{
-      The quality specified by QNAME is removed from all pixels
-      included in (or, if LISTED is false, not included in) the
-      supplied list of pixel indices. The quality of other pixels
-      is left unaltered.  The quality name must be defined in the NDF
-      specified by LOCS (LOCS should be obtained either by calling
-      IRQ\_FIND or IRQ\_NEW). An error is reported if the quality name is
-      undefined.
-
-      Note, write or update access must be available for the NDF (as
-      set up by routine LPG\_ASSOC for instance), and the QUALITY
-      component must not be mapped on entry to this routine.
-   }
-   \sstinvocation{
-      CALL IRQ\_RESQL( LOCS, LISTED, QNAME, NDIM, NCOORD, LIST, SET,
-                      STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         LOCS(5) = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         An array of 5 HDS locators. These locators identify the NDF
-         and the associated quality name information.  They should have
-         been obtained using routine IRQ\_FIND or routine IRQ\_NEW.
-      }
-      \sstsubsection{
-         LISTED = LOGICAL (Given)
-      }{
-         If true, then the quality is removed from all pixels included
-         in the list given by LIST.  If false, then the quality is
-         removed from all pixels not included in the list given by LIST.
-      }
-      \sstsubsection{
-         QNAME = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         The quality name to be removed from the selected pixels. This
-         quality name must be defined in the NDF specified by LOC. Name
-         definitions can be added to the NDF using routine IRQ\_ADDQN.
-      }
-      \sstsubsection{
-         NDIM = INTEGER (Given)
-      }{
-         The number of values required to specify a pixel position
-         (i.e. the number of dimensions in the NDF).
-      }
-      \sstsubsection{
-         NCOORD = INTEGER (Given)
-      }{
-         The number of pixels included in the input list.
-      }
-      \sstsubsection{
-         LIST( NDIM, NCOORD ) = INTEGER (Given)
-      }{
-         The list of pixel indices. Any indices which lie outside the
-         bounds of the NDF are ignored.
-      }
-      \sstsubsection{
-         SET = INTEGER (Returned)
-      }{
-         The number of pixels which hold the quality.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   IRQ\_RESQM
-}{
-   Remove a quality from pixels selected using a mask image, leaving
-   unselected pixels unchanged
-}{
-   \sstdescription{
-      The quality specified by QNAME is removed from all NDF pixels
-      which either do (or, if BAD is false,  do not) correspond to `bad{\tt '}
-      pixels in the input mask array.  The quality of all other pixels
-      is left unchanged.  The quality name must be defined in the NDF
-      specified by LOCS (LOCS should be obtained either by calling
-      IRQ\_FIND or IRQ\_NEW). An error is reported if the quality name is
-      undefined.
-
-      Note, write or update access must be available for the NDF (as
-      set up by routine LPG\_ASSOC for instance), and the QUALITY
-      component of the NDF must not be mapped on entry to this routine.
-   }
-   \sstinvocation{
-      CALL IRQ\_RESQM( LOCS, BAD, QNAME, SIZE, MASK, SET, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         LOCS(5) = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         An array of 5 HDS locators. These locators identify the NDF
-         and the associated quality name information.  They should have
-         been obtained using routine IRQ\_FIND or routine IRQ\_NEW.
-      }
-      \sstsubsection{
-         BAD = LOGICAL (Given)
-      }{
-         If true, then the quality is removed from all NDF pixels
-         corresponding to `bad{\tt '} pixels in the mask.  If false, then the
-         quality is removed from all NDF pixels corresponding to pixels
-         which are not `bad{\tt '} in the mask.
-      }
-      \sstsubsection{
-         QNAME = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         The quality name to be removed from the selected pixels. This
-         quality name must be defined in the NDF specified by LOC. Name
-         definitions can be added to the NDF using routine IRQ\_ADDQN.
-      }
-      \sstsubsection{
-         SIZE = INTEGER (Given)
-      }{
-         The total number of pixels in the MASK array.
-      }
-      \sstsubsection{
-         MASK( SIZE ) = REAL (Given)
-      }{
-         A vector which defines the pixels from which the quality
-         specified by QNAME is to be removed.  It is assumed that this
-         vector corresponds pixel-for-pixel with the vectorised NDF as
-         supplied to routine IRQ\_FIND or IRQ\_NEW.
-      }
-      \sstsubsection{
-         SET = INTEGER (Returned)
-      }{
-         The number of pixels in the NDF which hold the quality.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   IRQ\_RLSE
-}{
-   Release a temporary structure created by IRQ\_NEW or IRQ\_FIND
-}{
-   \sstdescription{
-      This routine releases the resources reserved by a call to IRQ\_NEW
-      or IRQ\_FIND. The cloned NDF identifier held in LOCS(1) is
-      annulled, and then all the five HDS locators in LOCS are annulled.
-      If no defined quality names exist within the NDF, then the
-      structure used to hold such names is deleted and the QUALITY
-      component of the NDF is reset to an undefined state.
-
-      Note, this routine attempts to execute even if STATUS is set on
-      entry, although no further error report will be made if it
-      subsequently fails under these circumstances.
-   }
-   \sstinvocation{
-      CALL IRQ\_RLSE( LOCS, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         LOCS(5) = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         An array of 5 HDS locators. These locators identify the NDF
-         and the associated quality name information.  They should have
-         been obtained using routine IRQ\_FIND or routine IRQ\_NEW.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   IRQ\_RWQN
-}{
-   Get and/or set the read-only flag for a quality name
-}{
-   \sstdescription{
-      This routine returns the current value of the read-only flag
-      associated with a quality name, and optionally assigns a new
-      value to the flag.
-
-      If the read-only flag is set for a quality name, any attempt to
-      remove the quality name using IRQ\_REMQN will result in an error
-      being reported.
-   }
-   \sstinvocation{
-      CALL IRQ\_RWQN( LOCS, QNAME, SET, NEWVAL, OLDVAL, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         LOCS(5) = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         An array of 5 HDS locators. These locators identify the NDF
-         and the associated quality name information.  They should have
-         been obtained using routine IRQ\_FIND or routine IRQ\_NEW.
-      }
-      \sstsubsection{
-         QNAME = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         The quality name to use. Leading blanks are ignored and
-         the search is case-insensitive. The maximum allowed length for
-         quality names is given by symbolic constant IRQ\_\_SZQNM which
-         currently has the value of 15.
-      }
-      \sstsubsection{
-         SET = LOGICAL (Given)
-      }{
-         If true, then the read-only flag for the quality name will be
-         set to the value supplied in NEWVAL. Otherwise, the current
-         value of the flag will be left unchanged.
-      }
-      \sstsubsection{
-         NEWVAL = LOGICAL (Given)
-      }{
-         The new value for the read-only flag. Only accessed if SET is
-         true.
-      }
-      \sstsubsection{
-         OLDVAL = LOGICAL (Returned)
-      }{
-         The value of the read-only flag on entry to this routine. If the
-         old value is of no interest, it is safe to supply the same
-         variable for OLDVAL as for NEWVAL since OLDVAL is updated after
-         NEWVAL is used.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   IRQ\_SETQ
-}{
-   Assign a given quality to all pixels in the NDF
-}{
-   \sstdescription{
-      The quality specified by QNAME is assigned to all pixels in the
-      NDF specified by LOCS (LOCS should be obtained either by calling
-      IRQ\_FIND or IRQ\_NEW). An error is reported if the quality name is
-      undefined within the NDF.
-
-      Note, write or update access must be available for the NDF (as
-      set up by routine LPG\_ASSOC for instance).
-   }
-   \sstinvocation{
-      CALL IRQ\_SETQ( LOCS, QNAME, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         LOCS(5) = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         An array of 5 HDS locators. These locators identify the NDF
-         and the associated quality name information.  They should have
-         been obtained using routine IRQ\_FIND or routine IRQ\_NEW.
-      }
-      \sstsubsection{
-         QNAME = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         The quality name to assign to all pixels in the NDF. This
-         quality name must be defined in the NDF specified by LOC. Name
-         definitions can be added to the NDF using routine IRQ\_ADDQN.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   IRQ\_SETQL
-}{
-   Assign a given quality to a list of pixels, leaving unlisted
-   pixels unchanged
-}{
-   \sstdescription{
-      The quality specified by QNAME is assigned to all pixels included
-      (or, if LISTED is false, not included) in the supplied list of
-      pixel indices. The quality of other pixels is left unaltered.
-      The quality name must be defined in the NDF specified by LOCS
-      (LOCS should be obtained either by calling IRQ\_FIND or IRQ\_NEW).
-      An error is reported if the quality name is undefined.
-
-      Note, write or update access must be available for the NDF (as
-      set up by routine LPG\_ASSOC for instance), and the QUALITY
-      component must not be mapped on entry to this routine.
-   }
-   \sstinvocation{
-      CALL IRQ\_SETQL( LOCS, LISTED, QNAME, NDIM, NCOORD, LIST, SET,
-                      STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         LOCS(5) = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         An array of 5 HDS locators. These locators identify the NDF
-         and the associated quality name information.  They should have
-         been obtained using routine IRQ\_FIND or routine IRQ\_NEW.
-      }
-      \sstsubsection{
-         LISTED = LOGICAL (Given)
-      }{
-         If true, then the quality is assigned to all pixels included
-         in the list given by LIST.  If false, then the quality is
-         assigned to all pixels not included in the list given by LIST.
-      }
-      \sstsubsection{
-         QNAME = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         The quality name to assign to the selected pixels. This quality
-         name must be defined in the NDF specified by LOC. Name
-         definitions can be added to the NDF using routine IRQ\_ADDQN.
-      }
-      \sstsubsection{
-         NDIM = INTEGER (Given)
-      }{
-         The number of values required to specify a pixel position
-         (i.e. the number of dimensions in the NDF).
-      }
-      \sstsubsection{
-         NCOORD = INTEGER (Given)
-      }{
-         The number of pixels included in the input list.
-      }
-      \sstsubsection{
-         LIST( NDIM, NCOORD ) = INTEGER (Given)
-      }{
-         The list of pixel indices. Any indices which lie outside the
-         bounds of the NDF are ignored.
-      }
-      \sstsubsection{
-         SET = INTEGER (Returned)
-      }{
-         The number of pixels in the NDF which hold the quality.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   IRQ\_SETQM
-}{
-   Assign a quality to pixels selected using a mask image, leaving
-   unselected pixels unchanged
-}{
-   \sstdescription{
-      The quality specified by QNAME is assigned to all NDF pixels
-      which either do (or, if BAD is false,  do not) correspond to `bad{\tt '}
-      pixels in the input mask array.  The quality of all other pixels
-      is left unchanged.  The quality name must be defined in the NDF
-      specified by LOCS (LOCS should be obtained either by calling
-      IRQ\_FIND or IRQ\_NEW). An error is reported if the quality name is
-      undefined.
-
-      Note, write or update access must be available for the NDF (as
-      set up by routine LPG\_ASSOC for instance), and the QUALITY
-      component of the NDF must not be mapped on entry to this routine.
-   }
-   \sstinvocation{
-      CALL IRQ\_SETQM( LOCS, BAD, QNAME, SIZE, MASK, SET, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         LOCS(5) = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         An array of 5 HDS locators. These locators identify the NDF
-         and the associated quality name information.  They should have
-         been obtained using routine IRQ\_FIND or routine IRQ\_NEW.
-      }
-      \sstsubsection{
-         BAD = LOGICAL (Given)
-      }{
-         If true, then the quality is assigned to all NDF pixels
-         corresponding to `bad{\tt '} pixels in the mask.  If false, then the
-         quality is assigned to all NDF pixels corresponding to pixels
-         which are not `bad{\tt '} in the mask.
-      }
-      \sstsubsection{
-         QNAME = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         The quality name to assign to the selected pixels. This quality
-         name must be defined in the NDF specified by LOC. Name
-         definitions can be added to the NDF using routine IRQ\_ADDQN.
-      }
-      \sstsubsection{
-         SIZE = INTEGER (Given)
-      }{
-         The total number of pixels in the MASK array.
-      }
-      \sstsubsection{
-         MASK( SIZE ) = REAL (Given)
-      }{
-         A vector which defines the pixels to which the quality
-         specified by QNAME is to be assigned.  It is assumed that this
-         vector corresponds pixel-for-pixel with the vectorised NDF
-         supplied to IRQ\_NEW or IRQ\_FIND.
-      }
-      \sstsubsection{
-         SET = INTEGER (Returned)
-      }{
-         The number of pixels in the NDF which hold the quality.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   IRQ\_SYNTX
-}{
-   Check the syntax of a quality expression
-}{
-   \sstdescription{
-      The syntax of the supplied quality expression is checked, and an
-      error is reported if a syntax error is detected.  If any of the
-      STATUS values IRQ\_\_BADSY, IRQ\_\_MSOPT or IRQ\_\_MSOPD are returned
-      (all of which correspond to various forms of syntax error in the
-      quality expression, see ID6 appendix E), a pointer to the
-      approximate position of the error within the quality expression
-      is returned in ERRPNT.  Note, in order for a quality expression
-      to compile successfully (using IRQ\_COM), it must not only contain
-      no syntax errors, but must also contain no undefined quality
-      names. IRQ\_SYNTX cannot check for undefined quality names.
-   }
-   \sstinvocation{
-      CALL IRQ\_SYNTX( QEXP, ERRPNT, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         QEXP = CHARACTER$*$($*$) (Given and Returned)
-      }{
-         A quality expression. See ID6 section 5 for details of the
-         allowed formats for quality expressions. On exit, the string is
-         converted to upper case and any leading blanks are removed.
-      }
-      \sstsubsection{
-         ERRPNT = INTEGER (Returned)
-      }{
-         If any of the STATUS values IRQ\_\_BADSY( {\tt "}Unrecognised logical
-         operator or constant{\tt "}), IRQ\_\_MSOPT ( {\tt "}Missing operator{\tt "}) or
-         IRQ\_\_MSOPD ( {\tt "}Missing operand{\tt "}) are returned, then ERRPNT
-         returns the offset within the quality expression at which the
-         error was detected. Note, the offset refers to the returned
-         form of QEXP, not the given form. These will be different if
-         the given form of QEXP has any leading blanks. An offset of
-         zero is returned if none of the errors associated with the
-         above STATUS values occur.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   IRQ\_SBAD$<$T$>$
-}{
-   Set pixels `bad{\tt '} which satisfy a given quality expression
-}{
-   \sstdescription{
-      IRQ\_COMP should be called before this routine to produce the
-      compiled quality expression identified by IDQ. The QUALITY
-      component of the NDF to which the quality expression refers (see
-      IRQ\_COMP argument LOCS) is mapped as a one dimensional vector.
-      The supplied array VEC must correspond pixel-for-pixel with the
-      mapped QUALITY vector.  All pixels which hold a QUALITY
-      satisfying the quality expression are found. If HELD is true,
-      then the corresponding pixels in VEC are set to the `bad{\tt '} value
-      (other pixels are left unaltered). If HELD is false, the
-      corresponding pixels in VEC are left as they are, but all the
-      other pixels in VEC are set to the `bad{\tt '} value. ALLBAD and NOBAD
-      indicate if the output VEC values are either all bad or all good.
-
-      Note, if the QUALITY component of the NDF is mapped for WRITE or
-      UPDATE access on entry to this routine, an error is reported.
-   }
-   \sstinvocation{
-      CALL IRQ\_SBAD$<$T$>$( IDQ, HELD, SIZE, VEC, ALLBAD, NOBAD, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         IDQ = INTEGER (Given)
-      }{
-         An identifier for a compiled quality expression, produced by
-         routine IRQ\_COMP. This identifier determines the NDF to which
-         the expression refers.
-      }
-      \sstsubsection{
-         HELD = LOGICAL (Given)
-      }{
-         If true then those VEC pixels which hold a quality satisfying
-         the supplied quality expression are set `bad{\tt '}. Otherwise, those
-         pixels which don{\tt '}t hold such a quality are set `bad{\tt '}.
-      }
-      \sstsubsection{
-         SIZE = INTEGER (Given)
-      }{
-         The total number of pixels in VEC. An error is reported if
-         this is not the same as the total number of pixels in the NDF
-         determined by IDQ.
-      }
-      \sstsubsection{
-         VEC( SIZE ) = $<$TYPE$>$ (Given and Returned)
-      }{
-         The data to be set `bad{\tt '}, depending on the corresponding
-         quality values stored in the NDF. It must be the same size as
-         the NDF, and must correspond pixel-for-pixel with the
-         vectorised NDF. Pixels which are not explicitly set `bad{\tt '} by
-         this routine retain the values they had on entry.
-      }
-      \sstsubsection{
-         ALLBAD = LOGICAL (Returned)
-      }{
-         Returned true if all pixels in VEC are returned with `bad{\tt '}
-         values, and false if any returned pixel values are not `bad{\tt '}.
-      }
-      \sstsubsection{
-         NOBAD = LOGICAL (Returned)
-      }{
-         Returned true if no pixels in VEC are returned with `bad{\tt '}
-         values. False if any `bad{\tt '} pixel values are returned.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -17245,6 +14732,45 @@ related items to be removed.
             used (i.e. the one with highest index).
       }
    }
+   \sstdiylist{
+      Environment Parameters
+   }{
+      \sstsubsection{
+         \%PARAM = LITERAL (Read)
+      }{
+         A string specifying the new co-ordinate Frame. If a null parameter
+         value is supplied, then the error is annulled and the current Frame
+         is left unchanged. The string can be one of the following:
+
+         \sstitemlist{
+
+            \sstitem
+            A Domain name such as SKY, AXIS, PIXEL, etc. The two
+            {\tt "}pseudo-domains{\tt "} WORLD and DATA may be supplied and will be
+            translated into the values supplied for arguments WCDOM and DCDOM
+            respectively, so long as the FrameSet does not contain Frames with
+            Domains WORLD or DATA.
+
+            \sstitem
+            An integer value giving the index of the required Frame within
+            the WCS component.
+
+            \sstitem
+            An IRAS90 Sky Co-ordinate System (SCS) values such as
+            EQUAT(J2000) (see SUN/163).
+         }
+      }
+      \sstsubsection{
+         \%EPARAM = \_DOUBLE (Read)
+      }{
+         If a celestial co-ordinate system is supplied (using parameter
+         \%PARAM) then an epoch value is needed to qualify it. This is the
+         epoch at which the supplied sky positions were determined. It should
+         be given as a decimal years value, with or without decimal places
+         ({\tt "}1996.8{\tt "} for example). Such values are interpreted as a Besselian
+         epoch if less than 1984.0 and as a Julian epoch otherwise.
+      }
+   }
 }
 \sstroutine{
    KPG1\_ASGDP
@@ -17315,7 +14841,7 @@ related items to be removed.
 \sstroutine{
    KPG1\_ASGET
 }{
-   Get an AST FrameSet from the WCS component of an NDF
+   Gets an AST FrameSet from the WCS component of an NDF
 }{
    \sstdescription{
       This routine determines the axes to be used from an NDF and returns a
@@ -17358,6 +14884,10 @@ related items to be removed.
       If the original Current Frame has less than NDIM axes, then simple
       axes are added into the new Current Frame to make up a total of
       NDIM. These axes are given the value 1.0.
+
+      Various environment parameters may be used to obtain options, etc. The
+      names of these parameters are hard-wired into this subroutine in
+      order to ensure conformity between applications.
    }
    \sstinvocation{
       CALL KPG1\_ASGET( INDF, NDIM, EXACT, TRIM, REQINV, SDIM, SLBND, SUBND,
@@ -17434,16 +14964,8 @@ related items to be removed.
       }
    }
    \sstdiylist{
-      Parameters
+      Environment Parameters
    }{
-      \sstsubsection{
-         The name of the following environment parameter(s) are hard-wired
-      }{
-      }
-      \sstsubsection{
-         into this subroutine in order to ensure conformity between application.
-      }{
-      }
       \sstsubsection{
          USEAXIS = LITERAL (Read)
       }{
@@ -18980,7 +16502,7 @@ related items to be removed.
 \sstroutine{
    KPG1\_ASTRM
 }{
-   Trim axes from the current Frame of a FrameSet
+   Trims axes from the current Frame of a FrameSet
 }{
    \sstdescription{
       This routine ensures that the number of axes in the current Frame of
@@ -19030,6 +16552,10 @@ related items to be removed.
       the Ident attribute of the new Frame, and is also appended to the
       end of the Frame{\tt '}s Domain. The new Frame corresponding to the lowest
       numbered ROI Region is left as the current Frame on exit.
+
+      Various environment parameters may be used to obtain options, etc. The
+      names of these parameters are hard-wired into this subroutine in
+      order to ensure conformity between applications.
    }
    \sstinvocation{
       CALL KPG1\_ASTRM( IWCS, DEFAX, LBND, UBND, WORK, STATUS )
@@ -19076,16 +16602,8 @@ related items to be removed.
       }
    }
    \sstdiylist{
-      Parameters
+      Environment Parameters
    }{
-      \sstsubsection{
-         The name of the following environment parameter(s) are hard-wired
-      }{
-      }
-      \sstsubsection{
-         into this subroutine in order to ensure conformity between application.
-      }{
-      }
       \sstsubsection{
          USEAXIS = LITERAL (Read)
       }{
@@ -19756,40 +17274,6 @@ related items to be removed.
    }
 }
 \sstroutine{
-   KPG1\_COPYC
-}{
-   Copy a 1D array of character strings
-}{
-   \sstdescription{
-      This routine copies a 1D array of character strings.
-   }
-   \sstinvocation{
-      CALL KPG1\_COPYC( NEL, IN, OUT, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         NEL = INTEGER (Given)
-      }{
-         The length of the array.
-      }
-      \sstsubsection{
-         IN = CHARACTER( NEL ) $*$ ( $*$ ) (Given)
-      }{
-         The input array.
-      }
-      \sstsubsection{
-         OUT = CHARACTER( NEL ) $*$ ( $*$ ) (Returned)
-      }{
-         The output array.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
    KPG1\_COPY
 }{
    To copy an array of a given type to another array of the same
@@ -19838,6 +17322,40 @@ related items to be removed.
 
          \sstitem
          Uses array pointers.
+      }
+   }
+}
+\sstroutine{
+   KPG1\_COPYC
+}{
+   Copy a 1D array of character strings
+}{
+   \sstdescription{
+      This routine copies a 1D array of character strings.
+   }
+   \sstinvocation{
+      CALL KPG1\_COPYC( NEL, IN, OUT, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NEL = INTEGER (Given)
+      }{
+         The length of the array.
+      }
+      \sstsubsection{
+         IN = CHARACTER( NEL ) $*$ ( $*$ ) (Given)
+      }{
+         The input array.
+      }
+      \sstsubsection{
+         OUT = CHARACTER( NEL ) $*$ ( $*$ ) (Returned)
+      }{
+         The output array.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
       }
    }
 }
@@ -21354,7 +18872,7 @@ related items to be removed.
       which allows all the requested ancillary pictures to be created within
       the FRAME picture.
 
-      Various environment parameters are used to obtain options, etc. The
+      Various environment parameters may be used to obtain options, etc. The
       names of these parameters are hard-wired into this subroutine in
       order to ensure conformity between application.
    }
@@ -22214,6 +19732,10 @@ related items to be removed.
 
         CALL AST\_ANNUL( IPLOT, STATUS )
         CALL AGP\_DEASS( {\tt '}DEVICE{\tt '}, .FALSE., STATUS )
+
+      Various environment parameter names are used by this routine,
+      to encourage uniformity in parameter naming, and behaviour.
+      See KPG1\_GRPHW for details.
    }
    \sstinvocation{
       CALL KPG1\_GRAPH( N, X, Y, NSIGMA, YSIGMA, XLAB, YLAB, TTL, XSYM,
@@ -22224,7 +19746,7 @@ related items to be removed.
       \sstsubsection{
          N = INTEGER (Given)
       }{
-         No. of points
+         Number of points
       }
       \sstsubsection{
          X( N ) = REAL (Given)
@@ -22372,22 +19894,6 @@ related items to be removed.
          If an error occurs, or if no graphics is produced because the
          user supplied a null value for a parameter, IPLOT is returned equal
          to AST\_\_NULL, and PGPLOT is shut down.
-      }
-   }
-   \sstdiylist{
-      Environment Parameters
-   }{
-      \sstsubsection{
-         Various envirnment parameter names are used by this routine,
-      }{
-      }
-      \sstsubsection{
-         to encourage uniformity in parameter naming, and behaviour.
-      }{
-      }
-      \sstsubsection{
-         See KPG1\_GRPHW for details.
-      }{
       }
    }
 }
@@ -22767,6 +20273,10 @@ related items to be removed.
 
         CALL AST\_ANNUL( IPLOT, STATUS )
         CALL KPG\_PGCLS( {\tt '}DEVICE{\tt '}, .FALSE., STATUS )
+
+      Various environment parameters are used to obtain options, etc. The
+      names of these parameters are hard-wired into this subroutine in
+      order to ensure conformity between applications.
    }
    \sstinvocation{
       CALL KPG1\_GRPHW( N, X, Y, NSIGMA, YSIGMA, XLAB, YLAB, TTL,
@@ -22945,106 +20455,131 @@ related items to be removed.
       Environment Parameters
    }{
       \sstsubsection{
-         The following envirnment parameter names are used by this routine,
+         AXES = \_LOGICAL (Read)
       }{
+         TRUE if annotated axes are to be produced.
       }
       \sstsubsection{
-         to encourage uniformity in parameter naming, and behaviour:
-      }{
-         AXES = \_LOGICAL (Read)
-            TRUE if annotated axes are to be produced.
          CLEAR = \_LOGICAL (Read)
-            TRUE if the graphics device is to be cleared on opening.
+      }{
+         TRUE if the graphics device is to be cleared on opening.
+      }
+      \sstsubsection{
          DEVICE = DEVICE (Read)
-            The plotting device.
+      }{
+         The plotting device.
+      }
+      \sstsubsection{
          LMODE = LITERAL (Read)
-            If the subroutine argument LMODE is .TRUE., then parameter
-            LMODE is used to specify how the default values for YBOT and
-            YTOP are found. If argument LMODE is .FALSE. then {\tt "}Extended{\tt "}
-            mode is always used. This parameter can take the following
-            values:
+      }{
+         If the subroutine argument LMODE is .TRUE., then parameter
+         LMODE is used to specify how the default values for YBOT and
+         YTOP are found. If argument LMODE is .FALSE. then {\tt "}Extended{\tt "}
+         mode is always used. This parameter can take the following
+         values:
 
          \sstitemlist{
 
             \sstitem
-               {\tt "}Range{\tt "} -- The lowest and highest supplied data values are
-               used (including error bars).
+            {\tt "}Range{\tt "} -- The lowest and highest supplied data values are
+            used (including error bars).
 
             \sstitem
-               {\tt "}Extended{\tt "} -- The lowest and highest supplied data values
-               are used (including error bars), extended to give a margin of
-               2.5\% of the total data range at each end.
+            {\tt "}Extended{\tt "} -- The lowest and highest supplied data values
+            are used (including error bars), extended to give a margin of
+            2.5\% of the total data range at each end.
 
             \sstitem
-               {\tt "}Extended,10,5{\tt "} -- Like {\tt "}Extended{\tt "}, except the margins at the
-               two ends are specified as a pair of numerical value in the second
-               and third elements of the array. These values are percentages of
-               the total data range. So, {\tt "}Extended,10,5{\tt "} includes a margin of 10\%
-               of the total data range in YBOT, and 5\% in YTOP. If only one
-               numerical value is given, the same value is used for both limits.
-               If no value is given, both limits default to 2.5. {\tt "}Range{\tt "} is
-               equivalent to {\tt "}Extended,0,0{\tt "}.
+            {\tt "}Extended,10,5{\tt "} -- Like {\tt "}Extended{\tt "}, except the margins at the
+            two ends are specified as a pair of numerical value in the second
+            and third elements of the array. These values are percentages of
+            the total data range. So, {\tt "}Extended,10,5{\tt "} includes a margin of 10\%
+            of the total data range in YBOT, and 5\% in YTOP. If only one
+            numerical value is given, the same value is used for both limits.
+            If no value is given, both limits default to 2.5. {\tt "}Range{\tt "} is
+            equivalent to {\tt "}Extended,0,0{\tt "}.
 
             \sstitem
-               {\tt "}Percentiles,5,95{\tt "} -- The second and third elements of the array
-               are interpreted as percentiles. For instance, {\tt "}Perc,5,95{\tt "} causes
-               5\% of the data points (ignoring error bars) to be below YBOT, and
-               10\% to be above the YTOP. If only 1 value (p1) is supplied, the
-               other one, p2, defaults to (100 - p1). If no values are supplied,
-               p1 and p2 default to 5 and 95.
+            {\tt "}Percentiles,5,95{\tt "} -- The second and third elements of the array
+            are interpreted as percentiles. For instance, {\tt "}Perc,5,95{\tt "} causes
+            5\% of the data points (ignoring error bars) to be below YBOT, and
+            10\% to be above the YTOP. If only 1 value (p1) is supplied, the
+            other one, p2, defaults to (100 - p1). If no values are supplied,
+            p1 and p2 default to 5 and 95.
 
             \sstitem
-               {\tt "}Sigma,2,3{\tt "} -- The second and third elements of the array are
-               interpreted as multiples of the standard deviation of the data
-               values (ignoring error bars). For instance, {\tt "}S,2,3{\tt "} causes the
-               YBOT to be the mean of the data values, minus two sigma, and YTOP
-               to be the mean plus three sigma. If only 1 value is supplied, the
-               same value is used for both limits. If no values are supplied,
-               both values default to 3.0.
+            {\tt "}Sigma,2,3{\tt "} -- The second and third elements of the array are
+            interpreted as multiples of the standard deviation of the data
+            values (ignoring error bars). For instance, {\tt "}S,2,3{\tt "} causes the
+            YBOT to be the mean of the data values, minus two sigma, and YTOP
+            to be the mean plus three sigma. If only 1 value is supplied, the
+            same value is used for both limits. If no values are supplied,
+            both values default to 3.0.
 
          }
          The above strings can be abbreviated to one character.
+      }
+      \sstsubsection{
          MARGIN( 4 ) = \_REAL (Read)
-            The widths of the margins to leave for axis annotation, given
-            as fractions of the corresponding dimension of the current picture.
-            Four values may be given, in the order - bottom, right, top, left.
-            If less than four values are given, extra values are used equal to
-            the first supplied value. If these margins are too narrow any axis
-            annotation may be clipped. The dynamic default is 0.15 (for all
-            edges) if either annotated axes or a key are produced, and zero
-            otherwise.
-         MARKER = INTEGER )Read)
-            The PGPLOT marker type to use. Only accessed if MODE is 3 or 5.
+      }{
+         The widths of the margins to leave for axis annotation, given
+         as fractions of the corresponding dimension of the current picture.
+         Four values may be given, in the order - bottom, right, top, left.
+         If less than four values are given, extra values are used equal to
+         the first supplied value. If these margins are too narrow any axis
+         annotation may be clipped. The dynamic default is 0.15 (for all
+         edges) if either annotated axes or a key are produced, and zero
+         otherwise.
+      }
+      \sstsubsection{
+         MARKER = \_INTEGER (Read)
+      }{
+         The PGPLOT marker type to use. Only accessed if MODE is 3 or 5.
+      }
+      \sstsubsection{
          STYLE = GROUP (Read)
-            A description of the plotting style required. The following
-            synonyms for graphical elements may be used:
-            {\tt "}Err(Bars){\tt "} - Specifies colour, etc for error bars. Size(errbars)
-                          scales the size of the serifs (i.e. a size value of
-                          1.0 produces a default size).
-            {\tt "}Sym(bols){\tt "} - Specifies colour, etc for markers (used in modes 3
-                          and 5).
-            {\tt "}Lin(es){\tt "}   - Specifies colour, etc for lines (used in modes 1, 2
-                          and 5).
+      }{
+         A description of the plotting style required. The following
+         synonyms for graphical elements may be used:
+         {\tt "}Err(Bars){\tt "} - Specifies colour, etc for error bars. Size(errbars)
+                       scales the size of the serifs (i.e. a size value of
+                       1.0 produces a default size).
+         {\tt "}Sym(bols){\tt "} - Specifies colour, etc for markers (used in modes 3
+                       and 5).
+         {\tt "}Lin(es){\tt "}   - Specifies colour, etc for lines (used in modes 1, 2
+                       and 5).
+      }
+      \sstsubsection{
          XLEFT = \_REAL (Read)
-            The axis value to place at the left hand end of the horizontal
-            axis. The dynamic default is specified by argument XL. The value
-            supplied may be greater than or less than the value supplied for
-            XRIGHT.
+      }{
+         The axis value to place at the left hand end of the horizontal
+         axis. The dynamic default is specified by argument XL. The value
+         supplied may be greater than or less than the value supplied for
+         XRIGHT.
+      }
+      \sstsubsection{
          XRIGHT = \_REAL (Read)
-            The axis value to place at the right hand end of the horizontal
-            axis. The dynamic default is specified by argument XR. The value
-            supplied may be greater than or less than the value supplied for
-            XLEFT.
+      }{
+         The axis value to place at the right hand end of the horizontal
+         axis. The dynamic default is specified by argument XR. The value
+         supplied may be greater than or less than the value supplied for
+         XLEFT.
+      }
+      \sstsubsection{
          YBOT = \_REAL (Read)
-            The axis value to place at the bottom end of the vertical
-            axis. The dynamic default is specified by argument YB. The value
-            supplied may be greater than or less than the value supplied for
-            YTOP.
+      }{
+         The axis value to place at the bottom end of the vertical
+         axis. The dynamic default is specified by argument YB. The value
+         supplied may be greater than or less than the value supplied for
+         YTOP.
+      }
+      \sstsubsection{
          YTOP = \_REAL (Read)
-            The axis value to place at the top end of the vertical axis.
-            The dynamic default is specified by argument YT. The value
-            supplied may be greater than or less than the value supplied
-            for YBOT.
+      }{
+         The axis value to place at the top end of the vertical axis.
+         The dynamic default is specified by argument YT. The value
+         supplied may be greater than or less than the value supplied
+         for YBOT.
       }
    }
 }
@@ -27253,136 +24788,9 @@ related items to be removed.
    }
 }
 \sstroutine{
-   KPG1\_PLOTA
-}{
-   Open the graphics device and see if there is an existing DATA
-   picture with which the new DATA picture could be aligned
-}{
-   \sstdescription{
-      This routine opens a graphics device, clearing it or not as
-      specified by the user. If it is not cleared an attempt is made to
-      find a DATA picture within the current picture. If found it becomes
-      the current AGI picture, the corresponding PGPLOT viewport is
-      established as the current PGPLOT viewport, and an AST Plot is
-      returned for it in which the Base (GRAPHICS) Frame corresponds to
-      PGPLOT world co-ordinates. If no DATA picture is found, or if the
-      device was not cleared on opening, the current AGI picture and
-      PGPLOT viewport are unchanged on exit and no Plot is returned.
-
-      Various environment parameters are used to obtain options, etc. The
-      names of these parameters are hard-wired into this subroutine in
-      order to ensure conformity between application.
-   }
-   \sstinvocation{
-      CALL KPG1\_PLOTA( IWCS, STAT, DOMAIN, IPIC0, IPICD, IPLOT, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         IWCS = INTEGER (Given)
-      }{
-         An AST pointer to a FrameSet. This may be AST\_\_NULL. The Current
-         and Base Frames are unchanged on exit. If an existing DATA picture
-         was created by a non-AST application it will not have a Plot
-         stored with it. A default Plot will be created in this case,
-         containing 2 Frames; a GRAPHICS Frame corresponding to millimetres
-         from the bottom left corner of the view surface, and a Frame
-         corresponding to AGI world co-ordinates. The AGI database does not
-         contain any information describing world co-ordinates and so such
-         information must be supplied by the calling application, on some
-         assumption such as {\tt "}AGI world co-ordinates are PIXEL co-ordinates{\tt "}.
-         This information is provided through a FrameSet (IWCS) and a Domain
-         name (DOMAIN). DOMAIN specifies the Domain in which AGI world
-         co-ordinates are assumed to live. A FrameSet may then be supplied
-         using argument IWCS containing a Frame with the same Domain which
-         will be used to describe AGI world co-ordinates in the returned
-         Plot (a default 2-D Frame with the specified Domain is used if no
-         FrameSet is supplied or if it does not contain a Frame with the
-         specified Domain). If DOMAIN is supplied Blank, a default 2-D Frame
-         with Domain AGI\_WORLD will be used to describe AGI world co-ordinates.
-
-         If the existing DATA picture was created by an AST application,
-         it will have a Plot stored with it which means that AGI world
-         co-ordinates will be ignored. Consequently, the values supplied
-         for IWCS and DOMAIN will also be ignored.
-      }
-      \sstsubsection{
-         STAT = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         Determines whether or not the new DATA picture creted by the
-         calling application is to be aligned with an existing DATA
-         picture:
-
-         {\tt '}NEW{\tt '}: no attempt is made to align the new DATA picture with an
-                existing DATA picture, even if the CLEAR parameter is
-                given a FALSE value.
-         {\tt '}OLD{\tt '}: the new DATA picture is always aligned with an existing
-                DATA picture. The CLEAR parameter is not accessed (it is
-                assumed to have a FALSE value) and an error is reported
-                if no DATA picture is available.
-         {\tt '}UNKNOWN{\tt '}: If CLEAR is given a FALSE value then the new DATA
-                picture is aligned with any existing DATA picture, but no
-                error is reported if no DATA picture exists.
-      }
-      \sstsubsection{
-         DOMAIN = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         The Domain for AGI world co-ordinates. Only used if a FrameSet is
-         supplied (IWCS). If a blank value is supplied then {\tt "}AGI\_WORLD{\tt "}
-         will be used. See description of argument IWCS above for more
-         details.
-      }
-      \sstsubsection{
-         IPIC0 = INTEGER (Returned)
-      }{
-         An AGI identifier for the original current picture.
-      }
-      \sstsubsection{
-         IPICD = INTEGER (Returned)
-      }{
-         An AGI identifier for the existing DATA picture. Returned equal
-         to -1 if there is no existing DATA picture or if the device was
-         cleared on opening.
-      }
-      \sstsubsection{
-         IPLOT = INTEGER (Returned)
-      }{
-         An AST pointer to a Plot associated with an existing DATA picture.
-         Returned equal to AST\_\_NULL if an error occurs, or if there is no
-         existing DATA picture, or if the device was cleared on opening.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         Close down AGI and PGPLOT using KPG1\_PGCLS.
-      }
-   }
-   \sstdiylist{
-      Parameters
-   }{
-      \sstsubsection{
-         CLEAR = \_LOGICAL (Read)
-      }{
-         TRUE if the graphics device is to be cleared on opening. See
-         argument STAT.
-      }
-      \sstsubsection{
-         DEVICE = DEVICE (Read)
-      }{
-         The plotting device.
-      }
-   }
-}
-\sstroutine{
    KPG1\_PLOT
 }{
-   Prepare for graphics output
+   Prepares for graphics output
 }{
    \sstdescription{
       This routine opens a graphics device and prepares for graphical
@@ -27415,8 +24823,8 @@ related items to be removed.
       On exit, the current PGPLOT viewport corresponds to area occupied by
       the new DATA picture. The bounds of the PGPLOT window produce a
       world co-ordinate system within the viewport corresponding to the
-      Base Frame in the returned Plot (i.e. millimetres from the bottom left
-      corner of the view surface - NOT pixel coordinates). Note, this is
+      Base Frame in the returned Plot (i.e. millimetres from the bottom-left
+      corner of the view surface - NOT pixel co-ordinates). Note, this is
       different to the world co-ordinate system stored in the AGI database
       with the new DATA picture.
 
@@ -27431,7 +24839,7 @@ related items to be removed.
 
       Various environment parameters are used to obtain options, etc. The
       names of these parameters are hard-wired into this subroutine in
-      order to ensure conformity between application.
+      order to ensure conformity between applications.
    }
    \sstinvocation{
       CALL KPG1\_PLOT( IWCS, STAT, APP, DATREF, MARGIN, NP, PNAME, PSIDE,
@@ -27540,17 +24948,17 @@ related items to be removed.
       \sstsubsection{
          BOX( 4 ) = DOUBLE PRECISION (Given)
       }{
-         The coordinates to be assigned to the bottom left, and top right
-         corners of the DATA picture in the AGI database (the coordinate
+         The co-ordinates to be assigned to the bottom-left, and top-right
+         corners of the DATA picture in the AGI database (the co-ordinate
          system in defined by argument DOMAIN). Only used if the new DATA
          picture is NOT being aligned with an existing DATA picture. Supplied
          in the order XLEFT, YBOTTOM, XRIGHT, YTOP. Note, the supplied
          bounds are stored in the AGI database, but do not effect the PGPLOT
          window on exit, which always has a world co-ordinate system of
-         millimetres from the bottom left corner of the view surface. If
-         the supplied box has zero area, then world coordinates for the
+         millimetres from the bottom-left corner of the view surface. If
+         the supplied box has zero area, then world co-ordinates for the
          DATA picture in the AGI database will be centimetres from the
-         bottom left corner of the DATA picture.
+         bottom-left corner of the DATA picture.
       }
       \sstsubsection{
          IPICD = INTEGER (Returned)
@@ -27560,7 +24968,7 @@ related items to be removed.
       \sstsubsection{
          IPICF = INTEGER (Returned)
       }{
-         An AGI identifier for the new FRAME picture. World coordinate system
+         An AGI identifier for the new FRAME picture. World co-ordinate system
          is inherited from the current picture on entry. If no FRAME picture
          is created then an identifier for the current picture on entry is
          returned.
@@ -27569,7 +24977,7 @@ related items to be removed.
          IPIC( NP ) = INTEGER (Returned)
       }{
          An array of AGI identifiers corresponding to the extra pictures
-         requested in PSIDE and PSIZE. The world coordinate system for each
+         requested in PSIDE and PSIZE. The world co-ordinate system for each
          picture is inherited from the FRAME picture. The actual size of a
          picture may be less than the requested size if there is insufficient
          room left in the FRAME picture to give it its requested size.
@@ -27614,7 +25022,7 @@ related items to be removed.
       }
    }
    \sstdiylist{
-      Parameters
+      Environment Parameters
    }{
       \sstsubsection{
          CLEAR = \_LOGICAL (Read)
@@ -27643,6 +25051,133 @@ related items to be removed.
          form {\tt "}name=value{\tt "}, where {\tt "}name{\tt "} is an AST Plot attribute name
          (or synonym recognised by this application - see KPG1\_ASPSY), and
          {\tt "}value{\tt "} is the value to assign to the attribute.
+      }
+   }
+}
+\sstroutine{
+   KPG1\_PLOTA
+}{
+   Opens the graphics device and see if there is an existing DATA
+   picture with which the new DATA picture could be aligned
+}{
+   \sstdescription{
+      This routine opens a graphics device, clearing it or not as
+      specified by the user. If it is not cleared an attempt is made to
+      find a DATA picture within the current picture. If found it becomes
+      the current AGI picture, the corresponding PGPLOT viewport is
+      established as the current PGPLOT viewport, and an AST Plot is
+      returned for it in which the Base (GRAPHICS) Frame corresponds to
+      PGPLOT world co-ordinates. If no DATA picture is found, or if the
+      device was not cleared on opening, the current AGI picture and
+      PGPLOT viewport are unchanged on exit and no Plot is returned.
+
+      Various environment parameters are used to obtain options, etc. The
+      names of these parameters are hard-wired into this subroutine in
+      order to ensure conformity between applications.
+   }
+   \sstinvocation{
+      CALL KPG1\_PLOTA( IWCS, STAT, DOMAIN, IPIC0, IPICD, IPLOT, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IWCS = INTEGER (Given)
+      }{
+         An AST pointer to a FrameSet. This may be AST\_\_NULL. The Current
+         and Base Frames are unchanged on exit. If an existing DATA picture
+         was created by a non-AST application it will not have a Plot
+         stored with it. A default Plot will be created in this case,
+         containing two Frames; a GRAPHICS Frame corresponding to millimetres
+         from the bottom-left corner of the view surface, and a Frame
+         corresponding to AGI world co-ordinates. The AGI database does not
+         contain any information describing world co-ordinates and so such
+         information must be supplied by the calling application, on some
+         assumption such as {\tt "}AGI world co-ordinates are PIXEL co-ordinates{\tt "}.
+         This information is provided through a FrameSet (IWCS) and a Domain
+         name (DOMAIN). DOMAIN specifies the Domain in which AGI world
+         co-ordinates are assumed to live. A FrameSet may then be supplied
+         using argument IWCS containing a Frame with the same Domain which
+         will be used to describe AGI world co-ordinates in the returned
+         Plot (a default 2-D Frame with the specified Domain is used if no
+         FrameSet is supplied or if it does not contain a Frame with the
+         specified Domain). If DOMAIN is supplied Blank, a default 2-D Frame
+         with Domain AGI\_WORLD will be used to describe AGI world co-ordinates.
+
+         If the existing DATA picture was created by an AST application,
+         it will have a Plot stored with it which means that AGI world
+         co-ordinates will be ignored. Consequently, the values supplied
+         for IWCS and DOMAIN will also be ignored.
+      }
+      \sstsubsection{
+         STAT = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Determines whether or not the new DATA picture creted by the
+         calling application is to be aligned with an existing DATA
+         picture:
+
+         {\tt '}NEW{\tt '}: no attempt is made to align the new DATA picture with an
+                existing DATA picture, even if the CLEAR parameter is
+                given a FALSE value.
+         {\tt '}OLD{\tt '}: the new DATA picture is always aligned with an existing
+                DATA picture. The CLEAR parameter is not accessed (it is
+                assumed to have a FALSE value) and an error is reported
+                if no DATA picture is available.
+         {\tt '}UNKNOWN{\tt '}: If CLEAR is given a FALSE value then the new DATA
+                picture is aligned with any existing DATA picture, but no
+                error is reported if no DATA picture exists.
+      }
+      \sstsubsection{
+         DOMAIN = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The Domain for AGI world co-ordinates. Only used if a FrameSet is
+         supplied (IWCS). If a blank value is supplied then {\tt "}AGI\_WORLD{\tt "}
+         will be used. See description of argument IWCS above for more
+         details.
+      }
+      \sstsubsection{
+         IPIC0 = INTEGER (Returned)
+      }{
+         An AGI identifier for the original current picture.
+      }
+      \sstsubsection{
+         IPICD = INTEGER (Returned)
+      }{
+         An AGI identifier for the existing DATA picture. Returned equal
+         to -1 if there is no existing DATA picture or if the device was
+         cleared on opening.
+      }
+      \sstsubsection{
+         IPLOT = INTEGER (Returned)
+      }{
+         An AST pointer to a Plot associated with an existing DATA picture.
+         Returned equal to AST\_\_NULL if an error occurs, or if there is no
+         existing DATA picture, or if the device was cleared on opening.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Close down AGI and PGPLOT using KPG1\_PGCLS.
+      }
+   }
+   \sstdiylist{
+      Environment Parameters
+   }{
+      \sstsubsection{
+         CLEAR = \_LOGICAL (Read)
+      }{
+         TRUE if the graphics device is to be cleared on opening. See
+         argument STAT.
+      }
+      \sstsubsection{
+         DEVICE = DEVICE (Read)
+      }{
+         The plotting device.
       }
    }
 }
@@ -27728,13 +25263,13 @@ related items to be removed.
       On exit, the current PGPLOT viewport corresponds to area occupied
       by the new DATA picture. The bounds of the PGPLOT window produce a
       world co-ordinate system within the viewport corresponding to
-      millimetres from the bottom left corner of the view surface. Note,
+      millimetres from the bottom-left corner of the view surface. Note,
       this is different to the world co-ordinate system stored in the AGI
       database with the new DATA picture.
 
       Various environment parameters are used to obtain options, etc. The
       names of these parameters are hard-wired into this subroutine in
-      order to ensure conformity between application.
+      order to ensure conformity between applications.
    }
    \sstinvocation{
       CALL KPG1\_PLOTP( IPICD, APP, MARGIN, NP, PNAME, PSIDE, PSIZE,
@@ -27813,17 +25348,17 @@ related items to be removed.
       \sstsubsection{
          BOX( 4 ) = DOUBLE PRECISION (Given)
       }{
-         The coordinates to be assigned to the bottom left, and top right
-         corners of the DATA picture in the AGI database (the coordinate
+         The co-ordinates to be assigned to the bottom-left, and top-right
+         corners of the DATA picture in the AGI database (the co-ordinate
          system in defined by argument DOMAIN). Only used if the new DATA
          picture is NOT being aligned with an existing DATA picture. Supplied
          in the order XLEFT, YBOTTOM, XRIGHT, YTOP. Note, the supplied
          bounds are stored in the AGI database, but do not effect the PGPLOT
          window on exit, which always has a world co-ordinate system of
-         millimetres from the bottom left corner of the view surface. If
-         the supplied box has zero area, then world coordinates for the
+         millimetres from the bottom-left corner of the view surface. If
+         the supplied box has zero area, then world co-ordinates for the
          DATA picture in the AGI database will be centimetres from the
-         bottom left corner of the DATA picture.
+         bottom-left corner of the DATA picture.
       }
       \sstsubsection{
          IPICD0 = INTEGER (Returned)
@@ -27833,7 +25368,7 @@ related items to be removed.
       \sstsubsection{
          IPICF = INTEGER (Returned)
       }{
-         An AGI identifier for the new FRAME picture. World coordinate system
+         An AGI identifier for the new FRAME picture. World co-ordinate system
          is inherited from the current picture on entry. If no FRAME picture
          is created then an identifier for the current picture on entry is
          returned.
@@ -27842,7 +25377,7 @@ related items to be removed.
          IPIC( NP ) = INTEGER (Returned)
       }{
          An array of AGI identifiers corresponding to the extra pictures
-         requested in ZSIDE and PSIZE. The world coordinate system for each
+         requested in ZSIDE and PSIZE. The world co-ordinate system for each
          picture is inherited from the FRAME picture. The actual size of a
          picture may be less than the requested size if there is insufficient
          room left in the FRAME picture to give it its requested size.
@@ -27865,7 +25400,7 @@ related items to be removed.
       }
    }
    \sstdiylist{
-      Parameters
+      Environment Parameters
    }{
       \sstsubsection{
          FILL = \_LOGICAL (Read)
@@ -41333,6 +38868,92 @@ related items to be removed.
    }
 }
 \sstroutine{
+   KPG\_STOSx
+}{
+   Calculates accurate order statistics by sorting an array
+}{
+   \sstdescription{
+      This routine calculates the median and optionally up to
+      one-hundred percentiles.  It achieves this by using Quicksort
+      to order the good array values, and hence provide correct values
+      (unlike the faster histogram approximation used by KPG1\_HSTAx).
+   }
+   \sstinvocation{
+      CALL KPG\_STOSx( EL, ARRAY, NGOOD, NUMPER, PERCNT,
+                      MEDIAN, PERVAL, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         EL = INTEGER (Given)
+      }{
+         Total number of pixels in the array.
+      }
+      \sstsubsection{
+         ARRAY( EL ) = ? (Given)
+      }{
+         The vectorised array of values whose ordered statistics are
+         to be calculated.
+      }
+      \sstsubsection{
+         NGOOD = INTEGER (Given)
+      }{
+         Number of valid pixels which contributed to the statistics.
+      }
+      \sstsubsection{
+         NUMPER = INTEGER (Given)
+      }{
+         Number of percentiles values to report.  This should be in
+         the range 1 to 100.  Set this to 1 and PERCNT(1) to VAL\_\_BADR
+         if percentiles are not required.
+      }
+      \sstsubsection{
+         PERCNT( NUMPER ) = REAL (Given)
+      }{
+         The percentiles to derive.  Valid percentiles must be in the
+         range 0.0 to 100.0, and preferably in ascending order.  If the
+         first element is set to the bad value, then no percentiles are
+         calculated.
+      }
+      \sstsubsection{
+         MEDIAN = DOUBLE PRECISION (Returned)
+      }{
+         Median value.  If there is an even number of good values
+         present in the array, the median is the average of the middle
+         pair.
+      }
+      \sstsubsection{
+         PERVAL( NUMPER ) = DOUBLE PRECISION (Returned)
+      }{
+         Percentile values corresponding to the percentile fractions
+         in PERCNT.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for double-precision, integer, and real data
+         types: replace {\tt "}x{\tt "} in the routine name by D, I, or R as
+         appropriate.  The data type of the ARRAY argument must match the
+         particular routine used.
+
+         \sstitem
+         If the value of NGOOD is not at least two, then this routine
+         will reported an error and abort.  The median and percentiles will
+         have the bad value.
+
+         \sstitem
+         The sorting is recorded in an index leaving the order of the
+         supplied array values intact.
+      }
+   }
+}
+\sstroutine{
    KPG1\_HDSKY
 }{
    Append a primitive HDS object to an AST KeyMap
@@ -41745,857 +39366,6 @@ related items to be removed.
          \sstitem
          If a .MORE.FITS extension already exists it will be completely
          replaced by this routine.
-      }
-   }
-}
-\sstroutine{
-   LPG1\_ADDTM
-}{
-   Copy temporary output NDFs totheir correct location
-}{
-   \sstdescription{
-      This routine replaces an output NDF name with a temporary NDF name
-      if the output NDF is already being used as an input NDF. It also
-      saves the association between the requested NDF and the temporary
-      NDF in a GRP group.
-   }
-   \sstinvocation{
-      CALL LPG1\_ADDTM( IGRP1, INDX, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         IGRP1 = INTEGER (Given)
-      }{
-         The GRP identifier for an NDG group holding the requested output
-         NDF specification.
-      }
-      \sstsubsection{
-         INDX = INTEGER (Given)
-      }{
-         The index within IGRP1 of the output NDF specification.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   LPG1\_PTPAR
-}{
-   Set the current value of a parameter equal to the contents of a
-   group
-}{
-   \sstdescription{
-      This routine sets the current value of a specified parameter equal
-      to a group expression which equates to the contents of a speified
-      group. Since a new value is stored for the parameter, the parameter
-      should not be given an access mode of READ in the interface file.
-
-      The group expresion is, either:
-         1) A list of group elements, delimited by the groups current
-         delimiter character
-
-      or, if the above string would be too long to use:
-
-         2) An indirection element refering to a new file created in the
-         users ADAM directory with a name of the form $<$param$>$\_values.
-   }
-   \sstinvocation{
-      CALL LPG1\_PTPAR( PARAM, IGRP, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         PARAM = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         The name of the parameter to use.
-      }
-      \sstsubsection{
-         IGRP = INTEGER (Given)
-      }{
-         The group to use.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   LPG1\_TIDY
-}{
-   Release resources and reset common block entries used to store
-   lists of data file names
-}{
-   \sstdescription{
-      Tidies the global variables used by LPG. See LPG\_AGAIN.
-   }
-   \sstinvocation{
-      CALL LPG1\_TIDY( STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         This routine attempts to execute even if an error has already
-         occurred.
-      }
-   }
-}
-\sstroutine{
-   LPG1\_TMPCP
-}{
-   Copy temporary output NDFs totheir correct location
-}{
-   \sstdescription{
-      This routine copies any temporary output NDFs created by the
-      previous invocation of the application to the locations specified
-      when the output parameter was acccessed. It should be called once
-      the application has completed.
-
-      Temporary output NDFs are created if the output NDF specified by
-      the parameter is currently in use by the application.
-   }
-   \sstinvocation{
-      CALL LPG1\_TMPCP( STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   LPG\_AGAIN
-}{
-   Decide if the application should be executed again
-}{
-   \sstdescription{
-      This routine is used to allow multiple invocations of an application
-      within an Starlink monolith to process a group of data files. The
-      initialization routine LPG\_START should be called prior to this
-      routine. This routine returns a logical flag indicating if the
-      application should be invoked again. A typical way to use this
-      routine within a monolith is as follows:
-
-         CALL LPG\_START( STATUS )
-         DO WHILE( LPG\_AGAIN( STATUS ) )
-            IF( ACTION .EQ. {\tt '}ADD{\tt '} ) THEN
-               CALL ADD( STATUS )
-            ELSE IF( ACTION .EQ. {\tt '}SUB{\tt '} ) THEN
-               CALL SUB( SATUS )
-            ELSE IF...
-            ...
-            END IF
-         END DO
-
-      The application corresponding to the required action will always be
-      invoked once. The applications should use the routines LPG\_ASSOC,
-      LPG\_PROP, LPG\_CREAT and LPG\_CREP to get identifier for NDFs, in
-      place of the usual routines from the NDF library. For catalogues,
-      routines LPG\_CATASSOC and LPG\_CATCREAT should be used in place of
-      CAT\_ASSOC and CAT\_CREAT.
-
-      LPG\_AGAIN returns a .TRUE. value until a group of data files is
-      exhausted, where-upon it deletes all its groups and returns a
-      .FALSE. value.
-
-      On the first invocation of the application, groups of data files are
-      obtained whenever one of the above LPG routines is used to get an NDF
-      or CAT identifier, and an identifier corresponding to the first name in
-      each group is returned to the application. On subsequent invocation,
-      the names in the groups obtained during the first invocation are used
-      without obtaining new parameter values from the environment. The
-      index of the returned data file within each group is increment by 1
-      each time the application is invoked.
-
-      If an application is invoked more than once, all other parameters
-      retain the values they had at the end of the first invocation.
-      Applications which use this scheme should avoid having parameters
-      with {\tt "}VPATH=DYNAMIC{\tt "} in the interace file, since the dynamic
-      default calculated on the first invocation will then be re-used for
-      all subsequent invocations, which may be inappropriate. A better
-      scheme is to have {\tt "}VPATH=DEFAULT{\tt "}, {\tt "}PPATH=DYNAMIC{\tt "} and {\tt "}DEFAULT=!{\tt "}.
-      The code should then annull any PAR\_\_NULL status after accessing
-      the parameter, and use the previously calculated dynamic default
-      value for the parameter. With this scheme, the parameter value is
-      {\tt "}!{\tt "} at the end of the first invocation, and so retains this value
-      for all subsequent invocations, resulting in appropriate dynamic
-      defaults being used.
-
-      A situation in which the above suggestion doesn{\tt '}t work is if an
-      application sometimes sets a dynamic default, and sometimes doesn{\tt '}t.
-      In this case, you do not want to have VPATH=DEFAULT,DEFAULT=! because
-      this would require the application to abort in the cases where there
-      is no dynamic default available. It is probably better in these
-      cases to have VPATH=PROMPT,PPATH=DYNAMIC and accept the fact that
-      the user will be prompted for a parameter which was previously
-      defaulted.
-
-      Some applications test to see if a parameter was specified on the
-      command line, and vary their behaviour accordingly. This is done by
-      checking the state of the parameter before accessing it, a state of
-      SUBPAR\_\_ACTIVE indicating that the parameter already has a value.
-      This is OK on the first invocation, but not on subsequent
-      invocations because the first invocation may have set a parameter
-      value, resulting in subsequent invocations thinking that the
-      parameter was given on the command line. To avoid this,
-      applications should use LPG\_STATE in place of PAR\_STATE. LPG\_STATE
-      remembers the state of the parameter on the first invocation, and
-      returns that state, rather than the current parameter state, on
-      subsequent invocations.
-   }
-   \sstinvocation{
-      RESULT = LPG\_AGAIN( STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-   \sstreturnedvalue{
-      \sstsubsection{
-         LPG\_AGAIN = LOGICAL
-      }{
-         .TRUE. if the application should be executed again.
-      }
-   }
-}
-\sstroutine{
-   LPG\_ASSOC
-}{
-   Obtain an identifier for an existing NDF via the parameter system
-}{
-   \sstdescription{
-      This routine should be called in place of NDF\_ASSOC within
-      applications which process groups of NDFs.
-
-      On the first invocation of the applicaton, a group of names of
-      existing NDFs will be obtained from the environment using the
-      specified parameter, and an NDF identifier for the first one
-      will be returned. If more than one NDF was supplied for the
-      parameter then the application may be invoked again (see
-      LPG\_AGAIN), in which case this routine will return an identifier
-      for the next NDF in the group supplied on the first invocation.
-
-      If an application attempts to get a new NDF by cancelling the
-      parameter (PAR\_CANCL), the returned NDF is NOT the next one in
-      the group, but is obtained by prompting the user for a single NDF.
-
-      The monolith routine should arrange to invoke the application
-      repeatedly until one or more of its NDF parameters have been
-      exhausted (i.e. all its values used). See NDF\_AGAIN.
-   }
-   \sstinvocation{
-      CALL LPG\_ASSOC( PARAM, MODE, INDF, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         PARAM = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         Name of the parameter.
-      }
-      \sstsubsection{
-         MODE = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         Type of NDF access required: {\tt '}READ{\tt '}, {\tt '}UPDATE{\tt '} or {\tt '}WRITE{\tt '}.
-      }
-      \sstsubsection{
-         INDF = INTEGER (Returned)
-      }{
-         NDF identifier.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   LPG\_CATASSOC
-}{
-   Obtain an identifier for an existing catalogue via the parameter
-   system
-}{
-   \sstdescription{
-      This routine should be called in place of CAT\_ASSOC within
-      applications which process groups of catalogues.
-
-      On the first invocation of the applicaton, a group of names of
-      existing catalogues will be obtained from the environment using the
-      specified parameter, and a CAT identifier for the first one
-      will be returned. If more than one catalogue was supplied for the
-      parameter then the application may be invoked again (see
-      LPG\_AGAIN), in which case this routine will return an identifier
-      for the next catalogue in the group supplied on the first invocation.
-
-      If an application attempts to get a new catalogue by cancelling the
-      parameter (PAR\_CANCL), the returned catalogue is NOT the next one in
-      the group, but is obtained by prompting the user for a single catalogue.
-
-      The monolith routine should arrange to invoke the application
-      repeatedly until one or more of its catalogue parameters have been
-      exhausted (i.e. all its values used). See CAT\_AGAIN.
-   }
-   \sstinvocation{
-      CALL LPG\_CATASSOC( PARAM, MODE, CI, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         PARAM = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         Name of the parameter.
-      }
-      \sstsubsection{
-         MODE = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         Type of catalogue access required: {\tt '}READ{\tt '}, or {\tt '}WRITE{\tt '}.
-      }
-      \sstsubsection{
-         CI = INTEGER (Returned)
-      }{
-         catalogue identifier.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   LPG\_CATCREAT
-}{
-   Create a new catalogue via the parameter system
-}{
-   \sstdescription{
-      This routine should be called in place of CAT\_CREAT within
-      applications which process lists of catalogues.
-
-      On the first invocation of the applicaton, a group of names for
-      some new catalogues will be obtained from the environment using the
-      specified parameter. The first name will be used to create an catalogue
-      with the requested attributes, and an identifier for the new catalogue
-      will be returned. If more than one name was supplied for the parameter
-      then the application may be invoked again (see LPG\_AGAIN), in which
-      case this routine will return an identifier for a new catalogue with the
-      next name in the group supplied on the first invocation.
-
-      If a modification element is included in the group expression
-      supplied for the parameter on the first invocation of the
-      application, the new catalogue names are based on the names of the
-      first group of existing data files (catalogues or NDFs) to be
-      accessed by the application.
-
-      If an application attempts to get a new catalogue by cancelling the
-      parameter (PAR\_CANCL), the name used to create the returned catalogue
-      is NOT the next one in the group, but is obtained by prompting the
-      user for a single new catalogue.
-
-      The monolith routine should arrange to invoke the application
-      repeatedly until one or more of its catalogue parameters have been
-      exhausted (i.e. all its values used). See CAT\_AGAIN.
-   }
-   \sstinvocation{
-      CALL LPG\_CATCREAT( PARAM, CI, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         PARAM = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         Name of the parameter.
-      }
-      \sstsubsection{
-         CI = INTEGER (Returned)
-      }{
-         catalogue identifier.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   LPG\_CREA1
-}{
-   Create a single new simple NDF using a specified parameter
-}{
-   \sstdescription{
-      This routine is equivalent to NDF\_CREAT except that it allows the
-      NDF to be specified using a GRP group expression (for instance, its
-      name may be given within a text file, etc). The first NDF in the
-      group expression is returned. Any other names in the group
-      expression are ignored. Any modification elements in the supplied
-      group expression will be treated literally.
-   }
-   \sstinvocation{
-      CALL LPG\_CREA1( PARAM, FTYPE, NDIM, LBND, UBND, INDF, NAME,
-                      STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         PARAM = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         Name of the ADAM parameter.
-      }
-      \sstsubsection{
-         FTYPE = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         Full data type of the NDF{\tt '}s DATA component (e.g. {\tt '}\_DOUBLE{\tt '} or
-         {\tt '}COMPLEX\_REAL{\tt '}).
-      }
-      \sstsubsection{
-         NDIM = INTEGER (Given)
-      }{
-         Number of NDF dimensions.
-      }
-      \sstsubsection{
-         LBND( NDIM ) = INTEGER (Given)
-      }{
-         Lower pixel-index bounds of the NDF.
-      }
-      \sstsubsection{
-         UBND( NDIM ) = INTEGER (Given)
-      }{
-         Upper pixel-index bounds of the NDF.
-      }
-      \sstsubsection{
-         INDF = INTEGER (Returned)
-      }{
-         NDF identifier.
-      }
-      \sstsubsection{
-         NAME = CHARACTER $*$ ( $*$ ) (Returned)
-      }{
-         The full file specification for the NDF.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   LPG\_CREAT
-}{
-   Create a new simple NDF via the parameter system
-}{
-   \sstdescription{
-      This routine should be called in place of NDF\_CREAT within
-      applications which process lists of NDFs.
-
-      On the first invocation of the applicaton, a group of names for
-      some new NDFs will be obtained from the environment using the
-      specified parameter. The first name will be used to create an NDF
-      with the requested attributes, and an identifier for the new NDF will
-      be returned. If more than one name was supplied for the parameter
-      then the application may be invoked again (see LPG\_AGAIN), in which
-      case this routine will return an identifier for a new NDF with the
-      next name in the group supplied on the first invocation.
-
-      If a modification element is included in the group expression
-      supplied for the parameter on the first invocation of the
-      application, the new NDF names are based on the names of the
-      first group of existing data files (NDFs or catalogues) to be
-      accessed by the application.
-
-      If an application attempts to get a new NDF by cancelling the
-      parameter (PAR\_CANCL), the name used to create the returned NDF is
-      NOT the next one in the group, but is obtained by prompting the
-      user for a single new NDF.
-
-      The monolith routine should arrange to invoke the application
-      repeatedly until one or more of its NDF parameters have been
-      exhausted (i.e. all its values used). See NDF\_AGAIN.
-   }
-   \sstinvocation{
-      CALL LPG\_CREAT( PARAM, FTYPE, NDIM, LBND, UBND, INDF, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         PARAM = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         Name of the parameter.
-      }
-      \sstsubsection{
-         FTYPE = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         Full data type of the NDF{\tt '}s DATA component (e.g. {\tt '}\_DOUBLE{\tt '} or
-         {\tt '}COMPLEX\_REAL{\tt '}).
-      }
-      \sstsubsection{
-         NDIM = INTEGER (Given)
-      }{
-         Number of NDF dimensions.
-      }
-      \sstsubsection{
-         LBND( NDIM ) = INTEGER (Given)
-      }{
-         Lower pixel-index bounds of the NDF.
-      }
-      \sstsubsection{
-         UBND( NDIM ) = INTEGER (Given)
-      }{
-         Upper pixel-index bounds of the NDF.
-      }
-      \sstsubsection{
-         INDF = INTEGER (Returned)
-      }{
-         NDF identifier.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   LPG\_CREP1
-}{
-   Create a single new primitive NDF using a specified parameter
-}{
-   \sstdescription{
-      This routine is equivalent to NDF\_CREP except that it allows the
-      NDF to be specified using a GRP group expression (for instance, its
-      name may be given within a text file, etc). The first NDF in the
-      group expression is returned. Any other names in the group
-      expression are ignored. Any modification elements in the supplied
-      group expression will be treated literally.
-   }
-   \sstinvocation{
-      CALL LPG\_CREP1( PARAM, FTYPE, NDIM, UBND, INDF, NAME, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         PARAM = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         Name of the ADAM parameter.
-      }
-      \sstsubsection{
-         FTYPE = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         Type of the NDF{\tt '}s DATA component (e.g. {\tt '}\_REAL{\tt '}). Note that
-         complex types are not permitted when creating a primitive NDF.
-      }
-      \sstsubsection{
-         NDIM = INTEGER (Given)
-      }{
-         Number of NDF dimensions.
-      }
-      \sstsubsection{
-         UBND( NDIM ) = INTEGER (Given)
-      }{
-         Upper pixel-index bounds of the NDF (the lower bound of each
-         dimension is taken to be 1).
-      }
-      \sstsubsection{
-         INDF = INTEGER (Returned)
-      }{
-         NDF identifier.
-      }
-      \sstsubsection{
-         NAME = CHARACTER $*$ ( $*$ ) (Returned)
-      }{
-         The full file specification for the NDF.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   LPG\_CREP
-}{
-   Create a new primitive NDF via the parameter system
-}{
-   \sstdescription{
-      This routine should be called in place of NDF\_CREP within
-      applications which process lists of NDFs.
-
-      On the first invocation of the applicaton, a group of names for
-      some new NDFs will be obtained from the environment using the
-      specified parameter. The first name will be used to create an NDF
-      with the requested attributes, and an identifier for the new NDF will
-      be returned. If more than one name was supplied for the parameter
-      then the application may be invoked again (see LPG\_AGAIN), in which
-      case this routine will return an identifier for a new NDF with the
-      next name in the group supplied on the first invocation.
-
-      If a modification element is included in the group expression
-      supplied for the parameter on the first invocation of the
-      application, the new NDF names are based on the names of the
-      first group of existing data files (NDFs or catalogues) to be
-      accessed by the application.
-
-      If an application attempts to get a new NDF by cancelling the
-      parameter (PAR\_CANCL), the name used to create the returned NDF is
-      NOT the next one in the group, but is obtained by prompting the
-      user for a single new NDF.
-
-      The monolith routine should arrange to invoke the application
-      repeatedly until one or more of its NDF parameters have been
-      exhausted (i.e. all its values used). See NDF\_AGAIN.
-   }
-   \sstinvocation{
-      CALL LPG\_CREP( PARAM, FTYPE, NDIM, UBND, INDF, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         PARAM = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         Name of the parameter.
-      }
-      \sstsubsection{
-         FTYPE = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         Type of the NDF{\tt '}s DATA component (e.g. {\tt '}\_REAL{\tt '}). Note that
-         complex types are not permitted when creating a primitive NDF.
-      }
-      \sstsubsection{
-         NDIM = INTEGER (Given)
-      }{
-         Number of NDF dimensions.
-      }
-      \sstsubsection{
-         UBND( NDIM ) = INTEGER (Given)
-      }{
-         Upper pixel-index bounds of the NDF (the lower bound of each
-         dimension is taken to be 1).
-      }
-      \sstsubsection{
-         INDF = INTEGER (Returned)
-      }{
-         NDF identifier.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   LPG\_PROP1
-}{
-   Create a single new NDF by propagation using a specified parameter
-}{
-   \sstdescription{
-      This routine is equivalent to NDF\_PROP except that it allows the
-      NDF to be specified using a GRP group expression (for instance, its
-      name may be given within a text file, etc). The first NDF in the
-      group expression is returned. Any other names in the group
-      expression are ignored. Modification elements use the name of the
-      supplied NDF as the basis name.
-   }
-   \sstinvocation{
-      CALL LPG\_PROP1( INDF1, CLIST, PARAM, INDF2, NAME, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         INDF1 = INTEGER (Given)
-      }{
-         Identifier for an existing NDF (or NDF section) to act as a
-         template.
-      }
-      \sstsubsection{
-         CLIST = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         A comma-separated list of the NDF components which are to be
-         propagated to the new data structure. By default, the HISTORY,
-         LABEL and TITLE components and all extensions are propagated.
-         See the {\tt "}Component Propagation{\tt "} section for further details.
-      }
-      \sstsubsection{
-         PARAM = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         Name of the ADAM parameter for the new NDF.
-      }
-      \sstsubsection{
-         INDF2 = INTEGER (Returned)
-      }{
-         Identifier for the new NDF.
-      }
-      \sstsubsection{
-         NAME = CHARACTER $*$ ( $*$ ) (Returned)
-      }{
-         The full file specification for the NDF.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   LPG\_PROP
-}{
-   Propagate NDF information to create a new NDF via the
-   parameter system
-}{
-   \sstdescription{
-      This routine should be called in place of NDF\_PROP within
-      applications which process groups of NDFs.
-
-      On the first invocation of the applicaton, a group of names for
-      some new NDFs will be obtained from the environment using the
-      specified parameter. The first name will be used to create an NDF
-      by propagation from INDF1, and an identifier for the new NDF will
-      be returned. If more than one name was supplied for the parameter
-      then the application may be invoked again (see LPG\_AGAIN), in which
-      case this routine will return an identifier for a new NDF with the
-      next name in the group supplied on the first invocation.
-
-      If a modification element is included in the group expression
-      supplied for the parameter on the first invocation of the
-      application, the new NDF names are based on the names of the
-      first group of existing data files (NDFs or catalogues) to be
-      accessed by the application.
-
-      If an application attempts to get a new NDF by cancelling the
-      parameter (PAR\_CANCL), the name used to create the returned NDF is
-      NOT the next one in the group, but is obtained by prompting the
-      user for a single new NDF.
-
-      The monolith routine should arrange to invoke the application
-      repeatedly until one or more of its NDF parameters have been
-      exhausted (i.e. all its values used). See NDF\_AGAIN.
-   }
-   \sstinvocation{
-      CALL LPG\_PROP( INDF1, CLIST, PARAM, INDF2, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         INDF1 = INTEGER (Given)
-      }{
-         Identifier for an existing NDF (or NDF section) to act as a
-         template.
-      }
-      \sstsubsection{
-         CLIST = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         A comma-separated list of the NDF components which are to be
-         propagated to the new data structure. By default, the HISTORY,
-         LABEL and TITLE components and all extensions are propagated.
-         See the {\tt "}Component Propagation{\tt "} section in the documentation
-         for routine NDF\_PROP within SUN/33 for further details.
-      }
-      \sstsubsection{
-         PARAM = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         Name of the parameter for the new NDF.
-      }
-      \sstsubsection{
-         INDF2 = INTEGER (Returned)
-      }{
-         Identifier for the new NDF.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   LPG\_REPLA
-}{
-   Indicate if input NDFs can be replaced
-}{
-   \sstdescription{
-      Sets a flag indicating if LPG applications can use a single NDF as
-      both input and output. If so, a temporary NDF is used to store
-      the output. This NDF is then used to replace the existing input NDF once
-      the application has completed. If REPLAC is .FALSE. (the default), an
-      error is reported if an attempt is made to use a single NDF as both input
-      and output.
-   }
-   \sstinvocation{
-      CALL LPG\_REPLA( REPLAC, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         REPLAC = LOGICAL (Given)
-      }{
-         If .TRUE., a single NDF can be used as both input and output
-         from an application. If .FALSE., an error will be reported if this
-         is attempted.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   LPG\_START
-}{
-   Initialise the contents of the LPG common blocks
-}{
-   \sstdescription{
-      Initialises the global variables used by LPG. See LPG\_AGAIN.
-   }
-   \sstinvocation{
-      CALL LPG\_START( VERBO, DELAYO, DISABO, REPLA0, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         VERBO = LOGICAL (Given)
-      }{
-         If .TRUE. then the name of the data file being used for each
-      }
-   }
-}
-\sstroutine{
-   LPG\_STATE
-}{
-   Return the original PAR state of a parameter
-}{
-   \sstdescription{
-      On the first invocation of the application, this routines returns
-      the current PAR state of specified parameter and stores it in
-      common. On subsequent invocations, the stored state is returned
-      rather than the current state.
-   }
-   \sstinvocation{
-      CALL LPG\_STATE( PARAM, STATE, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         PARAM = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         The parameter name.
-      }
-      \sstsubsection{
-         STATE = INTEGER (Returned)
-      }{
-         The original PAR state of the parameter.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
       }
    }
 }
