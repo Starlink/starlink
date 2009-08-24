@@ -52,7 +52,7 @@
 
 #  Copyright:
 #     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
-#     Copyright (C) 2008 Science and Technology Facilities Council.
+#     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -231,15 +231,25 @@ itcl::class gaia::GaiaSpectralPlot {
       add_menu_short_help $Options {Positive Y only}  \
          {Only range positive Y coordinates (useful when Log Y axis enabled)}
 
-      #   Display cordinate label.
+      #   Display coordinate label.
       $Options add checkbutton \
          -label {Coordinate label} \
-         -variable [scope itk_option(-show_label)] \
+         -variable [scope show_label_] \
          -onvalue 1 \
          -offvalue 0 \
          -command [code $this toggle_show_label_]
       add_menu_short_help $Options {Coordinate label}  \
          {Show the extraction coordinates of the spectrum}
+
+      #   Show prefix as part of the coordinate label.
+      $Options add checkbutton \
+         -label {Full coordinate label} \
+         -variable [scope show_full_label_] \
+         -onvalue 1 \
+         -offvalue 0 \
+         -command [code $this toggle_show_label_]
+      add_menu_short_help $Options {Full coordinate label}  \
+         {Prefix coordinates of the spectrum with filename}
 
       #  Reset all saved attributes to their defaults.
       $Options add command -label "Reset" \
@@ -763,9 +773,12 @@ itcl::class gaia::GaiaSpectralPlot {
 
    #  Set the value of the label. This is optional can be any string, but
    #  is expected to be the coordinates of the spectrum, when appropriate.
-   #  Set to blank to remove.
+   #  Set to blank to remove. Note this will have any -prefix added.
    public method update_label {value} {
-      if { $itk_option(-show_label) } {
+      if { $show_label_ } {
+         if { $itk_option(-label_prefix) != {} && $show_full_label_ } {
+            set value "$itk_option(-label_prefix): $value"
+         }
          if { $label_ == {} } {
             $itk_component(draw) set_drawing_mode text \
                [code $this created_label_ $value]
@@ -797,12 +810,16 @@ itcl::class gaia::GaiaSpectralPlot {
 
    #  Remove the label, if not wanted.
    protected method toggle_show_label_ {} {
-      if { ! $itk_option(-show_label) } {
+      if { ! $show_label_ } {
          if { $label_ != {} } {
             $itk_component(canvas) delete $label_
             set label_ {}
          }
       }
+      $props_ set_named_property GaiaSpectralPlot \
+         show_label_ $show_label_
+      $props_ set_named_property GaiaSpectralPlot \
+         show_full_label_ $show_full_label_
    }
 
    #===========================================================================
@@ -1294,6 +1311,9 @@ itcl::class gaia::GaiaSpectralPlot {
       set_refspeccolour "green"
       set_background "black"
       set_ref_line_colour 1 "red"
+      set show_label_ 0
+      set show_full_label_ 0
+      toggle_show_label_
    }
 
    #  Return the canvas id of the spectral plot.
@@ -1447,9 +1467,6 @@ itcl::class gaia::GaiaSpectralPlot {
    #  the new world coordinates.
    itk_option define -ref_range_changed_cmd ref_range_changed_cmd Ref_Range_Changed_Cmd {}
 
-   #  Whether to show the label or not.
-   itk_option define -show_label show_label Show_Label 0
-
    #  Command to execute when the colour of the spectral line is changed.
    #  The result will be appended by "spectrum" or "reference" and the
    #  new colour.
@@ -1478,6 +1495,9 @@ itcl::class gaia::GaiaSpectralPlot {
       }
    }
 
+   #  A prefix for the label. Usually dataset name etc.
+   itk_option define -label_prefix label_prefix Label_Prefix {}
+
    #  Protected variables: (available to instance)
    #  --------------------
 
@@ -1486,6 +1506,10 @@ itcl::class gaia::GaiaSpectralPlot {
 
    #  The label.
    protected variable label_ {}
+
+   #  Whether to show the label or not.
+   protected variable show_label_ 0
+   protected variable show_full_label_ 0
 
    #  The font to use when drawing the axes (AST integer).
    protected variable axes_font_ 0

@@ -40,7 +40,7 @@
 
 #  Copyright:
 #     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
-#     Copyright (C) 2008 Science and Technology Facilities Council.
+#     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -398,7 +398,8 @@ itcl::class gaia::GaiaCubeSpectrum {
                 -transient $itk_option(-transient_spectralplot) \
                 -fix_data_range $itk_option(-fix_data_range) \
                 -data_high $itk_option(-data_high) \
-                -data_low $itk_option(-data_low)]
+                -data_low $itk_option(-data_low) \
+                -label_prefix [$cube get_ndfname]]
 
          #  Make this a transient of main window, not this one.
          if { $itk_option(-transient_spectralplot) } {
@@ -408,6 +409,8 @@ itcl::class gaia::GaiaCubeSpectrum {
          #  Already have a plot, re-display if withdrawn.
          if { [wm state $spectrum_] == "withdrawn" } {
             $spectrum_ open
+            $spectrum_ configure -label_prefix \
+               [$itk_option(-gaiacube) get_ndfname]
          }
       }
    }

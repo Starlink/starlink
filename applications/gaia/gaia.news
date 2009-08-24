@@ -33,6 +33,13 @@
     displayed by a Skycat catalogue window. Previously this could only
     be done using the graphics toolbox facilities.
 
+    The optional coordinate label in the spectral extraction plot can
+    now have the filename displayed as a prefix to the coordinates of 
+    the extraction. To enable this select the "Full coordinate label"
+    item in the "Options" menu. Note that this and the old "Coordinate label"
+    are now session persistent.
+
+
     Version 4.3-1
     =============
 
