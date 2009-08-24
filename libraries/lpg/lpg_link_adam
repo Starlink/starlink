@@ -2,11 +2,11 @@
 #  N.B. the previous line should be blank.
 #+
 #  Name:
-#     lpg_link
+#     lpg_link_adam
 
 #  Purpose:
 #     Generate linker (ld) arguments for linking standalone version
-#     of IRQ library.
+#     of LPG library.
 
 #  Type of Module:
 #     Shell script.
@@ -43,11 +43,16 @@
 #        Generic version.
 #     2009 August 11 (MJC):
 #        Original LPG version.
+#     2009 August 24 (MJC):
+#        Revert to Plan A and have lpg_link_adam (no lpg_link).
 #     {enter_further_changes_here}
 
 #-
 
-      echo -llpg `ndf_link` `chr_link` `prm_link` `ctg_link` \
+#  Echo the LPG library reference, followed by the list of options for
+#  packages on which the LPG library depends.  Pass the result through an
+#  awk script to remove duplicate library references.
+      echo -llpg `ndf_link_adam` `chr_link_adam` `prm_link_adam` `ctg_link_adam` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
