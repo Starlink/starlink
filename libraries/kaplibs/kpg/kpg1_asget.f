@@ -55,11 +55,12 @@
 *     If the original Current Frame has less than NDIM axes, then simple
 *     axes are added into the new Current Frame to make up a total of
 *     NDIM. These axes are given the value 1.0.
-
-*  Parameters:
-*     The name of the following environment parameter(s) are hard-wired 
-*     into this subroutine in order to ensure conformity between application. 
 *
+*     Various environment parameters may be used to obtain options, etc. The
+*     names of these parameters are hard-wired into this subroutine in
+*     order to ensure conformity between applications. 
+
+*  Environment Parameters:
 *     USEAXIS = LITERAL (Read)
 *        A set of NDIM axes to be selected from the Current Frame. Each 
 *        axis can be specified either by giving its index within the Current 

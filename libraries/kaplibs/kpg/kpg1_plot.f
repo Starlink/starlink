@@ -63,9 +63,9 @@
 *
 *     Various environment parameters are used to obtain options, etc. The
 *     names of these parameters are hard-wired into this subroutine in
-*     order to ensure conformity between application. 
+*     order to ensure conformity between applications. 
 
-*  Parameters:
+*  Environment Parameters:
 *     CLEAR = _LOGICAL (Read)
 *        TRUE if the graphics device is to be cleared on opening. See
 *        argument STAT.

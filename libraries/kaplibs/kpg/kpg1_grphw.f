@@ -27,11 +27,12 @@
 *
 *       CALL AST_ANNUL( IPLOT, STATUS )
 *       CALL KPG_PGCLS( 'DEVICE', .FALSE., STATUS )
+*
+*     Various environment parameters are used to obtain options, etc. The
+*     names of these parameters are hard-wired into this subroutine in
+*     order to ensure conformity between applications. 
 
 *  Environment Parameters:
-*     The following envirnment parameter names are used by this routine,
-*     to encourage uniformity in parameter naming, and behaviour:
-*
 *        AXES = _LOGICAL (Read)
 *           TRUE if annotated axes are to be produced.
 *        CLEAR = _LOGICAL (Read)

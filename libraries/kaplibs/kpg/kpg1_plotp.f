@@ -31,9 +31,9 @@
 *
 *     Various environment parameters are used to obtain options, etc. The
 *     names of these parameters are hard-wired into this subroutine in
-*     order to ensure conformity between application. 
+*     order to ensure conformity between applications. 
 
-*  Parameters:
+*  Environment Parameters:
 *     FILL = _LOGICAL (Read)
 *        TRUE if the supplied aspect ratio is to be ignored, creating the 
 *        largest possible DATA picture within the current picture.  When 

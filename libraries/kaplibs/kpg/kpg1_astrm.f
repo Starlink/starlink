@@ -60,11 +60,12 @@
 *     the Ident attribute of the new Frame, and is also appended to the
 *     end of the Frame's Domain. The new Frame corresponding to the lowest 
 *     numbered ROI Region is left as the current Frame on exit.
-
-*  Parameters:
-*     The name of the following environment parameter(s) are hard-wired 
-*     into this subroutine in order to ensure conformity between application. 
 *
+*     Various environment parameters may be used to obtain options, etc. The
+*     names of these parameters are hard-wired into this subroutine in
+*     order to ensure conformity between applications. 
+
+*  Environment Parameters:
 *     USEAXIS = LITERAL (Read)
 *        A set of NDIM axes to be selected from the current Frame. Each 
 *        axis can be specified either by giving its index within the current 
