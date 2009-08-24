@@ -2,7 +2,7 @@
 #  N.B. the previous line should be blank.
 #+
 #  Name:
-#     ctg_link
+#     ctg_link_adam
 
 #  Purpose:
 #     Generate linker (ld) arguments for linking against the ADAM version
@@ -17,12 +17,12 @@
 #     for the compiler (or ld) command.  The arguments generated are written
 #     to the standard output.
 #
-#     Note that there is no ctg_link_adam.
+#     Note that there is no ctg_link.
 
 #  Invocation:
 #     The script may be invoked as part of a command such as:
 #
-#        alink program.f -L/star/lib `ctg_link`
+#        alink program.f -L/star/lib `ctg_link_adam`
 
 #  Copyright:
 #     Copyright (C) 1994 Science & Engineering Research Council.
@@ -54,6 +54,8 @@
 #        Original template.
 #     2009 August 9 (MJC):
 #        Initial CTG version.
+#     2009 August 24 (MJC):
+#        Revert to Plan A and have ctg_link_adam (no ctg_link).
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -64,7 +66,8 @@
 #  Echo the CTG library reference, followed by the list of options for
 #  packages on which the CTG library depends.  Pass the result through an
 #  awk script to remove duplicate library references.
-echo -lctg `grp_link` `cat_link` `one_link` `chr_link` `psx_link` \
+echo -lctg `grp_link_adam` `cat_link_adam` `one_link_adam` \
+`chr_link_adam` `psx_link_adam` \
 | awk '{for(f=NF;f;f--)if(!w[$f]++)l=$f" "l;print l}'
 
 #  End of script.
