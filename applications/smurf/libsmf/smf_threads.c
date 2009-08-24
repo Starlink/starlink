@@ -169,13 +169,14 @@ int smf_add_job( smfWorkForce *workforce, int flags, void *data,
 *        should be returned if the job may modify global data that is 
 *        already being modified as part of another currently active job. If 
 *        zero is returned, the checker MUST use the smf_wait_on_job function 
-*        to indicate which jobs have to be completed before this job can run. 
-*        The job will then be postponed until those jobs have completed. The
-*        arguments supplied to the checker are 1) the integer identifier for 
-*        the job being checked, 2) a pointer to the workforce, and 3) an 
-*        inherited status pointer. The function should return a non-zero value 
-*        if an error occurs. If a NULL pointer is supplied for "checker", the 
-*        job will start as soon as a worker is available to carry it out.
+*        to indicate a job that has to be completed before this job can be
+*        re-considered. The job will then be postponed until those jobs have 
+*        completed. The arguments supplied to the checker are 1) the integer 
+*        identifier for the job being checked, 2) a pointer to the workforce, 
+*        and 3) an inherited status pointer. The function should return a 
+*        non-zero value if an error occurs. If a NULL pointer is supplied 
+*        for "checker", the job will start as soon as a worker is available 
+*        to carry it out.
 *     status
 *        Pointer to the inherited status value.
 
@@ -719,12 +720,15 @@ void smf_wait_on_job( smfWorkForce *workforce, int ijob1, int ijob2,
 *        Pointer to the inherited status value.
 
 *  Description:
-*     This function stores a pointer to job1 within job2. The consequence
-*     of this is that no attempt to run job1 will be made until job2 has 
-*     completed.
-*
 *     This function is normally called from within a job checker function
-*     (see smf_add_job).
+*     (see smf_add_job). It indicates that job1 should not be run until job2 
+*     has completed. When job2 has completed, the checker function associated
+*     with job1 (see smf_add_job) will be re-invoked to see if job1 can
+*     then be run. If job1 depends on some other job being completed (in
+*     addition to job2) then this re-invocation of the checker function
+*     should return zero and indicate another job that must be run before 
+*     job1 can be run.
+*
 
 */
 
