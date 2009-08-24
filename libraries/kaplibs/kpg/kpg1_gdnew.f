@@ -29,7 +29,7 @@
 *     which allows all the requested ancillary pictures to be created within 
 *     the FRAME picture.
 *
-*     Various environment parameters are used to obtain options, etc. The
+*     Various environment parameters may be used to obtain options, etc. The
 *     names of these parameters are hard-wired into this subroutine in
 *     order to ensure conformity between application. 
 

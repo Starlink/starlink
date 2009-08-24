@@ -5,7 +5,7 @@
 *     KPG1_PLOTA
 
 *  Purpose:
-*     Open the graphics device and see if there is an existing DATA 
+*     Opens the graphics device and see if there is an existing DATA 
 *     picture with which the new DATA picture could be aligned.
 
 *  Language:
@@ -42,8 +42,8 @@
 *        and Base Frames are unchanged on exit. If an existing DATA picture
 *        was created by a non-AST application it will not have a Plot
 *        stored with it. A default Plot will be created in this case,
-*        containing 2 Frames; a GRAPHICS Frame corresponding to millimetres 
-*        from the bottom left corner of the view surface, and a Frame 
+*        containing two Frames; a GRAPHICS Frame corresponding to millimetres 
+*        from the bottom-left corner of the view surface, and a Frame 
 *        corresponding to AGI world co-ordinates. The AGI database does not 
 *        contain any information describing world co-ordinates and so such 
 *        information must be supplied by the calling application, on some 
@@ -275,7 +275,7 @@
 *  based application), then a default Plot will be created containing a 
 *  GRAPHICS Frame, and a Frame representing AGI world co-ordinates (the Frame 
 *  identified above is used for this purpose). The world co-ordinates in the 
-*  PGPLOT window is set to millimetres from the bottom left corner of the 
+*  PGPLOT window is set to millimetres from the bottom-left corner of the 
 *  view surface, which corresponds to the Base (GRAPHICS) Frame in the 
 *  returned Plot. 
          CALL KPG1_GDGET( IPICD, FRM, .FALSE., IPLOT, STATUS )

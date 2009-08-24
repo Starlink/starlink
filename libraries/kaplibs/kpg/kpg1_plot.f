@@ -6,7 +6,7 @@
 *     KPG1_PLOT
 
 *  Purpose:
-*     Prepare for graphics output.
+*     Prepares for graphics output.
 
 *  Language:
 *     Starlink Fortran 77
@@ -47,8 +47,8 @@
 *     On exit, the current PGPLOT viewport corresponds to area occupied by
 *     the new DATA picture. The bounds of the PGPLOT window produce a 
 *     world co-ordinate system within the viewport corresponding to the 
-*     Base Frame in the returned Plot (i.e. millimetres from the bottom left 
-*     corner of the view surface - NOT pixel coordinates). Note, this is
+*     Base Frame in the returned Plot (i.e. millimetres from the bottom-left 
+*     corner of the view surface - NOT pixel co-ordinates). Note, this is
 *     different to the world co-ordinate system stored in the AGI database 
 *     with the new DATA picture.
 *
@@ -150,27 +150,27 @@
 *        The Domain name corresponding to the AGI world co-ordinates. If a 
 *        blank value is supplied then "AGI_WORLD" will be used.
 *     BOX( 4 ) = DOUBLE PRECISION (Given)
-*        The coordinates to be assigned to the bottom left, and top right 
-*        corners of the DATA picture in the AGI database (the coordinate 
+*        The co-ordinates to be assigned to the bottom-left, and top-right 
+*        corners of the DATA picture in the AGI database (the co-ordinate 
 *        system in defined by argument DOMAIN). Only used if the new DATA 
 *        picture is NOT being aligned with an existing DATA picture. Supplied 
 *        in the order XLEFT, YBOTTOM, XRIGHT, YTOP. Note, the supplied
 *        bounds are stored in the AGI database, but do not effect the PGPLOT
 *        window on exit, which always has a world co-ordinate system of
-*        millimetres from the bottom left corner of the view surface. If
-*        the supplied box has zero area, then world coordinates for the
+*        millimetres from the bottom-left corner of the view surface. If
+*        the supplied box has zero area, then world co-ordinates for the
 *        DATA picture in the AGI database will be centimetres from the
-*        bottom left corner of the DATA picture.
+*        bottom-left corner of the DATA picture.
 *     IPICD = INTEGER (Returned)
 *        An AGI identifier for the new DATA picture.
 *     IPICF = INTEGER (Returned)
-*        An AGI identifier for the new FRAME picture. World coordinate system
+*        An AGI identifier for the new FRAME picture. World co-ordinate system
 *        is inherited from the current picture on entry. If no FRAME picture 
 *        is created then an identifier for the current picture on entry is
 *        returned.
 *     IPIC( NP ) = INTEGER (Returned)
 *        An array of AGI identifiers corresponding to the extra pictures
-*        requested in PSIDE and PSIZE. The world coordinate system for each
+*        requested in PSIDE and PSIZE. The world co-ordinate system for each
 *        picture is inherited from the FRAME picture. The actual size of a 
 *        picture may be less than the requested size if there is insufficient 
 *        room left in the FRAME picture to give it its requested size. 

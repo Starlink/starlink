@@ -77,17 +77,17 @@
 *           same value is used for both limits. If no values are supplied, 
 *           both values default to 3.0.
 *                 
-*        The above strings can be abbreviated to one character.
+*           The above strings can be abbreviated to one character.
 *        MARGIN( 4 ) = _REAL (Read)
 *           The widths of the margins to leave for axis annotation, given 
-*           as fractions of the corresponding dimension of the current picture. 
+*           as fractions of the corresponding dimension of the current picture.
 *           Four values may be given, in the order - bottom, right, top, left. 
 *           If less than four values are given, extra values are used equal to 
 *           the first supplied value. If these margins are too narrow any axis 
 *           annotation may be clipped. The dynamic default is 0.15 (for all 
 *           edges) if either annotated axes or a key are produced, and zero 
 *           otherwise. 
-*        MARKER = INTEGER )Read)
+*        MARKER = _INTEGER (Read)
 *           The PGPLOT marker type to use. Only accessed if MODE is 3 or 5.
 *        STYLE = GROUP (Read)
 *           A description of the plotting style required. The following 

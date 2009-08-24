@@ -27,14 +27,13 @@
 *       CALL AST_ANNUL( IPLOT, STATUS )
 *       CALL AGP_DEASS( 'DEVICE', .FALSE., STATUS )
 
-*  Environment Parameters:
-*     Various envirnment parameter names are used by this routine,
+*     Various environment parameter names are used by this routine,
 *     to encourage uniformity in parameter naming, and behaviour.
 *     See KPG1_GRPHW for details.
 
 *  Arguments:
 *     N = INTEGER (Given)
-*        No. of points
+*        Number of points
 *     X( N ) = REAL (Given)
 *        X value at each point.
 *     Y( N ) = REAL (Given)

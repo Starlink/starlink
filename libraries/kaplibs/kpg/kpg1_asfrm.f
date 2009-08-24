@@ -19,7 +19,7 @@
 *     This routine allows the user to specify a new Current Frame for a 
 *     FrameSet using an environment parameter.
 
-*  ADAM Parameters:
+*  Environment Parameters:
 *     %PARAM = LITERAL (Read)
 *        A string specifying the new co-ordinate Frame. If a null parameter 
 *        value is supplied, then the error is annulled and the current Frame 
@@ -36,7 +36,7 @@
 *
 *        - An IRAS90 Sky Co-ordinate System (SCS) values such as 
 *        EQUAT(J2000) (see SUN/163).
-*     %EPARAM = DOUBLE PRECISION (Read)
+*     %EPARAM = _DOUBLE (Read)
 *        If a celestial co-ordinate system is supplied (using parameter 
 *        %PARAM) then an epoch value is needed to qualify it. This is the 
 *        epoch at which the supplied sky positions were determined. It should 

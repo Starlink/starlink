@@ -5,7 +5,7 @@
 *     KPG1_ASGET
 
 *  Purpose:
-*     Get an AST FrameSet from the WCS component of an NDF.
+*     Gets an AST FrameSet from the WCS component of an NDF.
 
 *  Language:
 *     Starlink Fortran 77
@@ -198,7 +198,7 @@
 
 *  Local Variables:
       CHARACTER COSTR*( NDF__MXDIM * ( SZFMT + 1 ) + 1 ) 
-                                   ! Formatted coordinate string
+                                   ! Formatted co-ordinate string
       CHARACTER DOM*30             ! Current Frame domain
       CHARACTER PAXIS*( VAL__SZI ) ! Buffer for new axis number
       CHARACTER QAXIS*( VAL__SZI ) ! Buffer for original axis number
@@ -292,7 +292,7 @@
 *  Create a new GRID Frame with NDIM axes.
          NEWBAS = AST_FRAME( NDIM, 'DOMAIN=GRID', STATUS )
 
-*  Create a title for it, including the grid coordinates of the first
+*  Create a title for it, including the grid co-ordinates of the first
 *  pixel, i.e. (1.0,1.0,...) 
          NC = 0
          CALL CHR_PUTC( '(', COSTR, NC )
@@ -394,7 +394,7 @@
 *  Create a new PIXEL Frame with NDIM axes.
          NEWPIX = AST_FRAME( NDIM, 'DOMAIN=PIXEL', STATUS )
 
-*  Create a title for it, including the pixel coordinates of the first
+*  Create a title for it, including the pixel co-ordinates of the first
 *  pixel.
          NC = 0
          CALL CHR_PUTC( '(', COSTR, NC )
@@ -406,10 +406,10 @@
 
 *  Store the title in the Frame.
          IF ( NDIM .EQ. 1 ) THEN
-            CALL AST_SETC( NEWPIX, 'Title', 'Pixel coordinate; first '//
-     :                     'pixel at ' // COSTR( : NC ), STATUS )
+            CALL AST_SETC( NEWPIX, 'Title', 'Pixel co-ordinate; '//
+     :                     'first pixel at ' // COSTR( : NC ), STATUS )
          ELSE
-            CALL AST_SETC( NEWPIX, 'Title', 'Pixel coordinates; '//
+            CALL AST_SETC( NEWPIX, 'Title', 'Pixel co-ordinates; '//
      :                     'first pixel at ' // COSTR( : NC ), STATUS ) 
          END IF
 
@@ -423,7 +423,7 @@
             CALL CHR_PUTI( SDIM( I ), QAXIS, NCQ )
 
             CALL AST_SETC( NEWPIX, 'Label(' // PAXIS( : NCP ) // ')',
-     :                     'Pixel coordinate ' // QAXIS( : NCQ ), 
+     :                     'Pixel co-ordinate ' // QAXIS( : NCQ ), 
      :                     STATUS )
             CALL AST_SETC( NEWPIX, 'Symbol(' // PAXIS( : NCP ) // ')',
      :                     'p' // QAXIS( : NCQ ), STATUS )
@@ -432,7 +432,7 @@
 
          END DO
 
-*  Store the pixel coordinate at the centre of the low bound pixel on each
+*  Store the pixel co-ordinate at the centre of the low bound pixel on each
 *  axis. These are the constants used by AST_PERMMAP.
          DO I = 1, NDF__MXDIM
             CONST( I ) = DBLE( LBND( I ) ) - 0.5D0

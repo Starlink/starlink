@@ -4,7 +4,7 @@
 *     KPG1_ASTRM
 
 *  Purpose:
-*     Trim axes from the current Frame of a FrameSet.
+*     Trims axes from the current Frame of a FrameSet.
 
 *  Language:
 *     Starlink Fortran 77
