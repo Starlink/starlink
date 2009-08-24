@@ -32,6 +32,7 @@ STAR_LATEX_DOCUMENTATION(sun261)
  
 STAR_MESSGEN(irq_err.msg)
 
+STAR_CNF_COMPATIBLE_SYMBOLS
 STAR_PRM_COMPATIBLE_SYMBOLS
 
 dnl    If you wish to configure extra files, you can add them to this

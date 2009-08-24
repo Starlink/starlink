@@ -26,6 +26,7 @@ STAR_DECLARE_DEPENDENCIES([build], [cat grp one prm psx sae])
 STAR_DECLARE_DEPENDENCIES([link], [cat chr grp mers one par pcs prm psx] )
 STAR_DECLARE_DEPENDENCIES(sourceset, [htx sst])
 
+STAR_CNF_COMPATIBLE_SYMBOLS
 STAR_PRM_COMPATIBLE_SYMBOLS
 
 dnl    List the sun/ssn/... numbers which document this package and
