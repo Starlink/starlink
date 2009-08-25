@@ -33,6 +33,7 @@
 
 *  Authors:
 *     David S Berry (JAC, UCLan)
+*     Malcolm J. Currie (Starlink)
 *     {enter_new_authors_here}
 
 *  History:
@@ -48,10 +49,12 @@
 *     8-AUG-2009 (DSB):
 *        Only assign BORDER quality to pixels that are covered by another
 *        tile.
+*     2009 August 25 (MJC):
+*        Add star/irq.h include as it is no longer in star/kaplibs.h.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2007, 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2007-2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -78,6 +81,7 @@
 /* Starlink includes */
 #include "sae_par.h"
 #include "ndf.h"
+#include "star/irq.h"
 #include "star/kaplibs.h"
 
 /* SMURF includes */

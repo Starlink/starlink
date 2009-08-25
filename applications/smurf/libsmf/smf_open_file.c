@@ -52,6 +52,7 @@
  *     Tim Jenness (JAC, Hawaii)
  *     Edward Chapin (UBC)
  *     David Berry (JAC, UCLan)
+ *     Malcolm J. Currie (Starlink)
  *     {enter_new_authors_here}
 
  *  History:
@@ -186,6 +187,8 @@
  *        The only guaranteed way to "guess" is to read the embedded XML configuration.
  *     2009-05-26 (TIMJ):
  *        Move TCS_TAI fix up to smf_fix_metadata
+ *     2009-08-25 (MJC):
+ *        Add star/irq.h include as it is no longer in star/kaplibs.h.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -229,6 +232,7 @@
 #include "smf_typ.h"
 #include "smf_err.h"
 #include "mers.h"
+#include "star/irq.h"
 #include "star/kaplibs.h"
 #include "kpg_err.h"
 #include "irq_err.h"

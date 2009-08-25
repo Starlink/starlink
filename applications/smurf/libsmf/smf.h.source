@@ -22,6 +22,7 @@
 *     Andy Gibb (UBC)
 *     Tim Jenness (JAC, Hawaii)
 *     Edward Chapin (UBC)
+*     Malcolm J. Currie (Starlink)
 *     {enter_new_authors_here}
 
 *  History:
@@ -358,6 +359,8 @@
 *        Alphabetize and reformat to fit in 80 columns
 *     2009-08-06 (EC):
 *        Add smf_map_spikes
+*     2009-08-25 (MJC):
+*        Add star/irq.h include as it is no longer in star/kaplibs.h.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -400,6 +403,7 @@
 #include "star/grp.h"
 #include "smf_typ.h"
 #include "msg_par.h"
+#include "star/irq.h"
 #include "star/kaplibs.h"
 
 /* Handle GCC __attribute__ */
