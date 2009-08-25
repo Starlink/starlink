@@ -4,6 +4,7 @@
 #include "star/ndg.h" 
 #include "ast.h" 
 #include "star/kaplibs.h" 
+#include "star/irq.h"
 #include "star/grp.h" 
 #include "star/hds.h" 
 #include "par.h" 
@@ -798,6 +799,7 @@ void findclumps( int *status ) {
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics & Astronomy Research Council.
 *     Copyright (C) 2007-2009 Science & Technology Facilities Council.
+*     Copyright (C) 2009 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -819,6 +821,7 @@ void findclumps( int *status ) {
 *  Authors:
 *     DSB: David S. Berry
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     EC: Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -852,6 +855,8 @@ void findclumps( int *status ) {
 *        Rename ILEVEL to MSG_FILTER
 *     7-AUG-2009 (DSB):
 *        Change MaxBad from an absolute number of pixels to a fraction.
+*     25-AUG-2009 (EC):
+*        Add star/irq.h include as it is no longer in star/kaplibs.h.
 *     {enter_further_changes_here}
 
 *  Bugs:

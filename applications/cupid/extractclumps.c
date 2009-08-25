@@ -4,6 +4,7 @@
 #include "star/ndg.h" 
 #include "ast.h" 
 #include "star/kaplibs.h" 
+#include "star/irq.h"
 #include "star/grp.h" 
 #include "star/hds.h" 
 #include "par.h" 
@@ -128,6 +129,7 @@ void extractclumps( int *status ) {
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
 *     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2009 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -148,6 +150,7 @@ void extractclumps( int *status ) {
 
 *  Authors:
 *     DSB: David S. Berry
+*     EC: Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -162,6 +165,8 @@ void extractclumps( int *status ) {
 *        Added adam parameter BACKOFF.
 *     15-JAN-2009 (DSB):
 *        Remove ILEVEL arguments.
+*     25-AUG-2009 (EC):
+*        Add star/irq.h include as it is no longer in star/kaplibs.h.
 *     {enter_further_changes_here}
 
 *  Bugs:
