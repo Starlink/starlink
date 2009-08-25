@@ -185,7 +185,7 @@ smf_makefitschan.c \
 smf_maketanmap.c \
 smf_malloc.c \
 smf_map_or_malloc.c \
-smf_map_spikes.c \ 
+smf_map_spikes.c \
 smf_mapbounds.c \
 smf_mapbounds_approx.c \
 smf_maskacsis.c \
