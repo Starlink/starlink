@@ -1,5 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
+dist_bin_SCRIPTS = irq_link irq_link_adam
+
 lib_LTLIBRARIES = libirq.la libirq_adam.la
 
 libirq_la_SOURCES = \

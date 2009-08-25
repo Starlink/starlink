@@ -1,5 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
+dist_bin_SCRIPTS = lpg_link_adam
+
 lib_LTLIBRARIES = liblpg.la
 
 liblpg_la_SOURCES = \

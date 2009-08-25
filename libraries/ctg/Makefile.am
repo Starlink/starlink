@@ -1,5 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
+dist_bin_SCRIPTS = ctg_link_adam
+
 lib_LTLIBRARIES = libctg.la
 
 libctg_la_SOURCES = \
