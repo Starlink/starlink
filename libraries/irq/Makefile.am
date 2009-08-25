@@ -8,6 +8,7 @@ libirq_la_SOURCES = \
 	$(PUBLIC_INCLUDES) \
 	$(PRIVATE_INCLUDES) \
 	$(BLOCK_DATA_FILES) \
+	$(C_ROUTINES) \
 	$(F_ROUTINES) \
         $(G_ROUTINES:.gen=.f)
 

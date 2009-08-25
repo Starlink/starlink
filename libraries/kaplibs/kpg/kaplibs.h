@@ -22,6 +22,7 @@
 
 *  Copyright:
 *     Copyright (C) 2005, 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2009 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -43,6 +44,7 @@
 *  Authors:
 *     DSB: David .S. Berry
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     EC: Ed Chapin (UBC)
 
 *  History:
 *     29-SEP-2005 (DSB):
@@ -71,6 +73,8 @@
 *        Added IRQ constants.
 *     15-JUL-2008 (TIMJ):
 *        const and size_t to match Grp
+*     25-AUG-2009 (EC):
+*        IRQ now moved into separate library (EC)
 *-
 */
 
@@ -83,38 +87,9 @@
 /* Macros */
 /* ====== */
 
-/* An illegal IRQ_ identifier value. This value can sometimes be
-   specified by an application in place of an IRQ_ identifier in order
-   to supress some operation. */
-#define IRQ__NOID 0
-
-/* The name of the structure holding the quality names information.  */
-#define IRQ__QINAM QUALITY_NAMES
-
-/* The type of the structure holding the quality names information. */
-#define IRQ__QITYP QUALITY_NAMES
-
-/* Maximum length of descriptive comments stored with each quality name. */
-#define IRQ__SZCOM 50 
-
-/* Maximum length of a quality expression. */
-#define IRQ__SZQEX 255 
-
-/* Maximum length of a quality name. */
-#define IRQ__SZQNM 15 
-
-
 
 /* Type definitions */
 /* ================ */
-
-/* A structure used to pass a group of five HDS locators to and from IRQ
-   functions. */
-
-typedef struct IRQLocs {
-   HDSLoc *loc[ 5 ];
-} IRQLocs;
-
 
 
 /* Prototypes for public functions */
@@ -134,17 +109,6 @@ void kpg1Wgndf( const char *, const Grp *, size_t, size_t, const char *, Grp **,
 void kpg1Wrlst( const char *, int, int, int, double *, int, AstFrameSet *, const char *, int, int *, int, int * );
 void kpg1Wrtab( const char *, int, int, int, double *, int, AstFrameSet *, const char *, int, int *, Grp *, Grp *, int, int * );
 void kpg1Wrcat( const char *, int, int, int, double *, int, AstFrameSet *, const char *, int, int *, AstKeyMap *, Grp *, Grp *, int, int * );
-
-void irqAddqn( const IRQLocs *, const char *, int, const char *, int * );
-void irqDelet( int, int * );
-void irqFind( int, IRQLocs **, char[DAT__SZNAM + 1], int * );
-void irqGetqn( const IRQLocs *, const char *, int *, int *, int *, char *, int, int * );
-void irqNew( int, const char *, IRQLocs **, int * );
-void irqRbit( const IRQLocs *, const char *, int *, int * );
-void irqRlse( IRQLocs **, int * );
-void irqRwqn( const IRQLocs *, const char *, int, int, int *, int * );
-void irqSetqm( const IRQLocs *, int, const char *, int, float *, int *, int * );
-void irqFxbit( const IRQLocs *, const char *, int, int *, int * );
 
 int kpgGtfts( int, AstFitsChan ** fchan, int * status );
 int kpgPtfts( int, const AstFitsChan * fchan, int * status );
