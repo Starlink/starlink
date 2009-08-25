@@ -33,12 +33,16 @@
 #     script could reduce them.
 
 #  Copyright:
-#     Copyright (C) 1995 Rutherford Appleton Laboratory
+#     Copyright (C) 1992 Science & Engineering Research Council.
+#     Copyright (C) 1995, 1997, 1998, 2001, 2004 Central Laboratory of 
+#     the Research Councils.
+#     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
 
 #  Licence:
 #     This program is free software; you can redistribute it and/or
 #     modify it under the terms of the GNU General Public License as
-#     published by the Free Software Foundation; either version 2 of
+#     published by the Free Software Foundation; either Version 2 of
 #     the License, or (at your option) any later version.
 #
 #     This program is distributed in the hope that it will be
@@ -48,8 +52,8 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with this program; if not, write to the Free Software
-#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-#     02111-1307, USA
+#     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+#     02111-1307, USA.
 
 #  Authors:
 #     MJC:  Malcolm J. Currie (STARLINK)
@@ -74,15 +78,15 @@
 #     11-JUL-2001 (DSB):
 #        Replace most of the library list with `kaplibs_link_adam`.
 #     28-JUL-2004 (TIMJ):
-#        Add SHL
+#        Add SHL.
 #     2-SEP-2004 (TIMJ):
-#        Add ONE
+#        Add ONE.
 #     4-OCT-2004 (DSB):
 #        Added Tk/Tcl libraries (now needed since kpg1_tkast has been
 #        moved to kps1_tkast).
 #     12-SEP-2005 (TIMJ):
-#        Add -nogrf option
-#        Add -withtk option
+#        Add -nogrf option.
+#        Add -withtk option.
 #     {enter_further_changes_here}
 
 #  Bugs:
