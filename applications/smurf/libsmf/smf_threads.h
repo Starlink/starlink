@@ -95,7 +95,8 @@ int smf_add_job( smfWorkForce *workforce, int flags, void *data,
                   void (*func)( void *, int * ), 
                   int (*checker)( int, smfWorkForce *, int * ), 
                   int *status );
-void smf_wait_on_job( smfWorkForce *workforce, int ijob1, int ijob2, int *status );
+int smf_wait_on_job( smfWorkForce *workforce, int ijob1, int ijob2, int *status );
 int smf_job_wait( smfWorkForce *workforce, int *status );
+void *smf_get_job_data( int ijob, smfWorkForce *workforce, int *status );
 
 #endif
