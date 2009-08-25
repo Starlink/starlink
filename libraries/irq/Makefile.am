@@ -13,13 +13,20 @@ libirq_la_SOURCES = \
 
 libirq_adam_la_SOURCES = $(ADAM_F_ROUTINES)
 
+cincludedir = $(includedir)/star
+
 include_HEADERS = $(PUBLIC_INCLUDES)
+cinclude_HEADERS = $(PUBLIC_C_INCLUDES)
 include_MESSAGES = IRQ_ERR irq_err.h
+
 PUBLIC_INCLUDES = IRQ_PAR
+PUBLIC_C_INCLUDES = irq.h
 PRIVATE_INCLUDES = IRQ_CMO IRQ_COM IRQ_OPC IRQ_PAO
 BLOCK_DATA_FILES = irq1_opcin.f
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+
+C_ROUTINES = irq.c
 
 F_ROUTINES = \
 irq1_add.f irq1_altrp.f irq1_antmp.f irq1_check.f irq1_cmqm.f \
