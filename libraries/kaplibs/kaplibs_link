@@ -30,8 +30,8 @@
 
       if test "${nogrf}" = 'y'; then 
 #   No graphics
-         echo -lkpg -lira -lirq -lfts -laif -lccg \
-           `atl_link` \
+         echo -lkpg -lira -lfts -laif -lccg \
+           `irq_link` `atl_link` \
            `cat_link` `ndg_link` \
            `ndf_link` `ast_link -ems` \
            `fio_link` \
@@ -43,8 +43,8 @@
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
       elif test "${nogks}" = 'y'; then 
 #  Form list of graphics libraries.
-         echo -lkpg_grf -lkpg -lira -lirq -lfts -laif =lccg -lkapgrf \
-           `atl_link` \
+         echo -lkpg_grf -lkpg -lira -lfts -laif -lccg -lkapgrf \
+           `irq_link` `atl_link` \
            `cat_link` `ndg_link` \
            `ndf_link` `ast_link -ems -grf` \
            `agp_link` `fio_link` \
@@ -56,8 +56,8 @@
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
       else
-         echo -lkgs -lkpg_grf -lkpg -lira -lirq -lfts -laif -lccg -lkapgrf \
-           `atl_link` \
+         echo -lkgs -lkpg_grf -lkpg -lira -lfts -laif -lccg -lkapgrf \
+           `irq_link` `atl_link` \
            `cat_link` `snx_link -user` \
            `sgs_link` `ndg_link` \
            `gks_link` `gns_link` \
