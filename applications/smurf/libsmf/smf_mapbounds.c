@@ -374,8 +374,8 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
         /* Retrieve input SkyFrame */
         skyin = astGetFrame( hdr->wcs, AST__CURRENT );
 
-        smf_calc_skyframe( skyin, system, hdr, alignsys, &oskyframe, skyref,
-                           moving, status );
+        smf_calc_skyframe( igrp, size, skyin, system, hdr, alignsys, 
+                           &oskyframe, skyref, moving, status );
 
         /* Get the orientation of the map vertical within the output celestial
            coordinate system. This is derived form the MAP_PA FITS header, which

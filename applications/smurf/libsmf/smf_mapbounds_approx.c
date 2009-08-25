@@ -319,7 +319,8 @@ void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system, double pixsiz
   }
 
   /* Now create the output FrameSet. */
-  smf_calc_skyframe( skyin, system, hdr, 0, &skyframe, skyref, moving, status );
+  smf_calc_skyframe( NULL, 0, skyin, system, hdr, 0, &skyframe, skyref, 
+                     moving, status );
 
   /* Get the orientation of the map vertical within the output celestial
      coordinate system. This is derived form the MAP_PA FITS header, which
