@@ -184,7 +184,7 @@ CUPID is a package of applications which identify and analyse clumps of
 emission within 2- or 3- dimensional data arrays.
   </p></abstract>
   <dependencies >
-    <build>pcs</build><build>mers</build><build>cnf</build><build>ifd</build><build>ndf</build><build>sae</build><build option='link'>kaplibs</build><build option='link'>ast</build><build option='link'>shl</build><sourceset>sst</sourceset><sourceset>star2html</sourceset>
+    <build>pcs</build><build>mers</build><build>cnf</build><build>ifd</build><build>irq</build><build>ndf</build><build>sae</build><build option='link'>kaplibs</build><build option='link'>ast</build><build option='link'>shl</build><sourceset>sst</sourceset><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -866,7 +866,7 @@ Traces an HDS file
 </component>
 
 <component id="kappa" support="S">
-  <version>1.11-4</version>
+  <version>1.11-7</version>
   <path>applications/kappa</path>
   <description>KAPPA - Kernel Application Package</description>
   <abstract><p>
@@ -877,7 +877,7 @@ intended to work in conjunction with Starlink's various specialised
 packages.
   </p></abstract>
   <dependencies >
-    <build>pcs</build><build>agi</build><build>ast</build><build>chr</build><build>cnf</build><build>fio</build><build>grp</build><build>hds</build><build>ifd</build><build>kaplibs</build><build>mag</build><build>mers</build><build>ndf</build><build>one</build><build>par</build><build>pcs</build><build>prm</build><build>psx</build><build>sae</build><build>shl</build><build>tcl</build><build>tk</build><build>trn</build><build option='link'>ard</build><build option='link'>atl</build><build option='link'>kaplibs</build><build option='link'>one</build><build option='link'>shl</build><sourceset>sst</sourceset><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>pcs</build><build>agi</build><build>ast</build><build>chr</build><build>cnf</build><build>fio</build><build>grp</build><build>hds</build><build>ifd</build><build>kaplibs</build><build>mag</build><build>mers</build><build>ndf</build><build>one</build><build>par</build><build>pcs</build><build>prm</build><build>psx</build><build>sae</build><build>shl</build><build>tcl</build><build>tk</build><build>trn</build><build option='link'>ard</build><build option='link'>atl</build><build option='link'>kaplibs</build><build option='link'>irq</build><build option='link'>one</build><build option='link'>shl</build><sourceset>sst</sourceset><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -1568,7 +1568,7 @@ the James Clerk Maxwell Telescope. The tasks allows one to completely
 reduce your SCUBA-2 data.
   </p></abstract>
   <dependencies >
-    <build>pcs</build><sourceset>messgen</sourceset><build>ast</build><build>sae</build><build>pcs</build><build>mers</build><build>ndf</build><build>shl</build><build>gsl</build><build>ndg</build><build>fftw</build><build>ard</build><build>kaplibs</build><build>pda</build><build>gsd</build><link>ndf</link><link>ast</link><link>hlp</link><link>ndg</link><link>shl</link><link>pda</link><link>gsd</link><sourceset>sst</sourceset><sourceset>star2html</sourceset>
+    <build>pcs</build><sourceset>messgen</sourceset><build>ast</build><build>sae</build><build>pcs</build><build>mers</build><build>ndf</build><build>shl</build><build>gsl</build><build>ndg</build><build>fftw</build><build>ard</build><build>kaplibs</build><build>pda</build><build>gsd</build><build>irq</build><link>ndf</link><link>ast</link><link>hlp</link><link>ndg</link><link>shl</link><link>pda</link><link>gsd</link><link>irq</link><sourceset>sst</sourceset><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -5477,7 +5477,7 @@ KAPLIBS provides software developers with access to many of the internal
 KAPPA routines, so that KAPPA-like applications can be written and built
 independently of KAPPA.</p></abstract>
   <dependencies >
-    <build>pcs</build><build>agi</build><build>ast</build><build>atl</build><build>cat</build><build>chr</build><build>cnf</build><build>fio</build><build>generic</build><build>gks</build><build>gns</build><build>grp</build><build>hds</build><build>idi</build><build>lpg</build><build>mag</build><build>mers</build><build>ndf</build><build>ndg</build><build>par</build><build>pcs</build><build>prm</build><build>psx</build><build>sae</build><build>snx</build><build>trn</build><link>agi</link><link>ast</link><link>atl</link><link>cat</link><link>fio</link><link>grp</link><link>mag</link><link>mers</link><link>ndf</link><link>ndg</link><link>pcs</link><link>pda</link><link>pgplot</link><link>prm</link><link>psx</link><link>psx</link><link>snx</link><link>trn</link><sourceset>htx</sourceset><sourceset>sst</sourceset><sourceset>messgen</sourceset><sourceset>star2html</sourceset>
+    <build>pcs</build><build>agi</build><build>ast</build><build>atl</build><build>cat</build><build>chr</build><build>cnf</build><build>fio</build><build>generic</build><build>gks</build><build>gns</build><build>grp</build><build>hds</build><build>idi</build><build>lpg</build><build>mag</build><build>mers</build><build>ndf</build><build>ndg</build><build>par</build><build>pcs</build><build>prm</build><build>psx</build><build>sae</build><build>snx</build><build>trn</build><link>agi</link><link>ast</link><link>atl</link><link>cat</link><link>ctg</link><link>fio</link><link>grp</link><link>irq</link><link>lpg</link><link>mag</link><link>mers</link><link>ndf</link><link>ndg</link><link>pcs</link><link>pda</link><link>pgplot</link><link>prm</link><link>psx</link><link>psx</link><link>snx</link><link>trn</link><sourceset>htx</sourceset><sourceset>sst</sourceset><sourceset>messgen</sourceset><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -5938,13 +5938,13 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="pda" support="S">
-  <version>0.5-2</version>
+  <version>0.5-3</version>
   <path>libraries/pda</path>
   <description>Public Domain Algorithms</description>
   <abstract><p>Replacements of NAG routines with public domain equivalents from packages such as NETLIB and SLATEC. They have been homogenized to fit into the Starlink calling scheme.
     </p></abstract>
   <dependencies >
-    <build>sae</build><build>cnf</build><link>ems</link><link>cnf</link><sourceset>star2html</sourceset>
+    <build>sae</build><build>cnf</build><build>generic</build><link>ems</link><link>cnf</link><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -6787,24 +6787,6 @@ and some distortion.
       <name>Mark Taylor</name>
       <uname>mbt</uname>
       <email>m.b.taylor@bristol.ac.uk</email>
-      <role>owner</role>
-    </person>
-  </developers>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-</component>
-
-<component id="tcldict" support="U">
-  <version>8.5.2</version>
-  <path>thirdparty/tclsys/tcldict</path>
-  <description>tcldict</description>
-  <dependencies >
-    <build>tcl</build><build>tk</build>
-  </dependencies>
-  <developers>
-    <person>
-      <name>Peter W. Draper</name>
-      <uname>pwd</uname>
-      <email>p.w.draper@durham.ac.uk</email>
       <role>owner</role>
     </person>
   </developers>

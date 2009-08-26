@@ -25,12 +25,12 @@ STAR_MONOLITHS
 
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES(build, [agi ast atl cat chr cnf fio generic gks gns grp hds idi lpg mag mers ndf ndg par pcs prm psx sae snx trn])
-STAR_DECLARE_DEPENDENCIES(link, [agi ast atl cat fio grp mag mers ndf ndg pcs pda pgplot prm psx psx snx trn])
+STAR_DECLARE_DEPENDENCIES(link, [agi ast atl cat ctg fio grp irq lpg mag mers ndf ndg pcs pda pgplot prm psx psx snx trn])
 STAR_DECLARE_DEPENDENCIES(sourceset, [htx sst])
 
 dnl    There are numerous messgen files, and all should be listed here, so
 dnl    that they are listed as `predist' files.
-STAR_MESSGEN([ kpg/kpg_err.msg irq/irq_err.msg ])
+STAR_MESSGEN([ kpg/kpg_err.msg  ])
 
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.

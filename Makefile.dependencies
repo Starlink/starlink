@@ -152,6 +152,7 @@ $(MANIFESTS)/atools: \
 		$(MANIFESTS)/cfitsio \
 		$(MANIFESTS)/chr \
 		$(MANIFESTS)/cnf \
+		$(MANIFESTS)/ctg \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/fio \
 		$(MANIFESTS)/generic \
@@ -164,7 +165,9 @@ $(MANIFESTS)/atools: \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/idi \
 		$(MANIFESTS)/ifd \
+		$(MANIFESTS)/irq \
 		$(MANIFESTS)/kaplibs \
+		$(MANIFESTS)/lpg \
 		$(MANIFESTS)/mag \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/ncar \
@@ -476,6 +479,7 @@ $(MANIFESTS)/cupid: \
 		$(MANIFESTS)/cfitsio \
 		$(MANIFESTS)/chr \
 		$(MANIFESTS)/cnf \
+		$(MANIFESTS)/ctg \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/fio \
 		$(MANIFESTS)/generic \
@@ -488,7 +492,9 @@ $(MANIFESTS)/cupid: \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/idi \
 		$(MANIFESTS)/ifd \
+		$(MANIFESTS)/irq \
 		$(MANIFESTS)/kaplibs \
+		$(MANIFESTS)/lpg \
 		$(MANIFESTS)/mag \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/ncar \
@@ -621,6 +627,7 @@ $(MANIFESTS)/dipso: \
 		$(MANIFESTS)/cfitsio \
 		$(MANIFESTS)/chr \
 		$(MANIFESTS)/cnf \
+		$(MANIFESTS)/ctg \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/fio \
 		$(MANIFESTS)/gks \
@@ -631,7 +638,9 @@ $(MANIFESTS)/dipso: \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/idi \
+		$(MANIFESTS)/irq \
 		$(MANIFESTS)/kaplibs \
+		$(MANIFESTS)/lpg \
 		$(MANIFESTS)/mag \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/ncar \
@@ -679,6 +688,7 @@ $(MANIFESTS)/echomop: \
 		$(MANIFESTS)/cfitsio \
 		$(MANIFESTS)/chr \
 		$(MANIFESTS)/cnf \
+		$(MANIFESTS)/ctg \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/fio \
 		$(MANIFESTS)/generic \
@@ -691,7 +701,9 @@ $(MANIFESTS)/echomop: \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/htx \
 		$(MANIFESTS)/idi \
+		$(MANIFESTS)/irq \
 		$(MANIFESTS)/kaplibs \
+		$(MANIFESTS)/lpg \
 		$(MANIFESTS)/mag \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/ncar \
@@ -1493,6 +1505,7 @@ $(MANIFESTS)/kappa: \
 		$(MANIFESTS)/cfitsio \
 		$(MANIFESTS)/chr \
 		$(MANIFESTS)/cnf \
+		$(MANIFESTS)/ctg \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/fio \
 		$(MANIFESTS)/generic \
@@ -1505,6 +1518,7 @@ $(MANIFESTS)/kappa: \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/idi \
 		$(MANIFESTS)/ifd \
+		$(MANIFESTS)/irq \
 		$(MANIFESTS)/kaplibs \
 		$(MANIFESTS)/lpg \
 		$(MANIFESTS)/mag \
@@ -1548,6 +1562,7 @@ $(MANIFESTS)/kaprh: \
 		$(MANIFESTS)/cfitsio \
 		$(MANIFESTS)/chr \
 		$(MANIFESTS)/cnf \
+		$(MANIFESTS)/ctg \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/fio \
 		$(MANIFESTS)/generic \
@@ -1560,6 +1575,7 @@ $(MANIFESTS)/kaprh: \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/idi \
 		$(MANIFESTS)/ifd \
+		$(MANIFESTS)/irq \
 		$(MANIFESTS)/kaplibs \
 		$(MANIFESTS)/lpg \
 		$(MANIFESTS)/mag \
@@ -1844,6 +1860,8 @@ $(MANIFESTS)/pcs: \
 
 $(MANIFESTS)/pda: \
 		$(MANIFESTS)/cnf \
+		$(MANIFESTS)/generic \
+		$(MANIFESTS)/prm \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem
@@ -2011,8 +2029,10 @@ $(MANIFESTS)/polpack: \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/idi \
 		$(MANIFESTS)/ifd \
+		$(MANIFESTS)/irq \
 		$(MANIFESTS)/jpeg \
 		$(MANIFESTS)/kaplibs \
+		$(MANIFESTS)/lpg \
 		$(MANIFESTS)/mag \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/nbs \
@@ -2396,6 +2416,7 @@ $(MANIFESTS)/smurf: \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/idi \
+		$(MANIFESTS)/irq \
 		$(MANIFESTS)/kaplibs \
 		$(MANIFESTS)/lpg \
 		$(MANIFESTS)/mag \
@@ -2932,12 +2953,6 @@ $(MANIFESTS)/surf: \
 $(MANIFESTS)/tcl:
 	cd thirdparty/tclsys/tcl \
 	  && $(CONFIG_CPT) \
-	  && $(MAKE_CPT)
-
-$(MANIFESTS)/tcldict: \
-		$(MANIFESTS)/tcl \
-		$(MANIFESTS)/tk
-	cd thirdparty/tclsys/tcldict \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/tcllibs: \

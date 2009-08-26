@@ -108,8 +108,8 @@ AC_CHECK_HEADERS(slamac.h)
 dnl    Build dependencies for this package.
 dnl    Includes: fio, par, sae; 
 dnl    links to: chr, mers, fio, psx, task.
-STAR_DECLARE_DEPENDENCIES([build], [ast sae pcs mers ndf shl gsl ndg fftw ard kaplibs pda gsd])
-STAR_DECLARE_DEPENDENCIES([link], [ndf ast hlp ndg shl pda gsd])
+STAR_DECLARE_DEPENDENCIES([build], [ast sae pcs mers ndf shl gsl ndg fftw ard kaplibs pda gsd irq])
+STAR_DECLARE_DEPENDENCIES([link], [ndf ast hlp ndg shl pda gsd irq])
 dnl We use the sst package to build documentation (prohlp and prolat)
 STAR_DECLARE_DEPENDENCIES([sourceset], [sst])
 
