@@ -253,12 +253,13 @@ SUN                            STARLINK USER NOTES                           SUN
 255.01  2006-01-19 DSB   ??   CUPID - A Clump Identification and Analysis Package
 256.01  2005-04-28 MBT   ??   STILTS - STIL Tool Set
 257.01  2006-01-19 DSB   ??   ATL - A library of AST utility routines.
-258.01  2008-MM-DD            SMURF
+258.01  2008-MM-DD EC    ??   SMURF - The Sub-Millimetre User Reduction Facility
 259.01  2008-04-09 JB    ??   GSD2ACSIS - Programmer's Guide (SMURF)
 260.01  2008-06-20 BC    ??   ORAC-DR - ACSIS pipeline data reduction
 261.01  2009-08-08 DSB   ??   IRQ - Handling of QUALITY in NDFs
 262.01  2009-08-09 MJC   ??   CTG - Accessing Groups of Catalogues
 263.01  2009-08-11 MJC   ??   LPG - Processing in a loop a set of NDFs or catalogues
+264.01  2009-08-26 AGG   ??   ORAC-DR - SCUBA-2 pipeline data reduction
 
 AUTHORS                          AUTHORS                                AUTHORS
                                      (Site code)
@@ -267,6 +268,7 @@ AUTHORS                          AUTHORS                                AUTHORS
        ACD   Clive Davenhall         (EDI)
        ACF   Adrian Fish             (UCL - left)
        AFT   Allyn Tennant           (Marshall SFC)
+       AGG   Andy Gibb               (UBC)
        AJC   Alan Chipperfield       (RAL)
        AJP   Alan Penny              (RAL)
        APL   Alan Lotts              (DUR)
@@ -305,6 +307,7 @@ AUTHORS                          AUTHORS                                AUTHORS
        DW    David Wishart           (Clustan Ltd, Edinburgh)
        DXA   David Allan             (BIR - left)
        EBN   E Bertin                (Institute d'Astrophysique de Paris)
+       EC    Ed Chapin               (UBC)
        EDF   Eric Feigelson          (Penn State Univ, USA)
        ERN   ? EARN association      (?)
        EWG   Eric Greisen            (NRAO)
