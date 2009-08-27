@@ -75,11 +75,13 @@
 *        Make sure Grp for config is always freed
 *     2008-07-22 (TIMJ):
 *        Use kaplibs instead of ndgAssoc
+*     2009-08-27 (AGG):
+*        Template data file is specified by NDF, not IN
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
-*     Copyright (C) 2006-2008 the University of British Columbia. All
+*     Copyright (C) 2006-2009 the University of British Columbia. All
 *     Rights Reserved.
 
 *  Licence:
@@ -154,7 +156,7 @@ void smurf_dreamweights ( int *status ) {
   ndfBegin();
   
   /* Get group of input raw data NDFs */
-  kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
+  kpg1Rgndf( "NDF", 0, 1, "", &igrp, &size, status );
 
   /* Get group of output files from user: assume 1 output file for
      every input file */
