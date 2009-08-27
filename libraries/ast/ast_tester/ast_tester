@@ -7,7 +7,7 @@
 #     ast_tester <-nd>
 
 #  Description:
-#     Builds and runs various tests of an AST installation.
+#     Build and run various tests of an AST installation.
 #     
 #     Some tests produce graphical output. Postscript plots of the FITS 
 #     headers in the current directory are produced for visual comparison 
