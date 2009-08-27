@@ -9,7 +9,7 @@
 
       call ast_begin( status )
 
-c      call ast_watchmemory( 27212 );
+c      call ast_watchmemory( 209814 );
 
       call test2( status )
       call test1( status )
@@ -19,7 +19,7 @@ c      call ast_watchmemory( 27212 );
 
       call ast_end( status )
 c      call ast_activememory( ' ' )
-      call ast_flushmemory( 1 )
+c      call ast_flushmemory( 1 )
 
       if( status .eq. sai__ok ) then
          call msg_out( ' ', 'All StcsChan tests passed', status )
@@ -40,10 +40,14 @@ c      call ast_activememory( ' ' )
       include 'AST_ERR'
       include 'PRM_PAR'
 
+      integer iwrite
+      character buff(30)*300
+      common /bbb/ iwrite, buff
+
       integer iread, idoc
       common /aaa/ iread, idoc
 
-      integer status, ch, obj, km, i, sb, iobj
+      integer status, ch, obj, km, i, sb, iobj, nobj
       external source, sink
 
       double precision lbnd(4), ubnd(4)
@@ -89,7 +93,7 @@ c      call ast_activememory( ' ' )
       call asserta( obj, 'Label(3)', 'Declination', status )
       call asserta( obj, 'Label(4)', 'Wavelength', status )
       call asserta( obj, 'Unit(1)', 'd', status )
-      call asserta( obj, 'Unit(4)', 'A', status )
+      call asserta( obj, 'Unit(4)', 'Angstrom', status )
 
       call ast_GetRegionBounds( obj, lbnd, ubnd, status )
       call ast_setc( obj, 'Format(1)', 'iso.2', status )
@@ -161,6 +165,58 @@ c      call ast_activememory( ' ' )
 
 
 
+      idoc = 5
+      iread = 0
+
+      call ast_setl( ch, 'StcsIndent', .true., status )
+
+      obj = ast_read( ch, status )
+
+      iwrite = 0
+      nobj = ast_write( ch, obj, status )
+      call asserti( 'N obj', nobj, 1, status ) 
+
+      call assertc( 'line 1 3', buff(1), 
+     :              'TimeInterval TT GEOCENTER 1996-01-01T00:00:00 '//
+     :              '1996-01-01T00:30:00', status )
+      call assertc( 'line 2 3', buff(2), 
+     :              '   Time MJD 50814.0 Error 1.2 Resolution 0.8 '//
+     :              'PixSize 1024.0', status )
+      call assertc( 'line 3 3', buff(3), 
+     :              'Union ICRS GEOCENTER ( ', status )
+      call assertc( 'line 4 3', buff(4), 
+     :              '      Circle 180 10 20 ', status )
+      call assertc( 'line 5 3', buff(5), 
+     :              '      Circle 190 10 20 ', status )
+      call assertc( 'line 6 3', buff(6), 
+     :              '      Intersection ( ', status )
+      call assertc( 'line 7 3', buff(7), 
+     :              '         Circle 120 -10 20 ', status )
+      call assertc( 'line 8 3', buff(8), 
+     :              '         Difference ( ', status )
+      call assertc( 'line 9 3', buff(9), 
+     :              '            Circle 130 -10 20 ', status )
+      call assertc( 'line 10 3', buff(10), 
+     :              '            Circle 115 -10 10 ', status )
+      call assertc( 'line 11 3', buff(11), 
+     :              '         ) ', status )
+      call assertc( 'line 12 3', buff(12), 
+     :              '      ) ', status )
+      call assertc( 'line 13 3', buff(13), 
+     :              '   ) ', status )
+      call assertc( 'line 14 3', buff(14), 
+     :              '   Position 179.0 -11.5 Error 0.000889 0.000889 '//
+     :              'Resolution 0.001778', status )
+      call assertc( 'line 15 3', buff(15), 
+     :              '   Size 0.000333 0.000278 PixSize 0.000083 '//
+     :              '0.000083', status )
+      call assertc( 'line 16 3', buff(16), 
+     :              'Spectral BARYCENTER 1420.4 unit MHz Resolution '//
+     :              '10.0 ', status )
+      call assertc( 'line 17 3', buff(17), 
+     :              'RedshiftInterval BARYCENTER VELOCITY OPTICAL '//
+     :              '200 2300 Redshift 300', status )
+
       call ast_end( status )
 
       if( status .ne. sai__ok ) call err_rep( ' ', 'test1 failed.', 
@@ -177,7 +233,7 @@ c      call ast_activememory( ' ' )
       include 'PRM_PAR'
 
       integer iwrite
-      character buff(4)*300
+      character buff(30)*300
       common /bbb/ iwrite, buff
 
       integer iread, idoc
@@ -187,7 +243,7 @@ c      call ast_activememory( ' ' )
 
       external source, sink
 
-      integer status, ch, sf, unc, reg, nobj, obj
+      integer status, ch, sf, unc, reg, nobj, obj, chr_len
       double precision p1(2), p2(2), p3(3), lbnd(2), ubnd(2)
 
       if( status .ne. sai__ok ) return
@@ -195,6 +251,8 @@ c      call ast_activememory( ' ' )
 
       call ast_begin( status )
       ch = ast_stcschan( source, sink, 'ReportLevel=3',status )
+      call ast_setl( ch, 'StcsIndent', .true., status )
+      call ast_seti( ch, 'StcsLength', 60, status )
 
       sf = ast_skyframe( ' ', status );
       p1( 1 ) = 0.0
@@ -213,10 +271,11 @@ c      call ast_activememory( ' ' )
       iwrite = 0
       nobj = ast_write( ch, reg, status )
       call asserti( 'N obj', nobj, 1, status ) 
-      call asserti( 'iwrite', iwrite, 1, status ) 
+      call asserti( 'iwrite', iwrite, 2, status ) 
       call assertc( 'line 1', buff(1), 'Ellipse ICRS TOPOCENTER '//
-     :              '74.48451 28.64789 17.18873 5.729578 '//
-     :              '57.29578 Error 0.5729514 0.5726735', status )
+     :              '74.48451 28.64789 17.18873 5.729578', status )
+      call assertc( 'line 2', buff(2), '   57.29578 Error 0.5729514 '//
+     :              '0.5726735', status )
 
       call ast_set( ch, 'StcsCoords=1,StcsProps=1', status )
 
@@ -230,24 +289,32 @@ c      call ast_activememory( ' ' )
          call asserti( 'N obj 2', nobj, 1, status ) 
 
          call assertc( 'line 1 2', buff(1), 'TimeInterval TT '//
-     :                 'GEOCENTER 1996-01-01T00:00:00 '//
-     :                 '1996-01-01T00:30:00 Time MJD 50814.0 '//
-     :                 'Error 1.2 Resolution 0.8 PixSize 1024.0',
-     :                 status )
+     :                 'GEOCENTER 1996-01-01T00:00:00', status )
 
-         call assertc( 'line 2 2', buff(2), 'Circle ICRS GEOCENTER '//
-     :                 '179.0 -11.5 0.5 Position 179.0 -11.5 Error '//
-     :                 '0.000889 0.000889 Resolution 0.001778 Size '//
-     :                 '0.000333 0.000278 PixSize 0.000083 0.000083', 
-     :                 status )
+         call assertc( 'line 2 2', buff(2), '   1996-01-01T00:30:00 '//
+     :                 'Time MJD 50814.0 Error 1.2', status );
 
-         call assertc( 'line 3 2', buff(3), 'Spectral BARYCENTER '//
+         call assertc( 'line 3 2', buff(3), '   Resolution 0.8 '//
+     :                 'PixSize 1024.0', status )
+
+         call assertc( 'line 4 2', buff(4), 'Circle ICRS GEOCENTER '//
+     :                 '179.0 -11.5 0.5 Position 179.0 -11.5', status )
+
+         call assertc( 'line 5 2', buff(5), '   Error 0.000889 '//
+     :                 '0.000889 Resolution 0.001778', status )
+
+         call assertc( 'line 6 2', buff(6), '   Size 0.000333 '//
+     :                 '0.000278 PixSize 0.000083 0.000083', status )
+
+         call assertc( 'line 7 2', buff(7), 'Spectral BARYCENTER '//
      :                 '1420.4 unit MHz Resolution 10.0', status )
 
-         call assertc( 'line 4 2', buff(4), 'RedshiftInterval '//
-     :                 'BARYCENTER 200 2300 '//
-     :                 'Redshift 300 Resolution 0.7 PixSize 0.3', 
-     :                 status )
+         call assertc( 'line 8 2', buff(8), 'RedshiftInterval '//
+     :                 'BARYCENTER VELOCITY OPTICAL 200 2300 '//
+     :                 'Redshift 300', status )
+
+         call assertc( 'line 9 2', buff(9), '   Resolution 0.7 '//
+     :                 'PixSize 0.3', status )
 
       else      
          write(*,*) 'No object read from doc 3'
@@ -271,29 +338,38 @@ c      call ast_activememory( ' ' )
 
 
 
+
+
+
       subroutine source( status )
       implicit none
 
       integer iread, idoc
       common /aaa/ iread, idoc
 
+      logical done
       integer status, l, chr_len
       character c*80
 
       c = ' '
+      done = .false.
 
       if( idoc .eq. 1 ) then
          if( iread .eq. 0 ) then
             c = 'StartTime 1900-01-01 Circle ICRS 148.9 69.1 2.0 fred'
          else if( iread .eq. 1 ) then
-            c = 'SpectralInterval 4000 7000 unit A'
+            c = 'SpectralInterval 4000 7000 unit Angstrom'
+         else
+            done = .true.
          end if
 
       else if( idoc .eq. 2 ) then
          if( iread .eq. 0 ) then
             c = 'StartTime 1900-01-01 Circle ICRS 148.9 69.1 2.0 '
          else if( iread .eq. 1 ) then
-            c = 'SpectralInterval 4000 7000 unit A'
+            c = 'SpectralInterval 4000 7000 unit Angstrom'
+         else
+            done = .true.
          end if
 
       else if( idoc .eq. 3 ) then
@@ -323,6 +399,8 @@ c      call ast_activememory( ' ' )
             c = '200.0 2300.0 Redshift 300.0'
          else if( iread .eq. 12 ) then
             c = 'Resolution 0.7 PixSize 0.3'
+         else
+            done = .true.
          end if
 
       else if( idoc .eq. 4 ) then
@@ -338,12 +416,68 @@ c      call ast_activememory( ' ' )
             c = 'Spectral BARYCENTER 1420.4 unit MHz'
          else if( iread .eq. 5 ) then
             c = 'Resolution 10.0'
+         else
+            done = .true.
+         end if
+
+*  Like doc 3 but with a compound spatial region
+      else if( idoc .eq. 5 ) then
+         if( iread .eq. 0 ) then
+            c = 'TimeInterval TT GEOCENTER'
+         else if( iread .eq. 1 ) then
+            c = '1996-01-01T00:00:00 1996-01-01T00:30:00'
+         else if( iread .eq. 2 ) then
+            c = 'Time MJD 50814.0 Error 1.2'
+         else if( iread .eq. 3 ) then
+            c = 'Resolution 0.8 PixSize 1024.0'
+         else if( iread .eq. 4 ) then
+            c = ' '
+         else if( iread .eq. 5 ) then
+            c = 'Union ICRS GEOCENTER'
+         else if( iread .eq. 6 ) then
+            c = '      (Circle 180 10 20'
+         else if( iread .eq. 7 ) then
+            c = '       Circle 190 10 20'
+         else if( iread .eq. 8 ) then
+            c = '       Intersection ('
+         else if( iread .eq. 9 ) then
+            c = '          Circle 120 -10 20 Difference '
+         else if( iread .eq. 10 ) then
+            c = '          ( Circle 130 -10 20 '
+         else if( iread .eq. 11 ) then
+            c = '            Circle 115 -10 10 '
+         else if( iread .eq. 12 ) then
+            c = '          )'
+         else if( iread .eq. 13 ) then
+            c = '          Not (Circle 118 -8 3)'
+         else if( iread .eq. 14 ) then
+            c = '       )'
+         else if( iread .eq. 15 ) then
+            c = '      )'
+         else if( iread .eq. 16 ) then
+            c = 'Position 179.0 -11.5 Error 0.000889'
+         else if( iread .eq. 17 ) then
+            c = 'Resolution 0.001778 Size 0.000333 0.000278'
+         else if( iread .eq. 18 ) then
+            c = 'PixSize 0.000083 0.000083'
+         else if( iread .eq. 19 ) then
+            c = 'Spectral BARYCENTER 1420.4 unit MHz'
+         else if( iread .eq. 20 ) then
+            c = 'Resolution 10.0'
+         else if( iread .eq. 21 ) then
+            c = 'RedshiftInterval BARYCENTER VELOCITY OPTICAL'
+         else if( iread .eq. 22 ) then
+            c = '200.0 2300.0 Redshift 300.0'
+         else if( iread .eq. 23 ) then
+            c = 'Resolution 0.7 PixSize 0.3'
+         else
+            done = .true.
          end if
 
       end if
 
-      l = chr_len( c )
-      if( l .gt. 0 ) then
+      l = max( chr_len( c ), 1 )
+      if( .not. done ) then
          call ast_putline( c, l, status )
          iread = iread + 1
       else
@@ -362,7 +496,7 @@ c      call ast_activememory( ' ' )
       implicit none
 
       integer iwrite
-      character buff(4)*300
+      character buff(30)*300
       common /bbb/ iwrite, buff
 
       integer status, l
