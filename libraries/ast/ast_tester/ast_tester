@@ -32,6 +32,9 @@
 #              installed. A default of /star is used if not set.
 #        AST - should be set to the root of the tree in which the version of 
 #              AST to be tested is installed. A default of $HOME is used if not set.
+
+#  Author:
+#     DSB: David Berry (JAC, Hawaii)
 #-
 
 if( ! $?STARLINK ) then
