@@ -48,38 +48,11 @@ endif
 setenv PATH $AST/bin\:$STARLINK/bin\:$PATH
 
 
-# List the test progs
-
 # Build the progs
 #g95 -fno-second-underscore -o regression regression.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link`
 g95 -fno-second-underscore -o plotter plotter.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -pgp -ems` `pgplot_link`
 g95 -fno-second-underscore -o wcsconverter wcsconverter.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link` `err_link`
 g95 -fno-second-underscore -o simplify simplify.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link` `err_link`
-
-
-
-## Run the main regression tester
-
-# CURRENTLY COMMENTED OUT BECAUSE IT IS TOO FRAGILE 
-
-#regression >& regression.out
-#
-## Compare the results with the current expected output.
-#diff -c regression.out regression.current > regression.diff
-#
-#if( $status != 0 ) then
-#   echo ""
-#   echo "Regression output has changed"
-#   echo "See file $PWD/regression.diff"
-#else
-#   rm -f regression.out regression.diff >& /dev/null
-#   echo ""
-#   echo "Regression output has NOT changed"
-#endif
-
-
-
-
 
 # Run the other test progs
 echo "" 
