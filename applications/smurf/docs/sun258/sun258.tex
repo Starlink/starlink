@@ -20,13 +20,13 @@
 \newcommand{\stardocnumber}    {258.1}
 \newcommand{\stardocauthors}   {Edward Chapin, Andrew G. Gibb, Tim Jenness \& David S. Berry}
 \newcommand{\stardocdate}      {24 July 2009}
-\newcommand{\stardoctitle}     {SMURF}
-\newcommand{\stardocversion}   {0.5}
+\newcommand{\stardoctitle}     {SMURF -- the Sub-Millimetre User Reduction Facillity}
+\newcommand{\stardocversion}   {Version 0.5}
 \newcommand{\stardocmanual}    {User's Guide}
 \newcommand{\stardocabstract}  {
 
   The Sub-Millimetre User Reduction Facility (SMURF) is a software
-  package for reducing data produced by the ACSIS correlater and
+  package for reducing data produced by the ACSIS correlater and the
   SCUBA-2 bolometer array on the James Clerk Maxwell Telescope
   (JCMT). This document describes how to use SMURF to process raw
   ACSIS data into data cubes, and raw SCUBA-2 data into images.
@@ -57,6 +57,8 @@
 %        Updated DIMM section, removed .eps from filenames, other cleanup
 %     2009-08-06 (EC):
 %        Move/re-size some figures, address some comments from Per Friberg
+%     2009-08-26 (AGG):
+%        Comments from Douglas, add more references
 %     {Add further history here}
 %
 % -
@@ -183,18 +185,16 @@
 \newcommand{\HDSTRACE}{\textsc{hdstrace}}
 \newcommand{\HDSTRACEref}{\xref{\HDSTRACE}{sun102}{}}
 \newcommand{\KAPPA}{\textsc{kappa}}
-\newcommand{\KAPPAref}{\xref{\KAPPA}{sun95}{}}
+\newcommand{\KAPPAref}{\xref{(SUN/95)}{sun95}{}}
 \newcommand{\SMURF}{\textsc{smurf}}
-\newcommand{\SMURFcook}{\xref{\SMURF\ SCUBA-2 Cookbook}{sc19}{}}
-\newcommand{\ADAM}{\xref{ADAM}{sg4}{}}
-\newcommand{\AST}{\xref{AST}{sun210}{}}
-\newcommand{\ndf}{\xref{NDF}{sun33}{}}
+\newcommand{\SMURFcook}{\xref{SC/19}{sc19}{}}
+\newcommand{\ADAMsgref}{\xref{SG/4}{sg4}{}}
+\newcommand{\ADAMsunref}{\xref{SUN/101}{sun101}{}}
+\newcommand{\astref}{\xref{SUN/211}{sun211}{}}
+\newcommand{\ndfref}{\xref{SUN/33}{sun33}{}}
 
 % Application tasks
 \newcommand{\task}[1]{\textsf{#1}}
- 
-% ADAM parameters
-\newcommand{\param}[1]{\texttt{#1}}
  
 % SMURF tasks
 \newcommand{\badbolos}{\xref{\task{badbolos}}{sun258}{BADBOLOS}}
@@ -240,6 +240,7 @@
 \newcommand{\fitsedit}{\xref{\task{fitsedit}}{sun95}{FITSEDIT}}
 \newcommand{\kapdiv}{\xref{\task{div}}{sun95}{DIV}}
 \newcommand{\ndfcopy}{\xref{\task{ndfcopy}}{sun95}{NDFCOPY}}
+\newcommand{\provshow}{\xref{\task{provshow}}{sun95}{PROVSHOW}}
 \newcommand{\thresh}{\xref{\task{thresh}}{sun95}{THRESH}}
 \newcommand{\wcsmosaic}{\xref{\task{wcsmosaic}}{sun95}{WCSMOSAIC}}
 \newcommand{\wcsalign}{\xref{\task{wcsalign}}{sun95}{WCSALIGN}}
@@ -249,7 +250,7 @@
 % macros for typesetting parameters
 \newcommand{\aparam}[1]{\texttt{#1}}     % ADAM parameter
 \newcommand{\cparam}[1]{\texttt{#1}}     % CONFIG parameter
-\newcommand{\ndfcomp}[1]{\texttt{#1}}
+\newcommand{\ndfcomp}[1]{\texttt{#1}}    % NDF component
 
 %% Definitions imported from SUN/95
 
@@ -687,19 +688,47 @@
 \renewcommand{\thepage}{\arabic{page}}
 \setcounter{page}{1}
 
-% ? Main text
+% Main text
 
 \section{\xlabel{introduction}Introduction\label{se:smurfintro}}
 
 This guide is divided into two main parts, one dedicated to processing
-ACSIS data (Section \ref{se:acsisdr}) and the other for processing
-SCUBA-2 data (Section \ref{se:sc2dr}). This first section will
-introduce \SMURF\ and the basics of operation. The Starlink Cookbook
-(\xref{\textbf{SC/19}}{sc19}{}) is available for SCUBA-2 data
-processing.
+ACSIS data (\cite{acsis}, see Section \ref{se:acsisdr}) and the other
+for processing SCUBA-2 data (\cite{scuba2}, see Section
+\ref{se:sc2dr}). This first section will introduce \SMURF\ and the
+basics of operation. The SMURF Cookbook (\SMURFcook) is also
+available, providing an introduction to SCUBA-2 data processing.
 
-\SMURF\ is a suite of \starlink\ \ADAM\ tasks and therefore requires
-the \starlink\ environment to be defined.
+\SMURF\ is a suite of \starlink\ ADAM tasks (\xref{SUN/101}{sun101}{}
+and \xref{SG/4}{sg4}{}) and therefore requires the \starlink\
+environment to be defined.
+
+\subsection{Document conventions}
+
+In an attempt to make this document clearer to read, different fonts
+are used for specific structures.
+
+Observing modes are denoted by all upper case body text (e.g.\
+FLATFIELD).
+
+Starlink package names are shown in small caps (e.g.\ \SMURF);
+individual task names are shown in sans-serif (e.g.\ \makemap).
+
+Content listings are shown in fixed-width type (sometimes called
+`typewriter'). Extensions and components within NDF (\ndfref) data
+files are shown in upper case fixed-width type (e.g.\
+\ndfcomp{HISTORY}).
+
+Text relating to filenames, key presses or entries typed at the
+command line are also denoted by fixed-width type (e.g.\ \texttt{\%
+  smurf}), as are parameters for tasks which are displayed in upper
+case (e.g.\ \aparam{METHOD}).
+
+References to Starlink documents, i.e., Starlink User Notes (SUN),
+Starlink General documents (SG) and Starlink Cookbooks (SC), are given
+in the text using the document type and the corresponding number
+(e.g.\ SUN/95). Non-Starlink documents are cited in the text and
+listed in the bibliography.
 
 \subsection{Using SMURF}
 
@@ -720,14 +749,15 @@ prompt. The welcome message will appear as shown below:
 
 
 \end{verbatim}
-This defines aliases for each \SMURF\ command, shows the help command
-and version number. You can now use \SMURF\ routines or ask for help.
+This defines aliases for each \SMURF\ command, gives a reminder of the
+help command and shows the version number. You can now use \SMURF\
+routines or ask for help.
 
-\subsubsection{Getting Help}
+\subsubsection{Getting help}
 
 Access the \SMURF\ online help system as follows:
 \begin{enumerate}
-\item At the prompt, type \verb+smurfhelp+. The welcome message is
+\item At the prompt, type \smurfhelp. The welcome message is
   displayed along with a list of available topics.
 \item To get information, type the name of an available topic at the
   help prompt.  The next level of help lists information and further
@@ -740,23 +770,23 @@ Access the \SMURF\ online help system as follows:
   to the shell prompt.
 \end{enumerate}
 Further help on the help system maybe obtained by accessing the topic
-\verb+smurfhelp+ from within \verb+smurfhelp+.
+\verb+smurfhelp+ from within \smurfhelp.
 
 \subsubsection{SMURF parameters}
 
 \SMURF\ uses named parameters to specify input and output files and
-other variables necessary for data processing. \KAPPAref\ has a
+other variables necessary for data processing. \KAPPA\ \KAPPAref\ has a
 convenient overview of the parameter system used by \SMURF.
 
 \subsubsection{Message filter}
 
-All \SMURF\ commands support the ``message filter'' parameter
+All \SMURF\ commands support the `message filter' parameter
 (\verb+msg_filter+), which controls the number of messages \SMURF\
-writes to the screen during routines. The default setting for the
-message filter is \verb+normal+. Table \ref{tab:msgfilter}  lists the available
-values for \verb+msg_filter+. Be aware that specifying \verb+verbose+
-or \verb+debug+ will slow down execution due to the (potentially vast)
-number of messages written to the terminal.
+writes to the screen when executing routines. The default setting for
+the message filter is \verb+normal+. Table \ref{tab:msgfilter} lists
+the available values for \verb+msg_filter+. Be aware that specifying
+\verb+verbose+ or \verb+debug+ will slow down execution due to the
+(potentially vast) number of messages written to the terminal.
 
 \begin{table}
 \centering
@@ -775,13 +805,13 @@ all     & All messages regardless of debug level \\
 \label{tab:msgfilter}
 \end{table}
 
-\subsubsection{\xlabel{files}Working with Data Files\label{se:files}}
+\subsubsection{\xlabel{files}Working with data files\label{se:files}}
 
 \SMURF\ does not itself enforce a naming scheme on files. However, raw
 data from ACSIS and SCUBA-2 obey a well-defined naming scheme. The
 convention is as follows: the name is composed of an instrument
 prefix, the UT date in the form YYYYMMDD, a zero-padded five-digit
-observation number, followed by a two-digit subsystem number (ACSIS
+observation number, followed by a two-digit sub-system number (ACSIS
 only) and a zero-padded four-digit subscan number, all separated by
 underscore characters. The file has an extension of \verb+.sdf+. The
 instrument prefix for ACSIS is simply \verb+a+. For SCUBA-2 it is a
@@ -794,65 +824,48 @@ each wavelength, which are coded by a single digit (either 4 or 8 for
 Example ACSIS filename: a20090620\_00023\_01\_0002.sdf\\
 Example SCUBA-2 filename: s8a20090620\_00075\_0001.sdf
 
-You can process files either singly or in batches. It is more
-efficient to process multiple files at a time. To work with multiple
-files:
+Files can be processed either singly or in batches. It is more
+efficient to process multiple files at the same time. To work with
+multiple files:
 \begin{enumerate}
 \item Create an input file listing the filename of each subscan you
   wish to process.
 \item Create an output file listing corresponding output filenames for
   each input subscan, if appropriate.
 \item When specifying an input (or output list file for a routine,
-  type \verb+in=^infiles.lis+ or \verb+out=^outfiles.lis+. The caret
+  type \verb+`in=^infiles.lis'+ or \verb+`out=^outfiles.lis'+. The caret
   (\verb+^+) indicates that the input file is a list file.
 \end{enumerate}
 Note that the output filenames should be listed in the same order as
-the input filenames otherwise the processed data will be written under
+the input filenames, otherwise the processed data will be written under
 the wrong filenames. Take care to supply a different output file name
 from the input as the contents are overwritten!
 
-\subsection{Document conventions}
-
-Observing modes are denoted by all upper case body text (e.g.\
-FLATFIELD).
-
-Starlink package names are shown in small caps (e.g.\ \SMURF);
-individual task names are shown in sans-serif (e.g.\ \makemap).
-
-NDF extensions and components are shown in upper case fixed-width type
-(e.g.\ \ndfcomp{HISTORY}). Content listings are shown in fixed-width type.
-
-Text relating to filenames, key presses or entries typed at the
-command line are denoted by fixed-width type (e.g.\ \texttt{\%
-  smurf}), as are parameters for tasks (e.g.\ \aparam{METHOD}).
-
-Parameters are displayed in caps using a fixed-width type (e.g.\
-\aparam{PIXSIZE}).
-
-\subsection{Data File Structure}
+\subsection{Data file structure}
 
 Data files for both ACSIS and SCUBA-2 use the Starlink N-Dimensional
-data format (\ndf), a hierarchical format which allows
+data format (NDF, see \ndfref), a hierarchical format which allows
 additional data and metadata to be stored within a single file. Raw
 files contain a number of NDF components which store
 observation-specific data necessary for subsequent processing. The
 contents of these (and other NDF) files may be listed with
-\HDSTRACEref. Each file on disk is also known as a subscan.
+\HDSTRACEref. Each file on disk is also known as a `subscan'.
 
 The main (top-level) components are:
 \begin{itemize}
 \item Raw data (a 3-dimensional array);
 \item World Coordinate System information;
 \item History;
-\item Raw data units (K for ACSIS).
+\item Raw data units (K for ACSIS, current units for raw SCUBA-2 data,
+  W for flatfielded SCUBA-2 data).
 \end{itemize}
 For ACSIS, the raw data are stored as $N_{\rm chan} \times N_{\rm
   receptors} \times N_{\rm samp}$, while SCUBA-2 data are stored as
 $N_{\rm rows} \times N_{\rm columns} \times N_{\rm samp}$, where
-$N_{\rm samp}$ is the number of samples in a file.
+$N_{\rm samp}$ is the number of time samples in a file.
 
 The files also contain additional NDF components common to both
-instruments are stored:
+instruments:
 \begin{itemize}
 \item JCMT State structure (the telescope pointing record);
 \item JCMT Observatory Control System (OCS) information, with the
@@ -862,7 +875,7 @@ instruments are stored:
 \end{itemize}
 The FITS header is used to store information that either does not
 change or changes by a small amount during the course of an
-observation. We note that in the particular case of SCUBA-2 data a
+observation. Note that in the particular case of SCUBA-2 data a
 portion of the FITS header will change for each subscan (i.e. file) of
 a single observation. The FITS header may be viewed with the \KAPPA\
 \fitslist\ command.
@@ -872,19 +885,19 @@ dark squid data, the current flatfield solution and a polynomial fit
 to detector signal versus raw data (a correction for linear drift).
 ACSIS files contain information about the receptors used.
 
-Output files created by \SMURF\ may contain some or all of these plus
+Output files created by \SMURF\ may contain some or all of these, plus
 new components with information about the output data. These are noted
 in the description of specific applications. All output files contain
-contain a \ndfcomp{PROVENANCE} extension which contains a detailed
-record of the data processing history. Use the \KAPPA\ command
-provshow to list the contents.
+a \ndfcomp{PROVENANCE} extension which provides a detailed record of
+the data processing history. Use the \KAPPA\ command \provshow\ to list
+the contents.
 
 \subsection{Supported coordinate systems}
 
-\SMURF\ uses \AST\ for its astrometry and thus any coordinate system
-supported by \AST\ may be used when creating images/cubes. The default
-behaviour is to use the same system in which the observations were
-made (known as \aparam{TRACKING}).
+\SMURF\ uses AST (\astref) for its astrometry and thus any coordinate
+system supported by AST may be used when creating images/cubes. The
+default behaviour is to use the same system in which the observations
+were made (known as \aparam{TRACKING}).
 
 \subsubsection{Moving sources}
 
@@ -893,7 +906,7 @@ deal with moving sources. There is no need to deal with moving sources
 explicitly for any processing with \SMURF. However, mosaicking of
 DREAM and STARE images of moving sources will require the WCS
 attributes \verb+AlignOffset+ and \verb+SkyRefIs+ to be changed to 1
-and ``origin'' respectively. Use the \KAPPA\ task \wcsattrib\ to
+and `origin' respectively. Use the \KAPPA\ task \wcsattrib\ to
 modify these attributes.
 
 \subsection{File sizes and disk space}
@@ -921,10 +934,10 @@ To be written. In the meantime, see the ACSIS-DR web page at the JCMT:\\
 \section{\xlabel{scuba2}SCUBA-2 Data Reduction\label{se:sc2dr}}
 
 SCUBA-2 has two primary observing modes where the telescope is either
-stationary relative to the source (DREAM, STARE and when the FTS or
-polarimeter are in use), or moving (SCAN). The data processing differs
-in detail for each observing mode, though the general procedure is the
-same.
+stationary relative to the source (DREAM, STARE and typically when the
+FTS or polarimeter are in use), or moving (SCAN). The data processing
+differs in detail for each observing mode, though the general
+procedure is the same.
 
 In addition to data files, each observation is bracketed by dark
 frames. In some cases dark frames may also be recorded part-way
@@ -936,29 +949,30 @@ unusable in the worst cases). Dark frames can be identified by
 searching for the FITS keyword \texttt{SHUTTER}, which is 0 for dark
 frames.
 
-Two general approaches may be taken to data reduction. The first,
-outlined by the steps in Section \ref{se:dsworkflow} and
+Two general approaches may be taken to reducing data. The first,
+outlined by the steps in Sections \ref{se:dsworkflow} and
 \ref{se:rebin}, performs all of the data reduction tasks using a range
 of individual calls to \SMURF\ tasks (with the exception of
 \qlmakemap\ which encapsulates the most important of these operations
 in a single command). This method is useful if the user wishes to
 interact and view each step of the reduction, although the final maps
-are generally not of ``science grade'' quality. A second approach is
-to use the Dynamic Iterative Map Maker, described in Section
+are generally not of `science grade' quality. A second approach is to
+use the Dynamic Iterative Map Maker (DIMM), described in Section
 \ref{se:dimm}. All of the data pre-processing steps, as well as an
 iterated solution for the final map are handled using a single
-command. While the processing time may be larger, the reduced maps are
+command. While the processing time may be longer, the reduced maps are
 of superior quality.
 
-\subsection{\xlabel{arraycal}Array Calibration and Characterization Data\label{se:arraycal}}
+\subsection{\xlabel{arraycal}Array calibration and characterization\label{se:arraycal}}
 
 Data from array calibration observations (such as FLATFIELD and NOISE)
 are processed with \SMURF. NOISE observations are used to identify
 bolometers which are not in spec, from which a bad-bolometer mask can
 be created. There is usually no need to re-process these data, but
 they are included here for completeness. Note that for both
-observation types the data are all ``dark'', i.e.\ the value of
+observation types the data are all `dark', i.e.\ the value of
 \texttt{SHUTTER} is 0.
+% SKYDIP to be described here?
 
 \subsubsection{\xlabel{flatcal}FLATFIELD\label{se:flatcal}}
 
@@ -974,32 +988,33 @@ with suitable default values is included with the installation of
 \SMURF: \texttt{\$STARLINK\_DIR/share/smurf/resist.cfg}.
 
 The output from processing a FLATFIELD observation is a data file
-(which may be named automatically if not supplied) which contains the
-flatfield solution in the NDF extension \texttt{.MORE.SCUBA2.FLATCAL},
-the same location as for the raw data. The main data array for this
-output file is a three-dimensional array containing the
-dark-subtracted measurements for each heater setting ($N_{\rm
-  row}\times N_{\rm column} \times N_{\rm heat}$).
+(named automatically if not supplied) which contains the flatfield
+solution in the NDF extension \texttt{.MORE.SCUBA2.FLATCAL}, the same
+location as for the raw data. The main data array for this output file
+is a three-dimensional array containing the dark-subtracted
+measurements for each heater setting ($N_{\rm row}\times N_{\rm
+  column} \times N_{\rm heat}$).
 
 In addition to generating the flatfield solution, \calcflat\ can also
 create a responsivity image for the current subarray. The
 \aparam{RESP} parameter may be specified to store the
-responsivity. The responsivity has units of A/W.
+responsivity. The responsivity has units of amperes per watt (A/W).
 %WHAT ELSE CAN WE SAY ABOUT THE RESPONSIVITY?
 
 \subsubsection{NOISE}
 
 NOISE observations are designed to check that the bolometers are
-operating within spec. This is achieved by calculating the power
-spectrum and comparing the relative noise power at two frequencies.
-Excessively noisy bolometers are noted and a bad bolometer mask
-generated. There is no single \SMURF\ command that processes NOISE
-observations in this way but the procedure for creating a bad
-bolometer mask is as follows:
+operating within specifications. This is achieved by calculating the
+power spectrum and comparing the relative noise power at two
+frequencies.  Excessively noisy bolometers are noted and a bad
+bolometer mask generated. There is no single \SMURF\ command that
+processes NOISE observations in this way but the procedure for
+creating a bad bolometer mask is as follows:
 \begin{itemize}
 \item Calculate the power spectrum with \SMURF\ \fft;
 \item Select data at the two chosen frequencies with \KAPPA\ \ndfcopy\
-  (collapsing if necessary);
+  (collapsing the data cube along the frequency axis, if necessary, to
+  calculate an average over a small frequency range);
 \item Form the ratio of those two files with \KAPPA\ \kapdiv;
 \item Use \KAPPA\ \thresh\ (multiple times if necessary) to define a
   bad-bolometer mask.
@@ -1009,11 +1024,13 @@ Bad bolometer masks are supported by the \flatfield, \extinction,
 \remsky, \qlmakemap\ and \makemap\ tasks through the \aparam{BPM}
 parameter.
 
-\subsection{\xlabel{dsworkflow}DREAM/STARE Data Reduction Workflow\label{se:dsworkflow}}
+\subsection{\xlabel{dsworkflow}DREAM/STARE data reduction workflow\label{se:dsworkflow}}
 
-The DREAM/STARE observing modes are designed for mapping compact
-sources, i.e.\ those which are smaller than the field of view of
-SCUBA-2 (approximately 8 arcmin).
+The DREAM/STARE observing modes (\cite{scuba2}) were originally
+designed for mapping compact sources, i.e.\ those which are smaller
+than the field of view of SCUBA-2 (approximately 8 arcmin). Although
+it is now expected that SCAN will be the default mode, it is
+nevertheless more straightforward to discuss DREAM and STARE first.
 
 The workflow for processing DREAM and STARE data may proceed in one of
 two ways: a simplified workflow using images calculated by the data
@@ -1035,12 +1052,12 @@ The workflow proceeds as follows:
 The images calculated by the DA are stored as NDF extensions in the
 raw data files under \texttt{.MORE.SCU2RED.In} where \texttt{n} is an
 integer (non-zero-padded). Each image is an average of the data in
-typically 1 second. Note the final image is created from the whatever
+typically 1 second. Note the final image is created from whatever
 samples remain if the duration of the file is not an integer number of
 seconds. Each image has its own FITS header associated with it which
 contains values which vary between images.
 
-\subsubsection{\xlabel{flatfield}Applying the Flatfield Correction\label{se:flatfield}}
+\subsubsection{\xlabel{flatfield}Applying the flatfield correction\label{se:flatfield}}
 
 This section describes how to apply the flatfield solution to raw
 data. This step is not necessary for the simplified workflow.
@@ -1082,44 +1099,30 @@ This section describes how to subtract the signal from the atmosphere
 (or sky) from your observations. This step is required for both the
 full and simplified workflows.
 
-The sky is highly emissive (bright) at submillimetre wavelengths, and
-the radiation received from an astronomical source is only a very
-small fraction of the radiation received from the
-atmosphere. Typically the atmospheric signal is a factor of $10^5$
-times greater than that from the source (see in Figure
+The sky is highly emissive (bright) at submillimetre
+wavelengths\cite{archibald}, and the radiation received from an
+astronomical source is only a very small fraction of the radiation
+received from the atmosphere. Typically the atmospheric signal is a
+factor of $10^5$ times greater than that from the source (see Figure
 \ref{fig:signal} for a pictorial representation). In addition, the
 atmospheric emission varies significantly over the timescales of a
 typical observation, further swamping any contribution from the
 source. Fortunately, the emission from the sky is correlated over the
-SCUBA-2 field of view which enables simple sky removal techniques to
-be used effectively.
+SCUBA-2 field of view, which enables simple sky removal techniques to
+be used effectively\cite{archibald,sc2ana002}.
 
-\begin{latexonly}
-   \begin{figure}[htb]
-   \begin{center}
-     \includegraphics[width=150mm]{sun258_submmsignal}
-     \caption{Illustration of the relative magnitudes of atmospheric
-       and source signals at submillimetre wavelengths. Data from 850
-       $\mu$m observations of Jupiter with SCUBA-2. The sharp features
-       occur when Jupiter is seen by the bolometer. The increase in
-       optical power from Jupiter is $\sim$0.5\%. Most sources will be
-       many thousands of times fainter.}
-     \label{fig:signal}
-   \end{center}
-   \end{figure}
-\end{latexonly}
-\begin{htmlonly}
-   \label{fig:signal}
-   \htmladdimg{sun258_submmsignal.gif}
-
-   Figure ??: Illustration of the relative magnitudes of atmospheric
-   and source signals at submillimetre wavelengths. Data from 850
-   $\mu$m observations of Jupiter with SCUBA-2. The sharp features
-   occur when Jupiter is seen by the bolometer. The increase in
-   optical power from Jupiter is $\sim$0.5\%. Most sources will be
-   many thousands of times fainter.
-
-\end{htmlonly}
+\begin{figure}[htb]
+  \begin{center}
+    \includegraphics[width=150mm]{sun258_submmsignal}
+    \caption{Illustration of the relative magnitudes of atmospheric
+      and source signals at submillimetre wavelengths. Data are from
+      850 $\mu$m observations of Jupiter with SCUBA-2. The sharp
+      features occur when Jupiter is seen by the bolometer. The
+      increase in optical power from Jupiter is $\sim$0.5\%. Most
+      sources will be many thousands of times fainter.}
+    \label{fig:signal}
+  \end{center}
+\end{figure}
 
 In a single sample the signal collected from an astronomical source is
 negligible in comparison with the contribution from the
@@ -1131,7 +1134,7 @@ several options for fitting and removing the atmospheric contribution
 to the signal. All take advantage of the fact that the sky signal is
 correlated between adjacent bolometers.
 
-You can fit the atmospheric signal in the following ways:
+The atmospheric signal can be fit in the following ways:
 \begin{itemize}
 \item Calculate the mean value of the signal;
 \item Fit a gradient in elevation only;
@@ -1142,9 +1145,9 @@ subarrays simultaneously to make a better estimate of the atmospheric
 emission (see the \aparam{GROUP} parameter).
 
 For simple cases, subtracting a mean value may be sufficient, though
-it is not recommended for bright sources as the mean will be biassed
-high by the presence of the source. A more sophisticated solution may
-be obtained by fitting a plane to the data. The plane may have
+it is not recommended for bright sources, as the mean will be biassed
+too high by the presence of the source. A more sophisticated solution
+may be obtained by fitting a plane to the data. The plane may have
 arbitrary orientation (in azimuth and elevation) or may be fixed so
 that the slope is in elevation only.
 
@@ -1166,7 +1169,7 @@ astronomical source (represented by $I_{\rm src}$ in Equation
   atm}$). However, $I_{\rm src}$ is diminished by the optical depth
 of the atmosphere ($\tau$) as follows:
 \begin{equation}
-I_{\rm obs} = I_{\rm atm} + I_{\rm src} \exp(-\tau)
+I_{\rm obs} = I_{\rm atm} + I_{\rm src} \exp(-\tau).
 \label{eq:iobs}
 \end{equation}
 The optical depth is usually quoted as the value at the zenith
@@ -1183,19 +1186,19 @@ thus equal to $90-\phi$, where $\phi$ is the elevation. You can now
 calculate $\tau_{\rm obs}$ from $\tau_{\rm zenith}$ and $\phi$ as
 follows:
 \begin{equation}
-\tau_{\rm obs} = \tau_{\rm zenith} / \cos(90 - \phi )
+\tau_{\rm obs} = \tau_{\rm zenith} / \cos(90^\circ - \phi ).
 \label{eq:tau}
 \end{equation}
 
 Using Equation \ref{eq:tau}, rewrite Equation \ref{eq:iobs} as:
 \begin{equation}
 I_{\rm obs} = I_{\rm atm} + I_{\rm src} \exp \left( 
-\frac{-\tau_{\rm zenith}}{\cos(90-\phi)}\right)
+\frac{-\tau_{\rm zenith}}{\cos(90^\circ-\phi)}\right).
 \end{equation}
 %The top graph in Figure ??? shows how the observed signal varies with elevation
 %and airmass.
 
-The elevation angle of each bolometer can be calculated and given
+The elevation angle of each bolometer can be calculated, and given
 $\tau_{\rm zenith}$ \remsky\ calculates the $\tau_{\rm obs}$ at the
 elevation angle of each bolometer. 
 
@@ -1219,7 +1222,7 @@ The zenith optical depth can be obtained via three methods:
 \item JCMT Water Vapour Monitor: The JCMT Water Vapour Monitor (WVM)
   provides opacity estimates every 1.2 seconds by measuring the
   spectral shape of the 183 GHz water line along the telescope
-  line-of-site, and then converting this to an effective $\tau_{\rm
+  line-of-sight, and then converting this to an effective $\tau_{\rm
     zenith}$ at 225 GHz. Since the measurement is aligned with the
   submillimetre beam this method circumvents the need to apply the
   plane parallel approximation (which breaks down at the horizon). The
@@ -1256,7 +1259,8 @@ alternative method of sky subtraction has been used (such as using
 \aparam{HASSKYREM} may be set to \texttt{TRUE} to override the history
 check by \extinction.
 
-\subsubsection{\xlabel{dsimages}Calculating images from time-series data\label{se:dsimages}}
+\subsubsection{\xlabel{dsimages}Calculating images from time-series
+  data\label{se:dsimages}}
 
 This step is not required for the simplified workflow.
 
@@ -1267,7 +1271,7 @@ images are calculated with \dreamsolve.
 In \starecalc\ the user may specify how many samples to average to
 create images (the default is to calculate averages once a second).
 
-\dreamsolve\ requires the the DREAM weights file specified in the FITS
+\dreamsolve\ requires the DREAM weights file specified in the FITS
 header keyword \texttt{DRMWGHTS} to reside in the current
 directory. Data from each subarray require a corresponding weights
 file. See section \ref{se:dream} below for details on calculating
@@ -1281,8 +1285,8 @@ handled by routines in \KAPPA\ and \CCDPACK. Suitable tasks are
 align all the images to a common coordinate frame) followed by
 \CCDPACK\ \makemos.
 
-See the \SMURFcook\ (SC/19) for more detailed information about
-mosaicking SCUBA-2 images.
+See the SMURF cookbook (\SMURFcook) for more detailed information
+about mosaicking SCUBA-2 images.
 
 \subsubsection{\xlabel{dream}Using alternative DREAM solutions\label{se:dream}}
 
@@ -1291,38 +1295,45 @@ for completeness.
 
 The DREAM observing mode moves the secondary mirror in a pattern which
 causes adjacent bolometers to observe the same region of the sky
-multiple times. The data is then described by a series of simultaneous
-equations which are solved via a matrix inversion (using singular
-value decomposition). Since the pattern traced out by the secondary
-mirror is known, the inverse of the matrix can be pre-calculated (a
-time-consuming task) for a given output grid and applied to data at
-the time of observation (quick).
+multiple times \cite{scuba2,dream}. The data are then described by a
+series of simultaneous equations which are solved via a matrix
+inversion (using singular value decomposition). Since the pattern
+traced out by the secondary mirror is known, the inverse of the matrix
+can be pre-calculated (a time-consuming task) for a given output grid
+and applied to data at the time of observation (quick).
 
 It is {\em strongly} recommended that users become familiar with the
-details of DREAM (references) before using weights other than the
+details of DREAM \cite{dream} before using weights other than the
 default for science data processing.
 
 The user may wish to experiment with different regridding schemes or
-they may be other reasons, not known at the time of observation, which
-require the inverse matrix to be re-calculated. The task for doing
-this is called \dreamweights\ which allows the user to specify
-different output grid parameters. The calculation of the inverse is
-moderately time-consuming (compared with calculating the images) and
-takes of order 5--10 minutes on current hardware. The output file from
-\dreamweights\ is the weights file required by \dreamsolve. \KAPPA\
-\fitsedit\ may be used to specify weights files which differ in name
-from the default. Note that this process must be repeated for each
-subarray for which data exists and that data are to be combined should
-all use the same grid.
+there may be other reasons, not known at the time of observation,
+which require the inverse matrix to be re-calculated. The task for
+doing this is called \dreamweights, and this allows the user to
+specify different output grid parameters. The calculation of the
+inverse is moderately time-consuming (compared with calculating the
+images) and takes of order 5--10 minutes on current hardware. The
+output file from \dreamweights\ is the weights file required by
+\dreamsolve. \KAPPA\ \fitsedit\ may be used to specify weights files
+which differ in name from the default. Note that this process must be
+repeated for each subarray for which data exist and that data which
+are to be combined should all use the same grid.
 
-\subsection{\xlabel{scanworkflow}SCAN Data Reduction Workflow\label{se:scanworkflow}}
+\subsection{\xlabel{scanworkflow}SCAN data reduction
+  workflow\label{se:scanworkflow}}
 
 Processing SCAN data is more complicated than DREAM and STARE data.
 The challenge is to make an image when the data taken at each
-bolometer position does not line up exactly with the output map
-pixels. \SMURF\ supports two methods of creating a map:
+bolometer position do not line up exactly with the output map
+pixels. The fundamental difference is that the primary mirror is
+scanning the array continuously on the sky. The pixels in the map can
+therefore be chosen arbitrarily, and bear no relationship with the
+array of detectors \cite{sc2ana001,sc2ana005,sc2ana006}.
+
+\SMURF\ supports two methods of creating a map:
 \begin{enumerate}
-\item A simple rebinning algorithm to assign data to output map pixels;
+\item A simple rebinning algorithm to assign data to output map
+  pixels, sometimes referred to as a `naive map';
 \item An iterative method which solves for a succession of model
   components assumed to represent the raw data.
 \end{enumerate}
@@ -1330,7 +1341,7 @@ pixels. \SMURF\ supports two methods of creating a map:
 The rebinning method may be adequate for bright compact sources
 (bright enough to be detected in one sample and smaller than the field
 of view of the array). The rebin method is also suitable for obtaining
-a ``quick-look'' image. The \SMURF\ tasks \qlmakemap\ and \makemap\
+a `quick-look' image. The \SMURF\ tasks \qlmakemap\ and \makemap\
 support this map-making method.
 
 In practice, the dynamic iterative map maker (DIMM; see Section
@@ -1344,7 +1355,7 @@ different ways:
 \begin{enumerate}
 \item a multi-step approach following the method listed above for
   DREAM and STARE data (\makemap);
-\item a single-step approach which applies of the necessary
+\item a single-step approach which applies the necessary
   corrections internally while the data are loaded in memory
   (\qlmakemap).
 \end{enumerate}
@@ -1355,9 +1366,11 @@ co-ordinate system.
 As outlined in \ref{se:dsworkflow}, the procedure for processing
 SCUBA-2 data follows these steps:
 \begin{enumerate}
-\item Apply the flatfield correction (see Section \ref{se:flatfield}).
-\item Remove the contribution of atmosphere to the signal (see Section \ref{se:skysub}).
-\item Correct for atmospheric extinction (see Section \ref{se:extinction}).
+\item Apply the flatfield correction (see Section \ref{se:flatfield});
+\item Remove the contribution of atmosphere to the signal (see Section
+  \ref{se:skysub});
+\item Correct for atmospheric extinction (see Section
+  \ref{se:extinction});
 \item Make a map using the rebin method.
 \end{enumerate}
 
@@ -1368,16 +1381,19 @@ sum of the signal from every bolometer that observed at that position.
 
 There are many options for the pixel spreading scheme (see Table ???
 for a summary). The fastest option is to use the nearest-neighbour
-pixel spreading scheme (Nearest), which assigns the whole signal from
-one bolometer to the nearest map pixel. This option does not always
-produce smooth maps, but it produces a robust estimate of the noise.
+pixel spreading scheme (`Nearest'), which assigns the whole signal
+from one bolometer to the nearest map pixel. This option does not
+always produce smooth maps (if the map is poorly sampled, for example,
+but it produces a robust estimate of the noise. In the limit of a
+large number of `hits' per pixel, and with a pixel size sufficiently
+small compared to the beamsize, this method is optimal.
 
-For smoother maps, use the Linear scheme to share the input signal
-equally among the four nearest map pixels. There are more complicated
-options available, e.g., Sinc-type functions, or Gaussian
-distributions. These methods produce aesthetically pleasing maps, at
-the risk of introducing correlations into the noise.
-
+For smoother maps (with poor sampling, for example), the `Linear'
+scheme can be used to share the input signal equally among the four
+nearest map pixels. There are more complicated options available,
+e.g., Sinc-type functions, or Gaussian distributions. These methods
+produce aesthetically pleasing maps, at the risk of introducing
+correlations into the noise and additional smoothing to the map.
 
 Figure \ref{fig:rebinmap} shows an example map created from simulated
 observations of an extended source with bright features. It was
@@ -1387,30 +1403,20 @@ spreading scheme.
 Note the dark regions around the bright sources. They are negative
 bowls introduced by the sky subtraction method (Section
 \ref{se:skysub}). The random dots are cosmic ray spikes which are not
-removed by this workflow.
+removed by this particular workflow.
 
-\begin{latexonly}
-   \begin{figure}[htb]
-   \begin{center}
-     \includegraphics[width=0.7\linewidth]{sun258_rebinmap}
-     \caption{Image reconstructed from simulated data using the
-       \aparam{REBIN} method. Note the deep wells around bright
-       sources and the numerous spikes.}
-     \label{fig:rebinmap}
-   \end{center}
-   \end{figure}
-\end{latexonly}
-\begin{htmlonly}
-   \label{fig:rebinmap}
-   \htmladdimg{sun258_rebinmap.gif}
+\begin{figure}[htb]
+  \begin{center}
+    \includegraphics[width=0.7\linewidth]{sun258_rebinmap}
+    \caption{Image reconstructed from simulated data using the
+      \aparam{REBIN} method. Note the deep wells around bright
+      sources and the numerous spikes caused by (simulated) cosmic
+      rays.}
+    \label{fig:rebinmap}
+  \end{center}
+\end{figure}
 
-   Figure ??: Image reconstructed from simulated data using the
-   \aparam{REBIN} method. Note the deep wells around bright sources
-   and the numerous spikes.
-
-\end{htmlonly}
-
-\subsubsection{\xlabel{iter}Iterative map-maker\label{se:iter}}
+\subsubsection{\xlabel{iter}Dynamic iterative map-maker\label{se:iter}}
 
 The iterative map-maker is described more fully below in Section
 \ref{se:dimm}.
@@ -1420,11 +1426,12 @@ The iterative map-maker is described more fully below in Section
 
 The Dynamic Iterative Map-Maker (DIMM) is the preferred tool for
 producing maps of SCUBA-2 total power data obtained in SCAN
-mode. Rather than executing each of the steps described in Section
-\ref{se:rebin} separately, the DIMM is capable of performing all
-of the data pre-processing steps, as well as iteratively solving for
-multiple signal components (including the image of the astronomical
-sky) using a single call to the \makemap\ task.
+mode\cite{sc2ana006} (see also \SMURFcook). Rather than executing each
+of the steps described in Section \ref{se:rebin} separately, the DIMM
+is capable of performing all of the data pre-processing steps, as well
+as iteratively solving for multiple signal components (including the
+image of the astronomical sky) using a single call to the \makemap\
+task.
 
 \subsection{Signal model}
 
@@ -1438,62 +1445,43 @@ I^i_{\mathrm{obs}}(t) = [G_C^i COM(t) + O_C^i] + [G_D^i DKS^j(t) + O_D^i] +
 %
 Here $I^i_{\mathrm{obs}}(t)$ is the total power delivered to the $i$th
 detector in pW as a function of time. The actual data written to disk
-has some arbitrary digital units that are proportional to pW. The
+have some arbitrary digital units that are proportional to pW. The
 conversion to pW is accomplished by flatfield measurements described
 in Section \ref{se:flatcal}. Figure \ref{fig:comps} shows a pictorial
 representation of some of the components, and they are also described
 in Table~\ref{tab:dimm_components}.
 
 \begin{table}
-\begin{tabular}{cl}
+\begin{tabular}{cp{10cm}}
  Model Component & Definition \\
 \hline
-$COM$ & Removes common-mode signal, i.e., the signal seen by all \\
-      & bolometers. This is the removal of the atmosphere. In addition \\
-      & bad detectors are also flagged if there signal does not resemble \\
-      & the common mode measured by the other detectors. \\
-$GAI$ & If $COM$ specified, a gain and offset is used to fit $COM$ to each \\
-      & detector before removal. \\
+$COM$ & Removes common-mode signal, i.e., the signal seen by all bolometers. This removes most of the atmospheric emission. In addition bad detectors are also flagged if there signal does not resemble the common mode measured by the other detectors. \\
+$GAI$ & If $COM$ specified, a gain and offset is used to fit $COM$ to each detector before removal. \\
 $DKS$ & Fits gain and offset to remove signal recorded by dark squids. \\  
 $EXT$ & Applies the extinction correction. \\
-$AST$ & Triggers map estimation, and removal of astronomical signal from \\
-      & time-series. \\
-$FLT$ & Applied frequency domain filter. \\
-$NOI$ & Estimates the time-domain variance to establish relative detector \\ 
-      & weights for map estimated, and for chi-squared ($\chi^2$) tolerance. \\
+$AST$ & Triggers map estimation, and removal of astronomical signal from the time-series. \\
+$FLT$ & Applies a frequency domain filter. \\
+$NOI$ & Estimates the time-domain variance to establish relative detector weights for the map estimated, and for chi-squared ($\chi^2$) tolerance. \\
 \hline
 \end{tabular}
 \caption{Model Components for Iterative Mapmaking}
 \label{tab:dimm_components}
 \end{table}
 
-\begin{latexonly}
-   \begin{figure}[htb]
-   \begin{center}
-     \includegraphics[width=0.76\linewidth]{sun258_signalcpts}
-     \caption{Simulation of bolometer time-series showing some of the
-       components that make up the total signal. The top panel shows
-       the observed signal, with subsequent panels showing the
-       relative contributions from the atmosphere, the astronomical
-       source and white noise.}
-     \label{fig:comps}
-   \end{center}
-   \end{figure}
-\end{latexonly}
-\begin{htmlonly}
-   \label{fig:signal}
-   \htmladdimg{sun258_signalcpts.gif}
-
-   Figure ??: Simulation of bolometer time-series showing some of the
-   components that make up the total signal. The top panel shows the
-   observed signal, with subsequent panels showing the relative
-   contributions from the atmosphere, the astronomical source and
-   white noise.
-
-\end{htmlonly}
+\begin{figure}[htb]
+  \begin{center}
+    \includegraphics[width=0.76\linewidth]{sun258_signalcpts}
+    \caption{Simulation of bolometer time-series showing some of the
+      components that make up the total signal. The top panel shows
+      the observed signal, with subsequent panels showing the relative
+      contributions from the atmosphere, the astronomical source and
+      white noise.}
+    \label{fig:comps}
+  \end{center}
+\end{figure}
 
 There is a dominant signal seen almost equally by all of the
-detectors. This ``common-mode'' component, $COM$, is a mixture of
+detectors. This `common-mode' component, $COM$, is a mixture of
 emission from atmospheric water vapour and the ambient thermal load
 from the telescope itself. Each detector has two free parameters
 associated with this signal component: a gain, $G_C^i$, and offset,
@@ -1502,12 +1490,15 @@ flatfield has a small residual error, and/or small residual baseline
 offsets are present.
 
 The first successful observations with SCUBA-2 used test arrays that
-exhibited strong signals correlated along columns which were believed
-to be caused by magnetic field pickup. Dark squids, $DKS$, (readouts
-with no thermal absorbers) at the ends of the $j$th column seem to
-provide a good measurement of this signal. Similar to $COM$, the DIMM
-can fit a gain and offset, $G_D^i$ and $O_D^i$, to each detector for
-the appropriate dark squid signal in the $j$th column.
+exhibited strong signals correlated along columns (believed to be
+caused by magnetic field pick-up). Dark squids, $DKS$, (readouts with
+no thermal absorbers) at the ends of 
+%the $j$th 
+each
+column seem to provide
+a good measurement of this signal. Similar to $COM$, the DIMM can fit
+a gain and offset, $G_D^i$ and $O_D^i$, to each detector for the
+appropriate dark squid signal in the $j$th column.
 
 The actual astronomical signal from which we wish to make a map,
 $AST$, is attenuated by an extinction factor, $EXT$, resulting from
@@ -1517,46 +1508,41 @@ of the DIMM is to isolate the component of the bolometer signals
 produce by $AST$ and to re-grid it into a map.
 
 Finally, there is a residual noise term for each detector, $N^i(t)$,
-which accounts for all of the remaining signal not accounted for by
-the other model components. Ideally the dominant component of this
-signal would be the white noise resulting from the thermal background,
-the noise component responsible for the noise equivalent power (NEP)
-and corresponding noise equivalent flux density (NEFD) used to plan
+which includes all of the remaining signal not accounted for by the
+other model components. Ideally the dominant part of this signal would
+be the white noise resulting from the thermal background, the noise
+component responsible for the noise equivalent power (NEP) and
+corresponding noise equivalent flux density (NEFD) used to plan
 observations. In practice, the detectors also have other
 slowly-varying baselines that are independent of the correlated $COM$
 and $DKS$ signals described above. Therefore we express the residual
 noise as
 %
 \begin{equation}
-N^i(t) = N^i_w(t) + N^i_{lf}(t),
+N^i(t) = N^i_{\rm w}(t) + N^i_{\rm lf}(t),
 \label{eq:dimm_noise}
 \end{equation}
 %
-where $N^i_w(t)$ and $N^i_{lf}(t)$ are the white and independent
-low-frequency noise components respectively. The DIMM can attempt to
-fit $N^i_{lf}(t)$ using the $FLT$ model component such that the
-residual signal is given only by $N^i_w(t)$.
+where $N^i_{\rm w}(t)$ and $N^i_{\rm lf}(t)$ are the white and
+independent low-frequency noise components, respectively. The DIMM can
+attempt to fit $N^i_{\rm lf}(t)$ using the $FLT$ model component such
+that the residual signal is given only by $N^i_{\rm w}(t)$.
 
 The strategy used by the DIMM is to estimate each of the signal
 components sequentially, roughly in order of decreasing amplitude. At
 the end of this procedure a numerical value proportional to $\chi^2$
-quantifying the mismatch between the model and the data is calculated
-from the r.m.s. in the residual noise $N^i_w(t)$. Provided that the
-model components are in some sense ``orthogonal'', multiple iterations
-of this procedure produces improved estimates of each component with
-stable convergence properties. This can be checked by monitoring the
-value of $\chi^2$: if the change between subsequent iterations is
-small enough the DIMM can stop automatically. Alternatively, a set
-number of iterations may be requested. In the future, separate
-convergence tests for each model component may be added.
+(quantifying the mismatch between the model and the data) is
+calculated from the r.m.s. in the residual noise $N^i_{\rm
+  w}(t)$. Provided that the model components are in some sense
+`orthogonal', multiple iterations of this procedure produces improved
+estimates of each component with stable convergence properties. This
+can be checked by monitoring the value of $\chi^2$: if the change
+between subsequent iterations is small enough the DIMM can stop
+automatically. Alternatively, a set number of iterations may be
+requested. In the future, separate convergence tests for each model
+component may be added.
 
-The iterative algorithm solves for different model components,
-creating a better model of the raw data in successive iterations. The
-algorithm runs until it reaches a pre-set number of iterations or
-until the difference between the model and the real data ($\chi^2$) is
-no longer changing significantly.
-
-\subsection{Detailed Operation\label{se:dimmdetails}}
+\subsection{Detailed operation\label{se:dimmdetails}}
 
 \begin{figure}
 \begin{center}
@@ -1582,8 +1568,8 @@ below:
   controlled by the \cparam{MEMITER} and \cparam{MAXLEN} configuration
   file parameters, as well as the \makemap\ parameter
   \aparam{MAXMEM}. When the files are concatenated, it is also
-  possible add extra zero-padding at the beginning and end of the data
-  streams to facilitate filtering (see the \cparam{PADSTART} and
+  possible to add extra zero-padding at the beginning and end of the
+  data streams to facilitate filtering (see the \cparam{PADSTART} and
   \cparam{PADEND} configuration file parameters). This operation is
   equivalent to using the \concat\ task.
 
@@ -1600,7 +1586,7 @@ below:
   options provide the same functionality as the \clean\ task. It
   should be noted that the default configuration file does {\em not}
   perform many of these pre-processing steps; the best results are
-  obtained by flagging spikes, filtering etc. using equivalent
+  obtained by flagging spikes, filtering etc., using equivalent
   operations that can be executed during the iterative step.
 
 \item[3. Fit pre-map estimate models:] Once the iterative process has
@@ -1614,9 +1600,9 @@ below:
   correction determined from external sensors (see Section
   \ref{se:extinction}). Rather than subtracting a signal component,
   $EXT$ applies a time-varying scale factor to each detector, so that
-  the physical units of model components calculated before and after
+  the magnitude of the model components calculated before and after
   $EXT$ are different -- total power received by the detectors and
-  power incident on the top of the earth's atmosphere respectively.
+  power incident on the top of the earth's atmosphere, respectively.
 
 \item[4. Estimate map:] The location of the $AST$ component in
   \cparam{MODELORDER} indicates when the astronomical image should be
@@ -1629,7 +1615,7 @@ below:
   given pixel, the noise is greatly reduced compared to the
   time-series data. Using the pointing solution, the map is then
   projected back into the time-domain (effectively the result of
-  ``scanning'' each detector across the map), storing it as the $AST$
+  `scanning' each detector across the map), storing it as the $AST$
   signal component, and then removing it from the detector time
   streams. This model component is special since both the map and
   $AST$ are estimated by this step.
@@ -1637,69 +1623,70 @@ below:
 \item[5. Fit post-map estimate models:] Once the map has been
   estimated and the astronomical signal removed from the data, the
   residual should contain only noise. However, this signal often
-  contains a weak drift ($N_{lf}$ in Eq.~\ref{eq:dimm_noise}) that is
-  independent from one detector to the next. By specifying the $FLT$
-  model component after $AST$, it is possible to remove this component
-  using, for example, a low-pass filter. It is advisable to apply this
-  filter after estimating the map to avoid causing ringing around
-  bright astronomical sources. However, in this case at least two
-  iterations are required for this component to have any effect on the
-  estimated map. It is also advisable to specify $NOI$ as the final
-  model component. This model calculates the r.m.s. noise in each
-  detector, and is required if a $\chi^2$ stopping criterion has been
-  requested. Furthermore, the measured r.m.s. are used to weight each
-  detector in the map estimate. If $NOI$ has not been specified each
-  detector is given the same weight, which can be highly non-optimal
-  if the detectors exhibit a wide range of sensitivities.
+  contains a weak drift ($N_{\rm lf}$ in Eq.~\ref{eq:dimm_noise}) that
+  is independent from one detector to the next. By specifying the
+  $FLT$ model component after $AST$, it is possible to remove this
+  component using, for example, a low-pass filter. It is advisable to
+  apply this filter {\em after} estimating the map to avoid causing
+  ringing around bright astronomical sources. However, in this case at
+  least two iterations are required for this component to have any
+  effect on the estimated map. It is also advisable to specify $NOI$
+  as the final model component. This model calculates the r.m.s. noise
+  in each detector, and is required if a $\chi^2$ stopping criterion
+  has been requested. Furthermore, the measured r.m.s. values are used
+  to weight each detector in the map estimate. If $NOI$ has not been
+  specified each detector is given the same weight, which can be
+  highly non-optimal if the detectors exhibit a wide range of
+  sensitivities.
 
 \item[6. Check for convergence:] Finally, the solution is checked for
   convergence -- either by reaching the number of pre-defined
-  iterations requested, or $\chi^2$ has changed by less than the
-  CHITOL value specified in the configuration file. In the latter
+  iterations requested, or because $\chi^2$ has changed by less than
+  the CHITOL value specified in the configuration file. In the latter
   case, $\chi^2$ is calculated in the following way. In the first
   iteration, $NOI$ estimates the white-noise contribution to the
-  r.m.s., $\sigma_w$, in each detector directly from the flat part of
-  their power spectra (presently defined over the frequency range 2 to
-  10 Hz). If any astronomical signal, or low-frequency signal
-  components are present in the data, the r.m.s. of the data stream
-  will be much larger than this (the integral over the entire power
-  spectrum). However, as the solution converges, the residual signal
-  should slowly approach a white noise distribution once the other
-  signal components are estimated and removed. $\chi^2$ is therefore
-  calculated as $(1/N) \sum_i[ r_i^2/\sigma^2_w]$, where $r_i$ is the
-  $i$th residual sample for a given detector, and $N$ is the total
-  number of samples for that detector. This number, averaged over all
-  samples and detectors, should tend to 1 as the solution converges,
-  although in practice it is off by some factor related to the
-  bandwidth used to calculate $\sigma_w$.
+  r.m.s., $\sigma_{\rm w}$, in each detector directly from the flat
+  part of their power spectra (presently defined over the frequency
+  range 2 to 10 Hz). If any astronomical signal, or low-frequency
+  signal components are present in the data, the r.m.s.\ of the data
+  stream will be much larger than this (the integral over the entire
+  power spectrum). However, as the solution converges, the residual
+  signal should slowly approach a white noise distribution, once the
+  other signal components are estimated and removed. $\chi^2$ is
+  therefore calculated as $(1/N) \sum_i[ r_i^2/\sigma^2_{\rm w}]$,
+  where $r_i$ is the $i$th residual sample for a given detector, and
+  $N$ is the total number of samples for that detector. This number,
+  averaged over all samples and detectors, should tend to 1 as the
+  solution converges, although in practice it will be off by some
+  factor related to the bandwidth used to calculate $\sigma_{\rm w}$.
 
-  The final map estimate, model signal components, and residual signal
-  may then all be exported to files for examination (see
-  \cparam{EXPORTNDF} configuration file parameter).
+  The final map estimate, the model signal components, and the
+  residual signal may then all be exported to files for examination
+  (see the \cparam{EXPORTNDF} configuration file parameter).
 
 \end{description}
 
 \subsubsection{Processing time}
 
-The memiter parameter (Table \ref{tab:dimmconfig}) influences the time
-it takes the iterative algorithm to generate a solution. It determines
-whether:
+The \cparam{MEMITER} parameter (Table \ref{tab:dimmconfig}) influences
+the time it takes the iterative algorithm to generate a solution. It
+determines whether:
 \begin{enumerate}
-\item Iterations are performed in memory (memiter=1)
+\item Iterations are performed in memory (\cparam{MEMITER}=1)
 \item Component values are written to a file after each iteration
-  (memiter=0)
+  (\cparam{MEMITER}=0)
 \end{enumerate}
 
 For the first option, the algorithm loads as many data files as
 possible into memory and processes the data in a single, continuous
 chunk. Once the algorithm has estimated a map, it saves the map and
-loads the next continuous chunk of data. When all the data is
+loads the next continuous chunk of data. When all the data are
 processed, the routine combines the maps from each continuous chunk
 into one image.
 
-For the second option the algorithm loads one data file (or file
+For the second option, the algorithm loads one data file (or file
 chunk) into memory, processes the file, saves the map, and moves onto
-the next file. This method uses less memory, but it takes much longer
+the next file. This method uses less memory, but it takes much longer,
 because of the extra time spent writing files to disk. It will also
 give poorer results since operations like filtering require
 apodization and padding at the ends of each data stream to minimize
@@ -1707,56 +1694,47 @@ ringing. By processing small data files a large fraction of the data
 may not be used.
 
 If your computer has enough random access memory (RAM), it is
-recommended that you set memiter=1 in the configuration file, and
-allow the iterative algorithm to process as much data as
-possible. However, you can still limit the size of the continuous
-chunk using the \makemap\ parameter \aparam{MAXMEM}.
+recommended that \cparam{MEMITER} is set to 1 in the configuration
+file, and allow the iterative algorithm to process as much data as
+possible. However, the size of the continuous chunk can still be
+limited by using the \makemap\ parameter \aparam{MAXMEM}.
 
 \subsubsection{Example image}
 
-\begin{latexonly}
-   \begin{figure}[htb]
-   \begin{center}
-     \includegraphics[width=0.7\linewidth]{sun258_itermap}
-     \caption{Image reconstructed from simulated data using the
-       \aparam{ITERATE} method. Note how the deep wells around bright
-       sources are no longer present, and there are no spikes.}
-     \label{fig:itermap}
-   \end{center}
-   \end{figure}
-\end{latexonly}
-\begin{htmlonly}
-   \label{fig:rebinmap}
-   \htmladdimg{sun258_itermap.gif}
+\begin{figure}[htb]
+  \begin{center}
+    \includegraphics[width=0.7\linewidth]{sun258_itermap}
+    \caption{Image reconstructed from simulated data using the
+      \aparam{ITERATE} method. Note how the deep wells around bright
+      sources are no longer present, and there are no cosmic ray
+      spikes.}
+    \label{fig:itermap}
+  \end{center}
+\end{figure}
 
-   Figure ??: Image reconstructed from simulated data using the
-   \aparam{ITERATE} method. Note how the deep wells around bright
-   sources are no longer present, and there are no spikes.
-
-\end{htmlonly}
-
-Figure ??? shows an example of a map created from simulated observations
-of an extended source using the Iterate method. Compare this image
-with the map created from the same observations using the Rebin method
-(see Figure ???).The dark regions around the bright sources have
+Figure \ref{fig:itermap} shows an example of a map created from
+simulated observations of an extended source using the `Iterate'
+method. Compare this image with the map created from the same
+observations using the `Rebin' method (see Figure
+\ref{fig:rebinmap}).The dark regions around the bright sources have
 disappeared and the cosmic ray spikes have been removed.
 
 
 \subsubsection{Using the iterate method}
 
-When using \makemap\ with the iterate option, you need to apply the
-following parameters and options:
+When using \makemap\ with the iterate option, the following parameters
+and options have to applied:
 
 \begin{itemize}
-\item Create a configuration file, e.g. config.lis, containing all the
-  required parameters listed in the form keyword=value. The
+\item Create a configuration file, e.g.\ config.lis, containing all the
+  required parameters listed in the form `keyword=value'. The
   configuration parameters are summarized in Table \ref{tab:dimmconfig}
   and the default values are shown in the third column. A default 
   configuration file is located at 
   \texttt{\$STARLINK/share/smurf/dimmconfig.lis}.
-\item Set the method parameter to iterate.
-\item Set the correct pixel size for your observed wavelength using
-  the \aparam{PIXSIZE} parameter.
+\item Set the \aparam{METHOD} parameter to \aparam{ITERATE}.
+\item Set the correct pixel size for the observed wavelength using the
+  \aparam{PIXSIZE} parameter.
 \item If necessary, set the co-ordinate system using the \aparam{SYSTEM}
   parameter.
 \end{itemize}
@@ -1772,7 +1750,7 @@ makemap in=^input.lis out=mapname method=iterate config=^config.lis \
 
 Table \ref{tab:dimmconfig} summarizes the configuration parameters
 available for the model components used by the DIMM (see also detailed
-comments for \makemap\ task). The default values are shown in the
+comments for the \makemap\ task). The default values are shown in the
 third column.
 
 \begin{table}
@@ -1787,7 +1765,7 @@ Parameter        & Definition                                                   
 \hline
 numiter          & Either give a positive number that equals the number of             & 5\\
                  & iterations, or give a negative number that equals the maximum       & \\
-                 & number of iterations using chi squared ($\chi^2$) stopping criteria.& \\
+                 & number of iterations using chi squared ($\chi^2$) stopping criterion.& \\
 chitol           & $\chi^2$ tolerance, requires $NOI$ model component. If the $\chi^2$ & $10^{-6}$\\
                  & difference $<1\times10^{-6}$, then make the current iteration the   & \\
                  & last iteration.                                                     & \\
@@ -1797,7 +1775,7 @@ varmapmethod     & Method of estimating variance map. If equal to zero, then use
                  & map pixel.                                                          & \\
 memiter          & Either perform the iterations in memory (=1) or write the           &    1 \\
                  & component values to a file (=0).                                    & \\
-deldimm          & Delete ``.dimm'' (temporary model) files upon completion            & 1 (do delete)\\
+deldimm          & Delete `.dimm' (temporary model) files upon completion            & 1 (do delete)\\
 maxlen           & If performing the iterations in memory, this is the maximum         &    0 \\
                  & length (seconds) for concatenated data. If equal to zero, then      & \\
                  & attempt to concatenate entire continuous chunks.                    & \\
@@ -1805,7 +1783,7 @@ modelorder       & Order in which to calculate DIMM model components.           
                  &                                                                     &  ast,flt,noi)\\
 exportndf        & An option to export DIMM model components as NDF files. It          & 0 (do not\\
                  & exports one file per model component, per subarray. Use this        & export as NDF\\
-                 & option if you want to view the values in these files. Can also      & files)\\
+                 & option to view the values in these files. Can also      & files)\\
                  & specify list of components using modelorder syntax                  & \\
 \hline
                  & \multicolumn{2}{l}{\em Pre-processing Data Cleaning Options} \\
@@ -1814,7 +1792,7 @@ padstart         & Pad beginning of each chunk of data with this many samples   
 padend           & Pad end of each chunk of data with this many samples                & 1000 \\
 apod             & Apodize data at start and end over this many samples                & 1000 \\
 order            & Remove baseline polynomial of this order (0 = remove mean)          & 0 \\
-badfrac          & If this fraction of samples bad, ignore entire bolometer            & 0.05 \\
+badfrac          & If this fraction (or greater) of samples are bad, ignore entire bolometer            & 0.05 \\
 flagstat         & Ignore data while telescope moving slower than this (arcsec/sec)    & 2 \\
 dcthresh         & S/N threshold for detecting DC steps                                & -- \\
 dcbox            & Sample length for measuring noise for DC step finder                & -- \\
@@ -1831,7 +1809,7 @@ com.boxcar       & A low-pass boxcar filter that assists with convergence. Speci
                  & size, i.e., the number of samples to use.                           & \\
 com.boxfact      & Reduce the width of the boxcar by this box factor in each           &   0.5 \\
                  & iteration.                                                          & \\
-com.boxmin       & The minimum width below which the boxcar can't be reduced.          & 100 \\
+com.boxmin       & The minimum width below which the boxcar can not be reduced.          & 100 \\
 dks.boxcar       & Boxcar smooth dark squid signals before fitting/removing.           & 10 \\
 noi.spikethresh  & Additional despiking after each iteration, within the $NOI$         & 10 \\
                  & calculation.                                                        & \\
@@ -1849,7 +1827,7 @@ flt.filt\_notchlow   &                                                          
 \label{tab:dimmconfig}
 \end{table}
 
-\section{\xlabel{simulator}SCUBA-2 simulator\label{se:sc2sim}}
+\section{\xlabel{simulator}SCUBA-2 Simulator\label{se:sc2sim}}
 
 \SMURF\ has the capability to produce simulated data from SCUBA-2 with
 the \sctwosim\ task. The simulator samples an input astronomical image
@@ -1863,7 +1841,7 @@ The simulator supports the primary observing modes: DREAM, STARE and
 SCAN along with FLATFIELD, POINTING and FOCUS
 observations. Rudimentary support exists for the SCUBA-2 polarimeter
 though this is untested. Instrument apertures may be set (offsets
-which adjust the tracking position to a specific subarray) and
+which adjust the tracking position to a specific subarray), and
 microsteps (small offsets from the tracking position) are fully
 supported. Simulating the motion of the major Solar System bodies
 (Venus, the Moon, Mars, Jupiter, Saturn, Uranus and Neptune) is
@@ -1873,12 +1851,12 @@ For SCAN observations, the simulator has two modes controlled by the
 \texttt{SIMTYPE} parameter. A \texttt{FULL} simulation generates
 simulated complete astronomical data including the effect of the
 atmosphere. A \texttt{WEIGHTS} simulation generates data which may be
-used to assess areal coverage and ``hit'' density (i.e.\ the number of
+used to assess areal coverage and `hit' density (i.e.\ the number of
 times a point on the sky is observed) for different mapping strategies
 or the impact of non-working bolometers. Several different scanning
 models are supported: boustrophedon (conventional back-and-forth
-raster scan), two variations of ``pong'' (or box-scan) with either
-sharp or gentle turnarounds and a lissajous pattern.
+raster scan), two variations of `pong' (or box-scan) with either
+sharp or gentle turnarounds and a lissajous pattern. [REF TO ANA SCAN DOC]
 
 \subsection{\xlabel{simuse}Simulator workflow\label{se:simuse}}
 
@@ -1911,13 +1889,13 @@ avoid imaging and sampling artefacts.
 \subsubsection{Model atmosphere}
 
 The model atmosphere is calculated with the \skynoise\ task. The
-atmosphere is modelled as a Kolmogorov turbulent thin-screen (refs)
-with a characteristic turnover frequency and scaling law. Different
-models may be generated for the same parameters using a random number
-seed (specified or calculated internally using the system clock). The
-parameters may be modified though the user should be familiar with the
-details of this model of the atmosphere before exploring the parameter
-space too widely.
+atmosphere is modelled as a Kolmogorov turbulent thin-screen
+\cite{sc2ana002} with a characteristic turnover frequency and scaling
+law. Different models may be generated for the same parameters using a
+random number seed (specified or calculated internally using the
+system clock). The parameters may be modified though the user should
+be familiar with the details of this model of the atmosphere before
+exploring the parameter space too widely.
 
 The model atmosphere calculated is generic and may be used for
 simulations at both 850 $\mu$m and 450 $\mu$m. The model is scaled
@@ -1944,7 +1922,7 @@ information, and the files must be present in the current directory.
 
 The simulator has a large number of parameters which may be freely
 adjusted. The list of parameters is divided between two groups:
-simulation parameters (usually telescope- and instrument-specific) and
+simulation parameters (usually telescope- and instrument-specific); and
 observation parameters (properties of the observation in
 question). These are specified using the \texttt{SIMPAR} and
 \texttt{OBSPAR} ADAM parameters to \sctwosim. For convenience, the
@@ -1968,7 +1946,7 @@ simulate data for, the names of the atmosphere model and astronomical
 source files and the zenith opacity (at 225 GHz). The zenith opacty is
 converted to a value at the appropriate wavelength using the empirical
 relations derived for SCUBA by Archibald et al. (2002). Similar
-relations for SCUBA-2 do not yet exist.
+relations for SCUBA-2 will be derived.
 
 Data for all subarrays (at the specified wavelength) may be generated
 in a single run. The size of the output files is governed by the
@@ -1977,14 +1955,14 @@ of samples to write per file. Multiple observations may be simulated
 by setting the \texttt{OVERWRITE} parameter to \texttt{FALSE} (the
 default behaviour is to overwrite existing files).
 
-Since the data output from the simulator mimics the real instrument,
-it is possible to generate many GB of data which may take many minutes
-tor hours of CPU time. The \sctwosim\ parameter \texttt{SIMSTATS}
-tells the simulator to estimate the properties of the simulation
-including the duration of the simulation, quantity of data, memory
-requirements and CPU time. The results are printed to the screen and
-\sctwosim\ exits, allowing the user to modify the simulation
-parameters if necessary.
+A word of caution. Since the data output from the simulator mimics the
+real instrument, it is possible to generate many GB of data which may
+take many minutes to hours of CPU time. The \sctwosim\ parameter
+\texttt{SIMSTATS} tells the simulator to estimate the properties of
+the simulation including the duration of the simulation, quantity of
+data, memory requirements and CPU time. The results are printed to the
+screen, allowing the user to modify the simulation parameters if
+necessary.
 
 \subsubsection{\xlabel{dreamsim}A note on DREAM simulations\label{se:dreamsim}}
 
@@ -2000,20 +1978,22 @@ images are calculated using \dreamsolve.
 The processing of simulated data proceeds exactly as for real SCUBA-2
 data and depends on the observing mode. See the respective workflows
 in Sections \ref{se:dsworkflow} and \ref{se:scanworkflow} above. Note
-that dark frames are not produced by the simulator.
+that dark frames are not produced by the simulator and do not need to
+be included in any processing (there is no drift in the model
+bolometer response).
 
 FOCUS observations are designed to be processed by the ORAC-DR
-pipeline rather than \SMURF\ as their analysis involves multiple
+pipeline rather than \SMURF, as their analysis involves multiple
 steps. POINTING observations are equivalent to short science
 observations and should be processed in the same way.
 
 \section{Acknowledgments}
 
-The SCUBA-2 simulator code was originally written as a standalone
-application by Dennis Kelly at the UK Astronomy Technology Centre and
-implemented as a \SMURF\ task by Jen Balfour. The authors are grateful
-for the documentation written by Maria Kelly on which this SUN is
-based, and Christa van Laerhoven for an earlier version.
+The authors are grateful for the documentation written by Maria Kelly
+on which this SUN is based, and Christa van Laerhoven for an earlier
+version. The SCUBA-2 simulator code was originally written as a
+standalone application by Dennis Kelly at the UK Astronomy Technology
+Centre and implemented as a \SMURF\ task by Jen Balfour.
 
 % End of main text
 
@@ -2023,19 +2003,63 @@ based, and Christa van Laerhoven for an earlier version.
 \bibitem{archibald}
 Archibald~E.~N., et~al., 2002, MNRAS, 336, 1
 
-\bibitem{smurf}
-Chapin~E.~L., et~al., 2009, \textit{SMURF -- Sub-Millimetre User Reduction
-Facility},
-\xref{Starlink User Note 258}{sun258}{} 
+\bibitem{acsis}
+Buckle~J.~V., et~al., 2009, MNRAS, in press
 
-\bibitem{kappa}
-Currie~M.~J., 1997, {\it KAPPA --- Kernel Application Package},
-\xref{Starlink User Note 95}{sun95}{}
+%\bibitem{sc2cook}
+%Chapin~E.~L., 2009, \textit{The SMURF SCUBA-2 Data Analysis Cookbook},
+%\xref{Starlink Cookbook 19}{sc19}{} 
 
-\bibitem{gaia}
-Draper~P.~W., 1997, {\it GAIA -- Graphical Astronomy and Image 
-Analysis Tool},
-\xref{Starlink User Note 214}{sun214}{}
+%\bibitem{kappa}
+%Currie~M.~J., 1997, {\it KAPPA -- Kernel Application Package},
+%\xref{Starlink User Note 95}{sun95}{}
+
+%\bibitem{gaia}
+%Draper~P.~W., 1997, {\it GAIA -- Graphical Astronomy and Image 
+%Analysis Tool},
+%\xref{Starlink User Note 214}{sun214}{}
+
+\bibitem{scuba2}
+Holland~W.~S., et~al., 2006, Proc. SPIE, 6275, 45
+
+\bibitem{jenness}
+Jenness~T., et~al., 2006, MNRAS, 336, 14
+
+\bibitem{dream}
+Le~Poole~R.~S., van~Someren~Greve~H.~W., 1998, Proc. SPIE, 3357, 638
+
+\bibitem{sc2ana001}
+Scott~D., 2003, {\it Map-making in different noise regimes}, SCUBA-2
+  Data Reduction document SC2/ANA/S210/001
+
+\bibitem{sc2ana006}
+Scott~D., 2005, {\it Scan Mode Data Reduction Strategies for
+  SCUBA-2}, SCUBA-2 Data Reduction document SC2/ANA/S210/006
+
+\bibitem{sc2ana005}
+Scott~D., Van Engelen~A., 2005, {\it Scan Mode Strategies for
+  SCUBA-2}, SCUBA-2 Data Reduction document SC2/ANA/S210/005
+
+\bibitem{sc2ana002}
+Van Engelen~A., 2005, {\it Analysis of Atmospheric Emission using
+  SHARC-II Data and Implications for the SCUBA-2 Simulator},
+  SCUBA-2 Data Reduction document SC2/ANA/S210/002
+
+\bibitem{sc2ana004}
+Van Engelen~A., Scott~D., 2005, {\it A Correlation Study using SCUBA
+  Data, with implications for SCUBA-2 data reduction},
+  SCUBA-2 Data Reduction document SC2/ANA/S210/002
+
+%\bibitem{ast}
+%Warren-Smith~R.~F., Berry~D.~S., 2009, {\it AST -- A Library for
+%  Handling World Coordinate Systems in Astronomy},
+%\xref{Starlink User Note 211}{sun211}{}
+
+%\bibitem{ndf}
+%Warren-Smith~R.~F., Berry~D.~S., 2009, 
+%{\it NDF -- Routines for Accessing the Extensible N-Dimensional Data
+%  Format},
+%\xref{Starlink User Note 33}{sun33}{}
 
 \end{thebibliography}
  
@@ -2044,7 +2068,8 @@ Analysis Tool},
 
 \subsection{Global changes}
 \begin{itemize}
-  \item Improve description of SCUBA-2 processing routines for Nanahope Starlink release
+\item Improve description of SCUBA-2 processing routines for Nanahope
+  Starlink release
 \end{itemize}
 
 \subsection{New applications}
@@ -2071,7 +2096,7 @@ Analysis Tool},
 \menuitem{CALCDARK}{
  Calculate the 2d dark frame from a dark observation.}
 \menuitem{CALCFLAT}{
- Calculate a flatfield solution}
+ Calculate a flatfield solution.}
 \menuitem{CALCRESP}{
  Calculate bolometer responsivity from stored flatfield solution.}
 \menuitem{DREAMSOLVE}{
@@ -2133,7 +2158,7 @@ Gives help about SMURF.}
 \end{htmlonly}
 
 \newpage
-\section{\xlabel{ap_classified}Classified SMURF commands
+\section{\xlabel{ap_classified}Classified SMURF Commands
 \label{ap:classified}}
 
 \SMURF\ applications may be classified in terms of their
@@ -2248,7 +2273,7 @@ SCUBA-2 simulator.
 
 \end{small}
 
-\section{\xlabel{ap_full}Specifications of SMURF applications\label{ap:full}}
+\section{\xlabel{ap_full}Specifications of SMURF Applications\label{ap:full}}
 
 The following pages describe all the SMURF commands in detail.
 
