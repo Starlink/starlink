@@ -276,8 +276,13 @@ itcl::class gaia::GaiaCupidImporter {
 
       #  Do we have STC?
       set have_stc_($catwin) 0
-      if { [string first "Shape" $headings] != -1 } {
+      set shape_col [lsearch -exact $headings Shape]
+      if { $shape_col != -1 } {
          set have_stc_($catwin) 1
+         set stc_col_ $shape_col
+      } else {
+         set have_stc_($catwin) 0
+         set stc_col_ -1
       }
 
       #  Make sure slice coordinate is set for 3D import.
@@ -429,13 +434,11 @@ itcl::class gaia::GaiaCupidImporter {
          set colnames_ "Peak1 1 Peak2 2 Peak3 3 Cen1 4 Cen2 5 Cen3 6"
          set ra_col_ 4
          set dec_col_ 5
-         set stc_col_ 13
       } else {
          set coltypes_ "RA ra Dec dec"
          set colnames_ "Peak1 1 Peak2 2 Cen1 3 Cen2 4"
          set ra_col_ 3
          set dec_col_ 4
-         set stc_col_ 10
       }
    }
 
