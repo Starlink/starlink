@@ -31,10 +31,10 @@ AC_ARG_WITH(tk, [  --with-tk              directory containing tk configuration 
             with_tkconfig=${withval})
 
 dnl    If no Tcl/Tk given explicitly use the Starlink versions.
-if test "$with_tcl" == ""; then
+if test "$with_tcl" = ""; then
    with_tcl="$TCL_PREFIX/lib"
 fi
-if test "$with_tk" == ""; then
+if test "$with_tk" = ""; then
    with_tk="$TCL_PREFIX/lib"
 fi
 

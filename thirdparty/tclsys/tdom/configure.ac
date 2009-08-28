@@ -29,7 +29,7 @@ AC_ARG_WITH(tcl, [  --with-tcl              directory containing tcl configurati
             with_tclconfig=${withval})
 
 dnl    If no Tcl given explicitly use the Starlink versions.
-if test "$with_tcl" == ""; then
+if test "$with_tcl" = ""; then
    with_tcl="$TCL_PREFIX/lib"
 fi
 
