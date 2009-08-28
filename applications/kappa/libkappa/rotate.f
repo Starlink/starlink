@@ -188,7 +188,7 @@
 *     the Research Councils. 
 *     Copyright (C) 2005-2006 Particle Physics & Astronomy Research 
 *     Council. 
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -253,6 +253,9 @@
 *        propagation of the array components that could exhaust memory
 *        for large cubes.  Reduced memory requirements for 180-degree 
 *        rotation of cubes.
+*     28-AUG-2009 (DSB):
+*        Correct procedure for determining default rotation angle (old
+*        system assumed the WCS was 2-dimensional).
 *     {enter_further_changes_here}
 
 *-
@@ -296,6 +299,7 @@
       REAL ANGLE                 ! Clockwise degrees rotation
       DOUBLE PRECISION ANGLED    ! Rotation angle 
       CHARACTER * ( 80 ) AXCOMP  ! Axis character component
+      INTEGER AXES( 2 )          ! Indices of inputs to be picked
       INTEGER AXSUM              ! Sum of the axis indices
       INTEGER IAXIS              ! Axis index
       LOGICAL AXIS               ! Axis structure present?
@@ -303,6 +307,7 @@
       DOUBLE PRECISION B( 2 )    ! Second point
       LOGICAL BAD                ! Bad-pixel flag
       BYTE BB                    ! Quality Bad-bits value
+      INTEGER BCMAP              ! Base to current WCS Mapping 
       DOUBLE PRECISION C( 2 )    ! Third point
       INTEGER CFRM               ! Current WCS Frame
       CHARACTER * ( 8 ) COMP( 3 ) ! Array components to process
@@ -314,6 +319,7 @@
       CHARACTER * ( NDF__SZFTP ) DTYPE ! Array component storage type
       INTEGER EL                 ! Number of elements mapped
       CHARACTER * ( NDF__SZFRM ) FORM ! Form of the NDF array
+      INTEGER FRM2D              ! WCS rotation plane
       INTEGER I                  ! Loop counter
       INTEGER ICOMP              ! Loop counter for array components
       INTEGER IDIM               ! Total number of dimensions
@@ -321,11 +327,13 @@
       INTEGER IWCS               ! WCS FrameSet for input NDF
       DOUBLE PRECISION IXC       ! X pixel co-ord., centre of i/p array
       DOUBLE PRECISION IYC       ! Y pixel co-ord., centre of i/p array
+      INTEGER JUNK               ! An unused Mapping
       INTEGER LBND( NDF__MXDIM ) ! Lower bounds of NDF pixel axes
       INTEGER LBNDO( NDF__MXDIM ) ! Lower bounds of output array
       INTEGER LBNDS( NDIM + 1 )  ! Lower bounds of plane in cube
       INTEGER LONG               ! Longer dimension of input array
       INTEGER M( 4 )             ! MATRIX indices
+      INTEGER MAP2D              ! Mapping from 2D GRID to 2D WCS
       DOUBLE PRECISION MATRIX( NDF__MXDIM*NDF__MXDIM ) ! Rotation matrix
                                  ! for i/p -> o/p mapping
       INTEGER NC                 ! No. characters in text buffer
@@ -340,6 +348,7 @@
                                  ! be applied
       DOUBLE PRECISION OFFSET( NDF__MXDIM ) ! Offset vector for
                                  ! i/p -> o/p mapping
+      INTEGER OUTAX( NDF__MXDIM )! Indices of outputs to be picked
       DOUBLE PRECISION OXC       ! X pixel co-ord., centre of o/p array
       DOUBLE PRECISION OYC       ! Y pixel co-ord., centre of o/p array
       INTEGER PAXHI              ! Upper pixel bound of perp. axis 
@@ -486,11 +495,68 @@
       IF ( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
 
-*  If the current WCS Frame is a celestial co-ord Frame, get the index 
-*  of the latitude axis.  Otherwise, use the second axis.
+*  Get the Mapping from GRID coords to WCS coords.
+         BCMAP = AST_GETMAPPING( IWCS, AST__BASE, AST__CURRENT,
+     :                             STATUS )
+
+*  Get the current WCS Frame.
          CFRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
-         IF ( AST_ISASKYFRAME( CFRM, STATUS ) ) THEN
-            IAXIS = AST_GETI( CFRM, 'LATAXIS', STATUS )
+
+*  We need (effectively) a FrameSet in which the base Frame contains the 
+*  two GRID axes that span the rotation plane, and the current Frame 
+*  contains two corresponding WCS axes. If the WCS is 2-dimensional then 
+*  we can just use the above Mapping amd Frame to form the FrameSet.
+         IF( IDIM .EQ. 2 ) THEN
+            MAP2D = AST_CLONE( BCMAP, STATUS )
+            FRM2D = AST_CLONE( CFRM, STATUS )
+
+*  If the WCS is 3D, we need to split off the two GRID axes that span the
+*  rotation plane.
+         ELSE
+
+*  Get the indices of the GRID axes that span the rotation plane.
+            IF( PERPAX .EQ. 1 ) THEN
+               AXES( 1 ) = 2
+               AXES( 2 ) = 3
+            ELSE IF( PERPAX .EQ. 2 ) THEN
+               AXES( 1 ) = 1
+               AXES( 2 ) = 3
+            ELSE 
+               AXES( 1 ) = 1
+               AXES( 2 ) = 2
+            END IF
+
+*  Attempt to split the full WCS Mapping in order to get a Mapping from
+*  the above selected GRID axes and the corresponding WCS axes.
+            CALL AST_MAPSPLIT( BCMAP, 2, AXES, OUTAX, MAP2D, STATUS ) 
+
+*  Report an error if the Mapping could not be split.
+            IF( MAP2D .EQ. AST__NULL ) THEN
+               IF( STATUS .EQ. SAI__OK ) THEN
+                  STATUS = SAI__ERROR
+                  CALL ERR_REP( ' ', 'Rotation angle is undefined.', 
+     :                          STATUS )
+               END IF
+
+*  Report an error if the two GRID axes do not map into exactly two WCS
+*  axes.
+            ELSE IF( STATUS .EQ. SAI__OK ) THEN
+               IF( AST_GETI( MAP2D, 'Nout', STATUS ) .NE. 2 ) THEN
+                  STATUS = SAI__ERROR
+                  CALL ERR_REP( ' ', 'Rotation angle is undefined.', 
+     :                          STATUS )
+
+*  Otherwise, ceate a Frame containing the two corresponding WCS axes.
+               ELSE
+                  FRM2D = AST_PICKAXES( CFRM, 2, OUTAX, JUNK, STATUS ) 
+               END IF
+            END IF
+         END IF
+
+*  If the 2D WCS Frame is a celestial co-ord Frame, get the index 
+*  of the latitude axis.  Otherwise, use the second axis.
+         IF ( AST_ISASKYFRAME( FRM2D, STATUS ) ) THEN
+            IAXIS = AST_GETI( FRM2D, 'LATAXIS', STATUS )
          ELSE
             IAXIS = 2
          END IF
@@ -500,7 +566,7 @@
          YP( 1 ) = 1.0D0
          XP( 2 ) = 1.0D0
          YP( 2 ) = 100.0D0
-         CALL AST_TRAN2( IWCS, 2, XP, YP, .TRUE., XP, YP, STATUS )
+         CALL AST_TRAN2( MAP2D, 2, XP, YP, .TRUE., XP, YP, STATUS )
 
 *  Find another point (C) which is to the north of point 1 (A). The
 *  arc-distance from C to A is equal to the arc-distance form B to A.
@@ -508,8 +574,8 @@
          A( 2 ) = YP( 1 )
          B( 1 ) = XP( 2 )
          B( 2 ) = YP( 2 )
-         C( IAXIS ) = AST_AXOFFSET( CFRM, IAXIS, A( IAXIS ), 
-     :                              AST_DISTANCE( CFRM, A, B, STATUS ),
+         C( IAXIS ) = AST_AXOFFSET( FRM2D, IAXIS, A( IAXIS ), 
+     :                              AST_DISTANCE( FRM2D, A, B, STATUS ),
      :                              STATUS )
          C( 3 - IAXIS ) = A( 3 - IAXIS )
 
@@ -518,7 +584,7 @@
          YP( 1 ) = A( 2 )
          XP( 2 ) = C( 1 )
          YP( 2 ) = C( 2 )
-         CALL AST_TRAN2( IWCS, 2, XP, YP, .FALSE., XP, YP, STATUS )
+         CALL AST_TRAN2( MAP2D, 2, XP, YP, .FALSE., XP, YP, STATUS )
 
 *  Find the angle between the line joining these transformed points in
 *  the GRID Frame, and the second GRID axis.
@@ -527,7 +593,7 @@
          B( 1 ) = XP( 2 )
          B( 2 ) = YP( 2 )
          
-         ANGLED = AST_AXANGLE( AST_GETFRAME( IWCS, AST__BASE, STATUS ), 
+         ANGLED = AST_AXANGLE( AST_FRAME( 2, 'Domain=GRID', STATUS ), 
      :                         A, B, 2, STATUS )
 
 *  Check the angle is OK.  If so, convert to degrees.  Otherwise report
