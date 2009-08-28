@@ -276,7 +276,7 @@ itcl::class gaia::GaiaCupidImporter {
 
       #  Do we have STC?
       set have_stc_($catwin) 0
-      set shape_col [lsearch -exact $headings Shape]
+      set shape_col [lsearch -exact -nocase $headings Shape]
       if { $shape_col != -1 } {
          set have_stc_($catwin) 1
          set stc_col_ $shape_col
@@ -578,7 +578,7 @@ itcl::class gaia::GaiaCupidImporter {
    protected variable colnames_ \
       "Peak1 1 Peak2 2 Peak3 3 Cen1 4 Cen2 5 Cen3 6"
 
-   #  Various default column position.s
+   #  Various default column positions.
    protected variable ra_col_ -1
    protected variable dec_col_ -1
    protected variable stc_col_ -1
