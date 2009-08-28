@@ -497,8 +497,10 @@ itcl::class samp::SampClient {
          set trapping_ 1
          set signals [list SIGHUP SIGINT SIGQUIT SIGTERM]
          signal trap $signals "
-            samp::SampClient::stop_server
-            puts stderr \"GAIA aborts, signal: %S\"
+            catch {
+               samp::SampClient::stop_server
+               puts stderr \"GAIA aborts, signal: %S\"
+            }
             exit
          "
       }
