@@ -95,6 +95,7 @@
 *     end for
 *  Copyright:
 *     Copyright (C) 2000 Central Laboratory of the Research Councils
+*     Copyright (C) 2009 Science and Technology Facilities Council
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
@@ -113,6 +114,7 @@
 
 *  Authors:
 *     ACD: A C Davenhall (Edinburgh)
+*     PWD: Peter W. Draper (Durham)
 *  History:
 *     4/6/99  (ACD): Original version.
 *     25/6/99 (ACD): First stable version.
@@ -122,6 +124,8 @@
 *        and external format from CURSA-specific comments in the TST.
 *     20/7/00 (ACD): Added a check that any CURSA-specific external
 *        format is valid for the specified data type.
+*     28/8/09 (PWD): Don't use 'D' formats. TST are also read by C-based
+*                    libraries which only understand 'E'.
 *  Bugs:
 *     None known
 *-
@@ -270,7 +274,7 @@
                      DECPLC = MAX(1, DECPLC)
                      TOTAL = DECPLC + 7
 
-                     CALL CHR_PUTC ('D', FXFMT, LFXFMT)
+                     CALL CHR_PUTC ('E', FXFMT, LFXFMT)
                      CALL CHR_PUTI (TOTAL, FXFMT, LFXFMT)
                      CALL CHR_PUTC ('.', FXFMT, LFXFMT)
                      CALL CHR_PUTI (DECPLC, FXFMT, LFXFMT)
@@ -305,13 +309,13 @@
                IF (LOOP .EQ. RACOL) THEN
                   FDTYPE = CAT__TYPED
                   FUNIT = 'RADIANS{HOURS}'
-                  FXFMT = 'D19.10'
+                  FXFMT = 'E19.10'
                   FCOMM = 'Right Ascension.'
 
                ELSE IF (LOOP .EQ. DECCOL) THEN
                   FDTYPE = CAT__TYPED
                   FUNIT = 'RADIANS{DEGREES}'
-                  FXFMT = 'D19.10'
+                  FXFMT = 'E19.10'
                   FCOMM = 'Declination.'
 
                END IF

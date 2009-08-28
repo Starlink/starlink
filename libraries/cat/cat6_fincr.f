@@ -46,6 +46,7 @@
 *     end if
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
+*     Copyright (C) 2009 Science and Technology Facilities Council
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
@@ -64,9 +65,12 @@
 
 *  Authors:
 *     ACD: A C Davenhall (Edinburgh)
+*     PWD: Peter W. Draper (Durham)
 *  History:
 *     16/6/99 (ACD): Original version (from CAT5_FINCR).
 *     16/6/99 (ACD): First stable version.
+*     28/8/09 (PWD): Don't use 'D' formats. TST are also read by C-based
+*                    libraries which only understand 'E'.
 *  Bugs:
 *     None known
 *-
@@ -209,7 +213,7 @@ C5003             format(1x, 'after CINQ')
                      ELSE IF (FDTYPE .EQ. CAT__TYPER) THEN
                         FXFMT = 'E12.3'
                      ELSE IF (FDTYPE .EQ. CAT__TYPED) THEN
-                        FXFMT = 'D19.10'
+                        FXFMT = 'E19.10'
                      ELSE IF (FDTYPE .EQ. CAT__TYPEL) THEN
                         FXFMT = 'L5'
                      ELSE IF (FDTYPE .EQ. CAT__TYPEC) THEN
