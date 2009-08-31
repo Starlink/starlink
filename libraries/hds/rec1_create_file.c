@@ -89,7 +89,7 @@
 /* Copyright:								    */
 /*    Copyright (C) 1992 Science & Engineering Research Council		    */
 /*    Copyright (C) 2005 Particle Physics and Astronomy Research Council    */
-/*    Copyright (C) 2007 Science and Technology Facilities Council          */
+/*    Copyright (C) 2007,2009 Science and Technology Facilities Council     */
 
 /*  Licence:                                                                */
 /*     This program is free software; you can redistribute it and/or        */
@@ -151,6 +151,9 @@
 /*    29-AUG-2007 (PWD):                                                    */
 /*       Unlink an existing file before overwriting. This leaves the file   */
 /*       available to other processes that may have it opened.              */
+/*    31-AUG-2009 (TIMJ):                                                   */
+/*       Open the file read/write before calling unlink() since unlink()    */
+/*       will delete the file even if it is write protected.                */
 /*    {@enter_further_changes_here@}					    */
 
 /* Bugs:								    */
@@ -449,9 +452,20 @@ name cannot be used to create a new container file.",
       {
          if ( exists ) 
          {
+/*  unlink() allows us to delete a write-protected file if it is owned  */
+/*  by us. To work around this we first try to open the file for read/  */
+/*  write (without truncating it) and if we can do that we close and    */
+/*  do the unlink. We could also attempt to use the access() or stat()  */
+/*  system calls but we want to open the file eventually.               */
+           iochan = fopen( fns, "a+b" );
+
 /*  Note unlink may fail because of permissions or because this is a     */
 /*  directory. Handle that later.                                        */
+           if (iochan) {
+             fclose( iochan );
+             iochan = NULL;
              unlink( fns );
+           }
          }
          iochan = fopen( fns, "w+b" );
 	 if ( iochan == NULL )
