@@ -376,19 +376,19 @@ void findback( int *status ){
       for( iystep = 0; iystep < nystep; iystep++, islice++ ) {
 
 /* Report the bounds of the slice if required. */
-        msgBlankif( MSG__VERB, status );
-        msgOutiff( MSG__VERB, "", "   Processing slice %d of %d...", status,
-                   islice+1, nslice );
-        msgBlankif( MSG__VERB, status );
+         msgBlankif( MSG__VERB, status );
+         msgOutiff( MSG__VERB, "", "   Processing slice %d of %d...", status,
+                    islice+1, nslice );
+         msgBlankif( MSG__VERB, status );
 
 /* Process this slice, then increment the pointer to the next slice. */
          if( type == CUPID__FLOAT ) {
-            cupidFindback1F( slice_dim, slice_lbnd, box, rms, ipd1, ipd2, 
+            cupidFindback1F( ndim, slice_dim, slice_lbnd, box, rms, ipd1, ipd2,
                              wa, wb, newalg, status );
             ipd1 = ( (float *) ipd1 ) + slice_size;
             ipd2 = ( (float *) ipd2 ) + slice_size;
          } else {
-            cupidFindback1D( slice_dim, slice_lbnd, box, rms, ipd1, ipd2, 
+            cupidFindback1D( ndim, slice_dim, slice_lbnd, box, rms, ipd1, ipd2,
                              wa, wb, newalg, status  );
             ipd1 = ( (double *) ipd1 ) + slice_size;
             ipd2 = ( (double *) ipd2 ) + slice_size;

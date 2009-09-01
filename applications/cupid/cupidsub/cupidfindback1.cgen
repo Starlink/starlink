@@ -6,8 +6,8 @@
 #include "ndf.h"
 #include <math.h>
 
-void CGEN_FUNCTION(cupidFindback1)( int dim[3], int lbnd[3], int box[3], 
-                                    double rms, CGEN_TYPE *din, 
+void CGEN_FUNCTION(cupidFindback1)( int ndim, int dim[3], int lbnd[3], 
+                                    int box[3], double rms, CGEN_TYPE *din, 
                                     CGEN_TYPE *dout, CGEN_TYPE *wa, 
                                     CGEN_TYPE *wb, int alg, int *status ){
 /*
@@ -23,9 +23,10 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int lbnd[3], int box[3],
 *     Starlink C
 
 *  Synopsis:
-*     void cupidFindback1<X>( int dim[3], int lbnd[3], int box[3], double rms, 
-*                             CGEN_TYPE *din, CGEN_TYPE *dout, CGEN_TYPE *wa, 
-*                             CGEN_TYPE *wb, int alg, int *status )
+*     void cupidFindback1<X>( int ndim, int dim[3], int lbnd[3], int box[3], 
+*                             double rms, CGEN_TYPE *din, CGEN_TYPE *dout, 
+*                             CGEN_TYPE *wa, CGEN_TYPE *wb, int alg, 
+*                             int *status )
 
 *  Description:
 *     This function uses spatial filtering to remove features with a
@@ -61,6 +62,8 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int lbnd[3], int box[3],
 *     to obtain the output array.
 
 *  Parameters:
+*     ndim
+*        The number of dimensions in the input NDF.
 *     dim
 *        The length of each pixel axis in the supplied array.
 *     lbnd
@@ -143,22 +146,12 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int lbnd[3], int box[3],
    int nel;             /* Number of elements in input array */
    int newbox[ 3 ];     /* Box size for smoothing */
    int nrow;            /* Number of rows of data */
-   int nsig;            /* Number of significant dimensions. */
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
 
 /* Get the number of pixels in the input array. */
    nel = dim[ 0 ]*dim[ 1 ]*dim[ 2 ];
-
-/* Determine the number of significant dimensions. */
-   if( dim[ 2 ] > 1 ) {
-      nsig = 3;
-   } else if( dim[ 1 ] > 1 ) {
-      nsig = 2;
-   } else {
-      nsig = 1;
-   } 
 
 /* Filter the input data by replacing each input value by the minimum
    value in a box centred on the input pixel. The filtered data goes in
@@ -167,7 +160,7 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int lbnd[3], int box[3],
    CGEN_FUNCTION(cupidFindback3)( dim, box, din, wa, status );
 
    if( msgFlevok( MSG__DEBUG, status ) ) {
-      CGEN_FUNCTION(cupidDump)( wa, nsig, dim, lbnd, "min. filtered data",
+      CGEN_FUNCTION(cupidDump)( wa, ndim, dim, lbnd, "min. filtered data",
                                 status );
    }
 
@@ -178,7 +171,7 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int lbnd[3], int box[3],
    CGEN_FUNCTION(cupidFindback10)( dim, box, wa, dout, status );
 
    if( msgFlevok( MSG__DEBUG, status ) ) {
-      CGEN_FUNCTION(cupidDump)( dout, nsig, dim, lbnd, "max. filtered data",
+      CGEN_FUNCTION(cupidDump)( dout, ndim, dim, lbnd, "max. filtered data",
                                 status );
    }
 
@@ -204,7 +197,7 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int lbnd[3], int box[3],
       CGEN_FUNCTION(cupidFindback4)( dim, newbox, dout, wa, status );
 
       if( msgFlevok( MSG__DEBUG, status ) ) {
-         CGEN_FUNCTION(cupidDump)( wa, nsig, dim, lbnd, "mean filtered data", 
+         CGEN_FUNCTION(cupidDump)( wa, ndim, dim, lbnd, "mean filtered data", 
                                    status );
       }
 
@@ -231,7 +224,7 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int lbnd[3], int box[3],
       }
 
       if( msgFlevok( MSG__DEBUG, status ) ) {
-         CGEN_FUNCTION(cupidDump)( dout, nsig, dim, lbnd, "minimum of original "
+         CGEN_FUNCTION(cupidDump)( dout, ndim, dim, lbnd, "minimum of original "
                                    "and smoothed background", status );
       }
 
@@ -259,7 +252,7 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int lbnd[3], int box[3],
    }
 
    if( msgFlevok( MSG__DEBUG, status ) ) {
-      CGEN_FUNCTION(cupidDump)( dout, nsig, dim, lbnd, "initial residuals",
+      CGEN_FUNCTION(cupidDump)( dout, ndim, dim, lbnd, "initial residuals",
                                 status );
    }
 
@@ -269,7 +262,7 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int lbnd[3], int box[3],
    CGEN_FUNCTION(cupidFindback2)( rms, dim, dout, status );
 
    if( msgFlevok( MSG__DEBUG, status ) ) {
-      CGEN_FUNCTION(cupidDump)( dout, nsig, dim, lbnd, "source-rejected "
+      CGEN_FUNCTION(cupidDump)( dout, ndim, dim, lbnd, "source-rejected "
                                 "residuals", status );
    }
 
@@ -281,7 +274,7 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int lbnd[3], int box[3],
    CGEN_FUNCTION(cupidFindback4)( dim, box, dout, wb, status );
 
    if( msgFlevok( MSG__DEBUG, status ) ) {
-      CGEN_FUNCTION(cupidDump)( wb, nsig, dim, lbnd, "mean smoothed residuals", 
+      CGEN_FUNCTION(cupidDump)( wb, ndim, dim, lbnd, "mean smoothed residuals", 
                                 status );
    }
 
@@ -323,7 +316,7 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int lbnd[3], int box[3],
    }
 
    if( msgFlevok( MSG__DEBUG, status ) ) {
-      CGEN_FUNCTION(cupidDump)( wb, nsig, dim, lbnd, "filled residuals", status );
+      CGEN_FUNCTION(cupidDump)( wb, ndim, dim, lbnd, "filled residuals", status );
    }
 
 
@@ -332,7 +325,7 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int lbnd[3], int box[3],
    CGEN_FUNCTION(cupidFindback4)( dim, box, wb, dout, status );
 
    if( msgFlevok( MSG__DEBUG, status ) ) {
-      CGEN_FUNCTION(cupidDump)( dout, nsig, dim, lbnd, "smoothed filled "
+      CGEN_FUNCTION(cupidDump)( dout, ndim, dim, lbnd, "smoothed filled "
                                 "residuals", status );
    }
 
@@ -356,7 +349,7 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int lbnd[3], int box[3],
    }
 
    if( msgFlevok( MSG__DEBUG, status ) ) {
-      CGEN_FUNCTION(cupidDump)( dout, nsig, dim, lbnd, "final background", 
+      CGEN_FUNCTION(cupidDump)( dout, ndim, dim, lbnd, "final background", 
                                 status );
    }
 
