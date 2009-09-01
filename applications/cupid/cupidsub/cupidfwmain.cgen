@@ -278,8 +278,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 
 /* If required, dump the mask indicating which pixel are below the threshold. */
    if (msgFlevok(MSG__DEBUG2, status)) {
-     msgOutif( MSG__DEBUG2, "", "   About to dump initial mask", status );
-     cupidDumpI( ipa, ndim, dims, slbnd, status );
+     cupidDumpI( ipa, ndim, dims, slbnd, "initial mask", status );
    }
 
 /* Use a cellular automata to remove small isolated groups of usable
@@ -299,9 +298,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 
 /* If required, dump the mask resulting from the above cleaning. */
    if (msgFlevok(MSG__DEBUG2, status)) {
-     msgOutif( MSG__DEBUG2, "", "   About to dump cleaned initial mask",
-               status);
-     cupidDumpI( work, ndim, dims, slbnd, status );
+     cupidDumpI( work, ndim, dims, slbnd, "cleaned initial mask", status );
    }
 
 /* Initialise the pointer to an array holding the peak value in every clump. */
@@ -680,8 +677,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 
 /* If required, dump the unmerged clump mask. */
    if (msgFlevok(MSG__DEBUG2, status)) {
-     msgOutif( MSG__DEBUG2, "", "   About to dump raw clump mask", status );
-     cupidDumpI( work, ndim, dims, slbnd, status );
+     cupidDumpI( work, ndim, dims, slbnd, "raw clump mask", status );
    }
 
 /* Amalgamate adjoining clumps if there is no significant dip between the
@@ -694,9 +690,8 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 
 /* If required, dump the merged clump mask. */
    if (msgFlevok(MSG__DEBUG2, status)) {
-     msgOutif( MSG__DEBUG2, "",
-               "   About to dump merged but uncleaned clump mask", status );
-     cupidDumpI( work, ndim, dims, slbnd, status );
+     cupidDumpI( work, ndim, dims, slbnd, "merged but uncleaned clump mask", 
+                 status );
    }
 
 /* Smooth the boundaries between the clumps. This cellular automata replaces 
@@ -729,9 +724,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 
 /* If required, dump the cleaned clump mask. */
    if (msgFlevok(MSG__DEBUG2, status)) {
-     msgOutif( MSG__DEBUG2, "", "   About to dump cleaned clump mask",
-               status );
-     cupidDumpI( ipa, ndim, dims, slbnd, status );
+     cupidDumpI( ipa, ndim, dims, slbnd, "cleaned clump mask", status );
    }
 
 /* Free resources. */

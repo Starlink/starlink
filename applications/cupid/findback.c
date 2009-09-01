@@ -168,6 +168,9 @@ void findback( int *status ){
    int indf1;                /* Identifier for input NDF */
    int indf2;                /* Identifier for output NDF */
    int islice;               /* Slice index */
+   int iystep;               /* Index of slice in ydirection */
+   int izstep;               /* Index of slice in z direction */
+   int lbnd[ NDF__MXDIM ];   /* Lower pixel bounds of slice */
    int n;                    /* Number of values summed in "sum" */
    int ndim;                 /* Total number of pixel axes in NDF */
    int newalg;               /* Use experimental algorithm variations? */
@@ -177,12 +180,14 @@ void findback( int *status ){
    int nystep;               /* Number of independent y slices */
    int nzstep;               /* Number of slices in z direction */
    int sdim[ 3 ];            /* Dimensions of each significant NDF axis */
-   size_t size;              /* Size of GRP group */
    int slice_dim[ 3 ];       /* Dimensions of each significant slice axis */
+   int slice_lbnd[ 3 ];      /* Lower bounds of each significant slice axis */
    int slice_size;           /* Number of pixels in each slice */
    int sub;                  /* Output the background-subtracted input data? */
    int type;                 /* Integer identifier for data type */
+   int ubnd[ NDF__MXDIM ];   /* Upper pixel bounds of slice */
    int var;                  /* Does i/p NDF have a Variance component? */
+   size_t size;              /* Size of GRP group */
    void *ipd1;               /* Pointer to input Data array */
    void *ipd2;               /* Pointer to output Data array */
    void *ipdin;              /* Pointer to input Data array */
@@ -211,13 +216,14 @@ void findback( int *status ){
    ndgNdfas( grp, 1, "READ", &indf1, status );
    grpDelet( &grp, status );
 
-/* Get the dimensions of the input NDF. */
-   ndfDim( indf1, NDF__MXDIM, dim, &ndim, status );
+/* Get the pixel index bounds of the input NDF. */
+   ndfBound( indf1, NDF__MXDIM, lbnd, ubnd, &ndim, status );
 
 /* Identify and count the number of significant axes (i.e. axes spanning
    more than 1 pixel). Also record their dimensions. */
    nsdim = 0;
    for( i = 0; i < ndim; i++ ) {
+      dim[ i ] = ubnd[ i ] - lbnd[ i ] + 1;
       if( dim[ i ] > 1 ) sdim[ nsdim++ ] = dim[ i ];
    }
 
@@ -276,6 +282,9 @@ void findback( int *status ){
    slice_dim[ 0 ] = sdim[ 0 ];
    slice_dim[ 1 ] = sdim[ 1 ];
    slice_dim[ 2 ] = sdim[ 2 ];
+   slice_lbnd[ 0 ] = lbnd[ 0 ];
+   slice_lbnd[ 1 ] = lbnd[ 1 ];
+   slice_lbnd[ 2 ] = lbnd[ 2 ];
 
 /* If the 3rd pixel axis has a cell size of 1, arrange that each slice
    contains a single plane. */
@@ -358,27 +367,39 @@ void findback( int *status ){
    ipd1 = ipdin;
    ipd2 = ipdout;
    nslice = nystep*nzstep;
-   for( islice = 0; islice < nslice; islice++ ) {
+   islice = 0;
+
+   for( izstep = 0; izstep < nzstep; izstep++ ) {
+
+      slice_lbnd[ 1 ] = lbnd[ 1 ];
+
+      for( iystep = 0; iystep < nystep; iystep++, islice++ ) {
 
 /* Report the bounds of the slice if required. */
-     msgBlankif( MSG__VERB, status );
-     msgOutiff( MSG__VERB, "", "   Processing slice %d of %d...", status,
-                islice+1, nslice );
-     msgBlankif( MSG__VERB, status );
+        msgBlankif( MSG__VERB, status );
+        msgOutiff( MSG__VERB, "", "   Processing slice %d of %d...", status,
+                   islice+1, nslice );
+        msgBlankif( MSG__VERB, status );
 
 /* Process this slice, then increment the pointer to the next slice. */
-      if( type == CUPID__FLOAT ) {
-         cupidFindback1F( slice_dim, box, rms, ipd1, ipd2, 
-                          wa, wb, newalg, status );
-         ipd1 = ( (float *) ipd1 ) + slice_size;
-         ipd2 = ( (float *) ipd2 ) + slice_size;
-   
-      } else {
-         cupidFindback1D( slice_dim, box, rms, ipd1, ipd2, 
-                          wa, wb, newalg, status  );
-         ipd1 = ( (double *) ipd1 ) + slice_size;
-         ipd2 = ( (double *) ipd2 ) + slice_size;
+         if( type == CUPID__FLOAT ) {
+            cupidFindback1F( slice_dim, slice_lbnd, box, rms, ipd1, ipd2, 
+                             wa, wb, newalg, status );
+            ipd1 = ( (float *) ipd1 ) + slice_size;
+            ipd2 = ( (float *) ipd2 ) + slice_size;
+         } else {
+            cupidFindback1D( slice_dim, slice_lbnd, box, rms, ipd1, ipd2, 
+                             wa, wb, newalg, status  );
+            ipd1 = ( (double *) ipd1 ) + slice_size;
+            ipd2 = ( (double *) ipd2 ) + slice_size;
+         }
+
+/* Increment the lower bound on the 2nd pixel axis. */
+         slice_lbnd[ 1 ]++;
       }
+
+/* Increment the lower bound on the 3rd pixel axis. */
+      slice_lbnd[ 2 ]++;
    }     
 
 /* The output currently holds the background estimate. If the user has

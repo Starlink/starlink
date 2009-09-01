@@ -270,9 +270,9 @@ void cupidCFNebs( int *, int, int x[], int, int [3], int[3], int, int, int, int 
 void cupidCFXfer( CupidPixelSet *, CupidPixelSet *, int *, int[3], int * );
 void cupidClumpInfo1( HDSLoc *, CupidClumpInfo *, int * );
 void cupidDatCopy( HDSLoc *, HDSLoc *, int * );
-void cupidDumpD( double *, int, int *, int *, int * );
-void cupidDumpF( float *array, int ndim, int *dims, int *slbnd, int *status );
-void cupidDumpI( int *, int, int *, int *, int * );
+void cupidDumpD( double *, int, int *, int *, const char *, int * );
+void cupidDumpF( float *, int, int *, int *, const char *, int * );
+void cupidDumpI( int *, int, int *, int *, const char *, int * );
 void cupidEdges( float *, int, int[3], int[3], float, float, int * );
 void cupidGCListClump( int, int, double *, double, int *, double, int * );
 void cupidGCNdfClump( HDSLoc **, double, double *, double, int, int *, int *, int, double *, int *, int *, int, int *, AstKeyMap *, int, int * );

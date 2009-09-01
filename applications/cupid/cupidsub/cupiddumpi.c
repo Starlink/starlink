@@ -7,7 +7,7 @@
 #include <stdio.h>
 
 void cupidDumpI( int *array, int ndim, int *dims, int *slbnd,
-         int *status ){
+                 const char *text, int *status ){
 /*
 *+
 *  Name:
@@ -21,7 +21,7 @@ void cupidDumpI( int *array, int ndim, int *dims, int *slbnd,
 
 *  Synopsis:
 *     void cupidDumpI( int *array, int ndim, int *dims, int *slbnd,
-*        int *status )
+*                      const char *text, int *status )
 
 *  Description:
 *     This function is a diagnostic function which dumps the supplied
@@ -36,11 +36,14 @@ void cupidDumpI( int *array, int ndim, int *dims, int *slbnd,
 *        Pointer to the size of each pixel axis.
 *     slbnd
 *        Pointer to the lower pixel bounds of each pixel axis.
+*     text
+*        Description of the values to be dumped.
 *     status
 *        Pointer to the inherited status value.
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -66,6 +69,8 @@ void cupidDumpI( int *array, int ndim, int *dims, int *slbnd,
 *  History:
 *     7-DEC-2005 (DSB):
 *        Original version.
+*     1-SEP-2009 (DSB):
+*        Added "text" argument.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -88,12 +93,13 @@ void cupidDumpI( int *array, int ndim, int *dims, int *slbnd,
 
    jj++;
    sprintf( name, "idata%d", jj );
-   printf("   Dumping %s\n", name );
+   printf("   Dumping %s (%s)\n\n", name, text );
    ndfOpen( NULL, name, "WRITE", "NEW", &indf, &place, status );
    ndfNew( "_INTEGER", ndim, lbnd, ubnd, &place, &indf, status );
    ndfMap( indf, "DATA", "_INTEGER", "WRITE", (void *) &adata, &el, status );
    if( adata ) {
       for( i = 0; i < el; i++ ) adata[ i ] = array[ i ];
    }
+   ndfCput( text, indf, "Title", status );
    ndfAnnul( &indf, status );
 }

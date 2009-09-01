@@ -6,10 +6,10 @@
 #include "ndf.h"
 #include <math.h>
 
-void CGEN_FUNCTION(cupidFindback1)( int dim[3], int box[3], double rms, 
-                                    CGEN_TYPE *din, CGEN_TYPE *dout, 
-                                    CGEN_TYPE *wa, CGEN_TYPE *wb,
-                                    int alg, int *status ){
+void CGEN_FUNCTION(cupidFindback1)( int dim[3], int lbnd[3], int box[3], 
+                                    double rms, CGEN_TYPE *din, 
+                                    CGEN_TYPE *dout, CGEN_TYPE *wa, 
+                                    CGEN_TYPE *wb, int alg, int *status ){
 /*
 *+
 *  Name:
@@ -23,7 +23,7 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int box[3], double rms,
 *     Starlink C
 
 *  Synopsis:
-*     void cupidFindback1<X>( int dim[3], int box[3], double rms, 
+*     void cupidFindback1<X>( int dim[3], int lbnd[3], int box[3], double rms, 
 *                             CGEN_TYPE *din, CGEN_TYPE *dout, CGEN_TYPE *wa, 
 *                             CGEN_TYPE *wb, int alg, int *status )
 
@@ -63,6 +63,8 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int box[3], double rms,
 *  Parameters:
 *     dim
 *        The length of each pixel axis in the supplied array.
+*     lbnd
+*        The lower pixel bound of each pixel axis in the supplied array.
 *     box
 *        The dimensions of the each of the filters, in pixels.
 *     rms
@@ -114,6 +116,9 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int box[3], double rms,
 *        Added parameter "rms".
 *     14-JAN-2009 (TIMJ):
 *        Use msgOutif rather than ilevel.
+*     1-SEP-2009 (DSB):
+*        Make dumping of debugging arrays controllable via the MSG filter
+*        level rather than requiring re-compilation of cupid.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -136,8 +141,9 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int box[3], double rms,
    int j;               /* 1D vector index */
    int lbad;            /* Was previous pixel value bad? */
    int nel;             /* Number of elements in input array */
-   int nrow;            /* Number of rows of data */
    int newbox[ 3 ];     /* Box size for smoothing */
+   int nrow;            /* Number of rows of data */
+   int nsig;            /* Number of significant dimensions. */
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
@@ -145,18 +151,25 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int box[3], double rms,
 /* Get the number of pixels in the input array. */
    nel = dim[ 0 ]*dim[ 1 ]*dim[ 2 ];
 
+/* Determine the number of significant dimensions. */
+   if( dim[ 2 ] > 1 ) {
+      nsig = 3;
+   } else if( dim[ 1 ] > 1 ) {
+      nsig = 2;
+   } else {
+      nsig = 1;
+   } 
+
 /* Filter the input data by replacing each input value by the minimum
    value in a box centred on the input pixel. The filtered data goes in
    "wa". */
    msgOutif( MSG__VERB, "", "      Applying minimum filter", status );
    CGEN_FUNCTION(cupidFindback3)( dim, box, din, wa, status );
 
-/*
-   CGEN_FUNCTION(cupidDump)( wa, 1, &nel, &lbnd, status );
-   printf("Dumped min filtered data\n\n");
-*/
-
-
+   if( msgFlevok( MSG__DEBUG, status ) ) {
+      CGEN_FUNCTION(cupidDump)( wa, nsig, dim, lbnd, "min. filtered data",
+                                status );
+   }
 
 /* Apply a second filter which replaces each pixel value in "wa" by the 
    maximum value in a box centred on the pixel. The filtered data goes
@@ -164,10 +177,10 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int box[3], double rms,
    msgOutif( MSG__VERB, "", "      Applying maximum filter", status );
    CGEN_FUNCTION(cupidFindback10)( dim, box, wa, dout, status );
 
-/*
-   CGEN_FUNCTION(cupidDump)( dout, 1, &nel, &lbnd, status );
-   printf("Dumped max filtered data\n\n");
-*/
+   if( msgFlevok( MSG__DEBUG, status ) ) {
+      CGEN_FUNCTION(cupidDump)( dout, nsig, dim, lbnd, "max. filtered data",
+                                status );
+   }
 
 
 /* We now enter a loop in which the current background estimate is
@@ -190,10 +203,10 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int box[3], double rms,
 
       CGEN_FUNCTION(cupidFindback4)( dim, newbox, dout, wa, status );
 
-/*
-      CGEN_FUNCTION(cupidDump)( wa, 1, &nel, &lbnd, status );
-      printf("Dumped mean filtered data\n");
-*/
+      if( msgFlevok( MSG__DEBUG, status ) ) {
+         CGEN_FUNCTION(cupidDump)( wa, nsig, dim, lbnd, "mean filtered data", 
+                                   status );
+      }
 
 /* Reduce the box size to half its previous dimensions. */
       newbox[ 0 ] = ( newbox[ 0 ] - 1 )/2 + 1;
@@ -217,10 +230,10 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int box[3], double rms,
          }
       }
 
-/*   
-      CGEN_FUNCTION(cupidDump)( dout, 1, &nel, &lbnd, status );
-      printf("Dumped minimised filtered data\n\n");
-*/
+      if( msgFlevok( MSG__DEBUG, status ) ) {
+         CGEN_FUNCTION(cupidDump)( dout, nsig, dim, lbnd, "minimum of original "
+                                   "and smoothed background", status );
+      }
 
    }
 
@@ -245,21 +258,20 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int box[3], double rms,
       }
    }
 
-/*
-   CGEN_FUNCTION(cupidDump)( dout, 1, &nel, &lbnd, status );
-   printf("Dumped initial residuals\n\n");
-*/
-
+   if( msgFlevok( MSG__DEBUG, status ) ) {
+      CGEN_FUNCTION(cupidDump)( dout, nsig, dim, lbnd, "initial residuals",
+                                status );
+   }
 
 
 /* Identify background pixels and set all other pixel bad. */
    msgOutif( MSG__VERB, "", "      Removing source residuals", status );
    CGEN_FUNCTION(cupidFindback2)( rms, dim, dout, status );
 
-/*
-   CGEN_FUNCTION(cupidDump)( dout, 1, &nel, &lbnd, status );
-   printf("Dumped source-rejected residuals\n\n");
-*/
+   if( msgFlevok( MSG__DEBUG, status ) ) {
+      CGEN_FUNCTION(cupidDump)( dout, nsig, dim, lbnd, "source-rejected "
+                                "residuals", status );
+   }
 
 
 
@@ -268,10 +280,10 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int box[3], double rms,
    msgOutif( MSG__VERB, "", "      Smoothing background residuals", status );
    CGEN_FUNCTION(cupidFindback4)( dim, box, dout, wb, status );
 
-/*
-   CGEN_FUNCTION(cupidDump)( wb, 1, &nel, &lbnd, status );
-   printf("Dumped mean smoothed residuals\n\n");
-*/
+   if( msgFlevok( MSG__DEBUG, status ) ) {
+      CGEN_FUNCTION(cupidDump)( wb, nsig, dim, lbnd, "mean smoothed residuals", 
+                                status );
+   }
 
 
 
@@ -310,22 +322,19 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int box[3], double rms,
 
    }
 
-/*
-   CGEN_FUNCTION(cupidDump)( wb, 1, &nel, &lbnd, status );
-   printf("Dumped filled residuals\n\n");
-*/
-
+   if( msgFlevok( MSG__DEBUG, status ) ) {
+      CGEN_FUNCTION(cupidDump)( wb, nsig, dim, lbnd, "filled residuals", status );
+   }
 
 
 /* Smooth the residuals again, putting the results in the output array. */
    msgOutif( MSG__VERB, "", "      Smoothing filled residuals", status );
    CGEN_FUNCTION(cupidFindback4)( dim, box, wb, dout, status );
 
-/*
-   CGEN_FUNCTION(cupidDump)( dout, 1, &nel, &lbnd, status );
-   printf("Dumped smoothed filled residuals\n\n");
-*/
-
+   if( msgFlevok( MSG__DEBUG, status ) ) {
+      CGEN_FUNCTION(cupidDump)( dout, nsig, dim, lbnd, "smoothed filled "
+                                "residuals", status );
+   }
 
 
 /* The values in the output array now represent the bias between the input 
@@ -346,10 +355,10 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int box[3], double rms,
       }
    }
 
-/*
-   CGEN_FUNCTION(cupidDump)( dout, 1, &nel, &lbnd, status );
-   printf("Dumped final background\n\n");
-*/
+   if( msgFlevok( MSG__DEBUG, status ) ) {
+      CGEN_FUNCTION(cupidDump)( dout, nsig, dim, lbnd, "final background", 
+                                status );
+   }
 
 
 }
