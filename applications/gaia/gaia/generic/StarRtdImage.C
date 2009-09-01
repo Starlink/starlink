@@ -2181,7 +2181,7 @@ int StarRtdImage::astreplaceCmd( int argc, char *argv[] )
 //  StarRtdImage::astgetcloneCmd
 //
 //  Purpose:
-//     Returns a clone of the current AST frameset. 
+//     Returns a clone of the current AST frameset.
 //     Annul this after use.
 //-
 
@@ -5302,7 +5302,7 @@ int StarRtdImage::ndfCmdDisplay( int argc, char *argv[], NDFIO *ndf )
     image_ = ImageData::makeCompoundImage( name(), imio, ndfList, numNDFs,
                                            biasimage_->biasInfo(), verbose() );
     if ( ! image_) {
-	return error( "Failed to display NDFs" );
+        return error( "Failed to display NDFs" );
     }
 
     // Restore transformations
@@ -5329,29 +5329,31 @@ int StarRtdImage::hduCmdGet( int argc, char** argv, FitsIO* fits )
 
     //  Check for the optional hdu arg, otherwise use current
     if ( argc >= 2 && sscanf( argv[1], "%d", &hdu ) == 1 ) {
-	argc--;
-	argv++;
-	if ( hdu != saved_hdu ) {
-	    if ( hdu < 1 || hdu > numHDUs ) {
-		return fmt_error( "HDU number %d out of range (max %d)", hdu,
+        argc--;
+        argv++;
+        if ( hdu != saved_hdu ) {
+            if ( hdu < 1 || hdu > numHDUs ) {
+                return fmt_error( "HDU number %d out of range (max %d)", hdu,
                                   numHDUs );
             }
 
-	    //  Switch to the given HDU, but restore the original before returning
-	    if ( fits->setHDU( hdu ) != 0 ) {
+            //  Switch to the given HDU, but restore the original before
+            //  returning.
+            if ( fits->setHDU( hdu ) != 0 ) {
                 return TCL_ERROR;
             }
-	}
+        }
     }
 
     //  Check for the filename arg, needed for compressed image support.
     char* filename = NULL;
     if ( argc >= 2 ) {
-	filename = argv[1];
+        filename = argv[1];
     }
 
     //  Check if this is a compressed image and handle.
     if ( sfits->isCompressedImage() ) {
+        cout << "isCompressedImage" << endl;
         if ( argc >= 2 ) {
             status = sfits->saveCompressedImage( filename );
         }
@@ -5360,6 +5362,7 @@ int StarRtdImage::hduCmdGet( int argc, char** argv, FitsIO* fits )
         }
     }
     else {
+        cout << "isNotCompressedImage" << endl;
         //  Normal table save, check for the entry arg.
         char* entry = NULL;
         if ( argc >= 3 ) {
@@ -5372,7 +5375,7 @@ int StarRtdImage::hduCmdGet( int argc, char** argv, FitsIO* fits )
 
     //  Restore the original HDU before returning.
     if ( hdu != saved_hdu && fits->setHDU( saved_hdu ) != 0 ) {
-	status = TCL_ERROR;
+        status = TCL_ERROR;
     }
     return status;
 }
