@@ -121,6 +121,7 @@ typedef struct AstKeyMap {
                                           the KeyMap entries */
    int *nentry;                        /* No. of Entries in each table element */
    int mapsize;                        /* Length of table */
+   int keyerror;                       /* Report error if no key? */
 } AstKeyMap;
 
 /* Virtual function table. */
@@ -179,6 +180,11 @@ typedef struct AstKeyMapVtab {
    int (* TestSizeGuess)( AstKeyMap *, int * );
    void (* SetSizeGuess)( AstKeyMap *, int, int * );
    void (* ClearSizeGuess)( AstKeyMap *, int * );
+
+   int (* GetKeyError)( AstKeyMap *, int * );
+   int (* TestKeyError)( AstKeyMap *, int * );
+   void (* ClearKeyError)( AstKeyMap *, int * );
+   void (* SetKeyError)( AstKeyMap *, int, int * );
 
 } AstKeyMapVtab;
 
@@ -289,6 +295,11 @@ int astGetSizeGuess_( AstKeyMap *, int * );
 int astTestSizeGuess_( AstKeyMap *, int * );
 void astSetSizeGuess_( AstKeyMap *, int, int * );
 void astClearSizeGuess_( AstKeyMap *, int * );
+
+int astGetKeyError_( AstKeyMap *, int * );
+int astTestKeyError_( AstKeyMap *, int * );
+void astSetKeyError_( AstKeyMap *, int, int * );
+void astClearKeyError_( AstKeyMap *, int * );
 #endif
 
 /* Function interfaces. */
@@ -383,6 +394,15 @@ astINVOKE(V,astGetSizeGuess_(astCheckKeyMap(this),STATUS_PTR))
 astINVOKE(V,astSetSizeGuess_(astCheckKeyMap(this),sizeguess,STATUS_PTR))
 #define astTestSizeGuess(this) \
 astINVOKE(V,astTestSizeGuess_(astCheckKeyMap(this),STATUS_PTR))
+
+#define astClearKeyError(this) \
+astINVOKE(V,astClearKeyError_(astCheckKeyMap(this),STATUS_PTR))
+#define astGetKeyError(this) \
+astINVOKE(V,astGetKeyError_(astCheckKeyMap(this),STATUS_PTR))
+#define astSetKeyError(this,keyerror) \
+astINVOKE(V,astSetKeyError_(astCheckKeyMap(this),keyerror,STATUS_PTR))
+#define astTestKeyError(this) \
+astINVOKE(V,astTestKeyError_(astCheckKeyMap(this),STATUS_PTR))
 
 #else
 #define astMapGet0A(this,key,value) astINVOKE(V,astMapGet0AId_(astCheckKeyMap(this),key,(AstObject **)(value),STATUS_PTR))

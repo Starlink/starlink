@@ -21814,6 +21814,17 @@ f-
 has been added to the KeyMap class. They allow a single element of a vector
 valued entry to be returned.
 
+\item A new attribute called KeyError has been added to the KeyMap Class. It
+controls whether the 
+c+
+astMapGet... 
+c-
+f+
+AST\_MAPGET...
+f-
+family of functions report an error if an entry with the requested key does 
+not exist in the KeyMap.
+
 \end{enumerate}
 
 Programs which are statically linked will need to be re-linked in

@@ -171,5 +171,7 @@ FUNDEF          <FITS keyword had undefined value>
 MPVIN           <invalid integer index supplied for a KeyMap vector element>
 OPRIN           <operation specifier invalid>
 NONIN           <no inside point found>
+MPKER           <requested key not found in KeyMap>
+
 
 .END

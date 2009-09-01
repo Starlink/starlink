@@ -32,6 +32,7 @@ c     void pointer,
 *     In addition to those attributes common to all Objects, every
 *     KeyMap also has the following attributes:
 *
+*     - KeyError: Report an error if the requested key does not exist?
 *     - SizeGuess: The expected size of the KeyMap.
 
 *  Functions:
@@ -128,6 +129,8 @@ f     - AST_MAPTYPE: Return the data type of a named entry in a map.
 *         Remove rounding errors from formatted double values.
 *     27-APR-2009 (DSB):
 *         Added astMapGetElem<X>.
+*     1-SEP-2009 (DSB):
+*         Added KeyError attribute.
 *class--
 */
 
@@ -409,6 +412,11 @@ static int TestSizeGuess( AstKeyMap *, int * );
 static void ClearSizeGuess( AstKeyMap *, int * );
 static void SetSizeGuess( AstKeyMap *, int, int * );
 
+static int GetKeyError( AstKeyMap *, int * );
+static int TestKeyError( AstKeyMap *, int * );
+static void ClearKeyError( AstKeyMap *, int * );
+static void SetKeyError( AstKeyMap *, int, int * );
+
 #if defined(THREAD_SAFE)
 static int ManageLock( AstObject *, int, int, AstObject **, int * );
 #endif
@@ -624,6 +632,11 @@ static void ClearAttrib( AstObject *this_object, const char *attrib, int *status
 /* ---------- */
    if ( !strcmp( attrib, "sizeguess" ) ) {
       astClearSizeGuess( this );
+
+/* KeyError. */
+/* --------- */
+   } else if ( !strcmp( attrib, "keyerror" ) ) {
+      astClearKeyError( this );
 
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
@@ -1861,6 +1874,15 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
          result = getattrib_buff;
       }
 
+/* KeyError. */
+/* --------- */
+   } else if ( !strcmp( attrib, "keyerror" ) ) {
+      ival = astGetKeyError( this );
+      if ( astOK ) {
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
+      }
+
 /* If the attribute name was not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
@@ -2313,6 +2335,11 @@ void astInitKeyMapVtab_(  AstKeyMapVtab *vtab, const char *name, int *status ) {
    vtab->SetSizeGuess = SetSizeGuess;
    vtab->GetSizeGuess = GetSizeGuess;
    vtab->TestSizeGuess = TestSizeGuess;
+
+   vtab->ClearKeyError = ClearKeyError;
+   vtab->SetKeyError = SetKeyError;
+   vtab->GetKeyError = GetKeyError;
+   vtab->TestKeyError = TestKeyError;
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
@@ -3377,6 +3404,13 @@ static int MapGet0##X( AstKeyMap *this, const char *key, Xtype *value, int *stat
       } else { \
          result = 1; \
       } \
+\
+/* If the KeyError attribute is non-zero, report an error if the key is not \
+   found */ \
+   } if( astGetKeyError( this ) && astOK ) { \
+      astError( AST__MPKER, "astMapGet0" #X "(%s): No value was found for " \
+                "%s in the supplied KeyMap.", status, astGetClass( this ), \
+                key ); \
    } \
 \
 /* If an error occurred, return zero. */ \
@@ -3512,6 +3546,13 @@ int astMapGet0AId_( AstKeyMap *this, const char *key, AstObject **value, int *st
       } else {
          result = 1;
       }
+
+/* If the KeyError attribute is non-zero, report an error if the key is not 
+   found */ 
+   } if( astGetKeyError( this ) && astOK ) { 
+      astError( AST__MPKER, "astMapGet0A(%s): No value was found for " 
+                "%s in the supplied KeyMap.", status, astGetClass( this ), 
+                key ); 
    }
 
 /* If required, return an ID value for the Object. */
@@ -3768,6 +3809,13 @@ static int MapGet1##X( AstKeyMap *this, const char *key, int mxval, int *nval, X
 /* Increment the pointers to the next raw value. */ \
          raw = (char *) raw + raw_size; \
       } \
+\
+/* If the KeyError attribute is non-zero, report an error if the key is not \
+   found */ \
+   } if( astGetKeyError( this ) && astOK ) { \
+      astError( AST__MPKER, "astMapGet1" #X "(%s): No value was found for " \
+                "%s in the supplied KeyMap.", status, astGetClass( this ), \
+                key ); \
    } \
 \
 /* If an error occurred,return zero. */ \
@@ -3942,6 +3990,13 @@ static int MapGet1C( AstKeyMap *this, const char *key, int l, int mxval,
          raw = (char *) raw + raw_size;
          val += l;
       } 
+
+/* If the KeyError attribute is non-zero, report an error if the key is not 
+   found */ 
+   } if( astGetKeyError( this ) && astOK ) { 
+      astError( AST__MPKER, "astMapGet1C(%s): No value was found for " 
+                "%s in the supplied KeyMap.", status, astGetClass( this ), 
+                key ); 
    } 
 
 /* If an error occurred,return zero. */ 
@@ -4101,6 +4156,13 @@ int astMapGet1AId_( AstKeyMap *this, const char *key, int mxval, int *nval,
 /* Increment the pointers to the next raw value. */
          raw = (char *) raw + raw_size;
       } 
+
+/* If the KeyError attribute is non-zero, report an error if the key is not 
+   found */ 
+   } if( astGetKeyError( this ) && astOK ) { 
+      astError( AST__MPKER, "astMapGet1A(%s): No value was found for " 
+                "%s in the supplied KeyMap.", status, astGetClass( this ), 
+                key ); 
    } 
 
 /* If an error occurred,return zero. */ 
@@ -4348,6 +4410,13 @@ static int MapGetElem##X( AstKeyMap *this, const char *key, int elem, \
                       elem + 1, key ); \
          } \
       } \
+\
+/* If the KeyError attribute is non-zero, report an error if the key is not \
+   found */ \
+   } if( astGetKeyError( this ) && astOK ) { \
+      astError( AST__MPKER, "astMapGetElem" #X "(%s): No value was found for " \
+                "%s in the supplied KeyMap.", status, astGetClass( this ), \
+                key ); \
    } \
 \
 /* If an error occurred,return zero. */ \
@@ -4517,6 +4586,13 @@ static int MapGetElemC( AstKeyMap *this, const char *key, int l, int elem,
             value[ l - 1 ] = 0;
          }
       } 
+
+/* If the KeyError attribute is non-zero, report an error if the key is not
+   found */
+   } if( astGetKeyError( this ) && astOK ) {
+      astError( AST__MPKER, "astMapGetElemC(%s): No value was found for "
+                "%s in the supplied KeyMap.", status, astGetClass( this ),
+                key );
    } 
 
 /* If an error occurred,return zero. */ 
@@ -4674,6 +4750,13 @@ int astMapGetElemAId_( AstKeyMap *this, const char *key, int elem,
             *value = avalue ? astMakeId( avalue ) : NULL;
          }
       } 
+
+/* If the KeyError attribute is non-zero, report an error if the key is not
+   found */
+   } if( astGetKeyError( this ) && astOK ) {
+      astError( AST__MPKER, "astMapGetElemA(%s): No value was found for "
+                "%s in the supplied KeyMap.", status, astGetClass( this ),
+                key );
    } 
 
 /* If an error occurred,return zero. */ 
@@ -5519,6 +5602,14 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
         && ( nc >= len ) ) {
       astSetSizeGuess( this, ival );
 
+
+/* KeyError. */
+/* --------- */
+   } else if ( nc = 0,
+        ( 1 == astSscanf( setting, "keyerror= %d %n", &ival, &nc ) )
+        && ( nc >= len ) ) {
+      astSetKeyError( this, ival );
+
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
@@ -5730,6 +5821,11 @@ static int TestAttrib( AstObject *this_object, const char *attrib, int *status )
    if ( !strcmp( attrib, "sizeguess" ) ) {
       result = astTestSizeGuess( this );
 
+/* KeyError. */
+/* --------- */
+   } else if ( !strcmp( attrib, "keyerror" ) ) {
+      result = astTestKeyError( this );
+
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
@@ -5827,6 +5923,42 @@ static int TestSizeGuess( AstKeyMap *this, int *status ) {
 *        All KeyMaps have this attribute.
 *att--
 */
+
+/*
+*att++
+*  Name:
+*     KeyError
+
+*  Purpose:
+*     Report an error when getting the value of a non-existant KeyMap entry?
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer (boolean).
+
+*  Description:
+*     This attribute is a boolean value which controls how the 
+c     astMapGet... 
+f     AST_MAPGET...
+*     functions behave if the requested key is not found in the KeyMap.
+*     If KeyError is zero (the default), then these functions will return
+c     zero
+f     .FALSE.
+*     but no error will be reported. If KeyError is non-zero, then the
+*     same values are returned but an error is also reported.
+
+*  Applicability:
+*     KeyMap
+*        All KeyMaps have this attribute.
+*att--
+*/
+astMAKE_CLEAR(KeyMap,KeyError,keyerror,-INT_MAX)
+astMAKE_GET(KeyMap,KeyError,int,0,( ( this->keyerror != -INT_MAX ) ?
+                                   this->keyerror : 0 ))
+astMAKE_SET(KeyMap,KeyError,int,keyerror,( value != 0 ))
+astMAKE_TEST(KeyMap,KeyError,( this->keyerror != -INT_MAX ))
 
 /* Copy constructor. */
 /* ----------------- */
@@ -5992,6 +6124,12 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
    set = TestSizeGuess( this, status );
    ival = set ? GetSizeGuess( this, status ) : astGetSizeGuess( this );
    astWriteInt( channel, "SzGss", set, 0, ival, "Guess at KeyMap size" );
+
+/* KeyError. */
+/* --------- */
+   set = TestKeyError( this, status );
+   ival = set ? GetKeyError( this, status ) : astGetKeyError( this );
+   astWriteInt( channel, "KyErr", set, 0, ival, "Report non-existant keys?" );
 
 /* MapSize. */
 /* -------- */
@@ -6214,7 +6352,7 @@ AstKeyMap *astKeyMapId_( const char *options, ... ) {
 }
 
 AstKeyMap *astInitKeyMap_( void *mem, size_t size, int init, AstKeyMapVtab *vtab, 
-                     const char *name, int *status ) {
+                           const char *name, int *status ) {
 /*
 *+
 *  Name:
@@ -6290,7 +6428,7 @@ AstKeyMap *astInitKeyMap_( void *mem, size_t size, int init, AstKeyMapVtab *vtab
 /* Initialise an Object structure (the parent class) as the first component
    within the KeyMap structure, allocating memory if necessary. */
    new = (AstKeyMap *) astInitObject( mem, size, 0, (AstObjectVtab *) vtab,
-                                   name );
+                                      name );
 
    if ( astOK ) {
 
@@ -6301,6 +6439,7 @@ AstKeyMap *astInitKeyMap_( void *mem, size_t size, int init, AstKeyMapVtab *vtab
       new->mapsize = 0;
       new->table = NULL;
       new->nentry = NULL;
+      new->keyerror = -INT_MAX;
 
       NewTable( new, MIN_TABLE_SIZE, status );
 
@@ -6457,6 +6596,11 @@ AstKeyMap *astLoadKeyMap_( void *mem, size_t size, AstKeyMapVtab *vtab,
 /* ---------- */
       new->sizeguess = astReadInt( channel, "szgss", INT_MAX );
       if ( TestSizeGuess( new, status ) ) SetSizeGuess( new, new->sizeguess, status );
+
+/* KeyError. */
+/* --------- */
+      new->keyerror = astReadInt( channel, "kyerr", -INT_MAX );
+      if ( TestKeyError( new, status ) ) SetKeyError( new, new->keyerror, status );
 
 /* MapSize. */
 /* -------- */
