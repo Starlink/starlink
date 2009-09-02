@@ -5447,7 +5447,6 @@ int StarRtdImage::hduCmdGet( int argc, char** argv, FitsIO* fits )
 
     //  Check if this is a compressed image and handle.
     if ( sfits->isCompressedImage() ) {
-        cout << "isCompressedImage" << endl;
         if ( argc >= 2 ) {
             status = sfits->saveCompressedImage( filename );
         }
