@@ -148,6 +148,8 @@
 *        Allow multiple sky cubes to be supplied.
 *     29-JUN-2009 (DSB):
 *        Use new NDG provenance API.
+*     2-SEP-2009 (DSB):
+*        Always initialise the output to hold bad values.
 
 *  Copyright:
 *     Copyright (C) 2008-2009 Science and Technology Facilities Council.
@@ -463,13 +465,8 @@ void smurf_unmakecube( int *status ) {
 /* Ensure the output NDF has a history component. */
       ndfHcre( ondf, status );
 
-/* Get a pointer to the mapped output data array. Set all value sbad if
-   we are using AST to do the resampling. */
-      if( interp == AST__NEAREST ) {
-         ndfMap( ondf, "DATA", "_REAL", "WRITE", &out_data, &nel, status );
-      } else {
-         ndfMap( ondf, "DATA", "_REAL", "WRITE/BAD", &out_data, &nel, status );
-      }
+/* Get a pointer to the mapped output data array. Set all values bad. */
+      ndfMap( ondf, "DATA", "_REAL", "WRITE/BAD", &out_data, &nel, status );
 
 /* If the detector positions are to calculated on the basis of FPLANEX/Y
    rather than detpos, then free the detpos array in the templates smfHead
