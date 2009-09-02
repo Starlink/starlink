@@ -6,7 +6,7 @@
 *     CCG_SCR1
 
 *  Purpose:
-*     Combines data lines using a sigma clipped mean.
+*     Combines data lines using a sigma-clipped mean.
 
 *  Language:
 *     Starlink Fortran 77
@@ -24,7 +24,7 @@
 *     outside of this range are then rejected and  the resulting output
 *     mean values are returned in the array RESULT.  The variances are
 *     propagated through the combination process and returned in the
-*     RESVAR array.
+*     RESVAR array, and include a covariance correction.
 
 *  Arguments:
 *     NSIGMA = REAL (Given)
@@ -49,7 +49,7 @@
 *     RESULT( NPIX ) = ? (Returned)
 *        The output line of data.
 *     RESVAR( NPIX ) = ? (Returned)
-*        The output variances.
+*        The output population variances.
 *     WRK1( NLINES ) = ? (Returned)
 *        Workspace for calculations.
 *     WRK2( NLINES ) = ? (Returned)
@@ -121,6 +121,13 @@
 *     2009 July 17 (MJC):
 *        Do not include collapsed data comprising only bad values
 *        in argument NBAD.
+*     2009 September 2 (MJC):
+*        Change to calculate true weighted variance not "population
+*        variance" that gave the variance of the mean, and hence was
+*        not the desired sample variance for clipping.  Hence the
+*        range could be very narrow and in fact could exclude all data
+*        leading to a bad pixel.  Fix bug introduced last time when 
+*        reordering summations for efficiency.
 *     {enter_further_changes_here}
 
 *-
@@ -172,14 +179,19 @@
       <LTYPE> LOWER              ! Lower limit
       DOUBLE PRECISION MEAN      ! Weighted mean
       INTEGER NGOOD              ! Number of good pixels
+      DOUBLE PRECISION SAMVAR    ! Sample variance before rejection
       DOUBLE PRECISION SUM1      ! Weight sums
       DOUBLE PRECISION SUM2      ! Weighted value sums
+      DOUBLE PRECISION SUM3      ! Weighted squared-value sums
+      DOUBLE PRECISION SUM4      ! Sum of squared weights
       INTEGER UBND               ! Position of highest value lower than
                                  ! rejection threshold
       <LTYPE> UPPER              ! Upper limit
+      DOUBLE PRECISION VALUE     ! Single value
       DOUBLE PRECISION VAR       ! Population variance before rejection
       DOUBLE PRECISION W1        ! Weights as DBLE
       DOUBLE PRECISION W2        ! Weights as DBLE
+      DOUBLE PRECISION WEIGHT    ! Weight
 
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM_ type conversion functions
@@ -209,6 +221,8 @@
          CALL NUM_CLEARERR()
          SUM1 = 0.0D0
          SUM2 = 0.0D0
+         SUM3 = 0.0D0
+         SUM4 = 0.0D0
 
 *  Loop over all possible contributing pixels.
          DO 2 J = 1, NLINES
@@ -223,15 +237,18 @@
                POINT( NGOOD ) = J
 
 *  Change variance to weight.
-               VAR = 1.0D0 / NUM_<T>TOD( VARS( I, J ) )
+               WEIGHT = 1.0D0 / NUM_<T>TOD( VARS( I, J ) )
+               VALUE = NUM_<T>TOD( STACK( I, J ) )
 
 *  Increment sums.
-               SUM2 = SUM2 + NUM_<T>TOD( WRK1( NGOOD ) ) * VAR
-               SUM1 = SUM1 + VAR
+               SUM1 = SUM1 + WEIGHT
+               SUM2 = SUM2 + WEIGHT * VALUE
+               SUM3 = SUM3 + WEIGHT * VALUE * VALUE
+               SUM4 = SUM4 + WEIGHT * WEIGHT
 
 *  Transfer values to working buffers for the current output pixel.
                WRK1( NGOOD ) = STACK( I, J )
-               WRK2( NGOOD ) = NUM_DTO<T>( VAR )
+               WRK2( NGOOD ) = NUM_DTO<T>( WEIGHT )
 
 *  Set USED buffer in case no values are rejected.
                USED( NGOOD ) = .TRUE.
@@ -249,9 +266,12 @@
 *  Continue if more than one good value.
          IF ( NGOOD .GT. 0 ) THEN
 
-*  Form the weighted mean and population standard deviation.
+*  Form the weighted mean and population variance.
             MEAN = SUM2 / SUM1
             VAR = 1.0D0 / SUM1
+
+*  Find the weighted sample variance used for clipping outliers.
+            SAMVAR = ( SUM3 * SUM1 - SUM2 * SUM2 ) / ( SUM1 * SUM1 - SUM4 )
 
 *  Sort data prior to rejection -- this is necessary as clip may be
 *  non-central for (noisy) skew distributions, so the order statistics
@@ -260,8 +280,8 @@
             CALL CCG_IS3<T>( NGOOD, WRK1, WRK2, POINT, STATUS )
 
 *  Set the clipping range.
-            LOWER = NUM_DTO<T>( MEAN - DBLE( NSIGMA ) * SQRT( VAR ) )
-            UPPER = NUM_DTO<T>( MEAN + DBLE( NSIGMA ) * SQRT( VAR ) )
+            LOWER = NUM_DTO<T>( MEAN - DBLE( NSIGMA ) * SQRT( SAMVAR ) )
+            UPPER = NUM_DTO<T>( MEAN + DBLE( NSIGMA ) * SQRT( SAMVAR ) )
 
 *  Decide which orders of data are to be rejected. Pick out the least
 *  bound greater than the lower bound and the highest bound less than
