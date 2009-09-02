@@ -4987,9 +4987,9 @@ int StarRtdImage::fitsHduCmd( const ImageIO &imio, int argc, char *argv[] )
     if (strcmp(argv[0], "fits") == 0)
         return hduCmdFits(argc, argv, fits);
 
-    // <path> hdu list
+    // <path> hdu list, extended for compressed images
     if ( strcmp(argv[0], "list" ) == 0 ) {
-        int ret = hduCmdList( argc, argv, fits );
+        int ret = hduCmdCompList( argc, argv, fits );
         return ret;
     }
 
@@ -5005,6 +5005,100 @@ int StarRtdImage::fitsHduCmd( const ImageIO &imio, int argc, char *argv[] )
 
     // <path> hdu $number (Set the current HDU)
     return hduCmdSet( argc, argv, fits );
+}
+
+//+
+//  StarRtdImage::hduCmdCompList
+//
+//  Purpose:
+//     Implements the "hdu list" command. Note that if an extension contains
+//     a compressed image the string "COMPRESSED_IMAGE" will be part of
+//     the extname.
+//-
+int StarRtdImage::hduCmdCompList( int argc, char** argv, FitsIO* fits )
+{
+    //  Return a list of HDUs.
+    int numHDUs = fits->getNumHDUs();
+    if ( numHDUs <= 0 ) {
+        return TCL_OK;  // empty return list
+    }
+
+    //  Save current HDU, then loop through all HDUs to get info.
+    int curHDU = fits->getHDUNum();
+    ostringstream os;
+    int status = 0;
+    int count = 0;
+    for ( int i = 1; i <= numHDUs; i++ ) {
+        if ( fits->setHDU( i ) != 0 ) {
+            status++;
+            break;
+        }
+        const char* type = fits->getHDUType();
+        if ( !type ) {
+            status++;
+            break;
+        }
+
+        //  Get these keyword values and default to "".
+        char extName[80], naxis[32], naxis1[32], naxis2[32], naxis3[32];
+        char crpix1[32], crpix2[32];
+        fits->get( "EXTNAME", extName, sizeof(extName) );
+        fits->get( "NAXIS", naxis, sizeof(naxis) );
+        fits->get( "NAXIS1", naxis1, sizeof(naxis1) );
+        fits->get( "NAXIS2", naxis2, sizeof(naxis2) );
+        fits->get( "NAXIS3", naxis3, sizeof(naxis3) );
+        fits->get( "CRPIX1", crpix1, sizeof(crpix1) );
+        fits->get( "CRPIX2", crpix2, sizeof(crpix2) );
+
+        //  Is this compressed? ZIMAGE will be T or extname already contains
+        //  the COMPRESSED_IMAGE string.
+        if ( strstr( extName, "COMPRESSED_IMAGE" ) == NULL ) {
+            int zimage = 0;
+            fits->get( "ZIMAGE", zimage );
+            if ( zimage ) {
+                strcat( extName, "(COMPRESSED_IMAGE)" );
+            }
+        }
+
+        // Try avoiding long fractional strings
+        if (strlen(crpix1) != 0 &&  strlen(crpix2) != 0) {
+            double dcrpix1, dcrpix2;
+            fits->get("CRPIX1", dcrpix1);
+            fits->get("CRPIX2", dcrpix2);
+            os << "{"
+               << i
+               << " " << type
+               << " {" << extName << "}"
+               << " {" << naxis << "}"
+               << " {" << naxis1 << "}"
+               << " {" << naxis2 << "}"
+               << " {" << naxis3 << "}"
+               << " {" << dcrpix1 << "}"
+               << " {" << dcrpix2 << "}"
+               << "} ";
+        }
+        else {
+            os << "{"
+               << i
+               << " " << type
+               << " {" << extName << "}"
+               << " {" << naxis << "}"
+               << " {" << naxis1 << "}"
+               << " {" << naxis2 << "}"
+               << " {" << naxis3 << "}"
+               << " {" << crpix1 << "}"
+               << " {" << crpix2 << "}"
+               << "} ";
+        }
+        count++;
+    }
+    if (count) {
+        if (status == TCL_OK) {
+            set_result(os.str().c_str());
+        }
+        fits->setHDU(curHDU);
+    }
+    return status;
 }
 
 //+

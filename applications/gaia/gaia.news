@@ -42,6 +42,10 @@
     A problem displaying CUPID catalogues that include extra columns
     (using the extracols=1 parameter) has been fixed. Previously an "Unknown
     STC shape" error was thrown. 
+    
+    The detection of compressed images in FITS file has been improved.
+    Previously only those with EXTNAME of COMPRESSED_IMAGE where 
+    detected.
 
     Version 4.3-1
     =============

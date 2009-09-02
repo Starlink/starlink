@@ -404,6 +404,9 @@ int GaiaFITSHPutCard( StarFitsIO *fitsio, const char *card )
  * of the extensions in the given FITS file. The meta-data values are:
  *
  * "HDU Type ExtName NAXIS NAXIS1 NAXIS2 NAXIS3 CRPIX1 CRPIX2"
+ *
+ * Note that if an extension contains a compressed image the string
+ * "COMPRESSED_IMAGE" will be part of the extname.
  */
 int GaiaFITSHduList( StarFitsIO* fits, string &result )
 {
@@ -440,6 +443,16 @@ int GaiaFITSHduList( StarFitsIO* fits, string &result )
 	fits->get( "NAXIS3", naxis3 );
 	fits->get( "CRPIX1", crpix1 );
 	fits->get( "CRPIX2", crpix2 );
+
+        //  Is this compressed? ZIMAGE will be T or extname already contains
+        //  the COMPRESSED_IMAGE string.
+        if ( strstr( extName, "COMPRESSED_IMAGE" ) == NULL ) {
+            int zimage = 0;
+            fits->get( "ZIMAGE", zimage );
+            if ( zimage ) {
+                strcat( extName, "(COMPRESSED_IMAGE)" );
+            }
+        }
 
         os << "{"
            << i

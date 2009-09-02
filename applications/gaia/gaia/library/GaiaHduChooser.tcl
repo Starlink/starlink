@@ -15,8 +15,9 @@
 #     are accessed, so that we can apply heuristics to catalogue configuration
 #     (pick up RA and DEC columns, reconstruct the symbol etc). This is done
 #     by using the GaiaConvertTable conversions (which also deal with CAT &
-#     ASCII formats). We also intercept any binary tables that are of type
-#     "COMPRESSED_IMAGE" and convert these into temporary FITS image files.
+#     ASCII formats). We also intercept any binary tables that have
+#     "COMPRESSED_IMAGE" in their EXTNAME and convert these into temporary
+#     FITS image files. 
 #
 #     Later addition. Check for cubes and display them appropriately.
 
@@ -116,7 +117,7 @@ itcl::class gaia::GaiaHduChooser {
       set file [$image_ cget -file]
 
       #  May be a compressed image masquerading as a table. Check for that.
-      if { "$name" == "COMPRESSED_IMAGE" } {
+      if { [string first "COMPRESSED_IMAGE" $name] != 0 } {
 
          #  Arrange for decompression of this extension and then load it.
          decompress_inline_ $file $hdu

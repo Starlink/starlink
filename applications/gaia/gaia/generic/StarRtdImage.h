@@ -563,6 +563,9 @@ class StarRtdImage : public Skycat
    //  Implementation of hdu command for FITS files.
    int fitsHduCmd( const ImageIO &imio, int argc, char *argv[] );
 
+   //  Implementation of "hdu list" command.
+   int hduCmdCompList( int argc, char** argv, FitsIO* fits );
+
    //  Implementation of hdu command for NDF files.
    int ndfHduCmd( const ImageIO &imio, int argc, char *argv[] );
 

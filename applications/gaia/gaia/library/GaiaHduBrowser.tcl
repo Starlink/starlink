@@ -246,7 +246,7 @@ itcl::class gaia::GaiaHduBrowser {
       set file [$accessor_ cget -dataset]
 
       #  May be a compressed cube masquerading as a table. Check for that.
-      if { "$name" == "COMPRESSED_IMAGE" } {
+      if { [string first "COMPRESSED_IMAGE" $name] != 0 } {
 
          #  Arrange for decompression of this extension and then load it
          #  as required.
