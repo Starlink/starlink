@@ -3407,7 +3407,7 @@ static int MapGet0##X( AstKeyMap *this, const char *key, Xtype *value, int *stat
 \
 /* If the KeyError attribute is non-zero, report an error if the key is not \
    found */ \
-   } if( astGetKeyError( this ) && astOK ) { \
+   } else if( astGetKeyError( this ) && astOK ) { \
       astError( AST__MPKER, "astMapGet0" #X "(%s): No value was found for " \
                 "%s in the supplied KeyMap.", status, astGetClass( this ), \
                 key ); \
@@ -3549,7 +3549,7 @@ int astMapGet0AId_( AstKeyMap *this, const char *key, AstObject **value, int *st
 
 /* If the KeyError attribute is non-zero, report an error if the key is not 
    found */ 
-   } if( astGetKeyError( this ) && astOK ) { 
+   } else if( astGetKeyError( this ) && astOK ) { 
       astError( AST__MPKER, "astMapGet0A(%s): No value was found for " 
                 "%s in the supplied KeyMap.", status, astGetClass( this ), 
                 key ); 
@@ -3812,7 +3812,7 @@ static int MapGet1##X( AstKeyMap *this, const char *key, int mxval, int *nval, X
 \
 /* If the KeyError attribute is non-zero, report an error if the key is not \
    found */ \
-   } if( astGetKeyError( this ) && astOK ) { \
+   } else if( astGetKeyError( this ) && astOK ) { \
       astError( AST__MPKER, "astMapGet1" #X "(%s): No value was found for " \
                 "%s in the supplied KeyMap.", status, astGetClass( this ), \
                 key ); \
@@ -3993,7 +3993,7 @@ static int MapGet1C( AstKeyMap *this, const char *key, int l, int mxval,
 
 /* If the KeyError attribute is non-zero, report an error if the key is not 
    found */ 
-   } if( astGetKeyError( this ) && astOK ) { 
+   } else if( astGetKeyError( this ) && astOK ) { 
       astError( AST__MPKER, "astMapGet1C(%s): No value was found for " 
                 "%s in the supplied KeyMap.", status, astGetClass( this ), 
                 key ); 
@@ -4159,7 +4159,7 @@ int astMapGet1AId_( AstKeyMap *this, const char *key, int mxval, int *nval,
 
 /* If the KeyError attribute is non-zero, report an error if the key is not 
    found */ 
-   } if( astGetKeyError( this ) && astOK ) { 
+   } else if( astGetKeyError( this ) && astOK ) { 
       astError( AST__MPKER, "astMapGet1A(%s): No value was found for " 
                 "%s in the supplied KeyMap.", status, astGetClass( this ), 
                 key ); 
@@ -4413,7 +4413,7 @@ static int MapGetElem##X( AstKeyMap *this, const char *key, int elem, \
 \
 /* If the KeyError attribute is non-zero, report an error if the key is not \
    found */ \
-   } if( astGetKeyError( this ) && astOK ) { \
+   } else if( astGetKeyError( this ) && astOK ) { \
       astError( AST__MPKER, "astMapGetElem" #X "(%s): No value was found for " \
                 "%s in the supplied KeyMap.", status, astGetClass( this ), \
                 key ); \
@@ -4589,7 +4589,7 @@ static int MapGetElemC( AstKeyMap *this, const char *key, int l, int elem,
 
 /* If the KeyError attribute is non-zero, report an error if the key is not
    found */
-   } if( astGetKeyError( this ) && astOK ) {
+   } else if( astGetKeyError( this ) && astOK ) {
       astError( AST__MPKER, "astMapGetElemC(%s): No value was found for "
                 "%s in the supplied KeyMap.", status, astGetClass( this ),
                 key );
@@ -4753,7 +4753,7 @@ int astMapGetElemAId_( AstKeyMap *this, const char *key, int elem,
 
 /* If the KeyError attribute is non-zero, report an error if the key is not
    found */
-   } if( astGetKeyError( this ) && astOK ) {
+   } else if( astGetKeyError( this ) && astOK ) {
       astError( AST__MPKER, "astMapGetElemA(%s): No value was found for "
                 "%s in the supplied KeyMap.", status, astGetClass( this ),
                 key );
