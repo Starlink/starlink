@@ -1095,7 +1095,7 @@ package @PACKAGE@ {
                 position 2
                 type NDF
                 access WRITE
-                ppath DYNAMIC CURRENT
+                ppath DYNAMIC
                 vpath {PROMPT }
                 association ->GLOBAL.DATA_ARRAY
                 prompt {Processed flatfield file}
