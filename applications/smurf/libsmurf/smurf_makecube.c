@@ -787,6 +787,9 @@
 *        Now summarizes the input observations.
 *     3-JUL-2009 (DSB):
 *        Added EXTRACOLS parameter.
+*     3-SEP-2009 (DSB):
+*        If the target is moving, set AlignOffset non-zero in the output 
+*        current Frame.
 
 *  Copyright:
 *     Copyright (C) 2007-2009 Science and Technology Facilities Council.
@@ -1708,8 +1711,18 @@ void smurf_makecube( int *status ) {
             data = NULL;
          }
    
-/* Store the WCS FrameSet in the output NDF (if any). */
-         if( wcstile ) ndfPtwcs( wcstile, ondf, status );
+/* Store the WCS FrameSet in the output NDF (if any). If the target is
+   moving, set the AlignOffset attribute non-zero in the current Frame.
+   Use the Frame pointer rather than the FrameSet pointer to avoid
+   re-mapping the Frame within the FrameSet. */
+         if( wcstile ) {
+            if( moving ) {
+               tfrm = astGetFrame( wcstile, AST__CURRENT );
+               astSetI( tfrm, "AlignOffset", 1 );
+               tfrm = astAnnul( tfrm ); 
+            }
+            ndfPtwcs( wcstile, ondf, status );
+         }
    
 /* If we are creating an output Variance component... */
          if( genvar && *status == SAI__OK) {
