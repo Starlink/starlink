@@ -73,6 +73,9 @@
 *        Factor out observation summary reporting.
 *     2009-05-25 (TIMJ):
 *        Use new smf_obsmap_report API.
+*     2009-09-02 (TIMJ):
+*        Use smf_find_dateobs rather than directly accessing jcmtstate
+*        to be a little more robust with junk files.
 
 *  Copyright:
 *     Copyright (C) 2008-2009 Science and Technology Facilities Council.
@@ -204,7 +207,7 @@ void smf_find_darks( const Grp * ingrp, Grp **outgrp, Grp **darkgrp,
         sortinfo = &(alldarks[dkcount]);
         one_strlcpy( sortinfo->name, infile->file->name, sizeof(sortinfo->name),
                      status );
-        sortinfo->tai = (infile->hdr->allState)[0].tcs_tai;
+        smf_find_dateobs( infile->hdr, &(sortinfo->tai), NULL, status );
         msgSetc("F", infile->file->name);
         msgOutif(MSG__DEBUG, " ", "Dark file: ^F",status);
         dkcount++;
