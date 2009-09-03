@@ -81,6 +81,9 @@
 *        Use new smf_create_respfile routine for creating the responsivity image.
 *     2009-05-28 (AGG):
 *        Explicitly check for good status after requesting RESP parameter
+*     2009-09-02 (TIMJ):
+*        Write RESP provenance after OUT parameter has been defaulted. This
+*        was causing odd problems in the pipeline.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -388,10 +391,9 @@ void smurf_calcflat( int *status ) {
       kpg1Wgndf( "RESP", NULL, 1, 1, "", &rgrp, &rsize, status );
 
       if (*status == SAI__OK) {
-        /* Create the file on disk and handle provenance */
+        /* Create the file on disk */
         smfData *refdata = (bbhtframe->sdata)[0];
         smf_create_respfile( rgrp, 1, refdata, &respmap, status );
-        smf_accumulate_prov( NULL, dkgrp, 1, respmap->file->ndfid, "SMURF:CALCFLAT", status );
       } else if (*status == PAR__NULL) {
         void *pntr[] = {NULL, NULL, NULL};
         dim_t mydims[2];
@@ -461,7 +463,12 @@ void smurf_calcflat( int *status ) {
     /* write out the flatfield */
     smf_flat_write( flatname, bbhtframe, pixheat, powref, bolref, dkgrp, status );
 
-    if (respmap) smf_close_file( &respmap, status );
+    if (respmap) {
+      /* write the provenance at the end since we have some problems with A-tasks
+         in the pipeline causing trouble if the OUT parameter has not yet been set */
+      if (respmap->file) smf_accumulate_prov( NULL, dkgrp, 1, respmap->file->ndfid, "SMURF:CALCFLAT", status );
+      smf_close_file( &respmap, status );
+    }
 
   } else {
     *status = SAI__ERROR;
