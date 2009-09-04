@@ -143,6 +143,11 @@ f     - AST_GETREFPOS: Get reference position in any celestial system
 *     2-OCT-2007 (DSB):
 *        In Overlay, clear AlignSystem as well as System before calling
 *        the parent overlay method.
+*     4-SEP-2009 (DSB):
+*        In MakeSpecMapping, in order to produce alignment that is not
+*        affected by the epoch or reference position, make the alignment 
+*        frame adapt to the epoch and reference position of the target 
+*        and result Frames.
 *class--
 */
 
@@ -2525,7 +2530,8 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
 *        Pointer to the second SpecFrame.
 *     align_frm
 *        A SpecFrame defining the system and standard of rest in which to 
-*        align the target and result SpecFrames.
+*        align the target and result SpecFrames. The Epoch, RefRA and
+*        RefDec attributes will be changed on exit to be those of the result.
 *     report
 *        Should errors be reported if no match is possible? These reports
 *        will describe why no match was possible.
@@ -2654,12 +2660,12 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
   9) Convert from an absolute value to an offset value (if SpecOrigin set)  
 
    Steps 1,2,3,4 are performed using the attributes of the target (rest
-   frequency, reference position, etc), whilst steps 5,6,7,8 are performed 
-   using the attributes of the target (rest frequency, reference position, 
+   frequency, reference farem, etc), whilst steps 5,6,7,8 are performed 
+   using the attributes of the target (rest frequency, reference frame, 
    etc). It is necessary to go from target system to alignment system 
    via frequency because SOR conversion can only be performed in the
    frequency domain.
- 
+
    Some of these steps may not be necessary. Initially assume all steps
    are necessary (we leave steps 0, 1, 8 and 9 out of this process and
    implement them once all other steps have been done). */
@@ -2670,12 +2676,26 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
    step6 = 1;
    step7 = 1;
 
+/* Prepare for the first four steps (converting to the alignment frame)
+   by ensuring that the alignment Frame has the same epoch and reference
+   point as the target system. */
+   astSetEpoch( align_frm, astGetEpoch( target ) );
+   astSetRefRA( align_frm, astGetRefRA( target ) );
+   astSetRefDec( align_frm, astGetRefDec( target ) );
+
 /* Step 2 is not necessary if the target system is frequency. */
    if( target_system == AST__FREQ ) step2 = 0;
 
 /* Step 3 is not necessary if the alignment SOR is the same as the target 
    SOR. */
    if( EqualSor( target, align_frm, status ) ) step3 = 0;
+
+/* Prepare for the last four steps (converting from the alignment frame)
+   by ensuring that the alignment Frame has the same epoch and reference
+   point as the result system. */
+   astSetEpoch( align_frm, astGetEpoch( result ) );
+   astSetRefRA( align_frm, astGetRefRA( result ) );
+   astSetRefDec( align_frm, astGetRefDec( result ) );
 
 /* Step 6 is not necessary if the alignment SOR is the same as the result
    SOR. */
@@ -2704,6 +2724,13 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
 
 /* Now we know which steps are needed, let's do them (we delay unit
    conversion to the end)... */
+
+/* Prepare for the first four steps (converting to the alignment frame)
+   by ensuring that the alignment Frame has the same epoch and reference
+   point as the target system. */
+   astSetEpoch( align_frm, astGetEpoch( target ) );
+   astSetRefRA( align_frm, astGetRefRA( target ) );
+   astSetRefDec( align_frm, astGetRefDec( target ) );
 
 /* Step 2: target system in target rest frame to frequency in target rest 
    frame. */
@@ -2763,6 +2790,10 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
 /* Step 5: Alignment system in alignment rest frame to frequency in alignment 
    rest frame (from now on use the attributes of the result SpecFrame to
    define the conversion parameters). */
+   astSetEpoch( align_frm, astGetEpoch( result ) );
+   astSetRefRA( align_frm, astGetRefRA( result ) );
+   astSetRefDec( align_frm, astGetRefDec( result ) );
+
    if( step5 ) {
       if( align_system == AST__VREL ) {
          VerifyAttrs( result, vmess, "RestFreq", "astMatch", status );
@@ -4175,7 +4206,7 @@ static int SorConvert( AstSpecFrame *this, AstSpecFrame *that,
 
 *  Description:
 *     This function adds a conversion to a SpecMap which transforms
-*     frequencies between the standards of rest specified by "this" to
+*     frequencies from the standard of rest specified by "this" to
 *     the standard of rest specified by "that". Note the conversion is
 *     always between frequency in the two rest frames no matter what the 
 *     System attributes of the two SpecFrames may be (which are ignored).
