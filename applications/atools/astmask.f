@@ -70,6 +70,10 @@ c        by VAL, and all other pixels are left unchanged. Note, the Negated
 *        slightly different form of pixel coordinates (it assumes integral
 *        values are at the centre rather than the corners of each pixel) 
 *        and so requires a slightly different Mapping.
+*
+*        The suggested default is the input NDF. If accepted, this default 
+*        means that he supplied Region is assumed to be defined in the
+*        current WCS Frame of the supplied NDF.
 *     OUT = NDF (Read)
 *        The output NDF.
 *     RESULT = _INTEGER (Write)
@@ -123,6 +127,7 @@ c        by VAL, and all other pixels are left unchanged. Note, the Negated
       INCLUDE 'NDF_PAR'         ! NDF constants
       INCLUDE 'AST_PAR'         ! AST constants and function declarations
       INCLUDE 'PAR_ERR'         ! PAR errors
+      INCLUDE 'DAT_PAR'         ! DAT__ constants
       INCLUDE 'CNF_PAR'         ! For CNF_PVAL function
       INCLUDE 'PRM_PAR'         ! For VAL__ constants
 
@@ -139,6 +144,7 @@ c        by VAL, and all other pixels are left unchanged. Note, the Negated
       BYTE UBVAL
       CHARACTER DTYPE*( NDF__SZFTP )
       CHARACTER ITYPE*( NDF__SZTYP )
+      CHARACTER PATH*255
       CHARACTER VTEXT*30        
       DOUBLE PRECISION DVAL
       DOUBLE PRECISION SHIFT( NDF__MXDIM )
@@ -176,6 +182,13 @@ c        by VAL, and all other pixels are left unchanged. Note, the Negated
       CALL KPG1_GTOBJ( 'THIS', 'Region', AST_ISAREGION, THIS, STATUS )
       NAXREG = AST_GETI( THIS, 'NAXES', STATUS )
 
+*  Get the input NDF.
+      CALL PAR_GET0C( 'IN', PATH, STATUS )
+      CALL NDF_FIND( DAT__ROOT, PATH, INDF1, STATUS )
+
+*  Set the default for the MAP parameter to be the NDF path.
+      CALL PAR_DEF0C( 'MAP', PATH, STATUS )
+
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
@@ -204,10 +217,8 @@ c        by VAL, and all other pixels are left unchanged. Note, the Negated
          END IF
       END IF
 
-*  Get the input NDF.
-      CALL NDF_ASSOC( 'IN', 'READ', INDF1, STATUS )
-
-*  Get its pixel bounds, and ensure it has the correct number of pixel axes.
+*  Get the NDF pixel bounds, and ensure it has the correct number of pixel 
+*  axes.
       CALL NDF_BOUND( INDF1, NMOUT, LBND, UBND, NDIM, STATUS )
       IF( NDIM .NE. NMOUT .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR

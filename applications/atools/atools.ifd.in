@@ -1139,8 +1139,8 @@ iraf! {
          parameter map {
             position 2
             type LITERAL
-            prompt {The Mapping from Region to pixel coords}
-            ppath GLOBAL CURRENT
+            prompt {The Mapping from pixel coords to Region coords}
+            ppath DYNAMIC GLOBAL CURRENT
             association <-GLOBAL.AST_OBJECT
             helpkey *
          }
@@ -1154,7 +1154,7 @@ iraf! {
           }
          parameter in {
             position 5
-            type NDF
+            type LITERAL
             access READ
             ppath GLOBAL
             association <-GLOBAL.DATA_ARRAY
