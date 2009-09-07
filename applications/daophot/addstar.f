@@ -413,6 +413,8 @@ C
       INTEGER IR(97)
       DATA IFF /0/
       DATA M/714025/, IA/1366/, IC/150889/, RM/1.400511E-6/
+      SAVE IFF, IY, M, IR
+
  1000 CONTINUE
       IF ((IDUM .LT. 0) .OR. (IFF .EQ. 0)) THEN
          IFF = 1

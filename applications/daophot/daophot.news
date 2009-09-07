@@ -1,6 +1,14 @@
 1 DAOPHOT - DAO photometry package
                                                             Expires: **.**.**
 
+ This is DAOPHOT v1.3-5.
+
+ Changes at v1.3-5:
+
+   o As issue in the addstar command random number generating function
+     has been fixed. This problem could cause the PAUSE prompt to be 
+     issued (sometime repeatably.
+
  This is DAOPHOT v1.3-4.
 
  Changes at v1.3-4:
