@@ -1124,6 +1124,68 @@ iraf! {
 
       }
 
+      action astmask {
+         helplib {$ATOOLS_HELP}
+
+         parameter inside {
+            position 3
+            type _LOGICAL
+            access READ
+            prompt {Modify pixels inside the supplied Region?}
+            ppath CURRENT DEFAULT
+            default TRUE
+            helpkey *
+          }
+         parameter map {
+            position 2
+            type LITERAL
+            prompt {The Mapping from Region to pixel coords}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+         }
+         parameter val {
+            position 4
+            type LITERAL
+            prompt {The value that defines the pixels to be outlined}
+            ppath CURRENT DEFAULT
+            default BAD
+            helpkey *
+          }
+         parameter in {
+            position 5
+            type NDF
+            access READ
+            ppath GLOBAL
+            association <-GLOBAL.DATA_ARRAY
+            prompt {The input NDF}
+            helpkey *
+         }
+         parameter out {
+            position 6
+            type NDF
+            access WRITE
+            association ->GLOBAL.DATA_ARRAY
+            prompt {The output NDF}
+            helpkey *
+         }
+         parameter result {
+            type _INTEGER
+            access WRITE
+            vpath DEFAULT
+            default 0
+            helpkey *
+          }
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The input Region}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+         }
+      }
+
       action astoutline {
          helplib {$ATOOLS_HELP}
 
