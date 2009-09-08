@@ -32,7 +32,7 @@ figaro2_LDADD = $(LDADD) \
 ../appsub/libappsub.la \
 ../fig/libfig.la \
 ../fda/libfda.la \
-../jty/libjty.la \
+../jty/libfigjty.la \
 ../fit/libfigfit.la \
 ../tio/libfigtio.la \
 ../gen/libfiggen.la \
