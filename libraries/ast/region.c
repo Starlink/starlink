@@ -182,6 +182,9 @@ f     - AST_SHOWMESH: Display a mesh of points on the surface of a Region
 *        Modify MapRegion to use FrameSets properly.
 *     18-JUN-2009 (DSB):
 *        Override ObsAlt accessor methods.
+*     8-SEP-2009 (DSB):
+*        Fix bugs in astOverlap that could result in wrong results if
+*        either region is unbounded.
 *class--
 
 *  Implementation Notes:
@@ -5413,11 +5416,7 @@ static int Mask##X( AstRegion *this, AstMapping *map, int inside, int ndim, \
          ubndg[ idim ] = MIN( ubnd[ idim ], (int)( ubndgd[ idim ] + 0.5 ) + 2 ); \
          npix *= ( ubnd[ idim ] - lbnd[ idim ] + 1 ); \
          npixg *= ( ubndg[ idim ] - lbndg[ idim ] + 1 ); \
-         if( npixg <= 0 ) break; \
       } \
-\
-/* If the bounding box is null, return without action. */ \
-      if( npixg > 0 ) { \
 \
 /* All points outside this box are either all inside, or all outside, the \
    Region. So we can speed up processing by setting all the points which are \
@@ -5426,56 +5425,55 @@ static int Mask##X( AstRegion *this, AstMapping *map, int inside, int ndim, \
    of the Region. We do this by supplying an alternative output array to \
    the resampling function below, which has been pre-filled with "val" at \
    every pixel. */ \
-         if( ( inside != 0 ) == ( astGetNegated( used_region ) != 0 ) ) { \
+      if( ( inside != 0 ) == ( astGetNegated( used_region ) != 0 ) ) { \
 \
 /* Allocate memory for the alternative output array, and fill it with \
    "val". */ \
-            tmp_out = astMalloc( sizeof( Xtype )*(size_t) npix ); \
-            if( tmp_out ) { \
-               c = tmp_out; \
-               for( ipix = 0; ipix < npix; ipix++ ) *(c++) = val; \
-               result = npix - npixg; \
-            } \
+         tmp_out = astMalloc( sizeof( Xtype )*(size_t) npix ); \
+         if( tmp_out ) { \
+            c = tmp_out; \
+            for( ipix = 0; ipix < npix; ipix++ ) *(c++) = val; \
+            result = npix - npixg; \
+         } \
 \
 /* Indicate that we will use this temporary array rather than the \
    supplied array. */ \
-            out = tmp_out; \
+         out = tmp_out; \
 \
 /* If the outside of the grid box is outside the region of interest it \
    will be unchanged in the resturned array. Therefore we can use the \
    supplied array as the output array below. */ \
-         } else { \
-            tmp_out = NULL; \
-            out = in; \
-         } \
+      } else { \
+         tmp_out = NULL; \
+         out = in; \
+      } \
 \
 /* Temporarily invert the Region if required. The Region Transform methods \
    leave interior points unchanged and assign AST__BAD to exterior points. \
    This is the opposite of what we want (which is to leave exterior \
    points unchanged and assign VAL to interior points), so we negate the \
    region if the inside is to be assigned the value VAL.*/ \
-         if( inside ) astNegate( used_region ); \
+      if( inside ) astNegate( used_region ); \
 \
 /* Invoke astResample to mask just the region inside the bounding box found \
    above (specified by lbndg and ubndg), since all the points outside this \
    box will already contain their required value. */ \
-         result += astResample##X( used_region, ndim, lbnd, ubnd, in, NULL, AST__NEAREST, \
-                                   NULL, NULL, 0, 0.0, 100, val, ndim, \
-                                   lbnd, ubnd, lbndg, ubndg, out, NULL ); \
+      result += astResample##X( used_region, ndim, lbnd, ubnd, in, in, AST__NEAREST, \
+                                NULL, NULL, 0, 0.0, 100, val, ndim, \
+                                lbnd, ubnd, lbndg, ubndg, out, out ); \
 \
 /* Revert to the original setting of the Negated attribute. */ \
-         if( inside ) astNegate( used_region ); \
+      if( inside ) astNegate( used_region ); \
 \
 /* If required, copy the output data from the temporary output array to \
    the supplied array, and then free the temporary output array. */ \
-         if( tmp_out ) { \
-            c = tmp_out; \
-            d = in; \
-            for( ipix = 0; ipix < npix; ipix++ ) *(d++) = *(c++); \
-            tmp_out = astFree( tmp_out ); \
-         }\
+      if( tmp_out ) { \
+         c = tmp_out; \
+         d = in; \
+         for( ipix = 0; ipix < npix; ipix++ ) *(d++) = *(c++); \
+         tmp_out = astFree( tmp_out ); \
       }\
-   } \
+   }\
 \
 /* Free resources */ \
    ubndg = astFree( ubndg ); \
@@ -6106,8 +6104,8 @@ static int OverlapX( AstRegion *that, AstRegion *this, int *status ){
 */
 
 /* Local Variables: */
-   AstFrame *frm_reg1;            /* Pointer to current Frame in "reg1" Frame */
    AstFrame *bfrm_reg1;           /* Pointer to base Frame in "reg1" Frame */
+   AstFrame *frm_reg1;            /* Pointer to current Frame in "reg1" Frame */
    AstFrameSet *fs0;              /* FrameSet connecting Region Frames */
    AstFrameSet *fs;               /* FrameSet connecting Region Frames */
    AstMapping *cmap;              /* Mapping connecting Region Frames */
@@ -6117,9 +6115,9 @@ static int OverlapX( AstRegion *that, AstRegion *this, int *status ){
    AstPointSet *ps2;              /* Mesh covering second Region */
    AstPointSet *ps3;              /* Mesh covering first Region */
    AstPointSet *ps4;              /* Mesh covering first Region */
-   AstPointSet *reg2_submesh;     /* Second Region mesh minus boundary points */
-   AstPointSet *reg2_mesh;        /* Mesh covering second Region */
    AstPointSet *reg1_mesh;        /* Central point within first Region */
+   AstPointSet *reg2_mesh;        /* Mesh covering second Region */
+   AstPointSet *reg2_submesh;     /* Second Region mesh minus boundary points */
    AstRegion *reg1;               /* Region to use as the first Region */
    AstRegion *reg2;               /* Region to use as the second Region */
    AstRegion *unc1;               /* "unc" mapped into Frame of first Region */
@@ -6131,6 +6129,7 @@ static int OverlapX( AstRegion *that, AstRegion *this, int *status ){
    int allbad;                    /* Were all axis values bad? */
    int allgood;                   /* Were all axis values good? */
    int bnd1;                      /* Does reg1 have a finite boundary */
+   int bnd2;                      /* Does reg2 have a finite boundary */
    int bnd_that;                  /* Does "that" have a finite boundary */
    int bnd_this;                  /* Does "this" have a finite boundary */
    int first;                     /* First pass? */
@@ -6143,6 +6142,10 @@ static int OverlapX( AstRegion *that, AstRegion *this, int *status ){
    int nc;                        /* Number of axis values per point */
    int np;                        /* Number of points in mesh */
    int result;                    /* Value to return */
+   int reg1_neg;                  /* Was "reg1" negated to make it bounded? */
+   int reg2_neg;                  /* Was "reg2" negated to make it bounded? */
+   int that_neg;                  /* Was "that" negated to make it bounded? */
+   int this_neg;                  /* Was "this" negated to make it bounded? */
    int touch;                     /* Do the Regions touch? */
 
 /* Initialise. */
@@ -6181,19 +6184,36 @@ static int OverlapX( AstRegion *that, AstRegion *this, int *status ){
    either of the two Regions has a finite boundary length. This will be the 
    case if the region is bounded, or if it can be made bounded simply by 
    negating it. If a Region is unbounded regardless of the setting of its 
-   Negated flag, then it does not have a finite boundary. */
+   Negated flag, then it does not have a finite boundary. We leave the
+   Negated attributes (temporaily) set to the values that cause the
+   Regions to be bounded. Set flags to indicate if the Regions have been
+   negated. */
    bnd_this = astGetBounded( this );
    if( !bnd_this ) {
       astNegate( this );
       bnd_this = astGetBounded( this );
-      astNegate( this );
+      if( ! bnd_this ) {
+         astNegate( this );
+         this_neg = 0;
+      } else {    
+         this_neg = 1;
+      }
+   } else {
+      this_neg = 0;
    }
 
    bnd_that = astGetBounded( that );
    if( !bnd_that ) {
       astNegate( that );
       bnd_that = astGetBounded( that );
-      astNegate( that );
+      if( ! bnd_that ) {
+         astNegate( that );
+         that_neg = 0;
+      } else {    
+         that_neg = 1;
+      }
+   } else {
+      that_neg = 0;
    }
 
 /* If neither Regions has a finite boundary, then we cannot currently
@@ -6217,10 +6237,16 @@ static int OverlapX( AstRegion *that, AstRegion *this, int *status ){
       reg1 = this;
       reg2 = that;
       bnd1 = bnd_this;
+      bnd2 = bnd_that;
+      reg1_neg = this_neg;
+      reg2_neg = that_neg;
    } else {
       reg1 = that;
       reg2 = this;
       bnd1 = bnd_that;
+      bnd2 = bnd_this;
+      reg1_neg = that_neg;
+      reg2_neg = this_neg;
    }
 
 /* We may need to try again with the above selections swapped. We only do
@@ -6239,7 +6265,8 @@ L1:
 /* Get a pointer to the Frame represented by the first Region. */
       frm_reg1 = astGetFrame( reg1->frameset, AST__CURRENT );
 
-/* Get a pointer to the Mapping from current to base Frame in the first Region. */
+/* Get a pointer to the Mapping from current to base Frame in the first 
+   Region. */ 
       map_reg1 = astGetMapping( reg1->frameset, AST__CURRENT, AST__BASE );
 
 /* Get the Mapping from the current Frame of the second Region to the
@@ -6291,10 +6318,16 @@ L1:
                reg1 = this;
                reg2 = that;
                bnd1 = bnd_this;
+               bnd2 = bnd_that;
+               reg1_neg = this_neg;
+               reg2_neg = that_neg;
             } else {
                reg1 = that;
                reg2 = this;
                bnd1 = bnd_that;
+               bnd2 = bnd_this;
+               reg1_neg = that_neg;
+               reg2_neg = this_neg;
             }
             goto L1;     
 
@@ -6321,7 +6354,7 @@ L1:
    looked at the Bounded attributes. If the Bounded attribute is the same
    for both Regions then they are identical, otherwise they are mutually
    exclusive. */
-         result = ( astGetBounded( reg1 ) == astGetBounded( reg2 ) ) ? 5 : 6;
+         result = ( ( !reg1_neg && bnd1 ) == ( !reg2_neg && bnd2 ) ) ? 5 : 6;
 
 /* If the boundaries of the two Regions are not equivalent. */
       } else {
@@ -6375,7 +6408,7 @@ L1:
    of, or inside, the first region, return a result depending on whether the 
    second region is bounded or infinite. */
             if( allgood ) {
-               result = astGetBounded( reg2 ) ?  3 : 4;
+               result = ( !reg2_neg && bnd2 ) ?  3 : 4;
 
 /* If part of the mesh of the second Region was inside the first region,
    and part was outside, return a result of 4 (partial overlap). */
@@ -6386,25 +6419,21 @@ L1:
    the first Region) if the first region is unbounded then all points on the 
    second region mesh must be in a hole. The returned result then 
    depends on whether the second Region is bounded or not. */
-            } else if( !astGetBounded( reg1 ) ) {
-               result = astGetBounded( reg2 ) ? 1 : 2;
-
-/* We now know that the first Region is bounded. This means it must have
-   a finite boundary. Perform a sanity check that this is what we expected. 
-   Passing this test ensures that it is safe to call astRegMesh on the
-   first Region. */
             } else if( !bnd1 ) {
-               if( astOK ) {
-                  astError( AST__INTER, "astOverlap(Region): The first "
-                            "Region is bounded but has not got a finite "
-                            "boundary (AST programming error)." , status);
-               }
+               result = ( !reg2_neg && bnd2 ) ? 1 : 2;
 
-/* Since the first Region is bounded, we have two possibilities - the 
-   boundary of the first Region is either entirely on-or-inside, or entirely 
-   on-or-outside the second Region. To distinguish between these two cases 
-   we get a mesh of points covering the boundary of the first Region (now 
-   known to be finite) and transform it using the second Region. */
+/* Otherwise, if the second region is unbounded then all points on the first 
+   region mesh must be in a hole. The returned result then depends on whether 
+   the second Region is bounded or not. */
+            } else if( !bnd2 ) {
+               result = ( !reg1_neg && bnd1 ) ? 1 : 3;
+
+/* We now know both regions are bounded (or have been made bounded by
+   negating them), we have two possibilities - the boundary of the first 
+   Region is either entirely on-or-inside, or entirely on-or-outside the 
+   second Region. To distinguish between these two cases we get a mesh of 
+   points covering the boundary of the first Region (now known to be finite) 
+   and transform it using the second Region. */
             } else {
                reg1_mesh = astRegMesh( reg1 );
 
@@ -6423,8 +6452,19 @@ L1:
 
 /* If the first point in the mesh is inside the second Region, then all
    points are inside. Otherwise all points are outside. */
-                  result =  ( ptr[ 0 ][ 0 ] == AST__BAD ) ? 1 : 2;
-
+                  if( ptr[ 0 ][ 0 ] == AST__BAD ) {
+                     if( !reg1_neg && bnd1 ) {
+                        result = ( !reg2_neg && bnd2 ) ? 1 : 2;
+                     } else {
+                        result = ( !reg2_neg && bnd2 ) ? 3 : 4;
+                     }
+                  } else {
+                     if( !reg1_neg && bnd1 ) {
+                        result = ( !reg2_neg && bnd2 ) ? 2 : 1;
+                     } else {
+                        result = ( !reg2_neg && bnd2 ) ? 4 : 3;
+                     }
+                  }
                }
 
 /* Free resources.*/
@@ -6434,7 +6474,8 @@ L1:
             }
          }
 	 
-/* If there was no intersection or overlap, but the regions touch, then we consider there    to be an intersection if either region is closed. */	 
+/* If there was no intersection or overlap, but the regions touch, then we 
+   consider there to be an intersection if either region is closed. */	 
 	if( touch && result == 1 ) {
 	   if( astGetClosed( this) || astGetClosed( that ) ) result = 4;
 	} 
@@ -6471,6 +6512,10 @@ L1:
          result = 2;
       }
    }
+
+/* Re-instate the original Negated flags. */
+   if( this_neg ) astNegate( this );
+   if( that_neg ) astNegate( that );
 
 /* If not OK, return zero. */
    if( !astOK ) result = 0;
