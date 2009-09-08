@@ -6119,11 +6119,11 @@ static int OverlapX( AstRegion *that, AstRegion *this, int *status ){
    AstMapping *map;               /* Mapping form "reg2" current to "reg1" base */
    AstMapping *map_reg1;          /* Pointer to current->base Mapping in "reg1" */
    AstPointSet *ps1;              /* Mesh covering second Region */
-   AstPointSet *ps2;              /* Mesh covering second Region */
    AstPointSet *ps3;              /* Mesh covering first Region */
    AstPointSet *ps4;              /* Mesh covering first Region */
-   AstPointSet *reg1_mesh;        /* Central point within first Region */
+   AstPointSet *ps2;              /* Mesh covering second Region */
    AstPointSet *reg2_mesh;        /* Mesh covering second Region */
+   AstPointSet *reg1_mesh;        /* Mesh covering first Region */
    AstPointSet *reg2_submesh;     /* Second Region mesh minus boundary points */
    AstRegion *reg1;               /* Region to use as the first Region */
    AstRegion *reg2;               /* Region to use as the second Region */
@@ -6139,6 +6139,7 @@ static int OverlapX( AstRegion *that, AstRegion *this, int *status ){
    int bnd2;                      /* Does reg2 have a finite boundary */
    int bnd_that;                  /* Does "that" have a finite boundary */
    int bnd_this;                  /* Does "this" have a finite boundary */
+   int case1;                     /* First region inside second region? */
    int first;                     /* First pass? */
    int good;                      /* Any good axis values found? */
    int i;                         /* Mesh axis index */
@@ -6411,76 +6412,133 @@ L1:
                }
             }
 
-/* If the entire mesh of the second Region was either on the boundary
-   of, or inside, the first region, return a result depending on whether the 
-   second region is bounded or infinite. */
+/* If the entire mesh of the (potentially negated) second Region was either 
+   on the boundary of, or inside, the (potentially negated) first region, 
+   determine the result depending on whether the regions have been
+   negated and whether they are bounded. Check for impossible states (or
+   maybe just errors in my logic). */
             if( allgood ) {
-               result = ( !reg2_neg && bnd2 ) ?  3 : 4;
+
+/* Second region has a mesh so it must be bounded. */
+               if( !bnd2 && astOK ) {
+                     astError( AST__INTER, "astOverlap(%s): Inconsistent "
+                               "state 1 (internal AST programming error).", 
+                               status, astGetClass( this ) );
+
+/* If the first region has been made bounded by negating it... */
+               } else if( reg1_neg ) {
+                  if( bnd1 ) {
+
+/* If the second region has been made bounded by negating it, then the
+   unnegated first region is completely inside the unnegated second region. */
+                     if( reg2_neg ) {
+                        result = 2;
+
+/* If the second region was bounded without negating it, then there is
+   no overlap between the unnegated first region and the second region. */
+                     } else {
+                        result = 1;
+                     }
+
+/* If the first region has been negated then it should not be unbounded.
+   This is ensured by the nature of the code that sets the "this_neg" and
+   "that_neg" flags above. */
+                  } else if( astOK ) {
+                     astError( AST__INTER, "astOverlap(%s): Inconsistent "
+                               "state 2 (internal AST programming error).", 
+                               status, astGetClass( this ) );
+                  }
+
+/* If the first region was bounded without negating it, but the second
+   region was made bounded by negating it, there is partial overlap. */
+               } else if( reg2_neg ) {
+                  result = 4;
+
+/* If the first region was bounded without negating it, but the second
+   region was also bounded without negating it, the second region is
+   completely inside the first region. */
+               } else {
+                  result = 3;
+               }
 
 /* If part of the mesh of the second Region was inside the first region,
-   and part was outside, return a result of 4 (partial overlap). */
+   and part was outside, then there is partial ocverlap. */
             } else if( !allbad ) {
                result = 4;
 
-/* Otherwise,(i.e. if all points in the second Region mesh were on or outside 
-   the first Region) if the first region is unbounded then all points on the 
-   second region mesh must be in a hole. The returned result then 
-   depends on whether the second Region is bounded or not. */
-            } else if( !bnd1 ) {
-               result = ( !reg2_neg && bnd2 ) ? 1 : 2;
-
-/* Otherwise, if the second region is unbounded then all points on the first 
-   region mesh must be in a hole. The returned result then depends on whether 
-   the second Region is bounded or not. */
-            } else if( !bnd2 ) {
-               result = ( !reg1_neg && bnd1 ) ? 1 : 3;
-
-/* We now know both regions are bounded (or have been made bounded by
-   negating them), we have two possibilities - the boundary of the first 
-   Region is either entirely on-or-inside, or entirely on-or-outside the 
-   second Region. To distinguish between these two cases we get a mesh of 
-   points covering the boundary of the first Region (now known to be finite) 
-   and transform it using the second Region. */
+/* If no part of the mesh of the (possibly negated) second Region was inside 
+   the (possibly negated) first region ... */
             } else {
-               reg1_mesh = astRegMesh( reg1 );
+
+/* First deal with cases where the first region is unbounded. */
+               if( !bnd1 ) {
+                  if( reg1_neg && astOK ) {
+                     astError( AST__INTER, "astOverlap(%s): Inconsistent "
+                               "state 5 (internal AST programming error).", 
+                               status, astGetClass( this ) );
+                  } else if( reg2_neg ){
+                     result = 2;
+                  } else {
+                     result = 1;
+                  }
+
+/* The second region has a mesh so it must be bounded. */
+               } else if( !bnd2 && astOK ) {
+                     astError( AST__INTER, "astOverlap(%s): Inconsistent "
+                               "state 6 (internal AST programming error).", 
+                               status, astGetClass( this ) );
+
+/* So now we know both (possibly negated) regions are bounded. */
+               } else {
+
+/* We know that none of the reg2 mesh points are inside the bounded reg1.
+   But this still leaves two cases: 1) reg1 could be contained completely
+   within reg2, or 2) there is no overlap between reg2 and reg1. To
+   distinguish between these two cases we use reg2 to transform a point 
+   on the boundary of reg1. First get a mesh on the boundary of reg1. */
+                  reg1_mesh = astRegMesh( reg1 );
 
 /* Transform this mesh into the coordinate system of the second Region. */
-               ps3 = astTransform( cmap, reg1_mesh, 0, NULL );
+                  ps3 = astTransform( cmap, reg1_mesh, 0, NULL );
 
 /* Transform the points in this mesh using the second Region as a Mapping. 
    Any points outside the second region will be set bad in the output 
    PointSet. */
-               ps4 = astTransform( (AstMapping *) reg2, ps3, 1, NULL );
+                  ps4 = astTransform( (AstMapping *) reg2, ps3, 1, NULL );
 
 /* Get pointers to the axis data in this PointSet,and check they can be
    used safely. */
-               ptr = astGetPoints( ps4 );
-               if( astOK ) {
+                  ptr = astGetPoints( ps4 );
+                  if( astOK ) {
 
-/* If the first point in the mesh is inside the second Region, then all
-   points are inside. Otherwise all points are outside. */
-                  if( ptr[ 0 ][ 0 ] == AST__BAD ) {
-                     if( !reg1_neg && bnd1 ) {
-                        result = ( !reg2_neg && bnd2 ) ? 1 : 2;
+/* Test the firts point and set a flag indicating if we are in case 1 (if
+   not, we must be in case 2). */
+                     case1 = ( ptr[ 0 ][ 0 ] != AST__BAD );
+                  
+/* Apply logic similar to the other cases to determine the result. */
+                     if( reg1_neg ) {
+                        if( case1 == ( reg2_neg != 0 ) ) {
+                           result = 3;
+                        } else {
+                           result = 4;
+                        }
                      } else {
-                        result = ( !reg2_neg && bnd2 ) ? 3 : 4;
-                     }
-                  } else {
-                     if( !reg1_neg && bnd1 ) {
-                        result = ( !reg2_neg && bnd2 ) ? 2 : 1;
-                     } else {
-                        result = ( !reg2_neg && bnd2 ) ? 4 : 3;
+                        if( case1 == ( reg2_neg != 0 ) ) {
+                           result = 1;
+                        } else {
+                           result = 2;
+                        }
                      }
                   }
-               }
 
-/* Free resources.*/
-               ps3 = astAnnul( ps3 );
-               ps4 = astAnnul( ps4 );
-               reg1_mesh = astAnnul( reg1_mesh );
-            }
-         }
-	 
+/* Free resources. */
+                  reg1_mesh = astAnnul( reg1_mesh );
+                  ps3 = astAnnul( ps3 );
+                  ps4 = astAnnul( ps4 );
+               }
+	    }
+        }
+
 /* If there was no intersection or overlap, but the regions touch, then we 
    consider there to be an intersection if either region is closed. */	 
 	if( touch && result == 1 ) {
