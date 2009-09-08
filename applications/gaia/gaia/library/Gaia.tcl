@@ -1293,12 +1293,12 @@ itcl::class gaia::Gaia {
 
       #  If the window exists then just raise it. Can happen if control-e is
       #  pressed repeatably.
-      if { [info exists itk_component(xyprofile)] &&
-           [winfo exists $itk_component(xyprofile)] } {
-         wm deiconify $itk_component(xyprofile)
-         raise $itk_component(xyprofile)
+      if { [info exists itk_component($name)] && 
+           [winfo exists $itk_component($name)] } {
+         wm deiconify $itk_component($name)
+         raise $itk_component($name)
          if { $itk_option(-ukirt_xy) } {
-            $itk_component(xyprofile) restore
+            $itk_component($name) restore
          }
          return
       }
