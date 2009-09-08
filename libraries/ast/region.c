@@ -182,6 +182,8 @@ f     - AST_SHOWMESH: Display a mesh of points on the surface of a Region
 *        Modify MapRegion to use FrameSets properly.
 *     18-JUN-2009 (DSB):
 *        Override ObsAlt accessor methods.
+*     7-SEP-2009 (DSB):
+*        Fix astMask to avoid reading variance values from the data array.
 *     8-SEP-2009 (DSB):
 *        Fix bugs in astOverlap that could result in wrong results if
 *        either region is unbounded.
@@ -5416,7 +5418,11 @@ static int Mask##X( AstRegion *this, AstMapping *map, int inside, int ndim, \
          ubndg[ idim ] = MIN( ubnd[ idim ], (int)( ubndgd[ idim ] + 0.5 ) + 2 ); \
          npix *= ( ubnd[ idim ] - lbnd[ idim ] + 1 ); \
          npixg *= ( ubndg[ idim ] - lbndg[ idim ] + 1 ); \
+         if( npixg <= 0 ) break; \
       } \
+\
+/* If the bounding box is null, return without action. */ \
+      if( npixg > 0 ) { \
 \
 /* All points outside this box are either all inside, or all outside, the \
    Region. So we can speed up processing by setting all the points which are \
@@ -5425,55 +5431,56 @@ static int Mask##X( AstRegion *this, AstMapping *map, int inside, int ndim, \
    of the Region. We do this by supplying an alternative output array to \
    the resampling function below, which has been pre-filled with "val" at \
    every pixel. */ \
-      if( ( inside != 0 ) == ( astGetNegated( used_region ) != 0 ) ) { \
+         if( ( inside != 0 ) == ( astGetNegated( used_region ) != 0 ) ) { \
 \
 /* Allocate memory for the alternative output array, and fill it with \
    "val". */ \
-         tmp_out = astMalloc( sizeof( Xtype )*(size_t) npix ); \
-         if( tmp_out ) { \
-            c = tmp_out; \
-            for( ipix = 0; ipix < npix; ipix++ ) *(c++) = val; \
-            result = npix - npixg; \
-         } \
+            tmp_out = astMalloc( sizeof( Xtype )*(size_t) npix ); \
+            if( tmp_out ) { \
+               c = tmp_out; \
+               for( ipix = 0; ipix < npix; ipix++ ) *(c++) = val; \
+               result = npix - npixg; \
+            } \
 \
 /* Indicate that we will use this temporary array rather than the \
    supplied array. */ \
-         out = tmp_out; \
+            out = tmp_out; \
 \
 /* If the outside of the grid box is outside the region of interest it \
    will be unchanged in the resturned array. Therefore we can use the \
    supplied array as the output array below. */ \
-      } else { \
-         tmp_out = NULL; \
-         out = in; \
-      } \
+         } else { \
+            tmp_out = NULL; \
+            out = in; \
+         } \
 \
 /* Temporarily invert the Region if required. The Region Transform methods \
    leave interior points unchanged and assign AST__BAD to exterior points. \
    This is the opposite of what we want (which is to leave exterior \
    points unchanged and assign VAL to interior points), so we negate the \
    region if the inside is to be assigned the value VAL.*/ \
-      if( inside ) astNegate( used_region ); \
+         if( inside ) astNegate( used_region ); \
 \
 /* Invoke astResample to mask just the region inside the bounding box found \
    above (specified by lbndg and ubndg), since all the points outside this \
    box will already contain their required value. */ \
-      result += astResample##X( used_region, ndim, lbnd, ubnd, in, in, AST__NEAREST, \
-                                NULL, NULL, 0, 0.0, 100, val, ndim, \
-                                lbnd, ubnd, lbndg, ubndg, out, out ); \
+         result += astResample##X( used_region, ndim, lbnd, ubnd, in, NULL, AST__NEAREST, \
+                                   NULL, NULL, 0, 0.0, 100, val, ndim, \
+                                   lbnd, ubnd, lbndg, ubndg, out, NULL ); \
 \
 /* Revert to the original setting of the Negated attribute. */ \
-      if( inside ) astNegate( used_region ); \
+         if( inside ) astNegate( used_region ); \
 \
 /* If required, copy the output data from the temporary output array to \
    the supplied array, and then free the temporary output array. */ \
-      if( tmp_out ) { \
-         c = tmp_out; \
-         d = in; \
-         for( ipix = 0; ipix < npix; ipix++ ) *(d++) = *(c++); \
-         tmp_out = astFree( tmp_out ); \
+         if( tmp_out ) { \
+            c = tmp_out; \
+            d = in; \
+            for( ipix = 0; ipix < npix; ipix++ ) *(d++) = *(c++); \
+            tmp_out = astFree( tmp_out ); \
+         }\
       }\
-   }\
+   } \
 \
 /* Free resources */ \
    ubndg = astFree( ubndg ); \
