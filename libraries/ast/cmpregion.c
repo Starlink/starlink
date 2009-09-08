@@ -92,6 +92,8 @@ f     The CmpRegion class does not define any new routines beyond those
 *        Over-ride astRegBasePick.
 *     19-MAR-2009 (DSB):
 *        Over-ride the astDecompose method.
+*     8-SEP-2009 (DSB):
+*        Fix logic in RegTrace.
 *class--
 */
 
@@ -2288,6 +2290,7 @@ static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr,
    double dbreak;
    double dtot;
    double x;
+   double x0;
    int r1n;
    int r2n;
    AstPointSet *r1pset;
@@ -2370,7 +2373,8 @@ static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr,
 /* Find the correspond distance around the used sections of the second
    component region (normalised so that the entire border of the 
    component region has a length of "this->d0[1]"). */
-               x = ( dist[ i ] - dbreak )*dtot;
+               x0 = ( dist[ i ] - dbreak )*dtot;
+               x = x0;
 
 /* Convert this into the correspond distance around the entire border of 
    the second component region (normalised so that the entire border of the 
@@ -2379,10 +2383,8 @@ static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr,
                off = this->offs[ 1 ];
 
                for( j = 0; j < this->nbreak[ 1 ]; j++,rval++,off++ ) {
-                  if( x <= *rval ){
-                     x += *off;                  
-                     break;
-                  }
+                  if( *rval >= x0 ) break;
+                  x += *off;                  
                }
 
 /* Store this as the next distance to move around the second component
@@ -2393,16 +2395,15 @@ static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr,
    in the first component Region. */
             } else {
 
-               x = dist[ i ]*dtot;
+               x0 = dist[ i ]*dtot;
+               x = x0;
 
                rval = this->rvals[ 0 ];
                off = this->offs[ 0 ];
 
                for( j = 0; j < this->nbreak[ 0 ]; j++,rval++,off++ ) {
-                  if( x <= *rval ){
-                     x += *off;                  
-                     break;
-                  }
+                  if( *rval >= x0 ) break;
+                  x += *off;                  
                }
 
                r1d[ r1n++ ] = x;
@@ -2760,6 +2761,7 @@ static void SetBreakInfo( AstCmpRegion *this, int comp, int *status ){
    double rval;
    int i;
    int j;
+   double rbad;
    int nn;
    int prevgood;
    
@@ -2859,12 +2861,26 @@ static void SetBreakInfo( AstCmpRegion *this, int comp, int *status ){
    around the complete border is normalised to the range [0.0,1.0].
    Therefore the total distance around the used parts of the border will in
    general be less than 1.0 */
-               nn = 0;
-               rval = 0.0;
-               rvals = NULL;
-               offs = NULL;
 
-               prevgood = ( d[ 0 ] != AST__BAD );
+               if( d[ 0 ] == AST__BAD ) {
+                  nn = 1;
+                  j = 0;
+                  rvals = astMalloc( sizeof( double ) );
+                  offs = astMalloc( sizeof( double ) );
+                  if( astOK ) rvals[ 0 ] = -0.5*delta;
+                  rbad = 0.5;
+                  prevgood = 0;
+                  rval = -0.5*delta;
+
+               } else {
+                  nn = 0;
+                  rvals = NULL;
+                  offs = NULL;
+                  prevgood = 1;
+                  rbad = 0.0;
+                  rval = 0.0;
+               }
+               
                for( i = 1; i < NP; i++,p++,q++ ) {
 
                   if( d[ i ] == AST__BAD ) {
@@ -2873,19 +2889,28 @@ static void SetBreakInfo( AstCmpRegion *this, int comp, int *status ){
                         rvals = astGrow( rvals, nn, sizeof( double ) );
                         offs = astGrow( offs, nn, sizeof( double ) );
                         if( astOK ) {
-                           rvals[ j ] = rval;
-                           offs[ j ] = d[ i - 1 ] - rval +  0.5*delta;
+                           rvals[ j ] = rval + 0.5*delta;
+                           rbad = 0.0;
                         } else {
                            break;
                         }
+                        prevgood = 0;
                      }
 
-                     prevgood = 0;
+                     rbad += 1.0;
 
                   } else {
+                     if( !prevgood ) {
+                        offs[ j ] = rbad*delta;
+                        prevgood = 1;
+                     }
                      rval += delta;
-                     prevgood = 1;
                   }
+               }
+
+               if( !prevgood ) {
+                  rval += 0.5*delta;
+                  offs[ j ] = rbad*delta;
                }
 
 /* Record the information in the CmpRegion structure. */
