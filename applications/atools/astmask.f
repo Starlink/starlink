@@ -150,6 +150,7 @@ c        by VAL, and all other pixels are left unchanged. Note, the Negated
       DOUBLE PRECISION SHIFT( NDF__MXDIM )
       INTEGER EL
       INTEGER I
+      INTEGER IGRP
       INTEGER INDF1
       INTEGER INDF2
       INTEGER IPDATA
@@ -161,6 +162,7 @@ c        by VAL, and all other pixels are left unchanged. Note, the Negated
       INTEGER NMIN              
       INTEGER NMOUT             
       INTEGER RESULT
+      INTEGER SIZE
       INTEGER THIS              
       INTEGER UBND( NDF__MXDIM )
       INTEGER*2 UWVAL
@@ -182,9 +184,12 @@ c        by VAL, and all other pixels are left unchanged. Note, the Negated
       CALL KPG1_GTOBJ( 'THIS', 'Region', AST_ISAREGION, THIS, STATUS )
       NAXREG = AST_GETI( THIS, 'NAXES', STATUS )
 
-*  Get the input NDF.
-      CALL PAR_GET0C( 'IN', PATH, STATUS )
-      CALL NDF_FIND( DAT__ROOT, PATH, INDF1, STATUS )
+*  Get the input NDF, and its path as supplied by the user (i.e. not its
+*  full path). 
+      CALL KPG1_RGNDF( 'IN', 1, 1, ' ', IGRP, SIZE, STATUS )  
+      CALL NDG_NDFAS( IGRP, 1, 'Read', INDF1, STATUS )  
+      CALL GRP_GET( IGRP, 1, 1, PATH, STATUS ) 
+      CALL GRP_DELET( IGRP, STATUS ) 
 
 *  Set the default for the MAP parameter to be the NDF path.
       CALL PAR_DEF0C( 'MAP', PATH, STATUS )
@@ -196,7 +201,7 @@ c        by VAL, and all other pixels are left unchanged. Note, the Negated
       CALL KPG1_GTOBJ( 'MAP', 'Mapping', AST_ISAMAPPING, MAP, STATUS )
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
-         MAP = AST_UNITMAP( NAXREG, STATUS )
+         MAP = AST_UNITMAP( NAXREG, ' ', STATUS )
          NMIN = NAXREG
          NMOUT = NAXREG
 

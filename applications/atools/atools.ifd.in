@@ -1154,7 +1154,7 @@ iraf! {
           }
          parameter in {
             position 5
-            type LITERAL
+            type NDF
             access READ
             ppath GLOBAL
             association <-GLOBAL.DATA_ARRAY
