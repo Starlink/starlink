@@ -21,7 +21,7 @@ figaro5_LDADD = $(LDADD) \
 ../fibre/libfibre.la \
 ../fda/libfda.la \
 ../fig/libfig.la \
-../jty/libjty.la \
+../jty/libfigjty.la \
 ../tio/libfigtio.la \
 ../par/libfigpar.la \
 ../gen/libfiggen.la \

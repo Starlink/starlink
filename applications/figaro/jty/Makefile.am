@@ -1,8 +1,8 @@
 ## Process this file with automake to produce Makefile.in
 
-noinst_LTLIBRARIES = libjty.la
+lib_LTLIBRARIES = libfigjty.la
 
-libjty_la_SOURCES = \
+libfigjty_la_SOURCES = \
 	$(PRIVATE_INCLUDES) \
 	$(F_ROUTINES)
 

@@ -23,7 +23,7 @@ figaro3_LDADD = $(LDADD) \
 ../tio/libfigtio.la \
 ../fla/libfla.la \
 ../fda/libfda.la \
-../jty/libjty.la \
+../jty/libfigjty.la \
 ../gen/libfiggen.la \
 ../gkd/libgkd.la \
 ../par/libfigpar.la \
