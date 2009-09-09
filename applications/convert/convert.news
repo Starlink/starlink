@@ -3,6 +3,11 @@
  The bash CONVERT initialisation script has been changed so that it
  now works from any Bourne-compatible shell.
 
+1 CONVERT_Version_1.5-17
+
+ FITS2NDF now adds a default History record to the output NDF if the FITS
+ file contains no NDF2FITS history information.
+
 1 CONVERT_Version_1.5-16
 
  The FITS converters use the new NDG provenance system that inherits

@@ -586,6 +586,7 @@
 *     number of the group parameter.
 *     - You can supply compressed FITS files, such as the Rice
 *     compression.
+*     - NDF history recording is enabled in the output NDF.
 
 *  Special Formats:
 *     o  NDF2FITS
@@ -946,7 +947,9 @@
 *        Added TYPE parameter.  Move obtaining FMTCNV group to a
 *        subroutine.  Wrap long lines.
 *     2007 January 3 (MJC):
-*        Allow for FMTCNV=Native.  Add examples using the TYPE parameter.       
+*        Allow for FMTCNV=Native.  Add examples using the TYPE parameter.
+*     9-SEP-2009 (DSB):
+*        Enable default history recording in output NDF.
 *     {enter_further_changes_here}
 
 *-
@@ -1413,6 +1416,11 @@
 *  once the FITS file is read, and the true shape and data type are
 *  known.
          CALL NDF_NEW( '_UBYTE', 1, 1, 1, PLACE, NDF, STATUS )
+
+*  Create a History component in the NDF so that the NDF library will add
+*  default History information to the NDF when it is closed.
+         CALL NDF_HCRE( NDF, STATUS )
+
 
 *  Convert the FITS file.
 *  ======================
