@@ -131,6 +131,8 @@ typedef struct AstCmpRegionVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
+   int (* CmpRegionList)(  AstCmpRegion *, int *, AstRegion ***, int * );
+
 } AstCmpRegionVtab;
 
 #if defined(THREAD_SAFE) 
@@ -184,6 +186,7 @@ AstCmpRegion *astLoadCmpRegion_( void *, size_t, AstCmpRegionVtab *,
 /* Prototypes for member functions. */
 /* -------------------------------- */
 # if defined(astCLASS)           /* Protected */
+int astCmpRegionList_(  AstCmpRegion *, int *, AstRegion ***, int * );
 #endif
 
 /* Function interfaces. */
@@ -233,6 +236,8 @@ astINVOKE(O,astLoadCmpRegion_(mem,size,vtab,name,astCheckChannel(channel),STATUS
    to the wrong sort of Object is supplied. */
 
 #if defined(astCLASS)            /* Protected */
+#define astCmpRegionList(this,nreg,reg_list) \
+astINVOKE(V,astCmpRegionList_(this,nreg,reg_list,STATUS_PTR))
 #endif
 #endif
 

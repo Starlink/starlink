@@ -224,6 +224,7 @@ static void SetBreakInfo( AstCmpRegion *, int, int * );
 static void SetClosed( AstRegion *, int, int * );
 static void SetMeshSize( AstRegion *, int, int * );
 static void SetRegFS( AstRegion *, AstFrame *, int * );
+static int CmpRegionList( AstCmpRegion *, int *, AstRegion ***, int * );
 
 #if defined(THREAD_SAFE)
 static int ManageLock( AstObject *, int, int, AstObject **, int * );
@@ -232,6 +233,128 @@ static int ManageLock( AstObject *, int, int, AstObject **, int * );
 
 /* Member functions. */
 /* ================= */
+int CmpRegionList( AstCmpRegion *this, int *nreg, AstRegion ***reg_list, 
+                   int *status ) {
+/*
+*+
+*  Name:
+*     astCmpRegionList
+
+*  Purpose:
+*     Decompose a CmpRegion into a sequence of simpler Regions.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "cmpregion.h"
+*     int astCmpRegionList( AstCmpRegion *this, int *nreg, 
+*                           AstRegion ***reg_list, int *status )
+
+*  Class Membership:
+*     CmpRegion method.
+
+*  Description:
+*     This function decomposes a CmpRegion into a sequence of simpler 
+*     Regions which may be applied in sequence to achieve the same 
+*     effect. 
+
+*  Parameters:
+*     this
+*        Pointer to the Cmpregion to be decomposed (the Cmpregion is not
+*        actually modified by this function).
+*     nreg 
+*        The address of an int which holds a count of the number of
+*        individual Regions in the decomposition. On entry, this
+*        should count the number of Regions already in the
+*        "*reg_list" array (below). On exit, it is updated to include
+*        any new Regions appended by this function.
+*     reg_list
+*        Address of a pointer to an array of Region pointers. On
+*        entry, this array pointer should either be NULL (if no
+*        Regions have yet been obtained) or should point at a
+*        dynamically allocated array containing Region pointers
+*        ("*nreg" in number) which have been obtained from a previous
+*        invocation of this function.
+*
+*        On exit, the dynamic array will be enlarged to contain any
+*        new Region pointers that result from the decomposition
+*        requested. These pointers will be appended to any previously
+*        present, and the array pointer will be updated as necessary
+*        to refer to the enlarged array (any space released by the
+*        original array will be freed automatically).
+*
+*        The new Region pointers returned will identify a sequence of
+*        Region which, when applied in order, will represent an area
+*        equivalent to that of the original Region. 
+*
+*        All the Region pointers returned by this function should be
+*        annulled by the caller, using astAnnul, when no longer
+*        required. The dynamic array holding these pointers should
+*        also be freed, using astFree.
+
+*  Returned Value:
+*     An integer identifying the boolean operation that should be used to
+*     combine the Regions returned in "reg_list". This will be AST__AND
+*     or AST__OR.
+
+*- 
+*/
+
+/* Local Variables: */
+   int add;
+   AstCmpRegion *cmpreg;
+
+/* Check the global error status. */
+   if ( !astOK ) return AST__AND;
+
+/* If the first component of the supplied CmpRegion is itself a CmpRegion
+   that uses the same boolean operator as "this", call this function 
+   recursively to add its component Regions to the returned list. */
+   add = 1;
+   if( astIsACmpRegion( this->region1 ) ) {
+      cmpreg = (AstCmpRegion *) this->region1;
+      if( cmpreg->oper == this->oper ) {
+         (void) CmpRegionList( cmpreg, nreg, reg_list, status );
+         add = 0;
+      } 
+   }
+
+/* Otherwise, add the component Region directly into the returned list of 
+   Regions. */
+   if( add ) {
+      *reg_list = astGrow( *reg_list, *nreg + 1, sizeof( AstRegion * ) );
+      if( astOK ) {
+         ( *reg_list )[ *nreg ] = astClone( this->region1 );
+         ( *nreg )++;
+      }
+   }
+
+/* Do the same for the second component region */
+   add = 1;
+   if( astIsACmpRegion( this->region2 ) ) {
+      cmpreg = (AstCmpRegion *) this->region2;
+      if( cmpreg->oper == this->oper ) {
+         (void) CmpRegionList( cmpreg, nreg, reg_list, status );
+         add = 0;
+      } 
+   }
+
+/* Otherwise, add the component Region directly into the returned list of 
+   Regions. */
+   if( add ) {
+      *reg_list = astGrow( *reg_list, *nreg + 1, sizeof( AstRegion * ) );
+      if( astOK ) {
+         ( *reg_list )[ *nreg ] = astClone( this->region2 );
+         ( *nreg )++;
+      }
+   }
+
+/* Return the boolean operator used to combine the regions in the
+   returned array. */
+   return this->oper;
+}
+
 static void Decompose( AstMapping *this_mapping, AstMapping **map1, 
                        AstMapping **map2, int *series, int *invert1, 
                        int *invert2, int *status ) {
@@ -971,7 +1094,7 @@ void astInitCmpRegionVtab_(  AstCmpRegionVtab *vtab, const char *name, int *stat
 /* Store pointers to the member functions (implemented here) that
    provide virtual methods for this class. */
 
-/* None. */
+   vtab->CmpRegionList = CmpRegionList;
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
@@ -4368,7 +4491,12 @@ AstCmpRegion *astLoadCmpRegion_( void *mem, size_t size,
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
 
-/* None. */
+int astCmpRegionList_( AstCmpRegion *this, int *nreg, AstRegion ***reg_list,
+                       int *status ) {
+   if ( !astOK ) return AST__AND;
+   return (**astMEMBER(this,CmpRegion,CmpRegionList))( this, nreg, reg_list, 
+                                                       status );
+}
 
 
 
