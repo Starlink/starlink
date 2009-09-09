@@ -13,12 +13,14 @@ f     AST_CMPREGION
 *  Description:
 *     A CmpRegion is a Region which allows two component
 *     Regions (of any class) to be combined to form a more complex 
-*     Region. This combination may be performed either a boolean 
-*     AND operator or a boolean OR operator. If the AND operator is 
+*     Region. This combination may be performed a boolean AND, OR 
+*     or XOR (exclusive OR) operator. If the AND operator is 
 *     used, then a position is inside the CmpRegion only if it is 
 *     inside both of its two component Regions. If the OR operator is 
 *     used, then a position is inside the CmpRegion if it is inside 
-*     either (or both) of its two component Regions. Other operators can
+*     either (or both) of its two component Regions. If the XOR operator 
+*     is used, then a position is inside the CmpRegion if it is inside 
+*     one but not both of its two component Regions. Other operators can
 *     be formed by negating one or both component Regions before using 
 *     them to construct a new CmpRegion.
 *
@@ -94,6 +96,10 @@ f     The CmpRegion class does not define any new routines beyond those
 *        Over-ride the astDecompose method.
 *     8-SEP-2009 (DSB):
 *        Fix logic in RegTrace.
+*     9-SEP-2009 (DSB):
+*        - Added astCmpRegionList
+*        - Added support for XOR 
+*        - Override astGetObjSize.
 *class--
 */
 
@@ -156,6 +162,7 @@ static double (*parent_getfillfactor)( AstRegion *, int * );
 static void (*parent_regsetattrib)( AstRegion *, const char *, char **, int * );
 static void (*parent_regclearattrib)( AstRegion *, const char *, char **, int * );
 static void (* parent_resetcache)( AstRegion *, int * );
+static int (* parent_getobjsize)( AstObject *, int * );
 
 #if defined(THREAD_SAFE)
 static int (* parent_managelock)( AstObject *, int, int, AstObject **, int * );
@@ -206,6 +213,7 @@ static AstRegion *RegBasePick( AstRegion *this, int, const int *, int * );
 static double GetFillFactor( AstRegion *, int * );
 static int Equal( AstObject *, AstObject *, int * );
 static int GetBounded( AstRegion *, int * );
+static int GetObjSize( AstObject *, int * );
 static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int **, int * );
 static int RegTrace( AstRegion *, int, double *, double **, int * );
 static void ClearClosed( AstRegion *, int * );
@@ -845,6 +853,73 @@ static double GetFillFactor( AstRegion *this_region, int *status ) {
    return result;
 }
 
+static int GetObjSize( AstObject *this_object, int *status ) {
+/*
+*  Name:
+*     GetObjSize
+
+*  Purpose:
+*     Return the in-memory size of an Object.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpregion.h"
+*     int GetObjSize( AstObject *this, int *status ) 
+
+*  Class Membership:
+*     CmpRegion member function (over-rides the astGetObjSize protected
+*     method inherited from the parent class).
+
+*  Description:
+*     This function returns the in-memory size of the supplied CmpRegion,
+*     in bytes.
+
+*  Parameters:
+*     this
+*        Pointer to the CmpRegion.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     The Object size, in bytes.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstCmpRegion *this;        /* Pointer to CmpRegion structure */
+   int result;                /* Result value to return */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointers to the CmpRegion structure. */
+   this = (AstCmpRegion *) this_object;
+
+/* Invoke the GetObjSize method inherited from the parent class, and then
+   add on any components of the class structure defined by this class
+   which are stored in dynamically allocated memory. */
+   result = (*parent_getobjsize)( this_object, status );
+
+   result += astGetObjSize( this->region1 );
+   result += astGetObjSize( this->region2 );
+   if( this->xor1 ) result += astGetObjSize( this->xor1 );
+   if( this->xor2 ) result += astGetObjSize( this->xor2 );
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
+}
+
 static void GetRegions( AstCmpRegion *this, AstRegion **reg1, AstRegion **reg2,
                         int *oper, int *neg1, int *neg2, int *status ) {
 /*
@@ -1120,6 +1195,9 @@ void astInitCmpRegionVtab_(  AstCmpRegionVtab *vtab, const char *name, int *stat
 
    parent_equal = object->Equal;
    object->Equal = Equal;
+
+   parent_getobjsize = object->GetObjSize;
+   object->GetObjSize = GetObjSize;
 
 #if defined(THREAD_SAFE)
    parent_managelock = object->ManageLock;
@@ -3653,6 +3731,8 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
    Regions from the output CmpRegion. */
    out->region1 = NULL;
    out->region2 = NULL;
+   out->xor1 = NULL;
+   out->xor2 = NULL;
 
    for( i = 0; i < 2; i++ ) {
       out->rvals[ i ] = NULL;
@@ -3665,6 +3745,8 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
    CmpRegion structure. */
    out->region1 = astCopy( in->region1 );
    out->region2 = astCopy( in->region2 );
+   if( in->xor1 ) out->xor1 = astCopy( in->xor1 );
+   if( in->xor2 ) out->xor2 = astCopy( in->xor2 );
 }
 
 /* Destructor. */
@@ -3716,6 +3798,8 @@ static void Delete( AstObject *obj, int *status ) {
 /* Annul the pointers to the component Regions. */
    this->region1 = astAnnul( this->region1 );
    this->region2 = astAnnul( this->region2 );
+   if( this->xor1 ) this->xor1 = astAnnul( this->xor1 );
+   if( this->xor2 ) this->xor2 = astAnnul( this->xor2 );
 }
 
 /* Dump function. */
@@ -3748,15 +3832,31 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 */
 
 /* Local Variables: */
+   AstRegion *reg1;              /* First Region to include in dump */
+   AstRegion *reg2;              /* Second Region to include in dump */
    AstCmpRegion *this;           /* Pointer to the CmpRegion structure */
    const char *comment;          /* Pointer to comment string */
    int ival;                     /* Integer value */
+   int oper;                     /* The operator to include in the dump */
 
 /* Check the global error status. */
    if ( !astOK ) return;
 
 /* Obtain a pointer to the CmpRegion structure. */
    this = (AstCmpRegion *) this_object;
+
+/* Choose the operator and component regions to include in the dump. If
+   the CmpRegion originally used an XOR operator, then save the XORed
+   regions. Otherwise, store the real component Regions. */
+   if( this->xor1 ) {
+      oper = AST__XOR;
+      reg1 = this->xor1;
+      reg2 = this->xor2;
+   } else {
+      oper = this->oper;
+      reg1 = this->region1;
+      reg2 = this->region2;
+   }
 
 /* Write out values representing the instance variables for the CmpRegion
    class.  Accompany these with appropriate comment strings, possibly
@@ -3776,11 +3876,13 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 
 /* Oper */
 /* ------- */
-   ival = this->oper;
+   ival = oper;
    if( ival == AST__AND ) {
       comment = "Regions combined using Boolean AND";
    } else if( ival == AST__OR ) {
       comment = "Regions combined using Boolean OR";
+   } else if( ival == AST__XOR ) {
+      comment = "Regions combined using Boolean XOR";
    } else {
       comment = "Regions combined using unknown operator";
    }
@@ -3788,12 +3890,12 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 
 /* First Region. */
 /* -------------- */
-   astWriteObject( channel, "RegionA", 1, 1, this->region1,
+   astWriteObject( channel, "RegionA", 1, 1, reg1,
                    "First component Region" );
 
 /* Second Region. */
 /* --------------- */
-   astWriteObject( channel, "RegionB", 1, 1, this->region2,
+   astWriteObject( channel, "RegionB", 1, 1, reg2,
                    "Second component Region" );
 }
 
@@ -3950,12 +4052,14 @@ f     RESULT = AST_CMPREGION( REGION1, REGION2, OPER, OPTIONS, STATUS )
 *
 *     A CmpRegion is a Region which allows two component
 *     Regions (of any class) to be combined to form a more complex 
-*     Region. This combination may be performed either a boolean 
-*     AND operator or a boolean OR operator. If the AND operator is 
+*     Region. This combination may be performed a boolean AND, OR 
+*     or XOR (exclusive OR) operator. If the AND operator is 
 *     used, then a position is inside the CmpRegion only if it is 
 *     inside both of its two component Regions. If the OR operator is 
 *     used, then a position is inside the CmpRegion if it is inside 
-*     either (or both) of its two component Regions. Other operators can
+*     either (or both) of its two component Regions. If the XOR operator 
+*     is used, then a position is inside the CmpRegion if it is inside 
+*     one but not both of its two component Regions. Other operators can
 *     be formed by negating one or both component Regions before using 
 *     them to construct a new CmpRegion.
 *
@@ -3993,7 +4097,7 @@ f     REGION2 = INTEGER (Given)
 c     oper
 f     OPER = INTEGER (Given)
 *        The boolean operator with which to combine the two Regions. This
-*        must be one of the symbolic constants AST__AND or AST__OR.
+*        must be one of the symbolic constants AST__AND, AST__OR or AST__XOR.
 c     options
 f     OPTIONS = CHARACTER * ( * ) (Given)
 c        Pointer to a null-terminated string containing an optional
@@ -4169,7 +4273,8 @@ AstCmpRegion *astInitCmpRegion_( void *mem, size_t size, int init,
 *     region2
 *        Pointer to the second Region.
 *     oper
-*        The boolean operator to use. Must be one of AST__AND or AST__OR.
+*        The boolean operator to use. Must be one of AST__AND, AST__OR or
+*        AST__XOR.
 
 *  Returned Value:
 *     A pointer to the new CmpRegion.
@@ -4186,10 +4291,14 @@ AstCmpRegion *astInitCmpRegion_( void *mem, size_t size, int init,
    AstFrameSet *fs;              /* FrameSet connecting supplied Regions */
    AstMapping *map;              /* Mapping between two supplied Regions */
    AstMapping *smap;             /* Simplified Mapping between two supplied Regions */
-   AstRegion *new_reg2;          /* 2nd Region mapped into 1st Region's Frame */
-   AstRegion *reg1;              /* Copy of first supplied Region */
-   AstRegion *reg2;              /* Copy of second supplied Region */
+   AstRegion *new_reg1;          /* Replacement for first region */
+   AstRegion *new_reg2;          /* Replacement for second region */
+   AstRegion *reg1;              /* First Region to store in the CmpRegion */
+   AstRegion *reg2;              /* Second Region to store in the CmpRegion */
+   AstRegion *xor1;              /* Copy of first supplied Region or NULL */
+   AstRegion *xor2;              /* Copy of second supplied Region or NULL */
    int i;                        /* Loop count */
+   int used_oper;                /* The boolean operation actually used */
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -4201,7 +4310,7 @@ AstCmpRegion *astInitCmpRegion_( void *mem, size_t size, int init,
    new = NULL;
 
 /* Check the supplied oper value. */
-   if( oper != AST__AND && oper != AST__OR && astOK ) {
+   if( oper != AST__AND && oper != AST__OR && oper != AST__XOR && astOK ) {
       astError( AST__INTRD, "astInitCmpRegion(%s): Illegal "
                 "boolean operator value (%d) supplied.", status, name, oper );
    }
@@ -4237,6 +4346,39 @@ AstCmpRegion *astInitCmpRegion_( void *mem, size_t size, int init,
       fs = astAnnul( fs );
    }
 
+/* The Cmpregion class does not implement XOR directly (as it does for
+   AND and OR). Instead, when requested to create an XOR CmpRegion, it
+   creates a CmpRegion that uses AND and OR to simulate XOR. The top
+   level XOR CmpRegion actually uses AST__OR and the two component
+   regions within it are CmpRegions formed by combing the two supplied
+   Regions (one being negated first) using AND. Create the required
+   component Regions. */
+   if( oper == AST__XOR ) {
+      astNegate( reg1 );
+      new_reg1 = (AstRegion *) astCmpRegion( reg1, reg2, AST__AND, " ", 
+                                             status );
+      astNegate( reg1 );
+
+      astNegate( reg2 );
+      new_reg2 = (AstRegion *) astCmpRegion( reg1, reg2, AST__AND, " ", 
+                                             status );
+      astNegate( reg2 );
+
+      xor1 = reg1;
+      xor2 = reg2;
+
+      reg1 = new_reg1;
+      reg2 = new_reg2;
+
+      used_oper = AST__OR;
+
+/* For AND and OR, use the supplied operator. */
+   } else {
+      xor1 = NULL;
+      xor2 = NULL;
+      used_oper = oper;
+   }
+
 /* Initialise a Region structure (the parent class) as the first component
    within the CmpRegion structure, allocating memory if necessary. A NULL
    PointSet is suppled as the two component Regions will perform the function
@@ -4255,7 +4397,19 @@ AstCmpRegion *astInitCmpRegion_( void *mem, size_t size, int init,
       new->region2 = astClone( reg2 );
 
 /* Note the operator used to combine the somponent Regions. */
-      new->oper = oper;
+      new->oper = used_oper;
+
+/* If we are creating an XOR Cmpregion, save copies of the supplied
+   Regions (i.e. the supplied Regions which are XORed). These will not 
+   be the same as "reg1" and "reg2" since each of those two regions will
+   be CmpRegions that combine the supplied Regions using AST__AND. */
+      if( oper == AST__XOR ) {
+         new->xor1 = xor1;
+         new->xor2 = xor2;
+      } else {
+         new->xor1 = NULL;
+         new->xor2 = NULL;
+      } 
 
 /* Initialised cached values to show they have not yet been found. */
       for( i = 0; i < 2; i++ ) {
@@ -4381,11 +4535,14 @@ AstCmpRegion *astLoadCmpRegion_( void *mem, size_t size,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstCmpRegion *new;            /* Pointer to the new CmpRegion */
+   AstRegion *reg1;              /* First Region read from dump */
+   AstRegion *reg2;              /* Second Region read from dump */
    AstFrame *f1;                 /* Base Frame in parent Region */
    AstRegion *creg;              /* Pointer to component Region */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    int i;                        /* Loop count */
+   int oper;                     /* The operator to include in the dump */
 
 /* Initialise. */
    new = NULL;
@@ -4436,15 +4593,15 @@ AstCmpRegion *astLoadCmpRegion_( void *mem, size_t size,
 
 /* Operator */
 /* -------- */
-      new->oper = astReadInt( channel, "operator", AST__AND );
+      oper = astReadInt( channel, "operator", AST__AND );
 
 /* First Region. */
 /* -------------- */
-      new->region1 = astReadObject( channel, "regiona", NULL );
+      reg1 = astReadObject( channel, "regiona", NULL );
 
 /* Second Region. */
 /* --------------- */
-      new->region2 = astReadObject( channel, "regionb", NULL );
+      reg2 = astReadObject( channel, "regionb", NULL );
 
 /* Initialised cached values to show they have not yet been found. */
       for( i = 0; i < 2; i++ ) {
@@ -4452,6 +4609,38 @@ AstCmpRegion *astLoadCmpRegion_( void *mem, size_t size,
          new->offs[ i ] = NULL;
          new->nbreak[ i ] = 0;
          new->d0[ i ] = AST__BAD;
+      }
+
+/* The CmpRegion class does not implement XOR directly (as it does for
+   AND and OR). Instead, when requested to create an XOR CmpRegion, it
+   creates a CmpRegion that uses AND and OR to simulate XOR. The top
+   level XOR CmpRegion actually uses AST__OR and the two component
+   regions within it are CmpRegions formed by combing the two supplied
+   Regions (one being negated first) using AND. Create the required
+   component Regions. */
+      if( oper == AST__XOR ) {
+         astNegate( reg1 );
+         new->region1 = (AstRegion *) astCmpRegion( reg1, reg2, AST__AND, 
+                                                    " ", status );
+         astNegate( reg1 );
+   
+         astNegate( reg2 );
+         new->region2 = (AstRegion *) astCmpRegion( reg1, reg2, AST__AND, 
+                                                    " ", status );
+         astNegate( reg2 );
+   
+         new->xor1 = reg1;
+         new->xor2 = reg2;
+   
+         new->oper = AST__OR;
+   
+/* For AND and OR, use the supplied Regions and operator. */
+      } else {
+         new->region1 = reg1;
+         new->region2 = reg2;
+         new->xor1 = NULL;
+         new->xor2 = NULL;
+         new->oper = oper;
       }
 
 /* If either component Region has a dummy FrameSet rather than the correct

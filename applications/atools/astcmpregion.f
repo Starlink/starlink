@@ -23,12 +23,14 @@
 *     This application creates a new CmpMap and optionally initialises 
 *     its attributes. A CmpRegion is a Region which allows two component
 *     Regions (of any class) to be combined to form a more complex 
-*     Region. This combination may be performed either a boolean 
-*     AND operator or a boolean OR operator. If the AND operator is 
+*     Region. This combination may be performed a boolean AND, OR 
+*     or XOR (exclusive OR) operator. If the AND operator is 
 *     used, then a position is inside the CmpRegion only if it is 
 *     inside both of its two component Regions. If the OR operator is 
 *     used, then a position is inside the CmpRegion if it is inside 
-*     either (or both) of its two component Regions. Other operators can
+*     either (or both) of its two component Regions. If the XOR operator 
+*     is used, then a position is inside the CmpRegion if it is inside 
+*     one but not both of its two component Regions. Other operators can
 *     be formed by negating one or both component Regions before using 
 *     them to construct a new CmpRegion.
 *
@@ -56,7 +58,7 @@
 *  ADAM Parameters:
 *     OPER = LITERAL (Read)
 *        The boolean operator with which to combine the two Regions. This
-*        must be one of "AND" or "OR".
+*        must be one of "AND", "OR" or "XOR".
 *     OPTIONS = LITERAL (Read)
 *        A string containing an optional comma-separated list of attribute 
 *        assignments to be used for initialising the new CmpMap. 
@@ -68,7 +70,7 @@
 *        A text file to receive the new CmpMap.
 
 *  Copyright:
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007-2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -94,6 +96,8 @@
 *  History:
 *     28-MAY-2007 (DSB):
 *        Original version.
+*     9-SEP-2009 (DSB):
+*        Added XOR option.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -136,11 +140,14 @@
      :                 STATUS )
 
 *  Get the boolean operator to use.
-      CALL PAR_CHOIC( 'OPER', 'OR', 'AND,OR', .FALSE., TEXT, STATUS )
+      CALL PAR_CHOIC( 'OPER', 'OR', 'AND,OR,XOR', .FALSE., TEXT, 
+     :                STATUS )
       IF( TEXT .EQ. 'AND' ) THEN
          OPER = AST__AND
-      ELSE
+      ELSE IF( TEXT .EQ. 'OR' ) THEN
          OPER = AST__OR
+      ELSE
+         OPER = AST__XOR
       END IF
 
 *  Create the required CmpRegion.

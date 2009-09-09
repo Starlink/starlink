@@ -89,6 +89,7 @@
 #endif
 #define AST__AND 1
 #define AST__OR 2
+#define AST__XOR 3
 
 /* Define a dummy __attribute__ macro for use on non-GNU compilers. */
 #ifndef __GNUC__
@@ -114,6 +115,8 @@ typedef struct AstCmpRegion {
    double *offs[ 2 ];            /* Jump at each break */
    int nbreak[ 2 ];              /* Number of breaks */
    double d0[ 2 ];               /* Total used boundary length */
+   AstRegion *xor1;              /* First XORed Region */
+   AstRegion *xor2;              /* Second XORed Region */
 
 } AstCmpRegion;
 
