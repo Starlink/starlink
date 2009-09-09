@@ -854,13 +854,13 @@
 *  Implementation Deficiencies:
 *     - There is no propagation of arbitrary FITS HISTORY headers to
 *     the NDF's history records.
-*     - There is no support for FITS World Co-ordinate Systems.
 
 *  Copyright:
 *     Copyright (C) 1994 Science & Engineering Research Council.
 *     Copyright (C) 1997-1998, 2000, 2002, 2004 Central Laboratory of
 *     the Research Councils. Copyright (C) 2006-2007 Particle Physics &
-*     Astronomy Research Council. All Rights Reserved.
+*     Astronomy Research Council.  2009 Science & Technology
+*     Facilities Council.  All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or

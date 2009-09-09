@@ -563,9 +563,6 @@
 *  Implementation Status:
 *     - All NDF data types are supported.
 
-*  Implementation Deficiencies:
-*     - There is no support for FITS World Co-ordinate Systems.
-
 *  Copyright:
 *     Copyright (C) 1994 Science & Engineering Research Council.
 *     Copyright (C) 1996-2000, 2004 Central Laboratory of the Research
