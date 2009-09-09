@@ -6,7 +6,7 @@
 *     CCG_SM1x
 
 *  Purpose:
-*     Combines data lines using a sigma clipped median.
+*     Combines data lines using a sigma-clipped median.
 
 *  Language:
 *     Starlink Fortran 77
@@ -117,6 +117,12 @@
 *     2009 July 17 (MJC):
 *        Do not include collapsed data comprising only bad values
 *        in argument NBAD.
+*     2009 September 6 (MJC):
+*        Change to calculate true weighted variance not "population
+*        variance" that gave the variance of the mean, and hence was
+*        not the desired sample variance for clipping.  Hence the
+*        range could be very narrow and in fact could exclude all data
+*        leading to a bad pixel.
 *     {enter_further_changes_here}
 
 *-
@@ -166,13 +172,18 @@
                                  ! rejection threshold
       <LTYPE> LOWER              ! Lower limit
       INTEGER NGOOD              ! Number of good pixels
+      DOUBLE PRECISION SAMVAR    ! Sample variance before rejection
       DOUBLE PRECISION SUM1      ! Weight sums
       DOUBLE PRECISION SUM2      ! Weighted value sums
+      DOUBLE PRECISION SUM3      ! Weighted squared-value sums
+      DOUBLE PRECISION SUM4      ! Sum of squared weights
       DOUBLE PRECISION SVAR      ! Population variance before rejection
       INTEGER UBND               ! Position of highest value lower than
                                  ! rejection threshold
       <LTYPE> UPPER              ! Upper limit
+      DOUBLE PRECISION VALUE     ! Single value
       DOUBLE PRECISION VAR       ! Population variance after rejection
+      DOUBLE PRECISION WEIGHT    ! Weight
       DOUBLE PRECISION WMEAN     ! Weighted mean
 
 *  Internal References:
@@ -213,15 +224,18 @@
                POINT( NGOOD ) = J
 
 *  Change variance to weight.
-               SVAR = 1.0D0 / NUM_<T>TOD( VARS( I, J ) )
+               WEIGHT = 1.0D0 / NUM_<T>TOD( VARS( I, J ) )
+               VALUE = NUM_<T>TOD( STACK( I, J ) )
 
 *  Increment sums.
-               SUM2 = SUM2 + NUM_<T>TOD( STACK( I, J ) ) * SVAR
-               SUM1 = SUM1 + SVAR
+               SUM1 = SUM1 + WEIGHT
+               SUM2 = SUM2 + WEIGHT * VALUE
+               SUM3 = SUM3 + WEIGHT * VALUE * VALUE
+               SUM4 = SUM4 + WEIGHT * WEIGHT
 
-*  Transfer values to working buffers.
+*  Transfer values to working buffers for the current output pixel.
                WRK1( NGOOD ) = STACK( I, J )
-               WRK2( NGOOD ) = NUM_DTO<T>( SVAR )
+               WRK2( NGOOD ) = NUM_DTO<T>( WEIGHT )
 
 *  Finally trap numeric errors by rejecting all values.
                IF ( .NOT. NUM_WASOK() ) THEN
@@ -236,9 +250,12 @@
 *  Continue if more than one good value.
          IF ( NGOOD .GT. 0 ) THEN
 
-*  Form the weighted mean and population standard deviation.
+*  Form the weighted mean and population variance.
             WMEAN = SUM2 / SUM1
             SVAR = 1.0D0 / SUM1
+
+*  Find the weighted sample variance used for clipping outliers.
+            SAMVAR = ( SUM3 * SUM1 - SUM2 * SUM2 ) / ( SUM1 * SUM1 - SUM4 )
 
 *  Sort data prior to rejection -- this is necessary as clip may be
 *  non-central for (noisy) skew distributions, so the order statitics
@@ -247,8 +264,8 @@
             CALL CCG_IS3<T>( WRK1, WRK2, POINT, NGOOD, STATUS )
 
 *  Set the clipping range.
-            LOWER = NUM_DTO<T>( WMEAN - DBLE( NSIGMA ) * SQRT( SVAR ) )
-            UPPER = NUM_DTO<T>( WMEAN + DBLE( NSIGMA ) * SQRT( SVAR ) )
+            LOWER = NUM_DTO<T>( WMEAN - DBLE( NSIGMA ) * SQRT( SAMVAR ) )
+            UPPER = NUM_DTO<T>( WMEAN + DBLE( NSIGMA ) * SQRT( SAMVAR ) )
 
 *  Decide which orders of data are to be rejected. Pick out the least
 *  bound greater than the lower bound and the highest bound less than
