@@ -5343,36 +5343,36 @@ int StarRtdImage::ndfCmdDisplay( int argc, char *argv[], NDFIO *ndf )
     int numNDFs = 0;
 
     if ( ! image_ ) {
-	return error( "No images to display" );
+        return error( "No images to display" );
     }
 
     if ( argc == 2 ) {
-	//  Parse list of indices.
-	char** indices = NULL;
-	if ( Tcl_SplitList(interp_, argv[0], &numNDFs, &indices ) != TCL_OK ) {
-	    return TCL_ERROR;
+        //  Parse list of indices.
+        char** indices = NULL;
+        if ( Tcl_SplitList(interp_, argv[0], &numNDFs, &indices ) != TCL_OK ) {
+            return TCL_ERROR;
         }
 
-	if ( numNDFs > (int) ( sizeof( ndfList ) / sizeof( int ) ) ) {
-	    return fmt_error( "StarRtdImage::ndfCmdDisplay: too many "
+        if ( numNDFs > (int) ( sizeof( ndfList ) / sizeof( int ) ) ) {
+            return fmt_error( "StarRtdImage::ndfCmdDisplay: too many "
                               "NDFs: %d (max 256)", numNDFs );
         }
-	if ( numNDFs == 0 ) {
-	    return error( "No NDFs were specified" );
+        if ( numNDFs == 0 ) {
+            return error( "No NDFs were specified" );
         }
 
-	for ( int i = 0; i < numNDFs; i++ ) {
-	    if ( Tcl_GetInt( interp_, indices[1], &ndfList[i] ) != TCL_OK ) {
-		Tcl_Free( *indices );
-		return TCL_ERROR;
-	    }
-	}
-	Tcl_Free( *indices );
+        for ( int i = 0; i < numNDFs; i++ ) {
+            if ( Tcl_GetInt( interp_, indices[1], &ndfList[i] ) != TCL_OK ) {
+                Tcl_Free( *indices );
+                return TCL_ERROR;
+            }
+        }
+        Tcl_Free( *indices );
     }
     else {
-	// Use all images
-	numNDFs = ndf->getNumNDFs();
-	for ( int i = 0; i < numNDFs; i++ ) {
+        // Use all images
+        numNDFs = ndf->getNumNDFs();
+        for ( int i = 0; i < numNDFs; i++ ) {
             ndfList[i] = i + 1;
         }
     }
@@ -5448,14 +5448,16 @@ int StarRtdImage::hduCmdGet( int argc, char** argv, FitsIO* fits )
     //  Check if this is a compressed image and handle.
     if ( sfits->isCompressedImage() ) {
         if ( argc >= 2 ) {
-            status = sfits->saveCompressedImage( filename );
+            //  Create an object name of the filename plus HDU.
+            char objname[1024];
+            sprintf( objname, "%s[%d]", filename_, hdu );
+            status = sfits->saveCompressedImage( filename, objname );
         }
         else {
             status = error( "Saving compressed image requires a filename" );
         }
     }
     else {
-        cout << "isNotCompressedImage" << endl;
         //  Normal table save, check for the entry arg.
         char* entry = NULL;
         if ( argc >= 3 ) {
@@ -5954,12 +5956,16 @@ int StarRtdImage::parseName( const char *imagename, char **fullname,
     *fitsext = new char[namelen];
     strcpy( *fullname, imagename );
 
+    //  Does the name as given exist as a file? If so we don't need to 
+    //  check for slices & paths.
+    int exists = fileExists( *fullname );
+
     //  Look for a slice at the end of the file name. This needs to be
     //  removed while we do other tests.
     char *left = strrchr( *fullname, '(');
     char *right = strrchr( *fullname, ')');
     int haveslice = 0;
-    if ( left && right ) {
+    if ( left && right && ! exists ) {
         strcpy( *slice, left );
         *left = '\0';
         haveslice = 1;
@@ -5970,7 +5976,7 @@ int StarRtdImage::parseName( const char *imagename, char **fullname,
     left = strrchr( *fullname, '[');
     right = strrchr( *fullname, ']');
     int havefitsext = 0;
-    if ( left && right ) {
+    if ( left && right && ! exists ) {
         strcpy( *fitsext, left );
         *left = '\0';
         havefitsext = 1;
@@ -5982,7 +5988,7 @@ int StarRtdImage::parseName( const char *imagename, char **fullname,
 
         //  Check that name is a file, if so nothing to do except to check
         //  that it is a regular file.
-        if ( ! fileExists( *fullname ) ) {
+        if ( ! exists ) {
             delete[] *fullname;
             *fullname = NULL;
             delete[] *slice;
@@ -6005,29 +6011,22 @@ int StarRtdImage::parseName( const char *imagename, char **fullname,
         }
     } else {
 
-        //  Could be FITS file. No funny possibilities for these names.
+        //  Could be FITS file. This needs periods and existence.
         char* p = strchr( *fullname, '.' );
-        if ( p && ( strstr( p, ".fit" ) != NULL ||
-                    strstr( p, ".fts" ) != NULL ||
-                    strstr( p, ".FIT" ) != NULL ||
-                    strstr( p, ".FTS" ) != NULL ) ) {
+        if ( p && exists ) {
 
-            //  Is a FITS name, does file exist? If not assume might
-            //  be NDF component and pass on. Note a slice is valid,
-            //  but ultimately means this will be accessed as an NDF.
-            if ( fileExists( *fullname ) ) {
-                if ( ! haveslice ) {
-                    delete[] *slice;
-                    *slice = NULL;
-                }
-                if ( ! havefitsext ) {
-                    delete[] *fitsext;
-                    *fitsext = NULL;
-                }
-                delete[] *path;
-                *path = NULL;
-                return TCL_OK;
+            //  Assume non-NDF existent files are possible FITS.
+            if ( ! haveslice ) {
+                delete[] *slice;
+                *slice = NULL;
             }
+            if ( ! havefitsext ) {
+                delete[] *fitsext;
+                *fitsext = NULL;
+            }
+            delete[] *path;
+            *path = NULL;
+            return TCL_OK;
         }
     }
 

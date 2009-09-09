@@ -715,8 +715,8 @@ static int GaiaFITSTclCoord( ClientData clientData, Tcl_Interp *interp,
                     }
                     /* Do the transformation */
                     result = gaiaUtilsQueryCoord( info->wcs, axis, coords,
-                                                  trailed, readable, format, 
-                                                  ncoords, &coord, 
+                                                  trailed, readable, format,
+                                                  ncoords, &coord,
                                                   &error_mess );
                     if ( result == TCL_OK ) {
                         Tcl_SetStringObj( resultObj, coord, -1 );
@@ -914,7 +914,7 @@ static int GaiaFITSTclFitsWrite( ClientData clientData, Tcl_Interp *interp,
     /* Check arguments, need the fits handle and keyword, value and comment,
     *  or just card */
     if ( objc != 3 && objc != 6 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, 
+        Tcl_WrongNumArgs( interp, 1, objv,
            "fits_identifier [keyword value comment type | card]" );
         return TCL_ERROR;
     }
@@ -929,7 +929,7 @@ static int GaiaFITSTclFitsWrite( ClientData clientData, Tcl_Interp *interp,
             value = Tcl_GetString( objv[3] );
             comment = Tcl_GetString( objv[4] );
             type = Tcl_GetString( objv[5] );
-            result = GaiaFITSHPut( info->handle, keyword, value, comment, 
+            result = GaiaFITSHPut( info->handle, keyword, value, comment,
                                    type );
         }
         else {
@@ -1049,14 +1049,14 @@ static int GaiaFITSTclParseCard( ClientData clientData, Tcl_Interp *interp,
             while ( *c && *c != '\'' ) c--;
             *c = '\0';
         }
-    
+
         /*  Construct result */
         resultObj = Tcl_GetObjResult( interp );
-        Tcl_ListObjAppendElement( interp, resultObj, 
+        Tcl_ListObjAppendElement( interp, resultObj,
                                   Tcl_NewStringObj( keyword, -1 ) );
-        Tcl_ListObjAppendElement( interp, resultObj, 
+        Tcl_ListObjAppendElement( interp, resultObj,
                                   Tcl_NewStringObj( v, -1 ) );
-        Tcl_ListObjAppendElement( interp, resultObj, 
+        Tcl_ListObjAppendElement( interp, resultObj,
                                   Tcl_NewStringObj( comment, -1 ) );
         return TCL_OK;
     }
@@ -1071,8 +1071,8 @@ static int GaiaFITSTclParseCard( ClientData clientData, Tcl_Interp *interp,
  * "list"             returns a list of all the HDU properties.
  * "listheadings"     returns a list of headings for the returned properties.
  * "get <n> filename" save the nth HDU to the given diskfile, in fact this
- *                    currently only saves compressed images.
- * 
+ *                    currently only saves compressed images. An optional
+ *                    argument if given will be set as the OBJECT card.
  *
  * The headings are: HDU Type ExtName NAXIS NAXIS1 NAXIS2 NAXIS3 CRPIX1 CRPIX2,
  * as returned by the rtdimage command of the same name.
@@ -1084,7 +1084,7 @@ static int GaiaFITSTclHdu( ClientData clientData, Tcl_Interp *interp,
     int result;
 
     /* Check arguments, need the fits handle and the hdu command. */
-    if ( objc < 3 || objc > 5 ) {
+    if ( objc < 3 || objc > 6 ) {
         Tcl_WrongNumArgs( interp, 1, objv, "fits_identifier "
                           "[list|listheadings|get hdu filename]" );
         return TCL_ERROR;
@@ -1102,16 +1102,16 @@ static int GaiaFITSTclHdu( ClientData clientData, Tcl_Interp *interp,
         Tcl_SetObjResult( interp, Tcl_NewIntObj( nhdu ) );
         return TCL_OK;
     }
-    
+
     const char *action = Tcl_GetString( objv[2] );
-    
+
     //  hdu listheadings.
     if ( strcmp( action, "listheadings" ) == 0 ) {
         Tcl_SetResult( interp, "HDU Type ExtName NAXIS NAXIS1 "
                        "NAXIS2 NAXIS3 CRPIX1 CRPIX2", TCL_VOLATILE );
         return TCL_OK;
     }
-    
+
     //  hdu list.
     if ( strcmp( action, "list" ) == 0 ) {
         string list;
@@ -1124,10 +1124,11 @@ static int GaiaFITSTclHdu( ClientData clientData, Tcl_Interp *interp,
         return TCL_ERROR;
     }
 
-    //  hdu get <n> filename. Saves only compressed images...
+    //  hdu get <n> filename [objectname]. Saves only compressed images...
     if ( strcmp( action, "get" ) == 0 ) {
-        if ( objc != 5 ) {
-            Tcl_SetResult( interp, "hdu get requires a hdu and filename", 
+        if ( objc != 5 && objc != 6 ) {
+            Tcl_SetResult( interp, 
+                           "hdu get requires at least an hdu and filename",
                            TCL_VOLATILE );
             return TCL_ERROR;
         }
@@ -1136,12 +1137,17 @@ static int GaiaFITSTclHdu( ClientData clientData, Tcl_Interp *interp,
             return TCL_ERROR;
         }
         const char *filename = Tcl_GetString( objv[4] );
-        
+        const char *objectname = NULL;
+        if ( objc == 6 ) {
+            objectname = Tcl_GetString( objv[5] );
+        }
+
         //  Switch to the required HDU.
         int oldhdu = info->handle->getHDUNum();
         if ( info->handle->setHDU( hdu ) == TCL_OK ) {
             if ( info->handle->isCompressedImage() ) {
-                if (info->handle->saveCompressedImage( filename ) == TCL_OK) {
+                if ( info->handle->saveCompressedImage( filename, objectname )
+                     == TCL_OK ) {
                     info->handle->setHDU( oldhdu );
                     return TCL_OK;
                 }
@@ -1150,7 +1156,7 @@ static int GaiaFITSTclHdu( ClientData clientData, Tcl_Interp *interp,
         Tcl_SetResult( interp, "Failed to save HDU to disk", TCL_VOLATILE );
         return TCL_ERROR;
     }
-    
+
     //  Should never arrive here.
     Tcl_SetResult( interp, "Unknown HDU command", TCL_VOLATILE );
     return TCL_ERROR;

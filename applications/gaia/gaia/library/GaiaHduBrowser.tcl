@@ -286,7 +286,8 @@ itcl::class gaia::GaiaHduBrowser {
          }
 
          #  Write the HDU out to disk.
-         $accessor_ hdu get $hdu $converted_file
+         set objname "[$accessor_ cget -dataset]+\[${hdu}\]"
+         $accessor_ hdu get $hdu $converted_file $objname
 
          #  Success so cache for next time.
          set tempfiles_($file,$hdu) $converted_file

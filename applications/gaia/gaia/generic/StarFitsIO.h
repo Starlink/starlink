@@ -113,7 +113,7 @@ public:
     int isCompressedImage();
 
     // Save a compressed image from the current extension to a file.
-    int saveCompressedImage( const char *filename );
+    int saveCompressedImage( const char *filename, const char *object );
 
 protected:
     // Whether to merge headers or not.

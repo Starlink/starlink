@@ -680,23 +680,24 @@ int StarFitsIO::isCompressedImage()
  * Save the compressed image in the current HDU to a disk file.
  * Also merges the headers with those of the primary image if required.
  */
-int StarFitsIO::saveCompressedImage( const char *filename )
+int StarFitsIO::saveCompressedImage( const char *filename, const char *object )
 {
+    char card[FITSCARD+1];
     double *array;
     double bscale = 1.0;
     double bzero = 0.0;
     double nulval = 0.0;
     fitsfile *outfptr;
+    int anynul = 0;
     int bitpix = 0;
     int bytepix = 0;
     int datatype = 0;
-    long naxes[7];
     int naxis = 0;
+    int nkeys = 0;
     int status = 0;
+    long naxes[7];
     long nbytes = 0;
     long npix = 0;
-    int nkeys = 0;
-    int anynul = 0;
 
     //  If the file exists, rename it to make a backup and to avoid
     //  crashing if we have the file mapped already
@@ -728,10 +729,17 @@ int StarFitsIO::saveCompressedImage( const char *filename )
     // Create the new image
     fits_create_img( outfptr, bitpix, naxis, naxes, &status );
 
+    // Set the OBJECT card to hold the original name, if given.
+    if ( object != NULL && object[0] != '\0' ) {
+        char lcard[1024];
+        sprintf( lcard, "OBJECT  = '%s'", object );
+        lcard[80] = '\0';
+        fits_write_record( outfptr, lcard, &status );
+    }
+
     // Copy all the existing user keywords (not the structural keywords)
     // from the current HDU.
     fits_get_hdrspace( fitsio_, &nkeys, NULL, &status );
-    char card[FITSCARD+1];
     for ( int i = 1; i <= nkeys; i++) {
         fits_read_record( fitsio_, i, card, &status );
         if ( fits_get_keyclass( card ) > TYP_CMPRS_KEY ) {

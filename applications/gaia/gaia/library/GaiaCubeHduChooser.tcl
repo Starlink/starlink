@@ -204,7 +204,9 @@ itcl::class gaia::GaiaCubeHduChooser {
          }
 
          #  Write the HDU out to disk.
-         [get_accessor] hdu get $hdu $converted_file
+         set accessor [get_accessor]
+         set objname "[$accessor cget -dataset]+\[${hdu}\]"
+         $accessor hdu get $hdu $converted_file $objname
 
          #  Success so cache for next time.
          set tempfiles_($file,$hdu) $converted_file
