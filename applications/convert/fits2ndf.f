@@ -1029,6 +1029,7 @@
       CHARACTER * ( NDF__SZTYP ) TYPE ! Data type for processing
       INTEGER TSTAT              ! Temporary status
       CHARACTER WCSATT*255       ! Attributes for the WCS FitsChan
+
 *.
 
 *  Check the inherited global status.
@@ -1417,8 +1418,8 @@
 *  known.
          CALL NDF_NEW( '_UBYTE', 1, 1, 1, PLACE, NDF, STATUS )
 
-*  Create a History component in the NDF so that the NDF library will add
-*  default History information to the NDF when it is closed.
+*  Create a HISTORY component in the NDF so that the NDF library will
+*  add default History information to the NDF when it is closed.
          CALL NDF_HCRE( NDF, STATUS )
 
 
