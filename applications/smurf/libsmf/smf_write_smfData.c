@@ -63,6 +63,8 @@
 *        - add variance and quality overrides
 *     2009-07-31 (EC):
 *        - enable 2d variance arrays, supply external variance with smfData
+*     2009-09-09 (EC):
+*        - fix so that files that are neither 1- nor 3-dimensions can be written
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -203,10 +205,16 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
 
     if( var ) flags |= SMF__MAP_VAR;
   } else {
-    *status = SAI__ERROR;
-    errRep(" ", FUNC_NAME ": can only handle 1-d or 3-d data", 
-           status ); 
-    return;
+    /* For strange dimensions (especially 2- or 4-dimensions for FFTs) don't
+       try to write variance or quality */
+    var = NULL;
+    qual = NULL;
+
+    /* Word out size of data */
+    nelem = 1;
+    for( i=0; i<data->ndims; i++ ) {
+      nelem = nelem*data->dims[i];
+    }
   }
 
   msgSetc( "NAME", filename );
