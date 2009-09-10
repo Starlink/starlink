@@ -61,6 +61,7 @@
 *  Authors:
 *     DSB: David Berry (JAC, UCLan)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     EC: Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -72,6 +73,8 @@
 *        Added args "igrp" and "size" to allow returned "*moving" value to
 *        be based on the total distance moved by the tracking centre over 
 *        all supplied observations rather than just one observation.
+*     2009-09-09 (EC):
+*        Add extra status checks
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -257,8 +260,10 @@ void smf_calc_skyframe( const Grp *igrp, int size, const AstFrame *skyin,
       if( igrp && size > 1 ) {
          smf_open_file( igrp, ifirst, "READ", SMF__NOCREATE_DATA, &data, 
                         status );
-         thdr = data->hdr;
-      } else {
+         if( *status == SAI__OK ) {
+           thdr = data->hdr;
+         }
+       } else {
          thdr = hdr;
       }
 
@@ -279,7 +284,9 @@ void smf_calc_skyframe( const Grp *igrp, int size, const AstFrame *skyin,
       if( igrp && size > 1 ) {
          smf_open_file( igrp, ilast, "READ", SMF__NOCREATE_DATA, &data, 
                         status );
-         thdr = data->hdr;
+         if( *status == SAI__OK ) {
+           thdr = data->hdr;
+         }
       } else {
          thdr = hdr;
       }
