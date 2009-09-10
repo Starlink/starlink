@@ -211,6 +211,7 @@ static AstRegion *GetDefUnc( AstRegion *, int * );
 static AstRegion *MatchRegion( AstRegion *, int, AstRegion *, const char *, int * );
 static AstRegion *RegBasePick( AstRegion *this, int, const int *, int * );
 static double GetFillFactor( AstRegion *, int * );
+static int CmpRegionList( AstCmpRegion *, int *, AstRegion ***, int * );
 static int Equal( AstObject *, AstObject *, int * );
 static int GetBounded( AstRegion *, int * );
 static int GetObjSize( AstObject *, int * );
@@ -232,7 +233,7 @@ static void SetBreakInfo( AstCmpRegion *, int, int * );
 static void SetClosed( AstRegion *, int, int * );
 static void SetMeshSize( AstRegion *, int, int * );
 static void SetRegFS( AstRegion *, AstFrame *, int * );
-static int CmpRegionList( AstCmpRegion *, int *, AstRegion ***, int * );
+static void XORCheck( AstCmpRegion *, int * );
 
 #if defined(THREAD_SAFE)
 static int ManageLock( AstObject *, int, int, AstObject **, int * );
@@ -269,7 +270,7 @@ int CmpRegionList( AstCmpRegion *this, int *nreg, AstRegion ***reg_list,
 
 *  Parameters:
 *     this
-*        Pointer to the Cmpregion to be decomposed (the Cmpregion is not
+*        Pointer to the CmpRegion to be decomposed (the CmpRegion is not
 *        actually modified by this function).
 *     nreg 
 *        The address of an int which holds a count of the number of
@@ -310,57 +311,84 @@ int CmpRegionList( AstCmpRegion *this, int *nreg, AstRegion ***reg_list,
 */
 
 /* Local Variables: */
-   int add;
    AstCmpRegion *cmpreg;
+   int add;
+   int result;
 
 /* Check the global error status. */
    if ( !astOK ) return AST__AND;
 
+/* Check if this CmpRegion has an equivalent XOR representation. Is so,
+   store details of the XOR representation in the CmpRegion. */
+   XORCheck( this, status );
+
+/* The CmpRegion class only has full support for AND and OR operators.
+   However, it can also represent XOR operators, but it does this by 
+   an equivalent set of AND and OR operators. When an XOR CmpRegion is
+   created, the original supplied argument regions are stored in
+   "this->xor1" and "this->xor2", and the component Regions placed in the 
+   new CmpRegion are actually CmpRegions that implement the equivalent
+   of an XOR operation, using AND and OR operators. We want to hide this
+   to the outside world, so if the supplied CmpRegion represents an XOR 
+   operation, add the XOR regions to the returned list, and return an 
+   XOR operator. */
+   if( this->xor1 ) {
+      *reg_list = astGrow( *reg_list, *nreg + 2, sizeof( AstRegion * ) );
+      if( astOK ) {
+         ( *reg_list )[ (*nreg)++ ] = astClone( this->xor1 );
+         ( *reg_list )[ (*nreg)++ ] = astClone( this->xor2 );
+      }
+      result = AST__XOR;
+
+/* For AND and OR operators, we deal with the component Regions directly. */
+   } else {
+
 /* If the first component of the supplied CmpRegion is itself a CmpRegion
    that uses the same boolean operator as "this", call this function 
    recursively to add its component Regions to the returned list. */
-   add = 1;
-   if( astIsACmpRegion( this->region1 ) ) {
-      cmpreg = (AstCmpRegion *) this->region1;
-      if( cmpreg->oper == this->oper ) {
-         (void) CmpRegionList( cmpreg, nreg, reg_list, status );
-         add = 0;
-      } 
-   }
+      add = 1;
+      if( astIsACmpRegion( this->region1 ) ) {
+         cmpreg = (AstCmpRegion *) this->region1;
+         if( cmpreg->oper == this->oper ) {
+            (void) CmpRegionList( cmpreg, nreg, reg_list, status );
+            add = 0;
+         } 
+      }
 
 /* Otherwise, add the component Region directly into the returned list of 
    Regions. */
-   if( add ) {
-      *reg_list = astGrow( *reg_list, *nreg + 1, sizeof( AstRegion * ) );
-      if( astOK ) {
-         ( *reg_list )[ *nreg ] = astClone( this->region1 );
-         ( *nreg )++;
+      if( add ) {
+         *reg_list = astGrow( *reg_list, *nreg + 1, sizeof( AstRegion * ) );
+         if( astOK ) {
+            ( *reg_list )[ *nreg ] = astClone( this->region1 );
+            ( *nreg )++;
+         }
       }
-   }
 
 /* Do the same for the second component region */
-   add = 1;
-   if( astIsACmpRegion( this->region2 ) ) {
-      cmpreg = (AstCmpRegion *) this->region2;
-      if( cmpreg->oper == this->oper ) {
-         (void) CmpRegionList( cmpreg, nreg, reg_list, status );
-         add = 0;
-      } 
-   }
-
-/* Otherwise, add the component Region directly into the returned list of 
-   Regions. */
-   if( add ) {
-      *reg_list = astGrow( *reg_list, *nreg + 1, sizeof( AstRegion * ) );
-      if( astOK ) {
-         ( *reg_list )[ *nreg ] = astClone( this->region2 );
-         ( *nreg )++;
+      add = 1;
+      if( astIsACmpRegion( this->region2 ) ) {
+         cmpreg = (AstCmpRegion *) this->region2;
+         if( cmpreg->oper == this->oper ) {
+            (void) CmpRegionList( cmpreg, nreg, reg_list, status );
+            add = 0;
+         } 
       }
+   
+      if( add ) {
+         *reg_list = astGrow( *reg_list, *nreg + 1, sizeof( AstRegion * ) );
+         if( astOK ) {
+            ( *reg_list )[ *nreg ] = astClone( this->region2 );
+            ( *nreg )++;
+         }
+      }
+
+      result = this->oper;
    }
 
 /* Return the boolean operator used to combine the regions in the
    returned array. */
-   return this->oper;
+   return result;
 }
 
 static void Decompose( AstMapping *this_mapping, AstMapping **map1, 
@@ -1081,7 +1109,7 @@ static AstRegion *GetDefUnc( AstRegion *this_region, int *status ) {
    this = (AstCmpRegion *) this_region;   
 
 /* If the first component region has non-default uncertainty, use it as
-   the default uncertainty for the Cmpregion. Note, the current Frame of
+   the default uncertainty for the CmpRegion. Note, the current Frame of
    an uncertainty Region is assumed to be the same as the base Frame in the 
    CmpRegion. */
    if( astTestUnc( this->region1 ) ) {
@@ -2086,7 +2114,7 @@ static AstRegion *RegBasePick( AstRegion *this_region, int naxes,
 */
 
 /* Local Variables: */
-   AstCmpRegion *this;     /* Pointer to Cmpregion structure */
+   AstCmpRegion *this;     /* Pointer to CmpRegion structure */
    AstFrame *frm1;         /* Axes picked from the 1st encapsulated Region */
    AstFrame *frm2;         /* Axes picked from the 2nd encapsulated Region */
    AstRegion *result;      /* Returned Region */
@@ -2551,7 +2579,7 @@ static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr,
       SetBreakInfo( this, 1, status );
 
 /* Get the constants needed to convert the supplied distances (normalised
-   so that the border of the entire Cmpregion has a length of 1.0), into
+   so that the border of the entire CmpRegion has a length of 1.0), into
    distances around the border of each component Region. */
       dtot = this->d0[ 0 ] + this->d0[ 1 ];
       dbreak = this->d0[ 0 ]/dtot;
@@ -2696,7 +2724,7 @@ static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr,
          if( astOK ) {
 
 /* Copy the boundary positions from each component Region into a single
-   PointSet. These positions are in the base Frame of the Cmpregion. */
+   PointSet. These positions are in the base Frame of the CmpRegion. */
             r1n = 0;
             r2n = 0;
             for( i = 0; i < n; i++ ) {
@@ -2721,7 +2749,7 @@ static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr,
 
 
 /* If required, transform the base frame positions into the current
-   Frame of the Cmpregion, storing them in the supplied array. Then 
+   Frame of the CmpRegion, storing them in the supplied array. Then 
    free resources. */
       if( bpset ) {
          cpset = astPointSet( n, ncur, " ", status );
@@ -2907,7 +2935,7 @@ static void SetBreakInfo( AstCmpRegion *this, int comp, int *status ){
 *     This function returns without action if the supplied CmpRegion
 *     already contains break information for the specified component Region. 
 *     Otherwise, it creates the required information and stores it in the 
-*     Cmpregion.
+*     CmpRegion.
 *
 *     Each component Region in the CmpRegion has a boundary. But in
 *     general only part of the boundary of a component Region will also
@@ -2919,7 +2947,7 @@ static void SetBreakInfo( AstCmpRegion *this, int comp, int *status ){
 *     The complete boundary of a component Region is parameterised by a
 *     distance that goes from 0.0 to 1.0. This function find the ranges
 *     of this parameter that correspond to the sections of the boundary that
-*     are also on the Cmpregion boundary, and thus finds the total length
+*     are also on the CmpRegion boundary, and thus finds the total length
 *     that the component boundary contributes to the CmpRegion boundary.
 *     This length is stored in "this->d0" (a two element array, one for
 *     each component Region).
@@ -2927,10 +2955,10 @@ static void SetBreakInfo( AstCmpRegion *this, int comp, int *status ){
 *     It also find two arrays "this->rvals" and "this->offs" that allow a 
 *     distance value in the range 0.0 to "this->d0" (i.e. a distance
 *     measured by skipping over the parts of the component boundary that 
-*     are not on the Cmpregion boundary), to be converted into the
+*     are not on the CmpRegion boundary), to be converted into the
 *     corresponding distance value in the range 0.0 to 1.0 (i.e. a distance
 *     measured round the complete component boundary, including the parts
-*     not on the Cmpregion boundary).
+*     not on the CmpRegion boundary).
 
 *  Parameters:
 *     this
@@ -3680,6 +3708,105 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
    return result;
 }
 
+static void XORCheck( AstCmpRegion *this, int *status ) {
+/*
+*  Name:
+*     XORCheck
+
+*  Purpose:
+*     Check if the supplied CmpRegion represents an XOR operation.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpregion.h"
+*      void XORCheck( AstCmpRegion *this, int *status )
+
+*  Class Membership:
+*     CmpRegion method 
+
+*  Decription:
+*     This function analyses the component Regions within the supplied
+*     CmpRegion to see if the CmpRegion is equivalent to an XOR operation
+*     on two other Regions. If it is, teh Regions that are XORed are
+*     stored in the supplied CmpRegion.
+
+*  Parameters:
+*     this
+*        Pointer to the CmpRegion.
+
+*/
+
+/* Local Variables: */
+   AstCmpRegion *cmpreg1;
+   AstCmpRegion *cmpreg2;
+   int xor;
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* If the CmpRegion is already known to be an XOR operation, return
+   without action. */
+   if( this->xor1 ) return;
+
+/* To be equivalent to an XOR operation, the supplied CmpRegion must be an 
+   OR operation and each component Region must be a CmpRegion. */
+   if( this->oper == AST__OR && astIsACmpRegion( this->region1 )
+                             && astIsACmpRegion( this->region2 ) ) {
+      cmpreg1 = (AstCmpRegion *) this->region1;
+      cmpreg2 = (AstCmpRegion *) this->region2;
+
+/* Each component CmpRegion must be an AND operation. */
+      if( cmpreg1->oper == AST__AND && cmpreg2->oper == AST__AND ) {
+
+/* Temporarily negate the first component of the first CmpRegion. */
+         astNegate( cmpreg1->region1 );
+
+/* Initially, assume the supplied CmpRegion is not equivalent to an XOR 
+   operation. */
+         xor = 0;
+
+/* This negated region must be equal to one of the two component Regions
+   in the second component CmpRegion. Check the first. */
+         if( astEqual( cmpreg1->region1, cmpreg2->region1 ) ) {
+
+/* We now check that the other two Regions are equal (after negating the
+   first). If so, set "xor" non-zero. */
+            astNegate( cmpreg1->region2 );
+            if( astEqual( cmpreg1->region2, cmpreg2->region2 ) ) xor = 1;
+            astNegate( cmpreg1->region2 );
+
+/* Do equiovalent checks the other way round. */
+         } else if( astEqual( cmpreg1->region1, cmpreg2->region2 ) ) {
+            astNegate( cmpreg1->region2 );
+            if( astEqual( cmpreg1->region2, cmpreg2->region1 ) ) xor = 1;
+            astNegate( cmpreg1->region2 );
+         }
+
+/* Re-instate the original state of the Negated attribute in the first 
+   component of the first CmpRegion. */
+         astNegate( cmpreg1->region1 );
+
+/* If the supplied CmpRegion is equivalent to an XOR operation, store
+   copies of the components in the supplied CmpRegion. */
+         if( xor ) {
+            this->xor1 = astCopy( cmpreg1->region1 );
+            this->xor2 = astCopy( cmpreg1->region2 );
+
+/* We need to negate one of these two Region (it doesn't matter which),
+   and we choose to negate which ever of them is already negated (so that
+   it becomes un-negated). */
+            if( astGetNegated( this->xor1 ) ) {
+               astNegate( this->xor1 );
+            } else {
+               astNegate( this->xor2 );
+            }
+         }
+      }
+   }
+}
+
 /* Copy constructor. */
 /* ----------------- */
 static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
@@ -3844,6 +3971,10 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 
 /* Obtain a pointer to the CmpRegion structure. */
    this = (AstCmpRegion *) this_object;
+
+/* Check if this CmpRegion has an equivalent XOR representation. Is so,
+   store details of the XOR representation in the CmpRegion. */
+   XORCheck( this, status );
 
 /* Choose the operator and component regions to include in the dump. If
    the CmpRegion originally used an XOR operator, then save the XORed
@@ -4346,7 +4477,7 @@ AstCmpRegion *astInitCmpRegion_( void *mem, size_t size, int init,
       fs = astAnnul( fs );
    }
 
-/* The Cmpregion class does not implement XOR directly (as it does for
+/* The CmpRegion class does not implement XOR directly (as it does for
    AND and OR). Instead, when requested to create an XOR CmpRegion, it
    creates a CmpRegion that uses AND and OR to simulate XOR. The top
    level XOR CmpRegion actually uses AST__OR and the two component
@@ -4399,7 +4530,7 @@ AstCmpRegion *astInitCmpRegion_( void *mem, size_t size, int init,
 /* Note the operator used to combine the somponent Regions. */
       new->oper = used_oper;
 
-/* If we are creating an XOR Cmpregion, save copies of the supplied
+/* If we are creating an XOR CmpRegion, save copies of the supplied
    Regions (i.e. the supplied Regions which are XORed). These will not 
    be the same as "reg1" and "reg2" since each of those two regions will
    be CmpRegions that combine the supplied Regions using AST__AND. */
