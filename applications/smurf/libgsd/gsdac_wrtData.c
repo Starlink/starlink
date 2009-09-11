@@ -383,7 +383,7 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
 
 
   /* Close the file. */
-  acsSpecCloseTS ( fitschan, 0, status );
+  acsSpecCloseTS ( fitschan, 0, 0, NULL, status );
 
   /* Free allocated memory. */
   smf_free ( record, status );
