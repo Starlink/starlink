@@ -75,6 +75,8 @@
 *        all supplied observations rather than just one observation.
 *     2009-09-09 (EC):
 *        Add extra status checks
+*     2009-09-11 (DSB):
+*        Cater for SCUBA-2 file names in addition to ACSIS.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -145,6 +147,8 @@ void smf_calc_skyframe( const Grp *igrp, int size, const AstFrame *skyin,
    int 		  i;             /* Index into group */
    int 		  ifirst;        /* Index of first observation */
    int 		  ilast;         /* Index of last observation */
+   char         **matched_words; /* Numerical words extracted from file name */
+   int            nmatch;        /* Number of matching fields */
    int 		  obs;           /* Numerical obs number from file name */
    int 		  obs_max;       /* Maximum numerical obs number from file name */
    int 		  obs_min;       /* Minimum numerical obs number from file name */
@@ -202,6 +206,8 @@ void smf_calc_skyframe( const Grp *igrp, int size, const AstFrame *skyin,
 
 /* if there is more than one header available, find the index (within igrp) 
    of the first and last observations. */
+      ifirst = 1;
+      ilast = size;
       if( igrp && size > 1 ) {
 
 /* Store pointers to the strings to receive the supplemental information
@@ -220,8 +226,20 @@ void smf_calc_skyframe( const Grp *igrp, int size, const AstFrame *skyin,
 /* Get the i'th base file name. */
             ndgGtsup( igrp, i, fields, 200, status);
 
-/* Extract the date and observation number fields from the file name. */
-            if( sscanf( field4, "a%d_%d", &date, &obs ) == 2 ) {
+/* Locate the date and observation number fields within the file name
+   (assuming a standard JCMT file name format "<instrument><date>_<obs>..."). */
+            matched_words = astChrSplitRE( field4, "^[^_]+?(\\d+)_(\\d+)",
+                                           &nmatch, NULL );
+            if( matched_words && nmatch == 2 ) {
+
+/* Convert the date and obs strings to integers */
+               date = atoi( matched_words[ 0 ] );                        
+               obs = atoi( matched_words[ 1 ] );                        
+
+/* Free resources. */
+               matched_words[ 0 ] = astFree( matched_words[ 0 ] );
+               matched_words[ 1 ] = astFree( matched_words[ 1 ] );
+               matched_words = astFree( matched_words );
 
 /* If this observation is earlier than the current earliest observation
    (or is the first observation), record it as the earliest observation
@@ -246,6 +264,13 @@ void smf_calc_skyframe( const Grp *igrp, int size, const AstFrame *skyin,
                   obs_max = obs;
                   ilast = i;
                }
+
+/* Issue a warning (not an error since presumably the file must be OK to
+   have got this far), if the file name format is wrong. */
+            } else {
+               msgSetc( "F", field4 );
+               msgOut( " ", "Warning: File name ('^F') with unexpected "
+                       "format encountered in smf_calc_skyframe.", status );
             }
          }
       }
@@ -257,14 +282,11 @@ void smf_calc_skyframe( const Grp *igrp, int size, const AstFrame *skyin,
    slice in the first observation, then use  the Mapping from `sf1' (AzEl) 
    to `sf2' (output system) to convert the telescope base pointing position 
    for the first time slices from (az,el) to the output system. */
+      thdr = hdr;
       if( igrp && size > 1 ) {
          smf_open_file( igrp, ifirst, "READ", SMF__NOCREATE_DATA, &data, 
                         status );
-         if( *status == SAI__OK ) {
-           thdr = data->hdr;
-         }
-       } else {
-         thdr = hdr;
+         if( *status == SAI__OK ) thdr = data->hdr;
       }
 
       astSet( sf1, "Epoch=MJD %.*g", DBL_DIG, 
@@ -281,14 +303,11 @@ void smf_calc_skyframe( const Grp *igrp, int size, const AstFrame *skyin,
    in the last observation, then use  the Mapping from `sf1' (AzEl) to 
    `sf2' (output system) to convert the telescope base pointing position 
    for the last time slices from (az,el) to the output system. */
+      thdr = hdr;
       if( igrp && size > 1 ) {
          smf_open_file( igrp, ilast, "READ", SMF__NOCREATE_DATA, &data, 
                         status );
-         if( *status == SAI__OK ) {
-           thdr = data->hdr;
-         }
-      } else {
-         thdr = hdr;
+         if( *status == SAI__OK ) thdr = data->hdr;
       }
 
       astSet( sf1, "Epoch=MJD %.*g", DBL_DIG, 
