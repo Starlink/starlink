@@ -5,7 +5,7 @@
 *     KPG1_BBOXx
 
 *  Purpose:
-*     Determine the bounding box of selected pixels in an n-dimensional
+*     Determines the bounding box of selected pixels in an n-dimensional
 *     array.
 
 *  Language:
@@ -81,6 +81,8 @@
 *  History:
 *     8-MAR-2009 (DSB):
 *        Original version.
+*     2009 September 13 (MJC):
+*        Fix bug calculating the number of elements.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -129,7 +131,7 @@
 *  PIX array to hold the pixel indices of the first pixel.
       NEL = 1
       DO IDIM = 1, NDIM
-         NEL = NEL*(  UBND( 1 ) - LBND( 1 ) + 1 )
+         NEL = NEL * ( UBND( IDIM ) - LBND( IDIM ) + 1 )
          PIX( IDIM ) = LBND( IDIM )
       END DO      
 
