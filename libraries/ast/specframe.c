@@ -148,6 +148,10 @@ f     - AST_GETREFPOS: Get reference position in any celestial system
 *        affected by the epoch or reference position, make the alignment 
 *        frame adapt to the epoch and reference position of the target 
 *        and result Frames.
+*     14-SEP-2009 (DSB):
+*        In MakeSpecMapping, extend the 4-SEP-2009 fix to cover other
+*        attributes that define the available rest frames (e.g.
+*        SourceVRF, SourceVel, ObsLat, ObsLon, ObsAlt).
 *class--
 */
 
@@ -2530,8 +2534,7 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
 *        Pointer to the second SpecFrame.
 *     align_frm
 *        A SpecFrame defining the system and standard of rest in which to 
-*        align the target and result SpecFrames. The Epoch, RefRA and
-*        RefDec attributes will be changed on exit to be those of the result.
+*        align the target and result SpecFrames. 
 *     report
 *        Should errors be reported if no match is possible? These reports
 *        will describe why no match was possible.
@@ -2565,6 +2568,8 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
    AstMapping *umap2;            /* Second Units Mapping */
    AstSpecMap *specmap;          /* Pointer to SpecMap */
    AstShiftMap *sm;              /* ShiftMap pointer */
+   AstSpecFrame *align_target;   /* Alignment Frame with target properties */
+   AstSpecFrame *align_result;   /* Alignment Frame with result properties */
    AstSystemType serr;           /* Erroneous system */
    AstSystemType align_system;   /* Code to identify alignment system */
    AstSystemType target_system;  /* Code to identify target system */
@@ -2629,6 +2634,34 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
    VerifyAttrs( result, vmess, "StdOfRest", "astMatch", status );
    VerifyAttrs( target, vmess, "StdOfRest", "astMatch", status );
 
+/* When converting from the target Frame to the alignment Frame we want
+   to ignore any differences in the properties that define the available 
+   rest frames (for example, we want to consider all "source"  rest
+   frames to be connected using a UnitMap even if the source rest frames
+   are in motion with respect to each other). So create copy of the 
+   alignment Frame in which the properies defining the avialble rest
+   frames are the same as in the target Frame. */
+   align_target = astCopy( align_frm );
+   astSetEpoch( align_target, astGetEpoch( target ) );
+   astSetRefRA( align_target, astGetRefRA( target ) );
+   astSetRefDec( align_target, astGetRefDec( target ) );
+   astSetSourceVRF( align_target, astGetSourceVRF( target ) );
+   astSetSourceVel( align_target, astGetSourceVel( target ) );
+   astSetObsLat( align_target, astGetObsLat( target ) );
+   astSetObsLon( align_target, astGetObsLon( target ) );
+   astSetObsAlt( align_target, astGetObsAlt( target ) );
+
+/* Do the same for the result frame. */
+   align_result = astCopy( align_frm );
+   astSetEpoch( align_result, astGetEpoch( result ) );
+   astSetRefRA( align_result, astGetRefRA( result ) );
+   astSetRefDec( align_result, astGetRefDec( result ) );
+   astSetSourceVRF( align_result, astGetSourceVRF( result ) );
+   astSetSourceVel( align_result, astGetSourceVel( result ) );
+   astSetObsLat( align_result, astGetObsLat( result ) );
+   astSetObsLon( align_result, astGetObsLon( result ) );
+   astSetObsAlt( align_result, astGetObsAlt( result ) );
+
 /* The supported spectral coordinate systems fall into two groups;
    "relative", and "absolute". The relative systems define each axis
    value with respect to the rest frequency, whereas the absolute systems
@@ -2676,30 +2709,16 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
    step6 = 1;
    step7 = 1;
 
-/* Prepare for the first four steps (converting to the alignment frame)
-   by ensuring that the alignment Frame has the same epoch and reference
-   point as the target system. */
-   astSetEpoch( align_frm, astGetEpoch( target ) );
-   astSetRefRA( align_frm, astGetRefRA( target ) );
-   astSetRefDec( align_frm, astGetRefDec( target ) );
-
 /* Step 2 is not necessary if the target system is frequency. */
    if( target_system == AST__FREQ ) step2 = 0;
 
 /* Step 3 is not necessary if the alignment SOR is the same as the target 
    SOR. */
-   if( EqualSor( target, align_frm, status ) ) step3 = 0;
-
-/* Prepare for the last four steps (converting from the alignment frame)
-   by ensuring that the alignment Frame has the same epoch and reference
-   point as the result system. */
-   astSetEpoch( align_frm, astGetEpoch( result ) );
-   astSetRefRA( align_frm, astGetRefRA( result ) );
-   astSetRefDec( align_frm, astGetRefDec( result ) );
+   if( EqualSor( target, align_target, status ) ) step3 = 0;
 
 /* Step 6 is not necessary if the alignment SOR is the same as the result
    SOR. */
-   if( EqualSor( result, align_frm, status ) ) step6 = 0;
+   if( EqualSor( result, align_result, status ) ) step6 = 0;
 
 /* Step 7 is not necessary if the result system is frequency. */
    if( result_system == AST__FREQ ) step7 = 0;
@@ -2724,13 +2743,6 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
 
 /* Now we know which steps are needed, let's do them (we delay unit
    conversion to the end)... */
-
-/* Prepare for the first four steps (converting to the alignment frame)
-   by ensuring that the alignment Frame has the same epoch and reference
-   point as the target system. */
-   astSetEpoch( align_frm, astGetEpoch( target ) );
-   astSetRefRA( align_frm, astGetRefRA( target ) );
-   astSetRefDec( align_frm, astGetRefDec( target ) );
 
 /* Step 2: target system in target rest frame to frequency in target rest 
    frame. */
@@ -2775,7 +2787,7 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
 
 /* Step 3: frequency in target rest frame to frequency in alignment rest
    frame. */
-   if( step3 ) match = SorConvert( target, align_frm, specmap, status );
+   if( step3 ) match = SorConvert( target, align_target, specmap, status );
 
 /* Step 4: frequency in alignment rest frame to alignment system in alignment 
    rest frame. The alignment will be either relativistic velocity or
@@ -2790,10 +2802,6 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
 /* Step 5: Alignment system in alignment rest frame to frequency in alignment 
    rest frame (from now on use the attributes of the result SpecFrame to
    define the conversion parameters). */
-   astSetEpoch( align_frm, astGetEpoch( result ) );
-   astSetRefRA( align_frm, astGetRefRA( result ) );
-   astSetRefDec( align_frm, astGetRefDec( result ) );
-
    if( step5 ) {
       if( align_system == AST__VREL ) {
          VerifyAttrs( result, vmess, "RestFreq", "astMatch", status );
@@ -2803,7 +2811,7 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
 
 /* Step 6: frequency in alignment rest frame to frequency in result rest 
    frame. */
-   if( step6 ) match = SorConvert( align_frm, result, specmap, status );
+   if( step6 ) match = SorConvert( align_result, result, specmap, status );
 
 /* Step 7: frequency in result rest frame to result system in result rest
    frame. */
@@ -2935,6 +2943,8 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
    specmap = astAnnul( specmap );
    if( umap1 ) umap1 = astAnnul( umap1 );
    if( umap2 ) umap2 = astAnnul( umap2 );
+   align_result = astAnnul( align_result );
+   align_target = astAnnul( align_target );
 
 /* If an error occurred, annul the returned Mapping and clear the returned 
    values. */
