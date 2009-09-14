@@ -472,8 +472,8 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
 
 /* If we have not yet created the output SkyFrame, do so now. */
          if( ! *skyframe ) {
-           smf_calc_skyframe( igrp, size, skyin, system, hdr, alignsys, 
-                              skyframe, skyref, moving, status );
+           smf_calc_skyframe( skyin, system, hdr, alignsys, skyframe, skyref, 
+                              moving, status );
 
 /* Get the orientation of the map vertical within the output celestial
    coordinate system. This is derived form the MAP_PA FITS header, which

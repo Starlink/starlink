@@ -462,7 +462,7 @@ double smf_calc_meantau( const smfHead *hdr, int * status );
 
 void smf_calc_mode( smfHead * hdr, int * status );
 
-void smf_calc_skyframe( const Grp *igrp, int size, const AstFrame * skyin, 
+void smf_calc_skyframe( const AstFrame * skyin, 
                         const char * system, const smfHead* hdr, 
                         int alignsys, AstSkyFrame ** skyframe,
                         double skyref[2],

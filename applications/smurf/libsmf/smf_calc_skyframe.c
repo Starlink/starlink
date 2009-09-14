@@ -13,19 +13,12 @@
 *     C function
 
 *  Invocation:
-*     void smf_calc_skyframe( const Grp *igrp, int size, 
-*                             const AstFrame *skyin, const char * system, 
+*     void smf_calc_skyframe( const AstFrame *skyin, const char * system, 
 *                             const smfHead* hdr, int alignsys, 
 *                             AstSkyFrame ** skyframe, double skyref[2], 
 *                             int * moving, int * status ) 
 
 *  Arguments:
-*     igrp = Grp* (Given)
-*        Group of input NDFs. May be NULL, in which case the returned
-*        value of "*moving" is based just on the supplied header. If not
-*        NULL, "*moving" is based on all the supplied observations.
-*     size = int (Given)
-*        Number of elements in igrp. Ignored if igrp is NULL.
 *     skyin = const AstFrame * (Given)
 *        Input sky frame to use as reference.
 *     system = char* (Given)
@@ -77,6 +70,9 @@
 *        Add extra status checks
 *     2009-09-11 (DSB):
 *        Cater for SCUBA-2 file names in addition to ACSIS.
+*     2009-09-14 (DSB):
+*        Removed "igrp" and "size". Returned "moving" value is now determined 
+*        just from the supplied output coordinate system.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -123,40 +119,14 @@
 #include "smurf_par.h"
 #include "libsmf/smf.h"
 
-void smf_calc_skyframe( const Grp *igrp, int size, const AstFrame *skyin, 
-                        const char * system, const smfHead* hdr, 
-                        int alignsys, AstSkyFrame ** skyframe,
-                        double skyref[2], int * moving, int * status ) {
+void smf_calc_skyframe( const AstFrame *skyin, const char * system, 
+                        const smfHead* hdr, int alignsys,     
+                        AstSkyFrame ** skyframe, double skyref[2], 
+                        int * moving, int * status ) {
 
 /* Local Variables: */
-   double 	  az[ 2 ];       /* Azimuth values */
    AstMapping	 *azel2usesys = NULL; /* Mapping form AZEL to requested system */
-   smfData       *data = NULL;   /* Data structure for next observation */
-   int 		  date;          /* Numerical date from file name */
-   int 		  date_max;      /* Maximum numerical date from file name */
-   int 		  date_min;      /* Minimum numerical date from file name */
-   double 	  dec[ 2 ];      /* Dec values */
-   double 	  el[ 2 ];       /* Elevation values */
-   char 	  field1[ 200 ]; /* NDF slice specification */
-   char 	  field2[ 200 ]; /* HDS path */
-   char 	  field3[ 200 ]; /* File type */
-   char 	  field4[ 200 ]; /* Base file name */
-   char 	  field5[ 200 ]; /* Directory path */
-   char 	  field6[ 200 ]; /* Full NDF specification */
-   char 	 *fields[ 6 ];   /* Supplemental info from input group */
-   int 		  i;             /* Index into group */
-   int 		  ifirst;        /* Index of first observation */
-   int 		  ilast;         /* Index of last observation */
-   char         **matched_words; /* Numerical words extracted from file name */
-   int            nmatch;        /* Number of matching fields */
-   int 		  obs;           /* Numerical obs number from file name */
-   int 		  obs_max;       /* Maximum numerical obs number from file name */
-   int 		  obs_min;       /* Minimum numerical obs number from file name */
-   double 	  ra[ 2 ];       /* RA values */
-   double 	  sep;           /* Separation between first and last base positions */
    AstFrame 	 *sf1 = NULL;    /* Spatial Frame representing AZEL system */
-   AstFrame 	 *sf2 = NULL;    /* Spatial Frame representing requested system */
-   const smfHead *thdr;          /* Header for next observation */
    const char 	 *usesys = NULL; /* AST system for output cube */
 
 /* Check inherited status */
@@ -196,138 +166,7 @@ void smf_calc_skyframe( const Grp *igrp, int size, const AstFrame *skyin,
   astNorm( *skyframe, skyref );
 
 /* Determine if the telescope is tracking a moving target such as a planet 
-   or asteroid. This is indicated by significant change in the telescope 
-   base pointing position within the output coordinate system. Here, 
-   "significant" means more than 1 arc-second. Apparently users will only 
-   want to track moving objects if the output cube is in AZEL or GAPPT, so 
-   we ignoring a moving base pointing position unless the output system 
-   is AZEL or GAPPT. */
-  if( !strcmp( usesys, "AZEL" ) || !strcmp( usesys, "GAPPT" ) ) {
-
-/* if there is more than one header available, find the index (within igrp) 
-   of the first and last observations. */
-      ifirst = 1;
-      ilast = size;
-      if( igrp && size > 1 ) {
-
-/* Store pointers to the strings to receive the supplemental information
-   about the observation's file name.  */
-         fields[ 0 ] = field1;
-         fields[ 1 ] = field2;
-         fields[ 2 ] = field3;
-         fields[ 3 ] = field4;
-         fields[ 4 ] = field5;
-         fields[ 5 ] = field6;
-
-/* Search through the files, determining their order from the numerical fields
-   within the base file names. */
-         for( i = 1; i <= size; i++ ) {
-
-/* Get the i'th base file name. */
-            ndgGtsup( igrp, i, fields, 200, status);
-
-/* Locate the date and observation number fields within the file name
-   (assuming a standard JCMT file name format "<instrument><date>_<obs>..."). */
-            matched_words = astChrSplitRE( field4, "^[^_]+?(\\d+)_(\\d+)",
-                                           &nmatch, NULL );
-            if( matched_words && nmatch == 2 ) {
-
-/* Convert the date and obs strings to integers */
-               date = atoi( matched_words[ 0 ] );                        
-               obs = atoi( matched_words[ 1 ] );                        
-
-/* Free resources. */
-               matched_words[ 0 ] = astFree( matched_words[ 0 ] );
-               matched_words[ 1 ] = astFree( matched_words[ 1 ] );
-               matched_words = astFree( matched_words );
-
-/* If this observation is earlier than the current earliest observation
-   (or is the first observation), record it as the earliest observation
-   so far. */
-               if( i == 1 || date < date_min ) {
-                  date_min = date;
-                  obs_min = obs;
-                  ifirst = i;
-               } else if( date == date_min && obs < obs_min ) {
-                  obs_min = obs;
-                  ifirst = i;
-               }
-
-/* If this observation is later than the current latest observation
-   (or is the first observation), record it as the latest observation
-   so far. */
-               if( i == 1 || date > date_max ) {
-                  date_max = date;
-                  obs_max = obs;
-                  ilast = i;
-               } else if( date == date_max && obs > obs_max ) {
-                  obs_max = obs;
-                  ilast = i;
-               }
-
-/* Issue a warning (not an error since presumably the file must be OK to
-   have got this far), if the file name format is wrong. */
-            } else {
-               msgSetc( "F", field4 );
-               msgOut( " ", "Warning: File name ('^F') with unexpected "
-                       "format encountered in smf_calc_skyframe.", status );
-            }
-         }
-      }
-
-/* Get a copy of the output SkyFrame. */
-      sf2 = astCopy( *skyframe );
-
-/* Set the Epoch for `sf1' andf `sf2' to the epoch of the first time
-   slice in the first observation, then use  the Mapping from `sf1' (AzEl) 
-   to `sf2' (output system) to convert the telescope base pointing position 
-   for the first time slices from (az,el) to the output system. */
-      thdr = hdr;
-      if( igrp && size > 1 ) {
-         smf_open_file( igrp, ifirst, "READ", SMF__NOCREATE_DATA, &data, 
-                        status );
-         if( *status == SAI__OK ) thdr = data->hdr;
-      }
-
-      astSet( sf1, "Epoch=MJD %.*g", DBL_DIG, 
-              (thdr->allState)[ 0 ].tcs_tai + 32.184/86400.0 );
-      astSet( sf2, "Epoch=MJD %.*g", DBL_DIG, 
-              (thdr->allState)[ 0 ].tcs_tai + 32.184/86400.0 );
-      az[ 0 ] = (thdr->allState)[ 0 ].tcs_az_bc1;
-      el[ 0 ] = (thdr->allState)[ 0 ].tcs_az_bc2;
-      astTran2( astConvert( sf1, sf2, "" ), 1, az, el, 1, ra, dec );
-
-      if( data ) smf_close_file( &data, status );
-
-/* Set the Epoch for `sf1' andf `sf2' to the epoch of the last time slice
-   in the last observation, then use  the Mapping from `sf1' (AzEl) to 
-   `sf2' (output system) to convert the telescope base pointing position 
-   for the last time slices from (az,el) to the output system. */
-      thdr = hdr;
-      if( igrp && size > 1 ) {
-         smf_open_file( igrp, ilast, "READ", SMF__NOCREATE_DATA, &data, 
-                        status );
-         if( *status == SAI__OK ) thdr = data->hdr;
-      }
-
-      astSet( sf1, "Epoch=MJD %.*g", DBL_DIG, 
-              (thdr->allState)[ thdr->nframes - 1 ].tcs_tai + 32.184/86400.0 );
-      astSet( sf2, "Epoch=MJD %.*g", DBL_DIG, 
-              (thdr->allState)[ thdr->nframes - 1 ].tcs_tai + 32.184/86400.0 );
-      az[ 1 ] = (thdr->allState)[ thdr->nframes - 1 ].tcs_az_bc1;
-      el[ 1 ] = (thdr->allState)[ thdr->nframes - 1 ].tcs_az_bc2;
-      astTran2( astConvert( sf1, sf2, "" ), 1, az + 1, el + 1, 1, 
-                ra + 1, dec + 1 );
-      sf1 = astAnnul( sf1 );
-      sf2 = astAnnul( sf2 );
-
-      if( data ) smf_close_file( &data, status );
-
-/* Get the arc distance between the two positions and see if it is
-   greater than 1 arc-sec. */
-      sep = slaDsep( ra[ 0 ], dec[ 0 ], ra[ 1 ], dec[ 1 ] );
-      *moving = ( sep > AST__DD2R/3600.0 );
-   } else {
-     *moving = 0;
-   }
+   or asteroid. We assume this is the case if the output cube is in AZEL 
+   or GAPPT. */
+  *moving = ( !strcmp( usesys, "AZEL" ) || !strcmp( usesys, "GAPPT" ) );
 }
