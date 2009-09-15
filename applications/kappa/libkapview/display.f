@@ -628,6 +628,10 @@
 *     4-SEP-2007 (DSB):
 *        Attempt to guard against discontinuous WCS mappings that upset
 *        the calculation of the pixel aspect ratio.
+*     15-SEP-2009 (DSB):
+*        Use NINT instead of KPG1_FLOOR/CEIL when calculating WILBND and
+*        WIUBND. This avoids slight numerical inaccuracies introduced by 
+*        complex WCS Mappings producing shifts of whole pixels. 
 *     {enter_further_changes_here}
 
 *-
@@ -647,12 +651,6 @@
 
 *  Status:
       INTEGER STATUS
-
-*  External References:
-      INTEGER KPG1_CEIL          ! Smallest integer .GE. a given 
-                                 ! floating value
-      INTEGER KPG1_FLOOR         ! Largest integer .LE. a given floating
-                                 ! value
 
 *  Local Constants:
       REAL KW                    ! Width of key picture as a fraction of
@@ -1230,10 +1228,10 @@
       PCUBND( 2 ) = GUBND( 2 ) - 1.5 + REAL( SLBND( 2 ) )
 
 *  Find the pixel-index bounds of the NDF section.
-      WILBND( 1 ) = KPG1_FLOOR( PCLBND( 1 ) ) + 1
-      WIUBND( 1 ) = KPG1_CEIL( PCUBND( 1 ) )
-      WILBND( 2 ) = KPG1_FLOOR( PCLBND( 2 ) ) + 1
-      WIUBND( 2 ) = KPG1_CEIL( PCUBND( 2 ) )
+      WILBND( 1 ) = NINT( PCLBND( 1 ) ) + 1
+      WIUBND( 1 ) = NINT( PCUBND( 1 ) )
+      WILBND( 2 ) = NINT( PCLBND( 2 ) ) + 1
+      WIUBND( 2 ) = NINT( PCUBND( 2 ) )
 
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
