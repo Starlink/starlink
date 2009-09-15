@@ -1,76 +1,76 @@
 /*
-*+
-*  Name: 
-*     sc2sim_dateobs
+ *+
+ *  Name:
+ *     sc2sim_dateobs
 
-*  Purpose:
-*     Calculate the DATE-OBS string
+ *  Purpose:
+ *     Calculate the DATE-OBS string
 
-*  Language:
-*     Starlink ANSI C
+ *  Language:
+ *     Starlink ANSI C
 
-*  Type of Module:
-*     SC2SIM subroutine
+ *  Type of Module:
+ *     SC2SIM subroutine
 
-*  Invocation:
-*     sc2sim_dateobs ( double mjdaystart, char *dateobs, int *status);
+ *  Invocation:
+ *     sc2sim_dateobs ( double mjdaystart, char *dateobs, int *status);
 
-*  Arguments:
-*     mjdaystart = double (Given)
-*        MJD corresponding to first sample in file
-*     dateobs = char* (Given and Returned)
-*        Dateobs string
-*     status = int* (Given and Returned)
-*        Pointer to global status.
+ *  Arguments:
+ *     mjdaystart = double (Given)
+ *        MJD corresponding to first sample in file
+ *     dateobs = char* (Given and Returned)
+ *        Dateobs string
+ *     status = int* (Given and Returned)
+ *        Pointer to global status.
 
-*  Description:
-*      This routine constructs the DATE-OBS string for the FITS header
-*      in the output files. The necessary input is the MJD at the
-*      start of the file. The DATE-OBS returned is on the same time
-*      scale as the input so it is the caller's responsibility to
-*      ensure that the returned string corresponds to the time they expect.
+ *  Description:
+ *      This routine constructs the DATE-OBS string for the FITS header
+ *      in the output files. The necessary input is the MJD at the
+ *      start of the file. The DATE-OBS returned is on the same time
+ *      scale as the input so it is the caller's responsibility to
+ *      ensure that the returned string corresponds to the time they expect.
 
-*  Notes:
-*      - It's likely that this routine has re-invented the wheel so it may
-*        not be here forever.
+ *  Notes:
+ *      - It's likely that this routine has re-invented the wheel so it may
+ *        not be here forever.
 
-*  Authors:
-*     Andy Gibb (UBC)
-*     {enter_new_authors_here}
+ *  Authors:
+ *     Andy Gibb (UBC)
+ *     {enter_new_authors_here}
 
-*  History:
-*     2006-12-01 (AGG): 
-*        Original version 
-*     2006-12-01 (AGG):
-*        String written with a single sprintf
-*     2006-12-08 (JB):
-*        Date for current chunk is precalculated by calling function.
-*     {enter_further_changes_here}
+ *  History:
+ *     2006-12-01 (AGG):
+ *        Original version
+ *     2006-12-01 (AGG):
+ *        String written with a single sprintf
+ *     2006-12-08 (JB):
+ *        Date for current chunk is precalculated by calling function.
+ *     {enter_further_changes_here}
 
-*  Copyright:
-*     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
-*     University of British Columbia. All Rights Reserved.
+ *  Copyright:
+ *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
+ *     University of British Columbia. All Rights Reserved.
 
-*  Licence:
-*     This program is free software; you can redistribute it and/or
-*     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 3 of
-*     the License, or (at your option) any later version.
-*
-*     This program is distributed in the hope that it will be
-*     useful, but WITHOUT ANY WARRANTY; without even the implied
-*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
-*
-*     You should have received a copy of the GNU General Public
-*     License along with this program; if not, write to the Free
-*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-*     MA 02111-1307, USA
+ *  Licence:
+ *     This program is free software; you can redistribute it and/or
+ *     modify it under the terms of the GNU General Public License as
+ *     published by the Free Software Foundation; either version 3 of
+ *     the License, or (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be
+ *     useful, but WITHOUT ANY WARRANTY; without even the implied
+ *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ *     PURPOSE. See the GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public
+ *     License along with this program; if not, write to the Free
+ *     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+ *     MA 02111-1307, USA
 
-*  Bugs:
-*     {note_any_bugs_here}
-*-
-*/
+ *  Bugs:
+ *     {note_any_bugs_here}
+ *-
+ */
 
 #if HAVE_CONFIG_H
 #include <config.h>
@@ -114,6 +114,6 @@ void sc2sim_dateobs ( double mjdaystart, char *dateobs, int *status ) {
   slaDd2tf( 3, df, sign, ihmsf );
 
   /* Store this in dateobs as YYYY-MM-DDThh:mm:ss.sss */
-  sprintf( dateobs, "%d-%02d-%02dT%02d:%02d:%02d.%03d", 
-	   yy, mm, dd, ihmsf[0], ihmsf[1], ihmsf[2], ihmsf[3]);
+  sprintf( dateobs, "%d-%02d-%02dT%02d:%02d:%02d.%03d",
+           yy, mm, dd, ihmsf[0], ihmsf[1], ihmsf[2], ihmsf[3]);
 }

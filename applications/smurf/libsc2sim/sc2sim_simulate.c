@@ -1,313 +1,313 @@
 /*
-*+
-*  Name: 
-*     sc2sim_simulate
+ *+
+ *  Name:
+ *     sc2sim_simulate
 
-*  Purpose:
-*     Simulate a SCUBA-2 observation
+ *  Purpose:
+ *     Simulate a SCUBA-2 observation
 
-*  Language:
-*     Starlink ANSI C
+ *  Language:
+ *     Starlink ANSI C
 
-*  Type of Module:
-*     SC2SIM subroutine
+ *  Type of Module:
+ *     SC2SIM subroutine
 
-*  Invocation:
-*     sc2sim_simulate ( struct sc2sim_obs_struct *inx, 
-*                       struct sc2sim_sim_struct *sinx, 
-*                       double coeffs[], double digcurrent, double digmean, 
-*                       double digscale, char filter[], double *heater, 
-*                       int maxwrite, obsMode mode, mapCoordframe coordframe,
-*                       int nbol, double *pzero, int rseed, double samptime, 
-*                       double weights[], double *xbc, double *xbolo, 
-*                       double *ybc, double *ybolo, 
-*                       int hitsonly, int overwrite, int *status);
+ *  Invocation:
+ *     sc2sim_simulate ( struct sc2sim_obs_struct *inx,
+ *                       struct sc2sim_sim_struct *sinx,
+ *                       double coeffs[], double digcurrent, double digmean,
+ *                       double digscale, char filter[], double *heater,
+ *                       int maxwrite, obsMode mode, mapCoordframe coordframe,
+ *                       int nbol, double *pzero, int rseed, double samptime,
+ *                       double weights[], double *xbc, double *xbolo,
+ *                       double *ybc, double *ybolo,
+ *                       int hitsonly, int overwrite, int *status);
 
-*  Arguments:
-*     inx = sc2sim_obs_struct* (Given)
-*        Structure for values from XML
-*     sinx = sc2sim_sim_struct* (Given)
-*        Structure for sim values from XML
-*     coeffs = double[] (Given)
-*        Bolometer response coeffs
-*     digcurrent = double (Given)
-*        Digitisation mean current
-*     digmean = double (Given)
-*        Digitisation mean value
-*     digscale = double (Given)
-*        Digitisation scale factor
-*     filter = char[] (Given)
-*        String to hold filter name
-*     heater = double* (Given)
-*        Bolometer heater ratios
-*     maxwrite = int (Given)
-*        File close time
-*     mode = obsMode (Given)
-*        Observation mode
-*     coordframe = mapCoordframe (Given)
-*        Coordinate frame for the map
-*     nbol = int (Given)
-*        Total number of bolometers
-*     pzero = double* (Given)
-*        Bolometer power offsets
-*     rseed = int (Given)
-*        Seed for random number generator
-*     samptime = double (Given)
-*        Sample time in sec
-*     weights = double[] (Given)
-*        Impulse response
-*     xbc = double* (Given)
-*        Projected NAS X offsets of bolometers in arcsec
-*     xbolo = double* (Given)
-*        Native bolo x-offsets
-*     ybc = double* (Given)
-*        Projected NAS Y offsets of bolometers in arcsec
-*     ybolo = double* (Given)
-*        Native bolo y-offsets
-*     hitsonly = int (Given)
-*        Flag to indicate hits-only simulation
-*     overwrite = int (GIven)
-*        Flag to indicate whether to overwrite existing files
-*     simstats = int (Given)
-*        Flag to indicate whether to just report simulation statistics
-*        and exit
-*     status = int* (Given and Returned)
-*        Pointer to global status.
+ *  Arguments:
+ *     inx = sc2sim_obs_struct* (Given)
+ *        Structure for values from XML
+ *     sinx = sc2sim_sim_struct* (Given)
+ *        Structure for sim values from XML
+ *     coeffs = double[] (Given)
+ *        Bolometer response coeffs
+ *     digcurrent = double (Given)
+ *        Digitisation mean current
+ *     digmean = double (Given)
+ *        Digitisation mean value
+ *     digscale = double (Given)
+ *        Digitisation scale factor
+ *     filter = char[] (Given)
+ *        String to hold filter name
+ *     heater = double* (Given)
+ *        Bolometer heater ratios
+ *     maxwrite = int (Given)
+ *        File close time
+ *     mode = obsMode (Given)
+ *        Observation mode
+ *     coordframe = mapCoordframe (Given)
+ *        Coordinate frame for the map
+ *     nbol = int (Given)
+ *        Total number of bolometers
+ *     pzero = double* (Given)
+ *        Bolometer power offsets
+ *     rseed = int (Given)
+ *        Seed for random number generator
+ *     samptime = double (Given)
+ *        Sample time in sec
+ *     weights = double[] (Given)
+ *        Impulse response
+ *     xbc = double* (Given)
+ *        Projected NAS X offsets of bolometers in arcsec
+ *     xbolo = double* (Given)
+ *        Native bolo x-offsets
+ *     ybc = double* (Given)
+ *        Projected NAS Y offsets of bolometers in arcsec
+ *     ybolo = double* (Given)
+ *        Native bolo y-offsets
+ *     hitsonly = int (Given)
+ *        Flag to indicate hits-only simulation
+ *     overwrite = int (GIven)
+ *        Flag to indicate whether to overwrite existing files
+ *     simstats = int (Given)
+ *        Flag to indicate whether to just report simulation statistics
+ *        and exit
+ *     status = int* (Given and Returned)
+ *        Pointer to global status.
 
-*  Description:
-*     The is the main routine implementing the SIMULATE task.
-*
-*     This attempts to simulate the data taken by a SCUBA2 subarray
-*     (or subarrays) when observing an astronomical image plus atmospheric
-*     background while driving the JCMT.  The simulation includes photon
-*     and 1/f noise, and nonlinear response which varies for different
-*     bolometers.  It also includes SCUBA-2 field distortion.
-*
-*     Planet observations are now supported. In this case the WCS
-*     FrameSet is created on the fly. In principle this should be done
-*     at every time step, but in practice planets do not move
-*     significantly on the sky in 5 ms. Currently the geocentric
-*     apparent coordinates are calculated every 0.5 s (100 time
-*     steps).
-*
-*     smf_simulate combines the functionality of a number of executables
-*     built in earlier versions of the simulator : staresim, dreamsim,
-*     pongsim
+ *  Description:
+ *     The is the main routine implementing the SIMULATE task.
+ *
+ *     This attempts to simulate the data taken by a SCUBA2 subarray
+ *     (or subarrays) when observing an astronomical image plus atmospheric
+ *     background while driving the JCMT.  The simulation includes photon
+ *     and 1/f noise, and nonlinear response which varies for different
+ *     bolometers.  It also includes SCUBA-2 field distortion.
+ *
+ *     Planet observations are now supported. In this case the WCS
+ *     FrameSet is created on the fly. In principle this should be done
+ *     at every time step, but in practice planets do not move
+ *     significantly on the sky in 5 ms. Currently the geocentric
+ *     apparent coordinates are calculated every 0.5 s (100 time
+ *     steps).
+ *
+ *     smf_simulate combines the functionality of a number of executables
+ *     built in earlier versions of the simulator : staresim, dreamsim,
+ *     pongsim
 
-*  Notes:
-*     One of the fundamental properties of an astronomical simulator
-*     is time. In the SCUBA-2 simulator the user specifies a start
-*     time as a UTC modified Julian date. The internal time axis is
-*     established as a UT1 MJD. Planet positions are calculated using
-*     Terrestrial Time (TT). The JCMT state structure has two time
-*     entries: TCS_TAI is the TAI time of the current sample and
-*     RTS_END is the TAI at the end of the current sample. The sample
-*     length (steptime) is also taken to be in units of UTC seconds
-*     (which are the same as TAI but NOT the same as the UT/UT1
-*     second). See the documentation for SLALIB for further
-*     information on astronomical time systems.
+ *  Notes:
+ *     One of the fundamental properties of an astronomical simulator
+ *     is time. In the SCUBA-2 simulator the user specifies a start
+ *     time as a UTC modified Julian date. The internal time axis is
+ *     established as a UT1 MJD. Planet positions are calculated using
+ *     Terrestrial Time (TT). The JCMT state structure has two time
+ *     entries: TCS_TAI is the TAI time of the current sample and
+ *     RTS_END is the TAI at the end of the current sample. The sample
+ *     length (steptime) is also taken to be in units of UTC seconds
+ *     (which are the same as TAI but NOT the same as the UT/UT1
+ *     second). See the documentation for SLALIB for further
+ *     information on astronomical time systems.
 
-*  Authors:
-*     Tim Jenness (JAC, Hawaii)
-*     Andy Gibb (UBC)
-*     Edward Chapin (UBC)
-*     David Berry (JAC, UCLan)
-*     B.D.Kelly (ROE)
-*     Jen Balfour (UBC)
-*     Christa VanLaerhoven (UBC)
-*     {enter_new_authors_here}
+ *  Authors:
+ *     Tim Jenness (JAC, Hawaii)
+ *     Andy Gibb (UBC)
+ *     Edward Chapin (UBC)
+ *     David Berry (JAC, UCLan)
+ *     B.D.Kelly (ROE)
+ *     Jen Balfour (UBC)
+ *     Christa VanLaerhoven (UBC)
+ *     {enter_new_authors_here}
 
-*  History:
-*     2006-03-28 (EC): 
-*        Original version 
-*     2006-04-19 (EC): 
-*        Added jiggle offsets, filename consistent with mjd 
-*     2006-06-06 (AGG/EC/JB):  
-*        Clone from smurf_makemap
-*     2006-06-09 (JB): 
-*        Added heatrun task 
-*     2006-07-26 (JB): 
-*        Moved into sc2sim_simulate 
-*     2006-07-28 (JB):
-*        Changed sc2head to JCMTState
-*     2006-08-07 (TIMJ):
-*        GRP__NOID is not a Fortran concept.
-*     2006-08-08 (JB)
-*        Replaced call to sc2sim_hor2eq with call to slaDh2e
-*     2006-08-17 (TIMJ):
-*        Don't rely on a loop variable outside of the loop
-*     2006-08-18 (EC)
-*        Improved status handling, constants from smurf_par
-*        Fixed large number of memory leaks
-*        Removed unnecessary fopen/ndfGtwcs calls
-*     2006-08-21 (EC)
-*        Annul sc2 frameset at each time slice after calling simframe
-*     2006-09-01 (JB)
-*        Removed dependence on sc2sim_telpos
-*     2006-09-05 (JB)
-*        Check for ast & atm files.
-*     2006-09-06 (EC)
-*        Modified ndfwrdata call to include INSTRUME keyword
-*     2006-09-07 (EC):
-*        Modified sc2ast_createwcs calls to use new interface.
-*     2006-09-08 (EC):
-*        Modified call to sc2sim_calctime to use new interface.
-*     2006-09-11 (EC):
-*        Fixed pointer problem with callc to smf_calc_telpos
-*     2006-09-13 (EC):
-*        Removed another instance of hard-wired telescope coordinates
-*     2006-09-14 (EC):
-*        Added the ability to define scans in AzEl and RaDec coord. frames
-*     2006-09-22 (JB):
-*        Replaced dxml_structs with sc2sim_structs
-*     2006-10-03 (JB):
-*        Use width & height instead of gridcount in PONG
-*     2006-10-10 (JB) :
-*        Fill tcs_tai component.
-*     2006-10-16 (EC):
-*        Fixed a sign error in the rotation of the map coordinate frame. 
-*     2006-10-17 (JB):
-*        Check for pong_type        
-*     2006-10-18 (AGG):
-*        Ensure jig_x/y coordinates are in the correct units (radians)
-*     2006-11-16 (JB):
-*        Pass accel to curve PONG
-*     2006-11-21 (JB):
-*        Add liss mode
-*     2006-11-22 (JB):
-*        Add multiple map cycle capabilites to liss/pong
-*     2006-12-01 (AGG):
-*        Add DATE-OBS calculation
-*     2006-12-07 (JB):
-*        Merged with sc2sim_simhits and streamlined memory usage.
-*     2006-12-14 (JB):
-*        Corrected check for missing heatrun files.
-*     2006-12-14 (TIMJ):
-*        Put AST effective position error check in correct place
-*     2006-12-14 (AGG):
-*        Corrections to coordinate/time processing to makes things
-*        consistent. RTS_END is now written as a TAI time.
-*     2006-12-15 (AGG):
-*        TAI-UTC obtained from slaDat, assume DUT1 is zero
-*     2006-12-18 (AGG):
-*        DUT1 now obtained from input struct
-*     2006-12-18 (JB):
-*        Replace pattern-specific parameters with general 
-*        parameters.
-*     2006-12-21 (AGG):
-*        Set TAI to midpoint of sample, RTS to end. Use instap_x/y
-*        from inx struct
-*     2007-01-10 (AGG):
-*        - Add check that source is above 20 deg at start of observation
-*        - Fix off-by-one bug in digitizing signal
-*        - Set airmass to self-consistent value below 1 deg
-*     2007-01-10 (AGG):
-*        Add planet observations
-*     2007-01-11 (AGG):
-*        Set BASE position correctly for planets
-*     2007-01-16 (AGG):
-*        - Fill SMU_CHOP_PHASE, TCS_BEAM and TCS_SOURCE header entries
-*        - Fix time bug in calculating planet positions
-*     2007-01-26 (AGG):
-*        Add `overwrite' flag to allow simulations to create new files
-*        without overwriting old ones
-*     2007-02-01 (AGG):
-*        Fix `zero remainder' bug in calculating number of frames in
-*        last file
-*     2007-02-26 (AGG):
-*        Store planet RA, Dec in inx struct so they can be written to
-*        the FITS header
-*     2007-03-01 (AGG):
-*        Add simstats to API for reporting simulation statistics
-*     2007-03-20 (AGG):
-*        Update time passed to simframe to be the number of seconds
-*        since the simulation started, not the full MJD.
-*     2007-03-27 (AGG):
-*        Make this time-since-start a new variable for clarity
-*     2007-04-02 (AGG):
-*        Derive more FITS headers, add extra args to ndfwrdata
-*     2007-04-02 (EC):
-*        Moved telpos into sinx
-*     2007-05-29 (AGG):
-*        Minor change to error messages if atm/ast files could not be opened.
-*     2007-06-29 (EC):
-*        Try to re-set digitisation coefficients once the sky level is known,
-*        overriding values calculated in sc2sim_instrinit
-*     2007-07-03 (EC): 
-*        Made obsMode and mapCoordframe enumerated types more readable.
-*     2007-07-06 (AGG):
-*        Initialize FITS header strings
-*     2007-08-15 (CV):
-*        Added microstepping ability for STARE observations
-*     2007-08-27 (CV):
-*        Changed from microstepping by changing the telescope boresight
-*        pointing to using instrument aperature offsets
-*     2007-10-05 (AGG):
-*        Add subscanno and obsend variables to allow sc2sim_ndfwrdata
-*        to write the correct OBSEND keyword.
-*     2007-10-26 (EC):
-*        Pass curframe instead of frame to sc2sim_simframe to fix step
-*        in sky-signal bug.
-*     2007-10-29 (EC):
-*        Modified interface to smf_open_file.
-*     2007-10-31 (TIMJ):
-*        use size_t for some variables following sc2store mods
-*     2007-12-18 (AGG):
-*        Update to use new smf_free behaviour
-*     2008-01-30 (AGG):
-*        - Fix posptr bug when calling sc2sim_ndfwrdata
-*        - Factor out calculation of frame offset into time series for
-*          current output file
-*     2008-02-08 (CV):
-*        Set obscounter to 1 at the beginning of the simulation and
-*        increment as necessary rather than resetting to 1 (then
-*        incrementing as necessary) for each file.
-*     2008-04-02 (TIMJ):
-*        Fix strncpy usage.
-*     2008-04-18 (AGG):
-*        Use transmission for current wavelength to get atmospheric power
-*     2008-04-25 (AGG):
-*        Add loop over focus positions
-*     2008-05-14 (AGG):
-*        Take focus step into account for setting obsend flag
-*     2008-05-23 (AGG):
-*        Pass focposn to sc2sim_ndfwrdata
-*     2008-07-17 (TIMJ):
-*        - initialise scancrd
-*        - use one_strlcpy
-*     2008-08-25 (AGG):
-*        Force sc2store to think it's initialized to avoid EMS stack warnings
-*     2008-10-10 (AGG):
-*        Add NOISE observations
-*     {enter_further_changes_here}
+ *  History:
+ *     2006-03-28 (EC):
+ *        Original version
+ *     2006-04-19 (EC):
+ *        Added jiggle offsets, filename consistent with mjd
+ *     2006-06-06 (AGG/EC/JB):
+ *        Clone from smurf_makemap
+ *     2006-06-09 (JB):
+ *        Added heatrun task
+ *     2006-07-26 (JB):
+ *        Moved into sc2sim_simulate
+ *     2006-07-28 (JB):
+ *        Changed sc2head to JCMTState
+ *     2006-08-07 (TIMJ):
+ *        GRP__NOID is not a Fortran concept.
+ *     2006-08-08 (JB)
+ *        Replaced call to sc2sim_hor2eq with call to slaDh2e
+ *     2006-08-17 (TIMJ):
+ *        Don't rely on a loop variable outside of the loop
+ *     2006-08-18 (EC)
+ *        Improved status handling, constants from smurf_par
+ *        Fixed large number of memory leaks
+ *        Removed unnecessary fopen/ndfGtwcs calls
+ *     2006-08-21 (EC)
+ *        Annul sc2 frameset at each time slice after calling simframe
+ *     2006-09-01 (JB)
+ *        Removed dependence on sc2sim_telpos
+ *     2006-09-05 (JB)
+ *        Check for ast & atm files.
+ *     2006-09-06 (EC)
+ *        Modified ndfwrdata call to include INSTRUME keyword
+ *     2006-09-07 (EC):
+ *        Modified sc2ast_createwcs calls to use new interface.
+ *     2006-09-08 (EC):
+ *        Modified call to sc2sim_calctime to use new interface.
+ *     2006-09-11 (EC):
+ *        Fixed pointer problem with callc to smf_calc_telpos
+ *     2006-09-13 (EC):
+ *        Removed another instance of hard-wired telescope coordinates
+ *     2006-09-14 (EC):
+ *        Added the ability to define scans in AzEl and RaDec coord. frames
+ *     2006-09-22 (JB):
+ *        Replaced dxml_structs with sc2sim_structs
+ *     2006-10-03 (JB):
+ *        Use width & height instead of gridcount in PONG
+ *     2006-10-10 (JB) :
+ *        Fill tcs_tai component.
+ *     2006-10-16 (EC):
+ *        Fixed a sign error in the rotation of the map coordinate frame.
+ *     2006-10-17 (JB):
+ *        Check for pong_type
+ *     2006-10-18 (AGG):
+ *        Ensure jig_x/y coordinates are in the correct units (radians)
+ *     2006-11-16 (JB):
+ *        Pass accel to curve PONG
+ *     2006-11-21 (JB):
+ *        Add liss mode
+ *     2006-11-22 (JB):
+ *        Add multiple map cycle capabilites to liss/pong
+ *     2006-12-01 (AGG):
+ *        Add DATE-OBS calculation
+ *     2006-12-07 (JB):
+ *        Merged with sc2sim_simhits and streamlined memory usage.
+ *     2006-12-14 (JB):
+ *        Corrected check for missing heatrun files.
+ *     2006-12-14 (TIMJ):
+ *        Put AST effective position error check in correct place
+ *     2006-12-14 (AGG):
+ *        Corrections to coordinate/time processing to makes things
+ *        consistent. RTS_END is now written as a TAI time.
+ *     2006-12-15 (AGG):
+ *        TAI-UTC obtained from slaDat, assume DUT1 is zero
+ *     2006-12-18 (AGG):
+ *        DUT1 now obtained from input struct
+ *     2006-12-18 (JB):
+ *        Replace pattern-specific parameters with general
+ *        parameters.
+ *     2006-12-21 (AGG):
+ *        Set TAI to midpoint of sample, RTS to end. Use instap_x/y
+ *        from inx struct
+ *     2007-01-10 (AGG):
+ *        - Add check that source is above 20 deg at start of observation
+ *        - Fix off-by-one bug in digitizing signal
+ *        - Set airmass to self-consistent value below 1 deg
+ *     2007-01-10 (AGG):
+ *        Add planet observations
+ *     2007-01-11 (AGG):
+ *        Set BASE position correctly for planets
+ *     2007-01-16 (AGG):
+ *        - Fill SMU_CHOP_PHASE, TCS_BEAM and TCS_SOURCE header entries
+ *        - Fix time bug in calculating planet positions
+ *     2007-01-26 (AGG):
+ *        Add `overwrite' flag to allow simulations to create new files
+ *        without overwriting old ones
+ *     2007-02-01 (AGG):
+ *        Fix `zero remainder' bug in calculating number of frames in
+ *        last file
+ *     2007-02-26 (AGG):
+ *        Store planet RA, Dec in inx struct so they can be written to
+ *        the FITS header
+ *     2007-03-01 (AGG):
+ *        Add simstats to API for reporting simulation statistics
+ *     2007-03-20 (AGG):
+ *        Update time passed to simframe to be the number of seconds
+ *        since the simulation started, not the full MJD.
+ *     2007-03-27 (AGG):
+ *        Make this time-since-start a new variable for clarity
+ *     2007-04-02 (AGG):
+ *        Derive more FITS headers, add extra args to ndfwrdata
+ *     2007-04-02 (EC):
+ *        Moved telpos into sinx
+ *     2007-05-29 (AGG):
+ *        Minor change to error messages if atm/ast files could not be opened.
+ *     2007-06-29 (EC):
+ *        Try to re-set digitisation coefficients once the sky level is known,
+ *        overriding values calculated in sc2sim_instrinit
+ *     2007-07-03 (EC):
+ *        Made obsMode and mapCoordframe enumerated types more readable.
+ *     2007-07-06 (AGG):
+ *        Initialize FITS header strings
+ *     2007-08-15 (CV):
+ *        Added microstepping ability for STARE observations
+ *     2007-08-27 (CV):
+ *        Changed from microstepping by changing the telescope boresight
+ *        pointing to using instrument aperature offsets
+ *     2007-10-05 (AGG):
+ *        Add subscanno and obsend variables to allow sc2sim_ndfwrdata
+ *        to write the correct OBSEND keyword.
+ *     2007-10-26 (EC):
+ *        Pass curframe instead of frame to sc2sim_simframe to fix step
+ *        in sky-signal bug.
+ *     2007-10-29 (EC):
+ *        Modified interface to smf_open_file.
+ *     2007-10-31 (TIMJ):
+ *        use size_t for some variables following sc2store mods
+ *     2007-12-18 (AGG):
+ *        Update to use new smf_free behaviour
+ *     2008-01-30 (AGG):
+ *        - Fix posptr bug when calling sc2sim_ndfwrdata
+ *        - Factor out calculation of frame offset into time series for
+ *          current output file
+ *     2008-02-08 (CV):
+ *        Set obscounter to 1 at the beginning of the simulation and
+ *        increment as necessary rather than resetting to 1 (then
+ *        incrementing as necessary) for each file.
+ *     2008-04-02 (TIMJ):
+ *        Fix strncpy usage.
+ *     2008-04-18 (AGG):
+ *        Use transmission for current wavelength to get atmospheric power
+ *     2008-04-25 (AGG):
+ *        Add loop over focus positions
+ *     2008-05-14 (AGG):
+ *        Take focus step into account for setting obsend flag
+ *     2008-05-23 (AGG):
+ *        Pass focposn to sc2sim_ndfwrdata
+ *     2008-07-17 (TIMJ):
+ *        - initialise scancrd
+ *        - use one_strlcpy
+ *     2008-08-25 (AGG):
+ *        Force sc2store to think it's initialized to avoid EMS stack warnings
+ *     2008-10-10 (AGG):
+ *        Add NOISE observations
+ *     {enter_further_changes_here}
 
-*  Copyright:
-*     Copyright (C) 2007-2008 Science and Technology Facilities Council.
-*     Copyright (C) 2006-2007 Particle Physics and Astronomy Research
-*     Council. 
-*     Copyright (C) 2006-2008 University of British Columbia. All
-*     Rights Reserved.
+ *  Copyright:
+ *     Copyright (C) 2007-2008 Science and Technology Facilities Council.
+ *     Copyright (C) 2006-2007 Particle Physics and Astronomy Research
+ *     Council.
+ *     Copyright (C) 2006-2008 University of British Columbia. All
+ *     Rights Reserved.
 
-*  Licence:
-*     This program is free software; you can redistribute it and/or
-*     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 3 of
-*     the License, or (at your option) any later version.
-*
-*     This program is distributed in the hope that it will be
-*     useful, but WITHOUT ANY WARRANTY; without even the implied
-*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
-*
-*     You should have received a copy of the GNU General Public
-*     License along with this program; if not, write to the Free
-*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-*     MA 02111-1307, USA
+ *  Licence:
+ *     This program is free software; you can redistribute it and/or
+ *     modify it under the terms of the GNU General Public License as
+ *     published by the Free Software Foundation; either version 3 of
+ *     the License, or (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be
+ *     useful, but WITHOUT ANY WARRANTY; without even the implied
+ *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ *     PURPOSE. See the GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public
+ *     License along with this program; if not, write to the Free
+ *     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+ *     MA 02111-1307, USA
 
-*  Bugs:
-*     {note_any_bugs_here}
-*-
-*/
+ *  Bugs:
+ *     {note_any_bugs_here}
+ *-
+ */
 
 #if HAVE_CONFIG_H
 #include <config.h>
@@ -360,15 +360,15 @@
 
 #define INSTRUMENT "SCUBA-2"
 
-void sc2sim_simulate ( struct sc2sim_obs_struct *inx, 
-                       struct sc2sim_sim_struct *sinx, 
-                       double coeffs[], double digcurrent, double digmean, 
-                       double digscale, char filter[], double *heater, 
+void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
+                       struct sc2sim_sim_struct *sinx,
+                       double coeffs[], double digcurrent, double digmean,
+                       double digscale, char filter[], double *heater,
                        int maxwrite, obsMode mode, mapCoordframe coordframe,
-                       int nbol, double *pzero, int rseed, double samptime, 
-                       double weights[], double *xbc, double *xbolo, 
-                       double *ybc, double *ybolo, 
-                       int hitsonly, int overwrite, int simstats, 
+                       int nbol, double *pzero, int rseed, double samptime,
+                       double weights[], double *xbc, double *xbolo,
+                       double *ybc, double *ybolo,
+                       int hitsonly, int overwrite, int simstats,
                        int *status ) {
 
   double accel[2];                /* telescope accelerations (arcsec) */
@@ -452,7 +452,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   int ihmsf[4];                   /* H, M, S and fractional seconds */
   double instap[2];               /* Focal plane instrument offsets */
   int j;                          /* loop counter */
-  double jigpat[SC2SIM__MXSIM][2]; /* pointing: nas jiggle offsets from cen. 
+  double jigpat[SC2SIM__MXSIM][2]; /* pointing: nas jiggle offsets from cen.
                                       in ARCSEC */
   size_t jigsamples=1;            /* number of samples in jiggle pattern */
   double *jig_y_hor=NULL;         /* jiggle y-horizontal tanplane offset (radians) */
@@ -471,7 +471,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   static double noisecoeffs[SC2SIM__MXBOL*3*60]; /* noise coefficients */
   int noutfiles = 1;              /* Total number of output files per subarray */
   int nterms=0;                   /* number of 1/f noise frequencies */
-  int obsend = 0;                 /* Flag to indicate whether current file is last in 
+  int obsend = 0;                 /* Flag to indicate whether current file is last in
                                      observation */
   char obsid[80];                 /* OBSID for each observation */
   char obstype[SZFITSCARD+1];     /* Observation type, e.g. SCIENCE */
@@ -479,7 +479,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double phi;                     /* latitude (radians) */
   int planet = 0;                 /* Flag to indicate planet observation */
   double pnoise=0;                /* photon noise due to atmosphere */
-  double *posptr=NULL;            /* pointing: nasmyth offsets (arcsec) */ 
+  double *posptr=NULL;            /* pointing: nasmyth offsets (arcsec) */
   double pwvlos;                  /* mm precip. wat. vapor. line of site */
   double pwvzen = 0;              /* zenith precipital water vapour (mm) */
   double raapp;                   /* Apparent RA */
@@ -533,7 +533,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   if( *status == SAI__OK ) {
     /* Calculate year/month/day corresponding to MJD at start.
        Remember that inx->mjdaystart is a UTC date */
-    slaDjcl( inx->mjdaystart, &date_yr, &date_mo, &date_da, &date_df, 
+    slaDjcl( inx->mjdaystart, &date_yr, &date_mo, &date_da, &date_df,
              &date_status );
     if( date_status ) {
       *status = SAI__ERROR;
@@ -550,17 +550,17 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       narray++;
       curtok = strtok (NULL, ";");
     }
-    
+
   }
 
   if ( !hitsonly && ( *status == SAI__OK ) ) {
 
     /* Get simulation of astronomical and atmospheric images. */
-    msgOutif(MSG__VERB," ", 
-             "Get astronomical and atmospheric images", status); 
+    msgOutif(MSG__VERB," ",
+             "Get astronomical and atmospheric images", status);
 
     /* Create a group to store the sky images, and open them. */
-    skygrp = grpNew ( "GRP", status );              
+    skygrp = grpNew ( "GRP", status );
     grpPut1 ( skygrp, sinx->astname, 1, status );
     grpPut1 ( skygrp, sinx->atmname, 2, status );
 
@@ -576,7 +576,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       msgSetc ( "FILENAME", sinx->atmname );
       errRep( " ", "Unable to open atmospheric file ^FILENAME", status);
       goto CLEANUP;
-    }   
+    }
 
     /* Retrieve the astscale and atmscale from the FITS headers. */
     if( *status == SAI__OK ) {
@@ -589,23 +589,23 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
         astscale *= 3600.0; /* Convert from deg to arcsec */
       }
     }
- 
+
     if( *status == SAI__OK ) {
       atmhdr = atmdata->hdr;
-      smf_fits_getD ( atmhdr, "PIXSIZE", &atmscale, status );    
+      smf_fits_getD ( atmhdr, "PIXSIZE", &atmscale, status );
     }
 
     /* Retrieve the WCS info from the astronomical image. For planet
        observations this is not meaningful so WCS is created later */
     if( *status == SAI__OK ) {
       fitswcs = astdata->hdr->wcs;
-    }    
+    }
 
     /* Check the dimensions of the ast and atm data. */
     if( *status == SAI__OK ) {
       if ( ( astdata->ndims ) != 2 ) {
-        msgSetc ( "FILENAME", sinx->astname );          
-        errRep(FUNC_NAME, 
+        msgSetc ( "FILENAME", sinx->astname );
+        errRep(FUNC_NAME,
                "^FILENAME should have 2 dimensions, but it does not.",
                status);
         *status = DITS__APP_ERROR;
@@ -613,8 +613,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       }
 
       if ( ( atmdata->ndims ) != 2 ) {
-        msgSetc ( "FILENAME", sinx->atmname );          
-        errRep(FUNC_NAME, 
+        msgSetc ( "FILENAME", sinx->atmname );
+        errRep(FUNC_NAME,
                "^FILENAME should have 2 dimensions, but it does not.",
                status);
         *status = DITS__APP_ERROR;
@@ -636,7 +636,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       astnaxes[1] = (astdata->dims)[1];
       atmnaxes[0] = (atmdata->dims)[0];
       atmnaxes[1] = (atmdata->dims)[1];
-    
+
       /* Extract the Sky->map pixel mapping for the astronomical
          image. As noted above, this will have no meaning for planet
          observations since the WCS FrameSet is noted created until
@@ -646,11 +646,11 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       } else {
         astSetC( fitswcs, "SYSTEM", "ICRS" );
       }
-      sky2map = astGetMapping( fitswcs, AST__CURRENT, AST__BASE ); 
-    
+      sky2map = astGetMapping( fitswcs, AST__CURRENT, AST__BASE );
+
       if( !astOK ) {
         *status = SAI__ERROR;
-        errRep(FUNC_NAME, "AST error extracting sky->image pixel mapping", 
+        errRep(FUNC_NAME, "AST error extracting sky->image pixel mapping",
                status);
       }
     }
@@ -668,7 +668,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
     /*  Re-initialise random number generator to give a different sequence
         each time by using the given seed. */
     srand ( rseed );
-      
+
     /* Initialize SMU nasmyth jiggle offsets to 0 */
     for( i=0; i<SC2SIM__MXSIM; i++ ) {
       for( j=0; j<2; j++ ) {
@@ -693,20 +693,20 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
        liss : Lissajous pattern.
 
-       pong : StraightPong fills in a rectangular region with 
+       pong : StraightPong fills in a rectangular region with
        crosslinking straight line segments at angles of
-       45 degrees relative to the sides of the box. 
+       45 degrees relative to the sides of the box.
        CurvePong approximates the StraightPong pattern
        by Fourier-expanding the Lissajous pattern with
        five terms, resulting in approximately straight
        sweeps across the central region of the map, with
        smooth curved turnarounds at the edges of the map. */
 
-    /* Retrieve the map grid coordinates for each step in the 
+    /* Retrieve the map grid coordinates for each step in the
        pattern, and determine the number of frames required to
        complete the observation */
     switch( mode ) {
-      
+
     case MODE__STARE:
       /* Stare just points at a nasmyth offset of 0 from the map centre */
       msgOutif(MSG__VERB, " ", "Do a STARE observation", status );
@@ -733,7 +733,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
     case MODE__DREAM:
       /* Call sc2sim_getpat to get the dream pointing solution */
       msgOutif(MSG__VERB, " ", "Do a DREAM observation", status );
-       
+
       /*  Get jiggle pattern.
           jigpat[*][0] - X-coordinate in arcsec/time of the Jiggle position.
           jigpat[*][1] - Y-coordinate in arcsec/time of the Jiggle position.
@@ -741,19 +741,19 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
           to the number of samples per cycle. */
 
       sc2sim_getpat ( inx->nvert, inx->smu_samples, inx->steptime,
-                      inx->smu_offset+sinx->smu_terr, inx->conv_shape, 
-                      inx->conv_sig, inx->smu_move, inx->jig_step_x, 
+                      inx->smu_offset+sinx->smu_terr, inx->conv_shape,
+                      inx->conv_sig, inx->smu_move, inx->jig_step_x,
                       inx->jig_step_y, inx->jig_vert, &jigsamples, jigpat,
                       status );
-      
+
       count = jigsamples*sinx->ncycle;
-      
+
       /* dream uses the SMU to do the jiggle pattern so the posptr
          is just set to 0 */
       posptr = smf_malloc ( count*2, sizeof(*posptr), 1, status );
 
       if( *status == SAI__OK ) {
-        memset( posptr, 0, count*2*sizeof(double) );    
+        memset( posptr, 0, count*2*sizeof(double) );
       }
 
       break;
@@ -765,14 +765,14 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       accel[1] = 540.0;
       vmax[0] = inx->vmax;        /* Max is 600.0 arcsec/s */
       vmax[1] = inx->vmax;        /* Max is 600.0 arcsec/s */
-      
-      sc2sim_getsinglescan ( inx->scan_angle, inx->width, accel, vmax, 
+
+      sc2sim_getsinglescan ( inx->scan_angle, inx->width, accel, vmax,
                              samptime, &count, &posptr, status );
 
       /* indicate that we only have one pass */
       inx->nmaps = 1;
       steps_per_map = count;
-      
+
       break;
 
     case MODE__BOUS:
@@ -782,10 +782,10 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       accel[1] = 540.0;
       vmax[0] = inx->vmax;        /* Max is 600.0 arcsec/s */
       vmax[1] = inx->vmax;        /* Max is 600.0 arcsec/s */
-      
-      sc2sim_getbous ( inx->bous_angle, inx->width, inx->height, 
-                       inx->spacing, accel, vmax, samptime, &count, 
-                       &posptr, status );  
+
+      sc2sim_getbous ( inx->bous_angle, inx->width, inx->height,
+                       inx->spacing, accel, vmax, samptime, &count,
+                       &posptr, status );
 
       /* indicate that we only have one pass */
       inx->nmaps = 1;
@@ -803,14 +803,14 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       vmax[0] = inx->vmax;        /* Max is 600.0 arcsec/s */
       vmax[1] = inx->vmax;        /* Max is 600.0 arcsec/s */
 
-      sc2sim_getliss ( inx->liss_angle, inx->width, inx->height, 
-                       inx->spacing, accel, vmax, samptime, inx->nmaps, 
-                       &count, &posptr, status ); 
+      sc2sim_getliss ( inx->liss_angle, inx->width, inx->height,
+                       inx->spacing, accel, vmax, samptime, inx->nmaps,
+                       &count, &posptr, status );
       steps_per_map = count / inx->nmaps;
 
-      break; 
-      
-    
+      break;
+
+
     case MODE__PONG:
       /* Get pong pointing solution */
       vmax[0] = inx->vmax;        /* Max is 600.0 arcsec/s */
@@ -823,15 +823,15 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
         msgOutif(MSG__VERB, " ", "Do a STRAIGHT PONG observation", status );
 
-        sc2sim_getstraightpong ( inx->pong_angle, inx->width, inx->height, 
-                                 inx->spacing, accel, vmax, samptime, 
+        sc2sim_getstraightpong ( inx->pong_angle, inx->width, inx->height,
+                                 inx->spacing, accel, vmax, samptime,
                                  inx->nmaps, &count, &posptr, status );
 
-      } else if ( strncmp ( inx->pong_type, "CURVE", 5 ) == 0 ) { 
+      } else if ( strncmp ( inx->pong_type, "CURVE", 5 ) == 0 ) {
 
         msgOutif(MSG__VERB, " ", "Do a CURVE PONG observation", status );
 
-        sc2sim_getcurvepong ( inx->pong_angle, inx->width, inx->height, 
+        sc2sim_getcurvepong ( inx->pong_angle, inx->width, inx->height,
                               inx->spacing, accel, vmax, samptime,
                               inx->nmaps, &count, &posptr, status );
       } else {
@@ -850,7 +850,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       msgSetc( "MODE", inx->obsmode );
       errRep("", "^MODE is not a supported observation mode", status);
       break;
-      
+
     }/* switch */
 
     msgSeti( "COUNT", count );
@@ -867,7 +867,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
   /* Report simulation properties if requested */
   if ( simstats ) {
-    sc2sim_simstats( count, inx->steptime, maxwrite, nbol, narray, inx->nboly, 
+    sc2sim_simstats( count, inx->steptime, maxwrite, nbol, narray, inx->nboly,
                      status );
     goto CLEANUP;
   }
@@ -882,7 +882,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
   /* Frames will be "chunked" into blocks of size 'maxwrite' */
   mjuldate = smf_malloc ( maxwrite, sizeof(*mjuldate), 1, status );
-  lst = smf_malloc ( maxwrite, sizeof(*lst), 1, status );  
+  lst = smf_malloc ( maxwrite, sizeof(*lst), 1, status );
   base_az = smf_malloc ( maxwrite, sizeof(*base_az), 1, status );
   base_el = smf_malloc ( maxwrite, sizeof(*base_el), 1, status );
   base_p = smf_malloc ( maxwrite, sizeof(*base_p), 1, status );
@@ -895,38 +895,38 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   airmass = smf_malloc ( maxwrite, sizeof(*airmass), 1, status );
   head = smf_malloc( maxwrite, sizeof( *head ), 1, status );
 
-  /* Create an instrumental 1/f noise sequence for each bolometer by 
-     generating random amplitudes for the sine and cosine 
+  /* Create an instrumental 1/f noise sequence for each bolometer by
+     generating random amplitudes for the sine and cosine
      components of the lowest few frequencies, suitably scaled. */
   if( !hitsonly && ( *status == SAI__OK ) ) {
-    
+
     sigma = 1.0e-9;
     corner = 0.01;
     nterms = 20;
 
     if ( sinx->add_fnoise == 1 ) {
-      
-      msgOutif(MSG__VERB," ", 
-               "Create 1/f coefficients", status );     
-      
+
+      msgOutif(MSG__VERB," ",
+               "Create 1/f coefficients", status );
+
       for ( bol=0; bol<nbol; bol++ ) {
-        
+
         msgSeti( "BOL", bol );
-        msgOutif(MSG__VERB," ", 
-                 "1/f for bolometer number ^BOL", status);  
-        
-        sc2sim_getinvf ( sigma, corner, samptime, nterms, 
+        msgOutif(MSG__VERB," ",
+                 "1/f for bolometer number ^BOL", status);
+
+        sc2sim_getinvf ( sigma, corner, samptime, nterms,
                          &(noisecoeffs[bol*3*nterms]), status );
-        
-        msgOutif(MSG__VERB," ", 
+
+        msgOutif(MSG__VERB," ",
                  "1/f noise array made", status);
       }/* for all bolometers */
-      
+
     }/* if add fnoise */
 
   }/* if not hits-only */
 
-  msgOutif(MSG__VERB," ", 
+  msgOutif(MSG__VERB," ",
            "Get flatfield calibrations", status );
 
   /* Retrieve the flatfield calibrations for each subarray */
@@ -937,13 +937,13 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
     flatcal[k] = NULL;
     flatpar[k] = NULL;
 
-    if( *status == SAI__OK ) {    
+    if( *status == SAI__OK ) {
 
-      sprintf ( heatname, "%sheat%04i%02i%02i_00001", 
+      sprintf ( heatname, "%sheat%04i%02i%02i_00001",
                 subarrays[k], date_yr, date_mo, date_da );
 
-      sc2store_rdflatcal ( heatname, SC2STORE_FLATLEN, &colsize, 
-                           &rowsize, &(nflat[k]), flatname[k], &(flatcal[k]), 
+      sc2store_rdflatcal ( heatname, SC2STORE_FLATLEN, &colsize,
+                           &rowsize, &(nflat[k]), flatname[k], &(flatcal[k]),
                            &(flatpar[k]), status );
 
     }
@@ -954,7 +954,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   msgSeti( "YR", date_yr );
   msgSeti( "MO", date_mo );
   msgSeti( "DAY", date_da );
-  msgOutif(MSG__VERB," ", 
+  msgOutif(MSG__VERB," ",
            "Start observing at MJD ^DSTART, ^YR-^MO-^DAY", status);
 
   /* Calculate the apparent-to-mean coordinate conversion
@@ -993,7 +993,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       sc2sim_instap_calc( inx, curms, instap, status );
 
       /* For each chunk, determine the data for the corresponding
-         frames.  At the last frame, write the data for each 
+         frames.  At the last frame, write the data for each
          subarray to a file */
       for (curchunk = 0; curchunk < chunks && (*status == SAI__OK); curchunk++) {
 
@@ -1026,7 +1026,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
         start_time = inx->mjdaystart + (totaltime / SPD);
         taiutc = slaDat( start_time );
         sc2sim_calctime( (sinx->telpos[0])*DD2R, start_time, inx->dut1, samptime,
-                         lastframe, mjuldate, lst, status ); 
+                         lastframe, mjuldate, lst, status );
 
         /* If we're not simulating a planet observation then we only need
            to calculate the apparent RA, Dec once */
@@ -1052,7 +1052,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
               /* Calculate the TT from UT1 mjuldate, DUT1 and TT-UTC from slaDtt */
               tt = mjuldate[frame] + ((dtt - inx->dut1) / SPD);
 
-              slaRdplan( tt, inx->planetnum, -DD2R*(sinx->telpos)[0], 
+              slaRdplan( tt, inx->planetnum, -DD2R*(sinx->telpos)[0],
                          phi, &raapp, &decapp, &diam );
 
               /* Store RA Dec in inx struct so they can be written as FITS
@@ -1062,7 +1062,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
               inx->dec = decapp;
               /* Create frameset to allow sky2map mapping to be determined */
               fitschan = astFitsChan ( NULL, NULL, "" );
-              sc2ast_makefitschan( astnaxes[0]/2.0, astnaxes[1]/2.0, 
+              sc2ast_makefitschan( astnaxes[0]/2.0, astnaxes[1]/2.0,
                                    (-astscale*DAS2D), (astscale*DAS2D),
                                    raapp*DR2D, decapp*DR2D,
                                    "RA---TAN", "DEC--TAN", fitschan, status );
@@ -1092,7 +1092,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
           /* Parallactic angle */
           temp3 = slaPa ( hourangle, decapp, phi );
-      
+
           if( *status == SAI__OK ) {
             base_az[frame] = temp1;
             base_el[frame] = temp2;
@@ -1103,32 +1103,32 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
                frame chosen, project the pattern into AzEl and RADec so
                that it can be written to the JCMTState structure */
             switch( coordframe ) {
-	  
+
             case FRAME__NASMYTH:
               /* Get boresight tanplate offsets in Nasmyth coordinates (radians) */
               bor_x_nas = (posptr[curframe*2] - instap[0])*DAS2R;
               bor_y_nas = (posptr[curframe*2+1] - instap[1])*DAS2R;
 
               /* Calculate boresight offsets in horizontal coord. */
-              bor_x_hor =  bor_x_nas*cos(base_el[frame]) - 
+              bor_x_hor =  bor_x_nas*cos(base_el[frame]) -
                 bor_y_nas*sin(base_el[frame]);
-              bor_y_hor = bor_x_nas*sin(base_el[frame]) + 
-	              bor_y_nas*cos(base_el[frame]);
-	  
+              bor_y_hor = bor_x_nas*sin(base_el[frame]) +
+                bor_y_nas*cos(base_el[frame]);
+
               /* Calculate jiggle offsets in horizontal coord. */
               /* jigpat is in ARCSEC: jig_x/y_hor must be in RADIANS */
               jig_x_hor[frame] = DAS2R*(jigpat[curframe%jigsamples][0]*
                                         cos(base_el[frame]) -
                                         jigpat[curframe%jigsamples][1]*
                                         sin(base_el[frame]));
-	  
+
               jig_y_hor[frame] = DAS2R*(jigpat[curframe%jigsamples][0]*
                                         sin(base_el[frame]) +
                                         jigpat[curframe%jigsamples][1]*
                                         cos(base_el[frame]));
 
               break;
-	  
+
             case FRAME__AZEL:
               /* posptr and jigpat already give the azel tanplane offsets */
               bor_x_hor = (posptr[curframe*2])*DAS2R;
@@ -1138,32 +1138,32 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
               jig_x_hor[frame] = DAS2R*jigpat[curframe%jigsamples][0];
               jig_y_hor[frame] = DAS2R*jigpat[curframe%jigsamples][1];
               break;
-	  
+
             case FRAME__RADEC:
               /* posptr and jigpat give the RADec tanplane offsets */
               bor_x_cel = (posptr[curframe*2])*DAS2R;
               bor_y_cel = (posptr[curframe*2+1])*DAS2R;
-	  
+
               /* Rotate by the parallactic angle to get offsets in AzEl */
-              bor_x_hor =  bor_x_cel*cos(-base_p[frame]) - 
+              bor_x_hor =  bor_x_cel*cos(-base_p[frame]) -
                 bor_y_cel*sin(-base_p[frame]);
 
-              bor_y_hor = bor_x_cel*sin(-base_p[frame]) + 
+              bor_y_hor = bor_x_cel*sin(-base_p[frame]) +
                 bor_y_cel*cos(-base_p[frame]);
-	  
+
               /* jigpat is in ARCSEC: jig_x/y_hor must be in RADIANS */
               jig_x_hor[frame] = DAS2R*(jigpat[curframe%jigsamples][0]*
                                         cos(base_p[frame]) -
                                         jigpat[curframe%jigsamples][1]*
                                         sin(base_p[frame]));
-	  
+
               jig_y_hor[frame] = DAS2R*(jigpat[curframe%jigsamples][0]*
                                         sin(base_p[frame]) +
                                         jigpat[curframe%jigsamples][1]*
                                         cos(base_p[frame]));
               break;
 
-            default: 
+            default:
               *status = SAI__ERROR;
               errRep(FUNC_NAME, "Un-recognised map coordinate frame", status);
               break;
@@ -1172,12 +1172,12 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
           }/* if status OK */
 
           /* Calculate boresight spherical horizontal coordinates */
-      
+
           fc = astFitsChan ( NULL, NULL, "" );
 
           if( *status == SAI__OK ) {
             sc2ast_makefitschan( 0.0, 0.0, AST__DR2D, AST__DR2D,
-                                 base_az[frame]*AST__DR2D, 
+                                 base_az[frame]*AST__DR2D,
                                  base_el[frame]*AST__DR2D,
                                  "CLON-TAN", "CLAT-TAN", fc, status );
 
@@ -1189,7 +1189,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
             astTran2( fs, 1, &bor_x_hor, &bor_y_hor, 1, &temp1, &temp2 );
             if( !astOK ) {
               *status = SAI__ERROR;
-              errRep(FUNC_NAME, "AST error calculating telescope position", 
+              errRep(FUNC_NAME, "AST error calculating telescope position",
                      status);
             }
           }
@@ -1209,16 +1209,16 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
             if( !astOK ) {
               *status = SAI__ERROR;
-              errRep(FUNC_NAME, "AST error calculating effective position", 
+              errRep(FUNC_NAME, "AST error calculating effective position",
                      status);
             }      if( !astOK ) {
               *status = SAI__ERROR;
-              errRep(FUNC_NAME, "AST error calculating effective position", 
+              errRep(FUNC_NAME, "AST error calculating effective position",
                      status);
             }
 
           }
-      
+
           /* Free AST resources required for boresite pointing calculation */
           if( fs ) fs = astAnnul(fs);
           if( fc ) fc = astAnnul(fc);
@@ -1248,20 +1248,20 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
           if ( !hitsonly ) {
 
-            /* Create an sc2 frameset for this time slice and extract 
-               bolo->sky mapping */ 
+            /* Create an sc2 frameset for this time slice and extract
+               bolo->sky mapping */
             state.tcs_az_ac2 = bor_el[frame];
             state.tcs_az_ac1 = bor_az[frame];
             state.tcs_tr_dc1 = bor_ra[frame];
-            state.tcs_tr_dc2 = bor_dec[frame]; 
+            state.tcs_tr_dc2 = bor_dec[frame];
             state.tcs_tr_ac1 = bor_ra[frame];
-            state.tcs_tr_ac2 = bor_dec[frame]; 
+            state.tcs_tr_ac2 = bor_dec[frame];
             /* Set BASE position */
             if (planet) {
               state.tcs_tr_bc1 = raapp;
               state.tcs_tr_bc2 = decapp;
             } else {
-              state.tcs_tr_bc1 = inx->ra; 
+              state.tcs_tr_bc1 = inx->ra;
               state.tcs_tr_bc2 = inx->dec;
             }
             state.smu_az_jig_x = jig_x_hor[frame];
@@ -1280,20 +1280,20 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
               sc2ast_name2num( subarrays[k], &subnum, status );
 
               if( *status == SAI__OK ) {
-                sc2ast_createwcs(subnum, &state, instap, sinx->telpos, &fs, 
+                sc2ast_createwcs(subnum, &state, instap, sinx->telpos, &fs,
                                  status);
               }
-      
+
               /* simulate one frame of data */
               if( *status == SAI__OK ) {
-                sc2sim_simframe ( *inx, *sinx, astnaxes, astscale, 
-                                  astdata->pntr[0], atmnaxes, atmscale, 
-                                  atmdata->pntr[0], coeffs, fs, heater, nbol, 
-                                  focposn, curframe, nterms, noisecoeffs, pzero, samptime, 
-                                  timesincestart, weights, 
-                                  sky2map, xbolo, ybolo, xbc, ybc, 
-                                  &(posptr[curframe*2]), 
-                                  &(dbuf[(k*nbol*maxwrite) + (nbol*frame)]), 
+                sc2sim_simframe ( *inx, *sinx, astnaxes, astscale,
+                                  astdata->pntr[0], atmnaxes, atmscale,
+                                  atmdata->pntr[0], coeffs, fs, heater, nbol,
+                                  focposn, curframe, nterms, noisecoeffs, pzero, samptime,
+                                  timesincestart, weights,
+                                  sky2map, xbolo, ybolo, xbc, ybc,
+                                  &(posptr[curframe*2]),
+                                  &(dbuf[(k*nbol*maxwrite) + (nbol*frame)]),
                                   status );
               }
 
@@ -1304,13 +1304,13 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
             }/* for each subarray */
 
           }/* if not hits-only */
-   
+
           /* If this is the last frame, generate the headers for every
              frame and write the data to a file for all the subarrays */
 
           if ( ( frame == ( lastframe - 1 ) ) && ( *status == SAI__OK ) ) {
 
-            for ( j = 0; j < lastframe; j++ ) { 
+            for ( j = 0; j < lastframe; j++ ) {
 
               /* RTS -------------------------------------------------------*/
               /* Sequence number */
@@ -1325,15 +1325,15 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
               /* Coord. system  */
               if ( planet ) {
                 /* Note: the JCMT writes out APP not GAPPT */
-                snprintf(head[j].tcs_tr_sys,6,"APP");  
+                snprintf(head[j].tcs_tr_sys,6,"APP");
               } else {
-                snprintf(head[j].tcs_tr_sys,6,"J2000");  
+                snprintf(head[j].tcs_tr_sys,6,"J2000");
               }
 
               /* Percentage complete */
               switch( mode ) {
                 size_t percent;
-                
+
               case MODE__STARE:
               case MODE__NOISE:
               case MODE__DREAM:
@@ -1350,10 +1350,10 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
                 head[j].tcs_percent_cmp = percent;
                 break;
               default: /* should not get here */
-		if ( *status == SAI__OK ) {
-		  *status = SAI__ERROR;
-		  errRep("", "Error - observing mode not set", status);
-		}
+                if ( *status == SAI__OK ) {
+                  *status = SAI__ERROR;
+                  errRep("", "Error - observing mode not set", status);
+                }
               } /* switch */
 
               /* Angle between "up" in Nasmyth coordinates, and "up"
@@ -1363,12 +1363,12 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
               /* Demand coordinates */
               head[j].tcs_tr_dc1 = bor_ra[j];
-              head[j].tcs_tr_dc2 = bor_dec[j]; 
-            
+              head[j].tcs_tr_dc2 = bor_dec[j];
+
               /* Actual coordinates */
               head[j].tcs_tr_ac1 = bor_ra[j];
-              head[j].tcs_tr_ac2 = bor_dec[j]; 
-            
+              head[j].tcs_tr_ac2 = bor_dec[j];
+
               /* Base coordinates (e.g. tangent point for nominal map) */
               if (planet) {
                 head[j].tcs_tr_bc1 = raapp;
@@ -1379,33 +1379,33 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
               }
 
               /* TCS - Telescope tracking in horizontal coordinates ------- */
-            
-              /* Angle between "up" in Nasmyth coordinates, and "up" in 
+
+              /* Angle between "up" in Nasmyth coordinates, and "up" in
                  horizontal coordinates at the base telescope positions */
               head[j].tcs_az_ang = base_el[j];
-            
+
               /* Base coordinates */
               head[j].tcs_az_bc1 = base_az[j];
               head[j].tcs_az_bc2 = base_el[j];
-            
+
               /* Demand coordinates */
               head[j].tcs_az_dc1 = bor_az[j];
               head[j].tcs_az_dc2 = bor_el[j];
-           
+
               /* Actual coordinates */
               head[j].tcs_az_ac1 = bor_az[j];
               head[j].tcs_az_ac2 = bor_el[j];
-            
+
               /* Write airmass into header */
               head[j].tcs_airmass = airmass[j];
-            
+
               /* SMU - Secondary mirror structure ------------------------- */
               /* Jiggle horizontal offsets */
               head[j].smu_az_jig_x = jig_x_hor[j];
               head[j].smu_az_jig_y = jig_y_hor[j];
-           
+
               /* Other headers - more to be added as necessary */
-              one_strlcpy( head[j].smu_chop_phase, "M", 
+              one_strlcpy( head[j].smu_chop_phase, "M",
                            sizeof(head[j].smu_chop_phase), status );
               one_strlcpy( head[j].tcs_beam, "M",
                            sizeof(head[j].tcs_beam), status );
@@ -1415,38 +1415,38 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
               if ( !hitsonly ) {
 
                 /* WVM - Water vapour monitor ------------------------------- */
-            
+
                 /* Simulate WVM measurements consistent with airmass and
                    pwv using a subroutine from the WVM library used to
                    calculate opacities from the real monitor. drytau183 is
                    the excess broadband opacity, aka the dry component,
                    which is why it's small and independent of the PWV.
-              
+
                    Using a fixed value of drytau183 and choosing twater to be
                    10 degrees away from the ambient temperature seems to
                    generate WVM observations that can then be "fit" to get
                    the correct (input) values for CSO tau and the PWV using
                    wvmOpt. */
-            
+
                 /* Determine pwv from tauzen */
                 pwvzen = tau2pwv (sinx->tauzen);
-            
+
                 /* Line of site pwv      */
                 pwvlos = airmass[j]*pwvzen;
-            
+
                 /* Effective water temp. */
                 twater = sinx->atstart + 273.15 - 10;
-            
+
                 /* Not physically unreasonable number... Note it's negative
                    because of a missed -ve sign in the wvmEst */
-                drytau183 = -0.03;        
-            
+                drytau183 = -0.03;
+
                 /* Only update once every 240 samples */
                 if( j % 240 == 0 ) {
-                  wvmEst( airmass[j], pwvlos, /* model temp. */  
+                  wvmEst( airmass[j], pwvlos, /* model temp. */
                           twater, drytau183, tbri, ttau, teff, aeff );
                 }
-            
+
                 head[j].wvm_t12 = tbri[0];
                 head[j].wvm_t42 = tbri[1];
                 head[j].wvm_t78 = tbri[2];
@@ -1456,12 +1456,12 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
             }/* for each frame in this chunk */
 
             if ( !hitsonly ) {
-          
+
               /* For now just set to the last airmass calculated */
               sinx->airmass = airmass[frame-1];
-          
+
               /* Calculate `mean' tau CSO from the pwv */
-              tauCSO = 0.5 * ( pwv2tau(airmass[0],pwvzen) + 
+              tauCSO = 0.5 * ( pwv2tau(airmass[0],pwvzen) +
                                pwv2tau(airmass[frame-1],pwvzen) );
 
             }/* if not hits-only */
@@ -1469,7 +1469,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
             dateobs[0] = '\0'; /* Initialize the dateobs string to NULL */
             sc2sim_dateobs( start_time, dateobs, status );
 
-            /* For each subarray, digitise the data and write it to 
+            /* For each subarray, digitise the data and write it to
                a file */
             for ( k = 0; k < narray; k++ ) {
 
@@ -1478,19 +1478,19 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
                  the guess parameters provided by sc2sim_instrinit */
 
               if( dodigcalc ) {
-	    
+
                 /* Get photon noise level */
                 sc2sim_calctrans( inx->lambda, &skytrans, sinx->tauzen, status );
                 sc2sim_atmsky( inx->lambda, skytrans, &zenatm, status );
-                meanatm = zenatm * ( 1.0 - pow(0.01*skytrans,airmass[0]) ) / 
+                meanatm = zenatm * ( 1.0 - pow(0.01*skytrans,airmass[0]) ) /
                   ( 1.0 - (0.01*skytrans) );
-                sc2sim_getsigma( sinx->refload, sinx->refnoise, 
+                sc2sim_getsigma( sinx->refload, sinx->refnoise,
                                  sinx->telemission + meanatm, &pnoise, status );
 
                 /* Calculate scaling coefficients */
 
-                sc2sim_getscaling ( SC2SIM__NCOEFFS, coeffs, inx->targetpow, 
-                                    pnoise, &digmean, &digscale, &digcurrent, 
+                sc2sim_getscaling ( SC2SIM__NCOEFFS, coeffs, inx->targetpow,
+                                    pnoise, &digmean, &digscale, &digcurrent,
                                     status );
 
                 dodigcalc = 0;
@@ -1498,14 +1498,14 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
               /* Digitise the numbers */
               if( !hitsonly && ( *status == SAI__OK ) ) {
-                sc2sim_digitise ( nbol*(frame+1), &dbuf[k*maxwrite*nbol], 
+                sc2sim_digitise ( nbol*(frame+1), &dbuf[k*maxwrite*nbol],
                                   digmean, digscale,
                                   digcurrent, digits, status );
               }
 
               /* Compress and store as NDF */
               if( *status == SAI__OK ) {
-                sprintf( filename, "%s%04i%02i%02i_%05d_%04d", subarrays[k], 
+                sprintf( filename, "%s%04i%02i%02i_%05d_%04d", subarrays[k],
                          date_yr, date_mo, date_da, obscounter, subscanno );
                 /*If we are not overwriting existing files see if the file exists*/
                 if ( !overwrite ) {
@@ -1520,13 +1520,13 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
                       fileexists = 1;
                       fclose(ofile);
                       obscounter++;
-                      sprintf( filename, "%s%04i%02i%02i_%05d_%04d", subarrays[k], 
+                      sprintf( filename, "%s%04i%02i%02i_%05d_%04d", subarrays[k],
                                date_yr, date_mo, date_da, obscounter, subscanno );
                     } else {
                       /* If not, unset fileexists flag, increment counter
                          and set new file name */
                       fileexists = 0;
-                      sprintf( filename, "%s%04i%02i%02i_%05d_%04d", subarrays[k], 
+                      sprintf( filename, "%s%04i%02i%02i_%05d_%04d", subarrays[k],
                                date_yr, date_mo, date_da, obscounter, subscanno );
                     }
                   }
@@ -1534,7 +1534,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
 
                 msgSetc( "FILENAME", filename );
-                msgOutif(MSG__NORM, "", "  Writing ^FILENAME", status ); 
+                msgOutif(MSG__NORM, "", "  Writing ^FILENAME", status );
 
                 /* Calculate OBSID */
                 date_hr = (int)(date_df * 24);
@@ -1552,28 +1552,28 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
                 if ( mode == MODE__DREAM || mode == MODE__STARE ) {
                   nimage = maxwrite / 200;
                 }
-                /* LST start/end */                
+                /* LST start/end */
                 slaDr2tf(4, lst[0], sign, ihmsf);
-                sprintf( lststart, "%02d:%02d:%02d.%04d", 
+                sprintf( lststart, "%02d:%02d:%02d.%04d",
                          ihmsf[0], ihmsf[1], ihmsf[2], ihmsf[3]);
                 slaDr2tf(4, lst[lastframe-1], sign, ihmsf);
-                sprintf( lstend, "%02d:%02d:%02d.%04d", 
+                sprintf( lstend, "%02d:%02d:%02d.%04d",
                          ihmsf[0], ihmsf[1], ihmsf[2], ihmsf[3]);
                 /* HST start/end */
 
                 /* Write the data out to a file */
                 sc2sim_ndfwrdata( inx, sinx, tauCSO, filename, lastframe, nflat[k],
-                                  flatname[k], head, digits, dksquid, flatcal[k], 
+                                  flatname[k], head, digits, dksquid, flatcal[k],
                                   flatpar[k], INSTRUMENT, filter, dateobs, obsid,
-                                  &(posptr[frameoffset*2]), jigsamples, 
-                                  jigpat, obscounter, focposn, 
-                                  subscanno, obsend, utdate, 
-                                  head[0].tcs_az_bc1, 
+                                  &(posptr[frameoffset*2]), jigsamples,
+                                  jigpat, obscounter, focposn,
+                                  subscanno, obsend, utdate,
+                                  head[0].tcs_az_bc1,
                                   head[lastframe-1].tcs_az_bc1,
-                                  head[0].tcs_az_bc2, 
+                                  head[0].tcs_az_bc2,
                                   head[lastframe-1].tcs_az_bc2,
-                                  lststart, lstend, loclcrd, scancrd, 
-                                  totaltime, exptime, nimage, 
+                                  lststart, lstend, loclcrd, scancrd,
+                                  totaltime, exptime, nimage,
                                   sinx->tauzen, sinx->tauzen,
                                   status);
 
@@ -1582,16 +1582,16 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
             }/* for each subarray */
 
           }/* if lastframe */
-      
+
           /* exit loop over time slice if bad status */
           if( *status != SAI__OK ) {
             frame = lastframe;
             curchunk = chunks;
             curms = inx->nmicstep;
-          } 
-     
+          }
+
         }/* For all frames in this chunk */
-   
+
       } /* For each chunk */
     } /* For each microstep */
   } /* For each focus position */
@@ -1604,7 +1604,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       free( flatcal[k] );
       flatcal[k] = NULL;
     }
-    
+
     if( flatpar[k] ) {
       free( flatpar[k] );
       flatpar[k] = NULL;
@@ -1645,6 +1645,6 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
   ndfEnd ( status );
 
-  msgOutif(MSG__VERB," ", "Simulation successful.", status ); 
+  msgOutif(MSG__VERB," ", "Simulation successful.", status );
 
 }

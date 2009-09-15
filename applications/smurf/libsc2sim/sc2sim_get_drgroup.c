@@ -1,79 +1,79 @@
 /*
-*+
-*  Name:
-*     sc2sim_get_drgroup.c
+ *+
+ *  Name:
+ *     sc2sim_get_drgroup.c
 
-*  Purpose:
-*     Return a unique data-reduction group string
+ *  Purpose:
+ *     Return a unique data-reduction group string
 
-*  Language:
-*     Starlink ANSI C
+ *  Language:
+ *     Starlink ANSI C
 
-*  Type of Module:
-*     Subroutine
+ *  Type of Module:
+ *     Subroutine
 
-*  Invocation:
-*     sc2sim_get_drgroup ( struct sc2sim_obs_struct *inx, const char *filter,
-*                          const char *object, char *drgroup, int *status )
+ *  Invocation:
+ *     sc2sim_get_drgroup ( struct sc2sim_obs_struct *inx, const char *filter,
+ *                          const char *object, char *drgroup, int *status )
 
-*  Arguments:
-*     inx = const sc2sim_obs_struct* (Given)
-*        Pointer to observation struct
-*     filter = const char* (Given)
-*        Name of filter used in this observation
-*     object = const char* (Given)
-*        Name of object observed
-*     drgroup = char* (Returned)
-*        Name of data-reduction group. Must be at least 40 characters.
-*        If the drgroup does not fit in the buffer, an empty string
-*        is returned and status remains good.
-*     status = int* (Given and Returned)
-*        Pointer to global status.  
+ *  Arguments:
+ *     inx = const sc2sim_obs_struct* (Given)
+ *        Pointer to observation struct
+ *     filter = const char* (Given)
+ *        Name of filter used in this observation
+ *     object = const char* (Given)
+ *        Name of object observed
+ *     drgroup = char* (Returned)
+ *        Name of data-reduction group. Must be at least 40 characters.
+ *        If the drgroup does not fit in the buffer, an empty string
+ *        is returned and status remains good.
+ *     status = int* (Given and Returned)
+ *        Pointer to global status.
 
-*  Description:
-*     Determine the name of the data-reduction group used to combine
-*     data within ORAC-DR. Currently the DRGROUP string is a
-*     concatenation of the RA/Dec (or object name for moving sources),
-*     observation mode (DREAM, STARE, PONG, etc), observation type
-*     (SCIENCE, FOCUS or POINTING) and filter. The value is written as
-*     a FITS header and is thus restricted to 40 characters or less so
-*     as not to exceed the size of the FITS card.
+ *  Description:
+ *     Determine the name of the data-reduction group used to combine
+ *     data within ORAC-DR. Currently the DRGROUP string is a
+ *     concatenation of the RA/Dec (or object name for moving sources),
+ *     observation mode (DREAM, STARE, PONG, etc), observation type
+ *     (SCIENCE, FOCUS or POINTING) and filter. The value is written as
+ *     a FITS header and is thus restricted to 40 characters or less so
+ *     as not to exceed the size of the FITS card.
 
-*  Authors:
-*     A.G. Gibb (UBC)
-*     Tim Jenness (JAC, Hawaii)
-*     {enter_new_authors_here}
+ *  Authors:
+ *     A.G. Gibb (UBC)
+ *     Tim Jenness (JAC, Hawaii)
+ *     {enter_new_authors_here}
 
-*  History:
-*     2008-03-19 (AGG):
-*        Original
-*     2008-07-11 (TIMJ):
-*        Use strl*
+ *  History:
+ *     2008-03-19 (AGG):
+ *        Original
+ *     2008-07-11 (TIMJ):
+ *        Use strl*
 
-*  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
-*     Copyright (C) 2008 University of British Columbia. All Rights Reserved.
+ *  Copyright:
+ *     Copyright (C) 2008 Science and Technology Facilities Council.
+ *     Copyright (C) 2008 University of British Columbia. All Rights Reserved.
 
-*  Licence:
-*     This program is free software; you can redistribute it and/or
-*     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 3 of
-*     the License, or (at your option) any later version.
-*
-*     This program is distributed in the hope that it will be
-*     useful, but WITHOUT ANY WARRANTY; without even the implied
-*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
-*
-*     You should have received a copy of the GNU General Public
-*     License along with this program; if not, write to the Free
-*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-*     MA 02111-1307, USA
+ *  Licence:
+ *     This program is free software; you can redistribute it and/or
+ *     modify it under the terms of the GNU General Public License as
+ *     published by the Free Software Foundation; either version 3 of
+ *     the License, or (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be
+ *     useful, but WITHOUT ANY WARRANTY; without even the implied
+ *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ *     PURPOSE. See the GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public
+ *     License along with this program; if not, write to the Free
+ *     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+ *     MA 02111-1307, USA
 
-*  Bugs:
-*     {note_any_bugs_here}
-*-
-*/
+ *  Bugs:
+ *     {note_any_bugs_here}
+ *-
+ */
 
 /* Standard includes */
 #include <stdio.h>
@@ -91,16 +91,16 @@
 /* SC2SIM includes */
 #include "sc2sim.h"
 
-void sc2sim_get_drgroup ( const struct sc2sim_obs_struct *inx, const char *filter, 
-			  const char *object, char *drgroup, int *status ) {
+void sc2sim_get_drgroup ( const struct sc2sim_obs_struct *inx, const char *filter,
+                          const char *object, char *drgroup, int *status ) {
 
   /* Local variables */
   char decstr[8];             /* Dec as sDDMMSS where s is + or - */
-  size_t maxlen = 40;         /* Maximum length of DRGROUP string 
+  size_t maxlen = 40;         /* Maximum length of DRGROUP string
                                  This should really be a constant! */
   char sign[2];               /* Sign of declination */
   int iamsf[4];               /* Array containing H/D, M, S and .SS */
- 
+
   /* Check status */
   if ( *status != SAI__OK ) return;
 

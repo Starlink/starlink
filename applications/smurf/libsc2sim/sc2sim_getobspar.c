@@ -1,129 +1,129 @@
 /*
-*+
-*  Name:
-*     sc2sim_getobspar.c
+ *+
+ *  Name:
+ *     sc2sim_getobspar.c
 
-*  Purpose:
-*     Read observation parameters from keymap file and store in 
-*     sc2sim_obs struct.  
+ *  Purpose:
+ *     Read observation parameters from keymap file and store in
+ *     sc2sim_obs struct.
 
-*  Language:
-*     Starlink ANSI C
+ *  Language:
+ *     Starlink ANSI C
 
-*  Type of Module:
-*     Subroutine
+ *  Type of Module:
+ *     Subroutine
 
-*  Invocation:
-*     sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx, 
-*                        int *status )
+ *  Invocation:
+ *     sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
+ *                        int *status )
 
-*  Arguments:
-*     keymap = AstKeyMap* (Given)
-*        Keymap containing obs parameters
-*     sinx = sc2sim_obs_struct* (Returned)
-*        Structure for values from obs keymap file
-*     status = int* (Given and Returned)
-*        Pointer to global status.  
+ *  Arguments:
+ *     keymap = AstKeyMap* (Given)
+ *        Keymap containing obs parameters
+ *     sinx = sc2sim_obs_struct* (Returned)
+ *        Structure for values from obs keymap file
+ *     status = int* (Given and Returned)
+ *        Pointer to global status.
 
-*  Description:
-*     Retrieve obs parameters and store in sc2sim_obs_struct.
-*     If a parameter is unspecified, set it to a reasonable default value.
+ *  Description:
+ *     Retrieve obs parameters and store in sc2sim_obs_struct.
+ *     If a parameter is unspecified, set it to a reasonable default value.
 
-*  Authors:
-*     J. Balfour (UBC)
-*     A.G. Gibb (UBC)
-*     E. Chapin (UBC)
-*     C. VanLaerhoven (UBC)
-*     Tim Jenness (JAC, Hawaii)
-*     {enter_new_authors_here}
+ *  Authors:
+ *     J. Balfour (UBC)
+ *     A.G. Gibb (UBC)
+ *     E. Chapin (UBC)
+ *     C. VanLaerhoven (UBC)
+ *     Tim Jenness (JAC, Hawaii)
+ *     {enter_new_authors_here}
 
-*  History :
-*     2006-09-15 (JB):
-*        Original
-*     2006-10-04 (JB):
-*        Replace strcpy with strncpy, replace pong_gridcount with
-*        pong_width and pong_height
-*     2006-10-12 (AGG):
-*        - RA and Dec were not being stored in the inx struct
-*        - Delete wt0_name and wt1_name
-*     2006-10-13 (AGG):
-*        inx.nvert now set to a sensible (i.e non-zero) default value
-*     2006-10-16 (AGG):
-*        inx.jigvert[][] now stored correctly.
-*     2006-10-16 (JB):
-*        Add pong_type
-*     2006-10-23 (EC):
-*        Don't free constant memory used by AST
-*     2006-10-23 (AGG):
-*        Fix bug in Dec conversion to radians
-*     2006-10-25 (EC):
-*        Statically allocate memory for convert
-*     2006-11-21 (JB):
-*        Add lissajous parameters and remove bolfile (deprecated)
-*     2006-11-22 (JB):
-*        Add pong_nmaps and liss_nmaps.
-*     2006-12-18 (AGG):
-*        Add DUT1.
-*     2006-12-18 (JB):
-*        Replace pattern-specific parameters with general values.
-*     2006-12-21 (AGG):
-*        Add instap & instap_x/y
-*     2006-12-22 (AGG):
-*        Add planet and planetnum
-*     2007-01-26 (AGG):
-*        Add Venus to list of supported planets
-*     2007-02-01 (AGG):
-*        Might as well finish the job - Saturn and Neptune are now supported
-*     2007-08-15 (CV):
-*        Added microstepping parameters - nmicstep, mspat_x/y
-*     2007-08-20 (TIMJ):
-*        Can not use strtok on a const char*
-*     2007-09-05 (CV):
-*        Added a default microstep pattern which is used when nmicstep is set
-*        to any negative number
-*     2007-09-06 (AGG):
-*        Read HEATNUM as an integer
-*     2007-09-07 (AGG):
-*        - Set targetpow based on wavelength if not specified
-*        - Introduce flag to denote an 850 or 450 um simulation
-*     2007-10-31 (TIMJ):
-*        astMapGet0I uses int not size_t
-*     2008-03-19 (AGG):
-*        Add obstype, limit map size, scan speed & duration for a
-*        pointing or focus observation
-*     2008-04-23 (AGG):
-*        - Set a more descriptive default obstype for heatrun simulations
-*        - Use SC2SIM__FLEN for string length rather than numerical value
-*     2008-04-24 (AGG)
-*        - use errRep when setting bad status
-*        - add keywords for focus observation
+ *  History :
+ *     2006-09-15 (JB):
+ *        Original
+ *     2006-10-04 (JB):
+ *        Replace strcpy with strncpy, replace pong_gridcount with
+ *        pong_width and pong_height
+ *     2006-10-12 (AGG):
+ *        - RA and Dec were not being stored in the inx struct
+ *        - Delete wt0_name and wt1_name
+ *     2006-10-13 (AGG):
+ *        inx.nvert now set to a sensible (i.e non-zero) default value
+ *     2006-10-16 (AGG):
+ *        inx.jigvert[][] now stored correctly.
+ *     2006-10-16 (JB):
+ *        Add pong_type
+ *     2006-10-23 (EC):
+ *        Don't free constant memory used by AST
+ *     2006-10-23 (AGG):
+ *        Fix bug in Dec conversion to radians
+ *     2006-10-25 (EC):
+ *        Statically allocate memory for convert
+ *     2006-11-21 (JB):
+ *        Add lissajous parameters and remove bolfile (deprecated)
+ *     2006-11-22 (JB):
+ *        Add pong_nmaps and liss_nmaps.
+ *     2006-12-18 (AGG):
+ *        Add DUT1.
+ *     2006-12-18 (JB):
+ *        Replace pattern-specific parameters with general values.
+ *     2006-12-21 (AGG):
+ *        Add instap & instap_x/y
+ *     2006-12-22 (AGG):
+ *        Add planet and planetnum
+ *     2007-01-26 (AGG):
+ *        Add Venus to list of supported planets
+ *     2007-02-01 (AGG):
+ *        Might as well finish the job - Saturn and Neptune are now supported
+ *     2007-08-15 (CV):
+ *        Added microstepping parameters - nmicstep, mspat_x/y
+ *     2007-08-20 (TIMJ):
+ *        Can not use strtok on a const char*
+ *     2007-09-05 (CV):
+ *        Added a default microstep pattern which is used when nmicstep is set
+ *        to any negative number
+ *     2007-09-06 (AGG):
+ *        Read HEATNUM as an integer
+ *     2007-09-07 (AGG):
+ *        - Set targetpow based on wavelength if not specified
+ *        - Introduce flag to denote an 850 or 450 um simulation
+ *     2007-10-31 (TIMJ):
+ *        astMapGet0I uses int not size_t
+ *     2008-03-19 (AGG):
+ *        Add obstype, limit map size, scan speed & duration for a
+ *        pointing or focus observation
+ *     2008-04-23 (AGG):
+ *        - Set a more descriptive default obstype for heatrun simulations
+ *        - Use SC2SIM__FLEN for string length rather than numerical value
+ *     2008-04-24 (AGG)
+ *        - use errRep when setting bad status
+ *        - add keywords for focus observation
 
-*  Copyright:
-*     Copyright (C) 2007 Science and Technology Facilities Council.
-*     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
-*     Council. Copyright (C) 2005-2008 University of British Columbia.
-*     All Rights Reserved.
+ *  Copyright:
+ *     Copyright (C) 2007 Science and Technology Facilities Council.
+ *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
+ *     Council. Copyright (C) 2005-2008 University of British Columbia.
+ *     All Rights Reserved.
 
-*  Licence:
-*     This program is free software; you can redistribute it and/or
-*     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 3 of
-*     the License, or (at your option) any later version.
-*
-*     This program is distributed in the hope that it will be
-*     useful, but WITHOUT ANY WARRANTY; without even the implied
-*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
-*
-*     You should have received a copy of the GNU General Public
-*     License along with this program; if not, write to the Free
-*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-*     MA 02111-1307, USA
+ *  Licence:
+ *     This program is free software; you can redistribute it and/or
+ *     modify it under the terms of the GNU General Public License as
+ *     published by the Free Software Foundation; either version 3 of
+ *     the License, or (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be
+ *     useful, but WITHOUT ANY WARRANTY; without even the implied
+ *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ *     PURPOSE. See the GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public
+ *     License along with this program; if not, write to the Free
+ *     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+ *     MA 02111-1307, USA
 
-*  Bugs:
-*     {note_any_bugs_here}
-*-
-*/
+ *  Bugs:
+ *     {note_any_bugs_here}
+ *-
+ */
 
 /* Standard includes */
 #include <string.h>
@@ -142,14 +142,14 @@
 #include "prm_par.h"
 #include "mers.h"
 
-void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx, 
+void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
                         int *status ) {
 
   char convert[SC2SIM__FLEN]; /* String for converting values */
   char *curtok=NULL;     /* current jig vertex being parsed */
   double dec;            /* Double representation of Dec */
   int grid_max_x;        /* The reconstruction grid max X */
-  int grid_max_y;        /* The reconstruction grid max Y */ 
+  int grid_max_y;        /* The reconstruction grid max Y */
   int grid_min_x;        /* The reconstruction grid min X */
   int grid_min_y;        /* The reconstruction grid min Y */
   int i = 0;             /* Loop counter */
@@ -157,9 +157,9 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
   int iy;                /* grid offset */
   int j = 0;             /* Array index */
   double msdefault_x[4] = {0, 5.5, 7.0, 1.5}; /* default microstep pattern
-						 in x in bolometers */
+                                                 in x in bolometers */
   double msdefault_y[4] = {0, 1.5, 7.0, 5.5}; /* default microstep pattern
-						 in y in bolometers */
+                                                 in y in bolometers */
   int n = 0;             /* array index */
   int nvert_x=0;         /* Number of jig_x vertices */
   int nvert_y=0;         /* Number of jig_Y vertices */
@@ -173,7 +173,7 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
 
   /* Check status */
   if ( !StatusOkP(status) ) return;
- 
+
   /* First check for wavelength */
   if ( !astMapGet0D ( keymap, "LAMBDA", &(inx->lambda) ) )
     inx->lambda = 0.85e-3;
@@ -187,7 +187,7 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
     inx->bol_distx = 6.28;
 
   if ( !astMapGet0D ( keymap, "BOL_DISTY", &(inx->bol_disty) ) )
-    inx->bol_disty = 6.28; 
+    inx->bol_disty = 6.28;
 
   /*   if ( !astMapGet0D ( keymap, "BOL_DISTX", &(inx->bol_distx) ) )
        inx->bol_distx = 5.8;
@@ -196,7 +196,7 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
        inx->bol_disty = 5.8; */
 
   if ( !astMapGet0D ( keymap, "BOUS_ANGLE", &(inx->bous_angle) ) )
-    inx->bous_angle = 0.0; 
+    inx->bous_angle = 0.0;
 
   if ( !astMapGet0I ( keymap, "CONV_SHAPE", &(inx->conv_shape) ) )
     inx->conv_shape = 1;
@@ -205,7 +205,7 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
     inx->conv_sig = 1.0;
 
   if ( !astMapGet0C ( keymap, "COORDFRAME", &temp ) )
-    strncpy ( inx->coordframe, "RADEC", SC2SIM__FLEN ); 
+    strncpy ( inx->coordframe, "RADEC", SC2SIM__FLEN );
   else {
     strncpy ( convert, temp, SC2SIM__FLEN );
     /* Convert to uppercase */
@@ -239,7 +239,7 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
   if ( !astMapGet0C ( keymap, "FLATNAME", &temp ) )
     strncpy ( inx->flatname, "TABLE", SC2SIM__FLEN );
   else
-    strncpy ( inx->flatname, temp, SC2SIM__FLEN ); 
+    strncpy ( inx->flatname, temp, SC2SIM__FLEN );
 
   if ( !astMapGet0D ( keymap, "FOCSTART", &(inx->focstart) ) )
     inx->focstart = -3.0;
@@ -304,9 +304,9 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
     vert_x[2] = 1;
     vert_x[3] = -1;
     vert_x[4] = 0;
-    vert_x[5] = 1;      
+    vert_x[5] = 1;
     vert_x[6] = -1;
-    vert_x[7] = 1; 
+    vert_x[7] = 1;
   } else {
     /* Parse the string and retrieve the values */
     strncpy ( convert, temp, SC2SIM__FLEN );
@@ -314,12 +314,12 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
     while ( curtok != NULL ){
       nvert_x++;
       if ( nvert_x > SC2SIM__MXVERT ) {
-	*status = SAI__ERROR;
-	msgSeti("MAX",SC2SIM__MXVERT);
-	msgSeti("NX",nvert_x);
-	errRep(" ", 
-	       "Number of x vertices, ^NX, exceeds maximum, ^MAX", status); 
-	return;
+        *status = SAI__ERROR;
+        msgSeti("MAX",SC2SIM__MXVERT);
+        msgSeti("NX",nvert_x);
+        errRep(" ",
+               "Number of x vertices, ^NX, exceeds maximum, ^MAX", status);
+        return;
       }
       vert_x[nvert_x] = atoi ( curtok );
       curtok = strtok ( NULL, ";" );
@@ -335,9 +335,9 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
     vert_y[2] = 0;
     vert_y[3] = 1;
     vert_y[4] = -1;
-    vert_y[5] = 1;      
+    vert_y[5] = 1;
     vert_y[6] = 0;
-    vert_y[7] = -1; 
+    vert_y[7] = -1;
   } else {
     /* Parse the string and retrieve the values */
     strncpy ( convert, temp, SC2SIM__FLEN );
@@ -345,12 +345,12 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
     while ( curtok != NULL ){
       nvert_y++;
       if ( nvert_y > SC2SIM__MXVERT ) {
-	*status = SAI__ERROR;
-	msgSeti("MAX",SC2SIM__MXVERT);
-	msgSeti("NY",nvert_y);
-	errRep(" ", 
-	       "Number of y vertices, ^NY, exceeds maximum, ^MAX", status); 
-	return;
+        *status = SAI__ERROR;
+        msgSeti("MAX",SC2SIM__MXVERT);
+        msgSeti("NY",nvert_y);
+        errRep(" ",
+               "Number of y vertices, ^NY, exceeds maximum, ^MAX", status);
+        return;
       }
       vert_y[nvert_y] = atoi ( curtok );
       curtok = strtok ( NULL, ";" );
@@ -363,14 +363,14 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
     *status = SAI__ERROR;
     msgSeti("NX",nvert_x);
     msgSeti("NY",nvert_y);
-    errRep(" ", 
-	   "Number of vertices is not equal (nvert_x = ^NX, nvert_y = ^NY)", 
-	   status); 
+    errRep(" ",
+           "Number of vertices is not equal (nvert_x = ^NX, nvert_y = ^NY)",
+           status);
     return;
   } else  if ( nvert_x == 0 || nvert_y == 0 ) {
     *status = SAI__ERROR;
-    errRep(" ", 
-	   "Error parsing jig vertices - no vertices given?", status); 
+    errRep(" ",
+           "Error parsing jig vertices - no vertices given?", status);
     return;
   } else {
     for ( i = 0; i < nvert_x; i++ ) {
@@ -381,7 +381,7 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
 
   if ( !astMapGet0D ( keymap, "LISS_ANGLE", &(inx->liss_angle) ) )
     inx->liss_angle = 0.0;
- 
+
   if ( !astMapGet0D ( keymap, "MJDAYSTART", &(inx->mjdaystart) ) )
     inx->mjdaystart = 53795.0;
 
@@ -390,7 +390,7 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
   inx->nbolx = itemp;
 
   if ( !astMapGet0I ( keymap, "NBOLY", &itemp ) )
-    itemp= 32;   
+    itemp= 32;
   inx->nboly = itemp;
 
   if ( !astMapGet0I ( keymap, "NFOCSTEP", &(inx->nfocstep) ) )
@@ -400,24 +400,24 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
     inx->nmaps = 1;
 
   /* Calculate the relative grid coordinates */
-  inx->ngrid = 
+  inx->ngrid =
     ( 1 + grid_max_y - grid_min_y ) * ( 1 + grid_max_x - grid_min_x );
 
   if ( inx->ngrid <= SC2SIM__MXGRID ) {
     for ( iy=grid_min_y; iy<=grid_max_y; iy++ ) {
       for ( ix=grid_min_x; ix<=grid_max_x; ix++ ) {
-	(inx->gridpts)[j][0] = ix;
-	(inx->gridpts)[j][1] = iy;
-	j++;
+        (inx->gridpts)[j][0] = ix;
+        (inx->gridpts)[j][1] = iy;
+        j++;
       }
     }
   }
-  else {   
+  else {
     *status = SAI__ERROR;
     msgSeti("N",inx->ngrid);
     msgSeti("MAX",SC2SIM__MXGRID);
-    errRep(" ", 
-	   "Number of reconstruction grid points requested, ^N, exceeds maximum, ^MAX ", status); 
+    errRep(" ",
+           "Number of reconstruction grid points requested, ^N, exceeds maximum, ^MAX ", status);
     return;
   }
 
@@ -433,8 +433,8 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
       msgSeti("NMIC",inx->nmicstep);
       msgSeti("MAX",SC2SIM__MXMSTP);
       errRep(" ",
-	     "Number of microsteps, ^NMIC, greater than allowed, ^MAX",
-	     status );
+             "Number of microsteps, ^NMIC, greater than allowed, ^MAX",
+             status );
       return;
     }
 
@@ -443,66 +443,66 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
       /* use default pattern */
       inx->nmicstep = 4;
       for( n=0; n<inx->nmicstep; n++ ) {
-	inx->mspat_x[n] = msdefault_x[n];
-	inx->mspat_y[n] = msdefault_y[n];
+        inx->mspat_x[n] = msdefault_x[n];
+        inx->mspat_y[n] = msdefault_y[n];
       }
     }
     else if ( inx->nmicstep == 0 || inx->nmicstep == 1 ) {
       /* Don't microstep: set nmicstep to 1 (so the for loop in
-	 sc2sim_simulate doesn't break), don't put any offsets in to
-	 mspat_x/y
+         sc2sim_simulate doesn't break), don't put any offsets in to
+         mspat_x/y
       */
       inx->nmicstep = 1;
     }
     else {
       /* get custom pattern - first in x */
       if ( astMapGet0C ( keymap, "MSPAT_X", &temp ) ) {
-	/* Parse the string and retrieve the values */
-	n = 0;
-	strncpy ( convert, temp, SC2SIM__FLEN );
-	curtok = strtok ( convert, ";" );
-	while ( curtok != NULL ){
-	  if ( n >= SC2SIM__MXMSTP ) {
-	    *status = SAI__ERROR;
-	    msgSeti("NX",n);
-	    msgSeti("MAX",SC2SIM__MXMSTP);
-	    errRep(" ",
-		   "Length of microstep pattern in x, ^NX, exceeds length allowed, ^MAX",
-		   status); 
-	    return;
-	  }
-	  inx->mspat_x[n] = atof ( curtok );
-	  curtok = strtok ( NULL, ";" );
-	  n++;
-	}
+        /* Parse the string and retrieve the values */
+        n = 0;
+        strncpy ( convert, temp, SC2SIM__FLEN );
+        curtok = strtok ( convert, ";" );
+        while ( curtok != NULL ){
+          if ( n >= SC2SIM__MXMSTP ) {
+            *status = SAI__ERROR;
+            msgSeti("NX",n);
+            msgSeti("MAX",SC2SIM__MXMSTP);
+            errRep(" ",
+                   "Length of microstep pattern in x, ^NX, exceeds length allowed, ^MAX",
+                   status);
+            return;
+          }
+          inx->mspat_x[n] = atof ( curtok );
+          curtok = strtok ( NULL, ";" );
+          n++;
+        }
       }
 
       /* get pattern in y */
       if ( astMapGet0C ( keymap, "MSPAT_Y", &temp ) ) {
-	/* Parse the string and retrieve the values */
-	n = 0;
-	strncpy ( convert, temp, SC2SIM__FLEN );
-	curtok = strtok ( convert, ";" );
-	while ( curtok != NULL ){
-	  if ( n >= SC2SIM__MXMSTP ) {
-	    *status = SAI__ERROR;
-	    msgSeti("NY",n);
-	    msgSeti("MAX",SC2SIM__MXMSTP);
-	    errRep(" ",
-		   "Length of microstep pattern in y, ^NY, exceeds length allowed, ^MAX",
-		   status); 
-	    return;
-	  }
-	  inx->mspat_y[n] = atof ( curtok );
-	  curtok = strtok ( NULL, ";" );
-	  n++;
-	}
+        /* Parse the string and retrieve the values */
+        n = 0;
+        strncpy ( convert, temp, SC2SIM__FLEN );
+        curtok = strtok ( convert, ";" );
+        while ( curtok != NULL ){
+          if ( n >= SC2SIM__MXMSTP ) {
+            *status = SAI__ERROR;
+            msgSeti("NY",n);
+            msgSeti("MAX",SC2SIM__MXMSTP);
+            errRep(" ",
+                   "Length of microstep pattern in y, ^NY, exceeds length allowed, ^MAX",
+                   status);
+            return;
+          }
+          inx->mspat_y[n] = atof ( curtok );
+          curtok = strtok ( NULL, ";" );
+          n++;
+        }
       }
     } /* end getting custom pattern */
-   }
+  }
 
   if ( !astMapGet0I ( keymap, "NUMSAMPLES", &(inx->numsamples) ) )
-    inx->numsamples = 128; 
+    inx->numsamples = 128;
 
   if ( !astMapGet0I ( keymap, "NVERT", &itemp ) )
     itemp = nvert_x;
@@ -511,7 +511,7 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
   astMapGet0C ( keymap, "OBSMODE", &temp );
 
   if ( !astMapGet0C ( keymap, "OBSMODE", &temp ) )
-    strncpy ( inx->obsmode, "PONG", SC2SIM__FLEN ); 
+    strncpy ( inx->obsmode, "PONG", SC2SIM__FLEN );
   else {
     /* Convert to uppercase */
     strncpy ( convert, temp, SC2SIM__FLEN );
@@ -526,7 +526,7 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
   astMapGet0C ( keymap, "OBSTYPE", &temp );
 
   if ( !astMapGet0C ( keymap, "OBSTYPE", &temp ) )
-    strncpy ( inx->obstype, "SCIENCE", SC2SIM__FLEN ); 
+    strncpy ( inx->obstype, "SCIENCE", SC2SIM__FLEN );
   else {
     /* Convert to uppercase */
     strncpy ( convert, temp, SC2SIM__FLEN );
@@ -553,26 +553,26 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
     /* Can't use zero is it is the sun, a valid `planet' */
     inx->planetnum = -1;
   } else {
-    if ( strncmp( temp, "mars", 4 ) == 0 
-	 || strncmp( temp, "MARS", 4 ) == 0 ) {
+    if ( strncmp( temp, "mars", 4 ) == 0
+         || strncmp( temp, "MARS", 4 ) == 0 ) {
       inx->planetnum = 4;
-    } else if ( strncmp( temp, "uranus", 6 ) == 0 
-		|| strncmp( temp, "URANUS", 6 ) == 0 ) {
+    } else if ( strncmp( temp, "uranus", 6 ) == 0
+                || strncmp( temp, "URANUS", 6 ) == 0 ) {
       inx->planetnum = 7;
-    } else if ( strncmp( temp, "venus", 5 ) == 0 
-		|| strncmp( temp, "VENUS", 5 ) == 0 ) {
+    } else if ( strncmp( temp, "venus", 5 ) == 0
+                || strncmp( temp, "VENUS", 5 ) == 0 ) {
       inx->planetnum = 2;
-    } else if ( strncmp( temp, "jupiter", 7 ) == 0 
-		|| strncmp( temp, "JUPITER", 7 ) == 0 ) {
+    } else if ( strncmp( temp, "jupiter", 7 ) == 0
+                || strncmp( temp, "JUPITER", 7 ) == 0 ) {
       inx->planetnum = 5;
-    } else if ( strncmp( temp, "moon", 4 ) == 0 
-		|| strncmp( temp, "MOON", 4 ) == 0 ) {
+    } else if ( strncmp( temp, "moon", 4 ) == 0
+                || strncmp( temp, "MOON", 4 ) == 0 ) {
       inx->planetnum = 3;
-    } else if ( strncmp( temp, "saturn", 6 ) == 0 
-		|| strncmp( temp, "SATURN", 6 ) == 0 ) {
+    } else if ( strncmp( temp, "saturn", 6 ) == 0
+                || strncmp( temp, "SATURN", 6 ) == 0 ) {
       inx->planetnum = 6;
-    } else if ( strncmp( temp, "neptune", 7 ) == 0 
-		|| strncmp( temp, "NEPTUNE", 7 ) == 0 ) {
+    } else if ( strncmp( temp, "neptune", 7 ) == 0
+                || strncmp( temp, "NEPTUNE", 7 ) == 0 ) {
       inx->planetnum = 8;
     } else {
       /* Can't use zero is it is the sun, a valid `planet' */
@@ -590,7 +590,7 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
     inx->pong_angle = 0.0;
 
   if ( !astMapGet0C ( keymap, "PONG_TYPE", &temp ) )
-    strncpy ( inx->pong_type, "STRAIGHT", SC2SIM__FLEN ); 
+    strncpy ( inx->pong_type, "STRAIGHT", SC2SIM__FLEN );
   else {
     strncpy ( convert, temp, SC2SIM__FLEN );
     /* Convert to uppercase */
@@ -654,10 +654,10 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
      reset the map size and limit the length of the observation. Note
      that these limits are somewhat arbitrary though reasonable based
      on simulations of making small maps. */
-  if ( ((strncmp( inx->obstype, "POINT", 5) == 0) || 
-	(strncmp( inx->obstype, "FOCUS", 5) == 0)) && 
-       (strncmp( inx->obsmode, "DREAM", 5) || 
-	strncmp( inx->obsmode, "STARE", 5)) ) {
+  if ( ((strncmp( inx->obstype, "POINT", 5) == 0) ||
+        (strncmp( inx->obstype, "FOCUS", 5) == 0)) &&
+       (strncmp( inx->obsmode, "DREAM", 5) ||
+        strncmp( inx->obsmode, "STARE", 5)) ) {
     inx->height = 100.0;
     inx->width = 100.0;
     /* Limit number of map repeats to 10 if set to a high number */
