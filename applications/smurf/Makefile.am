@@ -39,6 +39,8 @@ examples/README \
 examples/atm.sdf \
 examples/candycanes.sdf \
 examples/dimmconfig.lis \
+examples/dreamobs.lis \
+examples/dreamsim.lis \
 examples/heatrunobs.lis \
 examples/heatrunsim.lis \
 examples/obspar.lis \
