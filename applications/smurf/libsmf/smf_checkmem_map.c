@@ -13,13 +13,13 @@
 *     C function
 
 *  Invocation:
-*     smf_checkmem_map( const int *lbnd, const int *ubnd, int rebin, 
+*     smf_checkmem_map( const int lbnd[2], const int ubnd[2], int rebin,
 *                       size_t available, size_t *necessary, int *status );
 
 *  Arguments:
-*     lbnd = int* (Given)
+*     lbnd = const int[2] (Given)
 *        2-element array indices for lower bounds of the output map
-*     ubnd = int* (Given)
+*     ubnd = const int[2] (Given)
 *        2-element array indices for upper bounds of the output map
 *     rebin = int (Given)
 *        If set calculate memory for method=rebin. Otherwise method=iterate.
@@ -90,7 +90,7 @@
 
 #define FUNC_NAME "smf_checkmem_map"
 
-void smf_checkmem_map( const int *lbnd, const int *ubnd, int rebin, 
+void smf_checkmem_map( const int lbnd[], const int ubnd[], int rebin,
 		       size_t available, size_t *necessary, int *status ) {
 
  /* Local Variables */
@@ -104,21 +104,25 @@ void smf_checkmem_map( const int *lbnd, const int *ubnd, int rebin,
   if( !lbnd ) {
     *status = SAI__ERROR;
     errRep("FUNC_NAME", "NULL lbnd supplied", status);
+    return;
   }
 
   if( !ubnd ) {
     *status = SAI__ERROR;
     errRep("FUNC_NAME", "NULL ubnd supplied", status);
+    return;
   }
 
   if( available < 1 ) {
     *status = SAI__ERROR;
     errRep("FUNC_NAME", "Invalid available memory: must be > 0", status);
+    return;
   }
 
   if( (*status == SAI__OK) && ((lbnd[0] > ubnd[0]) || (lbnd[1] > ubnd[1])) ) {
     *status = SAI__ERROR;
     errRep("FUNC_NAME", "Elements of ubnd must be > lbnd", status);
+    return;
   }
 
   if( *status == SAI__OK ) {

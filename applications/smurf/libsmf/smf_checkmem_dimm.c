@@ -117,7 +117,7 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
   size_t ndet;                 /* Number of detectors each time step */
   size_t nrow;                 /* Number of rows */
   size_t nsamp;                /* ndet*maxlen */
-  size_t total;                /* Total bytes required */
+  size_t total = 0;            /* Total bytes required */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -127,6 +127,7 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
   if( maxlen < 1 ) {
     *status = SAI__ERROR;
     errRep("", FUNC_NAME ": maxlen cannot be < 1", status);
+    return;
   }
 
   if( (nrelated < 1) || (nrelated > SMF__MXSMF) ) {
@@ -134,7 +135,8 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
     msgSeti("MAXREL",SMF__MXSMF);
     *status = SAI__ERROR;
     errRep("", FUNC_NAME ": nrelated, ^NREL, must be in the range [1,^MAXREL]", 
-	   status);    
+	   status);
+    return;
   }
 
   if( modeltyps ) {
@@ -142,6 +144,7 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
     *status = SAI__ERROR;
     errRep("", FUNC_NAME ": modeltyps specified, mmodels cannot be < 1", 
            status);
+    return;
     }
   }
 
@@ -223,7 +226,7 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
     }
 
     /* Set bad status if too big */
-    if( (total > available) && (*status == SAI__OK) ) {
+    if( (*status == SAI__OK) && (total > available) ) {
       *status = SMF__NOMEM;
       msgSeti("REQ",total/SMF__MB);
       msgSeti("AVAIL",available/SMF__MB);
