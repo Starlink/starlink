@@ -158,6 +158,7 @@ int *status          /* global status (given and returned) */
      if (*status == SAI__OK) {
        *status = SAI__ERROR;
        errRep( " ",  "structure of data array is wrong!!!", status);
+     }
    } 
    else
    {
