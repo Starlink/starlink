@@ -43,15 +43,19 @@ THETA  <NDF>
 End of Trace.
 
 *  Authors:
-*     B.Zhang (UoL)
+*     BZ: B.Zhang (UoL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 
 *  History :
 *     2008-03-16 (BZ):
 *        Create a test implementation for FTS-2
 *     2008-05-10 (BZ):
 *        Complete first draft of FreqCorr module
+*     2009-09-15 (TIMJ):
+*        Must read size of THETA from THETA and not assume BOLROW and BOLCAL.
 
 *  Copyright:
+*     Copyright (C) 2009 Science and Technology Facilities Council.
 *     Copyright (C) 2008 University of Lethbridge. All Rights Reserved.
 
 *  Licence:
@@ -106,11 +110,10 @@ int *status          /* global status (given and returned) */
 {
    int i, j, k, index;
    const char* theta_fn;              /* the file name of THETA */
-   HDSLoc *loc_theta = NULL;          /* root HDSLoc */
-   HDSLoc *loc_da = NULL;             /* HDSLoc to DATA_ARRAY */
-   HDSLoc *loc_data = NULL;           /* HDSLoc to DATA of DATA_ARRAY */
-   size_t theta_size;                 /* size of THETA */
-   double theta_vals[BOLROW][BOLCOL]; /* THETA values */
+   int theta_size;                    /* size of THETA */
+   int theta_dims[2];                 /* dimensionality of THETA */
+   int theta_indf;                    /* NDF identifier of THETA */
+   double *theta_vals = NULL;         /* THETA values */
    smfData *data;                     /* Pointer to in/output SCUBA2 data struct */
    float *tstream = NULL;             /* Pointer to input data stream */
    int nwn;                           /* number of spectral wavenumber in input data */
@@ -133,17 +136,10 @@ int *status          /* global status (given and returned) */
    ndfBegin();
 
    /* open THETA file */
-   hdsOpen(theta_fn, "READ", &loc_theta, status);
-   datFind(loc_theta, "DATA_ARRAY", &loc_da, status);
-   datFind(loc_da, "DATA", &loc_data, status);
+   ndfFind( NULL, theta_fn, &theta_indf, status );
+   ndfMap( theta_indf, "DATA", "_DOUBLE", "READ", (void*)&theta_vals, &theta_size, status );
+   ndfDim( theta_indf, 2, theta_dims, &i, status );
 
-   datGetVD(loc_data, BOLROW*BOLCOL, (double*)theta_vals, 
-            &theta_size, status);
-
-   /* close THETA file */
-   datAnnul(&loc_data,  status);
-   datAnnul(&loc_da,    status);
-   datAnnul(&loc_theta, status); 
   /* verify that everything was found */
   if(*status != SAI__OK)
   {
@@ -156,37 +152,44 @@ int *status          /* global status (given and returned) */
    smf_open_file( ogrp, 1, "UPDATE", SMF__NOCREATE_QUALITY, &data, status );
 
    if(data->ndims != 3 || 
-      (data->dims)[0] != BOLROW ||
-      (data->dims)[1] != BOLCOL)
+      (data->dims)[0] != theta_dims[0] ||
+      (data->dims)[1] != theta_dims[1])
    {
-     printf("structure of data array is wrong!!!\n");
+     if (*status == SAI__OK) {
+       *status = SAI__ERROR;
+       errRep( " ",  "structure of data array is wrong!!!", status);
    } 
    else
    {
+     size_t nbolx = theta_dims[0];
+     size_t nboly = theta_dims[1];
+     size_t nbols = nbolx * nboly;
+
      nwn = (data->dims)[2];
 
      /* retrieve pointer to the input data */
      tstream = (float*)((data->pntr)[0]);
 
      /* allocate memory */
-     spectrum_orig = smf_malloc(nwn, sizeof(float), 0, status);
-     spectrum_corr = smf_malloc(nwn, sizeof(float), 0, status);
-     wn_corr = smf_malloc(nwn, sizeof(double), 0, status);
+     spectrum_orig = smf_malloc(nwn, sizeof(*spectrum_orig), 0, status);
+     spectrum_corr = smf_malloc(nwn, sizeof(*spectrum_corr), 0, status);
+     wn_corr = smf_malloc(nwn, sizeof(*wn_corr), 0, status);
 
-     for(i=0; i<BOLROW; i++)
-       for(j=0; j<BOLCOL; j++)
+     for(i=0; i<nboly; i++)
+       for(j=0; j<nbolx; j++)
        {
+	 int bindex = j + nboly*i;
          for(k=0; k<nwn; k++)
          {
-           index = i + BOLROW*j + BOLROW*BOLCOL*k;
+           index =  bindex + nbols*k;
            *(spectrum_orig + k) = *(tstream+index);
-           wn_corr[k] = k*cos(theta_vals[i][j]);
+           wn_corr[k] = k*cos(theta_vals[bindex]);
          }
          /* frequency shift by cubic spline */
          csi_simplified(spectrum_orig, nwn, wn_corr, nwn, spectrum_corr);
          for(k=0; k<nwn; k++)
          {
-           index = i + BOLROW*j + BOLROW*BOLCOL*k;
+           index = bindex + nbols*k;
            *(tstream+index) = *(spectrum_corr + k);
          }
        }
@@ -197,6 +200,8 @@ int *status          /* global status (given and returned) */
   
    /* close NDF file */
    smf_close_file(&data, status);
+   ndfAnnul( &theta_indf, status );
+
    /* NDF end */
    ndfEnd( status );
 }
