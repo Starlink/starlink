@@ -152,6 +152,9 @@ f     - AST_GETREFPOS: Get reference position in any celestial system
 *        In MakeSpecMapping, extend the 4-SEP-2009 fix to cover other
 *        attributes that define the available rest frames (e.g.
 *        SourceVRF, SourceVel, ObsLat, ObsLon, ObsAlt).
+*     16-SEP-2009 (DSB):
+*        In MakeSpecMapping, retain the original alignment frame attribute 
+*        values if we are restoring the integrity of a FrameSet.
 *class--
 */
 
@@ -2634,33 +2637,59 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
    VerifyAttrs( result, vmess, "StdOfRest", "astMatch", status );
    VerifyAttrs( target, vmess, "StdOfRest", "astMatch", status );
 
-/* When converting from the target Frame to the alignment Frame we want
-   to ignore any differences in the properties that define the available 
-   rest frames (for example, we want to consider all "source"  rest
-   frames to be connected using a UnitMap even if the source rest frames
-   are in motion with respect to each other). So create copy of the 
-   alignment Frame in which the properies defining the avialble rest
-   frames are the same as in the target Frame. */
-   align_target = astCopy( align_frm );
-   astSetEpoch( align_target, astGetEpoch( target ) );
-   astSetRefRA( align_target, astGetRefRA( target ) );
-   astSetRefDec( align_target, astGetRefDec( target ) );
-   astSetSourceVRF( align_target, astGetSourceVRF( target ) );
-   astSetSourceVel( align_target, astGetSourceVel( target ) );
-   astSetObsLat( align_target, astGetObsLat( target ) );
-   astSetObsLon( align_target, astGetObsLon( target ) );
-   astSetObsAlt( align_target, astGetObsAlt( target ) );
+/* There are two different strategies for alignment. I'll use the Source
+   rest frame as an example, although the same argument applies to other
+   rest frames. In the first strategy, all "Source" rest frames are
+   considered equal. That is, if two SpecFrames respresent (for example)
+   frequencies in the source frame, then the SpecFrames are aligned using
+   a UnitMap even if the details of the two source rest frames differ.
+   This is usually what users want to see when (for instance) aligning 
+   plots of two spectra which both represent source frequencies but where
+   the source frames details differ. In the second strategy, "Source"
+   rest frames are aligned using a SpecMap that takes into account any
+   differences in the properties of the source rest frames. This is what
+   should happen when changes are made to the properties of a SpecFrame 
+   within a FrameSet. For instance, if the user changes the SourceVel
+   attribute of the current Frame (assumed here to be a SpecFrame) in a 
+   FrameSet, then the process of restoring the integrity of the FrameSet
+   (see frameset.c for details of integrity restoration) should cause the
+   base->current Mapping in the FrameSet to be modified to reflect the
+   new SourceVel value. 
 
-/* Do the same for the result frame. */
-   align_result = astCopy( align_frm );
-   astSetEpoch( align_result, astGetEpoch( result ) );
-   astSetRefRA( align_result, astGetRefRA( result ) );
-   astSetRefDec( align_result, astGetRefDec( result ) );
-   astSetSourceVRF( align_result, astGetSourceVRF( result ) );
-   astSetSourceVel( align_result, astGetSourceVel( result ) );
-   astSetObsLat( align_result, astGetObsLat( result ) );
-   astSetObsLon( align_result, astGetObsLon( result ) );
-   astSetObsAlt( align_result, astGetObsAlt( result ) );
+   So if the current call to this function is part of the process of 
+   restoring a FrameSet's integrity following changes to the FrameSet's 
+   current Frame, then we want to retain the properties of the supplied 
+   alignment Frame. So we use clones of the supplied alignment Frame. */
+   if( astGetFrameFlags( target ) & AST__INTFLAG ) {
+      align_target = astClone( align_frm );
+      align_result = astClone( align_frm );
+
+/* Buf if we are not restoring the integrity of a FrameSet, we want
+   to ignore any differences in the properties that define the available 
+   rest frames. So create copies of the alignment Frame in which the 
+   properies defining the available rest frames are the same as in the 
+   target and result Frames. */
+   } else {
+      align_target = astCopy( align_frm );
+      astSetEpoch( align_target, astGetEpoch( target ) );
+      astSetRefRA( align_target, astGetRefRA( target ) );
+      astSetRefDec( align_target, astGetRefDec( target ) );
+      astSetSourceVRF( align_target, astGetSourceVRF( target ) );
+      astSetSourceVel( align_target, astGetSourceVel( target ) );
+      astSetObsLat( align_target, astGetObsLat( target ) );
+      astSetObsLon( align_target, astGetObsLon( target ) );
+      astSetObsAlt( align_target, astGetObsAlt( target ) );
+
+      align_result = astCopy( align_frm );
+      astSetEpoch( align_result, astGetEpoch( result ) );
+      astSetRefRA( align_result, astGetRefRA( result ) );
+      astSetRefDec( align_result, astGetRefDec( result ) );
+      astSetSourceVRF( align_result, astGetSourceVRF( result ) );
+      astSetSourceVel( align_result, astGetSourceVel( result ) );
+      astSetObsLat( align_result, astGetObsLat( result ) );
+      astSetObsLon( align_result, astGetObsLon( result ) );
+      astSetObsAlt( align_result, astGetObsAlt( result ) );
+   }
 
 /* The supported spectral coordinate systems fall into two groups;
    "relative", and "absolute". The relative systems define each axis
@@ -7397,12 +7426,4 @@ f     function is invoked with STATUS set to an error value, or if it
 /* Return an ID value for the new SpecFrame. */
    return astMakeId( new );
 }
-
-
-
-
-
-
-
-
 
