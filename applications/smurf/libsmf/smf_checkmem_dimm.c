@@ -150,9 +150,9 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
     /* How many detectors at each time step? */
     switch( instrument ) {
     case INST__SCUBA2:
-      /* Kludgey, but at least we check SMF__COL_INDEX so this will help
+      /* Kludgey, but at least we check SC2STORE__COL_INDEX so this will help
          us catch possible future problems if order is changed */
-      if( SMF__COL_INDEX ) {
+      if( SC2STORE__COL_INDEX ) {
         ncol = 32;
         nrow = 40;
       } else {

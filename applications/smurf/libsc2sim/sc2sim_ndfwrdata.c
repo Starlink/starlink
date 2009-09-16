@@ -697,8 +697,8 @@ void sc2sim_ndfwrdata
   telpar.dut1 = SPD * inx->dut1;
 
   /* Store the timestream data */
-  sc2store_wrtstream ( file_name, subnum, nrec, fitsrec, inx->nbolx,
-                       inx->nboly, numsamples, nflat, flatname, head,
+  sc2store_wrtstream ( file_name, subnum, nrec, fitsrec, inx->colsize,
+                       inx->rowsize, numsamples, nflat, flatname, head,
                        &telpar, dbuf, dksquid, fcal, fpar, inx->obsmode,
                        NULL, 0, jigvert, inx->nvert, jigptr, jigsamples,
                        NULL, status );
@@ -710,9 +710,9 @@ void sc2sim_ndfwrdata
   /* Number of points in 1 frame - placeholder to remind us that it
      may be different for DREAM */
   if ( strncmp( inx->obsmode, "DREAM", 5) == 0 ) {
-    framesize = inx->nbolx * inx->nboly;
+    framesize = inx->colsize * inx->rowsize;
   } else {
-    framesize = inx->nbolx * inx->nboly;
+    framesize = inx->colsize * inx->rowsize;
   }
 
   /* Now we need to play with flat-fielded data */
@@ -791,8 +791,8 @@ void sc2sim_ndfwrdata
 
       /* Set dimensions of output image */
       ndim = 2;
-      dims[0] = inx->nbolx;
-      dims[1] = inx->nboly;
+      dims[SC2STORE__ROW_INDEX] = inx->colsize;
+      dims[SC2STORE__COL_INDEX] = inx->rowsize;
 
       /* Construct WCS FrameSet */
       sc2ast_createwcs( subnum, &state, instap, sinx->telpos, &wcs, status );
@@ -854,15 +854,15 @@ void sc2sim_ndfwrdata
 
       /* Store image */
       smf_get_taskname( NULL, prvname, status );
-      sc2store_putimage ( k, wcs, ndim, dims, inx->nbolx,
-                          inx->nboly, coadd, zero, obsidss, prvname, fitsrec, nrec, status );
+      sc2store_putimage ( k, wcs, ndim, dims, inx->colsize,
+                          inx->rowsize, coadd, zero, obsidss, prvname, fitsrec, nrec, status );
     }
   }
 
   /* Calculate polynomial fits and write out SCANFIT extension */
   poly = smf_malloc( framesize*ncoeff, sizeof( double ), 0, status );
   sc2math_fitsky ( 0, framesize, numsamples, ncoeff, rdata, poly, status );
-  sc2store_putscanfit ( inx->nbolx, inx->nboly, ncoeff, poly, status );
+  sc2store_putscanfit ( inx->colsize, inx->rowsize, ncoeff, poly, status );
 
   /* Free memory allocated for pointers */
   poly = smf_free( poly, status );

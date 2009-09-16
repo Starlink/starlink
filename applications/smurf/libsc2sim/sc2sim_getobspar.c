@@ -385,13 +385,13 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
   if ( !astMapGet0D ( keymap, "MJDAYSTART", &(inx->mjdaystart) ) )
     inx->mjdaystart = 53795.0;
 
-  if ( !astMapGet0I ( keymap, "NBOLX", &itemp ) )
+  if ( !astMapGet0I ( keymap, "COLSIZE", &itemp ) )
     itemp = 40;
-  inx->nbolx = itemp;
+  inx->colsize = itemp;
 
-  if ( !astMapGet0I ( keymap, "NBOLY", &itemp ) )
+  if ( !astMapGet0I ( keymap, "ROWSIZE", &itemp ) )
     itemp= 32;
-  inx->nboly = itemp;
+  inx->rowsize = itemp;
 
   if ( !astMapGet0I ( keymap, "NFOCSTEP", &(inx->nfocstep) ) )
     inx->nfocstep = 7;

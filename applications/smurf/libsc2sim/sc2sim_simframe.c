@@ -281,7 +281,7 @@ void sc2sim_simframe
 
   /* Sample astronomical sky image */
   if( *status == SAI__OK ) {
-    sc2sim_getast_wcs( nbol, xbolo, ybolo, bolo2map, astsim, astnaxes, dbuf,
+    sc2sim_getast_wcs( inx.colsize, inx.rowsize, xbolo, ybolo, bolo2map, astsim, astnaxes, dbuf,
                        status);
   }
 
@@ -303,9 +303,9 @@ void sc2sim_simframe
     skycoord = smf_malloc ( nbol*2, sizeof(*skycoord), 1, status  );
 
     lbnd_in[0] = 1;
-    ubnd_in[0] = BOLROW;
+    ubnd_in[SC2STORE__ROW_INDEX] = inx.colsize;
     lbnd_in[1] = 1;
-    ubnd_in[1] = BOLCOL;
+    ubnd_in[SC2STORE__COL_INDEX] = inx.rowsize;
 
     /* Transform bolo offsets into positions in azel and store in
        skycoord */

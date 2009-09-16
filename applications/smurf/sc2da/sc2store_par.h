@@ -19,4 +19,7 @@
 
 #define SC2STORE__MAXFITS 256 /* Maximum number of FITS records */
 
+#define SC2STORE__COL_INDEX 1    /* Index in data array for columns */
+#define SC2STORE__ROW_INDEX 0    /* Index in data array for rows */
+
 #endif /* SC2STORE_PAR_DEFINED */

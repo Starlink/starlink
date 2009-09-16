@@ -264,13 +264,13 @@ void smurf_calcflat( int *status ) {
     if (*status != SAI__OK) goto CLEANUP;
 
     /* Check row vs column count */
-    if ( ((darks->sdata)[0]->dims)[SMF__COL_INDEX] != (size_t)ncols ||
-         ((darks->sdata)[0]->dims)[SMF__ROW_INDEX] != (size_t)nrows ) {
+    if ( ((darks->sdata)[0]->dims)[SC2STORE__COL_INDEX] != (size_t)ncols ||
+         ((darks->sdata)[0]->dims)[SC2STORE__ROW_INDEX] != (size_t)nrows ) {
       *status = SAI__ERROR;
       msgSeti( "RC", ncols );
       msgSeti( "RR", nrows );
-      msgSeti( "DC", ((darks->sdata)[0]->dims)[SMF__COL_INDEX]);
-      msgSeti( "DR", ((darks->sdata)[0]->dims)[SMF__ROW_INDEX]);
+      msgSeti( "DC", ((darks->sdata)[0]->dims)[SC2STORE__COL_INDEX]);
+      msgSeti( "DR", ((darks->sdata)[0]->dims)[SC2STORE__ROW_INDEX]);
       errRep( " ", "Dimensions of subarray from resistor file (^RC x ^RR)"
               " do not match those of data file (^DC x ^DR)", status );
       goto CLEANUP;
@@ -398,8 +398,8 @@ void smurf_calcflat( int *status ) {
         void *pntr[] = {NULL, NULL, NULL};
         dim_t mydims[2];
         errAnnul( status );
-        mydims[SMF__ROW_INDEX] = nrows;
-        mydims[SMF__COL_INDEX] = ncols;
+        mydims[SC2STORE__ROW_INDEX] = nrows;
+        mydims[SC2STORE__COL_INDEX] = ncols;
         
         pntr[0] = smf_malloc( nbols, sizeof(double), 0, status );
         pntr[1] = smf_malloc( nbols, sizeof(double), 0, status );

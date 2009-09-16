@@ -57,6 +57,8 @@ static AstFrameSet *timeWcs( int subnum, int ntime,const SC2STORETelpar* telpar,
                              const double times[], int * status );
 static double sc2store_tzoffset(void);
 static void sc2store_initialise ( int *status );
+static void sc2store_fillbounds( size_t colsize, size_t rowsize, size_t dim3,
+                                 int lbnd[], int ubnd[], int * status );
 
 /* Private globals */
 
@@ -271,14 +273,7 @@ int *status              /* global status (given and returned) */
    ndfPlace ( NULL, filename, &place, status );
 
 /* Create an NDF inside the container */
-
-   ubnd[0] = colsize;
-   lbnd[0] = 1;
-   ubnd[1] = rowsize;
-   lbnd[1] = 1;
-   ubnd[2] = nframes;
-   lbnd[2] = 1;
-
+   sc2store_fillbounds( colsize, rowsize, nframes, lbnd, ubnd, status );
    ndfNew ( "_WORD", 3, lbnd, ubnd, &place, &sc2store_indf, status );
    ndfHcre ( sc2store_indf, status );
 #ifdef SC2STORE_WRITE_HISTORY
@@ -318,8 +313,8 @@ int *status              /* global status (given and returned) */
 
 /* Dark SQUID values for each frame */
 
-   ubnd[0] = rowsize;
-   lbnd[0] = 1;
+   ubnd[SC2STORE__COL_INDEX] = rowsize;
+   lbnd[SC2STORE__COL_INDEX] = 1;
    ubnd[1] = nframes;
    lbnd[1] = 1;
 
@@ -331,10 +326,7 @@ int *status              /* global status (given and returned) */
 
 /* Frame subtracted from each data frame before compression */
 
-   ubnd[0] = colsize;
-   lbnd[0] = 1;
-   ubnd[1] = rowsize;
-   lbnd[1] = 1;
+   sc2store_fillbounds( colsize, rowsize, 0, lbnd, ubnd, status );
 
    ndfPlace ( sc2store_scuba2loc, "STACKZERO", &place, status );
    ndfNew ( "_INTEGER", 2, lbnd, ubnd, &place, &sc2store_sindf, status );
@@ -344,12 +336,7 @@ int *status              /* global status (given and returned) */
 
 /* NDF containing flat-field calibration */
 
-   ubnd[0] = colsize;
-   lbnd[0] = 1;
-   ubnd[1] = rowsize;
-   lbnd[1] = 1;
-   ubnd[2] = nflat;
-   lbnd[2] = 1;
+   sc2store_fillbounds( colsize, rowsize, nflat, lbnd, ubnd, status );
 
    ndfPlace ( sc2store_scuba2loc, "FLATCAL", &place, status );
    ndfNew ( "_DOUBLE", 3, lbnd, ubnd, &place, &sc2store_findf, status );
@@ -1625,8 +1612,8 @@ int *status              /* global status (given and returned) */
 
    ndimx = 3;
    ndfDim ( sc2store_indf, ndimx, dim, &ndim, status );
-   *colsize = dim[0];
-   *rowsize = dim[1];
+   *colsize = dim[SC2STORE__ROW_INDEX];
+   *rowsize = dim[SC2STORE__COL_INDEX];
    *nframes = dim[2];
 
 /* Find extension for holding fixed-size data (subtracted constant and
@@ -1645,8 +1632,8 @@ int frame,               /* frame index (given) */
 const AstFrameSet *fset, /* World coordinate transformations (given) */
 int ndim,                /* dimensionality of image (given) */
 const int dims[],        /* dimensions of image (given) */
-size_t nbolx,            /* number of bolometers in X (given) */
-size_t nboly,            /* number of bolometers in Y (given) */
+size_t colsize,          /* number of pixels in a column (given) */
+size_t rowsize,            /* number of pixels in a row (given) */
 const double *image,     /* constructed image (given) */
 const double *zero,      /* bolometer zero values (given) */
 const char * obsidss,    /* OBSIDSS string for provenance (given) */
@@ -1744,10 +1731,7 @@ int *status              /* global status (given and returned) */
 
       if ( *status == SAI__OK )
       {
-         for ( j=0; j<ntot; j++ )
-         {
-            imptr[j] = image[j];
-         }
+        memcpy( imptr, image, ntot*sizeof(*image) );
       }
 
 /* Sort out provenance. This is by definition a root of the provenance tree */
@@ -1767,10 +1751,7 @@ int *status              /* global status (given and returned) */
 
 /* Create the array for bolometer zeros */
 
-      ubnd[0] = nbolx;
-      lbnd[0] = 1;
-      ubnd[1] = nboly;
-      lbnd[1] = 1;
+      sc2store_fillbounds( colsize, rowsize, 0, lbnd, ubnd, status );
       ndfNew ( "_DOUBLE", 2, lbnd, ubnd, &place, &bsc2store_zindf, status );
 
 /* Map the data array */
@@ -1782,10 +1763,7 @@ int *status              /* global status (given and returned) */
 
       if ( *status == SAI__OK )
       {
-         for ( j=0; j<nbolx*nboly; j++ )
-         {
-            bzptr[j] = zero[j];
-         }
+        memcpy( bzptr, zero, colsize*rowsize*sizeof(*zero));
       }
 
 /* Store the FITS headers */
@@ -1902,8 +1880,8 @@ int *status           /* global status (given and returned) */
 
 void sc2store_putscanfit
 (
-size_t nbolx,         /* number of bolometers in X (given) */
-size_t nboly,         /* number of bolometers in Y (given) */
+size_t colsize,       /* number of bolometers in a column (given) */
+size_t rowsize,       /* number of bolometers in a row (given) */
 size_t ncoeff,        /* number of coefficients (given) */
 const double *coptr,  /* coefficients (given) */
 int *status           /* global status (given and returned) */
@@ -1938,13 +1916,7 @@ int *status           /* global status (given and returned) */
 
    if ( *status == SAI__OK )
    {
-      ubnd[0] = nbolx;
-      lbnd[0] = 1;
-      ubnd[1] = nboly;
-      lbnd[1] = 1;
-      ubnd[2] = ncoeff;
-      lbnd[2] = 1;
-
+      sc2store_fillbounds( colsize, rowsize, ncoeff, lbnd, ubnd, status );
       ndfPlace ( sc2store_scu2redloc, "SCANFIT", &place, status );
       ndfNew ( "_DOUBLE", 3, lbnd, ubnd, &place, &uindf, status );
 
@@ -1957,10 +1929,7 @@ int *status           /* global status (given and returned) */
 
       if ( *status == SAI__OK )
       {
-         for ( j=0; j<nbolx*nboly*ncoeff; j++ )
-         {
-            imptr[j] = coptr[j];
-         }
+        memcpy( imptr, coptr, colsize*rowsize*ncoeff*sizeof(*coptr));
       }
 
 /* Unmap the data array */
@@ -3104,12 +3073,7 @@ int *status              /* global status (given and returned) */
 
 /* Create an NDF containing flat-field calibration */
 
-   ubnd[0] = colsize;
-   lbnd[0] = 1;
-   ubnd[1] = rowsize;
-   lbnd[1] = 1;
-   ubnd[2] = nflat;
-   lbnd[2] = 1;
+   sc2store_fillbounds( colsize, rowsize, nflat, lbnd, ubnd, status );
 
    ndfPlace ( sc2store_scuba2loc, "FLATCAL", &place, status );
    ndfNew ( "_DOUBLE", 3, lbnd, ubnd, &place, &sc2store_findf, status );
@@ -3405,12 +3369,7 @@ int *status              /* global status (given and returned) */
 
 /* Create an NDF inside the container */
 
-   ubnd[0] = colsize;
-   lbnd[0] = 1;
-   ubnd[1] = rowsize;
-   lbnd[1] = 1;
-   ubnd[2] = nframes;
-   lbnd[2] = 1;
+   sc2store_fillbounds( colsize, rowsize, nframes, lbnd, ubnd, status );
 
    if ( sc2store_compflag == 1 )
    {
@@ -3452,10 +3411,7 @@ int *status              /* global status (given and returned) */
 
 /* Frame subtracted from each data frame before compression */
 
-      ubnd[0] = colsize;
-      lbnd[0] = 1;
-      ubnd[1] = rowsize;
-      lbnd[1] = 1;
+      sc2store_fillbounds( colsize, rowsize, 0, lbnd, ubnd, status );
 
       ndfPlace ( sc2store_scuba2loc, "STACKZERO", &place, status );
       ndfNew ( "_INTEGER", 2, lbnd, ubnd, &place, &sc2store_sindf, status );
@@ -3963,4 +3919,19 @@ static void sc2store_initialise ( int * status ) {
       sc2store_initialised = 1;
    }
 
+}
+
+/* Fill NDF bounds array with colsize and rowsize dimensionality:
+   set dim3 to 0 if only have two dimensions */
+static void sc2store_fillbounds( size_t colsize, size_t rowsize, size_t dim3,
+                                 int lbnd[], int ubnd[], int * status ) {
+  if (*status != SAI__OK) return;
+  ubnd[SC2STORE__ROW_INDEX] = colsize;
+  lbnd[SC2STORE__ROW_INDEX] = 1;
+  ubnd[SC2STORE__COL_INDEX] = rowsize;
+  lbnd[SC2STORE__COL_INDEX] = 1;
+  if (dim3 > 0) {
+    ubnd[2] = dim3;
+    lbnd[2] = 1;
+  }
 }

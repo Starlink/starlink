@@ -110,8 +110,8 @@ void sc2sim_instap_calc
   if ( *status != SAI__OK ) return;
 
   /* Calculate midpoint of subarray - include offset from boresight */
-  halfx = 0.5 * (inx->nbolx + 4) * inx->bol_distx;
-  halfy = 0.5 * (inx->nboly + 4) * inx->bol_disty;
+  halfx = 0.5 * (inx->colsize + 4) * inx->bol_distx;
+  halfy = 0.5 * (inx->rowsize + 4) * inx->bol_disty;
 
   if  ( strncmp( inx->instap, " ", 1 ) != 0 ) {
     /* Check for valid subarray */

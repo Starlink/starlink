@@ -188,7 +188,7 @@ void sc2sim_instrinit( struct sc2sim_obs_struct *inx,
 
   /* Get the bolometer information */
   if( *status == SAI__OK ) {
-    nbol = inx->nbolx * inx->nboly;
+    nbol = inx->colsize * inx->rowsize;
   }
 
   decay = 5.0;
@@ -237,7 +237,7 @@ void sc2sim_instrinit( struct sc2sim_obs_struct *inx,
      calculate xbc and ybc on-the-fly as the telescope points at different
      regions of the sky. */
 
-  smf_get_gridcoords( *xbolo, *ybolo, BOLROW, BOLCOL, status );
+  smf_get_gridcoords( *xbolo, *ybolo, inx->colsize, inx->rowsize, status );
 
   /* Check to make sure that all the relevant elements of JCMTState are set! */
   state.tcs_az_ac1 = 0;

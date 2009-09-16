@@ -219,14 +219,12 @@
 *       repeat.
 *     mjdaystart (double) : 53795.0
 *       Modified julian date at start of observation.
-*     nbolx (integer) : 40
-*       Number of bolometers in x direction.  This
-*       is the number of bolometers in a "row",
-*       and this is the total number of "columns".
-*     nboly (integer) : 32
-*       Number of bolometers in x direction.  This
-*       is the number of bolometers in a "column",
+*     colsize (integer) : 40
+*       This is the number of bolometers in a "column",
 *       and this is the total number of "rows".
+*     rowsize (integer) : 32
+*       This is the number of bolometers in a "row",
+*       and this is the total number of "columns".
 *     numsamples (integer) : 128
 *       For the Stare obsmode, this is the number of
 *       samples.
@@ -671,13 +669,13 @@ void smurf_sc2sim( int *status ) {
      each time by using the given seed. */
   srand ( rseed );
 
-  nbol = inx.nbolx * inx.nboly;
+  nbol = inx.colsize * inx.rowsize;
   /* Bad bolometer mask */
   bolos = smf_malloc( (size_t)(nbol), sizeof(int), 1, status );
   lbnd[0] = 1;
   lbnd[1] = 1;
-  ubnd[0] = inx.nbolx;
-  ubnd[1] = inx.nboly;
+  ubnd[SC2STORE__COL_INDEX] = inx.rowsize;
+  ubnd[SC2STORE__ROW_INDEX] = inx.colsize;
   parGet0c("BADBOL", ard, LEN__METHOD, status);
   if ( *status == PAR__NULL ) {
     errAnnul( status );

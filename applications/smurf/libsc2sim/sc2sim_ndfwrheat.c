@@ -183,10 +183,10 @@ void sc2sim_ndfwrheat
   } else {
     astSetFitsI ( fitschan, "NFLAT", nflat, "Number of polynomial coefficients", 0 );
   }
-  astSetFitsI ( fitschan, "NBOLX", inx->nbolx,
-                "Number of bolometers in X direction", 0 );
-  astSetFitsI ( fitschan, "NBOLY", inx->nboly,
-                "Number of bolometers in Y direction", 0 );
+  astSetFitsI ( fitschan, "COLSIZE", inx->colsize,
+                "Number of bolometers in a column", 0 );
+  astSetFitsI ( fitschan, "ROWSIZE", inx->rowsize,
+                "Number of bolometers in a row", 0 );
   astSetFitsS ( fitschan, "SUBARRAY", sinx->subname, "Subarray name", 0 );
   astSetFitsI ( fitschan, "NUMSAMP", numsamples, "Number of samples", 0 );
   astSetFitsS ( fitschan, "FILTER", filter, "Filter used", 0 );
@@ -209,8 +209,8 @@ void sc2sim_ndfwrheat
   }
 
   /* Store the timestream data */
-  sc2store_wrtstream ( file_name, subnum, nrec, fitsrec, inx->nbolx,
-                       inx->nboly, numsamples, nflat, flatname, head, NULL,
+  sc2store_wrtstream ( file_name, subnum, nrec, fitsrec, inx->colsize,
+                       inx->rowsize, numsamples, nflat, flatname, head, NULL,
                        dbuf, dksquid, fcal, fpar, inx->obsmode,
                        NULL, 0, jigvert, inx->nvert, NULL, 0,
                        NULL, status );

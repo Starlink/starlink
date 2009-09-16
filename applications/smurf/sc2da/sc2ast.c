@@ -10,6 +10,12 @@
 
 #include "sc2ast.h"
 
+/* True if the data array is configured (COL, ROW) [the new way]
+   Undefined or false if (ROW,COL) order.
+   Should match the definition of ROW and COL index from sc2store.c
+   Remove COLROW once we have finished testing.
+ */
+/* #define COLROW 1 */
 
 static char errmess[132];              /* For DRAMA error messages */
 
@@ -226,7 +232,10 @@ int *status             /* global status (given and returned) */
    AstShiftMap *jigglemap;
    sc2astCache *result;
    int isub;
-
+#if COLROW
+   AstPermMap *permmap;
+   int perm[ 2 ];
+#endif
    double r;                       /* subarray angle */
    double rot[4];                  /* rotation matrix */
    const double rotangle[8] =
@@ -409,13 +418,28 @@ int *status             /* global status (given and returned) */
       astAddFrame( cache->frameset[ subnum ], AST__BASE, 
                    astUnitMap( 2, " " ), astFrame( 2, " " ) );
 
+/* Start off with a PermMap that swaps the grid axes from the new
+   axes ordering to the old axis ordering (AST uses 1-based axis
+   numbering). This covers the recent (ROW,COL) -> (COL,ROW) change. */
+#if COLROW
+     perm[ 0 ] = 2;
+     perm[ 1 ] = 1;
+     permmap = astPermMap( 2, perm, 2, perm, NULL, " " );
+     cache->map[ subnum ] = (AstMapping *) permmap;
+#endif
+
 /* The GRID domain locates the [0][0] pixel at coordinates (1,1). Shift
    these so that the [0][0] pixel is at the origin of a coordinate system */
 
       zshift[0] = -1.0;
       zshift[1] = -1.0;
       zshiftmap = astShiftMap ( 2, zshift, " " );
+#if COLROW
+      cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ],
+                                                       zshiftmap, 1, " " );
+#else
       cache->map[ subnum ] = (AstMapping *) zshiftmap;
+#endif
 
 /* The mm coords now have to be rotated through an angle approximating
    a multiple of 90 degrees */

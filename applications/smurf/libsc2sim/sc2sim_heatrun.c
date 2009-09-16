@@ -209,7 +209,7 @@ void sc2sim_heatrun ( struct sc2sim_obs_struct *inx,
   heatptr = smf_malloc ( numsamples, sizeof(*heatptr), 1, status );
   dbuf = smf_malloc ( numsamples*nbol, sizeof(*dbuf), 1, status );
   digits = smf_malloc ( numsamples*nbol, sizeof(*digits), 1, status );
-  dksquid = smf_malloc ( numsamples*inx->nboly, sizeof(*dksquid), 1, status );
+  dksquid = smf_malloc ( numsamples*inx->rowsize, sizeof(*dksquid), 1, status );
   head = smf_malloc ( numsamples, sizeof(*head), 1, status );
 
   /* Generate the list of heater settings */

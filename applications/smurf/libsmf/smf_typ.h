@@ -347,19 +347,6 @@ static const size_t SMF__BADIDX = (size_t)-1;
 #define SMF__MAP_VAR 8
 #define SMF__MAP_QUAL 16
 
-
-/* This constant defines the row and column index number for SMURF.
-   If we have to support differing definitions we need to move these
-   values into the smfData struct and set them correctly in smf_open_file
-
-   Note that "colsize" refers to the number of rows and "rowsize"
-   refers to the number of columns.
-*/
-
-#define SMF__ROW_INDEX 0
-#define SMF__COL_INDEX 1
-
-
 /* Define a structure used to hold information cached by smf_create_lutwcs. */
 typedef struct smfCreateLutwcsCache { 
    AstMapping *map;

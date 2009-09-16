@@ -120,15 +120,15 @@ void smf_get_dims( const smfData *data, dim_t *nrows, dim_t *ncols,
 
    /* Calculate Dimensions */
    if( data->isTordered ) {
-     nr = (data->dims)[SMF__ROW_INDEX];
-     nc = (data->dims)[SMF__COL_INDEX];
+     nr = (data->dims)[SC2STORE__ROW_INDEX];
+     nc = (data->dims)[SC2STORE__COL_INDEX];
      nb = (data->dims)[0]*(data->dims)[1];
      nt = (data->dims)[2];
      bs = 1;
      ts = nb;
    } else {
-     nr = (data->dims)[SMF__ROW_INDEX+1];
-     nc = (data->dims)[SMF__COL_INDEX+1];
+     nr = (data->dims)[SC2STORE__ROW_INDEX+1];
+     nc = (data->dims)[SC2STORE__COL_INDEX+1];
      nt = (data->dims)[0];
      nb = (data->dims)[1]*(data->dims)[2];
      bs=nt;

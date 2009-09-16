@@ -811,8 +811,8 @@ void smurf_impaztec( int *status ) {
   astSetFitsF ( fitschan, "RA", rad, "Right Ascension of observation", 0 );
   decd = dec * AST__DR2D;
   astSetFitsF ( fitschan, "DEC", decd, "Declination of observation", 0 );
-  astSetFitsI ( fitschan, "NBOLX", ncol, "number of bolometers in X direction", 0 );
-  astSetFitsI ( fitschan, "NBOLY", nrow, "number of bolometers in Y direction", 0 );
+  astSetFitsI ( fitschan, "ROWSIZE", ncol, "number of bolometers in row", 0 );
+  astSetFitsI ( fitschan, "COLSIZE", nrow, "number of bolometers in column", 0 );
   astSetFitsF ( fitschan, "STEPTIME", steptime, "sample interval in msec", 0 );
   astSetFitsS ( fitschan, "SUBARRAY", "AZTEC", "subarray name", 0 );
   astSetFitsI ( fitschan, "NUMSAMP", numsamples, "number of samples", 0 );

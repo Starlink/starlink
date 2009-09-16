@@ -170,8 +170,6 @@ void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim,
   astBegin;
 
   /* Old beginning */
-  nbolx = (data->dims)[0];
-  nboly = (data->dims)[1];
 
   /* Get structure for nth constructed image */
   strnum = cycle + 1;
@@ -193,9 +191,7 @@ void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim,
 
   /* Copy image array */
   if ( *status == SAI__OK ) {
-    for ( j=0; j<ntot; j++ ) {
-      imptr[j] = image[j];
-    }
+    memcpy( imptr, image, ntot*sizeof(*imptr));
   }
 
   /* Derive WCS */
@@ -225,9 +221,9 @@ void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim,
   ndfPlace ( bz_imloc, "ZERO", &place, status );
 
   /* Create the array for bolometer zeros */
-  ubnd[0] = nbolx;
+  ubnd[0] = dims[0];
   lbnd[0] = 1;
-  ubnd[1] = nboly;
+  ubnd[1] = dims[1];
   lbnd[1] = 1;
   ndfNew ( "_DOUBLE", 2, lbnd, ubnd, &place, &bzindf, status );
   ndfHcre ( bzindf, status );
@@ -238,9 +234,7 @@ void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim,
 
   /* Copy image array */
   if ( *status == SAI__OK ) {
-    for ( j=0; j<nbolx*nboly; j++ ) {
-      bzptr[j] = zero[j];
-    }
+    memcpy( bzptr, zero, dims[0]*dims[1]*sizeof(*zero));
   }
 
   /* Store the FITS headers */

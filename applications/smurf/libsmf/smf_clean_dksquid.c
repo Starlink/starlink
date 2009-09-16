@@ -254,7 +254,7 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
     for( j=0; (!nofit) && (*status==SAI__OK) && (j<nrow); j++ ) {
 
       /* Calculate bolometer index from row/col counters */
-      if( SMF__COL_INDEX ) {
+      if( SC2STORE__COL_INDEX ) {
         b = i*nrow + j;
       } else {
         b = i + j*ncol;

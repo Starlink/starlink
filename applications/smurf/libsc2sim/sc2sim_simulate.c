@@ -867,7 +867,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
   /* Report simulation properties if requested */
   if ( simstats ) {
-    sc2sim_simstats( count, inx->steptime, maxwrite, nbol, narray, inx->nboly,
+    sc2sim_simstats( count, inx->steptime, maxwrite, nbol, narray, inx->rowsize,
                      status );
     goto CLEANUP;
   }
@@ -878,7 +878,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   /* All four subarrays need to have their data stored simultaneously */
   dbuf = smf_malloc ( maxwrite*nbol*narray, sizeof(*dbuf), 1, status );
   digits = smf_malloc ( maxwrite*nbol, sizeof(*digits), 1, status );
-  dksquid = smf_malloc ( maxwrite*inx->nboly, sizeof(*dksquid), 1, status );
+  dksquid = smf_malloc ( maxwrite*inx->rowsize, sizeof(*dksquid), 1, status );
 
   /* Frames will be "chunked" into blocks of size 'maxwrite' */
   mjuldate = smf_malloc ( maxwrite, sizeof(*mjuldate), 1, status );

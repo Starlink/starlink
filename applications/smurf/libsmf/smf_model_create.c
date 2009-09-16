@@ -527,12 +527,12 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
             /* Store column dark squid followed by gain+off+corr each row */
             if( isTordered ) { /* T is 3rd axis if time-ordered */
               head.data.dims[0] = (idata->dims)[2] + 
-                (idata->dims)[SMF__ROW_INDEX]*3;
-              head.data.dims[1] = (idata->dims)[SMF__COL_INDEX];
+                (idata->dims)[SC2STORE__ROW_INDEX]*3;
+              head.data.dims[1] = (idata->dims)[SC2STORE__COL_INDEX];
             } else {           /* T is 1st axis if bolo-ordered */
               head.data.dims[0] = (idata->dims)[0] + 
-                (idata->dims)[1+SMF__ROW_INDEX]*3;
-              head.data.dims[1] = (idata->dims)[1+SMF__COL_INDEX];
+                (idata->dims)[1+SC2STORE__ROW_INDEX]*3;
+              head.data.dims[1] = (idata->dims)[1+SC2STORE__COL_INDEX];
             }
             break;
 
@@ -542,13 +542,13 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
 
             /* Note that we're using the time axis to store the coefficients */
             if( isTordered ) {
-              head.data.dims[SMF__ROW_INDEX] = (idata->dims)[SMF__ROW_INDEX];
-              head.data.dims[SMF__COL_INDEX] = (idata->dims)[SMF__COL_INDEX];
+              head.data.dims[SC2STORE__ROW_INDEX] = (idata->dims)[SC2STORE__ROW_INDEX];
+              head.data.dims[SC2STORE__COL_INDEX] = (idata->dims)[SC2STORE__COL_INDEX];
               head.data.dims[2] = 3; 
             } else {
               head.data.dims[0] = 3;
-              head.data.dims[1+SMF__ROW_INDEX]=(idata->dims)[1+SMF__ROW_INDEX];
-              head.data.dims[1+SMF__COL_INDEX]=(idata->dims)[1+SMF__COL_INDEX];
+              head.data.dims[1+SC2STORE__ROW_INDEX]=(idata->dims)[1+SC2STORE__ROW_INDEX];
+              head.data.dims[1+SC2STORE__COL_INDEX]=(idata->dims)[1+SC2STORE__COL_INDEX];
             }
             break;
 

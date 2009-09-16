@@ -191,8 +191,8 @@ struct sc2sim_obs_struct      /* parameters read from obs input file */
 				    (units: number of detectors) */
   double mspat_y[SC2SIM__MXMSTP]; /* microstep pattern offsets in y
 				    (units: number of decectors) */
-  size_t nbolx;                  /* number of bolometers in X */
-  size_t nboly;                  /* number of bolometers in Y */
+  size_t colsize;             /* number of bolometers in column */
+  size_t rowsize;             /* number of bolometers in row */
   int nfocstep;               /* Number of focus positions */
   int ngrid;                  /* Nr of reconstruction points for single
 				 bolometer */

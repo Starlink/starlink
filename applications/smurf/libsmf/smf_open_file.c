@@ -782,19 +782,19 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
 
         /* Verify that ndfdims matches row, col, nframes */
         /* Should probably inform user of the filename too */
-        if (ndfdims[0] != (int)colsize) {
-          msgSeti( "NC", colsize);
+        if (ndfdims[SC2STORE__ROW_INDEX] != (int)colsize) {
+          msgSeti( "NR", colsize);
           msgSeti( "DIMS", ndfdims[0]);
           *status = SAI__ERROR;
-          errRep( "", FUNC_NAME ": Number of input columns not equal to the "
-                  "number of output columns (^NC != ^DIMS)",status);
+          errRep( "", FUNC_NAME ": Number of input rows not equal to the "
+                  "number of output rows (^NR != ^DIMS)",status);
         }
-        if (ndfdims[1] != (int)rowsize) {
-          msgSeti( "NR", rowsize);
+        if (ndfdims[SC2STORE__COL_INDEX] != (int)rowsize) {
+          msgSeti( "NC", rowsize);
           msgSeti( "DIMS", ndfdims[1]);
           *status = SAI__ERROR;
-          errRep( "", FUNC_NAME ":Number of input rows not equal to the "
-                  "number of output rows (^NR != ^DIMS)",status);
+          errRep( "", FUNC_NAME ":Number of input columns not equal to the "
+                  "number of output columns (^NR != ^DIMS)",status);
         }
         if (ndfdims[2] != (int)nframes) {
           msgSeti( "NF", nframes);

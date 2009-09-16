@@ -114,7 +114,7 @@ smf_deepcopy_smfDA( const smfData *old, int * status ) {
 
   /* Need the number of bolometers, columns and time slices */
   nbol = (old->dims)[0] * (old->dims)[1];
-  ncol = (old->dims)[SMF__COL_INDEX];
+  ncol = (old->dims)[SC2STORE__COL_INDEX];
   ntslice = (old->dims)[2];
 
   /* Allocate space for and copy contents of pointers */

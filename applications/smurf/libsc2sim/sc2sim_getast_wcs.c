@@ -13,22 +13,24 @@
  *     Subroutine
 
  *  Invocation:
- *     sc2sim_getast_wcs ( int nboll, double *xbolo, double *ybolo,
- *                         AstCmpMap *bolo2map, double *astsim, int astnaxes[2],
- *                         double *dbuf, int *status )
+ *     sc2sim_getast_wcs ( size_t colsize, size_t rowsize, const double *xbolo,
+ *                         const double *ybolo, AstCmpMap *bolo2map, const double *astsim,
+ *                         const int astnaxes[2], double *dbuf, int *status )
 
  *  Arguments:
- *     nboll = int (Given)
- *        Total number of bolometers
- *     xbolo = double* (Given)
+ *     colsize = int (Given)
+ *        Number of bolometers in a column.
+ *     rowsize = int (Given)
+ *        Number of bolometers in a row
+ *     xbolo = const double* (Given)
  *        X-bolometer coordinates for array
- *     ybolo = double* (Given)
+ *     ybolo = const double* (Given)
  *        Y-bolometer coordinates for array
  *     bolo2map = AstCmpMap* (Given)
  *        Mapping bolo->sky image coordinates
- *     astsim = double* (Given)
+ *     astsim = const double* (Given)
  *        Astronomical image
- *     astnaxes = int[] (Given)
+ *     astnaxes = const int[] (Given)
  *        Dimensions of simulated image
  *     dbuf = double* (Returned)
  *        Pointer to bolo output
@@ -94,12 +96,13 @@
 
 void sc2sim_getast_wcs
 (
- int nboll,                   /* total number of bolometers (given) */
- double *xbolo,               /* x-bolometer coordinates for array (given) */
- double *ybolo,               /* y-bolometer coordinates for array (given) */
+ size_t colsize,              /* number of bolometers in column (given) */
+ size_t rowsize,              /* number of bolometers in row (given) */
+ const double *xbolo,         /* x-bolometer coordinates for array (given) */
+ const double *ybolo,         /* y-bolometer coordinates for array (given) */
  AstCmpMap *bolo2map,         /* mapping bolo->sky image coordinates (given ) */
- double *astsim,              /* astronomical image (given) */
- int astnaxes[2],             /* dimensions of simulated image (given) */
+ const double *astsim,        /* astronomical image (given) */
+ const int astnaxes[2],       /* dimensions of simulated image (given) */
  double *dbuf,                /* pointer to bolo output (returned) */
  int *status                  /* global status (given and returned) */
  )
@@ -112,6 +115,7 @@ void sc2sim_getast_wcs
   double *skycoord;         /* x- and y- sky map pixel coordinates */
   int lbnd_in[2];           /* Pixel bounds for astRebin */
   int ubnd_in[2];
+  size_t nboll;
 
   /* Check status */
   if ( !StatusOkP(status) ) return;
@@ -120,12 +124,13 @@ void sc2sim_getast_wcs
 
   /* Allocate space for arrays */
 
+  nboll = colsize * rowsize;
   skycoord = smf_malloc( nboll*2, sizeof(*skycoord), 1, status );
 
   lbnd_in[0] = 1;
-  ubnd_in[0] = BOLROW;
+  ubnd_in[SC2STORE__ROW_INDEX] = colsize;
   lbnd_in[1] = 1;
-  ubnd_in[1] = BOLCOL;
+  ubnd_in[SC2STORE__COL_INDEX] = rowsize;
 
   /* Transform bolo offsets into positions on the input sky image */
 

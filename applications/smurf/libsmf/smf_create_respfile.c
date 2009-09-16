@@ -92,8 +92,8 @@ void smf_create_respfile( const Grp * rgrp, size_t index,
   if (*status != SAI__OK) return;
 
   /* create the file for WRITE access */
-  ubnd[SMF__ROW_INDEX] = (refdata->dims)[SMF__ROW_INDEX] - lbnd[SMF__ROW_INDEX] + 1;
-  ubnd[SMF__COL_INDEX] = (refdata->dims)[SMF__COL_INDEX] - lbnd[SMF__COL_INDEX] + 1;
+  ubnd[SC2STORE__ROW_INDEX] = (refdata->dims)[SC2STORE__ROW_INDEX] - lbnd[SC2STORE__ROW_INDEX] + 1;
+  ubnd[SC2STORE__COL_INDEX] = (refdata->dims)[SC2STORE__COL_INDEX] - lbnd[SC2STORE__COL_INDEX] + 1;
   smf_open_newfile( rgrp, index, SMF__DOUBLE, 2, lbnd, ubnd,
                     SMF__MAP_VAR, respmap, status );
 

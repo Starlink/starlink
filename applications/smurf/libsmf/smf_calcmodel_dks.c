@@ -192,7 +192,7 @@ void smf_calcmodel_dks( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         for( j=0; (*status==SAI__OK)&&(j<nrow); j++ ) {
 
           /* Index in data array to start of the bolometer */
-          if( SMF__COL_INDEX ) {
+          if( SC2STORE__COL_INDEX ) {
             index = i*nrow + j;
           } else {
             index = i + j*ncol;

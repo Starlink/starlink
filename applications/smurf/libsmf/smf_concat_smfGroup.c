@@ -490,15 +490,15 @@ void smf_concat_smfGroup( smfWorkForce *wf, smfGroup *igrp,
 		
                 /* Allocate space in the smfData for DATA/VARAIANCE/QUALITY */
                 if( isTordered ) {
-                 data->dims[SMF__COL_INDEX] = refncol; 
-                 data->dims[SMF__ROW_INDEX] = refnrow;
+                 data->dims[SC2STORE__COL_INDEX] = refncol;
+                 data->dims[SC2STORE__ROW_INDEX] = refnrow;
                  data->dims[2] = tlen;
-                 ncol = data->dims[SMF__COL_INDEX];
+                 ncol = data->dims[SC2STORE__COL_INDEX];
                 } else {
                   data->dims[0] = tlen;
-                  data->dims[SMF__ROW_INDEX+1] = refnrow;
-                  data->dims[SMF__COL_INDEX+1] = refncol;
-                  ncol = data->dims[1+SMF__COL_INDEX];
+                  data->dims[SC2STORE__ROW_INDEX+1] = refnrow;
+                  data->dims[SC2STORE__COL_INDEX+1] = refncol;
+                  ncol = data->dims[1+SC2STORE__COL_INDEX];
                 }
                 data->ndims = 3;
 		

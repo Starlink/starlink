@@ -135,8 +135,6 @@
 #define PIBY2 (AST__DPI/2.0)           /* Math constant */
 #define DIAMETER 15.0                  /* Diameter JCMT in metres */
 #define MM2SEC 5.144                   /* plate scale at Nasmyth */
-#define BOLCOL 32                      /* number of columns in a subarray */
-#define BOLROW 40                      /* number of rows in a subarray */
 
 /* Given a value in Jy multiply by this constant, and the bandwidth in
    GHz (35 for 850um) to calculate pW */
@@ -247,12 +245,13 @@ double data[]      /* complex signal transformed in-place - even indices
 
 void sc2sim_getast_wcs 
 ( 
-int nboll,                   /* total number of bolometers (given) */
-double *xbolo,               /* x-bolometer coordinates for array (given) */
-double *ybolo,               /* y-bolometer coordinates for array (given) */
+size_t colsize,              /* number of bolometers in column (given) */
+size_t rowsize,              /* number of bolometers in row (given) */
+const double *xbolo,         /* x-bolometer coordinates for array (given) */
+const double *ybolo,         /* y-bolometer coordinates for array (given) */
 AstCmpMap *bolo2map,         /* mapping bolo->sky image coordinates (given ) */
-double *astsim,              /* astronomical image (given) */
-int astnaxes[2],             /* dimensions of simulated image (given) */
+const double *astsim,        /* astronomical image (given) */
+const int astnaxes[2],       /* dimensions of simulated image (given) */
 double *dbuf,                /* pointer to bolo output (returned) */
 int *status                  /* global status (given and returned) */
 );
