@@ -1,0 +1,110 @@
+# ##################################################################
+#                 OBSERVATION PARAMETERS
+# All of these parameters should be defined for all observing modes
+# ##################################################################
+
+# RA/Dec as HH/DD:MM:SS.S
+ra=00:00:00.0
+dec=00:00:00.0
+
+# Pick your wavelength (m)
+lambda=0.85e-3
+
+# Start observing on this date (UT MJD)
+mjdaystart=53997.5
+
+# Sample time (s)
+steptime=5.0e-3
+
+# ##################################################################
+# Optional parameters - uncomment as desired
+# ##################################################################
+
+# Are we offset tracking? If so, set instap to desired subarray
+#instap=s8d
+
+# Choose a planet from moon, venus, mars, jupiter, saturn, uranus, neptune
+#planet=mars
+
+# Coordinate frame used for the observation. Choices are radec, azel
+# or nasmyth. Default is radec.
+#coordframe=radec
+
+# Observation type: can be SCIENCE, FOCUS or POINTING
+#obstype=science
+
+# Distance between bolometers in X & Y directions (arcsec). Default is
+# as given bsed on current knowledge of JCMT and SCUBA-2 optics, but
+# may get updated once the instrument is on the telescope.
+#bol_distx=6.28
+#bol_disty=6.28
+
+# ##################################################################
+# End of common parameters
+# Observing mode-specific parameters should follow
+# ##################################################################
+# #####################################
+# DREAM-specific observation parameters
+# #####################################
+
+# These parameters can be separated into two main categories:
+# 1) SMU movement & DREAM pattern
+# 2) Image reconstruction
+# In principle parameters for the latter are only required when
+# calculating the DREAM weights arrays (dreamweights)
+
+# Select DREAM observing mode
+obsmode=dream
+
+# ########################
+# SMU related parameters:
+# ########################
+
+# Number of samples taken during the time it takes the SMU to move
+# from jiggle vertex to the next, a measure of the SMU speed. Unlikely
+# to be lower than 8 (default).
+smu_samples=8
+
+# SMU phase offset
+smu_offset=0.0
+
+# Integer code for the SMU motion alogorithm
+smu_move=8
+
+# #########################
+# DREAM pattern definition. 
+# #########################
+
+# Array of X,Y positions defining the vertices of the DREAM pattern,
+# listed in visit order.
+jig_pos.x=0;-1;1;-1;0;1;-1;1
+jig_pos.y=1;-1;0;1;-1;1;0;-1
+
+# X,Y scale factors for DREAM jiggle pattern (arcsec), usualy integer
+# multiples of the detector spacing
+jig_step_x=12.56
+jig_step_y=12.56
+
+# Integer code for convolution function. Possible options:
+# 0 - Gaussian, 1 - sinc(dx).sinc(dy), 2 - sinc(dx).sinc(dy) tapered,
+# 3 - sinc(dx).sinc(dy) delay tapered. Default is 1.
+conv_shape=1
+
+# Convolution function parameter, essentially a measure of the `width'
+# of the convolution function. Default is 1.0
+conv_sig=1.0
+
+# #################################
+# Image reconstruction parameters:
+# #################################
+
+# Upper and lower bounds of grid `seen' by one bolometer for reconstruction
+# Maximum corresponds to a 9x9 grid
+grid_min_x=-4
+grid_max_x=4
+grid_min_y=-4
+grid_max_y=4
+
+# Distance between points in the reconstruction grid (arcsec)
+grid_step_x=6.28
+grid_step_y=6.28
