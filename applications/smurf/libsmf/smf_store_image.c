@@ -37,7 +37,8 @@
 *     image = double * (Given)
 *        Data to be stored
 *     zero = double (Given)
-*        Bolometer zero points to be stored (if relevant)
+*        Bolometer zero points to be stored (if relevant). Can be a NULL pointer
+*        if no BOLZERO extension is required.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -69,6 +70,8 @@
 *        Use smf_find_subarray
 *     2009-08-18 (TIMJ):
 *        Add provenance to constructed images.
+*     2009-09-16 (TIMJ):
+*        Allow "zero" to be a null pointer
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -216,25 +219,27 @@ void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim,
   ndfPtwcs ( wcs, uindf, status );
 
   /* Store the bolometer zero points as an NDF in the extension */
-  ndfXnew ( uindf, "BOLZERO", "SCUBA2_ZER_ARR", 0, 0, &bz_imloc, 
-	    status );
-  ndfPlace ( bz_imloc, "ZERO", &place, status );
+  if (zero) {
+    ndfXnew ( uindf, "BOLZERO", "SCUBA2_ZER_ARR", 0, 0, &bz_imloc,
+	      status );
+    ndfPlace ( bz_imloc, "ZERO", &place, status );
 
-  /* Create the array for bolometer zeros */
-  ubnd[0] = dims[0];
-  lbnd[0] = 1;
-  ubnd[1] = dims[1];
-  lbnd[1] = 1;
-  ndfNew ( "_DOUBLE", 2, lbnd, ubnd, &place, &bzindf, status );
-  ndfHcre ( bzindf, status );
+    /* Create the array for bolometer zeros */
+    ubnd[0] = dims[0];
+    lbnd[0] = 1;
+    ubnd[1] = dims[1];
+    lbnd[1] = 1;
+    ndfNew ( "_DOUBLE", 2, lbnd, ubnd, &place, &bzindf, status );
+    ndfHcre ( bzindf, status );
 
-  /* Map the data array */
-  ndfMap ( bzindf, "DATA", "_DOUBLE", "WRITE", (void *)&bzptr, &el, 
-	   status );
+    /* Map the data array */
+    ndfMap ( bzindf, "DATA", "_DOUBLE", "WRITE", (void *)&bzptr, &el,
+	     status );
 
-  /* Copy image array */
-  if ( *status == SAI__OK ) {
-    memcpy( bzptr, zero, dims[0]*dims[1]*sizeof(*zero));
+    /* Copy image array */
+    if ( *status == SAI__OK ) {
+      memcpy( bzptr, zero, dims[0]*dims[1]*sizeof(*zero));
+    }
   }
 
   /* Store the FITS headers */

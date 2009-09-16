@@ -1635,7 +1635,7 @@ const int dims[],        /* dimensions of image (given) */
 size_t colsize,          /* number of pixels in a column (given) */
 size_t rowsize,            /* number of pixels in a row (given) */
 const double *image,     /* constructed image (given) */
-const double *zero,      /* bolometer zero values (given) */
+const double *zero,      /* bolometer zero values [can be null pointer] (given) */
 const char * obsidss,    /* OBSIDSS string for provenance (given) */
 const char * creator,    /* Creator application for provenance (given) */
 const char *fitshd,      /* string of concatenated FITS header records to
@@ -1744,26 +1744,29 @@ int *status              /* global status (given and returned) */
 
       ndfPtwcs ( fset, uindf, status );
 
-/* Store the bolometer zero points as an NDF in the extension */
+/* Store the bolometer zero points as an NDF in the extension if we have them */
 
-      ndfXnew ( uindf, "BOLZERO", "SCUBA2_ZER_ARR", 0, 0, &bz_imloc, status );
-      ndfPlace ( bz_imloc, "ZERO", &place, status );
+      if ( zero )
+      {
+	ndfXnew ( uindf, "BOLZERO", "SCUBA2_ZER_ARR", 0, 0, &bz_imloc, status );
+	ndfPlace ( bz_imloc, "ZERO", &place, status );
 
 /* Create the array for bolometer zeros */
 
-      sc2store_fillbounds( colsize, rowsize, 0, lbnd, ubnd, status );
-      ndfNew ( "_DOUBLE", 2, lbnd, ubnd, &place, &bsc2store_zindf, status );
+	sc2store_fillbounds( colsize, rowsize, 0, lbnd, ubnd, status );
+	ndfNew ( "_DOUBLE", 2, lbnd, ubnd, &place, &bsc2store_zindf, status );
 
 /* Map the data array */
 
-      ndfMap ( bsc2store_zindf, "DATA", "_DOUBLE", "WRITE", (void *)&bzptr, &el,
-        status );
+	ndfMap ( bsc2store_zindf, "DATA", "_DOUBLE", "WRITE", (void *)&bzptr, &el,
+		 status );
 
 /* Copy image array */
 
-      if ( *status == SAI__OK )
-      {
-        memcpy( bzptr, zero, colsize*rowsize*sizeof(*zero));
+	if ( *status == SAI__OK )
+	{
+	  memcpy( bzptr, zero, colsize*rowsize*sizeof(*zero));
+        }
       }
 
 /* Store the FITS headers */

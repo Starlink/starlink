@@ -56,11 +56,13 @@
 *        - Warn user if number of frames to average is not an integer
 *          factor of the number of time slices
 *        - Recalculate number of frames to average if necessary
+*     2009-0916 (TIMJ):
+*        No longer attempt to write an unused ZERO array to file
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2006-2008 University of British Columbia.
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 *     Copyright (C) 2007 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -199,11 +201,8 @@ void smf_calc_stareimage( smfData *data, const int naver, int *status) {
       /* Average the time stream data over the desired interval */
       smf_average_dataD( data, j*numaver, numaver, 1, &avdata, &npts, status );
 
-      /* Temporary */
-      zero = smf_malloc( npts, sizeof(double), 1, status );
-
       /* Store the averaged data as an image */
-      smf_store_image( data, scu2redloc, j, 2, dims, numaver, 0, 0, avdata, zero, 
+      smf_store_image( data, scu2redloc, j, 2, dims, numaver, 0, 0, avdata, NULL,
 		       status);
 
       avdata = smf_free( avdata, status );
