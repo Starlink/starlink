@@ -546,10 +546,10 @@ int *status                /* global status (given and returned) */
 /* Map bolometer quality array */
 
    ndim = 2;
-   lbnd[0] = 1;
-   lbnd[1] = 1;
-   ubnd[0] = qualdim[0];
-   ubnd[1] = qualdim[1];
+   lbnd[0] = SC2STORE__BOL_LBND;
+   lbnd[1] = SC2STORE__BOL_LBND;
+   ubnd[0] = qualdim[0] + SC2STORE__BOL_LBND - 1;
+   ubnd[1] = qualdim[1] + SC2STORE__BOL_LBND - 1;
    ndfPlace ( sc2store_dreamwtloc, "QUAL", &place, status );
    ndfNew ( "_INTEGER", ndim, lbnd, ubnd, &place, &sc2store_indfqual, 
      status );
@@ -1316,6 +1316,7 @@ int *status                /* global status (given and returned) */
     22Apr2008 : add arguments for gridwtsdim and invmatdim (bdk)
     02May2008 : add arguments for qual and qualdim (bdk)
     09May2008 : add windext argument (bdk)
+    16Sep2009 : handle column/row flip (timj)
 */
 {
    HDSLoc *gridszloc = NULL;   /* HDS locator to grid step size */
@@ -1325,6 +1326,10 @@ int *status                /* global status (given and returned) */
    int ndimx;                  /* maximum number of dimensions queried */
    int place;                  /* NDF placeholder */
    int there;                  /* flag for HDS component existence */
+
+   /* Provide fallback values for array size. Usually read from file */
+   const int colsize = 40;
+   const int rowsize = 32;
 
    if ( *status != SAI__OK ) return;
 
@@ -1385,9 +1390,16 @@ int *status                /* global status (given and returned) */
    {
       *windext = calloc ( 4, sizeof(int) );
       (*windext)[0] = 0;
-      (*windext)[1] = 39;
       (*windext)[2] = 0;
-      (*windext)[3] = 31;
+#if SC2STORE__COL_INDEX
+      /* Decide what to do based on SC2STORE__COL_INDEX being
+	 non-zero */
+      (*windext)[1] = colsize - 1;
+      (*windext)[3] = rowsize - 1;
+#else
+      (*windext)[3] = colsize - 1;
+      (*windext)[1] = rowsize - 1;
+#endif
    }
 
 /* Get grid extents */
@@ -1451,8 +1463,8 @@ int *status                /* global status (given and returned) */
    }
    else
    {
-      qualdim[0] = 40;
-      qualdim[1] = 32;
+      qualdim[SC2STORE__COL_INDEX] = rowsize;
+      qualdim[SC2STORE__ROW_INDEX] = colsize;
       *qual = calloc ( qualdim[0]*qualdim[1], sizeof(int) );
    }
    
