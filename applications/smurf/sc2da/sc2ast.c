@@ -15,7 +15,7 @@
    Should match the definition of ROW and COL index from sc2store.c
    Remove COLROW once we have finished testing.
  */
-/* #define COLROW 1 */
+#define COLROW 1
 
 static char errmess[132];              /* For DRAMA error messages */
 

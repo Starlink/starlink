@@ -19,9 +19,9 @@
 
 #define SC2STORE__MAXFITS 256 /* Maximum number of FITS records */
 
-#define SC2STORE__COL_INDEX 1    /* Index in data array for columns */
-#define SC2STORE__ROW_INDEX 0    /* Index in data array for rows */
-#define SC2STORE__BOL_LBND  1    /* Lower bounds of bolometer data arrays */
+#define SC2STORE__COL_INDEX 0    /* Index in data array for columns */
+#define SC2STORE__ROW_INDEX 1    /* Index in data array for rows */
+#define SC2STORE__BOL_LBND  0    /* Lower bounds of bolometer data arrays */
 
 /* The upper bound has to be such that
  *    SIZEDIM = BOL_UBND - BOL_LBND + 1
