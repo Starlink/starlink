@@ -21,5 +21,12 @@
 
 #define SC2STORE__COL_INDEX 1    /* Index in data array for columns */
 #define SC2STORE__ROW_INDEX 0    /* Index in data array for rows */
+#define SC2STORE__BOL_LBND  1    /* Lower bounds of bolometer data arrays */
+
+/* The upper bound has to be such that
+ *    SIZEDIM = BOL_UBND - BOL_LBND + 1
+ * so
+ *    BOL_UBND = SIZEDIM + BOL_LBND - 1
+ */
 
 #endif /* SC2STORE_PAR_DEFINED */

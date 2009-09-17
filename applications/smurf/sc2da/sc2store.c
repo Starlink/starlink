@@ -313,8 +313,8 @@ int *status              /* global status (given and returned) */
 
 /* Dark SQUID values for each frame */
 
-   ubnd[SC2STORE__COL_INDEX] = rowsize;
-   lbnd[SC2STORE__COL_INDEX] = 1;
+   ubnd[SC2STORE__COL_INDEX] = rowsize + SC2STORE__BOL_LBND - 1;
+   lbnd[SC2STORE__COL_INDEX] = SC2STORE__BOL_LBND;
    ubnd[1] = nframes;
    lbnd[1] = 1;
 
@@ -1325,7 +1325,6 @@ int *status                /* global status (given and returned) */
    int ndimx;                  /* maximum number of dimensions queried */
    int place;                  /* NDF placeholder */
    int there;                  /* flag for HDS component existence */
-
 
    if ( *status != SAI__OK ) return;
 
@@ -3487,8 +3486,8 @@ int *status              /* global status (given and returned) */
 
 /* Dark SQUID values for each frame */
 
-   ubnd[0] = rowsize;
-   lbnd[0] = 1;
+   ubnd[0] = rowsize + SC2STORE__BOL_LBND - 1;
+   lbnd[0] = SC2STORE__BOL_LBND;
    ubnd[1] = nframes;
    lbnd[1] = 1;
 
@@ -3929,10 +3928,10 @@ static void sc2store_initialise ( int * status ) {
 static void sc2store_fillbounds( size_t colsize, size_t rowsize, size_t dim3,
                                  int lbnd[], int ubnd[], int * status ) {
   if (*status != SAI__OK) return;
-  ubnd[SC2STORE__ROW_INDEX] = colsize;
-  lbnd[SC2STORE__ROW_INDEX] = 1;
-  ubnd[SC2STORE__COL_INDEX] = rowsize;
-  lbnd[SC2STORE__COL_INDEX] = 1;
+  ubnd[SC2STORE__ROW_INDEX] = colsize + SC2STORE__BOL_LBND - 1;
+  lbnd[SC2STORE__ROW_INDEX] = SC2STORE__BOL_LBND;
+  ubnd[SC2STORE__COL_INDEX] = rowsize + SC2STORE__BOL_LBND - 1;
+  lbnd[SC2STORE__COL_INDEX] = SC2STORE__BOL_LBND;
   if (dim3 > 0) {
     ubnd[2] = dim3;
     lbnd[2] = 1;
