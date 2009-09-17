@@ -584,10 +584,10 @@ int *status             /* global status (given and returned) */
    SkyFrame to avoid the overhead of constantly re-creating it. The Epoch 
    is set every time though since this will vary from call to call. Also,
    the SkyRef is set every time even though it only changes between
-   observations. We have to do this because the cache does not (yet) get cleared
-   between observations, especially in the DA. Benchmarking indicates that
-   there is no penalty in calling this every time for non-moving objects.
-*/
+   observations. We have to do this because the cache does not (yet) 
+   get cleared between observations, especially in the DA. Benchmarking 
+   indicates that there is no penalty in calling this every time for 
+   non-moving objects. */
    if( !cache->skyframe ) {
       cache->skyframe = astSkyFrame ( "system=AzEl" );
       
@@ -597,11 +597,19 @@ int *status             /* global status (given and returned) */
       astSetD( cache->skyframe, "ObsLat", telpos[1] );
 
       astExempt( cache->skyframe );
+
+/* If the cached SkyFrame already exists, ensure it has the required
+   System (AZEL). This needs to be checked since it is possible that the
+   System may have been changed via the FrameSet pointer returned by a
+   previous invocation of this function (the returned FrameSet contains a
+   clone, not a deep copy, of the cached SkyFrame pointer). */
+   } else {
+      astSet( cache->skyframe, "system=AzEl" );
    }
 
-/* Update the epoch, dut1 and sky reference.
-   Call this every time for skyref and dut1 since we can not ensure that
-   we will always have cleared the cache when a new observation starts */
+/* Update the epoch, dut1 and sky reference. Call this every time for 
+   skyref and dut1 since we can not ensure that we will always have 
+   cleared the cache when a new observation starts */
    astSet( cache->skyframe,
            "Epoch=MJD %.*g,SkyRef(1)=%.*g, SkyRef(2)=%.*g,dut1=%.*g",
            DBL_DIG, state->tcs_tai + 32.184/SC2AST_SPD,
