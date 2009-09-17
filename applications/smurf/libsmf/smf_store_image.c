@@ -240,6 +240,14 @@ void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim,
     if ( *status == SAI__OK ) {
       memcpy( bzptr, zero, dims[0]*dims[1]*sizeof(*zero));
     }
+
+    /* Unmap the data array */
+    ndfUnmap ( bzindf, "DATA", status );
+    ndfAnnul ( &bzindf, status );
+
+    /* Free the locators for the frame */
+    datAnnul ( &bz_imloc, status );
+
   }
 
   /* Store the FITS headers */
@@ -251,17 +259,9 @@ void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim,
   
   kpgPtfts( uindf, imfits, status );
 
-
-  /* Unmap the data array */
-  ndfUnmap ( bzindf, "DATA", status );
-  ndfAnnul ( &bzindf, status );
-
   /* Unmap the data array */
   ndfUnmap ( uindf, "DATA", status );
   ndfAnnul ( &uindf, status );
-
-  /* Free the locators for the frame */
-  datAnnul ( &bz_imloc, status );
 
   astEnd;
 

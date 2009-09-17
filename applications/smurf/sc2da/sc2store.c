@@ -1778,6 +1778,16 @@ int *status              /* global status (given and returned) */
 	{
 	  memcpy( bzptr, zero, colsize*rowsize*sizeof(*zero));
         }
+
+/* Unmap the data array */
+
+	ndfUnmap ( bsc2store_zindf, "DATA", status );
+	ndfAnnul ( &bsc2store_zindf, status );
+
+/* Free the locators for the frame */
+
+	datAnnul ( &bz_imloc, status );
+
       }
 
 /* Store the FITS headers */
@@ -1789,18 +1799,9 @@ int *status              /* global status (given and returned) */
 
 /* Unmap the data array */
 
-      ndfUnmap ( bsc2store_zindf, "DATA", status );
-      ndfAnnul ( &bsc2store_zindf, status );
-
-
-/* Unmap the data array */
-
       ndfUnmap ( uindf, "DATA", status );
       ndfAnnul ( &uindf, status );
 
-/* Free the locators for the frame */
-
-      datAnnul ( &bz_imloc, status );
    }
 
    if (pkm) pkm = astAnnul( pkm );
