@@ -477,7 +477,7 @@ int *status                /* global status (given and returned) */
 
    ndfMap ( sc2store_indfgridwts, "DATA", "_DOUBLE", "WRITE", 
      (void *)&tinterpwt, &el, status );
-   memcpy ( tinterpwt, gridwts, el*sizeof(double) );
+   memcpy ( tinterpwt, gridwts, el*sizeof(*gridwts) );
 
 /* Map inverse matrix array and copy data */
 
@@ -490,7 +490,7 @@ int *status                /* global status (given and returned) */
 
    ndfMap ( sc2store_indfinvmatx, "DATA", "_DOUBLE", "WRITE", (void *)&tinvmat,
      &el, status );
-   memcpy ( tinvmat, invmat, el*sizeof(double) );
+   memcpy ( tinvmat, invmat, el*sizeof(*invmat) );
      
 /* Map window extent array */
 
@@ -503,7 +503,7 @@ int *status                /* global status (given and returned) */
 
    ndfMap ( sc2store_indfwindext, "DATA", "_INTEGER", "WRITE", 
      (void *)&twindext, &el, status );
-   memcpy ( twindext, windext, el*sizeof(int) );
+   memcpy ( twindext, windext, el*sizeof(*windext) );
 
 /* Map grid extent array */
 
@@ -516,7 +516,7 @@ int *status                /* global status (given and returned) */
 
    ndfMap ( sc2store_indfgridext, "DATA", "_INTEGER", "WRITE", 
      (void *)&tgridext, &el, status );
-   memcpy ( tgridext, gridext, el*sizeof(int) );
+   memcpy ( tgridext, gridext, el*sizeof(*gridext) );
 
 /* Map SMU pattern extent array */
 
@@ -529,7 +529,7 @@ int *status                /* global status (given and returned) */
 
    ndfMap ( sc2store_indfjigext, "DATA", "_INTEGER", "WRITE", (void *)&tjigext,
      &el, status );
-   memcpy ( tjigext, jigext, el*sizeof(int) );
+   memcpy ( tjigext, jigext, el*sizeof(*jigext) );
 
 /* Put step intervals */
 
@@ -556,7 +556,7 @@ int *status                /* global status (given and returned) */
 
    ndfMap ( sc2store_indfqual, "DATA", "_INTEGER", "WRITE", (void *)&tqual,
      &el, status );
-   memcpy ( tqual, qual, el*sizeof(int) );
+   memcpy ( tqual, qual, el*sizeof(*qual) );
 
 
    sc2store_errconv ( status );
@@ -1388,7 +1388,7 @@ int *status                /* global status (given and returned) */
    }
    else
    {
-      *windext = calloc ( 4, sizeof(int) );
+      *windext = calloc ( 4, sizeof(**windext) );
       (*windext)[0] = 0;
       (*windext)[2] = 0;
 #if SC2STORE__COL_INDEX
@@ -1439,7 +1439,7 @@ int *status                /* global status (given and returned) */
    }
    else
    {
-      *jigext = calloc ( 4, sizeof(int) );
+      *jigext = calloc ( 4, sizeof(**jigext) );
       (*jigext)[0] = -1;
       (*jigext)[1] = 1;
       (*jigext)[2] = -1;
@@ -1465,7 +1465,7 @@ int *status                /* global status (given and returned) */
    {
       qualdim[SC2STORE__COL_INDEX] = rowsize;
       qualdim[SC2STORE__ROW_INDEX] = colsize;
-      *qual = calloc ( qualdim[0]*qualdim[1], sizeof(int) );
+      *qual = calloc ( qualdim[0]*qualdim[1], sizeof(**qual) );
    }
    
    sc2store_errconv ( status );
@@ -1546,11 +1546,11 @@ int *status            /* global status (given and returned) */
 
 /* Map space for the data to be copied */
 
-   *xz = (double *) calloc ( *nframes, sizeof(double) );
-   *yz = (double *) calloc ( *nframes, sizeof(double) );
-   *inptr = (double *) calloc ( (*nframes)*colsize*rowsize, sizeof(double) );
-   *flatcal = (double *) calloc ( (*nflat)*colsize*rowsize, sizeof(double) );
-   *flatpar = (double *) calloc ( (*nflat), sizeof(double) );
+   *xz = calloc ( *nframes, sizeof(**xz) );
+   *yz = calloc ( *nframes, sizeof(**yz) );
+   *inptr = calloc ( (*nframes)*colsize*rowsize, sizeof(**inptr) );
+   *flatcal = calloc ( (*nflat)*colsize*rowsize, sizeof(**flatcal) );
+   *flatpar = calloc ( (*nflat), sizeof(**flatpar) );
 
 /* Copy flat field data */
 
@@ -2081,10 +2081,10 @@ int *status              /* global status (given and returned) */
 /* Create copies of the calibration arrays */
 
       nbol = (*rowsize) * (*colsize);
-      *flatcal = calloc ( nbol*(*nflat), sizeof(double) );
-      memcpy ( *flatcal, fcal, nbol*(*nflat)*sizeof(double) );
-      *flatpar = calloc ( *nflat, sizeof(double) );
-      memcpy ( *flatpar, fpar, (*nflat)*sizeof(double) );
+      *flatcal = calloc ( nbol*(*nflat), sizeof(**flatcal) );
+      memcpy ( *flatcal, fcal, nbol*(*nflat)*sizeof(*fcal) );
+      *flatpar = calloc ( *nflat, sizeof(**flatpar) );
+      memcpy ( *flatpar, fpar, (*nflat)*sizeof(*fpar) );
    }
 
    if ( StatusOkP(status) )
@@ -2420,7 +2420,7 @@ int *status              /* global status (given and returned) */
 
    if ( StatusOkP(status) ) 
    {
-      *frhead = (JCMTState *) calloc ( nframes, sizeof(JCMTState) );
+      *frhead = (JCMTState *) calloc ( nframes, sizeof(**frhead) );
 
       for ( j=0; j<nframes; j++ )
       {
@@ -2536,7 +2536,7 @@ int *status              /* global status (given and returned) */
 /* Allocate space for the raw data */
 
     nbol = colsize * rowsize;
-    *rawdata = (int *) calloc ( nframes*nbol, sizeof(int) );
+    *rawdata = calloc ( nframes*nbol, sizeof(**rawdata) );
     if ( *rawdata == NULL )
     {
        *status = DITS__APP_ERROR;
@@ -2558,7 +2558,7 @@ int *status              /* global status (given and returned) */
         status );
       if ( *status == SAI__OK )
       {
-         memcpy ( *rawdata, udata, el*sizeof(int) );
+         memcpy ( *rawdata, udata, el*sizeof(*udata) );
       }
    }
    else
@@ -2957,7 +2957,7 @@ int *status           /* global status (given and returned) */
 
       tempstr = starMalloc ( (nlines * nchars) + 1 );
       fseek ( fd, 0, SEEK_SET );
-      fread ( tempstr, sizeof(char), inlen, fd );
+      fread ( tempstr, sizeof(*tempstr), inlen, fd );
       fclose ( fd );
       memset ( &(tempstr[inlen]), ' ', (nlines * nchars) - inlen );
       tempstr[nlines*nchars] = '\0';
@@ -3488,7 +3488,7 @@ int *status              /* global status (given and returned) */
 
       ndfMap ( sc2store_indf, "DATA", "_INTEGER", "WRITE", (void *)(&idata),
         &el, status );
-      memcpy ( idata, dbuf, el*sizeof(int) );
+      memcpy ( idata, dbuf, el*sizeof(*dbuf) );
    }
 
 /* Write history entry */
@@ -3564,7 +3564,7 @@ int *status                 /* global status (given and returned) */
    datMap ( temploc, "_INTEGER", "WRITE", 2, dims, (void **)(&headptr), 
      status );
 
-   memcpy ( headptr, mcehead, mceheadsz*numsamples*sizeof(int) );
+   memcpy ( headptr, mcehead, mceheadsz*numsamples*sizeof(*mcehead) );
 
 /* tidy up */
 
