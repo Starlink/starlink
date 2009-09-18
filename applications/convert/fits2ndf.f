@@ -950,6 +950,10 @@
 *        Allow for FMTCNV=Native.  Add examples using the TYPE parameter.
 *     9-SEP-2009 (DSB):
 *        Enable default history recording in output NDF.
+*     18-SEP-2009 (DSB):
+*        Remove default history recording in output NDF since the NDF
+*        library now allows the user to control automatic history creation 
+*        via the "NDF_AUTO_HISTORY" environment variable.
 *     {enter_further_changes_here}
 
 *-
@@ -1417,10 +1421,6 @@
 *  once the FITS file is read, and the true shape and data type are
 *  known.
          CALL NDF_NEW( '_UBYTE', 1, 1, 1, PLACE, NDF, STATUS )
-
-*  Create a HISTORY component in the NDF so that the NDF library will
-*  add default History information to the NDF when it is closed.
-         CALL NDF_HCRE( NDF, STATUS )
 
 
 *  Convert the FITS file.
