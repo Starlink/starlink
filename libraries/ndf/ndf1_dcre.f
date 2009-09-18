@@ -39,6 +39,8 @@
 
 *  Copyright:
 *     Copyright (C) 1993 Science & Engineering Research Council
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -96,6 +98,9 @@
 *        Eliminated initialisations now done by NDF1_PLDCB.
 *     31-OCT-2007 (DSB):
 *        Add call to NDF1_EVENT.
+*     18-SEP-2009 (DSB):
+*        Add a History component to the output NDF if the AUTO_HISTORY
+*        tuning parameter is non-zero.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -127,6 +132,10 @@
 *        DCB_LOC( NDF__MXDCB ) = CHARACTER * ( DAT__SZLOC ) (Read)
 *           Data object locator.
 
+      INCLUDE 'NDF_TCB'          ! NDF_ Tuning Control Block
+*        TCB_AUTOHISTORY = LOGICAL (Read)
+*           Automatic History creation flag.
+
 *  Arguments Given:
       CHARACTER * ( * ) FTYPE
       INTEGER NDIM
@@ -144,7 +153,6 @@
       INTEGER IDCB               ! Index to data object entry in the DCB
       INTEGER NLEV               ! Levels in HDS path name
       INTEGER PLACE              ! ARY_ placeholder for data array
-
 *.
 
 *  Set an initial value for the IDCB argument.
@@ -184,6 +192,10 @@
 
 *  Create a new base NDF entry in the ACB to describe the new object.
          CALL NDF1_CRNBN( IDCB, IACB, STATUS )
+
+*  If the AUTO_HISTORY tuning parameter is set non-zero, create an 
+*  empty history component.
+         IF( TCB_AUTOHISTORY ) CALL NDF1_HDCRE( IDCB, STATUS )
 
 *  Assign the name of the data file to the MSG token "NDF_EVENT"
          CALL NDF1_DMSG( 'NDF_EVENT', IDCB )

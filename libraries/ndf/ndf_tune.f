@@ -27,6 +27,12 @@
 
 *  Notes:
 *     The following tuning parameters are currently available:
+*     - 'AUTO_HISTORY': Controls whether to include an empty History 
+*     component in NDFs created using NDF_NEW or NDF_CREAT. If the 
+*     tuning parameter is zet to zero (the default), no History 
+*     component will be included in the new NDFs. If the tuning 
+*     parameter is zet non-zero, a History component will be added
+*     automatically to the new NDFs. 
 *     - 'DOCVT': Controls whether to convert foreign format data files
 *     to and from native NDF format for access (using the facilities
 *     described in SSN/20). If DOCVT is set to 1 (the default), and the
@@ -89,7 +95,7 @@
 
 *  Copyright:
 *     Copyright (C) 1993 Science & Engineering Research Council
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007-2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -127,6 +133,8 @@
 *        Add the DOCVT tuning parameter.
 *     1-NOV-2007 (DSB):
 *        Add the PXT... tuning parameters.
+*     18-SEP-2009 (DSB):
+*        Add the AUTO_HISTORY tuning parameter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -147,6 +155,8 @@
 
 *  Global Variables:
       INCLUDE 'NDF_TCB'          ! NDF_ Tuning Control Block
+*        TCB_AUTOHISTORY = LOGICAL (Write)
+*           Automatic History creation flag.
 *        TCB_DOCVT = LOGICAL (Write)
 *           Do format conversions flag.
 *        TCB_ETFLG = LOGICAL (Write)
@@ -245,6 +255,13 @@
      : 'KEEP; it should be 0 or 1 (possible programming error).',
      :                       STATUS )
             END IF
+
+*  Automatic History creation flag.
+*  ================================
+*  If AUTO_HISTORY was specified, then set the automatic history creation 
+*  flag appropriately.
+         ELSE IF ( NDF1_SIMLR( TPAR, 'AUTO_HISTORY', NDF__MINAB ) ) THEN
+            TCB_AUTOHISTORY = ( VALUE .NE. 0 ) 
 
 *  Show data conversions flag.
 *  ==========================

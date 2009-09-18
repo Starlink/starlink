@@ -29,6 +29,8 @@
 
 *  Copyright:
 *     Copyright (C) 1993 Science & Engineering Research Council
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -64,6 +66,8 @@
 *        Added NDF_DOCVT flag.
 *     1-NOV-2007 (DSB):
 *        Add initialisation of TCB_PXT.
+*     18-SEP-2009 (DSB):
+*        Add initialisation of TCB_AUTOHISTORY.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -81,6 +85,8 @@
 
 *  Global Variables:
       INCLUDE 'NDF_TCB'          ! NDF_ Tuning Control Block
+*        TCB_AUTOHISTORY = LOGICAL (Write)
+*           Automatic History creation flag.
 *        TCB_DOCVT = LOGICAL (Write)
 *           Do format conversions flag.
 *        TCB_ETFLG = LOGICAL (Write)
@@ -167,6 +173,15 @@
          CALL NDF1_RDTUN( 'NDF_KEEP', 0, IVAL, STATUS )
          IF ( STATUS .EQ. SAI__OK ) THEN
             TCB_KEEP = ( IVAL .EQ. 1 )
+         END IF
+         
+*  Create History components automatically.
+*  ========================================
+*  Read the "create History components automatically" flag from its 
+*  environment variable (if present) and set the TCB flag accordingly.
+         CALL NDF1_RDTUN( 'NDF_AUTO_HISTORY', 0, IVAL, STATUS )
+         IF ( STATUS .EQ. SAI__OK ) THEN
+            TCB_AUTOHISTORY = ( IVAL .NE. 0 )
          END IF
          
 *  Show data conversions flag.

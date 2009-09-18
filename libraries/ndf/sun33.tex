@@ -14,7 +14,7 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardocnumber}    {33.9}
 \newcommand{\stardocauthors}   {R.F.~Warren-Smith \& D.S.~Berry}
-\newcommand{\stardocdate}      {4th August 2009}
+\newcommand{\stardocdate}      {18th September 2009}
 \newcommand{\stardoctitle}     {NDF \\ [\latex{1ex}]
                                 Routines for Accessing the\\
                                 Extensible N-Dimensional Data Format}
@@ -7978,6 +7978,11 @@ already defined. Otherwise, it will initialise a new one, making the
 NDF receptive to new \st{history\/} records (although there will
 initially be none of these present).
 
+In addition, if the ``NDF\_AUTO\_HISTORY'' environment variable or
+``AUTO\_HISTORY'' tuning parameter is set to a non-zero integer (see
+\htmlref{NDF\_TUNE}{NDF_TUNE}), then a History component will be added 
+automatically to NDFs created using either NDF\_CREAT or NDF\_NEW.
+
 \subsection{\xlabel{resetting_the_history_component}\label{ss:resettinghistory}Resetting the History Component}
 
 The opposite process, of resetting the \st{history\/} component to an
@@ -8895,6 +8900,13 @@ behaviour according to the value which has been set for it. The tuning
 parameters currently available are as follows:
 
 \begin{description}
+
+\item[{\bf AUTO\_HISTORY:}]\mbox{}\\
+Controls whether to include an empty History component in NDFs created
+using NDF\_NEW or NDF\_CREAT. If the tuning parameter is zet to zero (the
+default), no History component will be included in the new NDFs. If the 
+tuning parameter is zet non-zero, a History component will be added
+automatically to the new NDFs. 
 
 \item[{\bf DOCVT:}]\mbox{}\\
 Controls whether to convert foreign format data files to and from
@@ -17480,6 +17492,14 @@ locator}{sun92}{using_locators}}
       \sstitemlist{
 
          \sstitem
+         {\tt '}AUTO\_HISTORY{\tt '}; Controls whether to include an empty 
+         History component in NDFs created using NDF\_NEW or NDF\_CREAT.
+	 If the tuning parameter is zet to zero (the default), no History
+	 component will be included in the new NDFs. If the tuning
+	 parameter is zet non-zero, a History component will be added
+	 automatically to the new NDFs.
+
+         \sstitem
          {\tt '}DOCVT{\tt '}: Controls whether to convert foreign format data files
          to and from native NDF format for access (using the facilities
          described in SSN/20). If DOCVT is set to 1 (the default), and the
@@ -19067,6 +19087,11 @@ the NDF\_ system between versions V1.8 and V1.9 (the current version):
    that a value is a percentage of the entire pixel axis. Thus ``m31($\sim$50\%,)''
    will create a section covering the central 50 percent of the NDF on
    the first pixel axis.
+
+   \item A history component will now be added automatically to the NDFs 
+   created by NDF\_CREAT and NDF\_NEW if the ``NDF\_AUTO\_HISTORY'' environment
+   variable, or ``AUTO\_HISTORY'' tuning parameter, is set to a non-zero 
+   integer.
 
 \end{enumerate}
 

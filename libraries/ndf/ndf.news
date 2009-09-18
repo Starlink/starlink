@@ -16,6 +16,10 @@ V1.9
    will create a section covering the central 50 percent of the NDF on
    the first pixel axis.
 
+   - A history component will now be added automatically to the NDFs 
+   created by NDF_CREAT and NDF_NEW if the "NDF_AUTO_HISTORY" environment
+   variable, or "AUTO_HISTORY" tuning parameter, is set to a non-zero integer.
+
 V1.8
    - New routine NDF_HSDAT allows history records to be created with a
    given date and time.

@@ -140,12 +140,20 @@
 *  is not specified within this KeyMap is propagated by default.
       INTEGER TCB_PXT
 
+*  Automatic history creation flag.
+*  ================================
+*  If this flag is .TRUE., the NDF_CREAT and NDF_NEW routines will add a 
+*  History component automatically to the output NDF. If this flag is 
+*  .FALSE. (the default), then NDF_CREAT and NDF_NEW do not include a 
+*  History component in the output NDF.
+      LOGICAL TCB_AUTOHISTORY
+
 *  Common blocks:
 *  =============
 
 *  Non-character data.
       COMMON /NDF1_TCB1/ TCB_DOCVT, TCB_ETFLG, TCB_FNFMT, TCB_KEEP,
-     :                   TCB_SHCVT, TCB_WARN, TCB_PXT
+     :                   TCB_SHCVT, TCB_WARN, TCB_PXT, TCB_AUTOHISTORY
 
 *  Save common block contents.
       SAVE /NDF1_TCB1/

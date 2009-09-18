@@ -32,7 +32,7 @@
 
 *  Copyright:
 *     Copyright (C) 1993 Science & Engineering Research Council
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007-2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -70,6 +70,8 @@
 *        Add the DOCVT tuning parameter.
 *     1-NOV-2007 (DSB):
 *        Add the PXT... tuning parameters.
+*     18-SEP-2009 (DSB):
+*        Add the AUTO_HISTORY tuning parameter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -90,6 +92,8 @@
 
 *  Global Variables:
       INCLUDE 'NDF_TCB'          ! NDF_ Tuning Control Block
+*        TCB_AUTOHISTORY = LOGICAL (Read)
+*           Automatic History creation flag.
 *        TCB_DOCVT = LOGICAL (Read)
 *           Do format conversions flag.
 *        TCB_ETFLG = LOGICAL (Read)
@@ -157,6 +161,15 @@
 *  If KEEP was specified, then return the keep NDF objects flag value.
          ELSE IF ( NDF1_SIMLR( TPAR, 'KEEP', NDF__MINAB ) ) THEN
             IF ( TCB_KEEP ) THEN
+               VALUE = 1
+            ELSE
+               VALUE = 0
+            END IF
+
+*  Create History component automatically flag.
+*  ============================================
+         ELSE IF ( NDF1_SIMLR( TPAR, 'AUTO_HISTORY', NDF__MINAB ) ) THEN
+            IF ( TCB_AUTOHISTORY ) THEN
                VALUE = 1
             ELSE
                VALUE = 0
