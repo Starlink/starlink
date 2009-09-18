@@ -155,7 +155,7 @@ based on:
 
 #  Where to send bugs.
 set gaia_bugs {
-Bug reports and suggestions to: gaia@star.rl.ac.uk
+Bug reports and suggestions to: starlink@jiscmail.ac.uk
 }
 set ukirt_ql_bugs {
 Bug reports and suggestions to: ab@roe.ac.uk
