@@ -108,6 +108,8 @@
 *     2009 July 17 (MJC):
 *        Permit VARIANCE and QUALITY to become the DATA_ARRAY via
 *        a new COMP argument.
+*     18-SEP-2009 (DSB):
+*        Allow excess WCS axes to be trimmed.
 *     {enter_further_changes_here}
 
 *-
@@ -225,10 +227,13 @@
          END IF
       END DO
 
-*  If there are no insignificant axes, there is nothing to trim.
+*  If there are no insignificant pixel axes, and the number of WCS axes
+*  equals the number of pixel axes, there is nothing to trim.
       IF( SIGDIM .EQ. NDIM ) THEN
-         UTRIM = .FALSE.
-
+         CALL KPG1_GTWCS( INDF1, IWCS, STATUS )
+         IF( AST_GETI( IWCS, 'Nin', STATUS ) .GE. 
+     :       AST_GETI( IWCS, 'NOUT', STATUS ) ) UTRIM = .FALSE.
+    
 *  If there are no significant axes, trimming is not possible.
       ELSE IF( SIGDIM .EQ. 0 .AND. TRIM ) THEN
          IF( STATUS .EQ. SAI__OK ) THEN
@@ -240,6 +245,7 @@
 
 *  Otherwise, use the supplied TRIM value.
       ELSE
+         IWCS = AST__NULL
          UTRIM = TRIM
       END IF
 
@@ -282,7 +288,8 @@
          IF ( UTRIM ) THEN
 
 *  Get the WCS FrameSet from the input NDF. 
-            CALL KPG1_GTWCS( INDF1, IWCS, STATUS )
+            IF( IWCS .EQ. AST__NULL ) CALL KPG1_GTWCS( INDF1, IWCS, 
+     :                                                 STATUS )
 
 *  Get the Mapping from base (GRID) Frame to current Frame. 
             MAP = AST_GETMAPPING( IWCS, AST__BASE, AST__CURRENT,
