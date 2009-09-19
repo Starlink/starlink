@@ -1360,7 +1360,7 @@ void smurf_makemap( int *status ) {
 
     /* Create SMURF extension in the output file and map pointers to
        WEIGHTS and EXP_TIME arrays */
-    smurfloc = smf_get_xloc ( odata, SMURF__EXTNAME, SMURF__EXTTYPE, "WRITE", 0, 0, status );
+    smurfloc = smf_get_smurfloc ( odata, "WRITE", status );
 
     /* Create WEIGHTS component in output file */
     smf_open_ndfname ( smurfloc, "WRITE", NULL, "WEIGHTS", "NEW", "_DOUBLE",

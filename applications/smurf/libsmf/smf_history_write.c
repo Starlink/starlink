@@ -141,13 +141,7 @@ void smf_history_write( const smfData* data, int *status) {
     HDSLoc *sloc = NULL;  /* Locator to SMURF extension */
 
     /* Locate the SMURF extension */
-    ndfXstat( file->ndfid, SMURF__EXTNAME, &there, status );
-    if (!there) {
-      /* Create SMURF extension if it does not already exist */
-      ndfXnew( file->ndfid, SMURF__EXTNAME, SMURF__EXTTYPE, 0, NULL, &sloc, status );
-    } else {
-      ndfXloc( file->ndfid, SMURF__EXTNAME, "UPDATE", &sloc, status );
-    }
+    sloc = smf_get_smurfloc( data, "UPDATE", status );
     datThere( sloc, SMURF__HISTEXT, &there, status );
     if (there) datErase( sloc, SMURF__HISTEXT, status );
     /* only write history if we have any keys in the keymap */

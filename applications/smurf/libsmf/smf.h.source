@@ -886,6 +886,8 @@ void smf_get_projpar( AstSkyFrame *skyframe, const double skyref[2],
                       double map_pa, double par[7], int *sparse, int *useauto,
                       int *status );
 
+HDSLoc * smf_get_smurfloc( const smfData *data, const char * accmode, int * status );
+
 void smf_get_spread( char *pabuf, int *spread, int *nparam, int *status );
 
 void smf_get_taskname( char * taskname, char * prvname, int * status);

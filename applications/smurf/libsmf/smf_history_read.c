@@ -131,10 +131,8 @@ void smf_history_read( smfData* data,int *status) {
   }
 
   /* Need the SMURF extension */
-  ndfXstat( file->ndfid, SMURF__EXTNAME, &there, status );
-  if (!there) return;
-
-  ndfXloc( file->ndfid, SMURF__EXTNAME, "READ", &sloc, status );
+  sloc = smf_get_smurfloc( data, "READ", status );
+  if (!sloc) return;
 
   datThere( sloc, SMURF__HISTEXT, &there, status );
 
