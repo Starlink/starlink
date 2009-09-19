@@ -1541,8 +1541,8 @@ void smurf_makecube( int *status ) {
    "on" time, and one for the Tsys values. Each of these 2D NDFs inherits 
    the spatial bounds of the main output NDF. Note, the Tsys array also 
    needs variances to be calculated. Include spatial WCS in each NDF. */
-         smurf_xloc = smf_get_xloc ( odata, "SMURF", "SMURF", "WRITE", 
-                                     0, 0, status );
+         smurf_xloc = smf_get_xloc ( odata, SMURF__EXTNAME, SMURF__EXTTYPE,
+				     "WRITE", 0, 0, status );
    
          smf_open_ndfname ( smurf_xloc, "WRITE", NULL, "EXP_TIME", "NEW", 
                             "_REAL", 2, (int *) tile->elbnd, 

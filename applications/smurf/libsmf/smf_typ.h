@@ -315,6 +315,13 @@ static const size_t SMF__BADIDX = (size_t)-1;
 /* suffix for simple binary files that store DIMM model components */
 #define SMF__DIMM_SUFFIX ".dimm"
 
+/* SMURF NDF extension name and type */
+#define SMURF__EXTNAME "SMURF"
+#define SMURF__EXTTYPE "SMURF_EXT"
+
+/* Name of SMURF history component */
+#define SMURF__HISTEXT "SMURFHIST"
+
 /* Bit flags for smf_calcmodel* model component calculations */
 #define SMF__DIMM_FIRSTCOMP 1 /* First component in the solution */
 #define SMF__DIMM_FIRSTITER 2 /* First iteration */

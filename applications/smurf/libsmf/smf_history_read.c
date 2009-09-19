@@ -131,12 +131,12 @@ void smf_history_read( smfData* data,int *status) {
   }
 
   /* Need the SMURF extension */
-  ndfXstat( file->ndfid, "SMURF", &there, status );
+  ndfXstat( file->ndfid, SMURF__EXTNAME, &there, status );
   if (!there) return;
 
-  ndfXloc( file->ndfid, "SMURF", "READ", &sloc, status );
+  ndfXloc( file->ndfid, SMURF__EXTNAME, "READ", &sloc, status );
 
-  datThere( sloc, "SMURFHIST", &there, status );
+  datThere( sloc, SMURF__HISTEXT, &there, status );
 
   /* If it exists, then continue to populate the AstKeyMap */
   if ( *status == SAI__OK && there ) {
@@ -151,7 +151,7 @@ void smf_history_read( smfData* data,int *status) {
     }
 
     /* Simplest possible history is just an array of strings */
-    datFind( sloc, "SMURFHIST", &shloc, status );
+    datFind( sloc, SMURF__HISTEXT, &shloc, status );
     datClen( shloc, &clen, status );
     datSize( shloc, &nrec, status );
 

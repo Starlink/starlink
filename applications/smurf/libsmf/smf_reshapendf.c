@@ -51,6 +51,8 @@
 *        tile.
 *     2009 August 25 (MJC):
 *        Add star/irq.h include as it is no longer in star/kaplibs.h.
+*     2009-09-18 (TIMJ):
+*        use c-preprocessor to define extension name.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -139,11 +141,11 @@ void smf_reshapendf( smfData **data, smfTile *tile, int *status ){
 /* Do not store quality info in sub-NDFs such as TSYS, etc. These are
    distinguished by the fact that they do not already have a SMURF
    extension. */
-            ndfXstat( tndf, "SMURF", &there, status );
+            ndfXstat( tndf, SMURF__EXTNAME, &there, status );
             if( there ) {
 
 /* Create a structure to hold new quality name info. */
-               irqNew( tndf, "SMURF", &qlocs, status );
+               irqNew( tndf, SMURF__EXTNAME, &qlocs, status );
 
 /* Add in quality names; "BORDER". */
                irqAddqn( qlocs, "BORDER", 0, "set iff a pixel is within "

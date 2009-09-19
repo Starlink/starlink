@@ -141,15 +141,15 @@ void smf_history_write( const smfData* data, int *status) {
     HDSLoc *sloc = NULL;  /* Locator to SMURF extension */
 
     /* Locate the SMURF extension */
-    ndfXstat( file->ndfid, "SMURF", &there, status );
+    ndfXstat( file->ndfid, SMURF__EXTNAME, &there, status );
     if (!there) {
       /* Create SMURF extension if it does not already exist */
-      ndfXnew( file->ndfid, "SMURF", "SMURF", 0, NULL, &sloc, status );
+      ndfXnew( file->ndfid, SMURF__EXTNAME, SMURF__EXTTYPE, 0, NULL, &sloc, status );
     } else {
-      ndfXloc( file->ndfid, "SMURF", "UPDATE", &sloc, status );
+      ndfXloc( file->ndfid, SMURF__EXTNAME, "UPDATE", &sloc, status );
     }
-    datThere( sloc, "SMURFHIST", &there, status );
-    if (there) datErase( sloc, "SMURFHIST", status );
+    datThere( sloc, SMURF__HISTEXT, &there, status );
+    if (there) datErase( sloc, SMURF__HISTEXT, status );
     /* only write history if we have any keys in the keymap */
     if (data->history) {
       HDSLoc * shloc = NULL; /* Locator to SMURHIST component */
@@ -176,8 +176,8 @@ void smf_history_write( const smfData* data, int *status) {
 	}
 
 	/* Create new history array and copy in the values */
-	datNew1C( sloc, "SMURFHIST", maxlen, nrec, status );
-	datFind( sloc, "SMURFHIST", &shloc, status );
+	datNew1C( sloc, SMURF__HISTEXT, maxlen, nrec, status );
+	datFind( sloc, SMURF__HISTEXT, &shloc, status );
 	datPut1C( shloc, nrec, (const char**)array, status );
 
 	/* free everything */

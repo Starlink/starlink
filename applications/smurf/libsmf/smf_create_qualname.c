@@ -59,11 +59,13 @@
 *        Fix pointer warning - we need a pointer to IRQLocs*
 *     2008-06-25 (EC):
 *        Added PAD for SMF__Q_PAD
+*     2009-09-18 (TIMJ):
+*        use c-preprocessor to define extension name.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2008 University of British Columbia.
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -145,14 +147,14 @@ void smf_create_qualname( const char *mode, int indf, IRQLocs **qlocs,
   }
 
   msgOutif(MSG__DEBUG, "", "Creating quality names extension", status);
-  ndfXstat( indf, "SMURF", &there, status );
+  ndfXstat( indf, SMURF__EXTNAME, &there, status );
   if (!there) {
     /* Create SMURF extension if it does not already exist */
-    ndfXnew( indf, "SMURF", "SMURF", 0, NULL, &smurfloc, status );
+    ndfXnew( indf, SMURF__EXTNAME, SMURF__EXTTYPE, 0, NULL, &smurfloc, status );
   }
 
   /* Create new quality names extension */
-  irqNew( indf, "SMURF", qlocs, status );
+  irqNew( indf, SMURF__EXTNAME, qlocs, status );
 
   /* Add SMURF quality names */
   msgOutif(MSG__DEBUG, "", "Adding SMURF quality names", status);
