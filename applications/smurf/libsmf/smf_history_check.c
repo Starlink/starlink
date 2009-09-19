@@ -105,11 +105,11 @@
 #define FUNC_NAME "smf_history_check"
 
 int smf_history_check( const smfData* data, const char * appl, int *status) {
-  size_t applen;       /* Length of supplied appl string */
   int i = 0;           /* Loop counter */
   int nrec = 0;        /* Number of history records */
   int retval = 0;      /* Return value */
   
+
   /* Check entry status */
   if (*status != SAI__OK) return retval;
 
@@ -127,12 +127,12 @@ int smf_history_check( const smfData* data, const char * appl, int *status) {
     return retval;
   }
 
-  applen = strlen( appl );
   nrec = astMapSize( data->history );
-
   if ( nrec != 0 ) {
     for ( i=0; i<nrec; i++ ) {
-      if ( strncmp( astMapKey( data->history, i ), appl, applen ) == 0 ) {
+      msgOutiff(MSG__DEBUG2, " ", "Checking history item '%s' for '%s'",
+		status, astMapKey( data->history, i ), appl);
+      if ( strcmp( astMapKey( data->history, i ), appl ) == 0 ) {
 	retval = 1;
 	break;
       }
