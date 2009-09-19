@@ -1,109 +1,109 @@
 /*
-*+
-*  Name:
-*     DREAMWEIGHTS
+ *+
+ *  Name:
+ *     DREAMWEIGHTS
 
-*  Purpose:
-*     Generate DREAM weights matrix
+ *  Purpose:
+ *     Generate DREAM weights matrix
 
-*  Language:
-*     Starlink ANSI C
+ *  Language:
+ *     Starlink ANSI C
 
-*  Type of Module:
-*     ADAM A-task
+ *  Type of Module:
+ *     ADAM A-task
 
-*  Invocation:
-*     smurf_dreamweights( int *status );
+ *  Invocation:
+ *     smurf_dreamweights( int *status );
 
-*  Arguments:
-*     status = int* (Given and Returned)
-*        Pointer to global status.
+ *  Arguments:
+ *     status = int* (Given and Returned)
+ *        Pointer to global status.
 
-*  Description:
-*     This is the main routine for (re)calculating the DREAM weights array
-*     and inverse matrix.
+ *  Description:
+ *     This is the main routine for (re)calculating the DREAM weights array
+ *     and inverse matrix.
 
-*  Notes:
-*     - Raw data MUST be passed in at present (this is due to a 
-*       limitation in smf_open_file)
-*     - Should allow for a list of bad (dead) bolometers.
-*     - This application interface is not finalised. Please do not rely on this
-*     command in scripts.
+ *  Notes:
+ *     - Raw data MUST be passed in at present (this is due to a
+ *       limitation in smf_open_file)
+ *     - Should allow for a list of bad (dead) bolometers.
+ *     - This application interface is not finalised. Please do not rely on this
+ *     command in scripts.
 
 
-*  ADAM Parameters:
-*     NDF = NDF (Read)
-*          Raw DREAM data file(s)
-*     CONFIG = Literal (Read)
-*          Name of config file. If CONFIG=! some default parameters will be
-*          used.
-*     MSG_FILTER = _CHAR (Read)
-*          Control the verbosity of the application. Values can be
-*          NONE (no messages), QUIET (minimal messages), NORMAL,
-*          VERBOSE, DEBUG or ALL. [NORMAL]
-*     OUT = NDF (Write)
-*          Output weights file(s)
+ *  ADAM Parameters:
+ *     NDF = NDF (Read)
+ *          Raw DREAM data file(s)
+ *     CONFIG = Literal (Read)
+ *          Name of config file. If CONFIG=! some default parameters will be
+ *          used.
+ *     MSG_FILTER = _CHAR (Read)
+ *          Control the verbosity of the application. Values can be
+ *          NONE (no messages), QUIET (minimal messages), NORMAL,
+ *          VERBOSE, DEBUG or ALL. [NORMAL]
+ *     OUT = NDF (Write)
+ *          Output weights file(s)
 
-*  Related Applications:
-*     SMURF: DREAMSOLVE
+ *  Related Applications:
+ *     SMURF: DREAMSOLVE
 
-*  Authors:
-*     Andy Gibb (UBC)
-*     Ed Chapin (UBC)
-*     Tim Jenness (JAC, Hawaii)
-*     {enter_new_authors_here}
+ *  Authors:
+ *     Andy Gibb (UBC)
+ *     Ed Chapin (UBC)
+ *     Tim Jenness (JAC, Hawaii)
+ *     {enter_new_authors_here}
 
-*  History:
-*     2006-08-22 (AGG):
-*        Initial version, copied from calcmapwts written by BDK
-*     2006-09-15 (AGG):
-*        Factor out determining the grid parameters into
-*        smf_dream_getgrid
-*     2006-09-15 (AGG):
-*        Factor out remaining code into smf_dream_calcweights
-*     2006-11-10 (AGG):
-*        Set some default values if a config file is not specified
-*     2007-10-29 (EC):
-*        Modified interface to smf_open_file.
-*     2007-12-18 (AGG):
-*        Update to use new smf_free behaviour
-*     2008-05-28 (TIMJ):
-*        Allow CONFIG=!
-*     2008-07-11 (AGG):
-*        Tidy up, ensure all pointers are freed
-*     2008-07-14 (AGG):
-*        Make sure Grp for config is always freed
-*     2008-07-22 (TIMJ):
-*        Use kaplibs instead of ndgAssoc
-*     2009-08-27 (AGG):
-*        Template data file is specified by NDF, not IN
-*     {enter_further_changes_here}
+ *  History:
+ *     2006-08-22 (AGG):
+ *        Initial version, copied from calcmapwts written by BDK
+ *     2006-09-15 (AGG):
+ *        Factor out determining the grid parameters into
+ *        smf_dream_getgrid
+ *     2006-09-15 (AGG):
+ *        Factor out remaining code into smf_dream_calcweights
+ *     2006-11-10 (AGG):
+ *        Set some default values if a config file is not specified
+ *     2007-10-29 (EC):
+ *        Modified interface to smf_open_file.
+ *     2007-12-18 (AGG):
+ *        Update to use new smf_free behaviour
+ *     2008-05-28 (TIMJ):
+ *        Allow CONFIG=!
+ *     2008-07-11 (AGG):
+ *        Tidy up, ensure all pointers are freed
+ *     2008-07-14 (AGG):
+ *        Make sure Grp for config is always freed
+ *     2008-07-22 (TIMJ):
+ *        Use kaplibs instead of ndgAssoc
+ *     2009-08-27 (AGG):
+ *        Template data file is specified by NDF, not IN
+ *     {enter_further_changes_here}
 
-*  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
-*     Copyright (C) 2006-2009 the University of British Columbia. All
-*     Rights Reserved.
+ *  Copyright:
+ *     Copyright (C) 2008 Science and Technology Facilities Council.
+ *     Copyright (C) 2006-2009 the University of British Columbia. All
+ *     Rights Reserved.
 
-*  Licence:
-*     This program is free software; you can redistribute it and/or
-*     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 3 of
-*     the License, or (at your option) any later version.
-*
-*     This program is distributed in the hope that it will be
-*     useful, but WITHOUT ANY WARRANTY; without even the implied
-*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
-*
-*     You should have received a copy of the GNU General Public
-*     License along with this program; if not, write to the Free
-*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-*     MA 02111-1307, USA
+ *  Licence:
+ *     This program is free software; you can redistribute it and/or
+ *     modify it under the terms of the GNU General Public License as
+ *     published by the Free Software Foundation; either version 3 of
+ *     the License, or (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be
+ *     useful, but WITHOUT ANY WARRANTY; without even the implied
+ *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ *     PURPOSE. See the GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public
+ *     License along with this program; if not, write to the Free
+ *     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+ *     MA 02111-1307, USA
 
-*  Bugs:
-*     {note_any_bugs_here}
-*-
-*/
+ *  Bugs:
+ *     {note_any_bugs_here}
+ *-
+ */
 
 #if HAVE_CONFIG_H
 #include <config.h>
@@ -154,7 +154,7 @@ void smurf_dreamweights ( int *status ) {
 
   /* Main routine */
   ndfBegin();
-  
+
   /* Get group of input raw data NDFs */
   kpg1Rgndf( "NDF", 0, 1, "", &igrp, &size, status );
 
@@ -179,7 +179,7 @@ void smurf_dreamweights ( int *status ) {
     } else {
       kpg1Kymap( confgrp, &keymap, status );
     }
-    if( confgrp ) grpDelet( &confgrp, status );      
+    if( confgrp ) grpDelet( &confgrp, status );
   }
 
   /* Determine grid parameters from inputs given above */
@@ -193,15 +193,15 @@ void smurf_dreamweights ( int *status ) {
     smf_open_file( igrp, i, "READ", 0, &data, status );
 
     /* Calculate weights based on this file */
-    smf_dream_calcweights( data, ogrp, i, gridstep, ngrid, gridminmax, 
-			   &(gridpts[0]), status);
+    smf_dream_calcweights( data, ogrp, i, gridstep, ngrid, gridminmax,
+                           &(gridpts[0]), status);
 
     /* Immediately check status on return and abort if an error occured */
     if ( *status != SAI__OK ) {
       msgSeti("I",i);
       msgSeti("N",size);
-      errRep(FUNC_NAME,	"Unable to determine DREAM weights for file ^I of ^N", 
-	     status);
+      errRep(FUNC_NAME, "Unable to determine DREAM weights for file ^I of ^N",
+             status);
     }
 
     smf_close_file( &data, status );
@@ -218,7 +218,7 @@ void smurf_dreamweights ( int *status ) {
     grpDelet( &igrp, status);
   }
   ndfEnd( status );
-  
-  msgOutif(MSG__VERB," ", "DREAM weights calculation completed successfully", 
-	   status);
+
+  msgOutif(MSG__VERB," ", "DREAM weights calculation completed successfully",
+           status);
 }

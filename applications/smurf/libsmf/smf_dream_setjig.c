@@ -1,71 +1,71 @@
 /*
-*+
-*  Name:
-*     smf_dream_setjig
+ *+
+ *  Name:
+ *     smf_dream_setjig
 
-*  Purpose:
-*     Routine to convert the DREAM jiggle path into positions in the 
-*     reconstruction grid
+ *  Purpose:
+ *     Routine to convert the DREAM jiggle path into positions in the
+ *     reconstruction grid
 
-*  Language:
-*     Starlink ANSI C
+ *  Language:
+ *     Starlink ANSI C
 
-*  Type of Module:
-*     Subroutine
+ *  Type of Module:
+ *     Subroutine
 
-*  Invocation:
-*     smf_dream_setjig ( char *subarray, int nsampcycle, double gridstep, 
-*                        double jigpath[DREAM__MXSAM][2], int *status ) 
+ *  Invocation:
+ *     smf_dream_setjig ( char *subarray, int nsampcycle, double gridstep,
+ *                        double jigpath[DREAM__MXSAM][2], int *status )
 
-*  Arguments:
-*     subarray = char (Given)
-*        Name of subarray
-*     nsampcycle = int (Given)
-*        Number of samples during one DREAM cycle
-*     gridstep (Given)
-*        Size of jiggle grid step in arcsec
-*     jigpath[][2] = double (Given and Returned)
-*        2-D array holding jiggle grid positions
-*     status = int* (Given and Returned)
-*        Pointer to global status.
+ *  Arguments:
+ *     subarray = char (Given)
+ *        Name of subarray
+ *     nsampcycle = int (Given)
+ *        Number of samples during one DREAM cycle
+ *     gridstep (Given)
+ *        Size of jiggle grid step in arcsec
+ *     jigpath[][2] = double (Given and Returned)
+ *        2-D array holding jiggle grid positions
+ *     status = int* (Given and Returned)
+ *        Pointer to global status.
 
-*  Description:
+ *  Description:
 
-*  Notes: 
+ *  Notes:
 
-*  Authors:
-*     Andy Gibb (UBC)
-*     {enter_new_authors_here}
+ *  Authors:
+ *     Andy Gibb (UBC)
+ *     {enter_new_authors_here}
 
-*  History:
-*     2006-05-15 (AGG):
-*        Initial test version: copied from calcmapwt.c
-*     {enter_further_changes_here}
+ *  History:
+ *     2006-05-15 (AGG):
+ *        Initial test version: copied from calcmapwt.c
+ *     {enter_further_changes_here}
 
-*  Copyright:
-*     Copyright (C) 2006 University of British Columbia. All Rights
-*     Reserved.
+ *  Copyright:
+ *     Copyright (C) 2006 University of British Columbia. All Rights
+ *     Reserved.
 
-*  Licence:
-*     This program is free software; you can redistribute it and/or
-*     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 3 of
-*     the License, or (at your option) any later version.
-*
-*     This program is distributed in the hope that it will be
-*     useful, but WITHOUT ANY WARRANTY; without even the implied
-*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
-*
-*     You should have received a copy of the GNU General Public
-*     License along with this program; if not, write to the Free
-*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-*     MA 02111-1307, USA
+ *  Licence:
+ *     This program is free software; you can redistribute it and/or
+ *     modify it under the terms of the GNU General Public License as
+ *     published by the Free Software Foundation; either version 3 of
+ *     the License, or (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be
+ *     useful, but WITHOUT ANY WARRANTY; without even the implied
+ *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ *     PURPOSE. See the GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public
+ *     License along with this program; if not, write to the Free
+ *     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+ *     MA 02111-1307, USA
 
-*  Bugs:
-*     {note_any_bugs_here}
-*-
-*/
+ *  Bugs:
+ *     {note_any_bugs_here}
+ *-
+ */
 
 /* Standard includes */
 #include <stdio.h>
@@ -82,8 +82,8 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_dream_setjig"
 
-void smf_dream_setjig( char *subarray, int nsampcycle, double gridstep,  
-		       double jigpath[DREAM__MXSAM][2], int *status) {
+void smf_dream_setjig( char *subarray, int nsampcycle, double gridstep,
+                       double jigpath[DREAM__MXSAM][2], int *status) {
 
   /* Local variables */
   size_t i;              /* Loop counter */

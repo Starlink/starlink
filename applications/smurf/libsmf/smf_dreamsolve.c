@@ -1,86 +1,86 @@
 /*
-*+
-*  Name:
-*     smf_dreamsolve
+ *+
+ *  Name:
+ *     smf_dreamsolve
 
-*  Purpose:
-*     Low-level DREAM solver
+ *  Purpose:
+ *     Low-level DREAM solver
 
-*  Language:
-*     Starlink ANSI C
+ *  Language:
+ *     Starlink ANSI C
 
-*  Type of Module:
-*     Library routine
+ *  Type of Module:
+ *     Library routine
 
-*  Invocation:
-*     smf_dreamsolve( smfData *data, int *status);
+ *  Invocation:
+ *     smf_dreamsolve( smfData *data, int *status);
 
-*  Arguments:
-*     data = smfData * (Given)
-*        Input (flatfielded) data
-*     status = int* (Given and Returned)
-*        Pointer to global status.
+ *  Arguments:
+ *     data = smfData * (Given)
+ *        Input (flatfielded) data
+ *     status = int* (Given and Returned)
+ *        Pointer to global status.
 
-*  Description:
-*     This is the main routine to process the raw DREAM data into
-*     images. Each reconstructed image is written sequentially to the
-*     SCU2RED extension in the output file. Note that the input data
-*     must have been flatfielded prior to calling this routine. If
-*     called with raw data an error will be issued and the routine
-*     will immediately return to the caller.
+ *  Description:
+ *     This is the main routine to process the raw DREAM data into
+ *     images. Each reconstructed image is written sequentially to the
+ *     SCU2RED extension in the output file. Note that the input data
+ *     must have been flatfielded prior to calling this routine. If
+ *     called with raw data an error will be issued and the routine
+ *     will immediately return to the caller.
 
-*  Notes:
-*     - *** No FITS (sub)headers are yet written for the images ***
+ *  Notes:
+ *     - *** No FITS (sub)headers are yet written for the images ***
 
-*  Authors:
-*     Andy Gibb (UBC)
-*     {enter_new_authors_here}
+ *  Authors:
+ *     Andy Gibb (UBC)
+ *     {enter_new_authors_here}
 
-*  History:
-*     2006-06-14 (AGG):
-*        Initial test version, copied from mapsolve written by BDK
-*     2006-10-26 (AGG):
-*        Streamline some of the image writing code, move into
-*        smf_store_image.c
-*     2006-11-10 (AGG):
-*        Store GRIDEXT and GRID_SIZE parameters in file
-*     2007-04-05 (AGG):
-*        Change OBSMODE to SAM_MODE
-*     2007-09-07 (AGG):
-*        Add integer npts for call to ndfMap
-*     2007-12-18 (AGG):
-*        Update to use new smf_free behaviour
-*     2008-07-24 (TIMJ):
-*        Use hdr->obsmode instead of SAM_MODE.
-*     2008-07-25 (AGG):
-*        Partial update to use sc2math routines
-*     {enter_further_changes_here}
+ *  History:
+ *     2006-06-14 (AGG):
+ *        Initial test version, copied from mapsolve written by BDK
+ *     2006-10-26 (AGG):
+ *        Streamline some of the image writing code, move into
+ *        smf_store_image.c
+ *     2006-11-10 (AGG):
+ *        Store GRIDEXT and GRID_SIZE parameters in file
+ *     2007-04-05 (AGG):
+ *        Change OBSMODE to SAM_MODE
+ *     2007-09-07 (AGG):
+ *        Add integer npts for call to ndfMap
+ *     2007-12-18 (AGG):
+ *        Update to use new smf_free behaviour
+ *     2008-07-24 (TIMJ):
+ *        Use hdr->obsmode instead of SAM_MODE.
+ *     2008-07-25 (AGG):
+ *        Partial update to use sc2math routines
+ *     {enter_further_changes_here}
 
-*  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
-*     Copyright (C) 2006-2008 University of British Columbia. All
-*     Rights Reserved.
+ *  Copyright:
+ *     Copyright (C) 2008 Science and Technology Facilities Council.
+ *     Copyright (C) 2006-2008 University of British Columbia. All
+ *     Rights Reserved.
 
-*  Licence:
-*     This program is free software; you can redistribute it and/or
-*     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 3 of
-*     the License, or (at your option) any later version.
-*
-*     This program is distributed in the hope that it will be
-*     useful, but WITHOUT ANY WARRANTY; without even the implied
-*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
-*
-*     You should have received a copy of the GNU General Public
-*     License along with this program; if not, write to the Free
-*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-*     MA 02111-1307, USA
+ *  Licence:
+ *     This program is free software; you can redistribute it and/or
+ *     modify it under the terms of the GNU General Public License as
+ *     published by the Free Software Foundation; either version 3 of
+ *     the License, or (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be
+ *     useful, but WITHOUT ANY WARRANTY; without even the implied
+ *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ *     PURPOSE. See the GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public
+ *     License along with this program; if not, write to the Free
+ *     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+ *     MA 02111-1307, USA
 
-*  Bugs:
-*     {note_any_bugs_here}
-*-
-*/
+ *  Bugs:
+ *     {note_any_bugs_here}
+ *-
+ */
 
 /* Standard includes */
 #include <string.h>
@@ -133,7 +133,7 @@ void smf_dreamsolve( smfData *data, int *status ) {
   int ncycles;                     /* Number of DREAM cycles in data stream */
   size_t nelem;                    /* Total number of points */
   int ngrid;                       /* Number of grid points in output map */
-  int nimages;			   /* Number of images to write to output file */
+  int nimages;                     /* Number of images to write to output file */
   int nframes;                     /* Number of time samples */
   int npts;                        /* Total number of points (int version) */
   int nsampcycle;                  /* Number of samples per DREAM cycle */
@@ -145,7 +145,7 @@ void smf_dreamsolve( smfData *data, int *status ) {
   int ubnd[2];                     /* Upper bounds */
   int naver;                       /* Temporary value... */
   int jigext[4] = { -1, 1, -1, 1 };/* Table of SMU pattern extents for a
-				      single bolometer */
+                                      single bolometer */
   int *qual = NULL;                /* True/false `quality' array (not NDF quality) */
   double *map = NULL;              /* Pointer to output DREAM image */
   int maxmap = 2400;               /* Maximum size of output DREAM image */
@@ -155,8 +155,8 @@ void smf_dreamsolve( smfData *data, int *status ) {
   /* Check we have time-series data */
   if ( data->ndims != 3) {
     *status = SAI__ERROR;
-    errRep(FUNC_NAME, 
-           "File does not contain time series data - unable to process", 
+    errRep(FUNC_NAME,
+           "File does not contain time series data - unable to process",
            status);
     return;
   }
@@ -178,7 +178,7 @@ void smf_dreamsolve( smfData *data, int *status ) {
        images will just be added onto the end of the current stack of
        images. */
     if (smf_history_check( data, "smf_dreamsolve", status) ) {
-      msgOut(" ", "File contains DREAM data which has already been processed: proceeding but this will NOT overwrite any DREAM images already written into the SCU2RED extension", 
+      msgOut(" ", "File contains DREAM data which has already been processed: proceeding but this will NOT overwrite any DREAM images already written into the SCU2RED extension",
              status);
     }
 
@@ -188,7 +188,7 @@ void smf_dreamsolve( smfData *data, int *status ) {
     /* OK we have DREAM data - retrieve various values - CHECK FOR NON-NULL!! */
     nframes = (data->dims)[2];
     nbol = (data->dims)[0]*(data->dims)[1];
-    ngrid = dream->ngrid;    
+    ngrid = dream->ngrid;
     nsampcycle = dream->nsampcycle;
     ncycles = nframes / nsampcycle;
 
@@ -199,7 +199,7 @@ void smf_dreamsolve( smfData *data, int *status ) {
        then it means we were not able to find the weights file */
     interpwt = dream->gridwts;
     invmat = dream->invmatx;
-    
+
     if ( interpwt == NULL || invmat == NULL ) {
       if ( *status == SAI__OK ) {
         smf_fits_getS( data->hdr, "DRMWGHTS", drmwghts, sizeof(drmwghts),
@@ -217,21 +217,21 @@ void smf_dreamsolve( smfData *data, int *status ) {
     /* Create new extension to store grid parameters */
     lbnd[0] = 1;
     ubnd[0] = 4;
-    gridndf = smf_get_ndfid( drmloc, "GRIDEXT", "WRITE", "NEW", 
+    gridndf = smf_get_ndfid( drmloc, "GRIDEXT", "WRITE", "NEW",
                              "_INTEGER", 1, lbnd, ubnd, status);
-    ndfMap( gridndf, "DATA", "_INTEGER", "WRITE", gridpntr, &npts, 
+    ndfMap( gridndf, "DATA", "_INTEGER", "WRITE", gridpntr, &npts,
             status);
     gridext = gridpntr[0];
     /* Calculate maximum extent of reconstruction grid in pixels */
-    sc2math_gridext( ngrid, dream->gridpts, &(gridext[0]), &(gridext[1]), 
-		     &(gridext[2]), &(gridext[3]), status );
+    sc2math_gridext( ngrid, dream->gridpts, &(gridext[0]), &(gridext[1]),
+                     &(gridext[2]), &(gridext[3]), status );
 
     /* Write grid size into output file - PROTECT FROM NON-NULL!! */
     ofile = data->file;
     ndfXpt0d( dream->gridstep, ofile->ndfid, "DREAM", "GRID_SIZE", status);
 
     /* Create SCU2RED extension to hold reconstructed images */
-    scu2redloc = smf_get_xloc(data, "SCU2RED", "SCUBA2_MAP_ARR", "WRITE", 
+    scu2redloc = smf_get_xloc(data, "SCU2RED", "SCUBA2_MAP_ARR", "WRITE",
                               0, NULL, status);
 
     /* Allocate memory for resources */
@@ -265,18 +265,18 @@ void smf_dreamsolve( smfData *data, int *status ) {
       /* Loop over number of images to solve for and store */
       nimages = ncycles/naver;
       for ( cycle=0; cycle<nimages; cycle++ ) {
-	/* Extract the raw data of a cycle. */
-	sc2math_get_cycle ( cycle, nsampcycle, ncycles, nbol,
-			    tstream, psbuf, status );
+        /* Extract the raw data of a cycle. */
+        sc2math_get_cycle ( cycle, nsampcycle, ncycles, nbol,
+                            tstream, psbuf, status );
 
-	sc2math_mapsolve( nsampcycle, (data->dims)[0], (data->dims)[1], gridext, 
-			  dream->gridstep, jigext, dream->jigscal, interpwt, 
-			  invmat, qual, psbuf, maxmap, dims, map, pbolzero, 
-			  status );
+        sc2math_mapsolve( nsampcycle, (data->dims)[0], (data->dims)[1], gridext,
+                          dream->gridstep, jigext, dream->jigscal, interpwt,
+                          invmat, qual, psbuf, maxmap, dims, map, pbolzero,
+                          status );
 
-	/* Write the image and bolometer zero offsets */
-	smf_store_image( data, scu2redloc, cycle, 2, dims, nsampcycle, 
-			 0, 0, map, pbolzero, status );
+        /* Write the image and bolometer zero offsets */
+        smf_store_image( data, scu2redloc, cycle, 2, dims, nsampcycle,
+                         0, 0, map, pbolzero, status );
       } /* End loop over cycle */
     }
     /* Add a history entry if everything's OK */
@@ -287,7 +287,7 @@ void smf_dreamsolve( smfData *data, int *status ) {
     datAnnul( &drmloc, status );
     datAnnul( &scu2redloc, status );
   } else {
-    msgOutif(MSG__VERB," ", 
+    msgOutif(MSG__VERB," ",
              "Input file is not a DREAM observation - ignoring", status);
   }
 }
