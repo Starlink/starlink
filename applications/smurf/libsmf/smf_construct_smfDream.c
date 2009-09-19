@@ -48,8 +48,7 @@
 *       does not exist. Currently the caller should check that the
 *       smfDream contains information from the weights file and issue
 *       its own error.
-*     - SAM_MODE FITS header is used to determine DREAM mode. Its absence
-*       implies we are not in DREAM mode.
+*     - The smfData is verified to ensure that we are in DREAM mode.
 
 *  Authors:
 *     Andy Gibb (UBC)
