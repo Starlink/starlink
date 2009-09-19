@@ -259,8 +259,7 @@ void smf_subtract_poly(smfData *data, unsigned char *quality, int rel,
   smf_free( firstframe, status );
   /* Write history entry */
   if ( *status == SAI__OK ) {
-    smf_history_add( data, FUNC_NAME, 
-		     "Polynomial subtraction successful", status);
+    smf_history_add( data, FUNC_NAME, status);
   } else {
     errRep(FUNC_NAME, "Error: status set bad. Possible programming error.", 
 	   status);

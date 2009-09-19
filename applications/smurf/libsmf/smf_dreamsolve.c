@@ -280,8 +280,8 @@ void smf_dreamsolve( smfData *data, int *status ) {
       } /* End loop over cycle */
     }
     /* Add a history entry if everything's OK */
-    smf_history_write(data, "smf_dreamsolve", "DREAM reconstruction successful", 
-                      status);
+    smf_history_add(data, "smf_dreamsolve", status);
+
     /* Free up NDF resources */
     ndfAnnul( &gridndf, status );
     datAnnul( &drmloc, status );

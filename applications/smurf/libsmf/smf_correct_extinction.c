@@ -478,8 +478,7 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
 
   /* Add history entry if !allextcorr */
   if( (*status == SAI__OK) && !allextcorr ) {
-    smf_history_add( data, FUNC_NAME, 
-                     "Extinction correction successful", status);
+    smf_history_add( data, FUNC_NAME, status);
   }
 
  CLEANUP:

@@ -165,7 +165,7 @@ void smf_flatfield ( const smfData *idata, smfData **odata, const int flags, int
     smf_flatten( *odata, status);
     /* Write history entry to file */
     if ( *status == SAI__OK ) {
-      smf_history_add( *odata, FUNC_NAME, "Flatfield successful", status);
+      smf_history_add( *odata, FUNC_NAME, status);
     } else {
       errRep(FUNC_NAME, "Error: status set bad. Possible programming error.", 
 	     status);

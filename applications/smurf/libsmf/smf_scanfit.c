@@ -264,5 +264,5 @@ void smf_scanfit( smfData *data, unsigned char *quality, int order,
   }
 
   /* Add history entry */
-  smf_history_add( data, FUNC_NAME, "Scanfit completed successfuly", status );
+  smf_history_add( data, FUNC_NAME, status );
 }

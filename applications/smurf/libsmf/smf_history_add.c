@@ -13,8 +13,7 @@
 *     C function
 
 *  Invocation:
-*     smf_history_add(  smfData * data, const char * appl,
-*                        const char * text, int * status );
+*     smf_history_add(  smfData * data, const char * appl, int *status );
 
 *  Arguments:
 *     data = const smfData* (Given)
@@ -22,9 +21,6 @@
 *     appl = const char * (Given)
 *        Name of "application" to store in file. If NULL, the 
 *        default application name will be used.
-*     text = const char * (Given)
-*        Descriptive text to write to the file. MERS message tokens
-*        can be included. Text will be truncated at NDF__SZHMX characters.
 *     status = int* (Given and Returned)
 *        Pointer to global status. Will be bad on return if this smfData
 *        is not associated with a file.
@@ -51,6 +47,8 @@
 *        attempting to write
 *     2008-03-25 (EC):
 *        Check for valid NDF identifier
+*     2009-09-17 (TIMJ):
+*        Remove supporting text since we are not using it.
 
 *  Notes:
 *     - SMURF subroutines should choose history "application" names
@@ -61,6 +59,7 @@
 *     - See also smf_history_write
 
 *  Copyright:
+*     Copyright (C) 2009 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research
 *     Council and the University of British Columbia. All Rights
 *     Reserved.
@@ -102,8 +101,7 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_history_add"
 
-void smf_history_add(  smfData* data, const char * appl, 
-			const char * text, int *status) {
+void smf_history_add(  smfData* data, const char * appl, int * status ) {
 
   smfFile *file = NULL; /* data->file */
   int done;             /* Flag to denote whether history entry has been added */
@@ -122,16 +120,6 @@ void smf_history_add(  smfData* data, const char * appl,
     return;
   }
 
-  /* If we have a file, write the history entry into the file ONLY if
-     the history component already exists.  */
-  file = data->file;
-  if ( (file !=NULL) && (file->ndfid != NDF__NOID) ) {
-    ndfState( file->ndfid, "HISTORY", &state, status );
-    if ( state == 1 ) {
-      smf_history_write( data, appl, text, status);
-    }
-  }
-
   /* Now add entry to the history AstKeyMap if not already present */
   if ( data->history == NULL ) {
     history = astKeyMap(" " );
@@ -140,5 +128,13 @@ void smf_history_add(  smfData* data, const char * appl,
   } else if ( !astMapGet0I( data->history, appl, &done ) ) {
     astMapPut0I( data->history, appl, 1, " " );
   }
+
+  /* If we have a file, write the history entry into the file */
+  file = data->file;
+  if ( (file !=NULL) && (file->ndfid != NDF__NOID) ) {
+    smf_history_write( data, status);
+  }
+
+  msgOutiff( MSG__DEBUG2, " ", "Adding history item '%s'", status, appl);
 
 }

@@ -24,15 +24,16 @@
 *        is not associated with a file.
 
 *  Description:
-*     This routine reads the history component for a file associated
+*     This routine reads the SMURF history component for a file associated
 *     with the current smfData and stores it in an AstKeyMap. This can
 *     then be queried by routines checking whether a particular step
-*     has been carried out. Note that the only entries stored in the
-*     history are those written by SMURF (starting with SMF_), not the
-*     application-level NDF history entries.
+*     has been carried out. Note that SMURF uses a private scheme for
+*     tracking activity relating to the data because a single SMURF command
+*     can add multiple history items.
 
 *  Authors:
-*     Andy Gibb (UBC)
+*     AGG: Andy Gibb (UBC)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -41,12 +42,20 @@
 *     2006-07-05 (AGG):
 *        Check for presence of history component before attempting to
 *        read
+*     2009-09-17 (TIMJ):
+*        Use private HISTORY rather than standard NDF history. This gives
+*        us more control and stops contamination of the main history. Main
+*        motivation is that recently NDF started using the registered
+*        application name rather than the override value given to.
+*        ndfHput. NDF history is more than we need for a simple
+*        keymap where we only need the keys.
 
 *  Notes:
 *     - Checks are made assuming the subroutine names are lower case
 *     - See also smf_history_write
 
 *  Copyright:
+*     Copyright (C) 2009 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research
 *     Council and the University of British Columbia. All Rights
 *     Reserved.
@@ -90,38 +99,27 @@
 
 void smf_history_read( smfData* data,int *status) {
 
+  char * buffer = NULL;       /* char buffer read from history info */
+  size_t bufelem = 0;         /* Size of one element in buffer */
+  size_t clen = 0;            /* String length in _CHAR*X */
   smfFile *file = NULL;       /* data->file */
   int i = 0;                  /* Loop counter */
-  int nrec = 0;               /* Number of history records */
-  char refappl[NDF__SZAPP+1]; /* Name of application from header record */
+  size_t nrec = 0;            /* Number of history records */
   AstKeyMap *history = NULL;  /* History to be stored in the smfData */
-  int state;                  /* State of history component */
+  char **pntrs = NULL;        /* Pointers to strings in buffer */
+  HDSLoc * shloc = NULL;      /* Locator to smurf history extension */
+  HDSLoc * sloc = NULL;       /* Locator to smurf extension */
+  int there;                  /* Presence of components */
 
   /* Check entry status */
   if (*status != SAI__OK) return;
 
   /* check that we have a smfData */
-  if ( data == NULL ) {
-    *status = SAI__ERROR;
-    errRep( FUNC_NAME,
-	    "Supplied smfData is a NULL pointer. Possible programming error.",
-	    status);
-    return;
-  }
-
-  /* Check that we have a file */
-  file = data->file;
-  if ( file == NULL ) {
-    *status = SAI__ERROR;
-    errRep( FUNC_NAME,
-	    "Supplied smfData is not associated with a file. Unable to query history", status );
-    return;
-  }
+  if (!smf_validate_smfData( data, 0, 1, status )) return;
 
   /* Special case sc2store file */
-  if (file->isSc2store) {
-    return;
-  }
+  file = data->file;
+  if (file->isSc2store) return;
 
   /* Check that we have an NDF */
   if (file->ndfid == NDF__NOID) {
@@ -132,41 +130,53 @@ void smf_history_read( smfData* data,int *status) {
     return;
   }
 
-  /* Check the state of the history component */
-  ndfState( file->ndfid, "HISTORY", &state, status );
+  /* Need the SMURF extension */
+  ndfXstat( file->ndfid, "SMURF", &there, status );
+  if (!there) return;
+
+  ndfXloc( file->ndfid, "SMURF", "READ", &sloc, status );
+
+  datThere( sloc, "SMURFHIST", &there, status );
 
   /* If it exists, then continue to populate the AstKeyMap */
-  if ( state == 1 ) {
-    /* Found out how many history records we have */
-    ndfHnrec( file->ndfid, &nrec, status );
-
-    if ( *status == SAI__OK ) {
-      /* Create AstKeyMap */
-      history = astKeyMap(" " );
-      /* Stop with an error if the history could not be created */
-      if ( history == AST__NULL) {
-	if ( *status == SAI__OK ){
-	  *status = SAI__ERROR;
-	  errRep(FUNC_NAME, "Unable to create history AstKeyMap", status);
-	}
-      }
-
-      /* History records start at 1 */
-      for (i = 1; i <= nrec; i++ ) {
-	/* Retrieve history record */
-	ndfHinfo(file->ndfid, "APPLICATION", i, refappl, NDF__SZAPP, status);
-	/* Pick out the SMF_ routines which write their own history entries */
-	if ( strncmp( refappl, "smf_", 4 ) == 0 ) {
-	  /* Insert record into history. Note that previous values are
-	     overwritten, thus avoiding duplicate entries. */
-	  astMapPut0I( history, refappl, 1, " " );
-	}
+  if ( *status == SAI__OK && there ) {
+    /* Create AstKeyMap */
+    history = astKeyMap(" " );
+    /* Stop with an error if the history could not be created */
+    if ( history == AST__NULL) {
+      if ( *status == SAI__OK ){
+	*status = SAI__ERROR;
+	errRep(FUNC_NAME, "Unable to create history AstKeyMap", status);
       }
     }
+
+    /* Simplest possible history is just an array of strings */
+    datFind( sloc, "SMURFHIST", &shloc, status );
+    datClen( shloc, &clen, status );
+    datSize( shloc, &nrec, status );
+
+    pntrs = smf_malloc( nrec, sizeof(*pntrs), 0, status );
+    bufelem = (clen+1)*sizeof(*buffer);
+    buffer = smf_malloc( nrec, bufelem, 1, status );
+
+    datGet1C( shloc, nrec, bufelem*nrec, buffer, pntrs, &nrec, status );
+    datAnnul( &shloc, status );
+
+    /* Now copy out the buffer into the keymap */
+    for (i = 0; i < nrec; i++ ) {
+      /* Retrieve history record */
+      astMapPut0I( history, pntrs[i], 1, " " );
+    }
+
+    pntrs = smf_free( pntrs, status );
+    buffer = smf_free( buffer, status );
+
   } else {
     /* Inform user if no history */
     msgOutif(MSG__VERB," ", "No history component present. Continuing but this may cause problems later.", status);
   }
+
+  datAnnul( &sloc, status );
 
   /* Store history in smfData */
   data->history = history;

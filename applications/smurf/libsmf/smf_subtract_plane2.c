@@ -432,7 +432,6 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky,
   /* Write history entry if we finish with good status. */
   for ( kk=0; kk<ndat; kk++) {
     data = (array->sdata)[kk];
-    smf_history_add( data, FUNC_NAME, 
-                     "Plane sky subtraction successful", status);
+    smf_history_add( data, FUNC_NAME, status );
   }
 }

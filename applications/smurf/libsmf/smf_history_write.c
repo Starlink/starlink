@@ -4,7 +4,7 @@
 *     smf_history_write
 
 *  Purpose:
-*     Write an extra history comment to a file
+*     Write SMURF processing history to file
 
 *  Language:
 *     Starlink ANSI C
@@ -13,24 +13,21 @@
 *     C function
 
 *  Invocation:
-*     smf_history_write( const smfData * data, const char * appl,
-*                        const char * text, int * status );
+*     smf_history_write( const smfData * data, int *status );
 
 *  Arguments:
 *     data = const smfData* (Given)
-*        Data struct to obtain file identifier from.
-*     appl = const char * (Given)
-*        Name of "application" to store in file. If NULL, the 
-*        default application name will be used.
-*     text = const char * (Given)
-*        Descriptive text to write to the file. MERS message tokens
-*        can be included. Text will be truncated at NDF__SZHMX characters.
+*        Data struct to obtain file identifier from and history keymap
 *     status = int* (Given and Returned)
 *        Pointer to global status. Will be bad on return if this smfData
 *        is not associated with a file.
 
 *  Description:
-*     This function stores additional history information to a file.
+*     This function synchronizes the history information stored in
+*     the smfData with the file on disk. Does nothing if the smfData
+*     is not open for write access. Does not affect the main NDF
+*     HISTORY record.
+*
 *     It should be used primarily to tag activities that have been
 *     performed on the data which can not be derived from the application
 *     name. For example, since extinction correction may be performed
@@ -54,6 +51,8 @@
 *     2008-07-08 (TIMJ):
 *        Need to copy input text to internal buffer to avoid const warning
 *        from NDF API.
+*     2009-09-17 (TIMJ):
+*        No longer use NDF HISTORY.
 
 *  Notes:
 *     - SMURF subroutines should choose history "application" names
@@ -63,12 +62,10 @@
 *     - See also smf_history_check
 *     - An error will occur if the file is opened read-only.
 *     - It is an error to associate HISTORY with raw data files.
-*     - HISTORY is only written to the file when it is closed. Therefore
-*       do not expect to be able to call smf_history_check on the
-*       same file that you just called smf_history_write on.
+*     - The file is updated immediately.
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council
 *     and University of British Coulmbia. All Rights Reserved.
 
@@ -110,35 +107,19 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_history_write"
 
-void smf_history_write( const smfData* data, const char * appl, 
-			const char * text, int *status) {
+void smf_history_write( const smfData* data, int *status) {
+
   smfFile *file = NULL;  /* data->file */
-  char *linarr[1];       /* Pointer to char * text */
-  int state;             /* State of history component in NDF */
-  char buffer[NDF__SZHMX+1]; /* Temp buffer for copy of const text */
+  int there;             /* Is component there? */
 
   /* Check entry status */
   if (*status != SAI__OK) return;
 
   /* check that we have a smfData */
-  if ( data == NULL ) {
-    *status = SAI__ERROR;
-    errRep( FUNC_NAME,
-	    "Supplied smfData is a NULL pointer. Possible programming error.",
-	    status);
-    return;
-  }
-
-  /* Check that we have a file */
-  file = data->file;
-  if ( file == NULL ) {
-    *status = SAI__ERROR;
-    errRep( FUNC_NAME,
-	    "Supplied smfData is not associated with a file. Unable to write history", status );
-    return;
-  }
+  if (!smf_validate_smfData( data, 0, 1, status) ) return;
 
   /* Special case sc2store file */
+  file = data->file;
   if (file->isSc2store && *status == SAI__OK) {
     *status = SAI__ERROR;
     errRep( FUNC_NAME, "Writing HISTORY information to raw data is not allowed",
@@ -155,18 +136,65 @@ void smf_history_write( const smfData* data, const char * appl,
   }
 
   /* Check that we have a history component to write to */
-  ndfState( file->ndfid, "HISTORY", &state, status );
-  if ( state == 1 ) {
-    /* If present, write the information to the file */
-    linarr[0] = buffer;
-    one_strlcpy( linarr[0], text, sizeof(buffer), status);
-    ndfHput("NORMAL", appl, 0, 1, linarr, 1, 1, 1, file->ndfid, status );
-    /* Needed to write a separate line for each call of ndfHput */
-    ndfHend( status ); 
+  ndfIsacc( file->ndfid, "WRITE", &there, status );
+  if ( there ) {
+    HDSLoc *sloc = NULL;  /* Locator to SMURF extension */
+
+    /* Locate the SMURF extension */
+    ndfXstat( file->ndfid, "SMURF", &there, status );
+    if (!there) {
+      /* Create SMURF extension if it does not already exist */
+      ndfXnew( file->ndfid, "SMURF", "SMURF", 0, NULL, &sloc, status );
+    } else {
+      ndfXloc( file->ndfid, "SMURF", "UPDATE", &sloc, status );
+    }
+    datThere( sloc, "SMURFHIST", &there, status );
+    if (there) datErase( sloc, "SMURFHIST", status );
+    /* only write history if we have any keys in the keymap */
+    if (data->history) {
+      HDSLoc * shloc = NULL; /* Locator to SMURHIST component */
+
+      size_t nrec = astMapSize( data->history );
+      if (nrec > 0) {
+	size_t maxlen = 0;
+	size_t i;
+	char ** array = NULL;
+	/* Create a char** array and attach strings. Also find the
+	   longest string as we go */
+	array = smf_malloc( nrec, sizeof(*array), 0, status );
+	if (array) {
+	  for ( i=0; i<nrec; i++ ) {
+	    const char *key = NULL;
+	    size_t len = 0;
+	    key = astMapKey( data->history, i );
+	    len = strlen( key );
+	    if ( len > maxlen ) maxlen = len;
+
+	    array[i] = smf_malloc( 1, (len+1)*sizeof(**array), 0, status );
+	    one_strlcpy( array[i], key, len+1, status );
+	  }
+	}
+
+	/* Create new history array and copy in the values */
+	datNew1C( sloc, "SMURFHIST", maxlen, nrec, status );
+	datFind( sloc, "SMURFHIST", &shloc, status );
+	datPut1C( shloc, nrec, (const char**)array, status );
+
+	/* free everything */
+	for ( i=0; i<nrec; i++ ) {
+	  array[i] = smf_free( array[i], status );
+	}
+	array = smf_free( array, status );
+	datAnnul( &shloc, status );
+      }
+    }
+    datAnnul( &sloc, status );
+
   } else {
     /* Inform user if no history */
-    msgOutif(MSG__VERB," ", "No history component present to write to. Continuing but this may cause problems later.", status);
-
+    msgOutif(MSG__VERB," ",
+	     "NDF does not have write permission enabled so can not update processing history."
+	     " This may cause problems later.", status);
   }
 
 }

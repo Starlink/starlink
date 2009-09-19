@@ -480,8 +480,7 @@ void smf_subtract_plane1( smfData *data, const char *fittype, double *meansky,
 
   /* Write history entry */
   if ( *status == SAI__OK ) {
-    smf_history_add( data, FUNC_NAME, 
-                     "Plane sky subtraction successful", status);
+    smf_history_add( data, FUNC_NAME, status);
   } else {
     errRep(FUNC_NAME, "Error: status set bad. Possible programming error.", 
            status);

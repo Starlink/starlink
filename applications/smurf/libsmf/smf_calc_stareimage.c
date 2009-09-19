@@ -209,8 +209,8 @@ void smf_calc_stareimage( smfData *data, const int naver, int *status) {
       zero = smf_free( zero, status );
     }
     /* Add a history entry if everything's OK */
-    smf_history_write(data, "smf_calc_stareimage", 
-		      "STARE images calculated successfully", status);
+    smf_history_add(data, "smf_calc_stareimage",  status );
+
     /* Release SCU2RED locator */
     datAnnul( &scu2redloc, status );
   } else {
