@@ -454,6 +454,7 @@ int *status                /* global status (given and returned) */
    ubnd[1] = 1;
    
    ndfNew ( "_INTEGER", ndim, lbnd, ubnd, &place, &sc2store_indfwt, status );
+   ndfHcre( sc2store_indfwt, status );
    ndfMap ( sc2store_indfwt, "DATA", "_INTEGER", "WRITE", (void **)&data, &el, 
      status );
    data[0] = 0;
