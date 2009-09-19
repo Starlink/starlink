@@ -30,19 +30,51 @@
  *     - This application interface is not finalised. Please do not rely on this
  *     command in scripts.
 
-
  *  ADAM Parameters:
  *     NDF = NDF (Read)
  *          Raw DREAM data file(s)
  *     CONFIG = Literal (Read)
- *          Name of config file. If CONFIG=! some default parameters will be
- *          used.
+ *          Specifies values for the configuration parameters used to determine
+ *          the grid properties. If the string "def"
+ *          (case-insensitive) or a null (!) value is supplied, a set of
+ *          default configuration parameter values will be used.
+ *
+ *          The supplied value should be either a comma-separated list of
+ *          strings or the name of a text file preceded by an up-arrow
+ *          character "^", containing one or more comma-separated list of
+ *          strings. Each string is either a "keyword=value" setting, or
+ *          the name of a text file preceded by an up-arrow character
+ *          "^". Such text files should contain further comma-separated
+ *          lists which will be read and interpreted in the same manner
+ *          (any blank lines or lines beginning with "#" are
+ *          ignored). Within a text file, newlines can be used as
+ *          delimiters as well as commas. Settings are applied in the
+ *          order in which they occur within the list, with later
+ *          settings over-riding any earlier settings given for the same
+ *          keyword.
+ *
+ *          Each individual setting should be of the form:
+ *
+ *             <keyword>=<value>
+ *
+ *          The parameters available for are listed in the "Configuration
+ *          Parameters" sections below. Default values will be used for
+ *          any unspecified parameters. Unrecognised options are ignored
+ *          (that is, no error is reported). [current value]
  *     MSG_FILTER = _CHAR (Read)
  *          Control the verbosity of the application. Values can be
  *          NONE (no messages), QUIET (minimal messages), NORMAL,
  *          VERBOSE, DEBUG or ALL. [NORMAL]
  *     OUT = NDF (Write)
  *          Output weights file(s)
+
+ *  Configuration Parameters:
+ *     GRIDSTEP = INTEGER
+ *         Scale size of the dream grid pattern. [6.28 arcsec]
+ *     GRIDMINMAX = INTEGER
+ *         Array of integers specify the extent of the DREAM
+ *         pattern in pixels. Order is xmin, xmax, ymin,
+ *         ymax [(-4,4,-4,4)]
 
  *  Related Applications:
  *     SMURF: DREAMSOLVE
@@ -77,10 +109,13 @@
  *        Use kaplibs instead of ndgAssoc
  *     2009-08-27 (AGG):
  *        Template data file is specified by NDF, not IN
+ *     2009-09-18 (TIMJ):
+ *        Document config parameters. Use vector syntax for
+ *        GRIDMINMAX. Remove need for malloc of gridminmax.
  *     {enter_further_changes_here}
 
  *  Copyright:
- *     Copyright (C) 2008 Science and Technology Facilities Council.
+ *     Copyright (C) 2008-2009 Science and Technology Facilities Council.
  *     Copyright (C) 2006-2009 the University of British Columbia. All
  *     Rights Reserved.
 
@@ -140,7 +175,8 @@ void smurf_dreamweights ( int *status ) {
   /* Local Variables */
   Grp *confgrp = NULL;        /* Group containing configuration file */
   smfData *data = NULL;       /* Input data */
-  int *gridminmax = NULL;     /* Extent of grid points array */
+  const int defgridminmax[] = { -4, 4, -4, 4 }; /* Default extent xmin,xmax,ymin,ymax */
+  int gridminmax[4];          /* Extent of grid points array */
   int gridpts[DREAM__MXGRID][2]; /* Array of points for reconstruction grid */
   double gridstep;            /* Size of reconstruction grid in arcsec */
   size_t i;                   /* Loop counter */
@@ -171,10 +207,7 @@ void smurf_dreamweights ( int *status ) {
       errAnnul( status );
       msgOutif(MSG__VERB, " ", "No config file specified - assuming default configuration parameters", status);
       keymap = astKeyMap(" " );
-      astMapPut0I( keymap, "GRIDXMIN", -4, " " );
-      astMapPut0I( keymap, "GRIDXMAX", 4, " " );
-      astMapPut0I( keymap, "GRIDYMIN", -4, " " );
-      astMapPut0I( keymap, "GRIDYMAX", 4, " " );
+      astMapPut1I( keymap, "GRIDMINMAX", 4, (int*)defgridminmax, " " );
       astMapPut0D( keymap, "GRIDSTEP", 6.28, " " );
     } else {
       kpg1Kymap( confgrp, &keymap, status );
@@ -183,7 +216,7 @@ void smurf_dreamweights ( int *status ) {
   }
 
   /* Determine grid parameters from inputs given above */
-  smf_dream_getgrid( keymap, &gridstep, &ngrid, &gridminmax, gridpts, status);
+  smf_dream_getgrid( keymap, &gridstep, &ngrid, gridminmax, gridpts, status);
   /* Annul keymap immediately as it is no longer required */
   if (keymap) keymap = astAnnul( keymap );
 
@@ -208,9 +241,6 @@ void smurf_dreamweights ( int *status ) {
   }
 
   /* Free up resources */
-  if ( gridminmax != NULL ) {
-    gridminmax = smf_free( gridminmax, status);
-  }
   if ( ogrp != NULL ) {
     grpDelet( &ogrp, status);
   }

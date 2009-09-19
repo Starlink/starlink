@@ -13,16 +13,20 @@
  *     Subroutine
 
  *  Invocation:
- *     smf_dream_getgrid ( const AstKeyMap *keymap, double gridstep, int ngrid,
- *                        int gridpts[DREAM__MXGRID][2], int *status )
+ *     smf_dream_getgrid ( const AstKeyMap *keymap, double * gridstep, int * ngrid,
+ *                        int gridminmax[4], int gridpts[DREAM__MXGRID][2],
+ *                        int *status )
 
  *  Arguments:
  *     keymap = AstKeyMap * (Given)
  *        AST keymap with grid parameters
- *     gridstep = double (Returned)
+ *     gridstep = double* (Returned)
  *        Grid spacing in arcsec
- *     ngrid = int (Returned)
+ *     ngrid = int* (Returned)
  *        Number of points in reconstruction grid
+ *     gridminmax = int[4] (Returned)
+ *        Pointer to array of size 4 to receive the extent of the
+ *        grid. Elements are xmin, xmax, ymin, ymax.
  *     gridpts = int (Returned)
  *        Array of positions in the reconstruction grid
  *     status = int* (Given and Returned)
@@ -39,6 +43,7 @@
 
  *  Authors:
  *     Andy Gibb (UBC)
+ *     TIMJ: Tim Jenness (JAC, Hawaii)
  *     {enter_new_authors_here}
 
  *  History:
@@ -46,9 +51,13 @@
  *        Initial version
  *     2007-12-18 (AGG):
  *        Update to use new smf_free behaviour
+ *     2009-09-18 (TIMJ):
+ *        Tweak API to remove unnecessary malloc. GRIDMINMAX is now
+ *        a vector rather than 4 elements in the keymap. Update prologue.
  *     {enter_further_changes_here}
 
  *  Copyright:
+ *     Copyright (C) 2009 Science and Technology Facilities Council.
  *     Copyright (C) 2006 University of British Columbia. All Rights
  *     Reserved.
 
@@ -88,8 +97,14 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_dream_getgrid"
 
+/* minmax locations */
+#define XMIN 0
+#define XMAX 1
+#define YMIN 2
+#define YMAX 3
+
 void smf_dream_getgrid( const AstKeyMap *keymap, double *gridstep, int *ngrid,
-                        int **gridminmax, int gridpts[DREAM__MXGRID][2],
+                        int gridminmax[4], int gridpts[DREAM__MXGRID][2],
                         int *status) {
 
   /* Local variables */
@@ -110,62 +125,44 @@ void smf_dream_getgrid( const AstKeyMap *keymap, double *gridstep, int *ngrid,
   if( !astMapGet0D( keymap, "GRIDSTEP", gridstep ) ) {
     *gridstep = 6.28; /* Define default value */
   }
-  if( !astMapGet0I( keymap, "GRIDXMIN", &gridxmin ) ) {
+
+  /* Get the grid extent, prefill it just in case */
+  gridminmax[XMIN] = 0;
+  gridminmax[XMAX] = 1;
+  gridminmax[YMIN] = 0;
+  gridminmax[YMAX] = 1;
+  if( !astMapGet1I( keymap, "GRIDMINMAX", 4, &tmp, gridminmax ) ) {
     *status = SAI__ERROR;
     errRep(FUNC_NAME, "GRIDXMIN unspecified", status);
-  }
-  if( !astMapGet0I( keymap, "GRIDXMAX", &gridxmax ) ) {
-    *status = SAI__ERROR;
-    errRep(FUNC_NAME, "GRIDXMAX unspecified", status);
-  }
-  if( !astMapGet0I( keymap, "GRIDYMIN", &gridymin ) ) {
-    *status = SAI__ERROR;
-    errRep(FUNC_NAME, "GRIDYMIN unspecified", status);
-  }
-  if( !astMapGet0I( keymap, "GRIDYMAX", &gridymax ) ) {
-    *status = SAI__ERROR;
-    errRep(FUNC_NAME, "GRIDYMAX unspecified", status);
   }
 
   if ( *status == SAI__OK ) {
     /* Check gridxmax > gridxmin etc: swap them round by default? */
-    if ( gridxmin > gridxmax ) {
+    if ( gridminmax[XMIN] > gridminmax[XMAX] ) {
       msgOutif(MSG__VERB," ", "Xmin > Xmax: swapping them round", status );
-      tmp = gridxmin;
-      gridxmin = gridxmax;
-      gridxmax = tmp;
+      tmp = gridminmax[XMIN];
+      gridminmax[XMIN] = gridminmax[XMAX];
+      gridminmax[XMAX] = tmp;
     }
-    if ( gridymin > gridymax ) {
+    if ( gridminmax[YMIN] > gridminmax[YMAX] ) {
       msgOutif(MSG__VERB," ", "Ymin > Ymax: swapping them round", status );
-      tmp = gridymin;
-      gridymin = gridymax;
-      gridymax = tmp;
+      tmp = gridminmax[YMIN];
+      gridminmax[YMIN] = gridminmax[YMAX];
+      gridminmax[YMAX] = tmp;
     }
 
     /* Create gridpts array from min/max extent */
-    *ngrid = ((gridxmax - gridxmin + 1) * (gridymax - gridymin + 1));
+    *ngrid = ((gridminmax[XMAX] - gridminmax[XMIN] + 1) *
+	      (gridminmax[YMAX] - gridminmax[YMIN] + 1));
     k = 0;
-    for ( ygrid=gridymin; ygrid<=gridymax; ygrid++ ) {
-      for ( xgrid=gridxmin; xgrid<=gridxmax; xgrid++ ) {
+    for ( ygrid=gridminmax[YMIN]; ygrid<=gridminmax[YMAX]; ygrid++ ) {
+      for ( xgrid=gridminmax[XMIN]; xgrid<=gridminmax[XMAX]; xgrid++ ) {
         gridpts[k][0] = xgrid;
         gridpts[k][1] = ygrid;
         k++;
       }
     }
-    /* Array to store gridextent */
-    nelem = 4;
-    *gridminmax = smf_malloc( nelem, sizeof(int), 1, status);
-    if ( *status == SAI__OK ) {
-      (*gridminmax)[0] = gridxmin;
-      (*gridminmax)[1] = gridxmax;
-      (*gridminmax)[2] = gridymin;
-      (*gridminmax)[3] = gridymax;
-    } else {
-      *gridminmax = smf_free( gridminmax, status );
-      errRep(FUNC_NAME, "Unable to allocate memory for grid extent array", status);
-    }
-  } else {
-    *gridminmax = NULL;
+
   }
 
 }

@@ -708,7 +708,7 @@ void smf_dream_calcweights ( smfData *data, const Grp *ogrp, const int index,
 			     int *status );
 
 void smf_dream_getgrid( const AstKeyMap *keymap, double *gridstep, int *ngrid, 
-			int **gridminmax, int gridpts[][2], int *status);
+			int gridminmax[4], int gridpts[][2], int *status);
 
 void smf_dream_setjig( char subarray[], int nsampcycle, double gridstep, 
 		       double jigpath[][2], int *status);

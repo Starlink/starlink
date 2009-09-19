@@ -1233,7 +1233,8 @@ package @PACKAGE@ {
                 type LITERAL
                 access READ
                 vpath {PROMPT }
-                ppath GLOBAL CURRENT
+                ppath CURRENT DEFAULT
+		default !
                 prompt {DREAM reconstruction parameters}
                 helpkey *
             }
