@@ -51,6 +51,7 @@
 
 *  Authors:
 *     Andy Gibb (UBC)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -66,9 +67,13 @@
 *     2006-09-21 (AGG):
 *        Check that the caller has requested WRITE or UPDATE access
 *        before attempting to create a new extension
+*     2009-09-18 (TIMJ):
+*        - ndfIsacc does not have separate UPDATE access check.
+*        - use smf_validate_smfData
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2009 Science and Technology Facilities Council.
 *     Copyright (C) 2006 University of British Columbia. All Rights
 *     Reserved.
 
@@ -130,7 +135,6 @@ HDSLoc * smf_get_xloc ( const smfData *data, const char *extname,
 			const char *extype, const char *accmode, 
 			const int ndims, const int *dims, int *status ) {
 
-  smfFile *file;            /* Pointer to input file struct */
   int indf;                 /* NDF identifier for input file */
   HDSLoc *loc = NULL;       /* Locator to return */
   int itexists;             /* Flag to denote whether extension exists */
@@ -140,20 +144,9 @@ HDSLoc * smf_get_xloc ( const smfData *data, const char *extname,
   if ( *status != SAI__OK ) return NULL;
 
   /* Retrieve NDF identifier from smfFile */
-  if ( data == NULL ) {
-    *status = SAI__ERROR;
-    errRep( FUNC_NAME,
-	    "Supplied smfData is a NULL pointer. Possible programming error.",
-	    status);
-    return NULL;
-  }
-  file = data->file;
-  if ( file == NULL ) {
-    *status = SAI__ERROR;
-    errRep(FUNC_NAME, "Supplied smfData is not associated with a file, unable to create a locator", status);
-    return NULL;
-  }
-  indf = file->ndfid;
+  if (!smf_validate_smfData( data, 0, 1, status) ) return NULL;
+
+  indf = data->file->ndfid;
   if ( indf == NDF__NOID ) {
     *status = SAI__ERROR;
     errRep(FUNC_NAME, "Supplied smfData is associated with a file but it isn't an NDF", status);
@@ -184,30 +177,22 @@ HDSLoc * smf_get_xloc ( const smfData *data, const char *extname,
     if ( strncmp ( accmode, "WRITE", 5) == 0 || 
 	 strncmp ( accmode, "UPDATE", 6) == 0) {
       /* If we want to create new extension we first have to check
-	 that the NDF is open for WRITE or UPDATE access */
+	 that the NDF is open for write access */
       ndfIsacc( indf, "WRITE", &isacc, status );
       if (isacc) {
 	msgSetc("E", extname);
 	msgOutif(MSG__DEBUG," ", "Creating new extension, ^E", status );
 	ndfXnew( indf, extname, extype, ndims, dims, &loc, status );
       } else {
-	/* OK not open for WRITE access, try UPDATE */
-	ndfIsacc( indf, "UPDATE", &isacc, status );
-	if (isacc) {
-	  msgSetc("E", extname);
-	  msgOutif(MSG__DEBUG," ", "Creating new extension, ^E", status );
-	  ndfXnew( indf, extname, extype, ndims, dims, &loc, status );
-	} else {
-	  /* OK file cannot be written to despite the fact we want a
-	     new extension - time to let the user know */
-	  if ( *status == SAI__OK ) {
-	    *status = SAI__ERROR;
-	    msgSetc("A", accmode );
-	    errRep(FUNC_NAME, 
-		   "Unable to create new extension: file is not open for ^A access", 
-		   status);
-	    loc = NULL;
-	  }
+	/* OK file cannot be written to despite the fact we want a
+	   new extension - time to let the user know */
+	if ( *status == SAI__OK ) {
+	  *status = SAI__ERROR;
+	  msgSetc("A", accmode );
+	  errRep(" ",
+		 FUNC_NAME ": Unable to create new extension: file is not open for ^A access",
+		 status);
+	  loc = NULL;
 	}
       }
     } else {
