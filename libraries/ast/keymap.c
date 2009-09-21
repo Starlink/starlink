@@ -392,12 +392,12 @@ static void MapPut0C( AstKeyMap *, const char *, const char *, const char *, int
 static void MapPut0D( AstKeyMap *, const char *, double, const char *, int * );
 static void MapPut0F( AstKeyMap *, const char *, float, const char *, int * );
 static void MapPut0I( AstKeyMap *, const char *, int, const char *, int * );
-static void MapPut1P( AstKeyMap *, const char *, int, void *[], const char *, int * );
-static void MapPut1A( AstKeyMap *, const char *, int, AstObject *[], const char *, int * );
-static void MapPut1C( AstKeyMap *, const char *, int, const char *[], const char *, int * );
-static void MapPut1D( AstKeyMap *, const char *, int, double *, const char *, int * );
-static void MapPut1F( AstKeyMap *, const char *, int, float *, const char *, int * );
-static void MapPut1I( AstKeyMap *, const char *, int, int *, const char *, int * );
+static void MapPut1P( AstKeyMap *, const char *, int, void *const [], const char *, int * );
+static void MapPut1A( AstKeyMap *, const char *, int, AstObject *const [], const char *, int * );
+static void MapPut1C( AstKeyMap *, const char *, int, const char *const [], const char *, int * );
+static void MapPut1D( AstKeyMap *, const char *, int, const double *, const char *, int * );
+static void MapPut1F( AstKeyMap *, const char *, int, const float *, const char *, int * );
+static void MapPut1I( AstKeyMap *, const char *, int, const int *, const char *, int * );
 static void MapRemove( AstKeyMap *, const char *, int * );
 static void NewTable( AstKeyMap *, int, int * );
 static void RemoveTableEntry( AstKeyMap *, int, const char *, int * );
@@ -2912,8 +2912,8 @@ f     AST_MAPPUT1<X>
 
 *  Synopsis:
 c     #include "ast.h"
-c     void astMapPut1<X>( AstKeyMap *this, const char *key, int size, <X>type value[], 
-c                         const char *comment );
+c     void astMapPut1<X>( AstKeyMap *this, const char *key, int size,
+c                         const <X>type value[], const char *comment );
 f     CALL AST_MAPPUT1<X>( THIS, KEY, SIZE, VALUE, COMMENT, STATUS )
 
 *  Class Membership:
@@ -2996,8 +2996,9 @@ c     this is attempted.
 */
 /* Define a macro to implement the function for a specific data type. */
 #define MAKE_MAPPUT1(X,Xtype,Itype,ValExp) \
-static void MapPut1##X( AstKeyMap *this, const char *key, int size, Xtype value[], \
-                        const char *comment, int *status ) { \
+static void MapPut1##X( AstKeyMap *this, const char *key, int size, \
+                        Xtype value[], const char *comment, \
+                        int *status ) { \
 \
 /* Local Variables: */ \
    AstMapEntry *mapentry;  /* Pointer to parent MapEntry structure */ \
@@ -3083,12 +3084,12 @@ for( i = 0; i < size; i++ ) { \
 
 /* Expand the above macro to generate a function for each required
    data type. */
-MAKE_MAPPUT1(D,double,AST__DOUBLETYPE,value[i])
-MAKE_MAPPUT1(F,float,AST__FLOATTYPE,value[i])
-MAKE_MAPPUT1(I,int,AST__INTTYPE,value[i])
-MAKE_MAPPUT1(C,const char *,AST__STRINGTYPE,astStore(NULL,value[i],strlen(value[i])+1))
-MAKE_MAPPUT1(A,AstObject *,AST__OBJECTTYPE,(value[i]?astClone(value[i]):NULL))
-MAKE_MAPPUT1(P,void *,AST__POINTERTYPE,value[i])
+MAKE_MAPPUT1(D,const double,AST__DOUBLETYPE,value[i])
+MAKE_MAPPUT1(F,const float,AST__FLOATTYPE,value[i])
+MAKE_MAPPUT1(I,const int,AST__INTTYPE,value[i])
+MAKE_MAPPUT1(C,const char *const,AST__STRINGTYPE,astStore(NULL,value[i],strlen(value[i])+1))
+MAKE_MAPPUT1(A,AstObject *const,AST__OBJECTTYPE,(value[i]?astClone(value[i]):NULL))
+MAKE_MAPPUT1(P,void *const,AST__POINTERTYPE,value[i])
 
 /* Undefine the macro. */
 #undef MAKE_MAPPUT1
@@ -3099,8 +3100,9 @@ MAKE_MAPPUT1(P,void *,AST__POINTERTYPE,value[i])
 #undef CHECK_C
 #undef CHECK_P
 
-void astMapPut1AId_( AstKeyMap *this, const char *key, int size, AstObject *value[],
-                     const char *comment, int *status ) {
+void astMapPut1AId_( AstKeyMap *this, const char *key, int size,  
+                     AstObject *const value[], const char *comment, 
+                     int *status ) {
 /*
 *  Name:
 *     astMapPut1AId_
@@ -3113,8 +3115,8 @@ void astMapPut1AId_( AstKeyMap *this, const char *key, int size, AstObject *valu
 
 *  Synopsis:
 *     #include "ast.h"
-*     void astMapPut1A( AstKeyMap *this, const char *key, int size, AstObject *value[], 
-*                       const char *comment )
+*     void astMapPut1A( AstKeyMap *this, const char *key, int size, 
+*                       AstObject *const value[], const char *comment )
 
 *  Class Membership:
 *     KeyMap method.
@@ -6791,17 +6793,18 @@ MAKE_MAPPUT0_(P,void *)
 #undef MAKE_MAPPUT0_
 
 #define MAKE_MAPPUT1_(X,Xtype) \
-void astMapPut1##X##_( AstKeyMap *this, const char *key, int size, Xtype value[], \
-                      const char *comment, int *status ){ \
+void astMapPut1##X##_( AstKeyMap *this, const char *key, int size, \
+                       Xtype value[], const char *comment, \
+                       int *status ){ \
    if ( !astOK ) return; \
    (**astMEMBER(this,KeyMap,MapPut1##X))(this,key,size,value,comment, status ); \
 }
-MAKE_MAPPUT1_(D,double)
-MAKE_MAPPUT1_(F,float)
-MAKE_MAPPUT1_(I,int)
-MAKE_MAPPUT1_(C,const char *)
-MAKE_MAPPUT1_(A,AstObject *)
-MAKE_MAPPUT1_(P,void *)
+MAKE_MAPPUT1_(D,const double)
+MAKE_MAPPUT1_(F,const float)
+MAKE_MAPPUT1_(I,const int)
+MAKE_MAPPUT1_(C,const char *const)
+MAKE_MAPPUT1_(A,AstObject *const)
+MAKE_MAPPUT1_(P,void *const)
 #undef MAKE_MAPPUT1_
 
 #define MAKE_MAPGET0_(X,Xtype) \

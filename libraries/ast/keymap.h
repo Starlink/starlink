@@ -144,12 +144,12 @@ typedef struct AstKeyMapVtab {
    void (* MapPut0C)( AstKeyMap *, const char *, const char *, const char *, int * );
    void (* MapPut0A)( AstKeyMap *, const char *, AstObject *, const char *, int * );
    void (* MapPut0P)( AstKeyMap *, const char *, void *, const char *, int * );
-   void (* MapPut1I)( AstKeyMap *, const char *, int, int[], const char *, int * );
-   void (* MapPut1D)( AstKeyMap *, const char *, int, double[], const char *, int * );
-   void (* MapPut1F)( AstKeyMap *, const char *, int, float[], const char *, int * );
-   void (* MapPut1C)( AstKeyMap *, const char *, int, const char *[], const char *, int * );
-   void (* MapPut1A)( AstKeyMap *, const char *, int, AstObject *[], const char *, int * );
-   void (* MapPut1P)( AstKeyMap *, const char *, int, void *[], const char *, int * );
+   void (* MapPut1I)( AstKeyMap *, const char *, int, const int[], const char *, int * );
+   void (* MapPut1D)( AstKeyMap *, const char *, int, const double[], const char *, int * );
+   void (* MapPut1F)( AstKeyMap *, const char *, int, const float[], const char *, int * );
+   void (* MapPut1C)( AstKeyMap *, const char *, int, const char *const [], const char *, int * );
+   void (* MapPut1A)( AstKeyMap *, const char *, int, AstObject *const [], const char *, int * );
+   void (* MapPut1P)( AstKeyMap *, const char *, int, void *const [], const char *, int * );
    int (* MapGet0I)( AstKeyMap *, const char *, int *, int * );
    int (* MapGet0D)( AstKeyMap *, const char *, double *, int * );
    int (* MapGet0F)( AstKeyMap *, const char *, float *, int * );
@@ -247,12 +247,12 @@ void astInitKeyMapGlobals_( AstKeyMapGlobals * );
 #if defined(astCLASS)            /* Protected */
 int astMapGet0A_( AstKeyMap *, const char *, AstObject **, int * );
 int astMapGet1A_( AstKeyMap *, const char *, int, int *, AstObject **, int * );
-void astMapPut1A_( AstKeyMap *, const char *, int, AstObject *[], const char *, int * );
+void astMapPut1A_( AstKeyMap *, const char *, int, AstObject *const [], const char *, int * );
 int astMapGetElemA_( AstKeyMap *, const char *, int, AstObject **, int * );
 #else
 int astMapGet0AId_( AstKeyMap *, const char *, AstObject **, int * );
 int astMapGet1AId_( AstKeyMap *, const char *, int, int *, AstObject **, int * );
-void astMapPut1AId_( AstKeyMap *, const char *, int, AstObject *[], const char *, int * );
+void astMapPut1AId_( AstKeyMap *, const char *, int, AstObject *const [], const char *, int * );
 int astMapGetElemAId_( AstKeyMap *, const char *, int, AstObject **, int * );
 #endif
 
@@ -279,16 +279,16 @@ void astMapPut0C_( AstKeyMap *, const char *, const char *, const char *, int * 
 void astMapPut0D_( AstKeyMap *, const char *, double, const char *, int * );
 void astMapPut0F_( AstKeyMap *, const char *, float, const char *, int * );
 void astMapPut0I_( AstKeyMap *, const char *, int, const char *, int * );
-void astMapPut1C_( AstKeyMap *, const char *, int, const char *[], const char *, int * );
-void astMapPut1D_( AstKeyMap *, const char *, int, double *, const char *, int * );
-void astMapPut1F_( AstKeyMap *, const char *, int, float *, const char *, int * );
-void astMapPut1I_( AstKeyMap *, const char *, int, int *, const char *, int * );
+void astMapPut1C_( AstKeyMap *, const char *, int, const char *const [], const char *, int * );
+void astMapPut1D_( AstKeyMap *, const char *, int, const double *, const char *, int * );
+void astMapPut1F_( AstKeyMap *, const char *, int, const float *, const char *, int * );
+void astMapPut1I_( AstKeyMap *, const char *, int, const int *, const char *, int * );
 void astMapRemove_( AstKeyMap *, const char *, int * );
 int astMapGet0P_( AstKeyMap *, const char *, void **, int * );
 int astMapGet1P_( AstKeyMap *, const char *, int, int *, void **, int * );
 int astMapGetElemP_( AstKeyMap *, const char *, int, void **, int * );
 void astMapPut0P_( AstKeyMap *, const char *, void *, const char *, int * );
-void astMapPut1P_( AstKeyMap *, const char *, int, void *[], const char *, int * );
+void astMapPut1P_( AstKeyMap *, const char *, int, void *const [], const char *, int * );
 
 #if defined(astCLASS)            /* Protected */
 int astGetSizeGuess_( AstKeyMap *, int * );
