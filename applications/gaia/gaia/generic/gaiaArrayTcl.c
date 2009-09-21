@@ -842,14 +842,20 @@ static int gaiaArrayGetMinMax( ClientData clientData, Tcl_Interp *interp,
         return TCL_ERROR;
     }
     info = (ARRAYinfo *) adr;
+    if ( info ) {
 
-    /* Get the min and max. */
-    gaiaArrayMinMax( info, &min, &max );
+        /* Get the min and max. */
+        gaiaArrayMinMax( info, &min, &max );
 
-    /* And report. */
-    resultObj = Tcl_GetObjResult( interp );
-    Tcl_ListObjAppendElement( interp, resultObj, Tcl_NewDoubleObj( min ) );
-    Tcl_ListObjAppendElement( interp, resultObj, Tcl_NewDoubleObj( max ) );
+        /* And report. */
+        resultObj = Tcl_GetObjResult( interp );
+        Tcl_ListObjAppendElement( interp, resultObj, Tcl_NewDoubleObj( min ) );
+        Tcl_ListObjAppendElement( interp, resultObj, Tcl_NewDoubleObj( max ) );
 
-    return TCL_OK;
+        return TCL_OK;
+    }
+
+    Tcl_SetResult( interp, "Cannot determine min and max of an empty array",
+                   TCL_VOLATILE );
+    return TCL_ERROR;
 }

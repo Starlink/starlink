@@ -261,14 +261,17 @@ itcl::class gaia::GaiaMask {
          return 0
       }
       if { $last_mask_ != $itk_option(-mask) } {
-         open_mask_
-         load_mask_
-         set last_mask_ $itk_option(-mask)
+         if { [open_mask_] } {
+            load_mask_
+            set last_mask_ $itk_option(-mask)
 
-         #  Set the range of values for this mask.
-         if { $itk_option(-show_slider) } {
-            lassign [array::getminmax $mask_adr_] min max
-            $itk_component(index) configure -to $max
+            #  Set the range of values for this mask.
+            if { $itk_option(-show_slider) } {
+               lassign [array::getminmax $mask_adr_] min max
+               $itk_component(index) configure -to $max
+            }
+         } else {
+            return 0
          }
       }
       return 1
@@ -306,7 +309,7 @@ itcl::class gaia::GaiaMask {
          if { $itk_option(-mask) != {} } {
             error_dialog "No such file: $itk_option(-mask)" $w_
          }
-         return
+         return 0
       }
 
       $mask_namer_ absolute
@@ -319,6 +322,7 @@ itcl::class gaia::GaiaMask {
 
       #  Record this mask in Go menu.
       $history_ add_history $itk_option(-mask)
+      return 1
    }
 
    #  Load the mask by mapping its data.

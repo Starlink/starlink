@@ -47,6 +47,9 @@
     Previously only those with EXTNAME of COMPRESSED_IMAGE where 
     detected.
 
+    A bug in the 2D mask toolbox caused GAIA to crash when a given mask
+    didn't exist. This has been fixed.
+
     Version 4.3-1
     =============
 
