@@ -212,7 +212,10 @@ datGet1C( const HDSLoc * locator,  size_t maxval, size_t bufsize, char *buffer,
 	  *status = DAT__TRUNC;
 	  emsSeti( "N", *actval );
 	  emsSeti( "SZ", lenstr );
-	  emsRep("datGet1C","datGet1C: Insufficient space supplied by caller to receive ^N strings from _CHAR*^SZ array", status);
+	  emsSeti( "NEED", i+1);
+	  emsSeti( "LEFT", nleft );
+	  emsRep("datGet1C","datGet1C: Insufficient space supplied by caller to receive ^N strings from _CHAR*^SZ array."
+		 " Need ^NEED but only have ^LEFT bytes remaining in buffer", status);
 	}
 
 	/* Copy i characters to output buffer if the will fit */
