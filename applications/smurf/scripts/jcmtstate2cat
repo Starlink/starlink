@@ -86,16 +86,11 @@ if ($version) {
 my @files = @ARGV;
 
 my %DATA;
-my $status = &NDF::SAI__OK;
 my $isfirst = 1;
 my $isfirst_file = 1;
 my @columns;
 my %cols;
 
-my $base_az; # First AZEL Base position for use as reference for az and el columns
-my $base_el;
-
-err_begin($status );
 for my $f (@files) {
 
   # Read JCMTSTATE information
@@ -134,7 +129,6 @@ for my $f (@files) {
     print join("\t",@slice)."\n";
   }
 }
-err_end( $status );
 
 exit;
 
