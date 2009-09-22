@@ -42,21 +42,16 @@ Print the full documentation to STDOUT.
 
 =head1 NOTES
 
-Four columns are generated in addition to writing the simple contents
-of the JCMT state structure. "ra" and "dec" contain the tracking
-coordinates taking into account jiggle and chop (noting that if the
-tracking system is GALACTIC the columns will still be called "ra" and
-"dec"). "az" and "el" contain the (moving) azimuth and elevation
-taking into account telescope and secondary movement. "daz" and "del"
-contain the azimuth and elevation of the observation taking account of
-jiggling and chopping but referenced back to the base position for the
-beginning of the observation. Note that jiggle and chop offsets are
-added onto the actual AZEL coordinates (TCS_AZ_AC1 and TCS_AZ_AC2)
-without attempting to convert them to RA/Dec first. This means that
-the values may not correspond to a simple rotation relative to the
-"ra" and "dec" values if the jiggle coordinate system is AZEL. If the
-jiggle coordinate system is TRACKING then the coordinates will be
-related by a simple rotation.
+Eight columns are generated in addition to writing the simple contents
+of the JCMT state structure. All are a combination of the telescope
+position and secondary mirror. "ra" and "dec" contain the tracking
+coordinates (noting that if the tracking system is GALACTIC the columns
+will still be called "ra" and "dec"). "dra" and "ddec" are the tracking
+offsets from the base position in arcseconds. "az" and "el" contain the
+(moving) azimuth and elevation. "daz" and "del" are the azimuth and
+elevation offsets from the base position in arcseconds. AZEL coordinates
+are calculated directly from the state information without converting
+first to RA/Dec.
 
 Note that information from the ACSIS extension is not included at this
 time. This is partly because this extension can change in shape
@@ -118,7 +113,7 @@ for my $f (@files) {
   # now dump the contents
   if ($isfirst_file) {
     print "# This is a TST formatted file\n";
-    print join("\t", "Id", "RA", "DEC", "DAZ","DEL", "AZ", "EL", @columns) ,"\n";
+    print join("\t", "Id", "RA", "DEC", "DRA", "DDEC", "AZ","EL", "DAZ", "DEL", @columns) ,"\n";
     print join("\t", map { "--" } (0..($#columns+3))),"\n";
     $isfirst_file = 0;
   }
@@ -129,82 +124,8 @@ for my $f (@files) {
     # Use the RTS sequence number as the ID
     push(@slice, $local{RTS_NUM}->[$i]);
 
-    # Check for bad values
-    my $isokay = 1;
-    for my $key (qw/ TCS_TR_AC1 TCS_TR_AC2 SMU_TR_JIG_X SMU_TR_JIG_Y
-                     SMU_TR_CHOP_X SMU_TR_CHOP_Y / ) {
-      if ($local{$key}->[$i] == &NDF::VAL__BADD()) {
-        $isokay = 0;
-        last;
-      }
-    }
-
-    # Now calculate the RA,Dec of the field centre in tracking coordinates
-    # taking the chop and jiggle into account
-    my ($ra, $dec) = (&NDF::VAL__BADD(), &NDF::VAL__BADD() );
-    if ($isokay) {
-      my $rabase = $local{TCS_TR_AC1}->[$i];
-      my $decbase = $local{TCS_TR_AC2}->[$i];
-      my $xoffset = $local{SMU_TR_JIG_X}->[$i] + $local{SMU_TR_CHOP_X}->[$i];
-      my $yoffset = $local{SMU_TR_JIG_Y}->[$i] + $local{SMU_TR_CHOP_Y}->[$i];
-      $xoffset *= Astro::SLA::DAS2R;
-      $yoffset *= Astro::SLA::DAS2R;
-
-      Astro::SLA::slaDtp2s( $xoffset, $yoffset, $rabase, $decbase, $ra, $dec );
-      $ra = Astro::Coords::Angle::Hour->new( $ra )->degrees;
-      $dec = Astro::Coords::Angle->new($dec)->degrees;
-    }
-    push(@slice, $ra, $dec );
-
-    # Check for bad values
-    $isokay = 1;
-    for my $key (qw/ TCS_AZ_AC1 TCS_AZ_AC2 SMU_AZ_JIG_X SMU_AZ_JIG_Y
-                     TCS_AZ_BC1 TCS_AZ_BC2 SMU_AZ_CHOP_X SMU_AZ_CHOP_Y / ) {
-      if ($local{$key}->[$i] == &NDF::VAL__BADD()) {
-        $isokay = 0;
-        last;
-      }
-    }
-
-    # Now calculate "az" and "el" and "daz" and "del". Complication
-    # here for daz/del is that we calculate the position after taking
-    # out the motion due to the telescope base position changing. Note
-    # that there is no rotation because we do not first convert each
-    # position to RA/Dec and then back to AZEL.
-    my ($az, $el) = (&NDF::VAL__BADD(), &NDF::VAL__BADD() );
-    my ($daz,$del) = ($az, $el);
-    if ($isokay) {
-
-      # Store the BASE AZEL position for later - first few could be bad but we
-      # know they are good in here
-      $base_az = $local{TCS_AZ_BC1}->[$i] unless defined $base_az;
-      $base_el = $local{TCS_AZ_BC2}->[$i] unless defined $base_el;
-
-      my $actual_az_diff = $local{TCS_AZ_AC1}->[$i] - $local{TCS_AZ_BC1}->[$i];
-      my $actual_el_diff = $local{TCS_AZ_AC2}->[$i] - $local{TCS_AZ_BC2}->[$i];
-      my $this_az_base = $base_az + $actual_az_diff;
-      my $this_el_base = $base_el + $actual_el_diff;
-
-      my $xoffset = $local{SMU_AZ_JIG_X}->[$i] + $local{SMU_AZ_CHOP_X}->[$i];
-      my $yoffset = $local{SMU_AZ_JIG_Y}->[$i] + $local{SMU_AZ_CHOP_Y}->[$i];
-      $xoffset *= Astro::SLA::DAS2R;
-      $yoffset *= Astro::SLA::DAS2R;
-
-      # az and el are not corrected for base position
-      Astro::SLA::slaDtp2s( $xoffset, $yoffset,
-                            $local{TCS_AZ_AC1}->[$i], $local{TCS_AZ_AC2}->[$i], $az, $el );
-      $az = Astro::Coords::Angle->new( $az )->degrees;
-      $el = Astro::Coords::Angle->new( $el )->degrees;
-
-      # daz and del are corrected for base position
-      Astro::SLA::slaDtp2s( $xoffset, $yoffset, $this_az_base, $this_el_base, $daz, $del );
-      $daz = Astro::Coords::Angle->new( $daz )->degrees;
-      $del = Astro::Coords::Angle->new( $del )->degrees;
-
-    }
-
-    push(@slice, $daz, $del, $az, $el );
-
+    push(@slice, calc_pos( "TR", $i, \%local) );
+    push(@slice, calc_pos( "AZ", $i, \%local) );
 
     # And append the remaining columns
     for my $col (@columns) {
@@ -215,6 +136,68 @@ for my $f (@files) {
 }
 err_end( $status );
 
+exit;
+
+# Calculate a sky position in either "AZ" or "TR" system
+# along with a "delta" offset from base.
+#
+# ($x, $y, $dx, $dy) = calc_pos( "AZ", $i, \%state );
+#
+# Where $i is the index into the arrays associoted with %state
+
+sub calc_pos {
+  my ($typ, $i, $sref) = @_;
+
+  my $bad = &NDF::VAL__BADD();
+  my ($x, $y, $dx, $dy) = ($bad, $bad, $bad, $bad);
+
+  # See if the values are good and copy them to local hash
+  my %local;
+  my $isokay = 1;
+  for my $tmpl (qw/ TCS_XX_AC1 TCS_XX_AC2 TCS_XX_BC1 TCS_XX_BC2
+		    SMU_XX_JIG_X SMU_XX_JIG_Y
+		    SMU_XX_CHOP_X SMU_XX_CHOP_Y / ) {
+    my $key = $tmpl;
+    $key =~ s/XX/$typ/;
+    if ( $sref->{$key}->[$i] == $bad) {
+      $isokay = 0;
+      last;
+    }
+    $local{$tmpl} = $sref->{$key}->[$i];
+  }
+
+  return ($x, $y, $dx, $dy) unless $isokay;
+
+  # Now calculate the two sets of positions
+
+  # Calculate the tangent plane offset of Actual from Base
+  # and convert to arcsec
+  Astro::SLA::slaDs2tp( $local{TCS_XX_AC1}, $local{TCS_XX_AC2},
+			$local{TCS_XX_BC1}, $local{TCS_XX_BC2},
+			my $xoffset, my $yoffset, my $j );
+  $xoffset *= Astro::SLA::DR2AS;
+  $yoffset *= Astro::SLA::DR2AS;
+
+  # These are natively in arcsec in the state structure
+  my $xoffset_jc = $local{SMU_XX_JIG_X} + $local{SMU_XX_CHOP_X};
+  my $yoffset_jc = $local{SMU_XX_JIG_Y} + $local{SMU_XX_CHOP_Y};
+
+  # get the arcsec total offset
+  $dx = $xoffset + $xoffset_jc;
+  $dy = $yoffset + $yoffset_jc;
+
+  # Convert jiggle/chop offset to radians
+  $xoffset_jc *= Astro::SLA::DAS2R;
+  $yoffset_jc *= Astro::SLA::DAS2R;
+
+  # Calculate spherical coordinate including jiggle/chop offset
+  Astro::SLA::slaDtp2s( $xoffset_jc, $yoffset_jc,
+			$local{TCS_XX_AC1}, $local{TCS_XX_AC2}, $x, $y );
+  $x = Astro::Coords::Angle->new( $x )->degrees;
+  $y = Astro::Coords::Angle->new( $y )->degrees;
+
+  return ($x, $y, $dx, $dy);
+}
 
 
 =head1 AUTHOR
