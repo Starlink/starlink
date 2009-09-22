@@ -72,6 +72,7 @@ use Astro::SLA;
 
 use Getopt::Long;
 use Pod::Usage;
+use JSA::Headers ();
 
 my ($help, $man, $version);
 my $ostatus = GetOptions( "help" => \$help,
@@ -101,58 +102,18 @@ my $base_el;
 
 err_begin($status );
 for my $f (@files) {
-  # just open with HDS
-  my $status = &NDF::SAI__OK;
-  hds_open( $f, "READ", my $loc, $status);
-  dat_find( $loc, "MORE", my $mloc, $status);
-  dat_find( $mloc, "JCMTSTATE", my $jloc, $status);
-  dat_annul( $mloc, $status);
 
-  # find out how many extensions we have
-  dat_ncomp( $jloc, my $ncomp, $status );
+  # Read JCMTSTATE information
+  my %local = JSA::Headers::read_jcmtstate( $f );
 
-  # if first time round, get the names for columns
   if ($isfirst) {
-    for my $i (1..$ncomp) {
-      dat_index( $jloc, $i, my $iloc, $status );
-      dat_name( $iloc, my $name, $status);
-      next if $name eq 'RTS_TASKS';
-      dat_annul( $iloc, $status );
-      push(@columns, $name);
-    }
-    $isfirst = 0;
+    # Lose ordering associated with the file but since
+    # all sections share subsystem prefix then we will
+    # not be grossly out of order
+    @columns = sort keys %local;
     %cols = map { $_, undef } @columns;
+    $isfirst = 1;
   }
-
-  my %local;
-  for my $i (1..$ncomp) {
-    dat_index( $jloc, $i, my $iloc, $status );
-    dat_name( $iloc, my $name, $status );
-    next if $name eq 'RTS_TASKS';
-    dat_type( $iloc, my $type, $status );
-    dat_size( $iloc, my $size, $status );
-    my @data;
-    if ($type eq '_DOUBLE' || $type eq '_REAL') {
-      dat_get1d( $iloc, $size, @data, my $el, $status );
-    } elsif ($type eq '_INTEGER') {
-      dat_get1i( $iloc, $size, @data, my $el, $status );
-    } elsif ($type =~ /_CHAR/) {
-      dat_get1c( $iloc, $size, @data, my $el, $status );
-    } else {
-      if ($status == &NDF::SAI__OK) {
-        $status = &NDF::SAI__ERROR;
-        err_rep( " ", "Unsupported type $type", $status );
-      }
-    }
-    dat_annul( $iloc, $status );
-    $local{$name} = \@data if exists $cols{$name};
-  }
-
-  # tidy
-  dat_annul( $jloc, $status);
-  dat_annul( $loc, $status);
-
-  last if $status != &NDF::SAI__OK;
 
   # now dump the contents
   if ($isfirst_file) {
