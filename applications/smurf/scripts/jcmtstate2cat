@@ -57,6 +57,8 @@ Note that information from the ACSIS extension is not included at this
 time. This is partly because this extension can change in shape
 between observations.
 
+MCE header information is included for SCUBA-2 data files.
+
 =cut
 
 use strict;
@@ -103,6 +105,15 @@ for my $f (@files) {
     @columns = sort keys %local;
     %cols = map { $_, undef } @columns;
     $isfirst = 1;
+  }
+
+  # See if we have an MCEHEAD from a SCUBA-2 file
+  {
+    my ($cols, $mcedata) = read_mce( $f );
+    if (defined $cols) {
+      push(@columns, @$cols);
+      %local = (%local, %$mcedata);
+    }
   }
 
   # now dump the contents
@@ -193,6 +204,226 @@ sub calc_pos {
   return ($x, $y, $dx, $dy);
 }
 
+# Arg: Filename
+# Return reference to array of columns and reference to hash of data
+# values indexed by column names.
+
+sub read_mce {
+  my $f = shift;
+  my $status = &NDF::SAI__OK;
+  err_begin($status );
+
+  my ($col, $mcedata);
+
+  # Use HDS directly
+  hds_open( $f, "READ", my $loc, $status);
+  dat_find( $loc, "MORE", my $mloc, $status);
+  dat_there( $mloc, "MCEHEADS", my $there, $status );
+  if ($there) {
+    dat_find( $mloc, "MCEHEADS", my $mceloc, $status );
+    dat_find( $mceloc, "MCEHEAD", my $mcloc, $status );
+    dat_annul( $mceloc, $status );
+
+    # Now we have the .MORE.MCEHEADS.MCEHEAD structure locator
+    # Move the whole thing into memory. May have to watch
+    # memory usage.
+    my @dims;
+    dat_shape( $mcloc, 2, @dims, my $ndim, $status );
+    my @mce;
+    dat_getvi( $mcloc, $dims[0]*$dims[1], @mce, my $size, $status);
+    dat_annul($mcloc, $status);
+
+    if ($status == &NDF::SAI__OK) {
+      $mcedata = {};
+      for my $i (1..$dims[1]) {
+	# pull $dims[0] elements of the array
+	my @slice = splice( @mce, 0, $dims[0] );
+	my ($c, $mceslice) = unpack_mce( @slice );
+	# Store the column information
+	$col = $c unless defined $col;
+	# copy data to array format
+	for my $k (@$col) {
+	  $mcedata->{$k} = [] unless exists $mcedata->{$k};
+	  push(@{$mcedata->{$k}}, $mceslice->{$k});
+	}
+      }
+    }
+
+  }
+  dat_annul( $mloc, $status);
+  dat_annul( $loc, $status );
+
+  # Does not matter if this all failed
+  if ($status != &NDF::SAI__OK) {
+    #err_annul( $status );
+    err_flush($status);
+  }
+  err_end($status);
+  return ($col, $mcedata);
+}
+
+# Unpack a single MCE data packet header
+#  ($col, $mcedata) = unpack_mce( @header );
+#
+
+sub unpack_mce {
+  my @data = @_;
+
+# Look up table indexed by version number, pointing
+# to reference to array of column names corresponding
+# to input array. If an entry is a code ref it should
+# be executed and will return a hash of columns and values.
+# undef means that the entry should be skipped
+
+  my %headers = ( 6 => [
+			\&ver6slot0,             # 0
+			"ClockCardCounter",      # 1
+			"row_len",               # 2
+			"num_rows-reported",     # 3
+			"data_rate",             # 4
+			"ReturnToZeroCounter",   # 5
+			"HeaderVersion",         # 6
+			"RampValue",
+			\&ver6slot8,
+			"num_rows_servoed",
+			"SyncBoxNumber",
+			"run_id",
+			"user_word",
+			"Errno13",
+			"FPGATempAC",
+			"FPGATempBC1",
+			"FPGATempBC2",
+			"FPGATempBC3",
+			"FPGATempRC1",
+			"FPGATempRC2",
+			"FPGATempRC3",
+			"FPGATempRC4",
+			"FPGATempCC",
+			"Errno23",
+			"CardTempAC",
+			"CardTempBC1",
+			"CardTempBC2",
+			"CardTempBC3",
+			"CardTempRC1",
+			"CardTempRC2",
+			"CardTempRC3",
+			"CardTempRC4",
+			"CardTempCC",
+			"Errno33",
+			\&ver6slot34,
+			\&ver6slot35,
+			\&ver6slot36,
+			\&ver6slot37,
+			\&ver6slot38,
+			\&ver6slot39,
+			\&ver6slot40,
+			"Errno41",
+			"BoxTemp",
+		       ],
+		);
+
+  # We have to know the version number.
+  # We have been told it is always in this location
+  my $vers = $data[6];
+  die "Can not understand MCE version $vers data headers"
+    unless exists $headers{$vers};
+
+  my @definitions = @{$headers{$vers}};
+
+  my $szhead = scalar(@data);
+  my $szdef  = scalar(@definitions);
+  die "Size of header ($szhead) differs from number expected for version $vers header ($szdef)"
+    if $szhead != $szdef;
+
+  my %mce;
+  my @col;
+  for my $i (0..$szhead-1) {
+    if (not ref($definitions[$i])) {
+      my $c = $definitions[$i];
+      push(@col, $c);
+      $mce{$c} = $data[$i];
+    } else {
+      my %extra = $definitions[$i]->( $data[$i] );
+      push(@col, sort keys %extra);
+      %mce = (%mce, %extra);
+    }
+  }
+
+  return (\@col, \%mce);
+}
+
+# These routines unpack data structures
+# Can be version specific.
+# Take the single integer to unpack
+# Return hash
+
+# Seems to be little endian but there is bound to
+# be an issue there
+
+sub ver6slot0 {
+  # This is a array of bits
+  my @bits = split( //, unpack("b32",pack("j",$_[0])));
+
+  return (
+	  mce_last_frame => $bits[0],
+	  mce_stop => $bits[1],
+	  mce_syncbox_freerun => $bits[2],
+	  mce_syncbox_error => $bits[3],
+	  mce_active_clock => $bits[4],
+	  mce_tes_bias_sqwav => $bits[5],
+	  mce_readout_card1ok => $bits[10],
+	  mce_readout_card2ok => $bits[11],
+	  mce_readout_card3ok => $bits[12],
+	  mce_readout_card4ok => $bits[13],
+	 );
+}
+
+sub ver6slot8 {
+  my @unpack = unpack( "vv", pack( "j", $_[0]));
+  return ( ramp_card_addr => $unpack[1],
+	   ramp_param_id => $unpack[0]);
+}
+
+sub ver6slot34 {
+  my @unpack = unpack( "cccc", pack( "j", $_[0]));
+  return ( PSUCSWver => $unpack[3],
+	   PSUCFan1Tach => $unpack[2],
+	   PSUCFan2Tach => $unpack[1],
+	   PSUCTemp1 => $unpack[0]);
+}
+
+sub ver6slot35 {
+  my @unpack = unpack( "ccv", pack("j", $_[0]));
+  return ( PSUCTemp2 => $unpack[0],
+	   PSUCTemp3 => $unpack[1],
+	   PSUCADCOffset => $unpack[2]);
+}
+
+sub ver6slot36 {
+  my @unpack = unpack( "vv", pack("j", $_[0]));
+  return (PSUCVolt1 => $unpack[0],
+	  PSUCVolt2 => $unpack[1]);
+}
+sub ver6slot37 {
+  my @unpack = unpack( "vv", pack("j", $_[0]));
+  return (PSUCVolt3 => $unpack[0],
+	  PSUCVolt4 => $unpack[1]);
+}
+sub ver6slot38 {
+  my @unpack = unpack( "vv", pack("j", $_[0]));
+  return (PSUCVolt5 => $unpack[0],
+	  PSUCCurr1 => $unpack[1]);
+}
+sub ver6slot39 {
+  my @unpack = unpack( "vv", pack("j", $_[0]));
+  return (PSUCCurr2 => $unpack[0],
+	  PSUCCurr3 => $unpack[1]);
+}
+sub ver6slot40 {
+  my @unpack = unpack( "vv", pack("j", $_[0]));
+  return (PSUCCurr4 => $unpack[0],
+	  PSUCCurr5 => $unpack[1]);
+}
 
 =head1 AUTHOR
 
