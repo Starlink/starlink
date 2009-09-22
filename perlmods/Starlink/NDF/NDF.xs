@@ -2320,7 +2320,7 @@ dat_get1c(loc, elx, value, el, status)
  PREINIT:
   ndfint i;
  CODE:
-  value = malloc(elx * FCHAR);
+  Newx( value, elx * FCHAR, char);
   dat_get1c_(loc, &elx, value, &el, &status, DAT__SZLOC, FCHAR);
 
   /* Check status */
@@ -2331,7 +2331,7 @@ dat_get1c(loc, elx, value, el, status)
       av_store( (AV*) SvRV(ST(2)), i, newSVpv(value+i*FCHAR,strlen(value+i*FCHAR)));
     }
   }
-  free(value); /* Hose */
+  Safefree(value); /* Hose */
  OUTPUT:
   status
   el
@@ -2404,7 +2404,7 @@ dat_getvc(loc, elx, value, el, status)
  PREINIT:
   ndfint i;
  CODE:
-  value = malloc(elx * FCHAR);
+  Newx( value, elx * FCHAR, char );
   dat_getvc_(loc, &elx, value, &el, &status, DAT__SZLOC, FCHAR);
 
   /* Check status */
@@ -2415,7 +2415,7 @@ dat_getvc(loc, elx, value, el, status)
       av_store( (AV*) SvRV(ST(2)), i, newSVpv(value+i*FCHAR,strlen(value+i*FCHAR)));
     }
   }
-  free(value); /* Hose */
+  Safefree(value); /* Hose */
  OUTPUT:
   el
   status
@@ -3418,7 +3418,7 @@ cmp_get1c(loc, name, elx, value, el, status)
  PREINIT:
   ndfint i;
  CODE:
-  value = malloc(elx * FCHAR);
+  Newx( value, elx * FCHAR, char );
   cmp_get1c_(loc, name, &elx, value, &el, &status, DAT__SZLOC, strlen(name), FCHAR);
   /* Check status */
   if (status == SAI__OK) {
@@ -3428,7 +3428,7 @@ cmp_get1c(loc, name, elx, value, el, status)
       av_store( (AV*) SvRV(ST(3)), i, newSVpv(value+i*FCHAR,strlen(value+i*FCHAR)));
     }
   }
-  free(value); /* Hose */
+  Safefree(value); /* Hose */
  OUTPUT:
   status
   el
@@ -3507,7 +3507,7 @@ cmp_getvc(loc, name, elx, value, el, status)
  PREINIT:
   ndfint i;
  CODE:
-  value = malloc(elx * FCHAR);
+  Newx( value, elx * FCHAR, char);
   cmp_getvc_(loc, name, &elx, value, &el, &status, DAT__SZLOC, strlen(name), FCHAR);
   /* Check status */
   if (status == SAI__OK) {
@@ -3517,7 +3517,7 @@ cmp_getvc(loc, name, elx, value, el, status)
       av_store( (AV*) SvRV(ST(3)), i, newSVpv(value+i*FCHAR,strlen(value+i*FCHAR)));
     }
   }
-  free(value); /* Hose */
+  Safefree(value); /* Hose */
  OUTPUT:
   status
   el
