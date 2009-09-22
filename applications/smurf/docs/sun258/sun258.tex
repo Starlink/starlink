@@ -246,6 +246,7 @@
 \newcommand{\wcsalign}{\xref{\task{wcsalign}}{sun95}{WCSALIGN}}
 \newcommand{\wcsattrib}{\xref{\task{wcsattrib}}{sun95}{WCSATTRIB}}
 \newcommand{\fitslist}{\xref{\task{fitslist}}{sun95}{FITSLIST}}
+\newcommand{\display}{\xref{\task{display}}{sun95}{DISPLAY}}
 
 % macros for typesetting parameters
 \newcommand{\aparam}[1]{\texttt{#1}}     % ADAM parameter
@@ -927,9 +928,136 @@ precision for all calculations.
 
 \section{\xlabel{acsis}ACSIS Data Reduction\label{se:acsisdr}}
 
-To be written. In the meantime, see the ACSIS-DR web page at the JCMT:\\
+SMURF contains a small number of commands specifically directed towards
+the reduction of ACSIS data. This section contains an introduction to 
+each of these commands. The reduction of ACSIS data is described 
+more fully in the {\em ACSIS Data Reduction Cookbook}: 
 \htmladdnormallink{\texttt{http://www.jach.hawaii.edu/JCMT/spectral\_line/data\_reduction/acsisdr/}}
-{http://www.jach.hawaii.edu/JCMT/spectral_line/data_reduction/acsisdr/}
+{http://www.jach.hawaii.edu/JCMT/spectral_line/data_reduction/acsisdr/}.
+
+\subsection{The makecube command}
+
+The central step in the reduction of ACSIS data is the conversion of one
+or more time-series cubes with {\tt [spectral channel number, receptor
+index, time-slice index]} axes, into a spatial cube with {\tt
+[RA, Dec, spectral channel number]} axes\footnote{The RA and Dec axes may
+be replaced by axes appropriate for other celestial co-ordinate
+systems.}. This step is accomplished using the \makecube\ command.
+
+This command first defines the extent (in both pixels and world
+co-ordinates) of the output cube, initialises the output cube to hold
+zero at every pixel, and then goes through each receptor sample value in
+the input data. For each such sample, it first works out its position on
+the sky and its spectral position, using the meta-data in the input
+files. It then determines the pixel in the output cube that has the same
+spatial and spectral position, and then ``pastes'' the sample value into
+the output cube at this central pixel position. This pasting involves
+dividing the input sample value up between the output pixels in the
+neighbourhood of the central output pixel, and then incrementing each of
+these output pixel values by its assigned share of the input sample
+value. Various schemes can be used to determine the share assigned to each
+output pixel - the simplest and fastest is ``nearest neighbour'' in which
+the whole input sample value is assigned to the central output pixel.
+Whilst being fast, this scheme can produce small geometric shifts in
+feature positions. Other available schemes include a bi-linear scheme
+that spreads each input value out linearly between the four closest
+output pixels, Gaussian weighting with a given radius, Sinc weighting,
+{\em etc}.
+
+There are many other aspects of the operation of \makecube\ that can be
+controlled via various program parameters, some the more important of
+which are:
+
+\begin{itemize}
+
+\item The output data can be split up amongst multiple output cubes, thus
+reducing the size of each individual cube. 
+
+\item The world co-ordinate system used by the output cubes can be
+specified. This includes both the nature of the WCS axes themselves and
+the details of the tangent-plane projection (pixel size, orientation,
+{\em etc}). If required, optimal values for the projection details can be
+determined automatically to produce a regular grid (or as close to a
+regular grid as is possible given the input data). Alternatively, the WCS
+in the output cube be copied from a specified reference NDF.
+
+\item Output variance values can be calculated either on the basis
+of the spread of the input data values that contribute to each output pixel,
+or on the basis of the system noise temperature values supplied in the 
+input NDFs.
+
+\item Input data from specified receptors can be excluded.
+
+\item Input data from specified spectral channels can be excluded.
+
+\item A catalogue can be created holding the spatial position of every
+used input sample value.
+
+\end{itemize}
+
+\subsection{The timesort command}
+
+The \makecube\ commands turns time-series cubes into spatial cubes. Each 
+plane in a time-series cube contains a set of spectra - one for each 
+used receptor - observed simultaneously at a time given by the position 
+of the plane on the third axis. It should be noted that the times
+associated with this third axis are not guaranteed to increase
+monotonically, although that will often be the case. For various reasons,
+the writing out of some times slices to the time-series cube may be delayed, 
+resulting in backwards steps in time along the third axis. This in itself
+is not a problem for \makecube\, which makes no assumptions about the
+order in which time-slices are stored in the time-series cube. However,
+other commands may fail - particularly commands that need to locate the
+time-slice index associated with a given time. Such commands assume that
+time is a monotonic function of time-slice index, and that therefore the
+equivalent of a simple binary chop can be used to locate the index
+associated with a given time. These commands will fail with a message
+indicating that ``no inverse transformation can be found'' if the
+time-series cube contains any out-of-order time slices. Operations that
+may produce such a failure include attempting to use \KAPPA\ \wcsalign\
+to align two time-series cubes, or displaying a 2D slice of a time-series
+cube using \KAPPA\ \display. In these cases, the time-series cube can be
+``rectified'' using \timesort. This produces a copy of the cube in which
+the time slices are in monotonic order.
+
+In addition, \timesort\ can also be used to assemble and re-order the time 
+slices from multiple input cubes relating to the same observation, and then 
+write them out again into a set of time-series cubes, each of a specified
+size. In this situation, if a single time slice is split across two
+input cubes (which can happen - spectra from some detectors being recorded
+in one file and those from the other detectors in another file), they
+will be merged together into a single plane in one of the output cubes. 
+
+
+\subsection{The unmakecube command}
+
+The process of converting one or more time-series cubes into a spatial
+cube will usually produce some degree of smoothing in the output data due
+to multiple input samples contributing to each pixel in the output cube.
+This smoothing can sometimes be useful in terms of reducing systematic
+differences between the input time-series cubes, such as differing
+base-lines. In these cases it is informative to be able to quantify the
+effect of this smoothing. The \unmakecube\ command provides this facility
+- it creates a set of ``artificial'' time-series cubes from a given
+spatial cube. In detail, for each sample position in a given set of input
+time-series cubes, a given spatial cube is interpolated to create a new
+spectrum, which is then stored at the corresponding position in an output
+time-series cube. Thus, any smoothing present in the spatial cube is
+transferred into the output time-series cube.
+
+A typical scheme for using unmakecube is:
+
+\begin{enumerate}
+\item use makecube to convert a set of ``genuine'' time-series cubes into
+a spatial cube.
+\item use unmakecube to generate a set of ``artificial'' time-series cubes 
+from the makecube output spatial cube. The original ``genuine''
+time-series cubes are used as templates for the new time-series cubes, so
+that they will be aligned sample-for-sample.
+\item use the facilities of \KAPPA\ or \GAIA\ to visualise or quantify the
+differences between the ``genuine'' and ``artificial'' time-series cubes.
+\end{enumerate}
+
 
 \section{\xlabel{scuba2}SCUBA-2 Data Reduction\label{se:sc2dr}}
 
