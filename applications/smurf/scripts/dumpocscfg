@@ -49,16 +49,16 @@ use Pod::Usage;
 
 my ($help, $man, $version);
 my $ostatus = GetOptions( "help" => \$help,
-			 "man" => \$man,
-			 "version" => \$version
-			 );
+                          "man" => \$man,
+                          "version" => \$version
+                        );
 pod2usage(1) if $help;
 pod2usage(-exitstatus => 0, -verbose =>2) if $man;
 if ($version) {
-    my $id = '$Id$';
-    print "dumpocscfg - Display OCS configuration XML\n";
-    print " CVS revision: $id\n";
-    exit;
+  my $id = '$Id$';
+  print "dumpocscfg - Display OCS configuration XML\n";
+  print " CVS revision: $id\n";
+  exit;
 }
 
 
@@ -72,94 +72,94 @@ my @columns;
 my %cols;
 err_begin($status );
 for my $f (@files) {
-    # just open with HDS
-    my $status = &NDF::SAI__OK;
-    hds_open( $f, "READ", my $loc, $status);
-    dat_find( $loc, "MORE", my $mloc, $status);
-    my $config = '';
+  # just open with HDS
+  my $status = &NDF::SAI__OK;
+  hds_open( $f, "READ", my $loc, $status);
+  dat_find( $loc, "MORE", my $mloc, $status);
+  my $config = '';
 
-    # Now look for JCMTOCS
-    dat_there( $mloc, "JCMTOCS", my $isthere, $status);
-    if ($isthere) {
-      dat_find( $mloc, "JCMTOCS", my $jloc, $status);
-      dat_find( $jloc, "CONFIG", my $cloc, $status );
-      dat_annul( $jloc, $status);
+  # Now look for JCMTOCS
+  dat_there( $mloc, "JCMTOCS", my $isthere, $status);
+  if ($isthere) {
+    dat_find( $mloc, "JCMTOCS", my $jloc, $status);
+    dat_find( $jloc, "CONFIG", my $cloc, $status );
+    dat_annul( $jloc, $status);
 
-      dat_len($cloc, my $strlen, $status);
-      dat_shape($cloc, 7, my @dim, my $ndim, $status);
-      dat_getvc( $cloc, $dim[0], my @config, my $nlines, $status );
-      dat_annul($cloc, $status );
+    dat_len($cloc, my $strlen, $status);
+    dat_shape($cloc, 7, my @dim, my $ndim, $status);
+    dat_getvc( $cloc, $dim[0], my @config, my $nlines, $status );
+    dat_annul($cloc, $status );
 
-      # because trailing spaces will be stripped, but we know that
-      # trailing spaces are important, we need to add spaces back on
-      # before joining (sprintf complains if a newline character is
-      # in the string so we use length). Remove the last newline from
-      # the last line only (and we do not need to pad the last line)
-      for my $line (@config[0..$#config-1]) {
-	$config .= $line . (" "x($strlen - length($line)));
+    # because trailing spaces will be stripped, but we know that
+    # trailing spaces are important, we need to add spaces back on
+    # before joining (sprintf complains if a newline character is
+    # in the string so we use length). Remove the last newline from
+    # the last line only (and we do not need to pad the last line)
+    for my $line (@config[0..$#config-1]) {
+      $config .= $line . (" "x($strlen - length($line)));
+    }
+    # Now the last line
+    chomp($config[-1]);
+    $config .= $config[-1];
+  } elsif ($status == &NDF::SAI__OK) {
+    print STDERR "# Configuration not stored in file. Checking headers\n";
+
+    # clean up from previous attempt
+    dat_annul($mloc, $status);
+    dat_annul($loc, $status);
+
+    # Get the FITS header
+    my $hdr = new Astro::FITS::Header::NDF( File => $f );
+    my $cfgname = $hdr->value("OCSCFG");
+
+    # Now look for the item
+    if ($cfgname) {
+      print STDERR "# Looking for OCS configuration $cfgname\n";
+
+      # Can be in two places
+      # /jcmtdata/orac_data/ocsconfigs/
+      # /jcmtdata/raw/acsis/spectra/YYYYMMDD/ocsconfigs/
+      # - ACSIS specific
+
+      my $path;
+      if (-e File::Spec->catfile( "/jcmtdata/orac_data/ocsconfigs",
+                                  $cfgname)) {
+
+        $path = File::Spec->catfile( "/jcmtdata/orac_data/ocsconfigs",
+                                     $cfgname);
+
+      } else {
+        # more work required
+        my $inst = $hdr->value("INSTRUME");
+        my $date = $hdr->value("UTDATE");
+        my $root;
+        if ($inst ne "SCUBA-2") {
+          # assume ACSIS if not SCUBA-2
+          $root = "/jcmtdata/raw/acsis/spectra/$date/ocsconfigs";
+        }
+
+        if ($root && -e File::Spec->catfile($root, $cfgname)) {
+          $path = File::Spec->catfile($root, $cfgname);
+        }
+
       }
-      # Now the last line
-      chomp($config[-1]);
-      $config .= $config[-1];
-    } elsif ($status == &NDF::SAI__OK) {
-      print STDERR "# Configuration not stored in file. Checking headers\n";
 
-      # clean up from previous attempt
-      dat_annul($mloc, $status);
-      dat_annul($loc, $status);
-
-      # Get the FITS header
-      my $hdr = new Astro::FITS::Header::NDF( File => $f );
-      my $cfgname = $hdr->value("OCSCFG");
-
-      # Now look for the item
-      if ($cfgname) {
-	print STDERR "# Looking for OCS configuration $cfgname\n";
-
-	# Can be in two places
-	# /jcmtdata/orac_data/ocsconfigs/
-	# /jcmtdata/raw/acsis/spectra/YYYYMMDD/ocsconfigs/
-	# - ACSIS specific
-	
-	my $path;
-	if (-e File::Spec->catfile( "/jcmtdata/orac_data/ocsconfigs",
-				    $cfgname)) {
-
-	 $path = File::Spec->catfile( "/jcmtdata/orac_data/ocsconfigs",
-				      $cfgname);
-
-	} else {
-	  # more work required
-	  my $inst = $hdr->value("INSTRUME");
-	  my $date = $hdr->value("UTDATE");
-	  my $root;
-	  if ($inst ne "SCUBA-2") {
-	    # assume ACSIS if not SCUBA-2
-	    $root = "/jcmtdata/raw/acsis/spectra/$date/ocsconfigs";
-	  } 
-
-	  if ($root && -e File::Spec->catfile($root, $cfgname)) {
-	    $path = File::Spec->catfile($root, $cfgname);
-	  }
-
-	}
-
-	if ($path) {
-	  open my $fh, "<$path" || die "Tried to open $path but failed: $!";
-	  my @lines = <$fh>;
-	  $config = join("", @lines);
-	  close $fh || die "Error closing $path: $!";
-	} else {
-	  print STDERR "# Unable to locate configuration file $cfgname on disk\n";
-	}
-
+      if ($path) {
+        open my $fh, "<$path" || die "Tried to open $path but failed: $!";
+        my @lines = <$fh>;
+        $config = join("", @lines);
+        close $fh || die "Error closing $path: $!";
+      } else {
+        print STDERR "# Unable to locate configuration file $cfgname on disk\n";
       }
 
     }
-    print $config ."\n" if defined $config;
+
+  }
+  print $config ."\n" if defined $config;
 
 
-    last if $status != &NDF::SAI__OK;
+  last if $status != &NDF::SAI__OK;
 }
 err_end( $status );
 

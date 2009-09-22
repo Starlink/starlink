@@ -114,11 +114,11 @@ for my $f (@files) {
   # if first time round, get the names for columns
   if ($isfirst) {
     for my $i (1..$ncomp) {
-	    dat_index( $jloc, $i, my $iloc, $status );
-	    dat_name( $iloc, my $name, $status);
-	    next if $name eq 'RTS_TASKS';
-	    dat_annul( $iloc, $status );
-	    push(@columns, $name);
+      dat_index( $jloc, $i, my $iloc, $status );
+      dat_name( $iloc, my $name, $status);
+      next if $name eq 'RTS_TASKS';
+      dat_annul( $iloc, $status );
+      push(@columns, $name);
     }
     $isfirst = 0;
     %cols = map { $_, undef } @columns;
@@ -133,16 +133,16 @@ for my $f (@files) {
     dat_size( $iloc, my $size, $status );
     my @data;
     if ($type eq '_DOUBLE' || $type eq '_REAL') {
-	    dat_get1d( $iloc, $size, @data, my $el, $status );
+      dat_get1d( $iloc, $size, @data, my $el, $status );
     } elsif ($type eq '_INTEGER') {
-	    dat_get1i( $iloc, $size, @data, my $el, $status );
+      dat_get1i( $iloc, $size, @data, my $el, $status );
     } elsif ($type =~ /_CHAR/) {
-	    dat_get1c( $iloc, $size, @data, my $el, $status );
+      dat_get1c( $iloc, $size, @data, my $el, $status );
     } else {
-	    if ($status == &NDF::SAI__OK) {
+      if ($status == &NDF::SAI__OK) {
         $status = &NDF::SAI__ERROR;
         err_rep( " ", "Unsupported type $type", $status );
-	    }
+      }
     }
     dat_annul( $iloc, $status );
     $local{$name} = \@data if exists $cols{$name};
@@ -223,7 +223,7 @@ for my $f (@files) {
       my $actual_el_diff = $local{TCS_AZ_AC2}->[$i] - $local{TCS_AZ_BC2}->[$i];
       my $this_az_base = $base_az + $actual_az_diff;
       my $this_el_base = $base_el + $actual_el_diff;
-        
+
       my $xoffset = $local{SMU_AZ_JIG_X}->[$i] + $local{SMU_AZ_CHOP_X}->[$i];
       my $yoffset = $local{SMU_AZ_JIG_Y}->[$i] + $local{SMU_AZ_CHOP_Y}->[$i];
       $xoffset *= Astro::SLA::DAS2R;
@@ -247,7 +247,7 @@ for my $f (@files) {
 
     # And append the remaining columns
     for my $col (@columns) {
-	    push(@slice, $local{$col}->[$i]);
+      push(@slice, $local{$col}->[$i]);
     }
     print join("\t",@slice)."\n";
   }

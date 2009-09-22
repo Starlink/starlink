@@ -59,24 +59,24 @@ use Pod::Usage;
 
 my ($help, $man, $version, $statistics, $trx, $receptor);
 my $ostatus = GetOptions( "help" => \$help,
-			  "man" => \$man,
-			  "version" => \$version,
-			  "statistics" => \$statistics,
-			  "trx" => \$trx,
-			  "receptor=s" => \$receptor,
-                         );
+                          "man" => \$man,
+                          "version" => \$version,
+                          "statistics" => \$statistics,
+                          "trx" => \$trx,
+                          "receptor=s" => \$receptor,
+                        );
 pod2usage(1) if $help;
 pod2usage(-exitstatus => 0, -verbose =>2) if $man;
 if ($version) {
-    my $id = '$Id$';
-    print "gettemps - Retrieve temperature information from ACSIS file\n";
-    print " CVS revision: $id\n";
-    exit;
+  my $id = '$Id$';
+  print "gettemps - Retrieve temperature information from ACSIS file\n";
+  print " CVS revision: $id\n";
+  exit;
 }
 
 my @files = @ARGV;
 if (@files > 1) {
-    die "Currently only supports a single file as argument\n";
+  die "Currently only supports a single file as argument\n";
 }
 
 my $status = &NDF::SAI__OK;
@@ -128,32 +128,32 @@ my %TRX;
 
 # initialise
 for my $recep (@names) {
-    $TSYS{$recep} = [];
-    $TRX{$recep} = [];
+  $TSYS{$recep} = [];
+  $TRX{$recep} = [];
 }
 
-my $ntrx = 0; # most TRX numbers available for any receptor
-$ntsys = 0;   # This will now be the most TSYS numbers available for a receptor
+my $ntrx = 0;            # most TRX numbers available for any receptor
+$ntsys = 0; # This will now be the most TSYS numbers available for a receptor
 my $i = 0;
 while ($i < @tsys) {
-    my $pushed_tsys;
-    my $pushed_trx;
-    for my $recep (@names) {
-      # store it - if it is a new value
-      # note that this means it is possible for different numbers of
-      # values for a receptor
-	if (!@{$TSYS{$recep}} || ($tsys[$i] != $TSYS{$recep}->[-1])) {
-	    push(@{$TSYS{$recep}}, $tsys[$i]);
-	    $pushed_tsys++;
-	}
-	if (!@{$TRX{$recep}} || ($trx[$i] != $TRX{$recep}->[-1])) {
-	    push(@{$TRX{$recep}}, $trx[$i]);
-	    $pushed_trx++;
-	}
-	$i++;
+  my $pushed_tsys;
+  my $pushed_trx;
+  for my $recep (@names) {
+    # store it - if it is a new value
+    # note that this means it is possible for different numbers of
+    # values for a receptor
+    if (!@{$TSYS{$recep}} || ($tsys[$i] != $TSYS{$recep}->[-1])) {
+      push(@{$TSYS{$recep}}, $tsys[$i]);
+      $pushed_tsys++;
     }
-    $ntsys++ if $pushed_tsys;
-    $ntrx++ if $pushed_trx;
+    if (!@{$TRX{$recep}} || ($trx[$i] != $TRX{$recep}->[-1])) {
+      push(@{$TRX{$recep}}, $trx[$i]);
+      $pushed_trx++;
+    }
+    $i++;
+  }
+  $ntsys++ if $pushed_tsys;
+  $ntrx++ if $pushed_trx;
 }
 
 # Decide which set of temperatures we are using
