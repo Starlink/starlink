@@ -23,7 +23,7 @@
                                 A.J.Chipperfield\\
                                 D.S.Berry\\
                                 A.C.Davenhall}
-\newcommand{\stardocdate}      {2009 July 30}
+\newcommand{\stardocdate}      {2009 September 18}
 \newcommand{\stardoctitle}     {CONVERT\\
                                 A Format-conversion Package}
 \newcommand{\stardocversion}   {Version 1.5-17}
@@ -1286,6 +1286,30 @@ There are some examples of the automatic system in action and use of
 NDF\_FORMATS\_IN and NDF\_FORMATS\_OUT in
 \latexelsehtml{SUN/95, Section~15.1.}{\xref{Automatic
 Conversion.}{sun95}{se_autoconvert}}
+
+
+\section{\label{sect_history}\xlabel{sect_history}Automatic HISTORY
+Creation}
+
+The \xref{NDF}{sun33}{the_history_component}\ data format offers a
+means by which processing commands and user comments may be recorded,
+so that at some future time you can determine how a given NDF was
+created.  History recording is optional.\footnote{This was because at
+the time it was created history records could potentially be quite bulky 
+for spectra.} However, now massive storage is cheap we recommend that 
+you routinely use NDF history recording.
+
+History recording may be enabled on an NDF-by-NDF basis using the 
+\KAPPAref\ command \xref{HISSET}{sun95}{HISSET} as described in the 
+\xref{NDF History section of SUN/95}{sun95}{se_conhistory}.  In the
+case of \CONVERT\ this has a disadvantage---the \CONVERT\ conversion
+command will be absent from the NDFs created by the $x$2NDF commands.
+If you wish that all new NDFs created by \CONVERT\ have history
+recording enabled at their creation, you should set the environment
+variable {\tt NDF\_AUTO\_HISTORY} to a non-zero value.  In fact, we
+recommend that you set this in your login script so any NDF created
+from scratch will have this property.
+
 
 \section{Acknowledgments}
 Jo Murray wrote the original versions of the applications that convert

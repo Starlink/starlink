@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.36}
 \newcommand{\stardocnumber}    {95.36}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2009 August 5}
+\newcommand{\stardocdate}      {2009 September 18}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.11}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -5543,6 +5543,15 @@ something `off the record', or erase the history altogether.
      % hisset hr1068 erase
 \end{verbatim}
 \latex{\normalsize}
+
+
+Some applications create new NDFs from scratch, not inheriting the
+history records and update mode from an input NDF.  Some examples are
+\htmlref{CREFRAME}{CREFRAME}, \htmlref{TRANDAT}{TRANDAT}, and 
+\htmlref{PSF}{PSF}.  Should you wish these to have history
+recording enabled as you create such NDFs, there is an environment
+variable {\tt NDF\_AUTO\_HISTORY} that should be set to a non-zero
+value, or immediately run \htmlref{HISSET}{HISSET} with the new NDF.
 
 \subsection{\xlabel{se_commenthistory}Adding Commentary to History Recording
 \label{se:commenthistory}}
