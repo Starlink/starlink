@@ -941,6 +941,10 @@ int *status                   /* global status (given and returned) */
    RETRIEVE_STATE( tcs_tr_dc2, TCS_TR_DC2, double, VAL__BADD );
    RETRIEVE_STATE( tcs_tr_bc1, TCS_TR_BC1, double, VAL__BADD );
    RETRIEVE_STATE( tcs_tr_bc2, TCS_TR_BC2, double, VAL__BADD );
+   RETRIEVE_STATE( tcs_en_dc1, TCS_EN_DC2, double, VAL__BADD );
+   RETRIEVE_STATE( tcs_en_dc2, TCS_EN_DC2, double, VAL__BADD );
+   RETRIEVE_STATE( tcs_dm_abs, TCS_DM_ABS, double, VAL__BADD );
+   RETRIEVE_STATE( tcs_dm_rel, TCS_DM_REL, double, VAL__BADD );
 
    RETRIEVE_STATE( jos_drcontrol,  JOS_DRCONTROL, int, VAL__BADI );
 
@@ -1154,6 +1158,10 @@ int *status                   /* global status (given and returned) */
    STORE_STATE( tcs_tr_dc2, TCS_TR_DC2, double );
    STORE_STATE( tcs_tr_bc1, TCS_TR_BC1, double );
    STORE_STATE( tcs_tr_bc2, TCS_TR_BC2, double );
+   STORE_STATE( tcs_en_dc1, TCS_EN_DC1, double );
+   STORE_STATE( tcs_en_dc2, TCS_EN_DC2, double );
+   STORE_STATE( tcs_dm_abs, TCS_DM_ABS, double );
+   STORE_STATE( tcs_dm_rel, TCS_DM_REL, double );
 
    /* Status flags */
    STORE_STATE( jos_drcontrol, JOS_DRCONTROL, int );

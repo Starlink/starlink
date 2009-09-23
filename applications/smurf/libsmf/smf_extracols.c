@@ -48,6 +48,8 @@
 *  History:
 *     2-JUL-2009 (DSB):
 *        Initial version.
+*     24-SEP-2009 (TIMJ):
+*        Add new JCMTSTATE items (Dome and Encoder)
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -213,6 +215,10 @@ void smf_extracols( smfHead *hdr, Grp *colgrp, void **cols_info,
                CHECK_ITEM("TCS_TR_BC2",AST__DOUBLETYPE,sizeof(double),tcs_tr_bc2) 
                CHECK_ITEM("TCS_TR_DC1",AST__DOUBLETYPE,sizeof(double),tcs_tr_dc1) 
                CHECK_ITEM("TCS_TR_DC2",AST__DOUBLETYPE,sizeof(double),tcs_tr_dc2) 
+               CHECK_ITEM("TCS_EN_DC1",AST__DOUBLETYPE,sizeof(double),tcs_en_dc1)
+               CHECK_ITEM("TCS_EN_DC2",AST__DOUBLETYPE,sizeof(double),tcs_en_dc2)
+               CHECK_ITEM("TCS_DM_ABS",AST__DOUBLETYPE,sizeof(double),tcs_dm_abs)
+               CHECK_ITEM("TCS_DM_REL",AST__DOUBLETYPE,sizeof(double),tcs_dm_rel)
                CHECK_ITEM("TCS_TR_SYS",AST__STRINGTYPE,sizeof(char)*JCMT__SZTCS_TR_SYS+1,tcs_tr_sys) 
                CHECK_ITEM("WVM_T12",AST__FLOATTYPE,sizeof(float),wvm_t12) 
                CHECK_ITEM("WVM_T42",AST__FLOATTYPE,sizeof(float),wvm_t42) 

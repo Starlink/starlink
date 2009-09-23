@@ -70,6 +70,7 @@
 *        TCS_TAI now optional for ACSIS but mandatory for SCUBA-2.
 *     22-SEP-2009 (TIMJ):
 *        JOS_DRCONTROL can now be read from SCUBA-2 files.
+*        Add DOME and ENCODER positions.
 
 *  Copyright:
 *     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
@@ -163,6 +164,10 @@ typedef struct JCMTState {
   double tcs_tr_dc2;
   double tcs_tr_bc1;
   double tcs_tr_bc2;
+  double tcs_en_dc1;  /* Telescope encoder coordinates */
+  double tcs_en_dc2;
+  double tcs_dm_abs;  /* Dome actual azimuth absolute */
+  double tcs_dm_rel;  /* Dome actual azimuth relative */
   int    jos_drcontrol; /* JOS DR control tag */
   float  enviro_rel_hum;
   float  enviro_pressure;
@@ -229,6 +234,10 @@ typedef enum
    TCS_TR_DC2,
    TCS_TR_BC1,
    TCS_TR_BC2,
+   TCS_EN_DC1,
+   TCS_EN_DC2,
+   TCS_DM_ABS,
+   TCS_DM_REL,
    JOS_DRCONTROL,
    ENVIRO_REL_HUM,
    ENVIRO_PRESSURE,
@@ -311,6 +320,14 @@ static const HDSdataRecord hdsRecords[JCMT_COMP_NUM] =
     { TCS_TR_DC2, "_DOUBLE", "TCS_TR_DC2", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
     { TCS_TR_BC1, "_DOUBLE", "TCS_TR_BC1", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
     { TCS_TR_BC2, "_DOUBLE", "TCS_TR_BC2", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
+    { TCS_EN_DC1, "_DOUBLE", "TCS_EN_DC1", (inst_t)(INST__ACSIS | INST__SCUBA2),
+      (inst_t)(INST__ACSIS|INST__SCUBA2) },
+    { TCS_EN_DC2, "_DOUBLE", "TCS_EN_DC2", (inst_t)(INST__ACSIS | INST__SCUBA2),
+      (inst_t)(INST__ACSIS|INST__SCUBA2) },
+    { TCS_DM_ABS, "_DOUBLE", "TCS_DM_ABS", (inst_t)(INST__ACSIS | INST__SCUBA2),
+      (inst_t)(INST__ACSIS|INST__SCUBA2) },
+    { TCS_DM_REL, "_DOUBLE", "TCS_DM_REL", (inst_t)(INST__ACSIS | INST__SCUBA2),
+      (inst_t)(INST__ACSIS|INST__SCUBA2) },
     { JOS_DRCONTROL, "_INTEGER", "JOS_DRCONTROL", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__SCUBA2 },
     { ENVIRO_REL_HUM, "_REAL", "ENVIRO_REL_HUM", INST__ACSIS, INST__NONE },
     { ENVIRO_PRESSURE, "_REAL", "ENVIRO_PRESSURE", INST__ACSIS, INST__NONE },
