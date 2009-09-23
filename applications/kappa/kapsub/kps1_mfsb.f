@@ -42,7 +42,7 @@
 *     ALL = LOGICAL ( Given)
 *        If .TRUE., the clipping threshold is a factor of the standard
 *        deviation of the whole data array in the NDF.  If .FALSE., the
-*        dierpsion comes form only the line being filtered.
+*        dispersion comes from only the line being filtered.
 *     MASK( * ) = BYTE (Returned)
 *        The mask of features.  Features have the bad value VAL__BADB
 *        and the remainder are set to 0.  The supplied array should
