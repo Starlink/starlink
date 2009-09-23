@@ -189,6 +189,10 @@
 #include <pthread.h>
 #endif
 
+#ifdef MEM_PROFILE
+#include <sys/times.h>
+#endif
+
 /* Function Macros. */
 /* =============== */
 /* These are defined as macros rather than functions to avoid the
@@ -328,8 +332,42 @@
    ( ( sizeof_memory != 0 ) ? sizeof_memory : SizeOfMemory( status ) )
 
 
+/* Type Definitions. */
+/* ================= */
+
+#ifdef MEM_PROFILE
+
+/* Structure used to record the time spent between matching calls to
+   astStartTimer and astStopTimer. */
+typedef struct AstTimer {
+   int id;                    /* Unique integer identifier for timer */
+   clock_t e0;                /* Absolute elapsed time at timer start */
+   clock_t u0;                /* Absolute user time at timer start */
+   clock_t s0;                /* Absolute system time at timer start */
+   clock_t et;                /* Cumulative elapsed time within timer */
+   clock_t ut;                /* Cumulative user time within timer */
+   clock_t st;                /* Cumulative system time within timer */
+   int nentry;                /* Number of entries into the timer */
+   const char *name;          /* An identifying label for the timer */
+   const char *file;          /* Name of source file where timer was started */
+   int line;                  /* Source file line no. where timer was started */
+   struct AstTimer *parent;   /* The parent enclosing timer */
+   int nchild;                /* Number of child timers */
+   struct AstTimer **children;/* Timers that count time within this timer */
+} AstTimer;
+
+#endif
+
 /* Module Variables. */
 /* ================= */
+
+/* Extra stuff for profiling (can only be used in single threaded
+   environments). */
+#ifdef MEM_PROFILE
+static AstTimer *Current_Timer = NULL;
+static int Enable_Timers = 0;
+static int Timer_Count = 0;
+#endif
 
 /* Extra stuff for debugging of memory management (tracking of leaks
    etc). */
@@ -437,6 +475,12 @@ static char *ChrSuber( const char *, const char *, const char *[], int, int, cha
 #ifdef MEM_DEBUG
 static void Issue( Memory *, int * );
 static void DeIssue( Memory *, int * );
+#endif
+
+#ifdef MEM_PROFILE
+static AstTimer *ReportTimer( AstTimer *, int, AstTimer **, int *, int * );
+static int CompareTimers( const void *, const void * );
+static int CompareTimers2( const void *, const void * );
 #endif
 
 /* Function implementations. */
@@ -3677,7 +3721,7 @@ int astSscanf_( const char *str, const char *fmt, ...) {
 }
 
 
-/* The remaining functions are used only when memory debugging is
+/* The next functions are used only when memory debugging is
    switched on via the MEM_DEBUG macro. They can be used for locating
    memory leaks, etc. */
 #ifdef MEM_DEBUG
@@ -4287,3 +4331,369 @@ static void DeIssue( Memory *mem, int *status ) {
 
 
 
+
+/* The next functions are used only when profiling AST application. */
+#ifdef MEM_PROFILE
+
+
+void astStartTimer_( const char *file, int line, const char *name, int *status ) {
+/*
+*+
+*  Name:
+*     astStartTimer
+
+*  Purpose:
+*     Measure the time spent until the corresponding call to astStopTimer.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     void astStartTimer( const char *name );
+
+*  Description:
+*     This function looks for a timer with the specified name within the
+*     current parent timer. If no timer with the given name is found, a
+*     new timer is created and initialised to zero. The current absolute 
+*     time (elapsed, user and system) is recorded in the timer. The new
+*     timer then becomes the current timer.
+
+*  Parameters:
+*     name
+*        A label for the timer. This should be unique within the
+*        enclosing parent timer.
+
+*  Notes:
+*     - This function should only be used in a single-threaded environment.
+*     - This function returns without action if timers are currently
+*     disabled (see astEnableTimers).
+
+*-
+*/
+
+/* Local Variables: */
+   int n, found, i;
+   AstTimer *t;
+   struct tms buf;
+
+/* Check inherited status. Also return if timers are currently disabled. */
+   if( !Enable_Timers || *status != 0 ) return;
+
+/* See if a timer with the given name exists in the list of child timers
+   within the current timer. */
+   found = 0;
+   if( Current_Timer ) {
+      for( i = 0; i < Current_Timer->nchild; i++ ) {
+         t = Current_Timer->children[ i ];
+         if( !strcmp( t->name, name ) ) {
+            found = 1;
+            break;
+         }
+      }
+   }
+
+/* If not, create and initialise one now, and add it into the list of
+   children within the current timer. */
+   if( !found ) {
+      t = astMalloc( sizeof( AstTimer ) );
+      t->id = Timer_Count++;
+      t->et = 0; 
+      t->ut = 0; 
+      t->st = 0; 
+      t->nentry = 0;
+      t->name = name;
+      t->file = file;
+      t->line = line;
+      t->parent = Current_Timer;
+      t->nchild = 0;
+      t->children = NULL;
+
+      if( Current_Timer ) {
+         n = (Current_Timer->nchild)++;
+         Current_Timer->children = astGrow( Current_Timer->children, 
+                                            sizeof( AstTimer *), 
+                                            Current_Timer->nchild );
+         Current_Timer->children[ n ] = t;
+      }
+   }
+
+/* Record the current absolute times (elapsed, user and system) within
+   the new timer. */
+   t->e0 = times(&buf);
+   t->u0 = buf.tms_utime;   
+   t->s0 = buf.tms_stime;   
+
+/* Increment the number of entries into the timer. */
+   (t->nentry)++;
+
+/* Use the new timer as the current timer until the corresponding call to
+   astStopTimer. */
+   Current_Timer = t;
+}
+
+void astEnableTimers_( int enable, int *status ) {
+/*
+*+
+*  Name:
+*     astEnableTimers
+
+*  Purpose:
+*     Set a global flag indicating if the use of AST timers is enabled.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     void astStartTimer( int enable );
+
+*  Description:
+*     This function sets a global flag that enables otr disables the user
+*     of AST Timers. If timers are disabled, the astStartTimer and
+*     astStopTimer functions will return without action.
+
+*  Parameters:
+*     enable
+*        If non-zero, timers will be used.
+
+*  Notes:
+*     - This function should only be used in a single-threaded environment.
+
+*-
+*/
+   Enable_Timers = enable;
+}
+
+void astStopTimer_( int *status ) {
+/*
+*+
+*  Name:
+*     astStopTimer
+
+*  Purpose:
+*     Record the time spent since the corresponding call to astStartTimer.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     void astStopTimer;
+
+*  Description:
+*     This function obtains the time increments since the corresponding
+*     call to astStartTimer, and adds these increments onto the total
+*     times stored in the current timer. It then changes the current
+*     timer to be the parent timer associated the current timer on entry.
+*
+*     If the current timer on entry has no parent (i.e. is a top level
+*     timer), the times spent in the top-level timer, and all its
+*     descendent timers, are displayed.
+
+*  Notes:
+*     - This function should only be used in a single-threaded environment.
+*     - This function returns without action if timers are currently
+*     disabled (see astEnableTimers).
+
+*-
+*/
+
+/* Local Variables: */
+   AstTimer *flat;
+   AstTimer *t;
+   int i;
+   int nflat;     
+   struct tms buf;
+
+/* Check inherited status. Also return if timers are currently disabled. */
+   if( !Enable_Timers || !Current_Timer || *status != 0 ) return;
+
+/* Get the current absolute times, and thus find the elapsed times since the 
+   corresponding call to astStartTimer. Use these elapsed times to increment 
+   the total times spent in the timer. */
+   Current_Timer->et += ( times(&buf) - Current_Timer->e0 );
+   Current_Timer->st += ( buf.tms_stime - Current_Timer->s0 );
+   Current_Timer->ut += ( buf.tms_utime - Current_Timer->u0 );
+
+/* If this is a top level timer, display the times spent in the current
+   timer, and in all its descendent timers. This also frees the memory
+   used by the timers. */
+   if( !Current_Timer->parent ) {
+      flat = NULL;
+      nflat = 0;
+      Current_Timer = ReportTimer( Current_Timer, 0, &flat, &nflat, status );
+
+/* Sort and display the flat list of timers, then free the memory used by
+   the flat list. */
+      qsort( flat, nflat, sizeof( AstTimer), CompareTimers2 );
+      printf("\n\n");
+      t = flat;
+      for( i = 0; i < nflat; i++,t++ ) {
+         printf( "%s (%s:%d): ", t->name, t->file, t->line );
+         printf( "elapsed=%ld ", (long int) t->et );
+/* 
+         printf( "system=%ld ", (long int) t->st );
+         printf( "user=%ld ", (long int) t->ut );
+*/
+         printf( "calls=%d ", t->nentry );
+         printf("\n");
+      }
+      flat = astFree( flat );
+
+/* If this is not a top level timer, restore the parent timer as the
+   curent timer. */
+   } else {
+      Current_Timer = Current_Timer->parent;
+   }
+}
+
+static AstTimer *ReportTimer( AstTimer *t, int ind, AstTimer **flat, 
+                              int *nflat, int *status ) {
+/*
+*  Name:
+*     ReportTimer
+
+*  Purpose:
+*     Free and report the times spent in a given timer, and all descendents.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     AstTimer *ReportTimer( AstTimer *t, int ind, AstTimer **flat,
+*                            int *nflat, int *status )
+
+*  Description:
+*     This routines reports to standard output the times spent in the 
+*     supplied timer. It then calls itself recursively to report the times 
+*     spent in each of the child timers of the supplied timer.
+*
+*     It also frees the memory used to hold the supplied timer.
+
+*  Parameters:
+*     t
+*        Pointer to the AstTimer structure.
+*     ind
+*        The number of spaces of indentation to display before the timer
+*        details.
+*     flat
+*        Address of a pointer to the start of an array of AstTimers. The
+*        number of elements in this array is given by "*nflat". Each
+*        Timer in this array holds the accumulated total for all entries
+*        into a given timer, from all parent contexts.
+*     nflat
+*        Address of an int holding the current length of the "*flat" array.
+*     status
+*        Pointer to the inherited status value.
+*/
+
+/* Local Variables: */
+   int found;
+   int i;
+   AstTimer *ft;
+   AstTimer *parent;
+
+/* Check inherited status */
+   if( *status != 0 ) return NULL;
+
+/* Display a single line of text containing the times stored in the supplied 
+   timer, preceeded by the requested number of spaces. */
+   for( i = 0; i < ind; i++ ) printf(" ");
+   printf( "%s (%s:%d): ", t->name, t->file, t->line );
+
+   printf( "id=%d ", t->id );
+   printf( "elapsed=%ld ", (long int) t->et );
+/* 
+   printf( "system=%ld ", (long int) t->st );
+   printf( "user=%ld ", (long int) t->ut );
+*/
+   printf( "calls=%d ", t->nentry );
+
+/* If there are any children, end the line with an opening bvrace. */
+   if( t->nchild ) printf("{");
+   printf("\n");
+
+/* If there is more than one child, sort them into descending order of 
+   elapsed time usage. */
+   if( t->nchild > 1 ) qsort( t->children, t->nchild, sizeof( AstTimer * ), 
+                              CompareTimers );
+
+/* Increment the indentation and call this function recursively to
+   display and free each child timer. */
+   ind += 3;
+   for( i = 0; i < t->nchild; i++ ) {
+      (t->children)[ i ] = ReportTimer( (t->children)[ i ], ind, flat,
+                                        nflat, status );
+   }
+
+/* Delimit the children by displaying a closing brace. */
+   if( t->nchild ) {
+      for( i = 0; i < ind - 3; i++ ) printf(" ");
+      printf("}\n");
+   }
+
+/* See if this timer is contained within itself at a higher level. */
+   parent = t->parent;
+   while( parent && ( parent->line != t->line ||
+                      strcmp( parent->file, t->file ) ) ) {
+      parent = parent->parent;
+   }
+
+/* If not, search for a timer in the "flat" array of timers that has the same
+   source file and line number. */
+   if( !parent ) {
+      found = 0;
+      ft = *flat;
+      for( i = 0; i < *nflat; i++, ft++ ) {
+         if( ft->line == t->line &&
+             !strcmp( ft->file, t->file ) ) {
+            found = 1;
+            break;
+         }
+      }
+
+/* If not found, add a new timer to the end of the "flat" array and
+   initialise it. */
+      if( !found ) {
+         i = (*nflat)++;
+         *flat = astGrow( *flat, *nflat, sizeof( AstTimer ) );
+         ft = (*flat) + i;
+         ft->id = 0;
+         ft->et = t->et; 
+         ft->ut = t->ut; 
+         ft->st = t->st; 
+         ft->nentry = t->nentry;
+         ft->name = t->name;
+         ft->file = t->file;
+         ft->line = t->line;
+         ft->parent = NULL;
+         ft->nchild = 0;
+         ft->children = NULL;
+
+
+/* If found, increment the properites to include the supplied timer. */
+      } else {
+         ft->et += t->et; 
+         ft->ut += t->ut; 
+         ft->st += t->st; 
+         ft->nentry += t->nentry;
+      }
+   }
+
+/* Free the memory used by the supplied timer. */
+   t->children = astFree( t->children );
+   return astFree( t );
+}
+
+
+static int CompareTimers( const void *a, const void *b ){
+   return ((*((AstTimer **) b ))->et) - ((*((AstTimer **) a ))->et);
+}
+
+static int CompareTimers2( const void *a, const void *b ){
+   return (((AstTimer *) b )->et) - (((AstTimer *) a )->et);
+}
+
+#endif

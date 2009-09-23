@@ -211,6 +211,13 @@ void astRemoveLeadingBlanks_( char *, int * );
 char *astAppendString_( char *, int *, const char *, int * );
 char *astChrSub_( const char *, const char *, const char *[], int, int * );
 
+#ifdef MEM_PROFILE
+void astStartTimer_( const char *, int, const char *, int * );
+void astStopTimer_( int * );
+void astEnableTimers_( int, int * );
+#endif
+
+
 #ifdef MEM_DEBUG
 void astActiveMemory_( const char * );
 void astWatchMemory_( int );
@@ -257,6 +264,14 @@ void astEndPM_( int * );
 #define astChrSplit(str,n) astERROR_INVOKE(astChrSplit_(str,n,STATUS_PTR))
 #define astChrSplitC(str,c,n) astERROR_INVOKE(astChrSplitC_(str,c,n,STATUS_PTR))
 #define astChrSplitRE(str,c,n,m) astERROR_INVOKE(astChrSplitRE_(str,c,n,m,STATUS_PTR))
+
+
+#ifdef MEM_PROFILE
+#define astStartTimer(name) astERROR_INVOKE(astStartTimer_(__FILE__,__LINE__,name,STATUS_PTR))
+#define astStopTimer astERROR_INVOKE(astStopTimer_(STATUS_PTR))
+#define astEnableTimers(enable) astERROR_INVOKE(astEnableTimers_(enable,STATUS_PTR))
+#endif
+
 
 /* Functions used for debugging memory leaks, etc */
 #ifdef MEM_DEBUG
