@@ -173,7 +173,7 @@ itcl::class gaia::GaiaCubeHduChooser {
       set file [[get_accessor] cget -dataset]
 
       #  May be a compressed cube masquerading as a table. Check for that.
-      if { [string first "COMPRESSED_IMAGE" $name] != 0 } {
+      if { [string first "COMPRESSED_IMAGE" $name] > -1 } {
 
          #  Arrange for decompression of this extension and then load it
          #  as required.

@@ -17,7 +17,7 @@
 #     by using the GaiaConvertTable conversions (which also deal with CAT &
 #     ASCII formats). We also intercept any binary tables that have
 #     "COMPRESSED_IMAGE" in their EXTNAME and convert these into temporary
-#     FITS image files. 
+#     FITS image files.
 #
 #     Later addition. Check for cubes and display them appropriately.
 
@@ -117,7 +117,7 @@ itcl::class gaia::GaiaHduChooser {
       set file [$image_ cget -file]
 
       #  May be a compressed image masquerading as a table. Check for that.
-      if { [string first "COMPRESSED_IMAGE" $name] != 0 } {
+      if { [string first "COMPRESSED_IMAGE" $name] > -1 } {
 
          #  Arrange for decompression of this extension and then load it.
          decompress_inline_ $file $hdu
