@@ -794,7 +794,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
           msgSeti( "DIMS", ndfdims[1]);
           *status = SAI__ERROR;
           errRep( "", FUNC_NAME ":Number of input columns not equal to the "
-                  "number of output columns (^NR != ^DIMS)",status);
+                  "number of output columns (^NC != ^DIMS)",status);
         }
         if (ndfdims[2] != (int)nframes) {
           msgSeti( "NF", nframes);
