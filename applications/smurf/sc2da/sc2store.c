@@ -1155,6 +1155,9 @@ int *status                   /* global status (given and returned) */
    STORE_STATE( tcs_tr_bc1, TCS_TR_BC1, double );
    STORE_STATE( tcs_tr_bc2, TCS_TR_BC2, double );
 
+   /* Status flags */
+   STORE_STATE( jos_drcontrol, JOS_DRCONTROL, int );
+
    /* Water Vapour Monitor */
    STORE_STATE( wvm_t12, WVM_T12, float );
    STORE_STATE( wvm_t42, WVM_T42, float );

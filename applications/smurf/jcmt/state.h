@@ -68,6 +68,8 @@
 *     26-MAY-2009 (TIMJ):
 *        Allow ACS_OFFEXPOSURE to be missing since it is now populated later.
 *        TCS_TAI now optional for ACSIS but mandatory for SCUBA-2.
+*     22-SEP-2009 (TIMJ):
+*        JOS_DRCONTROL can now be read from SCUBA-2 files.
 
 *  Copyright:
 *     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
@@ -309,7 +311,7 @@ static const HDSdataRecord hdsRecords[JCMT_COMP_NUM] =
     { TCS_TR_DC2, "_DOUBLE", "TCS_TR_DC2", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
     { TCS_TR_BC1, "_DOUBLE", "TCS_TR_BC1", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
     { TCS_TR_BC2, "_DOUBLE", "TCS_TR_BC2", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
-    { JOS_DRCONTROL, "_INTEGER", "JOS_DRCONTROL", INST__ACSIS, INST__NONE },
+    { JOS_DRCONTROL, "_INTEGER", "JOS_DRCONTROL", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__SCUBA2 },
     { ENVIRO_REL_HUM, "_REAL", "ENVIRO_REL_HUM", INST__ACSIS, INST__NONE },
     { ENVIRO_PRESSURE, "_REAL", "ENVIRO_PRESSURE", INST__ACSIS, INST__NONE },
     { ENVIRO_AIR_TEMP, "_REAL", "ENVIRO_AIR_TEMP", INST__ACSIS, INST__NONE },
