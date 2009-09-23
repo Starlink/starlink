@@ -247,6 +247,10 @@ f     The SkyFrame class does not define any new routines beyond those
 *        longitude axes and 1 for all latitude axes.
 *     18-JUN-2009 (DSB):
 *        Incorporate the new ObsAlt attribute.
+*     23-SEP-2009 (DSB):
+*        Allow some rounding error when checking for changes in SetObsLon
+*        and SetDut1. This reduces the number of times the expensive
+*        calculation of LAST is performed.
 *class--
 */
 
@@ -7894,8 +7898,8 @@ static void SetDut1( AstFrame *this_frame, double val, int *status ) {
    (*parent_setdut1)( this_frame, val, status );
 
 /* Recalculate the Local Apparent Sidereal Time value if the Dut1 value
-   has changed. */
-   if( val != orig ) SetLast( this, status );
+   has changed by more than 1E-4 second. */
+   if( fabs( val - orig ) > 1.0E-4 ) SetLast( this, status );
 }
 
 static void SetEpoch( AstFrame *this_frame, double val, int *status ) {
@@ -8156,8 +8160,8 @@ static void SetObsLon( AstFrame *this, double val, int *status ) {
    (*parent_setobslon)( this, val, status );
 
 /* Recalculate the Local Apparent Sidereal Time value if the ObsLon value
-   has changed. */
-   if( val != orig ) SetLast( (AstSkyFrame *) this, status );
+   has changed by more than about a metre. */
+   if( fabs( val - orig ) > 2.0E-7 ) SetLast( (AstSkyFrame *) this, status );
 
 }
 
