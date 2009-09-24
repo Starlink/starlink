@@ -468,8 +468,13 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
                                       "StdOfRest=Topocentric" );
             
             curframe2d = astFrame( 2, "Domain=BOLO" ); /* x, y, component */
+#if SC2STORE__COL_INDEX
+	    astSet( curframe2d, "label(1)=Rows,label(2)=Columns");
+#else
+	    astSet( curframe2d, "label(1)=Columns,label(2)=Rows");
+#endif
             curframe3d = astCmpFrame( specframe, curframe2d, " " );            
-            curframe1d = astFrame( 1, "Domain=COEFF"); /* real/imag component*/
+            curframe1d = astFrame( 1, "Domain=COEFF,label=Real/Imag component"); /* real/imag component*/
             curframe4d = astCmpFrame( curframe3d, curframe1d, " " );
             
             /* The mapping from 4d grid coordinates to (frequency, x,
