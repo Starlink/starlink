@@ -155,6 +155,21 @@
 /* Type Definitions. */
 /* ================= */
 
+/* Cached LAST look-up table. */
+/* -------------------------- */
+/* Holds a list of epoch values and the corresponding Local Apparent
+   Sidereal Time values. Also holds the observatory position and DUT1
+   value used when calculating the LAST values. */
+typedef struct AstSkyLastTable {
+   double obslat;         /* ObsLat at which LAST values were calculated */
+   double obslon;         /* ObsLon at which LAST values were calculated */
+   double obsalt;         /* ObsAlt at which LAST values were calculated */
+   double dut1;           /* Dut1 values at which LAST values were calculated */
+   int nentry;            /* Number of entries in the epoch and last arrays */
+   double *epoch;         /* Array of epoch values */
+   double *last;          /* Array of LAST values */
+} AstSkyLastTable;
+
 /* SkyFrame structure. */
 /* ------------------- */
 /* This structure contains all information that is unique to each object in
@@ -231,6 +246,9 @@ typedef struct AstSkyFrameVtab {
    void (* ClearAlignOffset)( AstSkyFrame *, int * );
    void (* SetAlignOffset)( AstSkyFrame *, int, int * );
 
+/* Local Apparent Sidereal Time look-up tables. */
+   int nlast_tables;
+   AstSkyLastTable **last_tables;
 
 } AstSkyFrameVtab;
 

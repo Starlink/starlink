@@ -251,6 +251,11 @@ f     The SkyFrame class does not define any new routines beyond those
 *        Allow some rounding error when checking for changes in SetObsLon
 *        and SetDut1. This reduces the number of times the expensive
 *        calculation of LAST is performed.
+*     24-SEP-2009 (DSB);
+*        Create a static cache of LAST values stored in the class virtual 
+*        function table. These are used in preference to calculating a new 
+*        value from scratch.
+
 *class--
 */
 
@@ -707,7 +712,6 @@ typedef struct SkyLineDef {
    double end_2d[2];
 } SkyLineDef;
 
-
 /* Module Variables. */
 /* ================= */
 
@@ -861,8 +865,10 @@ static double CalcLAST( AstSkyFrame *, double, double, double, double, double, i
 static double Distance( AstFrame *, const double[], const double[], int * );
 static double Gap( AstFrame *, int, double, int *, int * );
 static double GetBottom( AstFrame *, int, int * );
+static double GetCachedLAST( AstSkyFrame *, double, double, double, double, double, int * );
 static double GetEpoch( AstFrame *, int * );
 static double GetEquinox( AstSkyFrame *, int * );
+static void SetCachedLAST( AstSkyFrame *, double, double, double, double, double, double, int * );
 static void SetLast( AstSkyFrame *, int * );
 static double GetTop( AstFrame *, int, int * );
 static double Offset2( AstFrame *, const double[2], double, double, double[2], int * );
@@ -1123,6 +1129,8 @@ static double CalcLAST( AstSkyFrame *this, double epoch, double obslon,
 /* Local Variables: */
    astDECLARE_GLOBALS /* Declare the thread specific global data */
    AstFrameSet *fs;   /* Mapping from TDB offset to LAST offset */
+   double epoch0;     /* Supplied epoch value */
+   double result;     /* Returned LAST value */
 
 /* Get a pointer to the structure holding thread-specific global data. */   
    astGET_GLOBALS(this);
@@ -1130,49 +1138,65 @@ static double CalcLAST( AstSkyFrame *this, double epoch, double obslon,
 /* Check the global error status. */
    if ( !astOK ) return AST__BAD;
 
+/* See if the required LAST value can be determined from the cached LAST
+   values in the SkyFrame virtual function table. */
+   result = GetCachedLAST( this, epoch, obslon, obslat, obsalt, dut1,
+                           status );
+
+/* If not, we do an exact calculation from scratch. */
+   if( result == AST__BAD ) {
+
 /* If not yet done, create two TimeFrames. Note, this is done here 
    rather than in astInitSkyFrameVtab in order to avoid infinite vtab
    initialisation loops (caused by the TimeFrame class containing a 
    static SkyFrame). */
-   if( ! tdbframe ) {
-      astBeginPM;
-      tdbframe = astTimeFrame( "system=mjd,timescale=tdb", status );
-      lastframe = astTimeFrame( "system=mjd,timescale=last", status );
-      astEndPM;
-   }
+      if( ! tdbframe ) {
+         astBeginPM;
+         tdbframe = astTimeFrame( "system=mjd,timescale=tdb", status );
+         lastframe = astTimeFrame( "system=mjd,timescale=last", status );
+         astEndPM;
+      }
 
 /* For better accuracy, use this integer part of the epoch as the origin of 
    the two TimeFrames. */
-   astSetTimeOrigin( tdbframe, (int) epoch );
-   astSetTimeOrigin( lastframe, (int) epoch );
+      astSetTimeOrigin( tdbframe, (int) epoch );
+      astSetTimeOrigin( lastframe, (int) epoch );
 
 /* Convert the absolute Epoch value to an offset from the above origin. */
-   epoch -= (int) epoch;
+      epoch0 = epoch;
+      epoch -= (int) epoch;
 
 /* Store the observers position in the two TimeFrames. */
-   astSetObsLon( tdbframe, obslon );
-   astSetObsLon( lastframe, obslon );
-
-   astSetObsLat( tdbframe, obslat );
-   astSetObsLat( lastframe, obslat );
-
-   astSetObsAlt( tdbframe, obsalt );
-   astSetObsAlt( lastframe, obsalt );
+      astSetObsLon( tdbframe, obslon );
+      astSetObsLon( lastframe, obslon );
+   
+      astSetObsLat( tdbframe, obslat );
+      astSetObsLat( lastframe, obslat );
+   
+      astSetObsAlt( tdbframe, obsalt );
+      astSetObsAlt( lastframe, obsalt );
 
 /* Store the DUT1 value. */
-   astSetDut1( tdbframe, dut1 );
-   astSetDut1( lastframe, dut1 );
+      astSetDut1( tdbframe, dut1 );
+      astSetDut1( lastframe, dut1 );
 
 /* Get the conversion from tdb mjd offset to last mjd offset. */
-   fs = astConvert( tdbframe, lastframe, "" );
+      fs = astConvert( tdbframe, lastframe, "" );
 
 /* Use it to transform the SkyFrame Epoch from TDB offset to LAST offset. */
-   astTran1( fs, 1, &epoch, 1, &epoch );
-   fs = astAnnul( fs );
+      astTran1( fs, 1, &epoch, 1, &epoch );
+      fs = astAnnul( fs );
 
-/* Convert the LAST offset from days to radians, and return. */
-   return ( epoch - (int) epoch )*2*AST__DPI;
-   
+/* Convert the LAST offset from days to radians. */
+      result = ( epoch - (int) epoch )*2*AST__DPI;
+
+/* Cache the new LAST value in the SkyFrame virtual function table. */
+      SetCachedLAST( this, result, epoch0, obslon, obslat, obsalt, dut1,
+                     status );
+   }
+
+/* Return the required LAST value. */
+   return result;
 }
 
 static void ClearAsTime( AstSkyFrame *this, int axis, int *status ) {
@@ -2532,6 +2556,154 @@ static double GetBottom( AstFrame *this_frame, int axis, int *status ) {
    if ( !astOK ) result = -DBL_MAX;
 
 /* Return the result. */
+   return result;
+}
+
+static double GetCachedLAST( AstSkyFrame *this, double epoch, double obslon,
+                             double obslat, double obsalt, double dut1, 
+                             int *status ) {
+/*
+*  Name:
+*     GetCachedLAST
+
+*  Purpose:
+*     Attempt to get a LAST value from the cache in the SkyFrame vtab.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     double GetCachedLAST( AstSkyFrame *this, double epoch, double obslon,
+*                           double obslat, double obsalt, double dut1, 
+*                           int *status ) 
+
+*  Class Membership:
+*     SkyFrame member function.
+
+*  Description:
+*     This function searches the static cache of LAST values held in the
+*     SkyFrame virtual function table for a value that corresponds to the
+*     supplied parameter values. If one is found, it is returned.
+*     Otherwise AST__BAD is found.
+
+*  Parameters:
+*     this
+*        Pointer to the SkyFrame.
+*     epoch
+*        The epoch (MJD).
+*     obslon
+*        Observatory geodetic longitude (radians)
+*     obslat
+*        Observatory geodetic latitude (radians)
+*     obsalt
+*        Observatory geodetic altitude (metres)
+*     dut1 
+*        The UT1-UTC correction, in seconds.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*    The Local Apparent Sidereal Time, in radians.
+
+*  Notes:
+*     -  A value of AST__BAD will be returned if this function is invoked 
+*     with the global error status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   astDECLARE_GLOBALS 
+   AstSkyFrameVtab *vtab;
+   AstSkyLastTable *table; 
+   double *ep;
+   double *lp;
+   double dep;            
+   double result;     
+   int ihi;
+   int ilo;
+   int itable;
+   int itest;
+
+/* Get a pointer to the structure holding thread-specific global data. */   
+   astGET_GLOBALS(this);
+
+/* Initialise */
+   result = AST__BAD;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get a pointer to the SkyFrame virtual function table. */
+   vtab = (AstSkyFrameVtab *) ((AstObject *) this)->vtab;
+
+/* Loop round every LAST table held in the vtab. Each table refers to a
+   different observatory position and/or DUT1 value. */
+   for( itable = 0; itable < vtab->nlast_tables; itable++ ) {
+      table = (vtab->last_tables)[ itable ];
+
+/* See if the table refers to the given position and dut1 value, allowing
+   some small tolerance. */
+      if( fabs( table->obslat - obslat ) < 2.0E-7 && 
+          fabs( table->obslon - obslon ) < 2.0E-7 &&
+          fabs( table->obsalt - obsalt ) < 1.0 &&
+          fabs( table->dut1 - dut1 ) < 1.0E-5 ) {
+
+/* Get pointers to the array of epoch and corresponding LAST values in
+   the table. */
+         ep = table->epoch;
+         lp = table->last;
+
+/* The values in the epoch array are monotonic increasing. Do a binary chop 
+   within the table's epoch array to find the earliest entry that has a
+   value equal to or greater than the supplied epoch value. */
+         ilo = 0;
+         ihi = table->nentry - 1;
+         while( ihi > ilo ) {
+            itest = ( ilo + ihi )/2;
+            if( ep[ itest ] >= epoch ) {
+               ihi = itest;
+            } else {
+               ilo = itest + 1;
+            }
+         }
+
+/* Get the difference between the epoch at the entry selected above and
+   the requested epoch. */
+         dep = ep[ ilo ] - epoch;
+
+/* If the entry selected above is the first entry in the table, it can
+   only be used if it is within 0.1 second of the requested epoch. */
+         if( ilo == 0 ) {
+            if( fabs( dep ) < 0.1/86400.0 ) result = lp[ 0 ];
+
+/* If the list of epoch values contained no value that was greater than
+   the supplied epoch value, then we can use the last entry if
+   it is no more than 0.1 second away from the requested epoch. */
+         } else if( dep <= 0.0 ) {
+            if( fabs( dep ) < 0.1/86400.0 ) result = lp[ ilo ];
+
+/* Otherwise, see if the entry selected above is sufficiently close to
+   its lower neighbour (i.e. closer than 0.4 days) to allow a reasonably
+   accurate LAST value to be determined by interpolation. */
+         } else if( ep[ ilo ] - ep[ ilo - 1 ] < 0.4 ) {
+            ep += ilo - 1;
+            lp += ilo - 1;
+            result = *lp + ( epoch - *ep )*( lp[ 1 ] - *lp )/( ep[ 1 ] - *ep );
+
+/* If the neighbouring point is too far away for interpolation to be
+   reliable, then we can only use the point if it is within 0.1 seconds of
+   the requested epoch. */
+         } else if( fabs( dep ) < 0.1/86400.0 ) {
+            result = lp[ ilo ];
+         }
+
+/* If we have found the right table, we do not need to look at any other 
+   tables, so leave the table loop. */
+         break;
+      }
+   }
+
+/* Return the required LAST value. */
    return result;
 }
 
@@ -4256,6 +4428,11 @@ void astInitSkyFrameVtab_(  AstSkyFrameVtab *vtab, const char *name, int *status
    astSetDump( vtab, Dump, "SkyFrame",
                "Description of celestial coordinate system" );
 
+/* Initialise information about the tables of cached Local Apparent
+   Sidereal Time values stored in the vtab. */
+   vtab->nlast_tables = 0;
+   vtab->last_tables = NULL;
+
 /* Initialize constants for converting between hours, degrees and
    radians, etc.. */
    LOCK_MUTEX2
@@ -4268,7 +4445,6 @@ void astInitSkyFrameVtab_(  AstSkyFrameVtab *vtab, const char *name, int *status
 /* If we have just initialised the vtab for the current class, indicate
    that the vtab is now initialised. */
    if( vtab == &class_vtab ) class_init = 1;
-
 }
 
 static void Intersect( AstFrame *this_frame, const double a1[2],
@@ -7013,7 +7189,7 @@ static void Overlay( AstFrame *template, const int *template_axes,
    from the parent class. */
    (*parent_overlay)( template, template_axes, result, status );
 
-/* Reset the System and AlignSYstem values if necessary */
+/* Reset the System and AlignSystem values if necessary */
    if( reset_system ) {
       astSetSystem( template, new_system );
       astSetAlignSystem( template, new_alignsystem );
@@ -7848,6 +8024,145 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
    }
 }
 
+static void SetCachedLAST( AstSkyFrame *this, double last, double epoch, 
+                           double obslon, double obslat, double obsalt, 
+                           double dut1, int *status ) {
+/*
+*  Name:
+*     SetCachedLAST
+
+*  Purpose:
+*     Store a LAST value in the cache in the SkyFrame vtab.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     void SetCachedLAST( AstSkyFrame *this, double last, double epoch, 
+*                         double obslon, double obslat, double obsalt, 
+*                         double dut1, int *status )
+
+*  Class Membership:
+*     SkyFrame member function.
+
+*  Description:
+*     This function stores the supplied LAST value in a cache in the 
+*     SkyFrame virtual function table for later use by GetCachedLAST.
+
+*  Parameters:
+*     this
+*        Pointer to the SkyFrame.
+*     last
+*        The Local Apparent Sidereal Time (radians).
+*     epoch
+*        The epoch (MJD).
+*     obslon
+*        Observatory geodetic longitude (radians)
+*     obslat
+*        Observatory geodetic latitude (radians)
+*     obsalt
+*        Observatory geodetic altitude (metres)
+*     dut1 
+*        The UT1-UTC correction, in seconds.
+*     status
+*        Pointer to the inherited status variable.
+
+*/
+
+/* Local Variables: */
+   astDECLARE_GLOBALS 
+   AstSkyFrameVtab *vtab;
+   AstSkyLastTable *table; 
+   double *ep;
+   double *lp;
+   int i;
+   int itable;
+
+/* Get a pointer to the structure holding thread-specific global data. */   
+   astGET_GLOBALS(this);
+
+/* Initialise */
+   table = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Get a pointer to the SkyFrame virtual function table. */
+   vtab = (AstSkyFrameVtab *) ((AstObject *) this)->vtab;
+
+/* Loop round every LAST table held in the vtab. Each table refers to a
+   different observatory position and/or DUT1 value. */
+   for( itable = 0; itable < vtab->nlast_tables; itable++ ) {
+      table = (vtab->last_tables)[ itable ];
+
+/* See if the table refers to the given position and dut1 value, allowing
+   some small tolerance. If it does, leave the loop. */
+      if( fabs( table->obslat - obslat ) < 2.0E-7 && 
+          fabs( table->obslon - obslon ) < 2.0E-7 &&
+          fabs( table->obsalt - obsalt ) < 1.0 &&
+          fabs( table->dut1 - dut1 ) < 1.0E-5 ) break;
+
+/* Ensure "table" ends up NULL if no suitable table is found. */
+      table = NULL;
+   }
+
+/* If no table was found, create one now, and add it into the vtab cache. */
+   if( !table ) {
+
+      astBeginPM;
+      table = astMalloc( sizeof( AstSkyLastTable ) );
+      itable = (vtab->nlast_tables)++;
+      vtab->last_tables = astGrow( vtab->last_tables, vtab->nlast_tables,
+                                   sizeof( AstSkyLastTable * ) );
+      astEndPM;
+
+      if( astOK ) {
+         (vtab->last_tables)[ itable ] = table;
+         table->obslat = obslat;
+         table->obslon = obslon;
+         table->obsalt = obsalt;
+         table->dut1 = dut1;
+         table->nentry = 1;
+         table->epoch = astMalloc( sizeof( double ) );
+         table->last = astMalloc( sizeof( double ) );
+         if( astOK ) {
+            table->epoch[ 0 ] = epoch;
+            table->last[ 0 ] = last;
+         }
+      }
+
+/* If we have a table, add the new point into it. */
+   } else {
+
+/* Extend the epoch and last arrays. */
+      table->epoch = astGrow( table->epoch, ++(table->nentry), sizeof( double ) );
+      table->last = astGrow( table->last, table->nentry, sizeof( double ) );
+
+/* Check memory allocation was successful. */
+      if( astOK ) {
+
+/* Get pointers to the last original elements in the arrays of epoch and 
+   corresponding LAST values in the table. */
+         ep = table->epoch + table->nentry - 2;
+         lp = table->last + table->nentry - 2;
+
+/* Starting from the end of the arrays, shuffle all entries up one
+   element until an element is found which is less than the supplied epoch
+   value. This maintains the epoch array in monotonic increasing order. */
+         for( i = table->nentry - 2; i >= 0; i--,ep--,lp-- ) {
+            if( *ep <= epoch ) break;
+            ep[ 1 ] = *ep;
+            lp[ 1 ] = *lp;
+         }
+
+/* Store the new epoch and LAST value. */
+         ep[ 1 ] = epoch;
+         lp[ 1 ] = last;
+      }
+   }
+}
+
 static void SetDut1( AstFrame *this_frame, double val, int *status ) {
 /*
 *  Name:
@@ -8007,7 +8322,7 @@ static void SetLast( AstSkyFrame *this, int *status ) {
 /* The ratio between solar and sidereal time is a slowly varying function
    of epoch. The GetLAST function returns a fast approximation to LAST
    by using the ratio between solar and sidereal time. Indicate that
-   getLAST should re-calculate the ratio by setting the ratio value bad. */
+   GetLAST should re-calculate the ratio by setting the ratio value bad. */
    this->klast = AST__BAD;
 }
 
@@ -11144,6 +11459,7 @@ f     function is invoked with STATUS set to an error value, or if it
 /* Return an ID value for the new SkyFrame. */
    return astMakeId( new );
 }
+
 
 
 
