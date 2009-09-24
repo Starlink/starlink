@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.36}
 \newcommand{\stardocnumber}    {95.36}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2009 September 18}
+\newcommand{\stardocdate}      {2009 September 24}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.11}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -5551,7 +5551,13 @@ history records and update mode from an input NDF.  Some examples are
 \htmlref{PSF}{PSF}.  Should you wish these to have history
 recording enabled as you create such NDFs, there is an environment
 variable {\tt NDF\_AUTO\_HISTORY} that should be set to a non-zero
-value, or immediately run \htmlref{HISSET}{HISSET} with the new NDF.
+integer value, or immediately run \htmlref{HISSET}{HISSET} with the new NDF.
+Note that some applications may choose to disregard the value of {\tt
+NDF\_AUTO\_HISTORY} for good reason, such as for ancillary NDFs
+created with an NDF extension.  Whenever this option is exercised, the
+reference documentation for the task should indicate this behaviour in
+its Implementation Notes.  There are currently no such applications in
+\KAPPA.
 
 \subsection{\xlabel{se_commenthistory}Adding Commentary to History Recording
 \label{se:commenthistory}}
