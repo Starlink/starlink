@@ -255,6 +255,8 @@ f     The SkyFrame class does not define any new routines beyond those
 *        Create a static cache of LAST values stored in the class virtual 
 *        function table. These are used in preference to calculating a new 
 *        value from scratch.
+*     25-SEP-2009 (DSB);
+*        Do not calculate LAST until it is needed.
 
 *class--
 */
@@ -1384,7 +1386,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib, int *status
    }
 }
 
-static void ClearDut1( AstFrame *this_frame, int *status ) {
+static void ClearDut1( AstFrame *this, int *status ) {
 /*
 *  Name:
 *     ClearDut1
@@ -1422,14 +1424,18 @@ static void ClearDut1( AstFrame *this_frame, int *status ) {
    if ( !astOK ) return;
 
 /* Note the original value */
-   orig = astGetDut1( this_frame );
+   orig = astGetDut1( this );
 
 /* Invoke the parent method to clear the Frame Dut1 */
-   (*parent_cleardut1)( this_frame, status );
+   (*parent_cleardut1)( this, status );
 
-/* Recalculate the Local Apparent Sidereal Time value, if the Dut1
-   value has changed. */
-   if( orig != astGetDut1( this_frame ) ) SetLast( (AstSkyFrame *) this_frame, status );
+/* If the DUT1 value has changed significantly, indicate that the LAST value 
+   will need to be re-calculated when it is next needed. */
+   if( fabs( orig - astGetDut1( this ) ) > 1.0E-6 ) {
+      ( (AstSkyFrame *) this )->last = AST__BAD;
+      ( (AstSkyFrame *) this )->eplast = AST__BAD;
+      ( (AstSkyFrame *) this )->klast = AST__BAD;
+   }
 }
 
 static void ClearEpoch( AstFrame *this_frame, int *status ) {
@@ -1465,6 +1471,7 @@ static void ClearEpoch( AstFrame *this_frame, int *status ) {
 
 /* Local Variables: */
    AstSkyFrame *this;            /* Pointer to the SkyFrame structure */
+   double orig;                  /* Original epoch */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -1472,14 +1479,19 @@ static void ClearEpoch( AstFrame *this_frame, int *status ) {
 /* Obtain a pointer to the SkyFrame structure. */
    this = (AstSkyFrame *) this_frame;
 
+/* Save ther original epoch */
+   orig = astGetEpoch( this_frame );
+
 /* Invoke the parent method to clear the Frame epoch. */
    (*parent_clearepoch)( this_frame, status );
 
-/* Now get the new LAST value corresponding to the cleared Epoch.
-   If the original and cleared epoch are significantly different, this
-   will cause the new LAST to be calculated accurately and stored in the
-   SkyFrame. */
-   (void) GetLAST( this, status );
+/* If the Epoch value has changed significantly, indicate that the LAST value 
+   will need to be re-calculated when it is next needed. */
+   if( fabs( orig - astGetEpoch( this ) ) > 1.0E-8 ) {
+      this->last = AST__BAD;
+      this->eplast = AST__BAD;
+      this->klast = AST__BAD;
+   }
 }
 
 static void ClearObsAlt( AstFrame *this, int *status ) {
@@ -1524,9 +1536,13 @@ static void ClearObsAlt( AstFrame *this, int *status ) {
 /* Invoke the parent method to clear the Frame ObsAlt. */
    (*parent_clearobsalt)( this, status );
 
-/* If the value has changed, indicate that the magnitude of the diurnal 
-   aberration vector needs to be re-calculated. */
-   if( orig != astGetObsAlt( this ) ) {
+/* If the altitude has changed significantly, indicate that the LAST value 
+   and magnitude of the diurnal aberration vector will need to be 
+   re-calculated when next needed. */
+   if( fabs( orig - astGetObsAlt( this ) ) > 0.001 ) {
+      ( (AstSkyFrame *) this )->last = AST__BAD;
+      ( (AstSkyFrame *) this )->eplast = AST__BAD;
+      ( (AstSkyFrame *) this )->klast = AST__BAD;
       ( (AstSkyFrame *) this )->diurab = AST__BAD;
    }
 }
@@ -1573,9 +1589,13 @@ static void ClearObsLat( AstFrame *this, int *status ) {
 /* Invoke the parent method to clear the Frame ObsLat. */
    (*parent_clearobslat)( this, status );
 
-/* If the value has changed, indicate that the magnitude of the diurnal 
-   aberration vector needs to be re-calculated. */
-   if( orig != astGetObsLat( this ) ) {
+/* If the altitude has changed significantly, indicate that the LAST value 
+   and magnitude of the diurnal aberration vector will need to be 
+   re-calculated when next needed. */
+   if( fabs( orig - astGetObsLat( this ) ) > 1.0E-8 ) {
+      ( (AstSkyFrame *) this )->last = AST__BAD;
+      ( (AstSkyFrame *) this )->eplast = AST__BAD;
+      ( (AstSkyFrame *) this )->klast = AST__BAD;
       ( (AstSkyFrame *) this )->diurab = AST__BAD;
    }
 }
@@ -1622,9 +1642,13 @@ static void ClearObsLon( AstFrame *this, int *status ) {
 /* Invoke the parent method to clear the Frame ObsLon. */
    (*parent_clearobslon)( this, status );
 
-/* Recalculate the Local Apparent Sidereal Time value, if the ObsLon
-   value has changed. */
-   if( orig != astGetObsLon( this ) ) SetLast( (AstSkyFrame *) this, status );
+/* If the longitude has changed significantly, indicate that the LAST value 
+   will need to be re-calculated when it is next needed. */
+   if( fabs( orig - astGetObsLon( this ) ) > 1.0E-8 ) {
+      ( (AstSkyFrame *) this )->last = AST__BAD;
+      ( (AstSkyFrame *) this )->eplast = AST__BAD;
+      ( (AstSkyFrame *) this )->klast = AST__BAD;
+   }
 }
 
 static void ClearSystem( AstFrame *this_frame, int *status ) {
@@ -8212,9 +8236,13 @@ static void SetDut1( AstFrame *this_frame, double val, int *status ) {
 /* Invoke the parent method to set the Frame Dut1 value. */
    (*parent_setdut1)( this_frame, val, status );
 
-/* Recalculate the Local Apparent Sidereal Time value if the Dut1 value
-   has changed by more than 1E-4 second. */
-   if( fabs( val - orig ) > 1.0E-4 ) SetLast( this, status );
+/* If the DUT1 value has changed significantly, indicate that the LAST value 
+   will need to be re-calculated when it is next needed. */
+   if( fabs( orig - val ) > 1.0E-6 ) {
+      this->last = AST__BAD;
+      this->eplast = AST__BAD;
+      this->klast = AST__BAD;
+   }
 }
 
 static void SetEpoch( AstFrame *this_frame, double val, int *status ) {
@@ -8252,6 +8280,7 @@ static void SetEpoch( AstFrame *this_frame, double val, int *status ) {
 
 /* Local Variables: */
    AstSkyFrame *this;            /* Pointer to the SkyFrame structure */
+   double orig;                  /* Original epoch value */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -8259,13 +8288,20 @@ static void SetEpoch( AstFrame *this_frame, double val, int *status ) {
 /* Obtain a pointer to the SkyFrame structure. */
    this = (AstSkyFrame *) this_frame;
 
+/* Save the old epoch. */
+   orig = astGetEpoch( this );
+
 /* Invoke the parent method to set the Frame epoch. */
    (*parent_setepoch)( this_frame, val, status );
 
-/* Now get the new LAST value corresponding to the new Epoch. If the 
-   original and new epoch are significantly different, this will cause 
-   the new LAST to be calculated accurately and stored in the SkyFrame. */
-   (void) GetLAST( this, status );
+/* If the epoch has changed significantly, indicate that the LAST value 
+   corresponding to the Epoch will need to be re-calculated when it is 
+   next needed. */
+   if( fabs( orig - val ) > 1.0E-8 ) {
+      this->last = AST__BAD;
+      this->eplast = AST__BAD;
+      this->klast = AST__BAD;
+   }
 }
 
 static void SetLast( AstSkyFrame *this, int *status ) {
@@ -8370,12 +8406,15 @@ static void SetObsAlt( AstFrame *this, double val, int *status ) {
 /* Invoke the parent method to set the Frame ObsAlt. */
    (*parent_setobsalt)( this, val, status );
 
-/* If the value has changed, indicate that the magnitude of the diurnal 
-   aberration vector needs to be re-calculated. */
-   if( orig != astGetObsAlt( this ) ) {
+/* If the altitude has changed significantly, indicate that the LAST value 
+   and magnitude of the diurnal aberration vector will need to be 
+   re-calculated when next needed. */
+   if( fabs( orig - val ) > 0.001 ) {
+      ( (AstSkyFrame *) this )->last = AST__BAD;
+      ( (AstSkyFrame *) this )->eplast = AST__BAD;
+      ( (AstSkyFrame *) this )->klast = AST__BAD;
       ( (AstSkyFrame *) this )->diurab = AST__BAD;
    }
-
 }
 
 static void SetObsLat( AstFrame *this, double val, int *status ) {
@@ -8422,12 +8461,15 @@ static void SetObsLat( AstFrame *this, double val, int *status ) {
 /* Invoke the parent method to set the Frame ObsLat. */
    (*parent_setobslat)( this, val, status );
 
-/* If the value has changed, indicate that the magnitude of the diurnal 
-   aberration vector needs to be re-calculated. */
-   if( orig != astGetObsLat( this ) ) {
+/* If the altitude has changed significantly, indicate that the LAST value 
+   and magnitude of the diurnal aberration vector will need to be 
+   re-calculated when next needed. */
+   if( fabs( orig - val ) > 1.0E-8 ) {
+      ( (AstSkyFrame *) this )->last = AST__BAD;
+      ( (AstSkyFrame *) this )->eplast = AST__BAD;
+      ( (AstSkyFrame *) this )->klast = AST__BAD;
       ( (AstSkyFrame *) this )->diurab = AST__BAD;
    }
-
 }
 
 static void SetObsLon( AstFrame *this, double val, int *status ) {
@@ -8474,10 +8516,13 @@ static void SetObsLon( AstFrame *this, double val, int *status ) {
 /* Invoke the parent method to set the Frame ObsLon. */
    (*parent_setobslon)( this, val, status );
 
-/* Recalculate the Local Apparent Sidereal Time value if the ObsLon value
-   has changed by more than about a metre. */
-   if( fabs( val - orig ) > 2.0E-7 ) SetLast( (AstSkyFrame *) this, status );
-
+/* If the longitude has changed significantly, indicate that the LAST value 
+   will need to be re-calculated when it is next needed. */
+   if( fabs( orig - val ) > 1.0E-8 ) {
+      ( (AstSkyFrame *) this )->last = AST__BAD;
+      ( (AstSkyFrame *) this )->eplast = AST__BAD;
+      ( (AstSkyFrame *) this )->klast = AST__BAD;
+   }
 }
 
 static void SetSystem( AstFrame *this_frame, AstSystemType system, int *status ) {
