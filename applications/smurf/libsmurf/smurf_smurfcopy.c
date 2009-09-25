@@ -156,7 +156,7 @@ void smurf_smurfcopy ( int * status ) {
   for (i=1; i<=size; i++) {
 
     /* Open the input file using standard routine */
-    smf_open_file( igrp, i, "READ", 1, &data, status );
+    smf_open_file( igrp, i, "READ", SMF__NOCREATE_DA, &data, status );
 
     if (*status == SAI__OK) {
       if (!data->file->isTstream  || data->ndims != 3) {

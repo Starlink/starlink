@@ -147,7 +147,7 @@ void smurf_rawunpress( int *status ) {
     ndfMap( outndf, "DATA", "_INTEGER", "WRITE", &(outdata[0]), &nout, status );
 
     /* Open the input file using standard routine */
-    smf_open_file( igrp, i, "READ", 1, &data, status );
+    smf_open_file( igrp, i, "READ", SMF__NOCREATE_DA, &data, status );
 
     /* Quick sanity check to make sure we are raw data */
     if (*status == SAI__OK && data->da == NULL && data->dtype == SMF__INTEGER) {
