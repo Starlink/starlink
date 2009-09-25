@@ -544,6 +544,7 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
     
     for( j=0; j<nf*nbolo*2; j++ ) {
       *val *= norm;
+      if (*val == 0.0) *val = VAL__BADD;
       val++;
     }
   }
