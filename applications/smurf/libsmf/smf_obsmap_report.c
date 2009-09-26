@@ -51,6 +51,8 @@
 *        Include INBEAM in report.
 *     2009-07-10 (TIMJ):
 *        Include instrument information in report.
+*     2009-09-25 (TIMJ):
+*        Move sort routine externally.
 
 *  Copyright:
 *     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
@@ -97,21 +99,6 @@
 #include "smf.h"
 #include "smf_typ.h"
 #include "smf_err.h"
-
-/* Define a simple struct to contain the integer index into the KeyMap
-   timestamp for sorting. We will store these in an array
-   and pass them to qsort so that we can ensure that the reports
-   are in time order.
-*/
-
-typedef struct {
-  int index;
-  double utc;
-} smfSortInfo;
-
-/* local qsort sort routine */
-static int sortbytime( const void *in1, const void *in2);
-
 
 void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
                       int * status ) {
@@ -160,7 +147,7 @@ void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
         obsinfo = (AstKeyMap*)ao;  /* strict-aliasing warning avoidance in astMapGet0A */
         astMapGet0D( obsinfo, "MJD-OBS", &dateobs );
         obslist[i].index = i;
-        obslist[i].utc = dateobs;
+        obslist[i].mjd = dateobs;
 
         /* since we are looping already, extract INSTRUME information so that we can count it */
         astMapGet0C( obsinfo, "INSTRUME", &instrume );
@@ -169,7 +156,7 @@ void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
         obsinfo = astAnnul( obsinfo );
       }
     }
-    qsort( obslist, nobs, sizeof(*obslist), sortbytime );
+    qsort( obslist, nobs, sizeof(*obslist), smf_sort_bytime );
 
     /* See how many instruments we have */
     ninst = astMapSize( instmap );
@@ -287,28 +274,4 @@ void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
   }
 
   return;
-}
-
-
-/* This routine can be used to sort the darks */
-static int sortbytime ( const void *in1, const void *in2 ) {
-  const smfSortInfo * sort1;
-  const smfSortInfo * sort2;
-  double utc1;
-  double utc2;
-
-  sort1 = in1;
-  sort2 = in2;
-
-  utc1 = sort1->utc;
-  utc2 = sort2->utc;
-
-  if (utc1 < utc2) {
-    return -1;
-  } else if (utc1 > utc2) {
-    return 1;
-  } else {
-    /* least likely case last */
-    return 0;
-  }
 }

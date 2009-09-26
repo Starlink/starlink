@@ -1233,6 +1233,8 @@ void smf_set_clabels( const char title[], const char label[],
 
 void smf_set_moving( AstFrameSet* wcs, int *status );
 
+int smf_sort_bytime ( const void *in1, const void *in2 );
+
 void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe, 
                        int usedetpos, Grp *detgrp, int lbnd[ 3 ], int ubnd[ 3 ],
                        AstFrameSet **wcsout, int *hasoffexp, int *polobs, 

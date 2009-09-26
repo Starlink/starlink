@@ -646,5 +646,17 @@ typedef struct smfRebinMapData {
    int nused;
 } smfRebinMapData;
 
+/* Struct to facilitate sorting of data by time.
+   Array of these should be built up and passed
+   to qsort.
+ */
+
+typedef struct {
+  double mjd;     /* MJD date - primary sorting key  */
+  void *misc;     /* Pointer to additional information */
+  int index;      /* an index that will be sorted with the mjd */
+  char name [GRP__SZNAM+1]; /* string to carry around naming the item */
+} smfSortInfo;
+
 
 #endif /* SMF_TYP_DEFINED */

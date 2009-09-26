@@ -76,6 +76,8 @@
 *     2009-09-02 (TIMJ):
 *        Use smf_find_dateobs rather than directly accessing jcmtstate
 *        to be a little more robust with junk files.
+*     2009-09-25 (TIMJ):
+*        Move sort routine externally.
 
 *  Copyright:
 *     Copyright (C) 2008-2009 Science and Technology Facilities Council.
@@ -126,20 +128,6 @@
 #include "smf.h"
 #include "smf_typ.h"
 #include "smf_err.h"
-
-/* Define a simple struct to contain the filename and the
-   timestamp for sorting. We will store these in an array
-   and pass them to qsort so that we can ensure that the darks
-   are in time order.
-*/
-
-typedef struct {
-  char name[GRP__SZNAM+1];
-  double tai;
-} smfSortInfo;
-
-/* local qsort sort routine */
-static int sortbytime( const void *in1, const void *in2);
 
 #define FUNC_NAME "smf_find_darks"
 
@@ -207,7 +195,7 @@ void smf_find_darks( const Grp * ingrp, Grp **outgrp, Grp **darkgrp,
         sortinfo = &(alldarks[dkcount]);
         one_strlcpy( sortinfo->name, infile->file->name, sizeof(sortinfo->name),
                      status );
-        smf_find_dateobs( infile->hdr, &(sortinfo->tai), NULL, status );
+        smf_find_dateobs( infile->hdr, &(sortinfo->mjd), NULL, status );
         msgSetc("F", infile->file->name);
         msgOutif(MSG__DEBUG, " ", "Dark file: ^F",status);
         dkcount++;
@@ -234,7 +222,7 @@ void smf_find_darks( const Grp * ingrp, Grp **outgrp, Grp **darkgrp,
   if (dkcount > 0 && (darks || darkgrp) ) {
 
     /* sort darks into order */
-    qsort( alldarks, dkcount, sizeof(*alldarks), sortbytime);
+    qsort( alldarks, dkcount, sizeof(*alldarks), smf_sort_bytime);
 
     /* now open the darks and store them if requested */
     if (darks) {
@@ -305,27 +293,4 @@ void smf_find_darks( const Grp * ingrp, Grp **outgrp, Grp **darkgrp,
   objmap = astAnnul( objmap );
 
   return;
-}
-
-/* This routine can be used to sort the darks */
-static int sortbytime ( const void *in1, const void *in2 ) {
-  const smfSortInfo * sort1;
-  const smfSortInfo * sort2;
-  double tai1;
-  double tai2;
-
-  sort1 = in1;
-  sort2 = in2;
-
-  tai1 = sort1->tai;
-  tai2 = sort2->tai;
-
-  if (tai1 < tai2) {
-    return -1;
-  } else if (tai1 > tai2) {
-    return 1;
-  } else {
-    /* least likely case last */
-    return 0;
-  }
 }
