@@ -716,6 +716,7 @@ typedef struct AstFrameVtab {
    struct AstFrameSet *(* Convert)( AstFrame *, AstFrame *, const char *, int * );
    struct AstFrameSet *(* ConvertX)( AstFrame *, AstFrame *, const char *, int * );
    struct AstFrameSet *(* FindFrame)( AstFrame *, AstFrame *, const char *, int * );
+   void (* MatchAxes)( AstFrame *, AstFrame *, int[], int * );
    void (* CheckPerm)( AstFrame *, const int *, const char *, int * );
    void (* ClearDigits)( AstFrame *, int * );
    void (* ClearDirection)( AstFrame *, int, int * );
@@ -881,16 +882,17 @@ void astInitFrameGlobals_( AstFrameGlobals * );
 AstFrameSet *astConvert_( AstFrame *, AstFrame *, const char *, int * );
 AstFrameSet *astFindFrame_( AstFrame *, AstFrame *, const char *, int * );
 double astAngle_( AstFrame *, const double[], const double[], const double[], int * );
-double astDistance_( AstFrame *, const double[], const double[], int * );
-void astIntersect_( AstFrame *, const double[2], const double[2], const double[2], const double[2], double[2], int * );
-void astNorm_( AstFrame *, double[], int * );
+double astAxAngle_( AstFrame *, const double[2], const double[2], int, int * );
 double astAxDistance_( AstFrame *, int, double, double, int * );
 double astAxOffset_( AstFrame *, int, double, double, int * );
-double astAxAngle_( AstFrame *, const double[2], const double[2], int, int * );
+double astDistance_( AstFrame *, const double[], const double[], int * );
 double astOffset2_( AstFrame *, const double[2], double, double, double[2], int * );
+int astGetActiveUnit_( AstFrame *, int * );
+void astIntersect_( AstFrame *, const double[2], const double[2], const double[2], const double[2], double[2], int * );
+void astMatchAxes_( AstFrame *, AstFrame *, int[], int * );
+void astNorm_( AstFrame *, double[], int * );
 void astOffset_( AstFrame *, const double[], const double[], double, double[], int * );
 void astResolve_( AstFrame *, const double [], const double [], const double [], double [], double *, double *, int * );
-int astGetActiveUnit_( AstFrame *, int * );
 void astSetActiveUnit_( AstFrame *, int, int * );
 
 #if defined(astCLASS)            /* Protected */
@@ -1092,6 +1094,8 @@ astINVOKE(V,astAngle_(astCheckFrame(this),a,b,c,STATUS_PTR))
 astINVOKE(V,astDistance_(astCheckFrame(this),point1,point2,STATUS_PTR))
 #define astFindFrame(target,template,domainlist) \
 astINVOKE(O,astFindFrame_(astCheckFrame(target),astCheckFrame(template),domainlist,STATUS_PTR))
+#define astMatchAxes(frm1,frm2,axes) \
+astINVOKE(V,astMatchAxes_(astCheckFrame(frm1),astCheckFrame(frm2),axes,STATUS_PTR))
 #define astNorm(this,value) \
 astINVOKE(V,astNorm_(astCheckFrame(this),value,STATUS_PTR))
 #define astAxDistance(this,axis,v1,v2) \

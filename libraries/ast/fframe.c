@@ -224,6 +224,20 @@ F77_INTEGER_FUNCTION(ast_findframe)( INTEGER(TARGET),
    return RESULT;
 }
 
+F77_SUBROUTINE(ast_matchaxes)( INTEGER(FRM1),
+                               INTEGER(FRM2),
+                               INTEGER_ARRAY(AXES),
+                               INTEGER(STATUS) ) {
+   GENPTR_INTEGER(FRM1)
+   GENPTR_INTEGER(FRM2)
+   GENPTR_INTEGER_ARRAY(AXES)
+
+   astAt( "AST_MATCHAXES", NULL, 0 );
+   astWatchSTATUS(
+      astMatchAxes( astI2P( *FRM1 ), astI2P( *FRM2 ), AXES );
+   )
+}
+
 /* NO_CHAR_FUNCTION indicates that the f77.h method of returning a
    character result doesn't work, so add an extra argument instead and
    wrap this function up in a normal FORTRAN 77 function (in the file

@@ -21834,12 +21834,20 @@ current version):
 
 c+
 \begin{enumerate}
-
 \item The arrays that supply input values for astMapPut1<X> are now
 declared ``const''.
-
 \end{enumerate}
 c-
+
+\item Added method 
+c+
+astMatchAxes
+c-
+f+
+AST\_MATCHAXES
+f-
+to the Frame class. This method allows corresponding axes within two
+Frames to be identified.
 
 Programs which are statically linked will need to be re-linked in
 order to take advantage of these new facilities.

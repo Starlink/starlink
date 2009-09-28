@@ -570,39 +570,40 @@ static int Test##attribute( AstFrame *this_frame, int axis, int *status ) { \
 static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
-static int (* parent_getmaxaxes)( AstFrame *, int * );
-static int (* parent_getminaxes)( AstFrame *, int * );
-static int (* parent_getobjsize)( AstObject *, int * );
 static AstSystemType (* parent_getalignsystem)( AstFrame *, int * );
 static AstSystemType (* parent_getsystem)( AstFrame *, int * );
 static const char *(* parent_getattrib)( AstObject *, const char *, int * );
 static const char *(* parent_getdomain)( AstFrame *, int * );
 static const char *(* parent_gettitle)( AstFrame *, int * );
 static double (* parent_angle)( AstFrame *, const double[], const double[], const double[], int * );
+static double (* parent_getdut1)( AstFrame *, int * );
 static double (* parent_getepoch)( AstFrame *, int * );
 static double (* parent_getobsalt)( AstFrame *, int * );
 static double (* parent_getobslat)( AstFrame *, int * );
 static double (* parent_getobslon)( AstFrame *, int * );
 static int (* parent_getactiveunit)( AstFrame *, int * );
+static int (* parent_getmaxaxes)( AstFrame *, int * );
+static int (* parent_getminaxes)( AstFrame *, int * );
+static int (* parent_getobjsize)( AstObject *, int * );
 static int (* parent_getusedefs)( AstObject *, int * );
 static int (* parent_testattrib)( AstObject *, const char *, int * );
+static void (* parent_clearalignsystem)( AstFrame *, int * );
 static void (* parent_clearattrib)( AstObject *, const char *, int * );
+static void (* parent_cleardut1)( AstFrame *, int * );
 static void (* parent_clearepoch)( AstFrame *, int * );
 static void (* parent_clearobsalt)( AstFrame *, int * );
 static void (* parent_clearobslat)( AstFrame *, int * );
 static void (* parent_clearobslon)( AstFrame *, int * );
+static void (* parent_matchaxes)( AstFrame *, AstFrame *, int *, int * );
 static void (* parent_overlay)( AstFrame *, const int *, AstFrame *, int * );
 static void (* parent_setactiveunit)( AstFrame *, int, int * );
-static void (* parent_setframeflags)( AstFrame *, int, int * );
 static void (* parent_setattrib)( AstObject *, const char *, int * );
+static void (* parent_setdut1)( AstFrame *, double, int * );
 static void (* parent_setepoch)( AstFrame *, double, int * );
+static void (* parent_setframeflags)( AstFrame *, int, int * );
 static void (* parent_setobsalt)( AstFrame *, double, int * );
 static void (* parent_setobslat)( AstFrame *, double, int * );
 static void (* parent_setobslon)( AstFrame *, double, int * );
-static void (* parent_setdut1)( AstFrame *, double, int * );
-static void (* parent_cleardut1)( AstFrame *, int * );
-static double (* parent_getdut1)( AstFrame *, int * );
-static void (* parent_clearalignsystem)( AstFrame *, int * );
 
 #if defined(THREAD_SAFE)
 static int (* parent_managelock)( AstObject *, int, int, AstObject **, int * );
@@ -671,7 +672,6 @@ AstCmpFrame *astCmpFrameId_( void *, void *, const char *, ... );
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
-static int GetObjSize( AstObject *, int * );
 static AstAxis *GetAxis( AstFrame *, int, int * );
 static AstMapping *RemoveRegions( AstMapping *, int * );
 static AstMapping *Simplify( AstMapping *, int * );
@@ -696,10 +696,13 @@ static double Distance( AstFrame *, const double[], const double[], int * );
 static double Gap( AstFrame *, int, double, int *, int * );
 static int Fields( AstFrame *, int, const char *, const char *, int, char **, int *, double *, int * );
 static int GenAxisSelection( int, int, int [], int * );
+static int GetActiveUnit( AstFrame *, int * );
 static int GetDirection( AstFrame *, int, int * );
 static int GetMaxAxes( AstFrame *, int * );
 static int GetMinAxes( AstFrame *, int * );
 static int GetNaxes( AstFrame *, int * );
+static int GetObjSize( AstObject *, int * );
+static int GetUseDefs( AstObject *, int * );                         
 static int GoodPerm( int, const int [], int, const int [], int * );
 static int IsUnitFrame( AstFrame *, int * );
 static int Match( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame **, int * );
@@ -722,25 +725,24 @@ static void Copy( const AstObject *, AstObject *, int * );
 static void Decompose( AstMapping *, AstMapping **, AstMapping **, int *, int *, int *, int * );
 static void Delete( AstObject *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
+static void MatchAxes( AstFrame *, AstFrame *, int *, int * );
 static void Norm( AstFrame *, double [], int * );
 static void NormBox( AstFrame *, double[], double[], AstMapping *, int * );
 static void Offset( AstFrame *, const double [], const double [], double, double [], int * );
+static void Overlay( AstFrame *, const int *, AstFrame *, int * );
 static void PartitionSelection( int, const int [], const int [], int, int, int [], int, int * );
 static void PermAxes( AstFrame *, const int[], int * );
 static void PrimaryFrame( AstFrame *, int, AstFrame **, int *, int * );
 static void RenumberAxes( int, int [], int * );
 static void Resolve( AstFrame *, const double [], const double [], const double [], double [], double *, double *, int * );
-static void SetAxis( AstFrame *, int, AstAxis *, int * );
-static int GetActiveUnit( AstFrame *, int * );
 static void SetActiveUnit( AstFrame *, int, int * );
-static void SetFrameFlags( AstFrame *, int, int * );
+static void SetAxis( AstFrame *, int, AstAxis *, int * );
 static void SetDirection( AstFrame *, int, int, int * );
 static void SetFormat( AstFrame *, int, const char *, int * );
+static void SetFrameFlags( AstFrame *, int, int * );
 static void SetLabel( AstFrame *, int, const char *, int * );
 static void SetSymbol( AstFrame *, int, const char *, int * );
 static void SetUnit( AstFrame *, int, const char *, int * );
-static void Overlay( AstFrame *, const int *, AstFrame *, int * );
-static int GetUseDefs( AstObject *, int * );
 
 static const char *GetAttrib( AstObject *, const char *, int * );
 static int TestAttrib( AstObject *, const char *, int * );
@@ -3894,6 +3896,9 @@ void astInitCmpFrameVtab_(  AstCmpFrameVtab *vtab, const char *name, int *status
    parent_getminaxes = frame->GetMinAxes;
    frame->GetMinAxes = GetMinAxes;
 
+   parent_matchaxes = frame->MatchAxes;
+   frame->MatchAxes = MatchAxes;
+
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
    frame->Abbrev = Abbrev;
@@ -4614,6 +4619,113 @@ static int Match( AstFrame *template_frame, AstFrame *target,
 
 /* Return the result. */
    return match;
+}
+
+static void MatchAxes( AstFrame *frm1_frame, AstFrame *frm2, int *axes, 
+                       int *status ) {
+/*
+*  Name:
+*     MatchAxes
+
+*  Purpose:
+*     Find any corresponding axes in two Frames.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     void MatchAxes( AstFrame *frm1, AstFrame *frm2, int *axes )
+*                     int *status )
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the protected astMatchAxes
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function looks for corresponding axes within two supplied 
+*     Frames. An array of integers is returned that contains an element
+*     for each axis in the first supplied Frame. An element in this array 
+*     will be set to zero if the associated axis within the first Frame
+*     has no corresponding axis within the second Frame. Otherwise, it
+*     will be set to the index (a non-zero positive integer) of the
+*     corresponding axis within the second supplied array.
+
+*  Parameters:
+*     frm1
+*        Pointer to the first Frame.
+*     frm2
+*        Pointer to the second Frame.
+*     axes
+*        Pointer to an 
+*        integer array in which to return the indices of the axes (within
+*        the second Frame) that correspond to each axis within the first
+*        Frame. Axis indices start at 1. A value of zero will be stored
+*        in the returned array for each axis in the first Frame that has 
+*        no corresponding axis in the second Frame.
+*
+*        The number of elements in this array must be greater than or 
+*        equal to the number of axes in the first Frame.
+*     status
+*        Pointer to inherited status value.
+
+*  Notes:
+*     -  Corresponding axes are identified by the fact that a Mapping 
+*     can be found between them using astFindFrame or astConvert. Thus, 
+*     "corresponding axes" are not necessarily identical. For instance, 
+*     SkyFrame axes in two Frames will match even if they describe 
+*     different celestial coordinate systems
+*/
+
+/* Local Variables: */
+   AstCmpFrame *frm1;
+   const int *perm;
+   int *work;
+   int i;
+   int nax1;
+   int nax2;
+   int nax;
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Get a pointer to the CmpFrame. */
+   frm1 = (AstCmpFrame *) frm1_frame;   
+
+/* Get the number of axes in the two component Frames, and the total
+   number of axes in the CmpFrame. */
+   nax1 = astGetNaxes( frm1->frame1 );
+   nax2 = astGetNaxes( frm1->frame2 );
+   nax = nax1 + nax2;
+
+/* Allocate a work array to hold the unpermuted axis indices */
+   work = astMalloc( sizeof( int )*nax );
+   if( astOK ) {
+
+/* Use the parent MatchAxes method inherited from the parent Frame
+   class to match axes in the first component Frame within CmpFrame 
+   "frm1". Write the associated axis indices into the first part of the
+   work array. */
+      (*parent_matchaxes)( frm1->frame1, frm2, work, status );
+
+/* Use the parent MatchAxes method to match axes in the second component 
+   Frame. Write the associated axis indices into the work array
+   following the end of the values already in there. */
+      (*parent_matchaxes)( frm1->frame2, frm2, work + nax1, status );
+
+/* Obtain a pointer to the CmpFrame's axis permutation array. The index
+   into "perm" represents the external axis index, and the value held in
+   each element of "perm" represents the corresponding internal axis index. */
+      perm = astGetPerm( frm1 );
+
+/* Copy the frm2 axis indices from the work array into the returned "axes" 
+   array, permuting their order into the external axis order of the 
+   CmpFrame. */
+      for( i = 0; i < nax; i++ ) axes[ i ] = work[ perm[ i ] ];
+
+/* Free resources */
+      work = astFree( work );
+   }
 }
 
 static void Norm( AstFrame *this_frame, double value[], int *status ) {

@@ -19,6 +19,9 @@ Main Changes in this Version
 - The arrays that supply input values to astMapPut1<X> are now declared
 "const".
 
+- Added method astMatchAxes (AST_MATCHAXES) to the Frame class. This
+allows corresponding axes in two Frames to be identified.
+
 
 
 Main Changes in Version 5.1
