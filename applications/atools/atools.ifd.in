@@ -724,6 +724,34 @@ iraf! {
           }
 
       }
+      action astmatchaxes {
+
+         helplib {$ATOOLS_HELP}
+
+         parameter axes {
+            type _INTEGER
+            access WRITE
+            vpath INTERNAL
+            helpkey *
+          }
+
+         parameter frm1 {
+            position 1
+            type LITERAL
+            prompt {The first Frame}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+         parameter frm2 {
+            position 2
+            type LITERAL
+            prompt {The second Frame}
+            ppath CURRENT
+            helpkey *
+          }
+      }
       action astframe {
          helplib {$ATOOLS_HELP}
 

@@ -18,7 +18,7 @@ atools_mon_TASKS = astcopy astaddframe astclear astget astset asttest \
  astcmpframe astcmpmap astframe astgetframe astgetmapping astunitmap \
  atlhelp astskyframe astframeset astpermmap astremoveframe astremapframe \
  astmatrixmap astconvert astlutmap astpcdmap astwinmap astshiftmap \
- astfindframe astpermaxes astpickaxes astsimplify asttrann astmapbox \
+ astfindframe astmatchaxes astpermaxes astpickaxes astsimplify asttrann astmapbox \
  astinvert astspecframe asttimeframe astsetrefpos astgetrefpos astformat \
  astgetregbounds astunformat asttran1 asttran2 astmapregion astcmpregion \
  astmathmap astsetactunit astgetactunit astpolymap astswitchmap asttranmap \
@@ -90,7 +90,7 @@ atools_mon version.dat atools.csh atools.icl atools.sh
 
 IFC_FILES = astaddframe.ifc astclear.ifc astcmpframe.ifc astcmpmap.ifc \
 astconvert.ifc astcopy.ifc astdsbframe.ifc astellipse.ifc \
-astfindframe.ifc astfluxframe.ifc astformat.ifc astunformat.ifc astframe.ifc \
+astfindframe.ifc astmatchaxes.ifc astfluxframe.ifc astformat.ifc astunformat.ifc astframe.ifc \
 astframeset.ifc astgetactunit.ifc astgetframe.ifc astget.ifc \
 astgetmapping.ifc astgetrefpos.ifc astinvert.ifc astlutmap.ifc \
 astmapbox.ifc astmathmap.ifc astmatrixmap.ifc astpcdmap.ifc astbox.ifc \
@@ -107,7 +107,7 @@ astoutline.ifc astrate.ifc astoverlap.ifc astmask.ifc
 
 IFL_FILES = astaddframe.ifl astclear.ifl astcmpframe.ifl astcmpmap.ifl \
 astconvert.ifl astcopy.ifl astdsbframe.ifl astellipse.ifl \
-astfindframe.ifl astfluxframe.ifl astformat.ifl astunformat.ifl astframe.ifl \
+astfindframe.ifl astmatchaxes.ifl astfluxframe.ifl astformat.ifl astunformat.ifl astframe.ifl \
 astframeset.ifl astgetactunit.ifl astgetframe.ifl astget.ifl \
 astgetmapping.ifl astgetrefpos.ifl astinvert.ifl astlutmap.ifl \
 astmapbox.ifl astmathmap.ifl astmatrixmap.ifl astpcdmap.ifl astbox.ifl \
