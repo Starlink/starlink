@@ -53,8 +53,7 @@
 *     appropriate.  The data type of the ARRAY argument must match the 
 *     particular routine used.
 *     -  If the value of NGOOD is not at least two, then this routine 
-*     will reported an error and abort.  The median and percentiles will
-*     have the bad value.
+*     will abort.  The median and percentiles will have the bad value.
 *     -  The sorting is recorded in an index leaving the order of the 
 *     supplied array values intact.
  
@@ -88,6 +87,8 @@
 *     2009 August 21 (MJC):
 *        Exclude one- and two-byte integer types as sorting code
 *        does not support them.  Fix pasting bug involving KPG1_FLOOR.
+*     2009 September 28 (MJC):
+*        Do not report an error when NGOOD is too small.
 *     {enter_further_changes_here}
  
 *-
@@ -150,12 +151,6 @@
 
 *  Validate that there are sufficient valid values.
       IF ( NGOOD .LT. 2 ) THEN
-         STATUS = SAI__ERROR
-         CALL MSG_SETI( 'NG', NGOOD )
-         CALL MSG_SETI( 'EL', EL )
-         CALL ERR_REP( 'KPG_STOSx_INVDATA',
-     :                 'There too few good data (^NG of ^EL) to '/
-     :                 /'compute ordered statistics.', STATUS )
          GOTO 999
       END IF
 
