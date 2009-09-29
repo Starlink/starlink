@@ -140,7 +140,6 @@ void smurf_stackframes( int *status ) {
   AstCmpMap * totmap;
   AstCmpFrame *totfrm;
   int ubnd[NDF__MXDIM];          /* Upper bounds of output */
-  double zshift[2];              /* Pixel shift for output WCS */
 
   if (*status != SAI__OK) return;
 
@@ -337,15 +336,11 @@ void smurf_stackframes( int *status ) {
   timemap = astLutMap( size, times, 1.0, 1.0, " " );
   times = smf_free( times, status );
 
-  /* For now ignore the input 2d frameset and just make a new one */
-  frame2d = astFrame( 2, "Domain=BOLO" );
+  /* split up the current 2d frameset */
+  frame2d = astGetFrame( framewcs, AST__CURRENT );
+  map2d = astGetMapping( framewcs, AST__BASE, AST__CURRENT );
 
   totfrm = astCmpFrame( frame2d, timefrm, " " );
-
-  zshift[0] = -1; /* Set BOLO origin to 0, 0 */
-  zshift[1] = -1;
-  map2d = astShiftMap( 2, zshift, " " );
-
   totmap = astCmpMap( map2d, timemap, 0, " " );
 
   /* Create a 3D GRID Frame. */
