@@ -311,6 +311,9 @@ void smurf_stackframes( int *status ) {
       memcpy( odataq, (data->pntr)[2], szplane );
       odataq += szplane;
     }
+    smf_updateprov( outdata->file->ndfid, data, NDF__NOID,
+		    "SMURF:" TASK_NAME, status );
+
     smf_close_file( &data, status );
   }
 
