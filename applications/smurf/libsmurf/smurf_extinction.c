@@ -142,6 +142,8 @@
 *        method. Use new API for smf_correct_extinction.
 *     2009-03-30 (TIMJ):
 *        Add OUTFILES parameter.
+*     2009-09-29 (EC):
+*        Move parsing of tausrc and extmeth into smf_get_extpar
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -208,6 +210,7 @@ void smurf_extinction( int * status ) {
   int has_been_sky_removed = 0;/* Data are sky-removed */
   size_t i;                  /* Loop counter */
   Grp *igrp = NULL;          /* Input group */
+  AstKeyMap *keymap=NULL;    /* Keymap for storing parameters */
   smf_tausrc tausrc;         /* enum value of optical depth source */
   smf_extmeth extmeth;       /* Extinction correction method */
   char tausource[LEN__METHOD];  /* String for optical depth source */
@@ -251,40 +254,22 @@ void smurf_extinction( int * status ) {
             "CSOtau, Filtertau, WVMraw", 1,
             tausource, sizeof(tausource), status);
 
-  /* convert to flag - we can not ask derivative questions
-     until a data file is opened. */
-  switch (tausource[0]) {
-  case 'C':
-    tausrc = SMF__TAUSRC_CSOTAU;
-    break;
-  case 'F':
-    tausrc = SMF__TAUSRC_TAU;
-    break;
-  case 'W':
-    tausrc = SMF__TAUSRC_WVMRAW;
-    break;
-  default:
-    tausrc = SMF__TAUSRC_NULL;
-  }
-
   /* Decide how the correction is to be applied - convert to flag */
   parChoic( "METHOD", "ADAPTIVE",
             "Adaptive,Quick,Full,", 1, method, sizeof(method), status);
-  switch( method[0] ) {
-  case 'A':
-    extmeth = SMF__EXTMETH_ADAPT;
-    break;
-  case 'Q':
-    extmeth = SMF__EXTMETH_SINGLE;
-    break;
-  case 'F':
-    extmeth = SMF__EXTMETH_FULL;
-    break;
-  default:
-    extmeth = SMF__EXTMETH_NONE;
+
+  /* Place parameters into a keymap and extract values */
+  if( *status == SAI__OK ) {
+    keymap = astKeyMap( " " );
+    if( !astOK ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "ast error detected creating new astKeyMap", status );
+    } else {
+      astMapPut0C( keymap, "TAUSRC", tausource, NULL );
+      astMapPut0C( keymap, "TAUMETHOD", method, NULL );
+      smf_get_extpar( keymap, &tausrc, &extmeth, status );
+    }
   }
-
-
 
   for (i=1; i<=size && ( *status == SAI__OK ); i++) {
 
@@ -367,6 +352,6 @@ void smurf_extinction( int * status ) {
   if (bpms) smf_close_related( &bpms, status );
   grpDelet( &igrp, status);
   grpDelet( &ogrp, status);
-
+  if( keymap ) keymap = astAnnul( keymap );
   ndfEnd( status );
 }

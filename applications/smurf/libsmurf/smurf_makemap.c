@@ -454,6 +454,28 @@
 *       If FLT specified, perform filtering as an iterative component, rather
 *       than doing it once at the beginning as a pre-processing step. See
 *       FILT_ NOTCHLOW.
+*     EXT.TAUSRC = STRING
+*       As with EXTINCTION task, specify source of optical depth data: 
+*          - WVMRAW    - use the water vapour monitor time series data
+*          - CSOTAU    - use a single 225GHz tau value
+*          - FILTERTAU - use a single tau value for this wavelength
+*     EXT.METHOD = STRING
+*       As with EXTINCTION task, method to use for airmass calculation:
+*          - ADAPTIVE  - Determine whether to use QUICK or FULL
+*          based on the elevation of the source and the opacity.
+*          - FULL      - Calculate the airmass of each bolometer.
+*          - QUICK     - Use a single airmass for each time slice.
+*     EXT.CSOTAU = REAL
+*       As with EXTINCTION task, value of the 225 GHz zenith optical
+*       depth. Only used if TAUSRC equals "CSOTAU". If no value is
+*       given, the map maker will use the value from the FITS header for
+*       each file. Note that if a value is entered by the user, that
+*       value is used for all input files.
+*     EXT.FILTERTAU = REAL
+*       As with EXTINCTION task, value of the zenith optical depth for
+*       the current wavelength. Only used if TAUSRC equals
+*       "FILTERTAU". Note that no check is made to ensure that all the
+*       input files share the same filter.
 
 *  Related Applications:
 *     SMURF: QLMAKEMAP

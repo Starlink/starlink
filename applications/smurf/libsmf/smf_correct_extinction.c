@@ -217,6 +217,21 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
   /* Check status */
   if (*status != SAI__OK) return;
 
+  /* If no correction requested, return */
+  if( method==SMF__EXTMETH_NONE ) {
+    msgOutif(MSG__VERB, "", FUNC_NAME ": Extinction method=none, returning",
+             status );
+    return;
+  }
+
+  /* If no opacity monitor specified generate bad status */
+  if( tausrc==SMF__TAUSRC_NULL ) {
+    *status = SAI__ERROR;
+    errRep( "", FUNC_NAME ": No extinction monitor specified", 
+            status ); 
+    return;
+  }
+
   if( smf_history_check( data, FUNC_NAME, status) ) {
     /* If caller not requesting allextcorr fail here */
     if( !allextcorr ) {

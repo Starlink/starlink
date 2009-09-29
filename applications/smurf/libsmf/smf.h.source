@@ -361,6 +361,8 @@
 *        Add smf_map_spikes
 *     2009-08-25 (MJC):
 *        Add star/irq.h include as it is no longer in star/kaplibs.h.
+*     2009-09-29 (EC):
+*        Add smf_get_extpar
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -866,6 +868,9 @@ void smf_get_dims( const smfData *data, dim_t *nrows, dim_t *ncols,
                    dim_t *nbolo, dim_t *ntslice, dim_t *ndata,
                    size_t *bstride, size_t *tstride,int *status );
 
+void smf_get_extpar( AstKeyMap *keymap, smf_tausrc *tausrc,
+                     smf_extmeth *extmeth, int *status );
+
 size_t smf_get_findex( double f, double df, dim_t nf, int *status );
 
 void smf_get_gridcoords( double *row, double *col, int nrow, int ncol,
@@ -995,7 +1000,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
                        int isTordered, AstFrameSet *outfset, int moving, 
                        int *lbnd_out, int *ubnd_out, smfGroup **mgroup, 
                        int nofile, int leaveopen, smfArray **mdata, 
-                       double flagstat, int *status );
+                       double flagstat, AstKeyMap *keymap, int *status );
 
 void smf_model_createHdr( smfData *model, smf_modeltype type, 
                           smfHead *refhdr, int *status );

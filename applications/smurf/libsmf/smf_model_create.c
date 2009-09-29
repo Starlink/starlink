@@ -14,12 +14,11 @@
 
 *  Invocation:
 *     smf_model_create( smfWorkForce *wf, const smfGroup *igroup, 
-*                       const smfArray **iarray, dim_t nchunks, 
-*                       smf_modeltype mtype, int isTordered, 
-*		        AstFrameSet *outfset, int moving, 
-*		        int *lbnd_out, int *ubnd_out,
-*                       smfGroup **mgroup, int nofile, int leaveopen,
-*                       smfArray **mdata, int *status);
+*                       smfArray **iarray, dim_t nchunks, smf_modeltype mtype, 
+*                       int isTordered, AstFrameSet *outfset, int moving, 
+*                       int *lbnd_out, int *ubnd_out, smfGroup **mgroup, 
+*                       int nofile, int leaveopen, smfArray **mdata, 
+*                       double flagstat, AstKeyMap *keymap, int *status )
 
 *  Arguments:
 *     wf = smfWorkForce * (Given)
@@ -63,6 +62,8 @@
 *        the individual smfArrays get allocated here.
 *     flagstat = double (Given)
 *        Speed threshold (arcsec/sec) below which data are flagged (SMF__QUA)
+*     keymap = AstKeyMap* (Given)
+*        keymap containing parameters to control map-maker
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -196,6 +197,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/types.h>
+#include <stdio.h>
 
 /* Starlink includes */
 #include "mers.h"
@@ -217,7 +219,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
                        int isTordered, AstFrameSet *outfset, int moving, 
                        int *lbnd_out, int *ubnd_out, smfGroup **mgroup, 
                        int nofile, int leaveopen, smfArray **mdata, 
-                       double flagstat, int *status ) {
+                       double flagstat, AstKeyMap *keymap, int *status ) {
 
   /* Local Variables */
   size_t bstride;               /* Bolometer stride in data array */
@@ -226,6 +228,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
   smfData *data = NULL;         /* Data struct for file */
   size_t datalen=0;             /* Size of data buffer in bytes */
   void *dataptr=NULL;           /* Pointer to data portion of buffer */
+  smf_extmeth extmeth;          /* method of extinction correction */
   int fd=0;                     /* File descriptor */
   int flag=0;                   /* Flag */
   char fname_grpex[GRP__SZNAM+1];/* String for holding filename grpex */
@@ -238,6 +241,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
   size_t isize=0;               /* Number of files in input group */
   dim_t j;                      /* Loop counter */
   size_t k;                     /* Loop counter */
+  AstKeyMap *kmap=NULL;         /* Local keymap */
   dim_t l;                      /* Loop counter */
   size_t len = 0;               /* size of buffer */
   Grp *mgrp=NULL;               /* Temporary group to hold model names */
@@ -253,6 +257,8 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
   char *pname=NULL;             /* Poiner to fname */
   long remainder=0;             /* Extra length beyond integer pagesize */
   char suffix[] = SMF__DIMM_SUFFIX; /* String containing model suffix */
+  double tau;                   /* tau */
+  smf_tausrc tausrc;            /* Type of tau monitor */
   dim_t thisnrel;               /* Number of related items for this model */
   size_t tstride;               /* Time slice stride in data array */
   double val;                   /* Temporary value */
@@ -722,10 +728,45 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
 
             } else if( mtype == SMF__EXT ) {
               /* In this case run smf_correct_extinction on the input data
-                 (with only the header mapped) and store the gain coefficients
-                 in the model bufffer */              
-              smf_correct_extinction( idata, SMF__TAUSRC_WVMRAW,
-                                      SMF__EXTMETH_ADAPT, VAL__BADD, 
+                 (with only the header mapped) and store the correction
+                 factors in the model bufffer */     
+
+              if( !astMapGet0A( keymap, "EXT", &kmap ) ) {
+                /* No keymap parameters: use adaptive method + WVM by default */
+                kmap = NULL;
+                tausrc = SMF__TAUSRC_WVMRAW;
+                extmeth = SMF__EXTMETH_ADAPT;
+                tau = VAL__BADD;
+              } else {
+                /* Use sub-keymap containing EXT parameters */
+                smf_get_extpar( kmap, &tausrc, &extmeth, status );
+                if( (tausrc==SMF__TAUSRC_CSOTAU) && 
+                    (!astMapGet0D( kmap, "CSOTAU", &tau)) ) {
+
+                  /* is using CSO tau but no specific value supplied get
+                     from the header */
+                  tau = smf_cso2filt_tau( idata->hdr, VAL__BADD, status );
+                }
+                if( (tausrc==SMF__TAUSRC_TAU) && 
+                    (!astMapGet0D( kmap, "FILTERTAU", &tau)) ) {
+
+                  /* is using filter tau but no specific value supplied */
+                  tau = VAL__BADD;                     
+                } 
+                kmap = astAnnul( kmap );
+              }
+
+              /* Trap case where FILTERTAU requsted but no value given */
+              if( (tausrc==SMF__TAUSRC_TAU) && (tau==VAL__BADD) ) {
+                  *status = SAI__ERROR;
+                  errRep( "", FUNC_NAME 
+                         ": FILTERTAU requested but no value provided",
+                         status );
+              }
+
+              printf("tau: %i %i %lf\n", tausrc, extmeth, tau);
+
+              smf_correct_extinction( idata, tausrc, extmeth, tau, 
                                       (double *) dataptr, status );
 
             } else if( mtype == SMF__DKS ) {
@@ -837,6 +878,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
         i = nchunks;
       }
     }
+
 }
 
 

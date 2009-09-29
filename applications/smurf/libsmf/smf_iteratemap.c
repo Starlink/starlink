@@ -837,17 +837,17 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
         smf_model_create( wf, NULL, res, nchunks, SMF__LUT, 0, 
                           NULL, 0, NULL, NULL,
                           NULL, memiter, 
-                          memiter, lut, 0, status ); 
+                          memiter, lut, 0, keymap, status ); 
 
         smf_model_create( wf, NULL, res, nchunks, SMF__AST, 0, 
                           NULL, 0, NULL, NULL,
                           NULL, memiter, 
-                          memiter, ast, 0, status );
+                          memiter, ast, 0, keymap, status );
 
         smf_model_create( wf, NULL, res, nchunks, SMF__QUA, 0, 
                           NULL, 0, NULL, NULL,
                           NULL, memiter, 
-                          memiter, qua, flagstat, status );
+                          memiter, qua, flagstat, keymap, status );
 
         /* Since a copy of the LUT is still open in res[0] free it up here */
         for( i=0; i<res[0]->ndat; i++ ) {
@@ -868,22 +868,22 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
         smf_model_create( wf, igroup, NULL, 0, SMF__RES, 0, 
                           NULL, 0, NULL, NULL,
                           &resgroup, memiter, 
-                          memiter, res, 0, status );
+                          memiter, res, 0, keymap, status );
 
         smf_model_create( wf, igroup, NULL, 0, SMF__LUT, 0, 
                           outfset, moving, lbnd_out, ubnd_out,
                           &lutgroup, memiter, 
-                          memiter, lut, 0, status ); 
+                          memiter, lut, 0, keymap, status ); 
 
         smf_model_create( wf, igroup, NULL, 0, SMF__AST, 0, 
                           NULL, 0, NULL, NULL,
                           &astgroup, memiter, 
-                          memiter, ast, 0, status );
+                          memiter, ast, 0, keymap, status );
 
         smf_model_create( wf, igroup, NULL, 0, SMF__QUA, 0, 
                           NULL, 0, NULL, NULL,
                           &quagroup, memiter, 
-                          memiter, qua, flagstat, status );
+                          memiter, qua, flagstat, keymap, status );
       }
     }
 
@@ -908,12 +908,14 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
         if( memiter ) {
           smf_model_create( wf, NULL, res, nchunks, modeltyps[i], 0, 
                             NULL, 0, NULL, NULL,
-                            NULL, memiter, memiter, model[i], 0, status ); 
+                            NULL, memiter, memiter, model[i], 0, keymap, 
+                            status ); 
 
         } else {
           smf_model_create( wf, igroup, NULL, 0, modeltyps[i], 0, 
                             NULL, 0, NULL, NULL, &modelgroups[i], 
-                            memiter, memiter, model[i], 0, status );
+                            memiter, memiter, model[i], 0, keymap, 
+                            status );
         }
       }
     }

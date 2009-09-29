@@ -1947,6 +1947,13 @@ flt.filt\_edgehigh,  & Iterative filtering using $FLT$ model (see flt\_* above).
 flt.filt\_edgelow    &                                                                 & 20 \\
 flt.filt\_notchhigh, &                                                                 & -- \\
 flt.filt\_notchlow   &                                                                 & -- \\
+ext.tausrc       & Source of opacity data: water vapour monitor (WVMRAW),              & WVMRAW \\
+                 & $\tau_\mathrm{CSO}$ (CSOTAU), or explicit value for filter (FILTERTAU). & \\
+ext.taumethod    & Airmass calculation: full (separate value for each detector each    & ADAPTIVE \\
+                 & timeslice), quick (single airmass all detectors each timeslice), or & \\
+                 & adaptive (decide dynamically to use full or quick).                 & \\
+ext.csotau       & Value of zenith $\tau_\mathrm{CSO}$ if ext.tausrc=CSOTAU.            & -- \\
+ext.filtertau    & Value of zenith optical depth for filter if ext.tausrc=FILTERTAU    & -- \\
 \hline
 \hline
 \end{tabular}

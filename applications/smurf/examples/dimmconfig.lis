@@ -135,5 +135,17 @@ flt.filt_edgelow = 20
 #flt.filt_notchlow  = (25,55)
 #flt.filt_notchhigh = (35,65)
 
+# extinction correction (see EXTINCTION task for further information)
+# Best is to use WVM, uses continuously varying measurements as a
+# function of time stored with each observation. This is the default if
+# nothing is specified. 
+#
+# tausrc   : wvmraw, csotau, filtertau
+# taumethod: adaptive, full, quick
+# csotau   : use value only if tausrc=csotau
+# filtertau: use only if tausrc=filtertau
 
-
+ext.tausrc    =wvmraw
+ext.taumethod =adaptive
+#ext.csotau    = 0.2
+#ext.filtertau = 0.2
