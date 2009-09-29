@@ -1,76 +1,76 @@
 /*
-*+
-*  Name:
-*     smurf_par.h
+ *+
+ *  Name:
+ *     smurf_par.h
 
-*  Purpose:
-*     Constants for the smurf application
+ *  Purpose:
+ *     Constants for the smurf application
 
-*  Language:
-*     Starlink ANSI C
+ *  Language:
+ *     Starlink ANSI C
 
-*  Type of Module:
-*     Header File
+ *  Type of Module:
+ *     Header File
 
-*  Invocation:
-*     #include "smurf_par.h"
+ *  Invocation:
+ *     #include "smurf_par.h"
 
-*  Description:
-*     Constants used by the SMURF infrastructure.
+ *  Description:
+ *     Constants used by the SMURF infrastructure.
 
-*  Notes:
-*     All the POSIX Math constants (M_PI, M_PI_2 etc) are made available
-*     when including the file. The SLA conversion constants (DD2R, DR2D etc)
-*     are also available. Note, that to avoid confusion, for constants that are
-*     defined both in SLA and POSIX (DPI and DPIBY2), the POSIX version is to be
-*     preferred. This means that M_PI_2 should be used for PI/2 rather than DPIBY2.
+ *  Notes:
+ *     All the POSIX Math constants (M_PI, M_PI_2 etc) are made available
+ *     when including the file. The SLA conversion constants (DD2R, DR2D etc)
+ *     are also available. Note, that to avoid confusion, for constants that are
+ *     defined both in SLA and POSIX (DPI and DPIBY2), the POSIX version is to be
+ *     preferred. This means that M_PI_2 should be used for PI/2 rather than DPIBY2.
 
-*  Authors:
-*     Andy Gibb (UBC)
-*     Tim Jenness (JAC, Hawaii)
-*     {enter_new_authors_here}
+ *  Authors:
+ *     Andy Gibb (UBC)
+ *     Tim Jenness (JAC, Hawaii)
+ *     {enter_new_authors_here}
 
-*  History:
-*     2005-09-27 (AGG):
-*        Initial test version
-*     2006-07-27 (TIMJ):
-*        Add slamac.h constants
-*     2006-09-14 (AGG):
-*        Add LEN__METHOD & SZFITSCARD
-*     2006-12-12 (AGG):
-*        Add SPD
-*     2008-07-07 (TIMJ):
-*        GSL is available always.
-*     2008-08-27 (TIMJ):
-*        Add SC2FLAT__DTOI
-*     {enter_further_changes_here}
+ *  History:
+ *     2005-09-27 (AGG):
+ *        Initial test version
+ *     2006-07-27 (TIMJ):
+ *        Add slamac.h constants
+ *     2006-09-14 (AGG):
+ *        Add LEN__METHOD & SZFITSCARD
+ *     2006-12-12 (AGG):
+ *        Add SPD
+ *     2008-07-07 (TIMJ):
+ *        GSL is available always.
+ *     2008-08-27 (TIMJ):
+ *        Add SC2FLAT__DTOI
+ *     {enter_further_changes_here}
 
-*  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
-*     University of British Columbia.
-*     All Rights Reserved.
+ *  Copyright:
+ *     Copyright (C) 2008 Science and Technology Facilities Council.
+ *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
+ *     University of British Columbia.
+ *     All Rights Reserved.
 
-*  Licence:
-*     This program is free software; you can redistribute it and/or
-*     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 3 of
-*     the License, or (at your option) any later version.
-*
-*     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
-*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
-*
-*     You should have received a copy of the GNU General Public
-*     License along with this program; if not, write to the Free
-*     Software Foundation, Inc., 59 Temple Place,Suite 330, Boston,
-*     MA 02111-1307, USA
+ *  Licence:
+ *     This program is free software; you can redistribute it and/or
+ *     modify it under the terms of the GNU General Public License as
+ *     published by the Free Software Foundation; either version 3 of
+ *     the License, or (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be
+ *     useful,but WITHOUT ANY WARRANTY; without even the implied
+ *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ *     PURPOSE. See the GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public
+ *     License along with this program; if not, write to the Free
+ *     Software Foundation, Inc., 59 Temple Place,Suite 330, Boston,
+ *     MA 02111-1307, USA
 
-*  Bugs:
-*     {note_any_bugs_here}
-*-
-*/
+ *  Bugs:
+ *     {note_any_bugs_here}
+ *-
+ */
 
 #ifndef SMURF_PAR_DEFINED
 #define SMURF_PAR_DEFINED
