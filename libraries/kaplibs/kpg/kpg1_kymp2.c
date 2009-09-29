@@ -72,6 +72,7 @@ void kpg1Kymp2( const char *string, AstKeyMap *keymap, int *status ){
 
 *  Authors:
 *     DSB: David S. Berry
+*     EC: Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -82,6 +83,8 @@ void kpg1Kymp2( const char *string, AstKeyMap *keymap, int *status ){
 *        signs. 
 *     13-JUN-2008 (DSB):
 *        Add support for vector values.
+*     29-SEP-2009 (EC):
+*        Use c instead of equals+1 as pointer to value in scalar case
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -252,7 +255,7 @@ void kpg1Kymp2( const char *string, AstKeyMap *keymap, int *status ){
 
 /* Now store scalar values. */
       } else {
-         astMapPut0C( keymap, comp, equals + 1, NULL );
+         astMapPut0C( keymap, comp, c, NULL );
       }
 
 /* Otherwise, get another KeyMap in which to store the components
