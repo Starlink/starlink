@@ -49,6 +49,8 @@
 *        application name rather than the override value given to.
 *        ndfHput. NDF history is more than we need for a simple
 *        keymap where we only need the keys.
+*     2009-09-28 (TIMJ):
+*        No longer warn people if history information is missing.
 
 *  Notes:
 *     - Checks are made assuming the subroutine names are lower case
@@ -169,9 +171,6 @@ void smf_history_read( smfData* data,int *status) {
     pntrs = smf_free( pntrs, status );
     buffer = smf_free( buffer, status );
 
-  } else {
-    /* Inform user if no history */
-    msgOutif(MSG__VERB," ", "No history component present. Continuing but this may cause problems later.", status);
   }
 
   datAnnul( &sloc, status );
