@@ -151,6 +151,8 @@
 *     8-AUG-2009 (DSB):
 *        Added qxl/qxu/qyl/qyu tile items to indicate if boundary tiles
 *        need to be flagged using the BORDER quality.
+*     2009-09-29 (TIMJ):
+*        Use ndgCopy rather than smf_grpCopy
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -183,6 +185,7 @@
 #include "sae_par.h"
 #include "prm_par.h"
 #include "merswrap.h"
+#include "star/ndg.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"
@@ -280,7 +283,7 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
 /* Create a GRP group to hold the names of the input files that have data
    that falls within the bounds of the extended tile area. This is just a
    copy of the supplied group. */
-         result->grp = smf_grpCopy( igrp, 0, 0, 0, status );
+         result->grp = ndgCopy( igrp, 0, 0, 0, status );
          result->size = size;
 
 /* A NULL pointer for "jndf" means that the index of an NDF within a tile

@@ -65,9 +65,12 @@
 *        -added chunk to smfGroup
 *     2008-07-03 (EC):
 *        Changed ngroups/nrelated to dim_t
+*     2009-09-29 (TIMJ):
+*        Use ndgCopy rather than smf_grpCopy
 
 *  Copyright:
-*     Copyright (C) 2006 University of British Columbia.  All Rights
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2006-2008 University of British Columbia.  All Rights
 *     Reserved.
 
 *  Licence:
@@ -136,7 +139,7 @@ smfGroup *smf_construct_smfGroup( Grp *igrp, dim_t **subgroups, size_t *chunk,
 
   /* Copy the Grp */
   isize = grpGrpsz( igrp, status);
-  group->grp = smf_grpCopy( igrp, 1, isize, 0, status);
+  group->grp = ndgCopy( igrp, 1, isize, 0, status);
   if ( *status != SAI__OK ) {
     errRep(FUNC_NAME, "Error copying Grp for smfGroup", status);
     goto CLEANUP;

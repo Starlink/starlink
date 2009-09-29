@@ -44,6 +44,8 @@
 *        Initial version taken from smurf_makecube
 *     2008-07-24 (TIMJ):
 *        Use size_t
+*     2009-09-29 (TIMJ):
+*        Use ndgCopy rather than smf_grpCopy
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -51,7 +53,7 @@
 *     than returning a brand new group.
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -81,6 +83,7 @@
 #include "sae_par.h"
 #include "ast.h"
 #include "star/grp.h"
+#include "star/ndg.h"
 
 #include "smf.h"
 
@@ -120,7 +123,7 @@ smf_expand_tilegroup ( Grp * ogrp, size_t ntile, int npbin, size_t * outsize,
    and tile. */
   if( npbin > 1 ) {
     /* get a copy of the current output group */
-    tgrp = smf_grpCopy(ogrp, 0, 0, 0, status);
+    tgrp = ndgCopy(ogrp, 0, 0, 0, status);
     
     /* and clear the output group in preparation for repopulating it */
     grpSetsz(ogrp, 0, status );

@@ -914,9 +914,6 @@ void smf_getrefwcs( const char *param, AstFrameSet **specwcs,
 AstKeyMap *smf_groupscans( Grp *igrp,  int size, int *maxsyspop, 
                            int *conform, Grp **ogrp, int *status );
 
-Grp *smf_grpCopy( const Grp *grp1, size_t indxlo, size_t indxhi, int reject, 
-                  int *status );
-
 void smf_grp_related( Grp *igrp, const int grpsize, const int grpbywave, 
                       dim_t maxlen, dim_t *maxconcatlen, smfGroup **group, 
                       int *status );

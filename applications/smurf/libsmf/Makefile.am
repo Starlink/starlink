@@ -165,7 +165,6 @@ smf_getfitss.c \
 smf_getobsidss.c \
 smf_getrefwcs.c \
 smf_groupscans.c \
-smf_grpCopy.c \
 smf_grp_related.c \
 smf_history_add.c \
 smf_history_check.c \
