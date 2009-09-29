@@ -254,25 +254,26 @@ void smurf_stackframes( int *status ) {
 
   /* Propagate from the oldest file and resize it to 3d. */
   ndgNdfas( igrp, sortinfo[0].index, "READ", &indf, status );
-  ndgNdfpr( indf, "WCS,QUALITY,UNITS,TITLE,LABEL,NOEXTENSION(PROVENANCE)",
+  ndgNdfpr( indf, "WCS,UNITS,TITLE,LABEL,NOEXTENSION(PROVENANCE)",
 	    ogrp, 1, &outndf, status );
+  ndfAnnul( &indf, status );
   ndfBound( outndf, NDF__MXDIM, lbnd, ubnd, &refndims, status );
   lbnd[2] = 1;
   ubnd[2] = lbnd[2] + size - 1;
   ndfSbnd( 3, lbnd, ubnd, outndf, status );
   /* need to convince NDF that we have defined the data array
-   - and use the native type to avoid type conversion. */
+   and VARIANCE - and use the native type to avoid type conversion. */
   ndfType( outndf, "DATA", ndftype, sizeof(ndftype), status );
-  ndfMap(outndf, "DATA", ndftype, "WRITE", pntr, &itemp, status  );
+  ndfMap(outndf, "VARIANCE,DATA", ndftype, "WRITE/BAD", pntr, &itemp, status  );
   ndfAnnul( &outndf, status );
 
   /* Now reopen it with smf_open_file and copy all the data over
-     - do not need header information at this point and smf_open_file
-     will complain if we do read the header because there will be no
-     JCMTSTATE info and it is wanting this to be raw time series
-     data since it is 3d.
+     - indicate that this is not a time series file and don't waste
+     time reading the header. Use UPDATE mode so that we retain BAD
+     values in the variance slice if the input file does not have
+     variance.
   */
-  smf_open_file( ogrp, 1, "WRITE", SMF__NOCREATE_HEAD, &outdata, status );
+  smf_open_file( ogrp, 1, "UPDATE", SMF__NOCREATE_HEAD|SMF__NOTTSERIES, &outdata, status );
   if (*status != SAI__OK) goto CLEANUP;
 
   /* Create an array of doubles to store the LutMap information */
