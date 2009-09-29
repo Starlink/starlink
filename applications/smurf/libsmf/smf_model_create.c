@@ -744,18 +744,25 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
               } else {
                 /* Use sub-keymap containing EXT parameters */
                 smf_get_extpar( kmap, &tausrc, &extmeth, status );
-                if( (tausrc==SMF__TAUSRC_CSOTAU) &&
-                    (!astMapGet0D( kmap, "CSOTAU", &tau)) ) {
-
-                  /* is using CSO tau but no specific value supplied get
-                     from the header */
-                  tau = smf_cso2filt_tau( idata->hdr, VAL__BADD, status );
+                if( tausrc == SMF__TAUSRC_CSOTAU ) {
+                  if( !astMapGet0D( kmap, "CSOTAU", &tau ) ) {
+                    /* is using CSO tau but no specific value supplied get
+                       from the header */
+                    tau = smf_cso2filt_tau( idata->hdr, VAL__BADD, status );
+                  } else {
+                    msgOut( "", "*** EXTINCTION WARNING: single opacity value "
+                            "will be used for ALL input files.", status );
+                  }
                 }
-                if( (tausrc==SMF__TAUSRC_TAU) &&
-                    (!astMapGet0D( kmap, "FILTERTAU", &tau)) ) {
 
-                  /* is using filter tau but no specific value supplied */
-                  tau = VAL__BADD;
+                if( tausrc == SMF__TAUSRC_TAU ) {
+                  if( !astMapGet0D( kmap, "FILTERTAU", &tau ) ) {
+                    /* is using filter tau but no specific value supplied */
+                    tau = VAL__BADD;
+                  } else{
+                    msgOut( "", "*** EXTINCTION WARNING: single opacity value "
+                            "will be used for ALL input files.", status );
+                  }
                 }
                 kmap = astAnnul( kmap );
               }
