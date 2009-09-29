@@ -173,7 +173,9 @@ f     The CmpFrame class does not define any new routines beyond those
 *        class.
 *     18-JUN-2009 (DSB):
 *        Override astSetObsAlt and astClearObsAlt.
-
+*     29-SEP-2009 (DSB):
+*        Ensure the astMatch method provided by this class honours the
+*        PreserveAxes, MaxAxes and MinAxes attribute settings.
 *class--
 */
 
@@ -693,6 +695,7 @@ static const int *GetPerm( AstFrame *, int * );
 static double Angle( AstFrame *, const double[], const double[], const double[], int * );
 static double Distance( AstFrame *, const double[], const double[], int * );
 static double Gap( AstFrame *, int, double, int *, int * );
+static int ComponentMatch( AstCmpFrame *, AstFrame *, int, int **, int **, AstMapping **, AstFrame **, int * ); 
 static int Fields( AstFrame *, int, const char *, const char *, int, char **, int *, double *, int * );
 static int GenAxisSelection( int, int, int [], int * );
 static int GetActiveUnit( AstFrame *, int * );
@@ -1666,6 +1669,350 @@ static void ClearObsLon( AstFrame *this_frame, int *status ) {
 /* Now clear the ObsLon attribute in the two component Frames. */
    astClearObsLon( this->frame1 );
    astClearObsLon( this->frame2 );
+}
+
+static int ComponentMatch( AstCmpFrame *template, AstFrame *target,
+                           int icomp, int **template_axes, int **target_axes,
+                           AstMapping **map, AstFrame **result, int *status ) {
+/*
+*  Name:
+*     ComponentMatch
+
+*  Purpose:
+*     Determine if conversion is possible between a component Frame in a
+*     template CmpFrame and another target Frame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     int ComponentMatch( AstCmpFrame *template, AstFrame *target,
+*                         int icomp, int **template_axes, int **target_axes,
+*                         AstMapping **map, AstFrame **result, int *status )
+
+*  Class Membership:
+*     CmpFrame member function 
+
+*  Description:
+*     This function is like astMatch, but it compares the supplied target
+*     Frame with a specified component Frame of the supplied template 
+*     CmpFrame, rather than with the entire template CmpFrame. If a match
+*     is found, the returned Mapping, Frame and axis lists are adjusted so 
+*     that they refer to the entire template CmpFrame.
+
+*  Parameters:
+*     template
+*        Pointer to the template CmpFrame. This describes the
+*        coordinate system (or set of possible coordinate systems)
+*        into which we wish to convert our coordinates.
+*     target
+*        Pointer to the target Frame. This describes the coordinate
+*        system in which we already have coordinates.
+*     icomp
+*        The index of the component Frame to use within the template
+*        CmpFrame; 0 or 1.
+*     template_axes
+*        Address of a location where a pointer to int will be returned
+*        if the requested coordinate conversion is possible. This
+*        pointer will point at a dynamically allocated array of
+*        integers with one element for each axis of the "result" Frame
+*        (see below). It must be freed by the caller (using astFree)
+*        when no longer required.
+*
+*        For each axis in the result Frame, the corresponding element
+*        of this array will return the (zero-based) index of the
+*        template CmpFrame axis from which it is derived. If it is not
+*        derived from any template axis, a value of -1 will be
+*        returned instead.
+*     target_axes
+*        Address of a location where a pointer to int will be returned
+*        if the requested coordinate conversion is possible. This
+*        pointer will point at a dynamically allocated array of
+*        integers with one element for each axis of the "result" Frame
+*        (see below). It must be freed by the caller (using astFree)
+*        when no longer required.
+*
+*        For each axis in the result Frame, the corresponding element
+*        of this array will return the (zero-based) index of the
+*        target Frame axis from which it is derived. If it is not
+*        derived from any target axis, a value of -1 will be returned
+*        instead.
+*     map
+*        Address of a location where a pointer to a new Mapping will
+*        be returned if the requested coordinate conversion is
+*        possible. If returned, the forward transformation of this
+*        Mapping may be used to convert coordinates between the
+*        "target" Frame and the "result" Frame (see below) and the
+*        inverse transformation will convert in the opposite
+*        direction.
+*     result
+*        Address of a location where a pointer to a new Frame will be
+*        returned if the requested coordinate conversion is
+*        possible. If returned, this Frame describes the coordinate
+*        system that results from applying the returned Mapping
+*        (above) to the "target" coordinate system. In general, this
+*        Frame will combine attributes from (and will therefore be
+*        more specific than) both the target Frame and the template
+*        CmpFrame. In particular, when the template allows the
+*        possibility of transformaing to any one of a set of
+*        alternative coordinate systems, the "result" Frame will
+*        indicate which of the alternatives was used.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     A non-zero value is returned if the requested coordinate
+*     conversion is possible. Otherwise zero is returned (this will
+*     not in itself result in an error condition).
+
+*  Notes:
+*     - By default, the "result" Frame will have its number of axes
+*     and axis order determined by the "template" CmpFrame. However,
+*     if the PreserveAxes attribute of the template CmpFrame is
+*     non-zero, then the axis count and axis order of the "target"
+*     Frame will be used instead.
+*     - A value of zero will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables: */
+   AstFrame *ctemplate;
+   AstFrame *fother;
+   AstFrame *fresult;
+   AstMapping *fmap;
+   AstPermMap *pm;       
+   const int *perm;
+   int *ftarget_axes;
+   int *ftemplate_axes;
+   int *inperm;
+   int *operm;
+   int *outperm;
+   int axis;             
+   int match;            
+   int nax1;
+   int nax2;
+   int naxr;
+   int prax;
+   int praxo;
+   int result_naxes;     
+   int template_naxes;
+
+/* Initialise the returned values. */
+   *template_axes = NULL;
+   *target_axes = NULL;
+   *map = NULL;
+   *result = NULL;
+   match = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return match;
+   
+/* Get a pointer to the requested component Frame of the template CmpFrame. */
+   ctemplate = icomp ? template->frame2 :template->frame1;
+
+/* Temporarily set the component Frame PreserveAxes value to that of the
+   template CmpFrame. PreserveAxes determines whether astMatch returns a
+   result Frame that looks like the template or the target. */
+   if( astTestPreserveAxes( ctemplate ) ) {
+      praxo = astGetPreserveAxes( ctemplate ) ? 1 : 0;
+   } else {
+      praxo = -1;
+   }
+   prax = astGetPreserveAxes( template );
+   astSetPreserveAxes( ctemplate, prax );
+
+/* Attempt to find a match between the axes of the supplied target Frame
+   and the axes of the selected component Frame in the template. */
+   match = astMatch( ctemplate, target, &ftemplate_axes, &ftarget_axes, &fmap,
+                     &fresult );
+
+/* Restore the original PreserveAxes value in the component template
+   Frame. */
+   if( praxo == -1 ) {
+      astClearPreserveAxes( ctemplate );
+   } else {
+      astSetPreserveAxes( ctemplate, praxo );
+   }
+
+/* If a match was found, we need to adjust the Mapping, Frame and axis
+   lists returned by the above call to astMatch so that they refer to the 
+   full template CmpFrame or target (depending on PreserveAxes). */
+   if( match ) {
+
+/* Get the number of axes in each component Frame and the total number of
+   axes in the template CmpFrame. */
+      nax1 = astGetNaxes( template->frame1 );
+      nax2 = astGetNaxes( template->frame2 );
+      template_naxes = nax1 + nax2;
+
+/* Get the axis permutation array from the template and get its inverse.
+   The "perm" array holds the internal axis index at each external axis
+   index. The "operm" array holds the external axis index at each 
+   internal axis index. */
+      perm = astGetPerm( template );
+      operm = astMalloc( sizeof( int )*(size_t)template_naxes );
+      if( astOK) {
+         for( axis = 0; axis < template_naxes; axis++ ) {
+            operm[ perm[ axis ] ] = axis;
+         }
+
+/* The PreserveAxes attribute is used by astMatch to decide whether the
+   result Frame should inherit its axes from the target frame or the
+   template frame. First deal with cases where the order and count of axes 
+   in the result frame is the same as the target. */
+         if( prax ) {
+
+/* Return the result Frame and Mapping unchanged since they already refer
+   to the full target Frame used in the above call to astMatch. */
+            *result = astClone( fresult );
+            *map = astClone( fmap );
+
+/* Also return the lists of target axes unchanged. */
+            *target_axes = ftarget_axes;
+
+/* The values in the template axes list refer to the component template
+   Frame, but we want to return values that refer to the full template
+   CmpFrame. This involve sup to two setps 1) for the second component
+   Frame only, increase the axis numbers by the number of axes in the
+   first component Frame, and 2) take account of any axis permutation in 
+   the template. First allocate memory for the returned list (which,
+   because PreserveAxes is zero, will have an entry for each template axis). */
+            *template_axes = astMalloc( sizeof( int )*template_naxes );
+
+/* Now, if the second component of the template has been selected, increment 
+   the template axes so that they give the internal axis indices of the 
+   second component Frame within the CmpFrame. The first component axes
+   will be unchanged. */
+            result_naxes = astGetNaxes( fresult );
+            if( icomp ) {
+               for( axis = 0; axis < result_naxes; axis++ ) {
+                  ftemplate_axes[ axis ] += nax1;
+               }
+            }
+
+/* Now copy the internal axis value into the returned array, modifying them 
+   in the process from internal to external axis ordering. */
+            for( axis = 0; axis < result_naxes; axis++ ) {
+               (*template_axes)[ axis ] = operm[ ftemplate_axes[ axis ] ];
+            }
+
+/* If the order and count of axes in the result frame is the same as the 
+   template CmpFrame... */
+         } else {
+
+/* We need to adjust the Mapping, Frame and axis lists returned by the
+   above call to astMatch so that they refer to the supplied template
+   CmpFrame rather than to the selected component Frame. Get the number
+   of axes in the result Frame returned by astMatch (naxr) and the number
+   in the result Frame returned by this function (result-naxes). */
+            naxr = astGetNaxes( fresult );
+            result_naxes = ( icomp ? nax1 : nax2 ) + naxr;
+   
+/* Create the full result Frame by combining the partial result Frame 
+   returned by astMatch above with the other component Frame from the 
+   template. */
+            if( icomp ) {
+               fother = astCopy( template->frame1 );
+               *result = (AstFrame *) astCmpFrame( fother, fresult, "", status );
+            } else {
+               fother = astCopy( template->frame2 );
+               *result = (AstFrame *) astCmpFrame( fresult, fother, "", status );
+            } 
+            fother = astAnnul( fother );
+
+/* Modify the Mapping returned by the above call to astMatch so that it
+   produces positions within the full result Frame created above. */
+            if( icomp ) {
+               inperm = astMalloc( sizeof( int )*(size_t) naxr );
+               outperm = astMalloc( sizeof( int )*(size_t) result_naxes );
+               if( astOK ) {
+                  for( axis = 0; axis < nax1; axis++ ) outperm[ axis ] = -1;
+                  for( axis = 0; axis < naxr; axis++ ) {
+                     outperm[ axis + nax1 ] = axis;
+                     inperm[ axis ] = axis + nax1;
+                  }
+               }
+   
+            } else {
+               inperm = NULL;
+               outperm = NULL;
+            }
+   
+            pm = astPermMap( naxr, inperm, result_naxes, outperm, NULL, "", status );
+            *map = (AstMapping *) astCmpMap( fmap, pm, 1, "", status );
+
+/* Free resources. */
+            pm = astAnnul( pm );
+            if( inperm ) inperm = astFree( inperm );
+            if( outperm ) outperm = astFree( outperm );
+
+/* Allocate memory for the returned list of axes. */
+            *template_axes = astMalloc( sizeof( int )*(size_t)result_naxes );
+            *target_axes = astMalloc( sizeof( int )*(size_t)result_naxes );
+   
+/* The axis indices returned by astMatch above will refer to the selected
+   component Frame rather than the permuted (i.e. external) axis indices for 
+   the template CmpFrame. Change the template axes list so that they describe 
+   the axes in the full result Frame in terms of the external template axis 
+   numbering. This involves shifting the indices for the second component
+   Frame to leave room for the axes of the first component Frame, and
+   also permuting the axis indicies from internal to external order. */
+            if( icomp ) {
+               for( axis = 0; axis < nax1; axis++ ) {
+                  (*template_axes)[ axis ] = operm[ axis ];
+               }
+   
+               for( ; axis < result_naxes; axis++ ) {
+                  (*template_axes)[ axis ] = operm[ nax1 + ftemplate_axes[ axis - nax1 ] ];
+               }
+
+            } else {
+               for( axis = 0; axis < nax1; axis++ ) {
+                  (*template_axes)[ axis ] = operm[ ftemplate_axes[ axis ] ];
+               }
+   
+               for( ; axis < result_naxes; axis++ ) {
+                  (*template_axes)[ axis ] = operm[ axis ];
+               }
+            }
+
+/* Change the target axes list so that they describe the axes in the
+   full result Frame (this just means padding with -1 to indicate that 
+   the extra axes do not correspond to any axis in the target). */
+            for( axis = 0; axis < naxr; axis++ ) {
+               (*target_axes)[ axis ] = ftarget_axes[ axis ];
+            }
+      
+            for( ; axis < result_naxes; axis++ ) {
+               (*target_axes)[ axis ] = -1;
+            }
+
+/* Free resources */
+            ftarget_axes = astFree( ftarget_axes );
+         }
+      }
+
+      operm = astFree( operm );
+      ftemplate_axes = astFree( ftemplate_axes );
+      fmap = astAnnul( fmap );
+      fresult = astAnnul( fresult );
+
+   }
+
+/* If an error occurred, free all allocated memory, annul the result
+   Object pointers and clear all returned values. */
+   if ( !astOK ) {
+      *template_axes = astFree( *template_axes );
+      *target_axes = astFree( *target_axes );
+      *map = astAnnul( *map );
+      *result = astAnnul( *result );
+      match = 0;
+   }
+
+/* Return the result. */
+   return match;
 }
 
 static void Decompose( AstMapping *this_cmpframe, AstMapping **map1, 
@@ -4223,8 +4570,10 @@ static int Match( AstFrame *template_frame, AstFrame *target,
    int match;                    /* Match obtained (returned result)? */
    int maxax1;                   /* MaxAxes attribute for component 1 */
    int maxax2;                   /* MaxAxes attribute for component 2 */
+   int maxax;                    /* Max axes that can be matched by template */
    int minax1;                   /* MinAxes attribute for component 1 */
    int minax2;                   /* MinAxes attribute for component 2 */
+   int minax;                    /* Min axes that can be matched by template */
    int naxes1;                   /* Number of axes assigned to component 1 */
    int naxes2;                   /* Number of axes assigned to component 2 */
    int naxes;                    /* Total number of target axes */
@@ -4236,20 +4585,6 @@ static int Match( AstFrame *template_frame, AstFrame *target,
    int naxes_min;                /* Min number of axes to match component 1 */
    int permute;                  /* Permute attribute for template */
    int result_naxes;             /* Number of result Frame axes */
-   const int *perm;
-   int *operm;
-   int template_naxes;
-   int *ftemplate_axes;
-   int *ftarget_axes;
-   AstMapping *fmap;
-   AstFrame *fother;
-   AstFrame *fresult;
-   int naxr;
-   int nax1;
-   int nax2;
-   int *inperm;
-   int *outperm;
-   AstPermMap *pm;
 
 /* Initialise the returned values. */
    *template_axes = NULL;
@@ -4257,7 +4592,6 @@ static int Match( AstFrame *template_frame, AstFrame *target,
    *map = NULL;
    *result = NULL;
    match = 0;
-   pm = NULL;
 
 /* Check the global error status. */
    if ( !astOK ) return match;
@@ -4265,18 +4599,37 @@ static int Match( AstFrame *template_frame, AstFrame *target,
 /* Obtain a pointer to the template CmpFrame structure. */
    template = (AstCmpFrame *) template_frame;
 
-/* Obtain the minimum and maximum number of axes that each component
-   Frame of the template CmpFrame can match. */
-   minax1 = astGetMinAxes( template->frame1 );
-   maxax1 = astGetMaxAxes( template->frame1 );
-   minax2 = astGetMinAxes( template->frame2 );
-   maxax2 = astGetMaxAxes( template->frame2 );
+/* Obtain the maximum number of axes that the template CmpFrame, and each 
+   component Frame of the template CmpFrame, can match. If the MaxAxes
+   attribute is set for the template, use it and assume that each
+   component Frame can match any number of axes. */
+   if( astTestMaxAxes( template ) ) {
+      maxax = astGetMaxAxes( template );
+      maxax1 = 100000;
+      maxax2 = 100000;
+   } else {      
+      maxax1 = astGetMaxAxes( template->frame1 );
+      maxax2 = astGetMaxAxes( template->frame2 );
+      maxax = maxax1 + maxax2;
+   }
+
+/* Do the same for the minimum number of axes that can be matched by the
+   template CmpFrame. */
+   if( astTestMinAxes( template ) ) {
+      minax = astGetMinAxes( template );
+      minax1 = 1;
+      minax2 = 1;
+   } else {      
+      minax1 = astGetMinAxes( template->frame1 );
+      minax2 = astGetMinAxes( template->frame2 );
+      minax = minax1 + minax2;
+   }
 
 /* Obtain the number of axes in the target Frame and test to see if it
    is possible for the template to match it on the basis of axis
    counts. */
    naxes = astGetNaxes( target );
-   match = ( naxes >= ( minax1 + minax2 ) && naxes <= ( maxax1 + maxax2 ) );
+   match = ( naxes >= minax && naxes <= maxax );
 
 /* The next requirement is that all the frames have some axes. */
    if( naxes == 0 || maxax1 == 0 || maxax2 == 0 ) match = 0;
@@ -4322,7 +4675,12 @@ static int Match( AstFrame *template_frame, AstFrame *target,
       naxes_max2 = naxes - minax2;
       naxes_max = ( naxes_max1 < naxes_max2 ) ? naxes_max1 : naxes_max2;
 
-/* Allocate workspace. */
+/* No match possible if the number of axes are inconsistent. */
+      if( naxes_min > naxes_max ) match = 0;
+   }
+
+/* If a match is still possible, allocate workspace. */
+   if( match ) {
       axes1 = astMalloc( sizeof( int ) * (size_t) naxes );
       axes2 = astMalloc( sizeof( int ) * (size_t) naxes );
       used = astMalloc( sizeof( int ) * (size_t) naxes );
@@ -4436,173 +4794,15 @@ static int Match( AstFrame *template_frame, AstFrame *target,
    }
 
 /* If the target did not match the supplied template CmpFrame, see if it
-   will match either of the component Frames. */
-   if( astOK && !match ) {
+   will match either of the component Frames. First try matching it against 
+   the first component Frame. */
+   if( !match ) match = ComponentMatch( template, target, 0, template_axes, 
+                                        target_axes, map, result, status );
 
-/* First try matching it against the first component Frame. */
-      match = astMatch( template->frame1, target, &ftemplate_axes, &ftarget_axes,
-                        &fmap, &fresult );
-
-/* If a match was found, we need to adjust the values returned by the
-   above call to astMatch so that they refer to the supplied template
-   CmpFrame rather than to the first component Frame. */
-      if( match ) {
-         naxr = astGetNaxes( fresult );
-         nax1 = astGetNaxes( template->frame1 );
-         nax2 = astGetNaxes( template->frame2 );
-         result_naxes = naxr + nax2;
-         template_naxes = nax1 + nax2;
-
-/* Create the full result Frame by combining the partial result Frame 
-   returned by astMatch above with the other component Frame from the 
-   template. */
-         fother = astCopy( template->frame2 );
-         *result = (AstFrame *) astCmpFrame( fresult, fother, "", status );
-
-/* Modify the Mapping returned by the above call to astMatch so that it
-   produces positions within the full result Frame created above. */
-         pm = astPermMap( naxr, NULL, result_naxes, NULL, NULL, "", status );
-         *map = (AstMapping *) astCmpMap( fmap, pm, 1, "", status );
-
-/* Allocate memory for the returned list of axes. */
-         *template_axes = astMalloc( sizeof( int )*(size_t)result_naxes );
-         *target_axes = astMalloc( sizeof( int )*(size_t)result_naxes );
-
-/* The axis indices returned by astMatch above will refer to the first
-   component Frame rather than the permuted axis indices for the template
-   Frame. So we will need the CmpFrame axis permutation array. Also
-   allocate memory for the inverse of the axis permutation array. */
-         perm = astGetPerm( template );
-         operm = astMalloc( sizeof( int )*(size_t)template_naxes );
-         if( astOK ) {
-
-/* Create the inverse of the axis permutation array. */
-            for( axis = 0; axis < template_naxes; axis++ ) {
-               operm[ perm[ axis ] ] = axis;
-            }
-
-/* Change the template axes list so that they describe the axes in the
-   full result Frame in terms of the external template axis numbering. */
-            for( axis = 0; axis < naxr; axis++ ) {
-               (*template_axes)[ axis ] = operm[ ftemplate_axes[ axis ] ];
-            }
-
-            for( ; axis < result_naxes; axis++ ) {
-               (*template_axes)[ axis ] = operm[ nax1 + axis - naxr ];
-            }
-
-/* Change the target axes list so that they describe the axes in the
-   full result Frame (this just means padding with -1 to indicate that 
-   the extra axes do not correspond to any axis in the target). */
-            for( axis = 0; axis < naxr; axis++ ) {
-               (*target_axes)[ axis ] = ftarget_axes[ axis ];
-            }
-
-            for( ; axis < result_naxes; axis++ ) {
-               (*target_axes)[ axis ] = -1;
-            }
-
-         }
-
-/* Free resources */
-         ftemplate_axes = astFree( ftemplate_axes );
-         ftarget_axes = astFree( ftarget_axes );
-         fmap = astAnnul( fmap );
-         fresult = astAnnul( fresult );
-         fother = astAnnul( fother );
-         pm = astAnnul( pm );
-         operm = astFree( operm );
-
-/* If the target did not match the first component in the template
-   CmpFrame, try matching it against the second component. */
-      } else {
-         match = astMatch( template->frame2, target, &ftemplate_axes, &ftarget_axes,
-                           &fmap, &fresult );
-
-/* If a match was found, we need to adjust the values returned by the
-   above call to astMatch so that they refer to the supplied template
-   CmpFrame rather than to the first component Frame. */
-         if( match ) {
-            naxr = astGetNaxes( fresult );
-            nax1 = astGetNaxes( template->frame1 );
-            nax2 = astGetNaxes( template->frame2 );
-            result_naxes = nax1 + naxr;
-            template_naxes = nax1 + nax2;
-   
-/* Create the full result Frame by combining the partial result Frame 
-   returned by astMatch above with the other component Frame from the 
-   template. */
-            fother = astCopy( template->frame1 );
-            *result = (AstFrame *) astCmpFrame( fother, fresult, "", status );
-
-/* Modify the Mapping returned by the above call to astMatch so that it
-   produces positions within the full result Frame created above. */
-            inperm = astMalloc( sizeof( int )*(size_t) naxr );
-            outperm = astMalloc( sizeof( int )*(size_t) result_naxes );
-            if( astOK ) {
-               for( axis = 0; axis < nax1; axis++ ) outperm[ axis ] = -1;
-               for( axis = 0; axis < naxr; axis++ ) {
-                  outperm[ axis + nax1 ] = axis;
-                  inperm[ axis ] = axis + nax1;
-               }
-               pm = astPermMap( naxr, inperm, result_naxes, outperm, NULL, "", status );
-               *map = (AstMapping *) astCmpMap( fmap, pm, 1, "", status );
-            }
-
-/* Allocate memory for the returned list of axes. */
-            *template_axes = astMalloc( sizeof( int )*(size_t)result_naxes );
-            *target_axes = astMalloc( sizeof( int )*(size_t)result_naxes );
-   
-/* The axis indices returned by astMatch above will refer to the second
-   component Frame rather than the permuted axis indices for the template
-   Frame. So we will need the CmpFrame axis permutation array. Also
-   allocate memory for the inverse of the axis permutation array. */
-            perm = astGetPerm( template );
-            operm = astMalloc( sizeof( int )*(size_t)template_naxes );
-            if( astOK) {
-
-/* Create the inverse of the axis permutation array. */
-               for( axis = 0; axis < template_naxes; axis++ ) {
-                  operm[ perm[ axis ] ] = axis;
-               }
-   
-/* Change the template axes list so that they describe the axes in the
-   full result Frame in terms of the external template axis numbering. */
-               for( axis = 0; axis < nax1; axis++ ) {
-                  (*template_axes)[ axis ] = operm[ axis ];
-               }
-   
-               for( ; axis < result_naxes; axis++ ) {
-                  (*template_axes)[ axis ] = operm[ nax1 + ftemplate_axes[ axis - nax1 ] ];
-               }
-   
-/* Change the target axes list so that they describe the axes in the
-   full result Frame (this just means padding with -1 to indicate that 
-   the extra axes do not correspond to any axis in the target). */
-               for( axis = 0; axis < naxr; axis++ ) {
-                  (*target_axes)[ axis ] = ftarget_axes[ axis ];
-               }
-   
-               for( ; axis < result_naxes; axis++ ) {
-                  (*target_axes)[ axis ] = -1;
-               }
-   
-            }
-   
-   
-/* Free resources */
-            ftemplate_axes = astFree( ftemplate_axes );
-            ftarget_axes = astFree( ftarget_axes );
-            fmap = astAnnul( fmap );
-            fresult = astAnnul( fresult );
-            fother = astAnnul( fother );
-            pm = astAnnul( pm );
-            operm = astFree( operm );
-            inperm = astFree( inperm);
-            outperm = astFree( outperm);
-         }
-      }
-   }
+/* If we still dont have a mcth, try matching it against the second 
+   component Frame. */
+   if( !match ) match = ComponentMatch( template, target, 1, template_axes, 
+                                        target_axes, map, result, status );
 
 /* If an error occurred, free all allocated memory, annul the result
    Object pointers and clear all returned values. */
@@ -4713,11 +4913,13 @@ static void MatchAxes( AstFrame *frm1_frame, AstFrame *frm2, int *axes,
    into "perm" represents the external axis index, and the value held in
    each element of "perm" represents the corresponding internal axis index. */
       perm = astGetPerm( frm1 );
+      if( astOK ) {
 
 /* Copy the frm2 axis indices from the work array into the returned "axes" 
    array, permuting their order into the external axis order of the 
    CmpFrame. */
-      for( i = 0; i < nax; i++ ) axes[ i ] = work[ perm[ i ] ];
+         for( i = 0; i < nax; i++ ) axes[ i ] = work[ perm[ i ] ];
+      }
 
 /* Free resources */
       work = astFree( work );
