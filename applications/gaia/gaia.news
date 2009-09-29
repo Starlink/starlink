@@ -50,6 +50,10 @@
     A bug in the 2D mask toolbox caused GAIA to crash when a given mask
     didn't exist. This has been fixed.
 
+    The Skycat catalogue windows now have a "Clear all objects" item in 
+    the "Options" menu. This quickly clears all the plotting symbols from the
+    image. 
+
     Version 4.3-1
     =============
 

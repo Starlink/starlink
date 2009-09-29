@@ -145,6 +145,11 @@ itcl::class gaia::GaiaSearch {
             {Centre main image on selected object (also bound to {bitmap b2} in table)} \
             -command [code $this centre_selected_object_]
 
+         #  Clear all objects. Much faster than graphics clear.
+         add_menuitem $m command "Clear all objects" \
+            {Clear all objects displayed on image} \
+            -command [code $this clear_all_objects]
+
          #  Add labels to all objects.
          add_menuitem $m command "Label all objects" \
             {Label all objects displayed on image (same as double clicking on all rows)} \
@@ -547,6 +552,12 @@ itcl::class gaia::GaiaSearch {
       } else {
          $w_.cat origin 0.0 0.0
       }
+   }
+
+   #  Clear all the objects.
+   public method clear_all_objects {} {
+      deselect_objects
+      delete_objects
    }
 
    #  Public method to label the selected object (gives access to
