@@ -197,4 +197,6 @@ void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk,
       filt = smf_free_smfFilter( filt, status );
     }
   }
+
+  if( kmap ) kmap = astAnnul( kmap );
 }

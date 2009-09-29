@@ -896,4 +896,5 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
     job_data = smf_free( job_data, status );
   }
 
+  if( kmap ) kmap = astAnnul( kmap );
 }

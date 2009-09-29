@@ -286,4 +286,6 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   
   /* Clean Up */
   if( var ) var = smf_free(var, status);
+
+  if( kmap ) kmap = astAnnul( kmap );
 }

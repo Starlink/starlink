@@ -225,6 +225,8 @@ void smf_calcmodel_dks( smfWorkForce *wf, smfDIMMData *dat, int chunk,
                          0, 0, status );
     }
   }
+
+  if( kmap ) kmap = astAnnul( kmap );
 }
 
 
