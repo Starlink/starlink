@@ -32,6 +32,7 @@ smurf_sc2threadtest.c \
 smurf_scanfit.c \
 smurf_skynoise.c \
 smurf_smurfcopy.c \
+smurf_stackframes.c \
 smurf_starecalc.c \
 smurf_timesort.c \
 smurf_unmakecube.c

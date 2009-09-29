@@ -119,6 +119,8 @@
 *        Add CALCRESP
 *     2009-05-19 (TIMJ):
 *        Add RAWFIXMETA
+*     2009-09-27 (TIMJ):
+*        Add STACKFRAMES
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -278,6 +280,8 @@ void smurf_mon( int * status ) {
     smurf_calcresp( status );
   } else if (strcmp( taskname, "RAWFIXMETA" ) == 0 ) {
     smurf_rawfixmeta( status );
+  } else if (strcmp( taskname, "STACKFRAMES" ) == 0 ) {
+    smurf_stackframes( status );
   } else if (strcmp( taskname, "SC2THREADTEST" ) == 0 ) {
     smurf_sc2threadtest( status );
   } else {
