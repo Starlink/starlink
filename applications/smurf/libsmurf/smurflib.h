@@ -97,36 +97,36 @@
 #ifndef SMURF_LIB_DEFINED
 #define SMURF_LIB_DEFINED
 
-void smurf_extinction( int * );
-void smurf_flatfield( int * );
-void smurf_makemap( int * );
-void smurf_qlmakemap( int * );
-void smurf_makecube( int * );
-void smurf_remsky( int * );
-void smurf_scanfit( int * );
-void smurf_sc2fts( int * );
-void smurf_sc2sim( int * );
-void smurf_dreamsolve( int * );
-void smurf_dreamweights( int * );
 void smurf_badbolos( int * );
-void smurf_impaztec( int * );
-void smurf_skynoise( int * );
-void smurf_starecalc( int * );
-void smurf_help( int * );
-void smurf_timesort( int * );
-void smurf_gsd2acsis( int * );
-void smurf_unmakecube( int * );
-void smurf_rawunpress( int * );
-void smurf_rawfixmeta( int * );
-void smurf_sc2clean( int * );
-void smurf_gsdshow( int * );
-void smurf_sc2concat( int * );
-void smurf_sc2fft( int * );
-void smurf_smurfcopy( int * );
 void smurf_calcdark( int * );
 void smurf_calcflat( int * );
 void smurf_calcresp( int * );
+void smurf_dreamsolve( int * );
+void smurf_dreamweights( int * );
+void smurf_extinction( int * );
+void smurf_flatfield( int * );
+void smurf_gsd2acsis( int * );
+void smurf_gsdshow( int * );
+void smurf_help( int * );
+void smurf_impaztec( int * );
+void smurf_makecube( int * );
+void smurf_makemap( int * );
+void smurf_qlmakemap( int * );
+void smurf_rawfixmeta( int * );
+void smurf_rawunpress( int * );
+void smurf_remsky( int * );
+void smurf_sc2clean( int * );
+void smurf_sc2concat( int * );
+void smurf_sc2fft( int * );
+void smurf_sc2fts( int * );
+void smurf_sc2sim( int * );
 void smurf_sc2threadtest( int * );
+void smurf_scanfit( int * );
+void smurf_skynoise( int * );
+void smurf_smurfcopy( int * );
 void smurf_stackframes( int * );
+void smurf_starecalc( int * );
+void smurf_timesort( int * );
+void smurf_unmakecube( int * );
 
 #endif /* SMURF_LIB_DEFINED */
