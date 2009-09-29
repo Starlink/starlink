@@ -13,11 +13,11 @@
 *     Library routine
 
 *  Invocation:
-*     smf_model_create( smfWorkForce *wf, const smfGroup *igroup, 
-*                       smfArray **iarray, dim_t nchunks, smf_modeltype mtype, 
-*                       int isTordered, AstFrameSet *outfset, int moving, 
-*                       int *lbnd_out, int *ubnd_out, smfGroup **mgroup, 
-*                       int nofile, int leaveopen, smfArray **mdata, 
+*     smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
+*                       smfArray **iarray, dim_t nchunks, smf_modeltype mtype,
+*                       int isTordered, AstFrameSet *outfset, int moving,
+*                       int *lbnd_out, int *ubnd_out, smfGroup **mgroup,
+*                       int nofile, int leaveopen, smfArray **mdata,
 *                       double flagstat, AstKeyMap *keymap, int *status )
 
 *  Arguments:
@@ -34,8 +34,8 @@
 *     mtype = smf_modeltype (Given)
 *        Type of model component to create
 *     isTordered = int (Given)
-*        If 0, ensure template data is ordered by bolometer. If 1 ensure 
-*        template data is ordered by time slice (default ICD ordering). 
+*        If 0, ensure template data is ordered by bolometer. If 1 ensure
+*        template data is ordered by time slice (default ICD ordering).
 *        Ignored if not creating SMF__LUT.
 *     outfset = AstFrameSet* (Given)
 *        Frameset containing the sky->output map mapping if calculating
@@ -44,10 +44,10 @@
 *        Is coordinate system tracking moving object? (if outfset specified)
 *     lbnd_out = double* (Given)
 *        2-element array pixel coord. for the lower bounds of the output map
-*        (if outfset specified) 
+*        (if outfset specified)
 *     ubnd_out = double* (Given)
-*        2-element array pixel coord. for the upper bounds of the output map 
-*        (if outfset specified) 
+*        2-element array pixel coord. for the upper bounds of the output map
+*        (if outfset specified)
 *     mgroup = smfGroup ** (Returned)
 *        Pointer to smfGroup pointer that will contain model file names
 *     nofile = int (Given)
@@ -98,7 +98,7 @@
 *     2006-07-06 (EC):
 *        Initial Version
 *     2006-11-02 (EC):
-*        Propagate inputs to residual, create others with smf_open_newfile 
+*        Propagate inputs to residual, create others with smf_open_newfile
 *     2007-02-07 (EC):
 *        - Simplified container files.
 *        - In copyinput case map data array so that it gets copied.
@@ -106,11 +106,11 @@
 *        Now form the grpex here for the model container names
 *     2007-03-02 (EC):
 *        - Map variance to ensure creation for RESidual container
-*        - Set initial variance to 1 
+*        - Set initial variance to 1
 *     2007-06-13 (EC):
-*        - Use new DIMM binary file format 
+*        - Use new DIMM binary file format
 *     2007-06-25 (EC)
-*        Header length is now static / padded to multiple of pagesize 
+*        Header length is now static / padded to multiple of pagesize
 *     2007-07-10 (EC):
 *        Use smfGroups & smfArrays instead of groups and smfDatas
 *     2007-07-13 (EC):
@@ -125,7 +125,7 @@
 *     2007-08-21 (EC):
 *        Fixed up warnings caused by ambiguous pointer math
 *     2007-11-15 (EC):
-*        -Added ability to create models from a smfArray template, 
+*        -Added ability to create models from a smfArray template,
 *         requiring a change to the interface.
 *        -Fixed memory allocation bug
 *     2007-11-28 (EC):
@@ -214,11 +214,11 @@
 
 #define FUNC_NAME "smf_model_create"
 
-void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, 
-                       smfArray **iarray, dim_t nchunks, smf_modeltype mtype, 
-                       int isTordered, AstFrameSet *outfset, int moving, 
-                       int *lbnd_out, int *ubnd_out, smfGroup **mgroup, 
-                       int nofile, int leaveopen, smfArray **mdata, 
+void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
+                       smfArray **iarray, dim_t nchunks, smf_modeltype mtype,
+                       int isTordered, AstFrameSet *outfset, int moving,
+                       int *lbnd_out, int *ubnd_out, smfGroup **mgroup,
+                       int nofile, int leaveopen, smfArray **mdata,
                        double flagstat, AstKeyMap *keymap, int *status ) {
 
   /* Local Variables */
@@ -233,7 +233,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
   int flag=0;                   /* Flag */
   char fname_grpex[GRP__SZNAM+1];/* String for holding filename grpex */
   smfDIMMHead head;             /* Header for the file */
-  size_t headlen=0;             /* Size of header in bytes */ 
+  size_t headlen=0;             /* Size of header in bytes */
   void *headptr=NULL;           /* Pointer to header portion of buffer */
   dim_t i;                      /* Loop counter */
   smfData *idata=NULL;          /* Pointer to input smfdata data */
@@ -270,19 +270,19 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
   if( igroup == NULL ) {
     if( iarray == NULL ) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "Neither igroup nor iarray specified", 
-             status);        
+      errRep(FUNC_NAME, "Neither igroup nor iarray specified",
+             status);
     } else if( nchunks <= 0 ) {
       *status = SAI__ERROR;
       msgSeti("NCHUNKS",nchunks);
-      errRep(FUNC_NAME, 
+      errRep(FUNC_NAME,
              "iarray specified but invalid number of chunks, ^NCHUNKS",
-             status);        
+             status);
     } else {
       /* Since we're using smfArrays as template, no associated files */
       nofile = 1;
 
-      /* We have at most SMF__MXSMF related objects (subarrays) at each time 
+      /* We have at most SMF__MXSMF related objects (subarrays) at each time
          chunk */
       nrel = SMF__MXSMF;
 
@@ -317,8 +317,8 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
 
     if( (*status == SAI__OK) && (msize != isize) ) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "Couldn't create group of NDF model containers.", 
-             status);        
+      errRep(FUNC_NAME, "Couldn't create group of NDF model containers.",
+             status);
     }
 
     /* Now that we have the Grp of names, create a new smfGroup with the same
@@ -326,7 +326,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
        mgrp afterward. */
 
     *mgroup = smf_construct_smfGroup( mgrp, igroup->subgroups, igroup->chunk,
-                                      igroup->ngroups, igroup->nrelated, 1, 
+                                      igroup->ngroups, igroup->nrelated, 1,
                                       status );
 
     if( mgrp ) grpDelet( &mgrp, status );
@@ -349,11 +349,11 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
     /* For all remaining types (other than DKS) don't need data array */
     oflag |= SMF__NOCREATE_DATA;
   }
-	
+
   /* Loop over time chunks */
   if( *status == SAI__OK ) for( i=0; i<nchunks; i++ ) {
-    
-      /* For models that only have one file per subgroup fix up 
+
+      /* For models that only have one file per subgroup fix up
          mgroup such that only the first filename in each subgroup
          is used. Do this by setting remaining elements of mgroup->subgroups
          to 0. nrel is 1. */
@@ -399,16 +399,16 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
 
       /* Loop over subarrays */
       for( j=0; j<thisnrel; j++ ) {
-    
+
         /* Open the relevant template file if using igroup */
         if( igroup ) {
-	
+
           /* obtain grp idx for j'th element of i'th subgroup */
           idx=(*mgroup)->subgroups[i][j];
-	
+
           /* Only continue if there is a valid idx */
           if( idx > 0 ) {
-	  
+
             /* Open the template file - flags are set above depending
                on the type of model. If we're reading data, then
                do an open_and_flatfield */
@@ -419,11 +419,11 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
             } else {
               smf_open_file( igroup->grp, idx, "READ", oflag, &idata, status );
             }
-	
+
             /* Calculate the LUT if necessary */
-	  
+
             if( mtype == SMF__LUT ) {
-              smf_calc_mapcoord( wf, idata, outfset, moving, lbnd_out, 
+              smf_calc_mapcoord( wf, idata, outfset, moving, lbnd_out,
                                  ubnd_out, SMF__NOCREATE_FILE, status );
             }
 
@@ -442,20 +442,20 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
         if( *status == SAI__OK ) {
           if( idata->ndims != 3 ) {
             *status = SAI__ERROR;
-            errRep(FUNC_NAME, "Template data is not time-varying!", 
-                   status);      
-          }	
+            errRep(FUNC_NAME, "Template data is not time-varying!",
+                   status);
+          }
         }
-      
+
         if( *status == SAI__OK ) {
-	  
+
           /* initialize the header */
           memset( &head, 0, sizeof(head) );
           head.data.dtype=SMF__NULL;
 
-          /* Determine dimensions of model component */	  
+          /* Determine dimensions of model component */
           switch( mtype ) {
-	    
+
           case SMF__CUM: /* Cumulative model */
             head.data.dtype = SMF__DOUBLE;
             head.data.ndims = 3;
@@ -463,11 +463,11 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
             head.data.dims[1] = (idata->dims)[1];
             head.data.dims[2] = (idata->dims)[2];
             break;
-	    
+
           case SMF__RES: /* Model residual */
             /* Nothing here since copyinput set */
             break;
-	    
+
           case SMF__AST: /* Time-domain projection of map */
             head.data.dtype = SMF__DOUBLE;
             head.data.ndims = 3;
@@ -475,18 +475,18 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
             head.data.dims[1] = (idata->dims)[1];
             head.data.dims[2] = (idata->dims)[2];
             break;
-	    
+
           case SMF__COM: /* Common-mode at each time step */
             head.data.dtype = SMF__DOUBLE;
             head.data.ndims = 1;
 
             if( isTordered ) { /* T is 3rd axis if time-ordered */
-              head.data.dims[0] = (idata->dims)[2]; 
+              head.data.dims[0] = (idata->dims)[2];
             } else {           /* T is 1st axis if bolo-ordered */
-              head.data.dims[0] = (idata->dims)[0]; 
+              head.data.dims[0] = (idata->dims)[0];
             }
             break;
-	
+
           case SMF__NOI: /* Noise model */
             /* Currently just one variance for each bolometer */
             head.data.dtype = SMF__DOUBLE;
@@ -495,11 +495,11 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
             if( isTordered )  { /* T is 3rd axis if time-ordered */
               head.data.dims[0] = (idata->dims)[0];
               head.data.dims[1] = (idata->dims)[1];
-              head.data.dims[2] = 1; 
+              head.data.dims[2] = 1;
             } else {           /* T is 1st axis if bolo-ordered */
               head.data.dims[0] = 1;
               head.data.dims[1] = (idata->dims)[1];
-              head.data.dims[2] = (idata->dims)[2]; 
+              head.data.dims[2] = (idata->dims)[2];
             }
             break;
 
@@ -532,11 +532,11 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
             head.data.ndims = 2;
             /* Store column dark squid followed by gain+off+corr each row */
             if( isTordered ) { /* T is 3rd axis if time-ordered */
-              head.data.dims[0] = (idata->dims)[2] + 
+              head.data.dims[0] = (idata->dims)[2] +
                 (idata->dims)[SC2STORE__ROW_INDEX]*3;
               head.data.dims[1] = (idata->dims)[SC2STORE__COL_INDEX];
             } else {           /* T is 1st axis if bolo-ordered */
-              head.data.dims[0] = (idata->dims)[0] + 
+              head.data.dims[0] = (idata->dims)[0] +
                 (idata->dims)[1+SC2STORE__ROW_INDEX]*3;
               head.data.dims[1] = (idata->dims)[1+SC2STORE__COL_INDEX];
             }
@@ -548,13 +548,17 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
 
             /* Note that we're using the time axis to store the coefficients */
             if( isTordered ) {
-              head.data.dims[SC2STORE__ROW_INDEX] = (idata->dims)[SC2STORE__ROW_INDEX];
-              head.data.dims[SC2STORE__COL_INDEX] = (idata->dims)[SC2STORE__COL_INDEX];
-              head.data.dims[2] = 3; 
+              head.data.dims[SC2STORE__ROW_INDEX] =
+                (idata->dims)[SC2STORE__ROW_INDEX];
+              head.data.dims[SC2STORE__COL_INDEX] =
+                (idata->dims)[SC2STORE__COL_INDEX];
+              head.data.dims[2] = 3;
             } else {
               head.data.dims[0] = 3;
-              head.data.dims[1+SC2STORE__ROW_INDEX]=(idata->dims)[1+SC2STORE__ROW_INDEX];
-              head.data.dims[1+SC2STORE__COL_INDEX]=(idata->dims)[1+SC2STORE__COL_INDEX];
+              head.data.dims[1+SC2STORE__ROW_INDEX] =
+                (idata->dims)[1+SC2STORE__ROW_INDEX];
+              head.data.dims[1+SC2STORE__COL_INDEX] =
+                (idata->dims)[1+SC2STORE__COL_INDEX];
             }
             break;
 
@@ -583,7 +587,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
             for( k=0; k<head.data.ndims; k++ ) {
               head.data.dims[k] = (idata->dims)[k];
             }
-          } 
+          }
 
           /* Set the data-ordering flag in the header */
           head.data.isTordered = idata->isTordered;
@@ -596,13 +600,13 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
           /* Calculate the size of the data buffer. Format:
 
              Header:
-             smfDIMMHead struct 
+             smfDIMMHead struct
 
              Data:
              buf   = [smf_dtype] * dims[0] * dims[1] * ...
           */
 
-          /* Header must fit into integer multiple of pagesize so that the 
+          /* Header must fit into integer multiple of pagesize so that the
              data array starts on a page boundary (for later mmap) */
           pagesize = sysconf(_SC_PAGESIZE);
           headlen = sizeof(head);
@@ -614,10 +618,10 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
           for( k=0; k<head.data.ndims; k++ ) {
             ndata *= head.data.dims[k];
           }
-          datalen = ndata * smf_dtype_sz(head.data.dtype, status); 
+          datalen = ndata * smf_dtype_sz(head.data.dtype, status);
 
           if( mgroup != NULL ) {
-            /* Obtain a character string corresponding to the file name 
+            /* Obtain a character string corresponding to the file name
                if we used a group as the template */
             pname = name;
             grpGet( (*mgroup)->grp, idx, 1, &pname, GRP__SZNAM, status );
@@ -632,22 +636,22 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
           }
 
           if( nofile ) {
-            /* If there is no file associated with the data, use smf_malloc 
+            /* If there is no file associated with the data, use smf_malloc
                to allocate memory but don't initialize since we do that
                later */
 
             dataptr = smf_malloc( datalen, 1, 0, status );
-	    
+
           } else {
             /* If we are writing a file create and map it here */
-	    
-            if( (fd = open( name, O_RDWR | O_CREAT | O_TRUNC, 
+
+            if( (fd = open( name, O_RDWR | O_CREAT | O_TRUNC,
                             S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH )) == -1 ) {
               *status = SAI__ERROR;
-              errRep( FUNC_NAME, "Unable to open model container file", 
+              errRep( FUNC_NAME, "Unable to open model container file",
                       status );
             }
-	    
+
             /* First truncate the file to make it the correct size, and then
                map it (without the ftruncate bus errors are generated under
                linux when the memory is subsequently accessed...) */
@@ -655,16 +659,16 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
             if( *status == SAI__OK ) {
               if( ftruncate( fd, datalen+headlen ) == -1 ) {
                 *status = SAI__ERROR;
-                errRep( FUNC_NAME, "Unable to re-size container file", 
-                        status ); 
+                errRep( FUNC_NAME, "Unable to re-size container file",
+                        status );
               } else if( (buf = mmap( 0, datalen+headlen, 
                                       PROT_READ | PROT_WRITE,
                                       MAP_SHARED, fd, 0 ) ) == MAP_FAILED ) {
                 *status = SAI__ERROR;
-                errRep( FUNC_NAME, "Unable to map model container file", 
-                        status ); 
+                errRep( FUNC_NAME, "Unable to map model container file",
+                        status );
               }
-            } 
+            }
 
             if( *status == SAI__OK ) {
               headptr = buf;
@@ -673,7 +677,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
               /* Fill the header. memset to 0 first since much of this space is
                  padding to make it a multiple of the page size */
               memset( headptr, 0, headlen );
-              memcpy( headptr, &head, sizeof(head) ); 
+              memcpy( headptr, &head, sizeof(head) );
             }
           }
 
@@ -685,15 +689,15 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
 
             } else if( mtype == SMF__LUT ) {
               /* If this is a LUT copy it over from the template */
-              if( idata->lut ) {	  
+              if( idata->lut ) {
                 /* dataptr can be mmap'd or malloc'd memory */
                 memcpy( dataptr, idata->lut, datalen );
               } else {
                 *status = SAI__ERROR;
-                errRep(FUNC_NAME, "No LUT present in template for LUT model", 
-                       status);      
+                errRep(FUNC_NAME, "No LUT present in template for LUT model",
+                       status);
               }
-	      
+
             } else if( mtype == SMF__NOI ) {
               /* If this is a NOI, set to 1, avoid divide-by-zero */
               if( head.data.dtype == SMF__DOUBLE ) {
@@ -704,10 +708,10 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
                 /* Generate error message if NOI is not double... */
                 *status = SAI__ERROR;
                 errRep(FUNC_NAME,
-                       "Possible programming error. NOI should be DOUBLE.", 
+                       "Possible programming error. NOI should be DOUBLE.",
                        status);
               }
-	      
+
             } else if( mtype == SMF__QUA ) {
               /* If this is a QUA, and quality available in template copy it */
               if( (idata->pntr)[2] ) {
@@ -716,20 +720,20 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
 
               /* If flagstat is set, try flagging quality bits here */
               if( flagstat > 0 ) {
-                msgOutiff(MSG__VERB, "", FUNC_NAME 
+                msgOutiff(MSG__VERB, "", FUNC_NAME
                           ": flagging regions slewing < %f arcsec/sec...",
                           status, flagstat );
                 smf_flag_stationary( idata, dataptr, flagstat, &nflag, status );
                 if( *status == SAI__OK ) {
-                  msgOutiff(MSG__VERB," ", FUNC_NAME 
-                            ": %zu new time slices flagged", status, nflag ); 
+                  msgOutiff(MSG__VERB," ", FUNC_NAME
+                            ": %zu new time slices flagged", status, nflag );
                 }
               }
 
             } else if( mtype == SMF__EXT ) {
               /* In this case run smf_correct_extinction on the input data
                  (with only the header mapped) and store the correction
-                 factors in the model bufffer */     
+                 factors in the model bufffer */
 
               if( !astMapGet0A( keymap, "EXT", &kmap ) ) {
                 /* No keymap parameters: use adaptive method + WVM by default */
@@ -740,33 +744,31 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
               } else {
                 /* Use sub-keymap containing EXT parameters */
                 smf_get_extpar( kmap, &tausrc, &extmeth, status );
-                if( (tausrc==SMF__TAUSRC_CSOTAU) && 
+                if( (tausrc==SMF__TAUSRC_CSOTAU) &&
                     (!astMapGet0D( kmap, "CSOTAU", &tau)) ) {
 
                   /* is using CSO tau but no specific value supplied get
                      from the header */
                   tau = smf_cso2filt_tau( idata->hdr, VAL__BADD, status );
                 }
-                if( (tausrc==SMF__TAUSRC_TAU) && 
+                if( (tausrc==SMF__TAUSRC_TAU) &&
                     (!astMapGet0D( kmap, "FILTERTAU", &tau)) ) {
 
                   /* is using filter tau but no specific value supplied */
-                  tau = VAL__BADD;                     
-                } 
+                  tau = VAL__BADD;
+                }
                 kmap = astAnnul( kmap );
               }
 
               /* Trap case where FILTERTAU requsted but no value given */
               if( (tausrc==SMF__TAUSRC_TAU) && (tau==VAL__BADD) ) {
                   *status = SAI__ERROR;
-                  errRep( "", FUNC_NAME 
+                  errRep( "", FUNC_NAME
                          ": FILTERTAU requested but no value provided",
                          status );
               }
 
-              printf("tau: %i %i %lf\n", tausrc, extmeth, tau);
-
-              smf_correct_extinction( idata, tausrc, extmeth, tau, 
+              smf_correct_extinction( idata, tausrc, extmeth, tau,
                                       (double *) dataptr, status );
 
             } else if( mtype == SMF__DKS ) {
@@ -795,26 +797,26 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
               memset( dataptr, 0, datalen );
             }
           }
-	
-	
+
+
           if( *status == SAI__OK ) {
-	  
+
             /* If leaveopen set, pack the data into a smfArray */
             if( leaveopen ) {
-	      
+
               /* If this is the first element of the subgroup create
                  the smfArray */
               if( j == 0 ) {
                 mdata[i] = smf_create_smfArray( status );
               }
-	      
+
               /* Create a smfData for this element of the subgroup */
               flag = SMF__NOCREATE_DA;
 
               data = smf_create_smfData( flag, status );
 
               if( *status == SAI__OK ) {
-                data->isTordered = head.data.isTordered; 
+                data->isTordered = head.data.isTordered;
                 data->dtype = head.data.dtype;
                 data->ndims = head.data.ndims;
                 memcpy( data->dims, head.data.dims, sizeof( head.data.dims ) );
@@ -822,45 +824,45 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
 
                 /* Data pointer points to mmap'd memory AFTER HEADER */
                 data->pntr[0] = dataptr;
-		
-                /* Store the file descriptor to enable us to unmap when we 
+
+                /* Store the file descriptor to enable us to unmap when we
                    close */
                 if( !nofile ) {
                   data->file->fd = fd;
                 }
-		
+
                 /* Copy the DIMM filename into the smfFile. Even though
                    there may not be an associated file on disk we store
                    the name here in case we wish to export the data
                    to an NDF file at a later point. */
-                one_strlcpy( data->file->name, name, sizeof(data->file->name), 
+                one_strlcpy( data->file->name, name, sizeof(data->file->name),
                              status );
-		
+
                 /* Add the smfData to the smfArray */
                 smf_addto_smfArray( mdata[i], data, status );
               }
-	      
+
             } else if (!nofile) {
-	      
-              /* If leaveopen not set (and there is a file) write buffer to 
+
+              /* If leaveopen not set (and there is a file) write buffer to
                  file and close container */
-	      
+
               if( msync( buf, headlen+datalen, MS_ASYNC ) == -1 ) {
                 *status = SAI__ERROR;
-                errRep( FUNC_NAME, "Unable to sync model container file", 
-                        status ); 
+                errRep( FUNC_NAME, "Unable to sync model container file",
+                        status );
               } else if( munmap( buf, headlen+datalen ) == -1 ) {
                 *status = SAI__ERROR;
-                errRep( FUNC_NAME, "Unable to unmap model container file", 
-                        status ); 
+                errRep( FUNC_NAME, "Unable to unmap model container file",
+                        status );
               } else if( close( fd ) == -1 ) {
                 *status = SAI__ERROR;
-                errRep( FUNC_NAME, "Unable to close model container file", 
-                        status ); 
+                errRep( FUNC_NAME, "Unable to close model container file",
+                        status );
               }
             }
           }
-	  
+
           /* Close the input template file if it was opened here */
           if( igroup ) {
             smf_close_file( &idata, status );
@@ -872,13 +874,10 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
           j = thisnrel;
         }
       }
-    
+
       /* Set loop exit condition if bad status was set */
       if( *status != SAI__OK ) {
         i = nchunks;
       }
     }
-
 }
-
-
