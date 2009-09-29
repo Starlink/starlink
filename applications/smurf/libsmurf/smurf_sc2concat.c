@@ -1,100 +1,100 @@
 /*
-*+
-*  Name:
-*     SC2CONCAT
+ *+
+ *  Name:
+ *     SC2CONCAT
 
-*  Purpose:
-*     Concatenate files into a larger file.
+ *  Purpose:
+ *     Concatenate files into a larger file.
 
-*  Language:
-*     Starlink ANSI C
+ *  Language:
+ *     Starlink ANSI C
 
-*  Type of Module:
-*     ADAM A-task
+ *  Type of Module:
+ *     ADAM A-task
 
-*  Invocation:
-*     smurf_sc2concat( int *status );
+ *  Invocation:
+ *     smurf_sc2concat( int *status );
 
-*  Arguments:
-*     status = int* (Given and Returned)
-*        Pointer to global status.
+ *  Arguments:
+ *     status = int* (Given and Returned)
+ *        Pointer to global status.
 
-*  Description:
-*     Given a list of input files this task concatenates them into larger
-*     files. The rules it follows are: 
-*     - data files are grouped by subarray
-*     - files are only concatenated if they are continuous in time
-*     - the longest a concatenated file may be is given by MAXLEN (in sec.)
-*     - for each continuous chunk of data, shorter than MAXLEN, a file
-*     is generated on disk for each subarray. The file name is determined
-*     as the name of the first input file for the chunk, with a suffix
-*     "_con". The can be modified using the parameter OUT.
+ *  Description:
+ *     Given a list of input files this task concatenates them into larger
+ *     files. The rules it follows are:
+ *     - data files are grouped by subarray
+ *     - files are only concatenated if they are continuous in time
+ *     - the longest a concatenated file may be is given by MAXLEN (in sec.)
+ *     - for each continuous chunk of data, shorter than MAXLEN, a file
+ *     is generated on disk for each subarray. The file name is determined
+ *     as the name of the first input file for the chunk, with a suffix
+ *     "_con". The can be modified using the parameter OUT.
 
-*  ADAM Parameters:
-*     IN = NDF (Read)
-*          Input file(s)
-*     MSG_FILTER = _CHAR (Read)
-*          Control the verbosity of the application. Values can be
-*          NONE (no messages), QUIET (minimal messages), NORMAL,
-*          VERBOSE, DEBUG or ALL. [NORMAL]
-*     OUT = NDF (Write)
-*          Output concatenated files
-*     OUTFILES = LITERAL (Write)
-*          The name of text file to create, in which to put the names of
-*          all the output NDFs created by this application (one per
-*          line). If a null (!) value is supplied no file is created. [!]
-*     PADEND = _INTEGER (Read)
-*          Number of samples to pad at end.
-*     PADSTART = _INTEGER (Read)
-*          Number of samples to pad at start.
-*     MAXLEN = _DOUBLE (Read)
-*          Maximum length (in seconds) concatenated file).
+ *  ADAM Parameters:
+ *     IN = NDF (Read)
+ *          Input file(s)
+ *     MSG_FILTER = _CHAR (Read)
+ *          Control the verbosity of the application. Values can be
+ *          NONE (no messages), QUIET (minimal messages), NORMAL,
+ *          VERBOSE, DEBUG or ALL. [NORMAL]
+ *     OUT = NDF (Write)
+ *          Output concatenated files
+ *     OUTFILES = LITERAL (Write)
+ *          The name of text file to create, in which to put the names of
+ *          all the output NDFs created by this application (one per
+ *          line). If a null (!) value is supplied no file is created. [!]
+ *     PADEND = _INTEGER (Read)
+ *          Number of samples to pad at end.
+ *     PADSTART = _INTEGER (Read)
+ *          Number of samples to pad at start.
+ *     MAXLEN = _DOUBLE (Read)
+ *          Maximum length (in seconds) concatenated file).
 
-*  Related Applications:
-*     SMURF: SC2FFT, SC2CLEAN
+ *  Related Applications:
+ *     SMURF: SC2FFT, SC2CLEAN
 
-*  Authors:
-*     Edward Chapin (UBC)
-*     {enter_new_authors_here}
+ *  Authors:
+ *     Edward Chapin (UBC)
+ *     {enter_new_authors_here}
 
-*  History:
-*     2008-07-03 (EC):
-*        Initial version.
-*     2008-07-22 (TIMJ):
-*        Handle darks. USe kaplibs for groups. Free memory leak.
-*     2008-07-29 (EC):
-*        -Added parameter OUT
-*        -Switch to parGdr routines, and use steptime from header
-*     2009-03-30 (TIMJ):
-*        Add OUTFILES parameter.
-*     {enter_further_changes_here}
+ *  History:
+ *     2008-07-03 (EC):
+ *        Initial version.
+ *     2008-07-22 (TIMJ):
+ *        Handle darks. USe kaplibs for groups. Free memory leak.
+ *     2008-07-29 (EC):
+ *        -Added parameter OUT
+ *        -Switch to parGdr routines, and use steptime from header
+ *     2009-03-30 (TIMJ):
+ *        Add OUTFILES parameter.
+ *     {enter_further_changes_here}
 
-*  Copyright:
-*     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
-*     Council. Copyright (C) 2005-2008 University of British Columbia.
-*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
-*     All Rights Reserved.
+ *  Copyright:
+ *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
+ *     Council. Copyright (C) 2005-2008 University of British Columbia.
+ *     Copyright (C) 2008-2009 Science and Technology Facilities Council.
+ *     All Rights Reserved.
 
-*  Licence:
-*     This program is free software; you can redistribute it and/or
-*     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 3 of
-*     the License, or (at your option) any later version.
-*
-*     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
-*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
-*
-*     You should have received a copy of the GNU General Public
-*     License along with this program; if not, write to the Free
-*     Software Foundation, Inc., 59 Temple Place,Suite 330, Boston,
-*     MA 02111-1307, USA
+ *  Licence:
+ *     This program is free software; you can redistribute it and/or
+ *     modify it under the terms of the GNU General Public License as
+ *     published by the Free Software Foundation; either version 3 of
+ *     the License, or (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be
+ *     useful,but WITHOUT ANY WARRANTY; without even the implied
+ *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ *     PURPOSE. See the GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public
+ *     License along with this program; if not, write to the Free
+ *     Software Foundation, Inc., 59 Temple Place,Suite 330, Boston,
+ *     MA 02111-1307, USA
 
-*  Bugs:
-*     {note_any_bugs_here}
-*-
-*/
+ *  Bugs:
+ *     {note_any_bugs_here}
+ *-
+ */
 
 #if HAVE_CONFIG_H
 #include <config.h>
@@ -159,7 +159,7 @@ void smurf_sc2concat( int *status ) {
   /* Main routine */
   ndfBegin();
 
-  /* Find the number of cores/processors available and create a pool of 
+  /* Find the number of cores/processors available and create a pool of
      threads of the same size. */
   wf = smf_create_workforce( smf_get_nthread( status ), status );
 
@@ -177,8 +177,8 @@ void smurf_sc2concat( int *status ) {
   fgrp = NULL;
 
   if (isize == 0) {
-        msgOutif(MSG__NORM, " ","All supplied input frames were DARK,"
-                 " nothing to concatenate", status );
+    msgOutif(MSG__NORM, " ","All supplied input frames were DARK,"
+             " nothing to concatenate", status );
     goto CLEANUP;
   }
 
@@ -186,7 +186,7 @@ void smurf_sc2concat( int *status ) {
 
   /* Maximum length of a continuous chunk */
   parGdr0d( "MAXLEN", 0, 0, VAL__MAXI, 1, &maxlen_s, status );
-  if( maxlen_s > 0 ) {    
+  if( maxlen_s > 0 ) {
     /* Obtain sample length from header of first file in igrp */
     smf_open_file( igrp, 1, "READ", SMF__NOCREATE_DATA, &data, status );
     if( (*status == SAI__OK) && data && (data->hdr) ) {
@@ -196,7 +196,7 @@ void smurf_sc2concat( int *status ) {
   } else {
     maxlen = 0;
   }
-  
+
   /* Padding */
   parGdr0i( "PADSTART", 0, 0, VAL__MAXI, 1, &temp, status );
   padStart = (dim_t) temp;
@@ -230,7 +230,7 @@ void smurf_sc2concat( int *status ) {
   basesize = grpGrpsz( basegrp, status );
 
   /* Get output file(s) */
-  kpg1Wgndf( "OUT", basegrp, basesize, basesize, 
+  kpg1Wgndf( "OUT", basegrp, basesize, basesize,
              "More output files required...",
              &ogrp, &osize, status );
 
@@ -239,23 +239,23 @@ void smurf_sc2concat( int *status ) {
   for( contchunk=0;(*status==SAI__OK)&&contchunk<ncontchunks; contchunk++ ) {
 
     /* Concatenate this continuous chunk */
-    smf_concat_smfGroup( wf, igroup, darks, NULL, contchunk, 1, NULL, 0, NULL, 
+    smf_concat_smfGroup( wf, igroup, darks, NULL, contchunk, 1, NULL, 0, NULL,
                          NULL, padStart, padEnd, 0, &concat, status );
-    
+
     /* Export concatenated data for each subarray to NDF file */
     for( idx=0; (*status==SAI__OK)&&idx<concat->ndat; idx++ ) {
       if( concat->sdata[idx]->file && concat->sdata[idx]->file->name ) {
 
         /* Get the file name: note that we have to be careful to read
-           them out of this group in the same order that we put them 
+           them out of this group in the same order that we put them
            in above! */
         pname = fname;
         grpGet( ogrp, gcount, 1, &pname, GRP__SZNAM, status);
         smf_write_smfData( concat->sdata[idx], NULL, NULL, fname, NDF__NOID,
-                           status ); 
+                           status );
       } else {
         *status = SAI__ERROR;
-        errRep( FUNC_NAME, 
+        errRep( FUNC_NAME,
                 "Unable to determine file name for concatenated data.",
                 status );
       }
@@ -266,7 +266,7 @@ void smurf_sc2concat( int *status ) {
 
     /* Close the smfArray */
     smf_close_related( &concat, status );
-  
+
   }
 
   /* Write out the list of output NDF names, annulling the error if a null
@@ -285,7 +285,7 @@ void smurf_sc2concat( int *status ) {
   if( igroup ) smf_close_smfGroup( &igroup, status );
 
   ndfEnd( status );
-  
+
   if( *status == SAI__OK ) {
     msgOutif(MSG__VERB," ","SC2CONCAT succeeded.", status);
   } else {

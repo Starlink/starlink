@@ -1,94 +1,94 @@
 /*
-*+
-*  Name:
-*     CALCDARK
+ *+
+ *  Name:
+ *     CALCDARK
 
-*  Purpose:
-*     Calculate the 2d dark frame from dark observation.
+ *  Purpose:
+ *     Calculate the 2d dark frame from dark observation.
 
-*  Language:
-*     Starlink ANSI C
+ *  Language:
+ *     Starlink ANSI C
 
-*  Type of Module:
-*     ADAM A-task
+ *  Type of Module:
+ *     ADAM A-task
 
-*  Invocation:
-*     smurf_calcdark( int *status );
+ *  Invocation:
+ *     smurf_calcdark( int *status );
 
-*  Arguments:
-*     status = int* (Given and Returned)
-*        Pointer to global status.
+ *  Arguments:
+ *     status = int* (Given and Returned)
+ *        Pointer to global status.
 
-*  Description:
-*     Given a set of dark observations, calculate the dark frame from each.
-*     A bad pixel mask can be supplied to remove known bad pixels. Does not flatfield.
+ *  Description:
+ *     Given a set of dark observations, calculate the dark frame from each.
+ *     A bad pixel mask can be supplied to remove known bad pixels. Does not flatfield.
 
-*  Notes:
-*     Dark files will be subtracted from raw data during the flatfielding step.
-*     Commands that flatfield data can use either raw dark files or the output from
-*     CALCDARK.
+ *  Notes:
+ *     Dark files will be subtracted from raw data during the flatfielding step.
+ *     Commands that flatfield data can use either raw dark files or the output from
+ *     CALCDARK.
 
-*  ADAM Parameters:
-*     BPM = NDF (Read)
-*          Group of files to be used as bad pixel masks. Each data file
-*          specified with the IN parameter will be masked. The corresponding
-*          previous mask for a subarray will be used. If there is no previous
-*          mask the closest following will be used. It is not an error for
-*          no mask to match. A NULL parameter indicates no mask files to be
-*          supplied. [!]
-*     IN = NDF (Read)
-*          Input files to be processed. Non-darks will be filtered out.
-*     MSG_FILTER = _CHAR (Read)
-*          Control the verbosity of the application. Values can be
-*          NONE (no messages), QUIET (minimal messages), NORMAL,
-*          VERBOSE, DEBUG or ALL. [NORMAL]
-*     OUT = NDF (Write)
-*          Output dark files. These can be used as bad pixel masks in
-*          subsequent processing steps via the BPM parameter in other
-*          SCUBA-2 SMURF commands.
+ *  ADAM Parameters:
+ *     BPM = NDF (Read)
+ *          Group of files to be used as bad pixel masks. Each data file
+ *          specified with the IN parameter will be masked. The corresponding
+ *          previous mask for a subarray will be used. If there is no previous
+ *          mask the closest following will be used. It is not an error for
+ *          no mask to match. A NULL parameter indicates no mask files to be
+ *          supplied. [!]
+ *     IN = NDF (Read)
+ *          Input files to be processed. Non-darks will be filtered out.
+ *     MSG_FILTER = _CHAR (Read)
+ *          Control the verbosity of the application. Values can be
+ *          NONE (no messages), QUIET (minimal messages), NORMAL,
+ *          VERBOSE, DEBUG or ALL. [NORMAL]
+ *     OUT = NDF (Write)
+ *          Output dark files. These can be used as bad pixel masks in
+ *          subsequent processing steps via the BPM parameter in other
+ *          SCUBA-2 SMURF commands.
 
-*  Related Applications:
-*     SMURF: FLATFIELD, MAKEMAP
+ *  Related Applications:
+ *     SMURF: FLATFIELD, MAKEMAP
 
-*  Authors:
-*     Tim Jenness (JAC, Hawaii)
-*     Andy Gibb (JAC, Hawaii)
-*     {enter_new_authors_here}
+ *  Authors:
+ *     Tim Jenness (JAC, Hawaii)
+ *     Andy Gibb (JAC, Hawaii)
+ *     {enter_new_authors_here}
 
-*  History:
-*     2008-08-22 (TIMJ):
-*        Initial version.
-*     2008-11-12 (AGG)
-*        Check status before beginning loop
-*     2008-12-12 (TIMJ):
-*        Allow BPM masking.
-*     {enter_further_changes_here}
+ *  History:
+ *     2008-08-22 (TIMJ):
+ *        Initial version.
+ *     2008-11-12 (AGG)
+ *        Check status before beginning loop
+ *     2008-12-12 (TIMJ):
+ *        Allow BPM masking.
+ *     {enter_further_changes_here}
 
-*  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council,
-*     the University of British Columbia.
-*     All Rights Reserved.
+ *  Copyright:
+ *     Copyright (C) 2008 Science and Technology Facilities Council,
+ *     the University of British Columbia.
+ *     All Rights Reserved.
 
-*  Licence:
-*     This program is free software; you can redistribute it and/or
-*     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 3 of
-*     the License, or (at your option) any later version.
-*
-*     This program is distributed in the hope that it will be
-*     useful, but WITHOUT ANY WARRANTY; without even the implied
-*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
-*
-*     You should have received a copy of the GNU General Public
-*     License along with this program; if not, write to the Free
-*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-*     MA 02111-1307, USA
+ *  Licence:
+ *     This program is free software; you can redistribute it and/or
+ *     modify it under the terms of the GNU General Public License as
+ *     published by the Free Software Foundation; either version 3 of
+ *     the License, or (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be
+ *     useful, but WITHOUT ANY WARRANTY; without even the implied
+ *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ *     PURPOSE. See the GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public
+ *     License along with this program; if not, write to the Free
+ *     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+ *     MA 02111-1307, USA
 
-*  Bugs:
-*     {note_any_bugs_here}
-*-
-*/
+ *  Bugs:
+ *     {note_any_bugs_here}
+ *-
+ */
 
 #if HAVE_CONFIG_H
 #include <config.h>

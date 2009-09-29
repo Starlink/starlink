@@ -1,10 +1,10 @@
 /*
  *+
  *  Name:
- *     SC2FFT
+ *     CALCNOISE
 
  *  Purpose:
- *     Fourier Transform SCUBA-2 time-series data
+ *     Calculate noise image
 
  *  Language:
  *     Starlink ANSI C
@@ -13,68 +13,52 @@
  *     ADAM A-task
 
  *  Invocation:
- *     smurf_sc2fft( int *status );
+ *     smurf_calcnoise( int *status );
 
  *  Arguments:
  *     status = int* (Given and Returned)
  *        Pointer to global status.
 
  *  Description:
- *     This routine performs for the forward or inverse FFT of SCUBA-2 data.
- *     The FFT of the data are stored in a 4-dimensional array with dimensions
- *     frequency, xbolo, ybolo, component (where component is a dimension
- *     of length 2 holding the real and imaginary parts). The inverse flag
- *     is used to transform back to the time domain from the frequency domain.
- *     If the data are already in the requested domain, the ouput file is
- *     simply a copy of the input file.
+ *     This routine calculates the white noise on the array by performing
+ *     an FFT to generate a power spectrum and then extracting the
+ *     data between two frequency ranges.
 
  *  Notes:
  *     Transforming data loses the VARIANCE and QUALITY components.
 
  *  ADAM Parameters:
+ *     FREQ = _REAL (Given)
+ *          Frequency range (Hz) to use to calculate the white noise [2,10]
  *     IN = NDF (Read)
- *          Input files to be transformed
- *     INVERSE = _LOGICAL (Read)
- *          If true perform inverse transform
+ *          Input files to be transformed. Files from the same sequence
+ *          will be combined. Note that
  *     MSG_FILTER = _CHAR (Read)
  *          Control the verbosity of the application. Values can be
  *          NONE (no messages), QUIET (minimal messages), NORMAL,
  *          VERBOSE, DEBUG or ALL. [NORMAL]
  *     OUT = NDF (Write)
- *          Output files
+ *          Output files. Number of output files may differ from the
+ *          number of input files.
  *     OUTFILES = LITERAL (Write)
  *          The name of text file to create, in which to put the names of
  *          all the output NDFs created by this application (one per
  *          line). If a null (!) value is supplied no file is created. [!]
- *     POLAR = _LOGICAL (Read)
- *          If true use polar representation (amplitude,argument) of FFT
- *     POWER = _LOGICAL (Read)
- *          If set use polar representation of FFT with squared amplitudes
 
  *  Related Applications:
- *     SMURF: SC2CONCAT, SC2CLEAN
+ *     SMURF: SC2CONCAT, SC2CLEAN, SC2FFT
 
  *  Authors:
- *     Edward Chapin (UBC)
  *     Tim Jenness (JAC, Hawaii)
  *     {enter_new_authors_here}
 
  *  History:
- *     2008-07-22 (EC):
- *        Initial version - based on sc2clean task
- *     2008-07-25 (TIMJ):
- *        Use kaplibs for group in/out.
- *     2008-07-30 (EC):
- *        Handle raw data (filter out / apply darks, flatfield)
- *     2009-03-30 (TIMJ):
- *        Add OUTFILES parameter.
- *     2009-04-30 (EC):
- *        Use threads
+ *     2009-09-24 (EC):
+ *        Initial version - based on sc2fft task
  *     {enter_further_changes_here}
 
  *  Copyright:
- *     Copyright (C) 2008-2009 Science and Technology Facilities Council.
- *     Copyright (C) 2008-2009 University of British Columbia.
+ *     Copyright (C) 2009 Science and Technology Facilities Council.
  *     All Rights Reserved.
 
  *  Licence:
@@ -121,8 +105,8 @@
 #include "libsmf/smf_err.h"
 #include "sc2da/sc2store.h"
 
-#define FUNC_NAME "smurf_sc2fft"
-#define TASK_NAME "SC2FFT"
+#define FUNC_NAME "smurf_calcnoise"
+#define TASK_NAME "CALCNOISE"
 
 void smurf_sc2fft( int *status ) {
 
