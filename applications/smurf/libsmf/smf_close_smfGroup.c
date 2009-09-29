@@ -1,70 +1,70 @@
 /*
-*+
-*  Name:
-*     smf_close_smfGroup
+ *+
+ *  Name:
+ *     smf_close_smfGroup
 
-*  Purpose:
-*     Free resources associated with a smfGroup
+ *  Purpose:
+ *     Free resources associated with a smfGroup
 
-*  Language:
-*     Starlink ANSI C
+ *  Language:
+ *     Starlink ANSI C
 
-*  Type of Module:
-*     SMURF subroutine
+ *  Type of Module:
+ *     SMURF subroutine
 
-*  Invocation:
-*     smf_close_smfGroup( smfGroup *group, int *status );
+ *  Invocation:
+ *     smf_close_smfGroup( smfGroup *group, int *status );
 
-*  Arguments:
-*     group = smfGroup * (Given)
-*        Pointer to smfGroup to free
-*     status = int* (Given and Returned)
-*        Pointer to global status.
+ *  Arguments:
+ *     group = smfGroup * (Given)
+ *        Pointer to smfGroup to free
+ *     status = int* (Given and Returned)
+ *        Pointer to global status.
 
-*  Description:
-*     This routine frees all of the resources associated with the
-*     supplied smfGroup, setting it to a NULL pointer on exit.
+ *  Description:
+ *     This routine frees all of the resources associated with the
+ *     supplied smfGroup, setting it to a NULL pointer on exit.
 
-*  Notes:
+ *  Notes:
 
-*  Authors:
-*     Andy Gibb (UBC)
-*     {enter_new_authors_here}
+ *  Authors:
+ *     Andy Gibb (UBC)
+ *     {enter_new_authors_here}
 
-*  History:
-*     2006-07-04 (AGG):
-*        Initial version
-*     2007-12-18 (AGG):
-*        Update to use new smf_free behaviour
-*     2008-04-03 (AGG):
-*        Free resources even if status is bad
-*     2008-04-16 (EC):
-*        Free chunk
+ *  History:
+ *     2006-07-04 (AGG):
+ *        Initial version
+ *     2007-12-18 (AGG):
+ *        Update to use new smf_free behaviour
+ *     2008-04-03 (AGG):
+ *        Free resources even if status is bad
+ *     2008-04-16 (EC):
+ *        Free chunk
 
-*  Copyright:
-*     Copyright (C) 2006-2008 University of British Columbia.  All
-*     Rights Reserved.
+ *  Copyright:
+ *     Copyright (C) 2006-2008 University of British Columbia.  All
+ *     Rights Reserved.
 
-*  Licence:
-*     This program is free software; you can redistribute it and/or
-*     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 3 of
-*     the License, or (at your option) any later version.
-*
-*     This program is distributed in the hope that it will be
-*     useful, but WITHOUT ANY WARRANTY; without even the implied
-*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
-*
-*     You should have received a copy of the GNU General Public
-*     License along with this program; if not, write to the Free
-*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-*     MA 02111-1307, USA
+ *  Licence:
+ *     This program is free software; you can redistribute it and/or
+ *     modify it under the terms of the GNU General Public License as
+ *     published by the Free Software Foundation; either version 3 of
+ *     the License, or (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be
+ *     useful, but WITHOUT ANY WARRANTY; without even the implied
+ *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ *     PURPOSE. See the GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public
+ *     License along with this program; if not, write to the Free
+ *     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+ *     MA 02111-1307, USA
 
-*  Bugs:
-*     {note_any_bugs_here}
-*-
-*/
+ *  Bugs:
+ *     {note_any_bugs_here}
+ *-
+ */
 
 #if HAVE_CONFIG_H
 #include <config.h>
@@ -117,32 +117,32 @@ void smf_close_smfGroup ( smfGroup **group, int *status ) {
       (*group)->chunk = smf_free( (*group)->chunk, status );
     } else {
       *status = SAI__ERROR;
-      errRep( FUNC_NAME, 
-	      "Input smfGroup has no chunk (possible programming error)", 
-	      status );
+      errRep( FUNC_NAME,
+              "Input smfGroup has no chunk (possible programming error)",
+              status );
     }
 
     /* Free subgroups */
     subgroups = (*group)->subgroups;
     if ( subgroups == NULL ) {
       if ( *status == SAI__OK ) {
-	*status = SAI__ERROR;
-	errRep( FUNC_NAME, "Input smfGroup has no subgroups (possible programming error)", status );
+        *status = SAI__ERROR;
+        errRep( FUNC_NAME, "Input smfGroup has no subgroups (possible programming error)", status );
       }
     } else {
       for ( i=0; i<(*group)->ngroups; i++) {
-	/* Retrieve pointer to array of indices */
-	if ( subgroups[i] == NULL ) {
-	  if ( *status == SAI__OK ) {
-	    msgSeti("I",i);
-	    *status = SAI__ERROR;
-	    errRep( FUNC_NAME, "Subgroup ^I is NULL (possible programming error)", status );
-	  }
-	} else {
-	  indices = subgroups[i];
-	  /* Free memory associated with current array of indices */
-	  indices = smf_free( indices, status );
-	}
+        /* Retrieve pointer to array of indices */
+        if ( subgroups[i] == NULL ) {
+          if ( *status == SAI__OK ) {
+            msgSeti("I",i);
+            *status = SAI__ERROR;
+            errRep( FUNC_NAME, "Subgroup ^I is NULL (possible programming error)", status );
+          }
+        } else {
+          indices = subgroups[i];
+          /* Free memory associated with current array of indices */
+          indices = smf_free( indices, status );
+        }
       }
     }
     /* Free pointer to subgroups */
