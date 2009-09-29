@@ -752,7 +752,6 @@ static void (* parent_clearobsalt)( AstFrame *, int * );
 static void (* parent_clearobslat)( AstFrame *, int * );
 static void (* parent_clearobslon)( AstFrame *, int * );
 static void (* parent_clearsystem)( AstFrame *, int * );
-static void (* parent_matchaxes)( AstFrame *, AstFrame *, int *, int * );
 static void (* parent_overlay)( AstFrame *, const int *, AstFrame *, int * );
 static void (* parent_setattrib)( AstObject *, const char *, int * );
 static void (* parent_setdut1)( AstFrame *, double, int * );
@@ -4420,9 +4419,6 @@ void astInitSkyFrameVtab_(  AstSkyFrameVtab *vtab, const char *name, int *status
    parent_cleardut1 = frame->ClearDut1;
    frame->ClearDut1 = ClearDut1;
 
-   parent_matchaxes = frame->MatchAxes;
-   frame->MatchAxes = MatchAxes;
-
 /* Store replacement pointers for methods which will be over-ridden by new
    member functions implemented here. */
    frame->Angle = Angle;
@@ -4443,6 +4439,7 @@ void astInitSkyFrameVtab_(  AstSkyFrameVtab *vtab, const char *name, int *status
    frame->LineOffset = LineOffset;
    frame->GetActiveUnit = GetActiveUnit;
    frame->TestActiveUnit = TestActiveUnit;
+   frame->MatchAxes = MatchAxes;
 
 /* Store pointers to inherited methods that will be invoked explicitly
    by this class. */

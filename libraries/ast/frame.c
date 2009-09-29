@@ -6605,7 +6605,7 @@ f     CALL AST_MATCHAXES( FRM1, FRM2, AXES, STATUS )
 *     will be set to zero if the associated axis within the first Frame
 *     has no corresponding axis within the second Frame. Otherwise, it
 *     will be set to the index (a non-zero positive integer) of the
-*     corresponding axis within the second supplied array.
+*     corresponding axis within the second supplied Frame.
 
 *  Parameters:
 c     frm1

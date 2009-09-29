@@ -915,6 +915,7 @@ static void GetRegionBounds2( AstRegion *, double *, double *, int * );
 static void GetRegionPoints( AstRegion *, int, int, int *, double *, int * );
 static void Intersect( AstFrame *, const double[2], const double[2], const double[2], const double[2], double[2], int * );
 static void LineOffset( AstFrame *, AstLineDef *, double, double, double[2], int * );
+static void MatchAxes( AstFrame *, AstFrame *, int *, int * );
 static void Negate( AstRegion *, int * );
 static void Norm( AstFrame *, double[], int * );
 static void NormBox( AstFrame *, double[], double[], AstMapping *, int * );
@@ -4327,6 +4328,7 @@ void astInitRegionVtab_(  AstRegionVtab *vtab, const char *name, int *status ) {
    frame->LineContains = LineContains;
    frame->LineCrossing = LineCrossing;
    frame->LineOffset = LineOffset;
+   frame->MatchAxes = MatchAxes;
 
    frame->GetActiveUnit = GetActiveUnit;
    frame->SetActiveUnit = SetActiveUnit;
@@ -5636,11 +5638,80 @@ static int Match( AstFrame *this_frame, AstFrame *target,
 /* Invoke the parent astMatch method on the current Frame within the
    encapsulated FrameSet within the Region. */
    fr = astGetFrame( ((AstRegion *) this_frame)->frameset, AST__CURRENT );
-   match = Match( fr, target, template_axes, target_axes, map, result, status );
+   match = astMatch( fr, target, template_axes, target_axes, map, result );
    fr = astAnnul( fr );
 
 /* Return the result. */
    return match;
+}
+
+static void MatchAxes( AstFrame *frm1_frame, AstFrame *frm2, int *axes, 
+                       int *status ) {
+/*
+*  Name:
+*     MatchAxes
+
+*  Purpose:
+*     Find any corresponding axes in two Frames.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "region.h"
+*     void MatchAxes( AstFrame *frm1, AstFrame *frm2, int *axes )
+*                     int *status )
+
+*  Class Membership:
+*     Region member function (over-rides the protected astMatchAxes
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function looks for corresponding axes within two supplied 
+*     Frames. An array of integers is returned that contains an element
+*     for each axis in the first supplied Frame. An element in this array 
+*     will be set to zero if the associated axis within the first Frame
+*     has no corresponding axis within the second Frame. Otherwise, it
+*     will be set to the index (a non-zero positive integer) of the
+*     corresponding axis within the second supplied array.
+
+*  Parameters:
+*     frm1
+*        Pointer to the first Frame.
+*     frm2
+*        Pointer to the second Frame.
+*     axes
+*        Pointer to an 
+*        integer array in which to return the indices of the axes (within
+*        the second Frame) that correspond to each axis within the first
+*        Frame. Axis indices start at 1. A value of zero will be stored
+*        in the returned array for each axis in the first Frame that has 
+*        no corresponding axis in the second Frame.
+*
+*        The number of elements in this array must be greater than or 
+*        equal to the number of axes in the first Frame.
+*     status
+*        Pointer to inherited status value.
+
+*  Notes:
+*     -  Corresponding axes are identified by the fact that a Mapping 
+*     can be found between them using astFindFrame or astConvert. Thus, 
+*     "corresponding axes" are not necessarily identical. For instance, 
+*     SkyFrame axes in two Frames will match even if they describe 
+*     different celestial coordinate systems
+*/
+
+/* Local Variables: */
+   AstFrame *frm1;               /* Pointer to Region's current Frame */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Invoke the parent astMatchAxes method on the current Frame within the
+   encapsulated FrameSet within the Region. */
+   frm1 = astGetFrame( ((AstRegion *) frm1_frame)->frameset, AST__CURRENT );
+   astMatchAxes( frm1, frm2, axes );
+   frm1 = astAnnul( frm1 );
 }
 
 static void Negate( AstRegion *this, int *status ) {

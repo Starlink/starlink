@@ -594,7 +594,6 @@ static void (* parent_clearepoch)( AstFrame *, int * );
 static void (* parent_clearobsalt)( AstFrame *, int * );
 static void (* parent_clearobslat)( AstFrame *, int * );
 static void (* parent_clearobslon)( AstFrame *, int * );
-static void (* parent_matchaxes)( AstFrame *, AstFrame *, int *, int * );
 static void (* parent_overlay)( AstFrame *, const int *, AstFrame *, int * );
 static void (* parent_setactiveunit)( AstFrame *, int, int * );
 static void (* parent_setattrib)( AstObject *, const char *, int * );
@@ -3896,9 +3895,6 @@ void astInitCmpFrameVtab_(  AstCmpFrameVtab *vtab, const char *name, int *status
    parent_getminaxes = frame->GetMinAxes;
    frame->GetMinAxes = GetMinAxes;
 
-   parent_matchaxes = frame->MatchAxes;
-   frame->MatchAxes = MatchAxes;
-
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
    frame->Abbrev = Abbrev;
@@ -3945,6 +3941,7 @@ void astInitCmpFrameVtab_(  AstCmpFrameVtab *vtab, const char *name, int *status
    frame->ValidateSystem = ValidateSystem;
    frame->SystemString = SystemString;
    frame->SystemCode = SystemCode;
+   frame->MatchAxes = MatchAxes;
 
 /* Declare the copy constructor, destructor and class dump
    function. */
@@ -4702,16 +4699,15 @@ static void MatchAxes( AstFrame *frm1_frame, AstFrame *frm2, int *axes,
    work = astMalloc( sizeof( int )*nax );
    if( astOK ) {
 
-/* Use the parent MatchAxes method inherited from the parent Frame
-   class to match axes in the first component Frame within CmpFrame 
-   "frm1". Write the associated axis indices into the first part of the
-   work array. */
-      (*parent_matchaxes)( frm1->frame1, frm2, work, status );
+/* Use the astMatchAxes method to match axes in the first component Frame 
+   within CmpFrame "frm1". Write the associated axis indices into the first 
+   part of the work array. */
+      astMatchAxes( frm1->frame1, frm2, work );
 
-/* Use the parent MatchAxes method to match axes in the second component 
+/* Use the MatchAxes method to match axes in the second component 
    Frame. Write the associated axis indices into the work array
    following the end of the values already in there. */
-      (*parent_matchaxes)( frm1->frame2, frm2, work + nax1, status );
+      astMatchAxes( frm1->frame2, frm2, work + nax1 );
 
 /* Obtain a pointer to the CmpFrame's axis permutation array. The index
    into "perm" represents the external axis index, and the value held in
