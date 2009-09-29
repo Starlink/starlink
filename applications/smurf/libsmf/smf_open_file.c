@@ -46,6 +46,7 @@
  *       SMF__NOCREATE_HEAD: Do not allocate smfHead
  *       SMF__NOCREATE_DATA: Do not map DATA/VARIANCE/QUALITY
  *       SMF__NOFIX_METADATA: Do not fix metadata using smf_fix_metadata
+ *       SMF__NOTTSERIES: File is not a time series file even if 3d
 
  *  Authors:
  *     Andy Gibb (UBC)
@@ -376,7 +377,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
       /* Note that the data should be of type _DOUBLE here */
       isFlat = 1;  /* Data have been flatfielded */
     }
-    isTseries = 1; /* Data are in time series format */
+    isTseries = ( flags & SMF__NOTTSERIES ? 0 : 1); /* Data are in time series format */
   } else {
     /* Report a warning due to non-standard dimensions for file */
     if ( *status == SAI__OK) {
@@ -501,7 +502,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
             }
             /* Attempt to create QUALITY component - assume we have
                write or update access at this point */
-            ndfMap( indf, "QUALITY", "_UBYTE", "WRITE", &outdata[2], &nout, 
+            ndfMap( indf, "QUALITY", "_UBYTE", "WRITE/ZERO", &outdata[2], &nout,
                     status );
           }
           /* Done with quality names so free resources */

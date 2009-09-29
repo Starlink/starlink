@@ -338,6 +338,7 @@ static const size_t SMF__BADIDX = (size_t)-1;
 #define SMF__NOCREATE_QUALITY 32 /* If !SMF__NOCREATE_DATA don't map QUALITY */
 #define SMF__NOCREATE_LUT 64     /* Don't open pointing LUT */
 #define SMF__NOFIX_METADATA 128 /* Do not fix up metadata */
+#define SMF__NOTTSERIES   256    /* File is not time series data */
 
 /* Data quality bit mask (bits in single byte for QUALITY arrays */
 #define SMF__Q_BADS 1     /* Bad sample (VAL__BADD) flagged by DA system  */
