@@ -727,7 +727,7 @@ static void Copy( const AstObject *, AstObject *, int * );
 static void Decompose( AstMapping *, AstMapping **, AstMapping **, int *, int *, int *, int * );
 static void Delete( AstObject *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
-static void MatchAxes( AstFrame *, AstFrame *, int *, int * );
+static void MatchAxesX( AstFrame *, AstFrame *, int *, int * );
 static void Norm( AstFrame *, double [], int * );
 static void NormBox( AstFrame *, double[], double[], AstMapping *, int * );
 static void Offset( AstFrame *, const double [], const double [], double, double [], int * );
@@ -4288,7 +4288,7 @@ void astInitCmpFrameVtab_(  AstCmpFrameVtab *vtab, const char *name, int *status
    frame->ValidateSystem = ValidateSystem;
    frame->SystemString = SystemString;
    frame->SystemCode = SystemCode;
-   frame->MatchAxes = MatchAxes;
+   frame->MatchAxesX = MatchAxesX;
 
 /* Declare the copy constructor, destructor and class dump
    function. */
@@ -4818,11 +4818,11 @@ static int Match( AstFrame *template_frame, AstFrame *target,
    return match;
 }
 
-static void MatchAxes( AstFrame *frm1_frame, AstFrame *frm2, int *axes, 
-                       int *status ) {
+static void MatchAxesX( AstFrame *frm2_frame, AstFrame *frm1, int *axes, 
+                        int *status ) {
 /*
 *  Name:
-*     MatchAxes
+*     MatchAxesX
 
 *  Purpose:
 *     Find any corresponding axes in two Frames.
@@ -4832,37 +4832,36 @@ static void MatchAxes( AstFrame *frm1_frame, AstFrame *frm2, int *axes,
 
 *  Synopsis:
 *     #include "cmpframe.h"
-*     void MatchAxes( AstFrame *frm1, AstFrame *frm2, int *axes )
-*                     int *status )
+*     void MatchAxesX( AstFrame *frm2, AstFrame *frm1, int *axes )
+*                      int *status )
 
 *  Class Membership:
-*     CmpFrame member function (over-rides the protected astMatchAxes
+*     CmpFrame member function (over-rides the protected astMatchAxesX
 *     method inherited from the Frame class).
 
 *  Description:
 *     This function looks for corresponding axes within two supplied 
 *     Frames. An array of integers is returned that contains an element
-*     for each axis in the first supplied Frame. An element in this array 
-*     will be set to zero if the associated axis within the first Frame
-*     has no corresponding axis within the second Frame. Otherwise, it
+*     for each axis in the second supplied Frame. An element in this array 
+*     will be set to zero if the associated axis within the second Frame
+*     has no corresponding axis within the first Frame. Otherwise, it
 *     will be set to the index (a non-zero positive integer) of the
-*     corresponding axis within the second supplied array.
+*     corresponding axis within the first supplied Frame.
 
 *  Parameters:
-*     frm1
-*        Pointer to the first Frame.
 *     frm2
 *        Pointer to the second Frame.
+*     frm1
+*        Pointer to the first Frame.
 *     axes
-*        Pointer to an 
-*        integer array in which to return the indices of the axes (within
-*        the second Frame) that correspond to each axis within the first
-*        Frame. Axis indices start at 1. A value of zero will be stored
-*        in the returned array for each axis in the first Frame that has 
-*        no corresponding axis in the second Frame.
+*        Pointer to an integer array in which to return the indices of 
+*        the axes (within the first Frame) that correspond to each axis 
+*        within the second Frame. Axis indices start at 1. A value of zero 
+*        will be stored in the returned array for each axis in the second
+*        Frame that has no corresponding axis in the first Frame.
 *
 *        The number of elements in this array must be greater than or 
-*        equal to the number of axes in the first Frame.
+*        equal to the number of axes in the second Frame.
 *     status
 *        Pointer to inherited status value.
 
@@ -4875,44 +4874,44 @@ static void MatchAxes( AstFrame *frm1_frame, AstFrame *frm2, int *axes,
 */
 
 /* Local Variables: */
-   AstCmpFrame *frm1;
+   AstCmpFrame *frm2;
    const int *perm;
    int *work;
    int i;
-   int nax1;
    int nax2;
+   int nax1;
    int nax;
 
 /* Check the global error status. */
    if ( !astOK ) return;
 
 /* Get a pointer to the CmpFrame. */
-   frm1 = (AstCmpFrame *) frm1_frame;   
+   frm2 = (AstCmpFrame *) frm2_frame;   
 
 /* Get the number of axes in the two component Frames, and the total
    number of axes in the CmpFrame. */
-   nax1 = astGetNaxes( frm1->frame1 );
-   nax2 = astGetNaxes( frm1->frame2 );
-   nax = nax1 + nax2;
+   nax2 = astGetNaxes( frm2->frame1 );
+   nax1 = astGetNaxes( frm2->frame2 );
+   nax = nax2 + nax1;
 
 /* Allocate a work array to hold the unpermuted axis indices */
    work = astMalloc( sizeof( int )*nax );
    if( astOK ) {
 
 /* Use the astMatchAxes method to match axes in the first component Frame 
-   within CmpFrame "frm1". Write the associated axis indices into the first 
+   within CmpFrame "frm2". Write the associated axis indices into the first 
    part of the work array. */
-      astMatchAxes( frm1->frame1, frm2, work );
+      astMatchAxes( frm1, frm2->frame1, work );
 
 /* Use the MatchAxes method to match axes in the second component 
    Frame. Write the associated axis indices into the work array
    following the end of the values already in there. */
-      astMatchAxes( frm1->frame2, frm2, work + nax1 );
+      astMatchAxes( frm1, frm2->frame2, work + nax2 );
 
 /* Obtain a pointer to the CmpFrame's axis permutation array. The index
    into "perm" represents the external axis index, and the value held in
    each element of "perm" represents the corresponding internal axis index. */
-      perm = astGetPerm( frm1 );
+      perm = astGetPerm( frm2 );
       if( astOK ) {
 
 /* Copy the frm2 axis indices from the work array into the returned "axes" 

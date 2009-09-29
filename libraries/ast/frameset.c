@@ -922,6 +922,7 @@ static void Delete( AstObject *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
 static void Intersect( AstFrame *, const double[2], const double[2], const double[2], const double[2], double[2], int * );
 static void MatchAxes( AstFrame *, AstFrame *, int *, int * );
+static void MatchAxesX( AstFrame *, AstFrame *, int *, int * );
 static void Norm( AstFrame *, double[], int * );
 static void NormBox( AstFrame *, double[], double[], AstMapping *, int * );
 static void Offset( AstFrame *, const double[], const double[], double, double[], int * );
@@ -5008,6 +5009,7 @@ void astInitFrameSetVtab_(  AstFrameSetVtab *vtab, const char *name, int *status
    frame->IsUnitFrame = IsUnitFrame;
    frame->Match = Match;
    frame->MatchAxes = MatchAxes;
+   frame->MatchAxesX = MatchAxesX;
    frame->Norm = Norm;
    frame->NormBox = NormBox;
    frame->Offset = Offset;
@@ -5906,11 +5908,11 @@ static void MatchAxes( AstFrame *frm1_frame, AstFrame *frm2, int *axes,
 *  Description:
 *     This function looks for corresponding axes within two supplied 
 *     Frames. An array of integers is returned that contains an element
-*     for each axis in the first supplied Frame. An element in this array 
-*     will be set to zero if the associated axis within the first Frame
-*     has no corresponding axis within the second Frame. Otherwise, it
+*     for each axis in the second supplied Frame. An element in this array 
+*     will be set to zero if the associated axis within the second Frame
+*     has no corresponding axis within the first Frame. Otherwise, it
 *     will be set to the index (a non-zero positive integer) of the
-*     corresponding axis within the second supplied array.
+*     corresponding axis within the first supplied Frame.
 
 *  Parameters:
 *     frm1
@@ -5947,11 +5949,81 @@ static void MatchAxes( AstFrame *frm1_frame, AstFrame *frm2, int *axes,
 /* Get a pointer to the current Frame in the FrameSet. */
    frm1 = astGetFrame( (AstFrameSet *) frm1_frame, AST__CURRENT );   
 
-/* Invoke the astMatchAxes method on the current Frame of the FrameSet. */
-   astMatchAxes( frm1, frm2, axes );
+/* Invoke the astMatchAxesX on the second Frame. */
+   astMatchAxesX( frm2, frm1, axes );
 
 /* Free resources */
    frm1 = astAnnul( frm1 );
+}
+
+static void MatchAxesX( AstFrame *frm2_frame, AstFrame *frm1, int *axes, 
+                        int *status ) {
+/*
+*  Name:
+*     MatchAxesX
+
+*  Purpose:
+*     Find any corresponding axes in two Frames.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "frameset.h"
+*     void MatchAxesX( AstFrame *frm2, AstFrame *frm1, int *axes )
+*                      int *status )
+
+*  Class Membership:
+*     FrameSet member function (over-rides the protected astMatchAxesX
+*     method inherited from the Frame class).
+
+*     This function looks for corresponding axes within two supplied 
+*     Frames. An array of integers is returned that contains an element
+*     for each axis in the second supplied Frame. An element in this array 
+*     will be set to zero if the associated axis within the second Frame
+*     has no corresponding axis within the first Frame. Otherwise, it
+*     will be set to the index (a non-zero positive integer) of the
+*     corresponding axis within the first supplied Frame.
+
+*  Parameters:
+*     frm2
+*        Pointer to the second Frame.
+*     frm1
+*        Pointer to the first Frame.
+*     axes
+*        Pointer to an integer array in which to return the indices of 
+*        the axes (within the first Frame) that correspond to each axis 
+*        within the second Frame. Axis indices start at 1. A value of zero 
+*        will be stored in the returned array for each axis in the second
+*        Frame that has no corresponding axis in the first Frame.
+*
+*        The number of elements in this array must be greater than or 
+*        equal to the number of axes in the second Frame.
+*     status
+*        Pointer to inherited status value.
+
+*  Notes:
+*     -  Corresponding axes are identified by the fact that a Mapping 
+*     can be found between them using astFindFrame or astConvert. Thus, 
+*     "corresponding axes" are not necessarily identical. For instance, 
+*     SkyFrame axes in two Frames will match even if they describe 
+*     different celestial coordinate systems
+*/
+
+/* Local Variables: */
+   AstFrame *frm2;
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Get a pointer to the current Frame in the FrameSet. */
+   frm2 = astGetFrame( (AstFrameSet *) frm2_frame, AST__CURRENT );   
+
+/* Invoke the astMatchAxesX on the current Frame. */
+   astMatchAxesX( frm2, frm1, axes );
+
+/* Free resources */
+   frm2 = astAnnul( frm2 );
 }
 
 static void Norm( AstFrame *this_frame, double value[], int *status ) {

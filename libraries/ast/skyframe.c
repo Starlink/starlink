@@ -913,7 +913,7 @@ static void Delete( AstObject *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
 static void Intersect( AstFrame *, const double[2], const double[2], const double[2], const double[2], double[2], int * );
 static void LineOffset( AstFrame *, AstLineDef *, double, double, double[2], int * );
-static void MatchAxes( AstFrame *, AstFrame *, int *, int * );
+static void MatchAxesX( AstFrame *, AstFrame *, int *, int * );
 static void Norm( AstFrame *, double[], int * );
 static void NormBox( AstFrame *, double[], double[], AstMapping *, int * );
 static void Offset( AstFrame *, const double[], const double[], double, double[], int * );
@@ -4439,7 +4439,7 @@ void astInitSkyFrameVtab_(  AstSkyFrameVtab *vtab, const char *name, int *status
    frame->LineOffset = LineOffset;
    frame->GetActiveUnit = GetActiveUnit;
    frame->TestActiveUnit = TestActiveUnit;
-   frame->MatchAxes = MatchAxes;
+   frame->MatchAxesX = MatchAxesX;
 
 /* Store pointers to inherited methods that will be invoked explicitly
    by this class. */
@@ -6278,11 +6278,11 @@ static int Match( AstFrame *template_frame, AstFrame *target,
    return match;
 }
 
-static void MatchAxes( AstFrame *frm1_frame, AstFrame *frm2, int *axes, 
-                       int *status ) {
+static void MatchAxesX( AstFrame *frm2_frame, AstFrame *frm1, int *axes, 
+                        int *status ) {
 /*
 *  Name:
-*     MatchAxes
+*     MatchAxesX
 
 *  Purpose:
 *     Find any corresponding axes in two Frames.
@@ -6292,37 +6292,35 @@ static void MatchAxes( AstFrame *frm1_frame, AstFrame *frm2, int *axes,
 
 *  Synopsis:
 *     #include "skyframe.h"
-*     void MatchAxes( AstFrame *frm1, AstFrame *frm2, int *axes )
-*                     int *status )
+*     void MatchAxesX( AstFrame *frm2, AstFrame *frm1, int *axes )
+*                      int *status )
 
 *  Class Membership:
-*     SkyFrame member function (over-rides the protected astMatchAxes
+*     SkyFrame member function (over-rides the protected astMatchAxesX
 *     method inherited from the Frame class).
 
-*  Description:
 *     This function looks for corresponding axes within two supplied 
 *     Frames. An array of integers is returned that contains an element
-*     for each axis in the first supplied Frame. An element in this array 
-*     will be set to zero if the associated axis within the first Frame
-*     has no corresponding axis within the second Frame. Otherwise, it
+*     for each axis in the second supplied Frame. An element in this array 
+*     will be set to zero if the associated axis within the second Frame
+*     has no corresponding axis within the first Frame. Otherwise, it
 *     will be set to the index (a non-zero positive integer) of the
-*     corresponding axis within the second supplied array.
+*     corresponding axis within the first supplied Frame.
 
 *  Parameters:
-*     frm1
-*        Pointer to the first Frame.
 *     frm2
 *        Pointer to the second Frame.
+*     frm1
+*        Pointer to the first Frame.
 *     axes
-*        Pointer to an 
-*        integer array in which to return the indices of the axes (within
-*        the second Frame) that correspond to each axis within the first
-*        Frame. Axis indices start at 1. A value of zero will be stored
-*        in the returned array for each axis in the first Frame that has 
-*        no corresponding axis in the second Frame.
+*        Pointer to an integer array in which to return the indices of 
+*        the axes (within the first Frame) that correspond to each axis 
+*        within the second Frame. Axis indices start at 1. A value of zero 
+*        will be stored in the returned array for each axis in the second
+*        Frame that has no corresponding axis in the first Frame.
 *
 *        The number of elements in this array must be greater than or 
-*        equal to the number of axes in the first Frame.
+*        equal to the number of axes in the second Frame.
 *     status
 *        Pointer to inherited status value.
 
@@ -6337,9 +6335,9 @@ static void MatchAxes( AstFrame *frm1_frame, AstFrame *frm2, int *axes,
 /* Local Variables: */
    AstFrame *resfrm;          
    AstMapping *resmap;              
-   AstSkyFrame *frm1;
-   int *frm1_axes;
+   AstSkyFrame *frm2;
    int *frm2_axes;
+   int *frm1_axes;
    int max_axes;
    int min_axes;
    int preserve_axes;
@@ -6348,48 +6346,48 @@ static void MatchAxes( AstFrame *frm1_frame, AstFrame *frm2, int *axes,
    if ( !astOK ) return;
 
 /* Get a pointer to the SkyFrame. */
-   frm1 = (AstSkyFrame *) frm1_frame;   
+   frm2 = (AstSkyFrame *) frm2_frame;   
 
 /* Temporarily ensure that the PreserveAxes attribute is non-zero in
-   the second supplied Frame. This means thte result Frame returned by
+   the first supplied Frame. This means thte result Frame returned by
    astMatch below will have the axis count and order of the target Frame
    (i.e. "pfrm"). */
-   if( astTestPreserveAxes( frm2 ) ) {
-      preserve_axes = astGetPreserveAxes( frm2 ) ? 1 : 0;
+   if( astTestPreserveAxes( frm1 ) ) {
+      preserve_axes = astGetPreserveAxes( frm1 ) ? 1 : 0;
    } else {
       preserve_axes = -1;
    }
-   astSetPreserveAxes( frm2, 1 );
+   astSetPreserveAxes( frm1, 1 );
 
 /* Temporarily ensure that the MaxAxes and MinAxes attributes in the
-   second supplied Frame are set so the Frame can be used as a template
+   first supplied Frame are set so the Frame can be used as a template
    in astMatch for matching any number of axes. */
-   if( astTestMaxAxes( frm2 ) ) {
-      max_axes = astGetMaxAxes( frm2 );
+   if( astTestMaxAxes( frm1 ) ) {
+      max_axes = astGetMaxAxes( frm1 );
    } else {
       max_axes = -1;
    }
 
-   astSetMinAxes( frm2, 10000 );
-   if( astTestMinAxes( frm2 ) ) {
-      min_axes = astGetMinAxes( frm2 );
+   astSetMinAxes( frm1, 10000 );
+   if( astTestMinAxes( frm1 ) ) {
+      min_axes = astGetMinAxes( frm1 );
    } else {
       min_axes = -1;
    }
-   astSetMinAxes( frm2, 1 );
+   astSetMinAxes( frm1, 1 );
 
-/* Attempt to find a sub-frame within the second supplied Frame that
+/* Attempt to find a sub-frame within the first supplied Frame that
    corresponds to the supplied SkyFrame. */
-   if( astMatch( frm2, frm1, &frm2_axes, &frm1_axes, &resmap, &resfrm ) ) {
+   if( astMatch( frm1, frm2, &frm1_axes, &frm2_axes, &resmap, &resfrm ) ) {
 
-/* If successfull, Store the one-based index within "frm" of the 
+/* If successfull, Store the one-based index within "frm1" of the 
    corresponding axes. */
-      axes[ 0 ] = frm2_axes[ 0 ] + 1;
-      axes[ 1 ] = frm2_axes[ 1 ] + 1;
+      axes[ 0 ] = frm1_axes[ 0 ] + 1;
+      axes[ 1 ] = frm1_axes[ 1 ] + 1;
 
 /* Free resources */
-      frm2_axes = astFree( frm2_axes );
       frm1_axes = astFree( frm1_axes );
+      frm2_axes = astFree( frm2_axes );
       resmap = astAnnul( resmap );
       resfrm = astAnnul( resfrm );
 
@@ -6399,23 +6397,23 @@ static void MatchAxes( AstFrame *frm1_frame, AstFrame *frm2, int *axes,
       axes[ 1 ] = 0;
    }
 
-/* Re-instate the original attribute values in the second supplied Frame. */
+/* Re-instate the original attribute values in the first supplied Frame. */
    if( preserve_axes == -1 ) {
-      astClearPreserveAxes( frm2 );
+      astClearPreserveAxes( frm1 );
    } else {
-      astSetPreserveAxes( frm2, preserve_axes );
+      astSetPreserveAxes( frm1, preserve_axes );
    }
 
    if( max_axes == -1 ) {
-      astClearMaxAxes( frm2 );
+      astClearMaxAxes( frm1 );
    } else {
-      astSetMaxAxes( frm2, max_axes );
+      astSetMaxAxes( frm1, max_axes );
    }
 
    if( min_axes == -1 ) {
-      astClearMinAxes( frm2 );
+      astClearMinAxes( frm1 );
    } else {
-      astSetMinAxes( frm2, min_axes );
+      astSetMinAxes( frm1, min_axes );
    }
 }
 

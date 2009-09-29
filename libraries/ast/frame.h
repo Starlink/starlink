@@ -717,6 +717,7 @@ typedef struct AstFrameVtab {
    struct AstFrameSet *(* ConvertX)( AstFrame *, AstFrame *, const char *, int * );
    struct AstFrameSet *(* FindFrame)( AstFrame *, AstFrame *, const char *, int * );
    void (* MatchAxes)( AstFrame *, AstFrame *, int[], int * );
+   void (* MatchAxesX)( AstFrame *, AstFrame *, int[], int * );
    void (* CheckPerm)( AstFrame *, const int *, const char *, int * );
    void (* ClearDigits)( AstFrame *, int * );
    void (* ClearDirection)( AstFrame *, int, int * );
@@ -912,6 +913,7 @@ void astPermAxesId_( AstFrame *, const int[], int * );
 int astAxIn_( AstFrame *, int, double, double, double, int, int * );
 AstAxis * astGetAxis_( AstFrame *, int, int * );
 AstFrameSet *astConvertX_( AstFrame *, AstFrame *, const char *, int * );
+void astMatchAxesX_( AstFrame *, AstFrame *, int[], int * );
 AstLineDef *astLineDef_( AstFrame *, const double[2], const double[2], int * );
 AstPointSet *astResolvePoints_( AstFrame *, const double [], const double [], AstPointSet *, AstPointSet *, int * );
 const char *astAbbrev_( AstFrame *, int, const char *, const char *, const char *, int * );
@@ -1290,6 +1292,9 @@ astINVOKE(V,astTestUnit_(astCheckFrame(this),axis,STATUS_PTR))
 astINVOKE(V,astValidateAxis_(astCheckFrame(this),axis,method,STATUS_PTR))
 #define astValidateAxisSelection(this,naxes,axes,method) \
 astINVOKE(V,astValidateAxisSelection_(astCheckFrame(this),naxes,axes,method,STATUS_PTR))
+
+#define astMatchAxesX(frm2,frm1,axes) \
+astINVOKE(V,astMatchAxesX_(astCheckFrame(frm2),astCheckFrame(frm1),axes,STATUS_PTR))
 
 #define astFmtDecimalYr(year,digits) astFmtDecimalYr_(year,digits,STATUS_PTR)
 #define astReadDateTime(value) astReadDateTime_(value,STATUS_PTR)

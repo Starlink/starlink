@@ -260,7 +260,7 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *     18-JUN-2000 (DSB):
 *        Added ObsAlt attribute.
 *     28-SEP-2009 (DSB):
-*        Added astMatchAXes method.
+*        Added astMatchAxes method.
 *class--
 */
 
@@ -786,6 +786,7 @@ static AstFrameSet *Convert( AstFrame *, AstFrame *, const char *, int * );
 static AstFrameSet *ConvertX( AstFrame *, AstFrame *, const char *, int * );
 static AstFrameSet *FindFrame( AstFrame *, AstFrame *, const char *, int * );
 static void MatchAxes( AstFrame *, AstFrame *, int *, int * );
+static void MatchAxesX( AstFrame *, AstFrame *, int *, int * );
 static AstLineDef *LineDef( AstFrame *, const double[2], const double[2], int * );
 static AstPointSet *ResolvePoints( AstFrame *, const double [], const double [], AstPointSet *, AstPointSet *, int * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
@@ -5314,6 +5315,7 @@ void astInitFrameVtab_(  AstFrameVtab *vtab, const char *name, int *status ) {
    vtab->Fields = Fields;
    vtab->FindFrame = FindFrame;
    vtab->MatchAxes = MatchAxes;
+   vtab->MatchAxesX = MatchAxesX;
    vtab->Format = Format;
    vtab->Gap = Gap;
    vtab->GetAxis = GetAxis;
@@ -6601,11 +6603,11 @@ f     CALL AST_MATCHAXES( FRM1, FRM2, AXES, STATUS )
 *  Description:
 *     This function looks for corresponding axes within two supplied 
 *     Frames. An array of integers is returned that contains an element
-*     for each axis in the first supplied Frame. An element in this array 
-*     will be set to zero if the associated axis within the first Frame
-*     has no corresponding axis within the second Frame. Otherwise, it
+*     for each axis in the second supplied Frame. An element in this array 
+*     will be set to zero if the associated axis within the second Frame
+*     has no corresponding axis within the first Frame. Otherwise, it
 *     will be set to the index (a non-zero positive integer) of the
-*     corresponding axis within the second supplied Frame.
+*     corresponding axis within the first supplied Frame.
 
 *  Parameters:
 c     frm1
@@ -6619,13 +6621,13 @@ f     AXES = INTEGER( * ) (Returned)
 c        Pointer to an 
 f        An
 *        integer array in which to return the indices of the axes (within
-*        the second Frame) that correspond to each axis within the first
+*        the first Frame) that correspond to each axis within the second
 *        Frame. Axis indices start at 1. A value of zero will be stored
-*        in the returned array for each axis in the first Frame that has 
-*        no corresponding axis in the second Frame.
+*        in the returned array for each axis in the second Frame that has 
+*        no corresponding axis in the first Frame.
 *
 *        The number of elements in this array must be greater than or 
-*        equal to the number of axes in the first Frame.
+*        equal to the number of axes in the second Frame.
 f     STATUS = INTEGER (Given and Returned)
 f        The global status.
 
@@ -6642,18 +6644,70 @@ f     AST_FINDFRAME or AST_CONVERT.
 *     instance, SkyFrame axes in two Frames will match even if they
 *     describe different celestial coordinate systems
 *--
+
+* Implementation Notes:
+*    This function is simply a wrap-up for the protected astMatchAxesX
+*    method which performs the required processing but swaps the order
+*    of the first two arguments. This is a trick to allow the
+*    astMatchAxes method to be over-ridden by derived classes on the
+*    basis of the class of either of the first two arguments.
+*
+*    In practice, each class that represents an encapsulated Frame (e.g.
+*    FrameSet, Region, etc) should over-ride this method, extracting a
+*    Frame from the supplied "frm1" pointer, and the ninvoking
+*    astMatchAxesX.
+
+*/
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Invoke the "astMatchAxesX" method with the first two arguments
+   swapped. */
+   astMatchAxesX( frm2, frm1, axes );
+}
+
+static void MatchAxesX( AstFrame *frm2, AstFrame *frm1, int *axes, 
+                        int *status ) {
+/*
+*+
+*  Name:
+*     astMatchAxesX
+
+*  Purpose:
+*     Find any corresponding axes in two Frames.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "frame.h"
+*     void astMatchAxesX( AstFrame *frm2, AstFrame *frm1, int *axes )
+
+*  Class Membership:
+*     Frame method.
+
+*  Description:
+*     This function performs the processing for the public astMatchAxes
+*     method and has exactly the same interface except that the order
+*     of the first two arguments is swapped. This is a trick to allow
+*     the astMatchAxes method to be over-ridden by derived classes on
+*     the basis of the class of either of its first two arguments.
+*
+*     See the astMatchAxes method for details of the interface.
+*-
 */
 
 /* Local Variables: */
    AstFrame *pfrm;               
    AstFrame *resfrm;          
    AstMapping *resmap;              
-   int *frm2_axes;
+   int *frm1_axes;
    int *pfrm_axes;
    int ifirst;
    int max_axes;
    int min_axes;
-   int nax1;
+   int nax2;
    int pax;
    int preserve_axes;
 
@@ -6664,50 +6718,49 @@ f     AST_FINDFRAME or AST_CONVERT.
    the second supplied Frame. This means thte result Frame returned by
    astMatch below will have the axis count and order of the target Frame
    (i.e. "pfrm"). */
-   if( astTestPreserveAxes( frm2 ) ) {
-      preserve_axes = astGetPreserveAxes( frm2 ) ? 1 : 0;
+   if( astTestPreserveAxes( frm1 ) ) {
+      preserve_axes = astGetPreserveAxes( frm1 ) ? 1 : 0;
    } else {
       preserve_axes = -1;
    }
-   astSetPreserveAxes( frm2, 1 );
+   astSetPreserveAxes( frm1, 1 );
 
 /* Temporarily ensure that the MaxAxes and MinAxes attributes in the
    second supplied Frame are set so the Frame can be used as a template
    in astMatch for matching any number of axes. */
-   if( astTestMaxAxes( frm2 ) ) {
-      max_axes = astGetMaxAxes( frm2 );
+   if( astTestMaxAxes( frm1 ) ) {
+      max_axes = astGetMaxAxes( frm1 );
    } else {
       max_axes = -1;
    }
 
-   astSetMinAxes( frm2, 10000 );
-   if( astTestMinAxes( frm2 ) ) {
-      min_axes = astGetMinAxes( frm2 );
+   astSetMinAxes( frm1, 10000 );
+   if( astTestMinAxes( frm1 ) ) {
+      min_axes = astGetMinAxes( frm1 );
    } else {
       min_axes = -1;
    }
-   astSetMinAxes( frm2, 1 );
+   astSetMinAxes( frm1, 1 );
 
-/* Get the number of axes in the first supplied Frame. */
-   nax1 = astGetNaxes( frm1 );
+/* Get the number of axes in the frm2 Frame. */
+   nax2 = astGetNaxes( frm2 );
 
-/* Loop round the axes in the first Frame. */
-   for( ifirst = 0; ifirst < nax1; ifirst++ ) {
+/* Loop round the axes in the frm2 Frame. */
+   for( ifirst = 0; ifirst < nax2; ifirst++ ) {
 
-/* Identify the primary Frame defining the current axis in the first 
+/* Identify the primary Frame defining the current axis in the frm2 
    Frame. */
-      astPrimaryFrame( frm1, ifirst, &pfrm, &pax );
+      astPrimaryFrame( frm2, ifirst, &pfrm, &pax );
 
-/* Attempt to find a sub-frame within the second supplied Frame that
-   corresponds to this primary Frame. */
-      if( astMatch( frm2, pfrm, &frm2_axes, &pfrm_axes,
-                    &resmap, &resfrm ) ) {
+/* Attempt to find a sub-frame within the frm1 Frame that corresponds to 
+   this primary Frame. */
+      if( astMatch( frm1, pfrm, &frm1_axes, &pfrm_axes, &resmap, &resfrm ) ) {
 
-/* Store the one-based index within "frm" of the corresponding axis. */
-         axes[ ifirst ] = frm2_axes[ pax ] + 1;
+/* Store the one-based index within "frm1" of the corresponding axis. */
+         axes[ ifirst ] = frm1_axes[ pax ] + 1;
 
 /* Free resources */
-         frm2_axes = astFree( frm2_axes );
+         frm1_axes = astFree( frm1_axes );
          pfrm_axes = astFree( pfrm_axes );
          resmap = astAnnul( resmap );
          resfrm = astAnnul( resfrm );
@@ -6721,23 +6774,23 @@ f     AST_FINDFRAME or AST_CONVERT.
       pfrm = astAnnul( pfrm );
    }
 
-/* Re-instate the original attribute values in the second supplied Frame. */
+/* Re-instate the original attribute values in the frm1 Frame. */
    if( preserve_axes == -1 ) {
-      astClearPreserveAxes( frm2 );
+      astClearPreserveAxes( frm1 );
    } else {
-      astSetPreserveAxes( frm2, preserve_axes );
+      astSetPreserveAxes( frm1, preserve_axes );
    }
 
    if( max_axes == -1 ) {
-      astClearMaxAxes( frm2 );
+      astClearMaxAxes( frm1 );
    } else {
-      astSetMaxAxes( frm2, max_axes );
+      astSetMaxAxes( frm1, max_axes );
    }
 
    if( min_axes == -1 ) {
-      astClearMinAxes( frm2 );
+      astClearMinAxes( frm1 );
    } else {
-      astSetMinAxes( frm2, min_axes );
+      astSetMinAxes( frm1, min_axes );
    }
 }
 
@@ -13985,6 +14038,10 @@ AstFrameSet *astFindFrame_( AstFrame *target, AstFrame *template,
 void astMatchAxes_( AstFrame *frm1, AstFrame *frm2, int *axes, int *status ) {
    if ( !astOK ) return;
    (**astMEMBER(frm1,Frame,MatchAxes))( frm1, frm2, axes, status );
+}
+void astMatchAxesX_( AstFrame *frm2, AstFrame *frm1, int *axes, int *status ) {
+   if ( !astOK ) return;
+   (**astMEMBER(frm2,Frame,MatchAxesX))( frm2, frm1, axes, status );
 }
 const char *astFormat_( AstFrame *this, int axis, double value, int *status ) {
    if ( !astOK ) return NULL;

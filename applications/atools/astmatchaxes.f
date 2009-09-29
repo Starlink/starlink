@@ -22,11 +22,11 @@
 *  Description:
 *     This application looks for corresponding axes within two supplied 
 *     Frames. A list array of integers is displayed with one element
-*     for each axis in the first supplied Frame. An element in this list
-*     will be set to zero if the associated axis within the first Frame
-*     has no corresponding axis within the second Frame. Otherwise, it
+*     for each axis in the second supplied Frame. An element in this list
+*     will be set to zero if the associated axis within the second Frame
+*     has no corresponding axis within the first Frame. Otherwise, it
 *     will be set to the index (a non-zero positive integer) of the
-*     corresponding axis within the second supplied Frame.
+*     corresponding axis within the first supplied Frame.
 
 *  Usage:
 *     astmatchaxes frm1 frm2 
@@ -34,10 +34,10 @@
 *  ADAM Parameters:
 *     AXES() = _INTEGER (Write) 
 *        An output parameter to which is written an integer array holding 
-*        the indices of the axes (within the second Frame) that correspond to 
-*        each axis within the first Frame. Axis indices start at 1. A value 
+*        the indices of the axes (within the first Frame) that correspond to 
+*        each axis within the second Frame. Axis indices start at 1. A value 
 *        of zero will be stored in the returned array for each axis in the 
-*        first Frame that has no corresponding axis in the second Frame.
+*        second Frame that has no corresponding axis in the first Frame.
 *     FRM1 = LITERAL (Read)
 *        An NDF or text file holding the first Frame or FrameSet. If an NDF
 *        is supplied, the WCS FrameSet will be used. 
@@ -135,8 +135,8 @@
       CALL MSG_BLANK( STATUS )
 
       TEXT = ' '
-      TEXT( COL1: ) = 'FRM1'
-      TEXT( COL2: ) = 'FRM2'
+      TEXT( COL1: ) = 'FRM2'
+      TEXT( COL2: ) = 'FRM1'
       CALL MSG_OUT( ' ', TEXT, STATUS)
 
       TEXT = ' '
@@ -146,19 +146,19 @@
 
       ATTR = 'Label('
 
-      NAX = AST_GETI( FRM1, 'Naxes', STATUS )
+      NAX = AST_GETI( FRM2, 'Naxes', STATUS )
       DO I = 1, NAX
 
          IAT = 6
          CALL CHR_PUTI( I, ATTR, IAT )
          CALL CHR_APPND( ')', ATTR, IAT )
-         LAB1 = AST_GETC( FRM1, ATTR( : IAT ), STATUS )
+         LAB1 = AST_GETC( FRM2, ATTR( : IAT ), STATUS )
 
          IF( AXES( I ) .GT. 0 ) THEN
             IAT = 6
             CALL CHR_PUTI( AXES( I ), ATTR, IAT )
             CALL CHR_APPND( ')', ATTR, IAT )
-            LAB2 = AST_GETC( FRM2, ATTR( : IAT ), STATUS )
+            LAB2 = AST_GETC( FRM1, ATTR( : IAT ), STATUS )
          ELSE
             LAB2 = ' '
          END IF
