@@ -24,7 +24,9 @@
 *     gollowing a power law spectrum.
 
 *  ADAM Parameters:
-*     OBSFILE = GROUP (Read)
+*     FILENAME = _CHAR (Write)
+*          Name of the output file containing the sky noise image.
+*     OBSPAR = GROUP (Read)
 *          Specifies values for the observation parameters used by 
 *          skynoise generation. 
 *
@@ -59,7 +61,7 @@
 *          Seed for random number generator.  If a seed
 *          is not specified, the clock time in milliseconds
 *          is used.
-*     SIMFILE = GROUP (Read)
+*     SIMPAR = GROUP (Read)
 *          Specifies values for the simulation parameters.  See 
 *          the description for OBSFILE for the file format.
 *
