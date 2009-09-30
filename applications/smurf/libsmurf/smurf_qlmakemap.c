@@ -463,12 +463,6 @@ void smurf_qlmakemap( int *status ) {
     /* Update quality array */
     smf_update_quality( data, NULL, 1, NULL, 0.05, status );
 
-    /* Flag bolometers with DC steps as bad */
-    /*smf_correct_steps( data, NULL, 1000, 150, 1, status );*/
-
-    /* Clean off the dark squid signals */
-    smf_clean_dksquid( data, NULL, 0, 100, NULL, 0, 0, status );
-
     /* Check units are consistent */
     smf_check_units( i, data_units, data->hdr, status);
 
