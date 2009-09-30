@@ -16,11 +16,11 @@
 *     pntr = smf_construct_smfHead( smfHead * tofill, inst_t instrument,
 *              AstFrameSet * wcs, AstFrameSet * tswcs,
 *              AstFitsChan * fitshdr, const JCMTState * allState,
-*              dim_t curframe, smf_obsmode obsmode, smf_swmode swmode, 
+*              dim_t curframe, smf_obsmode obsmode, smf_swmode swmode,
 *              smf_obstype obstype, unsigned int ndet,
 *              const double fplanex[], const double fplaney[],
 *              const double detpos[], const char *detname, int dpazel,
-*              const double tsys[], 
+*              const double tsys[],
 *              const char title[], const char dlabel[], const char units[],
 *              const double telpos[], char *ocsconfig, int * status );
 
@@ -59,7 +59,7 @@
 *     fplanex = const double[] (Given)
 *        Y Coordinates of bolometers/receptors in the focal plane (radians)
 *     detpos = const double[] (Given)
-*        The position of the bolometers/receptors in tracking coordinates, 
+*        The position of the bolometers/receptors in tracking coordinates,
 *        in radians. This array should have a length of 2*ndet*nframes.
 *     detname = const char * (Given)
 *        A concatenated list of null-terminated detector names.
@@ -192,16 +192,16 @@
 
 smfHead *
 smf_construct_smfHead( smfHead * tofill, inst_t instrument,
-		       AstFrameSet * wcs, AstFrameSet * tswcs,
-		       AstFitsChan * fitshdr,
-		       JCMTState * allState, dim_t curframe,
-           const double instap[], dim_t nframes, double steptime,
-           smf_obsmode obsmode, smf_swmode swmode, smf_obstype obstype, unsigned int ndet,
-		       double fplanex[], double fplaney[],
-		       double detpos[], char *detname, 
-           int dpazel, double tsys[], const char title[],
-		       const char dlabel[], const char units[],
-           const double telpos[], char * ocsconfig, int * status ) {
+                       AstFrameSet * wcs, AstFrameSet * tswcs,
+                       AstFitsChan * fitshdr,
+                       JCMTState * allState, dim_t curframe,
+                       const double instap[], dim_t nframes, double steptime,
+                       smf_obsmode obsmode, smf_swmode swmode, smf_obstype obstype, unsigned int ndet,
+                       double fplanex[], double fplaney[],
+                       double detpos[], char *detname,
+                       int dpazel, double tsys[], const char title[],
+                       const char dlabel[], const char units[],
+                       const double telpos[], char * ocsconfig, int * status ) {
 
   smfHead * hdr = NULL;   /* Header components */
 

@@ -13,11 +13,11 @@
 *     Subroutine
 
 *  Invocation:
-*     pntr = smf_construct_smfData( smfData * tofill, smfFile * file, 
-*                      smfHead * hdr, smfDA * da, 
-*		       smf_dtype dtype, void * pntr[3], int isTordered, 
-*		       const dim_t dims[], int ndims,
-*		       int virtual, int ncoeff, double *poly, 
+*     pntr = smf_construct_smfData( smfData * tofill, smfFile * file,
+*                      smfHead * hdr, smfDA * da,
+*                      smf_dtype dtype, void * pntr[3], int isTordered,
+*                      const dim_t dims[], int ndims,
+*                      int virtual, int ncoeff, double *poly,
 *                      AstKeyMap * history, int * status );
 
 *  Arguments:
@@ -73,7 +73,7 @@
 *     - Free this memory using smf_close_file
 *     - Data arrays are not populated by this routine. The pointers
 *       are set to NULL.
-*     - The associated smfDream is currently left NULL (as returned 
+*     - The associated smfDream is currently left NULL (as returned
 *       from the call to smf_create_smfData)
 
 *  Authors:
@@ -137,13 +137,13 @@
 #define FUNC_NAME "smf_construct_smfData"
 
 smfData *
-smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr, 
-		       smfDA * da, smf_dtype dtype, 
-		       void * pntr[3], int isTordered, const dim_t dims[], 
-                       int ndims, int virtual, int ncoeff, double *poly, 
-		       AstKeyMap *history, int * status ) {
+smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr,
+                       smfDA * da, smf_dtype dtype,
+                       void * pntr[3], int isTordered, const dim_t dims[],
+                       int ndims, int virtual, int ncoeff, double *poly,
+                       AstKeyMap *history, int * status ) {
 
-  /* need to make sure that any memory we malloc will be freed on error 
+  /* need to make sure that any memory we malloc will be freed on error
      so make sure we NULL all pointers first. */
   smfData * data = NULL;   /* Main data struct */
   int i;
@@ -153,34 +153,34 @@ smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr,
 
   if (tofill == NULL) {
     /* Create a smfData without the extensions */
-    data = smf_create_smfData( SMF__NOCREATE_FILE | 
-			       SMF__NOCREATE_HEAD |
-			       SMF__NOCREATE_DA, status );
+    data = smf_create_smfData( SMF__NOCREATE_FILE |
+                               SMF__NOCREATE_HEAD |
+                               SMF__NOCREATE_DA, status );
   }
 
   if (*status == SAI__OK) {
 
     /* Attach components to smfData. In order to trap resource
-     issues, we make sure that we do not copy over a pre-existing 
-     struct */
+       issues, we make sure that we do not copy over a pre-existing
+       struct */
 
     if (data->file != NULL && file != NULL) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Attempt to overwrite pre-existing smfFile struct"
-	     " (possible programming error)",
-	     status);
+             " (possible programming error)",
+             status);
     }
     if (*status == SAI__OK && data->hdr != NULL && hdr != NULL) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Attempt to overwrite pre-existing smfHdr struct"
-	     " (possible programming error)",
-	     status);
+             " (possible programming error)",
+             status);
     }
     if (*status == SAI__OK &&  data->da != NULL && da != NULL) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Attempt to overwrite pre-existing smfDA struct"
-	     " (possible programming error)",
-	     status);
+             " (possible programming error)",
+             status);
     }
 
     if ( *status == SAI__OK ) {
@@ -191,15 +191,15 @@ smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr,
       if (da != NULL) data->da = da;
 
       /* Fill in other bits */
-      data->dtype = dtype; 
+      data->dtype = dtype;
       data->refcount = 1;
       data->virtual = virtual;
       for (i = 0; i < 3; i++ ) {
-	(data->pntr)[i] = pntr[i];
+        (data->pntr)[i] = pntr[i];
       }
       data->ndims = ndims;
       for (i = 0; i < ndims; i++ ) {
-	(data->dims)[i] = dims[i];
+        (data->dims)[i] = dims[i];
       }
       data->ncoeff = ncoeff;
       data->poly = poly;

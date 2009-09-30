@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     file = smf_construct_smfFile( smfFile * tofill, int ndfid,int isSc2store,
-*                 int isTstream, const char * name, HDSLoc* xloc, 
+*                 int isTstream, const char * name, HDSLoc* xloc,
 *                 int * status );
 
 *  Arguments:
@@ -111,8 +111,8 @@
 
 smfFile *
 smf_construct_smfFile(smfFile * tofill, int ndfid, int isSc2store,
-		      int isTstream, const char * name,
-		      int * status ) {
+                      int isTstream, const char * name,
+                      int * status ) {
 
   smfFile * file;
 

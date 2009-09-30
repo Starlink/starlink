@@ -179,7 +179,7 @@ smf_deepcopy_smfHead( const smfHead *old, int * status ) {
 
     fplaney = smf_malloc( ndet, sizeof(*fplaney), 0, status );
     if (fplaney) memcpy( fplaney, old->fplaney, ndet*sizeof(*fplaney) );
-  } 
+  }
 
   /* need to allocate detector positions */
   if (old->ndet > 0 && old->nframes > 0 && old->detpos) {
@@ -187,15 +187,15 @@ smf_deepcopy_smfHead( const smfHead *old, int * status ) {
     nframes = old->nframes;
     detpos = smf_malloc( 2*ndet*nframes, sizeof(*detpos), 0, status );
     if (detpos) memcpy( detpos, old->detpos, 2*ndet*nframes*sizeof(*detpos) );
-  } 
+  }
 
   /* need to allocate detector name array */
   if (old->ndet > 0 && old->detname) {
     ndet = old->ndet;
     detname = smf_malloc( ndet, strlen( old->detname ) + 1, 0, status );
-    if( detname ) memcpy( detname, old->detname, 
+    if( detname ) memcpy( detname, old->detname,
                           ndet*( strlen( old->detname ) + 1 ) );
-  } 
+  }
 
   /* Allocate Tsys array */
   if (old->ndet > 0 && old->tsys) {

@@ -78,7 +78,7 @@
 *  Copyright:
 *     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 *     Copyright (C) 2006-2007 Particle Physics and Astronomy Research
-*     Council. 
+*     Council.
 *     Copyright (C) 2006-2007 University of British Columbia.
 *     All Rights Reserved.
 
@@ -131,7 +131,7 @@ smf_create_smfHead( int * status ) {
 
   if (*status != SAI__OK) {
     errRep(FUNC_NAME,"Unable to allocate memory for smfHead structure",
-	   status );
+           status );
     return NULL;
   }
 

@@ -102,15 +102,15 @@ void smf_check_smfFile( const smfData *idata, smfData *odata, int * status ) {
       msgOutif(MSG__VERB," ", "NDF ID is zero, and filename is NULL. Assuming that is correct...", status);
     } else {
       if ( *status == SAI__OK ) {
-	*status = SAI__ERROR;
-	errRep(FUNC_NAME, "NDF ID is zero, but filename is set.", status);
+        *status = SAI__ERROR;
+        errRep(FUNC_NAME, "NDF ID is zero, but filename is set.", status);
       }
     }
   } else {
     if ( ofile->name == NULL) {
       if ( *status == SAI__OK ) {
-	*status = SAI__ERROR;
-	errRep(FUNC_NAME, "NDF ID is not zero, but filename is NULL.", status);
+        *status = SAI__ERROR;
+        errRep(FUNC_NAME, "NDF ID is not zero, but filename is NULL.", status);
       }
     }
   }
@@ -131,10 +131,10 @@ void smf_check_smfFile( const smfData *idata, smfData *odata, int * status ) {
   if ( !(ofile->isSc2store) ) {
     /* Check input value */
     if ( ifile->isSc2store == 1 ) {
-      
+
     }
   } else {
-    
+
   }
 
 }

@@ -86,8 +86,8 @@ int smf_validate_smfHead( const smfHead * hdr, int hasfits, int hasstate,
   if ( hdr == NULL ) {
     *status = SAI__ERROR;
     errRep( FUNC_NAME,
-	    "Supplied hdr is a NULL pointer. Possible programming error.",
-	    status);
+            "Supplied hdr is a NULL pointer. Possible programming error.",
+            status);
     return 0;
   }
 

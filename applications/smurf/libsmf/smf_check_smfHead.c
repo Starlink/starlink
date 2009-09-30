@@ -41,9 +41,9 @@
 *     2006-07-31 (TIMJ):
 *        Check fplanex/y and instrument
 *     2006-10-2 (DSB):
-*        Check detpos 
+*        Check detpos
 *     2006-11-6 (DSB):
-*        Check detname. 
+*        Check detname.
 *     2007-02-23 (AGG):
 *        Check instap
 *     2009-06-23 (TIMJ):
@@ -115,15 +115,15 @@ void smf_check_smfHead( const smfData *idata, smfData *odata, int * status ) {
   /* First check if INPUT WCS is null => we have time series data and
      we can forget about the WCS info for now */
   if (ihdr->wcs == NULL) {
-    msgOutif(MSG__DEBUG, "", 
-             "Input data are time series data: don't copy WCS as it is created later", 
+    msgOutif(MSG__DEBUG, "",
+             "Input data are time series data: don't copy WCS as it is created later",
              status);
     /* Set output WCS to null */
     ohdr->wcs = NULL;
   } else {
     owcs = ohdr->wcs;
     if ( owcs == NULL ) {
-      msgOutif(MSG__DEBUG," ", 
+      msgOutif(MSG__DEBUG," ",
                "Output data has no WCS, copying from input", status);
       /* Copy over WCS from input */
       owcs = astCopy(ihdr->wcs);
@@ -134,8 +134,8 @@ void smf_check_smfHead( const smfData *idata, smfData *odata, int * status ) {
       skyframe = astFindFrame( owcs, astSkyFrame(" "), " " );
       /* If no sky frame, copy the input WCS info using astCopy */
       if (skyframe == AST__NULL) {
-        msgOutif(MSG__DEBUG," ", 
-                 "Output FrameSet exists but does not have a SKYFRAME; copying WCS from input", 
+        msgOutif(MSG__DEBUG," ",
+                 "Output FrameSet exists but does not have a SKYFRAME; copying WCS from input",
                  status);
         owcs = astCopy(ihdr->wcs);
         ohdr->wcs = owcs;
@@ -148,7 +148,7 @@ void smf_check_smfHead( const smfData *idata, smfData *odata, int * status ) {
   /* Copy time series WCS if present and not in the output */
   if ( ihdr->tswcs != NULL ) {
     if (ohdr->tswcs == NULL) {
-      msgOutif(MSG__DEBUG," ", 
+      msgOutif(MSG__DEBUG," ",
                "Output data has no time series WCS, copying from input", status);
       /* Copy over WCS from input */
       ohdr->tswcs = astCopy(ihdr->tswcs);
@@ -224,13 +224,13 @@ void smf_check_smfHead( const smfData *idata, smfData *odata, int * status ) {
       ohdr->fplanex = smf_malloc( ihdr->ndet, sizeof(*(ohdr->fplanex)), 0,
                                   status );
       if (ohdr->fplanex) {
-        memcpy( ohdr->fplanex, ihdr->fplanex, 
+        memcpy( ohdr->fplanex, ihdr->fplanex,
                 ihdr->ndet * sizeof(*(ohdr->fplanex)));
       }
       ohdr->fplaney = smf_malloc( ihdr->ndet, sizeof(*(ohdr->fplaney)), 0,
                                   status );
       if (ohdr->fplaney) {
-        memcpy( ohdr->fplaney, ihdr->fplaney, 
+        memcpy( ohdr->fplaney, ihdr->fplaney,
                 ihdr->ndet * sizeof(*(ohdr->fplaney)));
       }
       ohdr->ndet = ihdr->ndet;
@@ -238,22 +238,22 @@ void smf_check_smfHead( const smfData *idata, smfData *odata, int * status ) {
 
     /* Detector positions */
     if (ohdr->detpos == NULL ){
-      ohdr->detpos = smf_malloc( 2*ihdr->ndet*ihdr->nframes, 
+      ohdr->detpos = smf_malloc( 2*ihdr->ndet*ihdr->nframes,
                                  sizeof(*(ohdr->detpos)), 0,
                                  status );
       if (ohdr->detpos) {
-        memcpy( ohdr->detpos, ihdr->detpos, 
+        memcpy( ohdr->detpos, ihdr->detpos,
                 2*ihdr->ndet*ihdr->nframes * sizeof(*(ohdr->detpos)));
       }
     }
 
     /* Detector names */
     if (ohdr->detname == NULL ){
-      ohdr->detname = smf_malloc( ihdr->ndet, 
+      ohdr->detname = smf_malloc( ihdr->ndet,
                                   ( strlen( ohdr->detname ) + 1 ), 0,
                                   status );
       if( ohdr->detname ) {
-        memcpy( ohdr->detname, ihdr->detname, 
+        memcpy( ohdr->detname, ihdr->detname,
                 ihdr->ndet*( strlen( ohdr->detname ) + 1 ) );
       }
     }
@@ -261,8 +261,8 @@ void smf_check_smfHead( const smfData *idata, smfData *odata, int * status ) {
     /* OCS Config */
     if (ohdr->ocsconfig == NULL ){
       ohdr->ocsconfig = smf_malloc( ihdr->ndet,
-                                  ( strlen( ohdr->ocsconfig ) + 1 ), 0,
-                                  status );
+                                    ( strlen( ohdr->ocsconfig ) + 1 ), 0,
+                                    status );
       if( ohdr->ocsconfig ) {
         strcpy( ohdr->ocsconfig, ihdr->ocsconfig );
       }

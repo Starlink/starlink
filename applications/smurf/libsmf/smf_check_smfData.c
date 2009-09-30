@@ -134,7 +134,7 @@ void smf_check_smfData( const smfData *idata, smfData *odata, const int flags, i
   } else {
     if ( odata->dtype != SMF__DOUBLE ) {
       *status = SAI__ERROR;
-      errRep( FUNC_NAME, 
+      errRep( FUNC_NAME,
               "Output data type is not set to _DOUBLE, possible programming error",
               status);
     }
@@ -142,7 +142,7 @@ void smf_check_smfData( const smfData *idata, smfData *odata, const int flags, i
 
   /* Check File if desired - this is important because we need to know that
      the smfData is associated with memory mapped information.
-   */
+  */
   if (! (flags & SMF__NOCREATE_FILE) ) {
     if ( odata->file == NULL ) {
       file = smf_deepcopy_smfFile( idata->file, status);
@@ -169,7 +169,7 @@ void smf_check_smfData( const smfData *idata, smfData *odata, const int flags, i
       msgSeti( "NDIMS", odata->ndims);
       msgSeti( "IDIMS", idata->ndims);
       *status = SAI__ERROR;
-      errRep( FUNC_NAME, 
+      errRep( FUNC_NAME,
               "Number of dimensions in output, ^NDIMS, is not equal to number in input, ^IDIMS", status);
     }
   }
@@ -185,7 +185,7 @@ void smf_check_smfData( const smfData *idata, smfData *odata, const int flags, i
         msgSeti( "IDIM", (idata->dims)[i] );
         msgSeti( "I", i+1 );
         *status = SAI__ERROR;
-        errRep( FUNC_NAME, 
+        errRep( FUNC_NAME,
                 "Size of axis ^I in output, ^ODIM, is not equal to size in input, ^IDIM", status);
       }
     }
@@ -242,8 +242,8 @@ void smf_check_smfData( const smfData *idata, smfData *odata, const int flags, i
   /* Handle QUALITY separately */
   if ( (idata->pntr)[2] != NULL ) {
     if ( (odata->pntr)[2] == NULL ) {
-    /* Check if output quality pntr is null. If so allocate memory and
-       copy over input QUALITY array */
+      /* Check if output quality pntr is null. If so allocate memory and
+         copy over input QUALITY array */
       (odata->pntr)[2] = smf_map_or_malloc( npts, SMF__UBYTE, 0, ondf, comps[2], status );
       memcpy( (odata->pntr)[2], (idata->pntr)[2], npts*sizeof(unsigned char) );
     }

@@ -86,8 +86,8 @@ int smf_validate_smfData( const smfData * data, int hashdr, int hasfile,
   if ( data == NULL ) {
     *status = SAI__ERROR;
     errRep( FUNC_NAME,
-	    "Supplied smfData is a NULL pointer. Possible programming error.",
-	    status);
+            "Supplied smfData is a NULL pointer. Possible programming error.",
+            status);
     return 0;
   }
 

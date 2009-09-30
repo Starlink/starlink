@@ -30,7 +30,7 @@
 *          - SMF__NOCREATE_DATA     Do not copy DATA component
 *          - SMF__NOCREATE_VARIANCE Do not copy VARIANCE component
 *          - SMF__NOCREATE_QUALITY  Do not copy QUALITY component
-*    
+*
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -127,8 +127,8 @@
 #define FUNC_NAME "smf_deepcopy_smfData"
 
 smfData *
-smf_deepcopy_smfData( const smfData *old, const int rawconvert, 
-		      const int flags, int * status ) {
+smf_deepcopy_smfData( const smfData *old, const int rawconvert,
+                      const int flags, int * status ) {
 
   int create[3];              /* Flag for copying each component */
   smfDA *da = NULL;           /* New smfDA */
@@ -174,7 +174,7 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
   }
 
   /* Set elements of create to reflect SMF__NOCREATE flags */
-  
+
   if( flags & SMF__NOCREATE_DATA ) {
     create[0] = 0;
   } else {
@@ -259,7 +259,7 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
     }
     poly = smf_malloc( npts, sizeof(double), 0, status);
     if ( *status != SAI__OK ) {
-      errRep(FUNC_NAME, 
+      errRep(FUNC_NAME,
              "Unable to allocate memory for polynomial coefficients", status);
       return NULL;
     }
@@ -283,8 +283,8 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
     da = smf_deepcopy_smfDA( old, status );
 
   /* Construct the new smfData */
-  new = smf_construct_smfData( new, file, hdr, da, dtype, pntr, isTordered, 
-                               dims, ndims, virtual, ncoeff, poly, history, 
+  new = smf_construct_smfData( new, file, hdr, da, dtype, pntr, isTordered,
+                               dims, ndims, virtual, ncoeff, poly, history,
                                status);
 
   return new;

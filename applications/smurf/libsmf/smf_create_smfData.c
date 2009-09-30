@@ -42,7 +42,7 @@
 *     - Free this memory using smf_close_file
 *     - Data arrays are not populated by this routine. The pointers
 *       are set to NULL.
-*     - The smfDream is initialized to NULL; it must be created and 
+*     - The smfDream is initialized to NULL; it must be created and
 *       attached separately.
 
 *  Authors:
@@ -112,7 +112,7 @@
 smfData *
 smf_create_smfData( int flags, int * status ) {
 
-  /* Need to make sure that any memory we malloc will be freed on error 
+  /* Need to make sure that any memory we malloc will be freed on error
      so make sure we NULL all pointers first. */
   smfData * data = NULL;   /* Main data struct */
   smfHead * hdr = NULL;    /* Data header */
@@ -123,7 +123,7 @@ smf_create_smfData( int flags, int * status ) {
   if (*status != SAI__OK) return NULL;
 
   data = smf_malloc( 1, sizeof(smfData), 0, status );
-  if (! (flags & SMF__NOCREATE_FILE) ) 
+  if (! (flags & SMF__NOCREATE_FILE) )
     file = smf_create_smfFile( status );
   if (! (flags & SMF__NOCREATE_HEAD) )
     hdr  = smf_create_smfHead( status );
@@ -133,7 +133,7 @@ smf_create_smfData( int flags, int * status ) {
   if (*status != SAI__OK) {
     /* Add our own message to the stack */
     errRep(FUNC_NAME, "Unable to allocate memory for smfData structure",
-	   status);
+           status);
     goto CLEANUP;
   }
 
@@ -145,7 +145,7 @@ smf_create_smfData( int flags, int * status ) {
   data->dream = NULL;
 
   /* Initialise remainder of smfData */
-  data->dtype = SMF__NULL; 
+  data->dtype = SMF__NULL;
   data->refcount = 1;
   data->virtual = 0;
   data->ndims = 0;
@@ -169,6 +169,6 @@ smf_create_smfData( int flags, int * status ) {
   file = smf_free( file, status );
   hdr = smf_free( hdr, status );
   da = smf_free( da, status );
-  
+
   return NULL;
 }
