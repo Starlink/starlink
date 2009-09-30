@@ -159,6 +159,8 @@
 *        Add flagstat to interface
 *     2009-07-31 (EC):
 *        Switch to 2d variance array (one value for each bolometer)
+*     2009-09-29 (EC):
+*        Allow multiple extinction correction methods
 *     {enter_further_changes_here}
 
 *  Copyright:
