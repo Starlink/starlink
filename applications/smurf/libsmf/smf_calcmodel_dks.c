@@ -29,7 +29,7 @@
 *     allmodel = smfArray ** (Returned)
 *        Array of smfArrays (each time chunk) to hold result of model calc
 *     flags = int (Given )
-*        Control flags: not used 
+*        Control flags: not used
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -46,7 +46,7 @@
 *     2008-09-30 (EC):
 *        Initial Version
 *     2009-04-17 (EC)
-*        - switch to subkeymap notation in config file 
+*        - switch to subkeymap notation in config file
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -87,13 +87,13 @@
 
 #define FUNC_NAME "smf_calcmodel_dks"
 
-void smf_calcmodel_dks( smfWorkForce *wf, smfDIMMData *dat, int chunk, 
-                        AstKeyMap *keymap, smfArray **allmodel, int flags, 
+void smf_calcmodel_dks( smfWorkForce *wf, smfDIMMData *dat, int chunk,
+                        AstKeyMap *keymap, smfArray **allmodel, int flags,
                         int *status) {
 
   /* Local Variables */
-  int boxcar_i=0;               /* width in samples of boxcar filter */ 
-  size_t boxcar=0;              /* Size of boxcar smooth window */  
+  int boxcar_i=0;               /* width in samples of boxcar filter */
+  size_t boxcar=0;              /* Size of boxcar smooth window */
   double *corrbuf=NULL;         /* Array of corr coeffs all bolos in this col */
   double *dksquid=NULL;         /* Pointer to current dark squid */
   double *gainbuf=NULL;         /* Array of gains for all bolos in this col */
@@ -116,7 +116,7 @@ void smf_calcmodel_dks( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   unsigned char *qua_data=NULL; /* Pointer to quality data */
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
-                                   
+
   /* Main routine */
   if (*status != SAI__OK) return;
 
@@ -137,9 +137,9 @@ void smf_calcmodel_dks( smfWorkForce *wf, smfDIMMData *dat, int chunk,
       *status = SAI__ERROR;
       msgSeti("BOX",boxcar_i);
       errRep("", FUNC_NAME ": DKS.BOXCAR in config file (^BOX) must be >= 0.",
-             status); 
+             status);
     }
-  } 
+  }
 
   /* Assert bolo-ordered data */
   for( idx=0; (*status==SAI__OK)&&(idx<res->ndat); idx++ ) {
@@ -164,17 +164,17 @@ void smf_calcmodel_dks( smfWorkForce *wf, smfDIMMData *dat, int chunk,
     qua_data = (qua->sdata[idx]->pntr)[0];
 
     /* Which QUALITY bits should be checked */
-    mask = ~(SMF__Q_JUMP|SMF__Q_STAT); 
+    mask = ~(SMF__Q_JUMP|SMF__Q_STAT);
 
     if( (res_data == NULL) || (model_data == NULL) || (qua_data == NULL) ) {
       *status = SAI__ERROR;
-      errRep("", FUNC_NAME ": Null data in inputs", status);      
+      errRep("", FUNC_NAME ": Null data in inputs", status);
     } else {
 
       if( flags&SMF__DIMM_FIRSTITER ) {
         msgOutif( MSG__VERB, "","   smoothing dark squids", status );
       } else {
-        msgOutif( MSG__VERB, "","   replacing signal from last iteration", 
+        msgOutif( MSG__VERB, "","   replacing signal from last iteration",
                   status );
       }
 
@@ -201,17 +201,17 @@ void smf_calcmodel_dks( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
           /* Continue if the bolo is OK */
           if( !(qua_data[index]&SMF__Q_BADB) ) {
-            
+
             if( flags&SMF__DIMM_FIRSTITER ) {
               /* For the first iteration we need to smooth the dark squids */
               smf_boxcar1D( dksquid, ntslice, boxcar, NULL, 0, status );
-              
+
             } else if( (gainbuf[j]!=VAL__BADD) && (offsetbuf[j]!=VAL__BADD) ) {
               for( k=0; k<ntslice; k++ ) {
                 /* If this isn't first iteration, put the previous iteration
-                   back into the signal */                
+                   back into the signal */
                 if( (res_data[index+k]!=VAL__BADD) && (dksquid[k]!=VAL__BADD)) {
-                  res_data[index+k] += dksquid[k]*gainbuf[j] + offsetbuf[j]; 
+                  res_data[index+k] += dksquid[k]*gainbuf[j] + offsetbuf[j];
                 }
 
               }
@@ -228,7 +228,3 @@ void smf_calcmodel_dks( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
   if( kmap ) kmap = astAnnul( kmap );
 }
-
-
-
-

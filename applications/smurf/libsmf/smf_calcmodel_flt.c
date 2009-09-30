@@ -29,7 +29,7 @@
 *     allmodel = smfArray ** (Returned)
 *        Array of smfArrays (each time chunk) to hold result of model calc
 *     flags = int (Given )
-*        Control flags: not used 
+*        Control flags: not used
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -48,7 +48,7 @@
 *     2009-03-10 (EC):
 *        Initial Version
 *     2009-04-17 (EC)
-*        - switch to subkeymap notation in config file 
+*        - switch to subkeymap notation in config file
 *     2009-04-27 (EC)
 *        Enable multiple threads in call to smf_filter_execute
 *     {enter_further_changes_here}
@@ -93,8 +93,8 @@
 
 #define FUNC_NAME "smf_calcmodel_flt"
 
-void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk, 
-                        AstKeyMap *keymap, smfArray **allmodel, int flags, 
+void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk,
+                        AstKeyMap *keymap, smfArray **allmodel, int flags,
                         int *status) {
 
   /* Local Variables */
@@ -115,7 +115,7 @@ void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
   size_t tstride;               /* Time slice stride in data array */
-                                   
+
   /* Main routine */
   if (*status != SAI__OK) return;
 
@@ -130,7 +130,7 @@ void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   res = dat->res[chunk];
   qua = dat->qua[chunk];
   model = allmodel[chunk];
-  
+
   /* Assert bolo-ordered data */
   for( idx=0; idx<res->ndat; idx++ ) if (*status == SAI__OK ) {
     smf_dataOrder( res->sdata[idx], 0, status );
@@ -143,9 +143,9 @@ void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk,
      and removing the new filtered component */
   for( idx=0; (*status==SAI__OK)&&(idx<res->ndat); idx++ ) {
     /* Obtain dimensions of the data */
-    smf_get_dims( res->sdata[idx],  NULL, NULL, &nbolo, &ntslice, 
+    smf_get_dims( res->sdata[idx],  NULL, NULL, &nbolo, &ntslice,
                   &ndata, &bstride, &tstride, status);
-      
+
     /* Get pointers to data/quality/model */
     res_data = (res->sdata[idx]->pntr)[0];
     qua_data = (qua->sdata[idx]->pntr)[0];
@@ -153,7 +153,7 @@ void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
     if( (res_data == NULL) || (model_data == NULL) || (qua_data == NULL) ) {
       *status = SAI__ERROR;
-      errRep( "", FUNC_NAME ": Null data in inputs", status);      
+      errRep( "", FUNC_NAME ": Null data in inputs", status);
     } else {
 
       /* Create a filter */
@@ -161,7 +161,7 @@ void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk,
       smf_filter_fromkeymap( filt, kmap, &dofft, status );
 
       if( !dofft ) {
-        msgOutif( MSG__VERB, " ", FUNC_NAME 
+        msgOutif( MSG__VERB, " ", FUNC_NAME
                   ": No valid filter specifiers for FLT given", status );
       }
 
@@ -174,7 +174,7 @@ void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         }
 
         /* Copy the residual into the model array so that we have a copy */
-        memcpy( model_data, res_data, 
+        memcpy( model_data, res_data,
                 ndata*smf_dtype_size(res->sdata[idx],status) );
       }
 

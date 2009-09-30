@@ -29,12 +29,12 @@
 *     allmodel = smfArray ** (Returned)
 *        Array of smfArrays (each time chunk) to hold result of model calc
 *     flags = int (Given )
-*        Control flags: not used 
+*        Control flags: not used
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
 *  Description:
-*     A special model component that assumes that the map is currently the 
+*     A special model component that assumes that the map is currently the
 *     best rebinned estimate of the sky and projects that signal into the
 *     time domain using the LUT.
 
@@ -55,7 +55,7 @@
 *     2007-05-23 (EC)
 *        Removed CUM calculation
 *     2007-06-13 (EC)
-*        pointing lut supplied as extra parameter to accomodate 
+*        pointing lut supplied as extra parameter to accomodate
 *        new DIMM file format
 *     2007-07-10 (EC)
 *        Use smfArray instead of smfData
@@ -109,7 +109,7 @@
 #define FUNC_NAME "smf_calcmodel_ast"
 
 void smf_calcmodel_ast( smfWorkForce *wf, smfDIMMData *dat, int chunk,
-                        AstKeyMap *keymap __attribute__((unused)), 
+                        AstKeyMap *keymap __attribute__((unused)),
                         smfArray **allmodel, int flags __attribute__((unused)),
                         int *status) {
 
@@ -126,7 +126,7 @@ void smf_calcmodel_ast( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   unsigned char *qua_data=NULL; /* Pointer to quality data */
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
-  
+
   /* Main routine */
   if (*status != SAI__OK) return;
 
@@ -149,20 +149,20 @@ void smf_calcmodel_ast( smfWorkForce *wf, smfDIMMData *dat, int chunk,
     model_data = (model->sdata[idx]->pntr)[0];
     qua_data = (qua->sdata[idx]->pntr)[0];
 
-    if( (res_data == NULL) || (lut_data == NULL) || (model_data == NULL) || 
+    if( (res_data == NULL) || (lut_data == NULL) || (model_data == NULL) ||
 	(qua_data == NULL) ) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "Null data in inputs", status);      
+      errRep(FUNC_NAME, "Null data in inputs", status);
     } else {
-	
+
       /* Get the raw data dimensions */
-      ndata = (res->sdata[idx]->dims)[0] * (res->sdata[idx]->dims)[1] * 
+      ndata = (res->sdata[idx]->dims)[0] * (res->sdata[idx]->dims)[1] *
 	(res->sdata[idx]->dims)[2];
-	
+
       /* Which QUALITY bits should be considered for ignoring data */
       mask = ~(SMF__Q_JUMP|SMF__Q_SPIKE|SMF__Q_STAT);
 
-      /* Loop over data points */ 
+      /* Loop over data points */
       for( i=0; i<ndata; i++ ) {
 	if( lut_data[i] != VAL__BADI ) {
 
@@ -172,15 +172,15 @@ void smf_calcmodel_ast( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 	    if( model_data[i] != VAL__BADD ) {
 	      res_data[i] += model_data[i];
 	    }
-	    
+
 	  /* calculate new model using the map/LUT */
 	  model_data[i] = dat->map[lut_data[i]];
-	    
+
 	  /* update the residual model */
 	  if( !(qua_data[i]&mask) && (model_data[i] != VAL__BADD) )
 	    res_data[i] -= model_data[i];
 	}
-      } 
+      }
     }
   }
 }

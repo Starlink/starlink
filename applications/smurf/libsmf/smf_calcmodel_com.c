@@ -29,7 +29,7 @@
 *     allmodel = smfArray ** (Returned)
 *        Array of smfArrays (each time chunk) to hold result of model calc
 *     flags = int (Given )
-*        Control flags: not used 
+*        Control flags: not used
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -83,11 +83,11 @@
 *        - Look at spread in GAIn correlation coefficients to iteratively
 *          flag additional bad bolometers
 *     2008-12-18 (EC)
-*        - Additionally look at spread in gain coefficients to flag bad bolos 
+*        - Additionally look at spread in gain coefficients to flag bad bolos
 *     2009-03-09 (EC)
 *        - Fit common mode gain to data, instead of using it to modify flatfield
 *     2009-04-17 (EC)
-*        - switch to subkeymap notation in config file 
+*        - switch to subkeymap notation in config file
 *     2009-04-30 (EC)
 *        Parallelize the slow bits: undoing old common mode, calculating new
 *        common mode, and fitting common mode template to all the bolos.
@@ -226,7 +226,7 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
     }
 
     /* Debugging message indicating thread started work */
-    msgOutiff( MSG__DEBUG, "", 
+    msgOutiff( MSG__DEBUG, "",
                "smfCalcmodelComPar(%i): thread starting on bolos %zu -- %zu",
                status, pdata->operation, pdata->b1, pdata->b2 );
 
@@ -243,7 +243,7 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
           off = 0;
           g = 1;
         }
-        
+
         /* Put the last iteration back in */
         if( !(qua_data[i*tstride+j*bstride]&mask_cor) ) {
           res_data[i*tstride+j*bstride] += g*lastmean+off;
@@ -251,7 +251,7 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
       }
     }
 
-    msgOutiff( MSG__DEBUG, "", 
+    msgOutiff( MSG__DEBUG, "",
                "smfCalcmodelComPar(%i): thread finishing bolos %zu -- %zu",
                status, pdata->operation, pdata->b1, pdata->b2 );
 
@@ -268,7 +268,7 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
     }
 
     /* Debugging message indicating thread started work */
-    msgOutiff( MSG__DEBUG, "", 
+    msgOutiff( MSG__DEBUG, "",
                "smfCalcmodelComPar(%i): thread starting on tslices %zu -- %zu",
                status, pdata->operation, pdata->t1, pdata->t2 );
 
@@ -276,18 +276,18 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
       /* Loop over bolometers to put the previous common-mode
          signal back in at each time-slice, and calculate the sum of
          all the detectors with good data. */
-      sum = 0;   /* Initialize sum to 0 */        
+      sum = 0;   /* Initialize sum to 0 */
       for( j=0; j<nbolo; j++ ) {
         if( !(qua_data[i*tstride+j*bstride]&mask_meas) ) {
           sum += res_data[i*tstride+j*bstride];
           weight[i]++;
         }
       }
-      
+
       /* Store the sum here. Init if first subarray, otherwise add to
          sum from previous subarrays. Renormalization happens outside
          thread after loop over subarray */
-      
+
       if( idx == 0 ) {
         model_data[i] = sum;
       } else {
@@ -295,7 +295,7 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
       }
     }
 
-    msgOutiff( MSG__DEBUG, "", 
+    msgOutiff( MSG__DEBUG, "",
                "smfCalcmodelComPar(%i): thread finishing tslices %zu -- %zu",
                status, pdata->operation, pdata->t1, pdata->t2 );
 
@@ -311,18 +311,18 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
     }
 
     /* Debugging message indicating thread started work */
-    msgOutiff( MSG__DEBUG, "", 
+    msgOutiff( MSG__DEBUG, "",
                "smfCalcmodelComPar(%i): thread starting on bolos %zu -- %zu",
                status, pdata->operation, pdata->b1, pdata->b2 );
 
     for( i=pdata->b1; (*status==SAI__OK) && (i<=pdata->b2); i++ ) {
-      if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {          
-        smf_templateFit1D( res_data+i*bstride, qua_data+i*bstride, 
-                           mask_meas, mask_cor, ntslice, tstride, 
-                           model_data, 0, gai_data+i*gbstride, 
-                           gai_data+gcstride+i*gbstride, 
-                           gai_data+2*gcstride+i*gbstride, status ); 
-        
+      if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {
+        smf_templateFit1D( res_data+i*bstride, qua_data+i*bstride,
+                           mask_meas, mask_cor, ntslice, tstride,
+                           model_data, 0, gai_data+i*gbstride,
+                           gai_data+gcstride+i*gbstride,
+                           gai_data+2*gcstride+i*gbstride, status );
+
         /* If divide-by-zero detected, flag bolo as bad */
         if( *status==SMF__DIVBZ ) {
           for( j=0; j<ntslice; j++ ) {
@@ -333,7 +333,7 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
       }
     }
 
-    msgOutiff( MSG__DEBUG, "", 
+    msgOutiff( MSG__DEBUG, "",
                "smfCalcmodelComPar(%i): thread finishing bolos %zu -- %zu",
                status, pdata->operation, pdata->b1, pdata->b2 );
 
@@ -341,21 +341,21 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
     *status = SAI__ERROR;
     errRep( "", "smfCalcmodelComPar: invalid operation specifier", status );
   }
-  
+
 }
 
 /* ------------------------------------------------------------------------ */
 
 #define FUNC_NAME "smf_calcmodel_com"
 
-void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk, 
-                        AstKeyMap *keymap, smfArray **allmodel, int flags, 
+void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
+                        AstKeyMap *keymap, smfArray **allmodel, int flags,
                         int *status) {
 
   /* Local Variables */
   size_t bstride;               /* Bolometer stride in data array */
-  int boxcar=0;                 /* width in samples of boxcar filter */ 
-  double boxcard=0;             /* double precision version of boxcar */ 
+  int boxcar=0;                 /* width in samples of boxcar filter */
+  double boxcard=0;             /* double precision version of boxcar */
   double boxfact=0;             /* Box width damping parameter */
   int boxmin=0;                 /* Min boxcar width if boxfact set */
   int do_boxcar=0;              /* flag to do boxcar smooth */
@@ -390,7 +390,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   size_t newbad;                /* Number of new bolos being flagged as bad */
   dim_t ntslice=0;              /* Number of time slices */
   int nw;                       /* Number of worker threads */
-  double off;                   /* Temporary offset */ 
+  double off;                   /* Temporary offset */
   smfCalcmodelComData *pdata=NULL; /* Pointer to job data */
   smfArray *qua=NULL;           /* Pointer to QUA at chunk */
   int quit;                     /* While loop quit flag */
@@ -403,7 +403,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   dim_t thisntslice=0;          /* "                                  */
   size_t tstride;               /* Time slice stride in data array */
   double *weight=NULL;          /* Weight at each point in model */
-                                   
+
   /* Main routine */
   if (*status != SAI__OK) return;
 
@@ -420,7 +420,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   qua = dat->qua[chunk];
   model = allmodel[chunk];
   if(dat->gai) gai = dat->gai[chunk];
-  
+
   /* Parse parameters */
 
   if( kmap ) {
@@ -440,7 +440,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
       if( !astMapGet0D( kmap, "BOXCARD", &boxcard) ) {
         *status = SAI__ERROR;
-        errRep( "", FUNC_NAME ": Failed to retrieve BOXCARD from keymap", 
+        errRep( "", FUNC_NAME ": Failed to retrieve BOXCARD from keymap",
                 status);
       } else {
         /* Use damped boxcar for smoothing width */
@@ -457,7 +457,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   if( do_boxcar ) {
     msgSeti("BOX",boxcar);
     msgOutif(MSG__VERB, " ", "    boxcar width ^BOX",status);
-  } 
+  }
 
   /* Assert bolo-ordered data */
   for( idx=0; idx<res->ndat; idx++ ) if (*status == SAI__OK ) {
@@ -469,13 +469,13 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   /* The common mode signal is stored as a single 1d vector for all 4
      subarrays.  The corresponding smfData is at position 0 in the
      model sdata. */
-  
+
   if( model->sdata[0] ) {
     /* Pointer to model data array */
     model_data = (model->sdata[0]->pntr)[0];
 
     /* Copy of model data array */
-    model_data_copy = smf_malloc( (model->sdata[0]->dims)[0], 
+    model_data_copy = smf_malloc( (model->sdata[0]->dims)[0],
 			  sizeof(*model_data_copy), 1, status );
     if( *status == SAI__OK ) {
       memcpy( model_data_copy, model_data, (model->sdata[0]->dims)[0] *
@@ -486,7 +486,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 			 status );
   } else {
     *status = SAI__ERROR;
-    errRep( "", FUNC_NAME ": Model smfData was not loaded!", status);      
+    errRep( "", FUNC_NAME ": Model smfData was not loaded!", status);
   }
 
   /* Which QUALITY bits should be checked for correcting sample. Ensure that
@@ -503,21 +503,21 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
      of the common mode back into the signal */
   for( idx=0; idx<res->ndat; idx++ ) if (*status == SAI__OK ) {
     /* Obtain dimensions of the data */
-    smf_get_dims( res->sdata[idx],  NULL, NULL, &thisnbolo, &thisntslice, 
+    smf_get_dims( res->sdata[idx],  NULL, NULL, &thisnbolo, &thisntslice,
                   &thisndata, &bstride, &tstride, status);
-      
+
     if(dat->gai) {
       smf_get_dims( gai->sdata[idx],  NULL, NULL, NULL, NULL, NULL,
                     &gbstride, &gcstride, status);
     }
-      
+
     if( idx == 0 ) {
       /* Store dimensions of the first file */
       nbolo = thisnbolo;
       ntslice = thisntslice;
-      ndata = thisndata;      
+      ndata = thisndata;
 
-      /*  --- Set up the division of labour for threads --- */ 
+      /*  --- Set up the division of labour for threads --- */
 
       /* Mutually exclusive blocks of bolos */
 
@@ -532,7 +532,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
         pdata->b1 = ii*step;
         pdata->b2 = (ii+1)*step-1;
-        
+
         /* Ensure that the last thread picks up any left-over bolometers */
         if( (ii==(nw-1)) && (pdata->b1<(nbolo-1)) ) {
           pdata->b2=nbolo-1;
@@ -553,7 +553,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         /* Blocks of bolos */
         pdata->t1 = ii*step;
         pdata->t2 = (ii+1)*step-1;
-        
+
         /* Ensure that the last thread picks up any left-over tslices */
         if( (ii==(nw-1)) && (pdata->t1<(ntslice-1)) ) {
           pdata->t2=ntslice-1;
@@ -562,12 +562,12 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
     } else {
       /* Check that dimensions haven't changed */
-      if( (thisnbolo != nbolo) || (thisntslice != ntslice) || 
+      if( (thisnbolo != nbolo) || (thisntslice != ntslice) ||
           (thisndata != ndata) ) {
-        *status = SAI__ERROR;        
-        errRep( "", FUNC_NAME 
-                ": smfData's in smfArray have different dimensions!", 
-                status);      
+        *status = SAI__ERROR;
+        errRep( "", FUNC_NAME
+                ": smfData's in smfArray have different dimensions!",
+                status);
       }
     }
 
@@ -580,14 +580,14 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
     if( (res_data == NULL) || (model_data == NULL) || (qua_data == NULL) ) {
       *status = SAI__ERROR;
-      errRep( "", FUNC_NAME ": Null data in inputs", status);      
+      errRep( "", FUNC_NAME ": Null data in inputs", status);
     } else {
 
       /* Set up the job data and undo previous iteration of model */
 
       for( ii=0; (*status==SAI__OK)&&(ii<nw); ii++ ) {
         pdata = job_data + ii;
-        
+
         pdata->bstride = bstride;
         pdata->gai_data = gai_data;
         pdata->gbstride = gbstride;
@@ -603,7 +603,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         pdata->tstride = tstride;
         pdata->qua_data = qua_data;
         pdata->ijob = -1;
-        pdata->weight = weight;        
+        pdata->weight = weight;
       }
     }
 
@@ -611,22 +611,22 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
       for( ii=0; ii<nw; ii++ ) {
         /* Submit the job */
         pdata = job_data + ii;
-        pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata, 
+        pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata,
                                    smfCalcmodelComPar, NULL, status );
       }
       /* Wait until all of the submitted jobs have completed */
-      smf_wait( wf, status );      
+      smf_wait( wf, status );
     } else {
       /* Call smfCalcmodelComPar directly using 1 core */
       smfCalcmodelComPar( job_data, status );
     }
-  }    
+  }
 
   /* Outer loop re-calculates common-mode until the list of "good" bolometers
      converges. Without a fit for gain/offset this loop only happens once.
      Otherwise it keeps going until the correlation coefficients of the
      template fits settle down to a list with no N-sigma outliers */
-  
+
   quit = 0;
   while( !quit && (*status==SAI__OK) ) {
     /* Initialize to assumption that we'll finish this iteration */
@@ -651,7 +651,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
       for( ii=0; (*status==SAI__OK)&&(ii<nw); ii++ ) {
         pdata = job_data + ii;
-        
+
         pdata->bstride = bstride;
         pdata->gai_data = gai_data;
         pdata->gbstride = gbstride;
@@ -674,11 +674,11 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         for( ii=0; ii<nw; ii++ ) {
           /* Submit the job */
           pdata = job_data + ii;
-          pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata, 
+          pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata,
                                      smfCalcmodelComPar, NULL, status );
         }
         /* Wait until all of the submitted jobs have completed */
-        smf_wait( wf, status );      
+        smf_wait( wf, status );
       } else {
         /* Call smfCalcmodelComPar directly using 1 core */
         smfCalcmodelComPar( job_data, status );
@@ -693,7 +693,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         model_data[i] = 0;
       }
     }
-      
+
     /* boxcar smooth if desired */
     if( do_boxcar ) {
       /* Do the smooth */
@@ -721,7 +721,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         smf_get_dims( gai->sdata[idx],  NULL, NULL, NULL, NULL, NULL,
                       &gbstride, &gcstride, status);
         gai_data = (gai->sdata[idx]->pntr)[0];
-        
+
         /* Set up the job data and fit template to blocks of bolos */
 
         for( ii=0; (*status==SAI__OK)&&(ii<nw); ii++ ) {
@@ -749,11 +749,11 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
           for( ii=0; ii<nw; ii++ ) {
             /* Submit the job */
             pdata = job_data + ii;
-            pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata, 
+            pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata,
                                        smfCalcmodelComPar, NULL, status );
           }
           /* Wait until all of the submitted jobs have completed */
-          smf_wait( wf, status );      
+          smf_wait( wf, status );
         } else {
           /* Call smfCalcmodelComPar directly using 1 core */
           smfCalcmodelComPar( job_data, status );
@@ -767,7 +767,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         for( i=0; (*status==SAI__OK) && (i<nbolo); i++ ) {
           /* Copy correlation coefficients into an array that has VAL__BADD
              set at locations of bad bolometers. Can't use the main quality
-             array directly as the stride may be different */          
+             array directly as the stride may be different */
           if( !(qua_data[i*bstride]&SMF__Q_BADB) && (gai_data[i*gbstride]) ) {
             gcoeff[i] = log(fabs(gai_data[i*gbstride]));
             corr[i] = gai_data[2*gcstride+i*gbstride];
@@ -776,15 +776,15 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
             corr[i] = VAL__BADD;
           }
         }
-        
+
         smf_stats1( corr, 1, nbolo, NULL, 0, &cmean, &csig, &cgood, status );
         msgSeti("N",cgood);
         msgOutif( MSG__VERB, "", FUNC_NAME ": ^N good bolos", status );
-        msgOutiff( MSG__DEBUG, " ", FUNC_NAME 
+        msgOutiff( MSG__DEBUG, " ", FUNC_NAME
                    ": corr coeff %8.5f +/- %8.5f", status, cmean, csig );
 
         smf_stats1( gcoeff, 1, nbolo, NULL, 0, &gmean, &gsig, &ggood, status );
-        msgOutiff( MSG__DEBUG, " ", FUNC_NAME 
+        msgOutiff( MSG__DEBUG, " ", FUNC_NAME
                    ": log(abs(gain coeff)) %8.5f +/- %8.5f", status,
                    gmean, gsig);
 
@@ -793,9 +793,9 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         for( i=0; (*status==SAI__OK) && (i<nbolo); i++ ) {
           if( (corr[i]==VAL__BADD) || (fabs(corr[i]-cmean) > 5*csig) ||
               (fabs(gcoeff[i]-gmean) > 5*gsig) || (fabs(gcoeff[i]-gmean)>3) ) {
-            /* If this bolometer wasn't previously flagged as bad 
+            /* If this bolometer wasn't previously flagged as bad
                do it here, and set quit=0 */
-            if( !(qua_data[i*bstride]&SMF__Q_BADB) ) { 
+            if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {
               quit = 0;
               for( j=0; j<ntslice; j++ )
                 qua_data[i*bstride + j*tstride] |= SMF__Q_BADB;
@@ -804,12 +804,12 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
               gai_data[i*gbstride+2*gcstride] = 0;   /* Zero correlation */
               newbad++;
             }
-          } 
+          }
         }
 
         if( newbad ) {
           msgSeti("NEW",newbad);
-          msgOutif( MSG__VERB, "", FUNC_NAME 
+          msgOutif( MSG__VERB, "", FUNC_NAME
                     ": flagged ^NEW new bad bolos", status );
         }
 
@@ -827,7 +827,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
               res_data[i*bstride + j*tstride] -= model_data[j];
             }
           }
-        }    
+        }
       }
     }
 
@@ -844,23 +844,23 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
     for( idx=0; (idx<res->ndat)&&(*status==SAI__OK); idx++ ) {
       smf_get_dims( res->sdata[idx],  NULL, NULL, NULL, NULL, NULL, &bstride,
                     &tstride, status );
-      
+
       /* Get pointers */
       res_data = (double *)(res->sdata[idx]->pntr)[0];
       qua_data = (unsigned char *)(qua->sdata[idx]->pntr)[0];
       smf_get_dims( gai->sdata[idx],  NULL, NULL, NULL, NULL, NULL,
                     &gbstride, &gcstride, status);
       gai_data = (gai->sdata[idx]->pntr)[0];
-      
-      for( i=0; (*status==SAI__OK) && (i<nbolo); i++ ) 
-        if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {          
+
+      for( i=0; (*status==SAI__OK) && (i<nbolo); i++ )
+        if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {
           /* The gain is the amplitude of the common mode template in data */
           g = gai_data[i*gbstride];
           if( (g!=VAL__BADD) && (g!=0) ){
             off = gai_data[i*gbstride+gcstride];
             gai_data[i*gbstride] = g;
-            
-            /* Remove the template */          
+
+            /* Remove the template */
             for( j=0; j<ntslice; j++ ) {
               if( !(qua_data[i*bstride + j*tstride]&mask_cor) ) {
                 res_data[i*bstride+j*tstride] -= (g*model_data[j] + off);
@@ -869,9 +869,9 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
           } else {
             *status = SAI__ERROR;
             msgSeti("BOLO",i);
-            errRep("", FUNC_NAME ": invalid gain encountered for bolo ^BOLO", 
+            errRep("", FUNC_NAME ": invalid gain encountered for bolo ^BOLO",
                    status);
-          }    
+          }
         }
     }
   }
@@ -886,7 +886,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
     /* Update value in the keymap so we can read it next iteration */
     astMapPut0D( kmap, "BOXCARD", boxcard, NULL );
   }
-  
+
   /* Clean up */
   if( weight)  weight = smf_free( weight, status );
   if( model_data_copy ) model_data_copy = smf_free( model_data_copy, status );

@@ -95,7 +95,7 @@
 #define FUNC_NAME "smf_calcmodel_ext"
 
 void smf_calcmodel_ext( smfWorkForce *wf, smfDIMMData *dat, int chunk,
-                        AstKeyMap *keymap __attribute__((unused)), 
+                        AstKeyMap *keymap __attribute__((unused)),
                         smfArray **allmodel, int flags, int *status) {
 
   /* Local Variables */
@@ -135,17 +135,17 @@ void smf_calcmodel_ext( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
     if( (res_data == NULL) || (model_data == NULL) || (qua_data == NULL) ) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "Null data in inputs", status);      
+      errRep(FUNC_NAME, "Null data in inputs", status);
     } else {
-	
+
       /* Get the raw data dimensions */
-      ndata = (res->sdata[idx]->dims)[0] * (res->sdata[idx]->dims)[1] * 
+      ndata = (res->sdata[idx]->dims)[0] * (res->sdata[idx]->dims)[1] *
 	(res->sdata[idx]->dims)[2];
-	
+
       /* Which QUALITY bits should be considered for ignoring data */
       mask = ~(SMF__Q_JUMP|SMF__Q_SPIKE|SMF__Q_STAT);
 
-      /* Loop over data points */ 
+      /* Loop over data points */
 
       if( !(flags&SMF__DIMM_INVERT) ) {
 	/* Apply the extinction correction */
@@ -165,7 +165,3 @@ void smf_calcmodel_ext( smfWorkForce *wf, smfDIMMData *dat, int chunk,
     }
   }
 }
-
-
-
-

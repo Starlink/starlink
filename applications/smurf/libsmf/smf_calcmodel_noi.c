@@ -35,9 +35,9 @@
 
 *  Description:
 *     Calculate the noise distribution for each detector. Currently this
-*     will just assume stationary, independent noise in each detector and 
+*     will just assume stationary, independent noise in each detector and
 *     measure the sample variance over a short interval. In addition,
-*     there is an 
+*     there is an
 
 *  Notes:
 
@@ -64,7 +64,7 @@
 *        -fixed nbolo/ntslice calculation
 *        -store variance instead of standard deviation
 *        -use smf_quick_noise instead of smf_simple_stats on whole array;
-*         added config parameters (NOISAMP/NOICHUNK) 
+*         added config parameters (NOISAMP/NOICHUNK)
 *     2008-04-18 (EC)
 *        -Only calculate the white noise level once (first iteration)
 *        -Add chisquared calculation
@@ -118,8 +118,8 @@
 #define FUNC_NAME "smf_calcmodel_noi"
 
 
-void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk, 
-                        AstKeyMap *keymap, smfArray **allmodel, int flags, 
+void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
+                        AstKeyMap *keymap, smfArray **allmodel, int flags,
                         int *status) {
 
   /* Local Variables */
@@ -152,7 +152,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   double spikethresh=0;         /* Threshold for spike detection */
   size_t tstride;               /* time slice stride */
   double *var=NULL;             /* Sample variance */
-   
+
   /* Main routine */
   if (*status != SAI__OK) return;
 
@@ -179,7 +179,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
     if( !astMapGet0D( kmap, "SPIKETHRESH", &spikethresh ) ) {
       spikethresh = 0;
     }
-  
+
     if( !astMapGet0I( kmap, "SPIKEITER", &spikeiter_s ) ) {
       spikeiter = 0;
     } else {
@@ -204,7 +204,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
   /* Loop over index in subgrp (subarray) */
   for( idx=0; idx<res->ndat; idx++ ) {
-      
+
     /* Get pointers to DATA components */
     res_data = (res->sdata[idx]->pntr)[0];
     model_data = (model->sdata[idx]->pntr)[0];
@@ -212,28 +212,28 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
     if( (res_data == NULL) || (model_data == NULL) || (qua_data == NULL) ) {
       *status = SAI__ERROR;
-      errRep( "", FUNC_NAME ": Null data in inputs", status);      
+      errRep( "", FUNC_NAME ": Null data in inputs", status);
     } else {
-    
+
       /* Get the raw data dimensions */
-      smf_get_dims( res->sdata[idx], NULL, NULL, &nbolo, &ntslice, &ndata, 
+      smf_get_dims( res->sdata[idx], NULL, NULL, &nbolo, &ntslice, &ndata,
                     &bstride, &tstride, status );
 
-      /* NOI model dimensions */      
-      smf_get_dims( model->sdata[idx], NULL, NULL, NULL, &mntslice, NULL, 
+      /* NOI model dimensions */
+      smf_get_dims( model->sdata[idx], NULL, NULL, NULL, &mntslice, NULL,
                     &mbstride, &mtstride, status );
 
       /* Only estimate the white noise level once at the beginning - the
-	 reason for this is to make measurements of the convergence 
+	 reason for this is to make measurements of the convergence
 	 easier. */
 
       var = smf_malloc( nbolo, sizeof(*var), 0, status );
 
       if( flags & SMF__DIMM_FIRSTITER ) {
         /* Measure the noise from power spectra */
-        smf_bolonoise( wf, res->sdata[idx], qua_data, 0, 0.5, SMF__F_WHITELO, 
+        smf_bolonoise( wf, res->sdata[idx], qua_data, 0, 0.5, SMF__F_WHITELO,
                        SMF__F_WHITEHI, 0, var, NULL, 0, status );
-        
+
 	for( i=0; i<nbolo; i++ ) if( !(qua_data[i*ntslice]&SMF__Q_BADB) ) {
             /* Loop over time and store the variance for each sample */
             for( j=0; j<mntslice; j++ ) {
@@ -250,17 +250,17 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
       if( spikethresh ) {
 	/* Now re-flag */
 	smf_flag_spikes( res->sdata[idx], var, qua_data, mask_spike,
-			 spikethresh, spikeiter, 
+			 spikethresh, spikeiter,
 			 100, &aiter, &nflag, status );
-        
+
 	msgSeti("THRESH",spikethresh);
 	msgSeti("NFLAG",nflag);
 	msgSeti("AITER",aiter);
-	msgOutif(MSG__VERB," ", 
+	msgOutif(MSG__VERB," ",
                  "   flagged ^NFLAG new ^THRESH-sig spikes in ^AITER "
-                 "iterations", status); 
-      } 
-      
+                 "iterations", status);
+      }
+
       /* Now calculate contribution to chi^2 */
       if( *status == SAI__OK ) {
 
@@ -269,7 +269,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
             id = i*bstride+j*tstride;              /* index in data array */
             im = i*mbstride+(j%mntslice)*mtstride; /* index in NOI array */
             if(model_data[im]>0 && !(qua_data[id]&mask) ) {
-              dat->chisquared[chunk] += res_data[id]*res_data[id] / 
+              dat->chisquared[chunk] += res_data[id]*res_data[id] /
                 model_data[im];
               nchisq++;
             }
@@ -283,7 +283,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   if( (*status == SAI__OK) && (nchisq >0) ) {
     dat->chisquared[chunk] /= (double) nchisq;
   }
-  
+
   /* Clean Up */
   if( var ) var = smf_free(var, status);
 

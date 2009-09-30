@@ -29,12 +29,12 @@
 *     allmodel = smfArray ** (Returned)
 *        Array of smfArrays (each time chunk) to hold result of model calc
 *     flags = int (Given )
-*        Control flags: not used 
+*        Control flags: not used
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
 *  Description:
-*     Presently this is mostly a dummy routine since the actual calculation of 
+*     Presently this is mostly a dummy routine since the actual calculation of
 *     this model occurs within smf_calcmodel_com. With the SMF__DIMM_INVERT
 *     flag, however, the gain correction applied in smf_calcmodel_com is
 *     undone to prepare for the next iteration.
@@ -55,7 +55,7 @@
 
 *  Copyright:
 *     Copyright (C) 2008 University of British Columbia.
-*     
+*
 *     All Rights Reserved.
 
 *  Licence:
@@ -93,7 +93,7 @@
 #define FUNC_NAME "smf_calcmodel_gai"
 
 void smf_calcmodel_gai( smfWorkForce *wf, smfDIMMData *dat, int chunk,
-                        AstKeyMap *keymap __attribute__((unused)), 
+                        AstKeyMap *keymap __attribute__((unused)),
                         smfArray **allmodel, int flags, int *status) {
 
   /* Local Variables */
@@ -140,9 +140,9 @@ void smf_calcmodel_gai( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
     if( (res_data == NULL) || (model_data == NULL) || (qua_data == NULL) ) {
       *status = SAI__ERROR;
-      errRep("", FUNC_NAME ": Null data in inputs", status);      
+      errRep("", FUNC_NAME ": Null data in inputs", status);
     } else {
-	
+
       /* Get the raw data dimensions */
       smf_get_dims( res->sdata[idx],  NULL, NULL, &nbolo, &ntslice, &ndata,
                     &bstride, &tstride, status);
@@ -168,6 +168,3 @@ void smf_calcmodel_gai( smfWorkForce *wf, smfDIMMData *dat, int chunk,
     }
   }
 }
-
-
-

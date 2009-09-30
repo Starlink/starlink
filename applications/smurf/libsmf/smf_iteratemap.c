@@ -19,7 +19,7 @@
 *                    int *ubnd_out, size_t maxmem, double *map,
 *                    unsigned int *hitsmap, double *mapvar, double
 *                    *weights, int *status );
- 
+
 *  Arguments:
 *     wf = smfWorkForce * (Given)
 *        Pointer to a pool of worker threads
@@ -29,7 +29,7 @@
 *        keymap containing parameters to control map-maker
 *     darks = const smfArray * (Given)
 *        Collection of dark frames. Can be NULL.
-*     bpms = smfArray * (Given) 
+*     bpms = smfArray * (Given)
 *        Masks for each subarray (e.g. returned by smf_reqest_mask call)
 *     outfset = AstFrameSet* (Given)
 *        Frameset containing the sky->output map mapping if calculating
@@ -38,11 +38,11 @@
 *        Is coordinate system tracking moving object? (if outfset specified)
 *     lbnd_out = double* (Given)
 *        2-element array pixel coord. for the lower bounds of the output map
-*        (if outfset specified) 
+*        (if outfset specified)
 *     maxmem = size_t (Given)
 *        Maximum memory that me be used by smf_iteratemap (bytes)
 *     map = double* (Returned)
-*        The output map array 
+*        The output map array
 *     hitsmap = unsigned int* (Returned)
 *        Number of samples that land in a pixel (ignore if NULL pointer)
 *     mapvar = double* (Returned)
@@ -57,7 +57,7 @@
 *     the component of the bolometer signals that are astronomical signal,
 *     atmospheric signal, and residual Gaussian noise, and creates a rebinned
 *     map of the astronomical signal.
-*     
+*
 *  Authors:
 *     EC: Edward Chapin (UBC)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -89,7 +89,7 @@
 *     2007-05-17 (EC)
 *        Added missing status checks
 *     2007-06-13 (EC):
-*        - Use new DIMM binary file format 
+*        - Use new DIMM binary file format
 *     2007-06-14 (EC):
 *        - If config file has exportndf set, export DIMM components to *.sdf
 *     2007-07-10 (EC):
@@ -101,7 +101,7 @@
 *        - fixed freeing of modeldata
 *     2007-08-09 (EC):
 *        - changed index order for model
-*        - added memiter flag to config file - avoids doing file i/o 
+*        - added memiter flag to config file - avoids doing file i/o
 *     2007-08-17 (EC):
 *        Added nofile flag to smf_model_create to avoid creating .dimm files
 *        in memiter=1 case.
@@ -136,7 +136,7 @@
 *        - Added maxlen to config file, modified smf_grp_related
 *        - Use variance stored in NOI to estimate map
 *        - Don't include VARIANCE of input files when concatenating
-*        - Store VARIANCE (from NOI) in residual 
+*        - Store VARIANCE (from NOI) in residual
 *     2008-04-18 (EC):
 *        Calculate and display chisquared for each chunk
 *     2008-04-23 (EC):
@@ -246,11 +246,11 @@
 
 #define FUNC_NAME "smf_iteratemap"
 
-void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap, 
-                     const smfArray *darks, const smfArray *bpms, 
-                     AstFrameSet *outfset, int moving, int *lbnd_out, 
-                     int *ubnd_out, size_t maxmem, double *map, 
-                     unsigned int *hitsmap, double *mapvar, 
+void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
+                     const smfArray *darks, const smfArray *bpms,
+                     AstFrameSet *outfset, int moving, int *lbnd_out,
+                     int *ubnd_out, size_t maxmem, double *map,
+                     unsigned int *hitsmap, double *mapvar,
                      double *weights, int *status ) {
 
   /* Local Variables */
@@ -364,11 +364,11 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
     msgSeti("L1",lbnd_out[1]);
     msgSeti("U0",ubnd_out[0]);
     msgSeti("U1",ubnd_out[1]);
-    errRep("", FUNC_NAME ": Invalid mapbounds: LBND=[^L0,^L1] UBND=[^U0,^U1]", 
-           status);      
+    errRep("", FUNC_NAME ": Invalid mapbounds: LBND=[^L0,^L1] UBND=[^U0,^U1]",
+           status);
   }
 
-  msize = (dim_t) (ubnd_out[0]-lbnd_out[0]+1) * 
+  msize = (dim_t) (ubnd_out[0]-lbnd_out[0]+1) *
     (dim_t) (ubnd_out[1]-lbnd_out[1]+1);
 
   /* Get size of the input group */
@@ -383,7 +383,7 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
 
     if( numiter == 0 ) {
       *status = SAI__ERROR;
-      errRep("", FUNC_NAME ": NUMITER cannot be 0", status);      
+      errRep("", FUNC_NAME ": NUMITER cannot be 0", status);
     } else {
       if( numiter < 0 ) {
         /* If negative, iterate to convergence or abs(numiter), whichever comes
@@ -405,21 +405,21 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
     if( chitol <= 0 ) {
       *status = SAI__ERROR;
       msgSetd("CHITOL",chitol);
-      errRep(FUNC_NAME, 
-             FUNC_NAME ": CHITOL is ^CHITOL, must be > 0", status);      
+      errRep(FUNC_NAME,
+             FUNC_NAME ": CHITOL is ^CHITOL, must be > 0", status);
     }
 
     /* Do iterations completely in memory - minimize disk I/O */
     if( !astMapGet0I( keymap, "MEMITER", &memiter ) ) {
       memiter = 0;
-    } 
+    }
 
     if( memiter ) {
-      msgOutif(MSG__VERB, " ", 
+      msgOutif(MSG__VERB, " ",
                FUNC_NAME ": MEMITER set; perform iterations in memory",
                status );
     } else {
-      msgOutif(MSG__VERB, " ", 
+      msgOutif(MSG__VERB, " ",
                FUNC_NAME ": MEMITER not set; perform iterations on disk",
                status );
 
@@ -433,20 +433,20 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
     }
 
     if( varmapmethod ) {
-      msgOutif(MSG__VERB, " ", 
+      msgOutif(MSG__VERB, " ",
                FUNC_NAME ": Will use sample variance to estimate"
                " variance map", status );
     } else {
-      msgOutif(MSG__VERB, " ", 
+      msgOutif(MSG__VERB, " ",
                FUNC_NAME ": Will use error propagation to estimate"
                " variance map", status );
     }
 
 
-    /* Data-cleaning parameters (should match SC2CLEAN) */    
-    smf_get_cleanpar( keymap, &apod, &badfrac, &dcbox, NULL, &dcthresh, 
+    /* Data-cleaning parameters (should match SC2CLEAN) */
+    smf_get_cleanpar( keymap, &apod, &badfrac, &dcbox, NULL, &dcthresh,
                       NULL, &f_edgelow, &f_edgehigh, f_notchlow,
-                      f_notchhigh, &f_nnotch, &dofft, &flagstat, &baseorder, 
+                      f_notchhigh, &f_nnotch, &dofft, &flagstat, &baseorder,
                       &spikethresh, &spikeiter, status );
 
     /* Maximum length of a continuous chunk */
@@ -510,22 +510,22 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
 
     if(astMapGet1C(keymap, "MODELORDER", 4, SMF_MODEL_MAX, &nm, modelnames)) {
       nmodels = (dim_t) nm;
-      
+
       /* Allocate modeltyps */
       if( nmodels >= 1 ) {
         modeltyps = smf_malloc( nmodels, sizeof(*modeltyps), 1, status );
         /* Extra components for exportNDF_which for 'res', 'qua' */
-        exportNDF_which = smf_malloc( nmodels+2, sizeof(*exportNDF_which), 
+        exportNDF_which = smf_malloc( nmodels+2, sizeof(*exportNDF_which),
                                       1, status );
       } else {
         msgOut(" ", FUNC_NAME ": No valid models in MODELORDER",
                status );
       }
-      
+
       /* Loop over names and figure out enumerated type */
       for( i=0; (*status==SAI__OK)&&(i<nmodels); i++ ) {
         modelname = modelnames+i*4; /* Pointer to current name */
-        thismodel = smf_model_gettype( modelname, status );	    
+        thismodel = smf_model_gettype( modelname, status );
 
         if( *status == SAI__OK ) {
           modeltyps[i] = thismodel;
@@ -539,19 +539,19 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
           /* set havenoi/whichnoi */
           if( thismodel == SMF__NOI ) {
             havenoi = 1;
-            whichnoi = i; 
+            whichnoi = i;
           }
-          
+
           /* set haveext/whichext */
           if( thismodel == SMF__EXT ) {
             haveext = 1;
-            whichext = i; 
+            whichext = i;
           }
 
           /* set havegai/whichgai */
           if( thismodel == SMF__GAI ) {
             havegai = 1;
-            whichgai = i; 
+            whichgai = i;
           }
         }
       }
@@ -584,7 +584,7 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
          exported; or (ii) a vector containing the 3-character model
          names for each component that will be exported (same syntax as
          modelorder) */
-      
+
       if(astMapGet1C(keymap, "EXPORTNDF", 4, SMF_MODEL_MAX, &nm, modelnames)) {
         /* Re-use variables used to parse MODELORDER. If there is a
          single element check to see if it is a single digit for the
@@ -639,14 +639,14 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
       }
     }
   }
-  
+
   if( untilconverge ) {
     msgSeti("MAX",maxiter);
-    msgOut(" ", 
+    msgOut(" ",
            FUNC_NAME ": Iterate to convergence (max ^MAX)",
            status );
     msgSetd("CHITOL",chitol);
-    msgOut(" ", 
+    msgOut(" ",
            FUNC_NAME ": Stopping criteria is a change in chi^2 < ^CHITOL",
            status);
   } else {
@@ -655,13 +655,13 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
   }
 
   msgSeti("NUMCOMP",nmodels);
-  msgOutif(MSG__VERB," ", 
-           FUNC_NAME ": ^NUMCOMP model components in solution: ", 
+  msgOutif(MSG__VERB," ",
+           FUNC_NAME ": ^NUMCOMP model components in solution: ",
            status);
   for( i=0; i<nmodels; i++ ) {
     msgSetc( "MNAME", smf_model_getname(modeltyps[i], status) );
     msgOutif(MSG__VERB,
-             " ", "  ^MNAME", status ); 
+             " ", "  ^MNAME", status );
   }
 
   /* Create an ordered smfGrp which keeps track of files corresponding to
@@ -670,7 +670,7 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
      concatenate _only_ continuous pieces of data. We subtract padStart
      and padEnd from maxlen since these also add to the file length. */
 
-  smf_grp_related( igrp, isize, 1, maxlen-padStart-padEnd, &maxconcat, 
+  smf_grp_related( igrp, isize, 1, maxlen-padStart-padEnd, &maxconcat,
                    &igroup, status );
 
   /* Once we've run smf_grp_related we know how many subarrays there
@@ -692,7 +692,7 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
       msgSeti( "LEN", maxconcat );
       msgSeti( "AVAIL", maxmem/SMF__MB );
       msgSeti( "NEED", memneeded/SMF__MB );
-      msgOut( " ", "  ^LEN continuous samples requires ^NEED Mb > ^AVAIL Mb", 
+      msgOut( " ", "  ^LEN continuous samples requires ^NEED Mb > ^AVAIL Mb",
               status );
 
       /* Try is meant to be the largest chunks of ~equal length that fit in
@@ -703,9 +703,9 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
       msgOut( " ", "  Will try to re-group data in chunks < ^TRY samples long",
               status);
       msgOut( " ", FUNC_NAME ": ***************", status );
-      
+
       /* Close igroup if needed before re-running smf_grp_related */
-      
+
       if( igroup ) {
         smf_close_smfGroup( &igroup, status );
       }
@@ -734,13 +734,13 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
 
     if( memiter ) {
       msgSeti( "NCONTCHUNKS", ncontchunks );
-      msgOutif(MSG__VERB," ", 
+      msgOutif(MSG__VERB," ",
                FUNC_NAME ": ^NCONTCHUNKS large continuous chunks outside"
                " iteration loop.", status);
     } else {
       msgSeti( "NCHUNKS", nchunks );
-      msgOutif(MSG__VERB," ", 
-               FUNC_NAME ": ^NCHUNKS file chunks inside iteration loop.", 
+      msgOutif(MSG__VERB," ",
+               FUNC_NAME ": ^NCHUNKS file chunks inside iteration loop.",
                status);
     }
   }
@@ -759,13 +759,13 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
     if( memiter ) {
       msgSeti("CHUNK", contchunk+1);
       msgSeti("NUMCHUNK", ncontchunks);
-      msgOut( " ", 
+      msgOut( " ",
               FUNC_NAME ": Continuous chunk ^CHUNK / ^NUMCHUNK =========",
               status);
     }
 
     /*** TIMER ***/
-    smf_timerinit( &tv1, &tv2, status ); 
+    smf_timerinit( &tv1, &tv2, status );
 
     if( *status == SAI__OK ) {
 
@@ -779,10 +779,10 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
       } else if( contchunk == 1 ) {
         /* Subsequent chunks are done in new map arrays and then added to
            the first */
-        thismap = smf_malloc( msize, sizeof(*thismap), 0, status ); 
-        thishits = smf_malloc( msize, sizeof(*thishits), 0, status ); 
-        thisvar = smf_malloc( msize, sizeof(*thisvar), 0, status ); 
-        thisweight = smf_malloc( msize, sizeof(*thisweight), 0, status ); 
+        thismap = smf_malloc( msize, sizeof(*thismap), 0, status );
+        thishits = smf_malloc( msize, sizeof(*thishits), 0, status );
+        thisvar = smf_malloc( msize, sizeof(*thisvar), 0, status );
+        thisweight = smf_malloc( msize, sizeof(*thisweight), 0, status );
       }
 
       if( memiter ) {
@@ -792,22 +792,22 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
            smf_concat_smfGroup below. */
 
         msgSeti("C",contchunk+1);
-        msgOutif(MSG__VERB," ", 
-                 FUNC_NAME ": Concatenating files in continuous chunk ^C", 
+        msgOutif(MSG__VERB," ",
+                 FUNC_NAME ": Concatenating files in continuous chunk ^C",
                  status);
 
-        /* Allocate length 1 array of smfArrays. */   
+        /* Allocate length 1 array of smfArrays. */
         res = smf_malloc( nchunks, sizeof(*res), 1, status );
 
         /* Concatenate (no variance since we calculate it ourselves -- NOI) */
-        smf_concat_smfGroup( wf, igroup, darks, bpms, contchunk, 0, outfset, 
-                             moving, lbnd_out, ubnd_out, padStart, padEnd, 
+        smf_concat_smfGroup( wf, igroup, darks, bpms, contchunk, 0, outfset,
+                             moving, lbnd_out, ubnd_out, padStart, padEnd,
                              SMF__NOCREATE_VARIANCE, &res[0], status );
 
         /*** TIMER ***/
         msgOutiff( MSG__DEBUG, "", FUNC_NAME ": ** %f s concatenating data",
                    status, smf_timerupdate(&tv1,&tv2,status) );
-      } 
+      }
     }
 
     /* Allocate space for the chisquared array */
@@ -834,19 +834,19 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
            bolo-ordered data although the work has already been done at
            the concatenation stage. */
 
-        smf_model_create( wf, NULL, res, nchunks, SMF__LUT, 0, 
+        smf_model_create( wf, NULL, res, nchunks, SMF__LUT, 0,
                           NULL, 0, NULL, NULL,
-                          NULL, memiter, 
-                          memiter, lut, 0, keymap, status ); 
+                          NULL, memiter,
+                          memiter, lut, 0, keymap, status );
 
-        smf_model_create( wf, NULL, res, nchunks, SMF__AST, 0, 
+        smf_model_create( wf, NULL, res, nchunks, SMF__AST, 0,
                           NULL, 0, NULL, NULL,
-                          NULL, memiter, 
+                          NULL, memiter,
                           memiter, ast, 0, keymap, status );
 
-        smf_model_create( wf, NULL, res, nchunks, SMF__QUA, 0, 
+        smf_model_create( wf, NULL, res, nchunks, SMF__QUA, 0,
                           NULL, 0, NULL, NULL,
-                          NULL, memiter, 
+                          NULL, memiter,
                           memiter, qua, flagstat, keymap, status );
 
         /* Since a copy of the LUT is still open in res[0] free it up here */
@@ -855,40 +855,40 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
             smf_close_mapcoord( res[0]->sdata[i], status );
           }
         }
-      
+
       } else {
-        /* If iterating using disk i/o need to create res and other model 
+        /* If iterating using disk i/o need to create res and other model
            components using igroup as template. In this case the pointing
            LUT probably doesn't exist, so give projection information to
-           smf_model_create. Also assert bolo-ordered template 
+           smf_model_create. Also assert bolo-ordered template
            (in this case res). */
 
         res = smf_malloc( nchunks, sizeof(*res), 1, status );
 
-        smf_model_create( wf, igroup, NULL, 0, SMF__RES, 0, 
+        smf_model_create( wf, igroup, NULL, 0, SMF__RES, 0,
                           NULL, 0, NULL, NULL,
-                          &resgroup, memiter, 
+                          &resgroup, memiter,
                           memiter, res, 0, keymap, status );
 
-        smf_model_create( wf, igroup, NULL, 0, SMF__LUT, 0, 
+        smf_model_create( wf, igroup, NULL, 0, SMF__LUT, 0,
                           outfset, moving, lbnd_out, ubnd_out,
-                          &lutgroup, memiter, 
-                          memiter, lut, 0, keymap, status ); 
+                          &lutgroup, memiter,
+                          memiter, lut, 0, keymap, status );
 
-        smf_model_create( wf, igroup, NULL, 0, SMF__AST, 0, 
+        smf_model_create( wf, igroup, NULL, 0, SMF__AST, 0,
                           NULL, 0, NULL, NULL,
-                          &astgroup, memiter, 
+                          &astgroup, memiter,
                           memiter, ast, 0, keymap, status );
 
-        smf_model_create( wf, igroup, NULL, 0, SMF__QUA, 0, 
+        smf_model_create( wf, igroup, NULL, 0, SMF__QUA, 0,
                           NULL, 0, NULL, NULL,
-                          &quagroup, memiter, 
+                          &quagroup, memiter,
                           memiter, qua, flagstat, keymap, status );
       }
     }
 
     /*** TIMER ***/
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": ** %f s creating static models", 
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": ** %f s creating static models",
                status, smf_timerupdate(&tv1,&tv2,status) );
 
     /* Dynamic components */
@@ -899,29 +899,29 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
 
       if( memiter != 1 ) {
         /* Array of smfgroups (one for each dynamic model component) */
-        modelgroups = smf_malloc( nmodels, sizeof(*modelgroups), 1, status );  
+        modelgroups = smf_malloc( nmodels, sizeof(*modelgroups), 1, status );
       }
 
       for( i=0; i<nmodels; i++ ) {
         model[i] = smf_malloc( nchunks, sizeof(**model), 1, status );
-      
+
         if( memiter ) {
-          smf_model_create( wf, NULL, res, nchunks, modeltyps[i], 0, 
+          smf_model_create( wf, NULL, res, nchunks, modeltyps[i], 0,
                             NULL, 0, NULL, NULL,
-                            NULL, memiter, memiter, model[i], 0, keymap, 
-                            status ); 
+                            NULL, memiter, memiter, model[i], 0, keymap,
+                            status );
 
         } else {
-          smf_model_create( wf, igroup, NULL, 0, modeltyps[i], 0, 
-                            NULL, 0, NULL, NULL, &modelgroups[i], 
-                            memiter, memiter, model[i], 0, keymap, 
+          smf_model_create( wf, igroup, NULL, 0, modeltyps[i], 0,
+                            NULL, 0, NULL, NULL, &modelgroups[i],
+                            memiter, memiter, model[i], 0, keymap,
                             status );
         }
       }
     }
- 
+
     /*** TIMER ***/
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": ** %f s creating dynamic models", 
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": ** %f s creating dynamic models",
                status, smf_timerupdate(&tv1,&tv2,status) );
 
     /* Start the main iteration loop */
@@ -957,10 +957,10 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
       while( !quit ) {
         msgSeti("ITER", iter+1);
         msgSeti("MAXITER", maxiter);
-        msgOut(" ", 
+        msgOut(" ",
                FUNC_NAME ": Iteration ^ITER / ^MAXITER ---------------",
                status);
-      
+
         /* Assume we've converged until we find a chunk that hasn't */
         if( iter > 0 ) {
           converged = 1;
@@ -972,7 +972,7 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
           if( !memiter ) {
             msgSeti("CHUNK", i+1);
             msgSeti("NUMCHUNK", nchunks);
-            msgOut(" ", FUNC_NAME ": File chunk ^CHUNK / ^NUMCHUNK", 
+            msgOut(" ", FUNC_NAME ": File chunk ^CHUNK / ^NUMCHUNK",
                    status);
           }
 
@@ -980,23 +980,23 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
              is already open from the smf_model_create calls */
 
           if( !memiter ) {
-	  
+
             /* If memiter not set open this chunk here */
             smf_open_related_model( resgroup, i, "UPDATE", &res[i], status );
             smf_open_related_model( lutgroup, i, "UPDATE", &lut[i], status );
             smf_open_related_model( astgroup, i, "UPDATE", &ast[i], status );
             smf_open_related_model( quagroup, i, "UPDATE", &qua[i], status );
-	  
+
             for( j=0; j<nmodels; j++ ) {
-              smf_open_related_model( modelgroups[j], i, "UPDATE", 
+              smf_open_related_model( modelgroups[j], i, "UPDATE",
                                       &model[j][i], status );
             }
 
             /*** TIMER ***/
-            msgOutiff( MSG__DEBUG, "", FUNC_NAME 
-                       ": ** %f s opening model files", 
+            msgOutiff( MSG__DEBUG, "", FUNC_NAME
+                       ": ** %f s opening model files",
                        status, smf_timerupdate(&tv1,&tv2,status) );
-          } 
+          }
 
           /* If first iteration pre-condition the data */
           if( iter == 0 ) {
@@ -1015,7 +1015,7 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
                 msgOutif(MSG__VERB," ", "  fit polynomial baselines", status);
                 smf_scanfit( data, qua_data, baseorder, status );
 
-                msgOutif(MSG__VERB," ", "  remove polynomial baselines", 
+                msgOutif(MSG__VERB," ", "  remove polynomial baselines",
                          status);
                 smf_subtract_poly( data, qua_data, 0, status );
               }
@@ -1027,15 +1027,15 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
 
               if( spikethresh ) {
                 msgOutif(MSG__VERB," ", "  flag spikes...", status);
-                smf_flag_spikes( data, NULL, qua_data, 
+                smf_flag_spikes( data, NULL, qua_data,
                                  ~(SMF__Q_JUMP|SMF__Q_STAT),
-                                 spikethresh, spikeiter, 100, 
+                                 spikethresh, spikeiter, 100,
                                  &aiter, NULL, status );
                 msgSeti("AITER",aiter);
                 msgOutif(MSG__VERB," ", "  ...finished in ^AITER iterations",
-                         status); 
+                         status);
               }
-              
+
               if( apod ) {
                 msgOutif(MSG__VERB," ", "  apodizing data", status);
                 smf_apodize( data, qua_data, apod, status );
@@ -1062,21 +1062,21 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
             }
 
             /*** TIMER ***/
-            msgOutiff( MSG__DEBUG, "", FUNC_NAME 
-                       ": ** %f s pre-conditioning data", 
+            msgOutiff( MSG__DEBUG, "", FUNC_NAME
+                       ": ** %f s pre-conditioning data",
                        status, smf_timerupdate(&tv1,&tv2,status) );
 
             /* If we don't have enough good detectors then set bad status */
             if( (*status==SAI__OK) && (goodbolo<SMF__MINSTATSAMP) ) {
               *status = SMF__INSMP;
               errRepf( "", FUNC_NAME ": Insufficient number of good bolos "
-                       "(%" DIM_T_FMT "<%i) to continue", status, goodbolo, 
+                       "(%" DIM_T_FMT "<%i) to continue", status, goodbolo,
                        SMF__MINSTATSAMP );
             }
           }
 
-          msgOut(" ", 
-                 FUNC_NAME ": Calculate time-stream model components", 
+          msgOut(" ",
+                 FUNC_NAME ": Calculate time-stream model components",
                  status);
 
           /* Call the model calculations in the desired order */
@@ -1112,13 +1112,13 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
                 dimmflags |= SMF__DIMM_FIRSTITER;
               }
 
-              if( *status == SAI__OK ) { 
+              if( *status == SAI__OK ) {
                 (*modelptr)( wf, &dat, i, keymap, model[j], dimmflags, status );
-              } 
+              }
 
               /*** TIMER ***/
-              msgOutiff( MSG__DEBUG, "", FUNC_NAME 
-                         ": ** %f s calculating model", 
+              msgOutiff( MSG__DEBUG, "", FUNC_NAME
+                         ": ** %f s calculating model",
                          status, smf_timerupdate(&tv1,&tv2,status) );
             }
           }
@@ -1127,7 +1127,7 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
              previous iteration of AST back into the residual, zero ast,
              and rebin the noise+astro signal into the map */
 
-          msgOut(" ", FUNC_NAME ": Rebin residual to estimate MAP", 
+          msgOut(" ", FUNC_NAME ": Rebin residual to estimate MAP",
                  status);
 
           if( *status == SAI__OK ) {
@@ -1153,7 +1153,7 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
               /* Ignore data with these QUALITY flags */
               mask = ~(SMF__Q_JUMP|SMF__Q_SPIKE);
 
-              for( k=0; k<dsize; k++ ) {	  
+              for( k=0; k<dsize; k++ ) {
                 if( !(qua_data[k]&mask) && (ast_data[k]!=VAL__BADD) ) {
                   res_data[k] += ast_data[k];
                 }
@@ -1162,32 +1162,32 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
                    Set ast_data back to 0 since we've moved all of the signal
                    into the residual, and then it will get re-estimated by
                    calcmodel_ast after we finish estimating the map. */
-	      
+
                 ast_data[k] = 0;
               }
 
               /* Setup rebin flags */
               rebinflags = 0;
-              if( (i == 0) && (idx == 0) ) {   
+              if( (i == 0) && (idx == 0) ) {
                 /* First call to rebin clears the arrays */
                 rebinflags = rebinflags | AST__REBININIT;
               }
-	    
+
               if( (i == nchunks-1) && (idx == res[i]->ndat-1) ) {
                 /* Final call to rebin re-normalizes */
                 rebinflags = rebinflags | AST__REBINEND;
               }
-	    
+
               /* Rebin the residual + astronomical signal into a map */
-              smf_rebinmap1( res[i]->sdata[idx], dat.noi[i]->sdata[idx], 
-                             lut_data, qua_data, mask, varmapmethod, 
-                             rebinflags, thismap, thisweight, thishits, 
+              smf_rebinmap1( res[i]->sdata[idx], dat.noi[i]->sdata[idx],
+                             lut_data, qua_data, mask, varmapmethod,
+                             rebinflags, thismap, thisweight, thishits,
                              thisvar, msize, &scalevar, status );
             }
 
             /*** TIMER ***/
-            msgOutiff( MSG__DEBUG, "", FUNC_NAME 
-                       ": ** %f s rebinning map", 
+            msgOutiff( MSG__DEBUG, "", FUNC_NAME
+                       ": ** %f s rebinning map",
                        status, smf_timerupdate(&tv1,&tv2,status) );
           }
 
@@ -1195,17 +1195,17 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
 
           if( !memiter ) {
             smf_close_related( &res[i], status );
-            smf_close_related( &ast[i], status );    
-            smf_close_related( &lut[i], status );    
-            smf_close_related( &qua[i], status );    
+            smf_close_related( &ast[i], status );
+            smf_close_related( &lut[i], status );
+            smf_close_related( &qua[i], status );
 
             for( j=0; j<nmodels; j++ ) {
               smf_close_related( &model[j][i], status );
             }
 
             /*** TIMER ***/
-            msgOutiff( MSG__DEBUG, "", FUNC_NAME 
-                       ": ** %f s closing model files", 
+            msgOutiff( MSG__DEBUG, "", FUNC_NAME
+                       ": ** %f s closing model files",
                        status, smf_timerupdate(&tv1,&tv2,status) );
           }
 
@@ -1214,17 +1214,17 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
 
           /* If NOI was present, we now have an estimate of chisquared */
           if( (*status==SAI__OK) && chisquared ) {
-            
+
             if( (iter==0) && (whichnoi>whichast) ) {
               /* If NOI comes after AST in MODELORDER we can't check chi^2 or
                  convergence until next iteration. */
-              msgOut( "", 
+              msgOut( "",
                       FUNC_NAME ": Will calculate chi^2 next iteration",
                       status );
             } else {
               msgSeti("CHUNK",i+1);
               msgSetd("CHISQ",chisquared[i]);
-              msgOut( " ", 
+              msgOut( " ",
                       FUNC_NAME ": *** CHISQUARED = ^CHISQ for chunk "
                       "^CHUNK", status);
 
@@ -1254,7 +1254,7 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
             }
           }
         }
-      
+
         if( *status == SAI__OK ) {
           msgOut(" ", FUNC_NAME ": Calculate ast", status);
 
@@ -1268,13 +1268,13 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
               smf_open_related_model( lutgroup, i, "UPDATE", &lut[i], status );
               smf_open_related_model( quagroup, i, "UPDATE", &qua[i], status );
               if( haveext ) {
-                smf_open_related_model( modelgroups[whichext], i, "UPDATE", 
+                smf_open_related_model( modelgroups[whichext], i, "UPDATE",
                                         &model[whichext][i], status );
               }
 
               /*** TIMER ***/
-              msgOutiff( MSG__DEBUG, "", FUNC_NAME 
-                         ": ** %f s opening model files", 
+              msgOutiff( MSG__DEBUG, "", FUNC_NAME
+                         ": ** %f s opening model files",
                          status, smf_timerupdate(&tv1,&tv2,status) );
             }
 
@@ -1287,8 +1287,8 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
             smf_calcmodel_ast( wf, &dat, i, keymap, ast, 0, status );
 
             /*** TIMER ***/
-            msgOutiff( MSG__DEBUG, "", FUNC_NAME 
-                       ": ** %f s calculating AST", 
+            msgOutiff( MSG__DEBUG, "", FUNC_NAME
+                       ": ** %f s calculating AST",
                        status, smf_timerupdate(&tv1,&tv2,status) );
 
             /* If EXTinction was applied during this iteration, AST and RES
@@ -1297,18 +1297,18 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
                the next iteration. Ditto for GAIn. */
 
             if( haveext ) {
-              smf_calcmodel_ext( wf, &dat, i, keymap, model[whichext], 
+              smf_calcmodel_ext( wf, &dat, i, keymap, model[whichext],
                                  SMF__DIMM_INVERT, status );
             }
 
             /*** TIMER ***/
-            msgOutiff( MSG__DEBUG, "", FUNC_NAME 
-                       ": ** %f s undoing EXT", 
+            msgOutiff( MSG__DEBUG, "", FUNC_NAME
+                       ": ** %f s undoing EXT",
                        status, smf_timerupdate(&tv1,&tv2,status) );
 
             /* Close files if memiter not set */
             if( !memiter ) {
-              smf_close_related( &ast[i], status );    
+              smf_close_related( &ast[i], status );
               smf_close_related( &res[i], status );
               smf_close_related( &lut[i], status );
               smf_close_related( &qua[i], status );
@@ -1317,8 +1317,8 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
               }
 
               /*** TIMER ***/
-              msgOutiff( MSG__DEBUG, "", FUNC_NAME 
-                         ": ** %f s closing model files", 
+              msgOutiff( MSG__DEBUG, "", FUNC_NAME
+                         ": ** %f s closing model files",
                          status, smf_timerupdate(&tv1,&tv2,status) );
             }
           }
@@ -1345,10 +1345,10 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
       }
 
       msgSeti("ITER",iter);
-      msgOut( " ", 
+      msgOut( " ",
               FUNC_NAME ": ****** Completed in ^ITER iterations", status);
       if( untilconverge && converged ) {
-        msgOut( " ", 
+        msgOut( " ",
                 FUNC_NAME ": ****** Solution CONVERGED",
                 status);
       }
@@ -1357,11 +1357,11 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
          Note that we don't do LUT since it is originally an extension in the
          input flatfielded data.
          Also - check that a filename is defined in the smfFile! */
-  
+
       if( exportNDF && (*status == SAI__OK) ) {
-        msgOut(" ", FUNC_NAME ": Export model components to NDF files.", 
+        msgOut(" ", FUNC_NAME ": Export model components to NDF files.",
                status);
-      
+
         for( i=0; i<nchunks; i++ ) {  /* Chunk loop */
           msgSeti("CHUNK", i+1);
           msgSeti("NUMCHUNK", nchunks);
@@ -1370,7 +1370,7 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
           /* Open each subgroup, loop over smfArray elements and export,
              then close subgroup. DIMM open/close not needed if memiter set.
              Note that QUA and NOI get stuffed into the QUALITY and
-             VARIANCE components of the residual. Also notice that 
+             VARIANCE components of the residual. Also notice that
              everything must be changed to time-ordered data before
              writing ICD-compliant files. */
 
@@ -1381,9 +1381,9 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
             smf_open_related_model( astgroup, i, "UPDATE", &ast[i], status );
 
             /* Dynamic components */
-            for( j=0; j<nmodels; j++ ) { 
-              smf_open_related_model( modelgroups[j], i, "UPDATE", 
-                                      &model[j][i], status );	      
+            for( j=0; j<nmodels; j++ ) {
+              smf_open_related_model( modelgroups[j], i, "UPDATE",
+                                      &model[j][i], status );
             }
           }
 
@@ -1393,15 +1393,15 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
             smf_dataOrder( qua[i]->sdata[idx], 1, status );
             smf_dataOrder( ast[i]->sdata[idx], 1, status );
 
-            for( j=0; j<nmodels; j++ ) { 
-	      
+            for( j=0; j<nmodels; j++ ) {
+
               /* Check for existence of the model for this subarray - in
                  some cases, like COM, there is only a file for one subarray,
                  unlike RES from which the range of idx is derived */
               if( model[j][i]->sdata[idx] ) {
                 smf_dataOrder( model[j][i]->sdata[idx], 1, status );
                 if( *status == SMF__WDIM ) {
-                  /* fails if not 3-dimensional data. Just annul and write out 
+                  /* fails if not 3-dimensional data. Just annul and write out
                      data as-is. */
                   errAnnul(status);
                   model[j][i]->sdata[idx]->isTordered=1;
@@ -1416,7 +1416,7 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
               } else {
                 /* Open the header of the original input file in memiter=0
                    case since it won't have been stored in the .DIMM files */
-                smf_open_file( igrp, resgroup->subgroups[i][idx], "READ", 
+                smf_open_file( igrp, resgroup->subgroups[i][idx], "READ",
                                SMF__NOCREATE_DATA, &data, status );
                 if( *status == SAI__OK ) {
                   hdr = data->hdr;
@@ -1438,12 +1438,12 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
               } else {
                 qua_data = NULL;
               }
-	      
+
               if( exportNDF_which[nmodels] ) {
                 if( (res[i]->sdata[idx]->file->name)[0] ) {
                   smf_model_createHdr( res[i]->sdata[idx], SMF__RES, hdr,
                                        status );
-                  smf_model_stripsuffix( res[i]->sdata[idx]->file->name, 
+                  smf_model_stripsuffix( res[i]->sdata[idx]->file->name,
                                          name, status );
 
                   /* if memiter=1, need to append "_res" to the name */
@@ -1454,23 +1454,23 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
                   smf_write_smfData( res[i]->sdata[idx], dat.noi[i]->sdata[idx],
                                      qua_data, name, NDF__NOID, status );
                 } else {
-                  msgOut( " ", 
+                  msgOut( " ",
                           "SMF__ITERATEMAP: Can't export RES -- NULL filename",
                           status);
                 }
               }
-	      
+
               if( exportNDF_which[whichast] ) {
 
                 if( (ast[i]->sdata[idx]->file->name)[0] ) {
                   smf_model_createHdr( ast[i]->sdata[idx], SMF__AST, hdr,
                                        status );
-                  smf_model_stripsuffix( ast[i]->sdata[idx]->file->name, 
+                  smf_model_stripsuffix( ast[i]->sdata[idx]->file->name,
                                          name, status );
-                  smf_write_smfData( ast[i]->sdata[idx], NULL, NULL, name, 
+                  smf_write_smfData( ast[i]->sdata[idx], NULL, NULL, name,
                                      NDF__NOID, status );
                 } else {
-                  msgOut( " ", 
+                  msgOut( " ",
                           "SMF__ITERATEMAP: Can't export AST -- NULL filename",
                           status);
                 }
@@ -1478,47 +1478,47 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
             }
 
             /* Dynamic components excluding NOI/AST */
-            for( j=0; j<nmodels; j++ ) 
+            for( j=0; j<nmodels; j++ )
               /* Remember to check again whether model[j][i]->sdata[idx] exists
                  for cases like COM */
               if( (*status == SAI__OK) && (modeltyps[j] != SMF__NOI) &&
-                  (modeltyps[j] != SMF__AST) && model[j][i]->sdata[idx] && 
+                  (modeltyps[j] != SMF__AST) && model[j][i]->sdata[idx] &&
                   exportNDF_which[j] ) {
                 if( (model[j][i]->sdata[idx]->file->name)[0] ) {
-                  smf_model_createHdr( model[j][i]->sdata[idx], modeltyps[j], 
+                  smf_model_createHdr( model[j][i]->sdata[idx], modeltyps[j],
                                        hdr,status );
-                  smf_model_stripsuffix( model[j][i]->sdata[idx]->file->name, 
+                  smf_model_stripsuffix( model[j][i]->sdata[idx]->file->name,
                                          name, status );
-                  smf_write_smfData( model[j][i]->sdata[idx], NULL, NULL, name, 
+                  smf_write_smfData( model[j][i]->sdata[idx], NULL, NULL, name,
                                      NDF__NOID, status );
                 } else {
                   msgSetc("MOD",smf_model_getname(modeltyps[j], status) );
-                  msgOut( " ", 
+                  msgOut( " ",
                           "SMF__ITERATEMAP: Can't export ^MOD: NULL filename",
                           status);
                 }
               }
-	    
+
             /* Close the input file containing the header */
             if( !memiter ) {
               smf_close_file( &data, status );
             }
           }
-	  
+
           if( !memiter ) { /* Close files if doing disk i/o */
             smf_close_related( &res[i], status );
             smf_close_related( &qua[i], status );
             smf_close_related( &ast[i], status );
-	    
-            for( j=0; j<nmodels; j++ ) { 
+
+            for( j=0; j<nmodels; j++ ) {
               smf_close_related( &model[j][i], status );
             }
           }
         }
 
         /*** TIMER ***/
-        msgOutiff( MSG__DEBUG, "", FUNC_NAME 
-                   ": ** %f s Exporting models", 
+        msgOutiff( MSG__DEBUG, "", FUNC_NAME
+                   ": ** %f s Exporting models",
                    status, smf_timerupdate(&tv1,&tv2,status) );
 
       }
@@ -1527,8 +1527,8 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
     /* Cleanup things used specifically in this contchunk */
 
     if( !memiter && deldimm ) {
-      msgOutif(MSG__VERB," ", 
-               FUNC_NAME ": Cleaning up " SMF__DIMM_SUFFIX " files", 
+      msgOutif(MSG__VERB," ",
+               FUNC_NAME ": Cleaning up " SMF__DIMM_SUFFIX " files",
                status);
 
       /* Delete temporary .DIMM files if requested */
@@ -1536,46 +1536,46 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
         pname = name;
 
         /* static model components */
-        for( j=0; (resgroup)&&(j<resgroup->nrelated); j++ ) {  
-          grpGet( resgroup->grp, resgroup->subgroups[i][j], 1, &pname, 
+        for( j=0; (resgroup)&&(j<resgroup->nrelated); j++ ) {
+          grpGet( resgroup->grp, resgroup->subgroups[i][j], 1, &pname,
                   GRP__SZNAM, status );
           remove(name);
         }
 
-        for( j=0; (lutgroup)&&(j<lutgroup->nrelated); j++ ) {  
-          grpGet( lutgroup->grp, lutgroup->subgroups[i][j], 1, &pname, 
+        for( j=0; (lutgroup)&&(j<lutgroup->nrelated); j++ ) {
+          grpGet( lutgroup->grp, lutgroup->subgroups[i][j], 1, &pname,
                   GRP__SZNAM, status );
           remove(name);
         }
 
-        for( j=0; (astgroup)&&(j<astgroup->nrelated); j++ ) {  
-          grpGet( astgroup->grp, astgroup->subgroups[i][j], 1, &pname, 
+        for( j=0; (astgroup)&&(j<astgroup->nrelated); j++ ) {
+          grpGet( astgroup->grp, astgroup->subgroups[i][j], 1, &pname,
                   GRP__SZNAM, status );
           remove(name);
-        }          
+        }
 
-        for( j=0; (quagroup)&&(j<quagroup->nrelated); j++ ) {  
-          grpGet( quagroup->grp, quagroup->subgroups[i][j], 1, &pname, 
+        for( j=0; (quagroup)&&(j<quagroup->nrelated); j++ ) {
+          grpGet( quagroup->grp, quagroup->subgroups[i][j], 1, &pname,
                   GRP__SZNAM, status );
           remove(name);
         }
 
         /* dynamic model components */
         for( k=0; k<nmodels; k++ ) {
-          for( j=0; (modelgroups[k])&&(j<(modelgroups[k])->nrelated); j++ ) {  
-            grpGet( (modelgroups[k])->grp, (modelgroups[k])->subgroups[i][j], 
+          for( j=0; (modelgroups[k])&&(j<(modelgroups[k])->nrelated); j++ ) {
+            grpGet( (modelgroups[k])->grp, (modelgroups[k])->subgroups[i][j],
                     1, &pname, GRP__SZNAM, status );
             remove(name);
-          }         
+          }
         }
       }
     }
 
     /* fixed model smfGroups */
     if( resgroup ) smf_close_smfGroup( &resgroup, status );
-    if( astgroup ) smf_close_smfGroup( &astgroup, status );  
-    if( lutgroup ) smf_close_smfGroup( &lutgroup, status );  
-    if( quagroup ) smf_close_smfGroup( &quagroup, status );  
+    if( astgroup ) smf_close_smfGroup( &astgroup, status );
+    if( lutgroup ) smf_close_smfGroup( &lutgroup, status );
+    if( quagroup ) smf_close_smfGroup( &quagroup, status );
 
     /* fixed model smfArrays */
     if( res ) {
@@ -1598,7 +1598,7 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
       }
       lut = smf_free( lut, status );
     }
-  
+
     if( qua ) {
       for( i=0; i<nchunks; i++ ) {
         if( qua[i] ) smf_close_related( &qua[i], status );
@@ -1615,17 +1615,17 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
       /* Free array of smfGroup pointers at this time chunk */
       modelgroups = smf_free( modelgroups, status );
     }
-    
+
     /* dynamic model smfArrays */
     if( model ) {
       for( i=0; i<nmodels; i++ ) {
         if( model[i] ) {
           for( j=0; j<nchunks; j++ ) {
             /* Close each model component smfArray at each time chunk */
-            if( model[i][j] ) 
+            if( model[i][j] )
               smf_close_related( &(model[i][j]), status );
           }
-	
+
           /* Free array of smfArray pointers for this model */
           model[i] = smf_free( model[i], status );
         }
@@ -1646,7 +1646,7 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
     if( chisquared) chisquared = smf_free( chisquared, status );
     if( lastchisquared) lastchisquared = smf_free( lastchisquared, status );
   }
-    
+
   /* The second set of map arrays get freed in the multiple contchunk case */
   if( thismap != map ) thismap = smf_free( thismap, status );
   if( thishits != hitsmap ) thishits = smf_free( thishits, status );
