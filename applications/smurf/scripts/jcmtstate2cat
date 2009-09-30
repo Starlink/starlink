@@ -70,6 +70,10 @@ use Astro::SLA;
 use Getopt::Long;
 use Pod::Usage;
 use JSA::Headers ();
+use JCMT::Tau::WVM::WVMLib;
+use Astro::FITS::Header::NDF;
+use NDF; # For VAL__BADD
+use Scalar::Util qw/ looks_like_number /;
 
 my ($help, $man, $version);
 my $ostatus = GetOptions( "help" => \$help,
@@ -92,6 +96,7 @@ my $isfirst = 1;
 my $isfirst_file = 1;
 my @columns;
 my %cols;
+my @wvmcol;
 
 for my $f (@files) {
 
@@ -105,6 +110,12 @@ for my $f (@files) {
     @columns = sort keys %local;
     %cols = map { $_, undef } @columns;
     $isfirst = 1;
+
+    # See if we have WVM columns
+    if (exists $local{WVM_T12} && exists $local{WVM_T42} && exists $local{WVM_T78}) {
+      push(@wvmcol, "WVMTAU");
+    }
+
   }
 
   # See if we have an MCEHEAD from a SCUBA-2 file
@@ -119,10 +130,23 @@ for my $f (@files) {
   # now dump the contents
   if ($isfirst_file) {
     print "# This is a TST formatted file\n";
-    print join("\t", "Id", "RA", "DEC", "DRA", "DDEC", "AZ","EL", "DAZ", "DEL", @columns) ,"\n";
+    print join("\t", "Id", "RA", "DEC", "DRA", "DDEC", "AZ","EL", "DAZ", "DEL", @wvmcol, @columns) ,"\n";
     print join("\t", map { "--" } (0..($#columns+3))),"\n";
     $isfirst_file = 0;
   }
+
+  # Find ambient temperature if we are handling WVM data
+  my $tamb;
+  if (@wvmcol) {
+    if (!exists $local{ENVIRO_AIR_TEMP}) {
+      my $hdr = Astro::FITS::Header::NDF->new( File => $f );
+      my $atstart = $hdr->value( "ATSTART" );
+      my $atend = $hdr->value( "ATEND" );
+      $tamb = (($atstart + $atend) / 2.0) + 273.15; # To Kelvin
+    }
+  }
+
+  my %wvmcache;
 
   for my $i ( 0 .. $#{$local{RTS_NUM}} ) {
     my @slice;
@@ -133,9 +157,52 @@ for my $f (@files) {
     push(@slice, calc_pos( "TR", $i, \%local) );
     push(@slice, calc_pos( "AZ", $i, \%local) );
 
+    # Calculate the WVM tau
+    if ( @wvmcol ) {
+      # we need a good airmass and an ambient temperature
+      my $isokay = 1;
+      for my $k (qw/ TCS_AIRMASS WVM_T12 WVM_T42 WVM_T78 / ) {
+        if ($local{$k}->[$i] < 0) {
+          $isokay = 0;
+          last;
+        }
+      }
+
+      # Cache the WVM calculation
+      # use a single airmass for the whole file (which is a reasonable
+      # idea for SCUBA-2 unless we are doing elevation scans)
+
+      my $wvmtau = &NDF::VAL__BADD();
+      if ($isokay) {
+        # Need the ambient temperature from ATSTART and ATEND
+        # SCUBA-2 does not store temperature in state
+        if (!defined $tamb) {
+          $tamb = $local{ENVIRO_AIR_TEMP}->[$i];
+        }
+
+        my $key = join("", sprintf("%.3f", $local{TCS_AIRMASS}->[$i]),
+                       $tamb, $local{WVM_T12}->[$i],
+                       $local{WVM_T42}->[$i], $local{WVM_T78}->[$i]);
+        if (exists $wvmcache{$key}) {
+          $wvmtau = $wvmcache{$key};
+        } else {
+          $wvmtau = JCMT::Tau::WVM::WVMLib::tsky2tau( $local{TCS_AIRMASS}->[$i],
+                                                      $tamb,
+                                                      $local{WVM_T12}->[$i],
+                                                      $local{WVM_T42}->[$i],
+                                                      $local{WVM_T78}->[$i]);
+          $wvmcache{$key} = $wvmtau;
+        }
+      }
+      push(@slice, $wvmtau );
+    }
+
     # And append the remaining columns
     for my $col (@columns) {
-      push(@slice, $local{$col}->[$i]);
+      my $value = $local{$col}->[$i];
+      $value = &NDF::VAL__BADD() if (looks_like_number($value) &&
+                                     ( $value == &NDF::VAL__BADI() || $value == &NDF::VAL__BADR() ));
+      push(@slice, $value);
     }
     print join("\t",@slice)."\n";
   }
