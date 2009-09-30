@@ -1175,7 +1175,7 @@ iraf! {
          parameter val {
             position 4
             type LITERAL
-            prompt {The value that defines the pixels to be outlined}
+            prompt {The value used to flag values in the output NDF}
             ppath CURRENT DEFAULT
             default BAD
             helpkey *
