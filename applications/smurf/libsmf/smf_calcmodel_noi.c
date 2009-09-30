@@ -34,10 +34,14 @@
 *        Pointer to global status.
 
 *  Description:
-*     Calculate the noise distribution for each detector. Currently this
-*     will just assume stationary, independent noise in each detector and
-*     measure the sample variance over a short interval. In addition,
-*     there is an
+*     Perform noise measurements on the detectors. The basic idea is to
+*     measure the white-noise level in each detector for the first iteration
+*     from the individual power spectra. For subsequent iterations, if
+*     called after all other model components have been fit, it will also
+*     estimate chi^2 by comparison the scatter in the final residual to the
+*     white noise level. The (reduced) chi^2 calculated should ideally
+*     converge to 1 provided that the models are correct, and the white noise
+*     has been measured correctly. 
 
 *  Notes:
 
