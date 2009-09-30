@@ -143,6 +143,10 @@
 *        Delete the GRP identifier before returning.
 *     28-MAY-2007 (DSB):
 *        Modified to support outlining of AST Regions as well as ARD files.
+*     30-SEP-2009 (DSB):
+*        Use ATL_MATCHREGION to ensure the Region axes correspond to the
+*        Plot axes. This should speed up the plotting in cases where the
+*        axes would not otherwise match.
 *     {enter_further_changes_here}
 
 *-
@@ -174,7 +178,8 @@
       INTEGER IPICK              ! AGI identifier for the KEY picture
       INTEGER IPIX               ! Index of PIXEL Frame
       INTEGER IPLOT              ! Pointer to AST Plot for DATA picture
-      INTEGER IREG               ! Pointer to AST Region to outline
+      INTEGER IREG               ! Pointer to supplied AST Region 
+      INTEGER NEWREG             ! Pointer to AST Region to outline
       INTEGER NFRM               ! Frame index increment between IWCS and IPLOT
       INTEGER REGVAL             ! Requested region value
       INTEGER RV                 ! Max available region value
@@ -274,11 +279,17 @@
 *  Now handle cases where an AST Region was supplied.
       ELSE IF( STATUS .EQ. SAI__OK ) THEN
 
+*  We now try to get a region in which the axes are the same in number and 
+*  type (but not necessarily order - AST_CONVERT, called later, will take 
+*  account of any difference in axis order) as those spanned by the current 
+*  Frame in the Plot. 
+         CALL ATL_MATCHREGION( IREG, IPLOT, NEWREG, STATUS )
+
 *  Find the Mapping from the existing Plot to the Frame represented by
 *  the Region. Record the original Base frame index because AST_CONVERT
 *  changes it.
          IBASE = AST_GETI( IPLOT, 'Base', STATUS )
-         FS = AST_CONVERT( IPLOT, IREG, ' ', STATUS )
+         FS = AST_CONVERT( IPLOT, NEWREG, ' ', STATUS )
 
 *  Get the Domain in which alignment occurred (the Domain of the new 
 *  base Frame in the Plot), and then reinstate the original Base Frame.
@@ -303,7 +314,7 @@
             CALL AST_ADDFRAME( IPLOT, AST__CURRENT, 
      :                         AST_GETMAPPING( FS, AST__BASE, 
      :                                         AST__CURRENT, STATUS ),
-     :                         IREG, STATUS )
+     :                         NEWREG, STATUS )
 
 *  Plot a boundary round the Region.
             SPARSE = AST_BORDER( IPLOT, STATUS )
