@@ -6367,8 +6367,8 @@ static void MatchAxesX( AstFrame *frm2_frame, AstFrame *frm1, int *axes,
    } else {
       max_axes = -1;
    }
+   astSetMaxAxes( frm1, 10000 );
 
-   astSetMinAxes( frm1, 10000 );
    if( astTestMinAxes( frm1 ) ) {
       min_axes = astGetMinAxes( frm1 );
    } else {

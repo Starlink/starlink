@@ -6654,7 +6654,7 @@ f     AST_FINDFRAME or AST_CONVERT.
 *
 *    In practice, each class that represents an encapsulated Frame (e.g.
 *    FrameSet, Region, etc) should over-ride this method, extracting a
-*    Frame from the supplied "frm1" pointer, and the ninvoking
+*    Frame from the supplied "frm1" pointer, and then invoking
 *    astMatchAxesX.
 
 */
@@ -6733,8 +6733,8 @@ static void MatchAxesX( AstFrame *frm2, AstFrame *frm1, int *axes,
    } else {
       max_axes = -1;
    }
+   astSetMaxAxes( frm1, 10000 );
 
-   astSetMinAxes( frm1, 10000 );
    if( astTestMinAxes( frm1 ) ) {
       min_axes = astGetMinAxes( frm1 );
    } else {
