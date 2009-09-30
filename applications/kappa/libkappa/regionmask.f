@@ -107,7 +107,6 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL constants
-      INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'AST_PAR'          ! AST constant and functions
                
 *  Status:     
@@ -119,23 +118,13 @@
 *  Local Variables:      
       CHARACTER CONTXT*40        ! Text version of constant value
       DOUBLE PRECISION CONST     ! The constant to assign
-      INTEGER AXES( NDF__MXDIM ) ! Region axis index for each WCS axis
-      INTEGER EREG               ! Unbnded Region spanning xtra WCS axes
       INTEGER FSET               ! Region -> PIXEL FrameSet
-      INTEGER I                  ! Loop index
       INTEGER INDF1              ! Identifier for the source NDF  
       INTEGER INDF2              ! Identifier for the output NDF
       INTEGER IPIX               ! Index of PIXEL Frame within IWCS
       INTEGER IREG               ! AST Region
       INTEGER IWCS               ! NDF WCS FrameSet
-      INTEGER JUNK               ! Unused Mapping
-      INTEGER NAX                ! No. of axes in current WCS Frame
       INTEGER NEWREG             ! Region matching WCS Frame
-      INTEGER NRPICK             ! No. of of region axes to pick
-      INTEGER NWPICK             ! No. of of WCS axes to pick
-      INTEGER RAXES( NDF__MXDIM )! Indicies of Region axes to pick
-      INTEGER UREG               ! Usr-sppld Region with no non-WCS axes
-      INTEGER WAXES( NDF__MXDIM )! Indicies of WCS axes to pick
       LOGICAL BAD                ! Assign bad values to the region?
       LOGICAL INSIDE             ! Assign value to inside of region?
       LOGICAL VAR                ! Does NDF VARIANCE component exist?
@@ -162,66 +151,8 @@
 *  We now try to get a region in which the axes are the same in number and 
 *  type (but not necessarily order - AST_CONVERT, called later, will take 
 *  account of any difference in axis order) as those spanned by the current 
-*  WCS Frame. First find which (if any) Region axis corresponds to each axis 
-*  in the current WCS Frame.
-
-      call ast_show( ireg, status )
-      call ast_show( iwcs, status )
-
-      CALL AST_MATCHAXES( IREG, IWCS, AXES, STATUS )
-
-*  Get a list (WAXES) of the WCS axis indices that have no corresponding 
-*  region axis. Also get a list (RAXES) of the Region axes indicies that 
-*  have corresponding axes in the WCS Frame.
-      NAX = AST_GETI( IWCS, 'Naxes', STATUS )
-      NWPICK = 0
-      NRPICK = 0
-      DO I = 1, NAX
-         IF( AXES( I ) .EQ. 0 ) THEN
-            NWPICK = NWPICK + 1
-            WAXES( NWPICK ) = I
-         ELSE
-            NRPICK = NRPICK + 1
-            RAXES( NRPICK ) = AXES( I )
-         END IF
-      END DO
-
-*  Report an error if none of the region axes are present in the WCS Frame.
-      IF( NRPICK .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN
-         STATUS = SAI__ERROR
-         CALL ERR_REP( ' ', 'The supplied Region has no axes in '//
-     :                 'common with the current WCS Frame in the NDF.', 
-     :                 status )
-      END IF
-
-*  Pick the axes from the Region that are also in the WCS Frame. This
-*  should produce a cut-down version of the user-supplied Region.
-      UREG = AST_PICKAXES( IREG, NRPICK, RAXES, JUNK, STATUS )
-
-*  If the resulting Object is not a Region, we cannot match the region
-*  and the WCS Frame.
-      IF( .NOT. AST_ISAREGION( UREG ) .AND. STATUS .EQ. SAI__OK ) THEN
-         STATUS = SAI__ERROR
-         CALL ERR_REP( ' ', 'Cannot pick the current WCS axes from '//
-     :                 'the supplied Region.', STATUS )
-      END IF
-
-*  If any WCS axes have no corresponding axis in the region, get an
-*  unbounded region (a negated NullRegion) in a Frame that spans the 
-*  WCS axes that have no corresponding axes in the Region.
-      IF( NWPICK .GT. 0 ) THEN
-         EREG = AST_NULLREGION( AST_PICKAXES( IWCS, NWPICK, WAXES, JUNK,
-     :                                        STATUS ), 
-     :                          AST__NULL, 'Negated=1', STATUS )
-
-*  Join this region in parallel with the region containing the WCS axes 
-*  picked from the user-supplied region.
-         NEWREG = AST_PRISM( UREG, EREG, ' ', STATUS )
-
-*  If there are no extra WCS axes, just use the cut-down user-supplied region. 
-      ELSE
-         NEWREG = AST_CLONE( UREG, STATUS )
-      END IF
+*  WCS Frame. 
+      CALL ATL_MATCHREGION( IREG, IWCS, NEWREG, STATUS )
 
 *  We need a Mapping from the co-ordinate system represented by the 
 *  Region to the pixel co-ordinate system of the NDF. The AST_COVNERT 

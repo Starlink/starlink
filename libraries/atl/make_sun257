@@ -1,10 +1,10 @@
 #!/bin/csh
 
-rm -f atl_routines.tex sun257.tex
+rm -f atl_routines.tex atl_routines_sorted.tex sun257.tex
 touch atl_routines.tex
 
-foreach n (atl_*.f atl*.c)
-   if( $n != "atl_test.f" && $n != "atl_test.c" && $n != "atl.c" ) then
+foreach n (atl_*.f)
+   if( $n != "atl_test.f" ) then
       $STARCONF_DEFAULT_STARLINK/bin/sst/prolat $n out=head \
                                noatask nodocument single nopage
       cat head >> atl_routines.tex
@@ -12,5 +12,16 @@ foreach n (atl_*.f atl*.c)
    endif
 end
 
-cat sun_head.tex atl_routines.tex sun_tail.tex > sun257.tex
+foreach n (atl*.c)
+   if( $n != "atl_test.c" && $n != "atl.c" ) then
+      $STARCONF_DEFAULT_STARLINK/bin/sst/prolat $n out=head \
+                               noatask nodocument nosingle nopage
+      cat head >> atl_routines.tex
+      rm head
+   endif
+end
+
+./sort-routines.pl
+
+cat sun_head.tex atl_routines_sorted.tex sun_tail.tex > sun257.tex
 

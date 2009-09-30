@@ -9,10 +9,10 @@
 \newcommand{\stardocsource}    {sun257.0}
 \newcommand{\stardocnumber}    {257.0}
 \newcommand{\stardocauthors}   {D.S. Berry}
-\newcommand{\stardocdate}      {16th April 2009}
+\newcommand{\stardocdate}      {3rd July 2006}
 \newcommand{\stardoctitle}     {ATL \\ [\latex{1ex}]
                                 A Library of AST Utility Routines}
-\newcommand{\stardocversion}   {Version 1.1}
+\newcommand{\stardocversion}   {Version 1.0}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -744,6 +744,44 @@ higher-level utility tasks.
    }
 }
 \sstroutine{
+   ATL\_EXTREG
+}{
+   Add axes to a Region so that it matches a given Frame
+}{
+   \sstdescription{
+      This routine returns a new Region (normally a Prism) defined with
+      the co-oridnate system specified by {\tt "}FRM{\tt "}. Any axes in FRM that are
+      also present in the supplied region OLDREG inherit their coverage
+      in the new region from OLDREG. Any axes in FRM that are not present
+      in OLDREG are unbounded in the new region.
+   }
+   \sstinvocation{
+      CALL ATL\_EXTREG( OLDREG, FRM, NEWREG, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IREG = INTEGER (Given)
+      }{
+         The Region to extrude.
+      }
+      \sstsubsection{
+         IFRM = INTEGER (Given)
+      }{
+         The Frame defining the axes required in the new Region.
+      }
+      \sstsubsection{
+         NEWREG = INTEGER (Returned)
+      }{
+         The new Region. Returned equal to AST\_\_NULL if an error occurs.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
    ATL\_FINDSKY
 }{
    Locate any sky axes within a Frame
@@ -898,6 +936,51 @@ higher-level utility tasks.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   ATL\_MATCHREGION
+}{
+   Ensure the axes in a Region match those in a Frame
+}{
+   \sstdescription{
+      This routine checks for matching axes in a supplied Region and
+      Frame. If possible, a new region is created containing a set of
+      axes that correspond in number and type (but not necessarily in
+      specific attributes) to those in the supplied Frame. This means
+      that AST\_CONVERT should be able to find a Mapping between the
+      supplied Frame and the returned Region. Note, the order of the
+      axes in the returned Region may not match those in the Frame,
+      but AST\_CONVERT will be able to identify any required re-ordering.
+
+      If it is not possible to find a matching Region (for instance, if
+      there are no axes in common between the supplied Region and Frame),
+      an error is reported.
+   }
+   \sstinvocation{
+      CALL ATL\_MATCHREGION( REGION, FRAME, NEWREG, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         REGION = INTEGER (Given)
+      }{
+         An AST pointer for the Region to be modified.
+      }
+      \sstsubsection{
+         FRAME = INTEGER (Given)
+      }{
+         An AST pointer for a Frame to be matched.
+      }
+      \sstsubsection{
+         NEWREG = INTEGER (Returned)
+      }{
+         An AST pointer to the returned Region.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned )
       }{
          The global status.
       }
@@ -1140,8 +1223,8 @@ higher-level utility tasks.
       \sstsubsection{
          VALUE = INTEGER (Given)
       }{
-         The new keyword value. If this is VAL\_\_BADI, then an UNDEF value
-         will be stored in the FitsChan.
+         The new keyword value. If this is VAL\_\_BADI, then an undefined
+         value will be stored in the FitsChan.
       }
       \sstsubsection{
          COMMNT = CHARACTER $*$ ( $*$ ) (Given)
@@ -1253,8 +1336,8 @@ higher-level utility tasks.
       \sstsubsection{
          VALUE = REAL (Given)
       }{
-         The new keyword value. If this is VAL\_\_BADR, then an UNDEF value
-         will be stored in ther FitsChan.
+         The new keyword value. If this is VAL\_\_BADR, then an undefined
+         value will be stored in the FitsChan.
       }
       \sstsubsection{
          COMMNT = CHARACTER $*$ ( $*$ ) (Given)
@@ -1310,8 +1393,11 @@ higher-level utility tasks.
       \sstsubsection{
          VALUE = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         The new keyword value. If this is AST\_\_UNDEFS, then an UNDEF value
-         will be stored in ther FitsChan.
+         The new keyword value. If this is ATL\_\_BADC, then an undefined
+         value will be stored in the FitsChan. Note, the ATL\_\_BADC string
+         is defined in include file ATL\_PAR, together with the integer
+         constant ATL\_SZBADC, which is equal to the length of the ATL\_\_BADC
+         string.
       }
       \sstsubsection{
          COMMNT = CHARACTER $*$ ( $*$ ) (Given)
@@ -1434,10 +1520,41 @@ higher-level utility tasks.
    Read an AST Object from a GRP group
 }{
    \sstdescription{
-      Read an AST Object from a GRP group.
+      Read an AST Object from a GRP group. The text in the group can be
+      either an AST Object dump, a set of FITS headers, or an STC-S
+      description.
    }
    \sstinvocation{
       CALL ATL\_RDGRP( IGRP, IAST, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IGRP = INTEGER (Given)
+      }{
+         An identifier for the group holding the text.
+      }
+      \sstsubsection{
+         IAST = INTEGER (Returned)
+      }{
+         The AST Object, or AST\_\_NULL.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   ATL\_RDSTCS
+}{
+   Read an AST Object from a GRP group using an StcsChan
+}{
+   \sstdescription{
+      Read an AST Object from a GRP group using an StcsChan.
+   }
+   \sstinvocation{
+      CALL ATL\_RDSTCS( IGRP, IAST, STATUS )
    }
    \sstarguments{
       \sstsubsection{
@@ -1470,13 +1587,43 @@ higher-level utility tasks.
    \sstinvocation{
       CALL ATL\_RM( FILE, STATUS )
    }
-   \sstdiytopic{
+   \sstdiylist{
       Parameters
    }{
-      FILE = CHARACTER $*$ ( $*$ ) (Given)
+      \sstsubsection{
+         FILE = CHARACTER $*$ ( $*$ ) (Given)
+      }{
          The path to the file.
-      STATUS = INTEGER (Given and Returned)
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
          The inherited global status.
+      }
+   }
+}
+\sstroutine{
+   ATL\_RMBLFT
+}{
+   Remove contiguous blanks from FITS header
+}{
+   \sstdescription{
+      This routine removes contiguous blank lines from the FITS header.
+   }
+   \sstinvocation{
+      CALL ATL\_RMBLFT( FC, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         FC1 = INTEGER (Given)
+      }{
+         Pointer to the FitsChan to clean.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
    }
 }
 \sstroutine{
@@ -1583,7 +1730,7 @@ higher-level utility tasks.
       separately by the caller).
    }
    \sstinvocation{
-      CALL ATL\_WCSPX( KM1, KM2, DIM, OBSLON, OBSLAT, IWCS, STATUS )
+      CALL ATL\_WCSPX( KM1, KM2, CRPIX, OBSLON, OBSLAT, IWCS, STATUS )
    }
    \sstarguments{
       \sstsubsection{
@@ -1641,10 +1788,13 @@ higher-level utility tasks.
          is missing a value of 6 (FK4 B1950) is assumed.
       }
       \sstsubsection{
-         DIM( 3 ) = INTEGER (Given)
+         CRPIX( 3 ) = DOUBLE PRECISION (Given)
       }{
-         The dimensions of the pixel axes of the array into which the SPECX
-         data is being placed.
+         The pixel co-ordinates at the reference point. The spatial
+         position of the reference point is given by RA\_DEC(1) and RA\_DEC(2)
+         offset by the DPOS(1) and DPOS(2) values (all these are in the KM1
+         KeyMap). The spectral reference value is given by the JFCEN item
+         in KM1.
       }
       \sstsubsection{
          OBSLON = DOUBLE PRECISION (Given)
@@ -1686,7 +1836,7 @@ higher-level utility tasks.
    of fixed length strings
 }{
    \sstdescription{
-      This function obtains a value for a named environment paramater and
+      This function obtains a value for a named environment parameter and
       stores it in the supplied KeyMap, using the parameter name as the
       key.
    }
@@ -1837,6 +1987,57 @@ higher-level utility tasks.
          status
       }{
          Pointer to the global status variable.
+      }
+   }
+}
+\sstroutine{
+   atlMatchRegion
+}{
+   Ensure the axes in a Region match those in a Frame
+}{
+   \sstdescription{
+      This function checks for matching axes in a supplied Region and
+      Frame. If possible, a new region is created containing a set of
+      axes that correspond in number and type (but not necessarily in
+      specific attributes) to those in the supplied Frame. This means
+      that astConvert should be able to find a Mapping between the
+      supplied Frame and the returned Region. Note, the order of the
+      axes in the returned Region may not match those in the Frame, but
+      astConvert will be able to identify any required re-ordering.
+
+      If it is not possible to find a matching Region (for instance, if
+      there are no axes in common between the supplied Region and Frame),
+      an error is reported.
+   }
+   \sstinvocation{
+      AstRegion $*$atlMatchRegion( AstRegion $*$region, AstFrame $*$frame,
+                                 int $*$status )
+   }
+   \sstarguments{
+      \sstsubsection{
+         region
+      }{
+         An AST pointer for the Region to be modified.
+      }
+      \sstsubsection{
+         frame
+      }{
+         An AST pointer for a Frame to be matched.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         An AST pointer for a Region that matches Frame, or NULL if
+      }{
+      }
+      \sstsubsection{
+         an error occurs.
+      }{
       }
    }
 }

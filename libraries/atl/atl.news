@@ -1,8 +1,15 @@
 1 ATL_library
 
-An new release (V1.1) of the ATL library is now available. The ATL
+An new release (V1.2) of the ATL library is now available. The ATL
 library contains high level AST-related utility functions. See SUN/256
 for details. Changed in the new version include:
+
+- A new function astMatchRegion/AST_MATCHREGION, which produces a Region
+with axes corresponding to those in a given Frame.
+
+
+
+Changes introduced by V1.1:
 
 - A new C function, atlGetParam, obtains a value for a named parameter 
 from the environment, and places the value in a supplied AST KeyMap. The 
