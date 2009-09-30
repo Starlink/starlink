@@ -97,6 +97,8 @@
 *        Original version.
 *     29-SEP-2009 (DSB):
 *        Modified to allow Region and WCS Frame to have different axes.
+*     30-SEP-2009 (DSB):
+*        Correct half pixel shift.
 *     {enter_further_changes_here}
 
 *-
@@ -107,7 +109,8 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL constants
-      INCLUDE 'AST_PAR'          ! AST constant and functions
+      INCLUDE 'AST_PAR'          ! AST constants and functions
+      INCLUDE 'NDF_PAR'          ! NDF constants
                
 *  Status:     
       INTEGER STATUS             ! Global status
@@ -118,12 +121,16 @@
 *  Local Variables:      
       CHARACTER CONTXT*40        ! Text version of constant value
       DOUBLE PRECISION CONST     ! The constant to assign
+      DOUBLE PRECISION SHIFT( NDF__MXDIM ) ! The shift for each axis
       INTEGER FSET               ! Region -> PIXEL FrameSet
+      INTEGER I                  ! Lop count
       INTEGER INDF1              ! Identifier for the source NDF  
       INTEGER INDF2              ! Identifier for the output NDF
       INTEGER IPIX               ! Index of PIXEL Frame within IWCS
       INTEGER IREG               ! AST Region
       INTEGER IWCS               ! NDF WCS FrameSet
+      INTEGER MAP                ! Region->pixel Mapping
+      INTEGER NAX                ! Number of pixel axes
       INTEGER NEWREG             ! Region matching WCS Frame
       LOGICAL BAD                ! Assign bad values to the region?
       LOGICAL INSIDE             ! Assign value to inside of region?
@@ -173,6 +180,19 @@
          GO TO 999
       END IF
 
+*  Get the Mapping from this FrameSet and modify it to take account of
+*  the half pixel shift required by KPS1_RMASK.
+      NAX = AST_GETI( FSET, 'Naxes', STATUS )
+
+      DO I = 1, NAX
+         SHIFT( I ) = 0.5D0
+      END DO
+
+      MAP = AST_CMPMAP( AST_GETMAPPING( FSET, AST__BASE, AST__CURRENT, 
+     :                                  STATUS ),
+     :                  AST_SHIFTMAP( NAX, SHIFT, ' ', STATUS ), 
+     :                  .TRUE., ' ', STATUS )
+
 *  Create the output NDF as a copy of the input NDF.
       CALL LPG_PROP( INDF1, 'Data,Variance,Quality,Axis,Units,WCS', 
      :               'OUT', INDF2, STATUS )
@@ -193,13 +213,13 @@
       CALL PAR_GET0L( 'INSIDE', INSIDE, STATUS )
 
 *  First mask the Data array.
-      CALL KPS1_RMASK( INDF2, 'Data', NEWREG, FSET, INSIDE, CONST, 
+      CALL KPS1_RMASK( INDF2, 'Data', NEWREG, MAP, INSIDE, CONST, 
      :                 STATUS )
 
 *  If the Variance array is defined, also mask the Variance array.
       CALL NDF_STATE( INDF2, 'Variance', VAR, STATUS )
       IF( VAR ) THEN
-         CALL KPS1_RMASK( INDF2, 'Variance', NEWREG, FSET, INSIDE, 
+         CALL KPS1_RMASK( INDF2, 'Variance', NEWREG, MAP, INSIDE, 
      :                    CONST, STATUS )
       END IF
 

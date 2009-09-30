@@ -27,17 +27,12 @@
 *     MAP = INTEGER (Given)
 *        Pointer to a Mapping. The forward transformation should map
 *	 positions in the coordinate system of the supplied Region into
-*	 pixel coordinates as defined by the LBND and UBND arguments. A
-*	 value of AST__NULL can be supplied if the coordinate system of
-*	 the supplied Region corresponds to pixel coordinates. This is
-*	 equivalent to supplying a UnitMap.
-*
-*        The number of inputs for this Mapping (as given by its Nin
-*	 attribute) should match the number of axes in the supplied
-*	 Region (as given by the Naxes attribute of the Region). The
-*	 number of outputs for the Mapping (as given by its Nout
-*	 attribute) should match the number of grid dimensions given by
-*	 the value of NDIM below.
+*	 a coordinate system that is offset on each axis by half a pixel 
+*        from pixel coordinates. So, if a 2D NDF has pixel origin [i,j],
+*        then the **centre** of the bottom left pixel should be
+*        [REAL(I),REAL(J)]. With the usual Starlink pixel coordinate
+*        system, these coordinates would be assigned to the **top left 
+*        corner** of the bottom right pixel.
 *     INSIDE = INTEGER (Given)
 *        A boolean value which indicates which pixel are to be masked. If
 *	 .TRUE. is supplied, then all grid pixels with centres inside the
