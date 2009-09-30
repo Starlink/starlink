@@ -1,102 +1,102 @@
 /*
- *+
- *  Name:
- *     SC2FFT
+*+
+*  Name:
+*     SC2FFT
 
- *  Purpose:
- *     Fourier Transform SCUBA-2 time-series data
+*  Purpose:
+*     Fourier Transform SCUBA-2 time-series data
 
- *  Language:
- *     Starlink ANSI C
+*  Language:
+*     Starlink ANSI C
 
- *  Type of Module:
- *     ADAM A-task
+*  Type of Module:
+*     ADAM A-task
 
- *  Invocation:
- *     smurf_sc2fft( int *status );
+*  Invocation:
+*     smurf_sc2fft( int *status );
 
- *  Arguments:
- *     status = int* (Given and Returned)
- *        Pointer to global status.
+*  Arguments:
+*     status = int* (Given and Returned)
+*        Pointer to global status.
 
- *  Description:
- *     This routine performs for the forward or inverse FFT of SCUBA-2 data.
- *     The FFT of the data are stored in a 4-dimensional array with dimensions
- *     frequency, xbolo, ybolo, component (where component is a dimension
- *     of length 2 holding the real and imaginary parts). The inverse flag
- *     is used to transform back to the time domain from the frequency domain.
- *     If the data are already in the requested domain, the ouput file is
- *     simply a copy of the input file.
+*  Description:
+*     This routine performs for the forward or inverse FFT of SCUBA-2 data.
+*     The FFT of the data are stored in a 4-dimensional array with dimensions
+*     frequency, xbolo, ybolo, component (where component is a dimension
+*     of length 2 holding the real and imaginary parts). The inverse flag
+*     is used to transform back to the time domain from the frequency domain.
+*     If the data are already in the requested domain, the ouput file is
+*     simply a copy of the input file.
 
- *  Notes:
- *     Transforming data loses the VARIANCE and QUALITY components.
+*  Notes:
+*     Transforming data loses the VARIANCE and QUALITY components.
 
- *  ADAM Parameters:
- *     IN = NDF (Read)
- *          Input files to be transformed
- *     INVERSE = _LOGICAL (Read)
- *          If true perform inverse transform
- *     MSG_FILTER = _CHAR (Read)
- *          Control the verbosity of the application. Values can be
- *          NONE (no messages), QUIET (minimal messages), NORMAL,
- *          VERBOSE, DEBUG or ALL. [NORMAL]
- *     OUT = NDF (Write)
- *          Output files
- *     OUTFILES = LITERAL (Write)
- *          The name of text file to create, in which to put the names of
- *          all the output NDFs created by this application (one per
- *          line). If a null (!) value is supplied no file is created. [!]
- *     POLAR = _LOGICAL (Read)
- *          If true use polar representation (amplitude,argument) of FFT
- *     POWER = _LOGICAL (Read)
- *          If set use polar representation of FFT with squared amplitudes
+*  ADAM Parameters:
+*     IN = NDF (Read)
+*          Input files to be transformed
+*     INVERSE = _LOGICAL (Read)
+*          If true perform inverse transform
+*     MSG_FILTER = _CHAR (Read)
+*          Control the verbosity of the application. Values can be
+*          NONE (no messages), QUIET (minimal messages), NORMAL,
+*          VERBOSE, DEBUG or ALL. [NORMAL]
+*     OUT = NDF (Write)
+*          Output files
+*     OUTFILES = LITERAL (Write)
+*          The name of text file to create, in which to put the names of
+*          all the output NDFs created by this application (one per
+*          line). If a null (!) value is supplied no file is created. [!]
+*     POLAR = _LOGICAL (Read)
+*          If true use polar representation (amplitude,argument) of FFT
+*     POWER = _LOGICAL (Read)
+*          If set use polar representation of FFT with squared amplitudes
 
- *  Related Applications:
- *     SMURF: SC2CONCAT, SC2CLEAN
+*  Related Applications:
+*     SMURF: SC2CONCAT, SC2CLEAN
 
- *  Authors:
- *     Edward Chapin (UBC)
- *     Tim Jenness (JAC, Hawaii)
- *     {enter_new_authors_here}
+*  Authors:
+*     Edward Chapin (UBC)
+*     Tim Jenness (JAC, Hawaii)
+*     {enter_new_authors_here}
 
- *  History:
- *     2008-07-22 (EC):
- *        Initial version - based on sc2clean task
- *     2008-07-25 (TIMJ):
- *        Use kaplibs for group in/out.
- *     2008-07-30 (EC):
- *        Handle raw data (filter out / apply darks, flatfield)
- *     2009-03-30 (TIMJ):
- *        Add OUTFILES parameter.
- *     2009-04-30 (EC):
- *        Use threads
- *     {enter_further_changes_here}
+*  History:
+*     2008-07-22 (EC):
+*        Initial version - based on sc2clean task
+*     2008-07-25 (TIMJ):
+*        Use kaplibs for group in/out.
+*     2008-07-30 (EC):
+*        Handle raw data (filter out / apply darks, flatfield)
+*     2009-03-30 (TIMJ):
+*        Add OUTFILES parameter.
+*     2009-04-30 (EC):
+*        Use threads
+*     {enter_further_changes_here}
 
- *  Copyright:
- *     Copyright (C) 2008-2009 Science and Technology Facilities Council.
- *     Copyright (C) 2008-2009 University of British Columbia.
- *     All Rights Reserved.
+*  Copyright:
+*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2009 University of British Columbia.
+*     All Rights Reserved.
 
- *  Licence:
- *     This program is free software; you can redistribute it and/or
- *     modify it under the terms of the GNU General Public License as
- *     published by the Free Software Foundation; either version 3 of
- *     the License, or (at your option) any later version.
- *
- *     This program is distributed in the hope that it will be
- *     useful, but WITHOUT ANY WARRANTY; without even the implied
- *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- *     PURPOSE. See the GNU General Public License for more details.
- *
- *     You should have received a copy of the GNU General Public
- *     License along with this program; if not, write to the Free
- *     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
- *     MA 02111-1307, USA
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 3 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+*     MA 02111-1307, USA
 
- *  Bugs:
- *     {note_any_bugs_here}
- *-
- */
+*  Bugs:
+*     {note_any_bugs_here}
+*-
+*/
 
 #if HAVE_CONFIG_H
 #include <config.h>

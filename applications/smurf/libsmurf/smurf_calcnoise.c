@@ -1,86 +1,86 @@
 /*
- *+
- *  Name:
- *     CALCNOISE
+*+
+*  Name:
+*     CALCNOISE
 
- *  Purpose:
- *     Calculate noise image
+*  Purpose:
+*     Calculate noise image
 
- *  Language:
- *     Starlink ANSI C
+*  Language:
+*     Starlink ANSI C
 
- *  Type of Module:
- *     ADAM A-task
+*  Type of Module:
+*     ADAM A-task
 
- *  Invocation:
- *     smurf_calcnoise( int *status );
+*  Invocation:
+*     smurf_calcnoise( int *status );
 
- *  Arguments:
- *     status = int* (Given and Returned)
- *        Pointer to global status.
+*  Arguments:
+*     status = int* (Given and Returned)
+*        Pointer to global status.
 
- *  Description:
- *     This routine calculates the white noise on the array by performing
- *     an FFT to generate a power spectrum and then extracting the
- *     data between two frequency ranges.
+*  Description:
+*     This routine calculates the white noise on the array by performing
+*     an FFT to generate a power spectrum and then extracting the
+*     data between two frequency ranges.
 
- *  Notes:
- *     Transforming data loses the VARIANCE and QUALITY components.
+*  Notes:
+*     Transforming data loses the VARIANCE and QUALITY components.
 
- *  ADAM Parameters:
- *     FREQ = _REAL (Given)
- *          Frequency range (Hz) to use to calculate the white noise [2,10]
- *     IN = NDF (Read)
- *          Input files to be transformed. Files from the same sequence
- *          will be combined. Note that
- *     MSG_FILTER = _CHAR (Read)
- *          Control the verbosity of the application. Values can be
- *          NONE (no messages), QUIET (minimal messages), NORMAL,
- *          VERBOSE, DEBUG or ALL. [NORMAL]
- *     OUT = NDF (Write)
- *          Output files. Number of output files may differ from the
- *          number of input files.
- *     OUTFILES = LITERAL (Write)
- *          The name of text file to create, in which to put the names of
- *          all the output NDFs created by this application (one per
- *          line). If a null (!) value is supplied no file is created. [!]
+*  ADAM Parameters:
+*     FREQ = _REAL (Given)
+*          Frequency range (Hz) to use to calculate the white noise [2,10]
+*     IN = NDF (Read)
+*          Input files to be transformed. Files from the same sequence
+*          will be combined. Note that
+*     MSG_FILTER = _CHAR (Read)
+*          Control the verbosity of the application. Values can be
+*          NONE (no messages), QUIET (minimal messages), NORMAL,
+*          VERBOSE, DEBUG or ALL. [NORMAL]
+*     OUT = NDF (Write)
+*          Output files. Number of output files may differ from the
+*          number of input files.
+*     OUTFILES = LITERAL (Write)
+*          The name of text file to create, in which to put the names of
+*          all the output NDFs created by this application (one per
+*          line). If a null (!) value is supplied no file is created. [!]
 
- *  Related Applications:
- *     SMURF: SC2CONCAT, SC2CLEAN, SC2FFT
+*  Related Applications:
+*     SMURF: SC2CONCAT, SC2CLEAN, SC2FFT
 
- *  Authors:
- *     Tim Jenness (JAC, Hawaii)
- *     {enter_new_authors_here}
+*  Authors:
+*     Tim Jenness (JAC, Hawaii)
+*     {enter_new_authors_here}
 
- *  History:
- *     2009-09-24 (EC):
- *        Initial version - based on sc2fft task
- *     {enter_further_changes_here}
+*  History:
+*     2009-09-24 (EC):
+*        Initial version - based on sc2fft task
+*     {enter_further_changes_here}
 
- *  Copyright:
- *     Copyright (C) 2009 Science and Technology Facilities Council.
- *     All Rights Reserved.
+*  Copyright:
+*     Copyright (C) 2009 Science and Technology Facilities Council.
+*     All Rights Reserved.
 
- *  Licence:
- *     This program is free software; you can redistribute it and/or
- *     modify it under the terms of the GNU General Public License as
- *     published by the Free Software Foundation; either version 3 of
- *     the License, or (at your option) any later version.
- *
- *     This program is distributed in the hope that it will be
- *     useful, but WITHOUT ANY WARRANTY; without even the implied
- *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- *     PURPOSE. See the GNU General Public License for more details.
- *
- *     You should have received a copy of the GNU General Public
- *     License along with this program; if not, write to the Free
- *     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
- *     MA 02111-1307, USA
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 3 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+*     MA 02111-1307, USA
 
- *  Bugs:
- *     {note_any_bugs_here}
- *-
- */
+*  Bugs:
+*     {note_any_bugs_here}
+*-
+*/
 
 #if HAVE_CONFIG_H
 #include <config.h>

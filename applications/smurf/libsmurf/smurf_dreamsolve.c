@@ -1,91 +1,91 @@
 /*
- *+
- *  Name:
- *     DREAMSOLVE
+*+
+*  Name:
+*     DREAMSOLVE
 
- *  Purpose:
- *     Solve DREAM observations and generate 2-D image.
+*  Purpose:
+*     Solve DREAM observations and generate 2-D image.
 
- *  Language:
- *     Starlink ANSI C
+*  Language:
+*     Starlink ANSI C
 
- *  Type of Module:
- *     ADAM A-task
+*  Type of Module:
+*     ADAM A-task
 
- *  Invocation:
- *     smurf_dreamsolve( int *status );
+*  Invocation:
+*     smurf_dreamsolve( int *status );
 
- *  Arguments:
- *     status = int* (Given and Returned)
- *        Pointer to global status.
+*  Arguments:
+*     status = int* (Given and Returned)
+*        Pointer to global status.
 
- *  Description:
- *     This command reconstructs a series of 2-D images from
- *     DREAM observations.
+*  Description:
+*     This command reconstructs a series of 2-D images from
+*     DREAM observations.
 
- *  ADAM Parameters:
- *     IN = NDF (Read)
- *          Name of input data files.
- *     MSG_FILTER = _CHAR (Read)
- *          Control the verbosity of the application. Values can be
- *          NONE (no messages), QUIET (minimal messages), NORMAL,
- *          VERBOSE, DEBUG or ALL. [NORMAL]
- *     OUT = NDF (Write)
- *          Name of output files containing DREAM images. The DREAM images
- *          will be written to extensions to match that in use by the SCUBA-2
- *          data acquisition system.
+*  ADAM Parameters:
+*     IN = NDF (Read)
+*          Name of input data files.
+*     MSG_FILTER = _CHAR (Read)
+*          Control the verbosity of the application. Values can be
+*          NONE (no messages), QUIET (minimal messages), NORMAL,
+*          VERBOSE, DEBUG or ALL. [NORMAL]
+*     OUT = NDF (Write)
+*          Name of output files containing DREAM images. The DREAM images
+*          will be written to extensions to match that in use by the SCUBA-2
+*          data acquisition system.
 
- *  Related Applications:
- *     SMURF: DREAMWEIGHTS, STARECALC;
- *     KAPPA: WCSMOSAIC;
- *     CCDPACK: MAKEMOS
+*  Related Applications:
+*     SMURF: DREAMWEIGHTS, STARECALC;
+*     KAPPA: WCSMOSAIC;
+*     CCDPACK: MAKEMOS
 
- *  Authors:
- *     Andy Gibb (UBC)
- *     Tim Jenness (JAC, Hawaii)
- *     Edward Chapin (UBC)
- *     {enter_new_authors_here}
+*  Authors:
+*     Andy Gibb (UBC)
+*     Tim Jenness (JAC, Hawaii)
+*     Edward Chapin (UBC)
+*     {enter_new_authors_here}
 
- *  History:
- *     2006-06-13 (AGG):
- *        Clone from smurf_makemap
- *     2006-07-26 (TIMJ):
- *        Remove unused sc2 includes.
- *     2006-08-07 (EC):
- *        Replaced sc2ast_createwcs_compat call with sc2ast_createwcs placeholder
- *     2006-09-07 (EC):
- *        Commented out sc2ast_createwcs placeholder due to interface change
- *     2006-09-14 (AGG):
- *        All processing moved into smf_dreamsolve
- *     2008-07-22 (TIMJ):
- *        Use kaplibs and support dark subtraction.
- *     {enter_further_changes_here}
+*  History:
+*     2006-06-13 (AGG):
+*        Clone from smurf_makemap
+*     2006-07-26 (TIMJ):
+*        Remove unused sc2 includes.
+*     2006-08-07 (EC):
+*        Replaced sc2ast_createwcs_compat call with sc2ast_createwcs placeholder
+*     2006-09-07 (EC):
+*        Commented out sc2ast_createwcs placeholder due to interface change
+*     2006-09-14 (AGG):
+*        All processing moved into smf_dreamsolve
+*     2008-07-22 (TIMJ):
+*        Use kaplibs and support dark subtraction.
+*     {enter_further_changes_here}
 
- *  Copyright:
- *     Copyright (C) 2008 Science and Technology Facilities Council.
- *     Copyright (C) 2006 University of British Columbia. All Rights
- *     Reserved.
+*  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2006 University of British Columbia. All Rights
+*     Reserved.
 
- *  Licence:
- *     This program is free software; you can redistribute it and/or
- *     modify it under the terms of the GNU General Public License as
- *     published by the Free Software Foundation; either version 3 of
- *     the License, or (at your option) any later version.
- *
- *     This program is distributed in the hope that it will be
- *     useful,but WITHOUT ANY WARRANTY; without even the implied
- *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- *     PURPOSE. See the GNU General Public License for more details.
- *
- *     You should have received a copy of the GNU General Public
- *     License along with this program; if not, write to the Free
- *     Software Foundation, Inc., 59 Temple Place,Suite 330, Boston,
- *     MA 02111-1307, USA
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 3 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place,Suite 330, Boston,
+*     MA 02111-1307, USA
 
- *  Bugs:
- *     {note_any_bugs_here}
- *-
- */
+*  Bugs:
+*     {note_any_bugs_here}
+*-
+*/
 
 #if HAVE_CONFIG_H
 #include <config.h>

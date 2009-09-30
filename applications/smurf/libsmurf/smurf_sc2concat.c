@@ -1,100 +1,100 @@
 /*
- *+
- *  Name:
- *     SC2CONCAT
+*+
+*  Name:
+*     SC2CONCAT
 
- *  Purpose:
- *     Concatenate files into a larger file.
+*  Purpose:
+*     Concatenate files into a larger file.
 
- *  Language:
- *     Starlink ANSI C
+*  Language:
+*     Starlink ANSI C
 
- *  Type of Module:
- *     ADAM A-task
+*  Type of Module:
+*     ADAM A-task
 
- *  Invocation:
- *     smurf_sc2concat( int *status );
+*  Invocation:
+*     smurf_sc2concat( int *status );
 
- *  Arguments:
- *     status = int* (Given and Returned)
- *        Pointer to global status.
+*  Arguments:
+*     status = int* (Given and Returned)
+*        Pointer to global status.
 
- *  Description:
- *     Given a list of input files this task concatenates them into larger
- *     files. The rules it follows are:
- *     - data files are grouped by subarray
- *     - files are only concatenated if they are continuous in time
- *     - the longest a concatenated file may be is given by MAXLEN (in sec.)
- *     - for each continuous chunk of data, shorter than MAXLEN, a file
- *     is generated on disk for each subarray. The file name is determined
- *     as the name of the first input file for the chunk, with a suffix
- *     "_con". The can be modified using the parameter OUT.
+*  Description:
+*     Given a list of input files this task concatenates them into larger
+*     files. The rules it follows are:
+*     - data files are grouped by subarray
+*     - files are only concatenated if they are continuous in time
+*     - the longest a concatenated file may be is given by MAXLEN (in sec.)
+*     - for each continuous chunk of data, shorter than MAXLEN, a file
+*     is generated on disk for each subarray. The file name is determined
+*     as the name of the first input file for the chunk, with a suffix
+*     "_con". The can be modified using the parameter OUT.
 
- *  ADAM Parameters:
- *     IN = NDF (Read)
- *          Input file(s)
- *     MSG_FILTER = _CHAR (Read)
- *          Control the verbosity of the application. Values can be
- *          NONE (no messages), QUIET (minimal messages), NORMAL,
- *          VERBOSE, DEBUG or ALL. [NORMAL]
- *     OUT = NDF (Write)
- *          Output concatenated files
- *     OUTFILES = LITERAL (Write)
- *          The name of text file to create, in which to put the names of
- *          all the output NDFs created by this application (one per
- *          line). If a null (!) value is supplied no file is created. [!]
- *     PADEND = _INTEGER (Read)
- *          Number of samples to pad at end.
- *     PADSTART = _INTEGER (Read)
- *          Number of samples to pad at start.
- *     MAXLEN = _DOUBLE (Read)
- *          Maximum length (in seconds) concatenated file).
+*  ADAM Parameters:
+*     IN = NDF (Read)
+*          Input file(s)
+*     MSG_FILTER = _CHAR (Read)
+*          Control the verbosity of the application. Values can be
+*          NONE (no messages), QUIET (minimal messages), NORMAL,
+*          VERBOSE, DEBUG or ALL. [NORMAL]
+*     OUT = NDF (Write)
+*          Output concatenated files
+*     OUTFILES = LITERAL (Write)
+*          The name of text file to create, in which to put the names of
+*          all the output NDFs created by this application (one per
+*          line). If a null (!) value is supplied no file is created. [!]
+*     PADEND = _INTEGER (Read)
+*          Number of samples to pad at end.
+*     PADSTART = _INTEGER (Read)
+*          Number of samples to pad at start.
+*     MAXLEN = _DOUBLE (Read)
+*          Maximum length (in seconds) concatenated file).
 
- *  Related Applications:
- *     SMURF: SC2FFT, SC2CLEAN
+*  Related Applications:
+*     SMURF: SC2FFT, SC2CLEAN
 
- *  Authors:
- *     Edward Chapin (UBC)
- *     {enter_new_authors_here}
+*  Authors:
+*     Edward Chapin (UBC)
+*     {enter_new_authors_here}
 
- *  History:
- *     2008-07-03 (EC):
- *        Initial version.
- *     2008-07-22 (TIMJ):
- *        Handle darks. USe kaplibs for groups. Free memory leak.
- *     2008-07-29 (EC):
- *        -Added parameter OUT
- *        -Switch to parGdr routines, and use steptime from header
- *     2009-03-30 (TIMJ):
- *        Add OUTFILES parameter.
- *     {enter_further_changes_here}
+*  History:
+*     2008-07-03 (EC):
+*        Initial version.
+*     2008-07-22 (TIMJ):
+*        Handle darks. USe kaplibs for groups. Free memory leak.
+*     2008-07-29 (EC):
+*        -Added parameter OUT
+*        -Switch to parGdr routines, and use steptime from header
+*     2009-03-30 (TIMJ):
+*        Add OUTFILES parameter.
+*     {enter_further_changes_here}
 
- *  Copyright:
- *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
- *     Council. Copyright (C) 2005-2008 University of British Columbia.
- *     Copyright (C) 2008-2009 Science and Technology Facilities Council.
- *     All Rights Reserved.
+*  Copyright:
+*     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
+*     Council. Copyright (C) 2005-2008 University of British Columbia.
+*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
+*     All Rights Reserved.
 
- *  Licence:
- *     This program is free software; you can redistribute it and/or
- *     modify it under the terms of the GNU General Public License as
- *     published by the Free Software Foundation; either version 3 of
- *     the License, or (at your option) any later version.
- *
- *     This program is distributed in the hope that it will be
- *     useful,but WITHOUT ANY WARRANTY; without even the implied
- *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- *     PURPOSE. See the GNU General Public License for more details.
- *
- *     You should have received a copy of the GNU General Public
- *     License along with this program; if not, write to the Free
- *     Software Foundation, Inc., 59 Temple Place,Suite 330, Boston,
- *     MA 02111-1307, USA
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 3 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place,Suite 330, Boston,
+*     MA 02111-1307, USA
 
- *  Bugs:
- *     {note_any_bugs_here}
- *-
- */
+*  Bugs:
+*     {note_any_bugs_here}
+*-
+*/
 
 #if HAVE_CONFIG_H
 #include <config.h>
