@@ -52,6 +52,8 @@
 *        Add switching mode.
 *     2009-06-23 (TIMJ):
 *        Add ocsconfig presence indicator
+*     2009-09-29 (TIMJ):
+*       Report pixel origin.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -152,6 +154,18 @@ void smf_dump_smfData( const smfData *data, int showflags, int *status) {
       }
     }
     msgOut("", "  dims  = ^D", status);
+  }
+
+  /* Size of array in each dimension */
+  if (ndims <= DAT__MXDIM) {
+    for ( i=0; i< ndims; i++) {
+      sprintf( string, "%" DIM_T_FMT, (data->lbnd)[i]);
+      msgSetc("D", string);
+      if ( i != ndims-1 ) {
+        msgSetc("D", ",");
+      }
+    }
+    msgOut("", "  pixel origin  = ^D", status);
   }
 
   /* Are data time-ordered? */

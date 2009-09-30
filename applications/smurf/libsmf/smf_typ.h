@@ -470,6 +470,7 @@ typedef struct smfData {
   smf_dtype dtype;           /* Data type of DATA and VARIANCE arrays */
   void * pntr[3];            /* Array of pointers to DATA/VARIANCE/QUALITY */
   dim_t dims[NDF__MXDIM];    /* Dimensions of data array */
+  dim_t lbnd[NDF__MXDIM];    /* Lower PIXEL bounds of data array */
   int isTordered;            /* 0=order by bolo, 1=order by tslice (default) */
   size_t ndims;              /* Number of active dimensions in "dims" */
   int refcount;              /* Reference count for data object */

@@ -66,9 +66,12 @@
 *        Initialize isTordered
 *     2007-12-18 (AGG):
 *        Update to use new smf_free behaviour
+*     2009-09-29 (TIMJ):
+*        Initialize pixel origin.
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research
 *     Council. University of British Columbia. All Rights Reserved.
 
@@ -159,6 +162,7 @@ smf_create_smfData( int flags, int * status ) {
   }
   for (i = 0; i < NDF__MXDIM; i++ ) {
     (data->dims)[i] = 0;
+    (data->lbnd)[i] = 1;
   }
 
   data->lut = NULL;

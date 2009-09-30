@@ -124,6 +124,9 @@
  *        Stride-ify
  *     2009-01-12 (EC):
  *        Add bad pixel masks (bpms) to interface
+ *     2009-09-29 (TIMJ):
+ *        Handle pixel origin in concatenated smfData
+
 
  *  Notes:
  *     If projection information supplied, pointing LUT will not be
@@ -501,6 +504,11 @@ void smf_concat_smfGroup( smfWorkForce *wf, smfGroup *igrp,
                   ncol = data->dims[1+SC2STORE__COL_INDEX];
                 }
                 data->ndims = 3;
+
+                /* time ordering should adjust pixel lower bounds automatically */
+                for (k = 0; k < 3; k++) {
+                  (data->lbnd)[k] = (refdata->lbnd)[k];
+                }
 
                 /* Set the data type and order */
                 data->dtype = refdtype;

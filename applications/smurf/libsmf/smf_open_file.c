@@ -256,6 +256,8 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
 
   char dtype[NDF__SZTYP+1];  /* String for DATA type */
   int indf;                  /* NDF identified for input file */
+  int lbnd[NDF__MXDIM];      /* Lower pixel bounds of NDF */
+  int ubnd[NDF__MXDIM];      /* Upper pixel bounds of NDF */
   int ndfdims[NDF__MXDIM];   /* Array containing size of each axis of array */
   int ndims;                 /* Number of dimensions in data */
   int qexists;               /* Boolean for presence of QUALITY component */
@@ -349,7 +351,8 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
     msgOutif(MSG__DEBUG, "", "Opening file ^F", status);
   }
 
-  /* Determine the dimensions of the DATA component */
+  /* Determine the dimensions of the DATA component and pixel origin */
+  ndfBound( indf, NDF__MXDIM, lbnd, ubnd, &ndims, status );
   ndfDim( indf, NDF__MXDIM, ndfdims, &ndims, status );
 
   /* Check type of DATA and VARIANCE arrays (they should both be the same!) */
@@ -838,10 +841,11 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
           ((*data)->pntr)[i] = outdata[i];
         }
       }
-      /* Store the dimensions and the size of each axis */
+      /* Store the dimensions, bounds and the size of each axis */
       (*data)->ndims = ndims;
       for (i=0; i< (size_t)ndims; i++) {
         ((*data)->dims)[i] = (dim_t)ndfdims[i];
+        ((*data)->lbnd)[i] = (dim_t)lbnd[i];
       }
     }
     /* Store DREAM parameters for flatfielded data if they exist. This

@@ -85,10 +85,12 @@
 *        Set relevant WCS attributes for moving sources
 *     2008-08-27 (AGG):
 *        Factor out WCS check for moving sources to smf_set_moving
+*     2009-09-29 (TIMJ):
+*        Read lower bounds of NDF and store in smfData
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 *     Copyright (C) 2006-2007 University of British Columbia. All
 *     Rights Reserved.
 
@@ -151,6 +153,7 @@ void smf_open_ndfname( const HDSLoc *loc, const char accmode[], const char filen
   smf_dtype dtype;              /* Data type */
   int flags = 0;                /* Flags for creating smfDA, smfFile and 
 				   smfHead components in the output smfData */
+  int i;
   int ndat;                     /* Number of elements mapped in the requested NDF */
   int ndimsmapped;              /* Number of dimensions in mapped NDF */
   int ndfid;                    /* NDF identifier */
@@ -225,10 +228,12 @@ void smf_open_ndfname( const HDSLoc *loc, const char accmode[], const char filen
     }
   }
 
-  temp = dims[0];
-  dimens[0] = temp;
-  temp = dims[1];
-  dimens[1] = temp;  
+  if (*status == SAI__OK) {
+    for (i=0; i<ndims; i++) {
+      ((*ndfdata)->dims)[i] = dims[i];
+      ((*ndfdata)->lbnd)[i] = lbnd[i];
+    }
+  }
 
   /* Allow for label, units and WCS to be written */
   if (updating) {
@@ -253,7 +258,7 @@ void smf_open_ndfname( const HDSLoc *loc, const char accmode[], const char filen
 
   /* And populate the new smfData */
   *ndfdata = smf_construct_smfData( *ndfdata, newfile, NULL, NULL, dtype, 
-                                    datarr, 1, dimens, ndims, 0, 0, NULL, NULL,
-                                    status );
+                                    datarr, 1, (*ndfdata)->dims, (*ndfdata)->lbnd, ndims, 0, 0,
+                                    NULL, NULL, status );
 
 }

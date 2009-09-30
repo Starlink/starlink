@@ -14,8 +14,8 @@
 
 *  Invocation:
 *     smf_open_newfile( const Grp * ingrp, int index, smf_dtype dtype,
-*                       int ndims, 
-*                       const dim_t dims[], int flags, smfData ** data, 
+*                       int ndims, const int lbnd[], const inst ubnd[],
+*                       int flags, smfData ** data, 
 *                       int *status);
 
 *  Arguments:
@@ -27,8 +27,10 @@
 *        Data type of this smfData. Unsupported types result in an error.
 *     ndims = int (Given)
 *        Number of dimensions in dims[]. Maximum of NDF__MXDIM.
-*     dims[] = const dim_t (Given)
-*        Array of dimensions. Values will be copied from this array.
+*     lbnd[] = const int (Given)
+*        Lower pixel bounds of output file.
+*     ubnd[] = const int (Given)
+*        Upper pixel bounds of output file.
 *     flags = int (Given)
 *        Flags to denote whether to create flatfield, header, or file components
 *        and create variance and quality arrays
@@ -138,7 +140,6 @@ void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, const int n
 
   /* Local variables */
   const char *datatype;         /* String for data type */
-  dim_t dims[NDF__MXDIM];       /* Dimensions of NDf to be created */
   smfFile *file = NULL;         /* Pointer to smfFile struct */
   char filename[GRP__SZNAM+1];  /* Input filename, derived from GRP */
   int i;                        /* Loop counter */
@@ -258,12 +259,14 @@ void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, const int n
 
   /* Set the dimensions of the new smfData */
   for ( i=0; i<ndims; i++) {
-    dims[i] = ubnd[i] - lbnd[i] + 1;
+    ((*data)->dims)[i] = ubnd[i] - lbnd[i] + 1;
+    ((*data)->lbnd)[i] = lbnd[i];
   }
 
   /* Fill the smfData */
-  *data = smf_construct_smfData( *data, file, NULL, NULL, dtype, pntr, 1, dims,
-                                 ndims, 0, 0, NULL, NULL, status);
+  *data = smf_construct_smfData( *data, file, NULL, NULL, dtype, pntr, 1,
+                                 (*data)->dims, (*data)->lbnd, ndims, 0, 0, NULL, NULL,
+                                 status);
 
   if ( *data == NULL ) {
     if ( *status == SAI__OK ) {

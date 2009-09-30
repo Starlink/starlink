@@ -50,9 +50,12 @@
 *        Initial test version
 *     2006-08-08 (TIMJ):
 *        Can not treat dim_t and int interchangeably.
+*     2009-09-29 (TIMJ):
+*        Read lower bounds of NDF and store in smfData
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     Copyright (C) 2006 University of British Columbia
 *     and the Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
@@ -108,13 +111,14 @@ void smf_open_ndf( const int newndf, const char accmode[],
   void *datarr[3] = { NULL, NULL, NULL }; /* Pointers for data */
   const char *datatype;         /* String for data type */
   int dims[NDF__MXDIM];         /* Extent of each dimension */
-  dim_t ddims[NDF__MXDIM];      /* dim_t version of dimensions */
   int flags = 0;                /* Flags for creating smfDA, smfFile and 
 				   smfHead components in the output smfData */
+  int lbnd[NDF__MXDIM];         /* Lower pixel bounds of NDF */
   int ndat;                     /* Number of elements mapped in the requested NDF */
   int ndims;                    /* Number of dimensions in the requested NDF */
   smfFile *newfile = NULL;      /* New smfFile with details of requested NDF */
   int i;                        /* loop counter */
+  int ubnd[NDF__MXDIM];         /* Upper pixel bounds of NDF */
 
   if ( *status != SAI__OK ) return;
 
@@ -155,6 +159,7 @@ void smf_open_ndf( const int newndf, const char accmode[],
   if ( *status != SAI__OK ) {
     errRep( FUNC_NAME, "Problem identifying dimensions of requested NDF", status );
   }
+  ndfBound( newndf, NDF__MXDIM, lbnd, ubnd, &ndims, status );
 
   /* Create the smfFile */
   newfile = smf_construct_smfFile( newfile, newndf, 0, 0, filename, status );
@@ -164,13 +169,14 @@ void smf_open_ndf( const int newndf, const char accmode[],
 
   if (*status == SAI__OK) {
     for (i=0; i<ndims; i++) {
-      ddims[i] = (dim_t)dims[i];
+      ((*ndfdata)->dims)[i] = dims[i];
+      ((*ndfdata)->lbnd)[i] = lbnd[i];
     }
   }
 
   /* And populate the new smfData */
   *ndfdata = smf_construct_smfData( *ndfdata, newfile, NULL, NULL, dtype, 
-                                    datarr, 1, ddims, ndims, 0, 0, NULL, NULL, 
-                                    status );
+                                    datarr, 1, (*ndfdata)->dims, (*ndfdata)->lbnd, ndims, 0, 0,
+                                    NULL, NULL, status );
 
 }

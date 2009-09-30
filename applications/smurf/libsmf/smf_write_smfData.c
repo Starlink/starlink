@@ -65,6 +65,8 @@
 *        - enable 2d variance arrays, supply external variance with smfData
 *     2009-09-09 (EC):
 *        - fix so that files that are neither 1- nor 3-dimensions can be written
+*     2009-09-29 (TIMJ):
+*        Use pixel origin from smfData
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -160,7 +162,7 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
    
   /* Calculate bounds */
   for (i = 0; i < data->ndims; i++) {
-    lbnd[i] = 1;
+    lbnd[i] = (data->lbnd)[i];
     ubnd[i] = lbnd[i] + (data->dims)[i] - 1;
   }
   

@@ -16,7 +16,7 @@
 *     pntr = smf_construct_smfData( smfData * tofill, smfFile * file,
 *                      smfHead * hdr, smfDA * da,
 *                      smf_dtype dtype, void * pntr[3], int isTordered,
-*                      const dim_t dims[], int ndims,
+*                      const dim_t dims[], const dim_t lbnd[], int ndims,
 *                      int virtual, int ncoeff, double *poly,
 *                      AstKeyMap * history, int * status );
 
@@ -44,6 +44,9 @@
 *        If set, data is ICD-compliant time-ordered. Otherwise bolom-ordered.
 *     dims[] = const dim_t (Given)
 *        Array of dimensions. Values will be copied from this array.
+*     lbnd[] = const dim_t (Given)
+*        Lower pixel bounds of the data. Defaults to 1 for each ndim axis if
+*        NULL pointer provided. Values will be copied from this array.
 *     ndims = int (Given)
 *        Number of dimensions in dims[]. Maximum of NDF__MXDIM.
 *     virtual = int (Given)
@@ -53,7 +56,7 @@
 *     poly = double * (Given)
 *        Pointer to array of polynomial coefficients
 *     history = AstKeyMap * (Given)
-*        history tracking.
+*        history tracking. Will not be copied or cloned by the routine.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -93,11 +96,15 @@
 *        Should use dim_t not int (again)!
 *     2008-07-21 (EC):
 *        Add isTordered flag
+*     2009-09-29 (TIMJ):
+*        Initialize pixel origin.
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research
 *     Council. University of British Columbia. All Rights Reserved.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -140,8 +147,8 @@ smfData *
 smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr,
                        smfDA * da, smf_dtype dtype,
                        void * pntr[3], int isTordered, const dim_t dims[],
-                       int ndims, int virtual, int ncoeff, double *poly,
-                       AstKeyMap *history, int * status ) {
+                       const dim_t lbnd[], int ndims, int virtual, int ncoeff,
+                       double *poly, AstKeyMap *history, int * status ) {
 
   /* need to make sure that any memory we malloc will be freed on error
      so make sure we NULL all pointers first. */
@@ -200,6 +207,7 @@ smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr,
       data->ndims = ndims;
       for (i = 0; i < ndims; i++ ) {
         (data->dims)[i] = dims[i];
+        if (lbnd) (data->lbnd)[i] = lbnd[i];
       }
       data->ncoeff = ncoeff;
       data->poly = poly;

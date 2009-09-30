@@ -70,6 +70,8 @@
 *        -Fixed dtype for QUALITY -- SMF__UBYTE instead of SMF__USHORT
 *     2009-01-06 (EC):
 *        Stride-ify
+*     2009-09-29 (TIMJ):
+*        Handle pixel origin reordering
 
 *  Notes:
 *     Nothing is done about the FITS channels or WCS information stored in
@@ -77,6 +79,7 @@
 *     bolo-ordered data produced with this routine.
 
 *  Copyright:
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     Copyright (C) 2005-2009 University of British Columbia.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
@@ -135,6 +138,7 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
   dim_t ndata;                  /* Number of data points */
   void *newbuf=NULL;            /* Pointer to new buffer */
   dim_t newdims[3];             /* Size of each dimension new buffer */ 
+  dim_t newlbnd[3];             /* New pixel origin */
   int *newlut=NULL;             /* Pointer to pointing LUT */
   dim_t ntslice;                /* Number of time slices */
   size_t tstr1;                 /* time index stride input */
@@ -186,12 +190,18 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
     newdims[0] = (data->dims)[1];
     newdims[1] = (data->dims)[2];
     newdims[2] = (data->dims)[0];
+    newlbnd[0] = (data->lbnd)[1];
+    newlbnd[1] = (data->lbnd)[2];
+    newlbnd[2] = (data->lbnd)[0];
     bstr2 = 1;
     tstr2 = nbolo;
   } else {
     newdims[0] = (data->dims)[2];
     newdims[1] = (data->dims)[0];
     newdims[2] = (data->dims)[1];
+    newlbnd[0] = (data->lbnd)[2];
+    newlbnd[1] = (data->lbnd)[0];
+    newlbnd[2] = (data->lbnd)[1];
     bstr2 = ntslice;
     tstr2 = 1;
   }
@@ -310,6 +320,7 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
   /* Set the new dimensions in the smfData */
   if( *status == SAI__OK ) {
     memcpy( data->dims, newdims, 3*sizeof(*newdims) );
+    memcpy( data->lbnd, newlbnd, 3*sizeof(*newlbnd) );
     data->isTordered = isTordered;
   }
 }

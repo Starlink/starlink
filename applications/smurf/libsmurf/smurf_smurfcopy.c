@@ -181,8 +181,8 @@ void smurf_smurfcopy ( int * status ) {
     if (slice == 0) slice = (data->dims)[2];
 
     /* construct output bounds */
-    lbnd[0] = 1;
-    lbnd[1] = 1;
+    lbnd[0] = (data->lbnd)[0];
+    lbnd[1] = (data->lbnd)[1];
     ubnd[0] = (data->dims)[0] - lbnd[0] + 1;
     ubnd[1] = (data->dims)[1] - lbnd[1] + 1;
 

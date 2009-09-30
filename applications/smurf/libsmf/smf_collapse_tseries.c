@@ -223,7 +223,7 @@ void smf_collapse_tseries( const smfData *indata, int nclip, const float clip[],
   if (indata->history) history = astCopy( indata->history );
 
   *outdata = smf_construct_smfData( NULL, NULL,  hdr, NULL,
-                                    dtype, pntr, 1, dims, 2, 0, 0,
+                                    dtype, pntr, 1, dims, indata->lbnd, 2, 0, 0,
                                     NULL, history, status );
 
   /* must free the data if outdata is null */
