@@ -1,7 +1,6 @@
 #include "f77.h"
 #include "ast.h"
 #include "atl.h"
-#include "ndf.h"
 #include "mers.h"
 #include "sae_par.h"
 
@@ -81,13 +80,13 @@ AstRegion *atlMatchRegion( AstRegion *region, AstFrame *frame, int *status ) {
    AstRegion *result;         /* Returned Region pointer */
    AstFrame *ureg;            /* Supplied Region with no non-Frame axes */
    int *old_status;           /* Original status pointer */
-   int axes[ NDF__MXDIM ];    /* Region axis index for each Frame axis */
+   int axes[ ATL__MXDIM ];    /* Region axis index for each Frame axis */
    int i;                     /* Loop index */
    int nax;                   /* No. of axes in supplied Frame */
    int nrpick;                /* No. of of region axes to pick */
    int nwpick;                /* No. of of Frame axes to pick */
-   int raxes[ NDF__MXDIM ];   /* Indicies of Region axes to pick */
-   int waxes[ NDF__MXDIM ];   /* Indicies of Frame axes to pick */
+   int raxes[ ATL__MXDIM ];   /* Indicies of Region axes to pick */
+   int waxes[ ATL__MXDIM ];   /* Indicies of Frame axes to pick */
 
 /* Initialise */
    result = NULL;
