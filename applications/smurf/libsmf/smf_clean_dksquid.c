@@ -13,8 +13,8 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_clean_dksquid( smfData *indata, unsigned char *quality, 
-*                        unsigned char mask, size_t window, smfData *model, 
+*     smf_clean_dksquid( smfData *indata, unsigned char *quality,
+*                        unsigned char mask, size_t window, smfData *model,
 *                        int calcdk, int nofit, int *status ) {
 
 *  Arguments:
@@ -37,7 +37,7 @@
 
 *  Return Value:
 
-*  Description: 
+*  Description:
 *     Columns of SCUBA-2 detectors exhibit a strong correlated signal
 *     which is shown clearly in the dark squids. As the dark squids do
 *     not see astronomical or atmospheric signal they can be used as a
@@ -47,7 +47,7 @@
 *     (un-flatfielded) detector by solving for a gain and offset using
 *     the explicit least-squares solution. If a dark squid is constant
 *     this routine flags every detector in the column as SMF__Q_BADB.
-* 
+*
 *     If a model smfData created with smf_model_create (SMF__DKS) is
 *     supplied, it can be used to override obtaining the dark squid
 *     signals from the DA extension of indata (calcdk=0 case), or
@@ -120,16 +120,16 @@
 
 #define FUNC_NAME "smf_clean_dksquid"
 
-void smf_clean_dksquid( smfData *indata, unsigned char *quality, 
-                        unsigned char mask, size_t window, smfData *model, 
+void smf_clean_dksquid( smfData *indata, unsigned char *quality,
+                        unsigned char mask, size_t window, smfData *model,
                         int calcdk, int nofit, int *status ) {
 
-  dim_t b;                /* Bolometer index */ 
+  dim_t b;                /* Bolometer index */
   size_t bstride;         /* Bolometer index stride */
   double corr;            /* Linear correlation coefficient */
   double *corrbuf=NULL;   /* Array of correlation coeffs all bolos this col */
-  int needDA=0;           /* Do we need dksquids from the DA? */ 
-  int dkgood;             /* Flag for non-constant dark squid */ 
+  int needDA=0;           /* Do we need dksquids from the DA? */
+  int dkgood;             /* Flag for non-constant dark squid */
   double *dksquid=NULL;   /* Buffer for smoothed dark squid */
   int firstdk;            /* First value in dksquid signal */
   double gain;            /* Gain parameter from template fit */
@@ -153,7 +153,7 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
   /* Check for NULL smfData pointer */
   if( !indata ) {
     *status = SAI__ERROR;
-    errRep( " ", FUNC_NAME 
+    errRep( " ", FUNC_NAME
             ": possible programming error, smfData pointer is NULL", status );
     return;
   }
@@ -164,22 +164,22 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
     if( !indata->da) {
       /* Check for NULL smfDA */
       *status = SAI__ERROR;
-      errRep( " ", FUNC_NAME 
-              ": possible programming error, no smfDA struct in smfData", 
+      errRep( " ", FUNC_NAME
+              ": possible programming error, no smfDA struct in smfData",
               status);
       return;
     } else if( !indata->da->dksquid) {
       /* Check for NULL dksquid */
         *status = SAI__ERROR;
-        errRep( " ", FUNC_NAME 
-                ": possible programming error, no dksquid array in smfData", 
+        errRep( " ", FUNC_NAME
+                ": possible programming error, no dksquid array in smfData",
                 status);
         return;
     }
   }
 
   /* Check for 3-d data and get dimensions */
-  smf_get_dims( indata, &nrow, &ncol, &nbolo, &ntslice, &ndata, &bstride, 
+  smf_get_dims( indata, &nrow, &ncol, &nbolo, &ntslice, &ndata, &bstride,
                 &tstride, status );
 
   /* Obtain the number of rows and columns */
@@ -190,7 +190,7 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
     if( model->dtype != SMF__DOUBLE ) {
       msgSetc("DT", smf_dtype_str(model->dtype, status) );
       *status = SAI__ERROR;
-      errRep(" ", FUNC_NAME ": Data type ^DT for model not supported.", 
+      errRep(" ", FUNC_NAME ": Data type ^DT for model not supported.",
              status );
       return;
     }
@@ -272,27 +272,27 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
 
         switch( indata->dtype ) {
         case SMF__DOUBLE:
-          smf_templateFit1D( &( ((double *)indata->pntr[0])[b*bstride] ), 
+          smf_templateFit1D( &( ((double *)indata->pntr[0])[b*bstride] ),
                              &qua[b*bstride], mask, mask,
-                             ntslice, tstride, dksquid, 1, &gain, &offset, 
+                             ntslice, tstride, dksquid, 1, &gain, &offset,
                              &corr, status );
           break;
-          
+
         case SMF__INTEGER:
-          smf_templateFit1I( &( ((int *)indata->pntr[0])[b*bstride] ), 
+          smf_templateFit1I( &( ((int *)indata->pntr[0])[b*bstride] ),
                              &qua[b*bstride], mask, mask,
-                             ntslice, tstride, dksquid, 1, &gain, &offset, 
+                             ntslice, tstride, dksquid, 1, &gain, &offset,
                              &corr, status );
           break;
-          
+
         default:
           msgSetc( "DT", smf_dtype_string( indata, status ));
           *status = SAI__ERROR;
-          errRep( " ", FUNC_NAME 
+          errRep( " ", FUNC_NAME
                   ": Unsupported data type for dksquid cleaning (^DT)",
                   status );
         }
-       
+
         if( *status == SMF__INSMP ) {
           /* Annul SMF__INSMP as it was probably due to a bad bolometer */
           errAnnul( status );
@@ -300,10 +300,10 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
             msgSeti( "COL", i );
             msgSeti( "ROW", j );
             msgOutif( MSG__DEBUG, "", FUNC_NAME
-                      ": ROW,COL (^ROW,^COL) insufficient good samples", 
+                      ": ROW,COL (^ROW,^COL) insufficient good samples",
                       status );
           }
-          
+
           /* Flag entire bolo as bad if it isn't already */
           if( qua && !(qua[b*bstride]&SMF__Q_BADB) ) {
             for( k=0; k<ntslice; k++ ) {
@@ -325,7 +325,7 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
             msgSetd( "OFF", offset );
             msgSetd( "CORR", corr );
             msgOutif( MSG__DEBUG, "", FUNC_NAME
-                      ": ROW,COL (^ROW,^COL) GAIN,OFFSET,CORR " 
+                      ": ROW,COL (^ROW,^COL) GAIN,OFFSET,CORR "
                       "(^GAI,^OFF,^CORR)", status );
           }
         }

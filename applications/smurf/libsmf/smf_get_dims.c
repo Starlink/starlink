@@ -4,7 +4,7 @@
 *     smf_get_dims
 
 *  Purpose:
-*     Calculate nbolo, ntslice and other dimensional properties for a 3-d smfData
+*     Calculate nbolo, ntslice and other dimensional properties for 3-d smfData
 
 *  Language:
 *     Starlink ANSI C
@@ -34,7 +34,7 @@
 *        How many elements to skip to get to the next bolometer at a given
 *        time slice.
 *     tstride - size_t* (Returned)
-*        How many elements to skip to get to the next time slice for the 
+*        How many elements to skip to get to the next time slice for the
 *        current bolometer.
 *     status = int * (Given and Returned)
 *        Pointer to inherited status.
@@ -113,7 +113,7 @@ void smf_get_dims( const smfData *data, dim_t *nrows, dim_t *ncols,
    if( data->ndims != 3 ) {
      *status = SMF__WDIM;
      msgSeti("NDIMS",data->ndims);
-     errRep(" ", FUNC_NAME 
+     errRep(" ", FUNC_NAME
             ": Input data have ^NDIMS dimensions, should be 3.", status);
     return;
    }
@@ -144,4 +144,3 @@ void smf_get_dims( const smfData *data, dim_t *nrows, dim_t *ncols,
    if( bstride ) *bstride = bs;
    if( tstride ) *tstride = ts;
 }
-
