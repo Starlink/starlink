@@ -191,6 +191,8 @@
 *        - Optinally delete .DIMM files (deldimm=1 in CONFIG file)
 *     2009-04-23 (EC):
 *        Add numerous MSG__DEBUG timing messages
+*     2009-09-30 (EC):
+*        Fix bug in handling of AST model component and residuals
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -1124,8 +1126,10 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
           }
 
           /* Once all the other model components have been calculated put the
-             previous iteration of AST back into the residual, zero ast,
-             and rebin the noise+astro signal into the map */
+             previous iteration of AST back into the residual. Note that
+             even though we've moved signals out from the time streams into
+             the map we don't zero AST here so that we can see how much it
+             has changed within smf_calcmodel_ast. */
 
           msgOut(" ", FUNC_NAME ": Rebin residual to estimate MAP",
                  status);
@@ -1157,13 +1161,6 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
                 if( !(qua_data[k]&mask) && (ast_data[k]!=VAL__BADD) ) {
                   res_data[k] += ast_data[k];
                 }
-
-                /* Not really necessary.
-                   Set ast_data back to 0 since we've moved all of the signal
-                   into the residual, and then it will get re-estimated by
-                   calcmodel_ast after we finish estimating the map. */
-
-                ast_data[k] = 0;
               }
 
               /* Setup rebin flags */
