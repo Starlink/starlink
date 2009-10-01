@@ -13,10 +13,10 @@
 *     C function
 
 *  Invocation:
-*     smf_rebinmap( smfWorkForce *wf, smfData *data, double *bolovar, 
-*                   int index, int size, AstFrameSet *outfset, int spread, 
-*                   const double params[], int moving, int genvar, 
-*                   int *lbnd_out, int *ubnd_out, double *map, *variance, 
+*     smf_rebinmap( smfWorkForce *wf, smfData *data, double *bolovar,
+*                   int index, int size, AstFrameSet *outfset, int spread,
+*                   const double params[], int moving, int genvar,
+*                   int *lbnd_out, int *ubnd_out, double *map, *variance,
 *                   double *weights, int *nused, int *status );
 
 *  Arguments:
@@ -44,21 +44,21 @@
 *        Flag to denote whether the object is moving
 *     genvar = int (Given)
 *        If zero, no output variances are calculated. Otherwise, output
-*        variances are calculated on the basis of the spread of input 
+*        variances are calculated on the basis of the spread of input
 *        data values.
 *     lbnd_out = double * (Given)
-*        2-element array pixel coord. for the lower bounds of the output map 
+*        2-element array pixel coord. for the lower bounds of the output map
 *     ubnd_out = double * (Given)
-*        2-element array pixel coord. for the upper bounds of the output map 
+*        2-element array pixel coord. for the upper bounds of the output map
 *     map = double* (Returned)
-*        A pointer to an array containing room for "nw" contiguous versions 
-*        of the output data array (where "nw" is the number of worker threads 
+*        A pointer to an array containing room for "nw" contiguous versions
+*        of the output data array (where "nw" is the number of worker threads
 *        in the supplied workforce).
 *     variance = double * (Returned)
-*        A pointer to an array containing room for "nw" contiguous versions 
+*        A pointer to an array containing room for "nw" contiguous versions
 *        of the output variance array.
 *     weights = double * (Returned)
-*        A pointer to an array containing room for "nw" contiguous versions 
+*        A pointer to an array containing room for "nw" contiguous versions
 *        of the relative weighting for each pixel in the output map. If
 *        "genvar" is non-zero, two doubles are needed for each output pixel.
 *        Otherwise, only one double is needed for each output pixel.
@@ -69,7 +69,7 @@
 *        Pointer to global status.
 
 *  Description:
-*     This function uses astRebinSeq to paste all time slices in the supplied 
+*     This function uses astRebinSeq to paste all time slices in the supplied
 *     input NDF into the output image, using a simple regridding of data.
 
 *  Authors:
@@ -98,7 +98,7 @@
 *     2007-07-11 (DSB):
 *        - Use astConvert to convert between input and output skyframes,
 *        rather than input frameset and output skyframe. Only get the
-*        azel->output skyframe FrameSet for moving sources if the input 
+*        azel->output skyframe FrameSet for moving sources if the input
 *        skyframe is not azel.
 *        - Avoid remapping the FrameSet more often than is necessary when
 *        setting and clearing the SkyRef attributes.
@@ -171,9 +171,9 @@
 #include "libsmf/smf.h"
 #include "libsmf/smf_threads.h"
 
-void smf_rebinmap( smfWorkForce *wf, smfData *data, double *bolovar, 
-                   int index, int size, AstFrameSet *outfset, int spread, 
-                   const double params[], int moving, int genvar, 
+void smf_rebinmap( smfWorkForce *wf, smfData *data, double *bolovar,
+                   int index, int size, AstFrameSet *outfset, int spread,
+                   const double params[], int moving, int genvar,
                    int *lbnd_out, int *ubnd_out, double *map, double *variance,
                    double *weights, int *nused, int *status ) {
 
@@ -218,7 +218,7 @@ void smf_rebinmap( smfWorkForce *wf, smfData *data, double *bolovar,
 /* Do some initialisation on the first invocation of this function. */
    if( index == 1 ) {
 
-/* Retrieve the skyframe and the sky2map mapping from the output frameset 
+/* Retrieve the skyframe and the sky2map mapping from the output frameset
    (actually map2sky). */
       oskyfrm = astGetFrame( outfset, AST__CURRENT );
       sky2map = astGetMapping( outfset, AST__BASE, AST__CURRENT );
@@ -245,22 +245,22 @@ void smf_rebinmap( smfWorkForce *wf, smfData *data, double *bolovar,
       if( genvar && variance ) rebinflags |= AST__GENVAR;
       if( bolovar ) rebinflags |= AST__VARWGT;
 
-/* The worker threads in the work force perform descrete jobs. In the 
-   context of this function, a single job consists of pasting all the 
-   time slices from a single input file into an output array. Each such  
-   job is described by a smfRebinMapData structure. We now allocate memory 
-   to hold an array of these structures. The number of elements in this 
+/* The worker threads in the work force perform descrete jobs. In the
+   context of this function, a single job consists of pasting all the
+   time slices from a single input file into an output array. Each such
+   job is described by a smfRebinMapData structure. We now allocate memory
+   to hold an array of these structures. The number of elements in this
    array need only equal the number of workers in the workforce (rather
    than the number of input files), since we will re-use them. */
       job_data = astMalloc( sizeof( smfRebinMapData )*nw );
       if( job_data ) {
 
 /* Initialise the components within these structures that are the same for
-   all input files. Each worker thread pastes its inputs into a different 
-   output array. This is done to avoid clashes caused by multiple workers 
-   writing to the same output array at the same time. Once all input files 
-   have been pasted, these separate output arrays are combined together to 
-   form the final output array. 
+   all input files. Each worker thread pastes its inputs into a different
+   output array. This is done to avoid clashes caused by multiple workers
+   writing to the same output array at the same time. Once all input files
+   have been pasted, these separate output arrays are combined together to
+   form the final output array.
 
    We take deep copies of any AST objects which are needed by the worker
    threads, and then unlock them so that the worker threads can lock them
@@ -268,7 +268,7 @@ void smf_rebinmap( smfWorkForce *wf, smfData *data, double *bolovar,
    that created them - i.e. this thread). */
          for( j = 0; j < nw; j++ ) {
             pdata = job_data + j;
-   
+
             pdata->data = NULL;
             pdata->rebinflags = rebinflags;
             pdata->abskyfrm = astCopy( abskyfrm );
@@ -286,18 +286,18 @@ void smf_rebinmap( smfWorkForce *wf, smfData *data, double *bolovar,
             pdata->ijob = -1;
          }
       }
-     
+
 /* Fill the supplied arrays with zeros on the first invocation. */
       p = map;
       p1 = p + nel*nw;
       while( p < p1 ) *(p++) = 0.0;
- 
+
       if( variance ) {
          p = variance;
          p1 = p + nel*nw;
          while( p < p1 ) *(p++) = 0.0;
       }
- 
+
       p = weights;
       p1 = p + nelw*nw;
       while( p < p1 ) *(p++) = 0.0;
@@ -320,7 +320,7 @@ void smf_rebinmap( smfWorkForce *wf, smfData *data, double *bolovar,
    }
 
 /* If all smfRebinMapData structures are currently in use, wait until
-   a job completes. When this happens, note the identifier for the job 
+   a job completes. When this happens, note the identifier for the job
    that has just completed. */
    if( pdata->ijob != -1 ) {
       ijob = smf_job_wait( wf, status );
@@ -351,29 +351,29 @@ void smf_rebinmap( smfWorkForce *wf, smfData *data, double *bolovar,
       }
    }
 
-/* Fill in the details of the current input file, and then submit a new 
+/* Fill in the details of the current input file, and then submit a new
    job to be performed by the work force. This job will paste the input
    file into the output array associated with the smfRebinMapData being
    used. The smf_add_job function returns the identifier for the new job.
    Store this identifier in the smfRebinMapData to indicate that the
    smfRebinMapData is now being used. The actual work of pasting the
-   slices into the output array is done by the smf_rebinslices function. 
+   slices into the output array is done by the smf_rebinslices function.
    We need to unlock all AST objects within the smfData so that the
    smf_rebinslices function can lock them. They will be re-locked when
    the job completes. */
    smf_lock_data( data, 0, status );
    pdata->nused = 0;
-   pdata->data = data;  
-   pdata->bolovar = bolovar;  
-   pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata, smf_rebinslices, 
+   pdata->data = data;
+   pdata->bolovar = bolovar;
+   pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata, smf_rebinslices,
                               NULL, status );
 
-/* Finalise things if we have just submitted a job to paste the last input 
+/* Finalise things if we have just submitted a job to paste the last input
    file. */
    if( index == size ) {
 
 /* Wait until all submitted jobs have completed. */
-      smf_wait( wf, status ); 
+      smf_wait( wf, status );
 
 /* Free the resources used by the array of smfRebinMapData structures. */
       for( j = 0; j < nw; j++ ) {
@@ -396,14 +396,14 @@ void smf_rebinmap( smfWorkForce *wf, smfData *data, double *bolovar,
 
 /* Add the data array used by the second and subsequent smfRebinMapData
    into the data array used by the first (this is the data array that
-   will be retained as the final output data array). */ 
+   will be retained as the final output data array). */
       p1 = map + nel;
       for( j = 1; j < nw; j++ ) {
          p = map;
          for( i = 0; i < nel; i++ ) *(p++) += *(p1++);
       }
 
-/* Likewise, add the variance array used by the second and subsequent 
+/* Likewise, add the variance array used by the second and subsequent
    smfRebinMapData into the variance array used by the first. */
       if( variance ) {
          p1 = variance + nel;
@@ -413,7 +413,7 @@ void smf_rebinmap( smfWorkForce *wf, smfData *data, double *bolovar,
          }
       }
 
-/* Likewise, add the weights array used by the second and subsequent 
+/* Likewise, add the weights array used by the second and subsequent
    smfRebinMapData into the weights array used by the first. */
       p1 = weights + nelw;
       for( j = 1; j < nw; j++ ) {
@@ -421,16 +421,16 @@ void smf_rebinmap( smfWorkForce *wf, smfData *data, double *bolovar,
          for( i = 0; i < nelw; i++ ) *(p++) += *(p1++);
       }
 
-/* Normalise the data and variance arrays. A dummy mapping is specified (it 
-   is not actually used for anything since we are not adding any more data 
+/* Normalise the data and variance arrays. A dummy mapping is specified (it
+   is not actually used for anything since we are not adding any more data
    into the output arrays). */
       ldim[ 0 ] = 1;
       ldim[ 1 ] = 1;
       dummy = (AstMapping *) astUnitMap( 2, " " );
-      astRebinSeqD( dummy, 0.0, 2, NULL, NULL, NULL, NULL, spread, 
-                    params, AST__REBINEND | rebinflags, 0.1, 1000000, 
-                    VAL__BADD, 2, ldim, udim, NULL, NULL, map, 
-                    variance, weights, nused ); 
+      astRebinSeqD( dummy, 0.0, 2, NULL, NULL, NULL, NULL, spread,
+                    params, AST__REBINEND | rebinflags, 0.1, 1000000,
+                    VAL__BADD, 2, ldim, udim, NULL, NULL, map,
+                    variance, weights, nused );
       dummy = astAnnul( dummy );
    }
 }

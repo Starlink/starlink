@@ -91,6 +91,8 @@
 *     2009-04-30 (EC)
 *        Parallelize the slow bits: undoing old common mode, calculating new
 *        common mode, and fitting common mode template to all the bolos.
+*     2009-09-30 (EC)
+*        Measure normalized change in model between iterations (dchisq)
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -370,8 +372,10 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   double gmean;                 /* mean of common-mode correlation gain */
   double gsig;                  /* standard deviation "                  */
   double g;                     /* temporary gain */
+  double gcopy;                 /* copy of g */
   smfArray *gai=NULL;           /* Pointer to GAI at chunk */
   double *gai_data=NULL;        /* Pointer to DATA component of GAI */
+  double **gai_data_copy=NULL;  /* copy of gai_data for all subarrays */
   size_t gbstride;              /* GAIn bolo stride */
   size_t gcstride;              /* GAIn coeff stride */
   dim_t i;                      /* Loop counter */
@@ -382,15 +386,23 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   AstKeyMap *kmap=NULL;         /* Local keymap */
   unsigned char mask_cor;       /* Ignore quality mask for correction */
   unsigned char mask_meas;      /* Ignore quality mask for measurement */
+  double dchisq=0;              /* this - last model residual chi^2 */
   smfArray *model=NULL;         /* Pointer to model at chunk */
   double *model_data=NULL;      /* Pointer to DATA component of model */
   double *model_data_copy=NULL; /* Copy of model_data */
   dim_t nbolo=0;                /* Number of bolometers */
   dim_t ndata=0;                /* Total number of data points */
   size_t newbad;                /* Number of new bolos being flagged as bad */
+  smfArray *noi=NULL;           /* Pointer to NOI at chunk */
+  double *noi_data=NULL;        /* Pointer to DATA component of model */
+  dim_t noibstride;             /* bolo stride for noise */
+  dim_t nointslice;             /* number of time slices for noise */
+  dim_t noitstride;             /* Time stride for noise */
+  size_t ndchisq=0;             /* number of elements contributing to dchisq */
   dim_t ntslice=0;              /* Number of time slices */
   int nw;                       /* Number of worker threads */
   double off;                   /* Temporary offset */
+  double offcopy;               /* copy of off */
   smfCalcmodelComData *pdata=NULL; /* Pointer to job data */
   smfArray *qua=NULL;           /* Pointer to QUA at chunk */
   int quit;                     /* While loop quit flag */
@@ -419,7 +431,26 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   res = dat->res[chunk];
   qua = dat->qua[chunk];
   model = allmodel[chunk];
-  if(dat->gai) gai = dat->gai[chunk];
+  if(dat->gai) {
+    gai = dat->gai[chunk];
+
+    /* Make a copy of gai_data (each subarray) for calculating convergence */
+    gai_data_copy = smf_malloc( gai->ndat, sizeof(*gai_data_copy), 0, status );
+    for( idx=0; (idx<gai->ndat)&&(*status==SAI__OK); idx++ ) {
+
+      smf_get_dims( gai->sdata[idx],  NULL, NULL, NULL, NULL,
+                    &thisndata, NULL, NULL, status);
+
+      gai_data_copy[idx] = smf_malloc( thisndata, sizeof(*gai_data_copy[idx]),
+                                       0, status );
+
+      gai_data = (gai->sdata[idx]->pntr)[0];
+
+      memcpy( gai_data_copy[idx], gai_data, thisndata *
+              sizeof(*gai_data_copy[idx]) );
+    }
+  }
+  if(dat->noi) noi = dat->noi[chunk];
 
   /* Parse parameters */
 
@@ -463,7 +494,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   for( idx=0; idx<res->ndat; idx++ ) if (*status == SAI__OK ) {
     smf_dataOrder( res->sdata[idx], 0, status );
     smf_dataOrder( qua->sdata[idx], 0, status );
-    if(dat->gai) smf_dataOrder( gai->sdata[idx], 0, status );
+    if(gai) smf_dataOrder( gai->sdata[idx], 0, status );
   }
 
   /* The common mode signal is stored as a single 1d vector for all 4
@@ -506,7 +537,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
     smf_get_dims( res->sdata[idx],  NULL, NULL, &thisnbolo, &thisntslice,
                   &thisndata, &bstride, &tstride, status);
 
-    if(dat->gai) {
+    if(gai) {
       smf_get_dims( gai->sdata[idx],  NULL, NULL, NULL, NULL, NULL,
                     &gbstride, &gcstride, status);
     }
@@ -574,7 +605,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
     /* Get pointers to data/quality/model */
     res_data = (res->sdata[idx]->pntr)[0];
     qua_data = (qua->sdata[idx]->pntr)[0];
-    if( dat->gai ) {
+    if( gai ) {
       gai_data = (gai->sdata[idx]->pntr)[0];
     }
 
@@ -642,7 +673,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
       /* Get pointers to data/quality/model */
       res_data = (res->sdata[idx]->pntr)[0];
       qua_data = (qua->sdata[idx]->pntr)[0];
-      if( dat->gai ) {
+      if( gai ) {
         gai_data = (gai->sdata[idx]->pntr)[0];
       }
 
@@ -708,8 +739,13 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
       /* Get pointers */
       res_data = (double *)(res->sdata[idx]->pntr)[0];
       qua_data = (unsigned char *)(qua->sdata[idx]->pntr)[0];
+      if( noi ) {
+        smf_get_dims( noi->sdata[idx],  NULL, NULL, NULL, &nointslice,
+                      NULL, &noibstride, &noitstride, status);
+        noi_data = (double *)(noi->sdata[idx]->pntr)[0];
+      }
 
-      if( dat->gai ) {
+      if( gai ) {
 
         /* If GAIn model supplied, fit gain/offset of sky model to
            each bolometer independently. It is stored as 3 planes of
@@ -779,13 +815,13 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
         smf_stats1( corr, 1, nbolo, NULL, 0, &cmean, &csig, &cgood, status );
         msgSeti("N",cgood);
-        msgOutif( MSG__VERB, "", FUNC_NAME ": ^N good bolos", status );
-        msgOutiff( MSG__DEBUG, " ", FUNC_NAME
-                   ": corr coeff %8.5f +/- %8.5f", status, cmean, csig );
+        msgOutif( MSG__VERB, "", "    ^N good bolos", status );
+        msgOutiff( MSG__DEBUG, "",
+                   "    corr coeff %8.5f +/- %8.5f", status, cmean, csig );
 
         smf_stats1( gcoeff, 1, nbolo, NULL, 0, &gmean, &gsig, &ggood, status );
-        msgOutiff( MSG__DEBUG, " ", FUNC_NAME
-                   ": log(abs(gain coeff)) %8.5f +/- %8.5f", status,
+        msgOutiff( MSG__DEBUG, " ",
+                   "    log(abs(gain coeff)) %8.5f +/- %8.5f", status,
                    gmean, gsig);
 
         /* Flag new bad bolometers */
@@ -809,8 +845,8 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
         if( newbad ) {
           msgSeti("NEW",newbad);
-          msgOutif( MSG__VERB, "", FUNC_NAME
-                    ": flagged ^NEW new bad bolos", status );
+          msgOutif( MSG__VERB, "",
+                    "    flagged ^NEW new bad bolos", status );
         }
 
         gcoeff = smf_free( gcoeff, status );
@@ -822,9 +858,18 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         quit = 1;
         for( i=0; i<nbolo; i++ ) {
           for( j=0; j<ntslice; j++ ) {
+
             /* update the residual */
             if( !(qua_data[i*bstride + j*tstride]&mask_cor) ) {
               res_data[i*bstride + j*tstride] -= model_data[j];
+
+              /* also measure contribution to dchisq */
+              if( noi ) {
+                dchisq += (model_data[j] - model_data_copy[j]) *
+                  (model_data[j] - model_data_copy[j]) /
+                  noi_data[i*noibstride + (j%nointslice)*noitstride];
+                ndchisq++;
+              }
             }
           }
         }
@@ -833,12 +878,12 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
     if( !quit ) {
       /* around we go again... */
-      msgOutif( MSG__DEBUG, "", FUNC_NAME ": Common mode not yet converged",
+      msgOutif( MSG__DEBUG, "", "    Common mode not yet converged",
                 status );
     }
   }
 
-  if( dat->gai) {
+  if( gai) {
     /* Once the common mode converged and if we're fitting the common
        mode gain and offset, remove scaled template here. */
     for( idx=0; (idx<res->ndat)&&(*status==SAI__OK); idx++ ) {
@@ -851,19 +896,38 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
       smf_get_dims( gai->sdata[idx],  NULL, NULL, NULL, NULL, NULL,
                     &gbstride, &gcstride, status);
       gai_data = (gai->sdata[idx]->pntr)[0];
+      if( noi ) {
+        smf_get_dims( noi->sdata[idx],  NULL, NULL, NULL, &nointslice,
+                      NULL, &noibstride, &noitstride, status);
+        noi_data = (double *)(noi->sdata[idx]->pntr)[0];
+      }
 
       for( i=0; (*status==SAI__OK) && (i<nbolo); i++ )
         if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {
           /* The gain is the amplitude of the common mode template in data */
           g = gai_data[i*gbstride];
+          gcopy = gai_data_copy[idx][i*gbstride];
+
           if( (g!=VAL__BADD) && (g!=0) ){
             off = gai_data[i*gbstride+gcstride];
-            gai_data[i*gbstride] = g;
+            offcopy = gai_data_copy[idx][i*gbstride+gcstride];
 
             /* Remove the template */
             for( j=0; j<ntslice; j++ ) {
               if( !(qua_data[i*bstride + j*tstride]&mask_cor) ) {
                 res_data[i*bstride+j*tstride] -= (g*model_data[j] + off);
+
+                /* also measure contribution to dchisq */
+                if( noi && 
+                    (noi_data[i*noibstride+(j%nointslice)*noitstride] != 0) ) {
+
+                  dchisq += ((g*model_data[j] + off) -
+                             (gcopy*model_data_copy[j] + offcopy)) *
+                    ((g*model_data[j] + off) -
+                     (gcopy*model_data_copy[j] + offcopy)) /
+                    noi_data[i*noibstride + (j%nointslice)*noitstride];
+                  ndchisq++;
+                }
               }
             }
           } else {
@@ -887,9 +951,25 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
     astMapPut0D( kmap, "BOXCARD", boxcard, NULL );
   }
 
+  /* Print normalized residual chisq for this model */
+  if( (*status==SAI__OK) && noi && (ndchisq>0) ) {
+    dchisq /= (double) ndchisq;
+    msgOutiff( MSG__VERB, "", "    normalized change in model: %lf", status,
+               dchisq );
+  }
+
   /* Clean up */
   if( weight)  weight = smf_free( weight, status );
   if( model_data_copy ) model_data_copy = smf_free( model_data_copy, status );
+
+  if( gai_data_copy ) {
+    for( idx=0; idx<gai->ndat; idx++ ) {
+      if( gai_data_copy[idx] ) {
+        gai_data_copy[idx] = smf_free( gai_data_copy[idx], status );
+      }
+    }
+    gai_data_copy = smf_free( gai_data_copy, status );
+  }
 
   /* Clean up the job data array */
   if( job_data ) {
