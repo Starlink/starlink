@@ -515,7 +515,7 @@ typedef struct smfDIMMData {
   smfArray **gai;            /* array of smfArray's of bolo gain corrections */
   double *map;               /* pointer to the current map estimate */
   double *mapvar;            /* pointer to the current map variance estimate */
-  double *chisquared;        /* chisquared at each chunk */
+  double *chisquared;        /* total chisquared at each chunk */
 } smfDIMMData;
 
 
