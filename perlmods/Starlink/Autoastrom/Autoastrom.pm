@@ -2312,6 +2312,20 @@ sub query_skycat {
                               $skycatname ) )
       if $self->starlink_output;
 
+    # If we only retrieved one object, there might be something
+    # wrong. Test to make sure that the returned object actually lies
+    # within the radius we queried.
+    if( $querycat->sizeof == 1 ) {
+      my $obj = $querycat->popstar();
+      if( ! UNIVERSAL::isa( $obj, "Astro::Catalog::Item" ) ||
+          $obj->coords->distance( $coords ) > $radius * DAS2R ) {
+        $self->printerr( "Object retrieved from $skycatname is not within the requested field.\n" );
+        $self->printerr( "Trying next catalogue in list.\n" );
+      } else {
+        $querycat->pushstar( $obj );
+      }
+    }
+
     last if $querycat->sizeof != 0;
 
     $self->printerr( "Retrieved zero objects from $skycatname. Trying next catalogue.\n" );
