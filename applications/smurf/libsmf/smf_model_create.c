@@ -781,6 +781,9 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
                                       (double *) dataptr, status );
 
             } else if( mtype == SMF__DKS ) {
+              /* First set the entire buffer to 0 */
+              memset( dataptr, 0, datalen );
+
               /* Initialize the model to hold an un-smoothed copy of
                  the dark squids (get smoothed later in smf_calcmodel_dks).
                  Since we need to pass a smfData to clean_dksquid, kludge
