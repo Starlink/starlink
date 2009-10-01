@@ -13,8 +13,8 @@
  *     SMURF subroutine
 
  *  Invocation:
- *     smf_grp_related( Grp *igrp, const int grpsize, const int grpbywave, 
- *                      dim_t maxlen, dim_t *maxconcatlen, smfGroup **group, 
+ *     smf_grp_related( Grp *igrp, const int grpsize, const int grpbywave,
+ *                      dim_t maxlen, dim_t *maxconcatlen, smfGroup **group,
  *                      int *status );
 
  *  Arguments:
@@ -44,7 +44,7 @@
  *     of Grps required to 1, and allows new Grps to be created on
  *     demand so that the maximum Grp number is not exceeded. In addition,
  *     continuous subsets of the input data are identified and stored in
- *     the "chunk" component of group. The caller may optionally specify 
+ *     the "chunk" component of group. The caller may optionally specify
  *     a maximum sample length (in time) for these continuous pieces. In
  *     this case, the length of each continuously flagged region is truncated
  *     to the minimum complete set of files that does not exceed the limit
@@ -159,8 +159,8 @@
 
 #define FUNC_NAME "smf_grp_related"
 
-void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave, 
-                       dim_t maxlen, dim_t *maxconcatlen, smfGroup **group, 
+void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
+                       dim_t maxlen, dim_t *maxconcatlen, smfGroup **group,
                        int *status ) {
 
   /* Local variables */
@@ -305,8 +305,8 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
                 }
               }
             } else {
-              msgOutif(MSG__VERB," ", 
-                       "Start and end times match but data arrays are of different size", 
+              msgOutif(MSG__VERB," ",
+                       "Start and end times match but data arrays are of different size",
                        status);
             }
           }
@@ -344,8 +344,8 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
       *status = SAI__ERROR;
       msgSeti("G",grpsize);
       msgSeti("S",ngroups);
-      errRep(FUNC_NAME, 
-             "Number of subgroups, ^S, exceeds grpsize, ^G. Possible programming error", 
+      errRep(FUNC_NAME,
+             "Number of subgroups, ^S, exceeds grpsize, ^G. Possible programming error",
              status);
     }
   }
@@ -358,7 +358,7 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
      are present in subsequent chunks flagged "continuous". */
 
   refsubsys = smf_malloc( nelem, sizeof(*refsubsys), 0, status );
-  all_len = smf_malloc( grpsize, sizeof(*all_len), 1, status ); 
+  all_len = smf_malloc( grpsize, sizeof(*all_len), 1, status );
 
   thislen = 0;
   totlen = 0;
@@ -371,7 +371,7 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
   for( i=0; i<ngroups; i++ ) {
 
     /* Open header of the first file at each time */
-    smf_open_file( igrp, subgroups[i][0], "READ", SMF__NOCREATE_DATA, &data, 
+    smf_open_file( igrp, subgroups[i][0], "READ", SMF__NOCREATE_DATA, &data,
                    status );
 
 
@@ -397,10 +397,10 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
         *status = SAI__ERROR;
         msgSeti("THISLEN",thislen);
         msgSeti("MAXLEN",maxlen);
-        errRep(FUNC_NAME, 
+        errRep(FUNC_NAME,
                "Length of file time steps exceeds maximum (^THISLEN>^MAXLEN)",
                status);
-      } 
+      }
 
       /* Add length to running total */
       totlen += thislen;
@@ -435,13 +435,13 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
               smf_find_subarray( hdr, NULL, 0, &subsysnum, status );
             } else {
               /* Otherwise open header in new file */
-              smf_open_file( igrp, subgroups[i][j], "READ", 
+              smf_open_file( igrp, subgroups[i][j], "READ",
                              SMF__NOCREATE_DATA, &data2, status );
               if( *status == SAI__OK ) {
                 hdr2 = data2->hdr;
                 smf_find_subarray( hdr2, NULL, 0, &subsysnum, status );
               }
-            }	
+            }
 
             /* Close the new file that we've opened */
             if( j>0 ) {
@@ -461,8 +461,8 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
            same chunk. Also check that the subsystems match, and that the
            continuous chunk doesn't exceed maxlen */
 
-        if( !( !strncmp(refobsidss, hdr->obsidss, sizeof(refobsidss)) && 
-              (seqcount==refseqcount) && ((nsubscan-refnsubscan)==1) ) || 
+        if( !( !strncmp(refobsidss, hdr->obsidss, sizeof(refobsidss)) &&
+               (seqcount==refseqcount) && ((nsubscan-refnsubscan)==1) ) ||
             !matchsubsys || (maxlen && (totlen > maxlen)) ) {
 
           /* Found a discontinuity */
@@ -486,7 +486,7 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
     }
 
     smf_tslice_ast( data, frame, 0, status );
-    
+
     if( *status == SAI__OK ) {
       /* Populate the reference subsystem array */
       for( j=0; j<nelem; j++ ) {
@@ -496,13 +496,13 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
             smf_find_subarray( hdr, NULL, 0, &subsysnum, status );
           } else {
             /* Otherwise open header in new file */
-            smf_open_file( igrp, subgroups[i][j], "READ", SMF__NOCREATE_DATA, 
+            smf_open_file( igrp, subgroups[i][j], "READ", SMF__NOCREATE_DATA,
                            &data2, status );
             if (*status == SAI__OK) {
               hdr2 = data2->hdr;
               smf_find_subarray( hdr2, NULL, 0, &subsysnum, status );
             }
-          }	
+          }
           if( *status == SAI__OK ) {
             refsubsys[j] = subsysnum;
           }
@@ -540,30 +540,30 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
     chunkstart = 0;
 
     for( i=1; i<=ngroups; i++ ) {
-      
+
       /* Chunk finished? */
       if( (i==ngroups) || (chunk[i] != chunk[i-1]) ) {
-	
+
         chunkend = i-1;
-	
+
         /* Flag the pieces of last chunk as bad if it was too short */
         if( totlen < SMF__MINCHUNKSAMP ) {
           for( j=chunkstart; j<=chunkend; j++ ) {
             keepchunk[j] = 0;
           }
-	  
+
           /* Warning message */
           msgSeti("LEN",totlen);
           msgSeti("MIN",SMF__MINCHUNKSAMP);
-          msgOut( " ", "SMF_GRP_RELATED: ignoring short chunk (^LEN<^MIN)", 
+          msgOut( " ", "SMF_GRP_RELATED: ignoring short chunk (^LEN<^MIN)",
                   status);
         }
-	
+
         /* Re-set the chunk start/length */
         chunkstart = i;
         totlen = 0;
       }
-      
+
       /* Add to the length of the current chunk if we're not at the end */
       if( i<ngroups ) totlen += all_len[i];
     }
@@ -573,14 +573,14 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
     maxnelem = 0;
     if( *status == SAI__OK ) for( i=0; i<ngroups; i++ ) {
         thisnelem = 0;
-      
+
         for( j=0; j<nelem; j++ ) {
           if( subgroups[i][j] > 0 ) {
             /* Increment subarray counter */
             thisnelem++;
           }
         }
-      
+
         /* update maxnelem based on this chunk */
         if( thisnelem > maxnelem ) {
           maxnelem = thisnelem;
@@ -603,15 +603,15 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
     }
   }
 
-  
+
   /* Create the smfGroup */
-    
+
   *group = smf_construct_smfGroup( igrp, new_subgroups, new_chunk, new_ngroups,
                                    maxnelem, 0, status );
 
   /* Return maxconcatlen if requested */
   if( maxconcatlen ) {
-    *maxconcatlen = maxconcat; 
+    *maxconcatlen = maxconcat;
   }
 
  CLEANUP:
@@ -622,7 +622,7 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
   refsubsys = smf_free( refsubsys, status );
   keepchunk = smf_free( keepchunk, status );
   chunk = smf_free( chunk, status );
-  all_len = smf_free( all_len, status); 
+  all_len = smf_free( all_len, status);
   lambda = smf_free( lambda, status );
 
   if( subgroups ) {
@@ -631,7 +631,7 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
     }
     subgroups = smf_free( subgroups, status );
   }
-  
+
   if( *status != SAI__OK ) {
     new_chunk = smf_free(new_chunk, status);
 
