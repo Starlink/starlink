@@ -183,8 +183,8 @@ void smurf_smurfcopy ( int * status ) {
     /* construct output bounds */
     lbnd[0] = (data->lbnd)[0];
     lbnd[1] = (data->lbnd)[1];
-    ubnd[0] = (data->dims)[0] - lbnd[0] + 1;
-    ubnd[1] = (data->dims)[1] - lbnd[1] + 1;
+    ubnd[0] = lbnd[0] + (data->dims)[0] - 1;
+    ubnd[1] = lbnd[1] + (data->dims)[1] - 1;
 
     /* Open an output file (losing history) but we do not want
        to propagate the full NDF size to the output file */

@@ -764,9 +764,9 @@ void smurf_impaztec( int *status ) {
   /* Create an NDF inside the container */
   framesize = ncol * nrow;
   lbnd[SC2STORE__COL_INDEX] = SC2STORE__BOL_LBND;
-  ubnd[SC2STORE__COL_INDEX] = ncol - lbnd[SC2STORE__COL_INDEX] + 1;
+  ubnd[SC2STORE__COL_INDEX] = lbnd[SC2STORE__COL_INDEX] + ncol - 1;
   lbnd[SC2STORE__ROW_INDEX] = SC2STORE__BOL_LBND;
-  ubnd[SC2STORE__ROW_INDEX] = nrow - lbnd[SC2STORE__ROW_INDEX] + 1;
+  ubnd[SC2STORE__ROW_INDEX] = lbnd[SC2STORE__ROW_INDEX] + nrow - 1;
   ubnd[2] = ngframes;
   lbnd[2] = 1;
   

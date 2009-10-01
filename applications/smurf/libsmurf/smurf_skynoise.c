@@ -245,8 +245,8 @@ void smurf_skynoise ( int *status ) {
  
    lbnd[0] = 1;
    lbnd[1] = 1;
-   ubnd[0] = size - lbnd[0] + 1;
-   ubnd[1] = size - lbnd[1] + 1;
+   ubnd[0] = lbnd[0] + size - 1;
+   ubnd[1] = lbnd[1] + size - 1;
 
    parPut0c ( "FILENAME", file_name, status );
    ndfCreat ( "FILENAME", "_DOUBLE", 2, lbnd, ubnd, &indf, status );

@@ -181,7 +181,7 @@ void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim,
   ntot = 1;
   for ( j=0; j<ndim; j++ ) {
     lbnd[j] = 1;
-    ubnd[j] = dims[j] + lbnd[j] - 1;
+    ubnd[j] = lbnd[j] + dims[j] - 1;
     ntot *= dims[j];
   }
   ndfPlace ( scu2redloc, imname, &place, status );
@@ -226,9 +226,9 @@ void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim,
 
     /* Create the array for bolometer zeros */
     lbnd[0] = SC2STORE__BOL_LBND;
-    ubnd[0] = dims[0] - lbnd[0] + 1;
+    ubnd[0] = lbnd[0] + dims[0] - 1;
     lbnd[1] = SC2STORE__BOL_LBND;
-    ubnd[1] = dims[1] - lbnd[0] + 1;
+    ubnd[1] = lbnd[1] + dims[1] - 1;
     ndfNew ( "_DOUBLE", 2, lbnd, ubnd, &place, &bzindf, status );
     ndfHcre ( bzindf, status );
 

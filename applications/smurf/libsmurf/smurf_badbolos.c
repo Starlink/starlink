@@ -209,8 +209,8 @@ void smurf_badbolos( int *status ) {
    /* Set pixels bounds for bad bolometer mask */
    lbnd[0] = SC2STORE__BOL_LBND;
    lbnd[1] = SC2STORE__BOL_LBND;
-   ubnd[0] = dims[0] - lbnd[0] + 1;
-   ubnd[1] = dims[1] - lbnd[1] + 1;
+   ubnd[0] = lbnd[0] + dims[0] - 1;
+   ubnd[1] = lbnd[0] + dims[1] - 1;
 
    /* Check to see if a bad bolo mask already exists for this NDF.  If 
       if does, open it for updating, otherwise create a new extension */
