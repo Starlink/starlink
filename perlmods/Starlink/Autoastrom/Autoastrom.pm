@@ -46,6 +46,8 @@ use Time::HiRes qw/ time /;
 
 use NDF;
 
+use constant DAS2R => 4.8481368110953599358991410235794797595635330237270e-6;
+
 use vars qw/ $VERSION $DEBUG /;
 
 $VERSION = '0.01';
@@ -2277,6 +2279,9 @@ sub query_skycat {
 
     my $query;
     eval {
+      if( defined( $self->skycatconfig ) ) {
+        $ENV{'SKYCAT_CFG'} = $self->skycatconfig;
+      }
       $query = new Astro::Catalog::Query::SkyCat( catalog => $skycatname,
                                                   RA => "$racen",
                                                   Dec => "$deccen",
