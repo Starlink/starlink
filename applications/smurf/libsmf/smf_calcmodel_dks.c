@@ -37,6 +37,7 @@
 *     Fit and remove dark squid signal for all detectors in the same column.
 
 *  Notes:
+*     - Currently buggy... doesn't converge, odd behaviour
 
 *  Authors:
 *     Edward Chapin (UBC)
@@ -47,6 +48,8 @@
 *        Initial Version
 *     2009-04-17 (EC)
 *        - switch to subkeymap notation in config file
+*     2009-10-01 (EC)
+*        Measure normalized change in model between iterations (dchisq)
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -92,9 +95,14 @@ void smf_calcmodel_dks( smfWorkForce *wf, smfDIMMData *dat, int chunk,
                         int *status) {
 
   /* Local Variables */
+  size_t bolcounter;            /* bolometer counter */
   int boxcar_i=0;               /* width in samples of boxcar filter */
   size_t boxcar=0;              /* Size of boxcar smooth window */
+  double *cdksquid=NULL;        /* Pointer to current dark squid (copy) */
   double *corrbuf=NULL;         /* Array of corr coeffs all bolos in this col */
+  double *cgainbuf=NULL;        /* Array gains for bolos in this col (copy) */
+  double *coffsetbuf=NULL;      /* Array offsets for bolos in this col (copy) */
+  double dchisq=0;              /* this - last model residual chi^2 */
   double *dksquid=NULL;         /* Pointer to current dark squid */
   double *gainbuf=NULL;         /* Array of gains for all bolos in this col */
   dim_t i;                      /* Loop counter */
@@ -106,9 +114,17 @@ void smf_calcmodel_dks( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   unsigned char mask;           /* quality mask */
   smfArray *model=NULL;         /* Pointer to model at chunk */
   double *model_data=NULL;      /* Pointer to DATA component of model */
+  double *model_data_copy=NULL; /* Copy of model_data for one subarray */
   dim_t nbolo=0;                /* Number of bolometers */
   dim_t ncol;                   /* Number of columns */
   dim_t ndata=0;                /* Total number of data points */
+  size_t ndchisq=0;             /* number of elements contributing to dchisq */
+  dim_t nmodel=0;               /* Total number of elements in model buffer */
+  smfArray *noi=NULL;           /* Pointer to NOI at chunk */
+  double *noi_data=NULL;        /* Pointer to DATA component of model */
+  dim_t noibstride;             /* bolo stride for noise */
+  dim_t nointslice;             /* number of time slices for noise */
+  dim_t noitstride;             /* Time stride for noise */
   dim_t nrow;                   /* Number of rows */
   dim_t ntslice=0;              /* Number of time slices */
   double *offsetbuf=NULL;       /* Array of offsets for all bolos in this col */
@@ -129,6 +145,14 @@ void smf_calcmodel_dks( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   res = dat->res[chunk];
   qua = dat->qua[chunk];
   model = allmodel[chunk];
+
+  if(dat->noi) {
+    noi = dat->noi[chunk];
+
+    nmodel = (model->sdata[0])->dims[0] * (model->sdata[0])->dims[1];
+
+    model_data_copy = smf_malloc( nmodel, sizeof(*model_data_copy), 1, status);
+  }
 
   /* Check for dark squid smoothing parameter in the CONFIG file */
   if( kmap && astMapGet0I( kmap, "BOXCAR", &boxcar_i) ) {
@@ -170,7 +194,6 @@ void smf_calcmodel_dks( smfWorkForce *wf, smfDIMMData *dat, int chunk,
       *status = SAI__ERROR;
       errRep("", FUNC_NAME ": Null data in inputs", status);
     } else {
-
       if( flags&SMF__DIMM_FIRSTITER ) {
         msgOutif( MSG__VERB, "","   smoothing dark squids", status );
       } else {
@@ -213,18 +236,85 @@ void smf_calcmodel_dks( smfWorkForce *wf, smfDIMMData *dat, int chunk,
                 if( (res_data[index+k]!=VAL__BADD) && (dksquid[k]!=VAL__BADD)) {
                   res_data[index+k] += dksquid[k]*gainbuf[j] + offsetbuf[j];
                 }
-
               }
             }
           }
         }
       }
+
+      /* Make a copy of the model to check convergence */
+      if( noi ) {
+        memcpy( model_data_copy, model_data, nmodel*sizeof(*model_data_copy) );
+      }
+
       /* Then re-fit and remove the dark squid signal */
       msgOutif( MSG__VERB, "", "   cleaning detectors", status );
       smf_clean_dksquid( res->sdata[idx], qua_data, mask, 0, model->sdata[idx],
                          0, 0, status );
+
+      /* How has the model changed? */
+      if( noi ) {
+
+        smf_get_dims( noi->sdata[idx],  NULL, NULL, NULL, &nointslice,
+                      NULL, &noibstride, &noitstride, status);
+        noi_data = (double *)(noi->sdata[idx]->pntr)[0];
+
+        /* Loop over column */
+        bolcounter = 0;
+        for( i=0; (*status==SAI__OK)&&(i<ncol); i++ ) {
+
+          /* get pointer to the dark squid and gain/offset buffers this col */
+          dksquid = model_data;
+          dksquid += i*(ntslice+nrow*3);
+          gainbuf = dksquid + ntslice;
+          offsetbuf = gainbuf + nrow;
+
+          cdksquid = model_data_copy;
+          cdksquid += i*(ntslice+nrow*3);
+          cgainbuf = cdksquid + ntslice;
+          coffsetbuf = cgainbuf + nrow;
+
+          /* Loop over rows */
+          for( j=0; (*status==SAI__OK)&&(j<nrow); j++ ) {
+
+            /* Index in data array to start of the bolometer */
+            if( SC2STORE__COL_INDEX ) {
+              index = i*nrow + j;
+            } else {
+              index = i + j*ncol;
+            }
+            index *= ntslice;
+
+            /* Continue if the bolo is OK */
+            if( !(qua_data[index]&SMF__Q_BADB) && (gainbuf[j]!=VAL__BADD) &&
+                (offsetbuf[j]!=VAL__BADD) ) {
+
+              for( k=0; k<ntslice; k++ ) {
+
+                dchisq += ( (dksquid[k]*gainbuf[j] + offsetbuf[j]) -
+                            (cdksquid[k]*cgainbuf[j] + coffsetbuf[j])) *
+                  ( (dksquid[k]*gainbuf[j] + offsetbuf[j]) -
+                    (cdksquid[k]*cgainbuf[j] + coffsetbuf[j]) ) /
+                  noi_data[bolcounter*noibstride + (k%nointslice)*noitstride];
+
+                ndchisq++;
+              }
+            }
+
+            bolcounter++;
+          }
+        }
+      }
     }
   }
 
+  /* Print normalized residual chisq for this model */
+  if( (*status==SAI__OK) && noi && (ndchisq>0) ) {
+    dchisq /= (double) ndchisq;
+    msgOutiff( MSG__VERB, "", "    normalized change in model: %lf", status,
+               dchisq );
+  }
+
   if( kmap ) kmap = astAnnul( kmap );
+  if( model_data_copy ) model_data_copy = smf_free(model_data_copy, status);
 }

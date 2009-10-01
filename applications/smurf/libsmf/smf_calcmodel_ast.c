@@ -67,6 +67,9 @@
 *        Use QUALITY
 *     2008-04-29 (EC)
 *        Check for VAL__BADD in map to avoid propagating to residual
+*     2009-09-30 (EC)
+*        -Measure normalized change in model between iterations (dchisq)
+*        -don't re-add last model to residual because handled in smf_iteratemap
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -114,18 +117,32 @@ void smf_calcmodel_ast( smfWorkForce *wf, smfDIMMData *dat, int chunk,
                         int *status) {
 
   /* Local Variables */
+  size_t bstride;               /* bolo stride */
+  double dchisq=0;              /* this - last model residual chi^2 */
   dim_t i;                      /* Loop counter */
   dim_t idx=0;                  /* Index within subgroup */
+  dim_t ii;                     /* array index */
+  dim_t j;                      /* Loop counter */
   smfArray *lut=NULL;           /* Pointer to LUT at chunk */
   int *lut_data=NULL;           /* Pointer to DATA component of lut */
   unsigned char mask;           /* Bitmask for quality */
+  double m;                      /* Hold temporary value of m */
   smfArray *model=NULL;         /* Pointer to model at chunk */
   double *model_data=NULL;      /* Pointer to DATA component of model */
+  dim_t nbolo=0;                /* Number of bolometers */
   dim_t ndata;                  /* Number of data points */
+  size_t ndchisq=0;             /* number of elements contributing to dchisq */
+  smfArray *noi=NULL;           /* Pointer to NOI at chunk */
+  double *noi_data=NULL;        /* Pointer to DATA component of model */
+  dim_t noibstride;             /* bolo stride for noise */
+  dim_t nointslice;             /* number of time slices for noise */
+  dim_t noitstride;             /* Time stride for noise */
+  dim_t ntslice=0;              /* Number of time slices */
   smfArray *qua=NULL;           /* Pointer to QUA at chunk */
   unsigned char *qua_data=NULL; /* Pointer to quality data */
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
+  size_t tstride;               /* Time slice stride in data array */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -135,6 +152,9 @@ void smf_calcmodel_ast( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   lut = dat->lut[chunk];
   qua = dat->qua[chunk];
   model = allmodel[chunk];
+  if(dat->noi) {
+    noi = dat->noi[chunk];
+  }
 
   /* Loop over index in subgrp (subarray) */
   for( idx=0; idx<res->ndat; idx++ ) {
@@ -148,6 +168,11 @@ void smf_calcmodel_ast( smfWorkForce *wf, smfDIMMData *dat, int chunk,
     lut_data = (lut->sdata[idx]->pntr)[0];
     model_data = (model->sdata[idx]->pntr)[0];
     qua_data = (qua->sdata[idx]->pntr)[0];
+    if( noi ) {
+      smf_get_dims( noi->sdata[idx],  NULL, NULL, NULL, &nointslice,
+                    NULL, &noibstride, &noitstride, status);
+      noi_data = (double *)(noi->sdata[idx]->pntr)[0];
+    }
 
     if( (res_data == NULL) || (lut_data == NULL) || (model_data == NULL) ||
 	(qua_data == NULL) ) {
@@ -156,31 +181,51 @@ void smf_calcmodel_ast( smfWorkForce *wf, smfDIMMData *dat, int chunk,
     } else {
 
       /* Get the raw data dimensions */
-      ndata = (res->sdata[idx]->dims)[0] * (res->sdata[idx]->dims)[1] *
-	(res->sdata[idx]->dims)[2];
+      smf_get_dims( res->sdata[idx],  NULL, NULL, &nbolo, &ntslice,
+                    &ndata, &bstride, &tstride, status);
 
       /* Which QUALITY bits should be considered for ignoring data */
       mask = ~(SMF__Q_JUMP|SMF__Q_SPIKE|SMF__Q_STAT);
 
       /* Loop over data points */
-      for( i=0; i<ndata; i++ ) {
-	if( lut_data[i] != VAL__BADI ) {
+      for( i=0; i<nbolo; i++ ) if( !(qua_data[i*bstride]&SMF__Q_BADB) )
+        for( j=0; j<ntslice; j++ ) {
 
-	  /* Add previous iteration of the model back into the residual */
-	  if( !(qua_data[i]&mask) )
+        ii = i*bstride+j*tstride;
 
-	    if( model_data[i] != VAL__BADD ) {
-	      res_data[i] += model_data[i];
-	    }
+	if( (lut_data[ii] != VAL__BADI) && (model_data[ii] != VAL__BADD) ) {
 
-	  /* calculate new model using the map/LUT */
-	  model_data[i] = dat->map[lut_data[i]];
+	  /* calculate new model value using the map/LUT */
+          m = dat->map[lut_data[ii]];
 
-	  /* update the residual model */
-	  if( !(qua_data[i]&mask) && (model_data[i] != VAL__BADD) )
-	    res_data[i] -= model_data[i];
+          /* measure contribution to dchisq */
+          if( noi && !(qua_data[ii]&mask) ) {
+            dchisq += (m - model_data[ii])*(m - model_data[ii]) /
+              noi_data[i*noibstride + (j%nointslice)*noitstride];
+            ndchisq++;
+          }
+
+          /* update model container with new value */
+	  model_data[ii] = m;
+
+	  /* update the residual model.
+             ***NOTE: unlike other model components we do *not* first
+                      add the previous realization back in. This is
+                      because we've already done this in smf_iteratemap
+                      before calling smf_rebinmap1. */
+
+	  if( !(qua_data[ii]&mask) ) {
+	    res_data[ii] -= model_data[ii];
+          }
 	}
       }
     }
+  }
+
+  /* Print normalized residual chisq for this model */
+  if( (*status==SAI__OK) && noi && (ndchisq>0) ) {
+    dchisq /= (double) ndchisq;
+    msgOutiff( MSG__VERB, "", "    normalized change in model: %lf", status,
+               dchisq );
   }
 }

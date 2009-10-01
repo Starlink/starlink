@@ -51,6 +51,8 @@
 *        - switch to subkeymap notation in config file
 *     2009-04-27 (EC)
 *        Enable multiple threads in call to smf_filter_execute
+*     2009-09-30 (EC)
+*        Measure normalized change in model between iterations (dchisq)
 *     {enter_further_changes_here}
 
 
@@ -99,16 +101,25 @@ void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
   /* Local Variables */
   size_t bstride;               /* bolo stride */
+  double dchisq=0;              /* this - last model residual chi^2 */
   int dofft;                    /* flag if we will actually do any filtering */
   smfFilter *filt=NULL;         /* Pointer to filter struct */
   size_t i;                     /* Loop counter */
+  dim_t ii;                     /* Array index */
   dim_t idx=0;                  /* Index within subgroup */
   size_t j;                     /* Loop counter */
   AstKeyMap *kmap=NULL;         /* Pointer to FLT-specific keys */
   smfArray *model=NULL;         /* Pointer to model at chunk */
   double *model_data=NULL;      /* Pointer to DATA component of model */
+  double *model_data_copy=NULL; /* Copy of model_data for one bolo */
   dim_t nbolo=0;                /* Number of bolometers */
   dim_t ndata=0;                /* Total number of data points */
+  size_t ndchisq=0;             /* number of elements contributing to dchisq */
+  smfArray *noi=NULL;           /* Pointer to NOI at chunk */
+  double *noi_data=NULL;        /* Pointer to DATA component of model */
+  dim_t noibstride;             /* bolo stride for noise */
+  dim_t nointslice;             /* number of time slices for noise */
+  dim_t noitstride;             /* Time stride for noise */
   dim_t ntslice=0;              /* Number of time slices */
   smfArray *qua=NULL;           /* Pointer to QUA at chunk */
   unsigned char *qua_data=NULL; /* Pointer to quality data */
@@ -129,6 +140,14 @@ void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   /* Obtain pointers to relevant smfArrays for this chunk */
   res = dat->res[chunk];
   qua = dat->qua[chunk];
+
+  smf_get_dims( res->sdata[0],  NULL, NULL, NULL, NULL,
+                &ndata, NULL, NULL, status);
+
+  if(dat->noi) {
+    noi = dat->noi[chunk];
+    model_data_copy = smf_malloc( ndata, sizeof(*model_data_copy), 1, status);
+  }
   model = allmodel[chunk];
 
   /* Assert bolo-ordered data */
@@ -150,6 +169,12 @@ void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk,
     res_data = (res->sdata[idx]->pntr)[0];
     qua_data = (qua->sdata[idx]->pntr)[0];
     model_data = (model->sdata[idx]->pntr)[0];
+
+    if( noi ) {
+      smf_get_dims( noi->sdata[idx],  NULL, NULL, NULL, &nointslice,
+                    NULL, &noibstride, &noitstride, status);
+      noi_data = (double *)(noi->sdata[idx]->pntr)[0];
+    }
 
     if( (res_data == NULL) || (model_data == NULL) || (qua_data == NULL) ) {
       *status = SAI__ERROR;
@@ -173,7 +198,14 @@ void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk,
           }
         }
 
-        /* Copy the residual into the model array so that we have a copy */
+        /* Make a copy of the last model if calculating dchisq */
+        if( noi ) {
+          memcpy( model_data_copy, model_data,
+                  ndata*smf_dtype_size(res->sdata[idx], status ) );
+        }
+
+        /* Copy the residual+old model into model_data where it will be
+           filtered again in this iteration. */
         memcpy( model_data, res_data,
                 ndata*smf_dtype_size(res->sdata[idx],status) );
       }
@@ -188,7 +220,17 @@ void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk,
       if( *status == SAI__OK ) {
         for( i=0; i<nbolo; i++ ) if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {
           for( j=0; j<ntslice; j++ ) {
-            model_data[i*bstride+j*tstride] -= res_data[i*bstride+j*tstride];
+
+            ii = i*bstride+j*tstride;
+            model_data[ii] -= res_data[ii];
+
+            /* also measure contribution to dchisq */
+            if( noi ) {
+              dchisq += (model_data[ii] - model_data_copy[ii]) *
+                (model_data[ii] - model_data_copy[ii]) /
+                noi_data[i*noibstride + (j%nointslice)*noitstride];
+              ndchisq++;
+            }
           }
         }
       }
@@ -198,5 +240,13 @@ void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk,
     }
   }
 
+  /* Print normalized residual chisq for this model */
+  if( (*status==SAI__OK) && noi && (ndchisq>0) ) {
+    dchisq /= (double) ndchisq;
+    msgOutiff( MSG__VERB, "", "    normalized change in model: %lf", status,
+               dchisq );
+  }
+
   if( kmap ) kmap = astAnnul( kmap );
+  if( model_data_copy ) model_data_copy = smf_free(model_data_copy, status);
 }
