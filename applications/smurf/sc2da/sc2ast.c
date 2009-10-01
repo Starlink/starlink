@@ -471,9 +471,6 @@ int *status             /* global status (given and returned) */
       cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], 
                                                       shiftmap, 1, " " );
 
-      printf("Setting up subarray %d coordinates: (%f,%f) rot %f\n",
-             subnum, shift[0], shift[1], r);
-
 /* The mapping from pixel numbers to millimetres is a simple scaling,
    because the pixel separation is the same in both coordinates and is
    accurately constant. A ZoomMap can be used for this. */
