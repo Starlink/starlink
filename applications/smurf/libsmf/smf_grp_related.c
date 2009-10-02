@@ -15,7 +15,7 @@
  *  Invocation:
  *     smf_grp_related( Grp *igrp, const int grpsize, const int grpbywave,
  *                      dim_t maxlen, dim_t *maxconcatlen, smfGroup **group,
- *                      int *status );
+ *                      Grp **basegrp, int *status );
 
  *  Arguments:
  *     igrp = Grp* (Given)
@@ -32,6 +32,12 @@
  *        Can be NULL.
  *     group = smfGroup ** (Returned)
  *        Returned smfGroup
+ *     basegrp = Grp ** (Returned)
+ *        For each group of related files, this group will contain the
+ *        names of the first member in each of those groups. Can
+ *        be used as a basis group for requesting output files that
+ *        could be derived from the smfGroup. Can be NULL if this information
+ *        is not required.
  *     status = int* (Given and Returned)
  *        Pointer to global status.
 
@@ -103,10 +109,12 @@
  *        Establish continuity based on OBSIDSS, SEQCOUNT and NSUBSCAN
  *     2008-11-14 (TIMJ):
  *        Use smf_find_seqcount
+ *     2009-10-01 (TIMJ):
+ *        Add basegrp argument.
  *     {enter_further_changes_here}
 
  *  Copyright:
- *     Copyright (C) 2008 Science and Technology Facilities Council.
+ *     Copyright (C) 2008-2009 Science and Technology Facilities Council.
  *     Copyright (C) 2006-2008 University of British Columbia.
  *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
  *     All Rights Reserved.
@@ -161,7 +169,7 @@
 
 void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
                        dim_t maxlen, dim_t *maxconcatlen, smfGroup **group,
-                       int *status ) {
+                       Grp **basegrp, int *status ) {
 
   /* Local variables */
   dim_t *all_len = NULL;      /* Lengths of each chunk */
@@ -613,6 +621,26 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
   if( maxconcatlen ) {
     *maxconcatlen = maxconcat;
   }
+
+  /* Create a base group for output files if required */
+  /* Create a base group of filenames */
+  if (*status == SAI__OK && basegrp ) {
+    *basegrp = grpNew( "Base Group", status );
+
+    /* Loop over time chunks */
+    for( i=0; (*status==SAI__OK)&&(i<(*group)->ngroups); i++ ) {
+      int idx;
+      /* Loop over subarray */
+      for( idx=0; idx<(*group)->nrelated; idx++ ) {
+        /* Check for new continuous chunk */
+        if( i==0 || ( (*group)->chunk[i] != (*group)->chunk[i-1]) ) {
+          ndgCpsup( (*group)->grp, (*group)->subgroups[i][idx], *basegrp, status );
+        }
+      }
+    }
+  }
+
+
 
  CLEANUP:
   starts = smf_free( starts, status );

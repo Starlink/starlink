@@ -922,7 +922,7 @@ AstKeyMap *smf_groupscans( Grp *igrp,  int size, int *maxsyspop,
 
 void smf_grp_related( Grp *igrp, const int grpsize, const int grpbywave,
                       dim_t maxlen, dim_t *maxconcatlen, smfGroup **group,
-                      int *status );
+                      Grp **basegrp, int *status );
 
 void smf_history_add( smfData* data, const char * appl,
                       int *status);

@@ -206,25 +206,11 @@ void smurf_sc2concat( int *status ) {
 
   /* Group the input files by subarray and continuity */
   smf_grp_related( igrp, isize, 1, maxlen-padStart-padEnd, &maxconcat, &igroup,
-                   status );
+                   &basegrp, status );
 
   /* Obtain the number of continuous chunks and subarrays */
   if( *status == SAI__OK ) {
     ncontchunks = igroup->chunk[igroup->ngroups-1]+1;
-  }
-
-  /* Create a base group of filenames */
-  basegrp = grpNew( "Base Group", status );
-
-  /* Loop over time chunks */
-  for( i=0; (*status==SAI__OK)&&(i<igroup->ngroups); i++ ) {
-    /* Loop over subarray */
-    for( idx=0; idx<igroup->nrelated; idx++ ) {
-      /* Check for new continuous chunk */
-      if( i==0 || (igroup->chunk[i] != igroup->chunk[i-1]) ) {
-        ndgCpsup( igroup->grp, igroup->subgroups[i][idx], basegrp, status );
-      }
-    }
   }
 
   basesize = grpGrpsz( basegrp, status );

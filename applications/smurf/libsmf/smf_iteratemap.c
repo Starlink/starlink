@@ -673,7 +673,7 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
      and padEnd from maxlen since these also add to the file length. */
 
   smf_grp_related( igrp, isize, 1, maxlen-padStart-padEnd, &maxconcat,
-                   &igroup, status );
+                   &igroup, NULL, status );
 
   /* Once we've run smf_grp_related we know how many subarrays there
      are.  We also know the maximum length of a concatenated piece of
@@ -712,7 +712,7 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
         smf_close_smfGroup( &igroup, status );
       }
 
-      smf_grp_related( igrp, isize, 1, try, &maxconcat, &igroup, status );
+      smf_grp_related( igrp, isize, 1, try, &maxconcat, &igroup, NULL, status );
     }
   }
 
