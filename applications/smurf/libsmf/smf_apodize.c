@@ -14,7 +14,7 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_apodize( smfData *data, unsigned char *quality, size_t len, 
+*     smf_apodize( smfData *data, unsigned char *quality, size_t len,
 *                  int *status );
 
 *  Arguments:
@@ -23,7 +23,7 @@
 *     quality = unsigned char * (Given and Returned)
 *        If set, use this buffer instead of QUALITY associated with data.
 *        If NULL, use the QUALITY associated with data. Locations of spikes
-*        will have bit SMF__Q_SPIKE set. 
+*        will have bit SMF__Q_SPIKE set.
 *     len = size_t (Given)
 *        Number of samples over which to apply apodization.
 *     status = int* (Given and Returned)
@@ -65,7 +65,7 @@
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008-2009 University of British Columbia. 
+*     Copyright (C) 2008-2009 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -106,7 +106,7 @@
 
 #define FUNC_NAME "smf_apodize"
 
-void smf_apodize( smfData *data, unsigned char *quality, size_t len, 
+void smf_apodize( smfData *data, unsigned char *quality, size_t len,
                   int *status ) {
 
   double ap;                    /* Apodization factor at this step */
@@ -130,13 +130,13 @@ void smf_apodize( smfData *data, unsigned char *quality, size_t len,
 
   if( !data->pntr[0] ) {
     *status = SAI__ERROR;
-    errRep( "", FUNC_NAME ": smfData does not contain a DATA component", 
+    errRep( "", FUNC_NAME ": smfData does not contain a DATA component",
             status );
     return;
   }
 
   /* Calculate data dimensions */
-  smf_get_dims( data,  NULL, NULL, &nbolo, &ntslice, &ndata, &bstride, 
+  smf_get_dims( data,  NULL, NULL, &nbolo, &ntslice, &ndata, &bstride,
                 &tstride, status );
 
   /* Obtain pointer to data and quality components */
@@ -166,7 +166,7 @@ void smf_apodize( smfData *data, unsigned char *quality, size_t len,
 
       if( j==ntslice ) {
         *status=SAI__ERROR;
-        errRep( "", FUNC_NAME ": Can't apodize, entire array is padding.", 
+        errRep( "", FUNC_NAME ": Can't apodize, entire array is padding.",
                 status );
       } else {
         first = j;
@@ -176,12 +176,12 @@ void smf_apodize( smfData *data, unsigned char *quality, size_t len,
         }
         last = j;
       }
-    } 
+    }
 
     /* Can we apodize? */
     if( (*status==SAI__OK) && ( (last-first+1) < (2*len) ) ) {
       *status = SAI__ERROR;
-      errRepf("", FUNC_NAME 
+      errRepf("", FUNC_NAME
               ": Can't apodize, not enough samples (%zu < %zu).", status,
               last-first+1, 4*len);
     }
@@ -226,6 +226,6 @@ void smf_apodize( smfData *data, unsigned char *quality, size_t len,
           }
         }
       }
-    } 
-  }  
+    }
+  }
 }

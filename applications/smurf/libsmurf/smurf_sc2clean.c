@@ -29,7 +29,7 @@
 *     and removing low-order polynomial baselines;
 *     - (iii) identifying and repairing DC steps;
 *     - (iv) flagging spikes;
-*     - (v) replacing spikes and other gaps in the data with a constrained 
+*     - (v) replacing spikes and other gaps in the data with a constrained
 *     realization of noise; and
 *     - (vi) applying other frequency-domain filters, such
 *     as a high-pass or correction of the DA system response.
@@ -39,7 +39,7 @@
 
 *  ADAM Parameters:
 *     APOD = _INTEGER (Read)
-*          Apodize time series start and end with a Hanning window that rolls 
+*          Apodize time series start and end with a Hanning window that rolls
 *          off in APOD samples.
 *     BADFRAC = _DOUBLE (Read)
 *          Fraction of bad samples in order for entire bolometer to be
@@ -78,7 +78,7 @@
 *          all the output NDFs created by this application (one per
 *          line). If a null (!) value is supplied no file is created. [!]
 *     SPIKEITER = _INTEGER (Read)
-*          If 0 iteratively find spikes until convergence. Otherwise 
+*          If 0 iteratively find spikes until convergence. Otherwise
 *          execute precisely this many iterations.
 *     SPIKETHRESH = _DOUBLE (Read)
 *          Flag spikes SPIKETHRESH-sigma away from mean
@@ -107,7 +107,7 @@
 *     2009-04-30 (EC):
 *        Use threads
 *     {enter_further_changes_here}
- 
+
 *  Copyright:
 *     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -193,7 +193,7 @@ void smurf_sc2clean( int *status ) {
   /* Main routine */
   ndfBegin();
 
-  /* Find the number of cores/processors available and create a pool of 
+  /* Find the number of cores/processors available and create a pool of
      threads of the same size. */
   wf = smf_create_workforce( smf_get_nthread( status ), status );
 
@@ -243,9 +243,9 @@ void smurf_sc2clean( int *status ) {
     atlGetParam( "SPIKETHRESH", keymap, status );
 
     smf_get_cleanpar( keymap, &apod, &badfrac, &dcbox, &dcbad, &dcthresh,
-                      &dkclean, NULL, NULL, NULL, NULL, NULL, NULL, 
+                      &dkclean, NULL, NULL, NULL, NULL, NULL, NULL,
                       &flagstat, &order, &spikethresh, &spikeiter, status );
-  }  
+  }
 
   /* Loop over input files */
   if( *status == SAI__OK ) for( i=1; i<=size; i++ ) {
@@ -279,8 +279,8 @@ void smurf_sc2clean( int *status ) {
     if( order >= 0 ) {
       msgSeti("ORDER",order);
       msgOutif(MSG__VERB," ",
-               "Fitting and removing ^ORDER-order polynomial baselines", 
-               status);  
+               "Fitting and removing ^ORDER-order polynomial baselines",
+               status);
       smf_scanfit( ffdata, NULL, order, status );
       smf_subtract_poly( ffdata, NULL, 0, status );
     }
@@ -295,12 +295,12 @@ void smurf_sc2clean( int *status ) {
                  "samples", status);
       } else {
         msgOutif(MSG__VERB," ",
-	       "Fixing DC steps of size ^DCTHRESH-sigma in ^DCBOX samples", 
+	       "Fixing DC steps of size ^DCTHRESH-sigma in ^DCBOX samples",
                  status);
-      } 
+      }
       smf_correct_steps( ffdata, NULL, dcthresh, dcbox, dcbad, status );
     }
-    
+
     /* Flag spikes */
     if( spikethresh ) {
       msgSetd("SPIKETHRESH",spikethresh);
@@ -310,33 +310,33 @@ void smurf_sc2clean( int *status ) {
 	msgOutif(MSG__VERB," ",
 		 "Flagging ^spikethresh-sigma spikes iteratively to "
                  "convergence.", status);
-	
+
       } else {
 	msgOutif(MSG__VERB," ",
 		 "Flagging ^spikethresh-sigma spikes with ^spikeiter "
                  "iterations", status);
       }
 
-      smf_flag_spikes( ffdata, NULL, NULL, mask, spikethresh, spikeiter, 100, 
+      smf_flag_spikes( ffdata, NULL, NULL, mask, spikethresh, spikeiter, 100,
                        &aiter, &nflag, status );
 
       if( *status == SAI__OK ) {
 	msgSeti("AITER",aiter);
 	msgOutif(MSG__VERB," ", "Finished in ^AITER iterations",
-		 status); 
+		 status);
       }
     }
 
     /* Flag periods of stationary pointing */
     if( flagstat ) {
       msgSetd("THRESH",flagstat);
-      msgOutif(MSG__VERB, "", 
+      msgOutif(MSG__VERB, "",
                "Flagging regions with speeds < ^THRESH arcsec/sec", status );
       smf_flag_stationary( ffdata, NULL, flagstat, &nflag, status );
       if( *status == SAI__OK ) {
 	msgSeti("N",nflag);
 	msgOutif(MSG__VERB," ", "^N new time slices flagged",
-		 status); 
+		 status);
       }
     }
 
@@ -357,13 +357,13 @@ void smurf_sc2clean( int *status ) {
     }
 
     /* frequency-domain filtering */
-    filt = smf_create_smfFilter( ffdata, status );      
+    filt = smf_create_smfFilter( ffdata, status );
     smf_filter_fromkeymap( filt, keymap, &dofft, status );
 
     if( dofft ) {
       msgOutif( MSG__VERB," ", "Apply frequency domain filter", status );
       smf_filter_execute( wf, ffdata, filt, status );
-      smf_convert_bad( ffdata, status );      
+      smf_convert_bad( ffdata, status );
     }
 
     filt = smf_free_smfFilter( filt, status );
