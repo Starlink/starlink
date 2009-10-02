@@ -1,10 +1,10 @@
 # Number of iterations
 #  postive number  = fixed number of iterations
 #  negative number = maximum iterations if using chi^2 stopping criteria
-numiter = 5
+numiter = -5
 
 # chi^2 tolerance in negative-numiter case (requires noi model component)
-chitol = 1e-6
+chitol = 1e-3
 
 # method of estimating variance map
 #  0 = propagate from the time-domain noise (requires noi model component)
@@ -55,11 +55,11 @@ exportndf = 0
 # --- Padding, apodization and mean subtraction are all fairly useful ---
 
 # Number of samples of padding to add to start and end before filtering
-padstart = 1000
-padend = 1000
+padstart = 100
+padend = 100
 
 # Apodize signals with a sin function roll-off across apod samples
-apod = 1000
+apod = 100
 
 # subtract a baseline polynomial of this order
 order = 0
@@ -123,15 +123,15 @@ com.boxcar = 10
 
 # low-pass filter dark squid signals using boxcar of this width (if dks
 # model is specified)
-dks.boxcar = 10
+dks.boxcar = 100
 
 # additional despiking after each iteration within noi calculation
 #noi.spikethresh = 10
 #noi.spikeiter = 0
 
 # iterative filter.
-flt.filt_edgehigh = 0.2
-flt.filt_edgelow = 20
+flt.filt_edgehigh = 0.1
+flt.filt_edgelow = 90
 #flt.filt_notchlow  = (25,55)
 #flt.filt_notchhigh = (35,65)
 
