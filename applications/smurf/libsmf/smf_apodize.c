@@ -5,7 +5,7 @@
 *     smf_apodize
 
 *  Purpose:
-*     Apodize (smooth roll-off) time-series data 
+*     Apodize (smooth roll-off) time-series data using Hanning window
 
 *  Language:
 *     Starlink ANSI C
@@ -33,14 +33,23 @@
 *     Before operations such as filtering it can be useful to apodize
 *     time-series data to avoid ringing caused sharp edges. This
 *     routine multiplies the start and end of each bolometer time
-*     stream by a trig function that rolls-off to 0 in len samples. If
-*     the data were previously padded (indicated by SMF__Q_PAD quality
-*     bits) then the apodizations starts after the padding (or before
-*     for the roll-off at the end). Apodized sections are quality
-*     flagged SMF__Q_APOD. In addition to the LEN samples at the start
-*     and end that are apodized, an additional section of data beyond that
-*     are also quality flagged SMF__Q_APOD to ensure that ringing caused
-*     by filtering does not get used in the final map.
+*     stream by a trig function that rolls-off to 0 in len samples (a
+*     Hanning window):
+*
+*     window(i) = 0.5 - (1.0 - 0.5)*cos( i*pi / len )
+*
+*     where i runs from 0 to (len-1) at the beginning of the time
+*     stream, and then the same window (flipped in time) is applied at
+*     the end of the time stream.
+*
+*     If the data were previously padded (indicated by SMF__Q_PAD
+*     quality bits) then the apodizations starts after the padding (or
+*     before for the roll-off at the end). Apodized sections are
+*     quality flagged SMF__Q_APOD. In addition to the LEN samples at
+*     the start and end that are apodized, an additional section of
+*     data beyond that are also quality flagged SMF__Q_APOD to ensure
+*     that ringing caused by filtering does not get used in the final
+*     map.
 
 *  Notes:
 
@@ -50,11 +59,13 @@
 
 *  History:
 *     2008-12-01 (EC):
-*        Initial version.
+*       Initial version.
+*     2009-10-02 (EC):
+*       Switch to using a softer Hanning window
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008 University of British Columbia. 
+*     Copyright (C) 2008-2009 University of British Columbia. 
 *     All Rights Reserved.
 
 *  Licence:
@@ -183,7 +194,7 @@ void smf_apodize( smfData *data, unsigned char *quality, size_t len,
 
         /* First roll-off the signal */
         for( j=0; j<len; j++ ) {
-          ap = sin( AST__DPI/2. * (double) j / len );
+          ap = 0.5 - 0.5*cos( AST__DPI * (double) j / len );
 
           if( !(qua[i*bstride+(first+j)*tstride]&mask) ) {
             dat[i*bstride+(first+j)*tstride]*=ap;
@@ -204,7 +215,7 @@ void smf_apodize( smfData *data, unsigned char *quality, size_t len,
       } else if (!qua) {
         /* Non-Quality checking version */
         for( j=0; j<len; j++ ) {
-          ap = sin( AST__DPI/2. * (double) j / len );
+          ap = 0.5 - 0.5*cos( AST__DPI * (double) j / len );
 
           if( dat[i*bstride+(first+j)*tstride]!=VAL__BADD ) {
             dat[i*bstride+(first+j)*tstride]*=ap;

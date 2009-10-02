@@ -29,8 +29,8 @@
 *     and removing low-order polynomial baselines;
 *     - (iii) identifying and repairing DC steps;
 *     - (iv) flagging spikes;
-*     - (v) replacing spikes and other gaps in the data with a constrained realization
-*     of noise; and
+*     - (v) replacing spikes and other gaps in the data with a constrained 
+*     realization of noise; and
 *     - (vi) applying other frequency-domain filters, such
 *     as a high-pass or correction of the DA system response.
 
@@ -39,8 +39,8 @@
 
 *  ADAM Parameters:
 *     APOD = _INTEGER (Read)
-*          Apodize time series start and end with trig function that rolls off
-*          in APOD samples.
+*          Apodize time series start and end with a Hanning window that rolls 
+*          off in APOD samples.
 *     BADFRAC = _DOUBLE (Read)
 *          Fraction of bad samples in order for entire bolometer to be
 *          flagged as bad
