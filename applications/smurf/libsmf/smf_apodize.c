@@ -179,7 +179,7 @@ void smf_apodize( smfData *data, unsigned char *quality, size_t len,
     } 
 
     /* Can we apodize? */
-    if( (*status==SAI__OK) && ( (last-first+1) < (4*len) ) ) {
+    if( (*status==SAI__OK) && ( (last-first+1) < (2*len) ) ) {
       *status = SAI__ERROR;
       errRepf("", FUNC_NAME 
               ": Can't apodize, not enough samples (%zu < %zu).", status,
