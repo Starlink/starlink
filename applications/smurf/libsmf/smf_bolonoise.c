@@ -13,10 +13,10 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_bolonoise( smfWorkForce *wf, smfData *data, 
-*                    unsigned char *quality, size_t window, double f_low, 
+*     smf_bolonoise( smfWorkForce *wf, const smfData *data,
+*                    unsigned char *quality, size_t window, double f_low,
 *                    double f_white1, double f_white2, double flagratio,
-*                    double *whitenoise, double *fratio, int nep, 
+*                    double *whitenoise, double *fratio, int nep,
 *                    int *status )
 
 *  Arguments:
@@ -36,37 +36,47 @@
 *        Upper frequency edge of window for calculating average white noise
 *     flagratio = double (Given)
 *        If nonzero, limit for fratio below which bolo is flagged as bad
-*     whitenoise = double* (Given)
-*        Estimate of variance in bolo signals produced by white noise. 
+*     whitenoise = double* (Returned)
+*        Externally allocated array (nbolos) that will hold estimates of
+*        the mean-square variances in bolo signals produced by white noise.
 *        Can be NULL.
-*     fratio = double* (Given)
-*        Array containing ratio of noise at f_low to the average from
-*        f_white1 to f_white2. Can be NULL.
+*     fratio = double* (Returned)
+*        Externally allocated array (nbolos) that will hold ratios of noise at
+*        f_low to the average from f_white1 to f_white2. Can be NULL.
 *     nep = int (Given)
-*        If set, calculate whitenoise in 1 second of averaged time-series data.
+*        If set, calculate whitenoise in 1 second of averaged time-series data
+*        by dividing by the sample rate.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
 *  Return Value:
 
-*  Description: 
+*  Description:
 *     Calculate the power spectrum for each detector. Optionally smooth
 *     the power spectrum with a boxcar filter. Measure the noise at a single
 *     low-frequency (f_low), and the average white-noise level over a range
 *     f_white1 to f_white2. The ratio of the first to the second number
 *     (fratio) is an estimate of the low-frequency noise of the detector
-*     an can be used to flag dead detectors, the idea being that little
+*     and can be used to flag dead detectors, the idea being that little
 *     or no optical power from the sky reaches them so they have relatively
-*     flat power spectra. Arrays containing the white noise level (whitenoise)
-*     and low-to-high frequency power ratio (fratio) can also be returned
-*     containing values for each bolometer. Whitenoise by default estimates
-*     the variance in the time-domain samples caused by the "white" part of
-*     the spectrum (i.e. on a per-sample basis). Setting the "NEP" flag
-*     calculates the effective variance expected in an average of 1 second
-*     of time stream data (i.e. appropriate for calculating NEP and NEFD). If
-*     either the low-frequency or white noise power are zero, and a quality
-*     array exists, the bolometer in question will have the SMF__Q_BADB
-*     flag set.
+*     flat power spectra.
+*
+*     Arrays containing the white noise level (whitenoise) and
+*     low-to-high frequency power ratio (fratio) can also be returned
+*     containing values for each bolometer. Whitenoise by default
+*     estimates the variance in the time-domain samples caused by the
+*     "white" part of the spectrum as the average in the mean square
+*     power between f_white1 and and f_white, and then assuming it holds
+*     at all frequencies in the data (i.e. multiply the power by nsamples).
+*
+*     Setting the "NEP" flag calculates the effective variance
+*     expected in an average of 1 second of time stream data
+*     (i.e. appropriate for calculating NEP and NEFD) by dividing by
+*     the sample rate.
+*
+*     If either the low-frequency or white noise power are zero, and
+*     a quality array exists, the bolometer in question will have the
+*     SMF__Q_BADB flag set.
 
 *  Notes:
 
@@ -85,9 +95,12 @@
 *     2008-12-17 (EC):
 *        -Use b/tstride
 *        -If no power detected, instead of bad status, set SMF__Q_BADB
+*     2009-10-01 (EC):
+*        - multiply white noise by total number of samples rather than
+*          measurement bandwidth.
 
 *  Copyright:
-*     Copyright (C) 2008 University of British Columbia.
+*     Copyright (C) 2008-2009 University of British Columbia.
 *     Copyright (C) 2008 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
@@ -126,9 +139,10 @@
 
 #define FUNC_NAME "smf_bolonoise"
 
-void smf_bolonoise( smfWorkForce *wf, smfData *data, unsigned char *quality, 
-                    size_t window, double f_low, double f_white1, 
-                    double f_white2, double flagratio, double *whitenoise, 
+void smf_bolonoise( smfWorkForce *wf, const smfData *data, 
+                    unsigned char *quality,
+                    size_t window, double f_low, double f_white1,
+                    double f_white2, double flagratio, double *whitenoise,
                     double *fratio, int nep, int *status ) {
 
   double *base=NULL;       /* Pointer to base coordinates of array */
@@ -178,7 +192,7 @@ void smf_bolonoise( smfWorkForce *wf, smfData *data, unsigned char *quality,
       /* Frequency steps in the FFT */
       df = 1. / (steptime * (double) ntslice );
     }
-  } 
+  }
 
   if( quality ) {
     qua = quality;
@@ -203,7 +217,7 @@ void smf_bolonoise( smfWorkForce *wf, smfData *data, unsigned char *quality,
   i_w2 = smf_get_findex( f_white2, df, nf, status );
 
   /* Loop over detectors */
-  for( i=0; (*status==SAI__OK)&&(i<nbolo); i++ ) 
+  for( i=0; (*status==SAI__OK)&&(i<nbolo); i++ )
     if( !qua || !(qua[i*bstride]&SMF__Q_BADB) ) {
 
     /* Pointer to start of power spectrum */
@@ -245,21 +259,29 @@ void smf_bolonoise( smfWorkForce *wf, smfData *data, unsigned char *quality,
 
       /* Store values */
       if( whitenoise ) {
-        /* Multiply average by bandwidth to get estimate of signal variance.
-           The factor of "2" is there because half of the power in the FFT
-           of real data is below the Nyquist frequency, and the other half
-           is stored above the Nyquist frequency. */
-        whitenoise[i] = p_white * 2 * (i_w2-i_w1+1);
-        /* If NEP set, scale this to variance in 1-second average by dividing
-           by the number of samples per second */
+        /* Multiply average white noise level by total number of
+           samples: this calculates the total white noise contribution
+           assuming this level holds at all frequencies. Another
+           potential way to calculate this number would be to multiply
+           by 2 * (i_w2-i_w1+1) instead of ntslice to estimate the
+           time-domain noise power generated only within the
+           measurement band. */
+
+        whitenoise[i] = p_white * ntslice;
+
+        /* If NEP set, scale this to variance in 1-second average by
+           dividing by the sampling frequency (equivalent to
+           multiplying by sample length). This gives you the "/rtHz"
+           in the units. */
+
         if( nep ) {
-          whitenoise[i] /= (1./steptime);
+          whitenoise[i] *= steptime;
         }
       }
       if( fratio ) fratio[i] = fr;
     }
   }
-  
+
   /* Clean up */
   if( pow ) smf_close_file( &pow, status );
 }
