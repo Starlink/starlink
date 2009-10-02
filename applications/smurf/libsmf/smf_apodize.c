@@ -183,7 +183,7 @@ void smf_apodize( smfData *data, unsigned char *quality, size_t len,
       *status = SAI__ERROR;
       errRepf("", FUNC_NAME
               ": Can't apodize, not enough samples (%zu < %zu).", status,
-              last-first+1, 4*len);
+              last-first+1, 2*len);
     }
 
     /* Do the apodization */
