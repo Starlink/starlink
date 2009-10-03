@@ -54,6 +54,8 @@
 *        Add ocsconfig presence indicator
 *     2009-09-29 (TIMJ):
 *       Report pixel origin.
+*     2009-10-02 (TIMJ):
+*       Add explicit history listing.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -218,11 +220,20 @@ void smf_dump_smfData( const smfData *data, int showflags, int *status) {
 
   /* History */
   if ( data->history == NULL ) {
-    msgSetc("P","NULL");
+    msgOut("", "  history = NULL", status );
   } else {
-    msgSetc("P","OK");
+    int nrec = astMapSize( data->history );
+    int i;
+    if (nrec == 0) {
+      msgOut( "", "  history = empty", status );
+    } else {
+      for ( i = 0; i < nrec; i++) {
+        msgSetc( "H", astMapKey( data->history, i ) );
+        if (i != (nrec-1)) msgSetc( "H", ",");
+      }
+      msgOut( "", "  history = ^H", status );
+    }
   }
-  msgOut("", "  history = ^P", status);
 
   /* Now for the structs within a smfData - start with the smfFile */
   if ( data->file == NULL ) {
