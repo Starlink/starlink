@@ -126,7 +126,8 @@
  *        Add bad pixel masks (bpms) to interface
  *     2009-09-29 (TIMJ):
  *        Handle pixel origin in concatenated smfData
-
+ *     2009-10-02 (TIMJ):
+ *        Copy more information from reference smfData
 
  *  Notes:
  *     If projection information supplied, pointing LUT will not be
@@ -442,11 +443,14 @@ void smf_concat_smfGroup( smfWorkForce *wf, smfGroup *igrp,
               tchunk = padStart;
 
               /* Allocate memory for empty smfData with a smfHead. Create
-                 a DA struct only if the input file has one. */
-              if( refdata->da ) creflag = 0;
-              else creflag = SMF__NOCREATE_DA;
-              data = smf_create_smfData( creflag, status );
-              da = data->da;
+                 a DA struct only if the input file has one. Create it as
+                 a clone rather than creating an empty smfDa. */
+              data = smf_create_smfData( SMF__NOCREATE_DA, status );
+              if (refdata->da) {
+                da = smf_deepcopy_smfDA( refdata, status );
+                data->da = da;
+              }
+              if (refdata->history) data->history = astCopy( refdata->history );
 
               if( *status == SAI__OK ) {
                 /* Copy over basic header information from the reference */
@@ -454,6 +458,9 @@ void smf_concat_smfGroup( smfWorkForce *wf, smfGroup *igrp,
                 refhdr = refdata->hdr;
                 hdr->instrument = refhdr->instrument;
                 hdr->steptime = refhdr->steptime;
+                hdr->obsmode = refhdr->obsmode;
+                hdr->obstype = refhdr->obstype;
+                hdr->swmode = refhdr->swmode;
 
                 switch ( hdr->instrument ) {
                 case INST__AZTEC:
@@ -519,10 +526,10 @@ void smf_concat_smfGroup( smfWorkForce *wf, smfGroup *igrp,
                 smf_get_dims( data, NULL, NULL, NULL, NULL, NULL,
                               &bstr, &tstr, status );
 
-                /* Allocate space for dksquid array. Ignore other DA for now*/
+                /* Allocate space for enlarged dksquid array. */
                 if( da ) {
-                  da->dksquid = smf_malloc( ncol*tlen, sizeof(*(da->dksquid)),
-                                            0, status );
+                  da->dksquid = smf_realloc( da->dksquid, ncol*tlen,
+                                              sizeof(*(da->dksquid)), status );
                 }
 
                 /* Un-set havearray values corresponding to flags */
