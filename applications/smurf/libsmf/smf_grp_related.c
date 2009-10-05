@@ -261,6 +261,7 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
   for (i=1; i<=grpsize; i++) {
     /* First step: open file and read start/end RTS_END values */
     smf_open_file( igrp, i, "READ", SMF__NOCREATE_DATA, &data, status );
+    if (*status != SAI__OK) goto CLEANUP;
     hdr = data->hdr;
 
     /* Set header for first time slice */
@@ -268,7 +269,7 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
     smf_tslice_ast( data, frame, 0, status );
     if ( *status != SAI__OK ) {
       errRep(FUNC_NAME, "Unable to retrieve first timeslice", status);
-      return;
+      goto CLEANUP;
     }
     opentime = hdr->state->rts_end;
     /* Set header for last time slice */
@@ -276,14 +277,14 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
     smf_tslice_ast( data, frame, 0, status );
     if ( *status != SAI__OK ) {
       errRep(FUNC_NAME, "Unable to retrieve final timeslice", status);
-      return;
+      goto CLEANUP;
     }
     writetime = hdr->state->rts_end;
     /* Retrieve wavelength if necessary */
     if ( grpbywave ) {
       smf_fits_getD(hdr, "WAVELEN", &obslam, status );
     }
-    if ( *status != SAI__OK ) return;
+    if ( *status != SAI__OK ) goto CLEANUP;
 
     /* Now get data dimensions */
     nx = (data->dims)[0];
@@ -326,7 +327,7 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
         /* Initialize the pointers to NULL */
         if ( *status != SAI__OK ) {
           errRep(FUNC_NAME, "Unable to allocate memory to store index array", status);
-          return;
+          goto CLEANUP;
         }
         indices[0] = i;
         subgroups[j] = indices;
@@ -652,6 +653,7 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
   chunk = smf_free( chunk, status );
   all_len = smf_free( all_len, status);
   lambda = smf_free( lambda, status );
+  if (data) smf_close_file( &data, status );
 
   if( subgroups ) {
     for( i=0; i<ngroups; i++ ) {
