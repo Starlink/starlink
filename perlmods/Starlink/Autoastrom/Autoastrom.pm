@@ -959,6 +959,30 @@ sub obsdata {
   return $self->{OBSDATA};
 }
 
+=item B<positional_error>
+
+The error, in pixels, of the positions in the two catalogues.
+
+  $auto->error( 4 );
+
+This parameter is used in the cross-correlation. Setting an
+appropriate positional error may result in more accurate fits.
+
+If this parameter is not defined, then the default value will be set
+according to the appropriate cross-correlation routine (see
+C<Astro::Correlate> and its correlation methods for more information).
+
+=cut
+
+sub positional_error {
+  my $self = shift;
+  if( @_ ) {
+    my $pos_error = shift;
+    $self->{POSITIONAL_ERROR} = $pos_error;
+  }
+  return $self->{POSITIONAL_ERROR};
+}
+
 =item B<rawcatalogue>
 
 Retrieve the catalogue of detected objects before astrometry
@@ -1701,6 +1725,7 @@ sub solve {
 # Perform the correlation.
     my $corr = new Astro::Correlate( catalog1 => $filtered_ndfcat,
                                      catalog2 => $filtered_querycat,
+                                     positional_error => $self->positional_error,
                                      keeptemps => $self->keeptemps,
                                      messages => $self->messages,
                                      method => $self->match,
