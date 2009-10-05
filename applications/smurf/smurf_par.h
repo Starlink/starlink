@@ -182,5 +182,11 @@ error can not determine PI
 
 #define SC2FLAT__DTOI (20.0e-6/65536)
 
+/* Convert raw DAC numbers to current
+   - include factor for MCE low-pass filter
+ */
+
+static const double RAW2CURRENT = 3.3 * 1.52e-13;
+
 
 #endif /* SMURF_PAR_DEFINED */

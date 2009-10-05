@@ -110,12 +110,10 @@ size_t smf_flat_responsivity ( smfData *respmap, size_t nheat,
   size_t bol;                  /* Bolometer offset into array */
   double * bolv = NULL;        /* Temp space for bol values */
   size_t k;                    /* loop counter */
-  const double mcepass = 3.3;  /* factor for MCE low-pass filter */
   size_t nbol;                 /* number of bolometers */
   size_t ngood = 0;            /* number of valid responsivities */
   int nrgood;                  /* number of good responsivities for bolo */
   double *powv = NULL;         /* Temp space for power values */
-  const double raw2current = 1.52e-13; /* Convert raw data numbers to current */
   double *respdata = NULL;     /* responsivity data */
   double *resps = NULL;        /* responsivities for a bolometer at each step */
   double *respvar = NULL;      /* responsivity variance */
@@ -144,7 +142,7 @@ size_t smf_flat_responsivity ( smfData *respmap, size_t nheat,
     for (k = 0; k < nheat; k++) {
       if ( bolval[k*nbol+bol] != VAL__BADD &&
            powval[k] != VAL__BADD) {
-        bolv[k] = mcepass * raw2current * bolval[k*nbol+bol];
+        bolv[k] = RAW2CURRENT * bolval[k*nbol+bol];
         powv[k] = powval[k];
         nrgood++;
       }
