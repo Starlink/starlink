@@ -222,6 +222,9 @@
 *        function.
 *     2008-12-11 (TIMJ):
 *        Use smf_request_mask and smf_apply_mask
+*     2009-10-06 (EC):
+*        - Don't paralleize smf_bolonoise for now (seems to be broken)
+*        - Add some timers for debugging
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -316,6 +319,7 @@ void smurf_qlmakemap( int *status ) {
   int smfflags = 0;          /* Flags for creating a new smfData */
   int spread;                /* Code for pixel spreading scheme */
   char system[10];           /* Celestial coordinate system for output image */
+  struct timeval tv1, tv2;   /* Timers */
   int ubnd_out[2];           /* Upper pixel bounds for output map */
   void *variance = NULL;     /* Pointer to the variance map */
   double *weights = NULL;    /* Pointer to the weights array */
@@ -329,6 +333,9 @@ void smurf_qlmakemap( int *status ) {
   /* Main routine */
   ndfBegin();
   
+  /*** TIMER ***/
+  smf_timerinit( &tv1, &tv2, status );
+
   /* Find the number of cores/processors available and create a pool of 
      threads of the same size. */
   wf = smf_create_workforce( smf_get_nthread( status ), status );
@@ -489,8 +496,15 @@ void smurf_qlmakemap( int *status ) {
     smf_get_dims( data, NULL, NULL, &nbolo, NULL, NULL, NULL, NULL, status );
     bolonoise = smf_malloc( nbolo, sizeof(*bolonoise), 1, status );
 
-    smf_bolonoise( wf, data, NULL, 0, 0.5, SMF__F_WHITELO, SMF__F_WHITEHI, 0, 
+    /*** TIMER ***/
+    smf_timerupdate(&tv1,&tv2,status);
+
+    smf_bolonoise( NULL, data, NULL, 0, 0.5, SMF__F_WHITELO, SMF__F_WHITEHI, 0, 
                    bolonoise, NULL, 0, status );
+
+    /*** TIMER ***/
+    msgOutiff( MSG__DEBUG, "", " ** %f s calling smf_bolonoise",
+               status, smf_timerupdate(&tv1,&tv2,status) );
 
     /* Propagate provenace */
     smf_accumulate_prov( data, igrp, i, odata->file->ndfid,
