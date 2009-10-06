@@ -48,13 +48,20 @@
 *        NULL pointer may be given. 
 *     wcsout = AstFrameSet * (Given)
 *        Pointer to the FrameSet describing the WCS of the output cube.
+*     tile_size = int[ 2 ] * (Given and Returned)
+*        An array holding the nominal spatial dimensions of each tile, in 
+*        pixels.  Edge tiles may be thinner if "trim" is non-zero. In order 
+*        to avoid creating very thin tiles around the edges, the actual tile 
+*        size used for the edge tiles may be up to 10 % larger than the 
+*        supplied value. This creation of "fat" edge tiles may be prevented 
+*        by supplying a negative value for the tile size, in which case edge
+*        tiles will never be wider than the supplied absolute value. If the
+*        first value is zero, then a single tile containing the entire output
+*        array is used, with no padding. The actual used tile sizes are 
+*        returned.
 *     trim = int (Given)
 *        If true then the border tiles are trimmed to exclude pixels off
 *        the edge of the full size output array.
-*     tile_size = int[ 2 ] * (Given)
-*        An array holding the spatial dimensions of each tile, in pixels.
-*        If the first value is less than zero, then a single tile
-*        containing the entire output array is used, with no padding.
 *     border = int (Given)
 *        The size of the overlap reqired between adjacent tiles, in
 *        pixels. The actual overlap used will be larger than this (by the
@@ -152,7 +159,9 @@
 *        Added qxl/qxu/qyl/qyu tile items to indicate if boundary tiles
 *        need to be flagged using the BORDER quality.
 *     2009-09-29 (TIMJ):
-*        Use ndgCopy rather than smf_grpCopy
+*        Use ndgCopy rather than smf_grpCopy.
+*     5-OCT-2009 (DSB):
+*        Allow thin edge tiles to be merged with the adjacent tiles.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -211,8 +220,10 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
    int indims;
    size_t ix;
    size_t iy;
+   int adjust[ 2 ];
    int lbin;
    int lbout;
+   int lfat[ 2 ];
    size_t numtile[ 2 ];
    int plbnd[ 2 ];
    int pubnd[ 2 ];
@@ -221,6 +232,9 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
    int tubnd[ 3 ];
    int ubin;
    int ubout;
+   int ufat[ 2 ];
+   int xlo;
+   int xhi;
    int yhi;
    int ylo;
    smfBox *box = NULL;
@@ -236,7 +250,7 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
 /* Make sure that we handle 2d or 3d bounds */
    indims = astGetI(wcsout, "Nin");
 
-/* copy input bounds to local temp copy */
+/* Copy input bounds to local temp copy */
    for (i = 0; i < 2; i++ ) {
      tlbnd[ i ] = lbnd[ i ];
      tubnd[ i ] = ubnd[ i ];
@@ -251,7 +265,7 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
 
 /* If required, produce a description of a single tile that is just large
    enough to hold the entire output array. */
-   if( tile_size[ 0 ] < 0 ) {
+   if( tile_size[ 0 ] == 0 ) {
       *ntiles = 1;
       result = astMalloc( sizeof( smfTile ) );
       if( result ) {
@@ -291,8 +305,20 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
          result->jndf = NULL;
       }
 
-/* If the tile size is positive, we split the output array into tiles... */
+/* If the tile size is non-zero, we split the output array into tiles... */
    } else {
+
+/* Ensure the tile sizes are positive, and set flags indicating if either 
+   supplied value was negative (indicating that we are free to expand the 
+   edge tiles by up to 10% to reduce the number of tiles). */
+      for( i = 0; i < 2; i++ ){
+         if( tile_size[ i ] < 0 ) {
+            tile_size[ i ] = -tile_size[ i ];
+            adjust[ i ] = 0;
+         } else {
+            adjust[ i ] = 1;
+         }
+      }
 
 /* Get the celestial coordinates of the reference position (the SkyRef
    value in the current Frame of the output WCS FrameSet), and find the
@@ -361,6 +387,19 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
             numtile[ i ]--;
          }
 
+/* If the edge tiles are being trimmed, and we have been told to avoid 
+   thin edge tiles on this axis, then see if the edge tile is thinner than
+   10% of the tile size. If so, reduce the number of tiles on this axis by 
+   one, and set a flag indicating that the edge tile on the lower bound of 
+   this axis should be merged with the adjacent tile (i.e. fattened). */
+         lfat[ i ] = 0;
+         if( trim && adjust[ i ] ) {
+            if( tlbnd[ i ] - plbnd[ i ] > 0.9*tile_size[ i ] ) {
+               numtile[ i ]--;
+               lfat[ i ] = 1;
+            }
+         }
+
 /* Now modify the upper bounds in the same way. */
          while( pubnd[ i ] < tubnd[ i ] - border ) {
             pubnd[ i ] += tile_size[ i ];
@@ -372,6 +411,13 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
             numtile[ i ]--;
          }
 
+         ufat[ i ] = 0;
+         if( trim && adjust[ i ] ) {
+            if( pubnd[ i ] - tubnd[ i ] > 0.9*tile_size[ i ] ) {
+               numtile[ i ]--;
+               ufat[ i ] = 1;
+            }
+         }
       }
 
 /* Determine the constant width border by which the basic tile area is to be
@@ -407,20 +453,27 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
 /* Store a pointer to the next tile desription to create. */
       tile = result;   
    
+/* Initialise the y axis bounds (without border or extension) of the tiles in 
+   the first row. */
+      ylo = plbnd[ 1 ];
+      yhi = ylo + tile_size[ 1 ] - 1;
+      if( lfat[ 1 ] || ( ufat[ 1 ] && numtile[ 1 ] == 1 ) ) yhi += tile_size[ 1 ];
+
 /* Loop round each row of tiles. */
       for( iy = 0; iy < numtile[ 1 ] && *status == SAI__OK; iy++ ) {
-   
-/* Store the y axis bounds (without border or extension) of the tiles in 
-   this row. */
-         ylo = plbnd[ 1 ] + iy*tile_size[ 1 ];
-         yhi = ylo + tile_size[ 1 ] - 1;
-   
+     
+/* Initialise the x axis bounds (without border or extension) of the tiles in 
+   the first column. */
+         xlo = plbnd[ 0 ];
+         xhi = xlo + tile_size[ 0 ] - 1;
+         if( lfat[ 0 ] || ( ufat[ 0 ] && numtile[ 0 ] == 1 ) ) xhi += tile_size[ 0 ];
+
 /* Loop round each tile in the current row. */
          for( ix = 0; ix < numtile[ 0 ]; ix++, tile++ ) {
    
 /* Store the tile area (without border or extension). */
-            tile->qlbnd[ 0 ] = plbnd[ 0 ] + ix*tile_size[ 0 ];
-            tile->qubnd[ 0 ] = tile->qlbnd[ 0 ] + tile_size[ 0 ] - 1;
+            tile->qlbnd[ 0 ] = xlo;
+            tile->qubnd[ 0 ] = xhi;
             tile->qlbnd[ 1 ] = ylo;
             tile->qubnd[ 1 ] = yhi;
             tile->qlbnd[ 2 ] = tlbnd[ 2 ];
@@ -513,8 +566,19 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
             tile->qyu = 1;
             if( iy == 0 ) tile->qyl = ( plbnd[ 1 ] < tlbnd[ 1 ] );
             if( iy == numtile[ 1 ] - 1 ) tile->qyu = ( pubnd[ 1 ] > tubnd[ 1 ] );
-
+   
+/* Store the x axis bounds (without border or extension) of the tiles in 
+   the next column. */
+            xlo = xhi + 1;
+            xhi = xlo + tile_size[ 0 ] - 1;
+            if( ufat[ 0 ] && ix == numtile[ 0 ] - 1 ) xhi += tile_size[ 0 ];
          }
+   
+/* Store the y axis bounds (without border or extension) of the tiles in 
+   the next row. */
+         ylo = yhi + 1;
+         yhi = ylo + tile_size[ 1 ] - 1;
+         if( ufat[ 1 ] && iy == numtile[ 1 ] - 1 ) yhi += tile_size[ 1 ];
       }
    }
 

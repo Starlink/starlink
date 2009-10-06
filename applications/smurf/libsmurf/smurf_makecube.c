@@ -519,15 +519,22 @@
 *          the output array up into a number of smaller rectangular tiles, 
 *          each created separately and stored in a separate output NDF. This 
 *          can be accomplished by supplying non-null values for the TILEDIMS 
-*          parameter. If supplied, these values give the spatial size of each 
-*          output tile, in pixels. If only one value is supplied, the
-*          supplied value is duplicated to create square tiles. Tiles are
-*          created in a raster fashion, from bottom left to top right of
-*          the spatial extent. The NDF file name specified by "out" is
-*          modified for each tile by appending "_<N>" to the end of it, 
-*          where <N> is the integer tile index (starting at 1). The
-*          number of tiles used to cover the entire output cube is written 
-*          to output parameter NTILES. The tiles all share the same 
+*          parameter. If supplied, these values give the nominal spatial size 
+*          of each output tile, in pixels. Edge tiles may be thinner if the 
+*          TRIMTILES parameter is set TRUE. In order to avoid creating very thin
+*          tiles around the edges, the actual tile size used for the edge tiles 
+*          may be up to 10 % larger than the supplied value. This creation of 
+*          "fat" edge tiles may be prevented by supplying a negative value for 
+*          the tile size, in which case edge tiles will never be wider than 
+*          the supplied absolute value. 
+*
+*          If only one value is supplied, the supplied value is duplicated to 
+*          create square tiles. Tiles are created in a raster fashion, from 
+*          bottom left to top right of the spatial extent. The NDF file name 
+*          specified by "out" is modified for each tile by appending "_<N>" 
+*          to the end of it, where <N> is the integer tile index (starting at 
+*          1). The number of tiles used to cover the entire output cube is  
+*          written to output parameter NTILES. The tiles all share the same 
 *          projection and so can be simply pasted together in pixel 
 *          coordinates to reconstruct the full size output array. The tiles 
 *          are centred so that the reference position (given by REFLON and 
@@ -790,6 +797,9 @@
 *     3-SEP-2009 (DSB):
 *        If the target is moving, set AlignOffset non-zero in the output 
 *        current Frame.
+*     4-OCT-2009 (DSB)
+*        Allow the supplied TIMEDIMS value to be changed by up to 10% to 
+*        avoid creating thin tiles around the edges.
 
 *  Copyright:
 *     Copyright (C) 2007-2009 Science and Technology Facilities Council.
@@ -1218,7 +1228,7 @@ void smurf_makecube( int *status ) {
 
 /* See if the output is to be split up into a number of separate tiles,
    each one being stored in a separate output NDF. If a null value is
-   supplied for TILEDIMS, annul the error and retina the original NULL 
+   supplied for TILEDIMS, annul the error and retain the original NULL 
    pointer for the array of tile structures (this is used as a flag that 
    the entire output grid should be stored in a single output NDF). Note,
    tiling cannot be used with sparse output NDFs. */
@@ -1240,7 +1250,7 @@ void smurf_makecube( int *status ) {
    containing a single tile description that encompasses the entire full
    size output grid. */
    if( !tiles ) {
-      tiledims[ 0 ] = -1;
+      tiledims[ 0 ] = 0;
       tiles = smf_choosetiles( igrp, size, lbnd_out, ubnd_out, boxes, 
                                spread, params, wcsout, tiledims, 
                                0, 0, &ntile, status );
