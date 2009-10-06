@@ -1,10 +1,10 @@
 /*
 *+
 *  Name:
-*     smf_create_respfile
+*     smf_create_bolfile
 
 *  Purpose:
-*     Create a file on disk and map it for use as a responsivity map
+*     Create a file on disk and map it for use as a bolometer map
 
 *  Language:
 *     Starlink ANSI C
@@ -13,8 +13,9 @@
 *     C function
 
 *  Invocation:
-*     void smf_create_respfile( const Grp * rgrp, size_t index,
-*               const smfData* refdata, smfData **respmap,
+*     void smf_create_bolfile( const Grp * rgrp, size_t index,
+*               const smfData* refdata, const char * datalabel,
+*               const char * units, smfData **respmap,
 *               int *status );
 
 *  Arguments:
@@ -25,14 +26,18 @@
 *     refdata = const smfData* (Given)
 *        Reference smfData. Dimensionality, sub array information and
 *        FITS header are obtained from this.
-*     respmap = smfData** (Returned)
+*     datalabel = const char * (Given)
+*        Label for the data array. Can be NULL. Title will be derived
+*        from this.
+*     bolmap = smfData** (Returned)
 *        Output smfData.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
 *  Description:
-*     Create a responsivity file on disk with the correct metadata. The file
-*     is mapped for WRITE and is ready to receive the actual responsivity data.
+*     Create a file on disk with the correct metadata for a 2d bolometer map.
+*     The file is mapped for WRITE and is ready to receive the data. Useful for
+*     responsivity images and noise data.
 
 *  Authors:
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -43,6 +48,8 @@
 *        Initial version.
 *     2009-05-21 (TIMJ):
 *        smf_construct_smfHead API tweak
+*     2009-10-05 (TIMJ):
+*        Rename to use for noise files as well as responsivity images.
 
 *  Notes:
 *     - Does not propogate provenance or history from refdata.
@@ -81,9 +88,10 @@
 #include "ast.h"
 #include "star/one.h"
 
-void smf_create_respfile( const Grp * rgrp, size_t index,
-                          const smfData* refdata, smfData **respmap,
-                          int *status ) {
+void smf_create_bolfile( const Grp * rgrp, size_t index,
+                         const smfData* refdata, const char *datalabel,
+                         const char *units,  smfData **respmap,
+                         int *status ) {
 
   int lbnd[2];
   int ubnd[2];
@@ -114,14 +122,17 @@ void smf_create_respfile( const Grp * rgrp, size_t index,
     /* Subarray information */
     smf_find_subarray( refdata->hdr, subarray, sizeof(subarray), &subnum, status );
     one_strlcpy( buffer, subarray, sizeof(buffer), status );
-    one_strlcat( buffer, " bolometer responsivity", sizeof(buffer), status );
+    if (datalabel) {
+      one_strlcat( buffer, " Bolometer ", sizeof(buffer), status );
+      one_strlcat( buffer, datalabel, sizeof(buffer), status );
+    }
 
     (*respmap)->hdr = smf_construct_smfHead( NULL, refdata->hdr->instrument,
                                              NULL, NULL, NULL, NULL, 0, refdata->hdr->instap, 1,
                                              refdata->hdr->steptime, refdata->hdr->obsmode,
                                              refdata->hdr->swmode, refdata->hdr->obstype, 0, NULL, NULL,
-                                             NULL, NULL, 0, NULL, buffer, "Responsivity",
-                                             "Amps/Watt", refdata->hdr->telpos, NULL, status );
+                                             NULL, NULL, 0, NULL, buffer, datalabel,
+                                             units, refdata->hdr->telpos, NULL, status );
     smf_write_clabels( *respmap, status );
 
     /* create frame for focal plane coordinates. Should really extract it from the

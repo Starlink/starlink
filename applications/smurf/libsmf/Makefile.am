@@ -72,9 +72,9 @@ smf_convert_bad.c \
 smf_copytime.c \
 smf_correct_extinction.c \
 smf_correct_steps.c \
+smf_create_bolfile.c \
 smf_create_lutwcs.c \
 smf_create_qualname.c \
-smf_create_respfile.c \
 smf_create_smfArray.c \
 smf_create_smfDA.c \
 smf_create_smfData.c \

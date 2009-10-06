@@ -393,7 +393,8 @@ void smurf_calcflat( int *status ) {
 
       if (*status == SAI__OK) {
         /* Create the file on disk */
-        smf_create_respfile( rgrp, 1, refdata, &respmap, status );
+        smf_create_bolfile( rgrp, 1, refdata, "Responsivity",
+                            "Amps/Watt", &respmap, status );
       } else if (*status == PAR__NULL) {
         void *pntr[] = {NULL, NULL, NULL};
         dim_t mydims[2];
