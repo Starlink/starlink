@@ -193,6 +193,11 @@
 *        Add numerous MSG__DEBUG timing messages
 *     2009-09-30 (EC):
 *        Fix bug in handling of AST model component and residuals
+*     2009-10-06 (EC):
+*        - don't automatically generate bad status if < SMF__MINSTATSAMP
+*          good bolos (to enable single-detector maps)
+*        - don't try to weight data at map-making stage if no noise estimate
+*          is available
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -1067,14 +1072,6 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
             msgOutiff( MSG__DEBUG, "", FUNC_NAME
                        ": ** %f s pre-conditioning data",
                        status, smf_timerupdate(&tv1,&tv2,status) );
-
-            /* If we don't have enough good detectors then set bad status */
-            if( (*status==SAI__OK) && (goodbolo<SMF__MINSTATSAMP) ) {
-              *status = SMF__INSMP;
-              errRepf( "", FUNC_NAME ": Insufficient number of good bolos "
-                       "(%" DIM_T_FMT "<%i) to continue", status, goodbolo,
-                       SMF__MINSTATSAMP );
-            }
           }
 
           msgOut(" ",
@@ -1176,10 +1173,17 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
               }
 
               /* Rebin the residual + astronomical signal into a map */
-              smf_rebinmap1( res[i]->sdata[idx], dat.noi[i]->sdata[idx],
-                             lut_data, qua_data, mask, varmapmethod,
-                             rebinflags, thismap, thisweight, thishits,
-                             thisvar, msize, &scalevar, status );
+              if( dat.noi ) {
+                smf_rebinmap1( res[i]->sdata[idx], dat.noi[i]->sdata[idx],
+                               lut_data, qua_data, mask, varmapmethod,
+                               rebinflags, thismap, thisweight, thishits,
+                               thisvar, msize, &scalevar, status );
+              } else {
+                smf_rebinmap1( res[i]->sdata[idx], NULL,
+                               lut_data, qua_data, mask, varmapmethod,
+                               rebinflags, thismap, thisweight, thishits,
+                               thisvar, msize, &scalevar, status );
+              }
             }
 
             /*** TIMER ***/
