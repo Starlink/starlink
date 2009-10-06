@@ -81,6 +81,9 @@
 *  History:
 *     18-MAR-1998 (DSB):
 *        Original version.
+*     6-OCT-2009 (DSB):
+*        Use SUBPAR_CURSAV to save the concatenated group expression rather 
+*        than SUBPAR_PUTNAME.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -237,7 +240,7 @@
 *  the total group expression consists of a single flag character.
       IF( NEXP .GT. 1 .AND. IAT .GT. 0 ) THEN
          IF( GRPEXP( : IAT ) .NE. FC ) THEN
-            CALL SUBPAR_PUTNAME( IPAR, GRPEXP( : IAT ), STATUS )
+            CALL SUBPAR_CURSAV( IPAR, GRPEXP( : IAT ), STATUS )
          END IF
       END IF
 
