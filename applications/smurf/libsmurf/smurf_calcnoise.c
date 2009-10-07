@@ -206,10 +206,6 @@ void smurf_calcnoise( int *status ) {
         smfData *outdata = NULL;
         dim_t nelem = 0;
 
-        /* Remove baselines */
-        smf_scanfit( thedata, NULL, 0, status );
-        smf_subtract_poly( thedata, NULL, 0, status );
-
         /* Convert the data to amps */
         smf_scalar_multiply( thedata, RAW2CURRENT, status );
 
@@ -220,7 +216,7 @@ void smurf_calcnoise( int *status ) {
         smf_create_bolfile( ogrp, gcount, thedata, "Noise", SIPREFIX "A Hz**-0.5",
                             &outdata, status );
 
-        smf_bolonoise( NULL, thedata, NULL, 0, 0.5,
+        smf_bolonoise( wf, thedata, NULL, 0, 0.5,
                        SMF__F_WHITELO, SMF__F_WHITEHI, 0,
                        (outdata->pntr)[0], NULL, 1, status );
 
