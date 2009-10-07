@@ -242,6 +242,7 @@ smf_resampcube_ast.c \
 smf_resampcube_copy.c \
 smf_resampcube_nn.c \
 smf_reshapendf.c \
+smf_scalar_multiply.c \
 smf_scale_tau.c \
 smf_scanfit.c \
 smf_select_pntr.c \

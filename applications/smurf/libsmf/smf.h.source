@@ -1226,6 +1226,8 @@ void smf_resampcube_nn( smfData *data, dim_t nchan,
 
 void smf_reshapendf( smfData **data, smfTile *tile, int *status );
 
+void smf_scalar_multiply( smfData * data, double dscalar, int * status );
+
 double smf_scale_tau ( const double tauwvm, const char *filter, int *status);
 
 void smf_scanfit( smfData *data, unsigned char *quality, int order,
