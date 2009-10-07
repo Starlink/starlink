@@ -98,6 +98,9 @@
 *     2009-10-01 (EC):
 *        - multiply white noise by total number of samples rather than
 *          measurement bandwidth.
+*     2009-10-06 (TIMJ):
+*        - continue even if not enough samples
+*        - update bad values after FFT
 
 *  Copyright:
 *     Copyright (C) 2008-2009 University of British Columbia.
@@ -153,7 +156,6 @@ void smf_bolonoise( smfWorkForce *wf, const smfData *data,
   size_t i_low;            /* Index in power spectrum to f_low */
   size_t i_w1;             /* Index in power spectrum to f_white1 */
   size_t i_w2;             /* Index in power spectrum to f_white2 */
-  int isTordered;          /* Order of the bolometer data */
   size_t j;                /* Loop counter */
   dim_t nbolo;             /* Number of bolometers */
   dim_t ndata;             /* Number of data points */
@@ -200,14 +202,13 @@ void smf_bolonoise( smfWorkForce *wf, const smfData *data,
     qua = data->pntr[2];
   }
 
-  isTordered = data->isTordered;
-
   /* Initialize arrays */
   if( whitenoise ) for(i=0; i<nbolo; i++) whitenoise[i] = VAL__BADD;
   if( fratio ) for(i=0; i<nbolo; i++) fratio[i] = VAL__BADD;
 
   /* FFT the data and convert to polar power form */
   pow = smf_fft_data( wf, data, 0, status );
+  smf_convert_bad(  pow, status );
   smf_fft_cart2pol( pow, 0, 1, status );
   smf_isfft( pow, NULL, NULL, &nf, status );
 
@@ -234,8 +235,11 @@ void smf_bolonoise( smfWorkForce *wf, const smfData *data,
                   status );
 
       /* It's OK if bad status was generated as long as a mean was calculated */
-      if( (*status==SMF__INSMP) && (ngood>0) ) {
+      if( *status==SMF__INSMP ) {
         errAnnul( status );
+        /* if we had no good data there was probably a problem with SMF__Q_BADB
+           so we simply go to the next bolometer */
+        if (ngood == 0) continue;
       }
 
       /* Set bolometer to bad if no power detected */
