@@ -106,10 +106,13 @@
 *        code in the caller (who just calls smf_apply_mask).
 *     2008-12-12 (TIMJ):
 *        Return boolean indicating whether the data were flatfielded or not.
+*     2009-10-06 (TIMJ):
+*        Do not need to malloc _DOUBLE for raw if smf_deepcopy_smfData
+*        is being called with rawconvert true.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2006-2008 University of British Columbia.
 *     All Rights Reserved.
@@ -251,17 +254,13 @@ int smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
     }
     /* If ffdata is NULL then populate a struct to work with */
     if ( *ffdata == NULL ) {
-      /* Note that we don't need to create a smfFile */
+      /* Note that we don't need to create a smfFile but we ask
+       the new smfData to be a _DOUBLE using the rawconvert flag */
       flags |= SMF__NOCREATE_FILE;
       *ffdata = smf_deepcopy_smfData( data, 1, flags, status );
-      /* Change data type to DOUBLE */
-      if ( *status == SAI__OK) {
-        ((*ffdata)->pntr)[0] = smf_realloc( ((*ffdata)->pntr)[0], npts, 
-                                            sizeof(double), status );
-        (*ffdata)->dtype = SMF__DOUBLE;
-      } else {
-        errRep( "", FUNC_NAME 
-                ": Error, unable to allocate memory for new smfData", 
+      if (*status != SAI__OK) {
+        errRep( "", FUNC_NAME
+                ": Error, unable to allocate memory for new smfData",
                status);
       }
     }
