@@ -32,14 +32,14 @@
 *        elements as frames stored in "heatframes". Memory allocated by
 *        caller.
 *     bolref = double [] (Returned)
-*        Response of each bolometer to powref. Dimensioned as number of 
+*        Response of each bolometer to powref. Dimensioned as number of
 *        frames in "heatframes" times the number of bolometers. Memory
 *        allocated by caller.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
 *  Description:
-*      Convert the list of heater settings (heatref) to the equivalent power 
+*      Convert the list of heater settings (heatref) to the equivalent power
 *      generated in the reference resistor (powref). For each bolometer
 *      calculate the actual power delivered at each of the (heatref) heater
 *      settings and interpolate to each of the powref values.
@@ -115,7 +115,7 @@ smf_flat_standardpow( const smfArray * heatframes, double refohms,
   numbol = (heatframes->sdata)[0]->dims[0] *
     (heatframes->sdata)[0]->dims[1];
 
-  /* Get some memory - 
+  /* Get some memory -
      bolometer power per input frame */
   powbol = smf_malloc( nheat, sizeof(*powbol), 1, status );
 
@@ -124,7 +124,7 @@ smf_flat_standardpow( const smfArray * heatframes, double refohms,
 
   /* Choose the reference heater powers to be the actual heater settings acting on
      the adopted reference resistance.  */
-   
+
   for ( j=0; j<nheat; j++ ) {
     current = heatref[j] * SC2FLAT__DTOI;
     powref[j] = current * current * refohms;
@@ -141,7 +141,7 @@ smf_flat_standardpow( const smfArray * heatframes, double refohms,
 
   /* For each bolometer interpolate to find the measurement it would report at the
      standard power input values */
-   
+
   for ( i=0; i<numbol; i++ )
     {
 
@@ -156,7 +156,7 @@ smf_flat_standardpow( const smfArray * heatframes, double refohms,
             }
           else
             {
-              powbol[j] = current * current * resistance[i];
+              powbol[j] = SIMULT * current * current * resistance[i];
             }
         }
 
@@ -170,13 +170,13 @@ smf_flat_standardpow( const smfArray * heatframes, double refohms,
 
       /* Trap bolometers which are unresponsive */
 
-      if ( powbol[0] != VAL__BADD && 
+      if ( powbol[0] != VAL__BADD &&
            (heatframe[0][i] == VAL__BADD || heatframe[nheat-1][i] == VAL__BADD ||
             (fabs ( heatframe[0][i] - heatframe[nheat-1][i] ) < 1.0) ) )
         {
           powbol[0] = VAL__BADD;
         }
-      
+
       for ( j=0; j<nheat; j++ )
         {
           if ( powbol[0] == VAL__BADD )
@@ -188,32 +188,31 @@ smf_flat_standardpow( const smfArray * heatframes, double refohms,
               if ( powref[j] < powbol[0] )
                 {
 
-                  /* Standard point is below actual measured range for this bolometer, 
+                  /* Standard point is below actual measured range for this bolometer,
                      extrapolate */
-   
+
                   s = ( heatframe[1][i] - heatframe[0][i] ) /
                     ( powbol[1] - powbol[0] );
-                  bolref[j*numbol+i] = heatframe[0][i] + 
+                  bolref[j*numbol+i] = heatframe[0][i] +
                     s * ( powref[j] - powbol[0] );
                 }
               else if ( powref[j] > powbol[nheat-1] )
                 {
 
-                  /* Standard point is above actual measured range for this bolometer, 
+                  /* Standard point is above actual measured range for this bolometer,
                      extrapolate */
-   
-                  s = ( heatframe[nheat-1][i] -
-                        heatframe[nheat-2][i] ) /
+
+                  s = ( heatframe[nheat-1][i] - heatframe[nheat-2][i] ) /
                     ( powbol[nheat-1] - powbol[nheat-2] );
-                  bolref[j*numbol+i] = heatframe[nheat-2][i] + 
+                  bolref[j*numbol+i] = heatframe[nheat-2][i] +
                     s * ( powref[j] - powbol[nheat-2] );
                 }
               else
                 {
 
-                  /* Standard point is within actual measured range for this bolometer, 
+                  /* Standard point is within actual measured range for this bolometer,
                      search for the points to interpolate */
-   
+
                   for ( k=1; k<nheat; k++ )
                     {
                       if ( powref[j] <= powbol[k] )
@@ -221,13 +220,13 @@ smf_flat_standardpow( const smfArray * heatframes, double refohms,
                           s = ( heatframe[k][i] -
                                 heatframe[k-1][i] ) /
                             ( powbol[k] - powbol[k-1] );
-                          bolref[j*numbol+i] = heatframe[k-1][i] + 
+                          bolref[j*numbol+i] = heatframe[k-1][i] +
                             s * ( powref[j] - powbol[k-1] );
-		     
+
                           break;
                         }
                     }
-   
+
                 }
             }
 

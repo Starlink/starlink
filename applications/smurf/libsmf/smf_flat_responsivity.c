@@ -26,7 +26,7 @@
 *     powval = const double [] (Given)
 *        Resistance input powers. Must be nheat elements.
 *     bolval = const double [] (Given)
-*        Response of each bolometer to powval. Dimensioned as number of 
+*        Response of each bolometer to powval. Dimensioned as number of
 *        number of bolometers (size of respmap) time nheat.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -121,7 +121,7 @@ size_t smf_flat_responsivity ( smfData *respmap, size_t nheat,
   if (*status != SAI__OK) return ngood;
 
   if (!smf_dtype_check_fatal(respmap, NULL, SMF__DOUBLE, status)) return ngood;
-  
+
   respdata = (respmap->pntr)[0];
   respvar  = (respmap->pntr)[1];
 
