@@ -454,10 +454,14 @@ void smurf_calcflat( int *status ) {
 
     /* Work out the output filename  - provide a default */
     ddata = (bbhtframe->sdata)[0];
-    smf_fits_getI( ddata->hdr, "UTDATE", &utdate, status );
-    smf_fits_getI( ddata->hdr, "OBSNUM", &obsnum, status );
-    snprintf( defname, sizeof(defname), "%s%08d_%05d_flat",
-              subarray, utdate, obsnum );
+    if (ddata) {
+      smf_fits_getI( ddata->hdr, "UTDATE", &utdate, status );
+      smf_fits_getI( ddata->hdr, "OBSNUM", &obsnum, status );
+      snprintf( defname, sizeof(defname), "%s%08d_%05d_flat",
+                subarray, utdate, obsnum );
+    } else {
+      defname[0] = '\0';
+    }
     parDef0c( "OUT", defname, status );
     kpg1Wgndf( "OUT", NULL, 1, 1, "", &flatgrp, &flatsize, status);
     pname = flatname;
