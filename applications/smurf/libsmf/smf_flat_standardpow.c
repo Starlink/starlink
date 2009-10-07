@@ -127,7 +127,7 @@ smf_flat_standardpow( const smfArray * heatframes, double refohms,
 
   for ( j=0; j<nheat; j++ ) {
     current = heatref[j] * SC2FLAT__DTOI;
-    powref[j] = current * current * refohms;
+    powref[j] = SIMULT * current * current * refohms;
   }
 
   /* Store pointers to data array for each frame */

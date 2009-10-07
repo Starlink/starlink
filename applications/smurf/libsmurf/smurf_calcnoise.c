@@ -217,7 +217,7 @@ void smurf_calcnoise( int *status ) {
         smf_apodize(thedata, NULL, (thedata->dims)[2] / 2, status );
 
         /* Create the output file */
-        smf_create_bolfile( ogrp, gcount, thedata, "Noise", "A/rtHz",
+        smf_create_bolfile( ogrp, gcount, thedata, "Noise", SIPREFIX "A Hz**-0.5",
                             &outdata, status );
 
         smf_bolonoise( NULL, thedata, NULL, 0, 0.5,

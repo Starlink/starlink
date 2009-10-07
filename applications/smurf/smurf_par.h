@@ -43,10 +43,12 @@
  *        GSL is available always.
  *     2008-08-27 (TIMJ):
  *        Add SC2FLAT__DTOI
+ *     2009-10-07 (TIMJ):
+ *        Add SIPREFIX and SIMULT.
  *     {enter_further_changes_here}
 
  *  Copyright:
- *     Copyright (C) 2008 Science and Technology Facilities Council.
+ *     Copyright (C) 2008-2009 Science and Technology Facilities Council.
  *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
  *     University of British Columbia.
  *     All Rights Reserved.
@@ -178,15 +180,25 @@ error can not determine PI
 /* Length of a FITS record, includes trailing nul */
 #define SZFITSCARD 81
 
+/* SI prefix and multiplied for output data. Used for Watts and Amps calculations
+  Set to 1e12 if you want all output in pico amps and pico watts.
+  Set to 1.0 if you want Watts or Amps. */
+#define SIPREFIX "p"
+#define SIMULT   1.0e12
+
 /* Heater circuit constant for converting D/A setting to Amps */
 
 #define SC2FLAT__DTOI (20.0e-6/65536)
 
 /* Convert raw DAC numbers to current
    - include factor for MCE low-pass filter
+   - convert everything to pA and pW (Since that is what
+   Wayne uses).
+
+    MCE * (DAC->Amps) * (Amps->pico Amps )
  */
 
-static const double RAW2CURRENT = 3.3 * 1.52e-13;
+static const double RAW2CURRENT = SIMULT * 3.3 * 1.52e-13;
 
 
 #endif /* SMURF_PAR_DEFINED */
