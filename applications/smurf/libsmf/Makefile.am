@@ -209,6 +209,7 @@ smf_open_model.c \
 smf_open_ndf.c \
 smf_open_ndfname.c \
 smf_open_newfile.c \
+smf_open_raw_asdouble.c \
 smf_open_related.c \
 smf_open_related_model.c \
 smf_polext.c \

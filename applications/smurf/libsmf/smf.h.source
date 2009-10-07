@@ -1057,6 +1057,10 @@ void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype,
                        const int ndims, const int *lbnd, const int *ubnd,
                        int flags, smfData ** data, int *status);
 
+void
+smf_open_raw_asdouble( const Grp *igrp, size_t index, const smfArray* darks,
+                       smfData **data, int *status );
+
 void smf_open_related( const smfGroup *group, const dim_t subindex,
                        const char *accmode, smfArray **relfiles,
                        int *status );
