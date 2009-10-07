@@ -32,7 +32,7 @@
 *          Frequency range (Hz) to use to calculate the white noise [2,10]
 *     IN = NDF (Read)
 *          Input files to be transformed. Files from the same sequence
-*          will be combined. Note that
+*          will be combined.
 *     MSG_FILTER = _CHAR (Read)
 *          Control the verbosity of the application. Values can be
 *          NONE (no messages), QUIET (minimal messages), NORMAL,
@@ -53,7 +53,7 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     2009-09-24 (EC):
+*     2009-10-01 (TIMJ):
 *        Initial version - based on sc2fft task
 *     {enter_further_changes_here}
 
@@ -108,15 +108,24 @@
 #define FUNC_NAME "smurf_calcnoise"
 #define TASK_NAME "CALCNOISE"
 
-void smurf_sc2fft( int *status ) {
+void smurf_calcnoise( int *status ) {
 
+  Grp * basegrp = NULL;     /* Basis group for output filenames */
+  smfArray *concat=NULL;     /* Pointer to a smfArray */
+  size_t contchunk;          /* Continuous chunk counter */
   smfArray *darks = NULL;   /* dark frames */
+  Grp *dkgrp = NULL;        /* Group of dark frames */
+  size_t dksize = 0;        /* Number of darks found */
   Grp *fgrp = NULL;         /* Filtered group, no darks */
+  size_t gcount=0;           /* Grp index counter */
   size_t i=0;               /* Counter, index */
   smfData *idata=NULL;      /* Pointer to input smfData */
   Grp *igrp = NULL;         /* Input group of files */
+  smfGroup *igroup=NULL;     /* smfGroup corresponding to igrp */
   int inverse=0;            /* If set perform inverse transform */
   char fname[GRP__SZNAM+1]; /* Name of container file without suffix */
+  dim_t maxconcat=0;         /* Longest continuous chunk length in samples */
+  size_t ncontchunks=0;      /* Number continuous chunks outside iter loop */
   smfData *odata=NULL;      /* Pointer to output smfData to be exported */
   Grp *ogrp = NULL;         /* Output group of files */
   size_t outsize;           /* Total number of NDF names in the output group */
@@ -137,81 +146,106 @@ void smurf_sc2fft( int *status ) {
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
   /* Filter out darks */
-  smf_find_darks( igrp, &fgrp, NULL, 1, SMF__NULL, &darks, status );
+  smf_find_darks( igrp, &fgrp, &dkgrp, 1, SMF__NULL, &darks, status );
 
   /* input group is now the filtered group so we can use that and
      free the old input group */
   size = grpGrpsz( fgrp, status );
-  grpDelet( &igrp, status);
-  igrp = fgrp;
-  fgrp = NULL;
+  dksize = grpGrpsz( dkgrp, status );
+  grpDelet( &igrp, status );
+
+  /* If we have all darks then we assume it's the dark files
+     that we are actually wanting to use for the noise. Otherwise
+     assume that the darks are to be ignored. */
+  if (size > 0) {
+    igrp = fgrp;
+    fgrp = NULL;
+    grpDelet( &dkgrp, status ); /* no longer needed */
+  } else {
+    msgOutif( MSG__NORM, " ", TASK_NAME ": Calculating noise properties of darks",
+              status );
+    size = dksize;
+    igrp = dkgrp;
+    dkgrp = NULL;
+    grpDelet( &fgrp, status );
+    smf_close_related( &darks, status );
+  }
+
+  /* We now need to combine files from the same subarray and same sequence
+     to form a continuous time series */
+  smf_grp_related( igrp, size, 1, 0, &maxconcat, &igroup,
+                   &basegrp, status );
 
   /* Get output file(s) */
-  if( size > 0 ) {
-    kpg1Wgndf( "OUT", igrp, size, size, "More output files required...",
-               &ogrp, &outsize, status );
-  } else {
-    msgOutif(MSG__NORM, " ", TASK_NAME ": All supplied input frames were DARK,"
-             " nothing to do", status );
+  size = grpGrpsz( basegrp, status );
+  kpg1Wgndf( "OUT", basegrp, size, size, "More output files required...",
+             &ogrp, &outsize, status );
+
+  /* Obtain the number of continuous chunks and subarrays */
+  if( *status == SAI__OK ) {
+    ncontchunks = igroup->chunk[igroup->ngroups-1]+1;
   }
+  msgOutiff( MSG__NORM, "", "Found %d continuous chunk%s", status, ncontchunks,
+             (ncontchunks > 1 ? "s" : "") );
 
-  /* Are we doing an inverse transform? */
-  parGet0l( "INVERSE", &inverse, status );
+  /* Loop over input data as contiguous chunks */
+  gcount = 1;
+  for( contchunk=0;(*status==SAI__OK)&&contchunk<ncontchunks; contchunk++ ) {
+    size_t idx;
 
-  /* Are we using polar coordinates instead of cartesian for the FFT? */
-  parGet0l( "POLAR", &polar, status );
+    /* Concatenate this continuous chunk but forcing a raw data read.
+       We will need quality. */
+    smf_concat_smfGroup( wf, igroup, darks, NULL, contchunk, 0, 1, NULL, 0, NULL,
+                         NULL, 0, 0, 0, &concat, status );
 
-  /* Are we going to assume amplitudes are squared? */
-  parGet0l( "POWER", &power, status );
+    /* Now loop over each subarray */
+    /* Export concatenated data for each subarray to NDF file */
+    for( idx=0; (*status==SAI__OK)&&idx<concat->ndat; idx++ ) {
+      if( concat->sdata[idx] ) {
+        smfData *thedata = concat->sdata[idx];
+        smfData *outdata = NULL;
+        dim_t nelem = 0;
 
-  /* If power is true, we must be in polar form */
-  if( power && !polar) {
-    msgOutif( MSG__NORM, " ", TASK_NAME
-              ": power spectrum requested so setting POLAR=TRUE", status );
-    polar = 1;
-  }
+        /* Remove baselines */
+        smf_scanfit( thedata, NULL, 0, status );
+        smf_subtract_poly( thedata, NULL, 0, status );
 
-  /* Loop over input files */
-  for( i=1; (*status==SAI__OK)&&(i<=size); i++ ) {
+        /* Convert the data to amps */
+        smf_scalar_multiply( thedata, RAW2CURRENT, status );
 
-    /* Open the file */
-    smf_open_and_flatfield( igrp, NULL, i, darks, &idata, status );
+        /* Apodize */
+        smf_apodize(thedata, NULL, (thedata->dims)[2] / 2, status );
 
-    /* Check whether we need to transform the data at all */
-    if( smf_isfft(idata,NULL,NULL,NULL,status) == inverse ) {
+        /* Create the output file */
+        smf_create_bolfile( ogrp, gcount, thedata, "Noise", "A/rtHz",
+                            &outdata, status );
 
-      /* If inverse transform, convert to cartesian representation first */
-      if( inverse && polar ) {
-        smf_fft_cart2pol( idata, 1, power, status );
+        smf_bolonoise( NULL, thedata, NULL, 0, 0.5,
+                       SMF__F_WHITELO, SMF__F_WHITEHI, 0,
+                       (outdata->pntr)[0], NULL, 1, status );
+
+        /* Bolonoise gives us a variance - we want square root */
+        for (i = 0; i < (outdata->dims)[0]*(outdata->dims)[1]; i++) {
+          double * od = (outdata->pntr)[0];
+          if ( od[i] != VAL__BADD ) od[i] = sqrt( od[i] );
+        }
+
+        smf_close_file( &outdata, status );
+
+      } else {
+        *status = SAI__ERROR;
+        errRepf( FUNC_NAME,
+                "Internal error obtaining concatenated data set for chunk %d",
+                 status, contchunk );
       }
 
-      /* Tranform the data */
-      odata = smf_fft_data( wf, idata, inverse, status );
-      smf_convert_bad( odata, status );
-
-      if( inverse ) {
-        /* If output is time-domain, ensure that it is ICD bolo-ordered */
-        smf_dataOrder( odata, 1, status );
-      } else if( polar ) {
-        /* Store FFT of data in polar form */
-        smf_fft_cart2pol( odata, 0, power, status );
-      }
-
-      /* Export the data to a new file */
-      pname = fname;
-      grpGet( ogrp, i, 1, &pname, GRP__SZNAM, status );
-      smf_write_smfData( odata, NULL, NULL, fname, NDF__NOID, status );
-
-      /* Free resources */
-      smf_close_file( &odata, status );
-    } else {
-      msgOutif( MSG__NORM, " ",
-                "Data are already transformed. No output will be produced",
-                status );
+      /* Increment the group index counter */
+      gcount++;
     }
 
-    /* Free resources */
-    smf_close_file( &idata, status );
+    /* Close the smfArray */
+    smf_close_related( &concat, status );
+
   }
 
   /* Write out the list of output NDF names, annulling the error if a null
@@ -222,9 +256,12 @@ void smurf_sc2fft( int *status ) {
   }
 
   /* Tidy up after ourselves: release the resources used by the grp routines */
-  grpDelet( &igrp, status);
-  grpDelet( &ogrp, status);
-
+ CLEANUP:
+  if (igrp) grpDelet( &igrp, status);
+  if (ogrp) grpDelet( &ogrp, status);
+  if (basegrp) grpDelet( &basegrp, status );
+  if( igroup ) smf_close_smfGroup( &igroup, status );
+  if (darks) smf_close_related( &darks, status );
   if( wf ) wf = smf_destroy_workforce( wf );
 
   ndfEnd( status );

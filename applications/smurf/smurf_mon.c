@@ -276,6 +276,8 @@ void smurf_mon( int * status ) {
     smurf_calcdark( status );
   } else if (strcmp( taskname, "CALCFLAT" ) == 0 ) {
     smurf_calcflat( status );
+  } else if (strcmp( taskname, "CALCNOISE" ) == 0 ) {
+    smurf_calcnoise( status );
   } else if (strcmp( taskname, "CALCRESP" ) == 0 ) {
     smurf_calcresp( status );
   } else if (strcmp( taskname, "RAWFIXMETA" ) == 0 ) {

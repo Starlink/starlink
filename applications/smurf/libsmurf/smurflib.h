@@ -100,6 +100,7 @@
 void smurf_badbolos( int * );
 void smurf_calcdark( int * );
 void smurf_calcflat( int * );
+void smurf_calcnoise( int * );
 void smurf_calcresp( int * );
 void smurf_dreamsolve( int * );
 void smurf_dreamweights( int * );
