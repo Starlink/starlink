@@ -631,6 +631,10 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
                         double dcthresh, dim_t dcbox, int flagbolo,
                         int *status );
 
+void smf_create_bolfile( const Grp * rgrp, size_t index,
+                         const smfData* refdata, const char * datalabel,
+                         const char *units, smfData **respmap, int *status );
+
 smfCreateLutwcsCache *smf_create_lutwcs( int clearcache,
                                          const double *fplane_x,
                                          const double *fplane_y,
@@ -644,10 +648,6 @@ smfCreateLutwcsCache *smf_create_lutwcs( int clearcache,
 
 void smf_create_qualname( const char *mode, int indf, IRQLocs **qlocs,
                           int *status);
-
-void smf_create_respfile( const Grp * rgrp, size_t index,
-                          const smfData* refdata, smfData **respmap,
-                          int *status );
 
 smfArray *smf_create_smfArray( int *status );
 
