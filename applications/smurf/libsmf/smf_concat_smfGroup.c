@@ -13,9 +13,9 @@
  *     C function
 
  *  Invocation:
- *     smf_concat_smfGroup( smfWorkForce *wf, smfGroup *igrp,
+ *     smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
  *                          const smfArray *darks, const smfArray *bpms,
- *                          size_t whichchunk, int isTordered,
+ *                          size_t whichchunk, int ensureflat, int isTordered,
  *                          AstFrameSet *outfset, int moving,
  *                          int *lbnd_out, int *ubnd_out, dim_t padStart,
  *                          dim_t padEnd, int flags, smfArray **concat,
@@ -24,7 +24,7 @@
  *  Arguments:
  *     wf = smfWorkForce * (Given)
  *        Pointer to a pool of worker threads (can be NULL)
- *     igrp = smfGroup* (Given)
+ *     igrp = const smfGroup* (Given)
  *        Group of input data files
  *     darks = const smfArray * (Given)
  *        Collection of darks that can be applied to non-flatfielded data.
@@ -33,6 +33,9 @@
  *        Masks for each subarray (e.g. returned by smf_reqest_mask call)
  *     whichchunk = size_t (Given)
  *        Which continuous subset of igrp will get concatenated?
+ *     ensureflat = int (Given)
+ *        If true, ensure that the flatfield is applied when opening the data
+ *        files, else read them as raw files converted to double.
  *     isTordered = int (Given)
  *        If 0, ensure concatenated data is ordered by bolometer. If 1 ensure
  *        concatenated data is ordered by time slice (default ICD ordering)
@@ -128,6 +131,7 @@
  *        Handle pixel origin in concatenated smfData
  *     2009-10-02 (TIMJ):
  *        Copy more information from reference smfData
+ *        Allow flatfielding to be disabled.
 
  *  Notes:
  *     If projection information supplied, pointing LUT will not be
@@ -189,9 +193,9 @@
 
 #define FUNC_NAME "smf_concat_smfGroup"
 
-void smf_concat_smfGroup( smfWorkForce *wf, smfGroup *igrp,
+void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
                           const smfArray *darks, const smfArray *bpms,
-                          size_t whichchunk, int isTordered,
+                          size_t whichchunk, int ensureflat, int isTordered,
                           AstFrameSet *outfset, int moving,
                           int *lbnd_out, int *ubnd_out, dim_t padStart,
                           dim_t padEnd, int flags, smfArray **concat,
@@ -413,8 +417,13 @@ void smf_concat_smfGroup( smfWorkForce *wf, smfGroup *igrp,
         if( (pass == 1) && (*status == SAI__OK) ) {
           /* Open the file corresponding to this chunk. Data may
              require flat-fielding. */
-          smf_open_and_flatfield( igrp->grp, NULL, igrp->subgroups[j][i],
-                                  darks, &refdata, status );
+          if (ensureflat) {
+            smf_open_and_flatfield( igrp->grp, NULL, igrp->subgroups[j][i],
+                                    darks, &refdata, status );
+          } else {
+            smf_open_raw_asdouble( igrp->grp, igrp->subgroups[j][i],
+                                   darks, &refdata, status );
+          }
 
           /* Apply bad pixel mask */
           smf_apply_mask( refdata, NULL, bpms, SMF__BPM_DATA, status );

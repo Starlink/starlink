@@ -807,7 +807,7 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
         res = smf_malloc( nchunks, sizeof(*res), 1, status );
 
         /* Concatenate (no variance since we calculate it ourselves -- NOI) */
-        smf_concat_smfGroup( wf, igroup, darks, bpms, contchunk, 0, outfset,
+        smf_concat_smfGroup( wf, igroup, darks, bpms, contchunk, 1, 0, outfset,
                              moving, lbnd_out, ubnd_out, padStart, padEnd,
                              SMF__NOCREATE_VARIANCE, &res[0], status );
 
