@@ -139,7 +139,7 @@
 
 #define FUNC_NAME "smf_bolonoise"
 
-void smf_bolonoise( smfWorkForce *wf, const smfData *data, 
+void smf_bolonoise( smfWorkForce *wf, const smfData *data,
                     unsigned char *quality,
                     size_t window, double f_low, double f_white1,
                     double f_white2, double flagratio, double *whitenoise,
@@ -239,14 +239,14 @@ void smf_bolonoise( smfWorkForce *wf, const smfData *data,
       }
 
       /* Set bolometer to bad if no power detected */
-      if( (*status==SAI__OK) && ( (p_low<=0) || (p_white<=0) ) ) {
+      if( (*status==SAI__OK) && qua && ( (p_low<=0) || (p_white<=0) ) ) {
         for( j=0; j<ntslice; j++ ) {
           qua[i*bstride + j*tstride] |= SMF__Q_BADB;
         }
       }
     }
 
-    if( (*status==SAI__OK) && !(qua[i*bstride]&SMF__Q_BADB) ) {
+    if( (*status==SAI__OK) && (!qua || !(qua[i*bstride]&SMF__Q_BADB)) ) {
       /* Power ratio */
       fr = p_low/p_white;
 
