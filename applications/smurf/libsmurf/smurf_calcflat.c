@@ -392,9 +392,9 @@ void smurf_calcflat( int *status ) {
       kpg1Wgndf( "RESP", NULL, 1, 1, "", &rgrp, &rsize, status );
 
       if (*status == SAI__OK) {
-        /* Create the file on disk */
+        /* Create the file on disk (units will normalise so no need for prefix) */
         smf_create_bolfile( rgrp, 1, refdata, "Responsivity",
-                            "Amps/Watt", &respmap, status );
+                            "A/W", &respmap, status );
       } else if (*status == PAR__NULL) {
         void *pntr[] = {NULL, NULL, NULL};
         dim_t mydims[2];
