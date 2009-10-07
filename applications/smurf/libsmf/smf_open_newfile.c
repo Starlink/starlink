@@ -215,7 +215,7 @@ void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, const int n
     return;
   }
   if ( flags & SMF__MAP_VAR ) {
-    ndfMap(newndf, "VARIANCE", datatype, "WRITE", &(pntr[1]), &nel, status);
+    ndfMap(newndf, "VARIANCE", datatype, "WRITE/BAD", &(pntr[1]), &nel, status);
     if ( *status != SAI__OK ) {
       errRep(FUNC_NAME, "Unable to map variance array", status);
       return;
