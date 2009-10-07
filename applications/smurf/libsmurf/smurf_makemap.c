@@ -283,15 +283,22 @@
 *          the output array up into a number of smaller rectangular tiles, 
 *          each created separately and stored in a separate output NDF. This 
 *          can be accomplished by supplying non-null values for the TILEDIMS 
-*          parameter. If supplied, these values give the spatial size of each 
-*          output tile, in pixels. If only one value is supplied, the
-*          supplied value is duplicated to create square tiles. Tiles are
-*          created in a raster fashion, from bottom left to top right of
-*          the spatial extent. The NDF file name specified by "out" is
-*          modified for each tile by appending "_<N>" to the end of it, 
-*          where <N> is the integer tile index (starting at 1). The
-*          number of tiles used to cover the entire output cube is written 
-*          to output parameter NTILES. The tiles all share the same 
+*          parameter. If supplied, these values give the nominal spatial size 
+*          of each output tile, in pixels. Edge tiles may be thinner if the 
+*          TRIMTILES parameter is set TRUE. In order to avoid creating very thin
+*          tiles around the edges, the actual tile size used for the edge tiles 
+*          may be up to 10 % larger than the supplied value. This creation of 
+*          "fat" edge tiles may be prevented by supplying a negative value for 
+*          the tile size, in which case edge tiles will never be wider than 
+*          the supplied absolute value. 
+*
+*          If only one value is supplied, the supplied value is duplicated to 
+*          create square tiles. Tiles are created in a raster fashion, from 
+*          bottom left to top right of the spatial extent. The NDF file name 
+*          specified by "out" is modified for each tile by appending "_<N>" 
+*          to the end of it, where <N> is the integer tile index (starting at 
+*          1). The number of tiles used to cover the entire output array is  
+*          written to output parameter NTILES. The tiles all share the same 
 *          projection and so can be simply pasted together in pixel 
 *          coordinates to reconstruct the full size output array. The tiles 
 *          are centred so that the reference position (given by REFLON and 
@@ -673,12 +680,14 @@
 *        - re-tabbed some sections to fit into 80 columns
 *        - define MAXMEM ADAM parameter
 *        - Added "Configuration Parameters" section
+*     2009-10-07 (DSB):
+*        Update to reflect new smf_choosetiles behaviour.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
 *     Council. Copyright (C) 2005-2009 University of British Columbia.
-*     Copyright (C) 2007-2008 Science and Technology Facilities Council.
+*     Copyright (C) 2007-2009 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -954,7 +963,7 @@ void smurf_makemap( int *status ) {
      size output grid. */
   
   if( !tiles ) {
-    tiledims[ 0 ] = -1;
+    tiledims[ 0 ] = 0;
     tiles = smf_choosetiles( igrp, size, lbnd_out, ubnd_out, boxes, 
                              spread, params, outfset, tiledims, 
                              0, 0, &ntile, status );
