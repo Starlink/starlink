@@ -58,74 +58,74 @@
 *          An optional array which consists of additional parameters
 *          required by the Sinc, SincSinc, SincCos, SincGauss, Somb,
 *          SombCos, and Gauss spreading methods (see parameter SPREAD).
-*	   
-*          PARAMS( 1 ) is required by all the above schemes. It is used to 
+*
+*          PARAMS( 1 ) is required by all the above schemes. It is used to
 *          specify how many pixels on either side of the output position
-*          (that is, the output position corresponding to the centre of the 
+*          (that is, the output position corresponding to the centre of the
 *          input pixel) are to receive contributions from the input pixel.
-*          Typically, a value of 2 is appropriate and the minimum allowed 
-*          value is 1 (i.e. one pixel on each side). A value of zero or 
-*          fewer indicates that a suitable number of pixels should be 
+*          Typically, a value of 2 is appropriate and the minimum allowed
+*          value is 1 (i.e. one pixel on each side). A value of zero or
+*          fewer indicates that a suitable number of pixels should be
 *          calculated automatically. [0]
-*	   
-*          PARAMS( 2 ) is required only by the SombCos, Gauss, SincSinc, 
+*
+*          PARAMS( 2 ) is required only by the SombCos, Gauss, SincSinc,
 *          SincCos, and SincGauss schemes.  For the SombCos, SincSinc, and
 *          SincCos schemes, it specifies the number of pixels at which the
 *          envelope of the function goes to zero.  The minimum value is
 *          1.0, and the run-time default value is 2.0.  For the Gauss and
 *          SincGauss scheme, it specifies the full-width at half-maximum
 *          (FWHM) of the Gaussian envelope.  The minimum value is 0.1, and
-*          the run-time default is 1.0.  On astronomical images and 
-*          spectra, good results are often obtained by approximately 
+*          the run-time default is 1.0.  On astronomical images and
+*          spectra, good results are often obtained by approximately
 *          matching the FWHM of the envelope function, given by PARAMS(2),
 *          to the point-spread function of the input data.  []
 *     PIXSIZE = REAL (Read)
 *          Pixel size in output image, in arcsec
 *     SPREAD = LITERAL (Read)
 *          The method to use when spreading each input pixel value out
-*          between a group of neighbouring output pixels. If SPARSE is set 
+*          between a group of neighbouring output pixels. If SPARSE is set
 *          TRUE, then SPREAD is not accessed and a value of "Nearest" is
 *          always assumed. SPREAD can take the following values:
-*	   
-*          - "Linear" -- The input pixel value is divided bi-linearly between 
-*          the four nearest output pixels.  Produces smoother output NDFs than 
+*
+*          - "Linear" -- The input pixel value is divided bi-linearly between
+*          the four nearest output pixels.  Produces smoother output NDFs than
 *          the nearest-neighbour scheme.
-*	   
+*
 *          - "Nearest" -- The input pixel value is assigned completely to the
 *          single nearest output pixel. This scheme is much faster than any
-*          of the others. 
-*	   
+*          of the others.
+*
 *          - "Sinc" -- Uses the sinc(pi*x) kernel, where x is the pixel
 *          offset from the interpolation point (resampling) or transformed
-*          input pixel centre (rebinning), and sinc(z)=sin(z)/z.  Use of 
+*          input pixel centre (rebinning), and sinc(z)=sin(z)/z.  Use of
 *          this scheme is not recommended.
-*	   
+*
 *          - "SincSinc" -- Uses the sinc(pi*x)sinc(k*pi*x) kernel. A
 *          valuable general-purpose scheme, intermediate in its visual
 *          effect on NDFs between the bi-linear and nearest-neighbour
-*          schemes. 
-*	   
+*          schemes.
+*
 *          - "SincCos" -- Uses the sinc(pi*x)cos(k*pi*x) kernel.  Gives
 *          similar results to the "Sincsinc" scheme.
-*	   
-*          - "SincGauss" -- Uses the sinc(pi*x)exp(-k*x*x) kernel.  Good 
+*
+*          - "SincGauss" -- Uses the sinc(pi*x)exp(-k*x*x) kernel.  Good
 *          results can be obtained by matching the FWHM of the
 *          envelope function to the point-spread function of the
 *          input data (see parameter PARAMS).
-*	   
+*
 *          - "Somb" -- Uses the somb(pi*x) kernel, where x is the pixel
-*          offset from the transformed input pixel centre, and 
-*          somb(z)=2*J1(z)/z (J1 is the first-order Bessel function of the 
+*          offset from the transformed input pixel centre, and
+*          somb(z)=2*J1(z)/z (J1 is the first-order Bessel function of the
 *          first kind.  This scheme is similar to the "Sinc" scheme.
-*	   
+*
 *          - "SombCos" -- Uses the somb(pi*x)cos(k*pi*x) kernel.  This
 *          scheme is similar to the "SincCos" scheme.
-*	   
-*          - "Gauss" -- Uses the exp(-k*x*x) kernel. The FWHM of the Gaussian 
-*          is given by parameter PARAMS(2), and the point at which to truncate 
+*
+*          - "Gauss" -- Uses the exp(-k*x*x) kernel. The FWHM of the Gaussian
+*          is given by parameter PARAMS(2), and the point at which to truncate
 *          the Gaussian to zero is given by parameter PARAMS(1).
-*	   
-*          For further details of these schemes, see the descriptions of 
+*
+*          For further details of these schemes, see the descriptions of
 *          routine AST_REBINx in SUN/211. ["Nearest"]
 *     SYSTEM = LITERAL (Read)
 *          The celestial coordinate system for the output map/
@@ -332,11 +332,11 @@ void smurf_qlmakemap( int *status ) {
 
   /* Main routine */
   ndfBegin();
-  
+
   /*** TIMER ***/
   smf_timerinit( &tv1, &tv2, status );
 
-  /* Find the number of cores/processors available and create a pool of 
+  /* Find the number of cores/processors available and create a pool of
      threads of the same size. */
   wf = smf_create_workforce( smf_get_nthread( status ), status );
 
@@ -371,7 +371,7 @@ void smurf_qlmakemap( int *status ) {
   if ( pixsize <= 0 || pixsize > 60. ) {
     msgSetd( "PIXSIZE", pixsize );
     *status = SAI__ERROR;
-    errRep( " ", "Invalid pixel size, ^PIXSIZE (must be positive but < 60 arcsec)", 
+    errRep( " ", "Invalid pixel size, ^PIXSIZE (must be positive but < 60 arcsec)",
 	   status );
   }
 
@@ -380,7 +380,7 @@ void smurf_qlmakemap( int *status ) {
 
   /* Obtain desired pixel-spreading scheme */
   parChoic( "SPREAD", "NEAREST", "NEAREST,LINEAR,SINC,"
-	    "SINCSINC,SINCCOS,SINCGAUSS,SOMB,SOMBCOS,GAUSS", 
+	    "SINCSINC,SINCCOS,SINCGAUSS,SOMB,SOMBCOS,GAUSS",
 	    1, pabuf, 10, status );
 
   smf_get_spread( pabuf, &spread, &nparam, status );
@@ -390,13 +390,13 @@ void smurf_qlmakemap( int *status ) {
 
   /* Calculate the map bounds - from the FIRST FILE only! */
   msgOutif( MSG__VERB," ",
-	   "SMURF_QLMAKEMAP: Determine approx map bounds from first file", 
+	   "SMURF_QLMAKEMAP: Determine approx map bounds from first file",
             status );
-  smf_mapbounds_approx( igrp, 1, system, pixsize, lbnd_out, ubnd_out, 
+  smf_mapbounds_approx( igrp, 1, system, pixsize, lbnd_out, ubnd_out,
 			&outframeset, &moving, status );
- 
+
   /* Write WCS bounds */
-  smf_store_outputbounds(0, lbnd_out, ubnd_out, outframeset, NULL, NULL, 
+  smf_store_outputbounds(0, lbnd_out, ubnd_out, outframeset, NULL, NULL,
                          status);
   msgBlank( status );
 
@@ -413,11 +413,11 @@ void smurf_qlmakemap( int *status ) {
     nweights = mapsize;
   }
   weights = smf_malloc( nweights*wf->nworker, sizeof(double), 1, status);
-  
+
   /* Create an output smfData */
   kpg1Wgndf( "OUT", igrp, 1, 1, "More output files required...",
              &ogrp, &outsize, status );
-  smf_open_newfile( ogrp, 1, SMF__DOUBLE, 2, lbnd_out, ubnd_out, smfflags, &odata, 
+  smf_open_newfile( ogrp, 1, SMF__DOUBLE, 2, lbnd_out, ubnd_out, smfflags, &odata,
 		    status );
 
   /* Map variance array if we want it in the output file - this should
@@ -432,9 +432,9 @@ void smurf_qlmakemap( int *status ) {
   /* Each worker thread needs its own output array. This is needed since
      otherwise different threads may attempt to write to the same output
      pixel at the same time. We create a 3D array now in which the
-     first 2 axes match the 2D output NDF dimensions, and the third axis 
-     has dimension equal to the number of worker threads. Once the 
-     rebinning is complete, these multiple output arrays are combined 
+     first 2 axes match the 2D output NDF dimensions, and the third axis
+     has dimension equal to the number of worker threads. Once the
+     rebinning is complete, these multiple output arrays are combined
      into one, and copied into the output NDF. */
     if( wf->nworker > 1 ) {
       map = smf_malloc( mapsize*wf->nworker, sizeof(double), 0, status);
@@ -454,11 +454,11 @@ void smurf_qlmakemap( int *status ) {
   for ( i=1; i<=size && *status == SAI__OK; i++ ) {
     /* Read data from the ith input file in the group */
     smf_open_and_flatfield( igrp, NULL, i, darks, &data, status );
-  
-    msgOutif( MSG__VERB," ", "SMURF_QLMAKEMAP: Cleaning bolometer data.", 
+
+    msgOutif( MSG__VERB," ", "SMURF_QLMAKEMAP: Cleaning bolometer data.",
               status );
 
-    /* Apply bad pixel mask to the quality array - noting that 
+    /* Apply bad pixel mask to the quality array - noting that
        smf_update_valbad will apply the mask to the data array.
        Also note that this uses smf_update_quality to do the masking
        which we call immediately afterwards to mask out dead bolometers.
@@ -499,7 +499,7 @@ void smurf_qlmakemap( int *status ) {
     /*** TIMER ***/
     smf_timerupdate(&tv1,&tv2,status);
 
-    smf_bolonoise( NULL, data, NULL, 0, 0.5, SMF__F_WHITELO, SMF__F_WHITEHI, 0, 
+    smf_bolonoise( NULL, data, NULL, 0, 0.5, SMF__F_WHITELO, SMF__F_WHITEHI, 0,
                    bolonoise, NULL, 0, status );
 
     /*** TIMER ***/
@@ -515,17 +515,17 @@ void smurf_qlmakemap( int *status ) {
 
     /* Rebin the data onto the output grid. This also closes the input file
        and frees the bolonoise array once the rebin is complete. */
-    smf_rebinmap( wf, data, bolonoise, i, size, outframeset, spread, params, 
-                  moving, genvar, lbnd_out, ubnd_out, map, variance, weights, 
+    smf_rebinmap( wf, data, bolonoise, i, size, outframeset, spread, params,
+                  moving, genvar, lbnd_out, ubnd_out, map, variance, weights,
                   &nused, status );
 
     if (*status != SAI__OK) break;
   }
 
   /* Wait untill all jobs have finished. If an error has occurred we may
-     have aborted the above loop early leaving some threads still running. 
+     have aborted the above loop early leaving some threads still running.
      If we close down all NDFs now, etc, we may pull the carpet out from
-     underneath these running threds, resulting in them suffering a 
+     underneath these running threds, resulting in them suffering a
      segmentation fault. */
   smf_wait( wf, status );
 
@@ -567,15 +567,15 @@ void smurf_qlmakemap( int *status ) {
     outframeset = astAnnul( outframeset );
   }
 
-  /* Tidy up and close the output file */  
+  /* Tidy up and close the output file */
   if (odata) smf_close_file ( &odata, status );
   if( ogrp ) grpDelet( &ogrp, status );
   if( darks ) smf_close_related( &darks, status );
   if( bpms ) smf_close_related( &bpms, status );
   grpDelet( &igrp, status );
   if( wf ) wf = smf_destroy_workforce( wf );
- 
+
   ndfEnd( status );
-  
+
   msgOutif( MSG__VERB," ", "Output map written", status );
 }

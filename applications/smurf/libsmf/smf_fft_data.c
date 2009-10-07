@@ -30,14 +30,14 @@
 *     Pointer to newly created smfData containing the forward or inverse
 *     transformed data.
 
-*  Description: 
+*  Description:
 *     Perform the forward or inverse FFT of a smfData. In the time
 *     domain the data may be 1-d (e.g. a single bolometer), or 3-d
 *     (either x,y,time or time,x,y depending on isTordered flag). The
 *     frequency domain representation of the data is 2-d
 *     (frequency,component) if the input was 1-d, and 4-d if the input was
 *     3-d (always frequency,x,y,component -- i.e. bolo-ordered). Component
-*     is an axis of length 2 containing the real and imaginary parts. 
+*     is an axis of length 2 containing the real and imaginary parts.
 *     Inverse transforms always leave the data in bolo-ordered format. If the
 *     data are already transformed, this routine returns a NULL pointer.
 *     If a non-null pointer wf is supplied, tell FFW to use multiple threads.
@@ -164,14 +164,14 @@ void smfFFTDataParallel( void *job_data_ptr, int *status ) {
   }
 
   /* Debugging message indicating thread started work */
-  msgOutiff( MSG__DEBUG, "", 
+  msgOutiff( MSG__DEBUG, "",
              "smfFFTDataParallel: thread starting on bolos %zu -- %zu",
              status, pdata->b1, pdata->b2 );
-  
+
 
   /* if b1 past end of the work, nothing to do so we return */
   if( pdata->b1 >= pdata->nbolo ) {
-    msgOutif( MSG__DEBUG, "", 
+    msgOutif( MSG__DEBUG, "",
               "smfFFTDataParallel: nothing for thread to do, returning",
               status);
     return;
@@ -183,33 +183,33 @@ void smfFFTDataParallel( void *job_data_ptr, int *status ) {
        /* Transform bolometers one at a time */
        baseR = pdata->data->pntr[0];
        baseR += i*pdata->nf;
-       
+
        baseI = baseR + pdata->nf*pdata->nbolo;
-       
+
        baseB = pdata->retdata->pntr[0];
-       baseB += i*pdata->ntslice;        
-       
+       baseB += i*pdata->ntslice;
+
        fftw_execute_split_dft_c2r( pdata->plan, baseR, baseI, baseB );
      }
    } else {                      /* Perform forward fft */
      for( i=pdata->b1; i<=pdata->b2; i++ ) {
        /* Transform bolometers one at a time */
        baseB = pdata->data->pntr[0];
-       baseB += i*pdata->ntslice;        
-       
+       baseB += i*pdata->ntslice;
+
        baseR = pdata->retdata->pntr[0];
        baseR += i*pdata->nf;
-       
+
        baseI = baseR + pdata->nf*pdata->nbolo;
        fftw_execute_split_dft_r2c( pdata->plan, baseB, baseR, baseI );
      }
    }
 
    /* Debugging message indicating thread finished work */
-   msgOutiff( MSG__DEBUG, "", 
+   msgOutiff( MSG__DEBUG, "",
               "smfFFTDataParallel: thread finishing bolos %zu -- %zu",
               status, pdata->b1, pdata->b2 );
-   
+
 }
 
 /* ------------------------------------------------------------------------ */
@@ -217,7 +217,7 @@ void smfFFTDataParallel( void *job_data_ptr, int *status ) {
 
 #define FUNC_NAME "smf_fft_data"
 
-smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse, 
+smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
                        int *status ) {
   double *baseR=NULL;           /* base pointer to real part of transform */
   double *baseI=NULL;           /* base pointer to imag part of transform */
@@ -271,23 +271,23 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
   /* Check for double-precision data */
   if( indata->dtype != SMF__DOUBLE ) {
     *status = SAI__ERROR;
-    errRep( "", FUNC_NAME 
-            ": Data is not double precision, must be flat-fielded first", 
+    errRep( "", FUNC_NAME
+            ": Data is not double precision, must be flat-fielded first",
             status );
     return NULL;
   }
 
   /* Create a copy of the input data since FFT operations often do
      calculations in-place */
-  data = smf_deepcopy_smfData( indata, 0, SMF__NOCREATE_VARIANCE | 
-                               SMF__NOCREATE_QUALITY | 
+  data = smf_deepcopy_smfData( indata, 0, SMF__NOCREATE_VARIANCE |
+                               SMF__NOCREATE_QUALITY |
                                SMF__NOCREATE_FILE |
                                SMF__NOCREATE_DA, status );
 
   /* Re-order a time-domain cube if needed */
   if( indata->isTordered && (indata->ndims == 3) ) {
     smf_dataOrder( data, 0, status );
-  } 
+  }
 
   /* Data dimensions. Time dimensions are either 1-d or 3-d. Frequency
      dimensions are either 2- or 4-d to store the real and imaginary
@@ -317,7 +317,7 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
 
   /* If the data are already transformed to the requested domain return
      a NULL pointer */
-     
+
   if( (*status==SAI__OK) && (isFFT != inverse) ) {
     retdata = NULL;
     goto CLEANUP;
@@ -327,13 +327,13 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
      data itself */
 
   retdata = smf_deepcopy_smfData( data, 0, SMF__NOCREATE_DATA |
-                                  SMF__NOCREATE_VARIANCE | 
-                                  SMF__NOCREATE_QUALITY | 
+                                  SMF__NOCREATE_VARIANCE |
+                                  SMF__NOCREATE_QUALITY |
                                   SMF__NOCREATE_FILE |
                                   SMF__NOCREATE_DA, status );
 
   if( *status == SAI__OK ) {
-      
+
     /* Allocate space for the transformed data */
 
     if( inverse ) {
@@ -368,13 +368,13 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
     ndata=1;
     for( j=0; j<retdata->ndims; j++ ) {
       ndata *= retdata->dims[j];
-    }    
+    }
 
-    retdata->pntr[0] = smf_malloc( ndata, smf_dtype_sz(retdata->dtype,status), 
+    retdata->pntr[0] = smf_malloc( ndata, smf_dtype_sz(retdata->dtype,status),
                                    1, status );
 
-    /* Describe the array dimensions for FFTW guru interface  
-       - dims describes the length and stepsize of time slices within bolometer 
+    /* Describe the array dimensions for FFTW guru interface
+       - dims describes the length and stepsize of time slices within bolometer
     */
 
     dims.n = ntslice;
@@ -382,13 +382,13 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
     dims.os = 1;
 
     /* Set up the job data */
-    
+
     if( nw > (int) nbolo ) {
       step = 1;
     } else {
       step = nbolo/nw;
     }
-    
+
     job_data = smf_malloc( nw, sizeof(*job_data), 1, status );
 
     for( i=0; (*status==SAI__OK)&&i<nw; i++ ) {
@@ -418,8 +418,8 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
 
         smf_mutex_lock( &smf_fft_data_mutex, status );
         pdata->plan = fftw_plan_guru_split_dft_c2r( 1, &dims, 0, NULL,
-                                                    baseR, baseI, 
-                                                    baseB, 
+                                                    baseR, baseI,
+                                                    baseB,
                                                     FFTW_ESTIMATE |
                                                     FFTW_UNALIGNED);
         smf_mutex_unlock( &smf_fft_data_mutex, status );
@@ -431,9 +431,9 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
 
         smf_mutex_lock( &smf_fft_data_mutex, status );
         pdata->plan = fftw_plan_guru_split_dft_r2c( 1, &dims, 0, NULL,
-                                                    baseB, 
-                                                    baseR, baseI, 
-                                                    FFTW_ESTIMATE | 
+                                                    baseB,
+                                                    baseR, baseI,
+                                                    FFTW_ESTIMATE |
                                                     FFTW_UNALIGNED);
         smf_mutex_unlock( &smf_fft_data_mutex, status );
 
@@ -444,7 +444,7 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
           steptime = retdata->hdr->steptime;
           if( steptime < VAL__SMLD ) {
             *status = SAI__ERROR;
-            errRep( "", FUNC_NAME 
+            errRep( "", FUNC_NAME
                     ": FITS header error: STEPTIME must be > 0",
                     status);
           }
@@ -452,40 +452,40 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
           if( *status == SAI__OK ) {
             /* Frequency steps in the FFT */
             df = 1. / (steptime * (double) ntslice );
-            
+
             /* Start an AST context */
             astBegin;
-            
+
             /* Create a new astFrameSet containing a 4d base GRID frame */
             tswcs = astFrameSet( astFrame( 4, "Domain=GRID" ), " " );
-            
+
             /* The current frame will have frequency along the first axis,
                x, y bolo coordinates along the second and third axes,
                and the component along a fourth axis of length two (real,
                imaginary coefficients). */
-            
+
             specframe = astSpecFrame( "System=freq,Unit=Hz,"
                                       "StdOfRest=Topocentric" );
-            
+
             curframe2d = astFrame( 2, "Domain=BOLO" ); /* x, y, component */
 #if SC2STORE__COL_INDEX
 	    astSet( curframe2d, "label(1)=Rows,label(2)=Columns");
 #else
 	    astSet( curframe2d, "label(1)=Columns,label(2)=Rows");
 #endif
-            curframe3d = astCmpFrame( specframe, curframe2d, " " );            
+            curframe3d = astCmpFrame( specframe, curframe2d, " " );
             curframe1d = astFrame( 1, "Domain=COEFF,label=Real/Imag component"); /* real/imag component*/
             curframe4d = astCmpFrame( curframe3d, curframe1d, " " );
-            
+
             /* The mapping from 4d grid coordinates to (frequency, x,
                y, coeff) is accomplished with a shift and a zoommap
                for the 1st dimension, and a shift for the others */
-            
+
             zshift = -1;
-            zshiftmapping = astShiftMap( 1, &zshift, " " ); 
+            zshiftmapping = astShiftMap( 1, &zshift, " " );
             scalemapping = astZoomMap( 1, df, " " );
             specmapping = astCmpMap( zshiftmapping, scalemapping, 1, " " );
-            
+
             zshift2[0] = -1; /* Set BOLO origin to 0, 0 */
             zshift2[1] = -1;
             zshiftmapping2 = astShiftMap( 2, zshift2, " " );
@@ -513,19 +513,19 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
 
       if( !pdata->plan ) {
         *status = SAI__ERROR;
-        errRep("", FUNC_NAME 
+        errRep("", FUNC_NAME
                ": FFTW3 could not create plan for transformation",
                status);
       }
     }
   }
-  
+
   /* Do the FFTs */
   if( nw > 1 ) {
     /* Submit jobs in parallel if we have multiple worker threads */
     for( i=0; (*status==SAI__OK)&&i<nw; i++ ) {
       pdata = job_data + i;
-      pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata, 
+      pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata,
                                  smfFFTDataParallel, NULL, status );
     }
     /* Wait until all of the submitted jobs have completed */
@@ -535,13 +535,13 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
     pdata = job_data;
     smfFFTDataParallel( job_data, status );
   }
-  
+
   /* Each sample needs to have a normalization applied if forward FFT */
   if( (*status==SAI__OK) && !inverse ) {
-    norm = 1. / (double) ntslice; 
-  
+    norm = 1. / (double) ntslice;
+
     val = retdata->pntr[0];
-    
+
     for( j=0; j<nf*nbolo*2; j++ ) {
       *val *= norm;
       if (*val == 0.0) *val = VAL__BADD;
@@ -549,15 +549,15 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
     }
   }
 
-  
+
  CLEANUP:
   if( data ) smf_close_file( &data, status );
-  
+
   /* Clean up the job data array */
   if( job_data ) {
     for( i=0; i<nw; i++ ) {
       pdata = job_data + i;
-      /* Destroy the plans */ 
+      /* Destroy the plans */
       smf_mutex_lock( &smf_fft_data_mutex, status );
       fftw_destroy_plan( pdata->plan);
       smf_mutex_unlock( &smf_fft_data_mutex, status );
