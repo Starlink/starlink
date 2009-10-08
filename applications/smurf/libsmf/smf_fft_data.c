@@ -45,7 +45,7 @@
 *  Notes:
 
 *  Authors:
-*     Ed Chapin (UBC)
+*     Ed Chapin (UBC) 
 *     {enter_new_authors_here}
 
 *  History:
@@ -66,6 +66,9 @@
 *        Move conversion of NaN/Inf-->VAL__BADD to smf_convert_bad.c
 *     2008-11-20 (TIMJ):
 *        "Close" the smfData instead of "free".
+*     2009-10-8 (DSB):
+*         Use a smf job context to ensure that smf_wait only waits for the jobs 
+*         submitted within this function.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -523,6 +526,7 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
   /* Do the FFTs */
   if( nw > 1 ) {
     /* Submit jobs in parallel if we have multiple worker threads */
+    smf_begin_job_context( wf, status );
     for( i=0; (*status==SAI__OK)&&i<nw; i++ ) {
       pdata = job_data + i;
       pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata,
@@ -530,6 +534,8 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
     }
     /* Wait until all of the submitted jobs have completed */
     smf_wait( wf, status );
+    smf_end_job_context( wf, status );
+
   } else {
     /* If there is only a single thread call smfFFTDataParallel directly*/
     pdata = job_data;

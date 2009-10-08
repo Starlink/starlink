@@ -58,6 +58,7 @@ struct smfJob {
   smfJob **waiting;           /* Array of jobs waiting on this one */
   smfJob *next;               /* Next job in list */
   smfJob *prev;               /* Previous job in list */
+  int conid;                  /* Context idenrifier for job */
 };
 
 /* Structure describing the whole work force. */
@@ -74,6 +75,9 @@ struct smfWorkForce {
   pthread_mutex_t jd_mutex;      /* Mutex controlling access to the job desk */
   int status;                    /* Inherited status value for the workforce */
   int kill;                      /* No. of workers still to be terminated */
+  int ncontext;                  /* Number of context identifiers issued so far */
+  int *contexts;                 /* List of job context identifiers. */
+  int condepth;                  /* Depth of job context nesting */
 };
 
 
@@ -98,5 +102,7 @@ int smf_add_job( smfWorkForce *workforce, int flags, void *data,
 int smf_wait_on_job( smfWorkForce *workforce, int ijob1, int ijob2, int *status );
 int smf_job_wait( smfWorkForce *workforce, int *status );
 void *smf_get_job_data( int ijob, smfWorkForce *workforce, int *status );
+void smf_begin_job_context( smfWorkForce *workforce, int *status );
+void smf_end_job_context( smfWorkForce *workforce, int *status );
 
 #endif

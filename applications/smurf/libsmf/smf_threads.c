@@ -80,6 +80,8 @@
 *     24-AUG-2009 (DSB):
 *        Added smf_get_job_data. Changed interface to smf_wait_on_job
 *        again.
+*     8-OCT-2009 (DSB):
+*        Added smf_begin_job_context and smf_end_job_context.
 */
 
 
@@ -120,9 +122,14 @@ static void *smf_run_worker( void *worker_ptr );
 static void smf_remove_from_list( smfJob *job, smfJob **head, int *status );
 static void smf_push_list_head( smfJob *job, smfJob **head, int *status );
 static void smf_push_list_foot( smfJob *job, smfJob **head, int *status );
-static smfJob *smf_find_job( smfJob *head, int ijob, int *status );
+static smfJob *smf_find_job( smfJob *head, int ijob, int conid, int *status );
 static smfJob *smf_pop_list_head( smfJob **head, int *status );
 static void smf_thread_log_( const char *text, const char *colour, int ijob );
+static int smf_get_job_context( smfWorkForce *workforce, int *status );
+static void smf_init_job( smfJob *job, int *status );
+static void smf_export_jobs( smfJob *head, int old, int new, int *status );
+static int smf_list_isempty( int conid, smfJob *head, int *status );
+static smfJob *smf_pop_list_first( smfJob **head, int conid, int *status );
 
 
 /* Public workforce-related functions */
@@ -215,16 +222,11 @@ int smf_add_job( smfWorkForce *workforce, int flags, void *data,
 
 /* Get a structure in which to place the job description. If any such
    structures are available on the workforce's list of free job structures, 
-   use one from the free list. Otherwise, create a new one. */
+   use one from the free list. Otherwise, create a new one and initialise it. */
    job = smf_pop_list_head( &(workforce->free_jobs), status );
    if( ! job ) {
       job = astMalloc( sizeof( smfJob ) );
-      if( job ) {
-         job->next = NULL;
-         job->prev = NULL;
-         job->waiting = NULL;
-         job->nwaiting = 0;
-      }
+      smf_init_job( job, status );
    }
 
 /* Store the supplied function and data pointers. */
@@ -234,6 +236,9 @@ int smf_add_job( smfWorkForce *workforce, int flags, void *data,
       job->func = func;
       job->data = data;
       job->checker = checker;
+
+/* Store the current job context identifier. */
+      job->conid = smf_get_job_context( workforce, status );
 
 /* Add the job to the foot of the available job list. As each worker
    thread becomes idle, it will take the next job at the head of this 
@@ -255,6 +260,52 @@ int smf_add_job( smfWorkForce *workforce, int flags, void *data,
 /* Return the job identifier. */
    return job->ijob;
 }
+
+void smf_begin_job_context( smfWorkForce *workforce, int *status ){
+/*
+*  Name:
+*     smf_job_context
+
+*  Purpose:
+*     Starts a new job context.
+
+*  Language:
+*     Starlink ANSI C
+
+*  Type of Module:
+*     C function
+
+*  Invocation:
+*     #include "smf_threads.h"
+*     void smf_begin_job_context( smfWorkForce *workforce, int *status )
+
+*  Arguments:
+*     workforce
+*        Pointer to the workforce performing the jobs.
+*     status
+*        Pointer to the inherited status value.
+
+*  Description:
+*     This function indicates that all jobs created before the subsequent matching 
+*     call to smf_end_job_context should be grouped together. This affects the 
+*     behaviour of functions smf_wait and smf_job_wait.
+
+*/
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
+
+/* Increment the depth of context nesting. */
+   (workforce->condepth)++;
+
+/* Ensure the array of context identifiers held in the workforce is large enough. */
+   workforce->contexts = astGrow( workforce->contexts, workforce->condepth, sizeof( int ) );
+
+/* Create a new identifier for the new context and store it as the last entry in the list
+   of context identifiers in the workforce. */
+   (workforce->contexts)[ workforce->condepth-1 ] = (workforce->ncontext)++;
+}
+
 
 smfWorkForce *smf_create_workforce( int nworker, int *status ) {
 /*
@@ -358,6 +409,9 @@ smfWorkForce *smf_create_workforce( int nworker, int *status ) {
       result->waiting_jobs = NULL;
       result->status = *status;
       result->kill = 0;
+      result->ncontext = 0;
+      result->contexts = NULL;
+      result->condepth = 0;
       smf_cond_init( &( result->all_done ), status );
       smf_cond_init( &( result->job_done ), status );
       smf_cond_init( &( result->page ), status );
@@ -486,6 +540,9 @@ smfWorkForce *smf_destroy_workforce( smfWorkForce *workforce ) {
       pthread_cond_destroy( &( workforce->job_done ) );
       pthread_cond_destroy( &( workforce->page ) );
 
+/* Free the list of job context identifiers. */
+      workforce->contexts = astFree( workforce->contexts );
+
 /* Free the memory holding the workforce. */
       workforce = astFree( workforce );
    }
@@ -494,6 +551,80 @@ smfWorkForce *smf_destroy_workforce( smfWorkForce *workforce ) {
    if( fd ) fclose( fd );
 
    return NULL;
+}
+
+void smf_end_job_context( smfWorkForce *workforce, int *status ){
+/*
+*  Name:
+*     smf_end_job_context
+
+*  Purpose:
+*     End the current job context.
+
+*  Language:
+*     Starlink ANSI C
+
+*  Type of Module:
+*     C function
+
+*  Invocation:
+*     #include "smf_threads.h"
+*     void smf_end_job_context( smfWorkForce *workforce, int *status )
+
+*  Arguments:
+*     workforce
+*        Pointer to the workforce performing the jobs.
+*     status
+*        Pointer to the inherited status value.
+
+*  Description:
+*     This function ends the job context started by the earlier matching 
+*     call to smf_begin_job_context. Any remaining jobs belonging to the 
+*     current job context are exported into the parent job context.
+
+*/
+
+/* Local Variables: */
+   int old;
+   int new;
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
+
+/* Wait in the job desk queue until we have exclusive access to the job 
+   desk. */
+   smf_mutex_lock( &( workforce->jd_mutex ), status );
+
+/* Decrement the depth of context nesting. */
+   (workforce->condepth)--;
+
+/* Report an error if the context depth goes negative. */
+   if( workforce->condepth < 0 ) {
+      *status = SAI__ERROR;
+      emsRep( "", "smf_end_job_context: No matching call to smf_begin_job_context.",
+              status );
+
+/* Otherwise, export any remaining jobs created in the current context into the parent
+   context. */
+   } else {
+
+/* Get the identifiers for the old and new job contexts. */
+      old = (workforce->contexts)[ workforce->condepth ];
+      new = smf_get_job_context( workforce, status );
+
+/* Search for jobs in the old context and assign them to the new context. */
+      smf_export_jobs( workforce->available_jobs, old, new, status );
+      smf_export_jobs( workforce->waiting_jobs, old, new, status );
+      smf_export_jobs( workforce->active_jobs, old, new, status );
+      smf_export_jobs( workforce->finished_jobs, old, new, status );
+
+/* For safety, zero the last entry in the list of context identifiers in the 
+   workforce. */
+      (workforce->contexts)[ workforce->condepth ] = 0;
+   }
+
+/* Unlock the mutex so that the next thread can access the job desk. */
+   smf_mutex_unlock( &( workforce->jd_mutex ), status );
 }
 
 void *smf_get_job_data( int ijob, smfWorkForce *workforce, int *status ){
@@ -541,10 +672,10 @@ void *smf_get_job_data( int ijob, smfWorkForce *workforce, int *status ){
    list of jobs in turn. Report an error if the job is not found.
    First see if the requested job is the one being checked by the 
    active worker. */
-   job = smf_find_job( workforce->available_jobs, ijob, status );
-   if( !job ) job = smf_find_job( workforce->finished_jobs, ijob, status );
-   if( !job ) job = smf_find_job( workforce->waiting_jobs, ijob, status );
-   if( !job ) job = smf_find_job( workforce->active_jobs, ijob, status );
+   job = smf_find_job( workforce->available_jobs, ijob, -1, status );
+   if( !job ) job = smf_find_job( workforce->finished_jobs, ijob, -1, status );
+   if( !job ) job = smf_find_job( workforce->waiting_jobs, ijob, -1, status );
+   if( !job ) job = smf_find_job( workforce->active_jobs, ijob, -1, status );
    if( !job && *status == SAI__OK ) {
       *status = SAI__ERROR;
       msgSeti( "I", ijob );
@@ -587,7 +718,8 @@ int smf_job_wait( smfWorkForce *workforce, int *status ) {
 *     blocks until the next job is completed.
 *
 *     Note, only jobs which had the SMF__REPORT_JOB flag set when calling
-*     smf_add_job are included in the list of returned jobs.
+*     smf_add_job and were created within the current job context (see 
+*     smf_begin_job_context) are included in the list of returned jobs.
 
 *  Returned Value:
 *     The integer identifier for the completed job. This can be compared
@@ -604,6 +736,7 @@ int smf_job_wait( smfWorkForce *workforce, int *status ) {
    int result;
    int wf_status;
    smfJob *job;
+   int conid;
 
 /* Start a new error reporting context. */
    emsBegin( status );
@@ -614,29 +747,39 @@ int smf_job_wait( smfWorkForce *workforce, int *status ) {
    smf_mutex_lock( &( workforce->jd_mutex ), status );
    smf_thread_log( "job_wait: At desk", DESK, -1 );
 
-/* Wait until there is a job available on the finished jobs list. Put it in 
-   a loop because of spurious wake ups. */ 
-   while( ! workforce->finished_jobs ){
-      smf_thread_log( "job_wait: Waiting for a job to complete", WAIT, -1 );
+/* Get the current job context identifier. */
+   conid = smf_get_job_context( workforce, status );
+
+/* If there are no jobs within the current job context on the finished, active 
+   or available job lists, report an error. */
+   if( smf_list_isempty( conid, workforce->finished_jobs, status ) &&
+       smf_list_isempty( conid, workforce->active_jobs, status ) &&
+       smf_list_isempty( conid, workforce->available_jobs, status ) ) {
+      *status = SAI__ERROR;
+      emsRep( "", "smf_job_wait: There are no jobs to wait for.", status );
+   }
+
+/* Wait until there is a job within the current context available on the finished
+   jobs list. Put it in a loop because of spurious wake ups. */ 
+   while( smf_list_isempty( conid, workforce->finished_jobs, status ) ){
+      smf_thread_log( "job_wait: Waiting for a job (any job) to complete", WAIT, -1 );
       smf_cond_wait( &( workforce->job_done ), &( workforce->jd_mutex ), 
                      status );
       if( *status != SAI__OK ) break;
    }
 
-/* Pop the head job of the list, and note its identifier. */
-   job = smf_pop_list_head( &(workforce->finished_jobs), status );
-   result = job->ijob;
-   smf_thread_log( "job_wait: Job completed", DESK, result );
+/* Pop the first job for the current context off the finished list, and note its 
+   identifier. */
+   job = smf_pop_list_first( &(workforce->finished_jobs), conid, status );
+   if( job ) {   
+      result = job->ijob;
+      smf_thread_log( "job_wait: Job completed", DESK, result );
 
 /* Clear the job data, and put the job structure onto the list of free
    job structures. */
-   job->ijob = 0;
-   job->flags = 0;
-   job->func = NULL;
-   job->data = NULL;
-   job->checker = NULL;
-   job->nwaiting = 0;
-   smf_push_list_head( job, &(workforce->free_jobs), status );
+      smf_init_job( job, status );
+      smf_push_list_head( job, &(workforce->free_jobs), status );
+   }
 
 /* Note the workforce status whilst we still have the job desk mutex. */
    wf_status = workforce->status;
@@ -682,13 +825,14 @@ void smf_wait( smfWorkForce *workforce, int *status ) {
 *        Pointer to the inherited status value.
 
 *  Description:
-*     This function blocks the calling thread until all jobs allocated to
-*     the work force using smf_add_job have been completed.
+*     This function blocks the calling thread until all jobs within the 
+*     current job context (see smf_begin_job_context) have been completed.
 *
 *     A side effect of this function is to empty the list of jobs waiting
 *     to be reported by smf_job_wait. Upon exit from this function, all
 *     jobs waiting to be reported via smf_job_wait will be considered to 
-*     have been reported.
+*     have been reported (again, this only affects jobs within the current 
+*     job context).
 
 *  Notes:
 *     - This function attempts to execute even if an error has already
@@ -698,6 +842,8 @@ void smf_wait( smfWorkForce *workforce, int *status ) {
 
 /* Local Variables: */
    smfJob *job;
+   smfJob *new_finished_head;
+   int conid;
    int wf_status;
 
 /* Start a new error reporting context. */
@@ -709,13 +855,18 @@ void smf_wait( smfWorkForce *workforce, int *status ) {
    smf_mutex_lock( &( workforce->jd_mutex ), status );
    smf_thread_log( "wait: At desk", DESK, njob );
 
-/* If there are any jobs available to run or any currently active jobs, 
-   wait until the last job completes. Spurious wake-ups can occur so put 
-   this in a loop. The call to pthread_cond_wait (within smf_cond_wait)
-   will release the specified mutex (the job desk mutex) before blocking
-   this thread. This enables worker threads to access the job deks to 
-   report completion of jobs and to get new jobs. */
-   while( ( workforce->available_jobs || workforce->active_jobs ) && 
+/* Get the current job context identifier. */
+   conid = smf_get_job_context( workforce, status );
+
+/* If there are any jobs within the current job context available to run,
+   or any currently active jobs, wait until the last job completes. 
+   Spurious wake-ups can occur so put this in a loop. The call to 
+   pthread_cond_wait (within smf_cond_wait) will release the specified 
+   mutex (the job desk mutex) before blocking this thread. This enables 
+   worker threads to access the job deks to report completion of jobs 
+   and to get new jobs. */
+   while( ( !smf_list_isempty( conid, workforce->available_jobs, status ) ||
+            !smf_list_isempty( conid, workforce->active_jobs, status ) ) && 
           *status == SAI__OK && workforce->status == SAI__OK ) {
       smf_thread_log( "wait: waiting for all done", WAIT, njob );
       smf_cond_wait( &( workforce->all_done ), &( workforce->jd_mutex ), 
@@ -724,18 +875,23 @@ void smf_wait( smfWorkForce *workforce, int *status ) {
 
    smf_thread_log( "wait: all done", DESK, njob );
 
-/* Empty the finished job list, moving them onto the free list. */
+/* Remove jobs for the current job context from the finished job list, 
+   re-initialising their contents and moving them onto the free list. */
+   new_finished_head = NULL;
    job = smf_pop_list_head( &(workforce->finished_jobs), status );
    while( job ) {
-      job->ijob = 0;
-      job->flags = 0;
-      job->func = NULL;
-      job->data = NULL;
-      job->checker = NULL;
-      job->nwaiting = 0;
-      smf_push_list_head( job, &(workforce->free_jobs), status );
+      if( job->conid == conid ) {
+         smf_init_job( job, status );
+         smf_push_list_head( job, &(workforce->free_jobs), status );
+      } else {
+         smf_push_list_foot( job, &new_finished_head, status );
+      }
       job = smf_pop_list_head( &(workforce->finished_jobs), status );
    }
+
+/* Restore the head of the list of remaining finished jobs (i.e. finished 
+   jobs that do not belong to the current job context). */
+   workforce->finished_jobs = new_finished_head;
 
 /* Note the workforce status whilst we still have the job desk mutex. */
    wf_status = workforce->status;
@@ -819,8 +975,8 @@ int smf_wait_on_job( smfWorkForce *workforce, int ijob1, int ijob2,
 /* Get a pointer to the structure describing the first job. Search each
    list of available and waiting jobs in turn. Report an error if the job 
    is not found. */
-   job1 = smf_find_job( workforce->available_jobs, ijob1, status );
-   if( !job1 ) job1 = smf_find_job( workforce->waiting_jobs, ijob1, status );
+   job1 = smf_find_job( workforce->available_jobs, ijob1, -1, status );
+   if( !job1 ) job1 = smf_find_job( workforce->waiting_jobs, ijob1, -1, status );
    if( !job1 && *status == SAI__OK ) {
       *status = SAI__ERROR;
       msgSeti( "I", ijob1 );
@@ -830,9 +986,9 @@ int smf_wait_on_job( smfWorkForce *workforce, int ijob1, int ijob2,
       
 /* Likewise, get a pointer to the structure describing the second job.
    Also search the list of active jobs in this case. */
-   job2 = smf_find_job( workforce->available_jobs, ijob2, status );
-   if( !job2 ) job2 = smf_find_job( workforce->waiting_jobs, ijob2, status );
-   if( !job2 ) job2 = smf_find_job( workforce->active_jobs, ijob2, status );
+   job2 = smf_find_job( workforce->available_jobs, ijob2, -1, status );
+   if( !job2 ) job2 = smf_find_job( workforce->waiting_jobs, ijob2, -1, status );
+   if( !job2 ) job2 = smf_find_job( workforce->active_jobs, ijob2, -1, status );
 
 /* If job2 was found return zero. */
    if( job2 ) {
@@ -852,8 +1008,65 @@ int smf_wait_on_job( smfWorkForce *workforce, int ijob1, int ijob2,
 
 /* Private workforce-related functions */
 /* ----------------------------------- */
+static void smf_export_jobs( smfJob *head, int old, int new, int *status ){
+/*
+*  Name:
+*     smf_export_jobs
 
-static smfJob *smf_find_job( smfJob *head, int ijob, int *status ){
+*  Purpose:
+*     Search for jobs belonging to the old context and assign them to the new context.
+
+*  Language:
+*     Starlink ANSI C
+
+*  Type of Module:
+*     C function
+
+*  Invocation:
+*     #include "smf_threads.h"
+*     void smf_export_jobs( smfJob *head, int old, int new, int *status )
+
+*  Arguments:
+*     head
+*        Pointer to the job at the head of the list to be searched.
+*     old
+*        Identifier for the old context.
+*     new
+*        Identifier for the new context.
+*     status
+*        Pointer to the inherited status value.
+
+*  Description:
+*     This function searches the given lists of jobs for jobs belonging to the 
+*     old context and assigns them to the new context.
+
+*/
+
+/* Local Variables; */
+   smfJob *job;
+
+
+/* Check inherited status. */
+   if( *status != SAI__OK ) return;
+
+/* Check the supplied head job first. */
+   job = head;
+
+/* Loop round all jobs in the list. */
+   while( job ) {
+
+/* If the job belongs to the old context, assign it to the new context. */
+      if( job->conid == old ) job->conid = new;
+
+/* Move on to the next job in the list. */
+      job = job->next;
+
+/* If we are back at the head, leave the loop. */
+      if( job == head ) break;
+   }
+}
+
+static smfJob *smf_find_job( smfJob *head, int ijob, int conid, int *status ){
 /*
 *  Name:
 *     smf_find_job
@@ -869,13 +1082,15 @@ static smfJob *smf_find_job( smfJob *head, int ijob, int *status ){
 
 *  Invocation:
 *     #include "smf_threads.h"
-*     smfJob *smf_find_job( smfJob *head, int ijob, int *status )
+*     smfJob *smf_find_job( smfJob *head, int ijob, int conid, int *status )
 
 *  Arguments:
 *     head
 *        Pointer to the job at the head of the list to be searched.
 *     ijob
-*        The integer identifier for the job.
+*        The integer identifier for the job. Ignored if negative.
+*     conid
+*        The job context identifier for the job. Ignored if negative.
 *     status
 *        Pointer to the inherited status value.
 
@@ -885,13 +1100,15 @@ static smfJob *smf_find_job( smfJob *head, int ijob, int *status ){
 
 *  Description:
 *     This function searches the given lists of jobs for a job that has a 
-*     given identifier. If found, a pointer to the job structure is returned. 
-*     Otherwise a NULL pointer is returned (without error).
+*     given identifier and a given context. If found, a pointer to the job 
+*     structure is returned. Otherwise a NULL pointer is returned (without 
+*     error).
 
 */
 
 /* Local Variables; */
    smfJob *result = NULL;
+   int ok;
 
 /* Check inherited status and check list is not empty.*/
    if( *status != SAI__OK || !head ) return result;
@@ -900,7 +1117,13 @@ static smfJob *smf_find_job( smfJob *head, int ijob, int *status ){
    result = head;
 
 /* Loop until we find a job with the given identifier. */
-   while( result->ijob != ijob ) {
+   while( result ) {
+
+/* Break if the current job has the right identifier and context. */
+      ok = 1;
+      if( ijob >= 0 && result->ijob != ijob ) ok = 0;
+      if( conid >= 0 && result->conid != conid ) ok = 0;
+      if( ok ) break;
 
 /* Move on to the next job in the list. */
       result = result->next;
@@ -914,6 +1137,252 @@ static smfJob *smf_find_job( smfJob *head, int ijob, int *status ){
    }
 
 /* Return the pointer to the job structure. */
+   return result;
+}
+
+static int smf_get_job_context( smfWorkForce *workforce, int *status ){
+/*
+*  Name:
+*     smf_get_job_context
+
+*  Purpose:
+*     Get the identifier for the current job context from a workforce.
+
+*  Language:
+*     Starlink ANSI C
+
+*  Type of Module:
+*     C function
+
+*  Invocation:
+*     #include "smf_threads.h"
+*     int smf_get_job_context( smfWorkForce *workforce, int *status )
+
+*  Arguments:
+*     workforce
+*        Pointer to the workforce.
+*     status
+*        Pointer to the inherited status value.
+
+*  Returned Value:
+*     An integer identifying the current job context from a workforce.
+
+*  Description:
+*     This function returns an integer identifying the current job 
+*     context from a workforce.
+
+*/
+
+/* Local Variables: */
+   int result;
+
+/* Initialise */
+   result = -1;
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return result;
+
+/* Get the identifier for the current job context. */
+   if( workforce->condepth > 0 ) {
+      result = (workforce->contexts)[ workforce->condepth - 1 ];
+   }
+
+/* Return the result. */
+   return result;
+}
+
+static void smf_init_job( smfJob *job, int *status ){
+/*
+*  Name:
+*     smf_init_job
+
+*  Purpose:
+*     Initialise fields of a Job structure.
+
+*  Language:
+*     Starlink ANSI C
+
+*  Type of Module:
+*     C function
+
+*  Invocation:
+*     #include "smf_threads.h"
+*     void smf_init_job( smfJob *job, int *status )
+
+*  Arguments:
+*     job
+*        Pointer to the smfJob to be initialised.
+*     status
+*        Pointer to the inherited status value.
+
+*  Description:
+*     This function initialises the supplied job to hold null values.
+
+*/
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
+
+/* Initialise the field of the job structure to null values. */
+   job->conid = -1;
+   job->prev = NULL;
+   job->next = NULL;
+   job->waiting = NULL;
+   job->ijob = 0;
+   job->flags = 0;
+   job->func = NULL;
+   job->data = NULL;
+   job->checker = NULL;
+   job->nwaiting = 0;
+}
+
+static int smf_list_isempty( int conid, smfJob *head, int *status ){
+/*
+*  Name:
+*     smf_list_isempty
+
+*  Purpose:
+*     Determines if the given linked list of jobs have any jobs in the specified context.
+
+*  Language:
+*     Starlink ANSI C
+
+*  Type of Module:
+*     C function
+
+*  Invocation:
+*     #include "smf_threads.h"
+*     iint smf_list_isempty( int conid, smfJob *head, int *status )
+
+*  Arguments:
+*     conid
+*        The identifier for the job context to be searched for.
+*     head
+*        Pointer to the job at the head of the linked list of jobs to be searched.
+*     status
+*        Pointer to the inherited status value.
+
+*  Returned Value:
+*     Non-zero if the list contains no jobs in the specified context.
+
+*  Description:
+*     This function returns an integer indicating if the supplied list of jobs is 
+*     devoid of any jobs belonging to a specified job context.
+
+*/
+
+/* Local Variables: */
+   int result;
+   smfJob *job;
+
+/* Initialise */
+   result = 1;
+
+/* Check inherited status */
+   if( *status != SAI__OK || !head ) return result;
+
+/* Check the supplied head job. */
+   if( head->conid == conid ) {
+      result = 0;
+
+/* Otherwise, check all the other jobs in the list. */
+   } else {
+      job = head->next;
+      while( job != head ) {
+         if( job->conid == conid ) {
+            result = 0;
+            break;
+         }
+         job = job->next;
+      }
+   }
+
+/* Return the result. */
+   return result;
+}
+
+static smfJob *smf_pop_list_first( smfJob **head, int conid, int *status ){
+/*
+*  Name:
+*     smf_pop_list_first
+
+*  Purpose:
+*     Return the first job that is in a given context and remove it from the list.
+
+*  Language:
+*     Starlink ANSI C
+
+*  Type of Module:
+*     C function
+
+*  Invocation:
+*     #include "smf_threads.h"
+*     smfJob *smf_pop_list_first( smfJob **head, int conid, int *status )
+
+*  Arguments:
+*     head
+*        Address of a location at which is stored a pointer to the smfJob at 
+*        the head of the list.
+*     conid
+*        The identifier for the required job context.
+*     status
+*        Pointer to the inherited status value.
+
+*  Returned Value:
+*     Pointer to the first smfJob that was in the required context.
+
+*  Description:
+*     This function returns a pointer to the job closest to the head of a list 
+*     that is in the requested job context, and removes the job from the list.
+
+*  Notes:
+*     - The "prev" link in a smfJob structure points towards the list
+*     foot, and the "next" link points towards the list head.
+*     - The head's next link points to the foot.
+*     - The foot's prev link points to the head.
+
+*/
+
+/* Local Variables; */
+   smfJob *result;
+   smfJob *next;
+   smfJob *prev;
+
+/* Initialise. */
+   result = NULL;
+
+/* Check inherited status */
+   if( *status != SAI__OK || ! *head ) return result;
+
+/* First check the supplied head job. */
+   if( (*head)->conid == conid ) {
+      result = *head;
+
+/* Othersise, check the other jobs in the list. */
+   } else {
+      result = (*head)->prev;
+      while( result != *head ) {
+         if( result->conid == conid ) break;
+         result = result->prev;
+      }
+      if( result == *head ) result = NULL;
+   }
+
+/* If we have found a job in the requested context, extract it 
+   from the list and close up the dangling links. Update the head 
+   job if the returned job is the original head job. */
+   if( result ) {
+      prev = result->prev;   
+      next = result->next;  
+      if( prev == result ) prev = NULL;
+      if( next == result ) next = NULL;
+      if( result == *head ) *head = prev;
+      if( prev ) prev->next = next;
+      if( next ) next->prev = prev;
+      result->prev = NULL;
+      result->next = NULL;
+   }
+
    return result;
 }
 
@@ -1769,5 +2238,6 @@ static void smf_thread_log_( const char *text, const char *colour, int ijob ) {
    }
    pthread_mutex_unlock( &fd_mutex );
 }
+
 
 

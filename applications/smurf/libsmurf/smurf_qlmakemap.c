@@ -225,6 +225,8 @@
 *     2009-10-06 (EC):
 *        - Don't paralleize smf_bolonoise for now (seems to be broken)
 *        - Add some timers for debugging
+*     2009-10-08 (DSB):
+*        Re-paralleize smf_bolonoise as the problem should now be fixed.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -499,7 +501,7 @@ void smurf_qlmakemap( int *status ) {
     /*** TIMER ***/
     smf_timerupdate(&tv1,&tv2,status);
 
-    smf_bolonoise( NULL, data, NULL, 0, 0.5, SMF__F_WHITELO, SMF__F_WHITEHI, 0,
+    smf_bolonoise( wf, data, NULL, 0, 0.5, SMF__F_WHITELO, SMF__F_WHITEHI, 0,
                    bolonoise, NULL, 0, status );
 
     /*** TIMER ***/
