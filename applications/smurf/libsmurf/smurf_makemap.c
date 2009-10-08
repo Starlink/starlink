@@ -682,6 +682,8 @@
 *        - Added "Configuration Parameters" section
 *     2009-10-07 (DSB):
 *        Update to reflect new smf_choosetiles behaviour.
+*     2009-10-08 (EC):
+*        Calculate dynamic default value for MAXMEM using sysconf call
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -720,6 +722,7 @@
 #include <sys/time.h>
 #include <time.h>
 #include <math.h>
+#include <unistd.h>
 
 /* STARLINK includes */
 #include "ast.h"
@@ -791,6 +794,7 @@ void smurf_makemap( int *status ) {
   size_t mapmem=0;           /* Memory needed for output map */
   size_t maxmem=0;           /* Max memory usage in bytes */
   int maxmem_mb;             /* Max memory usage in Mb */
+  int maxmem_default;        /* Default value for maxmem */
   double maxtexp = 0.0;      /* Maximum exposure time */
   float medtexp = 0.0;       /* Median exposure time */
   char method[LEN__METHOD];  /* String for map-making method */
@@ -876,10 +880,43 @@ void smurf_makemap( int *status ) {
             "GAPPT,FK4,FK4-NO-E,ECLIPTIC", 1, system, 10, status );
 
   /* Get the maximum amount of memory that we can use */
-  parGdr0i( "MAXMEM", 2000, 1, VAL__MAXI, 1, &maxmem_mb, status );
+
+  if( *status == SAI__OK ) {
+#if defined(_SC_PHYS_PAGES) && defined(_SC_AVPHYS_PAGES)
+    /* Figure out available physical memory from sysconf */
+    maxmem_default = (int) (sysconf(_SC_AVPHYS_PAGES) * sysconf(_SC_PAGE_SIZE) /
+                            SMF__MB);
+
+    /* Reduce that figure by 512MB to play it safe */
+    maxmem_default -= 512;
+    if( maxmem_default <= 0 ) {
+      *status = SAI__ERROR;
+      errRep( "", TASK_NAME ": Available memory estimated to be <= 0!",
+              status );
+    }
+
+    msgOutiff( MSG__VERB, "", TASK_NAME
+               ": Default MAXMEM is %i MBytes",
+               status, maxmem_default );
+#else
+    /* If sysconf can't tell us, try something safe...*/
+    maxmem_default = 1000;
+
+    msgOutiff( MSG__VERB, "", TASK_NAME
+               ": Can't determine default MAXMEM, setting to %i MBytes",
+               status, maxmem_default );
+#endif
+  }
+
+  /* Set dynamic default before querying the parameter */
+  parDef0i( "MAXMEM", maxmem_default, status );
+  parGdr0i( "MAXMEM", maxmem_default, 1, VAL__MAXI, 1, &maxmem_mb, status );
   if( *status==SAI__OK ) {
     maxmem = (size_t) maxmem_mb * SMF__MB;
   }
+  msgOutiff( MSG__NORM, "", TASK_NAME
+             ": Map-maker will use %i MBytes of memory",
+             status, maxmem_mb );
 
   /* Get METHOD - set rebin/iterate flags */
   parChoic( "METHOD", "REBIN", "REBIN, ITERATE.", 1,

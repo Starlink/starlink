@@ -542,10 +542,9 @@ package @PACKAGE@ {
 
             parameter maxmem {
                 type _INTEGER
-                vpath {DEFAULT }
                 prompt {Maximum memory available for map-making in Mb}
-                ppath GLOBAL CURRENT
-                default 2048
+                ppath DYNAMIC
+                vpath DYNAMIC
                 helpkey *
             }
 
