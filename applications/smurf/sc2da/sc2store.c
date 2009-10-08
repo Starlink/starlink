@@ -3706,6 +3706,81 @@ int *status                 /* global status (given and returned) */
    sc2store_sc2open = 1; 
 }
 
+/*+ sc2store_updflatcal - update flatfield calibration in SCUBA-2 NDF */
+
+void sc2store_updflatcal
+(
+const char filename[],      /* name of file to update (given) */
+size_t colsize,             /* number of bolometers in column (given) */
+size_t rowsize,             /* number of bolometers in row (given) */
+size_t nflat,               /* number of flat coeffs per bol (given) */
+const char *flatname,       /* name of flatfield algorithm (given) */
+const double *flatcal,      /* flat-field calibration (given) */
+const double *flatpar,      /* flat-field parameters (given) */
+int *status                 /* global status (given and returned) */
+)
+
+/*  Description :
+     Map a SCUBA-2 NDF file, delete the pre-existing flatfield calibration
+     and store the new values. Does not update the FITS header with the
+     FLAT file name or determine whether the subarray is correct.
+
+     File will be closed.
+
+    Authors :
+     T. Jenness (JAC, Hawaii)
+
+    History :
+     07Oct2009 : original (timj)
+*/
+
+{
+
+   size_t refcolsize = 0;
+   size_t refrowsize = 0;
+   size_t nframes = 0;
+   int isthere = 0;
+
+   if ( !StatusOkP(status) ) return;
+
+   if ( sc2store_sc2open != 0 )
+   {
+      *status = DITS__APP_ERROR;
+      sprintf ( sc2store_errmess,
+        "one SCUBA-2 data file already open, can't open %s", filename );
+      ErsRep ( 0, status, sc2store_errmess );
+      return;
+   }
+
+/* Open the file in UPDATE mode */
+   sc2store_open ( filename, "UPDATE", &refcolsize, &refrowsize, &nframes, status );
+
+   if ( refcolsize != colsize || refrowsize != rowsize && StatusOkP(status)) {
+     *status = DITS__APP_ERROR;
+     sprintf( sc2store_errmess,
+              "Columns and rows in flatfield do not match the file to be updated" );
+     ErsRep( 0, status, sc2store_errmess );
+   }
+
+/* Remove existing flatfield solution (consider adding to writeflatcal) */
+   datThere( sc2store_scuba2loc, "FLATCAL", &isthere, status );
+   if (isthere) {
+     datErase( sc2store_scuba2loc, "FLATCAL", status );
+   }
+
+   /* write the flatfield information */
+   sc2store_writeflatcal ( colsize, rowsize, nflat, flatname, flatcal, flatpar,
+     status );
+
+   if ( StatusOkP(status) )
+   {
+      sc2store_sc2open = 1;
+   }
+
+   sc2store_free( status );
+   return;
+}
+
 /*+ sc2store_force_initialised - indicate that we have already initialised */
 
 void sc2store_force_initialised

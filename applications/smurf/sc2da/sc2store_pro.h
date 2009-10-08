@@ -510,6 +510,19 @@ const char *xmlfile,        /* name of CONFIGURE XML file (given) */
 int *status                 /* global status (given and returned) */
 );
 
+void sc2store_updflatcal
+(
+const char filename[],      /* name of file to update (given) */
+size_t colsize,             /* number of bolometers in column (given) */
+size_t rowsize,             /* number of bolometers in row (given) */
+size_t nflat,               /* number of flat coeffs per bol (given) */
+const char *flatname,       /* name of flatfield algorithm (given) */
+const double *flatcal,      /* flat-field calibration (given) */
+const double *flatpar,      /* flat-field parameters (given) */
+int *status                 /* global status (given and returned) */
+);
+
+
 /*+ sc2store_force_initialised - indicate that we have already initialised */
 
 void sc2store_force_initialised
