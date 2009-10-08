@@ -251,14 +251,18 @@ void smf_bolonoise( smfWorkForce *wf, const smfData *data,
     }
 
     if( (*status==SAI__OK) && (!qua || !(qua[i*bstride]&SMF__Q_BADB)) ) {
-      /* Power ratio */
-      fr = p_low/p_white;
 
-      /* Flag bad bolometer */
-      if( fratio && qua && (fr < flagratio) ) {
-        for( j=0; j<ntslice; j++ ) {
-          qua[i*bstride + j*tstride] |= SMF__Q_BADB;
+      /* Power ratio requested */
+      if ( fratio ) {
+        fr = p_low/p_white;
+
+        /* Flag bad bolometer */
+        if( qua && (fr < flagratio) ) {
+          for( j=0; j<ntslice; j++ ) {
+            qua[i*bstride + j*tstride] |= SMF__Q_BADB;
+          }
         }
+        fratio[i] = fr;
       }
 
       /* Store values */
@@ -282,7 +286,6 @@ void smf_bolonoise( smfWorkForce *wf, const smfData *data,
           whitenoise[i] *= steptime;
         }
       }
-      if( fratio ) fratio[i] = fr;
     }
   }
 
