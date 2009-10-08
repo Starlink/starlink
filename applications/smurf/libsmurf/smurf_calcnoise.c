@@ -37,13 +37,18 @@
 *          Control the verbosity of the application. Values can be
 *          NONE (no messages), QUIET (minimal messages), NORMAL,
 *          VERBOSE, DEBUG or ALL. [NORMAL]
+*     NEP = _LOGICAL (Read)
+*          Output noise equivalent power images instead of noise images.
+*          [FALSE]
 *     OUT = NDF (Write)
-*          Output files. Number of output files may differ from the
-*          number of input files.
+*          Output files (either noise or NEP images depending on the NEP
+*          parameter). Number of output files may differ from the
+*          number of input files. These will be 2 dimensional.
 *     OUTFILES = LITERAL (Write)
 *          The name of text file to create, in which to put the names of
 *          all the output NDFs created by this application (one per
-*          line). If a null (!) value is supplied no file is created. [!]
+*          line) from the OUT parameter. If a null (!) value is supplied
+*          no file is created. [!]
 
 *  Related Applications:
 *     SMURF: SC2CONCAT, SC2CLEAN, SC2FFT
@@ -55,6 +60,8 @@
 *  History:
 *     2009-10-01 (TIMJ):
 *        Initial version - based on sc2fft task
+*     2009-10-07 (TIMJ):
+*        Add NEP
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -133,6 +140,7 @@ void smurf_calcnoise( int *status ) {
   int polar=0;              /* Flag for FFT in polar coordinates */
   int power=0;              /* Flag for squaring amplitude coeffs */
   size_t size;              /* Number of files in input group */
+  int wantnep = 0;          /* Do we want NEP image? else noise */
   smfWorkForce *wf = NULL;  /* Pointer to a pool of worker threads */
 
   /* Main routine */
@@ -176,7 +184,11 @@ void smurf_calcnoise( int *status ) {
   smf_grp_related( igrp, size, 1, 0, &maxconcat, &igroup,
                    &basegrp, status );
 
-  /* Get output file(s) */
+  /* NEP or Noise */
+  parGet0l( "NEP", &wantnep, status );
+
+  /* Get output file(s) - setting the prompt accordingly */
+  parPromt( "OUT", (wantnep ? "NEP images" : "Noise images"), status );
   size = grpGrpsz( basegrp, status );
   kpg1Wgndf( "OUT", basegrp, size, size, "More output files required...",
              &ogrp, &outsize, status );
@@ -212,9 +224,9 @@ void smurf_calcnoise( int *status ) {
         /* Apodize */
         smf_apodize(thedata, NULL, (thedata->dims)[2] / 2, status );
 
-        /* Create the output file */
-        smf_create_bolfile( ogrp, gcount, thedata, "Noise", SIPREFIX "A Hz**-0.5",
-                            &outdata, status );
+        /* Create the output file if required, else a malloced smfData */
+        smf_create_bolfile( (wantnep ? NULL : ogrp), gcount, thedata, "Noise",
+                            SIPREFIX "A Hz**-0.5", &outdata, status );
 
         smf_bolonoise( wf, thedata, NULL, 0, 0.5,
                        SMF__F_WHITELO, SMF__F_WHITEHI, 0,
@@ -224,6 +236,54 @@ void smurf_calcnoise( int *status ) {
         for (i = 0; i < (outdata->dims)[0]*(outdata->dims)[1]; i++) {
           double * od = (outdata->pntr)[0];
           if ( od[i] != VAL__BADD ) od[i] = sqrt( od[i] );
+        }
+
+        /* if an NEP is required we need a responsivity image from
+           the flatfield */
+        if (wantnep && *status == SAI__OK) {
+          smfDA *da = thedata->da;
+          smfData * nepdata = NULL;
+          size_t ngood;
+          smfData * respmap = NULL;
+
+          if (!da) {
+            *status = SAI__ERROR;
+            errRep( " ", "Attempting to calculate NEP image but no"
+                    " flatfield information available", status);
+          }
+
+          smf_create_bolfile( NULL, 1, thedata, "Responsivity", "A/W",
+                              &respmap, status );
+          if (*status == SAI__OK) {
+            ngood = smf_flat_responsivity( respmap, da->nflat, da->flatpar,
+                                           da->flatcal, status );
+          }
+          if (*status == SAI__OK && ngood == 0) {
+            *status = SAI__ERROR;
+            errRep( "", "No good responsivities found in flatfield."
+                    " Unable to calculate NEP", status );
+          }
+
+          /* now create the output image for NEP data */
+          smf_create_bolfile( ogrp, gcount, thedata, "NEP",
+                              "W Hz**-0.5", &nepdata, status );
+
+          /* and divide the noise data by the responsivity
+             correcting for SIMULT */
+          if (*status == SAI__OK) {
+            for (i = 0; i < (nepdata->dims)[0]*(nepdata->dims)[1]; i++) {
+              /* ignore variance since noise will not have any */
+              double * noise = (outdata->pntr)[0];
+              double * resp = (respmap->pntr)[0];
+              double * nep  = (nepdata->pntr)[0];
+              if (noise[i] == VAL__BADD || resp[i] == VAL__BADD) {
+                nep[i] = VAL__BADD;
+              } else {
+                nep[i] = (noise[i] / SIMULT) / resp[i];
+              }
+            }
+          }
+          smf_close_file( &nepdata, status );
         }
 
         smf_close_file( &outdata, status );

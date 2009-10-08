@@ -1197,13 +1197,22 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter nep {
+                type _LOGICAL
+                vpath DEFAULT
+                ppath CURRENT
+                prompt {Calculate NEP rather than noise?}
+                default FALSE
+                helpkey *
+            }
+
             parameter out {
                 position 2
                 type NDF
                 access WRITE
                 ppath DYNAMIC CURRENT
                 vpath {PROMPT }
-                prompt {Noise images}
+                prompt {Noise or NEP images}
                 helpkey *
             }
 
