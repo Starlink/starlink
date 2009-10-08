@@ -117,9 +117,9 @@ void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   size_t ndchisq=0;             /* number of elements contributing to dchisq */
   smfArray *noi=NULL;           /* Pointer to NOI at chunk */
   double *noi_data=NULL;        /* Pointer to DATA component of model */
-  dim_t noibstride;             /* bolo stride for noise */
+  size_t noibstride;            /* bolo stride for noise */
   dim_t nointslice;             /* number of time slices for noise */
-  dim_t noitstride;             /* Time stride for noise */
+  size_t noitstride;            /* Time stride for noise */
   dim_t ntslice=0;              /* Number of time slices */
   smfArray *qua=NULL;           /* Pointer to QUA at chunk */
   unsigned char *qua_data=NULL; /* Pointer to quality data */

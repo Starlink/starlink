@@ -122,9 +122,9 @@ void smf_calcmodel_dks( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   dim_t nmodel=0;               /* Total number of elements in model buffer */
   smfArray *noi=NULL;           /* Pointer to NOI at chunk */
   double *noi_data=NULL;        /* Pointer to DATA component of model */
-  dim_t noibstride;             /* bolo stride for noise */
+  size_t noibstride;            /* bolo stride for noise */
   dim_t nointslice;             /* number of time slices for noise */
-  dim_t noitstride;             /* Time stride for noise */
+  size_t noitstride;            /* Time stride for noise */
   dim_t nrow;                   /* Number of rows */
   dim_t ntslice=0;              /* Number of time slices */
   double *offsetbuf=NULL;       /* Array of offsets for all bolos in this col */
