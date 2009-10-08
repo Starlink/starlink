@@ -66,6 +66,8 @@
 *     2008-09-03 (TIMJ):
 *        Use GSL to fit a gradient directly rather than trying to calculate
 *        stats on the differences.
+*     2009-10-08 (TIMJ):
+*        WSH requests that responsivities are returned as positive numbers.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -157,7 +159,12 @@ size_t smf_flat_responsivity ( smfData *respmap, size_t nheat,
       gsl_fit_linear( powv, 1, bolv, 1, nrgood, &c0, &c1, &cov00, &cov01,
                       &cov11, &sumsq);
 
-      snr = fabs(c1) / sqrt( cov11 );
+      /* Wayne wants a positive responsivity. Dennis wants it to be
+         properly negative. */
+      c1 = fabs( c1 );
+
+      /* Calculate the signal to noise ratio */
+      snr = c1 / sqrt( cov11 );
 
       /* Nominal responsivity is -1.0e6 but we allow a bigger range
          through */
