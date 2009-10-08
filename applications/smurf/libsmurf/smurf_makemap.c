@@ -52,7 +52,7 @@
 *          there is no previous mask the closest following will be
 *          used. It is not an error for no mask to match. A NULL
 *          parameter indicates no mask files to be supplied. [!]
-*     CONFIG = GROUP (Read) 
+*     CONFIG = GROUP (Read)
 *          Specifies values for the configuration parameters used by the
 *          iterative map maker (METHOD=ITERATE). If the string "def"
 *          (case-insensitive) or a null (!) value is supplied, a set of
@@ -75,7 +75,7 @@
 *          Each individual setting should be of the form:
 *
 *             <keyword>=<value>
-*        
+*
 *          The parameters available for are listed in the "Configuration
 *          Parameters" sections below. Default values will be used for
 *          any unspecified parameters. Unrecognised options are ignored
@@ -125,11 +125,11 @@
 *          Input file(s)
 *     LBND( 2 ) = _INTEGER (Read)
 *          An array of values giving the lower pixel index bound on each
-*          spatial axis of the output NDF. The suggested default values 
+*          spatial axis of the output NDF. The suggested default values
 *          encompass all the input spatial information. []
 *     LBOUND( 2 ) = _INTEGER (Write)
 *          The lower pixel bounds of the output NDF. Note, values will be
-*          written to this output parameter even if a null value is supplied 
+*          written to this output parameter even if a null value is supplied
 *          for parameter OUT.
 *     MAXMEM = _INTEGER (Read)
 *          Maximum memory available for map-making in Mb
@@ -155,101 +155,101 @@
 *          The number of output tiles used to hold the entire output
 *          array (see parameter TILEDIMS). If no input data falls within
 *          a specified tile, then no output NDF will be created for the
-*          tile, but the tile will still be included in the tile numbering 
+*          tile, but the tile will still be included in the tile numbering
 *     OUT = NDF (Write)
 *          Output file
 *     OUTFILES = LITERAL (Write)
 *          The name of text file to create, in which to put the names of
 *          all the output NDFs created by this application via parameter
-*          OUT (one per line). If a null (!) value is supplied no file is 
+*          OUT (one per line). If a null (!) value is supplied no file is
 *          created. [!]
 *     PARAMS( 2 ) = _DOUBLE (Read)
 *          An optional array which consists of additional parameters
 *          required by the Sinc, SincSinc, SincCos, SincGauss, Somb,
 *          SombCos, and Gauss spreading methods (see parameter SPREAD).
-*	   
-*          PARAMS( 1 ) is required by all the above schemes. It is used to 
+*
+*          PARAMS( 1 ) is required by all the above schemes. It is used to
 *          specify how many pixels on either side of the output position
-*          (that is, the output position corresponding to the centre of the 
+*          (that is, the output position corresponding to the centre of the
 *          input pixel) are to receive contributions from the input pixel.
-*          Typically, a value of 2 is appropriate and the minimum allowed 
-*          value is 1 (i.e. one pixel on each side). A value of zero or 
-*          fewer indicates that a suitable number of pixels should be 
+*          Typically, a value of 2 is appropriate and the minimum allowed
+*          value is 1 (i.e. one pixel on each side). A value of zero or
+*          fewer indicates that a suitable number of pixels should be
 *          calculated automatically. [0]
-*	   
-*          PARAMS( 2 ) is required only by the SombCos, Gauss, SincSinc, 
+*
+*          PARAMS( 2 ) is required only by the SombCos, Gauss, SincSinc,
 *          SincCos, and SincGauss schemes.  For the SombCos, SincSinc, and
 *          SincCos schemes, it specifies the number of pixels at which the
 *          envelope of the function goes to zero.  The minimum value is
 *          1.0, and the run-time default value is 2.0.  For the Gauss and
 *          SincGauss scheme, it specifies the full-width at half-maximum
 *          (FWHM) of the Gaussian envelope.  The minimum value is 0.1, and
-*          the run-time default is 1.0.  On astronomical images and 
-*          spectra, good results are often obtained by approximately 
+*          the run-time default is 1.0.  On astronomical images and
+*          spectra, good results are often obtained by approximately
 *          matching the FWHM of the envelope function, given by PARAMS(2),
 *          to the point-spread function of the input data.
 *     PIXSIZE( 2 ) = _REAL (Read)
-*          Pixel dimensions in the output image, in arcsec. If only one value 
+*          Pixel dimensions in the output image, in arcsec. If only one value
 *          is supplied, the same value will be used for both axes.
 *     REF = NDF (Read)
 *          An existing NDF that is to be used to define the output grid.
-*          If supplied, the output grid will be aligned with the supplied 
+*          If supplied, the output grid will be aligned with the supplied
 *          reference NDF. The reference can be either 2D or 3D and the spatial
-*          frame will be extracted. If a null (!) value is supplied then the 
+*          frame will be extracted. If a null (!) value is supplied then the
 *          output grid is determined by parameters REFLON, REFLAT, etc. [!]
 *     REFLAT = LITERAL (Read)
-*          The formatted celestial latitude value at the tangent point of 
-*          the spatial projection in the output cube. This should be provided 
-*          in the system specified by parameter SYSTEM. 
+*          The formatted celestial latitude value at the tangent point of
+*          the spatial projection in the output cube. This should be provided
+*          in the system specified by parameter SYSTEM.
 *     REFLON = LITERAL (Read)
-*          The formatted celestial longitude value at the tangent point of 
-*          the spatial projection in the output cube. This should be provided 
-*          in the system specified by parameter SYSTEM. 
+*          The formatted celestial longitude value at the tangent point of
+*          the spatial projection in the output cube. This should be provided
+*          in the system specified by parameter SYSTEM.
 *     SPREAD = LITERAL (Read)
 *          The method to use when spreading each input pixel value out
-*          between a group of neighbouring output pixels. If SPARSE is set 
+*          between a group of neighbouring output pixels. If SPARSE is set
 *          TRUE, then SPREAD is not accessed and a value of "Nearest" is
 *          always assumed. SPREAD can take the following values:
-*	   
-*          - "Linear" -- The input pixel value is divided bi-linearly between 
-*          the four nearest output pixels.  Produces smoother output NDFs than 
+*
+*          - "Linear" -- The input pixel value is divided bi-linearly between
+*          the four nearest output pixels.  Produces smoother output NDFs than
 *          the nearest-neighbour scheme.
-*	   
+*
 *          - "Nearest" -- The input pixel value is assigned completely to the
 *          single nearest output pixel. This scheme is much faster than any
-*          of the others. 
-*	   
+*          of the others.
+*
 *          - "Sinc" -- Uses the sinc(pi*x) kernel, where x is the pixel
 *          offset from the interpolation point (resampling) or transformed
-*          input pixel centre (rebinning), and sinc(z)=sin(z)/z.  Use of 
+*          input pixel centre (rebinning), and sinc(z)=sin(z)/z.  Use of
 *          this scheme is not recommended.
-*	   
+*
 *          - "SincSinc" -- Uses the sinc(pi*x)sinc(k*pi*x) kernel. A
 *          valuable general-purpose scheme, intermediate in its visual
 *          effect on NDFs between the bi-linear and nearest-neighbour
-*          schemes. 
-*	   
+*          schemes.
+*
 *          - "SincCos" -- Uses the sinc(pi*x)cos(k*pi*x) kernel.  Gives
 *          similar results to the "Sincsinc" scheme.
-*	   
-*          - "SincGauss" -- Uses the sinc(pi*x)exp(-k*x*x) kernel.  Good 
+*
+*          - "SincGauss" -- Uses the sinc(pi*x)exp(-k*x*x) kernel.  Good
 *          results can be obtained by matching the FWHM of the
 *          envelope function to the point-spread function of the
 *          input data (see parameter PARAMS).
-*	   
+*
 *          - "Somb" -- Uses the somb(pi*x) kernel, where x is the pixel
-*          offset from the transformed input pixel centre, and 
-*          somb(z)=2*J1(z)/z (J1 is the first-order Bessel function of the 
+*          offset from the transformed input pixel centre, and
+*          somb(z)=2*J1(z)/z (J1 is the first-order Bessel function of the
 *          first kind.  This scheme is similar to the "Sinc" scheme.
-*	   
+*
 *          - "SombCos" -- Uses the somb(pi*x)cos(k*pi*x) kernel.  This
 *          scheme is similar to the "SincCos" scheme.
-*	   
-*          - "Gauss" -- Uses the exp(-k*x*x) kernel. The FWHM of the Gaussian 
-*          is given by parameter PARAMS(2), and the point at which to truncate 
+*
+*          - "Gauss" -- Uses the exp(-k*x*x) kernel. The FWHM of the Gaussian
+*          is given by parameter PARAMS(2), and the point at which to truncate
 *          the Gaussian to zero is given by parameter PARAMS(1).
-*	   
-*          For further details of these schemes, see the descriptions of 
+*
+*          For further details of these schemes, see the descriptions of
 *          routine AST_REBINx in SUN/211. ["Nearest"]
 *     SYSTEM = LITERAL (Read)
 *          The celestial coordinate system for the output cube. One of
@@ -258,13 +258,13 @@
 *          system used will be which ever system was used as the tracking
 *          system during in the observation.
 *
-*          The choice of system also determines if the telescope is 
-*          considered to be tracking a moving object such as a planet or 
+*          The choice of system also determines if the telescope is
+*          considered to be tracking a moving object such as a planet or
 *          asteroid. If system is GAPPT or AZEL, then each time slice in
 *          the input data will be shifted in order to put the base
 *          telescope position (given by TCS_AZ_BC1/2 in the JCMTSTATE
 *          extension of the input NDF) at the same pixel position that it
-*          had for the first time slice. For any other system, no such 
+*          had for the first time slice. For any other system, no such
 *          shifts are applied, even if the base telescope position is
 *          changing through the observation. [TRACKING]
 *     TILEBORDER = _INTEGER (Read)
@@ -272,57 +272,57 @@
 *          TILEDIMS. It gives the width, in pixels, of a border to add to
 *          each output tile. These borders contain data from the adjacent
 *          tile. This results in an overlap between adjacent tiles equal to
-*          twice the supplied border width. If the default value of zero 
+*          twice the supplied border width. If the default value of zero
 *          is accepted, then output tiles will abut each other in pixel
 *          space without any overlap. If a non-zero value is supplied,
-*          then each pair of adjacent tiles will overlap by twice the 
+*          then each pair of adjacent tiles will overlap by twice the
 *          given number of pixels. Pixels within the overlap border will
 *          be given a quality name of "BORDER" (see KAPPA:SHOWQUAL). [0]
 *     TILEDIMS( 2 ) = _INTEGER (Read)
-*          For large data sets, it may sometimes be beneficial to break 
-*          the output array up into a number of smaller rectangular tiles, 
-*          each created separately and stored in a separate output NDF. This 
-*          can be accomplished by supplying non-null values for the TILEDIMS 
-*          parameter. If supplied, these values give the nominal spatial size 
-*          of each output tile, in pixels. Edge tiles may be thinner if the 
+*          For large data sets, it may sometimes be beneficial to break
+*          the output array up into a number of smaller rectangular tiles,
+*          each created separately and stored in a separate output NDF. This
+*          can be accomplished by supplying non-null values for the TILEDIMS
+*          parameter. If supplied, these values give the nominal spatial size
+*          of each output tile, in pixels. Edge tiles may be thinner if the
 *          TRIMTILES parameter is set TRUE. In order to avoid creating very thin
-*          tiles around the edges, the actual tile size used for the edge tiles 
-*          may be up to 10 % larger than the supplied value. This creation of 
-*          "fat" edge tiles may be prevented by supplying a negative value for 
-*          the tile size, in which case edge tiles will never be wider than 
-*          the supplied absolute value. 
+*          tiles around the edges, the actual tile size used for the edge tiles
+*          may be up to 10 % larger than the supplied value. This creation of
+*          "fat" edge tiles may be prevented by supplying a negative value for
+*          the tile size, in which case edge tiles will never be wider than
+*          the supplied absolute value.
 *
-*          If only one value is supplied, the supplied value is duplicated to 
-*          create square tiles. Tiles are created in a raster fashion, from 
-*          bottom left to top right of the spatial extent. The NDF file name 
-*          specified by "out" is modified for each tile by appending "_<N>" 
-*          to the end of it, where <N> is the integer tile index (starting at 
-*          1). The number of tiles used to cover the entire output array is  
-*          written to output parameter NTILES. The tiles all share the same 
-*          projection and so can be simply pasted together in pixel 
-*          coordinates to reconstruct the full size output array. The tiles 
-*          are centred so that the reference position (given by REFLON and 
+*          If only one value is supplied, the supplied value is duplicated to
+*          create square tiles. Tiles are created in a raster fashion, from
+*          bottom left to top right of the spatial extent. The NDF file name
+*          specified by "out" is modified for each tile by appending "_<N>"
+*          to the end of it, where <N> is the integer tile index (starting at
+*          1). The number of tiles used to cover the entire output array is
+*          written to output parameter NTILES. The tiles all share the same
+*          projection and so can be simply pasted together in pixel
+*          coordinates to reconstruct the full size output array. The tiles
+*          are centred so that the reference position (given by REFLON and
 *          REFLAT) falls at the centre of a tile. If a tile receives no
-*          input data, then no corresponding output NDF is created, but 
-*          the tile is still included in the tile numbering scheme. If a 
-*          null (!) value is supplied for TILEDIMS, then the 
-*          entire output array is created as a single tile and stored in 
-*          a single output NDF with the name given by parameter OUT 
+*          input data, then no corresponding output NDF is created, but
+*          the tile is still included in the tile numbering scheme. If a
+*          null (!) value is supplied for TILEDIMS, then the
+*          entire output array is created as a single tile and stored in
+*          a single output NDF with the name given by parameter OUT
 *          (without any "_<N>" appendix). [!]
 *     TRIMTILES = _LOGICAL (Read)
 *          Only accessed if the output is being split up into more than
-*          one spatial tile (see parameter TILEDIMS). If TRUE, then the 
-*          tiles around the border will be trimmed to exclude areas that 
+*          one spatial tile (see parameter TILEDIMS). If TRUE, then the
+*          tiles around the border will be trimmed to exclude areas that
 *          fall outside the bounds of the full sized output array. This
-*          will result in the border tiles being smaller than the central 
+*          will result in the border tiles being smaller than the central
 *          tiles. [FALSE]
 *     UBND( 2 ) = _INTEGER (Read)
 *          An array of values giving the upper pixel index bound on each
-*          spatial axis of the output NDF. The suggested default values 
+*          spatial axis of the output NDF. The suggested default values
 *          encompass all the input spatial information. []
 *     UBOUND( 2 ) = _INTEGER (Write)
 *          The upper pixel bounds of the output NDF. Note, values will be
-*          written to this output parameter even if a null value is supplied 
+*          written to this output parameter even if a null value is supplied
 *          for parameter OUT.
 
 *  Configuration Parameters:
@@ -330,7 +330,7 @@
 *     *** General parameters controlling iterative map-maker ***
 *
 *     NUMITER = INTEGER
-*       A positive value if a set number of iterations are desired. A 
+*       A positive value if a set number of iterations are desired. A
 *       negative number indicates the maximum number of iterations allowed if
 *       CHITOL is being used for the stopping criterion.
 *     CHITOL = REAL
@@ -356,9 +356,9 @@
 *     MAXLEN = REAL
 *       Maximum number of seconds of data to be loaded at once if MEMITER=1.
 *     MODELORDER( ) = STRING
-*       An ordered list of model components to be fit by the iterative 
+*       An ordered list of model components to be fit by the iterative
 *       map-maker, e.g. "(com,gai,ext,ast,flt,noi)". Each component has a
-*       three-character abbreviation. The following components may be 
+*       three-character abbreviation. The following components may be
 *       specified:
 *         dks = fit and remove dark squid for the column
 *         com = remove common-mode signal
@@ -425,7 +425,7 @@
 *     *** The following parameters control calculation of model components ***
 *
 *     COM.BOXCAR = INTEGER
-*       If COM model component specified, boxcar smooth by this number of 
+*       If COM model component specified, boxcar smooth by this number of
 *       samples before removing it.
 *     COM.BOXFACT = REAL
 *       If specified, reduce length of boxcar filter after each iteration by
@@ -434,7 +434,7 @@
 *       If COM.BOXFACT specified, this value is the minimum boxcar filter length
 *       in samples.
 *     DKS.BOXCAR = INTEGER
-*       If DKS (dark squid) model component requested, boxcar dark squid 
+*       If DKS (dark squid) model component requested, boxcar dark squid
 *       signal by this many samples before fitting/removing from each detector
 *       in the same column.
 *     NOI.SPIKETHRESH = REAL
@@ -462,7 +462,7 @@
 *       than doing it once at the beginning as a pre-processing step. See
 *       FILT_ NOTCHLOW.
 *     EXT.TAUSRC = STRING
-*       As with EXTINCTION task, specify source of optical depth data: 
+*       As with EXTINCTION task, specify source of optical depth data:
 *          - WVMRAW    - use the water vapour monitor time series data
 *          - CSOTAU    - use a single 225GHz tau value
 *          - FILTERTAU - use a single tau value for this wavelength
@@ -518,7 +518,7 @@
 *     2005-09-27 (EC):
 *        Clone from smurf_extinction
 *     2005-12-16 (EC):
-*        Working for simple test case with astRebinSeq 
+*        Working for simple test case with astRebinSeq
 *     2006-01-04 (EC):
 *        Properly setting rebinflags
 *     2006-01-13 (EC):
@@ -628,7 +628,7 @@
 *     2008-05-03 (EC):
 *        - In provenance loop for iterate use READ instead of UPDATE
 *     2008-05-14 (EC):
-*        Added projection functionality cloned from smurf_makecube. See 
+*        Added projection functionality cloned from smurf_makecube. See
 *        ADAM parameters: PIXSIZE, REFLAT, REFLON, [L/U]BND/BOUND.
 *     2008-05-15 (EC):
 *        - Trap SMF__NOMEM from smf_checkmem_map; request new [L/U]BND
@@ -845,7 +845,7 @@ void smurf_makemap( int *status ) {
   /* Main routine */
   ndfBegin();
 
-  /* Find the number of cores/processors available and create a pool of 
+  /* Find the number of cores/processors available and create a pool of
      threads of the same size. */
   wf = smf_create_workforce( smf_get_nthread( status ), status );
 
@@ -892,26 +892,26 @@ void smurf_makemap( int *status ) {
     rebin = 0;
     iterate = 1;
   }
-  
+
   /* Get remaining parameters so errors are caught early */
   if( rebin ) {
     /* Obtain desired pixel-spreading scheme */
     parChoic( "SPREAD", "NEAREST", "NEAREST,LINEAR,SINC,"
-              "SINCSINC,SINCCOS,SINCGAUSS,SOMB,SOMBCOS,GAUSS", 
+              "SINCSINC,SINCCOS,SINCGAUSS,SOMB,SOMBCOS,GAUSS",
               1, pabuf, 10, status );
-    
+
     smf_get_spread( pabuf, &spread, &nparam, status );
-    
+
     /* Get an additional parameter vector if required. */
     if( nparam>0 ) {
       parExacd( "PARAMS", nparam, params, status );
     }
-    
+
   } else if ( iterate ) {
     /* Read a group of configuration settings into keymap */
     kpg1Gtgrp( "CONFIG", &confgrp, &ksize, status );
     kpg1Kymap( confgrp, &keymap, status );
-    if( confgrp ) grpDelet( &confgrp, status );      
+    if( confgrp ) grpDelet( &confgrp, status );
   }
 
   /* Calculate the map bounds */
@@ -934,14 +934,14 @@ void smurf_makemap( int *status ) {
   msgOutif( MSG__DEBUG, " ", "Mapbounds took ^TDIFF s", status);
 
   /* Write WCS bounds */
-  smf_store_outputbounds(1, lbnd_out, ubnd_out, outfset, NULL, NULL, 
+  smf_store_outputbounds(1, lbnd_out, ubnd_out, outfset, NULL, NULL,
                          status);
   msgBlank( status );
 
   /* See if the output is to be split up into a number of separate tiles,
      each one being stored in a separate output NDF. If a null value is
-     supplied for TILEDIMS, annul the error and retain the original NULL 
-     pointer for the array of tile structures (this is used as a flag that 
+     supplied for TILEDIMS, annul the error and retain the original NULL
+     pointer for the array of tile structures (this is used as a flag that
      the entire output grid should be stored in a single output NDF). */
 
   if( *status == SAI__OK ) {
@@ -952,7 +952,7 @@ void smurf_makemap( int *status ) {
       parGet0l( "TRIMTILES", &trimtiles, status );
       parGet0i( "TILEBORDER", &tileborder, status );
       if( nval == 1 ) tiledims[ 1 ] = tiledims[ 0 ];
-      tiles = smf_choosetiles( igrp, size, lbnd_out, ubnd_out, boxes, 
+      tiles = smf_choosetiles( igrp, size, lbnd_out, ubnd_out, boxes,
                                spread, params, outfset, tiledims,
                                trimtiles, tileborder, &ntile, status );
     }
@@ -961,22 +961,22 @@ void smurf_makemap( int *status ) {
   /* If we are not splitting the output up into tiles, then create an array
      containing a single tile description that encompasses the entire full
      size output grid. */
-  
+
   if( !tiles ) {
     tiledims[ 0 ] = 0;
-    tiles = smf_choosetiles( igrp, size, lbnd_out, ubnd_out, boxes, 
-                             spread, params, outfset, tiledims, 
+    tiles = smf_choosetiles( igrp, size, lbnd_out, ubnd_out, boxes,
+                             spread, params, outfset, tiledims,
                              0, 0, &ntile, status );
   }
 
   /* Write the number of tiles being created to an output parameter. */
   parPut0i( "NTILE", ntile, status );
-  
+
   /* Output the pixel bounds of the full size output array (not of an
      individual tile). */
   parPut1i( "LBOUND", 2, lbnd_out, status );
   parPut1i( "UBOUND", 2, ubnd_out, status );
-  
+
   if ( moving ) {
     msgOutif(MSG__VERB, " ", "Tracking a moving object", status);
   } else {
@@ -1072,7 +1072,7 @@ void smurf_makemap( int *status ) {
       /* Invert the output sky mapping so that it goes from sky to pixel
          coords. */
       astInvert( tskymap );
-   
+
       /* Store the initial number of pixels per spatial plane in the output tile. */
       nxy = ( tile->eubnd[ 0 ] - tile->elbnd[ 0 ] + 1 )*
             ( tile->eubnd[ 1 ] - tile->elbnd[ 1 ] + 1 );
@@ -1086,7 +1086,7 @@ void smurf_makemap( int *status ) {
       /* Create the 2D output NDF for this tile. */
       smfflags = 0;
       smfflags |= SMF__MAP_VAR;
-      smf_open_newfile ( ogrp, iout++, SMF__DOUBLE, 2, tile->elbnd, tile->eubnd, 
+      smf_open_newfile ( ogrp, iout++, SMF__DOUBLE, 2, tile->elbnd, tile->eubnd,
                          smfflags, &odata, status );
 
       /* Abort if an error has occurred. */
@@ -1128,9 +1128,9 @@ void smurf_makemap( int *status ) {
       /* Each worker thread needs its own output array. This is needed since
          otherwise different threads may attempt to write to the same output
          pixel at the same time. We create a 3D array now in which the
-         first 2 axes match the 2D output NDF dimensions, and the third axis 
-         has dimension equal to the number of worker threads. Once the 
-         rebinning is complete, these multiple output arrays are combined 
+         first 2 axes match the 2D output NDF dimensions, and the third axis
+         has dimension equal to the number of worker threads. Once the
+         rebinning is complete, these multiple output arrays are combined
          into one, and copied into the output NDF. */
       if( wf->nworker > 1 ) {
          map = smf_malloc( nxy*wf->nworker, sizeof(double), 0, status);
@@ -1141,7 +1141,7 @@ void smurf_makemap( int *status ) {
       }
 
       /* Simple Regrid of the data */
-      msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Make map using REBIN method", 
+      msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Make map using REBIN method",
                status);
 
       /* Find the last input file that contributes to the current output tile
@@ -1156,12 +1156,12 @@ void smurf_makemap( int *status ) {
         }
       }
 
-      /* Loop round all the input files that overlap this tile, pasting each one 
+      /* Loop round all the input files that overlap this tile, pasting each one
          into the output NDF. */
       first = 1;
       for( ifile = 1; ifile <= tile->size && *status == SAI__OK; ifile++ ) {
 
-        /* Get the zero-based index of the current input file (ifile) within the 
+        /* Get the zero-based index of the current input file (ifile) within the
            group of input NDFs (igrp). */
         jin = ( tile->jndf ) ? tile->jndf[ ifile - 1 ] : ifile - 1;
 
@@ -1172,9 +1172,9 @@ void smurf_makemap( int *status ) {
         pt = ptime ?  ptime[ jin ][ ipbin ] : NULL;
         if( !pt || pt[ 0 ] < VAL__MAXI ) {
 
-          /* Read data from the ith input file in the group */      
+          /* Read data from the ith input file in the group */
           smf_open_and_flatfield( tile->grp, NULL, ifile, darks, &data,
-                                  status ); 
+                                  status );
 
           /* Check that the data dimensions are 3 (for time ordered data) */
           if( *status == SAI__OK ) {
@@ -1182,20 +1182,20 @@ void smurf_makemap( int *status ) {
               msgSeti("I",ifile);
               msgSeti("THEDIMS", data->ndims);
               *status = SAI__ERROR;
-              errRep(FUNC_NAME, 
-                     "File ^I data has ^THEDIMS dimensions, should be 3.", 
+              errRep(FUNC_NAME,
+                     "File ^I data has ^THEDIMS dimensions, should be 3.",
                      status);
               break;
             }
           }
-      
+
           /* Check that the input data type is double precision */
           if( *status == SAI__OK ) {
             if( data->dtype != SMF__DOUBLE) {
               msgSeti("I",ifile);
               msgSetc("DTYPE", smf_dtype_string( data, status ));
               *status = SAI__ERROR;
-              errRep(FUNC_NAME, 
+              errRep(FUNC_NAME,
                      "File ^I has ^DTYPE data type, should be DOUBLE.",
                      status);
               break;
@@ -1234,11 +1234,11 @@ void smurf_makemap( int *status ) {
           /* Rebin the data onto the output grid. This also closes the
              data file.  */
           smf_rebinmap( wf, data, NULL, (first ? 1 : ifile), ilast, wcstile2d,
-                        spread, params, moving, 1, tile->elbnd, tile->eubnd, 
+                        spread, params, moving, 1, tile->elbnd, tile->eubnd,
                         map, variance, weights3d, &nused, status );
           first = 0;
           blank = 0;
-      
+
           /* Break out of loop over data files if bad status */
           if (*status != SAI__OK) {
             errRep(FUNC_NAME, "Rebinning step failed", status);
@@ -1249,9 +1249,9 @@ void smurf_makemap( int *status ) {
     L999:
 
    /* Wait untill all jobs have finished. If an error has occurred we may
-      have aborted the above loop early leaving some threads still running. 
+      have aborted the above loop early leaving some threads still running.
       If we close down all NDFs now, etc, we may pull the carpet out from
-      underneath these running threds, resulting in them suffering a 
+      underneath these running threds, resulting in them suffering a
       segmentation fault. */
       smf_wait( wf, status );
 
@@ -1319,9 +1319,9 @@ void smurf_makemap( int *status ) {
 
       /* Store the keywords holding the number of tiles generated and the index
          of the current tile. */
-      atlPtfti( fchan, "NUMTILES", ntile, 
+      atlPtfti( fchan, "NUMTILES", ntile,
                 "No. of tiles covering the field", status );
-      atlPtfti( fchan, "TILENUM", itile, 
+      atlPtfti( fchan, "TILENUM", itile,
                 "Index of this tile (1->NUMTILES)", status );
 
       /* If the FitsChan is not empty, store it in the FITS extension of the
@@ -1333,7 +1333,7 @@ void smurf_makemap( int *status ) {
 
       /* For each open output NDF (the main tile NDF, and any extension NDFs),
          first clone the NDF identifier, then close the file (which will unmap
-         the NDF arrays), and then reshape the NDF to exclude the boundary 
+         the NDF arrays), and then reshape the NDF to exclude the boundary
          that was added to the tile to avoid edge effects. */
       msgOutif( MSG__VERB, " ", "Reshaping output NDFs", status );
       smf_reshapendf( &tdata, tile, status );
@@ -1375,7 +1375,7 @@ void smurf_makemap( int *status ) {
 
     smfflags = 0;
     smfflags |= SMF__MAP_VAR;
-    smf_open_newfile ( ogrp, 1, SMF__DOUBLE, 2, lbnd_out, ubnd_out, smfflags, 
+    smf_open_newfile ( ogrp, 1, SMF__DOUBLE, 2, lbnd_out, ubnd_out, smfflags,
                        &odata, status );
 
     if ( *status == SAI__OK ) {
@@ -1413,21 +1413,21 @@ void smurf_makemap( int *status ) {
     datAnnul( &smurfloc, status );
 
     /* Iterative map-maker */
-    msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Make map using ITERATE method", 
+    msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Make map using ITERATE method",
              status);
 
     /* Allocate space for hitsmap */
     hitsmap = smf_malloc( nxy, sizeof (int), 1, status);
 
     /* Loop over all input data files to setup provenance handling */
-    for(i=1; (i<=size) && ( *status == SAI__OK ); i++ ) {	
+    for(i=1; (i<=size) && ( *status == SAI__OK ); i++ ) {
       smf_open_file( igrp, i, "READ", SMF__NOCREATE_DATA, &data, status );
       if( *status != SAI__OK) {
         msgSeti("I",i);
         msgSeti("S",size);
         errRep(FUNC_NAME, "Error opening input file ^I of ^S for provenance tracking", status);
       }
-        
+
       /* Store steptime for calculating EXP_TIME */
       if ( i==1 ) {
         steptime = data->hdr->steptime;
@@ -1449,8 +1449,8 @@ void smurf_makemap( int *status ) {
     }
 
     /* Call the low-level iterative map-maker */
-    smf_iteratemap( wf, igrp, keymap, darks, bpms, outfset, moving, lbnd_out, 
-                    ubnd_out, maxmem-mapmem, map, hitsmap, variance, weights, 
+    smf_iteratemap( wf, igrp, keymap, darks, bpms, outfset, moving, lbnd_out,
+                    ubnd_out, maxmem-mapmem, map, hitsmap, variance, weights,
                     status );
 
     /* Calculate exposure time per output pixel from hitsmap */
@@ -1506,7 +1506,7 @@ void smurf_makemap( int *status ) {
     smf_close_file ( &tdata, status );
     smf_close_file ( &wdata, status );
     smf_close_file ( &odata, status );
-    
+
   } else {
     /* no idea what mode */
     if (*status == SAI__OK) {
@@ -1531,7 +1531,7 @@ void smurf_makemap( int *status ) {
   if( keymap ) keymap = astAnnul( keymap );
 
   ndfEnd( status );
-  
+
   if( *status == SAI__OK ) {
     msgOutif(MSG__VERB," ","MAKEMAP succeeded, map written.", status);
   } else {
