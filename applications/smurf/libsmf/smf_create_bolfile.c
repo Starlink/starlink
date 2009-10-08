@@ -4,7 +4,7 @@
 *     smf_create_bolfile
 
 *  Purpose:
-*     Create a file on disk and map it for use as a bolometer map
+*     Create bolometer shaped 2D smfData, either malloced or on disk
 
 *  Language:
 *     Starlink ANSI C
@@ -13,16 +13,17 @@
 *     C function
 
 *  Invocation:
-*     void smf_create_bolfile( const Grp * rgrp, size_t index,
+*     void smf_create_bolfile( const Grp * bgrp, size_t index,
 *               const smfData* refdata, const char * datalabel,
-*               const char * units, smfData **respmap,
+*               const char * units, smfData **bolmap,
 *               int *status );
 
 *  Arguments:
-*     rgrp = const Grp * (Given)
-*        Group containing the relevant file name.
+*     bgrp = const Grp * (Given)
+*        Group containing the relevant file name. If NULL no file
+*        is created and the smfData is malloced.
 *     index = size_t (Given)
-*        Index into rgrp.
+*        Index into bgrp.
 *     refdata = const smfData* (Given)
 *        Reference smfData. Dimensionality, sub array information and
 *        FITS header are obtained from this.
@@ -35,9 +36,10 @@
 *        Pointer to global status.
 
 *  Description:
-*     Create a file on disk with the correct metadata for a 2d bolometer map.
-*     The file is mapped for WRITE and is ready to receive the data. Useful for
-*     responsivity images and noise data.
+*     Create a smfData with the correct metadata for a 2d bolometer map.
+*     The smfData will either be associated with a file and mapped for WRITE
+*     access ready to receive data, or else, if no Grp is supplied it will be
+*     malloced. Useful for responsivity images and noise data.
 
 *  Authors:
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -50,6 +52,8 @@
 *        smf_construct_smfHead API tweak
 *     2009-10-05 (TIMJ):
 *        Rename to use for noise files as well as responsivity images.
+*     2009-10-08 (TIMJ):
+*        Use malloc if the input group is null
 
 *  Notes:
 *     - Does not propogate provenance or history from refdata.
@@ -88,26 +92,49 @@
 #include "ast.h"
 #include "star/one.h"
 
-void smf_create_bolfile( const Grp * rgrp, size_t index,
+void smf_create_bolfile( const Grp * bgrp, size_t index,
                          const smfData* refdata, const char *datalabel,
-                         const char *units,  smfData **respmap,
+                         const char *units,  smfData **bolmap,
                          int *status ) {
 
   int lbnd[2];
   int ubnd[2];
 
-  *respmap = NULL;
+  *bolmap = NULL;
   if (*status != SAI__OK) return;
 
-  /* create the file for WRITE access */
+  /* Calculate bounds */
   lbnd[SC2STORE__ROW_INDEX] = (refdata->lbnd)[SC2STORE__ROW_INDEX];
   lbnd[SC2STORE__COL_INDEX] = (refdata->lbnd)[SC2STORE__COL_INDEX];
   ubnd[SC2STORE__ROW_INDEX] = lbnd[SC2STORE__ROW_INDEX] +
           (refdata->dims)[SC2STORE__ROW_INDEX] - 1;
   ubnd[SC2STORE__COL_INDEX] = lbnd[SC2STORE__ROW_INDEX] +
           (refdata->dims)[SC2STORE__COL_INDEX] - 1;
-  smf_open_newfile( rgrp, index, SMF__DOUBLE, 2, lbnd, ubnd,
-                    SMF__MAP_VAR, respmap, status );
+
+  /* either create the file or use malloc */
+  if (bgrp) {
+    /* create the file for WRITE access */
+    smf_open_newfile( bgrp, index, SMF__DOUBLE, 2, lbnd, ubnd,
+                      SMF__MAP_VAR, bolmap, status );
+  } else {
+    void *pntr[] = {NULL, NULL, NULL};
+    dim_t mydims[2];
+    dim_t mylbnd[2];
+    size_t nbols;
+
+    mylbnd[0] = lbnd[0];
+    mylbnd[1] = lbnd[1];
+    mydims[SC2STORE__ROW_INDEX] = (refdata->dims)[SC2STORE__ROW_INDEX];
+    mydims[SC2STORE__COL_INDEX] = (refdata->dims)[SC2STORE__COL_INDEX];
+    nbols = mydims[SC2STORE__ROW_INDEX] * mydims[SC2STORE__COL_INDEX];
+
+    pntr[0] = smf_malloc( nbols, sizeof(double), 0, status );
+    pntr[1] = smf_malloc( nbols, sizeof(double), 0, status );
+
+    *bolmap = smf_construct_smfData( NULL, NULL, NULL, NULL, SMF__DOUBLE,
+                                     pntr, 0, mydims, mylbnd, 2, 0, 0, NULL,
+                                     NULL, status );
+  }
 
   /* add some niceties - propagate some information from the first measurement */
   if (*status == SAI__OK) {
@@ -115,9 +142,6 @@ void smf_create_bolfile( const Grp * rgrp, size_t index,
     int subnum;                /* subarray number */
     char buffer[30];
     AstFrameSet *wcs = NULL;
-
-    /* write the FITS header */
-    kpgPtfts( (*respmap)->file->ndfid, refdata->hdr->fitshdr, status );
 
     /* Subarray information */
     smf_find_subarray( refdata->hdr, subarray, sizeof(subarray), &subnum, status );
@@ -127,18 +151,24 @@ void smf_create_bolfile( const Grp * rgrp, size_t index,
       one_strlcat( buffer, datalabel, sizeof(buffer), status );
     }
 
-    (*respmap)->hdr = smf_construct_smfHead( NULL, refdata->hdr->instrument,
-                                             NULL, NULL, NULL, NULL, 0, refdata->hdr->instap, 1,
+    /* create frame for focal plane coordinates. Should really extract it from the
+     refdata WCS rather than attempting to reconstruct. */
+    sc2ast_createwcs( subnum, NULL, NULL, NULL, &wcs, status );
+
+    (*bolmap)->hdr = smf_construct_smfHead( NULL, refdata->hdr->instrument,
+                                             wcs, astCopy( refdata->hdr->fitshdr ),
+                                             NULL, NULL, 0, refdata->hdr->instap, 1,
                                              refdata->hdr->steptime, refdata->hdr->obsmode,
                                              refdata->hdr->swmode, refdata->hdr->obstype, 0, NULL, NULL,
                                              NULL, NULL, 0, NULL, buffer, datalabel,
                                              units, refdata->hdr->telpos, NULL, status );
-    smf_write_clabels( *respmap, status );
 
-    /* create frame for focal plane coordinates. Should really extract it from the
-     refdata WCS rather than attempting to reconstruct. */
-    sc2ast_createwcs( subnum, NULL, NULL, NULL, &wcs, status );
-    ndfPtwcs( wcs, (*respmap)->file->ndfid, status );
+    /* write WCS and FITS information to file and sync other information */
+    if (bgrp) {
+      kpgPtfts( (*bolmap)->file->ndfid, refdata->hdr->fitshdr, status );
+      ndfPtwcs( wcs, (*bolmap)->file->ndfid, status );
+      smf_write_clabels( *bolmap, status );
+    }
   }
 
 }

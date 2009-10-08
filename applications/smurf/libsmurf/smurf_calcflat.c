@@ -391,27 +391,14 @@ void smurf_calcflat( int *status ) {
 
       kpg1Wgndf( "RESP", NULL, 1, 1, "", &rgrp, &rsize, status );
 
-      if (*status == SAI__OK) {
-        /* Create the file on disk (units will normalise so no need for prefix) */
-        smf_create_bolfile( rgrp, 1, refdata, "Responsivity",
-                            "A/W", &respmap, status );
-      } else if (*status == PAR__NULL) {
-        void *pntr[] = {NULL, NULL, NULL};
-        dim_t mydims[2];
-        dim_t lbnd[2];
+      if (*status == PAR__NULL) {
+        rgrp = NULL;
         errAnnul( status );
-        mydims[SC2STORE__ROW_INDEX] = nrows;
-        mydims[SC2STORE__COL_INDEX] = ncols;
-
-        pntr[0] = smf_malloc( nbols, sizeof(double), 0, status );
-        pntr[1] = smf_malloc( nbols, sizeof(double), 0, status );
-        lbnd[SC2STORE__ROW_INDEX] = (refdata->lbnd)[SC2STORE__ROW_INDEX];
-        lbnd[SC2STORE__COL_INDEX] = (refdata->lbnd)[SC2STORE__COL_INDEX];
-
-        respmap = smf_construct_smfData( NULL, NULL, NULL, NULL, SMF__DOUBLE,
-                                         pntr, 0, mydims, lbnd, 2, 0, 0, NULL,
-                                         NULL, status );
       }
+      /* Create the file on disk or malloc it as required.
+         (units will normalise so no need for prefix) */
+      smf_create_bolfile( rgrp, 1, refdata, "Responsivity",
+                          "A/W", &respmap, status );
       if (rgrp) grpDelet( &rgrp, status );
     }
 
