@@ -150,6 +150,11 @@ void smf_flat_write( const char * flatname, const smfArray * bbhtframes,
   rowsize = (frame->dims)[SC2STORE__COL_INDEX];
   numbols = colsize * rowsize;
 
+  /* Make sure we have a FLAT header that reflects this file
+     as the flatfield solution */
+  smf_fits_updateS( frame->hdr, "FLAT", flatname, "Name of flat-field file",
+                    status );
+
   /* Create a FITS header for DA */
   smf_fits_export2DA( frame->hdr->fitshdr, &ncards, fitsrec, status );
 
