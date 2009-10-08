@@ -10,6 +10,7 @@ smurf_calcdark.c \
 smurf_calcflat.c \
 smurf_calcnoise.c \
 smurf_calcresp.c \
+smurf_copyflat.c \
 smurf_dreamsolve.c \
 smurf_dreamweights.c \
 smurf_extinction.c \

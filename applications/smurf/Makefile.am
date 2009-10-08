@@ -24,7 +24,7 @@ smurf_mon_TASKS = extinction flatfield makemap remsky qlmakemap scanfit \
 	sc2sim dreamsolve makecube unmakecube impaztec dreamweights badbolos \
 	skynoise starecalc smurfhelp rawunpress timesort gsd2acsis sc2fts \
   sc2clean gsdshow sc2concat sc2fft smurfcopy calcdark calcflat calcresp \
-	sc2threadtest rawfixmeta stackframes calcnoise
+	sc2threadtest rawfixmeta stackframes calcnoise copyflat
 
 # These files are not built inside a subdir because they are in CVS
 # under an alternate build system that SMURF can not modify.

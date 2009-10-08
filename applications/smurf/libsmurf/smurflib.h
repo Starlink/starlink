@@ -102,6 +102,7 @@ void smurf_calcdark( int * );
 void smurf_calcflat( int * );
 void smurf_calcnoise( int * );
 void smurf_calcresp( int * );
+void smurf_copyflat( int * );
 void smurf_dreamsolve( int * );
 void smurf_dreamweights( int * );
 void smurf_extinction( int * );

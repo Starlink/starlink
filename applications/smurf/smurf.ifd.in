@@ -1263,6 +1263,33 @@ package @PACKAGE@ {
 
         }
 
+        action copyflat {
+
+            helplib {$SMURF_HELP}
+
+            parameter ref {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT }
+                association <-GLOBAL.DATA_ARRAY
+                prompt {Input file containing flatfield parameters to copy}
+                helpkey *
+            }
+
+            parameter in {
+                position 2
+                type NDF
+                access WRITE
+                ppath DYNAMIC CURRENT
+                vpath {PROMPT }
+                association ->GLOBAL.DATA_ARRAY
+                prompt {Files to receive the updated flatfield information}
+                helpkey *
+            }
+
+        }
+
         action dreamweights {
 
             helplib {$SMURF_HELP}

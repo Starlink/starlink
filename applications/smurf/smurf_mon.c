@@ -280,6 +280,8 @@ void smurf_mon( int * status ) {
     smurf_calcnoise( status );
   } else if (strcmp( taskname, "CALCRESP" ) == 0 ) {
     smurf_calcresp( status );
+  } else if (strcmp( taskname, "COPYFLAT" ) == 0 ) {
+    smurf_copyflat( status );
   } else if (strcmp( taskname, "RAWFIXMETA" ) == 0 ) {
     smurf_rawfixmeta( status );
   } else if (strcmp( taskname, "STACKFRAMES" ) == 0 ) {
