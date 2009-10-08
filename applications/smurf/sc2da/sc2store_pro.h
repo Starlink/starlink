@@ -216,10 +216,10 @@ int frame,               /* frame index (given) */
 const AstFrameSet *fset, /* World coordinate transformations (given) */
 int ndim,                /* dimensionality of image (given) */
 const int dims[],        /* dimensions of image (given) */
-size_t colsize,          /* number of bolometers in column (given) */
-size_t rowsize,          /* number of bolometers in row (given) */
+size_t colsize,          /* number of pixels in a column (given) */
+size_t rowsize,            /* number of pixels in a row (given) */
 const double *image,     /* constructed image (given) */
-const double *zero,      /* bolometer zero values (given) */
+const double *zero,      /* bolometer zero values [can be null pointer] (given) */
 const char * obsidss,    /* OBSIDSS string for provenance (given) */
 const char * creator,    /* Creator application for provenance (given) */
 const char *fitshd,      /* string of concatenated FITS header records to
@@ -243,8 +243,8 @@ int *status           /* global status (given and returned) */
 
 void sc2store_putscanfit
 (
-size_t colsize,       /* number of bolometers in column (given) */
-size_t rowsize,       /* number of bolometers in row (given) */
+size_t colsize,       /* number of bolometers in a column (given) */
+size_t rowsize,       /* number of bolometers in a row (given) */
 size_t ncoeff,        /* number of coefficients (given) */
 const double *coptr,  /* coefficients (given) */
 int *status           /* global status (given and returned) */
