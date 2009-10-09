@@ -142,6 +142,9 @@ void smurf_calcnoise( int *status ) {
   size_t size;              /* Number of files in input group */
   int wantnep = 0;          /* Do we want NEP image? else noise */
   smfWorkForce *wf = NULL;  /* Pointer to a pool of worker threads */
+  double freqdef[] = { SMF__F_WHITELO,
+                       SMF__F_WHITEHI }; /* Default values for frequency range */
+  double freqs[2];          /* Frequencies to use for white noise */
 
   /* Main routine */
   ndfBegin();
@@ -149,6 +152,11 @@ void smurf_calcnoise( int *status ) {
   /* Find the number of cores/processors available and create a pool of
      threads of the same size. */
   wf = smf_create_workforce( smf_get_nthread( status ), status );
+
+  /* Get frequency range of interest for white noise measurement */
+  parGdr1d( "FREQ", 2, freqdef, 0.0, 50.0, 1, freqs, status );
+  msgOutf( "", "Calculating noise between %g and %g Hz", status,
+           freqs[0], freqs[1]);
 
   /* Get input file(s) */
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
@@ -228,8 +236,7 @@ void smurf_calcnoise( int *status ) {
         smf_create_bolfile( (wantnep ? NULL : ogrp), gcount, thedata, "Noise",
                             SIPREFIX "A Hz**-0.5", &outdata, status );
 
-        smf_bolonoise( wf, thedata, NULL, 0, 0.5,
-                       SMF__F_WHITELO, SMF__F_WHITEHI, 0,
+        smf_bolonoise( wf, thedata, NULL, 0, 0.5, freqs[0], freqs[1], 0,
                        (outdata->pntr)[0], NULL, 1, status );
 
         /* Bolonoise gives us a variance - we want square root */

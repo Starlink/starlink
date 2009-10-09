@@ -1196,6 +1196,16 @@ package @PACKAGE@ {
 
             helplib {$SMURF_HELP}
 
+            parameter freq {
+                size *
+                type _DOUBLE
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                default !
+                prompt {Frequency limits for white noise calculation}
+                helpkey *
+            }
+
             parameter in {
                 position 1
                 type NDF
