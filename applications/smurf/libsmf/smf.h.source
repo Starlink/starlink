@@ -829,7 +829,7 @@ void smf_flag_stationary( smfData *data, unsigned char *quality,
                           double sthresh, size_t *nflagged,
                           int *status );
 
-size_t smf_flat_responsivity ( smfData *respmap, size_t nheat,
+size_t smf_flat_responsivity ( smfData *respmap, double snrmin, size_t nheat,
                                const double powval[], const double bolval[],
                                int *status );
 

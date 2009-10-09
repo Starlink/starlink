@@ -1181,6 +1181,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter snrmin {
+                type _DOUBLE
+                vpath DEFAULT
+                ppath CURRENT
+                default 10.0
+                prompt {Signal-to-noise threshold for responsivity data}
+                helpkey *
+            }
+
         }
 
         action calcnoise {

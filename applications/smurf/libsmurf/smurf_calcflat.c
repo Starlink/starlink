@@ -61,6 +61,9 @@
 *     RESPMASK = _LOGICAL (Read)
 *          If true, responsivity data will be used to mask bolometer data
 *          when calculating the flatfield [TRUE]
+*     SNRMIN = _DOUBLE (Read)
+*          Signal-to-noise ratio threshold to use when filtering the responsivity
+*          data to determine valid bolometers for the flatfield.
 
 *  Related Applications:
 *     SMURF: CALCRESP, FLATFIELD
@@ -177,6 +180,7 @@ void smurf_calcflat( int *status ) {
   char subarray[9];          /* subarray name */
   int subnum;                /* subarray number */
   int utdate;                /* UTdate of observation */
+  double snrmin = 3;         /* Minimum allowed signal-to-noise ratio for responsivity */
 
   /* Main routine */
   ndfBegin();
@@ -403,9 +407,10 @@ void smurf_calcflat( int *status ) {
     }
 
 
-    /* Calculate the responsivity in Amps/Watt */
-
-    ngood = smf_flat_responsivity( respmap, bbhtframe->ndat, powref, bolref,
+    /* Calculate the responsivity in Amps/Watt (using the supplied
+       signal-to-noise ratio minimum */
+    parGet0d( "SNRMIN", &snrmin, status );
+    ngood = smf_flat_responsivity( respmap, snrmin, bbhtframe->ndat, powref, bolref,
                                    status );
 
     /* Report the number of good responsivities */

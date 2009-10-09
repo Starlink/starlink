@@ -13,7 +13,7 @@
 *     Subroutine
 
 *  Invocation:
-*     size_t smf_flat_responsivity ( smfData *respmap, size_t nheat,
+*     size_t smf_flat_responsivity ( smfData *respmap, double snrmin, size_t nheat,
 *                                  const double powval[], const double bolval[],
 *                                  int *status );
 
@@ -21,6 +21,10 @@
 *     respmap = smfData * (Given & Returned)
 *        smfData to receive the responsivity map. Must be _DOUBLE.
 *        Will be assumed to be the correct size as compared to bolval.
+*     snrmin = double (Given)
+*        Minimum acceptable signal-to-noise ratio for a responsivity fit.
+*        Below this value the fit will be treated as bad and the bolometer
+*        will be disabled.
 *     nheat = size_t (Given)
 *        Number of measurements. 3rd dimension of bolval. Size of powval.
 *     powval = const double [] (Given)
@@ -68,10 +72,11 @@
 *        stats on the differences.
 *     2009-10-08 (TIMJ):
 *        WSH requests that responsivities are returned as positive numbers.
+*        Add SNR argument.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2007-2008 Science and Technology Facilities Council.
+*     Copyright (C) 2007-2009 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -105,7 +110,7 @@
 
 #include "gsl/gsl_fit.h"
 
-size_t smf_flat_responsivity ( smfData *respmap, size_t nheat,
+size_t smf_flat_responsivity ( smfData *respmap, double snrmin, size_t nheat,
                                const double powval[], const double bolval[],
                                int *status ) {
 
@@ -168,7 +173,7 @@ size_t smf_flat_responsivity ( smfData *respmap, size_t nheat,
 
       /* Nominal responsivity is -1.0e6 but we allow a bigger range
          through */
-      if ( fabs(c1) > 5.0e6 || fabs(c1) < 0.1e6 || snr < 25.0 ) {
+      if ( fabs(c1) > 5.0e6 || fabs(c1) < 0.1e6 || snr < snrmin ) {
         respdata[bol] = VAL__BADD;
         respvar[bol] = VAL__BADD;
       } else {

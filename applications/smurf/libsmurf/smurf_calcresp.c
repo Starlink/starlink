@@ -30,6 +30,10 @@
 *     a FLATFIELD observation.
 *     - Provenance is *not* propagated to the output files since the output files
 *     do not depend on the bolometer data.
+*     - The responsivity data are filtered using a signal-to-noise ratio of 5.0.
+*     The number of bolometers passing this criterion is reported in the NGOOD
+*     parameter. The variance is stored in the output files so additional filtering
+*     is possible.
 
 
 *  ADAM Parameters:
@@ -51,6 +55,7 @@
 
 *  Related Applications:
 *     SMURF: FLATFIELD, CALCFLAT
+*     KAPPA: MAKESNR
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
@@ -130,6 +135,8 @@ void smurf_calcresp( int *status ) {
   for (i=1; i<=size; i++) {
     smfData * idata = NULL;   /* input data object */
     smfData * respmap = NULL;  /* Responsivity map */
+    double snrmin = 5.0;      /* default filter */
+
 
     /* We do *not* need the data array itself, just flatfield information */
     smf_open_file( igrp, i, "READ", SMF__NOCREATE_DATA, &idata, status);
@@ -150,15 +157,16 @@ void smurf_calcresp( int *status ) {
 
     /* "bolref" and "powref" written by CALCFLAT correspond to parameters
        "flatcal" and "flatpar" in sc2store_wrtstream. */
-    ngood[i-1] = smf_flat_responsivity( respmap, idata->da->nflat,
-                                   idata->da->flatpar, idata->da->flatcal,
-                                   status );
+    ngood[i-1] = smf_flat_responsivity( respmap, snrmin, idata->da->nflat,
+                                        idata->da->flatpar, idata->da->flatcal,
+                                        status );
 
     /* Report the number of good responsivities */
     msgSeti( "NG", ngood[i-1] );
     msgSeti( "I", i );
+    msgSetd( "SNR", snrmin );
     msgOutif( MSG__NORM, "",
-              "Number of good responsivities for file ^I: ^NG", status);
+              "Number of responsivities with S/N ratio > ^SNR for file ^I: ^NG", status);
 
     /* close file */
     if (respmap) smf_close_file( &respmap, status );

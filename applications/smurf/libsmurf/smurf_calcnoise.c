@@ -255,7 +255,9 @@ void smurf_calcnoise( int *status ) {
           smf_create_bolfile( NULL, 1, thedata, "Responsivity", "A/W",
                               &respmap, status );
           if (*status == SAI__OK) {
-            ngood = smf_flat_responsivity( respmap, da->nflat, da->flatpar,
+            /* use a snr of 5 since we don't mind if we get a lot of
+               bolometers that are a bit dodgy since the point is the NEP */
+            ngood = smf_flat_responsivity( respmap, 5.0, da->nflat, da->flatpar,
                                            da->flatcal, status );
           }
           if (*status == SAI__OK && ngood == 0) {
