@@ -22,10 +22,9 @@
 *  Description:
 *     This routine calculates the white noise on the array by performing
 *     an FFT to generate a power spectrum and then extracting the
-*     data between two frequency ranges.
-
-*  Notes:
-*     Transforming data loses the VARIANCE and QUALITY components.
+*     data between two frequency ranges. It additionally calculates an
+*     NEP image and an image of the ratio of the power at the low end
+*     of the frequency range to the whitenoise.
 
 *  ADAM Parameters:
 *     FREQ = _REAL (Given)
@@ -37,9 +36,6 @@
 *          Control the verbosity of the application. Values can be
 *          NONE (no messages), QUIET (minimal messages), NORMAL,
 *          VERBOSE, DEBUG or ALL. [NORMAL]
-*     NEP = _LOGICAL (Read)
-*          Output noise equivalent power images instead of noise images.
-*          [FALSE]
 *     OUT = NDF (Write)
 *          Output files (either noise or NEP images depending on the NEP
 *          parameter). Number of output files may differ from the
@@ -49,6 +45,9 @@
 *          all the output NDFs created by this application (one per
 *          line) from the OUT parameter. If a null (!) value is supplied
 *          no file is created. [!]
+
+*  Notes:
+*     - NEP and NOISERATIO images are stored in the .MORE.SMURF extension
 
 *  Related Applications:
 *     SMURF: SC2CONCAT, SC2CLEAN, SC2FFT
@@ -62,6 +61,8 @@
 *        Initial version - based on sc2fft task
 *     2009-10-07 (TIMJ):
 *        Add NEP
+*     2009-10-08 (TIMJ):
+*        Remove NEP parameter. Write NEP and noise ratio image to extension.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -105,6 +106,7 @@
 #include "sae_par.h"
 #include "msg_par.h"
 #include "fftw3.h"
+#include "star/one.h"
 
 #include "smurf_par.h"
 #include "libsmf/smf.h"
@@ -114,6 +116,13 @@
 
 #define FUNC_NAME "smurf_calcnoise"
 #define TASK_NAME "CALCNOISE"
+
+static smfData *
+smf__create_bolfile_extension( const Grp * ogrp, size_t gcount,
+                               const smfData *refdata, const char hdspath[], 
+                               const char datalabel[], const char units[],
+                               int * status );
+
 
 void smurf_calcnoise( int *status ) {
 
@@ -139,7 +148,6 @@ void smurf_calcnoise( int *status ) {
   int polar=0;              /* Flag for FFT in polar coordinates */
   int power=0;              /* Flag for squaring amplitude coeffs */
   size_t size;              /* Number of files in input group */
-  int wantnep = 0;          /* Do we want NEP image? else noise */
   smfWorkForce *wf = NULL;  /* Pointer to a pool of worker threads */
   double freqdef[] = { SMF__F_WHITELO,
                        SMF__F_WHITEHI }; /* Default values for frequency range */
@@ -190,11 +198,7 @@ void smurf_calcnoise( int *status ) {
   smf_grp_related( igrp, size, 1, 0, &maxconcat, &igroup,
                    &basegrp, status );
 
-  /* NEP or Noise */
-  parGet0l( "NEP", &wantnep, status );
-
-  /* Get output file(s) - setting the prompt accordingly */
-  parPromt( "OUT", (wantnep ? "NEP images" : "Noise images"), status );
+  /* Get output file(s) */
   size = grpGrpsz( basegrp, status );
   kpg1Wgndf( "OUT", basegrp, size, size, "More output files required...",
              &ogrp, &outsize, status );
@@ -222,7 +226,8 @@ void smurf_calcnoise( int *status ) {
       if( concat->sdata[idx] ) {
         smfData *thedata = concat->sdata[idx];
         smfData *outdata = NULL;
-        dim_t nelem = 0;
+        smfData *ratdata = NULL;
+        smfData *nepdata = NULL;
 
         /* Convert the data to amps */
         smf_scalar_multiply( thedata, RAW2CURRENT, status );
@@ -231,21 +236,27 @@ void smurf_calcnoise( int *status ) {
         smf_apodize(thedata, NULL, (thedata->dims)[2] / 2, status );
 
         /* Create the output file if required, else a malloced smfData */
-        smf_create_bolfile( (wantnep ? NULL : ogrp), gcount, thedata, "Noise",
+        smf_create_bolfile( ogrp, gcount, thedata, "Noise",
                             SIPREFIX "A Hz**-0.5", &outdata, status );
 
-        smf_bolonoise( wf, thedata, NULL, 0, 0.5, freqs[0], freqs[1], 0,
-                       (outdata->pntr)[0], NULL, 1, status );
+        /* Create groups to handle the NEP and ratio images */
+        ratdata = smf__create_bolfile_extension( ogrp, gcount, thedata,
+                                                 ".MORE.SMURF.NOISERATIO",
+                                                 "Noise Ratio", NULL, status );
 
-        /* Bolonoise gives us a variance - we want square root */
-        for (i = 0; i < (outdata->dims)[0]*(outdata->dims)[1]; i++) {
-          double * od = (outdata->pntr)[0];
-          if ( od[i] != VAL__BADD ) od[i] = sqrt( od[i] );
+        if (*status == SAI__OK) {
+          smf_bolonoise( wf, thedata, NULL, 0, 0.5, freqs[0], freqs[1], 10.0,
+                         (outdata->pntr)[0], (ratdata->pntr)[0], 1, status );
+
+          /* Bolonoise gives us a variance - we want square root */
+          for (i = 0; i < (outdata->dims)[0]*(outdata->dims)[1]; i++) {
+            double * od = (outdata->pntr)[0];
+            if ( od[i] != VAL__BADD ) od[i] = sqrt( od[i] );
+          }
         }
 
-        /* if an NEP is required we need a responsivity image from
-           the flatfield */
-        if (wantnep && *status == SAI__OK) {
+        /* now to create the NEP image using the flatfield information */
+        if (*status == SAI__OK) {
           smfDA *da = thedata->da;
           smfData * nepdata = NULL;
           size_t ngood;
@@ -272,8 +283,9 @@ void smurf_calcnoise( int *status ) {
           }
 
           /* now create the output image for NEP data */
-          smf_create_bolfile( ogrp, gcount, thedata, "NEP",
-                              "W Hz**-0.5", &nepdata, status );
+          nepdata = smf__create_bolfile_extension( ogrp, gcount, thedata,
+                                                   ".MORE.SMURF.NEP", "NEP",
+                                                   "W Hz**-0.5", status );
 
           /* and divide the noise data by the responsivity
              correcting for SIMULT */
@@ -290,10 +302,11 @@ void smurf_calcnoise( int *status ) {
               }
             }
           }
-          smf_close_file( &nepdata, status );
+          if (nepdata) smf_close_file( &nepdata, status );
         }
 
-        smf_close_file( &outdata, status );
+        if (outdata) smf_close_file( &outdata, status );
+        if (ratdata) smf_close_file( &ratdata, status );
 
       } else {
         *status = SAI__ERROR;
@@ -330,4 +343,28 @@ void smurf_calcnoise( int *status ) {
 
   /* Ensure that FFTW doesn't have any used memory kicking around */
   fftw_cleanup();
+}
+
+static smfData *
+smf__create_bolfile_extension( const Grp * ogrp, size_t gcount,
+                               const smfData *refdata, const char hdspath[],
+                               const char datalabel[], const char units[],
+                               int * status ) {
+  char tempfile[SMF_PATH_MAX];
+  char * pname;
+  Grp * tempgrp = NULL;
+  smfData *newdata = NULL;
+
+  if (*status != SAI__OK) return newdata;
+
+  pname = tempfile;
+  grpGet( ogrp, 1, 1, &pname, SMF_PATH_MAX, status );
+  one_strlcat( tempfile, hdspath, sizeof(tempfile), status);
+  tempgrp = grpNew( "Ratio", status );
+  grpPut1( tempgrp, tempfile, 0, status );
+  smf_create_bolfile( tempgrp, 1, refdata, datalabel, units,
+                      &newdata, status );
+  if (tempgrp) grpDelet( &tempgrp, status );
+  return newdata;
+
 }
