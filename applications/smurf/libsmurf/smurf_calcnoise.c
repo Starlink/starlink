@@ -120,7 +120,6 @@ void smurf_calcnoise( int *status ) {
   Grp * basegrp = NULL;     /* Basis group for output filenames */
   smfArray *concat=NULL;     /* Pointer to a smfArray */
   size_t contchunk;          /* Continuous chunk counter */
-  smfArray *darks = NULL;   /* dark frames */
   Grp *dkgrp = NULL;        /* Group of dark frames */
   size_t dksize = 0;        /* Number of darks found */
   Grp *fgrp = NULL;         /* Filtered group, no darks */
@@ -162,7 +161,7 @@ void smurf_calcnoise( int *status ) {
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
   /* Filter out darks */
-  smf_find_darks( igrp, &fgrp, &dkgrp, 1, SMF__NULL, &darks, status );
+  smf_find_darks( igrp, &fgrp, &dkgrp, 1, SMF__NULL, NULL, status );
 
   /* input group is now the filtered group so we can use that and
      free the old input group */
@@ -184,7 +183,6 @@ void smurf_calcnoise( int *status ) {
     igrp = dkgrp;
     dkgrp = NULL;
     grpDelet( &fgrp, status );
-    smf_close_related( &darks, status );
   }
 
   /* We now need to combine files from the same subarray and same sequence
@@ -215,7 +213,7 @@ void smurf_calcnoise( int *status ) {
 
     /* Concatenate this continuous chunk but forcing a raw data read.
        We will need quality. */
-    smf_concat_smfGroup( wf, igroup, darks, NULL, contchunk, 0, 1, NULL, 0, NULL,
+    smf_concat_smfGroup( wf, igroup, NULL, NULL, contchunk, 0, 1, NULL, 0, NULL,
                          NULL, 0, 0, 0, &concat, status );
 
     /* Now loop over each subarray */
@@ -326,7 +324,6 @@ void smurf_calcnoise( int *status ) {
   if (ogrp) grpDelet( &ogrp, status);
   if (basegrp) grpDelet( &basegrp, status );
   if( igroup ) smf_close_smfGroup( &igroup, status );
-  if (darks) smf_close_related( &darks, status );
   if( wf ) wf = smf_destroy_workforce( wf );
 
   ndfEnd( status );
