@@ -36,6 +36,7 @@
 *        Upper frequency edge of window for calculating average white noise
 *     flagratio = double (Given)
 *        If nonzero, limit for fratio below which bolo is flagged as bad
+*        in the input "quality" array.
 *     whitenoise = double* (Returned)
 *        Externally allocated array (nbolos) that will hold estimates of
 *        the mean-square variances in bolo signals produced by white noise.
@@ -48,8 +49,6 @@
 *        by dividing by the sample rate.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
-
-*  Return Value:
 
 *  Description:
 *     Calculate the power spectrum for each detector. Optionally smooth
