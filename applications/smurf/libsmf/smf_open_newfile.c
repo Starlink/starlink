@@ -226,7 +226,7 @@ void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, const int n
     /* Create the named QUALITY bits extension before calling ndfMap */
     smf_create_qualname( "WRITE", newndf, &qlocs, status );
 
-    ndfMap(newndf, "QUALITY", "_UBYTE", "WRITE", &(pntr[2]), &nel, status);
+    ndfMap(newndf, "QUALITY", "_UBYTE", "WRITE/ZERO", &(pntr[2]), &nel, status);
 
     /* Done with quality names so free resources */
     irqRlse( &qlocs, status );
