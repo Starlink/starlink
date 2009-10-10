@@ -712,10 +712,7 @@
 *  Obtain the axis and plot styles.
 *  ================================
 *  Construct the default label for the X axis.
-      CALL KPG1_NDFNM( NDFI, NDFNAM, NMLEN, STATUS )
-      CALL MSG_SETC( 'NDF', NDFNAM )
-      CALL MSG_LOAD( ' ', 'Data value in ^NDF', XL, LENXL, 
-     :               STATUS )
+      CALL KPG1_DANOT( NDFI, MCOMP, XL, STATUS )
 
 *  Construct the default label for the Y axis.
       YL = 'Count'
