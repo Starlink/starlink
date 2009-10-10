@@ -343,7 +343,7 @@
          NVAL = 1
 
 *  Otherwise, get an array containing strings or numerical values.
-      ELSE IF( STATUS .EQ. SAI__OK ) THEN
+      ELSE IF ( STATUS .EQ. SAI__OK ) THEN
          CALL KPG1_MIXVD( PARAM, 3, VAL__MIND, VAL__MAXD,
      :                    VAMETH( : NCVM ), PVALS, NVAL, STATUS ) 
 
@@ -527,7 +527,7 @@
 *  --------------------------
 
 *  It's always hard to decide what limits to impose upon user-supplied
-*  values.  Here the restrictions are not especailly stringent. 
+*  values.  Here the restrictions are not especially stringent. 
 *  "Limit" values should lie within the range of allowed values for the
 *  data type of the array.
       INRANG = .TRUE.
@@ -535,7 +535,7 @@
 
 *  Check that the supplied first value is within the allowed range.
          IF ( ( V1 .LT. DRMIN .OR. V1 .GT. DRMAX ) .AND.
-     :        NVAL .GE. INE .AND. STATUS .EQ. SAI__OK) THEN
+     :        NVAL .GE. INE .AND. STATUS .EQ. SAI__OK ) THEN
             INRANG = .FALSE.
             STATUS = SAI__ERROR
             CALL MSG_SETD( 'V1', V1 )
@@ -549,7 +549,7 @@
 
 *  Repeat the check, this time for the second value.
          IF ( ( V2 .LT. DRMIN .OR. V2 .GT. DRMAX ) .AND.
-     :        NVAL .GT. INE .AND. STATUS .EQ. SAI__OK) THEN
+     :        NVAL .GT. INE .AND. STATUS .EQ. SAI__OK ) THEN
             INRANG = .FALSE.
             STATUS = SAI__ERROR
             CALL MSG_SETD( 'V2', V2 )
@@ -569,7 +569,7 @@
       ELSE IF ( PVALS( 1 ) .EQ. 'PERCENTILES' ) THEN
 
          IF ( ( V1 .LT. 0.0D0 .OR. V1 .GT. 100.0D0 ) .AND.
-     :        NVAL .GT. 1 .AND. STATUS .EQ. SAI__OK) THEN
+     :        NVAL .GT. 1 .AND. STATUS .EQ. SAI__OK ) THEN
             INRANG = .FALSE.
             STATUS = SAI__ERROR
             CALL MSG_SETD( 'V1', V1 )
@@ -580,7 +580,7 @@
          END IF
 
          IF ( ( V2 .LT. 0.0D0 .OR. V2 .GT. 100.0D0 ) .AND.
-     :        NVAL .GT. 2 .AND. STATUS .EQ. SAI__OK) THEN
+     :        NVAL .GT. 2 .AND. STATUS .EQ. SAI__OK ) THEN
             INRANG = .FALSE.
             STATUS = SAI__ERROR
             CALL MSG_SETD( 'V2', V2 )
