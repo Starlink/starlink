@@ -112,6 +112,7 @@
 
 *  Copyright:
 *     Copyright (C) 2000 Central Laboratory of the Research Councils.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -141,6 +142,10 @@
 *     2009 October 8 (TIMJ):
 *        Do not set status to bad and add to the error stack
 *        if status is already bad.
+*     2009 October 10 (MJC):
+*        Fix the actual paste bug where a status check was placed
+*        before an END IF instead of after, potentially causing
+*        unwarranted error messages to appear.
 
 *-
 
@@ -348,10 +353,10 @@
             PVALS( 1 ) = 'RANGE'
             NVAL = 1
          END IF
+      END IF
 
 *  Abort if an error has occurred.
-         IF ( STATUS .NE. SAI__OK ) GO TO 999
-      END IF      
+      IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Validate the string obtained.
 *  =============================
