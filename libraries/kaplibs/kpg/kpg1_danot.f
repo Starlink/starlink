@@ -16,10 +16,10 @@
 *     This routine examines the NDF for a label and units.  It creates a
 *     string of the form "label (units)" or "label" if the label but not
 *     the units are present.  If neither are present a string comprising
-*     the array component followed by ' values' is created.  If the
-*     label is defined but is blank, this same default is used.  Blank
-*     units are omitted.  The units are squared for the variance
-*     component.
+*     the array component followed by ' values in FILE' is created. Where
+*     "FILE" is the NDF filename. If the label is defined but is blank,
+*     this same default is used.  Blank units are omitted.  The units
+*     are squared for the variance component.
 
 *  Arguments:
 *     NDF = INTEGER (Given)
@@ -65,6 +65,9 @@
 *        Original version.
 *     1992 April 14 (MJC):
 *        Bug arising when the label is defined but is blank was fixed.
+*     2009 October 9 (TIMJ):
+*        - Include NDF name in default label.
+*        - Append component to label if not DATA
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -103,13 +106,18 @@
 
       CHARACTER * 256
      :  LABEL,                   ! NDF label
+     :  NDFNAM,                  ! Name of NDF
      :  UNITS                    ! NDF units
+
+      CHARACTER * 8
+     :  CMPNAM                   ! Uppercase copy of the component
 
       INTEGER
      :  NCLAB,                   ! Number of characters in the label
      :  NCLABD,                  ! Number of characters in the default
                                  ! label
-     :  NCUNIT                   ! Number of characters in the units
+     :  NCUNIT,                  ! Number of characters in the units
+     :  NMLEN                    ! Length of NDFNAM
 
 *.
 
@@ -123,9 +131,11 @@
 *    Set the string to the default in case there is no label, whereupon 
 *    the default is used.  Define the length of the default label.
 
+      CALL KPG1_NDFNM( NDF, NDFNAM, NMLEN, STATUS )
       NCLABD = CHR_LEN( COMP )
-      LABEL = COMP( :NCLABD )//' values'
-      NCLABD = NCLABD + 7
+      LABEL = COMP( :NCLABD )
+      CALL CHR_APPND( ' values in', LABEL, NCLABD )
+      CALL CHR_APPND( ' '//NDFNAM( : NMLEN), LABEL, NCLABD )
 
 *    See if there is a label component present.
 
@@ -141,8 +151,20 @@
 *       Check for a blank or null string.  Use the default in this case.
 
          IF ( NCLAB .LT. 1 .OR. LABEL( 1:1 ) .EQ. CHAR( 0 ) ) THEN
-            LABEL = COMP( :NCLABD-7 )//' values'
+            NCLABD = CHR_LEN( COMP )
+            LABEL = COMP( :NCLABD )
+            CALL CHR_APPND( ' values in', LABEL, NCLABD )
+            CALL CHR_APPND( ' '//NDFNAM( : NMLEN), LABEL, NCLABD )
             NCLAB = NCLABD
+         ELSE
+*        For non-DATA case append the component
+            CMPNAM = COMP
+            CALL CHR_UCASE( CMPNAM )
+            CALL CHR_LDBLK( CMPNAM )
+            IF ( CMPNAM(:2) .NE. 'DA') THEN
+               CALL CHR_APPND( ' '//COMP, LABEL, NCLAB )
+            END IF
+
          END IF
       ELSE
          NCLAB = NCLABD
