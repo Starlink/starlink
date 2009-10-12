@@ -155,6 +155,9 @@ f     - AST_GETREFPOS: Get reference position in any celestial system
 *     16-SEP-2009 (DSB):
 *        In MakeSpecMapping, retain the original alignment frame attribute 
 *        values if we are restoring the integrity of a FrameSet.
+*     12-OCT-2009 (DSB):
+*        In Match, if the template matches as a basic Frame but not as a
+*        SpecFrame, return the basic Frame match.
 *class--
 */
 
@@ -3095,7 +3098,8 @@ static int Match( AstFrame *template_frame, AstFrame *target,
    AstSpecFrame *template;       /* Pointer to template SpecFrame structure */
    int iaxis0;                   /* Axis index underlying axis 0 */
    int iaxis;                    /* Axis index */
-   int match;                    /* Coordinate conversion possible? */
+   int match;                    /* Basic coord. conversion possible? */
+   int smatch;                   /* SpecFrame coord. conversion possible? */
    int target_axis0;             /* Index of SpecFrame axis in the target */
    int target_naxes;             /* Number of target axes */
 
@@ -3119,38 +3123,38 @@ static int Match( AstFrame *template_frame, AstFrame *target,
    Frame class object. This ensures that the number of axes (1) and
    domain, etc. of the target Frame are suitable. Invoke the parent
    "astMatch" method to verify this. */
-   match = (*parent_match)( template_frame, target,
-                            template_axes, target_axes, map, result, status );
-
-/* If a match was found, annul the returned objects, which are not
-   needed, but keep the memory allocated for the axis association
-   arrays, which we will re-use. */
-   if ( astOK && match ) {
-      *map = astAnnul( *map );
-      *result = astAnnul( *result );
-   }
+   match = (*parent_match)( template_frame, target, template_axes, 
+                            target_axes, map, result, status );
 
 /* If OK so far, obtain pointers to the primary Frames which underlie
    all target axes. Stop when a SpecFrame axis is found. */
-   if ( match && astOK ) {
-      match = 0;
+   smatch = 0;
+   if( match && astOK ) {
       for( iaxis = 0; iaxis < target_naxes; iaxis++ ) {
          astPrimaryFrame( target, iaxis, &frame0, &iaxis0 );
          if( astIsASpecFrame( frame0 ) ) {
             frame0 = astAnnul( frame0 );
             target_axis0 = iaxis;
-            match = 1;
+            smatch = 1;
             break;
          } else {
             frame0 = astAnnul( frame0 );
          }
       }
-
    }
 
-/* Check at least one SpecFrame axis was found it the target. Store the
-   axis associataions. */
-   if( match && astOK ) {
+/* If at least one SpecFrame axis was found in the target, we can
+   returned a SpecFrame match. If no SpecFrame axes were found in the 
+   target, we can still return the basic Frame match. */
+   if( smatch && astOK ) {
+
+/* Annul the objects returned by the basic Frame match, which are not
+   needed, but keep the memory allocated for the axis association
+   arrays, which we will re-use. */
+      *map = astAnnul( *map );
+      *result = astAnnul( *result );
+
+/* Store the axis associataions. */
       (*template_axes)[ 0 ] = 0;
       (*target_axes)[ 0 ] = target_axis0;
 
@@ -3159,9 +3163,8 @@ static int Match( AstFrame *template_frame, AstFrame *target,
    order. This process also overlays the template attributes on to the
    target Frame and returns a Mapping between the target and result
    Frames which effects the required coordinate conversion. */
-      match = astSubFrame( target, template, 1, *target_axes, *template_axes,
-                           map, result );
-
+      match = astSubFrame( target, template, 1, *target_axes, 
+                           *template_axes, map, result );
    }
 
 /* If an error occurred, or conversion to the result Frame's
@@ -3174,7 +3177,6 @@ static int Match( AstFrame *template_frame, AstFrame *target,
       if( *result ) *result = astAnnul( *result );
       match = 0;
    }
-
 
 /* Return the result. */
    return match;

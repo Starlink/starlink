@@ -80,6 +80,9 @@ f     The FluxFrame class does not define any new routines beyond those
 *     2-OCT-2007 (DSB):
 *        In Overlay, clear AlignSystem as well as System before calling
 *        the parent overlay method.
+*     12-OCT-2009 (DSB):
+*        In Match, if the template matches as a basic Frame but not as a
+*        FluxFrame, return the basic Frame match.
 *class--
 */
 
@@ -2383,7 +2386,8 @@ static int Match( AstFrame *template_frame, AstFrame *target,
    AstFluxFrame *template;       /* Pointer to template FluxFrame structure */
    int iaxis0;                   /* Axis index underlying axis 0 */
    int iaxis;                    /* Axis index */
-   int match;                    /* Coordinate conversion possible? */
+   int match;                    /* Basic coord. conversion possible? */
+   int fmatch;                   /* FluxFrame coord. conversion possible? */
    int target_axis0;             /* Index of FluxFrame axis in the target */
    int target_naxes;             /* Number of target axes */
 
@@ -2407,27 +2411,19 @@ static int Match( AstFrame *template_frame, AstFrame *target,
    Frame class object. This ensures that the number of axes (1) and
    domain, etc. of the target Frame are suitable. Invoke the parent
    "astMatch" method to verify this. */
-   match = (*parent_match)( template_frame, target,
-                            template_axes, target_axes, map, result, status );
-
-/* If a match was found, annul the returned objects, which are not
-   needed, but keep the memory allocated for the axis association
-   arrays, which we will re-use. */
-   if ( astOK && match ) {
-      *map = astAnnul( *map );
-      *result = astAnnul( *result );
-   }
+   match = (*parent_match)( template_frame, target, template_axes, 
+                            target_axes, map, result, status );
 
 /* If OK so far, obtain pointers to the primary Frames which underlie
    all target axes. Stop when a FluxFrame axis is found. */
+   fmatch = 0;
    if ( match && astOK ) {
-      match = 0;
       for( iaxis = 0; iaxis < target_naxes; iaxis++ ) {
          astPrimaryFrame( target, iaxis, &frame0, &iaxis0 );
          if( astIsAFluxFrame( frame0 ) ) {
             frame0 = astAnnul( frame0 );
             target_axis0 = iaxis;
-            match = 1;
+            fmatch = 1;
             break;
          } else {
             frame0 = astAnnul( frame0 );
@@ -2435,9 +2431,18 @@ static int Match( AstFrame *template_frame, AstFrame *target,
       }
    }
 
-/* Check at least one FluxFrame axis was found it the target. Store the
-   axis associataions. */
-   if( match && astOK ) {
+/* If at least one FluxFrame axis was found in the target, we can
+   returned a FluxFrame match. If no FluxFrame axes were found in the 
+   target, we can still return the basic Frame match. */
+   if( fmatch && astOK ) {
+
+/* Annul the objects returned by the basic Frame match, which are not
+   needed, but keep the memory allocated for the axis association
+   arrays, which we will re-use. */
+      *map = astAnnul( *map );
+      *result = astAnnul( *result );
+
+/* Store the axis associataions. */
       (*template_axes)[ 0 ] = 0;
       (*target_axes)[ 0 ] = target_axis0;
 

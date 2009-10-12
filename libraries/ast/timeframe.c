@@ -152,6 +152,9 @@ f     - AST_CURRENTTIME: Return the current system time
 *        are allowed as intermediate gaps. Since months do not all have
 *        the same number of days, this means that the day number at major
 *        ticks will bounce around a bit.
+*     12-OCT-2009 (DSB):
+*        In Match, if the template matches as a basic Frame but not as a
+*        TimeFrame, return the basic Frame match.
 *class--
 */
 
@@ -3600,7 +3603,8 @@ static int Match( AstFrame *template_frame, AstFrame *target,
    AstTimeFrame *template;       /* Pointer to template TimeFrame structure */
    int iaxis0;                   /* Axis index underlying axis 0 */
    int iaxis;                    /* Axis index */
-   int match;                    /* Coordinate conversion possible? */
+   int match;                    /* Basic coord. conversion possible? */
+   int tmatch;                   /* TimeFrame coord. conversion possible? */
    int target_axis0;             /* Index of TimeFrame axis in the target */
    int target_naxes;             /* Number of target axes */
 
@@ -3627,24 +3631,16 @@ static int Match( AstFrame *template_frame, AstFrame *target,
    match = (*parent_match)( template_frame, target,
                             template_axes, target_axes, map, result, status );
 
-/* If a match was found, annul the returned objects, which are not
-   needed, but keep the memory allocated for the axis association
-   arrays, which we will re-use. */
-   if ( astOK && match ) {
-      *map = astAnnul( *map );
-      *result = astAnnul( *result );
-   }
-
 /* If OK so far, obtain pointers to the primary Frames which underlie
    all target axes. Stop when a TimeFrame axis is found. */
+   tmatch = 0;
    if ( match && astOK ) {
-      match = 0;
       for( iaxis = 0; iaxis < target_naxes; iaxis++ ) {
          astPrimaryFrame( target, iaxis, &frame0, &iaxis0 );
          if( astIsATimeFrame( frame0 ) ) {
             frame0 = astAnnul( frame0 );
             target_axis0 = iaxis;
-            match = 1;
+            tmatch = 1;
             break;
          } else {
             frame0 = astAnnul( frame0 );
@@ -3652,9 +3648,18 @@ static int Match( AstFrame *template_frame, AstFrame *target,
       }
    }
 
-/* Check at least one TimeFrame axis was found it the target. Store the
-   axis associataions. */
-   if( match && astOK ) {
+/* If at least one TimeFrame axis was found in the target, we can
+   returned a TimeFrame match. If no TimeFrame axes were found in the 
+   target, we can still return the basic Frame match. */
+   if( tmatch && astOK ) {
+
+/* Annul the objects returned by the basic Frame match, which are not
+   needed, but keep the memory allocated for the axis association
+   arrays, which we will re-use. */
+      *map = astAnnul( *map );
+      *result = astAnnul( *result );
+
+/* Store the axis associataions. */
       (*template_axes)[ 0 ] = 0;
       (*target_axes)[ 0 ] = target_axis0;
 

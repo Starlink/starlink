@@ -258,7 +258,9 @@ f     The SkyFrame class does not define any new routines beyond those
 *     25-SEP-2009 (DSB);
 *        Do not calculate LAST until it is needed.
 *     12-OCT-2009 (DSB);
-*        Handle 2.PI->0 discontinuity in cached LAST values.
+*        - Handle 2.PI->0 discontinuity in cached LAST values.
+*        - In Match, if the template matches as a basic Frame but not as
+*        a SkyFrame, return the basic Frame match.
 *class--
 */
 
@@ -6124,7 +6126,8 @@ static int Match( AstFrame *template_frame, AstFrame *target,
    int iaxis;                 /* Axis index */
    int iaxis0;                /* Axis index underlying axis 0 */
    int iaxis1;                /* Axis index underlying axis 1 */
-   int match;                 /* Coordinate conversion possible? */
+   int match;                 /* Basic coord. conversion possible? */
+   int smatch;                /* SkyFrame coord. conversion possible? */
    int swap1;                 /* Template axes swapped? */
    int swap2;                 /* Target axes swapped? */
    int swap;                  /* Additional axis swap needed? */
@@ -6158,27 +6161,18 @@ static int Match( AstFrame *template_frame, AstFrame *target,
    Frame class object. This ensures that the number of axes (2) and
    domain, etc. of the target Frame are suitable. Invoke the parent
    "astMatch" method to verify this. */
-   match = (*parent_match)( template_frame, target,
-                            template_axes, target_axes, map, result, status );
-
-/* If a match was found, annul the returned objects, which are not
-   needed, but keep the memory allocated for the axis association
-   arrays, which we will re-use. */
-   if ( astOK && match ) {
-      *map = astAnnul( *map );
-      *result = astAnnul( *result );
-   }
+   match = (*parent_match)( template_frame, target, template_axes, 
+                            target_axes, map, result, status );
 
 /* If OK so far, obtain pointers to the primary Frames which underlie
-   all target axes. Stop when a SkyFrame axis is found. */
+   all target axes. Stop when a TimeFrame axis is found. */
+   smatch = 0;
    if ( match && astOK ) {
-
-      match = 0;
       for( iaxis = 0; iaxis < target_naxes; iaxis++ ) {
          astPrimaryFrame( target, iaxis, &frame0, &iaxis0 );
          if( astIsASkyFrame( frame0 ) ) {
             target_axis0 = iaxis;
-            match = 1;
+            smatch = 1;
             break;
          } else {
             frame0 = astAnnul( frame0 );
@@ -6186,17 +6180,17 @@ static int Match( AstFrame *template_frame, AstFrame *target,
       }
 
 /* Check at least one SkyFrame axis was found it the target. */
-      if( match ) {
+      if( smatch ) {
 
 /* If so, search the remaining target axes for another axis that is
    derived from the same SkyFrame. */
-         match = 0;
+         smatch = 0;
          for( iaxis++ ; iaxis < target_naxes; iaxis++ ) {
             astPrimaryFrame( target, iaxis, &frame1, &iaxis1 );
             if( frame1 == frame0 ) {
                target_axis1 = iaxis;
                frame1 = astAnnul( frame1 );
-               match = 1;
+               smatch = 1;
                break;
             } else {
                frame1 = astAnnul( frame1 );
@@ -6210,11 +6204,10 @@ static int Match( AstFrame *template_frame, AstFrame *target,
 /* If this test is passed, we can now test that the underlying axis indices
    are 0 and 1, in either order. This then ensures that we have a
    single SkyFrame (not a compound Frame) with both axes present. */
-      if ( match && astOK ) {
-         match = ( ( ( iaxis0 == 0 ) && ( iaxis1 == 1 ) ) ||
-                   ( ( iaxis1 == 0 ) && ( iaxis0 == 1 ) ) );
+      if ( smatch && astOK ) {
+         smatch = ( ( ( iaxis0 == 0 ) && ( iaxis1 == 1 ) ) ||
+                    ( ( iaxis1 == 0 ) && ( iaxis0 == 1 ) ) );
       }
-
    }
 
 /* If a possible match has been detected, we must now decide how the
@@ -6223,7 +6216,7 @@ static int Match( AstFrame *template_frame, AstFrame *target,
    depends on whether the axis permutation array for the template
    SkyFrame (whose method we are executing) causes an axis
    reversal. Determine this by permuting axis index zero. */
-   if ( astOK && match ) {
+   if ( astOK && smatch ) {
       swap1 = ( astValidateAxis( template, 0, "astMatch" ) != 0 );
 
 /* The second factor depends on whether the axes of the underlying
@@ -6236,12 +6229,12 @@ static int Match( AstFrame *template_frame, AstFrame *target,
 
 /* Now check to see if this additional swap is permitted by the
    template's Permute attribute. */
-      match = ( !swap || astGetPermute( template ) );
+      smatch = ( !swap || astGetPermute( template ) );
    }
 
 /* If the Frames still match, we next set up the axis association
    arrays. */
-   if ( astOK && match ) {
+   if ( astOK && smatch ) {
 
 /* If the target axis order is to be preserved, then the target axis
    association involves no permutation but the template axis
@@ -6260,6 +6253,12 @@ static int Match( AstFrame *template_frame, AstFrame *target,
          (*target_axes)[ 0 ] = swap ? target_axis1 : target_axis0;
          (*target_axes)[ 1 ] = swap ? target_axis0 : target_axis1;
       }
+
+/* Annul the objects returned by the basic Frame match, which are not
+   needed, but keep the memory allocated for the axis association
+   arrays, which we will re-use. */
+      *map = astAnnul( *map );
+      *result = astAnnul( *result );
 
 /* Use the target's "astSubFrame" method to create a new Frame (the
    result Frame) with copies of the target axes in the required

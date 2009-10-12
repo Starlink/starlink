@@ -6485,19 +6485,19 @@ static int Match( AstFrame *template, AstFrame *target,
       match = ( ( target_naxes >= min_axes ) && ( target_naxes <= max_axes ) );
    }
 
-/* The third requirement is that if the template has its Domain
-   attribute defined, then the target must also have the same Domain
-   (although it need not be set - the default will do). First check if
-   the template has a domain. */
+/* The third requirement is that the Domain attributes must match,
+   although if the Domain is unset in the template, and the default
+   template Domain is blank, then this is treated as a "wildcard" that
+   matches any Domain name in the target. */
    if ( astOK && match ) {
-      if ( astTestDomain( template ) ) {
+      ptr = astGetDomain( template );
+      if ( astOK ) {
+         if ( astChrLen( ptr ) > 0 || astTestDomain( template ) ) {
 
 /* Obtain a pointer to the template domain. Then allocate memory and
    make a copy of it (this is necessary as we will next inquire the
    domain of the target and may over-write the buffer holding the
    template's domain). */
-         ptr = astGetDomain( template );
-         if ( astOK ) {
             template_domain = astStore( NULL, ptr,
                                         strlen( ptr ) + (size_t) 1 );
 
