@@ -14,6 +14,11 @@
    supplied with every NDF. Documented how NDF sections can now be
    defined by percentages along each dimension.
 
+   o  The default for the CATFRAME parameter (used by various
+   applications to indicate the Frame in which axis values should be 
+   stored within an output catalogue) has changed. It is now the 
+   current Frame in the WCS FrameSet associated with the input data.
+
 2 Modified_applications
 
    o  APERADD, BEAMFIT, CENTROID, CREFRAME, CURSOR, LISTSHOW,

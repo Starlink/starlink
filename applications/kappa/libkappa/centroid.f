@@ -75,11 +75,7 @@
 *        EQUAT(J2000) (see SUN/163).
 *
 *        If a null (!) value is supplied, the positions will be stored 
-*        in a SKY Frame, if a SKY Frame is available within the input 
-*        catalogue.  Otherwise, they will be stored in PIXEL 
-*        co-ordinates, if a PIXEL Frame is available within the input 
-*        catalogue.  Otherwise, they are stored in the base Frame of 
-*        the supplied  WCS information.  [!]
+*        in the current Frame. [!]
 *     CATEPOCH = DOUBLE PRECISION (Read)
 *        The epoch at which the sky positions stored in the output
 *        catalogue were determined.  It will only be accessed if an

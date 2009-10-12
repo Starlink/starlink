@@ -133,6 +133,7 @@
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
       INCLUDE 'PAR_ERR'          ! PAR error constants 
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
+      INCLUDE 'NDF_PAR'          ! NDF constants
 
 *  Arguments Given:
       CHARACTER PARAM*(*)
@@ -180,14 +181,17 @@
          IBASE = AST_GETI( IWCS, 'BASE', STATUS )
          ICURR = AST_GETI( IWCS, 'CURRENT', STATUS )
 
-*  Make the default Frame the current Frame. If a SKY Frame is available,
-*  use it, otherwise if a PIXEL Frame is available, use it, otherwise use
-*  the current Base Frame.
-         CALL KPG1_ASFFR( IWCS, 'SKY', IDEF,STATUS )
-         IF( IDEF .EQ. AST__NOFRAME ) THEN
-            CALL KPG1_ASFFR( IWCS, 'PIXEL', IDEF,STATUS )
-            IF( IDEF .EQ. AST__NOFRAME ) IDEF = IBASE
-         END IF         
+*  Set the current Frame to the default Frame to be used for parameter
+*  CATFRAME. We pick the default so that the catalogue holds the supplied 
+*  axis values without change.
+         IF( IFRM .EQ. AST__BASE ) THEN
+            IDEF = IBASE
+         ELSE IF( IFRM .EQ. AST__CURRENT ) THEN
+            IDEF = ICURR
+         ELSE 
+            IDEF = IFRM
+         END IF
+
          CALL AST_SETI( IWCS, 'CURRENT', IDEF, STATUS )
 
 *  Allow the user to change the current FRAME.

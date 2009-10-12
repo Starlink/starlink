@@ -56,12 +56,8 @@
 *        are to be stored in the output catalogue associated with
 *        Parameter OUTCAT.  See Parameter FRAME for a description of the
 *        allowed values for this parameter.  If a null (!) value is
-*        supplied, the positions will be stored in a SKY Frame, if a 
-*        SKY Frame is available within the input catalogue.  Otherwise,
-*        they will be stored in PIXEL co-ordinates, if a PIXEL Frame is
-*        available within the input catalogue.  Otherwise, they are
-*        stored in the Frame used to specify positions within the input
-*        catalogue. [!]
+*        supplied, the positions will be stored in the Frame used to 
+*        specify positions within the input catalogue. [!]
 *     CATEPOCH = DOUBLE PRECISION (Read)
 *        The epoch at which the sky positions stored in the output
 *        catalogue were determined.  It will only be accessed if an 
