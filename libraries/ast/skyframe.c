@@ -257,7 +257,8 @@ f     The SkyFrame class does not define any new routines beyond those
 *        value from scratch.
 *     25-SEP-2009 (DSB);
 *        Do not calculate LAST until it is needed.
-
+*     12-OCT-2009 (DSB);
+*        Handle 2.PI->0 discontinuity in cached LAST values.
 *class--
 */
 
@@ -2726,6 +2727,12 @@ static double GetCachedLAST( AstSkyFrame *this, double epoch, double obslon,
    tables, so leave the table loop. */
          break;
       }
+   }
+
+/* Ensure the returned value is within the range 0 - 2.PI. */
+   if( result != AST__BAD ) {
+      while( result > 2*AST__DPI ) result -= 2*AST__DPI;
+      while( result < 0.0 ) result += 2*AST__DPI;
    }
 
 /* Return the required LAST value. */
@@ -8321,9 +8328,21 @@ static void SetCachedLAST( AstSkyFrame *this, double last, double epoch,
             lp[ 1 ] = *lp;
          }
 
-/* Store the new epoch and LAST value. */
+/* Store the new epoch and LAST value. Add or subtract 2.PI as needed
+   from the new LAST value to ensure it is continuous with the previous
+   LAST value. This is needed for interpolation between the two values 
+   to be meaningful.  */
          ep[ 1 ] = epoch;
-         lp[ 1 ] = last;
+
+         if( last > lp[ 0 ] + AST__DPI ) {
+            lp[ 1 ] = last - 2*AST__DPI;
+
+         } else if( last < lp[ 0 ] - AST__DPI ) {
+            lp[ 1 ] = last + 2*AST__DPI;
+
+         } else {
+            lp[ 1 ] = last + 2*AST__DPI;
+         }
       }
    }
 }
