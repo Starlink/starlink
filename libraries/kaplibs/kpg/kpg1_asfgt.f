@@ -93,6 +93,9 @@
 *        KPG1_GTOBJ.
 *     4-AUG-2009 (DSB):
 *        Add FRACTION Frame.
+*     12-OCT-2009 (DSB):
+*        Access the parameter first as a literal string, before accessing
+*        it (via KPG1_GTOBJ) as an NDF, etc.
 *     {enter_further_changes_here}
 
 *-
@@ -136,6 +139,14 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Get the string describing the required co-ordinate Frame. Access it
+*  using PAR_GET0C now before we call KPG1_GTOBJ. This forces the
+*  parameter system to treat the user-supplied string as a literal string.
+*  If KPG1_GTOBJ accesses the parameter first, then the parametet system 
+*  seems to treat it like an HDS reference for ever more, thus reporting
+*  an error if it is later accessed using PAR_GET0C.
+      CALL PAR_GET0C( PDOM, DOM, STATUS )
+
 *  Attempt to get a Frame from the parameter value as an HDS path, an NDF
 *  name, or a text file.
       CALL KPG1_GTOBJ( PDOM, 'Frame', AST_ISAFRAME, FRM, STATUS )
@@ -155,9 +166,6 @@
 *  Domain name or IRAS90 SCS.
       ELSE
          CALL ERR_ANNUL( STATUS )
-
-*  Get the string describing the required co-ordinate Frame.
-         CALL PAR_GET0C( PDOM, DOM, STATUS )
 
 *  Convert to upper case, and remove blanks.
          CALL CHR_UCASE( DOM )
