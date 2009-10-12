@@ -109,6 +109,10 @@
 *     16-JUN-1995 (DSB):
 *        Modified to avoid re-calculating output median values when the 
 *        the input filter box has not changed position or size.
+*     2009 October 10 (MJC):
+*        Declare INVAL with generic local type (from REAL) to prevent
+*        comparing and assigning single-precision value with
+*        double-precision bad value.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -147,7 +151,7 @@
       <LTYPE> DUMMY              ! Un-used dummy argument
       INTEGER I, J               ! Output pixel indices
       INTEGER II, JJ             ! Input pixel indices
-      REAL INVAL                 ! Input data value
+      <LTYPE> INVAL              ! Input data value
       INTEGER ILO, IHI           ! Filter box x bounds
       INTEGER ILOL, IHIL         ! X bounds for previous output column
       INTEGER JLO, JHI           ! Filter box y bounds
