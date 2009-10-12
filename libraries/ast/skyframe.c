@@ -261,6 +261,8 @@ f     The SkyFrame class does not define any new routines beyond those
 *        - Handle 2.PI->0 discontinuity in cached LAST values.
 *        - In Match, if the template matches as a basic Frame but not as
 *        a SkyFrame, return the basic Frame match.
+*     12-OCT-2009 (BED);
+*        - Fix bug in caching LAST value.
 *class--
 */
 
@@ -8340,7 +8342,7 @@ static void SetCachedLAST( AstSkyFrame *this, double last, double epoch,
             lp[ 1 ] = last + 2*AST__DPI;
 
          } else {
-            lp[ 1 ] = last + 2*AST__DPI;
+            lp[ 1 ] = last;
          }
       }
    }
