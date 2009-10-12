@@ -108,6 +108,8 @@
 *        Renamed from kpg1_rdlst to kpg1_rdtab, and added argument LABS.
 *     4-MAY-2009 (DSB):
 *        Renamed from kpg1_rdtab to kpg1_rdcat, and added argument KEYMAP.
+*     12-OCT-2009 (DSB):
+*        Allow Symbol attribute values to be longer.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -156,7 +158,7 @@
       CHARACTER COLNAM*128       ! Column name
       CHARACTER EPOCH*40         ! Epoch string
       CHARACTER EQN*40           ! Equinox string
-      CHARACTER SYM*20           ! Axis symbol
+      CHARACTER SYM*80           ! Axis symbol
       INTEGER CI                 ! Catalogue identifier
       INTEGER DTYPE              ! Data type identifier
       INTEGER FRM                ! Frame pointer

@@ -180,6 +180,11 @@
 *        When choosing between log and lin axes, prefer linear if there is
 *        not much difference (since this allows points to be plotted at 
 *        negative axis values).
+*     12-OCT-2009 (DSB):
+*        Use the NDF component name (rather than the NDF label value) as 
+*        the Y axis Symbol attribute rather than the NDF label. This is 
+*        because the Symbol attribute is used as a column name and so 
+*        needs to be short and include no spaces.
 *     {enter_further_changes_here}
 
 *-
@@ -734,10 +739,15 @@
          TEXT = ' '
          IAT = 0
          CALL CHR_APPND( 'Log'//BCKSLH//'d10'//BCKSLH//'u(', TEXT, IAT )
-         CALL CHR_APPND( LAB, TEXT, IAT )
+         CALL CHR_APPND( MCOMP, TEXT, IAT )
          CALL CHR_APPND( ')', TEXT, IAT )
          CALL AST_SETC( WWWANT, 'SYMBOL(2)', TEXT( : IAT ), STATUS )
 
+         TEXT = ' '
+         IAT = 0
+         CALL CHR_APPND( 'Log'//BCKSLH//'d10'//BCKSLH//'u(', TEXT, IAT )
+         CALL CHR_APPND( LAB, TEXT, IAT )
+         CALL CHR_APPND( ')', TEXT, IAT )
          IF( LAB .EQ. MCOMP ) THEN
             TEXT( IAT : IAT ) = ' '   
             CALL CHR_APPND( 'value)', TEXT, IAT )
@@ -754,11 +764,11 @@
          END IF
 
       ELSE
+         CALL AST_SETC( WWWANT, 'SYMBOL(2)', MCOMP, STATUS )
+   
          TEXT = ' '
          IAT = 0
          CALL CHR_APPND( LAB, TEXT, IAT )
-         CALL AST_SETC( WWWANT, 'SYMBOL(2)', TEXT( : IAT ), STATUS )
-   
          IF( LAB .EQ. MCOMP ) THEN
             IAT = IAT + 1
             CALL CHR_APPND( 'value', TEXT, IAT )
