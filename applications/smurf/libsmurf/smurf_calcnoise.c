@@ -153,6 +153,8 @@ void smurf_calcnoise( int *status ) {
                        SMF__F_WHITEHI }; /* Default values for frequency range */
   double freqs[2];          /* Frequencies to use for white noise */
 
+  if (*status != SAI__OK) return;
+
   /* Main routine */
   ndfBegin();
 
