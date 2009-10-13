@@ -104,6 +104,7 @@ AC_CHECK_FUNCS( mmap msync munmap ftruncate, [], [
 
 AC_CHECK_HEADERS(math.h)
 AC_CHECK_HEADERS(slamac.h)
+AC_CHECK_HEADERS(mach/mach.h)
 
 dnl    Build dependencies for this package.
 dnl    Includes: fio, par, sae; 

@@ -882,30 +882,31 @@ void smurf_makemap( int *status ) {
   /* Get the maximum amount of memory that we can use */
 
   if( *status == SAI__OK ) {
-#if defined(_SC_PHYS_PAGES) && defined(_SC_AVPHYS_PAGES)
-    /* Figure out available physical memory from sysconf */
-    maxmem_default = (int) (sysconf(_SC_AVPHYS_PAGES) * sysconf(_SC_PAGE_SIZE) /
-                            SMF__MB);
+    double freemem = 0.0;
+    (void)smf_get_freemem( &freemem, NULL, status );
+    if (freemem > 0 ) {
+      const int min_mem = 512;
+      maxmem_default = (int)freemem;
 
-    /* Reduce that figure by 512MB to play it safe */
-    maxmem_default -= 512;
-    if( maxmem_default <= 0 ) {
-      *status = SAI__ERROR;
-      errRep( "", TASK_NAME ": Available memory estimated to be <= 0!",
-              status );
+      /* Reduce that figure by 512MB to play it safe */
+      if( maxmem_default <= min_mem ) {
+        *status = SAI__ERROR;
+        errRepf( "", TASK_NAME ": Available memory estimated to be %d MB but recommend at least %d MB!",
+                 status, maxmem_default, min_mem );
+      }
+      maxmem_default -= min_mem;
+
+      msgOutiff( MSG__VERB, "", TASK_NAME
+                 ": Default MAXMEM is %i MBytes",
+                 status, maxmem_default );
+    } else {
+      /* If smf_get_freemem can't tell us, try something safe...*/
+      maxmem_default = 1000;
+
+      msgOutiff( MSG__VERB, "", TASK_NAME
+                 ": Can't determine default MAXMEM, setting to %i MBytes",
+                 status, maxmem_default );
     }
-
-    msgOutiff( MSG__VERB, "", TASK_NAME
-               ": Default MAXMEM is %i MBytes",
-               status, maxmem_default );
-#else
-    /* If sysconf can't tell us, try something safe...*/
-    maxmem_default = 1000;
-
-    msgOutiff( MSG__VERB, "", TASK_NAME
-               ": Can't determine default MAXMEM, setting to %i MBytes",
-               status, maxmem_default );
-#endif
   }
 
   /* Set dynamic default before querying the parameter */
