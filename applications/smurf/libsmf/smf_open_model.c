@@ -115,7 +115,7 @@ void smf_open_model( const Grp *igrp, int index, const char *mode,
   char name[GRP__SZNAM+1];      /* Name of container file */
   size_t ndata=0;               /* Number of elements in data array */
   int oflags=0;                 /* bit flags for open */
-  long pagesize=0;              /* Size of memory page used by mmap */
+  size_t pagesize=0;            /* Size of memory page used by mmap */
   char *pname=NULL;             /* Poiner to fname */
   long remainder=0;             /* Extra length beyond integer pagesuze */
 
@@ -156,7 +156,7 @@ void smf_open_model( const Grp *igrp, int index, const char *mode,
 
     /* Header must fit into integer multiple of pagesize so that the data 
        array starts on a page boundary */
-    pagesize = sysconf(_SC_PAGESIZE);
+    (void)smf_get_freemem( NULL, &pagesize, status );
     headlen = sizeof(head);
     remainder = headlen % pagesize;
     if( remainder  ) headlen = headlen - remainder + pagesize;

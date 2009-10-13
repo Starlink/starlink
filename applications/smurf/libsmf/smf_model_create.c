@@ -255,7 +255,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
   size_t nflag;                 /* Number of flagged samples */
   dim_t nrel=0;                 /* Number of related elements (subarrays) */
   int oflag=0;                  /* Flags for opening template file */
-  long pagesize=0;              /* Size of memory page used by mmap */
+  size_t pagesize=0;            /* Size of memory page used by mmap */
   char *pname=NULL;             /* Poiner to fname */
   long remainder=0;             /* Extra length beyond integer pagesize */
   char suffix[] = SMF__DIMM_SUFFIX; /* String containing model suffix */
@@ -610,7 +610,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
 
           /* Header must fit into integer multiple of pagesize so that the
              data array starts on a page boundary (for later mmap) */
-          pagesize = sysconf(_SC_PAGESIZE);
+          (void)smf_get_freemem( NULL, &pagesize, status );
           headlen = sizeof(head);
           remainder = headlen % pagesize;
           if( remainder  ) headlen = headlen - remainder + pagesize;
