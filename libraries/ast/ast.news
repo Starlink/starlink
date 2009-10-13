@@ -16,12 +16,6 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
-- The astFindFrame and astConvert (AST_FINDFRAME and AST_CONVERT)
-functions will now succesfully match a Frame of a specialised class with
-a Frame of its parent class, returning a UnitMap between them. All the
-other restrictions on matching are unchanged (e.g. the number of axes 
-must match, the Domain names must match, etc.).
-
 - The arrays that supply input values to astMapPut1<X> are now declared
 "const".
 
