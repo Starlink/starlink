@@ -25,6 +25,7 @@ smf_calc_fcon.c \
 smf_calc_mapcoord.c \
 smf_calc_mappa.c \
 smf_calc_meantau.c \
+smf_calc_mmapsize.c \
 smf_calc_mode.c \
 smf_calc_skyframe.c \
 smf_calc_stareimage.c \

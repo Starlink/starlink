@@ -216,20 +216,9 @@ void smf_close_file( smfData ** data, int * status ) {
       /* Array was mmap'd to a file, and must now be sync'd and unmapped,
          and the file descriptor closed */
 
-      /* Length of the header including padding to page boundary */
-      (void)smf_get_freemem( NULL, &pagesize, status );
-      headlen = sizeof(*temphead);
-      remainder = headlen % pagesize;
-      if( remainder  ) headlen = headlen - remainder + pagesize;
-
-      /* Length of data array buffer */
-      ndata = 1;
-      for( i=0; i<(*data)->ndims; i++ ) {
-        ndata *= (*data)->dims[i];
-      }
-      datalen = ndata * smf_dtype_sz((*data)->dtype,status); 
-
-      buflen = headlen+datalen; /* Length of entire mapped buffer */
+      /* Get the size of the header and data section */
+      smf_calc_mmapsize( sizeof(*temphead), *data, &headlen, &datalen,
+                         &buflen, status );
 
       /* The header is in the same mapped array as the data array,
          but headlen bytes earlier. Point temphead to this location and

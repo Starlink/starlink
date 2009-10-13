@@ -106,6 +106,7 @@ void smf_open_model( const Grp *igrp, int index, const char *mode,
                      smfData **data, int *status ) {
   
   void *buf=NULL;               /* Pointer to total container buffer */
+  size_t buflen = 0;            /* datalen + headlen */
   size_t datalen=0;             /* Size of data buffer in bytes */
   int fd=0;                     /* File descriptor */
   smfDIMMHead head;             /* Header for the file */
@@ -154,22 +155,12 @@ void smf_open_model( const Grp *igrp, int index, const char *mode,
 
   if( *status == SAI__OK ) {
 
-    /* Header must fit into integer multiple of pagesize so that the data 
-       array starts on a page boundary */
-    (void)smf_get_freemem( NULL, &pagesize, status );
-    headlen = sizeof(head);
-    remainder = headlen % pagesize;
-    if( remainder  ) headlen = headlen - remainder + pagesize;
-
-    /* Length of data array buffer */
-    ndata = 1;
-    for( i=0; i<head.data.ndims; i++ ) {
-      ndata *= (size_t) head.data.dims[i];
-    }
-    datalen = ndata * smf_dtype_sz(head.data.dtype,status); 
+    /* Get the size of the header and data section */
+    smf_calc_mmapsize( sizeof(head), &(head.data), &headlen, &datalen,
+                       &buflen, status );
 
     /* map the entire file including the header */
-    if( (buf = mmap( 0, datalen+headlen, mflags, MAP_SHARED, fd, 0 ) ) 
+    if( (buf = mmap( 0, buflen, mflags, MAP_SHARED, fd, 0 ) ) 
 	== MAP_FAILED ) {
       *status = SAI__ERROR;
       errRep( FUNC_NAME, "Unable to map model container file", status ); 

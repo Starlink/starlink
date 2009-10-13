@@ -226,6 +226,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
   /* Local Variables */
   size_t bstride;               /* Bolometer stride in data array */
   void *buf=NULL;               /* Pointer to total container buffer */
+  size_t buflen = 0;            /* datalen + headlen */
   int copyinput=0;              /* If set, container is copy of input */
   smfData *data = NULL;         /* Data struct for file */
   size_t datalen=0;             /* Size of data buffer in bytes */
@@ -608,19 +609,9 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
              buf   = [smf_dtype] * dims[0] * dims[1] * ...
           */
 
-          /* Header must fit into integer multiple of pagesize so that the
-             data array starts on a page boundary (for later mmap) */
-          (void)smf_get_freemem( NULL, &pagesize, status );
-          headlen = sizeof(head);
-          remainder = headlen % pagesize;
-          if( remainder  ) headlen = headlen - remainder + pagesize;
-
-          /* Length of data array buffer */
-          ndata = 1;
-          for( k=0; k<head.data.ndims; k++ ) {
-            ndata *= head.data.dims[k];
-          }
-          datalen = ndata * smf_dtype_sz(head.data.dtype, status);
+          /* Get the size of the header and data section */
+          smf_calc_mmapsize( sizeof(head), &(head.data), &headlen, &datalen,
+                             &buflen, status );
 
           if( mgroup != NULL ) {
             /* Obtain a character string corresponding to the file name
@@ -659,11 +650,11 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
                linux when the memory is subsequently accessed...) */
 
             if( *status == SAI__OK ) {
-              if( ftruncate( fd, datalen+headlen ) == -1 ) {
+              if( ftruncate( fd, buflen ) == -1 ) {
                 *status = SAI__ERROR;
                 errRep( FUNC_NAME, "Unable to re-size container file",
                         status );
-              } else if( (buf = mmap( 0, datalen+headlen, 
+              } else if( (buf = mmap( 0, buflen, 
                                       PROT_READ | PROT_WRITE,
                                       MAP_SHARED, fd, 0 ) ) == MAP_FAILED ) {
                 *status = SAI__ERROR;
@@ -859,11 +850,11 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
               /* If leaveopen not set (and there is a file) write buffer to
                  file and close container */
 
-              if( msync( buf, headlen+datalen, MS_ASYNC ) == -1 ) {
+              if( msync( buf, buflen, MS_ASYNC ) == -1 ) {
                 *status = SAI__ERROR;
                 errRep( FUNC_NAME, "Unable to sync model container file",
                         status );
-              } else if( munmap( buf, headlen+datalen ) == -1 ) {
+              } else if( munmap( buf, buflen ) == -1 ) {
                 *status = SAI__ERROR;
                 errRep( FUNC_NAME, "Unable to unmap model container file",
                         status );
