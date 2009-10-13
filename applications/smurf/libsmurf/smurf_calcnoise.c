@@ -247,8 +247,8 @@ void smurf_calcnoise( int *status ) {
                                                  "Noise Ratio", NULL, status );
 
         if (*status == SAI__OK) {
-          smf_bolonoise( wf, thedata, NULL, 0, 0.5, freqs[0], freqs[1], 10.0,
-                         (outdata->pntr)[0], (ratdata->pntr)[0], 1, status );
+          smf_bolonoise( wf, thedata, NULL, 0, 0.5, freqs[0], freqs[1], 10.0, 1,
+                         (outdata->pntr)[0], (ratdata->pntr)[0], NULL, status );
 
           /* Bolonoise gives us a variance - we want square root */
           for (i = 0; i < (outdata->dims)[0]*(outdata->dims)[1]; i++) {

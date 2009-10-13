@@ -501,8 +501,8 @@ void smurf_qlmakemap( int *status ) {
     /*** TIMER ***/
     smf_timerupdate(&tv1,&tv2,status);
 
-    smf_bolonoise( wf, data, NULL, 0, 0.5, SMF__F_WHITELO, SMF__F_WHITEHI, 0,
-                   bolonoise, NULL, 0, status );
+    smf_bolonoise( wf, data, NULL, 0, 0.5, SMF__F_WHITELO, SMF__F_WHITEHI, 0, 0,
+                   bolonoise, NULL, NULL, status );
 
     /*** TIMER ***/
     msgOutiff( MSG__DEBUG, "", " ** %f s calling smf_bolonoise",

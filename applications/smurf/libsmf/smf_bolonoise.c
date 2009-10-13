@@ -16,8 +16,8 @@
 *     smf_bolonoise( smfWorkForce *wf, const smfData *data,
 *                    unsigned char *quality, size_t window, double f_low,
 *                    double f_white1, double f_white2, double flagratio,
-*                    double *whitenoise, double *fratio, int nep,
-*                    int *status )
+*                    int nep, double *whitenoise, double *fratio,
+*                    smfData **fftpow, int *status )
 
 *  Arguments:
 *     wf = smfWorkForce * (Given)
@@ -37,6 +37,9 @@
 *     flagratio = double (Given)
 *        If nonzero, limit for fratio below which bolo is flagged as bad
 *        in the input "quality" array.
+*     nep = int (Given)
+*        If set, calculate whitenoise in 1 second of averaged time-series data
+*        by dividing by the sample rate.
 *     whitenoise = double* (Returned)
 *        Externally allocated array (nbolos) that will hold estimates of
 *        the mean-square variances in bolo signals produced by white noise.
@@ -44,9 +47,8 @@
 *     fratio = double* (Returned)
 *        Externally allocated array (nbolos) that will hold ratios of noise at
 *        f_low to the average from f_white1 to f_white2. Can be NULL.
-*     nep = int (Given)
-*        If set, calculate whitenoise in 1 second of averaged time-series data
-*        by dividing by the sample rate.
+*     fftpow = smfData ** (Returned)
+*        Power spectrum of the time series returned in a smfData. Can be NULL.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -100,10 +102,13 @@
 *     2009-10-06 (TIMJ):
 *        - continue even if not enough samples
 *        - update bad values after FFT
+*     2009-10-13 (TIMJ):
+*        Allow the caller to retain the FFT. Move NEP parameter
+*        before return values.
 
 *  Copyright:
 *     Copyright (C) 2008-2009 University of British Columbia.
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -142,10 +147,10 @@
 #define FUNC_NAME "smf_bolonoise"
 
 void smf_bolonoise( smfWorkForce *wf, const smfData *data,
-                    unsigned char *quality,
-                    size_t window, double f_low, double f_white1,
-                    double f_white2, double flagratio, double *whitenoise,
-                    double *fratio, int nep, int *status ) {
+                    unsigned char *quality, size_t window, double f_low,
+                    double f_white1, double f_white2, double flagratio,
+                    int nep, double *whitenoise, double *fratio,
+                    smfData **fftpow,int *status ) {
 
   double *base=NULL;       /* Pointer to base coordinates of array */
   size_t bstride;          /* bolometer index stride */
@@ -288,6 +293,12 @@ void smf_bolonoise( smfWorkForce *wf, const smfData *data,
     }
   }
 
-  /* Clean up */
-  if( pow ) smf_close_file( &pow, status );
+  /* Clean up if the caller does not want to take over the power spectrum */
+  if( pow ) {
+    if (fftpow) {
+      *fftpow = pow;
+    } else {
+      smf_close_file( &pow, status );
+    }
+  }
 }

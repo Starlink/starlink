@@ -441,11 +441,11 @@ void smf_apply_mask( smfData *indata, unsigned char *quality,
                      const smfArray *bpms, smf_dark_sub_meth method,
                      int *status );
 
-void smf_bolonoise( smfWorkForce *wf, const smfData *data, 
-                    unsigned char *quality,
-                    size_t window, double f_low, double f_white1,
-                    double f_white2, double flagratio, double *whitenoise,
-                    double *fratio, int nep, int *status );
+void smf_bolonoise( smfWorkForce *wf, const smfData *data,
+                    unsigned char *quality, size_t window, double f_low,
+                    double f_white1, double f_white2, double flagratio,
+                    int nep, double *whitenoise, double *fratio,
+                    smfData **fftpow,int *status );
 
 double smf_calc_covar( const smfData *data, const int i, const int j,
                        int lo, int hi, int *status);

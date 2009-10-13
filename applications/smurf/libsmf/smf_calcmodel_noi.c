@@ -236,7 +236,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
       if( flags & SMF__DIMM_FIRSTITER ) {
         /* Measure the noise from power spectra */
         smf_bolonoise( wf, res->sdata[idx], qua_data, 0, 0.5, SMF__F_WHITELO,
-                       SMF__F_WHITEHI, 0, var, NULL, 0, status );
+                       SMF__F_WHITEHI, 0, 0, var, NULL, NULL, status );
 
 	for( i=0; i<nbolo; i++ ) if( !(qua_data[i*ntslice]&SMF__Q_BADB) ) {
             /* Loop over time and store the variance for each sample */
