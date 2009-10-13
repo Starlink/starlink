@@ -1168,7 +1168,8 @@ void astInitBoxVtab_(  AstBoxVtab *vtab, const char *name, int *status ) {
    will be used (by astIsABox) to determine if an object belongs
    to this class.  We can conveniently use the address of the (static)
    class_check variable to generate this unique value. */
-   vtab->check = &class_check;
+   vtab->id.check = &class_check;
+   vtab->id.parent = &(((AstRegionVtab *) vtab)->id);
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
@@ -1231,9 +1232,12 @@ void astInitBoxVtab_(  AstBoxVtab *vtab, const char *name, int *status ) {
    astSetDump( vtab, Dump, "Box", "Axis intervals" );
 
 /* If we have just initialised the vtab for the current class, indicate
-   that the vtab is now initialised. */
-   if( vtab == &class_vtab ) class_init = 1;
-
+   that the vtab is now initialised, and store a pointer to the class
+   identifier in the base "object" level of the vtab. */
+   if( vtab == &class_vtab ) {
+      class_init = 1;
+      astSetVtabClassIdentifier( vtab, &(vtab->id) );
+   }
 }
 
 static int MakeGrid( int naxes, double **ptr, int ip, double *lbnd,
@@ -4555,7 +4559,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /* ========================= */
 /* Implement the astIsABox and astCheckBox functions using the macros
    defined for this purpose in the "object.h" header file. */
-astMAKE_ISA(Box,Region,check,&class_check)
+astMAKE_ISA(Box,Region)
 astMAKE_CHECK(Box)
 
 AstBox *astBox_( void *frame_void, int form, const double point1[], 

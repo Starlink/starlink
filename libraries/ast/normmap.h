@@ -104,8 +104,8 @@ typedef struct AstNormMapVtab {
 /* Properties (e.g. methods) inherited from the parent class. */
    AstMappingVtab mapping_vtab;  /* Parent class virtual function table */
 
-/* Unique flag value to determine class membership. */
-   int *check;                   /* Check value */
+/* A Unique identifier to determine class membership. */
+   AstClassIdentifier id;
 
 } AstNormMapVtab;
 

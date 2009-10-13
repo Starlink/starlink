@@ -3521,7 +3521,8 @@ void astInitPlot3DVtab_(  AstPlot3DVtab *vtab, const char *name, int *status ) {
    will be used (by astIsAPlot3D) to determine if an object belongs
    to this class.  We can conveniently use the address of the (static)
    class_check variable to generate this unique value. */
-   vtab->check = &class_check;
+   vtab->id.check = &class_check;
+   vtab->id.parent = &(((AstPlotVtab *) vtab)->id);
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
@@ -3673,9 +3674,12 @@ SET_PLOT_ACCESSORS(Size)
    astSetDump( vtab, Dump, "Plot3D", "Provide facilities for 3D graphical output" );
 
 /* If we have just initialised the vtab for the current class, indicate
-   that the vtab is now initialised. */
-   if( vtab == &class_vtab ) class_init = 1;
-
+   that the vtab is now initialised, and store a pointer to the class
+   identifier in the base "object" level of the vtab. */
+   if( vtab == &class_vtab ) {
+      class_init = 1;
+      astSetVtabClassIdentifier( vtab, &(vtab->id) );
+   }
 }
 
 #if defined(THREAD_SAFE)
@@ -7257,7 +7261,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /* ========================= */
 /* Implement the astIsAPlot3D and astCheckPlot3D functions using the 
    macros defined for this purpose in the "object.h" header file. */
-astMAKE_ISA(Plot3D,Plot,check,&class_check)
+astMAKE_ISA(Plot3D,Plot)
 astMAKE_CHECK(Plot3D)
 
 

@@ -515,22 +515,34 @@ AstObject *astCast_( AstObject *this, AstObject *obj, int *status ) {
 *     Object method.
 
 *  Description:
-*     This function returns a deep copy of the supplied Object, but cast into
-*     an instance of the ancestor class specified by "obj".
+*     This function returns a pointer to an ancestral component of the
+*     supplied object. The required class of the ancestral component is
+*     specified by another object. Specifically, if "this" and "new" are 
+*     of the same class, a clone of "this" is returned. If "this" is an 
+*     instance of a subclass of "obj", then a deep copy of the component
+*     of "this" that matches "obj" is returned. Otherwise, a NULL pointer
+*     is returned without error.
 
 *  Parameters:
 *     this
 *        Pointer to the Object to be cast.
 *     obj
 *        Pointer to an Object that defines the class of the returned Object. 
-*        The returned Object will be of the same class as "obj". "this" 
-*        should be a sub-class of "obj".
+*        The returned Object will be of the same class as "obj". 
+
+*  Returned Value:
+*     A pointer to the new Object, or a clone of the supplied pointer. NULL 
+*     if "this" is not a sub-class of "obj".
 *-
 */
 
 /* Local Variables: */
-   AstObjectVtab *old_vtab;
+   AstClassIdentifier *obj_id;
+   AstClassIdentifier *this_id;
    AstObject *new;
+   AstObjectVtab *obj_vtab;
+   AstObjectVtab *this_vtab;
+   int *obj_check;    
 
 /* Initialise */
    new = NULL;
@@ -538,17 +550,46 @@ AstObject *astCast_( AstObject *this, AstObject *obj, int *status ) {
 /* Check pointer have been supplied. */
    if( this && obj ) {
 
+/* Get pointers to the virtual function tables for the two objects. */
+      this_vtab = this->vtab;
+      obj_vtab = obj->vtab;
+
+/* Get pointers to the AstClassIdentifier that identifies the top-level
+   class of each vtab. */
+      this_id = this_vtab->top_id;
+      obj_id = obj_vtab->top_id;
+
+/* Class membership is specified by the "check" value in each class
+   identifier. Get the check value for "obj". */
+      obj_check = obj_id->check;
+
+/* If the two objects are of the same class, just return a clone of
+   "this". */
+      if( this_id->check == obj_check ) {
+         new = astClone( this );
+
+/* If the two objects are not of the same class, walk up the class heiarchy
+   of "this" until the class of "obj" is reached. */
+      } else {
+         while( this_id && ( this_id->check != obj_check ) ) {
+            this_id = this_id->parent;
+         }
+
+/* Check that "this" is a subclass of "obj". */
+         if( this_id ) {
+
 /* Temporarily change the vtab of the supplied object to the supplied
    vtab. */
-      old_vtab = this->vtab;
-      this->vtab = obj->vtab;
+            this->vtab = obj_vtab;
 
 /* Now take a copy of the object (now considered to be an instance of the
    class specified by "vtab"). */
-      new = astCopy( this );
+            new = astCopy( this );
 
 /* Re-instate the original Object vtab. */
-      this->vtab = old_vtab;
+            this->vtab = this_vtab;
+         }
+      }
    }
 
 /* Return the copy pointer. */

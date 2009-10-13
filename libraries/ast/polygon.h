@@ -129,8 +129,8 @@ typedef struct AstPolygonVtab {
 /* Properties (e.g. methods) inherited from the parent class. */
    AstRegionVtab region_vtab;    /* Parent class virtual function table */
 
-/* Unique flag value to determine class membership. */
-   int *check;                   /* Check value */
+/* A Unique identifier to determine class membership. */
+   AstClassIdentifier id;
 
 /* Properties (e.g. methods) specific to this class. */
    AstPolygon *(* Downsize)( AstPolygon *, double, int, int * );

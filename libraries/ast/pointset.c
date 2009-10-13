@@ -1529,7 +1529,8 @@ void astInitPointSetVtab_(  AstPointSetVtab *vtab, const char *name, int *status
    will be used (by astIsAPointSet) to determine if an object belongs
    to this class.  We can conveniently use the address of the (static)
    class_check variable to generate this unique value. */
-   vtab->check = &class_check;
+   vtab->id.check = &class_check;
+   vtab->id.parent = NULL;
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
@@ -1573,9 +1574,12 @@ void astInitPointSetVtab_(  AstPointSetVtab *vtab, const char *name, int *status
    astSetDump( vtab, Dump, "PointSet", "Container for a set of points" );
 
 /* If we have just initialised the vtab for the current class, indicate
-   that the vtab is now initialised. */
-   if( vtab == &class_vtab ) class_init = 1;
-
+   that the vtab is now initialised, and store a pointer to the class
+   identifier in the base "object" level of the vtab. */
+   if( vtab == &class_vtab ) {
+      class_init = 1;
+      astSetVtabClassIdentifier( vtab, &(vtab->id) );
+   }
 }
 
 static void PermPoints( AstPointSet *this, int forward, const int perm[], int *status ) {
@@ -2413,7 +2417,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /* ========================= */
 /* Implement the astIsAPointSet and astCheckPointSet functions using the macros
    defined for this purpose in the "object.h" header file. */
-astMAKE_ISA(PointSet,Object,check,&class_check)
+astMAKE_ISA(PointSet,Object)
 astMAKE_CHECK(PointSet)
 
 AstPointSet *astPointSet_( int npoint, int ncoord, const char *options, int *status, ...) {

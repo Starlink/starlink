@@ -56,6 +56,8 @@ g95 -fno-second-underscore -o simplify simplify.f -I$AST/include -I$STARLINK/inc
 
 # Run the other test progs
 echo "" 
+
+
 foreach prog (teststcschan teststc testspecframe testfitschan testswitchmap testrebin testtrangrid testnormmap testtime testrate testflux testratemap testspecflux testxmlchan testregions testkeymap )
 
 g95 -fno-second-underscore -w -g -o $prog -g $prog.f -I$AST/include \
@@ -63,9 +65,23 @@ g95 -fno-second-underscore -w -g -o $prog -g $prog.f -I$AST/include \
      `psx_link` `prm_link` `chr_link` `err_link`
 
 $prog
-#rm $prog
+rm $prog
 
 end
+
+
+
+foreach prog (testcast)
+
+gcc -o $prog $prog.c -I.. -L/star/lib `ast_link`
+
+$prog
+rm $prog
+
+end
+
+
+
 
 # Make new plots.
 echo ""

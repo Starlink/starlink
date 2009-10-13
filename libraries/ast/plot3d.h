@@ -105,8 +105,8 @@ typedef struct AstPlot3DVtab {
 /* Properties (e.g. methods) inherited from the parent class. */
    AstPlotVtab plot_vtab;      /* Parent class virtual function table */
 
-/* Unique flag value to determine class membership. */
-   int *check;                   /* Check value */
+/* A Unique identifier to determine class membership. */
+   AstClassIdentifier id;
 
    int (* GetRootCorner)( AstPlot3D *, int * );
    int (* TestRootCorner)( AstPlot3D *, int * );

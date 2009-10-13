@@ -807,7 +807,8 @@ void astInitDSBSpecFrameVtab_(  AstDSBSpecFrameVtab *vtab, const char *name, int
    will be used (by astIsADSBSpecFrame) to determine if an object belongs
    to this class.  We can conveniently use the address of the (static)
    class_check variable to generate this unique value. */
-   vtab->check = &class_check;
+   vtab->id.check = &class_check;
+   vtab->id.parent = &(((AstSpecFrameVtab *) vtab)->id);
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
@@ -871,9 +872,12 @@ void astInitDSBSpecFrameVtab_(  AstDSBSpecFrameVtab *vtab, const char *name, int
    astSetDump( vtab, Dump, "DSBSpecFrame", "Dual sideband spectral axis" );
 
 /* If we have just initialised the vtab for the current class, indicate
-   that the vtab is now initialised. */
-   if( vtab == &class_vtab ) class_init = 1;
-
+   that the vtab is now initialised, and store a pointer to the class
+   identifier in the base "object" level of the vtab. */
+   if( vtab == &class_vtab ) {
+      class_init = 1;
+      astSetVtabClassIdentifier( vtab, &(vtab->id) );
+   }
 }
 
 static int Match( AstFrame *template_frame, AstFrame *target,
@@ -2669,7 +2673,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /* ========================= */
 /* Implement the astIsADSBSpecFrame and astCheckDSBSpecFrame functions using the macros
    defined for this purpose in the "object.h" header file. */
-astMAKE_ISA(DSBSpecFrame,SpecFrame,check,&class_check)
+astMAKE_ISA(DSBSpecFrame,SpecFrame)
 astMAKE_CHECK(DSBSpecFrame)
 
 AstDSBSpecFrame *astDSBSpecFrame_( const char *options, int *status, ...) {

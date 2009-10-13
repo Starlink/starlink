@@ -2286,7 +2286,8 @@ void astInitKeyMapVtab_(  AstKeyMapVtab *vtab, const char *name, int *status ) {
    will be used (by astIsAKeyMap) to determine if an object belongs
    to this class.  We can conveniently use the address of the (static)
    class_check variable to generate this unique value. */
-   vtab->check = &class_check;
+   vtab->id.check = &class_check;
+   vtab->id.parent = NULL;
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
@@ -2370,9 +2371,12 @@ void astInitKeyMapVtab_(  AstKeyMapVtab *vtab, const char *name, int *status ) {
    astSetDump( vtab, Dump, "KeyMap", "Map of key/value pairs" );
 
 /* If we have just initialised the vtab for the current class, indicate
-   that the vtab is now initialised. */
-   if( vtab == &class_vtab ) class_init = 1;
-
+   that the vtab is now initialised, and store a pointer to the class
+   identifier in the base "object" level of the vtab. */
+   if( vtab == &class_vtab ) {
+      class_init = 1;
+      astSetVtabClassIdentifier( vtab, &(vtab->id) );
+   }
 }
 
 static int KeyCmp( const char *key1, const char *key2, int *status ) {
@@ -6158,7 +6162,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /* ========================= */
 /* Implement the astIsAKeyMap and astCheckKeyMap functions using the macros
    defined for this purpose in the "object.h" header file. */
-astMAKE_ISA(KeyMap,Object,check,&class_check)
+astMAKE_ISA(KeyMap,Object)
 astMAKE_CHECK(KeyMap)
 
 AstKeyMap *astKeyMap_( const char *options, int *status, ...) {

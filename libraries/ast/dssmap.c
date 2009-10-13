@@ -801,7 +801,8 @@ void astInitDssMapVtab_(  AstDssMapVtab *vtab, const char *name, int *status ) {
    will be used (by astIsADssMap) to determine if an object belongs
    to this class.  We can conveniently use the address of the (static)
    class_check variable to generate this unique value. */
-   vtab->check = &class_check;
+   vtab->id.check = &class_check;
+   vtab->id.parent = &(((AstMappingVtab *) vtab)->id);
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
@@ -830,9 +831,12 @@ void astInitDssMapVtab_(  AstDssMapVtab *vtab, const char *name, int *status ) {
    astSetDelete( object, Delete );
 
 /* If we have just initialised the vtab for the current class, indicate
-   that the vtab is now initialised. */
-   if( vtab == &class_vtab ) class_init = 1;
-
+   that the vtab is now initialised, and store a pointer to the class
+   identifier in the base "object" level of the vtab. */
+   if( vtab == &class_vtab ) {
+      class_init = 1;
+      astSetVtabClassIdentifier( vtab, &(vtab->id) );
+   }
 }
 
 static int MapMerge( AstMapping *this, int where, int series, int *nmap,
@@ -1489,7 +1493,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /* ========================= */
 /* Implement the astIsADssMap and astCheckDssMap functions using the macros
    defined for this purpose in the "object.h" header file. */
-astMAKE_ISA(DssMap,Mapping,check,&class_check)
+astMAKE_ISA(DssMap,Mapping)
 astMAKE_CHECK(DssMap)
 
 AstDssMap *astDssMap_( void *fits_void, const char *options, int *status, ...) {

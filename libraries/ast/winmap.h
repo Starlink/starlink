@@ -178,8 +178,8 @@ typedef struct AstWinMapVtab {
 /* Properties (e.g. methods) inherited from the parent class. */
    AstMappingVtab mapping_vtab;  /* Parent class virtual function table */
 
-/* Unique flag value to determine class membership. */
-   int *check;                   /* Check value */
+/* A Unique identifier to determine class membership. */
+   AstClassIdentifier id;
 
 /* Properties (e.g. methods) specific to this class. */
    int (* WinTerms)( AstWinMap *, double **, double **, int * );

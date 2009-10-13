@@ -3055,7 +3055,8 @@ void astInitSkyAxisVtab_(  AstSkyAxisVtab *vtab, const char *name, int *status )
    will be used (by astIsASkyAxis) to determine if an object belongs
    to this class.  We can conveniently use the address of the (static)
    class_check variable to generate this unique value. */
-   vtab->check = &class_check;
+   vtab->id.check = &class_check;
+   vtab->id.parent = &(((AstAxisVtab *) vtab)->id);
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
@@ -3145,9 +3146,12 @@ void astInitSkyAxisVtab_(  AstSkyAxisVtab *vtab, const char *name, int *status )
    UNLOCK_MUTEX2
 
 /* If we have just initialised the vtab for the current class, indicate
-   that the vtab is now initialised. */
-   if( vtab == &class_vtab ) class_init = 1;
-
+   that the vtab is now initialised, and store a pointer to the class
+   identifier in the base "object" level of the vtab. */
+   if( vtab == &class_vtab ) {
+      class_init = 1;
+      astSetVtabClassIdentifier( vtab, &(vtab->id) );
+   }
 }
 
 static void ParseDHmsFormat( const char *fmt, int digs, char *sep, int *plus,
@@ -4416,7 +4420,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /* ========================= */
 /* Implement the astIsASkyAxis and astCheckSkyAxis functions using the macros
    defined for this purpose in the "object.h" header file. */
-astMAKE_ISA(SkyAxis,Axis,check,&class_check)
+astMAKE_ISA(SkyAxis,Axis)
 astMAKE_CHECK(SkyAxis)
 
 AstSkyAxis *astSkyAxis_( const char *options, int *status, ...) {

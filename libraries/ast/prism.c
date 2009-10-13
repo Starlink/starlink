@@ -1140,7 +1140,8 @@ void astInitPrismVtab_(  AstPrismVtab *vtab, const char *name, int *status ) {
    will be used (by astIsAPrism) to determine if an object belongs to
    this class.  We can conveniently use the address of the (static)
    class_check variable to generate this unique value. */
-   vtab->check = &class_check;
+   vtab->id.check = &class_check;
+   vtab->id.parent = &(((AstRegionVtab *) vtab)->id);
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
@@ -1223,9 +1224,12 @@ void astInitPrismVtab_(  AstPrismVtab *vtab, const char *name, int *status ) {
    astSetDump( vtab, Dump, "Prism", "Region extrusion into higher dimensions" );
 
 /* If we have just initialised the vtab for the current class, indicate
-   that the vtab is now initialised. */
-   if( vtab == &class_vtab ) class_init = 1;
-
+   that the vtab is now initialised, and store a pointer to the class
+   identifier in the base "object" level of the vtab. */
+   if( vtab == &class_vtab ) {
+      class_init = 1;
+      astSetVtabClassIdentifier( vtab, &(vtab->id) );
+   }
 }
 
 #if defined(THREAD_SAFE)
@@ -3652,7 +3656,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /* ========================= */
 /* Implement the astIsAPrism and astCheckPrism functions using the
    macros defined for this purpose in the "object.h" header file. */
-astMAKE_ISA(Prism,Region,check,&class_check)
+astMAKE_ISA(Prism,Region)
 astMAKE_CHECK(Prism)
 
 AstPrism *astPrism_( void *region1_void, void *region2_void, 

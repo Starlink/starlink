@@ -4293,7 +4293,8 @@ void astInitSkyFrameVtab_(  AstSkyFrameVtab *vtab, const char *name, int *status
    will be used (by astIsASkyFrame) to determine if an object belongs
    to this class.  We can conveniently use the address of the (static)
    class_check variable to generate this unique value. */
-   vtab->check = &class_check;
+   vtab->id.check = &class_check;
+   vtab->id.parent = &(((AstFrameVtab *) vtab)->id);
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
@@ -4478,8 +4479,12 @@ void astInitSkyFrameVtab_(  AstSkyFrameVtab *vtab, const char *name, int *status
    UNLOCK_MUTEX2
 
 /* If we have just initialised the vtab for the current class, indicate
-   that the vtab is now initialised. */
-   if( vtab == &class_vtab ) class_init = 1;
+   that the vtab is now initialised, and store a pointer to the class
+   identifier in the base "object" level of the vtab. */
+   if( vtab == &class_vtab ) {
+      class_init = 1;
+      astSetVtabClassIdentifier( vtab, &(vtab->id) );
+   }
 }
 
 static void Intersect( AstFrame *this_frame, const double a1[2],
@@ -10960,7 +10965,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /* ========================= */
 /* Implement the astIsASkyFrame and astCheckSkyFrame functions using the macros
    defined for this purpose in the "object.h" header file. */
-astMAKE_ISA(SkyFrame,Frame,check,&class_check)
+astMAKE_ISA(SkyFrame,Frame)
 astMAKE_CHECK(SkyFrame)
 
 AstSkyFrame *astSkyFrame_( const char *options, int *status, ...) {

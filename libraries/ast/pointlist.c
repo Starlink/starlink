@@ -585,7 +585,8 @@ void astInitPointListVtab_(  AstPointListVtab *vtab, const char *name,
    will be used (by astIsAPointList) to determine if an object belongs
    to this class.  We can conveniently use the address of the (static)
    class_check variable to generate this unique value. */
-   vtab->check = &class_check;
+   vtab->id.check = &class_check;
+   vtab->id.parent = &(((AstRegionVtab *) vtab)->id);
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
@@ -651,9 +652,12 @@ void astInitPointListVtab_(  AstPointListVtab *vtab, const char *name,
    astSetDump( vtab, Dump, "PointList", "Collection of points" );
 
 /* If we have just initialised the vtab for the current class, indicate
-   that the vtab is now initialised. */
-   if( vtab == &class_vtab ) class_init = 1;
-
+   that the vtab is now initialised, and store a pointer to the class
+   identifier in the base "object" level of the vtab. */
+   if( vtab == &class_vtab ) {
+      class_init = 1;
+      astSetVtabClassIdentifier( vtab, &(vtab->id) );
+   }
 }
 
 /*
@@ -2780,7 +2784,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /* ========================= */
 /* Implement the astIsAPointList and astCheckPointList functions using the macros
    defined for this purpose in the "object.h" header file. */
-astMAKE_ISA(PointList,Region,check,&class_check)
+astMAKE_ISA(PointList,Region)
 astMAKE_CHECK(PointList)
 
 AstPointList *astPointList_( void *frame_void, AstPointSet *points,

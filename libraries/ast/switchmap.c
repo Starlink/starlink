@@ -653,7 +653,8 @@ void astInitSwitchMapVtab_(  AstSwitchMapVtab *vtab, const char *name, int *stat
    will be used (by astIsASwitchMap) to determine if an object belongs to
    this class.  We can conveniently use the address of the (static)
    class_check variable to generate this unique value. */
-   vtab->check = &class_check;
+   vtab->id.check = &class_check;
+   vtab->id.parent = &(((AstMappingVtab *) vtab)->id);
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
@@ -690,9 +691,12 @@ void astInitSwitchMapVtab_(  AstSwitchMapVtab *vtab, const char *name, int *stat
    astSetDump( vtab, Dump, "SwitchMap", "Alternate regionalised Mapping" );
 
 /* If we have just initialised the vtab for the current class, indicate
-   that the vtab is now initialised. */
-   if( vtab == &class_vtab ) class_init = 1;
-
+   that the vtab is now initialised, and store a pointer to the class
+   identifier in the base "object" level of the vtab. */
+   if( vtab == &class_vtab ) {
+      class_init = 1;
+      astSetVtabClassIdentifier( vtab, &(vtab->id) );
+   }
 }
 
 #if defined(THREAD_SAFE)
@@ -2076,7 +2080,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /* ========================= */
 /* Implement the astIsASwitchMap and astCheckSwitchMap functions using the
    macros defined for this purpose in the "object.h" header file. */
-astMAKE_ISA(SwitchMap,Mapping,check,&class_check)
+astMAKE_ISA(SwitchMap,Mapping)
 astMAKE_CHECK(SwitchMap)
 
 AstSwitchMap *astSwitchMap_( void *fsmap_void, void *ismap_void, int nroute, 

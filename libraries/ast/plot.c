@@ -18398,7 +18398,8 @@ void astInitPlotVtab_(  AstPlotVtab *vtab, const char *name, int *status ) {
    used (by astIsAPlot) to determine if an object belongs to this class.
    We can conveniently use the address of the (static) class_init variable to
    generate this unique value. */
-   vtab->check = &class_check;
+   vtab->id.check = &class_check;
+   vtab->id.parent = &(((AstFrameSetVtab *) vtab)->id);
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
@@ -18615,9 +18616,12 @@ void astInitPlotVtab_(  AstPlotVtab *vtab, const char *name, int *status ) {
    astSetDump( vtab, Dump, "Plot", "Provide facilities for 2D graphical output" );
 
 /* If we have just initialised the vtab for the current class, indicate
-   that the vtab is now initialised. */
-   if( vtab == &class_vtab ) class_init = 1;
-
+   that the vtab is now initialised, and store a pointer to the class
+   identifier in the base "object" level of the vtab. */
+   if( vtab == &class_vtab ) {
+      class_init = 1;
+      astSetVtabClassIdentifier( vtab, &(vtab->id) );
+   }
 }
 
 static int Inside( int n, float *cx, float *cy, float x, float y, int *status ){
@@ -29037,7 +29041,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /* Implement the astIsAPlot and astCheckPlot functions using
    the macros defined for this purpose in the "object.h" header
    file. */
-astMAKE_ISA(Plot,FrameSet,check,&class_check)
+astMAKE_ISA(Plot,FrameSet)
 astMAKE_CHECK(Plot)
 
 AstPlot *astPlot_( void *frame_void, const float *graphbox, 

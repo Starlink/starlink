@@ -849,7 +849,7 @@ type astGet##attribute##_( Ast##class *this, int *status ) { \
 
 *  Synopsis:
 *     #include "object.h"
-*     astMAKE_ISA(class)
+*     astMAKE_ISA(class,parent)
 
 *  Class Membership:
 *     Defined by the Object class.
@@ -865,12 +865,6 @@ type astGet##attribute##_( Ast##class *this, int *status ) { \
 *        tested.
 *     parent
 *        The name of the parent class.
-*     check
-*        The name of the component in the class virtual function table
-*        which holds the "magic number" that uniquely identifies the
-*        class. Normally this is called "check".
-*     magic
-*        The value of the "magic number" (may be an expression).
 
 *  Notes:
 *     - This macro is provided so that class definitions can easiy
@@ -882,7 +876,7 @@ type astGet##attribute##_( Ast##class *this, int *status ) { \
 */
 
 /* Define the macro. */
-#define astMAKE_ISA(class,parent,check,magic) \
+#define astMAKE_ISA(class,parent) \
 \
 /* Declare the function (see the object.c file for a prologue). */ \
 int astIsA##class##_( const Ast##class *this, int *status ) { \
@@ -906,7 +900,7 @@ int astIsA##class##_( const Ast##class *this, int *status ) { \
 \
 /* If OK, see whether the check component in the object's virtual function \
    table matches the expected "magic" value. */ \
-         isa = ( *astMEMBER(this,class,check) == (magic) ); \
+         isa = ( *astMEMBER(this,class,id.check) == &class_check ); \
       } \
    } \
 \
@@ -1222,6 +1216,11 @@ int astTest##attribute##_( Ast##class *this, int *status ) { \
 #define AST__NULL (astI2P(0))
 
 
+#if defined(astCLASS)            /* Protected */
+#define astSetVtabClassIdentifier(vtab,id_ptr) \
+   ((AstObjectVtab *)(vtab))->top_id = (id_ptr)
+#endif
+
 /* Type Definitions. */
 /* ================= */
 
@@ -1253,6 +1252,12 @@ typedef struct AstObject {
 
 } AstObject;
 
+/* Class identifier structure */
+typedef struct AstClassIdentifier {
+   int *check;
+   struct AstClassIdentifier *parent;
+} AstClassIdentifier;
+
 /* Virtual function table. */
 /* ----------------------- */
 /* The virtual function table makes a forward reference to the
@@ -1265,6 +1270,10 @@ struct AstChannel;
    objects in the class (e.g. pointers to its virtual functions). */
 #if defined(astCLASS)            /* Protected */
 typedef struct AstObjectVtab {
+
+/* Pointer to the structure that identifies the top-level class described
+   by the vtab. */
+   AstClassIdentifier *top_id;
 
 /* Properties specific to this class. */
    const char *( *GetID )( AstObject *, int * );
