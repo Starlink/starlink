@@ -1840,6 +1840,26 @@ iraf! {
           }
       }
 
+      action astgetregframe {
+         helplib {$ATOOLS_HELP}
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The input Region}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+         parameter result {
+            position 2
+            type LITERAL
+            prompt {Name of file in which to store the Frame}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+      }
+
       action astdownsize {
          helplib {$ATOOLS_HELP}
          parameter this {
