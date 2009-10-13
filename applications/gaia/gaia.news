@@ -54,6 +54,8 @@
     the "Options" menu. This quickly clears all the plotting symbols from the
     image. 
 
+    The UCAC3 catalogue has been added to the standard Skycat catalogues.
+
     Version 4.3-1
     =============
 
