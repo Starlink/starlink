@@ -45,6 +45,11 @@
 *          all the output NDFs created by this application (one per
 *          line) from the OUT parameter. If a null (!) value is supplied
 *          no file is created. [!]
+*     POWER = NDF (Write)
+*          Output files to contain the power spectra for each processed
+*          chunk. There will be the same number of output files as
+*          created for the OUT parameter. If a null (!) value
+*          is supplied no files will be created. [!]
 
 *  Notes:
 *     - NEP and NOISERATIO images are stored in the .MORE.SMURF extension
@@ -146,6 +151,7 @@ void smurf_calcnoise( int *status ) {
   size_t outsize;           /* Total number of NDF names in the output group */
   char *pname=NULL;         /* Poiner to fname */
   int polar=0;              /* Flag for FFT in polar coordinates */
+  Grp *powgrp = NULL;       /* Group for output power spectra */
   int power=0;              /* Flag for squaring amplitude coeffs */
   size_t size;              /* Number of files in input group */
   smfWorkForce *wf = NULL;  /* Pointer to a pool of worker threads */
@@ -205,6 +211,15 @@ void smurf_calcnoise( int *status ) {
   kpg1Wgndf( "OUT", basegrp, size, size, "More output files required...",
              &ogrp, &outsize, status );
 
+  /* and see if we want power spectra */
+  if (*status == SAI__OK) {
+    kpg1Wgndf( "POWER", basegrp, size, size, "More output files required...",
+               &powgrp, &outsize, status );
+    if (*status == PAR__NULL) {
+      errAnnul( status );
+    }
+  }
+
   /* Obtain the number of continuous chunks and subarrays */
   if( *status == SAI__OK ) {
     ncontchunks = igroup->chunk[igroup->ngroups-1]+1;
@@ -230,6 +245,7 @@ void smurf_calcnoise( int *status ) {
         smfData *outdata = NULL;
         smfData *ratdata = NULL;
         smfData *nepdata = NULL;
+        smfData *powdata = NULL;
 
         /* Convert the data to amps */
         smf_scalar_multiply( thedata, RAW2CURRENT, status );
@@ -248,13 +264,24 @@ void smurf_calcnoise( int *status ) {
 
         if (*status == SAI__OK) {
           smf_bolonoise( wf, thedata, NULL, 0, 0.5, freqs[0], freqs[1], 10.0, 1,
-                         (outdata->pntr)[0], (ratdata->pntr)[0], NULL, status );
+                         (outdata->pntr)[0], (ratdata->pntr)[0],
+                         (powgrp ? &powdata : NULL), status );
 
           /* Bolonoise gives us a variance - we want square root */
           for (i = 0; i < (outdata->dims)[0]*(outdata->dims)[1]; i++) {
             double * od = (outdata->pntr)[0];
             if ( od[i] != VAL__BADD ) od[i] = sqrt( od[i] );
           }
+
+          if (powdata) {
+            char fname[GRP__SZNAM+1]; /* Name of container file without suffix */
+            char *pname = NULL;
+            pname = fname;
+            grpGet( powgrp, gcount, 1, &pname, sizeof(fname), status );
+            smf_write_smfData( powdata, NULL, NULL, fname, NDF__NOID, status );
+            smf_close_file( &powdata, status );
+          }
+
         }
 
         /* now to create the NEP image using the flatfield information */
@@ -337,6 +364,7 @@ void smurf_calcnoise( int *status ) {
  CLEANUP:
   if (igrp) grpDelet( &igrp, status);
   if (ogrp) grpDelet( &ogrp, status);
+  if (powgrp) grpDelet( &powgrp, status );
   if (basegrp) grpDelet( &basegrp, status );
   if( igroup ) smf_close_smfGroup( &igroup, status );
   if( wf ) wf = smf_destroy_workforce( wf );

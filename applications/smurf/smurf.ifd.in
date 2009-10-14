@@ -1235,6 +1235,16 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter power {
+                type NDF
+                access WRITE
+                ppath CURRENT DEFAULT
+                vpath {PROMPT }
+                default !
+                prompt {Power spectra files}
+                helpkey *
+            }
+
         }
 
         action calcresp {
