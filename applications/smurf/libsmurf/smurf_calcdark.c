@@ -148,18 +148,13 @@ void smurf_calcdark( int *status ) {
 
   for (i=1; i<=size && *status == SAI__OK; i++ ) {
     smfData * dark = (darks->sdata)[i-1]; /* This dark */
-    char *pname = NULL;
-    char filename[GRP__SZNAM+1];
 
     /* Open input file and create output file. Do not propagate
        since we do not want to get a large file the wrong size */
     ndgNdfas( dgrp, i, "READ", &indf, status );
 
-    /* need the output filename */
-    pname = filename;
-    grpGet( ogrp, i, 1, &pname, sizeof(filename), status );
     smf_apply_mask( dark, NULL, bpms, SMF__BPM_DATA, status );
-    smf_write_smfData( dark, NULL, NULL, filename, indf, status );
+    smf_write_smfData( dark, NULL, NULL, NULL, ogrp, i, indf, status );
     ndfAnnul( &indf, status);
   }
 

@@ -1453,7 +1453,7 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
                   }
 
                   smf_write_smfData( res[i]->sdata[idx], dat.noi[i]->sdata[idx],
-                                     qua_data, name, NDF__NOID, status );
+                                     qua_data, name, NULL, 0, NDF__NOID, status );
                 } else {
                   msgOut( " ",
                           "SMF__ITERATEMAP: Can't export RES -- NULL filename",
@@ -1469,7 +1469,7 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
                   smf_model_stripsuffix( ast[i]->sdata[idx]->file->name,
                                          name, status );
                   smf_write_smfData( ast[i]->sdata[idx], NULL, NULL, name,
-                                     NDF__NOID, status );
+                                     NULL, 0, NDF__NOID, status );
                 } else {
                   msgOut( " ",
                           "SMF__ITERATEMAP: Can't export AST -- NULL filename",
@@ -1491,7 +1491,7 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
                   smf_model_stripsuffix( model[j][i]->sdata[idx]->file->name,
                                          name, status );
                   smf_write_smfData( model[j][i]->sdata[idx], NULL, NULL, name,
-                                     NDF__NOID, status );
+                                     NULL, 0, NDF__NOID, status );
                 } else {
                   msgSetc("MOD",smf_model_getname(modeltyps[j], status) );
                   msgOut( " ",

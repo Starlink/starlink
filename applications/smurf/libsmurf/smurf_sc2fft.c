@@ -142,13 +142,11 @@ void smurf_sc2fft( int *status ) {
   smfGroup *igroup=NULL;     /* smfGroup corresponding to igrp */
   Grp *igrp = NULL;         /* Input group of files */
   int inverse=0;            /* If set perform inverse transform */
-  char fname[GRP__SZNAM+1]; /* Name of container file without suffix */
   dim_t maxconcat=0;         /* Longest continuous chunk length in samples */
   size_t ncontchunks=0;      /* Number continuous chunks outside iter loop */
   smfData *odata=NULL;      /* Pointer to output smfData to be exported */
   Grp *ogrp = NULL;         /* Output group of files */
   size_t outsize;           /* Total number of NDF names in the output group */
-  char *pname=NULL;         /* Poiner to fname */
   int polar=0;              /* Flag for FFT in polar coordinates */
   int power=0;              /* Flag for squaring amplitude coeffs */
   size_t size;              /* Number of files in input group */
@@ -249,9 +247,7 @@ void smurf_sc2fft( int *status ) {
           }
 
           /* Export the data to a new file */
-          pname = fname;
-          grpGet( ogrp, gcount, 1, &pname, GRP__SZNAM, status );
-          smf_write_smfData( odata, NULL, NULL, fname, NDF__NOID, status );
+          smf_write_smfData( odata, NULL, NULL, NULL, ogrp, gcount, NDF__NOID, status );
 
           /* Free resources */
           smf_close_file( &odata, status );

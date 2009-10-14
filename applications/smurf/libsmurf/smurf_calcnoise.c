@@ -149,13 +149,11 @@ void smurf_calcnoise( int *status ) {
   Grp *igrp = NULL;         /* Input group of files */
   smfGroup *igroup=NULL;     /* smfGroup corresponding to igrp */
   int inverse=0;            /* If set perform inverse transform */
-  char fname[GRP__SZNAM+1]; /* Name of container file without suffix */
   dim_t maxconcat=0;         /* Longest continuous chunk length in samples */
   size_t ncontchunks=0;      /* Number continuous chunks outside iter loop */
   smfData *odata=NULL;      /* Pointer to output smfData to be exported */
   Grp *ogrp = NULL;         /* Output group of files */
   size_t outsize;           /* Total number of NDF names in the output group */
-  char *pname=NULL;         /* Poiner to fname */
   int polar=0;              /* Flag for FFT in polar coordinates */
   Grp *powgrp = NULL;       /* Group for output power spectra */
   int power=0;              /* Flag for squaring amplitude coeffs */
@@ -285,11 +283,7 @@ void smurf_calcnoise( int *status ) {
           }
 
           if (powdata) {
-            char fname[GRP__SZNAM+1]; /* Name of container file without suffix */
-            char *pname = NULL;
-            pname = fname;
-            grpGet( powgrp, gcount, 1, &pname, sizeof(fname), status );
-            smf_write_smfData( powdata, NULL, NULL, fname, NDF__NOID, status );
+            smf_write_smfData( powdata, NULL, NULL, NULL, powgrp, gcount, NDF__NOID, status );
             smf_close_file( &powdata, status );
           }
 

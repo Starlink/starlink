@@ -135,7 +135,6 @@ void smurf_sc2concat( int *status ) {
   smfArray *darks = NULL;    /* dark frames */
   smfData *data=NULL;        /* Pointer to a smfData */
   Grp *fgrp = NULL;          /* Filtered group, no darks */
-  char fname[GRP__SZNAM+1];  /* String for holding filename */
   size_t gcount=0;           /* Grp index counter */
   size_t i;                  /* Loop counter */
   size_t idx;                /* Subarray counter */
@@ -150,7 +149,6 @@ void smurf_sc2concat( int *status ) {
   size_t osize;              /* Number of files in input group */
   dim_t padStart=0;          /* How many samples padding at start */
   dim_t padEnd=0;            /* How many samples padding at end */
-  char *pname=NULL;          /* Poiner to fname */
   int temp;                  /* Temporary signed integer */
   smfWorkForce *wf = NULL;   /* Pointer to a pool of worker threads */
 
@@ -231,14 +229,8 @@ void smurf_sc2concat( int *status ) {
     /* Export concatenated data for each subarray to NDF file */
     for( idx=0; (*status==SAI__OK)&&idx<concat->ndat; idx++ ) {
       if( concat->sdata[idx]->file && concat->sdata[idx]->file->name ) {
-
-        /* Get the file name: note that we have to be careful to read
-           them out of this group in the same order that we put them
-           in above! */
-        pname = fname;
-        grpGet( ogrp, gcount, 1, &pname, GRP__SZNAM, status);
-        smf_write_smfData( concat->sdata[idx], NULL, NULL, fname, NDF__NOID,
-                           status );
+        smf_write_smfData( concat->sdata[idx], NULL, NULL, NULL, ogrp, gcount,
+                           NDF__NOID, status );
       } else {
         *status = SAI__ERROR;
         errRep( FUNC_NAME,

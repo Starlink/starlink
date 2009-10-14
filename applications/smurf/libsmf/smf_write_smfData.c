@@ -15,6 +15,7 @@
 *  Invocation:
 *     smf_write_smfData ( const smfData *data, const smfData *variance,
 *                        unsigned char *quality, const char * filename,
+*                        const Grp * igrp, size_t grpindex,
 *                        int provid, int * status );
 
 *  Arguments:
@@ -29,7 +30,13 @@
 *     quality = unsigned char * (Given)
 *        If set, use this buffer instead of QUALITY associated with data.
 *     filename = const char * (Given)
-*        Name of output NDF.
+*        Name of output NDF if non-NULL. If NULL the filename is obtained
+*        from the group.
+*     igrp = const Grp * (Given)
+*        Group containing the required filename. Can be NULL, in which
+*        case the explicitly supplied filename is used.
+*     grpindex = size_t (Given)
+*        Index into group.
 *     provid = int (Given)
 *        NDF id to propagate provenance from. Can be NDF__NOID.
 *     status = int* (Given and Returned)
@@ -47,6 +54,8 @@
 *     if the number of time slices can be determined. ntslices is assumed
 *     to be the length of the only axis if data is 1-d, and the length of the
 *     3rd axis for 3d data (ICD format).
+*
+*     It is an error for both "grp" and "filename" to be NULL.
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
@@ -67,10 +76,12 @@
 *        - fix so that files that are neither 1- nor 3-dimensions can be written
 *     2009-09-29 (TIMJ):
 *        Use pixel origin from smfData
+*     2009-10-13 (TIMJ):
+*        Add Grp argument
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 *     Copyright (C) 2008,2009 University of British Columbia.
 *     All Rights Reserved.
 
@@ -122,6 +133,7 @@
 
 void smf_write_smfData( const smfData *data, const smfData *variance,
                         unsigned char *quality, const char * filename,
+                        const Grp * igrp, size_t grpindex,
                         int provid, int * status ) {
 
   size_t dbstride;              /* bolo stride of data */
@@ -149,9 +161,19 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
   if (*status != SAI__OK) return;
   if (!data) return;
 
-  /* create a group so that we can reuse smf_open_newfile interface */
-  ogrp = grpNew( "", status );
-  grpPut1( ogrp, filename, 0, status );
+  /* if we have a filename we need to make a group */
+  if (filename) {
+    ogrp = grpNew( "", status );
+    grpPut1( ogrp, filename, 0, status );
+  } else if (igrp) {
+    /* Copy the required entry to a new group */
+    ogrp = ndgCopy( igrp, grpindex, grpindex, 0, status );
+  } else {
+    *status = SAI__ERROR;
+    errRep( "", FUNC_NAME ": Must supply a filename or a group."
+            " Possible programming error.", status );
+    return;
+  }
 
   /* Check for QUALITY components, and header */
   if( quality ) qual = quality;
