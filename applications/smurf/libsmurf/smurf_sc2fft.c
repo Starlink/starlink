@@ -41,7 +41,10 @@
 *          NONE (no messages), QUIET (minimal messages), NORMAL,
 *          VERBOSE, DEBUG or ALL. [NORMAL]
 *     OUT = NDF (Write)
-*          Output files
+*          Output files. The number of output files can differ from
+*          the number of input files due to darks being filtered out
+*          and also to files from the same sequence being concatenated
+*          before aplying the FFT.
 *     OUTFILES = LITERAL (Write)
 *          The name of text file to create, in which to put the names of
 *          all the output NDFs created by this application (one per
@@ -52,7 +55,7 @@
 *          If set use polar representation of FFT with squared amplitudes
 
 *  Related Applications:
-*     SMURF: SC2CONCAT, SC2CLEAN
+*     SMURF: SC2CONCAT, SC2CLEAN, CALCNOISE
 
 *  Authors:
 *     Edward Chapin (UBC)
@@ -70,6 +73,8 @@
 *        Add OUTFILES parameter.
 *     2009-04-30 (EC):
 *        Use threads
+*     2009-10-13 (TIMJ):
+*        Concatenate files from the same sequence.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -126,13 +131,20 @@
 
 void smurf_sc2fft( int *status ) {
 
+  Grp * basegrp = NULL;     /* Basis group for output filenames */
+  smfArray *concat=NULL;     /* Pointer to a smfArray */
+  size_t contchunk;          /* Continuous chunk counter */
   smfArray *darks = NULL;   /* dark frames */
   Grp *fgrp = NULL;         /* Filtered group, no darks */
+  size_t gcount=0;           /* Grp index counter */
   size_t i=0;               /* Counter, index */
   smfData *idata=NULL;      /* Pointer to input smfData */
+  smfGroup *igroup=NULL;     /* smfGroup corresponding to igrp */
   Grp *igrp = NULL;         /* Input group of files */
   int inverse=0;            /* If set perform inverse transform */
   char fname[GRP__SZNAM+1]; /* Name of container file without suffix */
+  dim_t maxconcat=0;         /* Longest continuous chunk length in samples */
+  size_t ncontchunks=0;      /* Number continuous chunks outside iter loop */
   smfData *odata=NULL;      /* Pointer to output smfData to be exported */
   Grp *ogrp = NULL;         /* Output group of files */
   size_t outsize;           /* Total number of NDF names in the output group */
@@ -162,14 +174,28 @@ void smurf_sc2fft( int *status ) {
   igrp = fgrp;
   fgrp = NULL;
 
+  /* We now need to combine files from the same subarray and same sequence
+     to form a continuous time series */
+  smf_grp_related( igrp, size, 1, 0, &maxconcat, &igroup,
+                   &basegrp, status );
+
   /* Get output file(s) */
+  size = grpGrpsz( basegrp, status );
   if( size > 0 ) {
-    kpg1Wgndf( "OUT", igrp, size, size, "More output files required...",
+    kpg1Wgndf( "OUT", basegrp, size, size, "More output files required...",
                &ogrp, &outsize, status );
   } else {
     msgOutif(MSG__NORM, " ", TASK_NAME ": All supplied input frames were DARK,"
              " nothing to do", status );
   }
+
+
+  /* Obtain the number of continuous chunks and subarrays */
+  if( *status == SAI__OK ) {
+    ncontchunks = igroup->chunk[igroup->ngroups-1]+1;
+  }
+  msgOutiff( MSG__NORM, "", "Found %d continuous chunk%s", status, ncontchunks,
+             (ncontchunks > 1 ? "s" : "") );
 
   /* Are we doing an inverse transform? */
   parGet0l( "INVERSE", &inverse, status );
@@ -187,47 +213,61 @@ void smurf_sc2fft( int *status ) {
     polar = 1;
   }
 
-  /* Loop over input files */
-  for( i=1; (*status==SAI__OK)&&(i<=size); i++ ) {
+  gcount = 1;
+  for( contchunk=0;(*status==SAI__OK)&&contchunk<ncontchunks; contchunk++ ) {
+    size_t idx;
 
-    /* Open the file */
-    smf_open_and_flatfield( igrp, NULL, i, darks, &idata, status );
+    /* Concatenate this continuous chunk but forcing a raw data read.
+       We will need quality. */
+    smf_concat_smfGroup( wf, igroup, darks, NULL, contchunk, 1, 1, NULL, 0, NULL,
+                         NULL, 0, 0, 0, &concat, status );
 
-    /* Check whether we need to transform the data at all */
-    if( smf_isfft(idata,NULL,NULL,NULL,status) == inverse ) {
+    /* Now loop over each subarray */
+    /* Export concatenated data for each subarray to NDF file */
+    for( idx=0; (*status==SAI__OK)&&idx<concat->ndat; idx++ ) {
+      if( concat->sdata[idx] ) {
+        smfData * idata = concat->sdata[idx];
 
-      /* If inverse transform, convert to cartesian representation first */
-      if( inverse && polar ) {
-        smf_fft_cart2pol( idata, 1, power, status );
+        /* Check whether we need to transform the data at all */
+        if( smf_isfft(idata,NULL,NULL,NULL,status) == inverse ) {
+
+          /* If inverse transform, convert to cartesian representation first */
+          if( inverse && polar ) {
+            smf_fft_cart2pol( idata, 1, power, status );
+          }
+
+          /* Tranform the data */
+          odata = smf_fft_data( wf, idata, inverse, status );
+          smf_convert_bad( odata, status );
+
+          if( inverse ) {
+            /* If output is time-domain, ensure that it is ICD bolo-ordered */
+            smf_dataOrder( odata, 1, status );
+          } else if( polar ) {
+            /* Store FFT of data in polar form */
+            smf_fft_cart2pol( odata, 0, power, status );
+          }
+
+          /* Export the data to a new file */
+          pname = fname;
+          grpGet( ogrp, gcount, 1, &pname, GRP__SZNAM, status );
+          smf_write_smfData( odata, NULL, NULL, fname, NDF__NOID, status );
+
+          /* Free resources */
+          smf_close_file( &odata, status );
+        } else {
+          msgOutif( MSG__NORM, " ",
+                    "Data are already transformed. No output will be produced",
+                    status );
+        }
       }
 
-      /* Tranform the data */
-      odata = smf_fft_data( wf, idata, inverse, status );
-      smf_convert_bad( odata, status );
-
-      if( inverse ) {
-        /* If output is time-domain, ensure that it is ICD bolo-ordered */
-        smf_dataOrder( odata, 1, status );
-      } else if( polar ) {
-        /* Store FFT of data in polar form */
-        smf_fft_cart2pol( odata, 0, power, status );
-      }
-
-      /* Export the data to a new file */
-      pname = fname;
-      grpGet( ogrp, i, 1, &pname, GRP__SZNAM, status );
-      smf_write_smfData( odata, NULL, NULL, fname, NDF__NOID, status );
-
-      /* Free resources */
-      smf_close_file( &odata, status );
-    } else {
-      msgOutif( MSG__NORM, " ",
-                "Data are already transformed. No output will be produced",
-                status );
+      /* Update index into group */
+      gcount++;
     }
 
-    /* Free resources */
-    smf_close_file( &idata, status );
+    /* Close the smfArray */
+    smf_close_related( &concat, status );
   }
 
   /* Write out the list of output NDF names, annulling the error if a null
@@ -240,7 +280,8 @@ void smurf_sc2fft( int *status ) {
   /* Tidy up after ourselves: release the resources used by the grp routines */
   grpDelet( &igrp, status);
   grpDelet( &ogrp, status);
-
+  if (basegrp) grpDelet( &basegrp, status );
+  if( igroup ) smf_close_smfGroup( &igroup, status );
   if( wf ) wf = smf_destroy_workforce( wf );
 
   ndfEnd( status );
