@@ -1196,6 +1196,15 @@ package @PACKAGE@ {
 
             helplib {$SMURF_HELP}
 
+            parameter flow {
+                type _DOUBLE
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                default !
+                prompt {Frequency to use for noise ratio image}
+                helpkey *
+            }
+
             parameter freq {
                 size *
                 type _DOUBLE

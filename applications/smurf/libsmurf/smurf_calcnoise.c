@@ -23,11 +23,15 @@
 *     This routine calculates the white noise on the array by performing
 *     an FFT to generate a power spectrum and then extracting the
 *     data between two frequency ranges. It additionally calculates an
-*     NEP image and an image of the ratio of the power at the low end
-*     of the frequency range to the whitenoise.
+*     NEP image and an image of the ratio of the power at a specified
+*     frequency to the whitenoise.
 
 *  ADAM Parameters:
-*     FREQ = _REAL (Given)
+*     FLOW = _DOUBLE (Given)
+*          Frequency to use when determining noise ratio image. The noise
+*          ratio image is determined by dividing the power at this frequency
+*          by the white noise [0.5]
+*     FREQ = _DOUBLE (Given)
 *          Frequency range (Hz) to use to calculate the white noise [2,10]
 *     IN = NDF (Read)
 *          Input files to be transformed. Files from the same sequence
@@ -68,6 +72,8 @@
 *        Add NEP
 *     2009-10-08 (TIMJ):
 *        Remove NEP parameter. Write NEP and noise ratio image to extension.
+*     2009-10-13 (TIMJ):
+*        Add POWER and FLOW parameters.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -155,6 +161,7 @@ void smurf_calcnoise( int *status ) {
   int power=0;              /* Flag for squaring amplitude coeffs */
   size_t size;              /* Number of files in input group */
   smfWorkForce *wf = NULL;  /* Pointer to a pool of worker threads */
+  double f_low = 0.5;       /* Frequency to use for noise ratio image */
   double freqdef[] = { SMF__F_WHITELO,
                        SMF__F_WHITEHI }; /* Default values for frequency range */
   double freqs[2];          /* Frequencies to use for white noise */
@@ -170,8 +177,12 @@ void smurf_calcnoise( int *status ) {
 
   /* Get frequency range of interest for white noise measurement */
   parGdr1d( "FREQ", 2, freqdef, 0.0, 50.0, 1, freqs, status );
-  msgOutf( "", "Calculating noise between %g and %g Hz", status,
-           freqs[0], freqs[1]);
+  /* Get the low frequency to use for the noise ratio */
+  parGdr0d( "FLOW", f_low, 0.0, 50.0, 1, &f_low, status );
+
+  msgOutf( "", "Calculating noise between %g and %g Hz and noise ratio for %g Hz", status,
+           freqs[0], freqs[1], f_low);
+
 
   /* Get input file(s) */
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
@@ -263,7 +274,7 @@ void smurf_calcnoise( int *status ) {
                                                  "Noise Ratio", NULL, status );
 
         if (*status == SAI__OK) {
-          smf_bolonoise( wf, thedata, NULL, 0, 0.5, freqs[0], freqs[1], 10.0, 1,
+          smf_bolonoise( wf, thedata, NULL, 0, f_low, freqs[0], freqs[1], 10.0, 1,
                          (outdata->pntr)[0], (ratdata->pntr)[0],
                          (powgrp ? &powdata : NULL), status );
 
