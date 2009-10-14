@@ -127,6 +127,7 @@
 
 #define FUNC_NAME "smurf_calcnoise"
 #define TASK_NAME "CALCNOISE"
+#define CREATOR PACKAGE_UPCASE ":" TASK_NAME
 
 static smfData *
 smf__create_bolfile_extension( const Grp * ogrp, size_t gcount,
@@ -283,8 +284,12 @@ void smurf_calcnoise( int *status ) {
           }
 
           if (powdata) {
-            smf_write_smfData( powdata, NULL, NULL, NULL, powgrp, gcount, NDF__NOID, status );
+            int provid = NDF__NOID;
+            /* open a reference input file for provenance propagation */
+            ndgNdfas( basegrp, gcount, "READ", &provid, status );
+            smf_write_smfData( powdata, NULL, NULL, NULL, powgrp, gcount, provid, status );
             smf_close_file( &powdata, status );
+            ndfAnnul( &provid, status );
           }
 
         }
@@ -336,10 +341,22 @@ void smurf_calcnoise( int *status ) {
               }
             }
           }
+          if (*status == SAI__OK && nepdata->file) {
+            smf_accumulate_prov( NULL, basegrp, 1, nepdata->file->ndfid,
+                                 CREATOR, status );
+          }
           if (nepdata) smf_close_file( &nepdata, status );
         }
 
+        if (*status == SAI__OK && outdata->file) {
+          smf_accumulate_prov( NULL, basegrp, 1, outdata->file->ndfid,
+                               CREATOR, status );
+        }
         if (outdata) smf_close_file( &outdata, status );
+        if (*status == SAI__OK && ratdata->file) {
+          smf_accumulate_prov( NULL, basegrp, 1, ratdata->file->ndfid,
+                               CREATOR, status );
+        }
         if (ratdata) smf_close_file( &ratdata, status );
 
       } else {

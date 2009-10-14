@@ -225,6 +225,7 @@ void smurf_sc2fft( int *status ) {
     for( idx=0; (*status==SAI__OK)&&idx<concat->ndat; idx++ ) {
       if( concat->sdata[idx] ) {
         smfData * idata = concat->sdata[idx];
+        int provid = NDF__NOID;
 
         /* Check whether we need to transform the data at all */
         if( smf_isfft(idata,NULL,NULL,NULL,status) == inverse ) {
@@ -246,10 +247,14 @@ void smurf_sc2fft( int *status ) {
             smf_fft_cart2pol( odata, 0, power, status );
           }
 
+          /* open a reference input file for provenance propagation */
+          ndgNdfas( basegrp, gcount, "READ", &provid, status );
+
           /* Export the data to a new file */
-          smf_write_smfData( odata, NULL, NULL, NULL, ogrp, gcount, NDF__NOID, status );
+          smf_write_smfData( odata, NULL, NULL, NULL, ogrp, gcount, provid, status );
 
           /* Free resources */
+          ndfAnnul( &provid, status );
           smf_close_file( &odata, status );
         } else {
           msgOutif( MSG__NORM, " ",
