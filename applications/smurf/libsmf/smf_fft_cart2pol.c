@@ -26,8 +26,6 @@
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
-*  Returned Value:
-
 *  Description:
 *     Convert between cartesian representation of the transform (real, 
 *     imaginary) and polar form (amplitude, argument). The argument is
@@ -35,6 +33,7 @@
 
 *  Authors:
 *     Ed Chapin (UBC)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  Notes:
@@ -46,8 +45,11 @@
 *  History:
 *     2008-09-18 (EC):
 *        Initial version.
+*     2009-10-13 (TIMJ):
+*        Handle case where one of baseI or baseR are bad but not both.
 
 *  Copyright:
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     Copyright (C) 2008 University of British Columbia.
 *     All Rights Reserved.
 
@@ -138,48 +140,56 @@ void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status ) {
     baseI = baseR + nf*nbolo;
 
     if( inverse ) {
-      for( j=0; (*status==SAI__OK)&&(j<nf); j++ ) if( (baseR[j]!=VAL__BADD)&&
-                                                      (baseI[j]!=VAL__BADD) ) {
-        if( fabs(baseI[j]) > AST__DPI ) {
-          /* Check for valid argument */
-          *status = SAI__ERROR;
-          errRep( "", FUNC_NAME 
-                  ": abs(argument) > PI. FFT data may not be in polar form.", 
-                  status);          
-        } else {
-          /* Convert polar --> cartesian */
-          if( power ) {
-            if( baseR[j] < 0 ) {
-              /* Check for sqrt of negative number */
-              *status = SAI__ERROR;
-              errRep( "", FUNC_NAME 
-                      ": amplitude^2 < 0. FFT data may not be in correct form", 
-                      status);          
-            } else {
-              amp = sqrt(baseR[j]);
-            }
+      for( j=0; (*status==SAI__OK)&&(j<nf); j++ ) {
+        if( (baseR[j]!=VAL__BADD) && (baseI[j]!=VAL__BADD) ) {
+          if( fabs(baseI[j]) > AST__DPI ) {
+            /* Check for valid argument */
+            *status = SAI__ERROR;
+            errRep( "", FUNC_NAME
+                    ": abs(argument) > PI. FFT data may not be in polar form.",
+                    status);
           } else {
-            amp = baseR[j];
-          }
+            /* Convert polar --> cartesian */
+            if( power ) {
+              if( baseR[j] < 0 ) {
+                /* Check for sqrt of negative number */
+                *status = SAI__ERROR;
+                errRep( "", FUNC_NAME
+                        ": amplitude^2 < 0. FFT data may not be in correct form",
+                        status);
+              } else {
+                amp = sqrt(baseR[j]);
+              }
+            } else {
+              amp = baseR[j];
+            }
 
-          real = baseR[j]*cos(baseI[j]);
-          imag = baseR[j]*sin(baseI[j]);
-          baseR[j] = real;
-          baseI[j] = imag;
+            real = baseR[j]*cos(baseI[j]);
+            imag = baseR[j]*sin(baseI[j]);
+            baseR[j] = real;
+            baseI[j] = imag;
+          }
+        } else {
+          baseR[j] = VAL__BADD;
+          baseI[j] = VAL__BADD;
         }
       }
     } else {
-      for( j=0; j<nf; j++ ) if( (baseR[j]!=VAL__BADD)&&
-                                (baseI[j]!=VAL__BADD) ) {
-        /* Convert cartesian --> polar */
-        amp = baseR[j]*baseR[j] + baseI[j]*baseI[j];
-        if( !power ) amp = sqrt(amp);
-        theta = atan2( baseI[j], baseR[j] );
-        baseR[j] = amp;
-        baseI[j] = theta;
+      for( j=0; j<nf; j++ ) {
+        if( (baseR[j]!=VAL__BADD)&&
+            (baseI[j]!=VAL__BADD) ) {
+          /* Convert cartesian --> polar */
+          amp = baseR[j]*baseR[j] + baseI[j]*baseI[j];
+          if( !power ) amp = sqrt(amp);
+          theta = atan2( baseI[j], baseR[j] );
+          baseR[j] = amp;
+          baseI[j] = theta;
+        } else {
+          baseR[j] = VAL__BADD;
+          baseI[j] = VAL__BADD;
+        }
       }
     }
-    
   }
 
 }
