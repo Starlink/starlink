@@ -8012,16 +8012,6 @@ package kappa {
 
          helplib {$KAPPA_HELP}
 
-         parameter axes {
-            type _INTEGER
-            vpath DYNAMIC DEFAULT
-            ppath DYNAMIC DEFAULT
-            default !
-            prompt {Indices of pixel axes spanning the smoothing plane}
-            helpkey *
-            size *
-         }
-
          parameter box {
             position 3
             type _INTEGER

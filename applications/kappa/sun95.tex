@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.36}
 \newcommand{\stardocnumber}    {95.36}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2009 September 24}
+\newcommand{\stardocdate}      {2009 October 3}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.11}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -2329,14 +2329,19 @@ access to the help-library information for that parameter, for example,
 
        Parameters
 
-         BOX(2) = _INTEGER (Read)
-            The x and y sizes (in pixels) of the rectangular box to be
-            applied to smooth the image. If only a single value is given,
-            then it will be duplicated so that a square filter is used,
-            except where the image is one-dimensional, for which the box
-            size along the insignificant dimension is set to 1.  The
-            values given will be rounded up to positive odd integers,
-            if necessary.
+         BOX() = _INTEGER (Read)
+            The sizes (in pixels) of the rectangular box to be applied to 
+            smooth the data.  These should be given in axis order.  A value
+            set to 1 indicates no smoothing along that axis.  Thus, for
+            example, BOX=[3,3,1] for a three-dimensional NDF would apply a 
+            3x3-pixel filter to all its planes independently.
+   
+            If fewer values are supplied than the number of dimensions of
+            the NDF, then the final value will be duplicated for the
+            missing dimensions.
+   
+            The values given will be rounded up to positive odd integers, if
+            necessary, to retain symmetry.
 
      BOX - Smoothing box size /3,3/ >
 \end{verbatim}
@@ -12194,7 +12199,7 @@ picture.}
 \menuitem{BEAMFIT}{
  Fits beam features in a two-dimensional NDF.}
 \menuitem{BLOCK}{
- Smooths a one- or two-dimensional image using a square or rectangular box filter.}
+ Smooths an NDF using an n-dimensional rectangular box filter.}
 \menuitem{CADD}{
  Adds a scalar to an NDF data structure.}
 \menuitem{CALC}{
@@ -12946,7 +12951,7 @@ functions as follows.
 \item {\large\bf Filtering}
 \begin{description}
 \classitem{BLOCK}
- Smooths a one- or two-dimensional image using a square or rectangular box filter.
+ Smooths an NDF using an n-dimensional rectangular box filter.
 \classitem{CONVOLVE}
  Convolves a pair of one- or two-dimensional NDFs together.
 \classitem{FFCLEAN}
@@ -15270,47 +15275,46 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
 \sstroutine{
    BLOCK
 }{
-   Smooths an NDF using a one- or two-dimensional square or rectangular
-   box filter.
+   Smooths an NDF using an n-dimensional rectangular box filter.
 }{
    \sstdescription{
-      This application smooths an NDF using a one- or two-dimensional square or
-      rectangular box filter. Each output pixel is either the mean or the 
-      median of the input pixels within the filter box. The mean estimator 
-      provides one of the fastest methods of smoothing an image and is often 
-      useful as a general-purpose smoothing algorithm when the exact form of 
-      the smoothing point-spread function is not important.  
- 
-      The NDF may have up to three dimensions. If it has three dimensions, then
-      the filter is applied in turn to each plane in the cube and the
-      result written to the corresponding plane in the output cube. The
-      orientation of the smoothing plane can be specified using the
-      AXES parameter.
+
+      This application smooths an n-dimensional NDF using a rectangular 
+      box filter, whose dimensionality is the same as that of the NDF 
+      being smoothed.   Each output pixel is either the mean or the 
+      median of the input pixels within the filter box.  The mean 
+      estimator provides one of the fastest methods of smoothing an
+      image and is often useful as a general-purpose smoothing
+      algorithm when the exact form of the smoothing point-spread
+      function is not important.  
+
+      It is possible to smooth in selected dimensions by setting
+      the boxsize to 1 for the dimensions not requiring smoothing.
+      For example you can apply two-dimensional smoothing to the planes
+      of a three-dimensional NDF (see Parameter BOX).  If it has three
+      dimensions, then the filter is applied in turn to each plane in
+      the cube and the result written to the corresponding plane in the 
+      output cube.
    }
    \sstusage{
       block in out box [estimator]
    }
    \sstparameters{
       \sstsubsection{
-         AXES(2) = \_INTEGER (Read)
+         BOX() = \_INTEGER (Read)
       }{
-         This parameter is only accessed if the NDF has exactly three 
-         significant pixel axes. It should be set to the indices of the NDF 
-         pixel axes which span the plane in which smoothing is to be
-         applied. All pixel planes parallel to the specified plane will
-         be smoothed independently of each other. The dynamic default
-         is the indices of the first two significant axes in the NDF.  {\tt []}
-      }
-      \sstsubsection{
-         BOX(2) = \_INTEGER (Read)
-      }{
-         The \textit{x} and \textit{y} sizes (in pixels) of the rectangular box to be
-         applied to smooth the image.  If only a single value is given,
-         then it will be duplicated so that a square filter is used,
-         except where the image is one-dimensional, for which the box size
-         along the insignificant dimension is set to 1.  The values
-         given will be rounded up to positive odd integers, if
-         necessary.
+         The sizes (in pixels) of the rectangular box to be applied to 
+         smooth the data.  These should be given in axis order.  A value
+         set to {\tt 1} indicates no smoothing along that axis.  Thus, for
+         example, BOX={\tt [3,3,1]} for a three-dimensional NDF would apply a 
+         3x3-pixel filter to all its planes independently.
+
+         If fewer values are supplied than the number of dimensions of
+         the NDF, then the final value will be duplicated for the
+         missing dimensions.
+
+         The values given will be rounded up to positive odd integers, if
+         necessary, to retain symmetry.
       }
       \sstsubsection{
          ESTIMATOR = \htmlref{LITERAL}{se:parmenu} (Read)
@@ -15321,13 +15325,12 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
       \sstsubsection{
          IN = NDF (Read)
       }{
-         The input NDF containing the one- or two-dimensional image to which
-         box smoothing is to be applied.
+         The input NDF to which box smoothing is to be applied.
       }
       \sstsubsection{
          OUT = NDF (Write)
       }{
-         The output NDF which is to contain the smoothed image.
+         The output NDF which is to contain the smoothed data.
       }
       \sstsubsection{
          TITLE = LITERAL (Read)
@@ -15409,6 +15412,20 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          pixels in size.  Smoothed output values are generated only if
          at least 60\% of the pixels in the smoothing box are good,
          otherwise the affected output pixel is bad.
+      }
+      \sstexamplesubsection{
+         block in=cubein out=cubeout box=[3,3,7]
+      }{
+         Smooths the three-dimensional NDF called cubein using a box
+         that has three elements along the first two axes and seven
+         along the third.  The smoothed cube is written to NDF cubeout.
+      }
+      \sstexamplesubsection{
+         block in=cubein out=cubeout box=[3,1,7]
+      }{
+         As the previous example, except that planes comprising the
+         first and third axes are smoothed independently for all
+         lines.
       }
    }
    \sstdiytopic{
@@ -56682,6 +56699,21 @@ The following applications have been modified:
         of the fit parameters.
       \end{itemize}
 
+   \item [\htmlref{BLOCK}{BLOCK}]\mbox{}
+      \begin{itemize}
+        \item The dimensionality restriction is now lifted.  This
+        enables, for example, smoothing of a data cube in all its
+        dimensions simultaneously.  As a consequence the AXES
+        parameter is withdrawn.  However, you can replicate its
+        function by setting one of the three BOX-parameter sizes to 1
+        to specify the axis not being smoothed; the remaining two BOX
+        values of 3 or more define a plane that is smoothed
+        independently for all parallel planes.  The independent
+        smoothing of axes is now generalised, so for example, you can
+        smooth all lines in an image or cube; or all lines, planes, or
+        cubes in a hypercube.
+      \end{itemize}
+
    \item [\htmlref{CENTROID}{CENTROID}]\mbox{}
       \begin{itemize}
         \item Parameter QUIET has been withdrawn.  Instead set the
@@ -57161,7 +57193,7 @@ functions as follows.
 \item {\large\bf Filtering}
 \begin{description}
 \classitem{BLOCK}
- Smooths a one- or two-dimensional image using a square or rectangular box filter.
+ Smooths an NDF using an n-dimensional rectangular box filter.
 \classitem{CONVOLVE}
  Convolves a pair of one- or two-dimensional NDFs together.
 \classitem{FFCLEAN}

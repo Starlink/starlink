@@ -28,6 +28,20 @@
       MSG_FILTER environment variable to QUIET to control the
       output messaging.
 
+   o  BLOCK
+
+      -  The dimensionality restriction is now lifted.  This
+      enables, for example, smoothing of a data cube in all its
+      dimensions simultaneously.  As a consequence the AXES
+      parameter is withdrawn.  However, you can replicate its
+      function by setting one of the three BOX-parameter sizes to
+      1 to specify the axis not being smoothed; the remaining two 
+      BOX values of 3 or more define a plane that is smoothed
+      independently for all parallel planes.  The independent
+      smoothing of axes is now generalised, so for example, you can
+      smooth all lines in an image or cube; or all lines, planes,
+      or cubes in a hypercube.
+
    o  FFCLEAN, MSTATS, WCSMOSAIC
 
       -  Parameter ILEVEL has been withdrawn.  Instead use the 
@@ -50,8 +64,8 @@
 
       -  There is a new DOTFILE parameter that permits a summary of the
       provenance tree to be written to a text file in "dot" format,
-      suitable for visualising with third-party tools such as Graphviz or 
-      ZGRViewer.
+      suitable for visualising with third-party tools such as Graphviz 
+      or ZGRViewer.
 
    o  SETAXIS
 
