@@ -237,6 +237,7 @@
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'PAR_ERR'          ! Parameter system error codes
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
+      INCLUDE 'MSG_PAR'          ! Message-system constants
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -244,12 +245,14 @@
 *  Local Constants: 
 
 *  Local Variables:
+      CHARACTER * 30 BUFFER      ! Text buffer for message
       CHARACTER * ( 13 ) COMP    ! List of components to process
       CHARACTER * ( 6 ) ESTIM    ! Method to estimate smoothed values
       CHARACTER * ( NDF__SZFTP ) DTYPE ! Numeric type for output arrays
       CHARACTER * ( NDF__SZTYP ) ITYPE ! Numeric type for processing
       INTEGER BOX( NDF__MXDIM )  ! Smoothing box size
       INTEGER BOXSIZ             ! Number of pixels in smoothing box
+      INTEGER CPOS               ! Character position
       INTEGER DIM( NDF__MXDIM )  ! NDF dimensions
       INTEGER EL                 ! Number of mapped array elements
       INTEGER I                  ! Loop counter
@@ -265,6 +268,7 @@
       INTEGER PNTR1( 2 )         ! Pointers for mapped input arrays
       INTEGER PNTR2( 2 )         ! Pointers for mapped output arrays
       INTEGER SDIM( NDF__MXDIM ) ! Significant NDF dimensions
+      INTEGER STATE              ! State of BOX parameter
       INTEGER UBND( NDF__MXDIM + 1 ) ! Upper bounds of NDF pixel axes
       INTEGER WPNTR1             ! Mapped workspace pointer
       INTEGER WPNTR2             ! Mapped workspace pointer
@@ -303,11 +307,26 @@
          DIM( I ) = UBND( I ) - LBND( I ) + 1
       END DO
 
-*  Obtain the smoothing box sizes, duplicating the value if only a
-*  single value is given.  Each box size must be a positive odd number,
-*  so derive IBOX so that BOX = 2*IBOX+1 is rounded up if necessary.
-*  Also allow for one-dimensional data, setting the default box size
-*  to 1 element.
+*  Obtain the smoothing box sizes, duplicating the value if fewer values
+*  than the number of dimensions is supplied.  Since undeclared values 
+*  adopt the final value, inform the user of the NDF's dimensionality.
+*  It is not needed for vectors as PAR_GDRVI will warn if too many
+*  values are presented.  Prefer not to use PAR_PROMT, as this 
+*  undermines the interface-file concept.
+*
+*  Each box size must be a positive odd number, so derive IBOX so that 
+*  BOX = 2*IBOX+1 is rounded up if necessary.
+      CALL LPG_STATE( 'BOX', STATE, STATUS )
+      IF ( NDIM .GT. 1 .AND. STATE .NE. PAR__ACTIVE ) THEN
+         BUFFER = ' '
+         CPOS = 1
+         CALL CHR_APPND( 'The data have', BUFFER, CPOS )
+         CPOS = CPOS + 1
+         CALL CHR_PUTI( NDIM, BUFFER, CPOS )
+         CALL CHR_APPND( ' dimensions.', BUFFER, CPOS )
+         CALL MSG_OUTIF( MSG__NORM, 'BLOCK_DIMS', BUFFER, STATUS )
+      END IF
+
       CALL PAR_GDRVI( 'BOX', NDIM, 1, VAL__BADI, BOX, NVAL, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 999
       IF ( NVAL .LT. NDIM ) THEN
