@@ -117,7 +117,7 @@ kpg1_pow.gdr \
 kpg1_prow.gdr kpg1_psfs.gdr kpg1_qntl.gdr kpg1_rfco.gdr \
 kpg1_ssaz.gdr kpg1_stds.gdr kpg1_stfl.gdr kpg1_tral.gdr \
 kpg1_trbo.gdr kpg1_trig.gdr kpg1_trpi.gdr kpg1_unz2.gdr \
-kpg1_xyzw.gdr kpg1_ker1.gdr
+kpg1_xyzw.gdr kpg1_ker1.gdr kpg_blon.gdr  kpg_bmdn.gdr
 
 KPG_DI_GEN = kpg1_ctcp.gdi
 

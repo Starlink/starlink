@@ -1,0 +1,484 @@
+      SUBROUTINE KPG_BLON<T>( BAD, SAMBAD, VAR, NDIM, DIMS, A, IBOX,
+     :                        NLIM, WDIM, B, BADOUT, ASUM, NSUM, 
+     :                        STATUS )
+*+
+*  Name:
+*     KPG_BLONx
+ 
+*  Purpose:
+*     Smooths an n-dimensional image using box filter.
+ 
+*  Language:
+*     Starlink Fortran 77
+ 
+*  Invocation:
+*     CALL KPG_BLONx( BAD, SAMBAD, VAR, NDIM, DIMS, A, IBOX,
+*                     NLIM, WDIM, B, BADOUT, ASUM, NSUM, STATUS )
+ 
+*  Description:
+*     The routine smooths an n-dimensional array using an n-dimensional
+*     box filter; each pixel is replaced by the mean of those good
+*     neighbours which lie within a box of specified size.
+
+*  Arguments:
+*     BAD = LOGICAL (Given)
+*        Whether it is necessary to check for bad pixels in the input
+*        image.
+*     SAMBAD = LOGICAL (Given)
+*        If a .TRUE. value is given for this argument, then bad input
+*        pixels will be propagated to the output image unchanged (a
+*        smoothed output value will be calculated for all other
+*        pixels). If a .FALSE. value is given, then the NLIM argument
+*        determines whether an output pixel is good or bad.  The value
+*        of SAMBAD is not relevant if BAD is .FALSE..
+*     VAR = LOGICAL (Given)
+*        If a .FALSE. value is given for this argument, then the
+*        smoothing applied will be appropriate to a data image. If a
+*        .TRUE. value is given, then the smoothing will be appropriate
+*        to an image containing variance values. In the latter case the
+*        output values will be (on average) smaller than the input
+*        values to take account of the variance-reducing effect which
+*        smoothing produces.
+*     NDIM = INTEGER (Given)
+*        The number of dimensions of the array to be smoothed.
+*     DIMS( NDIM ) = INTEGER (Given)
+*        The dimensions of the array to be smoothed.
+*     A( * ) = ? (Given)
+*        Input array to be smoothed.  Its dimensions are given by
+*        argument DIMS.
+*     IBOX( NDIM ) = INTEGER (Given)
+*        Half-size of the smoothing box in pixels along eeach axis
+*        (the actual size of the ith axis's box used will be 
+*        2*IBOX(i)+1 pixels).
+*     NLIM = INTEGER (Given)
+*        Minimum number of good pixels which must be present in the
+*        smoothing box in order to calculate a smoothed output pixel.
+*        If this minimum number is not satisfied, then a bad output
+*        pixel will result. A value between 1 and the total number of
+*        pixels in the smoothing box should be supplied.
+*     WDIM = INTEGER (Given)
+*        The dimension of the ASUM and NSUM workspaces.  It must be at
+*        least 1 + DIMS( 1 ) for a two-dimensional array , and at least
+*        1 + ( DIMS(1) * ... ( 1 + DIMS(NDIM-1) ) ... ) for an 
+*        NDIM-dimensional array.  For example a 20x16x27-element array
+*        would need WLIM not fewer than 1+(20*(1+16)=341 elements.
+*     B( * ) = ? (Returned)
+*        The smoothed output array.  It has the same dimensions as A.
+*     BADOUT = LOGICAL (Returned)
+*        Whether bad pixels are present in the output image.
+*     ASUM( * ) = ? (Returned)
+*        Workspace for the pixel sums.
+*     NSUM( * ) = INTEGER (Returned)
+*        Workspace for counting good pixels.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+ 
+*  Notes:
+*     -  There is a routine for processing single- and double-precision
+*     arrays; replace "x" in the routine name by R or D as appropriate.
+*     The data type of the A, B and ASUM arguments must match the
+*     routine used.
+*     -  The routine uses recursion of the standard filter algorithm
+*     for each dimension moving from the highest to lowest. Recursion 
+*     ends when there is only the integrated value and the corresponding
+*     number of contributing pixels sums used to find the output
+*     smoothed value for the current element of the input array.  At
+*     each dimension the filter box is initialised with the required 
+*     number of values for the box width, and then as the routine 
+*     progresses through each position in the current dimension a new 
+*     section is incorporated into the summations, while a section 
+*     leaving the box is subtracted.
+ 
+*  Copyright:
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+ 
+*  History:
+*     2009 October 3 (MJC)
+*        Original version.
+*     {enter_further_changes_here}
+ 
+*-
+ 
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+ 
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT primitive data constants
+      INCLUDE 'NDF_PAR'          ! NDF public constants
+ 
+*  Arguments Given:
+      LOGICAL BAD
+      LOGICAL SAMBAD
+      LOGICAL VAR
+      INTEGER NDIM
+      INTEGER DIMS( NDIM )
+      <TYPE> A( * )
+      INTEGER IBOX( NDIM )
+      INTEGER NLIM
+      INTEGER WDIM
+ 
+*  Arguments Returned:
+      <TYPE> B( * )
+      LOGICAL BADOUT
+      <TYPE> ASUM( WDIM )
+      INTEGER NSUM( WDIM )
+ 
+*  Status:
+      INTEGER STATUS             ! Global status
+ 
+*  Local Variables:
+      INTEGER BNEW               ! New box pixel offset
+      INTEGER BOF                ! Box pixel offset
+      INTEGER BOLD               ! Old box pixel offset
+      INTEGER CDIM               ! Current dimension in recursion
+      <TYPE> DENOM               ! Denominator for smoothed output value
+      INTEGER EL                 ! Number of elements in output array
+      LOGICAL END                ! New box has been found or there are
+                                 ! no more boxes to sum
+      INTEGER I                  ! Loop counter
+      INTEGER IDIM( NDF__MXDIM ) ! Indices of an array element
+      INTEGER J                  ! Index within summation array
+      INTEGER K                  ! Loop counter for box initialisation
+      INTEGER IB                 ! Box index
+      INTEGER M                  ! Loop counter for output elements
+      INTEGER NEW                ! Position of new pixel
+      <TYPE> NPIX                ! Number of pixels in smoothing box
+      INTEGER OLD                ! Position of old pixel
+      INTEGER SOF( NDF__MXDIM )  ! Summation array offset
+      INTEGER STRIDE( NDF__MXDIM ) ! Strides through array dimensions
+
+*.
+
+*  Initialise the bad-output-pixel flag.
+      BADOUT = .FALSE.
+
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Compute the strides and numbers of elements.
+*  ============================================
+
+*  Initialise the stride of dimension number 1 for the data and output
+*  array objects. (The stride for a dimension is the amount by which
+*  the vectorised array index increases when the n-dimensional array
+*  index for that dimension increases by 1.)
+      STRIDE( 1 ) = 1
+
+*  Calculate the stride for each remaining dimension.  The final stride
+*  is also the number of elements in the initial summation arrays.
+      DO I = 2, NDIM
+         STRIDE( I ) = STRIDE( I - 1 ) * DIMS( I - 1 )
+      END DO
+
+*  Calculate the number of pixels in the averaging box and in the full
+*  array to be smoothed.
+      NPIX = 1
+      EL = 1
+      DO I = 1, NDIM
+         EL = EL * DIMS( I )
+         NPIX = NPIX * ( 2 * IBOX( I ) + 1 )
+      END DO
+
+*  Find the offsets in the summation arrays for each dimensionality.
+      SOF( NDIM ) = 0
+      DO I = NDIM - 1, 1, -1
+         SOF( I ) = SOF( I + 1 ) + STRIDE( I + 1 )
+      END DO
+
+*  Form the initial summations for the highest dimension.
+*  ======================================================
+
+*  It would be straightforward to extract each box in turn and sum
+*  within it in.  However, this is inefficient and a rolling window
+*  is used so only the values leaving and entering the smoothing
+*  region need be processed.
+
+*  Initialise the portion of the workspace arrays required for the
+*  NDIM dimension's summations.
+      DO I = 1, STRIDE( NDIM )
+         ASUM( I ) = 0<CONST>
+         NSUM( I ) = 0
+      END DO
+
+*  Loop to initialise elements of the two workspace arrays so that they
+*  contain sum for the good pixels in a box of size 1x(2*IBOX(NDIM)+1)
+*  centred on pixel location (IX,0,...).  First loop over all the 
+*  possible contributing lines.
+      DO K = -IBOX( NDIM ), IBOX( NDIM )
+
+*  If the pixel lies outside the input array, then use the boundary
+*  instead.
+         IB = MAX( 1, MIN( K, DIMS( NDIM ) ) )
+
+*  Find the offset of the line to be accumulated.
+         BOF = ( IB - 1 ) * STRIDE( NDIM )
+
+*  Accumulate sums for each box in the workspace arrays. If bad pixels
+*  are present, then test for them.
+         IF ( BAD ) THEN
+            DO I = 1, STRIDE( NDIM )
+               IF ( A( I + BOF ) .NE. VAL__BAD<T> ) THEN
+                  ASUM( I ) = ASUM( I ) + A( I + BOF )
+                  NSUM( I ) = NSUM( I ) + 1
+               END IF
+            END DO
+ 
+*  If no bad pixels are present, then omit the test for them.
+         ELSE
+            DO I = 1, STRIDE( NDIM )
+               ASUM( I ) = ASUM( I ) + A( I + BOF )
+            END DO
+         END IF
+      END DO
+
+*  Prepare to form the sums.
+*  =========================
+*
+*  Recursive scanning of the array dimensions begins with the highest
+*  dimension.
+      CDIM = NDIM
+      DO I = 1, NDIM 
+         IDIM( I ) = 0
+      END DO
+
+*  Loop for every array element.
+*  ============================
+      M = 0
+      DO WHILE ( M .LT. EL )
+
+*  This is effectively a "DO UNTIL" loop, which starts with the current
+*  dimension summing values and numbers of pixels in the smoothing box, 
+*  and reduces dimensionality, summing the sums, until just a vector 
+*  remains.
+
+*  Determine what should be the current dimension for the summations.
+*  ==================================================================
+         END = .FALSE.
+         DO WHILE ( .NOT. END )
+
+*  Shift the box along the current dimension.
+            IDIM( CDIM ) = IDIM( CDIM ) + 1
+
+*  Has it gone beyond the current dimension?
+            IF ( IDIM( CDIM ) .GT. DIMS( CDIM ) ) THEN
+
+*  Reset index within current dimension.
+               IDIM( CDIM ) = 0
+
+*  As it has completed the dimension for the current next-higher 
+*  dimension's smoothing block, go to the next higher dimension.  There
+*  must be one since there are still output elements to be computed.
+               CDIM = CDIM + 1
+
+            ELSE
+
+*  The next box location has been located successfully within the
+*  current dimenson, so exit the loop.
+               END = .TRUE.
+
+            END IF
+         END DO
+
+*  Smooth down the array.
+*  ======================
+
+*  Loop to form smoothed output values for each image line (or plane
+*  or hyperplane depending on the dimensionality) by moving the
+*  accumulated sums for each initial box down the input array.
+
+*  Find the position of the old input line/plane/cube/hypercube that 
+*  is lost from the box as the box is moved down the array in the
+*  current dimension.  Likewise find the position of the new 
+*  line/plane/cube/hypercube that enters the box.  Allow for the array
+*  boundaries.
+         OLD = MAX( 1, IDIM( CDIM ) - IBOX( CDIM ) - 1 )
+         NEW = MIN( DIMS( CDIM ), IDIM( CDIM ) + IBOX( CDIM ) )
+
+*  Find the offset of the slab to be removed and the slab to be 
+*  accumulated.  Note that the recursion is different for the highest
+*  dimension as this is where values are extracted and summed from the
+*  input array.  In subsequent recursions, values in the summation
+*  array are summed to the next unused portion of the summation arrays.
+         IF ( CDIM .EQ. NDIM ) THEN
+            BOLD = ( OLD - 1 ) * STRIDE( CDIM )
+            BNEW = ( NEW - 1 ) * STRIDE( CDIM )
+
+*  Remove the pixels in the old line from the accumulated sums and add
+*  the pixels in the new line.  If bad pixels are present, then test
+*  for them.
+            IF ( BAD ) THEN
+               DO I = 1, STRIDE( NDIM )
+                  IF ( A( I + BOLD ) .NE. VAL__BAD<T> ) THEN
+                     ASUM( I ) = ASUM( I ) - A( I + BOLD )
+                     NSUM( I ) = NSUM( I ) - 1
+                  END IF
+
+                  IF ( A( I + BNEW ) .NE. VAL__BAD<T> ) THEN
+                     ASUM( I ) = ASUM( I ) + A( I + BNEW )
+                     NSUM( I ) = NSUM( I ) + 1
+                  END IF
+               END DO
+
+*  If bad pixels are absent, then there is no need to test for them.
+*  There is also no need to keep track of the number of good pixels in
+*  the box, as this will always be equal to the total number of pixels
+*  in the smoothing box.
+            ELSE
+               DO I = 1, STRIDE( CDIM )
+                  ASUM( I ) = ASUM( I ) + ( A( I + BNEW ) - 
+     :                                      A( I + BOLD ) )
+               END DO
+            END IF
+
+*  Add the sums from a higher dimension to collapse a dimension.
+*  =============================================================
+         ELSE
+
+*  Loop to initialise elements of the two workspace arrays so that they
+*  contain sum for the good pixels in a box of size 1x(2*IBOX(CDIM)+1).
+            IF ( IDIM( CDIM ) .EQ. 1 ) THEN
+
+*  Initialise the portion of the workspace arrays required for the
+*  NDIM dimension's summations.
+               DO I = 1, STRIDE( CDIM )
+                  ASUM( I + SOF( CDIM ) ) = 0<CONST>
+                  NSUM( I + SOF( CDIM ) ) = 0
+               END DO
+
+*  Loop to initialise elements of the two workspace arrays so that they
+*  contain sum for the good pixels in a box of size 1x(2*IBOX(CDIM)+1)
+*  centred on pixel location (IX,0,...).
+               DO K = -IBOX( CDIM ), IBOX( CDIM )
+
+*  If the pixel lies outside the input array, then use the boundary
+*  instead.
+                  IB = MAX( 1, MIN( K, DIMS( CDIM ) ) )
+
+*  Find the offset of the line to be accumulated.  This has two
+*  components: the location of the next line/plane/cube in the 
+*  smoothing box, and the offset of the already summed data within 
+*  the summation array.  Note that the latter is for the next higher
+*  dimension.
+                  BOF = ( IB - 1 ) * STRIDE( CDIM ) + SOF( CDIM + 1 )
+
+*  Accumulate sums for each box in the workspace arrays.
+                  DO I = 1, STRIDE( CDIM )
+                     J = I + SOF( CDIM )
+                     ASUM( J ) = ASUM( J ) + ASUM( I + BOF )
+                     IF ( BAD ) NSUM( J ) = NSUM( J ) + NSUM( I + BOF )
+                  END DO
+               END DO
+            END IF
+
+*  For the smmothing box centred on element IDIM( CDIM ), find the 
+*  offset of the slab to be removed for the slab centred and the 
+*  slab to be accumulated.  As above combine the two components.
+*  Note that the ofset for the input summation array is for the
+*  next higher dimension.
+            BOLD = ( OLD - 1 ) * STRIDE( CDIM ) + SOF( CDIM + 1 ) 
+            BNEW = ( NEW - 1 ) * STRIDE( CDIM ) + SOF( CDIM + 1 )
+
+            DO I = 1, STRIDE( CDIM )
+               J = I + SOF( CDIM )
+               ASUM( J ) = ASUM( J ) + ( ASUM( I + BNEW ) - 
+     :                                   ASUM( I + BOLD ) )
+               IF ( BAD ) NSUM( J ) = NSUM( J ) + NSUM( I + BNEW ) -
+     :                                            NSUM( I + BOLD )
+            END DO
+         END IF
+
+*  See if the recursion has ended such that we can evaluate output 
+*  values.
+         IF ( CDIM .EQ. 1 ) THEN
+
+*  Find the denominator along each array line.
+*  ============================================
+
+*  Increment the output-pixel index.
+            M = M + 1
+
+*  If there are no bad pixels present, then this is equal to the number
+*  of pixels in the smoothing box.  Otherwise, use the accumulated sum
+*  of good pixels.
+            IF ( .NOT. BAD ) THEN
+               DENOM = NPIX
+            ELSE
+               DENOM = NSUM( 1 + SOF( 1 ) )
+            END IF
+ 
+*  If smoothing a variance image, then use the square of the number of
+*  good pixels (this takes account of the variance-reducing effect that
+*  smoothing introduces).
+            IF ( VAR ) DENOM = DENOM * DENOM
+ 
+*  Calculate the smoothed output value.
+*  ====================================
+
+*  This is valid if there are no bad pixels present.
+            IF ( DENOM .EQ. 0 ) THEN
+               B( M ) = VAL__BAD<T>
+
+            ELSE IF ( .NOT. BAD ) THEN
+               B( M ) = ASUM( 1 + SOF( 1 ) ) / DENOM
+ 
+*  It is also valid if SAMBAD is .TRUE. and the corresponding input
+*  pixel is not bad.
+            ELSE IF ( SAMBAD ) THEN
+               IF ( A( M ) .NE. VAL__BAD<T> ) THEN
+                  B( M ) = ASUM( 1 + SOF( 1 ) ) / DENOM
+ 
+*  It is bad if SAMBAD is .TRUE. and the corresponding input pixel is
+*  bad.  Note that bad pixels are present in the output image.
+               ELSE
+                  B( M ) = VAL__BAD<T>
+                  BADOUT = .TRUE.
+               END IF
+ 
+*  It is valid if SAMBAD is .FALSE. and the NLIM criterion is met.
+            ELSE
+               IF ( DENOM .GE. NLIM ) THEN
+                  B( M ) = ASUM( 1 + SOF( 1 ) ) / DENOM
+ 
+*  It is bad if the NLIM criterion is not met.  Note that bad pixels are
+*  present in the output image.
+               ELSE
+                  B( M ) = VAL__BAD<T>
+                  BADOUT = .TRUE.
+               END IF
+            END IF
+
+*  The algorithm calls itself recursively here.
+*  ============================================
+
+*  The algorithm invokes itself recursively to process the next lower
+*  dimension.  Decrement the current dimension count and branch back to
+*  the start.
+         ELSE
+            CDIM = CDIM - 1
+         END IF
+
+      END DO
+ 
+      END

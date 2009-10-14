@@ -978,7 +978,9 @@ libraries/kaplibs/kpg/kpg1_axvl.f
 libraries/kaplibs/kpg/kpg1_bbox.f
 libraries/kaplibs/kpg/kpg1_bl1d.f
 libraries/kaplibs/kpg/kpg1_bloc.f
+libraries/kaplibs/kpg/kpg_blon.f
 libraries/kaplibs/kpg/kpg1_bmed.f
+libraries/kaplibs/kpg/kpg_bmdn.f
 libraries/kaplibs/kpg/kpg1_bor2.f
 libraries/kaplibs/kpg/kpg1_cadd.f
 libraries/kaplibs/kpg/kpg1_chax.f

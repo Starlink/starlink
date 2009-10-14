@@ -1,0 +1,613 @@
+      SUBROUTINE KPG_BMDN<T>( BAD, SAMBAD, VAR, NDIM, DIMS, IN, HB,
+     :                       NLIM, OUT, BADOUT, WORK1, WORK2, STATUS )
+*+
+* Name:
+*     KPG_BMDNx
+
+*  Purpose:
+*     Smooths an n-dimensional array using a block median filter.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL KPG_BMDNx( BAD, SAMBAD, VAR, NDIM, DIMS, IN, HB, NLIM, 
+*                     OUT, BADOUT, WORK1, WORK2, STATUS )
+
+*  Description:
+*     The input array is filtered by replacing every pixel with the
+*     median of the pixel values contained in an n-dimemsional 
+*     rectangular region centred on the required output pixel.  If the 
+*     box is so large in either dimension that an entire cube, plane,
+*     line, or column is included for all output pixels, then the 
+*     output values will be the same and so can be copied rather than 
+*     re-calculated.
+
+*  Arguments:
+*     BAD = LOGICAL (Given)
+*        Whether or not it is necessary to check for bad pixels in the
+*        input image.
+*     SAMBAD = LOGICAL (Given)
+*        If a .TRUE. value is given for this argument, then bad input
+*        pixels will be propagated to the output image unchanged (a
+*        smoothed output value will be calculated for all other
+*        pixels).  If a .FALSE. value is given, then the NLIM argument
+*        determines whether an output pixel is good or bad.  The value
+*        of SAMBAD is not relevant if BAD is .FALSE..
+*     VAR = LOGICAL (Given)
+*        Indicates if the input image holds data values or variance
+*        values.  This argument is currently ignored (input values are
+*        assumed to be data values).
+*        smoothing produces.
+*     NDIM = INTEGER (Given)
+*        The number of dimensions of the array to be smoothed.
+*     DIMS( NDIM ) = INTEGER (Given)
+*        The dimensions of the input array to be smoothed and the 
+*        smoothed array.
+*     IN( * ) = ? (Given)
+*        The input array, whose dimensions are given by argument DIMS.
+*     HB( NDIM ) = INTEGER (Given)
+*        The half-width of the filter block along the each dimension,
+*        in pixels.
+*     NLIM = INTEGER (Given)
+*        Minimum number of good pixels which must be present in the
+*        smoothing box in order to calculate a smoothed output pixel.
+*        If this minimum number is not satisfied, then a bad output
+*        pixel will result.  A value between 1 and the total number of
+*        pixels in the smoothing box should be supplied.
+*     OUT( * ) = ? (Returned)
+*        The output array, whose dimensions are given by argument DIMS.
+*     BADOUT = LOGICAL (Returned)
+*        Whether bad pixels are present in the output image.
+*     WORK1( * ) = ? (Returned)
+*        Work space.  It should have sufficient capacity to store the
+*        n-dimensional box, comprising at least the product of the
+*        sequence (2*HB(i)+1) elements, summed from i = 1 to NDIM.
+*     WORK2( * ) = INTEGER (Returned)
+*        Work space.  It should have sufficient capacity to store the
+*        n-dimensional box, comprising at least the product of the
+*        sequence (2*HB(i)+1) elements, summed from i = 1 to NDIM.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for processing single- and double-precision
+*     arrays; replace "x" in the routine name by R or D as appropriate.
+*     The data type of the IN, OUT, and WORK1 arguments must match the
+*     routine used.
+
+*  Copyright:
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This programme is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE.  See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     2009 October 10 (MJC):
+*        Original version.
+*     {enter__changes_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT public constants
+      INCLUDE 'NDF_PAR'          ! NDF public constants
+
+*  Arguments Given:
+      LOGICAL BAD
+      LOGICAL SAMBAD
+      LOGICAL VAR
+      INTEGER NDIM
+      INTEGER DIMS( NDIM )
+      <TYPE> IN( * )
+      INTEGER HB( NDIM )
+      INTEGER NLIM
+
+*  Arguments Returned:
+      <TYPE> OUT( * )
+      LOGICAL BADOUT
+      <TYPE> WORK1( * )      
+      INTEGER WORK2( * )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER BDIM               ! Current dimension for box extraction
+      INTEGER CDIM               ! Current dimension in recursion
+      <LTYPE> DUMMY              ! Un-used dummy argument
+      INTEGER EL                 ! Total number of elements in i/o arrays
+      LOGICAL END                ! End loop through axes
+      INTEGER HI( NDF__MXDIM )   ! Filter box upper bounds
+      INTEGER HIL( NDF__MXDIM )  ! Previous filter-box upper 
+      INTEGER IDIM( NDF__MXDIM ) ! Indices of an array element
+      INTEGER I                  ! Loop counter
+      INTEGER IVO                ! Index of input array value
+      INTEGER J                  ! Loop counter
+      INTEGER LO( NDF__MXDIM )   ! Filter-box lower bounds
+      INTEGER LOL( NDF__MXDIM )  ! Previous filter-box lower bounds
+      INTEGER M                  ! Counter of output values
+      <LTYPE> MIDPER             ! Central percentile, i.e. median
+      LOGICAL MORE               ! More pixels to copy?
+      INTEGER N                  ! Number of good pixels in box
+      INTEGER NEW                ! Position of new pixel
+      INTEGER OLD                ! Position of old pixel
+      INTEGER OVO                ! Index of output array value
+      INTEGER PIX( NDF__MXDIM )  ! Pixel indices of next pixel to sort
+      INTEGER STRIDE( NDF__MXDIM ) ! Strides through array dimensions
+
+*.
+
+*  Initialise the BADOUT flag to indicate that no bad values have yet 
+*  been put in the output image.
+      BADOUT = .FALSE.
+
+*  Check the inherited status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Set up the constant for the median position.
+      MIDPER = 1<CONST> / 2<CONST>
+
+*  Initialise the y bounds of the filter box used to create the
+*  `previous' output line.
+      DO I = 1, NDIM
+         LOL( I ) = VAL__BADI
+         HIL( I ) = VAL__BADI
+      END DO
+
+*  Compute the strides and numbers of elements.
+*  ============================================
+
+*  Initialise the stride of dimension number 1 for the data and output
+*  array objects. (The stride for a dimension is the amount by which
+*  the vectorised array index increases when the n-dimensional array
+*  index for that dimension increases by 1.)
+      STRIDE( 1 ) = 1
+
+*  Calculate the stride for each remaining dimension.  The final stride
+*  is also the number of elements in the initial summation arrays.
+      DO I = 2, NDIM
+         STRIDE( I ) = STRIDE( I - 1 ) * DIMS( I - 1 )
+      END DO
+
+*  Calculate the number of pixels in the averaging box and in the full
+*  array to be smoothed.
+      EL = 1
+      DO I = 1, NDIM
+         EL = EL * DIMS( I )
+      END DO
+
+*  Prepare to extract the box.
+*  ===========================
+*
+*  Recursive scanning of the array dimensions begins with the highest
+*  dimension.  As the first step is to add one to the current dimension
+*  reset its element to zero here.
+      CDIM = 1
+      DO I = 1, NDIM 
+         IDIM( I ) = 1
+         LO( I ) = 1
+         HI( I ) = MIN( DIMS( I ), 1 + HB( I ) )
+      END DO
+      IDIM( CDIM ) = 0
+
+*  Data containing bad values.
+*  ===========================
+
+*  First deal with cases where bad pixels may be present in the input
+*  array.
+      IF ( BAD ) THEN
+ 
+*  Loop for every array element.
+*  =============================
+         M = 0
+         DO WHILE ( M .LT. EL )
+
+*  This is effectively a "DO UNTIL" loop, which starts with the current
+*  dimension copying values within the box neighbourhood into the work 
+*  array.  It works through the dimensions as if it were a series of
+*  nested do loops for each dimension.  Once all the values in the box 
+*  are recorded in the work array it is sorted to find the median.
+
+*  Determine which dimension to increment and set its box limits.
+*  ==============================================================
+            END = .FALSE.
+            DO WHILE ( .NOT. END )
+
+*  Shift the box along the current dimension.
+               IDIM( CDIM ) = IDIM( CDIM ) + 1
+
+*  Has it gone beyond the current dimension?
+               IF ( IDIM( CDIM ) .GT. DIMS( CDIM ) ) THEN
+
+*  Reset index and box limits to the start within current dimension.
+                  IDIM( CDIM ) = 1
+                  LO( CDIM ) = 1
+                  HI( CDIM ) = MIN( DIMS( CDIM ), 1 + HB( CDIM ) )
+
+*  Initialise the bounds of the filter box used to create the
+*  `previous' output column/row/plane/hyperplane.
+                  LOL( CDIM ) = VAL__BADI
+                  HIL( CDIM ) = VAL__BADI
+
+*  As it has completed the dimension for the current next-higher 
+*  dimension's smoothing block, go to the next higher dimension.  There
+*  must be one since there are still output elements to be computed.
+                  CDIM = CDIM + 1
+                  IF ( CDIM .GT. NDIM ) THEN
+                     CDIM = NDIM
+                     END = .TRUE.
+                  END IF
+
+               ELSE
+
+*  The next box location has been located successfully within the
+*  current dimenson, so exit the loop.
+                  END = .TRUE.
+
+               END IF
+            END DO
+
+*  Form the upper and lower bounds of the input block.  Limit them to
+*  the edges of the input array.
+            LO( CDIM ) = MAX( 1, IDIM( CDIM ) - HB( CDIM ) )
+            HI( CDIM ) = MIN( DIMS( CDIM ), IDIM( CDIM ) + HB( CDIM ) )
+
+*  Avoid duplication of calculations.
+*  ==================================
+
+*  Find the offset of the current and previous
+*  column/row/plane/hyperplane.
+            NEW = ( IDIM( CDIM ) - 1 ) * STRIDE( CDIM )
+            OLD = ( IDIM( CDIM ) - 2 ) * STRIDE( CDIM )
+
+*  If both bounds are the same as last time, then the current output
+*  column/row/plane/hyperplane  will be identical to the previous 
+*  equivalent.  Save time by copying it rather than re-calculating it.
+            IF ( LO( CDIM ) .EQ. LOL( CDIM ) .AND. 
+     :           HI( CDIM ) .EQ. HIL( CDIM ) ) THEN
+               DO I = 1, STRIDE( CDIM )
+                  OUT( I + NEW ) = OUT( I + OLD )
+               END DO
+               M = M + STRIDE( CDIM )
+
+*  Extract the new neighbourhood.
+*  ==============================
+
+*  Can only sort once the bounds in all dimensions are known.
+             ELSE
+
+*  Find the index of the output element.
+               OVO = 1
+               DO I = 1, NDIM
+                  OVO = OVO + MAX( 0, ( IDIM( I ) - 1 ) ) * STRIDE( I )
+               END DO
+
+*  If the input pixel is bad and SAMBAD is .TRUE., then the output
+*  pixel will also be bad.
+               IF ( SAMBAD .AND. IN( OVO ) .EQ. VAL__BAD<T> ) THEN
+                  OUT( OVO ) = VAL__BAD<T>
+                  BADOUT = .TRUE.
+
+*  If the current output column/row/plane/hyperplane is based on 
+*  different input pixels to the previous one, calculate the new
+*  output one.
+               ELSE
+
+*  Extract the new neighbourhood.
+*  ==============================
+
+*  Find the index within the input vectorised array corresponding to
+*  the first pixel within the section to be copied.  Further find the 
+*  index within the output vectorised array corresponding to the first
+*  pixel within the section to be copied.  Also, store the indices of
+*  the first pixel to be copied.
+                  IVO = 1
+                  N = 1
+
+                  DO I = 1, NDIM
+                     IVO = IVO + ( LO( I ) - 1 ) * STRIDE( I )
+                     PIX( I ) = LO( I )
+                  END DO
+
+*  Loop round every pixel in the area to be copied.
+                  MORE = .TRUE.
+                  DO WHILE ( MORE )
+
+*  Copy the current pixel into the WORK1 array that will be sorted, and
+*  set up points for these values in the WORK2 array.  Note N is 
+*  incremented after assignment, as it starts at index 1.
+                     IF ( IN( IVO ) .NE. VAL__BAD<T> ) THEN 
+                        WORK1( N ) = IN( IVO )
+                        WORK2( N ) = N
+                     END IF
+
+*  Get the index on the first axis of the next pixel to be copied.
+                     PIX( 1 ) = PIX( 1 ) + 1            
+
+*  Correspondingly increase the vectorised index of the input array.
+                     IF ( IN( IVO ) .NE. VAL__BAD<T> ) N = N + 1
+                     IVO = IVO + 1
+
+*  If we are now beyond the end of this axis, increment the next axis by
+*  one and reset this axis to the lower bound.  Do this until an axis 
+*  does not overflow, or the final axis has overflowed.
+                     BDIM = 1
+                     DO WHILE ( PIX( BDIM ) .GT. HI( BDIM ) .AND. MORE )
+
+*  Reset the pixel index on this axis to the lower bound.
+                        PIX( BDIM ) = LO( BDIM )
+
+*  This has moved us backwards by DIMS( BDIM ) pixels on axis BDIM. 
+*  Reduce the vector index in the input array to take account of this.
+                        IVO = IVO - ( HI( BDIM ) - LO( BDIM ) + 1 ) *
+     :                        STRIDE( BDIM )
+
+*  Move on to the next axis.
+                        BDIM = BDIM + 1
+
+*  If there are no more axes to increment, we have reached the end of 
+*  the array, so leave the loops.  Also avoid accessing outside the
+*  bounds of the PIX and HI arrays for an NDF__MXDIM-dimensional array, 
+*  or uninitialised PIX( NDIM + 1 ) and HI( NDIM + 1 ) for
+*  NDIM < NDF__MXDIM.
+                        IF ( BDIM .GT. NDIM ) THEN
+                           MORE = .FALSE.
+                           BDIM = BDIM - 1
+
+                        ELSE
+
+*  Increment the pixel index on this new axis by 1.
+                           PIX( BDIM ) = PIX( BDIM ) + 1
+
+*  Increase the vector indices in the input and output arrays to take 
+*  account of this move of one pixel.
+                           IVO = IVO + STRIDE( BDIM )
+                        
+                       END IF               
+                     END DO
+                  END DO
+
+*  Set and count the current output array value.
+*  =============================================
+
+*  Find the median of the data in the work array and store it in the
+*  output image.  If SAMBAD is .FALSE., the NLIM criterion has to be
+*  met.  There is no additional point, so decrement the count of values
+*  stored.
+                  N = N - 1
+                  IF ( SAMBAD .OR. N .GE. NLIM ) THEN
+                     CALL KPG1_QNTL<T>( .FALSE., .TRUE., MIDPER, N, 
+     :                                  WORK1, DUMMY, WORK2, 
+     :                                  OUT( OVO ), STATUS )
+
+*  Otherwise, store a bad value in the output image. 
+                  ELSE
+                     OUT( OVO ) = VAL__BAD<T>
+                     BADOUT = .TRUE.
+                  END IF
+
+*  Increment the output-pixel index by a stride along the first
+*  dimension.
+                  M = M + 1
+               END IF
+
+            END IF
+
+*  Save the filter-box bounds used to create this output row/column/
+*  plane/hyperplane.
+            LOL( CDIM ) = LO( CDIM )
+            HIL( CDIM ) = HI( CDIM )
+
+*  An output point is evaluated so need to define the next box starting
+*  at the first dimension.
+            CDIM = 1
+         END DO
+
+*  No bad values are present in the input array.
+*  =============================================
+
+*  This is for efficiency to avoid testing for bad pixels when there 
+*  is none.
+      ELSE
+
+*  Loop for every array element.
+*  =============================
+         M = 0
+         DO WHILE ( M .LT. EL )
+
+*  This is effectively a "DO UNTIL" loop, which starts with the current
+*  dimension copying values within the box neighbourhood into the work 
+*  array.  It works through the dimensions as if it were a series of
+*  nested do loops for each dimension.  Once all the values in the box 
+*  are recorded in the work array it is sorted to find the median.
+
+*  Determine which dimension to increment and set its box limits.
+*  ==============================================================
+            END = .FALSE.
+            DO WHILE ( .NOT. END )
+
+*  Shift the box along the current dimension.
+               IDIM( CDIM ) = IDIM( CDIM ) + 1
+
+*  Has it gone beyond the current dimension?
+               IF ( IDIM( CDIM ) .GT. DIMS( CDIM ) ) THEN
+
+*  Reset index and box limits to the start within current dimension.
+                  IDIM( CDIM ) = 1
+                  LO( CDIM ) = 1
+                  HI( CDIM ) = MIN( DIMS( CDIM ), 1 + HB( CDIM ) )
+
+*  Initialise the bounds of the filter box used to create the
+*  `previous' output column.
+                  LOL( CDIM ) = VAL__BADI
+                  HIL( CDIM ) = VAL__BADI
+
+*  As it has completed the dimension for the current next-higher 
+*  dimension's smoothing block, go to the next higher dimension.  There
+*  must be one since there are still output elements to be computed.
+                  CDIM = CDIM + 1
+
+               ELSE
+
+*  The next box location has been located successfully within the
+*  current dimenson, so exit the loop.
+                  END = .TRUE.
+
+               END IF
+            END DO
+
+*  Form the upper and lower bounds of the input block.  Limit them to
+*  the edges of the input array
+            LO( CDIM ) = MAX( 1, IDIM( CDIM ) - HB( CDIM ) )
+            HI( CDIM ) = MIN( DIMS( CDIM ), IDIM( CDIM ) + HB( CDIM ) )
+
+*  Avoid duplication of calculations.
+*  ==================================
+
+*  Find the offset of the current and previous
+*  column/row/plane/hyperplane.
+            NEW = ( IDIM( CDIM ) - 1 ) * STRIDE( CDIM )
+            OLD = ( IDIM( CDIM ) - 2 ) * STRIDE( CDIM )
+
+*  If both bounds are the same as last time, then the current output
+*  coloumn/row/plane/hyperplane row will be identical to the previous 
+*  output equivalent.  Save time by copying it rather than 
+*  re-calculating it.
+            IF ( LO( CDIM ) .EQ. LOL( CDIM ) .AND. 
+     :           HI( CDIM ) .EQ. HIL( CDIM ) ) THEN
+               DO I = 1, STRIDE( CDIM )
+                  OUT( I + NEW ) = OUT( I + OLD )
+               END DO
+               M = M + STRIDE( CDIM )
+
+*  Extract the new neighbourhood.
+*  ==============================
+
+*  Can only sort once the bounds in all dimensions are known.
+            ELSE
+
+*  Find the index of the output element.
+               OVO = 1
+               DO I = 1, NDIM
+                  OVO = OVO + MAX( 0, ( IDIM( I ) - 1 ) ) * STRIDE( I )
+               END DO
+
+*  Find the index within the input vectorised array corresponding to
+*  the first pixel within the section to be copied.  Further find the 
+*  index within the output vectorised array corresponding to the first
+*  pixel within the section to be copied.  Also, store the indices of
+*  the first pixel to be copied.
+               IVO = 1
+               N = 1
+
+               DO I = 1, NDIM
+                  IVO = IVO + ( LO( I ) - 1 ) * STRIDE( I )
+                  PIX( I ) = LO( I )
+               END DO
+
+*  Loop round every pixel in the area to be copied.
+               MORE = .TRUE.
+               DO WHILE ( MORE )
+
+*  Copy the current pixel into the WORK1 array that will be sorted, and
+*  set up points for these values in the WORK2 array.  Note N is 
+*  incremented after assignment, as it starts at index 1.
+                  WORK1( N ) = IN( IVO )
+                  WORK2( N ) = N
+
+*  Get the index on the first axis of the next pixel to be copied.
+                  PIX( 1 ) = PIX( 1 ) + 1            
+
+*  Correspondingly increase the vectorised indices.
+                  N = N + 1
+                  IVO = IVO + 1
+
+*  If we are now beyond the end of this axis, increment the next axis by
+*  one and reset this axis to the lower bound.  Do this until an axis 
+*  does not overflow, or the final axis has overflowed.
+                  BDIM = 1
+                  DO WHILE ( PIX( BDIM ) .GT. HI( BDIM ) .AND. MORE )
+
+*  Reset the pixel index on this axis to the lower bound.
+                     PIX( BDIM ) = LO( BDIM )
+
+*  This has moved us backwards by DIMS( BDIM ) pixels on axis BDIM. 
+*  Reduce the vector index in the input array to take account of this.
+                     IVO = IVO - ( HI( BDIM ) - LO( BDIM ) + 1 ) *
+     :                     STRIDE( BDIM )
+
+*  Move on to the next axis.
+                     BDIM = BDIM + 1
+
+*  If there are no more axes to increment, we have reached the end of 
+*  the array, so leave the loops.  Also avoid accessing outside the
+*  bounds of the PIX and HI arrays for an NDF__MXDIM-dimensional array, 
+*  or uninitialised PIX( NDIM + 1 ) and HI( NDIM + 1 ) for
+*  NDIM < NDF__MXDIM.
+                     IF ( BDIM .GT. NDIM ) THEN
+                        MORE = .FALSE.
+                        BDIM = BDIM - 1
+
+                     ELSE
+
+*  Increment the pixel index on this new axis by 1.
+                        PIX( BDIM ) = PIX( BDIM ) + 1
+
+*  Increase the vector indices in the input and output arrays to take 
+*  account of this move of one pixel.
+                        IVO = IVO + STRIDE( BDIM )
+                     END IF               
+                  END DO
+               END DO
+
+*  Set and count the current output array value.
+*  =============================================
+
+*  Find the median of the data in the work array and store it in the
+*  output array.  There is no additional point, so decrement the count 
+*  of values stored.
+               N = N - 1
+               CALL KPG1_QNTL<T>( .FALSE., .TRUE., MIDPER, N, WORK1,
+     :                            DUMMY, WORK2, OUT( OVO ), STATUS )
+
+*  Increment the output-pixel index by a stride along the first
+*  dimension.
+               M = M + 1
+            END IF
+
+*  Save the filter-box bounds used to create this output column/row/
+*  plane/hyperplane.
+            LOL( CDIM ) = LO( CDIM )
+            HIL( CDIM ) = HI( CDIM )
+
+*  An output point is evaluated so need to define the next box starting
+*  at the first dimension.
+            CDIM = 1
+
+         END DO
+      END IF
+
+      END
