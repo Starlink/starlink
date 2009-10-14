@@ -1747,7 +1747,7 @@ void astInitAxisVtab_(  AstAxisVtab *vtab, const char *name, int *status ) {
    to this class.  We can conveniently use the address of the (static)
    class_check variable to generate this unique value. */
    vtab->id.check = &class_check;
-   vtab->id.parent = NULL;
+   vtab->id.parent = &(((AstObjectVtab *) vtab)->id);
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */

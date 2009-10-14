@@ -190,6 +190,9 @@ f     - AST_VERSION: Return the verson of the AST library being used.
 *        Object ID.
 *     28-JAN-2008 (DSB):
 *        Allow unlocked objects to be annulled using astAnnul.
+*     14-OCT-2009 (DSB):
+*        Modify astCast to make it a virtual function and add type 
+*        checking.
 *class--
 */
 
@@ -363,6 +366,7 @@ static int astgetc_init = 0;
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
+static AstObject *Cast( AstObject *, AstObject *, int * );
 static const char *Get( AstObject *, const char *, int * );
 static const char *GetAttrib( AstObject *, const char *, int * );
 static const char *GetID( AstObject *, int * );
@@ -495,7 +499,7 @@ f     error value
    return NULL;
 }
 
-AstObject *astCast_( AstObject *this, AstObject *obj, int *status ) {
+static AstObject *Cast( AstObject *this, AstObject *obj, int *status ) {
 /*
 *+
 *  Name:
@@ -505,7 +509,7 @@ AstObject *astCast_( AstObject *this, AstObject *obj, int *status ) {
 *     Cast an Object into an instance of a sub-class.
 
 *  Type:
-*     Protected function.
+*     Protected virtual function.
 
 *  Synopsis:
 *     #include "object.h"
@@ -515,13 +519,13 @@ AstObject *astCast_( AstObject *this, AstObject *obj, int *status ) {
 *     Object method.
 
 *  Description:
-*     This function returns a pointer to an ancestral component of the
+*     This function returns a deep copy of an ancestral component of the
 *     supplied object. The required class of the ancestral component is
 *     specified by another object. Specifically, if "this" and "new" are 
-*     of the same class, a clone of "this" is returned. If "this" is an 
-*     instance of a subclass of "obj", then a deep copy of the component
-*     of "this" that matches "obj" is returned. Otherwise, a NULL pointer
-*     is returned without error.
+*     of the same class, a copy of "this" is returned. If "this" is an 
+*     instance of a subclass of "obj", then a copy of the component
+*     of "this" that matches the class of "obj" is returned. Otherwise, 
+*     a NULL pointer is returned without error.
 
 *  Parameters:
 *     this
@@ -531,68 +535,127 @@ AstObject *astCast_( AstObject *this, AstObject *obj, int *status ) {
 *        The returned Object will be of the same class as "obj". 
 
 *  Returned Value:
-*     A pointer to the new Object, or a clone of the supplied pointer. NULL 
-*     if "this" is not a sub-class of "obj".
+*     A pointer to the new Object. NULL if "this" is not a sub-class of 
+*     "obj", or if an error occurs.
+
+*  Notes:
+*     - A NULL pointer will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
 *-
 */
 
 /* Local Variables: */
-   AstClassIdentifier *obj_id;
-   AstClassIdentifier *this_id;
    AstObject *new;
-   AstObjectVtab *obj_vtab;
-   AstObjectVtab *this_vtab;
-   int *obj_check;    
+   int generation_gap;
 
 /* Initialise */
    new = NULL;
 
+/* Check inherited status */
+   if( !astOK ) return new;
+
 /* Check pointer have been supplied. */
    if( this && obj ) {
 
-/* Get pointers to the virtual function tables for the two objects. */
-      this_vtab = this->vtab;
-      obj_vtab = obj->vtab;
+/* See how many steps up the class inheritance ladder it is from "this" to 
+   "obj". A positive value is returned if "this" is a sub-class of "obj". 
+   A negative value is returned if "obj" is a sub-class of "this". Zero 
+   is returned if they are of the same class. AST__COUSIN is returned if
+   they share a common ancestor but are not on the same line of descent. */
+      generation_gap = astClassCompare( astVTAB( this ), astVTAB( obj ) );
 
-/* Get pointers to the AstClassIdentifier that identifies the top-level
-   class of each vtab. */
-      this_id = this_vtab->top_id;
-      obj_id = obj_vtab->top_id;
-
-/* Class membership is specified by the "check" value in each class
-   identifier. Get the check value for "obj". */
-      obj_check = obj_id->check;
-
-/* If the two objects are of the same class, just return a clone of
+/* If the two objects are of the same class, just return a copy of
    "this". */
-      if( this_id->check == obj_check ) {
-         new = astClone( this );
+      if( generation_gap == 0 ) {
+         new = astCopy( this );
 
-/* If the two objects are not of the same class, walk up the class heiarchy
-   of "this" until the class of "obj" is reached. */
-      } else {
-         while( this_id && ( this_id->check != obj_check ) ) {
-            this_id = this_id->parent;
-         }
+/* If "this" is a subclass of "obj", return a deep copy of "this" cast
+   into the class of "obj". */
+      } else if( generation_gap != AST__COUSIN && generation_gap > 0 ) {
+         new = astCastCopy( this, obj );
 
-/* Check that "this" is a subclass of "obj". */
-         if( this_id ) {
-
-/* Temporarily change the vtab of the supplied object to the supplied
-   vtab. */
-            this->vtab = obj_vtab;
-
-/* Now take a copy of the object (now considered to be an instance of the
-   class specified by "vtab"). */
-            new = astCopy( this );
-
-/* Re-instate the original Object vtab. */
-            this->vtab = this_vtab;
-         }
       }
    }
 
-/* Return the copy pointer. */
+/* Return the new pointer. */
+   return new;
+}
+
+AstObject *astCastCopy_( AstObject *this, AstObject *obj, int *status ) {
+/*
+*+
+*  Name:
+*     astCastCopy
+
+*  Purpose:
+*     Cast an Object into an instance of a sub-class, without type-checking.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "object.h"
+*     AstObject *astCastCopy( AstObject *this, AstObject *obj ) 
+
+*  Class Membership:
+*     Object method.
+
+*  Description:
+*     This function returns a deep copy of an ancestral component of the
+*     supplied object. The required class of the ancestral component is
+*     specified by another object. No checks are performed that "this" is
+*     a sub-class of "obj".
+*
+*     It works by temporarily changing the vtab in "this" to be the same
+*     as in "obj", and then doing a deep copy, and then re-instating the
+*     original vtab.
+
+*  Parameters:
+*     this
+*        Pointer to the Object to be cast.
+*     obj
+*        Pointer to an Object that defines the class of the returned Object. 
+*        The returned Object will be of the same class as "obj". 
+
+*  Returned Value:
+*     A pointer to the new Object. 
+
+*  Notes:
+*     - A NULL pointer will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*-
+*/
+
+/* Local Variables: */
+   AstObject *new;
+   AstObjectVtab *this_vtab;
+
+/* Initialise */
+   new = NULL;
+
+/* Check inherited status */
+   if( !astOK ) return new;
+
+/* Check pointer have been supplied. */
+   if( this && obj ) {
+
+/* Save a pointer to the original virtual function tables for "this". */
+      this_vtab = astVTAB( this );
+
+/* Temporarily change the vtab of "this" to that of "obJ". */
+      this->vtab = astVTAB( obj );
+
+/* Now take a copy of the object (now considered to be an instance of the
+   class specified by "obj"). */
+      new = astCopy( this );
+
+/* Re-instate the original Object vtab. */
+      this->vtab = this_vtab;
+   }
+
+/* Return the new pointer. */
    return new;
 }
 
@@ -749,6 +812,102 @@ AstObject *astCheckLock_( AstObject *this, int *status ) {
 /* Return the supploed pointer. */
    return this;
 
+}
+
+int astClassCompare_( AstObjectVtab *class1, AstObjectVtab *class2, 
+                      int *status ) {
+/*
+*+
+*  Name:
+*     astClassCompare
+
+*  Purpose:
+*     Determine the relationship between two AST classes.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "object.h"
+*     int astClassCompare( AstObjectVtab *class1, AstObjectVtab *class2 )
+
+*  Class Membership:
+*     Object method.
+
+*  Description:
+*     This function returns the number of steps up the class inheritance 
+*     ladder from the class specified by "class1" to the class specified
+*     by "class2". 
+
+*  Parameters:
+*     class1
+*        Pointer to a virtual function table describing the first AST class.
+*     class2
+*        Pointer to a virtual function table describing the second AST class.
+
+*  Returned Value:
+*     The generation gap between "class1" and "class2". The result will be 
+*     positive if "class1" is a subclass of "class2", negative if "class2" 
+*     is a subclass of "class1", zero if they are of the same class (or
+*     an error occurs), or AST__COUSIN if they are not on the same line 
+*     of descent.
+
+*-
+*/
+
+/* Local Variables: */
+   AstClassIdentifier *class1_id;
+   AstClassIdentifier *class2_id;
+   AstClassIdentifier *id;
+   int *class1_check;    
+   int *class2_check;    
+   int result;                 
+
+/* Initialise */
+   result = 0;
+
+/* Check inherited status */
+   if( !astOK ) return result;
+
+/* Check pointer have been supplied. */
+   if( class1 && class2 ) {
+
+/* Get pointers to the AstClassIdentifier that identifies the top-level
+   class of each vtab. */
+      class1_id = class1->top_id;
+      class2_id = class2->top_id;
+
+/* Class membership is specified by the "check" value in each class
+   identifier. Get the check values for both vtabs. */
+      class1_check = class1_id->check;
+      class2_check = class2_id->check;
+
+/* Try walking up the class heirarchy of "class1" until the class of 
+   "class2" is reached. The top-level AstObject class has a NULL "parent" 
+   pointer in its class identifier structure. */
+      id = class1_id;
+      while( id && ( id->check != class2_check ) ) {
+         id = id->parent;
+         result++;
+      }
+
+/* If "class1" is not a subclass of "class2", try walking up the class 
+   heirarchy of "class2" until the class of "class1" is reached. */
+      if( !id ) {
+         result = 0;
+         id = class2_id;
+         while( id && ( id->check != class1_check ) ) {
+            id = id->parent;
+            result--;
+         }
+
+/* If "class2" is not a subclass of "class1", return AST__COUSIN. */
+         if( !id ) result = AST__COUSIN;
+      }
+   }
+
+/* Return the generation gap. */
+   return result;
 }
 
 static void Clear( AstObject *this, const char *attrib, int *status ) {
@@ -4350,6 +4509,11 @@ void astInitObjectVtab_(  AstObjectVtab *vtab, const char *name, int *status ) {
 /* Get a pointer to Thread-specific global data. */
    astGET_GLOBALS(NULL);
 
+/* Initialise the contents of the class identifier. Since this is the
+   base class, we assign null values to the fields. */
+   vtab->id.check = NULL;
+   vtab->id.parent = NULL;
+
 /* Store pointers to the member functions (implemented here) that provide
    virtual methods for this class. */
    vtab->Clear = Clear;
@@ -4370,7 +4534,7 @@ void astInitObjectVtab_(  AstObjectVtab *vtab, const char *name, int *status ) {
    vtab->TestID = TestID;
    vtab->TestIdent = TestIdent;
    vtab->VSet = VSet;
-
+   vtab->Cast = Cast;
    vtab->GetObjSize = GetObjSize;
 
    vtab->TestUseDefs = TestUseDefs;
@@ -4801,6 +4965,10 @@ void astVSet_( AstObject *this, const char *settings, char **text, va_list args,
 int astGetObjSize_( AstObject *this, int *status ) {
    if ( !astOK || !this ) return 0;
    return (**astMEMBER(this,Object,GetObjSize))( this, status );
+}
+AstObject *astCast_( AstObject *this, AstObject *obj, int *status ) {
+   if ( !astOK ) return NULL;
+   return (**astMEMBER(this,Object,Cast))( this, obj, status );
 }
 int astSame_( AstObject *this, AstObject *that, int *status ) {
    if ( !astOK ) return 0;
@@ -7548,6 +7716,3 @@ MYSTATIC const char *HeadString( int *head, char *list ){
 }
 
 #endif
-
-
-

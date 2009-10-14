@@ -676,6 +676,7 @@ AstCmpFrame *astCmpFrameId_( void *, void *, const char *, ... );
 static AstAxis *GetAxis( AstFrame *, int, int * );
 static AstMapping *RemoveRegions( AstMapping *, int * );
 static AstMapping *Simplify( AstMapping *, int * );
+static AstObject *Cast( AstObject *, AstObject *, int * );
 static AstPointSet *ResolvePoints( AstFrame *, const double [], const double [], AstPointSet *, AstPointSet *, int * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
 static AstSystemType GetAlignSystem( AstFrame *, int * );
@@ -1210,6 +1211,118 @@ static double Angle( AstFrame *this_frame, const double a[],
 
 /* Return the result. */
    return result;
+}
+
+static AstObject *Cast( AstObject *this_object, AstObject *obj, int *status ) {
+/*
+*  Name:
+*     Cast
+
+*  Purpose:
+*     Cast an Object into an instance of a sub-class.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     AstObject *Cast( AstObject *this, AstObject *obj, int *status ) 
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the protected astCast
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function returns a deep copy of an ancestral component of the
+*     supplied object. The required class of the ancestral component is
+*     specified by another object. Specifically, if "this" and "new" are 
+*     of the same class, a copy of "this" is returned. If "this" is an 
+*     instance of a subclass of "obj", then a copy of the component
+*     of "this" that matches the class of "obj" is returned. Otherwise, 
+*     a NULL pointer is returned without error.
+
+*  Parameters:
+*     this
+*        Pointer to the Object to be cast.
+*     obj
+*        Pointer to an Object that defines the class of the returned Object. 
+*        The returned Object will be of the same class as "obj". 
+
+*  Returned Value:
+*     A pointer to the new Object. NULL if "this" is not a sub-class of 
+*     "obj", or if an error occurs.
+
+*  Notes:
+*     - A NULL pointer will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables; */
+   AstAxis *newaxis;
+   AstFrame *cfrm;
+   AstFrame *this;
+   AstObject *new;
+   astDECLARE_GLOBALS       
+   int generation_gap;
+   int i;
+   int naxes;
+
+/* Initialise */
+   new = NULL;
+
+/* Check inherited status */
+   if( !astOK ) return new;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
+
+/* See how many steps up the class inheritance ladder it is from "obj" 
+   to this class (CmpFrame). A positive value is returned if CmpFrame
+   is a sub-class of "obj". A negative value is returned if "obj" is 
+   a sub-class of CmpFrame. Zero is returned if "obj" is a CmpFrame. 
+   AST__COUSIN is returned if "obj" is not on the same line of descent 
+   as CmpFrame. */
+   generation_gap = astClassCompare( (AstObjectVtab *) &class_vtab, 
+                                     astVTAB( obj ) );
+
+/* If "obj" is a CmpFrame or a sub-class of CmpFrame, we can cast by 
+   truncating the vtab for "this" so that it matches the vtab of "obJ", 
+   and then taking a deep copy of "this". */
+   if( generation_gap <= 0 && generation_gap != AST__COUSIN ) {
+      new = astCastCopy( this_object, obj );
+
+/* If "obj" is not a CmpFrame or a sub-class of CmpFrame (e.g. it's a 
+   Frame), we create a basic Frame containing the same axes and attributes 
+   as the CmpFrame, and then attempt to cast this Frame into the class 
+   indicated by "obj". */
+   } else {
+      this = (AstFrame *) this_object;
+
+/* Create a basic Frame with the right number of axes. */
+      naxes = astGetNaxes( this );
+      cfrm = astFrame( naxes, " ", status );
+
+/* Replace the Axis structures in the basic Frame with those in the
+   CmpFrame. */
+      for( i = 0; i < naxes; i++ ) {
+         newaxis = astGetAxis( this, i );
+         astSetAxis( cfrm, i, newaxis );
+         newaxis = astAnnul( newaxis );
+      }
+
+/* Overlay the properties of the CmpFrame onto the basic Frame. */
+      astOverlay( this, NULL, cfrm );
+
+/* Try to cast the basic Frame to the class of "obj". */
+      new = astCast( cfrm, obj );
+
+/* Annull the basic Frame. */
+      cfrm = astAnnul( cfrm );
+   }
+
+/* Return the new pointer. */
+   return new;
 }
 
 static void ClearAlignSystem( AstFrame *this_frame, int *status ) {
@@ -4245,13 +4358,14 @@ void astInitCmpFrameVtab_(  AstCmpFrameVtab *vtab, const char *name, int *status
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
+   object->Cast = Cast;
+   mapping->Decompose = Decompose;
    frame->Abbrev = Abbrev;
    frame->ClearDirection = ClearDirection;
    frame->ClearFormat = ClearFormat;
    frame->ClearLabel = ClearLabel;
    frame->ClearSymbol = ClearSymbol;
    frame->ClearUnit = ClearUnit;
-   mapping->Decompose = Decompose;
    frame->Distance = Distance;
    frame->Fields = Fields;
    frame->Format = Format;
@@ -5422,6 +5536,9 @@ static void Overlay( AstFrame *template_frame, const int *template_axes,
 *        If any axis in the result Frame is not associated with a
 *        template Frame axis, the corresponding element of this array
 *        should be set to -1.
+*        
+*        If a NULL pointer is supplied, the template and result axis
+*        indicies are assumed to be identical.
 *     result
 *        Pointer to the Frame which is to receive the new attribute values.
 *     status
@@ -5500,7 +5617,7 @@ static void Overlay( AstFrame *template_frame, const int *template_axes,
 
 /* Get the internal axis number within the template CmpFrame which
    provides attribute values for the current result axis. */
-            icmp = perm[ template_axes[ j ] ];
+            icmp = perm[ template_axes ? template_axes[ j ] : j ];
 
 /* If this template axis is in the first template subframe, store the 
    corresponding internal frame axis index in "axes1" and set a flag
@@ -5540,7 +5657,7 @@ static void Overlay( AstFrame *template_frame, const int *template_axes,
                if( rperm[ j ] == i + nres1 ) break;
             }
 
-            icmp = perm[ template_axes[ j ] ];
+            icmp = perm[ template_axes ? template_axes[ j ] : j ];
 
             if( icmp < nc1 ) { 
                if( issecond ) {
@@ -5603,7 +5720,7 @@ static void Overlay( AstFrame *template_frame, const int *template_axes,
 
 /* Get the internal axis number within the template CmpFrame which
    provides attribute values for the current results axis. */
-            icmp = perm[ template_axes[ i ] ];
+            icmp = perm[ template_axes ? template_axes[ i ] : i ];
 
 /* If this template axis is in the first component Frame, store the 
    corresponding internal frame axis index in "axes1" and set "axis2" to

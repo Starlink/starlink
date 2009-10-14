@@ -1189,6 +1189,7 @@ static int class_check;
 
 /* Pointers to parent class methods which are used or extended by this
    class. */
+static AstObject *(* parent_cast)( AstObject *, AstObject *, int * );
 static void (* parent_removeframe)( AstFrameSet *, int, int * );
 static int (* parent_getobjsize)( AstObject *, int * );
 static int (* parent_equal)( AstObject *, AstObject *, int * );
@@ -1200,6 +1201,9 @@ static const char *(* parent_getattrib)( AstObject *, const char *, int * );
 static int (* parent_testattrib)( AstObject *, const char *, int * );
 static void (* parent_clearattrib)( AstObject *, const char *, int * );
 static void (* parent_setattrib)( AstObject *, const char *, int * );
+
+/* A FrameSet pointer that is used when calling astCast. */
+static AstFrameSet *dummy_frameset = NULL;
 
 #if defined(THREAD_SAFE)
 static int (* parent_managelock)( AstObject *, int, int, AstObject **, int * );
@@ -1221,11 +1225,13 @@ astMAKE_INITGLOBALS(Plot3D)
 #define class_vtab astGLOBAL(Plot3D,Class_Vtab)
 #define getattrib_buff astGLOBAL(Plot3D,GetAttrib_Buff)
 
-
-
 static pthread_mutex_t mutex2 = PTHREAD_MUTEX_INITIALIZER;
 #define LOCK_MUTEX2 pthread_mutex_lock( &mutex2 ); 
 #define UNLOCK_MUTEX2 pthread_mutex_unlock( &mutex2 ); 
+
+static pthread_mutex_t mutex3 = PTHREAD_MUTEX_INITIALIZER;
+#define LOCK_MUTEX3 pthread_mutex_lock( &mutex3 ); 
+#define UNLOCK_MUTEX3 pthread_mutex_unlock( &mutex3 ); 
 
 /* If thread safety is not needed, declare and initialise globals at static 
    variables. */ 
@@ -1242,12 +1248,16 @@ static int class_init = 0;       /* Virtual function table initialised? */
 #define LOCK_MUTEX2
 #define UNLOCK_MUTEX2
 
+#define LOCK_MUTEX3
+#define UNLOCK_MUTEX3
+
 #endif
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
 static AstFrameSet *Fset3D( AstFrameSet *, int, int * );
 static AstKeyMap *GetGrfContext( AstPlot *, int * );
+static AstObject *Cast( AstObject *, AstObject *, int * );
 static AstPlot *AxisPlot( AstPlot3D *, int, int *, int * );
 static AstPointSet *ExtendTicks( AstPlot *, AstPointSet *, int * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
@@ -1739,6 +1749,96 @@ static int Border( AstPlot *this_plot, int *status ){
 /* Return a flag indicating if any bad values were encountered in any of
    the Plots. */
    return result;
+}
+
+static AstObject *Cast( AstObject *this_object, AstObject *obj, int *status ) {
+/*
+*  Name:
+*     Cast
+
+*  Purpose:
+*     Cast an Object into an instance of a sub-class.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot3d.h"
+*     AstObject *Cast( AstObject *this, AstObject *obj, int *status ) 
+
+*  Class Membership:
+*     Plot3D member function (over-rides the protected astCast
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function returns a deep copy of an ancestral component of the
+*     supplied object. The required class of the ancestral component is
+*     specified by another object. Specifically, if "this" and "new" are 
+*     of the same class, a copy of "this" is returned. If "this" is an 
+*     instance of a subclass of "obj", then a copy of the component
+*     of "this" that matches the class of "obj" is returned. Otherwise, 
+*     a NULL pointer is returned without error.
+
+*  Parameters:
+*     this
+*        Pointer to the Object to be cast.
+*     obj
+*        Pointer to an Object that defines the class of the returned Object. 
+*        The returned Object will be of the same class as "obj". 
+
+*  Returned Value:
+*     A pointer to the new Object. NULL if "this" is not a sub-class of 
+*     "obj", or if an error occurs.
+
+*  Notes:
+*     - A NULL pointer will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables; */
+   AstObject *new;
+   astDECLARE_GLOBALS       
+   int generation_gap;
+
+/* Initialise */
+   new = NULL;
+
+/* Check inherited status */
+   if( !astOK ) return new;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
+
+/* See how many steps up the class inheritance ladder it is from "obj" 
+   to this class (Plot3D). A positive value is returned if Plot3D
+   is a sub-class of "obj". A negative value is returned if "obj" is 
+   a sub-class of Plot3D. Zero is returned if "obj" is a Plot3D. 
+   AST__COUSIN is returned if "obj" is not on the same line of descent 
+   as Plot3D. */
+   generation_gap = astClassCompare( (AstObjectVtab *) &class_vtab, 
+                                     astVTAB( obj ) );
+
+/* If "obj" is a Plot3D or a sub-class of Plot3D, we can cast by 
+   truncating the vtab for "this" so that it matches the vtab of "obJ", 
+   and then taking a deep copy of "this". */
+   if( generation_gap <= 0 && generation_gap != AST__COUSIN ) {
+      new = astCastCopy( this_object, obj );
+
+/* If "obj" is a Plot (the parent class), we cast by returning a deep
+   copy of the Plot covering the XY face. */
+   } else if( generation_gap == 1 ) {
+      new = astCopy( ( (AstPlot3D *) this_object)->plotxy );
+
+/* If "obj" is a FrameSet or higher, we attempt to use the implementation
+   inherited from the parent class to cast the FrameSet component into the 
+   class indicated by "obj". */
+   } else {
+      new = (*parent_cast)( this_object, obj, status );
+   }
+
+/* Return the new pointer. */
+   return new;
 }
 
 static void ChangeRootCorner( AstPlot3D *this, int old, int new, int *status ){
@@ -3501,7 +3601,8 @@ void astInitPlot3DVtab_(  AstPlot3DVtab *vtab, const char *name, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS          /* Pointer to thread-specific global data */
+   AstFrame *dummy_frame;      /* The Frame to put in dummy_frameset */
    AstPlotVtab *plot;          /* Pointer to Plot component of Vtab */
    AstFrameSetVtab *fset;      /* Pointer to FrameSet component of Vtab */
    AstMappingVtab *mapping;    /* Pointer to Mapping component of Vtab */
@@ -3558,6 +3659,9 @@ SET_PLOT3D_ACCESSORS(Norm)
 
    parent_vset = object->VSet;
    object->VSet = VSet;
+
+   parent_cast = object->Cast;
+   object->Cast = Cast;
 
    parent_clear = object->Clear;
    object->Clear = Clear;
@@ -3672,6 +3776,16 @@ SET_PLOT_ACCESSORS(Size)
    astSetCopy( vtab, Copy );
    astSetDelete( vtab, Delete );
    astSetDump( vtab, Dump, "Plot3D", "Provide facilities for 3D graphical output" );
+
+/* Create a FrameSet that can be used when calling astCast to indicate
+   the class to which we want to cast. */
+   LOCK_MUTEX3
+   if( !dummy_frameset ) {
+      dummy_frame = astFrame( 1, " ", status );
+      dummy_frameset = astFrameSet( dummy_frame, " ", status );
+      dummy_frame = astAnnul( dummy_frame );
+   }
+   UNLOCK_MUTEX3
 
 /* If we have just initialised the vtab for the current class, indicate
    that the vtab is now initialised, and store a pointer to the class
@@ -6680,7 +6794,7 @@ static void UpdatePlots( AstPlot3D *this, int *status ) {
 
 /* Return without action if the Plot3D does not contain the three 2D
    Plots. This may be the case for instance if this function is called
-   before the Plot3D is fullt constructed. */
+   before the Plot3D is fully constructed. */
    if( this->plotxy && this->plotxz && this->plotyz ){
 
 /* We need a FrameSet that is equivalent to the one that was used to
@@ -6689,7 +6803,7 @@ static void UpdatePlots( AstPlot3D *this, int *status ) {
    parent FrameSet, remove the GRAPHICS Frame (Frame 1) and set the base 
    Frame to be the Frame that was the base Frame when the Plot3D was 
    constructed. */
-      fset = (AstFrameSet *) astCast( this, this->plotxy );
+      fset = (AstFrameSet *) astCast( this, dummy_frameset );
       astSetBase( fset, this->pix_frame );
       astRemoveFrame( fset, 1 );   
 

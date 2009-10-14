@@ -7363,6 +7363,9 @@ static void Overlay( AstFrame *template, const int *template_axes,
 *
 *        If any axis in the result Frame is not associated with a template
 *        axis, the corresponding element of this array should be set to -1.
+*        
+*        If a NULL pointer is supplied, the template and result axis
+*        indicies are assumed to be identical.
 *     result
 *        Pointer to the Frame which is to receive the new attribute values.
 *-
@@ -7426,7 +7429,7 @@ static void Overlay( AstFrame *template, const int *template_axes,
    template axis each one corresponds. Check that the resulting axis index is
    valid. If not, then the axis will not receive new attributes. */
       for ( result_axis = 0; result_axis < result_naxes; result_axis++ ) {
-         template_axis = template_axes[ result_axis ];
+         template_axis = template_axes ? template_axes[ result_axis ] : result_axis;
          if ( ( template_axis >= 0 ) && ( template_axis < template_naxes ) ) {
 
 /* Obtain pointers to the relevant Axis objects of each Frame and use the

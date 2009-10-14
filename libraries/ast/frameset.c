@@ -823,6 +823,7 @@ static AstMapping *CombineMaps( AstMapping *, int, AstMapping *, int, int, int *
 static AstMapping *GetMapping( AstFrameSet *, int, int, int * );
 static AstMapping *RemoveRegions( AstMapping *, int * );
 static AstMapping *Simplify( AstMapping *, int * );
+static AstObject *Cast( AstObject *, AstObject *, int * );
 static AstPointSet *ResolvePoints( AstFrame *, const double [], const double [], AstPointSet *, AstPointSet *, int * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
 static const char *Abbrev( AstFrame *, int, const char *, const char *, const char *, int * );
@@ -1824,6 +1825,94 @@ static double AxOffset( AstFrame *this_frame, int axis, double v1, double dist, 
 
 /* Return the result. */
    return result;
+}
+
+static AstObject *Cast( AstObject *this_object, AstObject *obj, int *status ) {
+/*
+*  Name:
+*     Cast
+
+*  Purpose:
+*     Cast an Object into an instance of a sub-class.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "frameset.h"
+*     AstObject *Cast( AstObject *this, AstObject *obj, int *status ) 
+
+*  Class Membership:
+*     FrameSet member function (over-rides the protected astCast
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function returns a deep copy of an ancestral component of the
+*     supplied object. The required class of the ancestral component is
+*     specified by another object. Specifically, if "this" and "new" are 
+*     of the same class, a copy of "this" is returned. If "this" is an 
+*     instance of a subclass of "obj", then a copy of the component
+*     of "this" that matches the class of "obj" is returned. Otherwise, 
+*     a NULL pointer is returned without error.
+
+*  Parameters:
+*     this
+*        Pointer to the Object to be cast.
+*     obj
+*        Pointer to an Object that defines the class of the returned Object. 
+*        The returned Object will be of the same class as "obj". 
+
+*  Returned Value:
+*     A pointer to the new Object. NULL if "this" is not a sub-class of 
+*     "obj", or if an error occurs.
+
+*  Notes:
+*     - A NULL pointer will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables; */
+   AstFrame *cfrm;
+   AstObject *new;
+   astDECLARE_GLOBALS       
+   int generation_gap;
+
+/* Initialise */
+   new = NULL;
+
+/* Check inherited status */
+   if( !astOK ) return new;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
+
+/* See how many steps up the class inheritance ladder it is from "obj" 
+   to this class (FrameSet). A positive value is returned if FrameSet
+   is a sub-class of "obj". A negative value is returned if "obj" is 
+   a sub-class of FrameSet. Zero is returned if "obj" is a FrameSet. 
+   AST__COUSIN is returned if "obj" is not on the same line of descent 
+   as FrameSet. */
+   generation_gap = astClassCompare( (AstObjectVtab *) &class_vtab, 
+                                     astVTAB( obj ) );
+
+/* If "obj" is a FrameSet or a sub-class of FrameSet, we can cast by 
+   truncating the vtab for "this" so that it matches the vtab of "obJ", 
+   and then taking a deep copy of "this". */
+   if( generation_gap <= 0 && generation_gap != AST__COUSIN ) {
+      new = astCastCopy( this_object, obj );
+
+/* If "obj" is not a FrameSet or a sub-class of FrameSet (e.g. a Frame or
+   some sub-class of Frame), we attempt to cast the current Frame into 
+   the class indicated by "obj". */
+   } else {
+      cfrm = astGetFrame( (AstFrameSet *) this_object, AST__CURRENT );
+      new = astCast( cfrm, obj );
+      cfrm = astAnnul( cfrm );
+   }
+
+/* Return the new pointer. */
+   return new;
 }
 
 static void CheckPerm( AstFrame *this_frame, const int *perm, const char *method, int *status ) {
@@ -4951,6 +5040,7 @@ void astInitFrameSetVtab_(  AstFrameSetVtab *vtab, const char *name, int *status
 
    object->GetUseDefs = GetUseDefs;
    object->Equal = Equal;
+   object->Cast = Cast;
 
    mapping->GetIsLinear = GetIsLinear;
    mapping->GetNin = GetNin;
@@ -6385,6 +6475,9 @@ static void Overlay( AstFrame *template_frame, const int *template_axes,
 *        If any axis in the result Frame is not associated with a
 *        template Frame axis, the corresponding element of this array
 *        should be set to -1.
+*        
+*        If a NULL pointer is supplied, the template and result axis
+*        indicies are assumed to be identical.
 *     result
 *        Pointer to the Frame which is to receive the new attribute values.
 *     status

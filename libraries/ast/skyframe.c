@@ -7277,6 +7277,9 @@ static void Overlay( AstFrame *template, const int *template_axes,
 *
 *        If any axis in the result Frame is not associated with a template
 *        axis, the corresponding element of this array should be set to -1.
+*        
+*        If a NULL pointer is supplied, the template and result axis
+*        indicies are assumed to be identical.
 *     result
 *        Pointer to the Frame which is to receive the new attribute values.
 *     status
@@ -7301,6 +7304,8 @@ static void Overlay( AstFrame *template, const int *template_axes,
    int skyref_changed;           /* Has the SkyRef attribute changed? */
    int reset_system;             /* Was the template System value cleared? */
    int skyframe;                 /* Result Frame is a SkyFrame? */
+   int tax0;                     /* Template axis for result axis 0 */
+   int tax1;                     /* Template axis for result axis 1 */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -7386,14 +7391,23 @@ static void Overlay( AstFrame *template, const int *template_axes,
       astSet##attr( result, astGet##attr( template ) ); \
    }
 
+/* Store template axis indices */
+   if( template_axes ) {
+      tax0 = template_axes[ 0 ];
+      tax1 = template_axes[ 1 ];
+   } else {
+      tax0 = 0;
+      tax1 = 1;
+   }
+
 /* Define a similar macro that does the same for SkyFrame specific axis 
    attributes. */
 #define OVERLAY2(attr) \
-   if( astTest##attr( template, template_axes[ 0 ] ) ) { \
-      astSet##attr( result, 0, astGet##attr( template, template_axes[ 0 ] ) ); \
+   if( astTest##attr( template, tax0 ) ) { \
+      astSet##attr( result, 0, astGet##attr( template, tax0 ) ); \
    } \
-   if( astTest##attr( template, template_axes[ 1 ] ) ) { \
-      astSet##attr( result, 1, astGet##attr( template, template_axes[ 1 ] ) ); \
+   if( astTest##attr( template, tax1 ) ) { \
+      astSet##attr( result, 1, astGet##attr( template, tax1 ) ); \
    }         
 
 /* Use the macro to transfer each SkyFrame attribute in turn. */
