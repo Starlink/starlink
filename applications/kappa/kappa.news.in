@@ -64,8 +64,8 @@
 
       -  There is a new DOTFILE parameter that permits a summary of the
       provenance tree to be written to a text file in "dot" format,
-      suitable for visualising with third-party tools such as Graphviz 
-      or ZGRViewer.
+      suitable for visualising with third-party tools such as Graphviz,
+      ZGRViewer or OmniGraffle.
 
    o  SETAXIS
 

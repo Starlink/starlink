@@ -70,7 +70,7 @@
 *        Name of a new text file in which to store a description of the
 *        provenance tree using the "dot" format. This file can be
 *        visualised using third-party tools such as Graphviz, ZGRViewer,
-*        etc.
+*        OmniGraffle, etc.
 *     HISTORY = _LOGICAL (Read)
 *        If TRUE, any history records stored with each ancestor are
 *        included in the displayed information. Since the amount of
