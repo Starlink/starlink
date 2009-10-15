@@ -30,14 +30,6 @@
 *     regionmask in region out
 
 *  ADAM Parameters:
-*     REGION = FILENAME (Read)
-*        The name of the text file containing a text dump of an AST 
-*        Region. Any sub-class of Region may be supplied (e.g. Box, 
-*        Polygon, CmpRegion, Prism, etc.). If the axes spanned by this
-*        Region are not the same as those of the current WCS Frame in 
-*        the input NDF, an attempt will be made to create an equivalent
-*        new Region that does match the current WCS Frame. An error will
-*        be reported if this is not possible.
 *     CONST = LITERAL (Given)
 *        The constant numerical value to assign to the region, or the 
 *        string "Bad".  ["Bad"]
@@ -49,6 +41,14 @@
 *        outside.  [TRUE]
 *     OUT = NDF (Write)
 *        The name of the output NDF.
+*     REGION = FILENAME (Read)
+*        The name of the text file containing a text dump of an AST 
+*        Region. Any sub-class of Region may be supplied (e.g. Box, 
+*        Polygon, CmpRegion, Prism, etc.). If the axes spanned by this
+*        Region are not the same as those of the current WCS Frame in 
+*        the input NDF, an attempt will be made to create an equivalent
+*        new Region that does match the current WCS Frame. An error will
+*        be reported if this is not possible.
 
 *  Examples:
 *     regionmask a1060 galaxies.txt a1060_sky 
@@ -69,7 +69,7 @@
 *     -  All non-complex numeric data types can be handled.
 
 *  Copyright:
-*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2008, 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -98,7 +98,7 @@
 *     29-SEP-2009 (DSB):
 *        Modified to allow Region and WCS Frame to have different axes.
 *     30-SEP-2009 (DSB):
-*        Correct half pixel shift.
+*        Correct half-pixel shift.
 *     {enter_further_changes_here}
 
 *-
