@@ -378,6 +378,7 @@ static int TestAttrib( AstObject *, const char *, int * );
 static int TestID( AstObject *, int * );
 static int TestIdent( AstObject *, int * );
 static unsigned long Magic( const AstObject *, size_t, int * );
+static void CleanAttribs( AstObject *, int * );
 static void Clear( AstObject *, const char *, int * );
 static void ClearAttrib( AstObject *, const char *, int * );
 static void ClearID( AstObject *, int * );
@@ -631,6 +632,7 @@ AstObject *astCastCopy_( AstObject *this, AstObject *obj, int *status ) {
 /* Local Variables: */
    AstObject *new;
    AstObjectVtab *this_vtab;
+   size_t this_size;
 
 /* Initialise */
    new = NULL;
@@ -647,12 +649,26 @@ AstObject *astCastCopy_( AstObject *this, AstObject *obj, int *status ) {
 /* Temporarily change the vtab of "this" to that of "obJ". */
       this->vtab = astVTAB( obj );
 
+/* Temporarily change the size of "this" to be the size of "obj". */
+      this_size = this->size;
+      this->size = obj->size;
+
 /* Now take a copy of the object (now considered to be an instance of the
    class specified by "obj"). */
       new = astCopy( this );
 
-/* Re-instate the original Object vtab. */
+/* Re-instate the original Object vtab and size. */
       this->vtab = this_vtab;
+      this->size = this_size;
+
+/* The sub-clas to which "this" originally belonged may have extended the
+   range of values allowed for one or more of the attributes inherited from
+   the "obj" class. This means that the current attribute values stored
+   in the returned object may be inappropriate for the class of "obj". An
+   example is the System attribute defined by the Frame class, and extended
+   by sub-classes of Frame. So we now call astCleanAttribs to ensure that
+   any inappropriate attribute values are cleared in the returned object. */
+      astCleanAttribs( new );
    }
 
 /* Return the new pointer. */
@@ -908,6 +924,42 @@ int astClassCompare_( AstObjectVtab *class1, AstObjectVtab *class2,
 
 /* Return the generation gap. */
    return result;
+}
+
+static void CleanAttribs( AstObject *this_object, int *status ) {
+/*
+*+
+*  Name:
+*     astCleanAttribs
+
+*  Purpose:
+*     Clear any invalid set attribute values.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "object.h"
+*     void astCleanAttribs( AstObject *this, int *status )
+
+*  Class Membership:
+*     Object method.
+
+*  Description:
+*     This function clears any attributes that are currently set to
+*     invalid values in the supplied object. This can happen for instance
+*     when an object is cast into an instance of a parent class using
+*     astCast, since sub-classes can extend the range of valid values 
+*     an attribute can take.
+
+*  Parameters:
+*     this
+*        Pointer to the Object to be cleaned.
+*-
+*/
+
+/* The base Object class has no attributes that need cleaning. */
+
 }
 
 static void Clear( AstObject *this, const char *attrib, int *status ) {
@@ -4536,6 +4588,7 @@ void astInitObjectVtab_(  AstObjectVtab *vtab, const char *name, int *status ) {
    vtab->VSet = VSet;
    vtab->Cast = Cast;
    vtab->GetObjSize = GetObjSize;
+   vtab->CleanAttribs = CleanAttribs;
 
    vtab->TestUseDefs = TestUseDefs;
    vtab->SetUseDefs = SetUseDefs;
@@ -4965,6 +5018,10 @@ void astVSet_( AstObject *this, const char *settings, char **text, va_list args,
 int astGetObjSize_( AstObject *this, int *status ) {
    if ( !astOK || !this ) return 0;
    return (**astMEMBER(this,Object,GetObjSize))( this, status );
+}
+void astCleanAttribs_( AstObject *this, int *status ) {
+   if ( !astOK ) return;
+   (**astMEMBER(this,Object,CleanAttribs))( this, status );
 }
 AstObject *astCast_( AstObject *this, AstObject *obj, int *status ) {
    if ( !astOK ) return NULL;

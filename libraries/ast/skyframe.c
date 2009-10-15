@@ -8317,20 +8317,27 @@ static void SetCachedLAST( AstSkyFrame *this, double last, double epoch,
          table->obsalt = obsalt;
          table->dut1 = dut1;
          table->nentry = 1;
+
+         astBeginPM;
          table->epoch = astMalloc( sizeof( double ) );
          table->last = astMalloc( sizeof( double ) );
+         astEndPM;
+
          if( astOK ) {
             table->epoch[ 0 ] = epoch;
             table->last[ 0 ] = last;
          }
       }
 
+
 /* If we have a table, add the new point into it. */
    } else {
 
 /* Extend the epoch and last arrays. */
+      astBeginPM;
       table->epoch = astGrow( table->epoch, ++(table->nentry), sizeof( double ) );
       table->last = astGrow( table->last, table->nentry, sizeof( double ) );
+      astEndPM;
 
 /* Check memory allocation was successful. */
       if( astOK ) {
@@ -10010,8 +10017,8 @@ static int ValidateSystem( AstFrame *this, AstSystemType system, const char *met
 /* If the value is out of bounds, report an error. */
    if ( system < FIRST_SYSTEM || system > LAST_SYSTEM ) {
          astError( AST__AXIIN, "%s(%s): Bad value (%d) given for the System "
-                   "attribute of a %s.", status, method, astGetClass( this ),
-                   (int) system, astGetClass( this ) );
+                   "or AlignSystem attribute of a %s.", status, method, 
+                   astGetClass( this ), (int) system, astGetClass( this ) );
 
 /* Otherwise, return the supplied value. */
    } else {

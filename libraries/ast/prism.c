@@ -336,6 +336,7 @@ AstRegion *astConvertToPrism_( AstRegion *this, int *status ) {
    the Region. If it can, the Frame pointer returned by astPickAxes will identify 
    a Region. */
          pickfrm1 = astPickAxes( this, nax, ax, &junk );
+         junk = astAnnul( junk );
          if( astIsARegion( pickfrm1 ) ) {
 
 /* Check that the remaining (unselected) axes can also be picked into a
@@ -348,6 +349,7 @@ AstRegion *astConvertToPrism_( AstRegion *this, int *status ) {
             }
 
             pickfrm2 = astPickAxes( this, nax, ax, &junk );
+            junk = astAnnul( junk );
             if( astIsARegion( pickfrm2 ) ) {
 
 /* See if either of these picked Regions can be simplified. */
@@ -397,8 +399,8 @@ AstRegion *astConvertToPrism_( AstRegion *this, int *status ) {
 
                sp1 = astAnnul( sp1 );
                sp2 = astAnnul( sp2 );
-               pickfrm2 = astAnnul( pickfrm2 );
             }
+            pickfrm2 = astAnnul( pickfrm2 );
          }
 
          pickfrm1 = astAnnul( pickfrm1 );

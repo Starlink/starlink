@@ -71,7 +71,7 @@ end
 
 
 
-foreach prog (testcast)
+foreach prog (testcast testconvert)
 
 gcc -o $prog $prog.c -I.. -L/star/lib `ast_link`
 
@@ -179,6 +179,8 @@ foreach n ( "timj ast fits-wcs cdmatrix=1" \
       rm -f $old_file.diff  $new_file
    else
       echo "   $old_file and $new_file differ\!\! (see $old_file.diff)"
+      echo "   Command was:"
+      echo "      wcsconverter $in_file $encoding $new_file <quote>$attrs,FitsDigits=8<quote>"
       set ok = 0
    endif
 

@@ -9433,8 +9433,8 @@ static int ValidateSystem( AstFrame *this, AstSystemType system, const char *met
 /* If the value is out of bounds, report an error. */
    if ( system < FIRST_SYSTEM || system > LAST_SYSTEM ) {
          astError( AST__AXIIN, "%s(%s): Bad value (%d) given for the System "
-                   "attribute of a %s.", status, method, astGetClass( this ),
-                   (int) system, astGetClass( this ) );
+                   "or AlignSystem attribute of a %s.", status, method, 
+                   astGetClass( this ), (int) system, astGetClass( this ) );
 
 /* Otherwise, return the supplied value. */
    } else {

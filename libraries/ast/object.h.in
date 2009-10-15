@@ -1228,6 +1228,35 @@ int astTest##attribute##_( Ast##class *this, int *status ) { \
 
 
 #if defined(astCLASS)            /* Protected */
+
+/* Test the validy of an attribute value  */
+/* -------------------------------------  */
+/* If the set attribute value is invalid, clear it. These macros should
+   be used in a context in which error reporting has been deferred by 
+   calling astReporting( 0 ). */
+
+#define astCLEAN_ATTRIB(attr) \
+   if( astTest##attr(this) ) { \
+      astSet##attr( this, astGet##attr( this ) ); \
+      if( !astOK ) { \
+         astClearStatus; \
+         astClear##attr( this ); \
+      } \
+   }  
+
+#define astCLEAN_INDEXED_ATTRIB(attr,index) \
+   if( astTest##attr(this,index) ) { \
+      astSet##attr( this, index, astGet##attr( this, index ) ); \
+      if( !astOK ) { \
+         astClearStatus; \
+         astClear##attr( this, index ); \
+      } \
+   }  
+
+#endif
+
+
+#if defined(astCLASS)            /* Protected */
 #define astSetVtabClassIdentifier(vtab,id_ptr) \
    ((AstObjectVtab *)(vtab))->top_id = (id_ptr)
 #endif
@@ -1291,6 +1320,7 @@ typedef struct AstObjectVtab {
    AstClassIdentifier *top_id;
 
 /* Properties specific to this class. */
+   void ( *CleanAttribs )( AstObject *, int * );
    AstObject *( *Cast )( AstObject *, AstObject *, int * );
    const char *( *GetID )( AstObject *, int * );
    const char *( *GetIdent )( AstObject *, int * );
@@ -1455,6 +1485,7 @@ void astUnlockId_( AstObject *, int, int * );
 
 #if defined(astCLASS)            /* Protected */
 
+void astCleanAttribs_( AstObject *, int * );
 AstObject *astCast_( AstObject *, AstObject *, int * );
 AstObject *astCastCopy_( AstObject *, AstObject *, int * );
 
@@ -1611,6 +1642,7 @@ astINVOKE(V,astManageLock_(astCheckObject(this),mode, extra,fail,STATUS_PTR))
 #define astManageLock(this,mode,extra,fail) 
 #endif
 
+#define astCleanAttribs(this) astINVOKE(V,astCleanAttribs_(astCheckObject(this),STATUS_PTR))
 #define astGetObjSize(this) astINVOKE(V,astGetObjSize_(astCheckObject(this),STATUS_PTR))
 #define astCast(this,obj) astINVOKE(O,astCast_(astCheckObject(this),astCheckObject(obj),STATUS_PTR))
 #define astCastCopy(this,obj) astCastCopy_((AstObject*)this,(AstObject*)obj,STATUS_PTR)

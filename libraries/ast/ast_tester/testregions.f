@@ -5,7 +5,7 @@
 
       status = sai__ok
 
-c      call ast_SetWatchId( 292567 )
+c      call ast_watchmemory( 282905 )
 
       call ast_begin( status )
       call checkRemoveRegions( status )
@@ -22,7 +22,7 @@ c      call ast_SetWatchId( 292567 )
 
       call ast_end( status )
 
-c      call ast_listissued( 'testregions' )
+c      call ast_activememory( 'testregions' )
 
       if( status .eq. sai__ok ) then
          write(*,*) 'All Region tests passed'

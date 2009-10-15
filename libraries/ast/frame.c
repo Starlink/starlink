@@ -702,6 +702,7 @@ static const char *(* parent_getattrib)( AstObject *, const char *, int * );
 static int (* parent_testattrib)( AstObject *, const char *, int * );
 static void (* parent_clearattrib)( AstObject *, const char *, int * );
 static void (* parent_setattrib)( AstObject *, const char *, int * );
+static void (* parent_cleanattribs)( AstObject *, int * );
 
 #if defined(THREAD_SAFE)
 static int (* parent_managelock)( AstObject *, int, int, AstObject **, int * );
@@ -825,6 +826,7 @@ static int GetIsLinear( AstMapping *, int * );
 static int GetIsSimple( AstMapping *, int * );
 static int LineContains( AstFrame *, AstLineDef *, int, double *, int * );
 static int LineCrossing( AstFrame *, AstLineDef *, AstLineDef *, double **, int * );
+static void CleanAttribs( AstObject *, int * );
 static void LineOffset( AstFrame *, AstLineDef *, double, double, double[2], int * );
 
 static double GetTop( AstFrame *, int, int * );
@@ -1773,6 +1775,71 @@ static void CheckPerm( AstFrame *this, const int *perm, const char *method, int 
       astError( AST__PRMIN, "Each axis index should lie in the range 1 to %d "
                 "and should occur only once.", status, naxes );
    }
+}
+
+static void CleanAttribs( AstObject *this_object, int *status ) {
+/*
+*  Name:
+*     CleanAttribs
+
+*  Purpose:
+*     Clear any invalid set attribute values.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "frame.h"
+*     void CleanAttribs( AstObject *this_object, int *status )
+
+*  Class Membership:
+*     Frame member function (over-rides the protected astCleanAttribs
+*     method inherited from the Object class).
+
+*  Description:
+*     This function clears any attributes that are currently set to
+*     invalid values in thr supplied object.
+
+*  Parameters:
+*     this
+*        Pointer to the Object to be cleaned.
+
+*/
+
+/* Local Variables; */
+   AstAxis *ax;
+   AstFrame *this;
+   int i;
+   int nax;
+   int reporting;
+
+/* Check inherited status */
+   if( !astOK ) return;
+
+/* Get a pointer to the Frame structure. */
+   this = (AstFrame *) this_object;
+
+/* Defer error reporting, as required by the astCLEAN_ATTRIB macro. */
+   reporting = astReporting( 0 );
+
+/* Clean attributes in any Objects contained within "this". */
+   nax = astGetNaxes( this );
+   for( i = 0; i < nax; i++ ) {
+      ax = astGetAxis( this, i );
+      astCleanAttribs( ax );
+      ax = astAnnul( ax );
+   }
+
+/* Clean attributes of this class. */
+   astCLEAN_ATTRIB(System)
+   astCLEAN_ATTRIB(AlignSystem)
+
+/* Re-establish error reporting. */
+   astReporting( reporting );
+
+/* Invoke the method inherited form the parent to clean attributes
+   defined by the parent class. */
+   (*parent_cleanattribs)( this_object, status );
 }
 
 static char *CleanDomain( char *domain, int *status ) {
@@ -5456,6 +5523,9 @@ void astInitFrameVtab_(  AstFrameVtab *vtab, const char *name, int *status ) {
    object->SetAttrib = SetAttrib;
    parent_testattrib = object->TestAttrib;
    object->TestAttrib = TestAttrib;
+
+   parent_cleanattribs = object->CleanAttribs;
+   object->CleanAttribs = CleanAttribs;
 
 #if defined(THREAD_SAFE)
    parent_managelock = object->ManageLock;
@@ -10961,8 +11031,8 @@ static int ValidateSystem( AstFrame *this, AstSystemType system, const char *met
 /* If the value is out of bounds, report an error. */
    if ( system < FIRST_SYSTEM || system > LAST_SYSTEM ) {
          astError( AST__AXIIN, "%s(%s): Bad value (%d) given for the System "
-                   "attribute of a %s.", status, method, astGetClass( this ),
-                   (int) system, astGetClass( this ) );
+                   "or AlignSystem attribute of a %s.", status, method, 
+                   astGetClass( this ), (int) system, astGetClass( this ) );
 
 /* Otherwise, return the supplied value. */
    } else {
@@ -14070,14 +14140,48 @@ const int *astGetPerm_( AstFrame *this, int *status ) {
    if ( !astOK ) return NULL;
    return (**astMEMBER(this,Frame,GetPerm))( this, status );
 }
+
+
 int astMatch_( AstFrame *this, AstFrame *target,
                int **template_axes, int **target_axes,
                AstMapping **map, AstFrame **result, int *status ) {
+   int match;
+   AstFrame *super_this;
+
    if ( !astOK ) return 0;
-   return (**astMEMBER(this,Frame,Match))( this, target,
-                                           template_axes, target_axes,
-                                           map, result, status );
+
+   match = (**astMEMBER(this,Frame,Match))( this, target,
+                                            template_axes, target_axes,
+                                            map, result, status );
+
+/* If the template ("this") could not be used to probe the target, it may
+   be because the template class is a more specialised form of the target
+   class. E.g. a SkyFrame cannot directly be used to probe a Frame, but a 
+   Frame *can* be used to probe a SkyFrame. This means (for instance),
+   that a basic Frame with Domain FRED cannot be aligned (using astConvert)
+   with a CmpFrame with Domain FRED. This sort of alignment is often
+   useful, so we try now to use the supplied template to probe a modified
+   form of the target that has been cast into the same class as the
+   template. This is only possible if the template class is a sub-class of 
+   the target class. Attempt to do the cast. */
+   if( ! match ) {
+      super_this = (AstFrame *) astCast( this, target );
+
+/* If the cast was  possible, invoke the Match method appropriate to
+   the new template class (i.e. the target class). */
+      if( super_this ) {
+         match = (**astMEMBER(super_this,Frame,Match))( super_this, target,
+                                                        template_axes, 
+                                                        target_axes, map, 
+                                                        result, status );
+         super_this = astAnnul( super_this );
+      }
+   }
+
+   return match;
 }
+
+
 int astIsUnitFrame_( AstFrame *this, int *status ){
    if ( !astOK ) return 0;
    return (**astMEMBER(this,Frame,IsUnitFrame))( this, status );

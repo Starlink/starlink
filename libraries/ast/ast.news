@@ -16,6 +16,14 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
+- The details of how a Frame is aligned with another Frame by the
+astFindFrame and astConvert (AST_FINDFRAME and AST_CONVERT) functions
+have been changed. The changes mean that a Frame can now be aligned with
+an instance of a sub-class of Frame, so long as the number of axes and
+the Domain values are consistent. For instance, a basic 2-dimensional
+Frame with Domain "SKY" will now align succesfully with a SkyFrame,
+conversion between the two Frames being achieved using a UnitMap.
+
 - The arrays that supply input values to astMapPut1<X> are now declared
 "const".
 
