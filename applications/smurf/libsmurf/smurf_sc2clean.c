@@ -44,13 +44,13 @@
 *     BADFRAC = _DOUBLE (Read)
 *          Fraction of bad samples in order for entire bolometer to be
 *          flagged as bad
-*     DCTHRESH = _DOUBLE (Read)
-*          N-sigma threshold at which to detect DC steps
 *     DCBAD = _LOGICAL (Read)
 *          If true, instead of repairing DC steps, flag bolo as bad
 *     DCBOX = _INTEGER (Read)
 *          Width of the box (samples) over which to estimate the mean
 *          signal level for DC step detection
+*     DCTHRESH = _DOUBLE (Read)
+*          N-sigma threshold at which to detect DC steps
 *     DKCLEAN = _LOGICAL (Read)
 *          If true fit and remove dark squid signals
 *     FILT_EDGEHIGH = _DOUBLE (Read)

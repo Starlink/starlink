@@ -33,6 +33,8 @@
 *  ADAM Parameters:
 *     IN = NDF (Read)
 *          Input file(s)
+*     MAXLEN = _DOUBLE (Read)
+*          Maximum length (in seconds) concatenated file).
 *     MSG_FILTER = _CHAR (Read)
 *          Control the verbosity of the application. Values can be
 *          NONE (no messages), QUIET (minimal messages), NORMAL,
@@ -47,8 +49,6 @@
 *          Number of samples to pad at end.
 *     PADSTART = _INTEGER (Read)
 *          Number of samples to pad at start.
-*     MAXLEN = _DOUBLE (Read)
-*          Maximum length (in seconds) concatenated file).
 
 *  Related Applications:
 *     SMURF: SC2FFT, SC2CLEAN

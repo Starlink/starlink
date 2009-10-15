@@ -31,8 +31,6 @@
 *     command in scripts.
 
 *  ADAM Parameters:
-*     NDF = NDF (Read)
-*          Raw DREAM data file(s)
 *     CONFIG = Literal (Read)
 *          Specifies values for the configuration parameters used to determine
 *          the grid properties. If the string "def"
@@ -65,6 +63,8 @@
 *          Control the verbosity of the application. Values can be
 *          NONE (no messages), QUIET (minimal messages), NORMAL,
 *          VERBOSE, DEBUG or ALL. [NORMAL]
+*     NDF = NDF (Read)
+*          Raw DREAM data file(s)
 *     OUT = NDF (Write)
 *          Output weights file(s)
 

@@ -51,17 +51,17 @@
 *     smurfhelp [topic] [subtopic] [subsubtopic] [subsubsubtopic]
 
 *  ADAM Parameters:
-*     TOPIC = LITERAL (Read)
-*        Topic for which help is to be given. [" "]
 *     SUBTOPIC = LITERAL (Read)
 *        Subtopic for which help is to be given. [" "]
 *     SUBSUBTOPIC = LITERAL (Read)
 *        Subsubtopic for which help is to be given. [" "]
 *     SUBSUBSUBTOPIC = LITERAL (Read)
 *        Subsubsubtopic for which help is to be given. [" "]
+*     TOPIC = LITERAL (Read)
+*        Topic for which help is to be given. [" "]
 
 *  Algorithm:
-*     -  Call smfAdam
+*     -  Call shlAdam
 
 *  Implementation Status:
 *     -  Uses the portable help system.

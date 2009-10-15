@@ -26,6 +26,10 @@
 *  ADAM Parameters:
 *     FILENAME = _CHAR (Write)
 *          Name of the output file containing the sky noise image.
+*     MSG_FILTER = _CHAR (Read)
+*          Control the verbosity of the application. Values can be
+*          NONE (no messages), QUIET (minimal messages), NORMAL,
+*          VERBOSE, DEBUG or ALL. [NORMAL]
 *     OBSPAR = GROUP (Read)
 *          Specifies values for the observation parameters used by 
 *          skynoise generation. 
@@ -53,10 +57,6 @@
 *          below.  The default values will be used for any unspecified
 *          parameters.  Unregnized parameters are ignored (i.e. no
 *          error is reported).
-*     MSG_FILTER = _CHAR (Read)
-*          Control the verbosity of the application. Values can be
-*          NONE (no messages), QUIET (minimal messages), NORMAL,
-*          VERBOSE, DEBUG or ALL. [NORMAL]
 *     SEED = INTEGER (Read)
 *          Seed for random number generator.  If a seed
 *          is not specified, the clock time in milliseconds
