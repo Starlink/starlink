@@ -157,7 +157,6 @@
 
 #include "smf.h"
 #include "smurf_par.h"
-#include "libsmurf/smurflib.h"
 #include "smf_err.h"
 #include "sc2da/sc2store.h"
 

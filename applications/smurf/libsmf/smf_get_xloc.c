@@ -122,7 +122,6 @@
 /* SMURF includes */
 #include "smf.h"
 #include "smurf_par.h"
-#include "libsmurf/smurflib.h"
 #include "smf_err.h"
 
 /* SC2DA includes */
