@@ -71,6 +71,11 @@
 *  History:
 *     4-AUG-2009 (DSB):
 *        Original version.
+*     15-OCT-2009 (DSB):
+*        Modify the handling of upper and lower bounds so that a lower
+*        fraction bound of 0.0 results in the lower pixel index bound
+*        being used, and an upper fraction bound of 1.0 results in the 
+*        upper pixel index bound being used.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -125,24 +130,38 @@
             A = 1.0D0
          END IF
 
-*  Check the first bound. Skip if it is not a FRACTION value. Otherwise,
-*  convert the fraction bound into a pixel index.
-         IF( FRAME1( I ) .EQ. 2 ) THEN
-            VALUE1( I ) = NINT( 0.5D0 + VALUE1( I )*A + B )
-            FRAME1( I ) = 1
-         END IF
+*  First handle cases where we are dealing with a upper and lower bound.
+         IF( ISBND( I ) ) THEN
 
-*  Check the second bound in the same way if it is a bound. If it is a
-*  range, convert using an appropriate scaling.
-         IF( FRAME2( I ) .EQ. 2 ) THEN
-            IF( ISBND( I ) ) THEN
-               VALUE2( I ) = NINT( 0.5D0 + VALUE2( I )*A + B )
-            ELSE
+*  Convert the lower bound, rounding up to the next higher pixel centre.
+            IF( FRAME1( I ) .EQ. 2 ) THEN
+               VALUE1( I ) = NINT( VALUE1( I )*A + B ) + 1
+               FRAME1( I ) = 1
+            END IF
+
+*  Convert the upper bound, rounding down to the next lower pixel centre.
+            IF( FRAME2( I ) .EQ. 2 ) THEN
+               VALUE2( I ) = NINT( VALUE2( I )*A + B ) 
+               FRAME2( I ) = 1
+            END IF
+
+*  Now handle cases where we are dealing with a centre and width.
+         ELSE
+
+*  Check the centre value. Skip if it is not a FRACTION value. Otherwise,
+*  convert the fraction bound into a pixel index.
+            IF( FRAME1( I ) .EQ. 2 ) THEN
+               VALUE1( I ) = NINT( 0.5D0 + VALUE1( I )*A + B )
+               FRAME1( I ) = 1
+            END IF
+
+*  Convert the fraction range into pixels using an appropriate scaling.
+            IF( FRAME2( I ) .EQ. 2 ) THEN
                VALUE2( I ) = NINT( VALUE2( I )*
      :                             DBLE( NUBND( I ) - NLBND( I ) + 1 ) )
                IF( VALUE2( I ) .LT. 1 ) VALUE2( I ) = 1
+               FRAME2( I ) = 1
             END IF
-            FRAME2( I ) = 1
          END IF
 
       END DO
