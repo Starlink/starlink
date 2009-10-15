@@ -10,15 +10,21 @@ Version 3.0
    - CTG, IRQ, and LPG libraries are no longer in KAPLIBS.  They are 
      autonomous libraries each with its own documentation and link
      scripts.
+   - KPG_BLONx added.  It smooths an n-dimensional image using box
+     mean filter (unlike KPG1_BLOCx which is limited to 
+     two-dimensional data).
+   - KPG_BMDNx added.  It smooths an n-dimensional array using a box
+     median filter (unlike KPG1_BMEDx which is limited to 
+     two-dimensional data).
+   - KPG1_GRAPH: The IPLOT argument is now "Given and Returned" and must
+     be initialised before calling KPG1_GRAPH.
    - KPG1_MVBDx added. It modifies an array index (such as produced by
      PDA_QSIAx) to exclude indices that refer to bad data values.
+   - KPG1_SAXAX added. It sets the attributes of an axis in an AST Frame
+     so that they describe an array component of an NDF.
    - KPG_STOSx added.  It calculates accurate order statistics by
      sorting an array by means of an index, returning the median and 
      optionally percentiles.
-   - KPG1_SAXAX added. It sets the attributes of an axis in an AST Frame
-     so that they describe an array component of an NDF.
-   - KPG1_GRAPH: The IPLOT argument is now "Given and Returned" and must
-     be initialised before calling KPG1_GRAPH.
 
 Version 2.8
    - KPG1_ELGAU added from KAPPA routine KPS1_ELGAU. It finds ellipse
