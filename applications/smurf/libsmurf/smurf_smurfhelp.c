@@ -13,7 +13,7 @@
 *     ADAM A-task
 
 *  Invocation:
-*     void smurf_help( int * status );
+*     void smurf_smurfhelp( int * status );
 
 *  Arguments:
 *     status = int * (Given and Returned)
@@ -153,6 +153,9 @@
 *  History:
 *     01-NOV-2006 (TIMJ):
 *        Import from kaphelp.f
+*     2009-10-15 (TIMJ):
+*        Rename to smurf_smurfhelp so that the documentation appears
+*        in the correct alphabetical order.
 *     {enter_further_changes_here}
 
 *-
@@ -161,7 +164,7 @@
 #include "star/shl.h"
 #include "sae_par.h"
 
-void smurf_help( int * status ) {
+void smurf_smurfhelp( int * status ) {
 
   if (*status != SAI__OK) return;
 

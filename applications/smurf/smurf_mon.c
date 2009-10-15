@@ -281,7 +281,7 @@ void smurf_mon( int * status ) {
   } else if (strcmp( taskname, "SMURFCOPY" ) == 0 ) {
     smurf_smurfcopy( status );
   } else if (strcmp( taskname, "SMURFHELP" ) == 0 ) {
-    smurf_help( status );
+    smurf_smurfhelp( status );
   } else if (strcmp( taskname, "STACKFRAMES" ) == 0 ) {
     smurf_stackframes( status );
   } else if (strcmp( taskname, "STARECALC" ) == 0 ) {

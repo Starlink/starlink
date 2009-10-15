@@ -17,7 +17,6 @@ smurf_extinction.c \
 smurf_flatfield.c \
 smurf_gsd2acsis.c \
 smurf_gsdshow.c \
-smurf_help.c \
 smurf_impaztec.c \
 smurf_makecube.c \
 smurf_makemap.c \
@@ -34,6 +33,7 @@ smurf_sc2threadtest.c \
 smurf_scanfit.c \
 smurf_skynoise.c \
 smurf_smurfcopy.c \
+smurf_smurfhelp.c \
 smurf_stackframes.c \
 smurf_starecalc.c \
 smurf_timesort.c \
