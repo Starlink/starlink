@@ -43247,6 +43247,11 @@ KAPPA: \htmlref{FLIP}{FLIP},
       \sstitemlist{
 
          \sstitem
+         Any pixels that are bad (after any compression) in either array
+         are excluded from the plot, and from the calculation of the
+         default axis limits
+
+         \sstitem
          The application stores two pictures in the 
          \htmlref{graphics database}{se:agitate} in the following order: a
          FRAME picture containing the annotated axes
@@ -56803,6 +56808,12 @@ The following applications have been modified:
          provenance tree to be written to a text file in ``dot'' format,
          suitable for visualising with third-party tools such as Graphviz,
          ZGRViewer or OmniGraffle.
+      \end{itemize}
+
+   \item [\htmlref{SCATTER}{SCATTER}] \mbox{}
+      \begin{itemize}
+        \item The calculation of the axis ranges now excludes any pixels
+         that are bad in either NDF.
       \end{itemize}
 
    \item [\htmlref{SETAXIS}{SETAXIS}] \mbox{}

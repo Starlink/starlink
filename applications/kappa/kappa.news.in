@@ -67,6 +67,11 @@
       suitable for visualising with third-party tools such as Graphviz,
       ZGRViewer or OmniGraffle.
 
+   o  SCATTER
+
+      -  The calculation of the axis ranges now excludes any pixels that 
+      are bad in either NDF.
+
    o  SETAXIS
 
       -  If MODE is "WCS" and the selected axis is a celestial

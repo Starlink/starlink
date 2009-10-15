@@ -171,6 +171,9 @@
 *        axis before forming the plot.
 
 *  Notes:
+*     -  Any pixels that are bad (after any compression) in either array
+*     are excluded from the plot, and from the calculation of the
+*     default axis limits
 *     -  The application stores two pictures in the graphics database in 
 *     the following order: a FRAME picture containing the annotated axes 
 *     and data plot, and a DATA picture containing just the data plot.
@@ -229,6 +232,8 @@
 *        Use CNF_PVAL.
 *     2006 February 24 (MJC):
 *        Added new CUMUL argument set to .FALSE. to KPG1_GHSTx calls.
+*     15-OCT-2009 (DSB):
+*        Ignore points that are bad in either input NDF.
 *     {enter_further_changes_here}
 
 *-
@@ -455,16 +460,31 @@
 *  Update the number of elements being plotted.
          NEL = CEL
 
+*  If we are not block averaging, copy the input data arrays into two
+*  work arrays without change.
+      ELSE
+         CALL PSX_CALLOC( NEL, '_REAL', IPW3, STATUS )
+         CALL PSX_CALLOC( NEL, '_REAL', IPW4, STATUS )
+         CALL VEC_RTOR( .FALSE., NEL, %VAL( CNF_PVAL( IP1 ) ), 
+     :                   %VAL( CNF_PVAL( IPW3 ) ), IERR,
+     :                   NERR, STATUS )
+         CALL VEC_RTOR( .FALSE., NEL, %VAL( CNF_PVAL( IP2 ) ), 
+     :                   %VAL( CNF_PVAL( IPW4 ) ), IERR,
+     :                   NERR, STATUS )
       END IF
 
+*  Ensure the two work arrays have the same bad pixel mask.
+      CALL KPS1_SCAT1( NEL, %VAL( CNF_PVAL( IPW3 ) ), 
+     :                 %VAL( CNF_PVAL( IPW4 ) ), STATUS )
+      
 *  Obtain the maximum and minimum values to define the bounds of the 
 *  first histogram.
-      CALL KPG1_MXMNR( .TRUE., NEL, %VAL( CNF_PVAL( IP1 ) ), 
+      CALL KPG1_MXMNR( .TRUE., NEL, %VAL( CNF_PVAL( IPW3 ) ), 
      :                 NINVAL, RMAXV, RMINV,
      :                 MAXPOS, MINPOS, STATUS )
 
 *  Generate the histogram between those bounds.
-      CALL KPG1_GHSTR( .TRUE., NEL, %VAL( CNF_PVAL( IP1 ) ), 
+      CALL KPG1_GHSTR( .TRUE., NEL, %VAL( CNF_PVAL( IPW3 ) ), 
      :                 NUMBIN, .FALSE., RMAXV, RMINV,
      :                 HIST, STATUS )
 
@@ -480,14 +500,15 @@
       END IF
 
 *  Do the same for the second NDF.
-      CALL KPG1_MXMNR( .TRUE., NEL, %VAL( CNF_PVAL( IP2 ) ), 
+      CALL KPG1_MXMNR( .TRUE., NEL, %VAL( CNF_PVAL( IPW4 ) ), 
      :                 NINVAL, RMAXV, RMINV,
      :                 MAXPOS, MINPOS, STATUS )
-      CALL KPG1_GHSTR( .TRUE., NEL, %VAL( CNF_PVAL( IP2 ) ), 
+      CALL KPG1_GHSTR( .TRUE., NEL, %VAL( CNF_PVAL( IPW4 ) ), 
      :                 NUMBIN, .FALSE., RMAXV, RMINV,
      :                 HIST, STATUS )
       CALL KPG1_HSTFR( NUMBIN, HIST, RMAXV, RMINV, 2, PERC2, PERV2, 
      :                 STATUS )
+
       IF( PERV2( 1 ) .GT. PERV2( 2 ) ) THEN
          RVAL = PERV2( 1 )
          PERV2( 1 ) = PERV2( 2 )
@@ -520,8 +541,8 @@
 
 *  Produce the scatter plot.
       IPLOT = AST__NULL
-      CALL KPG1_GRAPH( NEL, %VAL( CNF_PVAL( IP1 ) ), 
-     :                 %VAL( CNF_PVAL( IP2 ) ), 0.0, 0.0,
+      CALL KPG1_GRAPH( NEL, %VAL( CNF_PVAL( IPW3 ) ), 
+     :                 %VAL( CNF_PVAL( IPW4 ) ), 0.0, 0.0,
      :                 LAB1( : LEN1 ), LAB2( : LEN2 ), 'Scatter plot',
      :                 'XDATA', 'YDATA', 3, .FALSE., PERV1( 1 ), 
      :                 PERV1( 2 ), PERV2( 1 ), PERV2( 2 ), 
