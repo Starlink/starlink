@@ -206,6 +206,8 @@
 #     29-JUL-2009 (TIMJ):
 #         Change MSG_FILTER defaulting from NORM to ! to support
 #         new msgIfget behaviour.
+#     14-OCT-2009 (TIMJ):
+#         Alphabetize. Remove MSG_FILTER definitions.
 #     {enter_changes_here}
 
 #  Bugs:
@@ -218,842 +220,68 @@ package @PACKAGE@ {
 
     executable @PACKAGE@_mon {
 
-        action smurfhelp {
-            alias {smurfh(elp)}
+        action badbolos {
 
             helplib {$SMURF_HELP}
 
-            parameter topic {
-                position 1
-                type LITERAL
-                access READ
-                vpath DEFAULT
-                prompt {Help topic}
-                default {         }
-                helpkey *
-            }
-
-            parameter subtopic {
-                position 2
-                type LITERAL
-                access READ
-                vpath DEFAULT
-                prompt {Help subtopic}
-                default {         }
-                helpkey *
-            }
-
-            parameter subsubtopic {
-                position 3
-                type LITERAL
-                access READ
-                vpath DEFAULT
-                prompt {Help subsubtopic}
-                default {         }
-                helpkey *
-            }
-            parameter subsubsubtopic {
-                position 4
-                type LITERAL
-                access READ
-                vpath DEFAULT
-                prompt {Help subsubsubtopic}
-                default {         }
-                helpkey *
-            }
-
-            parameter msg_filter {
+            parameter ard {
                 type _CHAR
-                prompt {Message level}
-                default !
-                vpath DEFAULT
+                access READ
+                vpath {PROMPT }
+                prompt {Input ARD Description File}
+                ppath GLOBAL CURRENT
                 helpkey *
             }
 
-        }
+            parameter bad_bolos {
+                position 4
+                type _INTEGER
+                prompt {Number of additional bad individual bolometers}
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
+                helpkey *
+            }
 
+            parameter bad_columns {
+                position 2
+                type _INTEGER
+                prompt {Number of bad columns of bolometers}
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
+                helpkey *
+            }
 
-        action extinction {
-
-            helplib {$SMURF_HELP}
-
-            parameter bpm {
-                type NDF
-                access READ
-                vpath DEFAULT
-                ppath CURRENT DEFAULT
-                prompt {Bad pixel masks}
-                default !
+            parameter bad_rows {
+                position 3
+                type _INTEGER
+                prompt {Number of bad rows of bolometers}
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
                 helpkey *
             }
 
             parameter in {
                 position 1
-                type NDF
-                access READ
-                vpath {PROMPT }
-                ppath GLOBAL CURRENT
-                association <-GLOBAL.DATA_ARRAY
-                prompt {Input NDF data structure}
-                helpkey *
-            }
-
-            parameter out {
-                position 2
-                type NDF
-                access WRITE
-                vpath {PROMPT }
-                association ->GLOBAL.DATA_ARRAY
-                prompt {Output NDF data structure}
-                helpkey *
-            }
-
-            parameter outfiles {
-                type LITERAL
-                prompt {Text file in which to put the output NDF names}
-                default !
-                vpath DEFAULT
-                ppath CURRENT DEFAULT
-                helpkey *
-            }
-
-            parameter tausrc {
-                position 3
                 type _CHAR
-                prompt {Source of opacity data}
-                helpkey *
-            }
-
-            parameter method {
-                position 4
-                type _CHAR
+                access READ
                 vpath {PROMPT }
-                prompt {Method to use for airmass calculation}
-                ppath CURRENT
-                helpkey *
-            }
-
-            parameter hasskyrem {
-                type _LOGICAL
-                vpath {DEFAULT}
-                prompt {Has sky removal been applied?}
+                prompt {Input Simulated NDF File}
                 ppath GLOBAL CURRENT
-                default FALSE
-                helpkey *
-            }
-
-            parameter csotau {
-                type _REAL
-                prompt {Zenith optical depth at 225 GHz}
-                ppath DYNAMIC CURRENT
-                helpkey *
-            }
-
-            parameter filtertau {
-                type _REAL
-                prompt {Zenith optical depth for current filter}
-                ppath DYNAMIC CURRENT
-                helpkey *
-            }
-
-            parameter msg_filter {
-                type _CHAR
-                prompt {Message level}
-                default !
-                vpath DEFAULT
-                helpkey *
-            }
-
-        }
-
-        action makemap {
-
-            helplib {$SMURF_HELP}
-
-            parameter alignsys {
-                type _LOGICAL
-                vpath DEFAULT
-                ppath CURRENT
-                prompt {Align data in the output spatial co-ordinate system?}
-                default FALSE
-                helpkey *
-            }
-
-            parameter bpm {
-                type NDF
-                access READ
-                vpath DEFAULT
-                ppath CURRENT DEFAULT
-                prompt {Bad pixel masks}
-                default !
-                helpkey *
-            }
-
-            parameter in {
-                position 1
-                type NDF
-                access READ
-                vpath {PROMPT }
-                ppath GLOBAL CURRENT
-                association <-GLOBAL.DATA_ARRAY
-                prompt {Input NDF data structure}
-                helpkey *
-            }
-
-            parameter lbnd {
-                size *
-                type _INTEGER
-                access READ
-                vpath DYNAMIC
-                ppath DYNAMIC
-                prompt {Lower pixel index bounds for output spatial axes}
-                helpkey *
-            }
-
-            parameter lbound {
-                size *
-                type _INTEGER
-                access WRITE
-                vpath INTERNAL
-                helpkey *
-            }
-
-            parameter ubnd {
-                size *
-                type _INTEGER
-                access READ
-                vpath DYNAMIC
-                ppath DYNAMIC
-                prompt {Upper pixel index bounds for output spatial axes}
-                helpkey *
-            }
-
-            parameter ubound {
-                size *
-                type _INTEGER
-                access WRITE
-                vpath INTERNAL
-                helpkey *
-            }
-
-            parameter fbl {
-                size *
-                type _DOUBLE
-                access WRITE
-                vpath INTERNAL
-                helpkey *
-            }
-
-            parameter fbr {
-                size *
-                type _DOUBLE
-                access WRITE
-                vpath INTERNAL
-                helpkey *
-            }
-
-
-            parameter flbnd {
-                size *
-                type _DOUBLE
-                access WRITE
-                vpath INTERNAL
-                helpkey *
-            }
-
-            parameter fubnd {
-                size *
-                type _DOUBLE
-                access WRITE
-                vpath INTERNAL
-                helpkey *
-            }
-
-            parameter ftl {
-                size *
-                type _DOUBLE
-                access WRITE
-                vpath INTERNAL
-                helpkey *
-            }
-
-            parameter ftr {
-                size *
-                type _DOUBLE
-                access WRITE
-                vpath INTERNAL
-                helpkey *
-            }
-
-            parameter ref {
-                type NDF
-                access READ
-                vpath DEFAULT
-                ppath CURRENT DEFAULT
-                prompt {Reference NDF}
-                default !
-                helpkey *
-            }
-
-            parameter reflat {
-                type LITERAL
-                access READ
-                ppath DYNAMIC
-                vpath DYNAMIC
-                prompt {Celestial latitude at output reference point}
-                helpkey *
-            }
-
-            parameter reflon {
-                type LITERAL
-                access READ
-                ppath DYNAMIC
-                vpath DYNAMIC
-                prompt {Celestial longitude at output reference point}
-                helpkey *
-            }
-
-            parameter out {
-                position 2
-                type NDF
-                access WRITE
-                vpath {PROMPT }
-                association ->GLOBAL.DATA_ARRAY
-                prompt {Output NDF data structure}
-                helpkey *
-            }
-
-            parameter pixsize {
-                position 3
-                type _REAL
-                prompt {Output pixel size(s) for the map (arcsec)}
-                ppath DYNAMIC
-                vpath DYNAMIC
-                helpkey *
-            }
-
-            parameter crota {
-                type _REAL
-                prompt {Position angle of second pixel axis in output (degs)}
-                ppath DYNAMIC
-                vpath DYNAMIC
-                helpkey *
-            }
-
-            parameter maxmem {
-                type _INTEGER
-                prompt {Maximum memory available for map-making in Mb}
-                ppath DYNAMIC
-                vpath DYNAMIC
-                helpkey *
-            }
-
-            parameter tiledims {
-                type _INTEGER
-                prompt {Output tile dimensions in pixels}
-                ppath CURRENT DEFAULT
-                vpath DEFAULT
-                default !
                 helpkey *
             }
 
             parameter method {
                 type _CHAR
-                prompt {Map-making method}
-                default REBIN
+                prompt {Bad bolometer generation method}
+                default RANDOM
                 helpkey *
             }
 
-            parameter config {
-                type LITERAL
-                access READ
-                ppath CURRENT
-                prompt {Map-maker tuning parameters}
-                helpkey *
-            }
-
-            parameter ntile {
+            parameter seed {
+                position 5
                 type _INTEGER
-                access WRITE
-                vpath DEFAULT
-                default 0
-                helpkey *
-            }
-
-            parameter outfiles {
-                type LITERAL
-                prompt {Text file in which to put the output NDF names}
-                default !
-                vpath DEFAULT
-                ppath CURRENT DEFAULT
-                helpkey *
-            }
-
-            parameter params {
-                size *
-                type _DOUBLE
-                vpath PROMPT
-                ppath CURRENT
-                prompt {Auxiliary rebinning parameters}
-                helpkey *
-            }
-
-            parameter spread {
-                type LITERAL
-                vpath DEFAULT
-                ppath DEFAULT
-                prompt {Pixel spreading method}
-                helpkey *
-                default {Nearest}
-            }
-
-            parameter system {
-                position 4
-                type LITERAL
-                access READ
-                vpath DEFAULT
-                ppath CURRENT DEFAULT
-                prompt {Celestial coord system for output cube}
-                default TRACKING
-                helpkey *
-            }
-
-            parameter tileborder {
-                type _INTEGER
-                prompt {Width of tile overlap in pixels}
-                ppath CURRENT DEFAULT
-                vpath DEFAULT
-                default 0
-                helpkey *
-            }
-
-            parameter trimtiles {
-                type _LOGICAL
-                vpath DEFAULT
-                prompt {Trim the output tiles?}
-                ppath CURRENT DEFAULT
-                default FALSE
-                helpkey *
-            }
-
-            parameter msg_filter {
-                type _CHAR
-                prompt {Message level}
                 vpath DEFAULT
                 default !
-                helpkey *
-            }
-
-        }
-
-        action qlmakemap {
-
-            helplib {$SMURF_HELP}
-
-            parameter crota {
-                type _REAL
-                prompt {Position angle of second pixel axis in output (degs)}
-                ppath DYNAMIC
-                vpath DYNAMIC
-                helpkey *
-            }
-
-            parameter in {
-                position 1
-                type NDF
-                access READ
-                vpath {PROMPT }
-                ppath GLOBAL CURRENT
-                association <-GLOBAL.DATA_ARRAY
-                prompt {Input NDF data structure}
-                helpkey *
-            }
-
-            parameter out {
-                position 2
-                type NDF
-                access WRITE
-                vpath {PROMPT }
-                association ->GLOBAL.DATA_ARRAY
-                prompt {Output NDF data structure}
-                helpkey *
-            }
-
-            parameter outfiles {
-                type LITERAL
-                prompt {Text file in which to put the output NDF names}
-                default !
-                vpath DEFAULT
-                ppath CURRENT DEFAULT
-                helpkey *
-            }
-
-            parameter bpm {
-                type NDF
-                access READ
-                vpath DEFAULT
-                ppath CURRENT DEFAULT
-                prompt {Bad pixel masks}
-                default !
-                helpkey *
-            }
-
-            parameter params {
-                size *
-                type _DOUBLE
-                vpath PROMPT
-                ppath CURRENT
-                prompt {Auxiliary rebinning parameters}
-                helpkey *
-            }
-
-            parameter pixsize {
-                position 3
-                type _REAL
-                vpath {PROMPT }
-                prompt {Output map pixel size in arcsec}
-                ppath GLOBAL CURRENT
-                default 3.0
-                helpkey *
-            }
-
-            parameter spread {
-                type LITERAL
-                vpath DEFAULT
-                ppath DEFAULT
-                prompt {Pixel spreading method}
-                helpkey *
-                default {Nearest}
-            }
-
-            parameter system {
-                position 4
-                type LITERAL
-                access READ
-                vpath DEFAULT
-                ppath CURRENT DEFAULT
-                prompt {Celestial coord system for output map}
-                default TRACKING
-                helpkey *
-            }
-
-            parameter genvar {
-                type _LOGICAL
-                vpath DEFAULT
-                default 0
-                helpkey *
-            }
-
-            parameter reflat {
-                type LITERAL
-                access READ
-                ppath DYNAMIC
-                vpath DYNAMIC
-                prompt {Celestial latitude at output reference point}
-                helpkey *
-            }
-
-            parameter reflon {
-                type LITERAL
-                access READ
-                ppath DYNAMIC
-                vpath DYNAMIC
-                prompt {Celestial longitude at output reference point}
-                helpkey *
-            }
-
-            parameter meansky {
-                type _DOUBLE
-                access WRITE
-                vpath DEFAULT
-                default 0.0
-                helpkey *
-            }
-
-            parameter msg_filter {
-                type _CHAR
-                prompt {Message level}
-                default !
-                vpath DEFAULT
-                helpkey *
-            }
-
-        }
-
-        action flatfield {
-
-            helplib {$SMURF_HELP}
-
-            parameter bpm {
-                type NDF
-                access READ
-                vpath DEFAULT
-                ppath CURRENT DEFAULT
-                prompt {Bad pixel masks}
-                default !
-                helpkey *
-            }
-
-            parameter in {
-                position 1
-                type NDF
-                access READ
-                vpath {PROMPT }
-                association <-GLOBAL.DATA_ARRAY
-                prompt {Input timeseries}
-                helpkey *
-            }
-
-            parameter out {
-                position 2
-                type NDF
-                access WRITE
-                vpath {PROMPT }
-                association ->GLOBAL.DATA_ARRAY
-                prompt {Flatfielded timeseries}
-                helpkey *
-            }
-
-            parameter outfiles {
-                type LITERAL
-                prompt {Text file in which to put the output NDF names}
-                default !
-                vpath DEFAULT
-                ppath CURRENT DEFAULT
-                helpkey *
-            }
-
-            parameter msg_filter {
-                type _CHAR
-                prompt {Message level}
-                default !
-                vpath DEFAULT
-                helpkey *
-            }
-        }
-
-        action rawunpress {
-
-            helplib {$SMURF_HELP}
-
-            parameter in {
-                position 1
-                type NDF
-                access READ
-                vpath {PROMPT }
-                association <-GLOBAL.DATA_ARRAY
-                prompt {Input timeseries}
-                helpkey *
-            }
-
-            parameter out {
-                position 2
-                type NDF
-                access WRITE
-                vpath {PROMPT }
-                association ->GLOBAL.DATA_ARRAY
-                prompt {Uncompressed timeseries}
-                helpkey *
-            }
-
-            parameter msg_filter {
-                type _CHAR
-                prompt {Message level}
-                default !
-                vpath DEFAULT
-                helpkey *
-            }
-        }
-
-        action rawfixmeta {
-
-            helplib {$SMURF_HELP}
-
-            parameter in {
-                position 1
-                type NDF
-                access READ
-                vpath {PROMPT }
-                association <-GLOBAL.DATA_ARRAY
-                prompt {Input timeseries}
-                helpkey *
-            }
-
-            parameter out {
-                position 2
-                type NDF
-                access WRITE
-                vpath {PROMPT }
-                association ->GLOBAL.DATA_ARRAY
-                prompt {Uncompressed timeseries}
-                helpkey *
-            }
-
-            parameter msg_filter {
-                type _CHAR
-                prompt {Message level}
-                default !
-                vpath DEFAULT
-                helpkey *
-            }
-        }
-
-        action scanfit {
-
-            helplib {$SMURF_HELP}
-
-            parameter bpm {
-                type NDF
-                access READ
-                vpath DEFAULT
-                ppath CURRENT DEFAULT
-                prompt {Bad pixel masks}
-                default !
-                helpkey *
-            }
-
-            parameter in {
-                position 1
-                type NDF
-                access READ
-                vpath {PROMPT }
-                association <-GLOBAL.DATA_ARRAY
-                prompt {Input timeseries}
-                helpkey *
-            }
-
-            parameter out {
-                position 2
-                type NDF
-                access WRITE
-                vpath {PROMPT }
-                association ->GLOBAL.DATA_ARRAY
-                prompt {Scanfit timeseries}
-                helpkey *
-            }
-
-            parameter outfiles {
-                type LITERAL
-                prompt {Text file in which to put the output NDF names}
-                default !
-                vpath DEFAULT
-                ppath CURRENT DEFAULT
-                helpkey *
-            }
-
-            parameter order {
-                position 3
-                type INTEGER
-                prompt {Polynomial order}
-                helpkey *
-            }
-
-            parameter msg_filter {
-                type _CHAR
-                prompt {Message level}
-                default !
-                vpath DEFAULT
-                helpkey *
-            }
-        }
-
-        action remsky {
-
-            helplib {$SMURF_HELP}
-
-            parameter bpm {
-                type NDF
-                access READ
-                vpath DEFAULT
-                ppath CURRENT DEFAULT
-                prompt {Bad pixel masks}
-                default !
-                helpkey *
-            }
-
-            parameter in {
-                position 1
-                type NDF
-                access READ
-                vpath {PROMPT }
-                association <-GLOBAL.DATA_ARRAY
-                prompt {Input timeseries}
-                helpkey *
-            }
-
-            parameter method {
-                position 3
-                type _CHAR
-                prompt {Sky removal method}
-                helpkey *
-            }
-
-            parameter out {
-                position 2
-                type NDF
-                access WRITE
-                vpath {PROMPT }
-                association ->GLOBAL.DATA_ARRAY
-                prompt {Sky-subtracted timeseries}
-                helpkey *
-            }
-
-            parameter outfiles {
-                type LITERAL
-                prompt {Text file in which to put the output NDF names}
-                default !
-                vpath DEFAULT
-                ppath CURRENT DEFAULT
-                helpkey *
-            }
-
-            parameter group {
-                position 4
-                type _LOGICAL
-                prompt {Group related files?}
-                ppath DEFAULT CURRENT
-                default FALSE
-                helpkey *
-            }
-
-            parameter fit {
-                type _CHAR
-                vpath {PROMPT }
-                prompt {Remove mean, slope or plane?}
-                ppath GLOBAL CURRENT
-                helpkey *
-            }
-
-            parameter msg_filter {
-                type _CHAR
-                prompt {Message level}
-                default !
-                vpath DEFAULT
-                helpkey *
-            }
-        }
-
-        action stackframes {
-
-            helplib {$SMURF_HELP}
-
-            parameter in {
-                position 1
-                type NDF
-                access READ
-                vpath {PROMPT }
-                association <-GLOBAL.DATA_ARRAY
-                prompt {Input processed 2d frames}
-                helpkey *
-            }
-
-            parameter out {
-                position 2
-                type NDF
-                access WRITE
-                vpath {PROMPT }
-                association ->GLOBAL.DATA_ARRAY
-                prompt {Stacked frames}
                 helpkey *
             }
 
@@ -1093,13 +321,6 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-            parameter msg_filter {
-                type _CHAR
-                prompt {Message level}
-                default !
-                vpath DEFAULT
-                helpkey *
-            }
         }
 
         action calcflat {
@@ -1116,6 +337,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter ngood {
+                type _INTEGER
+                access WRITE
+                vpath DEFAULT
+                prompt {Number of good responsivities}
+                default 0
+                helpkey *
+            }
+
             parameter out {
                 position 2
                 type NDF
@@ -1124,23 +354,6 @@ package @PACKAGE@ {
                 vpath {PROMPT }
                 association ->GLOBAL.DATA_ARRAY
                 prompt {Processed flatfield file}
-                helpkey *
-            }
-
-            parameter msg_filter {
-                type _CHAR
-                prompt {Message level}
-                default !
-                vpath DEFAULT
-                helpkey *
-            }
-
-            parameter ngood {
-                type _INTEGER
-                access WRITE
-                vpath DEFAULT
-                prompt {Number of good responsivities}
-                default 0
                 helpkey *
             }
 
@@ -1270,6 +483,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter ngood {
+                size *
+                type _INTEGER
+                access WRITE
+                vpath INTERNAL
+                prompt {Number of good responsivities in each file}
+                helpkey *
+            }
+
             parameter out {
                 position 2
                 type NDF
@@ -1281,38 +503,11 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-            parameter msg_filter {
-                type _CHAR
-                prompt {Message level}
-                default !
-                vpath DEFAULT
-                helpkey *
-            }
-
-            parameter ngood {
-                size *
-                type _INTEGER
-                access WRITE
-                vpath INTERNAL
-                prompt {Number of good responsivities in each file}
-                helpkey *
-            }
-
         }
 
         action copyflat {
 
             helplib {$SMURF_HELP}
-
-            parameter ref {
-                position 1
-                type NDF
-                access READ
-                vpath {PROMPT }
-                association <-GLOBAL.DATA_ARRAY
-                prompt {Input file containing flatfield parameters to copy}
-                helpkey *
-            }
 
             parameter in {
                 position 2
@@ -1325,11 +520,60 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter ref {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT }
+                association <-GLOBAL.DATA_ARRAY
+                prompt {Input file containing flatfield parameters to copy}
+                helpkey *
+            }
+
+        }
+
+        action dreamsolve {
+
+            helplib {$SMURF_HELP}
+
+            parameter in {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT }
+                ppath GLOBAL CURRENT
+                association <-GLOBAL.DATA_ARRAY
+                prompt {Input data file}
+                helpkey *
+            }
+
+            parameter out {
+                position 2
+                type NDF
+                access WRITE
+                vpath {PROMPT }
+                ppath GLOBAL CURRENT
+                association ->GLOBAL.DATA_ARRAY
+                prompt {Output data file}
+                helpkey *
+            }
+
         }
 
         action dreamweights {
 
             helplib {$SMURF_HELP}
+
+            parameter config {
+                position 3
+                type LITERAL
+                access READ
+                vpath {PROMPT }
+                ppath CURRENT DEFAULT
+                default !
+                prompt {DREAM reconstruction parameters}
+                helpkey *
+            }
 
             parameter ndf {
                 position 1
@@ -1353,29 +597,44 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-            parameter config {
-                position 3
-                type LITERAL
-                access READ
-                vpath {PROMPT }
-                ppath CURRENT DEFAULT
-                default !
-                prompt {DREAM reconstruction parameters}
-                helpkey *
-            }
-
-            parameter msg_filter {
-                type _CHAR
-                prompt {Message level}
-                default !
-                vpath DEFAULT
-                helpkey *
-            }
         }
 
-        action dreamsolve {
+        action extinction {
 
             helplib {$SMURF_HELP}
+
+            parameter bpm {
+                type NDF
+                access READ
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Bad pixel masks}
+                default !
+                helpkey *
+            }
+
+            parameter csotau {
+                type _REAL
+                prompt {Zenith optical depth at 225 GHz}
+                ppath DYNAMIC CURRENT
+                helpkey *
+            }
+
+            parameter filtertau {
+                type _REAL
+                prompt {Zenith optical depth for current filter}
+                ppath DYNAMIC CURRENT
+                helpkey *
+            }
+
+            parameter hasskyrem {
+                type _LOGICAL
+                vpath {DEFAULT}
+                prompt {Has sky removal been applied?}
+                ppath GLOBAL CURRENT
+                default FALSE
+                helpkey *
+            }
 
             parameter in {
                 position 1
@@ -1384,29 +643,48 @@ package @PACKAGE@ {
                 vpath {PROMPT }
                 ppath GLOBAL CURRENT
                 association <-GLOBAL.DATA_ARRAY
-                prompt {Input data file}
+                prompt {Input NDF data structure}
                 helpkey *
             }
+
+            parameter method {
+                position 4
+                type _CHAR
+                vpath {PROMPT }
+                prompt {Method to use for airmass calculation}
+                ppath CURRENT
+                helpkey *
+            }
+
             parameter out {
                 position 2
                 type NDF
                 access WRITE
                 vpath {PROMPT }
-                ppath GLOBAL CURRENT
                 association ->GLOBAL.DATA_ARRAY
-                prompt {Output data file}
+                prompt {Output NDF data structure}
                 helpkey *
             }
-            parameter msg_filter {
-                type _CHAR
-                prompt {Message level}
+
+            parameter outfiles {
+                type LITERAL
+                prompt {Text file in which to put the output NDF names}
                 default !
                 vpath DEFAULT
+                ppath CURRENT DEFAULT
                 helpkey *
             }
+
+            parameter tausrc {
+                position 3
+                type _CHAR
+                prompt {Source of opacity data}
+                helpkey *
+            }
+
         }
 
-        action starecalc {
+        action flatfield {
 
             helplib {$SMURF_HELP}
 
@@ -1425,9 +703,8 @@ package @PACKAGE@ {
                 type NDF
                 access READ
                 vpath {PROMPT }
-                ppath GLOBAL CURRENT
                 association <-GLOBAL.DATA_ARRAY
-                prompt {Input data file(s)}
+                prompt {Input timeseries}
                 helpkey *
             }
 
@@ -1436,9 +713,8 @@ package @PACKAGE@ {
                 type NDF
                 access WRITE
                 vpath {PROMPT }
-                ppath GLOBAL CURRENT
                 association ->GLOBAL.DATA_ARRAY
-                prompt {Output data file(s)}
+                prompt {Flatfielded timeseries}
                 helpkey *
             }
 
@@ -1451,108 +727,100 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-            parameter naver {
-                type _INTEGER
-                prompt {Number of samples to average together to produce an image}
-                vpath DEFAULT
-                default !
+        }
+
+        action gsd2acsis {
+            helplib {$SMURF_HELP}
+
+            parameter directory {
+                position 2
+                type _CHAR
+                access WRITE
+                vpath {PROMPT }
+                association ->GLOBAL.DATA_ARRAY
+                prompt {Output Directory}
                 ppath GLOBAL CURRENT
                 helpkey *
             }
 
-            parameter msg_filter {
+            parameter in {
+                position 1
                 type _CHAR
-                prompt {Message level}
-                default !
-                vpath DEFAULT
+                access READ
+                vpath {PROMPT }
+                prompt {Input DAS or AOSC GSD File}
+                ppath GLOBAL CURRENT
                 helpkey *
             }
+
+            parameter obsnum {
+                position 3
+                type _INTEGER
+                access WRITE
+                vpath {PROMPT }
+                association ->GLOBAL.DATA_ARRAY
+                prompt {Observation Number}
+                ppath GLOBAL CURRENT
+                helpkey *
+            }
+
         }
 
-        action sc2sim {
+        action gsdshow {
+            helplib {$SMURF_HELP}
+
+            parameter descriptions {
+                position 2
+                type _LOGICAL
+                prompt {Show descriptions?}
+                ppath DEFAULT CURRENT
+                default FALSE
+                helpkey *
+            }
+
+            parameter in {
+                position 1
+                type _CHAR
+                access READ
+                vpath {PROMPT }
+                prompt {Input DAS or AOSC GSD File}
+                ppath GLOBAL CURRENT
+                helpkey *
+            }
+
+            parameter showdata {
+                position 3
+                type _LOGICAL
+                prompt {Print out data array?}
+                ppath DEFAULT CURRENT
+                default FALSE
+                helpkey *
+            }
+
+        }
+
+        action impaztec {
 
             helplib {$SMURF_HELP}
 
-            parameter obspar {
+            parameter in {
                 position 1
                 type _CHAR
-                prompt {Observation parameters}
-                vpath {PROMPT}
+                access READ
+                vpath {PROMPT }
+                prompt {Input AzTEC NETCDF File}
                 ppath GLOBAL CURRENT
                 helpkey *
             }
 
-            parameter simpar {
+            parameter out {
                 position 2
                 type _CHAR
-                prompt {Simulation parameters}
-                vpath {PROMPT}
+                access WRITE
+                vpath {PROMPT }
+                association ->GLOBAL.DATA_ARRAY
+                prompt {Output NDF file}
                 ppath GLOBAL CURRENT
-                helpkey *
-            }
-
-            parameter seed {
-                position 3
-                type _INTEGER
-                vpath DEFAULT
-                default !
-                helpkey *
-            }
-
-            parameter maxwrite {
-                position 4
-                type _INTEGER
-                prompt {Number of samples to write in output file}
-                vpath DEFAULT
-                default 12000
-                ppath GLOBAL CURRENT
-                helpkey *
-            }
-
-            parameter overwrite {
-                position 5
-                type _LOGICAL
-                prompt {Overwrite existing files?}
-                vpath DEFAULT
-                default TRUE
-                ppath CURRENT
-                helpkey *
-            }
-
-            parameter simstats {
-                position 6
-                type _LOGICAL
-                prompt {Report simulation statistics only?}
-                vpath DEFAULT
-                default FALSE
-                ppath CURRENT
-                helpkey *
-            }
-
-            parameter simtype {
-                position 7
-                type _CHAR
-                prompt {Simulation type (FULL or WEIGHTS)}
-                vpath {PROMPT}
-                ppath GLOBAL CURRENT
-                helpkey *
-            }
-
-            parameter badbol {
-                type _CHAR
-                access READ
-                vpath {DEFAULT }
-                default !
-                prompt {ARD Description File for Bad Bolometer mask}
-                ppath GLOBAL CURRENT
-                helpkey *
-            }
-
-            parameter msg_filter {
-                type _CHAR
-                prompt {Message level}
-                vpath DEFAULT
-                default !
                 helpkey *
             }
 
@@ -1784,14 +1052,6 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-            parameter msg_filter {
-                type _CHAR
-                prompt {Message level}
-                default !
-                vpath DEFAULT
-                helpkey *
-            }
-
             parameter outfiles {
                 type LITERAL
                 prompt {Text file in which to put the output NDF names}
@@ -1872,6 +1132,26 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter spread {
+                type LITERAL
+                vpath DEFAULT
+                ppath DEFAULT
+                prompt {Pixel spreading method}
+                helpkey *
+                default {Nearest}
+            }
+
+            parameter system {
+                position 4
+                type LITERAL
+                access READ
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Celestial coord system for output cube}
+                default TRACKING
+                helpkey *
+            }
+
             parameter tileborder {
                 type _INTEGER
                 prompt {Width of tile overlap in pixels}
@@ -1908,35 +1188,6 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-            parameter weights {
-                type _LOGICAL
-                vpath DEFAULT
-                ppath CURRENT
-                prompt {Save pixel weights in the output NDF?}
-                default FALSE
-                helpkey *
-            }
-            parameter spread {
-                type LITERAL
-                vpath DEFAULT
-                ppath DEFAULT
-                prompt {Pixel spreading method}
-                helpkey *
-                default {Nearest}
-            }
-
-            parameter system {
-                position 4
-                type LITERAL
-                access READ
-                vpath DEFAULT
-                ppath CURRENT DEFAULT
-                prompt {Celestial coord system for output cube}
-                default TRACKING
-                helpkey *
-            }
-
-
             parameter ubnd {
                 size *
                 type _INTEGER
@@ -1963,20 +1214,101 @@ package @PACKAGE@ {
                 default TRUE
                 helpkey *
             }
+            parameter weights {
+                type _LOGICAL
+                vpath DEFAULT
+                ppath CURRENT
+                prompt {Save pixel weights in the output NDF?}
+                default FALSE
+                helpkey *
+            }
 
         }
 
-        action unmakecube {
+        action makemap {
 
             helplib {$SMURF_HELP}
 
-            parameter detectors {
-                type LITERAL
+            parameter alignsys {
+                type _LOGICAL
+                vpath DEFAULT
+                ppath CURRENT
+                prompt {Align data in the output spatial co-ordinate system?}
+                default FALSE
+                helpkey *
+            }
+
+            parameter bpm {
+                type NDF
                 access READ
                 vpath DEFAULT
                 ppath CURRENT DEFAULT
-                prompt {Names of detectors to be included}
+                prompt {Bad pixel masks}
                 default !
+                helpkey *
+            }
+
+            parameter config {
+                type LITERAL
+                access READ
+                ppath CURRENT
+                prompt {Map-maker tuning parameters}
+                helpkey *
+            }
+
+            parameter crota {
+                type _REAL
+                prompt {Position angle of second pixel axis in output (degs)}
+                ppath DYNAMIC
+                vpath DYNAMIC
+                helpkey *
+            }
+
+            parameter fbl {
+                size *
+                type _DOUBLE
+                access WRITE
+                vpath INTERNAL
+                helpkey *
+            }
+
+            parameter fbr {
+                size *
+                type _DOUBLE
+                access WRITE
+                vpath INTERNAL
+                helpkey *
+            }
+
+            parameter flbnd {
+                size *
+                type _DOUBLE
+                access WRITE
+                vpath INTERNAL
+                helpkey *
+            }
+
+            parameter fubnd {
+                size *
+                type _DOUBLE
+                access WRITE
+                vpath INTERNAL
+                helpkey *
+            }
+
+            parameter ftl {
+                size *
+                type _DOUBLE
+                access WRITE
+                vpath INTERNAL
+                helpkey *
+            }
+
+            parameter ftr {
+                size *
+                type _DOUBLE
+                access WRITE
+                vpath INTERNAL
                 helpkey *
             }
 
@@ -1987,26 +1319,67 @@ package @PACKAGE@ {
                 vpath {PROMPT }
                 ppath GLOBAL CURRENT
                 association <-GLOBAL.DATA_ARRAY
-                prompt {Input sky cubes}
+                prompt {Input NDF data structure}
                 helpkey *
             }
 
-            parameter interp {
-                type LITERAL
-                vpath DEFAULT
-                ppath DEFAULT
-                prompt {Pixel interpolation method}
+            parameter lbnd {
+                size *
+                type _INTEGER
+                access READ
+                vpath DYNAMIC
+                ppath DYNAMIC
+                prompt {Lower pixel index bounds for output spatial axes}
                 helpkey *
-                default {Nearest}
+            }
+
+            parameter lbound {
+                size *
+                type _INTEGER
+                access WRITE
+                vpath INTERNAL
+                helpkey *
+            }
+
+            parameter maxmem {
+                type _INTEGER
+                prompt {Maximum memory available for map-making in Mb}
+                ppath DYNAMIC
+                vpath DYNAMIC
+                helpkey *
+            }
+
+            parameter method {
+                type _CHAR
+                prompt {Map-making method}
+                default REBIN
+                helpkey *
+            }
+
+            parameter ntile {
+                type _INTEGER
+                access WRITE
+                vpath DEFAULT
+                default 0
+                helpkey *
             }
 
             parameter out {
-                position 3
+                position 2
                 type NDF
                 access WRITE
                 vpath {PROMPT }
                 association ->GLOBAL.DATA_ARRAY
-                prompt {Output time series cubes}
+                prompt {Output NDF data structure}
+                helpkey *
+            }
+
+            parameter outfiles {
+                type LITERAL
+                prompt {Text file in which to put the output NDF names}
+                default !
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
                 helpkey *
             }
 
@@ -2015,176 +1388,847 @@ package @PACKAGE@ {
                 type _DOUBLE
                 vpath PROMPT
                 ppath CURRENT
-                prompt {Auxiliary interpolation parameters}
+                prompt {Auxiliary rebinning parameters}
                 helpkey *
             }
 
-            parameter msg_filter {
-                type _CHAR
-                prompt {Message level}
-                default !
-                vpath DEFAULT
+            parameter pixsize {
+                position 3
+                type _REAL
+                prompt {Output pixel size(s) for the map (arcsec)}
+                ppath DYNAMIC
+                vpath DYNAMIC
                 helpkey *
             }
 
             parameter ref {
-                position 2
                 type NDF
                 access READ
-                vpath PROMPT
-                ppath CURRENT
-                prompt {Template time series cubes}
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Reference NDF}
+                default !
                 helpkey *
             }
 
-            parameter usedetpos {
+            parameter reflat {
+                type LITERAL
+                access READ
+                ppath DYNAMIC
+                vpath DYNAMIC
+                prompt {Celestial latitude at output reference point}
+                helpkey *
+            }
+
+            parameter reflon {
+                type LITERAL
+                access READ
+                ppath DYNAMIC
+                vpath DYNAMIC
+                prompt {Celestial longitude at output reference point}
+                helpkey *
+            }
+
+            parameter spread {
+                type LITERAL
+                vpath DEFAULT
+                ppath DEFAULT
+                prompt {Pixel spreading method}
+                helpkey *
+                default {Nearest}
+            }
+
+            parameter system {
+                position 4
+                type LITERAL
+                access READ
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Celestial coord system for output cube}
+                default TRACKING
+                helpkey *
+            }
+
+            parameter tileborder {
+                type _INTEGER
+                prompt {Width of tile overlap in pixels}
+                ppath CURRENT DEFAULT
+                vpath DEFAULT
+                default 0
+                helpkey *
+            }
+
+            parameter tiledims {
+                type _INTEGER
+                prompt {Output tile dimensions in pixels}
+                ppath CURRENT DEFAULT
+                vpath DEFAULT
+                default !
+                helpkey *
+            }
+
+            parameter trimtiles {
                 type _LOGICAL
                 vpath DEFAULT
-                ppath CURRENT
-                prompt {Read detector positions from the input NDF?}
-                default TRUE
+                prompt {Trim the output tiles?}
+                ppath CURRENT DEFAULT
+                default FALSE
+                helpkey *
+            }
+
+            parameter ubnd {
+                size *
+                type _INTEGER
+                access READ
+                vpath DYNAMIC
+                ppath DYNAMIC
+                prompt {Upper pixel index bounds for output spatial axes}
+                helpkey *
+            }
+
+            parameter ubound {
+                size *
+                type _INTEGER
+                access WRITE
+                vpath INTERNAL
                 helpkey *
             }
 
         }
 
-        action impaztec {
+        action qlmakemap {
 
             helplib {$SMURF_HELP}
 
+            parameter bpm {
+                type NDF
+                access READ
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Bad pixel masks}
+                default !
+                helpkey *
+            }
+
+            parameter crota {
+                type _REAL
+                prompt {Position angle of second pixel axis in output (degs)}
+                ppath DYNAMIC
+                vpath DYNAMIC
+                helpkey *
+            }
+
+            parameter genvar {
+                type _LOGICAL
+                vpath DEFAULT
+                default 0
+                helpkey *
+            }
+
             parameter in {
                 position 1
-                type _CHAR
+                type NDF
                 access READ
                 vpath {PROMPT }
-                prompt {Input AzTEC NETCDF File}
                 ppath GLOBAL CURRENT
+                association <-GLOBAL.DATA_ARRAY
+                prompt {Input NDF data structure}
+                helpkey *
+            }
+
+            parameter meansky {
+                type _DOUBLE
+                access WRITE
+                vpath DEFAULT
+                default 0.0
                 helpkey *
             }
 
             parameter out {
                 position 2
-                type _CHAR
+                type NDF
                 access WRITE
                 vpath {PROMPT }
                 association ->GLOBAL.DATA_ARRAY
-                prompt {Output NDF file}
-                ppath GLOBAL CURRENT
+                prompt {Output NDF data structure}
                 helpkey *
             }
 
-            parameter msg_filter {
-                type _CHAR
-                prompt {Message level}
-                vpath DEFAULT
+            parameter outfiles {
+                type LITERAL
+                prompt {Text file in which to put the output NDF names}
                 default !
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
                 helpkey *
             }
+
+            parameter params {
+                size *
+                type _DOUBLE
+                vpath PROMPT
+                ppath CURRENT
+                prompt {Auxiliary rebinning parameters}
+                helpkey *
+            }
+
+            parameter pixsize {
+                position 3
+                type _REAL
+                vpath {PROMPT }
+                prompt {Output map pixel size in arcsec}
+                ppath GLOBAL CURRENT
+                default 3.0
+                helpkey *
+            }
+
+            parameter reflat {
+                type LITERAL
+                access READ
+                ppath DYNAMIC
+                vpath DYNAMIC
+                prompt {Celestial latitude at output reference point}
+                helpkey *
+            }
+
+            parameter reflon {
+                type LITERAL
+                access READ
+                ppath DYNAMIC
+                vpath DYNAMIC
+                prompt {Celestial longitude at output reference point}
+                helpkey *
+            }
+
+            parameter spread {
+                type LITERAL
+                vpath DEFAULT
+                ppath DEFAULT
+                prompt {Pixel spreading method}
+                helpkey *
+                default {Nearest}
+            }
+
+            parameter system {
+                position 4
+                type LITERAL
+                access READ
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Celestial coord system for output map}
+                default TRACKING
+                helpkey *
+            }
+
         }
 
-        action badbolos {
+        action rawfixmeta {
 
             helplib {$SMURF_HELP}
 
             parameter in {
                 position 1
-                type _CHAR
+                type NDF
                 access READ
                 vpath {PROMPT }
-                prompt {Input Simulated NDF File}
+                association <-GLOBAL.DATA_ARRAY
+                prompt {Input timeseries}
+                helpkey *
+            }
+
+            parameter out {
+                position 2
+                type NDF
+                access WRITE
+                vpath {PROMPT }
+                association ->GLOBAL.DATA_ARRAY
+                prompt {Uncompressed timeseries}
+                helpkey *
+            }
+
+        }
+
+        action rawunpress {
+
+            helplib {$SMURF_HELP}
+
+            parameter in {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT }
+                association <-GLOBAL.DATA_ARRAY
+                prompt {Input timeseries}
+                helpkey *
+            }
+
+            parameter out {
+                position 2
+                type NDF
+                access WRITE
+                vpath {PROMPT }
+                association ->GLOBAL.DATA_ARRAY
+                prompt {Uncompressed timeseries}
+                helpkey *
+            }
+
+        }
+
+        action remsky {
+
+            helplib {$SMURF_HELP}
+
+            parameter bpm {
+                type NDF
+                access READ
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Bad pixel masks}
+                default !
+                helpkey *
+            }
+
+            parameter in {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT }
+                association <-GLOBAL.DATA_ARRAY
+                prompt {Input timeseries}
+                helpkey *
+            }
+
+            parameter fit {
+                type _CHAR
+                vpath {PROMPT }
+                prompt {Remove mean, slope or plane?}
                 ppath GLOBAL CURRENT
+                helpkey *
+            }
+
+            parameter group {
+                position 4
+                type _LOGICAL
+                prompt {Group related files?}
+                ppath DEFAULT CURRENT
+                default FALSE
                 helpkey *
             }
 
             parameter method {
-                type _CHAR
-                prompt {Bad bolometer generation method}
-                default RANDOM
-                helpkey *
-            }
-
-            parameter ard {
-                type _CHAR
-                access READ
-                vpath {PROMPT }
-                prompt {Input ARD Description File}
-                ppath GLOBAL CURRENT
-                helpkey *
-            }
-
-            parameter bad_columns {
-                position 2
-                type _INTEGER
-                prompt {Number of bad columns of bolometers}
-                vpath {PROMPT}
-                ppath GLOBAL CURRENT
-                helpkey *
-            }
-
-            parameter bad_rows {
                 position 3
-                type _INTEGER
-                prompt {Number of bad rows of bolometers}
-                vpath {PROMPT}
-                ppath GLOBAL CURRENT
-                helpkey *
-            }
-
-            parameter bad_bolos {
-                position 4
-                type _INTEGER
-                prompt {Number of additional bad individual bolometers}
-                vpath {PROMPT}
-                ppath GLOBAL CURRENT
-                helpkey *
-            }
-
-            parameter seed {
-                position 5
-                type _INTEGER
-                vpath DEFAULT
-                default !
-                helpkey *
-            }
-
-            parameter msg_filter {
                 type _CHAR
-                prompt {Message level}
-                vpath DEFAULT
-                default !
+                prompt {Sky removal method}
                 helpkey *
             }
+
+            parameter out {
+                position 2
+                type NDF
+                access WRITE
+                vpath {PROMPT }
+                association ->GLOBAL.DATA_ARRAY
+                prompt {Sky-subtracted timeseries}
+                helpkey *
+            }
+
+            parameter outfiles {
+                type LITERAL
+                prompt {Text file in which to put the output NDF names}
+                default !
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                helpkey *
+            }
+
         }
 
-        action skynoise {
+        action sc2clean {
+            helplib {$SMURF_HELP}
+
+            parameter apod {
+                type _INTEGER
+                vpath {DEFAULT}
+                prompt {Number of samples over which to apodize}
+                default 0
+                helpkey *
+            }
+
+            parameter badfrac {
+                type _DOUBLE
+                vpath {DEFAULT}
+                prompt {Fraction of bad samples to flag entire bolo bad}
+                default 0.0
+                helpkey *
+            }
+
+            parameter dcbad {
+                type _LOGICAL
+                vpath {DEFAULT}
+                prompt {Flag entire bolo bad if DC step is found}
+                ppath GLOBAL CURRENT
+                default TRUE
+                helpkey *
+            }
+
+            parameter dcbox {
+                type _INTEGER
+                vpath {DEFAULT}
+                prompt {Size of box (samples) to measure means for DC step-finding}
+                default 0
+                helpkey *
+            }
+
+            parameter dcthresh {
+                type _DOUBLE
+                vpath {DEFAULT}
+                prompt {N-sigma threshold for DC step repair}
+                default 150
+                helpkey *
+            }
+
+            parameter dkclean {
+                type _LOGICAL
+                vpath {DEFAULT }
+                prompt {Fit and remove dark squid signals}
+                ppath GLOBAL CURRENT
+                default FALSE
+                helpkey *
+            }
+
+            parameter filt_edgehigh {
+                type _DOUBLE
+                vpath {DEFAULT}
+                prompt {Frequency [Hz] of hard high-pass filter}
+                default 0
+                helpkey *
+            }
+
+            parameter filt_edgelow {
+                type _DOUBLE
+                vpath {DEFAULT}
+                prompt {Frequency [Hz] of hard low-pass filter}
+                default 0
+                helpkey *
+            }
+
+            parameter filt_notchhigh {
+                type _DOUBLE
+                vpath {DEFAULT}
+                prompt {Array of upper-frequency edges [Hz] for notch filters}
+                default 0
+                helpkey *
+            }
+
+            parameter filt_notchlow {
+                type _DOUBLE
+                vpath {DEFAULT}
+                prompt {Array of lower-frequency edges [Hz] for notch filters}
+                default 0
+                helpkey *
+            }
+
+            parameter flagstat {
+                type _DOUBLE
+                vpath {DEFAULT}
+                prompt {Threshold slew velocity [arcsec/sec] to flag stationary}
+                default 0
+                helpkey *
+            }
+
+            parameter in {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT }
+                association <-GLOBAL.DATA_ARRAY
+                prompt {Input timeseries}
+                helpkey *
+            }
+
+            parameter order {
+                type _INTEGER
+                vpath {DEFAULT}
+                prompt {Remove baseline polynomial of order}
+                default -1
+                helpkey *
+            }
+
+            parameter out {
+                position 2
+                type NDF
+                access WRITE
+                vpath {PROMPT }
+                association ->GLOBAL.DATA_ARRAY
+                prompt {Cleaned timeseries}
+                helpkey *
+            }
+
+            parameter outfiles {
+                type LITERAL
+                prompt {Text file in which to put the output NDF names}
+                default !
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                helpkey *
+            }
+
+            parameter spikeiter {
+                type _INTEGER
+                vpath {DEFAULT}
+                prompt {Number of iterations for spike-finder (0=until converge)}
+                default 0
+                helpkey *
+            }
+
+            parameter spikethresh {
+                type _DOUBLE
+                vpath {DEFAULT}
+                prompt {N-sigma threshold for spike-flagger}
+                default 0
+                helpkey *
+            }
+
+        }
+
+        action sc2concat {
 
             helplib {$SMURF_HELP}
+
+            parameter in {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT }
+                ppath GLOBAL CURRENT
+                association <-GLOBAL.DATA_ARRAY
+                prompt {Input NDF data structure}
+                helpkey *
+            }
+
+            parameter maxlen {
+                type _DOUBLE
+                access READ
+                ppath CURRENT DEFAULT
+                prompt {Maximum concatenated length in seconds}
+                vpath DEFAULT
+                default !
+                helpkey *
+            }
+
+            parameter out {
+                position 2
+                type NDF
+                access WRITE
+                ppath CURRENT
+                default {'./\*_con'}
+                association ->GLOBAL.DATA_ARRAY
+                prompt {Output NDF data structure}
+                helpkey *
+            }
+
+            parameter outfiles {
+                type LITERAL
+                prompt {Text file in which to put the output NDF names}
+                default !
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                helpkey *
+            }
+
+            parameter padend {
+                type _INTEGER
+                access READ
+                ppath CURRENT DEFAULT
+                prompt {Number of samples to pad at start}
+                vpath DEFAULT
+                default !
+                helpkey *
+            }
+
+            parameter padstart {
+                type _INTEGER
+                access READ
+                ppath CURRENT DEFAULT
+                prompt {Number of samples to pad at end}
+                vpath DEFAULT
+                default !
+                helpkey *
+            }
+
+        }
+
+        action sc2fft {
+
+            helplib {$SMURF_HELP}
+
+            parameter in {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT }
+                ppath GLOBAL CURRENT
+                association <-GLOBAL.DATA_ARRAY
+                prompt {Input NDF data structure}
+                helpkey *
+            }
+
+            parameter inverse {
+                type _LOGICAL
+                vpath {DEFAULT }
+                prompt {Perform inverse transformation if set}
+                ppath GLOBAL CURRENT
+                default FALSE
+                helpkey *
+            }
+
+            parameter out {
+                position 2
+                type NDF
+                access WRITE
+                vpath {PROMPT }
+                ppath GLOBAL CURRENT
+                association ->GLOBAL.DATA_ARRAY
+                prompt {Output NDF data structure}
+                helpkey *
+            }
+
+            parameter outfiles {
+                type LITERAL
+                prompt {Text file in which to put the output NDF names}
+                default !
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                helpkey *
+            }
+
+            parameter polar {
+                type _LOGICAL
+                vpath {DEFAULT }
+                prompt {Use polar instead of cartesian representation of FFT?}
+                ppath GLOBAL CURRENT
+                default FALSE
+                helpkey *
+            }
+
+            parameter power {
+                type _LOGICAL
+                vpath {DEFAULT }
+                prompt {Calculate power spectrum (in polar coordinates)?}
+                ppath GLOBAL CURRENT
+                default FALSE
+                helpkey *
+            }
+
+        }
+
+        action sc2fts {
+            helplib {$SMURF_HELP}
+
+            parameter in {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT }
+                ppath GLOBAL CURRENT
+                prompt {Input data files}
+                helpkey *
+            }
+
+            parameter out {
+                position 2
+                type NDF
+                access WRITE
+                vpath {PROMPT }
+                ppath GLOBAL CURRENT
+                prompt {Output data file}
+                helpkey *
+            }
+
+            parameter parslist {
+                position 3
+                type _CHAR
+                vpath {PROMPT }
+                prompt {Parameter list: eg. op1.key1=value1, op2.key2=value2, ...}
+                helpkey *
+            }
+
+        }
+
+        action sc2sim {
+
+            helplib {$SMURF_HELP}
+
+            parameter badbol {
+                type _CHAR
+                access READ
+                vpath {DEFAULT }
+                default !
+                prompt {ARD Description File for Bad Bolometer mask}
+                ppath GLOBAL CURRENT
+                helpkey *
+            }
+
+            parameter maxwrite {
+                position 4
+                type _INTEGER
+                prompt {Number of samples to write in output file}
+                vpath DEFAULT
+                default 12000
+                ppath GLOBAL CURRENT
+                helpkey *
+            }
 
             parameter obspar {
                 position 1
                 type _CHAR
-                prompt {Observation file}
+                prompt {Observation parameters}
                 vpath {PROMPT}
                 ppath GLOBAL CURRENT
+                helpkey *
+            }
+
+            parameter overwrite {
+                position 5
+                type _LOGICAL
+                prompt {Overwrite existing files?}
+                vpath DEFAULT
+                default TRUE
+                ppath CURRENT
+                helpkey *
+            }
+
+            parameter seed {
+                position 3
+                type _INTEGER
+                vpath DEFAULT
+                default !
                 helpkey *
             }
 
             parameter simpar {
                 position 2
                 type _CHAR
-                prompt {Simulation file}
+                prompt {Simulation parameters}
                 vpath {PROMPT}
                 ppath GLOBAL CURRENT
                 helpkey *
             }
 
-            parameter seed {
-                position 3
-                type _INTEGER
+            parameter simstats {
+                position 6
+                type _LOGICAL
+                prompt {Report simulation statistics only?}
                 vpath DEFAULT
+                default FALSE
+                ppath CURRENT
+                helpkey *
+            }
+
+            parameter simtype {
+                position 7
+                type _CHAR
+                prompt {Simulation type (FULL or WEIGHTS)}
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
+                helpkey *
+            }
+
+        }
+
+        action sc2threadtest {
+
+            helplib {$SMURF_HELP}
+
+            parameter nchunks {
+                type _INTEGER
+                vpath  {DEFAULT}
+                prompt {Number of time chunks}
+                default 2
+                helpkey *
+            }
+
+            parameter nsub {
+                type _INTEGER
+                vpath  {DEFAULT}
+                prompt {Number of subarrays}
+                default 4
+                helpkey *
+            }
+
+            parameter nthread {
+                type _INTEGER
+                vpath  {DEFAULT}
+                prompt {Number of threads to use}
+                default 2
+                helpkey *
+            }
+
+            parameter tsteps {
+                type _INTEGER
+                vpath  {DEFAULT}
+                prompt {Number of time samples in simulated data chunk}
+                default 6000
+                helpkey *
+            }
+
+        }
+
+        action scanfit {
+
+            helplib {$SMURF_HELP}
+
+            parameter bpm {
+                type NDF
+                access READ
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Bad pixel masks}
                 default !
                 helpkey *
             }
+
+            parameter in {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT }
+                association <-GLOBAL.DATA_ARRAY
+                prompt {Input timeseries}
+                helpkey *
+            }
+
+            parameter order {
+                position 3
+                type INTEGER
+                prompt {Polynomial order}
+                helpkey *
+            }
+
+            parameter out {
+                position 2
+                type NDF
+                access WRITE
+                vpath {PROMPT }
+                association ->GLOBAL.DATA_ARRAY
+                prompt {Scanfit timeseries}
+                helpkey *
+            }
+
+            parameter outfiles {
+                type LITERAL
+                prompt {Text file in which to put the output NDF names}
+                default !
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                helpkey *
+            }
+
+        }
+
+        action skynoise {
+
+            helplib {$SMURF_HELP}
 
             parameter exponent {
                 position 4
@@ -2203,11 +2247,202 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-            parameter msg_filter {
+            parameter obspar {
+                position 1
                 type _CHAR
-                prompt {Message level}
+                prompt {Observation file}
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
+                helpkey *
+            }
+
+            parameter seed {
+                position 3
+                type _INTEGER
                 vpath DEFAULT
                 default !
+                helpkey *
+            }
+
+            parameter simpar {
+                position 2
+                type _CHAR
+                prompt {Simulation file}
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
+                helpkey *
+            }
+
+        }
+
+        action smurfcopy {
+
+            helplib {$SMURF_HELP}
+
+            parameter in {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT }
+                association <-GLOBAL.DATA_ARRAY
+                prompt {Input timeseries}
+                helpkey *
+            }
+
+            parameter out {
+                position 2
+                type NDF
+                access WRITE
+                vpath {PROMPT }
+                association ->GLOBAL.DATA_ARRAY
+                prompt {Output filename}
+                helpkey *
+            }
+
+            parameter outfiles {
+                type LITERAL
+                prompt {Text file in which to put the output NDF names}
+                default !
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                helpkey *
+            }
+
+            parameter slice {
+                position 3
+                type _INTEGER
+                access READ
+                ppath  DYNAMIC CURRENT
+                prompt {Index of time slice to extract (0 for last)}
+                helpkey *
+            }
+
+        }
+
+        action smurfhelp {
+            alias {smurfh(elp)}
+
+            helplib {$SMURF_HELP}
+
+            parameter subtopic {
+                position 2
+                type LITERAL
+                access READ
+                vpath DEFAULT
+                prompt {Help subtopic}
+                default {         }
+                helpkey *
+            }
+
+            parameter subsubtopic {
+                position 3
+                type LITERAL
+                access READ
+                vpath DEFAULT
+                prompt {Help subsubtopic}
+                default {         }
+                helpkey *
+            }
+
+            parameter subsubsubtopic {
+                position 4
+                type LITERAL
+                access READ
+                vpath DEFAULT
+                prompt {Help subsubsubtopic}
+                default {         }
+                helpkey *
+            }
+
+            parameter topic {
+                position 1
+                type LITERAL
+                access READ
+                vpath DEFAULT
+                prompt {Help topic}
+                default {         }
+                helpkey *
+            }
+
+        }
+
+        action stackframes {
+
+            helplib {$SMURF_HELP}
+
+            parameter in {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT }
+                association <-GLOBAL.DATA_ARRAY
+                prompt {Input processed 2d frames}
+                helpkey *
+            }
+
+            parameter out {
+                position 2
+                type NDF
+                access WRITE
+                vpath {PROMPT }
+                association ->GLOBAL.DATA_ARRAY
+                prompt {Stacked frames}
+                helpkey *
+            }
+
+        }
+
+        action starecalc {
+
+            helplib {$SMURF_HELP}
+
+            parameter bpm {
+                type NDF
+                access READ
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Bad pixel masks}
+                default !
+                helpkey *
+            }
+
+            parameter in {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT }
+                ppath GLOBAL CURRENT
+                association <-GLOBAL.DATA_ARRAY
+                prompt {Input data file(s)}
+                helpkey *
+            }
+
+            parameter naver {
+                type _INTEGER
+                prompt {Number of samples to average together to produce an image}
+                vpath DEFAULT
+                default !
+                ppath GLOBAL CURRENT
+                helpkey *
+            }
+
+            parameter out {
+                position 2
+                type NDF
+                access WRITE
+                vpath {PROMPT }
+                ppath GLOBAL CURRENT
+                association ->GLOBAL.DATA_ARRAY
+                prompt {Output data file(s)}
+                helpkey *
+            }
+
+            parameter outfiles {
+                type LITERAL
+                prompt {Text file in which to put the output NDF names}
+                default !
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
                 helpkey *
             }
 
@@ -2271,14 +2506,6 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-            parameter msg_filter {
-                type _CHAR
-                prompt {Message level}
-                default !
-                vpath DEFAULT
-                helpkey *
-            }
-
             parameter nout {
                 type _INTEGER
                 access WRITE
@@ -2317,525 +2544,78 @@ package @PACKAGE@ {
 
         }
 
-        action gsd2acsis {
+        action unmakecube {
+
             helplib {$SMURF_HELP}
 
-            parameter in {
-                position 1
-                type _CHAR
-                access READ
-                vpath {PROMPT }
-                prompt {Input DAS or AOSC GSD File}
-                ppath GLOBAL CURRENT
-                helpkey *
-            }
-
-            parameter directory {
-                position 2
-                type _CHAR
-                access WRITE
-                vpath {PROMPT }
-                association ->GLOBAL.DATA_ARRAY
-                prompt {Output Directory}
-                ppath GLOBAL CURRENT
-                helpkey *
-            }
-
-            parameter obsnum {
-                position 3
-                type _INTEGER
-                access WRITE
-                vpath {PROMPT }
-                association ->GLOBAL.DATA_ARRAY
-                prompt {Observation Number}
-                ppath GLOBAL CURRENT
-                helpkey *
-            }
-
-            parameter msg_filter {
-                type _CHAR
-                prompt {Message level}
-                vpath DEFAULT
-                default !
-                helpkey *
-            }
-        }
-
-        action sc2test {
-            parameter in {
-                position 1
-                type NDF
-                access READ
-                vpath {PROMPT }
-                ppath GLOBAL CURRENT
-                association <-GLOBAL.DATA_ARRAY
-                prompt {Input NDF data structure}
-                helpkey *
-            }
-            parameter msg_filter {
-                type _CHAR
-                prompt {Message level}
-                default !
-                vpath DEFAULT
-                helpkey *
-            }
-        }
-
-        action sc2fts {
-            helplib {$SMURF_HELP}
-
-            parameter in {
-                position 1
-                type NDF
-                access READ
-                vpath {PROMPT }
-                ppath GLOBAL CURRENT
-                prompt {Input data files}
-                helpkey *
-            }
-            parameter out {
-                position 2
-                type NDF
-                access WRITE
-                vpath {PROMPT }
-                ppath GLOBAL CURRENT
-                prompt {Output data file}
-                helpkey *
-            }
-            parameter parslist {
-                position 3
-                type _CHAR
-                vpath {PROMPT }
-                prompt {Parameter list: eg. op1.key1=value1, op2.key2=value2, ...}
-                helpkey *
-            }
-            parameter msg_filter {
-                type _CHAR
-                prompt {Message level}
-                default !
-                vpath DEFAULT
-                helpkey *
-            }
-        }
-
-        action sc2clean {
-            helplib {$SMURF_HELP}
-
-            parameter in {
-                position 1
-                type NDF
-                access READ
-                vpath {PROMPT }
-                association <-GLOBAL.DATA_ARRAY
-                prompt {Input timeseries}
-                helpkey *
-            }
-            parameter out {
-                position 2
-                type NDF
-                access WRITE
-                vpath {PROMPT }
-                association ->GLOBAL.DATA_ARRAY
-                prompt {Cleaned timeseries}
-                helpkey *
-            }
-            parameter outfiles {
+            parameter detectors {
                 type LITERAL
-                prompt {Text file in which to put the output NDF names}
-                default !
+                access READ
                 vpath DEFAULT
                 ppath CURRENT DEFAULT
+                prompt {Names of detectors to be included}
+                default !
                 helpkey *
             }
-            parameter apod {
-                type _INTEGER
-                vpath {DEFAULT}
-                prompt {Number of samples over which to apodize}
-                default 0
-                helpkey *
-            }
-            parameter badfrac {
-                type _DOUBLE
-                vpath {DEFAULT}
-                prompt {Fraction of bad samples to flag entire bolo bad}
-                default 0.0
-                helpkey *
-            }
-            parameter dcthresh {
-                type _DOUBLE
-                vpath {DEFAULT}
-                prompt {N-sigma threshold for DC step repair}
-                default 150
-                helpkey *
-            }
-            parameter dcbox {
-                type _INTEGER
-                vpath {DEFAULT}
-                prompt {Size of box (samples) to measure means for DC step-finding}
-                default 0
-                helpkey *
-            }
-            parameter dcbad {
-                type _LOGICAL
-                vpath {DEFAULT}
-                prompt {Flag entire bolo bad if DC step is found}
+
+            parameter in {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT }
                 ppath GLOBAL CURRENT
+                association <-GLOBAL.DATA_ARRAY
+                prompt {Input sky cubes}
+                helpkey *
+            }
+
+            parameter interp {
+                type LITERAL
+                vpath DEFAULT
+                ppath DEFAULT
+                prompt {Pixel interpolation method}
+                helpkey *
+                default {Nearest}
+            }
+
+            parameter out {
+                position 3
+                type NDF
+                access WRITE
+                vpath {PROMPT }
+                association ->GLOBAL.DATA_ARRAY
+                prompt {Output time series cubes}
+                helpkey *
+            }
+
+            parameter params {
+                size *
+                type _DOUBLE
+                vpath PROMPT
+                ppath CURRENT
+                prompt {Auxiliary interpolation parameters}
+                helpkey *
+            }
+
+            parameter ref {
+                position 2
+                type NDF
+                access READ
+                vpath PROMPT
+                ppath CURRENT
+                prompt {Template time series cubes}
+                helpkey *
+            }
+
+            parameter usedetpos {
+                type _LOGICAL
+                vpath DEFAULT
+                ppath CURRENT
+                prompt {Read detector positions from the input NDF?}
                 default TRUE
                 helpkey *
             }
-            parameter dkclean {
-                type _LOGICAL
-                vpath {DEFAULT }
-                prompt {Fit and remove dark squid signals}
-                ppath GLOBAL CURRENT
-                default FALSE
-                helpkey *
-            }
-            parameter filt_edgehigh {
-                type _DOUBLE
-                vpath {DEFAULT}
-                prompt {Frequency [Hz] of hard high-pass filter}
-                default 0
-                helpkey *
-            }
-            parameter filt_edgelow {
-                type _DOUBLE
-                vpath {DEFAULT}
-                prompt {Frequency [Hz] of hard low-pass filter}
-                default 0
-                helpkey *
-            }
-            parameter filt_notchhigh {
-                type _DOUBLE
-                vpath {DEFAULT}
-                prompt {Array of upper-frequency edges [Hz] for notch filters}
-                default 0
-                helpkey *
-            }
-            parameter filt_notchlow {
-                type _DOUBLE
-                vpath {DEFAULT}
-                prompt {Array of lower-frequency edges [Hz] for notch filters}
-                default 0
-                helpkey *
-            }
-            parameter flagstat {
-                type _DOUBLE
-                vpath {DEFAULT}
-                prompt {Threshold slew velocity [arcsec/sec] to flag stationary}
-                default 0
-                helpkey *
-            }
-            parameter order {
-                type _INTEGER
-                vpath {DEFAULT}
-                prompt {Remove baseline polynomial of order}
-                default -1
-                helpkey *
-            }
-            parameter spikethresh {
-                type _DOUBLE
-                vpath {DEFAULT}
-                prompt {N-sigma threshold for spike-flagger}
-                default 0
-                helpkey *
-            }
-            parameter spikeiter {
-                type _INTEGER
-                vpath {DEFAULT}
-                prompt {Number of iterations for spike-finder (0=until converge)}
-                default 0
-                helpkey *
-            }
-            parameter msg_filter {
-                type _CHAR
-                prompt {Message level}
-                default !
-                vpath DEFAULT
-                helpkey *
-            }
-        }
 
-        action gsdshow {
-            helplib {$SMURF_HELP}
-
-            parameter in {
-                position 1
-                type _CHAR
-                access READ
-                vpath {PROMPT }
-                prompt {Input DAS or AOSC GSD File}
-                ppath GLOBAL CURRENT
-                helpkey *
-            }
-
-            parameter descriptions {
-                position 2
-                type _LOGICAL
-                prompt {Show descriptions?}
-                ppath DEFAULT CURRENT
-                default FALSE
-                helpkey *
-            }
-
-            parameter showdata {
-                position 3
-                type _LOGICAL
-                prompt {Print out data array?}
-                ppath DEFAULT CURRENT
-                default FALSE
-                helpkey *
-            }
-
-            parameter msg_filter {
-                type _CHAR
-                prompt {Message level}
-                vpath DEFAULT
-                default !
-                helpkey *
-            }
-        }
-
-        action sc2concat {
-
-            helplib {$SMURF_HELP}
-
-            parameter in {
-                position 1
-                type NDF
-                access READ
-                vpath {PROMPT }
-                ppath GLOBAL CURRENT
-                association <-GLOBAL.DATA_ARRAY
-                prompt {Input NDF data structure}
-                helpkey *
-            }
-
-            parameter out {
-                position 2
-                type NDF
-                access WRITE
-                ppath CURRENT
-                default {'./\*_con'}
-                association ->GLOBAL.DATA_ARRAY
-                prompt {Output NDF data structure}
-                helpkey *
-            }
-
-            parameter outfiles {
-                type LITERAL
-                prompt {Text file in which to put the output NDF names}
-                default !
-                vpath DEFAULT
-                ppath CURRENT DEFAULT
-                helpkey *
-            }
-
-            parameter maxlen {
-                type _DOUBLE
-                access READ
-                ppath CURRENT DEFAULT
-                prompt {Maximum concatenated length in seconds}
-                vpath DEFAULT
-                default !
-                helpkey *
-            }
-
-            parameter padend {
-                type _INTEGER
-                access READ
-                ppath CURRENT DEFAULT
-                prompt {Number of samples to pad at start}
-                vpath DEFAULT
-                default !
-                helpkey *
-            }
-
-            parameter padstart {
-                type _INTEGER
-                access READ
-                ppath CURRENT DEFAULT
-                prompt {Number of samples to pad at end}
-                vpath DEFAULT
-                default !
-                helpkey *
-            }
-
-            parameter msg_filter {
-                type _CHAR
-                prompt {Message level}
-                default !
-                vpath DEFAULT
-                helpkey *
-            }
-        }
-
-        action sc2fft {
-
-            helplib {$SMURF_HELP}
-
-            parameter in {
-                position 1
-                type NDF
-                access READ
-                vpath {PROMPT }
-                ppath GLOBAL CURRENT
-                association <-GLOBAL.DATA_ARRAY
-                prompt {Input NDF data structure}
-                helpkey *
-            }
-
-            parameter out {
-                position 2
-                type NDF
-                access WRITE
-                vpath {PROMPT }
-                ppath GLOBAL CURRENT
-                association ->GLOBAL.DATA_ARRAY
-                prompt {Output NDF data structure}
-                helpkey *
-            }
-
-            parameter outfiles {
-                type LITERAL
-                prompt {Text file in which to put the output NDF names}
-                default !
-                vpath DEFAULT
-                ppath CURRENT DEFAULT
-                helpkey *
-            }
-
-            parameter inverse {
-                type _LOGICAL
-                vpath {DEFAULT }
-                prompt {Perform inverse transformation if set}
-                ppath GLOBAL CURRENT
-                default FALSE
-                helpkey *
-            }
-
-            parameter polar {
-                type _LOGICAL
-                vpath {DEFAULT }
-                prompt {Use polar instead of cartesian representation of FFT?}
-                ppath GLOBAL CURRENT
-                default FALSE
-                helpkey *
-            }
-
-            parameter power {
-                type _LOGICAL
-                vpath {DEFAULT }
-                prompt {Calculate power spectrum (in polar coordinates)?}
-                ppath GLOBAL CURRENT
-                default FALSE
-                helpkey *
-            }
-
-            parameter msg_filter {
-                type _CHAR
-                prompt {Message level}
-                default !
-                vpath DEFAULT
-                helpkey *
-            }
-        }
-
-        action smurfcopy {
-
-            helplib {$SMURF_HELP}
-
-            parameter in {
-                position 1
-                type NDF
-                access READ
-                vpath {PROMPT }
-                association <-GLOBAL.DATA_ARRAY
-                prompt {Input timeseries}
-                helpkey *
-            }
-
-            parameter out {
-                position 2
-                type NDF
-                access WRITE
-                vpath {PROMPT }
-                association ->GLOBAL.DATA_ARRAY
-                prompt {Output filename}
-                helpkey *
-            }
-
-            parameter outfiles {
-                type LITERAL
-                prompt {Text file in which to put the output NDF names}
-                default !
-                vpath DEFAULT
-                ppath CURRENT DEFAULT
-                helpkey *
-            }
-
-            parameter slice {
-                position 3
-                type _INTEGER
-                access READ
-                ppath  DYNAMIC CURRENT
-                prompt {Index of time slice to extract (0 for last)}
-                helpkey *
-            }
-
-            parameter msg_filter {
-                type _CHAR
-                prompt {Message level}
-                default !
-                vpath DEFAULT
-                helpkey *
-            }
-        }
-
-        action sc2threadtest {
-
-            helplib {$SMURF_HELP}
-
-            parameter nthread {
-                type _INTEGER
-                vpath  {DEFAULT}
-                prompt {Number of threads to use}
-                default 2
-                helpkey *
-            }
-
-            parameter tsteps {
-                type _INTEGER
-                vpath  {DEFAULT}
-                prompt {Number of time samples in simulated data chunk}
-                default 6000
-                helpkey *
-            }
-
-            parameter nchunks {
-                type _INTEGER
-                vpath  {DEFAULT}
-                prompt {Number of time chunks}
-                default 2
-                helpkey *
-            }
-
-
-            parameter nsub {
-                type _INTEGER
-                vpath  {DEFAULT}
-                prompt {Number of subarrays}
-                default 4
-                helpkey *
-            }
-
-            parameter msg_filter {
-                type _CHAR
-                prompt {Message level}
-                default !
-                vpath DEFAULT
-                helpkey *
-            }
         }
 
     }

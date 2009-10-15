@@ -121,6 +121,8 @@
 *        Add RAWFIXMETA
 *     2009-09-27 (TIMJ):
 *        Add STACKFRAMES
+*     2009-10-14 (TIMJ):
+*        Alphabetize call to tasks.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -222,56 +224,8 @@ void smurf_mon( int * status ) {
   ndfHappn( appname, status );
 
   /* Call the subroutine associated with the requested task */
-  if (strcmp( taskname, "EXTINCTION" ) == 0 ) {
+  if (strcmp( taskname, "BADBOLOS" ) == 0 ) {
     smurf_extinction( status );
-  } else if (strcmp( taskname, "FLATFIELD" ) == 0 ) {
-    smurf_flatfield( status );
-  } else if (strcmp( taskname, "MAKEMAP" ) == 0 ) {
-    smurf_makemap( status );
-  } else if (strcmp( taskname, "QLMAKEMAP" ) == 0 ) {
-    smurf_qlmakemap( status );
-  } else if (strcmp( taskname, "MAKECUBE" ) == 0 ) {
-    smurf_makecube( status );
-  } else if (strcmp( taskname, "UNMAKECUBE" ) == 0 ) {
-    smurf_unmakecube( status );
-  } else if (strcmp( taskname, "REMSKY" ) == 0 ) {
-    smurf_remsky( status );
-  } else if (strcmp( taskname, "SCANFIT" ) == 0 ) {
-    smurf_scanfit( status );
-  } else if (strcmp( taskname, "SC2SIM" ) == 0 ) {
-    smurf_sc2sim( status );
-  } else if (strcmp( taskname, "DREAMSOLVE" ) == 0 ) {
-    smurf_dreamsolve( status );
-  } else if (strcmp( taskname, "DREAMWEIGHTS" ) == 0 ) {
-    smurf_dreamweights( status );
-  } else if (strcmp( taskname, "IMPAZTEC" ) == 0 ) {
-    smurf_impaztec( status );
-  } else if (strcmp( taskname, "BADBOLOS" ) == 0 ) {
-    smurf_badbolos( status );
-  } else if (strcmp( taskname, "SKYNOISE" ) == 0 ) {
-    smurf_skynoise( status );
-  } else if (strcmp( taskname, "STARECALC" ) == 0 ) {
-    smurf_starecalc( status );
-  } else if (strcmp( taskname, "SMURFHELP" ) == 0 ) {
-    smurf_help( status );
-  } else if (strcmp( taskname, "RAWUNPRESS" ) == 0 ) {
-    smurf_rawunpress( status );
-  } else if (strcmp( taskname, "TIMESORT" ) == 0 ) {
-    smurf_timesort( status );
-  } else if (strcmp( taskname, "GSD2ACSIS" ) == 0 ) {
-    smurf_gsd2acsis( status );
-  } else if (strcmp( taskname, "SC2FTS" ) == 0 ) {
-    smurf_sc2fts( status );
-  } else if (strcmp( taskname, "SC2CLEAN" ) == 0 ) {
-    smurf_sc2clean( status );
-  } else if (strcmp( taskname, "GSDSHOW" ) == 0 ) {
-    smurf_gsdshow( status );
-  } else if (strcmp( taskname, "SC2CONCAT" ) == 0 ) {
-    smurf_sc2concat( status );
-  } else if (strcmp( taskname, "SC2FFT" ) == 0 ) {
-    smurf_sc2fft( status );
-  } else if (strcmp( taskname, "SMURFCOPY" ) == 0 ) {
-    smurf_smurfcopy( status );
   } else if (strcmp( taskname, "CALCDARK" ) == 0 ) {
     smurf_calcdark( status );
   } else if (strcmp( taskname, "CALCFLAT" ) == 0 ) {
@@ -282,12 +236,60 @@ void smurf_mon( int * status ) {
     smurf_calcresp( status );
   } else if (strcmp( taskname, "COPYFLAT" ) == 0 ) {
     smurf_copyflat( status );
+  } else if (strcmp( taskname, "DREAMSOLVE" ) == 0 ) {
+    smurf_dreamsolve( status );
+  } else if (strcmp( taskname, "DREAMWEIGHTS" ) == 0 ) {
+    smurf_dreamweights( status );
+  } else if (strcmp( taskname, "EXTINCTION" ) == 0 ) {
+    smurf_extinction( status );
+  } else if (strcmp( taskname, "FLATFIELD" ) == 0 ) {
+    smurf_flatfield( status );
+  } else if (strcmp( taskname, "GSD2ACSIS" ) == 0 ) {
+    smurf_gsd2acsis( status );
+  } else if (strcmp( taskname, "GSDSHOW" ) == 0 ) {
+    smurf_gsdshow( status );
+  } else if (strcmp( taskname, "IMPAZTEC" ) == 0 ) {
+    smurf_impaztec( status );
+  } else if (strcmp( taskname, "MAKECUBE" ) == 0 ) {
+    smurf_makecube( status );
+  } else if (strcmp( taskname, "MAKEMAP" ) == 0 ) {
+    smurf_makemap( status );
+  } else if (strcmp( taskname, "QLMAKEMAP" ) == 0 ) {
+    smurf_qlmakemap( status );
   } else if (strcmp( taskname, "RAWFIXMETA" ) == 0 ) {
     smurf_rawfixmeta( status );
-  } else if (strcmp( taskname, "STACKFRAMES" ) == 0 ) {
-    smurf_stackframes( status );
+  } else if (strcmp( taskname, "RAWUNPRESS" ) == 0 ) {
+    smurf_rawunpress( status );
+  } else if (strcmp( taskname, "REMSKY" ) == 0 ) {
+    smurf_remsky( status );
+  } else if (strcmp( taskname, "SC2CLEAN" ) == 0 ) {
+    smurf_sc2clean( status );
+  } else if (strcmp( taskname, "SC2CONCAT" ) == 0 ) {
+    smurf_sc2concat( status );
+  } else if (strcmp( taskname, "SC2FFT" ) == 0 ) {
+    smurf_sc2fft( status );
+  } else if (strcmp( taskname, "SC2FTS" ) == 0 ) {
+    smurf_sc2fts( status );
+  } else if (strcmp( taskname, "SC2SIM" ) == 0 ) {
+    smurf_sc2sim( status );
   } else if (strcmp( taskname, "SC2THREADTEST" ) == 0 ) {
     smurf_sc2threadtest( status );
+  } else if (strcmp( taskname, "SCANFIT" ) == 0 ) {
+    smurf_scanfit( status );
+  } else if (strcmp( taskname, "SKYNOISE" ) == 0 ) {
+    smurf_skynoise( status );
+  } else if (strcmp( taskname, "SMURFCOPY" ) == 0 ) {
+    smurf_smurfcopy( status );
+  } else if (strcmp( taskname, "SMURFHELP" ) == 0 ) {
+    smurf_help( status );
+  } else if (strcmp( taskname, "STACKFRAMES" ) == 0 ) {
+    smurf_stackframes( status );
+  } else if (strcmp( taskname, "STARECALC" ) == 0 ) {
+    smurf_starecalc( status );
+  } else if (strcmp( taskname, "TIMESORT" ) == 0 ) {
+    smurf_timesort( status );
+  } else if (strcmp( taskname, "UNMAKECUBE" ) == 0 ) {
+    smurf_unmakecube( status );
   } else {
     *status = SAI__ERROR;
     msgSetc( "TASK", taskname );

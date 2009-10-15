@@ -20,11 +20,40 @@ jcmtincludedir = $(includedir)/jcmt
 jcmtinclude_HEADERS = jcmt/state.h
 
 # Tasks
-smurf_mon_TASKS = extinction flatfield makemap remsky qlmakemap scanfit \
-	sc2sim dreamsolve makecube unmakecube impaztec dreamweights badbolos \
-	skynoise starecalc smurfhelp rawunpress timesort gsd2acsis sc2fts \
-  sc2clean gsdshow sc2concat sc2fft smurfcopy calcdark calcflat calcresp \
-	sc2threadtest rawfixmeta stackframes calcnoise copyflat
+smurf_mon_TASKS = \
+badbolos \
+calcdark \
+calcflat \
+calcnoise \
+calcresp \
+copyflat \
+dreamsolve \
+dreamweights \
+extinction \
+flatfield \
+gsd2acsis \
+gsdshow \
+impaztec \
+makecube \
+makemap \
+qlmakemap \
+rawfixmeta \
+rawunpress \
+remsky \
+sc2clean \
+sc2concat \
+sc2fft \
+sc2fts \
+sc2sim \
+sc2threadtest \
+scanfit \
+skynoise \
+smurfcopy \
+smurfhelp \
+stackframes \
+starecalc \
+timesort \
+unmakecube
 
 # These files are not built inside a subdir because they are in CVS
 # under an alternate build system that SMURF can not modify.
