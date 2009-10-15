@@ -185,6 +185,9 @@
 *        the Y axis Symbol attribute rather than the NDF label. This is 
 *        because the Symbol attribute is used as a column name and so 
 *        needs to be short and include no spaces.
+*     15-OCT-2009 (DSB):
+*        Extract code that sets axis attribute to describe an NDF array
+*        component into a new routine (KPG1_SAXAT).
 *     {enter_further_changes_here}
 
 *-
@@ -197,13 +200,6 @@
       INCLUDE 'AST_PAR'          ! AST constants 
       INCLUDE 'AST_ERR'          ! AST error constants 
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
-
-*  Local Constants:
-      CHARACTER BCKSLH*1         ! A single backslash
-*  Some compilers need '\\' to get '\', which isn't a problem as Fortran
-*  will truncate the string '\\' to '\' on the occasions when that isn't
-*  needed.
-      PARAMETER( BCKSLH = '\\' )    
 
 *  Arguments Given:
       INTEGER INDF
@@ -228,7 +224,6 @@
 
 *  Local Variables:
       CHARACTER ATTR*20          ! Attribute name
-      CHARACTER LAB*80           ! Label text string
       CHARACTER TEXT*100         ! General text string
       CHARACTER UNIT*100         ! Unit attribute value
       DOUBLE PRECISION C         ! Offset of fit
@@ -597,18 +592,7 @@
      :                      2, AXES, TMAP, STATUS ) 
 
 *  Set the label, symbol and units for the data axis (axis 2).
-      TEXT = ' '
-      IAT = 0
-      CALL CHR_APPND( MCOMP, TEXT, IAT )
-      CALL CHR_UCASE( TEXT )
-      CALL AST_SETC( WWGOT, 'SYMBOL(2)', TEXT( : IAT ), STATUS )
-
-      IAT = IAT + 1
-      CALL CHR_APPND( 'value', TEXT, IAT )
-      CALL AST_SETC( WWGOT, 'LABEL(2)', TEXT( : IAT ), STATUS )
-      IF( DUNIT .NE. ' ' ) CALL AST_SETC( WWGOT, 'UNIT(2)', 
-     :                                    DUNIT( : CHR_LEN( DUNIT ) ),
-     :                                    STATUS )
+      CALL KPG1_SAXAT( INDF, MCOMP, 2, .FALSE., WWGOT, STATUS )
 
 *  Clear the Domain and Title values which will have been inherited from the
 *  supplied FrameSet.
@@ -729,57 +713,9 @@
       CALL AST_ANNUL( FR1, STATUS )
       CALL AST_ANNUL( FR2, STATUS )
 
-*  Get the Label component from the NDF, use a default equal to 
-*  "<MCOMP> value" where MCOMP is the name of the NDF component.
-      LAB = MCOMP
-      CALL NDF_CGET( INDF, 'LABEL', LAB, STATUS )
-
 *  Set the label, symbol and units for the data axis (axis 2).
-      IF( YMAP .EQ. 'VALUELOG' ) THEN
-         TEXT = ' '
-         IAT = 0
-         CALL CHR_APPND( 'Log'//BCKSLH//'d10'//BCKSLH//'u(', TEXT, IAT )
-         CALL CHR_APPND( MCOMP, TEXT, IAT )
-         CALL CHR_APPND( ')', TEXT, IAT )
-         CALL AST_SETC( WWWANT, 'SYMBOL(2)', TEXT( : IAT ), STATUS )
-
-         TEXT = ' '
-         IAT = 0
-         CALL CHR_APPND( 'Log'//BCKSLH//'d10'//BCKSLH//'u(', TEXT, IAT )
-         CALL CHR_APPND( LAB, TEXT, IAT )
-         CALL CHR_APPND( ')', TEXT, IAT )
-         IF( LAB .EQ. MCOMP ) THEN
-            TEXT( IAT : IAT ) = ' '   
-            CALL CHR_APPND( 'value)', TEXT, IAT )
-         END IF
-
-         CALL AST_SETC( WWWANT, 'LABEL(2)', TEXT( : IAT ), STATUS )
-         IF( DUNIT .NE. ' ' ) THEN
-            TEXT = ' '
-            IAT = 0
-            CALL CHR_APPND( 'Log(', TEXT, IAT )
-            CALL CHR_APPND( DUNIT, TEXT, IAT )
-            CALL CHR_APPND( ')', TEXT, IAT )
-            CALL AST_SETC( WWWANT, 'UNIT(2)', TEXT( : IAT ), STATUS )
-         END IF
-
-      ELSE
-         CALL AST_SETC( WWWANT, 'SYMBOL(2)', MCOMP, STATUS )
-   
-         TEXT = ' '
-         IAT = 0
-         CALL CHR_APPND( LAB, TEXT, IAT )
-         IF( LAB .EQ. MCOMP ) THEN
-            IAT = IAT + 1
-            CALL CHR_APPND( 'value', TEXT, IAT )
-         END IF
-
-         CALL AST_SETC( WWWANT, 'LABEL(2)', TEXT( : IAT ), STATUS )
-         IF( DUNIT .NE. ' ' ) CALL AST_SETC( WWWANT, 'UNIT(2)', 
-     :                                      DUNIT( : CHR_LEN( DUNIT ) ), 
-     :                                      STATUS )
-
-      END IF
+      CALL KPG1_SAXAT( INDF, MCOMP, 2, ( YMAP .EQ. 'VALUELOG' ), 
+     :                 WWWANT, STATUS )
 
 *  Set the Domain of the "what we want" Frame to DATAPLOT (a special
 *  Domain used to indicate a 2D Frame with one dependant axis and one

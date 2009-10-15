@@ -304,6 +304,8 @@
 *        Remove unused variable and wrapped long lines.
 *     2008 June 17 (MJC):
 *        Trim trailing blanks from output NDF character components.
+*     15-OCT-2009 (DSB):
+*        Make use of KPG1_SAXAT and KPG1_ASTTL.
 *     {enter_further_changes_here}
 
 *-
@@ -351,14 +353,14 @@
       DOUBLE PRECISION DDUMMY    ! Dummy for swapping the data range
       DOUBLE PRECISION DRANGE( 2 ) ! Data range of the histogram
       INTEGER EL                 ! Number of array elements mapped
+      INTEGER FRAME              ! Frame used to pass default attributes
       INTEGER HPNTR              ! Pointer to the histogram
       INTEGER HPPTR1             ! Pointer to the histogram x locus
       INTEGER HPPTR2             ! Pointer to the histogram y locus
       INTEGER IAT                ! Position with TEXT
       INTEGER IERR               ! Position of first conversion error
       INTEGER IFIL               ! File descriptor for logfile
-      INTEGER IPLOT              ! AST pointer to Plot to use for 
-                                 ! plotting
+      INTEGER IWCS               ! Pointer to NDFs WCS FrameSet
       CHARACTER * ( 256 ) LABEL  ! Label of the histogram NDF
       INTEGER LENXL              ! Used length of XL
       LOGICAL LOGFIL             ! Log file is required
@@ -399,6 +401,9 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Begin an AST context.
+      CALL AST_BEGIN( STATUS )
+
 *  Begin an NDF context.
       CALL NDF_BEGIN
 
@@ -407,6 +412,9 @@
 
 *  Obtain the NDF to be analysed.
       CALL LPG_ASSOC( 'IN', 'READ', NDFI, STATUS )
+
+*  Get its WCS FrameSet. 
+      CALL KPG1_GTWCS( NDFI, IWCS, STATUS )
 
 *  Determine which array component is to be analysed.
 *  Find which components to plot.
@@ -711,35 +719,33 @@
 
 *  Obtain the axis and plot styles.
 *  ================================
-*  Construct the default label for the X axis.
-      CALL KPG1_DANOT( NDFI, MCOMP, XL, STATUS )
-
-*  Construct the default label for the Y axis.
-      YL = 'Count'
 
 *  Are the axes logarithmic?
       CALL PAR_GTD0L( 'XLOG', .FALSE., .TRUE., XLOG, STATUS )
       CALL PAR_GTD0L( 'YLOG', .FALSE., .TRUE., YLOG, STATUS )
 
-*  Allow for case where x-axis is logarithmic, and some data is zero
-*  or negative.
-      IF ( XLOG ) THEN    
-         TEXT = ' '
-         IAT = 0
-         CALL CHR_APPND( 'Log'//BCKSLH//'d10'//BCKSLH//'u(', TEXT, IAT )
-         CALL CHR_APPND( XL, TEXT, IAT )
-         CALL CHR_APPND( ')', TEXT, IAT ) 
-         XL = TEXT
-      ENDIF
+*  Create a Frame that will be used to communicate default attribute
+*  values for the Plot.
+      FRAME = AST_FRAME( 2, ' ', STATUS )
 
+*  Ensure the Title attribute of the Frame has a useful value.
+      CALL KPG1_ASTTL( FRAME, IWCS, NDFI, STATUS )
+
+*  Set the Label, Units and Symbol attributes for the X axis so that they 
+*  describe the required NDF array component.
+      CALL KPG1_SAXAT( NDFI, MCOMP, 1, XLOG, FRAME, STATUS )
+
+*  Store the default Y axis Label and Symbol in the Frame, and clear the
+*  Units attribute
       IF ( YLOG ) THEN
-         TEXT = ' '
-         IAT = 0
-         CALL CHR_APPND( 'Log'//BCKSLH//'d10'//BCKSLH//'u(', TEXT, IAT )
-         CALL CHR_APPND( YL, TEXT, IAT )
-         CALL CHR_APPND( ')', TEXT, IAT ) 
-         YL = TEXT
-      ENDIF
+         TEXT = 'Log'//BCKSLH//'d10'//BCKSLH//'u(Count)'
+      ELSE
+         TEXT =  'Count'
+      END IF
+
+      CALL AST_SETC( FRAME, 'Label(2)', TEXT, STATUS )
+      CALL AST_SETC( FRAME, 'Symbol(2)', TEXT, STATUS )
+      CALL AST_CLEAR( FRAME, 'Unit(2)', STATUS )
 
 *  Derive the data ranges.
 *  =======================
@@ -779,15 +785,14 @@
 *  vertical axis.
          CALL KPG1_GRAPH( NUMBIN, %VAL( CNF_PVAL( HPPTR1 ) ), 
      :                    %VAL( CNF_PVAL( HPPTR2 ) ),
-     :                    0.0, 0.0,  XL, YL, 'Histogram plot', 'XDATA',
-     :                    'YDATA', 1, .TRUE., VAL__BADR, VAL__BADR, 
+     :                    0.0, 0.0,  XL, YL, ' ', ' ',
+     :                    ' ', 1, .TRUE., VAL__BADR, VAL__BADR, 
      :                    0.0, VAL__BADR, 'KAPPA_HISTOGRAM', .TRUE., 
-     :                    .FALSE., IPLOT, STATUS )  
+     :                    .FALSE., FRAME, STATUS )  
 
-*  If anything was plotted, annul the Plot, and shut down the graphics 
-*  workstation and database.
-         IF ( IPLOT .NE. AST__NULL ) THEN
-            CALL AST_ANNUL( IPLOT, STATUS )
+*  If anything was plotted, shut down the graphics workstation and 
+*  database.
+         IF ( FRAME .NE. AST__NULL ) THEN
             CALL KPG1_PGCLS( 'DEVICE', .FALSE., STATUS )
          END IF
 
@@ -882,6 +887,9 @@
 
 *  End the NDF context.
       CALL NDF_END( STATUS )
+
+*  End the AST context.
+      CALL AST_END( STATUS )
 
 *  Close the logfile, if used.
       IF ( LOGFIL ) CALL FIO_ANNUL( IFIL, STATUS )

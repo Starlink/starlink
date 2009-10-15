@@ -240,6 +240,7 @@ kpg1_rcatw.f \
 kpg1_rdast.f \
 kpg1_reprt.f \
 kpg1_rglmt.f \
+kpg1_saxat.f \
 kpg1_scalx.f \
 kpg1_sclof.f \
 kpg1_sdimp.f \

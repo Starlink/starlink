@@ -136,23 +136,33 @@
 *        accessed if NSIGMA is zero.
 *     XLAB = CHARACTER * ( * ) (Given)
 *        A default label for the X axis. Only used if the user does not
-*        supply an alternative. Trailing spaces are ignored.
+*        supply an alternative. Trailing spaces are ignored. If a Plot is
+*        supplied via IPLOT, then the "Label(1)" attribute in the Plot is 
+*        used as the default in preference to XLAB.
 *     YLAB = CHARACTER * ( * ) (Given)
 *        A default label for the Y axis. Only used if the user does not
-*        supply an alternative. Trailing spaces are ignored.
+*        supply an alternative. Trailing spaces are ignored. If a Plot is
+*        supplied via IPLOT, then the "Label(2)" attribute in the Plot is 
+*        used as the default in preference to YLAB.
 *     TTL = CHARACTER * ( * ) (Given)
 *        A default title for the plot. Only used if the user does not
-*        supply an alternative.
+*        supply an alternative. If a Plot is supplied via IPLOT, then the 
+*        "Title" attribute in the Plot is used as the default in preference 
+*        to TTL.
 *     XSYM = CHARACTER * ( * ) (Given)
 *        The default symbol for the horizontal axis. Only used if the user 
 *        does not supply an alternative. This will be stored with the Plot
 *        in the AGI database and (for instance) used by CURSOR as axis 
-*        symbols when displaying the curosir positions on the screen.
+*        symbols when displaying the cursor positions on the screen. If
+*        a Plot is supplied via IPLOT, then the "Symbol(1)" attribute in 
+*        the Plot is used as the default in preference to XSYM.
 *     YSYM = CHARACTER * ( * ) (Given)
 *        The default symbol for the horizontal axis. Only used if the user 
 *        does not supply an alternative. This will be stored with the Plot
 *        in the AGI database and (for instance) used by CURSOR as axis 
-*        symbols when displaying the curosir positions on the screen.
+*        symbols when displaying the cursor positions on the screen. If
+*        a Plot is supplied via IPLOT, then the "Symbol(2)" attribute in 
+*        the Plot is used as the default in preference to XSYM.
 *     MODE = INTEGER (Given)
 *        Determines the way in which the data points are represented:
 *            1 - A "staircase" histogram, in which each horizontal line is
@@ -202,8 +212,15 @@
 *        Work space.
 *     DBAR( N, 2 ) = DOUBLE PRECISION (Given and Returned)
 *        Work space. Not accessed if NSIGMA is zero.
-*     IPLOT = INTEGER (Returned)
-*        The AST Plot used to do the drawing.
+*     IPLOT = INTEGER (Given and Returned)
+*        On entry, this can either be AST_NULL or a pointer to a 2D 
+*        Frame. If AST__NULL, the supplied values for the XLAB, YLAB, 
+*        TTL, XSYM and YSYM arguments are used without change. If a Frame
+*        is supplied, the Label, Title, Units and Symbol attributes of 
+*        the Frame are used in preference to XLAB, YLAB, TTL, XSYM and 
+*        YSYM (which are then ignored). Any supplied Frame pointer is 
+*        annulled before returning, and a pointer to the Plot used to
+*        draw the axes is returned.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -214,6 +231,7 @@
 
 *  Copyright:
 *     Copyright (C) 1999, 2001 Central Laboratory of the Research Councils.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -253,6 +271,8 @@
 *        picture.
 *     1-MAR-2001 (DSB):
 *        Retain good axis values if the value on the other axis is bad.
+*     15-OCT-2009 (DSB):
+*        Allow IPLOT to be used to supply default Frame attribute values.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -308,6 +328,7 @@
       CHARACTER PLMODE*5      ! LMODE parameter name
       DOUBLE PRECISION BOX( 4 ) ! Bounding box for plot
       INTEGER AXMAPS( 2 )     ! 1-D Mappings for each axis
+      INTEGER FRAME           ! Current Frame for Plot
       INTEGER I               ! Loop index
       INTEGER IFRM            ! Pointer to defaults Frame 
       INTEGER IMARK           ! Marker type to use
@@ -487,30 +508,44 @@
          END DO
       END IF
 
-*  Create a FrameSet containing a single Frame in which the default values 
-*  for labels, symbols, title, etc can be set.
-      IFRM = AST_FRAMESET( AST_FRAME( 2, 'DOMAIN=DATAPLOT', STATUS ), 
-     :                     ' ', STATUS )
+*  If no Frame was supplied, create one now and set its attributes using
+*  the supplied arguments.
+      IF( IPLOT .EQ. AST__NULL ) THEN
+         FRAME = AST_FRAME( 2, 'DOMAIN=DATAPLOT', STATUS )
 
 *  Set the default value for the axis labels.
-      IF( XLAB .NE. ' ' ) CALL AST_SETC( IFRM, 'LABEL(1)', 
-     :                                   XLAB( : CHR_LEN( XLAB ) ), 
-     :                                   STATUS )
-      IF( YLAB .NE. ' ' ) CALL AST_SETC( IFRM, 'LABEL(2)', 
-     :                                   YLAB( : CHR_LEN( YLAB ) ), 
-     :                                   STATUS )
+         IF( XLAB .NE. ' ' ) CALL AST_SETC( FRAME, 'LABEL(1)', 
+     :                                      XLAB( : CHR_LEN( XLAB ) ), 
+     :                                      STATUS )
+         IF( YLAB .NE. ' ' ) CALL AST_SETC( FRAME, 'LABEL(2)', 
+     :                                      YLAB( : CHR_LEN( YLAB ) ), 
+     :                                      STATUS )
 
 *  Set the default plot title.
-      IF( TTL .NE. ' ' ) CALL AST_SETC( IFRM, 'TITLE', 
+         IF( TTL .NE. ' ' ) CALL AST_SETC( FRAME, 'TITLE', 
      :                                 TTL( : CHR_LEN( TTL ) ), STATUS )
 
 *  Set the default value for the axis symbols.
-      IF( XSYM .NE. ' ' ) CALL AST_SETC( IFRM, 'SYMBOL(1)', 
+         IF( XSYM .NE. ' ' ) CALL AST_SETC( FRAME, 'SYMBOL(1)', 
      :                                   XSYM( : CHR_LEN( XSYM ) ), 
      :                                   STATUS )
-      IF( YSYM .NE. ' ' ) CALL AST_SETC( IFRM, 'SYMBOL(2)', 
+         IF( YSYM .NE. ' ' ) CALL AST_SETC( FRAME, 'SYMBOL(2)', 
      :                                   YSYM( : CHR_LEN( YSYM ) ), 
      :                                   STATUS )
+
+*  If a Frame was supplied, use it and ensure it has the correct Domain.
+*  Retain its other attribute values.
+      ELSE
+         FRAME = IPLOT
+         CALL AST_SET( FRAME, 'DOMAIN=DATAPLOT', STATUS )
+      END IF
+
+*  Create a FrameSet containing this single Frame.
+      IFRM = AST_FRAMESET( FRAME, ' ', STATUS )
+
+*  Annul the Frame pointer (which may have been supplied by the user via
+*  the IPLOT argument).
+      CALL AST_ANNUL( FRAME, STATUS )
 
 *  Atempt to open a graphics workstation, obtaining an AST Plot for 
 *  drawing in a new DATA picture using PGPLOT.

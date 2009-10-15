@@ -15,6 +15,10 @@ Version 3.0
    - KPG_STOSx added.  It calculates accurate order statistics by
      sorting an array by means of an index, returning the median and 
      optionally percentiles.
+   - KPG1_SAXAX added. It sets the attributes of an axis in an AST Frame
+     so that they describe an array component of an NDF.
+   - KPG1_GRAPH: The IPLOT argument is now "Given and Returned" and must
+     be initialised before calling KPG1_GRAPH.
 
 Version 2.8
    - KPG1_ELGAU added from KAPPA routine KPS1_ELGAU. It finds ellipse

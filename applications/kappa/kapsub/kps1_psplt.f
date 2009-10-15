@@ -335,6 +335,7 @@
       IATTTL = 17
 
 *  Plot the binned data.
+      IPLOT = AST__NULL
       CALL KPG1_GRAPH( NDATA + 1, PROFR, PROFIL, 0.0, 0.0, 
      :                 DEFLBX( : IATX ), DEFLBY( : IATY ), 
      :                 DEFTTL( : IATTTL ), 'XDATA', 'YDATA', 3, 

@@ -46,25 +46,33 @@
 *        The standard deviation associated with each Y value.
 *     XLAB = CHARACTER * ( * ) (Given)
 *        A default label for the X axis. Only used if the user does not
-*        supply an alternative. Trailing spaces are ignored.
+*        supply an alternative. Trailing spaces are ignored. If a Plot is
+*        supplied via IPLOT, then the "Label(1)" attribute in the Plot is 
+*        used as the default in preference to XLAB.
 *     YLAB = CHARACTER * ( * ) (Given)
 *        A default label for the Y axis. Only used if the user does not
-*        supply an alternative. Trailing spaces are ignored.
+*        supply an alternative. Trailing spaces are ignored. If a Plot is
+*        supplied via IPLOT, then the "Label(2)" attribute in the Plot is 
+*        used as the default in preference to YLAB.
 *     TTL = CHARACTER * ( * ) (Given)
 *        A default title for the plot. Only used if the user does not
-*        supply an alternative.
+*        supply an alternative. If a Plot is supplied via IPLOT, then the 
+*        "Title" attribute in the Plot is used as the default in preference 
+*        to TTL.
 *     XSYM = CHARACTER * ( * ) (Given)
 *        The default symbol for the horizontal axis. Only used if the user 
-*        does not supply an alternative. This is not displayed on the
-*        screen, but will be stored with the Plot in the AGI database and 
-*        (for instance) used by CURSOR as axis symbols when displaying the 
-*        cursor positions on the screen.
+*        does not supply an alternative. This will be stored with the Plot
+*        in the AGI database and (for instance) used by CURSOR as axis 
+*        symbols when displaying the cursor positions on the screen. If
+*        a Plot is supplied via IPLOT, then the "Symbol(1)" attribute in 
+*        the Plot is used as the default in preference to XSYM.
 *     YSYM = CHARACTER * ( * ) (Given)
-*        The default symbol for the vertical axis. Only used if the user 
-*        does not supply an alternative. This is not displayed on the
-*        screen, but will be stored with the Plot in the AGI database and 
-*        (for instance) used by CURSOR as axis symbols when displaying the 
-*        cursor positions on the screen.
+*        The default symbol for the horizontal axis. Only used if the user 
+*        does not supply an alternative. This will be stored with the Plot
+*        in the AGI database and (for instance) used by CURSOR as axis 
+*        symbols when displaying the cursor positions on the screen. If
+*        a Plot is supplied via IPLOT, then the "Symbol(2)" attribute in 
+*        the Plot is used as the default in preference to XSYM.
 *     MODE = INTEGER (Given)
 *        Determines the way in which the data points are represented:
 *            1 - A "staircase" histogram, in which each horizontal line is
@@ -108,8 +116,15 @@
 *        .FALSE., the supplied bounds (YB, YT ) are used, and the 
 *        eqivalent of "Extended" LMODE is used for any bounds which are 
 *        not supplied.
-*     IPLOT = INTEGER (Returned)
-*        The AST Plot used to do the drawing.
+*     IPLOT = INTEGER (Given and Returned)
+*        On entry, this can either be AST_NULL or a pointer to a 2D 
+*        Frame. If AST__NULL, the supplied values for the XLAB, YLAB, 
+*        TTL, XSYM and YSYM arguments are used without change. If a Frame
+*        is supplied, the Label, Title, Units and Symbol attributes of 
+*        the Frame are used in preference to XLAB, YLAB, TTL, XSYM and 
+*        YSYM (which are then ignored). Any supplied Frame pointer is 
+*        annulled before returning, and a pointer to the Plot used to
+*        draw the axes is returned.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -120,6 +135,7 @@
 
 *  Copyright:
 *     Copyright (C) 1999, 2004 Central Laboratory of the Research Councils.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -150,6 +166,8 @@
 *        Added argument LMODE. 
 *     2004 September 1 (TIMJ):
 *        Use CNF_PVAL
+*     15-OCT-2009 (DSB):
+*        Allow IPLOT to be used to supply default Frame attribute values.
 *     {enter_further_changes_here}
 
 *  Bugs:

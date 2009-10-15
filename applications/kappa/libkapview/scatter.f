@@ -240,6 +240,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
+      INCLUDE 'AST_PAR'          ! AST constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
@@ -518,6 +519,7 @@
       END IF
 
 *  Produce the scatter plot.
+      IPLOT = AST__NULL
       CALL KPG1_GRAPH( NEL, %VAL( CNF_PVAL( IP1 ) ), 
      :                 %VAL( CNF_PVAL( IP2 ) ), 0.0, 0.0,
      :                 LAB1( : LEN1 ), LAB2( : LEN2 ), 'Scatter plot',

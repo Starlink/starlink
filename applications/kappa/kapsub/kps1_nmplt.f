@@ -404,6 +404,7 @@
      :                     STATUS )
 
 *  Draw the plot.
+            IPLOT = AST__NULL
             CALL KPG1_GRAPH( NDATA, ASUM, BSUM, 1.0, VARLIM, 
      :                       XL( : LENXL ), YL( : LENYL ), 
      :                       'Normalization plot', 'XDATA', 'YDATA', 3, 
