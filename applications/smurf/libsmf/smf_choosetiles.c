@@ -162,6 +162,8 @@
 *        Use ndgCopy rather than smf_grpCopy.
 *     5-OCT-2009 (DSB):
 *        Allow thin edge tiles to be merged with the adjacent tiles.
+*     15-OCT-2009 (DSB):
+*        Correct bounds of merged adjacent tiles.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -456,8 +458,12 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
 /* Initialise the y axis bounds (without border or extension) of the tiles in 
    the first row. */
       ylo = plbnd[ 1 ];
-      yhi = ylo + tile_size[ 1 ] - 1;
-      if( lfat[ 1 ] || ( ufat[ 1 ] && numtile[ 1 ] == 1 ) ) yhi += tile_size[ 1 ];
+      if( numtile[ 1 ] == 1 ) {
+         yhi = pubnd[ 1 ];
+      } else {
+         yhi = ylo + tile_size[ 1 ] - 1;
+         if( lfat[ 1 ] ) yhi += tile_size[ 1 ];
+      }
 
 /* Loop round each row of tiles. */
       for( iy = 0; iy < numtile[ 1 ] && *status == SAI__OK; iy++ ) {
@@ -465,8 +471,12 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
 /* Initialise the x axis bounds (without border or extension) of the tiles in 
    the first column. */
          xlo = plbnd[ 0 ];
-         xhi = xlo + tile_size[ 0 ] - 1;
-         if( lfat[ 0 ] || ( ufat[ 0 ] && numtile[ 0 ] == 1 ) ) xhi += tile_size[ 0 ];
+         if( numtile[ 0 ] == 1 ) {
+            xhi = pubnd[ 0 ];
+         } else {
+            xhi = xlo + tile_size[ 0 ] - 1;
+            if( lfat[ 0 ] ) xhi += tile_size[ 0 ];
+         }
 
 /* Loop round each tile in the current row. */
          for( ix = 0; ix < numtile[ 0 ]; ix++, tile++ ) {
@@ -571,14 +581,14 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
    the next column. */
             xlo = xhi + 1;
             xhi = xlo + tile_size[ 0 ] - 1;
-            if( ufat[ 0 ] && ix == numtile[ 0 ] - 1 ) xhi += tile_size[ 0 ];
+            if( ufat[ 0 ] && ix == numtile[ 0 ] - 2 ) xhi += tile_size[ 0 ];
          }
    
 /* Store the y axis bounds (without border or extension) of the tiles in 
    the next row. */
          ylo = yhi + 1;
          yhi = ylo + tile_size[ 1 ] - 1;
-         if( ufat[ 1 ] && iy == numtile[ 1 ] - 1 ) yhi += tile_size[ 1 ];
+         if( ufat[ 1 ] && iy == numtile[ 1 ] - 2 ) yhi += tile_size[ 1 ];
       }
    }
 
