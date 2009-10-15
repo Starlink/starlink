@@ -42,10 +42,10 @@
 *     OUT = NDF (Write)
 *        The name of the output NDF.
 *     REGION = FILENAME (Read)
-*        The name of the text file containing a text dump of an AST 
-*        Region. Any sub-class of Region may be supplied (e.g. Box, 
+*        The name of the text file containing a text dump of an AST
+*        Region. Any sub-class of Region may be supplied (e.g. Box,
 *        Polygon, CmpRegion, Prism, etc.). If the axes spanned by this
-*        Region are not the same as those of the current WCS Frame in 
+*        Region are not the same as those of the current WCS Frame in
 *        the input NDF, an attempt will be made to create an equivalent
 *        new Region that does match the current WCS Frame. An error will
 *        be reported if this is not possible.
