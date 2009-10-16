@@ -77,8 +77,8 @@ smu_move=8
 
 # Array of X,Y positions defining the vertices of the DREAM pattern,
 # listed in visit order.
-jig_pos.x=0;-1;1;-1;0;1;-1;1
-jig_pos.y=1;-1;0;1;-1;1;0;-1
+jig_pos.x=(0,-1,1,-1,0,1,-1,1)
+jig_pos.y=(1,-1,0,1,-1,1,0,-1)
 
 # X,Y scale factors for DREAM jiggle pattern (arcsec), usualy integer
 # multiples of the detector spacing

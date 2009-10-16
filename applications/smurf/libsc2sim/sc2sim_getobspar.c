@@ -297,7 +297,7 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
 
   /* Retrieve the string representation of the jig_pos.x.  If
      there is no provided string, supply a default. */
-  if ( !astMapGet0C ( keymap, "JIG_POS.X", &temp ) ) {
+  if ( !astMapGet1I ( keymap, "JIG_POS.X", SC2SIM__MXVERT, &nvert_x, vert_x ) ) {
     nvert_x = 8;
     vert_x[0] = 0;
     vert_x[1] = -1;
@@ -307,28 +307,11 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
     vert_x[5] = 1;
     vert_x[6] = -1;
     vert_x[7] = 1;
-  } else {
-    /* Parse the string and retrieve the values */
-    strncpy ( convert, temp, SC2SIM__FLEN );
-    curtok = strtok ( convert, ";" );
-    while ( curtok != NULL ){
-      nvert_x++;
-      if ( nvert_x > SC2SIM__MXVERT ) {
-        *status = SAI__ERROR;
-        msgSeti("MAX",SC2SIM__MXVERT);
-        msgSeti("NX",nvert_x);
-        errRep(" ",
-               "Number of x vertices, ^NX, exceeds maximum, ^MAX", status);
-        return;
-      }
-      vert_x[nvert_x] = atoi ( curtok );
-      curtok = strtok ( NULL, ";" );
-    }
   }
 
   /* Retrieve the string representation of the jig_pos.y.  If
      there is no provided string, supply a default. */
-  if ( !astMapGet0C ( keymap, "JIG_POS.Y", &temp ) ) {
+  if ( !astMapGet1I ( keymap, "JIG_POS.Y", SC2SIM__MXVERT, &nvert_y, vert_y ) ) {
     nvert_y = 8;
     vert_y[0] = 1;
     vert_y[1] = -1;
@@ -338,23 +321,6 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
     vert_y[5] = 1;
     vert_y[6] = 0;
     vert_y[7] = -1;
-  } else {
-    /* Parse the string and retrieve the values */
-    strncpy ( convert, temp, SC2SIM__FLEN );
-    curtok = strtok ( convert, ";" );
-    while ( curtok != NULL ){
-      nvert_y++;
-      if ( nvert_y > SC2SIM__MXVERT ) {
-        *status = SAI__ERROR;
-        msgSeti("MAX",SC2SIM__MXVERT);
-        msgSeti("NY",nvert_y);
-        errRep(" ",
-               "Number of y vertices, ^NY, exceeds maximum, ^MAX", status);
-        return;
-      }
-      vert_y[nvert_y] = atoi ( curtok );
-      curtok = strtok ( NULL, ";" );
-    }
   }
 
   /* Check to make sure the number of vertices is equal, and store
@@ -453,51 +419,26 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
          mspat_x/y
       */
       inx->nmicstep = 1;
+      inx->mspat_x[0] = 0.0;
+      inx->mspat_y[0] = 0.0;
     }
     else {
+      int nmicx = 0;
+      int nmicy = 0;
       /* get custom pattern - first in x */
-      if ( astMapGet0C ( keymap, "MSPAT_X", &temp ) ) {
-        /* Parse the string and retrieve the values */
-        n = 0;
-        strncpy ( convert, temp, SC2SIM__FLEN );
-        curtok = strtok ( convert, ";" );
-        while ( curtok != NULL ){
-          if ( n >= SC2SIM__MXMSTP ) {
-            *status = SAI__ERROR;
-            msgSeti("NX",n);
-            msgSeti("MAX",SC2SIM__MXMSTP);
-            errRep(" ",
-                   "Length of microstep pattern in x, ^NX, exceeds length allowed, ^MAX",
-                   status);
-            return;
-          }
-          inx->mspat_x[n] = atof ( curtok );
-          curtok = strtok ( NULL, ";" );
-          n++;
-        }
-      }
-
+      astMapGet1D( keymap, "MSPAT_X", SC2SIM__MXMSTP, &nmicx, inx->mspat_x );
       /* get pattern in y */
-      if ( astMapGet0C ( keymap, "MSPAT_Y", &temp ) ) {
-        /* Parse the string and retrieve the values */
-        n = 0;
-        strncpy ( convert, temp, SC2SIM__FLEN );
-        curtok = strtok ( convert, ";" );
-        while ( curtok != NULL ){
-          if ( n >= SC2SIM__MXMSTP ) {
-            *status = SAI__ERROR;
-            msgSeti("NY",n);
-            msgSeti("MAX",SC2SIM__MXMSTP);
-            errRep(" ",
-                   "Length of microstep pattern in y, ^NY, exceeds length allowed, ^MAX",
-                   status);
-            return;
-          }
-          inx->mspat_y[n] = atof ( curtok );
-          curtok = strtok ( NULL, ";" );
-          n++;
-        }
+      astMapGet1D( keymap, "MSPAT_X", SC2SIM__MXMSTP, &nmicy, inx->mspat_y );
+
+      if (nmicx != nmicy && *status == SAI__OK) {
+        *status = SAI__ERROR;
+        msgSeti( "NX", nmicx );
+        msgSeti( "NY", nmicy );
+        errRep( " ",
+                "Number of x offset in microstep (^NX) differs to number of y offsets (^NY)",
+                status);
       }
+      inx->nmicstep = nmicx;
     } /* end getting custom pattern */
   }
 

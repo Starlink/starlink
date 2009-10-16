@@ -177,20 +177,22 @@
 *     jig_step_y (double) : 6.28 (arcseconds)
 *       The step size in the y-direction between
 *       jiggle positions.
-*     jig_pos.x (char[]) : "0;-1;1;-1;0;1;-1;1"
+*     jig_pos.x (char[]) : "(0,-1,1,-1,0,1,-1,1)"
 *       Array with relative vertex coordinates
 *       for the x-direction, in units of pixel
 *       distance.  This parameter value should
-*       be a semicolon-separated list of integer
-*       values.  The number of values must be the
+*       be a comma-separated list of integer
+*       values surrounded by parentheses.
+*       The number of values must be the
 *       same as the number of values in the
 *       jig_pos.y array.
-*     jig_pos.y (char[]) : "1;-1;0;1;-1;1;0;-1"
+*     jig_pos.y (char[]) : "(1,-1,0,1,-1,1,0,-1)"
 *       Array with relative vertex coordinates
 *       for the y-direction, in units of pixel
 *       distance.  This parameter value should
-*       be a semicolon-separated list of integer
-*       values.  The number of values must be the
+*       be a comma-separated list of integer
+*       values surrounded by parentheses.
+*       The number of values must be the
 *       same as the number of values in the
 *       jig_pos.x array.
 *     lambda (double) : 0.85e-3 (metres)
