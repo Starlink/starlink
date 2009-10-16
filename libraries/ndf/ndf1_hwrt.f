@@ -15,11 +15,11 @@
 *  Description:
 *     The routine writes lines of text to the history component of an
 *     NDF. If the history has not yet been modified by the current
-*     application, it creates a new history record, initialises it, and
-*     inserts the text suppled. If the history has already been
-*     modified, then the new text is simply appended to any already
-*     present. The routine returns without action if the NDF does not
-*     have a history component.
+*     application (and APPN is not "<APPEND>"), it creates a new history 
+*     record, initialises it, and inserts the text suppled. If the history 
+*     has already been modified (or if APPN is "<APPEND>"), then the new 
+*     text is simply appended to any already present. The routine returns 
+*     without action if the NDF does not have a history component.
 
 *  Arguments:
 *     IDCB = INTEGER (Given)
@@ -29,7 +29,9 @@
 *        new history record) if the history has not yet been modified
 *        by the current application, otherwise it is ignored. If a
 *        blank value is given, then a suitable default will be used
-*        instead.
+*        instead. The special value "<APPEND>" may be supplied in order 
+*        to append the text lines to the current history text even if 
+*        the  history has not yet been modified by the current application.
 *     NLINES = INTEGER (Given)
 *        Number of new lines of text to be added to the history record
 *        (must be at least 1).
@@ -101,6 +103,9 @@
 *     23-JAN-2009 (DSB):
 *        Set the new history record date and time to the values 
 *        specified by DCB_HTIME (if set).
+*     16-OCT-2009 (DSB):
+*        If APPN is "<APPEND>", always append text to the current 
+*        history record.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -177,6 +182,7 @@
       INTEGER PNTR               ! Pointer to mapped text lines
       INTEGER SUB( 1 )           ! Array subscript
       INTEGER YMDHM( 5 )         ! Integer date/time field values
+      LOGICAL APPEND             ! Append text to current record?
       LOGICAL INIT               ! Initialise new history record?
       REAL SEC                   ! Seconds field value
 
@@ -193,10 +199,15 @@
 *  more to do.
          IF ( DCB_HLOC( IDCB ) .NE. DAT__NOLOC ) THEN
 
+*  See if we should append the text to the current history record.
+            APPEND = ( APPN .EQ. '<APPEND>' ) .AND.
+     :               ( DCB_HNREC( IDCB ) .GT. 0 ) 
+
 *  Note if a new history record must be initialised. This will be so if
 *  history has not yet been modified by the current application so that
-*  the current record's text length is still zero.
-            INIT = ( DCB_HTLEN( IDCB ) .EQ. 0 )
+*  the current record's text length is still zero, and we are not
+*  appending to the current history record.
+            INIT = ( DCB_HTLEN( IDCB ) .EQ. 0 ) .AND. .NOT. APPEND
 
 *  Obtain a new (empty) history record structure if necessary.
             IF ( INIT ) THEN
@@ -307,8 +318,8 @@
 
 *  Create a new TEXT array in the history record with the required
 *  number of lines and characters per line.
-                  CALL DAT_NEW1C( CELL, 'TEXT', LEN( TEXT( 1 ) ),
-     :                            NLINES, STATUS )
+                  CLEN = LEN( TEXT( 1 ) )
+                  CALL DAT_NEW1C( CELL, 'TEXT', CLEN, NLINES, STATUS )
                   CALL DAT_FIND( CELL, 'TEXT', TLOC, STATUS )
 
 *  If we are appending to an existing history record, then obtain a
@@ -326,12 +337,19 @@
                   SUB( 1 ) = DIM( 1 ) - NLINES + 1
                   CALL DAT_SLICE( LOC, 1, SUB, DIM, TLOC, STATUS )
                   CALL DAT_ANNUL( LOC, STATUS )
+
+*  If we are appending to the current history record, the length recorded
+*  in the DCB may still be zero. If this is the case, record the length of
+*  the text already in the history record.
+                  CALL DAT_CLEN( TLOC, CLEN, STATUS )
+                  IF( DCB_HTLEN( IDCB ) .EQ. 0 ) THEN
+                     DCB_HTLEN( IDCB ) = CLEN
+                  END IF
                END IF
 
 *  Map the new lines in the TEXT array for writing and copy the history
 *  text into them.
                CALL DAT_MAPV( TLOC, '_CHAR', 'WRITE', PNTR, EL, STATUS )
-               CALL DAT_CLEN( TLOC, CLEN, STATUS )
                IF ( STATUS .EQ. SAI__OK ) THEN
                   CALL NDF1_HCPY( NLINES, %VAL( CNF_PVAL( PNTR ) ),
      :                            TEXT, STATUS, 

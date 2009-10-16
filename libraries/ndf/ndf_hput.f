@@ -33,7 +33,9 @@
 *        Name of the current application. This will only be used if a
 *        new history record is created by this routine, otherwise it is
 *        ignored. If a blank value is given, then a system-supplied
-*        default will be used instead.
+*        default will be used instead. If the special value '<APPEND>'
+*        is supplied, then the text is always appended to the current
+*        history record, even if it was created by a previous application.
 *     REPL = LOGICAL (Given)
 *        Whether the text supplied is intended to replace the history
 *        information which is supplied by default. If a .TRUE. value is
@@ -42,7 +44,8 @@
 *        be suppressed. If a .FALSE. value is given, then default
 *        history information is not suppressed and will later be
 *        appended to the text supplied (unless suppressed by another
-*        call to NDF_HPUT).
+*        call to NDF_HPUT). The supplied value is ignored, and a value 
+*        of .TRUE. assumed, if APPN is supplied equal to '<APPEND>'.
 *     NLINES = INTEGER (Given)
 *        Number of lines of history text supplied.
 *     TEXT( NLINES ) = CHARACTER * ( * ) (Given)
@@ -131,6 +134,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     DSB: David S Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -146,6 +150,10 @@
 *     17-JUN-1993 (RFWS):
 *        Removed calls to ERR_BEGIN and ERR_END so as to confine the
 *        effect of MSG_LOAD to the current message context only.
+*     16-OCT-2009 (DSB):
+*        IF APPN is supplied as "<APPEND>", append the text to the current 
+*        history record, even if the current history record was created by 
+*        a previous application.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -255,7 +263,9 @@
 *  If history text has been written successfully, then cancel the
 *  default history writing flag if required.
                         IF ( STATUS .EQ. SAI__OK ) THEN
-                           IF ( REPL ) DCB_HDEF( IDCB ) = .FALSE.
+                           IF ( REPL .OR. APPN .EQ. '<APPEND>' ) THEN
+                              DCB_HDEF( IDCB ) = .FALSE.
+                           END IF
                         END IF
                      END IF
                   END IF

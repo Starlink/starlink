@@ -70,7 +70,7 @@ ndf1_dump.f ndf1_dv.f ndf1_dvanl.f ndf1_dw.f ndf1_dx.f ndf1_ellip.f    \
 ndf1_expid.f ndf1_exppl.f ndf1_ffs.f ndf1_filex.f ndf1_fmhdt.f	       \
 ndf1_forxt.f ndf1_fsplt.f ndf1_gadex.f ndf1_gawex.f       \
 ndf1_gtbb.f ndf1_gtenv.f ndf1_gthdt.f ndf1_gtxtn.f ndf1_h2ast.f	       \
-ndf1_hcpy.f ndf1_hdcre.f ndf1_hderr.f ndf1_fr2px.f \
+ndf1_hcpy.f ndf1_hdcre.f ndf1_hderr.f ndf1_htlen.f ndf1_fr2px.f \
 ndf1_hfwrt.f ndf1_hincr.f ndf1_hlerr.f ndf1_hnew.f ndf1_hprp.f	       \
 ndf1_hrst.f ndf1_hscrt.f ndf1_htcmp.f ndf1_htop.f	       \
 ndf1_hunmp.f ndf1_hwdef.f ndf1_hwrt.f ndf1_id2ac.f ndf1_imp.f	       \

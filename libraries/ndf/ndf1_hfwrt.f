@@ -18,11 +18,12 @@
 *     The routine writes a series of text lines to the current history
 *     record, after first applying optional message token translation
 *     and formatting operations.  If the history has not yet been
-*     modified by the current application, it creates a new history
-*     record, initialises it, and inserts the text suppled. If the
-*     history has already been modified, then the new text is simply
-*     appended to any already present. The routine returns without
-*     action if the NDF does not have a history component.
+*     modified by the current application (and APPN is not "<APPEND>"), 
+*     it creates a new history record, initialises it, and inserts the 
+*     text suppled. If the history has already been modified (or if APPN
+*     is "<APPEND>"), then the new text is simply appended to any already 
+*     present. The routine returns without action if the NDF does not 
+*     have a history component.
 
 *  Arguments:
 *     IDCB = INTEGER (Given)
@@ -32,7 +33,9 @@
 *        new history record) if the history has not yet been modified
 *        by the current application, otherwise it is ignored. If a
 *        blank value is given, then a suitable default will be used
-*        instead.
+*        instead. The special value "<APPEND>" may be supplied in order 
+*        to append the text lines to the current history text even if 
+*        the  history has not yet been modified by the current application.
 *     NLINES = INTEGER (Given)
 *        Number of new lines of text to be added to the history record.
 *     TEXT( NLINES ) = CHARACTER * ( * ) (Given)
@@ -82,6 +85,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     DSB: David S Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -95,6 +99,9 @@
 *     17-NOV-1994 (RFWS):
 *        Changed to preserve indentation on un-wrapped text and on the
 *        first line of each wrapped paragraph.
+*     16-OCT-2009 (DSB):
+*        If APPN is "<APPEND>", always append text to the current 
+*        history record.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -184,9 +191,17 @@
 
 *  Obtain the text length for the current history record. If this is
 *  zero (because there is not yet a current record), then use the
-*  length of the input text lines instead.
+*  length of the input text lines instead, or if APN is <APPEND> use the
+*  length of the current history record.
                L = DCB_HTLEN( IDCB )
-               IF ( L .EQ. 0 ) L = LEN( TEXT( 1 ) )
+               IF ( L .EQ. 0 ) THEN
+                  IF( APPN .EQ. '<APPEND>' ) THEN
+                     CALL NDF1_HTLEN( IDCB, L, STATUS )
+                     IF( L .EQ. 0 ) L = LEN( TEXT( 1 ) )
+                  ELSE
+                     L = LEN( TEXT( 1 ) )
+                  END IF
+               END IF
 
 *  Initialise.
                LBUF = 0
