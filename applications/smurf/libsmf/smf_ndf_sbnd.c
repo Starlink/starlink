@@ -115,8 +115,8 @@ void smf_ndf_sbnd( int ndim, int *lbnd, int *ubnd, smfData *data,
                        &( data->pntr[ 0 ] ), &el, status );
       if( vm ) ndfMap( data->file->ndfid, "Variance", type, "UPDATE", 
                        &( data->pntr[ 1 ] ), &el, status );
-      if( qm ) ndfMap( data->file->ndfid, "Data", "_UBYTE", 
-                       "UPDATE", &( data->pntr[ 0 ] ), &el, status );
+      if( qm ) ndfMap( data->file->ndfid, "Quality", "_UBYTE",
+                       "UPDATE", &( data->pntr[ 2 ] ), &el, status );
       
 /* Modify the bounds information in the smfData. */
       for( i = 0; i < ndim; i++ ) {
