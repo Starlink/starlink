@@ -49,22 +49,22 @@
 *          NONE (no messages), QUIET (minimal messages), NORMAL,
 *          VERBOSE, DEBUG or ALL. [NORMAL]
 *     OBSPAR = GROUP (Read)
-*          Specifies values for the observation parameters used by 
-*          simulation.  
+*          Specifies values for the observation parameters used by
+*          simulation.
 *
-*          The supplied value should be either a 
-*          comma-separated list of strings or the name of a text 
-*          file preceded by an up-arrow character "^", containing 
-*          one or more comma-separated (or line-break separated) 
-*          list of strings. Each string is either a "keyword=value" 
-*          setting, or the name of a text file preceded by an up-arrow 
-*          character "^". Such text files should contain further 
-*          comma-separated lists which will be read and interpreted 
-*          in the same manner (any blank lines or lines beginning 
-*          with "#" are ignored). Within a text file, newlines can 
-*          be used as delimiters as well as commas. Settings are 
-*          applied in the order in which they occur within the list, 
-*          with later settings over-riding any earlier settings given 
+*          The supplied value should be either a
+*          comma-separated list of strings or the name of a text
+*          file preceded by an up-arrow character "^", containing
+*          one or more comma-separated (or line-break separated)
+*          list of strings. Each string is either a "keyword=value"
+*          setting, or the name of a text file preceded by an up-arrow
+*          character "^". Such text files should contain further
+*          comma-separated lists which will be read and interpreted
+*          in the same manner (any blank lines or lines beginning
+*          with "#" are ignored). Within a text file, newlines can
+*          be used as delimiters as well as commas. Settings are
+*          applied in the order in which they occur within the list,
+*          with later settings over-riding any earlier settings given
 *          for the same keyword.
 *
 *          Each individual setting should be of the form:
@@ -84,7 +84,7 @@
 *          is not specified, the clock time in milliseconds
 *          is used.
 *     SIMPAR = GROUP (Read)
-*          Specifies values for the simulation parameters.  See 
+*          Specifies values for the simulation parameters.  See
 *          the description for OBSPAR for the file format.
 *
 *          The parameter names and their default values are listed
@@ -449,7 +449,7 @@
 *     2006-06-09 (JB):
 *        Added heatrun task.
 *     2006-06-27 (TIMJ):
-*        switch from sc2head to a generic JCMTState definition that can be used for 
+*        switch from sc2head to a generic JCMTState definition that can be used for
 *        ACSIS and SCUBA-2. Also involves moving the STATE information into a separate
 *        part of the data file.
 *     2006-07-31 (JB):
@@ -469,7 +469,7 @@
 *     2006-10-03 (JB):
 *        Remove unused variables.
 *     2006-11-21 (JB):
-*         Expanded comments section for use with 
+*         Expanded comments section for use with
 *         smurf_help task and added Lissajous mode.
 *     2006-11-22 (JB):
 *         Added multiple map cycle capabilities to liss/pong
@@ -597,23 +597,23 @@ void smurf_sc2sim( int *status ) {
   AstKeyMap *obskeymap = NULL;    /* AstKeyMap for obs parameters */
   size_t osize = 0;               /* Size of obsGrp */
   int overwrite = 0;              /* Flag to specify whether existing
-				     files are overwritten */
+                                     files are overwritten */
   double *pzero = NULL;           /* bolometer power offsets */
   int rseed;                      /* seed for random number generator */
   int scan = 0;                   /* Flag for running a SCAN observation */
   Grp *simGrp = NULL;             /* Group containing sim parameter file */
   AstKeyMap *simkeymap = NULL;    /* AstKeyMap for sim parameters */
   int simstats = 0;               /* Flag to denote whether just to
-				     list simulation statistics */
+                                     list simulation statistics */
   char simtype[LEN__METHOD];      /* String for simulation type */
   size_t ssize = 0;               /* Size of simGrp */
   struct timeval time;            /* Structure for system time */
   static double weights[SC2SIM__MXIRF]; /* impulse response */
-  double *xbc = NULL;             /* projected NAS X offsets of bolometers 
-				     in arcsec */
+  double *xbc = NULL;             /* projected NAS X offsets of bolometers
+                                     in arcsec */
   double *xbolo = NULL;           /* Native bolo x-offsets */
-  double *ybc = NULL;             /* projected NAS Y offsets of bolometers 
-				     in arcsec */
+  double *ybc = NULL;             /* projected NAS Y offsets of bolometers
+                                     in arcsec */
   double *ybolo = NULL;           /* Native bolo y-offsets */
   /* ARD parameters */
   char ard[LEN__METHOD];          /* Name of ARD description */
@@ -622,16 +622,16 @@ void smurf_sc2sim( int *status ) {
   int *bolos = NULL;              /* Array of all bolometers */
   int lbnd[2];                    /* Lower pixel bounds for bad pixel mask */
   int lbnde[2];                   /* Lower pixel bounds encompassing all
-			  	     external pixels */
+                                     external pixels */
   int lbndi[2];                   /* Lower pixel bounds encompassing all
-				     internal pixels */
+                                     internal pixels */
   int regval=0;                   /* First keyword in ARD description */
   float trcoeff;                  /* Coefficients for ARD mapping */
   int ubnd[2];                    /* Upper pixel bounds for bad pixel mask */
   int ubnde[2];                   /* Upper pixel bounds encompassing all
-				     external pixels */
+                                     external pixels */
   int ubndi[2];                   /* Upper pixel bounds encompassing all
-				     internal pixels */
+                                     internal pixels */
 
   /* Get input parameters */
   kpg1Gtgrp ( "OBSPAR", &obsGrp, &osize, status );
@@ -639,7 +639,7 @@ void smurf_sc2sim( int *status ) {
   kpg1Gtgrp ( "SIMPAR", &simGrp, &ssize, status );
   kpg1Kymap ( simGrp, &simkeymap, status );
 
-  /* Seed random number generator, either with the time in 
+  /* Seed random number generator, either with the time in
      milliseconds, or from user-supplied seed */
   parGet0i( "SEED", &rseed, status );
   if ( *status == PAR__NULL ) {
@@ -647,11 +647,11 @@ void smurf_sc2sim( int *status ) {
     gettimeofday ( &time, NULL );
     rseed = ( time.tv_sec * 1000 ) + ( time.tv_usec / 1000 );
     msgOutif(MSG__VERB," ",
-	     "Seeding random numbers with clock time", status);
+             "Seeding random numbers with clock time", status);
   } else {
     msgSeti( "SEED", rseed );
     msgOutif(MSG__VERB," ","Seeding random numbers with ^SEED", status);
-  } 
+  }
 
   /* Initialise random number generator to give same sequence every time,
      leading to the same series of pzero and heater offsets */
@@ -662,8 +662,8 @@ void smurf_sc2sim( int *status ) {
 
   msgOutif(MSG__VERB, "", "  Initialise instrument", status);
   sc2sim_instrinit ( &inx, &sinx, obskeymap, simkeymap, coeffs, &digcurrent,
-		     &digmean, &digscale, &elevation, weights, &heater, 
-		     &pzero, &xbc, &ybc, &xbolo, &ybolo, status );
+                     &digmean, &digscale, &elevation, weights, &heater,
+                     &pzero, &xbc, &ybc, &xbolo, &ybolo, status );
 
   /* Re-initialise random number generator to give a different sequence
      each time by using the given seed. */
@@ -683,12 +683,12 @@ void smurf_sc2sim( int *status ) {
     ardGrpex ( ard, NULL, &ardGrp, &ardFlag, status );
     trcoeff = VAL__BADR;
     ardWork ( ardGrp, 2, lbnd, ubnd, &trcoeff, 0, &regval, bolos,
-	      lbndi, ubndi, lbnde, ubnde, status );
+              lbndi, ubndi, lbnde, ubnde, status );
   }
 
   /* String for the wavelength of the filter */
   sprintf( filter,"%i",(int) (inx.lambda*1e6) );
-  
+
   /* Get observation mode and coordinate frame */
   mode = sc2sim_getobsmode( inx.obsmode, status );
   coordframe = sc2sim_getcoordframe( inx.coordframe, status );
@@ -748,8 +748,8 @@ void smurf_sc2sim( int *status ) {
 
   if ( !simstats ) {
     msgSetc("T",inx.obstype);
-    msgOutif(MSG__NORM, "", "  Simulating a ^T observation at ^L um in ^M mode", 
-	     status);
+    msgOutif(MSG__NORM, "", "  Simulating a ^T observation at ^L um in ^M mode",
+             status);
     msgSetc("SUB", sinx.subname);
     msgOutif(MSG__NORM, "", "  Simulating subarrays: ^SUB", status);
   }
@@ -758,25 +758,25 @@ void smurf_sc2sim( int *status ) {
   if ( heatrun ) {
     /* Do a heatrun/flatfield simulation */
     sc2sim_heatrun ( &inx, &sinx, coeffs, digcurrent, digmean, digscale, filter,
-		     heater, nbol, pzero, inx.steptime, status );
+                     heater, nbol, pzero, inx.steptime, status );
 
   } else {
 
     if ( scan ) {
       /* Check if this is a full of weights-only simulation */
-      parChoic( "SIMTYPE", "FULL", "FULL, WEIGHTS", 1, 
-		simtype, LEN__METHOD, status);
+      parChoic( "SIMTYPE", "FULL", "FULL, WEIGHTS", 1,
+                simtype, LEN__METHOD, status);
       /* Set the flag for hits-only */
       if( strncmp( simtype, "FULL", 4 ) == 0 ) {
-	hitsonly = 0; 
+        hitsonly = 0;
       } else if ( strncmp( simtype, "WEIGHTS", 7 ) == 0 ) {
-	hitsonly = 1;
+        hitsonly = 1;
       } else {
-	if ( *status == SAI__OK ) {
-	  *status = SAI__ERROR;
-	  msgSetc( "S", simtype );
-	  errRep("", "^S is not a supported simulation type", status);
-	}
+        if ( *status == SAI__OK ) {
+          *status = SAI__ERROR;
+          msgSetc( "S", simtype );
+          errRep("", "^S is not a supported simulation type", status);
+        }
       }
     }
 
@@ -785,12 +785,12 @@ void smurf_sc2sim( int *status ) {
     /* Will new output files overwrite old ones? */
     parGet0l("OVERWRITE", &overwrite, status);
 
-    sc2sim_simulate ( &inx, &sinx, coeffs, digcurrent, digmean, digscale, 
-		      filter, heater, maxwrite, mode, coordframe, nbol, 
-		      pzero, rseed, inx.steptime, weights, xbc, xbolo, ybc, 
-		      ybolo, hitsonly, overwrite, simstats, status);
+    sc2sim_simulate ( &inx, &sinx, coeffs, digcurrent, digmean, digscale,
+                      filter, heater, maxwrite, mode, coordframe, nbol,
+                      pzero, rseed, inx.steptime, weights, xbc, xbolo, ybc,
+                      ybolo, hitsonly, overwrite, simstats, status);
   }
- 
+
   /* Free resources */
   heater = smf_free( heater, status );
   pzero = smf_free( pzero, status );
@@ -800,9 +800,9 @@ void smurf_sc2sim( int *status ) {
   ybolo = smf_free( ybolo, status );
   bolos = smf_free( bolos, status );
 
-  if ( ardGrp ) grpDelet ( &ardGrp, status ); 
-  if ( simGrp ) grpDelet ( &simGrp, status ); 
-  if ( obsGrp ) grpDelet ( &obsGrp, status ); 
+  if ( ardGrp ) grpDelet ( &ardGrp, status );
+  if ( simGrp ) grpDelet ( &simGrp, status );
+  if ( obsGrp ) grpDelet ( &obsGrp, status );
 
   msgOutif(MSG__NORM, "", " Simulation complete", status);
 
