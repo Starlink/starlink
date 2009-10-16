@@ -242,11 +242,14 @@ void sc2sim_instrinit( struct sc2sim_obs_struct *inx,
   /* Check to make sure that all the relevant elements of JCMTState are set! */
   state.tcs_az_ac1 = 0;
   state.tcs_az_ac2 = 0;
+  state.tcs_az_bc1 = 0;
+  state.tcs_az_bc2 = 0;
   state.smu_az_jig_x = 0;
   state.smu_az_jig_y = 0;
   state.smu_az_chop_x = 0;
   state.smu_az_chop_y = 0;
   state.rts_end = 53795.0;
+  state.tcs_tai = state.rts_end;
   smf_calc_telpos( NULL, "JCMT", telpos, status );
   instap[0] = 0;
   instap[1] = 0;
