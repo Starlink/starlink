@@ -233,7 +233,7 @@
 *     Copyright (C) 1994 Science & Engineering Research Council.
 *     Copyright (C) 1995-2000, 2003-2004 Central Laboratory of the
 *     Research Councils. Copyright (C) 2006 Particle Physics &
-*     Astronomy Research Council. Copyright (C) 2007-2008 Science &
+*     Astronomy Research Council. Copyright (C) 2007-2009 Science &
 *     Technology Facilities Council. All Rights Reserved.
 
 *  Licence:
@@ -344,6 +344,10 @@
 *        Invoke and document PROVEN argument's GENERIC option.
 *     2008 October 9 (MJC):
 *        Update documentation on the CADC provenance.
+*     2009 October 16 (MJC):
+*        Disable automatic quality masking if the conversions includes
+*        the QUALITY component along with either DATA or VARIANCE
+*        array.
 *     {enter_further_changes_here}
 
 *-
@@ -541,6 +545,24 @@
 *  Take a local copy of the supplied BITPIX in case in needs to be
 *  modified.
       BP = BITPIX
+
+*  Disable Quality masking.
+*  ========================
+
+*  When a QUALITY array component is being exported, its information
+*  should not be used twice to mask bad pixels in the DATA or VARIANCE
+*  components.  There must be more than one array being propagated,
+*  because if it were DATA or VARIANCE, the automatic masking should be
+*  applied, and if it were QUALITY there is no self masking.  Therefore
+*  disable automatic quality masking in these cases.  
+      IF ( NOARR .GT. 1. AND. ( ARRNAM( 1 ) .EQ. 'DATA' .OR. 
+     :                          ARRNAM( 1 ) .EQ. 'VARIANCE' ) ) THEN
+         DO I = 2, NOARR
+            IF ( ARRNAM( I ) .EQ. 'QUALITY' ) THEN
+               CALL NDF_SQMF( .FALSE., NDF, STATUS )
+            END IF
+         END DO
+      END IF
 
 *  Loop for each array component.
 *  ==============================

@@ -85,15 +85,18 @@
 *        FITS primary array.  The order of the variance and quality
 *        in COMP decides the order they will appear in the FITS file.
 *
+*        The choice of COMP may affect automatic quality masking. 
+*        See "Quality Masking" for the details.
+*
 *        COMP may be a list of comma-separated values to be applied to
 *        each conversion in turn.  The list must be enclosed in double
 *        quotes.  An error results if more values than the number of
 *        input NDFs are supplied.  If too few are given, the last value
-*        in the list is applied to the remainder of the NDFs; thus a 
-*        single value is applied to all the conversions.  The given 
+*        in the list is applied to the remainder of the NDFs; thus a
+*        single value is applied to all the conversions.  The given
 *        values must be in the same order as that of the input NDFs.
 *        Indirection through a text file may be used.  If more than one
-*        line is required to enter the information at a prompt then 
+*        line is required to enter the information at a prompt then
 *        place a "-" at the end of each line where a continuation line
 *        is desired.  ["A"]
 *     CONTAINER = _LOGICAL (Read)
@@ -497,6 +500,16 @@
 *     When PROFITS is TRUE any existing provenance keywords in the FITS
 *     airlock are not copied to the FITS file.
 
+*  Quality Masking:
+*     -  NDF automatic quality masking is a facility whereby any bad
+*     quality information (flagged by the bad-bits mask) present can be 
+*     incorporated in the data or variance as bad values.  NDF2FITS uses 
+*     this facility in exported data variance information provided the 
+*     quality array is not transferred.  Thus if a QUALITY component is 
+*     present in the input NDF, the data and any variance arrays will
+*     not be masked whenever Parameter COMP's value is 'A' or contains 
+*     'Q'.
+
 *  Special Formats:
 *     In the general case, NDF extensions (excluding the FITS extension)
 *     may be converted to one-row binary tables in the FITS file when
@@ -567,7 +580,7 @@
 *     Copyright (C) 1994 Science & Engineering Research Council.
 *     Copyright (C) 1996-2000, 2004 Central Laboratory of the Research
 *     Councils. Copyright (C) 2006 Particle Physics & Astronomy
-*     Research Council. Copyright (C) 2007-2008 Science & Technology
+*     Research Council. Copyright (C) 2007-2009 Science & Technology
 *     Facilities Council. All Rights Reserved.
 
 *  Licence:
@@ -654,6 +667,9 @@
 *        Document PROVENANCE parameter's Generic option.
 *     2008 October 9 (MJC):
 *        Document the CADC-provenance PRODUCT keyword.
+*     2009 October 16 (MJC):
+*        Add prologue section on Quality Masking.  Allow three-letter
+*        COMP permutations.
 *     {enter_further_changes_here}
 
 *-
@@ -678,9 +694,10 @@
       CHARACTER * ( 2 ) CHR_NTH  ! Ordinal abbreviation
 
 *  Local Constants:
-      CHARACTER * ( 25 ) ACPERM  ! Valid permutations for the array
+      CHARACTER*49 ACPERM        ! Valid permutations for the array
                                  ! components
-      PARAMETER ( ACPERM = 'A,D,V,Q,DV,VD,DQ,QD,VQ,QV' )
+      PARAMETER ( ACPERM = 'A,D,V,Q,DV,VD,DQ,QD,VQ,QV,DVQ,DQV,VDQ,'/
+     :                     /'VQD,QDV,QVD' )
 
       INTEGER BLOCKF             ! Blocking factor
       PARAMETER ( BLOCKF = 1 )
@@ -751,7 +768,7 @@
       LOGICAL PROHIS             ! True if history information is
                                  ! propagated
       CHARACTER * ( 7 ) PROVEX   ! Provenance export option
-      LOGICAL QUAPRE             ! True if the QUA:LITY component is
+      LOGICAL QUAPRE             ! True if the QUALITY component is
                                  ! present
       LOGICAL QUASEL             ! True if QUALITY was selected
       LOGICAL VARPRE             ! True if the VARIANCE component is
@@ -1084,9 +1101,10 @@
                CALL MSG_SETI( 'I', I )
                CALL MSG_SETC( 'TH', CHR_NTH( I ) )
                CALL MSG_SETC( 'GM', COMPS )
+               CALL MSG_SETC( 'PERM', ACPERM )
                CALL MSG_OUT( 'COMPS_ERR',
      :           'The ^I^TH value "^GM" is not one of the acceptable '/
-     :           /'COMP values: A,D,V,Q,DV,DQ,QV.', STATUS )
+     :           /'COMP values: ^PERM.', STATUS )
 
 *  Let the user have another go.  So cancel the parameter value and
 *  delete the group.

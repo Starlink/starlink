@@ -1,12 +1,24 @@
+1 CONVERT_Version_1.5-18
+
+ NDF2FITS allows three-letter permutations for Parameter COMP.
+ There is now no automatic quality masking of data and variance
+ whenever the quality array is exported to the FITS file too.
+ A new section of the NDF2FITS reference documentation explains
+ this in more detail.
+
+ FITS2NDF recognises the new "Group:" heading in HISTORY headers
+ that originally came from an exported NDF.  [This lists all the
+ NDFs stored within a GRP group used in an application.]  Thus the
+ original paragraph and indentation may be preserved after an
+ NDF->FITS->NDF cycle.
+
 1 CONVERT_Version_1.5-17
 
  The bash CONVERT initialisation script has been changed so that it
  now works from any Bourne-compatible shell.
 
-1 CONVERT_Version_1.5-17
-
- FITS2NDF now adds a default History record to the output NDF if the FITS
- file contains no NDF2FITS history information.
+ FITS2NDF now adds a default History record to the output NDF if the 
+ FITS file contains no NDF2FITS history information.
 
 1 CONVERT_Version_1.5-16
 

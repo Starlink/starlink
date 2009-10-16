@@ -4290,6 +4290,10 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          FITS primary array.  The order of the variance and quality
          in COMP decides the order they will appear in the FITS file.
 
+         The choice of COMP may affect automatic quality masking.  See
+         \htmlref{\texttt{"}Quality Masking\texttt{"}}{quality_masking}
+         for the details.
+
          COMP may be a list of comma-separated values to be applied to
          each conversion in turn.  The list must be enclosed in double quotes.
          An error results if more values than
@@ -4898,6 +4902,18 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
 
        When PROFITS is \texttt{TRUE} any existing provenance keywords in the
        FITS airlock are not copied to the FITS file.
+   }
+   \sstdiytopic{
+      \label{quality_masking}Quality Masking
+   }{
+      NDF automatic quality masking is a facility whereby any bad
+      quality information (flagged by the bad-bits mask) present can be 
+      incorporated in the data or variance as bad values.  NDF2FITS uses 
+      this facility in exported data variance information provided the 
+      quality array is not transferred.  Thus if a QUALITY component is 
+      present in the input NDF, the data and any variance arrays will
+      not be masked whenever Parameter COMP's value is \texttt{'A'} or 
+      contains \texttt{'Q'}.
    }
    \sstdiytopic{
       Special Formats
