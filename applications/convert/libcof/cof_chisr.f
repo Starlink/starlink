@@ -96,6 +96,8 @@
 *        Indent paragraphs of text after the first line except for
 *        Software, Arguments, and Parameters headings for which a new
 *        line is created.
+*     2009 October 16 (MJC):
+*        Added Group heading to the list of records not indented.
 *     {enter_further_changes_here}
 
 *-
@@ -163,6 +165,7 @@
       CHARACTER*( DAT__SZLOC ) HLOC ! Locator to HISTORY component
       CHARACTER*4 IC             ! Record number
       INTEGER IARG               ! Index of "Arguments:" heading
+      INTEGER IGRP               ! Index of "Group:" heading
       INTEGER IPAR               ! Index of "Parameters:" heading
       INTEGER IREC               ! Loop counter for history records
       INTEGER ISOF               ! Index of "Software:" heading
@@ -510,6 +513,7 @@
 *  paragraph, or for lines starting with a heading.
                            BUF = PARAGR( TEXCOL:TEXCOL + WIDTH - 1 )
                            IARG = CHR_INDEX( BUF, 'Arguments:' )
+                           IGRP = CHR_INDEX( BUF, 'Group:' )
                            IPAR = CHR_INDEX( BUF, 'Parameters:' )
                            ISOF = CHR_INDEX( BUF, 'Software:' )
 
@@ -519,9 +523,9 @@
      :                                        TEXCOL, TEXT( :WIDTH ) )
 
 *  A heading would fit in the next output line.
-                           ELSE IF ( IARG .GT. 0 .OR. IPAR .GT. 0 .OR.
-     :                               ISOF .GT. 0 ) THEN
-                              CPHEAD = MAX( IARG, IPAR, ISOF )
+                           ELSE IF ( IARG .GT. 0 .OR. IGRP .GT. 0 .OR.
+     :                               IPAR .GT. 0 .OR. ISOF .GT. 0 ) THEN
+                              CPHEAD = MAX( IARG, IGRP, IPAR, ISOF )
 
 *  The heading is at the current paragraph position.  So treat it like
 *  the first line.
@@ -543,6 +547,7 @@
 
 *  Obtain the new position of the heading.
                                  IARG = CHR_INDEX( BUF, 'Arguments:' )
+                                 IGRP = CHR_INDEX( BUF, 'Group:' )
                                  IPAR = CHR_INDEX( BUF, 'Parameters:' )
                                  ISOF = CHR_INDEX( BUF, 'Software:' )
                                  CPHEAD = MAX( IARG, IPAR, ISOF )
