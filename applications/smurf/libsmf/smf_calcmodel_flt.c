@@ -96,7 +96,8 @@
 #define FUNC_NAME "smf_calcmodel_flt"
 
 void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk,
-                        AstKeyMap *keymap, smfArray **allmodel, int flags,
+                        AstKeyMap *keymap, smfArray **allmodel,
+                        int flags __attribute__((unused)),
                         int *status) {
 
   /* Local Variables */

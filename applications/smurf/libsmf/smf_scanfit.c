@@ -118,7 +118,7 @@
 
 #define FUNC_NAME "smf_scanfit"
 
-void smf_scanfit( smfData *data, unsigned char *quality, int order, 
+void smf_scanfit( smfData *data, unsigned char *quality, size_t order,
 		  int *status) {
 
   int cliptype;             /* Type of sigma clipping */
@@ -171,18 +171,6 @@ void smf_scanfit( smfData *data, unsigned char *quality, int order,
       errRep( FUNC_NAME, "Requested polynomial order, ^O, greater than or "
               "equal to number of points, ^NF. Unable to fit polynomial.", 
               status );
-      return;
-    }
-  }
-
-  /* If order is -ve, something's wrong! */
-  if ( order < 0 ) {
-    if ( *status == SAI__OK) {
-      msgSeti("O",order);
-      *status = SAI__ERROR;
-      errRep( FUNC_NAME, 
-	      "Polynomial order, ^O, is negative. Unable to fit polynomial", 
-	      status );
       return;
     }
   }

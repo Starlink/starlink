@@ -85,7 +85,7 @@ void smf_ndf_sbnd( int ndim, int *lbnd, int *ubnd, smfData *data,
    const char *type;    /* Mapped data type */
    int dm;              /* Is the "Data" component mapped? */
    int el;              /* Nu,mber of array elements mapped */
-   int i;               /* Axis index */
+   size_t i;               /* Axis index */
    int qm;              /* Is the "Quality" component mapped? */
    int vm;              /* Is the "Variance" component mapped? */
 
@@ -119,7 +119,7 @@ void smf_ndf_sbnd( int ndim, int *lbnd, int *ubnd, smfData *data,
                        "UPDATE", &( data->pntr[ 2 ] ), &el, status );
       
 /* Modify the bounds information in the smfData. */
-      for( i = 0; i < ndim; i++ ) {
+      for( i = 0; i < (size_t)ndim; i++ ) {
          data->dims[ i ] = ubnd[ i ] - lbnd[ i ] + 1;
       }
       for( ; i < data->ndims; i++ ) {

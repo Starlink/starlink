@@ -167,7 +167,7 @@
 
 #define FUNC_NAME "smf_grp_related"
 
-void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
+void smf_grp_related(  Grp *igrp, const size_t grpsize, const int grpbywave,
                        dim_t maxlen, dim_t *maxconcatlen, smfGroup **group,
                        Grp **basegrp, int *status ) {
 
@@ -175,31 +175,31 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
   dim_t *all_len = NULL;      /* Lengths of each chunk */
   size_t allOK = 1;           /* Flag to determine whether to continue */
   size_t *chunk=NULL;         /* Array of flags for continuous chunks */
-  int chunkend;               /* Index to end of chunk */
-  int chunkstart;             /* Index to start of chunk */
+  dim_t chunkend;             /* Index to end of chunk */
+  dim_t chunkstart;           /* Index to start of chunk */
   smfData *data = NULL;       /* Current smfData */
   smfData *data2 = NULL;      /* Second smfData */
   double *ends = NULL;        /* Array of ending RTS_END values */
   int frame;                  /* Variable to store either first or last frame*/
   smfHead *hdr=NULL;          /* Header for current file */
   smfHead *hdr2=NULL;         /* Second header */
-  int i;                      /* Loop counter for index into Grp */
+  size_t i;                   /* Loop counter for index into Grp */
   dim_t isub;                 /* loop counter over subgroup */
   dim_t *indices = NULL;      /* Array of indices to be stored in subgroup */
-  int j;                      /* Loop counter */
-  int k = 0;                  /* Incremental counter for subgroup indices */
+  size_t j;                   /* Loop counter */
+  size_t k = 0;               /* Incremental counter for subgroup indices */
   int *keepchunk=NULL;        /* Flag for chunks that will be kept */
   double *lambda = NULL;      /* Wavelength - only used if grpbywave is true */
   int matchsubsys;            /* Flag for matched subarrays */
   dim_t maxconcat=0;          /* Longest continuous chunk length */
-  int maxnelem=0;             /* Max elem (subarrays) encountered */
+  dim_t maxnelem=0;           /* Max elem (subarrays) encountered */
   dim_t *nbolx = NULL;        /* Number of bolometers in X direction */
   dim_t *nboly = NULL;        /* Number of bolometers in Y direction */
-  int nelem;                  /* Number of elements in index array */
+  dim_t nelem;                /* Number of elements in index array */
   size_t *new_chunk=NULL;     /* chunks associated with new_subgroups */
   dim_t new_ngroups=0;        /* counter for new_subgroups */
   dim_t **new_subgroups=NULL; /* subgroups that are long enough */
-  int ngroups = 0;            /* Counter for subgroups to be stored */
+  size_t ngroups = 0;         /* Counter for subgroups to be stored */
   dim_t nx;                   /* (data->dims)[0] */
   dim_t ny;                   /* (data->dims)[1] */
   double obslam;              /* Observed wavelength from FITS header (m) */
@@ -216,7 +216,7 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
   int subsysnum;              /* Subsystem numeric id. 0 - 8 */
   size_t thischunk;           /* Current chunk that we're on */
   dim_t thislen;              /* Length of current time chunk */
-  int thisnelem;              /* Number of elements (subarrays) at this chunk*/
+  dim_t thisnelem;            /* Number of elements (subarrays) at this chunk*/
   dim_t totlen;               /* Total length of continuous time chunk */
   double writetime;           /* RTS_END value at end of written data */
 
@@ -630,7 +630,7 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
 
     /* Loop over time chunks */
     for( i=0; (*status==SAI__OK)&&(i<(*group)->ngroups); i++ ) {
-      int idx;
+      size_t idx;
       /* Loop over subarray */
       for( idx=0; idx<(*group)->nrelated; idx++ ) {
         /* Check for new continuous chunk */

@@ -111,7 +111,7 @@
 
 #define FUNC_NAME "smf_calcmodel_ast"
 
-void smf_calcmodel_ast( smfWorkForce *wf, smfDIMMData *dat, int chunk,
+void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)), smfDIMMData *dat, int chunk,
                         AstKeyMap *keymap __attribute__((unused)),
                         smfArray **allmodel, int flags __attribute__((unused)),
                         int *status) {

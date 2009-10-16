@@ -163,6 +163,7 @@
 
 #include "star/shl.h"
 #include "sae_par.h"
+#include "smurflib.h"
 
 void smurf_smurfhelp( int * status ) {
 

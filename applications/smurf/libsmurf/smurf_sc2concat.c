@@ -136,7 +136,6 @@ void smurf_sc2concat( int *status ) {
   smfData *data=NULL;        /* Pointer to a smfData */
   Grp *fgrp = NULL;          /* Filtered group, no darks */
   size_t gcount=0;           /* Grp index counter */
-  size_t i;                  /* Loop counter */
   size_t idx;                /* Subarray counter */
   Grp *igrp = NULL;          /* Group of input files */
   smfGroup *igroup=NULL;     /* smfGroup corresponding to igrp */

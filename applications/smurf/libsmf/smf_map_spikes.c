@@ -107,8 +107,8 @@
 void smf_map_spikes( smfData *data, smfData *variance, int *lut,
                      unsigned char *qual, unsigned char mask, double *map, 
                      unsigned int *hitsmap, double *mapvar,
-                     dim_t msize, double thresh, size_t *nflagged, 
-                     int *status ) {
+                     dim_t msize __attribute__((unused)), double thresh,
+                     size_t *nflagged, int *status ) {
 
   /* Local Variables */
   double *dat=NULL;          /* Pointer to data array */
@@ -121,7 +121,6 @@ void smf_map_spikes( smfData *data, smfData *variance, int *lut,
   dim_t nbolo;               /* number of bolos */
   size_t nflag=0;            /* Number of samples flagged */
   dim_t ntslice;             /* number of time slices */
-  double thisweight;         /* The weight at this point */
   double threshsq;           /* square of thresh */
   double *var=NULL;          /* Pointer to variance array */
   size_t vbstride;           /* bolo stride of variance */

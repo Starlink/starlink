@@ -124,7 +124,7 @@ void CGEN_FUNCTION(smf_detmask)( const CGEN_TYPE *in, int len, int ndim,
    const CGEN_TYPE *pin;
    CGEN_TYPE *pout;
    int i;
-   size_t ic[ NDF__MXDIM ];
+   int ic[ NDF__MXDIM ];
    size_t iel;
    size_t nel;
 

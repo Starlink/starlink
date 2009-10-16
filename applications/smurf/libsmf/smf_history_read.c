@@ -105,7 +105,7 @@ void smf_history_read( smfData* data,int *status) {
   size_t bufelem = 0;         /* Size of one element in buffer */
   size_t clen = 0;            /* String length in _CHAR*X */
   smfFile *file = NULL;       /* data->file */
-  int i = 0;                  /* Loop counter */
+  size_t i = 0;               /* Loop counter */
   size_t nrec = 0;            /* Number of history records */
   AstKeyMap *history = NULL;  /* History to be stored in the smfData */
   char **pntrs = NULL;        /* Pointers to strings in buffer */

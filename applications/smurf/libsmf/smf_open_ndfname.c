@@ -148,7 +148,6 @@ void smf_open_ndfname( const HDSLoc *loc, const char accmode[], const char filen
 
   /* Local variables */
   void *datarr[3] = { NULL, NULL, NULL }; /* Pointers for data */
-  dim_t dimens[NDF__MXDIM];     /* Dimensions of image */
   int dims[NDF__MXDIM];         /* Extent of each dimension */
   smf_dtype dtype;              /* Data type */
   int flags = 0;                /* Flags for creating smfDA, smfFile and 
@@ -160,7 +159,6 @@ void smf_open_ndfname( const HDSLoc *loc, const char accmode[], const char filen
   AstFrameSet *ndfwcs = NULL;   /* Copy of input FrameSet to write to NDF */
   smfFile *newfile = NULL;      /* New smfFile with details of requested NDF */
   int place;                    /* Placeholder for NDF */
-  int temp;                     /* Temporary integer to convert to dim_t */
   int updating = 0;             /* True if the extension is being updated */
 
   /* Initialize the output smfData to NULL pointer */

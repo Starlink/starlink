@@ -137,8 +137,6 @@ void smurf_sc2fft( int *status ) {
   smfArray *darks = NULL;   /* dark frames */
   Grp *fgrp = NULL;         /* Filtered group, no darks */
   size_t gcount=0;           /* Grp index counter */
-  size_t i=0;               /* Counter, index */
-  smfData *idata=NULL;      /* Pointer to input smfData */
   smfGroup *igroup=NULL;     /* smfGroup corresponding to igrp */
   Grp *igrp = NULL;         /* Input group of files */
   int inverse=0;            /* If set perform inverse transform */
@@ -192,7 +190,7 @@ void smurf_sc2fft( int *status ) {
   if( *status == SAI__OK ) {
     ncontchunks = igroup->chunk[igroup->ngroups-1]+1;
   }
-  msgOutiff( MSG__NORM, "", "Found %d continuous chunk%s", status, ncontchunks,
+  msgOutiff( MSG__NORM, "", "Found %zu continuous chunk%s", status, ncontchunks,
              (ncontchunks > 1 ? "s" : "") );
 
   /* Are we doing an inverse transform? */

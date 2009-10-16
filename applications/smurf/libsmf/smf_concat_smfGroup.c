@@ -203,7 +203,6 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
 
   /* Local Variables */
   size_t bstr;                  /* Concatenated bolo stride */
-  int creflag;                  /* flags for smfData creation */
   smfDA *da=NULL;               /* Pointer to smfDA struct */
   smfData *data=NULL;           /* Concatenated smfData */
   int flag;                     /* Flag */

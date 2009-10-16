@@ -90,7 +90,8 @@
 
 #define FUNC_NAME "smf_calcmodel_dks"
 
-void smf_calcmodel_dks( smfWorkForce *wf, smfDIMMData *dat, int chunk,
+void smf_calcmodel_dks( smfWorkForce *wf __attribute__((unused)),
+                        smfDIMMData *dat, int chunk,
                         AstKeyMap *keymap, smfArray **allmodel, int flags,
                         int *status) {
 

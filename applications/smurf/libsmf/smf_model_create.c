@@ -256,9 +256,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
   size_t nflag;                 /* Number of flagged samples */
   dim_t nrel=0;                 /* Number of related elements (subarrays) */
   int oflag=0;                  /* Flags for opening template file */
-  size_t pagesize=0;            /* Size of memory page used by mmap */
   char *pname=NULL;             /* Poiner to fname */
-  long remainder=0;             /* Extra length beyond integer pagesize */
   char suffix[] = SMF__DIMM_SUFFIX; /* String containing model suffix */
   double tau;                   /* tau */
   smf_tausrc tausrc;            /* Type of tau monitor */

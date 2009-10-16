@@ -127,7 +127,7 @@ void smurf_stackframes( int *status ) {
   AstFrameSet *outwcs;           /* Output frameset */
   void * pntr[3];                /* for ndfMap */
   dim_t refdims[NDF__MXDIM];     /* Reference dimensions */
-  int refndims = 0;              /* Number of dims in first image */
+  size_t refndims = 0;           /* Number of dims in first image */
   char reftype[NDF__SZTYP+1];    /* reference data type */
   size_t size;                   /* Size of intput group */
   smfSortInfo * sortinfo = NULL; /* For sorting */
@@ -168,7 +168,7 @@ void smurf_stackframes( int *status ) {
     if (*status == SAI__OK) {
       /* Remove trailing dims that are size 1 */
       size_t j;
-      int ndims = 1;
+      size_t ndims = 1;
       for (j=data->ndims; j > 0; j--) {
 	/* Loop until we don't have a size 1 */
 	if (data->dims[j-1] != 1) {
@@ -181,7 +181,7 @@ void smurf_stackframes( int *status ) {
 	if (j != ndims) msgSetc("DIMS", "x" );
       }
       msgOutiff( MSG__DEBUG, " ",
-		 "File %d has %d dimensions [^DIMS]",status, i, ndims );
+		 "File %zu has %zu dimensions [^DIMS]",status, i, ndims );
 
       if (refndims == 0) {
 	/* need to store reference dims - do not use memcpy since
@@ -195,21 +195,21 @@ void smurf_stackframes( int *status ) {
 	const char * dtype = smf_dtype_string( data, status );
 	if (!dtype && *status == SAI__OK) {
 	  *status = SAI__ERROR;
-	  errRepf( " ", "Unable to determine data type of file %d. Something is very wrong",
+	  errRepf( " ", "Unable to determine data type of file %zu. Something is very wrong",
 		   status, i );
 	}
 
 	if (refndims != ndims) {
 	  if (*status != SAI__OK) {
 	    *status = SAI__ERROR;
-	    errRepf( " ", "Dimensionality of file %d does not match that of first file",
+	    errRepf( " ", "Dimensionality of file %zu does not match that of first file",
 		     status, i );
 	  }
         } else if ( *status == SAI__OK && strcmp( reftype, dtype ) != 0 ) {
 	  /* This check would not be necessary if we could modify smf_open_file
 	     to force the data type to use */
 	  *status = SAI__ERROR;
-	  errRepf( " ", "Data type of file %d [%s] differs from that of the first file [%s]",
+	  errRepf( " ", "Data type of file %zu [%s] differs from that of the first file [%s]",
 		   status, i, dtype, reftype );
 
 	} else {
@@ -218,7 +218,7 @@ void smurf_stackframes( int *status ) {
 	    for (j = 1; j <= ndims; j++) {
 	      if ( refdims[j-1] != (data->dims)[j-1] ) {
 		*status = SAI__ERROR;
-		errRepf( " ", "Dimension %d of file %d differs from that of the first file",
+		errRepf( " ", "Dimension %zu of file %zu differs from that of the first file",
 			 status, i, j );
 		break;
 	      }
@@ -239,12 +239,12 @@ void smurf_stackframes( int *status ) {
 
   if (refndims != 2) {
     *status = SAI__OK;
-    errRepf(" ", TASK_NAME " requires that all input files have 2 dimensions not %d", status,
+    errRepf(" ", TASK_NAME " requires that all input files have 2 dimensions not %zu", status,
 	    refndims);
   }
 
-  msgOutf( " ", "Input files all have dimensions of %d x %d", status,
-	   refdims[0], refdims[1] );
+  msgOutf( " ", "Input files all have dimensions of %zu x %zu", status,
+	   (size_t)refdims[0], (size_t)refdims[1] );
 
   /* Now need to sort the files into time order. We have the dates and indices */
   qsort( sortinfo, size, sizeof(*sortinfo), smf_sort_bytime );
@@ -256,7 +256,8 @@ void smurf_stackframes( int *status ) {
   ndgNdfpr( indf, "WCS,UNITS,TITLE,LABEL,NOEXTENSION(PROVENANCE)",
 	    ogrp, 1, &outndf, status );
   ndfAnnul( &indf, status );
-  ndfBound( outndf, NDF__MXDIM, lbnd, ubnd, &refndims, status );
+  ndfBound( outndf, NDF__MXDIM, lbnd, ubnd, &itemp, status );
+  refndims = itemp;
   lbnd[2] = 1;
   ubnd[2] = lbnd[2] + size - 1;
   ndfSbnd( 3, lbnd, ubnd, outndf, status );

@@ -148,8 +148,6 @@ void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim,
   double *imptr = NULL;            /* Pointer to mapped space for image */
   int j;                           /* Loop counter */
   int lbnd[2];                     /* Lower dimension bounds */
-  int nbolx;                       /* Number of bolometers in the X direction */
-  int nboly;                       /* Number of bolometers in the Y direction */
   int ntot;                        /* Total number of elements */
   int place;                       /* NDF placeholder */
   char prvname[2*PAR__SZNAM +1];   /* Provenance creator */

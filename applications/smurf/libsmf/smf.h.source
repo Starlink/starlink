@@ -447,8 +447,8 @@ void smf_bolonoise( smfWorkForce *wf, const smfData *data,
                     int nep, double *whitenoise, double *fratio,
                     smfData **fftpow,int *status );
 
-double smf_calc_covar( const smfData *data, const int i, const int j,
-                       int lo, int hi, int *status);
+double smf_calc_covar( const smfData *data, const size_t i, const size_t j,
+                       size_t lo, size_t hi, int *status);
 
 double smf_calc_fcon( smfData *data, dim_t nchan, int report,
                       AstMapping **specmap, AstFrame **specframe,
@@ -787,7 +787,7 @@ void smf_find_subarray ( const smfHead * hdr, char subarray[],
                          size_t buflen, int *subnum, int *status );
 
 void smf_fit_poly( const smfData *data, unsigned char *quality,
-                   const int order, double *poly, int *status);
+                   const size_t order, double *poly, int *status);
 
 void smf_fits_crchan( size_t nfits, const char * headrec, AstFitsChan ** fits,
                       int *status);
@@ -926,7 +926,7 @@ void smf_getrefwcs( const char *param, AstFrameSet **specwcs,
 AstKeyMap *smf_groupscans( Grp *igrp,  int size, int *maxsyspop,
                            int *conform, Grp **ogrp, int *status );
 
-void smf_grp_related( Grp *igrp, const int grpsize, const int grpbywave,
+void smf_grp_related( Grp *igrp, const size_t grpsize, const int grpbywave,
                       dim_t maxlen, dim_t *maxconcatlen, smfGroup **group,
                       Grp **basegrp, int *status );
 
@@ -1236,7 +1236,7 @@ void smf_scalar_multiply( smfData * data, double dscalar, int * status );
 
 double smf_scale_tau ( const double tauwvm, const char *filter, int *status);
 
-void smf_scanfit( smfData *data, unsigned char *quality, int order,
+void smf_scanfit( smfData *data, unsigned char *quality, size_t order,
                   int *status );
 
 void smf_select_pntr( void *const pntr[3], smf_dtype dtype, double **ddata,

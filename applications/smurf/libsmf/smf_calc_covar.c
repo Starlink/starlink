@@ -99,18 +99,18 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_calc_covar"
 
-double smf_calc_covar ( const smfData *data, const int i, const int j,
-			int lo, int hi, int *status) {
+double smf_calc_covar ( const smfData *data, const size_t i, const size_t j,
+			size_t lo, size_t hi, int *status) {
 
   /* Local variables */
   double *indata = NULL;      /* Pointer to input data array */
   size_t k;                   /* Loop counter */
   dim_t nframes;              /* Max number of data points*/
-  int npts;                   /* Number of points in timeseries */
+  size_t npts;                   /* Number of points in timeseries */
   dim_t nbol;                 /* Number of bolometers */
   double *idata = NULL;       /* Pointer to array for bolometer 1 data */
   double *jdata = NULL;       /* Pointer to array for bolometer 2 data */
-  int temp;                   /* Temporary variable */
+  size_t temp;                   /* Temporary variable */
   double covar = VAL__BADD;   /* Covariance, initialuzed to bad */
 
   /* Check status */
@@ -124,7 +124,7 @@ double smf_calc_covar ( const smfData *data, const int i, const int j,
   if (*status != SAI__OK) return covar;
 
   /* Check bolometer indices are in range */
-  if ( i > nframes || i < 0 ) {
+  if ( i > nframes ) {
     if ( *status == SAI__OK) {
       msgSeti("I", i);
       msgSeti("N", nframes);
@@ -133,7 +133,7 @@ double smf_calc_covar ( const smfData *data, const int i, const int j,
       return covar;
     }
   }
-  if ( j > nframes || j < 0 ) {
+  if ( j > nframes ) {
     if ( *status == SAI__OK) {
       msgSeti("I", j);
       msgSeti("N", nframes);
@@ -144,7 +144,7 @@ double smf_calc_covar ( const smfData *data, const int i, const int j,
   }
 
   /* Check requested range is valid */
-  if ( lo > nframes || lo < 0 ) {
+  if ( lo > nframes ) {
     if ( *status == SAI__OK) {
       msgSeti("J", lo);
       msgSeti("N", nframes);
@@ -153,7 +153,7 @@ double smf_calc_covar ( const smfData *data, const int i, const int j,
       return covar;
     }
   }
-  if ( hi > nframes || hi < 0 ) {
+  if ( hi > nframes ) {
     if ( *status == SAI__OK) {
       msgSeti("J", hi);
       msgSeti("N", nframes);

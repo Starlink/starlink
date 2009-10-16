@@ -794,7 +794,7 @@ void smurf_makemap( int *status ) {
   size_t mapmem=0;           /* Memory needed for output map */
   size_t maxmem=0;           /* Max memory usage in bytes */
   int maxmem_mb;             /* Max memory usage in Mb */
-  int maxmem_default;        /* Default value for maxmem */
+  int maxmem_default = 1000; /* Default value for maxmem */
   double maxtexp = 0.0;      /* Maximum exposure time */
   float medtexp = 0.0;       /* Median exposure time */
   char method[LEN__METHOD];  /* String for map-making method */

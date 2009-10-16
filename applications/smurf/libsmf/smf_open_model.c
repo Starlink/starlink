@@ -111,14 +111,10 @@ void smf_open_model( const Grp *igrp, int index, const char *mode,
   int fd=0;                     /* File descriptor */
   smfDIMMHead head;             /* Header for the file */
   size_t headlen=0;             /* Size of header in bytes */ 
-  int i;                        /* Loop counter */
   int mflags=0;                 /* bit flags for mmap */
   char name[GRP__SZNAM+1];      /* Name of container file */
-  size_t ndata=0;               /* Number of elements in data array */
   int oflags=0;                 /* bit flags for open */
-  size_t pagesize=0;            /* Size of memory page used by mmap */
   char *pname=NULL;             /* Poiner to fname */
-  long remainder=0;             /* Extra length beyond integer pagesuze */
 
   if ( *status != SAI__OK ) return;
 

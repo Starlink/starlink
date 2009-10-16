@@ -107,7 +107,8 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_dump_smfData"
 
-void smf_dump_smfData( const smfData *data, int showflags, int *status) {
+void smf_dump_smfData( const smfData *data, int showflags __attribute__((unused)),
+                       int *status) {
 
   /* Local variables */
   smfFile *file;                /* File struct within smfData */

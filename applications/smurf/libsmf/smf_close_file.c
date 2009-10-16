@@ -159,9 +159,6 @@ void smf_close_file( smfData ** data, int * status ) {
   size_t headlen=0;       /* Size of header (mmap'd files) in bytes */ 
   size_t       i;         /* loop counter */
   int       isSc2store = 0; /* is this sc2Store data */
-  size_t ndata=0;         /* Number of elements in data array */
-  size_t pagesize=0;      /* Size of memory page used by mmap */
-  long remainder=0;       /* Extra length beyond integer pagesuze */
   smfDIMMHead *temphead=NULL; /* Pointer to DIMM header */
 
 

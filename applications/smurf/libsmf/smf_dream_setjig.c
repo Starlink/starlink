@@ -86,7 +86,7 @@ void smf_dream_setjig( char *subarray, int nsampcycle, double gridstep,
                        double jigpath[DREAM__MXSAM][2], int *status) {
 
   /* Local variables */
-  size_t i;              /* Loop counter */
+  int i;                 /* Loop counter */
   double t;              /* Temporary variable */
 
   /* Check status */

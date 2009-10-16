@@ -113,7 +113,7 @@ void * smf_map_or_malloc (size_t nelem, smf_dtype type, int zero, int indf,
   ndfMap( indf, comp, smf_dtype_str(type, status),
           (zero ? "WRITE/ZERO" : "WRITE"), pntr, &nout, status);
 
-  if (nelem != nout && *status == SAI__OK) {
+  if (nelem != (size_t)nout && *status == SAI__OK) {
     ndfUnmap( indf, comp, status );
     *status = SAI__ERROR;
     msgSetc( "COMP", comp );

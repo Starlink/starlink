@@ -146,18 +146,13 @@ void smurf_calcnoise( int *status ) {
   Grp *fgrp = NULL;         /* Filtered group, no darks */
   size_t gcount=0;           /* Grp index counter */
   size_t i=0;               /* Counter, index */
-  smfData *idata=NULL;      /* Pointer to input smfData */
   Grp *igrp = NULL;         /* Input group of files */
   smfGroup *igroup=NULL;     /* smfGroup corresponding to igrp */
-  int inverse=0;            /* If set perform inverse transform */
   dim_t maxconcat=0;         /* Longest continuous chunk length in samples */
   size_t ncontchunks=0;      /* Number continuous chunks outside iter loop */
-  smfData *odata=NULL;      /* Pointer to output smfData to be exported */
   Grp *ogrp = NULL;         /* Output group of files */
   size_t outsize;           /* Total number of NDF names in the output group */
-  int polar=0;              /* Flag for FFT in polar coordinates */
   Grp *powgrp = NULL;       /* Group for output power spectra */
-  int power=0;              /* Flag for squaring amplitude coeffs */
   size_t size;              /* Number of files in input group */
   smfWorkForce *wf = NULL;  /* Pointer to a pool of worker threads */
   double f_low = 0.5;       /* Frequency to use for noise ratio image */
@@ -234,7 +229,7 @@ void smurf_calcnoise( int *status ) {
   if( *status == SAI__OK ) {
     ncontchunks = igroup->chunk[igroup->ngroups-1]+1;
   }
-  msgOutiff( MSG__NORM, "", "Found %d continuous chunk%s", status, ncontchunks,
+  msgOutiff( MSG__NORM, "", "Found %zu continuous chunk%s", status, ncontchunks,
              (ncontchunks > 1 ? "s" : "") );
 
   /* Loop over input data as contiguous chunks */
@@ -254,7 +249,6 @@ void smurf_calcnoise( int *status ) {
         smfData *thedata = concat->sdata[idx];
         smfData *outdata = NULL;
         smfData *ratdata = NULL;
-        smfData *nepdata = NULL;
         smfData *powdata = NULL;
 
         /* Convert the data to amps */
@@ -362,7 +356,7 @@ void smurf_calcnoise( int *status ) {
       } else {
         *status = SAI__ERROR;
         errRepf( FUNC_NAME,
-                "Internal error obtaining concatenated data set for chunk %d",
+                "Internal error obtaining concatenated data set for chunk %zu",
                  status, contchunk );
       }
 
@@ -383,7 +377,6 @@ void smurf_calcnoise( int *status ) {
   }
 
   /* Tidy up after ourselves: release the resources used by the grp routines */
- CLEANUP:
   if (igrp) grpDelet( &igrp, status);
   if (ogrp) grpDelet( &ogrp, status);
   if (powgrp) grpDelet( &powgrp, status );

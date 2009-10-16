@@ -94,7 +94,6 @@ void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap, int *dofilt,
   double f_notchlow[SMF__MXNOTCH]; /* Array low-freq. edges of notch filters */
   double f_notchhigh[SMF__MXNOTCH];/* Array high-freq. edges of notch filters */
   int f_nnotch=0;           /* Number of notch filters in array */
-  int i;                    /* Loop counter */
 
   /* Main routine */
   if (*status != SAI__OK) return;

@@ -106,7 +106,6 @@ void smf_history_add(  smfData* data, const char * appl, int * status ) {
   smfFile *file = NULL; /* data->file */
   int done;             /* Flag to denote whether history entry has been added */
   AstKeyMap *history;   /* AstKeyMap storing history information */
-  int state = 0;        /* Flag to denote whether history component exists in NDF */
 
   /* Check entry status */
   if (*status != SAI__OK) return;

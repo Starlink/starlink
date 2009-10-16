@@ -733,7 +733,7 @@ int smf_job_wait( smfWorkForce *workforce, int *status ) {
 */
 
 /* Local Variables: */
-   int result;
+   int result = 0;
    int wf_status;
    smfJob *job;
    int conid;
@@ -2231,10 +2231,10 @@ static void smf_thread_log_( const char *text, const char *colour, int ijob ) {
    pthread_mutex_lock( &fd_mutex );
    if( ijob > 0 ) {
       fprintf( fd ? fd : stdout, "%ld %ld.%.6ld %s %s (J%d)\n", (long) pthread_self(), 
-               (long) tv.tv_sec, tv.tv_usec, colour, text, ijob );
+               (long) tv.tv_sec, (long)tv.tv_usec, colour, text, ijob );
    } else {
       fprintf( fd ? fd : stdout, "%ld %ld.%.6ld %s %s\n", (long) pthread_self(), 
-               (long) tv.tv_sec, tv.tv_usec, colour, text );
+               (long) tv.tv_sec, (long)tv.tv_usec, colour, text );
    }
    pthread_mutex_unlock( &fd_mutex );
 }

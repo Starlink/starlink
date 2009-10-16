@@ -108,12 +108,7 @@ void smf_dream_getgrid( const AstKeyMap *keymap, double *gridstep, int *ngrid,
                         int *status) {
 
   /* Local variables */
-  int gridxmin = 0;          /* Minimum X extent of reconstruction grid */
-  int gridxmax = 1;          /* Maximum X extent of reconstruction grid */
-  int gridymin = 0;          /* Minimum Y extent of reconstruction grid */
-  int gridymax = 1;          /* Maximum Y extent of reconstruction grid */
   int k;                     /* Loop counter */
-  size_t nelem;              /* Number of elements in array */
   int tmp;                   /* General purpose temporary variable */
   int xgrid;                 /* X position in reconstruction grid */
   int ygrid;                 /* Y position in reconstruction grid */
