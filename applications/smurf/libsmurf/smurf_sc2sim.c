@@ -227,6 +227,16 @@
 *     rowsize (integer) : 32
 *       This is the number of bolometers in a "row",
 *       and this is the total number of "columns".
+*     mstap_x (double) : 0.0
+*       Array of microstep X-offsets in the focal plane.
+*       Units are arcseconds. Multiple values can be
+*       supplied as comma-separated list of offsets
+*       surrounded by parentheses, e.g "(10,20)"
+*     mstap_y (double) : 0.0
+*       Array of microstep Y-offsets in the focal plane.
+*       Units are arcseconds. Multiple values can be
+*       supplied as comma-separated list of offsets
+*       surrounded by parentheses, e.g "(10,20)"
 *     numsamples (integer) : 128
 *       For the Stare obsmode, this is the number of
 *       samples.
