@@ -123,6 +123,9 @@
 *        Add STACKFRAMES
 *     2009-10-14 (TIMJ):
 *        Alphabetize call to tasks.
+*     2009-10-16 (DSB):
+*        Use ndgBeggh and ndgEndgh to record expanded GRP groups in
+*        output NDF history.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -166,6 +169,7 @@
 #include "ndf.h"
 #include "star/grp.h"
 #include "star/hds.h"
+#include "star/ndg.h"
 #include "ast.h"
 #include "ems.h"
 #include "sc2da/sc2ast.h"
@@ -222,6 +226,13 @@ void smurf_mon( int * status ) {
   snprintf( appname, NDF__SZAPP, "%-*s (%s V%s)", PAR__SZNAM,
 	    taskname, PACKAGE_UPCASE, PACKAGE_VERSION);
   ndfHappn( appname, status );
+
+   /* Begin a GRP NDF history block. This causes the contents of GRP 
+      groups to be appended to default history text added to any NDFs 
+      during the block. */
+   ndgBeggh( status );
+
+
 
   /* Call the subroutine associated with the requested task */
   if (strcmp( taskname, "BADBOLOS" ) == 0 ) {
@@ -295,6 +306,10 @@ void smurf_mon( int * status ) {
     msgSetc( "TASK", taskname );
     errRep( "smurf_mon", "Unrecognized taskname: ^TASK", status);
   }
+
+
+/* End the GRP NDF history block. */
+   ndgEndgh( status );
 
   /* Clear cached info from sc2ast_createwcs. */
   sc2ast_createwcs(-1, NULL, NULL, NULL, NULL, status);
