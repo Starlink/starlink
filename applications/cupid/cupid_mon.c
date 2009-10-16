@@ -80,6 +80,9 @@ void cupid_mon( int *status ) {
 *        Add CUPID and version number to NDF history.
 *     31-JUL-2009 (DSB):
 *        Use ndgBegpv/Endpv to provide automatic provenance propagation.
+*     16-OCT-2009 (DSB):
+*        Use ndgBeggh/ndgEndgh to record contents of group parameters in 
+*        the history component of output NDFs.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -119,6 +122,11 @@ void cupid_mon( int *status ) {
    by calling ndgEndpv. */
    ndgBegpv( status );
 
+/* Begin a GRP NDF history block. This causes the contents of GRP groups
+   to be appended to default history text added to any NDFs during the
+   block. */
+   ndgBeggh( status );
+
 /* Check the string against valid A-task names---if matched then call
    the relevant A-task. */
 
@@ -151,6 +159,9 @@ void cupid_mon( int *status ) {
       *status = SAI__ERROR;
       errRep( "CUPID_MON_NOCOM", "CUPID: No such command ^CMD.", status );
    }
+
+/* End the GRP NDF history block. */
+   ndgEndgh( status );
 
 /* End the provenance block. This will result in every output NDF being
    given a provenance extension containing a record of the input NDFs
