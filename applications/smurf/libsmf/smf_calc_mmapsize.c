@@ -95,7 +95,7 @@ void smf_calc_mmapsize( size_t headsize, const smfData * data,
 
   /* Header must fit into integer multiple of pagesize so that the data
      array starts on a page boundary */
-  (void)smf_get_freemem( NULL, &pagesize, status );
+  (void)smf_get_freemem( NULL, &pagesize, NULL, status );
   if (*status != SAI__OK) return;
 
   remainder = headsize % pagesize;

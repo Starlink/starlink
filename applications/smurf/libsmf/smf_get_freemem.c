@@ -13,7 +13,8 @@
  *     C function
 
  *  Invocation:
- *     size_t smf_get_freemem( double * mbytes, size_t *pagesize, int *status );
+ *     size_t smf_get_freemem( double * mbytes, size_t *pagesize,
+ *                             size_t *physsize, int *status );
 
  *  Arguments:
  *     mbytes = double * (Returned)
@@ -21,6 +22,8 @@
  *        megabytes if required. Can be NULL.
  *     pagesize = size_t * (Returned)
  *        Pagesize in bytes. Can be NULL.
+ *     physsize = size_t * (Returned)
+ *        Total physical memory in bytes. Can be NULL.
  *     status = int* (Given and Returned)
  *        Pointer to inherited status.
 
@@ -34,13 +37,17 @@
 
  *  Authors:
  *     TIMJ: Tim Jenness (JAC, Hawaii)
+ *     EC: Ed Chapin (UBC)
 
  *  History:
  *     2009-10-12 (TIMJ):
  *       Initial version
+ *     2009-10-16 (EC):
+ *       Add physsize parameter.
 
  *  Copyright:
  *     Copyright (C) 2009 Science & Technology Facilities Council.
+ *     Copyright (C) 2009 University of British Columbia.
  *     All Rights Reserved.
 
  *  Licence:
@@ -87,7 +94,8 @@
 
 
 
-size_t smf_get_freemem ( double *mbytes, size_t * pagesize, int * status ) {
+size_t smf_get_freemem ( double *mbytes, size_t * pagesize, 
+                         size_t * physsize, int * status ) {
   size_t mem_used = 0;
   size_t mem_free = 0;
   size_t mem_total = 0;
@@ -145,5 +153,6 @@ size_t smf_get_freemem ( double *mbytes, size_t * pagesize, int * status ) {
 
   /* sort out return values */
   if (mbytes) *mbytes = freembytes;
+  if (physsize) *physsize = mem_total;
   return mem_free;
 }

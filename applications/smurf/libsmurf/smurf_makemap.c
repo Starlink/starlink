@@ -680,15 +680,15 @@
 *        - re-tabbed some sections to fit into 80 columns
 *        - define MAXMEM ADAM parameter
 *        - Added "Configuration Parameters" section
-*     2009-10-07 (DSB):
+*     2009-10-07 (DSB): 
 *        Update to reflect new smf_choosetiles behaviour.
 *     2009-10-08 (EC):
 *        Calculate dynamic default value for MAXMEM using sysconf call
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
-*     Council. Copyright (C) 2005-2009 University of British Columbia.
+*     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2005-2009 University of British Columbia.
 *     Copyright (C) 2007-2009 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
@@ -811,6 +811,7 @@ void smurf_makemap( int *status ) {
   AstFrameSet *outfset=NULL; /* Frameset containing sky->output mapping */
   char pabuf[ 10 ];          /* Text buffer for parameter value */
   double params[ 4 ];        /* astRebinSeq parameters */
+  size_t physsize;           /* Physical memory available */
   char *pname = NULL;        /* Name of currently opened data file */
   int ***ptime = NULL;       /* Holds time slice indices for each bol bin */
   int *pt = NULL;            /* Holds time slice indices for each bol bin */
@@ -883,28 +884,36 @@ void smurf_makemap( int *status ) {
 
   if( *status == SAI__OK ) {
     double freemem = 0.0;
-    (void)smf_get_freemem( &freemem, NULL, status );
-    if (freemem > 0 ) {
-      const int min_mem = 512;
-      maxmem_default = (int)freemem;
+    physsize = 0;
 
-      /* Reduce that figure by 512MB to play it safe */
+
+    (void)smf_get_freemem( NULL, NULL, &physsize, status );
+
+    /* Convert physical memory to MB */
+    freemem = physsize / SMF__MB;
+
+    if (physsize > 0 ) {
+      const int min_mem = 512;
+
+      /* Set default memory as 80% of physical memory */
+      maxmem_default = (int) (freemem*0.80);
+
+      /* Generate warning if this seems too small... */
       if( maxmem_default <= min_mem ) {
         *status = SAI__ERROR;
-        errRepf( "", TASK_NAME ": Available memory estimated to be %d MB but recommend at least %d MB!",
+        errRepf( "", TASK_NAME ": Available memory estimated to be %d MB but recommend at least %d MB! You may wish to set MAXMEM manually.",
                  status, maxmem_default, min_mem );
       }
-      maxmem_default -= min_mem;
 
       msgOutiff( MSG__VERB, "", TASK_NAME
-                 ": Default MAXMEM is %i MBytes",
+                 ": Default MAXMEM is %i MBytes (80%% of physical memory)",
                  status, maxmem_default );
     } else {
       /* If smf_get_freemem can't tell us, try something safe...*/
       maxmem_default = 1000;
 
       msgOutiff( MSG__VERB, "", TASK_NAME
-                 ": Can't determine default MAXMEM, setting to %i MBytes",
+                 ": Can't determine memory, setting to %i MBytes. You may wish to set MAXMEM manually.",
                  status, maxmem_default );
     }
   }
