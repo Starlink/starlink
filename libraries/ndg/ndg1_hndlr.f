@@ -21,8 +21,8 @@
 *     EVNAME = CHARACTER * ( * ) (Given)
 *        The type of NDF event that has occurred.
 *     EVTEXT = CHARACTER * ( * ) (Given)
-*        Descriptive information associated with the event. This will be
-*        the path to the file that was opened or closed.
+*        Descriptive information associated with the event. This will 
+*        usually be the path to the file that was opened, closed, etc.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -61,6 +61,8 @@
 *        Record each input NDF that is mapped for read or update access.
 *     3-AUG-2009 (DSB):
 *        Ensure a re-opened output NDF is not treated as an input NDF.
+*     15-OCT-2009 (DSB):
+*        Add handler for DEF_HISTORY event.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -74,6 +76,9 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and functions
+      INCLUDE 'NDF_PAR'          ! NDF constants 
+      INCLUDE 'GRP_PAR'          ! GRP constants 
+      INCLUDE 'DAT_PAR'          ! DAT constants 
 
 *  Global Variables:
       INTEGER RDKMP              ! KeyMap holding input NDFs
@@ -81,13 +86,17 @@
       INTEGER MPKMP              ! KeyMap holding mapped NDFs
       COMMON /NDG_PRV/ RDKMP, WRKMP, MPKMP
 
+      INTEGER DHKMP              ! KeyMap holding NDF to which default 
+                                 ! history has been written.
+      INTEGER GHKMP              ! KeyMap holding GRP group contents
+      COMMON /NDG_GH/ GHKMP, DHKMP
+
 *  Arguments Given:
       CHARACTER EVNAME*(*)
       CHARACTER EVTEXT*(*)
 
 *  Status:
       INTEGER STATUS             ! Global status
-*.
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -124,6 +133,12 @@
 *  add the path to the NDF to the MPKMP KeyMap.
       IF( EVNAME .EQ. 'UPDATE_DATA' .OR. EVNAME .EQ. 'READ_DATA' ) THEN
          CALL AST_MAPPUT0I( MPKMP, EVTEXT, 0, ' ', STATUS )
+      END IF
+
+*  If the event was the writing of default history, add the path to the NDF 
+*  to the DHKMP KeyMap.
+      IF( EVNAME .EQ. 'DEF_HISTORY' ) THEN
+         CALL AST_MAPPUT0I( DHKMP, EVTEXT, 0, ' ', STATUS )
       END IF
 
       END
