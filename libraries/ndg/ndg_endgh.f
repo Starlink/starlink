@@ -156,7 +156,7 @@
                      ILINE = 1
                      LINES( 1 ) = ' '
                      IAT = 0
-                     CALL CHR_APPND( 'Group', LINES( 1 ), IAT )
+                     CALL CHR_APPND( 'Group:', LINES( 1 ), IAT )
                      IAT = IAT + 1
                      CALL CHR_APPND( PARAM, LINES( 1 ), IAT )
                      CALL CHR_APPND( '="', LINES( 1 ), IAT )
@@ -211,9 +211,9 @@
                            END IF
                         END DO
 
-*  If there is not room to append a comma or a closing quote to the end
-*  of the line, start a new line.
-                        IF( IAT .GE. NDF__SZHMX ) THEN
+*  If there is not room to append a comma and space, or a closing quote to 
+*  the end of the line, start a new line.
+                        IF( IAT .GE. NDF__SZHMX - 1 ) THEN
                            ILINE = ILINE + 1
                            IAT = 0
                         END IF
@@ -227,17 +227,19 @@
                               CALL CHR_APPND( '"', LINES( ILINE ), IAT )
                            ELSE
                               CALL CHR_APPND( ',', LINES( ILINE ), IAT )
+                              IAT = IAT + 1
                            END IF
       
                         END IF
                      END DO
                   END IF
-               END DO
 
 *  Append the array of lines describing the contents of the expanded group
 *  to the current history record.
-               CALL NDF_HPUT( ' ', '<APPEND>', .TRUE., ILINE, LINES, 
-     :                        .FALSE., .FALSE., .FALSE., INDF, STATUS ) 
+                  CALL NDF_HPUT( ' ', '<APPEND>', .TRUE., ILINE, LINES, 
+     :                           .FALSE., .FALSE., .FALSE., INDF, 
+     :                           STATUS ) 
+               END DO
 
 *  Annul the NDF identifier
                CALL NDF_ANNUL( INDF, STATUS )
