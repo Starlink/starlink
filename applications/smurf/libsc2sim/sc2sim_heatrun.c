@@ -194,6 +194,9 @@ void sc2sim_heatrun ( struct sc2sim_obs_struct *inx,
 
   /* Do a heatrun simulation */
 
+  /* Force sc2store to think it's initialized */
+  sc2store_force_initialised( status );
+
   /* Calculate year/month/day corresponding to MJD at start */
   slaDjcl( inx->mjdaystart, &date_yr, &date_mo, &date_da, &date_df,
            &date_status );
