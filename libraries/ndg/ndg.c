@@ -351,6 +351,25 @@ void ndgCrexp( const char grpexp[], const Grp *igrp0, Grp ** igrp, size_t *size,
    return;
 }
 
+F77_SUBROUTINE(ndg_beggh)( INTEGER(STATUS) );
+
+void ndgBeggh( int * status ) {
+  DECLARE_INTEGER(STATUS);
+  F77_EXPORT_INTEGER(*status, STATUS );
+  F77_CALL(ndg_beggh)( INTEGER_ARG(&STATUS) );
+  F77_IMPORT_INTEGER( STATUS, *status );
+}
+
+
+F77_SUBROUTINE(ndg_endgh)( INTEGER(STATUS) );
+
+void ndgEndgh( int * status ) {
+  DECLARE_INTEGER(STATUS);
+  F77_EXPORT_INTEGER(*status, STATUS );
+  F77_CALL(ndg_endgh)( INTEGER_ARG(&STATUS) );
+  F77_IMPORT_INTEGER( STATUS, *status );
+}
+
 
 
 
