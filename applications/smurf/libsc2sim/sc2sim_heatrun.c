@@ -92,11 +92,18 @@
  *        DREAM-specific code.
  *     2007-10-05 (AGG):
  *        Loop over all requested subarrays
+ *     2009-10-15 (TJ):
+ *        Initialise sc2store in heatrun simulation, otherwise you get
+ *        an emsLevel warning on completion.
+ *     200910-16 (AGG):
+ *        Include sc2store functions, remove unused variable
  *     {enter_further_changes_here}
 
  *  Copyright:
  *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
- *     University of British Columbia. All Rights Reserved.
+ *     Copyright (C) 2009 Science and Technology Facilities Council.
+ *     Copyright (C) 2006-2009 University of British Columbia. All
+ *     Rights Reserved.
 
  *  Licence:
  *     This program is free software; you can redistribute it and/or
@@ -145,6 +152,7 @@
 #include "sc2da/Dits_Err.h"
 #include "sc2da/Ers.h"
 #include "sc2da/sc2store_par.h"
+#include "sc2da/sc2store.h"
 #include "sc2da/sc2math.h"
 #include "sc2da/sc2ast.h"
 
@@ -166,7 +174,6 @@ void sc2sim_heatrun ( struct sc2sim_obs_struct *inx,
   int bol;                        /* counter for indexing bolometers */
   double corner;                  /* corner frequency in Hz */
   double current;                 /* bolometer current in amps */
-  char *curtok=NULL;              /* current subarray name being parsed */
   int date_da;                    /* day corresponding to MJD */
   double date_df;                 /* day fraction corresponding to MJD */
   int date_mo;                    /* month corresponding to MJD */
