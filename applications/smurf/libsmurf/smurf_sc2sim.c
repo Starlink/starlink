@@ -115,11 +115,6 @@
 *       For the Boustrophedon obsmode, this parameter specifies
 *       the angle of the pattern relative to the telescope
 *       axes in radians anticlockwise.
-*     bous_width (double) : 2000.0 (arcseconds)
-*       For the Boustrophedon obsmode, this parameter specifies
-*       the width of the bous pattern in arcseconds.  This width
-*       is the width of each of back-and-forth sweeps across
-*       the sky, and is measured from the centre of the array.
 *     bous_height (double) : 2000.0 (arcseconds)
 *       For the Boustrophedon obsmode, this parameter specifies
 *       the height of the bous pattern in arcseconds.  This
@@ -135,6 +130,14 @@
 *     bous_vmax (double) : 200.0 (arcseconds/second)
 *       For the Boustrophedon obsmode, this parameter specifies
 *       the maximum telescope velocity.
+*     bous_width (double) : 2000.0 (arcseconds)
+*       For the Boustrophedon obsmode, this parameter specifies
+*       the width of the bous pattern in arcseconds.  This width
+*       is the width of each of back-and-forth sweeps across
+*       the sky, and is measured from the centre of the array.
+*     colsize (integer) : 40
+*       This is the number of bolometers in a "column",
+*       and this is the total number of "rows".
 *     conv_shape (int) : 1
 *       Flag for the possible convolution functions where
 *          0 - Gaussian
@@ -155,11 +158,11 @@
 *       Name of flatfield correction technique.
 *     grid_max_x (integer) : 1
 *       Reconstruction grid max x.
-*     grid_max_x (integer) : 1
+*     grid_max_y (integer) : 1
 *       Reconstruction grid max y.
 *     grid_min_x (integer) : 1
 *       Reconstruction grid min x.
-*     grid_min_x (integer) : 1
+*     grid_min_y (integer) : 1
 *       Reconstruction grid min y.
 *     grid_step_x (double) : 6.28 (arcseconds)
 *       Grid step in X direction.
@@ -201,12 +204,12 @@
 *       For the LISS obsmode, this parameter specifies
 *       the angle of the pattern relative to the telescope
 *       axes in radians anticlockwise.
-*     liss_width (double) : 2000.0 (arcseconds)
-*       For the LISS obsmode, this parameter specifies
-*       the width of the Lissajous pattern in arcseconds.
 *     liss_height (double) : 2000.0 (arcseconds)
 *       For the LISS obsmode, this parameter specifies
 *       the height of the Lissajous pattern in arcseconds.
+*     liss_nmaps (integer) : 1
+*       The number of times the Lissajous pattern should
+*       repeat.
 *     liss_spacing (double) : 240.0 (arcseconds)
 *       For the LISS obsmode, this parameter specifies
 *       the spacing of the Lissajous pattern in arcseconds.
@@ -216,17 +219,11 @@
 *     liss_vmax (double) : 200.0 (arcseconds/second)
 *       For the LISS obsmode, this parameter specifies
 *       the maximum telescope velocity.
-*     liss_nmaps (integer) : 1
-*       The number of times the Lissajous pattern should
-*       repeat.
+*     liss_width (double) : 2000.0 (arcseconds)
+*       For the LISS obsmode, this parameter specifies
+*       the width of the Lissajous pattern in arcseconds.
 *     mjdaystart (double) : 53795.0
 *       Modified julian date at start of observation.
-*     colsize (integer) : 40
-*       This is the number of bolometers in a "column",
-*       and this is the total number of "rows".
-*     rowsize (integer) : 32
-*       This is the number of bolometers in a "row",
-*       and this is the total number of "columns".
 *     mstap_x (double) : 0.0
 *       Array of microstep X-offsets in the focal plane.
 *       Units are arcseconds. Multiple values can be
@@ -280,12 +277,12 @@
 *       For the PONG obsmode, this parameter specifies
 *       the angle of the pattern relative to the telescope
 *       axes in radians anticlockwise.
-*     pong_width (double) : 2000.0 (arcseconds)
-*       For the PONG obsmode, this parameter specifies
-*       the width of the Pong pattern in arcseconds.
 *     pong_height (double) : 2000.0 (arcseconds)
 *       For the PONG obsmode, this parameter specifies
 *       the height of the Pong pattern in arcseconds.
+*     pong_nmaps (integer) : 1
+*       The number of times the Pong pattern should
+*       repeat.
 *     pong_spacing (double) : 240.0 (arcseconds)
 *       For the PONG obsmode, this parameter specifies
 *       the spacing of the Pong pattern in arcseconds.
@@ -298,19 +295,20 @@
 *     pong_vmax (double) : 200.0 (arcseconds/second)
 *       For the PONG obsmode, this parameter specifies
 *       the maximum telescope velocity.
-*     pong_nmaps (integer) : 1
-*       The number of times the Pong pattern should
-*       repeat.
+*     pong_width (double) : 2000.0 (arcseconds)
+*       For the PONG obsmode, this parameter specifies
+*       the width of the Pong pattern in arcseconds.
 *     ra (char[]) : 0:0:0.0 O (hours:minutes:seconds)
 *       Sexagesimal string representation of the Right
 *       ascension of the observation.
-*     steptime (double) : 0.005 (sec)
-*       Sample interval time.
+*     rowsize (integer) : 32
+*       This is the number of bolometers in a "row",
+*       and this is the total number of "columns".
 *     scan_angle (double) : 0.0 (radians)
 *       For the SINGLESCAN obsmode, this parameter specifies
 *       the angle of the pattern relative to the telescope
 *       axes in radians anticlockwise.
-*     scan_pa8thlength (double) : 2000.0 (arcseconds)
+*     scan_pathlength (double) : 2000.0 (arcseconds)
 *       For the SINGLESCAN obsmode, this parameter specifies
 *       the width of the scan path in arcseconds.
 *     scan_vmax (double) : 200.0 (arcseconds/second)
@@ -336,6 +334,8 @@
 *       SMU phase shift.
 *     smu_samples (integer) : 1
 *       Number of samples per jiggle vertex .
+*     steptime (double) : 0.005 (sec)
+*       Sample interval time.
 *     subsysnr (integer) : 1
 *       Subsystem number.
 *     targetpow (double) : 25.0 (pW)
@@ -366,11 +366,11 @@
 *       sky image.
 *     astpol (double) : 10.0 (percent)
 *       Polarisation of source.
+*     atend (double) : 5.0 (Degrees Celsius)
+*       Ambient temperature at end.
 *     atmname (char[]) : ""
 *       Name of the file containing atmospheric
 *       sky image.
-*     atend (double) : 5.0 (Degrees Celsius)
-*       Ambient temperature at end.
 *     atmxvel (double) : 5000.0 (arcsec/sec)
 *       Atm background velocity in X.
 *     atmyvel (double) : 0.0 (arcsec/sec)
@@ -417,10 +417,10 @@
 *       order. A single subarray can be named as a simple string (e.g. "s8a"),
 *       multiple subarrays can be given using commas and parentheses
 *       (e.g. "(s8a,s4a)".
-*     telemission (double) : 4.0 (pW)
-*       Telescope background pW per pixel.
 *     tauzen (double) : 0.052583
 *       Optical depth at 225 GHz at the zenith.
+*     telemission (double) : 4.0 (pW)
+*       Telescope background pW per pixel.
 *     xpoint (double) : 20.0 (arcsec)
 *       X pointing offset on sky.
 *     ypoint (double) : 20.0 (arcsec)
