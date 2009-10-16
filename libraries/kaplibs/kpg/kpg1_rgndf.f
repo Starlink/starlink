@@ -264,6 +264,11 @@
 
       END DO
 
+*  Register the returned group with NDG so that its contents will be
+*  appended to the end of any default history records written out by the 
+*  NDF library.
+      CALL NDG_ADDGH( PARAM, IGRP, STATUS )
+
 *  If an error has occured, return SIZE with the value 1 to avoid
 *  potential access violations if SIZE is used as the dimension of a
 *  passed array. Also, attempt to delete the group and set IGRP to 

@@ -247,6 +247,11 @@
 *  Get the group size.
       CALL GRP_GRPSZ( IGRP, SIZE, STATUS )
 
+*  Register the returned group with NDG so that its contents will be
+*  appended to the end of any default history records written out by the 
+*  NDF library.
+      CALL NDG_ADDGH( PARAM, IGRP, STATUS )
+
 *  If an error occurred, return a group size of zero.
       IF( STATUS .NE. SAI__OK ) SIZE = 0
 
