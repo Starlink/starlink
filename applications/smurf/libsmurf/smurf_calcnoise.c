@@ -410,7 +410,7 @@ smf__create_bolfile_extension( const Grp * ogrp, size_t gcount,
   if (*status != SAI__OK) return newdata;
 
   pname = tempfile;
-  grpGet( ogrp, 1, 1, &pname, SMF_PATH_MAX, status );
+  grpGet( ogrp, gcount, 1, &pname, SMF_PATH_MAX, status );
   one_strlcat( tempfile, hdspath, sizeof(tempfile), status);
   tempgrp = grpNew( "Ratio", status );
   grpPut1( tempgrp, tempfile, 0, status );
