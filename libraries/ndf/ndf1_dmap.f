@@ -73,6 +73,7 @@
 
 *  Copyright:
 *     Copyright (C) 1989, 1990 Science & Engineering Research Council.
+*     Copyright (C) 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -93,6 +94,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -111,7 +113,7 @@
 *        values in the ACB.
 *     3-APR-1990 (RFWS):
 *        Added the MASK argument and code to support it.
-*     1-SEP-2008 (RFWS):
+*     1-SEP-2008 (DSB):
 *        Raise an NDF event when the DATA array is mapped.
 *     {enter_further_changes_here}
 

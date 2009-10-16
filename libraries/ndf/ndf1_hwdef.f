@@ -41,6 +41,8 @@
 
 *  Copyright:
 *     Copyright (C) 1993 Science & Engineering Research Council
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -60,6 +62,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     DSB: David S Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -78,6 +81,8 @@
 *        Added executing file name to history text.
 *     26-APR-1994 (RFWS):
 *        Split verbose mode history text into two lines.
+*     16-OCT-2009 (DSB):
+*        Raise an NDF event after the default history has been written.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -191,6 +196,14 @@
 *  history writing flag.
                IF ( STATUS .EQ. SAI__OK ) THEN
                   DCB_HDEF( IDCB ) = .FALSE.
+
+*  Use NDF1_EVENT to flag a "default history written" event. If the caller 
+*  has registered a handler for this type of event (using NDF_HNDLR), it 
+*  will be called. First, assign the name of the NDF to the MSG token 
+*  "NDF_EVENT", then raise the event.
+                  CALL NDF1_DMSG( 'NDF_EVENT', IDCB )
+                  CALL NDF1_EVENT( 'DEF_HISTORY', STATUS )
+
                END IF
             END IF
          END IF

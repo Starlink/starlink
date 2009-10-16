@@ -12,7 +12,7 @@ typedef void (* NdfEventHandler)( CHARACTER(EVNAME), CHARACTER(TEXT), INTEGER( S
                                   TRAIL(EVNAME) TRAIL(TEXT) );
 
 /* The number of different event types */
-#define NTYPE 8
+#define NTYPE 9
 
 /* The names of the different event types. */
 static const char *types[ NTYPE ] = { "OPEN_NEW_NDF", 
@@ -22,13 +22,14 @@ static const char *types[ NTYPE ] = { "OPEN_NEW_NDF",
                                       "CLOSE_NDF",
                                       "READ_DATA",
                                       "WRITE_DATA",
-                                      "UPDATE_DATA" };
+                                      "UPDATE_DATA",
+                                      "DEF_HISTORY" };
 
 /* An array of pointers to the currently registered event handlers. */
-static NdfEventHandler *handlers[ NTYPE ] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
+static NdfEventHandler *handlers[ NTYPE ] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
 
 /* The number of handlers registered for each event type. */
-static int nhandlers[ NTYPE ] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+static int nhandlers[ NTYPE ] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 /* Local Prototypes */
 static int CheckType( const char *, int * );
@@ -119,6 +120,10 @@ F77_SUBROUTINE(ndf_hndlr)( CHARACTER(EVNAME),
 *     - UPDATE_DATA: Occurs when the DATA component of an NDF is mapped for
 *     update access. The "descriptive information" is the path to the NDF that 
 *     is mapped.
+*
+*     - DEF_HISTORY: Occurs immediately after a default history record has
+*     been writtent to an NDF. The "descriptive information" is the path to 
+*     the NDF.
 
 *  Notes:
 *     - Any number of handlers can be registered with a given event type.
@@ -127,7 +132,7 @@ F77_SUBROUTINE(ndf_hndlr)( CHARACTER(EVNAME),
 *     -  This routine is intended to be callable from Fortran.
 
 *  Copyright:
-*     Copyright (C) 2007-2008 Science & Technology Facilities Council.
+*     Copyright (C) 2007-2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -155,6 +160,8 @@ F77_SUBROUTINE(ndf_hndlr)( CHARACTER(EVNAME),
 *        Original version.
 *     1-SEP-2008 (DSB):
 *        Added READ_DATA, WRITE_DATA and UPDATE_DATA event types.
+*     16-OCT-2009 (DSB):
+*        Added DEF_HISTORY event type.
 *     {@enter_changes_here@}
 
 *  Bugs:
