@@ -57,10 +57,12 @@
  *        Print out value of tauzen if too low, use msgOut for reporting
  *     2008-04-24 (AGG):
  *        Set more appropriate default values for the atmosphere
+ *     2009-10-16 (AGG):
+ *        Use one_strlcpy rather than strlcpy
  *     {enter_further_changes_here}
 
  *  Copyright:
- *     Copyright (C) 2005-2008 University of British Columbia. All
+ *     Copyright (C) 2005-2009 University of British Columbia. All
  *     Rights Reserved.
 
  *  Licence:
@@ -97,6 +99,7 @@
 #include "ast.h"
 #include "sae_par.h"
 #include "mers.h"
+#include "star/one.h"
 
 void sc2sim_getsimpar ( AstKeyMap *keymap, struct sc2sim_sim_struct *sinx,
                         int *status ) {
@@ -229,7 +232,7 @@ void sc2sim_getsimpar ( AstKeyMap *keymap, struct sc2sim_sim_struct *sinx,
     char *ptr = subnames;
     int i;
     for (i = 0; i < sinx->nsubarrays; i++) {
-      strlcpy( (sinx->subname)[i], ptr, SC2SIM__SUBLEN );
+      one_strlcpy( (sinx->subname)[i], ptr, SC2SIM__SUBLEN, status );
       ptr += SC2SIM__SUBLEN;
     }
   }
