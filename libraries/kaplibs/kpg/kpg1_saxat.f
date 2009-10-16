@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_SAXAT( INDF, MCOMP, AXIS, LOG, FRAME, STATUS )
+      SUBROUTINE KPG1_SAXAT( INDF, COMP, AXIS, LOG, FRAME, STATUS )
 *+
 *  Name:
 *     KPG1_SAXAT
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_SAXAT( INDF, MCOMP, AXIS, LOG, FRAME, STATUS )
+*     CALL KPG1_SAXAT( INDF, COMP, AXIS, LOG, FRAME, STATUS )
 
 *  Description:
 *     This routine sets the Symbol, Units and Label attributes of a 
@@ -24,7 +24,7 @@
 *  Arguments:
 *     INDF = INTEGER (Given)
 *        An identifier for the NDF being described.
-*     MCOMP = CHARACTER * ( * ) (Given)
+*     COMP = CHARACTER * ( * ) (Given)
 *        The name of the NDF array component being described.
 *     AXIS = INTEGER (Given)
 *        The index of the Frame axis to be modified.
@@ -67,6 +67,8 @@
 *  History:
 *     15-OCT-2009 (DSB):
 *        Original version, extracted from KPS1_LPLFS.
+*     16-OCT-2009 (DSB):
+*        Recognise "Error" as a component name.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -90,7 +92,7 @@
 
 *  Arguments Given:
       INTEGER INDF
-      CHARACTER MCOMP*(*)
+      CHARACTER COMP*(*)
       INTEGER AXIS
       LOGICAL LOG
       INTEGER FRAME
@@ -135,7 +137,7 @@
 *  Get the Units component from the NDF (and square them if dealing with 
 *  variance).
       UNITS = ' '
-      CALL KPG1_DAUNI( INDF, MCOMP, UNITS, NCU, STATUS )
+      CALL KPG1_DAUNI( INDF, COMP, UNITS, NCU, STATUS )
 
 *  Get the Label component from the NDF.
       LAB = ' '
@@ -144,7 +146,7 @@
 *  If the label is blank, use the name of the NDF array component 
 *  followed by " value" instead.
       IF( LAB .EQ. ' ' ) THEN
-         LAB = MCOMP
+         LAB = COMP
          IAT = CHR_LEN( LAB )
          CALL CHR_APPND( ' value', LAB, IAT )
 
@@ -153,12 +155,16 @@
       ELSE
          IAT = CHR_LEN( LAB )
 
-         IF( MCOMP( 1 : 1 ) .EQ. 'v' .OR. 
-     :       MCOMP( 1 : 1 ) .EQ. 'V' ) THEN
+         IF( COMP( 1 : 1 ) .EQ. 'v' .OR. 
+     :       COMP( 1 : 1 ) .EQ. 'V' ) THEN
             CALL CHR_APPND( ' variance', LAB, IAT )
 
-         ELSE IF( MCOMP( 1 : 1 ) .EQ. 'q' .OR. 
-     :            MCOMP( 1 : 1 ) .EQ. 'Q' ) THEN
+         ELSE IF( COMP( 1 : 1 ) .EQ. 'e' .OR. 
+     :       COMP( 1 : 1 ) .EQ. 'E' ) THEN
+            CALL CHR_APPND( ' error', LAB, IAT )
+
+         ELSE IF( COMP( 1 : 1 ) .EQ. 'q' .OR. 
+     :            COMP( 1 : 1 ) .EQ. 'Q' ) THEN
             CALL CHR_APPND( ' quality', LAB, IAT )
 
          END IF
@@ -173,7 +179,7 @@
          TEXT = ' '
          IAT = 0
          CALL CHR_APPND( 'Log'//BCKSLH//'d10'//BCKSLH//'u(', TEXT, IAT )
-         CALL CHR_APPND( MCOMP, TEXT, IAT )
+         CALL CHR_APPND( COMP, TEXT, IAT )
          CALL CHR_APPND( ')', TEXT, IAT )
          CALL AST_SETC( FRAME, SATT, TEXT( : IAT ), STATUS )
 
@@ -200,7 +206,7 @@
       ELSE
 
 *  Symbol...
-         CALL AST_SETC( FRAME, SATT, MCOMP, STATUS )
+         CALL AST_SETC( FRAME, SATT, COMP, STATUS )
 
 *  Label...
          CALL AST_SETC( FRAME, LATT, LAB, STATUS )
