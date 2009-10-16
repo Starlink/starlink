@@ -163,7 +163,6 @@ void sc2sim_heatrun ( struct sc2sim_obs_struct *inx,
                       double digscale, char filter[], double *heater, int nbol,
                       double *pzero, double samptime, int *status) {
 
-  char arraynames[80];            /* list of unparsed subarray names */
   int bol;                        /* counter for indexing bolometers */
   double corner;                  /* corner frequency in Hz */
   double current;                 /* bolometer current in amps */
@@ -185,13 +184,11 @@ void sc2sim_heatrun ( struct sc2sim_obs_struct *inx,
   JCMTState *head;                /* per-frame headers */
   double *heatptr;                /* pointer to list of heater settings */
   int j;                          /* loop counter */
-  int narray = 0;                 /* number of subarrays to generate data for */
   int nflat;                      /* number of flat coeffs per bol */
   int numsamples;                 /* Number of samples in output. */
   double *output;                 /* series of output values */
   int sample;                     /* sample counter */
   double sigma;                   /* instrumental white noise */
-  char subarrays[8][80];          /* list of parsed subarray names */
 
   if ( *status != SAI__OK) return;
 
@@ -300,31 +297,18 @@ void sc2sim_heatrun ( struct sc2sim_obs_struct *inx,
     }
   }
 
-  /* Parse the list of subarray names, find out how many subarrays to
-     generate */
-  if( *status == SAI__OK ) {
-    strcpy( arraynames, sinx->subname );
-    curtok = strtok ( arraynames, ";");
-    while ( curtok != NULL && narray < 4 ) {
-      strcpy( subarrays[narray], curtok );
-      narray++;
-      curtok = strtok (NULL, ";");
-    }
-  }
 
   /* Loop over array of subarrays */
-  for ( j = 0; j < narray; j++ ) {
+  for ( j = 0; j < sinx->nsubarrays; j++ ) {
     /* Get the name of this flatfield solution */
-    sprintf ( filename, "%sheat%04i%02i%02i_00001", subarrays[j], date_yr,
+    sprintf ( filename, "%sheat%04i%02i%02i_00001", (sinx->subname)[j], date_yr,
               date_mo, date_da );
 
     msgSetc( "FILENAME", filename );
     msgOut(" ", "Writing ^FILENAME", status );
-    /* Over-ride subarray name for writing out to file */
-    strcpy ( sinx->subname, subarrays[j] );
 
     /* Store the data in output file file_name */
-    sc2sim_ndfwrheat( inx, sinx, filename, numsamples, nflat, flatname, head,
+    sc2sim_ndfwrheat( inx, sinx, j, filename, numsamples, nflat, flatname, head,
                       digits, dksquid, flatcal, flatpar, filter, status );
 
     msgSetc( "FILENAME", filename );

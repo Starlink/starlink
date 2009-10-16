@@ -558,6 +558,7 @@ void sc2sim_ndfwrdata
 ( 
 const struct sc2sim_obs_struct *inx,  /* structure for values from XML (given) */
 const struct sc2sim_sim_struct *sinx, /* structure for sim values from XML (given)*/
+int subindex,             /* index into sinx->subname of subarray being written */
 double meanwvm,           /* 225 GHz tau */
 const char file_name[],   /* output file name (given) */
 size_t numsamples,        /* number of samples (given) */
@@ -600,6 +601,7 @@ void sc2sim_ndfwrheat
 ( 
 const struct sc2sim_obs_struct *inx,      /* structure for values from XML (given) */
 const struct sc2sim_sim_struct *sinx, /* structure for sim values from XML (given)*/
+int subindex,            /* index into sinx->subname of subarray being written */
 const char file_name[],  /* output file name (given) */
 size_t numsamples,    /* number of samples (given) */
 size_t nflat,         /* number of flat coeffs per bol (given) */

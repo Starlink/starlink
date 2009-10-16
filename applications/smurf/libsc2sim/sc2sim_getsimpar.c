@@ -101,6 +101,7 @@
 void sc2sim_getsimpar ( AstKeyMap *keymap, struct sc2sim_sim_struct *sinx,
                         int *status ) {
 
+  char subnames[SC2SIM__MAXSUBS * SC2SIM__SUBLEN];
   const char *temp=NULL; /* Pointer to static strings created by ast */
 
   /* Check status */
@@ -221,10 +222,17 @@ void sc2sim_getsimpar ( AstKeyMap *keymap, struct sc2sim_sim_struct *sinx,
   if ( !astMapGet0D ( keymap, "SPIKE_T0", &(sinx->spike_t0) ) )
     sinx->spike_t0 = 20.0;
 
-  if ( !astMapGet0C ( keymap, "SUBNAME", &temp ) )
-    strncpy ( sinx->subname, "s8a", SC2SIM__FLEN );
-  else
-    strncpy ( sinx->subname, temp, SC2SIM__FLEN );
+  if ( !astMapGet1C ( keymap, "SUBNAME", SC2SIM__SUBLEN, SC2SIM__MAXSUBS, &(sinx->nsubarrays), subnames ) ) {
+    strncpy ( (sinx->subname)[0], "s8a", SC2SIM__SUBLEN );
+    sinx->nsubarrays = 1;
+  } else {
+    char *ptr = subnames;
+    int i;
+    for (i = 0; i < sinx->nsubarrays; i++) {
+      strlcpy( (sinx->subname)[i], ptr, SC2SIM__SUBLEN );
+      ptr += SC2SIM__SUBLEN;
+    }
+  }
 
   if ( !astMapGet0D ( keymap, "TELEMISSION", &(sinx->telemission) ) )
     sinx->telemission = 4.0;

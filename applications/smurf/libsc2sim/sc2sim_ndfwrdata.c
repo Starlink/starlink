@@ -290,6 +290,7 @@ void sc2sim_ndfwrdata
 (
  const struct sc2sim_obs_struct *inx,  /* structure for values from XML (given) */
  const struct sc2sim_sim_struct *sinx, /* structure for sim values from XML (given)*/
+ int subindex,            /* index into sinx->subname of subarray being written */
  double meanwvm,          /* Mean 225 GHz tau */
  const char file_name[],  /* output file name (given) */
  size_t numsamples,       /* number of samples (given) */
@@ -521,7 +522,7 @@ void sc2sim_ndfwrdata
   /* SCUBA-2 */
   astSetFitsCM ( fitschan, "-- SCUBA-2 specific parameters --", 0 );
   astSetFitsS ( fitschan, "INSTRUME", instrume, "Instrument name - SCUBA-2", 0 );
-  astSetFitsS ( fitschan, "SUBARRAY", sinx->subname, "subarray name", 0 );
+  astSetFitsS ( fitschan, "SUBARRAY", (sinx->subname)[subindex], "subarray name", 0 );
   astSetFitsF ( fitschan, "SHUTTER", 1, "Shutter for darks: 0=closed, 1=open",
                 0 );
   astSetFitsS ( fitschan, "FILTER", filter, "filter used", 0 );
@@ -555,7 +556,7 @@ void sc2sim_ndfwrdata
                   "[arcsec] SMU jiggle pattern scale factor", 0 );
     /* Construct weights name from subarray */
     strncat( weightsname, "dreamweights_", 13);
-    strncat( weightsname, sinx->subname, 3);
+    strncat( weightsname, (sinx->subname)[subindex], 3);
     strncat( weightsname, ".sdf", 4);
     astSetFitsS ( fitschan, "DRMWGHTS", weightsname,
                   "Name of DREAM weights file", 0 );
@@ -678,7 +679,7 @@ void sc2sim_ndfwrdata
   smf_fits_export2DA ( fitschan, &nrec, fitsrec, status );
 
   /* Calculate the sub array index */
-  sc2ast_name2num( sinx->subname, &subnum, status );
+  sc2ast_name2num( (sinx->subname)[subindex], &subnum, status );
 
   /* There are "issues" handling const for arrays in call to wrtstream
      partly caused by the input struct being const and the jig_vert

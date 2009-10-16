@@ -227,7 +227,7 @@ void sc2sim_instrinit( struct sc2sim_obs_struct *inx,
   sc2sim_getweights ( decay, inx->steptime, SC2SIM__MXIRF, weights, status );
 
   /* Get the subsystem number */
-  sc2ast_name2num( sinx->subname, &subnum, status );
+  sc2ast_name2num( (sinx->subname)[0], &subnum, status );
 
   /* Get the native x- and y- (GRID) coordinates of each bolometer
      Since sc2sim_simframe still needs xbc & ybc to interpolate values from

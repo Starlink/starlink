@@ -140,6 +140,7 @@ void sc2sim_ndfwrheat
 (
  const struct sc2sim_obs_struct *inx, /* structure for values from XML (given) */
  const struct sc2sim_sim_struct *sinx, /* structure for sim values from XML (given)*/
+ int subindex,            /* index into sinx->subname of subarray being written */
  const char file_name[],  /* output file name (given) */
  size_t numsamples,    /* number of samples (given) */
  size_t nflat,         /* number of flat coeffs per bol (given) */
@@ -187,7 +188,7 @@ void sc2sim_ndfwrheat
                 "Number of bolometers in a column", 0 );
   astSetFitsI ( fitschan, "ROWSIZE", inx->rowsize,
                 "Number of bolometers in a row", 0 );
-  astSetFitsS ( fitschan, "SUBARRAY", sinx->subname, "Subarray name", 0 );
+  astSetFitsS ( fitschan, "SUBARRAY", (sinx->subname)[subindex], "Subarray name", 0 );
   astSetFitsI ( fitschan, "NUMSAMP", numsamples, "Number of samples", 0 );
   astSetFitsS ( fitschan, "FILTER", filter, "Filter used", 0 );
 
@@ -195,7 +196,7 @@ void sc2sim_ndfwrheat
   smf_fits_export2DA ( fitschan, &nrec, fitsrec, status );
 
   /* Calculate the sub array index */
-  sc2ast_name2num( sinx->subname, &subnum, status );
+  sc2ast_name2num( (sinx->subname)[subindex], &subnum, status );
 
   /* There are "issues" handling const for arrays in call to wrtstream
      partly caused by the input struct being const and the jig_vert

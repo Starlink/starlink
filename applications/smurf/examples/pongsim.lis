@@ -2,8 +2,8 @@
 #           EXAMPLE PONG SIMULATION PARAMETERS
 # ##################################################################
 
-# List of subarrays to simulate data for (semi-colon separated). 
-subname=s8a;s8b;s8c;s8d
+# List of subarrays to simulate data for.
+subname=(s8a,s8b,s8c,s8d)
 
 # Name of model atmosphere file
 atmname=atm.sdf

@@ -11,7 +11,8 @@
 #define SC2SIM__NCOEFFS 6         /* no. of coeffs for bolometer response */
 #define SC2SIM__FLEN 132    /* length of file names */
 #define SC2SIM__MXBOL 1600  /* maximum no. of bolometers */
-
+#define SC2SIM__SUBLEN 4    /* Number of characters in subarray name including nul */
+#define SC2SIM__MAXSUBS 8   /* Maximum number of subarrays */
 
 #define SC2SIM__MXOUT 1764  /* maximum number of output points.(42x42) */
 

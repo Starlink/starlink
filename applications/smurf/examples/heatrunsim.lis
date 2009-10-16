@@ -3,8 +3,8 @@
 # All of these parameters should be defined for all observing modes
 # ##################################################################
 
-# List of subarrays to simulate data for (semi-colon separated). 
-subname=s8a;s8b;s8c;s8d
+# List of subarrays to simulate data for.
+subname=(s8a,s8b,s8c,s8d)
 
 # Flag to specify whether to add heater noise
 add_hnoise=0

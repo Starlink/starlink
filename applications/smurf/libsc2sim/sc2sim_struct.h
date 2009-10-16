@@ -101,9 +101,11 @@
  *        Add nfocstep, focstep and focstart
  *     2008-10-10 (AGG):
  *        Add MODE__NOISE to obsMode
+ *     2009-10-15 (TIMJ):
+ *        Store subarray names in char array.
 
 *  Copyright:
-*     Copyright (C) 2007 Science and Technology Facilities Council.
+*     Copyright (C) 2007,2009 Science and Technology Facilities Council.
 *     Copyright (C) 2003-2006 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2005-2008 University of British Columbia.
 *     All Rights Reserved.
@@ -263,7 +265,8 @@ struct sc2sim_sim_struct      /* parameters read from sim input file */
   double spike_p0;            /* Minimum spike power (Jy) */
   double spike_p1;            /* Peak spike power (Jy) */
   double spike_t0;            /* Mean time between bolometer spikes (s) */
-  char subname[80];           /* name of subarray */
+  char subname[SC2SIM__MAXSUBS][SC2SIM__SUBLEN]; /* names of subarrays */
+  int  nsubarrays;            /* number of subarrays */
   double telemission;         /* telescope background pW per pixel */
   double telpos[3];           /* telescope W. lon/lat/altitude (deg/deg/m) */
   double tauzen;              /* optical depth at 225GHz at the zenith */

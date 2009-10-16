@@ -400,12 +400,11 @@
 *     smu_terr (double) : 0.0
 *       SMU timing error.
 *     subname (char[]) : s8a
-*       Semi-colon-separated list of subarray
-*       names for the simulation.  Any number
-*       of subarrays can be selected in any
-*       order, and should be separated by
-*       semi-colons (with no spaces) e.g.
-*       s8a;s8b;s8d
+*       Subarray names for the simulation.
+*       Any number of subarrays can be selected in any
+*       order. A single subarray can be named as a simple string (e.g. "s8a"),
+*       multiple subarrays can be given using commas and parentheses
+*       (e.g. "(s8a,s4a)".
 *     telemission (double) : 4.0 (pW)
 *       Telescope background pW per pixel.
 *     tauzen (double) : 0.052583
@@ -747,10 +746,14 @@ void smurf_sc2sim( int *status ) {
   parGet0l( "SIMSTATS", &simstats, status );
 
   if ( !simstats ) {
+    int i;
     msgSetc("T",inx.obstype);
     msgOutif(MSG__NORM, "", "  Simulating a ^T observation at ^L um in ^M mode",
              status);
-    msgSetc("SUB", sinx.subname);
+    for (i=0; i<sinx.nsubarrays; i++) {
+      msgSetc("SUB", (sinx.subname)[i]);
+      if (i != sinx.nsubarrays-1) msgSetc("SUB", ",");
+    }
     msgOutif(MSG__NORM, "", "  Simulating subarrays: ^SUB", status);
   }
 

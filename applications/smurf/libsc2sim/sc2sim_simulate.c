@@ -375,7 +375,6 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   float aeff[3];                  /* output of wvmOpt */
   double *airmass=NULL;           /* mean airmass of observation */
   double amprms[21];              /* AMPRMS parameters for SLALIB routines */
-  char arraynames[80];            /* list of unparsed subarray names */
   smfData *astdata=NULL;          /* pointer to SCUBA2 data struct */
   smfHead *asthdr=NULL;           /* pointer to header in data */
   int astnaxes[2];                /* dimensions of simulated image */
@@ -465,7 +464,6 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   char lststart[SZFITSCARD+1] = "\0";      /* LST at start of sub-scan */
   double meanatm;                 /* Atmos. emission at start airmass */
   double *mjuldate=NULL;          /* Modified Julian date each sample - UT1 */
-  int narray = 0;                 /* number of subarrays to generate data for */
   size_t nflat[8];                /* number of flat coeffs per bol */
   int nimage = 0;                 /* Number of subimages within subscan */
   static double noisecoeffs[SC2SIM__MXBOL*3*60]; /* noise coefficients */
@@ -539,18 +537,6 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Couldn't calculate calendar date from MJD", status);
     }
-  }
-
-  if( *status == SAI__OK ) {
-    /* Parse the list of subnames, find out how many subarrays to generate. */
-    strcpy( arraynames, sinx->subname );
-    curtok = strtok ( arraynames, ";");
-    while ( curtok != NULL && narray < 4 ) {
-      strcpy( subarrays[narray], curtok );
-      narray++;
-      curtok = strtok (NULL, ";");
-    }
-
   }
 
   if ( !hitsonly && ( *status == SAI__OK ) ) {
@@ -867,7 +853,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
   /* Report simulation properties if requested */
   if ( simstats ) {
-    sc2sim_simstats( count, inx->steptime, maxwrite, nbol, narray, inx->rowsize,
+    sc2sim_simstats( count, inx->steptime, maxwrite, nbol, sinx->nsubarrays, inx->rowsize,
                      status );
     goto CLEANUP;
   }
@@ -876,7 +862,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
      time-slice */
 
   /* All four subarrays need to have their data stored simultaneously */
-  dbuf = smf_malloc ( maxwrite*nbol*narray, sizeof(*dbuf), 1, status );
+  dbuf = smf_malloc ( maxwrite*nbol*(sinx->nsubarrays), sizeof(*dbuf), 1, status );
   digits = smf_malloc ( maxwrite*nbol, sizeof(*digits), 1, status );
   dksquid = smf_malloc ( maxwrite*inx->rowsize, sizeof(*dksquid), 1, status );
 
@@ -930,7 +916,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
            "Get flatfield calibrations", status );
 
   /* Retrieve the flatfield calibrations for each subarray */
-  for ( k = 0; k < narray; k++ ) {
+  for ( k = 0; k < sinx->nsubarrays; k++ ) {
 
     /* Preset all the flatfield calibrations and parameters
        to NULL */
@@ -940,7 +926,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
     if( *status == SAI__OK ) {
 
       sprintf ( heatname, "%sheat%04i%02i%02i_00001",
-                subarrays[k], date_yr, date_mo, date_da );
+                (sinx->subname)[k], date_yr, date_mo, date_da );
 
       sc2store_rdflatcal ( heatname, SC2STORE_FLATLEN, &colsize,
                            &rowsize, &(nflat[k]), flatname[k], &(flatcal[k]),
@@ -1274,10 +1260,10 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
             /* For each subarray, retrieve the wcs frameset, then generate
                the frame of data */
             timesincestart = ( mjuldate[frame] - inx->mjdaystart ) * SPD;
-            for ( k = 0; k < narray; k++ ) {
+            for ( k = 0; k < sinx->nsubarrays; k++ ) {
 
               /* Get the numerical subarray number from the name */
-              sc2ast_name2num( subarrays[k], &subnum, status );
+              sc2ast_name2num( (sinx->subname)[k], &subnum, status );
 
               if( *status == SAI__OK ) {
                 sc2ast_createwcs(subnum, &state, instap, sinx->telpos, &fs,
@@ -1471,7 +1457,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
             /* For each subarray, digitise the data and write it to
                a file */
-            for ( k = 0; k < narray; k++ ) {
+            for ( k = 0; k < sinx->nsubarrays; k++ ) {
 
               /* If we haven't calculate parameters for the digitization yet,
                  do it now before the first digitise call. This will override
@@ -1505,7 +1491,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
               /* Compress and store as NDF */
               if( *status == SAI__OK ) {
-                sprintf( filename, "%s%04i%02i%02i_%05d_%04d", subarrays[k],
+                sprintf( filename, "%s%04i%02i%02i_%05d_%04d", (sinx->subname)[k],
                          date_yr, date_mo, date_da, obscounter, subscanno );
                 /*If we are not overwriting existing files see if the file exists*/
                 if ( !overwrite ) {
@@ -1520,13 +1506,13 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
                       fileexists = 1;
                       fclose(ofile);
                       obscounter++;
-                      sprintf( filename, "%s%04i%02i%02i_%05d_%04d", subarrays[k],
+                      sprintf( filename, "%s%04i%02i%02i_%05d_%04d", (sinx->subname)[k],
                                date_yr, date_mo, date_da, obscounter, subscanno );
                     } else {
                       /* If not, unset fileexists flag, increment counter
                          and set new file name */
                       fileexists = 0;
-                      sprintf( filename, "%s%04i%02i%02i_%05d_%04d", subarrays[k],
+                      sprintf( filename, "%s%04i%02i%02i_%05d_%04d", (sinx->subname)[k],
                                date_yr, date_mo, date_da, obscounter, subscanno );
                     }
                   }
@@ -1545,9 +1531,6 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
                 sprintf( utdate, "%04d%02d%02d", date_yr, date_mo, date_da);
 
-                /* Set the subarray name */
-                strcpy ( sinx->subname, subarrays[k] );
-
                 /* Number of .In images KLUDGE */
                 if ( mode == MODE__DREAM || mode == MODE__STARE ) {
                   nimage = maxwrite / 200;
@@ -1562,7 +1545,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
                 /* HST start/end */
 
                 /* Write the data out to a file */
-                sc2sim_ndfwrdata( inx, sinx, tauCSO, filename, lastframe, nflat[k],
+                sc2sim_ndfwrdata( inx, sinx, k, tauCSO, filename, lastframe, nflat[k],
                                   flatname[k], head, digits, dksquid, flatcal[k],
                                   flatpar[k], INSTRUMENT, filter, dateobs, obsid,
                                   &(posptr[frameoffset*2]), jigsamples,
@@ -1598,7 +1581,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
   /* Release memory */
   /* Free buffers that get allocated for each subarray */
-  for ( k = 0; k < narray; k++ ) {
+  for ( k = 0; k < sinx->nsubarrays; k++ ) {
 
     if( flatcal[k] ) {
       free( flatcal[k] );
