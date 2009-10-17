@@ -339,6 +339,7 @@ void smurf_calcnoise( int *status ) {
             smf_accumulate_prov( NULL, basegrp, 1, nepdata->file->ndfid,
                                  CREATOR, status );
           }
+          if (respmap) smf_close_file( &respmap, status );
           if (nepdata) smf_close_file( &nepdata, status );
         }
 
