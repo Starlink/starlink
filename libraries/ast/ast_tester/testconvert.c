@@ -20,7 +20,7 @@ main(){
    AstSpecFrame *df = astSpecFrame( " ", status );
    AstCmpFrame *cf = astCmpFrame( df, sf, " ", status );
    AstFrame *bf = astFrame( 2, "Domain=SKY", status );
-
+   AstFrame *target, *template;
 
 
    fs = astConvert( bf, sf, " " );
@@ -64,6 +64,7 @@ main(){
    }
 
    astClearDomain( bf );
+
    fs = astConvert( bf, sf, " " );
    if( fs ) {
       if( !astEqual( astGetFrame( fs, AST__BASE ), bf ) && astOK ) {
@@ -213,9 +214,12 @@ main(){
       } 
    }
 
-
-
-
+   target = astFrame( 2, "Domain=ARDAPP", status );
+   template = (AstFrame *) astSkyFrame( "System=GAPPT", status );
+   fs = astFindFrame( target, template, " " );
+   if( fs && astOK ) {
+      astError( AST__INTER, "Error 51\n",  status );
+   }
 
 
 

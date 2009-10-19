@@ -14145,8 +14145,10 @@ const int *astGetPerm_( AstFrame *this, int *status ) {
 int astMatch_( AstFrame *this, AstFrame *target,
                int **template_axes, int **target_axes,
                AstMapping **map, AstFrame **result, int *status ) {
-   int match;
+
    AstFrame *super_this;
+   const char *dom;
+   int match;
 
    if ( !astOK ) return 0;
 
@@ -14167,9 +14169,14 @@ int astMatch_( AstFrame *this, AstFrame *target,
    if( ! match ) {
       super_this = (AstFrame *) astCast( this, target );
 
-/* If the cast was  possible, invoke the Match method appropriate to
-   the new template class (i.e. the target class). */
+/* If the cast was  possible, fix the template Domain since the parent
+   class may provide a different default Domain, and then invoke the Match 
+   method appropriate to the new template class (i.e. the target class). */
       if( super_this ) {
+         if( astTestDomain( target ) ) {
+            dom = astGetDomain( this );
+            if( astChrLen( dom ) > 0 ) astSetDomain( super_this, dom );
+         }
          match = (**astMEMBER(super_this,Frame,Match))( super_this, target,
                                                         template_axes, 
                                                         target_axes, map, 
