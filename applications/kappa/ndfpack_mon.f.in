@@ -101,6 +101,9 @@
 *        Change API for MSG_IFGETENV
 *     29-JUL-2009 (TIMJ):
 *        MSG_IFGET now called in fixed part.
+*     19-OCT-2009 (DSB):
+*        Use NDG_BEGGH/NDG_ENDGH to record contents of group parameters in 
+*        the history component of output NDFs.
 *     {enter_further_changes_here}
 
 *-
@@ -204,6 +207,11 @@
 *  NDFs that are opened for input or output, until the block is closed 
 *  by calling NDG_ENDPV.
          CALL NDG_BEGPV( STATUS )
+
+*  Begin a GRP NDF history block. This causes the contents of GRP groups 
+*  to be appended to default history text added to any NDFs during the
+*  block. 
+         CALL NDG_BEGGH( STATUS )
 
 *  Check the string against valid A-task names---if matched then call
 *  the relevant A-task.
@@ -416,6 +424,9 @@
      :     'NDFPACK: No such option ^CMD.', STATUS )
 
          END IF
+
+*  End the GRP NDF history block.
+         CALL NDG_ENDGH( STATUS )
 
 *  End the provenance block. This will result in every output NDF being
 *  given a provenance extension containing a record of the input NDFs
