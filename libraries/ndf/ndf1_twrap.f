@@ -1,4 +1,4 @@
-      SUBROUTINE NDF1_TWRAP( IN, FP, OUT )
+      SUBROUTINE NDF1_TWRAP( IN, INDENT, FP, OUT )
 *+
 *  Name:
 *     NDF1_TWRAP
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL NDF1_TWRAP( IN, FP, OUT )
+*     CALL NDF1_TWRAP( IN, INDENT, FP, OUT )
 
 *  Description:
 *     The routine splits a stream of input text into separate output
@@ -32,6 +32,10 @@
 *  Arguments:
 *     IN = CHARACTER * ( * ) (Given)
 *        The input text stream.
+*     INDENT = INTEGER (Given)
+*        The number of leading spaces to include in the output buffer. 
+*        It can be set negative to indicate that any spaces in the input 
+*        should be preserved.
 *     FP = INTEGER (Given and Returned)
 *        The formatting pointer. On entry it should point to the next
 *        input character to be considered (if less than 1, then 1 is
@@ -64,6 +68,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     DSB: David S Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -74,6 +79,8 @@
 *     17-NOV-1994 (RFWS):
 *        Do not strip leading blanks before transferring text to the
 *        output.
+*     19-OCT-2009 (DSB):
+*        Add argument INDENT.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -86,6 +93,7 @@
 
 *  Arguments Given:
       CHARACTER * ( * ) IN
+      INTEGER INDENT
 
 *  Arguments Given and Returned:
       INTEGER FP
@@ -102,7 +110,7 @@
       INTEGER L1                 ! Significant length of input string
       INTEGER L2                 ! Length of output character variable
       INTEGER NC                 ! No. of significant input characters
-
+      INTEGER OFIRST             ! Index of first output character
 *.
 
 *  Obtain the number of significant characters in the input string and
@@ -112,6 +120,27 @@
 
 *  Advance FP to the start of the string if necessary.
       FP = MAX( FP, 1 )
+
+*  Ensure the output buffer starts with the required number of leading
+*  spaces, and reduce the maximum length of the output string by the number 
+*  of leading spaces.
+      IF( INDENT .GT. 0 ) THEN
+         OUT( : INDENT ) = ' '
+         L2 = L2 - INDENT
+      END IF
+
+*  Unless input spaces are being preserved (indicated by INDENT being
+*  negative), advance FP over any leading spaces in the input.
+      IF( INDENT .GE. 0 .AND. L1 .GT. 0 ) THEN
+         DO WHILE( FP .LT. L1 .AND. IN( FP : FP ) .EQ. ' ' )
+            FP = FP + 1
+         END DO         
+
+*  Note the index of the first output character to be written.
+         OFIRST = INDENT + 1
+      ELSE
+         OFIRST = 1
+      END IF
 
 *  If all the input characters are blank, then set the output string
 *  blank.
@@ -124,9 +153,10 @@
          NC = L1 - FP + 1
 
 *  If these characters will fit into the output string, then copy them
-*  and advance FP beyond the last character transferred.
+*  into the output buffer (following any leading spaces) and advance FP 
+*  beyond the last character transferred.
          IF ( NC .LE. L2 ) THEN
-            OUT = IN( FP : L1 )
+            OUT( OFIRST : ) = IN( FP : L1 )
             FP = L1 + 1
 
 *  Otherwise, the input text must be broken, at a blank if possible.
@@ -142,9 +172,9 @@
             BREAK = FP + L2
  4          CONTINUE           
 
-*  Copy input characters to the output, as far as the line break.
-*  Advance FP to point at the next input character.
-            OUT = IN( FP : BREAK - 1 )
+*  Copy input characters to the output (after any the leading spaces), as 
+*  far as the line break. Advance FP to point at the next input character.
+            OUT( OFIRST : )  = IN( FP : BREAK - 1 )
             FP = BREAK
 
 *  If the break character was a blank, then skip over it (it is replaced

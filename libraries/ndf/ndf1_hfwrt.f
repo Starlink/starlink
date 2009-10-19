@@ -155,11 +155,13 @@
       INTEGER I1                 ! Source character position
       INTEGER I2                 ! Destination character position
       INTEGER ILINE              ! Loop counter for input text lines
+      INTEGER INDENT             ! Indent for next output line
       INTEGER L                  ! Length of output history text lines
       INTEGER LBUF               ! No. characters used in BUF
       INTEGER LOUT               ! No. output buffer characters used
       INTEGER NC                 ! Length of current input line
       INTEGER NCNX               ! Length of next input line
+      LOGICAL APPEND             ! Append text to current history record?
       LOGICAL EMPTY              ! BUF empty?
       LOGICAL OK                 ! Output line formatted OK?
 
@@ -189,18 +191,31 @@
 *  to do.
             IF ( DCB_HLOC( IDCB ) .NE. DAT__NOLOC ) THEN
 
+*  Set a flag if we are appending the new text to the end of the current
+*  history record.
+               APPEND = ( APPN .EQ. '<APPEND>' )
+
 *  Obtain the text length for the current history record. If this is
 *  zero (because there is not yet a current record), then use the
-*  length of the input text lines instead, or if APN is <APPEND> use the
-*  length of the current history record.
+*  length of the input text lines instead, or if APPN is <APPEND> use 
+*  the length of the current history record.
                L = DCB_HTLEN( IDCB )
                IF ( L .EQ. 0 ) THEN
-                  IF( APPN .EQ. '<APPEND>' ) THEN
+                  IF( APPEND ) THEN
                      CALL NDF1_HTLEN( IDCB, L, STATUS )
                      IF( L .EQ. 0 ) L = LEN( TEXT( 1 ) )
                   ELSE
                      L = LEN( TEXT( 1 ) )
                   END IF
+               END IF
+
+*  If we are appending text to the current history record, indicate that
+*  the first line should not be indented. Otherwise, indicate that spaces
+*  should be left unchanged (see NDF1_TWRAP).
+               IF( APPEND ) THEN
+                  INDENT = 0
+               ELSE
+                  INDENT = -1
                END IF
 
 *  Initialise.
@@ -324,9 +339,13 @@
 
 *  Format a line from BUF, appending the result to the output buffer,
 *  and determine whether the contents of BUF have been exhausted.
-                           CALL NDF1_TWRAP( BUF( : LBUF ), FP,
+                           CALL NDF1_TWRAP( BUF( : LBUF ), INDENT, FP,
      :                                 OUT( 1 )( LOUT + 1 : LOUT + L ) )
                            EMPTY = ( FP .EQ. 0 )
+
+*  If we are appending text to the current history record, indicate that
+*  the second and all subsequent lines should be indentned by 3 spaces.
+                           IF( APPEND ) INDENT = 3
 
 *  Determine if the resulting output line will be correctly formatted
 *  (it may not be if BUF has been prematurely exhausted so that the
