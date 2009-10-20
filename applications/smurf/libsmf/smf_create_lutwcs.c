@@ -261,6 +261,8 @@ smfCreateLutwcsCache *smf_create_lutwcs( int clearcache, const double *fplane_x,
          cache->skyframe = NULL;
          cache->azel[ 0 ] = NULL;
          cache->azel[ 1 ] = NULL;
+         cache->instap[ 0 ] = AST__BAD;
+         cache->instap[ 1 ] = AST__BAD;
          result = cache;
 
       } else {
