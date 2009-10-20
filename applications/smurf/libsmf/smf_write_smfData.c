@@ -66,7 +66,7 @@
 *     2008-08-25 (TIMJ):
 *        Initial version.
 *     2008-09-30 (EC):
-*        Added functionality from smf_NDFexport: 
+*        Added functionality from smf_NDFexport:
 *        - write WCS information
 *        - write JCMT State array
 *        - add variance and quality overrides
@@ -180,13 +180,13 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
 
   /* see if we need to write quality */
   if ( qual ) flags |= SMF__MAP_QUAL;
-   
+
   /* Calculate bounds */
   for (i = 0; i < data->ndims; i++) {
     lbnd[i] = (data->lbnd)[i];
     ubnd[i] = lbnd[i] + (data->dims)[i] - 1;
   }
-  
+
   if( data->ndims == 1 ) {
     /* Dimensions for 1-d data */
     ntslice = data->dims[0];
@@ -196,35 +196,35 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
     dtstride = 1;
   } else if( data->ndims == 3 ) {
     /* Dimensions for 3-d data */
-    smf_get_dims( data, NULL, NULL, &nbolo, &ntslice, &nelem, &dbstride, 
+    smf_get_dims( data, NULL, NULL, &nbolo, &ntslice, &nelem, &dbstride,
                   &dtstride, status );
 
     /* Only handle variance for 3d data */
     if( variance ) {
       var = variance->pntr[0];
 
-      smf_get_dims( variance, NULL, NULL, &vnbolo, &vntslice, NULL, &vbstride, 
+      smf_get_dims( variance, NULL, NULL, &vnbolo, &vntslice, NULL, &vbstride,
                     &vtstride, status );
-      
+
       /* Check that the variance dimensions are compatible with data */
       if( (vnbolo != nbolo) || ( (vntslice>1) && (vntslice!=ntslice) ) ) {
         *status = SAI__ERROR;
-        errRep(" ", FUNC_NAME ": variance dimensions incompatible with data", 
-               status ); 
+        errRep(" ", FUNC_NAME ": variance dimensions incompatible with data",
+               status );
         return;
       }
-      
+
       /* We've assumed that var is double precision... need to check */
       if( variance->dtype != SMF__DOUBLE ) {
         *status = SAI__ERROR;
-        errRep(" ", FUNC_NAME ": variance array is not double precision", 
-               status ); 
-        return;        
+        errRep(" ", FUNC_NAME ": variance array is not double precision",
+               status );
+        return;
       }
 
     } else {
-      var = (data->pntr)[1];    
-    } 
+      var = (data->pntr)[1];
+    }
 
     if( var ) flags |= SMF__MAP_VAR;
   } else {
@@ -312,20 +312,20 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
         /* Get an HDS locator */
         ndfXnew( outfile->ndfid, JCMT__EXTNAME, JCMT__EXTTYPE, 0, 0,
                  &jcmtstateloc, status );
-        
+
         /* Map the header */
-        sc2store_headcremap( jcmtstateloc, inhdr->nframes, INST__SCUBA2, 
+        sc2store_headcremap( jcmtstateloc, inhdr->nframes, INST__SCUBA2,
                              status  );
-        
+
         /* Write out the per-frame headers */
         for( i=0; (*status==SAI__OK)&&(i<inhdr->nframes); i++ ) {
           sc2store_headput( i, inhdr->allState[i], status );
         }
       }
-      
+
     }
   }
-  
+
   /* Close the output file */
   smf_close_file( &outdata, status );
   grpDelet( &ogrp, status );
