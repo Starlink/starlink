@@ -660,6 +660,8 @@ f     - Title: The Plot title drawn using AST_GRID
 *        previous long values were split, or if the value contains a 
 *        space.
 *        - Take account of zero height bounding boxes in UpdateConcat.
+*        - Correct Dump so that it dumps attributes for all available 
+*        axes (2 for a Plot, 3 for a Plot3D).
 *class--
 */
 
@@ -28862,7 +28864,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
       ival = set ? GetStyle( this, id, status ) : astGetStyle( this, id );
       (void) sprintf( buff, "Style%d", id + 1 );
       comment = GrfItem( id, " line style", &ax, status );
-      if( ax < nax - 1 ) astWriteInt( channel, buff, set, 0, ival, comment );
+      if( ax < nax ) astWriteInt( channel, buff, set, 0, ival, comment );
       comment = (char *) astFree( (void *) comment );
    }
 
@@ -28873,7 +28875,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
       ival = set ? GetFont( this, id, status ) : astGetFont( this, id );
       (void) sprintf( buff, "Font%d", id + 1 );
       comment = GrfItem( id, " character font", &ax, status );
-      if( ax < nax - 1 ) astWriteInt( channel, buff, set, 0, ival, comment );
+      if( ax < nax ) astWriteInt( channel, buff, set, 0, ival, comment );
       comment = (char *) astFree( (void *) comment );
    }
 
@@ -28884,7 +28886,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
       ival = set ? GetColour( this, id, status ) : astGetColour( this, id );
       (void) sprintf( buff, "Col%d", id + 1 );
       comment = GrfItem( id, " colour index", &ax, status );
-      if( ax < nax - 1 ) astWriteInt( channel, buff, set, 0, ival, comment );
+      if( ax < nax ) astWriteInt( channel, buff, set, 0, ival, comment );
       comment = (char *) astFree( (void *) comment );
    }
 
@@ -28896,7 +28898,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
       if( dval != AST__BAD ) {
          (void) sprintf( buff, "Width%d", id + 1 );
          comment = GrfItem( id, " line width", &ax, status );
-         if( ax < nax - 1 ) astWriteDouble( channel, buff, set, 0, dval, comment );
+         if( ax < nax ) astWriteDouble( channel, buff, set, 0, dval, comment );
          comment = (char *) astFree( (void *) comment );
       }
    }
@@ -28909,7 +28911,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
       if( dval != AST__BAD ) {
          (void) sprintf( buff, "Size%d", id + 1 );
          comment = GrfItem( id, " character size", &ax, status );
-         if( ax < nax - 1 ) astWriteDouble( channel, buff, set, 0, dval, comment );
+         if( ax < nax ) astWriteDouble( channel, buff, set, 0, dval, comment );
          comment = (char *) astFree( (void *) comment );
       }
    }
