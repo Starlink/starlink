@@ -196,6 +196,8 @@ f     - Title: The Plot title drawn using AST_GRID
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
 *     Research Councils
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -653,6 +655,11 @@ f     - Title: The Plot title drawn using AST_GRID
 *        - Fix memory leak.
 *     6-SEP-2007 (DSB):
 *        Dump and load any user-specified tick mark values.
+*     20-OCT-2009 (DSB):
+*        - Modify SplitValue so that it only splits long values if 
+*        previous long values were split, or if the value contains a 
+*        space.
+*        - Take account of zero height bounding boxes in UpdateConcat.
 *class--
 */
 
@@ -12645,24 +12652,26 @@ static const char *SplitValue( AstPlot *this, const char *value, int axis,
    interpreted. */
    if( value && astGetEscape( this ) && !HasEscapes( value, status ) ) {
 
-/* We split the line if the line is long or if *split was non-zero on
-   entry. In this case always return *split equal to 1. */
+/* Attempt to find a space close to the centre of the formatted string. */
       l = strlen( value );
-      if( *split || l > 9 ) {
-         *split = 1;
-
-/* Find a space close to the centre of the formatted string. */
-         idmin = 2*l;
-         imin = -1;
-         for( i = 0; i < l; i++ ) {
-            if( isspace( value[ i ] ) ) {
-               id = abs( i - l/2 );
-               if( id < idmin ) {
-                  idmin = id;
-                  imin = i;
-               }
+      idmin = 2*l;
+      imin = -1;
+      for( i = 0; i < l; i++ ) {
+         if( isspace( value[ i ] ) ) {
+            id = abs( i - l/2 );
+            if( id < idmin ) {
+               idmin = id;
+               imin = i;
             }
          }
+      }
+
+/* We split the line if previous lines have been split (i.e. if *split was 
+   non-zero on entry) or if this line is long AND it contains a space. This
+   means that a sequence of long labels will not be split unless they contain
+   spaces. */
+      if( *split || ( l > 9 && imin != -1 ) ) {
+         *split = 1;
 
 /* Initialse the pointer into the returned buffer at which the next
    character will be placed. */
@@ -25442,9 +25451,10 @@ static void TextLabels( AstPlot *this, int edgeticks, int dounits[2],
 }
 
 static void UpdateConcat( float *xbn, float *ybn, float ux, float uy,
-                           float rx, float ry, float *x, float *y,
-                           float x0, float y0, float *alpha_lo, 
-                           float *alpha_hi, float *beta_lo, float *beta_hi, int *status ){
+                          float rx, float ry, float *x, float *y,
+                          float x0, float y0, float *alpha_lo, 
+                          float *alpha_hi, float *beta_lo, float *beta_hi, 
+                          int *status ){
 
 /*
 *  Name:
@@ -25456,10 +25466,10 @@ static void UpdateConcat( float *xbn, float *ybn, float ux, float uy,
 
 *  Synopsis:
 *     #include "plot.h"
-*     void UpdateConcat( float *xbn, float *ybn, float ux, float uy,
-*                         float rx, float ry, float *x, float *y,
-*                         float x0, float y0, float *alpha_lo, 
-*                         float *alpha_hi, float *beta_lo, float *beta_hi, int *status )
+*     void UpdateConcat( float *xbn, float *ybn, float ux, float uy, 
+*                        float rx, float ry, float *x, float *y,
+*                        float x0, float y0, float *alpha_lo, float *alpha_hi,
+*                        float *beta_lo, float *beta_hi, int *status )
 
 *  Description:
 *     This function modifies the supplied concatenation point (x,y) by moving
@@ -25583,17 +25593,23 @@ static void UpdateConcat( float *xbn, float *ybn, float ux, float uy,
          if( beta > bhi ) bhi = beta;
 
 /* The bottom left corner has negative values for both alpha and beta.
-   Commence the process of updating the concatenation point by subtracting off
-   the coordinates at the bottom left corner. */
-         if( alpha < 0.0 ) {      
-            if( beta < 0.0 ) {      
+   Commence the process of updating the concatenation point by subtracting 
+   off the coordinates at the bottom left corner. For zero height bounding
+   boxes (such as may be produced if the text is completely blank), the
+   "alpha" value should be zero, but may be slightly non-zero due to
+   rounding errors. Allow for this (assuming non-blank text will always
+   produce a boundiong box that is at least 1.0E-4 of the up vector in
+   height). We do the same for bounding box width (although zero width
+   boxes will probably not occur). */
+         if( alpha < 1.0E-4 ) {      
+            if( beta < 1.0E-4 ) {      
                *x -= xbn[ ic ];
                *y -= ybn[ ic ];
 
 /* The bottom right corner has negative alpha and positive beta. Complete
    the process of updating the concatenation point by adding on the 
    coordinates at the bottom right corner. */
-            } else {
+            } else if( beta > -1.0E-4 ) {
                *x += xbn[ ic ];
                *y += ybn[ ic ];
             }
