@@ -116,6 +116,7 @@
       INTEGER NPATH
       INTEGER NREM
       INTEGER PLACE
+      LOGICAL HASHIS
 *.
 
 *  Begin a new error reporting context (we want to clean up even if an
@@ -235,11 +236,26 @@
                   END IF
 
 *  Append the array of lines describing the contents of the expanded group
-*  to the current history record.
+*  to the current history record, and suppress the creation of default
+*  NDF history (which has already been added to the NDF - we do not want
+*  another default history record to be written when the NDF is closed 
+*  below).
                   CALL NDF_HPUT( ' ', '<APPEND>', .TRUE., ILINE, LINES, 
      :                           .FALSE., .FALSE., .FALSE., INDF, 
      :                           STATUS ) 
                END DO
+
+*  If no GRP parameters have been registered, no call will have been made
+*  to NDF_HPUT, and so the re-writing of default history to the NDF will
+*  not have been suppressed. So, if NPAR is zero and the NDF has a history 
+*  component, set its history update mode to SKIP. This means that no 
+*  default history record will be added to the NDF when it is closed below,
+*  but the history update mode stored in the NDF structure on disk will 
+*  not be changed.
+               IF( NPAR .EQ. 0 ) THEN 
+                  CALL NDF_STATE( INDF, 'History', HASHIS, STATUS )
+                  IF( HASHIS ) CALL NDF_HSMOD( 'SKIP', INDF, STATUS )
+               END IF
 
 *  Annul the NDF identifier
                CALL NDF_ANNUL( INDF, STATUS )
