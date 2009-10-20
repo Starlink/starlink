@@ -31,8 +31,6 @@
 *     "_con". The can be modified using the parameter OUT.
 
 *  ADAM Parameters:
-*     IGNOREDARK = LOGICAL (Read)
-*          If set, don't use darks to mask data.
 *     IN = NDF (Read)
 *          Input file(s)
 *     MAXLEN = _DOUBLE (Read)
@@ -51,6 +49,8 @@
 *          Number of samples to pad at end.
 *     PADSTART = _INTEGER (Read)
 *          Number of samples to pad at start.
+*     USEDARKS = LOGICAL (Read)
+*          If set, use darks to mask data [TRUE]
 
 *  Related Applications:
 *     SMURF: SC2FFT, SC2CLEAN
@@ -70,7 +70,7 @@
 *     2009-03-30 (TIMJ):
 *        Add OUTFILES parameter.
 *     2009-10-20 (EC):
-*        Add IGNOREDARK parameter.
+*        Add USEDARKS parameter.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -141,7 +141,7 @@ void smurf_sc2concat( int *status ) {
   Grp *fgrp = NULL;          /* Filtered group, no darks */
   size_t gcount=0;           /* Grp index counter */
   size_t idx;                /* Subarray counter */
-  int igdark;                /* flag for ignoring darks */
+  int usedarks;              /* flag for using darks */
   Grp *igrp = NULL;          /* Group of input files */
   smfGroup *igroup=NULL;     /* smfGroup corresponding to igrp */
   size_t isize;              /* Number of files in input group */
@@ -153,7 +153,6 @@ void smurf_sc2concat( int *status ) {
   size_t osize;              /* Number of files in input group */
   dim_t padStart=0;          /* How many samples padding at start */
   dim_t padEnd=0;            /* How many samples padding at end */
-  smfArray *thedarks = NULL; /* dark frames */
   int temp;                  /* Temporary signed integer */
   smfWorkForce *wf = NULL;   /* Pointer to a pool of worker threads */
 
@@ -207,8 +206,8 @@ void smurf_sc2concat( int *status ) {
   parGdr0i( "PADEND", 0, 0, VAL__MAXI, 1, &temp, status );
   padEnd = (dim_t) temp;
 
-  /* Are we ignoring darks? */
-  parGet0l( "IGNOREDARK", &igdark, status );
+  /* Are we using darks? */
+  parGet0l( "USEDARKS", &usedarks, status );
 
   /* Group the input files by subarray and continuity */
   smf_grp_related( igrp, isize, 1, maxlen-padStart-padEnd, &maxconcat, &igroup,
@@ -231,12 +230,9 @@ void smurf_sc2concat( int *status ) {
   for( contchunk=0;(*status==SAI__OK)&&contchunk<ncontchunks; contchunk++ ) {
 
     /* Concatenate this continuous chunk */
-
-    if( igdark ) thedarks = NULL;
-    else thedarks = darks;
-
-    smf_concat_smfGroup( wf, igroup, thedarks, NULL, contchunk, 1, 1, NULL, 0,
-                         NULL, NULL, padStart, padEnd, 0, &concat, status );
+    smf_concat_smfGroup( wf, igroup, usedarks ? darks:NULL, NULL, contchunk, 1,
+                                      1, NULL, 0, NULL, NULL, padStart, padEnd,
+                                      0, &concat, status );
 
     /* Export concatenated data for each subarray to NDF file */
     for( idx=0; (*status==SAI__OK)&&idx<concat->ndat; idx++ ) {
