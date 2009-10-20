@@ -1895,6 +1895,15 @@ package @PACKAGE@ {
 
             helplib {$SMURF_HELP}
 
+            parameter ignoredark {
+                type _LOGICAL
+                vpath {DEFAULT }
+                prompt {If set don't mask data using darks}
+                ppath GLOBAL CURRENT
+                default FALSE
+                helpkey *
+            }
+
             parameter in {
                 position 1
                 type NDF
