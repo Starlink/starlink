@@ -129,6 +129,7 @@
 *     Copyright (C) 1992, 1993 Science & Engineering Research Council.
 *     Copyright (C) 1999, 2000 Central Laboratory of the Research Councils.
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -166,6 +167,9 @@
 *        Check that return variables from CHR_FANDL are non-zero
 *     20-SEP-2006 (DSB):
 *        Remove erroneous "%" signs from error messages.
+*     20-OCT-2009 (DSB):
+*        Register the returned group with NDG_ADDGH so that it is
+*        included in NDF history.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -398,6 +402,11 @@
          GO TO 10
 
       END IF
+
+*  Register the returned group with NDG so that its contents will be
+*  appended to the end of any default history records written out by the 
+*  NDF library.
+      IF( SIZE .GT. 0 ) CALL NDG_ADDGH( PARAM, IGRP, STATUS )
 
 *  Delete the group used to hold the list of bad NDFs.
  999  CONTINUE
