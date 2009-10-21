@@ -382,7 +382,11 @@ void smurf_mon( int * status ) {
   /* The astFlushMemory function does nothing unless AST has been compiled 
    * with the MEM_DEBUG flag. If this is the case, then it frees all AST 
    * internal structures, and report the number of memory blocks that have 
-   * not been freed (useful for identifying memory leaks). */
+   * not been freed (useful for identifying memory leaks).
+   * Use astActiveMemory() below to list all active memory and then
+   * use astWatchMemory() at the start of this routine to get reports when
+   * a particular ID is used. Set a breakpoint in the debugger for astMemoryAlarm_
+   */
   astFlushMemory( 1 );
 }
 
