@@ -16,6 +16,8 @@
 #define SC2STORE_PAR_DEFINED
 
 #define SC2STORE_FLATLEN 17  /* maximum length of flatfield algorithm name */
+#define SC2STORE_UNITLEN 20  /* maximum length of data units string */
+#define SC2STORE_LABLEN  40  /* maximum length of data label string */
 
 #define SC2STORE__MAXFITS 256 /* Maximum number of FITS records */
 

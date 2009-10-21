@@ -235,6 +235,7 @@
 #include "mers.h"
 #include "star/irq.h"
 #include "star/kaplibs.h"
+#include "star/one.h"
 #include "kpg_err.h"
 #include "irq_err.h"
 #include "prm_par.h"
@@ -644,6 +645,9 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
         file->isTstream = isTseries;
       }
     } else {
+      char units[SC2STORE_UNITLEN];
+      char dlabel[SC2STORE_LABLEN];
+
       /* Get the time series WCS if header exists */
       if( hdr ) {
         ndfGtwcs( indf, &(hdr->tswcs), status );
@@ -681,7 +685,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
       sc2store_force_initialised( status );
       sc2store_rdtstream( pname, "READ", SC2STORE_FLATLEN,
                           SC2STORE__MAXFITS, 
-                          &nfits, fitsrec, &colsize, &rowsize, 
+                          &nfits, units, dlabel, fitsrec, &colsize, &rowsize,
                           &nframes, &(da->nflat), da->flatname,
                           &tmpState, ptdata, pdksquid, 
                           &flatcal, &flatpar, &jigvert, &nvert, &jigpath, 
@@ -752,6 +756,10 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
 
           /* Metadata corrections - hide the messages by default */
           if ( !(flags & SMF__NOFIX_METADATA) ) smf_fix_metadata( MSG__VERB, *data, status );
+
+          /* Store units and label */
+          one_strlcpy( hdr->units, units, sizeof(hdr->units), status );
+          one_strlcpy( hdr->dlabel, dlabel, sizeof(hdr->dlabel), status );
 
           /* Determine and store the telescope location in hdr->telpos */
           smf_telpos_get( hdr, status );

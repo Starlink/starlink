@@ -36,6 +36,7 @@
 #include "dat_par.h"
 #include "star/hds.h"
 #include "star/kaplibs.h"
+#include "star/util.h"
 #include "ast.h"
 #include "ndf.h"
 #include "star/ndg.h"
@@ -1552,7 +1553,7 @@ int *status            /* global status (given and returned) */
 /* Read the TSTREAM data */
 
    sc2store_rdtstream ( filename, access, flatlen,
-     SC2STORE__MAXFITS, &nrec, fitsrec, &colsize, &rowsize, nframes,
+     SC2STORE__MAXFITS, &nrec, NULL, NULL, fitsrec, &colsize, &rowsize, nframes,
      nflat, flatname, &frhead, &tmptr, &dksquid, &fcal, &fpar,
      jigvert, nvert, jigpath, npath, status );
 
@@ -2176,6 +2177,8 @@ const char *access,      /* "READ" or "UPDATE" access (given) */
 size_t flatlen,          /* length of space for flatfield name (given) */
 size_t maxfits,          /* max number of FITS headers (given) */
 size_t *nrec,            /* actual number of FITS records (returned) */
+char units[SC2STORE_UNITLEN],/* data units. can be NULL (returned) */
+char label[SC2STORE_LABLEN], /* data label. Can be NULL (returned) */
 char *fitshead,          /* up to maxfits FITS header records (returned) */
 size_t *colsize,         /* number of pixels in column (returned) */
 size_t *rowsize,         /* number of pixels in row (returned) */
@@ -2253,8 +2256,8 @@ int *status              /* global status (given and returned) */
    sc2store_open ( filename, access, colsize, rowsize, nframes, status );
 
    if( outdata && dksquid ) {
-      sc2store_readraw ( access, *colsize, *rowsize, *nframes, outdata, dksquid, 
-        status );
+     sc2store_readraw ( access, *colsize, *rowsize, *nframes, units, label, outdata,
+                        dksquid, status );
    }
 
    sc2store_readflatcal ( access, flatlen, nflat, flatname, flatcal, flatpar,
@@ -2514,6 +2517,8 @@ const char *access,      /* "READ" or "UPDATE" access (given) */
 size_t colsize,          /* number of pixels in column (given) */
 size_t rowsize,          /* number of pixels in row (given) */
 size_t nframes,          /* number of frames (given) */
+char units[SC2STORE_UNITLEN],/* data units. can be NULL (returned) */
+char label[SC2STORE_LABLEN], /* data label. Can be NULL (returned) */
 int **rawdata,           /* raw timestream data (returned) */
 int **dksquid,           /* pointer to dark SQUID values (returned) */
 int *status              /* global status (given and returned) */
@@ -2530,6 +2535,8 @@ int *status              /* global status (given and returned) */
    int *bzero;                 /* pointer to compression offset values */
    short *data;                /* pointer to compressed data array */
    int el;                     /* number of elements mapped */
+   int hasunits = 0;           /* are units defined? */
+   int haslabel = 0;           /* is the data label defined? */
    int isthere = 0;            /* is an extension present? */
    int j;                      /* loop counter */
    int nbol;                   /* number of bolometers */
@@ -2564,6 +2571,25 @@ int *status              /* global status (given and returned) */
    if ( strcmp ( type, "_INTEGER" ) == 0 )
    {
 
+/* Units and label - we can trust the values in the file if they
+   already exist */
+     if (units) {
+       ndfState( sc2store_indf, "Units", &hasunits, status );
+       if (hasunits) {
+         ndfCget( sc2store_indf, "Units", units, SC2STORE_UNITLEN, status );
+       } else {
+         star_strlcpy( units, "DAC Units", SC2STORE_UNITLEN );
+       }
+     }
+     if (label) {
+       ndfState( sc2store_indf, "Label", &haslabel, status );
+       if (haslabel) {
+         ndfCget( sc2store_indf, "Label", label, SC2STORE_LABLEN, status );
+       } else {
+         star_strlcpy( label, "Signal", SC2STORE_LABLEN );
+       }
+     }
+
 /* Map the data array */
 
       ndfMap ( sc2store_indf, "DATA", "_INTEGER", "READ", (void *)(&udata), &el, 
@@ -2576,6 +2602,15 @@ int *status              /* global status (given and returned) */
    else
    {
      
+/* Units and label - we are uncompressing so we ignore the label
+   and units that are in the file already. */
+     if (units) {
+         star_strlcpy( units, "DAC Units", SC2STORE_UNITLEN );
+     }
+     if (label) {
+         star_strlcpy( label, "Signal", SC2STORE_LABLEN );
+     }
+
 /* Map the data array */
 
       ndfMap ( sc2store_indf, "DATA", "_WORD", "READ", (void *)(&data), &el, 
@@ -3406,6 +3441,9 @@ int *status              /* global status (given and returned) */
       ndfNew ( "_WORD", 3, lbnd, ubnd, &place, &sc2store_indf, status );
       ndfHcre ( sc2store_indf, status );
 
+/* Labels and units */
+      ndfCput( "Compressed Signal", sc2store_indf, "LABEL", status );
+
 /* Map the data array */
 
       ndfMap ( sc2store_indf, "DATA", "_WORD", "WRITE", (void *)(&sdata), &el, 
@@ -3495,6 +3533,10 @@ int *status              /* global status (given and returned) */
       ndfHcre ( sc2store_indf, status );
       ndfXnew ( sc2store_indf, "SCUBA2", "SCUBA2_FM_PAR", 0, 0,
         &sc2store_scuba2loc, status );
+
+/* Labels and units */
+      ndfCput( "DAC units", sc2store_indf, "UNITS", status );
+      ndfCput( "Signal", sc2store_indf, "LABEL", status );
 
 /* Map the data array */
 
