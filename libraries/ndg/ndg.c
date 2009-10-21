@@ -370,6 +370,17 @@ void ndgEndgh( int * status ) {
   F77_IMPORT_INTEGER( STATUS, *status );
 }
 
+F77_SUBROUTINE(ndg_hwrgh)( INTEGER(INDF), INTEGER(STATUS) );
+
+void ndgHwrgh( int indf, int *status ) {
+  DECLARE_INTEGER(INDF);
+  DECLARE_INTEGER(STATUS);
+  F77_EXPORT_INTEGER( indf, INDF );
+  F77_EXPORT_INTEGER( *status, STATUS );
+  F77_CALL(ndg_hwrgh)( INTEGER_ARG(&INDF), INTEGER_ARG(&STATUS) );
+  F77_IMPORT_INTEGER( STATUS, *status );
+}
+
 
 
 

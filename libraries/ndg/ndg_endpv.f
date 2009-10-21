@@ -204,14 +204,6 @@
                   ELSE
                      CALL NDF_XSTAT( INDF1, 'PROVENANCE', THERE, 
      :                               STATUS )
-
-*  If the NDF has a history component, set its history update mode to
-*  SKIP. This means that no history record will be added to the NDF when
-*  it is closed, but the history update mode stored in the NDF structure
-*  on disk will not be changed.
-                     CALL NDF_STATE( INDF1, 'History', HASHIS, STATUS )
-                     IF( HASHIS ) CALL NDF_HSMOD( 'SKIP', INDF1, 
-     :                                            STATUS )
                   END IF
 
 *  Only modify this output NDF if is exists and has no provenance
@@ -276,8 +268,16 @@
 
                   END IF
    
-                  IF( INDF1 .NE. NDF__NOID ) CALL NDF_ANNUL( INDF1, 
-     :                                                       STATUS )
+*  If we have an NDF, close it. If the NDF has a history component, set its 
+*  history update mode to SKIP before closing it. This means that no history 
+*  record will be added to the NDF when it is closed, but the history update 
+*  mode stored in the NDF structure on disk will not be changed.
+                  IF( INDF1 .NE. NDF__NOID ) THEN
+                     CALL NDF_STATE( INDF1, 'History', HASHIS, STATUS )
+                     IF( HASHIS ) CALL NDF_HSMOD( 'SKIP', INDF1, 
+     :                                            STATUS )
+                     CALL NDF_ANNUL( INDF1, STATUS )
+                  END IF
                END IF
             END DO
          END IF

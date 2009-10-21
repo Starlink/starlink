@@ -118,5 +118,6 @@ AstXmlElement *ndgPutParam( AstXmlElement *elem, const char *name, int ndim, int
 AstXmlElement *ndgPutGroup( AstXmlElement *elem, const char *name, int *status );
 HDSLoc *ndgVot2hds( AstXmlElement *elem, HDSLoc *ploc, int *status );
 const char *ndgGetAttrib( AstXmlElement *elem, const char *name, const char *method, int *status );
+void ndgHwrgh( int indf, int *status );
 
 #endif

@@ -93,28 +93,14 @@
       PARAMETER ( MXLINE = 20 )
 
 *  Local Variables:
-      CHARACTER ELEM*(GRP__SZNAM)
       CHARACTER KEY*30
-      CHARACTER LINES( MXLINE )*(NDF__SZHMX)
-      CHARACTER PARAM*30
       CHARACTER PATH*512
-      INTEGER ELEN
       INTEGER I
-      INTEGER IAT
-      INTEGER IEL
       INTEGER IGRP
-      INTEGER ILINE
       INTEGER INDF
-      INTEGER IPAR
       INTEGER IPATH
-      INTEGER JAT
-      INTEGER NC
-      INTEGER NEL
       INTEGER NGRP         
-      INTEGER NLEFT
-      INTEGER NPAR
       INTEGER NPATH
-      INTEGER NREM
       INTEGER PLACE
       LOGICAL HASHIS
 *.
@@ -130,7 +116,15 @@
 *  Loop round each NDF to which default history has been written.
       NPATH = AST_MAPSIZE( DHKMP, STATUS )
       DO IPATH = 1, NPATH
-         PATH = AST_MAPKEY( DHKMP, IPATH, STATUS )
+
+*  Get the key with index 1 on each pass through this loop. Since the
+*  key is immediately removed form the KeyMap, what was key 2 will become
+*  key 1 on each pass.
+         PATH = AST_MAPKEY( DHKMP, 1, STATUS )
+
+*  Remove the NDF form the keymap to avoid it recieving a second copy of
+*  group contents if this routine is ever called again.
+         CALL AST_MAPREMOVE( DHKMP, PATH, STATUS )
 
 *  Check no error has occurred.
          IF( STATUS .EQ. SAI__OK ) THEN 
@@ -144,121 +138,22 @@
             IF( STATUS .NE. SAI__OK ) THEN
                CALL ERR_ANNUL( STATUS )
                       
-*  Otherwise, see if this output NDF has a PROVENANCE extenion
+*  Otherwise, append a description of each registered GRP group to the
+*  current History record of the NDF.
             ELSE
+               CALL NDG1_HWRGH( INDF, STATUS )
 
-*  Loop round every entry in the GRP NDF history keymap.
-               NPAR = AST_MAPSIZE( GHKMP, STATUS )
-               DO IPAR = 1, NPAR
-                  PARAM = AST_MAPKEY( GHKMP, IPAR, STATUS ) 
-                  IF( AST_MAPGET0I( GHKMP, PARAM, IGRP, STATUS ) ) THEN
-
-*  Initialise the first line to hold the parameter name.
-                     ILINE = 1
-                     LINES( 1 ) = ' '
-                     IAT = 0
-                     CALL CHR_APPND( 'Group:', LINES( 1 ), IAT )
-                     IAT = IAT + 1
-                     CALL CHR_APPND( PARAM, LINES( 1 ), IAT )
-                     CALL CHR_APPND( '="', LINES( 1 ), IAT )
-
-*  Loop round every element in the group.
-                     CALL GRP_GRPSZ( IGRP, NEL, STATUS ) 
-                     DO IEL = 1, NEL
-                        CALL GRP_GET( IGRP, IEL, 1, ELEM, STATUS ) 
-
-*  Get the total length of the element and initialise the number of
-*  element characters still to be appended to the history text, and the
-*  index of the next element character to write.
-                        ELEN = CHR_LEN( ELEM )
-                        NLEFT = ELEN
-                        JAT = 1
-
-*  Loop round until the whole element has been appended to the history
-*  text, or we have filled the array of lines.
-                        DO WHILE( NLEFT .GT. 0 .AND. ILINE .LE. MXLINE ) 
-
-*  Determine how much room is left at the end of the current line.
-                           NREM = NDF__SZHMX - IAT
-
-*  If this is zero, start a new line.
-                           IF( NREM .LE. 0 ) THEN
-                              ILINE = ILINE + 1
-                              IAT = 0
-                              NREM = NDF__SZHMX 
-                           END IF   
-
-*  If we have filled the array of history text lines, append an ellipsis
-*  to the end of the last line.
-                           IF( ILINE .GT. MXLINE ) THEN
-                              LINES( MXLINE )( NDF__SZHMX - 4 : ) = 
-     :                                                            ' ...'
-
-*  Otherwise, append as much of the element as possible to the end of the
-*  current line.
-                           ELSE
-
-*  Note the number of characters to write.
-                              NC = MIN( NLEFT, NREM )
-*  Write them.
-                              CALL CHR_APPND( ELEM( JAT:JAT + NC - 1 ),
-     :                                        LINES( ILINE ), IAT )
-
-*  Update the number of characters left to be written.
-                              NLEFT = NLEFT - NC
-
-*  Update the index of the next character to be written.
-                              JAT = JAT + NC
-                           END IF
-                        END DO
-
-*  If there is not room to append a comma and space, or a closing quote to 
-*  the end of the line, start a new line.
-                        IF( IAT .GE. NDF__SZHMX - 1 ) THEN
-                           ILINE = ILINE + 1
-                           IAT = 0
-                        END IF
-
-*  Check we have not filled the array of lines.
-                        IF( ILINE .LE. MXLINE ) THEN
-
-*  Append a double quote if this is the last element in the group, or a
-*  comma otherwise.
-                           IF( IEL .EQ. NEL ) THEN
-                              CALL CHR_APPND( '"', LINES( ILINE ), IAT )
-                           ELSE
-                              CALL CHR_APPND( ',', LINES( ILINE ), IAT )
-                              IAT = IAT + 1
-                           END IF
-      
-                        END IF
-                     END DO
-                  END IF
-
-*  Append the array of lines describing the contents of the expanded group
-*  to the current history record, and suppress the creation of default
-*  NDF history (which has already been added to the NDF - we do not want
-*  another default history record to be written when the NDF is closed 
-*  below).
-                  CALL NDF_HPUT( ' ', '<APPEND>', .TRUE., ILINE, LINES, 
-     :                           .FALSE., .FALSE., .FALSE., INDF, 
-     :                           STATUS ) 
-               END DO
-
-*  If no GRP parameters have been registered, no call will have been made
-*  to NDF_HPUT, and so the re-writing of default history to the NDF will
-*  not have been suppressed. So, if NPAR is zero and the NDF has a history 
-*  component, set its history update mode to SKIP. This means that no 
-*  default history record will be added to the NDF when it is closed below,
-*  but the history update mode stored in the NDF structure on disk will 
-*  not be changed.
-               IF( NPAR .EQ. 0 ) THEN 
-                  CALL NDF_STATE( INDF, 'History', HASHIS, STATUS )
-                  IF( HASHIS ) CALL NDF_HSMOD( 'SKIP', INDF, STATUS )
-               END IF
+*  If the NDF has a history component, set its history update mode to SKIP. 
+*  This means that no default history record will be added to the NDF when 
+*  it is closed below (one has already been written during the course of
+*  the application that has just finished), but the history update mode 
+*  stored in the NDF structure on disk will not be changed.
+               CALL NDF_STATE( INDF, 'History', HASHIS, STATUS )
+               IF( HASHIS ) CALL NDF_HSMOD( 'SKIP', INDF, STATUS )
 
 *  Annul the NDF identifier
                CALL NDF_ANNUL( INDF, STATUS )
+
             END IF
          END IF
       END DO

@@ -6023,9 +6023,22 @@ static void ndg1WriteProvenanceNDF( Provenance *provenance, int indf,
    recent history record at the time the structure was first stored in the 
    NDF, get one now. */
       if( provenance->main->hhash == 0 ) {
+
+/* Check the NDF has a history component. */
          ndfState( indf, "History", &there, status ); 
          if( there ) {
+
+/* If the default history may not yet have been written, ensure it is
+   written by calling ndfHdef. */
             if( whdef ) ndfHdef( indf, "", status );
+
+/* Ensure descriptions of any registered GRP groups have been appended to
+   the current history record (an application registers a group by
+   calling NDG_ADDGH). */
+            ndgHwrgh( indf, status );
+
+/* Get the index of the current history record, and if there is a current
+   record, get its hash code. */
             ndfHnrec( indf, &irec, status );
             if( irec ) ndg1ReadHistRec( NULL, indf, irec, 
                                         &(provenance->main->hhash), status );

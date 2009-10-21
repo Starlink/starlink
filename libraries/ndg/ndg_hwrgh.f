@@ -1,0 +1,105 @@
+      SUBROUTINE NDG_HWRGH( INDF, STATUS )
+*+
+*  Name:
+*     NDG_HWRGH
+
+*  Purpose:
+*     Write GRP history to an NDF.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL NDG_HWRGH( INDF, STATUS )
+
+*  Description:
+*     This routine appends a description of each currently registered GRP 
+*     group to the current History record in the supplied NDF. See
+*     NDF_ENDGH. It returns without action if 1) the NDF library has not
+*     yet written a default history record to the NDF, or 2) GRP history
+*     has already been written to the NDF.
+
+*  Arguments:
+*     INDF = INTEGER (Given)
+*        The NDF identifier.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Copyright:
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This programme is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE.  See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
+*  Authors:
+*     DSB: David Berry (JAC, Hawaii)
+*     {enter_new_authors_here}
+
+*  History:
+*     21-OCT-2009 (DSB):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'AST_PAR'
+
+*  Global Variables:
+      INTEGER DHKMP              ! KeyMap holding NDF to which default 
+                                 ! history has been written.
+      INTEGER GHKMP              ! KeyMap holding GRP group contents
+      COMMON /NDG_GH/ GHKMP, DHKMP
+
+*  Arguments Given:
+      INTEGER INDF
+
+*  Status:
+      INTEGER STATUS
+
+*  Local Variables:
+      CHARACTER NDFNAM*255
+      INTEGER NDFLEN
+*.
+
+*  Check inherited status
+      IF( STATUS .NE. SAI__OK ) RETURN
+
+*  Check that the supplied NDF is in the KeyMap holding the paths of NDFs
+*  to which default history has been written.
+      CALL NDF_MSG( 'T', INDF )
+      CALL MSG_LOAD( ' ', '^T', NDFNAM, NDFLEN, STATUS )
+      IF( AST_MAPHASKEY( DHKMP, NDFNAM( : NDFLEN ), STATUS ) ) THEN 
+
+*  Append the contents of registered groups to the current history record 
+*  in the NDF.
+         CALL NDG1_HWRGH( INDF, STATUS )
+
+*  Remove the path for the supplied NDF form the group, thus preventing
+*  future routines from writing out group contents again.
+         CALL AST_MAPREMOVE( DHKMP, NDFNAM( : NDFLEN ), STATUS ) 
+
+      END IF
+
+      END
