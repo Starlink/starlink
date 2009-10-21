@@ -12,7 +12,6 @@ CGENERIC_ROUTINES = smf_boxcar1.cgen smf_templateFit1.cgen smf_sort.cgen \
 BUILT_C_ROUTINES = $(CGENERIC_ROUTINES:.cgen=.c)
 
 C_ROUTINES = \
-smf_NDFexport_smfFilter.c \
 smf_accumulate_prov.c \
 smf_addmap1.c \
 smf_addto_smfArray.c \
