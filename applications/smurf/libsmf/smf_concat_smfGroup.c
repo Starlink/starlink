@@ -35,7 +35,8 @@
  *        Which continuous subset of igrp will get concatenated?
  *     ensureflat = int (Given)
  *        If true, ensure that the flatfield is applied when opening the data
- *        files, else read them as raw files converted to double.
+ *        files, else, if they are already flatfielded read them as is, or if
+ *        they are raw files read them as raw files converted to double.
  *     isTordered = int (Given)
  *        If 0, ensure concatenated data is ordered by bolometer. If 1 ensure
  *        concatenated data is ordered by time slice (default ICD ordering)
@@ -420,8 +421,18 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
             smf_open_and_flatfield( igrp->grp, NULL, igrp->subgroups[j][i],
                                     darks, &refdata, status );
           } else {
-            smf_open_raw_asdouble( igrp->grp, igrp->subgroups[j][i],
-                                   darks, &refdata, status );
+            /* open as raw if raw else just open as whatever we have */
+            smfData * tmpdata = NULL;
+            smf_open_file( igrp->grp, igrp->subgroups[j][i], "READ",
+                           SMF__NOCREATE_DATA, &tmpdata, status );
+            if (tmpdata && tmpdata->file && tmpdata->file->isSc2store) {
+              smf_open_raw_asdouble( igrp->grp, igrp->subgroups[j][i],
+                                     darks, &refdata, status );
+            } else {
+              smf_open_and_flatfield( igrp->grp, NULL, igrp->subgroups[j][i],
+                                      darks, &refdata, status );
+            }
+            smf_close_file( &tmpdata, status );
           }
 
           /* Apply bad pixel mask */
