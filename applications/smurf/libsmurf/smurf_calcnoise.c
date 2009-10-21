@@ -278,7 +278,7 @@ void smurf_calcnoise( int *status ) {
         }
 
         one_strlcpy( noiseunits, thedata->hdr->units, sizeof(noiseunits), status );
-        if (strlen(noiseunits)) one_strlcpy( noiseunits, " ", sizeof(noiseunits), status );
+        if (strlen(noiseunits)) one_strlcat( noiseunits, " ", sizeof(noiseunits), status );
         one_strlcat( noiseunits, "Hz**-0.5", sizeof(noiseunits), status );
 
         /* Apodize */
