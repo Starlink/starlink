@@ -28,6 +28,11 @@
 *        The global status.
 
 *  Notes:
+*     - The group is registered only if the current value of the
+*     associated parameter contains an "INDIRECTION" or "NAME_TOKEN"
+*     control character (see SUN/150). This prevents group descriptions
+*     being added to the NDF history if the contents of the group are 
+*     already described fully by the parameters list.
 *     - This routine records a copy of the group contents at the time
 *     this routine is called. Any subsequent changes to the contents of
 *     the group are not included in the default NDF history.
@@ -75,21 +80,26 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and functions
+      INCLUDE 'GRP_PAR'          ! GRP constants 
 
 *  Global Variables:
-      INTEGER GHKMP              ! KeyMap holding group contents
-      COMMON /NDG_GH/ GHKMP
+      INTEGER DHKMP              ! KeyMap holding NDF to which default 
+                                 ! history has been written.
+      INTEGER GHKMP              ! KeyMap holding GRP group contents
+      COMMON /NDG_GH/ GHKMP, DHKMP
 
 *  Arguments Given:
       CHARACTER PARAM*(*)
       INTEGER IGRP      
+      INTEGER IPAR
+      CHARACTER GRPEXP*(4*GRP__SZGEX )
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
       INTEGER IGRP2
-
+      CHARACTER CC*2
 *.
 
 *  Check the inherited status
@@ -104,10 +114,24 @@
             CALL GRP_DELET( IGRP2, STATUS ) 
          END IF
 
+* Get the current un-interpreted parameter value.
+         CALL SUBPAR_FINDPAR( PARAM, IPAR, STATUS )
+         CALL SUBPAR_GETNAME( IPAR, GRPEXP, STATUS )
+
+*  Get the control characters used by the group for indirection and
+*  modification.
+         CALL GRP_GETCC( IGRP, 'INDIRECTION,NAME_TOKEN', CC, STATUS )  
+
+*  Only register the group if it contain one or more of the above group
+*  control characters.
+         IF( INDEX( GRPEXP, CC( 1 : 1 ) ) .GT. 0 .OR.
+     :       INDEX( GRPEXP, CC( 2 : 2 ) ) .GT. 0 ) THEN
+
 *  Take a copy of the group, and store the new GRP identifier in the 
 *  KeyMap.
-         CALL GRP_COPY( IGRP, 0, 0, .FALSE., IGRP2, STATUS ) 
-         CALL AST_MAPPUT0I( GHKMP, PARAM, IGRP2, ' ', STATUS ) 
+            CALL GRP_COPY( IGRP, 0, 0, .FALSE., IGRP2, STATUS ) 
+            CALL AST_MAPPUT0I( GHKMP, PARAM, IGRP2, ' ', STATUS ) 
+         END IF
 
 *  Annul any error caused by GHKMP not being a valid KeyMap pointer.
       ELSE IF( STATUS .NE. SAI__OK ) THEN
