@@ -23,7 +23,7 @@
  *        Data label. Not modified if NULL.
  *     units = const char[] (Given)
  *        Data units. Not modified if NULL.
- *     hdr = const smfHead* (Given)
+ *     hdr = smfHead* (Given)
  *        Header to be modified. No action if hdr is NULL.
  *     status = int (Given & Returned)
  *        inherited status.
@@ -38,9 +38,11 @@
  *  History:
  *     2008-04-30 (TIMJ):
  *        Original version.
+ *     2009-10-21 (TIMJ):
+ *        Use star_strlcpy
 
-*  Copyright:
- *     Copyright (C) 2008 Science and Technology Facilities Council.
+ *  Copyright:
+ *     Copyright (C) 2008-2009 Science and Technology Facilities Council.
  *     All Rights Reserved.
 
  *  Licence:
@@ -70,6 +72,7 @@
 /* Starlink includes */
 #include "ndf.h"
 #include "sae_par.h"
+#include "star/one.h"
 
 #include "smf.h"
 #include "smf_typ.h"
@@ -81,16 +84,13 @@ void smf_set_clabels( const char title[], const char label[], const char units[]
   if (hdr == NULL) return;
 
   if (title) {
-    strncpy( hdr->title, title, SMF__CHARLABEL);
-    (hdr->title)[SMF__CHARLABEL-1] = '\0';
+    one_strlcpy( hdr->title, title, sizeof(hdr->title), status );
   }
   if (label) {
-    strncpy( hdr->dlabel, label, SMF__CHARLABEL);
-    (hdr->dlabel)[SMF__CHARLABEL-1] = '\0';
+    one_strlcpy( hdr->dlabel, label, sizeof(hdr->dlabel), status );
   }
   if (units) {
-    strncpy( hdr->units, units, SMF__CHARLABEL);
-    (hdr->units)[SMF__CHARLABEL-1] = '\0';
+    one_strlcpy( hdr->units, units, sizeof(hdr->units), status );
   }
 
   return;
