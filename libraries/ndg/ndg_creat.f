@@ -298,6 +298,11 @@
 
       END IF
 
+*  Register the returned group with NDG so that its contents will be
+*  appended to the end of any default history records written out by the 
+*  NDF library.
+      IF( SIZE .GT. 0 ) CALL NDG_ADDGH( PARAM, IGRP, STATUS )
+
 *  If a null parameter value was given, annul the error. If no NDFs
 *  were added to the group re-report it with a more friendly report.
  999  CONTINUE
