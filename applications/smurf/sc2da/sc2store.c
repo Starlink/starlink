@@ -2224,10 +2224,13 @@ int *status              /* global status (given and returned) */
     11Nov2007 : make compressed data short instead of unsigned short (bdk)
     16Nov2007 : restructure on top of sc2store_readraw() (bdk)
     20Jun2008 : check for NULL outdata or dksquid pointers (dsb)
+    20Oct2009 : Add units and label (timj)
 */
 
 {
 
+   if (units) units[0] = '\0';
+   if (label) label[0] = '\0';
 
    if ( !StatusOkP(status) ) return;
 
@@ -2530,6 +2533,7 @@ int *status              /* global status (given and returned) */
     16Nov2007 : original (bdk)
     29Nov2007 : calloc returned pointer irrespective of the file data being
                 compressed (bdk)
+    20Oct2009 : add units and label arguments (timj)
 */
 {
    int *bzero;                 /* pointer to compression offset values */
@@ -2548,6 +2552,8 @@ int *status              /* global status (given and returned) */
    char type[NDF__SZTYP+1];    /* type of stored raw data */
    int *udata;                 /* pointer to uncompressed data array */
 
+   if (units) units[0] = '\0';
+   if (label) label[0] = '\0';
 
    if ( *status != SAI__OK ) return;
 
