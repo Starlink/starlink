@@ -2224,7 +2224,7 @@ int *status              /* global status (given and returned) */
     11Nov2007 : make compressed data short instead of unsigned short (bdk)
     16Nov2007 : restructure on top of sc2store_readraw() (bdk)
     20Jun2008 : check for NULL outdata or dksquid pointers (dsb)
-    20Oct2009 : Add units and label (timj)
+    20Oct2009 : Add units and label. _readraw now handles null pointers (timj)
 */
 
 {
@@ -2258,10 +2258,8 @@ int *status              /* global status (given and returned) */
 
    sc2store_open ( filename, access, colsize, rowsize, nframes, status );
 
-   if( outdata && dksquid ) {
-     sc2store_readraw ( access, *colsize, *rowsize, *nframes, units, label, outdata,
-                        dksquid, status );
-   }
+   sc2store_readraw ( access, *colsize, *rowsize, *nframes, units, label, outdata,
+                      dksquid, status );
 
    sc2store_readflatcal ( access, flatlen, nflat, flatname, flatcal, flatpar,
      status );
@@ -2522,8 +2520,8 @@ size_t rowsize,          /* number of pixels in row (given) */
 size_t nframes,          /* number of frames (given) */
 char units[SC2STORE_UNITLEN],/* data units. can be NULL (returned) */
 char label[SC2STORE_LABLEN], /* data label. Can be NULL (returned) */
-int **rawdata,           /* raw timestream data (returned) */
-int **dksquid,           /* pointer to dark SQUID values (returned) */
+int **rawdata,           /* raw timestream data. Can be NULL (returned) */
+int **dksquid,           /* pointer to dark SQUID values. Can be NULL (returned) */
 int *status              /* global status (given and returned) */
 )
 /*
@@ -2534,6 +2532,9 @@ int *status              /* global status (given and returned) */
     29Nov2007 : calloc returned pointer irrespective of the file data being
                 compressed (bdk)
     20Oct2009 : add units and label arguments (timj)
+    21Oct2009 : Allow rawdata and dksquid to be null so that we can still
+                read the units. Note that we do not trust the label/units
+                for compressed data.
 */
 {
    int *bzero;                 /* pointer to compression offset values */
@@ -2561,14 +2562,18 @@ int *status              /* global status (given and returned) */
 /* Allocate space for the raw data */
 
     nbol = colsize * rowsize;
-    *rawdata = calloc ( nframes*nbol, sizeof(**rawdata) );
-    if ( *rawdata == NULL )
-    {
-       *status = DITS__APP_ERROR;
-       ErsRep ( 0, status, 
-         "sc2store_readraw: failed to map space for timestream data" );
-       return;  
-    }
+
+    if (rawdata)
+      {
+        *rawdata = calloc ( nframes*nbol, sizeof(**rawdata) );
+        if ( *rawdata == NULL )
+          {
+            *status = DITS__APP_ERROR;
+            ErsRep ( 0, status, 
+                     "sc2store_readraw: failed to map space for timestream data" );
+            return;
+          }
+      }
 
 /* Check for whether the data are "_SHORT", ie compressed, or "_INTEGER" */
 
@@ -2598,12 +2603,15 @@ int *status              /* global status (given and returned) */
 
 /* Map the data array */
 
-      ndfMap ( sc2store_indf, "DATA", "_INTEGER", "READ", (void *)(&udata), &el, 
-        status );
-      if ( *status == SAI__OK )
-      {
-         memcpy ( *rawdata, udata, el*sizeof(*udata) );
-      }
+     if (rawdata)
+       {
+         ndfMap ( sc2store_indf, "DATA", "_INTEGER", "READ", (void *)(&udata), &el,
+                  status );
+         if ( *status == SAI__OK )
+           {
+             memcpy ( *rawdata, udata, el*sizeof(*udata) );
+           }
+       }
    }
    else
    {
@@ -2617,71 +2625,78 @@ int *status              /* global status (given and returned) */
          star_strlcpy( label, "Signal", SC2STORE_LABLEN );
      }
 
+     if (rawdata)
+       {
+
 /* Map the data array */
 
-      ndfMap ( sc2store_indf, "DATA", "_WORD", "READ", (void *)(&data), &el, 
-        status );
+         ndfMap ( sc2store_indf, "DATA", "_WORD", "READ", (void *)(&data), &el,
+                  status );
 
 /* map compression zero offset for each frame */
 
-      ndfOpen ( sc2store_scuba2loc, "BZERO", "READ", "OLD", &sc2store_zindf,
-        &place, status );
+         ndfOpen ( sc2store_scuba2loc, "BZERO", "READ", "OLD", &sc2store_zindf,
+                   &place, status );
 
-      ndfMap ( sc2store_zindf, "DATA", "_INTEGER", "READ", (void *)(&bzero), 
-        &el, status );
+         ndfMap ( sc2store_zindf, "DATA", "_INTEGER", "READ", (void *)(&bzero),
+                  &el, status );
 
 /* Global data scale factor in compression */
 
-      datThere ( sc2store_scuba2loc, "BSCALE", &isthere, status );
+         datThere ( sc2store_scuba2loc, "BSCALE", &isthere, status );
 
-      if ( ( *status == SAI__OK ) && ( isthere != 0 ) )
-      {
-         datFind ( sc2store_scuba2loc, "BSCALE", &sc2store_bscaleloc, status );
-         datGet0D ( sc2store_bscaleloc, &sc2store_rdbscale, status );
-         datAnnul ( &sc2store_bscaleloc, status );
-      }
-      else
-      {
-         sc2store_rdbscale = 1.0;
-      }
+         if ( ( *status == SAI__OK ) && ( isthere != 0 ) )
+           {
+             datFind ( sc2store_scuba2loc, "BSCALE", &sc2store_bscaleloc, status );
+             datGet0D ( sc2store_bscaleloc, &sc2store_rdbscale, status );
+             datAnnul ( &sc2store_bscaleloc, status );
+           }
+         else
+           {
+             sc2store_rdbscale = 1.0;
+           }
 
 /* STACKZERO subtracted frame */
 
-      ndfOpen ( sc2store_scuba2loc, "STACKZERO", "READ", "OLD", &sc2store_sindf,
-        &place, status );
+         ndfOpen ( sc2store_scuba2loc, "STACKZERO", "READ", "OLD", &sc2store_sindf,
+                   &place, status );
 
-      ndfMap ( sc2store_sindf, "DATA", "_INTEGER", "READ", (void *)(&stackz), 
-        &el, status );
+         ndfMap ( sc2store_sindf, "DATA", "_INTEGER", "READ", (void *)(&stackz),
+                  &el, status );
 
 /* Map space for the decompressed data */
 
-      if ( StatusOkP(status) ) 
-      {
+         if ( StatusOkP(status) )
+           {
 
 /* get details of incompressible pixels and decompress frames */
 
-         ndfXloc ( sc2store_indf, "INCOMPS", "READ", &sc2store_incomploc, 
-	   status );
+             ndfXloc ( sc2store_indf, "INCOMPS", "READ", &sc2store_incomploc,
+                       status );
 
-         for ( j=0; j<nframes; j++ )
-         {
+             for ( j=0; j<nframes; j++ )
+               {
 
-            sc2store_getincomp ( j, &npix, pixnum, pixval, status );
-            sc2store_decompress ( nbol, stackz, bzero[j],
-              &(data[j*nbol]), npix, pixnum,
-              pixval, &((*rawdata)[j*nbol]), status );
-         }
-      }
-
+                 sc2store_getincomp ( j, &npix, pixnum, pixval, status );
+                 sc2store_decompress ( nbol, stackz, bzero[j],
+                                       &(data[j*nbol]), npix, pixnum,
+                                       pixval, &((*rawdata)[j*nbol]), status );
+               }
+           }
+       }
    }
 
 /* Dark SQUID values for each frame */
 
-   ndfOpen ( sc2store_scuba2loc, "DKSQUID", "READ", "OLD", &sc2store_dindf,
-     &place, status );
+   if (dksquid)
+     {
+       ndfOpen ( sc2store_scuba2loc, "DKSQUID", "READ", "OLD", &sc2store_dindf,
+                 &place, status );
 
-   ndfMap ( sc2store_dindf, "DATA", "_INTEGER", "READ", (void *)dksquid, &el, 
-     status );
+       ndfMap ( sc2store_dindf, "DATA", "_INTEGER", "READ", (void *)dksquid, &el,
+                status );
+     }
+
    sc2store_errconv ( status );
 
 }

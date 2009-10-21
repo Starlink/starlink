@@ -369,8 +369,8 @@ size_t rowsize,          /* number of pixels in row (given) */
 size_t nframes,          /* number of frames (given) */
 char units[SC2STORE_UNITLEN],/* data units. can be NULL (returned) */
 char label[SC2STORE_LABLEN], /* data label. Can be NULL (returned) */
-int **rawdata,           /* raw timestream data (returned) */
-int **dksquid,           /* pointer to dark SQUID values (returned) */
+int **rawdata,           /* raw timestream data. Can be NULL (returned) */
+int **dksquid,           /* pointer to dark SQUID values. Can be NULL (returned) */
 int *status              /* global status (given and returned) */
 );
 
