@@ -935,7 +935,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
 
   /* report data units */
   if (hdr) {
-    msgOutiff( MSG__VERB, "", "Data read with label '%s (%s)'",
+    msgOutiff( MSG__DEBUG, "", "Data read with label '%s (%s)'",
                status, (strlen(hdr->dlabel) ? hdr->dlabel : "<none>"),
                (strlen(hdr->units) ? hdr->units : ""));
   }
