@@ -74,6 +74,7 @@
 /* Starlink includes */
 #include "mers.h"
 #include "sae_par.h"
+#include "star/one.h"
 
 #include "smf.h"
 #include "smf_typ.h"
@@ -87,16 +88,15 @@ void smf_check_units( int count, char current[],
 
   /* Check units are consistent */
   if (count == 1) {
-    strncpy( current, hdr->units, SMF__CHARLABEL);
-    current[SMF__CHARLABEL] = '\0';
+    one_strlcpy( current, hdr->units, SMF__CHARLABEL, status );
   } else {
     if (strcmp( current, hdr->units) != 0 ) {
       *status = SAI__ERROR;
       msgSeti( "I", count);
       msgSetc( "PRV", current );
       msgSetc( "CUR", hdr->units );
-      errRep( "", "Data units inconsistency. Previously got ^PRV"
-	      " but file ^I had units of ^CUR", status);
+      errRep( "", "Data units inconsistency. Previously got '^PRV'"
+	      " but file ^I had units of '^CUR'", status);
     }
   }
 
