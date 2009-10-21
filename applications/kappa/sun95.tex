@@ -56765,6 +56765,9 @@ The following applications have been modified:
         \item Parameter QUIET has been withdrawn.  Instead set the
         MSG\_FILTER environment variable to {\tt QUIET} to suppress
         output messages.
+        \item A bug has been fixed that caused logfile output to be 
+        truncated to 255 characters per row even if MAXLEN was 
+        greater than 255.
       \end{itemize}
 
    \item [\htmlref{MSTATS}{MSTATS}] \mbox{}

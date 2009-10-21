@@ -54,6 +54,11 @@
       displayed FITS cards to include cards derived from the NDF WCS 
       component, in addition to those read from the FITS extension.
 
+   o  LOOK
+
+      -  A bug has been fixed that caused logfile output to be truncated
+      to 255 characters per row even if MAXLEN was greater than 255.
+
    o  NDFCOPY
 
       -  There is a new COMP parameter that permits the QUALITY

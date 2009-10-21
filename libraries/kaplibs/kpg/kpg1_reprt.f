@@ -32,6 +32,7 @@
 
 *  Copyright:
 *     Copyright (C) 2001 Central Laboratory of the Research Councils.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -57,6 +58,9 @@
 *  History:
 *     15-AUG-2001 (DSB):
 *        Original version.
+*     21-OCT-2009 (DSB):
+*        If there are no msg tokens in the text, avoid truncation by 
+*        internal MERS buffer length when writing text to log file.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -79,6 +83,9 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  External References:
+      INTEGER CHR_LEN
+
 *  Local Variables:
       CHARACTER OPSTR*255        ! Buffer for message text
       INTEGER OPLEN              ! Length of message text
@@ -94,11 +101,18 @@
 *  If writing to the file...
       IF( LOG ) THEN 
 
-*  Get the expanded text of the message.
-         CALL MSG_LOAD( ' ', MESS, OPSTR, OPLEN, STATUS )
-
-*  Write it to the file.
-         CALL FIO_WRITE( FD, OPSTR( : OPLEN ), STATUS )
+*  If there are no msg tokens in the text, just write it out directly. 
+*  This avoids limitation imposed by the fixed length nature of some MERS
+*  internal buffers. 
+         IF( INDEX( MESS, '^' ) .EQ. 0 ) THEN
+            CALL FIO_WRITE( FD, MESS( : CHR_LEN( MESS ) ), STATUS )
+ 
+*  Otherwise, get the expanded text of the message, and write it to the 
+*  file.
+         ELSE
+            CALL MSG_LOAD( ' ', MESS, OPSTR, OPLEN, STATUS )
+            CALL FIO_WRITE( FD, OPSTR( : OPLEN ), STATUS )
+         END IF
 
       END IF
 
