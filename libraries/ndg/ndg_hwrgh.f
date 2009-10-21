@@ -88,18 +88,19 @@
 
 *  Check that the supplied NDF is in the KeyMap holding the paths of NDFs
 *  to which default history has been written.
-      CALL NDF_MSG( 'T', INDF )
-      CALL MSG_LOAD( ' ', '^T', NDFNAM, NDFLEN, STATUS )
-      IF( AST_MAPHASKEY( DHKMP, NDFNAM( : NDFLEN ), STATUS ) ) THEN 
+      IF( DHKMP .NE. AST__NULL ) THEN 
+         CALL NDF_MSG( 'T', INDF )
+         CALL MSG_LOAD( ' ', '^T', NDFNAM, NDFLEN, STATUS )
+         IF( AST_MAPHASKEY( DHKMP, NDFNAM( : NDFLEN ), STATUS ) ) THEN 
 
 *  Append the contents of registered groups to the current history record 
 *  in the NDF.
-         CALL NDG1_HWRGH( INDF, STATUS )
+            CALL NDG1_HWRGH( INDF, STATUS )
 
 *  Remove the path for the supplied NDF form the group, thus preventing
 *  future routines from writing out group contents again.
-         CALL AST_MAPREMOVE( DHKMP, NDFNAM( : NDFLEN ), STATUS ) 
-
+            CALL AST_MAPREMOVE( DHKMP, NDFNAM( : NDFLEN ), STATUS ) 
+         END IF
       END IF
 
       END
