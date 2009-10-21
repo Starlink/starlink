@@ -685,7 +685,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
       sc2store_force_initialised( status );
       sc2store_rdtstream( pname, "READ", SC2STORE_FLATLEN,
                           SC2STORE__MAXFITS, 
-                          &nfits, units, dlabel, fitsrec, &colsize, &rowsize,
+                          &nfits, fitsrec, units, dlabel, &colsize, &rowsize,
                           &nframes, &(da->nflat), da->flatname,
                           &tmpState, ptdata, pdksquid, 
                           &flatcal, &flatpar, &jigvert, &nvert, &jigpath, 
