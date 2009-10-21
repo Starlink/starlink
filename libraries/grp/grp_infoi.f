@@ -147,7 +147,7 @@
 
 *  Local Constants:
       INTEGER SZITEM             ! Max. length of an item name.
-      PARAMETER ( SZITEM = 6 )
+      PARAMETER ( SZITEM = 9 )
 
 *  Local Variables:
       INTEGER DEPTH              ! No. of levels of indirection at
