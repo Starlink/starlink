@@ -194,6 +194,9 @@
 *        Add the HIDE parameter.
 *     30-JUL-2009 (DSB):
 *        Add the DOTFILE parameter.
+*     21-OCT-2009 (DSB):
+*        Modified to handle either " or ' as quote characters in history
+*        information.
 *     {enter_further_changes_here}
 
 *-
@@ -220,10 +223,13 @@
       PARAMETER( MXREC = 100 )
 
 *  Local Variables:
+      CHARACTER C*1              ! Current character 
       CHARACTER ID*10            ! Integer index for the current NDF
       CHARACTER KEY*20           ! Key for entry within KeyMap
       CHARACTER MORE*(DAT__SZLOC)! Locator for MORE info
       CHARACTER PARIDS*255       ! Buffer for direct parent ID list
+      CHARACTER QUOTE1*1         ! Outer quote character 
+      CHARACTER QUOTE2*1         ! Inner quote character 
       CHARACTER SHOW*7           ! The ancestors to be displayed
       CHARACTER TEXT*255         ! Text for output dot file
       CHARACTER VALUE*1024       ! Buffer for one field value
@@ -258,7 +264,6 @@
       LOGICAL HIDDEN             ! Is current ancestor hidden?
       LOGICAL HIDE               ! Exclude hidden ancestors?
       LOGICAL HIST               ! Display history info?
-      LOGICAL QUOTED             ! Is character inside single quotes?
       LOGICAL THERE              ! Does the named component exist?
       LOGICAL USE                ! Display the current ancestor?
 *.
@@ -519,14 +524,30 @@
 			   
                            DO WHILE( ISTART .LE. NC ) 
 
-                              QUOTED = .FALSE.
+*  Handle nested " and ' quotes using QUOTE1 (holds the outer most quote
+*  character or blank if no quoting) and QUOTE2 (holds the inner quote
+*  character or blank if there is only one or zero levels of quoting).
+*  This is full of holes, but should do for most cases.
+                              QUOTE1 = ' '
+                              QUOTE2 = ' '
                               IEND = ISTART
-                              DO WHILE( ( QUOTED .OR. 
+                              DO WHILE( ( QUOTE1 .NE. ' ' .OR.
      :                                    VALUE( IEND:IEND ) .NE. ' ' )
      :                                  .AND. IEND .LE. NC ) 
 
-                                 IF( VALUE( IEND:IEND ) .EQ. '''' ) 
-     :                                             QUOTED = .NOT. QUOTED
+                                 C = VALUE( IEND:IEND ) 
+                                 IF( C .EQ. '''' .OR. C .EQ. '"' ) THEN
+                                    IF( QUOTE2 .EQ. C ) THEN
+                                       QUOTE2 = ' '
+                                    ELSE IF( QUOTE1 .EQ. C ) THEN
+                                       QUOTE1 = ' '
+                                       QUOTE2 = ' '
+                                    ELSE IF( QUOTE1 .EQ. ' ' ) THEN
+                                       QUOTE1 = C
+                                    ELSE IF( QUOTE2 .EQ. ' ' ) THEN
+                                       QUOTE2 = C
+                                    END IF
+                                 END IF
 
                                  IEND = IEND + 1
                               END DO
