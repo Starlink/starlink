@@ -53,6 +53,8 @@
 *        Add provenance propagation.
 *     2008-07-22 (TIMJ):
 *        Use kaplibs for param IN/OUT
+*     2009-10-20 (TIMJ):
+*        Write units and label from smfData to output file.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -161,8 +163,13 @@ void smurf_rawunpress( int *status ) {
       memcpy( (outdata)[0], (data->pntr)[0], nout );
     }
 
-    /* Set labels */
+    /* Set labels (sc2store may have changed them on read) */
     ndfCput( "Uncompressed, not flatfielded", outndf, "TITLE", status);
+    if (*status == SAI__OK) {
+      ndfCput( data->hdr->units, outndf, "UNITS", status );
+      ndfCput( data->hdr->dlabel, outndf, "LABEL", status );
+    }
+
 
     /* Free resources for files */
     ndfAnnul( &outndf, status);
