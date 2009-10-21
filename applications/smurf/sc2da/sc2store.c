@@ -3755,7 +3755,7 @@ int *status                 /* global status (given and returned) */
 /* Open the file in UPDATE mode */
    sc2store_open ( filename, "UPDATE", &refcolsize, &refrowsize, &nframes, status );
 
-   if ( refcolsize != colsize || refrowsize != rowsize && StatusOkP(status)) {
+   if ( ((refcolsize != colsize) || (refrowsize != rowsize)) && StatusOkP(status)) {
      *status = DITS__APP_ERROR;
      sprintf( sc2store_errmess,
               "Columns and rows in flatfield do not match the file to be updated" );
