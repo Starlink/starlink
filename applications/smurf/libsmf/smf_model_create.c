@@ -463,10 +463,14 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
             head.data.dims[0] = (idata->dims)[0];
             head.data.dims[1] = (idata->dims)[1];
             head.data.dims[2] = (idata->dims)[2];
+            smf_set_clabels( "Cumulative Signal", "Signal",
+                             idata->hdr->units, &head.hdr, status );
             break;
 
           case SMF__RES: /* Model residual */
-            /* Nothing here since copyinput set */
+            /* Not much here since copyinput set */
+            smf_set_clabels( "Residual Signal", "Signal",
+                             idata->hdr->units, &head.hdr, status );
             break;
 
           case SMF__AST: /* Time-domain projection of map */
@@ -475,11 +479,15 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
             head.data.dims[0] = (idata->dims)[0];
             head.data.dims[1] = (idata->dims)[1];
             head.data.dims[2] = (idata->dims)[2];
+            smf_set_clabels( "Astronomical Signal", "Signal",
+                             idata->hdr->units, &head.hdr, status );
             break;
 
           case SMF__COM: /* Common-mode at each time step */
             head.data.dtype = SMF__DOUBLE;
             head.data.ndims = 1;
+            smf_set_clabels( "Common-mode Signal", "Signal",
+                             idata->hdr->units, &head.hdr, status );
 
             if( isTordered ) { /* T is 3rd axis if time-ordered */
               head.data.dims[0] = (idata->dims)[2];
@@ -492,6 +500,9 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
             /* Currently just one variance for each bolometer */
             head.data.dtype = SMF__DOUBLE;
             head.data.ndims = 3;
+            smf_set_clabels( "Noise Variance", "Variance",
+                             idata->hdr->units, &head.hdr, status );
+            one_strlcat(head.hdr.units, "**2", sizeof(head.hdr.units), status);
 
             if( isTordered )  { /* T is 3rd axis if time-ordered */
               head.data.dims[0] = (idata->dims)[0];
@@ -510,6 +521,8 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
             head.data.dims[0] = (idata->dims)[0];
             head.data.dims[1] = (idata->dims)[1];
             head.data.dims[2] = (idata->dims)[2];
+            smf_set_clabels( "Extinction Correction", "1/Extinction",
+                             "\0", &head.hdr, status );
             break;
 
           case SMF__LUT: /* Pointing LookUp Table for each data point */
@@ -541,11 +554,15 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
                 (idata->dims)[1+SC2STORE__ROW_INDEX]*3;
               head.data.dims[1] = (idata->dims)[1+SC2STORE__COL_INDEX];
             }
+            smf_set_clabels( "Dark Squid Model", "Value", "\0",
+                             &head.hdr, status );
             break;
 
           case SMF__GAI: /* Gain/offset for each bolometer */
             head.data.dtype = SMF__DOUBLE;
             head.data.ndims = 3; /* Gain, Offset, Correlation coefficient */
+            smf_set_clabels( "Common-mode Gain/Offset", "Value", "\0",
+                             &head.hdr, status );
 
             /* Note that we're using the time axis to store the coefficients */
             if( isTordered ) {
@@ -572,6 +589,8 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
             head.data.dims[0] = (idata->dims)[0];
             head.data.dims[1] = (idata->dims)[1];
             head.data.dims[2] = (idata->dims)[2];
+            smf_set_clabels( "Filtered-out Signal", "Signal",
+                             idata->hdr->units, &head.hdr, status );
             break;
 
           default:
@@ -585,6 +604,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
           if( copyinput ) { /* If copying input, copy data dims directly */
             head.data.dtype = idata->dtype; /* Inherit type from template */
             head.data.ndims = idata->ndims;
+
             for( k=0; k<head.data.ndims; k++ ) {
               head.data.dims[k] = (idata->dims)[k];
             }

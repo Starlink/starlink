@@ -469,6 +469,8 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
                 hdr->obsmode = refhdr->obsmode;
                 hdr->obstype = refhdr->obstype;
                 hdr->swmode = refhdr->swmode;
+                smf_set_clabels( refhdr->title, refhdr->dlabel,
+                             refhdr->units, hdr, status );
 
                 switch ( hdr->instrument ) {
                 case INST__AZTEC:
