@@ -61,6 +61,11 @@
 *        identifier values are also listed on standard output (using
 *        MSG_OUT).
 *
+*        ALLSIMPLE - A value of 1 is returned if all elements within the
+*        group were specified explicitly (i.e. by a literal name rather
+*        than by indirection or modification). Otherwise a value of zero 
+*        is returned. The value of the INDEX argument is ignored. 
+*
 *     VALUE = INTEGER (Returned)
 *        The requested item of information.
 *     STATUS = INTEGER (Given and Returned)
@@ -69,6 +74,7 @@
 *  Copyright:
 *     Copyright (C) 1992 Science & Engineering Research Council.
 *     Copyright (C) 2005, 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -98,6 +104,8 @@
 *        Added NGRP item.
 *     9-JAN-2006 (DSB):
 *        Added ACTIVE item.
+*     21-OCT-2009 (DSB):
+*        Added ALLSIMPLE item.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -144,6 +152,7 @@
 *  Local Variables:
       INTEGER DEPTH              ! No. of levels of indirection at
                                  ! which the name was specified.
+      INTEGER IEL                ! Element index.
       INTEGER IFILE              ! The index within the groups FILES
                                  ! array at which the indirection file
                                  ! name is stored.
@@ -197,7 +206,6 @@
             END IF
          END DO
 
-
          IF( VALUE .GT. 1 ) THEN
             CALL MSG_SETI( 'N', VALUE )
             CALL MSG_OUT( ' ', 'There are ^N currently active GRP '//
@@ -224,14 +232,41 @@
 *  Abort if an error has occurred.
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
+*  The ALLSIMPLE item ignored the INDEX value, so handle it now before we
+*  check the validity of INDEX.
+      IF( LITEM( : 9 ) .EQ. 'ALLSIMPLE' ) THEN
+
+*  Assume all elements are simple.
+         VALUE = 1
+
+*  Loop round all elements. Break out of the loop early if an element is
+*  found that is not simple.
+         IEL = 1
+         DO WHILE( IEL .LE. CMN_GSIZE( SLOT ) )
+
+*  Get infor,mation about the element.
+            CALL GRP1_GTELM( SLOT, IEL, NAME, DEPTH, IFILE, MODGRP,
+     :                       MODIND, STATUS )
+
+*  If it was specified by indirection or modification, set the returned
+*  value to zero and set "I" so that the loop will exit.
+            IF( MODIND .NE. 0 .OR. DEPTH .NE. 0 ) THEN
+               VALUE = 0
+               IEL = CMN_GSIZE( SLOT ) + 1
+
+*  If the element was simple, advance to check the next element.
+            ELSE
+               IEL = IEL + 1
+            END IF
+         END DO
+
 *  If the index is outside the bounds of the group, report an error.
-      IF( INDEX .LE. 0 .OR. INDEX .GT. CMN_GSIZE( SLOT ) ) THEN
+      ELSE IF( INDEX .LE. 0 .OR. INDEX .GT. CMN_GSIZE( SLOT ) ) THEN
          STATUS = GRP__OUTBN
          CALL MSG_SETI( 'I', INDEX )
          CALL MSG_SETI( 'S', CMN_GSIZE( SLOT ) )
-         CALL ERR_REP( 'GRP_INFOI_ERR1',
-     :               'GRP_INFOI: Group index (^I) out of bounds [1,^S]',
-     :                 STATUS )
+         CALL ERR_REP( 'GRP_INFOI_ERR1', 'GRP_INFOI: Group index (^I)'//
+     :                 ' out of bounds [1,^S]', STATUS )
 
 *  Otherwise get the information from the group.
       ELSE
@@ -252,12 +287,11 @@
          ELSE IF( LITEM( : 5 ) .EQ. 'DEPTH' ) THEN
             VALUE = DEPTH
 
-         ELSE
+         ELSE IF( LITEM( : 9 ) .NE. 'ALLSIMPLE' ) THEN
             STATUS = GRP__BADIT
             CALL MSG_SETC( 'ITEM', ITEM )
-            CALL ERR_REP( 'GRP_INFOI_ERR2',
-     :'GRP_INFOI: Unknown item of information requested - ^ITEM.',
-     :                       STATUS )
+            CALL ERR_REP( 'GRP_INFOI_ERR2', 'GRP_INFOI: Unknown item '//
+     :                    'of information requested - ^ITEM.', STATUS )
          END IF
 
       END IF
@@ -267,9 +301,8 @@
 
       IF( STATUS .NE. SAI__OK ) THEN
          CALL MSG_SETC( 'IT', ITEM )
-         CALL ERR_REP( 'GRP_INFOI_ERR3',
-     :      'GRP_INFOI: Unable to get the "^IT" attribute of a group '//
-     :      'name.' , STATUS )
+         CALL ERR_REP( 'GRP_INFOI_ERR3', 'GRP_INFOI: Unable to get '//
+     :                 'the "^IT" attribute of a group name.' , STATUS )
       END IF
 
       END

@@ -6,13 +6,13 @@
 %------------------------------------------------------------------------------
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun150.7}
-\newcommand{\stardocnumber}    {150.7}
+\newcommand{\stardocsource}    {sun150.8}
+\newcommand{\stardocnumber}    {150.8}
 \newcommand{\stardocauthors}   {D.S. Berry}
-\newcommand{\stardocdate}      {9th January 2006}
+\newcommand{\stardocdate}      {21st October 2009}
 \newcommand{\stardoctitle}     {GRP \\ [1ex]
                                 Routines for Managing Groups of Objects}
-\newcommand{\stardocversion}   {Version 3.3}
+\newcommand{\stardocversion}   {Version 3.4}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -2861,6 +2861,11 @@ environment}
          number of GRP group identifiers currently in use, the numerical
          identifier values are also listed on standard output (using
          MSG\_OUT).
+
+         ALLSIMPLE - A value of 1 is returned if all elements within the
+         group were specified explicitly (i.e. by a literal name rather
+         than by indirection or modification). Otherwise a value of zero 
+         is returned. The value of the INDEX argument is ignored. 
       }
       \sstsubsection{
          VALUE = INTEGER (Returned)
@@ -3617,6 +3622,15 @@ library (see \xref{SUN/121}{sun121}{}), the CHR library (see
 Peter Draper is thanked for his work on porting the original IRH\_ package to
 UNIX, and Rodney Warren-Smith is thanked for his extensive suggestions for
 improvements to the GRP\_ package.
+
+\section{Changes and New Features in V3.4}
+The following changes have occurred in the GRP\_ system since version 3.3:
+
+\begin{enumerate}
+\item The GRP\_INFOI routine has a new option to return a flag indicating
+if all elements in a group were supplied literally (i.e. not by
+indirection or modification).
+\end{enumerate}
 
 \section{Changes and New Features in V3.3}
 The following changes have occurred in the GRP\_ system since version 3.2:

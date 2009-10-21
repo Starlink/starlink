@@ -1,14 +1,9 @@
 1 GRP_library
                                              Expires: ???
 
-A new release (V3.2) of the GRP library is now available. It includes
+A new release (V3.4) of the GRP library is now available. It includes
 the following changes:
 
- - The GRP_INFOI routine can now return the total number of active GRP
-identifiers.
-
- - Shell meta-characters (referneces to environment variables, for
-instance) may now be included with file specifications used as
-indirection elements (e.g. "^$DATA_DIR/myfiles").
-
- - Now released under the GPL
+- The GRP_INFOI routine has a new option to return a flag indicating
+if all elements in a group were supplied literally (i.e. not by
+indirection or modification).
