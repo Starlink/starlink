@@ -57,6 +57,7 @@
 
 *  Notes:
 *     - NEP and NOISERATIO images are stored in the .MORE.SMURF extension
+*     - NEP image is only created for raw, unflatfielded data.
 
 *  Related Applications:
 *     SMURF: SC2CONCAT, SC2CLEAN, SC2FFT
@@ -74,6 +75,8 @@
 *        Remove NEP parameter. Write NEP and noise ratio image to extension.
 *     2009-10-13 (TIMJ):
 *        Add POWER and FLOW parameters.
+*     2009-10-21 (TIMJ):
+*        Propagate units properly if we do not have raw data.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -250,16 +253,40 @@ void smurf_calcnoise( int *status ) {
         smfData *outdata = NULL;
         smfData *ratdata = NULL;
         smfData *powdata = NULL;
+        int do_nep = 1;
+        char noiseunits[SMF__CHARLABEL];
 
-        /* Convert the data to amps */
-        smf_scalar_multiply( thedata, RAW2CURRENT, status );
+        if ( ! thedata || !thedata->hdr ) {
+          *status = SAI__ERROR;
+          errRepf( "", "Concatenated data set %zu is missing a header. Should not be possible",
+                   status, idx);
+          break;
+        }
+
+        /* Convert the data to amps if we have DAC units. Else leave them
+           alone. */
+        if ( strncmp(thedata->hdr->units, "DAC", 3) == 0) {
+          msgOutiff( MSG__VERB, "", "Scaling data from '%s' to amps",
+                     status, thedata->hdr->units );
+          smf_scalar_multiply( thedata, RAW2CURRENT, status );
+          smf_set_clabels( NULL, NULL, SIPREFIX "A", thedata->hdr, status );
+        } else {
+          do_nep = 0;
+          msgOutiff( MSG__VERB, "",
+                     "Data in units of '%s' and not raw, so not generating NEP image",
+                     status, strlen(thedata->hdr->units) ? thedata->hdr->units : "<none>" );
+        }
+
+        one_strlcpy( noiseunits, thedata->hdr->units, sizeof(noiseunits), status );
+        if (strlen(noiseunits)) one_strlcpy( noiseunits, " ", sizeof(noiseunits), status );
+        one_strlcat( noiseunits, "Hz**-0.5", sizeof(noiseunits), status );
 
         /* Apodize */
         smf_apodize(thedata, NULL, SMF__MAXAPLEN, status );
 
         /* Create the output file if required, else a malloced smfData */
         smf_create_bolfile( ogrp, gcount, thedata, "Noise",
-                            SIPREFIX "A Hz**-0.5", &outdata, status );
+                            noiseunits, &outdata, status );
 
         /* Create groups to handle the NEP and ratio images */
         ratdata = smf__create_bolfile_extension( ogrp, gcount, thedata,
@@ -289,7 +316,7 @@ void smurf_calcnoise( int *status ) {
         }
 
         /* now to create the NEP image using the flatfield information */
-        if (*status == SAI__OK) {
+        if (*status == SAI__OK && do_nep ) {
           smfDA *da = thedata->da;
           smfData * nepdata = NULL;
           size_t ngood;
