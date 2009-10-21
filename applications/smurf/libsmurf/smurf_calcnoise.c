@@ -255,7 +255,7 @@ void smurf_calcnoise( int *status ) {
         smf_scalar_multiply( thedata, RAW2CURRENT, status );
 
         /* Apodize */
-        smf_apodize(thedata, NULL, (thedata->dims)[2] / 2, status );
+        smf_apodize(thedata, NULL, SMF__MAXAPLEN, status );
 
         /* Create the output file if required, else a malloced smfData */
         smf_create_bolfile( ogrp, gcount, thedata, "Noise",

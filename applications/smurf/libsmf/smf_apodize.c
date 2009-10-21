@@ -25,7 +25,9 @@
 *        If NULL, use the QUALITY associated with data. Locations of spikes
 *        will have bit SMF__Q_SPIKE set.
 *     len = size_t (Given)
-*        Number of samples over which to apply apodization.
+*        Number of samples over which to apply apodization. Can be set to
+*        SMF__MAXAPLEN in which case the routine will automatically apodize
+*        the entire data stream (maximum valid value of len)
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -62,6 +64,8 @@
 *       Initial version.
 *     2009-10-02 (EC):
 *       Switch to using a softer Hanning window
+*     2009-10-21 (EC):
+*       Enable SMF__MAXAPLEN for len
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -120,6 +124,7 @@ void smf_apodize( smfData *data, unsigned char *quality, size_t len,
   dim_t ndata;                  /* Number of data points */
   dim_t ntslice;                /* Number of time slices */
   unsigned char *qua=NULL;      /* Pointer to the QUALITY array */
+  size_t thelen=0;              /* apodization length */
   size_t tstride;               /* Time slice stride in data array */
   unsigned char mask;           /* Quality bit mask */
 
@@ -179,11 +184,20 @@ void smf_apodize( smfData *data, unsigned char *quality, size_t len,
     }
 
     /* Can we apodize? */
-    if( (*status==SAI__OK) && ( (last-first+1) < (2*len) ) ) {
-      *status = SAI__ERROR;
-      errRepf("", FUNC_NAME
-              ": Can't apodize, not enough samples (%zu < %zu).", status,
-              last-first+1, 2*len);
+    if( *status == SAI__OK ) {
+      if( len == SMF__MAXAPLEN ) {
+        thelen = (last-first+1)/2;
+        msgOutiff( MSG__DEBUG, "", FUNC_NAME 
+                   ": Using maximum apodization length, %zu samples.",
+                   status, thelen );
+      } else if( (last-first+1) < (2*len) ) {
+        *status = SAI__ERROR;
+        errRepf("", FUNC_NAME
+                ": Can't apodize, not enough samples (%zu < %zu).", status,
+                last-first+1, 2*len);
+      } else {
+        thelen = len;
+      }
     }
 
     /* Do the apodization */
@@ -193,8 +207,8 @@ void smf_apodize( smfData *data, unsigned char *quality, size_t len,
       if( qua && !(qua[i*bstride]&SMF__Q_BADB)) {
 
         /* First roll-off the signal */
-        for( j=0; j<len; j++ ) {
-          ap = 0.5 - 0.5*cos( AST__DPI * (double) j / len );
+        for( j=0; j<thelen; j++ ) {
+          ap = 0.5 - 0.5*cos( AST__DPI * (double) j / thelen );
 
           if( !(qua[i*bstride+(first+j)*tstride]&mask) ) {
             dat[i*bstride+(first+j)*tstride]*=ap;
@@ -206,16 +220,16 @@ void smf_apodize( smfData *data, unsigned char *quality, size_t len,
             qua[i*bstride+(last-j)*tstride]|=SMF__Q_APOD;
           }
         }
-        /* then put in some extra flags, len samples again*/
-        for( j=len; j<2*len; j++ ) {
+        /* then put in some extra flags, thelen samples again*/
+        for( j=thelen; j<2*thelen; j++ ) {
           qua[i*bstride+(first+j)*tstride]|=SMF__Q_APOD;
           qua[i*bstride+(last-j)*tstride]|=SMF__Q_APOD;
         }
 
       } else if (!qua) {
         /* Non-Quality checking version */
-        for( j=0; j<len; j++ ) {
-          ap = 0.5 - 0.5*cos( AST__DPI * (double) j / len );
+        for( j=0; j<thelen; j++ ) {
+          ap = 0.5 - 0.5*cos( AST__DPI * (double) j / thelen );
 
           if( dat[i*bstride+(first+j)*tstride]!=VAL__BADD ) {
             dat[i*bstride+(first+j)*tstride]*=ap;
