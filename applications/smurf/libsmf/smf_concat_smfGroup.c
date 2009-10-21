@@ -512,18 +512,23 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
                   data->dims[SC2STORE__ROW_INDEX] = refnrow;
                   data->dims[2] = tlen;
                   ncol = data->dims[SC2STORE__COL_INDEX];
+
+                  /* lbounds in the concatenated data match the reference */
+                  for (k = 0; k < 3; k++) {
+                    (data->lbnd)[k] = (refdata->lbnd)[k];
+                  }
                 } else {
                   data->dims[0] = tlen;
                   data->dims[SC2STORE__ROW_INDEX+1] = refnrow;
                   data->dims[SC2STORE__COL_INDEX+1] = refncol;
                   ncol = data->dims[1+SC2STORE__COL_INDEX];
+
+                  /* lbounds must be altered if bolo-ordered concatenated data*/
+                  data->lbnd[0] = refdata->lbnd[2];
+                  data->lbnd[1] = refdata->lbnd[0];
+                  data->lbnd[2] = refdata->lbnd[1];
                 }
                 data->ndims = 3;
-
-                /* time ordering should adjust pixel lower bounds automatically */
-                for (k = 0; k < 3; k++) {
-                  (data->lbnd)[k] = (refdata->lbnd)[k];
-                }
 
                 /* Set the data type and order */
                 data->dtype = refdtype;
