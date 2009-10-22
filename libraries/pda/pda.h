@@ -25,7 +25,9 @@
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics & Astronomy Research
-*     Council. All Rights Reserved.
+*     Council.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -55,6 +57,8 @@
 *        Added pdaRand and pdaRnnor.
 *     11-MAY-2006 (TIMJ):
 *        Fix pdaRand prototype.
+*     21-OCT-2009 (DSB):
+*        Added pdaRnpoi.
 *     {enter_further_changes_here}
 
 *-
@@ -68,4 +72,5 @@ void pdaDeflt( int, int *, int, int, double * );
 float pdaRand( void );
 float pdaRnnor( float, float );
 double pdaD1mach( int );
+int pdaRnpoi( float );
 #endif

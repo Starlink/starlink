@@ -23,7 +23,7 @@
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2007 Science and Technology Facilities Council.
+*     Copyright (C) 2007-2009 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -54,6 +54,8 @@
 *        Added pdaRand and pdaRnnor.
 *     20-APR-2007 (PWD):
 *        Added pda_d1mach.
+*     21-OCT-2009 (DSB):
+*        Added pdaRnpoi.
 *     {enter_further_changes_here}
 
 *-
@@ -226,6 +228,16 @@ float pdaRnnor( float mean, float sigma ){
    SIGMA = sigma;
    return F77_CALL(pda_rnnor)( REAL_ARG(&MEAN), REAL_ARG(&SIGMA) );
 }
+
+
+F77_INTEGER_FUNCTION(pda_rnpoi)( REAL(MEAN) );
+
+int pdaRnpoi( float mean ){
+   DECLARE_REAL(MEAN);
+   MEAN = mean;
+   return F77_CALL(pda_rnpoi)( REAL_ARG(&MEAN) );
+}
+
 
 F77_SUBROUTINE(pda_deflt)( INTEGER(ALG), 
                            INTEGER_ARRAY(IV), 
