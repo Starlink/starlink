@@ -11,6 +11,13 @@ Changes introduced at V1.2
    - MAKECLUMPS now allows clump parameters to be distributed 
      using a Poisson distribution.
 
+   - MAKECLUMPS now allows a SHAPE column to be added to the output
+     catalogue, holding the STC-S outline of each clump. See parameter
+     SHAPE.
+
+   - MAKECLUMPS now allows the output WCS to be copied from an input 
+     NDF. See parameter LIKE.
+
 
 Changes introduced at V1.1
 

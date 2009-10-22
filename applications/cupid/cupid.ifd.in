@@ -545,9 +545,20 @@ package cupid {
             size *
             type _INTEGER
             access READ
-            ppath CURRENT,DEFAULT
+            ppath DYNAMIC,CURRENT,DEFAULT
             prompt {Lower pixel bounds of output array}
             default 1 1
+            helpkey *
+          }
+
+         parameter like {
+            type NDF
+            access READ
+            vpath DEFAULT
+            ppath GLOBAL
+            association <-GLOBAL.DATA_ARRAY
+            prompt {An NDF to define the output WCS}
+            default !
             helpkey *
           }
 
@@ -616,6 +627,16 @@ package cupid {
             helpkey *
           }
 
+         parameter shape {
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT,DEFAULT
+            prompt {Spatial clump shape in output catalogue}
+            default None
+            helpkey *
+          }
+
          parameter trunc {
             type _REAL
             access READ
@@ -630,7 +651,7 @@ package cupid {
             size *
             type _INTEGER
             access READ
-            ppath CURRENT,DEFAULT
+            ppath DYNAMIC,CURRENT,DEFAULT
             prompt {Upper pixel bounds of output array}
             default 200 200
             helpkey *
