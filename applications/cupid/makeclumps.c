@@ -122,14 +122,15 @@ void makeclumps( int *status ) {
 *        the instrumental smoothing specified by BEAMFWHM and VELFWHM.
 *     PARDIST = LITERAL (Read)
 *        The shape of the distribution from which clump parameter values are 
-*        chosen. Can be "Normal" or "Uniform". The distribution for each
-*        clump parameter is specified by itw own ADAM parameter containing 
-*        two values; the mean and the width of the distribution. If PARDIST 
-*        is "Normal", the width is the standard deviation. If PARDIST is 
-*        "Uniform", the width is half the range between the maximum and 
-*        minimum parameter values. In either case, if a width of zero is
-*        supplied, the relevant parameter is given a constant value equal
-*        to the specified mean. [current value]
+*        chosen. Can be "Normal", "Uniform" or "Poisson". The distribution 
+*        for each clump parameter is specified by its own ADAM parameter 
+*        containing two values; the mean and the width of the distribution. 
+*        If PARDIST is "Normal", the width is the standard deviation. If 
+*        PARDIST is "Uniform", the width is half the range between the 
+*        maximum and minimum parameter values. In either of these two cases, 
+*        if a width of zero is supplied, the relevant parameter is given a 
+*        constant value equal to the specified mean.  If PARDIST is
+*        "Poisson", the width is ignored. [current value]
 *     PEAK( 2 ) = _REAL (Read)
 *        Defines the distribution from which the peak value (above the
 *        local background) of each clump is chosen. See parameter PARDIST 
@@ -206,6 +207,8 @@ void makeclumps( int *status ) {
 *         do not cast the address of an int to the address of a size_t.
 *     15-JAN-2009 (DSB):
 *        Remove ILEVEL arguments.
+*     22-OCT-2009 (DSB):
+*        Add poisson distribution option.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -243,6 +246,7 @@ void makeclumps( int *status ) {
    int area;                     /* Clump area */
    int deconv;                   /* Store deconvolved clump properties */
    int dims[ 3 ];                /* Dimensions before axis permutation */
+   int dist;                     /* Clump parameters distribution */
    int i;                        /* Loop count */
    int indf2;                    /* Identifier for output NDF without noise */
    int indf;                     /* Identifier for output NDF with noise */
@@ -252,7 +256,6 @@ void makeclumps( int *status ) {
    int nclumps;                  /* Number of stored clumps */
    int ndim;                     /* Number of pixel axes */
    int nel;                      /* Number of elements in array */
-   int normal;                   /* Clump parameters normally distributed? */
    int nval;                     /* Number of values supplied */
    int ubnd[ 3 ];                /* Upper pixel bounds */
    size_t st;                    /* A size_t that can be passed as an argument */
@@ -284,8 +287,15 @@ void makeclumps( int *status ) {
 /* Get the other needed parameters. Which are needed depends on whether
    we are producing 1, 2 or 3 dimensional data. */
    
-   parChoic( "PARDIST", "NORMAL", "NORMAL,UNIFORM", 1, text, 8, status );
-   normal = strcmp( text, "NORMAL" ) ? 0 : 1;
+   parChoic( "PARDIST", "NORMAL", "NORMAL,UNIFORM,POISSON", 1, text, 8, 
+             status );
+   if( !strcmp( text, "UNIFORM" ) ) {
+      dist = 0;
+   } else if( !strcmp( text, "NORMAL" ) ) {
+      dist = 1;
+   } else if( !strcmp( text, "POISSON" ) ) {
+      dist = 2;
+   }
 
    parGet0r( "TRUNC", &trunc, status );
    parGet0i( "NCLUMP", &nclump, status );
@@ -391,21 +401,21 @@ void makeclumps( int *status ) {
       }
 
 /* Determine the parameter values to use for the clump. */
-      par[ 0 ] = cupidRanVal( normal, peak, status );
+      par[ 0 ] = cupidRanVal( dist, peak, status );
       par[ 1 ] = 0.0;
       par[ 2 ] = (int) cupidRanVal( 0, pos1, status );
-      par[ 3 ] = cupidRanVal( normal, fwhm1, status );
+      par[ 3 ] = cupidRanVal( dist, fwhm1, status );
 
       if( ndim > 1 ) {
          par[ 4 ] = (int) cupidRanVal( 0, pos2, status );
-         par[ 5 ] = cupidRanVal( normal, fwhm2, status );
+         par[ 5 ] = cupidRanVal( dist, fwhm2, status );
          par[ 6 ] = cupidRanVal( 0, angle, status );
 
          if( ndim > 2 ) {
             par[ 7 ] = cupidRanVal( 0, pos3, status );
-            par[ 8 ] = cupidRanVal( normal, fwhm3, status );
-            par[ 9 ] = cupidRanVal( normal, vgrad1, status );
-            par[ 10 ] = cupidRanVal( normal, vgrad2, status );
+            par[ 8 ] = cupidRanVal( dist, fwhm3, status );
+            par[ 9 ] = cupidRanVal( dist, vgrad1, status );
+            par[ 10 ] = cupidRanVal( dist, vgrad2, status );
          }
       }
 

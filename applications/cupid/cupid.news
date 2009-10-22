@@ -6,6 +6,12 @@
  and  analyse clumps of emission within 2- or 3- dimensional 
  data arrays.
 
+Changes introduced at V1.2
+
+   - MAKECLUMPS now allows clump parameters to be distributed 
+     using a Poisson distribution.
+
+
 Changes introduced at V1.1
 
    - For consistency with other Starlink applications the ILEVEL
@@ -18,6 +24,7 @@ Changes introduced at V1.1
      include more bad pixels. This was particularly noticable with the
      FellWalker algorithm which tends to produce larger clumps than (say)
      ClumpFind.
+
 
 Changes introduced at V1.0
 

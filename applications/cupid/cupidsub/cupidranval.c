@@ -2,20 +2,20 @@
 #include "cupid.h"
 #include "star/pda.h"
 
-float cupidRanVal( int normal, float p[2], int *status ){
+float cupidRanVal( int dist, float p[2], int *status ){
 /*
 *+
 *  Name:
 *     cupidRanVal
 
 *  Purpose:
-*     Return a random sample from a uniform or normal distribution.
+*     Return a random sample from a uniform, normal or poisson distribution.
 
 *  Language:
 *     Starlink C
 
 *  Synopsis:
-*     float cupidRanVal( int normal, float p[2], int *status )
+*     float cupidRanVal( int dist, float p[2], int *status )
 
 *  Description:
 *     This function returns a random sample from a uniform or normal
@@ -23,21 +23,23 @@ float cupidRanVal( int normal, float p[2], int *status ){
 
 *  Parameters:
 *     normal
-*        If non-zero, then the returned sample is drawn from a normal
-*        (Gaussian) distribution. Otherwise, it is drawn from a uniform
-*        distribution.
+*        0 - Use a uniform distribution
+*        1 - Use a normal distribution
+*        2 - Use a Poisson distribution
 *     p
 *        Element zero contains the mean of the distribution, element one
 *        contains the width (i.e. the standard deviation for a normal
-*        distribution, or the half-width for a uniform distribution).
+*        distribution, or the half-width for a uniform distribution). The
+*        second element is ignored when using a Poisson distribution.
 *     status
 *        Pointer to the inherited status value.
 
 *  Returned Value:
-*     The model value or gradient.
+*     The model random value.
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -63,6 +65,8 @@ float cupidRanVal( int normal, float p[2], int *status ){
 *  History:
 *     31-OCT-2005 (DSB):
 *        Original version.
+*     22-OCT-2009 (DSB):
+*        Add support for Poisson distribution.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -71,8 +75,10 @@ float cupidRanVal( int normal, float p[2], int *status ){
 *-
 */
 
+/* Local Constants: */
+#define PMEAN 1.0E8
+   
 /* Local Variables: */
-
    float ret;             /* Returned value */
 
 /* Initialise */
@@ -82,8 +88,10 @@ float cupidRanVal( int normal, float p[2], int *status ){
    if( *status != SAI__OK ) return ret;
 
 /* Get the required sample. */
-   if( normal ) {
+   if( dist == 1 ) {
       ret = pdaRnnor( p[ 0 ], p[ 1 ] );
+   } else if( dist == 2 ) {
+      ret = p[ 0 ]*( pdaRnpoi( PMEAN )/PMEAN );
    } else {
       ret = p[ 0 ] + 2*( pdaRand() - 0.5 )*p[ 1 ];
    }
