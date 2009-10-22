@@ -4855,12 +4855,12 @@ static const char *ReadSpaceArgs( AstStcsChan *this, const char *word,
                    "'%s' in an STC-S description: '%s'.", status, word,
                    ContextFragment( con, &fbuf, status ) );
       }
-      word = GetNextWord( this, con, status );
 
 /* Store the property value in the KeyMap. */
       astMapPut0C( props, "RADIUS1", word, NULL );
 
 /* Get the second radius value . */
+      word = GetNextWord( this, con, status );
       val = astChr2Double( word );
       if( val == AST__BAD && astOK ) {
          astError( AST__BADIN, "astRead(StcsChan): Expected the second "
@@ -4868,12 +4868,12 @@ static const char *ReadSpaceArgs( AstStcsChan *this, const char *word,
                    "'%s' in an STC-S description: '%s'.", status, word,
                    ContextFragment( con, &fbuf, status ) );
       }
-      word = GetNextWord( this, con, status );
 
 /* Store the property value in the KeyMap. */
       astMapPut0C( props, "RADIUS2", word, NULL );
 
 /* Get the position angle value. */
+      word = GetNextWord( this, con, status );
       val = astChr2Double( word );
       if( val == AST__BAD && astOK ) {
          astError( AST__BADIN, "astRead(StcsChan): Expected the position "
