@@ -406,6 +406,16 @@ void makeclumps( int *status ) {
             }
          }
       }
+
+/* The "LIKE" NDF may have a different origin to the output NDFs. This
+   means that the GRID to PIXEL in the "iwcs" FrameSet will probably not
+   describe the pixel origin requested via the LBND parameter.  To correct
+   this, annul the existing "iwcs" FrameSet and retrieve it from the
+   output NDF (whch has the correct pixel origin). The NDF library
+   automatically corrects any FrameSet storing using ndfPtwcs so that the
+   GRID->PIXEL Mapping is in agreement with the NDF pixel origin. */
+      iwcs = astAnnul( iwcs );
+      ndfGtwcs( indf, &iwcs, status );
    }
 
 /* See what STC-S shape should be used to describe each spatial clump. */
