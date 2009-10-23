@@ -416,7 +416,8 @@ static char *AddItem( AstStcsChan *this, AstKeyMap *km, const char *key,
 *        the buffer. Updated on exit.
 *     crem
 *        Pointer to an int in which to store the maximum number of 
-*        characters before a new line. Ignored if zero. Updated on exit.
+*        characters before a new line. Ignored if linelen is zero. Updated 
+*        on exit.
 *     linelen
 *        The maximum number of character per line, or zero if all text is
 *        to be included in a single line.
@@ -6131,8 +6132,10 @@ static void WriteProps( AstStcsChan *this, AstKeyMap *props, int *status ){
    remaining characters in the current output line. */
    if( pretty ) {
       linelen = astGetStcsLength( this );
-      crem = linelen;
-   }      
+   } else {
+      linelen = 0;
+   }
+   crem = linelen;
 
 /* Add each word in the time sub-phrase into the output buffer, in the
    order defined by the STC-S standard. */
