@@ -38,6 +38,7 @@
                                  ! history has been written.
       INTEGER GHKMP_COM2         ! KeyMap holding GRP group contents
       LOGICAL STATE_COM2         ! Current provenance-recording state
+      LOGICAL AUTO_COM2          ! Original value of AUTO_HISTORY
 
-      COMMON /NDG_COM2/ GHKMP_COM2, DHKMP_COM2, STATE_COM2
+      COMMON /NDG_COM2/ GHKMP_COM2, DHKMP_COM2, STATE_COM2, AUTO_COM2
 

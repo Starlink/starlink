@@ -4332,6 +4332,13 @@ underscore and capitalise the following character.
       being added to the list of NDFs that will receive extra history
       holding GRP group contents when NDG\_ENDGH is called to end the
       current GRP history block.
+
+      In addition, if the GRP history block is halted, this routine will
+      ensure that the AUTO\_HISTORY tuning parameter used by the NDF
+      library is set to zero, thus preventing the automatic creation of
+      History components in any new NDFs. When the block is un-halted
+      this tuning parameter is set back to the value it had at the time
+      the block was halted.
    }
    \sstinvocation{
       CALL NDG\_HLTGH( NEW, OLD, STATUS )
