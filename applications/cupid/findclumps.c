@@ -932,6 +932,7 @@ void findclumps( int *status ) {
    int nsig;                    /* Number of significant pixel axes */
    int nskyax;                  /* No. of sky axes in current WCS Frame */
    int nspecax;                 /* No. of spectral axes in current WCS Frame */
+   int old;                     /* The previous state of the gh or pv block */
    int perspectrum;             /* Process spectra independently? */
    int repconf;                 /* Report configuration? */
    int sdim[ NDF__MXDIM ];      /* The indices of the significant pixel axes */
@@ -1262,6 +1263,12 @@ void findclumps( int *status ) {
 /* Delete the group, if any. */
    if( grp ) grpDelet( &grp, status );      
 
+/* Ensure that NDG will not add provenance or history to the clump 
+   cut-out NDFs created below. We will re-start the provenance and GRP
+   history blocks before creating the main output NDFs. */
+   ndgHltgh( 0, &old, status );
+   ndgHltpv( 0, &old, status );
+
 /* Switch for each method */
    if( !strcmp( method, "GAUSSCLUMPS" ) ) {
       ndfs = cupidGaussClumps( type, nsig, slbnd, subnd, ipd, ipv, rms, 
@@ -1338,6 +1345,11 @@ void findclumps( int *status ) {
 /* Skip the rest if no clumps were found. */
    if( ndfs ) {
 
+/* Re-start the NDG provenance and GRP blocks so that the main output NDF
+   will receive provenance and group history. */
+      ndgHltgh( 1, &old, status );
+      ndgHltpv( 1, &old, status );
+
 /* Create the main output NDF and map the data array. */
       ipo = NULL;
       ndfProp( indf, "AXIS,WCS,NOEXTENSION(CUPID)", "OUT", &indf2, 
@@ -1359,6 +1371,17 @@ void findclumps( int *status ) {
 
 /* Create a CUPID extension in the output NDF. */
       ndfXnew( indf2, "CUPID", "CUPID_EXT", 0, NULL, &xloc, status );
+
+/* Re-halt the NDG provenance and GRP blocks to prevent the clump cut-out
+   NDFs receiving provenance and group history. First ensure the default
+   history record has been written out to the main NDF as this is the
+   trigger that causes NDG to add the NDF to its list of NDFs to receive 
+   GRP history, and the NDF library otherwise would not write out the
+   default history until the NDF was closed, by which time the NDG gh loop
+   will be halted. . */
+      ndfHdef( indf2, " ", status );
+      ndgHltgh( 0, &old, status );
+      ndgHltpv( 0, &old, status );
 
 /* Store the clump properties in the CUPID extension and output catalogue
    (if needed). This may reject further clumps (such clumps will have the
@@ -1421,6 +1444,13 @@ void findclumps( int *status ) {
    NDF (minus Quality). Annul the error if a null parameter value is
    supplied. */
       if( *status == SAI__OK ) {
+
+/* Temporarily re-start the gh and pv blocks so that the QOUT NDF gets
+   provenance and history. */
+         ndgHltgh( 1, &old, status );
+         ndgHltpv( 1, &old, status );
+
+/* Create the NDF. */
          ndfProp( indf, "Units,Data,Variance,Axis,Wcs", "QOUT", &indf3, 
                   status ); 
          if( *status == PAR__NULL ) {
@@ -1451,7 +1481,17 @@ void findclumps( int *status ) {
             datCopy( xqnloc, qxloc, "QUALITY_NAMES", status );
             datAnnul( &qxloc, status );
             datAnnul( &xqnloc, status );
+
+/* Explitly annul the NDF so that the NDF library will write a default
+   history record to it, and the NDG gh block will thus know that it
+   also needs GRP history. */
+            ndfAnnul( &indf3, status );
          }
+
+/* Re-halt the gh and pv blocks to prevent clump cut-out NDFs getting
+   history or provenance. */
+         ndgHltgh( 0, &old, status );
+         ndgHltpv( 0, &old, status );
       }
 
 /* Release the extension locator.*/

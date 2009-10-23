@@ -143,7 +143,6 @@ HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, int nel,
    HDSLoc *ret;              /* The returned HDS object */
    HDSLoc *cloc;             /* Cell locator */
    HDSLoc *xloc;             /* Extension locator */
-   NdgProvenance *prov;      /* NDF provenance structure */
    const char *key;          /* KeyMap key name */
    double *out;              /* Pointer to output NDF Data array */
    double *pout;             /* Pointer to next output pixel */
@@ -302,15 +301,6 @@ HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, int nel,
 /* Release the extension locator. */
       datAnnul( &xloc, status );
    }
-
-/* We do not want the automatic provenance propagation (implemented within
-   the cupid monolith function) to add full provenance to the NDF, so store 
-   an empty provenance structure explicitly in the NDF now. The automatic
-   provenance propagation system does not attempt to over-write any
-   provenance already present in the output NDF. */
-   prov = ndgReadProv( indf, "CUPID:FINDCLUMPS", status );
-   ndgWriteProv( prov, indf, 1, status );
-   prov = ndgFreeProv( prov, status );
 
 /* End the NDF context */
    ndfEnd( status );
