@@ -67,10 +67,7 @@
       INCLUDE 'GRP_PAR'
 
 *  Global Variables:
-      INTEGER DHKMP              ! KeyMap holding NDF to which default 
-                                 ! history has been written.
-      INTEGER GHKMP              ! KeyMap holding GRP group contents
-      COMMON /NDG_GH/ GHKMP, DHKMP
+      INCLUDE 'NDG_COM2'         ! Global GRP history information
 
 *  Arguments Given:
       INTEGER INDF
@@ -110,10 +107,10 @@
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Loop round every entry in the GRP NDF history keymap.
-      NPAR = AST_MAPSIZE( GHKMP, STATUS )
+      NPAR = AST_MAPSIZE( GHKMP_COM2, STATUS )
       DO IPAR = 1, NPAR
-         PARAM = AST_MAPKEY( GHKMP, IPAR, STATUS ) 
-         IF( AST_MAPGET0I( GHKMP, PARAM, IGRP, STATUS ) ) THEN
+         PARAM = AST_MAPKEY( GHKMP_COM2, IPAR, STATUS ) 
+         IF( AST_MAPGET0I( GHKMP_COM2, PARAM, IGRP, STATUS ) ) THEN
 
 *  Initialise the first line to hold the parameter name.
             ILINE = 1

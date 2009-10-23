@@ -76,10 +76,7 @@
       INCLUDE 'GRP_PAR'
 
 *  Global Variables:
-      INTEGER DHKMP              ! KeyMap holding NDF to which default 
-                                 ! history has been written.
-      INTEGER GHKMP              ! KeyMap holding GRP group contents
-      COMMON /NDG_GH/ GHKMP, DHKMP
+      INCLUDE 'NDG_COM2'         ! Global GRP history information
 
 *  Status:
       INTEGER STATUS
@@ -103,28 +100,29 @@
       INTEGER NPATH
       INTEGER PLACE
       LOGICAL HASHIS
+      LOGICAL OLD
 *.
 
 *  Begin a new error reporting context (we want to clean up even if an
 *  error has occurred).
       CALL ERR_BEGIN( STATUS )
 
-*  Indicate that the routine NDG1_HNDLR should no longer be called 
-*  whenever default history is written to an NDF.
-      CALL NDF_HNDLR( 'DEF_HISTORY', NDG1_HNDLR, .FALSE., STATUS )
+*  Remove the NDF event handlers needed to record the NDFs in which
+*  GRP history should be stored.
+      CALL NDG_HLTGH( .FALSE., OLD, STATUS )
 
 *  Loop round each NDF to which default history has been written.
-      NPATH = AST_MAPSIZE( DHKMP, STATUS )
+      NPATH = AST_MAPSIZE( DHKMP_COM2, STATUS )
       DO IPATH = 1, NPATH
 
 *  Get the key with index 1 on each pass through this loop. Since the
 *  key is immediately removed form the KeyMap, what was key 2 will become
 *  key 1 on each pass.
-         PATH = AST_MAPKEY( DHKMP, 1, STATUS )
+         PATH = AST_MAPKEY( DHKMP_COM2, 1, STATUS )
 
 *  Remove the NDF form the keymap to avoid it recieving a second copy of
 *  group contents if this routine is ever called again.
-         CALL AST_MAPREMOVE( DHKMP, PATH, STATUS )
+         CALL AST_MAPREMOVE( DHKMP_COM2, PATH, STATUS )
 
 *  Check no error has occurred.
          IF( STATUS .EQ. SAI__OK ) THEN 
@@ -160,17 +158,17 @@
 
 *  Free resources. First delete the groups for which identifiers are held
 *  in the keymap.
-      NGRP = AST_MAPSIZE( GHKMP, STATUS )
+      NGRP = AST_MAPSIZE( GHKMP_COM2, STATUS )
       DO I = 1, NGRP
-         KEY = AST_MAPKEY( GHKMP, I, STATUS ) 
-         IF( AST_MAPGET0I( GHKMP, KEY, IGRP, STATUS ) ) THEN
+         KEY = AST_MAPKEY( GHKMP_COM2, I, STATUS ) 
+         IF( AST_MAPGET0I( GHKMP_COM2, KEY, IGRP, STATUS ) ) THEN
             CALL GRP_DELET( IGRP, STATUS ) 
          END IF
       END DO
 
 * Now free the KeyMaps.
-      CALL AST_ANNUL( GHKMP, STATUS )
-      CALL AST_ANNUL( DHKMP, STATUS )
+      CALL AST_ANNUL( GHKMP_COM2, STATUS )
+      CALL AST_ANNUL( DHKMP_COM2, STATUS )
 
 *  End the error reporting context.
       CALL ERR_END( STATUS )

@@ -81,15 +81,8 @@
       INCLUDE 'DAT_PAR'          ! DAT constants 
 
 *  Global Variables:
-      INTEGER RDKMP              ! KeyMap holding input NDFs
-      INTEGER WRKMP              ! KeyMap holding output NDFs
-      INTEGER MPKMP              ! KeyMap holding mapped NDFs
-      COMMON /NDG_PRV/ RDKMP, WRKMP, MPKMP
-
-      INTEGER DHKMP              ! KeyMap holding NDF to which default 
-                                 ! history has been written.
-      INTEGER GHKMP              ! KeyMap holding GRP group contents
-      COMMON /NDG_GH/ GHKMP, DHKMP
+      INCLUDE 'NDG_COM1'         ! Global provenance information
+      INCLUDE 'NDG_COM2'         ! Global GRP history information
 
 *  Arguments Given:
       CHARACTER EVNAME*(*)
@@ -102,7 +95,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  If the event was the opening of an input NDF( i.e. an existing NDF 
-*  opened for READ or UPDATE mode), add the path to the NDF to the RDKMP
+*  opened for READ or UPDATE mode), add the path to the NDF to the RDKMP_COM1
 *  KeyMap. Use the NDF name as the key, rather than the value so that any
 *  subsequent invocations of this routine with the same NDF will overwrite
 *  the earlier KeyMap entry, rather than creating an extra KeyMap entry.
@@ -111,34 +104,34 @@
 *  If an application creates an output NDF, closes it, and then re-opens
 *  it before the application terminates, we do not want the NDF to be
 *  included in the list of input NDFs, so do not add the NDF into the
-*  RDKMP keymap if it is already in the WRKMP keymap.
+*  RDKMP_COM1 keymap if it is already in the WRKMP_COM1 keymap.
       IF( EVNAME .EQ. 'READ_EXISTING_NDF' .OR. 
      :    EVNAME .EQ. 'UPDATE_EXISTING_NDF' ) THEN
 
-         IF( .NOT. AST_MAPHASKEY( WRKMP, EVTEXT, STATUS ) ) THEN
-            CALL AST_MAPPUT0I( RDKMP, EVTEXT, 0, ' ', STATUS )
+         IF( .NOT. AST_MAPHASKEY( WRKMP_COM1, EVTEXT, STATUS ) ) THEN
+            CALL AST_MAPPUT0I( RDKMP_COM1, EVTEXT, 0, ' ', STATUS )
          ENDIF
 
       END IF
 
 *  If the event was the opening of an output NDF( i.e. an existing NDF 
 *  opened for UPDATE mode or a new NDF opened), add the path to the NDF 
-*  to the WRKMP KeyMap.
+*  to the WRKMP_COM1 KeyMap.
       IF( EVNAME .EQ. 'UPDATE_EXISTING_NDF' .OR. 
      :    EVNAME .EQ. 'OPEN_NEW_NDF' ) THEN
-         CALL AST_MAPPUT0I( WRKMP, EVTEXT, 0, ' ', STATUS )
+         CALL AST_MAPPUT0I( WRKMP_COM1, EVTEXT, 0, ' ', STATUS )
       END IF
 
 *  If the event was the mapping of a data array for read or update access, 
-*  add the path to the NDF to the MPKMP KeyMap.
+*  add the path to the NDF to the MPKMP_COM1 KeyMap.
       IF( EVNAME .EQ. 'UPDATE_DATA' .OR. EVNAME .EQ. 'READ_DATA' ) THEN
-         CALL AST_MAPPUT0I( MPKMP, EVTEXT, 0, ' ', STATUS )
+         CALL AST_MAPPUT0I( MPKMP_COM1, EVTEXT, 0, ' ', STATUS )
       END IF
 
 *  If the event was the writing of default history, add the path to the NDF 
-*  to the DHKMP KeyMap.
+*  to the DHKMP_COM2 KeyMap.
       IF( EVNAME .EQ. 'DEF_HISTORY' ) THEN
-         CALL AST_MAPPUT0I( DHKMP, EVTEXT, 0, ' ', STATUS )
+         CALL AST_MAPPUT0I( DHKMP_COM2, EVTEXT, 0, ' ', STATUS )
       END IF
 
       END

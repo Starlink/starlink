@@ -1,5 +1,12 @@
 1 NDG_library
 
+Version 5.8
+   o  Added functions for appending GRP group contents to default
+   history records written by the NDF library.
+
+   o  New function ndgHltpv (NDG_HLTPV) allows selected NDFs to be
+   exempted from a provenance block.
+
 Version 5.7
    o The entire API for provenance handling has been re-written.
 

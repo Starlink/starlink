@@ -65,32 +65,35 @@
       INCLUDE 'AST_PAR'          ! AST constants and functions
 
 *  Global Variables:
-      INTEGER DHKMP              ! KeyMap holding NDF to which default 
-                                 ! history has been written.
-      INTEGER GHKMP              ! KeyMap holding GRP group contents
-      COMMON /NDG_GH/ GHKMP, DHKMP
+      INCLUDE 'NDG_COM2'         ! Global GRP history information
 
 *  External References:
       EXTERNAL NDG1_HNDLR
 
 *  Status:
       INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      LOGICAL OLD
+
 *.
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Indicate that the routine NDG1_HNDLR should be called whenever default
-*  history has been written to an NDF.
-      CALL NDF_HNDLR( 'DEF_HISTORY', NDG1_HNDLR, .TRUE., STATUS )
+*  Indicate that NDF event handlers needed to record the NDFs in which
+*  GRP history should be stored have not yet been established, and then
+*  establish them. 
+      STATE_COM2 = .FALSE.
+      CALL NDG_HLTGH( .TRUE., OLD, STATUS )
 
 *  Create a AST KeyMap to hold integer identifiers for deep copies of the
 *  registered GRP groups. The key for each entry is the associated
 *  parameter name.
-      GHKMP = AST_KEYMAP( ' ', STATUS )
+      GHKMP_COM2 = AST_KEYMAP( ' ', STATUS )
 
 *  Create a AST KeyMap to hold the paths to the NDFs to which default
 *  history has been written.
-      DHKMP = AST_KEYMAP( ' ', STATUS )
+      DHKMP_COM2 = AST_KEYMAP( ' ', STATUS )
 
       END

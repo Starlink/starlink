@@ -83,10 +83,7 @@
       INCLUDE 'GRP_PAR'          ! GRP constants 
 
 *  Global Variables:
-      INTEGER DHKMP              ! KeyMap holding NDF to which default 
-                                 ! history has been written.
-      INTEGER GHKMP              ! KeyMap holding GRP group contents
-      COMMON /NDG_GH/ GHKMP, DHKMP
+      INCLUDE 'NDG_COM2'         ! Global GRP history information
 
 *  Arguments Given:
       CHARACTER PARAM*(*)
@@ -105,12 +102,12 @@
 *  Check the inherited status
       IF( STATUS .NE. SAI__OK ) RETURN
 
-*  Check that GHKMP is a valid AST KeyMap pointer. This will only be the
+*  Check that GHKMP_COM2 is a valid AST KeyMap pointer. This will only be the
 *  case if NDG_BEGGH has been called previously. 
-      IF( AST_ISAKEYMAP( GHKMP, STATUS ) ) THEN
+      IF( AST_ISAKEYMAP( GHKMP_COM2, STATUS ) ) THEN
 
 *  Delete any group already stored for the  given parameter.
-         IF( AST_MAPGET0I( GHKMP, PARAM, IGRP2, STATUS ) ) THEN
+         IF( AST_MAPGET0I( GHKMP_COM2, PARAM, IGRP2, STATUS ) ) THEN
             CALL GRP_DELET( IGRP2, STATUS ) 
          END IF
 
@@ -130,10 +127,10 @@
 *  Take a copy of the group, and store the new GRP identifier in the 
 *  KeyMap.
             CALL GRP_COPY( IGRP, 0, 0, .FALSE., IGRP2, STATUS ) 
-            CALL AST_MAPPUT0I( GHKMP, PARAM, IGRP2, ' ', STATUS ) 
+            CALL AST_MAPPUT0I( GHKMP_COM2, PARAM, IGRP2, ' ', STATUS ) 
          END IF
 
-*  Annul any error caused by GHKMP not being a valid KeyMap pointer.
+*  Annul any error caused by GHKMP_COM2 not being a valid KeyMap pointer.
       ELSE IF( STATUS .NE. SAI__OK ) THEN
          CALL ERR_ANNUL( STATUS )
 

@@ -71,32 +71,26 @@
       INCLUDE 'AST_PAR'          ! AST constants and functions
 
 *  Global Variables:
-      INTEGER RDKMP              ! KeyMap holding input NDFs
-      INTEGER WRKMP              ! KeyMap holding output NDFs
-      INTEGER MPKMP              ! KeyMap holding mapped NDFs
-      COMMON /NDG_PRV/ RDKMP, WRKMP, MPKMP
+      INCLUDE 'NDG_COM1'         ! Global provenance information
 
 *  External References:
       EXTERNAL NDG1_HNDLR
 
 *  Status:
       INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      LOGICAL OLD
 *.
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Indicate that the routine NDG1_HNDLR should be called whenever an NDF
-*  is opened or closed, or has its data array mapped for read or update
-*  access
-      CALL NDF_HNDLR( 'READ_EXISTING_NDF', NDG1_HNDLR, .TRUE., STATUS )
-      CALL NDF_HNDLR( 'WRITE_EXISTING_NDF', NDG1_HNDLR, .TRUE., STATUS )
-      CALL NDF_HNDLR( 'UPDATE_EXISTING_NDF', NDG1_HNDLR, .TRUE., 
-     :                 STATUS )
-      CALL NDF_HNDLR( 'OPEN_NEW_NDF', NDG1_HNDLR, .TRUE., STATUS )
-      CALL NDF_HNDLR( 'CLOSE_NDF', NDG1_HNDLR, .TRUE., STATUS )
-      CALL NDF_HNDLR( 'READ_DATA', NDG1_HNDLR, .TRUE., STATUS )
-      CALL NDF_HNDLR( 'UPDATE_DATA', NDG1_HNDLR, .TRUE., STATUS )
+*  Indicate that NDF event handlers needed to record the NDFs in which
+*  provenance should be stored have not yet been established, and then
+*  establish them. 
+      STATE_COM1 = .FALSE.
+      CALL NDG_HLTPV( .TRUE., OLD, STATUS )
 
 *  Indicate that the PROVENANCE extension should not be propagated by
 *  default when NDF_PROP or NDF_SCOPY is called.
@@ -106,14 +100,14 @@
 *  the provenance block. Each KeyMap entry has a key that is an NDF name
 *  (the entry value is of no significance and will be set arbitrarily to 
 *  zero).
-      RDKMP = AST_KEYMAP( ' ', STATUS )
+      RDKMP_COM1 = AST_KEYMAP( ' ', STATUS )
 
 *  Create a AST KeyMap to hold the paths to the NDFs that are written during 
 *  the provenance block.
-      WRKMP = AST_KEYMAP( ' ', STATUS )
+      WRKMP_COM1 = AST_KEYMAP( ' ', STATUS )
 
 *  Create a AST KeyMap to hold the paths to the NDFs that have their Data
 *  array mapped for read or update access.
-      MPKMP = AST_KEYMAP( ' ', STATUS )
+      MPKMP_COM1 = AST_KEYMAP( ' ', STATUS )
 
       END

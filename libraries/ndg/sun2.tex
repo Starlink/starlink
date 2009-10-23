@@ -19,10 +19,10 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {2.8}
 \newcommand{\stardocauthors}   {D.S.\ Berry \\ M.B.\ Taylor}
-\newcommand{\stardocdate}      {6th July 2009}
+\newcommand{\stardocdate}      {22nd October 2009}
 \newcommand{\stardoctitle}     {NDG \\ [\latex{1ex}]
                                 Routines for Accessing Groups of NDFs}
-\newcommand{\stardocversion}   {Version 5.7}
+\newcommand{\stardocversion}   {Version 5.8}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 \newcommand{\stardocabstract}  {
 This document describes the routines provided within the NDG subroutine 
@@ -2257,7 +2257,8 @@ when no longer needed, using ndgFreeProv.
 The following public functions are available. There is an equivalent set
 of F77 routines with names formed by converting the C name to upper case
 and inserting an underscore after the initial ``NDG'' string (C and F77
-versions are documented individually in separate prologues below):
+versions are - for the most part - documented individually in separate 
+prologues below):
 
 \begin{itemize}
    \item  ndgCopyProv: Create a deep copy of a provenance structure.
@@ -2268,6 +2269,7 @@ versions are documented individually in separate prologues below):
    \item  ndgFreeProv: Free the resources used by a provenance structure.
    \item  ndgGetProv: Get information about a specific ancestor.
    \item  ndgHideProv: Hide a specific ancestor.
+   \item  ndgHltpv: Temporarily stop recording NDFs within a provenance block
    \item  ndgIsHiddenProv: See if an ancestor is hidden.
    \item  ndgModifyProv: Modify information stored for a specific ancestor.
    \item  ndgPutProv: Add a new ancestor NDF into a provenance structure.
@@ -2277,6 +2279,11 @@ versions are documented individually in separate prologues below):
    \item  ndgUnhideProv: Ensure an ancestor is not hidden.
    \item  ndgWriteProv: Writes a provenance structure out to an NDF.
 \end{itemize}
+
+Note, within a provenance block, it is possible to prevent selected NDFs
+receiving provenance by using ndgHltpv (NDG\_HLTPV) to stop the recording
+of NDF names before the NDFs are accessed, and then calling ndgHltpv
+again afterwards to re-establish the recording of NDF names.
 
 \subsection{The PROVENANCE Extension:}
 
@@ -2749,6 +2756,52 @@ another statement of the software that performed the action.
          STATUS = INTEGER (Given and Returned)
       }{
          The global status.
+      }
+   }
+}
+\sstroutine{
+   NDG\_HLTPV
+}{
+   Temporarily halt an NDF provenance block
+}{
+   \sstdescription{
+      This routine can be called to stop subseqently accessed NDFs
+      being added to the list of NDFs that will receive updated
+      provenance information when NDG\_ENDPV is called to end the
+      current provenance block.
+   }
+   \sstinvocation{
+      CALL NDG\_HLTPV( NEW, OLD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NEW = LOGICAL (Read)
+      }{
+         The new required provenance-recording state.
+      }
+      \sstsubsection{
+         OLD = LOGICAL (Returned)
+      }{
+         The provenance-recording state on entry to this routine.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         A .FALSE. provenance-recording state means that any subseqently
+         accessed NDFs will not be added to the list of NDFs to receive
+         updated provenance information when NDG\_ENDPV is called.
+
+         \sstitem
+         A .TRUE. provenance-recording state means that any subseqently
+         accessed NDFs are added to the list of NDFs to receive updated
+         provenance information when NDG\_ENDPV is called.
       }
    }
 }
@@ -4111,6 +4164,246 @@ another statement of the software that performed the action.
       }
    }
 }
+
+\section{Routines for controling recording of GRP group contents}
+
+The functions described in this section allow the contents of GRP 
+groups to be appended to the default history record written by the 
+NDF library.
+
+If an ADAM application accesses a parameter as a GRP group, the default
+history record added by the NDF library to any output NDFs will include
+the group expression supplied in response to the associated parameter
+prompt. This is not always very informative - for instance, if the group
+expression gives the name of a file from which the group contents are to
+be read, rather than giving the group contents directly, then name of the
+file will be recorded in the default history record but not the contents
+of the file.
+
+The NDG functions described below allow the default history record to be
+expanded to include the contents of any GRP group parameters accessed by
+the application. The contents of each such group is described in a new
+line of text that begings with the string ``Group: <PARAM>='', where
+<PARAM> is the name of the parameter with which the group is associated.
+
+There are two parts to using these facilities:
+
+\begin{enumerate}
+\item Each time a group parameter is accessed, the group must be
+``registered'' with NDG using ndgAddgh (NDG\_ADDGH).
+\item Before the application accesses any group parameters, it must begin
+a ``GRP history'' block by calling ndgBeggh (NDG\_BEGGH). When the
+application has finished accessing group parameters, and producing output
+NDFs, it should end the GRP history block by calling ndgEndgh (NDG\_ENDGH).
+\end{enumerate}
+
+During a GRP history block, a record is kept of all NDFs to which the NDF
+library writes default history information. When ndgEndgh is called, the
+contents of all groups registered using ndgAddgh within the GRP history
+block, are appended to the current history record in each of the NDFs to
+which default history has been written.
+
+Note, within a GRP history block, it is possible to prevent selected NDFs
+receiving this extra information by using ndgHltgh (NDG\_HLTGH) to stop
+the recording of NDF names before the NDFs identifiers are annulled
+(which is normally when the default history is written out), and then
+calling ndgHltgh again afterwards to re-establish the recording of NDF
+names.
+
+The C interfaces are the direct equivalent of the F77 interfaces
+described below - convert the F77 name to lower-case, remove the 
+underscore and capitalise the following character.
+
+\sstroutine{
+   NDG\_ADDGH
+}{
+   Register a GRP group for GRP NDF history recording
+}{
+   \sstdescription{
+      This routine should be called to indicate that the contents of the
+      supplied GRP group should be included in the default History
+      information written out by the NDF library. It returns without
+      action unless a GRP NDF history block has previously been created
+      by calling NDG\_BEGGH.
+   }
+   \sstinvocation{
+      CALL NDG\_ADDGH( PARAM, IGRP, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The name of the parameter associated with the group.
+      }
+      \sstsubsection{
+         IGRP = INTEGER (Given)
+      }{
+         The GRP group identifier.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The group is registered only if the current value of the
+         associated parameter contains an {\tt "}INDIRECTION{\tt "} or {\tt "}NAME\_TOKEN{\tt "}
+         control character (see SUN/150). This prevents group descriptions
+         being added to the NDF history if the contents of the group are
+         already described fully by the parameters list.
+
+         \sstitem
+         This routine records a copy of the group contents at the time
+         this routine is called. Any subsequent changes to the contents of
+         the group are not included in the default NDF history.
+
+         \sstitem
+         This routine can be invoked multiple times for the same parameter.
+         Later invocations will replace the group contents registered by
+         earlier invocations.
+      }
+   }
+}
+\sstroutine{
+   NDG\_BEGGH
+}{
+   Begin a GRP NDF history block
+}{
+   \sstdescription{
+      This routine should be called to mark the start of a GRP NDF
+      history block. The block should be ended by a matching
+      call to NDG\_ENDGH. See NDG\_ENDGH for more details.
+
+      Note - GRP NDF history blocks must not be nested.
+   }
+   \sstinvocation{
+      CALL NDG\_BEGGH( STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   NDG\_ENDGH
+}{
+   End a GRP NDF history block
+}{
+   \sstdescription{
+      This routine should be called to mark the end of a GRP NDF
+      history block. The block should have been started by a
+      matching call to NDG\_BEGGH. Note, GRP NDF history blocks must
+      not be nested.
+
+      During a GRP NDF history block, application code can register GRP
+      groups using routine NDG\_ADDGH. When default history information is
+      written to any NDF, a handler routine is called that adds a new
+      history record to the NDF for each currently registered GRP group.
+      The new history record identifies the ADAM parameter with which the
+      group is associated, and lists the contents of the group (as it
+      existed at the time the group was registered - any subsequent changes
+      to the group contents are ignored).
+   }
+   \sstinvocation{
+      CALL NDG\_ENDGH( STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   NDG\_HLTGH
+}{
+   Temporarily halt a GRP history block
+}{
+   \sstdescription{
+      This routine can be called to stop subseqently accessed NDFs
+      being added to the list of NDFs that will receive extra history
+      holding GRP group contents when NDG\_ENDGH is called to end the
+      current GRP history block.
+   }
+   \sstinvocation{
+      CALL NDG\_HLTGH( NEW, OLD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NEW = LOGICAL (Read)
+      }{
+         The new required GRP history-recording state.
+      }
+      \sstsubsection{
+         OLD = LOGICAL (Returned)
+      }{
+         The GRP history-recording state on entry to this routine.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         A .FALSE. GRP history-recording state means that any subseqently
+         accessed NDFs will not be added to the list of NDFs to receive
+         extra history holding GRP group contents when NDG\_ENDPV is called.
+
+         \sstitem
+         A .TRUE. GRP history-recording state means that any subseqently
+         accessed NDFs are added to the list of NDFs to receive  extra
+         history holding GRP group contents when NDG\_ENDPV is called.
+      }
+   }
+}
+\sstroutine{
+   NDG\_HWRGH
+}{
+   Write GRP history to an NDF
+}{
+   \sstdescription{
+      This routine appends a description of each currently registered GRP
+      group to the current History record in the supplied NDF. See
+      NDF\_ENDGH. It returns without action if 1) the NDF library has not
+      yet written a default history record to the NDF, or 2) GRP history
+      has already been written to the NDF.
+   }
+   \sstinvocation{
+      CALL NDG\_HWRGH( INDF, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         INDF = INTEGER (Given)
+      }{
+         The NDF identifier.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+
+\section{Changes Introduced in NDG Version 5.8}
+\begin{itemize}
+   \item Added functions for appending GRP group contents to default
+    history records written by the NDF library.
+   \item New function ndgHltpv (NDG\_HLTPV) allows selected NDFs to be
+    exempted from a provenance block.
+\end{itemize}
 
 \section{Changes Introduced in NDG Version 5.7}
 \begin{itemize}

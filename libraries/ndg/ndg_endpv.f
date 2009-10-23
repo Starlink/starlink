@@ -104,10 +104,7 @@
       INCLUDE 'PSX_ERR'          ! PSX error constants
 
 *  Global Variables:
-      INTEGER RDKMP              ! KeyMap holding input NDFs
-      INTEGER WRKMP              ! KeyMap holding output NDFs
-      INTEGER MPKMP              ! KeyMap holding mapped NDFs
-      COMMON /NDG_PRV/ RDKMP, WRKMP, MPKMP
+      INCLUDE 'NDG_COM1'         ! Global provenance information
 
 *  Arguments Given:
       CHARACTER CREATR*(*) 
@@ -132,6 +129,7 @@
       INTEGER PLACE
       LOGICAL HASHIS
       LOGICAL INPRV
+      LOGICAL OLD
       LOGICAL THERE
 *.
 
@@ -144,17 +142,9 @@
       INDF1 = NDF__NOID
       INDF2 = NDF__NOID
 
-*  Indicate that the routine NDG1_HNDLR should no longer be called 
-*  whenever an NDF is opened or closed.
-      CALL NDF_HNDLR( 'READ_EXISTING_NDF', NDG1_HNDLR, .FALSE., STATUS )
-      CALL NDF_HNDLR( 'WRITE_EXISTING_NDF', NDG1_HNDLR, .FALSE., 
-     :                STATUS )
-      CALL NDF_HNDLR( 'UPDATE_EXISTING_NDF', NDG1_HNDLR, .FALSE., 
-     :                STATUS )
-      CALL NDF_HNDLR( 'OPEN_NEW_NDF', NDG1_HNDLR, .FALSE., STATUS )
-      CALL NDF_HNDLR( 'CLOSE_NDF', NDG1_HNDLR, .FALSE., STATUS )
-      CALL NDF_HNDLR( 'READ_DATA', NDG1_HNDLR, .FALSE., STATUS )
-      CALL NDF_HNDLR( 'UPDATE_DATA', NDG1_HNDLR, .FALSE., STATUS )
+*  Remove the NDF event handlers needed to record the NDFs in which
+*  provenance should be stored.
+      CALL NDG_HLTPV( .FALSE., OLD, STATUS )
 
 *  Indicate that the PROVENANCE extension should be propagated by
 *  default when NDF_PROP or NDF_SCOPY is called.
@@ -183,9 +173,9 @@
          IF( AUTOPV .EQ. '1' .OR. AUTOPV .EQ. ' ' ) THEN
 
 *  Loop round each output NDF
-            NW = AST_MAPSIZE( WRKMP, STATUS )
+            NW = AST_MAPSIZE( WRKMP_COM1, STATUS )
             DO IW = 1, NW
-               WRNDF = AST_MAPKEY( WRKMP, IW, STATUS )
+               WRNDF = AST_MAPKEY( WRKMP_COM1, IW, STATUS )
 
 *  Check no error has occurred.
                IF( STATUS .EQ. SAI__OK ) THEN 
@@ -217,17 +207,17 @@
 *  indicates if any input NDF had a PROVENANCE extension.
                      INPRV = .FALSE.
 
-                     NR = AST_MAPSIZE( RDKMP, STATUS )
+                     NR = AST_MAPSIZE( RDKMP_COM1, STATUS )
                      DO IR = 1, NR
-                        RDNDF = AST_MAPKEY( RDKMP, IR, STATUS )
+                        RDNDF = AST_MAPKEY( RDKMP_COM1, IR, STATUS )
 
 *  Existing NDFs that were opened for UPDATE will be in both KeyMaps. Check
 *  to make sure we are not establishing an NDF as its own parent. Also,
 *  check the Data array of the NDF was mapped for READ or UPDATE. Also
 *  check no error has occurred.
                         IF( WRNDF .NE. RDNDF .AND. 
-     :                      AST_MAPHASKEY( MPKMP, RDNDF, STATUS ) .AND.
-     :                      STATUS .EQ. SAI__OK ) THEN 
+     :                      AST_MAPHASKEY( MPKMP_COM1, RDNDF, STATUS ) 
+     :                      .AND. STATUS .EQ. SAI__OK ) THEN 
 
 *  Get an NDF identifier for it. This will fail if the NDF has been
 *  deleted (e.g. if it was a temporary NDF), so annul the error if an 
@@ -284,8 +274,8 @@
       END IF
 
 *  Free resources.
-      CALL AST_ANNUL( RDKMP, STATUS )
-      CALL AST_ANNUL( MPKMP, STATUS )
-      CALL AST_ANNUL( WRKMP, STATUS )
+      CALL AST_ANNUL( RDKMP_COM1, STATUS )
+      CALL AST_ANNUL( MPKMP_COM1, STATUS )
+      CALL AST_ANNUL( WRKMP_COM1, STATUS )
 
       END

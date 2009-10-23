@@ -381,6 +381,44 @@ void ndgHwrgh( int indf, int *status ) {
   F77_IMPORT_INTEGER( STATUS, *status );
 }
 
+F77_SUBROUTINE(ndg_hltgh)( LOGICAL(NEW), LOGICAL(OLD), INTEGER(STATUS) );
+
+void ndgHltgh( int new, int *old, int *status ){
+   DECLARE_LOGICAL(NEW);
+   DECLARE_LOGICAL(OLD);
+   DECLARE_INTEGER(STATUS);
+
+   if ( *status != SAI__OK ) return;
+
+   F77_EXPORT_LOGICAL( new, NEW );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(ndg_hltgh)( LOGICAL_ARG(&NEW), LOGICAL_ARG(&OLD), 
+                        INTEGER_ARG(&STATUS) );
+
+   F77_IMPORT_LOGICAL( OLD, *old );
+   F77_IMPORT_INTEGER( STATUS, *status );
+}
+
+F77_SUBROUTINE(ndg_hltpv)( LOGICAL(NEW), LOGICAL(OLD), INTEGER(STATUS) );
+
+void ndgHltpv( int new, int *old, int *status ){
+   DECLARE_LOGICAL(NEW);
+   DECLARE_LOGICAL(OLD);
+   DECLARE_INTEGER(STATUS);
+
+   if ( *status != SAI__OK ) return;
+
+   F77_EXPORT_LOGICAL( new, NEW );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(ndg_hltpv)( LOGICAL_ARG(&NEW), LOGICAL_ARG(&OLD), 
+                        INTEGER_ARG(&STATUS) );
+
+   F77_IMPORT_LOGICAL( OLD, *old );
+   F77_IMPORT_INTEGER( STATUS, *status );
+}
+
 
 
 
