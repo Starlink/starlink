@@ -139,6 +139,10 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 *     14-JAN-2009 (TIMJ):
 *        Use MERS for message filtering.
 *        Fix debugging messages when 2d image is processed.
+*     22-OCT-2009 (DSB):
+*        Do explicit bounds checking when scanning the 3x3x3
+*        neighbourhood box, rather than just marking the edge pixels bad.
+*        This avoid the output mask having a border of bad pixels.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -155,9 +159,9 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    double frac;    /* Min fraction of neighbouring good pixels */
    double g;       /* Gradient from central pixel to neighbouring pixel */
    double h;       /* Pixel data value (i.e. "height" of a pixel) */
-   double sea_level;/* Data values less than this are at "sea level" */
    double maxg;    /* Maximum gradient found so far */
    double noise;   /* Data value at which each route commences */
+   double sea_level;/* Data values less than this are at "sea level" */
    int *m1;        /* Pointer to input array */
    int *m2;        /* Pointer to output array */
    int *m3;        /* Pointer used to swap arrays */
@@ -193,7 +197,11 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    int jz;         /* Z plane count */
    int jzhi;       /* Highest value for axis 1 within extended neighbourhood */
    int jzlo;       /* Lowest value for axis 1 within extended neighbourhood */
+   int lpercent;   /* Previous displayed percent value */
    int maxjump;    /* Longest jump to a higher neighbouring pixel */
+   int mix;        /* Grid index on 1st axis of 3x3x3 pixel being tested */
+   int miy;        /* Grid index on 2nd axis of 3x3x3 pixel being tested */
+   int miz;        /* Grid index on 3rd axis of 3x3x3 pixel being tested */
    int nflat;      /* Number of starting pixels in "route" which are flat */
    int nix;        /* GRID index on 1st axis at central pixel */
    int niy;        /* GRID index on 2nd axis at central pixel */
@@ -204,14 +212,15 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    int nv;         /* Vector index of next pixel along the route */
    int nzero;      /* No. of axes with zero displacement between pixels */
    int percent;    /* Percent of pixels done */
-   int lpercent;   /* Previous displayed percent value */
    int ret;        /* The highest index value in "ipa" */
    int route_length;/* Number of pixels stored in "route" array */
    int skip0;      /* Total skip from centre to first 3x3x3 neighbour */
    int skip1;      /* Total skip from centre to first extended neighbour */
    int xlim;       /* Number of x planes in 3x3x3 neighbourhood */
    int ylim;       /* Number of y planes in 3x3x3 neighbourhood */
+   int yon;        /* Is the current Y row within the bounds of the array? */
    int zlim;       /* Number of z planes in 3x3x3 neighbourhood */
+   int zon;        /* Is the current Z plane within the bounds of the array? */
 
 /* The distance from a central pixel centre to the centre of a neighbouring 
    pixel, indexed by the number of axes (0, 1, 2 or 3) on which the two 
@@ -244,26 +253,14 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    sea_level = noise + 2*rms;
 
 /* Fill the supplied "ipa" array with -1 for all pixels which are below the
-   threshold, are bad, or are at the edge of the array. Fill all other
-   pixels with zero to indicate that the pixel is "usable but not yet 
-   checked". Marking the edges as unusable means we do not need to check at 
-   a later point whether the 3x3x3 cube centred on the current pixel extends 
-   beyond the edge of the data array. */
+   threshold, or are bad. Fill all other pixels with zero to indicate that 
+   the pixel is "usable but not yet checked". */
    pa = ipa;
    pd = array;
    for( iz = 1; iz <= dims[ 2 ]; iz++ ) {
       for( iy = 1; iy <= dims[ 1 ]; iy++ ) {
          for( ix = 1; ix <= dims[ 0 ]; ix++, pa++, pd++ ) {
-            if( ix == 1 || ix == dims[ 0 ] ) {
-               *pa = -1;
-   
-            } else if( ndim > 1 && ( iy == 1 || iy == dims[ 1 ] ) ) {
-               *pa = -1;
-   
-            } else if( ndim > 2 && ( iz == 1 || iz == dims[ 2 ] ) ) {
-               *pa = -1;
-
-            } else if( *pd == CGEN_BAD ){
+            if( *pd == CGEN_BAD ){
                *pa = -1;
 
             } else if( *pd <= noise ){
@@ -445,37 +442,69 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
                      nzero = perspectrum ? 2 : 3 - ndim;
 
 /* Check the 3x3x3 cube of neighbouring pixels, and determine the one
-   with the highest gradient. */
+   with the highest gradient. We check them in "fortran order". Initialise 
+   the grid indices at the first ("bottom left") pixel of the 3x3x3 cube. */
                      ixoff = iix - xlim/2;
                      iyoff = iiy - ylim/2;
                      izoff = iiz - zlim/2;
 
+/* Initialise the grid coords and vector index of the pixel with the
+   highest gradient. */
                      nix = 0;
                      niy = 0;
                      niz = 0;
                      nv = 0;
 
+/* Initialise the vector index of the first pixel in the box. **/
                      jvz = iv - skip0;
-                     for( jz = 0; jz < zlim; jz++ ) {
+
+/* Initialise the grid index on the 3rd axis of the first pixel. */
+                     miz = izoff;
+
+/* Loop round all Z planes in the 3x3x3 cube, updating the Z grid index
+   of the pixel being tested (miz) on each pass. */
+                     for( jz = 0; jz < zlim; jz++,miz++ ) {
+
+/* Determine if the current Z plane is within the bounds of the data
+   array. */
+                        zon = ( miz >= 1 && miz <= dims[ 2 ] );
+
+/* Initialise the vector index, and the grid index on the 2nd axis, of the 
+   first pixel in the current Z plane. Then loop round all Y rows in the 
+   current Z plane. */
                         jvy = jvz;
-                        for( jy = 0; jy < ylim; jy++ ) {
+                        miy = iyoff;
+                        for( jy = 0; jy < ylim; jy++,miy++ ) {
+
+/* Determine if the current Y row is within the bounds of the data
+   array. */
+                           yon = zon && ( miy >= 1 && miy <= dims[ 1 ] );
+
+/* Initialise the vector index, and the grid index on the 1st, of the 
+   first column in the current Y row. Then loop round all X columns in the 
+   current Y row. */
                            jvx = jvy;
-                           for( jx = 0; jx < xlim; jx++ ) {
+                           mix = ixoff;
+                           for( jx = 0; jx < xlim; jx++,mix++ ) {
 
-/* Ignore unusable pixels (which includes edge pixels), but not pixels which 
-   have already been assigned to another clump. Also skip the central pixel 
-   (for which nzero is 3). Find the gradient to this neighbour. If it is the 
-   largest found so far, record its vector index and GRID coords. */
-                              if( work[ jvx ] >= 0 && nzero < 3 ) {
-                                 g = ( (double) array[ jvx ] - h )/dist[ nzero ];
-                                 if( g > maxg ) {
-                                    maxg = g;
-                                    nv = jvx;
+/* Ignore pixels that are not within the bounds of the data array. */
+                              if( yon && mix >= 1 && mix <= dims[ 0 ] ) {
 
-                                    nix = ixoff + jx;
-                                    niy = iyoff + jy;
-                                    niz = izoff + jz;
-
+/* Ignore unusable pixels but not pixels which have already been assigned 
+   to another clump. Also skip the central pixel (for which nzero is 3). 
+   Find the gradient to this neighbour. If it is the largest found so far, 
+   record its vector index and GRID coords. */
+                                 if( work[ jvx ] >= 0 && nzero < 3 ) {
+                                    g = ( (double) array[ jvx ] - h )/dist[ nzero ];
+                                    if( g > maxg ) {
+                                       maxg = g;
+                                       nv = jvx;
+   
+                                       nix = mix;
+                                       niy = miy;
+                                       niz = miz;
+   
+                                    }
                                  }
                               }
 
@@ -511,12 +540,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 /* If there is no upward route from the current pixel, (i.e. if it is a
    local maximum), we check the slightly more extended neighbourhood for 
    a higher pixel. We do this because a local maximum could be just a
-   noise spike. In these loops, we need to check that the neighbouring
-   pixel is not off the edge of the data array - the fact that the edge
-   pixels are bad and thus will never be used as the central pixel does
-   not in this case prevent the neighbourhood from extending over the
-   edge of the image, due to the fact that the neighbourhood is larger 
-   than 3x3x3. */
+   noise spike. */
                      if( maxg <= 0 ) {
 
                         msgSeti( "P", iix + slbnd[ 0 ] - 1 );
