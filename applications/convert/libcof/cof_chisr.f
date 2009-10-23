@@ -98,6 +98,10 @@
 *        line is created.
 *     2009 October 16 (MJC):
 *        Added Group heading to the list of records not indented.
+*     2009 October 22 (MJC):
+*        Allow for more than one Group heading, and for multiple
+*        headings in the buffer extracted from a history paragraph.
+*        There may still be other special cases.
 *     {enter_further_changes_here}
 
 *-
@@ -152,6 +156,7 @@
       CHARACTER*80 CARD          ! FITS header card
       CHARACTER*( DAT__SZLOC ) CLOC ! Locator to a character component
       INTEGER CPHEAD             ! Character position of heading
+      INTEGER CPHED2             ! Character position of second heading
       INTEGER CRCOL              ! Column where "Current record:" begins
       CHARACTER*( NDF__SZHDT ) CREATD ! History creation date
       LOGICAL CRETEX             ! Create TEXT component in a record?
@@ -166,6 +171,7 @@
       CHARACTER*4 IC             ! Record number
       INTEGER IARG               ! Index of "Arguments:" heading
       INTEGER IGRP               ! Index of "Group:" heading
+      INTEGER IGRP2              ! Index of second "Group:" heading
       INTEGER IPAR               ! Index of "Parameters:" heading
       INTEGER IREC               ! Loop counter for history records
       INTEGER ISOF               ! Index of "Software:" heading
@@ -173,6 +179,7 @@
       INTEGER KINDEX             ! Keyword index
       CHARACTER*8 KEYWRD         ! FITS keyword
       CHARACTER*( DAT__SZLOC ) LOC ! Locator to NDF
+      INTEGER LWIDTH             ! Width of line to write to history
       INTEGER LSTAT              ! Local status value
       LOGICAL MAKHIS             ! Make HISTORY structure?
       CHARACTER*( NDF__SZHUM ) MODE ! Update mode
@@ -500,7 +507,7 @@
                            CRETEX = .FALSE.
                         END IF
 
-*  Convert the text into paragraphs of WIDTH characters.
+*  Convert the text into paragraphs of up to WIDTH characters.
                         TEXCOL = 1
   160                   CONTINUE     ! Start of DO WHILE loop
 
@@ -509,7 +516,7 @@
                         IF ( TEXCOL .NE. 0 .AND.
      :                       STATUS .EQ. SAI__OK ) THEN
 
-*  Text in paragrapgh is indented, except for the first line of the
+*  Text in paragraph is indented, except for the first line of the
 *  paragraph, or for lines starting with a heading.
                            BUF = PARAGR( TEXCOL:TEXCOL + WIDTH - 1 )
                            IARG = CHR_INDEX( BUF, 'Arguments:' )
@@ -517,22 +524,61 @@
                            IPAR = CHR_INDEX( BUF, 'Parameters:' )
                            ISOF = CHR_INDEX( BUF, 'Software:' )
 
+*  Need to allow for short text after a heading, where more than
+*  one heading exists within the allowed paragraph width.  First find
+*  the first heading, so want to find the minimum positive offset.  If
+*  we add more headings make IARG, IGRP etc. an array.
+                            CPHEAD = WIDTH
+                            IF ( IARG .GT. 0 ) 
+     :                        CPHEAD = MIN( CPHEAD, IARG )
+                            IF ( IGRP .GT. 0 )
+     :                        CPHEAD = MIN( CPHEAD, IGRP )
+                            IF ( IPAR .GT. 0 )
+     :                        CPHEAD = MIN( CPHEAD, IPAR )
+                            IF ( ISOF .GT. 0 )
+     :                        CPHEAD = MIN( CPHEAD, ISOF )
+
+*  If the heading is short there may be a later heading within the
+*  allowed width.  Only want to extract up to but not including the 
+*  second heading.  Note successive Group headings may appear.
+                            CPHED2 = MAX( IARG, IGRP, IPAR, ISOF )
+                            IGRP2 = CHR_INDEX( BUF( IGRP + 1: ),
+     :                                         'Group:' )
+                            IF ( IGRP2 .GT. 0 ) THEN
+                               LWIDTH = IGRP2 - 1
+                            ELSE IF ( CPHED2 .GT. CPHEAD ) THEN
+                               LWIDTH = MIN( CPHED2 - 1, WIDTH )
+                            ELSE
+                               LWIDTH = WIDTH
+                            END IF
+
 *  First line of paragraph, hence no indentation.
                            IF ( IREC .EQ. 0 ) THEN
                               CALL CHR_PFORM( 1, PARAGR, .FALSE.,
-     :                                        TEXCOL, TEXT( :WIDTH ) )
+     :                                        TEXCOL, TEXT( :LWIDTH ) )
 
 *  A heading would fit in the next output line.
                            ELSE IF ( IARG .GT. 0 .OR. IGRP .GT. 0 .OR.
      :                               IPAR .GT. 0 .OR. ISOF .GT. 0 ) THEN
-                              CPHEAD = MAX( IARG, IGRP, IPAR, ISOF )
 
 *  The heading is at the current paragraph position.  So treat it like
 *  the first line.
                               IF ( CPHEAD .EQ. 1 ) THEN
                                  CALL CHR_PFORM( 1, PARAGR, .FALSE., 
      :                                           TEXCOL,
-     :                                           TEXT( :WIDTH ) )
+     :                                           TEXT( :LWIDTH ) )
+
+*  It seems with Group that a leading space appears that prevents the
+*  Group heading from not being indented.  So shift the current index 
+*  within the paragraph pointer by one to skip over the space.  Then 
+*  index of the heading will be one and indented correctly.  It has
+*  no affect when it's a continuation (indented) line, as leading spaces
+*  are expected and removed.  Note we must not change TEXCOL, when
+*  CHR_PFORM returns it as zero, since this indicates that the
+*  paragraph has ended, and it is time to move on to the next HISTORY
+*  record.
+                                 IF ( TEXCOL .NE. 0 ) 
+     :                             TEXCOL = TEXCOL + 1
 
 *  Just transfer up to but excluding the heading, indenting the regulation 
 *  three characters.  Shift the position within paragraph to be at the
@@ -550,7 +596,18 @@
                                  IGRP = CHR_INDEX( BUF, 'Group:' )
                                  IPAR = CHR_INDEX( BUF, 'Parameters:' )
                                  ISOF = CHR_INDEX( BUF, 'Software:' )
-                                 CPHEAD = MAX( IARG, IPAR, ISOF )
+
+*  Again find the first heading.
+                                 CPHEAD = WIDTH
+                                 IF ( IARG .GT. 0 )
+     :                             CPHEAD = MIN( CPHEAD, IARG )
+                                 IF ( IGRP .GT. 0 )
+     :                             CPHEAD = MIN( CPHEAD, IGRP )
+                                 IF ( IPAR .GT. 0 )
+     :                             CPHEAD = MIN( CPHEAD, IPAR )
+                                 IF ( ISOF .GT. 0 )
+     :                             CPHEAD = MIN( CPHEAD, ISOF )
+
                                  CALL CHR_APPND( BUF( :CPHEAD - 1 ),
      :                                           TEXT, BCOL )
                               END IF
@@ -559,7 +616,7 @@
                            ELSE
                               TEXT = ' '
                               CALL CHR_PFORM( 1, PARAGR, .FALSE.,
-     :                                        TEXCOL, TEXT( 4:WIDTH ) )
+     :                                        TEXCOL, TEXT( 4:LWIDTH ) )
                            END IF
 
 *  Increment the text line counter, and extend the TEXT component.
@@ -569,7 +626,7 @@
 *  Get a locator to the cell and write the history record.
                            CALL DAT_CELL( TLOC, 1, JREC, TELOC,
      :                                    STATUS )
-                           CALL DAT_PUT0C( TELOC, TEXT( :WIDTH ),
+                           CALL DAT_PUT0C( TELOC, TEXT( :LWIDTH ),
      :                                     STATUS )
 
 *  Release the locator to the TEXT element.
