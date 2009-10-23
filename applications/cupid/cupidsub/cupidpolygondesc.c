@@ -3,6 +3,7 @@
 #include "ast.h"
 #include "cupid.h"
 #include <string.h>
+#include <math.h>
 
 AstRegion *cupidPolygonDesc( double *ipd, int velax, double *peak,
                              int space_axes[ 2 ], int ndim, int *lbnd, 
@@ -100,6 +101,8 @@ AstRegion *cupidPolygonDesc( double *ipd, int velax, double *peak,
 *        For 3D data, use the largest pixel in the mask as the inside point, 
 *        not the peak (since the peak can get trimmed of if it is at the 
 *        edge of the clump, causing astOutline to fail).
+*     22-OCT-2009 (DSB):
+*        Correct conversion from 2D pixel coords to pixel indices.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -171,8 +174,8 @@ AstRegion *cupidPolygonDesc( double *ipd, int velax, double *peak,
          }
 
 /* Store the pixel indices of the clump peak. */
-         inside[ 0 ] = (int)( peak[ space_axes[ 0 ] ] + 1.0 );
-         inside[ 1 ] = (int)( peak[ space_axes[ 1 ] ] + 1.0 );
+         inside[ 0 ] = (int)floor( peak[ space_axes[ 0 ] ] + 1.0 );
+         inside[ 1 ] = (int)floor( peak[ space_axes[ 1 ] ] + 1.0 );
 
 /* If the data is 3D, we need to collapse the supplied 3D mask array along 
    the spectral axis to get a 2D mask. */
