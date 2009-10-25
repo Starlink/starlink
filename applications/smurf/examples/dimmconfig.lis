@@ -149,3 +149,6 @@ ext.tausrc    =wvmraw
 ext.taumethod =adaptive
 #ext.csotau    = 0.2
 #ext.filtertau = 0.2
+
+# Use the GAIn/COMmon mode to re-calculate the flatfield?
+#gai.flatfield = 1

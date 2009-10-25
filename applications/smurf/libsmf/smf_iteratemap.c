@@ -198,6 +198,9 @@
 *          good bolos (to enable single-detector maps)
 *        - don't try to weight data at map-making stage if no noise estimate
 *          is available
+*     2009-10-25 (EC):
+*        Add back in option of using common-mode to flatfield data; need to
+*        invert the GAIn once per iteration.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -1305,6 +1308,16 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
             /*** TIMER ***/
             msgOutiff( MSG__DEBUG, "", FUNC_NAME
                        ": ** %f s undoing EXT",
+                       status, smf_timerupdate(&tv1,&tv2,status) );
+
+            if( havegai ) {
+              smf_calcmodel_gai( wf, &dat, i, keymap, model[whichgai],
+                                 SMF__DIMM_INVERT, status );
+            }
+
+            /*** TIMER ***/
+            msgOutiff( MSG__DEBUG, "", FUNC_NAME
+                       ": ** %f s undoing GAI",
                        status, smf_timerupdate(&tv1,&tv2,status) );
 
             /* Close files if memiter not set */

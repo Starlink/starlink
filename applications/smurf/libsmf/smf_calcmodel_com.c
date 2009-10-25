@@ -93,6 +93,8 @@
 *        common mode, and fitting common mode template to all the bolos.
 *     2009-09-30 (EC)
 *        Measure normalized change in model between iterations (dchisq)
+*     2009-10-25 (EC)
+*        Add back in option of using commod-mode to flatfield data
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -144,6 +146,7 @@ typedef struct smfCalcmodelComData {
   double *gai_data;        /* pointer to gain model (can be NULL) data */
   size_t gbstride;         /* gain bolo stride */
   size_t gcstride;         /* gain coefficient stride */
+  int gflat;               /* correct flatfield using GAI */
   dim_t idx;               /* Index within subgroup */
   int ijob;                /* Job identifier */
   unsigned char mask_cor;  /* Ignore quality mask for correction */
@@ -170,6 +173,7 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
   double *gai_data;        /* pointer to gain model (can be NULL) data */
   size_t gbstride;         /* gain bolo stride */
   size_t gcstride;         /* gain coefficient stride */
+  int gflat;               /* correct flatfield using GAI */
   size_t i;                /* Loop counter */
   dim_t idx;               /* Index within subgroup */
   size_t j;                /* Loop counter */
@@ -204,6 +208,7 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
   gai_data = pdata->gai_data;
   gbstride = pdata->gbstride;
   gcstride = pdata->gcstride;
+  gflat = pdata->gflat;
   idx = pdata->idx;
   mask_cor = pdata->mask_cor;
   mask_meas = pdata->mask_meas;
@@ -248,7 +253,12 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
 
         /* Put the last iteration back in */
         if( !(qua_data[i*tstride+j*bstride]&mask_cor) ) {
-          res_data[i*tstride+j*bstride] += g*lastmean+off;
+          if( gflat ) {
+
+          } else {
+            /* Add scaled template  back on */
+            res_data[i*tstride+j*bstride] += g*lastmean+off;
+          }
         }
       }
     }
@@ -368,6 +378,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   double *corr=NULL;            /* Array to hold correlation coefficients */
   double csig;                  /* standard deviation "                  */
   double *gcoeff=NULL;          /* Array to hold gain coefficients */
+  int gflat=0;                  /* If set use GAIn to adjust flatfield */
   dim_t ggood;                  /* Number of good gain. coeff. samples */
   double gmean;                 /* mean of common-mode correlation gain */
   double gsig;                  /* standard deviation "                  */
@@ -378,6 +389,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   double **gai_data_copy=NULL;  /* copy of gai_data for all subarrays */
   size_t gbstride;              /* GAIn bolo stride */
   size_t gcstride;              /* GAIn coeff stride */
+  AstKeyMap *gkmap=NULL;        /* Local GAIn keymap */
   dim_t i;                      /* Loop counter */
   int ii;                       /* Loop counter */
   dim_t idx=0;                  /* Index within subgroup */
@@ -425,6 +437,11 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   /* Obtain pointer to sub-keymap containing COM parameters */
   if( !astMapGet0A( keymap, "COM", &kmap ) ) {
     kmap = NULL;
+  }
+
+  /* Obtain pointer to sub-keymap containing GAI parameters */
+  if( !astMapGet0A( keymap, "GAI", &gkmap ) ) {
+    gkmap = NULL;
   }
 
   /* Obtain pointers to relevant smfArrays for this chunk */
@@ -487,7 +504,19 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
   if( do_boxcar ) {
     msgSeti("BOX",boxcar);
-    msgOutif(MSG__VERB, " ", "    boxcar width ^BOX",status);
+    msgOutif(MSG__VERB, " ", "    boxcar width ^BOX", status);
+  }
+
+  /* Are we using gains to adjust the flatfield? */
+  if( gkmap ) {
+    astMapGet0I( gkmap, "FLATFIELD", &gflat );
+
+    /* If gflat specified but no GAI model, warn user */
+    if( gflat && !(dat->gai) ) {
+      msgOut( "", FUNC_NAME
+              ": *** WARNING: GAI.FLATFIELD set but GAI not part of MODELORDER",
+              status);
+    }
   }
 
   /* Assert bolo-ordered data */
@@ -623,6 +652,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         pdata->gai_data = gai_data;
         pdata->gbstride = gbstride;
         pdata->gcstride = gcstride;
+        pdata->gflat = gflat;
         pdata->idx = idx;
         pdata->mask_cor = mask_cor;
         pdata->mask_meas = mask_meas;
@@ -687,6 +717,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         pdata->gai_data = gai_data;
         pdata->gbstride = gbstride;
         pdata->gcstride = gcstride;
+        pdata->gflat = gflat;
         pdata->idx = idx;
         pdata->mask_cor = mask_cor;
         pdata->mask_meas = mask_meas;
@@ -767,6 +798,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
           pdata->gai_data = gai_data;
           pdata->gbstride = gbstride;
           pdata->gcstride = gcstride;
+          pdata->gflat = gflat;
           pdata->idx = idx;
           pdata->mask_cor = mask_cor;
           pdata->mask_meas = mask_meas;
@@ -908,18 +940,27 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
           g = gai_data[i*gbstride];
           gcopy = gai_data_copy[idx][i*gbstride];
 
-          if( (g!=VAL__BADD) && (g!=0) ){
+          if( (g!=VAL__BADD) && (g!=0) ) {
             off = gai_data[i*gbstride+gcstride];
             offcopy = gai_data_copy[idx][i*gbstride+gcstride];
 
             /* Remove the template */
             for( j=0; j<ntslice; j++ ) {
               if( !(qua_data[i*bstride + j*tstride]&mask_cor) ) {
-                res_data[i*bstride+j*tstride] -= (g*model_data[j] + off);
+
+                if( gflat ) {
+                  /* If correcting the flatfield, scale data to match
+                     template amplitude first, then remove */
+                  res_data[i*bstride+j*tstride] =
+                    (res_data[i*bstride+j*tstride] - off)/g - model_data[j];
+                } else {
+                  /* Subtract scaled template off data */
+                  res_data[i*bstride+j*tstride] -= (g*model_data[j] + off);
+                }
 
                 /* also measure contribution to dchisq */
-                if( noi && 
-                    (noi_data[i*noibstride+(j%nointslice)*noitstride] != 0) ) {
+                if( noi &&
+                    (noi_data[i*noibstride+(j%nointslice)*noitstride] != 0)) {
 
                   dchisq += ((g*model_data[j] + off) -
                              (gcopy*model_data_copy[j] + offcopy)) *
@@ -930,6 +971,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
                 }
               }
             }
+
           } else {
             *status = SAI__ERROR;
             msgSeti("BOLO",i);
@@ -977,4 +1019,5 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   }
 
   if( kmap ) kmap = astAnnul( kmap );
+  if( gkmap ) gkmap = astAnnul( gkmap );
 }

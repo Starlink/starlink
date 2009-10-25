@@ -50,11 +50,13 @@
 *        Initial Version
 *     2008-12-12 (EC):
 *        Add inverse capability
+*     2009-10-25 (EC):
+*        Only invert if common-mode being used to flatfield data
 *     {enter_further_changes_here}
 
 
 *  Copyright:
-*     Copyright (C) 2008 University of British Columbia.
+*     Copyright (C) 2008-2009 University of British Columbia.
 *
 *     All Rights Reserved.
 
@@ -101,9 +103,11 @@ void smf_calcmodel_gai( smfWorkForce *wf __attribute__((unused)),
   size_t bstride;               /* bolometer stride */
   size_t gbstride;              /* GAIn bolo stride */
   size_t gcstride;              /* GAIn coeff stride */
+  int gflat=0;                  /* correct flatfield using GAI */
   dim_t i;                      /* Loop counter */
   dim_t idx=0;                  /* Index within subgroup */
   dim_t j;                      /* Loop counter */
+  AstKeyMap *kmap=NULL;         /* Local GAIn keymap */
   unsigned char mask;           /* Bitmask for quality */
   smfArray *model=NULL;         /* Pointer to model at chunk */
   double *model_data=NULL;      /* Pointer to DATA component of model */
@@ -120,6 +124,16 @@ void smf_calcmodel_gai( smfWorkForce *wf __attribute__((unused)),
   /* Main routine */
   if( *status != SAI__OK ) return;
   if( !(flags&SMF__DIMM_INVERT) ) return;
+
+  /* Obtain pointer to sub-keymap containing GAI parameters */
+  if( astMapGet0A( keymap, "GAI", &kmap ) ) {
+    astMapGet0I( kmap, "FLATFIELD", &gflat );
+  }
+
+  /* Only have to do something if gai.flatfield set */
+  if( !gflat ) {
+    goto L998;
+  }
 
   /* Obtain pointers to relevant smfArrays for this chunk */
   res = dat->res[chunk];
@@ -158,7 +172,7 @@ void smf_calcmodel_gai( smfWorkForce *wf __attribute__((unused)),
       /* Undo the gain correction stored in GAI */
       for( i=0; i<nbolo; i++ ) {
         if( !(qua_data[i*bstride]&SMF__Q_BADB) && (model_data[i*gbstride]>0) ) {
-          scale = 1./model_data[i*gbstride];
+          scale = model_data[i*gbstride];
           for( j=0; j<ntslice; j++ ) {
             if( !(qua_data[i*bstride + j*tstride]&mask) ) {
               res_data[i*bstride + j*tstride] *= scale;
@@ -168,4 +182,9 @@ void smf_calcmodel_gai( smfWorkForce *wf __attribute__((unused)),
       }
     }
   }
+
+ L998:
+
+  /* Clean up */
+  if( kmap ) kmap = astAnnul( kmap );
 }
