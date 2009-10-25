@@ -13,7 +13,7 @@
 *     C function
 
 *  Invocation:
-*     smf_rebinmap1( smfData *data, smfData *variance, int *lut, 
+*     smf_rebinmap1( smfData *data, smfData *variance, int *lut,
 *                    unsigned char *qual, unsigned char mask,
 *                    int sampvar, int flags, double *map,
 *                    double *mapweight, unsigned int *hitsmap,
@@ -41,17 +41,17 @@
 *     int sampvar (Given)
 *        If set, calculate mapvar from the (weighted) sample variance of data
 *        that land in the pixel. Otherwise a theoretical variance is calculated
-*        by propagating the variance on each sample into the pixel. 
+*        by propagating the variance on each sample into the pixel.
 *     int flags (Given)
 *        Flags to control the rebinning process (see astRebin flags)
 *     map = double* (Returned)
-*        The output map array 
+*        The output map array
 *     mapweight = double* (Returned)
-*        Relative weighting for each pixel in map. 
+*        Relative weighting for each pixel in map.
 *     hitsmap = unsigned int* (Returned)
 *        Number of samples that land in a pixel.
 *     mapvar = double* (Returned)
-*        Variance of each pixel in map 
+*        Variance of each pixel in map
 *     msize = dim_t (Given)
 *        Number of pixels in map
 *     scalevariance = double* (Returned)
@@ -63,10 +63,10 @@
 *        Pointer to global status.
 
 *  Description:
-*     This function does a simple regridding of data into a map. If a 
+*     This function does a simple regridding of data into a map. If a
 *     variance array is supplied it is used to calculate weights. Optionally
 *     return a hitsmap (number of samples that land in a pixel).
-*     
+*
 *  Authors:
 *     Edward Chapin (UBC)
 *     {enter_new_authors_here}
@@ -81,7 +81,7 @@
 *     2008-04-03 (EC):
 *        - Added QUALITY to interface
 *     2008-04-23 (EC):
-*        Added sample variance calculation 
+*        Added sample variance calculation
 *     2008-04-29 (EC):
 *        Flag map/weight/variance pixels with < SMF__MINSTATSAMP hits as bad
 *     2008-07-03 (EC):
@@ -93,7 +93,7 @@
 *  Notes:
 *     If the variance map is calculated from the scatter of data in each pixel,
 *     rather than using the Gaussian error propagation formula, the expression
-*     used is:   
+*     used is:
 *                  sigma^2 =  sum(w_i)*sum(w_i*x_i^2) - [sum(w_i*x_i)]^2
 *                             ------------------------------------------
 *                                          N*[sum(w_i)]^2
@@ -144,11 +144,11 @@
 
 #define FUNC_NAME "smf_rebinmap1"
 
-void smf_rebinmap1( smfData *data, smfData *variance, int *lut, 
-                    unsigned char *qual, unsigned char mask, 
-                    int sampvar, int flags, double *map, 
-                    double *mapweight, unsigned int *hitsmap, 
-                    double *mapvar, dim_t msize, double *scalevariance, 
+void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
+                    unsigned char *qual, unsigned char mask,
+                    int sampvar, int flags, double *map,
+                    double *mapweight, unsigned int *hitsmap,
+                    double *mapvar, dim_t msize, double *scalevariance,
                     int *status ) {
 
   /* Local Variables */
@@ -170,7 +170,7 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
   dim_t vnbolo;              /* number of bolos in variance */
   dim_t vntslice;            /* number of bolos in variance */
   size_t vtstride;           /* tstride of variance */
-  
+
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -178,36 +178,36 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
   /* Check inputs */
   if( !data || !map || !lut || !mapweight || !mapvar || !hitsmap ) {
     *status = SAI__ERROR;
-    errRep(" ", FUNC_NAME ": Null inputs", status ); 
+    errRep(" ", FUNC_NAME ": Null inputs", status );
     return;
   }
 
   if( !data->pntr[0] ) {
     *status = SAI__ERROR;
-    errRep(" ", FUNC_NAME ": supplied data is empty", status ); 
+    errRep(" ", FUNC_NAME ": supplied data is empty", status );
     return;
-  } 
+  }
 
   dat = data->pntr[0];
-  smf_get_dims( data, NULL, NULL, &nbolo, &ntslice, &dsize, &dbstride, 
+  smf_get_dims( data, NULL, NULL, &nbolo, &ntslice, &dsize, &dbstride,
                 &dtstride, status );
 
   if( variance ) {
     var = variance->pntr[0];
-    smf_get_dims( variance, NULL, NULL, &vnbolo, &vntslice, NULL, &vbstride, 
+    smf_get_dims( variance, NULL, NULL, &vnbolo, &vntslice, NULL, &vbstride,
                   &vtstride, status );
 
     /* Check that the variance dimensions are compatible with data */
     if( (vnbolo != nbolo) || ( (vntslice>1) && (vntslice!=ntslice) ) ) {
       *status = SAI__ERROR;
-      errRep(" ", FUNC_NAME ": variance dimensions incompatible with data", 
-             status ); 
+      errRep(" ", FUNC_NAME ": variance dimensions incompatible with data",
+             status );
       return;
     }
   }
 
   /* If this is the first data to be accumulated zero the arrays */
-  if( flags & AST__REBININIT ) { 
+  if( flags & AST__REBININIT ) {
     memset( map, 0, msize*sizeof(*map) );
     memset( mapweight, 0, msize*sizeof(*mapweight) );
     memset( mapvar, 0, msize*sizeof(*mapvar) );
@@ -218,7 +218,7 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
     /* Accumulate data and weights in the case that variances are given*/
 
     if( sampvar ) {
-      /* Measure weighted sample variance for varmap */      
+      /* Measure weighted sample variance for varmap */
       if( qual ) {       /* QUALITY checking version */
 	for( i=0; i<nbolo; i++ ) {
           if( !(qual[i*dbstride]&SMF__Q_BADB) ) for( j=0; j<ntslice; j++ ) {
@@ -230,7 +230,7 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
             if( (lut[di] != VAL__BADI) && !(qual[di]&mask) && (var[vi] != 0) ){
               thisweight = 1/var[vi];
               map[lut[di]] += thisweight*dat[di];
-              mapweight[lut[di]] += thisweight;  	    
+              mapweight[lut[di]] += thisweight;
               hitsmap[lut[di]] ++;
 
               /* Calculate this sum to estimate E(x^2) */
@@ -238,7 +238,7 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
             }
           }
 	}
-      } else {           /* VAL__BADD checking version */	
+      } else {           /* VAL__BADD checking version */
 	for( i=0; i<nbolo; i++ ) {
           for( j=0; j<ntslice; j++ ) {
 
@@ -246,14 +246,14 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
             vi = i*vbstride + (j%vntslice)*vtstride;
 
             /* Check that the LUT, data and variance values are valid */
-            if( (lut[di] != VAL__BADI) && (dat[di] != VAL__BADD) && 
-                (var[vi] != VAL__BADD) && (var[vi] != 0) ) {        
-              
+            if( (lut[di] != VAL__BADI) && (dat[di] != VAL__BADD) &&
+                (var[vi] != VAL__BADD) && (var[vi] != 0) ) {
+
               thisweight = 1/var[vi];
               map[lut[di]] += thisweight*dat[di];
-              mapweight[lut[di]] += thisweight;  	    
+              mapweight[lut[di]] += thisweight;
               hitsmap[lut[di]] ++;
-              
+
               /* Calculate this sum to estimate E(x^2) */
               mapvar[lut[di]] += thisweight*dat[di]*dat[di];
             }
@@ -275,12 +275,12 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
             if( (lut[di] != VAL__BADI) && !(qual[di]&mask) && (var[vi] != 0) ){
               thisweight = 1/var[vi];
               map[lut[di]] += thisweight*dat[di];
-              mapweight[lut[di]] += thisweight;  	    
+              mapweight[lut[di]] += thisweight;
               hitsmap[lut[di]] ++;
             }
           }
         }
-      } else {           /* VAL__BADD checking version */	
+      } else {           /* VAL__BADD checking version */
 	for( i=0; i<nbolo; i++ ) {
           for( j=0; j<ntslice; j++ ) {
 
@@ -288,11 +288,11 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
             vi = i*vbstride + (j%vntslice)*vtstride;
 
             /* Check that the LUT, data and variance values are valid */
-            if( (lut[di] != VAL__BADI) && (dat[di] != VAL__BADD) && 
-                (var[vi] != VAL__BADD) && (var[vi] != 0) ) {        
+            if( (lut[di] != VAL__BADI) && (dat[di] != VAL__BADD) &&
+                (var[vi] != VAL__BADD) && (var[vi] != 0) ) {
               thisweight = 1/var[vi];
               map[lut[di]] += thisweight*dat[di];
-              mapweight[lut[di]] += thisweight;  	    
+              mapweight[lut[di]] += thisweight;
               hitsmap[lut[di]] ++;
             }
           }
@@ -331,15 +331,15 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
   }
 
   /* If this is the last data to be accumulated re-normalize */
-  if( flags & AST__REBINEND ) { 
+  if( flags & AST__REBINEND ) {
 
     if( sampvar || !var ) {
       /* Variance also needs re-normalization in sampvar case */
-      
+
       scaleweight=0;
       scalevar=0;
 
-      for( i=0; i<msize; i++ ) {      
+      for( i=0; i<msize; i++ ) {
         if( !mapweight[i] ) {
           /* If 0 weight set pixels to bad */
           mapweight[i] = VAL__BADD;
@@ -371,7 +371,7 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
       /* Re-normalize scalevar */
       if( scaleweight ) {
         scalevar /= scaleweight;
-        
+
         if( scalevariance ) {
           *scalevariance = scalevar;
         }
@@ -380,8 +380,8 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
     } else {
       /* Re-normalization for error propagation case */
 
-      for( i=0; i<msize; i++ ) {      
-	if( !mapweight[i] ) { 
+      for( i=0; i<msize; i++ ) {
+	if( !mapweight[i] ) {
 	  /* If 0 weight set pixels to bad */
 	  mapweight[i] = VAL__BADD;
 	  map[i] = VAL__BADD;
