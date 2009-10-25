@@ -304,16 +304,21 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
        the variance map is always estimated from the sample variance */
 
     if( qual ) {       /* QUALITY checking version */
-      for( i=0; i<dsize; i++ ) {
-	/* Check that the LUT, data and variance values are valid */
-	if( (lut[i] != VAL__BADI) && !(qual[i]&mask) ) {
-	  map[lut[i]] += dat[i];
-	  mapweight[lut[i]] ++;
-	  hitsmap[lut[i]] ++;
+      for( i=0; i<nbolo; i++ ) {
+        if( !(qual[i*dbstride]&SMF__Q_BADB) ) for( j=0; j<ntslice; j++ ) {
 
-	  /* Calculate this sum to estimate E(x^2) */
-	  mapvar[lut[i]] += dat[i]*dat[i];
-	}
+          di = i*dbstride + j*dtstride;
+
+          /* Check that the LUT, data and variance values are valid */
+          if( (lut[di] != VAL__BADI) && !(qual[di]&mask) ) {
+            map[lut[di]] += dat[di];
+            mapweight[lut[di]] ++;
+            hitsmap[lut[di]] ++;
+
+            /* Calculate this sum to estimate E(x^2) */
+            mapvar[lut[di]] += dat[di]*dat[di];
+          }
+        }
       }
     } else {           /* VAL__BADD checking version */
       for( i=0; i<dsize; i++ ) {
