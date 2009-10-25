@@ -1416,11 +1416,9 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
             bolomask = smf_malloc( nbolo, sizeof(*bolomask), 0, status );
             double *bmapweight = NULL;
             unsigned int *bhitsmap = NULL;
-            double *bmapvar = NULL;
 
             bmapweight = smf_malloc(msize,sizeof(*bmapweight),0,status);
             bhitsmap = smf_malloc(msize,sizeof(*bhitsmap),0,status);
-            bmapvar = smf_malloc(msize,sizeof(*bmapvar),0,status);
 
             if( *status == SAI__OK ) {
               for( k=0; k<nbolo; k++ ) {
@@ -1453,7 +1451,7 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
                            name );
 
                   smf_open_newfile ( mgrp, 1, SMF__DOUBLE, 2, lbnd_out,
-                                     ubnd_out, 0, &mapdata, status );
+                                     ubnd_out, SMF__MAP_VAR, &mapdata, status );
 
                   /* Rebin the data for this single bolometer. Don't care
                      about variance weighting because all samples from
@@ -1464,7 +1462,7 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
                                  mask,
                                  1, AST__REBININIT | AST__REBINEND,
                                  mapdata->pntr[0],
-                                 bmapweight, bhitsmap, bmapvar, msize,
+                                 bmapweight, bhitsmap, mapdata->pntr[1], msize,
                                  NULL, status );
 
                   /* Set the bolo to bad quality again */
@@ -1492,7 +1490,6 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
             if( bolomask ) bolomask = smf_free( bolomask, status );
             if( bmapweight ) bmapweight = smf_free( bmapweight, status );
             if( bhitsmap ) bhitsmap = smf_free( bhitsmap, status );
-            if( bmapvar ) bmapvar = smf_free( bmapvar, status );
 
             /* Remove ast from res once again */
             for( k=0; k<dsize; k++ ) {
