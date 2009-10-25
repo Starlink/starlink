@@ -199,8 +199,10 @@
 *        - don't try to weight data at map-making stage if no noise estimate
 *          is available
 *     2009-10-25 (EC):
-*        Add back in option of using common-mode to flatfield data; need to
-*        invert the GAIn once per iteration.
+*        - Add back in option of using common-mode to flatfield data; need to
+*          invert the GAIn once per iteration.
+*        - add bolomap flag to config file (produce single-detector images)
+
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -271,6 +273,7 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
   smfGroup *astgroup=NULL;      /* smfGroup of ast model files */
   double badfrac;               /* Bad bolo fraction for flagging */
   int baseorder;                /* Order of poly for baseline fitting */
+  int bolomap=0;                /* If set, produce single bolo maps */
   size_t bstride;               /* Bolometer stride */
   double *chisquared=NULL;      /* chisquared for each chunk each iter */
   double chitol=0;              /* chisquared change tolerance for stopping */
@@ -435,6 +438,11 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
 
       /* Should temporary .DIMM files be deleted at the end? */
       astMapGet0I( keymap, "DELDIMM", &deldimm );
+    }
+
+    /* Are we going to produce single-bolo maps? */
+    if( !astMapGet0I( keymap, "BOLOMAP", &bolomap ) ) {
+      bolomap = 0;
     }
 
     /* Method to use for calculating the variance map */
@@ -1365,6 +1373,135 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
         msgOut( " ",
                 FUNC_NAME ": ****** Solution CONVERGED",
                 status);
+      }
+
+      /* Create sub-maps for each bolometer if requested. We add AST back
+         into the residual, and rebin that single for each detector that
+         is flagged as being OK */
+
+      if( bolomap && (*status == SAI__OK) ) {
+        /* Currently only support memiter=1 case */
+        if( !memiter ) {
+          msgOut( "", FUNC_NAME
+                  ": *** WARNING *** bolomap=1, but memiter=0", status );
+        } else {
+          /* Loop over subgroup index (subarray) */
+          for( idx=0; idx<res[0]->ndat; idx++ ) {
+
+            /* Pointers to everything we need */
+            ast_data = (ast[0]->sdata[idx]->pntr)[0];
+            res_data = (res[0]->sdata[idx]->pntr)[0];
+            lut_data = (lut[0]->sdata[idx]->pntr)[0];
+            qua_data = (qua[0]->sdata[idx]->pntr)[0];
+
+            smf_get_dims( res[0]->sdata[idx], NULL, NULL, &nbolo, NULL, 
+                          &dsize, &bstride, NULL, status );
+
+            /* Ignore jumps and spikes */
+            mask = ~(SMF__Q_JUMP|SMF__Q_SPIKE);
+
+            /* Add ast back into res */
+            for( k=0; k<dsize; k++ ) {
+              if( !(qua_data[k]&mask) && (ast_data[k]!=VAL__BADD) ) {
+                res_data[k] += ast_data[k];
+              }
+            }
+
+            /* Make a copy of the quality at first time slice as a good
+               bolo mask, and then set quality to SMF__Q_BADB. Later we
+               will unset BADB for one bolo at a time to make individual
+               maps. */
+
+            unsigned char *bolomask = NULL;
+            bolomask = smf_malloc( nbolo, sizeof(*bolomask), 0, status );
+            double *bmapweight = NULL;
+            unsigned int *bhitsmap = NULL;
+            double *bmapvar = NULL;
+
+            bmapweight = smf_malloc(msize,sizeof(*bmapweight),0,status);
+            bhitsmap = smf_malloc(msize,sizeof(*bhitsmap),0,status);
+            bmapvar = smf_malloc(msize,sizeof(*bmapvar),0,status);
+
+            if( *status == SAI__OK ) {
+              for( k=0; k<nbolo; k++ ) {
+                bolomask[k] = qua_data[k*bstride];
+                qua_data[k*bstride] = SMF__Q_BADB;
+              }
+
+              /* Identify good bolos in the copied mask and produce a map */
+              for( k=0; (k<nbolo)&&(*status==SAI__OK); k++ ) {
+                if( !(bolomask[k]&SMF__Q_BADB) ) {
+                  /* Set the quality back to good for this single bolometer */
+                  qua_data[k*bstride] = bolomask[k];
+
+                  /* Create a buffer for the new map ----------------------- */
+
+                  Grp *mgrp=NULL;        /* Temporary group to hold map names */
+                  smfData *mapdata=NULL; /* smfData for new map */
+                  char tmpname[GRP__SZNAM+1]; /* temp name buffer */
+
+                  smf_model_stripsuffix( res[0]->sdata[idx]->file->name,
+                                         tmpname, status );
+                  sprintf(name, "%s_map_%i_%i", tmpname,
+                          (k % res[0]->sdata[idx]->dims[1])+1,    /* x-coord */
+                          (k / res[0]->sdata[idx]->dims[1])+1 );  /* y-coord */
+
+                  mgrp = grpNew( "bolo map", status );
+                  grpPut1( mgrp, name, 1, status );
+
+                  msgOutf( "", "*** Writing single bolo map %s", status,
+                           name );
+
+                  smf_open_newfile ( mgrp, 1, SMF__DOUBLE, 2, lbnd_out,
+                                     ubnd_out, 0, &mapdata, status );
+
+                  /* Rebin the data for this single bolometer. Don't care
+                     about variance weighting because all samples from
+                     same detector are about the same. */
+
+                  smf_rebinmap1( res[0]->sdata[idx], NULL,
+                                 lut_data, qua_data,
+                                 mask,
+                                 1, AST__REBININIT | AST__REBINEND,
+                                 mapdata->pntr[0],
+                                 bmapweight, bhitsmap, bmapvar, msize,
+                                 NULL, status );
+
+                  /* Set the bolo to bad quality again */
+                  qua_data[k*bstride] = SMF__Q_BADB;
+
+                  /* Write WCS */
+                  smf_set_moving(outfset,status);
+                  ndfPtwcs( outfset, mapdata->file->ndfid, status );
+
+                  /* Clean up */
+                  if( mgrp ) grpDelet( &mgrp, status );
+                  smf_close_file( &mapdata, status );
+
+                }
+              }
+
+              /* Set quality back to its original state */
+              for( k=0; k<nbolo; k++ ) {
+                bolomask[k] = qua_data[k*bstride];
+                qua_data[k*bstride] = SMF__Q_BADB;
+              }
+            }
+
+            /* Free up memory */
+            if( bolomask ) bolomask = smf_free( bolomask, status );
+            if( bmapweight ) bmapweight = smf_free( bmapweight, status );
+            if( bhitsmap ) bhitsmap = smf_free( bhitsmap, status );
+            if( bmapvar ) bmapvar = smf_free( bmapvar, status );
+
+            /* Remove ast from res once again */
+            for( k=0; k<dsize; k++ ) {
+              if( !(qua_data[k]&mask) && (ast_data[k]!=VAL__BADD) ) {
+                res_data[k] -= ast_data[k];
+              }
+            }
+          }
+        }
       }
 
       /* Export DIMM model components to NDF files.

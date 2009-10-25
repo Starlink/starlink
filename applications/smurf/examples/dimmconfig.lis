@@ -47,6 +47,9 @@ modelorder = (com,gai,ext,ast,flt,noi)
 exportndf = 0
 #exportndf = (com,ast,flt,res,noi,qua)
 
+# Create single-beam maps in addition to main map?
+
+#bolomap = 1
 
 # ----------------------------------------------------------------------------
 # The following parameters control data-cleaning before iterations start
