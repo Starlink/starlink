@@ -134,7 +134,7 @@ dks.boxcar = 100
 
 # iterative filter.
 flt.filt_edgehigh = 0.1
-flt.filt_edgelow = 90
+#flt.filt_edgelow = 90
 #flt.filt_notchlow  = (25,55)
 #flt.filt_notchhigh = (35,65)
 
@@ -154,4 +154,4 @@ ext.taumethod =adaptive
 #ext.filtertau = 0.2
 
 # Use the GAIn/COMmon mode to re-calculate the flatfield?
-#gai.flatfield = 1
+gai.flatfield = 1
