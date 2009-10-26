@@ -113,6 +113,11 @@ void smf_calcmodel_gai( smfWorkForce *wf __attribute__((unused)),
   double *model_data=NULL;      /* Pointer to DATA component of model */
   dim_t nbolo;                  /* Number of bolometers */
   dim_t ndata;                  /* Number of data points */
+  smfArray *noi=NULL;           /* Pointer to NOI at chunk */
+  double *noi_data=NULL;        /* Pointer to DATA component of model */
+  size_t noibstride;            /* bolo stride for noise */
+  dim_t nointslice;             /* number of time slices for noise */
+  size_t noitstride;            /* Time stride for noise */
   dim_t ntslice;                /* Number of time slices */
   smfArray *qua=NULL;           /* Pointer to QUA at chunk */
   unsigned char *qua_data=NULL; /* Pointer to quality data */
@@ -139,6 +144,7 @@ void smf_calcmodel_gai( smfWorkForce *wf __attribute__((unused)),
   res = dat->res[chunk];
   qua = dat->qua[chunk];
   model = allmodel[chunk];
+  if(dat->noi) noi = dat->noi[chunk];
 
   /* Loop over index in subgrp (subarray) */
   for( idx=0; idx<res->ndat; idx++ ) {
@@ -152,6 +158,11 @@ void smf_calcmodel_gai( smfWorkForce *wf __attribute__((unused)),
     res_data = (res->sdata[idx]->pntr)[0];
     qua_data = (qua->sdata[idx]->pntr)[0];
     model_data = (model->sdata[idx]->pntr)[0];
+    if( noi ) {
+      smf_get_dims( noi->sdata[idx],  NULL, NULL, NULL, &nointslice,
+                    NULL, &noibstride, &noitstride, status);
+      noi_data = (double *)(noi->sdata[idx]->pntr)[0];
+    }
 
     if( (res_data == NULL) || (model_data == NULL) || (qua_data == NULL) ) {
       *status = SAI__ERROR;
@@ -169,13 +180,25 @@ void smf_calcmodel_gai( smfWorkForce *wf __attribute__((unused)),
        match mask_cor in smf_calcmodel_com!) */
       mask = ~(SMF__Q_JUMP|SMF__Q_SPIKE|SMF__Q_APOD|SMF__Q_STAT);
 
-      /* Undo the gain correction stored in GAI */
+      /* Undo the gain correction stored in GAI (the gain is applied to
+         the signal and noise in smf_calcmodel_com) */
       for( i=0; i<nbolo; i++ ) {
         if( !(qua_data[i*bstride]&SMF__Q_BADB) && (model_data[i*gbstride]>0) ) {
           scale = model_data[i*gbstride];
+
+          /* First undo the flatfield correction to the signal */
           for( j=0; j<ntslice; j++ ) {
             if( !(qua_data[i*bstride + j*tstride]&mask) ) {
               res_data[i*bstride + j*tstride] *= scale;
+            }
+          }
+
+          /* Then scale the noise. */
+          if( noi ) {
+            for( j=0; j<nointslice; j++ ) {
+              if( noi_data[i*noibstride + j*noitstride] != VAL__BADD ) {
+                noi_data[i*noibstride + j*noitstride] *= (scale*scale);
+              }
             }
           }
         }

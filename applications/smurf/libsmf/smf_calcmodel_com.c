@@ -251,14 +251,12 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
           g = 1;
         }
 
-        /* Put the last iteration back in */
         if( !(qua_data[i*tstride+j*bstride]&mask_cor) ) {
-          if( gflat ) {
-
-          } else {
-            /* Add scaled template  back on */
-            res_data[i*tstride+j*bstride] += g*lastmean+off;
-          }
+          /* Add scaled template back on. Note that this also applies
+           in the case that the common-mode was used to flatfield,
+           since the gain correction will already have been un-done in
+           a call to smf_calcmodel_gai in smf_iteratemap. */
+          res_data[i*tstride+j*bstride] += g*lastmean+off;
         }
       }
     }
@@ -934,8 +932,9 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         noi_data = (double *)(noi->sdata[idx]->pntr)[0];
       }
 
-      for( i=0; (*status==SAI__OK) && (i<nbolo); i++ )
+      for( i=0; (*status==SAI__OK) && (i<nbolo); i++ ) {
         if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {
+
           /* The gain is the amplitude of the common mode template in data */
           g = gai_data[i*gbstride];
           gcopy = gai_data_copy[idx][i*gbstride];
@@ -944,17 +943,26 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
             off = gai_data[i*gbstride+gcstride];
             offcopy = gai_data_copy[idx][i*gbstride+gcstride];
 
-            /* Remove the template */
+            /* Important: if flat-fielding data re-scale noi. May have
+               different dimensions from res. */
+            if( gflat && noi ) {
+              for( j=0; j<nointslice; j++ ) {
+                if( noi_data[i*noibstride + j*noitstride] != VAL__BADD ) {
+                  noi_data[i*noibstride + j*noitstride] /= (g*g);
+                }
+              }
+            }
+
+            /* Remove the common mode */
             for( j=0; j<ntslice; j++ ) {
               if( !(qua_data[i*bstride + j*tstride]&mask_cor) ) {
-
                 if( gflat ) {
                   /* If correcting the flatfield, scale data to match
                      template amplitude first, then remove */
                   res_data[i*bstride+j*tstride] =
                     (res_data[i*bstride+j*tstride] - off)/g - model_data[j];
                 } else {
-                  /* Subtract scaled template off data */
+                  /* Otherwise subtract scaled template off data */
                   res_data[i*bstride+j*tstride] -= (g*model_data[j] + off);
                 }
 
@@ -962,12 +970,23 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
                 if( noi &&
                     (noi_data[i*noibstride+(j%nointslice)*noitstride] != 0)) {
 
-                  dchisq += ((g*model_data[j] + off) -
-                             (gcopy*model_data_copy[j] + offcopy)) *
-                    ((g*model_data[j] + off) -
-                     (gcopy*model_data_copy[j] + offcopy)) /
-                    noi_data[i*noibstride + (j%nointslice)*noitstride];
-                  ndchisq++;
+                  if( gflat ) {
+                    /* Compare change in template + offset/g */
+                    dchisq += ( (model_data[j] + off/g) -
+                                (model_data_copy[j] + offcopy/gcopy) ) *
+                      ( (model_data[j] + off/g) -
+                        (model_data_copy[j] + offcopy/gcopy) ) /
+                      noi_data[i*noibstride + (j%nointslice)*noitstride];
+                    ndchisq++;
+                  } else {
+                    /* Otherwise scale the template and measure change*/
+                    dchisq += ((g*model_data[j] + off) -
+                               (gcopy*model_data_copy[j] + offcopy)) *
+                      ((g*model_data[j] + off) -
+                       (gcopy*model_data_copy[j] + offcopy)) /
+                      noi_data[i*noibstride + (j%nointslice)*noitstride];
+                    ndchisq++;
+                  }
                 }
               }
             }
@@ -979,6 +998,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
                    status);
           }
         }
+      }
     }
   }
 

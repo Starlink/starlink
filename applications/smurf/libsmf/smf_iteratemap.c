@@ -13,8 +13,10 @@
 *     C function
 
 *  Invocation:
+
 *     smf_iteratemap(smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
-*                    AstKeyMap *keymap, const smfArray * darks, const smfArray *bpms,
+*                    AstKeyMap *keymap, const smfArray * darks,
+*                    const smfArray *bpms,
 *                    AstFrameSet *outfset, int moving, int *lbnd_out,
 *                    int *ubnd_out, size_t maxmem, double *map,
 *                    unsigned int *hitsmap, double *mapvar, double
@@ -206,7 +208,8 @@
 *          invert the GAIn once per iteration.
 *        - add bolomap flag to config file (produce single-detector images)
 *     2009-10-25 (TIMJ):
-*        Add bolrootgrp argument to give us control of where the bolometer maps go.
+*        Add bolrootgrp argument to give us control of where the bolometer
+*        maps go.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -263,7 +266,8 @@
 #define FUNC_NAME "smf_iteratemap"
 
 void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
-                     AstKeyMap *keymap, const smfArray *darks, const smfArray *bpms,
+                     AstKeyMap *keymap, const smfArray *darks,
+                     const smfArray *bpms,
                      AstFrameSet *outfset, int moving, int *lbnd_out,
                      int *ubnd_out, size_t maxmem, double *map,
                      unsigned int *hitsmap, double *mapvar,
@@ -1310,7 +1314,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
             /* If EXTinction was applied during this iteration, AST and RES
                are currently in units of Jy. Un-do the EXTinction correction
                here so that RES is in the right units again before starting
-               the next iteration. Ditto for GAIn. */
+               the next iteration. Ditto for GAIn if the common-mode gain has
+               been used as a flatfield correction (see smf_calcmodel_com). */
 
             if( haveext ) {
               smf_calcmodel_ext( wf, &dat, i, keymap, model[whichext],
@@ -1398,7 +1403,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
             lut_data = (lut[0]->sdata[idx]->pntr)[0];
             qua_data = (qua[0]->sdata[idx]->pntr)[0];
 
-            smf_get_dims( res[0]->sdata[idx], NULL, NULL, &nbolo, NULL, 
+            smf_get_dims( res[0]->sdata[idx], NULL, NULL, &nbolo, NULL,
                           &dsize, &bstride, NULL, status );
 
             /* Ignore jumps and spikes */
@@ -1604,8 +1609,10 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
                     one_strlcat( name, "_res", SMF_PATH_MAX+1, status );
                   }
 
-                  smf_write_smfData( res[i]->sdata[idx], dat.noi[i]->sdata[idx],
-                                     qua_data, name, NULL, 0, NDF__NOID, status );
+                  smf_write_smfData( res[i]->sdata[idx],
+                                     havenoi ? dat.noi[i]->sdata[idx] : NULL,
+                                     qua_data, name, NULL, 0, NDF__NOID,
+                                     status );
                 } else {
                   msgOut( " ",
                           "SMF__ITERATEMAP: Can't export RES -- NULL filename",
