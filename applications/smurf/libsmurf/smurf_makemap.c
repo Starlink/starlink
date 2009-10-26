@@ -1417,6 +1417,8 @@ void smurf_makemap( int *status ) {
 
 
   } else if ( iterate ) {
+    Grp *bolrootgrp = NULL;
+    char tempfile[GRP__SZNAM+1];
 
     /************************* I T E R A T E *************************************/
 
@@ -1432,6 +1434,13 @@ void smurf_makemap( int *status ) {
       map = (odata->pntr)[0];
       variance = (odata->pntr)[1];
     }
+
+    /* Work out the name for the root file path if bolomaps are being created */
+    pname = tempfile;
+    grpGet( ogrp, 1, 1, &pname, sizeof(tempfile), status );
+    one_strlcat( tempfile, ".MORE.SMURF.BOLOMAPS", sizeof(tempfile), status);
+    bolrootgrp = grpNew( "bolomap root", status );
+    grpPut1( bolrootgrp, tempfile, 0, status );
 
     /* Compute number of pixels in output map */
     nxy = (ubnd_out[0] - lbnd_out[0] + 1) * (ubnd_out[1] - lbnd_out[1] + 1);
@@ -1496,9 +1505,11 @@ void smurf_makemap( int *status ) {
     }
 
     /* Call the low-level iterative map-maker */
-    smf_iteratemap( wf, igrp, keymap, NULL, bpms, outfset, moving, lbnd_out,
+    smf_iteratemap( wf, igrp, bolrootgrp, keymap, NULL, bpms, outfset, moving, lbnd_out,
                     ubnd_out, maxmem-mapmem, map, hitsmap, variance, weights,
                     status );
+
+    if( bolrootgrp ) grpDelet( &bolrootgrp, status );
 
     /* Calculate exposure time per output pixel from hitsmap */
     for (i=0; (i<nxy) && (*status == SAI__OK); i++) {

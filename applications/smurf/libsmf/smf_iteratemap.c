@@ -13,8 +13,8 @@
 *     C function
 
 *  Invocation:
-*     smf_iteratemap(smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
-*                    const smfArray * darks, const smfArray *bpms,
+*     smf_iteratemap(smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
+*                    AstKeyMap *keymap, const smfArray * darks, const smfArray *bpms,
 *                    AstFrameSet *outfset, int moving, int *lbnd_out,
 *                    int *ubnd_out, size_t maxmem, double *map,
 *                    unsigned int *hitsmap, double *mapvar, double
@@ -23,8 +23,11 @@
 *  Arguments:
 *     wf = smfWorkForce * (Given)
 *        Pointer to a pool of worker threads
-*     igrp = Grp* (Given)
+*     igrp = const Grp* (Given)
 *        Group of input data files
+*     bolrootgrp = const Grp * (Given)
+*        Root name to use for bolometer output maps (if required). Can be a
+*        path to an HDS container.
 *     keymap = AstKeyMap* (Given)
 *        keymap containing parameters to control map-maker
 *     darks = const smfArray * (Given)
@@ -202,13 +205,14 @@
 *        - Add back in option of using common-mode to flatfield data; need to
 *          invert the GAIn once per iteration.
 *        - add bolomap flag to config file (produce single-detector images)
-
+*     2009-10-25 (TIMJ):
+*        Add bolrootgrp argument to give us control of where the bolometer maps go.
 *     {enter_further_changes_here}
 
 *  Notes:
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2006-2009 University of British Columbia
 *     All Rights Reserved.
@@ -258,8 +262,8 @@
 
 #define FUNC_NAME "smf_iteratemap"
 
-void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
-                     const smfArray *darks, const smfArray *bpms,
+void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
+                     AstKeyMap *keymap, const smfArray *darks, const smfArray *bpms,
                      AstFrameSet *outfset, int moving, int *lbnd_out,
                      int *ubnd_out, size_t maxmem, double *map,
                      unsigned int *hitsmap, double *mapvar,
@@ -1429,23 +1433,24 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
               /* Identify good bolos in the copied mask and produce a map */
               for( k=0; (k<nbolo)&&(*status==SAI__OK); k++ ) {
                 if( !(bolomask[k]&SMF__Q_BADB) ) {
+                  Grp *mgrp=NULL;        /* Temporary group to hold map names */
+                  smfData *mapdata=NULL; /* smfData for new map */
+                  char tmpname[GRP__SZNAM+1]; /* temp name buffer */
+                  char thisbol[20];      /* name particular to this bolometer */
+
                   /* Set the quality back to good for this single bolometer */
                   qua_data[k*bstride] = bolomask[k];
 
                   /* Create a buffer for the new map ----------------------- */
-
-                  Grp *mgrp=NULL;        /* Temporary group to hold map names */
-                  smfData *mapdata=NULL; /* smfData for new map */
-                  char tmpname[GRP__SZNAM+1]; /* temp name buffer */
-
-                  smf_model_stripsuffix( res[0]->sdata[idx]->file->name,
-                                         tmpname, status );
-                  sprintf(name, "%s_map_%i_%i", tmpname,
-                          (k % res[0]->sdata[idx]->dims[1])+1,    /* x-coord */
-                          (k / res[0]->sdata[idx]->dims[1])+1 );  /* y-coord */
-
-                  mgrp = grpNew( "bolo map", status );
-                  grpPut1( mgrp, name, 1, status );
+                  pname = tmpname;
+                  grpGet( bolrootgrp, 1, 1, &pname, sizeof(tmpname), status );
+                  sprintf( thisbol, ".C%02luR%02lu",
+                           (k % res[0]->sdata[idx]->dims[1])+1,    /* x-coord */
+                           (k / res[0]->sdata[idx]->dims[1])+1 );  /* y-coord */
+                  one_strlcat( name, tmpname, sizeof(name), status );
+                  one_strlcat( name, thisbol, sizeof(name), status );
+                  mgrp = grpNew( "bolomap", status );
+                  grpPut1( mgrp, name, 0, status );
 
                   msgOutf( "", "*** Writing single bolo map %s", status,
                            name );
