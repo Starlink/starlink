@@ -13,15 +13,15 @@
  *     SMURF subroutine
 
  *  Invocation:
- *     smfGroup* = smf_construct_smfGroup( Grp *igrp, int **subgroups,
+ *     smfGroup* = smf_construct_smfGroup( const Grp *igrp, int **subgroups,
  *                                         size_t *chunk,
- *                                        const dim_t ngroups,
+ *                                         const dim_t ngroups,
  *                                         const dim_t nrelated,
  *                                         const int copy,
  *                                         int *status );
 
  *  Arguments:
- *     igrp = Grp* (Given)
+ *     igrp = const Grp* (Given)
  *        Input Grp to be copied
  *     subgroups = int** (Given)
  *        Pointer to array of pointers to arrays of indices into Grp
