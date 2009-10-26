@@ -1447,7 +1447,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
                   sprintf( thisbol, ".C%02luR%02lu",
                            (k % res[0]->sdata[idx]->dims[1])+1,    /* x-coord */
                            (k / res[0]->sdata[idx]->dims[1])+1 );  /* y-coord */
-                  one_strlcat( name, tmpname, sizeof(name), status );
+                  one_strlcpy( name, tmpname, sizeof(name), status );
                   one_strlcat( name, thisbol, sizeof(name), status );
                   mgrp = grpNew( "bolomap", status );
                   grpPut1( mgrp, name, 0, status );
