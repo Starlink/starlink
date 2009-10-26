@@ -602,7 +602,7 @@ smfFile *smf_construct_smfFile(smfFile * tofill, int ndfid, int isSc2store,
                                int isTstream, const char * name,
                                int * status );
 
-smfGroup *smf_construct_smfGroup( Grp *igrp, dim_t **subgroups, size_t *chunk,
+smfGroup *smf_construct_smfGroup( const Grp *igrp, dim_t **subgroups, size_t *chunk,
                                   const dim_t ngroups, const dim_t nrelated,
                                   const int copysubgroups, int *status );
 
@@ -924,7 +924,7 @@ void smf_getrefwcs( const char *param, AstFrameSet **specwcs,
 AstKeyMap *smf_groupscans( Grp *igrp,  int size, int *maxsyspop,
                            int *conform, Grp **ogrp, int *status );
 
-void smf_grp_related( Grp *igrp, const size_t grpsize, const int grpbywave,
+void smf_grp_related( const Grp *igrp, const size_t grpsize, const int grpbywave,
                       dim_t maxlen, dim_t *maxconcatlen, smfGroup **group,
                       Grp **basegrp, int *status );
 

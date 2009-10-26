@@ -118,7 +118,7 @@
 
 #define FUNC_NAME "smf_construct_smfGroup"
 
-smfGroup *smf_construct_smfGroup( Grp *igrp, dim_t **subgroups, size_t *chunk,
+smfGroup *smf_construct_smfGroup( const Grp *igrp, dim_t **subgroups, size_t *chunk,
                                   const dim_t ngroups,  const dim_t nrelated,
                                   const int copy, int *status ) {
 

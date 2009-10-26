@@ -13,12 +13,12 @@
  *     SMURF subroutine
 
  *  Invocation:
- *     smf_grp_related( Grp *igrp, const int grpsize, const int grpbywave,
+ *     smf_grp_related( const Grp *igrp, const int grpsize, const int grpbywave,
  *                      dim_t maxlen, dim_t *maxconcatlen, smfGroup **group,
  *                      Grp **basegrp, int *status );
 
  *  Arguments:
- *     igrp = Grp* (Given)
+ *     igrp = const Grp* (Given)
  *        Input Grp
  *     grpsize = const int (Given)
  *        Size of input Grp
@@ -167,7 +167,7 @@
 
 #define FUNC_NAME "smf_grp_related"
 
-void smf_grp_related(  Grp *igrp, const size_t grpsize, const int grpbywave,
+void smf_grp_related(  const Grp *igrp, const size_t grpsize, const int grpbywave,
                        dim_t maxlen, dim_t *maxconcatlen, smfGroup **group,
                        Grp **basegrp, int *status ) {
 
