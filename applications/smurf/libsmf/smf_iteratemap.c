@@ -1114,6 +1114,40 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
               /* Which model component are we on */
               j = k%nmodels;
 
+              /* If this is the first model component and not the first
+                 iteration, we need to undo EXTinction and GAIn (if used
+                 for flatfielding) so that RES/NOI are in the correct
+                 units. */
+
+              if( (j==0) && (iter>0) ) {
+                if( haveext ) {
+                  msgOutiff( MSG__VERB, "",
+                             "  ** undoing EXTinction from previous iteration",
+                             status );
+                  smf_calcmodel_ext( wf, &dat, i, keymap, model[whichext],
+                                     SMF__DIMM_INVERT, status );
+                }
+
+                /*** TIMER ***/
+                msgOutiff( MSG__DEBUG, "", FUNC_NAME
+                           ": ** %f s undoing EXT",
+                           status, smf_timerupdate(&tv1,&tv2,status) );
+
+                if( havegai ) {
+                  msgOutiff( MSG__VERB, "",
+                             "  ** undoing GAIn from previous iteration",
+                             status );
+                  smf_calcmodel_gai( wf, &dat, i, keymap, model[whichgai],
+                                     SMF__DIMM_INVERT, status );
+                }
+
+                /*** TIMER ***/
+                msgOutiff( MSG__DEBUG, "", FUNC_NAME
+                           ": ** %f s undoing GAI",
+                           status, smf_timerupdate(&tv1,&tv2,status) );
+              }
+
+              /* Message stating which model we're in */
               msgSetc("MNAME", smf_model_getname(modeltyps[j],status));
               msgOutif(MSG__VERB," ", "  ^MNAME", status);
               modelptr = smf_model_getptr( modeltyps[j], status );
@@ -1287,10 +1321,6 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
               smf_open_related_model( resgroup, i, "UPDATE", &res[i], status );
               smf_open_related_model( lutgroup, i, "UPDATE", &lut[i], status );
               smf_open_related_model( quagroup, i, "UPDATE", &qua[i], status );
-              if( haveext ) {
-                smf_open_related_model( modelgroups[whichext], i, "UPDATE",
-                                        &model[whichext][i], status );
-              }
 
               /*** TIMER ***/
               msgOutiff( MSG__DEBUG, "", FUNC_NAME
@@ -1311,41 +1341,12 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
                        ": ** %f s calculating AST",
                        status, smf_timerupdate(&tv1,&tv2,status) );
 
-            /* If EXTinction was applied during this iteration, AST and RES
-               are currently in units of Jy. Un-do the EXTinction correction
-               here so that RES is in the right units again before starting
-               the next iteration. Ditto for GAIn if the common-mode gain has
-               been used as a flatfield correction (see smf_calcmodel_com). */
-
-            if( haveext ) {
-              smf_calcmodel_ext( wf, &dat, i, keymap, model[whichext],
-                                 SMF__DIMM_INVERT, status );
-            }
-
-            /*** TIMER ***/
-            msgOutiff( MSG__DEBUG, "", FUNC_NAME
-                       ": ** %f s undoing EXT",
-                       status, smf_timerupdate(&tv1,&tv2,status) );
-
-            if( havegai ) {
-              smf_calcmodel_gai( wf, &dat, i, keymap, model[whichgai],
-                                 SMF__DIMM_INVERT, status );
-            }
-
-            /*** TIMER ***/
-            msgOutiff( MSG__DEBUG, "", FUNC_NAME
-                       ": ** %f s undoing GAI",
-                       status, smf_timerupdate(&tv1,&tv2,status) );
-
             /* Close files if memiter not set */
             if( !memiter ) {
               smf_close_related( &ast[i], status );
               smf_close_related( &res[i], status );
               smf_close_related( &lut[i], status );
               smf_close_related( &qua[i], status );
-              if( haveext ) {
-                smf_close_related( &model[whichext][i], status );
-              }
 
               /*** TIMER ***/
               msgOutiff( MSG__DEBUG, "", FUNC_NAME
