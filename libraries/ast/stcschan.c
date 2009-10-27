@@ -4803,7 +4803,7 @@ static const char *ReadSpaceArgs( AstStcsChan *this, const char *word,
       }
 
 /* Remove the trailing space, and store the property value in the KeyMap. */
-      prop[ nc - 1 ] = 0;
+      if( astOK ) prop[ nc - 1 ] = 0;
       astMapPut0C( props, "CENTRE", prop, NULL );
       astMapPut1D( props, "DCENTRE", naxes, vals, NULL );
 
