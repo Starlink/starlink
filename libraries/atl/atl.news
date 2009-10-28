@@ -1,13 +1,19 @@
 1 ATL_library
 
-An new release (V1.2) of the ATL library is now available. The ATL
+An new release (V1.3) of the ATL library is now available. The ATL
 library contains high level AST-related utility functions. See SUN/256
 for details. Changed in the new version include:
 
+- A new function astAddWcsAxis has been added. It modifies a WCS FrameSet
+by adding one or more axes to the base (GRID) Frame and the current (WCS)
+Frame, using a supplied Mapping to connect the new axes. Any other Frames 
+are left unchanged.
+
+
+Changes introduced by V1.2:
+
 - A new function astMatchRegion/AST_MATCHREGION, which produces a Region
 with axes corresponding to those in a given Frame.
-
-
 
 Changes introduced by V1.1:
 

@@ -66,6 +66,7 @@ enum { ATL__MXDIM  = 7 };
 /* -------------------------- */
 AstRegion *atlMatchRegion( AstRegion *, AstFrame *, int * );
 int atlMapGet1S( AstKeyMap *, const char *, int, int, int *, char *, int * );
+void atlAddWcsAxis( AstFrameSet *, AstMapping *, AstFrame *, int * );
 void atlAxtrm( AstFrameSet *, int *, int *, int *, double *, int * );
 void atlGetParam( const char *, AstKeyMap *, int * );
 void atlKychk( AstKeyMap *, const char *, const char *, int * );

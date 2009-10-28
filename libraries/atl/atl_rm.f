@@ -17,7 +17,7 @@
 *     specified file. No error occurs if the file cannot be removed for
 *     any reason.
 
-*  Parameters:
+*  Arguments:
 *     FILE = CHARACTER * ( * ) (Given)
 *        The path to the file.
 *     STATUS = INTEGER (Given and Returned)

@@ -744,44 +744,6 @@ higher-level utility tasks.
    }
 }
 \sstroutine{
-   ATL\_EXTREG
-}{
-   Add axes to a Region so that it matches a given Frame
-}{
-   \sstdescription{
-      This routine returns a new Region (normally a Prism) defined with
-      the co-oridnate system specified by {\tt "}FRM{\tt "}. Any axes in FRM that are
-      also present in the supplied region OLDREG inherit their coverage
-      in the new region from OLDREG. Any axes in FRM that are not present
-      in OLDREG are unbounded in the new region.
-   }
-   \sstinvocation{
-      CALL ATL\_EXTREG( OLDREG, FRM, NEWREG, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         IREG = INTEGER (Given)
-      }{
-         The Region to extrude.
-      }
-      \sstsubsection{
-         IFRM = INTEGER (Given)
-      }{
-         The Frame defining the axes required in the new Region.
-      }
-      \sstsubsection{
-         NEWREG = INTEGER (Returned)
-      }{
-         The new Region. Returned equal to AST\_\_NULL if an error occurs.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
    ATL\_FINDSKY
 }{
    Locate any sky axes within a Frame
@@ -1587,9 +1549,7 @@ higher-level utility tasks.
    \sstinvocation{
       CALL ATL\_RM( FILE, STATUS )
    }
-   \sstdiylist{
-      Parameters
-   }{
+   \sstarguments{
       \sstsubsection{
          FILE = CHARACTER $*$ ( $*$ ) (Given)
       }{
@@ -1826,6 +1786,61 @@ higher-level utility tasks.
 
          \sstitem
          Double Sideband is always assumed
+      }
+   }
+}
+\sstroutine{
+   atlAddWcsAxis
+}{
+   Add one or more axes to an NDFs WCS FrameSet
+}{
+   \sstdescription{
+      This function adds one or more new axes to both the base (i.e. GRID)
+      Frame and the current (i.e. WCS) Frame in the supplied WCS FrameSet.
+      If the FrameSet contains any other Frames, their dimensionality is
+      left unchanged.
+   }
+   \sstinvocation{
+      void atlAddWcsAxis(  AstFrameSet $*$wcs, AstMapping $*$map, AstFrame $*$frm,
+                           int $*$status )
+   }
+   \sstarguments{
+      \sstsubsection{
+         wcs
+      }{
+         A pointer to a FrameSet that is to be used as the WCS FrameSet in
+         an NDF. This imposes the restriction that the base Frame must
+         have Domain GRID.
+      }
+      \sstsubsection{
+         map
+      }{
+         A pointer to a Mapping. The forward transformation should transform
+         the new GRID axes into the new WCS axes.
+      }
+      \sstsubsection{
+         frm
+      }{
+         A pointer to a Frame defining the new WCS axes.
+      }
+      \sstsubsection{
+         status
+      }{
+         Pointer to the global status variable.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The new GRID and WCS axes are appended to the end of the existing
+         axes, so the axis indices associated with the new axes will extend
+         from {\tt "}nold$+$1{\tt "} to {\tt "}nold$+$nnew{\tt "}, where {\tt "}nold{\tt "} is the number of axes in
+         the original Frame, and {\tt "}nnew{\tt "} is the number of new axes.
+
+         \sstitem
+         An error will be reported if the Nout attribute of {\tt "}map{\tt "} is
+         different to the Naxes attribute of {\tt "}frm{\tt "}.
       }
    }
 }
