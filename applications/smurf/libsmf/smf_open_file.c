@@ -853,7 +853,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
       (*data)->ndims = ndims;
       for (i=0; i< (size_t)ndims; i++) {
         ((*data)->dims)[i] = (dim_t)ndfdims[i];
-        ((*data)->lbnd)[i] = (dim_t)lbnd[i];
+        ((*data)->lbnd)[i] = lbnd[i];
       }
     }
     /* Store DREAM parameters for flatfielded data if they exist. This

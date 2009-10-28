@@ -162,7 +162,7 @@ void smf_dump_smfData( const smfData *data, int showflags __attribute__((unused)
   /* Size of array in each dimension */
   if (ndims <= DAT__MXDIM) {
     for ( i=0; i< ndims; i++) {
-      sprintf( string, "%" DIM_T_FMT, (data->lbnd)[i]);
+      sprintf( string, "%d", (data->lbnd)[i]);
       msgSetc("D", string);
       if ( i != ndims-1 ) {
         msgSetc("D", ",");

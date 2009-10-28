@@ -16,7 +16,7 @@
 *     pntr = smf_construct_smfData( smfData * tofill, smfFile * file,
 *                      smfHead * hdr, smfDA * da,
 *                      smf_dtype dtype, void * pntr[3], int isTordered,
-*                      const dim_t dims[], const dim_t lbnd[], int ndims,
+*                      const dim_t dims[], const int lbnd[], int ndims,
 *                      int virtual, int ncoeff, double *poly,
 *                      AstKeyMap * history, int * status );
 
@@ -147,7 +147,7 @@ smfData *
 smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr,
                        smfDA * da, smf_dtype dtype,
                        void * pntr[3], int isTordered, const dim_t dims[],
-                       const dim_t lbnd[], int ndims, int virtual, int ncoeff,
+                       const int lbnd[], int ndims, int virtual, int ncoeff,
                        double *poly, AstKeyMap *history, int * status ) {
 
   /* need to make sure that any memory we malloc will be freed on error
