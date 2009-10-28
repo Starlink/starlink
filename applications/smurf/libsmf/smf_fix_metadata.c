@@ -44,6 +44,7 @@
 *  Authors:
 *     TIMJ: Tim Jenness (JAC, Hawaii)
 *     EC: Ed Chapin (UBC)
+*     BRADC: Brad Cavanagh (JAC, Hawaii)
 
 *  Notes:
 *     o Currently only examines ACSIS data. All other smfDatas cause the
@@ -66,6 +67,8 @@
 *        Check OCS Config before flipping sign of instrument aperture
 *     2009-07-06 (TIMJ):
 *        Add ability to look up information in table indexed by OBSID.
+*     2009-10-28 (BRADC):
+*        Check for missing FFT_WIN header.
 
 *  Copyright:
 *     Copyright (C) 2009 Science & Technology Facilities Council.
@@ -137,6 +140,7 @@ struct FitsHeaderStruct {
   char rot_crd[81];
   char obsid[81];
   char obsidss[81];
+  char fft_win[81];
 };
 
 /* Struct defining dut1 information */
@@ -679,6 +683,28 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
       astDelFits( fits );
       have_fixed |= SMF__FIXED_FITSHDR;
       ncards--;  /* Adjust the target number of cards */
+    }
+  }
+
+  /* FFT_WIN */
+  if( ! astTestFits( fits, "FFT_WIN", NULL ) ) {
+    if( hdr->ocsconfig ) {
+      int found;
+      found = smf__pattern_extract( hdr->ocsconfig, "window type=\"(\\w+)\"", NULL, fitsvals.fft_win,
+                                    sizeof( fitsvals.fft_win ), status );
+      if( found ) {
+        smf_fits_updateS( hdr, "FFT_WIN", fitsvals.fft_win, "Type of window used for FFT", status );
+        msgOutiff( msglev, "", INDENT "Missing FFT_WIN - setting to '%s'", status, fitsvals.fft_win );
+        have_fixed |= SMF__FIXED_FITSHDR;
+      } else {
+        smf_fits_updateS( hdr, "FFT_WIN", "truncate", "Type of window used for FFT", status );
+        msgOutiff( msglev, "", INDENT "Missing FFT_WIN - not found in ocsconfig - setting to 'truncate'", status );
+        have_fixed |= SMF__FIXED_FITSHDR;
+      }
+    } else {
+      smf_fits_updateS( hdr, "FFT_WIN", "truncate", "Type of window used for FFT", status );
+      msgOutiff( msglev, "", INDENT "Missing FFT_WIN - not found in ocsconfig - setting to 'truncate'", status );
+      have_fixed |= SMF__FIXED_FITSHDR;
     }
   }
 
