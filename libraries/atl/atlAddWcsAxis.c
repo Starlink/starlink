@@ -133,7 +133,7 @@ void atlAddWcsAxis( AstFrameSet *wcs, AstMapping *map, AstFrame *frm,
 
 /* Find the original number of GRID axes, and the number of new GRID axes 
    to add. */
-   ngrid_old = astGet( grid_frm, "Naxes" );
+   ngrid_old = astGetI( grid_frm, "Naxes" );
    ngrid_add = astGetI( map, "Nin" );
 
 /* Use astPickAxes to create a GRID Frame with the required additional number 
