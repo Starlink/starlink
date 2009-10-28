@@ -1450,13 +1450,21 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
                   /* Set the quality back to good for this single bolometer */
                   qua_data[k*bstride] = bolomask[k];
 
-                  /* Create a buffer for the new map ----------------------- */
+                  /* Create a name for the new map, take into account the
+                     chunk number. Only required if we are using a single
+                     output container. */
                   pname = tmpname;
                   grpGet( bolrootgrp, 1, 1, &pname, sizeof(tmpname), status );
-                  sprintf( thisbol, ".C%02luR%02lu",
+                  one_strlcpy( name, tmpname, sizeof(name), status );
+                  one_strlcat( name, ".", sizeof(name), status );
+                  if (ncontchunks > 1) {
+                    char tempstr[20];
+                    sprintf(tempstr, "CH%02lu", contchunk);
+                    one_strlcat( name, tempstr, sizeof(name), status );
+                  }
+                  sprintf( thisbol, "C%02luR%02lu",
                            (k % res[0]->sdata[idx]->dims[1])+1,    /* x-coord */
                            (k / res[0]->sdata[idx]->dims[1])+1 );  /* y-coord */
-                  one_strlcpy( name, tmpname, sizeof(name), status );
                   one_strlcat( name, thisbol, sizeof(name), status );
                   mgrp = grpNew( "bolomap", status );
                   grpPut1( mgrp, name, 0, status );
