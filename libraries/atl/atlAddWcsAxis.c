@@ -1,5 +1,6 @@
 #include "atl.h"
 #include "ast.h"
+#include "mers.h"
 #include "sae_par.h"
 
 void atlAddWcsAxis( AstFrameSet *wcs, AstMapping *map, AstFrame *frm, 
@@ -147,10 +148,10 @@ void atlAddWcsAxis( AstFrameSet *wcs, AstMapping *map, AstFrame *frm,
 /* Set up the attributes for the new axes. These values are copied from
    ndf1_inifr.f  */
    for( i = ngrid_old + 1; i <= ngrid_new; i++ ) {
-      astSet( new_grid_frm, "Format(%d)=%3.1f", i );
+      astSet( new_grid_frm, "Format(%d)=%%3.1f", i );
       astSet( new_grid_frm, "Label(%d)=Data grid index %d", i, i );
       astSet( new_grid_frm, "Symbol(%d)=g%d", i, i );
-      astSet( new_grid_frm, "Unit(%d)=pixel", i, i );
+      astSet( new_grid_frm, "Unit(%d)=pixel", i );
    }
 
 /* Create a CmpFrame containing the original current Frame, and the
