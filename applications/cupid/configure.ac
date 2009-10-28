@@ -30,7 +30,7 @@ dnl    Setup for creating a monolith.
 STAR_MONOLITHS
 
 dnl CUPID source files depend on include files from the following components  
-STAR_DECLARE_DEPENDENCIES([build], [mers cnf ifd irq ndf sae])
+STAR_DECLARE_DEPENDENCIES([build], [mers cnf ifd irq ndf sae pda])
 
 dnl The CUPID link script links against the following components
 STAR_DECLARE_DEPENDENCIES([build], [kaplibs ast shl], [link])
