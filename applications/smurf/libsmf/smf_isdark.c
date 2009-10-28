@@ -115,6 +115,9 @@ int smf_isdark( const smfData * indata, int * status ) {
   if (!indata->hdr) return 0;
   if (!indata->hdr->fitshdr) return 0;
 
+  /* if this is ACSIS data return */
+  if (indata->hdr->instrument == INST__ACSIS) return 0;
+
   /* Shutter is no a double. 0 indicates closed */
   smf_fits_getD( indata->hdr, "SHUTTER", &shutval, status );
 
