@@ -13,6 +13,7 @@ BUILT_C_ROUTINES = $(CGENERIC_ROUTINES:.cgen=.c)
 
 C_ROUTINES = \
 smf_accumulate_prov.c \
+smf_add_spectral_axis.c \
 smf_addmap1.c \
 smf_addto_smfArray.c \
 smf_apodize.c \
