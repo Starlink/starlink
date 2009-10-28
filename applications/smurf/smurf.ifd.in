@@ -2398,6 +2398,16 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter sort {
+                position 3
+                type _LOGICAL
+                access READ
+                vpath PROMPT
+                ppath CURRENT DEFAULT
+                default TRUE
+                helpkey *
+            }
+
         }
 
         action starecalc {

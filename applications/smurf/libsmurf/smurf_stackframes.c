@@ -22,8 +22,12 @@
 *  Description:
 *     Takes a stack of 2d frames of bolometer data, usually noise
 *     images or responsivity images, and combines them into a single
-*     cube with an annotated time axis. This makes it easy to look
-*     at the behaviour of a single detector as it varies with time.
+*     cube with, if sort is enabled, an annotated time axis.
+*     This makes it easy to look at the behaviour of a single detector
+*     as it varies with time. Not all observations include time information
+*     or should be sorted by time and for those set SORT to false. The 3rd
+*     axis will not be a time axis in that case. This can be useful for
+*     examining bolometer maps created by MAKEMAP.
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
@@ -36,15 +40,19 @@
 *     OUT = NDF (Write)
 *          Single output file with all the 2d images stacked into a single
 *          observation.
+*     SORT = _LOGICAL (Read)
+*          Should the data be sorted into time order (true) or left in the
+*          order given in IN (false). Default is true.
 
 *  Notes:
 *     - No special SCUBA-2 processing is applied. The assumption is simply
 *     that you have some images that are all the same size and you want to
 *     put them into a single cube with a time axis.
-*     - Variations in pixel origin are ignored.
+*     - Variations in pixel origin are ignored. Make sure images are aligned
+*     and are the same size.
 
 *  Related Applications:
-*     SMURF: CALCNOISE, CALCFLAT
+*     SMURF: CALCNOISE, CALCFLAT, MAKEMAP
 
 *  Authors:
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -53,6 +61,8 @@
 *  History:
 *     2009-09-25 (TIMJ):
 *        Initial version.
+*     2009-10-28 (TIMJ):
+*        Add SORT option.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -94,6 +104,7 @@
 #include "sae_par.h"
 #include "mers.h"
 #include "star/one.h"
+#include "par.h"
 
 /* SMURF includes */
 #include "smurf_par.h"
@@ -106,6 +117,7 @@
 
 void smurf_stackframes( int *status ) {
 
+  int dosort = 0;                /* Sort into time order? */
   AstFrame * frame2d;            /* 2D frame from input image */
   AstObject * framewcs = NULL;   /* input WCS frame */
   AstFrame * gridfrm;            /* 3d grid frame */
@@ -154,10 +166,14 @@ void smurf_stackframes( int *status ) {
   kpg1Wgndf( "OUT", igrp, 1, 1, "",
 	     &ogrp, &outsize, status );
 
+  /* See if we need to sort */
+  parGet0l( "SORT", &dosort, status );
+
   if (*status != SAI__OK) goto CLEANUP;
 
   /* To sort into time order we need to extract some information
-     from each file */
+     from each file. For ease of programming we do use the sort
+     struct even if not sorting */
   sortinfo = smf_malloc( size, sizeof(*sortinfo), 1, status );
 
   /* First check that all the input files are the right shape */
@@ -229,7 +245,11 @@ void smurf_stackframes( int *status ) {
     }
     if (*status == SAI__OK) {
       smfSortInfo * thisitem = &(sortinfo[i-1]);
-      smf_find_dateobs( data->hdr, &(thisitem->mjd), NULL, status );
+      if (dosort) {
+        smf_find_dateobs( data->hdr, &(thisitem->mjd), NULL, status );
+      } else {
+        thisitem->mjd = 0.0;
+      }
       thisitem->index = i;
     }
     smf_close_file( &data, status );
@@ -247,7 +267,7 @@ void smurf_stackframes( int *status ) {
 	   (size_t)refdims[0], (size_t)refdims[1] );
 
   /* Now need to sort the files into time order. We have the dates and indices */
-  qsort( sortinfo, size, sizeof(*sortinfo), smf_sort_bytime );
+  if (dosort) qsort( sortinfo, size, sizeof(*sortinfo), smf_sort_bytime );
 
   /* Now we can do the real work */
 
@@ -292,7 +312,7 @@ void smurf_stackframes( int *status ) {
     smfData * data = NULL;
     smf_open_file( igrp, sortinfo[i-1].index, "READ", 0, &data, status );
     if (*status != SAI__OK) break;
-    smf_find_dateobs( data->hdr, &(times[i-1]), NULL, status );
+    if (dosort) smf_find_dateobs( data->hdr, &(times[i-1]), NULL, status );
 
     /* Store the first WCS */
     if (i==1) {
@@ -312,30 +332,35 @@ void smurf_stackframes( int *status ) {
       memcpy( odataq, (data->pntr)[2], szplane );
       odataq += szplane;
     }
-    smf_updateprov( outdata->file->ndfid, data, NDF__NOID,
-		    "SMURF:" TASK_NAME, status );
+    if (outdata->hdr) smf_updateprov( outdata->file->ndfid, data, NDF__NOID,
+                                      "SMURF:" TASK_NAME, status );
 
     smf_close_file( &data, status );
   }
 
   /* Now need to sort out the WCS */
 
-  /* Need a LutMap which transforms grid coord into MJD (in days)
-     Can also tweak the TimeFrame attributes a little.
-     We do not have to special case the LUT for the case of a single
-     observation since this routine enforces a minimum of 2 frames.
-     Do put in a TimeOrigin based on the first observation.
-     Also assume that observations are
-     going to be some distance apart so use iso.0 formatting.
-   */
-  timefrm = astTimeFrame ( "format=iso.0" );
-  origin = floor( times[0] );
-  astSetD( timefrm, "TimeOrigin", origin );
-  for (i = 0; i < size; i++ ) {
-    times[i] = times[i] - origin;
+  if (dosort) {
+    /* Need a LutMap which transforms grid coord into MJD (in days)
+       Can also tweak the TimeFrame attributes a little.
+       We do not have to special case the LUT for the case of a single
+       observation since this routine enforces a minimum of 2 frames.
+       Do put in a TimeOrigin based on the first observation.
+       Also assume that observations are
+       going to be some distance apart so use iso.0 formatting.
+    */
+    timefrm = astTimeFrame ( "format=iso.0" );
+    origin = floor( times[0] );
+    astSetD( timefrm, "TimeOrigin", origin );
+    for (i = 0; i < size; i++ ) {
+      times[i] = times[i] - origin;
+    }
+    timemap = astLutMap( size, times, 1.0, 1.0, " " );
+    times = smf_free( times, status );
+  } else {
+    timefrm = (AstTimeFrame*)astFrame( 1, "Domain=INDEX,Unit(1)=pixel,Label(1)=File Number");
+    timemap = (AstLutMap*)astUnitMap( 1, " ");
   }
-  timemap = astLutMap( size, times, 1.0, 1.0, " " );
-  times = smf_free( times, status );
 
   /* split up the current 2d frameset */
   frame2d = astGetFrame( framewcs, AST__CURRENT );
