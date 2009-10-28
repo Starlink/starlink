@@ -313,7 +313,7 @@ void smurf_sc2clean( int *status ) {
                  "iterations", status);
       }
 
-      smf_flag_spikes( ffdata, NULL, NULL, SMF__Q_MOD, spikethresh, spikeiter, 
+      smf_flag_spikes( ffdata, NULL, NULL, SMF__Q_MOD, spikethresh, spikeiter,
                        100, &aiter, &nflag, status );
 
       if( *status == SAI__OK ) {

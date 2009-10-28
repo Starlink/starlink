@@ -13,7 +13,7 @@
 *     Library routine
 
 *  Invocation:
-*     smf_correct_steps( smfData *data, unsigned char *quality, 
+*     smf_correct_steps( smfData *data, unsigned char *quality,
 *                        double dcthresh, dim_t dcbox, int flagbolo,
 *                        int *status )
 
@@ -23,7 +23,7 @@
 *     quality = unsigned char * (Given and Returned)
 *        If set, use this buffer instead of QUALITY associated with data.
 *        If NULL, use the QUALITY associated with data. Locations of steps
-*        will have bit SMF__Q_JUMP set. 
+*        will have bit SMF__Q_JUMP set.
 *     dcthresh = double (Given)
 *        N-sigma threshold for DC jump to be detected
 *     dcbox = dim_t (Given)
@@ -105,8 +105,8 @@
 
 #define FUNC_NAME "smf_correct_steps"
 
-void smf_correct_steps( smfData *data, unsigned char *quality, 
-                        double dcthresh, dim_t dcbox, int flagbolo, 
+void smf_correct_steps( smfData *data, unsigned char *quality,
+                        double dcthresh, dim_t dcbox, int flagbolo,
                         int *status ) {
 
   /* Local Variables */
@@ -154,14 +154,14 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
 
   if( !dat ) {
     *status = SAI__ERROR;
-    errRep( "", FUNC_NAME ": smfData does not contain a DATA component", 
+    errRep( "", FUNC_NAME ": smfData does not contain a DATA component",
             status );
     return;
   }
 
   if( *status == SAI__OK ) {
     /* obtain data dimensions */
-    smf_get_dims( data,  NULL, NULL, &nbolo, &ntslice, NULL, NULL, NULL, 
+    smf_get_dims( data,  NULL, NULL, &nbolo, &ntslice, NULL, NULL, NULL,
                   status );
 
     /* If data stream too short for box size generate error */
@@ -170,7 +170,7 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
       msgSeti("NTSLICE",ntslice);
       msgSeti("DCBOX",ntslice);
       errRep("", FUNC_NAME
-	     ": Can't find jumps: ntslice=^NTSLICE, must be > dcbox" 
+	     ": Can't find jumps: ntslice=^NTSLICE, must be > dcbox"
              "(=^DCBOX)*2", status);
     }
 
@@ -178,32 +178,32 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
     if( dcthresh <= 0 ) {
       *status = SAI__ERROR;
       msgSeti("DCTHRESH",dcthresh);
-      errRep("", FUNC_NAME 
+      errRep("", FUNC_NAME
              ": Can't find jumps: dcthresh (^dcthresh) must be > 0", status);
     }
-  }  
+  }
 
   /* Repair DC steps */
   if( dcbox && dcthresh && (*status == SAI__OK) ) {
 
     /* allocate alljump buffer */
     alljump = smf_malloc( ntslice, sizeof(*alljump), 0, status );
-    
+
     for( i=0; (*status==SAI__OK) && (i<nbolo); i++ ) {
       base = i*ntslice;
       isbad = 0;
-      
+
       /* Continue if bolo stream is not flagged bad */
       if( !(qua[base] & SMF__Q_BADB) && (*status == SAI__OK) ) {
-	
+
 	/* initial conditions for jump detection */
-	smf_stats1( dat+base, 1, dcbox, qua, SMF__Q_MOD, &mean1, NULL, &nmean1, 
+	smf_stats1( dat+base, 1, dcbox, qua, SMF__Q_MOD, &mean1, NULL, &nmean1,
                     status);
-	smf_stats1( dat+base+dcbox, 1, dcbox, qua, SMF__Q_MOD, &mean2, NULL, 
+	smf_stats1( dat+base+dcbox, 1, dcbox, qua, SMF__Q_MOD, &mean2, NULL,
                     &nmean2, status );
-	
+
 	/* Estimate rms in a box as the bolo rms divided by sqrt(dcbox) */
-	dcstep = smf_quick_noise( data, i, dcbox, 10, qua, SMF__Q_MOD, 
+	dcstep = smf_quick_noise( data, i, dcbox, 10, qua, SMF__Q_MOD,
                                   status ) * dcthresh / sqrt(dcbox);
 
 	if( *status == SAI__OK ) {
@@ -211,7 +211,7 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
 	  injump = 0;  /* jump occured somewhere in boxes */
 	  maxdiff = 0; /* max difference between mean1 and mean2 for jump */
 	  maxind = 0;  /* index to location of maxdiff */
-	  
+
 	  /* counter is at mean1/mean2 boundary -- location potential jumps.
 	     Counter runs from dcbox --> ntslice-dcbox. */
 
@@ -249,7 +249,7 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
 		injump = 0;
 	      }
 	    }
-	    
+
 	    /* Move along the boxes and update the mean estimates */
 	    if( !(qua[base+(j-dcbox)] & SMF__Q_MOD) ) {
 	      /* Drop sample at j-dcbox from mean1 */
@@ -260,14 +260,14 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
 	      /* Move sample at j from mean2 to mean1 */
 	      mean1 = (nmean1*mean1 + dat[base+(j%ntslice)]) / (nmean1+1);
 	      nmean1 ++;
-	      
+
 	      mean2 = (nmean2*mean2 - dat[base+(j%ntslice)]) / (nmean2-1);
 	      nmean2 --;
-	      
+
 	    }
 	    if( !(qua[base+((j+dcbox+1)%ntslice)] & SMF__Q_MOD) ) {
 	      /* Add sample at j+dcbox+1 to mean1 */
-	      mean2 = (nmean2*mean2 + dat[base+((j+dcbox+1)%ntslice)]) / 
+	      mean2 = (nmean2*mean2 + dat[base+((j+dcbox+1)%ntslice)]) /
 		(nmean2+1);
 	      nmean2 ++;
 	    }
@@ -275,7 +275,7 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
             /* Don't need to continue if bad bolo, and flagbolo set */
             if( flagbolo && isbad ) break;
 	  }
-	  
+
 	  /* calculate the new corrected baseline if requested */
           if( !flagbolo ) {
             baseline = 0;
@@ -284,7 +284,7 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
 
                 /* Update the baseline at each sample in which jumps occured */
                 baseline += alljump[j];
-	      
+
                 /* Flag the jump in QUALITY */
                 qua[base+j] |= SMF__Q_JUMP;
 
@@ -293,11 +293,11 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
                   msgSeti( "T", j );
                   msgSetd( "STEP", alljump[j] );
                   msgSetd( "THRESH", dcstep );
-                  msgOutif( MSG__DEBUG, "", 
-                            "jump ^STEP (>^THRESH) in bolo ^BOL at ^T", 
+                  msgOutif( MSG__DEBUG, "",
+                            "jump ^STEP (>^THRESH) in bolo ^BOL at ^T",
                             status );
                 }
-              } 
+              }
 
               /* Correct the data by the current baseline estimate */
               dat[base+j] -= baseline;
@@ -305,7 +305,7 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
           }
         }
       }
-      
+
       /* If we got a SMF__INSMP, flag entire bolometer as bad and annul */
       if( *status == SMF__INSMP ) {
         errAnnul( status );
@@ -322,5 +322,5 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
     /* Clean up */
     alljump = smf_free( alljump, status );
   }
-    
+
 }

@@ -13,15 +13,15 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_subtract_poly( smfData *data, unsigned char *quality, int rel, 
-*                        int *status ) 
+*     smf_subtract_poly( smfData *data, unsigned char *quality, int rel,
+*                        int *status )
 
 *  Arguments:
 *     data = smfData** (Given and Returned)
 *        Pointer to input data struct
 *     quality = unsigned char * (Given)
 *        If set, use this buffer instead of QUALITY associated with data.
-*        If NULL, use the QUALITY associated with data. 
+*        If NULL, use the QUALITY associated with data.
 *     rel = int (Given)
 *        Integer flag to denote whether the polynomial is subtracted
 *        relative to the first value (as for 1/f drifts)
@@ -114,7 +114,7 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_subtract_poly"
 
-void smf_subtract_poly(smfData *data, unsigned char *quality, int rel, 
+void smf_subtract_poly(smfData *data, unsigned char *quality, int rel,
 		       int *status) {
 
   /* Local variables */
@@ -192,7 +192,7 @@ void smf_subtract_poly(smfData *data, unsigned char *quality, int rel,
     /* Loop over the timeslices for this bolometer */
     for (j=0; j<nframes; j++) {
       jay = (double)j; /* Cast outside the inner loop over bolometers */
-      
+
       /* Loop over the number of bolometers */
       for (i=0; i<nbol; i++) if ( !(qual[i] & SMF__Q_BADB) ) {
 
@@ -200,7 +200,7 @@ void smf_subtract_poly(smfData *data, unsigned char *quality, int rel,
 	   terms are trivial and are determined manually. This is
 	   quicker than calling pow() unnecessarily. */
 
-	if ( (outdata[i + nbol*j] != VAL__BADD) && 
+	if ( (outdata[i + nbol*j] != VAL__BADD) &&
 	     !(qual[i + nbol*j] & SMF__Q_MOD) ) {
 
 	  baseline = -firstframe[i];
@@ -223,7 +223,7 @@ void smf_subtract_poly(smfData *data, unsigned char *quality, int rel,
     /* Loop over the timeslices for this bolometer */
     for (j=0; j<nframes; j++) {
       jay = (double)j; /* Cast outside the inner loop over bolometers */
-      
+
       /* Loop over the number of bolometers */
       for (i=0; i<nbol; i++)  if ( !(qual[i*nframes] & SMF__Q_BADB) ) {
 
@@ -257,7 +257,7 @@ void smf_subtract_poly(smfData *data, unsigned char *quality, int rel,
   if ( *status == SAI__OK ) {
     smf_history_add( data, FUNC_NAME, status);
   } else {
-    errRep(FUNC_NAME, "Error: status set bad. Possible programming error.", 
+    errRep(FUNC_NAME, "Error: status set bad. Possible programming error.",
 	   status);
   }
 

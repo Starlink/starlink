@@ -13,15 +13,15 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_fit_poly( const smfData *data, unsigned char *quality, 
-*                   const int order, int *status ) 
+*     smf_fit_poly( const smfData *data, unsigned char *quality,
+*                   const int order, int *status )
 
 *  Arguments:
 *     data = smfData* (Given and Returned)
 *        Pointer to input data struct
 *     quality = unsigned char * (Given)
 *        If set, use this buffer instead of QUALITY associated with data.
-*        If NULL, use the QUALITY associated with data. 
+*        If NULL, use the QUALITY associated with data.
 *     order = int (Given)
 *        Order of polynomial fit
 *     status = int* (Given and Returned)
@@ -35,7 +35,7 @@
 *     coefficients are stored in the poly pointer in the supplied
 *     smfData.
 
-*  Notes: 
+*  Notes:
 *     This routine will fail if there is no associated QUALITY component.
 *     No sigma-clipping is carried out to refine the fit. This
 *     accounts for any differences between this method and
@@ -111,7 +111,7 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_fit_poly"
 
-void smf_fit_poly( const smfData *data, unsigned char *quality, 
+void smf_fit_poly( const smfData *data, unsigned char *quality,
                    const size_t order, double *poly, int *status) {
 
   /* Local variables */
@@ -141,8 +141,8 @@ void smf_fit_poly( const smfData *data, unsigned char *quality,
 
   if ( smf_history_check( data, FUNC_NAME, status) ) {
     msgSetc("F", FUNC_NAME);
-    msgOutif(MSG__VERB," ", 
-             "^F has already been run on these data, returning to caller", 
+    msgOutif(MSG__VERB," ",
+             "^F has already been run on these data, returning to caller",
              status);
     return;
   }
@@ -162,7 +162,7 @@ void smf_fit_poly( const smfData *data, unsigned char *quality,
 
   /* Assign pointer to input data array */
   /* of course, check status on return... */
-  indata = (data->pntr)[0]; 
+  indata = (data->pntr)[0];
 
   /* Return with error if there is no QUALITY component */
   if( quality ) {
@@ -185,7 +185,7 @@ void smf_fit_poly( const smfData *data, unsigned char *quality,
       msgSeti("NF",nframes);
       *status = SAI__ERROR;
       errRep( FUNC_NAME, "Requested polynomial order, ^O, greater than or "
-              "equal to the number of points, ^NF. Unable to fit polynomial.", 
+              "equal to the number of points, ^NF. Unable to fit polynomial.",
               status );
     }
     return;
@@ -203,7 +203,7 @@ void smf_fit_poly( const smfData *data, unsigned char *quality,
 
   /* Loop over bolometers. Only fit this bolometer if it is not
      flagged SMF__Q_BADB */
-  for ( j=0; j<nbol; j++) 
+  for ( j=0; j<nbol; j++)
     if( (data->isTordered && !(qual[j] & SMF__Q_BADB) ) ||
         (!data->isTordered && !(qual[j*nframes] & SMF__Q_BADB)) ) {
 
@@ -222,21 +222,21 @@ void smf_fit_poly( const smfData *data, unsigned char *quality,
           /* data */
           gsl_vector_set( psky, i, indata[j + nbol*i] );
 
-          /* weights */	
-          if( !(qual[nbol*i + j]&SMF__Q_FIT) && (indata[j + nbol*i] 
+          /* weights */
+          if( !(qual[nbol*i + j]&SMF__Q_FIT) && (indata[j + nbol*i]
                                                  != VAL__BADD) ) {
             gsl_vector_set( weight, i, 1.0); /* Good QUALITY */
           } else {
             gsl_vector_set( weight, i, 0.0); /* Bad QUALITY */
           }
-	
+
         } else {                 /* bolo-ordered */
 
           /* data */
           gsl_vector_set( psky, i, indata[j*nframes + i] );
 
-          /* weights */	
-          if( !(qual[j*nframes + i]&SMF__Q_FIT) && (indata[j*nframes + i] != 
+          /* weights */
+          if( !(qual[j*nframes + i]&SMF__Q_FIT) && (indata[j*nframes + i] !=
                                                     VAL__BADD) ) {
             gsl_vector_set( weight, i, 1.0); /* Good QUALITY */
           } else {
@@ -260,6 +260,6 @@ void smf_fit_poly( const smfData *data, unsigned char *quality,
   gsl_vector_free( psky );
   gsl_vector_free( weight );
   gsl_vector_free( coeffs );
-  gsl_matrix_free( mcov );  
+  gsl_matrix_free( mcov );
 
 }
