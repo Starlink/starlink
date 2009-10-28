@@ -143,8 +143,11 @@ void smf_calcmodel_ext( smfWorkForce *wf __attribute__((unused)),
       ndata = (res->sdata[idx]->dims)[0] * (res->sdata[idx]->dims)[1] *
 	(res->sdata[idx]->dims)[2];
 
-      /* Which QUALITY bits should be considered for ignoring data */
-      mask = ~(SMF__Q_JUMP|SMF__Q_SPIKE|SMF__Q_STAT);
+      /* Which QUALITY bits should be considered for ignoring data. Should
+         apply correction to basically every sample unless we're ignoring
+         the enture bolometer, or an individual sample was flagged bad
+         by the DA system. */
+      mask = SMF__Q_BADS & SMF__Q_BADB;
 
       /* Loop over data points */
 

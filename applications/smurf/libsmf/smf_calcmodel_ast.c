@@ -184,7 +184,8 @@ void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)), smfDIMMData *d
       smf_get_dims( res->sdata[idx],  NULL, NULL, &nbolo, &ntslice,
                     &ndata, &bstride, &tstride, status);
 
-      /* Which QUALITY bits should be considered for ignoring data */
+      /* Which QUALITY bits should be considered for ignoring data. Should
+         match smf_iteratemap where AST added back into residual */
       mask = ~(SMF__Q_JUMP|SMF__Q_SPIKE|SMF__Q_STAT);
 
       /* Loop over data points */
@@ -197,6 +198,12 @@ void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)), smfDIMMData *d
 
 	  /* calculate new model value using the map/LUT */
           m = dat->map[lut_data[ii]];
+
+          /*
+          if( (m==VAL__BADD) && (!(qua_data[i*bstride+j*tstride]&mask)) ) {
+            printf("Nooo... %li %li\n", i, j);
+          }
+          */
 
           /* measure contribution to dchisq */
           if( noi && !(qua_data[ii]&mask) ) {

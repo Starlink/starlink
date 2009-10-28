@@ -1204,8 +1204,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
               dsize = (ast[i]->sdata[idx]->dims)[0] *
                 (ast[i]->sdata[idx]->dims)[1] * (ast[i]->sdata[idx]->dims)[2];
 
-              /* Ignore data with these QUALITY flags */
-              mask = ~(SMF__Q_JUMP|SMF__Q_SPIKE);
+              /* Ignore data with these QUALITY flags (should match
+                 smf_calcmodel_ast where it is first calculated) */
+              mask = ~(SMF__Q_JUMP|SMF__Q_SPIKE|SMF__Q_STAT);
 
               for( k=0; k<dsize; k++ ) {
                 if( !(qua_data[k]&mask) && (ast_data[k]!=VAL__BADD) ) {
@@ -1226,6 +1227,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
               }
 
               /* Rebin the residual + astronomical signal into a map */
+              mask = ~(SMF__Q_JUMP);
+
               if( dat.noi ) {
                 smf_rebinmap1( res[i]->sdata[idx], dat.noi[i]->sdata[idx],
                                lut_data, qua_data, mask, varmapmethod,
@@ -1407,10 +1410,10 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
             smf_get_dims( res[0]->sdata[idx], NULL, NULL, &nbolo, NULL,
                           &dsize, &bstride, NULL, status );
 
-            /* Ignore jumps and spikes */
-            mask = ~(SMF__Q_JUMP|SMF__Q_SPIKE);
+            /* Add ast back into res. Mask should match ast_calcmodel_ast. */
 
-            /* Add ast back into res */
+            mask = SMF__Q_BADS & SMF__Q_BADB;
+
             for( k=0; k<dsize; k++ ) {
               if( !(qua_data[k]&mask) && (ast_data[k]!=VAL__BADD) ) {
                 res_data[k] += ast_data[k];
