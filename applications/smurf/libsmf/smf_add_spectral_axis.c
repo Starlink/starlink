@@ -73,6 +73,9 @@
 #include "star/atl.h"
 #include "sae_par.h"
 
+/* Smurf includes */
+#include "smf.h"
+
 void smf_add_spectral_axis( int indf, AstFitsChan *fc, int *status ){
 
 /* Local Variables */

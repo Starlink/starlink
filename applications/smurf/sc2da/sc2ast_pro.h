@@ -115,6 +115,13 @@ const char * sc2ast_convert_system
  int * status         /* Inherited status (given & returned) */
 );
 
+void sc2ast_make_bolo_frame
+(
+ AstFrame **frm,         /* Address for new Frame pointer */
+ AstMapping **map,       /* Address for new Mapping pointer */
+ int * status            /* inherited status (given & returned ) */
+);
+
  
  
 #endif

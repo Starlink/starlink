@@ -69,10 +69,12 @@
 *     2009-10-8 (DSB):
 *         Use a smf job context to ensure that smf_wait only waits for the jobs 
 *         submitted within this function.
+*     2009-10-28 (DSB):
+*         Use sc2ast_make_bolo_frame.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 *     Copyright (C) 2008 University of British Columbia.
 *     All Rights Reserved.
 
@@ -114,6 +116,9 @@
 #include "smf.h"
 #include "smf_typ.h"
 #include "smf_err.h"
+
+/* Data Acquisition Includes */
+#include "sc2da/sc2ast.h"
 
 /* ------------------------------------------------------------------------ */
 /* Local variables and functions */
@@ -254,10 +259,9 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
   double steptime;              /* Length of a sample in seconds */
   AstFrameSet *tswcs=NULL;      /* WCS for 4d FFT data */
   double *val=NULL;             /* Element of data to be normalized */
-  double zshift2[3];            /* Amount by which to shift bolo origin */
   double zshift;                /* Amount by which to shift freq. origin */
   AstShiftMap *zshiftmapping=NULL;  /* Map to shift origin of freq. GRID */
-  AstShiftMap *zshiftmapping2=NULL; /* Map to shift origin of bolo GRID */
+  AstMapping *zshiftmapping2=NULL; /* Map to shift origin of bolo GRID */
 
   if (*status != SAI__OK) return NULL;
 
@@ -462,6 +466,10 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
             /* Create a new astFrameSet containing a 4d base GRID frame */
             tswcs = astFrameSet( astFrame( 4, "Domain=GRID" ), " " );
 
+            /* Get a Frame describing bolometer rows and columns, and a
+               Mapping from 2D GRID coords to this BOLO Frame. */
+            sc2ast_make_bolo_frame( &curframe2d, &zshiftmapping2, status );
+
             /* The current frame will have frequency along the first axis,
                x, y bolo coordinates along the second and third axes,
                and the component along a fourth axis of length two (real,
@@ -470,12 +478,8 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
             specframe = astSpecFrame( "System=freq,Unit=Hz,"
                                       "StdOfRest=Topocentric" );
 
-            curframe2d = astFrame( 2, "Domain=BOLO" ); /* x, y, component */
-#if SC2STORE__COL_INDEX
-	    astSet( curframe2d, "label(1)=Rows,label(2)=Columns");
-#else
-	    astSet( curframe2d, "label(1)=Columns,label(2)=Rows");
-#endif
+
+
             curframe3d = astCmpFrame( specframe, curframe2d, " " );
             curframe1d = astFrame( 1, "Domain=COEFF,label=Real/Imag component"); /* real/imag component*/
             curframe4d = astCmpFrame( curframe3d, curframe1d, " " );
@@ -488,10 +492,6 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
             zshiftmapping = astShiftMap( 1, &zshift, " " );
             scalemapping = astZoomMap( 1, df, " " );
             specmapping = astCmpMap( zshiftmapping, scalemapping, 1, " " );
-
-            zshift2[0] = -1; /* Set BOLO origin to 0, 0 */
-            zshift2[1] = -1;
-            zshiftmapping2 = astShiftMap( 2, zshift2, " " );
 
             mapping3d = astCmpMap( specmapping, zshiftmapping2, 0, " " );
 

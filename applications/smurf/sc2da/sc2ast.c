@@ -216,10 +216,14 @@ int *status             /* global status (given and returned) */
      15Dec2008 : Clone the cached SkyFrame instead of deep copying it
                  (it's much faster). (DSB)
      18Dec2008 : dut1 is now an argument (TIMJ)
+     28Oct2009 : Add a Frame with Domain "BOLO" to returned FrameSet (DSB)
 */
 
 {
+
    AstMapping *azelmap;
+   AstFrame *bfrm;
+   AstMapping *bmap;
    AstMapping *mapping;
    AstMatrixMap *rotmap;
    AstPolyMap *polymap;
@@ -413,8 +417,13 @@ int *status             /* global status (given and returned) */
       cache->frameset[ subnum ] = astFrameSet( astFrame ( 2, "Domain=GRID" ), 
                                               " " );   
 
-/* We add a dummy 2D Frame to the FrameSet so that there is a Frame to
-   remove on the first call to astRemoveFrame below. */
+/* Add a 2D Frame with DOmain "BOLO" describing the bolometer rows and 
+   columns. */
+      sc2ast_make_bolo_frame( &bfrm, &bmap, status );
+      astAddFrame( cache->frameset[ subnum ], AST__BASE, bmap, bfrm );
+
+/* We add a second 2D Frame to the FrameSet. Without this, the first call to 
+   astRemoveFrame below would remove the BOLO Frame we have just added. */
       astAddFrame( cache->frameset[ subnum ], AST__BASE, 
                    astUnitMap( 2, " " ), astFrame( 2, " " ) );
 
@@ -1125,3 +1134,52 @@ const char * sc2ast_convert_system
    return result;
 }
 
+
+void sc2ast_make_bolo_frame
+(
+ AstFrame **frm,         /* Address for new Frame pointer */
+ AstMapping **map,       /* Address for new Mapping pointer */
+ int * status            /* inherited status (given & returned ) */
+)
+
+/*
+*  Purpose:
+*    Return a Frame representing bolometer index.
+
+*  Description:
+*    Returns a Frame describing bolometer rows and columns, and a Mapping
+*    from GRID coords to bolometer coords.
+
+*  Authors:
+*    David S Berry (JAC, Hawaii)
+
+*  History:
+*    28-OCT-2009 (DSB):
+*       Initial version
+
+*/
+
+{
+
+/* Local Variables: */
+   double shift[ 2 ];
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
+
+/* Create the bolometer Frame */
+   *frm = astFrame( 2, "Domain=BOLO,Title=Bolometer rows and columns" ); 
+
+/* Set the axis symbols, depending on the current preferred order. */
+#if COLROW
+   astSet( *frm, "label(1)=Columns,label(2)=Rows");
+#else
+   astSet( *frm, "label(1)=Rows,label(2)=Columns");
+#endif
+
+/* To get bolometer coords, subtract 1.0 from the GRID coords. Do
+   this using a ShiftMap. */
+   shift[ 0 ] = -1;
+   shift[ 1 ] = -1;
+   *map = (AstMapping *) astShiftMap( 2, shift, " " );
+}
