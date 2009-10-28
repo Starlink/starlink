@@ -126,7 +126,6 @@ void smf_apodize( smfData *data, unsigned char *quality, size_t len,
   unsigned char *qua=NULL;      /* Pointer to the QUALITY array */
   size_t thelen=0;              /* apodization length */
   size_t tstride;               /* Time slice stride in data array */
-  unsigned char mask;           /* Quality bit mask */
 
   if ( *status != SAI__OK ) return;
 
@@ -152,9 +151,6 @@ void smf_apodize( smfData *data, unsigned char *quality, size_t len,
   } else {
     qua = data->pntr[2];
   }
-
-  /* Set the quality bitmask to decide which samples to apodize */
-  mask = ~(SMF__Q_JUMP|SMF__Q_SPIKE|SMF__Q_STAT);
 
   /* Loop over bolometer */
   for( i=0; (*status==SAI__OK)&&(i<nbolo); i++ ) {
@@ -187,7 +183,7 @@ void smf_apodize( smfData *data, unsigned char *quality, size_t len,
     if( *status == SAI__OK ) {
       if( len == SMF__MAXAPLEN ) {
         thelen = (last-first+1)/2;
-        msgOutiff( MSG__DEBUG, "", FUNC_NAME 
+        msgOutiff( MSG__DEBUG, "", FUNC_NAME
                    ": Using maximum apodization length, %zu samples.",
                    status, thelen );
       } else if( (last-first+1) < (2*len) ) {
@@ -210,12 +206,12 @@ void smf_apodize( smfData *data, unsigned char *quality, size_t len,
         for( j=0; j<thelen; j++ ) {
           ap = 0.5 - 0.5*cos( AST__DPI * (double) j / thelen );
 
-          if( !(qua[i*bstride+(first+j)*tstride]&mask) ) {
+          if( !(qua[i*bstride+(first+j)*tstride]&SMF__Q_MOD) ) {
             dat[i*bstride+(first+j)*tstride]*=ap;
             qua[i*bstride+(first+j)*tstride]|=SMF__Q_APOD;
           }
 
-          if( !(qua[i*bstride+(last-j)*tstride]&mask) ) {
+          if( !(qua[i*bstride+(last-j)*tstride]&SMF__Q_MOD) ) {
             dat[i*bstride+(last-j)*tstride]*=ap;
             qua[i*bstride+(last-j)*tstride]|=SMF__Q_APOD;
           }

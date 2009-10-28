@@ -183,11 +183,6 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
     }
   }  
 
-  /* Set the quality mask to complement of SMF__Q_JUMP so that past DC step
-     flags get ignored */
-
-  mask = ~(SMF__Q_JUMP|SMF__Q_STAT);
-
   /* Repair DC steps */
   if( dcbox && dcthresh && (*status == SAI__OK) ) {
 
@@ -202,14 +197,14 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
       if( !(qua[base] & SMF__Q_BADB) && (*status == SAI__OK) ) {
 	
 	/* initial conditions for jump detection */
-	smf_stats1( dat+base, 1, dcbox, qua, mask, &mean1, NULL, &nmean1, 
+	smf_stats1( dat+base, 1, dcbox, qua, SMF__Q_MOD, &mean1, NULL, &nmean1, 
                     status);
-	smf_stats1( dat+base+dcbox, 1, dcbox, qua, mask, &mean2, NULL, &nmean2, 
-                    status );
+	smf_stats1( dat+base+dcbox, 1, dcbox, qua, SMF__Q_MOD, &mean2, NULL, 
+                    &nmean2, status );
 	
 	/* Estimate rms in a box as the bolo rms divided by sqrt(dcbox) */
-	dcstep = smf_quick_noise( data, i, dcbox, 10, qua, mask, status ) *
-	  dcthresh / sqrt(dcbox);
+	dcstep = smf_quick_noise( data, i, dcbox, 10, qua, SMF__Q_MOD, 
+                                  status ) * dcthresh / sqrt(dcbox);
 
 	if( *status == SAI__OK ) {
 	  memset( alljump, 0, ntslice*sizeof(*alljump) );
@@ -256,12 +251,12 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
 	    }
 	    
 	    /* Move along the boxes and update the mean estimates */
-	    if( !(qua[base+(j-dcbox)] & mask) ) {
+	    if( !(qua[base+(j-dcbox)] & SMF__Q_MOD) ) {
 	      /* Drop sample at j-dcbox from mean1 */
 	      mean1 = (nmean1*mean1 - dat[base+(j-dcbox)]) / (nmean1-1);
 	      nmean1 --;
 	    }
-	    if( !(qua[base+(j%ntslice)] & mask) ) {
+	    if( !(qua[base+(j%ntslice)] & SMF__Q_MOD) ) {
 	      /* Move sample at j from mean2 to mean1 */
 	      mean1 = (nmean1*mean1 + dat[base+(j%ntslice)]) / (nmean1+1);
 	      nmean1 ++;
@@ -270,7 +265,7 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
 	      nmean2 --;
 	      
 	    }
-	    if( !(qua[base+((j+dcbox+1)%ntslice)] & mask) ) {
+	    if( !(qua[base+((j+dcbox+1)%ntslice)] & SMF__Q_MOD) ) {
 	      /* Add sample at j+dcbox+1 to mean1 */
 	      mean2 = (nmean2*mean2 + dat[base+((j+dcbox+1)%ntslice)]) / 
 		(nmean2+1);

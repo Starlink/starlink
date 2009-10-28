@@ -479,7 +479,7 @@ void smurf_qlmakemap( int *status ) {
     smf_fits_outhdr( data->hdr->fitshdr, &fchan, status );
 
     /* Synchronize bad values with QUALITY */
-    smf_update_valbad( data, ~(SMF__Q_JUMP|SMF__Q_STAT), status );
+    smf_update_valbad( data, SMF__Q_GOOD, status );
 
     /* Remove a mean sky level - call low-level 1-D routine */
     smf_subtract_plane1( data, "MEAN", &meansky, status );

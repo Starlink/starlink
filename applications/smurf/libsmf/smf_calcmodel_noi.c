@@ -135,8 +135,6 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   dim_t im;                     /* Loop counter */
   dim_t j;                      /* Loop counter */
   AstKeyMap *kmap=NULL;         /* Local keymap */
-  unsigned char mask;           /* Bitmask for quality */
-  unsigned char mask_spike;     /* Bitmask for quality */
   size_t mbstride;              /* model bolometer stride */
   dim_t mntslice;               /* Number of model time slices */
   size_t mtstride;              /* model time slice stride */
@@ -196,12 +194,6 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
     }
   }
 
-  /* Which QUALITY bits should be considered for ignoring data */
-  mask = ~(SMF__Q_JUMP|SMF__Q_STAT);
-
-  /* Which QUALITY bits should be considered for re-flagging spikes */
-  mask_spike = ~(SMF__Q_JUMP|SMF__Q_SPIKE|SMF__Q_STAT);
-
   /* Initialize chisquared */
   dat->chisquared[chunk] = 0;
   nchisq = 0;
@@ -238,7 +230,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         smf_bolonoise( wf, res->sdata[idx], qua_data, 0, 0.5, SMF__F_WHITELO,
                        SMF__F_WHITEHI, 0, 0, var, NULL, NULL, status );
 
-	for( i=0; i<nbolo; i++ ) if( !(qua_data[i*ntslice]&SMF__Q_BADB) ) {
+	for( i=0; i<nbolo; i++ ) if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {
             /* Loop over time and store the variance for each sample */
             for( j=0; j<mntslice; j++ ) {
               model_data[i*mbstride+(j%mntslice)*mtstride] = var[i];
@@ -253,7 +245,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
       /* Flag spikes in the residual */
       if( spikethresh ) {
 	/* Now re-flag */
-	smf_flag_spikes( res->sdata[idx], var, qua_data, mask_spike,
+	smf_flag_spikes( res->sdata[idx], var, qua_data, SMF__Q_MOD,
 			 spikethresh, spikeiter,
 			 100, &aiter, &nflag, status );
 
@@ -272,7 +264,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
           for( j=0; j<ntslice; j++ ) {
             id = i*bstride+j*tstride;              /* index in data array */
             im = i*mbstride+(j%mntslice)*mtstride; /* index in NOI array */
-            if(model_data[im]>0 && !(qua_data[id]&mask) ) {
+            if(model_data[im]>0 && !(qua_data[id]&SMF__Q_GOOD) ) {
               dat->chisquared[chunk] += res_data[id]*res_data[id] /
                 model_data[im];
               nchisq++;

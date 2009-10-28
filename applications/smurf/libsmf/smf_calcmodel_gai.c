@@ -108,7 +108,6 @@ void smf_calcmodel_gai( smfWorkForce *wf __attribute__((unused)),
   dim_t idx=0;                  /* Index within subgroup */
   dim_t j;                      /* Loop counter */
   AstKeyMap *kmap=NULL;         /* Local GAIn keymap */
-  unsigned char mask;           /* Bitmask for quality */
   smfArray *model=NULL;         /* Pointer to model at chunk */
   double *model_data=NULL;      /* Pointer to DATA component of model */
   dim_t nbolo;                  /* Number of bolometers */
@@ -176,10 +175,6 @@ void smf_calcmodel_gai( smfWorkForce *wf __attribute__((unused)),
       smf_get_dims( model->sdata[idx],  NULL, NULL, NULL, NULL, NULL,
                     &gbstride, &gcstride, status);
 
-      /* Which QUALITY bits should be considered for correcting data (must
-       match mask_cor in smf_calcmodel_com!) */
-      mask = ~(SMF__Q_JUMP|SMF__Q_SPIKE|SMF__Q_APOD|SMF__Q_STAT);
-
       /* Undo the gain correction stored in GAI (the gain is applied to
          the signal and noise in smf_calcmodel_com) */
       for( i=0; i<nbolo; i++ ) {
@@ -188,7 +183,7 @@ void smf_calcmodel_gai( smfWorkForce *wf __attribute__((unused)),
 
           /* First undo the flatfield correction to the signal */
           for( j=0; j<ntslice; j++ ) {
-            if( !(qua_data[i*bstride + j*tstride]&mask) ) {
+            if( !(qua_data[i*bstride + j*tstride]&SMF__Q_MOD) ) {
               res_data[i*bstride + j*tstride] *= scale;
             }
           }

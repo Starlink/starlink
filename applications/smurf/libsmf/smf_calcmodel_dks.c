@@ -99,6 +99,7 @@ void smf_calcmodel_dks( smfWorkForce *wf __attribute__((unused)),
   size_t bolcounter;            /* bolometer counter */
   int boxcar_i=0;               /* width in samples of boxcar filter */
   size_t boxcar=0;              /* Size of boxcar smooth window */
+  size_t bstride;               /* bolo stride */
   double *cdksquid=NULL;        /* Pointer to current dark squid (copy) */
   double *corrbuf=NULL;         /* Array of corr coeffs all bolos in this col */
   double *cgainbuf=NULL;        /* Array gains for bolos in this col (copy) */
@@ -112,7 +113,6 @@ void smf_calcmodel_dks( smfWorkForce *wf __attribute__((unused)),
   dim_t j;                      /* Loop counter */
   dim_t k;                      /* Loop counter */
   AstKeyMap *kmap=NULL;         /* Local keymap */
-  unsigned char mask;           /* quality mask */
   smfArray *model=NULL;         /* Pointer to model at chunk */
   double *model_data=NULL;      /* Pointer to DATA component of model */
   double *model_data_copy=NULL; /* Copy of model_data for one subarray */
@@ -133,6 +133,7 @@ void smf_calcmodel_dks( smfWorkForce *wf __attribute__((unused)),
   unsigned char *qua_data=NULL; /* Pointer to quality data */
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
+  size_t tstride;               /* time stride */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -177,7 +178,7 @@ void smf_calcmodel_dks( smfWorkForce *wf __attribute__((unused)),
 
     /* Obtain dimensions of the data */
     smf_get_dims( res->sdata[idx], &nrow, &ncol, &nbolo, &ntslice, &ndata,
-                  NULL, NULL, status);
+                  &bstride, &tstride, status);
 
     /* Get pointer to DATA component of residual */
     res_data = (res->sdata[idx]->pntr)[0];
@@ -187,9 +188,6 @@ void smf_calcmodel_dks( smfWorkForce *wf __attribute__((unused)),
 
     /* Geta pointer to the QUAlity array */
     qua_data = (qua->sdata[idx]->pntr)[0];
-
-    /* Which QUALITY bits should be checked */
-    mask = ~(SMF__Q_JUMP|SMF__Q_STAT);
 
     if( (res_data == NULL) || (model_data == NULL) || (qua_data == NULL) ) {
       *status = SAI__ERROR;
@@ -250,8 +248,8 @@ void smf_calcmodel_dks( smfWorkForce *wf __attribute__((unused)),
 
       /* Then re-fit and remove the dark squid signal */
       msgOutif( MSG__VERB, "", "   cleaning detectors", status );
-      smf_clean_dksquid( res->sdata[idx], qua_data, mask, 0, model->sdata[idx],
-                         0, 0, status );
+      smf_clean_dksquid( res->sdata[idx], qua_data, SMF__Q_MOD, 0,
+                         model->sdata[idx], 0, 0, status );
 
       /* How has the model changed? */
       if( noi ) {
@@ -292,13 +290,15 @@ void smf_calcmodel_dks( smfWorkForce *wf __attribute__((unused)),
 
               for( k=0; k<ntslice; k++ ) {
 
-                dchisq += ( (dksquid[k]*gainbuf[j] + offsetbuf[j]) -
-                            (cdksquid[k]*cgainbuf[j] + coffsetbuf[j])) *
-                  ( (dksquid[k]*gainbuf[j] + offsetbuf[j]) -
-                    (cdksquid[k]*cgainbuf[j] + coffsetbuf[j]) ) /
-                  noi_data[bolcounter*noibstride + (k%nointslice)*noitstride];
+                if( !(qua_data[bolcounter*bstride+k*tstride]&SMF__Q_GOOD) ) {
+                  dchisq += ( (dksquid[k]*gainbuf[j] + offsetbuf[j]) -
+                              (cdksquid[k]*cgainbuf[j] + coffsetbuf[j])) *
+                    ( (dksquid[k]*gainbuf[j] + offsetbuf[j]) -
+                      (cdksquid[k]*cgainbuf[j] + coffsetbuf[j]) ) /
+                    noi_data[bolcounter*noibstride + (k%nointslice)*noitstride];
 
-                ndchisq++;
+                  ndchisq++;
+                }
               }
             }
 

@@ -226,7 +226,7 @@ void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk,
             model_data[ii] -= res_data[ii];
 
             /* also measure contribution to dchisq */
-            if( noi ) {
+            if( noi && !(qua_data[i*bstride]&SMF__Q_GOOD) ) {
               dchisq += (model_data[ii] - model_data_copy[ii]) *
                 (model_data[ii] - model_data_copy[ii]) /
                 noi_data[i*noibstride + (j%nointslice)*noitstride];

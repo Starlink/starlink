@@ -324,7 +324,6 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
   smfArray **lut=NULL;          /* Pointing LUT for each file */
   int *lut_data=NULL;           /* Pointer to DATA component of lut */
   smfGroup *lutgroup=NULL;      /* smfGroup of lut model files */
-  unsigned char mask;           /* Bitmask for QUALITY flags */
   dim_t maxconcat;              /* Longest continuous chunk length in samples*/
   int maxiter=0;                /* Maximum number of iterations */
   dim_t maxlen=0;               /* Max chunk length in samples */
@@ -1204,12 +1203,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
               dsize = (ast[i]->sdata[idx]->dims)[0] *
                 (ast[i]->sdata[idx]->dims)[1] * (ast[i]->sdata[idx]->dims)[2];
 
-              /* Ignore data with these QUALITY flags (should match
-                 smf_calcmodel_ast where it is first calculated) */
-              mask = ~(SMF__Q_JUMP|SMF__Q_SPIKE|SMF__Q_STAT);
-
               for( k=0; k<dsize; k++ ) {
-                if( !(qua_data[k]&mask) && (ast_data[k]!=VAL__BADD) ) {
+                if( !(qua_data[k]&SMF__Q_MOD) && (ast_data[k]!=VAL__BADD) ) {
                   res_data[k] += ast_data[k];
                 }
               }
@@ -1227,16 +1222,15 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
               }
 
               /* Rebin the residual + astronomical signal into a map */
-              mask = ~(SMF__Q_JUMP);
 
               if( dat.noi ) {
                 smf_rebinmap1( res[i]->sdata[idx], dat.noi[i]->sdata[idx],
-                               lut_data, qua_data, mask, varmapmethod,
+                               lut_data, qua_data, SMF__Q_GOOD, varmapmethod,
                                rebinflags, thismap, thisweight, thishits,
                                thisvar, msize, &scalevar, status );
               } else {
                 smf_rebinmap1( res[i]->sdata[idx], NULL,
-                               lut_data, qua_data, mask, varmapmethod,
+                               lut_data, qua_data, SMF__Q_GOOD, varmapmethod,
                                rebinflags, thismap, thisweight, thishits,
                                thisvar, msize, &scalevar, status );
               }
@@ -1412,10 +1406,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
 
             /* Add ast back into res. Mask should match ast_calcmodel_ast. */
 
-            mask = SMF__Q_BADS & SMF__Q_BADB;
-
             for( k=0; k<dsize; k++ ) {
-              if( !(qua_data[k]&mask) && (ast_data[k]!=VAL__BADD) ) {
+              if( !(qua_data[k]&SMF__Q_MOD) && (ast_data[k]!=VAL__BADD) ) {
                 res_data[k] += ast_data[k];
               }
             }
@@ -1481,7 +1473,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
 
                   smf_rebinmap1( res[0]->sdata[idx], NULL,
                                  lut_data, qua_data,
-                                 mask,
+                                 SMF__Q_GOOD,
                                  1, AST__REBININIT | AST__REBINEND,
                                  mapdata->pntr[0],
                                  bmapweight, bhitsmap, mapdata->pntr[1], msize,
@@ -1515,7 +1507,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
 
             /* Remove ast from res once again */
             for( k=0; k<dsize; k++ ) {
-              if( !(qua_data[k]&mask) && (ast_data[k]!=VAL__BADD) ) {
+              if( !(qua_data[k]&SMF__Q_MOD) && (ast_data[k]!=VAL__BADD) ) {
                 res_data[k] -= ast_data[k];
               }
             }

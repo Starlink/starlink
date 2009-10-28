@@ -121,7 +121,6 @@ void smf_fit_poly( const smfData *data, unsigned char *quality,
   double *indata=NULL;     /* Pointer to data array */
   dim_t j;                 /* Loop counter */
   dim_t k;                 /* Loop counter */
-  unsigned char mask;      /* QUALITY bit mask */
   gsl_matrix *mcov=NULL;   /* Covariance matrix */
   dim_t nbol=0;           /* Number of bolometers */
   size_t ncoeff = 2;       /* Number of coefficients to fit for; def. line */
@@ -202,9 +201,6 @@ void smf_fit_poly( const smfData *data, unsigned char *quality,
   coeffs = gsl_vector_alloc( ncoeff );
   mcov = gsl_matrix_alloc( ncoeff, ncoeff );
 
-  /* QUALITY bitmask for samples to ignore */
-  mask = ~(SMF__Q_JUMP|SMF__Q_STAT);
-
   /* Loop over bolometers. Only fit this bolometer if it is not
      flagged SMF__Q_BADB */
   for ( j=0; j<nbol; j++) 
@@ -227,7 +223,8 @@ void smf_fit_poly( const smfData *data, unsigned char *quality,
           gsl_vector_set( psky, i, indata[j + nbol*i] );
 
           /* weights */	
-          if( !(qual[nbol*i + j]&mask) && (indata[j + nbol*i] != VAL__BADD) ) {
+          if( !(qual[nbol*i + j]&SMF__Q_FIT) && (indata[j + nbol*i] 
+                                                 != VAL__BADD) ) {
             gsl_vector_set( weight, i, 1.0); /* Good QUALITY */
           } else {
             gsl_vector_set( weight, i, 0.0); /* Bad QUALITY */
@@ -239,8 +236,8 @@ void smf_fit_poly( const smfData *data, unsigned char *quality,
           gsl_vector_set( psky, i, indata[j*nframes + i] );
 
           /* weights */	
-          if( !(qual[j*nframes + i]&mask) && (indata[j*nframes + i] != 
-                                              VAL__BADD) ) {
+          if( !(qual[j*nframes + i]&SMF__Q_FIT) && (indata[j*nframes + i] != 
+                                                    VAL__BADD) ) {
             gsl_vector_set( weight, i, 1.0); /* Good QUALITY */
           } else {
             gsl_vector_set( weight, i, 0.0); /* Bad QUALITY */

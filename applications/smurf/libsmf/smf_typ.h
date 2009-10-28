@@ -350,6 +350,16 @@ static const size_t SMF__BADIDX = (size_t)-1;
 #define SMF__Q_APOD 32    /* Apodized/boundary data */
 #define SMF__Q_STAT 64    /* Telescope stationary */
 
+/* These macros are for several commonly-used combinations of quality flags */
+#define SMF__Q_GOOD ~(SMF__Q_JUMP) /* Samples that don't go into the map. Also
+                                      don't include in chi^2 */
+#define SMF__Q_MOD (SMF__Q_BADS|SMF__Q_BADB|SMF__Q_PAD) /* Samples that can't
+                                                           be modified
+                                                           by fitted models */
+#define SMF__Q_FIT ~(SMF__Q_APOD|SMF__Q_STAT)           /* Samples that can't
+                                                           be used to fit
+                                                           time-domain models */
+
 /* Flags for smf_open_newfile
    Must be individual bits in a single integer
 */

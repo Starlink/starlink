@@ -149,8 +149,6 @@ typedef struct smfCalcmodelComData {
   int gflat;               /* correct flatfield using GAI */
   dim_t idx;               /* Index within subgroup */
   int ijob;                /* Job identifier */
-  unsigned char mask_cor;  /* Ignore quality mask for correction */
-  unsigned char mask_meas; /* Ignore quality mask for measurement */
   double *model_data;      /* pointer to common mode data */
   dim_t nbolo;             /* number of bolometers */
   dim_t ntslice;           /* number of time slices */
@@ -178,8 +176,6 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
   dim_t idx;               /* Index within subgroup */
   size_t j;                /* Loop counter */
   double lastmean;         /* Last values of common mode */
-  unsigned char mask_cor;  /* Ignore quality mask for correction */
-  unsigned char mask_meas; /* Ignore quality mask for measurement */
   double *model_data;      /* pointer to common mode data */
   dim_t nbolo;             /* number of bolometers */
   dim_t ntslice;           /* number of time slices */
@@ -210,8 +206,6 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
   gcstride = pdata->gcstride;
   gflat = pdata->gflat;
   idx = pdata->idx;
-  mask_cor = pdata->mask_cor;
-  mask_meas = pdata->mask_meas;
   model_data = pdata->model_data; /* Careful! */
   nbolo = pdata->nbolo;
   ntslice = pdata->ntslice;
@@ -251,7 +245,7 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
           g = 1;
         }
 
-        if( !(qua_data[i*tstride+j*bstride]&mask_cor) ) {
+        if( !(qua_data[i*tstride+j*bstride]&SMF__Q_MOD) ) {
           /* Add scaled template back on. Note that this also applies
            in the case that the common-mode was used to flatfield,
            since the gain correction will already have been un-done in
@@ -288,7 +282,7 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
          all the detectors with good data. */
       sum = 0;   /* Initialize sum to 0 */
       for( j=0; j<nbolo; j++ ) {
-        if( !(qua_data[i*tstride+j*bstride]&mask_meas) ) {
+        if( !(qua_data[i*tstride+j*bstride]&SMF__Q_FIT) ) {
           sum += res_data[i*tstride+j*bstride];
           weight[i]++;
         }
@@ -328,7 +322,7 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
     for( i=pdata->b1; (*status==SAI__OK) && (i<=pdata->b2); i++ ) {
       if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {
         smf_templateFit1D( res_data+i*bstride, qua_data+i*bstride,
-                           mask_meas, mask_cor, ntslice, tstride,
+                           SMF__Q_FIT, SMF__Q_MOD, ntslice, tstride,
                            model_data, 0, gai_data+i*gbstride,
                            gai_data+gcstride+i*gbstride,
                            gai_data+2*gcstride+i*gbstride, status );
@@ -394,8 +388,6 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   dim_t j;                      /* Loop counter */
   smfCalcmodelComData *job_data=NULL; /* Array of job data */
   AstKeyMap *kmap=NULL;         /* Local keymap */
-  unsigned char mask_cor;       /* Ignore quality mask for correction */
-  unsigned char mask_meas;      /* Ignore quality mask for measurement */
   double dchisq=0;              /* this - last model residual chi^2 */
   smfArray *model=NULL;         /* Pointer to model at chunk */
   double *model_data=NULL;      /* Pointer to DATA component of model */
@@ -547,13 +539,6 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
     errRep( "", FUNC_NAME ": Model smfData was not loaded!", status);
   }
 
-  /* Which QUALITY bits should be checked for correcting sample. Ensure that
-     this matches the mask used in smf_calcmodel_gai! */
-  mask_cor = ~(SMF__Q_JUMP|SMF__Q_SPIKE|SMF__Q_APOD|SMF__Q_STAT);
-
-  /* Which QUALITY bits should be checked for measuring the mean */
-  mask_meas = mask_cor;
-
   /* Allocate job data for threads */
   job_data = smf_malloc( nw, sizeof(*job_data), 1, status );
 
@@ -652,8 +637,6 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         pdata->gcstride = gcstride;
         pdata->gflat = gflat;
         pdata->idx = idx;
-        pdata->mask_cor = mask_cor;
-        pdata->mask_meas = mask_meas;
         pdata->model_data = model_data_copy; /* Careful! */
         pdata->nbolo = nbolo;
         pdata->ntslice = ntslice;
@@ -717,8 +700,6 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         pdata->gcstride = gcstride;
         pdata->gflat = gflat;
         pdata->idx = idx;
-        pdata->mask_cor = mask_cor;
-        pdata->mask_meas = mask_meas;
         pdata->model_data = model_data; /* Careful! */
         pdata->nbolo = nbolo;
         pdata->ntslice = ntslice;
@@ -798,8 +779,6 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
           pdata->gcstride = gcstride;
           pdata->gflat = gflat;
           pdata->idx = idx;
-          pdata->mask_cor = mask_cor;
-          pdata->mask_meas = mask_meas;
           pdata->model_data = model_data;
           pdata->nbolo = nbolo;
           pdata->ntslice = ntslice;
@@ -890,11 +869,11 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
           for( j=0; j<ntslice; j++ ) {
 
             /* update the residual */
-            if( !(qua_data[i*bstride + j*tstride]&mask_cor) ) {
+            if( !(qua_data[i*bstride + j*tstride]&SMF__Q_MOD) ) {
               res_data[i*bstride + j*tstride] -= model_data[j];
 
               /* also measure contribution to dchisq */
-              if( noi ) {
+              if( noi && !(qua_data[i*bstride + j*tstride]&SMF__Q_GOOD)) {
                 dchisq += (model_data[j] - model_data_copy[j]) *
                   (model_data[j] - model_data_copy[j]) /
                   noi_data[i*noibstride + (j%nointslice)*noitstride];
@@ -955,7 +934,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
             /* Remove the common mode */
             for( j=0; j<ntslice; j++ ) {
-              if( !(qua_data[i*bstride + j*tstride]&mask_cor) ) {
+              if( !(qua_data[i*bstride + j*tstride]&SMF__Q_MOD) ) {
                 if( gflat ) {
                   /* If correcting the flatfield, scale data to match
                      template amplitude first, then remove */
@@ -968,7 +947,8 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
                 /* also measure contribution to dchisq */
                 if( noi &&
-                    (noi_data[i*noibstride+(j%nointslice)*noitstride] != 0)) {
+                    (noi_data[i*noibstride+(j%nointslice)*noitstride] != 0) &&
+                    !(qua_data[i*bstride + j*tstride]&SMF__Q_GOOD) ) {
 
                   if( gflat ) {
                     /* Compare change in template + offset/g */

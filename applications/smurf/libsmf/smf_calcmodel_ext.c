@@ -102,7 +102,6 @@ void smf_calcmodel_ext( smfWorkForce *wf __attribute__((unused)),
   /* Local Variables */
   dim_t i;                      /* Loop counter */
   dim_t idx=0;                  /* Index within subgroup */
-  unsigned char mask;           /* Bitmask for quality */
   smfArray *model=NULL;         /* Pointer to model at chunk */
   double *model_data=NULL;      /* Pointer to DATA component of model */
   dim_t ndata;                  /* Number of data points */
@@ -143,25 +142,19 @@ void smf_calcmodel_ext( smfWorkForce *wf __attribute__((unused)),
       ndata = (res->sdata[idx]->dims)[0] * (res->sdata[idx]->dims)[1] *
 	(res->sdata[idx]->dims)[2];
 
-      /* Which QUALITY bits should be considered for ignoring data. Should
-         apply correction to basically every sample unless we're ignoring
-         the enture bolometer, or an individual sample was flagged bad
-         by the DA system. */
-      mask = SMF__Q_BADS & SMF__Q_BADB;
-
       /* Loop over data points */
 
       if( !(flags&SMF__DIMM_INVERT) ) {
 	/* Apply the extinction correction */
 	for( i=0; i<ndata; i++ ) {
-	  if( !(qua_data[i]&mask) ) {
+	  if( !(qua_data[i]&SMF__Q_MOD) ) {
 	    res_data[i] *= model_data[i];
 	  }
 	}
       } else {
 	/* Undo the extinction correction */
 	for( i=0; i<ndata; i++ ) {
-	  if( !(qua_data[i]&mask) && (model_data[i] > 0) ) {
+	  if( !(qua_data[i]&SMF__Q_MOD) && (model_data[i] > 0) ) {
 	    res_data[i] /= model_data[i];
 	  }
 	}

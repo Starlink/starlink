@@ -125,7 +125,6 @@ void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)), smfDIMMData *d
   dim_t j;                      /* Loop counter */
   smfArray *lut=NULL;           /* Pointer to LUT at chunk */
   int *lut_data=NULL;           /* Pointer to DATA component of lut */
-  unsigned char mask;           /* Bitmask for quality */
   double m;                      /* Hold temporary value of m */
   smfArray *model=NULL;         /* Pointer to model at chunk */
   double *model_data=NULL;      /* Pointer to DATA component of model */
@@ -184,10 +183,6 @@ void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)), smfDIMMData *d
       smf_get_dims( res->sdata[idx],  NULL, NULL, &nbolo, &ntslice,
                     &ndata, &bstride, &tstride, status);
 
-      /* Which QUALITY bits should be considered for ignoring data. Should
-         match smf_iteratemap where AST added back into residual */
-      mask = ~(SMF__Q_JUMP|SMF__Q_SPIKE|SMF__Q_STAT);
-
       /* Loop over data points */
       for( i=0; i<nbolo; i++ ) if( !(qua_data[i*bstride]&SMF__Q_BADB) )
         for( j=0; j<ntslice; j++ ) {
@@ -199,14 +194,15 @@ void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)), smfDIMMData *d
 	  /* calculate new model value using the map/LUT */
           m = dat->map[lut_data[ii]];
 
-          /*
-          if( (m==VAL__BADD) && (!(qua_data[i*bstride+j*tstride]&mask)) ) {
-            printf("Nooo... %li %li\n", i, j);
+          if( m==VAL__BADD ){
+            /* We can get here if no data we regridded into the map at
+               this particular pixel (so it is un-defined). Set the value to 0
+               to avoid propagating the undefined value. */
+            m = 0;
           }
-          */
 
-          /* measure contribution to dchisq */
-          if( noi && !(qua_data[ii]&mask) ) {
+          /* measure contribution to dchisq (samples that would go in map) */
+          if( noi && !(qua_data[ii]&SMF__Q_GOOD) ) {
             dchisq += (m - model_data[ii])*(m - model_data[ii]) /
               noi_data[i*noibstride + (j%nointslice)*noitstride];
             ndchisq++;
@@ -221,7 +217,7 @@ void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)), smfDIMMData *d
                       because we've already done this in smf_iteratemap
                       before calling smf_rebinmap1. */
 
-	  if( !(qua_data[ii]&mask) ) {
+	  if( !(qua_data[ii]&SMF__Q_MOD) ) {
 	    res_data[ii] -= model_data[ii];
           }
 	}
