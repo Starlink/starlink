@@ -901,6 +901,7 @@ static int Unformat( AstFrame *, int, const char *, double *, int * );
 static int ValidateAxis( AstFrame *, int, const char *, int * );
 static int ValidateFrameIndex( AstFrameSet *, int, const char *, int * );
 static void AddFrame( AstFrameSet *, int, AstMapping *, AstFrame *, int * );
+static void AppendAxes( AstFrameSet *, AstFrame *, int * );
 static void Clear( AstObject *, const char *, int * );
 static void ClearAttrib( AstObject *, const char *, int * );
 static void ClearBase( AstFrameSet *, int * );
@@ -1129,8 +1130,10 @@ f     This routine adds a new Frame and an associated Mapping to a
 *     one which already exists within the FrameSet. The new Frame then
 *     becomes the FrameSet's current Frame.
 *
-c     This function may also be used to merge two FrameSets.
-f     This routine may also be used to merge two FrameSets.
+c     This function
+f     This routine 
+*     may also be used to merge two FrameSets, or to append extra axes 
+*     to every Frame in a FrameSet.
 
 *  Parameters:
 c     this
@@ -1142,7 +1145,9 @@ f     IFRAME = INTEGER (Given)
 *        the coordinate system upon which the new one is to be based.
 *        This value should lie in the range from 1 to the number of
 *        Frames already in the FrameSet (as given by its Nframe
-*        attribute).
+*        attribute). As a special case, AST__ALLFRAMES may be supplied, 
+*        in which case the axes defined by the supplied Frame are appended
+*        to every Frame in the FrameSet (see the Notes section for details).
 c     map
 f     MAP = INTEGER (Given)
 *        Pointer to a Mapping which describes how to convert
@@ -1151,7 +1156,9 @@ c        Frame with index "iframe") into coordinates in the new
 f        Frame with index IFRAME) into coordinates in the new
 *        system. The Mapping's forward transformation should perform
 *        this conversion, and its inverse transformation should
-*        convert in the opposite direction.
+*        convert in the opposite direction. The supplied Mapping is ignored
+c        if parameter "iframe"is equal to AST__ALLFRAMES.
+f        if parameter IFRAME is equal to AST__ALLFRAMES.
 c     frame
 f     FRAME = INTEGER (Given)
 *        Pointer to a Frame that describes the new coordinate system.
@@ -1197,6 +1204,26 @@ c     Frame of the "frame" FrameSet. This latter Frame becomes the
 f     the IFRAME argument (in the original FrameSet) and the current
 f     Frame of the FRAME FrameSet. This latter Frame becomes the
 *     current Frame in the merged FrameSet.
+*     - As another special case, if a value of AST__ALLFRAMES is supplied
+*     for parameter
+c     "iframe",
+f     IFRAME,
+*     then the supplied Mapping is ignored, and the axes defined by the 
+*     supplied Frame are appended to each Frame in the FrameSet. In detail,
+*     each Frame in the FrameSet is replaced by a CmpFrame containing the 
+*     original Frame and the Frame specified by parameter
+c     "frame".
+f     FRAME.
+*     In addition, each Mapping in the FrameSet is replaced by a CmpMap 
+*     containing the original Mapping and a UnitMap in parallel. The Nin and
+*     Nout attributes of the UnitMap are set equal to the number of axes 
+*     in the supplied Frame. Each new CmpMap is simplified using 
+c     astSimplify
+f     AST_SIMPLIFY
+*     before being stored in the FrameSet.
+
+
+
 *--
 */
 
@@ -1223,7 +1250,15 @@ f     Frame of the FRAME FrameSet. This latter Frame becomes the
 /* Check the global error status. */
    if ( !astOK ) return;
 
-/* Initialise variables to avoid "used of uninitialised variable"
+/* First handle cases where we are appending axes to the existing 
+   Frames in a FrameSet. */
+   if( iframe == AST__ALLFRAMES ) {
+      AppendAxes( this, frame, status );
+      return;
+   }
+
+/* Now handle cases where we are adding a new Frame into the FrameSet. 
+   Initialise variables to avoid "used of uninitialised variable"
    messages from dumb compilers. */
    inode_map = NULL;
    next_map = NULL;
@@ -1582,6 +1617,89 @@ static double Angle( AstFrame *this_frame, const double a[],
 
 /* Return the result. */
    return result;
+}
+
+static void AppendAxes( AstFrameSet *this, AstFrame *frame, int *status ) {
+/*
+*  Name:
+*     AppendAxes
+
+*  Purpose:
+*     Append axes to every Frame in a FrameSet.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "frameset.h"
+*     void AppendAxes( AstFrameSet *this, AstFrame *frame, int *status )
+
+*  Class Membership:
+*     FrameSet member function 
+
+*  Description:
+*     This function replaces every Frame in the FrameSet with a CmpFrame 
+*     holding the original Frame and the supplied Frame. It also replaces 
+*     every Mapping in the FrameSet with a parallel CmpMap holding the 
+*     original Mapping and a UnitMap. The Nin and Nout attributes of every 
+*     UnitMap are equal to the number of axes in the supplied Frame. Each
+*     CmpMap is simplified before being stored in the FrameSet.
+
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     frame
+*        Pointer to a Frame holding the new axes to add to every Frame in 
+*        the FrameSet.
+*     status
+*        Pointer to the inherited status variable.
+
+*/
+
+/* Local Variables: */
+   AstCmpFrame *frm;             /* Pointer to new Frame */
+   AstCmpMap *map;               /* UnitMap to new Mapping */
+   AstUnitMap *umap;             /* UnitMap to feed the new axes */
+   int iframe;                   /* Frame index */
+   int imap;                     /* Mapping index */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Loop round every Frame in the FrameSet. */
+   for ( iframe = 0; iframe < this->nframe; iframe++ ) {
+
+/* Create a CmpFrame holding the original Frame and the new Frame. */
+      frm = astCmpFrame( this->frame[ iframe ], frame, " ", status );
+
+/* Annul the original Frame pointer and store the new CmpFrame pointer. */
+      (void) astAnnul( this->frame[ iframe ] );
+      this->frame[ iframe ] = (AstFrame *) frm;
+   }
+
+/* Create a UnitMap with the number of inputs and outputs equal to the 
+   number of axes in the supplied Frame. */
+   umap = astUnitMap( astGetNaxes( frame ), " ", status );
+
+/* Loop round every Mapping in the FrameSet. */
+   for ( imap = 0; imap < this->nnode - 1; imap++ ) {
+
+/*  Crate a parallel CmpMap holding the original Mapping and the UnitMap. */
+      map = astCmpMap( this->map[ imap ], umap, 0, " ", status );
+
+/* Annul the original Mapping pointer. */
+      (void) astAnnul( this->map[ imap ] );
+
+/* Simplify the new Mapping, and store it in the FrameSet. */
+      this->map[ imap ] = astSimplify( map );
+
+/* Annul the un-simplified Mapping pointer. */
+      map = astAnnul( map );
+   }
+
+/* Annul the UnitMap pointer. */
+   umap = astAnnul( umap );
 }
 
 static double AxAngle( AstFrame *this_frame, const double a[], const double b[], int axis, int *status ) {

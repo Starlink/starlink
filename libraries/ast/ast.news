@@ -30,6 +30,8 @@ conversion between the two Frames being achieved using a UnitMap.
 - Added method astMatchAxes (AST_MATCHAXES) to the Frame class. This
 allows corresponding axes in two Frames to be identified.
 
+- The astAddFrame (AST_ADDFRAME) method can now be used to append one or 
+more axes to all Frames in a FrameSet.
 
 
 Main Changes in Version 5.1

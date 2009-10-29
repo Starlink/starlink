@@ -462,6 +462,7 @@
 #define AST__BASE (0)            /* Identify base Frame */
 #define AST__CURRENT (-1)        /* Identify current Frame */
 #define AST__NOFRAME (-99)       /* An invalid Frame index */
+#define AST__ALLFRAMES (-199)    /* A value representing all Frames */
 
 /* Type Definitions. */
 /* ================= */
