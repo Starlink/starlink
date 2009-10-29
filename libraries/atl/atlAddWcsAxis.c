@@ -173,7 +173,7 @@ void atlAddWcsAxis( AstFrameSet *wcs, AstMapping *map, AstFrame *frm,
 
 /* Note the original base Frame index, and make the new GRID Frame (just added) the 
    base Frame. */
-   ibase = astGetI( wcs, "Based" );
+   ibase = astGetI( wcs, "Base" );
    astSetI( wcs, "Base", astGetI( wcs, "Current" ) );
 
 /* Re-instate the original current Frame (unless the original base and current Frames 
