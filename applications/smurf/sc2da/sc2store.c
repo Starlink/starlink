@@ -40,6 +40,7 @@
 #include "ast.h"
 #include "ndf.h"
 #include "star/ndg.h"
+#include "star/atl.h"
 #include "mers.h"
 #include "f77.h"
 #include "Dits_Err.h"
@@ -3928,14 +3929,13 @@ AstFrameSet *timeWcs( int subnum, int ntime, const SC2STORETelpar* telpar,
 *        Integrated into specwriter.
 *     19-DEC-2006 (TIMJ):
 *        Integrated into SCUBA-2 software as variant of ACSIS DA version
+*     29-OCT-2009 (DSB):
+*        Modified to use atlAddWcsAxis.
 
 */
 
 /* Local Variables: */
-   AstCmpFrame *totfrm;
-   AstCmpMap *totmap;
-   AstFrame *gridfrm;
-   AstFrameSet *result, *spacefset;
+   AstFrameSet *result;
    AstLutMap *timemap;
    AstTimeFrame *timefrm;
    double tcopy[2];  /* local copy of time lut for when only 1 number present */
@@ -3951,16 +3951,15 @@ AstFrameSet *timeWcs( int subnum, int ntime, const SC2STORETelpar* telpar,
 /* Start an AST context so we do not need to annul AST pointers explicitly. */
    astBegin;
 
-   /* Create a frame covering the focal plane coordinates */
-   sc2ast_createwcs( subnum, NULL, NULL, NULL, &spacefset, status );
+/* Create a frameset holding the 2D GRID Frame and a 2D Frame describing focal 
+   plane coordinates */
+   sc2ast_createwcs( subnum, NULL, NULL, NULL, &result, status );
 
-/*
-   Now create a TimeFrame to describe MJD in the TAI timescale, and
-   a LutMap which transforms grid coord into MJD (in days). The default
-   TimeFrame attribute values give us what we want. 
-   Work out the duration of the observation to decide on formatting.
-   To give AST some help with formatting axes we use a TimeOrigin.
-*/
+/* Now create a TimeFrame to describe MJD in the TAI timescale, and a LutMap
+   which transforms grid coord into MJD (in days). The default TimeFrame 
+   attribute values give us what we want. Work out the duration of the 
+   observation to decide on formatting. To give AST some help with 
+   formatting axes we use a TimeOrigin. */
    timefrm = astTimeFrame( " " );
 
    /* If telpar is defined, add additional info */
@@ -4008,26 +4007,9 @@ AstFrameSet *timeWcs( int subnum, int ntime, const SC2STORETelpar* telpar,
 
    if (malloced) free( ltimes );
 
-/* We now have the Frames and Mappings describing all the individual
-   axes. Join all the Frames together into a CmpFrame (in the order spectral,
-   spatial, time), and join all the Mappings together into a parallel
-   CmpMap. */
-   totfrm = astCmpFrame( spacefset, timefrm, " " );
-   totmap = astCmpMap( spacefset, timemap, 0, " " );
-
-/* Create a 3D GRID Frame. */
-   gridfrm = astFrame( 3, "Domain=GRID,Title=FITS pixel coordinates" );
-   astSet( gridfrm, "Unit(1)=pixel,Label(1)=FITS pixel axis 1" );
-   astSet( gridfrm, "Unit(2)=pixel,Label(2)=FITS pixel axis 2" );
-   astSet( gridfrm, "Unit(3)=pixel,Label(2)=FITS pixel axis 3" );
-
-/* Create the FrameSet to return, initially containing just the above
-   GRID Frame. */
-   result = astFrameSet( gridfrm, " " );
-
-/* Add the total Frame into the FrameSet using the total Mapping to
-   connect it to the base (i.e. GRID) Frame. */
-   astAddFrame( result, AST__BASE, totmap, totfrm );
+/* Now append the time axis to every Frame in the FrameSet, except for the base Frame, 
+   which receives an extra grid axis instead. */
+   atlAddWcsAxis( result, (AstMapping *) timemap, (AstFrame *) timefrm, status );
 
 /* If no error has occurred, export the resulting FrameSet pointer
    from the current AST context so that it will not be annulled by the
