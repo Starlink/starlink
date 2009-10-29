@@ -20,7 +20,7 @@
 *                    AstFrameSet *outfset, int moving, int *lbnd_out,
 *                    int *ubnd_out, size_t maxmem, double *map,
 *                    unsigned int *hitsmap, double *mapvar, double
-*                    *weights, int *status );
+*                    *weights, char data_units[], int *status );
 
 *  Arguments:
 *     wf = smfWorkForce * (Given)
@@ -54,6 +54,10 @@
 *        Variance of each pixel in map
 *     weights = double* (Returned)
 *        Relative weighting for each pixel in map
+*     data_units = char[] (Returned)
+*        Data units read from the first chunk. These may be different from
+*        that read from raw data due to flatfielding. Should be a buffer
+*        of at least size SMF__CHARLABEL. Can be NULL.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -210,6 +214,9 @@
 *     2009-10-25 (TIMJ):
 *        Add bolrootgrp argument to give us control of where the bolometer
 *        maps go.
+*     2009-10-28 (TIMJ):
+*        Add data_units. Needed because we can only read data units after
+*        the data have been flatfielded. Also check for consistency.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -271,7 +278,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
                      AstFrameSet *outfset, int moving, int *lbnd_out,
                      int *ubnd_out, size_t maxmem, double *map,
                      unsigned int *hitsmap, double *mapvar,
-                     double *weights, int *status ) {
+                     double *weights, char data_units[], int *status ) {
 
   /* Local Variables */
   size_t aiter;                 /* Actual iterations of sigma clipper */
@@ -832,6 +839,15 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
         /*** TIMER ***/
         msgOutiff( MSG__DEBUG, "", FUNC_NAME ": ** %f s concatenating data",
                    status, smf_timerupdate(&tv1,&tv2,status) );
+      }
+    }
+
+    /* Check units */
+    {
+      smfData *tmpdata = res[0]->sdata[0];
+      /* Check units are consistent */
+      if (tmpdata && tmpdata->hdr) {
+        smf_check_units( contchunk+1, data_units, tmpdata->hdr, status);
       }
     }
 

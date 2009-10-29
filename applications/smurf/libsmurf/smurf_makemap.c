@@ -1498,9 +1498,6 @@ void smurf_makemap( int *status ) {
         steptime = data->hdr->steptime;
       }
 
-      /* Check units are consistent */
-      smf_check_units( i, data_units, data->hdr, status);
-
       /* Propagate provenance to the output file */
       smf_accumulate_prov( data, igrp, i, ondf, "SMURF:MAKEMAP(ITER)",
                            status);
@@ -1516,7 +1513,7 @@ void smurf_makemap( int *status ) {
     /* Call the low-level iterative map-maker */
     smf_iteratemap( wf, igrp, bolrootgrp, keymap, NULL, bpms, outfset, moving, lbnd_out,
                     ubnd_out, maxmem-mapmem, map, hitsmap, variance, weights,
-                    status );
+                    data_units, status );
 
     if( bolrootgrp ) grpDelet( &bolrootgrp, status );
 
