@@ -21,10 +21,12 @@ void atlAddWcsAxis( AstFrameSet *wcs, AstMapping *map, AstFrame *frm,
 *                          int *status )
 
 *  Description:
-*     This function adds one or more new axes to both the base (i.e. GRID)
-*     Frame and the current (i.e. WCS) Frame in the supplied WCS FrameSet.
-*     If the FrameSet contains any other Frames, their dimensionality is
-*     left unchanged.
+*     This function adds one or more new axes to all the Frames in an NDF 
+*     WCS FrameSet. The base (i.e. GRID) Frame is expanded to include a number 
+*     of extra axes equal to the Nin attribute of the supplied Mapping. All 
+*     other Frames in the FrameSet are replaced by CmpFrames holding the 
+*     original Frame and the supplied Frame. These new axes are connected to 
+*     the new GRID axes using the supplied Mapping.
 
 *  Arguments:
 *     wcs
@@ -83,14 +85,14 @@ void atlAddWcsAxis( AstFrameSet *wcs, AstMapping *map, AstFrame *frm,
 */
 
 /* Local Variables: */
-   AstCmpMap *new_map;      /* Mapping from new GRID Frame to new WCS Frame */
+   AstCmpMap *gmap;         /* Mapping from new GRID Frame to new base Frame */
    AstFrame *grid_frm;      /* Pointer to original base (GRID) Frame */
    AstFrame *new_grid_frm;  /* Pointer to new GRID Frame */
-   AstCmpFrame *new_wcs_frm;/* Pointer to new WCS Frame */
-   AstMapping *pmap;        /* Mapping from original to new GRID Frame */
    const char *dom;         /* Pointer to Domain attribute value */
    int axes[ ATL__MXDIM ];  /* Indicies of grid axes to pick */
    int i;                   /* Axis index */
+   int ibase;               /* Index of original base Frame */
+   int icurr;               /* Index of original current Frame */
    int ngrid_add;           /* Number of additional grid axes */
    int ngrid_new;           /* New number of grid axes */
    int ngrid_old;           /* Original number of grid axes */
@@ -138,12 +140,11 @@ void atlAddWcsAxis( AstFrameSet *wcs, AstMapping *map, AstFrame *frm,
    ngrid_add = astGetI( map, "Nin" );
 
 /* Use astPickAxes to create a GRID Frame with the required additional number 
-   of axes. This also returns a pointer to a new PermMap that maps the old
-   GRID Frame to the new one. */
+   of axes. */
    ngrid_new = ngrid_old + ngrid_add;
    for( i = 0; i < ngrid_old; i++ ) axes[ i ] = i + 1;
    for( ; i < ngrid_new; i++ ) axes[ i ] = 0;
-   new_grid_frm = astPickAxes( grid_frm, ngrid_new, axes, &pmap );
+   new_grid_frm = astPickAxes( grid_frm, ngrid_new, axes, NULL );
 
 /* Set up the attributes for the new axes. These values are copied from
    ndf1_inifr.f  */
@@ -154,35 +155,34 @@ void atlAddWcsAxis( AstFrameSet *wcs, AstMapping *map, AstFrame *frm,
       astSet( new_grid_frm, "Unit(%d)=pixel", i );
    }
 
-/* Create a CmpFrame containing the original current Frame, and the
-   supplied Frame holding the additional WCS axes. */
-   new_wcs_frm = astCmpFrame( astGetFrame( wcs, AST__CURRENT ),
-                              frm, " " );
+/* Append the supplied Frame to every Frame in the FrameSet, including the base 
+   (GRID) Frame. These new axes in each Frame are inter-connected using UnitMaps. */
+   astAddFrame( wcs, AST__ALLFRAMES, NULL, frm );
 
-/* Create a CmpMap describing the transformation from the new extended
-   GRID Frame to the new extended. This is made up of the Mapping from
-   the original GRID Frame to the original WCS Frame, in parallel with
-   the supplied Mapping. */
-   new_map = astCmpMap( astGetMapping( wcs, AST__BASE, AST__CURRENT ),
-                        map, 0, " " );
+/* Now construct a Mapping that transforms the base Frame in the FrameSet (modified 
+   by the above call) into the expanded GRID Frame created above. This is a parallel 
+   CmpMap that uses a UnitMap to transform the original grid axes, and the inverse of 
+   the supplied Mapping to transform the newly added grid axes. */
+   gmap = astCmpMap( astUnitMap( ngrid_old, " " ), map, 0, " " );
+   astInvert( gmap );
 
-/* Remove the original current Frame from the FrameSet. */
-   astRemoveFrame( wcs, AST__CURRENT );
+/* Add the new GRID Frame into the FrameSet. It becomes the current Frame so note the 
+   index of the original current Frame first. */
+   icurr = astGetI( wcs, "Current" );
+   astAddFrame( wcs, AST__BASE, gmap, new_grid_frm );
 
-/* Add the new GRID Frame into the WCS FrameSet, using the PermMap
-   returned by astPickAxes to connect it to the original GRID Frame. The
-   new Frame is amde the current Frame. */
-   astAddFrame( wcs, AST__BASE, pmap, new_grid_frm );
-
-/* Remove the original base Frame and make the new GRID Frame (currently
-   the current Frame) the new base Frame */
-   astRemoveFrame( wcs, AST__BASE );
+/* Note the original base Frame index, and make the new GRID Frame (just added) the 
+   base Frame. */
+   ibase = astGetI( wcs, "Based" );
    astSetI( wcs, "Base", astGetI( wcs, "Current" ) );
 
-/* Add the new WCS Frame into the WCS FrameSet, using the CmpMap found
-   above to connect it to the new GRID Frame. The new Frame is made the 
-   current Frame. */
-   astAddFrame( wcs, AST__BASE, new_map, new_wcs_frm );
+/* Re-instate the original current Frame (unless the original base and current Frames 
+   were the same, in which case the original current Frame will be removed when the 
+   original base Frame is removed below). */
+   if( ibase != icurr ) astSetI( wcs, "Current", icurr );
+ 
+/* Remove the original base Frame. */
+   astRemoveFrame( wcs, ibase );
 
 /* End the AST Object context. This annulls all AST objects created since
    the matching call to astBegin. */

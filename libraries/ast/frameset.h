@@ -635,7 +635,7 @@ astINVOKE(O,astLoadFrameSet_(mem,size,vtab,name,astCheckChannel(channel),STATUS_
    use. This provides a contextual error report if a pointer to the wrong sort
    of object is supplied. */
 #define astAddFrame(this,iframe,map,frame) \
-astINVOKE(V,astAddFrame_(astCheckFrameSet(this),iframe,astCheckMapping(map),astCheckFrame(frame),STATUS_PTR))
+astINVOKE(V,astAddFrame_(astCheckFrameSet(this),iframe,(((iframe)!=AST__ALLFRAMES)?astCheckMapping(map):NULL),astCheckFrame(frame),STATUS_PTR))
 #define astGetFrame(this,iframe) \
 astINVOKE(O,astGetFrame_(astCheckFrameSet(this),iframe,STATUS_PTR))
 #define astGetMapping(this,iframe1,iframe2) \
