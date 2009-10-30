@@ -330,7 +330,16 @@ void smf_get_projpar( AstSkyFrame *skyframe, const double skyref[2],
             parDef1d( "PIXSIZE", ( defsize[ 0 ] == defsize[ 1 ] ) ? 1 : 2, 
                            defsize, status );
          }
-         parGet1d( "PIXSIZE", 2, pixsize, &nval, status );
+         if (*status == SAI__OK) {
+           parGet1d( "PIXSIZE", 2, pixsize, &nval, status );
+           if (*status == PAR__NULL) {
+             /* Null just defaults to what we had before */
+             errAnnul( status );
+             pixsize[0] = 0.1*NINT( fabs( par[ 4 ] )*AST__DR2D*36000.0 );
+             pixsize[1] = 0.1*NINT( fabs( par[ 5 ] )*AST__DR2D*36000.0 );
+             nval = 2;
+           }
+         }
      
 /* If OK, duplicate the first value if only one value was supplied. */
          if( *status == SAI__OK ) {
