@@ -147,10 +147,12 @@ void smf_get_projpar( AstSkyFrame *skyframe, const double skyref[2],
    const char *deflat;   /* Default for REFLAT */
    const char *deflon;   /* Default for REFLON */
    double autorot;       /* Autogrid default for CROTA parameter */
+   const double fbpixsize = 6.0; /* Fallback pixel size if we have no other information */
    double defsize[ 2 ];  /* Default pixel sizes in arc-seconds */
    double pixsize[ 2 ];  /* Pixel sizes in arc-seconds */
    double rdiam;         /* Diameter of bounding circle, in rads */
    int coin;             /* Are all points effectively co-incident? */
+   int i;
    int nval;             /* Number of values supplied */
    int sparse = 0;       /* Local definition of sparseness */
    int udefs = 0;        /* Flag for defaults used or not */
@@ -231,8 +233,8 @@ void smf_get_projpar( AstSkyFrame *skyframe, const double skyref[2],
          par[ 0 ] = 0.0;
          par[ 1 ] = 0.0;
          if (par[4] == AST__BAD || par[5] == AST__BAD ) {
-           par[ 4 ] = (6.0/3600.0)*AST__DD2R;
-           par[ 5 ] = (6.0/3600.0)*AST__DD2R;
+           par[ 4 ] = (fbpixsize/3600.0)*AST__DD2R;
+           par[ 5 ] = (fbpixsize/3600.0)*AST__DD2R;
          }
          par[ 6 ] = map_pa;
       }
@@ -324,19 +326,39 @@ void smf_get_projpar( AstSkyFrame *skyframe, const double skyref[2],
    the spectral axis is fixed by the first input data file - see 
    smf_cubebounds.c). First convert the autogrid values form rads to arcsec
    and establish them as the dynamic default for "PIXSIZE". */
-         if( par[ 4 ] != AST__BAD && par[ 5 ] != AST__BAD ) {
-            defsize[ 0 ] = 0.1*NINT( fabs( par[ 4 ] )*AST__DR2D*36000.0 );
-            defsize[ 1 ] = 0.1*NINT( fabs( par[ 5 ] )*AST__DR2D*36000.0 );
-            parDef1d( "PIXSIZE", ( defsize[ 0 ] == defsize[ 1 ] ) ? 1 : 2, 
-                           defsize, status );
+         nval = 0;
+         if( par[ 4 ] != AST__BAD || par[ 5 ] != AST__BAD ) {
+           for ( i = 4; i <= 5; i++ ) {
+             if ( par[ i ] != AST__BAD ) {
+               defsize[ nval ] = 0.1*NINT( fabs( par[ i ] )*AST__DR2D*36000.0 );
+               nval++;
+             }
+           }
+           /* set the dynamic default, handling case where both dimensions
+              have same default. */
+           if (nval == 1) {
+             defsize[1] = defsize[0];
+           } else if (nval == 2 && defsize[0] == defsize[1]) {
+             nval = 1;
+           }
+           parDef1d( "PIXSIZE", nval, defsize, status );
+
+         } else {
+           /* pick a default in case something odd happens and we have
+              no other values*/
+           defsize[ 0 ] = fbpixsize;
+           defsize[ 1 ] = defsize[ 0 ];
+           nval = 2;
          }
          if (*status == SAI__OK) {
+           pixsize[0] = AST__BAD;
+           pixsize[1] = AST__BAD;
            parGet1d( "PIXSIZE", 2, pixsize, &nval, status );
            if (*status == PAR__NULL) {
              /* Null just defaults to what we had before */
              errAnnul( status );
-             pixsize[0] = 0.1*NINT( fabs( par[ 4 ] )*AST__DR2D*36000.0 );
-             pixsize[1] = 0.1*NINT( fabs( par[ 5 ] )*AST__DR2D*36000.0 );
+             pixsize[0] = defsize[0];
+             pixsize[1] = defsize[1];
              nval = 2;
            }
          }
