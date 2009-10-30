@@ -190,7 +190,8 @@
 *          to the point-spread function of the input data.
 *     PIXSIZE( 2 ) = _REAL (Read)
 *          Pixel dimensions in the output image, in arcsec. If only one value
-*          is supplied, the same value will be used for both axes.
+*          is supplied, the same value will be used for both axes. The default
+*          depends on the wavelength of the input data.
 *     REF = NDF (Read)
 *          An existing NDF that is to be used to define the output grid.
 *          If supplied, the output grid will be aligned with the supplied
