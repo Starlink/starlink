@@ -382,6 +382,11 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
            gives the orientation of the map vertical within the tracking system. */
         map_pa = smf_calc_mappa( hdr, system, skyin, status );
 
+        /* Provide a sensible default for the pixel size based on wavelength */
+        par[4] = smf_calc_telres( hdr->fitshdr, status );
+        par[4] *= AST__DD2R/3600.0;
+        par[5] = par[4];
+
         /* Calculate the projection parameters. We do not enable autogrid determination
            for SCUBA-2 so we do not need to obtain all the data before calculating
            projection parameters. */
