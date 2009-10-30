@@ -84,15 +84,17 @@
 *        SCUBA-2 does not use autogrid facilities.
 *     2008-06-04 (DSB):
 *        Correct signs of CDELT values when autogrid algorithm fails.
+*     2009-10-29 (TIMJ):
+*        If par[4] and par[5] are filled in then fallback to those values
+*        rather than filling in with 6 arcsec.
 *     {enter_further_changes_here}
 
 *  Notes:
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2006-2007 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2008 University of British Columbia.
-*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2008-2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -224,12 +226,14 @@ void smf_get_projpar( AstSkyFrame *skyframe, const double skyref[2],
       }
 
 /* If autogrid values were not found, use the following fixed default 
-   values. */
+   values. Do not override extenal defaults for pixel size. */
       if( !autogrid || ( autogrid && par[ 0 ] == AST__BAD ) ) {
          par[ 0 ] = 0.0;
          par[ 1 ] = 0.0;
-         par[ 4 ] = (6.0/3600.0)*AST__DD2R;
-         par[ 5 ] = (6.0/3600.0)*AST__DD2R;
+         if (par[4] == AST__BAD || par[5] == AST__BAD ) {
+           par[ 4 ] = (6.0/3600.0)*AST__DD2R;
+           par[ 5 ] = (6.0/3600.0)*AST__DD2R;
+         }
          par[ 6 ] = map_pa;
       }
      
