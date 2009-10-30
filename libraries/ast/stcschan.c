@@ -81,6 +81,8 @@ f     encodings and the internal ASCII encoding. If no such routines
 *     The full text of version 1.30 is supported by the StcsChan class, 
 *     with the following exceptions and provisos:
 *
+*     - When reading an STC-S phrase, case is ignored except when reading
+*     units strings.
 *     - There is no support for multiple intervals specified within a 
 *     TimeInterval, PositionInterval, SpectralInterval or RedshiftInterval.
 *     - If the ET timescale is specified, TT is used instead.

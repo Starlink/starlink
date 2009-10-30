@@ -24,7 +24,7 @@ f+
 \newcommand{\stardocnumber}    {210.26}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {21st September 2009}
+\newcommand{\stardocdate}      {30th October 2009}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -21825,12 +21825,10 @@ not exist in the KeyMap.
 
 \end{enumerate}
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V5.3}
+\subsection{Changes Introduced in V5.3}
 
-The following describes the most significant changes which have
-occurred in the AST library between versions V5.2 and V5.3 (the
-current version):
+The following describes the most significant changes which 
+occurred in the AST library between versions V5.2 and V5.3:
 
 \begin{enumerate}
 
@@ -21871,6 +21869,20 @@ f+
 AST\_ADDFRAME
 f-
 method can now be used to append one or more axes to all Frames in a FrameSet.
+\end{enumerate}
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V5.3-1}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V5.3 and V5.3-1 (the
+current version):
+
+\begin{enumerate}
+
+\item The StcsChan class now ignores case when reading STC-S phrases (except
+that units strings are still case sensitive).
+
 \end{enumerate}
 
 Programs which are statically linked will need to be re-linked in

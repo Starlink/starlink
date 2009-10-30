@@ -1,6 +1,6 @@
 AST Library
 -----------
-   A new release (V5.3) of the Starlink AST (astrometry) library is
+   A new release (V5.3-1) of the Starlink AST (astrometry) library is
 now available.
 
    AST provides a comprehensive range of facilities for attaching
@@ -15,6 +15,13 @@ environment-independent.
 
 Main Changes in this Version
 ----------------------------
+
+- The StcsChan class now ignores case when reading STC-S phrases (except
+that units strings are still case sensitive).
+
+
+Main Changes in Version 5.3
+---------------------------
 
 - The details of how a Frame is aligned with another Frame by the
 astFindFrame and astConvert (AST_FINDFRAME and AST_CONVERT) functions
