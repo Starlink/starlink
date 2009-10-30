@@ -106,6 +106,10 @@
 *        Correction to the 20-NOV-2007 fix.
 *     2-DEC-2008 (DSB):
 *        Avoid integer truncation when modifying pixel coordinate bounds.
+*     30-OCT-2009 (DSB):
+*        Changed to accomodate taking a 2D section from a 3D NDF in cases
+*        where the bounds on each of the two axes are specified using WCS 
+*        values.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -246,6 +250,23 @@
          WUBND( I ) = AST__BAD    
       END DO
 
+*  Initialise a box that encloses the required section of PIXEL space.
+      DO I = 1, NPIX
+         DLBNDD( I ) = DBLE( LBNDD( I ) ) - 1.0D0
+         DUBNDD( I ) = DBLE( UBNDD( I ) ) 
+         PLBND( I ) = DLBNDD( I )
+         PUBND( I ) = DUBNDD( I )
+      END DO
+
+*  Pad out with "1:1" bounds to allow for the section specifying more
+*  pixel axes than there are in the NDF.
+      DO I = NPIX + 1, NDF__MXDIM
+         DLBNDD( I ) = 0.0D0
+         DUBNDD( I ) = 1.0D0
+         PLBND( I ) = 0.0D0
+         PUBND( I ) = 1.0D0
+      END DO
+
 *  If any axis that has been specified using "centre/width" format has a
 *  WCS width value and a defaulted centre value, then we use a default
 *  equal to the axis value at the centre of the NDF.
@@ -275,7 +296,7 @@
       ALLPIX = .TRUE.
 
 *  Indicate that so far we have not found any centre/width bounds that
-*  ause a WCS value for one limit and a pixel value for the other.
+*  use a WCS value for one limit and a pixel value for the other.
       MIXED = .FALSE.
 
 *  We now set up the bounds of two boxes; PLBND/PUBND hold the bounds of
@@ -294,10 +315,6 @@
 *  axis for which bounds have been supplied.
       DO I = 1, NAX
 
-*  Get the pixel coordinate bounds of the NDF on this axis.
-         DLBNDD( I ) = DBLE( LBNDD( I ) ) - 1.0D0
-         DUBNDD( I ) = DBLE( UBNDD( I ) ) 
-
 *  If upper and lower limits have been supplied for this axis...
          IF( ISBND( I ) ) THEN
 
@@ -313,18 +330,40 @@
 *  the ALLPIX flag to indicate that at least one bound is specified as a
 *  WCS value.
             ELSE
-               PLBND( I ) = DLBNDD( I )
-               WLBND( I ) = VALUE1( I )
-               ALLPIX = .FALSE.
+               IF( I .GT. NWCS .AND. STATUS .EQ. SAI__OK ) THEN
+                  STATUS = NDF__BNDIN
+                  CALL MSG_SETI( 'I', I )
+                  CALL MSG_SETI( 'N', NWCS )
+                  CALL ERR_REP( 'NDF1_WPLIM_NOV', 'Lower bound for '//
+     :                          'axis ^I was specified using a WCS '//
+     :                          'value, but there are only ^N axes '//
+     :                          'in the current WCS Frame.', STATUS )
+                  GO TO 999
+               ELSE
+                  PLBND( I ) = DLBNDD( I )
+                  WLBND( I ) = VALUE1( I )
+                  ALLPIX = .FALSE.
+               END IF
             END IF
 
 *  Do the same for the upper bound.
             IF( ISPIX2( I ) ) THEN
                PUBND( I ) = VALUE2( I ) 
             ELSE
-               PUBND( I ) = DUBNDD( I )
-               WUBND( I ) = VALUE2( I )
-               ALLPIX = .FALSE.
+               IF( I .GT. NWCS .AND. STATUS .EQ. SAI__OK ) THEN
+                  STATUS = NDF__BNDIN
+                  CALL MSG_SETI( 'I', I )
+                  CALL MSG_SETI( 'N', NWCS )
+                  CALL ERR_REP( 'NDF1_WPLIM_NOV', 'Upper bound for '//
+     :                          'axis ^I was specified using a WCS '//
+     :                          'value, but there are only ^N axes '//
+     :                          'in the current WCS Frame.', STATUS )
+                  GO TO 999
+               ELSE
+                  PUBND( I ) = DUBNDD( I )
+                  WUBND( I ) = VALUE2( I )
+                  ALLPIX = .FALSE.
+               END IF
             END IF
 
 *  If the bounds for this axis are specified by centre and width, and have
@@ -341,50 +380,82 @@
 *  If WCS, then use the NDF Bounds as the pixel box and store the WCS box
 *  bounds.
             ELSE
-               DELTA = 0.5*VALUE2( I )
-               PLBND( I ) = DLBNDD( I ) 
-               PUBND( I ) = DUBNDD( I ) 
-               WLBND( I ) = VALUE1( I ) - DELTA
-               WUBND( I ) = VALUE1( I ) + DELTA
-               ALLPIX = .FALSE.
+               IF( I .GT. NWCS .AND. STATUS .EQ. SAI__OK ) THEN
+                  STATUS = NDF__BNDIN
+                  CALL MSG_SETI( 'I', I )
+                  CALL MSG_SETI( 'N', NWCS )
+                  CALL ERR_REP( 'NDF1_WPLIM_NOV', 'Axis ^I was '//
+     :                          'specified using a WCS centre and '//
+     :                          'width, but there are only ^N axes '//
+     :                          'in the current WCS Frame.', STATUS )
+                  GO TO 999
+               ELSE
+                  DELTA = 0.5*VALUE2( I )
+                  PLBND( I ) = DLBNDD( I ) 
+                  PUBND( I ) = DUBNDD( I ) 
+                  WLBND( I ) = VALUE1( I ) - DELTA
+                  WUBND( I ) = VALUE1( I ) + DELTA
+                  ALLPIX = .FALSE.
+               END IF
             END IF
 
 *  If the bounds for this axis are specified by centre and width, and the
 *  centre is a WCS value but the the width is a pixel value...
          ELSE IF( .NOT. ISPIX1( I ) .AND. ISPIX2( I ) ) THEN
-            ALLPIX = .FALSE.
-            MIXED = .TRUE.
+            IF( I .GT. NWCS .AND. STATUS .EQ. SAI__OK ) THEN
+               STATUS = NDF__BNDIN
+               CALL MSG_SETI( 'I', I )
+               CALL MSG_SETI( 'N', NWCS )
+               CALL ERR_REP( 'NDF1_WPLIM_NOV', 'Axis ^I was '//
+     :                       'specified using a WCS centre, '//
+     :                       'but there are only ^N axes '//
+     :                       'in the current WCS Frame.', STATUS )
+               GO TO 999
+            ELSE
+               ALLPIX = .FALSE.
+               MIXED = .TRUE.
 
 *  Store the central WCS values as the upper and lower bounds of the WCS
 *  box.
-            WUBND( I ) = VALUE1( I )
-            WLBND( I ) = VALUE1( I )
+               WUBND( I ) = VALUE1( I )
+               WLBND( I ) = VALUE1( I )
 
 *  Use defaults for the upper and lower bounds of the pixel box.
-            PLBND( I ) = DLBNDD( I ) 
-            PUBND( I ) = DUBNDD( I ) 
+               PLBND( I ) = DLBNDD( I ) 
+               PUBND( I ) = DUBNDD( I ) 
+            END IF
 
 *  If the bounds for this axis are specified by centre and width, and the
 *  centre is a pixel value but the the width is a WCS value...
          ELSE 
-            ALLPIX = .FALSE.
-            MIXED = .TRUE.
+            IF( I .GT. NWCS .AND. STATUS .EQ. SAI__OK ) THEN
+               STATUS = NDF__BNDIN
+               CALL MSG_SETI( 'I', I )
+               CALL MSG_SETI( 'N', NWCS )
+               CALL ERR_REP( 'NDF1_WPLIM_NOV', 'Axis ^I was '//
+     :                       'specified using a WCS width, '//
+     :                       'but there are only ^N axes '//
+     :                       'in the current WCS Frame.', STATUS )
+               GO TO 999
+            ELSE
+               ALLPIX = .FALSE.
+               MIXED = .TRUE.
 
 *  Store the central pixel values as the upper and lower bounds of the
 *  pixel box. Leave the WCS box bounds set to bad so that defaults will
 *  be fund and used.
-            PUBND( I ) = VALUE1( I )
-            PLBND( I ) = VALUE1( I )
-
+               PUBND( I ) = VALUE1( I )
+               PLBND( I ) = VALUE1( I )
+            END IF
          END IF
 
       END DO
 
 c      write(*,*) 'A:'
-c      write(*,*) '   PLBND: ',(PLBND(KK),kk=1,NAX)
-c      write(*,*) '   PUBND: ',(PUBND(KK),kk=1,NAX)
-c      write(*,*) '   WLBND: ',(WLBND(KK),kk=1,NAX)
-c      write(*,*) '   WUBND: ',(WUBND(KK),kk=1,NAX)
+c      write(*,*) '   PLBND: ',(PLBND(KK),kk=1,NDF__MXDIM)
+c      write(*,*) '   PUBND: ',(PUBND(KK),kk=1,NDF__MXDIM)
+c      write(*,*) '   WLBND: ',(WLBND(KK),kk=1,NWCS)
+c      write(*,*) '   WUBND: ',(WUBND(KK),kk=1,NWCS)
 c      write(*,*) '   '
 
 *  If any centre/values bounds were specified in which the centre is
@@ -452,10 +523,10 @@ c      write(*,*) '   '
       END IF
 
 c      write(*,*) 'B:'
-c      write(*,*) '   PLBND: ',(PLBND(KK),kk=1,NAX)
-c      write(*,*) '   PUBND: ',(PUBND(KK),kk=1,NAX)
-c      write(*,*) '   WLBND: ',(WLBND(KK),kk=1,NAX)
-c      write(*,*) '   WUBND: ',(WUBND(KK),kk=1,NAX)
+c      write(*,*) '   PLBND: ',(PLBND(KK),kk=1,NDF__MXDIM)
+c      write(*,*) '   PUBND: ',(PUBND(KK),kk=1,NDF__MXDIM)
+c      write(*,*) '   WLBND: ',(WLBND(KK),kk=1,NWCS)
+c      write(*,*) '   WUBND: ',(WUBND(KK),kk=1,NWCS)
 c      write(*,*) '   '
 
 *  If all bounds are now specified using pixel indices, then we can pass
@@ -596,10 +667,10 @@ c                           PUBND( I ) = PLBND( I ) + VALUE2( I )
          END IF
 
 c      write(*,*) 'D:'
-c      write(*,*) '   PLBND: ',(PLBND(KK),kk=1,NAX)
-c      write(*,*) '   PUBND: ',(PUBND(KK),kk=1,NAX)
-c      write(*,*) '   WLBND: ',(WLBND(KK),kk=1,NAX)
-c      write(*,*) '   WUBND: ',(WUBND(KK),kk=1,NAX)
+c      write(*,*) '   PLBND: ',(PLBND(KK),kk=1,NDF__MXDIM)
+c      write(*,*) '   PUBND: ',(PUBND(KK),kk=1,NDF__MXDIM)
+c      write(*,*) '   WLBND: ',(WLBND(KK),kk=1,NWCS)
+c      write(*,*) '   WUBND: ',(WUBND(KK),kk=1,NWCS)
 c      write(*,*) '   '
 
 *  If we still need to find the overlap of the WCS and PIXEL boxes, do it
@@ -686,15 +757,15 @@ c      write(*,*) '   '
 
 *  Define an AST Interval within the PIXEL Frame, using the bounds stored 
 *  in PLBND/PUBND.
-               PFRM = AST_FRAME( NAX, 'Domain=PIXEL', STATUS )
+               PFRM = AST_FRAME( NPIX, 'Domain=PIXEL', STATUS )
                PBOX = AST_INTERVAL( PFRM, PLBND, PUBND, AST__NULL, ' ', 
      :                              STATUS )
 
 c      write(*,*) 'F:'
-c      write(*,*) '   PLBND: ',(PLBND(KK),kk=1,NAX)
-c      write(*,*) '   PUBND: ',(PUBND(KK),kk=1,NAX)
-c      write(*,*) '   WLBND: ',(WLBND(KK),kk=1,NAX)
-c      write(*,*) '   WUBND: ',(WUBND(KK),kk=1,NAX)
+c      write(*,*) '   PLBND: ',(PLBND(KK),kk=1,NDF__MXDIM)
+c      write(*,*) '   PUBND: ',(PUBND(KK),kk=1,NDF__MXDIM)
+c      write(*,*) '   WLBND: ',(WLBND(KK),kk=1,NWCS)
+c      write(*,*) '   WUBND: ',(WUBND(KK),kk=1,NWCS)
 c      write(*,*) '   '
 
 *  Now form a compound region that is the intersection of the two aboves
@@ -707,10 +778,10 @@ c      write(*,*) '   '
                CALL AST_GETREGIONBOUNDS( CMPREG, PLBND, PUBND, STATUS )
 
 c      write(*,*) 'G:'
-c      write(*,*) '   PLBND: ',(PLBND(KK),kk=1,NAX)
-c      write(*,*) '   PUBND: ',(PUBND(KK),kk=1,NAX)
-c      write(*,*) '   WLBND: ',(WLBND(KK),kk=1,NAX)
-c      write(*,*) '   WUBND: ',(WUBND(KK),kk=1,NAX)
+c      write(*,*) '   PLBND: ',(PLBND(KK),kk=1,NDF__MXDIM)
+c      write(*,*) '   PUBND: ',(PUBND(KK),kk=1,NDF__MXDIM)
+c      write(*,*) '   WLBND: ',(WLBND(KK),kk=1,NWCS)
+c      write(*,*) '   WUBND: ',(WUBND(KK),kk=1,NWCS)
 c      write(*,*) '   '
 
 *  Report an error if the pixel and WCS boxes do not overlap.
@@ -728,8 +799,8 @@ c      write(*,*) '   '
       END IF
 
 c      write(*,*) 'H:'
-c      write(*,*) '   PLBND: ',(PLBND(KK),kk=1,NAX)
-c      write(*,*) '   PUBND: ',(PUBND(KK),kk=1,NAX)
+c      write(*,*) '   PLBND: ',(PLBND(KK),kk=1,NDF__MXDIM)
+c      write(*,*) '   PUBND: ',(PUBND(KK),kk=1,NDF__MXDIM)
 c      write(*,*) '   '
 
 *  Convert the pixel coordinate box to pixel indices.
