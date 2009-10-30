@@ -177,7 +177,7 @@ c      call ast_flushmemory( 1 )
       call asserti( 'N obj', nobj, 1, status ) 
 
       call assertc( 'line 1 3', buff(1), 
-     :              'TimeInterval TT GEOCENTER 1996-01-01T00:00:00 '//
+     :              'TimeInterval TT geocenter 1996-01-01T00:00:00 '//
      :              '1996-01-01T00:30:00', status )
       call assertc( 'line 2 3', buff(2), 
      :              '   Time MJD 50814.0 Error 1.2 Resolution 0.8 '//
@@ -289,7 +289,7 @@ c      call ast_flushmemory( 1 )
          call asserti( 'N obj 2', nobj, 1, status ) 
 
          call assertc( 'line 1 2', buff(1), 'TimeInterval TT '//
-     :                 'GEOCENTER 1996-01-01T00:00:00', status )
+     :                 'GEoCENTER 1996-01-01T00:00:00', status )
 
          call assertc( 'line 2 2', buff(2), '   1996-01-01T00:30:00 '//
      :                 'Time MJD 50814.0 Error 1.2', status );
@@ -367,14 +367,14 @@ c      call ast_flushmemory( 1 )
          if( iread .eq. 0 ) then
             c = 'StartTime 1900-01-01 Circle ICRS 148.9 69.1 2.0 '
          else if( iread .eq. 1 ) then
-            c = 'SpectralInterval 4000 7000 unit Angstrom'
+            c = 'SpeCtralInterval 4000 7000 unit Angstrom'
          else
             done = .true.
          end if
 
       else if( idoc .eq. 3 ) then
          if( iread .eq. 0 ) then
-            c = 'TimeInterval TT GEOCENTER'
+            c = 'TimeInterVal TT GEoCENTER'
          else if( iread .eq. 1 ) then
             c = '1996-01-01T00:00:00 1996-01-01T00:30:00'
          else if( iread .eq. 2 ) then
@@ -388,7 +388,7 @@ c      call ast_flushmemory( 1 )
          else if( iread .eq. 6 ) then
             c = 'Resolution 0.001778 Size 0.000333 0.000278'
          else if( iread .eq. 7 ) then
-            c = 'PixSize 0.000083 0.000083'
+            c = 'PixSIZE 0.000083 0.000083'
          else if( iread .eq. 8 ) then
             c = 'Spectral BARYCENTER 1420.4 unit MHz'
          else if( iread .eq. 9 ) then
@@ -409,11 +409,11 @@ c      call ast_flushmemory( 1 )
          else if( iread .eq. 1 ) then
             c = '1996-01-01T00:00:00 1996-01-01T00:30:00'
          else if( iread .eq. 2 ) then
-            c = 'Time MJD 50814.0 Error 1.2'
+            c = 'Time mjd 50814.0 ERROR 1.2'
          else if( iread .eq. 3 ) then
             c = 'Resolution 0.8 PixSize 1024.0'
          else if( iread .eq. 4 ) then
-            c = 'Spectral BARYCENTER 1420.4 unit MHz'
+            c = 'Spectral barycenter 1420.4 UNIT MHz'
          else if( iread .eq. 5 ) then
             c = 'Resolution 10.0'
          else
@@ -423,7 +423,7 @@ c      call ast_flushmemory( 1 )
 *  Like doc 3 but with a compound spatial region
       else if( idoc .eq. 5 ) then
          if( iread .eq. 0 ) then
-            c = 'TimeInterval TT GEOCENTER'
+            c = 'tIMEiNTERVAL tt geocenter'
          else if( iread .eq. 1 ) then
             c = '1996-01-01T00:00:00 1996-01-01T00:30:00'
          else if( iread .eq. 2 ) then
@@ -441,7 +441,7 @@ c      call ast_flushmemory( 1 )
          else if( iread .eq. 8 ) then
             c = '       Intersection ('
          else if( iread .eq. 9 ) then
-            c = '          Circle 120 -10 20 Difference '
+            c = '          cIRCLE 120 -10 20 dIFFERENCE '
          else if( iread .eq. 10 ) then
             c = '          ( Circle 130 -10 20 '
          else if( iread .eq. 11 ) then
@@ -463,11 +463,11 @@ c      call ast_flushmemory( 1 )
          else if( iread .eq. 19 ) then
             c = 'Spectral BARYCENTER 1420.4 unit MHz'
          else if( iread .eq. 20 ) then
-            c = 'Resolution 10.0'
+            c = 'rESOLUTION 10.0'
          else if( iread .eq. 21 ) then
-            c = 'RedshiftInterval BARYCENTER VELOCITY OPTICAL'
+            c = 'rEDSHIFTiNTERVAL barycenter velocity optical'
          else if( iread .eq. 22 ) then
-            c = '200.0 2300.0 Redshift 300.0'
+            c = '200.0 2300.0 rEDSHIFT 300.0'
          else if( iread .eq. 23 ) then
             c = 'Resolution 0.7 PixSize 0.3'
          else

@@ -151,6 +151,8 @@ f     The StcsChan class does not define any new routines beyond those
 *        Original version.
 *     22-MAY-2008 (DSB):
 *        Retain default Equinox values in SkyFrame when reading an STC-S.
+*     30-OCT-2009 (DSB):
+*        Make case insensitive (except for units strings).
 *class--
 */
 
@@ -2086,7 +2088,7 @@ static void MapPut0C( AstKeyMap *km, const char *key, const char *value,
 
 /* If the value is equal to the default value, and we are NOT storing
    default values, ensure the KeyMap has no entry for the given key. */
-      if( !strcmp( value, def ) && !defs ) {
+      if( astChrMatch( value, def ) && !defs ) {
          astMapRemove( km, key );
 
 /* Otherwise, store the value. */
@@ -2497,45 +2499,45 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
 
       if( astMapGet0C( props, "TIMESCALE", &cval ) ) {
 
-         if( !strcmp( cval, "TT" ) ) {
+         if( astChrMatch( cval, "TT" ) ) {
             ts = AST__TT;
 
-         } else if( !strcmp( cval, "TDT" ) ) {
-            ts = AST__TT;
-            new_ts = "TT";
-
-         } else if( !strcmp( cval, "ET" ) ) {
+         } else if( astChrMatch( cval, "TDT" ) ) {
             ts = AST__TT;
             new_ts = "TT";
 
-         } else if( !strcmp( cval, "TAI" ) ) {
+         } else if( astChrMatch( cval, "ET" ) ) {
+            ts = AST__TT;
+            new_ts = "TT";
+
+         } else if( astChrMatch( cval, "TAI" ) ) {
             ts = AST__TAI;
 
-         } else if( !strcmp( cval, "IAT" ) ) {
+         } else if( astChrMatch( cval, "IAT" ) ) {
             ts = AST__TAI;
             new_ts = "TAI";
 
-         } else if( !strcmp( cval, "UTC" ) ) {
+         } else if( astChrMatch( cval, "UTC" ) ) {
             ts = AST__UTC;
 
-         } else if( !strcmp( cval, "TEB" ) ) {
+         } else if( astChrMatch( cval, "TEB" ) ) {
             ts = AST__TDB;
             new_ts = "TDB";
             level = 1;
 
-         } else if( !strcmp( cval, "TDB" ) ) {
+         } else if( astChrMatch( cval, "TDB" ) ) {
             ts = AST__TDB;
 
-         } else if( !strcmp( cval, "TCG" ) ) {
+         } else if( astChrMatch( cval, "TCG" ) ) {
             ts = AST__TCG;
 
-         } else if( !strcmp( cval, "TCB" ) ) {
+         } else if( astChrMatch( cval, "TCB" ) ) {
             ts = AST__TCB;
 
-         } else if( !strcmp( cval, "LST" ) ) {
+         } else if( astChrMatch( cval, "LST" ) ) {
             ts = AST__LMST;
 
-         } else if( !strcmp( cval, "nil" ) ) {
+         } else if( astChrMatch( cval, "nil" ) ) {
             astAddWarning( this, 2, "Time scale defaulting to 'TAI'.",
                            "astRead", status );
 
@@ -2565,7 +2567,7 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
    position but issue a warning for anything other than "TOPOCENTER" and 
    "UNKNOWNRefPos". */
       if( !astMapGet0C( props, "REFPOS", &cval ) ) cval = "UNKNOWNRefPos";
-      if( strcmp( cval, "TOPOCENTER" ) ) {
+      if( !astChrMatch( cval, "TOPOCENTER" ) ) {
          astAddWarning( this, 1, "AST only supports topocentric time frames, "
                         "so 'TOPOCENTER' will be used in place of '%s'.", 
                         "astRead", status, cval );
@@ -2691,17 +2693,17 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
       is_skyframe = 0;
       if( astMapGet0C( props, "FLAVOUR", &cval ) ) {
 
-         if( !strcmp( cval, "SPHER2" ) ) {
+         if( astChrMatch( cval, "SPHER2" ) ) {
             spacefrm = (AstFrame *) astSkyFrame( "", status );
             is_skyframe = 1;
    
-         } else if( !strcmp( cval, "CART1" ) ) {
+         } else if( astChrMatch( cval, "CART1" ) ) {
             spacefrm = astFrame( 1, "", status );
    
-         } else if( !strcmp( cval, "CART2" ) ) {
+         } else if( astChrMatch( cval, "CART2" ) ) {
             spacefrm = astFrame( 2, "", status );
    
-         } else if( !strcmp( cval, "CART3" ) ) {
+         } else if( astChrMatch( cval, "CART3" ) ) {
             spacefrm = astFrame( 3, "", status );
    
          } else {
@@ -2718,34 +2720,34 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
 /* Consider each supported space frame. Report an error for frames
    not supported by AST. */
       if( astMapGet0C( props, "FRAME", &cval ) ) {
-         if( !strcmp( cval, "ICRS" ) ) {
+         if( astChrMatch( cval, "ICRS" ) ) {
             sys = AST__ICRS;
 
-         } else if( !strcmp( cval, "FK5" ) ) {
+         } else if( astChrMatch( cval, "FK5" ) ) {
             sys = AST__FK5;
 
-         } else if( !strcmp( cval, "FK4" ) ) {
+         } else if( astChrMatch( cval, "FK4" ) ) {
             sys = AST__FK4;
 
-         } else if( !strcmp( cval, "J2000" ) ) {
+         } else if( astChrMatch( cval, "J2000" ) ) {
             sys = AST__FK5;
 
-         } else if( !strcmp( cval, "B1950" ) ) {
+         } else if( astChrMatch( cval, "B1950" ) ) {
             sys = AST__FK4;
 
-         } else if( !strcmp( cval, "ECLIPTIC" ) ) {
+         } else if( astChrMatch( cval, "ECLIPTIC" ) ) {
             sys = AST__ECLIPTIC;
 
-         } else if( !strcmp( cval, "GALACTIC" ) ) {
+         } else if( astChrMatch( cval, "GALACTIC" ) ) {
             sys = AST__GALACTIC;
 
-         } else if( !strcmp( cval, "GALACTIC_II" ) ) {
+         } else if( astChrMatch( cval, "GALACTIC_II" ) ) {
             sys = AST__GALACTIC;
 
-         } else if( !strcmp( cval, "SUPER_GALACTIC" ) ) {
+         } else if( astChrMatch( cval, "SUPER_GALACTIC" ) ) {
             sys = AST__SUPERGALACTIC;
 
-         } else if( !strcmp( cval, "UNKNOWNFrame" ) ) {
+         } else if( astChrMatch( cval, "UNKNOWNFrame" ) ) {
             sys = AST__UNKNOWN;
 
          } else {
@@ -2777,7 +2779,7 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
    SkyFrames we consider "TOPOCENTER" and "UNKNOWN" acceptable and all 
    other unsupported. For other Frames we allow any reference position. */
       if( !astMapGet0C( props, "REFPOS", &cval ) ) cval = "UNKNOWNRefPos";
-      if( is_skyframe && strcmp( cval, "TOPOCENTER" ) ) {
+      if( is_skyframe && !astChrMatch( cval, "TOPOCENTER" ) ) {
          astAddWarning( this, 1, "AST only supports topocentric sky frames, "
                         "so 'TOPOCENTER' will be used in place of '%s'.", 
                         "astRead", status, cval );
@@ -2925,26 +2927,26 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
       sor = AST__BADSOR;
       if( astMapGet0C( props, "REFPOS", &cval ) ) {
 
-         if( !strcmp( cval, "GEOCENTER" ) ) {
+         if( astChrMatch( cval, "GEOCENTER" ) ) {
             sor = AST__GESOR;
 
-         } else if( !strcmp( cval, "BARYCENTER" ) ) {
+         } else if( astChrMatch( cval, "BARYCENTER" ) ) {
             sor = AST__BYSOR;
 
-         } else if( !strcmp( cval, "HELIOCENTER" ) ) {
+         } else if( astChrMatch( cval, "HELIOCENTER" ) ) {
             sor = AST__HLSOR;
 
-         } else if( !strcmp( cval, "TOPOCENTER" ) ) {
+         } else if( astChrMatch( cval, "TOPOCENTER" ) ) {
             sor = AST__TPSOR;
 
-         } else if( !strcmp( cval, "LSR" ) ||
-                    !strcmp( cval, "LSRK" ) ) {
+         } else if( astChrMatch( cval, "LSR" ) ||
+                    astChrMatch( cval, "LSRK" ) ) {
             sor = AST__LKSOR;
 
-         } else if( !strcmp( cval, "LSRD" ) ) {
+         } else if( astChrMatch( cval, "LSRD" ) ) {
             sor = AST__LDSOR;
 
-         } else if( !strcmp( cval, "GALACTIC_CENTER" ) ) {
+         } else if( astChrMatch( cval, "GALACTIC_CENTER" ) ) {
             sor = AST__GLSOR;
 
          } else {
@@ -3060,26 +3062,26 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
       sor = AST__BADSOR;
       if( astMapGet0C( props, "REFPOS", &cval ) ) {
 
-         if( !strcmp( cval, "GEOCENTER" ) ) {
+         if( astChrMatch( cval, "GEOCENTER" ) ) {
             sor = AST__GESOR;
 
-         } else if( !strcmp( cval, "BARYCENTER" ) ) {
+         } else if( astChrMatch( cval, "BARYCENTER" ) ) {
             sor = AST__BYSOR;
 
-         } else if( !strcmp( cval, "HELIOCENTER" ) ) {
+         } else if( astChrMatch( cval, "HELIOCENTER" ) ) {
             sor = AST__HLSOR;
 
-         } else if( !strcmp( cval, "TOPOCENTER" ) ) {
+         } else if( astChrMatch( cval, "TOPOCENTER" ) ) {
             sor = AST__TPSOR;
 
-         } else if( !strcmp( cval, "LSR" ) ||
-                    !strcmp( cval, "LSRK" ) ) {
+         } else if( astChrMatch( cval, "LSR" ) ||
+                    astChrMatch( cval, "LSRK" ) ) {
             sor = AST__LKSOR;
 
-         } else if( !strcmp( cval, "LSRD" ) ) {
+         } else if( astChrMatch( cval, "LSRD" ) ) {
             sor = AST__LDSOR;
 
-         } else if( !strcmp( cval, "GALACTIC_CENTER" ) ) {
+         } else if( astChrMatch( cval, "GALACTIC_CENTER" ) ) {
             sor = AST__GLSOR;
 
          } else {
@@ -3106,15 +3108,15 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
    or a warning for unsupported combinations. */
       if( astMapGet0C( props, "DOPPLERDEF", &cval ) ){
 
-         if( !strcmp( cval, "OPTICAL" ) ) {
-            if( !strcmp( type, "VELOCITY" ) ){
+         if( astChrMatch( cval, "OPTICAL" ) ) {
+            if( astChrMatch( type, "VELOCITY" ) ){
                astSetSystem( redfrm, AST__VOPTICAL );
             } else {
                astSetSystem( redfrm, AST__REDSHIFT );
             }
 
-         } else if( !strcmp( cval, "RADIO" ) ) {
-            if( !strcmp( type, "VELOCITY" ) ){
+         } else if( astChrMatch( cval, "RADIO" ) ) {
+            if( astChrMatch( type, "VELOCITY" ) ){
                astSetSystem( redfrm, AST__VRADIO );
             } else {
                astSetSystem( redfrm, AST__REDSHIFT );
@@ -3123,8 +3125,8 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
                               status );
             }
 
-         } else if( !strcmp( cval, "RELATIVISTIC" ) ) {
-            if( !strcmp( type, "VELOCITY" ) ){
+         } else if( astChrMatch( cval, "RELATIVISTIC" ) ) {
+            if( astChrMatch( type, "VELOCITY" ) ){
                astSetSystem( redfrm, AST__VREL );
             } else {
                astSetSystem( redfrm, AST__REDSHIFT );
@@ -3134,7 +3136,7 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
             }
 
          } else {
-            if( !strcmp( type, "VELOCITY" ) ){
+            if( astChrMatch( type, "VELOCITY" ) ){
                astSetSystem( redfrm, AST__VOPTICAL );
                astAddWarning( this, 1, "Doppler velocity definition defaulting"
                               " to 'OPTICAL' in an STC-S description.", 
@@ -3147,7 +3149,7 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
       }
 
 /* Set the units. */
-      if( !strcmp( type, "VELOCITY" ) ){
+      if( astChrMatch( type, "VELOCITY" ) ){
          if( astMapGet0C( props, "UNIT", &cval ) ) {
             astSetUnit( redfrm, 0, cval );
          } else {
@@ -3509,16 +3511,16 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
          look_for = FILL_FACTOR;
 
 /* Now check the word to see if it a known time sub-phrase identifier. */
-         if( !strcmp( word, "TimeInterval" ) ) {
+         if( astChrMatch( word, "TimeInterval" ) ) {
             timeid = TIME_INTERVAL_ID;
 
-         } else if( !strcmp( word, "StartTime" ) ) {
+         } else if( astChrMatch( word, "StartTime" ) ) {
             timeid = START_TIME_ID;
 
-         } else if( !strcmp( word, "StopTime" ) ) {
+         } else if( astChrMatch( word, "StopTime" ) ) {
             timeid = STOP_TIME_ID;
 
-         } else if( !strcmp( word, "Time" ) ) {
+         } else if( astChrMatch( word, "Time" ) ) {
             look_for = TIME_SCALE;  /* After "Time", we move on to find the 
             timeid = TIME_ID;          time-scale, not the fill factor */
 
@@ -3592,11 +3594,11 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
          spaceid = NULL_ID;         
 
 /* Now check the word to see if it a known velocity sub-phrase identifier. */
-         if( !strcmp( word, "VelocityInterval" ) ) {
+         if( astChrMatch( word, "VelocityInterval" ) ) {
             velid = VELOCITY_INTERVAL_ID;
             look_for = FILL_FACTOR;
 
-         } else if( !strcmp( word, "Velocity" ) ) {
+         } else if( astChrMatch( word, "Velocity" ) ) {
             velid = VELOCITY_ID;
             look_for = VELOCITY;
 
@@ -3630,11 +3632,11 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
          velid = NULL_ID;
 
 /* Now check the word to see if it a known spectral sub-phrase identifier. */
-         if( !strcmp( word, "SpectralInterval" ) ) {
+         if( astChrMatch( word, "SpectralInterval" ) ) {
             look_for = FILL_FACTOR;         /* Move on to find the fill factor */
             specid = SPECTRAL_INTERVAL_ID;
 
-         } else if( !strcmp( word, "Spectral" ) ) {
+         } else if( astChrMatch( word, "Spectral" ) ) {
             look_for = REFPOS;              /* Move on to find the refpos */
             specid = SPECTRAL_ID;
 
@@ -3669,11 +3671,11 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
          specid = NULL_ID;         
 
 /* Now check the word to see if it a known spectral sub-phrase identifier. */
-         if( !strcmp( word, "RedshiftInterval" ) ) {
+         if( astChrMatch( word, "RedshiftInterval" ) ) {
             look_for = FILL_FACTOR;       /* Move on to find the fill factor */
             redid = REDSHIFT_INTERVAL_ID;
 
-         } else if( !strcmp( word, "Redshift" ) ) {
+         } else if( astChrMatch( word, "Redshift" ) ) {
             look_for = REFPOS;            /* Move on to find the refpos */
             redid = REDSHIFT_ID;
 
@@ -3712,7 +3714,7 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
    factor from the next word. If this fails, or if the current word is
    not "fillfactor", indicate that we will be re-interpreting the current 
    word in a new context and so do not need a new word. */
-         if( !strcmp( word, "fillfactor" ) ) {
+         if( astChrMatch( word, "fillfactor" ) ) {
             word = GetNextWord( this, &con, status );
             if( astChr2Double( word ) == AST__BAD ) {
                astError( AST__BADIN, "astRead(StcsChan): Expected a numerical "
@@ -3756,18 +3758,18 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
 /* If the current word is a recognised STC-S timescale, store it in the
    props KeyMap. Otherwise, indicate that the word can be re-used in the 
    next context. */
-         if( !strcmp( word, "TT" )  ||
-             !strcmp( word, "TDT" ) ||
-             !strcmp( word, "ET" )  ||
-             !strcmp( word, "TAI" ) ||
-             !strcmp( word, "IAT" ) ||
-             !strcmp( word, "UTC" ) ||
-             !strcmp( word, "TEB" ) ||
-             !strcmp( word, "TDB" ) ||
-             !strcmp( word, "TCG" ) ||
-             !strcmp( word, "TCB" ) ||
-             !strcmp( word, "LST" ) ||
-             !strcmp( word, "nil" ) ) {
+         if( astChrMatch( word, "TT" )  ||
+             astChrMatch( word, "TDT" ) ||
+             astChrMatch( word, "ET" )  ||
+             astChrMatch( word, "TAI" ) ||
+             astChrMatch( word, "IAT" ) ||
+             astChrMatch( word, "UTC" ) ||
+             astChrMatch( word, "TEB" ) ||
+             astChrMatch( word, "TDB" ) ||
+             astChrMatch( word, "TCG" ) ||
+             astChrMatch( word, "TCB" ) ||
+             astChrMatch( word, "LST" ) ||
+             astChrMatch( word, "nil" ) ) {
 
             astMapPut0C( props, "TIMESCALE", word, NULL );
 
@@ -3786,18 +3788,18 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
 
 /* If the current word is a recognised STC-S spatial frame, store it in 
    the props KeyMap. Otherwise, indicate that the word can be re-used. */ 
-         if( !strcmp( word, "ICRS" ) ||
-             !strcmp( word, "FK5" ) ||
-             !strcmp( word, "FK4" ) ||
-             !strcmp( word, "J2000" ) ||
-             !strcmp( word, "B1950" ) ||
-             !strcmp( word, "ECLIPTIC" ) ||
-             !strcmp( word, "GALACTIC" ) ||
-             !strcmp( word, "GALACTIC_II" ) ||
-             !strcmp( word, "SUPER_GALACTIC" ) ||
-             !strcmp( word, "GEO_C" ) ||
-             !strcmp( word, "GEO_D" ) ||
-             !strcmp( word, "UNKNOWNFrame" ) ) {
+         if( astChrMatch( word, "ICRS" ) ||
+             astChrMatch( word, "FK5" ) ||
+             astChrMatch( word, "FK4" ) ||
+             astChrMatch( word, "J2000" ) ||
+             astChrMatch( word, "B1950" ) ||
+             astChrMatch( word, "ECLIPTIC" ) ||
+             astChrMatch( word, "GALACTIC" ) ||
+             astChrMatch( word, "GALACTIC_II" ) ||
+             astChrMatch( word, "SUPER_GALACTIC" ) ||
+             astChrMatch( word, "GEO_C" ) ||
+             astChrMatch( word, "GEO_D" ) ||
+             astChrMatch( word, "UNKNOWNFrame" ) ) {
 
             astMapPut0C( props, "FRAME", word, NULL );
             
@@ -3817,31 +3819,31 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
 /* If the current word is a recognised STC-S reference position, store it in 
    the props KeyMap. Otherwise, indicate that the word can be re-used. The
    first group of reference positions apply to all sub-phrases. */ 
-         if( !strcmp( word, "GEOCENTER" ) ||
-             !strcmp( word, "BARYCENTER" ) ||
-             !strcmp( word, "HELIOCENTER" ) ||
-             !strcmp( word, "TOPOCENTER" ) ||
-             !strcmp( word, "GALACTIC_CENTER" ) ||
-             !strcmp( word, "EMBARYCENTER" ) ||
-             !strcmp( word, "MOON" ) ||
-             !strcmp( word, "MERCURY" ) ||
-             !strcmp( word, "VENUS" ) ||
-             !strcmp( word, "MARS" ) ||
-             !strcmp( word, "JUPITER" ) ||
-             !strcmp( word, "SATURN" ) ||
-             !strcmp( word, "URANUS" ) ||
-             !strcmp( word, "NEPTUNE" ) ||
-             !strcmp( word, "PLUTO" ) ||
-             !strcmp( word, "UNKNOWNRefPos" ) ) {
+         if( astChrMatch( word, "GEOCENTER" ) ||
+             astChrMatch( word, "BARYCENTER" ) ||
+             astChrMatch( word, "HELIOCENTER" ) ||
+             astChrMatch( word, "TOPOCENTER" ) ||
+             astChrMatch( word, "GALACTIC_CENTER" ) ||
+             astChrMatch( word, "EMBARYCENTER" ) ||
+             astChrMatch( word, "MOON" ) ||
+             astChrMatch( word, "MERCURY" ) ||
+             astChrMatch( word, "VENUS" ) ||
+             astChrMatch( word, "MARS" ) ||
+             astChrMatch( word, "JUPITER" ) ||
+             astChrMatch( word, "SATURN" ) ||
+             astChrMatch( word, "URANUS" ) ||
+             astChrMatch( word, "NEPTUNE" ) ||
+             astChrMatch( word, "PLUTO" ) ||
+             astChrMatch( word, "UNKNOWNRefPos" ) ) {
 
             astMapPut0C( props, "REFPOS", word, NULL );
 
 /* This group of reference positions apply only to spectral and redshift 
    sub-phrases. */ 
-         } else if( !strcmp( word, "LSR" ) ||
-                    !strcmp( word, "LSRK" ) ||
-                    !strcmp( word, "LSRD" ) ||
-                    !strcmp( word, "LOCAL_GROUP_CENTER" ) ) {
+         } else if( astChrMatch( word, "LSR" ) ||
+                    astChrMatch( word, "LSRK" ) ||
+                    astChrMatch( word, "LSRD" ) ||
+                    astChrMatch( word, "LOCAL_GROUP_CENTER" ) ) {
 
             if( specid != NULL_ID || redid != NULL_ID ) {
                astMapPut0C( props, "REFPOS", word, NULL );
@@ -3908,8 +3910,8 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
 
 /* If the current word is "JD" or "MJD", the following word should be 
    numerical. */
-         is_jd = !strcmp( word, "JD" );
-         if( is_jd || !strcmp( word, "MJD" ) ) {
+         is_jd = astChrMatch( word, "JD" );
+         if( is_jd || astChrMatch( word, "MJD" ) ) {
             word = GetNextWord( this, &con, status );
             value = astChr2Double( word );
             if( value == AST__BAD && astOK ) {
@@ -3964,8 +3966,8 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
 
 /* If the current word is "JD" or "MJD", the following word should be 
    numerical. */
-         is_jd = !strcmp( word, "JD" );
-         if( is_jd || !strcmp( word, "MJD" ) ) {
+         is_jd = astChrMatch( word, "JD" );
+         if( is_jd || astChrMatch( word, "MJD" ) ) {
             word = GetNextWord( this, &con, status );
             value = astChr2Double( word );
             if( value == AST__BAD && astOK ) {
@@ -4007,7 +4009,7 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
 /* If we are currently looking for the label before a time coord value... */
       } else if( look_for == TIME_LABEL ) {
 /* ------------------------------------------------------------------ */
-         if( !strcmp( word, "Time" ) ) {
+         if( astChrMatch( word, "Time" ) ) {
             look_for = TIME;
          } else {
             new_word = 0;
@@ -4026,8 +4028,8 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
 
 /* If the current word is "JD" or "MJD", the following word should be 
    numerical. */
-         is_jd = !strcmp( word, "JD" );
-         if( is_jd || !strcmp( word, "MJD" ) ) {
+         is_jd = astChrMatch( word, "JD" );
+         if( is_jd || astChrMatch( word, "MJD" ) ) {
             word = GetNextWord( this, &con, status );
             value = astChr2Double( word );
             if( value == AST__BAD && astOK ) {
@@ -4073,22 +4075,22 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
 /* If the current word is a recognised flavour value, note how many axis
    values are required to specify a position. Otherwise, indicate that 
    the word can be re-used. */ 
-         if( !strcmp( word, "SPHER2" ) ) {
+         if( astChrMatch( word, "SPHER2" ) ) {
             naxes = 2;
 
-         } else if( !strcmp( word, "UNITSPHER" ) ) {
+         } else if( astChrMatch( word, "UNITSPHER" ) ) {
             naxes = 2;
 
-         } else if( !strcmp( word, "CART1" ) ) {
+         } else if( astChrMatch( word, "CART1" ) ) {
             naxes = 1;
 
-         } else if( !strcmp( word, "CART2" ) ) {
+         } else if( astChrMatch( word, "CART2" ) ) {
             naxes = 2;
 
-         } else if( !strcmp( word, "CART3" ) ) {
+         } else if( astChrMatch( word, "CART3" ) ) {
             naxes = 3;
 
-         } else if( !strcmp( word, "SPHER3" ) ) {
+         } else if( astChrMatch( word, "SPHER3" ) ) {
             naxes = 3;
 
          } else {
@@ -4165,10 +4167,10 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
    value... */
       } else if( look_for == RED_SPEC_LABEL ) {
 /* ------------------------------------------------------------------ */
-         if( specid != NULL_ID && !strcmp( word, "Spectral" ) ) {
+         if( specid != NULL_ID && astChrMatch( word, "Spectral" ) ) {
             look_for = RED_SPEC_VALUE;
 
-         } else if( redid != NULL_ID && !strcmp( word, "Redshift" ) ) {
+         } else if( redid != NULL_ID && astChrMatch( word, "Redshift" ) ) {
             look_for = RED_SPEC_VALUE;
 
          } else {
@@ -4204,7 +4206,7 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
 /* ------------------------------------------------------------------ */
 
 /* Check the current word is "Position". If so, get the next word. */
-         if( !strcmp( word, "Position" ) ) {
+         if( astChrMatch( word, "Position" ) ) {
             word = GetNextWord( this, &con, status );
 
 /* Get a value for every space axis. */
@@ -4239,15 +4241,15 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
       } else if( look_for == TYPE_DOPPLER ) {
 /* ------------------------------------------------------------------ */
 
-         if( !strcmp( word, "VELOCITY" ) ||
-             !strcmp( word, "REDSHIFT" ) ) {
+         if( astChrMatch( word, "VELOCITY" ) ||
+             astChrMatch( word, "REDSHIFT" ) ) {
             astMapPut0C( props, "TYPE", word, NULL );
             word = GetNextWord( this, &con, status );
          }
 
-         if( !strcmp( word, "OPTICAL" ) ||
-             !strcmp( word, "RADIO" ) ||
-             !strcmp( word, "RELATIVISTIC" ) ) {
+         if( astChrMatch( word, "OPTICAL" ) ||
+             astChrMatch( word, "RADIO" ) ||
+             astChrMatch( word, "RELATIVISTIC" ) ) {
             astMapPut0C( props, "DOPPLERDEF", word, NULL );
          } else {
             new_word = 0;
@@ -4262,7 +4264,7 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
       } else if( look_for == VELOCITY ) {
 /* ------------------------------------------------------------------ */
 
-         if( !strcmp( word, "Velocity" ) ) {
+         if( astChrMatch( word, "Velocity" ) ) {
             word = GetNextWord( this, &con, status );
             if( astChr2Double( word ) == AST__BAD && astOK ) {
                astError( AST__BADIN, "astRead(StcsChan): Expected a "
@@ -4286,7 +4288,7 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
 /* See if the current word is "unit". If so, read the next word (which
    will be the unit string itself). Otherwise, indicate the current word
    can be re-used. */
-         if( !strcmp( word, "unit" ) ) {
+         if( astChrMatch( word, "unit" ) ) {
             word = GetNextWord( this, &con, status );
          } else {
             new_word = 0;
@@ -4385,7 +4387,7 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
 
 /* If the current word is "Error" read all subsequent words until the first 
    non-numerical value is encountered. */
-         if( !strcmp( word, "Error" ) ) {
+         if( astChrMatch( word, "Error" ) ) {
             word = GetNextWord( this, &con, status );
             value = astChr2Double( word );
 
@@ -4441,7 +4443,7 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
 
 /* If the current word is "Resolution" read all subsequent words until the 
    first non-numerical value is encountered. */
-         if( !strcmp( word, "Resolution" ) ) {
+         if( astChrMatch( word, "Resolution" ) ) {
             word = GetNextWord( this, &con, status );
             value = astChr2Double( word );
 
@@ -4497,7 +4499,7 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
 
 /* If the current word is "Size" read all subsequent words until the 
    first non-numerical value is encountered. */
-         if( !strcmp( word, "Size" ) ) {
+         if( astChrMatch( word, "Size" ) ) {
             word = GetNextWord( this, &con, status );
             value = astChr2Double( word );
 
@@ -4553,7 +4555,7 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
 
 /* If the current word is "PixSize" read all subsequent words until the 
    first non-numerical value is encountered. */
-         if( !strcmp( word, "PixSize" ) ) {
+         if( astChrMatch( word, "PixSize" ) ) {
             word = GetNextWord( this, &con, status );
             value = astChr2Double( word );
 
@@ -5589,40 +5591,40 @@ static int SpaceId( const char *word, int *status ){
 /* Check inherited status */
    if( !astOK ) return NULL_ID;
 
-   if( !strcmp( word, "PositionInterval" ) ) {
+   if( astChrMatch( word, "PositionInterval" ) ) {
       spaceid = POSITION_INTERVAL_ID;
 
-   } else if( !strcmp( word, "AllSky" ) ) {
+   } else if( astChrMatch( word, "AllSky" ) ) {
       spaceid = ALLSKY_ID;
 
-   } else if( !strcmp( word, "Circle" ) ) {
+   } else if( astChrMatch( word, "Circle" ) ) {
       spaceid = CIRCLE_ID;
 
-   } else if( !strcmp( word, "Ellipse" ) ) {
+   } else if( astChrMatch( word, "Ellipse" ) ) {
       spaceid = ELLIPSE_ID;
 
-   } else if( !strcmp( word, "Box" ) ) {
+   } else if( astChrMatch( word, "Box" ) ) {
       spaceid = BOX_ID;
 
-   } else if( !strcmp( word, "Polygon" ) ) {
+   } else if( astChrMatch( word, "Polygon" ) ) {
       spaceid = POLYGON_ID;
 
-   } else if( !strcmp( word, "Convex" ) ) {
+   } else if( astChrMatch( word, "Convex" ) ) {
       spaceid = CONVEX_ID;
 
-   } else if( !strcmp( word, "Union" ) ) {
+   } else if( astChrMatch( word, "Union" ) ) {
       spaceid = UNION_ID;
 
-   } else if( !strcmp( word, "Intersection" ) ) {
+   } else if( astChrMatch( word, "Intersection" ) ) {
       spaceid = INTERSECTION_ID;
 
-   } else if( !strcmp( word, "Difference" ) ) {
+   } else if( astChrMatch( word, "Difference" ) ) {
       spaceid = DIFFERENCE_ID;
 
-   } else if( !strcmp( word, "Not" ) ) {
+   } else if( astChrMatch( word, "Not" ) ) {
       spaceid = NOT_ID;
 
-   } else if( !strcmp( word, "Position" ) ) {
+   } else if( astChrMatch( word, "Position" ) ) {
       spaceid = POSITION_ID;
 
    } else {
@@ -6151,7 +6153,7 @@ static void WriteProps( AstStcsChan *this, AstKeyMap *props, int *status ){
       line = AddItem( this, spprops, "START", NULL, line, &nc, &crem, linelen, status );
       line = AddItem( this, spprops, "STOP", NULL, line, &nc, &crem, linelen, status );
 
-      prefix = strcmp( id, "Time" ) ? "Time " : NULL;
+      prefix = !astChrMatch( id, "Time" ) ? "Time " : NULL;
       line = AddItem( this, spprops, "TIME", prefix, line, &nc, &crem, linelen, status );
 
       line = AddItem( this, spprops, "UNIT", "unit ", line, &nc, &crem, linelen, status );
@@ -6185,7 +6187,7 @@ static void WriteProps( AstStcsChan *this, AstKeyMap *props, int *status ){
       line = PutRegionProps( this, spprops, id, (pretty ? 0 : -1), line, &nc, 
                              &crem, linelen, status );
 
-      prefix = strcmp( id, "Position" ) ? "Position " : NULL;
+      prefix = !astChrMatch( id, "Position" ) ? "Position " : NULL;
       line = AddItem( this, spprops, "POSITION", prefix, line, &nc, &crem, linelen, status );
       line = AddItem( this, spprops, "UNIT", "unit ", line, &nc, &crem, linelen, status );
       line = AddItem( this, spprops, "ERROR", "Error ", line, &nc, &crem, linelen, status );
@@ -6216,7 +6218,7 @@ static void WriteProps( AstStcsChan *this, AstKeyMap *props, int *status ){
       line = AddItem( this, spprops, "LOLIMIT", NULL, line, &nc, &crem, linelen, status );
       line = AddItem( this, spprops, "HILIMIT", NULL, line, &nc, &crem, linelen, status );
 
-      prefix = strcmp( id, "Spectral" ) ? "Spectral " : NULL;
+      prefix = !astChrMatch( id, "Spectral" ) ? "Spectral " : NULL;
       line = AddItem( this, spprops, "SPECTRAL", prefix, line, &nc, &crem, linelen, status );
 
       line = AddItem( this, spprops, "UNIT", "unit ", line, &nc, &crem, linelen, status );
@@ -6249,7 +6251,7 @@ static void WriteProps( AstStcsChan *this, AstKeyMap *props, int *status ){
       line = AddItem( this, spprops, "LOLIMIT", NULL, line, &nc, &crem, linelen, status );
       line = AddItem( this, spprops, "HILIMIT", NULL, line, &nc, &crem, linelen, status );
 
-      prefix = strcmp( id, "Redshift" ) ? "Redshift " : NULL;
+      prefix = !astChrMatch( id, "Redshift" ) ? "Redshift " : NULL;
       line = AddItem( this, spprops, "REDSHIFT", prefix, line, &nc, &crem, linelen, status );
 
       line = AddItem( this, spprops, "UNIT", "unit ", line, &nc, &crem, linelen, status );
@@ -7308,12 +7310,12 @@ static int WriteRegion( AstStcsChan *this, AstRegion *reg, AstKeyMap *props,
             if( !astMapGet0C( spprops, "DOPPLERDEF", &dopdef ) ) dopdef = "OPTICAL";
             if( !astMapGet0C( spprops, "TYPE", &type ) ) type = "VELOCITY";
 
-            if( !strcmp( type, "VELOCITY" ) ) {
-               if( !strcmp( dopdef, "OPTICAL" ) ) {
+            if( astChrMatch( type, "VELOCITY" ) ) {
+               if( astChrMatch( dopdef, "OPTICAL" ) ) {
                   sys = AST__VOPTICAL;
-               } else if( !strcmp( dopdef, "RADIO" ) ) {
+               } else if( astChrMatch( dopdef, "RADIO" ) ) {
                   sys = AST__VRADIO;
-               } else if( !strcmp( dopdef, "RELATIVISTIC" ) ) {
+               } else if( astChrMatch( dopdef, "RELATIVISTIC" ) ) {
                   sys = AST__VREL;
                } else {
                   astAddWarning( this, 1, "Illegal STC-S DopplerDef '%s' "
@@ -7322,8 +7324,8 @@ static int WriteRegion( AstStcsChan *this, AstRegion *reg, AstKeyMap *props,
                   ok = 0;
                }
 
-            } else if( !strcmp( type, "REDSHIFT" ) ) {
-               if( !strcmp( dopdef, "OPTICAL" ) ) {
+            } else if( astChrMatch( type, "REDSHIFT" ) ) {
+               if( astChrMatch( dopdef, "OPTICAL" ) ) {
                   sys = AST__REDSHIFT;
                } else {
                   astAddWarning( this, 1, "Unsupported combination of "
