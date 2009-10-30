@@ -26,8 +26,6 @@
 *        usually 1 to use the first file in the Grp
 *     system = char* (Given)
 *        String indicating the type of projection (e.g. "icrs")
-*     pixsize = double (Given)
-*        Linear size of a map pixel (arcsec)
 *     lbnd_out = double* (Returned)
 *        2-element array pixel coord. for the lower bounds of the output map 
 *     ubnd_out = double* (Returned)
@@ -112,6 +110,8 @@
 *     2008-12-2 (DSB):
 *        Use smf_getfitsd instead of smf_fits_getD in order to avoid use
 *        of astIsUndef.
+*     2009-10-29 (TIMJ):
+*        Remove pixsize from API and set a dynamic default in this routine.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -151,6 +151,7 @@
 #include "sae_par.h"
 #include "star/ndg.h"
 #include "star/slalib.h"
+#include "par.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"
@@ -158,7 +159,7 @@
 
 #define FUNC_NAME "smf_mapbounds_approx"
 
-void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system, double pixsize, 
+void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system,
 			   int *lbnd_out, int *ubnd_out, AstFrameSet **outframeset,
 			   int *moving, int *status ) {
 
@@ -180,6 +181,7 @@ void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system, double pixsiz
   double mapx;                 /* Map X offset in radians */
   double mapy;                 /* Map Y offset in radians */
   double par[7];               /* Projection parameters */
+  double pixsize = 0.0;        /* Requested pixel size */
   char *pname = NULL;          /* Name of currently opened data file */
   double shift[ 2 ];           /* Shifts from PIXEL to GRID coords */
   AstMapping *sky2map = NULL;  /* Mapping celestial->map coordinates */
@@ -249,6 +251,17 @@ void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system, double pixsiz
   if( *status == SAI__OK) {
     hdr = data->hdr;
     swcsin = hdr->wcs;
+
+    /* Calculate default pixel size */
+    pixsize = smf_calc_telres( hdr->fitshdr, status );
+
+    /* Get the user defined pixel size - we trust that smf_get_projpar will
+       also read PIXSIZE and get the same answer. We pre-fill par[] to allow
+       PIXSIZE=! to accept the dynamic default in both places.*/
+    parGdr0d( "PIXSIZE", pixsize, 0, 60, 1, &pixsize, status );
+    par[4] = pixsize*AST__DD2R/3600.0;
+    par[5] = par[4];
+
     /* Retrieve input SkyFrame */
     skyin = astGetFrame( swcsin, AST__CURRENT );
 

@@ -1575,9 +1575,9 @@ package @PACKAGE@ {
             parameter pixsize {
                 position 3
                 type _REAL
-                vpath {PROMPT }
+                ppath DYNAMIC DEFAULT
+                vpath DYNAMIC
                 prompt {Output map pixel size in arcsec}
-                ppath GLOBAL CURRENT
                 default 3.0
                 helpkey *
             }

@@ -80,7 +80,8 @@
 *          matching the FWHM of the envelope function, given by PARAMS(2),
 *          to the point-spread function of the input data.  []
 *     PIXSIZE = REAL (Read)
-*          Pixel size in output image, in arcsec
+*          Pixel size in output image, in arcsec. Default value depends on
+*          the wavelength of the supplied data.
 *     SPREAD = LITERAL (Read)
 *          The method to use when spreading each input pixel value out
 *          between a group of neighbouring output pixels. If SPARSE is set
@@ -316,7 +317,6 @@ void smurf_qlmakemap( int *status ) {
   double overallmeansky = 0.0; /* Mean sky level across all input files */
   char pabuf[ 10 ];          /* Text buffer for parameter value */
   double params[ 4 ];        /* astRebinSeq parameters */
-  double pixsize = 3.0;      /* Size of an output map pixel in arcsec */
   size_t size;               /* Number of files in input group */
   int smfflags = 0;          /* Flags for creating a new smfData */
   int spread;                /* Code for pixel spreading scheme */
@@ -368,15 +368,6 @@ void smurf_qlmakemap( int *status ) {
   parChoic( "SYSTEM", "TRACKING", "TRACKING,FK5,ICRS,AZEL,GALACTIC,"
 	    "GAPPT,FK4,FK4-NO-E,ECLIPTIC", 1, system, 10, status );
 
-  /* Get the user defined pixel size */
-  parGet0d( "PIXSIZE", &pixsize, status );
-  if ( pixsize <= 0 || pixsize > 60. ) {
-    msgSetd( "PIXSIZE", pixsize );
-    *status = SAI__ERROR;
-    errRep( " ", "Invalid pixel size, ^PIXSIZE (must be positive but < 60 arcsec)",
-	   status );
-  }
-
   /* Decide whether output map contains variance */
   parGet0l( "GENVAR", &genvar, status );
 
@@ -394,7 +385,7 @@ void smurf_qlmakemap( int *status ) {
   msgOutif( MSG__VERB," ",
 	   "SMURF_QLMAKEMAP: Determine approx map bounds from first file",
             status );
-  smf_mapbounds_approx( igrp, 1, system, pixsize, lbnd_out, ubnd_out,
+  smf_mapbounds_approx( igrp, 1, system, lbnd_out, ubnd_out,
 			&outframeset, &moving, status );
 
   /* Write WCS bounds */
