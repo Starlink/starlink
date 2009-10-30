@@ -38,10 +38,12 @@
 *  History:
 *     28-MAR-2008 (DSB)
 *        Initial version. 
+*     2009-10-29 (TIMJ):
+*        Add support for SCUBA-2
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2008-2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -77,6 +79,7 @@ float smf_calc_telres( AstFitsChan *hdr, int *status ) {
 
 /* Local Variables: */
    char *value;
+   double dlambda;
    double los;
    double loe;
    float diam;
@@ -103,9 +106,14 @@ float smf_calc_telres( AstFitsChan *hdr, int *status ) {
 /* Note the telescope diamter, in metres. */
          diam = 15.0;
 
+/* Start by looking for a wavelength header */
+         if ( astGetFitsF( hdr, "WAVELEN", &dlambda ) ) {
+/* we have a wavelength directly */
+           lambda = dlambda;
+
 /* Find the local oscillator frequencies (GHz, topocentric) at the start 
    and end of the observation. */
-         if( ! astGetFitsF( hdr, "LOFREQS", &los ) ) {
+         } else if( ! astGetFitsF( hdr, "LOFREQS", &los ) ) {
             if( *status == SAI__OK ) {
                *status = SAI__ERROR;
                errRep( "", "The \"LOFREQS\" FITS header was not found.", 
