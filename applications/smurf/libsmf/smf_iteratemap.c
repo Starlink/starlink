@@ -57,7 +57,7 @@
 *     data_units = char[] (Returned)
 *        Data units read from the first chunk. These may be different from
 *        that read from raw data due to flatfielding. Should be a buffer
-*        of at least size SMF__CHARLABEL. Can be NULL.
+*        of at least size SMF__CHARLABEL.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
