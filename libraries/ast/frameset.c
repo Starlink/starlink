@@ -230,6 +230,9 @@ f     - AST_REMOVEFRAME: Remove a Frame from a FrameSet
 *        Override the astIntersect method.
 *     18-JUN-2009 (DSB):
 *        Override ObsAlt accessor methods.
+*     30-OCT-2009 (DSB):
+*        Make the Ident attribute relate to the FrameSet, not the current
+*        Frame.
 *class--
 */
 
@@ -2268,6 +2271,11 @@ static void ClearAttrib( AstObject *this_object, const char *attrib, int *status
    } else if ( !strcmp( attrib, "id" ) ) {
       astClearID( this );
 
+/* Ident. */
+/* ------ */
+   } else if ( !strcmp( attrib, "ident" ) ) {
+      astClearIdent( this );
+
 /* Invert. */
 /* ------- */
 /* Since this affects the choice of current Frame, we must restore the
@@ -3921,6 +3929,11 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 /* --- */
    } else if ( !strcmp( attrib, "id" ) ) {
       result = astGetID( this );
+
+/* Ident. */
+/* ------ */
+   } else if ( !strcmp( attrib, "ident" ) ) {
+      result = astGetIdent( this );
 
 /* Invert. */
 /* ------- */
@@ -8076,6 +8089,12 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
                        && ( nc >= len ) ) {
       astSetID( this, setting + id );
 
+/* Ident. */
+/* ------ */
+   } else if ( nc = 0, ( 0 == astSscanf( setting, "ident=%n%*[^\n]%n", &id, &nc ) )
+                       && ( nc >= len ) ) {
+      astSetIdent( this, setting + id );
+
 /* Invert. */
 /* ------- */
 /* Since this affects the choice of current Frame, we must restore the
@@ -9001,6 +9020,11 @@ static int TestAttrib( AstObject *this_object, const char *attrib, int *status )
 /* --- */
    } else if ( !strcmp( attrib, "id" ) ) {
       result = astTestID( this );
+
+/* Ident. */
+/* ------ */
+   } else if ( !strcmp( attrib, "ident" ) ) {
+      result = astTestIdent( this );
 
 /* Invert. */
 /* ------- */
