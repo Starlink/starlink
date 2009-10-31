@@ -76,6 +76,7 @@ f     The SkyFrame class does not define any new routines beyond those
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Starlink)
 *     DSB: David S. Berry (Starlink)
+*     BEC: Brad Cavanagh (JAC, Hawaii)
 
 *  History:
 *     4-MAR-1996 (RFWS):
@@ -259,7 +260,7 @@ f     The SkyFrame class does not define any new routines beyond those
 *        Do not calculate LAST until it is needed.
 *     12-OCT-2009 (DSB);
 *        - Handle 2.PI->0 discontinuity in cached LAST values.
-*     12-OCT-2009 (DSB);
+*     12-OCT-2009 (BEC);
 *        - Fix bug in caching LAST value.
 *     31-OCT-2009 (DSB);
 *        Correct SetCachedLAST to handle cases where the epoch to be
