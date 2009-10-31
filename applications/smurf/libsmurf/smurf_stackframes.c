@@ -42,7 +42,9 @@
 *          observation.
 *     SORT = _LOGICAL (Read)
 *          Should the data be sorted into time order (true) or left in the
-*          order given in IN (false). Default is true.
+*          order given in IN (false). If the first file in IN has no
+*          date information sorting will be disabled automatically.
+*          Default is true if date information is available.
 
 *  Notes:
 *     - No special SCUBA-2 processing is applied. The assumption is simply
@@ -63,6 +65,8 @@
 *        Initial version.
 *     2009-10-28 (TIMJ):
 *        Add SORT option.
+*     2009-10-30 (TIMJ):
+*        Only ask for SORT option if we know that sorting is possible.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -166,9 +170,6 @@ void smurf_stackframes( int *status ) {
   kpg1Wgndf( "OUT", igrp, 1, 1, "",
 	     &ogrp, &outsize, status );
 
-  /* See if we need to sort */
-  parGet0l( "SORT", &dosort, status );
-
   if (*status != SAI__OK) goto CLEANUP;
 
   /* To sort into time order we need to extract some information
@@ -245,6 +246,21 @@ void smurf_stackframes( int *status ) {
     }
     if (*status == SAI__OK) {
       smfSortInfo * thisitem = &(sortinfo[i-1]);
+      /* first time round we see whether there is a date in the file
+         to provide an intelligent default for SORT parameter */
+      if (i==1) {
+        double thismjd;
+        smf_find_dateobs( data->hdr, &thismjd, NULL, status );
+        if (*status != SAI__OK) {
+          dosort = 0;
+          errAnnul( status );
+          msgOutif( MSG__NORM, "", "No date information available. Disabling date sorting",
+                    status);
+        } else {
+          parDef0l( "SORT", 1, status);
+          parGet0l( "SORT", &dosort, status );
+        }
+      }
       if (dosort) {
         smf_find_dateobs( data->hdr, &(thisitem->mjd), NULL, status );
       } else {
@@ -356,11 +372,11 @@ void smurf_stackframes( int *status ) {
       times[i] = times[i] - origin;
     }
     timemap = astLutMap( size, times, 1.0, 1.0, " " );
-    times = smf_free( times, status );
   } else {
     timefrm = (AstTimeFrame*)astFrame( 1, "Domain=INDEX,Unit(1)=pixel,Label(1)=File Number");
     timemap = (AstLutMap*)astUnitMap( 1, " ");
   }
+  times = smf_free( times, status );
 
   /* split up the current 2d frameset */
   frame2d = astGetFrame( framewcs, AST__CURRENT );

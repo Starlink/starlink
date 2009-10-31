@@ -2403,7 +2403,7 @@ package @PACKAGE@ {
                 type _LOGICAL
                 access READ
                 vpath PROMPT
-                ppath CURRENT DEFAULT
+                ppath CURRENT DYNAMIC DEFAULT
                 default TRUE
                 helpkey *
             }
