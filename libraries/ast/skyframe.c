@@ -259,8 +259,11 @@ f     The SkyFrame class does not define any new routines beyond those
 *        Do not calculate LAST until it is needed.
 *     12-OCT-2009 (DSB);
 *        - Handle 2.PI->0 discontinuity in cached LAST values.
-*     12-OCT-2009 (BED);
+*     12-OCT-2009 (DSB);
 *        - Fix bug in caching LAST value.
+*     31-OCT-2009 (DSB);
+*        Correct SetCachedLAST to handle cases where the epoch to be
+*        stored is smaller than any epoch already in the table.
 *class--
 */
 
@@ -3399,7 +3402,7 @@ static double GetLAST( AstSkyFrame *this, int *status ) {
 
 /* If we do not know the ratio of sidereal to solar time at the current
    epoch, calculate it now. This involves a full calculation of LAST at
-   the end of the current linear approxcimation period. */
+   the end of the current linear approximation period. */
          if( this->klast == AST__BAD ) {
             last1 = CalcLAST( this, this->eplast + 0.4, astGetObsLon( this ),
                               astGetObsLat( this ), astGetObsAlt( this ), 
@@ -8269,6 +8272,7 @@ static void SetCachedLAST( AstSkyFrame *this, double last, double epoch,
    AstSkyLastTable *table; 
    double *ep;
    double *lp;
+   double lp_ref;
    int i;
    int itable;
 
@@ -8357,15 +8361,24 @@ static void SetCachedLAST( AstSkyFrame *this, double last, double epoch,
          }
 
 /* Store the new epoch and LAST value. Add or subtract 2.PI as needed
-   from the new LAST value to ensure it is continuous with the previous
+   from the new LAST value to ensure it is continuous with an adjacent
    LAST value. This is needed for interpolation between the two values 
    to be meaningful.  */
          ep[ 1 ] = epoch;
 
-         if( last > lp[ 0 ] + AST__DPI ) {
+/* For most cases, compare with the previous LAST value. If the new epoch 
+   value is smaller than any epoch already in the table, there will be no 
+   previous LAST value. So compare with the next value instead. */
+         if( i >= 0 ) {
+            lp_ref = lp[ 0 ];
+         } else {
+            lp_ref = lp[ 2 ];
+         }
+
+         if( last > lp_ref + AST__DPI ) {
             lp[ 1 ] = last - 2*AST__DPI;
 
-         } else if( last < lp[ 0 ] - AST__DPI ) {
+         } else if( last < lp_ref - AST__DPI ) {
             lp[ 1 ] = last + 2*AST__DPI;
 
          } else {
