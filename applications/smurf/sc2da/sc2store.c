@@ -3931,10 +3931,14 @@ AstFrameSet *timeWcs( int subnum, int ntime, const SC2STORETelpar* telpar,
 *        Integrated into SCUBA-2 software as variant of ACSIS DA version
 *     29-OCT-2009 (DSB):
 *        Modified to use atlAddWcsAxis.
+*     30-OCT-2009 (DSB):
+*        Take a deep copy of the FrameSet to avoid changing the cached
+*        FrameSet.
 
 */
 
 /* Local Variables: */
+   AstFrameSet *fset;
    AstFrameSet *result;
    AstLutMap *timemap;
    AstTimeFrame *timefrm;
@@ -3951,9 +3955,14 @@ AstFrameSet *timeWcs( int subnum, int ntime, const SC2STORETelpar* telpar,
 /* Start an AST context so we do not need to annul AST pointers explicitly. */
    astBegin;
 
-/* Create a frameset holding the 2D GRID Frame and a 2D Frame describing focal 
-   plane coordinates */
-   sc2ast_createwcs( subnum, NULL, NULL, NULL, &result, status );
+/* Obtain a pointer to a frameset holding the 2D GRID Frame and a 2D Frame 
+   describing focal plane coordinates */
+   sc2ast_createwcs( subnum, NULL, NULL, NULL, &fset, status );
+
+/* We are about to change the FrameSet, so take a deep copy. This is
+   needed since the FrameSet returned by sc2ast_createwcs is held in a 
+   cache may be needed elsewhere. */
+   result = astCopy( fset );
 
 /* Now create a TimeFrame to describe MJD in the TAI timescale, and a LutMap
    which transforms grid coord into MJD (in days). The default TimeFrame 

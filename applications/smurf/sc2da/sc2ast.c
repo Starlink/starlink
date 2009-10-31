@@ -217,6 +217,8 @@ int *status             /* global status (given and returned) */
                  (it's much faster). (DSB)
      18Dec2008 : dut1 is now an argument (TIMJ)
      28Oct2009 : Add a Frame with Domain "BOLO" to returned FrameSet (DSB)
+     30Oct2009 : Report an error if the number of base or current Frame
+                 axes in the cached FrameSet has been changed.
 */
 
 {
@@ -240,6 +242,8 @@ int *status             /* global status (given and returned) */
    AstPermMap *permmap;
    int perm[ 2 ];
 #endif
+   int nin;
+   int nout;
    double r;                       /* subarray angle */
    double rot[4];                  /* rotation matrix */
    const double rotangle[8] =
@@ -417,7 +421,7 @@ int *status             /* global status (given and returned) */
       cache->frameset[ subnum ] = astFrameSet( astFrame ( 2, "Domain=GRID" ), 
                                               " " );   
 
-/* Add a 2D Frame with DOmain "BOLO" describing the bolometer rows and 
+/* Add a 2D Frame with Domain "BOLO" describing the bolometer rows and 
    columns. */
       sc2ast_make_bolo_frame( &bfrm, &bmap, status );
       astAddFrame( cache->frameset[ subnum ], AST__BASE, bmap, bfrm );
@@ -529,8 +533,27 @@ int *status             /* global status (given and returned) */
    needed. This is done by calling this function with "subnum" set to -1. */
       astExempt( cache->map[ subnum ] );
       astExempt( cache->frameset[ subnum ] );
-   }
 
+/* If we already have a cached FrameSet, check that no-one has been mucking 
+   about with it - it should have 2D base Frame and a 2D current Frame. */
+   } else {
+      nin = astGetI( cache->frameset[ subnum ], "Nin" );
+      nout = astGetI( cache->frameset[ subnum ], "Nout" );
+      if( nin != 2 && *status == SAI__OK ) {
+         *status = SAI__ERROR;
+         sprintf( errmess, "sc2ast_createwcs2: cached FrameSet has been "
+                  "corrupted - it now has %d base frame axes (should be 2).",
+	          nin ); 
+         ErsRep( 0, status, errmess );
+
+      } else if( nout != 2 && *status == SAI__OK ) {
+         *status = SAI__ERROR;
+         sprintf( errmess, "sc2ast_createwcs2: cached FrameSet has been "
+                  "corrupted - it now has %d current frame axes (should "
+                  "be 2).", nout ); 
+         ErsRep( 0, status, errmess );
+      }
+   }
 
    /* If state is NULL we are simply returning the focal plane coordinate
       frames */
