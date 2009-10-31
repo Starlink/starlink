@@ -358,9 +358,9 @@ void sc2sim_ndfwrdata
   char objectname[JCMT__SZTCS_SOURCE+1]; /* Name of object */
   double obsgeo[3];               /* Cartesian geodetic observatory coords. */
   char obsidss[84];               /* OBSID + wavelength */
-  double *poly;                   /* Pointer to polynomial fit solution */
+  double *poly = NULL;            /* Pointer to polynomial fit solution */
   char prvname[2*PAR__SZNAM+1];   /* Name to use for provenance */
-  double *rdata;                  /* Pointer to flatfielded data */
+  double *rdata = NULL;           /* Pointer to flatfielded data */
   char recipe[30];                /* Name of default ORAC-DR recipe */
   SC2STORETelpar telpar;          /* Struct for telescope info */
   int seqend;                     /* RTS index of last frame in output image */
@@ -717,7 +717,9 @@ void sc2sim_ndfwrdata
   }
 
   /* Now we need to play with flat-fielded data */
-  rdata = smf_malloc( framesize*numsamples, sizeof(double), 1, status );
+  rdata = smf_malloc( framesize*numsamples, sizeof(*rdata), 1, status );
+  if (*status != SAI__OK) goto CLEANUP;
+
   /* Apply flatfield to timestream */
   for ( j=0; j<framesize*numsamples; j++ ) {
     rdata[j] = (double)dbuf[j];
@@ -861,13 +863,14 @@ void sc2sim_ndfwrdata
   }
 
   /* Calculate polynomial fits and write out SCANFIT extension */
-  poly = smf_malloc( framesize*ncoeff, sizeof( double ), 0, status );
+  poly = smf_malloc( framesize*ncoeff, sizeof( *poly ), 0, status );
   sc2math_fitsky ( 0, framesize, numsamples, ncoeff, rdata, poly, status );
   sc2store_putscanfit ( inx->colsize, inx->rowsize, ncoeff, poly, status );
 
+ CLEANUP:
   /* Free memory allocated for pointers */
-  poly = smf_free( poly, status );
-  rdata = smf_free( rdata, status );
+  if (poly) poly = smf_free( poly, status );
+  if (rdata) rdata = smf_free( rdata, status );
 
   /* Close the file */
   sc2store_free ( status );
