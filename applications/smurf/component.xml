@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="smurf">
-  <version>0.5.2</version>
+  <version>0.9.0</version>
   <path>applications/smurf</path>
   <description>SURF2 - SCUBA-2 User Reduction Facility</description>
   <abstract><p>
