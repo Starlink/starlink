@@ -2658,10 +2658,7 @@ package @PACKAGE@ {
 
         Type smurfhelp for help on @PACKAGE_UPCASE@ commands.
         Type "showme sun258" to browse the hypertext documentation.
-
-        NOTE, several applications have had major changes made to their
-        parameter lists. See the "Release Notes" section of SUN/XXX for
-        details.
+        Type "showme sc19" to view the SCUBA-2 map-making cookbook.
 
     }
 
