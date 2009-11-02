@@ -48,6 +48,7 @@
 #include <memory>
 #include <bitset>
 #include <cmath>
+#include <cstdio>
 
 /*  Local includes. */
 #include "VOTableStream.h"
