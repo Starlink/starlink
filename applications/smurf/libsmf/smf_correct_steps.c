@@ -128,7 +128,6 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
   dim_t nmean2;                 /* Number of samples in mean1 */
   dim_t ntslice=0;              /* Number of time slices */
   unsigned char *qua=NULL;      /* Pointer to quality flags */
-  unsigned char mask;           /* bitmask for quality */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -170,7 +169,7 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
       msgSeti("NTSLICE",ntslice);
       msgSeti("DCBOX",ntslice);
       errRep("", FUNC_NAME
-	     ": Can't find jumps: ntslice=^NTSLICE, must be > dcbox"
+             ": Can't find jumps: ntslice=^NTSLICE, must be > dcbox"
              "(=^DCBOX)*2", status);
     }
 
@@ -196,87 +195,87 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
       /* Continue if bolo stream is not flagged bad */
       if( !(qua[base] & SMF__Q_BADB) && (*status == SAI__OK) ) {
 
-	/* initial conditions for jump detection */
-	smf_stats1( dat+base, 1, dcbox, qua, SMF__Q_MOD, &mean1, NULL, &nmean1,
+        /* initial conditions for jump detection */
+        smf_stats1( dat+base, 1, dcbox, qua, SMF__Q_MOD, &mean1, NULL, &nmean1,
                     status);
-	smf_stats1( dat+base+dcbox, 1, dcbox, qua, SMF__Q_MOD, &mean2, NULL,
+        smf_stats1( dat+base+dcbox, 1, dcbox, qua, SMF__Q_MOD, &mean2, NULL,
                     &nmean2, status );
 
-	/* Estimate rms in a box as the bolo rms divided by sqrt(dcbox) */
-	dcstep = smf_quick_noise( data, i, dcbox, 10, qua, SMF__Q_MOD,
+        /* Estimate rms in a box as the bolo rms divided by sqrt(dcbox) */
+        dcstep = smf_quick_noise( data, i, dcbox, 10, qua, SMF__Q_MOD,
                                   status ) * dcthresh / sqrt(dcbox);
 
-	if( *status == SAI__OK ) {
-	  memset( alljump, 0, ntslice*sizeof(*alljump) );
-	  injump = 0;  /* jump occured somewhere in boxes */
-	  maxdiff = 0; /* max difference between mean1 and mean2 for jump */
-	  maxind = 0;  /* index to location of maxdiff */
+        if( *status == SAI__OK ) {
+          memset( alljump, 0, ntslice*sizeof(*alljump) );
+          injump = 0;  /* jump occured somewhere in boxes */
+          maxdiff = 0; /* max difference between mean1 and mean2 for jump */
+          maxind = 0;  /* index to location of maxdiff */
 
-	  /* counter is at mean1/mean2 boundary -- location potential jumps.
-	     Counter runs from dcbox --> ntslice-dcbox. */
+          /* counter is at mean1/mean2 boundary -- location potential jumps.
+             Counter runs from dcbox --> ntslice-dcbox. */
 
-	  for( j=dcbox; j<(ntslice-dcbox); j++ ) {
+          for( j=dcbox; j<(ntslice-dcbox); j++ ) {
 
             /*
-            if( i==900 ) {
+              if( i==900 ) {
               msgSeti("J", j);
               msgSetd("M1", mean1);
               msgSetd("M2", mean2);
               msgSetd("D", mean2-mean1);
               msgOut("","^J ^M1 ^M2 ^D",status);
-            }
+              }
             */
 
-	    if( fabs(mean2 - mean1) >= dcstep ) {
-	      /* is the difference between the two boxes significant? */
+            if( fabs(mean2 - mean1) >= dcstep ) {
+              /* is the difference between the two boxes significant? */
               isbad = 1;
 
-	      if( !injump ) {
-		/* Starting new jump, initialize search */
-		maxdiff = mean2 - mean1;
-		maxind = j%ntslice;
-		injump = 1;
-	      } else if( fabs(mean2 - mean1) > fabs(maxdiff) ) {
-		/* Update the search for the maximum step size */
-		maxdiff = mean2 - mean1;
-		maxind = j%ntslice;
-	      }
-	    } else {
-	      /* If difference is small, but injump is set, that means we've
-		 finished the search for the last step */
-	      if( injump ) {
-		alljump[maxind] = maxdiff;
-		injump = 0;
-	      }
-	    }
+              if( !injump ) {
+                /* Starting new jump, initialize search */
+                maxdiff = mean2 - mean1;
+                maxind = j%ntslice;
+                injump = 1;
+              } else if( fabs(mean2 - mean1) > fabs(maxdiff) ) {
+                /* Update the search for the maximum step size */
+                maxdiff = mean2 - mean1;
+                maxind = j%ntslice;
+              }
+            } else {
+              /* If difference is small, but injump is set, that means we've
+                 finished the search for the last step */
+              if( injump ) {
+                alljump[maxind] = maxdiff;
+                injump = 0;
+              }
+            }
 
-	    /* Move along the boxes and update the mean estimates */
-	    if( !(qua[base+(j-dcbox)] & SMF__Q_MOD) ) {
-	      /* Drop sample at j-dcbox from mean1 */
-	      mean1 = (nmean1*mean1 - dat[base+(j-dcbox)]) / (nmean1-1);
-	      nmean1 --;
-	    }
-	    if( !(qua[base+(j%ntslice)] & SMF__Q_MOD) ) {
-	      /* Move sample at j from mean2 to mean1 */
-	      mean1 = (nmean1*mean1 + dat[base+(j%ntslice)]) / (nmean1+1);
-	      nmean1 ++;
+            /* Move along the boxes and update the mean estimates */
+            if( !(qua[base+(j-dcbox)] & SMF__Q_MOD) ) {
+              /* Drop sample at j-dcbox from mean1 */
+              mean1 = (nmean1*mean1 - dat[base+(j-dcbox)]) / (nmean1-1);
+              nmean1 --;
+            }
+            if( !(qua[base+(j%ntslice)] & SMF__Q_MOD) ) {
+              /* Move sample at j from mean2 to mean1 */
+              mean1 = (nmean1*mean1 + dat[base+(j%ntslice)]) / (nmean1+1);
+              nmean1 ++;
 
-	      mean2 = (nmean2*mean2 - dat[base+(j%ntslice)]) / (nmean2-1);
-	      nmean2 --;
+              mean2 = (nmean2*mean2 - dat[base+(j%ntslice)]) / (nmean2-1);
+              nmean2 --;
 
-	    }
-	    if( !(qua[base+((j+dcbox+1)%ntslice)] & SMF__Q_MOD) ) {
-	      /* Add sample at j+dcbox+1 to mean1 */
-	      mean2 = (nmean2*mean2 + dat[base+((j+dcbox+1)%ntslice)]) /
-		(nmean2+1);
-	      nmean2 ++;
-	    }
+            }
+            if( !(qua[base+((j+dcbox+1)%ntslice)] & SMF__Q_MOD) ) {
+              /* Add sample at j+dcbox+1 to mean1 */
+              mean2 = (nmean2*mean2 + dat[base+((j+dcbox+1)%ntslice)]) /
+                (nmean2+1);
+              nmean2 ++;
+            }
 
             /* Don't need to continue if bad bolo, and flagbolo set */
             if( flagbolo && isbad ) break;
-	  }
+          }
 
-	  /* calculate the new corrected baseline if requested */
+          /* calculate the new corrected baseline if requested */
           if( !flagbolo ) {
             baseline = 0;
             for( j=1; j<ntslice; j++ ) {
