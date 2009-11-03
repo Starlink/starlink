@@ -47,7 +47,7 @@
 *        The minimum number of pixels required to contribute to an
 *        output pixel.
 *     RESULT( NPIX ) = ? (Returned)
-*        The output line of data.
+*        The output line of clipped standard deviations.
 *     WRK1( NLINES ) = ? (Returned)
 *        Workspace for calculations.
 *     WRK2( NLINES ) = ? (Returned)
@@ -109,6 +109,8 @@
 *     2009 July 17 (MJC):
 *        Do not include collapsed data comprising only bad values
 *        in argument NBAD.
+*     2009 November 3 (MJC):
+*        Return clipped standard deviations, not variances.
 *     {enter_further_changes_here}
 
 *-
@@ -295,9 +297,9 @@
             END IF
          END IF
 
-*  If there are sufficient good pixels output the result.
+*  If there are sufficient good pixels output the standard deviation.
          IF ( NGOOD .GE. MINPIX .AND. VAR .NE. VAL__BADD ) THEN
-            RESULT( I ) = NUM_DTO<T>( VAR )
+            RESULT( I ) = NUM_DTO<T>( SQRT( VAR ) )
 
 *  Trap numeric errors.
             IF ( .NOT. NUM_WASOK() ) THEN
