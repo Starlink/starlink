@@ -64,6 +64,8 @@
 *  History:
 *     2009-03-27 (TIMJ):
 *        Original version.
+*     2009-11-03 (TIMJ):
+*        Actually close the files that we open...
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -150,7 +152,10 @@ void smurf_calcresp( int *status ) {
 
     /* Abort if we had trouble. Alternative is to loop round to the next file but 
        it is safer to tell people there is a problem */
-    if (*status != SAI__OK) break;
+    if (*status != SAI__OK) {
+      if (idata) smf_close_file( &idata, status );
+      break;
+    }
 
     /* Create an output responsivity file. */
     smf_create_bolfile( ogrp, i, idata, "Responsivity", "A/W", &respmap, status );
@@ -168,7 +173,8 @@ void smurf_calcresp( int *status ) {
     msgOutif( MSG__NORM, "",
               "Number of responsivities with S/N ratio > ^SNR for file ^I: ^NG", status);
 
-    /* close file */
+    /* close files */
+    if (idata) smf_close_file( &idata, status );
     if (respmap) smf_close_file( &respmap, status );
 
   }
