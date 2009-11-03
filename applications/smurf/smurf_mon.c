@@ -81,7 +81,7 @@
 *        Add STARECALC
 *     2006-11-01 (DSB):
 *        Added value for new steptime parameter in calls to
-*        smf_create_lutwcs and smf_detpos_wcs. 
+*        smf_create_lutwcs and smf_detpos_wcs.
 *     2006-11-01 (TIMJ):
 *        Add SMURFHELP
 *     2007-03-23 (TIMJ):
@@ -198,23 +198,27 @@ void smurf_mon( int * status ) {
   int emslev1;                 /* EMS level on entry */
   int emslev2;                 /* EMS level on exit */
 
-  if ( *status != SAI__OK ) return; 
+  if ( *status != SAI__OK ) return;
 
   /* Read the input error message stack level */
   emsLevel( &emslev1 );
 
   /* Initialise AST */
   astBegin;
-  memory_caching = astTune( "MemoryCaching", 1 ); 
+  memory_caching = astTune( "MemoryCaching", 1 );
 
   /* Register our status variable with AST */
   astWatch( status );
+
+  /* If we are watching a particular memory Id reported by astActiveMemory
+     we set the watch point here. */
+  /* astWatchMemory( 29 ); */
 
   /* Find out the task name and provenance name we were invoked with */
   smf_get_taskname( taskname, NULL, status );
 
   /* Get the GRP and HDS status for leak checking - need the task name
-    to mask out parameter names. Also need to mask out the monlith name */
+     to mask out parameter names. Also need to mask out the monlith name */
   strcpy(filter, "!SMURF_MON,!");
   strcat(filter, taskname );
   grpInfoi( NULL, 0, "NGRP", &ngrp0, status );
@@ -224,13 +228,13 @@ void smurf_mon( int * status ) {
   /* Update the application name in the NDF history recording
      to include the version number of the application */
   snprintf( appname, NDF__SZAPP, "%-*s (%s V%s)", PAR__SZNAM,
-	    taskname, PACKAGE_UPCASE, PACKAGE_VERSION);
+            taskname, PACKAGE_UPCASE, PACKAGE_VERSION);
   ndfHappn( appname, status );
 
-   /* Begin a GRP NDF history block. This causes the contents of GRP 
-      groups to be appended to default history text added to any NDFs 
-      during the block. */
-   ndgBeggh( status );
+  /* Begin a GRP NDF history block. This causes the contents of GRP
+     groups to be appended to default history text added to any NDFs
+     during the block. */
+  ndgBeggh( status );
 
 
 
@@ -308,8 +312,8 @@ void smurf_mon( int * status ) {
   }
 
 
-/* End the GRP NDF history block. */
-   ndgEndgh( status );
+  /* End the GRP NDF history block. */
+  ndgEndgh( status );
 
   /* Clear cached info from sc2ast_createwcs. */
   sc2ast_createwcs(-1, NULL, NULL, NULL, NULL, status);
@@ -332,9 +336,9 @@ void smurf_mon( int * status ) {
     msgSeti( "NGRP0", ngrp0 );
     msgSeti( "NGRP1", ngrp1 );
     msgOut( " ", "WARNING: The number of active "
-	    "GRP identifiers increased from ^NGRP0 to ^NGRP1 "
-	    "during execution of ^NAME (" PACKAGE_UPCASE " programming "
-	    " error).", status);
+            "GRP identifiers increased from ^NGRP0 to ^NGRP1 "
+            "during execution of ^NAME (" PACKAGE_UPCASE " programming "
+            " error).", status);
     msgBlank(status);
   }
   errEnd( status );
@@ -353,9 +357,9 @@ void smurf_mon( int * status ) {
     msgSeti( "NLOC0", nloc0 );
     msgSeti( "NLOC1", nloc1 );
     msgOut( " ", "WARNING: The number of active "
-	    "HDS Locators increased from ^NLOC0 to ^NLOC1 "
-	    "during execution of ^NAME (" PACKAGE_UPCASE " programming "
-	    " error).", status);
+            "HDS Locators increased from ^NLOC0 to ^NLOC1 "
+            "during execution of ^NAME (" PACKAGE_UPCASE " programming "
+            " error).", status);
     msgBlank(status);
     hdsShow("LOCATORS", status);
     hdsShow("FILES", status);
@@ -379,14 +383,15 @@ void smurf_mon( int * status ) {
     errRlse();
   }
 
-  /* The astFlushMemory function does nothing unless AST has been compiled 
-   * with the MEM_DEBUG flag. If this is the case, then it frees all AST 
-   * internal structures, and report the number of memory blocks that have 
+  /* The astFlushMemory function does nothing unless AST has been compiled
+   * with the MEM_DEBUG flag. If this is the case, then it frees all AST
+   * internal structures, and report the number of memory blocks that have
    * not been freed (useful for identifying memory leaks).
    * Use astActiveMemory() below to list all active memory and then
    * use astWatchMemory() at the start of this routine to get reports when
    * a particular ID is used. Set a breakpoint in the debugger for astMemoryAlarm_
    */
+  /* astActiveMemory("Exit:"); */
   astFlushMemory( 1 );
 }
 
