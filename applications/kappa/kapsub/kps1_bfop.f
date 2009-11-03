@@ -117,6 +117,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -138,6 +139,9 @@
 *     2009 February 2 (MJC):
 *        Made the last change more general using Digits attribute and
 *        checking for AsTime axes.
+*     2009 November 3 (DSB):
+*        Avoid accessing SkyFrame attributes if the supplied Frame is not
+*        a SkyFrame.
 *     {enter_further_changes_here}
 
 *-
@@ -185,6 +189,7 @@
       CHARACTER*12 FMAT( 2 )     ! SkyFrame format
       INTEGER IAT                ! No. of characters currently in buffer
       INTEGER IB                 ! Beam loop counter
+      LOGICAL ISSKY              ! Is RFRM a SkyFrame?
       INTEGER J                  ! Loop count
       INTEGER K                  ! Loop count
       INTEGER LAT                ! Index to latitude axis in SkyFrame
@@ -202,12 +207,23 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Some attributes are only defined for SkyFrames, so see if the results
+*  Frame is a SkyFrame.
+      ISSKY = AST_ISASKYFRAME( RFRM , STATUS )
+
 *  Inquire current number of SkyFrame format precision digits
 *  and whether the axis should be formatted as a time axis.
+*  Not all types of Frame have an AsTime attribute, so check for 
+*  and annull any errors that occur when getting the value of AsTime.
       PREC( 1 ) = AST_GETI( RFRM, 'Digits(1)', STATUS )
       PREC( 2 ) = AST_GETI( RFRM, 'Digits(2)', STATUS )
-      TIME( 1 ) = AST_GETL( RFRM, 'AsTime(1)', STATUS )
-      TIME( 2 ) = AST_GETL( RFRM, 'AsTime(2)', STATUS )
+      IF( ISSKY ) THEN
+         TIME( 1 ) = AST_GETL( RFRM, 'AsTime(1)', STATUS )
+         TIME( 2 ) = AST_GETL( RFRM, 'AsTime(2)', STATUS )
+      ELSE
+         TIME( 1 ) = .FALSE.
+         TIME( 2 ) = .FALSE.
+      END IF
 
 *  Provide sufficient precision for sky co-ordinates.  Use three
 *  figures are the decimals seconds of time and two digits of
@@ -298,7 +314,11 @@
 
 *  Obtain the latitude axis so that the required precision
 *  is used.
-      LAT = AST_GETI( RFRM, 'LatAxis', STATUS )
+      IF( ISSKY ) THEN
+         LAT = AST_GETI( RFRM, 'LatAxis', STATUS )
+      ELSE
+         LAT = 1
+      END IF
 
 *  Write the primary-beam offset and error out to the output
 *  parameter.  Both values are written to REFOFF.
