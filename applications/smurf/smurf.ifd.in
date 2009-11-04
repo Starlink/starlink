@@ -1352,6 +1352,8 @@ package @PACKAGE@ {
             parameter method {
                 type _CHAR
                 prompt {Map-making method}
+                vpath PROMPT
+                ppath CURRENT DEFAULT
                 default REBIN
                 helpkey *
             }
