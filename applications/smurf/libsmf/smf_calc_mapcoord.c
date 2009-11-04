@@ -163,6 +163,8 @@ void smfCalcMapcoordPar( void *job_data_ptr, int *status ) {
   double *outmapcoord=NULL;/* Coordinates of each bolo */
   smfCalcMapcoordData *pdata=NULL; /* Pointer to job data */
   AstMapping *sky2map=NULL;
+  struct timeval tv1;      /* Timer */
+  struct timeval tv2;      /* Timer */
   int xnear;               /* x-nearest neighbour pixel */
   int ynear;               /* y-nearest neighbour pixel */
 
@@ -205,6 +207,7 @@ void smfCalcMapcoordPar( void *job_data_ptr, int *status ) {
   msgOutiff( MSG__DEBUG, "", 
              "smfCalcMapcoordPar: thread starting on tslices %zu -- %zu",
              status, pdata->t1, pdata->t2 );
+  smf_timerinit( &tv1, &tv2, status );
 
   /* Lock the supplied AST object pointers for exclusive use by this
      thread.  The invoking thread should have unlocked them before
@@ -264,8 +267,8 @@ void smfCalcMapcoordPar( void *job_data_ptr, int *status ) {
   if( outmapcoord ) outmapcoord = smf_free( outmapcoord, status );
 
   msgOutiff( MSG__DEBUG, "", 
-             "smfCalcMapcoordPar: thread finishing tslices %zu -- %zu",
-             status, pdata->t1, pdata->t2 );
+             "smfCalcMapcoordPar: thread finishing tslices %zu -- %zu (%.3f sec)",
+             status, pdata->t1, pdata->t2, smf_timerupdate(&tv1, &tv2, status) );
 }
 
 /* ------------------------------------------------------------------------ */
