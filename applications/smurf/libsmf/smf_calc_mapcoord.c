@@ -222,35 +222,41 @@ void smfCalcMapcoordPar( void *job_data_ptr, int *status ) {
       
   /* Loop over time slices */
   for( i=pdata->t1; i<=pdata->t2; i++ ) {
-    
+
     /* Calculate the bolometer to map-pixel transformation for tslice */
     bolo2map = smf_rebin_totmap( data, i, abskyfrm, sky2map, moving,
                                  status );
 
     if( *status == SAI__OK ) {
-      /* skip if we did not get a mapping this time round */
-      if (!bolo2map) continue;
-
-      astTranGrid( bolo2map, 2, lbnd_in, ubnd_in, 0.1, 1000000, 1,
-                   2, nbolo, outmapcoord );
-      
-      for( j=0; j<nbolo; j++ ) {
-        xnear = (int) (outmapcoord[j] - 0.5);
-        ynear = (int) (outmapcoord[nbolo+j] - 0.5);
-	
-        if( (xnear >= 0) && (xnear <= ubnd_out[0] - lbnd_out[0]) &&
-            (ynear >= 0) && (ynear <= ubnd_out[1] - lbnd_out[1]) ) {
-          /* Point lands on map */
-          lut[i*nbolo+j] = ynear*(ubnd_out[0]-lbnd_out[0]+1) + xnear;
-        } else {
-          /* Point lands outside map */
+      /* skip if we did not get a mapping this time round but fill the LUT
+         with bads */
+      if (!bolo2map) {
+        for ( j=0; j<nbolo; j++) {
           lut[i*nbolo+j] = VAL__BADI;
+        }
+      } else {
+
+        astTranGrid( bolo2map, 2, lbnd_in, ubnd_in, 0.1, 1000000, 1,
+                     2, nbolo, outmapcoord );
+
+        for( j=0; j<nbolo; j++ ) {
+          xnear = (int) (outmapcoord[j] - 0.5);
+          ynear = (int) (outmapcoord[nbolo+j] - 0.5);
+
+          if( (xnear >= 0) && (xnear <= ubnd_out[0] - lbnd_out[0]) &&
+              (ynear >= 0) && (ynear <= ubnd_out[1] - lbnd_out[1]) ) {
+            /* Point lands on map */
+            lut[i*nbolo+j] = ynear*(ubnd_out[0]-lbnd_out[0]+1) + xnear;
+          } else {
+            /* Point lands outside map */
+            lut[i*nbolo+j] = VAL__BADI;
+          }
         }
       }
     }
     /* clean up ast objects */
-    bolo2map = astAnnul( bolo2map );
-    
+    if (bolo2map) bolo2map = astAnnul( bolo2map );
+
     /* Break out of loop over time slices if bad status */
     if (*status != SAI__OK) {
       i = pdata->t2;
