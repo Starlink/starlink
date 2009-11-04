@@ -187,6 +187,8 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
   unsigned char *qua_data; /* Pointer to common quality data */
   double *weight=NULL;     /* Weight at each point in model */
 
+  struct timeval tv1;      /* Timers */
+  struct timeval tv2;      /* Timers */
 
   if( *status != SAI__OK ) return;
 
@@ -275,18 +277,24 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
     msgOutiff( MSG__DEBUG, "",
                "smfCalcmodelComPar(%i): thread starting on tslices %zu -- %zu",
                status, pdata->operation, pdata->t1, pdata->t2 );
+    smf_timerinit( &tv1, &tv2, status);
 
     for( i=pdata->t1; i<=pdata->t2; i++ ) {
+      double thisweight = 0.0;
+      size_t ibase = i*tstride;
       /* Loop over bolometers to put the previous common-mode
          signal back in at each time-slice, and calculate the sum of
          all the detectors with good data. */
       sum = 0;   /* Initialize sum to 0 */
       for( j=0; j<nbolo; j++ ) {
-        if( !(qua_data[i*tstride+j*bstride]&SMF__Q_FIT) ) {
-          sum += res_data[i*tstride+j*bstride];
-          weight[i]++;
+        size_t ijindex = ibase + j*bstride;
+        if( !(qua_data[ijindex]&SMF__Q_FIT) ) {
+          sum += res_data[ijindex];
+          thisweight++;
         }
       }
+      /* use local variable to loop */
+      weight[i] = thisweight;
 
       /* Store the sum here. Init if first subarray, otherwise add to
          sum from previous subarrays. Renormalization happens outside
@@ -300,8 +308,9 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
     }
 
     msgOutiff( MSG__DEBUG, "",
-               "smfCalcmodelComPar(%i): thread finishing tslices %zu -- %zu",
-               status, pdata->operation, pdata->t1, pdata->t2 );
+               "smfCalcmodelComPar(%i): thread finishing tslices %zu -- %zu (%.3f sec)",
+               status, pdata->operation, pdata->t1, pdata->t2,
+               smf_timerupdate(&tv1, &tv2, status) );
 
   } else if( pdata->operation == 2 ) {
     /* Loop over the block of bolos for this thread and fit the template */
@@ -318,19 +327,22 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
     msgOutiff( MSG__DEBUG, "",
                "smfCalcmodelComPar(%i): thread starting on bolos %zu -- %zu",
                status, pdata->operation, pdata->b1, pdata->b2 );
+    smf_timerinit( &tv1, &tv2, status);
 
     for( i=pdata->b1; (*status==SAI__OK) && (i<=pdata->b2); i++ ) {
-      if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {
-        smf_templateFit1D( res_data+i*bstride, qua_data+i*bstride,
+      size_t ibase = i*bstride;
+      size_t igbase = i*gbstride;
+      if( !(qua_data[ibase]&SMF__Q_BADB) ) {
+        smf_templateFit1D( res_data+ibase, qua_data+ibase,
                            SMF__Q_FIT, SMF__Q_MOD, ntslice, tstride,
-                           model_data, 0, gai_data+i*gbstride,
-                           gai_data+gcstride+i*gbstride,
-                           gai_data+2*gcstride+i*gbstride, status );
+                           model_data, 0, gai_data+igbase,
+                           gai_data+gcstride+igbase,
+                           gai_data+2*gcstride+igbase, status );
 
         /* If divide-by-zero detected, flag bolo as bad */
         if( *status==SMF__DIVBZ ) {
           for( j=0; j<ntslice; j++ ) {
-            qua_data[i*bstride+j*tstride] |= SMF__Q_BADB;
+            qua_data[ibase+j*tstride] |= SMF__Q_BADB;
           }
           errAnnul( status );
         }
@@ -338,8 +350,9 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
     }
 
     msgOutiff( MSG__DEBUG, "",
-               "smfCalcmodelComPar(%i): thread finishing bolos %zu -- %zu",
-               status, pdata->operation, pdata->b1, pdata->b2 );
+               "smfCalcmodelComPar(%i): thread finishing bolos %zu -- %zu (%.3f sec)",
+               status, pdata->operation, pdata->b1, pdata->b2,
+               smf_timerupdate(&tv1, &tv2, status) );
 
   } else {
     *status = SAI__ERROR;
@@ -810,12 +823,13 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         corr = smf_malloc( nbolo, sizeof(*corr), 0, status );
 
         for( i=0; (*status==SAI__OK) && (i<nbolo); i++ ) {
+          size_t igbase = i*gbstride;
           /* Copy correlation coefficients into an array that has VAL__BADD
              set at locations of bad bolometers. Can't use the main quality
              array directly as the stride may be different */
-          if( !(qua_data[i*bstride]&SMF__Q_BADB) && (gai_data[i*gbstride]) ) {
-            gcoeff[i] = log(fabs(gai_data[i*gbstride]));
-            corr[i] = gai_data[2*gcstride+i*gbstride];
+          if( !(qua_data[i*bstride]&SMF__Q_BADB) && (gai_data[igbase]) ) {
+            gcoeff[i] = log(fabs(gai_data[igbase]));
+            corr[i] = gai_data[2*gcstride+igbase];
           } else {
             gcoeff[i] = VAL__BADD;
             corr[i] = VAL__BADD;
@@ -838,15 +852,18 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         for( i=0; (*status==SAI__OK) && (i<nbolo); i++ ) {
           if( (corr[i]==VAL__BADD) || (fabs(corr[i]-cmean) > 5*csig) ||
               (fabs(gcoeff[i]-gmean) > 5*gsig) || (fabs(gcoeff[i]-gmean)>3) ) {
+            size_t ibase = i*bstride;
             /* If this bolometer wasn't previously flagged as bad
                do it here, and set quit=0 */
-            if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {
+            if( !(qua_data[ibase]&SMF__Q_BADB) ) {
+              size_t igbase = i*gbstride;
               quit = 0;
-              for( j=0; j<ntslice; j++ )
-                qua_data[i*bstride + j*tstride] |= SMF__Q_BADB;
-              gai_data[i*gbstride] = 1;              /* Set gain to 1 */
-              gai_data[i*gbstride+gcstride] = 0;     /* offset to 0 */
-              gai_data[i*gbstride+2*gcstride] = 0;   /* Zero correlation */
+              for( j=0; j<ntslice; j++ ) {
+                qua_data[ibase + j*tstride] |= SMF__Q_BADB;
+              }
+              gai_data[igbase] = 1;              /* Set gain to 1 */
+              gai_data[igbase+gcstride] = 0;     /* offset to 0 */
+              gai_data[igbase+2*gcstride] = 0;   /* Zero correlation */
               newbad++;
             }
           }
@@ -866,14 +883,16 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
            immediately and quit while loop. */
         quit = 1;
         for( i=0; i<nbolo; i++ ) {
+          size_t ibase = i*bstride;
           for( j=0; j<ntslice; j++ ) {
+            size_t ijindex = ibase + j*tstride;
 
             /* update the residual */
-            if( !(qua_data[i*bstride + j*tstride]&SMF__Q_MOD) ) {
-              res_data[i*bstride + j*tstride] -= model_data[j];
+            if( !(qua_data[ijindex]&SMF__Q_MOD) ) {
+              res_data[ijindex] -= model_data[j];
 
               /* also measure contribution to dchisq */
-              if( noi && !(qua_data[i*bstride + j*tstride]&SMF__Q_GOOD)) {
+              if( noi && !(qua_data[ijindex]&SMF__Q_GOOD)) {
                 dchisq += (model_data[j] - model_data_copy[j]) *
                   (model_data[j] - model_data_copy[j]) /
                   noi_data[i*noibstride + (j%nointslice)*noitstride];
@@ -912,43 +931,48 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
       }
 
       for( i=0; (*status==SAI__OK) && (i<nbolo); i++ ) {
-        if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {
+        size_t ibase = i*bstride;
+        if( !(qua_data[ibase]&SMF__Q_BADB) ) {
+          size_t igbase = i*gbstride;
+          size_t inbase = i*noibstride;
 
           /* The gain is the amplitude of the common mode template in data */
-          g = gai_data[i*gbstride];
-          gcopy = gai_data_copy[idx][i*gbstride];
+          g = gai_data[igbase];
+          gcopy = gai_data_copy[idx][igbase];
 
           if( (g!=VAL__BADD) && (g!=0) ) {
-            off = gai_data[i*gbstride+gcstride];
-            offcopy = gai_data_copy[idx][i*gbstride+gcstride];
+            off = gai_data[igbase+gcstride];
+            offcopy = gai_data_copy[idx][igbase+gcstride];
 
             /* Important: if flat-fielding data re-scale noi. May have
                different dimensions from res. */
             if( gflat && noi ) {
               for( j=0; j<nointslice; j++ ) {
-                if( noi_data[i*noibstride + j*noitstride] != VAL__BADD ) {
-                  noi_data[i*noibstride + j*noitstride] /= (g*g);
+                size_t jnoffset = j*noitstride;
+                if( noi_data[inbase + jnoffset] != VAL__BADD ) {
+                  noi_data[inbase + jnoffset] /= (g*g);
                 }
               }
             }
 
             /* Remove the common mode */
             for( j=0; j<ntslice; j++ ) {
-              if( !(qua_data[i*bstride + j*tstride]&SMF__Q_MOD) ) {
+              size_t ijindex = ibase + j*tstride;
+              if( !(qua_data[ijindex]&SMF__Q_MOD) ) {
                 if( gflat ) {
                   /* If correcting the flatfield, scale data to match
                      template amplitude first, then remove */
-                  res_data[i*bstride+j*tstride] =
-                    (res_data[i*bstride+j*tstride] - off)/g - model_data[j];
+                  res_data[ijindex] =
+                    (res_data[ijindex] - off)/g - model_data[j];
                 } else {
                   /* Otherwise subtract scaled template off data */
-                  res_data[i*bstride+j*tstride] -= (g*model_data[j] + off);
+                  res_data[ijindex] -= (g*model_data[j] + off);
                 }
 
                 /* also measure contribution to dchisq */
                 if( noi &&
-                    (noi_data[i*noibstride+(j%nointslice)*noitstride] != 0) &&
-                    !(qua_data[i*bstride + j*tstride]&SMF__Q_GOOD) ) {
+                    (noi_data[inbase+(j%nointslice)*noitstride] != 0) &&
+                    !(qua_data[ijindex]&SMF__Q_GOOD) ) {
 
                   if( gflat ) {
                     /* Compare change in template + offset/g */
@@ -956,7 +980,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
                                 (model_data_copy[j] + offcopy/gcopy) ) *
                       ( (model_data[j] + off/g) -
                         (model_data_copy[j] + offcopy/gcopy) ) /
-                      noi_data[i*noibstride + (j%nointslice)*noitstride];
+                      noi_data[inbase + (j%nointslice)*noitstride];
                     ndchisq++;
                   } else {
                     /* Otherwise scale the template and measure change*/
@@ -964,7 +988,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
                                (gcopy*model_data_copy[j] + offcopy)) *
                       ((g*model_data[j] + off) -
                        (gcopy*model_data_copy[j] + offcopy)) /
-                      noi_data[i*noibstride + (j%nointslice)*noitstride];
+                      noi_data[inbase + (j%nointslice)*noitstride];
                     ndchisq++;
                   }
                 }
