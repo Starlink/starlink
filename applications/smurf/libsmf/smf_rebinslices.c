@@ -30,6 +30,7 @@
 
 *  Authors:
 *     DSB: David Berry (JAC, UClan)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -37,10 +38,12 @@
 *        Initial version.
 *     24-NOV-2008 (DSB):
 *        Update astRebinSeq argument "nused" correctly.
+*     2009-11-03 (TIMJ):
+*        Skip bad bolo2map mappings.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -151,6 +154,8 @@ void smf_rebinslices( void *job_data_ptr, int *status ){
 /* Calculate the bolometer to map-pixel transformation for this tslice */
       bolo2map = smf_rebin_totmap( data, islice, abskyfrm, sky2map, moving, 
                                    status );
+      /* skip if we did not get a mapping this time round */
+      if (*status == SAI__OK && !bolo2map) continue;
 
 /* Rebin this time slice */
       astRebinSeqD( bolo2map, 0.0, 2, lbnd_in, ubnd_in, boldata,

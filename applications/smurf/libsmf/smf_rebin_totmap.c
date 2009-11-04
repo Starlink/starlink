@@ -47,6 +47,7 @@
 *  Authors:
 *     David S Berry (JAC, UClan)
 *     Ed Chapin (UBC)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -58,10 +59,13 @@
 *        Changed name to smf_rebin_totmap from smf_rebincube_totmap
 *     15-JUL-2008 (DSB):
 *        Annull the "fs" pointer before leaving.
+*     2009-11-03 (TIMJ):
+*        Allow for case where all telescope information is missing
+*        from timeslice. This is due to a bug in the SCUBA-2 DA system.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007-2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -136,6 +140,12 @@ AstMapping *smf_rebin_totmap( smfData *data, dim_t itime,
    set to the epoch of the time slice. */
    smf_tslice_ast( data, itime, 1, status );
    swcsin = hdr->wcs;
+
+   /* Sometimes it is possible for the DA to drop some state structures.
+      We need to trap that. */
+   if ( *status == SAI__OK && hdr->state->tcs_az_bc1 == VAL__BADD ) {
+     return NULL;
+   }
 
 /* Get the current Frame from the input WCS FrameSet. If this is the first 
    time slice, see if the current Frame is an AZEL Frame (it is assumed 

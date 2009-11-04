@@ -140,13 +140,15 @@
 *        routine in FAST mode. Now work out the maximum excursion of the
 *        telescope relative to BASE and only ask the transformation code
 *        to look at those 4 time slices.
+*     2009-11-03 (TIMJ):
+*        Skip bad bolo2map mappings and bad telescope data.
 *     {enter_further_changes_here}
 
 *  Notes:
 *     The par[7] array used in this routine is documented in smf_get_projpar.c
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2005-2008 University of British Columbia.
 *     All Rights Reserved.
@@ -216,6 +218,8 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
   int lbnd0[ 2 ];              /* Defaults for LBND parameter */
   double map_pa=0;             /* Map PA in output coord system (rads) */ 
   dim_t maxloop;               /* Number of times to go round the time slice loop */
+  dim_t nbadt  = 0;            /* Number of bad time slices */
+  dim_t ngoodt = 0;            /* Number of good time slices */
   double par[7];               /* Projection parameters */
   char *pname = NULL;          /* Name of currently opened data file */
   double shift[ 2 ];           /* Shifts from PIXEL to GRID coords */
@@ -480,6 +484,13 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
             double offx, offy;
             int jstat = 0;
 
+            if (ac1 == VAL__BADD || ac2 == VAL__BADD) {
+              /* missing telescope info */
+              nbadt++;
+              continue;
+            }
+            ngoodt++;
+
             if (!usefixedbase) {
               bc1 = state.tcs_tr_bc1;
               bc2 = state.tcs_tr_bc2;
@@ -522,6 +533,9 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
                                      *moving, status );
 
         if ( *status == SAI__OK ) {
+          /* skip if we did not get a mapping this time round */
+          if (!bolo2map) continue;
+
           /* Check corner pixels in the array for their projected extent
              on the sky to set the pixel bounds */
           astTran2( bolo2map, 4, x_array_corners, y_array_corners, 1,
@@ -568,6 +582,12 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
       *status = SAI__ERROR;
       errRep( " ", "Unable to find any valid map bounds", status );
     }
+  }
+
+  if (nbadt > 0) {
+    msgOutf( "", "   Processed %zu time slices to calculate bounds,"
+             " of which %zu had bad telescope data and were skipped",
+             status, (size_t)(ngoodt+nbadt), (size_t)nbadt );
   }
 
   /* If spatial reference wcs was supplied, store par values that result in

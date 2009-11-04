@@ -47,7 +47,8 @@
 *
 *     
 *  Authors:
-*     Edward Chapin (UBC)
+*     EC: Edward Chapin (UBC)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 
 *  History:
 *     2006-05-16 (EC):
@@ -77,11 +78,14 @@
 *        -Applied Andy's fix for off-by-one errors in nearest-neighbour calc
 *     2009-04-30 (EC):
 *        -Parellelized, borrowing code from smf_rebinmap and smf_rebinslices
+*     2009-11-03 (TIMJ):
+*        Skip bad bolo2map mappings.
 
 *  Notes:
 *     This routines asserts ICD data order.
 
 *  Copyright:
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     Copyright (C) 2005-2009 University of British Columbia.
 *     All Rights Reserved.
 
@@ -219,8 +223,11 @@ void smfCalcMapcoordPar( void *job_data_ptr, int *status ) {
     /* Calculate the bolometer to map-pixel transformation for tslice */
     bolo2map = smf_rebin_totmap( data, i, abskyfrm, sky2map, moving,
                                  status );
-    
+
     if( *status == SAI__OK ) {
+      /* skip if we did not get a mapping this time round */
+      if (!bolo2map) continue;
+
       astTranGrid( bolo2map, 2, lbnd_in, ubnd_in, 0.1, 1000000, 1,
                    2, nbolo, outmapcoord );
       
