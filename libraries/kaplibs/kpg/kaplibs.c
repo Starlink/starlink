@@ -74,6 +74,8 @@
 *        Add kpgStati
 *     2009 August 25 (MJC/EC):
 *        Removed IRQ interfaces.
+*     5-NOV-2009 (DSB):
+*        Add kpg1Loctd.
 *     {enter_further_changes_here}
 
 *-
@@ -1189,6 +1191,100 @@ void kpg1Elgau( float *sig, float *sig0, float *axis, float *theta,
    F77_IMPORT_REAL( THETA, *theta );
    F77_IMPORT_INTEGER( STATUS, *status );
 
+}
+
+/* ------------------------------- */
+
+F77_SUBROUTINE(kpg1_loctd)( INTEGER(NDIM), 
+                            INTEGER_ARRAY(LBND), 
+                            INTEGER_ARRAY(UBND), 
+                            DOUBLE_ARRAY(ARRAY), 
+                            REAL_ARRAY(INIT), 
+                            INTEGER_ARRAY(SEARCH), 
+                            LOGICAL(POSTIV),
+                            REAL_ARRAY(MXSHFT),
+                            INTEGER(MAXITE),
+                            REAL(TOLER),
+                            INTEGER(SEL),
+                            REAL_ARRAY(FINAL),
+                            REAL_ARRAY(WORK1),
+                            INTEGER(STATUS) );
+
+void kpg1Loctd( int ndim, const int *lbnd, const int *ubnd, 
+                const double *array, const float *init, const int
+		*search, int postiv, const float *mxshft, int maxite,
+		float toler, int sel, float *final, float *work1, int
+		*status ){
+
+   DECLARE_INTEGER(NDIM); 
+   DECLARE_INTEGER_ARRAY_DYN(LBND); 
+   DECLARE_INTEGER_ARRAY_DYN(UBND); 
+   DECLARE_DOUBLE_ARRAY_DYN(ARRAY); 
+   DECLARE_REAL_ARRAY_DYN(INIT); 
+   DECLARE_INTEGER_ARRAY_DYN(SEARCH); 
+   DECLARE_LOGICAL(POSTIV);
+   DECLARE_REAL_ARRAY_DYN(MXSHFT);
+   DECLARE_INTEGER(MAXITE);
+   DECLARE_REAL(TOLER);
+   DECLARE_INTEGER(SEL);
+   DECLARE_REAL_ARRAY_DYN(FINAL);
+   DECLARE_REAL_ARRAY_DYN(WORK1);
+   DECLARE_INTEGER(STATUS);
+   int i, nel, nw;
+   
+   nel = 1;
+   for( i = 0; i < ndim; i++ ) nel *= ( ubnd[ i ] - lbnd [ i ] + 1 );
+   nw = 51*sel*ndim;
+
+   F77_CREATE_INTEGER_ARRAY( LBND, ndim );
+   F77_CREATE_INTEGER_ARRAY( UBND, ndim );
+   F77_CREATE_DOUBLE_ARRAY( ARRAY, nel );
+   F77_CREATE_REAL_ARRAY( INIT, ndim );
+   F77_CREATE_INTEGER_ARRAY( SEARCH, ndim );
+   F77_CREATE_REAL_ARRAY( MXSHFT, ndim );
+   F77_CREATE_REAL_ARRAY( FINAL, ndim );
+   F77_CREATE_REAL_ARRAY( WORK1, nw );
+
+   F77_EXPORT_INTEGER( ndim, NDIM ); 
+   F77_EXPORT_INTEGER_ARRAY( lbnd, LBND, ndim ); 
+   F77_EXPORT_INTEGER_ARRAY( ubnd, UBND, ndim ); 
+   F77_EXPORT_DOUBLE_ARRAY( array, ARRAY, nel ); 
+   F77_EXPORT_REAL_ARRAY( init, INIT, ndim ); 
+   F77_EXPORT_INTEGER_ARRAY( search, SEARCH, ndim ); 
+   F77_EXPORT_LOGICAL( postiv, POSTIV );
+   F77_EXPORT_REAL_ARRAY( mxshft, MXSHFT, ndim );
+   F77_EXPORT_INTEGER( maxite, MAXITE );
+   F77_EXPORT_REAL( toler, TOLER );
+   F77_EXPORT_INTEGER( sel, SEL );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(kpg1_loctd)( INTEGER_ARG(&NDIM), 
+                         INTEGER_ARRAY_ARG(LBND), 
+                         INTEGER_ARRAY_ARG(UBND), 
+                         DOUBLE_ARRAY_ARG(ARRAY), 
+                         REAL_ARRAY_ARG(INIT), 
+                         INTEGER_ARRAY_ARG(SEARCH), 
+                         LOGICAL_ARG(&POSTIV),
+                         REAL_ARRAY_ARG(MXSHFT), 
+                         INTEGER_ARG(&MAXITE),
+                         REAL_ARG(&TOLER),
+                         INTEGER_ARG(&SEL),
+                         REAL_ARRAY_ARG(FINAL), 
+                         REAL_ARRAY_ARG(WORK1), 
+                         INTEGER_ARG(&STATUS) );
+
+   F77_IMPORT_INTEGER( STATUS, *status );
+   F77_IMPORT_REAL_ARRAY( FINAL, final, nbnd );
+   F77_IMPORT_REAL_ARRAY( WORK1, work1, nbnd );
+
+   F77_FREE_INTEGER( LBND );
+   F77_FREE_INTEGER( UBND );
+   F77_FREE_DOUBLE( ARRAY );
+   F77_FREE_REAL( INIT );
+   F77_FREE_INTEGER( SEARCH );
+   F77_FREE_REAL( MXSHFT );
+   F77_FREE_REAL( FINAL );
+   F77_FREE_REAL( WORK1 );
 }
 
 

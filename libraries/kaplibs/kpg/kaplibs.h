@@ -78,6 +78,8 @@
 *        const and size_t to match Grp
 *     2009 August 25 (MJC/EC):
 *        Removed IRQ interfaces, macros, and type definitions.
+*     5-NOV-2009 (DSB):
+*        Add kpg1Loctd.
 *     {enter_further_changes_here}
 
 *-
@@ -151,5 +153,6 @@ void kpg1Hsstp( int, const int *, double, double, double *, double *, double *, 
 void fts1Astwn( AstFitsChan *, int, int * );
 void kpg1Ky2hd( AstKeyMap *, HDSLoc *, int * );
 void kpg1Elgau( float *, float *, float *, float *, int * );
+void kpg1Loctd( int, const int *, const int *, const double *, const float *, const int *, int, const float *, int, float, int, float *, float *, int * );
 
 #endif
