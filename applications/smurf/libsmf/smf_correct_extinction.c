@@ -133,10 +133,15 @@
 *     2008-12-16 (TIMJ):
 *        - new API using integer constants rather than strings.
 *        - adaptive mode now working (inside and outside loop).
+*     2009-11-04 (TIMJ):
+*        Sometimes the DA drops TCS packets so we have to deal with
+*        this by picking a recent airmass. Won't be completely accurate
+*        but will be good enough for extinction correction of points that
+*        will not be gridded into a map.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
 *     Council. Copyright (C) 2005-2008 University of British
 *     Columbia. All Rights Reserved.
@@ -191,8 +196,13 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
 
   /* Local variables */
   double airmass;          /* Airmass */
+  double amstart = VAL__BADD; /* Airmass at start */
+  double amend = VAL__BADD;   /* Airmass at end */
+  double amprev;           /* Previous airmass in loop */
   double *azel = NULL;     /* AZEL coordinates */
   size_t base;             /* Offset into 3d data array */
+  double elstart = VAL__BADD; /* Elevation at start (radians) */
+  double elend = VAL__BADD; /* Elevation at end (radians) */
   double extcorr = 1.0;    /* Extinction correction factor */
   smfHead *hdr = NULL;     /* Pointer to full header struct */
   dim_t i;                 /* Loop counter */
@@ -290,31 +300,67 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
     tausrc = SMF__TAUSRC_TAU;
   }
 
+  /* it is possible to have gaps in the TCS part of jcmtstate which causes
+     difficulties in determining telescope elevation for extinction correction.
+     We can not necessarily assume that first and last airmasses are known so
+     we find them as a reference.
+  */
+  if (ndims == 3) {
+    JCMTState * curstate = hdr->allState;
+    for ( k=0; k<nframes && (*status == SAI__OK) ; k++) {
+      amstart = curstate->tcs_airmass;
+      elstart = curstate->tcs_az_ac2;
+      if (amstart != VAL__BADD && elstart != VAL__BADD) {
+        break;
+      }
+      curstate++;
+    }
+    /* reset and start from end */
+    curstate = &((hdr->allState)[nframes-1]);
+    for ( k=nframes; k>0 && (*status == SAI__OK) ; k--) {
+      amend = curstate->tcs_airmass;
+      elend = curstate->tcs_az_ac2;
+      if (amend != VAL__BADD && elend != VAL__BADD) {
+        break;
+      }
+      curstate--;
+    }
+  } else {
+    smf_getfitsd( hdr, "AMSTART", &amstart, status );
+    smf_getfitsd( hdr, "ELSTART", &elstart, status );
+    smf_getfitsd( hdr, "AMEND", &amend, status );
+    smf_getfitsd( hdr, "ELEND", &elend, status );
+    if (elstart != VAL__BADD) elstart *= DD2R;
+    if (elend != VAL__BADD) elend *= DD2R;
+
+  }
+
+  if (*status == SAI__OK && (amstart == VAL__BADD || amend == VAL__BADD)) {
+    *status = SAI__ERROR;
+    errRep( "", "No good airmass values found in JCMTSTATE structure for these data",
+            status );
+  }
+
   /* if we are not doing WVM correction but are in adaptive mode we can determine
      whether or not we will have to use full or single mode just by looking at the
      airmass data. */
   if (ndims == 3 && tausrc != SMF__TAUSRC_WVMRAW && method == SMF__EXTMETH_ADAPT) {
     /* first and last is a good approximation given that most SCUBA-2 files will only
        be a minute duration. */
-    double el1;
-    double am1;
-    double el2;
-    double am2;
-    smf_tslice_ast( data, 0, 0, status );
-    el1 = hdr->state->tcs_az_ac2;
-    am1 = hdr->state->tcs_airmass;
-    smf_tslice_ast( data, nframes-1, 0, status );
-    el2 = hdr->state->tcs_az_ac2;
-    am2 = hdr->state->tcs_airmass;
+    double refel;
+    double refam;
 
     /* only need to examine the largest airmass */
-    if (am2 > am1) {
-      am1 = am2;
-      el1 = el2;
+    if (amstart > amend) {
+      refam = amstart;
+      refel = elstart;
+    } else {
+      refam = amend;
+      refel = elend;
     }
 
     /* and choose a correction method */
-    if (is_large_delta_atau( am1, el1, tau, status) ) {
+    if (is_large_delta_atau( refam, refel, tau, status) ) {
       method = SMF__EXTMETH_FULL;
       msgOutif(MSG__DEBUG, " ",
                "Adaptive extinction algorithm selected per-bolometer airmass value "
@@ -348,6 +394,9 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
   lbnd[1] = 1;
   ubnd[0] = nx;
   ubnd[1] = ny;
+
+  /* Store the previous good airmass if we need it for a gap */
+  amprev = amstart;
 
   /* Loop over number of time slices/frames */
 
@@ -383,7 +432,7 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
         newtau = 0;
       }
       if (newtau) {
-        tau = smf_calc_wvm( hdr, status );
+        tau = smf_calc_wvm( hdr, amprev, status );
         newtau = 0;
         /* Check status and/or value of tau */
         if ( tau == VAL__BADD ) {
@@ -403,7 +452,7 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
          the state structure */
       if ( ndims == 2 ) {
         /* This may change depending on exact FITS keyword */
-        smf_fits_getD( hdr, "AMSTART", &airmass, status );
+        airmass = amstart;
 
         /* speed is not an issue for a 2d image */
         adaptive = 0;
@@ -411,6 +460,17 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
       } else {
         /* Else use airmass value in state structure */
         airmass = hdr->state->tcs_airmass;
+
+        /* if things have gone bad use the previous value else store
+           this value. We also need to switch to quick mode and disable adaptive. */
+        if (airmass == VAL__BADD) {
+          airmass = amprev;
+          quick = 1;
+          adaptive = 0;
+        } else {
+          amprev = airmass;
+        }
+
       }
 
       /* we have an airmass, see if we need to provide per-pixel correction */
@@ -516,6 +576,9 @@ static int is_large_delta_atau ( double airmass1, double elevation1, double tau,
 
   /* short circuit if tau is extremely small */
   if (tau < 0.000001) return 0;
+
+  /* Bad telescope information */
+  if (elevation1 == VAL__BADD) return 0;
 
   /* get the elevation and add on the array footprint. Calculate the airmass
      at the new location and find the difference to the reference airmass.

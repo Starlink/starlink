@@ -13,21 +13,28 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_calc_wvm( const smfHead *hdr, int *status) {
+*     smf_calc_wvm( const smfHead *hdr, double approxam, int *status) {
 
 *  Arguments:
 *     hdr = const smfHead* (Given)
-*        Header struct from data struct
+*        Header struct from data struct. TCS_AIRMASS value will be
+*        read from JCMTSTATE.
+*     approxam = double (Given)
+*        If the Airmass value stored in the header is bad, this
+*        value is used as an approximation. If it is VAL__BADD
+*        the AMSTART and AMEND headers will be read from the header.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
 *  Description:
 *     This routine returns the optical depth for the given SCUBA-2
-*     filter based on the raw temperature info from the WVM. 
+*     filter based on the raw temperature info from the WVM.
 
 *  Notes:
 *     - Returns a value of VAL__BADD if status is set bad on entry
 *     - See also smf_scale_tau.c for scaling between filters/wavelengths
+*     - If the TCS_AIRMASS value is missing "approxam" is used instead.
+*       If this is a bad value then AMSTART or AMEND will be examined.
 
 *  Authors:
 *     Andy Gibb (UBC)
@@ -45,10 +52,12 @@
 *        - Ambient temperature should be in kelvin
 *        - PWV should be converted to zenith value before calculating tau.
 *        - use smf_cso2filt_tau
+*     2009-11-04 (TIMJ):
+*        Add fallback airmass value in case we have bad TCS data.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research
 *     Council.  Copyright (C) 2006-2008 University of British
 *     Columbia.  All Rights Reserved.
@@ -93,7 +102,7 @@
 #include "wvm/wvmCal.h"
 #include "wvm/wvmTau.h"
 
-double smf_calc_wvm( const smfHead *hdr, int *status ) {
+double smf_calc_wvm( const smfHead *hdr, double approxam, int *status ) {
 
   /* Local variables */
   double airmass;           /* Airmass of current observation */
@@ -119,6 +128,17 @@ double smf_calc_wvm( const smfHead *hdr, int *status ) {
   wvm[2] = state->wvm_t78;
   airmass = state->tcs_airmass;
 
+  if (airmass == VAL__BADD) {
+    if ( approxam != VAL__BADD && approxam > 0) {
+      airmass = approxam;
+    } else {
+      smf_getfitsd( hdr, "AMSTART", &airmass, status );
+      if (airmass == VAL__BADD) {
+        smf_getfitsd( hdr, "AMEND", &airmass, status );
+      }
+    }
+  }
+
   /* Retrieve the ambient temperature and convert to kelvin */
   /* FUTURE: interpolate to current timeslice */
   smf_fits_getD( hdr, "ATSTART", &tamb, status );
@@ -126,14 +146,21 @@ double smf_calc_wvm( const smfHead *hdr, int *status ) {
 
   if ( *status == SAI__OK ) {
 
-    /* Get the pwv for this airmass */
-    wvmOpt( (float)airmass, (float)tamb, wvm, &pwv, &tau0, &twater);
-    
-    /* Convert to zenith pwv */
-    pwv /= airmass;
+    if (airmass == VAL__BADD) {
+      *status = SAI__ERROR;
+      errRep( "", "Unable to determine airmass so can not calculate WVM opacity at zenith",
+              status);
+    } else {
 
-    /* convert zenith pwv to zenith tau */
-    tau225 = pwv2tau( airmass, pwv );
+      /* Get the pwv for this airmass */
+      wvmOpt( (float)airmass, (float)tamb, wvm, &pwv, &tau0, &twater);
+
+      /* Convert to zenith pwv */
+      pwv /= airmass;
+
+      /* convert zenith pwv to zenith tau */
+      tau225 = pwv2tau( airmass, pwv );
+    }
   }
 
   /* Scale from CSO to filter tau */
