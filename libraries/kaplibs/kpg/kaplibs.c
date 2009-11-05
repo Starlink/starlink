@@ -1256,6 +1256,8 @@ void kpg1Loctd( int ndim, const int *lbnd, const int *ubnd,
    F77_EXPORT_INTEGER( maxite, MAXITE );
    F77_EXPORT_REAL( toler, TOLER );
    F77_EXPORT_INTEGER( sel, SEL );
+   F77_EXPORT_REAL_ARRAY( final, FINAL, ndim ); 
+   F77_EXPORT_REAL_ARRAY( work1, WORK1, nw ); 
    F77_EXPORT_INTEGER( *status, STATUS );
 
    F77_CALL(kpg1_loctd)( INTEGER_ARG(&NDIM), 
