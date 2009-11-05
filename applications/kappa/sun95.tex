@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.36}
 \newcommand{\stardocnumber}    {95.36}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2009 October 14}
+\newcommand{\stardocdate}      {2009 November 5}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.11}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -39938,8 +39938,8 @@ KAPPA: \htmlref{COMPADD}{COMPADD},
          All methods propagate variances from input to output, but the
          variance estimates produced by interpolation schemes need to be
          treated with care since the spatial smoothing produced by these
-         methods introduces correlations in the variance estimates.
-         {\tt [}current value{\tt{]}}
+         methods introduces correlations variance estimates.  The
+         initial default is {\tt "SincSinc"}.  {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
          OUT = NDF (Write)
@@ -42206,7 +42206,8 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
          spatial frequencies in the sample positions and in the pixel-centre
          positions.  For these reasons, if you want to use the
          output variances, you are generally safer using nearest-neighbour
-         interpolation.  {\tt [}current value{\tt{]}}
+         interpolation.  The initial default is "Nearest".  
+         {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
          OUT = NDF (Write)
@@ -46115,10 +46116,10 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
          }
          In the above, ${\rm sinc}(z)=\sin(z)/z$.  Some of these schemes will
          require additional parameters to be supplied via the PARAMS
-         parameter.  A more detailed discussion of these schemes is
-         given in the \htmlref{``Sub-pixel Interpolation
-         Schemes''}{subpixel:sqorst} section below.
-         {\tt ["Linear"]}
+         parameter.  A more-detailed discussion of these schemes is
+         given in the \htmlref{``Sub-pixel Interpolation Schemes''}{subpixel:sqorst} 
+         section below.  The initial default is {\tt "Linear"}. 
+         {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
          OBJ = LITERAL (Read)
@@ -46357,7 +46358,7 @@ KAPPA: \htmlref{REGRID}{REGRID},
          }
          In the above, ${\rm sinc}(z)=\sin(z)/z$.  Some of these schemes will
          require additional parameters to be supplied via the PARAMS
-         parameter.  A more detailed discussion of these schemes is
+         parameter.  A more-detailed discussion of these schemes is
          given in the {\tt "Sub-Pixel Interpolation Schemes"} section below.
          {\tt ["Auto"]}
       }
@@ -48982,7 +48983,8 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          spatial frequencies in the sample positions and in the pixel
          centre positions.  For these reasons, if you want to use the
          output variances, you are generally safer using nearest-neighbour
-         interpolation.  {\tt [}current value{\tt{]}}
+         interpolation.  The initial default is {\tt "SincSinc"}. 
+         {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
          OUT = NDF (Write)
@@ -50039,7 +50041,8 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          the spatial frequencies in the sample positions and in the
          pixel-centre positions.  For these reasons, if you want to use
          the output variances, you are generally safer using
-         nearest-neighbour interpolation.  {\tt [}current value{\tt{]}}
+         nearest-neighbour interpolation.  The initial default is
+         {\tt "SincSinc"}.  {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
          OUT = NDF (Write)

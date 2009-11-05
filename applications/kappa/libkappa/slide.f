@@ -69,9 +69,9 @@
 *
 *        In the above, sinc(z)=sin(z)/z.  Some of these schemes will
 *        require additional parameters to be supplied via the PARAMS
-*        parameter.  A more detailed discussion of these schemes is
+*        parameter.  A more-detailed discussion of these schemes is
 *        given in the "Sub-Pixel Interpolation Schemes" section below.
-*        ["Linear"]
+*        the initial default is "Linear".  [current value]
 *     OBJ = LITERAL (Read)
 *        Position of the standard object in pixel co-ordinates.  The
 *        number of values supplied must match the number of pixel axes

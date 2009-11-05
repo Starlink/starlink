@@ -208,7 +208,8 @@
 *        the spatial frequencies in the sample positions and in the
 *        pixel-centre positions.  For these reasons, if you want to use
 *        the output variances, you are generally safer using
-*        nearest-neighbour interpolation.  [current value]
+*        nearest-neighbour interpolation.  The initial default is
+*        "SincSinc".  [current value]
 *     OUT = NDF (Write)
 *        The output NDF. If a null (!) value is supplied, the application
 *        will terminate early without creating an output cube, but

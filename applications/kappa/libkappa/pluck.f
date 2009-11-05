@@ -164,8 +164,8 @@
 *        All methods propagate variances from input to output, but the
 *        variance estimates produced by interpolation schemes need to be
 *        treated with care since the spatial smoothing produced by these
-*        methods introduces correlations in the variance estimates.  
-*        [current value]
+*        methods introduces correlations in the variance estimates.  The
+*        initial default is "SincSinc".  [current value]
 *     OUT = NDF (Write)
 *        The name for the output NDF, or the name of the single 
 *        container file if CONTAINER=TRUE.

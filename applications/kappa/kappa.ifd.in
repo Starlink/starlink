@@ -14766,7 +14766,7 @@ iraf! {
             ppath CURRENT DEFAULT
             prompt {Re-sampling method}
             helpkey *
-            default {Nearest}
+            default {SincSinc}
         }
 
          parameter out {
