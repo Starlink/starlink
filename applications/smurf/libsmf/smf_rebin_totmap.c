@@ -63,7 +63,7 @@
 *        Allow for case where all telescope information is missing
 *        from timeslice. This is due to a bug in the SCUBA-2 DA system.
 *     2009-11-05 (TIMJ):
-*        For a moving target clone the frameset and annul the clone since
+*        For a moving target copy the frameset and annul the copy since
 *        that is faster than clearing SkyRefIs attribute. Setting SkyRefIs
 *        is still slow.
 *     {enter_further_changes_here}
