@@ -633,7 +633,11 @@ int *status             /* global status (given and returned) */
    previous invocation of this function (the returned FrameSet contains a
    clone, not a deep copy, of the cached SkyFrame pointer). */
    } else {
-      astSet( cache->skyframe, "system=AzEl" );
+     /* Only do this if we know it is not AZEL already since it takes
+        time for AST to change from AZEL to AZEL */
+     if ( strcmp("AZEL", astGetC(cache->skyframe, "SYSTEM")) != 0 ) {
+       astSet( cache->skyframe, "system=AzEl" );
+     }
    }
 
 /* Update the epoch, dut1 and sky reference. Call this every time for 
