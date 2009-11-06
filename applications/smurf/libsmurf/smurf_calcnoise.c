@@ -375,7 +375,7 @@ void smurf_calcnoise( int *status ) {
                                CREATOR, status );
         }
         if (outdata) smf_close_file( &outdata, status );
-        if (*status == SAI__OK && ratdata->file) {
+        if (*status == SAI__OK && ratdata && ratdata->file) {
           smf_accumulate_prov( NULL, basegrp, 1, ratdata->file->ndfid,
                                CREATOR, status );
         }
