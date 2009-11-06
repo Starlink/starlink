@@ -54,6 +54,8 @@
 *        Rename to use for noise files as well as responsivity images.
 *     2009-10-08 (TIMJ):
 *        Use malloc if the input group is null
+*     2009-11-06 (TIMJ):
+*        Preferentially select BOLO frame for output WCS
 
 *  Notes:
 *     - Does not propogate provenance or history from refdata.
@@ -89,6 +91,7 @@
 
 #include "sae_par.h"
 #include "ndf.h"
+#include "star/kaplibs.h"
 #include "ast.h"
 #include "star/one.h"
 
@@ -139,6 +142,7 @@ void smf_create_bolfile( const Grp * bgrp, size_t index,
   /* add some niceties - propagate some information from the first measurement */
   if (*status == SAI__OK) {
     char subarray[9];          /* subarray name */
+    int frnum = AST__NOFRAME;  /* Index of BOLO frame */
     int subnum;                /* subarray number */
     char buffer[30];
     AstFrameSet *wcs = NULL;
@@ -151,9 +155,13 @@ void smf_create_bolfile( const Grp * bgrp, size_t index,
       one_strlcat( buffer, datalabel, sizeof(buffer), status );
     }
 
-    /* create frame for focal plane coordinates. Should really extract it from the
-     refdata WCS rather than attempting to reconstruct. */
+    /* Create output WCS. Should really extract it from the
+       refdata WCS rather than attempting to reconstruct. */
     sc2ast_createwcs( subnum, NULL, NULL, NULL, &wcs, status );
+
+    /* and switch to BOLO frame which is best for bolometer analysis */
+    kpg1Asffr( wcs, "BOLO", &frnum, status );
+    if (frnum != AST__NOFRAME) astSetI( wcs, "CURRENT", frnum );
 
     (*bolmap)->hdr = smf_construct_smfHead( NULL, refdata->hdr->instrument,
                                              wcs, astCopy( refdata->hdr->fitshdr ),
