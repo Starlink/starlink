@@ -15,9 +15,9 @@
 *                      STATUS )
 
 *  Description:
-*     This routine evaluates within an array the BEAMFIT multi-Gaussian
-*     fit and subtracts from it the array that was fitted to derive the
-*     residuals, that it returns as two-dimensional image.
+*     This routine evaluates the BEAMFIT multi-Gaussian fit within an
+*     array, and subtracts it from the array that was fitted to derive
+*     the residuals, that it returns as a two-dimensional image.
 
 *  Arguments:
 *     DIM1 = INTEGER (Given)
@@ -36,7 +36,7 @@
 *        The coefficients of the fit in the PIXEL Frame.  The width
 *         measures are standard deviations.
 *     OUT( DIM1, DIM2 ) = ? (Returned)
-*        The residuals at every element.
+*        The residuals (original data minus model) at every element.
 *     STATUS = INTEGER (Given)
 *        The global status.
 
@@ -47,7 +47,7 @@
 *     type specified.
 
 *  Copyright:
-*     Copyright (C) 2007 Particle Physics and Astronomy Research
+*     Copyright (C) 2007, 2009 Particle Physics and Astronomy Research
 *     Council.  All Rights Reserved.
 
 *  Licence:
@@ -75,6 +75,9 @@
 *        Original version.
 *     2007 July 25 (MJC):
 *        Change API for strict compilers.
+*     2009 November 5 (MJC):
+*        Make the residuals data minus model (previously it had the
+*        reverse sense).
 *     {enter_further_changes_here}
 
 *-
@@ -177,7 +180,7 @@
                END DO
  
 *  Form the residual.
-               OUT( I, J ) = NUM_DTO<T>( GI ) - IN( I, J )
+               OUT( I, J ) = IN( I, J ) - NUM_DTO<T>( GI )
 
             ELSE
                OUT( I, J ) = VAL__BAD<T>

@@ -15015,8 +15015,8 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
       \sstsubsection{
          RESID = NDF (Write)
       }{
-         The map of the residuals of the fit.  It inherits the
-         properties of the input NDF, except that its data type is 
+         The map of the residuals (data minus model) of the fit.  It inherits
+         the properties of the input NDF, except that its data type is 
          \_DOUBLE or \_REAL depending on the precision demanded by the 
          type of IN, and no variance is propagated.  A null ({\tt{!}}) value 
          requests that no residual map be created.  {\tt [!]}
@@ -56705,6 +56705,8 @@ The following applications have been modified:
         \item Parameter QUIET has been withdrawn.  Instead set the
         MSG\_FILTER environment variable to {\tt QUIET} to suppress display
         of the fit parameters.
+        \item The map of residuals now contains the normal
+        `data minus fit' evaluations rather than the reverse sense.
       \end{itemize}
 
    \item [\htmlref{BLOCK}{BLOCK}]\mbox{}

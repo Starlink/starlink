@@ -28,6 +28,10 @@
       MSG_FILTER environment variable to QUIET to control the
       output messaging.
 
+   o  BEAMFIT
+      -  The map of residuals now contains the normal 
+      `data minus fit' evaluations rather than the reverse sense.
+
    o  BLOCK
 
       -  The dimensionality restriction is now lifted.  This

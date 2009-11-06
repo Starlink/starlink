@@ -353,11 +353,11 @@
 *        commas.  A null value (!) requests that the centre of the
 *        supplied map is deemed to be the reference position.
 *     RESID = NDF (Write)
-*        The map of the residuals of the fit.  It inherits the
-*        properties of the input NDF, except that its data type is 
-*        _DOUBLE or _REAL depending on the precision demanded by the 
-*         type of IN, and no variance is propagated.  A null (!) value 
-*         requests that no residual map be created.  [!]
+*        The map of the residuals (data minus model) of the fit.  It 
+*        inherits the properties of the input NDF, except that its data
+*        type is _DOUBLE or _REAL depending on the precision demanded by
+*        the type of IN, and no variance is propagated.  A null (!) value 
+*        requests that no residual map be created.  [!]
 *     RMS = _REAL (Write)
 *        The primary beam position's root mean-squared deviation from
 *        the fit.
@@ -1271,7 +1271,7 @@
 
 *  End the NDF context.
       CALL NDF_END( STATUS )
-      
+
       CALL ERR_RLSE
 
 
