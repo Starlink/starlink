@@ -62,6 +62,10 @@
 *     2009-11-03 (TIMJ):
 *        Allow for case where all telescope information is missing
 *        from timeslice. This is due to a bug in the SCUBA-2 DA system.
+*     2009-11-05 (TIMJ):
+*        For a moving target clone the frameset and annul the clone since
+*        that is faster than clearing SkyRefIs attribute. Setting SkyRefIs
+*        is still slow.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -176,6 +180,7 @@ AstMapping *smf_rebin_totmap( smfData *data, dim_t itime,
    current telescope base pointing position (the mapping in the "fs"
    FrameSet is also modified automatically). */
    if( moving ) {
+     AstFrameSet* tempfs = NULL;
 
 /* Get the Mapping from AZEL (at the current input epoch) to the output sky 
    system. If the input sky coordinate system is AZEL, then we already have 
@@ -195,29 +200,34 @@ AstMapping *smf_rebin_totmap( smfData *data, dim_t itime,
                 &(hdr->state->tcs_az_bc2), 1, &a, &b );
       azel2usesys = astAnnul( azel2usesys );
 
+/* Take a copy of the global frameset rather than actually using it because
+   it takes a non-trivial amount of time to clear the SkyRefIs attributes
+   when we have finished obtaining the mapping. Setting SkyRefIs is slow
+   and clearing it is just as slow. It is faster to copy and then annul
+   a frameset. */
+      tempfs = astCopy( fs );
+
 /* Store the reference point in the current Frame of the FrameSet (using
    the current Frame pointer rather than the FrameSet pointer avoid the
    extra time spent re-mapping the FrameSet - the FrameSet will be re-mapped
    when we set SkyRefIs below). */
-      skyout = astGetFrame( fs, AST__CURRENT );
+
+      skyout = astGetFrame( tempfs, AST__CURRENT );
       astSetD( skyout, "SkyRef(1)", a );
       astSetD( skyout, "SkyRef(2)", b );
 
 /* Modified the SkyRefIs attribute in the FrameSet so that the current
    Frame represents offsets from the origin (set above). We use the FrameSet
-   pointer "fs" now rather than "skyout" so that the Mapping in the FrameSet
+   pointer "tempfs" now rather than "skyout" so that the Mapping in the FrameSet
    will be modified to remap the current Frame. */
-      astSet( fs, "SkyRefIs=origin" );
+      astSet( tempfs, "SkyRefIs=origin" );
 
-/* Get the Mapping and then clear the SkyRef attributes (this is because
-   the current Frame in "fs" may be "*skyframe" and we do not want to make a
-   permanent change to *skyframe). */
-      fsmap = astGetMapping( fs, AST__BASE, AST__CURRENT );
-      astClear( fs, "SkyRefIs" );
-      astClear( skyout, "SkyRef(1)" );
-      astClear( skyout, "SkyRef(2)" );
-
+/* Get the Mapping and then clean up. We do not have to clear any attributes
+   because we are working on a complete copy. */
+      fsmap = astGetMapping( tempfs, AST__BASE, AST__CURRENT );
       skyout = astAnnul( skyout );
+      tempfs = astAnnul( tempfs );
+
 
 /* If the target is not moving, just get the Mapping. */
    } else {
