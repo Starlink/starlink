@@ -26,6 +26,7 @@
 *  Copyright:
 *     Copyright (C) 1999 CLRC
 *     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -57,6 +58,9 @@
 *        invalid" errors.
 *     23-DEC-2005 (TIMJ):
 *        Call DAT_CUT rather than NDG1_HCUT
+*     05-NOV-2009 (TIMJ):
+*        Do not create .sdf structure in hierarchy if it does not
+*        already exist and is first in the HDS path list.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -82,6 +86,7 @@
 
 *  External References:
       INTEGER CHR_LEN
+      LOGICAL CHR_SIMLR
 
 *  Local Variables:
       CHARACTER BN*(GRP__SZFNM)
@@ -103,6 +108,7 @@
       INTEGER PLEN
       INTEGER START
       LOGICAL MORE
+      LOGICAL SKIP_THIS
       LOGICAL THERE
 *.
 
@@ -141,6 +147,7 @@
 
 *  Loop round all components in the path.
          MORE = .TRUE.
+         SKIP_THIS = .FALSE.
          START = 1
          DO WHILE( MORE .AND. STATUS .EQ. SAI__OK ) 
 
@@ -198,30 +205,49 @@
 
 *  If not, create it as a scalar structure with type NDG__STRUC.
                   IF( .NOT. THERE ) THEN
-                     CALL DAT_NEW( XLOC, PATH( N1 : N2 ), NDG__STRUC, 0,
-     :                             0, STATUS ) 
+
+*  Unless this happens to be the first entry in the path and it is "sdf"
+*  noting that DAT__FLEXT includes the leading "."
+                     IF (START .EQ. 2 .AND.
+     :                    CHR_SIMLR( PATH( N1 : N2 ),
+     :                               DAT__FLEXT(2 : ) ) )
+     :                    THEN
+*  Do not need to do anything and indicate that we wish to skip
+                        SKIP_THIS = .TRUE.
+                     ELSE
+                        CALL DAT_NEW( XLOC, PATH( N1 : N2 ), NDG__STRUC,
+     :                             0, 0, STATUS )
+                     END IF
                   END IF
 
-*  Get a locator to it.
-                  CALL DAT_FIND( XLOC, PATH( N1 : N2 ), LOC2, STATUS ) 
+*  Get a locator to it unless we have been told to skip it above.
+                  IF ( .NOT. SKIP_THIS ) THEN
+
+                     CALL DAT_FIND( XLOC, PATH( N1 : N2 ), LOC2, STATUS)
 
 *  Now annul the locator to the parent object.
-                  CALL DAT_ANNUL( XLOC, STATUS )
+                     CALL DAT_ANNUL( XLOC, STATUS )
 
 *  If there is no array sub-script, use this locator as the parent for
 *  the next field in the component path.
-                  IF( OPPAR .EQ. 0 ) THEN
-                     CALL DAT_CLONE( LOC2, XLOC, STATUS )
+                     IF( OPPAR .EQ. 0 ) THEN
+                        CALL DAT_CLONE( LOC2, XLOC, STATUS )
 
 *  If there was an array subscript, we need to get a locator to the correct 
 *  cell. An error will be reported if the array is not big enough to
 *  fit the specified cell in. Tough!
-                  ELSE IF( STATUS .EQ. SAI__OK ) THEN
-                     CALL DAT_CUT( LOC2, PATH( OPPAR : L ), XLOC, 
-     :                               STATUS )
+                     ELSE IF( STATUS .EQ. SAI__OK ) THEN
+                        CALL DAT_CUT( LOC2, PATH( OPPAR : L ), XLOC,
+     :                       STATUS )
+                     END IF
+
+                     CALL DAT_ANNUL( LOC2, STATUS )
+
                   END IF
 
-                  CALL DAT_ANNUL( LOC2, STATUS )
+*  Reset skip instruction since we should only skip once
+                  SKIP_THIS = .FALSE.
+
 
                END IF
             END IF
