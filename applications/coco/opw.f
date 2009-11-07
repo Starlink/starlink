@@ -25,9 +25,11 @@
       CHARACTER*(*) FILE
       INTEGER IOS
 
-
-
       OPEN (LU,FILE=FILE,STATUS='UNKNOWN',IOSTAT=IOS)
+      IF (IOS .NE. 0 .AND. LU.EQ.6 .AND.
+     :     FILE(1:4) .EQ. '/dev') THEN
+         IOS=0
+      ENDIF
 
 C Convex version did the following test for unit=6
 C      IF (LU.EQ.6) THEN
