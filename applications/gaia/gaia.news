@@ -56,6 +56,11 @@
 
     The UCAC3 catalogue has been added to the standard Skycat catalogues.
 
+    Short integer data types (FITS BITPIX 16 & -16, HDS _WORD & _UWORD) may
+    now have data display limits outside those of the data type. Previously
+    these data types unexpectably wrapped or refused to extend the contrast
+    when given limits outside the data range.
+
     Version 4.3-1
     =============
 
