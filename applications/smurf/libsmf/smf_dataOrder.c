@@ -138,7 +138,7 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
   dim_t ndata;                  /* Number of data points */
   void *newbuf=NULL;            /* Pointer to new buffer */
   dim_t newdims[3];             /* Size of each dimension new buffer */ 
-  dim_t newlbnd[3];             /* New pixel origin */
+  int newlbnd[3];               /* New pixel origin */
   int *newlut=NULL;             /* Pointer to pointing LUT */
   dim_t ntslice;                /* Number of time slices */
   size_t tstr1;                 /* time index stride input */
