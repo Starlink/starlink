@@ -460,9 +460,11 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
           case SMF__CUM: /* Cumulative model */
             head.data.dtype = SMF__DOUBLE;
             head.data.ndims = 3;
-            head.data.dims[0] = (idata->dims)[0];
-            head.data.dims[1] = (idata->dims)[1];
-            head.data.dims[2] = (idata->dims)[2];
+            for( k=0; k<3; k++ ) {
+              head.data.dims[k] = (idata->dims)[k];
+              head.data.lbnd[k] = (idata->lbnd)[k];
+            }
+
             smf_set_clabels( "Cumulative Signal", "Signal",
                              idata->hdr->units, &head.hdr, status );
             break;
@@ -476,9 +478,11 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
           case SMF__AST: /* Time-domain projection of map */
             head.data.dtype = SMF__DOUBLE;
             head.data.ndims = 3;
-            head.data.dims[0] = (idata->dims)[0];
-            head.data.dims[1] = (idata->dims)[1];
-            head.data.dims[2] = (idata->dims)[2];
+            for( k=0; k<3; k++ ) {
+              head.data.dims[k] = (idata->dims)[k];
+              head.data.lbnd[k] = (idata->lbnd)[k];
+            }
+
             smf_set_clabels( "Astronomical Signal", "Signal",
                              idata->hdr->units, &head.hdr, status );
             break;
@@ -486,6 +490,8 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
           case SMF__COM: /* Common-mode at each time step */
             head.data.dtype = SMF__DOUBLE;
             head.data.ndims = 1;
+            head.data.lbnd[0] = 1;
+
             smf_set_clabels( "Common-mode Signal", "Signal",
                              idata->hdr->units, &head.hdr, status );
 
@@ -508,19 +514,29 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
               head.data.dims[0] = (idata->dims)[0];
               head.data.dims[1] = (idata->dims)[1];
               head.data.dims[2] = 1;
+
+              head.data.lbnd[0] = (idata->lbnd)[0];
+              head.data.lbnd[1] = (idata->lbnd)[1];
+              head.data.lbnd[2] = 1;
             } else {           /* T is 1st axis if bolo-ordered */
               head.data.dims[0] = 1;
               head.data.dims[1] = (idata->dims)[1];
               head.data.dims[2] = (idata->dims)[2];
+
+              head.data.lbnd[0] = 1;
+              head.data.lbnd[1] = (idata->lbnd)[1];
+              head.data.lbnd[2] = (idata->lbnd)[2];
             }
             break;
 
           case SMF__EXT: /* Extinction correction - gain for each bolo/time */
             head.data.dtype = SMF__DOUBLE;
             head.data.ndims = 3;
-            head.data.dims[0] = (idata->dims)[0];
-            head.data.dims[1] = (idata->dims)[1];
-            head.data.dims[2] = (idata->dims)[2];
+            for( k=0; k<3; k++ ) {
+              head.data.dims[k] = (idata->dims)[k];
+              head.data.lbnd[k] = (idata->lbnd)[k];
+            }
+
             smf_set_clabels( "Extinction Correction", "1/Extinction",
                              "\0", &head.hdr, status );
             break;
@@ -528,17 +544,19 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
           case SMF__LUT: /* Pointing LookUp Table for each data point */
             head.data.dtype = SMF__INTEGER;
             head.data.ndims = 3;
-            head.data.dims[0] = (idata->dims)[0];
-            head.data.dims[1] = (idata->dims)[1];
-            head.data.dims[2] = (idata->dims)[2];
+            for( k=0; k<3; k++ ) {
+              head.data.dims[k] = (idata->dims)[k];
+              head.data.lbnd[k] = (idata->lbnd)[k];
+            }
             break;
 
           case SMF__QUA: /* Quality byte for each data point */
             head.data.dtype = SMF__UBYTE;
             head.data.ndims = 3;
-            head.data.dims[0] = (idata->dims)[0];
-            head.data.dims[1] = (idata->dims)[1];
-            head.data.dims[2] = (idata->dims)[2];
+            for( k=0; k<3; k++ ) {
+              head.data.dims[k] = (idata->dims)[k];
+              head.data.lbnd[k] = (idata->lbnd)[k];
+            }
             break;
 
           case SMF__DKS: /* Scaled Dark SQUID */
@@ -561,6 +579,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
           case SMF__GAI: /* Gain/offset for each bolometer */
             head.data.dtype = SMF__DOUBLE;
             head.data.ndims = 3; /* Gain, Offset, Correlation coefficient */
+
             smf_set_clabels( "Common-mode Gain/Offset", "Value", "\0",
                              &head.hdr, status );
 
@@ -586,9 +605,11 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
                easy visualization */
             head.data.dtype = SMF__DOUBLE;
             head.data.ndims = 3;
-            head.data.dims[0] = (idata->dims)[0];
-            head.data.dims[1] = (idata->dims)[1];
-            head.data.dims[2] = (idata->dims)[2];
+            for( k=0; k<3; k++ ) {
+              head.data.dims[k] = (idata->dims)[k];
+              head.data.lbnd[k] = (idata->lbnd)[k];
+            }
+
             smf_set_clabels( "Filtered-out Signal", "Signal",
                              idata->hdr->units, &head.hdr, status );
             break;
@@ -607,6 +628,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
 
             for( k=0; k<head.data.ndims; k++ ) {
               head.data.dims[k] = (idata->dims)[k];
+              head.data.lbnd[k] = (idata->lbnd)[k];
             }
           }
 
@@ -845,6 +867,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
                 data->dtype = head.data.dtype;
                 data->ndims = head.data.ndims;
                 memcpy( data->dims, head.data.dims, sizeof( head.data.dims ) );
+                memcpy( data->lbnd, head.data.lbnd, sizeof( head.data.lbnd ) );
                 data->hdr->steptime = head.hdr.steptime;
 
                 /* Data pointer points to mmap'd memory AFTER HEADER */
