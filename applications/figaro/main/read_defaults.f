@@ -174,13 +174,13 @@ C      integer find_file
             call dat_get1c(nloc,NFITSVAR,readvar,elem,status)
             call dta_annul(nloc,status)
 
-            print2999, elem
- 2999       format(1x, 'elem ', i4)
+*            print2999, elem
+* 2999       format(1x, 'elem ', i4)
 
             if(status.eq.SAI__OK) then
                do j = 1, NFITSVAR
-                  print3000, j,i, READVAR(j)
- 3000             format(1x, 'j,i, READVAR(j): ', i5, i5, a8)
+*                  print3000, j,i, READVAR(j)
+* 3000             format(1x, 'j,i, READVAR(j): ', i5, i5, a8)
                   fits_unames(j,i)=READVAR(j)
                end do
 
