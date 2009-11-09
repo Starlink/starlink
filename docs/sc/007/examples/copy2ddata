@@ -15,6 +15,7 @@
 #  Authors:
 #     MJC: Martin Clayton (Starlink, UCL)
 #     AJH: Anthony Holloway (Starlink, Manchester)
+#     MJC: Malcolm J. Currie (Starlink)
 #     {add_further_authors_here}
 
 #  History:
@@ -22,6 +23,8 @@
 #       Original version.
 #     15-NOV-1998 (AJH):
 #       Converted to copy 2-d data files.
+#     2009 November 8 (MJC):
+#       TAGFILE no longer exists.
 #     {add_further_changes_here}
 
 #-
@@ -34,9 +37,6 @@
 
 #  Location of the data, i.e., the document.
     set DOC = 'sc7';
-
-#  Name of file indicating presence of example data.
-    set TAGFILE = ${DOC}'_examples';
 
 #  Definition of example data files.
     set DATAFILES = 'object2d.sdf arcframe2d.sdf quartz2dscrunch.sdf';
@@ -52,18 +52,6 @@
          "$data_expected_in" == $cwd || ) then
        echo "! Cannot copy data onto itself.";
        exit;
-    endif
-
-#  Look for tag file which indicates presence of example data.
-#  If not found in the path given, try the $STAR tree.
-    if ( ! -e $data_expected_in/$TAGFILE ) then
-       if ( ! -e $STAR/$EXAMPLES/$DOC/$TAGFILE ) then
-          echo "! Example data not found in $data_expected_in/.";
-          exit;
-
-       else
-          set data_expected_in = $STAR/$EXAMPLES/$DOC;
-       endif
     endif
 
 #  Copy the data across.
