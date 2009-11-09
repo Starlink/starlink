@@ -107,7 +107,7 @@
       integer ifail
       logical mode
       integer yerrptr,status
-      integer nwork,ptr1,slot,slot2
+      integer nwork,ptr0,ptr1,slot,slot2,slot3,slot4,slot5
       integer nbad,cnv_fmtcnv
       integer fit_handler
       external fit_handler,lm_mgf
@@ -141,14 +141,19 @@
 *   PTR1(M*5)  (r)
 * For guesses:
 *     N (r)
-*
-      nwork = (mpts*n + max((5*n + 2*mpts),(2*n*(n+1))))
+
+      nwork = (mpts*n + max((5*n + 2*mpts),(2*n*(n+1)))) * VAL__NBD +
+     :                                                 n * VAL__NBI
 
 * Get the ptr1 space below, so pass 0 bytes. ---MJC
-      call get_opt_vm(0,ptr1,status)
+      call get_opt_vm(0,ptr0,status)
 
-      call dsa_get_work_array(nwork,'float',ptr1,slot,status)
-      call dsa_get_work_array(n,'real',guessptr,slot2,status)
+      call dsa_get_work_array(n,'float',guessptr,slot2,status)
+      call dsa_get_workspace(nwork,ptr1,slot,status)
+      call dsa_get_work_array(mpts,'double',weightptr,slot3,status)
+      call dsa_get_work_array(mpts,'double',densptr,slot4,status)
+      call dsa_get_workspace(nwork,dataptr,slot5,status)
+
       if(status.ne.SAI__OK) return
       crash = .false.
 
@@ -216,6 +221,12 @@
       end if
       fitpar(2) = fitpar(2) * EFOLD
 
+*  Free workspace.  If later these are defined mostly in get_opt_vm
+*  (as originally) use the opt_slot* slots passed via opt_cmn.
+      call dsa_free_workspace(slot5,status)
+      call dsa_free_workspace(slot4,status)
+      call dsa_free_workspace(slot3,status)
       call dsa_free_workspace(slot2,status)
       call dsa_free_workspace(slot,status)
+
       end
