@@ -79,7 +79,7 @@
 
 *  Local Variables:
       INTEGER I                  ! Loop index
-      CHARACTER * ( 6 ) TYPEUC   ! Given type in upper case
+      CHARACTER * 7 TYPEUC       ! Given type in upper case
 
 *  Includes with DATA statements:
       INCLUDE 'DSA_TYPES'        ! DSA type constants
