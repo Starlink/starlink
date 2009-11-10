@@ -118,6 +118,8 @@
 *     19-OCT-2009 (DSB):
 *        Use NDG_BEGGH/NDG_ENDGH to record contents of group parameters in 
 *        the history component of output NDFs.
+*     2009 November 10 (MJC/DSB):
+*        Add CARPET.
 *     {enter_further_changes_here}
 
 *-
@@ -270,6 +272,11 @@
          ELSE IF ( NAME .EQ. 'CALPOL' ) THEN
             CALL CALPOL ( STATUS )
 
+*  Forms a `carpet' cube by extruding an image along a third 
+*  `data value' axis.
+         ELSE IF ( NAME .EQ. 'CARPET' ) THEN
+            CALL CARPET ( STATUS )
+
 *  Divides an NDF by a scalar.
          ELSE IF ( NAME .EQ. 'CDIV' ) THEN
             CALL CDIV ( STATUS )
@@ -385,10 +392,6 @@
 *  Computes an histogram of an NDF's values.
          ELSE IF ( NAME .EQ. 'HISTOGRAM' ) THEN
             CALL HISTOGRAM ( STATUS )
-
-*  Form a cube by extruding an image along a third "data value" axis. */
-         ELSE IF ( NAME .EQ. 'IMAGECUBE' ) THEN
-            CALL IMAGECUBE ( STATUS )
 
 *  Forms a higher-resolution NDF by interleaving a set of NDFs.
          ELSE IF ( NAME .EQ. 'INTERLEAVE' ) THEN

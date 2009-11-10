@@ -109,11 +109,10 @@ libndfpack/ndfpack.hlp
 #  Define the tasks for each monolith.
 
 KAPPA_TASKS = div pow add aperadd ardgen ardmask block cadd calc      \
-calpol cdiv centroid chanmap chpix cmult collapse compadd compave     \
+calpol carpet cdiv centroid chanmap chpix cmult collapse compadd compave \
 compick convolve copybad creframe csub errclip expon ffclean fillbad  \
 fitsurface flip fourier gausmooth glitch globals histat histeq        \
-histogram imagecube interleave laplace kstest logar look lucy manic \
-makesurface \
+histogram interleave laplace kstest logar look lucy manic makesurface \
 maths median mstats mult noglobals nomagic normalize numb outset parget \
 paste permaxes pixdupe psf rift regrid rotate segment setmagic shadow \
 slide sqorst stats sub substitute surfit thresh trandat trig wiener   \
@@ -254,7 +253,7 @@ thresh.ifc trandat.ifc trig.ifc wcsalign.ifc \
 wcsmosaic.ifc wcstran.ifc wiener.ifc zaplin.ifc errclip.ifc \
 expon.ifc ffclean.ifc fillbad.ifc fitsurface.ifc \
 flip.ifc fourier.ifc gausmooth.ifc glitch.ifc \
-globals.ifc histat.ifc histeq.ifc histogram.ifc imagecube.ifc \
+globals.ifc histat.ifc histeq.ifc histogram.ifc \
 kstest.ifc laplace.ifc logar.ifc look.ifc \
 lucy.ifc makesnr.ifc makesurface.ifc manic.ifc maths.ifc \
 median.ifc mstats.ifc mult.ifc noglobals.ifc \
@@ -262,20 +261,20 @@ nomagic.ifc normalize.ifc numb.ifc oddeven.ifc outset.ifc \
 parget.ifc paste.ifc permaxes.ifc pixdupe.ifc \
 psf.ifc regrid.ifc rift.ifc add.ifc aperadd.ifc \
 ardgen.ifc ardmask.ifc block.ifc cadd.ifc calc.ifc \
-calpol.ifc cdiv.ifc centroid.ifc chanmap.ifc chpix.ifc \
+calpol.ifc carpet.ifc cdiv.ifc centroid.ifc chanmap.ifc chpix.ifc \
 cmult.ifc collapse.ifc compadd.ifc compave.ifc compick.ifc \
 convolve.ifc copybad.ifc creframe.ifc csub.ifc cumulvec.ifc \
 div.ifc beamfit.ifc pluck.ifc pow.ifc ndfpack_mon.ifc \
 kapview_mon.ifc kappa_mon.ifc wcsslide.ifc regionmask.ifc
 
 
-BUILT_IFL_FILES = kappa_mon.ifl beamfit.ifl chanmap.ifl \
-chpix.ifl cmult.ifl collapse.ifl \
+BUILT_IFL_FILES = kappa_mon.ifl beamfit.ifl carpet.ifl \
+chanmap.ifl chpix.ifl cmult.ifl collapse.ifl \
 compadd.ifl compave.ifl compick.ifl convolve.ifl \
 copybad.ifl creframe.ifl csub.ifl cumulvec.ifl div.ifl errclip.ifl \
 expon.ifl ffclean.ifl fillbad.ifl fitsurface.ifl \
 flip.ifl fourier.ifl gausmooth.ifl glitch.ifl \
-globals.ifl histat.ifl histeq.ifl histogram.ifl imagecube.ifl \
+globals.ifl histat.ifl histeq.ifl histogram.ifl \
 kaphelp.ifl kapversion.ifl kstest.ifl laplace.ifl \
 listmake.ifl listshow.ifl logar.ifl \
 look.ifl lucy.ifl makesnr.ifl makesurface.ifl manic.ifl \
