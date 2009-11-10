@@ -11456,6 +11456,75 @@ package kappa {
 
       }
 
+      action imagecube {
+         alias {imag(ecube)}
+
+         helplib {$KAPPA_HELP}
+
+         parameter in {
+            position 1
+            type NDF
+            access READ
+            vpath PROMPT
+            ppath GLOBAL CURRENT
+            association <->GLOBAL.DATA_ARRAY
+            prompt {Input image}
+            helpkey *
+         }
+
+         parameter mode {
+            position 5
+            type LITERAL
+            vpath DEFAULT
+            prompt {Method for calculating output values}
+            ppath CURRENT DEFAULT
+            default Data
+            helpkey *
+         }
+
+         parameter ndatapix {
+            position 3
+            type _INTEGER
+            vpath DYNAMIC DEFAULT 
+            ppath DYNAMIC DEFAULT
+            default 100
+            prompt {Number of pixels on output data value axis}
+            helpkey *
+         }
+
+         parameter out {
+            position 2
+            type NDF
+            access WRITE
+            vpath PROMPT
+            ppath CURRENT
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Output cube}
+            helpkey *
+         }
+
+         parameter range {
+            position 4
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Range of values on output data value axis}
+            helpkey *
+         }
+
+         parameter sigma {
+            position 6
+            type _DOUBLE
+            vpath DEFAULT 
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Standard deviation in input image}
+            helpkey *
+         }
+
+      }
+
       action interleave {
          alias {inte(rleave)}
 

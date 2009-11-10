@@ -386,6 +386,10 @@
          ELSE IF ( NAME .EQ. 'HISTOGRAM' ) THEN
             CALL HISTOGRAM ( STATUS )
 
+*  Form a cube by extruding an image along a third "data value" axis. */
+         ELSE IF ( NAME .EQ. 'IMAGECUBE' ) THEN
+            CALL IMAGECUBE ( STATUS )
+
 *  Forms a higher-resolution NDF by interleaving a set of NDFs.
          ELSE IF ( NAME .EQ. 'INTERLEAVE' ) THEN
             CALL INTERLEAVE ( STATUS )

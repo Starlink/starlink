@@ -112,7 +112,8 @@ KAPPA_TASKS = div pow add aperadd ardgen ardmask block cadd calc      \
 calpol cdiv centroid chanmap chpix cmult collapse compadd compave     \
 compick convolve copybad creframe csub errclip expon ffclean fillbad  \
 fitsurface flip fourier gausmooth glitch globals histat histeq        \
-histogram interleave laplace kstest logar look lucy manic makesurface \
+histogram imagecube interleave laplace kstest logar look lucy manic \
+makesurface \
 maths median mstats mult noglobals nomagic normalize numb outset parget \
 paste permaxes pixdupe psf rift regrid rotate segment setmagic shadow \
 slide sqorst stats sub substitute surfit thresh trandat trig wiener   \
@@ -253,7 +254,7 @@ thresh.ifc trandat.ifc trig.ifc wcsalign.ifc \
 wcsmosaic.ifc wcstran.ifc wiener.ifc zaplin.ifc errclip.ifc \
 expon.ifc ffclean.ifc fillbad.ifc fitsurface.ifc \
 flip.ifc fourier.ifc gausmooth.ifc glitch.ifc \
-globals.ifc histat.ifc histeq.ifc histogram.ifc \
+globals.ifc histat.ifc histeq.ifc histogram.ifc imagecube.ifc \
 kstest.ifc laplace.ifc logar.ifc look.ifc \
 lucy.ifc makesnr.ifc makesurface.ifc manic.ifc maths.ifc \
 median.ifc mstats.ifc mult.ifc noglobals.ifc \
@@ -274,7 +275,7 @@ compadd.ifl compave.ifl compick.ifl convolve.ifl \
 copybad.ifl creframe.ifl csub.ifl cumulvec.ifl div.ifl errclip.ifl \
 expon.ifl ffclean.ifl fillbad.ifl fitsurface.ifl \
 flip.ifl fourier.ifl gausmooth.ifl glitch.ifl \
-globals.ifl histat.ifl histeq.ifl histogram.ifl \
+globals.ifl histat.ifl histeq.ifl histogram.ifl imagecube.ifl \
 kaphelp.ifl kapversion.ifl kstest.ifl laplace.ifl \
 listmake.ifl listshow.ifl logar.ifl \
 look.ifl lucy.ifl makesnr.ifl makesurface.ifl manic.ifl \
