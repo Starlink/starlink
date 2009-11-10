@@ -47,10 +47,11 @@ modelorder = (com,gai,ext,ast,flt,noi)
 exportndf = 0
 #exportndf = (com,gai,ast,flt,res,noi,qua)
 
-# should all data points in exported model components be set to BAD values
-# wherever there is a bad bolometer established during map-making?
+# Normally all data points in exported model components are set to BAD values
+# wherever there is a bad bolometer established during map-making. Set
+# this flag to prevent this behaviour.
 
-exportsedbad = 1
+#noexportsetbad = 1
 
 # Create single-beam maps in addition to main map?
 #bolomap = 1

@@ -218,7 +218,7 @@
 *        Add data_units. Needed because we can only read data units after
 *        the data have been flatfielded. Also check for consistency.
 *     2009-11-10 (EC):
-*        Add exportsetbad dimmconfig parameter to set bad values in exported
+*        Add noexportsetbad dimmconfig parameter to set bad values in exported
 *        files when SMF__Q_BADB bits set.
 *     {enter_further_changes_here}
 
@@ -308,7 +308,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
   double dtemp;                 /* temporary double */
   int exportNDF=0;              /* If set export DIMM files to NDF at end */
   int *exportNDF_which=NULL;    /* Which models in modelorder will be exported*/
-  int exportsetbad=0;           /* Set bad values in exported models */
+  int noexportsetbad=0;         /* Don't set bad values in exported models */
   smfFilter *filt=NULL;         /* Pointer to filter struct */
   double flagstat;              /* Threshold for flagging stationary regions */
   double f_edgelow=0;           /* Freq. cutoff for low-pass edge filter */
@@ -465,8 +465,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
     }
 
     /* Are we going to set bad values in exported models? */
-    if( !astMapGet0I( keymap, "EXPORTSETBAD", &exportsetbad ) ) {
-      exportsetbad = 0;
+    if( !astMapGet0I( keymap, "NOEXPORTSETBAD", &noexportsetbad ) ) {
+      noexportsetbad = 0;
     }
 
     /* Method to use for calculating the variance map */
@@ -1641,7 +1641,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
                     one_strlcat( name, "_res", SMF_PATH_MAX+1, status );
                   }
 
-                  if( exportsetbad ) {
+                  if( !noexportsetbad ) {
                     smf_update_valbad( res[i]->sdata[idx], SMF__NUL,
                                        qua_data, 0, 0, SMF__Q_BADB, status );
                   }
@@ -1667,7 +1667,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
                   smf_model_stripsuffix( ast[i]->sdata[idx]->file->name,
                                          name, status );
 
-                  if( exportsetbad ) {
+                  if( !noexportsetbad ) {
                     smf_update_valbad( ast[i]->sdata[idx], SMF__NUL,
                                        qua_data, 0, 0, SMF__Q_BADB, status );
                   }
@@ -1695,7 +1695,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
                   smf_model_stripsuffix( model[j][i]->sdata[idx]->file->name,
                                          name, status );
 
-                  if( exportsetbad ) {
+                  if( !noexportsetbad ) {
                     smf_update_valbad( model[j][i]->sdata[idx], modeltyps[j],
                                        qua_data, bstride, tstride, SMF__Q_BADB,
                                        status );
