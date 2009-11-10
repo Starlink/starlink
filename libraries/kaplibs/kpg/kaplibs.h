@@ -106,6 +106,7 @@
 /* =============================== */
 
 void kpg1Asget( int, int, int, int, int, int *, int *, int *, AstFrameSet **, int * );
+void kpg1Darad( const char *, int, double *, const char *, int *, double *, double *, int * );
 void kpg1Fillr( float, int, float *, int * );
 void kpg1Gausr( float, int, int, float, int, int, int, int, float *, float *, int *, float *, float *, float *, int * );
 void kpg1Gtgrp( const char *, Grp **, size_t*, int *);

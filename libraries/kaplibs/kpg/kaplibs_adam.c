@@ -591,3 +591,57 @@ void kpg1Gilst( int lonum, int upnum, int maxlin, const char *param,
 }
 
 
+/* ------------------------------- */
+
+F77_SUBROUTINE(kpg1_darad)( CHARACTER(PARAM), 
+                            INTEGER(EL),
+                            DOUBLE_ARRAY(ARRAY), 
+                            CHARACTER(METHDS), 
+                            LOGICAL(BAD),
+                            DOUBLE(LOWER), 
+                            DOUBLE(UPPER),
+                            INTEGER(STATUS) 
+                            TRAIL(PARAM)
+                            TRAIL(METHDS) );
+
+void kpg1Darad( const char *param, int el, double *array, const char *methds,
+                int *bad, double *lower, double *upper, int *status ){
+   DECLARE_CHARACTER_DYN(PARAM);
+   DECLARE_INTEGER(EL);
+   DECLARE_DOUBLE_ARRAY_DYN(ARRAY);
+   DECLARE_CHARACTER_DYN(METHDS);
+   DECLARE_LOGICAL(BAD);
+   DECLARE_DOUBLE(LOWER);
+   DECLARE_DOUBLE(UPPER);
+   DECLARE_INTEGER(STATUS);
+
+   F77_CREATE_EXPORT_CHARACTER( param, PARAM );
+   F77_EXPORT_INTEGER( el, EL );
+   F77_CREATE_DOUBLE_ARRAY( ARRAY, el );
+   F77_EXPORT_DOUBLE_ARRAY( array, ARRAY, el );
+   F77_CREATE_EXPORT_CHARACTER( methds, METHDS );
+   F77_EXPORT_LOGICAL( *bad, BAD );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(kpg1_darad)( CHARACTER_ARG(PARAM),
+                         INTEGER_ARG(&EL),
+                         DOUBLE_ARRAY_ARG(ARRAY),
+                         CHARACTER_ARG(METHDS),
+                         LOGICAL_ARG(&BAD),
+                         DOUBLE_ARG(&LOWER),
+                         DOUBLE_ARG(&UPPER),
+                         INTEGER_ARG(&STATUS)
+                         TRAIL_ARG(PARAM)
+                         TRAIL_ARG(METHDS) );
+
+   F77_IMPORT_INTEGER( STATUS, *status );
+   F77_IMPORT_INTEGER( LOWER, *lower );
+   F77_IMPORT_INTEGER( UPPER, *upper );
+
+   F77_FREE_CHARACTER(PARAM);
+   F77_FREE_CHARACTER(METHDS);
+   F77_FREE_DOUBLE(ARRAY);
+}
+
+
+
