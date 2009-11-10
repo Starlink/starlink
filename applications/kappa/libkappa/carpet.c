@@ -12,14 +12,14 @@
 #include <string.h> 
 #include <stdio.h>
 
-F77_SUBROUTINE(imagecube)( INTEGER(STATUS) ){
+F77_SUBROUTINE(carpet)( INTEGER(STATUS) ){
 /*
 *+
 *  Name:
-*     IMAGECUBE
+*     CARPET
 
 *  Purpose:
-*     Create a cube  representing a carpet plot of an image.
+*     Creates a cube representing a carpet plot of an image.
 
 *  Language:
 *     C (designed to be called from Fortran)
@@ -28,37 +28,38 @@ F77_SUBROUTINE(imagecube)( INTEGER(STATUS) ){
 *     ADAM A-task
 
 *  Invocation:
-*     CALL MAKESURFACE( STATUS )
+*     CALL CARPET( STATUS )
 
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Description:
-*     This application creates a new 3D NDF from an existing 2D NDF. The
-*     resulting NDF can, for instance, be viewed with the 3D iso-surface
-*     facilities of the GAIA image viewer, in order to create a display
-*     similar to a "carpet plot" of the image (the iso-surface at value 
-*     zero represents the input image data values).
+*     This application creates a new three-dimensional NDF from an 
+*     existing two-dimensional NDF. The resulting NDF can, for instance, 
+*     be viewed with the three-dimensional iso-surface facilities of the 
+*     GAIA image viewer, in order to create a display similar to a 
+*     "carpet plot" of the image (the iso-surface at value zero represents 
+*     the input image data values).
 *
 *     The first two pixel axes (X and Y) in the output cube correspond to the 
 *     pixel axes in the input image. The third pixel axis (Z) in the output 
 *     cube is proportional to data value in the input image. The value of
 *     a pixel in the output cube measures the difference between the data 
-*     value implied by its Z axis position, and the data value of the 
+*     value implied by its Z-axis position, and the data value of the 
 *     corresponding pixel in the input image. Two schemes are available
-*     (see parameter MODE) - the output pixel values can be either simply
+*     (see Parameter MODE): the output pixel values can be either simply
 *     the difference between these two data values, or the difference
 *     divided by the standard deviation at the corresponding pixel in the 
-*     input image (as determined either from the Variance component in
-*     the input NDF or by parameter SIGMA).
+*     input image (as determined either from the VARIANCE component in
+*     the input NDF or by Parameter SIGMA).
 
 *  Usage:
-*     imagecube in out ndatapix range mode sigma 
+*     carpet in out [ndatapix] [range] [mode] [sigma] 
 
 *  ADAM Parameters:
-*     IN = NDF (Update)
-*        The input 2D NDF. 
+*     IN = NDF (Read)
+*        The input two-dimensional NDF. 
 *     MODE = LITERAL (Read)
 *        Determines how the pixel values in the output cube are calculated.
 *
@@ -69,7 +70,7 @@ F77_SUBROUTINE(imagecube)( INTEGER(STATUS) ){
 *
 *        - "Sigma" -- this is the same as "Data" except that the output
 *                     pixel values are divided by the standard deviation
-*                     implied either by the Variance component of the
+*                     implied either by the VARIANCE component of the
 *                     input image, or by the SIGMA parameter.
 *
 *        ["Data"]
@@ -77,9 +78,9 @@ F77_SUBROUTINE(imagecube)( INTEGER(STATUS) ){
 *        The number of pixels to use for the data value axis in the
 *        output cube. The pixel origin of this axis will be 1. The
 *        dynamic default is the square root of the number of pixels in 
-*        the input image. This gives a fairly "cubic" output cube. []
+*        the input image. This gives a fairly "cubic" output cube.  []
 *     OUT = NDF (Write)
-*        The output 3D NDF. 
+*        The output three-dimensional NDF. 
 *     RANGE = LITERAL (Read)
 *        RANGE specifies the range covered by the data value axis (i.e. the
 *        third pixel axis) in the output cube. The supplied string should 
@@ -124,34 +125,33 @@ F77_SUBROUTINE(imagecube)( INTEGER(STATUS) ){
 *        values are only calculated where necessary for the chosen method.
 *
 *        The method name can be abbreviated to a single character, and
-*        is case insensitive.  The initial value is "Range".  The 
+*        is case insensitive.  The initial default value is "Range".  The 
 *        suggested defaults are the current values, or ! if these do 
 *        not exist.  [current value]
 *     SIGMA = _REAL (Read)
-*        The standard deviation to use if parameter MODE is set to "Sigma".
+*        The standard deviation to use if Parameter MODE is set to "Sigma".
 *        If a null (!) value is supplied, the standard deviations implied
-*        by the Variance component in the input image are used (an error
-*        will be reported if the input image does not have a Variance 
+*        by the VARIANCE component in the input image are used (an error
+*        will be reported if the input image does not have a VARIANCE 
 *        component). If a SIGMA value is supplied, the same value is used
-*        to scale all output pixels. [!]
+*        to scale all output pixels.  [!]
 
 *  Examples:
-*     imagecube m31 m31-cube mode=sigma
-*        Asssuming the 2D NDF in file m31.sdf contains a Variance component, 
-*        this will create a 3D NDF called "m31-cube.sdf" in which the
-*        third pixel axis corresponds to data value in "m31", and each
-*        output pixel value is the number of standard deviations of the
-*        pixel away from the corresponding input data value. If you then 
-*        uses GAIA to view the cube, an iso-surface at value zero will be
-*        a carpet plot of the data values in "m31", an iso-surface at
-*        value -1.0 will be a carplot plot showing data values one sigma
-*        below the "m31" data values, and an iso-surface at value +1.0 
-*        will be a carplot plot showing data values one sigma above the 
-*        "m31" data values. This can help to visualise the errors in
-*        an image.
+*     carpet m31 m31-cube mode=sigma
+*        Asssuming the two-dimensional NDF in file m31.sdf contains a 
+*        VARIANCE component, this will create a three-dimensional NDF called 
+*        m31-cube in which the third pixel axis corresponds to data value in 
+*        NDF m31, and each output pixel value is the number of standard 
+*        deviations of the pixel away from the corresponding input data value. 
+*        If you then use GAIA to view the cube, an iso-surface at value zero 
+*        will be a carpet plot of the data values in m31, an iso-surface at
+*        value -1.0 will be a carpet plot showing data values one standard
+*        deviation below the m31 data values, and an iso-surface at value +1.0 
+*        will be a carpet plot showing data values one sigma above the 
+*        m31 data values. This can help to visualise the errors in an image.
 
 *  Implementation Status:
-*     -  Any Variance and Quality components in the input image are not 
+*     -  Any VARIANCE and QUALITY components in the input image are not 
 *     propagated to the output cube.
 
 *  Copyright:
@@ -161,7 +161,7 @@ F77_SUBROUTINE(imagecube)( INTEGER(STATUS) ){
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -171,8 +171,8 @@ F77_SUBROUTINE(imagecube)( INTEGER(STATUS) ){
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David S. Berry
@@ -243,7 +243,7 @@ F77_SUBROUTINE(imagecube)( INTEGER(STATUS) ){
    ndgNdfas( grp, 1, "READ", &indf1, STATUS );
    grpDelet( &grp, STATUS );
 
-/* See if the NDF has a variance component. */
+/* See if the NDF has a VARIANCE component. */
    ndfState( indf1, "Variance", &hasvar, STATUS ); 
 
 /* Now get the WCS FrameSet and significant bounds from the NDF, ensuring
@@ -263,7 +263,7 @@ F77_SUBROUTINE(imagecube)( INTEGER(STATUS) ){
          if( ! hasvar ) {
             ndfMsg( "NDF", indf1 );
             *STATUS = SAI__ERROR;
-            errRep( " ", "The NDF '^NDF' has no Variance component but a "
+            errRep( " ", "The NDF '^NDF' has no VARIANCE component but a "
                     "null value was supplied for parameter SIGMA.", STATUS );
          }
       } 
@@ -273,18 +273,18 @@ F77_SUBROUTINE(imagecube)( INTEGER(STATUS) ){
       sigma = 1.0;
    }
 
-/* Map the input Data and, if required, Variance, component of the input 
+/* Map the input DATA and, if required, VARIANCE component of the input 
    image. */
    ndfMap( indf1, "Data", "_DOUBLE", "READ", (void *) &ipdin, &el, STATUS );
    if( sigma == 0.0 ) ndfMap( indf1, "Variance", "_DOUBLE", "READ", 
                               (void *) &ipvin, &el, STATUS );
 
-/* Get the number of pixels on the output data value axis. */
+/* Get the number of pixels on the output data-value axis. */
    dpdef = (int) sqrt( (double) el );
    if( dpdef < 2 ) dpdef = 2;
    parGdr0i( "NDATAPIX", dpdef, 2, VAL__MAXI, 1, &ndatapix, STATUS );
 
-/* Get the range for the output data value axis. */
+/* Get the range for the output data-value axis. */
    bad = 1;
    kpg1Darad( "RANGE", el, ipdin, "Limit,Percentiles,Range,Sigmas", 
               &bad, &dlo, &dhi, STATUS );
@@ -298,17 +298,17 @@ F77_SUBROUTINE(imagecube)( INTEGER(STATUS) ){
    subnd[ 2 ] = ndatapix;
    ndfSbnd( 3, slbnd, subnd, indf2, STATUS ); 
 
-/* Create a 1D Frame to represent the data value axis. */
+/* Create a 1D Frame to represent the data-value axis. */
    datafrm = astFrame( 1, "Domain=DATAVALUE" );
 
-/* If the input NDF has a Label component, assign it to the Label
+/* If the input NDF has a LABEL component, assign it to the Label
    attribute of this Frame. */
    cval[ 0 ] = 0;
    ndfCget( indf1, "Label", cval, 255, STATUS ); 
    if( astChrLen( cval ) == 0 ) strcpy( cval, "Data value" );
    astSetC( datafrm, "Label(1)", cval );
 
-/* If the input NDF has a Unit component, assign it to the Unit
+/* If the input NDF has a UNIT component, assign it to the Unit
    attribute of this Frame. */
    cval[ 0 ] = 0;
    ndfCget( indf1, "Unit", cval, 255, STATUS ); 
@@ -327,7 +327,7 @@ F77_SUBROUTINE(imagecube)( INTEGER(STATUS) ){
 /* Store the modified WCS FrameSet in the output NDF. */
    ndfPtwcs( wcs, indf2, STATUS );
 
-/* Map the output Data component as an array of doubles. */
+/* Map the output DATA component as an array of doubles. */
    ndfMap( indf2, "Data", "_DOUBLE", "WRITE", (void *) &ipdout, &el, STATUS );
 
 /* Get an array holding the data value associated with each pixel on the
@@ -388,8 +388,8 @@ F77_SUBROUTINE(imagecube)( INTEGER(STATUS) ){
 /* If an error has occurred, issue another error report identifying the 
    program which has failed (i.e. this one). */
    if( *STATUS != SAI__OK ) {
-      errRep( "IMAGECUBE_ERR", "IMAGECUBE: Failed to create a 3D cube "
-              "from a  2D image.", STATUS );
+      errRep( "CARPET_ERR", "CARPET: Failed to create a carpet cube "
+              "from a two-dimensional image.", STATUS );
    }
 
 }

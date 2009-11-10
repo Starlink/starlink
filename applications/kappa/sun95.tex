@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.36}
 \newcommand{\stardocnumber}    {95.36}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2009 November 5}
+\newcommand{\stardocdate}      {2009 November 10}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.11}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -12206,6 +12206,8 @@ picture.}
  Evaluates a mathematical expression.}
 \menuitem{CALPOL}{
  Calculates polarisation parameters.}
+\menuitem{CARPET}{
+ Creates a cube representing a carpet plot of an image.}
 \menuitem{CDIV}{
  Divides an NDF by a scalar.}
 \menuitem{CENTROID}{
@@ -12655,6 +12657,8 @@ functions as follows.
 %
 \item {\large\bf Detail enhancement}
 \begin{description}
+\classitem{CARPET}
+ Creates a cube representing a carpet plot of an image.
 \classitem{COLCOMP}
  Produces a colour composite image from 1, 2 or 3 individual NDFs.
 \classitem{HISTEQ}
@@ -12889,6 +12893,8 @@ functions as follows.
 \label{cl:compexp}
 \item {\large\bf Compression and expansion}
 \begin{description}
+\classitem{CARPET}
+ Creates a cube representing a carpet plot of an image.
 \classitem{CHANMAP}
  Creates a channel map from a cube NDF by compressing slices along a nominated axis
 \classitem{COLLAPSE}
@@ -15956,6 +15962,168 @@ KAPPA: \htmlref{VECPLOT}{VECPLOT};
          All \htmlref{non-complex numeric data types}{ap:HDStypes} can be handled.  Arithmetic
          is performed using single-precision floating point.
 
+      }
+   }
+}
+\sstroutine{
+   CARPET
+}{
+   Creates a cube representing a carpet plot of an image
+}{
+   \sstdescription{
+      This application creates a new three-dimensional NDF from an
+      existing two-dimensional NDF. The resulting NDF can, for instance,
+      be viewed with the three-dimensional iso-surface facilities of the
+      \GAIAref\ image viewer, in order to create a display similar to a
+      {\em carpet plot} of the image (the iso-surface at value zero represents
+      the input image data values).
+
+      The first two pixel axes ($X$ and $Y$) in the output cube correspond to the
+      pixel axes in the input image. The third pixel axis ($Z$) in the output
+      cube is proportional to data value in the input image. The value of
+      a pixel in the output cube measures the difference between the data
+      value implied by its $Z$-axis position, and the data value of the
+      corresponding pixel in the input image. Two schemes are available
+      (see Parameter MODE): the output pixel values can be either simply
+      the difference between these two data values, or the difference
+      divided by the standard deviation at the corresponding pixel in the
+      input image (as determined either from the \htmlref{VARIANCE}{apndf:variance} 
+      component in the input NDF or by Parameter SIGMA).
+   }
+   \sstusage{
+      carpet in out [ndatapix] [range] [mode] [sigma]
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         The input two-dimensional NDF.
+      }
+      \sstsubsection{
+         MODE = LITERAL (Read)
+      }{
+         Determines how the pixel values in the output cube are calculated.
+
+         \sstitemlist{
+
+            \sstitem
+            {\tt "Data"} --- the value of each output pixel is equal to the difference
+                         between the data value implied by its position along
+                         the data value axis, and the value of the
+                         corresponding pixel in the input image.
+
+            \sstitem
+            {\tt "Sigma"} --- this is the same as {\tt "Data"} except that the output
+                         pixel values are divided by the standard deviation
+                         implied either by the VARIANCE component of the
+                         input image, or by the SIGMA parameter.
+
+         }
+         [{\tt "Data"}]
+      }
+      \sstsubsection{
+         NDATAPIX = \_INTEGER (Read)
+      }{
+         The number of pixels to use for the data value axis in the
+         output cube. The pixel origin of this axis will be 1. The
+         dynamic default is the square root of the number of pixels in
+         the input image. This gives a fairly `cubic' output cube. {\tt []}
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         The output three-dimensional NDF.
+      }
+      \sstsubsection{
+         RANGE = LITERAL (Read)
+      }{
+         RANGE specifies the range covered by the data value axis (\emph{i.e.} the
+         third pixel axis) in the output cube. The supplied string should
+         consist of up to three sub-strings, separated by commas.  For all
+         but the option where you give explicit numerical limits, the first
+         sub-string must specify the method to use.  If supplied, the other
+         two sub-strings should be numerical values as described below
+         (default values will be used if these sub-strings are not
+         provided).  The following options are available.
+
+         \ssthitemlist{
+
+            \sstitem
+            lower,upper --- You can supply explicit lower and upper limiting
+            values.  For example, {\tt "10,200"} would set the lower limit on the
+            output data axis to 10 and its upper limit to 200.  No method name
+            prefixes the two values.  If only one value is supplied, the
+            {\tt "Range"} method is adopted.  The limits must be within the dynamic
+            range for the data type of the input NDF array component.
+
+            \sstitem
+            {\tt "Percentiles"} --- The default values for the output data axis
+            range are set to the specified percentiles of the input data.  For
+            instance, if the value {\tt "Per,10,99"} is supplied, then the lowest
+            10\% and highest 1\% of the data values are beyond the bounds of
+            the output data value axis.  If only one value, p1, is supplied,
+            the second value, p2, defaults to (100 - p1).  If no values are
+            supplied, the values default to {\tt "5,95"}.  Values must be in the
+            range 0 to 100.
+
+            {\tt "Range"} --- The minimum and maximum array values are used.  No
+            other sub-strings are needed by this option.  Null ({\tt{!}}) is a
+            synonym for the {\tt "Range"} method.
+
+            \sstitem
+            {\tt "Sigmas"} --- The limits on the output data value axis are set to
+            the specified numbers of standard deviations below and above the
+            mean of the input data.  For instance, if the supplied value is
+            {\tt "sig,1.5,3.0"}, then the data value axis extends from the mean of
+            the input data minus 1.5 standard deviations to the mean plus 3
+            standard deviations.  If only one value is supplied, the second
+            value defaults to the supplied value.  If no values are supplied,
+            both default to {\tt "3.0"}.
+
+         }
+         The limits adopted for the data value axis are reported unless
+         parameter RANGE is specified on the command line.  In this case
+         values are only calculated where necessary for the chosen method.
+
+         The method name can be abbreviated to a single character, and
+         is case insensitive.  The initial default value is {\tt "Range"}.  The
+         suggested defaults are the current values, or {\tt{!}} if these do
+         not exist.  {\tt [}current value{\tt{]}}
+      }
+      \sstsubsection{
+         SIGMA = \_REAL (Read)
+      }{
+         The standard deviation to use if Parameter MODE is set to {\tt "Sigma"}.
+         If a null ({\tt{!}}) value is supplied, the standard deviations implied
+         by the VARIANCE component in the input image are used (an error
+         will be reported if the input image does not have a VARIANCE
+         component). If a SIGMA value is supplied, the same value is used
+         to scale all output pixels.  {\tt [!]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         carpet m31 m31-cube mode=sigma
+      }{
+         Asssuming the two-dimensional NDF in file {\tt m31.sdf} contains a
+         VARIANCE component, this will create a three-dimensional NDF called
+         m31-cube in which the third pixel axis corresponds to data value in
+         NDF m31, and each output pixel value is the number of standard
+         deviations of the pixel away from the corresponding input data value.
+         If you then use \GAIA\ to view the cube, an iso-surface at value zero
+         will be a carpet plot of the data values in m31, an iso-surface at
+         value {\tt -1.0} will be a carpet plot showing data values one standard
+         deviation below the m31 data values, and an iso-surface at value {\tt +1.0}
+         will be a carpet plot showing data values one sigma above the
+         m31 data values. This can help to visualise the errors in an image.
+      }
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         Any \htmlref{VARIANCE}{apndf:variance} and \htmlref{QUALITY}{apndf:quality} components 
+         in the input image are not propagated to the output cube.
       }
    }
 }
@@ -56688,6 +56856,20 @@ The following applications have been modified:
 
 \end{itemize}
 
+\subsection{New Commands}
+The following new applications have been added:
+
+\begin{description}
+
+   \item [\htmlref{CARPET}{CARPET}] \mbox{}
+   This is intended for the creation of {\em carpet plots} of images.
+   It forms a three-dimensional NDF from a two-dimensional NDF where
+   the original input axes are retained and the new third axis is 
+   proportional to the data values or signal-to-noise ratios (provided
+   VARIANCE is present) of the input NDF.
+
+\end{description}
+
 \subsection{Modified Commands}
 The following applications have been modified:
 
@@ -56918,6 +57100,8 @@ functions as follows.
 %
 \item {\large\bf Detail enhancement}
 \begin{description}
+\classitem{CARPET}
+ Creates a cube representing a carpet plot of an image.
 \classitem{COLCOMP}
  Produces a colour composite image from 1, 2 or 3 individual NDFs.
 \classitem{HISTEQ}
@@ -57150,6 +57334,8 @@ functions as follows.
 %
 \item {\large\bf Compression and expansion}
 \begin{description}
+\classitem{CARPET}
+ Creates a cube representing a carpet plot of an image.
 \classitem{CHANMAP}
  Creates a channel map from a cube NDF by compressing slices along a nominated axis
 \classitem{COLLAPSE}

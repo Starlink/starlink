@@ -19,6 +19,16 @@
    stored within an output catalogue) has changed. It is now the 
    current Frame in the WCS FrameSet associated with the input data.
 
+2 New_applications
+
+The following new applications have been added:
+
+   o  CARPET is intended for the creation of `carpet plots' of images.
+   It forms a three-dimensional NDF from a two-dimensional NDF where
+   the original input axes are retained and the new third axis is 
+   proportional to the data values or signal-to-noise ratios of the 
+   input NDF.
+
 2 Modified_applications
 
    o  APERADD, BEAMFIT, CENTROID, CREFRAME, CURSOR, LISTSHOW,
