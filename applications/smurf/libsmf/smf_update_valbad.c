@@ -14,11 +14,30 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_update_valbad( smfData *data, unsigned char mask, int *status );
+*     smf_update_valbad( smfData *data, smf_modeltype mtype,
+*                        unsigned char *qual, size_t qbstride,
+*                        size_t qtstride, unsigned char mask,
+*                        int *status )
 
 *  Arguments:
 *     data = smfData* (Given)
 *        Pointer to smfData to be updated
+*     mtype = smf_modeltype (Given)
+*        If data is an iterative map-maker model component it may have
+*        different dimensions from qual. In this specific case set
+*        mtype as well as qbstride and qtstride. Otherwise set mtype to
+*        SMF__NUL (or 0) if data and qual have the same dimensions.
+*     qual = unsigned char* (Given)
+*        If provided use this quality array instead of one supplied with data.
+*        If being used with an iterative map-maker model component it is
+*        assumed to be a 3-dimensions array corresponding to time-series
+*        data, and both qbstride and qtstride must be set. qual can be NULL.
+*     qbstride = size_t (Given)
+*        If mtype is set, provide the bolometer stride for the qual array.
+*        Otherwise ignored.
+*     qtstride = size_t (Given)
+*        If mtype is set, provide the time slice stride for the qual array.
+*        Otherwise ignored.
 *     mask = unsigned char (Given)
 *        Bitmask of QUALITY flags to consider for setting VAL__BADD values
 *     status = int* (Given and Returned)
@@ -27,7 +46,7 @@
 *  Description:
 *     This routine checks the QUALITY of a smfData for bits that are
 *     present in the mask. When encountered the corresponding data
-*     value is set to VAL__BADD. 
+*     value is set to VAL__BADD.
 
 *  Notes:
 
@@ -37,12 +56,16 @@
 
 *  History:
 *     2008-10-20 (EC):
-*        Initial version.
+*       Initial version.
+*     2009-11-10 (EC):
+*       - handle iterative map-maker model components by supplying external
+*         quality array and dimensions
+*       - handle multiple data types 
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
-*     University of British Columbia. All Rights Reserved.
+*     Copyright (C) 2008-2009 University of British Columbia.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -81,44 +104,168 @@
 
 #define FUNC_NAME "smf_update_valbad"
 
-void smf_update_valbad( smfData *data, unsigned char mask, int *status ) {
+void smf_update_valbad( smfData *data, smf_modeltype mtype, unsigned char *qual,
+                        size_t qbstride, size_t qtstride, unsigned char mask,
+                        int *status ) {
+
+  size_t bstride;               /* data bolo stride */
   dim_t i;                      /* loop counter */
+  dim_t j;                      /* loop counter */
+  size_t offset;                /* array index */
   dim_t nbolo;                  /* Number of bolometers */
   dim_t ndata;                  /* Number of data points */
   dim_t ntslice;                /* Number of time slices */
-  unsigned char *qual=NULL;     /* Pointer to the QUALITY array */
+  unsigned char *quality=NULL;  /* Pointer to the QUALITY array */
+  size_t tstride;               /* data time stride */
 
   if ( *status != SAI__OK ) return;
 
-  /* Verify double precision*/
-  if (!smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status )) return;
-
-  /* Check for QUALITY */
-  if( data->pntr[2] ) {
-    qual = (unsigned char *) data->pntr[2]; /* QUALITY given by smfData */
-  } else {
-    *status = SAI__ERROR;
-    errRep( "", FUNC_NAME ": smfData does not contain a QUALITY component", 
-            status);
-    return;
-  }
-
   /* Check for DATA */
-  if( !data->pntr[0] ) {
+  if( !data || !data->pntr[0] ) {
     *status = SAI__ERROR;
-    errRep( "", FUNC_NAME ": smfData does not contain a DATA component", 
+    errRep( "", FUNC_NAME ": no data supplied!",
             status );
-    return;
+    goto CLEANUP;
   }
 
-  /* Calculate data dimensions */
-  smf_get_dims( data,  NULL, NULL, &nbolo, &ntslice, &ndata, NULL, NULL, status );
+  /* Get the QUALITY array, or generate bad status */
+  quality = qual ? qual : data->pntr[2];
 
-  if( *status == SAI__OK ) { 
-    /* Synchronize VAL__BADD with QUALITY matching any mask bits */
-    for( i=0; i<ndata; i++ ) {    /* Loop over all samples */
-      if( qual[i]&mask ) 
-        ((double *)data->pntr[0])[i] = VAL__BADD;
-    }    
+  if( !quality ) {
+    *status = SAI__ERROR;
+    errRep( "", FUNC_NAME ": smfData does not contain a QUALITY component",
+            status);
+    goto CLEANUP;
   }
+
+  if( mtype == SMF__NUL ) { /* If mtype unspecified data & qual same dims */
+
+    /* Calculate data dimensions.  Don't use smf_get_dims as it doesn't
+       know what to do with oddly-shaped array. */
+    ndata = 1;
+    for( i=0; i<data->ndims; i++ ) {
+      ndata *= data->dims[i];
+    }
+
+    if( *status == SAI__OK ) {
+      /* Synchronize VAL__BADD with QUALITY matching any mask bits */
+      for( i=0; i<ndata; i++ ) {    /* Loop over all samples */
+        if( quality[i]&mask ) {
+          switch( data->dtype ) {
+          case SMF__INTEGER:
+            ((int *)data->pntr[0])[i] = VAL__BADI;
+            break;
+          case SMF__FLOAT:
+            ((float *)data->pntr[0])[i] = VAL__BADR;
+            break;
+          case SMF__DOUBLE:
+            ((double *)data->pntr[0])[i] = VAL__BADD;
+            break;
+          case SMF__USHORT:
+            ((unsigned short*)data->pntr[0])[i] = VAL__BADUW;
+            break;
+          case SMF__UBYTE:
+            ((unsigned char*)data->pntr[0])[i] = VAL__BADUB;
+            break;
+          default:
+            *status = SAI__ERROR;
+            errRep( "", FUNC_NAME ": Can't handle unknown data type", status );
+            goto CLEANUP;
+          }
+        }
+      }
+    }
+  } else {                  /* Otherwise data & qual may have different dims */
+
+    switch( mtype ) {
+    case SMF__COM:
+      /* 1-d array length time. Not very useful applying a full 3-d
+         quality mask to these data so generate a warning and
+         return. */
+
+      msgOutif( MSG__VERB, "", FUNC_NAME
+                ": Don't currently handle COM model components.",
+                status );
+      goto CLEANUP;
+      break;
+
+    case SMF__DKS:
+      /* Each columns dark squid signal followed by gain, offset and
+         correlation coefficient for each row. See
+         smf_model_create. This one is tricky and can't be done using
+         the same method as other model components. Just generate a
+         warning message and return for now. */
+
+      msgOutif( MSG__VERB, "", FUNC_NAME
+                ": Don't currently handle DKS model components.",
+              status );
+      goto CLEANUP;
+      break;
+
+    case SMF__GAI:
+      /* 3d array so we can used smf_get_dims: 3 planes of bolo data
+         corresponding gain, offsed and correlation coefficient of commond
+         mode signal in each detector. See smf_model_create. */
+      smf_get_dims( data, NULL, NULL, &nbolo, &ntslice, NULL, &bstride,
+                    &tstride, status );
+      break;
+
+    default:
+      /* Otherwise assume a 3-d model. While the time axes may not
+         match we can still use qual to find the bad bolos. */
+      smf_get_dims( data, NULL, NULL, &nbolo, &ntslice, NULL, &bstride,
+                    &tstride, status );
+    }
+
+    if( *status == SAI__ERROR ) goto CLEANUP;
+
+    /* Now loop over bolos and time slices in data and check the quality.
+       This is probably only a useful thing to do if we're checking
+       SMF__Q_BADB since the time slices in the quality and model arrays
+       may not agree */
+
+    if( mask != SMF__Q_BADB ) {
+      msgOut( "", FUNC_NAME
+              ": Warning, set model values based on mask other than BADBOL",
+              status );
+    }
+
+    for( i=0; (*status==SAI__OK)&&(i<nbolo); i++ ) {
+      for( j=0; (*status==SAI__OK)&&(j<ntslice); j++ ) {
+        if( quality[i*qbstride + j*qtstride]&mask ) {
+
+          /* Array index in data */
+          offset = i*bstride + j*tstride;
+
+          switch( data->dtype ) {
+          case SMF__INTEGER:
+            ((int *)data->pntr[0])[offset] = VAL__BADI;
+            break;
+          case SMF__FLOAT:
+            ((float *)data->pntr[0])[offset] = VAL__BADR;
+            break;
+          case SMF__DOUBLE:
+            ((double *)data->pntr[0])[offset] = VAL__BADD;
+            break;
+          case SMF__USHORT:
+            ((unsigned short*)data->pntr[0])[offset] = VAL__BADUW;
+            break;
+          case SMF__UBYTE:
+            ((unsigned char*)data->pntr[0])[offset] = VAL__BADUB;
+            break;
+          default:
+            *status = SAI__ERROR;
+            errRep( "", FUNC_NAME ": Can't handle unknown data type", status );
+            goto CLEANUP;
+          }
+        }
+      }
+    }
+  }
+
+ CLEANUP:
+  return;
 }
+
+
+

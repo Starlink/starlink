@@ -1308,7 +1308,9 @@ void smf_update_quality( smfData *data, unsigned char *target, int syncbad,
                          const int *badmask, double badfrac,
                          int *status );
 
-void smf_update_valbad( smfData *data, unsigned char mask, int *status );
+void smf_update_valbad( smfData *data, smf_modeltype mtype, unsigned char *qual,
+                        size_t qbstride, size_t qtstride, unsigned char mask,
+                        int *status );
 
 void smf_updateprov( int ondf, const smfData *data, int indf,
                      const char *creator, int *status );

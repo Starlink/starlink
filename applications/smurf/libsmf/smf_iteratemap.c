@@ -217,6 +217,9 @@
 *     2009-10-28 (TIMJ):
 *        Add data_units. Needed because we can only read data units after
 *        the data have been flatfielded. Also check for consistency.
+*     2009-11-10 (EC):
+*        Add exportsetbad dimmconfig parameter to set bad values in exported
+*        files when SMF__Q_BADB bits set.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -305,6 +308,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
   double dtemp;                 /* temporary double */
   int exportNDF=0;              /* If set export DIMM files to NDF at end */
   int *exportNDF_which=NULL;    /* Which models in modelorder will be exported*/
+  int exportsetbad=0;           /* Set bad values in exported models */
   smfFilter *filt=NULL;         /* Pointer to filter struct */
   double flagstat;              /* Threshold for flagging stationary regions */
   double f_edgelow=0;           /* Freq. cutoff for low-pass edge filter */
@@ -372,6 +376,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
   double *thisweight=NULL;      /* Pointer to this weights map */
   double *thisvar=NULL;         /* Pointer to this variance map */
   size_t try;                   /* Try to concatenate this many samples */
+  size_t tstride;               /* Time stride */
   struct timeval tv1, tv2;      /* Timers */
   int untilconverge=0;          /* Set if iterating to convergence */
   double *var_data=NULL;        /* Pointer to DATA component of NOI */
@@ -457,6 +462,11 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
     /* Are we going to produce single-bolo maps? */
     if( !astMapGet0I( keymap, "BOLOMAP", &bolomap ) ) {
       bolomap = 0;
+    }
+
+    /* Are we going to set bad values in exported models? */
+    if( !astMapGet0I( keymap, "EXPORTSETBAD", &exportsetbad ) ) {
+      exportsetbad = 0;
     }
 
     /* Method to use for calculating the variance map */
@@ -1565,11 +1575,17 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
             }
           }
 
-          /* Loop over subgroup (subarray), re-order and export */
+          /* Loop over subgroup (subarray), re-order, set bad values
+             wherever a SMF__Q_BADB flag is encountered (if requested),
+             and export */
           for( idx=0; idx<res[i]->ndat; idx++ ) {
-            smf_dataOrder( res[i]->sdata[idx], 1, status );
             smf_dataOrder( qua[i]->sdata[idx], 1, status );
+            smf_dataOrder( res[i]->sdata[idx], 1, status );
             smf_dataOrder( ast[i]->sdata[idx], 1, status );
+
+            /* Get quality array strides for smf_update_valbad */
+            smf_get_dims( qua[i]->sdata[idx], NULL, NULL, NULL, NULL, NULL,
+                          &bstride, &tstride, status );
 
             for( j=0; j<nmodels; j++ ) {
 
@@ -1605,17 +1621,13 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
             /* QUA becomes the quality component of RES. NOI becomes
                the variance component of RES if present. */
             if( *status == SAI__OK ) {
-              if( havenoi && exportNDF_which[whichnoi] ) {
+              if( havenoi ) {
                 var_data = (model[whichnoi][i]->sdata[idx]->pntr)[0];
               } else {
                 var_data = NULL;
               }
 
-              if( exportNDF_which[nmodels+1] ) {
-                qua_data = (qua[i]->sdata[idx]->pntr)[0];
-              } else {
-                qua_data = NULL;
-              }
+              qua_data = (qua[i]->sdata[idx]->pntr)[0];
 
               if( exportNDF_which[nmodels] ) {
                 if( (res[i]->sdata[idx]->file->name)[0] ) {
@@ -1629,9 +1641,16 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
                     one_strlcat( name, "_res", SMF_PATH_MAX+1, status );
                   }
 
+                  if( exportsetbad ) {
+                    smf_update_valbad( res[i]->sdata[idx], SMF__NUL,
+                                       qua_data, 0, 0, SMF__Q_BADB, status );
+                  }
+
                   smf_write_smfData( res[i]->sdata[idx],
-                                     havenoi ? dat.noi[i]->sdata[idx] : NULL,
-                                     qua_data, name, NULL, 0, NDF__NOID,
+                                     (havenoi && exportNDF_which[whichnoi]) ?
+                                     dat.noi[i]->sdata[idx] : NULL,
+                                     exportNDF_which[nmodels+1] ?
+                                     qua_data : NULL, name, NULL, 0, NDF__NOID,
                                      status );
                 } else {
                   msgOut( " ",
@@ -1647,6 +1666,12 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
                                        status );
                   smf_model_stripsuffix( ast[i]->sdata[idx]->file->name,
                                          name, status );
+
+                  if( exportsetbad ) {
+                    smf_update_valbad( ast[i]->sdata[idx], SMF__NUL,
+                                       qua_data, 0, 0, SMF__Q_BADB, status );
+                  }
+
                   smf_write_smfData( ast[i]->sdata[idx], NULL, NULL, name,
                                      NULL, 0, NDF__NOID, status );
                 } else {
@@ -1669,6 +1694,13 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
                                        hdr,status );
                   smf_model_stripsuffix( model[j][i]->sdata[idx]->file->name,
                                          name, status );
+
+                  if( exportsetbad ) {
+                    smf_update_valbad( model[j][i]->sdata[idx], modeltyps[j],
+                                       qua_data, bstride, tstride, SMF__Q_BADB,
+                                       status );
+                  }
+
                   smf_write_smfData( model[j][i]->sdata[idx], NULL, NULL, name,
                                      NULL, 0, NDF__NOID, status );
                 } else {
