@@ -167,7 +167,7 @@
      :                  aa,MAX_KPLUS1,ylim,kp1,%VAL(CNF_PVAL(w2ptr)),
      :                  %VAL(CNF_PVAL(npts)),%VAL(CNF_PVAL(ptr5)),
      :                  used,%VAL(CNF_PVAL(d_aptr)),
-     :                  %VAL(CNF_PVAL(ptr1)),polydata,
+     :                  %VAL(CNF_PVAL(ptr6)),polydata,
      :                  %VAL(CNF_PVAL(ptr4)),athree,maxnpts2,a3all)
 
 * Release workspace
