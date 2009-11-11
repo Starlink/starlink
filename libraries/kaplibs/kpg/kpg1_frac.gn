@@ -166,6 +166,9 @@
 *     2009 June 28 (MJC):
 *        Constrain the integer-valued or integer spaced tests further
 *        to exclude absolute values below 2.
+*     2009 November 11 (MJC):
+*        Switch a constraint used to determine whether or not values are
+*        integer stored in a floating-point data type.
 *     {enter_further_changes_here}
 
 *-
@@ -293,10 +296,10 @@
       ELSE IF ( MAXV .GT. NUM_ITO<T>( VAL__MAXI ) .OR. 
      :          MINV .LT. NUM_ITO<T>( VAL__MINI ) .OR.
 
-*  The extreme values must be inside +/-3.  This is to cater for small
-*  +/- dynamic values, but also the the integer increments, hence the
+*  The extreme values must exceed +/-3.  This is to cater for small
+*  +/- dynamic ranges, but also the integer increments, hence the
 *  wider range.
-     :          ABS( MAXV - MINV ) .GT. 3<CONST> ) THEN
+     :          ABS( MAXV - MINV ) .LT. 3<CONST> ) THEN
          INTVAL = .FALSE.
       ELSE
 
