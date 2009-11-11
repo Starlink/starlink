@@ -24,6 +24,11 @@
 
     Other changes:
 
+    The X and Y coordinate readouts have been changed so you can now
+    enter a new position and centre on it (assuming the position isn't
+    off image, or near to an edge, in those cases the image will just 
+    scroll to the edge).
+
     The "Filter" button in a Skycat catalogue window has been enhanced so
     that it now removes any off-image objects, unless there are objects that
     are not plotted, in which case it removes them (this was the old

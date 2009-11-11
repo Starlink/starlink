@@ -956,6 +956,22 @@ move any overlapping windows and try again"
       }
    }
 
+   #  Make sure scroll includes a given X and Y position on the image.
+   public method show_position {x y type} {
+
+      #  Convert position into canvas coords.
+      $image_ convert coords $x $y $type xc yc canvas
+
+      set dw [$image_ dispwidth]
+      set dh [$image_ dispheight]
+      set cw [winfo width $canvas_]
+      set ch [winfo height $canvas_]
+      if {$cw != 1 && $dw && $dh} {
+         $canvas_ xview moveto [expr (($xc-$cw/2.0)/$dw)]
+         $canvas_ yview moveto [expr (($yc-$ch/2.0)/$dh)]
+      }
+   }
+
    #  Select a region of the image and zoom to show as much of it as
    #  possible.
    public method zoomin {} {

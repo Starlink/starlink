@@ -122,7 +122,7 @@ itcl::class gaia::GaiaImagePanel {
       if {$itk_option(-showxy)} {
          if { $itk_option(-showpxy) } {
             itk_component add x {
-               util::LabelValue $w_.x \
+               util::LabelEntry $w_.x \
                   -text "PX:" \
                   -textvariable ${var}(PX) \
                   -labelfont $itk_option(-labelfont) \
@@ -130,10 +130,11 @@ itcl::class gaia::GaiaImagePanel {
                   -labelwidth $itk_option(-labelwidth) \
                   -valuewidth $itk_option(-valuewidth) \
                   -relief groove \
-                  -anchor e
+                  -anchor e \
+                  -command [code $this goto_x_]
             }
             itk_component add y {
-               util::LabelValue $w_.y \
+               util::LabelEntry $w_.y \
                   -text "PY:" \
                   -textvariable ${var}(PY) \
                   -labelfont $itk_option(-labelfont) \
@@ -141,12 +142,13 @@ itcl::class gaia::GaiaImagePanel {
                   -labelwidth $itk_option(-labelwidth) \
                   -valuewidth $itk_option(-valuewidth) \
                   -relief groove \
-                  -anchor e
+                  -anchor e \
+                  -command [code $this goto_y_]
             }
 
          } else {
             itk_component add x {
-               util::LabelValue $w_.x \
+               util::LabelEntry $w_.x \
                   -text "X:" \
                   -textvariable ${var}(X) \
                   -labelfont $itk_option(-labelfont) \
@@ -154,10 +156,11 @@ itcl::class gaia::GaiaImagePanel {
                   -labelwidth $itk_option(-labelwidth) \
                   -valuewidth $itk_option(-valuewidth) \
                   -relief groove \
-                  -anchor e
+                  -anchor e \
+                  -command [code $this goto_x_]
             }
             itk_component add y {
-               util::LabelValue $w_.y \
+               util::LabelEntry $w_.y \
                   -text "Y:" \
                   -textvariable ${var}(Y) \
                   -labelfont $itk_option(-labelfont) \
@@ -165,7 +168,8 @@ itcl::class gaia::GaiaImagePanel {
                   -labelwidth $itk_option(-labelwidth) \
                   -valuewidth $itk_option(-valuewidth) \
                   -relief groove \
-                  -anchor e
+                  -anchor e \
+                  -command [code $this goto_y_]
             }
          }
 
@@ -192,9 +196,12 @@ itcl::class gaia::GaiaImagePanel {
                $itk_component(value)   $row,2 -fill x -anchor w
          }
 
-         add_short_help $itk_component(x) {X image coordinates at mouse pointer}
-         add_short_help $itk_component(y) {Y image coordinates at mouse pointer}
-         add_short_help $itk_component(value) {Raw image value at X,Y coordinates}
+         add_short_help $itk_component(x) \
+            {X image coordinates at mouse pointer, enter new value to centre}
+         add_short_help $itk_component(y) \
+            {Y image coordinates at mouse pointer, enter new value to centre}
+         add_short_help $itk_component(value) \
+            {Raw image value at X,Y coordinates}
       }
 
       #  Ra and dec.
@@ -749,6 +756,28 @@ itcl::class gaia::GaiaImagePanel {
       } else {
          $image_ cut $low $high
          updateValues
+      }
+   }
+
+   #  Go to a given X grid coordinate. In fact since we cannot scroll
+   #  outside the displayed window just makes it visible, if possible.
+   protected method goto_x_ {x} {
+      set var $image_
+      global ::$var
+      set y [set ${var}(Y)]
+      if { $x != {} && $y != {} } {
+         $itk_option(-image) show_position $x $y image
+      }
+   }
+
+   #  Go to a given Y grid coordinate. In fact since we cannot scroll
+   #  outside the displayed window just makes it visible, if possible.
+   protected method goto_y_ {y} {
+      set var $image_
+      global ::$var
+      set x [set ${var}(X)]
+      if { $x != {} && $y != {} } {
+         $itk_option(-image) show_position $x $y image
       }
    }
 
