@@ -388,8 +388,8 @@ F77_SUBROUTINE(carpet)( INTEGER(STATUS) ){
 /* If an error has occurred, issue another error report identifying the 
    program which has failed (i.e. this one). */
    if( *STATUS != SAI__OK ) {
-      errRep( "CARPET_ERR", "CARPET: Failed to create a carpet cube "
-              "from a two-dimensional image.", STATUS );
+      errRep( "CARPET_ERR", "CARPET: Failed to create a cube (representing "
+              "a carpet plot) from a two-dimensional image.", STATUS );
    }
 
 }
