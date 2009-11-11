@@ -24,7 +24,7 @@
 
     Other changes:
 
-    The X and Y coordinate readouts have been changed so you can now
+    The X, Y, RA and DEC coordinate readouts have been changed so you can now
     enter a new position and centre on it (assuming the position isn't
     off image, or near to an edge, in those cases the image will just 
     scroll to the edge).

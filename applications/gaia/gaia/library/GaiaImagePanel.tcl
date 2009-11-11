@@ -155,7 +155,6 @@ itcl::class gaia::GaiaImagePanel {
                   -valuefont $itk_option(-valuefont) \
                   -labelwidth $itk_option(-labelwidth) \
                   -valuewidth $itk_option(-valuewidth) \
-                  -relief groove \
                   -anchor e \
                   -command [code $this goto_x_]
             }
@@ -167,7 +166,6 @@ itcl::class gaia::GaiaImagePanel {
                   -valuefont $itk_option(-valuefont) \
                   -labelwidth $itk_option(-labelwidth) \
                   -valuewidth $itk_option(-valuewidth) \
-                  -relief groove \
                   -anchor e \
                   -command [code $this goto_y_]
             }
@@ -207,26 +205,26 @@ itcl::class gaia::GaiaImagePanel {
       #  Ra and dec.
       if {$itk_option(-showwcs)} {
          itk_component add ra {
-            util::LabelValue $w_.ra \
+            util::LabelEntry $w_.ra \
                -text "\u03b1:" \
                -textvariable ${var}(RA) \
                -labelfont $itk_option(-wcsfont) \
                -valuefont $itk_option(-valuefont) \
                -labelwidth $itk_option(-labelwidth) \
                -valuewidth $itk_option(-valuewidth) \
-               -relief groove \
-               -anchor e
+               -anchor e \
+               -command [code $this goto_ra_]
          }
          itk_component add dec {
-            util::LabelValue $w_.dec \
+            util::LabelEntry $w_.dec \
                -text "\u03b4:" \
                -textvariable ${var}(DEC) \
                -labelfont $itk_option(-wcsfont) \
                -valuefont $itk_option(-valuefont) \
                -labelwidth $itk_option(-labelwidth) \
                -valuewidth $itk_option(-valuewidth) \
-               -relief groove \
-               -anchor e
+               -anchor e \
+               -command [code $this goto_dec_]
          }
          itk_component add equinox {
             util::LabelValue $w_.equinox \
@@ -257,8 +255,10 @@ itcl::class gaia::GaiaImagePanel {
          $itk_component(dec) config -textvariable ${var}(DEC)
          $itk_component(equinox) config -textvariable ${var}(EQUINOX)
 
-         add_short_help $itk_component(ra)  {World Coordinates RA value}
-         add_short_help $itk_component(dec)  {World Coordinates DEC value}
+         add_short_help $itk_component(ra)  \
+            {World Coordinates RA value, enter new value to centre}
+         add_short_help $itk_component(dec)  \
+            {World Coordinates DEC value, enter new value to centre}
          add_short_help $itk_component(equinox) {World Coordinates equinox (default: J2000)}
       }
 
@@ -756,6 +756,30 @@ itcl::class gaia::GaiaImagePanel {
       } else {
          $image_ cut $low $high
          updateValues
+      }
+   }
+
+   #  Go to a given RA. In fact since we cannot scroll outside the displayed
+   #  window just makes it visible, if possible. 
+   protected method goto_ra_ {ra} {
+      set var $image_
+      global ::$var
+      set dec [set ${var}(DEC)]
+      set equinox [set ${var}(EQUINOX)]
+      if { $ra != {} && $dec != {} } {
+         $itk_option(-image) show_position $ra $dec "wcs $equinox"
+      }
+   }
+
+   #  Go to a given Dec. In fact since we cannot scroll outside the displayed
+   #  window just makes it visible, if possible. 
+   protected method goto_dec_ {dec} {
+      set var $image_
+      global ::$var
+      set ra [set ${var}(RA)]
+      set equinox [set ${var}(EQUINOX)]
+      if { $ra != {} && $dec != {} } {
+         $itk_option(-image) show_position $ra $dec "wcs $equinox"
       }
    }
 
