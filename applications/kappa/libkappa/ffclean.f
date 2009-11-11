@@ -197,6 +197,7 @@
 *     MJC: Malcolm J. Currie (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
 *     DSB: David Berry (JAC, UCLan)
+*     PWD: Peter W. Draper (University of Durham)
 *     {enter_new_authors_here}
 
 *  History:
@@ -230,6 +231,9 @@
 *     2009 July 22 (MJC):
 *        Remove ILEVEL parameter and use the current reporting level
 *        instead (set by the global MSG_FILTER environment variable).
+*     2009 November 11 (PWD):
+*        Fix initialisation of OFF variable to be correct for double
+*        precision data. Previously this only worked for real data.
 *     {enter_further_changes_here}
 
 *-
@@ -745,7 +749,11 @@
 
 *  Loop round each spectrum or plane, and complete the grid index bounds
 *  of the current spectrum or plane.
-      OFF = -PNEL * VAL__NBR
+      IF ( ITYPE .EQ. '_REAL' ) THEN
+         OFF = -PNEL * VAL__NBR
+      ELSE
+         OFF = -PNEL * VAL__NBD
+      END IF
       DO IL2 = 1, LDIM( 2 )
 
          IF ( LNAX .EQ. 2 ) THEN
