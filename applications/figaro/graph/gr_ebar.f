@@ -40,7 +40,7 @@
       real x(n),y(n),xerr(n),yerr(n),ticklen
       character*(*) ebar
       character*5 ebar1
-      integer emin,emax,slot,status
+      integer emin,emax,slot,slot2,status
       include 'bytesdef'
 
 * See if x or y error bars, or both are required.
@@ -48,9 +48,9 @@
       ebar1 = ebar(:(min(5,len(ebar))))
       call chr_ucase(ebar1)
       status = SAI__OK
-      call dsa_get_work_array(n*2,'float',emin,slot,status)
+      call dsa_get_work_array(n,'float',emin,slot,status)
+      call dsa_get_work_array(n,'float',emax,slot2,status)
       if(status.ne.SAI__OK) return
-      emax = emin + n*bytes_float
 
 * X error bars
 
@@ -69,5 +69,6 @@
         call pgerry(n,x,%VAL(CNF_PVAL(emin)),%VAL(CNF_PVAL(emax)),
      :              ticklen)
       end if
+      call dsa_free_workspace(slot2,status)
       call dsa_free_workspace(slot,status)
       end
