@@ -242,6 +242,7 @@
       production = .false.
       nfits = 0
       maxendw = 0.0d0
+      chisqmax = 0.0
       minstartw = VAL__MAXD
 *
 * fitting/editing loop
