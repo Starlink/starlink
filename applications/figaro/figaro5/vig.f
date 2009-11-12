@@ -157,15 +157,12 @@
 
 * pointers to VM
 
-      integer ptr1,ptr2,ptr3,ptr4,ptr5
+      integer ptr1,ptr2,ptr3,ptr4,ptr5,ptr6,ptr7
 
 * FIGARO handles to VM
 
       integer slot,slot1,slot2,slot3,slot4,slot5,slot6,slot7
-
-* bytes required for r*8 array length ni
-
-      integer eni
+      integer slot8,slot9
 
 * MAximum of NL and NI
 
@@ -382,14 +379,14 @@
 
 * get work space for the correction
 
-      ptr2 = ptr1 + 8*max_size
-      ptr3 = ptr2 + eni
+      call dsa_get_work_array(ni,'double',ptr6,slot8,status)
+      call dsa_get_work_array(nl,'double',ptr7,slot9,status)
 
 * apply the correction to the data
 
       call correct(%VAL(CNF_PVAL(iptr)),coeffi,coeffl,ni,nl,mord,kp1i,
-     :             kp1l,%VAL(CNF_PVAL(ptr1)),%VAL(CNF_PVAL(ptr2)),
-     :             %VAL(CNF_PVAL(ptr3)),max_size)
+     :             kp1l,%VAL(CNF_PVAL(ptr1)),%VAL(CNF_PVAL(ptr6)),
+     :             %VAL(CNF_PVAL(ptr7)),max_size)
 
 * close down graphics and DSA
 
