@@ -346,8 +346,7 @@
      :                              slot,status)
             call dsa_get_work_array(line_count*2,'double',ylimptr,slot1,
      :                              status)
-            call dsa_get_work_array(line_count,'int',ylimptr,slot2,
-     :                              status)
+            call dsa_get_work_array(line_count,'int',ptr1,slot2, status)
             if(status.ne.SAI__OK) goto 500
             call comb_contin(%VAL(CNF_PVAL(aaptr)),
      :                       %VAL(CNF_PVAL(ylimptr)),
@@ -390,12 +389,12 @@
 **********************************************************************
 * Get virtual memory:-
 *  PTR0     WAVDIM*NUSED     (d)
-*  PTR1/2   NUSED               (d)
-*  PTR3-6   SPDIM1             (d)
-*  PTR7-9   SPDIM1             (r)
+*  PTR1/2   NUSED            (d)
+*  PTR3-6   SPDIM1           (d)
+*  PTR7-9   SPDIM1           (r)
 *  PTR10-11 WAVDIM           (d)
-*  AAPTR    LINE_COUNT*MAX_ORD  (d)
-*  YLIMPTR  LINE_COUNT*2        (d)
+*  AAPTR    NUSED*MAX_ORD    (d)
+*  YLIMPTR  LINE_COUNT*2     (d)
 
         call dsa_get_work_array(wavdim*nused,'double',ptr0,slot,status)
         call dsa_get_work_array(nused,'double',ptr1,slot1,status)
@@ -409,8 +408,8 @@
         call dsa_get_work_array(spdim1,'float',ptr9,slot9,status)
         call dsa_get_work_array(wavdim,'double',ptr10,slot10,status)
         call dsa_get_work_array(wavdim,'double',ptr11,slot11,status)
-        call dsa_get_work_array(line_count*MAX_ORD,'double',aaptr,
-     :                          slot12,status)
+        call dsa_get_work_array(nused*MAX_ORD,'double',aaptr,slot12,
+     :                          status)
         call dsa_get_work_array(line_count*2,'double',ylimptr,slot13,
      :                          status)
 
