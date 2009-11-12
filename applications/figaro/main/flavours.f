@@ -106,8 +106,10 @@
       real vcorr
       save vcorr,vtype
       integer ptr1,ptr2,ptr3,ptr4,ptr5,ptr6,ptr7,ptr8,ptr9
+      integer ptr10,ptr11,ptr12,ptr13,ptr14
       integer i,pstat,mark
       integer slot,slot2,slot3,slot4,slot5,slot6,slot7,slot8,slot9
+      integer slot10,slot11,slot12,slot13,slot14
       real disper
       integer FL_HARD, FL_TABLE, FL_PLOT
       integer FL_PRINT, FL_RATIO, FL_GREY, FL_CONT, FL_FULL
@@ -135,7 +137,6 @@
       integer dumi
       real dumr
       character dumc
-      include 'DYNAMIC_MEMORY'
 *
       data dict/
      :     'NO         : Don''t mark points according to flux',
@@ -243,7 +244,7 @@
 
 
 
-*  Plot rotation Curves e.t.c.
+*  Plot rotation Curves etc.
 
       if(cur_flav(FL_PLOT)) then
 
@@ -252,18 +253,20 @@
 *  Into PTR2 : NXP*MGAUSS (real)
 *  Into PTR3 : NXP*MGAUSS (real)
 *  Into PTR4 : NXP*MGAUSS (real)
+*
 * For plot_av_rot:
 *  Into PTR5 : LINE_COUNT (int)
 *  Into PTR6 : LINE_COUNT (int)
 *  Into PTR7 : LINE_COUNT (int)
 *  Into PTR8 : LINE_COUNT*MGAUSS (real)
 *  Into PTR9 : LINE_COUNT*MGAUSS (real)
+*
 * For plotall:
-*  Into PTR1 : NXP*MGAUSS (real)
-*  Into PTR2 : NXP*MGAUSS (real)
-*  Into PTR3 : NXP*MGAUSS (real)
-*  Into PTR4 : NXP*MGAUSS (real)
-*  Into PTR5 : LINE_COUNT (int)
+*  Into PTR10 : LINE_COUNT (int)
+*  Into PTR11 : NXP*MGAUSS*LINE_COUNT (real)
+*  Into PTR12 : NXP*MGAUSS*LINE_COUNT (real)
+*  Into PTR13 : NXP*MGAUSS*LINE_COUNT (real)
+*  Into PTR14 : NXP*MGAUSS*LINE_COUNT (real)
 
 * Extra memory may be needed for plot_av_rot
 
@@ -282,7 +285,16 @@
          end if
 
          if(cur_plot(PL_ALV)) then
-            call dsa_get_work_array(line_count,'int',ptr5,slot5,status)
+            call dsa_get_work_array(line_count,'int',ptr10,slot10,
+     :                              status)
+            call dsa_get_work_array(line_count*mgauss*nxp,'float',ptr11,
+     :                              slot11,status)
+            call dsa_get_work_array(line_count*mgauss*nxp,'float',ptr12,
+     :                              slot12,status)
+            call dsa_get_work_array(line_count*mgauss*nxp,'float',ptr13,
+     :                              slot13,status)
+            call dsa_get_work_array(line_count*mgauss*nxp,'float',ptr14,
+     :                              slot14,status)
          end if
          
          if(status.eq.SAI__OK) then
@@ -353,17 +365,30 @@
                call plotall(%VAL(CNF_PVAL(d_rptr)),
      :                      %VAL(CNF_PVAL(d_vptr)),
      :                      %VAL(CNF_PVAL(staptr)),line_name,
-     :                      %VAL(CNF_PVAL(d_wptr)),%VAL(CNF_PVAL(ptr1)),
-     :                      %VAL(CNF_PVAL(ptr2)),%VAL(CNF_PVAL(ptr3)),
-     :                      %VAL(CNF_PVAL(ptr4)),vcorr,
+     :                      %VAL(CNF_PVAL(d_wptr)),
+     :                      %VAL(CNF_PVAL(ptr11)),
+     :                      %VAL(CNF_PVAL(ptr12)),%VAL(CNF_PVAL(ptr13)),
+     :                      %VAL(CNF_PVAL(ptr14)),vcorr,
      :                      cur_flav(FL_SOFT),nagerr,
-     :                      %VAL(CNF_PVAL(ptr5)))
+     :                      %VAL(CNF_PVAL(ptr10)))
             end if
-            call dsa_free_workspace(slot9,status)
-            call dsa_free_workspace(slot8,status)
-            call dsa_free_workspace(slot7,status)
-            call dsa_free_workspace(slot6,status)
-            call dsa_free_workspace(slot5,status)
+
+            if(cur_plot(PL_ALV)) then
+               call dsa_free_workspace(slot14,status)
+               call dsa_free_workspace(slot13,status)
+               call dsa_free_workspace(slot12,status)
+               call dsa_free_workspace(slot11,status)
+               call dsa_free_workspace(slot10,status)
+            end if
+
+            if(cur_plot(PL_AV).and.(line_count.gt.1)) then
+               call dsa_free_workspace(slot9,status)
+               call dsa_free_workspace(slot8,status)
+               call dsa_free_workspace(slot7,status)
+               call dsa_free_workspace(slot6,status)
+               call dsa_free_workspace(slot5,status)
+            end if
+
             call dsa_free_workspace(slot4,status)
             call dsa_free_workspace(slot3,status)
             call dsa_free_workspace(slot2,status)
