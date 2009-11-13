@@ -53,6 +53,9 @@ exportndf = 0
 
 #noexportsetbad = 1
 
+# Create an extension containing the map after each iteration?
+#itermap = 1
+
 # Create single-beam maps in addition to main map?
 #bolomap = 1
 

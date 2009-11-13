@@ -14,7 +14,8 @@
 
 *  Invocation:
 
-*     smf_iteratemap(smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
+*     smf_iteratemap(smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
+*                    const Grp *bolrootgrp,
 *                    AstKeyMap *keymap, const smfArray * darks,
 *                    const smfArray *bpms,
 *                    AstFrameSet *outfset, int moving, int *lbnd_out,
@@ -27,6 +28,9 @@
 *        Pointer to a pool of worker threads
 *     igrp = const Grp* (Given)
 *        Group of input data files
+*     iterrootgrp = const Grp * (Given)
+*        Root name to use for iteration output maps (if required). Can be a
+*        path to an HDS container.
 *     bolrootgrp = const Grp * (Given)
 *        Root name to use for bolometer output maps (if required). Can be a
 *        path to an HDS container.
@@ -220,6 +224,9 @@
 *     2009-11-10 (EC):
 *        Add noexportsetbad dimmconfig parameter to set bad values in exported
 *        files when SMF__Q_BADB bits set.
+*     2009-11-12 (EC):
+*        Add itermap and iterrootgrp to enable writing of intermediate maps
+*        after each iteration (matching style of bolomap and bolrootgrp).
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -275,7 +282,8 @@
 
 #define FUNC_NAME "smf_iteratemap"
 
-void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
+void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
+                     const Grp *bolrootgrp,
                      AstKeyMap *keymap, const smfArray *darks,
                      const smfArray *bpms,
                      AstFrameSet *outfset, int moving, int *lbnd_out,
@@ -326,8 +334,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
   int ii;                       /* Loop counter */
   dim_t idx=0;                  /* index within subgroup */
   smfGroup *igroup=NULL;        /* smfGroup corresponding to igrp */
-  int iter;                     /* Iteration number */
   int isize;                    /* Number of files in input group */
+  int iter;                     /* Iteration number */
+  int itermap=0;                /* If set, produce maps each iteration */
   dim_t j;                      /* Loop counter */
   dim_t k;                      /* Loop counter */
   dim_t l;                      /* Loop counter */
@@ -462,6 +471,11 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
     /* Are we going to produce single-bolo maps? */
     if( !astMapGet0I( keymap, "BOLOMAP", &bolomap ) ) {
       bolomap = 0;
+    }
+
+    /* Are we going to produce maps for each iteration? */
+    if( !astMapGet0I( keymap, "ITERMAP", &itermap ) ) {
+      itermap = 0;
     }
 
     /* Are we going to set bad values in exported models? */
@@ -1266,6 +1280,53 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
             msgOutiff( MSG__DEBUG, "", FUNC_NAME
                        ": ** %f s rebinning map",
                        status, smf_timerupdate(&tv1,&tv2,status) );
+
+            /* If storing each iteration in an extension do it here if this
+               was the last chunk of data to be added */
+
+            if( itermap && (i == nchunks-1) ) {
+               Grp *mgrp=NULL;        /* Temporary group to hold map name */
+               smfData *imapdata=NULL;/* smfData for this iteration map */
+               char tmpname[GRP__SZNAM+1]; /* temp name buffer */
+               char tempstr[20];
+
+               /* Create a name for this iteration map, take into
+                  account the chunk number. Only required if we are
+                  using a single output container. */
+
+               pname = tmpname;
+               grpGet( iterrootgrp, 1, 1, &pname, sizeof(tmpname), status );
+               one_strlcpy( name, tmpname, sizeof(name), status );
+               one_strlcat( name, ".", sizeof(name), status );
+               if (ncontchunks > 1) {
+                 sprintf(tempstr, "CH%02lu", contchunk);
+                 one_strlcat( name, tempstr, sizeof(name), status );
+               }
+               sprintf( tempstr, "I%03i", iter+1 );
+               one_strlcat( name, tempstr, sizeof(name), status );
+               mgrp = grpNew( "itermap", status );
+               grpPut1( mgrp, name, 0, status );
+
+               msgOutf( "", "*** Writing map from this iteration to %s", status,
+                        name );
+
+               smf_open_newfile ( mgrp, 1, SMF__DOUBLE, 2, lbnd_out,
+                                  ubnd_out, SMF__MAP_VAR, &imapdata, status);
+
+               /* Copy over the signal and variance maps */
+               if( *status == SAI__OK ) {
+                 memcpy( imapdata->pntr[0], thismap, msize*sizeof(*thismap) );
+                 memcpy( imapdata->pntr[1], thisvar, msize*sizeof(*thismap) );
+               }
+
+               /* Write WCS */
+               smf_set_moving(outfset,status);
+               ndfPtwcs( outfset, imapdata->file->ndfid, status );
+
+               /* Clean up */
+               if( mgrp ) grpDelet( &mgrp, status );
+               smf_close_file( &imapdata, status );
+            }
           }
 
           /* Close files here if memiter not set */
@@ -1460,10 +1521,10 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
               /* Identify good bolos in the copied mask and produce a map */
               for( k=0; (k<nbolo)&&(*status==SAI__OK); k++ ) {
                 if( !(bolomask[k]&SMF__Q_BADB) ) {
-                  Grp *mgrp=NULL;        /* Temporary group to hold map names */
-                  smfData *mapdata=NULL; /* smfData for new map */
+                  Grp *mgrp=NULL;       /* Temporary group to hold map names */
+                  smfData *mapdata=NULL;/* smfData for new map */
                   char tmpname[GRP__SZNAM+1]; /* temp name buffer */
-                  char thisbol[20];      /* name particular to this bolometer */
+                  char thisbol[20];     /* name particular to this bolometer */
 
                   /* Set the quality back to good for this single bolometer */
                   qua_data[k*bstride] = bolomask[k];
@@ -1481,8 +1542,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
                     one_strlcat( name, tempstr, sizeof(name), status );
                   }
                   sprintf( thisbol, "C%02luR%02lu",
-                           (k % res[0]->sdata[idx]->dims[1])+1,    /* x-coord */
-                           (k / res[0]->sdata[idx]->dims[1])+1 );  /* y-coord */
+                           (k % res[0]->sdata[idx]->dims[1])+1,   /* x-coord */
+                           (k / res[0]->sdata[idx]->dims[1])+1 ); /* y-coord */
                   one_strlcat( name, thisbol, sizeof(name), status );
                   mgrp = grpNew( "bolomap", status );
                   grpPut1( mgrp, name, 0, status );
@@ -1491,7 +1552,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *bolrootgrp,
                            name );
 
                   smf_open_newfile ( mgrp, 1, SMF__DOUBLE, 2, lbnd_out,
-                                     ubnd_out, SMF__MAP_VAR, &mapdata, status );
+                                     ubnd_out, SMF__MAP_VAR, &mapdata, status);
 
                   /* Rebin the data for this single bolometer. Don't care
                      about variance weighting because all samples from

@@ -877,7 +877,7 @@ void smf_get_extpar( AstKeyMap *keymap, smf_tausrc *tausrc,
 
 size_t smf_get_findex( double f, double df, dim_t nf, int *status );
 
-size_t smf_get_freemem ( double * mbytes, size_t *pagesize, 
+size_t smf_get_freemem ( double * mbytes, size_t *pagesize,
                          size_t *physsize, int * status );
 
 void smf_get_gridcoords( double *row, double *col, int nrow, int ncol,
@@ -951,8 +951,10 @@ int smf_isdark( const smfData *data, int * status );
 int smf_isfft( const smfData *indata, dim_t *ntslice, dim_t *nbolo,
                dim_t *nf, int *status );
 
-void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp * bolrootgrp,
-                     AstKeyMap *keymap, const smfArray *darks, const smfArray *bpms,
+void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
+                     const Grp * bolrootgrp,
+                     AstKeyMap *keymap, const smfArray *darks,
+                     const smfArray *bpms,
                      AstFrameSet *outfset, int moving, int *lbnd_out,
                      int *ubnd_out, size_t maxmem, double *map,
                      unsigned int *hitsmap, double *mapvar,
