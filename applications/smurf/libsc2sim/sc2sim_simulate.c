@@ -408,7 +408,6 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   int curframe;                   /* current frame in context of entire
                                      simulation (not just this chunk) */
   int curms;                      /* current microstep (loop counter) */
-  char *curtok=NULL;              /* current subarray name being parsed */
   char dateobs[SZFITSCARD+1] = "\0";       /* DATE-OBS string for observation */
   int date_da;                    /* day corresponding to MJD */
   double date_df;                 /* day fraction corresponding to MJD */
@@ -498,7 +497,6 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   JCMTState state;                /* Telescope state at one time slice */
   double start_time=0.0;          /* UTC time of start of current scan */
   size_t steps_per_map = 0;       /* Number of steps in single pass of scan map */
-  char subarrays[8][80];          /* list of parsed subarray names */
   int subnum;                     /* Subarray number */
   int subscanno = 0;              /* Sub-scan number (last number in output filanem)*/
   double taiutc;                  /* Difference between TAI and UTC time (TAI-UTC s) */
@@ -1066,7 +1064,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
               inx->ra = raapp;
               inx->dec = decapp;
               /* Create frameset to allow sky2map mapping to be determined */
-              fitschan = astFitsChan ( NULL, NULL, "" );
+              fitschan = astFitsChan ( NULL, NULL, " " );
               sc2ast_makefitschan( astnaxes[0]/2.0, astnaxes[1]/2.0,
                                    (-astscale*DAS2D), (astscale*DAS2D),
                                    raapp*DR2D, decapp*DR2D,
@@ -1178,7 +1176,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
           /* Calculate boresight spherical horizontal coordinates */
 
-          fc = astFitsChan ( NULL, NULL, "" );
+          fc = astFitsChan ( NULL, NULL, " " );
 
           if( *status == SAI__OK ) {
             sc2ast_makefitschan( 0.0, 0.0, AST__DR2D, AST__DR2D,
