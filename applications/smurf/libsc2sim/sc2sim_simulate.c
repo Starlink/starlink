@@ -279,10 +279,12 @@
  *        Force sc2store to think it's initialized to avoid EMS stack warnings
  *     2008-10-10 (AGG):
  *        Add NOISE observations
+ *     2009-11-13 (TIMJ):
+ *        Use AST to determine pixel scale of astronomical image.
  *     {enter_further_changes_here}
 
  *  Copyright:
- *     Copyright (C) 2007-2008 Science and Technology Facilities Council.
+ *     Copyright (C) 2007-2009 Science and Technology Facilities Council.
  *     Copyright (C) 2006-2007 Particle Physics and Astronomy Research
  *     Council.
  *     Copyright (C) 2006-2008 University of British Columbia. All
@@ -564,18 +566,6 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       goto CLEANUP;
     }
 
-    /* Retrieve the astscale and atmscale from the FITS headers. */
-    if( *status == SAI__OK ) {
-      asthdr = astdata->hdr;
-      smf_fits_getD ( asthdr, "PIXSIZE", &astscale, status );
-      /* If PIXSIZE couldn't be found, then look for CDELT2 */
-      if ( *status != SAI__OK ) {
-        errAnnul(status);
-        smf_fits_getD ( asthdr, "CDELT2", &astscale, status );
-        astscale *= 3600.0; /* Convert from deg to arcsec */
-      }
-    }
-
     if( *status == SAI__OK ) {
       atmhdr = atmdata->hdr;
       smf_fits_getD ( atmhdr, "PIXSIZE", &atmscale, status );
@@ -640,6 +630,35 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
                status);
       }
     }
+
+    /* Retrieve the astscale and atmscale from the FITS headers. */
+    if( *status == SAI__OK ) {
+      double gridc[2];
+      double pixsc[2];
+
+      gridc[0] = astnaxes[0] / 2.0;
+      gridc[1] = astnaxes[1] / 2.0;
+
+      kpgPixsc( fitswcs, gridc, pixsc, NULL, NULL, 0, status );
+      if (*status == SAI__OK) {
+        astscale = (pixsc[0] + pixsc[1]) / 2.0;
+        astscale *= DR2AS;
+      } else {
+        errFlush(status);
+        errAnnul( status );
+        asthdr = astdata->hdr;
+        smf_fits_getD ( asthdr, "PIXSIZE", &astscale, status );
+        /* If PIXSIZE couldn't be found, then look for CDELT2 */
+        if ( *status != SAI__OK ) {
+          errAnnul(status);
+          smf_fits_getD ( asthdr, "CDELT2", &astscale, status );
+          astscale *= 3600.0; /* Convert from deg to arcsec */
+        }
+      }
+      msgOutiff( MSG__VERB, "","Input image has pixel scale of %.1f arcsec",
+                status, astscale );
+    }
+
 
   }/* if not hits-only */
 
