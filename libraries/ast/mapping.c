@@ -264,6 +264,9 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        Prevent memory over-run in RebinSeq<X>.
 *     5-MAY-2009 (DSB):
 *        Added astRemoveRegions.
+*     11-NOV-2009 (DSB):
+*        In astRebinSeq initialise "*nused" to zero (as documented) if the
+*        AST__REBININIT flag is supplied.
 *class--
 */
 
@@ -11689,6 +11692,7 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
             w = weights + npix_out; \
             for( ipix_out = 0; ipix_out < npix_out; ipix_out++, w++ ) *w = 0; \
          } \
+         *nused = 0; \
       } \
 \
 /* Perform the rebinning. Note that we pass all gridded data, the \
