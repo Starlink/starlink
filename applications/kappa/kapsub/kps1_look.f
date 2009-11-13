@@ -125,6 +125,8 @@
 *        Added CGList format.
 *     5-MAY-2009 (DSB):
 *        Added WList format.
+*     11-NOV-2009 (DSB):
+*        Fix formatting of axis and data values in WLIST mode.
 *     {enter_further_changes_here}
 
 *-
@@ -160,6 +162,7 @@
 
 *  External References:
       INTEGER CHR_LEN          ! Used length of a string
+
 *  Local Constants:
       INTEGER MXSTOR           ! No. of WCS positions to transform 
       PARAMETER( MXSTOR = 100 )
@@ -183,6 +186,7 @@
       PARAMETER( XGAP = 3    ) ! values in Strips format (one will be a ":").
 
 *  Local Variables:
+      CHARACTER CC*40          ! Buffer for formatted value
       DOUBLE PRECISION A       ! Value for first WCS axis
       DOUBLE PRECISION ASTORE( MXSTOR ) ! Stored WCS axis 1 values
       DOUBLE PRECISION B       ! Value for second WCS axis
@@ -190,6 +194,7 @@
       DOUBLE PRECISION POS( 2 )! Normalised WCS position
       DOUBLE PRECISION XSTORE( MXSTOR ) ! Stored pixel axis 1 values
       DOUBLE PRECISION YSTORE( MXSTOR ) ! Stored pixel axis 2 values
+      DOUBLE PRECISION VSTORE( MXSTOR ) ! Stored data values
       INTEGER COLWID           ! Max field width for a column in a "strip"
       INTEGER I                ! Loop index for stored positions
       INTEGER IAT              ! Length of string
@@ -204,7 +209,6 @@
       INTEGER VWID             ! Max field width for a data value
       INTEGER XWID             ! Max field width for an X pixel index
       INTEGER YWID             ! Max field width for a Y pixel index
-
 *.
 
 *  Check the global inherited status.
@@ -243,10 +247,10 @@
 
 *  Find the maximum field width for a pixel index or WCS coord value.
       IF( FORMAT .EQ. 'WLIST' ) THEN
-         CALL AST_TRAN2( MAP, 1, DBLE( XLO ), DBLE( YLO ), .TRUE.,
-     :                   A, B, STATUS )
-         XWID = CHR_LEN( AST_FORMAT( IWCS, 1, A, STATUS ) )
-         YWID = CHR_LEN( AST_FORMAT( IWCS, 2, B, STATUS ) )
+         CC = AST_FORMAT( IWCS, 1, AST__DPI, STATUS )
+         XWID = CHR_LEN( CC )
+         CC = AST_FORMAT( IWCS, 2, AST__DPI, STATUS )
+         YWID = CHR_LEN( CC )
 
       ELSE
          CALL CHR_ITOC( XLO, LINE, IAT )
@@ -262,10 +266,10 @@
          YWID = MAX( YWID, IAT )
       END IF
 
-*  Add an extra space onto all field widths.
-      VWID = VWID + 1
-      XWID = XWID + 1
-      YWID = YWID + 1
+*  Add two extra spaces onto all field widths.
+      VWID = VWID + 2
+      XWID = XWID + 2
+      YWID = YWID + 2
 
 *  Strips: Output consists of a set of rectangular blocks, displayed one after 
 *  the other. Each block represents a vertical strip covering the entire
@@ -437,7 +441,8 @@
 *  transformed.
                STORED = STORED + 1
                XSTORE( STORED ) = DBLE( IX ) - 0.5D0
-               YSTORE( STORED ) = DBLE( IX ) - 0.5D0
+               YSTORE( STORED ) = DBLE( IY ) - 0.5D0
+               VSTORE( STORED ) = ARRAY( IX, IY )
 
 *  If the store is now full, or if this is the last pixel, transform the
 *  stored pixel positions into WCS positions. 
@@ -456,23 +461,28 @@
                      POS( 2 ) = BSTORE( I )
                      CALL AST_NORM( IWCS, POS, STATUS )
 
-                     CALL CHR_APPND( AST_FORMAT( IWCS, 1, POS( 1 ), 
-     :                                           STATUS ), LINE, IAT )
+                     CC = AST_FORMAT( IWCS, 1, POS( 1 ), STATUS )
+                     CC( XWID: ) = ' '
+                     CALL CHR_APPND( CC, LINE, IAT )
+
                      IAT = XWID
                      JAT = IAT
-                     CALL CHR_APPND( AST_FORMAT( IWCS, 2, POS( 2 ), 
-     :                                           STATUS ), LINE, IAT )
+
+                     CC = AST_FORMAT( IWCS, 2, POS( 2 ), STATUS )
+                     CC( YWID: ) = ' '
+                     CALL CHR_APPND( CC, LINE, IAT )
+
                      IAT = JAT + YWID
 
-                     IF( ARRAY( IX, IY ) .EQ. VAL__BADD ) THEN
+                     IF( VSTORE( I ) .EQ. VAL__BADD ) THEN
                         CALL CHR_PUTC( BADTXT, LINE, IAT )
 	             
-                     ELSE IF( ARRAY( IX, IY ) .EQ. OUTVAL ) THEN
+                     ELSE IF( VSTORE( I ) .EQ. OUTVAL ) THEN
                         CALL CHR_PUTC( OUTTXT, LINE, IAT )
 	             
                      ELSE
                         CALL CHR_PUTC( AST_FORMAT( FRM, 1, 
-     :                                             ARRAY( IX, IY ), 
+     :                                             VSTORE( I ), 
      :                                             STATUS ), 
      :                                 LINE, IAT )
                      END IF
