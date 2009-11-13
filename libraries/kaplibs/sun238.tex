@@ -2261,9 +2261,9 @@ related items to be removed.
       input column in STACK is then used to estimate the range of
       values which represent the required sigma clipping.  Values
       outside of this range are then rejected and the resulting output
-      variance values are returned in the array RESULT.  The variances
-      are propagated through the combination process and returned in the
-      RESVAR array.
+      stasndard deviations are returned in the array RESULT.  The
+      variances are propagated through the combination process and
+      returned in the RESVAR array.
    }
    \sstinvocation{
       CALL CCG\_CS1x( NSIGMA, NPIX, NLINES, STACK, VARS, MINPIX, NMAT,
@@ -2317,12 +2317,12 @@ related items to be removed.
       \sstsubsection{
          RESULT( NPIX ) = ? (Returned)
       }{
-         The output line of data, i.e. the clipped variances.
+         The output line of data, i.e. the clipped standard deviations.
       }
       \sstsubsection{
          RESVAR( NPIX ) = ? (Returned)
       }{
-         The output variances of the clipped variances.
+         The output variances of the clipped standard deviations.
       }
       \sstsubsection{
          WRK1( NLINES ) = ? (Returned)
@@ -2437,7 +2437,7 @@ related items to be removed.
       \sstsubsection{
          RESULT( NPIX ) = ? (Returned)
       }{
-         The output line of data.
+         The output line of clipped standard deviations.
       }
       \sstsubsection{
          WRK1( NLINES ) = ? (Returned)
@@ -26777,7 +26777,7 @@ related items to be removed.
       the NDF Units component.
    }
    \sstinvocation{
-      CALL KPG1\_SAXAT( INDF, MCOMP, AXIS, LOG, FRAME, STATUS )
+      CALL KPG1\_SAXAT( INDF, COMP, AXIS, LOG, FRAME, STATUS )
    }
    \sstarguments{
       \sstsubsection{
@@ -26786,7 +26786,7 @@ related items to be removed.
          An identifier for the NDF being described.
       }
       \sstsubsection{
-         MCOMP = CHARACTER $*$ ( $*$ ) (Given)
+         COMP = CHARACTER $*$ ( $*$ ) (Given)
       }{
          The name of the NDF array component being described.
       }
@@ -39169,6 +39169,52 @@ related items to be removed.
          \sstitem
          The sorting is recorded in an index leaving the order of the
          supplied array values intact.
+      }
+   }
+}
+\sstroutine{
+   KPG1\_CH2PM
+}{
+   Create an AST PolyMap describing a Starlink POLYNOMIAL HDS structure
+}{
+   \sstdescription{
+      This routine creates an AST PolyMap that implements the
+      polynomial transformation described by a supplied Starlink
+      POLYNOMIAL structure (see SGP/38).
+   }
+   \sstinvocation{
+      CALL KPG1\_CH2PM( LOC, POLYMAP, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         LOC = CHARACTER $*$ ( DAT\_\_SZLOC ) (Given)
+      }{
+         An HDS locator for the POLYNOMIAL structure.
+      }
+      \sstsubsection{
+         POLYMAP = INTEGER (Returned)
+      }{
+         An AST pointer to the new PolyMap.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The returned PolyMap has a defined forward transformation
+         (equivalent to the supplied POLYNOMIAL), but no inverse
+         transformation.
+
+         \sstitem
+         Both CHEBYSHEV and SIMPLE variants of the POLYNOMIAL structure
+         are supported. But currently only 1- or 2- dimensional Chebyshev
+         polynomials can be handled. An error is reported for Chebyshev
+         polynomials of higher dimensionality.
       }
    }
 }

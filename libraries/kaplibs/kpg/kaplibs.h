@@ -155,5 +155,6 @@ void fts1Astwn( AstFitsChan *, int, int * );
 void kpg1Ky2hd( AstKeyMap *, HDSLoc *, int * );
 void kpg1Elgau( float *, float *, float *, float *, int * );
 void kpg1Loctd( int, const int *, const int *, const double *, const float *, const int *, int, const float *, int, float, int, float *, float *, int * );
+void kpg1Ch2pm( HDSLoc *, AstPolyMap **, int * );
 
 #endif

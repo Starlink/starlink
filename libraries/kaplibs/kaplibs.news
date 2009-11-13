@@ -7,6 +7,9 @@ and which may be of use to anyone developing their own KAPPA-like
 applications (see SUN/238).
 
 Version 3.0
+   - KPG_CH2PM added.  It creates an AST PolyMap that performs a
+     polynomial transformation equivalent to a supplied Starlink
+     POLYNOMIAL structure (Chebshev and simple are both supported).
    - CTG, IRQ, and LPG libraries are no longer in KAPLIBS.  They are 
      autonomous libraries each with its own documentation and link
      scripts.
