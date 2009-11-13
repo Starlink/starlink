@@ -482,6 +482,7 @@ void smurf_calcflat( int *status ) {
   if (darks) smf_close_related( &darks, status );
   if (igrp) grpDelet( &igrp, status);
   if (ogrp) grpDelet( &ogrp, status);
+  if (fgrp) grpDelet( &fgrp, status);
   if (dkgrp) grpDelet( &dkgrp, status );
   if (resistance) resistance = smf_free( resistance, status );
   if (pixheat) pixheat = smf_free( pixheat, status );
