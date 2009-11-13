@@ -76,6 +76,8 @@
 *        Removed IRQ interfaces.
 *     5-NOV-2009 (DSB):
 *        Add kpg1Loctd.
+*     13-NOV-2009 (TIMJ):
+*        Add kpg1_pixsc
 *     {enter_further_changes_here}
 
 *-
@@ -1290,3 +1292,79 @@ void kpg1Loctd( int ndim, const int *lbnd, const int *ubnd,
 }
 
 
+F77_SUBROUTINE(kpg1_pixsc)( INTEGER(IWCS),
+                            DOUBLE_ARRAY(AT),
+                            DOUBLE_ARRAY(PIXSC),
+                            CHARACTER_ARRAY(VALUE),
+                            CHARACTER_ARRAY(UNIT),
+                            INTEGER(STATUS) TRAIL(VALUE) TRAIL(UNIT));
+
+void kpgPixsc( AstFrameSet * iwcs,
+               const double at[],
+               double pixsc[],
+               char *const *value,
+               char *const *unit,
+               int chrarr_length,
+               int *status ) {
+  int nwcs;
+  int nin;
+  int strlength;
+
+  DECLARE_INTEGER( IWCS );
+  DECLARE_DOUBLE_ARRAY_DYN( AT );
+  DECLARE_DOUBLE_ARRAY_DYN( PIXSC );
+  DECLARE_CHARACTER_ARRAY_DYN( VALUE );
+  DECLARE_CHARACTER_ARRAY_DYN( UNIT );
+  DECLARE_INTEGER( STATUS );
+
+  if (*status != SAI__OK) return;
+  if (! iwcs) return;
+
+  /* We need to know how much space to allocate for the return arrays
+     in the fortran side */
+  nwcs = astGetI( iwcs, "Nout" );
+  nin = astGetI( iwcs, "Nin" );
+
+  /* if the returned char array pointers are null we set a length
+     that will work */
+  if ( (value) || unit && chrarr_length > 0) {
+    strlength = chrarr_length;
+  } else {
+    strlength = 40;
+  }
+
+  F77_CREATE_DOUBLE_ARRAY( PIXSC, nwcs );
+  F77_CREATE_DOUBLE_ARRAY( AT, nwcs );
+  F77_CREATE_CHARACTER_ARRAY( VALUE, strlength-1, nwcs );
+  F77_CREATE_CHARACTER_ARRAY( UNIT, strlength-1, nwcs );
+  F77_EXPORT_DOUBLE_ARRAY( at, AT, nin );
+  F77_ASSOC_DOUBLE_ARRAY( PIXSC, pixsc );
+  F77_EXPORT_INTEGER( astP2I( iwcs ), IWCS );
+  F77_EXPORT_INTEGER( *status, STATUS );
+
+  F77_CALL(kpg1_pixsc)( INTEGER_ARG(&IWCS),
+                        DOUBLE_ARRAY_ARG(AT),
+                        DOUBLE_ARRAY_ARG(PIXSC),
+                        CHARACTER_ARRAY_ARG(VALUE),
+                        CHARACTER_ARRAY_ARG(UNIT),
+                        INTEGER_ARG(&STATUS)
+                        TRAIL_ARG(VALUE)
+                        TRAIL_ARG(UNIT) );
+
+  F77_IMPORT_INTEGER( STATUS, *status );
+  if (pixsc) {
+    F77_IMPORT_DOUBLE_ARRAY( PIXSC, pixsc, nwcs );
+  }
+  if (value && chrarr_length > 0) {
+    F77_IMPORT_CHARACTER_ARRAY_P( VALUE, VALUE_length, value, strlength,
+                                  nwcs );
+  }
+  if (unit && chrarr_length > 0) {
+    F77_IMPORT_CHARACTER_ARRAY_P( UNIT, UNIT_length, unit, strlength,
+                                  nwcs );
+  }
+  F77_FREE_CHARACTER(VALUE);
+  F77_FREE_CHARACTER(UNIT);
+
+  return;
+}

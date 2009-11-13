@@ -80,6 +80,8 @@
 *        Removed IRQ interfaces, macros, and type definitions.
 *     5-NOV-2009 (DSB):
 *        Add kpg1Loctd.
+*     13-NOV-2009 (TIMJ):
+*        Add kpg1_pixsc
 *     {enter_further_changes_here}
 
 *-
@@ -157,5 +159,14 @@ void kpg1Ky2hd( AstKeyMap *, HDSLoc *, int * );
 void kpg1Elgau( float *, float *, float *, float *, int * );
 void kpg1Loctd( int, const int *, const int *, const double *, const float *, const int *, int, const float *, int, float, int, float *, float *, int * );
 void kpg1Ch2pm( HDSLoc *, AstPolyMap **, int * );
+
+void kpgPixsc( AstFrameSet * iwcs,
+               const double at[],
+               double pixsc[],
+               char *const *value, /* can be NULL */
+               char *const *unit, /* can be NULL */
+               int chrarr_length, /* length of each element in "value" and "unit". Can be 0 if no value/unit required */
+               int *status );
+
 
 #endif
