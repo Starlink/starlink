@@ -279,8 +279,8 @@ void smurf_stackframes( int *status ) {
 	    refndims);
   }
 
-  msgOutf( " ", "Input files all have dimensions of %zu x %zu", status,
-	   (size_t)refdims[0], (size_t)refdims[1] );
+  msgOutf( " ", "All %zu input files have dimensions of %zu x %zu", status,
+	   size, (size_t)refdims[0], (size_t)refdims[1] );
 
   /* Now need to sort the files into time order. We have the dates and indices */
   if (dosort) qsort( sortinfo, size, sizeof(*sortinfo), smf_sort_bytime );
