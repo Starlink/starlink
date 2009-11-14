@@ -68,6 +68,8 @@
 *     2009 October 9 (TIMJ):
 *        - Include NDF name in default label.
 *        - Append component to label if not DATA
+*     2009 November 13 (MJC):
+*        Append component name of known length.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -162,7 +164,8 @@
             CALL CHR_UCASE( CMPNAM )
             CALL CHR_LDBLK( CMPNAM )
             IF ( CMPNAM(:2) .NE. 'DA') THEN
-               CALL CHR_APPND( ' '//COMP, LABEL, NCLAB )
+               CMPNAM = COMP
+               CALL CHR_APPND( ' '//CMPNAM, LABEL, NCLAB )
             END IF
 
          END IF
