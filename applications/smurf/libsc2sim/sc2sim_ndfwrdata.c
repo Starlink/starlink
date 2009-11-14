@@ -699,9 +699,9 @@ void sc2sim_ndfwrdata
 
   /* Store the timestream data */
   sc2store_wrtstream ( file_name, subnum, nrec, fitsrec, inx->colsize,
-                       inx->rowsize, numsamples, nflat, flatname, head,
+                       inx->rowsize, numsamples, nflat, 0, flatname, head,
                        &telpar, dbuf, dksquid, fcal, fpar, inx->obsmode,
-                       NULL, 0, jigvert, inx->nvert, jigptr, jigsamples,
+                       NULL, NULL, 0, jigvert, inx->nvert, jigptr, jigsamples,
                        NULL, status );
 
   /* Create SCU2RED extension for storing polynomial fits and

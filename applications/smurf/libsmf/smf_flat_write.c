@@ -205,9 +205,9 @@ void smf_flat_write( const char * flatname, const smfArray * bbhtframes,
   sc2store_setcompflag ( 0, status );
   sc2store_wrtstream ( flatname, subnum, ncards,
                        fitsrec, colsize, rowsize, bbhtframes->ndat,
-                       bbhtframes->ndat, "TABLE", state, NULL,
+                       bbhtframes->ndat, 0, "TABLE", state, NULL,
                        ibuf, dksquid, bolref, powref, "FLATCAL",
-                       mcehead, mceheadsz, jig_vert,
+                       mcehead, NULL, mceheadsz, jig_vert,
                        nvert, jig_path, npath, xmlfile, status );
 
   sc2store_free ( status );

@@ -67,6 +67,7 @@ static void sc2store_fillbounds( size_t colsize, size_t rowsize, size_t dim3,
 static HDSLoc *sc2store_bscaleloc = NULL;    /* HDS locator to scale factor */
 static int sc2store_compflag = 1;            /* flag enabling data compression */
 static int sc2store_dindf = NDF__NOID;       /* NDF identifier for dark SQUID values */
+static int sc2store_htindf = NDF__NOID;      /* NDF identifier for heater track values */
 static HDSLoc *sc2store_dreamwtloc = NULL;   /* HDS locator to DREAM weights */
 static HDSLoc *sc2store_drmloc = NULL;       /* HDS locator to DREAM parameters */
 static char sc2store_errmess[132];           /* error string */
@@ -556,6 +557,14 @@ int *status          /* global status (given and returned) */
 /* Release Header values for each frame */
 
    sc2store_headunmap ( &tstatus );
+
+/* Release heater tracking values for each frame */
+
+   if ( sc2store_htindf != NDF__NOID )
+   {
+      ndfUnmap ( sc2store_htindf, "DATA", &tstatus );
+      ndfAnnul ( &sc2store_htindf, &tstatus );
+   }
 
 /* Release Dark SQUID values for each frame */
 
@@ -2991,8 +3000,10 @@ const char *filename,    /* name of HDS container file (given) */
 size_t colsize,          /* number of pixels in a column (given) */
 size_t rowsize,          /* number of pixels in a row (given) */
 size_t nframes,          /* number of frames (given) */
+size_t ntrack,           /* number of bolometers used for heater tracking (given) */
 const int *dbuf,         /* time stream data (given) */
 const int *dksquid,      /* dark SQUID time stream data (given) */
+const int *trackinfo,    /* 3xntrack int array with (col,row,heat) groups (given) */
 int *status              /* global status (given and returned) */
 )
 /*
@@ -3011,6 +3022,7 @@ int *status              /* global status (given and returned) */
     09Nov2007 : store global BSCALE (bdk)
     12Nov2007 : make main data array short rather than unsigned short (bdk)
     17Aug2009 : Write explicit history message (timj)
+    13Nov2009 : Add heater track info (timj)
 */
 
 {
@@ -3172,6 +3184,70 @@ int *status              /* global status (given and returned) */
             0, 0, 0, sc2store_indf, status );
 #endif
 
+/* Heater tracking information. We have an array that is 3 x ntrack in size
+   where the order is (col1, row1, heat1), (col2, row2, heat2 )...
+   We need to determine the maximum extent of col and row and create an 2d
+   image accordingly with the correct pixel origin.
+*/
+   if (ntrack > 0 && trackinfo ) {
+     const int * thistrack = trackinfo;
+     int * hpntr = NULL;
+     int sdims[2];  /* number of dimensions in subset of image */
+
+     /* these are flipped because we are calculating the min/max */
+     ubnd[0] = 0;
+     ubnd[1] = 0;
+     lbnd[SC2STORE__ROW_INDEX] = colsize + SC2STORE__BOL_LBND - 1;
+     lbnd[SC2STORE__COL_INDEX] = rowsize + SC2STORE__BOL_LBND - 1;
+
+     for ( j = 0; j < ntrack; j++ ) {
+       int colnum = thistrack[0];
+       int rownum = thistrack[1];
+       if (colnum > ubnd[SC2STORE__COL_INDEX]) ubnd[SC2STORE__COL_INDEX] = colnum;
+       if (rownum > ubnd[SC2STORE__ROW_INDEX]) ubnd[SC2STORE__ROW_INDEX] = rownum;
+       if (colnum < lbnd[SC2STORE__COL_INDEX]) lbnd[SC2STORE__COL_INDEX] = colnum;
+       if (colnum < lbnd[SC2STORE__ROW_INDEX]) lbnd[SC2STORE__ROW_INDEX] = rownum;
+       thistrack += 3;
+     }
+
+     /* now create the extension and map it */
+     ndfPlace ( sc2store_scuba2loc, "TRACKINFO", &place, status );
+     ndfNew ( "_INTEGER", 2, lbnd, ubnd, &place, &sc2store_htindf, status );
+
+     ndfMap ( sc2store_htindf, "DATA", "_INTEGER", "WRITE/BAD", (void *)(&hpntr),
+              &el, status );
+
+     /* calculate dimensions */
+     sdims[SC2STORE__COL_INDEX] = ubnd[SC2STORE__COL_INDEX]
+       - lbnd[SC2STORE__COL_INDEX] + 1;
+     sdims[SC2STORE__ROW_INDEX] = ubnd[SC2STORE__ROW_INDEX]
+       - lbnd[SC2STORE__ROW_INDEX] + 1;
+
+     thistrack = trackinfo;
+     for ( j = 0; j < ntrack; j++ ) {
+       int colnum = thistrack[0];
+       int rownum = thistrack[1];
+       int offset = 0;
+
+       /* offset into data array must take into account the lbnd */
+       colnum -= lbnd[SC2STORE__COL_INDEX];
+       rownum -= lbnd[SC2STORE__ROW_INDEX];
+
+       if ( SC2STORE__COL_INDEX == 0 ) {
+         offset = colnum + (rownum * sdims[0]);
+       } else {
+         offset = rownum + (colnum * sdims[0]);
+       }
+
+       /* and store the value in the correct place */
+       hpntr[offset] = thistrack[2];
+
+       /* skip round to the next group */
+       thistrack += 3;
+     }
+   }
+
+
 /* Dark SQUID values for each frame */
 
    ubnd[0] = rowsize + SC2STORE__BOL_LBND - 1;
@@ -3262,6 +3338,7 @@ size_t colsize,             /* number of bolometers in column (given) */
 size_t rowsize,             /* number of bolometers in row (given) */
 size_t nframes,             /* number of frames (given) */
 size_t nflat,               /* number of flat coeffs per bol (given) */
+size_t ntrack,              /* number of bolometers used for heater tracking (given) */
 const char *flatname,       /* name of flatfield algorithm (given) */
 const JCMTState head[],     /* header data for each frame (given) */
 const SC2STORETelpar* telpar, /* Additional telescope information (given) */
@@ -3271,6 +3348,7 @@ const double *flatcal,      /* flat-field calibration (given) */
 const double *flatpar,      /* flat-field parameters (given) */
 const char *obsmode,        /* Observing mode (given) */
 const int *mcehead,         /* MCE header for each sample (given) */
+const int *trackinfo,       /* 3xntrack int array with (col,row,heat) groups (given) */
 size_t mceheadsz,           /* number of values per MCE header (given) */
 int jigvert[][2],           /* Array of jiggle vertices (given) */
 size_t nvert,               /* Number of jiggle vertices (given) */
@@ -3302,6 +3380,7 @@ int *status                 /* global status (given and returned) */
      25Oct2007 : use RTS_END time for call to timeWcs (bdk)
      11Nov2007 : make compressed data short instead of unsigned short (bdk)
      13Nov2007 : divide by sc2store_wrbscale (bdk)
+     13Nov2009 : Add heater track info (timj)
 */
 
 {
@@ -3321,8 +3400,8 @@ int *status                 /* global status (given and returned) */
 
 /* Map all the data arrays */
 
-   sc2store_writeraw ( filename, colsize, rowsize, nframes, dbuf, dksquid, 
-     status );
+   sc2store_writeraw ( filename, colsize, rowsize, nframes, ntrack, dbuf, dksquid,
+                       trackinfo, status );
    sc2store_writeflatcal ( colsize, rowsize, nflat, flatname, flatcal, flatpar,
      status );
 

@@ -407,8 +407,10 @@ const char *filename,    /* name of HDS container file (given) */
 size_t colsize,          /* number of pixels in a column (given) */
 size_t rowsize,          /* number of pixels in a row (given) */
 size_t nframes,          /* number of frames (given) */
+size_t ntrack,           /* number of bolometers used for heater tracking (given) */
 const int *dbuf,         /* time stream data (given) */
 const int *dksquid,      /* dark SQUID time stream data (given) */
+const int *trackinfo,    /* 3xntrack int array with (col,row,heat) groups (given) */
 int *status              /* global status (given and returned) */
 );
 
@@ -434,6 +436,7 @@ size_t colsize,             /* number of bolometers in column (given) */
 size_t rowsize,             /* number of bolometers in row (given) */
 size_t nframes,             /* number of frames (given) */
 size_t nflat,               /* number of flat coeffs per bol (given) */
+size_t ntrack,              /* number of bolometers used for heater tracking (given) */
 const char *flatname,       /* name of flatfield algorithm (given) */
 const JCMTState head[],     /* header data for each frame (given) */
 const SC2STORETelpar* telpar, /* Additional telescope information (given) */
@@ -443,6 +446,7 @@ const double *flatcal,      /* flat-field calibration (given) */
 const double *flatpar,      /* flat-field parameters (given) */
 const char *obsmode,        /* Observing mode (given) */
 const int *mcehead,         /* MCE header for each sample (given) */
+const int *trackinfo,       /* 3xntrack int array with (col,row,heat) groups (given) */
 size_t mceheadsz,           /* number of values per MCE header (given) */
 int jigvert[][2],           /* Array of jiggle vertices (given) */
 size_t nvert,               /* Number of jiggle vertices (given) */
