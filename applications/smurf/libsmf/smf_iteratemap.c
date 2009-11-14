@@ -227,6 +227,8 @@
 *     2009-11-12 (EC):
 *        Add itermap and iterrootgrp to enable writing of intermediate maps
 *        after each iteration (matching style of bolomap and bolrootgrp).
+*     2009-11-13 (EC):
+*        If chi^2 increases don't set converged flag; warn user.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -1370,13 +1372,24 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                   ((iter > 1)&&(whichnoi>whichast)) ) {
                 /* Again, we have to check if NOI was calculated at least
                    twice, which depends on NOI and AST in MODELORDER */
-                msgSetd("DIFF", chisquared[i]-lastchisquared[i]);
+
+                double chidiff;   /* temporary variable to store diff */
+
+                chidiff = chisquared[i]-lastchisquared[i];
+
+                msgSetd("DIFF", chidiff);
                 msgOut( " ",
                         FUNC_NAME ": *** change: ^DIFF", status );
 
+                if( chidiff > 0 ) {
+                  msgOut( " ", FUNC_NAME
+                          ": ****** WARNING! CHISQUARED Increased ******",
+                          status );
+                }
+
                 /* Check for the stopping criterion */
                 if( untilconverge ) {
-                  if( (lastchisquared[i]-chisquared[i]) > chitol ) {
+                  if( (chidiff > 0) || (-chidiff > chitol) ) {
                     /* Found a chunk that isn't converged yet */
                     converged=0;
                   }
