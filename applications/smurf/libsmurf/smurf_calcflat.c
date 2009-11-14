@@ -22,7 +22,7 @@
 *  Description:
 *     This routine can calculate a flatfield solution from a flatfield observation.
 *
-*     The flatfield observation consists of a series of dark measurements taken at 
+*     The flatfield observation consists of a series of measurements taken at
 *     various pixel heater settings. One standard SCUBA-2 raw data file is stored for
 *     each measurement.
 *
@@ -31,7 +31,7 @@
 *     to the optimum which is used as a reference to subtract pixel zero-point drifts.
 
 *  Notes:
-*     - Does not yet enforce the observation to be of type FLATFIELD.
+*     - Works with Dark and Sky flatfields but not with black-body flatfields.
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
@@ -87,6 +87,8 @@
 *     2009-09-02 (TIMJ):
 *        Write RESP provenance after OUT parameter has been defaulted. This
 *        was causing odd problems in the pipeline.
+*     2009-11-13 (TIMJ):
+*        Add support for sky flatfields
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -143,6 +145,9 @@
 #define FUNC_NAME "smurf_calcflat"
 #define TASK_NAME "CALCFLAT"
 
+/* minimum number of files for a good flatfield */
+#define MINFLAT 5
+
 void smurf_calcflat( int *status ) {
 
   smfArray * bbhtframe = NULL; /* Data (non-reference) frames */
@@ -152,6 +157,7 @@ void smurf_calcflat( int *status ) {
   Grp * dkgrp = NULL;       /* Group of darks */
   char defname[GRP__SZNAM+1]; /* default output file name */
   char flatname[GRP__SZNAM+1]; /* Actual output file name */
+  smfArray * flatfiles = NULL; /* Flatfield data from all files */
   Grp *flatgrp = NULL;      /* Output flatfield group */
   size_t flatsize;          /* Size ouf output flatfield group */
   Grp * fgrp = NULL;        /* Filtered group */
@@ -162,7 +168,7 @@ void smurf_calcflat( int *status ) {
   size_t nbols;             /* Number of bolometers */
   int ncols;                /* Number of columns */
   int nrows;                /* Number of rows */
-  size_t ndarks;            /* Number of darks to process */
+  size_t nflatfiles;        /* Number of flatfield files to process */
   size_t ngood;             /* Number of good responsivities */
   Grp *igrp = NULL;         /* Input group of files */
   int obsnum;               /* Observation number */
@@ -186,19 +192,10 @@ void smurf_calcflat( int *status ) {
   ndfBegin();
 
   /* Get input file(s) */
-  kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
+  kpg1Rgndf( "IN", 0, MINFLAT, "", &igrp, &size, status );
 
   /* Find darks (might be all) */
   smf_find_darks( igrp, &fgrp, &dkgrp, 1, SMF__DOUBLE, &darks, status );
-
-  if (!darks || darks->ndat < 3) {
-    if (*status == SAI__OK) {
-      *status = SAI__ERROR;
-      errRep( " ","Flatfield observation must include at least three darks",
-              status);
-    }
-    goto CLEANUP;
-  }
 
   /* input group is now the filtered group so we can use that and
      free the old input group */
@@ -206,6 +203,38 @@ void smurf_calcflat( int *status ) {
   grpDelet( &igrp, status);
   igrp = fgrp;
   fgrp = NULL;
+
+  /* See whether we had all darks or science + dark */
+  if ( size == 0 ) {
+    /* everything is in the dark */
+    flatfiles = darks;
+    darks = NULL;
+  } else {
+    const float clip[] = { 3.0 };
+    flatfiles = smf_create_smfArray( status );
+    if (*status == SAI__OK) {
+      for (i = 1; i <= size; i++ ) {
+        smfData *outfile = NULL;
+        smfData *infile = NULL;
+        if (*status != SAI__OK) break;
+        smf_open_file( igrp, i, "READ", 0, &infile, status );
+
+        if (*status == SAI__OK && infile
+            && infile->hdr->obstype != SMF__TYP_FLATFIELD) {
+          *status = SAI__ERROR;
+          errRep( "", "Attempting to run calcflat on a non-flatfield observation",
+                  status );
+        }
+
+        /* calculate mean and standard deviation and throw out
+           S/N < 1 and constant signal data. Also clip at 3sigma */
+        smf_collapse_tseries( infile, 1, clip, 1.0, 1, SMF__DOUBLE,
+                              &outfile, status );
+        smf_close_file( &infile, status );
+        smf_addto_smfArray( flatfiles, outfile, status );
+      }
+    }
+  }
 
   /* get the reference pixel heater resistance */
   parGdr0d("REFRES", 2.0, 0, VAL__MAXD, 1, &refohms, status );
@@ -260,39 +289,38 @@ void smurf_calcflat( int *status ) {
   }
 
 
-  /* a full dark flatfield will be obvious */
-  if ( size == 0 ) {
+  if ( *status == SAI__OK ) {
 
     /* Get reference subarray */
-    smf_find_subarray( (darks->sdata)[0]->hdr, subarray, sizeof(subarray), &subnum, status );
+    smf_find_subarray( (flatfiles->sdata)[0]->hdr, subarray, sizeof(subarray), &subnum, status );
     if (*status != SAI__OK) goto CLEANUP;
 
     /* Check row vs column count */
-    if ( ((darks->sdata)[0]->dims)[SC2STORE__COL_INDEX] != (size_t)ncols ||
-         ((darks->sdata)[0]->dims)[SC2STORE__ROW_INDEX] != (size_t)nrows ) {
+    if ( ((flatfiles->sdata)[0]->dims)[SC2STORE__COL_INDEX] != (size_t)ncols ||
+         ((flatfiles->sdata)[0]->dims)[SC2STORE__ROW_INDEX] != (size_t)nrows ) {
       *status = SAI__ERROR;
       msgSeti( "RC", ncols );
       msgSeti( "RR", nrows );
-      msgSeti( "DC", ((darks->sdata)[0]->dims)[SC2STORE__COL_INDEX]);
-      msgSeti( "DR", ((darks->sdata)[0]->dims)[SC2STORE__ROW_INDEX]);
+      msgSeti( "DC", ((flatfiles->sdata)[0]->dims)[SC2STORE__COL_INDEX]);
+      msgSeti( "DR", ((flatfiles->sdata)[0]->dims)[SC2STORE__ROW_INDEX]);
       errRep( " ", "Dimensions of subarray from resistor file (^RC x ^RR)"
               " do not match those of data file (^DC x ^DR)", status );
       goto CLEANUP;
     }
 
     /* check that we are all from the same observation and same subarray */
-    for (i = 1; i < darks->ndat; i++) {
+    for (i = 1; i < flatfiles->ndat; i++) {
       int nsub;
 
-      if (strcmp( (darks->sdata)[0]->hdr->obsidss,
-                  (darks->sdata)[i]->hdr->obsidss ) != 0 ) {
+      if (strcmp( (flatfiles->sdata)[0]->hdr->obsidss,
+                  (flatfiles->sdata)[i]->hdr->obsidss ) != 0 ) {
         *status = SAI__ERROR;
         errRep(" ", "Flatfield can not be calculated from multiple observations",
                status);
         goto CLEANUP;
       }
 
-      smf_find_subarray( (darks->sdata)[i]->hdr, NULL, 0, &nsub, status );
+      smf_find_subarray( (flatfiles->sdata)[i]->hdr, NULL, 0, &nsub, status );
       if (nsub != subnum) {
         *status = SAI__ERROR;
         errRep( " ", "Flatfield command does not yet handle multiple subarrays in a single call",
@@ -302,16 +330,16 @@ void smurf_calcflat( int *status ) {
 
     }
 
-    /* Okay, single observation, darks in time order */
+    /* Okay, single observation, flatfield files in time order */
 
     /* Report reference heater setting */
-    smf_fits_getD( (darks->sdata)[0]->hdr, "PIXHEAT", &heatref,
+    smf_fits_getD( (flatfiles->sdata)[0]->hdr, "PIXHEAT", &heatref,
                    status );
     msgSetd( "PX", heatref );
     msgOutif( MSG__NORM, " ", "Reference heater setting: ^PX", status );
 
     /* get some memory for pixel heater settings */
-    pixheat = smf_malloc( darks->ndat, sizeof(*pixheat), 0, status );
+    pixheat = smf_malloc( flatfiles->ndat, sizeof(*pixheat), 0, status );
 
     /* and some memory for non-reference frames */
     bbhtframe = smf_create_smfArray( status );
@@ -320,34 +348,34 @@ void smurf_calcflat( int *status ) {
     /* this smfArray does not own the data */
     bbhtframe->owndata = 0;
 
-    /* Need odd number of darks */
-    ndarks = darks->ndat;
-    if (darks->ndat % 2 == 0) {
+    /* Need odd number of flatfiles */
+    nflatfiles = flatfiles->ndat;
+    if (flatfiles->ndat % 2 == 0) {
       msgOutif( MSG__NORM, " ",
-                "Observed an even number of darks. Dropping last dark from processing.",
+                "Observed an even number of sequences. Dropping last one from processing.",
                 status);
-      ndarks--;
+      nflatfiles--;
     }
 
     /* Loop over every other frame. Assumes start and end on dark
-       but note that this branch assumes all files are darks but with
+       but note that this branch assumes all files are flatfield observations but with
        varying PIXHEAT */
-    for (i = 1; i < ndarks; i+=2) {
+    for (i = 1; i < nflatfiles; i+=2) {
       double heater;
       double ref1;
       double ref2;
 
       /* get the pixel heater settings and make sure they are consistent */
-      smf_fits_getD( (darks->sdata)[i]->hdr, "PIXHEAT", &heater,
+      smf_fits_getD( (flatfiles->sdata)[i]->hdr, "PIXHEAT", &heater,
                      status );
 
       msgSetd( "PX", heater );
       msgOutif( MSG__NORM, " ", "Processing heater setting ^PX", status );
 
       /* Get reference */
-      smf_fits_getD( (darks->sdata)[i-1]->hdr, "PIXHEAT", &ref1,
+      smf_fits_getD( (flatfiles->sdata)[i-1]->hdr, "PIXHEAT", &ref1,
                      status );
-      smf_fits_getD( (darks->sdata)[i+1]->hdr, "PIXHEAT", &ref2,
+      smf_fits_getD( (flatfiles->sdata)[i+1]->hdr, "PIXHEAT", &ref2,
                      status );
 
       if (ref1 != heatref || ref2 != heatref) {
@@ -356,18 +384,18 @@ void smurf_calcflat( int *status ) {
           msgSetd( "REF", heatref );
           msgSetd( "R1", ref1 );
           msgSetd( "R2", ref2 );
-          errRep( " ", "Bracketing darks have inconsistent heater settings"
+          errRep( " ", "Bracketing sequences have inconsistent heater settings"
                   " (^REF ref cf ^R1 and ^R2)", status );
           break;
         }
       }
 
-      /* Subtract darks using MEAN */
-      smf_subtract_dark( (darks->sdata)[i], (darks->sdata)[i-1],
-                         (darks->sdata)[i+1], SMF__DKSUB_MEAN, status);
+      /* Subtract bracketing files using MEAN */
+      smf_subtract_dark( (flatfiles->sdata)[i], (flatfiles->sdata)[i-1],
+                         (flatfiles->sdata)[i+1], SMF__DKSUB_MEAN, status);
 
       /* Store the frame for later */
-      smf_addto_smfArray( bbhtframe, (darks->sdata)[i], status );
+      smf_addto_smfArray( bbhtframe, (flatfiles->sdata)[i], status );
 
       pixheat[bbhtframe->ndat - 1] = heater;
 
@@ -470,9 +498,6 @@ void smurf_calcflat( int *status ) {
       smf_close_file( &respmap, status );
     }
 
-  } else {
-    *status = SAI__ERROR;
-    errRep( " ", "Blackbody flatfield not yet supported", status );
   }
 
 
@@ -480,6 +505,7 @@ void smurf_calcflat( int *status ) {
  CLEANUP:
   if (bbhtframe) smf_close_related( &bbhtframe, status );
   if (darks) smf_close_related( &darks, status );
+  if (flatfiles) smf_close_related( &flatfiles, status );
   if (igrp) grpDelet( &igrp, status);
   if (ogrp) grpDelet( &ogrp, status);
   if (fgrp) grpDelet( &fgrp, status);
