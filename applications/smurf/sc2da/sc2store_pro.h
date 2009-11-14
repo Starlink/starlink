@@ -24,25 +24,6 @@ void sc2store_creimages
 int *status              /* global status (given and returned) */
 );
 
-/*+ sc2store_cremap - create HDS container file and map data arrays */
-
-void sc2store_cremap
-(
-const char *filename,    /* name of HDS container file (given) */
-size_t colsize,          /* number of pixels in a column (given) */
-size_t rowsize,          /* number of pixels in a row (given) */
-size_t nframes,          /* number of frames (given) */
-size_t nflat,            /* number of flat coeffs per bol (given) */
-const char *flatname,    /* name of flatfield algorithm (given) */
-int **bzero,             /* pointer to subtracted offset values (returned) */
-short **data,            /* pointer to data array (returned) */
-int **dksquid,           /* pointer to dark SQUID values (returned) */
-int **stackz,            /* pointer to subtracted frame (returned) */
-double **flatcal,        /* pointer to flat calibration (returned) */
-double **flatpar,        /* pointer to flat parameters (returned) */
-int *status              /* global status (given and returned) */
-);
-
 /*+ sc2store_cremapwts - create and write a DREAM weights file */
 
 void sc2store_cremapwts
@@ -174,28 +155,6 @@ int **qual,                /* bolometer quality mask (returned) */
 int *status                /* global status (given and returned) */
 );
 
-/*+ sc2store_ndfreadscan - read a single scan from an NDF file */
-
-void sc2store_ndfreadscan
-(
-const char *filename,  /* name of input map file (given) */
-const char *access,    /* "READ" or "UPDATE" access to data file (given) */
-size_t flatlen,        /* length of string for flatname (given) */
-size_t *nframes,       /* number of frames in scan (returned) */
-double **xz,           /* X centre for each frame (returned) */
-double **yz,           /* Y centre for each frame (returned) */
-double **inptr,        /* measurement values (returned) */
-size_t *nflat,         /* number of flatfield coeffs per pixel (returned) */
-char *flatname,        /* name of flatfield algorithm (returned) */
-double **flatcal,      /* flatfield calibration (returned) */
-double **flatpar,      /* flatfield parameters (returned) */
-int **jigvert,         /* pointer to DREAM jiggle vertices (returned) */
-size_t *nvert,         /* Number of vertices in jiggle pattern (returned) */
-double **jigpath,      /* pointer to path of SMU over jiggle pattern (returned) */
-size_t *npath,         /* Number of points in SMU path (returned) */
-int *status            /* global status (given and returned) */
-);
-
 /*+ sc2store_open - open a SCUBA-2 data file */
 
 void sc2store_open
@@ -250,17 +209,6 @@ const double *coptr,  /* coefficients (given) */
 int *status           /* global status (given and returned) */
 );
 
-/*+ sc2store_rdfitshead - read FITS headers from a SCUBA-2 file */
-
-void sc2store_rdfitshead
-(
-const char *filename,    /* name of HDS container file (given) */
-size_t maxfits,          /* maximum number of FITS records accepted (given) */
-size_t *nrec,            /* number of FITS records (returned) */
-char *fitshead,          /* up to maxfits FITS header records (returned) */
-int *status              /* global status (given and returned) */
-);
-
 /*+ sc2store_rdflatcal - read SCUBA-2 flatfield calibration */
 
 void sc2store_rdflatcal
@@ -273,16 +221,6 @@ size_t *nflat,           /* number of flat coeffs per bol (returned) */
 char *flatname,          /* name of flatfield algorithm (returned) */
 double **flatcal,        /* pointer to flatfield calibration (returned) */
 double **flatpar,        /* pointer to flatfield parameters (returned) */
-int *status              /* global status (given and returned) */
-);
-
-/*+ sc2store_rdframehead - read SCUBA-2 frame headers */
-
-void sc2store_rdframehead
-(
-const char *filename,    /* name of HDS container file (given) */
-size_t *nframes,         /* number of data frames (returned) */
-JCMTState *frhead[],     /* header data for each frame (returned) */
 int *status              /* global status (given and returned) */
 );
 
