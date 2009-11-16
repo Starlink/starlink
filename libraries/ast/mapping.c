@@ -11728,11 +11728,15 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
 /* Find the average weight per input pixel, if we do not already know it \
    to be 1.0. */ \
          if( flags & AST__VARWGT ) { \
-            sw = 0.0; \
-            for( i = 0; i < npix_out; i++ ) { \
-               sw += weights[ i ]; \
+            if( *nused > 0 ) { \
+               sw = 0.0; \
+               for( i = 0; i < npix_out; i++ ) { \
+                  sw += weights[ i ]; \
+               } \
+               mwpip = sw/( *nused ); \
+            } else { \
+               mwpip = AST__BAD; \
             } \
-            mwpip = sw/( *nused ); \
 \
          } else { \
             mwpip = 1.0; \
@@ -11745,7 +11749,7 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
    by the mean weight per input pixel. */ \
          for( i = 0; i < npix_out; i++ ) { \
             sw = weights[ i ]; \
-            nn = sw/mwpip; \
+            nn = ( mwpip != AST__BAD ) ? sw/mwpip : 0.0; \
             if( nn > 2.0 && fabs( sw ) >= wlim ) { \
                a = out[ i ]/sw; \
                out_var[ i ] = ( out_var[ i ]/sw - a*a )*weights[ i + npix_out ]; \
