@@ -355,6 +355,7 @@
 #define AST__GENVAR (512)        /* Generate output variances when rebinning? */
 #define AST__VARWGT (1024)       /* Use input variances as weights? */
 #define AST__NOBAD (2048)        /* Leave bad output values unchanged? */
+#define AST__DISVAR (4096)       /* Generate distribution (not mean) variance? */
 
 /* These macros identify standard sub-pixel interpolation algorithms
    for use by astResample<X>. They are used by giving the macro's

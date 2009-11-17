@@ -267,6 +267,8 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *     11-NOV-2009 (DSB):
 *        In astRebinSeq initialise "*nused" to zero (as documented) if the
 *        AST__REBININIT flag is supplied.
+*     17-NOV-2009 (DSB):
+*        Added AST_DISVAR flag for use with astRebinSeq.
 *class--
 */
 
@@ -11407,6 +11409,17 @@ f     routine
 *     within a sequence, and any supplied input variances will have no effect 
 *     on the output variances (although input variances will still be used 
 *     to weight the input data if the AST__VARWGT flag is also supplied).
+*     The statistical meaning of these output varianes is determined by
+*     the presence or absence of the AST__DISVAR flag (see below).
+*     - AST__DISVAR: This flag is ignored unless the AST__GENVAR flag
+*     has also been specified. It determines the statistical meaning of
+*     the generated output variances. If AST__DISVAR is not specified, 
+*     generated variances represent variances on the output mean  values. If
+*     AST__DISVAR is specified, the generated variances represent the variance
+*     of the distribution from which the input values were taken. Eaxch output
+*     variance created with AST__DISVAR will be larger than that created
+*     without AST__DISVAR by a factor equal to the number of input samples 
+*     that contribute to the output sample.
 *     - AST__VARWGT: Indicates that the input data should be weighted by
 *     the reciprocal of the input variances. Otherwise, all input data are 
 *     given equal weight. If this flag is specified, the calculation of the 
@@ -11721,9 +11734,9 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
 /* Ensure "wlim" is not zero. */ \
       if( wlim < 1.0E-10 ) wlim = 1.0E-10; \
 \
-/* If required create the output variances from the spread of the input \
-   data values.*/ \
-      if( flags & AST__GENVAR ) { \
+/* If required set the output variances so that they are estimates of \
+   the variance on the mean of the distribution of input values. */ \
+      if( ( flags & AST__GENVAR ) && !( flags & AST__DISVAR ) ) { \
 \
 /* Find the average weight per input pixel, if we do not already know it \
    to be 1.0. */ \
@@ -11758,6 +11771,20 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
                } else { \
                   out_var[ i ] *= nn/( nn - 1.0 ); \
                } \
+            } else { \
+               out_var[ i ] = badval; \
+            } \
+         } \
+\
+/* If required set the output variances so that they are estimates of \
+   the variance of the distribution of input values. */ \
+      } else if( flags & AST__GENVAR ) { \
+         for( i = 0; i < npix_out; i++ ) { \
+            sw = weights[ i ]; \
+            if( fabs( sw ) >= wlim ) { \
+               a = out[ i ]; \
+               out_var[ i ] = ( sw*out_var[ i ] - a*a ); \
+               if( out_var[ i ] < 0.0 ) out_var[ i ] = badval; \
             } else { \
                out_var[ i ] = badval; \
             } \
