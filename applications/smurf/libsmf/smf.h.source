@@ -363,6 +363,8 @@
  *        Add star/irq.h include as it is no longer in star/kaplibs.h.
  *     2009-09-29 (EC):
  *        Add smf_get_extpar
+ *     2009-11-17 (EC):
+ *        Add smf_get_goodrange
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -632,7 +634,7 @@ void smf_correct_extinction( smfData *data, smf_tausrc tausrc,
 
 void smf_correct_steps( smfData *data, unsigned char *quality,
                         double dcthresh, dim_t dcbox, int flagbolo,
-                        int *status );
+                        size_t *nsteps, int *status );
 
 void smf_create_bolfile( const Grp * rgrp, size_t index,
                          const smfData* refdata, const char * datalabel,
@@ -879,6 +881,10 @@ size_t smf_get_findex( double f, double df, dim_t nf, int *status );
 
 size_t smf_get_freemem ( double * mbytes, size_t *pagesize,
                          size_t *physsize, int * status );
+
+void smf_get_goodrange( const unsigned char *quality, dim_t ntslice,
+                        size_t tstride, unsigned char mask,
+                        size_t *istart, size_t *iend, int *status );
 
 void smf_get_gridcoords( double *row, double *col, int nrow, int ncol,
                          int *status );

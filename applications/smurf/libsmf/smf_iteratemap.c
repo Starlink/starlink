@@ -362,6 +362,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   dim_t nbolo;                  /* Number of bolometers */
   dim_t nchunks=0;              /* Number of chunks within iteration loop */
   size_t ncontchunks=0;         /* Number continuous chunks outside iter loop*/
+  size_t nflag;                 /* Number of flagged detectors */
   int nm=0;                     /* Signed int version of nmodels */
   dim_t nmodels=0;              /* Number of model components / iteration */
   int numiter;                  /* Total number iterations */
@@ -1088,8 +1089,10 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
               }
 
               if( dcthresh && dcbox ) {
-                msgOutif(MSG__VERB," ", "  correct steps", status);
-                smf_correct_steps( data, qua_data, dcthresh, dcbox, 1, status );
+                msgOutif(MSG__VERB," ", "  flag bolos with steps...", status);
+                smf_correct_steps( data, qua_data, dcthresh, dcbox, 1, &nflag,
+                                   status );
+                msgOutiff(MSG__VERB, "","  ...%li flagged\n", status, nflag);
               }
 
               if( spikethresh ) {
@@ -1097,10 +1100,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                 smf_flag_spikes( data, NULL, qua_data,
                                  ~(SMF__Q_JUMP|SMF__Q_STAT),
                                  spikethresh, spikeiter, 100,
-                                 &aiter, NULL, status );
-                msgSeti("AITER",aiter);
-                msgOutif(MSG__VERB," ", "  ...finished in ^AITER iterations",
-                         status);
+                                 &aiter, &nflag, status );
+                msgOutiff(MSG__VERB,"", "  ...found %li in %li iterations",
+                          status, nflag, aiter );
               }
 
               if( apod ) {

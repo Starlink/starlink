@@ -62,11 +62,13 @@
 *        Fixed indexing problem 
 *     2008-04-18 (EC):
 *        Improved range checking on inputs
+*     2009-11-17 (EC):
+*        Add ability to skip padding/apodization at time stream ends
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 University of British Columbia. All Rights
-*     Reserved.
+*     Copyright (C) 2008-2009 University of British Columbia. 
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -117,6 +119,8 @@ double smf_quick_noise( smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk,
   double *dat=NULL;             /* Pointer to bolo data */
   double goodfrac;              /* Fraction of good samples */
   dim_t i;                      /* Loop counter */
+  size_t istart;                /* Start of the good range */
+  size_t iend;                  /* End of the good range */
   dim_t len;                    /* Length of interval including starts */
   double minsig;                /* Minimum measured r.m.s. */
   dim_t nbolo;                  /* Number of bolometers */
@@ -193,18 +197,26 @@ double smf_quick_noise( smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk,
   }
 
   /* Now calculate the rms in nchunk uniformly distributed chunks starting
-     with length nsamp */
+     with length nsamp, and skipping over padding/apodization */
+
+  if( qua ) {
+    smf_get_goodrange( qua, ntslice, 1, SMF__Q_PAD|SMF__Q_APOD,
+                       &istart, &iend, status );
+  } else {
+    istart = 0;
+    iend = ntslice-1;
+  }
 
   dat = data->pntr[0];
-  len = ntslice-nsamp;
+  len = (iend-istart+1)-nsamp;
   minsig = 0;
 
   for( i=0; i<nchunk; i++ ) {
     /* Calculate the r.m.s. of this chunk */
-    smf_stats1( dat+bolo*ntslice+i*len/(nchunk-1), 1, nsamp, 
-                qua+bolo*ntslice+i*len/(nchunk-1), mask, NULL, &sig, &ngood, 
-                status );
-	
+    smf_stats1( dat+bolo*ntslice+istart+i*len/(nchunk-1), 1, nsamp, 
+                qua+bolo*ntslice+istart+i*len/(nchunk-1), mask, NULL, &sig, 
+                &ngood, status );
+
     if( *status == SMF__INSMP ) {
       /* Annul the bad status; there simply weren't enough samples for
 	 statistics */

@@ -66,6 +66,8 @@
 *       Switch to using a softer Hanning window
 *     2009-10-21 (EC):
 *       Enable SMF__MAXAPLEN for len
+*     2009-11-17 (EC):
+*       Move range checking into smf_get_goodrange
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -156,28 +158,8 @@ void smf_apodize( smfData *data, unsigned char *quality, size_t len,
   for( i=0; (*status==SAI__OK)&&(i<nbolo); i++ ) {
 
     /* Determine the first and last samples to apodize (after padding) */
-    first = 0;
-    last = ntslice-1;
-
-    if( qua && !(qua[i*bstride]&SMF__Q_BADB)) {
-      /* First sample */
-      for( j=0; j<ntslice; j++ ) {
-        if( !(qua[i*bstride+j*tstride]&SMF__Q_PAD) ) break;
-      }
-
-      if( j==ntslice ) {
-        *status=SAI__ERROR;
-        errRep( "", FUNC_NAME ": Can't apodize, entire array is padding.",
-                status );
-      } else {
-        first = j;
-        /* Last sample if first was found */
-        for( j=ntslice-1; j>0; j-- ) {
-          if( !(qua[i*bstride+j*tstride]&SMF__Q_PAD) ) break;
-        }
-        last = j;
-      }
-    }
+    smf_get_goodrange( qua+i*bstride, ntslice, tstride, SMF__Q_PAD,
+                       &first, &last, status );
 
     /* Can we apodize? */
     if( *status == SAI__OK ) {

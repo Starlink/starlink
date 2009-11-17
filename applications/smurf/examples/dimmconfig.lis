@@ -92,10 +92,10 @@ flagstat = 2
 # --- Most of the following are probably not useful ---
 
 # S/N threshold to detect DC steps
-#dcthresh = 150
+dcthresh = 20000
 
 # box size over which to measure rms for DC step finder
-#dcbox = 400
+dcbox = 200
 
 # S/N ratio to flag spikes with sigma-clipper
 # spikethresh = 5

@@ -153,6 +153,7 @@ smf_get_dims.c \
 smf_get_extpar.c \
 smf_get_findex.c \
 smf_get_freemem.c \
+smf_get_goodrange.c \
 smf_get_gridcoords.c \
 smf_get_moltrans.c \
 smf_get_ndfid.c \
