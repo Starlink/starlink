@@ -113,6 +113,9 @@
 *        Modified for ARD version 2.0.
 *     10-MAY-2007 (DSB):
 *        New argument list for ARD1_RDCOF.
+*     18-NOV-2009 (DSB):
+*        Ensure that the current UWCS Frame on exit has the number of axes
+*        specified by any DIMENSION statement.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -266,9 +269,11 @@
       IF( .NOT. STAT ) THEN 
 
 *  If it is a DIMENSION statement, indicate that a DIMENSION statement has 
-*  been found.
+*  been found, and ensure that the current Frame in the UWCS FrameSet has
+*  the requested number of axes..
          IF( TYPE .EQ. ARD__DIM ) THEN
             NEEDIM = .FALSE.
+            CALL ARD1_DMWCS( AWCS, STARGS, UWCS, STATUS )
 
 *  If it is a WCS statement, read the UWCS FrameSet from the GRP group and
 *  delete it.

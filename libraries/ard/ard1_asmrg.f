@@ -100,6 +100,8 @@
       INTEGER IMAT1              ! Index of alignment Frame in IWCS1 
       INTEGER IMAT2              ! Index of alignment Frame in IWCS2
       INTEGER MAP                ! Simplified mapping between two Frames
+      INTEGER NAX1               ! Number of current Frame axes in IWCS1
+      INTEGER NAX2               ! Number of current Frame axes in IWCS2
       INTEGER NFRM1              ! No. of Frames supplied in IWCS1
       INTEGER TEMP               ! AST pointer to a FrameSet
 
@@ -151,6 +153,15 @@
       END IF
 
       CALL CHR_APPND( 'PIXEL,GRID,ARDAPP,', DOMLST, IAT )
+
+*  Set the MaxAxes and MinAxes so that the two current Frames could match
+*  if their Domains are compatible.
+      NAX1 = AST_GETI( IWCS1, 'Naxes', STATUS )
+      NAX2 = AST_GETI( IWCS2, 'Naxes', STATUS )
+      CALL AST_SETI( IWCS1, 'MinAxes', MIN( NAX1, NAX2 ), STATUS )
+      CALL AST_SETI( IWCS2, 'MinAxes', MIN( NAX1, NAX2 ), STATUS )
+      CALL AST_SETI( IWCS1, 'MaxAxes', MAX( NAX1, NAX2 ), STATUS )
+      CALL AST_SETI( IWCS2, 'MaxAxes', MAX( NAX1, NAX2 ), STATUS )
 
 *  Attempt to align the FrameSets. If succesfull, a new FrameSet is 
 *  returned describing the relationship between the Current Frames in 

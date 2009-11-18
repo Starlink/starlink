@@ -58,7 +58,7 @@ BASIC_F_ROUTINES = \
   ard1_truni.f ard1_twwcs.f ard1_ubbox.f ard1_uinterp.f ard1_who.f \
   ard1_xor.f ard1_snkta.f ard_grpex.f ard_wcs.f ard_work.f ard_ptwcs.f \
   ard1_crfnd.f ard1_get.f ard1_assim.f ard_plot.f ard_gtwcs.f \
-  ard1_fplot.f ard1_ceil.f \
+  ard1_fplot.f ard1_ceil.f ard1_dmwcs.f \
   ard1_cntdr.F ard1_eval.F
 
 BASIC_C_ROUTINES = ard.c
