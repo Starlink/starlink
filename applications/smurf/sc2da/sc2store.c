@@ -3193,12 +3193,19 @@ int *status              /* global status (given and returned) */
      const int * thistrack = trackinfo;
      int * hpntr = NULL;
      int sdims[2];  /* number of dimensions in subset of image */
+     int maxbnd[2];
+     int minbnd[2];
+
+     minbnd[0] = SC2STORE__BOL_LBND;
+     minbnd[1] = SC2STORE__BOL_LBND;
+     maxbnd[SC2STORE__ROW_INDEX] = colsize + SC2STORE__BOL_LBND - 1;
+     maxbnd[SC2STORE__COL_INDEX] = rowsize + SC2STORE__BOL_LBND - 1;
 
      /* these are flipped because we are calculating the min/max */
-     ubnd[0] = 0;
-     ubnd[1] = 0;
-     lbnd[SC2STORE__ROW_INDEX] = colsize + SC2STORE__BOL_LBND - 1;
-     lbnd[SC2STORE__COL_INDEX] = rowsize + SC2STORE__BOL_LBND - 1;
+     ubnd[0] = minbnd[0];
+     ubnd[1] = minbnd[1];
+     lbnd[0] = maxbnd[0];
+     lbnd[1] = maxbnd[1];
 
      for ( j = 0; j < ntrack; j++ ) {
        int colnum = thistrack[0];
@@ -3210,12 +3217,19 @@ int *status              /* global status (given and returned) */
        thistrack += 3;
      }
 
-     /* now create the extension and map it */
-     ndfPlace ( sc2store_scuba2loc, "TRACKINFO", &place, status );
-     ndfNew ( "_INTEGER", 2, lbnd, ubnd, &place, &sc2store_htindf, status );
-
-     ndfMap ( sc2store_htindf, "DATA", "_INTEGER", "WRITE/BAD", (void *)(&hpntr),
-              &el, status );
+     /* sanity checks */
+     if (*status == SAI__OK) {
+       if (lbnd[0] < minbnd[0] || lbnd[0] > maxbnd[0] ||
+           lbnd[1] < minbnd[1] || lbnd[1] > maxbnd[1] ||
+           ubnd[0] < minbnd[0] || ubnd[0] > maxbnd[0] ||
+           ubnd[1] < minbnd[1] || ubnd[1] > maxbnd[1] ) {
+         *status = SAI__ERROR;
+         errRepf( "", "Calculated pixel bounds (%d,%d) -> (%d,%d) are out of "
+                  "expected range (%d,%d) -> (%d,%d)", status,
+                  lbnd[0],lbnd[1],ubnd[0],ubnd[1],
+                  minbnd[0],minbnd[1],maxbnd[0],maxbnd[1]);
+       }
+     }
 
      /* calculate dimensions */
      sdims[SC2STORE__COL_INDEX] = ubnd[SC2STORE__COL_INDEX]
@@ -3223,27 +3237,43 @@ int *status              /* global status (given and returned) */
      sdims[SC2STORE__ROW_INDEX] = ubnd[SC2STORE__ROW_INDEX]
        - lbnd[SC2STORE__ROW_INDEX] + 1;
 
-     thistrack = trackinfo;
-     for ( j = 0; j < ntrack; j++ ) {
-       int colnum = thistrack[0];
-       int rownum = thistrack[1];
-       int offset = 0;
+     /* now create the extension and map it */
+     ndfPlace ( sc2store_scuba2loc, "TRACKINFO", &place, status );
+     ndfNew ( "_INTEGER", 2, lbnd, ubnd, &place, &sc2store_htindf, status );
 
-       /* offset into data array must take into account the lbnd */
-       colnum -= lbnd[SC2STORE__COL_INDEX];
-       rownum -= lbnd[SC2STORE__ROW_INDEX];
+     ndfMap ( sc2store_htindf, "DATA", "_INTEGER", "WRITE/BAD", (void *)(&hpntr),
+              &el, status );
 
-       if ( SC2STORE__COL_INDEX == 0 ) {
-         offset = colnum + (rownum * sdims[0]);
-       } else {
-         offset = rownum + (colnum * sdims[0]);
+     if (*status == SAI__OK) {
+       thistrack = trackinfo;
+       for ( j = 0; j < ntrack; j++ ) {
+         int colnum = thistrack[0];
+         int rownum = thistrack[1];
+         int offset = 0;
+
+         /* offset into data array must take into account the lbnd */
+         colnum -= lbnd[SC2STORE__COL_INDEX];
+         rownum -= lbnd[SC2STORE__ROW_INDEX];
+
+         if ( SC2STORE__COL_INDEX == 0 ) {
+           offset = colnum + (rownum * sdims[0]);
+         } else {
+           offset = rownum + (colnum * sdims[0]);
+         }
+
+         if (offset < 0 || offset > el ) {
+           *status = SAI__ERROR;
+           errRepf( "", "Calculated offset for heater tracking information is out of bounds"
+                    " ( 0 < %d < %d )", status, offset, el );
+           break;
+         }
+
+         /* and store the value in the correct place */
+         hpntr[offset] = thistrack[2];
+
+         /* skip round to the next group */
+         thistrack += 3;
        }
-
-       /* and store the value in the correct place */
-       hpntr[offset] = thistrack[2];
-
-       /* skip round to the next group */
-       thistrack += 3;
      }
    }
 
@@ -3263,10 +3293,13 @@ int *status              /* global status (given and returned) */
 
 /* Copy the dark SQUID values */
 
-   for ( j=0; j<nframes*rowsize; j++ )
-   {
-      darksquid[j] = dksquid[j];
-   }
+   if (*status == SAI__OK)
+     {
+       for ( j=0; j<nframes*rowsize; j++ )
+         {
+           darksquid[j] = dksquid[j];
+         }
+     }
 
 
    if ( StatusOkP(status) )
