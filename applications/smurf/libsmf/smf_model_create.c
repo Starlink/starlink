@@ -538,7 +538,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
             }
 
             smf_set_clabels( "Extinction Correction", "1/Extinction",
-                             "\0", &head.hdr, status );
+                             "", &head.hdr, status );
             break;
 
           case SMF__LUT: /* Pointing LookUp Table for each data point */
@@ -572,7 +572,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
                 (idata->dims)[1+SC2STORE__ROW_INDEX]*3;
               head.data.dims[1] = (idata->dims)[1+SC2STORE__COL_INDEX];
             }
-            smf_set_clabels( "Dark Squid Model", "Value", "\0",
+            smf_set_clabels( "Dark Squid Model", "Value", "",
                              &head.hdr, status );
             break;
 
@@ -580,8 +580,8 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
             head.data.dtype = SMF__DOUBLE;
             head.data.ndims = 3; /* Gain, Offset, Correlation coefficient */
 
-            smf_set_clabels( "Common-mode Gain/Offset", "Value", "\0",
-                             &head.hdr, status );
+            smf_set_clabels( "Common-mode Gain/Offset/Correlation", "Value",
+                             "", &head.hdr, status );
 
             /* Note that we're using the time axis to store the coefficients */
             if( isTordered ) {
@@ -590,12 +590,24 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
               head.data.dims[SC2STORE__COL_INDEX] =
                 (idata->dims)[SC2STORE__COL_INDEX];
               head.data.dims[2] = 3;
+
+              head.data.lbnd[SC2STORE__ROW_INDEX] =
+                (idata->lbnd)[SC2STORE__ROW_INDEX];
+              head.data.lbnd[SC2STORE__COL_INDEX] =
+                (idata->lbnd)[SC2STORE__COL_INDEX];
+              head.data.lbnd[2] = 1;
             } else {
               head.data.dims[0] = 3;
               head.data.dims[1+SC2STORE__ROW_INDEX] =
                 (idata->dims)[1+SC2STORE__ROW_INDEX];
               head.data.dims[1+SC2STORE__COL_INDEX] =
                 (idata->dims)[1+SC2STORE__COL_INDEX];
+
+              head.data.lbnd[0] = 1;
+              head.data.lbnd[1+SC2STORE__ROW_INDEX] =
+                (idata->lbnd)[1+SC2STORE__ROW_INDEX];
+              head.data.lbnd[1+SC2STORE__COL_INDEX] =
+                (idata->lbnd)[1+SC2STORE__COL_INDEX];
             }
             break;
 
