@@ -798,6 +798,7 @@ int *status                   /* global status (given and returned) */
    RETRIEVE_STATE( wvm_time, WVM_TIME, double, VAL__BADD );
 
    RETRIEVE_STATE( sc2_heat, SC2_HEAT, int, VAL__BADI );
+   RETRIEVE_STATE( sc2_mixtemp, SC2_MIXTEMP, float, VAL__BADR );
 
    RETRIEVE_STATE( acs_exposure, ACS_EXPOSURE, float, VAL__BADR );
    RETRIEVE_STATE( acs_offexposure, ACS_OFFEXPOSURE, float, VAL__BADR );
@@ -1014,6 +1015,7 @@ int *status                   /* global status (given and returned) */
 
    /* SCUBA-2 specific */
    STORE_STATE( sc2_heat, SC2_HEAT, int );
+   STORE_STATE( sc2_mixtemp, SC2_MIXTEMP, float );
 
    /* FTS and polarimeter */
    STORE_STATE( fts_pos, FTS_POS, float );

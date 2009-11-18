@@ -71,6 +71,8 @@
 *     22-SEP-2009 (TIMJ):
 *        JOS_DRCONTROL can now be read from SCUBA-2 files.
 *        Add DOME and ENCODER positions.
+*     2009-11-18 (TIMJ):
+*        Add SC2_MIXTEMP in kelvin
 
 *  Copyright:
 *     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
@@ -177,6 +179,7 @@ typedef struct JCMTState {
   float  wvm_t78;
   double wvm_time;
   int    sc2_heat;
+  float  sc2_mixtemp;
   float  acs_exposure;
   float  acs_offexposure;
   int    acs_no_prev_ref;
@@ -247,6 +250,7 @@ typedef enum
    WVM_T78,
    WVM_TIME,
    SC2_HEAT,
+   SC2_MIXTEMP,
    ACS_EXPOSURE,
    ACS_OFFEXPOSURE,
    ACS_NO_PREV_REF,
@@ -337,6 +341,7 @@ static const HDSdataRecord hdsRecords[JCMT_COMP_NUM] =
     { WVM_T78, "_REAL", "WVM_T78", INST__SCUBA2, INST__NONE },
     { WVM_TIME, "_DOUBLE", "WVM_TIME", INST__SCUBA2, INST__NONE },
     { SC2_HEAT, "_INTEGER", "SC2_HEAT", INST__SCUBA2, INST__NONE },
+    { SC2_MIXTEMP, "_REAL", "SC2_MIXTEMP", INST__SCUBA2, INST__NONE },
     { ACS_SOURCE_RO, CHARTYP(JCMT__SZACS_SOURCE_RO), "ACS_SOURCE_RO", INST__ACSIS, INST__NONE },
     { ACS_NO_PREV_REF, "_INTEGER", "ACS_NO_PREV_REF", INST__ACSIS, INST__NONE },
     { ACS_NO_NEXT_REF, "_INTEGER", "ACS_NO_NEXT_REF", INST__ACSIS, INST__NONE },
