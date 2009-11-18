@@ -66,6 +66,9 @@
     these data types unexpectably wrapped or refused to extend the contrast
     when given limits outside the data range.
 
+    The patch toolbox now says when you have not defined any background
+    regions. Previously an uninformative error dialog was shown.
+
     Version 4.3-1
     =============
 

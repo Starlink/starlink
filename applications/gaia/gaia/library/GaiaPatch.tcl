@@ -405,7 +405,9 @@ itcl::class gaia::GaiaPatch {
                set fit_region [$Repl_ bbox_annuli]
             } else {
                set backok [$Back_ save_description {GaiaPatchFit.ard}]
-               set fit_region [$Back_ bbox]
+               if { [catch {set fit_region [$Back_ bbox]} ] } {
+                  set backok 0
+               }
             }
             if { $backok } {
 
@@ -434,7 +436,7 @@ itcl::class gaia::GaiaPatch {
                   error_dialog "Sorry this image cannot be modified (file is readonly)."
                }
             } else {
-               error_dialog "No background regions available."
+               error_dialog "No background regions are available."
             }
          } else {
             error_dialog "No replacement regions available."
