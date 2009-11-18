@@ -69,6 +69,9 @@
     The patch toolbox now says when you have not defined any background
     regions. Previously an uninformative error dialog was shown.
 
+    The import plain text file dialog now supports the definition of the
+    RA and Dec celestial coordinate system.
+
     Version 4.3-1
     =============
 

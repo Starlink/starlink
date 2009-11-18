@@ -151,14 +151,30 @@ itcl::class gaia::GaiaTextImport {
       }
 
       #  If the result is a TAB table then we can specify the
-      #  equinox of the values.
+      #  system and equinox of the values.
       if { $itk_option(-format) == "tab" } {
+
+         itk_component add system {
+            LabelMenu $w_.system \
+               -text "System:" \
+               -relief raised \
+               -labelwidth 9
+         }
+         foreach system {fk5 fk4 fk4-no-e gappt ecliptic galactic
+            supergalactic} {
+            $itk_component(system) add \
+               -label $system \
+               -value $system
+         }
+         pack $itk_component(system) -side top -fill x -ipadx 1m -ipady 2m
+         add_short_help $itk_component(system) {Celestial coordinate system}
+
          itk_component add equinox {
             LabelEntryMenu $w_.equinox \
                -text "Equinox:" \
                -labelwidth 9
          }
-         foreach equinox "2000 1950" {
+         foreach equinox {2000 1950} {
             $itk_component(equinox) add \
                -label $equinox \
                -value $equinox
@@ -275,7 +291,7 @@ itcl::class gaia::GaiaTextImport {
       incr saved_
    }
 
-   #  Activate interface, waiting until window is closed. Return the 
+   #  Activate interface, waiting until window is closed. Return the
    #  filename and which coordinates where found.
    public method activate {} {
       wm deiconify $w_
@@ -679,7 +695,8 @@ itcl::class gaia::GaiaTextImport {
             }
             if { $values_($this,ra) != {} || $values_($this,dec) != {} } {
                puts $outid "equinox: [$itk_component(equinox) get]"
-            }            
+               puts $outid "system: [$itk_component(system) get]"
+            }
             if { $values_($this,x) != {} } {
                puts $outid "x_col: $values_($this,x)"
                set xout_ 1
@@ -693,7 +710,7 @@ itcl::class gaia::GaiaTextImport {
                append headings "$values_($this,heading$i)\t"
             }
             if { $values_($this,ra) != {} && $values_($this,dec) != {}
-                 || 
+                 ||
                  $values_($this,x) != {} && $values_($this,y) != {} } {
                puts $outid "symbol: {} circle 4"
             }
@@ -889,7 +906,7 @@ itcl::class gaia::GaiaTextImport {
    #  Current list of parsed words.
    protected variable wordlist_
 
-   #  The coordinates (ra,dec,x,y) found when the output file 
+   #  The coordinates (ra,dec,x,y) found when the output file
    #  was written.
    protected variable raout_ -1
    protected variable decout_ -1
