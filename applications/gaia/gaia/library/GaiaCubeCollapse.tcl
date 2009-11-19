@@ -137,9 +137,10 @@ itcl::class gaia::GaiaCubeCollapse {
       }
 
       $maintask_ runwiths "in=$ndfname out=$tmpimage_ axis=$axis \
-                           low=$lb high=$ub estimator=$combination_type_ \
+                           low=\"$lb\" high=\"$ub\" \
+                           estimator=$combination_type_ \
                            wcsatts=\"$wcsatts\" accept"
-      
+
       #  Tell cube to use these limits for spectral extraction.
       $itk_option(-gaiacube) set_extraction_range \
          $itk_option(-lower_limit) $itk_option(-upper_limit)
