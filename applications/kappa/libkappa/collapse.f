@@ -437,6 +437,9 @@
 *     2009 July 15 (MJC):
 *        Fix bug calculating the fraction of bad pixels created for
 *        large datasets processed in blocks.
+*     2009 November 20 (MJC):
+*        Adjust the precision of the fractions and WLIM in the bad-pixel
+*        warning.
 *     {enter_further_changes_here}
 
 *-
@@ -479,6 +482,7 @@
       CHARACTER DTYPE*( NDF__SZFTP ) ! Numeric type for output arrays
       CHARACTER ESTIM*( 6 )      ! Method to use to estimate collapsed
                                  ! values
+      CHARACTER FORMAT*6         ! Format for warning
       CHARACTER ITYPE*( NDF__SZTYP ) ! Numeric type for processing
       CHARACTER LOC1*(DAT__SZLOC)! Locator to the output NDF
       CHARACTER LOC2*(DAT__SZLOC)! Locator to NDF AXIS array
@@ -561,6 +565,7 @@
       INTEGER NC                 ! Used length of string
       INTEGER NCOMP              ! No. of components within cell of AXIS
                                  ! array
+      INTEGER NDEC               ! Number of decimal places in warning
       INTEGER NDIM               ! Number of pixel axes in input NDF
       INTEGER NDIMO              ! Number of pixel axes in output NDF
       INTEGER NERR               ! Number of numerical errors
@@ -1277,7 +1282,17 @@
 *  annoying some users, report the number of output data that were 
 *  flagged by the WLIM threshold at the normal reporting level.
       IF ( NFLAG .GT. 0 ) THEN
-         CALL MSG_FMTR( 'WLIM', 'F6.4', WLIM )
+
+*  First set the number of decimal places commensurate with the number
+*  of output data values.
+         NDEC = MAX( 2, MIN( 10, NINT( LOG10( REAL( ELO ) ) ) ) )
+         FORMAT = 'F'
+         NC = 1
+         CALL CHR_PUTI( NDEC + 2, FORMAT, NC )
+         CALL CHR_PUTC( '.', FORMAT, NC )
+         CALL CHR_PUTI( NDEC, FORMAT, NC )
+
+         CALL MSG_FMTR( 'WLIM', FORMAT( :NC ), WLIM )
          IF ( NFLAG .EQ. ELO ) THEN
             CALL MSG_OUTIF( MSG__NORM, '',
      :        'WARNING: All of the output pixels are set bad due to '/
@@ -1290,7 +1305,9 @@
 *  fraction of bad pixels.  Note this includes cases where all the input
 *  pixels along the collapse axis were bad for a given output pixel.
          ELSE IF ( NFLAG .LT. ELO ) THEN
-            CALL MSG_FMTR( 'FRAC', 'F6.4', REAL( NFLAG ) / REAL( ELO ) )
+            CALL MSG_FMTR( 'FRAC', FORMAT( :NC ),
+     :                     REAL( NFLAG ) / REAL( ELO ) )
+
             CALL MSG_SETI( 'NF', NFLAG )
             CALL MSG_SETI( 'EL', ELO )
             CALL MSG_OUTIF( MSG__NORM, '',
