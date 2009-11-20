@@ -163,7 +163,7 @@ void smf_add_spectral_axis( int indf, AstFitsChan *fc, int *status ){
    axis. Other Frames are left unchanged. The SpecFrame and the new GRID
    axis are connected using the WinMap created above. */
          atlAddWcsAxis( wcs, (AstMapping *) specmap, (AstFrame *) specfrm, 
-                        status );
+                        NULL, NULL, status );
 
 /* Change the NDF bounds to include a 3rd axis with pixel bounds "1:1". */
          lbnd[ 2 ] = 1;

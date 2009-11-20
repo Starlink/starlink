@@ -322,7 +322,8 @@ F77_SUBROUTINE(carpet)( INTEGER(STATUS) ){
    outa[ 0 ] = dlo;
    outb[ 0 ] = dhi;
    map = astWinMap( 1, ina, inb, outa, outb, " " );
-   atlAddWcsAxis(  wcs, (AstMapping *) map, datafrm, STATUS );
+   atlAddWcsAxis(  wcs, (AstMapping *) map, datafrm, slbnd + 2, subnd + 2,
+                   STATUS );
 
 /* Store the modified WCS FrameSet in the output NDF. */
    ndfPtwcs( wcs, indf2, STATUS );

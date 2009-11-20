@@ -1795,14 +1795,17 @@ higher-level utility tasks.
    Add one or more axes to an NDFs WCS FrameSet
 }{
    \sstdescription{
-      This function adds one or more new axes to both the base (i.e. GRID)
-      Frame and the current (i.e. WCS) Frame in the supplied WCS FrameSet.
-      If the FrameSet contains any other Frames, their dimensionality is
-      left unchanged.
+      This function adds one or more new axes to all the Frames in an NDF
+      WCS FrameSet. Frames that are known to be NDF-special (e.g. GRID,
+      AXIS, PIXEL and FRACTION) are expanded to include a number of extra
+      appropriate axes equal to the Nin attribute of the supplied Mapping.
+      all other Frames in the FrameSet are replaced by CmpFrames holding the
+      original Frame and the supplied Frame. These new axes are connected to
+      the new GRID axes using the supplied Mapping.
    }
    \sstinvocation{
       void atlAddWcsAxis(  AstFrameSet $*$wcs, AstMapping $*$map, AstFrame $*$frm,
-                           int $*$status )
+                           int $*$lbnd, int $*$ubnd, int $*$status )
    }
    \sstarguments{
       \sstsubsection{
@@ -1824,6 +1827,20 @@ higher-level utility tasks.
          A pointer to a Frame defining the new WCS axes.
       }
       \sstsubsection{
+         lbnd
+      }{
+         An array holding the lower pixel index bounds on the new axes.
+         If a NULL pointer is supplied, a value of 1 is assumed for all
+         the new axes.
+      }
+      \sstsubsection{
+         ubnd
+      }{
+         An array holding the upper pixel index bounds on the new axes.
+         If a NULL pointer is supplied, any FRACTION Frame in the
+         supplied FrameSet is removed.
+      }
+      \sstsubsection{
          status
       }{
          Pointer to the global status variable.
@@ -1833,10 +1850,10 @@ higher-level utility tasks.
       \sstitemlist{
 
          \sstitem
-         The new GRID and WCS axes are appended to the end of the existing
-         axes, so the axis indices associated with the new axes will extend
-         from {\tt "}nold$+$1{\tt "} to {\tt "}nold$+$nnew{\tt "}, where {\tt "}nold{\tt "} is the number of axes in
-         the original Frame, and {\tt "}nnew{\tt "} is the number of new axes.
+         The new axes are appended to the end of the existing axes, so the
+         axis indices associated with the new axes will extend from {\tt "}nold$+$1{\tt "}
+         to {\tt "}nold$+$nnew{\tt "}, where {\tt "}nold{\tt "} is the number of axes in the original
+         Frame, and {\tt "}nnew{\tt "} is the number of new axes.
 
          \sstitem
          An error will be reported if the Nout attribute of {\tt "}map{\tt "} is

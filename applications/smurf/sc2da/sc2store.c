@@ -3603,14 +3603,13 @@ AstFrameSet *timeWcs( int subnum, int ntime, const SC2STORETelpar* telpar,
 *                int * status );
 
 *  Description:
-*     Returns a FrameSet in which the base Frame is a 3D GRID Frame, and
-*     the current Frame has 3 axes in the order (fplanex,fplaney,time).
-*     The time axis is described using a MJD(TAI) TimeFrame, and its relationship
-*     to GRID coords is specified by the supplied look-up table of time
-*     values. The spatial axis is described by a 2D Frame with
-*     Domain "FPLANE" and is connected to the GRID coords via a
-*     mapping created by sc2ast and containing the mapping from pixel to focal plane
-*     arcsecond offsets.
+*     Returns a FrameSet in which the base Frame is a 3D GRID Frame, and the 
+*     current Frame has 3 axes in the order (fplanex,fplaney,time). The time 
+*     axis is described using a MJD(TAI) TimeFrame, and its relationship to
+*     GRID coords is specified by the supplied look-up table of time values. 
+*     The spatial axis is described by a 2D Frame with Domain "FPLANE" and 
+*     is connected to the GRID coords via a Mapping created by sc2ast and 
+*     containing the Mapping from pixel to focal plane arcsecond offsets.
 
 *  Parameters:
 *     subnum = int (Given)
@@ -3731,7 +3730,8 @@ AstFrameSet *timeWcs( int subnum, int ntime, const SC2STORETelpar* telpar,
 
 /* Now append the time axis to every Frame in the FrameSet, except for the base Frame, 
    which receives an extra grid axis instead. */
-   atlAddWcsAxis( result, (AstMapping *) timemap, (AstFrame *) timefrm, status );
+   atlAddWcsAxis( result, (AstMapping *) timemap, (AstFrame *) timefrm,
+                  NULL, NULL, status );
 
 /* If no error has occurred, export the resulting FrameSet pointer
    from the current AST context so that it will not be annulled by the
