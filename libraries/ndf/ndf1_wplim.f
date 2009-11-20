@@ -110,6 +110,9 @@
 *        Changed to accomodate taking a 2D section from a 3D NDF in cases
 *        where the bounds on each of the two axes are specified using WCS 
 *        values.
+*     20-NOV-2009 (DSB):
+*        Correct conversion from pixel coords bounds to pixel index
+*        bounds.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -125,6 +128,7 @@
       INCLUDE 'NDF_PAR'          ! NDF_ public constants      
       INCLUDE 'AST_PAR'          ! AST_ constants and functions
       INCLUDE 'NDF_ERR'          ! NDF_ error codes
+      INCLUDE 'PRM_PAR'          ! VAL_ constants
 
 *  Arguments Given:
       INTEGER IWCS
@@ -172,6 +176,7 @@
       INTEGER FSMAP
       INTEGER I
       INTEGER INTERV
+      INTEGER INTPRT
       INTEGER J
       INTEGER JJ
       INTEGER JUNK
@@ -814,24 +819,31 @@ c      write(*,*) '   '
                PUBND( I ) = TEMP
             END IF
 
-*  For the upper bound, select the index of the pixel that contains the
-*  PUBND value. Integer values are considered to be part of the lower
-*  pixel.
-            UBND( I ) = INT( PUBND( I ) ) 
-            IF(  PUBND( I ) .GT. 0.0 .AND.
-     :           DBLE( UBND( I ) ) .LT.  PUBND( I ) ) 
-     :         UBND( I ) = UBND( I ) + 1
-
-*  For the lower bound, select the index of the pixel that contains the
-*  PLBND value. Integer values are considered to be part of the higher
-*  pixel.
-            IF( PLBND( I ) .GT. 0.0 ) THEN
-               LBND( I ) = INT( PLBND( I ) ) + 1
+*  Select the index of the pixel that contains the PUBND value. If PUBND is 
+*  exactly integer, the axis value is considered to be the upper edge of the 
+*  upper bound.
+            INTPRT = INT( PUBND( I ) ) 
+            IF( ABS( PUBND( I ) - DBLE( INTPRT ) ) .LT. 
+     :          100*VAL__EPSD ) THEN
+               UBND( I ) = INTPRT
+            ELSE IF( PUBND( I ) .GT. 0.0 ) THEN
+               UBND( I ) = INTPRT + 1
             ELSE 
-               LBND( I ) = INT( PLBND( I ) ) 
-               IF( DBLE( LBND( I ) ) .EQ.  PLBND( I ) ) 
-     :            LBND( I ) = LBND( I ) - 1
-            END IF              
+               UBND( I ) = INTPRT 
+            END IF
+
+*  Select the index of the pixel that contains the PLBND value. If PLBND is 
+*  exactly integer, the axis value is considered to be the lower edge of the 
+*  lower bound. 
+            INTPRT = INT( PLBND( I ) ) 
+            IF( ABS( PLBND( I ) - DBLE( INTPRT ) ) .LT. 
+     :          100*VAL__EPSD ) THEN
+               LBND( I ) = INTPRT + 1
+            ELSE IF( PLBND( I ) .GT. 0.0 ) THEN
+               LBND( I ) = INTPRT + 1
+            ELSE 
+               LBND( I ) = INTPRT 
+            END IF
 
 *  Ensure that any supplied pixel bounds are honoured exactly.
             IF( ISBND( I ) ) THEN
