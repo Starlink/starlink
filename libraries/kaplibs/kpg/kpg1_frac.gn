@@ -169,6 +169,11 @@
 *     2009 November 11 (MJC):
 *        Switch a constraint used to determine whether or not values are
 *        integer stored in a floating-point data type.
+*     2009 November 19 (MJC):
+*        Set flag in outlier-clipping loop so that a new histogram is
+*        generated between the narrowed limits.  Increase the minimum
+*        allowed sparseness from 4 to 16% and add commentary about it.
+*        Fix non-physical looping criterion.
 *     {enter_further_changes_here}
 
 *-
@@ -200,8 +205,17 @@
       INTEGER VAL_<T>TOI
 
 *  Local Constants:
+
+*  This setting is somewhat arbitrary balancing a normal distribution
+*  with outliers, against a spiketrum-like quantised value.  It was
+*  originally 4% to permit quantized histograms not to be rejected,
+*  however, such distributions are not really within the remit of the
+*  algorithm.  The increase to 16% does produce far more-accurate 
+*  quantiles for the regular mono-modal data with extreme outliers.
+*  The loss of accuracy for quantised data is now offset by the fact
+*  that STATS can compute precise quantiles for any distribution.
       DOUBLE PRECISION FILLIM  ! Minimum fraction of fill histogram
-      PARAMETER( FILLIM = 0.04D0 ) ! bins to avoid iteration
+      PARAMETER( FILLIM = 0.16D0 ) ! bins to avoid iteration
 
       INTEGER NUMBIN           ! Number of bins in histogram
       PARAMETER( NUMBIN = 10000 ) ! should be enough
@@ -601,8 +615,11 @@
 *  Time to exit the loop?
 *  ======================
 
+*  Need a recomputerd histogram if the limits have changed.
+            FINDHI = TRIMED( 1 ) .OR. TRIMED( 2 )
+
 *  Need to exit the loop when further thinning of the histogram is not
-*  possible.
+*  possible, i.e. there's been no trimming on this loop.
             LOOP = TRIMED( 1 ) .OR. TRIMED( 2 )
 
 *  Under some circumstances (many elements have identical values),
@@ -708,7 +725,7 @@
 *  Cannot trim any more.  This probably a dataset without true
 *  outliers, just quantised to a few values.  Prevent trimming beyond
 *  physical limits.
-            LOOP = LOOP .AND. LOWER .LT. UPPER
+            LOOP = LOOP .AND. LOWER .LE. UPPER
 
 *  Histogram is not too sparse so the histogram limits are satisfactory
 *  to compute the values corresponding to the clipped fractions.
