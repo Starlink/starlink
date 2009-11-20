@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_HSMOx( BAD, EL, ARRAY, PARAM, PARAM, DMAX, DMIN, 
+*     CALL KPS1_HSMOx( BAD, EL, ARRAY, PARAM, METHOD, DMAX, DMIN, 
 *                      NGOOD, NUMPER, PERCNT, PERVAL, MODE, STATUS )
 
 *  Description:
@@ -63,7 +63,7 @@
 *        The number of percentiles.
 *     PERCNT( NUMPER ) = REAL (Given & Returned)
 *        The sorted percentiles in increasing order that must include 
-*        values of 25 and 75.  They may just comprsire these two 
+*        values of 25 and 75.  They may just comprise these two 
 *        for the inter-quartile range, but there could be user-selected 
 *        values too.  
 *
@@ -273,7 +273,7 @@
          END IF
 
 *  Convert the index to a data value allowing for the offset from a
-*  bin's lower limt to its centre.
+*  bin's lower limit to its centre.
          WIDTH = ( DMAX - DMIN ) / DBLE( NUMBIN )
          IF ( INTTYP ) WIDTH = DBLE( NINT( WIDTH ) )
 
