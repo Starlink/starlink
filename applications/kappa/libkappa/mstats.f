@@ -549,7 +549,7 @@
 *  derive a result.
          IF ( NNDF .GT. 3 ) THEN
             ESTIMO = 'Mean,WMean,Mode,Median,Max,Min,Comax,Comin,'/
-     :               /'Absdev,RMS,Sigma,Sum,Iwc,Iwd,Integ'
+     :               /'Absdev,Cmean,Csigma,RMS,Sigma,Sum,Iwc,Iwd,Integ'
          ELSE IF ( NNDF .EQ. 1 ) THEN
             ESTIMO = 'Mean,Max,Min,Comax,Comin,Sum,Iwc,Integ'
          ELSE IF ( NNDF .GE. 2 ) THEN

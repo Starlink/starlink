@@ -862,7 +862,7 @@
       PIXPCH = REAL( AEL ) / REAL( NOCHAN )
       IF ( INT( PIXPCH ) .GT. 3 ) THEN
          ESTIMO = 'Mean,WMean,Mode,Median,Max,Min,Comax,Comin,Absdev,'/
-     :            /'RMS,Sigma,Sum,Iwc,Iwd,Integ'
+     :            /'Cmean,Csigma,RMS,Sigma,Sum,Iwc,Iwd,Integ'
       ELSE IF ( INT( PIXPCH ) .EQ. 1 ) THEN
          ESTIMO = 'Mean,Max,Min,Comax,Comin,Sum,Iwc,Integ'
       ELSE IF ( INT( PIXPCH ) .GE. 2 ) THEN
