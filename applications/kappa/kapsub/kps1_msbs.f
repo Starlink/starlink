@@ -2,7 +2,7 @@
      :                      INDFS, ONDF, STATUS )
 *+
 *  Name:
-*     KPS1_MSA
+*     KPS1_MSBS
 
 *  Purpose:
 *     Obtains identifiers to matched NDF sections for MSTATS.
@@ -16,10 +16,9 @@
 
 *  Description:
 *     Matches NDF bounds and data types for a given component of a
-*     group of NDFs.  The NDF
-*     identifiers and the pointers to the mapped data, as well as 
-*     an identifier for a newly created output NDF propagated from
-*     one of the input ones, are returned.
+*     group of NDFs.  The NDF identifiers and the pointers to the 
+*     mapped data, as well as an identifier for a newly created output
+*     NDF propagated from one of the input ones, are returned.
 
 *  Arguments:
 *     IGRP = INTEGER (Given)
@@ -138,7 +137,7 @@
                CALL MSG_SETI( 'NDIM0', NDIM0 )
                CALL MSG_SETI( 'NDIM', NDIM )
                STATUS = SAI__ERROR
-               CALL ERR_REP( 'KPS1_MSA_ERR1', 'NDF ^NDF0 ' //
+               CALL ERR_REP( 'KPS1_MSBS_ERR1', 'NDF ^NDF0 ' //
      :                       'has ^NDIM0 dimensions and ^NDF ' //
      :                       'has ^NDIM; they must match.', STATUS )
                GO TO 99
