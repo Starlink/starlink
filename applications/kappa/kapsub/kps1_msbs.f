@@ -112,6 +112,9 @@
 
 *.
 
+*  Set the returned identifier to null.
+      ONDF = NDF__NOID
+
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
