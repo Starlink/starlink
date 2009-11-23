@@ -101,13 +101,20 @@ size_t smf_get_findex( double f, double df, dim_t nf, int *status ) {
    }
 
    /* If we get here, retval is guaranteed to be >= 0, and not infinity */
-   retval = (size_t) round( f/df ); 
+   retval = (size_t) round( f/df );
 
    if( retval >= nf ) {
-     *status= SAI__ERROR;
-     msgSetd("F",f);
-     msgSetd("N",df*nf);
-     errRep( FUNC_NAME, "Filter edge ^F Hz is > Nyquist ^N Hz", status );
+     *status= SMF__INFREQ;
+     errRepf( FUNC_NAME, "Invalid frequency %lf Hz is > Nyquist %lf Hz", status,
+              f, df*nf);
+     retval = 0;
+   }
+
+   if( (f > 0) && (retval == 0) ) {
+     *status= SMF__INFREQ;
+     errRepf( FUNC_NAME, "Invalid frequency %lf Hz is being rounded to 0 "
+              "(data stream is too short to sample this frequency)", status,
+              f );
      retval = 0;
    }
 
