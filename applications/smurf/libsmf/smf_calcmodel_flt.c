@@ -186,9 +186,18 @@ void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk,
       filt = smf_create_smfFilter( res->sdata[idx], status );
       smf_filter_fromkeymap( filt, kmap, &dofft, status );
 
-      if( !dofft ) {
-        msgOutif( MSG__VERB, " ", FUNC_NAME
-                  ": No valid filter specifiers for FLT given", status );
+      if( *status == SMF__INFREQ ) {
+        /* If a bad frequency was specified just annul the error and
+           skip the FLT model component */
+        dofft = 0;
+        errAnnul( status );
+        msgOut( "", FUNC_NAME ": invalid frequency for filter specified. "
+                "Skipping FLT model component.", status );
+      } else {
+        if( !dofft ) {
+          msgOutif( MSG__VERB, " ", FUNC_NAME
+                    ": No valid filter specifiers for FLT given", status );
+        }
       }
 
       if( *status == SAI__OK ) {
