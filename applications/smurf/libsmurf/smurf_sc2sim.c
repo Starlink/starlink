@@ -398,6 +398,9 @@
 *     flux2cur (integer) : 1
 *       Flag to indicate to convert power
 *       from flux to current.
+*     interp (char[]) : "Nearest"
+*       Name of the interpolation scheme to use when 
+*       sampling the sky image. See docs for astResample.
 *     meanatm (double) : 7.0 (pW)
 *       Mean expeected atmospheric signal.
 *     nasang (double) : 90.0 (Degrees)
@@ -409,6 +412,12 @@
 *     ncycle (integer) : 1
 *       Number of cycles through the DREAM
 *       pattern.
+*     param1 (double) : 2.0
+*       Name of the first parameter for the sky interpolation 
+*       scheme specified by "interp". See docs for astResample.
+*     param2 (double) : 2.0
+*       Name of the second parameter for the sky interpolation 
+*       scheme specified by "interp". See docs for astResample.
 *     smu_terr (double) : 0.0
 *       SMU timing error.
 *     subname (char[]) : s8a
@@ -506,6 +515,8 @@
 *         Free bolos array.
 *     2008-10-10 (AGG):
 *         Add NOISE observing mode
+*     2009-11-20 (DSB):
+*         Document "interp", "param1" and "param2".
 *     {enter_further_changes_here}
 
 *  Copyright:

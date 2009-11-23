@@ -144,6 +144,8 @@
  *        - Add defocus multiplier
  *     2008-10-10 (AGG):
  *        Allow NOISE observations, set the astronomical signal to zero
+ *     2009-11-20 (DSB):
+ *        Pass "interp" and "params" to sc2sim_getast_wcs.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -271,7 +273,7 @@ void sc2sim_simframe
   }
 
   if( *status == SAI__OK ) {
-    bolo2map = astCmpMap( bolo2sky, sky2map, 1, "" );
+    bolo2map = astCmpMap( bolo2sky, sky2map, 1, " " );
     if( !astOK ) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "AST error calculating bolo->image pixel mapping",
@@ -281,8 +283,8 @@ void sc2sim_simframe
 
   /* Sample astronomical sky image */
   if( *status == SAI__OK ) {
-    sc2sim_getast_wcs( inx.colsize, inx.rowsize, xbolo, ybolo, bolo2map, astsim, astnaxes, dbuf,
-                       status);
+    sc2sim_getast_wcs( inx.colsize, inx.rowsize, xbolo, ybolo, bolo2map, astsim, astnaxes, 
+                       sinx.interp, sinx.params, dbuf, status);
   }
 
   if( *status == SAI__OK ) {

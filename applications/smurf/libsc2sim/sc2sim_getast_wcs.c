@@ -15,7 +15,8 @@
  *  Invocation:
  *     sc2sim_getast_wcs ( size_t colsize, size_t rowsize, const double *xbolo,
  *                         const double *ybolo, AstCmpMap *bolo2map, const double *astsim,
- *                         const int astnaxes[2], double *dbuf, int *status )
+ *                         const int astnaxes[2], int interp, const double *params, 
+ *                         double *dbuf, int *status )
 
  *  Arguments:
  *     colsize = int (Given)
@@ -32,6 +33,12 @@
  *        Astronomical image
  *     astnaxes = const int[] (Given)
  *        Dimensions of simulated image
+ *     interp = int (Given)
+ *        Interpolation method. See docs for astResample for available
+ *        options.
+ *     params = const double * (Given)
+ *        Parameters for the interpolation scheme specified by "interp". See docs for 
+ *        astResample.
  *     dbuf = double* (Returned)
  *        Pointer to bolo output
  *     status = int* (Given and Returned)
@@ -58,6 +65,9 @@
  *        Set bad values to zero
  *     2007-12-18 (AGG):
  *        Update to use new smf_free behaviour
+ *     2009-11-20 (DSB):
+ *        Support other interpolation methods in addition to nearest
+ *        neighbour.
 
  *  Copyright:
  *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
@@ -103,6 +113,8 @@ void sc2sim_getast_wcs
  AstCmpMap *bolo2map,         /* mapping bolo->sky image coordinates (given ) */
  const double *astsim,        /* astronomical image (given) */
  const int astnaxes[2],       /* dimensions of simulated image (given) */
+ int interp,                  /* interpolation method (given) */
+ const double *params,        /* parameters for interpolation method (given) */
  double *dbuf,                /* pointer to bolo output (returned) */
  int *status                  /* global status (given and returned) */
  )
@@ -113,51 +125,96 @@ void sc2sim_getast_wcs
   int xnear;                /* Nearest-neighbour x-pixel coordinate */
   int ynear;                /* Nearest-neighbour y-pixel coordinate */
   double *skycoord;         /* x- and y- sky map pixel coordinates */
-  int lbnd_in[2];           /* Pixel bounds for astRebin */
+  int lbnd_in[2];           /* Pixel bounds for astResample */
   int ubnd_in[2];
+  int lbnd_out[2];          /* Pixel bounds for astResample */
+  int ubnd_out[2];
   size_t nboll;
 
   /* Check status */
   if ( !StatusOkP(status) ) return;
 
-  /* astTranGrid method ----------------------------------------- */
+  /* First deal with nearest neighbour interpolation... */
+  if( interp == AST__NEAREST ) {
 
-  /* Allocate space for arrays */
+     /* astTranGrid method ----------------------------------------- */
+   
+     /* Allocate space for arrays */
+   
+     nboll = colsize * rowsize;
+     skycoord = smf_malloc( nboll*2, sizeof(*skycoord), 1, status );
+   
+     lbnd_in[0] = 1;
+     ubnd_in[SC2STORE__ROW_INDEX] = colsize;
+     lbnd_in[1] = 1;
+     ubnd_in[SC2STORE__COL_INDEX] = rowsize;
+   
+     /* Transform bolo offsets into positions on the input sky image */
+   
+     astTranGrid( bolo2map, 2, lbnd_in, ubnd_in, 0.1, 1000000, 1,
+                  2, nboll, skycoord );
+   
+     /* Nearest-neighbour sampling of image
+        Notes: -1 to account for FORTRAN array indices starting at 1, and
+        +0.5 so that we round to the nearest pixel */
+   
+     for ( i=0; i<nboll; i++ ) {
+       /* Fortran 2d array so stored by column rather than row! */
+       xnear = (int) (skycoord[i] - 1. + 0.5);
+       ynear = (int) (skycoord[nboll+i] - 1. + 0.5);
+       if( (xnear >= 0) && (xnear < astnaxes[0]) &&
+           (ynear >= 0) && (ynear < astnaxes[1]) ) {
+         dbuf[i] = astsim[xnear + astnaxes[0]*ynear];
+         /* Set to zero if we have a bad value */
+         if ( dbuf[i] == VAL__BADD ) {
+           dbuf[i] = 0.0;
+         }
+       } else {
+         dbuf[i] = 0.0;
+       }
+     }
+   
+     skycoord = smf_free(skycoord, status);
 
-  nboll = colsize * rowsize;
-  skycoord = smf_malloc( nboll*2, sizeof(*skycoord), 1, status );
+  /* Now deal with all other interpolation methods... */
 
-  lbnd_in[0] = 1;
-  ubnd_in[SC2STORE__ROW_INDEX] = colsize;
-  lbnd_in[1] = 1;
-  ubnd_in[SC2STORE__COL_INDEX] = rowsize;
+  } else {
 
-  /* Transform bolo offsets into positions on the input sky image */
+     /* astResample requires the inverse Mapping, so invert the supplied
+        Mapping temporarily. */
 
-  astTranGrid( bolo2map, 2, lbnd_in, ubnd_in, 0.1, 1000000, 1,
-               2, nboll, skycoord );
+     astInvert( bolo2map );     
 
-  /* Nearest-neighbour sampling of image
-     Notes: -1 to account for FORTRAN array indices starting at 1, and
-     +0.5 so that we round to the nearest pixel */
+     /* The inputs and outputs of bolo2map are one-based GRID coordinates.
+        Store the bounds of the input (sky) array, and output (bolometer)
+        array. */
 
-  for ( i=0; i<nboll; i++ ) {
-    /* Fortran 2d array so stored by column rather than row! */
-    xnear = (int) (skycoord[i] - 1. + 0.5);
-    ynear = (int) (skycoord[nboll+i] - 1. + 0.5);
-    if( (xnear >= 0) && (xnear < astnaxes[0]) &&
-        (ynear >= 0) && (ynear < astnaxes[1]) ) {
-      dbuf[i] = astsim[xnear + astnaxes[0]*ynear];
-      /* Set to zero if we have a bad value */
-      if ( dbuf[i] == VAL__BADD ) {
-        dbuf[i] = 0.0;
-      }
-    } else {
-      dbuf[i] = 0.0;
-    }
+     lbnd_in[0] = 1;
+     lbnd_in[1] = 1;
+     ubnd_in[0] = astnaxes[0];
+     ubnd_in[1] = astnaxes[1];
+
+     lbnd_out[0] = 1;
+     lbnd_out[1] = 1;
+     ubnd_out[SC2STORE__ROW_INDEX] = colsize;
+     ubnd_out[SC2STORE__COL_INDEX] = rowsize;
+
+     /* Resample the sky image into the bolometer array. Not sure if
+        there will be any bad values in the sky image, but use the AST__USEBAD
+        flag just in case (astResample runs slightly faster without it).
+        Each bolometer array contains relatively few pixels, so switch
+        off the facility for approximating the Mapping by a linear
+        transformation since it won't gain us much in terms of speed (and
+        may actually be slower). */
+
+     astResampleD( bolo2map, 2, lbnd_in, ubnd_in, astsim, NULL, interp, NULL, 
+                   params, AST__USEBAD, 0.0, 0, VAL__BADD, 2, lbnd_out, 
+                   ubnd_out, lbnd_out, ubnd_out, dbuf, NULL ); 
+
+     /* Re-invert the supplied Mapping to bring it back to its original state. */
+
+     astInvert( bolo2map );     
   }
-
-  skycoord = smf_free(skycoord, status);
 }
 
 

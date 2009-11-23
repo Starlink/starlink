@@ -59,6 +59,8 @@
  *        Set more appropriate default values for the atmosphere
  *     2009-10-16 (AGG):
  *        Use one_strlcpy rather than strlcpy
+ *     2009-11-20 (DSB):
+ *        Add sinx->params and sinx->interp.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -258,5 +260,37 @@ void sc2sim_getsimpar ( AstKeyMap *keymap, struct sc2sim_sim_struct *sinx,
   if ( !astMapGet0D ( keymap, "YPOINT", &(sinx->ypoint) ) )
     sinx->ypoint = 20.0;
 
+  if ( !astMapGet0C ( keymap, "INTERP", &temp ) ) {
+    sinx->interp = AST__NEAREST;
+  } else if( astChrMatch( temp, "nearest" ) ) {
+    sinx->interp = AST__NEAREST;
+  } else if( astChrMatch( temp, "linear" ) ) {
+    sinx->interp = AST__LINEAR;
+  } else if( astChrMatch( temp, "sinc" ) ) {
+    sinx->interp = AST__SINC;
+  } else if( astChrMatch( temp, "sincsinc" ) ) {
+    sinx->interp = AST__SINCSINC;
+  } else if( astChrMatch( temp, "sinccos" ) ) {
+    sinx->interp = AST__SINCCOS;
+  } else if( astChrMatch( temp, "sincgauss" ) ) {
+    sinx->interp = AST__SINCGAUSS;
+  } else if( astChrMatch( temp, "somb" ) ) {
+    sinx->interp = AST__SOMB;
+  } else if( astChrMatch( temp, "sombcos" ) ) {
+    sinx->interp = AST__SOMBCOS;
+  } else if( astChrMatch( temp, "blockave" ) ) {
+    sinx->interp = AST__BLOCKAVE;
+  } else if( *status == SAI__OK ) {
+    *status = SAI__ERROR;
+    msgSetc( "I", temp );
+    errRep( " ", "Bad value (^I) for simpar 'Interp'.", status );
+  } 
+  
+  if ( !astMapGet0D ( keymap, "PARAM1", sinx->params ) )
+    sinx->params[0] = 2.0;
+
+  if ( !astMapGet0D ( keymap, "PARAM2", sinx->params + 1 ) )
+    sinx->params[1] = 2.0;
+  
 }
 

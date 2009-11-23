@@ -88,6 +88,8 @@
 *        Change sc2sim_getsigma type to void 
 *     2008-05-23 (AGG):
 *        Add focposn to sc2sim_ndfwrdata API
+*     2009-11-20 (DSB):
+*        Add interp and params to sc2sim_getast_wcs API.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -252,6 +254,8 @@ const double *ybolo,         /* y-bolometer coordinates for array (given) */
 AstCmpMap *bolo2map,         /* mapping bolo->sky image coordinates (given ) */
 const double *astsim,        /* astronomical image (given) */
 const int astnaxes[2],       /* dimensions of simulated image (given) */
+int interp,                  /* interpolation method (given) */
+const double *params,        /* parameters for interpolation method (given) */
 double *dbuf,                /* pointer to bolo output (returned) */
 int *status                  /* global status (given and returned) */
 );

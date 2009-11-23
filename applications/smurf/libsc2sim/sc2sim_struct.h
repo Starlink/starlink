@@ -103,6 +103,8 @@
  *        Add MODE__NOISE to obsMode
  *     2009-10-15 (TIMJ):
  *        Store subarray names in char array.
+ *     2009-11-20 (DSB):
+ *        Added interp and params.
 
 *  Copyright:
 *     Copyright (C) 2007,2009 Science and Technology Facilities Council.
@@ -253,11 +255,13 @@ struct sc2sim_sim_struct      /* parameters read from sim input file */
   double casspol;             /* polarisation of Cass optics (%) */
   double casstrans;           /* transmission of Cass optics (%) */
   int flux2cur;               /* Convert power to current 1=yes, 0=no */
+  int interp;                 /* Interpolation method */
   double jy2pw;               /* Jy to pW conversion modulo atm transmission */
   double nasang;              /* polarisation angle of Nasmyth optics (deg) */
   double naspol;              /* polarisation of Nasmyth optics (%) */
   double nastrans;            /* transmission of Nasmyth optics (%) */
   int ncycle;                 /* Number of cycles through the pattern */
+  double params[2];           /* Interpolation parameters */
   double refload;             /* Reference load in pW */
   double refnoise;            /* Reference NEP in pW/sqrt(Hz) @ refload */
   double smu_terr;            /* SMU timing error */
