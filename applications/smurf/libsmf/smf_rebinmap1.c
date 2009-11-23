@@ -395,11 +395,6 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
 	  /* Otherwise re-normalize */
 	  mapvar[i] = 1/mapweight[i];
 	  map[i] *= mapvar[i];
-
-          /* variance only reliable if we had enough samples */
-          if( hitsmap[i] < SMF__MINSTATSAMP ) {
-            mapvar[i] = VAL__BADD;
-          }
 	}
       }
     }

@@ -1266,18 +1266,11 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
               }
 
               /* Rebin the residual + astronomical signal into a map */
-
-              if( dat.noi ) {
-                smf_rebinmap1( res[i]->sdata[idx], dat.noi[i]->sdata[idx],
-                               lut_data, qua_data, SMF__Q_GOOD, varmapmethod,
-                               rebinflags, thismap, thisweight, thishits,
-                               thisvar, msize, &scalevar, status );
-              } else {
-                smf_rebinmap1( res[i]->sdata[idx], NULL,
-                               lut_data, qua_data, SMF__Q_GOOD, varmapmethod,
-                               rebinflags, thismap, thisweight, thishits,
-                               thisvar, msize, &scalevar, status );
-              }
+              smf_rebinmap1( res[i]->sdata[idx],
+                             dat.noi ? dat.noi[i]->sdata[idx] : NULL,
+                             lut_data, qua_data, SMF__Q_GOOD, varmapmethod,
+                             rebinflags, thismap, thisweight, thishits,
+                             thisvar, msize, &scalevar, status );
             }
 
             /*** TIMER ***/
@@ -1489,7 +1482,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
          is flagged as being OK */
 
       if( bolomap && (*status == SAI__OK) ) {
-        /* Currently only support memiter=1 case */
+        /* Currently only support memiter=1 case to avoid having to do
+           a separate chunk loop. */
         if( !memiter ) {
           msgOut( "", FUNC_NAME
                   ": *** WARNING *** bolomap=1, but memiter=0", status );
@@ -1573,10 +1567,11 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      about variance weighting because all samples from
                      same detector are about the same. */
 
-                  smf_rebinmap1( res[0]->sdata[idx], NULL,
+                  smf_rebinmap1( res[0]->sdata[idx],
+                                 dat.noi ? dat.noi[0]->sdata[idx] : NULL,
                                  lut_data, qua_data,
-                                 SMF__Q_GOOD,
-                                 1, AST__REBININIT | AST__REBINEND,
+                                 SMF__Q_GOOD, varmapmethod,
+                                 AST__REBININIT | AST__REBINEND,
                                  mapdata->pntr[0],
                                  bmapweight, bhitsmap, mapdata->pntr[1], msize,
                                  NULL, status );
