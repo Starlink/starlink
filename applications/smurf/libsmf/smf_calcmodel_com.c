@@ -95,6 +95,10 @@
 *        Measure normalized change in model between iterations (dchisq)
 *     2009-10-25 (EC)
 *        Add back in option of using commod-mode to flatfield data
+*     2009-11-24 (EC)
+*        - bad bolo flagging from common-mode fit can be controlled with
+*          config params: corr_tol, gain_tol, gain_abstol
+*        - only throw out bolos with correlation coeffs that are *lower*
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -381,6 +385,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   dim_t cgood;                  /* Number of good corr. coeff. samples */
   double cmean;                 /* mean of common-mode correlation coeff */
   double *corr=NULL;            /* Array to hold correlation coefficients */
+  double corr_tol;              /* n-sigma correlation coeff. tolerance */
   double csig;                  /* standard deviation "                  */
   double *gcoeff=NULL;          /* Array to hold gain coefficients */
   int gflat=0;                  /* If set use GAIn to adjust flatfield */
@@ -392,6 +397,8 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   smfArray *gai=NULL;           /* Pointer to GAI at chunk */
   double *gai_data=NULL;        /* Pointer to DATA component of GAI */
   double **gai_data_copy=NULL;  /* copy of gai_data for all subarrays */
+  double gain_abstol;           /* absolute gain coeff. tolerance */
+  double gain_tol;              /* n-sigma gain coeff. tolerance */
   size_t gbstride;              /* GAIn bolo stride */
   size_t gcstride;              /* GAIn coeff stride */
   AstKeyMap *gkmap=NULL;        /* Local GAIn keymap */
@@ -502,6 +509,19 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
     /* Check for minimum boxcar width*/
     if( astMapGet0I( kmap, "BOXMIN", &boxmin) ) {
       do_boxmin = 1;
+    }
+
+    /* Bolo rejection parameters */
+    if( !astMapGet0D(kmap, "CORR_TOL", &corr_tol) ) {
+      corr_tol = 5;
+    }
+
+    if( !astMapGet0D(kmap, "GAIN_TOL", &gain_tol) ) {
+      gain_tol = 5;
+    }
+
+    if( !astMapGet0D(kmap, "GAIN_ABSTOL", &gain_abstol) ) {
+      gain_abstol = 3;
     }
   }
 
@@ -850,8 +870,10 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         /* Flag new bad bolometers */
         newbad = 0;
         for( i=0; (*status==SAI__OK) && (i<nbolo); i++ ) {
-          if( (corr[i]==VAL__BADD) || (fabs(corr[i]-cmean) > 5*csig) ||
-              (fabs(gcoeff[i]-gmean) > 5*gsig) || (fabs(gcoeff[i]-gmean)>3) ) {
+          if( (corr[i]==VAL__BADD) ||
+              ((cmean - corr[i]) > corr_tol*csig) || /* only flag worse bolos */
+              (fabs(gcoeff[i]-gmean) > gain_tol*gsig) ||
+              (fabs(gcoeff[i]-gmean) > gain_abstol) ) {
             size_t ibase = i*bstride;
             /* If this bolometer wasn't previously flagged as bad
                do it here, and set quit=0 */
