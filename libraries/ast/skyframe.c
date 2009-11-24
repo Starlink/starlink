@@ -265,6 +265,12 @@ f     The SkyFrame class does not define any new routines beyond those
 *     31-OCT-2009 (DSB);
 *        Correct SetCachedLAST to handle cases where the epoch to be
 *        stored is smaller than any epoch already in the table.
+*     24-NOV-2009 (DSB):
+*        - In CalcLast, only use end values form the table of stored 
+*        LAST values if the corresponding epochs are within 0.001 of 
+*        a second of the required epoch (this tolerance used to be 
+*        0.1 seconds).
+*        - Do not clear the cached LAST value in SetEpoch and ClearEpoch.
 *class--
 */
 
@@ -1493,13 +1499,6 @@ static void ClearEpoch( AstFrame *this_frame, int *status ) {
 /* Invoke the parent method to clear the Frame epoch. */
    (*parent_clearepoch)( this_frame, status );
 
-/* If the Epoch value has changed significantly, indicate that the LAST value 
-   will need to be re-calculated when it is next needed. */
-   if( fabs( orig - astGetEpoch( this ) ) > 1.0E-8 ) {
-      this->last = AST__BAD;
-      this->eplast = AST__BAD;
-      this->klast = AST__BAD;
-   }
 }
 
 static void ClearObsAlt( AstFrame *this, int *status ) {
@@ -2704,15 +2703,20 @@ static double GetCachedLAST( AstSkyFrame *this, double epoch, double obslon,
          dep = ep[ ilo ] - epoch;
 
 /* If the entry selected above is the first entry in the table, it can
-   only be used if it is within 0.1 second of the requested epoch. */
+   only be used if it is within 0.001 second of the requested epoch. */
          if( ilo == 0 ) {
-            if( fabs( dep ) < 0.1/86400.0 ) result = lp[ 0 ];
+            if( fabs( dep ) < 0.001/86400.0 ) {
+               result = lp[ 0 ];
+            }
 
 /* If the list of epoch values contained no value that was greater than
    the supplied epoch value, then we can use the last entry if
-   it is no more than 0.1 second away from the requested epoch. */
+   it is no more than 0.001 second away from the requested epoch. */
          } else if( dep <= 0.0 ) {
-            if( fabs( dep ) < 0.1/86400.0 ) result = lp[ ilo ];
+            if( fabs( dep ) < 0.001/86400.0 ) {
+                result = lp[ ilo ];
+            } 
+
 
 /* Otherwise, see if the entry selected above is sufficiently close to
    its lower neighbour (i.e. closer than 0.4 days) to allow a reasonably
@@ -2723,9 +2727,9 @@ static double GetCachedLAST( AstSkyFrame *this, double epoch, double obslon,
             result = *lp + ( epoch - *ep )*( lp[ 1 ] - *lp )/( ep[ 1 ] - *ep );
 
 /* If the neighbouring point is too far away for interpolation to be
-   reliable, then we can only use the point if it is within 0.1 seconds of
+   reliable, then we can only use the point if it is within 0.001 seconds of
    the requested epoch. */
-         } else if( fabs( dep ) < 0.1/86400.0 ) {
+         } else if( fabs( dep ) < 0.001/86400.0 ) {
             result = lp[ ilo ];
          }
 
@@ -8496,14 +8500,6 @@ static void SetEpoch( AstFrame *this_frame, double val, int *status ) {
 /* Invoke the parent method to set the Frame epoch. */
    (*parent_setepoch)( this_frame, val, status );
 
-/* If the epoch has changed significantly, indicate that the LAST value 
-   corresponding to the Epoch will need to be re-calculated when it is 
-   next needed. */
-   if( fabs( orig - val ) > 1.0E-8 ) {
-      this->last = AST__BAD;
-      this->eplast = AST__BAD;
-      this->klast = AST__BAD;
-   }
 }
 
 static void SetLast( AstSkyFrame *this, int *status ) {
