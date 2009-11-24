@@ -18358,13 +18358,63 @@ iraf! {
       }
    }
 
+   command lutaips0 {
+      alias {lutaips0}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/aips0_lut}
+      }
+   }
+
+   command lutbackgr {
+      alias {lutbackgr}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/backgr_lut}
+      }
+   }
+
    command lutbgyrw {
-      alias {lutb(gyrw)}
+      alias {lutbgyrw}
       task lutable {
          taskinherit device
          taskparam mapping=linear
          taskparam coltab=external
          taskparam {lut=$KAPPA_DIR/bgyrw_lut}
+      }
+   }
+
+   command lutblue {
+      alias {lutblue}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/blue_lut}
+      }
+   }
+
+   command lutblulut {
+      alias {lutblulut}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/blulut_lut}
+      }
+   }
+
+   command lutbrown {
+      alias {lutbrown}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/brown_lut}
       }
    }
 
@@ -18386,8 +18436,18 @@ iraf! {
       }
    }
 
+   command lutcolor {
+      alias {lutcolor}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/color_lut}
+      }
+   }
+
    command lutcont {
-      alias {lutcon(t)}
+      alias {lutcont}
       task lutable {
          taskinherit device
          taskparam mapping=linear
@@ -18397,11 +18457,22 @@ iraf! {
    }
 
    command lutfc {
+      alias {lutfc}
       task lutable {
          taskinherit device
          taskparam mapping=linear
          taskparam coltab=external
          taskparam {lut=$KAPPA_DIR/fc_lut}
+      }
+   }
+
+   command lutgreen {
+      alias {lutgreen}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/green_lut}
       }
    }
 
@@ -18415,7 +18486,7 @@ iraf! {
    }
 
    command lutheat {
-      alias {luthe(at)}
+      alias {lutheat}
       task lutable {
          taskinherit device
          taskparam mapping=linear
@@ -18424,13 +18495,133 @@ iraf! {
       }
    }
 
+   command lutidl11 {
+      alias {lutidl11}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/idl11_lut}
+      }
+   }
+
+   command lutidl12 {
+      alias {lutidl12}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/idl12_lut}
+      }
+   }
+
+   command lutidl14 {
+      alias {lutidl14}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/idl14_lut}
+      }
+   }
+
+   command lutidl15 {
+      alias {lutidl15}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/idl15_lut}
+      }
+   }
+
+   command lutidl2 {
+      alias {lutidl2}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/idl2_lut}
+      }
+   }
+
+   command lutidl4 {
+      alias {lutidl4}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/idl4_lut}
+      }
+   }
+
+   command lutidl5 {
+      alias {lutidl5}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/idl5_lut}
+      }
+   }
+
+   command lutidl6 {
+      alias {lutidl6}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/idl6_lut}
+      }
+   }
+
    command lutikon {
-      alias {luti(kon)}
+      alias {lutikon}
       task lutable {
          taskinherit device
          taskparam mapping=linear
          taskparam coltab=external
          taskparam {lut=$KAPPA_DIR/ikon_lut}
+      }
+   }
+
+   command lutisophot {
+      alias {lutisophot}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/isophot_lut}
+      }
+   }
+
+   command lutlight {
+      alias {lutlight}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/light_lut}
+      }
+   }
+
+   command lutlogo {
+      alias {lutlogo}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/logo_lut}
+      }
+   }
+
+   command lutmanycol {
+      alias {lutmanycol}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/manycol_lut}
       }
    }
 
@@ -18443,13 +18634,153 @@ iraf! {
       }
    }
 
+   command lutpastel {
+      alias {lutpastel}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/pastel_lut}
+      }
+   }
+
+   command lutrainbow1 {
+      alias {lutrainbow1}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/rainbow1_lut}
+      }
+   }
+
+   command lutrainbow2 {
+      alias {lutrainbow2}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/rainbow2_lut}
+      }
+   }
+
+   command lutrainbow3 {
+      alias {lutrainbow3}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/rainbow3_lut}
+      }
+   }
+
+   command lutrainbow4 {
+      alias {lutrainbow4}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/rainbow4_lut}
+      }
+   }
+
+   command lutrainbow {
+      alias {lutrainbow}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/rainbow_lut}
+      }
+   }
+
+   command lutramp {
+      alias {lutramp}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/ramp_lut}
+      }
+   }
+
    command lutramps {
-      alias {lutra(mps)}
+      alias {lutramps}
       task lutable {
          taskinherit device
          taskparam mapping=linear
          taskparam coltab=external
          taskparam {lut=$KAPPA_DIR/ramps_lut}
+      }
+   }
+
+   command lutrandom1 {
+      alias {lutrandom1}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/random1_lut}
+      }
+   }
+
+   command lutrandom2 {
+      alias {lutrandom2}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/random2_lut}
+      }
+   }
+
+   command lutrandom3 {
+      alias {lutrandom3}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/random3_lut}
+      }
+   }
+
+   command lutrandom4 {
+      alias {lutrandom4}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/random4_lut}
+      }
+   }
+
+   command lutrandom5 {
+      alias {lutrandom5}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/random5_lut}
+      }
+   }
+
+   command lutrandom6 {
+      alias {lutrandom6}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/random6_lut}
+      }
+   }
+
+   command lutrandom {
+      alias {lutrandom}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/random_lut}
       }
    }
 
@@ -18463,8 +18794,68 @@ iraf! {
       }
    }
 
-   command lutspec {
-      alias {lutsp(ec)}
+   command lutreal {
+      alias {lutreal}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/real_lut}
+      }
+   }
+
+   command lutred {
+      alias {lutred}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/red_lut}
+      }
+   }
+
+   command lutsmooth1 {
+      alias {lutsmooth1}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/smooth1_lut}
+      }
+   }
+
+   command lutsmooth2 {
+      alias {lutsmooth2}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/smooth2_lut}
+      }
+   }
+
+   command lutsmooth3 {
+      alias {lutsmooth3}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/smooth3_lut}
+      }
+   }
+
+   command lutsmooth {
+      alias {lutsmooth}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/smooth_lut}
+      }
+   }
+
+   command lutspectrum {
+      alias {lutspectrum}
       task lutable {
          taskinherit device
          taskparam mapping=linear
@@ -18473,8 +18864,58 @@ iraf! {
       }
    }
 
+   command lutspec {
+      alias {lutspec}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/spectrum_lut}
+      }
+   }
+
+   command lutstaircase {
+      alias {lutstaircase}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/staircase_lut}
+      }
+   }
+
+   command lutstairs8 {
+      alias {lutstairs8}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/stairs8_lut}
+      }
+   }
+
+   command lutstairs9 {
+      alias {lutstairs9}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/stairs9_lut}
+      }
+   }
+
+   command lutstandard {
+      alias {lutstandard}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/standard_lut}
+      }
+   }
+
    command lutwarm {
-      alias {lutwa(rm)}
+      alias {lutwarm}
       task lutable {
          taskinherit device
          taskparam mapping=linear
@@ -18484,7 +18925,7 @@ iraf! {
    }
 
    command lutzebra {
-      alias {lutz(ebra)}
+      alias {lutzebra}
       task lutable {
          taskinherit device
          taskparam mapping=linear
