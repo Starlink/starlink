@@ -1572,6 +1572,13 @@ void smurf_makemap( int *status ) {
     }
     histogram = astFree( histogram );
 
+    /* Store the keywords holding the number of tiles generated and the index
+       of the current tile. For the iterative mapmaker these are currently
+       alwatys 1. */
+    atlPtfti( fchan, "NUMTILES", 1,
+              "No. of tiles covering the field", status );
+    atlPtfti( fchan, "TILENUM", 1,
+              "Index of this tile (1->NUMTILES)", status );
 
     /* If the FitsChan is not empty, store it in the FITS extension of the
        output NDF (any existing FITS extension is deleted). No need to
