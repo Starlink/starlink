@@ -48,7 +48,7 @@
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 2001 Central Laboratory of the Research Councils.
+*     Copyright (C) 2008, 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
