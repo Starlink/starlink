@@ -419,6 +419,7 @@ typedef struct smfHead {
   smf_obstype obstype;      /* Observation type */
   smf_obsmode obsmode;      /* observing mode */
   smf_swmode swmode;        /* switching mode */
+  smf_obstype seqtype;      /* Sequence type */
   int isCloned;             /* If false, allState is owned by this
                                struct, if true it should not be freed */
   JCMTState *allState;     /* Array of STATE for every time slice */

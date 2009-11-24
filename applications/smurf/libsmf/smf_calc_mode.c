@@ -76,20 +76,26 @@
 #include "ast.h"
 #include "sae_par.h"
 #include "mers.h"
+#include "star/one.h"
 
 /* SMURF includes */
 #include "smf.h"
 #include "smf_typ.h"
+#include "smf_err.h"
 
 #define FUNC_NAME "smf_calc_mode"
+
+static smf_obstype smf__parse_obstype ( char obs_type[], int *status );
 
 void smf_calc_mode ( smfHead * hdr, int * status ) {
   
   char sam_mode[SZFITSCARD+1];   /* Value of SAM_MODE header */
   char obs_type[SZFITSCARD+1];   /* value of OBS_TYPE header */
   char sw_mode[SZFITSCARD+1];    /* value of SW_MODE header */
+  char seq_type[SZFITSCARD+1];   /* value of SEQ_TYPE header */
 
   smf_obstype type = SMF__TYP_NULL;   /* temporary type */
+  smf_obstype stype = SMF__TYP_NULL;   /* temporary seq type */
   smf_obsmode mode = SMF__OBS_NULL;   /* temporary mode */
   smf_swmode  swmode = SMF__SWM_NULL; /* Switching mode */
 
@@ -108,6 +114,15 @@ void smf_calc_mode ( smfHead * hdr, int * status ) {
     smf_fits_getS( hdr, "SAM_MODE", sam_mode, sizeof(sam_mode), status );
     smf_fits_getS( hdr, "SW_MODE", sw_mode, sizeof(sw_mode), status );
     smf_fits_getS( hdr, "OBS_TYPE", obs_type, sizeof(obs_type), status );
+
+    /* SEQ_TYPE is "new" */
+    if ( *status == SAI__OK ) {
+      smf_fits_getS( hdr, "SEQ_TYPE", seq_type, sizeof(seq_type), status );
+      if (*status == SMF__NOKWRD ) {
+        errAnnul( status );
+        one_strlcpy( seq_type, obs_type, sizeof(seq_type), status );
+      }
+    }
 
     /* start with sample type */
     if (strcasecmp( sam_mode, "SCAN" ) == 0 ||
@@ -151,31 +166,44 @@ void smf_calc_mode ( smfHead * hdr, int * status ) {
     }
 
     /* obs type */
-    if (strcasecmp( obs_type, "SCIENCE" ) == 0) {
-      type = SMF__TYP_SCIENCE;
-    } else if (strcasecmp( obs_type, "POINTING" ) == 0) {
-      type = SMF__TYP_POINTING;
-    } else if (strcasecmp( obs_type, "FOCUS" ) == 0) {
-      type = SMF__TYP_FOCUS;
-    } else if (strcasecmp( obs_type, "SKYDIP" ) == 0) {
-      type = SMF__TYP_SKYDIP;
-    } else if (strcasecmp( obs_type, "FLATFIELD" ) == 0) {
-      type = SMF__TYP_FLATFIELD;
-    } else if (strcasecmp( obs_type, "NOISE" ) == 0) {
-      type = SMF__TYP_NOISE;
-    } else {
-      if (*status != SAI__OK) {
-        *status = SAI__ERROR;
-        msgSetc( "TYP", obs_type );
-        errRep( " ", "Unrecognized observation type '^TYP'", status );
-      }
-    }
+    type = smf__parse_obstype( obs_type, status );
+    stype = smf__parse_obstype( seq_type, status );
+
   }
 
   hdr->obstype = type;
+  hdr->seqtype = stype;
   hdr->obsmode = mode;
   hdr->swmode = swmode;
 
 }
 
 
+/* Factor out the OBS_TYPE checking for re-use in SEQ_TYPE checking */
+
+static smf_obstype smf__parse_obstype ( char obs_type[], int *status ) {
+  smf_obstype type = SMF__TYP_NULL;
+
+  if (*status != SAI__OK) return type;
+
+  if (strcasecmp( obs_type, "SCIENCE" ) == 0) {
+    type = SMF__TYP_SCIENCE;
+  } else if (strcasecmp( obs_type, "POINTING" ) == 0) {
+    type = SMF__TYP_POINTING;
+  } else if (strcasecmp( obs_type, "FOCUS" ) == 0) {
+    type = SMF__TYP_FOCUS;
+  } else if (strcasecmp( obs_type, "SKYDIP" ) == 0) {
+    type = SMF__TYP_SKYDIP;
+  } else if (strcasecmp( obs_type, "FLATFIELD" ) == 0) {
+    type = SMF__TYP_FLATFIELD;
+  } else if (strcasecmp( obs_type, "NOISE" ) == 0) {
+    type = SMF__TYP_NOISE;
+  } else {
+    if (*status != SAI__OK) {
+      *status = SAI__ERROR;
+      msgSetc( "TYP", obs_type );
+      errRep( " ", "Unrecognized observation type '^TYP'", status );
+    }
+  }
+  return type;
+}
