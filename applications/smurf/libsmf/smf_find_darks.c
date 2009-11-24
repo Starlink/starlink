@@ -55,6 +55,8 @@
 *       will simply filter out the dark frames.
 *     - it is an error for "darkgrp", "outgrp" and "darks" to all be NULL.
 *     - The darks will be returned in time order.
+*     - Observations which have a SEQ_TYPE header and whose value differs
+*       OBS_TYPE will be filtered out and not copied to outgrp.
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
@@ -78,6 +80,10 @@
 *        to be a little more robust with junk files.
 *     2009-09-25 (TIMJ):
 *        Move sort routine externally.
+*     2009-11-24 (TIMJ):
+*        Quick hack to filter out SEQ_TYPE ne OBS_TYPE observations. Proper
+*        solution is for an additional smfArray to be returned with these
+*        items.
 
 *  Copyright:
 *     Copyright (C) 2008-2009 Science and Technology Facilities Council.
@@ -201,10 +207,17 @@ void smf_find_darks( const Grp * ingrp, Grp **outgrp, Grp **darkgrp,
         dkcount++;
       }
     } else {
-      /* store the file in the output group */
-      ndgCpsup( ingrp, i, ogrp, status );
-      msgSetc("F", infile->file->name);
-      msgOutif(MSG__DEBUG, " ", "Non-dark file: ^F",status);
+      /* compare sequence type with observation type and drop it (for now)
+         if they differ */
+      if ( infile->hdr->obstype == infile->hdr->seqtype ) {
+        /* store the file in the output group */
+        ndgCpsup( ingrp, i, ogrp, status );
+        msgSetc("F", infile->file->name);
+        msgOutif(MSG__DEBUG, " ", "Non-dark file: ^F",status);
+      } else {
+        msgSetc("F", infile->file->name);
+        msgOutif(MSG__DEBUG, " ", "Sequence type mismatch with observation type: ^F",status);
+      }
     }
 
     /* close the file */
