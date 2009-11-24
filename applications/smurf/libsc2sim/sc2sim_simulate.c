@@ -281,6 +281,8 @@
  *        Add NOISE observations
  *     2009-11-13 (TIMJ):
  *        Use AST to determine pixel scale of astronomical image.
+ *     2009-11-24 (DSB):
+ *        Assign values to state.tcs_az_bc1/2 before calling sc2ast_createwcs.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -1260,6 +1262,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
             state.tcs_tr_ac1 = bor_ra[frame];
             state.tcs_tr_ac2 = bor_dec[frame];
             /* Set BASE position */
+            state.tcs_az_bc1 = base_az[ frame ];
+            state.tcs_az_bc2 = base_el[ frame ];
             if (planet) {
               state.tcs_tr_bc1 = raapp;
               state.tcs_tr_bc2 = decapp;
@@ -1267,6 +1271,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
               state.tcs_tr_bc1 = inx->ra;
               state.tcs_tr_bc2 = inx->dec;
             }
+
             state.smu_az_jig_x = jig_x_hor[frame];
             state.smu_az_jig_y = jig_y_hor[frame];
             state.smu_az_chop_x = 0;
