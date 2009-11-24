@@ -75,6 +75,10 @@
 *  History:
 *     2008 April 13 (MJC):
 *        Original version based upon MBT's KPS1_MSA.
+*     2009 November 24 (MJC):
+*        Initialise returned identifiers.  Use NDF_MSG rather than
+*        GRP_GET and MSG_SETC to define tokens for the NDF names in
+*        the error message.
 *     {enter_further_changes_here}
 
 *-
@@ -112,8 +116,11 @@
 
 *.
 
-*  Set the returned identifier to null.
+*  Set the returned identifiers to null.
       ONDF = NDF__NOID
+      DO I = 1, NNDF
+         INDFS( I ) = NDF__NOID
+      END DO
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -133,10 +140,8 @@
             NDIM0 = NDIM 
          ELSE
             IF ( NDIM .NE. NDIM0 ) THEN
-               CALL GRP_GET( IGRP, 1, 1, NAME, STATUS )
-               CALL MSG_SETC( 'NDF0', NAME )
-               CALL GRP_GET( IGRP, 1, I, NAME, STATUS )
-               CALL MSG_SETC( 'NDF', NAME )
+               CALL NDF_MSG( 'NDF0', INDFS( 1 ) )
+               CALL NDF_MSG( 'NDF', INDFS( I ) )
                CALL MSG_SETI( 'NDIM0', NDIM0 )
                CALL MSG_SETI( 'NDIM', NDIM )
                STATUS = SAI__ERROR
