@@ -68,6 +68,10 @@
  *     2009-11-20 (DSB):
  *        Support other interpolation methods in addition to nearest
  *        neighbour.
+ *     2009-11-24 (DSB):
+ *        Put zeros ito the returned array instead of VAL__BADD values.
+ *        Also correct the determination of nearest integer for negative 
+ *        values of "skycoord".
 
  *  Copyright:
  *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
@@ -129,7 +133,7 @@ void sc2sim_getast_wcs
   int ubnd_in[2];
   int lbnd_out[2];          /* Pixel bounds for astResample */
   int ubnd_out[2];
-  size_t nboll;
+  int nboll;
 
   /* Check status */
   if ( !StatusOkP(status) ) return;
@@ -156,12 +160,12 @@ void sc2sim_getast_wcs
    
      /* Nearest-neighbour sampling of image
         Notes: -1 to account for FORTRAN array indices starting at 1, and
-        +0.5 so that we round to the nearest pixel */
+        +/-0.5 so that we round to the nearest pixel */
    
      for ( i=0; i<nboll; i++ ) {
        /* Fortran 2d array so stored by column rather than row! */
-       xnear = (int) (skycoord[i] - 1. + 0.5);
-       ynear = (int) (skycoord[nboll+i] - 1. + 0.5);
+       xnear = (int) (skycoord[i] + (skycoord[i]>0?0.5:-0.5)) - 1;
+       ynear = (int) (skycoord[nboll+i] + (skycoord[nboll+i]>0?0.5:-0.5)) - 1;
        if( (xnear >= 0) && (xnear < astnaxes[0]) &&
            (ynear >= 0) && (ynear < astnaxes[1]) ) {
          dbuf[i] = astsim[xnear + astnaxes[0]*ynear];
@@ -184,6 +188,13 @@ void sc2sim_getast_wcs
         Mapping temporarily. */
 
      astInvert( bolo2map );     
+
+     /* We want to generate zeros rather than VAL__BADDs in the output
+        array, so initialise the output array to hold zeros, and use the
+        AST__NOBAD flag when calling astResample. We need to also use the
+        AST__USEBAD flag so that bad values in the input are recognised. */
+     nboll = colsize * rowsize;
+     for ( i=0; i<nboll; i++ ) dbuf[i] = 0.0;
 
      /* The inputs and outputs of bolo2map are one-based GRID coordinates.
         Store the bounds of the input (sky) array, and output (bolometer)
@@ -208,8 +219,8 @@ void sc2sim_getast_wcs
         may actually be slower). */
 
      astResampleD( bolo2map, 2, lbnd_in, ubnd_in, astsim, NULL, interp, NULL, 
-                   params, AST__USEBAD, 0.0, 0, VAL__BADD, 2, lbnd_out, 
-                   ubnd_out, lbnd_out, ubnd_out, dbuf, NULL ); 
+                   params, AST__USEBAD | AST__NOBAD, 0, 0, VAL__BADD, 
+                   2, lbnd_out, ubnd_out, lbnd_out, ubnd_out, dbuf, NULL ); 
 
      /* Re-invert the supplied Mapping to bring it back to its original state. */
 
