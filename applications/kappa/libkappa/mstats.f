@@ -552,9 +552,12 @@
      :               /'Absdev,Cmean,Csigma,RMS,Sigma,Sum,Iwc,Iwd,Integ'
          ELSE IF ( NNDF .EQ. 1 ) THEN
             ESTIMO = 'Mean,Max,Min,Comax,Comin,Sum,Iwc,Integ'
-         ELSE IF ( NNDF .GE. 2 ) THEN
+         ELSE IF ( NNDF .EQ. 2 ) THEN
             ESTIMO = 'Mean,WMean,Max,Min,Comax,Comin,Absdev,Sum,Iwc,'/
      :               /'Integ'
+         ELSE IF ( NNDF .EQ. 3 ) THEN
+            ESTIMO = 'Mean,WMean,Median,Max,Min,Comax,Comin,Absdev,'/
+     :               /'Sum,Iwc,Integ'
          END IF
 
 *  Get the ESTIMATOR and WLIM parameters.
