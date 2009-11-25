@@ -89,6 +89,8 @@
 *        was causing odd problems in the pipeline.
 *     2009-11-13 (TIMJ):
 *        Add support for sky flatfields
+*     2009-11-24 (TIMJ):
+*        Handle case where no darks are supplied.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -209,6 +211,11 @@ void smurf_calcflat( int *status ) {
     /* everything is in the dark */
     flatfiles = darks;
     darks = NULL;
+
+    /* make the input group be the dark group for later provenance handling */
+    if (igrp) grpDelet( &igrp, status );
+    igrp = dkgrp;
+    dkgrp = NULL;
   } else {
     const float clip[] = { 3.0 };
     flatfiles = smf_create_smfArray( status );
@@ -489,12 +496,12 @@ void smurf_calcflat( int *status ) {
     if (flatgrp) grpDelet( &flatgrp, status );
 
     /* write out the flatfield */
-    smf_flat_write( flatname, bbhtframe, pixheat, powref, bolref, dkgrp, status );
+    smf_flat_write( flatname, bbhtframe, pixheat, powref, bolref, igrp, status );
 
     if (respmap) {
       /* write the provenance at the end since we have some problems with A-tasks
          in the pipeline causing trouble if the OUT parameter has not yet been set */
-      if (respmap->file) smf_accumulate_prov( NULL, dkgrp, 1, respmap->file->ndfid, "SMURF:CALCFLAT", status );
+      if (respmap->file) smf_accumulate_prov( NULL, igrp, 1, respmap->file->ndfid, "SMURF:CALCFLAT", status );
       smf_close_file( &respmap, status );
     }
 
