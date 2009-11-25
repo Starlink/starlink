@@ -58,6 +58,7 @@
 
 *  Authors:
 *     Edward Chapin (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -69,10 +70,12 @@
 *     2008-04-18 (EC):
 *        - Return nflagged
 *        - use size_t in interface
+*     2009-11-25 (TIMJ):
+*        Tidy up status handling a bit.
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
-*     University of British Columbia.
+*     Copyright (C) 2008 Univeristy of British Columbia.
+*     Copyright (C) 2009 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -141,6 +144,7 @@ void smf_flag_spikes( smfData *data, double *bolovar, unsigned char *quality,
 
   /* Assert bolo-ordered data to make life easier */
   smf_dataOrder( data, 0, status );
+  if (*status != SAI__OK) return;
 
   /* Pointers to data and quality */
   dat = data->pntr[0];
@@ -168,11 +172,12 @@ void smf_flag_spikes( smfData *data, double *bolovar, unsigned char *quality,
                   status );
 
     /* Valid threshold check */
-    if( thresh <= 0 ) {
+    if( thresh <= 0 && *status == SAI__OK ) {
       *status = SAI__ERROR;
       msgSetd("THRESH",thresh);
       errRep( "", FUNC_NAME ": Can't find spikes: thresh=^THRESH, must be > 0",
 	     status);
+      return;
     }
   }
 
@@ -193,17 +198,22 @@ void smf_flag_spikes( smfData *data, double *bolovar, unsigned char *quality,
         if( bolovar[i] > 0 ) {
           sig = sqrt(bolovar[i]);
         } else {
-          errRep( "", FUNC_NAME ": error, bolovar <= 0.", status );
+          if (*status == SAI__OK) {
+            *status = SAI__ERROR;
+            errRepf( "", FUNC_NAME ": error, variance for bolometer %d <= 0. (is %g)", status, (int)i, bolovar[i] );
+          }
         }
       } else {
         /* Calculate mean and rms of the bolometer */
-        smf_stats1( dat+base, 1, ntslice, qua+base, mask, &mean,
-                    &sig, &ngood, status );
+        if (*status == SAI__OK) {
+          smf_stats1( dat+base, 1, ntslice, qua+base, mask, &mean,
+                      &sig, &ngood, status );
 
-        if( *status == SMF__INSMP ) {
-          /* Insufficient samples for this bolometer. Annul the error. */
-          errAnnul( status );
-          sig = 0;
+          if( *status == SMF__INSMP ) {
+            /* Insufficient samples for this bolometer. Annul the error. */
+            errAnnul( status );
+            sig = 0;
+          }
         }
       }
 
