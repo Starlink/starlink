@@ -36,6 +36,7 @@
 *     -  Otherwise, search for the component to see if it is there.
 
 *  Copyright:
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     Copyright (C) 1989 Science & Engineering Research Council.
 *     All Rights Reserved.
 
@@ -64,6 +65,8 @@
 *        Original version.
 *     26-SEP-1989 (RFWS):
 *        Completed prologue and corrected minor errors.
+*     25-NOV-2009 (TIMJ):
+*        Include the name of the extension in the error message
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -133,13 +136,14 @@
             END IF
          END IF
       END IF
-       
+
 *  If an error occurred, then report context information and call the
 *  error tracing routine.
       IF ( STATUS .NE. SAI__OK ) THEN
+         CALL MSG_SETC( 'NAM', XNAME )
          CALL ERR_REP( 'NDF_XSTAT_ERR',
-     :   'NDF_XSTAT: Error determining if a named NDF extension ' //
-     :   'exists.', STATUS )
+     :   'NDF_XSTAT: Error determining if an NDF extension named ' //
+     :   '"^NAM" exists.', STATUS )
          CALL NDF1_TRACE( 'NDF_XSTAT', STATUS )
       END IF
 
