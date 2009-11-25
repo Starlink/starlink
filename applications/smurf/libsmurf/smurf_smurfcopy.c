@@ -32,7 +32,8 @@
 *  ADAM Parameters:
 *     IN = NDF (Read)
 *          Input file. Can not be a DARK frame. If the input file is
-*          raw data, it will not be flatfielded but will be uncompressed.
+*          raw data it will be flatfielded before writing out. This allows
+*          a reasonable bad pixel mask to be applied.
 *     MSG_FILTER = _CHAR (Read)
 *          Control the verbosity of the application. Values can be
 *          NONE (no messages), QUIET (minimal messages), NORMAL,
@@ -51,6 +52,10 @@
 *  History:
 *     2008-08-13 (TIMJ):
 *        Initial version
+*     2009-11-25 (TIMJ):
+*        Flatfield the data to make it more useful. Fix a problem with
+*        bad status leading to a segv. Fix provenance propagation
+*        from raw data.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -58,6 +63,8 @@
 *     or multiple indices from a single input file. Once extracted the
 *     output file can no longer be processed by SMURF routines.
 *     - Currently only understands SCUBA-2 data.
+*     - SCUBA-2 data will be flatfielded in the output slice if the input
+*     file is raw.
 
 *  Related Applications:
 *     KAPPA: CONTOUR, OUTLINE;
@@ -156,7 +163,8 @@ void smurf_smurfcopy ( int * status ) {
   for (i=1; i<=size; i++) {
 
     /* Open the input file using standard routine */
-    smf_open_file( igrp, i, "READ", SMF__NOCREATE_DA, &data, status );
+    smf_open_and_flatfield( igrp, NULL, i, NULL, &data, status );
+    if (*status != SAI__OK) break;
 
     if (*status == SAI__OK) {
       if (!data->file->isTstream  || data->ndims != 3) {
@@ -196,10 +204,10 @@ void smurf_smurfcopy ( int * status ) {
 
     /* protect against null pointer smfFile */
     if (*status == SAI__OK) {
-
+      smf_dump_smfData( data, 0, status );
       /* sort out provenance */
-      smf_updateprov( ofile->ndfid, data, NDF__NOID,
-                      "SMURF:SMURFCOPY", status );
+      smf_accumulate_prov( data, igrp, i, ofile->ndfid,
+                           "SMURF:SMURFCOPY", status );
 
       /* copy the slice in */
       dtypsz = smf_dtype_size( odata, status );
