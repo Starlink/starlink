@@ -195,12 +195,18 @@ void smf_flag_spikes( smfData *data, double *bolovar, unsigned char *quality,
 
       if( bolovar ) {
         /* User-supplied variance */
-        if( bolovar[i] > 0 ) {
+        if (bolovar[i] == VAL__BADD) {
+          if (*status == SAI__OK) {
+            *status = SAI__ERROR;
+            errRepf( "", FUNC_NAME ": error, supplied variance for bolometer %d is the bad value", status, (int)i );
+          }
+        } else if( bolovar[i] > 0 ) {
           sig = sqrt(bolovar[i]);
         } else {
           if (*status == SAI__OK) {
             *status = SAI__ERROR;
-            errRepf( "", FUNC_NAME ": error, variance for bolometer %d <= 0. (is %g)", status, (int)i, bolovar[i] );
+            errRepf( "", FUNC_NAME ": error, supplied variance of %g for bolometer %d is not positive",
+                     status, bolovar[i], (int)i );
           }
         }
       } else {
