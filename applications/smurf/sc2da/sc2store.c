@@ -3177,7 +3177,7 @@ int *status              /* global status (given and returned) */
 
       ndfMap ( sc2store_indf, "DATA", "_INTEGER", "WRITE", (void *)(&idata),
         &el, status );
-      memcpy ( idata, dbuf, el*sizeof(*dbuf) );
+      if (StatusOkP(status) ) memcpy ( idata, dbuf, el*sizeof(*dbuf) );
    }
 
 /* Write history entry */
