@@ -129,6 +129,9 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   /* Local Variables */
   size_t aiter;                 /* Actual iterations of sigma clipper */
   size_t bstride;               /* bolometer stride */
+  int dcbad;                    /* If set flag bolo as bad instead of repair */
+  dim_t dcbox;                  /* Width of box for DC step detection */
+  double dcthresh;              /* Threshold for DC step detection */
   dim_t i;                      /* Loop counter */
   dim_t id;                     /* Loop counter */
   dim_t idx=0;                  /* Index within subgroup */
@@ -150,7 +153,6 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
   size_t spikeiter=0;           /* Number of iterations for spike detection */
-  int spikeiter_s;              /* signed version of spikeiter */
   double spikethresh=0;         /* Threshold for spike detection */
   size_t tstride;               /* time slice stride */
   double *var=NULL;             /* Sample variance */
@@ -177,22 +179,12 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   /* Obtain parameters for NOI */
   if( kmap ) {
 
-    /* Despiker */
-    if( !astMapGet0D( kmap, "SPIKETHRESH", &spikethresh ) ) {
-      spikethresh = 0;
-    }
-
-    if( !astMapGet0I( kmap, "SPIKEITER", &spikeiter_s ) ) {
-      spikeiter = 0;
-    } else {
-      if( spikeiter_s < 0 ) {
-        *status = SAI__ERROR;
-        errRep("", FUNC_NAME ": NOI.SPIKEITER cannot be < 0.", status );
-      } else {
-        spikeiter = (size_t) spikeiter_s;
-      }
-    }
+    /* Data-cleaning parameters  */
+    smf_get_cleanpar( kmap, NULL, NULL, &dcbox, &dcbad, &dcthresh,
+                      NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+                      &spikethresh, &spikeiter, status );
   }
+
 
   /* Initialize chisquared */
   dat->chisquared[chunk] = 0;
@@ -242,19 +234,27 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         }
       }
 
-      /* Flag spikes in the residual */
-      if( spikethresh ) {
-	/* Now re-flag */
-	smf_flag_spikes( res->sdata[idx], var, qua_data, SMF__Q_MOD,
-			 spikethresh, spikeiter,
-			 100, &aiter, &nflag, status );
+      if( kmap ) {
+        /* Flag spikes in the residual after first iteration */
+        if( spikethresh && !(flags&SMF__DIMM_FIRSTITER) ) {
+	  /* Now re-flag */
+          smf_flag_spikes( res->sdata[idx], var, qua_data,
+                           SMF__Q_MOD,
+                           spikethresh, spikeiter,
+                           100, &aiter, &nflag, status );
 
-	msgSeti("THRESH",spikethresh);
-	msgSeti("NFLAG",nflag);
-	msgSeti("AITER",aiter);
-	msgOutif(MSG__VERB," ",
-                 "   flagged ^NFLAG new ^THRESH-sig spikes in ^AITER "
-                 "iterations", status);
+          msgOutiff(MSG__VERB," ",
+                    "   flagged %li new %lf-sig spikes in %li "
+                    "iterations", status, nflag, spikethresh, aiter);
+        }
+
+        /* Flag bad detectors with DC steps in them */
+        if( dcthresh && dcbox ) {
+          smf_correct_steps( res->sdata[idx], qua_data, dcthresh, dcbox, dcbad,
+                             &nflag, status );
+          msgOutiff(MSG__VERB, "","   detected %li bolos with DC steps\n",
+                    status, nflag);
+        }
       }
 
       /* Now calculate contribution to chi^2 */
