@@ -219,9 +219,9 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
                     qua+base+(istart+dcbox)*tstride, SMF__Q_MOD,
                     &mean2, NULL,&nmean2, status );
 
-        /* Estimate rms in a box as the bolo rms divided by sqrt(dcbox) */
+        /* Estimate expected rms in a box as the bolo rms */
         dcstep = smf_quick_noise( data, i, dcbox, 10, qua, SMF__Q_MOD,
-                                  status ) * dcthresh / sqrt(dcbox);
+                                  status ) * dcthresh;
 
         if( *status == SAI__OK ) {
           memset( alljump, 0, ntslice*sizeof(*alljump) );
