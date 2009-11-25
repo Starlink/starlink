@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.36}
 \newcommand{\stardocnumber}    {95.36}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2009 November 10}
+\newcommand{\stardocdate}      {2009 November 24}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.11}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -16859,24 +16859,24 @@ KAPPA: \htmlref{PASTE}{PASTE},
 
             \sstitem
             {\tt "WMean"}  --- Weighted mean in which each data value is weighted
-                        by the reciprocal of the associated variance.  
+                        by the reciprocal of the associated variance.  (2)
 
             \sstitem
-            {\tt "Mode"}   --- Modal value
+            {\tt "Mode"}   --- Modal value  (4)
 
             \sstitem
             {\tt "Median"} --- Median value.  Note that this is extremely memory
                         and CPU intensive for large datasets; use with 
-                        care!  If strange things happen, use {\tt "Mean"}.
+                        care!  If strange things happen, use {\tt "Mean"}.  (3)
 
             \sstitem
-            {\tt "Absdev"} --- Mean absolute deviation from the unweighted mean.
+            {\tt "Absdev"} --- Mean absolute deviation from the unweighted mean.  (2)
 
            \sstitem
-            {\tt "Cmean"}  --- Sigma-clipped mean.
+            {\tt "Cmean"}  --- Sigma-clipped mean.  (4)
 
             \sstitem
-            {\tt "Csigma"} --- Sigma-clipped standard deviation.
+            {\tt "Csigma"} --- Sigma-clipped standard deviation.  (4)
  
             \sstitem
             {\tt "Comax"}  --- Co-ordinate of the maximum value.
@@ -16897,7 +16897,7 @@ KAPPA: \htmlref{PASTE}{PASTE},
             \sstitem
             {\tt "Iwd"}    --- Intensity-weighted dispersion of the
                         co-ordinate, normalised like {\tt "Iwc"} by the 
-                        integrated value.
+                        integrated value.  (4)
 
             \sstitem
             {\tt "Max"}    --- Maximum value.
@@ -16906,20 +16906,21 @@ KAPPA: \htmlref{PASTE}{PASTE},
             {\tt "Min"}    --- Minimum value.
 
             \sstitem
-            {\tt "Rms"}    --- Root-mean-square value.
+            {\tt "Rms"}    --- Root-mean-square value.  (4)
 
             \sstitem
-            {\tt "Sigma"}  --- Standard deviation about the unweighted mean.
+            {\tt "Sigma"}  --- Standard deviation about the unweighted mean.  (4)
 
             \sstitem
             {\tt "Sum"}    --- The total value.
          }
          The selection is restricted if each channel contains three
          or fewer pixels.  For instance, measures of dispersion like
-           "Sigma" and "Iwd" are meaningless for single-pixel channels.
-           If you supply an unavailable option, you will be informed,
-         and presented with the available options.
-         {\tt ["Mean"]}
+         {\tt "Sigma"} and {\tt "Iwd"} are meaningless for single-pixel 
+         channels. The minimum number of pixels per channel for each estimator
+	 is given in parentheses in the list above.  Where there is no number,
+	 there is no restriction.  If you supply an unavailable option, you
+	 will be informed, and presented with the available options. {\tt ["Mean"]}
       }
       \sstsubsection{
          HIGH = LITERAL (Read)
@@ -35395,24 +35396,24 @@ plot (9k).
 
             \sstitem
             {\tt "WMean"}  --- Weighted mean in which each data value is weighted
-                        by the reciprocal of the associated variance.  
+                        by the reciprocal of the associated variance.  (2)
 
             \sstitem
-            {\tt "Mode"}   --- Modal value
+            {\tt "Mode"}   --- Modal value.  (4)
 
             \sstitem
             {\tt "Median"} --- Median value.  Note that this is extremely memory
                         and CPU intensive for large datasets; use with 
-                        care!  If strange things happen, use {\tt "Mean"}. \\
+                        care!  If strange things happen, use {\tt "Mean"}.  (3) \\
 
             \sstitem
-            {\tt "Absdev"} --- Mean absolute deviation from the unweighted mean.
+            {\tt "Absdev"} --- Mean absolute deviation from the unweighted mean.  (2)
 
             \sstitem
-            {\tt "Cmean"}  --- Sigma-clipped mean.
+            {\tt "Cmean"}  --- Sigma-clipped mean.  (4)
 
             \sstitem
-            {\tt "Csigma"} --- Sigma-clipped standard deviation.
+            {\tt "Csigma"} --- Sigma-clipped standard deviation.  (4)
 
             \sstitem
             {\tt "Comax"}  --- Co-ordinate of the maximum value.
@@ -35433,7 +35434,7 @@ plot (9k).
             \sstitem
             {\tt "Iwd"}    --- Intensity-weighted dispersion of the
                         co-ordinate, normalised like {\tt "Iwc"} by the 
-                        integrated value.
+                        integrated value.  (4)
 
             \sstitem
             {\tt "Max"}    --- Maximum value.
@@ -35442,10 +35443,10 @@ plot (9k).
             {\tt "Min"}    --- Minimum value.
 
             \sstitem
-            {\tt "Rms"}    --- Root-mean-square value.
+            {\tt "Rms"}    --- Root-mean-square value.  (4)
 
             \sstitem
-            {\tt "Sigma"}  --- Standard deviation about the unweighted mean.
+            {\tt "Sigma"}  --- Standard deviation about the unweighted mean.  (4)
 
             \sstitem
             {\tt "Sum"}    --- The total value.
@@ -35459,11 +35460,13 @@ plot (9k).
           and hence assign the desired co-ordinate for a each NDF.  
           Indirection through a text file is recommended.
   
-          The selection is restricted if each channel contains three or
-          fewer pixels.  For instance, measures of dispersion like {\tt "Sigma"} 
-          and {\tt "Iwd"} are meaningless for combining only two NDFs.
-          If you supply an unavailable option, you will be informed,
-          and presented with the available options.  {\tt ["Mean"]}
+          The selection is restricted if there are only a few input NDFs. For
+	  instance, measures of dispersion like {\tt "Sigma"} and {\tt "Iwd"}
+	  are meaningless for combining only two NDFs.  The minimum number of
+	  input NDFs for each estimator is given in parentheses in the list
+	  above.  Where there is no number, there is no restriction.  If you
+	  supply an unavailable option, you will be informed, and presented
+	  with the available options.   {\tt ["Mean"]}
       }
       \sstsubsection{
          IN = \htmlref{GROUP}{se:groups} (Read)

@@ -78,14 +78,15 @@
 *          "Mean"   -- Mean value
 *          "WMean"  -- Weighted mean in which each data value is 
 *                      weighted by the reciprocal of the associated 
-*                      variance.  
-*          "Mode"   -- Modal value
+*                      variance.  (2)
+*          "Mode"   -- Modal value  (4)
 *          "Median" -- Median value.  Note that this is extremely memory
 *                      and CPU intensive for large datasets; use with 
-*                      care!  If strange things happen, use "Mean".
+*                      care!  If strange things happen, use "Mean".  (3)
 *          "Absdev" -- Mean absolute deviation from the unweighted mean.
-*          "Cmean"  -- Sigma-clipped mean.
-*          "Csigma" -- Sigma-clipped standard deviation.
+*                      (2)
+*          "Cmean"  -- Sigma-clipped mean.  (4)
+*          "Csigma" -- Sigma-clipped standard deviation.  (4)
 *          "Comax"  -- Co-ordinate of the maximum value.
 *          "Comin"  -- Co-ordinate of the minimum value.
 *          "Integ"  -- Integrated value, being the sum of the products 
@@ -96,11 +97,11 @@
 *                      the integrated value (see the "Integ" option).
 *          "Iwd"    -- Intensity-weighted dispersion of the
 *                      co-ordinate, normalised like "Iwc" by the 
-*                      integrated value.
+*                      integrated value.  (4)
 *          "Max"    -- Maximum value.
 *          "Min"    -- Minimum value.
-*          "Rms"    -- Root-mean-square value.
-*          "Sigma"  -- Standard deviation about the unweighted mean.
+*          "Rms"    -- Root-mean-square value. (4)
+*          "Sigma"  -- Standard deviation about the unweighted mean. (4)
 *          "Sum"    -- The total value.
 *
 *        Where needed, the co-ordinates are the indices of the input
@@ -111,11 +112,13 @@
 *        and hence assign the desired co-ordinate for a each NDF.  
 *        Indirection through a text file is recommended.
 *
-*        The selection is restricted if each channel contains three or
-*        fewer pixels.  For instance, measures of dispersion like
-*        "Sigma" and "Iwd" are meaningless for combining only two NDFs.
-*        If you supply an unavailable option, you will be informed,
-*        and presented with the available options.   ["Mean"]
+*        The selection is restricted if there are only a few input NDFs.
+*        For instance, measures of dispersion like "Sigma" and "Iwd" are
+*        meaningless for combining only two NDFs.  The minimum number of 
+*        input NDFs for each estimator is given in parentheses in the 
+*        list above.  Where there is no number, there is no restriction. 
+*        If you supply an unavailable option, you will be informed, and
+*        presented with the available options.   ["Mean"]
 *     IN = GROUP (Read)
 *        A group of input NDFs.  They may have different shapes, but 
 *        must all have the same number of dimensions.  This should 
