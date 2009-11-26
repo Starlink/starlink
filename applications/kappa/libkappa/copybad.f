@@ -139,6 +139,8 @@
 *     2009-11-25 (TIMJ):
 *        Do not force the type of OUT to be the type of REF, it should
 *        be the type of IN.
+*     26-NOV-2009 (DSB):
+*        Initialise TY_IN.
 *     {enter_further_changes_here}
 
 *-
@@ -187,6 +189,7 @@
      :               OUT, STATUS )
 
 * Map the NDF DATA arrays using the type from IN.
+      CALL NDF_TYPE( IN, 'Data', TY_IN, STATUS )  
       CALL NDF_MAP( REF, 'Data', TY_IN, 'READ', P_REF, NEL, STATUS )
       CALL NDF_MAP( OUT, 'Data', TY_IN, 'UPDATE', P_OUT, NEL, STATUS )
       
