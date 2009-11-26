@@ -400,8 +400,8 @@
             DO I = 2, NDIM - 1
                WDIM = WDIM * ( 1 + DIM( I ) )
             END DO
-            WDIM = WDIM + 1
          END IF
+         WDIM = WDIM + 1
 
          CALL PSX_CALLOC( WDIM, ITYPE, WPNTR1, STATUS )
          CALL PSX_CALLOC( WDIM, '_INTEGER', WPNTR2, STATUS )
