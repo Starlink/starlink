@@ -75,7 +75,7 @@
 *     Copyright (C) 1998, 2000, 2003-2004 Central Laboratory of the
 *     Research Councils. 
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -136,6 +136,9 @@
 *     24-FEB-2009 (BEC):
 *        - Correct mapping mode for output NDF's VARIANCE component
 *          from WRITE to UPDATE.
+*     2009-11-25 (TIMJ):
+*        Do not force the type of OUT to be the type of REF, it should
+*        be the type of IN.
 *     {enter_further_changes_here}
 
 *-
@@ -153,7 +156,6 @@
 
 *  Local Variables:
       CHARACTER * ( NDF__SZTYP ) TY_IN  ! Data type for processing
-      CHARACTER * ( NDF__SZTYP ) TY_OUT ! Data type for output NDF
       INTEGER NEL                       ! Number of mapped elements
       INTEGER IN                        ! Identifier for IN (input)
       INTEGER NBAD                      ! Number of bad pixels in output
@@ -184,15 +186,7 @@
       CALL LPG_PROP( IN, 'Data,WCS,Axis,Variance,Quality,Units', 'OUT',
      :               OUT, STATUS )
 
-*  Determine which data type to use to process the input data/variance
-*  arrays. Also find and set an appropriate data type for these components 
-*  in the output NDF.
-      CALL NDF_MTYPE( '_BYTE,_WORD,_UBYTE,_UWORD,_INTEGER, _REAL,'//
-     :                '_DOUBLE', IN, REF, 'Data,Variance', TY_IN, 
-     :                TY_OUT, STATUS )
-      CALL NDF_STYPE( TY_OUT, OUT, 'Data,Variance', STATUS )
-
-* Map the NDF DATA arrays.
+* Map the NDF DATA arrays using the type from IN.
       CALL NDF_MAP( REF, 'Data', TY_IN, 'READ', P_REF, NEL, STATUS )
       CALL NDF_MAP( OUT, 'Data', TY_IN, 'UPDATE', P_OUT, NEL, STATUS )
       
