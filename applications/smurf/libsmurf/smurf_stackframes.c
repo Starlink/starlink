@@ -67,6 +67,9 @@
 *        Add SORT option.
 *     2009-10-30 (TIMJ):
 *        Only ask for SORT option if we know that sorting is possible.
+*     2009-11-27 (TIMJ):
+*        Propagate provenance (if available on input) and merge input
+*        FITS headers.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -122,6 +125,7 @@
 void smurf_stackframes( int *status ) {
 
   int dosort = 0;                /* Sort into time order? */
+  AstFitsChan *fchan = NULL;     /* FitsChan holding output NDF FITS extension */
   AstFrame * frame2d;            /* 2D frame from input image */
   AstObject * framewcs = NULL;   /* input WCS frame */
   AstFrame * gridfrm;            /* 3d grid frame */
@@ -177,7 +181,10 @@ void smurf_stackframes( int *status ) {
      struct even if not sorting */
   sortinfo = smf_malloc( size, sizeof(*sortinfo), 1, status );
 
-  /* First check that all the input files are the right shape */
+  /* First check that all the input files are the right shape.
+     We also sort out FITS header merging here for the output fits header
+     so that we do not need to read the header later on.
+   */
   for (i=1; i<=size; i++) {
     smfData * data = NULL;
 
@@ -268,6 +275,16 @@ void smurf_stackframes( int *status ) {
       }
       thisitem->index = i;
     }
+
+    /* Store the first WCS */
+    if (i==1) {
+      framewcs = astClone( data->hdr->wcs );
+    }
+
+    /* Merge fits headers as we go */
+    if (*status == SAI__OK && data->hdr->fitshdr) smf_fits_outhdr( data->hdr->fitshdr,
+                                                                   &fchan, status );
+
     smf_close_file( &data, status );
   }
 
@@ -324,16 +341,13 @@ void smurf_stackframes( int *status ) {
   odatav = (outdata->pntr)[1];
   odataq = (outdata->pntr)[2];
 
+  /* Read each file again to get the data but do not bother getting a
+     header this time around */
   for (i = 1; i <= size; i++ ) {
     smfData * data = NULL;
-    smf_open_file( igrp, sortinfo[i-1].index, "READ", 0, &data, status );
+    smf_open_file( igrp, sortinfo[i-1].index, "READ", SMF__NOCREATE_HEAD, &data, status );
     if (*status != SAI__OK) break;
     if (dosort) smf_find_dateobs( data->hdr, &(times[i-1]), NULL, status );
-
-    /* Store the first WCS */
-    if (i==1) {
-      framewcs = astClone( data->hdr->wcs );
-    }
 
     /* copy data to slice */
     if ( odatad && (data->pntr)[0] ) {
@@ -348,8 +362,9 @@ void smurf_stackframes( int *status ) {
       memcpy( odataq, (data->pntr)[2], szplane );
       odataq += szplane;
     }
-    if (outdata->hdr) smf_updateprov( outdata->file->ndfid, data, NDF__NOID,
-                                      "SMURF:" TASK_NAME, status );
+    /* output metadata */
+    smf_accumulate_prov( data, igrp, i, outdata->file->ndfid,
+                         "SMURF:" TASK_NAME, status );
 
     smf_close_file( &data, status );
   }
@@ -396,6 +411,11 @@ void smurf_stackframes( int *status ) {
   astAddFrame( outwcs, AST__BASE, totmap, totfrm );
 
   if (*status == SAI__OK) ndfPtwcs( outwcs, outdata->file->ndfid, status );
+
+  /* Write output fits header if we have one */
+  if( *status == SAI__OK && fchan && astGetI( fchan, "NCard" ) > 0 ) {
+    kpgPtfts( outdata->file->ndfid, fchan, status );
+  }
 
  CLEANUP:
   smf_close_file( &outdata, status );
