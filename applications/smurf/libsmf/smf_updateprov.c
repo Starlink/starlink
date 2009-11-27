@@ -35,6 +35,11 @@
 *     output NDF. It includes the input OBSIDSS value in the output
 *     provenance information.
 
+*  Notes:
+*     Always propagates provenance if we have OBSIDSS available or if
+*     we have ancestors in the input provenance. Does not propagate if
+*     we have no ancestors and no OBSIDSS.
+
 *  Authors:
 *     David S Berry (JAC, UCLan)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -55,6 +60,10 @@
 *        Use thread-safe obsidss API.
 *     29-JUN-2009 (DSB):
 *        Use new NDG provenance API.
+*     2009-11-27 (TIMJ):
+*        Only store provenance if we are a root (OBSIDSS is available)
+*        or we have provenance to propagate. Allow there to be no
+*        fits header at all.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -113,7 +122,7 @@ void smf_updateprov( int ondf, const smfData *data, int indf,
 /* Get a FitsChan holding the contents of the input NDF FITS extension. */
    if( !data ) {
       kpgGtfts( indf, &fc, status );
-   } else {
+   } else if (data->hdr) {
       fc = data->hdr->fitshdr;
    }
 
@@ -127,9 +136,11 @@ void smf_updateprov( int ondf, const smfData *data, int indf,
 /* Initially, assume that we should include details of ancestor NDFs. */
    isroot = 0;
 
-/* Get the OBSIDSS keyword value from the input FITS header. */
-   obsidss = smf_getobsidss( fc, NULL, 0, obsidssbuf,
-                             sizeof(obsidssbuf), status );
+/* Get the OBSIDSS keyword value from the input FITS header if we have a FITS
+   header. There can be cases (eg in STACKFRAMES) where we do not have a
+   FITS header so handle that gracefully. */
+   if (fc) obsidss = smf_getobsidss( fc, NULL, 0, obsidssbuf,
+                                     sizeof(obsidssbuf), status );
    if( obsidss ) {
 
 /* Search through all the ancestors of the input NDF (including the input
@@ -162,15 +173,18 @@ void smf_updateprov( int ondf, const smfData *data, int indf,
 
 /* Update the provenance for the output NDF to include the input NDF as
    an ancestor. Indicate that each input NDF is a root NDF (i.e. has no 
-   parents). */
-   oprov = ndgReadProv( ondf, creator, status );
-   ndgPutProv( oprov, indf, NULL, tkm, isroot, status );
-   ndgWriteProv( oprov, ondf, 1, status );
-   oprov = ndgFreeProv( oprov, status );
+   parents). Do nothing if we have no provenance to propagate, unless
+   we have root information and are propagating that. */
+   if ( ndgCountProv( prov, status ) > 0 || tkm) {
+     oprov = ndgReadProv( ondf, creator, status );
+     ndgPutProv( oprov, indf, NULL, tkm, isroot, status );
+     ndgWriteProv( oprov, ondf, 1, status );
+     oprov = ndgFreeProv( oprov, status );
+   }
 
 /* Free resources. */
    if( prov ) prov = ndgFreeProv( prov, status );
    if( tkm ) tkm = astAnnul( tkm );
-   if( !data ) fc = astAnnul( fc );
+   if( !data && fc ) fc = astAnnul( fc );
 }
 
