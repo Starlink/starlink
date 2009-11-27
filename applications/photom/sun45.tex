@@ -15,11 +15,11 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {45.15}
+\newcommand{\stardocnumber}    {45.16}
 \newcommand{\stardocauthors}   {Nicholas Eaton, Peter W.\ Draper \& Alasdair Allan}
-\newcommand{\stardocdate}      {16th March 2007}
+\newcommand{\stardocdate}      {27th November 2009}
 \newcommand{\stardoctitle}     {PHOTOM --- A Photometry Package }
-\newcommand{\stardocversion}   {version 1.10-0}
+\newcommand{\stardocversion}   {version 1.11-0}
 \newcommand{\stardocmanual}    {User's Manual}
 \newcommand{\stardocabstract}  {
   \begin{center}
@@ -2585,7 +2585,7 @@ interpreted by a gaussian error source, so PADU and BIASLE are not
 required. With guassian errors the source signal is effectively zero
 (since it has the same noise per pixel as the sky), so 
 \begin{equation}\underline{
-\varepsilon( S_o ) = PADU * \sigma_s * a_o
+\varepsilon( S_o ) = PADU * \sigma_s * \sqrt( a_o )
 }\end{equation}
 and
 \begin{equation}\underline{
@@ -2737,83 +2737,5 @@ The full description of PHOTOPT follows.
       }
    }
 }
-
-\section{Changes}
-\subsection{Release 1.5}
-
-In this release PHOTOM has gained a new application and has been
-ported to Linux. It has also been changed to optionally output its
-results as straight counts rather than transforming them into
-magnitudes.
-
-The new application AUTOPHOTOM performs aperture photometry of a list
-of objects. It is really designed to be used non-interactively by the
-new GAIA (\xref{SUN/214}{sun214}{}) aperture photometry tool or from a
-script.
-
-Other changes are the modification of PHOTOM to use the mouse
-buttons as well as the keyboard during the interactive sizing and
-placing of the apertures, the addition of an on-line help command
-\texttt{photomhelp} and many changes to the documentation, including the
-addition of a hypertext version. Use the command:
-\begin{quote}
-\begin{verbatim}
-% showme sun45
-\end{verbatim}
-\end{quote}
-to view this.
-
-\subsection{Release 1.6}
-The applications \htmlref{PHOTOM}{PHOTOM} and
-\htmlref{AUTOPHOTOM}{AUTOPHOTOM} have both been extended so that the
-exposure time may now be specified as a constant, or read from a FITS
-header keyword. These changes have also been reflected in the GAIA
-(see \xref{SUN/214}{sun214}{}) interface.
-
-\subsection{Release 1.7}
-The application \htmlref{AUTOPHOTOM}{AUTOPHOTOM} has been extended so
-that annular sky regions may also be defined in pixels (in addition to
-the existing method of two scale factors).
-
-A harmless \verb+FIO__EOF+ message, which appeared in
-\htmlref{PHOTOM's}{PHOTOM} automatic mode has been stopped.
-
-\subsection{Release 1.8}
-The option to use the optimal extraction algorithm has been added
-to both \htmlref{PHOTOM}{PHOTOM} and \htmlref{AUTOPHOTOM}{AUTOPHOTOM}. 
-The additional parameters \texttt{OPTIMA}, \texttt{CLIP} and \texttt{SEE} 
-have been added to support this facility. These changes have also been 
-reflected in the GAIA (see \xref{SUN/214}{sun214}{}) interface.
-
-A bug in the error estimation routine for optimal extraction was found 
-and fixed.
-
-Fixed a bug which caused a fatal \verb+IO+ error during PSF fitting in a (very) 
-limited range of cases.
-
-A bug which left the sky value uninitialised under Linux (but not Digital UNIX or Solaris) was found and fixed.
-
-A bug introduced into the initalisation scripts was fixed.
-
-A bug which meant that the error return code for a PSF star was not correctly reported was fixed.
-
-Modified the optimal extraction algorithim to handle bad pixels inside the PSF mask without termination. Note that photometry obtained using such a PSF is dubious to say the least.
-
-Fixed a bug which meant that the error in the flux was not corrected for the exposure time, although the flux itself had been.
-
-\subsection{Release 1.9}
-
-Problem with PSF star centroiding resolved.
-
-Increased robustness of centroiding algorithim for extreme cases.
-
-Bug in handling position files with PHOTOM under optimal extraction resolved.
-
-Fixed some GRID/PIXEL co-ordianate inconsistences when reporting the
-final fitted $X,Y$ co-ordinates.
-
-\subsection{Release 1.10}
-
-Added gaussian noise estimator for apertures.
 
 \end{document}

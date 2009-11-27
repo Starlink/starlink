@@ -40,14 +40,20 @@
   Bug Fixes 
   ---------
 
-    Since v1.11
+    v 1.12
+    ------
+    A error in the gaussian error calculations has been corrected.
+    Previously these over estimated the error by a factor sqrt(N).
+
+
+    v 1.11
     -----------
  
     The FWHM reported for the PSF star during optimal photometry has 
     been increased by a factor 1.665. The previous value reported 
     was sqrt(2)*sigma.
 
-    Since v1.10
+    v 1.10
     -----------
 
     A bug in the PHOTOM interface stopped the PHOTON parameter from being
@@ -70,7 +76,7 @@
     The input description file may now contain tab character between
     the various fields.
   
-    Since v1.9
+    v 1.9
     ----------
 
     Problem with PSF star centroiding resolved.
@@ -83,7 +89,7 @@
     Fixed some GIRD/PIXEL co-ordianate inconsistences when reporting the
     final fitted $X,Y$ co-ordinatles.
 
-    Since v 1.8
+    v 1.8
     -----------
 
     Fixed a bug which meant that the error in the flux was not corrected
@@ -106,11 +112,9 @@
       Alasdair Allan (STARLINK, Exeter University)
       30th December 2000
  
-    Since v 1.7
+    v 1.7
     -----------
 
     A harmless FIO__EOF message, which appeared in PHOTOM's automatic
     mode has been stopped.
 
-       Peter W. Draper (STARLINK, Durham University)
-       9th November 1998

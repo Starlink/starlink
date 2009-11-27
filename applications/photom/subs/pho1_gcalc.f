@@ -191,7 +191,7 @@
 
 *   Or error from sky variance as a gaussian estimate.
          ELSEIF ( PHOTON .EQ. 4 ) THEN
-            ERR2 = ( PADU * SIGMA * AREA ) ** 2
+            ERR2 = AREA * ( ( PADU * SIGMA ) ** 2 )
 
          ENDIF
       ELSE
