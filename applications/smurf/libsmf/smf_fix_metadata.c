@@ -47,7 +47,7 @@
 *     BRADC: Brad Cavanagh (JAC, Hawaii)
 
 *  Notes:
-*     o Works on ACSIS data.  All other smfDatas cause the
+*     o Works on ACSIS and SCUBA-2 data.  All other smfDatas cause the
 *     function to return without comment.
 *     o OFF exposure calculation for scan observations is an estimate
 *     due to the difficulty of working out exactly where in the scan a
@@ -70,7 +70,7 @@
 *     2009-10-28 (BRADC):
 *        Check for missing FFT_WIN header.
 *     2009-11-27 (TIMJ):
-*        Split ACSIS off into separate routine in preparation for SCUBA-2
+*        Call SCUBA-2 and ACSIS specialist fixup routines.
 
 *  Copyright:
 *     Copyright (C) 2009 Science & Technology Facilities Council.
@@ -220,9 +220,9 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
 
   /* Only do something for ACSIS and SCUBA-2 data */
   if (hdr->instrument == INST__ACSIS) {
-    have_fixed = smf_fix_metadata_acsis( msglev, data, have_fixed, status );
+    have_fixed = smf_fix_metadata_acsis( msglev, data, have_fixed, &ncards, status );
   } else if (hdr->instrument == INST__SCUBA2) {
-    /* have_fixed = smf_fix_metadata_scuba2( msglev, data, have_fixed, status ); */
+    have_fixed = smf_fix_metadata_scuba2( msglev, data, have_fixed, &ncards, status );
   }
 
   /* If we have fixed up the header, we need to record this by modifying the

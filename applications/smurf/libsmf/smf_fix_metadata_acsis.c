@@ -13,7 +13,8 @@
 *     C function
 
 *  Invocation:
-*     int smf_fix_metadata( msglev_t msglev, smfData * data, int have_fixed, int * status );
+*     int smf_fix_metadata_acsis( msglev_t msglev, smfData * data, int have_fixed,
+*                                 int * ncards, int * status );
 
 *  Arguments:
 *     msglev = msglev_t (Given)
@@ -25,6 +26,10 @@
 *        smfData to be examined and fixed.
 *     have_fixed = int (Given)
 *        Current status of have_fixed. Modified value will be returned.
+*     ncards = int * (Given & Returned)
+*        Number of fits cards in the smfData on entry. Can be modified
+*        if FITS headers are removed by this routine but should not be
+*        modified if cards are added.
 *     status = int * (Given & Returned)
 *        Pointer to global status
 
@@ -161,7 +166,8 @@ static const ObsIdLUT * smf__find_obsidlut( const struct FitsHeaderStruct * fits
 /* Indent for informational messages */
 #define INDENT "   "
 
-int smf_fix_metadata_acsis ( msglev_t msglev, smfData * data, int have_fixed, int * status ) {
+int smf_fix_metadata_acsis ( msglev_t msglev, smfData * data, int have_fixed, int * ncards,
+                             int * status ) {
 
   int cardisdef;             /* FITS card is defined */
   int cardthere;             /* FITS card is present */
@@ -173,7 +179,6 @@ int smf_fix_metadata_acsis ( msglev_t msglev, smfData * data, int have_fixed, in
   size_t i;
   int missing_exp = 0;       /* Are we missing ACS_EXPOSURE? */
   int missing_off = 0;       /* Are we missing ACS_OFFEXPOSURE? */
-  int ncards;                /* number of cards in FitsChan on entry */
   AstKeyMap * obsmap = NULL; /* Info from all observations */
   AstKeyMap * objmap = NULL; /* All the object names used */
   double steptime = 0.0;     /* Step time */
@@ -320,9 +325,6 @@ int smf_fix_metadata_acsis ( msglev_t msglev, smfData * data, int have_fixed, in
 
   fits = hdr->fitshdr;
   tmpState = hdr->allState;
-
-  /* find out where the FITS header currently ends */
-  ncards = astGetI( fits, "NCard" );
 
   if (hdr->instrument != INST__ACSIS) {
     if (*status != SAI__OK) {
@@ -598,7 +600,7 @@ int smf_fix_metadata_acsis ( msglev_t msglev, smfData * data, int have_fixed, in
     if (astFindFits( fits, "POL_CONN", NULL, 0 ) ) {
       astDelFits( fits );
       have_fixed |= SMF__FIXED_FITSHDR;
-      ncards--;  /* Adjust the target number of cards */
+      (*ncards)--;  /* Adjust the target number of cards */
     }
   }
 
@@ -903,22 +905,6 @@ int smf_fix_metadata_acsis ( msglev_t msglev, smfData * data, int have_fixed, in
     }
     have_fixed |= SMF__FIXED_JCMTSTATE;
 
-  }
-
-  /* If we have fixed up the header, we need to record this by modifying the
-     DHSVER header */
-  if (have_fixed) {
-    /* need to include date and consider not overwriting previous value */
-    smf_fits_updateS( hdr, "DHSVER", "MOD", "Data Handling Version", status );
-  }
-
-  /* Get the number of cards in the header now. And if the header has grown we
-     add a comment card indicating what the new block represent. This all assumes
-     that we do not try to add new cards into their "proper" positions in the header
-     when we fix it. */
-  if (ncards < astGetI( fits, "NCard" ) ) {
-    astSetI( fits, "Card", ncards+1 );
-    astSetFitsCM( fits, "---- Metadata Fixups ----", 0 );
   }
 
   return have_fixed;
