@@ -136,6 +136,7 @@ smf_fits_updateD.c \
 smf_fits_updateS.c \
 smf_fits_updateU.c \
 smf_fix_metadata.c \
+smf_fix_metadata_acsis.c \
 smf_flag_spikes.c \
 smf_flag_stationary.c \
 smf_flat_responsivity.c \
@@ -215,6 +216,7 @@ smf_open_newfile.c \
 smf_open_raw_asdouble.c \
 smf_open_related.c \
 smf_open_related_model.c \
+smf_pattern_extract.c \
 smf_polext.c \
 smf_quick_noise.c \
 smf_realloc.c \

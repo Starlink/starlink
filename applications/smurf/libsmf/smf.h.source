@@ -825,6 +825,9 @@ int smf_fits_updateU( smfHead * hdr, const char * name,
 
 int smf_fix_metadata( msglev_t msglev, smfData * data, int * status );
 
+int smf_fix_metadata_acsis( msglev_t msglev, smfData * data, int have_fixed,
+                            int * status );
+
 void smf_flag_spikes( smfData *data, double *bolovar, unsigned char *quality,
                       unsigned char mask, double thresh, size_t niter,
                       size_t maxiter, size_t *aiter, size_t *nflagged,
@@ -1082,6 +1085,9 @@ void smf_open_related( const smfGroup *group, const dim_t subindex,
 void smf_open_related_model( const smfGroup *group, const dim_t subindex,
                              const char *accmode, smfArray **relfiles,
                              int *status );
+
+int smf_pattern_extract ( const char * sourcestr, const char * pattern,
+                          double *dresult, char * sresult, size_t szstr, int * status );
 
 void smf_polext( int ondf, double angle, int *status );
 
