@@ -99,6 +99,8 @@
 *        - bad bolo flagging from common-mode fit can be controlled with
 *          config params: corr_tol, gain_tol, gain_abstol
 *        - only throw out bolos with correlation coeffs that are *lower*
+*     2009-11-30 (EC)
+*        - optionally delay calculation until after 1st iteration (notfirst)
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -385,7 +387,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   dim_t cgood;                  /* Number of good corr. coeff. samples */
   double cmean;                 /* mean of common-mode correlation coeff */
   double *corr=NULL;            /* Array to hold correlation coefficients */
-  double corr_tol;              /* n-sigma correlation coeff. tolerance */
+  double corr_tol=5;            /* n-sigma correlation coeff. tolerance */
   double csig;                  /* standard deviation "                  */
   double *gcoeff=NULL;          /* Array to hold gain coefficients */
   int gflat=0;                  /* If set use GAIn to adjust flatfield */
@@ -397,8 +399,8 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   smfArray *gai=NULL;           /* Pointer to GAI at chunk */
   double *gai_data=NULL;        /* Pointer to DATA component of GAI */
   double **gai_data_copy=NULL;  /* copy of gai_data for all subarrays */
-  double gain_abstol;           /* absolute gain coeff. tolerance */
-  double gain_tol;              /* n-sigma gain coeff. tolerance */
+  double gain_abstol=5;         /* absolute gain coeff. tolerance */
+  double gain_tol=5;            /* n-sigma gain coeff. tolerance */
   size_t gbstride;              /* GAIn bolo stride */
   size_t gcstride;              /* GAIn coeff stride */
   AstKeyMap *gkmap=NULL;        /* Local GAIn keymap */
@@ -420,6 +422,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   size_t noibstride;            /* bolo stride for noise */
   dim_t nointslice;             /* number of time slices for noise */
   size_t noitstride;            /* Time stride for noise */
+  int notfirst=0;               /* flag for delaying until after 1st iter */
   size_t ndchisq=0;             /* number of elements contributing to dchisq */
   dim_t ntslice=0;              /* Number of time slices */
   int nw;                       /* Number of worker threads */
@@ -453,31 +456,6 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   if( !astMapGet0A( keymap, "GAI", &gkmap ) ) {
     gkmap = NULL;
   }
-
-  /* Obtain pointers to relevant smfArrays for this chunk */
-  res = dat->res[chunk];
-  qua = dat->qua[chunk];
-  model = allmodel[chunk];
-  if(dat->gai) {
-    gai = dat->gai[chunk];
-
-    /* Make a copy of gai_data (each subarray) for calculating convergence */
-    gai_data_copy = smf_malloc( gai->ndat, sizeof(*gai_data_copy), 0, status );
-    for( idx=0; (idx<gai->ndat)&&(*status==SAI__OK); idx++ ) {
-
-      smf_get_dims( gai->sdata[idx],  NULL, NULL, NULL, NULL,
-                    &thisndata, NULL, NULL, status);
-
-      gai_data_copy[idx] = smf_malloc( thisndata, sizeof(*gai_data_copy[idx]),
-                                       0, status );
-
-      gai_data = (gai->sdata[idx]->pntr)[0];
-
-      memcpy( gai_data_copy[idx], gai_data, thisndata *
-              sizeof(*gai_data_copy[idx]) );
-    }
-  }
-  if(dat->noi) noi = dat->noi[chunk];
 
   /* Parse parameters */
 
@@ -523,6 +501,10 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
     if( !astMapGet0D(kmap, "GAIN_ABSTOL", &gain_abstol) ) {
       gain_abstol = 3;
     }
+
+    if( !astMapGet0I(kmap, "NOTFIRST", &notfirst) ) {
+      notfirst = 0;
+    }
   }
 
   if( do_boxcar ) {
@@ -541,6 +523,38 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
               status);
     }
   }
+
+  /* Are we skipping the first iteration? */
+  if( notfirst && (flags & SMF__DIMM_FIRSTITER) ) {
+    msgOutif( MSG__VERB, "", FUNC_NAME
+              ": skipping COM this iteration", status );
+    return;
+  }
+
+  /* Obtain pointers to relevant smfArrays for this chunk */
+  res = dat->res[chunk];
+  qua = dat->qua[chunk];
+  model = allmodel[chunk];
+  if(dat->gai) {
+    gai = dat->gai[chunk];
+
+    /* Make a copy of gai_data (each subarray) for calculating convergence */
+    gai_data_copy = smf_malloc( gai->ndat, sizeof(*gai_data_copy), 0, status );
+    for( idx=0; (idx<gai->ndat)&&(*status==SAI__OK); idx++ ) {
+
+      smf_get_dims( gai->sdata[idx],  NULL, NULL, NULL, NULL,
+                    &thisndata, NULL, NULL, status);
+
+      gai_data_copy[idx] = smf_malloc( thisndata, sizeof(*gai_data_copy[idx]),
+                                       0, status );
+
+      gai_data = (gai->sdata[idx]->pntr)[0];
+
+      memcpy( gai_data_copy[idx], gai_data, thisndata *
+              sizeof(*gai_data_copy[idx]) );
+    }
+  }
+  if(dat->noi) noi = dat->noi[chunk];
 
   /* Assert bolo-ordered data */
   for( idx=0; idx<res->ndat; idx++ ) if (*status == SAI__OK ) {
@@ -869,6 +883,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
         /* Flag new bad bolometers */
         newbad = 0;
+
         for( i=0; (*status==SAI__OK) && (i<nbolo); i++ ) {
           if( (corr[i]==VAL__BADD) ||
               ((cmean - corr[i]) > corr_tol*csig) || /* only flag worse bolos */

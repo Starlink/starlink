@@ -130,6 +130,11 @@ dcbad = 1
 # These parameters control the iterative model components
 # ----------------------------------------------------------------------------
 
+# delay calculation of COM until after the first iteration? (good if
+# the astronomical signal is expected to dominate the sky signal)
+
+#com.notfirst = 1
+
 # low-pass boxcar filter on COM (samples) to assist with convergence
 # if boxfact set reduce width of boxcar by this factor each iteration
 # boxmin specifies a minimum width below which it can't be reduced
@@ -188,5 +193,9 @@ ext.taumethod =adaptive
 #ext.csotau    = 0.2
 #ext.filtertau = 0.2
 
-# Use the GAIn/COMmon mode to re-calculate the flatfield?
+# Use the GAIn/COMmon mode to re-calculate the flatfield? Probably a
+# good idea in most cases, but dangerous for short scans of very bright
+# sources because the astronomical signal may completely dominate
+# sky signal.
+
 gai.flatfield = 1
