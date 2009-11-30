@@ -83,6 +83,8 @@
 #include "prm_par.h"
 #include "mers.h"
 
+#include "smf.h"
+
 #include <string.h>
 #include <stdlib.h>
 
