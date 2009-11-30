@@ -42,6 +42,7 @@
 
 *  Authors:
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     EC: Ed Chapin (UBC)
 
 *  Notes:
 *     Pattern should only match one result.
@@ -52,6 +53,7 @@
 
 *  Copyright:
 *     Copyright (C) 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2009 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -82,6 +84,7 @@
 #include "mers.h"
 
 #include <string.h>
+#include <stdlib.h>
 
 int smf_pattern_extract ( const char * sourcestr, const char * pattern,
                           double *dresult, char * sresult, size_t szstr, int * status ) {
