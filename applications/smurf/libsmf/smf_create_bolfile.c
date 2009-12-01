@@ -134,9 +134,9 @@ void smf_create_bolfile( const Grp * bgrp, size_t index,
 
     mylbnd[0] = lbnd[0];
     mylbnd[1] = lbnd[1];
-    mydims[SC2STORE__ROW_INDEX] = (refdata->dims)[SC2STORE__ROW_INDEX];
-    mydims[SC2STORE__COL_INDEX] = (refdata->dims)[SC2STORE__COL_INDEX];
-    nbols = mydims[SC2STORE__ROW_INDEX] * mydims[SC2STORE__COL_INDEX];
+    mydims[0] = ubnd[0] - lbnd[0] + 1;
+    mydims[1] = ubnd[1] - lbnd[1] + 1;
+    nbols = mydims[0] * mydims[1];
 
     pntr[0] = smf_malloc( nbols, sizeof(double), 0, status );
     pntr[1] = smf_malloc( nbols, sizeof(double), 0, status );
