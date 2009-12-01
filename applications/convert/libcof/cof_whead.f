@@ -103,8 +103,15 @@
 *          ORIGIN other than the default "Starlink Project, U.K." or
 *          a blank string.
 *        EXTNAME --- is the component name of the object from the COMP
-*          argument, unless argument EXTNAM is not blank when
-*          EXTNAME is set to EXTNAM. 
+*          argument, unless argument EXTNAM is not blank when keyword
+*          EXTNAME is set to EXTNAM.  If the component is too long to
+*          fit within the header (68 characters), EXTNAME is set to 
+*          '@EXTNAMEF'.  The full path is then stored in keyword 
+*          EXTNAMEF using the HEASARC Long-string CONTINUE convention
+*          (http://fits.gsfc.nasa.gov/registry/continue_keyword.html).
+*        EXTVER --- is only set when EXTNAME (q.v.) cannot accommodate
+*          the component name and is assigned the HDU index to provide a
+*          unique identifier.
 *        EXTLEVEL --- when argument EXTNAM is not blank, this is the 
 *          level in the hierarchical structure of the extension.  A 
 *          top-level extension has value 1, sub-components of this
@@ -139,7 +146,7 @@
 *     Copyright (C) 1994 Science & Engineering Research Council.
 *     Copyright (C) 1995-2000, 2006 Central Laboratory of the Research
 *     Councils.
-*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2008, 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -232,6 +239,8 @@
 *        Use HDS_SPLIT to find whether we have an NDF inside an HDS container.
 *        This is more reliable than looking for a "." in the filename (since
 *        sometimes directories have "."s in them).
+*     2009 November 25 (MJC):
+*        Allow for long extension names.
 *     {enter_further_changes_here}
 
 *-
@@ -405,12 +414,22 @@
       CALL FTPKYS( FUNIT, 'HDUCLAS2', COMP, 'Array component subclass',
      :             FSTAT )
 
+      NCHAR = CHR_LEN( EXTNAM )
       IF ( EXTNAM( 1:1 ) .NE. ' ' ) THEN
 
-*  Write the NDF's component name.
-         NCHAR = CHR_LEN( EXTNAM )
-         CALL FTPKYS( FUNIT, 'EXTNAME', EXTNAM( :MIN( 68, NCHAR ) ), 
-     :                'Component', FSTAT )
+*  Some structures can generate long names, for which the CONTINUE
+*  convention is in use by writing the LONGSTRN keyword containing the
+*  version number of the convention.
+         IF ( NCHAR .GT. 68 ) THEN
+
+*  Write the NDF's component name.  This writes a dummy EXTNAME,
+*  a unique EXTVER, and the full component name in keyword EXTNAMEF.
+            CALL COF_WENAM( FUNIT, EXTNAM, 'Component', STATUS )
+
+         ELSE
+            CALL FTPKYS( FUNIT, 'EXTNAME', EXTNAM( :NCHAR ), 
+     :                   'Component', FSTAT )
+         END IF
 
 *  Set the extension type.
          CALL FTPKYS( FUNIT, 'EXTTYPE', 'NDF', 'HDS data '/
@@ -420,9 +439,7 @@
       ELSE IF ( COMP .NE. 'DATA' .AND. COMP .NE. 'HEADER' ) THEN
 
 *  Write the NDF's component name.
-         CALL FTPKYS( FUNIT, 'EXTNAME', COMP, 'Array component',
-     :                FSTAT )
-
+         CALL FTPKYS( FUNIT, 'EXTNAME', COMP, 'Array component', FSTAT )
       END IF
 
 *  Handle a bad status.  Negative values are reserved for non-fatal

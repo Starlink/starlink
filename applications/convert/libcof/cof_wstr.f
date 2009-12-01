@@ -45,8 +45,8 @@
 *     is open.
 
 *  Copyright:
-*     Copyright (C) 2008 Science & Technology Facilities Council. All
-*     Rights Reserved.
+*     Copyright (C) 2008, 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -74,6 +74,8 @@
 *        Original version.
 *     2008 June 12 (TIMJ):
 *        Fix valgrind warning.
+*     2009 November 25 (MJC):
+*        Allow for long extension names.
 *     {enter_further_changes_here}
 
 *-
@@ -98,7 +100,13 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  External References:
+      INTEGER CHR_LEN            ! Effective string length
+
 *  Local Constants:
+      INTEGER   FITSCH           ! Maximum length of a FITS character
+      PARAMETER( FITSCH = 68 )   ! value
+
       INTEGER FITSOK             ! Good status for FITSIO library
       PARAMETER( FITSOK = 0 )
 
@@ -110,6 +118,7 @@
       INTEGER CPOS               ! Character position
       INTEGER FSTAT              ! FITSIO status
       INTEGER IVALUE             ! Integer component value
+      INTEGER NC                 ! Number of characters in keyword
       INTEGER NCEXT              ! Column from which the EXTNAME starts
       CHARACTER*6 ROUTIN         ! Name of the FITSIO routine used to
                                  ! copy data into the binary table
@@ -177,6 +186,21 @@
          CALL COF_FIOER( FSTAT, 'COF_WSTR_ERR1',
      :      'FTPHBN', 'Error writing binary-table header.', STATUS )
          GOTO 999
+      END IF
+
+*  Check that the EXTNAM header is not too long for a single header.
+      NC = CHR_LEN( EXTNAM( NCEXT: ) )
+
+*  Some structures can generate long names, for which the CONTINUE
+*  convention is in use by writing the LONGSTRN keyword containing the
+*  version number of the convention.
+      IF ( NC .GT. FITSCH ) THEN 
+
+*  Write the NDF's component name.  This writes a dummy EXTNAME,
+*  a unique EXTVER, and the full component name in keyword EXTNAMEF.
+         CALL COF_WENAM( FUNIT, EXTNAM( NCEXT: ),
+     :                   'name of this binary-table extension', STATUS )
+         IF ( STATUS .NE. SAI__OK ) GOTO 999
       END IF
 
 *  Write the TNULL1 card for an integer object (column).

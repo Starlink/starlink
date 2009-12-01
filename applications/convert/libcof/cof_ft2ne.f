@@ -38,8 +38,8 @@
 *  Copyright:
 *     Copyright (C) 1997 Central Laboratory of the Research Councils.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2008 Science & Technology Facilities Council. All
-*     Rights Reserved.
+*     Copyright (C) 2008, 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -74,6 +74,10 @@
 *        conversions.
 *     2008 February 7 (MJC):
 *        Only search for the first MORE component.
+*     2009 November 30 (MJC):
+*        Allow for long strings to be stored in EXTNAME keyword
+*        via indirection.  Set the type for a MORE structure in an NDF
+*        extension to be EXT instead of the generic STRUCT.
 *     {enter_further_changes_here}
 
 *-
@@ -131,17 +135,11 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Obtain the EXTNAME keyword.
-      CALL COF_GKEYC( FUNIT, 'EXTNAME', THERE, EXPATH, COMENT, STATUS )
+*  Obtain the EXTNAME keyword, allowing for long strings.
+      CALL COF_GENAM( FUNIT, EXPATH, COMENT, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GOTO 999
 
-      IF ( .NOT. THERE ) THEN
-         STATUS = SAI__ERROR
-         CALL ERR_REP( 'COF_FT2NE_EXTNAME',
-     :     'EXTNAME keyword is missing.  Unable to recreate the '/
-     :     /'NDF extension.', STATUS )
-         GOTO 999
-      END IF
-
+*  Validate the extension name.
       CALL CHR_UCASE( EXPATH )
       IF ( INDEX( EXPATH, 'MORE' ) .EQ. 0 ) THEN
          STATUS = SAI__ERROR

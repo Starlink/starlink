@@ -53,7 +53,7 @@
 *     Copyright (C) 1994 Science & Engineering Research Council.
 *     Copyright (C) 1997, 1999, 2002, 2004 Central Laboratory of the
 *     Research Councils. Copyright (C) 2006 Particle Physics &
-*     Astronomy Research Council. Copyright (C) 2008 Science &
+*     Astronomy Research Council. Copyright (C) 2008, 2009 Science &
 *     Technology Facilities Council. All Rights Reserved.
 
 *  Licence:
@@ -100,6 +100,8 @@
 *        Some tidying.
 *     2008 June 13 (MJC):
 *        Only attempt to write null value for integer-valued columns.
+*     2009 November 25 (MJC):
+*        Allow for long extension names.
 *     {enter_further_changes_here}
 
 *-
@@ -155,7 +157,7 @@
                                  ! array
       DOUBLE PRECISION DVALUE    ! D.p. component value
       INTEGER EL                 ! Number of array elements
-      CHARACTER * ( FITSCH ) EXTNAM  ! Name of the component
+      CHARACTER * ( 256 ) EXTNAM ! Name of the component
       CHARACTER * ( DAT__SZTYP ) EXTTYP ! Component type
       CHARACTER * ( 256 ) FILE   ! Name of the HDS file
       INTEGER FSTAT              ! FITSIO status
@@ -188,7 +190,7 @@
       CHARACTER * ( 6 ) ROUTIN   ! Name of the FITSIO routine used to
                                  ! copy data into the binary table
       INTEGER RVALUE             ! Real component value
-      CHARACTER * ( 68 ) SHAPE   ! Shape of the structure
+      CHARACTER * ( FITSCH ) SHAPE ! Shape of the structure
       INTEGER SIZE               ! Size as if vector
       INTEGER STRLEN             ! Length of a string component
       CHARACTER * ( DAT__SZTYP ) TFORM( MXOBJ ) ! Components' types
@@ -289,6 +291,20 @@
 *  The "variable-length data area" has length of 0 bytes.
          CALL FTPHBN( FUNIT, 1, 1, TTYPE, TFORM, TUNIT,
      :                EXTNAM( NCEXT: ), 0, FSTAT )
+
+*  Check that the EXTNAM header is not too long for a single header.
+*  Some structures can generate long names, for which the CONTINUE
+*  convention is in use by writing the LONGSTRN keyword containing the
+*  version number of the convention.
+         NC = CHR_LEN( EXTNAM( NCEXT: ) )
+         IF ( NC .GT. FITSCH ) THEN 
+
+*  Write the NDF's component name.  This writes a dummy EXTNAME,
+*  a unique EXTVER, and the full component name in keyword EXTNAMEF.
+            CALL COF_WENAM( FUNIT, EXTNAM( NCEXT: ),
+     :                      'name of this binary-table extension',
+     :                      STATUS )
+         END IF
 
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
@@ -985,6 +1001,20 @@
 *  The "variable-length data area" has length of 0 bytes.
                   CALL FTPHBN( FUNIT, 1, NOPRIM, TTYPE, TFORM,
      :                         TUNIT, EXTNAM( NCEXT: ), 0, FSTAT )
+
+*  Check that the EXTNAM header is not too long for a single header.
+*  Some structures can generate long names, for which the CONTINUE
+*  convention is in use by writing the LONGSTRN keyword containing the
+*  version number of the convention.
+                  NC = CHR_LEN( EXTNAM( NCEXT: ) )
+                  IF ( NC .GT. FITSCH ) THEN 
+
+*  Write the NDF's component name.  This writes a dummy EXTNAME,
+*  a unique EXTVER, and the full component name in keyword EXTNAMEF.
+                     CALL COF_WENAM( FUNIT, EXTNAM( NCEXT: ),
+     :                               'name of this binary-table '/
+     :                               /' extension', STATUS )
+                  END IF
 
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
