@@ -638,7 +638,7 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
 
 void smf_create_bolfile( const Grp * rgrp, size_t index,
                          const smfData* refdata, const char * datalabel,
-                         const char *units, smfData **respmap, int *status );
+                         const char *units, int hasqual, smfData **respmap, int *status );
 
 smfCreateLutwcsCache *smf_create_lutwcs( int clearcache,
                                          const double *fplane_x,

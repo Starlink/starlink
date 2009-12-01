@@ -15,7 +15,7 @@
 *  Invocation:
 *     void smf_create_bolfile( const Grp * bgrp, size_t index,
 *               const smfData* refdata, const char * datalabel,
-*               const char * units, smfData **bolmap,
+*               const char * units, int hasqual, smfData **bolmap,
 *               int *status );
 
 *  Arguments:
@@ -30,6 +30,8 @@
 *     datalabel = const char * (Given)
 *        Label for the data array. Can be NULL. Title will be derived
 *        from this.
+*     hasqual = int (Given)
+*        If true include a QUALITY component.
 *     bolmap = smfData** (Returned)
 *        Output smfData.
 *     status = int* (Given and Returned)
@@ -56,6 +58,8 @@
 *        Use malloc if the input group is null
 *     2009-11-06 (TIMJ):
 *        Preferentially select BOLO frame for output WCS
+*     2009-11-30 (TIMJ):
+*        Add ability to enable quality.
 
 *  Notes:
 *     - Does not propogate provenance or history from refdata.
@@ -97,7 +101,7 @@
 
 void smf_create_bolfile( const Grp * bgrp, size_t index,
                          const smfData* refdata, const char *datalabel,
-                         const char *units,  smfData **bolmap,
+                         const char *units, int hasqual, smfData **bolmap,
                          int *status ) {
 
   int lbnd[2];
@@ -116,9 +120,12 @@ void smf_create_bolfile( const Grp * bgrp, size_t index,
 
   /* either create the file or use malloc */
   if (bgrp) {
+    int flags = SMF__MAP_VAR;
+    if (hasqual) flags |= SMF__MAP_QUAL;
+
     /* create the file for WRITE access */
     smf_open_newfile( bgrp, index, SMF__DOUBLE, 2, lbnd, ubnd,
-                      SMF__MAP_VAR, bolmap, status );
+                      flags, bolmap, status );
   } else {
     void *pntr[] = {NULL, NULL, NULL};
     dim_t mydims[2];
@@ -133,6 +140,7 @@ void smf_create_bolfile( const Grp * bgrp, size_t index,
 
     pntr[0] = smf_malloc( nbols, sizeof(double), 0, status );
     pntr[1] = smf_malloc( nbols, sizeof(double), 0, status );
+    if (hasqual) pntr[2] = smf_malloc( nbols, sizeof(char), 0, status );
 
     *bolmap = smf_construct_smfData( NULL, NULL, NULL, NULL, SMF__DOUBLE,
                                      pntr, 0, mydims, mylbnd, 2, 0, 0, NULL,

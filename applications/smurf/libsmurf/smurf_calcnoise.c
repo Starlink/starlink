@@ -286,7 +286,7 @@ void smurf_calcnoise( int *status ) {
 
         /* Create the output file if required, else a malloced smfData */
         smf_create_bolfile( ogrp, gcount, thedata, "Noise",
-                            noiseunits, &outdata, status );
+                            noiseunits, 1, &outdata, status );
 
         /* Create groups to handle the NEP and ratio images */
         ratdata = smf__create_bolfile_extension( ogrp, gcount, thedata,
@@ -329,7 +329,7 @@ void smurf_calcnoise( int *status ) {
           }
 
           smf_create_bolfile( NULL, 1, thedata, "Responsivity", "A/W",
-                              &respmap, status );
+                              0, &respmap, status );
           if (*status == SAI__OK) {
             /* use a snr of 5 since we don't mind if we get a lot of
                bolometers that are a bit dodgy since the point is the NEP */
@@ -435,7 +435,7 @@ smf__create_bolfile_extension( const Grp * ogrp, size_t gcount,
   one_strlcat( tempfile, hdspath, sizeof(tempfile), status);
   tempgrp = grpNew( "Ratio", status );
   grpPut1( tempgrp, tempfile, 0, status );
-  smf_create_bolfile( tempgrp, 1, refdata, datalabel, units,
+  smf_create_bolfile( tempgrp, 1, refdata, datalabel, units, 1,
                       &newdata, status );
   if (tempgrp) grpDelet( &tempgrp, status );
   return newdata;

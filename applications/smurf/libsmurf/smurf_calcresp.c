@@ -158,7 +158,7 @@ void smurf_calcresp( int *status ) {
     }
 
     /* Create an output responsivity file. */
-    smf_create_bolfile( ogrp, i, idata, "Responsivity", "A/W", &respmap, status );
+    smf_create_bolfile( ogrp, i, idata, "Responsivity", "A/W", 0, &respmap, status );
 
     /* "bolref" and "powref" written by CALCFLAT correspond to parameters
        "flatcal" and "flatpar" in sc2store_wrtstream. */

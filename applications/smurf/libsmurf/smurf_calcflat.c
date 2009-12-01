@@ -437,7 +437,7 @@ void smurf_calcflat( int *status ) {
       /* Create the file on disk or malloc it as required.
          (units will normalise so no need for prefix) */
       smf_create_bolfile( rgrp, 1, refdata, "Responsivity",
-                          "A/W", &respmap, status );
+                          "A/W", 0, &respmap, status );
       if (rgrp) grpDelet( &rgrp, status );
     }
 
