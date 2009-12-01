@@ -1185,7 +1185,10 @@
      :                   XNAME .EQ. 'FIBRES_IFU' ) .AND. 
      :                   XTYPE .EQ. 'FIBRE_EXT'
 
-                  SMURF = ( XTYPE .EQ. 'SMURF' )
+*  The type was originally SMURF, but was changed 2009 September 19
+*  to SMURF_EXT.  So we have to support both types.
+                  SMURF = XTYPE .EQ. 'SMURF' .OR.
+     :                    XTYPE .EQ. 'SMURF_EXT'
 
 *  Skip over the FITS extension.
                   IF ( XNAME .NE. 'FITS' .AND. .NOT. E2DF .AND. 
