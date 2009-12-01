@@ -215,11 +215,11 @@
 
 *  Validate that we have a SMURF extension.
       CALL DAT_TYPE( LOC, TYPE, STATUS )
-      IF ( TYPE .NE. 'SMURF' ) THEN
+      IF ( TYPE .NE. 'SMURF' .AND. TYPE .NE. 'SMURF_EXT' ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'COF_SMURF_NOTSMURFF',
-     :     'COF_SMURF: The supplied extension is not of type SMURF.'/
-     :     /'(Probable programming error.)', STATUS )
+     :     'COF_SMURF: The supplied extension is not of type SMURF '/
+     :     /'or SMURF_EXT.  (Probable programming error.)', STATUS )
          GOTO 999
       END IF
 
@@ -229,11 +229,11 @@
 *  Look for any non-NDF components.
 *  ================================
 
-*  The SMURF type should define the contents, but it is not clear how 
-*  rigid or final this structure is.  Since we need FITS2NDF to be
-*  able to recreate the original NDF structure, yet use generic code,
-*  the SMURF structure must be first recreated to hold its named
-*  NDFs.
+*  The SMURF/SMURF_EXT type should define the contents, but it is 
+*  not clear how rigid or final this structure is.  Since we need 
+*  FITS2NDF to be able to recreate the original NDF structure, yet 
+*  use generic code, the SMURF structure must be first recreated to 
+*  hold its named NDFs.
 
 *  Enumerate the SMURF extension components.
       NONNDF = 0
@@ -257,7 +257,7 @@
       IF ( NONNDF .EQ. 0 ) THEN
          CALL HDS_TRACE( LOC, NLEV, NAME, FILE, STATUS )
 
-         CALL COF_WSTR( FUNIT, NAME, 'SMURF', NLEV, WRITTN, STATUS )
+         CALL COF_WSTR( FUNIT, NAME, 'SMURF_EXT', NLEV, WRITTN, STATUS )
       END IF
 
 *  Enumerate the SMURF extension components.
