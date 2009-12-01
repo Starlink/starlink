@@ -259,10 +259,8 @@
       CHARACTER * ( 48 ) COMENT  ! Comment from FITS-extension header
       DOUBLE PRECISION DELTA     ! Machine precision for scaling
       INTEGER DIMS( NDF__MXDIM ) ! NDF dimensions (axis length)
-      LOGICAL E2DF               ! Extension is from 2dF?
       INTEGER EL                 ! Number of elements in array
       LOGICAL FEXIST             ! FITS already exists?
-      LOGICAL FITPRE             ! FITS airlock extension is present?
       CHARACTER FORM * ( NDF__SZFRM ) ! Storage form
       DOUBLE PRECISION FSCALE    ! Reduction factor for scale
       INTEGER FSTAT              ! FITSIO error status
@@ -275,15 +273,12 @@
       INTEGER IPNTR              ! Pointer to input array
       DOUBLE PRECISION MAXV      ! Max. value to appear in scaled array
       DOUBLE PRECISION MINV      ! Min. value to appear in scaled array
-      LOGICAL MULTIN             ! Multi-NDF container?
       INTEGER NBYTES             ! Number of bytes per array value
       INTEGER NC                 ! Number of character in string
       INTEGER NCF                ! Number of characters in filename
       INTEGER NDECIM             ! Number of decimal places in header
                                  ! value
       INTEGER NDIM               ! Number of dimensions
-      INTEGER NEXTN              ! Number of extensions
-      INTEGER NEX2PR             ! Number of extensions to process
       LOGICAL NSCALE             ! Array component is scaled in the NDF?
       BYTE NULL8                 ! Null value for BITPIX=8
       INTEGER * 2 NULL16         ! Null value for BITPIX=16
@@ -300,9 +295,6 @@
       LOGICAL THERE              ! BITPIX FITS header card ! is present?
       CHARACTER * ( NDF__SZTYP ) TYPE ! NDF array's data type
       LOGICAL VALID              ! The NDF identifier is valid?
-      CHARACTER * ( DAT__SZLOC ) XLOC ! Locator to an NDF extension
-      CHARACTER * ( NDF__SZXNM ) XNAME ! Name of NDF extension
-      CHARACTER * ( DAT__SZTYP ) XTYPE ! Name of NDF extension
       
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
