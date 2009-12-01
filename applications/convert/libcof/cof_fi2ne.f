@@ -258,11 +258,18 @@
 *  NDF2FITS via COF_H2BIN only creates binary tables when the structure
 *  contains primitive objects.  If the structure merely contains other
 *  structures then at present there is no way of determining the data
-*  type.  So use something generic.
+*  type.  So use something generic, except for the special case of an
+*  NDF within an extension having its own extension.
                ELSE
                   IF ( NDIM .EQ. 0 ) THEN
-                     CALL DAT_NEW( SXLOC( LEVEL - 1 ), NAME, 'STRUCT',
+                     IF ( NAME .EQ. 'MORE' ) THEN
+                        CALL DAT_NEW( SXLOC( LEVEL - 1 ), NAME, 'EXT',
      :                             0, 0, STATUS )
+                     ELSE
+                        CALL DAT_NEW( SXLOC( LEVEL - 1 ), NAME,
+     :                                'STRUCT', 0, 0, STATUS )
+                     END IF
+
                   ELSE
                      CALL DAT_NEW( SXLOC( LEVEL - 1 ), NAME, 'STRUCT',
      :                             NDIM, DIMS, STATUS )
