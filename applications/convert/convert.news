@@ -1,3 +1,10 @@
+1 CONVERT_Version_1.5-19
+
+ NDF2FITS now recognises the modified data type of the SMURF 
+ extension. It also handles component names that are too long to
+ fit in a single EXTNAME header by creating an EXTNAMEF keyword 
+ that uses the Long-string convention.
+
 1 CONVERT_Version_1.5-18
 
  NDF2FITS allows three-letter permutations for Parameter COMP.

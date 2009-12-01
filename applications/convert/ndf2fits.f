@@ -135,11 +135,11 @@
 *     MERGE = _LOGICAL (Read)
 *        Whether or not to merge the FITS-airlocks' headers of the 
 *        header NDF of a UKIRT multi-NDF container file with its sole 
-*        data NDF into the primary HDU.  This parameter is only used
-*        when CONTAINER is TRUE; and when the container file only has
-*        two component NDFs: one data NDF of arbitrary name, and the
-*        other called HEADER that stores the global headers of the
-*        dataset. [TRUE]
+*        data NDF into the primary header and data unit (HDU).  This 
+*        parameter is only used when CONTAINER is TRUE; and when the 
+*        container file only has two component NDFs: one data NDF of
+*        arbitrary name, and the other called HEADER that stores the 
+*        global headers of the dataset.  [TRUE]
 *     NATIVE = _LOGICAL (Read)
 *        If a TRUE value is given for Parameter NATIVE, then World
 *        Co-ordinate System (WCS) information will be written to the 
@@ -326,6 +326,15 @@
 *          being the usual dot.  The path includes the indices to
 *          elements of any array structures present; the indices are in
 *          a comma-separated list within parentheses.
+*
+*          If the component is too long to fit within the header 
+*          (68 characters), EXTNAME is set to  '@EXTNAMEF'.  The full 
+*          path is then stored in keyword EXTNAMEF using the HEASARC 
+*          Long-string CONTINUE convention
+*          (http://fits.gsfc.nasa.gov/registry/continue_keyword.html)
+*        EXTVER --- is only set when EXTNAME (q.v.) cannot accommodate
+*          the component name, and it is assigned the HDU index to 
+*          provide a unique identifier.
 *        EXTLEVEL --- is the level in the hierarchical structure of the
 *          extensions.  Thus a top-level extension has value 1,
 *          sub-components of this extension have value 2 and so on.

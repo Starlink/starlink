@@ -130,7 +130,14 @@
 *          ORIGIN other than the default "Starlink Project, U.K." or
 *          a blank string.
 *        EXTNAME --- is the is the path of the extension within the
-*          NDF.
+*          NDF.  If the path is too long to fit within the header
+*          (68 characters), EXTNAME is set to  '@EXTNAMEF'.  The full 
+*          path is then stored in keyword EXTNAMEF using the HEASARC 
+*          Long-string CONTINUE convention
+*          (http://fits.gsfc.nasa.gov/registry/continue_keyword.html).
+*        EXTVER --- is only set when EXTNAME (q.v.) cannot accommodate
+*          the component name and is assigned the HDU index to provide a
+*          unique identifier.
 *        EXTLEVEL --- is the level in the hierarchical structure of the
 *          extensions.  Thus a top-level extension has value 1,
 *          sub-components of this extension have value 2 and so on.
@@ -164,8 +171,8 @@
 *     open.
 
 *  Copyright:
-*     Copyright (C) 2007 Science & Technology Facilities Council. All
-*     Rights Reserved.
+*     Copyright (C) 2007, 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or

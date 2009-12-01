@@ -23,7 +23,7 @@
                                 A.J.Chipperfield\\
                                 D.S.Berry\\
                                 A.C.Davenhall}
-\newcommand{\stardocdate}      {2009 September 24}
+\newcommand{\stardocdate}      {2009 November 30}
 \newcommand{\stardoctitle}     {CONVERT\\
                                 A Format-conversion Package}
 \newcommand{\stardocversion}   {Version 1.5-17}
@@ -4382,10 +4382,10 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
       }{
          Whether or not to merge the FITS-airlocks' headers of the 
          header NDF of a UKIRT multi-NDF container file with its sole 
-         data NDF into the primary HDU.  This parameter is only used
-         when CONTAINER is \texttt{TRUE}; and when the container file only has
-         two component NDFs: one data NDF of arbitrary name, and the
-         other called HEADER that stores the global headers of the
+         data NDF into the primary header and data unit (HDU).  This parameter 
+         is only used when CONTAINER is \texttt{TRUE}; and when the container 
+         file only has two component NDFs: one data NDF of arbitrary name, and 
+         the other called HEADER that stores the global headers of the
          dataset. \texttt{[TRUE]}
       }
       \sstsubsection{
@@ -4646,6 +4646,17 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
               elements of any array structures present; the indices are in
               a comma-separated list within parentheses.
 
+              If the component is too long to fit within the header 
+              (68 characters), EXTNAME is set to  \texttt{@EXTNAMEF}.  The 
+              full  path is then stored in keyword EXTNAMEF using the HEASARC 
+              Long-string CONTINUE convention \goodbreak
+              (\texttt{http://fits.gsfc.nasa.gov/registry/continue\_keyword.html}).
+
+            \sstitem
+            EXTVER --- is only set when EXTNAME ({\em{q.v.}}) cannot accommodate
+              the component name, and it is assigned the HDU index to provide a
+              unique identifier.
+            
             \sstitem
             EXTLEVEL --- is the level in the hierarchical structure of the
               extensions.  Thus a top-level extension has value 1,
@@ -4657,8 +4668,8 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
 
             \sstitem
             EXTSHAPE --- is the shape of the NDF extension used to
-            create a binary table.  It is a comma-separated list of the
-            dimensions, and is 0 when the extension is not an array.
+              create a binary table.  It is a comma-separated list of the
+              dimensions, and is 0 when the extension is not an array.
 
             \sstitem
             HDUCLAS1, HDUCLAS{\em{n}} --- \texttt{"NDF"} and the
@@ -7437,5 +7448,26 @@ SMURF data containing VARIANCE or QUALITY that was formerly in an NDF.
 The bash \CONVERT\ initialisation script has been changed so that it
 now works from any Bourne-compatible shell.
 
+
+\section{Release Notes -- V1.5-18}
+
+\htmlref{NDF2FITS}{NDF2FITS} allows three-letter permutations for 
+Parameter COMP.  There is now no automatic quality masking of data 
+and variance whenever the quality array is exported to the FITS file 
+too.  A new section of the NDF2FITS reference documentation explains
+this in more detail.
+
+\htmlref{FITS2NDF}{FITS2NDF} recognises the new {\tt "Group:"} heading
+in HISTORY headers that originally came from an exported NDF.  [This
+lists all the NDFs stored within a GRP group used in an application.]
+Thus the original paragraph and indentation may be preserved after an
+NDFÂ$\rightarrow$FITS$\rightarrow$NDF cycle.
+
+\section{Release Notes -- V1.5-19}
+
+\htmlref{NDF2FITS}{NDF2FITS} now recognises the modified data type of
+the SMURF extension. It also handles component names that are too long
+to fit in a single EXTNAME header by creating an EXTNAMEF keyword that
+uses the Long-string convention.
 
 \end{document}
