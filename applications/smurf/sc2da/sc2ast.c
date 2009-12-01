@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "star/slalib.h"
 #include "sae_par.h"
@@ -219,8 +220,14 @@ int *status             /* global status (given and returned) */
      28Oct2009 : Add a Frame with Domain "BOLO" to returned FrameSet (DSB)
      30Oct2009 : Report an error if the number of base or current Frame
                  axes in the cached FrameSet has been changed.
+     30Oct2009 : Report an error if the number of base or current Frame
+                 axes in the cached FrameSet has been changed.
+     26Nov2009 : Allow different polynomial distortions to be selected using 
+                 the environment variable "SMURF_DISTORTION" - set it to
+                 "NEW" to get the new (experimental) correction; set it to 
+                 "NONE" to get no correction; set it to anything else (or 
+                 leave it unset) to get the original correction. 
 */
-
 {
 
    AstMapping *azelmap;
@@ -236,6 +243,7 @@ int *status             /* global status (given and returned) */
    double shifts[ 2 ];
    AstShiftMap *instapmap;     
    AstShiftMap *jigglemap;
+   const char *distortion;
    sc2astCache *result;
    int isub;
 #if COLROW
@@ -254,16 +262,28 @@ int *status             /* global status (given and returned) */
 /* xoff and yoff are the distance in pixel units from the tracking centre
    to the [0][0] pixel in a subarray */
 
-   const double xoff[8] =
+/* Original values */
    /*    s8a    s8b     s8c   s8d    s4a    s4b    s4c    s4d */
+   const double xoff[8] =
       { -41.5,   33.5, 41.5, -33.5, -41.5,  33.5,  41.5, -33.5 };
    const double yoff[8] =
       { -33.5,  -41.5, 33.5,  41.5,  33.5,  41.5, -33.5, -41.5 };
 
-/* Distortion mappings. X and Y are in the distorted image, x and y are
-   undistorted (Nasmyth). All units are mm.
 
-   Least-squares fit to ray tracing provided by Tully gives
+/* Values modified to reduce errors implied by NEW distortion. */
+   /*    s8a    s8b     s8c   s8d    s4a    s4b    s4c    s4d */
+   const double xoff_NEW[8] =
+      { -41.5,   33.5, 41.5, -32.83, -41.54,  33.5,  41.5, -33.5 };
+   const double yoff_NEW[8] =
+      { -33.5,  -41.5, 33.5,  40.48,  33.47,  41.5, -33.5, -41.5 };
+
+
+
+
+/* Distortion Mappings. A specific version of the distortion Mapping can
+   be selected by setting a value for the SMURF_DISTORTION environment
+   variable. The default Mapping (used if SMURF_DISTORTION is not set) is 
+   the original least-squares fit to ray tracing provided by Tully:
 
    x = 0.30037 + 0.99216 * X - 1.4428e-4 * X^2 - 3.612e-6 * X^3
        + 9.6e-4 * Y - 8.628e-6 * Y^2 - 2.986e-7 * Y^3
@@ -277,7 +297,9 @@ int *status             /* global status (given and returned) */
    Y = -0.662328 - 1.082e-3 * x + 6.956e-5 * x^2 + 1.676e-7 * x^3
        + 1.0135 * y + 2.321e-4 * y^2 + 1.221e-6 * y^3
 
- */
+
+   X and Y are in the distorted image, x and y are undistorted (Nasmyth). 
+   All units are mm. */
 
 /* Forward coefficients are from FRAME850 to Nasmyth */
    const double coeff_f[] = 
@@ -321,6 +343,103 @@ int *status             /* global status (given and returned) */
                2.321e-4,    2.0, 0.0, 2.0,
                1.221e-6,    2.0, 0.0, 3.0
                };
+
+
+
+/* SMURF_DISTORTION = "NEW": determined from bolomap approach, using 
+   s4a and s8d data from 20091027 obs 00009 and 00011 (Mars). */
+/* ------------------------------------------------------------ */
+
+
+/* SCUBA-2 PolyMap cooefficients. Forward coefficients are from 
+   FRAME850 to Nasmyth */ 
+
+/* Forward transformation coefficients... */
+   int ncoeff_f_NEW = 20;
+   const double coeff_f_NEW[] = {
+
+/* X-coordinate */ 
+               2.1976      ,     1.0, 0.0, 0.0,
+               1.113       ,     1.0, 1.0, 0.0,
+               0.00086737  ,     1.0, 2.0, 0.0,
+               2.9666e-06  ,     1.0, 3.0, 0.0,
+               -0.002982   ,     1.0, 0.0, 1.0,
+               -0.0011575  ,     1.0, 1.0, 1.0,
+               -9.2562e-06 ,     1.0, 2.0, 1.0,
+               -0.0015143  ,     1.0, 0.0, 2.0,
+               -8.2161e-06 ,     1.0, 1.0, 2.0,
+               2.1786e-05  ,     1.0, 0.0, 3.0,
+
+/* Y-coordinate */ 
+               -2.2503     ,     2.0, 0.0, 0.0,
+               -0.042933   ,     2.0, 1.0, 0.0,
+               -0.001213   ,     2.0, 2.0, 0.0,
+               -2.1321e-05 ,     2.0, 3.0, 0.0,
+               1.1442      ,     2.0, 0.0, 1.0,
+               0.0011264   ,     2.0, 1.0, 1.0,
+               -2.11e-06   ,     2.0, 2.0, 1.0,
+               -0.0026191  ,     2.0, 0.0, 2.0,
+               -8.4599e-06 ,     2.0, 1.0, 2.0,
+               1.9787e-05  ,     2.0, 0.0, 3.0,
+            };
+
+
+
+
+/* Inverse transformation coefficients... */
+   int ncoeff_i_NEW = 42;
+   const double coeff_i_NEW[] = {
+
+/* X-coordinate */ 
+               -1.9728     ,     1.0, 0.0, 0.0,
+               0.90303     ,     1.0, 1.0, 0.0,
+               -0.00058854 ,     1.0, 2.0, 0.0,
+               -2.891e-07  ,     1.0, 3.0, 0.0,
+               2.3989e-08  ,     1.0, 4.0, 0.0,
+               1.0263e-10  ,     1.0, 5.0, 0.0,
+               0.005341    ,     1.0, 0.0, 1.0,
+               0.00091785  ,     1.0, 1.0, 1.0,
+               7.2323e-06  ,     1.0, 2.0, 1.0,
+               5.254e-08   ,     1.0, 3.0, 1.0,
+               3.8727e-10  ,     1.0, 4.0, 1.0,
+               0.00094081  ,     1.0, 0.0, 2.0,
+               1.7813e-06  ,     1.0, 1.0, 2.0,
+               -6.369e-08  ,     1.0, 2.0, 2.0,
+               -1.0938e-09 ,     1.0, 3.0, 2.0,
+               -6.6428e-06 ,     1.0, 0.0, 3.0,
+               1.2908e-07  ,     1.0, 1.0, 3.0,
+               1.7878e-10  ,     1.0, 2.0, 3.0,
+               -1.5367e-07 ,     1.0, 0.0, 4.0,
+               -6.0621e-10 ,     1.0, 1.0, 4.0,
+               6.3697e-10  ,     1.0, 0.0, 5.0,
+
+/* Y-coordinate */ 
+               1.9081      ,     2.0, 0.0, 0.0,
+               0.028861    ,     2.0, 1.0, 0.0,
+               0.00073391  ,     2.0, 2.0, 0.0,
+               1.1793e-05  ,     2.0, 3.0, 0.0,
+               -4.7371e-08 ,     2.0, 4.0, 0.0,
+               -5.5907e-11 ,     2.0, 5.0, 0.0,
+               0.88351     ,     2.0, 0.0, 1.0,
+               -0.00062761 ,     2.0, 1.0, 1.0,
+               7.7334e-06  ,     2.0, 2.0, 1.0,
+               1.1531e-07  ,     2.0, 3.0, 1.0,
+               3.6052e-10  ,     2.0, 4.0, 1.0,
+               0.0017209   ,     2.0, 0.0, 2.0,
+               1.6477e-06  ,     2.0, 1.0, 2.0,
+               6.6126e-08  ,     2.0, 2.0, 2.0,
+               -7.584e-11  ,     2.0, 3.0, 2.0,
+               -4.8381e-06 ,     2.0, 0.0, 3.0,
+               4.1446e-08  ,     2.0, 1.0, 3.0,
+               -1.2307e-09 ,     2.0, 2.0, 3.0,
+               -1.303e-07  ,     2.0, 0.0, 4.0,
+               -2.4744e-10 ,     2.0, 1.0, 4.0,
+               5.4009e-10  ,     2.0, 0.0, 5.0,
+            };
+
+
+
+
 
 /* Check the sub-array number. If it is -1, free the cached AST objects and 
    the cache structure itself, and then return. Otherwise, report an error 
@@ -474,12 +593,30 @@ int *status             /* global status (given and returned) */
       cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], 
                                                       rotmap, 1, " " );
 
+/* See which version of the distortion polynomial and array reference
+   points are to be used. */
+      distortion = getenv( "SMURF_DISTORTION" );
+
 /* For each 450/850 subarray, the next Mapping creates FRAME450/FRAME850
    coordinates, which are coordinates in millimetres with origin at the
    center of the focal plane. */
+      if( !distortion ) {
+         shift[ 0 ] = xoff[ subnum ];
+         shift[ 1 ] = yoff[ subnum ];
 
-      shift[ 0 ] = xoff[ subnum ];
-      shift[ 1 ] = yoff[ subnum ];
+      } else if( !strcmp( "NEW", distortion ) ) {
+         shift[ 0 ] = xoff_NEW[ subnum ];
+         shift[ 1 ] = yoff_NEW[ subnum ];
+
+      } else if( !strcmp( "NONE", distortion ) ) {
+         shift[ 0 ] = xoff[ subnum ];
+         shift[ 1 ] = yoff[ subnum ];
+
+      } else {
+         shift[ 0 ] = xoff[ subnum ];
+         shift[ 1 ] = yoff[ subnum ];
+      }
+
       shiftmap = astShiftMap( 2, shift, " " );
       cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], 
                                                       shiftmap, 1, " " );
@@ -492,11 +629,25 @@ int *status             /* global status (given and returned) */
       cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], 
 						      zoommap, 1, " " );
 
-/* Correct for polynomial distortion */      
+/* Correct for polynomial distortion (as specified by the "SMURF_DISTORTION"
+   environment variable). */      
+      if( !distortion ) {
+         polymap = astPolyMap( 2, 2, 14, coeff_f, 14, coeff_i, " " );
 
-      polymap = astPolyMap( 2, 2, 14, coeff_f, 14, coeff_i, " " );
-      cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], 
-						      polymap, 1, " " );
+      } else if( !strcmp( "NEW", distortion ) ) {
+         polymap = astPolyMap( 2, 2, ncoeff_f_NEW, coeff_f_NEW, 
+                                     ncoeff_i_NEW, coeff_i_NEW, " " );
+      } else if( !strcmp( "NONE", distortion ) ) {
+         polymap = NULL;
+
+      } else {
+         polymap = astPolyMap( 2, 2, 14, coeff_f, 14, coeff_i, " " );
+      }
+
+      if( polymap ) {
+         cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ],
+      						          polymap, 1, " " );
+      }
       
 /* Convert from mm to radians (but these coords are still cartesian (x,y)
    (i.e. measured in the tangent plane) rather than spherical (lon,lat)
