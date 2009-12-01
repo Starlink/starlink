@@ -68,6 +68,7 @@ examples/README \
 examples/atm.sdf \
 examples/candycanes.sdf \
 examples/dimmconfig.lis \
+examples/dimmconfig_brightplanet.lis \
 examples/dreamobs.lis \
 examples/dreamsim.lis \
 examples/heatrunobs.lis \
