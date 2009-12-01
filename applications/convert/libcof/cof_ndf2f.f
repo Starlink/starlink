@@ -1199,14 +1199,15 @@
                      CALL COF_2DFEX( XNAME, XLOC, FUNIT, STATUS )
 
                   ELSE IF ( SMURF ) THEN
-                  
+
 *  Handle SMURF extension's NDFs as NDFs rather than a general HDS
 *  structure, but also may inherit the metadata (FITS airlock, HISTORY)
 *  of the parent NDFs.
                      CALL COF_SMURF( XNAME, XLOC, FUNIT, NDF, FILNAM, 
      :                               NOARR, ARRNAM, BITPIX, BLOCKF, 
-     :                               ORIGIN, PROFIT, DUPLEX, PROHIS, 
-     :                               SUMS, ENCOD, NATIVE, STATUS )
+     :                               ORIGIN, PROFIT, DUPLEX, PROEXT,
+     :                               PROHIS, SUMS, ENCOD, NATIVE,
+     :                               STATUS )
                   END IF
 
 *  Write integrity-check headers.
