@@ -347,7 +347,7 @@ void smurf_stackframes( int *status ) {
     smfData * data = NULL;
     smf_open_file( igrp, sortinfo[i-1].index, "READ", SMF__NOCREATE_HEAD, &data, status );
     if (*status != SAI__OK) break;
-    if (dosort) smf_find_dateobs( data->hdr, &(times[i-1]), NULL, status );
+    if (dosort) times[i-1] = sortinfo[i-1].mjd;
 
     /* copy data to slice */
     if ( odatad && (data->pntr)[0] ) {
