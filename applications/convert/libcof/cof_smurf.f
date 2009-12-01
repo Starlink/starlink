@@ -1,6 +1,6 @@
       SUBROUTINE COF_SMURF( SNAME, LOC, FUNIT, NDF, FILNAM, NOARR, 
      :                      ARRNAM, BITPIX, BLOCKF, ORIGIN, PROFIT, 
-     :                      DUPLEX, PROHIS, SUMS, ENCOD, 
+     :                      DUPLEX, PROEXT, PROHIS, SUMS, ENCOD, 
      :                      NATIVE, STATUS )
 *+
 *  Name:
@@ -13,8 +13,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL COF_SMURF( SNAME, LOC, FUNIT, NDF, FILNAM, NOARR, ARRNAM, 
-*                     BITPIX, BLOCKF, ORIGIN, PROFIT, DUPLEX, 
+*     CALL COF_SMURF( SNAME, LOC, FUNIT, NDF, FILNAM, NOARR, ARRNAM,
+*                     BITPIX, BLOCKF, ORIGIN, PROFIT, DUPLEX, PROEXT,
 *                     PROHIS, ENCOD, NATIVE, STATUS )
 
 *  Description:
@@ -80,6 +80,10 @@
 *        means that the airlocks headers only appear with the primary 
 *        array.  Supplying .TRUE., propagates the FITS airlock headers 
 *        for other array components of the NDF.
+*     PROEXT = LOGICAL (Given)
+*        If .TRUE., the NDF extensions (other than the FITS extension)
+*        are propagated to the FITS files as FITS binary-table
+*        extensions, one per structure of the hierarchy.
 *     PROHIS = LOGICAL (Given)
 *        If .TRUE., any NDF history records are written to the primary
 *        FITS header as HISTORY cards.  These follow the mandatory
@@ -103,8 +107,8 @@
 *     open.
 
 *  Copyright:
-*     Copyright (C) 2007 Science & Technology Facilities Council. All
-*     Rights Reserved.
+*     Copyright (C) 2007, 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -129,7 +133,12 @@
 *  History:
 *     2007 October 21 (MJC):
 *        Original version.
-*     {enter_changes_here}
+*     2009 November 28 (MJC):
+*        Allow for optional processing of extensions within the NDFs,
+*        which are converted in binary tables using the generic
+*        recursion.  Write the dummy header for SMURF structure as type
+*        SMURF_EXT.
+*     {enter_further_changes_here}
 
 *-
       
@@ -139,6 +148,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Data-system constants
+      INCLUDE 'NDF_PAR'          ! NDF constants
 
 *  Arguments Given:
       CHARACTER * ( * ) SNAME
@@ -153,6 +163,7 @@
       CHARACTER * ( * ) ORIGIN
       LOGICAL PROFIT
       LOGICAL DUPLEX
+      LOGICAL PROEXT
       LOGICAL PROHIS
       LOGICAL SUMS
       CHARACTER * ( * ) ENCOD
@@ -168,15 +179,21 @@
 *  Local Variables:
       CHARACTER*( DAT__SZLOC ) CLOC ! Locator to a SMURF component
       CHARACTER*256 FILE         ! Name of the HDS file (dummy)
-      INTEGER I                  ! Loop counter
+      LOGICAL FITPRE             ! FITS airlock extension is present?
+      INTEGER I                  ! Component loop counter
+      INTEGER IEXT               ! Extension loop counter
+      CHARACTER*68 NAME          ! Name of HDS path
       INTEGER NCOMP              ! Number of components SMURF extension
       INTEGER NDFE               ! Extension NDF identifier
-      CHARACTER*68 NAME          ! Name of HDS path
+      INTEGER NEXTN              ! Number of extensions
+      INTEGER NEX2PR             ! Number of extensions to process
       INTEGER NLEV               ! Number of hierarchical levels
       INTEGER NONNDF             ! Number of non-NDF SMURF components
       CHARACTER*( DAT__SZTYP ) TYPE ! Type of the NDF component
       LOGICAL VALID              ! The NDF identifier is valid?
       LOGICAL WRITTN             ! Dummy structure is written?
+      CHARACTER * ( DAT__SZLOC ) XLOC ! Locator to an NDF extension
+      CHARACTER * ( NDF__SZXNM ) XNAME ! Name of NDF extension
       
 *.
 
@@ -260,8 +277,58 @@
 *  Convert the NDF, but using the parent NDF's metadata.
             CALL COF_NEX2F( NAME, FUNIT, NDF, NDFE, FILNAM, 1,
      :                      ARRNAM, BITPIX, BLOCKF, ORIGIN, PROFIT, 
-     :                      DUPLEX, PROHIS, SUMS, ENCOD, NATIVE, 
+     :                      DUPLEX, PROHIS, SUMS, ENCOD, NATIVE,
      :                      STATUS )
+
+*  Process extensions.
+*  ===================
+            IF ( PROEXT ) THEN
+
+*  Use binary tables for all extensions other than FITS.  Special
+*  software for handling standard extensions will be provided as it
+*  becomes available.
+
+*  Look for NDF extensions.  Check whether or not there are any present.
+               CALL NDF_XNUMB( NDFE, NEXTN, STATUS )
+
+               IF ( NEXTN .GE. 1 ) THEN
+
+*  See if one of these is the FITS extension.
+                  CALL NDF_XSTAT( NDFE, 'FITS', FITPRE, STATUS )
+
+*  Find the number of extensions to process, as the FITS extension
+*  is handled elsewhere.
+                  IF ( FITPRE ) THEN
+                     NEX2PR = NEXTN - 1
+                  ELSE
+                     NEX2PR = NEXTN
+                  END IF
+
+*  Are there any extensions to process?
+                  IF ( NEX2PR .GE. 1 ) THEN
+
+*  Loop through the extensions.
+                     DO IEXT = 1, NEXTN
+
+*  Get the name of the next extension.
+                        CALL NDF_XNAME( NDFE, IEXT, XNAME, STATUS )
+
+*  Get a locator to the extension.
+                        CALL NDF_XLOC( NDFE, XNAME, 'READ', XLOC,
+     :                                 STATUS )
+
+*  Process the extension into a hierarchy.
+                        CALL COF_THIER( XNAME, XLOC, FUNIT, STATUS )
+
+*  Write integrity-check headers.
+                        IF ( SUMS ) CALL FTPCKS( FUNIT, STATUS )
+
+*  Annul the locator so it may be reused.
+                        CALL DAT_ANNUL( XLOC, STATUS )
+                     END DO
+                  END IF
+               END IF
+            END IF
 
 *   Free resources.
             CALL NDF_ANNUL( NDFE, STATUS )
