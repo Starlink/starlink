@@ -67,6 +67,8 @@
 *     2007 July 11 (PWD):
 *        When extension has a symbolic type of IMAGE use that
 *        to override the XTENSION value (for compressed images).
+*     2009 November 30 (MJC):
+*        Add NDF label.
 *     {enter_further_changes_here}
 
 *-
@@ -90,14 +92,15 @@
                                  ! blanks
 
 *  Local Variables:
-      CHARACTER * ( 48 ) COMENT  ! Keyword comment
+      CHARACTER*48 COMENT        ! Keyword comment
       INTEGER HDUTYP             ! Current HDU type
+      CHARACTER*70 LABEL         ! NDF label
       INTEGER NC                 ! Number of characters in a component
       INTEGER NHDU               ! Number of the current HDU
       LOGICAL THERE              ! Keyword is present?
-      CHARACTER * ( 70 ) TITLE   ! NDF title
-      CHARACTER * ( 70 ) UNITS   ! NDF units
-      CHARACTER * ( 8 ) XTENS    ! Extension name
+      CHARACTER*70 TITLE         ! NDF title
+      CHARACTER*70 UNITS         ! NDF units
+      CHARACTER*8 XTENS          ! Extension name
 
 *.
 
@@ -138,6 +141,15 @@
       IF ( THERE .AND. TITLE .NE. ' ' ) THEN
          NC = CHR_LEN( TITLE )
          CALL NDF_CPUT( TITLE( :NC ), NDF, 'Title', STATUS )
+      END IF
+
+*  Obtain the units from the BUNIT keyword in the header.
+      CALL COF_GKEYC( FUNIT, 'LABEL', THERE, LABEL, COMENT, STATUS )
+
+*  If it is present, set the NDF units, truncating unnecessary blanks.
+      IF ( THERE .AND. LABEL .NE. ' ' ) THEN
+         NC = CHR_LEN( UNITS )
+         CALL NDF_CPUT( LABEL( :NC ), NDF, 'Label', STATUS )
       END IF
 
 *  Obtain the units from the BUNIT keyword in the header.
