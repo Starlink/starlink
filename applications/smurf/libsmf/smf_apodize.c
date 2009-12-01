@@ -68,6 +68,8 @@
 *       Enable SMF__MAXAPLEN for len
 *     2009-11-17 (EC):
 *       Move range checking into smf_get_goodrange
+*     2009-12-01 (EC):
+*       Apodize and mask all detectors to ensure that smf_get_goodrange works!
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -181,23 +183,22 @@ void smf_apodize( smfData *data, unsigned char *quality, size_t len,
     /* Do the apodization */
     if( *status == SAI__OK ) {
 
-      /* Quality checking version */
-      if( qua && !(qua[i*bstride]&SMF__Q_BADB)) {
+      /* Quality recording version */
+      if( qua ) { 
 
         /* First roll-off the signal */
         for( j=0; j<thelen; j++ ) {
           ap = 0.5 - 0.5*cos( AST__DPI * (double) j / thelen );
 
-          if( !(qua[i*bstride+(first+j)*tstride]&SMF__Q_MOD) ) {
-            dat[i*bstride+(first+j)*tstride]*=ap;
-            qua[i*bstride+(first+j)*tstride]|=SMF__Q_APOD;
-          }
+          /* Set the quality bit */
+          qua[i*bstride+(first+j)*tstride]|=SMF__Q_APOD;
+          qua[i*bstride+(last-j)*tstride]|=SMF__Q_APOD;
 
-          if( !(qua[i*bstride+(last-j)*tstride]&SMF__Q_MOD) ) {
-            dat[i*bstride+(last-j)*tstride]*=ap;
-            qua[i*bstride+(last-j)*tstride]|=SMF__Q_APOD;
-          }
+          /* scale the signal */
+          dat[i*bstride+(first+j)*tstride]*=ap;
+          dat[i*bstride+(last-j)*tstride]*=ap;
         }
+
         /* then put in some extra flags, thelen samples again*/
         for( j=thelen; j<2*thelen; j++ ) {
           qua[i*bstride+(first+j)*tstride]|=SMF__Q_APOD;
