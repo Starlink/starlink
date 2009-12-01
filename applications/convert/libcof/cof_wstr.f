@@ -17,7 +17,7 @@
 *     The routine creates a FITS binary table of one row to store the
 *     a dummy object called DUMMY_FOR_STRUC.  This is used to preserve
 *     extension structures containing only NDFs whose paths may need
-*     to be recreatedby FITS2NDF.
+*     to be recreated by FITS2NDF.
 
 *  Arguments:
 *     FUNIT = INTEGER (Given)

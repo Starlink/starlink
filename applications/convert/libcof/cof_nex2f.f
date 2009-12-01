@@ -1,13 +1,13 @@
       SUBROUTINE COF_NEX2F( SNAME, FUNIT, NDFP, NDF, FILNAM, NOARR, 
      :                      ARRNAM, BITPIX, BLOCKF, ORIGIN, PROFIT, 
-     :                      DUPLEX, PROHIS, SUMS, ENCOD, NATIVE,
+     :                      DUPLEX, PROHIS, SUMS, ENCOD, NATIVE, 
      :                      STATUS )
 *+
 *  Name:
 *     COF_NEX2F
 
 *  Purpose:
-*     Converts a SMURF extension NDF into a FITS IMAGE extensions.
+*     Converts a SMURF extension NDF into FITS IMAGE extensions.
 
 *  Language:
 *     Starlink Fortran 77

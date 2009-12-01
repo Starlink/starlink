@@ -65,7 +65,7 @@
 *     EXTNAM = CHARACTER * ( * ) (Given)
 *        If the input NDF is part of an extension, set this to the 
 *        extension's path (including its name) within the NDF 
-*        hierarchy.  A blank string indicastes that the NDF being
+*        hierarchy.  A blank string indicates that the NDF being
 *        processed in the primary NDF.  This argument affects the
 *        values or presence of FITS keywords.  See the Notes
 *        for EXTNAME, EXTLEVEL, and EXTTYPE keywords.
