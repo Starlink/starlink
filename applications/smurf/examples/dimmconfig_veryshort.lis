@@ -1,14 +1,15 @@
 # *** Specialized config for short scans of bright source ***
 #
 # The main feature of this config file is that we turn off
-# gai.flatfield. The reason for this is that cases in which
-# the astronomical signal dominates with respect to
-# the sky, the self-flatfield will effectively down-weight
-# detectors that see the source prominently. We also delay
-# calculation of the common-mode (and hence rejection of
-# bolometers) until after the first iteration so that
-# there is less contamination from the astronomical
-# signal (com.notfirst).
+# gai.flatfield. The reason for this is that cases in which the sky
+# (common-mode) signal has very little time to drift (so it is likely
+# insignificant WRT other components of the signal), the
+# self-flatfield will be highly uncertain, and may effectively
+# down-weight detectors that see bright astronomical sources
+# prominently. We also delay calculation of the common-mode (and hence
+# rejection of bolometers) until after the first iteration so that
+# there is less contamination from the astronomical signal
+# (com.notfirst).
 #
 # ***********************************************************
 
