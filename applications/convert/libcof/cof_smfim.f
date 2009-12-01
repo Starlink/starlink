@@ -125,8 +125,10 @@
 *  History:
 *     2008 February 12 (MJC):
 *        Original version based upon COF_2DFIM.
-*     2009 June 26
+*     2009 June 26 (MJC):
 *        Restore correct logic for VARIANCE and QUALITY extensions.
+*     2009 November 30 (MJC):
+*        Reads possible long-string EXTNAME.
 *     {enter_further_changes_here}
 
 *-
@@ -178,7 +180,7 @@
       INTEGER EL                 ! Number of elements in array
       CHARACTER*( DAT__SZLOC ) ELOC ! Locator to NDF extension (MORE)
                                  ! structure
-      CHARACTER*68 EXTNAM  ! Name of the extension/path
+      CHARACTER*132 EXTNAM       ! Name of the extension/path
       LOGICAL EXNDF              ! FITS file originated from an NDF?
       LOGICAL EXTEND             ! Value of FITS EXTEND keyword
       LOGICAL FIRST              ! Processing the first HDU
@@ -641,9 +643,9 @@
 *  Obtain and validate the extension's name.
 *  =========================================
 
-*  Obtain the full component name.
-            CALL COF_GKEYC( FUNIT, 'EXTNAME', THERE, EXTNAM, COMENT,
-     :                      STATUS )
+*  Obtain the full component name, allowing for long strings
+            CALL COF_GENAM( FUNIT, EXTNAM, COMENT, STATUS )
+            IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  Extract the extension name.  This assumes that it was originally an
 *  NDF extension.
