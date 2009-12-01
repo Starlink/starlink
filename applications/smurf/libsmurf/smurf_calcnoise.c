@@ -58,6 +58,9 @@
 *  Notes:
 *     - NEP and NOISERATIO images are stored in the .MORE.SMURF extension
 *     - NEP image is only created for raw, unflatfielded data.
+*     - If the data have flatfield information available the noise and
+*     NOISERATIO images will be masked by the flatfield bad bolometer mask.
+*     The mask can be removed using SETQUAL or SETBB (clear the bad bits mask).
 
 *  Related Applications:
 *     SMURF: SC2CONCAT, SC2CLEAN, SC2FFT
@@ -77,6 +80,9 @@
 *        Add POWER and FLOW parameters.
 *     2009-10-21 (TIMJ):
 *        Propagate units properly if we do not have raw data.
+*     2009-11-30 (TIMJ):
+*        Add quality mask so that bolometers known to be masked by
+*        bad responsivity will be masked in the noise data.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -294,13 +300,13 @@ void smurf_calcnoise( int *status ) {
                                                  "Noise Ratio", NULL, status );
 
         if (*status == SAI__OK) {
+          double * od = (outdata->pntr)[0];
           smf_bolonoise( wf, thedata, NULL, 0, f_low, freqs[0], freqs[1], 10.0, 1,
                          (outdata->pntr)[0], (ratdata->pntr)[0],
                          (powgrp ? &powdata : NULL), status );
 
           /* Bolonoise gives us a variance - we want square root */
           for (i = 0; i < (outdata->dims)[0]*(outdata->dims)[1]; i++) {
-            double * od = (outdata->pntr)[0];
             if ( od[i] != VAL__BADD ) od[i] = sqrt( od[i] );
           }
 
@@ -315,59 +321,100 @@ void smurf_calcnoise( int *status ) {
 
         }
 
-        /* now to create the NEP image using the flatfield information */
-        if (*status == SAI__OK && do_nep ) {
+        /* we want to use a quality mask derived from the flatfield
+           and apply it to the NOISE and NOISERATIO data so that we can
+           give people the option of looking at all the data or all
+           the data with working bolometers */
+        if (*status == SAI__OK) {
           smfDA *da = thedata->da;
-          smfData * nepdata = NULL;
-          size_t ngood;
+          size_t ngood = 0;
           smfData * respmap = NULL;
 
-          if (!da) {
-            *status = SAI__ERROR;
-            errRep( " ", "Attempting to calculate NEP image but no"
-                    " flatfield information available", status);
-          }
-
-          smf_create_bolfile( NULL, 1, thedata, "Responsivity", "A/W",
-                              0, &respmap, status );
-          if (*status == SAI__OK) {
-            /* use a snr of 5 since we don't mind if we get a lot of
-               bolometers that are a bit dodgy since the point is the NEP */
-            ngood = smf_flat_responsivity( respmap, 5.0, da->nflat, da->flatpar,
-                                           da->flatcal, status );
-          }
-          if (*status == SAI__OK && ngood == 0) {
-            *status = SAI__ERROR;
-            errRep( "", "No good responsivities found in flatfield."
-                    " Unable to calculate NEP", status );
-          }
-
-          /* now create the output image for NEP data */
-          nepdata = smf__create_bolfile_extension( ogrp, gcount, thedata,
-                                                   ".MORE.SMURF.NEP", "NEP",
-                                                   "W Hz**-0.5", status );
-
-          /* and divide the noise data by the responsivity
-             correcting for SIMULT */
-          if (*status == SAI__OK) {
-            for (i = 0; i < (nepdata->dims)[0]*(nepdata->dims)[1]; i++) {
-              /* ignore variance since noise will not have any */
-              double * noise = (outdata->pntr)[0];
-              double * resp = (respmap->pntr)[0];
-              double * nep  = (nepdata->pntr)[0];
-              if (noise[i] == VAL__BADD || resp[i] == VAL__BADD) {
-                nep[i] = VAL__BADD;
-              } else {
-                nep[i] = (noise[i] / SIMULT) / resp[i];
-              }
+          if (da) {
+            smf_create_bolfile( NULL, 1, thedata, "Responsivity", "A/W",
+                                0, &respmap, status );
+            if (*status == SAI__OK) {
+              /* use a snr of 5 since we don't mind if we get a lot of
+                 bolometers that are a bit dodgy since the point is the NEP */
+              ngood = smf_flat_responsivity( respmap, 5.0, da->nflat, da->flatpar,
+                                             da->flatcal, status );
+            }
+          } else {
+            if (do_nep) {
+              *status = SAI__ERROR;
+              errRep( " ", "Attempting to calculate NEP image but no"
+                      " flatfield information available", status);
+            } else {
+              /* we might simply be running calcnoise on data
+                 that already have been flatfielded */
+              msgOutif( MSG__VERB, " ", "Unable to add bad bolometer mask since"
+                        " no flatfield information avaialable", status);
             }
           }
-          if (*status == SAI__OK && nepdata->file) {
-            smf_accumulate_prov( NULL, basegrp, 1, nepdata->file->ndfid,
-                                 CREATOR, status );
+
+          if (do_nep) {
+            smfData * nepdata = NULL;
+
+            if (*status == SAI__OK && ngood == 0) {
+              *status = SAI__ERROR;
+              errRep( "", "No good responsivities found in flatfield."
+                      " Unable to calculate NEP", status );
+            }
+
+            /* now create the output image for NEP data */
+            nepdata = smf__create_bolfile_extension( ogrp, gcount, thedata,
+                                                     ".MORE.SMURF.NEP", "NEP",
+                                                     "W Hz**-0.5", status );
+
+            /* and divide the noise data by the responsivity
+               correcting for SIMULT */
+            if (*status == SAI__OK) {
+              for (i = 0; i < (nepdata->dims)[0]*(nepdata->dims)[1]; i++) {
+                /* ignore variance since noise will not have any */
+                double * noise = (outdata->pntr)[0];
+                double * resp = (respmap->pntr)[0];
+                double * nep  = (nepdata->pntr)[0];
+                if (noise[i] == VAL__BADD || resp[i] == VAL__BADD) {
+                  nep[i] = VAL__BADD;
+                } else {
+                  nep[i] = (noise[i] / SIMULT) / resp[i];
+                }
+              }
+            }
+            if (*status == SAI__OK && nepdata->file) {
+              smf_accumulate_prov( NULL, basegrp, 1, nepdata->file->ndfid,
+                                   CREATOR, status );
+            }
+            if (nepdata) smf_close_file( &nepdata, status );
           }
+
+          /* now mask the noise and ratio data */
+          if (respmap) {
+            double * rdata = (respmap->pntr)[0];
+            unsigned char * outq = (outdata->pntr)[2];
+            unsigned char * ratq = NULL;
+
+            if (ratdata) ratq = (ratdata->pntr)[2];
+
+            /* set the quality mask */
+            for (i = 0; i < (outdata->dims)[0]*(outdata->dims)[1]; i++) {
+              if ( rdata[i] == VAL__BADD) {
+                outq[i] |= SMF__Q_BADB;
+                if (ratq) ratq[i] |= SMF__Q_BADB;
+              }
+            }
+
+            /* by default we enable the mask */
+            if (outdata && outdata->file) {
+              ndfSbb( SMF__Q_BADB, outdata->file->ndfid, status );
+            }
+            if (ratdata && ratdata->file) {
+              ndfSbb( SMF__Q_BADB, ratdata->file->ndfid, status );
+            }
+
+          }
+
           if (respmap) smf_close_file( &respmap, status );
-          if (nepdata) smf_close_file( &nepdata, status );
         }
 
         if (*status == SAI__OK && outdata->file) {
