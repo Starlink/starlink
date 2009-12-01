@@ -29,7 +29,7 @@
 *        The global status.
 
 *  Prior Requirements:
-*     The curreent header and data unit must either be primary or an
+*     The current header and data unit must either be primary or an
 *     IMAGE extension.  The routine aborts with an error status if this
 *     requirement is not satisfied.
 *
