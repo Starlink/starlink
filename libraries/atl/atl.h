@@ -68,6 +68,7 @@ AstRegion *atlMatchRegion( AstRegion *, AstFrame *, int * );
 int atlMapGet1S( AstKeyMap *, const char *, int, int, int *, char *, int * );
 void atlAddWcsAxis( AstFrameSet *, AstMapping *, AstFrame *, int *, int *, int * );
 void atlAxtrm( AstFrameSet *, int *, int *, int *, double *, int * );
+void atlCreat( const char *, AstObject *, int * );
 void atlGetParam( const char *, AstKeyMap *, int * );
 void atlKychk( AstKeyMap *, const char *, const char *, int * );
 void atlMapPut1S( AstKeyMap *, const char *, const char *, int, int, const char *, int * );
