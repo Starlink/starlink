@@ -9,7 +9,9 @@
 # prominently. We also delay calculation of the common-mode (and hence
 # rejection of bolometers) until after the first iteration so that
 # there is less contamination from the astronomical signal
-# (com.notfirst).
+# (com.notfirst). Finally, we remove the FLT model component (as well
+# as the padding/apodization) as they are unnecessary -- again, since
+# baseline drifts are going to be very small.
 #
 # ***********************************************************
 
@@ -47,7 +49,7 @@ maxlen = 0
 #  flt = apply filter to time streams
 #  noi = estimate time-domain variance
 
-modelorder = (com,gai,ext,ast,flt,noi)
+modelorder = (com,gai,ext,ast,noi)
 
 # Export model files as NDF?
 # Specify a value of 1 or 0 to export all or none of the components
@@ -81,11 +83,11 @@ exportndf = 0
 # --- Padding, apodization and mean subtraction are all fairly useful ---
 
 # Number of samples of padding to add to start and end before filtering
-padstart = 100
-padend = 100
+#padstart = 100
+#padend = 100
 
 # Apodize signals with a sin function roll-off across apod samples
-apod = 100
+#apod = 100
 
 # subtract a baseline polynomial of this order
 order = 0
