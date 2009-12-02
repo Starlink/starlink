@@ -255,6 +255,8 @@ void smurf_mon( int * status ) {
     smurf_dreamsolve( status );
   } else if (strcmp( taskname, "DREAMWEIGHTS" ) == 0 ) {
     smurf_dreamweights( status );
+  } else if (strcmp( taskname, "DSUTILS" ) == 0 ) {
+    smurf_dsutils( status );
   } else if (strcmp( taskname, "EXTINCTION" ) == 0 ) {
     smurf_extinction( status );
   } else if (strcmp( taskname, "FLATFIELD" ) == 0 ) {

@@ -599,6 +599,153 @@ package @PACKAGE@ {
 
         }
 
+        action dsutils {
+
+            helplib {$SMURF_HELP}
+
+            parameter bmap {
+                type LITERAL
+                prompt {File in which to put focal plane pixel to sky mapping}
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                default !
+                helpkey *
+            }
+
+            parameter border {
+                type _INTEGER
+                prompt {Width of border to exclude form each time slice (in pixels)}
+                default 4
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                helpkey *
+            }
+
+            parameter feature {
+                type LITERAL
+                prompt {Feature to use for alignment}
+                ppath CURRENT DEFAULT
+                vpath DEFAULT
+                default BEAMFIT
+                helpkey *
+            }
+
+            parameter forward {
+                type _LOGICAL
+                prompt {Produce code for forward transformation?}
+                ppath CURRENT DEFAULT
+                default TRUE
+                helpkey *
+            }
+
+            parameter in {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT }
+                ppath GLOBAL CURRENT
+                association <-GLOBAL.DATA_ARRAY
+                prompt {Input time series cube}
+                helpkey *
+            }
+
+            parameter infitx {
+                type NDF
+                access READ
+                vpath DEFAULT
+                ppath GLOBAL CURRENT
+                association <-GLOBAL.DATA_ARRAY
+                default !
+                prompt {NDF containing polynomial fit for X distortion}
+                helpkey *
+            }
+
+            parameter infity {
+                type NDF
+                access READ
+                vpath DEFAULT
+                ppath GLOBAL CURRENT
+                association <-GLOBAL.DATA_ARRAY
+                prompt {NDF containing polynomial fit for Y distortion}
+                default !
+                helpkey *
+            }
+
+            parameter incat {
+                type LITERAL
+                prompt {Name of input catalogue text file}
+                vpath DEFAULT 
+                ppath CURRENT DEFAULT
+                default !
+                helpkey *
+            }
+
+            parameter lowfactor {
+                type _REAL
+                prompt {Factor for lowest usable data sum}
+                ppath CURRENT DEFAULT
+                default 0.5
+                helpkey *
+            }
+
+            parameter maxerr {
+                type _REAL 
+                prompt {Max allowed distance from base to centroid (in pixels)}
+                default 10
+                ppath CURRENT DEFAULT
+                helpkey *
+            }
+
+            parameter niter {
+                type _INTEGER
+                prompt {Number of sigma clips}
+                default 3
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                helpkey *
+            }
+
+            parameter outdx {
+                type NDF
+                access WRITE
+                vpath {PROMPT }
+                association ->GLOBAL.DATA_ARRAY
+                prompt {Output NDF holding focal-plane X offsets}
+                helpkey *
+            }
+
+            parameter outdy {
+                type NDF
+                access WRITE
+                vpath {PROMPT }
+                association ->GLOBAL.DATA_ARRAY
+                prompt {Output NDF holding focal-plane Y offsets}
+                helpkey *
+            }
+
+            parameter outcat {
+                type LITERAL
+                prompt {Name of output catalogue text file}
+                ppath CURRENT 
+                helpkey *
+            }
+
+            parameter outcode {
+                type LITERAL
+                prompt {Name of output C source file}
+                ppath CURRENT 
+                helpkey *
+            }
+
+            parameter subarray {
+                type LITERAL
+                prompt {SCUBA-2 sub-array name}
+                ppath CURRENT DEFAULT
+                default s8d
+                helpkey *
+            }
+        }
+
         action extinction {
 
             helplib {$SMURF_HELP}

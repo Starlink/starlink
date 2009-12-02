@@ -29,6 +29,7 @@ calcresp \
 copyflat \
 dreamsolve \
 dreamweights \
+dsutils \
 extinction \
 flatfield \
 gsd2acsis \

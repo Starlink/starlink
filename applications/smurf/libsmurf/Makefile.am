@@ -13,6 +13,7 @@ smurf_calcresp.c \
 smurf_copyflat.c \
 smurf_dreamsolve.c \
 smurf_dreamweights.c \
+smurf_dsutils.c \
 smurf_extinction.c \
 smurf_flatfield.c \
 smurf_gsd2acsis.c \
