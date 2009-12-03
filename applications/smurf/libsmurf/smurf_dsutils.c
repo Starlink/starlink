@@ -696,7 +696,7 @@ void smurf_dsutils( int *status ) {
          if( forward ) {
             fprintf( fp2, "\n");
             fprintf( fp2, "/* Change the plate scale used to create the distortion data\n");
-            fprintf( fp2, "#define MM2RAD = MM2RAD*%g\n", alpha );
+            fprintf( fp2, "#define MM2RAD MM2RAD*%g\n", alpha );
             fprintf( fp2, "\n");
             fprintf( fp2, "\n");
             fprintf( fp2, "/* SCUBA-2 PolyMap cooefficients. Forward coefficients are from \n");
