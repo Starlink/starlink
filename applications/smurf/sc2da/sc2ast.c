@@ -651,8 +651,6 @@ int *status             /* global status (given and returned) */
       } else {
          radmap = astZoomMap ( 2, MM2RAD, " " );
       }
-
-      radmap = astZoomMap ( 2, MM2RAD, " " );
       cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], 
                                                       radmap, 1, " " );
 
