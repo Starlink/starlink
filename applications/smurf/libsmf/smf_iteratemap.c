@@ -1004,7 +1004,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       dat.qua = qua;
       dat.lut = lut;
       dat.map = thismap;
+      dat.hitsmap = thishits;
       dat.mapvar = thisvar;
+      dat.msize = msize;
       dat.chisquared = chisquared;
       if( havenoi ) {
         dat.noi = model[whichnoi];
