@@ -39,7 +39,7 @@ double *kpg1Chcof( int nloc,  HDSLoc **loc, int *ncoeff_f, int *nin,
 *        from the returned array.
 *     ncoeff_f
 *        The number of coefficients described by the returned array,
-*        sutable for passing to teh PolyMap constructor.
+*        sutable for passing to the PolyMap constructor.
 *     nin
 *        Pointer to integer in which to return the number of inputs for 
 *        the polynomial. The number of outputs will be equal to "nloc".
@@ -85,6 +85,9 @@ double *kpg1Chcof( int nloc,  HDSLoc **loc, int *ncoeff_f, int *nin,
 *  History:
 *     13-NOV-2009 (DSB):
 *        Original version.
+*     3-DEC-2009 (DSB):
+*        Include linear coefficients in returned array, even if they are
+*        zero-valued.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -114,6 +117,8 @@ double *kpg1Chcof( int nloc,  HDSLoc **loc, int *ncoeff_f, int *nin,
    int iel;
    int iloc;
    int j;
+   int k;
+   int linear;
    int ndim;
    size_t nc;
    size_t nel;
@@ -277,12 +282,14 @@ double *kpg1Chcof( int nloc,  HDSLoc **loc, int *ncoeff_f, int *nin,
          for( i = 0; i < ndim; i++ ) power[ i ] = 0;
    
 /* Loop round all the simple coefficients currently in "w2". */
+         k = 0;
          q = w2;
          for( i = 0; i < nc; i++,q++ ) {
 
 /* If the coefficient is non-zero, append it to the returned array,
-   extending it as necessary. */
-            if( *q != 0.0 ) {
+   extending it as necessary. For linear terms, append them even if they
+   are zero. */
+            if( *q != 0.0 || linear ) {
                result = astGrow( result, (++(*ncoeff_f))*( 2 + ndim ), 
                                  sizeof( double ) );
                if( *status == SAI__OK ) {
@@ -300,6 +307,15 @@ double *kpg1Chcof( int nloc,  HDSLoc **loc, int *ncoeff_f, int *nin,
                power[ j ] = 0;
                j++;
             }
+
+/* Set a flag if the next pass will be for a linear term. */
+            if( power[ k ] == 1 ) {
+               linear = 1;
+               k++;
+            } else {
+               linear = 0;
+            }
+
          }
       }
 

@@ -166,6 +166,12 @@
 *  History:
 *     2-DEC-2009 (DSB):
 *        Initial version.
+*     3-DEC-2009 (DSB):
+*        Modified to ensure that the average of the X and Y linear
+*        coefficients in the final polymap have a mean value of 1.0.
+*        This requires MM2RAD to be changed in sc2ast.c - include the
+*        required scaling factor in the forward transformation code 
+*        written to paremeter OUTCODE.
 
 *  Copyright:
 *     Copyright (C) 2009 Science and Technology Facilities Council.
@@ -349,6 +355,9 @@ void smurf_dsutils( int *status ) {
    double *work = NULL;      /* Pointer to astRebinSeq work array */
    double *worka;            /* Work array */
    double *workb;            /* Work array */
+   double *xlin = NULL;
+   double *ylin = NULL;
+   double alpha;
    double bcx;               /* Pixel X coord at base position */
    double bcy;               /* Pixel Y coord at base position */
    double dx;
@@ -623,7 +632,9 @@ void smurf_dsutils( int *status ) {
       ndfXloc( indf2, "SURFACEFIT", "Read", &xloc2, status ); 
       datFind( xloc2, "FIT", floc + 1, status );
 
-/* Convert them to coefficients of a standard polynomial. */
+/* Convert them to coefficients of a standard polynomial. This excludes
+   zero-valued coefficients, except for the linear coefficients, which are
+   included even if they are zero valued. */
       cofs = kpg1Chcof( 2, floc, &ncoeff_f, &nin, status );
 
 /* Get the name of the output file to hold the generated C code and attempt to open it. */
@@ -647,45 +658,82 @@ void smurf_dsutils( int *status ) {
          }
       }
 
+/* Get pointers to the linear X and Y coefficient values. */
+      p = cofs;
+      for( i = 0; i < ncoeff_f; i++ ) {
+         if( p[ 1 ] == 1.0 && p[ 2 ] == 1 && p[ 3 ] == 0  ) {
+            xlin = p;
+         } else if( p[ 1 ] == 2.0 && p[ 2 ] == 0.0 && p[ 3 ] == 1.0  ) {
+            ylin = p;
+         }
+         p += 4;
+      }
+
+/* We want a PolyMap that converts (x,y) into corrected (x,y) in one
+   step. Therefore we need add 1.0 to the linear X and Y terms. */
+      *(xlin) += 1.0;         
+      *(ylin) += 1.0;         
+
+/* We further modify the coefficients of the forward transformation to
+   ensure that the mean of the two linear coefficients is unity. The
+   scaling factor required to do this should be applied to the MM2RAD 
+   value used to create the supplied  distortion data. */
+      if( forward ) {
+         alpha = 0.5*( *xlin + *ylin );
+         p = cofs;
+         for( i = 0; i < ncoeff_f; i++ ) {
+            p[ 0 ] /= alpha;
+            p += 4;
+         }
+      } else {
+         alpha = 1.0;
+      }
+
 /* Write out the code if required. */
       if( fp2 ) {
+
          fprintf( fp2, "\n" );
          if( forward ) {
+            fprintf( fp2, "\n");
+            fprintf( fp2, "/* Change the plate scale used to create the distortion data\n");
+            fprintf( fp2, "#define MM2RAD = MM2RAD*%g\n", alpha );
+            fprintf( fp2, "\n");
+            fprintf( fp2, "\n");
             fprintf( fp2, "/* SCUBA-2 PolyMap cooefficients. Forward coefficients are from \n");
-            fprintf( fp2, "   FRAME850 to Nasmyth */ \n\n");
+            fprintf( fp2, "   FRAME850 to Nasmyth */ \n");
+            fprintf( fp2, "\n");
             fprintf( fp2, "/* Forward transformation coefficients... */\n");
             fprintf( fp2, "   int ncoeff_f = %d;\n", ncoeff_f );
-            fprintf( fp2, "   const double coeff_f[] = {\n\n");
+            fprintf( fp2, "   const double coeff_f[] = {\n");
          } else {
             fprintf( fp2, "/* Inverse transformation coefficients... */\n");
             fprintf( fp2, "   int ncoeff_i = %d;\n", ncoeff_f );
-            fprintf( fp2, "   const double coeff_i[] = {\n\n");
+            fprintf( fp2, "   const double coeff_i[] = {\n");
          }
+         fprintf( fp2, "\n");
 
 /* The supplied polynomial gives a correction to add on to (x,y), as a function
-   of (x,y). We want a PolyMap that converts (x,y) into corrected (x,y)
-   in one step. Therefore add 1.0 to the linear X and Y terms. */
+   of (x,y). */
          fprintf( fp2, "/* X-coordinate */ \n");
          p = cofs;
          for( i = 0; i < ncoeff_f; i++ ) {
             if( p[ 1 ] == 1.0 ) {
-               if( p[ 2 ] == 1 && p[ 3 ] == 0  ) *p += 1.0; 
                fprintf( fp2, "               %-12.5g,     %3.1f, %3.1f, %3.1f,\n", 
                        p[ 0 ], p[ 1 ], p[ 2 ], p[ 3 ] );
             }
             p += 4;
          }
-   
+
          fprintf( fp2, "\n/* Y-coordinate */ \n");
          p = cofs;
          for( i = 0; i < ncoeff_f; i++ ) {
             if( p[ 1 ] == 2.0 ) {
-               if( p[ 2 ] == 0.0 && p[ 3 ] == 1.0  ) *p += 1.0; 
                fprintf( fp2, "               %-12.5g,     %3.1f, %3.1f, %3.1f,\n", 
                        p[ 0 ], p[ 1 ], p[ 2 ], p[ 3 ] );
             }
             p += 4;
          }
+
          fprintf( fp2, "            };\n" );
          fprintf( fp2, "\n\n\n" );
 
