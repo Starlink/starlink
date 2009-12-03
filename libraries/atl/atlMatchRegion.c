@@ -4,7 +4,7 @@
 #include "mers.h"
 #include "sae_par.h"
 
-AstRegion *atlMatchRegion( AstRegion *region, AstFrame *frame, int *status ) {
+AstRegion *atlMatchRegion( AstRegion *region, AstFrame *frm, int *status ) {
 /*
 *+
 *  Name:
@@ -14,7 +14,7 @@ AstRegion *atlMatchRegion( AstRegion *region, AstFrame *frame, int *status ) {
 *     Ensure the axes in a Region match those in a Frame.
 
 *  Invocation:
-*     AstRegion *atlMatchRegion( AstRegion *region, AstFrame *frame, 
+*     AstRegion *atlMatchRegion( AstRegion *region, AstFrame *frm, 
 *                                int *status )
 
 *  Description:
@@ -34,14 +34,20 @@ AstRegion *atlMatchRegion( AstRegion *region, AstFrame *frame, int *status ) {
 *  Arguments:
 *     region
 *        An AST pointer for the Region to be modified.
-*     frame
+*     frm
 *        An AST pointer for a Frame to be matched.
 *     status
 *        The global status.
 
 *  Returned Value:
-*      An AST pointer for a Region that matches Frame, or NULL if
-*      an error occurs.
+*     An AST pointer for a Region that matches Frame, or NULL if
+*     an error occurs.
+
+*  Notes:
+*     - If "frm" is a FrameSet, the current Frame is checked first. If
+*     no match is found, each other Frame is checked in turn, finishing with
+*     the base Frame. If any of these Frames match, it is left as the
+*     current Frame in the FrameSet on exit.
 
 *  Copyright:
 *     Copyright (C) 2009 Science & Technology Facilities Council.
@@ -70,23 +76,32 @@ AstRegion *atlMatchRegion( AstRegion *region, AstFrame *frame, int *status ) {
 *  History:
 *     30-SEP-2009 (DSB):
 *        Original version.
+*     3-DEC-2009 (DSB):
+*        Modified to cater for FrameSets as well as Frames.
 *     {enter_further_changes_here}
 *-
 */
 
 /* Local Variables: */ 
+   AstFrame *ureg;            /* Supplied Region with no non-Frame axes */
+   AstFrame *frame;           /* Frame to be checked */
+   AstFrameSet *fset;         /* Supplied FrameSet */
    AstMapping *junk;          /* Unused Mapping */
    AstNullRegion *ereg;       /* Unbounded Region spanning extra Frame axes */
    AstRegion *result;         /* Returned Region pointer */
-   AstFrame *ureg;            /* Supplied Region with no non-Frame axes */
    int *old_status;           /* Original status pointer */
    int axes[ ATL__MXDIM ];    /* Region axis index for each Frame axis */
    int i;                     /* Loop index */
+   int ibase;                 /* Index of base Frame */
+   int icurr;                 /* Index of current Frame */
+   int j;                     /* Loop index */
    int nax;                   /* No. of axes in supplied Frame */
+   int nfrm;                  /* Number of Frames in FrameSet */
    int nrpick;                /* No. of of region axes to pick */
    int nwpick;                /* No. of of Frame axes to pick */
    int raxes[ ATL__MXDIM ];   /* Indicies of Region axes to pick */
    int waxes[ ATL__MXDIM ];   /* Indicies of Frame axes to pick */
+   int iframe;                /* Index of Frame to be checked */
 
 /* Initialise */
    result = NULL;
@@ -100,60 +115,128 @@ AstRegion *atlMatchRegion( AstRegion *region, AstFrame *frame, int *status ) {
 /* Begin an AST context. */
    astBegin;
 
+/* If a FrameSet was supplied, see how many Frames it contains. */
+   if( astIsAFrameSet( frm ) ){
+      fset = (AstFrameSet *) frm;
+      nfrm = astGetI( fset, "NFrame" );
+      icurr = astGetI( fset, "Current" );
+      ibase = astGetI( fset, "Base" );
+
+/* If a Frame was supplied, arrange for the following loop to be executed 
+   only once. */
+   } else {
+      fset = NULL;
+      nfrm = -1;
+   }
+
+/* Loop checking all Frames. If "frm" is not a FrameSet, this loop
+   executed only once, checking the supplied Frame. If "frm" is a FrameSet, 
+   the first pass round this loop checks the current Frame, the last pass
+   checks the base Frame, and the other passes check the other Frames in
+   order of increasing Frame index. */
+   for( j = 0; j <= nfrm + 1; j++ ) {
+
+/* Get the Frame to be checked. */
+      if( fset ) {
+         if( j == 0 ) {
+            iframe = icurr;
+         } else if( j == nfrm + 1 && ibase != icurr ) {
+            iframe = ibase;
+         } else if( j != ibase && j != icurr ) {              
+            iframe = j;
+         } else {            
+            iframe = AST__NOFRAME;
+         }
+
+         if( iframe != AST__NOFRAME ) {
+            frame = astGetFrame( fset, iframe );
+         } else {
+            frame = NULL;
+         }
+
+      } else {
+         frame = astClone( frm );
+      }         
+
+/* Skip if there is no Frame to be checked for this value of "j". */
+      if( frame ) {
+
 /* Try to get a region in which the axes are the same in number and type 
    (but not necessarily order - astConvert should be called to take 
    account of any difference in axis order) as those spanned by the 
    supplied Frame. First find which (if any) Region axis corresponds 
    to each axis in the Frame. */
-   astMatchAxes( region, frame, axes );
+         astMatchAxes( region, frame, axes );
 
 /* Get a list (WAXES) of the Frame axis indices that have no corresponding 
    region axis. Also get a list (RAXES) of the Region axes indicies that 
    have corresponding axes in the Frame. */
-   nax = astGetI( frame, "Naxes" );
-   nwpick = 0;
-   nrpick = 0;
-   for( i = 0; i < nax; i++ ) {
-      if( axes[ i ] == 0 ) {
-         waxes[ nwpick++ ] = i + 1;
-      } else {
-         raxes[ nrpick++ ] = axes[ i ];
-      }
-   }
+         nax = astGetI( frame, "Naxes" );
+         nwpick = 0;
+         nrpick = 0;
+         for( i = 0; i < nax; i++ ) {
+            if( axes[ i ] == 0 ) {
+               waxes[ nwpick++ ] = i + 1;
+            } else {
+               raxes[ nrpick++ ] = axes[ i ];
+            }
+         }
 
-/* Report an error if none of the region axes are present in the Frame. */
-   if( nrpick == 0 && *status == SAI__OK ) {
-      *status = SAI__ERROR;
-      errRep( " ", "The supplied Region has no axes in common with "
-              "the current WCS Frame in the NDF.", status );
-   }
+/* Check that some of the region axes are present in the Frame. */
+         if( nrpick > 0 ) {
 
 /* Pick the axes from the Region that are also in the Frame. This
    should produce a cut-down version of the supplied Region. */
-   ureg = astPickAxes( region, nrpick, raxes, &junk );
+            ureg = astPickAxes( region, nrpick, raxes, &junk );
 
-/* If the resulting Object is not a Region, we cannot match the region
-   and the Frame. */
-   if( ! astIsARegion( ureg ) && *status == SAI__OK ) {
-      *status = SAI__ERROR;
-      errRep( " ", "Cannot pick the current WCS axes from the supplied "
-              "Region.", status );
-   }
+/* Check the resulting Object is a Region. */
+            if( astIsARegion( ureg ) ) {
 
 /* If any Frame axes have no corresponding axis in the region, get an
    unbounded region (a negated NullRegion) in a Frame that spans the 
    Frame axes that have no corresponding axes in the Region. */
-   if( nwpick > 0 ) {
-      ereg = astNullRegion( astPickAxes( frame, nwpick, waxes, &junk ), 
-                            NULL, "Negated=1" );
+               if( nwpick > 0 ) {
+                  ereg = astNullRegion( astPickAxes( frame, nwpick, waxes, 
+                                                     &junk ), 
+                                        NULL, "Negated=1" );
 
 /* Join this region in parallel with the region containing the Frame axes 
    picked from the supplied region. */
-      result = (AstRegion *) astPrism( (AstRegion *) ureg, ereg, " " );
+                  result = (AstRegion *) astPrism( (AstRegion *) ureg, ereg, 
+                                                   " " );
 
 /* If there are no extra Frame axes, just use the cut-down supplied region. */
-   } else {
-      result = astClone( ureg );
+               } else {
+                  result = astClone( ureg );
+               }  
+            }
+
+/* Free resources. */
+            ureg = astAnnul( ureg );
+         }
+
+/* Free the Frame pointer. */
+         frame = astAnnul( frame );
+      }
+
+/* Leave the loop if we have foudn a matching Frame, setting the current
+   Frame in the supplied FrameSet first (if a FrameSet was supplied). */
+      if( result ) {
+         if( fset ) astSetI( fset, "Current", iframe );
+         break;
+      }
+   }
+
+/* Report an error if no matching Frame could be found. */
+   if( !result && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      if( fset ) {
+         errRep( " ", "The supplied Region has cannot be aligned with any "
+                 "available Frame in the NDF.", status );
+      } else {
+         errRep( " ", "The supplied Region has cannot be aligned with "
+                 "the NDF.", status );
+      }
    }
 
 /* Export the returned Region. */
