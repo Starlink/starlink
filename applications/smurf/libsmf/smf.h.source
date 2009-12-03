@@ -1274,10 +1274,6 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 
 int smf_spreadwidth( int spread, const double params[], int *status );
 
-void smf_stats1( double *data, dim_t start, dim_t nsamp,
-                 unsigned char *qual, unsigned char mask, double *mean,
-                 double *sigma, dim_t *ngood, int *status );
-
 void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim,
                       int dims[], int nsampcycle, int vxmin, int vymin,
                       double *image, double *zero, int *status);

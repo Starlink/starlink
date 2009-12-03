@@ -1,11 +1,11 @@
-/*
+/* -*- C -*-
 *+
 *  Name:
 *     smf_stats1
 
 *  Purpose:
-*     Low-level routine for calculating mean and standard deviation on
-*     a contiguous array of double-precision data.
+*     Low-level routine for calculating mean and standard deviation of
+*     a data array.
 
 *  Language:
 *     Starlink ANSI C
@@ -14,13 +14,13 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_stats1( double *data, dim_t stride, dim_t nsamp, 
-*                 unsigned char *qual, unsigned char mask, double *mean, 
-*                 double *sigma, dim_t *ngood, int *status )
+*     void smf_stats1<X>( CGEN_TYPE *data, dim_t stride, dim_t nsamp,
+*                         unsigned char *qual, unsigned char mask, double *mean,
+*                         double *sigma, dim_t *ngood, int *status )
 
 *  Arguments:
-*     data = double* (Given)
-*        Pointer to input dataarray
+*     data = CGEN_TYPE* (Given)
+*        Pointer to input data array
 *     stride = dim_t (Given)
 *        Index stride between elements
 *     nsamp = dim_t (Given)
@@ -28,7 +28,7 @@
 *     qual = usigned char* (Given)
 *        If specified, use this QUALITY array to decide which samples
 *        to use (provided mask). Otherwise data are only ignored if set
-*        to VAL__BADD.
+*        to CGEN_BAD.
 *     mask = unsigned char (Given)
 *        Use with qual to define which bits in quality are relevant to
 *        ignore data in the calculation.
@@ -40,16 +40,16 @@
 *        the standard deviation.
 *     ngood = dim_t* (Given and Returned)
 *        Pointer to variable that will indicate how many samples were used
-*        to calculate the statistics. 
+*        to calculate the statistics.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
 *  Description:
 *     Calculate mean and standard deviation provided there is at least 1
 *     good sample. However, status is set to SMF__INSMP if there are not
-*     at least SMF__MINSTATSAMP good samples. 
+*     at least SMF__MINSTATSAMP good samples.
 
-*  Notes: 
+*  Notes:
 *     The algorithm is "naive" and may suffer roundoff problems. It may be
 *     necessary to switch to a (slower) compensated method. See:
 *     http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance
@@ -68,12 +68,14 @@
 *        Initialise return values even if status is bad on entry.
 *     2008-12-15 (EC):
 *        Remove initial time slice from interface, and add stride parameter.
+*     2009-12-03 (EC):
+*        Make this a generic function
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
-*     Copyright (C) 2008 University of British Columbia. All Rights
-*     Reserved.
+*     Copyright (C) 2008,2009 University of British Columbia.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -115,9 +117,10 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_stats1"
 
-void smf_stats1( double *data, dim_t stride, dim_t nsamp, 
-                 unsigned char *qual, unsigned char mask, double *mean, 
-                 double *sigma, dim_t *ngood, int *status ) {
+void CGEN_FUNCTION(smf_stats1)( CGEN_TYPE *data, dim_t stride, dim_t nsamp,
+                                unsigned char *qual, unsigned char mask,
+                                double *mean, double *sigma, dim_t *ngood,
+                                int *status ) {
 
   /* Local variables */
   dim_t count=0;              /* Number of samples in estimate */
@@ -149,31 +152,31 @@ void smf_stats1( double *data, dim_t stride, dim_t nsamp,
       for( i=0; i<nsamp*stride; i+=stride ) {
 
         if( !(qual[i] & mask) ) {
-          sum += data[i];
-          sumsq += data[i]*data[i];
+          sum += (double) data[i];
+          sumsq += ((double) data[i]) * ((double) data[i]);
           count++;
-        } 
+        }
       }
     } else {
       /* Mean only */
       for( i=0; i<nsamp*stride; i+=stride ) if( !(qual[i] & mask) ) {
-          sum += data[i];
+          sum += (double) data[i];
           count++;
         }
     }
   } else {
-    /* VAL__BADD checking version */
+    /* CGEN_BAD checking version */
     if( sigma ) {
       /* Standard deviation calculating version */
-      for( i=0; i<nsamp*stride; i+=stride ) if( data[i] != VAL__BADD ) {
-          sum += data[i];
-          sumsq += data[i]*data[i];
+      for( i=0; i<nsamp*stride; i+=stride ) if( data[i] != CGEN_BAD ) {
+          sum += (double) data[i];
+          sumsq += ((double) data[i]) * ((double) data[i]);
           count++;
         }
     } else {
       /* Mean only */
-      for( i=0; i<nsamp*stride; i+=stride ) if( data[i] != VAL__BADD ) {
-          sum += data[i];
+      for( i=0; i<nsamp*stride; i+=stride ) if( data[i] != CGEN_BAD ) {
+          sum += (double) data[i];
           count++;
         }
     }
@@ -193,7 +196,7 @@ void smf_stats1( double *data, dim_t stride, dim_t nsamp,
     msgSeti("MIN",SMF__MINSTATSAMP);
     msgSeti("N", count );
     msgSeti("MX", nsamp );
-    errRep( "", FUNC_NAME 
+    errRep( "", FUNC_NAME
             ": Insufficient number of good samples (^N<^MIN out of ^MX) for "
             "statistics", status );
     return;

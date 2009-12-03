@@ -870,13 +870,13 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
           }
         }
 
-        smf_stats1( corr, 1, nbolo, NULL, 0, &cmean, &csig, &cgood, status );
+        smf_stats1D( corr, 1, nbolo, NULL, 0, &cmean, &csig, &cgood, status );
         msgSeti("N",cgood);
         msgOutif( MSG__VERB, "", "    ^N good bolos", status );
         msgOutiff( MSG__DEBUG, "",
                    "    corr coeff %8.5f +/- %8.5f", status, cmean, csig );
 
-        smf_stats1( gcoeff, 1, nbolo, NULL, 0, &gmean, &gsig, &ggood, status );
+        smf_stats1D( gcoeff, 1, nbolo, NULL, 0, &gmean, &gsig, &ggood, status );
         msgOutiff( MSG__DEBUG, " ",
                    "    log(abs(gain coeff)) %8.5f +/- %8.5f", status,
                    gmean, gsig);

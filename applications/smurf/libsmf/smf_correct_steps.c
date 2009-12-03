@@ -212,12 +212,12 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
       if( !(qua[base] & SMF__Q_BADB) && (*status == SAI__OK) ) {
 
         /* initial conditions for jump detection */
-        smf_stats1( dat+base+istart*tstride, tstride, dcbox,
-                    qua+base+istart*tstride, SMF__Q_MOD, &mean1, NULL,
-                    &nmean1, status);
-        smf_stats1( dat+base+(istart+dcbox)*tstride, tstride, dcbox,
-                    qua+base+(istart+dcbox)*tstride, SMF__Q_MOD,
-                    &mean2, NULL,&nmean2, status );
+        smf_stats1D( dat+base+istart*tstride, tstride, dcbox,
+                     qua+base+istart*tstride, SMF__Q_MOD, &mean1, NULL,
+                     &nmean1, status);
+        smf_stats1D( dat+base+(istart+dcbox)*tstride, tstride, dcbox,
+                     qua+base+(istart+dcbox)*tstride, SMF__Q_MOD,
+                     &mean2, NULL,&nmean2, status );
 
         /* Estimate expected rms in a box as the bolo rms */
         dcstep = smf_quick_noise( data, i, dcbox, 10, qua, SMF__Q_MOD,

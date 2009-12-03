@@ -213,9 +213,9 @@ double smf_quick_noise( smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk,
 
   for( i=0; i<nchunk; i++ ) {
     /* Calculate the r.m.s. of this chunk */
-    smf_stats1( dat+bolo*ntslice+istart+i*len/(nchunk-1), 1, nsamp, 
-                qua+bolo*ntslice+istart+i*len/(nchunk-1), mask, NULL, &sig, 
-                &ngood, status );
+    smf_stats1D( dat+bolo*ntslice+istart+i*len/(nchunk-1), 1, nsamp, 
+                 qua+bolo*ntslice+istart+i*len/(nchunk-1), mask, NULL, &sig, 
+                 &ngood, status );
 
     if( *status == SMF__INSMP ) {
       /* Annul the bad status; there simply weren't enough samples for
