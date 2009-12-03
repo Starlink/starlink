@@ -871,7 +871,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
     }
 
     /* Check units */
-    {
+    if (*status == SAI__OK) {
       smfData *tmpdata = res[0]->sdata[0];
       /* Check units are consistent */
       if (tmpdata && tmpdata->hdr) {
