@@ -5,6 +5,9 @@
  fit in a single EXTNAME header by creating an EXTNAMEF keyword 
  that uses the Long-string convention.
 
+ Added support for the SMURF_EXT type for the SMURF extension, 
+ and for extensions within the SMURF extension's NDFs.
+
 1 CONVERT_Version_1.5-18
 
  NDF2FITS allows three-letter permutations for Parameter COMP.
