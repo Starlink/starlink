@@ -648,7 +648,7 @@ int *status             /* global status (given and returned) */
    measured on the sky. */
       if( distortion && !strcmp( "NEW", distortion ) ) {
          radmap = astZoomMap ( 2, MM2RAD_NEW, " " );
-      } else 
+      } else {
          radmap = astZoomMap ( 2, MM2RAD, " " );
       }
 
