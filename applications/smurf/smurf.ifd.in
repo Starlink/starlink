@@ -638,6 +638,46 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter fpixsize {
+                type _DOUBLE 
+                prompt {Pixel size in focal plane units (mm)}
+                vpath CURRENT DEFAULT
+                default 1
+                helpkey *
+            }
+
+            parameter fxlo {
+                type _DOUBLE 
+                prompt {Lower focal plane X limit, in mm}
+                vpath CURRENT DEFAULT
+                default -50
+                helpkey *
+            }
+
+            parameter fxhi {
+                type _DOUBLE 
+                prompt {Upper focal plane X limit, in mm}
+                vpath CURRENT DEFAULT
+                default 50
+                helpkey *
+            }
+
+            parameter fylo {
+                type _DOUBLE 
+                prompt {Lower focal plane Y limit, in mm}
+                vpath CURRENT DEFAULT
+                default -50
+                helpkey *
+            }
+
+            parameter fyhi {
+                type _DOUBLE 
+                prompt {Upper focal plane Y limit, in mm}
+                vpath CURRENT DEFAULT
+                default 50
+                helpkey *
+            }
+
             parameter in {
                 position 1
                 type NDF
@@ -705,6 +745,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+
+            parameter outang {
+                type NDF
+                access WRITE
+                prompt {Output NDF holding focal-plane distortion angles}
+                ppath CURRENT
+                helpkey *
+            }
+
             parameter outdx {
                 type NDF
                 access WRITE
@@ -737,6 +786,16 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter outmag {
+                type NDF
+                access WRITE
+                association ->GLOBAL.DATA_ARRAY
+                prompt {Output NDF holding focal-plane distortion magnitudes}
+                vpath DEFAULT
+                ppath CURRENT, DEFAULT
+                default !
+                helpkey *
+            }
             parameter subarray {
                 type LITERAL
                 prompt {SCUBA-2 sub-array name}

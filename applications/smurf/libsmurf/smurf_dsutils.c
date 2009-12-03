@@ -51,6 +51,26 @@
 *          and INFITY, and if a non-null (!) value is supplied for parameter
 *          OUTCODE. It indices whether the code written to the OUTCODE
 *          file should describe the forward or inverse PolyMap transformation.
+*     FPIXSIZE = _DOUBLE (Read)
+*          Only acccessed if a non-null value is supplied for parameter
+*          OUTMAG. It gives the pixel size (in mm), of the NDFs created 
+*          via parameters OUTANG and OUTMAG. [1.0]
+*     FXHI = _DOUBLE (Read)
+*          Only acccessed if a non-null value is supplied for parameter
+*          OUTMAG. It gives the upper bound (in mm) on the focal plane X 
+*          axis, of the NDFs created via parameters OUTANG and OUTMAG. [50]
+*     FXLO = _DOUBLE (Read)
+*          Only acccessed if a non-null value is supplied for parameter
+*          OUTMAG. It gives the lower bound (in mm) on the focal plane X 
+*          axis, of the NDFs created via parameters OUTANG and OUTMAG. [-50]
+*     FYHI = _DOUBLE (Read)
+*          Only acccessed if a non-null value is supplied for parameter
+*          OUTMAG. It gives the upper bound (in mm) on the focal plane Y
+*          axis, of the NDFs created via parameters OUTANG and OUTMAG. [50]
+*     FYLO = _DOUBLE (Read)
+*          Only acccessed if a non-null value is supplied for parameter
+*          OUTMAG. It gives the lower bound (in mm) on the focal plane Y 
+*          axis, of the NDFs created via parameters OUTANG and OUTMAG. [-50]
 *     IN = NDF (Read)
 *          Only accessed if null (!) values are supplied for parameter INFITX, 
 *          INFITY, and INCAT. It should be a flatfielded time series
@@ -122,6 +142,19 @@
 *          value was supplied for INCAT, then OUTDX is the name of an NDF
 *          to recieve the forward Y axis correctiosn at every bolometer
 *          in the subarray (in mm).
+*     OUTANG = NDF (Write)
+*          Only acccessed if a non-null value is supplied for parameter
+*          OUTMAG. OUTANG specifies the output NDF to receive the
+*          orientation of the distortion (in degrees anti-clockwise from
+*          the positive Y axis) at each point in the focal plane. 
+*     OUTMAG = NDF (Write)
+*          An output NDF to receive the magnitude of the distortion (in mm)
+*          at each point in the focal plane. If a null (!) value is supplied, 
+*          no NDF will be created. The NDFs specified by OUTMAG and OUTANG 
+*          can be displayed as a vector plot using KAPPA:VECPLOT. In addition,
+*          the outline of any sub-array can be over-plotted by changing 
+*          the current coordinate Frame and then using KAPPA:ARDPLOT (for 
+*          instance "wcsframe outmag s8a" followed by "ardplot s8a"). [!]
 *     SUBARRAY = LITERAL (Write)
 *          The name of the subarray being processed: one of "s8a", "s8b", 
 *          "s8b", "s8d", "s4a", "s4b", "s4b", "s4d".
@@ -241,6 +274,7 @@ static int GetColIndex( AstKeyMap *header, const char *colname, int *status );
 static void AddColName( AstKeyMap *header, const char *colname, const char *desc, 
                         int *status );
 static void PutHeader( FILE *fp, AstKeyMap *header, int *status );
+static AstPolyMap *FindPolyMap( AstMapping *map, int *status );
 
 
 #define __USE_GNU 1
@@ -250,8 +284,13 @@ static void PutHeader( FILE *fp, AstKeyMap *header, int *status );
 void smurf_dsutils( int *status ) {
 
 /* Local Variables */
+   AstBox *box;
+   AstFrame *frm;            
+   AstFrame *fp_frm;            
    AstFrameSet *fp_fset;     /* GRID->focal plane FrameSet */
    AstFrameSet *swcsin;      /* WCS FrameSet for current time slice */
+   AstFrameSet *wcs;         /* WCS FrameSet for output NDF */
+   AstKeyMap *header;        /* Holds header info from input catalogue */
    AstMapping *fp_map;       /* GRID->focal plane (in millimetres - no PolyMap) */
    AstMapping *map = NULL;   /* Mapping that moves the centroid to the origin */
    AstMapping *map2 = NULL;  /* Mapping that moves the centroid to the origin */
@@ -260,6 +299,9 @@ void smurf_dsutils( int *status ) {
    FILE *fp1 = NULL;         /* File pointer for input catalogue */
    FILE *fp2 = NULL;         /* File pointer for output catalogue */
    Grp *igrp = NULL;         /* Group of input files */
+   HDSLoc *floc[ 2 ] = { NULL, NULL };
+   HDSLoc *xloc1 = NULL;
+   HDSLoc *xloc2 = NULL;
    SliceInfo *slice = NULL;  /* Point to structure describing current time slice */
    SliceInfo *slices = NULL; /* Array of structures describing each time slice */
    char **words;             /* Pointer to array of word pointers */
@@ -279,10 +321,12 @@ void smurf_dsutils( int *status ) {
    dim_t peakx;              /* Index on the first pixel axis at peak */
    dim_t peaky;              /* Index on the second pixel axis at peak */
    double *amp_vals = NULL;  
-   double *damp_vals = NULL; 
-   double *rms_vals = NULL;  
    double *bc1_vals = NULL;  /* Pointer to BC1 column values */
    double *bc2_vals = NULL;  /* Pointer to BC2 column values */
+   double *cofs;
+   double *damp_vals = NULL; 
+   double *data1;
+   double *data2;
    double *dbf1_vals = NULL; /* Pointer to DBF1 column values */
    double *dbf2_vals = NULL; /* Pointer to DBF2 column values */
    double *dfx_vals = NULL;  /* Pointer to focal plane X offset values */
@@ -291,30 +335,50 @@ void smurf_dsutils( int *status ) {
    double *dpy_vals = NULL;  /* Pointer to pixel Y offset values */
    double *f1_vals = NULL;   /* Pointer to F1 column values */
    double *f2_vals = NULL;   /* Pointer to F2 column values */
+   double *p1x;
+   double *p1y;
+   double *p2x;
+   double *p2y;
+   double *p3;
+   double *p4;
    double *p;                /* Pointer to array in which to put column value */
    double *pd0;              /* Ptr to 1st data value in current i/p time slice */
    double *pd;               /* Ptr to data array */
    double *pv0;              /* Ptr to 1st var value in current i/p time slice */
+   double *rms_vals = NULL;  
    double *work = NULL;      /* Pointer to astRebinSeq work array */
+   double *worka;            /* Work array */
+   double *workb;            /* Work array */
    double bcx;               /* Pixel X coord at base position */
    double bcy;               /* Pixel Y coord at base position */
+   double dx;
+   double dy;                                 
    double f1_hi;             /* High bound on feature pixel X coord */
    double f1_lo;             /* Low bound on feature pixel X coord */
    double f2_hi;             /* High bound on feature pixel Y coord */
    double f2_lo;             /* Low bound on feature pixel Y coord */
+   double fpixsize;
+   double fxhi;
+   double fxlo;
+   double fyhi;
+   double fylo;
    double gx;                /* Value for 1st axis in GRID frame */
    double gy;                /* Value for 2ns axis in GRID frame */
+   double ina[ 2 ];
+   double inb[ 2 ];
    double lowsum;            /* Lwest data sum in any usable time slice */
    double maxerr;            /* Max allowed base->cent distance */
    double maxsum;            /* Largest data sum in any time slice */
+   double outa[ 2 ];
+   double outb[ 2 ];
    double ox;                /* Value for 1st axis in offset sky frame */
    double oy;                /* Value for 2nd axis in offset sky frame */
    double peakv;             /* Largest pixel value found so far */
+   double pnt1[ 2 ];
+   double pnt2[ 2 ];
    double shift[ 2 ];        /* Axis shifts */
    double sum;               /* Sum of all good data values in time slice */
    double wlim;              /* Min weight for a valid output pixel */
-   double *worka;            /* Work array */
-   double *workb;            /* Work array */
    double xin[ 2 ];          /* Pixel coord X positions */
    double xout[ 2 ];         /* Focal plane X positions (mm) */
    double yin[ 2 ];          /* Pixel coord Y positions */
@@ -322,7 +386,6 @@ void smurf_dsutils( int *status ) {
    float cent[ 2 ];          /* Accurate centroid in pixel cords */
    float init[ 2 ];          /* Initial guess at centroid in pixel cords */
    float lowfactor;          /* Factor giving lowest usable total data sum */
-   AstKeyMap *header;        /* Holds header info from input catalogue */
    float mxshft[ 2 ];        /* Max shift from initial guess to final centroid */
    float val;                /* Column value */
    float work1[ WORK1_SIZE ];/* Work array for kpg1Loctd */
@@ -339,6 +402,8 @@ void smurf_dsutils( int *status ) {
    int l;                    /* Input line number */
    int lbnd[ 2 ];            /* Pixel index lower bounds in input array */
    int lbnd_out[ 2 ];        /* Pixel index lower bounds in output NDF */
+   int ncoeff_f, nin;
+   int nel;
    int ngood;                /* Number of usable time slices */
    int niter;                /* Number of sigma-clips to perform */
    int nrow;                 /* Number of usable rows */
@@ -354,15 +419,9 @@ void smurf_dsutils( int *status ) {
    smfData *data = NULL;     /* Pointer to data struct for input file */
    smfFile *file = NULL;     /* Pointer to file struct for input file */
    smfHead *hdr = NULL;      /* Pointer to data header for time slice */
-   double ina[ 2 ];
-   double inb[ 2 ];
-   double outa[ 2 ];
-   double outb[ 2 ];
-   HDSLoc *xloc1 = NULL;
-   HDSLoc *xloc2 = NULL;
-   HDSLoc *floc[ 2 ] = { NULL, NULL };
-   int ncoeff_f, nin;
-   double *cofs;
+
+   const char *sa_name[] = { "s8a", "s8b", "s8c", "s8d", 
+                             "s4a", "s4b", "s4c", "s4d" };
 
 
 /* Uncomment to stop the program on any of the following exceptions. */
@@ -380,14 +439,174 @@ void smurf_dsutils( int *status ) {
 
 
 
+/* First, see if output NDFs holding the vector shifts implied by the polymap
+   currently selected via environment variable SMURF_DISTORTION should be 
+   created. This is the case if a value is supplied for OUTMAG.
+--------------------------------------------------------------------- */
+
+/* First get the focal plane bounds of the required output NDF (in mm). */
+   parGet0d( "FXLO", &fxlo, status );
+   parGet0d( "FXHI", &fxhi, status );
+   parGet0d( "FYLO", &fylo, status );
+   parGet0d( "FYHI", &fyhi, status );
+            
+/* Get the pixel size, in mm. NDFs. */
+   parGet0d( "FPIXSIZE", &fpixsize, status );
+
+/* Determine the bounds of the output NDFs, placing pixel coords
+   (0.0,0.0) at the origin of the focal plane coord system. */
+   lbnd[ 0 ] = floor( fxlo/fpixsize );
+   ubnd[ 0 ] = ceil( fxhi/fpixsize );
+   lbnd[ 1 ] = floor( fylo/fpixsize );
+   ubnd[ 1 ] = ceil( fyhi/fpixsize );
+
+/* Create the output vector magnitude NDF. */
+   ndfCreat( "OUTMAG", "_DOUBLE", 2, lbnd, ubnd, &indf1, status ); 
+
+/* If a null value was supplied, annul the error and skip. */
+   if( *status == PAR__NULL ) {
+      errAnnul( status );
+
+/* Otherwise, create the output vector angle NDF. */
+   } else {
+      ndfCreat( "OUTANG", "_DOUBLE", 2, lbnd, ubnd, &indf2, status ); 
+
+/* Begin a new AST context. */
+      astBegin;
+  
+/* Get a Mapping from GRID coords to focal plane coords, in mm. */
+      ina[ 0 ] = 0.0;
+      ina[ 1 ] = 0.0;
+      inb[ 0 ] = 1.0;
+      inb[ 1 ] = 1.0;
+      outa[ 0 ] = fpixsize*( lbnd[ 0 ] - 1.5 );
+      outa[ 1 ] = fpixsize*( lbnd[ 1 ] - 1.5 );
+      outb[ 0 ] = outa[ 0 ] + fpixsize;
+      outb[ 1 ] = outa[ 1 ] + fpixsize;
+      fp_map = (AstMapping *) astWinMap( 2, ina, inb, outa, outb, " " );
+
+/* Create a WCS FrameSet. The current Frame (index 2 in the FrameSet) is 
+   focal plane (X,Y) in mm. The origin of focal plane (X,Y) coincides with 
+   the origin of pixel coordinates. */
+      wcs = astFrameSet( astFrame( 2, "Domain=GRID" ), " " );
+      fp_frm = astFrame( 2, "Domain=FPLANE,label(1)=FplaneX,"
+                         "label(2)=FplaneY,Unit(1)=mm,Unit(2)=mm" );
+      astAddFrame( wcs, AST__BASE, fp_map, fp_frm );
+
+/* We now need the PolyMap  specified by the current setting of
+   environment variable SMURF_DISTORTION. Get the whole GRID-> FP (in
+   rads) Mapping for the first sub array, and extract the PolyMap from it. */
+      sc2ast_createwcs( 0, NULL, NULL, NULL, &fp_fset, status );
+      polymap = FindPolyMap( astGetMapping( fp_fset, AST__BASE, AST__CURRENT ),
+                             status );           
+/* If no PolyMap was found, use a UnitMap instead. */
+      if( !polymap ) polymap = (AstPolyMap *) astUnitMap( 2, " " );
+
+/* Get the focal plane FrameSet for subarray s8a, and extract the FP->GRID 
+   Mapping. */
+      fp_fset = GetFPFrameSet( "s8a", status );
+      map = astGetMapping( fp_fset, AST__CURRENT, AST__BASE );
+
+/* Create a Region defining the bounds of the s8a aray in grid coords. */
+      frm = astFrame( 2, "Unit(1)=pixel,Unit(2)=pixel" );
+      astSet( frm, "Title=Grid coords in sub-array s8a,Domain=S8A" );
+      pnt1[ 0 ] = 0.5;
+      pnt1[ 1 ] = 0.5;
+      pnt2[ 0 ] = 32.5;
+      pnt2[ 1 ] = 40.5;
+      box = astBox( frm, 1, pnt1, pnt2, NULL, " " );
+
+/* Add it into the WCS FrameSet. */
+      astAddFrame( wcs, 2, map, box );
+
+/* Do the same for each of the other subarrays. */
+      for( i = 1; i < 8; i++ ) {
+         fp_fset = GetFPFrameSet( sa_name[ i ], status );
+         map = astGetMapping( fp_fset, AST__CURRENT, AST__BASE );
+         astSet( frm, "Title=Grid coords in sub-array %s,Domain=%s",
+                 sa_name[ i ], sa_name[ i ] );
+         box = astBox( frm, 1, pnt1, pnt2, NULL, " " );
+         astAddFrame( wcs, 2, map, box );
+      }
+
+/* Re-instate the original current frame, and store in the NDFs. */
+      astSetI( wcs, "Current", 2 );
+      ndfPtwcs( wcs, indf1, status );
+      ndfPtwcs( wcs, indf2, status );
+
+/* Map the DATA component of the output NDFs. */
+      ndfMap( indf1, "Data", "_DOUBLE", "Write", (void *) &data1,
+              &nel, status ); 
+      ndfMap( indf2, "Data", "_DOUBLE", "Write", (void *) &data2,
+              &nel, status ); 
+
+/* Create a pair of work arrays. */
+      worka = astMalloc( 2*sizeof( double )*nel );
+      workb = astMalloc( 2*sizeof( double )*nel );
+
+/* Fill the first work array with the focal plane (X,Y) values at the centre
+   of every pixel. The X values are stored first in the work array, followed 
+   by the Y values. */
+      lbnd_out[ 0 ] = 1;
+      lbnd_out[ 1 ] = 1;
+      ubnd_out[ 0 ] = ( ubnd[ 0 ] - lbnd[ 0 ] + 1 );
+      ubnd_out[ 1 ] = ( ubnd[ 1 ] - lbnd[ 1 ] + 1 );
+      astTranGrid( fp_map, 2, lbnd_out, ubnd_out, 0.0, 0, 1, 2,
+                   nel, worka );  
+
+/* Transform these focal plane (X,Y) values into corrected focal plane
+   (X,Y) values using the polymap, storeing the results in the second work
+   array. */
+      astTran2( polymap, nel, worka, worka + nel, 1, workb, workb + nel );
+
+/* For each point, get the offset from uncorrected to corrected focal
+   plane (X,Y), convert into a vector magnitude and angle and store in
+   the two output NDFs. */
+      p1x = worka;
+      p1y = p1x + nel;
+      p2x = workb;
+      p2y = p2x + nel;
+      p3 = data1;
+      p4 = data2;
+      for( i = 0; i < nel; i++ ) {
+         dx = *(p2x++) - *(p1x++);  
+         dy = *(p2y++) - *(p1y++);  
+         *(p3++) = sqrt( dx*dx + dy*dy );
+         *(p4++) = atan2( dy, dx )*AST__DR2D - 90.0;
+      }
+
+/* Store units and labels in the output NDFs. */
+      ndfCput( "Correction magnitude", indf1, "Label", status );
+      ndfCput( "mm", indf1, "Unit", status );
+      ndfCput( "Correction position angle", indf2, "Label", status );
+      ndfCput( "Degrees", indf2, "Unit", status );
+
+/* Free resources. */
+      worka = astFree( worka );
+      workb = astFree( workb );
+
+/* End the AST context. */
+      astEnd;
+
+/* Close the NDFs. */
+      ndfAnnul( &indf1, status );
+      ndfAnnul( &indf2, status );
+   }
+
+
+
+
 
 
 /* If input NDFs are supplied for parameter INFITX and INFITY, we can do
-   one of two things: 1) create C source code defining the coefficients 
+   three things: 1) create C source code defining the coefficients 
    needed for a single transformation (forward or inverse) of a 2D PolyMap 
    corresponding to the Starlink POLYNOMIAL structure in the SURFACEFIT 
-   extension in both NDFs, or 2) actually create the PolyMap and then use
-   it to create two output NDFs holding the sampled PolyMap outputs.
+   extension in both NDFs, 2) actually create the PolyMap and then use
+   it to create two output NDFs holding the sampled PolyMap outputs, 3)
+   create a pair of output NDFs holding the magnitude and orientation of 
+   the vectors representing the shift implied by the PolyMap at each point
+   in the focal plane. 
    ---------------------------------------------------------------- */
    ndfAssoc( "INFITX", "Read", &indf1, status );
    ndfAssoc( "INFITY", "Read", &indf2, status );
@@ -557,8 +776,10 @@ void smurf_dsutils( int *status ) {
 /* Free resources. */
          worka = astFree( worka );
          workb = astFree( workb );
+
       }
 
+/* Free remaining resources. */
       cofs = astFree( cofs );
       datAnnul( floc, status );
       datAnnul( floc + 1, status );
@@ -1958,4 +2179,41 @@ static void PutHeader( FILE *fp, AstKeyMap *header, int *status ) {
 
 
 
+/* Search a supplied Mapping for a PolyMap, returning a pointer to it. 
+   NULL is returned if no PolyMap is found.
+--------------------------------------------------------------------- */
+static AstPolyMap *FindPolyMap( AstMapping *map, int *status ){
 
+/* Local Variables; */
+   AstPolyMap *result;
+   AstMapping *map1;
+   AstMapping *map2;
+   int series;
+   int invert1;
+   int invert2;
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return NULL;
+
+/* If the supplied Mapping is a PolyMap, return it. */
+   if( astIsAPolyMap( map ) ) {
+      result = astClone( map );
+
+/* Otherwise, if the supplied Mapping is a series CmpMap, search each of its
+   component Mappings. */
+   } else if( astIsACmpMap( map ) ) {
+      astDecompose( map, &map1, &map2, &series, &invert1, &invert2 );
+      if( series ) {
+         result = FindPolyMap( map1, status );
+         if( !result ) result = FindPolyMap( map2, status );
+      } else {
+         result = NULL;
+      }
+
+/* Otherwise, return NULL */
+   } else {
+      result = NULL;
+   }
+
+   return result;
+}
