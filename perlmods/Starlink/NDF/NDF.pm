@@ -15,7 +15,7 @@ require DynaLoader;
 
 # Version derived from CVS repository:  '$Revision$ '
 
-$VERSION = '1.48';
+$VERSION = '1.49';
 
 # Add the following to the 'ndf'=> associative array if you want to
 # use ADAM PARAMETERS. Remove the comment field from the entries in the XS

@@ -3441,13 +3441,13 @@ cmp_get1d(loc, name, elx, value, el, status)
   ndfdouble * value = NO_INIT
   ndfint &el = NO_INIT
   ndfint &status
- PROTOTYPE: $$\@$$
+ PROTOTYPE: $$$\@$$
  CODE:
   value = get_mortalspace(elx, PACKD);
   cmp_get1d_(loc, name, &elx, value, &el, &status, DAT__SZLOC,strlen(name));
   /* Check status */
   if (status == SAI__OK)
-    unpack1D( (SV*)ST(2), (void *)value, PACKD, el);
+    unpack1D( (SV*)ST(3), (void *)value, PACKD, el);
  OUTPUT:
   value
   el
@@ -3461,13 +3461,13 @@ cmp_get1i(loc, name, elx, value, el, status)
   ndfint * value = NO_INIT
   ndfint &el = NO_INIT
   ndfint &status
- PROTOTYPE: $$\@$$
+ PROTOTYPE: $$$\@$$
  CODE:
   value = get_mortalspace(elx, PACKI32);
   cmp_get1i_(loc, name, &elx, value, &el, &status, DAT__SZLOC,strlen(name));
   /* Check status */
   if (status == SAI__OK)
-    unpack1D( (SV*)ST(2), (void *)value, PACKI32, el);
+    unpack1D( (SV*)ST(3), (void *)value, PACKI32, el);
  OUTPUT:
   value
   el
@@ -3481,13 +3481,13 @@ cmp_get1r(loc, name, elx, value, el, status)
   ndffloat * value = NO_INIT
   ndfint &el = NO_INIT
   ndfint &status
- PROTOTYPE: $$\@$$
+ PROTOTYPE: $$$\@$$
  CODE:
   value = get_mortalspace(elx, PACKF);
   cmp_get1r_(loc, name, &elx, value, &el, &status, DAT__SZLOC,strlen(name));
   /* Check status */
   if (status == SAI__OK)
-    unpack1D( (SV*)ST(2), (void *)value, PACKF, el);
+    unpack1D( (SV*)ST(3), (void *)value, PACKF, el);
  OUTPUT:
   value
   el
