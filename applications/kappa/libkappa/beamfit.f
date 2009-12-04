@@ -704,6 +704,7 @@
       FILE = MODE .EQ. 'FILE'
       INTERF = MODE .EQ. 'INTERFACE'
       TITLE = ' '
+      REFNAM = ' '
 
 *  Abort if an error occurred.
       IF ( STATUS .NE.  SAI__OK ) GO TO 999
@@ -808,6 +809,7 @@
             END IF
             I = I + 1
          END DO
+
       END IF
 
 *  Obtain the NDF & WCS Frame
