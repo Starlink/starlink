@@ -662,6 +662,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter fxoff {
+                type _DOUBLE 
+                prompt {Focal plane X value at ref point, in mm}
+                ppath CURRENT DEFAULT
+                vpath DEFAULT
+                default !
+                helpkey *
+            }
+
             parameter fylo {
                 type _DOUBLE 
                 prompt {Lower focal plane Y limit, in mm}
@@ -675,6 +684,15 @@ package @PACKAGE@ {
                 prompt {Upper focal plane Y limit, in mm}
                 vpath CURRENT DEFAULT
                 default 50
+                helpkey *
+            }
+
+            parameter fyoff {
+                type _DOUBLE 
+                prompt {Focal plane Y value at ref point, in mm}
+                ppath CURRENT DEFAULT
+                vpath DEFAULT
+                default !
                 helpkey *
             }
 

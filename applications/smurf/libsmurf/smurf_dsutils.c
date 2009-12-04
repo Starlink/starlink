@@ -63,6 +63,12 @@
 *          Only acccessed if a non-null value is supplied for parameter
 *          OUTMAG. It gives the lower bound (in mm) on the focal plane X 
 *          axis, of the NDFs created via parameters OUTANG and OUTMAG. [-50]
+*     FXOFF = _DOUBLE (Read)
+*          Only acccessed if a non-null value is supplied for parameter
+*          OUTMAG. It gives the focal plane X coord for a point that
+*          defines a global offset to be removed from OUTMAG and OUTANG.
+*          The point specified by FXOFF and FYOFF will have value zero
+*          in OUTANG. No offset is removed if a null (!) value is supplied. [!]
 *     FYHI = _DOUBLE (Read)
 *          Only acccessed if a non-null value is supplied for parameter
 *          OUTMAG. It gives the upper bound (in mm) on the focal plane Y
@@ -71,6 +77,12 @@
 *          Only acccessed if a non-null value is supplied for parameter
 *          OUTMAG. It gives the lower bound (in mm) on the focal plane Y 
 *          axis, of the NDFs created via parameters OUTANG and OUTMAG. [-50]
+*     FYOFF = _DOUBLE (Read)
+*          Only acccessed if a non-null value is supplied for parameter
+*          OUTMAG. It gives the focal plane Y coord for a point that
+*          defines a global offset to be removed from OUTMAG and OUTANG.
+*          The point specified by FXOFF and FYOFF will have value zero
+*          in OUTANG. No offset is removed if a null (!) value is supplied. [!]
 *     IN = NDF (Read)
 *          Only accessed if null (!) values are supplied for parameter INFITX, 
 *          INFITY, and INCAT. It should be a flatfielded time series
@@ -291,8 +303,8 @@ void smurf_dsutils( int *status ) {
 
 /* Local Variables */
    AstBox *box;
-   AstFrame *frm;            
    AstFrame *fp_frm;            
+   AstFrame *frm;            
    AstFrameSet *fp_fset;     /* GRID->focal plane FrameSet */
    AstFrameSet *swcsin;      /* WCS FrameSet for current time slice */
    AstFrameSet *wcs;         /* WCS FrameSet for output NDF */
@@ -360,7 +372,9 @@ void smurf_dsutils( int *status ) {
    double alpha;
    double bcx;               /* Pixel X coord at base position */
    double bcy;               /* Pixel Y coord at base position */
+   double dx0;
    double dx;
+   double dy0;
    double dy;                                 
    double f1_hi;             /* High bound on feature pixel X coord */
    double f1_lo;             /* Low bound on feature pixel X coord */
@@ -369,10 +383,14 @@ void smurf_dsutils( int *status ) {
    double fpixsize;
    double fxhi;
    double fxlo;
+   double fxoff;
    double fyhi;
    double fylo;
+   double fyoff;
    double gx;                /* Value for 1st axis in GRID frame */
+   int gxoff;
    double gy;                /* Value for 2ns axis in GRID frame */
+   int gyoff;
    double ina[ 2 ];
    double inb[ 2 ];
    double lowsum;            /* Lwest data sum in any usable time slice */
@@ -408,6 +426,7 @@ void smurf_dsutils( int *status ) {
    int ival;                 /* Temporary integer value storage */
    int ix;                   /* Grid index on the first pixel axis */
    int iy;                   /* Grid index on the second pixel axis */
+   int iz;
    int l;                    /* Input line number */
    int lbnd[ 2 ];            /* Pixel index lower bounds in input array */
    int lbnd_out[ 2 ];        /* Pixel index lower bounds in output NDF */
@@ -568,6 +587,49 @@ void smurf_dsutils( int *status ) {
    array. */
       astTran2( polymap, nel, worka, worka + nel, 1, workb, workb + nel );
 
+/* Get the focal plane coords for the point that defines the global offset to be 
+   removed (if any). */
+      dx0 = 0.0;
+      dy0 = 0.0;
+      if( *status == SAI__OK ) {
+         parGet0d( "FXOFF", &fxoff, status );
+         parGet0d( "FYOFF", &fyoff, status );
+
+         if( *status == PAR__NULL ) {
+            errAnnul( status );
+
+         } else {
+
+/* Convert to grid coords. */
+            astTran2( wcs, 1, &fxoff, &fyoff, 0, &fxoff, &fyoff );
+
+/* Convert to GRID indices. */
+            if( fxoff > 0.0 ) {
+               gxoff = (int) ( fxoff + 0.5 );
+            } else {
+               gxoff = (int) ( fxoff - 0.5 );
+            }
+            if( fyoff > 0.0 ) {
+               gyoff = (int) ( fyoff + 0.5 );
+            } else {
+               gyoff = (int) ( fyoff - 0.5 );
+            }
+
+/* Convert to a vector offset. */
+            iz = ( gxoff - 1 ) + ( gyoff - 1 )*( ubnd[ 0 ] - lbnd[ 0 ] + 1 );
+
+/* Store the x and y offsets to remove. */
+            dx0 = workb[ iz ] - worka[ iz ];
+            dy0 = workb[ iz + nel ] - worka[ iz + nel ];
+
+            msgSetr( "DX", dx0 );
+            msgSetr( "DY", dy0 );
+            msgOut( " ", "Removing vector offset (^DX,^DY) [mm]", status );
+
+
+         }
+      }
+
 /* For each point, get the offset from uncorrected to corrected focal
    plane (X,Y), convert into a vector magnitude and angle and store in
    the two output NDFs. */
@@ -578,8 +640,8 @@ void smurf_dsutils( int *status ) {
       p3 = data1;
       p4 = data2;
       for( i = 0; i < nel; i++ ) {
-         dx = *(p2x++) - *(p1x++);  
-         dy = *(p2y++) - *(p1y++);  
+         dx = *(p2x++) - *(p1x++) - dx0;  
+         dy = *(p2y++) - *(p1y++) - dy0;  
          *(p3++) = sqrt( dx*dx + dy*dy );
          *(p4++) = atan2( dy, dx )*AST__DR2D - 90.0;
       }
