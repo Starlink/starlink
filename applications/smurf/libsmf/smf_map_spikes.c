@@ -15,7 +15,7 @@
 *  Invocation:
 *     smf_map_spikes( smfData *data, smfData *variance, int *lut, 
 *                     unsigned char *qual, unsigned char mask, 
-*                     double *map, unsigned int *hitsmap, double *mapvar,
+*                     double *map, int *hitsmap, double *mapvar,
 *                     dim_t msize, double thresh, size_t *nflagged,
 *                     int *status )
 
@@ -37,7 +37,7 @@
 *        the calculation.
 *     map = double* (Given)
 *        The current map estimate 
-*     hitsmap = unsigned int* (Given)
+*     hitsmap = int* (Given)
 *        Number of samples that land in a pixel.
 *     mapvar = double* (Given)
 *        Variance of each pixel in map 
@@ -106,7 +106,7 @@
 
 void smf_map_spikes( smfData *data, smfData *variance, int *lut,
                      unsigned char *qual, unsigned char mask, double *map, 
-                     unsigned int *hitsmap, double *mapvar,
+                     int *hitsmap, double *mapvar,
                      dim_t msize __attribute__((unused)), double thresh,
                      size_t *nflagged, int *status ) {
 

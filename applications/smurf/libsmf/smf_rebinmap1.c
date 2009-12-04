@@ -16,7 +16,7 @@
 *     smf_rebinmap1( smfData *data, smfData *variance, int *lut,
 *                    unsigned char *qual, unsigned char mask,
 *                    int sampvar, int flags, double *map,
-*                    double *mapweight, unsigned int *hitsmap,
+*                    double *mapweight, int *hitsmap,
 *                    double *mapvar, dim_t msize, double *scalevariance,
 *                    int *status )
 
@@ -147,7 +147,7 @@
 void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
                     unsigned char *qual, unsigned char mask,
                     int sampvar, int flags, double *map,
-                    double *mapweight, unsigned int *hitsmap,
+                    double *mapweight, int *hitsmap,
                     double *mapvar, dim_t msize, double *scalevariance,
                     int *status ) {
 

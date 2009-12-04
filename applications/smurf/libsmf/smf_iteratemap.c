@@ -20,7 +20,7 @@
 *                    const smfArray *bpms,
 *                    AstFrameSet *outfset, int moving, int *lbnd_out,
 *                    int *ubnd_out, size_t maxmem, double *map,
-*                    unsigned int *hitsmap, double *mapvar, double
+*                    int *hitsmap, double *mapvar, double
 *                    *weights, char data_units[], int *status );
 
 *  Arguments:
@@ -52,7 +52,7 @@
 *        Maximum memory that me be used by smf_iteratemap (bytes)
 *     map = double* (Returned)
 *        The output map array
-*     hitsmap = unsigned int* (Returned)
+*     hitsmap = int* (Returned)
 *        Number of samples that land in a pixel (ignore if NULL pointer)
 *     mapvar = double* (Returned)
 *        Variance of each pixel in map
@@ -290,7 +290,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      const smfArray *bpms,
                      AstFrameSet *outfset, int moving, int *lbnd_out,
                      int *ubnd_out, size_t maxmem, double *map,
-                     unsigned int *hitsmap, double *mapvar,
+                     int *hitsmap, double *mapvar,
                      double *weights, char data_units[], int *status ) {
 
   /* Local Variables */
@@ -383,7 +383,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   double spikethresh;           /* Threshold for spike detection */
   double steptime;              /* Length of a sample in seconds */
   int temp;                     /* temporary signed integer */
-  unsigned int *thishits=NULL;  /* Pointer to this hits map */
+  int *thishits=NULL;           /* Pointer to this hits map */
   double *thismap=NULL;         /* Pointer to this map */
   smf_modeltype thismodel;      /* Type of current model */
   double *thisweight=NULL;      /* Pointer to this weights map */
@@ -1519,7 +1519,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             unsigned char *bolomask = NULL;
             bolomask = smf_malloc( nbolo, sizeof(*bolomask), 0, status );
             double *bmapweight = NULL;
-            unsigned int *bhitsmap = NULL;
+            int *bhitsmap = NULL;
 
             bmapweight = smf_malloc(msize,sizeof(*bmapweight),0,status);
             bhitsmap = smf_malloc(msize,sizeof(*bhitsmap),0,status);

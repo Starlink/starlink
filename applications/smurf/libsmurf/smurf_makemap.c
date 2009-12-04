@@ -779,7 +779,7 @@ void smurf_makemap( int *status ) {
   smfFile *file=NULL;        /* Pointer to SCUBA2 data file struct */
   int first;                 /* Is this the first input file? */
   int *histogram = NULL;     /* Histogram for calculating exposure statistics */
-  unsigned int *hitsmap;     /* Hitsmap array calculated in ITERATE method */
+  int *hitsmap;              /* Hitsmap array calculated in ITERATE method */
   dim_t i;                   /* Loop counter */
   int ifile;                 /* Input file index */
   Grp *igrp = NULL;          /* Group of input files */
@@ -1493,7 +1493,7 @@ void smurf_makemap( int *status ) {
              status);
 
     /* Allocate space for hitsmap */
-    hitsmap = smf_malloc( nxy, sizeof (int), 1, status);
+    hitsmap = smf_malloc( nxy, sizeof (*hitsmap), 1, status);
 
     /* Loop over all input data files to setup provenance handling */
     for(i=1; (i<=size) && ( *status == SAI__OK ); i++ ) {

@@ -14,9 +14,9 @@
 
 *  Invocation:
 *     smf_addmap1( double *map1, double *mapweight1, 
-*                  unsigned int *hitsmap1, double *mapvar1, 
+*                  int *hitsmap1, double *mapvar1, 
 *                  double *map2, double *mapweight2, 
-*                  unsigned int *hitsmap2, double *mapvar2, dim_t msize, 
+*                  int *hitsmap2, double *mapvar2, dim_t msize, 
 *                  int *status ) {
 
 *  Arguments:
@@ -24,7 +24,7 @@
 *        The first map 
 *     mapweight1 = double* (Given and Returned)
 *        Relative weighting for each pixel in map1
-*     hitsmap1 = unsigned int* (Given and Returned)
+*     hitsmap1 = int* (Given and Returned)
 *        Number of samples that land in map1 pixels
 *     mapvar1 = double* (Given and Returned)
 *        Variance of each pixel in map1
@@ -32,7 +32,7 @@
 *        The second map 
 *     mapweight2 = double* (Given)
 *        Relative weighting for each pixel in map2
-*     hitsmap2 = unsigned int* (Given)
+*     hitsmap2 = int* (Given)
 *        Number of samples that land in map2 pixels
 *     mapvar2 = double* (Given and Returned)
 *        Variance of each pixel in map2
@@ -101,9 +101,9 @@
 #define FUNC_NAME "smf_addmap1"
 
 void smf_addmap1( double *map1, double *mapweight1, 
-                  unsigned int *hitsmap1, double *mapvar1, 
+                  int *hitsmap1, double *mapvar1, 
                   double *map2, double *mapweight2, 
-                  unsigned int *hitsmap2, double *mapvar2, dim_t msize, 
+                  int *hitsmap2, double *mapvar2, dim_t msize, 
                   int *status ) {
 
   /* Local Variables */
