@@ -21,7 +21,9 @@
 static char errmess[132];              /* For DRAMA error messages */
 
 #define MM2RAD (0.92*2.4945e-5)        /* scale at array in radians */
-#define MM2RAD_NEW MM2RAD*1.12857      /* MM2RAD for use with NEW distortion */
+#define MM2RAD_NEW1 MM2RAD*1.12857     /* MM2RAD for use with NEW1 distortion */
+#define MM2RAD_NEW2 MM2RAD*1.0842      /* MM2RAD for use with NEW2 distortion */
+#define MM2RAD_NEW3 MM2RAD*1.09607     /* MM2RAD for use with NEW3 distortion */
 
 #define PIBY2 1.57079632679
 #define PI 2*PIBY2 
@@ -223,13 +225,18 @@ int *status             /* global status (given and returned) */
      30Oct2009 : Report an error if the number of base or current Frame
                  axes in the cached FrameSet has been changed.
      30Oct2009 : Report an error if the number of base or current Frame
-                 axes in the cached FrameSet has been changed.
+                 axes in the cached FrameSet has been changed. (DSB)
      26Nov2009 : Allow different polynomial distortions to be selected using 
                  the environment variable "SMURF_DISTORTION" - set it to
                  "NEW" to get the new (experimental) correction; set it to 
                  "NONE" to get no correction; set it to anything else (or 
-                 leave it unset) to get the original correction. 
-     3Dec2009  : Move linear terms in NEW distortion from PolyMap into MM2RAD.
+                 leave it unset) to get the original correction. (DSB)
+     3Dec2009  : Move linear terms in NEW distortion from PolyMap into
+                 MM2RAD. (DSB)
+     4Dec2009  : Rename NEW to NEW1, and add NEW2 (improved pre-mirror-fix 
+                 distortion map), and NEW3 (initial post-mirror-fix
+                 distortion map). (DSB)
+
 */
 {
 
@@ -273,12 +280,31 @@ int *status             /* global status (given and returned) */
       { -33.5,  -41.5, 33.5,  41.5,  33.5,  41.5, -33.5, -41.5 };
 
 
-/* Values modified to reduce errors implied by NEW distortion. */
+/* Values modified to reduce errors implied by NEW1 distortion (initial
+   pre-mirror-fix distortion). */
    /*    s8a    s8b     s8c   s8d    s4a    s4b    s4c    s4d */
-   const double xoff_NEW[8] =
+   const double xoff_NEW1[8] =
       { -41.5,   33.5, 41.5, -32.83, -41.54,  33.5,  41.5, -33.5 };
-   const double yoff_NEW[8] =
+   const double yoff_NEW1[8] =
       { -33.5,  -41.5, 33.5,  40.48,  33.47,  41.5, -33.5, -41.5 };
+
+
+/* Values modified to reduce errors implied by NEW2 distortion (improved
+   pre-mirror-fix distortion). */
+   /*    s8a    s8b     s8c   s8d    s4a    s4b    s4c    s4d */
+   const double xoff_NEW2[8] =
+      { -41.5,   33.5, 41.5, -32.62, -41.45,  33.5,  41.5, -33.5 };
+   const double yoff_NEW2[8] =
+      { -33.5,  -41.5, 33.5,  40.73,  33.68,  41.5, -33.5, -41.5 };
+
+
+/* Values modified to reduce errors implied by NEW3 distortion (initial
+   post-mirror-fix distortion). */
+   /*    s8a    s8b     s8c   s8d    s4a    s4b    s4c    s4d */
+   const double xoff_NEW3[8] =
+      { -41.5,   33.5, 41.5, -31.46, -40.39,  33.5,  41.5, -33.5 };
+   const double yoff_NEW3[8] =
+      { -33.5,  -41.5, 33.5,  40.55,  33.5,  41.5, -33.5, -41.5 };
 
 
 
@@ -349,7 +375,7 @@ int *status             /* global status (given and returned) */
 
 
 
-/* SMURF_DISTORTION = "NEW": determined from bolomap approach, using 
+/* SMURF_DISTORTION = "NEW1": determined from bolomap approach, using 
    s4a and s8d data from 20091027 obs 00009 and 00011 (Mars). */
 /* ------------------------------------------------------------ */
 
@@ -358,8 +384,8 @@ int *status             /* global status (given and returned) */
    FRAME850 to Nasmyth */ 
 
 /* Forward transformation coefficients... */
-   int ncoeff_f_NEW = 20;
-   const double coeff_f_NEW[] = {
+   int ncoeff_f_NEW1 = 20;
+   const double coeff_f_NEW1[] = {
 
 /* X-coordinate */ 
                1.9472      ,     1.0, 0.0, 0.0,
@@ -390,8 +416,8 @@ int *status             /* global status (given and returned) */
 
 
 /* Inverse transformation coefficients... */
-   int ncoeff_i_NEW = 42;
-   const double coeff_i_NEW[] = {
+   int ncoeff_i_NEW1 = 42;
+   const double coeff_i_NEW1[] = {
 
 /* X-coordinate */ 
                -1.9741     ,     1.0, 0.0, 0.0,
@@ -439,6 +465,190 @@ int *status             /* global status (given and returned) */
                -5.5674e-10 ,     2.0, 1.0, 4.0,
                1.133e-09   ,     2.0, 0.0, 5.0,
             };
+
+
+/* SMURF_DISTORTION = "NEW2": determined from bolomap approach, using 
+   s4a and s8d data from 20091027_00009, 20091027_00011, 20091201_00098
+   and 20091201_00100 (with improved scripts). */
+/* ------------------------------------------------------------ */
+
+
+/* SCUBA-2 PolyMap cooefficients. Forward coefficients are from 
+   FRAME850 to Nasmyth */ 
+
+/* Forward transformation coefficients... */
+   int ncoeff_f_NEW2 = 20;
+   const double coeff_f_NEW2[] = {
+
+/* X-coordinate */ 
+               1.7777      ,     1.0, 0.0, 0.0,
+               0.99678     ,     1.0, 1.0, 0.0,
+               0.00010172  ,     1.0, 2.0, 0.0,
+               -7.0709e-07 ,     1.0, 3.0, 0.0,
+               -0.0070205  ,     1.0, 0.0, 1.0,
+               -0.00036612 ,     1.0, 1.0, 1.0,
+               3.117e-06   ,     1.0, 2.0, 1.0,
+               -0.00046285 ,     1.0, 0.0, 2.0,
+               -5.0563e-06 ,     1.0, 1.0, 2.0,
+               4.8072e-06  ,     1.0, 0.0, 3.0,
+
+/* Y-coordinate */ 
+               -1.518      ,     2.0, 0.0, 0.0,
+               -0.01234    ,     2.0, 1.0, 0.0,
+               6.2232e-05  ,     2.0, 2.0, 0.0,
+               -3.1321e-07 ,     2.0, 3.0, 0.0,
+               1.0032      ,     2.0, 0.0, 1.0,
+               0.00079397  ,     2.0, 1.0, 1.0,
+               7.7788e-06  ,     2.0, 2.0, 1.0,
+               -0.00045257 ,     2.0, 0.0, 2.0,
+               5.7306e-06  ,     2.0, 1.0, 2.0,
+               -2.6759e-06 ,     2.0, 0.0, 3.0,
+            };
+
+/* Inverse transformation coefficients... */
+   int ncoeff_i_NEW2 = 42;
+   const double coeff_i_NEW2[] = {
+
+/* X-coordinate */ 
+               -1.773      ,     1.0, 0.0, 0.0,
+               1.0043      ,     1.0, 1.0, 0.0,
+               -0.00010866 ,     1.0, 2.0, 0.0,
+               6.2202e-07  ,     1.0, 3.0, 0.0,
+               -8.9563e-10 ,     1.0, 4.0, 0.0,
+               -5.1578e-12 ,     1.0, 5.0, 0.0,
+               0.0076309   ,     1.0, 0.0, 1.0,
+               0.00039363  ,     1.0, 1.0, 1.0,
+               -3.568e-06  ,     1.0, 2.0, 1.0,
+               4.7332e-09  ,     1.0, 3.0, 1.0,
+               5.6723e-11  ,     1.0, 4.0, 1.0,
+               0.00045037  ,     1.0, 0.0, 2.0,
+               4.8826e-06  ,     1.0, 1.0, 2.0,
+               -1.7942e-08 ,     1.0, 2.0, 2.0,
+               -3.4355e-11 ,     1.0, 3.0, 2.0,
+               -4.6588e-06 ,     1.0, 0.0, 3.0,
+               -6.7703e-09 ,     1.0, 1.0, 3.0,
+               -2.1211e-10 ,     1.0, 2.0, 3.0,
+               7.1082e-09  ,     1.0, 0.0, 4.0,
+               4.322e-10   ,     1.0, 1.0, 4.0,
+               -1.5486e-10 ,     1.0, 0.0, 5.0,
+
+/* Y-coordinate */ 
+               1.4942      ,     2.0, 0.0, 0.0,
+               0.011475    ,     2.0, 1.0, 0.0,
+               -8.4666e-05 ,     2.0, 2.0, 0.0,
+               3.3269e-07  ,     2.0, 3.0, 0.0,
+               -3.7564e-10 ,     2.0, 4.0, 0.0,
+               -1.1094e-11 ,     2.0, 5.0, 0.0,
+               0.99968     ,     2.0, 0.0, 1.0,
+               -0.00077605 ,     2.0, 1.0, 1.0,
+               -7.8063e-06 ,     2.0, 2.0, 1.0,
+               9.384e-09   ,     2.0, 3.0, 1.0,
+               2.3439e-11  ,     2.0, 4.0, 1.0,
+               0.00046731  ,     2.0, 0.0, 2.0,
+               -7.1745e-06 ,     2.0, 1.0, 2.0,
+               1.3424e-08  ,     2.0, 2.0, 2.0,
+               4.5287e-10  ,     2.0, 3.0, 2.0,
+               3.0534e-06  ,     2.0, 0.0, 3.0,
+               -2.5124e-08 ,     2.0, 1.0, 3.0,
+               -9.0546e-11 ,     2.0, 2.0, 3.0,
+               -3.0955e-09 ,     2.0, 0.0, 4.0,
+               -3.0071e-10 ,     2.0, 1.0, 4.0,
+               1.6281e-10  ,     2.0, 0.0, 5.0,
+            };
+
+
+/* SMURF_DISTORTION = "NEW3": determined from bolomap approach, using 
+   s4a and s8d data from 20091203_00092, 20091203_00038 and 20091203_00039
+   (post mirror fix). */
+/* ------------------------------------------------------------ */
+
+/* SCUBA-2 PolyMap cooefficients. Forward coefficients are from 
+   FRAME850 to Nasmyth */ 
+
+/* Forward transformation coefficients... */
+   int ncoeff_f_NEW3 = 20;
+   const double coeff_f_NEW3[] = {
+
+/* X-coordinate */ 
+               2.1329      ,     1.0, 0.0, 0.0,
+               0.9892      ,     1.0, 1.0, 0.0,
+               0.00038764  ,     1.0, 2.0, 0.0,
+               8.9905e-06  ,     1.0, 3.0, 0.0,
+               -0.01555    ,     1.0, 0.0, 1.0,
+               0.00045098  ,     1.0, 1.0, 1.0,
+               1.2651e-05  ,     1.0, 2.0, 1.0,
+               0.00020844  ,     1.0, 0.0, 2.0,
+               1.8346e-07  ,     1.0, 1.0, 2.0,
+               -2.5748e-06 ,     1.0, 0.0, 3.0,
+
+/* Y-coordinate */ 
+               -2.249      ,     2.0, 0.0, 0.0,
+               -0.038506   ,     2.0, 1.0, 0.0,
+               -0.00086302 ,     2.0, 2.0, 0.0,
+               -7.4832e-06 ,     2.0, 3.0, 0.0,
+               1.0108      ,     2.0, 0.0, 1.0,
+               0.0012899   ,     2.0, 1.0, 1.0,
+               2.5747e-05  ,     2.0, 2.0, 1.0,
+               -0.00045431 ,     2.0, 0.0, 2.0,
+               1.4096e-06  ,     2.0, 1.0, 2.0,
+               2.5223e-06  ,     2.0, 0.0, 3.0,
+            };
+
+
+
+/* Inverse transformation coefficients... */
+   int ncoeff_i_NEW3 = 42;
+   const double coeff_i_NEW3[] = {
+
+/* X-coordinate */ 
+               -2.123      ,     1.0, 0.0, 0.0,
+               1.0121      ,     1.0, 1.0, 0.0,
+               -0.00037464 ,     1.0, 2.0, 0.0,
+               -9.9457e-06 ,     1.0, 3.0, 0.0,
+               5.8683e-10  ,     1.0, 4.0, 0.0,
+               1.4293e-10  ,     1.0, 5.0, 0.0,
+               0.015673    ,     1.0, 0.0, 1.0,
+               -0.00044873 ,     1.0, 1.0, 1.0,
+               -1.3223e-05 ,     1.0, 2.0, 1.0,
+               6.2626e-08  ,     1.0, 3.0, 1.0,
+               1.0483e-09  ,     1.0, 4.0, 1.0,
+               -0.00019079 ,     1.0, 0.0, 2.0,
+               2.8369e-07  ,     1.0, 1.0, 2.0,
+               3.9446e-08  ,     1.0, 2.0, 2.0,
+               5.4352e-10  ,     1.0, 3.0, 2.0,
+               2.4257e-06  ,     1.0, 0.0, 3.0,
+               -3.7609e-09 ,     1.0, 1.0, 3.0,
+               -2.4672e-10 ,     1.0, 2.0, 3.0,
+               3.378e-09   ,     1.0, 0.0, 4.0,
+               -9.774e-11  ,     1.0, 1.0, 4.0,
+               -2.1984e-11 ,     1.0, 0.0, 5.0,
+
+/* Y-coordinate */ 
+               2.1555      ,     2.0, 0.0, 0.0,
+               0.032547    ,     2.0, 1.0, 0.0,
+               0.0007184   ,     2.0, 2.0, 0.0,
+               4.8141e-06  ,     2.0, 3.0, 0.0,
+               -5.8353e-08 ,     2.0, 4.0, 0.0,
+               -4.6928e-10 ,     2.0, 5.0, 0.0,
+               0.99432     ,     2.0, 0.0, 1.0,
+               -0.0011474  ,     2.0, 1.0, 1.0,
+               -2.4441e-05 ,     2.0, 2.0, 1.0,
+               6.6223e-08  ,     2.0, 3.0, 1.0,
+               8.9367e-10  ,     2.0, 4.0, 1.0,
+               0.00040726  ,     2.0, 0.0, 2.0,
+               -3.8309e-06 ,     2.0, 1.0, 2.0,
+               5.147e-09   ,     2.0, 2.0, 2.0,
+               9.4018e-10  ,     2.0, 3.0, 2.0,
+               -1.7737e-06 ,     2.0, 0.0, 3.0,
+               2.5759e-08  ,     2.0, 1.0, 3.0,
+               4.1244e-10  ,     2.0, 2.0, 3.0,
+               -8.1515e-09 ,     2.0, 0.0, 4.0,
+               -1.1878e-10 ,     2.0, 1.0, 4.0,
+               9.9128e-12  ,     2.0, 0.0, 5.0,
+            };
+
+
+
 
 
 
@@ -603,9 +813,22 @@ int *status             /* global status (given and returned) */
 /* For each 450/850 subarray, the next Mapping creates FRAME450/FRAME850
    coordinates, which are coordinates in millimetres with origin at the
    center of the focal plane. */
-      if( distortion && !strcmp( "NEW", distortion ) ) {
-         shift[ 0 ] = xoff_NEW[ subnum ];
-         shift[ 1 ] = yoff_NEW[ subnum ];
+      if( !distortion ) {
+         shift[ 0 ] = xoff[ subnum ];
+         shift[ 1 ] = yoff[ subnum ];
+
+      } else if( !strcmp( "NEW1", distortion ) ) {
+         shift[ 0 ] = xoff_NEW1[ subnum ];
+         shift[ 1 ] = yoff_NEW1[ subnum ];
+
+      } else if( !strcmp( "NEW2", distortion ) ) {
+         shift[ 0 ] = xoff_NEW2[ subnum ];
+         shift[ 1 ] = yoff_NEW2[ subnum ];
+
+      } else if( !strcmp( "NEW3", distortion ) ) {
+         shift[ 0 ] = xoff_NEW3[ subnum ];
+         shift[ 1 ] = yoff_NEW3[ subnum ];
+
       } else {
          shift[ 0 ] = xoff[ subnum ];
          shift[ 1 ] = yoff[ subnum ];
@@ -628,9 +851,18 @@ int *status             /* global status (given and returned) */
       if( !distortion ) {
          polymap = astPolyMap( 2, 2, 14, coeff_f, 14, coeff_i, " " );
 
-      } else if( !strcmp( "NEW", distortion ) ) {
-         polymap = astPolyMap( 2, 2, ncoeff_f_NEW, coeff_f_NEW, 
-                                     ncoeff_i_NEW, coeff_i_NEW, " " );
+      } else if( !strcmp( "NEW1", distortion ) ) {
+         polymap = astPolyMap( 2, 2, ncoeff_f_NEW1, coeff_f_NEW1, 
+                                     ncoeff_i_NEW1, coeff_i_NEW1, " " );
+
+      } else if( !strcmp( "NEW2", distortion ) ) {
+         polymap = astPolyMap( 2, 2, ncoeff_f_NEW2, coeff_f_NEW2, 
+                                     ncoeff_i_NEW2, coeff_i_NEW2, " " );
+
+      } else if( !strcmp( "NEW3", distortion ) ) {
+         polymap = astPolyMap( 2, 2, ncoeff_f_NEW3, coeff_f_NEW3, 
+                                     ncoeff_i_NEW3, coeff_i_NEW3, " " );
+
       } else if( !strcmp( "NONE", distortion ) ) {
          polymap = NULL;
 
@@ -646,8 +878,18 @@ int *status             /* global status (given and returned) */
 /* Convert from mm to radians (but these coords are still cartesian (x,y)
    (i.e. measured in the tangent plane) rather than spherical (lon,lat)
    measured on the sky. */
-      if( distortion && !strcmp( "NEW", distortion ) ) {
-         radmap = astZoomMap ( 2, MM2RAD_NEW, " " );
+      if( !distortion ) {
+         radmap = astZoomMap ( 2, MM2RAD, " " );
+
+      } else if( !strcmp( "NEW1", distortion ) ) {
+         radmap = astZoomMap ( 2, MM2RAD_NEW1, " " );
+
+      } else if( !strcmp( "NEW2", distortion ) ) {
+         radmap = astZoomMap ( 2, MM2RAD_NEW2, " " );
+
+      } else if( !strcmp( "NEW3", distortion ) ) {
+         radmap = astZoomMap ( 2, MM2RAD_NEW3, " " );
+
       } else {
          radmap = astZoomMap ( 2, MM2RAD, " " );
       }
