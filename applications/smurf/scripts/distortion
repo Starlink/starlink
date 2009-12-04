@@ -2,11 +2,15 @@
 
 #  Check a list of observations has been supplied on the command line.
 if( $# < 1 ) then
+   echo 
+   echo "Produces a 2D polynomial describing the SCUBA-2 focal plane distortion"
+   echo 
    echo "Usage: distortion <inlist>"
    echo
    echo "   <inlist> is a text file in which each line contains the path"
    echo "   to a directory holding the raw time series cubes for a single"
-   echo "   observation."
+   echo "   planet observation."
+   echo
    exit
 endif
 
@@ -38,7 +42,7 @@ cd distortion-tmp
 #  Create a temporary ADAM directory within the above directory.
 mkdir adam
 setenv ADAM_USER $PWD/adam 
-   
+
 #  For each observation, use the iterative mapmaker to create a set of
 #  maps for each individual bolometer. An accurate position for the source 
 #  in each bolomap is found using kappa:beamfit. This is compared to the 
@@ -467,26 +471,42 @@ end
 
 echo "" >> code.c
 
-#  Find the median Y offset for each subarray, converting from mm to pixels.
+#  Find the median (or mean if less than 4 values are available) X offset for each subarray, 
+#  converting from mm to pixels.
 foreach n (s*.fpcx)
    set w = `wc $n`
    $KAPPA_DIR/trandat freename=$n auto shape=$w[1] ndf=tmp
-   $KAPPA_DIR/stats tmp order quiet
-   set median = `$KAPPA_DIR/parget median stats`
-   set median = `$KAPPA_DIR/calc exp='pa/1.135' pa=$median`
+
+   if( $w[1] > 3 ) then
+      $KAPPA_DIR/stats tmp order quiet
+      set typical = `$KAPPA_DIR/parget median stats`
+   else
+      $KAPPA_DIR/stats tmp quiet
+      set typical = `$KAPPA_DIR/parget mean stats`
+   endif   
+
+   set typical = `$KAPPA_DIR/calc exp='pa/1.135' pa=$typical`
    set subarray = `basename $n .fpcx`
-   echo "Add $median pixels to the focal plane X centre of subarray $subarray" | tee -a code.c
+   echo "Add $typical pixels to the focal plane X centre of subarray $subarray" | tee -a code.c
 end
 
-#  Find the median Y offset for each subarray, converting from mm to pixels.
+#  Find the median (or mean if less than 4 values are available) Y offset for each subarray, 
+#  converting from mm to pixels.
 foreach n (s*.fpcy)
    set w = `wc $n`
    $KAPPA_DIR/trandat freename=$n auto shape=$w[1] ndf=tmp
-   $KAPPA_DIR/stats tmp order quiet
-   set median = `$KAPPA_DIR/parget median stats`
-   set median = `$KAPPA_DIR/calc exp='pa/1.135' pa=$median`
+
+   if( $w[1] > 3 ) then
+      $KAPPA_DIR/stats tmp order quiet
+      set typical = `$KAPPA_DIR/parget median stats`
+   else
+      $KAPPA_DIR/stats tmp quiet
+      set typical = `$KAPPA_DIR/parget mean stats`
+   endif   
+
+   set typical = `$KAPPA_DIR/calc exp='pa/1.135' pa=$typical`
    set subarray = `basename $n .fpcy`
-   echo "Add $median pixels to the focal plane Y centre of subarray $subarray" | tee -a code.c
+   echo "Add $typical pixels to the focal plane Y centre of subarray $subarray" | tee -a code.c
 end
 
 #  Move the final result ("code.c") into the parent directory

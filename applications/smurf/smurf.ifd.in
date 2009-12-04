@@ -2876,6 +2876,10 @@ package @PACKAGE@ {
         obey {@PERL@ $SMURF_DIR/gettsys}
     }
 
+    command distortion {
+        obey {$SMURF_DIR/distortion}
+    }
+
     icl {defhelp @PACKAGE@ $@PACKAGE_UPCASE@_HELP 0}
 
     display {
