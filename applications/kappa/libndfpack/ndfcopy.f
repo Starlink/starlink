@@ -73,13 +73,14 @@
 *        matching section from the input NDF before copying takes
 *        place.  By default, no template will be used and the shape of
 *        the output NDF will therefore match that of the input NDF (or
-*        NDF section). The shape of the template in either pixel indices 
-*        or the current WCS Frame may be used, as selected by parameter
-*        LIKEWCS. [!]
+*        NDF section).  The shape of the template in either pixel
+*        indices or the current WCS Frame may be used, as selected by 
+*        parameter LIKEWCS. [!]
 *     LIKEWCS = _LOGICAL (Read)
-*        If TRUE, then the WCS bounds of the template supplied via parameter 
-*        LIKE are used to decide on the bounds of the output NDF. Otherwise,
-*        the pixel bounds of the template are used.  [FALSE]
+*        If TRUE, then the WCS bounds of the template supplied via 
+*        parameter LIKE are used to decide on the bounds of the output 
+*        NDF.  Otherwise, the pixel bounds of the template are used. 
+*        [FALSE]
 *     OUT = NDF (Write)
 *        The output NDF data structure.
 *     TITLE = LITERAL (Read)
@@ -112,7 +113,7 @@
 *        there are pixel axes in the output NDF.  If this involves
 *        removing axes, then the axes to retain are specified by
 *        parameter USEAXIS.  If TRIMWCS=FALSE, then all axes are
-*        retained in the current WCS Frame of the output NDF.  Using the 
+*        retained in the current WCS Frame of the output NDF.  Using the
 *        example in the description of the TRIM parameter, if the input 
 *        NDF "stokes" has a three-dimensional current WCS Frame with 
 *        axes (RA,Dec,Stokes) and TRIMWSC=TRUE, then an axis will be
@@ -378,10 +379,10 @@
          IF ( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
 
-*  If a template was supplied, then obtain the pixel or WCS bounds of it,
-*  as determined by the LIKEWCS parameter, and select a matching section 
-*  from the input NDF.  Annul the original input NDF identifier and 
-*  replace it with the section identifier.
+*  If a template was supplied, then obtain the pixel or WCS bounds of
+*  it, as determined by the LIKEWCS parameter, and select a matching 
+*  section from the input NDF.  Annul the original input NDF identifier
+*  and replace it with the section identifier.
          ELSE
             CALL PAR_GET0L( 'LIKEWCS', LIKWCS, STATUS )
             CALL KPG1_LIKE( NDF1, NDF2, LIKWCS, NDFT, STATUS )
@@ -404,8 +405,8 @@
       CALL KPS1_NDFCP( NDF1, COMP, TRIM, TRMWCS, 'OUT', PLACE, NDF3,
      :                 STATUS )
 
-*  See if we are to copy equivalent sections of any NDFs contained in the
-*  extensions of the supplied NDF.
+*  See if we are to copy equivalent sections of any NDFs contained in
+*  the extensions of the supplied NDF.
       CALL PAR_GET0L( 'EXTEN', EXTEN, STATUS )
 
 *  If so, get a GRP group containing paths to any NDFs contained with 
@@ -423,7 +424,7 @@
             IF( STATUS .EQ. SAI__OK ) THEN
                STATUS = SAI__ERROR
                CALL ERR_REP( ' ', 'Unequal number of extension NDFs '//
-     :                       'in input and output (programming error).', 
+     :                       'in input and output (programming error).',
      :                       STATUS )
             END IF
          END IF

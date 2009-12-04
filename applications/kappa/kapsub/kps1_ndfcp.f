@@ -19,10 +19,10 @@
 *     location.  It performs most of the work for the NDFCOPY 
 *     application.  
 *
-*     It also permits the VARIANCE, ERROR or QUALITY components to become
-*     the DATA_ARRAY in the output NDF (see the COMP argument), thus losing
-*     the original DATA_ARRAY and omitting the respective VARIANCE or 
-*     QUALITY too.
+*     It also permits the VARIANCE, ERROR or QUALITY components to
+*     become the DATA_ARRAY in the output NDF (see the COMP argument),
+*     thus losing the original DATA_ARRAY and omitting the respective 
+*     VARIANCE or QUALITY too.
 
 *  Arguments:
 *     INDF1 = INTEGER (Given)
@@ -112,7 +112,7 @@
 *     18-SEP-2009 (DSB):
 *        Allow excess WCS axes to be trimmed.
 *     2009-12-03 (TIMJ):
-*        Allow COMP=ERROR
+*        Allow COMP=ERROR.
 *     {enter_further_changes_here}
 
 *-
@@ -257,7 +257,7 @@
 *  Determine whether it is a one-to-one transfer of array components,
 *  or VARIANCE or QUALITY is to replace the DATA_ARRAY.
       DIRECT = .NOT. ( COMP .EQ. 'VARIANCE' .OR.
-     :     COMP .EQ. 'ERROR' .OR. COMP .EQ. 'QUALITY' )
+     :                 COMP .EQ. 'ERROR' .OR. COMP .EQ. 'QUALITY' )
 
 *  If not, copy all components from the input NDF (or section) to
 *  create  the output NDF.
@@ -525,8 +525,9 @@
                ICOMPN( I ) = ICOMP( I )
                IF ( COMP .EQ. ACOMP( I ) ) THEN
                   OCOMP( I ) = 'DATA'
+
                ELSE IF ( COMP .EQ. 'ERROR' .AND.
-     :                 ACOMP( I ) .EQ. 'VARIANCE') THEN
+     :                   ACOMP( I ) .EQ. 'VARIANCE' ) THEN
                   ICOMP( I ) = COMP
                   ICOMPN( I ) = 'VARIANCE'
                   OCOMP( I ) = 'DATA'
@@ -562,13 +563,13 @@
                CALL NDF_TYPE( INDF1, ICOMPN( I ), TYPE, STATUS )
                CALL NDF_MAP( INDF1, ICOMP( I ), TYPE, 'READ', IP1, EL, 
      :                       STATUS ) 
-               CALL NDF_BAD( INDF1, ICOMPN( I ), .FALSE., BAD, STATUS)
+               CALL NDF_BAD( INDF1, ICOMPN( I ), .FALSE., BAD, STATUS )
 
 *  The data type may have changed if there's is a new DATA_ARRAY.  NDF
 *  must be told about the potential change of data type.  Even though
 *  the data are mapped and copied using the desired type, upon unmapping
 *  the DATA_ARRAY would revert to the input component's data type.  
-               IF ( .NOT. DIRECT .AND. OCOMP( I ) .NE. 'QUALITY')
+               IF ( .NOT. DIRECT .AND. OCOMP( I ) .NE. 'QUALITY' )
      :           CALL NDF_STYPE( TYPE, INDF2, OCOMP( I ), STATUS ) 
                CALL NDF_MAP( INDF2, OCOMP( I ), TYPE, 'WRITE', IP2, EL, 
      :                       STATUS ) 
