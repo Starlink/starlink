@@ -235,7 +235,8 @@ int *status             /* global status (given and returned) */
                  MM2RAD. (DSB)
      4Dec2009  : Rename NEW to NEW1, and add NEW2 (improved pre-mirror-fix 
                  distortion map), and NEW3 (initial post-mirror-fix
-                 distortion map). (DSB)
+                 distortion map). "NEW" gets translated to NEW2 or NEW3
+                 depending on the date (from state->tcs_tai). (DSB)
 
 */
 {
@@ -809,6 +810,18 @@ int *status             /* global status (given and returned) */
 /* See which version of the distortion polynomial and array reference
    points are to be used. */
       distortion = getenv( "SMURF_DISTORTION" );
+
+/* Translate NEW into NEW3 or NEW2 depending on its date. MJD 55168.19
+   was the start of observing on 3rd December 2009 - the first night of
+   observing with the corrected C2 mirror rotation. */
+      if( distortion && !strcmp( "NEW", distortion ) ) {
+         if( state->tcs_tai > 55168.19 ) {
+            distortion = "NEW3";   
+         } else {
+            distortion = "NEW2";   
+         }
+      }
+
 
 /* For each 450/850 subarray, the next Mapping creates FRAME450/FRAME850
    coordinates, which are coordinates in millimetres with origin at the
