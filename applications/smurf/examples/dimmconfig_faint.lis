@@ -26,7 +26,7 @@
 # like more or less iterations).
 #
 # Finally, good results seem to be obtained at 850um setting
-# flt.filt_edgehigh = 0.1, and at 450um setting it to 0.3.
+# flt.filt_edgehigh = 0.3, and at 450um setting it to 0.1.
 #
 # ***********************************************************
 
