@@ -19,8 +19,8 @@
 *     location.  It performs most of the work for the NDFCOPY 
 *     application.  
 *
-*     It also permits the VARIANCE or QUALITY components to become the 
-*     DATA_ARRAY in the output NDF (see the COMP argument), thus losing
+*     It also permits the VARIANCE, ERROR or QUALITY components to become
+*     the DATA_ARRAY in the output NDF (see the COMP argument), thus losing
 *     the original DATA_ARRAY and omitting the respective VARIANCE or 
 *     QUALITY too.
 
@@ -33,8 +33,8 @@
 *        If this is set to 'DATA' all the array components are copied to
 *        their counterparts in the output NDF.
 
-*        If this is set to 'VARIANCE' or 'QUALITY' the VARIANCE or
-*        QUALITY component respectively becomes the new DATA_ARRAY in
+*        If this is set to 'VARIANCE', 'ERROR' or 'QUALITY' the VARIANCE,
+*        ERROR or QUALITY component respectively becomes the new DATA_ARRAY in
 *        the output NDF, and the chosen array component is absent from 
 *        the output NDF.  The information stored within the input 
 *        DATA_ARRAY is not transferred.  Also any variance is not 
@@ -110,6 +110,8 @@
 *        a new COMP argument.
 *     18-SEP-2009 (DSB):
 *        Allow excess WCS axes to be trimmed.
+*     2009-12-03 (TIMJ):
+*        Allow COMP=ERROR
 *     {enter_further_changes_here}
 
 *-
@@ -144,6 +146,7 @@
 *  Local Variables:
       CHARACTER CLIST*35         ! List of components to propagate
       CHARACTER ICOMP( 3 )*(DAT__SZNAM) ! Input array-component names
+      CHARACTER ICOMPN( 3 )*(DAT__SZNAM) ! Input array-component names for NDF STYPE
       CHARACTER LOC1*(DAT__SZLOC) ! Locator to the output NDF
       CHARACTER LOC2*(DAT__SZLOC) ! Locator to output AXIS array
       CHARACTER LOC2C*(DAT__SZLOC)! Loc. for a single o/p AXIS structure
@@ -200,6 +203,7 @@
       DATA ACOMP /'DATA', 'VARIANCE', 'QUALITY' /
 
 *.
+      UTRIM = .FALSE.
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -251,7 +255,8 @@
 
 *  Determine whether it is a one-to-one transfer of array components,
 *  or VARIANCE or QUALITY is to replace the DATA_ARRAY.
-      DIRECT = .NOT. ( COMP .EQ. 'VARIANCE' .OR. COMP .EQ. 'QUALITY' )
+      DIRECT = .NOT. ( COMP .EQ. 'VARIANCE' .OR.
+     :     COMP .EQ. 'ERROR' .OR. COMP .EQ. 'QUALITY' )
 
 *  If not, copy all components from the input NDF (or section) to
 *  create  the output NDF.
@@ -260,7 +265,7 @@
             CALL LPG_PROP( INDF1, 'Title,Label,Units,Data,Variance,'//
      :                     'Quality,Axis,History,WCS', 'OUT', INDF2, 
      :                     STATUS )
-         ELSE	    
+         ELSE
             CALL NDF_SCOPY( INDF1, 'Title,Label,Units,Data,Variance,'//
      :                      'Quality,Axis,History,WCS', OPLACE, INDF2, 
      :                      STATUS )
@@ -500,21 +505,29 @@
 
 *  Define the input and output array components.  The direct one-to-one
 *  transfer is straightforward.
+         SCOMP = 0
          IF ( DIRECT ) THEN
             SCOMP = 1
             DO I = SCOMP, 3
                ICOMP( I ) = ACOMP( I )
+               ICOMPN( I ) = ICOMP( I )
                OCOMP( I ) = ACOMP( I )
             END DO
 
 *  For VARIANCE we can retain any QUALITY but lose the DATA_ARRAY.
 *  So we transfer a maximum of two array components starting at Index 2.
 *  Make the input VARIANCE the ouptut DATA_ARRAY.
-         ELSE IF ( COMP .EQ. 'VARIANCE' ) THEN
+         ELSE IF ( COMP .EQ. 'VARIANCE' .OR. COMP .EQ. 'ERROR' ) THEN
             SCOMP = 2
             DO I = SCOMP, 3
                ICOMP( I ) = ACOMP( I )
+               ICOMPN( I ) = ICOMP( I )
                IF ( COMP .EQ. ACOMP( I ) ) THEN
+                  OCOMP( I ) = 'DATA'
+               ELSE IF ( COMP .EQ. 'ERROR' .AND.
+     :                 ACOMP( I ) .EQ. 'VARIANCE') THEN
+                  ICOMP( I ) = COMP
+                  ICOMPN( I ) = 'VARIANCE'
                   OCOMP( I ) = 'DATA'
                ELSE
                   OCOMP( I ) = ACOMP( I )
@@ -525,26 +538,36 @@
          ELSE IF ( COMP .EQ. 'QUALITY' ) THEN
             SCOMP = 3
             ICOMP( SCOMP ) = 'QUALITY'
+            ICOMPN( SCOMP ) = ICOMP( SCOMP )
             OCOMP( SCOMP ) = 'DATA'
+         ELSE
+            IF (STATUS .EQ. SAI__OK) THEN
+               STATUS = SAI__ERROR
+               CALL MSG_SETC( 'C', COMP )
+               CALL ERR_REP( ' ',
+     :              'Could not understand supplied component ^C',
+     :              STATUS )
+            END IF
          END IF
 
 *  Copy all the selected array components that exist.
          DO I = SCOMP, 3
-            CALL NDF_STATE( INDF1, ICOMP( I ), THERE, STATUS ) 
+            CALL NDF_STATE( INDF1, ICOMPN( I ), THERE, STATUS )
+
             IF( THERE ) THEN
 
 *  Obtain the data type of the array component and determine whether it
 *  contains any bad pixels without reading all its elements.
-               CALL NDF_TYPE( INDF1, ICOMP( I ), TYPE, STATUS )
+               CALL NDF_TYPE( INDF1, ICOMPN( I ), TYPE, STATUS )
                CALL NDF_MAP( INDF1, ICOMP( I ), TYPE, 'READ', IP1, EL, 
      :                       STATUS ) 
-               CALL NDF_BAD( INDF1, ICOMP( I ), .FALSE., BAD, STATUS )
+               CALL NDF_BAD( INDF1, ICOMPN( I ), .FALSE., BAD, STATUS)
 
 *  The data type may have changed if there's is a new DATA_ARRAY.  NDF
 *  must be told about the potential change of data type.  Even though
 *  the data are mapped and copied using the desired type, upon unmapping
 *  the DATA_ARRAY would revert to the input component's data type.  
-               IF ( .NOT. DIRECT )
+               IF ( .NOT. DIRECT .AND. OCOMP( I ) .NE. 'QUALITY')
      :           CALL NDF_STYPE( TYPE, INDF2, OCOMP( I ), STATUS ) 
                CALL NDF_MAP( INDF2, OCOMP( I ), TYPE, 'WRITE', IP2, EL, 
      :                       STATUS ) 

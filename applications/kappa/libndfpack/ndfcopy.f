@@ -47,6 +47,10 @@
 *                        the DATA_ARRAY in the output NDF and retains
 *                        its data type.  The original DATA_ARRAY is not 
 *                        copied.
+*          "Error"    -- The ERROR component in the input NDF becomes
+*                        the DATA_ARRAY in the output NDF and retains
+*                        its data type.  The original DATA_ARRAY is not
+*                        copied.
 *          "Quality" --  The QUALITY component in the input NDF becomes 
 *                        the DATA_ARRAY in the output NDF and will be
 *                        data type _UBYTE.  The original DATA_ARRAY and 
@@ -256,6 +260,8 @@
 *        Added Parameter TRIMBAD.
 *     2009 July 17 (MJC):
 *        Added Parameter COMP.
+*     2009-12-03 (TIMJ):
+*        Allow COMP=ERROR
 *     {enter_further_changes_here}
 
 *-
@@ -275,6 +281,7 @@
 
 *  Local Variables:
       CHARACTER COMP*8           ! NDF array component to read
+      CHARACTER COMPN*8          ! NDF array component as known to NDF_STATE
       CHARACTER LOC*(DAT__SZLOC) ! Locator for output extension NDF
       CHARACTER NAME*(DAT__SZNAM)! Name for output extension NDF
       CHARACTER PLOC*(DAT__SZLOC)! Locator for LOC's parent
@@ -325,13 +332,17 @@
       CALL LPG_ASSOC( 'IN', 'READ', NDF1, STATUS )
 
 *  Determine which array component is to be copied.
-      CALL PAR_CHOIC( 'COMP', 'Data', 'Data,Variance,Quality', 
+      CALL PAR_CHOIC( 'COMP', 'Data', 'Data,Variance,Quality,Error',
      :                .FALSE., COMP, STATUS )
 
 *  Check that the required component exists and report an error if it
 *  does not.
       IF ( STATUS .EQ. SAI__OK ) THEN
-         CALL NDF_STATE( NDF1, COMP, THERE, STATUS )
+         COMPN = COMP
+         IF (COMPN .EQ. 'ERROR') THEN
+            COMPN = 'VARIANCE'
+         END IF
+         CALL NDF_STATE( NDF1, COMPN, THERE, STATUS )
          IF ( .NOT. THERE ) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'COMP', COMP )
