@@ -1,6 +1,6 @@
 1 KAPPA_Version_1.11
 
-   A new release of KAPPA (@PACKAGE_VERSION@) is under development.  The main 
+   A new release of KAPPA (@PACKAGE_VERSION@) is under development.  The main
    changes so far are listed below.  For complete details of all 
    changes, see the "Release Notes" appendix in SUN/95.
 
@@ -70,26 +70,27 @@ The following new applications have been added:
 
    o  LOOK
 
-      -  A bug has been fixed that caused logfile output to be truncated
-      to 255 characters per row even if MAXLEN was greater than 255.
+      -  A bug has been fixed that caused logfile output to be 
+      truncated to 255 characters per row even if MAXLEN was greater
+      than 255.
 
    o  NDFCOPY
 
       -  There is a new COMP parameter that permits the QUALITY,
-      ERROR or VARIANCE components to become the DATA_ARRAY in the output
-      NDF.
+      ERROR or VARIANCE components to become the DATA_ARRAY in the 
+      output NDF.
 
    o  PROVSHOW
 
-      -  There is a new DOTFILE parameter that permits a summary of the
-      provenance tree to be written to a text file in "dot" format,
-      suitable for visualising with third-party tools such as Graphviz,
-      ZGRViewer or OmniGraffle.
+      -  There is a new DOTFILE parameter that permits a summary of 
+      the provenance tree to be written to a text file in "dot" 
+      format, suitable for visualising with third-party tools such 
+      as Graphviz, ZGRViewer or OmniGraffle.
 
    o  SCATTER
 
-      -  The calculation of the axis ranges now excludes any pixels that 
-      are bad in either NDF.
+      -  The calculation of the axis ranges now excludes any pixels 
+      that are bad in either NDF.
 
    o  SETAXIS
 
@@ -100,8 +101,8 @@ The following new applications have been added:
    o  WCSTRAN
 
       - There is a new SKYDEG parameter that can be used to force
-      celestial longitude and latitude axis values to be formatted as
-      decimal degrees, regardless of the setting of the Format
+      celestial longitude and latitude axis values to be formatted
+      as decimal degrees, regardless of the setting of the Format
       attributes for the axes.
 
 1 KAPPA_Version_1.10
@@ -125,8 +126,8 @@ The following new applications have been added:
       `staircase', dots or markers at each point, and lines 
       connecting data points (the only available mode previously).
 
-      -  New SPECAXES parameter can be used to suppress the drawing of
-      axes around each spectrum.
+      -  New SPECAXES parameter can be used to suppress the drawing
+      of axes around each spectrum.
 
       -  New ALIGN parameter controls whether to align the spectra
       spatially with an existing picture.
@@ -183,10 +184,10 @@ The following new applications have been added:
 
    o  LISTSHOW
 
-      -  A new option ``STCS'' has been added to the PLOT parameter. This
-      marks each position by drawing the shape giving in the column
-      specified by new parameter STCSCOL. The shape is specified using
-      the IVOA "STC-S" format.
+      -  A new option ``STCS'' has been added to the PLOT parameter.
+      This marks each position by drawing the shape giving in the 
+      column specified by new parameter STCSCOL. The shape is 
+      specified using the IVOA "STC-S" format.
 
    o  LOOK
 
@@ -218,14 +219,14 @@ The following new applications have been added:
       -  Has a new parameter called HIDE that can be set to TRUE
       to hide the selected ancestors rather than permanently deleting
       them. Hidden ancestors in an NDF PROVENANCE extension will in 
-      general be ignored by subsequent applications, but all the provenance 
-      information for hidden ancestors is retained unchanged in the 
-      PROVENANCE extension.
+      general be ignored by subsequent applications, but all the 
+      provenance information for hidden ancestors is retained 
+      unchanged in the PROVENANCE extension.
 
    o PROVSHOW
       -  Has a new parameter called HISTORY that can be set to TRUE
-      to display any history records stored in the provenance extension
-      of each ancestor NDF.
+      to display any history records stored in the provenance 
+      extension of each ancestor NDF.
       -  Has a new parameter called HIDE that can be set to TRUE
       to include "hidden" ancestors in the display. Ancestors can be
       hidden using PROVREM.
@@ -233,9 +234,10 @@ The following new applications have been added:
    o  ROTATE
 
       -  Efficiency improvements have been made for rotations of 180 
-      degrees and arbitrary angles that should greatly reduce the memory
-      requirements for processing cubes.  Additional efficiencies have
-      be made for the 0-degree rotation special case.
+      degrees and arbitrary angles that should greatly reduce the 
+      memory requirements for processing cubes.  Additional 
+      efficiencies have be made for the 0-degree rotation special 
+      case.
 
    o STATS
       -  Can calculate accurate median and percentile values using
