@@ -77,8 +77,8 @@ The following new applications have been added:
    o  NDFCOPY
 
       -  There is a new COMP parameter that permits the QUALITY,
-      ERROR or VARIANCE components to become the DATA_ARRAY in the 
-      output NDF.
+      or VARIANCE components or the errors (square root of the 
+      VARIANCE) to become the DATA_ARRAY in the output NDF.
 
    o  PROVSHOW
 

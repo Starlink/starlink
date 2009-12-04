@@ -33,13 +33,14 @@
 *        If this is set to 'DATA' all the array components are copied to
 *        their counterparts in the output NDF.
 
-*        If this is set to 'VARIANCE', 'ERROR' or 'QUALITY' the VARIANCE,
-*        ERROR or QUALITY component respectively becomes the new DATA_ARRAY in
-*        the output NDF, and the chosen array component is absent from 
-*        the output NDF.  The information stored within the input 
-*        DATA_ARRAY is not transferred.  Also any variance is not 
-*        propagated when 'QUALITY' is supplied, as the variance applies
-*        to the DATA_ARRAY.  
+*        If this is set to 'VARIANCE' or 'QUALITY' the VARIANCE or
+*        QUALITY component respectively becomes the new DATA_ARRAY in 
+*        the output NDF.  If it is set to 'ERROR' the square root
+*        VARIANCE component becomes the new DATA_ARRAY.  The chosen 
+*        array component is absent from the output NDF.  The information
+*        stored within the input DATA_ARRAY is not transferred.  Also
+*        any variance is not propagated when 'QUALITY' is supplied, as 
+*        the variance applies to the DATA_ARRAY.  
 *     TRIM = LOGICAL (Given)
 *        Should insignificant pixel axes be removed form the output NDF?
 *     TRMWCS = LOGICAL (Given)

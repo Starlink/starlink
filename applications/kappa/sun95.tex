@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.36}
 \newcommand{\stardocnumber}    {95.36}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2009 November 24}
+\newcommand{\stardocdate}      {2009 December 4}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.11}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -36005,6 +36005,13 @@ KAPPA: \htmlref{ADD}{ADD},
             its data type.  The original DATA\_ARRAY is not copied.
 
             \sstitem
+            {\tt "Error"}  --- The square root of the VARIANCE component 
+            in the input NDF becomes the DATA\_ARRAY in the 
+            output NDF and retains the VARIANCE's data 
+            type.  The original DATA\_ARRAY and VARIANCE components
+            are not copied.
+
+            \sstitem
             {\tt "Quality"} ---  The QUALITY component in the input NDF
             becomes the \linebreak DATA\_ARRAY in the output NDF and will be data type
             \_UBYTE.  The original DATA\_ARRAY and VARIANCE components are
@@ -56970,8 +56977,9 @@ The following applications have been modified:
       \begin{itemize}
         \item There is a new COMP parameter that permits the
         \htmlref{QUALITY}{apndf:quality} or 
-        \htmlref{VARIANCE}{apndf:variance} components to become the 
-        DATA\_ARRAY in the output NDF.               
+        \htmlref{VARIANCE}{apndf:variance} components or
+        the errors (square root of the VARIANCE) to become the 
+        DATA\_ARRAY in the output NDF.
       \end{itemize}
 
    \item [\htmlref{NDFTRACE}{NDFTRACE}]\mbox{}

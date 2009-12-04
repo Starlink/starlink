@@ -47,10 +47,11 @@
 *                        the DATA_ARRAY in the output NDF and retains
 *                        its data type.  The original DATA_ARRAY is not 
 *                        copied.
-*          "Error"    -- The ERROR component in the input NDF becomes
-*                        the DATA_ARRAY in the output NDF and retains
-*                        its data type.  The original DATA_ARRAY is not
-*                        copied.
+*          "Error"    -- The square root of the VARIANCE component in 
+*                        the input NDF becomes the DATA_ARRAY in the 
+*                        output NDF and retains the VARIANCE's data 
+*                        type.  The original DATA_ARRAY and VARIANCE
+*                        components are not copied.
 *          "Quality" --  The QUALITY component in the input NDF becomes 
 *                        the DATA_ARRAY in the output NDF and will be
 *                        data type _UBYTE.  The original DATA_ARRAY and 
