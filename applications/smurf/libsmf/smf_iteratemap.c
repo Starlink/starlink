@@ -1817,13 +1817,13 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
        to properly free up resources used by this chunk. */
 
     if( *status == SMF__INSMP ) {
-      msgOut( "", " ********** Warning! ********** ", status );
+      errAnnul( status );
+      msgOut( "", " ************************* Warning! ************************* ", status );
       msgOut( "", " This data chunk failed due to insufficient good samples.",
               status );
       msgOut( "", " This is oftern due to strict bad-bolo flagging.", status );
       msgOut( "", " Annuling the bad status and trying to continue...", status);
-      msgOut( "", " ****************************** ", status );
-      errAnnul( status );
+      msgOut( "", " ************************************************************ ", status );
     } else {
       /* In the multiple contchunk case, add this map to the total if
          we got here with clean status */
