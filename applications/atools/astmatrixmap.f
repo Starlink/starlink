@@ -136,7 +136,7 @@
       IF( FORM .EQ. 0 ) THEN
          NEL = NOUT*NIN
       ELSE IF( FORM .EQ. 1 ) THEN
-         NEL = MIN( NOUT, NEL )
+         NEL = MIN( NOUT, NIN )
       ELSE 
          NEL = 0
       END IF
