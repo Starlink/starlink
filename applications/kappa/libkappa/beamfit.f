@@ -525,6 +525,9 @@
 *     2009 July 22 (MJC):
 *        Remove QUIET parameter and use the current reporting level
 *        instead (set by the global MSG_FILTER environment variable).
+*     2009 December 4 (MJC):
+*        In interface mode shift the origin of degenerate axes to 1.
+*        Thus it is now possible to fit to arbitrary planes of a cube.
 *     {enter_further_changes_here}
 
 *-
@@ -600,6 +603,7 @@
       INTEGER IWCS               ! WCS FrameSet from input NDF
       INTEGER IWCSG              ! FrameSet read from input catalogue
       INTEGER J                  ! Loop counter and index
+      INTEGER LBND( NDF__MXDIM ) ! Full NDF lower bounds
       CHARACTER*(DAT__SZLOC) LOCI ! Locator for input data structure
       LOGICAL LOGF               ! Write log of positions to text file?
       LOGICAL LOOP               ! Loop for more cmd-line POS params?
@@ -617,11 +621,11 @@
       INTEGER NAXC               ! Number of axes in current NDF Frame
       INTEGER NAXIN              ! Number of axes in supplied Frame
       INTEGER NC                 ! Character column counter
+      INTEGER NDFC               ! Copied-NDF identifier
       INTEGER NDFI               ! Input NDF identifier
       INTEGER NDFR               ! Residuals map's NDF identifier
       CHARACTER*256 NDFNAM       ! Name of input IMAGE
-      INTEGER NDIMS              ! Number of significant dimensions of 
-                                 ! the NDF
+      INTEGER NDIM               ! Number of dimensions of the NDF
       INTEGER NPOS               ! Number of supplied beam positions
       INTEGER NVAL               ! Number of values returned for a
                                  ! parameter
@@ -629,6 +633,7 @@
       DOUBLE PRECISION OFFSET( BF__MXPOS - 1, NDF__MXDIM )! Separations
       CHARACTER*( PAR__SZNAM + 1 ) PARNAM ! Parameter name for the
                                  ! current initial beam position
+      INTEGER PLACE              ! NDF placeholder
       LOGICAL POLAR              ! Use polar co-ordinates for POS2-POS5?
       LOGICAL POSC               ! Centre fixed at supplied position?
       LOGICAL QUIET              ! Suppress screen output?
@@ -638,12 +643,14 @@
       DOUBLE PRECISION S2FWHM    ! Standard deviation to FWHM
       INTEGER SDIM( BF__NDIM )   ! Significant dimensions of the NDF
       CHARACTER*4 SEPAR          ! SEPn parameter name
+      INTEGER SHIFT( NDF__MXDIM ) ! Pixel-index shifts to apply
       INTEGER SLBND( BF__NDIM )  ! Significant lower bounds of the image
       CHARACTER*3 SPARAM         ! Parameter root for fixed separations
       CHARACTER*7 SKYREF         ! Value of Frame attribute SkyRefIs
       INTEGER STATE              ! State of POSx parameter
       INTEGER SUBND( BF__NDIM )  ! Significant upper bounds of the image
       CHARACTER*80 TITLE         ! Title for output positions list
+      INTEGER UBND( NDF__MXDIM ) ! Full NDF lower bounds
       LOGICAL VAR                ! Use variance for weighting
       INTEGER WAX                ! Index of axis measuring fixed FWHMs
 
@@ -1218,13 +1225,46 @@
 *  user to supply a new one before continuing each time.
       ELSE
 
+*  KPS1_BFINT needs to make a BF__DIM-dimensional NDF section of the
+*  fitting region.  Unspecified extra dimensions in NDF_SECT default
+*  to bounds 1:1, and that may not be the chosen section for these
+*  additional dimensions, resulting in an array full of bad values, and
+*  hence no fit.  So shift the bounds along these dimensions to match 
+*  the default used by NDF_SECT called in KPS1_BFINT.
+         CALL NDF_BOUND( NDFI, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
+         IF ( NDIM .GT. BF__NDIM ) THEN
+            CALL NDF_TEMP( PLACE, STATUS )
+            CALL NDF_SCOPY( NDFI, 
+     :                      'Data,Variance,NoHistory,NoExtension()',
+     :                      PLACE, NDFC, STATUS )
+
+*  Determine the pixel-index shifts required for the degenerate axes.
+            DO I = 1, NDIM
+               IF ( LBND( I ) .EQ. UBND( I ) ) THEN
+                  SHIFT( I ) = 1 - LBND( I )
+               ELSE
+                  SHIFT( I ) = 0
+               END IF
+            END DO
+
+*  Apply the shifts to the temporary NDF.
+            CALL NDF_SHIFT( NDIM, SHIFT, NDFC, STATUS )
+
+*  Just the right number of dimensions so use the original input NDF.
+         ELSE
+            NDFC = NDFI
+         END IF
+
 *  Fit the beams obtained interactively, and determine errors. 
 *  Display the results.
-         CALL KPS1_BFINT( NDFI, IWCS, IPLOT, MAP3, MAP1, MAP2, CFRM, 
+         CALL KPS1_BFINT( NDFC, IWCS, IPLOT, MAP3, MAP1, MAP2, CFRM, 
      :                    VAR, NPOS, POLAR, 'POS', CURSOR, MARK, IMARK,
      :                    NAXC, NAXIN, LOGF, FDL, FIXCON, AMPRAT, SLBND,
      :                    SUBND, FAREA, FITREG, REFPOS, REFLAB, MXCOEF,
      :                    FPAR, STATUS )
+
+*  Delete the temporary NDF.
+         IF ( NDIM .GT. BF__NDIM ) CALL NDF_ANNUL( NDFC, STATUS )
 
       END IF
 
@@ -1236,7 +1276,7 @@
       CALL NDF_BEGIN
 
 *  Create a new NDF, by propagating the shape, size, WCS, etc. from the
-*  input NDF,
+*  input NDF.
       CALL LPG_PROP( NDFI, 'NOLABEL,WCS,AXIS', 'RESID', NDFR, STATUS )
 
 *  Determine the data type to use for the residuals map.
