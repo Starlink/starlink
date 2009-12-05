@@ -1810,8 +1810,32 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       }
     }
 
-    /* Cleanup things used specifically in this contchunk */
+    /* If we get here and there is a SMF__INSMP we probably flagged all
+       of the data as bad for some reason. In a multi-chunk map it is
+       annoying to have the whole thing die here. So, annul the error,
+       warn the user, and then continue on... This will also help us
+       to properly free up resources used by this chunk. */
 
+    if( *status == SMF__INSMP ) {
+      msgOut( "", " ********** Warning! ********** ", status );
+      msgOut( "", " This data chunk failed due to insufficient good samples.",
+              status );
+      msgOut( "", " This is oftern due to strict bad-bolo flagging.", status );
+      msgOut( "", " Annuling the bad status and trying to continue...", status);
+      msgOut( "", " ****************************** ", status );
+      errAnnul( status );
+    } else {
+      /* In the multiple contchunk case, add this map to the total if
+         we got here with clean status */
+      if( contchunk >= 1 ) {
+        msgOut( " ", FUNC_NAME ": Adding map estimated from this continuous"
+                " chunk to total", status);
+        smf_addmap1( map, weights, hitsmap, mapvar, thismap, thisweight,
+                     thishits, thisvar, msize, status );
+      }
+    }
+
+    /* Cleanup things used specifically in this contchunk */
     if( !memiter && deldimm ) {
       msgOutif(MSG__VERB," ",
                FUNC_NAME ": Cleaning up " SMF__DIMM_SUFFIX " files",
@@ -1825,25 +1849,33 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         for( j=0; (resgroup)&&(j<resgroup->nrelated); j++ ) {
           grpGet( resgroup->grp, resgroup->subgroups[i][j], 1, &pname,
                   GRP__SZNAM, status );
-          remove(name);
+          if( *status == SAI__OK ) {
+            remove(name);
+          }
         }
 
         for( j=0; (lutgroup)&&(j<lutgroup->nrelated); j++ ) {
           grpGet( lutgroup->grp, lutgroup->subgroups[i][j], 1, &pname,
                   GRP__SZNAM, status );
-          remove(name);
+          if( *status == SAI__OK ) {
+            remove(name);
+          }
         }
 
         for( j=0; (astgroup)&&(j<astgroup->nrelated); j++ ) {
           grpGet( astgroup->grp, astgroup->subgroups[i][j], 1, &pname,
                   GRP__SZNAM, status );
-          remove(name);
+          if( *status == SAI__OK ) {
+            remove(name);
+          }
         }
 
         for( j=0; (quagroup)&&(j<quagroup->nrelated); j++ ) {
           grpGet( quagroup->grp, quagroup->subgroups[i][j], 1, &pname,
                   GRP__SZNAM, status );
-          remove(name);
+          if( *status == SAI__OK ) {
+            remove(name);
+          }
         }
 
         /* dynamic model components */
@@ -1851,7 +1883,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           for( j=0; (modelgroups[k])&&(j<(modelgroups[k])->nrelated); j++ ) {
             grpGet( (modelgroups[k])->grp, (modelgroups[k])->subgroups[i][j],
                     1, &pname, GRP__SZNAM, status );
-            remove(name);
+            if( *status == SAI__OK ) {
+              remove(name);
+            }
           }
         }
       }
@@ -1917,15 +1951,6 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         }
       }
       model = smf_free( model, status );
-    }
-
-    /* In the multiple contchunk case, add maps together */
-
-    if( contchunk >= 1 ) {
-      msgOut( " ", FUNC_NAME ": Adding map estimated from this continuous"
-              " chunk to total", status);
-      smf_addmap1( map, weights, hitsmap, mapvar, thismap, thisweight,
-                   thishits, thisvar, msize, status );
     }
 
     /* Free chisquared array */
