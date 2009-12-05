@@ -126,7 +126,7 @@ foreach indir ($dir_list)
 #  Get the observation number.
    set obsnum = `$KAPPA_DIR/fitsmod junk edit=print keyword=OBSNUM`
    
-#  Get the subarray name, and its corresponding integer index.
+#  Get the subarray name, and its corresponding integer index. 
    set subarray = `$KAPPA_DIR/fitsmod junk edit=print keyword=SUBARRAY`
    if( $subarray == "s8a" ) then
       set array = 0
@@ -347,14 +347,25 @@ foreach indir ($dir_list)
    echo "$PWD/$pdir/outdx_A" >> outdx_A.lis
    echo "$PWD/$pdir/outdy_A" >> outdy_A.lis
 
+#  Choose a reference observation for later on. Prefer 450 um if both 450 and 850 are 
+#  present since the axes are the usual way round (unlike 850 which has swapped axes).
+   if( array > 3 ) then
+      refdx = "$PWD/$pdir/outdx"
+      refdy = "$PWD/$pdir/outdy"
+
+   else if( $idir == 1 ) then
+      refdx = "$PWD/$pdir/outdx"
+      refdy = "$PWD/$pdir/outdy"
+   endif
+
 end
 
 #  Align all the outdx and outdy files. Alignment occurs in focal plane 
 #  X and Y coords.
 $KAPPA_DIR/wcsalign in=^outdx.lis out=^outdx_A.lis method=sincsinc wlim=0.4 \
-                    rebin=no ref=! lbnd=!
+                    rebin=no ref=$refdx lbnd=!
 $KAPPA_DIR/wcsalign in=^outdy.lis out=^outdy_A.lis method=sincsinc wlim=0.4 \
-                    rebin=no ref=! lbnd=!
+                    rebin=no ref=$refdy lbnd=!
 
 #  Mosaic them into a single image, adjusting the zero points to make 
 #  them agree as far as possible.
