@@ -21,6 +21,10 @@
  Full details of the release are given in the updated Starlink 
  User Note SUN/194.2.
 
+2 V0.5-4
+
+   * Created PDA-specific error codes in PDA_ERR.
+
 2 V0.5-3
    * Made PDA_QSIAx and PDA_QSIDx generic and now supporting all
      numeric data types.
