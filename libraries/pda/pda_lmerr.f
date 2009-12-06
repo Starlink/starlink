@@ -67,7 +67,7 @@
 *        likely caused the failure of the inversion of the
 *        curvature matrix.
 *     STATUS = INTEGER (Given & Returned)
-*        Global inherited status.  It is set to SAI__ERROR if the
+*        Global inherited status.  It is set to PDA__FICMX if the
 *        curvature matrix cannot be inverted.
 
 *   Notes:
@@ -122,6 +122,9 @@
 *        only on EMS.
 *     2007 May 31 (MJC):
 *        Replace external machine precision with internal PDA_D1MACH.
+*     2009 December 5 (MJC):
+*        Use explicit error code for the failure to invert the curvature
+*        matrix.
 *     {enter_further_changes_here}
 
 *-
@@ -131,6 +134,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PDA_ERR'          ! PDA error constants
 
 *  Arguments Given:
       INTEGER M
@@ -185,7 +189,7 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Define a parameter.  Cannot do this with a PARAMETER dstatement
+*  Define a parameter.  Cannot do this with a PARAMETER statement
 *  because of the PDA function.
       MINPS = 1.D2 * PDA_D1MACH( 4 )
 
@@ -300,7 +304,7 @@
 *  failure.
          CALL PDA_DGEFA( COVAR, N, N, PIVOT, IFAIL )
          IF ( IFAIL .NE. 0 ) THEN
-            STATUS = SAI__ERROR
+            STATUS = PDA__FICMX
             CALL EMS_REP( ' ', 'Failed to invert the curvature matrix.',
      :                    STATUS )
             GOTO 999

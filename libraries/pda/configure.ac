@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
  
 dnl    Initialisation: package name and version number
-AC_INIT(pda, 0.5-3, ussc@star.rl.ac.uk)
+AC_INIT(pda, 0.5-4, ussc@star.rl.ac.uk)
  
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -31,6 +31,11 @@ STAR_DECLARE_DEPENDENCIES([link],  [ems cnf])
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
 STAR_LATEX_DOCUMENTATION(sun194)
+
+dnl    There is a .msg file in this directory, and this adds Makefile
+dnl    rules to generate the xxx_ERR, xxx_err.h and fac_nnn_err files
+dnl    which correspond to it.
+STAR_MESSGEN(pda_err.msg)
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.

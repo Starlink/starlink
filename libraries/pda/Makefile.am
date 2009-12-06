@@ -12,10 +12,12 @@ libpda_la_SOURCES = \
         $(PUBLIC_INCLUDES) \
 	$(F_ROUTINES) \
         $(GEN_F_ROUTINES) \
-	$(C_ROUTINES)
+	$(C_ROUTINES) \
+        $(include_MESSAGES)
 
 include_HEADERS = $(PUBLIC_F_INCLUDES)
 cinclude_HEADERS = $(PUBLIC_C_INCLUDES)
+include_MESSAGES = PDA_ERR
 
 F_ROUTINES = pda_baksld.f pda_db2ink.f pda_dcfti1.f pda_dmpar.f	       \
 pda_dqed.f pda_dscal.f pda_fstats.f pda_lmsad.f pda_passb4.f	       \
@@ -96,7 +98,7 @@ MAINTAINERCLEANFILES = $(GEN_F_ROUTINES)
 
 PDA_BDIRW_GEN = pda_qsia.gbdirw pda_qsid.gbdirw
 
-PUBLIC_F_INCLUDES = 
+PUBLIC_F_INCLUDES =
 PUBLIC_C_INCLUDES = pda.h
 PUBLIC_INCLUDES = $(PUBLIC_F_INCLUDES) $(PUBLIC_C_INCLUDES)
 
@@ -151,3 +153,8 @@ Subplex_LDADD = `$(srcdir)/pda_link`
 dist_starnews_DATA = pda.news
 
 dist_pkgdata_DATA = Subplex_README
+
+# Files for distribution that are not picked up elsewhere.
+EXTRA_DIST = pda_err.msg
+
+CLEANFILES = PDA_ERR
