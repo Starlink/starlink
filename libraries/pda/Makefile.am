@@ -102,6 +102,8 @@ PUBLIC_F_INCLUDES =
 PUBLIC_C_INCLUDES = pda.h
 PUBLIC_INCLUDES = $(PUBLIC_F_INCLUDES) $(PUBLIC_C_INCLUDES)
 
+BUILT_SOURCES = $(include_MESSAGES)
+
 .gbdirw.f:
 	$(FGENERIC) $(<)
 
@@ -156,7 +158,5 @@ dist_pkgdata_DATA = Subplex_README
 
 # Files for distribution that are not picked up elsewhere.
 EXTRA_DIST = pda_err.msg
-
-BUILT_SOURCES = $(include_MESSAGES)
 
 CLEANFILES = PDA_ERR
