@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="pamela">
+  <version>1.0.6</version>
+  <path>applications/pamela</path>
+  <description>PAMELA</description>
+  <abstract><p>
+Pamela is...
+  </p></abstract>
+  <dependencies >
+    <build>pcs</build><build option='link'>fio</build><build option='link'>generic</build><build option='link'>prm</build><build option='link'>par</build><build option='link'>sae</build><build option='link'>hds</build>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Tom Marsh</name>
+      <uname>trm</uname>
+    </person>
+  </developers>
+  <documentation></documentation>
+  <bugreports>t.r.marsh@warwick.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>

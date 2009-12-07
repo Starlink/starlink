@@ -608,6 +608,10 @@ applications/news/newsmaint
 
 applications/observe/observe
 
+applications/pamela/pamela.csh
+applications/pamela/pamela.icl
+applications/pamela/pamela.sh
+
 applications/period/period
 
 applications/photom/photom.csh

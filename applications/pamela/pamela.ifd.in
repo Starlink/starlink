@@ -1,0 +1,2310 @@
+# -*- tcl -*-
+
+package pamela {
+   version @PACKAGE_VERSION@
+   prefix pam
+
+   executable pamela_mon {
+      action extnor {
+
+         parameter image {
+            position 1
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_IMAGE
+            prompt {Data frame}
+          }
+
+         parameter flat {
+            position 2
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_FLAT
+            prompt {Balance factor frame}
+          }
+
+         parameter dload {
+            type _LOGICAL
+            default FALSE
+            vpath GLOBAL PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_DLOAD
+            prompt {Include a dark frame ?}
+          }
+
+         parameter dark {
+            position 3
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_DARK
+            prompt {Dark frame}
+          }
+
+         parameter region {
+            position 4
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_REGION
+            prompt {Object region input file}
+          }
+
+         parameter sky {
+            position 5
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_SKY
+            prompt {Sky fit input file}
+          }
+
+         parameter trace {
+            type _LOGICAL
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_TRACE
+            prompt {Load a trace of spectrum distortion ?}
+          }
+
+         parameter track {
+            position 6
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_TRACK
+            prompt {Distortion map file}
+          }
+
+         parameter spect {
+            position 7
+            type IMAGE
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Spectrum output file}
+          }
+
+         parameter ystart {
+            position 8
+            type _INTEGER
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_YSTART
+            prompt {Lower Y limit}
+          }
+
+         parameter yend {
+            position 9
+            type _INTEGER
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_YEND
+            prompt {Upper Y limit}
+          }
+
+         parameter readout {
+            position 10
+            type _REAL
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_READOUT
+            prompt {Readout noise, RMS data numbers}
+          }
+
+         parameter photon {
+            position 11
+            type _REAL
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_PHOTON
+            prompt {Photons/data number}
+          }
+
+      }
+
+      action extopt {
+
+         parameter image {
+            position 1
+            type LITERAL
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_IMAGE
+            prompt {Data frame to process}
+          }
+
+         parameter flat {
+            position 2
+            type LITERAL
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_FLAT
+            prompt {Balance factor frame}
+          }
+
+         parameter dload {
+            type _LOGICAL
+            default FALSE
+            vpath GLOBAL PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_DLOAD
+            prompt {Include a dark frame ?}
+          }
+
+         parameter dark {
+            position 3
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_DARK
+            prompt {Dark frame}
+          }
+
+         parameter region {
+            position 4
+            type LITERAL
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_REGION
+            prompt {Object region input file}
+          }
+
+         parameter sky {
+            position 5
+            type LITERAL
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_SKY
+            prompt {Sky fit input file}
+          }
+
+         parameter spect {
+            position 6
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Spectrum output file}
+          }
+
+         parameter ystart {
+            position 7
+            type _INTEGER
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_YSTART
+            prompt {Lower Y limit}
+          }
+
+         parameter yend {
+            position 8
+            type _INTEGER
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_YEND
+            prompt {Upper Y limit}
+          }
+
+         parameter readout {
+            position 9
+            type _REAL
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_READOUT
+            prompt {Readout noise, RMS data numbers}
+          }
+
+         parameter photon {
+            position 10
+            type _REAL
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_PHOTON
+            prompt {Photons/data number}
+          }
+
+         parameter old {
+            type _LOGICAL
+            default FALSE
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Use old profile fit ?}
+          }
+
+         parameter npoly {
+            position 11
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Profile poly order}
+          }
+
+         parameter profit {
+            position 12
+            type IMAGE
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Profile file}
+          }
+
+         parameter thresh {
+            position 13
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Rejection threshold}
+          }
+
+         parameter nblock {
+            position 14
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Wavelength blocking factor}
+          }
+
+         parameter nmed {
+            position 15
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Width of median filter for sums}
+          }
+
+         parameter zaprats {
+            type _LOGICAL
+            default TRUE
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Do you want to reject cosmic rays ?}
+          }
+
+         parameter ratlo {
+            position 16
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Cosmic rat lower rejection threshold}
+          }
+
+         parameter rathi {
+            position 17
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Cosmic rat upper rejection threshold}
+          }
+
+         parameter eps {
+            position 18
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Fudge factor to prevent bad rejections}
+          }
+
+         parameter plot {
+            type _LOGICAL
+            default TRUE
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Do you want option of plots ?}
+          }
+
+         parameter device {
+            position 19
+            type _CHAR
+            default /xserve
+            vpath GLOBAL PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_DEVICE
+            prompt {Plot device}
+          }
+
+      }
+
+      action faker {
+
+         parameter template {
+            position 1
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {ASCII template file}
+          }
+
+         parameter seed {
+            position 2
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Seed integer}
+          }
+
+         parameter output {
+            position 3
+            type IMAGE
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Output image name}
+          }
+
+      }
+
+      action idtype {
+
+         parameter image {
+            position 1
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_IMAGE
+            prompt {Data frame}
+          }
+
+         parameter flat {
+            position 2
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_FLAT
+            prompt {Balance frame}
+          }
+
+         parameter trace {
+            type _LOGICAL
+            default FALSE
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Load a trace of spectrum distortion ?}
+          }
+
+         parameter track {
+            position 3
+            type IMAGE
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Distortion map file}
+          }
+
+         parameter xstart {
+            position 4
+            type _INTEGER
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_XSTART
+            prompt {Lower X limit}
+          }
+
+         parameter xend {
+            position 5
+            type _INTEGER
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_XEND
+            prompt {Upper X limit}
+          }
+
+         parameter ystart {
+            position 6
+            type _INTEGER
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_YSTART
+            prompt {Lower Y limit}
+          }
+
+         parameter yend {
+            position 7
+            type _INTEGER
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_YEND
+            prompt {Upper Y limit}
+          }
+
+         parameter nxwidth {
+            position 8
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Median filter width in X direction}
+          }
+
+         parameter nywidth {
+            position 9
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Median filter width in Y direction}
+          }
+
+         parameter tobjm {
+            position 10
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Multiplicative object threshold}
+          }
+
+         parameter tobja {
+            position 11
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Additive object threshold}
+          }
+
+         parameter tlinm {
+            position 12
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Multiplicative line threshold}
+          }
+
+         parameter tlina {
+            position 13
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Additive line threshold}
+          }
+
+         parameter flim {
+            position 14
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Flat/junk dividing limit}
+          }
+
+      }
+
+
+      action medprf {
+
+         parameter image {
+            position 1
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_IMAGE
+            prompt {Data frame}
+          }
+
+         parameter flat {
+            position 2
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_FLAT
+            prompt {Balance frame}
+          }
+
+         parameter trace {
+            type _LOGICAL
+            default FALSE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_TRACE
+            prompt {Load a trace of spectrum distortion ?}
+          }
+
+         parameter track {
+            position 3
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_TRACK
+            prompt {Distortion map file}
+          }
+
+         parameter profile {
+            position 4
+            type IMAGE
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Output profile}
+          }
+
+         parameter xstart {
+            position 5
+            type _INTEGER
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_XSTART
+            prompt {Lower X limit}
+          }
+
+         parameter xend {
+            position 6
+            type _INTEGER
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_XEND
+            prompt {Upper X limit}
+          }
+
+         parameter ystart {
+            position 7
+            type _INTEGER
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_YSTART
+            prompt {Lower Y limit}
+          }
+
+         parameter yend {
+            position 8
+            type _INTEGER
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_YEND
+            prompt {Upper Y limit}
+          }
+
+         parameter nwidth {
+            position 9
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Median filter width}
+          }
+
+         parameter method {
+            position 10
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {L(inear), Q(uadratic) or S(inc) rebinning?}
+          }
+
+      }
+
+      action noise {
+
+         parameter files {
+            position 1
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {File containing list of images or spectra}
+          }
+
+         parameter xstart {
+            position 2
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Lower X limit}
+          }
+
+         parameter xend {
+            position 3
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Upper X limit}
+          }
+
+         parameter ystart {
+            position 4
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Lower Y limit}
+          }
+
+         parameter yend {
+            position 5
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Upper Y limit}
+          }
+
+         parameter nxbox {
+            position 6
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {X size of boxes}
+          }
+
+         parameter nybox {
+            position 7
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Y size of boxes}
+          }
+
+         parameter device {
+            position 8
+            type _CHAR
+            default /xserve
+            vpath GLOBAL PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.DEVICE
+            prompt {Plot device}
+          }
+
+      }
+
+
+      action optext {
+         parameter image {
+            position 1
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_IMAGE
+            prompt {Data frame to process}
+          }
+
+         parameter flat {
+            position 2
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_FLAT
+            prompt {Balance factor frame}
+          }
+
+         parameter dload {
+            type _LOGICAL
+            default FALSE
+            vpath GLOBAL PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_DLOAD
+            prompt {Include a dark frame ?}
+          }
+
+         parameter dark {
+            position 3
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_DARK
+            prompt {Dark frame}
+          }
+
+         parameter region {
+            position 4
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_REGION
+            prompt {Object region input file}
+          }
+
+         parameter sky {
+            position 5
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_SKY
+            prompt {Sky fit input file}
+          }
+
+         parameter track {
+            position 6
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_TRACK
+            prompt {Distortion map file}
+          }
+
+         parameter fract {
+            position 7
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_FRACT
+            prompt {Fraction file}
+          }
+
+         parameter spect {
+            position 8
+            type IMAGE
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Spectrum output file}
+          }
+
+         parameter ystart {
+            position 9
+            type _INTEGER
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_YSTART
+            prompt {Lower Y limit}
+          }
+
+         parameter yend {
+            position 10
+            type _INTEGER
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_YEND
+            prompt {Upper Y limit}
+          }
+
+         parameter readout {
+            position 11
+            type _REAL
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_READOUT
+            prompt {Readout noise, RMS data numbers}
+          }
+
+         parameter photon {
+            position 12
+            type _REAL
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_PHOTON
+            prompt {Photons/data number}
+          }
+
+         parameter zaprats {
+            type _LOGICAL
+            default TRUE
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Do you want to reject cosmic rays ?}
+          }
+
+         parameter ratlo {
+            position 13
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Cosmic rat lower rejection threshold}
+          }
+
+         parameter rathi {
+            position 14
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Cosmic rat upper rejection threshold}
+          }
+
+         parameter eps {
+            position 15
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Fudge factor to prevent bad rejections}
+          }
+
+         parameter iave {
+            position 16
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Number of sky rows to average}
+          }
+
+         parameter plot {
+            type _LOGICAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Do you want to plot ?}
+          }
+
+         parameter device {
+            position 17
+            type _CHAR
+            default /xserve
+            vpath GLOBAL PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_DEVICE
+            prompt {Plot device}
+          }
+
+      }
+
+
+      action picstat {
+
+         parameter image {
+            position 1
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_IMAGE
+            prompt {Input data file}
+          }
+
+         parameter streg {
+            position 2
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Statistics region input file}
+          }
+
+         parameter clip {
+            position 3
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Sigma rejection threshold}
+          }
+
+         parameter plot {
+            type _LOGICAL
+            default TRUE
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Do you want histogram plot ?}
+          }
+
+         parameter device {
+            position 4
+            type _CHAR
+            default /xserve
+            vpath GLOBAL PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_DEVICE
+            prompt {Plot device}
+          }
+
+         parameter range {
+            position 5
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Sigma range for plot}
+          }
+
+         parameter nbin {
+            position 6
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Number of bins}
+          }
+
+         parameter pic_mean {
+            position 7
+            type _REAL
+            vpath DEFAULT
+            default 0
+            association ->GLOBAL.PIC_MEAN
+          }
+
+         parameter pic_median {
+            position 8
+            type _REAL
+            vpath DEFAULT
+            default 0
+            association ->GLOBAL.PIC_MEDIAN
+          }
+
+      }
+
+
+      action polfit {
+
+         parameter input {
+            position 1
+            type IMAGE
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Input spectrum}
+          }
+
+         parameter output {
+            position 2
+            type IMAGE
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Output fit spectrum}
+          }
+
+         parameter npoly {
+            position 3
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Number of poly fit coefficients}
+          }
+
+         parameter thrlo {
+            position 4
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Low reject threshold}
+          }
+
+         parameter thrhi {
+            position 5
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {High reject threshold}
+          }
+
+         parameter ncycle {
+            position 6
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Maximum number of reject cycles}
+          }
+
+         parameter plot {
+            type _LOGICAL
+            default TRUE
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Do you want to plot the fit ?}
+          }
+
+         parameter device {
+            position 7
+            type _CHAR
+            default /xserve
+            vpath GLOBAL PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.DEVICE
+            prompt {Plot device}
+          }
+
+         parameter auto {
+            type _LOGICAL
+            default TRUE
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Do you want automatic choice of scale ?}
+          }
+
+         parameter limits {
+            position 8
+            type _REAL
+            vpath DYNAMIC PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Plot y limits}
+          }
+
+      }
+
+      action pplot {
+
+         parameter image {
+            position 1
+            type IMAGE
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Data frame to plot}
+          }
+
+         parameter xstart {
+            position 2
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Lower X limit of region}
+          }
+
+         parameter xend {
+            position 3
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Upper X limit of region}
+          }
+
+         parameter ystart {
+            position 4
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Lower Y limit of region}
+          }
+
+         parameter yend {
+            position 5
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Upper Y limit of region}
+          }
+
+         parameter dirn {
+            position 6
+            type _CHAR
+            default X
+            vpath CURRENT PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Direction to plot slice}
+          }
+
+         parameter auto {
+            type _LOGICAL
+            default TRUE
+            vpath CURRENT PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Set plot limits automatically?}
+          }
+
+         parameter limits {
+            position 7
+            type _REAL
+            vpath DYNAMIC PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Plot limits (X1,X2,Y1,Y2)}
+          }
+
+         parameter device {
+            position 8
+            type _CHAR
+            default /xserve
+            vpath GLOBAL DEFAULT PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.DEVICE
+            prompt {Plot device}
+          }
+
+      }
+
+      action profit {
+
+         parameter image {
+            position 1
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_IMAGE
+            prompt {Data frame}
+          }
+
+         parameter flat {
+            position 2
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_FLAT
+            prompt {Balance factor frame}
+          }
+
+         parameter dload {
+            type _LOGICAL
+            default FALSE
+            vpath GLOBAL PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_DLOAD
+            prompt {Include a dark frame ?}
+          }
+
+         parameter dark {
+            position 3
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_DARK
+            prompt {Dark frame}
+          }
+
+         parameter region {
+            position 4
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_REGION
+            prompt {Object region input file}
+          }
+
+         parameter sky {
+            position 5
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_SKY
+            prompt {Sky fit input file}
+          }
+
+         parameter track {
+            position 6
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_TRACK
+            prompt {Distortion map file}
+          }
+
+         parameter fract {
+            position 7
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_FRACT
+            prompt {Fraction output file}
+          }
+
+         parameter ystart {
+            position 8
+            type _INTEGER
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_YSTART
+            prompt {Lower Y limit}
+          }
+
+         parameter yend {
+            position 9
+            type _INTEGER
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_YEND
+            prompt {Upper Y limit}
+          }
+
+         parameter readout {
+            position 10
+            type _REAL
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_READOUT
+            prompt {Readout noise, RMS data numbers}
+          }
+
+         parameter photon {
+            position 11
+            type _REAL
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_PHOTON
+            prompt {Photons/data number}
+          }
+
+         parameter npoly {
+            position 12
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Profile poly order}
+          }
+
+         parameter sizex {
+            position 13
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {X separation of polynomials}
+          }
+
+         parameter thresh {
+            position 14
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Rejection threshold}
+          }
+
+         parameter nslow {
+            position 15
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Maximum number of one-by-one rejections}
+          }
+
+         parameter badval {
+            position 16
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Bad pixel limit (reject above)}
+          }
+
+         parameter nblock {
+            position 17
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Wavelength blocking factor}
+          }
+
+         parameter nmed {
+            position 18
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Width of median filter for sums}
+          }
+
+         parameter plot {
+            type _LOGICAL
+            default TRUE
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Do you want to plot ?}
+          }
+
+         parameter device {
+            position 19
+            type _CHAR
+            default /xserve
+            vpath GLOBAL PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_DEVICE
+            prompt {Plot device}
+          }
+
+      }
+
+
+
+
+
+
+
+
+
+
+      action recomp {
+
+         parameter fract {
+            position 1
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_FRACT
+            prompt {Fraction file to recompute}
+          }
+
+         parameter track {
+            position 2
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_TRACK
+            prompt {Distortion map file}
+          }
+
+         parameter ystart {
+            position 3
+            type _INTEGER
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_YSTART
+            prompt {Lower Y limit}
+          }
+
+         parameter yend {
+            position 4
+            type _INTEGER
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_YEND
+            prompt {Upper Y limit}
+          }
+
+      }
+
+
+
+
+      action regpic {
+
+         parameter image {
+            position 1
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_IMAGE
+            prompt {Data frame}
+          }
+
+         parameter flat {
+            position 2
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_FLAT
+            prompt {Balance frame}
+          }
+
+         parameter dload {
+            type _LOGICAL
+            default FALSE
+            vpath GLOBAL PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_DLOAD
+            prompt {Include a dark frame ?}
+          }
+
+         parameter dark {
+            position 3
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_DARK
+            prompt {Dark frame}
+          }
+
+         parameter trace {
+            type _LOGICAL
+            default FALSE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_TRACE
+            prompt {Load a trace of spectrum distortion ?}
+          }
+
+         parameter track {
+            position 4
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_TRACK
+            prompt {Distortion map file}
+          }
+
+         parameter region {
+            position 5
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_REGION
+            prompt {Sky region output file}
+          }
+
+         parameter xstart {
+            position 6
+            type _INTEGER
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_XSTART
+            prompt {Lower X limit}
+          }
+
+         parameter xend {
+            position 7
+            type _INTEGER
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_XEND
+            prompt {Upper X limit}
+          }
+
+         parameter ystart {
+            position 8
+            type _INTEGER
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_YSTART
+            prompt {Lower Y limit}
+          }
+
+         parameter yend {
+            position 9
+            type _INTEGER
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_YEND
+            prompt {Upper Y limit}
+          }
+
+         parameter grey {
+            type _LOGICAL
+            default FALSE
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Do you want grey scale plot ?}
+          }
+
+         parameter auto {
+            type _LOGICAL
+            default TRUE
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Do you want automatic choice of scale ?}
+          }
+
+         parameter limits {
+            position 10
+            type _REAL
+            vpath DYNAMIC PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Plot limits}
+          }
+
+         parameter nwidth {
+            position 11
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Median filter width}
+          }
+
+         parameter device {
+            position 12
+            type _CHAR
+            default /xserve
+            vpath GLOBAL PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_DEVICE
+            prompt {Plot device}
+          }
+
+         parameter method {
+            position 13
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Select regions with C(ursor) or T(erminal)?}
+          }
+
+      }
+
+      action skew {
+
+         parameter image {
+            position 1
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_IMAGE
+            prompt {Data frame}
+          }
+
+         parameter track {
+            position 2
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_TRACK
+            prompt {Distortion map file}
+          }
+
+         parameter skewed {
+            position 3
+            type IMAGE
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Skewed output frame}
+          }
+
+         parameter ystart {
+            position 4
+            type _INTEGER
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_YSTART
+            prompt {Lower Y limit}
+          }
+
+         parameter yend {
+            position 5
+            type _INTEGER
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_YEND
+            prompt {Upper Y limit}
+          }
+
+         parameter remove {
+            type _LOGICAL
+            default TRUE
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Remove distortion  ? (else add)}
+          }
+
+         parameter rebin {
+            position 6
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {L(inear), Q(uadratic) or S(inc) rebinning ?}
+          }
+
+      }
+
+      action skyfit {
+
+         parameter image {
+            position 1
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_IMAGE
+            prompt {Data frame}
+          }
+
+         parameter flat {
+            position 2
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_FLAT
+            prompt {Balance frame}
+          }
+
+         parameter dload {
+            type _LOGICAL
+            default FALSE
+            vpath GLOBAL PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_DLOAD
+            prompt {Include a dark frame ?}
+          }
+
+         parameter dark {
+            position 3
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_DARK
+            prompt {Dark frame}
+          }
+
+         parameter region {
+            position 4
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_REGION
+            prompt {Sky region input file}
+          }
+
+         parameter trace {
+            type _LOGICAL
+            default FALSE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_TRACE
+            prompt {Load a trace of spectrum distortion ?}
+          }
+
+         parameter track {
+            position 5
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_TRACK
+            prompt {Distortion map file}
+          }
+
+         parameter sky {
+            position 6
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_SKY
+            prompt {Sky fit output file}
+          }
+
+         parameter xstart {
+            position 7
+            type _INTEGER
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_XSTART
+            prompt {Lower X limit}
+          }
+
+         parameter xend {
+            position 8
+            type _INTEGER
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_XEND
+            prompt {Upper X limit}
+          }
+
+         parameter ystart {
+            position 9
+            type _INTEGER
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_YSTART
+            prompt {Lower Y limit}
+          }
+
+         parameter yend {
+            position 10
+            type _INTEGER
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_YEND
+            prompt {Upper Y limit}
+          }
+
+         parameter npoly {
+            position 11
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Number of terms for the sky fit}
+          }
+
+         parameter thresh {
+            position 12
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Threshold for sky fit}
+          }
+
+         parameter readout {
+            position 13
+            type _REAL
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_READOUT
+            prompt {Readout noise (RMS ADU)}
+          }
+
+         parameter photon {
+            position 14
+            type _REAL
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_PHOTON
+            prompt {Detected photons/ADU}
+          }
+
+      }
+
+      action skymov {
+
+         parameter image {
+            position 1
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_IMAGE
+            prompt {Data frame}
+          }
+
+         parameter flat {
+            position 2
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_FLAT
+            prompt {Balance frame}
+          }
+
+         parameter region {
+            position 3
+            type IMAGE
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Sky region input file}
+          }
+
+         parameter trace {
+            type _LOGICAL
+            default FALSE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_TRACE
+            prompt {Load a trace of spectrum distortion ?}
+          }
+
+         parameter track {
+            position 4
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_TRACK
+            prompt {Distortion map file}
+          }
+
+         parameter outsky {
+            position 5
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_REGION
+            prompt {Sky region output file}
+          }
+
+         parameter xstart {
+            position 6
+            type _INTEGER
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_XSTART
+            prompt {Lower X limit}
+          }
+
+         parameter xend {
+            position 7
+            type _INTEGER
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_XEND
+            prompt {Upper X limit}
+          }
+
+         parameter ystart {
+            position 8
+            type _INTEGER
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_YSTART
+            prompt {Lower Y limit}
+          }
+
+         parameter yend {
+            position 9
+            type _INTEGER
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_YEND
+            prompt {Upper Y limit}
+          }
+
+         parameter slo {
+            position 10
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Lower search limit}
+          }
+
+         parameter shi {
+            position 11
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Upper search limit}
+          }
+
+         parameter fwhm {
+            position 12
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Full width half maximum for gaussian X-corr}
+          }
+
+         parameter xpos {
+            position 13
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Reference position of object}
+          }
+
+         parameter npoly {
+            position 14
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Number of poly terms}
+          }
+
+         parameter thrlo {
+            position 15
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Low bad sky threshold}
+          }
+
+         parameter thrhi {
+            position 16
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {High bad sky threshold}
+          }
+
+         parameter nmin {
+            position 17
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Minimum bad pixel block}
+          }
+
+         parameter median {
+            type _LOGICAL
+            default TRUE
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Use median for profile (else average) ?}
+          }
+
+         parameter nwidth {
+            position 18
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Width of median filter (odd)}
+          }
+
+      }
+
+
+
+
+      action splfit {
+
+         parameter input {
+            position 1
+            type IMAGE
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Input spectrum}
+          }
+
+         parameter output {
+            position 2
+            type IMAGE
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Output fit spectrum}
+          }
+
+         parameter nspline {
+            position 3
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Number of splines}
+          }
+
+         parameter thrlo {
+            position 4
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Low reject threshold}
+          }
+
+         parameter thrhi {
+            position 5
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {High reject threshold}
+          }
+
+         parameter ncycle {
+            position 6
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Maximum number of reject cycles}
+          }
+
+         parameter plot {
+            type _LOGICAL
+            default TRUE
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Do you want to plot the fit ?}
+          }
+
+         parameter device {
+            position 7
+            type _CHAR
+            default /xserve
+            vpath GLOBAL PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.DEVICE
+            prompt {Plot device}
+          }
+
+         parameter auto {
+            type _LOGICAL
+            default TRUE
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Do you want automatic choice of scale ?}
+          }
+
+         parameter limits {
+            position 8
+            type _REAL
+            vpath DYNAMIC PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Plot y limits}
+          }
+
+      }
+
+
+      action track {
+
+         parameter image {
+            position 1
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_IMAGE
+            prompt {Data frame to process}
+          }
+
+         parameter flat {
+            position 2
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_FLAT
+            prompt {Balance frame}
+          }
+
+         parameter old {
+            type _LOGICAL
+            default FALSE
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Do you want to update an old fit ?}
+          }
+
+         parameter track {
+            position 3
+            type IMAGE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_TRACK
+            prompt {File for track coefficients}
+          }
+
+         parameter nspline {
+            position 4
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Number of splines}
+          }
+
+         parameter order {
+            position 5
+            type _INTEGER
+            vpath CURRENT DYNAMIC
+            ppath CURRENT DYNAMIC
+            prompt {Order of splines}
+          }
+
+         parameter npoly {
+            position 6
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Order of polynomial fit}
+          }
+
+         parameter nfpoly {
+            position 7
+            type _INTEGER
+            vpath CURRENT DYNAMIC
+            ppath CURRENT DYNAMIC
+            prompt {Order of plot polynomial}
+          }
+
+         parameter xstart {
+            position 8
+            type _INTEGER
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_XSTART
+            prompt {Lower X limit}
+          }
+
+         parameter xend {
+            position 9
+            type _INTEGER
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_XEND
+            prompt {Upper X limit}
+          }
+
+         parameter ystart {
+            position 10
+            type _INTEGER
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_YSTART
+            prompt {Lower Y limit}
+          }
+
+         parameter yend {
+            position 11
+            type _INTEGER
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_YEND
+            prompt {Upper Y limit}
+          }
+
+         parameter tweak {
+            type _LOGICAL
+            default FALSE
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Do you want to tweak the old trace ?}
+          }
+
+         parameter pick {
+            type _LOGICAL
+            default FALSE
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Pick spectrum point automatically ?}
+          }
+
+         parameter nobj {
+            position 12
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Number of objects}
+          }
+
+         parameter iobj {
+            position 13
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Which object (counting from left)}
+          }
+
+         parameter iblock {
+            position 14
+            type _INTEGER
+            vpath CURRENT DYNAMIC
+            ppath CURRENT DYNAMIC
+            prompt {Number of rows for initial position}
+          }
+
+         parameter ypos {
+            position 15
+            type _REAL
+            vpath CURRENT DYNAMIC
+            ppath CURRENT DYNAMIC
+            prompt {What Y position}
+          }
+
+         parameter offset {
+            position 16
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Offset to add to locate tweaked track}
+          }
+
+         parameter fchange {
+            position 17
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Maximum shift during first tweak if TWEAK}
+          }
+
+         parameter plot {
+            type _LOGICAL
+            default FALSE
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Do you want to plot ?}
+          }
+
+         parameter auto {
+            type _LOGICAL
+            default TRUE
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Scale frame plot automatically?}
+          }
+
+         parameter device {
+            position 18
+            type _CHAR
+            default /xserve
+            vpath GLOBAL PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_DEVICE
+            prompt {Plot device}
+          }
+
+         parameter limits {
+            position 19
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Frame plot levels}
+          }
+
+         parameter width {
+            position 20
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Width of window}
+          }
+
+         parameter esig {
+            position 21
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {FWHM of gaussian}
+          }
+
+         parameter fwhm {
+            position 22
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {FWHM of profile}
+          }
+
+         parameter readout {
+            position 23
+            type _REAL
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_READOUT
+            prompt {Readout noise (RMS ADU)}
+          }
+
+         parameter photon {
+            position 24
+            type _REAL
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.PAM_PHOTON
+            prompt {Number of ADU/count}
+          }
+
+         parameter clip {
+            position 25
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Sigma rejection threshold}
+          }
+
+         parameter nblock {
+            position 26
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Block size}
+          }
+
+         parameter psig {
+            position 27
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Block cleaner threshold}
+          }
+
+         parameter tcycle {
+            position 28
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Number of tweak cycles}
+          }
+
+         parameter change {
+            position 29
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Maximum shift during a tweak}
+          }
+
+      }
+   }
+
+   command debias {
+       obey { perl $PAMELA_DIR/debias.pl }
+   }
+
+    command fixhead {
+        obey { perl $PAMELA_DIR/fixhead.pl }
+    }
+
+    command fixrun {
+        obey { $PAMELA_DIR/fixrun.csh }
+    }
+
+    command whtdiv {
+        obey { $PAMELA_DIR/whtdiv.csh }
+    }
+
+    command makebias {
+        obey { $PAMELA_DIR/makebias.csh }
+    }
+
+    command listformat {
+        obey { $PAMELA_DIR/listformat.csh }
+    }
+
+    command uniqformat {
+        obey { $PAMELA_DIR/uniqformat.csh }
+    }
+
+    command loopdisplay {
+        obey { $PAMELA_DIR/loopdisplay.csh }
+    }
+
+    command reduce {
+        obey { perl $PAMELA_DIR/reduce.pl }
+    }
+
+    command renumber {
+        obey { perl $PAMELA_DIR/renumber.pl }
+    }
+
+    command repet {
+        obey { perl $PAMELA_DIR/repet.pl }
+    }
+
+    command rotate {
+        obey { perl $PAMELA_DIR/rotate.pl }
+    }
+
+    command shiftaux {
+        obey { $PAMELA_DIR/shiftaux.py }
+    }
+
+    command loganal {
+        obey { perl $PAMELA_DIR/loganal.pl }
+    }
+
+    command ultradas {
+        obey { $PAMELA_DIR/ultradas.csh }
+    }
+
+    command splitbysource {
+        obey { perl $PAMELA_DIR/splitbysource.pl }
+    }
+
+    command lsnosdf {
+        obey { $PAMELA_DIR/lsnosdf.csh }
+    }
+
+    command ls1d {
+        obey { $PAMELA_DIR/ls1d.csh }
+    }
+
+    display {
+
+        Welcome to pamela (Version @PACKAGE_VERSION@)
+
+    }
+
+
+}

@@ -34,7 +34,7 @@
 * 'fixhead', 'expo', and 'root' have been retired.
 *
 *PAMELA
-      SUBROUTINE PAMELA(STATUS)
+      SUBROUTINE PAMELA_MON(STATUS)
       INCLUDE 'SAE_PAR'
       INCLUDE 'PAR_PAR'
       INTEGER STATUS
