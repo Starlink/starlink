@@ -105,7 +105,6 @@ typedef struct AstXmlChan {
    AstXmlParent *container;    /* XmlParent to which content will be added */
    AstXmlDocument *readcontext;/* XmlDocument giving context for current read */
    int write_isa;              /* Is the next "isA" really needed? */
-   int xmlindent;              /* Indentat output? */
    int xmllength;              /* Buffer length */
    int xmlformat;              /* Output format to use when writing */
    int formatdef;              /* Default format */
@@ -128,11 +127,6 @@ typedef struct AstXmlChanVtab {
    AstClassIdentifier id;
 
 /* Properties (e.g. methods) specific to this class. */
-   int (* GetXmlIndent)( AstXmlChan *, int * );
-   int (* TestXmlIndent)( AstXmlChan *, int * );
-   void (* ClearXmlIndent)( AstXmlChan *, int * );
-   void (* SetXmlIndent)( AstXmlChan *, int, int * );
-
    int (* GetXmlLength)( AstXmlChan *, int * );
    int (* TestXmlLength)( AstXmlChan *, int * );
    void (* ClearXmlLength)( AstXmlChan *, int * );
@@ -214,11 +208,6 @@ void astInitXmlChanGlobals_( AstXmlChanGlobals * );
 /* Prototypes for member functions. */
 /* -------------------------------- */
 # if defined(astCLASS)           /* Protected */
-int astGetXmlIndent_( AstXmlChan *, int * );
-int astTestXmlIndent_( AstXmlChan *, int * );
-void astClearXmlIndent_( AstXmlChan *, int * );
-void astSetXmlIndent_( AstXmlChan *, int, int * );
-
 int astGetXmlLength_( AstXmlChan *, int * );
 int astTestXmlLength_( AstXmlChan *, int * );
 void astClearXmlLength_( AstXmlChan *, int * );
@@ -285,11 +274,6 @@ astINVOKE(O,astLoadXmlChan_(mem,size,vtab,name,astCheckChannel(channel),STATUS_P
    to the wrong sort of Object is supplied. */
 
 #if defined(astCLASS)            /* Protected */
-
-#define astClearXmlIndent(this) astINVOKE(V,astClearXmlIndent_(astCheckXmlChan(this),STATUS_PTR))
-#define astGetXmlIndent(this) astINVOKE(V,astGetXmlIndent_(astCheckXmlChan(this),STATUS_PTR))
-#define astSetXmlIndent(this,xmlindent) astINVOKE(V,astSetXmlIndent_(astCheckXmlChan(this),xmlindent,STATUS_PTR))
-#define astTestXmlIndent(this) astINVOKE(V,astTestXmlIndent_(astCheckXmlChan(this),STATUS_PTR))
 
 #define astClearXmlLength(this) astINVOKE(V,astClearXmlLength_(astCheckXmlChan(this),STATUS_PTR))
 #define astGetXmlLength(this) astINVOKE(V,astGetXmlLength_(astCheckXmlChan(this),STATUS_PTR))

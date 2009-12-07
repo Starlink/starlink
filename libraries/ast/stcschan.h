@@ -95,7 +95,6 @@ typedef struct AstStcsChan {
    int stcsarea;                /* Read the STC CoordinatesArea? */
    int stcscoords;              /* Read the STC Coordinates? */
    int stcsprops;               /* Read the STC-S properties? */
-   int stcsindent;              /* Indentat output? */
    int stcslength;              /* Line length */
 } AstStcsChan;
 
@@ -127,11 +126,6 @@ typedef struct AstStcsChanVtab {
    int (* TestStcsProps)( AstStcsChan *, int * );
    void (* ClearStcsProps)( AstStcsChan *, int * );
    void (* SetStcsProps)( AstStcsChan *, int, int * );
-
-   int (* GetStcsIndent)( AstStcsChan *, int * );
-   int (* TestStcsIndent)( AstStcsChan *, int * );
-   void (* ClearStcsIndent)( AstStcsChan *, int * );
-   void (* SetStcsIndent)( AstStcsChan *, int, int * );
 
    int (* GetStcsLength)( AstStcsChan *, int * );
    int (* TestStcsLength)( AstStcsChan *, int * );
@@ -217,11 +211,6 @@ int astTestStcsProps_( AstStcsChan *, int * );
 void astClearStcsProps_( AstStcsChan *, int * );
 void astSetStcsProps_( AstStcsChan *, int, int * );
 
-int astGetStcsIndent_( AstStcsChan *, int * );
-int astTestStcsIndent_( AstStcsChan *, int * );
-void astClearStcsIndent_( AstStcsChan *, int * );
-void astSetStcsIndent_( AstStcsChan *, int, int * );
-
 int astGetStcsLength_( AstStcsChan *, int * );
 int astTestStcsLength_( AstStcsChan *, int * );
 void astClearStcsLength_( AstStcsChan *, int * );
@@ -305,11 +294,6 @@ astINVOKE(V,astGetStcsProps_(astCheckStcsChan(this),STATUS_PTR))
 astINVOKE(V,astSetStcsProps_(astCheckStcsChan(this),value,STATUS_PTR))
 #define astTestStcsProps(this) \
 astINVOKE(V,astTestStcsProps_(astCheckStcsChan(this),STATUS_PTR))
-
-#define astClearStcsIndent(this) astINVOKE(V,astClearStcsIndent_(astCheckStcsChan(this),STATUS_PTR))
-#define astGetStcsIndent(this) astINVOKE(V,astGetStcsIndent_(astCheckStcsChan(this),STATUS_PTR))
-#define astSetStcsIndent(this,stcsindent) astINVOKE(V,astSetStcsIndent_(astCheckStcsChan(this),stcsindent,STATUS_PTR))
-#define astTestStcsIndent(this) astINVOKE(V,astTestStcsIndent_(astCheckStcsChan(this),STATUS_PTR))
 
 #define astClearStcsLength(this) astINVOKE(V,astClearStcsLength_(astCheckStcsChan(this),STATUS_PTR))
 #define astGetStcsLength(this) astINVOKE(V,astGetStcsLength_(astCheckStcsChan(this),STATUS_PTR))

@@ -116,7 +116,6 @@ f     encodings and the internal ASCII encoding. If no such routines
 *
 *     - StcsArea: Return the CoordinateArea component after reading an STC-S?
 *     - StcsCoords: Return the Coordinates component after reading an STC-S?
-*     - StcsIndent: Controls output of indentation and line feeds
 *     - StcsLength: Controls output buffer length
 *     - StcsProps: Return the STC-S properties after reading an STC-S?
 
@@ -264,6 +263,7 @@ static const char *(* parent_getattrib)( AstObject *, const char *, int * );
 static int (* parent_testattrib)( AstObject *, const char *, int * );
 static void (* parent_clearattrib)( AstObject *, const char *, int * );
 static void (* parent_setattrib)( AstObject *, const char *, int * );
+static int (* parent_getindent)( AstChannel *, int * );
 
 /* Address of this static variable is used as a unique identifier for
    member of this class. */
@@ -328,6 +328,7 @@ static char *SourceWrap( const char *(*)( void ), int * );
 static const char *GetNextWord( AstStcsChan *, WordContext *, int * );
 static const char *ReadSpaceArgs( AstStcsChan *, const char *, int, int, WordContext *, AstKeyMap *, int * );
 static double *BoxCorners( AstFrame *, const double[2], const double[2], int * );
+static int GetIndent( AstChannel *, int * );
 static int GetRegionProps( AstStcsChan *, AstRegion *, AstKeyMap *, int, int, double, int, int * );
 static int SpaceId( const char *, int * );
 static int Write( AstChannel *, AstObject *, int * );
@@ -365,12 +366,6 @@ static int TestStcsLength( AstStcsChan *, int * );
 static void ClearStcsLength( AstStcsChan *, int * );
 static void SetStcsLength( AstStcsChan *, int, int * );
 static int GetStcsLength( AstStcsChan *, int * );
-
-static int TestStcsIndent( AstStcsChan *, int * );
-static void ClearStcsIndent( AstStcsChan *, int * );
-static void SetStcsIndent( AstStcsChan *, int, int * );
-static int GetStcsIndent( AstStcsChan *, int * );
-
 
 /* Member functions. */
 /* ================= */
@@ -687,9 +682,6 @@ static void ClearAttrib( AstObject *this_object, const char *attrib, int *status
    } else if ( !strcmp( attrib, "stcsprop" ) ) {
       astClearStcsProps( this );
 
-   } else if ( !strcmp( attrib, "stcsindent" ) ) {
-      astClearStcsIndent( this );
-
    } else if ( !strcmp( attrib, "stcslength" ) ) {
       astClearStcsLength( this );
 
@@ -928,15 +920,6 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
          result = getattrib_buff;
       }
 
-/* StcsIndent */
-/* --------- */
-   } else if ( !strcmp( attrib, "stcsindent" ) ) {
-      ival = astGetStcsIndent( this );
-      if ( astOK ) {
-         (void) sprintf( getattrib_buff, "%d", ival );
-         result = getattrib_buff;
-      }
-
 /* StcsLength */
 /* --------- */
    } else if ( !strcmp( attrib, "stcslength" ) ) {
@@ -1088,6 +1071,45 @@ static void GetFmt( const char *key, AstKeyMap *props, int i, int defdigs,
    } else {
       sprintf( fmt, "%%.%df", after );
    }
+}
+
+static int GetIndent( AstChannel *this, int *status ) {
+/*
+*  Name:
+*     GetIndent
+
+*  Purpose:
+*     Get the value of the Indent attribute for a StcsChan.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "stcschan.h"
+*     int GetIndent( AstChannel *this, int *status )
+
+*  Class Membership:
+*     StcsChan member function (over-rides the protected astGetIndent
+*     method inherited from the Channel class).
+
+*  Description:
+*     This function returns the value of the Indent attribute, supplying
+*     a default value appropriate to an StcsChan.
+
+*  Parameters:
+*     this
+*        Pointer to the StcsChan.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     - The Indent value to use.
+
+*/
+
+/* If the attribute is set, return its value. Otherwise return a value of
+   zero. */
+   return astTestIndent( this ) ? (*parent_getindent)( this, status ) : 0;
 }
 
 static const char *GetNextWord( AstStcsChan *this, WordContext *con, 
@@ -1763,11 +1785,6 @@ void astInitStcsChanVtab_(  AstStcsChanVtab *vtab, const char *name, int *status
    vtab->SetStcsProps = SetStcsProps;
    vtab->TestStcsProps = TestStcsProps;
 
-   vtab->SetStcsIndent = SetStcsIndent;
-   vtab->ClearStcsIndent = ClearStcsIndent;
-   vtab->TestStcsIndent = TestStcsIndent;
-   vtab->GetStcsIndent = GetStcsIndent;
-
    vtab->SetStcsLength = SetStcsLength;
    vtab->ClearStcsLength = ClearStcsLength;
    vtab->TestStcsLength = TestStcsLength;
@@ -1789,6 +1806,9 @@ void astInitStcsChanVtab_(  AstStcsChanVtab *vtab, const char *name, int *status
 
    channel->Write = Write;
    channel->Read = Read;
+
+   parent_getindent = channel->GetIndent;
+   channel->GetIndent = GetIndent;
 
 /* Declare the Dump function for this class. There is no destructor or
    copy constructor. */
@@ -5232,13 +5252,6 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
                && ( nc >= len ) ) {
       astSetStcsProps( this, ival );
 
-/* StcsIndent */
-/* ----------*/
-   } else if ( nc = 0,
-        ( 1 == astSscanf( setting, "stcsindent= %d %n", &ival, &nc ) )
-        && ( nc >= len ) ) {
-      astSetStcsIndent( this, ival );
-
 /* StcsLength */
 /* ----------*/
    } else if ( nc = 0,
@@ -5838,9 +5851,6 @@ static int TestAttrib( AstObject *this_object, const char *attrib, int *status )
    } else if ( !strcmp( attrib, "stcsprops" ) ) {
       result = astTestStcsProps( this );
 
-   } else if ( !strcmp( attrib, "stcsindent" ) ) {
-      result = astTestStcsIndent( this );
-
    } else if ( !strcmp( attrib, "stcslength" ) ) {
       result = astTestStcsLength( this );
 
@@ -6130,7 +6140,7 @@ static void WriteProps( AstStcsChan *this, AstKeyMap *props, int *status ){
 
 /* See if indentation and new-lines are to be added to the output text to
    make it look pretty. */
-   pretty = astGetStcsIndent( this );
+   pretty = astGetIndent( this );
 
 /* If so, get the line length to use, and initialise the number of
    remaining characters in the current output line. */
@@ -7723,65 +7733,6 @@ astMAKE_TEST(StcsChan,StcsProps,( this->stcsprops != -INT_MAX ))
 /*
 *att++
 *  Name:
-*     StcsIndent
-
-*  Purpose:
-*     Controls indentation and line splitting of output text.
-
-*  Type:
-*     Public attribute.
-
-*  Synopsis:
-*     Integer (boolean).
-
-*  Description:
-*     This attribute controls how the STC-S text is written out to the
-*     sink function when writing an AST object to an StcsChan. If it is
-*     zero (the default) the entire STC-S description is written out by a
-*     single invocation of the sink function. The text supplied to the
-*     sink function will not contain any linefeed characters, and each
-*     pair of adjacent words will be separated by a single space. The
-*     text may thus be arbitrarily large and the StcsLength attribute is 
-*     ignored.
-*
-*     If StcsIndent is non-zero, then the text is written out via
-*     multiple calls to the sink function, each call corresponding to a
-*     single "line" of text (although no line feed characters will be
-*     inserted by AST). The complete STC-S description is broken into
-*     lines so that:
-*
-*     - the line length specified by attribute StcsLength is not exceeded
-*     - each sub-phrase (time, space, etc.) starts on a new line
-*     - each argument in a compound spatial region starts on a new line
-*
-*     If this causes a sub-phrase to extend to two or more lines, then the 
-*     second and subsequent lines will be indented by three spaces compared 
-*     to the first line. In addition, lines within a compound spatial region
-*     will have extra indentation to highlight the nesting produced by the 
-*     parentheses. Each new level of nesting will be indented by a further 
-*     three spaces.
-f
-f     Note, the default value of zero is unlikely to be appropriate when
-f     an StcsChan is used within Fortran code. In this case, StcsIndent
-f     should usually be set non-zero, and the StcsLength attribute set to 
-f     the size of the CHARACTER variable used to 
-f     receive the text returned by AST_GETLINE within the sink function.
-f     This avoids the possibility of long lines being truncated invisibly
-f     within AST_GETLINE.
-
-*  Applicability:
-*     StcsChan
-*        All StcsChans have this attribute.
-*att--
-*/
-astMAKE_CLEAR(StcsChan,StcsIndent,stcsindent,-1)
-astMAKE_GET(StcsChan,StcsIndent,int,0,(this->stcsindent == -1 ? 0 : this->stcsindent))
-astMAKE_SET(StcsChan,StcsIndent,int,stcsindent,( value ? 1 : 0 ))
-astMAKE_TEST(StcsChan,StcsIndent,( this->stcsindent != -1 ))
-
-/*
-*att++
-*  Name:
 *     StcsLength
 
 *  Purpose:
@@ -7796,9 +7747,9 @@ astMAKE_TEST(StcsChan,StcsIndent,( this->stcsindent != -1 ))
 *  Description:
 *     This attribute specifies the maximum length to use when writing out 
 *     text through the sink function supplied when the StcsChan was created.
-*     It is ignored if the StcsIndent attribute is zero (in which case
-*     the text supplied to the sink function can be of any length). The
-*     default value is 70.
+*     It is ignored if the Indent attribute is zero (in which case the text 
+*     supplied to the sink function can be of any length). The default value 
+*     is 70.
 *
 *     The number of characters in each string written out through the sink 
 *     function will not usually be greater than the value of this attribute 
@@ -7810,7 +7761,7 @@ f     Note, the default value of zero is unlikely to be appropriate when
 f     an StcsChan is used within Fortran code. In this case, StcsLength
 f     should usually be set to the size of the CHARACTER variable used to 
 f     receive the text returned by AST_GETLINE within the sink function.
-f     In addition, the StcsIndent attribute should be set non-zero. This 
+f     In addition, the Indent attribute should be set non-zero. This 
 f     avoids the possibility of long lines being truncated invisibly
 f     within AST_GETLINE.
 
@@ -7910,12 +7861,6 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
    astWriteInt( channel, "StcsProps", set, 0, ival,
                 ival ? "Read the STC-S properties" :
                        "Do not read the STC-S properties" );
-
-/* StcsIndent */
-/* ---------- */
-      set = TestStcsIndent( this, status );
-      ival = set ? GetStcsIndent( this, status ) : astGetStcsIndent( this );
-      astWriteInt( channel, "StcsInd", set, 0, ival, "STC-S indentation" );
 
 /* StcsLength */
 /* ---------- */
@@ -8541,7 +8486,6 @@ AstStcsChan *astInitStcsChan_( void *mem, size_t size, int init,
       new->stcsarea = -INT_MAX;
       new->stcscoords = -INT_MAX;
       new->stcsprops = -INT_MAX;
-      new->stcsindent = -1;
       new->stcslength = -INT_MAX;
 
 /* If an error occurred, clean up by deleting the new object. */
@@ -8692,10 +8636,6 @@ AstStcsChan *astLoadStcsChan_( void *mem, size_t size,
 /* ---------- */
       new->stcsprops = astReadInt( channel, "stcsprops", -INT_MAX );
       if ( TestStcsProps( new, status ) ) SetStcsProps( new, new->stcsprops, status );
-
-/* StcsIndent */
-/* ---------- */
-      new->stcsindent = astReadInt( channel, "stcsind", -1 );
 
 /* StcsLength */
 /* ---------- */

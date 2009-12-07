@@ -21883,6 +21883,17 @@ current version):
 \item The StcsChan class now ignores case when reading STC-S phrases (except
 that units strings are still case sensitive).
 
+\item The Channel class now has an Indent attribute that controls indentation 
+in the text created by 
+c+
+astWrite.
+c-
+f+
+AST\_WRITE.
+f-
+The StcsIndent and XmlIndent attributes have been removed.
+
+
 \end{enumerate}
 
 Programs which are statically linked will need to be re-linked in

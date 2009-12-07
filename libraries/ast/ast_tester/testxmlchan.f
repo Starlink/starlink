@@ -207,7 +207,7 @@
       ifile = ifil
       filelen( ifil ) = 0
 
-      ch = ast_xmlchan( ast_null, sink, 'xmlindent=1,comment=1', 
+      ch = ast_xmlchan( ast_null, sink, 'indent=1,comment=1', 
      :                  status )
       call ast_seti( ch, 'xmllength', linelen, status )
       call ast_setc( ch, 'xmlformat', fmt, status )

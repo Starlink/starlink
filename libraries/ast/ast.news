@@ -19,6 +19,10 @@ Main Changes in this Version
 - The StcsChan class now ignores case when reading STC-S phrases (except
 that units strings are still case sensitive).
 
+- The Channel class now has an Indent attribute that controls indentation 
+in the text created by astWrite/AST_WRITE. The StcsIndent and XmlIndent
+attributes have been removed.
+
 
 Main Changes in Version 5.3
 ---------------------------

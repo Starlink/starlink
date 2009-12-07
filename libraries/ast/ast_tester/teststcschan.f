@@ -22,7 +22,7 @@ c      call ast_activememory( ' ' )
 c      call ast_flushmemory( 1 )
 
       if( status .eq. sai__ok ) then
-         call msg_out( ' ', 'All StcsChan tests passed', status )
+         call msg_out( ' ', ' All StcsChan tests passed', status )
       else
          call err_rep( ' ', 'StcsChan tests failed', status )
       end if
@@ -168,7 +168,7 @@ c      call ast_flushmemory( 1 )
       idoc = 5
       iread = 0
 
-      call ast_setl( ch, 'StcsIndent', .true., status )
+      call ast_setl( ch, 'Indent', .true., status )
 
       obj = ast_read( ch, status )
 
@@ -251,7 +251,7 @@ c      call ast_flushmemory( 1 )
 
       call ast_begin( status )
       ch = ast_stcschan( source, sink, 'ReportLevel=3',status )
-      call ast_setl( ch, 'StcsIndent', .true., status )
+      call ast_setl( ch, 'Indent', .true., status )
       call ast_seti( ch, 'StcsLength', 60, status )
 
       sf = ast_skyframe( ' ', status );

@@ -32,6 +32,7 @@ f     and "sink" routines which connect it to an external data store
 *
 *     - Comment: Include textual comments in output?
 *     - Full: Set level of output detail
+*     - Indent: Indentation increment between objects
 *     - ReportLevel: Selects the level of error reporting
 *     - Skip: Skip irrelevant data?
 *     - Strict: Generate errors instead of warnings?
@@ -105,6 +106,8 @@ f     - AST_WRITE: Write an Object to a Channel
 *        Added astAddWarning and astWarnings.
 *     11-JUN-2009 (DSB):
 *        Enable astChannelData to be used from within astRead.
+*     7-DEC-2009 (DSB):
+*        Added Indent attribute.
 *class--
 */
 
@@ -120,9 +123,6 @@ f     - AST_WRITE: Write an Object to a Channel
    deliberately kept small so as to simplify integration with
    standards such as FITS. */
 #define MAX_NAME "8"
-
-/* Define the increment used for indenting output text. */
-#define INDENT_INC 3
 
 /* Max length of string returned by GetAttrib */
 #define GETATTRIB_BUFF_LEN 50    
@@ -314,14 +314,12 @@ static const char *GetAttrib( AstObject *, const char *, int * );
 static double ReadDouble( AstChannel *, const char *, double, int * );
 static int GetComment( AstChannel *, int * );
 static int GetFull( AstChannel *, int * );
-static int GetReportLevel( AstChannel *, int * );
 static int GetSkip( AstChannel *, int * );
 static int GetStrict( AstChannel *, int * );
 static int ReadInt( AstChannel *, const char *, int, int * );
 static int TestAttrib( AstObject *, const char *, int * );
 static int TestComment( AstChannel *, int * );
 static int TestFull( AstChannel *, int * );
-static int TestReportLevel( AstChannel *, int * );
 static int TestSkip( AstChannel *, int * );
 static int TestStrict( AstChannel *, int * );
 static int Use( AstChannel *, int, int, int * );
@@ -331,7 +329,6 @@ static void AppendValue( AstChannelValue *, AstChannelValue **, int * );
 static void ClearAttrib( AstObject *, const char *, int * );
 static void ClearComment( AstChannel *, int * );
 static void ClearFull( AstChannel *, int * );
-static void ClearReportLevel( AstChannel *, int * );
 static void ClearSkip( AstChannel *, int * );
 static void ClearStrict( AstChannel *, int * );
 static void ClearValues( AstChannel *, int * );
@@ -347,7 +344,6 @@ static void RemoveValue( AstChannelValue *, AstChannelValue **, int * );
 static void SetAttrib( AstObject *, const char *, int * );
 static void SetComment( AstChannel *, int, int * );
 static void SetFull( AstChannel *, int, int * );
-static void SetReportLevel( AstChannel *, int, int * );
 static void SetSkip( AstChannel *, int, int * );
 static void SetStrict( AstChannel *, int, int * );
 static void SinkWrap( void (*)( const char * ), const char *, int * );
@@ -359,6 +355,17 @@ static void WriteInt( AstChannel *, const char *, int, int, int, const char *, i
 static void WriteIsA( AstChannel *, const char *, const char *, int * );
 static void WriteObject( AstChannel *, const char *, int, int, AstObject *, const char *, int * );
 static void WriteString( AstChannel *, const char *, int, int, const char *, const char *, int * );
+
+static int GetReportLevel( AstChannel *, int * );
+static int TestReportLevel( AstChannel *, int * );
+static void ClearReportLevel( AstChannel *, int * );
+static void SetReportLevel( AstChannel *, int, int * );
+
+static int GetIndent( AstChannel *, int * );
+static int TestIndent( AstChannel *, int * );
+static void ClearIndent( AstChannel *, int * );
+static void SetIndent( AstChannel *, int, int * );
+
 
 /* Member functions. */
 /* ================= */
@@ -630,6 +637,11 @@ static void ClearAttrib( AstObject *this_object, const char *attrib, int *status
    } else if ( !strcmp( attrib, "full" ) ) {
       astClearFull( this );
 
+/* Indent. */
+/* ------- */
+   } else if ( !strcmp( attrib, "indent" ) ) {
+      astClearIndent( this );
+
 /* ReportLevel. */
 /* ------------ */
    } else if ( !strcmp( attrib, "reportlevel" ) ) {
@@ -879,6 +891,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
    const char *result;           /* Pointer value to return */
    int comment;                  /* Comment attribute value */
    int full;                     /* Full attribute value */
+   int indent;                   /* Indent attribute value */
    int report_level;             /* ReportLevel attribute value */
    int skip;                     /* Skip attribute value */
    int strict;                   /* Report errors insead of warnings? */
@@ -915,6 +928,15 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
       full = astGetFull( this );
       if ( astOK ) {
          (void) sprintf( getattrib_buff, "%d", full );
+         result = getattrib_buff;
+      }
+
+/* Indent. */
+/* ------- */
+   } else if ( !strcmp( attrib, "indent" ) ) {
+      indent = astGetIndent( this );
+      if ( astOK ) {
+         (void) sprintf( getattrib_buff, "%d", indent );
          result = getattrib_buff;
       }
 
@@ -1687,6 +1709,7 @@ AstChannel *astInitChannel_( void *mem, size_t size, int init,
 /* Set all attributes to their undefined values. */
       new->comment = -INT_MAX;
       new->full = -INT_MAX;
+      new->indent = -INT_MAX;
       new->report_level = -INT_MAX;
       new->skip = -INT_MAX;
       new->strict = -INT_MAX;
@@ -1804,6 +1827,11 @@ void astInitChannelVtab_(  AstChannelVtab *vtab, const char *name, int *status )
    vtab->GetReportLevel = GetReportLevel;
    vtab->SetReportLevel = SetReportLevel;
    vtab->TestReportLevel = TestReportLevel;
+
+   vtab->ClearIndent = ClearIndent;
+   vtab->GetIndent = GetIndent;
+   vtab->SetIndent = SetIndent;
+   vtab->TestIndent = TestIndent;
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
@@ -3226,6 +3254,7 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
    AstChannel *this;             /* Pointer to the Channel structure */
    int comment;                  /* Comment attribute value */
    int full;                     /* Full attribute value */
+   int indent;                   /* Indent attribute value */
    int len;                      /* Length of setting string */
    int nc;                       /* Number of characters read by "astSscanf" */
    int report_level;             /* Skip attribute value */
@@ -3260,6 +3289,13 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
                ( 1 == astSscanf( setting, "full= %d %n", &full, &nc ) )
                && ( nc >= len ) ) {
       astSetFull( this, full );
+
+/* Indent. */
+/* ------- */
+   } else if ( nc = 0,
+               ( 1 == astSscanf( setting, "indent= %d %n", &indent, &nc ) )
+               && ( nc >= len ) ) {
+      astSetIndent( this, indent );
 
 /* ReportLavel. */
 /* ------------ */
@@ -3465,6 +3501,11 @@ static int TestAttrib( AstObject *this_object, const char *attrib, int *status )
 /* ----- */
    } else if ( !strcmp( attrib, "full" ) ) {
       result = astTestFull( this );
+
+/* Indent. */
+/* ------- */
+   } else if ( !strcmp( attrib, "indent" ) ) {
+      result = astTestIndent( this );
 
 /* ReportLevel. */
 /* ------------ */
@@ -3808,7 +3849,7 @@ static void WriteBegin( AstChannel *this, const char *class,
 
 /* Increment the indentation level and clear the count of items written
    for this Object. */
-   current_indent += INDENT_INC;
+   current_indent += astGetIndent( this );
    items_written = 0;
 }
 
@@ -4007,7 +4048,7 @@ static void WriteEnd( AstChannel *this, const char *class, int *status ) {
 
 /* Decrement the indentation level so that the "End" item matches the
    corresponding "Begin" item. */
-   current_indent -= INDENT_INC;
+   current_indent -= astGetIndent( this );
 
 /* Start building a dynamic string with an initial space. Then add
    further spaces to suit the current indentation level. */
@@ -4251,6 +4292,7 @@ static void WriteIsA( AstChannel *this, const char *class,
    astDECLARE_GLOBALS            /* Declare the thread specific global data */
    char *line;                   /* Pointer to dynamic output string */
    int i;                        /* Loop counter for indentation characters */
+   int indent_inc;               /* Indentation increment */
    int nc;                       /* Number of output characters */
 
 /* Check the global error status. */
@@ -4269,8 +4311,9 @@ static void WriteIsA( AstChannel *this, const char *class,
    further spaces to suit the current indentation level, but reduced
    by one to allow the "IsA" item to match the "Begin" and "End" items
    which enclose it. */
+      indent_inc = astGetIndent( this );
       line = astAppendString( NULL, &nc, " " );
-      for ( i = 0; i < ( current_indent - INDENT_INC ); i++ ) {
+      for ( i = 0; i < ( current_indent - indent_inc ); i++ ) {
          line = astAppendString( line, &nc, " " );
       }
 
@@ -4387,6 +4430,7 @@ static void WriteObject( AstChannel *this, const char *name,
    astDECLARE_GLOBALS            /* Declare the thread specific global data */
    char *line;                   /* Pointer to dynamic output string */
    int i;                        /* Loop counter for indentation characters */
+   int indent_inc;               /* Indentation increment */
    int nc;                       /* Number of output characters */
 
 /* Check the global error status. */
@@ -4430,9 +4474,10 @@ static void WriteObject( AstChannel *this, const char *name,
    well, suitably indented (this is omitted if the value is commented
    out). */
       if ( set ) {
-         current_indent += INDENT_INC;
+         indent_inc = astGetIndent( this );
+         current_indent += indent_inc;
          (void) astWrite( this, value );
-         current_indent -= INDENT_INC;
+         current_indent -= indent_inc;
       }
    }
 }
@@ -4700,6 +4745,80 @@ astMAKE_CLEAR(Channel,Full,full,-INT_MAX)
 astMAKE_GET(Channel,Full,int,0,( this->full != -INT_MAX ? this->full : 0 ))
 astMAKE_SET(Channel,Full,int,full,( value > 0 ? 1 : ( value < 0 ? -1 : 0 ) ))
 astMAKE_TEST(Channel,Full,( this->full != -INT_MAX ))
+
+/*
+*att++
+*  Name:
+*     Indent
+
+*  Purpose:
+*     Specifies the indentation to use in text produced by a Channel.
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer (boolean).
+
+*  Description:
+*     This attribute controls the indentation within the output text produced by
+f     the AST_WRITE function.
+c     the astWrite function.
+*     It gives the increase in the indentation for each level in the object 
+*     heirarchy. If it is set to zero, no indentation will be used. [3]
+
+*  Applicability:
+*     Channel
+*        The default value is zero for a basic Channel.
+*     FitsChan
+*        The FitsChan class ignores this attribute.
+*     StcsChan
+*        The default value for an StcsChan is zero, which causes the entire 
+*        STC-S description is written out by a single invocation of the sink 
+*        function. The text supplied to the sink function will not contain 
+*        any linefeed characters, and each pair of adjacent words will be 
+*        separated by a single space. The text may thus be arbitrarily large 
+*        and the StcsLength attribute is ignored.
+*
+*        If Indent is non-zero, then the text is written out via multiple 
+*        calls to the sink function, each call corresponding to a single 
+*        "line" of text (although no line feed characters will be inserted 
+*        by AST). The complete STC-S description is broken into lines so that:
+*
+*        - the line length specified by attribute StcsLength is not exceeded
+*        - each sub-phrase (time, space, etc.) starts on a new line
+*        - each argument in a compound spatial region starts on a new line
+*        
+*        If this causes a sub-phrase to extend to two or more lines, then the 
+*        second and subsequent lines will be indented by three spaces compared 
+*        to the first line. In addition, lines within a compound spatial region
+*        will have extra indentation to highlight the nesting produced by the 
+*        parentheses. Each new level of nesting will be indented by a further 
+*        three spaces.
+f
+f        Note, the default value of zero is unlikely to be appropriate when
+f        an StcsChan is used within Fortran code. In this case, Indent
+f        should usually be set non-zero, and the StcsLength attribute set to 
+f        the size of the CHARACTER variable used to 
+f        receive the text returned by AST_GETLINE within the sink function.
+f        This avoids the possibility of long lines being truncated invisibly
+f        within AST_GETLINE.
+*     XmlChan
+*        The default value for an XmlChan is zero, which results in no 
+*        linefeeds or indentation strings being added to output text.
+*        If any non-zero value is assigned to Indent, then extra linefeed and
+*        space characters will be inserted as necessary to ensure that each 
+*        XML tag starts on a new line, and each tag will be indented by
+*        a further 3 spaces to show its depth in the containment hierarchy. 
+*att--
+*/
+
+/* This is an integer value with a value of -INT_MAX when undefined,
+   yielding a default of 3. Sub-classes may over-ride theis default. */
+astMAKE_CLEAR(Channel,Indent,indent,-INT_MAX)
+astMAKE_GET(Channel,Indent,int,3,( this->indent != -INT_MAX ? this->indent : 3 ))
+astMAKE_SET(Channel,Indent,int,indent,value)
+astMAKE_TEST(Channel,Indent,( this->indent != -INT_MAX ))
 
 /*
 *att++
@@ -5002,6 +5121,12 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
    which is more useful to a human reader as it corresponds to the
    actual default attribute value.  Since "set" will be zero, these
    values are for information only and will not be read back. */
+
+/* Indent */
+/* ------------ */
+   set = TestIndent( this, status );
+   ival = set ? GetIndent( this, status ) : astGetIndent( this );
+   astWriteInt( channel, "Indnt", set, 0, ival, "Indentation increment" );
 
 /* ReportLevel. */
 /* ------------ */
@@ -5697,6 +5822,11 @@ AstChannel *astLoadChannel_( void *mem, size_t size,
    supplying the "unset" value as the default. If a "set" value is
    obtained, we then use the appropriate (private) Set... member
    function to validate and set the value properly. */
+
+/* Indent. */
+/* ------- */
+      new->indent = astReadInt( channel, "indnt", -INT_MAX );
+      if ( TestIndent( new, status ) ) SetIndent( new, new->indent, status );
 
 /* ReportLevel. */
 /* ------------ */

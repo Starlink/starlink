@@ -37,7 +37,6 @@ f     encodings and the internal ASCII encoding. If no such routines
 *     XmlChan also has the following attributes:
 *
 *     - XmlFormat: System for formatting Objects as XML
-*     - XmlIndent: Controls output of indentation and line feeds
 *     - XmlLength: Controls output buffer length
 *     - XmlPrefix: The namespace prefix to use when writing
 
@@ -112,9 +111,6 @@ f     The XmlChan class does not define any new routines beyond those
    the header files that define class interfaces that they should make
    "protected" symbols available. */
 #define astCLASS XmlChan
-
-/* Number of spaces indentation per level of nesting */
-#define INDENT_INC 3
 
 /* The XML element name used to store an AST attribute setting */
 #define ATTR "_attribute"
@@ -274,6 +270,7 @@ static void (* parent_clearattrib)( AstObject *, const char *, int * );
 static void (* parent_setattrib)( AstObject *, const char *, int * );
 static int (* parent_getfull)( AstChannel *, int * );
 static int (* parent_getcomment)( AstChannel *, int * );
+static int (* parent_getindent)( AstChannel *, int * );
 
 /* Text values used to represent XmlFormat values externally. These
    should be in the order defined by the associated constants above. */
@@ -409,6 +406,7 @@ static int ElemListD( AstXmlChan *, AstXmlElement *, int, double *, int * );
 static int FindString( int, const char *[], const char *, const char *, const char *, const char *, int * );
 static int GetComment( AstChannel *, int * );
 static int GetFull( AstChannel *, int * );
+static int GetIndent( AstChannel *, int * );
 static int IsUsable( AstXmlElement *, int * );
 static int ReadInt( AstChannel *, const char *, int, int * );
 static int TestAttrib( AstObject *, const char *, int * );
@@ -446,11 +444,6 @@ static int TestXmlFormat( AstXmlChan *, int * );
 static void ClearXmlFormat( AstXmlChan *, int * );
 static void SetXmlFormat( AstXmlChan *, int, int * );
 static int GetXmlFormat( AstXmlChan *, int * );
-
-static int TestXmlIndent( AstXmlChan *, int * );
-static void ClearXmlIndent( AstXmlChan *, int * );
-static void SetXmlIndent( AstXmlChan *, int, int * );
-static int GetXmlIndent( AstXmlChan *, int * );
 
 static int TestXmlPrefix( AstXmlChan *, int * );
 static void ClearXmlPrefix( AstXmlChan *, int * );
@@ -2116,11 +2109,6 @@ void astInitXmlChanVtab_(  AstXmlChanVtab *vtab, const char *name, int *status )
 /* Store pointers to the member functions (implemented here) that provide
    virtual methods for this class. */
 
-   vtab->SetXmlIndent = SetXmlIndent;
-   vtab->ClearXmlIndent = ClearXmlIndent;
-   vtab->TestXmlIndent = TestXmlIndent;
-   vtab->GetXmlIndent = GetXmlIndent;
-
    vtab->SetXmlLength = SetXmlLength;
    vtab->ClearXmlLength = ClearXmlLength;
    vtab->TestXmlLength = TestXmlLength;
@@ -2156,10 +2144,15 @@ void astInitXmlChanVtab_(  AstXmlChanVtab *vtab, const char *name, int *status )
    channel->ReadObject = ReadObject;
    channel->ReadString = ReadString;
 
+   parent_getindent = channel->GetIndent;
+   channel->GetIndent = GetIndent;
+
    parent_getfull = channel->GetFull;
    channel->GetFull = GetFull;
+
    parent_getcomment = channel->GetComment;
    channel->GetComment = GetComment;
+
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
@@ -2820,14 +2813,9 @@ static void ClearAttrib( AstObject *this_object, const char *attrib, int *status
 
 /* Check the attribute name and clear the appropriate attribute. */
 
-/* XmlIndent */
-/* --------- */
-   if ( !strcmp( attrib, "xmlindent" ) ) {
-      astClearXmlIndent( this );
-
 /* XmlLength */
 /* --------- */
-   } else if ( !strcmp( attrib, "xmllength" ) ) {
+   if ( !strcmp( attrib, "xmllength" ) ) {
       astClearXmlLength( this );
 
 /* XmlFormat */
@@ -4842,18 +4830,9 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
    the value into "getattrib_buff" as a null terminated string in an appropriate
    format.  Set "result" to point at the result string. */
 
-/* XmlIndent */
-/* --------- */
-   if ( !strcmp( attrib, "xmlindent" ) ) {
-      ival = astGetXmlIndent( this );
-      if ( astOK ) {
-         (void) sprintf( getattrib_buff, "%d", ival );
-         result = getattrib_buff;
-      }
-
 /* XmlLength */
 /* --------- */
-   } else if ( !strcmp( attrib, "xmllength" ) ) {
+   if ( !strcmp( attrib, "xmllength" ) ) {
       ival = astGetXmlLength( this );
       if ( astOK ) {
          (void) sprintf( getattrib_buff, "%d", ival );
@@ -4968,6 +4947,46 @@ static int GetFull( AstChannel *this, int *status ) {
 
    return astTestFull( this ) ? (*parent_getfull)( this, status ) : -1;
 }
+
+static int GetIndent( AstChannel *this, int *status ) {
+/*
+*  Name:
+*     GetIndent
+
+*  Purpose:
+*     Get the value of the Indent attribute for an XmlChan.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "XmlChan.h"
+*     int GetIndent( AstChannel *this, int *status )
+
+*  Class Membership:
+*     XmlChan member function (over-rides the protected astGetIndent
+*     method inherited from the Channel class).
+
+*  Description:
+*     This function returns the value of the Indent attribute, supplying
+*     a default value appropriate to an XmlChan.
+
+*  Parameters:
+*     this
+*        Pointer to the XmlChan.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     - The Indent value to use.
+
+*/
+
+/* If the attribute is set, return its value. Otherwise return a value of
+   zero. */
+   return astTestIndent( this ) ? (*parent_getindent)( this, status ) : 0;
+}
+
 
 static char GetNextChar( void *data, int *status ) {
 /*
@@ -9205,16 +9224,9 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
    in "nc" to check that the entire string was matched. Once a value
    has been obtained, use the appropriate method to set it. */
 
-/* XmlIndent */
-/* ----------*/
-   if ( nc = 0,
-        ( 1 == astSscanf( setting, "xmlindent= %d %n", &ival, &nc ) )
-        && ( nc >= len ) ) {
-      astSetXmlIndent( this, ival );
-
 /* XmlLength */
 /* ----------*/
-   } else if ( nc = 0,
+   if ( nc = 0,
         ( 1 == astSscanf( setting, "xmllength= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
       astSetXmlLength( this, ival );
@@ -10946,14 +10958,9 @@ static int TestAttrib( AstObject *this_object, const char *attrib, int *status )
 
 /* Check the attribute name and test the appropriate attribute. */
 
-/* XmlIndent */
-/* --------- */
-   if ( !strcmp( attrib, "xmlindent" ) ) {
-      result = astTestXmlIndent( this );
-
 /* XmlLength */
 /* --------- */
-   } else if ( !strcmp( attrib, "xmllength" ) ) {
+   if ( !strcmp( attrib, "xmllength" ) ) {
       result = astTestXmlLength( this );
 
 /* XmlFormat */
@@ -12361,7 +12368,7 @@ static void WriteEnd( AstChannel *this_channel, const char *class, int *status )
 
 /* First get a single string holding the complete formatted XML
    representation of the AST object. */
-         if( astGetXmlIndent( this ) ) {
+         if( astGetIndent( this ) ) {
             text = (char *) astXmlShow( this->container );
          } else {
             text = (char *) astXmlFormat( this->container );
@@ -13116,39 +13123,6 @@ astMAKE_GET(XmlChan,XmlFormat,int,0,(this->xmlformat == UNKNOWN_FORMAT ?
 /*
 *att++
 *  Name:
-*     XmlIndent
-
-*  Purpose:
-*     Controls output of indentation and line feeds.
-
-*  Type:
-*     Public attribute.
-
-*  Synopsis:
-*     Integer (boolean).
-
-*  Description:
-*     This attribute controls the appearance of the XML produced when an
-*     AST object is written to an XmlChan. If it is non-zero, then extra
-*     linefeed characters will be inserted as necessary to ensure that each 
-*     XML tag starts on a new line, and each tag will be indented to show 
-*     its depth in the containment hierarchy. If XmlIndent is zero (the
-*     default), then no linefeeds or indentation strings will be added to
-*     output text.
-
-*  Applicability:
-*     XmlChan
-*        All XmlChans have this attribute.
-*att--
-*/
-astMAKE_CLEAR(XmlChan,XmlIndent,xmlindent,-1)
-astMAKE_GET(XmlChan,XmlIndent,int,0,(this->xmlindent == -1 ? 0 : this->xmlindent))
-astMAKE_SET(XmlChan,XmlIndent,int,xmlindent,( value ? 1 : 0 ))
-astMAKE_TEST(XmlChan,XmlIndent,( this->xmlindent != -1 ))
-
-/*
-*att++
-*  Name:
 *     XmlLength
 
 *  Purpose:
@@ -13384,12 +13358,6 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 
 /* Now do instance variables which are not attributes. */
 /* =================================================== */
-
-/* XmlIndent */
-/* --------- */
-      set = TestXmlIndent( this, status );
-      ival = set ? GetXmlIndent( this, status ) : astGetXmlIndent( this );
-      astWriteInt( channel, "XmlInd", set, 0, ival, "XML indentation" );
 
 /* XmlLength */
 /* --------- */
@@ -14026,7 +13994,6 @@ AstXmlChan *astInitXmlChan_( void *mem, size_t size, int init,
       new->container = NULL;    /* XmlElement to which content will be added */ 
       new->readcontext = NULL;  /* XmlElement giving context for current read */ 
       new->write_isa = 0;       /* Write out the next "IsA" item? */
-      new->xmlindent = -1;      /* Indentat output? */
       new->xmllength = -INT_MAX;/* Buffer length */
       new->xmlprefix = NULL;    /* Xml prefix */
       new->xmlformat = UNKNOWN_FORMAT; /* Xml format */
@@ -14172,7 +14139,6 @@ AstXmlChan *astLoadXmlChan_( void *mem, size_t size,
       new->container = NULL;    /* XmlElement to which content will be added */ 
       new->readcontext = NULL;  /* XmlElement giving context for current read */ 
       new->write_isa = 0;       /* Write out the next "IsA" item? */
-      new->xmlindent = -1;      /* Indent output? */
       new->xmllength = -INT_MAX;/* Buffer length */
       new->xmlprefix = NULL;    /* Xml prefix */
       new->reset_source = 1;    /* A new line should be read from the source */
@@ -14180,10 +14146,6 @@ AstXmlChan *astLoadXmlChan_( void *mem, size_t size,
       new->formatdef = NATIVE_FORMAT;  /* Default Xml format */
 
 /* Now restore presistent values. */
-
-/* XmlIndent */
-/* --------- */
-      new->xmlindent = astReadInt( channel, "xmlind", -1 );
 
 /* XmlLength */
 /* --------- */

@@ -270,6 +270,7 @@ typedef struct AstChannel {
    int comment;                  /* Output comments? */
    int full;                     /* Set max/normal/min information level */
    int skip;                     /* Skip data between Objects? */
+   int indent;                   /* Indentation increment in astWrite output */
    int report_level;             /* Skip data between Objects? */
    int strict;                   /* Report unexpected data items? */
    void *data;                   /* Data to pass to source/sink functions */
@@ -333,6 +334,11 @@ typedef struct AstChannelVtab {
    int (* TestReportLevel)( AstChannel *, int * );
    void (* ClearReportLevel)( AstChannel *, int * );
    void (* SetReportLevel)( AstChannel *, int, int * );
+
+   int (* GetIndent)( AstChannel *, int * );
+   int (* TestIndent)( AstChannel *, int * );
+   void (* ClearIndent)( AstChannel *, int * );
+   void (* SetIndent)( AstChannel *, int, int * );
 
 } AstChannelVtab;
 
@@ -475,6 +481,11 @@ int astTestReportLevel_( AstChannel *, int * );
 void astClearReportLevel_( AstChannel *, int * );
 void astSetReportLevel_( AstChannel *, int, int * );
 
+int astGetIndent_( AstChannel *, int * );
+int astTestIndent_( AstChannel *, int * );
+void astClearIndent_( AstChannel *, int * );
+void astSetIndent_( AstChannel *, int, int * );
+
 
 #endif
 
@@ -614,6 +625,15 @@ astINVOKE(V,astGetReportLevel_(astCheckChannel(this),STATUS_PTR))
 astINVOKE(V,astSetReportLevel_(astCheckChannel(this),value,STATUS_PTR))
 #define astTestReportLevel(this) \
 astINVOKE(V,astTestReportLevel_(astCheckChannel(this),STATUS_PTR))
+
+#define astClearIndent(this) \
+astINVOKE(V,astClearIndent_(astCheckChannel(this),STATUS_PTR))
+#define astGetIndent(this) \
+astINVOKE(V,astGetIndent_(astCheckChannel(this),STATUS_PTR))
+#define astSetIndent(this,value) \
+astINVOKE(V,astSetIndent_(astCheckChannel(this),value,STATUS_PTR))
+#define astTestIndent(this) \
+astINVOKE(V,astTestIndent_(astCheckChannel(this),STATUS_PTR))
 
 #endif
 #endif
