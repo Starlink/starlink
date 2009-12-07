@@ -1,0 +1,87 @@
+#!/usr/local/bin/perl
+#
+# !!begin 
+# !!title  Combining script
+# !!author T.R. Marsh
+# !!date   10 April 2003
+# !!root   medcom
+# !!index  medcom 
+# !!descr  Perl script for combining frames
+# !!head1  Script for cmbining frames
+#
+# !!table
+# !!trow{!!emph{Name:}}{medcom}
+# !!trow{!!emph{Purpose:}}{to combine similar frames}
+# !!trow{!!emph{Invocation}}{perl medcom list output scale nblock}
+# !!table
+#
+# where:
+#
+# !!table
+# !!arg{list}{list of files to combine}
+# !!arg{output}{name of output file.}
+# !!arg{scale}{y or n according to whether you want to scale when taking
+# medians}
+# !!arg{nblock}{number of files to combine with medians}
+# !!table
+#
+# !!head2 Action
+#
+# !!emph{medcom} combines frames in groups by median and then averages them
+# to beat down noise while avoiding digitisation of medians.
+#
+# !!end 
+
+$FIGARO = '$STARLINK_DIR/bin/figaro';
+
+(@ARGV == 4) or die "usage: list output scale nblock\n";
+
+$list   = shift;
+$output = shift;
+$scale  = shift;
+if($scale =~ /y|Y/){
+    $scale = "true";
+}elsif($scale =~ /n|N/){
+    $scale = "false";
+}else{
+    die "scale must be y or n, but was = $scale\n";
+}
+$nblock = shift;
+
+open(LIST, $list) or die "Failed to open $list\n";
+while(<LIST>){
+    $file[$n++] = $_;
+}
+close(LIST);
+$nlist = $n;
+
+$ngroup = int($nlist/$nblock);
+
+$temp = "zzz_list";
+
+if($ngroup > 1){
+    for($i=0; $i<$ngroup; $i++){
+	$n1 = $nblock*$i;
+	$n2 = $n1 + $nblock;
+	if($i == $ngroup - 1){
+	    $n2 = $nlist;
+	}
+	open(TEMP, ">$temp") or die "Could not open $temp for output\n";
+	for($n=$n1; $n<$n2; $n++){
+	    print TEMP "$file[$n]\n";
+	}
+	close(TEMP);
+	if($i == 0){
+	    system("$FIGARO/medsky $temp scaled=$scale $output");
+	}else{
+	    system("$FIGARO/medsky $temp scaled=$scale zzz_medsky");
+	    system("$FIGARO/iadd $output zzz_medsky $output");
+	}
+	print "Taken median of files ", $n1+1," to ", $n2,"\n";
+    }
+    system("$FIGARO/icdiv $output $ngroup $output");
+}else{
+    system("$FIGARO/medsky $list scaled=$scale $output");
+}	    
+
+exit;

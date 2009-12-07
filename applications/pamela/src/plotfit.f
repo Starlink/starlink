@@ -1,0 +1,269 @@
+        SUBROUTINE PLOTFIT( NDATA, XDATA, YDATA, YSIGMA, YFIT,
+     *          XLABEL, YLABEL, TITLE )
+*
+*  PLOTS RESULT OF A DATA FIT
+*
+*  Inputs:
+*       NDATA   = NUMBER OF DATA PAIRS
+*       XDATA   = DATA X VALUE
+*       YDATA   = DATA Y VALUE
+*       YSIGMA  = UNCERTAINTY IN Y (1-SIGMA) (NEGATIVE IF REJECTED FROM FIT)
+*       YFIT    = FIT Y VALUE
+*       XLABEL  = LABEL FOR X AXIS OF THE PLOT
+*       YLABEL  = LABEL FIR Y AXIS OF THE PLOT
+*       TITLE   = PLOT TITLE
+*
+*  JULY 1984 BY KEITH HORNE AT IOA.
+*
+        REAL*4 XDATA(1), YDATA(1), YSIGMA(1), YFIT(1)
+        CHARACTER*(*) XLABEL, YLABEL, TITLE
+        PARAMETER (MXPLOT=500)
+        REAL*4 XPLOT(MXPLOT), YPLOT(MXPLOT)
+        CHARACTER*1 REPLY
+        LOGICAL ASCENT  ! X-VALUES ASCEND
+        LOGICAL MONOTONE! X-VALUES MONOTONIC
+        LOGICAL PENDOWN ! PLOT PEN IS 'DOWN'
+        PARAMETER (IPLOTSYM=20)
+        REAL*8 CALC
+*
+      IF( NDATA.LE.0) THEN
+        PRINT *,'** NO DATA IN ''PLOTFIT'''
+        RETURN
+      END IF
+*
+*  COMPUTE RMS OF NORMALIZED RESIDUALS AND DETERMINE IF DATA ARE MONOTONIC
+*
+        NSUM = 0
+        CALC = 0.D0
+        XMAX = XDATA(1)
+        XMIN = XMAX
+        ASCENT = XDATA(NDATA).GT.XDATA(1)
+        MONOTONE=.TRUE.
+      DO I=1,NDATA
+        XMAX = MAX(XMAX, XDATA(I))
+        XMIN = MIN(XMIN, XDATA(I))
+        IF( ASCENT .AND. XMAX.NE.XDATA(I) ) MONOTONE = .FALSE.
+        IF( .NOT.ASCENT .AND. XMIN.NE.XDATA(I) ) MONOTONE = .FALSE.
+      IF(YSIGMA(I).GT.0) THEN
+        NSUM = NSUM + 1
+        RESIDUAL = (YDATA(I) - YFIT(I)) / YSIGMA(I)
+        CALC = CALC + RESIDUAL*RESIDUAL
+      END IF
+      END DO
+        RMS = 1.
+        IF(NSUM.GT.0) RMS = REAL(SQRT(CALC/NSUM))
+        PRINT *,'RMS of normalized residuals =', RMS
+        IF(MONOTONE) PRINT *,'X-values are monotonic'
+        IF(.NOT.MONOTONE) PRINT *,'X-values are NOT monotonic.'
+*
+*  GET DEFAULT PLOT RANGES
+*
+        CALL PGLIMIT( NDATA, XDATA, XMIN, XMAX, 0. )
+        CALL PGLIMIT( NDATA, YDATA, YMIN, YMAX, 0. )
+*
+*  OVERRIDE DEFAULT PLOT RANGES
+*
+   10   CALL PGSETLIMS( XMIN, XMAX, YMIN, YMAX, IFAIL )
+        IF( IFAIL.NE.0 ) RETURN
+*
+*  FRAME THE FIRST PLOT (DATA PLUS FIT)
+*
+        CALL PGSTART(1,2,NEW)
+*
+        CALL PGSLW(1)
+        CALL PGSCI(5)   ! AQUA
+        CALL PGENV( XMIN, XMAX, YMIN, YMAX, 0, 1 )
+        CALL PGSCI(7)   ! YELLOW
+        CALL PGLABEL( XLABEL, YLABEL, TITLE )
+*
+*  LOOP TO PLOT THE DATA (IN WHITE AND BLUE) ------------------------
+*
+        NPLOT = 0
+        PENDOWN = .TRUE.
+        CALL PGSCI(1)
+      DO I=1,NDATA
+*
+*  DUMP DATA SEGMENT IN WHITE
+*
+      IF( PENDOWN .AND. YSIGMA(I).LE.0.) THEN
+      IF( NPLOT.GT.0 ) THEN
+      IF(MONOTONE) THEN
+        CALL PGLINE(NPLOT, XPLOT, YPLOT)
+      ELSE
+        CALL PGPOINT(NPLOT, XPLOT, YPLOT, IPLOTSYM )
+      END IF
+        XPLOT(1) = XPLOT(NPLOT)
+        YPLOT(1) = YPLOT(NPLOT)
+        NPLOT = 1
+        PENDOWN = .FALSE.
+        CALL PGSCI(4)   ! BLUE
+      END IF
+*
+*  DUMP MASKED DATA SEGMENT IN BLUE
+*
+      ELSE IF( .NOT.PENDOWN .AND. YSIGMA(I).GT.0.) THEN
+        NPLOT = NPLOT + 1
+        XPLOT(NPLOT) = XDATA(I)
+        YPLOT(NPLOT) = YDATA(I)
+      IF(NPLOT.GT.0) THEN
+      IF(MONOTONE) THEN
+        CALL PGLINE(NPLOT, XPLOT, YPLOT)
+      ELSE
+        CALL PGPOINT(NPLOT, XPLOT, YPLOT, IPLOTSYM )
+      END IF
+        NPLOT = 0
+        PENDOWN = .TRUE.
+        CALL PGSCI(1)   ! WHITE
+      END IF
+      END IF
+*
+*  EMPTY PLOT BUFFER IF FULL
+*
+      IF(NPLOT.GE.MXPLOT) THEN
+      IF(MONOTONE) THEN
+        CALL PGLINE(NPLOT, XPLOT, YPLOT)
+      ELSE
+        CALL PGPOINT(NPLOT, XPLOT, YPLOT, IPLOTSYM )
+      END IF
+        XPLOT(1) = XPLOT(NPLOT)
+        YPLOT(1) = YPLOT(NPLOT)
+        NPLOT = 1
+      END IF
+*
+*  ADD NEW DATA PAIR TO PLOT BUFFER
+*
+        NPLOT = NPLOT + 1
+        XPLOT(NPLOT) = XDATA(I)
+        YPLOT(NPLOT) = YDATA(I)
+*
+      END DO
+*
+*  DUMP FINAL PLOT SEGMENT
+*
+      IF(NPLOT.GT.0) THEN
+      IF(MONOTONE) THEN
+        CALL PGLINE(NPLOT, XPLOT, YPLOT)
+      ELSE
+        CALL PGPOINT(NPLOT, XPLOT, YPLOT, IPLOTSYM )
+      END IF
+      END IF
+*
+*  PLOT THE FIT (IN RED) ----------------------------------
+*
+        CALL PGSCI(2)
+      IF(MONOTONE) THEN
+        CALL PGLINE( NDATA, XDATA, YFIT)
+      ELSE
+        NPLOT = 0
+      DO I=1,NDATA
+        NPLOT = NPLOT + 1
+        XPLOT(NPLOT) = XDATA(I)
+        YPLOT(NPLOT) = YFIT(I)
+      IF(NPLOT.GE.MXPLOT) THEN
+        CALL PGLINE(NPLOT, XPLOT, YPLOT )
+        NPLOT = 0
+      END IF
+      END DO
+      END IF
+*
+*  FRAME THE SECOND PLOT (NORMALIZED RESIDUALS) --------------------
+*
+        CALL PGSLW(1)
+        CALL PGSCI(5)   ! AQUA
+        CALL PGENV( XMIN, XMAX, -5., +5., 0, 1)
+        CALL PGSCI(7)   ! YELLOW
+        CALL PGLABEL( XLABEL, 'Sigma', 'Normalized Residuals' )
+*
+*  LOOP TO PLOT THE DATA
+*
+        NPLOT = 0
+        PENDOWN = .TRUE.
+        CALL PGSCI(1)
+      DO I=1,NDATA
+*
+*  DUMP DATA SEGMENT IN WHITE
+*
+      IF( PENDOWN .AND. YSIGMA(I).LE.0.) THEN
+      IF( NPLOT.GT.0 ) THEN
+      IF(MONOTONE) THEN
+        CALL PGLINE(NPLOT, XPLOT, YPLOT)
+      ELSE
+        CALL PGPOINT(NPLOT, XPLOT, YPLOT, IPLOTSYM )
+      END IF
+        XPLOT(1) = XPLOT(NPLOT)
+        YPLOT(1) = YPLOT(NPLOT)
+        NPLOT = 1
+        PENDOWN = .FALSE.
+        CALL PGSCI(4)   ! BLUE
+      END IF
+*
+*  DUMP MASKED DATA SEGMENT IN BLUE
+*
+      ELSE IF( .NOT.PENDOWN .AND. YSIGMA(I).GT.0.) THEN
+        NPLOT = NPLOT + 1
+        XPLOT(NPLOT) = XDATA(I)
+        YPLOT(NPLOT) = (YDATA(I) -YFIT(I)) / ABS(RMS*YSIGMA(I))
+      IF(NPLOT.GT.0) THEN
+      IF(MONOTONE) THEN
+        CALL PGLINE(NPLOT, XPLOT, YPLOT)
+      ELSE
+        CALL PGPOINT(NPLOT, XPLOT, YPLOT, IPLOTSYM )
+      END IF
+        NPLOT = 0
+        PENDOWN = .TRUE.
+        CALL PGSCI(1)   ! WHITE
+      END IF
+      END IF
+*
+*  EMPTY PLOT BUFFER IF FULL
+*
+      IF(NPLOT.GE.MXPLOT) THEN
+      IF(MONOTONE) THEN
+        CALL PGLINE(NPLOT, XPLOT, YPLOT)
+      ELSE
+        CALL PGPOINT(NPLOT, XPLOT, YPLOT, IPLOTSYM )
+      END IF
+        XPLOT(1) = XPLOT(NPLOT)
+        YPLOT(1) = YPLOT(NPLOT)
+        NPLOT = 1
+      END IF
+*
+*  ADD NEW DATA PAIR TO PLOT BUFFER
+*
+        NPLOT = NPLOT + 1
+        XPLOT(NPLOT) = XDATA(I)
+        IF(YSIGMA(I).NE.0.)
+     $YPLOT(NPLOT) = (YDATA(I) -YFIT(I)) / ABS(RMS*YSIGMA(I))
+*
+      END DO
+*
+*  DUMP FINAL PLOT SEGMENT
+*
+      IF(NPLOT.GT.0) THEN
+      IF(MONOTONE) THEN
+        CALL PGLINE(NPLOT, XPLOT, YPLOT)
+      ELSE
+        CALL PGPOINT(NPLOT, XPLOT, YPLOT, IPLOTSYM )
+      END IF
+      END IF
+*
+*  PLOT -1,0,1 SIGMA LEVELS ---------------------------------
+*
+        XPLOT(1) = XMIN
+        XPLOT(2) = XMAX
+      DO I=-1,1,1
+        YPLOT(1) = I
+        YPLOT(2) = I
+        CALL PGSCI(7)           ! YELLOW
+        IF( I.EQ.0 ) CALL PGSCI(2)      ! RED
+        CALL PGLINE(2,XPLOT,YPLOT)
+      END DO
+*
+        CALL PGSTOP
+*
+        WRITE(*,'(A,$)') 'Plot again ? (Y/ ) '
+        READ(*,'(A)') REPLY
+        IF( REPLY.EQ.'Y') GOTO 10
+*
+        RETURN
+        END

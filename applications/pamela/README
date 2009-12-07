@@ -1,0 +1,44 @@
+
+Look inside "Makefile" to see how to set up pamela.
+
+Mostly it is fairly straightforward, but there are a couple of
+problems that you might encounter:
+
+1) If everything links OK, but every command falls over saying
+   "segmentation fault" before getting anywhere, you may be suffering
+   from a problem of STARLINK and RedHat. This needs a different version
+   of "libcurses.a" placed so that it is used during linking. Once you
+   have done so, re-link pamela. See the STARLINK site for more detailed
+   instructions. Ignore anything they may say about the problem being fixed
+   under RedHat 7, it seems not to be true as far as I can tell. It has been
+   encountered under RedHat 5, 6.2, 7.1 and 7.2.
+
+2) You may encounter another problem with NDF which will occur as soon as you 
+   try to run a routine as a result of running across a network. Redirecting 
+   your ADAM_USER environment variable (with setenv) seems to be the way to cure 
+   this; it likes this to be on your local machine.
+
+
+Installing on Macs (intel)
+
+Install the scisoft software suite from ESO, it has the pgplot that works (you
+get loads of other stuff too e.g. IRAF):
+
+http://web.mac.com/npirzkal/iWeb/Scisoft/Scisoft.html
+
+For pgplot you need aquaterm (http://sourceforge.net/projects/aquaterm/)
+
+You should install compilers: gcc (http://developer.apple.com/tools/),
+gfortran (http://hpc.sourceforge.net/) and g95.
+
+PGPLOT in the makefile should be set to:
+
+PGPLOT     = -L$(PGDIR) -lpgplot -lgwm -lgfortran -laquaterm -L/usr/X11R6/lib -lX11 
+
+with PGDIR directed to the /scisoft version of pgplot
+
+Other useful stuff for the mac & astronomy can be located at:
+
+http://www.dsg.port.ac.uk/~eme/mac.html
+
+TRM

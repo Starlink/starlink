@@ -1,0 +1,78 @@
+#!/bin/csh
+#
+# This carries out initial data sorting for Dec 2005
+# SPY run including transfer from the ING computer,
+# conversion from FITS, correcting for multi-extension,
+# sorting into red and blue, fixing of headers,
+# and separation by source type. Supply it with a 'night number',
+# e.g. 1 for the first night, etc.
+#
+# The data on the ING computers should have written to a file
+# called 'transfer.tar'. You may want to delete this after
+# this routine has run to save space
+
+
+if($#argv != 1) then
+  echo "usage: night"
+  exit
+endif
+
+# the first night was 09/12/2005. Data on  ING computers
+# stored in directories of the form 20051209 so this next bit
+# just translates the night number into the correct date, and
+# would clearly reauire changing for another run.
+
+set day   = 8
+set night = $1
+
+@ day = ($day + $night)
+
+# you will get prompted for the password at this point
+if($day < 10) then
+  scp whtobs@draco.roque.ing.iac.es:/obsdata/whta/2005120"$day"/transfer.tar .
+else
+  scp whtobs@draco.roque.ing.iac.es:/obsdata/whta/200512"$day"/transfer.tar .
+endif
+
+# unpack
+tar xvf transfer.tar
+
+# convert all *.fit files to sdf
+
+source /star/etc/cshrc
+source /star/etc/login
+convert > /dev/null
+
+foreach file (`ls r*.fit`)
+  if( !(-e $file:r.sdf) ) then
+    fits2ndf $file $file:r 
+    echo "$file  --> $file:r.sdf"
+  else
+    echo "$file:r.sdf already exists"
+  endif
+end
+
+# fix up for ultradas
+pamela > /dev/null
+
+ultradas r*.sdf
+
+# fixheaders
+fixhead $night 3 r*.sdf
+
+# divide according to the instrument (needs directories 'red', 'blue'
+# and possibly 'aux' to be available
+whtdiv r*.sdf
+
+# delete the *.fit files
+\rm -f r*.fit
+
+# separate out accoring to nature 'bias', 'flat' etc.
+# Requires directories to be present. If not you
+# can create them and run 'splitbysource' by hand.
+ 
+cd red
+splitbysource r*.sdf
+
+cd ../blue
+splitbysource r*.sdf

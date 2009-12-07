@@ -1,0 +1,194 @@
+#
+# Used 3 poly terms when fitting flat.
+#
+# Data file specifying data dependent parameters for reduce.pl script.
+# Typically one should one such file for each night, arm of spectrograph
+# etc.
+#
+# Note # is the comment flag, = defines the start of a data item, 
+# a space defines its end. (i.e. no space in data items are possible).
+#
+# reduce.pl will look for exact matches to the words before the =
+# sign so don't be tempted to shorten them. It does not mind about changing
+# the number of spaces.
+#
+# ND 'reduce.pl' applies pattern matching rules to recognise the data items
+# and if your value fails you will get a message of the form
+# 'xstart undefined'
+#
+# If this happens look at the relevant entry in the data file.
+#
+# Examples of recognized integers: +34, 4, -6
+# although note that some variables expect only positive integers and
+# negative values will fail.
+
+# Version
+
+version  = 12/12/2005 # Must match the version in "reduce.pl"
+
+# NDF files always needed for reduction
+
+balance     = balance     # Balance frame name
+zero        = zero        # name of null frame
+unit        = unit        # name of unit frame 
+master sky  = SRMAST      # name of master sky region file for skymov
+
+# Script and log files (output and useful for checking on reduction)
+
+data types    = zzz_datatypes            # file of data types
+reduce script = zzz_reduction            # reduction script used
+reduce log    = zzz_reduction.log        # log of running reduction script.
+
+files         =   # Any extra files or file lists in adition to those on the command line.
+
+# Arc selection
+
+arc_pos_tolerance  = 2         # Tolerance on sky position (deg) for arc/object
+arc_pa_tolerance   = 2.        # Tolerance on PA of slit (deg) for arc/object
+arc_time_tolerance = 80.       # Tolerance on time (minutes) for arc/object
+
+# valid region of frame (i.e. avoiding all dodgy areas)
+
+xstart      = 10        # start of useful region in X
+xend        = 100       # end of useful region in X  
+ystart      = 801       # start of useful region in Y
+yend        = 3800      # end of useful region in Y  
+
+# noise model
+
+readout = 2.9           # Readout noise, RMS ADU. 
+bias_region = debias.reg # If defined, readout noise will be measured for each frame from this region
+photon  = 1.05           # electrons/ADU
+
+# Object identifier - use to distinguish spectra if extracting more than one object/frame.
+
+identifier =  # String that gets tacked onto files names. 
+
+# idtype parameters
+
+idtype_track   = TRMAST   # name of trace file (same one used for all files). Leave blank if you don't want one.
+idtype_nxwidth = 11       # median filter width in X
+idtype_nywidth = 15       # median filter width in Y
+idtype_tobjm   = 1.2    # multiplicative object threshold (only just > 1 if sky strong)
+idtype_tobja   = 40.0     # additive object threshold
+idtype_tlinm   = 50.      # multiplicative line threshold
+idtype_tlina   = 5000.    # additive line threshold
+idtype_flim    = 10000.   # junk/flat discrimination
+
+# Tracing of curved spectra
+
+track_npoly    = 4       # Order of tracing polynomial, 0 ==> no tracing
+track_xstart   = 20      # start of region to search for objects
+track_xend     = 90      # end of region to search for objects
+track_template =         # template trace dealing with high order coefficients. Blank to ignore
+track_tweak    = false   # 'true' or 'false' to tweak or not to find initial position (only relevant if track_template file specified)
+track_offset   = 1       # Offset to add when tweak (if track_tweak)
+track_fchange  = 2       # Reject if position changes by more than this after first position refine (if track_tweak)
+track_nobj     = 1       # Number of objects in the frame (if not !track_tweak)
+track_iobj     = 1       # Spectrum to extract counting from the left (if not !track_tweak)
+track_iblock   = 500     # No. of rows to average in finding objects (if not !track_tweak)
+track_ypos     = 2000    # Initial y position.
+track_width    = 25      # width of the window 
+track_esig     = 4.      # FWHM of gaussian for cross correlation.
+track_fwhm     = 3.      # Estimated true FWHM of profile
+track_clip     = 3.      # Rejection criterion for poly fitting
+track_nblock   = 1      # No. of rows to average in tracing objects
+track_psig     = 4       # Rejection criterion for blocking
+track_tcycle   = 10      # Number of rejection cycles for poly fitting
+track_change   = 1     # Reject if position changes by more than this after reject
+ 
+# Flats
+#
+# Fits to spectrum use ARD mask file to remove bad parts.
+# Example:
+#
+# DIMENSION(1)
+# LINE(0,54) .OR. LINE(1075,2100)
+#
+# This masks pixels at the start and end of the spectrum.
+
+nearflat    = false		# true/false to to create individual flats for object frames, in which case you need:
+twilight    = unit		# name of twilight frame (set = unit for no effect)
+maskfile    = ardfile		# ARD mask file for masking fit to mean flat spectrum
+flat_pos_tolerance  = 2         # Tolerance on sky position (deg) for flat/object association
+flat_pa_tolerance   = 10.       # Tolerance on PA of slit (deg) for flat/object
+flat_time_tolerance = 160.      # Tolerance on time (minutes) for flat/object
+flat_npoly  = 2			# No. of poly coeffs for fitting spectral variation of flats.
+flat_thrlo  = -3		# Lower reject threshold
+flat_thrhi  =  3 		# Upper reject threshold
+flat_ncycle = 10 		# Number of rejection cycles.
+ 
+# Dichroic ripple
+# ---------------
+# On WHT ISIS blue arm spectra, the dichroic "ripple" moves around, but there
+# is not enough signal in a typical flat at the extreme blue end, so using
+# "nearflat" directly can more than double the noise. To cope with this, we
+# form a balance frame by extracting a spectral response from the balance
+# frame created by "nearflat"  between  dichroic_ylo and dichroic_yhi and
+# multiply it row-wise through  a dichroic_balance - a balance frame for which the 
+# spectral response has been comletely divided out. (or for which the dichroic was
+# taken out, or a unit frame).
+# Note that these are figaro-style values i.e., pixel no. - 0.5
+# To disable this feature, set dichroic_ylo=0 (or nearflat = 0).
+# (PFLM 1 May 2001)
+
+dichroic_ylo = 0.0			# Lower limit to extract dichroic response.
+dichroic_yhi = 134.5			# Upper limit to extract dichroic response.
+dichroic_balance = dichroic_balance	# Flat with pixel-to-pixel noise only.
+
+# skymov parameters
+
+skymov_slo    = 20         # start of search region        
+skymov_shi    = 80         # end of search region          
+skymov_fwhm   = 4.0        # FWHM
+skymov_xpos   = 52.193     # object reference position  
+skymov_npoly  = 3          # number of poly coeffs 
+skymov_tlo    = -3.5       # lower reject threshold
+skymov_thi    = +3.2       # upper reject threshold
+skymov_nmin   = 3          # minimum block of bad pixels
+skymov_nwidth = 15         # median filter width 
+
+# Next is optional 'ardmask' file to mask bad pixels which
+# are fixed relative to the CCD
+
+sky_mask       = skymask.ard  # name of 1-D ardmask file to mask bad pixels
+
+# skyfit parameters
+
+skyfit_npoly  = 3      # number of poly coeffs
+skyfit_thresh = 3.     # reject threshold
+
+# extopt parameters (if tracing not being used)
+
+extopt_npoly  = 6      # number of poly coeffs
+extopt_thresh = 5.     # reject threshold
+extopt_nblock = 3      # rows/block
+extopt_nmed   = 5      # median filter width
+extopt_ratlim = 4.     # cosmic ray rejection
+extopt_eps    = 0.01   # prevent spurious rejection at high S/N
+
+# Profile fitting (if tracing being used)
+
+profit_npoly  = 3	# Order of profile fitting polynomial
+profit_sizex  = 0.5	# The separation in pixels between the polynomials.
+profit_thresh = 3.0	# Sigma threshold for poly fits.
+profit_nblock = 1	# Data will be taken in groups of NBLOCK rows
+profit_nmed   = 5       # median filter width
+profit_badval = 50000	# Bad pixel value for profit. Set large to ignore
+profit_nslow  = 30	# Number of pixels to reject slowly
+
+# optext parameters (if tracing is being used)
+
+optext_ratlim = 3.8     # cosmic ray rejection
+optext_eps    = 0.025   # prevent spurious rejection at high S/N
+optext_iave   = 1       # Number of sky pixels to average over.
+
+
+
+
+
+
+
+
+
+

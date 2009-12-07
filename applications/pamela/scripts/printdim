@@ -1,0 +1,18 @@
+#!/bin/csh -f
+#
+# script to print out sdf dimensions
+
+if($#argv < 1) then
+  echo "usage: file1 file 2 etc"
+  exit
+endif
+
+source $STARLINK_DIR/etc/cshrc
+source $STARLINK_DIR/etc/login
+
+foreach file ($argv)
+  set dim = `hdstrace $file:r.data_array.data | grep DATA | sed -e 's/ *DATA\(//' -e 's/\).*$//'`
+  echo "$file has dimensions = $dim"
+end
+
+exit

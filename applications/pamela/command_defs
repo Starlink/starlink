@@ -1,0 +1,45 @@
+#
+# List of pamela commands
+# Use 58 as last argument when running htmlcon
+# e.g.
+#
+# htmlcon command_defs help_pointers pamela command html/ 58
+#
+class Tilted           # commands that cope with tilted/curved spectra
+class Extract          # extraction commands
+class Sky              # sky estimation
+class Miscellaneous    # just what it says
+class Fitting          # polynomial etc fits
+class Statistics       # some useful statistics
+class Examine          # information on frames
+class Scripts          # scripts combining pamela commands
+extnor   -- normal spectrum extraction.                    # Tilted Extract 
+extopt   -- Horne's optimal extraction.                    # Extract Fitting
+faker    -- fakes up test data.                            # Miscellaneous
+idtype   -- determines data type, 'arc', 'flat' or 'data'. # Miscellaneous Tilted Examine
+medprf   -- median collapse of an image.                   # Miscellaneous Tilted Examine
+noise    -- calibrates noise model of detector.            # Statistics
+optext   -- optimal extraction from curved spectra.        # Extract Tilted
+pamela   -- general info on pamela.                        # Miscellaneous
+picstat  -- computes useful statistics on a file.          # Statistics Examine
+polfit   -- fits splines to spectra.                       # Fitting
+pplot    -- plots slices of data.                          # Miscellaneous Examine
+profit   -- fits profile to curved spectra.                # Extract Fitting Tilted
+recomp   -- recomputes fraction file for a new spectrum.   # Tilted
+regpic   -- interactive selection of sky/object regions.   # Sky Tilted
+skew     -- straightens/tilts a spectrum.                  # Tilted
+skyfit   -- makes poly fits to the sky background.         # Tilted Sky Fitting
+skymov   -- moves regions to account for drift along slit. # Sky Tilted
+splfit   -- fits splines to spectra.                       # Fitting
+track    -- measures and fits the spectrum curvature.      # Tilted Fitting
+debias   -- debiasses a series of frames                   # Scripts 
+fixhead  -- fixes headers into a standard form             # Scripts 
+makebias -- makes a mean bias frame                        # Scripts
+reduce   -- grand reduction script                         # Scripts
+rotate   -- rotate frames                                  # Scripts
+renumber -- renames frames to their run number             # Scripts
+splitbysource -- divides up data according to type (arc, flat etc) # Scripts
+ultradas -- converts from ultradas to standard format sdf  # Scripts
+lsnosdf  -- list files without trailing .sdf               # Scripts
+
+
