@@ -506,6 +506,19 @@ endif
 unset orac_dir
 
 #
+#   Pamela
+#
+
+if ( -e ${bindir}/pamela/pamela.csh ) then
+   alias pamelasetup source ${bindir}/pamela/pamela.csh
+   alias pamela source ${bindir}/pamela/pamela.csh
+else
+   alias pamelasetup ${staretcdir}/notinst pamelasetup
+   alias pamela ${staretcdir}/notinst pamela
+endif
+
+
+#
 #   Period
 #
 

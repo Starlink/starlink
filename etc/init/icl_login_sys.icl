@@ -74,6 +74,8 @@
 {       Added DATACUBE definitions.
 {    2009 May 6 (BRADC):
 {       Added CUPID definitions.
+{    2009 Dec 6th (TIMJ):
+{       Add PAMELA
 
 {  Display ICL Version
 VERSION
@@ -319,6 +321,16 @@ elseif file_exists("$NDPROGS_DIR/ndprogs.csh")
    defstring ndprogs notavailable NDPROGS
 else
    defstring ndprogs notinstalled NDPROGS
+endif
+
+{  POLPACK
+defhelp pamela $ADAM_PACKAGES PAMELA
+if file_exists("$PAMELA_DIR/pamela.icl") 
+   defstring pamela load $PAMELA_DIR/pamela.icl
+elseif file_exists("$POLPACK_DIR/pamela.csh")
+   defstring pamela notavailable PAMELA
+else
+   defstring pamela notinstalled PAMELA
 endif
 
 {  PHOTOM

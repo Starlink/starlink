@@ -456,6 +456,13 @@ if ( -e ${bindir}/oracdr ) then
 endif
 
 #
+#  PAMELA
+if ( -e ${bindir}/pamela/pamela.csh ) then
+   setenv PAMELA_DIR ${bindir}/pamela
+endif
+
+
+#
 #  PERIOD
 if ( -e ${bindir}/period ) then
    setenv PERIOD_DIR ${bindir}/period
