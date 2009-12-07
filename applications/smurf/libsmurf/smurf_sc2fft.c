@@ -32,6 +32,9 @@
 *     Transforming data loses the VARIANCE and QUALITY components.
 
 *  ADAM Parameters:
+*     FLAT = LOGICAL (Read)
+*          If set ensure data are flatfielded. If not set do not scale the
+*          data in any way (but convert to DOUBLE) [TRUE]
 *     IN = NDF (Read)
 *          Input files to be transformed
 *     INVERSE = _LOGICAL (Read)
@@ -75,6 +78,8 @@
 *        Use threads
 *     2009-10-13 (TIMJ):
 *        Concatenate files from the same sequence.
+*     2009-12-07 (EC):
+*        Add FLAT parameter.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -135,6 +140,7 @@ void smurf_sc2fft( int *status ) {
   smfArray *concat=NULL;     /* Pointer to a smfArray */
   size_t contchunk;          /* Continuous chunk counter */
   smfArray *darks = NULL;   /* dark frames */
+  int ensureflat;            /* Flag for flatfielding data */
   Grp *fgrp = NULL;         /* Filtered group, no darks */
   size_t gcount=0;           /* Grp index counter */
   smfGroup *igroup=NULL;     /* smfGroup corresponding to igrp */
@@ -193,6 +199,9 @@ void smurf_sc2fft( int *status ) {
   msgOutiff( MSG__NORM, "", "Found %zu continuous chunk%s", status, ncontchunks,
              (ncontchunks > 1 ? "s" : "") );
 
+  /* Are we flatfielding? */
+  parGet0l( "FLAT", &ensureflat, status );
+
   /* Are we doing an inverse transform? */
   parGet0l( "INVERSE", &inverse, status );
 
@@ -215,8 +224,8 @@ void smurf_sc2fft( int *status ) {
 
     /* Concatenate this continuous chunk but forcing a raw data read.
        We will need quality. */
-    smf_concat_smfGroup( wf, igroup, darks, NULL, contchunk, 1, 1, NULL, 0, NULL,
-                         NULL, 0, 0, 0, &concat, status );
+    smf_concat_smfGroup( wf, igroup, darks, NULL, contchunk, ensureflat, 1,
+                         NULL, 0, NULL, NULL, 0, 0, 0, &concat, status );
 
     /* Now loop over each subarray */
     /* Export concatenated data for each subarray to NDF file */

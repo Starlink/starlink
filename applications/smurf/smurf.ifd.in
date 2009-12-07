@@ -2121,6 +2121,15 @@ package @PACKAGE@ {
 
             helplib {$SMURF_HELP}
 
+            parameter FLAT {
+                type _LOGICAL
+                vpath {DEFAULT }
+                prompt {If set ensure data are flatfielded}
+                ppath GLOBAL CURRENT
+                default TRUE
+                helpkey *
+            }
+
             parameter in {
                 position 1
                 type NDF
@@ -2195,6 +2204,15 @@ package @PACKAGE@ {
         action sc2fft {
 
             helplib {$SMURF_HELP}
+
+            parameter FLAT {
+                type _LOGICAL
+                vpath {DEFAULT }
+                prompt {If set ensure data are flatfielded}
+                ppath GLOBAL CURRENT
+                default TRUE
+                helpkey *
+            }
 
             parameter in {
                 position 1

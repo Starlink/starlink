@@ -31,6 +31,9 @@
 *     "_con". The can be modified using the parameter OUT.
 
 *  ADAM Parameters:
+*     FLAT = LOGICAL (Read)
+*          If set ensure data are flatfielded. If not set do not scale the
+*          data in any way (but convert to DOUBLE) [TRUE]
 *     IN = NDF (Read)
 *          Input file(s)
 *     MAXLEN = _DOUBLE (Read)
@@ -71,6 +74,8 @@
 *        Add OUTFILES parameter.
 *     2009-10-20 (EC):
 *        Add USEDARKS parameter.
+*     2009-12-07 (EC):
+*        Add FLAT parameter.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -138,6 +143,7 @@ void smurf_sc2concat( int *status ) {
   size_t contchunk;          /* Continuous chunk counter */
   smfArray *darks = NULL;    /* dark frames */
   smfData *data=NULL;        /* Pointer to a smfData */
+  int ensureflat;            /* Flag for flatfielding data */
   Grp *fgrp = NULL;          /* Filtered group, no darks */
   size_t gcount=0;           /* Grp index counter */
   size_t idx;                /* Subarray counter */
@@ -209,6 +215,9 @@ void smurf_sc2concat( int *status ) {
   /* Are we using darks? */
   parGet0l( "USEDARKS", &usedarks, status );
 
+  /* Are we flatfielding? */
+  parGet0l( "FLAT", &ensureflat, status );
+
   /* Group the input files by subarray and continuity */
   smf_grp_related( igrp, isize, 1, maxlen-padStart-padEnd, &maxconcat, &igroup,
                    &basegrp, status );
@@ -230,9 +239,9 @@ void smurf_sc2concat( int *status ) {
   for( contchunk=0;(*status==SAI__OK)&&contchunk<ncontchunks; contchunk++ ) {
 
     /* Concatenate this continuous chunk */
-    smf_concat_smfGroup( wf, igroup, usedarks ? darks:NULL, NULL, contchunk, 1,
-                                      1, NULL, 0, NULL, NULL, padStart, padEnd,
-                                      0, &concat, status );
+    smf_concat_smfGroup( wf, igroup, usedarks ? darks:NULL, NULL, contchunk,
+                         ensureflat, 1, NULL, 0, NULL, NULL, padStart, padEnd,
+                         0, &concat, status );
 
     /* Export concatenated data for each subarray to NDF file */
     for( idx=0; (*status==SAI__OK)&&idx<concat->ndat; idx++ ) {
