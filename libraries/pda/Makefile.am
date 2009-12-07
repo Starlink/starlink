@@ -157,4 +157,6 @@ dist_pkgdata_DATA = Subplex_README
 # Files for distribution that are not picked up elsewhere.
 EXTRA_DIST = pda_err.msg
 
+BUILT_SOURCES = $(include_MESSAGES)
+
 CLEANFILES = PDA_ERR
