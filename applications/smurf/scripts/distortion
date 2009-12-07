@@ -1,4 +1,4 @@
-#!/bin/tcsh -x
+#!/bin/tcsh 
 
 #  Check a list of observations has been supplied on the command line.
 if( $# < 1 ) then
@@ -120,7 +120,7 @@ foreach indir ($dir_list)
 #  non-darks in a variable.
             set val = `$KAPPA_DIR/fitsmod $n edit=print keyword=SHUTTER`
             if( "$val" == "0" ) then
-               echo $n >> $t/darks.lis
+               echo $n >> darks.lis
             else
                set nondarks = "$nondarks $n"
             endif
