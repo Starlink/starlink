@@ -36,6 +36,6 @@ dnl STAR_CHECK_PROGS(hlib)
 
 dnl STAR_LATEX_DOCUMENTATION(sun102)
 
-AC_CONFIG_FILES([Makefile src/Makefile component.xml])
+AC_CONFIG_FILES([Makefile pamela.ifd src/Makefile component.xml])
 
 AC_OUTPUT
