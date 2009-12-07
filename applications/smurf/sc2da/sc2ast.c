@@ -815,7 +815,7 @@ int *status             /* global status (given and returned) */
    was the start of observing on 3rd December 2009 - the first night of
    observing with the corrected C2 mirror rotation. */
       if( distortion && !strcmp( "NEW", distortion ) ) {
-         if( state->tcs_tai > 55168.19 ) {
+         if( !state || state->tcs_tai > 55168.19 ) {
             distortion = "NEW3";   
          } else {
             distortion = "NEW2";   
