@@ -1,0 +1,87 @@
+#!/bin/tcsh
+
+#+
+#  Description:
+#     Displays a vector plot on the current graphics device showing the 
+#     distortion at each point in the quadrant of the focal plane containing
+#     subarrays s8d and s4a, and over-plots the outline of each sub-array. 
+#     The distortion to use can be specified on the command line or selected 
+#     by setting the environment variable SMURF_DISTORTION before running 
+#     this script.
+
+#  Usage:
+#     showdistortion [distortion] [fxoff fyoff]
+
+#  Arguments:
+#     distortion
+#        A distortion code. If no value is supplied, the current value of 
+#        the SMURF_DISTORTION envieonment variable will be used.
+#     fxoff fyoff
+#        The focal plane coordinates (in mm) of a reference point. The 
+#        distortion vector at this reference point will be subtracted from 
+#        all displayed vectors. If not supplied, no reference vector will 
+#        be subtracted.
+
+#-
+
+#  If a distortion code was given on the command line, use it.
+if( $# > 0 ) then
+   setenv SMURF_DISTORTION "$1"
+endif
+
+#  Report the distortion code that will be used, and note if no distortion
+#  is being used.
+set none = 0
+if( $?SMURF_DISTORTION ) then
+   set dist = "$SMURF_DISTORTION"
+   echo "   Using distortion polynomial '$SMURF_DISTORTION'" 
+   if( "$SMURF_DISTORTION" == "NONE" ) then
+      set none = 1;
+   endif    
+else
+   set dist = "OLD"
+   echo "   Using original distortion polynomial" 
+endif
+
+#  Note the focal plane position of the vector to use as the reference (if 
+#  any). This vector will be subtracted from all other displayed vectors.
+if( $# > 1 ) then
+   set fxoff = $2
+else
+   set fxoff = "!"
+endif
+
+if( $# > 2 ) then
+   set fyoff = $3
+else
+   set fyoff = "!"
+endif
+
+# Get NDFs holding the magnitude and orientation of the distortion at
+# each point in the focal plane.
+$SMURF_DIR/dsutils outmag=mag outang=ang in=! fxlo=-50 fxhi=0 fylo=0 fyh=50 \
+                   fxoff=$fxoff fyoff=$fyoff
+$KAPPA_DIR/settitle mag "'$dist distortion map'"
+
+#  Clear the graphics device, display a faint greyscale image of the vector 
+#  magnitude, and then draw the vectors (so long as SMURF_DISTORTION is 
+#  not NONE, VECPLOT objects to drawing nothing but zero length vectors).
+$KAPPA_DIR/gdclear current
+if( $none == 0 ) then
+   $KAPPA_DIR/display mag mode=sigma sigmas=\[-2,15\] quiet
+   $KAPPA_DIR/vecplot mag ang arrow=0.003 clear=no quiet
+else
+   echo "   There are no vectors draw because SMURF_DISTORTION is set to NONE"
+   $KAPPA_DIR/display mag mode=scale low=0 high=1 
+endif
+
+#  Display s8d outline in red
+$KAPPA_DIR/wcsframe mag s8d
+$KAPPA_DIR/ardplot region=mag quiet style='colour=red'
+$KAPPA_DIR/wcsframe mag fplane
+
+#  Display s4a outline in green
+$KAPPA_DIR/wcsframe mag s4a
+$KAPPA_DIR/ardplot region=mag quiet style='colour=green'
+$KAPPA_DIR/wcsframe mag fplane
+

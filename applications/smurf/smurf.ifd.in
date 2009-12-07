@@ -2880,6 +2880,10 @@ package @PACKAGE@ {
         obey {$SMURF_DIR/distortion}
     }
 
+    command showdistortion {
+        obey {$SMURF_DIR/showdistortion}
+    }
+
     icl {defhelp @PACKAGE@ $@PACKAGE_UPCASE@_HELP 0}
 
     display {

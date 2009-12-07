@@ -108,7 +108,8 @@ dist_pkgdata_DATA = LICENCE $(EXAMPLE_FILES)
 DYNSCRIPTS = smurf.sh smurf.csh smurf.icl
 
 # Install without modification
-STATICSCRIPTS = scripts/jcmtstate2cat scripts/dumpocscfg scripts/gettsys scripts/distortion
+STATICSCRIPTS = scripts/jcmtstate2cat scripts/dumpocscfg scripts/gettsys \
+scripts/distortion scripts/showdistortion
 
 # IFL files
 IFL_FILES = $(smurf_mon_TASKS:=.ifl) smurf_mon.ifl
