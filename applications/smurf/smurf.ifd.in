@@ -621,6 +621,23 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter colname {
+                type LITERAL
+                prompt {Name of a columne to write to an output NDF}
+                ppath CURRENT DEFAULT
+                vpath DEFAULT
+                default !
+                helpkey *
+            }
+
+            parameter colndf {
+                type NDF
+                access WRITE
+                prompt {Output NDF for values read from COLNAME column}
+                ppath CURRENT
+                helpkey *
+            }
+
             parameter feature {
                 type LITERAL
                 prompt {Feature to use for alignment}
@@ -762,7 +779,6 @@ package @PACKAGE@ {
                 ppath CURRENT DEFAULT
                 helpkey *
             }
-
 
             parameter outang {
                 type NDF

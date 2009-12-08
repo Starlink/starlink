@@ -40,6 +40,17 @@
 *          gives the border width in pixels. Time slices with peak positions 
 *          closer to any edge than this amount will not be included in the 
 *          output catalogue. [4]
+*     COLNAME = LITERAL (Read)
+*          Only accessed if a value is supplied for "INCAT". If supplied, 
+*          COLNAME should be the name of a column in the INCAT catalogue.
+*          An output NDF holding these values will be created (see
+*          parameter COLNDF). [!]
+*     COLNDF = NDF (Write)
+*          Only accessed if a value is supplied for "COLNAME". If supplied, 
+*          an NDF is created holding the values from the catalogue column
+*          specified by COLNAME. The column value from each row in the INCAT 
+*          catalgue is pasted into the output NDF at a position specified
+*          by the FEATURE parameter.
 *     FEATURE = LITERAL (Read)
 *          Only accessed if an input catalogue is specified via parameter
 *          "INCAT". It specifies whether the output offsets should be
@@ -243,6 +254,7 @@
 #define MXSHFT 6.0
 #define WORK1_SIZE 51*SEARCH*SEARCH*2
 #define MAXPATH 255
+#define MAXCOLNAME 15
 #define BUFSIZE 255
 #define HEADER "# SCUBA-2 focal plane distortion data"
 #define BC1 0
@@ -254,6 +266,7 @@
 #define AMP 6
 #define DAMP 7
 #define RMS 8
+#define EXTRA 9
 
 #define PIX2MM 1.135                   /* Focal plane pixel interval in mm */
 #define PIBY2 1.57079632679
@@ -324,6 +337,7 @@ void smurf_dsutils( int *status ) {
    SliceInfo *slices = NULL; /* Array of structures describing each time slice */
    char **words;             /* Pointer to array of word pointers */
    char buf[ BUFSIZE ];      /* Line read from input catalogue */
+   char colname[ MAXCOLNAME ];
    char feature[11];         /* Feature to use for distortion calculations */
    char incat[ MAXPATH ];    /* Name of input catalogue */
    char outcat[ MAXPATH ];   /* Name of output catalogue */
@@ -351,6 +365,7 @@ void smurf_dsutils( int *status ) {
    double *dfy_vals = NULL;  /* Pointer to focal plane Y offset values */
    double *dpx_vals = NULL;  /* Pointer to pixel X offset values */
    double *dpy_vals = NULL;  /* Pointer to pixel Y offset values */
+   double *extra_vals = NULL; 
    double *f1_vals = NULL;   /* Pointer to F1 column values */
    double *f2_vals = NULL;   /* Pointer to F2 column values */
    double *p1x;
@@ -936,7 +951,15 @@ void smurf_dsutils( int *status ) {
    }
 
 /* If we got an input catalogue... */
-   if( fp1 ) {
+   if( fp1 && *status == SAI__OK ) {
+
+/* See if we are pasting a single column of the catalogue into an output
+   NDF. If not, annul the error and pass on. */
+      parGet0c( "COLNAME", colname, MAXCOLNAME, status );
+      if(  *status == PAR__NULL ) {
+         errAnnul( status );
+         colname[ 0 ] = 0;
+      }
 
 /* Get the name of any output catalogue and attempt to open it. */
       if( *status == SAI__OK ) {
@@ -1005,6 +1028,12 @@ void smurf_dsutils( int *status ) {
       } else {
          col[ F1 ] = GetColIndex( header, "BC1", status );
          col[ F2 ] = GetColIndex( header, "BC2", status );
+      }
+
+      if( colname[ 0 ] ) {
+         col[ EXTRA ] = GetColIndex( header, colname, status );
+      } else {
+         col[ EXTRA ] = -1;
       }
 
 /* Initialiuse the number of rows read so far, and the upper and lower
@@ -1105,6 +1134,13 @@ void smurf_dsutils( int *status ) {
 
 /* If we read a feature position, store it in the expanded array. */
             if( p ) p[ nrow ] = val;
+
+/* Now look for an dstore any extra column. */
+            if( i == col[ EXTRA ] ) {
+               p = extra_vals = astGrow( extra_vals, nrow + 1, sizeof( *extra_vals ) );
+            }
+            if( p ) p[ nrow ] = val;
+
          }            
 
 /* Free resources. */
@@ -1193,9 +1229,12 @@ void smurf_dsutils( int *status ) {
       Filter( nrow, bc1_vals, damp_vals, 3.0, "DAMP", status );
       Filter( nrow, bc1_vals, rms_vals, 3.0, "RMS", status );
 
-/* Transfer flags into bc2_vals */
+/* Transfer flags into bc2_vals and extra_vals (if used). */
       for( irow = 0; irow < nrow; irow++ ) {
-         if( bc1_vals[ irow ] == VAL__BADD ) bc2_vals[ irow ] = VAL__BADD;
+         if( bc1_vals[ irow ] == VAL__BADD ) {
+            bc2_vals[ irow ] = VAL__BADD;
+            if( extra_vals ) extra_vals[ irow ] = VAL__BADD;
+         }
       }
 
 /* Create any required output catalogue */
@@ -1250,6 +1289,12 @@ void smurf_dsutils( int *status ) {
       PasteNDF( subarray, NULL, NULL, nrow, f1_vals, f2_vals, bc2_vals, dbf2_vals, map,
                 fp_fset, niter, genvar, 2.0, "OUTDY", status );
 
+/* Create an NDF holding any extra required column in the same way. */
+      if( extra_vals ) {
+         PasteNDF( subarray, NULL, NULL, nrow, f1_vals, f2_vals, extra_vals, 
+                   dbf1_vals, map, fp_fset, niter, genvar, 2.0, "COLNDF", status );
+      }
+
 /* Free resources. */
       bc1_vals = astFree( bc1_vals );
       bc2_vals = astFree( bc2_vals );
@@ -1264,6 +1309,7 @@ void smurf_dsutils( int *status ) {
       dpy_vals = astFree( dpy_vals );
       dfx_vals = astFree( dfx_vals );
       dfy_vals = astFree( dfy_vals );
+      extra_vals = astFree( extra_vals );
 
 /* Nothing else to do, so jump to the end. */
       goto L999;
@@ -1748,7 +1794,7 @@ static void PasteNDF( const char *subarray, int *lb, int *ub, int nvals,
    if( *status != SAI__OK ) return;
 
 /* Create the NDF with the required bounds (the default bounds match a 
-   complete s8d time slice). */
+   complete time slice). */
    if( !lb ) {
       lbnd[ 0 ] = 0;
       lbnd[ 1 ] = 0;
@@ -1857,7 +1903,6 @@ static void PasteNDF( const char *subarray, int *lb, int *ub, int nvals,
                dx = fabs( datvals[ irow ] - work2d[ irow ] );
                if( dx > NSIGMA*sqrt( work2v[ irow ] ) ){ 
                   datvals[ irow ] = VAL__BADD;
-                  varvals[ irow ] = VAL__BADD;
                   nrej++;
                }
             }

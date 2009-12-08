@@ -5,7 +5,7 @@ if( $# < 1 ) then
    echo 
    echo "Produces a 2D polynomial describing the SCUBA-2 focal plane distortion"
    echo 
-   echo "Usage: distortion <inlist> [-t]"
+   echo "Usage: distortion <inlist> [-t|-extra]"
    echo
    echo "   <inlist> is a text file in which each line contains the path"
    echo "   to a directory holding the raw time series cubes for a single"
@@ -14,6 +14,12 @@ if( $# < 1 ) then
    echo "If the -t option is supplied, the distortion is calculated on the"
    echo "basis of individual slices in the time series data. Otherwise it is"
    echo "calculated on the basis of maps made from individual bolometers."
+   echo
+   echo "If the -extra option is supplied (and the "-t" option is *not*"
+   echo "supplied), a pair of images is created for each observation, one"
+   echo "(with prefix '_amp') contains the peak amplitude of the fitted"
+   echo "source in each bolometer map, and the other (with prefix '_sum')
+   echo "the total data sum in the fitted source in each bolometer map."
    echo
    exit
 endif
@@ -38,11 +44,17 @@ foreach dir (`cat $1`)
    set dir_list = "$dir_list $indir"
 end
 
-#  See if we are using the timeslices or bolomaps algorithm
+#  See if we are using the timeslices or bolomaps algorithm. Also see
+#  if we are to create images of the peak value and total sum of the 
+#  fitted sources for each bolometer (can only be done when using the
+#  bolomaps algorithm).
 set method = BOLOMAPS
+set make_extra = 0
 if( $# > 1 ) then
    if( "$2" == "-t" ) then
       set method = TIMESLICES
+   else if( "$2" == "-extra" ) then
+      set make_extra = 1
    else   
       echo "Unknown second command line argument - $2"
       exit
@@ -132,138 +144,154 @@ foreach indir ($dir_list)
       set iscan = 0
       foreach n ($nondarks)
          @ iscan = $iscan + 1
+         set scandir = `basename $n .sdf`
+         mkdir $scandir
+         cd $scandir
    
 #  Tell the user what's happening
          echo "=========================="
          echo "Processing scan $n ....."
          echo " "
    
-#  Get the observation and subscan numbers
-         set obsnum = `$KAPPA_DIR/fitsmod $n edit=print keyword=OBSNUM`
-         set subscan = `$KAPPA_DIR/fitsmod $n edit=print keyword=NSUBSCAN`
-   
-#  The name of the output catalogue for this scan.
-         set scat = "scan-$iscan.txt"
-   
-#  Keep a list of all the output catalogues
-         set cats = "$cats $scat"
-   
 #  Use the iterative mapmaker to extract the astronomical and residual signals
-#  from a single subscan (with flat), add the signals together, remove NaNs,
-#  and set the bad-bits mask. 
+#  from a single subscan (with flat).
          echo "$n" > in.lis
-         echo "^darks.lis" >> in.lis
+         echo "^../darks.lis" >> in.lis
          $SMURF_DIR/makemap ^in.lis method=iter out=junk \
-              config="'^/star/share/smurf/dimmconfig.lis,exportndf=(ast,res,qua)'"
-         $KAPPA_DIR/native "*_res"
-         $KAPPA_DIR/setbb "*_res" 255
-         $KAPPA_DIR/add "*_res" "*_ast" test-new
-         rm -f *_res.sdf *_ast.sdf
+              config="'^/star/share/smurf/dimmconfig.lis,exportndf=(ast,res,qua)'" >& junk.log
+         cat junk.log
+
+#  Check makemap ran succesfully
+         grep \!\! junk.log >& /dev/null
    
+#  Check a peak was fitted succesfully.
+         if( $status == 1 ) then
+
+#  Get the subarray name, and its corresponding integer index. 
+            set subarray = `$KAPPA_DIR/fitsmod junk edit=print keyword=SUBARRAY`
+            if( $subarray == "s8a" ) then
+               set array = 0
+            else if( $subarray == "s8b" ) then
+               set array = 1
+            else if( $subarray == "s8c" ) then
+               set array = 2
+            else if( $subarray == "s8d" ) then
+               set array = 3
+            else if( $subarray == "s4a" ) then
+               set array = 4
+            else if( $subarray == "s4b" ) then
+               set array = 5
+            else if( $subarray == "s4c" ) then
+               set array = 6
+            else if( $subarray == "s4d" ) then
+               set array = 7
+            else 
+               echo "Unknown subarray - $subarray"
+               exit
+            endif
+
+#  Add the signals together, remove NaNs, and set the bad-bits mask. 
+            $KAPPA_DIR/native "*_res"
+            $KAPPA_DIR/setbb "*_res" 255
+            $KAPPA_DIR/add "*_res" "*_ast" test-new
+            rm -f *_res.sdf *_ast.sdf
+      
+#  Get the observation and subscan numbers
+            set obsnum = `$KAPPA_DIR/fitsmod $n edit=print keyword=OBSNUM`
+            set subscan = `$KAPPA_DIR/fitsmod $n edit=print keyword=NSUBSCAN`
+      
+#  The name of the output catalogue for this scan.
+            set scat = "$PWD/scan-$iscan.txt"
+      
+#  Keep a list of all the output catalogues
+            set cats = "$cats $scat"
+      
 #  Looking at individual bolometer time series, the noise values put into 
 #  the _res model by the iterative mapmaker seem way too high. So find the 
 #  noise in each bolometer by smoothing the time series for each bolometer, 
 #  then substracting the smoothed from the original, and collapsing to get
 #  sigma-clipped std. dev for each bolometer. 
-         $KAPPA_DIR/block in=test-new box=\[1,1,10\] out=test-smooth
-         $KAPPA_DIR/sub test-new test-smooth noise
-         $KAPPA_DIR/collapse noise axis=mjd bolo-noise estimator=csigma
-   
+            $KAPPA_DIR/block in=test-new box=\[1,1,10\] out=test-smooth
+            $KAPPA_DIR/sub test-new test-smooth noise
+            $KAPPA_DIR/collapse noise axis=mjd bolo-noise estimator=csigma
+      
 #  Square the bolometer noise values, expand out to a full 3D array and set 
 #  as the variance component in test-new.
-         $KAPPA_DIR/mult bolo-noise bolo-noise bolo-var
-         $KAPPA_DIR/wcsalign method=near in=bolo-var ref=test-new out=bvar-cube accept
-         $KAPPA_DIR/setvar test-new from=bvar-cube comp=data
-   
-#  Findback assumes the noise is the same through-out the data file. So convert
-#  the signal into an SNR cube, so that we can use an RMS of 1.0 for all 
-#  pixels.
-         $KAPPA_DIR/maths exp="ia/sqrt(va)" ia=test-new out=snr 
-   
-#  We want findback to process time series independently, so we need to 
-#  re-order the axes to put the time axis first.
-         $KAPPA_DIR/permaxes in=snr perm=\[3,1,2\] out=snr-perm
-   
-#  Now find the background in each time series.
-         $CUPID_DIR/findback in=snr-perm out=snr-back-perm box=\[400,1,1\] rms=1.0 \
-                       msg_filter=norm
-   
-#  Permute the axes in the background cube back to the original order.
-         $KAPPA_DIR/permaxes in=snr-back-perm perm=\[2,3,1\] out=snr-back
-   
-#  Convert the background from SNR to data, and then subtract from the 
-#  original data.
-         $KAPPA_DIR/maths exp="ia-ib*sqrt(va)" ia=test-new ib=snr-back out=backoff2
-   
+            $KAPPA_DIR/mult bolo-noise bolo-noise bolo-var
+            $KAPPA_DIR/wcsalign method=near in=bolo-var ref=test-new out=bvar-cube accept
+            $KAPPA_DIR/setvar test-new from=bvar-cube comp=data
+      
 #  Smooth the data spatially with a gaussian beam similar to the PSF. Use a 
 #  low WLIM in order to interpolate across missing pixels. This gives beamfit 
 #  a better chance of success. Remove quality first otherwise this foils our
 #  attempt to reduce the number of bad pixels.
-         $KAPPA_DIR/erase backoff2.quality ok
-         $KAPPA_DIR/gausmooth in=backoff2 out=backoff fwhm=2.5 wlim=0.6
-   
+            $KAPPA_DIR/erase test-new.quality ok
+            $KAPPA_DIR/gausmooth in=test-new out=backoff fwhm=2.5 wlim=0.6
+      
 #  Get a list of the time slice indices with data sum more than 0.5 of the
 #  maximum data sum in any slice, and in which the peak centroid is no more than 
 #  10 pixels from the telescope base positions. 
-         $SMURF_DIR/dsutils in=backoff border=4 maxerr=10 outcat=out.txt \
-                            lowfactor=0.5
-   
+            $SMURF_DIR/dsutils in=backoff border=4 maxerr=10 outcat=out.txt \
+                               lowfactor=0.5
+      
 #  Strip the header from the out.txt file and create lists holding the 
 #  column values.
-         grep -v \# out.txt > out2.txt
-         set izs = `cat out2.txt | awk '{print $1}'`
-         set sums = `cat out2.txt | awk '{print $2}'`
-         set bc1s = `cat out2.txt | awk '{print $3}'`
-         set bc2s = `cat out2.txt | awk '{print $4}'`
-         set cent1s = `cat out2.txt | awk '{print $5}'`
-         set cent2s = `cat out2.txt | awk '{print $6}'`
-         set peak1s = `cat out2.txt | awk '{print $7}'`
-         set peak2s = `cat out2.txt | awk '{print $8}'`
-   
+            grep -v \# out.txt > out2.txt
+            set izs = `cat out2.txt | awk '{print $1}'`
+            set sums = `cat out2.txt | awk '{print $2}'`
+            set bc1s = `cat out2.txt | awk '{print $3}'`
+            set bc2s = `cat out2.txt | awk '{print $4}'`
+            set cent1s = `cat out2.txt | awk '{print $5}'`
+            set cent2s = `cat out2.txt | awk '{print $6}'`
+            set peak1s = `cat out2.txt | awk '{print $7}'`
+            set peak2s = `cat out2.txt | awk '{print $8}'`
+      
 #  Use pixel coords from here on, increasing the format precision from the 
 #  one decimal place provided by the NDF library.
-         $KAPPA_DIR/wcsadd backoff frame=pixel domain=newpix maptype=unit accept
-         $KAPPA_DIR/wcsattrib backoff set 'format(1)' "%5.3f"
-         $KAPPA_DIR/wcsattrib backoff set 'format(2)' "%5.3f"
-         $KAPPA_DIR/wcsattrib backoff set 'format(3)' "%5.3f"
-   
+            $KAPPA_DIR/wcsadd backoff frame=pixel domain=newpix maptype=unit accept
+            $KAPPA_DIR/wcsattrib backoff set 'format(1)' "%5.3f"
+            $KAPPA_DIR/wcsattrib backoff set 'format(2)' "%5.3f"
+            $KAPPA_DIR/wcsattrib backoff set 'format(3)' "%5.3f"
+      
 #  Write out the header for the extended catalogue
-         echo "# SCUBA-2 focal plane distortion data" > $scat
-         echo "#" >> $scat
-         echo "# IZ Sum BC1 BC2 CENT1 CENT2 PEAK1 PEAK2 BF1 BF2 DBF1 DBF2 Amp DAmp RMS obs subscan" >> $scat
-   
+            echo "# SCUBA-2 focal plane distortion data" > $scat
+            echo "#" >> $scat
+            echo "# IZ Sum BC1 BC2 CENT1 CENT2 PEAK1 PEAK2 BF1 BF2 DBF1 DBF2 Amp DAmp RMS obs subscan" >> $scat
+      
 #  Loop round the selected slice indices.
-         set nslice = $#izs
-         set islice = 0
-         while( $islice < $nslice ) 
-            @ islice = $islice + 1
-   
+            set nslice = $#izs
+            set islice = 0
+            while( $islice < $nslice ) 
+               @ islice = $islice + 1
+      
 #  Get the slice index.
-            set iz = $izs[$islice]
-   
+               set iz = $izs[$islice]
+      
 #  Get the source centroid position (pixel coords) for this time slice
-            set cx = $cent1s[$islice]
-            set cy = $cent2s[$islice]
-   
+               set cx = $cent1s[$islice]
+               set cy = $cent2s[$islice]
+      
 #  Fit a gaussian to this position.
-            $KAPPA_DIR/beamfit backoff\(,,$iz\) mode=inter \
-                         pos=\"$cx $cy\" | grep \!\! >& /dev/null
-   
+               $KAPPA_DIR/beamfit backoff\(,,$iz\) mode=inter \
+                            pos=\"$cx $cy\" | grep \!\! >& /dev/null
+      
 #  Check a peak was fitted succesfully.
-            if( $status == 1 ) then
-   
+               if( $status == 1 ) then
+      
 #  Display the parameters of the fit, and copy them into the output text file.
-               set amp = `$KAPPA_DIR/parget amp beamfit`
-               set posxy = `$KAPPA_DIR/parget centre beamfit`
-               set rms = `$KAPPA_DIR/parget rms beamfit`
-               echo "$iz $sums[$islice] $bc1s[$islice] $bc2s[$islice] $cx $cy $peak1s[$islice] $peak2s[$islice] $posxy $amp $rms $obsnum $subscan" >> $scat
-               echo "Slice $iz ($islice of $nslice) "
-         
-            else
-               echo "Slice $iz ($islice of $nslice) - beamfit failure"
-            endif
-   
-         end   
+                  set amp = `$KAPPA_DIR/parget amp beamfit`
+                  set posxy = `$KAPPA_DIR/parget centre beamfit`
+                  set rms = `$KAPPA_DIR/parget rms beamfit`
+                  echo "$iz $sums[$islice] $bc1s[$islice] $bc2s[$islice] $cx $cy $peak1s[$islice] $peak2s[$islice] $posxy $amp $rms $obsnum $subscan" >> $scat
+                  echo "Slice $iz ($islice of $nslice) "
+            
+               else
+                  echo "Slice $iz ($islice of $nslice) - beamfit failure"
+               endif
+      
+            end   
+         endif
+         cd ..
       end
 
 #  Now concatenate all the individual catalogues into one. Initialise it by 
@@ -287,6 +315,29 @@ foreach indir ($dir_list)
       $SMURF_DIR/makemap "$indir/*" method=iter out=junk system=AZEL \
                 alignsys=t config="'^/star/share/smurf/dimmconfig.lis,bolomap=1'" | tee makemap.log
       
+#  Get the subarray name, and its corresponding integer index. 
+      set subarray = `$KAPPA_DIR/fitsmod junk edit=print keyword=SUBARRAY`
+      if( $subarray == "s8a" ) then
+         set array = 0
+      else if( $subarray == "s8b" ) then
+         set array = 1
+      else if( $subarray == "s8c" ) then
+         set array = 2
+      else if( $subarray == "s8d" ) then
+         set array = 3
+      else if( $subarray == "s4a" ) then
+         set array = 4
+      else if( $subarray == "s4b" ) then
+         set array = 5
+      else if( $subarray == "s4c" ) then
+         set array = 6
+      else if( $subarray == "s4d" ) then
+         set array = 7
+      else 
+         echo "Unknown subarray - $subarray"
+         exit
+      endif
+
 #  See if the bolomaps have a chunk number in the NDF name or not. If so, get 
 #  the highest chunk number (only check up to 5 chunks).
       grep "Writing single bolo map" makemap.log | grep CH05 > /dev/null
@@ -371,13 +422,14 @@ foreach indir ($dir_list)
       echo "# DBC2 - error in BC2" >> $cat
       echo "# AMP - source amplitude (produced by beamfit)" >> $cat
       echo "# DAMP - error in AMP" >> $cat
+      echo "# FSUM - total data value in fitted source (produed by beamfit)"
       echo "# RMS - RMS error of beamfit solution" >> $cat
       echo "# OBS - observation number" >> $cat
       echo "# DATE - observation date" >> $cat
       echo "# ARRAY - array index (s8a=0, s8b=1, s8c=2, s8d=3, s4a=4, s4b=5, s4c=6, s4d=7)" >> $cat
       echo "# ELEV - telescope elevation (degrees)" >> $cat
       echo "#" >> $cat
-      echo "# ICH BC1 BC2 BF1 BF2 DBC1 DBC2 AMP DAMP RMS OBS DATE ARRAY ELEV" >> $cat
+      echo "# ICH BC1 BC2 BF1 BF2 DBC1 DBC2 AMP DAMP FSUM RMS OBS DATE ARRAY ELEV" >> $cat
       
 #  Loop round all GRID X columns (1 to 32)
       set ix = 0
@@ -457,6 +509,7 @@ foreach indir ($dir_list)
                      set amp = `$KAPPA_DIR/parget amp beamfit`
                      set posxy = `$KAPPA_DIR/parget centre beamfit`
                      set rms = `$KAPPA_DIR/parget rms beamfit`
+                     set fsum = `$KAPPA_DIR/parget sum beamfit`
          
 #  Get the Mapping from bolomap pixel coords to sky offsets from the 
 #  reference point, and combine with the mapping from sky offsets to focal 
@@ -488,7 +541,7 @@ foreach indir ($dir_list)
          
 #  Display the parameters of the fit, and copy them into the output text
 #  file. 
-                        echo "$ich $bc1 $bc2 $bf1 $bf2 $posxy[3] $posxy[4] $amp $rms $obsnum $date $array $elev " >> $cat
+                        echo "$ich $bc1 $bc2 $bf1 $bf2 $posxy[3] $posxy[4] $amp $fsum $rms $obsnum $date $array $elev " >> $cat
                      endif   
                   else
                      echo "  beamfit failure"
@@ -500,40 +553,25 @@ foreach indir ($dir_list)
             end
          end
       end 
-      
 
+#  If required, create an image containing the peak source values for every 
+#  bolometer in the current observation, and another containing the fitted 
+#  total data sum.
+      if( $make_extra ) then
+         $SMURF_DIR/dsutils infitx=\! incat=$cat subarray=$subarray \
+                            feature=beam outdx=! outdy=! outcat=\! \
+                            colname=AMP colndf=../../$subarray$date-$obsnum-amp
+         $SMURF_DIR/dsutils infitx=\! incat=$cat subarray=$subarray \
+                            feature=beam outdx=! outdy=! outcat=\! \
+                            colname=FSUM colndf=../../$subarray$date-$obsnum-sum
+      endif
+
+   endif
 
 
 #  From here on is common to both bolomaps and timeslices methods
 #  ==============================================================
 
-#  Move into the parent directory
-      cd ..
-   endif
-
-#  Get the subarray name, and its corresponding integer index. 
-   set subarray = `$KAPPA_DIR/fitsmod junk edit=print keyword=SUBARRAY`
-   if( $subarray == "s8a" ) then
-      set array = 0
-   else if( $subarray == "s8b" ) then
-      set array = 1
-   else if( $subarray == "s8c" ) then
-      set array = 2
-   else if( $subarray == "s8d" ) then
-      set array = 3
-   else if( $subarray == "s4a" ) then
-      set array = 4
-   else if( $subarray == "s4b" ) then
-      set array = 5
-   else if( $subarray == "s4c" ) then
-      set array = 6
-   else if( $subarray == "s4d" ) then
-      set array = 7
-   else 
-      echo "Unknown subarray - $subarray"
-      exit
-   endif
-      
 #  Bin the offsets in the "total.txt" catalogue to create two images, one 
 #  containing FplaneX offsets and the other containing FplaneY offsets, 
 #  both in units of mm. The current WCS Frame in these images is FPLANE 
@@ -542,7 +580,7 @@ foreach indir ($dir_list)
    $SMURF_DIR/dsutils infitx=\! incat=$cat subarray=$subarray feature=beam \
                   outdx=outdx outdy=outdy outcat=\!
 
-#  Move back to the original directory.
+#  Move back to the "distortion-tmp" directory.
    cd ..
 
 #  Construct a list of all the outdx.sdf files, and another of all the 
