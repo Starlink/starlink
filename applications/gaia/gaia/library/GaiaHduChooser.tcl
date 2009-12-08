@@ -178,10 +178,13 @@ itcl::class gaia::GaiaHduChooser {
          }
 
          #  Write the HDU out to disk.
-         $image_ hdu get $hdu $converted_file
-
-         #  Success so cache for next time.
-         set tempfiles_($file,$hdu) $converted_file
+         if { [catch {$image_ hdu get $hdu $converted_file} msg] } {
+            error "Failed to decompress image to file $converted_file \
+                   (no write permission?) \n$msg"
+         } else {
+            #  Success so cache for next time.
+            set tempfiles_($file,$hdu) $converted_file
+         }
       }
 
       #  Display the image. Note this is not marked temporary as we reuse
