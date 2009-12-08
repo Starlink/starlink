@@ -18,7 +18,7 @@ if( $# < 1 ) then
    echo "If the -extra option is supplied (and the "-t" option is *not*"
    echo "supplied), a pair of images is created for each observation, one"
    echo "(with prefix '_amp') contains the peak amplitude of the fitted"
-   echo "source in each bolometer map, and the other (with prefix '_sum')
+   echo "source in each bolometer map, and the other (with prefix '_sum')"
    echo "the total data sum in the fitted source in each bolometer map."
    echo
    exit
