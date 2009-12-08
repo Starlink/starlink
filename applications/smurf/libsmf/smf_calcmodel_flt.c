@@ -53,8 +53,9 @@
 *        Enable multiple threads in call to smf_filter_execute
 *     2009-09-30 (EC)
 *        Measure normalized change in model between iterations (dchisq)
+*     2009-12-07 (EC)
+*        - optionally delay calculation until after 1st iteration (notfirst)
 *     {enter_further_changes_here}
-
 
 *  Copyright:
 *     Copyright (C) 2009 University of British Columbia.
@@ -121,6 +122,7 @@ void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   size_t noibstride;            /* bolo stride for noise */
   dim_t nointslice;             /* number of time slices for noise */
   size_t noitstride;            /* Time stride for noise */
+  int notfirst=0;               /* flag for delaying until after 1st iter */
   dim_t ntslice=0;              /* Number of time slices */
   smfArray *qua=NULL;           /* Pointer to QUA at chunk */
   unsigned char *qua_data=NULL; /* Pointer to quality data */
@@ -135,6 +137,17 @@ void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   if( !astMapGet0A( keymap, "FLT", &kmap ) ) {
     msgOutif( MSG__VERB, " ", FUNC_NAME ": FLT model requested, "
               "but no parameters specified.", status );
+    return;
+  }
+
+  /* Are we skipping the first iteration? */
+  if( !astMapGet0I(kmap, "NOTFIRST", &notfirst) ) {
+    notfirst = 0;
+  }
+
+  if( notfirst && (flags & SMF__DIMM_FIRSTITER) ) {
+    msgOutif( MSG__VERB, "", FUNC_NAME
+              ": skipping FLT this iteration", status );
     return;
   }
 

@@ -178,6 +178,11 @@ flt.filt_edgehigh = 0.1
 #flt.filt_notchlow  = (25,55)
 #flt.filt_notchhigh = (35,65)
 
+# delay calculation of FLT until after the first iteration? May help
+# with negative structure around bright sources
+
+#flt.notfirst = 1
+
 # extinction correction (see EXTINCTION task for further information)
 # Best is to use WVM, uses continuously varying measurements as a
 # function of time stored with each observation. This is the default if
