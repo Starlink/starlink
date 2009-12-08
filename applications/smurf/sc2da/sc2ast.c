@@ -20,10 +20,10 @@
 
 static char errmess[132];              /* For DRAMA error messages */
 
-#define MM2RAD (0.92*2.4945e-5)        /* scale at array in radians */
-#define MM2RAD_NEW1 MM2RAD*1.12857     /* MM2RAD for use with NEW1 distortion */
-#define MM2RAD_NEW2 MM2RAD*1.0842      /* MM2RAD for use with NEW2 distortion */
-#define MM2RAD_NEW3 MM2RAD*1.09607     /* MM2RAD for use with NEW3 distortion */
+#define MM2RAD 2.4945e-5               /* scale at array in radians */
+#define MM2RAD_NEW1 MM2RAD*1.0383      /* MM2RAD for use with NEW1 distortion */
+#define MM2RAD_NEW2 MM2RAD*0.9975      /* MM2RAD for use with NEW2 distortion */
+#define MM2RAD_NEW3 MM2RAD*1.0084      /* MM2RAD for use with NEW3 distortion */
 
 #define PIBY2 1.57079632679
 #define PI 2*PIBY2 
@@ -237,7 +237,12 @@ int *status             /* global status (given and returned) */
                  distortion map), and NEW3 (initial post-mirror-fix
                  distortion map). "NEW" gets translated to NEW2 or NEW3
                  depending on the date (from state->tcs_tai). (DSB)
-
+     8Dec2009  : Use "DATE" instead of "NEW" and make it the default. Add
+                 ORIGINAL as an option (to get the original distortion).
+                 Transfer Ed's 0.92 factor out of MM2RAD and into MM2RAD_NEW* -
+                 this will leave the NEW* mappings unchanged, but will 
+                 change ORIGINAL. Report an error if SMURF_DISTORTION has 
+                 an unknown value.
 */
 {
 
@@ -270,6 +275,17 @@ int *status             /* global status (given and returned) */
    double shift[2];
    double zshift[2];
 
+/* Codes identifying the available optical distortion maps */
+   enum distortion_codes {
+      BAD_DISTORTION,      /* A bad distortion code */
+      DATE_DISTORTION,     /* Appropriate distortion for date of observation */
+      ORIGINAL_DISTORTION, /* Original ray-traced distortion */
+      NONE_DISTORTION,     /* Assume no distortion */
+      NEW1_DISTORTION,     /* First estimate prior to C2 mirror fix */
+      NEW2_DISTORTION,     /* Second estimate prior to C2 mirror fix */
+      NEW3_DISTORTION      /* First estimate after C2 mirror fix */
+   } idistortion;
+
 /* xoff and yoff are the distance in pixel units from the tracking centre
    to the [0][0] pixel in a subarray */
 
@@ -282,7 +298,7 @@ int *status             /* global status (given and returned) */
 
 
 /* Values modified to reduce errors implied by NEW1 distortion (initial
-   pre-mirror-fix distortion). */
+   pre-C2-mirror-fix distortion). */
    /*    s8a    s8b     s8c   s8d    s4a    s4b    s4c    s4d */
    const double xoff_NEW1[8] =
       { -41.5,   33.5, 41.5, -32.83, -41.54,  33.5,  41.5, -33.5 };
@@ -291,7 +307,7 @@ int *status             /* global status (given and returned) */
 
 
 /* Values modified to reduce errors implied by NEW2 distortion (improved
-   pre-mirror-fix distortion). */
+   pre-C2-mirror-fix distortion). */
    /*    s8a    s8b     s8c   s8d    s4a    s4b    s4c    s4d */
    const double xoff_NEW2[8] =
       { -41.5,   33.5, 41.5, -32.62, -41.45,  33.5,  41.5, -33.5 };
@@ -300,7 +316,7 @@ int *status             /* global status (given and returned) */
 
 
 /* Values modified to reduce errors implied by NEW3 distortion (initial
-   post-mirror-fix distortion). */
+   post-C2-mirror-fix distortion). */
    /*    s8a    s8b     s8c   s8d    s4a    s4b    s4c    s4d */
    const double xoff_NEW3[8] =
       { -41.5,   33.5, 41.5, -31.46, -40.39,  33.5,  41.5, -33.5 };
@@ -312,8 +328,10 @@ int *status             /* global status (given and returned) */
 
 /* Distortion Mappings. A specific version of the distortion Mapping can
    be selected by setting a value for the SMURF_DISTORTION environment
-   variable. The default Mapping (used if SMURF_DISTORTION is not set) is 
-   the original least-squares fit to ray tracing provided by Tully:
+   variable. If SMURF_DISTORTION is left unset, a distortion appropriate for
+   the date of observation is used. If SMURF_DISTORTION is set to "ORIGINAL" 
+   the distortion used is the original least-squares fit to ray tracing 
+   provided by Tully:
 
    x = 0.30037 + 0.99216 * X - 1.4428e-4 * X^2 - 3.612e-6 * X^3
        + 9.6e-4 * Y - 8.628e-6 * Y^2 - 2.986e-7 * Y^3
@@ -560,7 +578,7 @@ int *status             /* global status (given and returned) */
 
 /* SMURF_DISTORTION = "NEW3": determined from bolomap approach, using 
    s4a and s8d data from 20091203_00092, 20091203_00038 and 20091203_00039
-   (post mirror fix). */
+   (post C2 mirror fix). */
 /* ------------------------------------------------------------ */
 
 /* SCUBA-2 PolyMap cooefficients. Forward coefficients are from 
@@ -808,37 +826,57 @@ int *status             /* global status (given and returned) */
                                                       rotmap, 1, " " );
 
 /* See which version of the distortion polynomial and array reference
-   points are to be used. */
+   points are to be used. If the environment variable is not set, use
+   "DATE". Otherwise, check it is a known value. */
       distortion = getenv( "SMURF_DISTORTION" );
 
-/* Translate NEW into NEW3 or NEW2 depending on its date. MJD 55168.19
-   was the start of observing on 3rd December 2009 - the first night of
-   observing with the corrected C2 mirror rotation. */
-      if( distortion && !strcmp( "NEW", distortion ) ) {
-         if( !state || state->tcs_tai > 55168.19 ) {
-            distortion = "NEW3";   
-         } else {
-            distortion = "NEW2";   
-         }
+      idistortion = BAD_DISTORTION;
+      if( ! distortion ) {
+         idistortion = DATE_DISTORTION;
+      } else if( !strcmp( distortion, "DATE" ) ) {
+         idistortion = DATE_DISTORTION;
+      } else if( !strcmp( distortion, "ORIGINAL" ) ) {
+         idistortion = ORIGINAL_DISTORTION;
+      } else if( !strcmp( distortion, "NONE" ) ) {
+         idistortion = NONE_DISTORTION;
+      } else if( !strcmp( distortion, "NEW1" ) ) {
+         idistortion = NEW1_DISTORTION;
+      } else if( !strcmp( distortion, "NEW2" ) ) {
+         idistortion = NEW2_DISTORTION;
+      } else if( !strcmp( distortion, "NEW3" ) ) {
+         idistortion = NEW3_DISTORTION;
+      } else if( *status == SAI__OK ) {
+         *status = SAI__ERROR;
+         sprintf( errmess, "Environment variable SMURF_DISTORTION has "
+                  "illegal value '%s'.\n", distortion );
+         ErsRep( 0, status, errmess );
+         return cache;
       }
 
+/* Translate DATE into the best estimate of the distortion for the date
+   the data was obtained. MJD 55168.19 was the start of observing on 3rd 
+   December 2009 - the first night of observing with the corrected C2 
+   mirror rotation. */
+      if( idistortion == DATE_DISTORTION ) {
+         if( !state || state->tcs_tai > 55168.19 ) {
+            idistortion = NEW3_DISTORTION;   
+         } else {
+            idistortion = NEW2_DISTORTION;   
+         }
+      }
 
 /* For each 450/850 subarray, the next Mapping creates FRAME450/FRAME850
    coordinates, which are coordinates in millimetres with origin at the
    center of the focal plane. */
-      if( !distortion ) {
-         shift[ 0 ] = xoff[ subnum ];
-         shift[ 1 ] = yoff[ subnum ];
-
-      } else if( !strcmp( "NEW1", distortion ) ) {
+      if( NEW1_DISTORTION == idistortion ) {
          shift[ 0 ] = xoff_NEW1[ subnum ];
          shift[ 1 ] = yoff_NEW1[ subnum ];
 
-      } else if( !strcmp( "NEW2", distortion ) ) {
+      } else if( NEW2_DISTORTION == idistortion ) {
          shift[ 0 ] = xoff_NEW2[ subnum ];
          shift[ 1 ] = yoff_NEW2[ subnum ];
 
-      } else if( !strcmp( "NEW3", distortion ) ) {
+      } else if( NEW3_DISTORTION == idistortion ) {
          shift[ 0 ] = xoff_NEW3[ subnum ];
          shift[ 1 ] = yoff_NEW3[ subnum ];
 
@@ -861,22 +899,19 @@ int *status             /* global status (given and returned) */
 
 /* Correct for polynomial distortion (as specified by the "SMURF_DISTORTION"
    environment variable). */      
-      if( !distortion ) {
-         polymap = astPolyMap( 2, 2, 14, coeff_f, 14, coeff_i, " " );
-
-      } else if( !strcmp( "NEW1", distortion ) ) {
+      if( NEW1_DISTORTION == idistortion ) {
          polymap = astPolyMap( 2, 2, ncoeff_f_NEW1, coeff_f_NEW1, 
                                      ncoeff_i_NEW1, coeff_i_NEW1, " " );
 
-      } else if( !strcmp( "NEW2", distortion ) ) {
+      } else if( NEW2_DISTORTION == idistortion ) {
          polymap = astPolyMap( 2, 2, ncoeff_f_NEW2, coeff_f_NEW2, 
                                      ncoeff_i_NEW2, coeff_i_NEW2, " " );
 
-      } else if( !strcmp( "NEW3", distortion ) ) {
+      } else if( NEW3_DISTORTION == idistortion ) {
          polymap = astPolyMap( 2, 2, ncoeff_f_NEW3, coeff_f_NEW3, 
                                      ncoeff_i_NEW3, coeff_i_NEW3, " " );
 
-      } else if( !strcmp( "NONE", distortion ) ) {
+      } else if( NONE_DISTORTION == idistortion ) {
          polymap = NULL;
 
       } else {
@@ -891,16 +926,13 @@ int *status             /* global status (given and returned) */
 /* Convert from mm to radians (but these coords are still cartesian (x,y)
    (i.e. measured in the tangent plane) rather than spherical (lon,lat)
    measured on the sky. */
-      if( !distortion ) {
-         radmap = astZoomMap ( 2, MM2RAD, " " );
-
-      } else if( !strcmp( "NEW1", distortion ) ) {
+      if( NEW1_DISTORTION == idistortion ) {
          radmap = astZoomMap ( 2, MM2RAD_NEW1, " " );
 
-      } else if( !strcmp( "NEW2", distortion ) ) {
+      } else if( NEW2_DISTORTION == idistortion ) {
          radmap = astZoomMap ( 2, MM2RAD_NEW2, " " );
 
-      } else if( !strcmp( "NEW3", distortion ) ) {
+      } else if( NEW3_DISTORTION == idistortion ) {
          radmap = astZoomMap ( 2, MM2RAD_NEW3, " " );
 
       } else {
