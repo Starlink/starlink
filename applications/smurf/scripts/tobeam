@@ -30,6 +30,7 @@
 #       Handle 3d "images"
 #    2009-12-08 (TIMJ):
 #       Integrate into SMURF and add copyright and licence.
+#       Use smaller gaussian FWHM.
 
 #  Copyright:
 #     Copyright (C) 2009 Science & Technology Facilities Council.
@@ -125,7 +126,7 @@ $ATOOLS_DIR/astmatrixmap nin=$ndim nout=$ndim form=1 matrix="$matrix" \
 
 #  Get the FWHM for the gaussian smoothing, 1/sqrt(2) of the full beam
 #  width (i.e. twice the Airy radius), and convert to output pixels.
-set fwhm = `$KAPPA_DIR/calc exp="(2.0*pa)/(sqrt(2.0)*pb)" pa=$airy \
+set fwhm = `$KAPPA_DIR/calc exp="(pa)/(sqrt(2.0)*pb)" pa=$airy \
                                                       pb=$outsize`
 
 #  Report:
