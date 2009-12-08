@@ -71,6 +71,9 @@ cd distortion-tmp
 mkdir adam
 setenv ADAM_USER $PWD/adam 
 
+#  Create some empty files so that we can append to them later.
+touch outdx.lis outdy.lis outdx_A.lis outdy_A.lis
+
 #  For each observation, use the iterative mapmaker to create a set of
 #  maps for each individual bolometer. An accurate position for the source 
 #  in each bolomap is found using kappa:beamfit. This is compared to the 
@@ -422,7 +425,7 @@ foreach indir ($dir_list)
       echo "# DBC2 - error in BC2" >> $cat
       echo "# AMP - source amplitude (produced by beamfit)" >> $cat
       echo "# DAMP - error in AMP" >> $cat
-      echo "# FSUM - total data value in fitted source (produed by beamfit)"
+      echo "# FSUM - total data value in fitted source (produed by beamfit)" >> $cat
       echo "# RMS - RMS error of beamfit solution" >> $cat
       echo "# OBS - observation number" >> $cat
       echo "# DATE - observation date" >> $cat
@@ -712,8 +715,11 @@ foreach n (`cat outdx_A.lis`)
 #  Get the subarray name, and store the result in a file for the subarray
    set words = `$KAPPA_DIR/setext $n DSUTILS get SUBARRAY loop=no`
    set subarray = $words[3]
-   echo $mean >> $subarray.fpcx
-
+   if( -e $subarray.fpcx ) then
+      echo $mean >> $subarray.fpcx
+   else
+      echo $mean > $subarray.fpcx
+   endif
 end
 
 #  Do the same for the Y offsets.
@@ -723,7 +729,11 @@ foreach n (`cat outdy_A.lis`)
    set mean = `$KAPPA_DIR/parget mean stats`
    set words = `$KAPPA_DIR/setext $n DSUTILS get SUBARRAY loop=no`
    set subarray = $words[3]
-   echo $mean >> $subarray.fpcy
+   if( -e $subarray.fpcx ) then
+      echo $mean >> $subarray.fpcy
+   else
+      echo $mean > $subarray.fpcy
+   endif
 end
 
 echo "" >> code.c
