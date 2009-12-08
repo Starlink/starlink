@@ -12,23 +12,24 @@
 #     Creates a unique set of filenames that describe a set of temporary files
 #     for a particular purpose. For instance if the prefix is set to
 #     "GaiaClass" and type to ".sdf" then each call to get_name will return a
-#     filename "GaiaClass<n>.sdf", where <n> is some unique integer.
-#     If the exists configuration option is set then it is acceptable
-#     for the given file to exist already (this is the default), 
-#     otherwise the name returned will not be that of an existing file.
+#     filename "GaiaClass<n>.sdf", where <n> is some unique integer.  If the
+#     exists configuration option is set then it is acceptable for the given
+#     file to exist already (this is the default), otherwise the name returned
+#     will not be that of an existing file.
 #
 #     All the names generated are stored and the associated disk files
 #     can be deleted using the "clear" method (note the unique integer
 #     will not be reset), further names can then be generated and
-#     stored. 
+#     stored.
 #
-#     By default the names are not absolute, so will be created
-#     in the default directory, but if the environment variable 
-#     GAIA_TEMP_DIR is set the names will be qualified using the
-#     directory.
+#     By default the names are not absolute, so will be created in the default
+#     directory, but if the environment variable GAIA_TEMP_DIR is set the names
+#     will be qualified using the directory. At least one check will be made to
+#     see if the current directory or GAIA_TEMP_DIR is writable and if not
+#     GAIA_TEMP_DIR will be set to /tmp.
 #
-#     If a one off name is required use the make_name method,
-#     but that will require a unique integer.
+#     If a one off name is required use the make_name method, but that will
+#     require a unique integer.
 
 #  Invocations:
 #
@@ -87,19 +88,20 @@
 #.
 
 itcl::class gaia::GaiaTempName {
-   
+
    #  Inheritances:
    #  -------------
-   
+
    #  Nothing
 
    #  Constructor:
    #  ------------
    constructor {args} {
-      
+
       #  Evaluate any options.
       eval configure $args
-   }   
+      check_writable_
+   }
 
    #  Destructor:
    #  -----------
@@ -147,7 +149,7 @@ itcl::class gaia::GaiaTempName {
    }
 
    #  Clear all the temporary files, deleting any diskfiles.
-   public method clear {} { 
+   public method clear {} {
       foreach f $tmpnames_ {
          if { [::file exists $f] } {
             catch {::file delete -force $f}
@@ -159,10 +161,36 @@ itcl::class gaia::GaiaTempName {
    #  Create a temporary file name from a prefix, integer and type.
    #  This will be made absolute if the GAIA_TEMP_DIR variable is set.
    public proc make_name {prefix unique type} {
+      check_writable_
       if { [info exists ::env(GAIA_TEMP_DIR)] } {
          set prefix [::file join "$::env(GAIA_TEMP_DIR)" "$prefix"]
       }
       return "${prefix}${unique}${type}"
+   }
+
+   #  Check if the designated directory is writable and if not change the 
+   #  setting of GAIA_TEMP_DIR to TMPDIR or /tmp.
+   protected proc check_writable_ {} {
+      if { ! $writechecked_ } {
+         set writable 0
+         if { [info exists ::env(GAIA_TEMP_DIR)] } {
+            if { [::file writable $::env(GAIA_TEMP_DIR)] } {
+               set writable 1
+            }
+         } else {
+            if { [::file writable "."] } {
+               set writable 1
+            }
+         }
+         if { ! $writable } {
+            if { [info exists ::env(TMPDIR)] } {
+               set ::env(GAIA_TEMP_DIR) $::env(TMPDIR)
+            } else {
+               set ::env(GAIA_TEMP_DIR) "/tmp"
+            }
+         }
+         set writechecked_ 1
+      }
    }
 
    #  Configuration options: (public variables)
@@ -176,7 +204,7 @@ itcl::class gaia::GaiaTempName {
 
    #  Whether it is OK to return the name of a file that exists.
    public variable exists 1
-   
+
    #  Protected variables: (available to instance)
    #  --------------------
 
@@ -190,6 +218,8 @@ itcl::class gaia::GaiaTempName {
    #  Common variables: (shared by all instances)
    #  -----------------
 
+   #  Whether writability has been checked.
+   common writechecked_ 0
 
 #  End of class definition.
 }

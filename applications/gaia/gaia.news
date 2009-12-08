@@ -72,6 +72,9 @@
     The import plain text file dialog now supports the definition of the
     RA and Dec celestial coordinate system.
 
+    If the current directory or the one pointed to by GAIA_TEMP_DIR is
+    not writable temporary files will be written into /tmp instead.
+
     Version 4.3-1
     =============
 
