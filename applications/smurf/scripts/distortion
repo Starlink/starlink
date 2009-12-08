@@ -627,12 +627,12 @@ $CCDPACK_DIR/makemos in=^outdy_A.lis out=outdy-total zero scale \
 $KAPPA_DIR/stats outdx-total quiet clip=\[3,3,3\]
 set mean = `$KAPPA_DIR/parget mean stats`
 $KAPPA_DIR/csub outdx-total $mean a.sdf
-mv a.sdf outdx-total.sdf
+mv -f a.sdf outdx-total.sdf
 
 $KAPPA_DIR/stats outdy-total quiet clip=\[3,3,3\]
 set mean = `$KAPPA_DIR/parget mean stats`
 $KAPPA_DIR/csub outdy-total $mean a.sdf
-mv a.sdf outdy-total.sdf
+mv -f a.sdf outdy-total.sdf
 
 #  Save the names of the total focal plane offset images
 set outdx = outdx-total
@@ -780,7 +780,7 @@ end
 
 echo
 if( -e code.c ) then
-   mv code.c ..
+   mv -f code.c ..
    echo "Finished - results are in file code.c"
 else
    echo "Finished - something went wrong so there are no results :-("
