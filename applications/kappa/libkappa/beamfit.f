@@ -361,6 +361,11 @@
 *     RMS = _REAL (Write)
 *        The primary beam position's root mean-squared deviation from
 *        the fit.
+*     SUM = _DOUBLE (Write)
+*        The total data sum of the multi-Gaussian fit. The fit is
+*        evaluated at the centre of every pixel in the input NDF
+*        (including bad-valued pixels), and the sum of these is 
+*        written to this output parameter.
 *     TITLE = LITERAL (Read)
 *        The title for the NDF to contain the residuals of the fit.
 *        If null (!) is entered the NDF will not contain a title.  
@@ -483,6 +488,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
+*     DSB: David Berry (JACH)
 *     {enter_new_authors_here}
 
 *  History:
@@ -528,6 +534,8 @@
 *     2009 December 4 (MJC):
 *        In interface mode shift the origin of degenerate axes to 1.
 *        Thus it is now possible to fit to arbitrary planes of a cube.
+*     8-DEC-2009 (DSB):
+*        Added parameter SUM.
 *     {enter_further_changes_here}
 
 *-
@@ -640,6 +648,7 @@
       CHARACTER*22 REFLAB        ! Label describing reference point
       CHARACTER*256 REFNAM       ! Reference name
       DOUBLE PRECISION REFPOS( BF__NDIM ) ! Reference position
+      LOGICAL RESID              ! Produce output residuals?
       DOUBLE PRECISION S2FWHM    ! Standard deviation to FWHM
       INTEGER SDIM( BF__NDIM )   ! Significant dimensions of the NDF
       CHARACTER*4 SEPAR          ! SEPn parameter name
@@ -649,6 +658,7 @@
       CHARACTER*7 SKYREF         ! Value of Frame attribute SkyRefIs
       INTEGER STATE              ! State of POSx parameter
       INTEGER SUBND( BF__NDIM )  ! Significant upper bounds of the image
+      DOUBLE PRECISION SUM       ! Sum of fit evaluated at pixel centres
       CHARACTER*80 TITLE         ! Title for output positions list
       INTEGER UBND( NDF__MXDIM ) ! Full NDF lower bounds
       LOGICAL VAR                ! Use variance for weighting
@@ -1279,37 +1289,54 @@
 *  input NDF.
       CALL LPG_PROP( NDFI, 'NOLABEL,WCS,AXIS', 'RESID', NDFR, STATUS )
 
+*  A null status can be ignored.  This means that no output NDF was
+*  required. Set a flag indicating that KPS1_BFREx should not form 
+*  the residuals, and stored (unused) values in the pointer variables.
+      IF ( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         RESID = .FALSE.
+         IPRES = 0
+         IPD = 0
+
+*  If an output NDF was given, set the flag to indicate that KPS1_BFREx 
+*  should form the residuals.
+      ELSE
+         RESID = .TRUE.         
+
 *  Determine the data type to use for the residuals map.
-      CALL NDF_MTYPE( '_REAL,_DOUBLE', NDFI, NDFI, 'Data', ITYPE,
-     :                DTYPE, STATUS )
+         CALL NDF_MTYPE( '_REAL,_DOUBLE', NDFI, NDFI, 'Data', ITYPE,
+     :                   DTYPE, STATUS )
 
 *  Map it for write access.
-      CALL KPG1_MAP( NDFR, 'Data', ITYPE, 'WRITE', IPRES, EL, STATUS )
+         CALL KPG1_MAP( NDFR, 'Data', ITYPE, 'WRITE', IPRES, EL, 
+     :                  STATUS )
 
 *  Map the input data array.
-      CALL KPG1_MAP( NDFI, 'Data', ITYPE, 'READ', IPD, EL, STATUS )
-
-*  Fill the data array with the evaluated point-spread function less
-*  the original array.
-      IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPS1_BFRED( DIMS( 1 ), DIMS( 2 ), %VAL( CNF_PVAL( IPD ) ),
-     :                    SLBND, NPOS, MXCOEF, FPAR,
-     :                    %VAL( CNF_PVAL( IPRES ) ), STATUS )
-      ELSE
-         CALL KPS1_BFRER( DIMS( 1 ), DIMS( 2 ), %VAL( CNF_PVAL( IPD ) ),
-     :                    SLBND, NPOS, MXCOEF, FPAR, 
-     :                    %VAL( CNF_PVAL( IPRES ) ), STATUS )
-      END IF
+         CALL KPG1_MAP( NDFI, 'Data', ITYPE, 'READ', IPD, EL, STATUS )
 
 *  Store a title.
-      CALL NDF_CINP( 'TITLE', NDFR, 'TITLE', STATUS )
+         CALL NDF_CINP( 'TITLE', NDFR, 'TITLE', STATUS )
 
 *  Store a label.
-      CALL NDF_CPUT( 'BEAMFIT residuals map', NDFR, 'Lab', STATUS )
+         CALL NDF_CPUT( 'BEAMFIT residuals map', NDFR, 'Lab', STATUS )
 
-*  A null status can be ignored.  This means that no output NDF was
-*  required.
-      IF ( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
+      END IF
+
+*  Fill the data array with the evaluated point-spread function less
+*  the original array. This also find the total data sum in the fit.
+*  Since we 
+      IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+         CALL KPS1_BFRED( DIMS( 1 ), DIMS( 2 ), %VAL( CNF_PVAL( IPD ) ),
+     :                    SLBND, NPOS, MXCOEF, FPAR, RESID,
+     :                    %VAL( CNF_PVAL( IPRES ) ), SUM, STATUS )
+      ELSE
+         CALL KPS1_BFRER( DIMS( 1 ), DIMS( 2 ), %VAL( CNF_PVAL( IPD ) ),
+     :                    SLBND, NPOS, MXCOEF, FPAR, RESID,
+     :                    %VAL( CNF_PVAL( IPRES ) ), SUM, STATUS )
+      END IF
+
+*  Write the total data sum to the output parameter.
+      CALL PAR_PUT0D( 'SUM', SUM, STATUS )
 
 *  End the NDF context.
       CALL NDF_END( STATUS )

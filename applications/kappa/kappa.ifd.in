@@ -7987,6 +7987,16 @@ package kappa {
             helpkey *
          }
 
+
+         parameter sum {
+            access WRITE
+            type _DOUBLE
+            vpath DEFAULT
+            default 0
+            prompt {Object to contain the total data sum in the fit}
+            helpkey *
+         }
+
          parameter title {
             type LITERAL
             vpath DEFAULT

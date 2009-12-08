@@ -1,5 +1,5 @@
       SUBROUTINE KPS1_BFRE<T>( DIM1, DIM2, IN, LBND, NPOS, NPAR, FPAR,
-     :                       OUT, STATUS )
+     :                       RESID, OUT, SUM, STATUS )
 *+
 *  Name:
 *     KPS1_BFREx
@@ -11,8 +11,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_BFREx( DIM1, DIM2, IN, LBND, NPOS, NPAR, FPAR, OUT,
-*                      STATUS )
+*     CALL KPS1_BFREx( DIM1, DIM2, IN, LBND, NPOS, NPAR, FPAR, RESID, 
+*                      OUT, SUM, STATUS )
 
 *  Description:
 *     This routine evaluates the BEAMFIT multi-Gaussian fit within an
@@ -35,8 +35,15 @@
 *     FPAR( NPAR ) = DOUBLE PRECISION (Given)
 *        The coefficients of the fit in the PIXEL Frame.  The width
 *         measures are standard deviations.
+*     RESID = LOGICAL (Read)
+*        Produce output residuals? If .FALSE., the IN and OUT arrays are
+*        not accessed, but a value for SUM is still returned.
 *     OUT( DIM1, DIM2 ) = ? (Returned)
 *        The residuals (original data minus model) at every element.
+*     SUM = DOUBLE PRECISION (Returned)
+*        The total data sum in the multi-Gaussian fit. This is the sum 
+*        of the model evaluated at the centre of every pixel in the 
+*        supplied NDF (including bad-valued pixels).
 *     STATUS = INTEGER (Given)
 *        The global status.
 
@@ -68,6 +75,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David Berry (JACH)
 *     {enter_new_authors_here}
 
 *  History:
@@ -78,6 +86,8 @@
 *     2009 November 5 (MJC):
 *        Make the residuals data minus model (previously it had the
 *        reverse sense).
+*     8-DEC-2009 (DSB):
+*        Added arguments SUM and RESID.
 *     {enter_further_changes_here}
 
 *-
@@ -98,9 +108,11 @@
       INTEGER NPOS
       INTEGER NPAR
       DOUBLE PRECISION FPAR( NPAR )
+      LOGICAL RESID
 
 *  Arguments Returned:
       <TYPE> OUT( DIM1, DIM2 )
+      DOUBLE PRECISION SUM
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -147,44 +159,54 @@
 *  Only need to apply the background level once.
       BACK( 1 ) = FPAR( 7 )
 
+*  Initialise the sum of the multi-Gaussian fit value at the centre of
+*  every pixel.
+      SUM = 0.0D0
+
 *  Loop for each line.
       DO J = 1, DIM2
          YY = DBLE( LBND( 2 ) + J - 1 ) - 0.5D0
 
 *  Loop for each column. 
          DO I = 1, DIM1
-            IF ( IN( I, J ) .NE. VAL__BAD<T> ) THEN
-               XX = DBLE( LBND( 1 ) + I - 1 ) - 0.5D0
+            XX = DBLE( LBND( 1 ) + I - 1 ) - 0.5D0
 
-               GI = 0.0D0
-               DO IG = 1, NPOS
-                  BPO = ( IG - 1 ) * BF__NCOEF
+            GI = 0.0D0
+            DO IG = 1, NPOS
+               BPO = ( IG - 1 ) * BF__NCOEF
 
 *  Define useful variables.
-                  CT = COS( FPAR( 5 + BPO ) )
-                  ST = SIN( FPAR( 5 + BPO ) )
+               CT = COS( FPAR( 5 + BPO ) )
+               ST = SIN( FPAR( 5 + BPO ) )
 
 *  Evaluate sum of Gaussians.  Recall FPAR( 1 + BPO ) and 
 *  FPAR( 2 + BPO ) are the x and y centre co-ordinates respectively for
 *  the IGth Gaussian.   FPAR( 3 + BPO ) and  FPAR( 4  + BPO ) are the 
 *  major- and minor-axis standard deviations respectively.
-                  E1 = ( XX - FPAR( 1 + BPO ) ) * CT +
-     :                 ( YY - FPAR( 2 + BPO ) ) * ST
-                  E2 = ( YY - FPAR( 2 + BPO ) ) * CT - 
-     :                 ( XX - FPAR( 1 + BPO ) ) * ST
-                  E3 = E1 * E1 / ( FPAR( 3 + BPO ) *  FPAR( 3 + BPO ) )
-                  E4 = E2 * E2 / ( FPAR( 4 + BPO ) *  FPAR( 4 + BPO ) )
-                  E5 = EXP( -0.5 * ( E3 + E4 ) )
-                  E6 = E5 * FPAR( 6 + BPO ) + BACK( IG )
-                  GI = GI + E6
-               END DO
+               E1 = ( XX - FPAR( 1 + BPO ) ) * CT +
+     :              ( YY - FPAR( 2 + BPO ) ) * ST
+               E2 = ( YY - FPAR( 2 + BPO ) ) * CT - 
+     :              ( XX - FPAR( 1 + BPO ) ) * ST
+               E3 = E1 * E1 / ( FPAR( 3 + BPO ) *  FPAR( 3 + BPO ) )
+               E4 = E2 * E2 / ( FPAR( 4 + BPO ) *  FPAR( 4 + BPO ) )
+               E5 = EXP( -0.5 * ( E3 + E4 ) )
+               E6 = E5 * FPAR( 6 + BPO ) + BACK( IG )
+               GI = GI + E6
+            END DO
  
-*  Form the residual.
-               OUT( I, J ) = IN( I, J ) - NUM_DTO<T>( GI )
-
-            ELSE
-               OUT( I, J ) = VAL__BAD<T>
+*  If required, form the residual.
+            IF( RESID ) THEN
+               IF ( IN( I, J ) .NE. VAL__BAD<T> ) THEN
+                  OUT( I, J ) = IN( I, J ) - NUM_DTO<T>( GI )
+               ELSE
+                  OUT( I, J ) = VAL__BAD<T>
+               END IF
             END IF
+
+*  Update the sum of the multi-Gaussian fit value at the centre of
+*  every pixel.
+            SUM = SUM + GI
+
          END DO
 
       END DO

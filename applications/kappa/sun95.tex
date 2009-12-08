@@ -15124,6 +15124,14 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          The primary beam position's root mean-squared deviation from
          the fit.
       }
+      \sstsubsection{
+         SUM = \_DOUBLE (Write)
+      }{
+         The total data sum of the multi-Gaussian fit. The fit is
+         evaluated at the centre of every pixel in the input NDF
+         (including bad-valued pixels), and the sum of these is 
+         written to this output parameter.
+      }
    }
    \sstexamples{
       \sstexamplesubsection{
