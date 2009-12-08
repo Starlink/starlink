@@ -41,9 +41,10 @@
 *     OUT( DIM1, DIM2 ) = ? (Returned)
 *        The residuals (original data minus model) at every element.
 *     SUM = DOUBLE PRECISION (Returned)
-*        The total data sum in the multi-Gaussian fit. This is the sum 
-*        of the model evaluated at the centre of every pixel in the 
-*        supplied NDF (including bad-valued pixels).
+*        The total data sum of the multi-Gaussian fit above the
+*        background. This is the sum of the model (minus the background) 
+*        evaluated at the centre of every pixel in the supplied NDF 
+*        (including bad-valued pixels).
 *     STATUS = INTEGER (Given)
 *        The global status.
 
@@ -204,8 +205,8 @@
             END IF
 
 *  Update the sum of the multi-Gaussian fit value at the centre of
-*  every pixel.
-            SUM = SUM + GI
+*  every pixel. Exclude the background.
+            SUM = SUM + GI - FPAR( 7 )
 
          END DO
 
