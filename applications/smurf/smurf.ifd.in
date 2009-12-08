@@ -2918,6 +2918,10 @@ package @PACKAGE@ {
         obey {$SMURF_DIR/showdistortion}
     }
 
+    command tobeam {
+        obey {$SMURF_DIR/tobeam}
+    }
+
     icl {defhelp @PACKAGE@ $@PACKAGE_UPCASE@_HELP 0}
 
     display {
