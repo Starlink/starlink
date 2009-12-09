@@ -632,8 +632,10 @@ if( $idir > 1 ) then
 
 #  If we only have one observation, just copy it to the right place.
 else
-   $KAPPA_DIR/ndfcopy in=^outdx.lis out=outdx-total.sdf
-   $KAPPA_DIR/ndfcopy in=^outdy.lis out=outdy-total.sdf
+   $KAPPA_DIR/ndfcopy in=^outdx.lis out=^outdx_A.lis
+   $KAPPA_DIR/ndfcopy in=^outdy.lis out=^outdy_A.lis
+   $KAPPA_DIR/ndfcopy in=^outdx_A.lis out=outdx_a
+   $KAPPA_DIR/ndfcopy in=^outdy_A.lis out=outdy-total.sdf
 endif
 
 #  Ensure that the mean residual (after sigma clipping) is zero.
