@@ -1,4 +1,4 @@
-#!/bin/tcsh 
+#!/bin/tcsh
 
 #  Check a list of observations has been supplied on the command line.
 if( $# < 1 ) then
@@ -74,17 +74,7 @@ setenv ADAM_USER $PWD/adam
 #  Create some empty files so that we can append to them later.
 touch outdx.lis outdy.lis outdx_A.lis outdy_A.lis
 
-#  For each observation, use the iterative mapmaker to create a set of
-#  maps for each individual bolometer. An accurate position for the source 
-#  in each bolomap is found using kappa:beamfit. This is compared to the 
-#  position implied by the telescope base position (assuming no distortion).
-#  A catalogue holding these positions is created for each observation. The 
-#  focal plane X and Y offsets are found for each bolometer and stored in a 
-#  catalogue (total.txt), in TOPCAT "ascii" format. This catalogue is then 
-#  used to create a pair of 2D NDFs, one holding the focal Plane X offset 
-#  for each bolometer, and the other holding the Y offsets (both in units 
-#  of mm). These are called outdx.sdf and outdy.sdf. Each observation is 
-#  processed in a separate directory.
+#  Loop round each observation.
 set idir = 0
 foreach indir ($dir_list)
 
@@ -274,22 +264,24 @@ foreach indir ($dir_list)
                set cx = $cent1s[$islice]
                set cy = $cent2s[$islice]
       
-#  Fit a gaussian to this position.
-               $KAPPA_DIR/beamfit backoff\(,,$iz\) mode=inter \
-                            pos=\"$cx $cy\" | grep \!\! >& /dev/null
+#  Fit a PSF to this position.
+               rm -f coin > /dev/null
+               echo "$cx,$cy" > coin
+               $KAPPA_DIR/psf backoff\(,,$iz\) incat=! cofile=coin isize=31 device=! | grep \!\! >& /dev/null
       
-#  Check a peak was fitted succesfully.
+#  Check a psf was fitted succesfully.
                if( $status == 1 ) then
       
-#  Display the parameters of the fit, and copy them into the output text file.
-                  set amp = `$KAPPA_DIR/parget amp beamfit`
-                  set posxy = `$KAPPA_DIR/parget centre beamfit`
-                  set rms = `$KAPPA_DIR/parget rms beamfit`
-                  echo "$iz $sums[$islice] $bc1s[$islice] $bc2s[$islice] $cx $cy $peak1s[$islice] $peak2s[$islice] $posxy $amp $rms $obsnum $subscan" >> $scat
+#  Copy the parameters of the psf into the output text file.
+                  set amp = `$KAPPA_DIR/parget amp1 psf`
+                  set posxy = `$KAPPA_DIR/parget centre psf`
+                  set fsum = `$KAPPA_DIR/parget total psf`
+         
+                  echo "$iz $sums[$islice] $bc1s[$islice] $bc2s[$islice] $cx $cy $peak1s[$islice] $peak2s[$islice] $posxy 0 0 $amp 0 0 $obsnum $subscan" >> $scat
                   echo "Slice $iz ($islice of $nslice) "
             
                else
-                  echo "Slice $iz ($islice of $nslice) - beamfit failure"
+                  echo "Slice $iz ($islice of $nslice) - psf failure"
                endif
       
             end   
@@ -512,11 +504,19 @@ foreach indir ($dir_list)
          
 #  Check a psf was found succesfully.
                   if( $status == 1 ) then
-         
+
 #  Get the parameters of the psf.
                      set amp = `$KAPPA_DIR/parget amp1 psf`
                      set posxy = `$KAPPA_DIR/parget centre psf`
-                     set fsum = `$KAPPA_DIR/parget total psf`
+
+#  Get the total data sum within 60 arc-sec of the source.
+                     if( $array > 3 ) then
+                        set diam = 30
+                     else
+                        set diam = 15
+                     endif
+                     $KAPPA_DIR/aperadd $ndf centre="$posxy" diam=$diam
+                     set fsum = `$KAPPA_DIR/parget total aperadd`
          
 #  Get the Mapping from bolomap pixel coords to sky offsets from the 
 #  reference point, and combine with the mapping from sky offsets to focal 
