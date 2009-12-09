@@ -41,8 +41,8 @@ The following new applications have been added:
    o  BEAMFIT
       -  The map of residuals now contains the normal 
       `data minus fit' evaluations rather than the reverse sense.
-      -  The total data sum in the multi-Gaussian fit is now written 
-      to the output parameter SUM.
+      -  The total background-subtracted data sum in the 
+      multi-Gaussian fit is now written to the output parameter SUM.
 
    o  BLOCK
 
