@@ -362,10 +362,11 @@
 *        The primary beam position's root mean-squared deviation from
 *        the fit.
 *     SUM = _DOUBLE (Write)
-*        The total data sum of the multi-Gaussian fit. The fit is
-*        evaluated at the centre of every pixel in the input NDF
-*        (including bad-valued pixels), and the sum of these is 
-*        written to this output parameter.
+*        The total data sum of the multi-Gaussian fit above the 
+*        background.  The fit is evaluated at the centre of every pixel
+*        in the input NDF (including bad-valued pixels).  The fitted 
+*        background level is then removed from the fit value, and the
+*        sum of these is written to this output parameter.
 *     TITLE = LITERAL (Read)
 *        The title for the NDF to contain the residuals of the fit.
 *        If null (!) is entered the NDF will not contain a title.  
