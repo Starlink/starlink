@@ -384,12 +384,12 @@ itcl::class gaia::GaiaNDFChooser {
       for {set i 0} {$i < $num_images_} {incr i} {
          set f [frame $w.f$i -borderwidth 2 -relief raised]
          set im [RtdImage $f.im \
-		    -graphics 0 \
-		    -displaymode 0 \
-		    -canvaswidth 100 \
-		    -canvasheight 100 \
-		    -fitwidth 100 \
-		    -fitheight 100]
+                    -graphics 0 \
+                    -displaymode 0 \
+                    -canvaswidth 100 \
+                    -canvasheight 100 \
+                    -fitwidth 100 \
+                    -fitheight 100]
          pack $im -fill both -expand 1
 
          # save widget names for later reference
@@ -432,7 +432,7 @@ itcl::class gaia::GaiaNDFChooser {
    #  This method is called when the user clicks on an image NDF icon.
    #  Display the selected image.
    protected method select_image_ndf_ {ndf {component "data"}} {
-      catch {
+      if { [catch {
          busy {
             $image_ hdu $ndf $component
             $itk_option(-image) configure -component $component
@@ -449,6 +449,15 @@ itcl::class gaia::GaiaNDFChooser {
             }
             catch "$table_ select_row [expr $ndf-1]"
             select_ndf_
+         }
+      } msg ] } {
+         warning_dialog "Failed to select NDF component: $msg"
+
+         #  If this isn't the data component, switch back to that.
+         #  Alternatively we could clear the display, but that would
+         #  loose the context.
+         if { $component != "data" } {
+            select_image_ndf_ $ndf "data"
          }
       }
    }

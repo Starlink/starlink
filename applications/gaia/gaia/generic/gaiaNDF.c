@@ -461,8 +461,16 @@ int gaiaMapComponent( int ndfid, void **data, const char* component,
    if ( strncmp( dtype, "_BYTE", 7 ) == 0 ) {
       strcpy( dtype, "_WORD" );
    }
-   ndfMap( ndfid, component, dtype, access, ptr, &el, &status );
-   *data = ptr[0];
+
+   /*  Take care to not pass back a random pointer if this fails 
+    *  (corrupt data component or invalid ERROR values). */
+   *data = NULL;
+   if ( status == SAI__OK ) {
+       ndfMap( ndfid, component, dtype, access, ptr, &el, &status );
+       if ( status == SAI__OK ) {
+           *data = ptr[0];
+       }
+   }
 
    /* If an error occurred return an error message */
    if ( status != SAI__OK ) {

@@ -9,7 +9,6 @@
  *  Language:
  *    C++
 
- *
  *  Notes:
  *    May want to create an NDFIO::initialize member if supporting NDF
  *    reading and writing from shared memory.
@@ -488,6 +487,7 @@ int NDFIO::makeDisplayable( int index, const char *component )
       //  Release existing displayable.
       if ( curd_ != 0 ) {
          gaiaFreeMNDF( NDFinfo_, curd_ );
+         curd_ = 0;
       }
 
       //  If NDF is marked writable then we need to allocate some
@@ -536,6 +536,9 @@ int NDFIO::makeDisplayable( int index, const char *component )
       else {
          // Failed to copy the image, must have ran out of memory or some
          // such.
+         if ( ! readonly ) {
+             cnfFree( indata );
+         }
          error( error_mess );
          free( error_mess );
          return 0;
