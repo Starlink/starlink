@@ -161,7 +161,7 @@ foreach indir ($dir_list)
          echo "$n" > in.lis
          echo "^../darks.lis" >> in.lis
          $SMURF_DIR/makemap ^in.lis method=iter out=junk \
-              config="'^/star/share/smurf/dimmconfig.lis,exportndf=(ast,res,qua)'" >& junk.log
+              config="'^$SMURF_DIR/../../share/smurf/dimmconfig.lis,exportndf=(ast,res,qua)'" >& junk.log
          cat junk.log
 
 #  Check makemap ran succesfully
@@ -316,7 +316,7 @@ foreach indir ($dir_list)
 
 #  Use the iterative mapmaker to create map for each individual bolometers.
       $SMURF_DIR/makemap "$indir/*" method=iter out=junk system=AZEL \
-                alignsys=t config="'^/star/share/smurf/dimmconfig.lis,bolomap=1'" | tee makemap.log
+                alignsys=t config="'^$SMURF_DIR/../../share/smurf/dimmconfig.lis,bolomap=1'" | tee makemap.log
       
 #  Get the subarray name, and its corresponding integer index. 
       set subarray = `$KAPPA_DIR/fitsmod junk edit=print keyword=SUBARRAY`
@@ -417,16 +417,16 @@ foreach indir ($dir_list)
       echo "# SCUBA-2 focal plane distortion data" > $cat
       echo "#" >> $cat
       echo "# ICH - zero-based makemap chunk index" >> $cat
-      echo "# BC1 - array pixel X coord at centre of source (produced by beamfit)" >> $cat
-      echo "# BC2 - array pixel Y coord at centre of source (produced by beamfit)" >> $cat
+      echo "# BC1 - array pixel X coord at centre of source " >> $cat
+      echo "# BC2 - array pixel Y coord at centre of source " >> $cat
       echo "# BF1 - array pixel X coord at bolometer centre" >> $cat
       echo "# BF2 - - array pixel Y coord at bolometer centre" >> $cat
       echo "# DBC1 - error in BC1" >> $cat
       echo "# DBC2 - error in BC2" >> $cat
-      echo "# AMP - source amplitude (produced by beamfit)" >> $cat
+      echo "# AMP - source amplitude " >> $cat
       echo "# DAMP - error in AMP" >> $cat
-      echo "# FSUM - total data value in fitted source (produed by beamfit)" >> $cat
-      echo "# RMS - RMS error of beamfit solution" >> $cat
+      echo "# FSUM - total data value in fitted source " >> $cat
+      echo "# RMS - RMS error of fit" >> $cat
       echo "# OBS - observation number" >> $cat
       echo "# DATE - observation date" >> $cat
       echo "# ARRAY - array index (s8a=0, s8b=1, s8c=2, s8d=3, s4a=4, s4b=5, s4c=6, s4d=7)" >> $cat
@@ -502,17 +502,21 @@ foreach indir ($dir_list)
          
 #  Find the pixel coords at the centre of the feature. The feature is 
 #  nominally at the reference point and so should, in the absence of errors 
-#  and incorrect polymaps, have pixel coords (0.5,0.5).
-                  $KAPPA_DIR/beamfit $ndf mode=inter pos=\"0.5 0.5\" | grep \!\! >& /dev/null
+#  and incorrect polymaps, have pixel coords (0.5,0.5). PSF fails unless a good 
+#  central position is supplied, so first find the peak value in a box centred 
+#  on (0,0)
+                  $KAPPA_DIR/stats $ndf'(0~20,0~20)' quiet
+                  rm -f coin > /dev/null
+                  $KAPPA_DIR/parget maxcoord stats > coin
+                  $KAPPA_DIR/psf $ndf incat=! cofile=coin isize=31 device=! | grep \!\! >& /dev/null
          
-#  Check a peak was fitted succesfully.
+#  Check a psf was found succesfully.
                   if( $status == 1 ) then
          
-# Get the parameters of the fit.
-                     set amp = `$KAPPA_DIR/parget amp beamfit`
-                     set posxy = `$KAPPA_DIR/parget centre beamfit`
-                     set rms = `$KAPPA_DIR/parget rms beamfit`
-                     set fsum = `$KAPPA_DIR/parget sum beamfit`
+#  Get the parameters of the psf.
+                     set amp = `$KAPPA_DIR/parget amp1 psf`
+                     set posxy = `$KAPPA_DIR/parget centre psf`
+                     set fsum = `$KAPPA_DIR/parget total psf`
          
 #  Get the Mapping from bolomap pixel coords to sky offsets from the 
 #  reference point, and combine with the mapping from sky offsets to focal 
@@ -520,7 +524,7 @@ foreach indir ($dir_list)
                      $ATOOLS_DIR/astgetmapping $ndf PIXEL SKY smap.ast
                      $ATOOLS_DIR/astcmpmap smap.ast bmap.ast yes \! sbmap.ast
          
-#  Use this CmpMap to transform the beam centre from bolomap pixel coords
+#  Use this CmpMap to transform the psf centre from bolomap pixel coords
 #  to offsets from the nominal reference point in pixel coords within the 
 #  bolometer array.
                      set dfp = `$ATOOLS_DIR/asttran2 sbmap.ast $posxy[1] $posxy[2] y`
@@ -534,20 +538,19 @@ foreach indir ($dir_list)
 #  corresponds to the bolometer array pixel coords of the source after 
 #  distortion (columns BF1 and BF2 give the bolometer array pixel coords 
 #  of the source before distortion). In the absence of any distortion, the 
-#  beamfit centre found above would be at bolometer array pixel offsets (0,0).
+#  psf centre found above would be at bolometer array pixel offsets (0,0).
 #  Any discrepancy is caused by distortion (and noise). So modify the known 
 #  bolometer position ($bf1,$bf2) by subtracting off the discrepancies in 
-#  the beamfit position to get the distorted source position.
+#  the psf position to get the distorted source position.
                      else
                         set bc1 = `$KAPPA_DIR/calc exp="pa-pb" pa=$bf1 pb=$dfp[1]`
                         set bc2 = `$KAPPA_DIR/calc exp="pa-pb" pa=$bf2 pb=$dfp[2]`
          
-#  Display the parameters of the fit, and copy them into the output text
-#  file. 
-                        echo "$ich $bc1 $bc2 $bf1 $bf2 $posxy[3] $posxy[4] $amp $fsum $rms $obsnum $date $array $elev " >> $cat
+#  Copy the parameters of the fit into the output text file. 
+                        echo "$ich $bc1 $bc2 $bf1 $bf2 0 0 $amp 0 $fsum 0 $obsnum $date $array $elev " >> $cat
                      endif   
                   else
-                     echo "  beamfit failure"
+                     echo "  psf failure"
                   endif
                endif
       
@@ -609,19 +612,29 @@ foreach indir ($dir_list)
 
 end
 
+#  If we have more than one observation, we need to combine them.
+if( $idir > 1 ) then
+
 #  Align all the outdx and outdy files. Alignment occurs in focal plane 
 #  X and Y coords.
-$KAPPA_DIR/wcsalign in=^outdx.lis out=^outdx_A.lis method=sincsinc wlim=0.4 \
-                    rebin=no ref=$refdx lbnd=!
-$KAPPA_DIR/wcsalign in=^outdy.lis out=^outdy_A.lis method=sincsinc wlim=0.4 \
-                    rebin=no ref=$refdy lbnd=!
+   $KAPPA_DIR/wcsalign in=^outdx.lis out=^outdx_A.lis method=sincsinc wlim=0.4 \
+                       rebin=no ref=$refdx lbnd=!
+   $KAPPA_DIR/wcsalign in=^outdy.lis out=^outdy_A.lis method=sincsinc wlim=0.4 \
+                       rebin=no ref=$refdy lbnd=!
 
 #  Mosaic them into a single image, adjusting the zero points to make 
-#  them agree as far as possible.
-$CCDPACK_DIR/makemos in=^outdx_A.lis out=outdx-total zero scale \
-                     logto=term skysup=0 method=median optov=$idir
-$CCDPACK_DIR/makemos in=^outdy_A.lis out=outdy-total zero scale \
-                     logto=term skysup=0 method=median optov=$idir
+#  them agree as far as possible. Use the largest possible number of overlaps.
+   @ nov = $idir - 1
+   $CCDPACK_DIR/makemos in=^outdx_A.lis out=outdx-total zero scale \
+                        logto=term skysup=0 method=median optov=$nov
+   $CCDPACK_DIR/makemos in=^outdy_A.lis out=outdy-total zero scale \
+                        logto=term skysup=0 method=median optov=$nov
+
+#  If we only have one observation, just copy it to the right place.
+else
+   $KAPPA_DIR/ndfcopy in=^outdx.lis out=outdx-total.sdf
+   $KAPPA_DIR/ndfcopy in=^outdy.lis out=outdy-total.sdf
+endif
 
 #  Ensure that the mean residual (after sigma clipping) is zero.
 $KAPPA_DIR/stats outdx-total quiet clip=\[3,3,3\]
@@ -701,6 +714,7 @@ $SMURF_DIR/dsutils subarray=s8d infitx=invdxr infity=invdyr outcode=inv.c \
                             outdx=! outdy=! forward=no
 
 #  Conbine both transformations into one file
+rm -f code.c >& /dev/null
 cat fwd.c inv.c > code.c
 
 #  Now find the systematic offset unique to each individual directory.
@@ -729,7 +743,7 @@ foreach n (`cat outdy_A.lis`)
    set mean = `$KAPPA_DIR/parget mean stats`
    set words = `$KAPPA_DIR/setext $n DSUTILS get SUBARRAY loop=no`
    set subarray = $words[3]
-   if( -e $subarray.fpcx ) then
+   if( -e $subarray.fpcy ) then
       echo $mean >> $subarray.fpcy
    else
       echo $mean > $subarray.fpcy
