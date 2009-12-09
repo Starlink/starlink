@@ -74,6 +74,10 @@
 
     If the current directory or the one pointed to by GAIA_TEMP_DIR is
     not writable temporary files will be written into /tmp instead.
+  
+    The presence of illegal negative variance values should be handled
+    when requesting that they be displayed as errors. Previously this 
+    condition caused GAIA to abort.
 
     Version 4.3-1
     =============
