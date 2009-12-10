@@ -85,6 +85,7 @@
 
 *  Copyright:
 *     Copyright (C) 2007 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -126,6 +127,9 @@
 *     2007 June 25 (MJC):
 *        Switch ORIENT to radians to be compatible with its use within
 *        KPS1_STPAD.
+*     2009 December 9 (MJC):
+*        Loosened constraint on size of marginal profiles such that it
+*        it now only restricts to the storage available in KPS1_STPAx.
 *     {enter_further_changes_here}
 
 *-
@@ -324,14 +328,15 @@
       DO IG = 1, NBEAMS
 
 *  Use moments to estimate the fit parameters.  The INIT array
-*  contains the fitted estimates for the centroid.
+*  contains the fitted estimates for the centroid.  101 is the
+*  dimension of the marginal arrays in KPS1_STPAx.
          CALL ERR_MARK
          INIT( 1 ) = PIXPOS( IG, 1 )
          INIT( 2 ) = PIXPOS( IG, 2 )
          CALL KPS1_STPAD( DIMS( 1 ), DIMS( 2 ),
      :                    %VAL( CNF_PVAL( IPWD ) ), FLBND, 1, 
-     :                    MIN( 15, DIMS( 1 ), DIMS( 2 ) ), INIT, SIGMIN,
-     :                    AXRAT, ORIENT, NGOOD, WORK, STATUS )
+     :                    MIN( 101, DIMS( 1 ), DIMS( 2 ) ), INIT,
+     :                    SIGMIN, AXRAT, ORIENT, NGOOD, WORK, STATUS )
 
 *  Something went wrong, say the array supplied is too small, and revert
 *  to semi-arbitrary default initial values for the coefficients.
