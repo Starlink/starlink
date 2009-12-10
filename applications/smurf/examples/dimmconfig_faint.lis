@@ -241,4 +241,4 @@ ext.taumethod =adaptive
 # Constrain boundary regions with low hit count to 0. The threshold is where
 # the hits are this fraction lower than the mean
 
-ast.zero_lowhits = 0.5
+#ast.zero_lowhits = 0.5
