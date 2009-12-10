@@ -33,7 +33,7 @@
 # Number of iterations
 #  postive number  = fixed number of iterations
 #  negative number = maximum iterations if using chi^2 stopping criteria
-numiter = 10
+numiter = -5
 
 # chi^2 tolerance in negative-numiter case (requires noi model component)
 chitol = 1e-3
@@ -64,7 +64,7 @@ maxlen = 0
 #  flt = apply filter to time streams
 #  noi = estimate time-domain variance
 
-modelorder = (com,gai,ext,ast,flt,noi)
+modelorder = (com,gai,ext,flt,ast,noi)
 
 # Export model files as NDF?
 # Specify a value of 1 or 0 to export all or none of the components
@@ -98,11 +98,11 @@ itermap = 1
 # --- Padding, apodization and mean subtraction are all fairly useful ---
 
 # Number of samples of padding to add to start and end before filtering
-padstart = 100
-padend = 100
+padstart = 1000
+padend = 1000
 
 # Apodize signals with a sin function roll-off across apod samples
-apod = 100
+apod = 1000
 
 # subtract a baseline polynomial of this order
 order = 0
@@ -188,8 +188,8 @@ com.boxcar = 10
 # com.gain_tol: n-sigma away from mean gain coefficient tolerance
 # com.gain_tolabs: absolute factor away from mean gain coefficient tolerance
 
-com.corr_tol = 3
-com.gain_tol = 3
+com.corr_tol = 3.5
+com.gain_tol = 3.5
 com.gain_abstol = 3
 
 # low-pass filter dark squid signals using boxcar of this width (if dks
@@ -198,7 +198,7 @@ dks.boxcar = 100
 
 # additional despiking / DC step finding after each iteration within noi
 # calculation
-noi.spikethresh = 10
+noi.spikethresh = 20
 noi.spikeiter = 0
 noi.dcbox = 200
 noi.dcthresh = 5
@@ -207,10 +207,10 @@ noi.dcbad = 1
 # iterative filter.
 
 # Good for 450um as independent detector drift drowned out by sky?
-flt.filt_edgehigh = 0.1
+#flt.filt_edgehigh = 0.1
 
 # Better for 850um
-#flt.filt_edgehigh = 0.3
+flt.filt_edgehigh = 0.3
 
 #flt.filt_edgelow = 90
 #flt.filt_notchlow  = (25,55)
@@ -236,4 +236,9 @@ ext.taumethod =adaptive
 # sources because the astronomical signal may completely dominate
 # sky signal.
 
-gai.flatfield = 1
+#gai.flatfield = 1
+
+# Constrain boundary regions with low hit count to 0. The threshold is where
+# the hits are this fraction lower than the mean
+
+ast.zero_lowhits = 0.5

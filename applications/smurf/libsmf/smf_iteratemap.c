@@ -1006,6 +1006,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       dat.map = thismap;
       dat.hitsmap = thishits;
       dat.mapvar = thisvar;
+      dat.mapweight = thisweight;
       dat.msize = msize;
       dat.chisquared = chisquared;
       if( havenoi ) {

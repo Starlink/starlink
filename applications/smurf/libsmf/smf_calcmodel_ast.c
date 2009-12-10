@@ -70,11 +70,12 @@
 *     2009-09-30 (EC)
 *        -Measure normalized change in model between iterations (dchisq)
 *        -don't re-add last model to residual because handled in smf_iteratemap
+*     2009-12-10 (EC)
+*        -add ast.zero_lowhits config parameter for zeroing the border
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
-*     University of British Columbia.
+*     Copyright (C) 2006-2009 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -119,18 +120,24 @@ void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)), smfDIMMData *d
   /* Local Variables */
   size_t bstride;               /* bolo stride */
   double dchisq=0;              /* this - last model residual chi^2 */
+  int *hitsmap;                 /* Pointer to hitsmap data */
   dim_t i;                      /* Loop counter */
   dim_t idx=0;                  /* Index within subgroup */
   dim_t ii;                     /* array index */
   dim_t j;                      /* Loop counter */
+  AstKeyMap *kmap=NULL;         /* Local keymap */
   smfArray *lut=NULL;           /* Pointer to LUT at chunk */
   int *lut_data=NULL;           /* Pointer to DATA component of lut */
-  double m;                      /* Hold temporary value of m */
+  double m;                     /* Hold temporary value of m */
+  double *map;                  /* Pointer to map data */
+  double meanhits;              /* Mean hits in the map */
   smfArray *model=NULL;         /* Pointer to model at chunk */
   double *model_data=NULL;      /* Pointer to DATA component of model */
   dim_t nbolo=0;                /* Number of bolometers */
   dim_t ndata;                  /* Number of data points */
   size_t ndchisq=0;             /* number of elements contributing to dchisq */
+  size_t newzero;               /* number new pixels zeroed */
+  dim_t ngood;                  /* Number good samples for stats */
   smfArray *noi=NULL;           /* Pointer to NOI at chunk */
   double *noi_data=NULL;        /* Pointer to DATA component of model */
   size_t noibstride;            /* bolo stride for noise */
@@ -142,17 +149,72 @@ void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)), smfDIMMData *d
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
   size_t tstride;               /* Time slice stride in data array */
+  double *mapvar = NULL;        /* Variance map */
+  double *mapweight = NULL;     /* Weight map */
+  double zero_lowhits=0;        /* Zero regions with low hit count? */
 
   /* Main routine */
   if (*status != SAI__OK) return;
+
+  /* Obtain pointer to sub-keymap containing COM parameters */
+  if( !astMapGet0A( keymap, "AST", &kmap ) ) {
+    kmap = NULL;
+  }
 
   /* Obtain pointers to relevant smfArrays for this chunk */
   res = dat->res[chunk];
   lut = dat->lut[chunk];
   qua = dat->qua[chunk];
+  map = dat->map;
+  hitsmap = dat->hitsmap;
+  mapvar = dat->mapvar;
+  mapweight = dat->mapweight; 
   model = allmodel[chunk];
   if(dat->noi) {
     noi = dat->noi[chunk];
+  }
+
+  /* Parse parameters */
+  if( kmap ) {
+    /* Will we apply boundary condition to map? */
+    if( astMapGet0D( kmap, "ZERO_LOWHITS", &zero_lowhits) ) {
+      if( zero_lowhits < 0 ) {
+        *status = SAI__ERROR;
+        errRep( "", FUNC_NAME ": AST.ZERO_LOWHITS cannot be < 0.", status ); 
+      }
+    }
+  }
+
+  if( *status != SAI__OK ) {
+    return;
+  }
+
+  /* Constrain map to zero around the edge? */
+  if( (*status == SAI__OK) && (zero_lowhits) ) {
+    /* Set hits pixels with 0 hits to VAL__BADI so that stats1 ignores them */
+    for( i=0; i<dat->msize; i++ ) {
+      if( hitsmap[i] == 0 ) {
+        hitsmap[i] = VAL__BADI;
+      }
+    }
+
+    /* Find the mean hits in the map */
+    smf_stats1I( hitsmap, 1, dat->msize, NULL, 0, &meanhits, NULL, &ngood,
+                 status );
+
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME
+               ": mean hits = %lf, ngood = %li", status, meanhits, ngood );
+
+    /* Apply boundary condition */
+    newzero = 0;
+    for( i=0; i<dat->msize; i++ ) {
+      if( (hitsmap[i] != VAL__BADI) && (hitsmap[i] < meanhits*zero_lowhits) ) {
+        map[i] = 0;
+        mapweight[i] = VAL__BADD;
+        mapvar[i] = VAL__BADD;
+        newzero ++;
+      }
+    }
   }
 
   /* Loop over index in subgrp (subarray) */

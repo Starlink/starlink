@@ -32,7 +32,7 @@ maxlen = 0
 #  flt = apply filter to time streams
 #  noi = estimate time-domain variance
 
-modelorder = (com,gai,ext,ast,flt,noi)
+modelorder = (com,gai,ext,flt,ast,noi)
 
 # Export model files as NDF?
 # Specify a value of 1 or 0 to export all or none of the components
@@ -203,4 +203,9 @@ ext.taumethod =adaptive
 # sources because the astronomical signal may completely dominate
 # sky signal.
 
-gai.flatfield = 1
+#gai.flatfield = 1
+
+# Constrain boundary regions with low hit count to 0. The threshold is where
+# the hits are this fraction lower than the mean
+
+# ast.zero_lowhits = 0.5
