@@ -552,14 +552,14 @@
       ELSE
 
 *  Get some workspace the length of the two axes.
-      CALL PSX_CALLOC( XDIM, '_DOUBLE', AXPTR, STATUS )
-      CALL PSX_CALLOC( YDIM, '_DOUBLE', AYPTR, STATUS )
+         CALL PSX_CALLOC( XDIM, '_DOUBLE', AXPTR, STATUS )
+         CALL PSX_CALLOC( YDIM, '_DOUBLE', AYPTR, STATUS )
 
 *  Fill the work arrays with pixel co-ordinates.
-      CALL KPG1_SSAZD( XDIM, 1.0D0, DBLE( LBND( 1 ) ) - 0.5D0,
-     :                 %VAL( CNF_PVAL( AXPTR ) ) , STATUS )
-      CALL KPG1_SSAZD( YDIM, 1.0D0, DBLE( LBND( 2 ) ) - 0.5D0,
-     :                 %VAL( CNF_PVAL( AYPTR ) ) , STATUS )
+         CALL KPG1_SSAZD( XDIM, 1.0D0, DBLE( LBND( 1 ) ) - 0.5D0,
+     :                    %VAL( CNF_PVAL( AXPTR ) ) , STATUS )
+         CALL KPG1_SSAZD( YDIM, 1.0D0, DBLE( LBND( 2 ) ) - 0.5D0,
+     :                    %VAL( CNF_PVAL( AYPTR ) ) , STATUS )
       END IF
 
 *  Calculate dimensions of work arrays.
