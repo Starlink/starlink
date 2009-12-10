@@ -58,6 +58,7 @@
 *        unchanged.
 
 *  Copyright:
+*     Copyright (C) 2009 Science and Technology Facilities Council.
 *     Copyright (C) 1992 Science & Engineering Research Council.
 *     Copyright (C) 1995, 1998 Central Laboratory of the Research
 *     Councils. All Rights Reserved.
@@ -82,6 +83,7 @@
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -92,6 +94,8 @@
 *        declarations.
 *     12-OCT-1998 (DSB):
 *        Added prologue comment about conversion of NaN and Inf values.
+*     2009-12-09 (TIMJ):
+*        Prevent a warning about possible HDS locator leak
 *     {enter_further_changes_here}
 
 *-
@@ -117,9 +121,10 @@
 *  Access the HDS structure to be converted.
       CALL DAT_ASSOC( 'OBJECT', 'UPDATE', LOC, STATUS )
 
-*  Perform the conversion and annul the locator.
+*  Perform the conversion and annul the locator and parameter.
       CALL KPG1_NACVT( LOC, STATUS )
       CALL DAT_ANNUL( LOC, STATUS )
+      CALL DAT_CANCL( 'OBJECT', STATUS )
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
