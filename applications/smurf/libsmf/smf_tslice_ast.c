@@ -99,6 +99,8 @@
 *        Do not use an int for index API use dim_t. Use smf_get_dims.
 *     2009-01-13 (TIMJ):
 *        DUT1 setting moved to WCS routines.
+*     2009-12-09 (TIMJ):
+*        Trap bad telescope position.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -213,11 +215,14 @@ void smf_tslice_ast (smfData * data, dim_t index, int needwcs, int * status ) {
     switch( hdr->instrument ) {
 
     case INST__SCUBA2:
-      /* Need to get the subarray number */
-      smf_find_subarray( hdr, NULL, 0, &subsysnum, status );
-      hdr->cache1 = sc2ast_createwcs2( subsysnum, tmpState, dut1, hdr->instap, 
-                                       hdr->telpos, &(hdr->wcs),
-                                       hdr->cache1, status );
+      /* only do this if we know we have a valid telescope position */
+      if ( ! tmpState->jos_drcontrol & DRCNTRL__POSITION ) {
+        /* Need to get the subarray number */
+        smf_find_subarray( hdr, NULL, 0, &subsysnum, status );
+        hdr->cache1 = sc2ast_createwcs2( subsysnum, tmpState, dut1, hdr->instap,
+                                         hdr->telpos, &(hdr->wcs),
+                                         hdr->cache1, status );
+      }
       break;
       
     case INST__AZTEC:

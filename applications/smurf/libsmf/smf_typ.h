@@ -151,6 +151,8 @@
  *        Add ACSIS observing modes.
  *     2009-05-20 (TIMJ):
  *        Add switching modes.
+ *     2009-12-09 (TIMJ):
+ *        Add _BIT values from sc2headman_struct.h
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -674,5 +676,23 @@ typedef struct {
   char name [GRP__SZNAM+1]; /* string to carry around naming the item */
 } smfSortInfo;
 
+
+/* These are the bits defined in the DA for use in the SCUBA-2 DRCONTROL
+   structure to indicate whether we are missing information from a particular
+   DRAMA task. A completely valid state item will have a DRCONTROL flag
+   of zero. These definitions should match those defined in sc2headman_struct.h
+   in the online software. */
+
+typedef enum {
+  DRCNTRL__SMU_BIT = 1,
+  DRCNTRL__PTCS_BIT = 2,
+  DRCNTRL__SCUBA2_BIT = 4,
+  DRCNTRL__RTS_BIT = 8,
+  DRCNTRL__FTS2_BIT = 16,
+  DRCNTRL__POL2_BIT = 32
+} drcntrl_bits;
+
+/* and define a combo value to indicate loss of telescope-ness */
+#define DRCNTRL__POSITION ( DRCNTRL__SMU_BIT | DRCNTRL__PTCS_BIT )
 
 #endif /* SMF_TYP_DEFINED */

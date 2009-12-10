@@ -66,6 +66,9 @@
 *        For a moving target copy the frameset and annul the copy since
 *        that is faster than clearing SkyRefIs attribute. Setting SkyRefIs
 *        is still slow.
+*     2009-12-09 (TIMJ):
+*        Check for valid astrometry using JOS_DRCONTROL (which became
+*        valid for SCUBA-2 on 20091205)
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -144,6 +147,17 @@ AstMapping *smf_rebin_totmap( smfData *data, dim_t itime,
    set to the epoch of the time slice. */
    smf_tslice_ast( data, itime, 1, status );
    swcsin = hdr->wcs;
+   if (!swcsin) return NULL;
+
+   /* If this is SCUBA-2 and we have a DRCONTROL flag indicating that
+      we are missing SMU and PTCS information for this slice we should
+      not try to use this slice for astrometry. We call after smf_tslice_ast
+      to ensure that the smfHead is in a consistent state. This DR control
+      test does not work for data before 20091205. */
+   if (*status == SAI__OK && hdr->instrument == INST__SCUBA2 &&
+       hdr->state->jos_drcontrol & DRCNTRL__POSITION) {
+     return NULL;
+   }
 
    /* Sometimes it is possible for the DA to drop some state structures.
       We need to trap that. */

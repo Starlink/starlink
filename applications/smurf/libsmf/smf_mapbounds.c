@@ -142,6 +142,10 @@
 *        to look at those 4 time slices.
 *     2009-11-03 (TIMJ):
 *        Skip bad bolo2map mappings and bad telescope data.
+*     2009-12-09 (TIMJ):
+*        Use DRCONTROL flags to check whether we got data from the SMU and TCS.
+*        For older data also check SMU information since bad values from the
+*        SMU can break sc2ast_createwcs.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -207,6 +211,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
   smfBox *box = NULL;          /* smfBox for current file */
   smfData *data = NULL;        /* pointer to  SCUBA2 data struct */
   double dlbnd[ 2 ];    /* Floating point lower bounds for output map */
+  drcntrl_bits drcntrl_mask = 0;/* Mask to use for DRCONTROL on this instrument */
   double dubnd[ 2 ];    /* Floating point upper bounds for output map */
   smfFile *file = NULL;        /* SCUBA2 data file information */
   AstFitsChan *fitschan = NULL;/* Fits channels to construct WCS header */
@@ -334,6 +339,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
       switch( hdr->instrument ) {
 	  
       case INST__SCUBA2:
+        drcntrl_mask = DRCNTRL__POSITION;
         /* 4 corner bolometers of the subarray */
         x_array_corners[0] = 1;
         x_array_corners[1] = 1;
@@ -481,10 +487,17 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
             JCMTState state = (hdr->allState)[j];
             double ac1 = state.tcs_tr_ac1;
             double ac2 = state.tcs_tr_ac2;
+            double smu = state.smu_az_jig_x;
             double offx, offy;
             int jstat = 0;
 
-            if (ac1 == VAL__BADD || ac2 == VAL__BADD) {
+            /* we also trap the case where we are missing SMU information
+               since this will affect the position of the telescope later
+               on. Have to test jos state first but data before 20091205 do
+               not have this set. Use SMU_AZ_JIG_X as a proxy for all SMU
+               data. */
+            if ( state.jos_drcontrol & drcntrl_mask ||
+                ac1 == VAL__BADD || ac2 == VAL__BADD || smu == VAL__BADD ) {
               /* missing telescope info */
               nbadt++;
               continue;
