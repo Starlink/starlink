@@ -2,21 +2,23 @@
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
+% ? Document identification
 \newcommand{\stardoccategory}  {Starlink General Paper}
 \newcommand{\stardocinitials}  {SGP}
-\newcommand{\stardocnumber}    {38.2}
+\newcommand{\stardocnumber}    {38.3}
 \newcommand{\stardocsource}    {sgp\stardocnumber}
 \newcommand{\stardocauthors}   {Malcolm J Currie, P T Wallace \&
                                 R F Warren-Smith}
-\newcommand{\stardocdate}      {1989 January 20}
+\newcommand{\stardocdate}      {2009 December 10}
 \newcommand{\stardoctitle}     {Starlink Standard Data Structures}
+% ? End of document identification
 %------------------------------------------------------------------------------
 
 \newcommand{\stardocname}{\stardocinitials /\stardocnumber}
 \markright{\stardocname}
 \setlength{\textwidth}{160mm}
-\setlength{\textheight}{240mm}
-\setlength{\topmargin}{-5mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
 \setlength{\oddsidemargin}{0mm}
 \setlength{\evensidemargin}{0mm}
 \setlength{\parindent}{0mm}
@@ -39,7 +41,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %\begin{latexonly} and %\end{latexonly} lines (used by 
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -86,31 +88,38 @@
 \newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
 \newcommand{\htmladdnormallink}[2]{#1}
 \newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
 \newcommand{\hyperref}[4]{#2\ref{#4}#3}
 \newcommand{\htmlref}[2]{#1}
 \newcommand{\htmlimage}[1]{}
 \newcommand{\htmladdtonavigation}[1]{}
 
-% Define commands for HTML-only or LaTeX-only text.
+\newenvironment{latexonly}{}{}
 \newcommand{\html}[1]{}
 \newcommand{\latex}[1]{#1}
-
-% Use latex2html 98.2.
 \newcommand{\latexhtml}[2]{#1}
+
+%  Provide CSS support.
+\newcommand{\htmlsetstyle}[3][]{}
+\newcommand{\htmladdtostyle}[3][]{}
 
 %  Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
 \newcommand{\xlabel}[1]{}
 
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+%  Define LaTeX2HTML symbol.
+\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
 
 %  Define command to re-centre underscore for Latex and leave as normal
 %  for HTML (severe problems with \_ in tabbing environments and \_\_
 %  generally otherwise).
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
+\renewcommand{\_}{\texttt{\symbol{95}}}
+%\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+%\latex{\setunderscore}
+
+%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  to stop the automatic creation of a second table of contents page
+%  by latex2html.
+\newcommand{\latexonlytoc}[0]{\tableofcontents}
 
 % -----------------------------------------------------------------------------
 %  Debugging.
@@ -124,6 +133,8 @@
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
 %end{latexonly}
+% -----------------------------------------------------------------------------
+% ? Document-specific \newcommand or \newenvironment commands.
 
 % -----------------------------------------------------------------------------
 
@@ -189,7 +200,7 @@
       \htmladdnormallink{Rutherford Appleton Laboratory}
                         {http://www.cclrc.ac.uk/ral} \\
    \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+      \htmladdnormallink{Starlink Project}{http://www.starlink.rl.ac.uk/}
    \begin{rawhtml} </H2> \end{rawhtml}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
@@ -220,15 +231,18 @@
 % -----------------------------------------------------------------------------
 % ? Latex document Table of Contents (if used).
 %  ===========================================
-% \newpage
+%\newpage
 \begin{latexonly}
    \setlength{\parskip}{0mm}
-   \tableofcontents
+   \latexonlytoc
    \setlength{\parskip}{\medskipamount}
    \markright{\stardocname}
 \end{latexonly}
 % ? End of Latex document table of contents
 % -----------------------------------------------------------------------------
+\cleardoublepage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
 
 \section{Introduction}
 \label{se:intro}
