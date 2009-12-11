@@ -495,8 +495,8 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
                since this will affect the position of the telescope later
                on. Have to test jos state first but data before 20091205 do
                not have this set. Use SMU_AZ_JIG_X as a proxy for all SMU
-               data. */
-            if ( state.jos_drcontrol & drcntrl_mask ||
+               data. Between 20091125 and 20091204 we had a -1 in DRCONTROL. */
+            if ( (state.jos_drcontrol >= 0 && state.jos_drcontrol & drcntrl_mask) ||
                 ac1 == VAL__BADD || ac2 == VAL__BADD || smu == VAL__BADD ) {
               /* missing telescope info */
               nbadt++;

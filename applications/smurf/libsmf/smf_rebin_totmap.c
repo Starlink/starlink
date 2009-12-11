@@ -153,9 +153,10 @@ AstMapping *smf_rebin_totmap( smfData *data, dim_t itime,
       we are missing SMU and PTCS information for this slice we should
       not try to use this slice for astrometry. We call after smf_tslice_ast
       to ensure that the smfHead is in a consistent state. This DR control
-      test does not work for data before 20091205. */
+      test does not work for data before 20091205. Between 20091125 and 20091204
+      DRCONTROL was erroneously negative. */
    if (*status == SAI__OK && hdr->instrument == INST__SCUBA2 &&
-       hdr->state->jos_drcontrol & DRCNTRL__POSITION) {
+       hdr->state->jos_drcontrol >= 0 && hdr->state->jos_drcontrol & DRCNTRL__POSITION) {
      return NULL;
    }
 
