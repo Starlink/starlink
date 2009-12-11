@@ -125,13 +125,13 @@ void smf_addmap1( double *map1, double *mapweight1,
      with map1 */
 
   for( i=0; i<msize; i++ ) {
-    if( map1[i] == VAL__BADD ) {
+    if( (map1[i] == VAL__BADD) || (mapvar1[i] == VAL__BADD) ) {
       /* If bad pixel in map1 just copy map2 */
       map1[i] = map2[i];
       mapweight1[i] = mapweight2[i]; 
       hitsmap1[i] = hitsmap2[i]; 
       mapvar1[i] = mapvar2[i];
-    } else if( map2[i] != VAL__BADD ) {
+    } else if( (map2[i] != VAL__BADD) && (mapvar2[i] != VAL__BADD) ) {
       /* Add together if both maps have good pixels */
       map1[i] = mapweight1[i]*map1[i] + mapweight2[i]*map2[i];
       mapweight1[i] += mapweight2[i];
