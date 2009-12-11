@@ -1872,18 +1872,65 @@ can be used to build NDFs and other {\it composite} structures.
 
 \subsection{\xlabel{se_polynomial}$<${\bf POLYNOMIAL}$>$ Structure\label{se:spolynomial}}
 
-The $<${\bf POLYNOMIAL}$>$ structure is used for storing the coefficients of an
-$n$-dimensional ordinary or Chebyshev polynomial.  Evaluation of
-the polynomial yields a $<${\bf float}$>$ scalar result.
+The $<${\bf POLYNOMIAL}$>$ structure is used for storing the
+coefficients of an $n$-dimensional ordinary or Chebyshev polynomial,
+or the coefficients of a cubic B-spline.  The value of the {[}{\bf
+VARIANT}{]} component defines which of these types of polynomial is
+stored.  Evaluation of the polynomial yields a $<${\bf float}$>$
+scalar result.
+
+In the following descriptions NAXIS is the dimensionality of the 
+{[}{\bf DATA\_ARRAY}{]} and therefore the dimensionality of the space
+over which the polynomial function is defined.
+
+\subsubsection{{[}{\bf VARIANT}{]} = `SIMPLE'}
 
 \begin{table}[hbt]
 \centering
-\caption{Contents of the $<${\bf POLYNOMIAL}$>$ Structure}
+\caption{Contents of the $<${\bf POLYNOMIAL}$>$ Structure,
+               {[}{\bf VARIANT}{]} = `SIMPLE'}
 \begin{tabular}{|l|l|l|}
 \hline
 Component Name & TYPE & Brief Description \\ \hline
-{[}{\bf VARIANT}{]} & $<${\bf \_CHAR}$>$ & registered variant \\
+{[}{\bf VARIANT}{]} & $<${\bf \_CHAR}$>$ & {\tt `SIMPLE'} \\
 {[}{\bf DATA\_ARRAY}{]} & $<${\bf farray}$>$ & coefficients \\
+{[}{\bf VARIANCE}{]}  & $<${\bf farray}$>$ & variance of the
+coefficients \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{description}
+\item [{[}DATA\_ARRAY{]}] This is mandatory.  The scalar (VALUE) which
+results from the evaluation of the polynomial inherits the equivalent
+primitive TYPE of the polynomial coefficients.
+
+The {[}{\bf DATA\_ARRAY}{]} is the $NAXIS$-dimensional array
+containing the $NAXIS$-di\-men\-sion\-al poly\-no\-mial
+co\-efficients.  The function is evaluated as:
+\[{\rm VALUE} = \sum {\rm DATA\underline{~~}ARRAY}(I_1,I_2,\ldots,I_{\rm NAXIS}) \prod_{j=1}^{\rm NAXIS} {\rm AXIS}_j\!^{I_j-1} \]
+summed over all elements of the DATA\_ARRAY.
+
+Here, AXIS$_n$ is the co-ordinate value along axis $n$, and NAXIS$_n$
+is the dimension of axis $n$.
+
+\item [{[}VARIANCE{]}]  This optional component is used to describe the
+variance of the errors associated with the polynomial coefficients
+given by the {[}{\bf DATA\_ARRAY}{]} component, and it must be an
+array of the same dimension as {[}{\bf DATA\_ARRAY}{]}.
+
+\end{description}
+
+\subsubsection{{[}{\bf VARIANT}{]} = `CHEBYSHEV'}
+
+\begin{table}[hbt]
+\centering
+\caption{Contents of the $<${\bf POLYNOMIAL}$>$ Structure,
+               {[}{\bf VARIANT}{]} = `CHEBYSHEV'}
+\begin{tabular}{|l|l|l|}
+\hline
+Component Name & TYPE & Brief Description \\ \hline
+{[}{\bf VARIANT}{]} & $<${\bf \_CHAR}$>$ & {\tt `CHEBYSHEV'} \\
+{[}{\bf DATA\_ARRAY}{]} & $<${\bf farray}$>$ & Chebyshev coefficients \\
 {[}{\bf VARIANCE}{]}  & $<${\bf farray}$>$ & variance of the coefficients \\
 {[}{\bf TMIN}(NAXIS){]} & $<${\bf float}$>$ & lower bound of co-ordinate range\\
 {[}{\bf TMAX}(NAXIS){]} & $<${\bf float}$>$ & upper bound of co-ordinate range\\ \hline
@@ -1891,59 +1938,80 @@ Component Name & TYPE & Brief Description \\ \hline
 \end{table}
 
 \begin{description}
-\item [{[}VARIANT{]}] At present, there are
-two variants. The base variant
-({[}{\bf VARIANT}{]} = {\tt `SIMPLE'}) is the ordinary polynomial,
-while
-{[}{\bf VARIANT}{]} = {\tt `CHEBYSHEV'} is used
-for storing Chebyshev polynomials.
-\item [{[}DATA\_ARRAY{]}]  This is mandatory.  The
-interpretation depends on the value
-of {[}{\bf VARIANT}{]}.  The
-scalar (VALUE) which results from the
-evaluation of the polynomial inherits the equivalent primitive TYPE
-of the polynomial coefficients.
 
-\begin{description}
-\item [{[}{\bf VARIANT}{]} =] {\tt `SIMPLE'}
-The {[}{\bf DATA\_ARRAY}{]} is the $NAXIS$-dimensional array containing
-the $NAXIS$-di\-men\-sion\-al poly\-no\-mial
-co\-efficients.  The function is evaluated as:
-\[{\rm VALUE} = \sum {\rm DATA\underline{~~}ARRAY}(I_1,I_2,\ldots,I_{\rm NAXIS}) \prod_{j=1}^{\rm NAXIS} {\rm AXIS}_j\!^{I_j-1} \]
-summed over all elements of the DATA\_ARRAY.
+\item [{[}DATA\_ARRAY{]}] This is mandatory.  The interpretation The
+scalar (VALUE) which results from the evaluation of the polynomial
+inherits the equivalent primitive TYPE of the polynomial coefficients.
 
-Here, AXIS$_n$ is the co-ordinate value along axis $n$, and
-NAXIS$_n$ is the dimension of axis $n$.
-
-\item [{[}{\bf VARIANT}{]} =] {\tt `CHEBYSHEV'}
 The {[}{\bf DATA\_ARRAY}{]} contains the NAXIS-dimensional
 array of Chebyshev-polynomial coefficients.  The function is evaluated as: 
 
 \[{\rm VALUE}=\sum {\rm DATA\underline{~~}ARRAY}(I_1,I_2,\ldots,I_{\rm NAXIS})\prod_{j=1}^{\rm NAXIS} T(I_{j-1},S_j) \]
-summed over all elements of the DATA\_ARRAY, where
-$T(m,x)$ is the Chebyshev polynomial of order $m$ evaluated at
-$x$ (in the range $-$1 to $+$1),
-and
-\[ S_n = ({\rm AXIS}_n - {\rm TMIN}(n))/({\rm TMAX}(n) - {\rm TMIN}(n)) \]
+summed over all elements of the DATA\_ARRAY, where $T(m,x)$ is the
+Chebyshev polynomial of order $m$ evaluated at $x$ (in the range $-$1
+to $+$1), and
+
+\[ S_n = ( 2 * {\rm AXIS}_n - ( {\rm TMAX}(n) + {\rm TMIN}(n))/({\rm TMAX}(n) - {\rm TMIN}(n)) \]
+
 
 If the polynomial is evaluated outside this interval, the result is bad, and set
 to the magic value.
-\end{description}
-\item [{[}VARIANCE{]}]
-This optional component is used to describe the variance of the
-errors associated with the polynomial coefficients given
-by the {[}{\bf DATA\_ARRAY}{]} component, and
-it must be an array of the same
-dimension as {[}{\bf DATA\_ARRAY}{]}.
-\item [NAXIS]
-The dimensionality of the
-{[}{\bf DATA\_ARRAY}{]} and therefore the dimensionality
-of the space over which the polynomial function is defined.
+
+\item [{[}VARIANCE{]}]  This optional component is used to describe the
+variance of the errors associated with the Chebyshev polynomial coefficients
+given by the {[}{\bf DATA\_ARRAY}{]} component, and it must be an
+array of the same dimension as {[}{\bf DATA\_ARRAY}{]}.
+
 \item [{[}TMIN{\rm ($n$)}{]}, {[}TMAX{\rm ($n$)}{]}]
-These are the minimum and maximum values along
-AXIS number $n$.  They represent the bounds of the normalised
-co-ordinate range.  Only processed if
-{[}{\bf VARIANT}{]} = {\tt `CHEBYSHEV'}, for which they are mandatory.
+These are the minimum and maximum values along AXIS number $n$.  They 
+represent the bounds of the normalised co-ordinate range.  They
+are mandatory.
+
+\end{description}
+
+
+\subsubsection{{[}{\bf VARIANT}{]} = `BSPLINE'}
+
+\begin{table}[hbt]
+\centering
+\caption{Contents of the $<${\bf POLYNOMIAL}$>$ Structure,
+               {[}{\bf VARIANT}{]} = `BSPLINE'}
+\begin{tabular}{|l|l|l|}
+\hline
+Component Name & TYPE & Brief Description \\ \hline
+{[}{\bf VARIANT}{]} & $<${\bf \_CHAR}$>$ & {\tt `BSPLINE'} \\
+{[}{\bf DATA\_ARRAY}{]} & $<${\bf farray}$>$ & coefficients \\
+{[}{\bf VARIANCE}{]}  & $<${\bf farray}$>$ & variance of the coefficients \\
+{[}{\bf SCALE}{]}  & $<${\bf float}$>$ & normalisation \\
+{[}{\bf KNOTS}{]}  & $<${\bf farray}$>$ & co-ordinates of the knots \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{description}
+
+\item The {[}{\bf DATA\_ARRAY}{]} contains the NAXIS-dimensional array of
+cubic-spline coefficients.  Its dimension along an axis is equal to 
+the total number of knots along that axis less four.  The function 
+is evaluated as: 
+
+\[{\rm VALUE}=1/{\rm SCALE}~~\sum {\rm DATA\underline{~~}ARRAY}(I_1,I_2,\ldots,I_{\rm NAXIS})\prod_{j=1}^{\rm NAXIS} B_j({\rm AXIS}_j) \]
+where $B_j$(AXIS$_j$) is the normalised cubic B-spline along the $j$th
+axis with the knots recorded in {[}{\bf KNOTS}{]}, and SCALE is the value 
+of component {[}{\bf SCALE}{]}.
+
+\item [{[}VARIANCE{]}]  This optional component is used to describe the
+variance of the errors associated with the spline coefficients
+given by the {[}{\bf DATA\_ARRAY}{]} component, and it must be an
+array of the same dimension as {[}{\bf DATA\_ARRAY}{]}.
+
+\item [{[}KNOTS{]}]  A vector of knot co-ordinatess, starting with
+those along the first dimension, followed by any second dimension, and
+so on.  It has a dimension that is the sum of the number of knots
+along all axes.
+
+\item [{[}SCALE{]}] The normalisation factor to convert the evaluated
+spline into the fitted value.
+
 \end{description}
 
 \subsection{\xlabel{se_array}$<${\bf ARRAY}$>$Structure\label{se:sarray}}
@@ -3336,4 +3404,21 @@ eds. Sedmak, K., Capaccioli, M. \& Allen, R.J., Osservatorio Astronomico
 di Trieste, p.445.
 \vspace{-2mm}
 \end{verse}
+
+\appendix
+\section{Release Notes}
+The document is substantially unchanged from the 1989 October version.
+The recent changes (SGP/38.3) are:
+\begin{itemize}
+\item a correction to the formula for evalution of the normalised
+co-ordinates for a Chebyshev polynomial,
+\item the addition of a $<${\bf POLYNOMIAL}$>$ variant for B-Splines,
+and
+\item some formatting changes.
+\end{itemize}
+
+Note that this document does not describe additional structures
+created since the late 1990s that are commonly found in NDFs, such as
+WCS and PROVENANCE.
+
 \end{document}
