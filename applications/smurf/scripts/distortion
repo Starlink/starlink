@@ -294,9 +294,18 @@ foreach indir ($dir_list)
 #  Copy the centroid parameters into the output text file.
                   set posxy = `$KAPPA_DIR/parget centre centroid`
                   set errxy = `$KAPPA_DIR/parget error centroid`
-                  echo "$iz $sums[$islice] $bc1s[$islice] $bc2s[$islice] $peak1s[$islice] $peak2s[$islice] $posxy $errxy 1 0 0 $obsnum $subscan" >> $scat
-                  echo "Slice $iz ($islice of $nslice) "
+
+#  Check there are no <bad> values.
+                  echo "$posxy $errxy" | grep bad >& /dev/null
+                  if( $status == 1 ) then
+
+                     echo "$iz $sums[$islice] $bc1s[$islice] $bc2s[$islice] $peak1s[$islice] $peak2s[$islice] $posxy $errxy 1 0 0 $obsnum $subscan" >> $scat
+                     echo "Slice $iz ($islice of $nslice) "
             
+                  else
+                     echo "Slice $iz ($islice of $nslice) - centroid failure"
+                  endif
+
                else
                   echo "Slice $iz ($islice of $nslice) - centroid failure"
                endif
