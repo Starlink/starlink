@@ -1310,8 +1310,10 @@ void smurf_makemap( int *status ) {
          arrays into the output NDF, free the work arrays, and use the
          NDF arrays from here on. */
       if( wf->nworker > 1 ) {
-         memcpy( (odata->pntr)[0], map, sizeof(double)*nxy );
-         memcpy( (odata->pntr)[1], variance, sizeof(double)*nxy );
+         if( *status == SAI__OK ) {
+            memcpy( (odata->pntr)[0], map, sizeof(double)*nxy );
+            memcpy( (odata->pntr)[1], variance, sizeof(double)*nxy );
+         }
          (void) smf_free( map, status );
          (void) smf_free( variance, status );
          map = (odata->pntr)[0];

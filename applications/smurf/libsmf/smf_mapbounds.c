@@ -365,6 +365,11 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
         y_array_corners[3] = 1;
         break;
 	  
+      case INST__ACSIS:
+        smf_find_acsis_corners( data, x_array_corners, y_array_corners, 
+                                status);
+        break;
+	  
       default:
         *status = SAI__ERROR;
         errRep(FUNC_NAME, "Don't know how to calculate mapbounds for data created with this instrument", status);	  

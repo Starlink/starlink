@@ -33,7 +33,8 @@
 *        Number of pixels in fplane_* LUTs. Ignored if cache from previous 
 *        call exists.
 *     state = JCMTState* (Given)
-*        Current JCMT state (time, pointing etc.)
+*        Current JCMT state (time, pointing etc.) If NULL is supplied,
+*        the returned FrameSet describes focal plane coords, in radians.
 *     dut1 = double (Given)
 *        DUT1 correction in seconds.
 *     instap = const double[2] (Given)
@@ -119,6 +120,9 @@
 *        Add dut1 argument.
 *     2009-04-3 (DSB):
 *        Negate usage of instap values.
+*     2009-124-14 (DSB):
+*        Allow "state" to be NULL in order to request a focal plane
+*        FrameSet.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -204,7 +208,7 @@ smfCreateLutwcsCache *smf_create_lutwcs( int clearcache, const double *fplane_x,
   double rmat[ 4 ];
   int inperm[2];
   int outperm[2];
-
+  AstFrame *fp_pos_frame;
 
 
   /* Main routine */
@@ -311,10 +315,15 @@ smfCreateLutwcsCache *smf_create_lutwcs( int clearcache, const double *fplane_x,
       cache->frameset = astFrameSet( astFrame ( 2, "Domain=GRID" ), 
                                     " " );   
     
-      /* We add a dummy 2D Frame to the FrameSet so that there is a Frame to
-         remove on the first call to astRemoveFrame below. */
-      astAddFrame( cache->frameset, AST__BASE, 
-                   astUnitMap( 2, " " ), astFrame( 2, " " ) );
+      /* We add a 2D Frame descirbing focal plane positions to the FrameSet.
+         If not telescope state is supplied this frame will be retained
+         as the current Frame on exit. If a telescope state is supplied, it 
+         will be replaced below by a suitable SkyFrame */
+      fp_pos_frame = astFrame( 2, "Unit(1)=rad,Unit(2)=rad,Domain=FPLANE"
+  			          ",label(1)=FplaneX,label(2)=FplaneY" );
+      astSetActiveUnit( fp_pos_frame, 1 );
+      astAddFrame( cache->frameset, AST__BASE, astUnitMap( 2, " " ), 
+                   fp_pos_frame );
 
       /* Start LUT-specific code */    
 
@@ -382,104 +391,113 @@ smfCreateLutwcsCache *smf_create_lutwcs( int clearcache, const double *fplane_x,
 
   if( *status == SAI__OK ) {
 
-    /* Create a Mapping that rotates focal plane coords so that the Y
-       axis is parallel to the projection of the elevation axis. */
+    /* If no state pointer has been supplied, remap the focal plane Frame
+       using the cached Mapping, and return a clone of the cached 
+       FrameSet describing the relationship between GRID and focal plane 
+       coords */
+    if( !state ) {
+      astRemapFrame( cache->frameset, AST__CURRENT, cache->map );
+      *fset = astClone( cache->frameset );
 
-    rmat[ 0 ] =  cos( state->tcs_az_ang );
-    rmat[ 1 ] =  sin( state->tcs_az_ang );
-    rmat[ 2 ] = -rmat[ 1 ];
-    rmat[ 3 ] = rmat[ 0 ];
-    rmap = astMatrixMap( 2, 2, 0, rmat, " " );
-
-
-    /* Create a Mapping from tanplane AzEl coords (in rads) to spherical
-       AzEl coords (in rads). */
-
-    azelmap = sc2ast_maketanmap( state->tcs_az_ac1, state->tcs_az_ac2,
-				 cache->azel, 0, status );
-  
-
-    /* Get the SMU positional values. Any "bad" value gets set to 0 before
-     using it to calculate the jigglemap. If the values are good, convert
-    them to radians from arcsec */
-
-    if( state->smu_az_jig_x == VAL__BADD ) temp_jig_x = 0;
-    else temp_jig_x = state->smu_az_jig_x/DR2AS;
-
-    if( state->smu_az_jig_y == VAL__BADD ) temp_jig_y = 0;
-    else temp_jig_y = state->smu_az_jig_y/DR2AS;
-
-    if( state->smu_az_chop_x == VAL__BADD ) temp_chop_x = 0;
-    else temp_chop_x = state->smu_az_chop_x/DR2AS;
-
-    if( state->smu_az_chop_y == VAL__BADD ) temp_chop_y = 0;
-    else temp_chop_y = state->smu_az_chop_y/DR2AS;
-    
-
-    /* Calculate final mapping with SMU position correction only if needed */
-    if( (!temp_jig_x) && (!temp_jig_y) && (!temp_chop_x) && (!temp_chop_y) ) {
-    
-      /* Combine these with the cached Mapping (from GRID coords for subarray 
-         to Tanplane Nasmyth coords in rads), to get total Mapping from GRID 
-         coords to spherical AzEl in rads. */
-
-      mapping = (AstMapping *) astCmpMap( cache->map, 
-                                          astCmpMap( rmap, azelmap, 1, " " ),
-                                          1, " " );    
-
+    /* Otherwise, create a Mapping that rotates focal plane coords so that 
+       the Y axis is parallel to the projection of the elevation axis. */
     } else {
-      /* Create a ShiftMap which moves the origin of projection plane (X,Y)
-         coords to take account of the small offsets of SMU jiggle pattern. 
-         Add this shifted map to the static cached mapping x*/
-
-      shifts[ 0 ] = temp_jig_x + temp_chop_x;
-      shifts[ 1 ] = temp_jig_y + temp_chop_y;
-      jigglemap = astShiftMap( 2, shifts, " " );
-    
-      mapping = (AstMapping *) astCmpMap( cache->map, 
-                                          astCmpMap( rmap,
-                                                     astCmpMap( jigglemap, azelmap, 
-                                                                1, " " ), 
-                                                     1, " " ),
-                                          1, " " );
-    }
+      rmat[ 0 ] =  cos( state->tcs_az_ang );
+      rmat[ 1 ] =  sin( state->tcs_az_ang );
+      rmat[ 2 ] = -rmat[ 1 ];
+      rmat[ 3 ] = rmat[ 0 ];
+      rmap = astMatrixMap( 2, 2, 0, rmat, " " );
   
-    /* If not already created, create a SkyFrame describing (Az,El). Hard-wire 
-       the geodetic longitude and latitude of JCMT into this Frame. Note, the 
-       Epoch value should be TDB, but we supply TT (=TAI+32.184 sec) instead 
-       since the difference is only 1-2 milliseconds. We cache the created 
-       SkyFrame to avoid the overhead of constantly re-creating it. The Epoch 
-       is set every time though since this will vary from call to call. */
-    if( !cache->skyframe ) {
-      cache->skyframe = astSkyFrame ( "system=AzEl" );
-
-      /* Ast assumes longitude increases eastward, so change sign to
-	 be consistent with smf_calc_telpos here */
-      astSetD( cache->skyframe, "ObsLon", -telpos[0] );
-      astSetD( cache->skyframe, "ObsLat", telpos[1] );
-
-      astExempt( cache->skyframe );
+  
+      /* Create a Mapping from tanplane AzEl coords (in rads) to spherical
+         AzEl coords (in rads). */
+  
+      azelmap = sc2ast_maketanmap( state->tcs_az_ac1, state->tcs_az_ac2,
+  				 cache->azel, 0, status );
+    
+  
+      /* Get the SMU positional values. Any "bad" value gets set to 0 before
+       using it to calculate the jigglemap. If the values are good, convert
+      them to radians from arcsec */
+  
+      if( state->smu_az_jig_x == VAL__BADD ) temp_jig_x = 0;
+      else temp_jig_x = state->smu_az_jig_x/DR2AS;
+  
+      if( state->smu_az_jig_y == VAL__BADD ) temp_jig_y = 0;
+      else temp_jig_y = state->smu_az_jig_y/DR2AS;
+  
+      if( state->smu_az_chop_x == VAL__BADD ) temp_chop_x = 0;
+      else temp_chop_x = state->smu_az_chop_x/DR2AS;
+  
+      if( state->smu_az_chop_y == VAL__BADD ) temp_chop_y = 0;
+      else temp_chop_y = state->smu_az_chop_y/DR2AS;
+      
+  
+      /* Calculate final mapping with SMU position correction only if needed */
+      if( (!temp_jig_x) && (!temp_jig_y) && (!temp_chop_x) && (!temp_chop_y) ) {
+      
+        /* Combine these with the cached Mapping (from GRID coords for subarray 
+           to Tanplane Nasmyth coords in rads), to get total Mapping from GRID 
+           coords to spherical AzEl in rads. */
+  
+        mapping = (AstMapping *) astCmpMap( cache->map, 
+                                            astCmpMap( rmap, azelmap, 1, " " ),
+                                            1, " " );    
+  
+      } else {
+        /* Create a ShiftMap which moves the origin of projection plane (X,Y)
+           coords to take account of the small offsets of SMU jiggle pattern. 
+           Add this shifted map to the static cached mapping x*/
+  
+        shifts[ 0 ] = temp_jig_x + temp_chop_x;
+        shifts[ 1 ] = temp_jig_y + temp_chop_y;
+        jigglemap = astShiftMap( 2, shifts, " " );
+      
+        mapping = (AstMapping *) astCmpMap( cache->map, 
+                                            astCmpMap( rmap,
+                                                       astCmpMap( jigglemap, azelmap, 
+                                                                  1, " " ), 
+                                                       1, " " ),
+                                            1, " " );
+      }
+    
+      /* If not already created, create a SkyFrame describing (Az,El). Hard-wire 
+         the geodetic longitude and latitude of JCMT into this Frame. Note, the 
+         Epoch value should be TDB, but we supply TT (=TAI+32.184 sec) instead 
+         since the difference is only 1-2 milliseconds. We cache the created 
+         SkyFrame to avoid the overhead of constantly re-creating it. The Epoch 
+         is set every time though since this will vary from call to call. */
+      if( !cache->skyframe ) {
+        cache->skyframe = astSkyFrame ( "system=AzEl" );
+  
+        /* Ast assumes longitude increases eastward, so change sign to
+  	 be consistent with smf_calc_telpos here */
+        astSetD( cache->skyframe, "ObsLon", -telpos[0] );
+        astSetD( cache->skyframe, "ObsLat", telpos[1] );
+  
+        astExempt( cache->skyframe );
+      }
+  
+      /* Set the date and time at the middle of the observation. Use TCS_TAI 
+         values corresponding to the centre of the integration and corresponding
+         to the astrometry calculation. Remember to convert from TAI to TDB (as
+         required by the Epoch attribute). */
+      astSet( cache->skyframe, "Epoch=MJD %.*g, dut1=%.*g",
+              DBL_DIG, state->tcs_tai + 32.184/SPD,
+              DBL_DIG, dut1 ); 
+  
+      /* Now modify the cached FrameSet to use the new Mapping and SkyFrame.
+         First remove the existing current Frame and then add in the new one.
+         Note, we add a copy of the SkyFrame rather than the cached SkyFrame 
+         itself since the SkyFrame contained in the FrameSet will be modified 
+         by later functions.  */
+      astRemoveFrame( cache->frameset, AST__CURRENT );
+      astAddFrame( cache->frameset, AST__BASE, mapping, 
+                   astCopy( cache->skyframe ) );
+  
+      /* Return the final FrameSet. */
+      *fset = astClone( cache->frameset );
     }
-
-    /* Set the date and time at the middle of the observation. Use TCS_TAI 
-       values corresponding to the centre of the integration and corresponding
-       to the astrometry calculation. Remember to convert from TAI to TDB (as
-       required by the Epoch attribute). */
-    astSet( cache->skyframe, "Epoch=MJD %.*g, dut1=%.*g",
-            DBL_DIG, state->tcs_tai + 32.184/SPD,
-            DBL_DIG, dut1 ); 
-
-    /* Now modify the cached FrameSet to use the new Mapping and SkyFrame.
-       First remove the existing current Frame and then add in the new one.
-       Note, we add a copy of the SkyFrame rather than the cached SkyFrame 
-       itself since the SkyFrame contained in the FrameSet will be modified 
-       by later functions.  */
-    astRemoveFrame( cache->frameset, AST__CURRENT );
-    astAddFrame( cache->frameset, AST__BASE, mapping, 
-                 astCopy( cache->skyframe ) );
-
-    /* Return the final FrameSet. */
-    *fset = astClone( cache->frameset );
   }
 
   /* Exempt the returned FrameSet pointer, and then end the AST context. This
