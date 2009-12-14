@@ -638,15 +638,6 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-            parameter feature {
-                type LITERAL
-                prompt {Feature to use for alignment}
-                ppath CURRENT DEFAULT
-                vpath DEFAULT
-                default BEAMFIT
-                helpkey *
-            }
-
             parameter forward {
                 type _LOGICAL
                 prompt {Produce code for forward transformation?}
@@ -763,14 +754,6 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-            parameter maxerr {
-                type _REAL 
-                prompt {Max allowed distance from base to centroid (in pixels)}
-                default 10
-                ppath CURRENT DEFAULT
-                helpkey *
-            }
-
             parameter niter {
                 type _INTEGER
                 prompt {Number of sigma clips}
@@ -837,6 +820,15 @@ package @PACKAGE@ {
                 default s8d
                 helpkey *
             }
+            parameter zbox {
+                type _INTEGER
+                prompt {Smoothing box for timeslice data (in slices)}
+                default !
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                helpkey *
+            }
+
         }
 
         action extinction {
