@@ -269,6 +269,9 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        AST__REBININIT flag is supplied.
 *     17-NOV-2009 (DSB):
 *        Added AST_DISVAR flag for use with astRebinSeq.
+*     15-DEC-2009 (DSB):
+*        Ensure that all axes span at least one pixel when calling
+*        astLinearApprox.
 *class--
 */
 
@@ -9937,10 +9940,13 @@ static void RebinAdaptively( AstMapping *this, int ndim_in,
                               (size_t) ( ndim_out*( ndim_in + 1 ) ) );
       if( astOK ) {
 
-/* Copy the bounds into these arrays */
+/* Copy the bounds into these arrays, and change them so that they refer
+   to the lower and upper edges of the cell rather than the centre. This
+   is essential if one of the axes is spanned by a single cell, since
+   otherwise the upper and lower bounds would be identical. */
          for( i = 0; i < ndim_in; i++ ) {
-            flbnd[ i ] = (double) lbnd[ i ];
-            fubnd[ i ] = (double) ubnd[ i ];
+            flbnd[ i ] = (double) lbnd[ i ] - 0.5;
+            fubnd[ i ] = (double) ubnd[ i ] + 0.5;
          }
 
 /* Get the linear approximation to the forward transformation. */
@@ -13786,10 +13792,13 @@ static int ResampleAdaptively( AstMapping *this, int ndim_in,
                               (size_t) ( ndim_in*( ndim_out + 1 ) ) );
       if( astOK ) {
 
-/* Copy the bounds into these arrays */
+/* Copy the bounds into these arrays, and change them so that they refer
+   to the lower and upper edges of the cell rather than the centre. This
+   is essential if one of the axes is spanned by a single cell, since
+   otherwise the upper and lower bounds would be identical. */
          for( i = 0; i < ndim_out; i++ ) {
-            flbnd[ i ] = (double) lbnd[ i ];
-            fubnd[ i ] = (double) ubnd[ i ];
+            flbnd[ i ] = (double) lbnd[ i ] - 0.5;
+            fubnd[ i ] = (double) ubnd[ i ] + 0.5;
          }
 
 /* Get the linear approximation to the inverse transformation. The
@@ -19713,10 +19722,13 @@ static void TranGridAdaptively( AstMapping *this, int ncoord_in,
                               (size_t) ( ncoord_out*( ncoord_in + 1 ) ) );
       if( astOK ) {
 
-/* Copy the bounds into these arrays */
+/* Copy the bounds into these arrays, and change them so that they refer
+   to the lower and upper edges of the cell rather than the centre. This
+   is essential if one of the axes is spanned by a single cell, since
+   otherwise the upper and lower bounds would be identical. */
          for( i = 0; i < ncoord_in; i++ ) {
-            flbnd[ i ] = (double) lbnd[ i ];
-            fubnd[ i ] = (double) ubnd[ i ];
+            flbnd[ i ] = (double) lbnd[ i ] - 0.5;
+            fubnd[ i ] = (double) ubnd[ i ] + 0.5;
          }
 
 /* Get the linear approximation to the forward transformation. */
