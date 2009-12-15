@@ -312,6 +312,12 @@ foreach indir ($dir_list)
       
             end   
          endif
+
+#  Clean up some files to reduce the disk space usage of this script, but
+#  retain some in order to allow debugging.
+         rm -f snr*.sdf test-smooth.sdf noise.sdf bvar-cube.sdf
+
+#  Move back to the observation directory.
          cd ..
       end
 
