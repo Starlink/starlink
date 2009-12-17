@@ -151,7 +151,7 @@ C      real get_wave
       call dsa_get_work_array(line_count,'double',ptr1,slot,status)
       call dsa_get_work_array(line_count,'double',dwaves,slot2,status)
       call dsa_get_work_array(400,'double',ptr3,slot3,status)
-      call dsa_get_work_array(cent,'double',cent,slot4,status)
+      call dsa_get_work_array(line_count,'double',cent,slot4,status)
       more = status.eq.SAI__OK
 
 * Loop on more lines to identify
