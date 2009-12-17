@@ -1249,6 +1249,10 @@ move any overlapping windows and try again"
 
       #  Fit to all items on the canvas, not just the image.
       lassign [$canvas_ bbox all] x0 y0 x1 y1
+      if { $x0 == {} } {
+         #  Nothing drawn.
+         return
+      }
 
       $image_ convert coords $x0 $y0 canvas x0 y0 image
       $image_ convert coords $x1 $y1 canvas x1 y1 image
