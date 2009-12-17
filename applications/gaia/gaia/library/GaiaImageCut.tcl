@@ -81,51 +81,6 @@ itcl::class gaia::GaiaImageCut {
       $itk_component(median) configure -text "Median Filter"
    }
 
-   #  Override update_graph, not sure why added test for image range.
-   method update_graph {{modimg 1}} {
-      set from [$image_ min]
-      set to [$image_ max]
-      if {$to <= $from} {
-         # no image is loaded ?
-         if {[$image_ isclear] || ! $initialized_ } {
-            quit
-            return
-         }
-      }
-      lassign [$image_ cut] low high
-
-      if {[expr $low >= $high]} {
-         return
-      }
-      lassign [get_cuts] plow phigh
-      if {$plow != $low || $phigh != $high} {
-         $itk_component(percent) config -value ""
-      }
-
-      # adapt new scale range
-      if {$low < $low_} {
-         setb_lowcut [expr $low <= $low_] $low
-      } else {
-         $itk_component(lowcut) config -value $low \
-            -increment $increment_ -resolution $resolution_
-      }
-      if {$high > $high_} {
-         setb_highcut [expr $high >= $high_] $high
-      } else {
-         $itk_component(highcut) config -value $high \
-            -increment $increment_ -resolution $resolution_
-      }
-      update_xaxis
-
-      # plot the distribution of pixel values
-      if {[catch {
-         $image_ graphdist $graph_ elem $itk_option(-num_points) \
-            $xVector_ $yVector_} msg]} {
-         #warning_message $msg
-      }
-      #update_increment
-   }
-
    #  Set entry values of the lowcut scale widget and update scale
    #  widgets. Override to increment by resolution.
    method setb_lowcut {setlow_ value} {
