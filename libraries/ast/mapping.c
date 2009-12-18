@@ -272,6 +272,14 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *     15-DEC-2009 (DSB):
 *        Ensure that all axes span at least one pixel when calling
 *        astLinearApprox.
+*     18-DEC-2009 (DSB):
+*        When using a 1D spreading kernel (in astRebin(Seq)), if the kernel 
+*        is not contained completely within the output array, reflect the 
+*        section of the kernel that falls outside the output array back into 
+*        the output array so that no flux is lost. Also discovered that the
+*        n-D code (i.e. the KERNEL_ND macro) incorrectly uses the first 
+*        user-supplied parameter as the full kernel width rather than the
+*        half-width. This has been fixed.
 *class--
 */
 
@@ -16510,65 +16518,70 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
 \
 /* Local Variables: */ \
    astDECLARE_GLOBALS            /* Thread-specific data */ \
-   Xtype in_val;                 /* Input pixel value */ \
    Xtype c; \
-   double error; \
+   Xtype in_val;                 /* Input pixel value */ \
    double **wtptr;               /* Pointer to array of weight pointers */ \
+   double **wtptr_last;          /* Array of highest weight pointer values */ \
    double *filter;               /* Pointer to Nd array of filter values */ \
+   double *kp;                   /* Pointer to next weight values */ \
    double *kstart;               /* Pointer to next kernel value */ \
    double *kval;                 /* Pointer to 1d array of kernel values */ \
    double *wtprod;               /* Accumulated weight value array pointer */ \
-   double **wtptr_last;          /* Array of highest weight pointer values */ \
+   double *xfilter;              /* Pointer to 1d array of x axis filter values */ \
    double *xnl;                  /* Pointer to previous ofset array (n-d) */ \
-   double xxn; \
-   double xxl;                   /* Previous X offset */ \
-   double yyl;                   /* Previous Y offset */ \
+   double error; \
    double pixwt;                 /* Weight to apply to individual pixel */ \
-   double x;                     /* x coordinate value */ \
-   double xn;                    /* Coordinate value (n-d) */ \
-   double y;                     /* y coordinate value */ \
    double sum;                   /* Sum of all filter values */ \
    double wgt;                   /* Weight for input value */ \
+   double x;                     /* x coordinate value */ \
+   double xn;                    /* Coordinate value (n-d) */ \
    double xx;                    /* X offset */ \
+   double xxl;                   /* Previous X offset */ \
+   double xxn; \
+   double y;                     /* y coordinate value */ \
    double yy;                    /* Y offset */ \
-   double *kp;                   /* Pointer to next weight values */ \
+   double yyl;                   /* Previous Y offset */ \
    int *hi;                      /* Pointer to array of upper indices */ \
-   int *lo;                      /* Pointer to array of lower indices */ \
    int *jhi;                     /* Pointer to array of filter upper indices */ \
    int *jlo;                     /* Pointer to array of filter lower indices */ \
+   int *lo;                      /* Pointer to array of lower indices */ \
    int *stride;                  /* Pointer to array of dimension strides */ \
    int bad;                      /* Output pixel bad? */ \
    int done;                     /* All pixel indices done? */ \
+   int genvar;                   /* Generate output variances? */ \
    int hi_ix;                    /* Upper output pixel index (x dimension) */ \
    int hi_iy;                    /* Upper output pixel index (y dimension) */ \
    int hi_jx;                    /* Upper filter pixel index (x dimension) */ \
    int hi_jy;                    /* Upper filter pixel index (y dimension) */ \
+   int idim;                     /* Loop counter for dimensions */ \
+   int ii;                       /* Loop counter for dimensions */ \
+   int ix;                       /* Pixel index in output grid x dimension */ \
+   int iy;                       /* Pixel index in output grid y dimension */ \
+   int jjx;                      /* Reflected pixel index in filter grid x dimension */ \
+   int jjy;                      /* Reflected pixel index in filter grid y dimension */ \
+   int jx;                       /* Pixel index in filter grid x dimension */ \
+   int jxn; \
+   int jy;                       /* Pixel index in filter grid y dimension */ \
+   int kerror;                   /* Error signalled by kernel function? */ \
    int lo_ix;                    /* Lower output pixel index (x dimension) */ \
    int lo_iy;                    /* Lower output pixel index (y dimension) */ \
    int lo_jx;                    /* Lower filter pixel index (x dimension) */ \
    int lo_jy;                    /* Lower filter pixel index (y dimension) */ \
-   int idim;                     /* Loop counter for dimensions */ \
-   int ii;                       /* Loop counter for dimensions */ \
-   int ix;                       /* Pixel index in output grid x dimension */ \
-   int jx;                       /* Pixel index in filter grid x dimension */ \
-   int ixn;                      /* Pixel index in input grid (n-d) */ \
-   int ixn0;                     /* First pixel index in input grid (n-d) */ \
-   int iy;                       /* Pixel index in output grid y dimension */ \
-   int jy;                       /* Pixel index in filter grid y dimension */ \
-   int kerror;                   /* Error signalled by kernel function? */ \
    int nb2;                      /* The total number of neighbouring pixels */ \
    int nf;                       /* Number of pixels in filter array */ \
+   int nwx;                      /* Used X width of kernel function (*2) */ \
+   int nwy;                      /* Used Y width of kernel function (*2) */ \
    int off1;                     /* Input pixel offset due to y index */ \
    int off_in;                   /* Offset to input pixel */ \
    int off_out;                  /* Offset to output pixel */ \
+   int off_xedge;                /* Does filter box overlap array edge on the X axis? */ \
+   int off_yedge;                /* Does filter box overlap array edge on the Y axis? */ \
    int point;                    /* Loop counter for output points */ \
    int s;                        /* Temporary variable for strides */ \
-   int genvar;                   /* Generate output variances? */ \
    int usebad;                   /* Use "bad" input pixel values? */ \
    int usevar;                   /* Process variance array? */ \
    int varwgt;                   /* Use input variances as weights? */ \
    int ystride;                  /* Stride along input grid y dimension */ \
-   int jxn; \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
@@ -16656,6 +16669,9 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
 /* ---------------------------------------- */ \
       } else if ( ndim_out == 2 ) { \
 \
+/* Allocate workspace to hold the X axis filter values. */ \
+         xfilter = astMalloc( sizeof( double ) * (size_t) nb2 ); \
+\
 /* Calculate the stride along the y dimension of the output grid. */ \
          ystride = ubnd_out[ 0 ] - lbnd_out[ 0 ] + 1; \
 \
@@ -16701,6 +16717,9 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
                } \
             } \
          } \
+\
+/* Free work space */ \
+         xfilter = astFree( xfilter ); \
 \
 /* Exit point on error in kernel function */ \
          Kernel_SError_2d: ; \
@@ -16832,14 +16851,17 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
          } \
       } \
 \
-/* Obtain the x coordinate of the current point and test if it is bad. */ \
+/* Obtain the x coordinate of the current point and test if it is bad. \
+   Also test that the central point falls within the output array. */ \
       x = coords[ 0 ][ point ]; \
+      ix = (int) floor( x ); \
+      if( ix < lbnd_out[ 0 ] || ix > ubnd_out[ 0 ] ) bad = 1; \
       bad = bad || ( x == AST__BAD ); \
 \
 /* If OK, calculate the lowest and highest indices (in the x \
-   dimension) of the region of neighbouring pixels that will \
-   contribute to the interpolated result. Constrain these values to \
-   lie within the output grid. */ \
+   dimension) of the region of neighbouring output pixels that will \
+   receive contributions from the current input pixel. Constrain these \
+   values to lie within the output grid. */ \
       if ( !bad ) { \
          ix = (int) floor( x ) - neighb + 1; \
          lo_ix = MaxI( ix, lbnd_out[ 0 ], status ); \
@@ -16857,27 +16879,65 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
             lo_jx = lo_ix - ix; \
             hi_jx = hi_ix - ix; \
 \
+/* See if the kernel extends off the edge of the output array. */ \
+            nwx =  hi_jx - lo_jx + 1; \
+            off_xedge = ( nwx < nb2 ); \
+\
 /* Use the kernel function to fill the work array with weights for all output \
    pixels whether or not they fall within the output array. At the same \
    time find the sum of all the factors. */ \
             xx = (double) ix - x; \
-            if( xx != xxl ) { \
-               xxl = xx; \
-\
+            if( xx != xxl || off_xedge ) { \
                sum = 0.0; \
-               for ( jx = 0; jx < nb2; jx++ ) { \
-                  ( *kernel )( xx, params, flags, &pixwt, status ); \
 \
-/* Check for errors arising in the kernel function. */ \
-                  if ( !astOK ) { \
-                     kerror = 1; \
-                     goto Kernel_SError_1d; \
+/* First handle cases where the kernel box overlaps an edge of the output \
+   array. In these cases, in order to conserve flux, the bit of the \
+   kernel function that is off the edge is reflected back onto the array. \
+   Care must be taken since the reflected part of the kernel may itself \
+   overlap the opposite edge of the array, in which case the overlapping \
+   part must again be reflected back onto the array. This iterative \
+   reflection is implemented using a fractional division (%) operator. */ \
+               if( off_xedge ) { \
+                  nwx *= 2; \
+                  xxl = AST__BAD; \
+                  for( jx = 0; jx < nb2; jx++ ) filter[ jx ] = 0.0; \
+\
+                  for ( jx = 0; jx < nb2; jx++ ) { \
+                     ( *kernel )( xx, params, flags, &pixwt, status ); \
+                     if ( !astOK ) { \
+                        kerror = 1; \
+                        goto Kernel_SError_1d; \
+                     } \
+\
+                     jjx =  ( jx - lo_jx ) % nwx + lo_jx; \
+                     if( jjx < lo_jx ) jjx += nwx; \
+                     if( jjx > hi_jx ) jjx = 2*hi_jx - jjx + 1; \
+\
+                     filter[ jjx ] += pixwt; \
+                     sum += pixwt; \
+                     xx += 1.0; \
                   } \
 \
+/* Now handle cases where the kernel box is completely within the output \
+   array. */ \
+               } else { \
+                  xxl = xx; \
+\
+                  for ( jx = 0; jx < nb2; jx++ ) { \
+                     ( *kernel )( xx, params, flags, &pixwt, status ); \
+\
+/* Check for errors arising in the kernel function. */ \
+                     if ( !astOK ) { \
+                        kerror = 1; \
+                        goto Kernel_SError_1d; \
+                     } \
+\
 /* Store the kernel factor and increment the sum of all factors. */ \
-                  filter[ jx ] = pixwt; \
-                  sum += pixwt; \
-                  xx += 1.0; \
+                     filter[ jx ] = pixwt; \
+                     sum += pixwt; \
+                     xx += 1.0; \
+                  } \
+\
                } \
 \
 /* Ensure we do not divide by zero. */ \
@@ -16954,14 +17014,19 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
          } \
       } \
 \
-/* Obtain the x coordinate of the current point and test if it is bad. */ \
+/* Obtain the x coordinate of the current point and test if it is bad. \
+   Also test that the central point falls within the output array. */ \
       x = coords[ 0 ][ point ]; \
+      ix = (int) floor( x ); \
+      if( ix < lbnd_out[ 0 ] || ix > ubnd_out[ 0 ] ) bad = 1; \
       bad = bad || ( x == AST__BAD ); \
       if ( !bad ) { \
 \
 /* Similarly obtain and test the y coordinate. */ \
          y = coords[ 1 ][ point ]; \
-         bad = ( y == AST__BAD ); \
+         iy = (int) floor( y ); \
+         if( iy < lbnd_out[ 1 ] || iy > ubnd_out[ 1 ] ) bad = 1; \
+         bad = bad || ( y == AST__BAD ); \
          if ( !bad ) { \
 \
 /* If OK, calculate the lowest and highest indices (in each dimension) \
@@ -16989,6 +17054,13 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
                lo_jy = lo_iy - iy; \
                hi_jy = hi_iy - iy; \
 \
+/* See if the kernel extends off the edge of the output array on either \
+   axis. */ \
+               nwx =  hi_jx - lo_jx + 1; \
+               nwy =  hi_jy - lo_jy + 1; \
+               off_xedge = ( nwx < nb2 ); \
+               off_yedge = ( nwy < nb2 ); \
+\
 /* Loop to evaluate the kernel function along the y dimension, storing \
    the resulting weight values in all elements of each associated row \
    in the kvar array. The function's argument is the offset of the \
@@ -16996,51 +17068,123 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
    position. */ \
                yy = (double) iy - y; \
                xx = (double) ix - x; \
-               if( xx != xxl || yy != yyl ) { \
-                  xxl = xx; \
-                  yyl = yy; \
+               if( xx != xxl || yy != yyl || off_xedge || off_yedge ) { \
 \
-                  kp = filter; \
-                  for ( jy = 0; jy < nb2; jy++ ) { \
-                     ( *kernel )( yy, params, flags, &pixwt, status ); \
+/* First handle cases where the kernel box extends beyond the top or \
+   bottom edge of the output array. In these cases, in order to conserve \
+   flux, the bit of the kernel function that is off the edge is reflected \
+   back onto the array. Care must be taken since the reflected part of the \
+   kernel may itself overlap the opposite edge of the array, in which \
+   case the overlapping part must again be reflected back onto the \
+   array. This iterative reflection is implemented using a fractional \
+   division (%) operator. */ \
+                  if( off_yedge ) { \
+                     nwy *= 2; \
+                     xxl = AST__BAD; \
+                     yyl = AST__BAD; \
+                     for( jy = 0; jy < nb2*nb2; jy++ ) filter[ jy ] = 0.0; \
 \
-/* Check for errors arising in the kernel function. */ \
-                     if ( !astOK ) { \
-                        kerror = 1; \
-                        goto Kernel_SError_2d; \
+                     for ( jy = 0; jy < nb2; jy++ ) { \
+                        ( *kernel )( yy, params, flags, &pixwt, status ); \
+                        if ( !astOK ) { \
+                           kerror = 1; \
+                           goto Kernel_SError_2d; \
+                        } \
+\
+                        jjy =  ( jy - lo_jy ) % nwy + lo_jy; \
+                        if( jjy < lo_jy ) jjy += nwy; \
+                        if( jjy > hi_jy ) jjy = 2*hi_jy - jjy + 1; \
+\
+                        kp = filter + jjy*nb2; \
+                        for( jx = 0; jx < nb2; jx++ ) *(kp++) += pixwt; \
+                        yy += 1.0; \
                      } \
 \
+/* Now handles cases where the kernel does not overlap the top or bottom edge \
+   of the output array. */ \
+                  } else { \
+                     xxl = xx; \
+                     yyl = yy; \
+                     kp = filter; \
+                     for ( jy = 0; jy < nb2; jy++ ) { \
+                        ( *kernel )( yy, params, flags, &pixwt, status ); \
+\
+/* Check for errors arising in the kernel function. */ \
+                        if ( !astOK ) { \
+                           kerror = 1; \
+                           goto Kernel_SError_2d; \
+                        } \
+\
 /* Store the kernel factor in all elements of the current row. */ \
-                     for( jx = 0; jx < nb2; jx++ ) *(kp++) = pixwt; \
+                        for( jx = 0; jx < nb2; jx++ ) *(kp++) = pixwt; \
 \
 /* Move on to the next row. */ \
-                     yy += 1.0; \
+                        yy += 1.0; \
+                     } \
                   } \
 \
 /* Loop to evaluate the kernel function along the x dimension, multiplying \
    the resulting weight values by the values already stored in the the \
    associated column in the kvar array. The function's argument is the \
    offset of the output pixel (along this dimension) from the central output \
-   position. Also form the total data sum in the filter array. */ \
+   position. Also form the total data sum in the filter array. First \
+   handle cases where the kernel overlaps the left or right edge of the \
+   output array. */ \
                   sum = 0.0; \
-                  for ( jx = 0; jx < nb2; jx++ ) { \
-                     ( *kernel )( xx, params, flags, &pixwt, status ); \
+\
+/* First deal with cases where the kernel extends beyond the left or \
+   right edge of the output array. */ \
+                  if( off_xedge ) { \
+                     nwx *= 2; \
+                     xxl = AST__BAD; \
+                     for( jx = 0; jx < nb2; jx++ ) xfilter[ jx ] = 0.0; \
+\
+                     for ( jx = 0; jx < nb2; jx++ ) { \
+                        ( *kernel )( xx, params, flags, &pixwt, status ); \
+                        if ( !astOK ) { \
+                           kerror = 1; \
+                           goto Kernel_SError_2d; \
+                        } \
+\
+                        jjx =  ( jx - lo_jx ) % nwx + lo_jx; \
+                        if( jjx < lo_jx ) jjx += nwx; \
+                        if( jjx > hi_jx ) jjx = 2*hi_jx - jjx + 1; \
+\
+                        xfilter[ jjx ] += pixwt; \
+                        xx += 1.0; \
+                     } \
+\
+                     for ( jx = 0; jx < nb2; jx++ ) { \
+                        kp = filter + jx; \
+                        for( jy = 0; jy < nb2; jy++, kp += nb2 ) { \
+                           *kp *= xfilter[ jx ]; \
+                           sum += *kp; \
+                        } \
+                     } \
+\
+/* Now deal with cases where the kernel does not extends beyond the left or \
+   right edge of the output array. */ \
+                  } else { \
+\
+                     for ( jx = 0; jx < nb2; jx++ ) { \
+                        ( *kernel )( xx, params, flags, &pixwt, status ); \
 \
 /* Check for errors arising in the kernel function. */ \
-                     if ( !astOK ) { \
-                        kerror = 1; \
-                        goto Kernel_SError_2d; \
-                     } \
+                        if ( !astOK ) { \
+                           kerror = 1; \
+                           goto Kernel_SError_2d; \
+                        } \
 \
 /* Multiply the kernel factor by all elements of the current column. */ \
-                     kp = filter + jx; \
-                     for( jy = 0; jy < nb2; jy++, kp += nb2 ) { \
-                        *kp *= pixwt; \
-                        sum += *kp; \
-                     } \
+                        kp = filter + jx; \
+                        for( jy = 0; jy < nb2; jy++, kp += nb2 ) { \
+                           *kp *= pixwt; \
+                           sum += *kp; \
+                        } \
 \
 /* Move on to the next column. */ \
-                     xx += 1.0; \
+                        xx += 1.0; \
+                     } \
                   } \
 \
 /* Ensure we do not divide by zero. */ \
@@ -17136,18 +17280,19 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
 \
 /* Test if the coordinate is bad. If true, the corresponding output pixel \
    value will be bad, so give up on this point. */ \
-            bad = ( xn == AST__BAD ); \
+            ix = (int) floor( xn ); \
+            if( ix < lbnd_out[ idim ] || ix > ubnd_out[ idim ] ) bad = 1; \
+            bad = bad || ( xn == AST__BAD ); \
             if ( bad ) break; \
 \
 /* Calculate the lowest and highest indices (in the current dimension) \
    of the region of neighbouring output pixels that will be modified. \
    Constrain these values to lie within the output grid. */ \
-            ixn = (int) floor( xn ); \
-            ixn0 = ixn - neighb + 1; \
-            lo[ idim ] = MaxI( ixn0, lbnd_out[ idim ], status ); \
-            hi[ idim ] = MinI( ixn + neighb, ubnd_out[ idim ], status ); \
-            jlo[ idim ] = lo[ idim ] - ixn0; \
-            jhi[ idim ] = hi[ idim ] - ixn0; \
+            ix = (int) floor( xn ) - neighb + 1; \
+            lo[ idim ] = MaxI( ix, lbnd_out[ idim ], status ); \
+            hi[ idim ] = MinI( ix + nb2 - 1, ubnd_out[ idim ], status ); \
+            jlo[ idim ] = lo[ idim ] - ix; \
+            jhi[ idim ] = hi[ idim ] - ix; \
 \
 /* Check there is some overlap with the output array on this axis. */ \
             if( lo[ idim ] > hi[ idim ] ) { \
@@ -17164,25 +17309,66 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
             wtptr[ idim ] = kval + nb2*idim; \
             wtptr_last[ idim ] = wtptr[ idim ] + nb2 - 1; \
 \
+/* See if the kernel extends off the edge of the output array on the current \
+   axis. */ \
+            lo_jx = jlo[ idim ]; \
+            hi_jx = jhi[ idim ]; \
+            nwx =  hi_jx - lo_jx + 1; \
+            off_xedge = ( nwx < nb2 ); \
+\
 /* Loop to evaluate the kernel function along each dimension, storing \
    the resulting values. The function's argument is the offset of the \
    output pixel (along the relevant dimension) from the central output \
    point. */ \
-            xxn = (double) ( ixn - neighb + 1 ) - xn; \
-            if( xxn != xnl[ idim ] ) { \
+            xxn = (double) ix - xn; \
+            if( xxn != xnl[ idim ] || off_xedge ) { \
                sum = AST__BAD; \
-               xnl[ idim ] = xxn; \
-               for ( jxn = 0; jxn < nb2; jxn++ ) { \
-                  ( *kernel )( xxn, params, flags, wtptr[ idim ] + jxn, status ); \
 \
-/* Check for errors arising in the kernel function. */ \
-                  if ( !astOK ) { \
-                     kerror = 1; \
-                     goto Kernel_SError_Nd; \
+/* First handle cases where the kernel box overlaps an edge of the output \
+   array. In these cases, in order to conserve flux, the bit of the \
+   kernel function that is off the edge is reflected back onto the array. \
+   Care must be taken since the reflected part of the kernel may itself \
+   overlap the opposite edge of the array, in which case the overlapping \
+   part must again be reflected back onto the array. This iterative \
+   reflection is implemented using a fractional division (%) operator. */ \
+               if( off_xedge ) { \
+                  nwx *= 2; \
+                  xnl[ idim ] = AST__BAD; \
+                  kp = wtptr[ idim ]; \
+                  for( jx = 0; jx < nb2; jx++ ) *(kp++) = 0.0; \
+\
+                  kp = wtptr[ idim ]; \
+                  for ( jx = 0; jx < nb2; jx++ ) { \
+                     ( *kernel )( xxn, params, flags, &pixwt, status ); \
+                     if ( !astOK ) { \
+                        kerror = 1; \
+                        goto Kernel_SError_1d; \
+                     } \
+\
+                     jjx =  ( jx - lo_jx ) % nwx + lo_jx; \
+                     if( jjx < lo_jx ) jjx += nwx; \
+                     if( jjx > hi_jx ) jjx = 2*hi_jx - jjx + 1; \
+\
+                     kp[ jjx ] += pixwt; \
+                     xxn += 1.0; \
                   } \
 \
+/* Now handle cases where the kernel box is completely within the output \
+   array. */ \
+               } else { \
+                  xnl[ idim ] = xxn; \
+                  for ( jxn = 0; jxn < nb2; jxn++ ) { \
+                     ( *kernel )( xxn, params, flags, wtptr[ idim ] + jxn, status ); \
+\
+/* Check for errors arising in the kernel function. */ \
+                     if ( !astOK ) { \
+                        kerror = 1; \
+                        goto Kernel_SError_Nd; \
+                     } \
+\
 /* Increment the kernel position. */ \
-                  xxn += 1.0; \
+                     xxn += 1.0; \
+                  } \
                } \
             } \
          } \

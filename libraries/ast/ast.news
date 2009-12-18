@@ -16,6 +16,13 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
+- A bug has been fixed in the astRebin(Seq)/AST_REBIN(SEQ) methods 
+that could cause flux to be lost from the edges of the supplied array.
+
+- A bug has been fixed in the astRebin(Seq)/AST_REBIN(SEQ) methods 
+that caused the first user supplied parameter to be interpreted as the
+full width of the spreading kernel, rather than the half-width.
+
 - The StcsChan class now ignores case when reading STC-S phrases (except
 that units strings are still case sensitive).
 

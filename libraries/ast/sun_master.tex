@@ -21880,6 +21880,25 @@ current version):
 
 \begin{enumerate}
 
+\item A bug has been fixed in the 
+c+
+astRebin(Seq)
+c-
+f+
+AST\_REBIN(SEQ)
+f-
+methods that could cause flux to be lost from the edges of the supplied array.
+
+\item A bug has been fixed in the 
+c+
+astRebin(Seq)
+c-
+f+
+AST\_REBIN(SEQ)
+f-
+methods that caused the first user supplied parameter to be interpreted as the
+full width of the spreading kernel, rather than the half-width.
+
 \item The StcsChan class now ignores case when reading STC-S phrases (except
 that units strings are still case sensitive).
 
