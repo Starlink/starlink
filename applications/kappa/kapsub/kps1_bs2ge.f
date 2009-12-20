@@ -36,8 +36,8 @@
 *     version of this into the required one-dimensional array.
 *
 *     The routine will also read the knot positions in _INTEGER type
-*     arrays XKNOTS and YKNOTS, and a data-scaling factor in SCALE of
-*     type _REAL.
+*     array KNOTS (or XKNOTS and YKNOTS for older data), and a 
+*     data-scaling factor in SCALE of type _REAL.
 
 *  Arguments:
 *     LOC = CHARACTER*( DAT__SZLOC ) (Given)
@@ -71,7 +71,7 @@
 *     -  Uses the magic-value method for bad or undefined pixels.
 
 *  Copyright:
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007, 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -97,7 +97,13 @@
 *  History:
 *     2007 July 4 (MJC):
 *        Original version derived from KPG1_PL2GE.
-*     {enter_changes_here}
+*     2009 December 17 (MJC):
+*        Use a single generic concatenated KNOTS vector as now 
+*        documented in SGP/38, but for compatibility with older data
+*        test for XKNOTS and YKNOTS components if KNOTS is absent.
+*     2009 December 19 (MJC):
+*        Use known values to declare XKNOT and YKNOT dimensions.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_new_bugs_here}
@@ -110,6 +116,8 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! SSE global definitions
       INCLUDE 'DAT_PAR'          ! DAT__ global constants
+      INCLUDE 'NDF_PAR'          ! NDF public constants
+      INCLUDE 'CNF_PAR'          ! CNF_PVAL
 
 *  Arguments Given:
       CHARACTER*( DAT__SZLOC ) LOC
@@ -142,10 +150,14 @@
       CHARACTER*256 FILE         ! File name
       INTEGER IX                 ! Loop counter
       INTEGER IY                 ! Loop counter
+      INTEGER KPNTR              ! Pointer to knots' vector workspace
+      CHARACTER*( DAT__SZLOC ) LOCK ! Locator to KNOTS component
       CHARACTER * ( DAT__SZNAM ) NAME ! Name of HDS component
       INTEGER NDIM               ! Number of dimensions
+      INTEGER NKNOTS             ! Total number of knots
       INTEGER NLEV               ! Number of lvels in the HDS path
       CHARACTER*256 PATH         ! HDS path name
+      LOGICAL VALID              ! KNOTS locator is valid?
       CHARACTER*10 VARNT         ! Variant of the POLYNOMIAL structure
 
 *.
@@ -190,27 +202,73 @@
                END DO
             END DO
 
+*  Test whether there is a KNOTS component.
+            CALL DAT_FIND( LOC, 'KNOTS', LOCK, STATUS )
+            CALL DAT_VALID( LOCK, VALID, STATUS )
+
+            IF ( VALID ) THEN
+               CALL DAT_ANNUL( LOCK, STATUS )
+
+*  Obtain workspace of the length of the KNOTS array.
+               NKNOTS = NXKNOT + NYKNOT + 16
+               CALL PSX_CALLOC( NKNOTS, '_REAL', KPNTR, STATUS )
+
+               CALL CMP_GET1R( LOC, 'KNOTS', NKNOTS,
+     :                         %VAL( CNF_PVAL( KPNTR ) ), ELX, STATUS )
+
+               IF ( ELX .NE. NKNOTS ) THEN
+                  CALL HDS_TRACE( LOC, NLEV, PATH, FILE, STATUS )
+                  STATUS = SAI__ERROR
+                  CALL MSG_SETI( 'X', ELX )
+                  CALL MSG_SETI( 'NX', NKNOTS )
+                  CALL MSG_SETC( 'P', PATH )
+                  CALL MSG_SETC( 'F', FILE )
+                  CALL ERR_REP( 'KPS1_BS2GE_INVPOLY2', 'The '/
+     :                          /'POLYNOMIAL structure ^P in ^F has '/
+     :                          /'fewer (^X) knots than expected '/
+     :                          /'(^NX).', STATUS )
+                  GO TO 999
+               END IF
+
+*  Copy the X-axis set of knots from the work vector into returned
+*  array.
+               CALL KPG1_CPNDR( 1, 1, NKNOTS,
+     :                          %VAL( CNF_PVAL( KPNTR ) ), 1, 
+     :                          NXKNOT + 8, XKNOT, ELX, STATUS )
+
+*  Copy the Y-axis set of knots from the work vector into returned
+*  array, offset by the number XKNOTS.
+               CALL KPG1_CPNDR( 1, 1, NKNOTS,
+     :                          %VAL( CNF_PVAL( KPNTR ) ), NXKNOT + 9, 
+     :                          NKNOTS, YKNOT, ELX, STATUS )
+
+               CALL PSX_FREE( KPNTR, STATUS )
+
+            ELSE
+
 *  Copy the knots to the XKNOTS and YKNOTS arrays within the 
 *  POLYNOMIAL structure.
-            CALL CMP_GET1R( LOC, 'XKNOTS', NXKNOT + 8, XKNOT, ELX,
-     :                      STATUS )
-            CALL CMP_GET1R( LOC, 'XKNOTS', NYKNOT + 8, YKNOT, ELY,
-     :                      STATUS )
+               CALL CMP_GET1R( LOC, 'XKNOTS', NXKNOT + 8, XKNOT, ELX,
+     :                         STATUS )
+               CALL CMP_GET1R( LOC, 'YKNOTS', NYKNOT + 8, YKNOT, ELY,
+     :                         STATUS )
 
-            IF ( ELX .NE. NXKNOT + 8 .OR. ELY .NE. NYKNOT + 8 ) THEN
-               CALL HDS_TRACE( LOC, NLEV, PATH, FILE, STATUS )
-               STATUS = SAI__ERROR
-               CALL MSG_SETI( 'X', ELX )
-               CALL MSG_SETI( 'Y', ELY )
-               CALL MSG_SETI( 'NX', NXKNOT + 8 )
-               CALL MSG_SETI( 'NY', NYKNOT + 8 )
-               CALL MSG_SETC( 'P', PATH )
-               CALL MSG_SETC( 'F', FILE )
-               CALL ERR_REP( 'KPS1_BS2GE_INVPOLY', 'The POLYNOMIAL '/
-     :                       /'structure ^P in ^F has fewer (^X,^Y) '/
-     :                       /'knots than expected (^NX,^NY).', STATUS )
-               GO TO 999
-            END IF
+               IF ( ELX .NE. NXKNOT + 8 .OR. ELY .NE. NYKNOT + 8 ) THEN
+                  CALL HDS_TRACE( LOC, NLEV, PATH, FILE, STATUS )
+                  STATUS = SAI__ERROR
+                  CALL MSG_SETI( 'X', ELX )
+                  CALL MSG_SETI( 'Y', ELY )
+                  CALL MSG_SETI( 'NX', NXKNOT + 8 )
+                  CALL MSG_SETI( 'NY', NYKNOT + 8 )
+                  CALL MSG_SETC( 'P', PATH )
+                  CALL MSG_SETC( 'F', FILE )
+                  CALL ERR_REP( 'KPS1_BS2GE_INVPOLY', 'The POLYNOMIAL '/
+     :                          /'structure ^P in ^F has fewer '/
+     :                          /'(^X,^Y) knots than expected '/
+     :                          /'(^NX,^NY).', STATUS )
+                  GO TO 999
+               END IF
+            END IF 
 
 *  Read the data scaling factor.
             CALL CMP_GET0R( LOC, 'SCALE', SCALE, STATUS )

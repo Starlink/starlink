@@ -20,23 +20,25 @@
 *     bi-cubic polynomial surface to a standard Starlink POLYNOMIAL 
 *     structure, as defined in SGP/38, but with a variant 'BSPLINE' not
 *     promulgated there.  An empty POLYNOMIAL structure should already
-*     have been created.  All floating point components within the
+*     have been created.  All floating-point components within the
 *     structure are written as DOUBLE PRECISION.
 *
 *     It is assumed the calling programme has a one-dimensional array of
 *     coefficients, where COEFF( ( IX - 1 ) * ( NYKNOT + 4 ) + IY ) 
 *     contains the coefficient at the (IX,IY)th knot number, where 
-*     NYKNOT + 4 is the total number of Y terms).  Such a 
+*     NYKNOT + 4 is the total number of Y terms.  Such a 
 *     one-dimensional array is used by the PDA_SURFIT and PDA_BISPEV
 *     routines, and defined in the NAG manual (see Chapter E02 on 
 *     "Curve and Surface fitting").
 *
-*     This routine will convert the coefficient array to two-dimensional,  
-*     flip it around and store it in the POLYNOMIAL structure so that 
-*     DATA_ARRAY(IX,IY) contains the coefficient for the (IX,IY)th term.
+*     This routine will convert the coefficient array to 
+*     two-dimensional, flip it around and store it in the POLYNOMIAL
+*     structure so that DATA_ARRAY(IX,IY) contains the coefficient for
+*     the (IX,IY)th term.
 *
-*     The routine will also load the knot positions arrays XKNOTS and 
-*     YKNOTS, and a data-scaling factor in SCALE, all of which have
+*     The routine will also load the knot positions in the vector KNOTS 
+*     storing the first dimension knots followed by the second
+*     dimension, and a data-scaling factor in SCALE, both of which have 
 *     type _REAL.
 
 *  Arguments:
@@ -71,7 +73,7 @@
 *     -  Uses the magic-value method for bad or undefined pixels.
 
 *  Copyright:
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007, 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -97,7 +99,11 @@
 *  History:
 *     2007 July 4 (MJC):
 *        Original version derived from KPG1_PL2PU.
-*     {enter_changes_here}
+*     2009 December 17 (MJC):
+*        Use a single generic KNOTS vector rather than XKNOTS and
+*        YKNOTS, since naming is not easily extensible beyond three
+*        dimensions.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -110,6 +116,8 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! SSE global definitions
       INCLUDE 'DAT_PAR'          ! DAT__ global constants
+      INCLUDE 'NDF_PAR'          ! NDF public constants
+      INCLUDE 'CNF_PAR'          ! CNF_PVAL
 
 *  Arguments Given:
       CHARACTER*( DAT__SZLOC ) LOC
@@ -134,8 +142,13 @@
 
 *  Local Variables:
       INTEGER DIM( MAXDIM )      ! Dimensions of coefficients array
+      INTEGER IDIMS( NDF__MXDIM ) ! Dimensions of knots along one axis
       INTEGER IX                 ! Loop counter
       INTEGER IY                 ! Loop counter
+      INTEGER KPNTR              ! Pointer to knots' vector workspace
+      INTEGER NKNOTS             ! Total number of knots
+      INTEGER ODIMS( NDF__MXDIM ) ! Dimensions of combined knots vector
+      INTEGER OFFSET( NDF__MXDIM ) ! Offsets to paste knots' array
 
 *.
 
@@ -154,7 +167,7 @@
 
 *  Flip the coefficients array to normal Fortran order.
       DO IY = 1, DIM( 2 )
-         DO IX = 1,DIM(  1 )
+         DO IX = 1, DIM( 1 )
             WORK( IX, IY ) = COEFF( ( IX - 1 ) * ( NYKNOT + 4 ) + IY )
          END DO
       END DO
@@ -164,12 +177,43 @@
       CALL CMP_PUTNR( LOC, 'DATA_ARRAY', MAXDIM, DIM, WORK, DIM,
      :                STATUS )
 
-*  Copy the knots to the XKNOTS and YKNOTS arrays within the 
-*  POLYNOMIAL structure.
-      CALL DAT_NEW1R( LOC, 'XKNOTS', NXKNOT + 8, STATUS )
-      CALL DAT_NEW1R( LOC, 'YKNOTS', NXKNOT + 8, STATUS )
-      CALL CMP_PUT1R( LOC, 'XKNOTS', NXKNOT + 8, XKNOT, STATUS )
-      CALL CMP_PUT1R( LOC, 'YKNOTS', NYKNOT + 8, YKNOT, STATUS )
+*  Obtain workspace of the length of the KNOTS array.
+      NKNOTS = NXKNOT + NYKNOT + 16
+      CALL PSX_CALLOC( NKNOTS, '_REAL', KPNTR, STATUS )
+
+*  Prepare for pasting array.  The routine uses the maximum number of
+*  dimensions.
+      IDIMS( 1 ) = NXKNOT + 8
+      ODIMS( 1 ) = NKNOTS
+      OFFSET( 1 ) = 0
+
+      DO IX = 2, NDF__MXDIM
+         IDIMS( IX ) = 1 
+         ODIMS( IX ) = 1 
+         OFFSET( IX ) = 0
+      END DO
+
+*  Paste the X-axis set of knots into the work vector.
+      CALL KPG1_PASTR( .FALSE., .FALSE., OFFSET, IDIMS, NXKNOT + 8,
+     :                 XKNOT, ODIMS, NKNOTS, %VAL( CNF_PVAL( KPNTR ) ),
+     :                 STATUS )
+
+*  Paste the Y-axis set of knots into the work vector immediately
+*  the X-axis knots.
+      IDIMS( 1 ) = NYKNOT + 8
+      OFFSET( 1 ) = NXKNOT + 8
+
+      CALL KPG1_PASTR( .FALSE., .FALSE., OFFSET, IDIMS, NYKNOT + 8,
+     :                 YKNOT, ODIMS, NKNOTS, %VAL( CNF_PVAL( KPNTR ) ),
+     :                 STATUS )
+
+
+*  Copy the knots to the KNOTS array within the POLYNOMIAL structure.
+      CALL DAT_NEW1R( LOC, 'KNOTS', NKNOTS, STATUS )
+      CALL CMP_PUT1R( LOC, 'KNOTS', NKNOTS, %VAL( CNF_PVAL( KPNTR ) ),
+     :                STATUS )
+
+      CALL PSX_FREE( KPNTR, STATUS )
 
 *  Store the data scaling factor.
       CALL DAT_NEW0R( LOC, 'SCALE', STATUS )
