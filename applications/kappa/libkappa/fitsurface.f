@@ -189,7 +189,7 @@
 *     Copyright (C) 1993 Science & Engineering Research Council.
 *     Copyright (C) 1995-1997, 2003-2004 Central Laboratory of the
 *     Research Councils.
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007, 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -256,6 +256,9 @@
 *        SURFACEFIT extension.
 *     2007 July 3 (MJC):
 *        Added bi-cubic spline fitting and parameter KNOTS.
+*     2009 December 19 (MJC):
+*        Fix bug in the calculation of required workspace for splines 
+*        when the number of knots are different along the two axes.
 *     {enter_further_changes_here}
 
 *-
@@ -579,16 +582,18 @@
 *  the spline-fitting routine.  We add a couple of clamps.
          DSIZE = DSIZE + 2
 
-*  Find the dimension of the workspace arrays for the spline-fitting
-*  function.  Note that these sizes assume a bi-cubic spline.
+*  Find the dimensions of the workspace arrays for the spline-fitting
+*  function.  Note that these sizes assume a bi-cubic spline.  These
+*  formulae are specified by PDA_SURFIT (u is NXPAR, v is NYPAR, b1 is
+*  S1, b2 is S2).
          NXPAR = NXKNOT + 4
          NYPAR = NYKNOT + 4
          IF ( NYKNOT .GT. NXKNOT ) THEN
             S1 = 3 * NYPAR + 4
-            S2 = S1 + NYKNOT + 1
+            S2 = S1 + NYPAR - 3
          ELSE
             S1 = 3 * NXPAR + 4
-            S2 = S1 + NYKNOT + 1
+            S2 = S1 + NXPAR - 3
          END IF
 
          NWS = NXPAR * NYPAR * ( 2 + S1 + S2 ) + 
