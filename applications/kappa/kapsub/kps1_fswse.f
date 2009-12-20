@@ -55,7 +55,7 @@
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007, 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -81,6 +81,8 @@
 *  History:
 *     2007 July 3 (MJC):
 *        Original version based upon KPS1_FSPWE.
+*     2009 December 19 (MJC):
+*        Use dynamic workspace for the work array.
 *     {enter_further_changes_here}
 
 *-
@@ -91,6 +93,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Data-system constants
+      INCLUDE 'CNF_PAR'          ! CNF_PVAL
 
 *  Arguments Given:
       INTEGER NDFI
@@ -108,16 +111,10 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  Local Constants:
-      INTEGER MXPAR              ! Maximum number of parameters which
-                                 ! can be handled in each direction
-      PARAMETER ( MXPAR = 15 )   ! equals MXKNOT (11) + 4
-
 *  Local Variables:
       CHARACTER*( DAT__SZLOC ) FLOC ! Locator to FIT polynomial
                                  ! structure
-      DOUBLE PRECISION WORK( MXPAR, MXPAR ) ! Workspace for flipped
-                                 ! polynomial coefficients
+      INTEGER KPNTR              ! Pointer to workspace
       CHARACTER*( DAT__SZLOC ) XLOC ! Locator to SURFACEFIT extension
 
 *.
@@ -135,8 +132,12 @@
       CALL DAT_NEW( XLOC, 'FIT', 'POLYNOMIAL', 0, 0, STATUS )
       CALL DAT_FIND( XLOC, 'FIT', FLOC, STATUS )
 
+      CALL PSX_CALLOC( ( NXKNOT + 4 ) * ( NYKNOT + 4 ), '_REAL', KPNTR,
+     :                 STATUS )
       CALL KPS1_BS2PU( FLOC, NXKNOT, NYKNOT, XKNOT, YKNOT, SCALE,
-     :                 NCOEF, COEFF, WORK, STATUS )
+     :                 NCOEF, COEFF, %VAL( CNF_PVAL( KPNTR ) ),
+     :                 STATUS )
+      CALL PSX_FREE( KPNTR, STATUS )
 
 *  In addition to the coefficients, write the RMS error, the maximum
 *  residual to the SURFACEFIT extension, and the co-ordinate system.
