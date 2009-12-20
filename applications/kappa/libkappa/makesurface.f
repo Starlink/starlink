@@ -129,7 +129,7 @@
 *     Copyright (C) 1995, 1997-1998, 2004 Central Laboratory of the
 *     Research Councils. 
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2007-2008 Science and Technology Facilities Council.
+*     Copyright (C) 2007-2009 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -191,6 +191,9 @@
 *        component when parameter VARIANCE is TRUE.
 *     2008 June 17 (MJC):
 *        Trim trailing blanks from output NDF character components.
+*     2009 December 19 (MJC):
+*        Instead of a fixed work array use a dynamic workspace whose 
+*        type depends on the fit type.
 *     {enter_further_changes_here}
 
 *-
@@ -297,8 +300,7 @@
       DOUBLE PRECISION VARIAN( MCHOEF ) ! Chebyshev coeff's variances
       CHARACTER * ( DAT__SZTYP ) VARNT ! Variant of FIT structure
       LOGICAL VARPRE             ! Chebyshev coeff's variance present?
-      DOUBLE PRECISION WORK( MXPAR, MXPAR ) ! Work array used when
-                                 ! reading coefficients
+      INTEGER WRKPTR             ! Pointer to workspace reading coeffs.
       INTEGER WPTR               ! Pointer to temporary workspace
       INTEGER XDIM               ! First (x) dimension of data array
       CHARACTER * ( 40 ) XLABEL  ! X-axis label of NDF
@@ -382,12 +384,26 @@
 
 *  Check that the type of variant can be dealt with.
       IF ( VARNT .EQ. 'CHEBYSHEV' ) THEN
+         ATYPE = '_DOUBLE'
+
+*  PDA spline code works in single precision.
+      ELSE IF ( VARNT .EQ. 'BSPLINE' ) THEN
+         ATYPE = '_REAL'
+      END IF
+
+*  Obtain workspace of the appropriatte data type used to obtain
+*  the fit coefficients.
+      CALL PSX_CALLOC( MXPAR * MXPAR, ATYPE, WRKPTR, STATUS )
+
+*  Extract the fit parameters from the POLYNOMIAL-type structure.
+      IF ( VARNT .EQ. 'CHEBYSHEV' ) THEN
 
 *  Read the polynomial structure to obtain the coefficients and
 *  variances, and the x-y limits, and check this has worked.
          CALL KPG1_PL2GE( FLOC, MXPAR, VARNT, NXPAR, NYPAR, LIMITS,
      :                    PXMIN, PXMAX, PYMIN, PYMAX, CHCOEF,
-     :                    VARPRE, VARIAN, WORK, STATUS )
+     :                    VARPRE, VARIAN, %VAL( CNF_PVAL( WRKPTR ) ),
+     :                    STATUS )
 
          IF ( STATUS .NE. SAI__OK ) GO TO 999
 
@@ -399,15 +415,12 @@
             END IF
          END DO
 
-         ATYPE = '_DOUBLE'
 
 *  Check that the type of variant can be dealt with.
       ELSE IF ( VARNT .EQ. 'BSPLINE' ) THEN
          CALL KPS1_BS2GE( FLOC, MXPAR, NXKNOT, NYKNOT, XKNOT, YKNOT,
-     :                    SCALE, COEFF, WORK, STATUS )
-
-*  PDA spline code works in single precision.
-         ATYPE = '_REAL'
+     :                    SCALE, COEFF, %VAL( CNF_PVAL( WRKPTR ) ),
+     :                    STATUS )
 
 *  There's no variance as yet in the SPLINE variant.
          CREVAR = .FALSE.
@@ -424,6 +437,9 @@
          CALL ERR_REP( ' ', 'Polynomials of variant ^VARNT cannot be '/
      :                 /'dealt with at present.', STATUS )
       END IF
+
+*  Tidy workspace used to obtain the fit coefficients.
+      CALL PSX_FREE( WRKPTR, STATUS )
 
 *  Attempt to open a template NDF, which the output NDF will be based
 *  on.  This may be the same as the input NDF.  If a NULL response is
