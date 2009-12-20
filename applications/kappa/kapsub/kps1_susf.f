@@ -48,13 +48,13 @@
 *        If true the data values will be scaled.
 *     NWS = INTEGER (Given)
 *        The dimension of the WS work space which must be at least
-*        U*V*(2+B1+B2)+2*(U+V+3*(NBIN+NE)+NE-6)+B2+1  where
+*        U*V*(2+B1+B2)+2*(U+V+4*(NBIN+NE)+NE-6)+B2+1  where
 *        U = NXKNOT + 4, V = NYKNOT + 4, NE = MAX( NXKNOT, NYKNOT ) +
 *        8.  Defining BX = 3*V+4, BY = 3*U+4, if (BX>=BY) then
 *        B1 = BY and B2 = B1+V-3, otherwise B1 = BX and B2 = B1+U-3.
 *     NLWS = INTEGER (Given)
 *        The dimension of the LWS work space which must be at least
-*        U*V*(B2+1)+B2 where the varaibles are the same as those
+*        U*V*(B2+1)+B2 where the variables are the same as those
 *        defined in the description of NWS.
 *     NIWS = INTEGER (Given)
 *        The dimension of the IWS work space which must be at least
