@@ -208,7 +208,7 @@
 *  Copyright:
 *     Copyright (C) 1996, 1998, 2000, 2004 Central Laboratory of the
 *     Research Councils. 
-*     Copyright (C) 2007, 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2007-2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -257,6 +257,11 @@
 *     2008 January 5 (MJC):
 *        Write a constant variance array using the mean square residual
 *        of the fit when parameter GENVAR is TRUE.
+*     2009 December 19 (MJC):
+*        Fix two bugs: one in the calculation of required workspace
+*        for splines when the number of knots are different along the
+*        two axes; and the other arising from the spline fitting is
+*        single-precision in PDA when finiding the maximum residual.
 *     {enter_further_changes_here}
 
 *-
@@ -441,6 +446,8 @@
       INTEGER PNTRO( 2 )         !    "     " output data & variance
       INTEGER RESPTR             ! Mnemonic pointer to the residuals to
                                  ! fitted binned data
+      REAL RMAX                  ! Maximum value for spline
+      REAL RMIN                  ! Minimum value for spline
       REAL RMS                   ! RMS difference of the input and
                                  ! output data arrays
       REAL RMSF                  ! RMS difference of the fitted and raw
@@ -952,16 +959,18 @@
 
          NWORK = 7
 
-*  Find the dimension of the workspace arrays for the spline-fitting
-*  function.  Note that these sizes assume a bi-cubic spline.
+*  Find the dimensions of the workspace arrays for the spline-fitting
+*  function.  Note that these sizes assume a bi-cubic spline.  These
+*  formulae are specified by PDA_SURFIT (u is NXPAR, v is NYPAR, b1 is
+*  S1, b2 is S2).
          NXPAR = NXKNOT + 4
          NYPAR = NYKNOT + 4
          IF ( NYKNOT .GT. NXKNOT ) THEN
             S1 = 3 * NYPAR + 4
-            S2 = S1 + NYKNOT + 1
+            S2 = S1 + NYPAR - 3
          ELSE
             S1 = 3 * NXPAR + 4
-            S2 = S1 + NYKNOT + 1
+            S2 = S1 + NXPAR - 3
          END IF
          NWS = NXPAR * NYPAR * ( 2 + S1 + S2 ) + 2 * ( NXPAR + NYPAR +
      :         4 * MAXBIN + 5 * ( MAX( NXKNOT, NYKNOT ) + 8 ) - 6 ) +
@@ -1444,10 +1453,10 @@
      :                       %VAL( CNF_PVAL( RESPTR ) ), RMS, STATUS )
 
 *  Determine the maximum absolute residual.
-            CALL KPG1_MXMND( BAD, NELM, %VAL( CNF_PVAL( RESPTR ) ), 
-     :                       NINVAL, MAXMUM, MINMUM, MAXPOS, MINPOS, 
+            CALL KPG1_MXMNR( BAD, NELM, %VAL( CNF_PVAL( RESPTR ) ), 
+     :                       NINVAL, RMAX, RMIN, MAXPOS, MINPOS, 
      :                       STATUS )
-            RSMAX = MAX( ABS( MAXMUM ), ABS( MINMUM ) )
+            RSMAX = DBLE( MAX( ABS( RMAX ), ABS( RMIN ) ) )
 
 *  Report the latest rms error. It should be decreasing each cycle.
 *  Note the RMS is already scaled correctly at this point during the
