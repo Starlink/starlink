@@ -48,12 +48,12 @@
 *        is assumed to be MXPAR * MXPAR (see below).  It should be set
 *        to the maximum number of interior knots per axis plus four.
 *     NXKNOT = INTEGER (Returned)
-*        Number of x interior knots.
+*        The number of x interior knots.
 *     NYKNOT = INTEGER (Returned)
-*        Number of y interior knots.
-*     XKNOT( NXKNOT+8 ) = REAL (Returned)
+*        The number of y interior knots.
+*     XKNOT( MXPAR + 4 ) = REAL (Returned)
 *        The x positions of complete set of knots associated with x.
-*     YKNOT( NYKNOT+8 ) = REAL (Returned)
+*     YKNOT( MXPAR + 4 ) = REAL (Returned)
 *        The y positions of complete set of knots associated with y.
 *     SCALE = REAL (Returned)
 *        The scale factor applied to the data values before calculating
@@ -126,8 +126,8 @@
 *  Arguments Returned:
       INTEGER NXKNOT
       INTEGER NYKNOT
-      REAL XKNOT( NXKNOT + 8 )
-      REAL YKNOT( NYKNOT + 8 )
+      REAL XKNOT( MXPAR + 4 )
+      REAL YKNOT( MXPAR + 4 )
       REAL COEFF( MXPAR * MXPAR )
       REAL SCALE
       REAL WORK( MXPAR, MXPAR )
