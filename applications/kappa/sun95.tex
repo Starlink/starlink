@@ -42366,8 +42366,7 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
             scheme is similar to the {\tt "SincCos"} scheme.
 
             \sstitem
-            {\tt "Gauss"} --- Uses the $e^{-kx^2}$ kernel.  This option is only
-            available when rebinning (\emph{i.e.} if REBIN is set to {\tt TRUE}).
+            {\tt "Gauss"} --- Uses the $e^{-kx^2}$ kernel.  
             The FWHM of the Gaussian is given by Parameter PARAMS(2), and
             the point at which to truncate the Gaussian to zero is given by
             Parameter PARAMS(1).
@@ -57021,6 +57020,12 @@ The following applications have been modified:
          provenance tree to be written to a text file in ``dot'' format,
          suitable for visualising with third-party tools such as Graphviz,
          ZGRViewer or OmniGraffle.
+      \end{itemize}
+
+   \item [\htmlref{REGRID}{REGRID}]\mbox{}
+      \begin{itemize}
+        \item METHOD=GAUSS can now be used when re-sampling as well as
+         when re-binning.
       \end{itemize}
 
    \item [\htmlref{SCATTER}{SCATTER}] \mbox{}

@@ -89,6 +89,11 @@ The following new applications have been added:
       format, suitable for visualising with third-party tools such 
       as Graphviz, ZGRViewer or OmniGraffle.
 
+   o REGRID
+      
+     -  METHOD=GAUSS can now be used when re-sampling as well as
+     when re-binning.
+
    o  SCATTER
 
       -  The calculation of the axis ranges now excludes any pixels 

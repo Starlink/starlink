@@ -144,11 +144,9 @@
 *        - "SombCos" -- Uses the somb(pi*x)cos(k*pi*x) kernel.  This
 *        scheme is similar to the "SincCos" scheme.
 *
-*        - "Gauss" -- Uses the exp(-k*x*x) kernel. This option is only 
-*        available when rebinning (i.e. if REBIN is set to TRUE).
-*        The FWHM of the Gaussian is given by parameter PARAMS(2), and
-*        the point at which to truncate the Gaussian to zero is given
-*        by parameter PARAMS(1).
+*        - "Gauss" -- Uses the exp(-k*x*x) kernel. The FWHM of the Gaussian 
+*        is given by parameter PARAMS(2), and the point at which to 
+*        truncate the Gaussian to zero is given by parameter PARAMS(1).
 *
 *        -  "BlockAve"  -- Block averaging over all pixels in the 
 *        surrounding N-dimensional cube. This option is only available 
@@ -676,14 +674,7 @@
      :                   'BlockAve,Somb,SombCos', .TRUE., METHOD, 
      :                   STATUS )
 
-         IF( .NOT. REBIN .AND. METHOD( 1 : 1 ) .EQ. 'G' ) THEN
-            CALL MSG_OUT( ' ', 'Method "Gauss" cannot be used '//
-     :                    'because REBIN is set false.', STATUS )
-            CALL MSG_OUT( ' ', 'Please supply a new value for '//
-     :                    'parameter METHOD.', STATUS )
-            CALL PAR_CANCL( 'METHOD', STATUS )
-
-         ELSE IF( REBIN .AND. METHOD( 1 : 2 ) .EQ. 'BL' ) THEN
+         IF( REBIN .AND. METHOD( 1 : 2 ) .EQ. 'BL' ) THEN
             CALL MSG_OUT( ' ', 'Method "BlockAve" cannot be used '//
      :                    'because REBIN is set true.', STATUS )
             CALL MSG_OUT( ' ', 'Please supply a new value for '//

@@ -12946,6 +12946,16 @@ f     A value of zero or less may be given for PARAMS(1)
 c     In each of these cases, the "finterp" parameter is not used:
 f     In each of these cases, the FINTERP argument is not used:
 *
+*     - AST__GAUSS: This scheme uses a kernel of the form exp(-k*x*x), with 
+*     k a positive constant. The full-width at half-maximum (FWHM) is
+*     given by 
+c     "params[1]"
+f     PARAMS(2)
+f     value, which should be at least 0.1 (in addition, setting PARAMS(1)
+*     to zero will select the number of contributing pixels so as to utilise
+*     the width of the kernel out to where the envelope declines to 1% of its
+*     maximum value). This kernel suppresses noise at the expense of
+*     smoothing the output array.
 *     - AST__SINC: This scheme uses a sinc(pi*x) kernel, where x is the
 *     pixel offset from the interpolation point and sinc(z)=sin(z)/z. This
 *     sometimes features as an "optimal" interpolation kernel in books on
@@ -14590,6 +14600,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 
 /* Interpolation using a 1-d kernel. */
 /* --------------------------------- */
+         case AST__GAUSS:
          case AST__SINC:
          case AST__SINCCOS:
          case AST__SINCGAUSS:
@@ -14685,6 +14696,29 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
                   kernel = SincGauss;
 
 /* Constrain the full width half maximum of the gaussian factor. */
+                  fwhm = MaxD( 0.1, params[ 1 ], status );
+
+/* Store the required value of "k" in a local parameter array and pass
+   this array to the kernel function. */
+                  lpar[ 0 ] = 4.0 * log( 2.0 ) / ( fwhm * fwhm );
+                  par = lpar;
+
+/* Obtain the number of neighbouring pixels to use. If this is zero or
+   less, use the number of neighbouring pixels required by the width
+   of the kernel (out to where the gaussian term falls to 1% of its
+   peak value). */
+                  neighb = (int) floor( params[ 0 ] + 0.5 );
+                  if ( neighb <= 0 ) neighb = (int) ceil( sqrt( -log( 0.01 ) /
+                                                                lpar[ 0 ] ) );
+                  break;
+
+/* exp(-k*x*x) interpolation. */
+/* -------------------------- */
+/* Assign the kernel function. */
+               case AST__GAUSS:
+                  kernel = Gauss;
+
+/* Constrain the full width half maximum of the gaussian. */
                   fwhm = MaxD( 0.1, params[ 1 ], status );
 
 /* Store the required value of "k" in a local parameter array and pass
