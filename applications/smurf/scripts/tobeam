@@ -6,7 +6,7 @@
 #    tobeam
 
 #  Purpose:
-#    Regrids the supplied input NDF to half a pixel size equal to half
+#    Re-grids the supplied input NDF to half a pixel size equal to half
 #    the Airy disk radius. A Gaussian spreading function is used that
 #    produces Gaussian smoothing with an FWHM of 1/sqrt(2) of the full
 #    beam width. The EXP_TIME array held in the SMURF extension of the
@@ -31,6 +31,9 @@
 #    2009-12-08 (TIMJ):
 #       Integrate into SMURF and add copyright and licence.
 #       Use smaller gaussian FWHM.
+#    2009-12-21 (DSB):
+#       Changed to use re-sampling (without flux conservation) rather than 
+#       re-binning.
 
 #  Copyright:
 #     Copyright (C) 2009 Science & Technology Facilities Council.
@@ -122,24 +125,24 @@ else
    exit
 endif
 $ATOOLS_DIR/astmatrixmap nin=$ndim nout=$ndim form=1 matrix="$matrix" \
-                     options=! result=map.ast
+                         options=! result=map.ast
 
-#  Get the FWHM for the gaussian smoothing, 1/sqrt(2) of the full beam
-#  width (i.e. twice the Airy radius), and convert to output pixels.
+#  Get the FWHM for the gaussian kernel, 1/sqrt(2) of the full beam
+#  width (i.e. twice the Airy radius), and convert to input pixels.
 set fwhm = `$KAPPA_DIR/calc exp="(pa)/(sqrt(2.0)*pb)" pa=$airy \
-                                                      pb=$outsize`
+                                                      pb=$insize`
 
 #  Report:
 echo
 echo "   Input pixel size: $insize (arc-sec)"
 echo "   Output pixel size: $outsize (arc-sec)"
-echo "   FWHM: $fwhm (output pixels)"
+echo "   FWHM: $fwhm (input pixels)"
 echo
 
-#  Use the matrixmap to rebin the input image, smoothing it with a gaussian
+#  Use the matrixmap to re-sample the input image, smoothing it with a gaussian
 #  at the same time.
-$KAPPA_DIR/regrid $in $out rebin=yes method=gauss params=\[$fwhm,$fwhm\] \
-              mapping=map.ast quiet
+$KAPPA_DIR/regrid $in $out rebin=no method=gauss params=\[0,$fwhm\] \
+                  conserve=no mapping=map.ast quiet
 
 #  Do the same to the EXP_TIME NDF stored in the SMURF extension (except
 #  the EXP_TIME array is always 2D).
@@ -148,8 +151,8 @@ if( $ndim == 3 ) then
                             options=! result=map.ast
 endif
 
-$KAPPA_DIR/regrid $in.more.smurf.exp_time $out.more.smurf.exp_time rebin=yes \
-              method=gauss params=\[$fwhm,$fwhm\] mapping=map.ast quiet
+$KAPPA_DIR/regrid $in.more.smurf.exp_time $out.more.smurf.exp_time rebin=no \
+                  conserve=no method=gauss params=\[0,$fwhm\] mapping=map.ast quiet
 
 #  Clean up
 rm -f map.ast
