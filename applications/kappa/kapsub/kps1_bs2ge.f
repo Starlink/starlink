@@ -146,16 +146,15 @@
       INTEGER DIMX( MAXDIM )     ! Declared dimensions of coefficients 
                                  ! array
       INTEGER ELX                ! Number of X knots read from structure
-      INTEGER ELY                ! Number of X knots read from structure
+      INTEGER ELY                ! Number of Y knots read from structure
       CHARACTER*256 FILE         ! File name
       INTEGER IX                 ! Loop counter
       INTEGER IY                 ! Loop counter
       INTEGER KPNTR              ! Pointer to knots' vector workspace
-      CHARACTER*( DAT__SZLOC ) LOCK ! Locator to KNOTS component
       CHARACTER * ( DAT__SZNAM ) NAME ! Name of HDS component
       INTEGER NDIM               ! Number of dimensions
       INTEGER NKNOTS             ! Total number of knots
-      INTEGER NLEV               ! Number of lvels in the HDS path
+      INTEGER NLEV               ! Number of levels in the HDS path
       CHARACTER*256 PATH         ! HDS path name
       LOGICAL VALID              ! KNOTS locator is valid?
       CHARACTER*10 VARNT         ! Variant of the POLYNOMIAL structure
