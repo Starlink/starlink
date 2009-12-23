@@ -203,11 +203,9 @@
             END DO
 
 *  Test whether there is a KNOTS component.
-            CALL DAT_FIND( LOC, 'KNOTS', LOCK, STATUS )
-            CALL DAT_VALID( LOCK, VALID, STATUS )
+            CALL DAT_THERE( LOC, 'KNOTS', VALID, STATUS )
 
             IF ( VALID ) THEN
-               CALL DAT_ANNUL( LOCK, STATUS )
 
 *  Obtain workspace of the length of the KNOTS array.
                NKNOTS = NXKNOT + NYKNOT + 16
