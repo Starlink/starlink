@@ -89,6 +89,7 @@
 *     MJC: Malcolm J. Currie (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
 *     DSB: David S. Berry (JAC, Hawaii)
+*     BRADC: Brad Cavanagh (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -116,6 +117,9 @@
 *        Use new NDG provenance API.
 *     7-JUL-2009 (DSB):
 *        Ignore hidden ancestors.
+*     22-DEC-2009 (BRADC):
+*        Handle periods in ancestor path when no file extension is
+*        given.
 *     {enter_further_changes_here}
 
 *-
@@ -275,7 +279,9 @@
 *  *** Assume UNIX for the moment. ***
                CALL CHR_LASTO( PATH, '/', CPOS )
                CALL CHR_LASTO( PATH, '.', SOE )
-               IF ( SOE .EQ. 0 ) SOE = CHR_LEN( PATH ) + 1
+               IF ( ( SOE .EQ. 0 ) .OR. ( SOE .LT. CPOS ) ) THEN
+                  SOE = CHR_LEN( PATH ) + 1
+               END IF
 
                NAME = PATH( CPOS + 1 : SOE - 1 )
                NCNAME = SOE - CPOS - 1
