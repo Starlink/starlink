@@ -68,11 +68,14 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     BRADC: Brad Cavanagh (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     1990 Feb 22 (MJC):
 *        Original version.
+*     2009 DEC 30 (BRADC):
+*        Use INTEGER*8 to avoid overflow.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -108,7 +111,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER
+      INTEGER*8
      :  I, J,                    ! 2-d array indices
      :  L                        ! Loop counter
 
@@ -127,10 +130,9 @@
 
 *    Fill the array with the list of values, by computing which bin a
 *    given x-y position is situated.
-
       DO  L = 1, NBIN
-         I = MIN( INT( REAL( X( L ) ) / SX ) + 1, NX )
-         J = MIN( INT( REAL( Y( L ) ) / SY ) + 1, NY )
+         I = MIN( INT( X( L )  / SX, 8 ) + 1, NX )
+         J = MIN( INT( Y( L )  / SY, 8 ) + 1, NY )
          ARRAY( I, J ) = REAL( Z( L ) )
       END DO
 
