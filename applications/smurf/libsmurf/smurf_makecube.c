@@ -84,11 +84,10 @@
 *          spatial pixel axis in order to optimise the grid. [FALSE]
 *     BADMASK = LITERAL (Read)
 *          A string determining the way in which bad pixels are propagated
-*          from input to output. "AND" should usually be used since this 
-*          scheme uses all input data, thus reducing the noise in the output, 
-*          and also minimises the number of bad pixels in the output. 
-*          However, for large data sets, the memory requirements of the "AND" 
-*          scheme can be excessive. For this reason, two other schemes, 
+*          from input to output. The "AND" scheme  uses all input data, thus 
+*          reducing the noise in the output, and also minimises the number of 
+*          bad pixels in the output. However, the memory requirements of the 
+*          "AND" scheme can be excessive. For this reason, two other schemes, 
 *          "FIRST" and "OR", are provided which greatly reduce the memory 
 *          requirements, at the expense either of introducing more bad pixels 
 *          into the output ("OR") or producing higher output noise levels 
