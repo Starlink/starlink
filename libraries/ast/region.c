@@ -187,6 +187,9 @@ f     - AST_SHOWMESH: Display a mesh of points on the surface of a Region
 *     8-SEP-2009 (DSB):
 *        Fix bugs in astOverlap that could result in wrong results if
 *        either region is unbounded.
+*     4-JAN-2010 (DSB):
+*        Fix bug in GetRegionBounds (it was assumed implicitly that the base 
+*        Frame had the same number of axes as the current Frame).
 *class--
 
 *  Implementation Notes:
@@ -8180,6 +8183,8 @@ f        The global status.
    AstPointSet *bmesh;        /* PointSet holding base Frame mesh */
    AstPointSet *cmesh;        /* PointSet holding current Frame mesh */
    double **bptr;             /* Pointer to PointSet coord arrays */
+   double *blbnd;             /* Lower bounds in base Frame */
+   double *bubnd;             /* Upper bounds in base Frame */
    double *p;                 /* Array of values for current axis */
    double width;              /* Width of bounding box on i'th axis */
    int i;                     /* Axis count */
@@ -8215,11 +8220,15 @@ f        The global status.
    corners of the base frame bounding box instead. */
       } else {
 
+/* Get workspace to hold the bounds of the region within the base Frame. */
+         nbase = astGetNin( smap );
+         blbnd = astMalloc( sizeof( double )*nbase );
+         bubnd = astMalloc( sizeof( double )*nbase );
+
 /* Get the base Frame bounding box. */
-         astRegBaseBox( this, lbnd, ubnd );      
+         astRegBaseBox( this, blbnd, bubnd );      
 
 /* Get the number of corners in the base Frame bounding box. */
-         nbase = astGetNin( smap );
          npos = pow( 2, nbase );
 
 /* Create a PointSet to hold the positions at the corners in the base
@@ -8240,12 +8249,16 @@ f        The global status.
                      lo = 1 - lo;
                      j = 0;
                   }
-                  p[ ip ] = lo ? lbnd[ i ] : ubnd[ i ];
+                  p[ ip ] = lo ? blbnd[ i ] : bubnd[ i ];
                }
    
                jmax *= 2;
             }
          }
+
+/* Release resources. */
+         blbnd = astFree( blbnd );
+         bubnd = astFree( bubnd );
       }
 
 /* Create a new PointSet holding the above points transformed into the 
