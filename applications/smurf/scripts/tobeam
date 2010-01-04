@@ -34,6 +34,8 @@
 #    2009-12-21 (DSB):
 #       Changed to use re-sampling (without flux conservation) rather than 
 #       re-binning.
+#    2010-1-4 (DSB):
+#       Correct comment describing FWHM of Gaussian kernel.
 
 #  Copyright:
 #     Copyright (C) 2009 Science & Technology Facilities Council.
@@ -127,8 +129,8 @@ endif
 $ATOOLS_DIR/astmatrixmap nin=$ndim nout=$ndim form=1 matrix="$matrix" \
                          options=! result=map.ast
 
-#  Get the FWHM for the gaussian kernel, 1/sqrt(2) of the full beam
-#  width (i.e. twice the Airy radius), and convert to input pixels.
+#  Get the FWHM for the gaussian kernel, 1/sqrt(2) of the Airy radius, 
+#  and convert to input pixels.
 set fwhm = `$KAPPA_DIR/calc exp="(pa)/(sqrt(2.0)*pb)" pa=$airy \
                                                       pb=$insize`
 
