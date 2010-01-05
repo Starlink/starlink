@@ -459,7 +459,7 @@ void smurf_dsutils( int *status ) {
 
 
 /* Uncomment to stop the program on any of the following exceptions. */
-   feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW ); 
+/*   feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW ); */
 
 /* Check inherited status */
    if (*status != SAI__OK) return;
