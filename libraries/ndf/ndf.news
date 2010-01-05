@@ -4,6 +4,10 @@ NDF Library
    Subsecond accuracy has been restored to history recording
    (was lost in the switch to Unix)
 
+V1.10
+   - A new function NDF_ISIN has been added, which determines if one NDF
+   is contained within another NDF.
+
 V1.9
    - A new standard WCS Frame called FRACTION has been introduced, This
    Frame is created automatically by the NDF library in the same that the

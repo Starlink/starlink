@@ -14,11 +14,11 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardocnumber}    {33.9}
 \newcommand{\stardocauthors}   {R.F.~Warren-Smith \& D.S.~Berry}
-\newcommand{\stardocdate}      {18th September 2009}
+\newcommand{\stardocdate}      {5th January 2009}
 \newcommand{\stardoctitle}     {NDF \\ [\latex{1ex}]
                                 Routines for Accessing the\\
                                 Extensible N-Dimensional Data Format}
-\newcommand{\stardocversion}   {Version 1.9}
+\newcommand{\stardocversion}   {Version 1.10}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -10808,6 +10808,8 @@ The following is an example \xref{ADAM}{sg4}{} interface file
             {Determine whether a specified type of NDF access is available}
 \noteroutine{NDF\_ISBAS( INDF, ISBAS, STATUS )}
             {Enquire if an NDF is a base NDF}
+\noteroutine{NDF\_ISIN( INDF1, INDF2, ISIN, STATUS )}
+            {Enquire if one NDF is contained within another NDF}
 \noteroutine{NDF\_ISTMP( INDF, ISTMP, STATUS )}
             {Determine if an NDF is temporary}
 \noteroutine{NDF\_LOC( INDF, MODE, LOC, STATUS )}
@@ -10939,6 +10941,8 @@ The following is an example \xref{ADAM}{sg4}{} interface file
             {Determine whether a specified type of NDF access is available}
 \noteroutine{\htmlref{NDF\_ISBAS}{NDF_ISBAS}( INDF, ISBAS, STATUS )}
             {Enquire if an NDF is a base NDF}
+\noteroutine{NDF\_ISIN( INDF1, INDF2, ISIN, STATUS )}
+            {Enquire if one NDF is contained within another NDF}
 \noteroutine{\htmlref{NDF\_ISTMP}{NDF_ISTMP}( INDF, ISTMP, STATUS )}
             {Determine if an NDF is temporary}
 \noteroutine{\htmlref{NDF\_NBLOC}{NDF_NBLOC}( INDF, NDIM, MXDIM, NBLOCK, STATUS )}
@@ -14638,6 +14642,65 @@ locator}{sun92}{using_locators}}
          STATUS = INTEGER (Given and Returned)
       }{
          The global status.
+      }
+   }
+}
+\sstroutine{
+   NDF\_ISIN
+}{
+   See if one NDF is contained within another NDF
+}{
+   \sstdescription{
+      The routine returns a logical flag indicating if the first supplied
+      NDF is contained within an extension of the second supplied NDF.
+      The search is recursive, so for instance a true value will be
+      returned if the second supplied NDF is contained within an extension
+      of an intermediate NDF that is contained within an extension of the
+      first supplied NDF.
+   }
+   \sstinvocation{
+      CALL NDF\_ISIN( INDF1, INDF2, ISIN, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         INDF1 = INTEGER (Given)
+      }{
+         The first NDF.
+      }
+      \sstsubsection{
+         INDF2 = INTEGER (Given)
+      }{
+         The second NDF.
+      }
+      \sstsubsection{
+         ISIN = LOGICAL (Returned)
+      }{
+         .TRUE. of the first NDF is contained within an extension of the
+         second NDF, and .FALSE. otherwise.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         A .TRUE. value is returned if the two supplied NDF identifiers
+         refer to the same base NDF.
+
+         \sstitem
+         If an identifier for an NDF section is supplied to this
+         routine, then the search will be applied to the associated
+         base NDF.
+
+         \sstitem
+         If this routine is called with STATUS set, then a value of
+         .FALSE. will be returned for the ISIN argument, although no
+         further processing will occur. The same value will also be
+         returned if the routine should fail for any reason.
       }
    }
 }
@@ -18642,6 +18705,8 @@ Appendix~\ref{ss:cinterface}.\\[1.0ex]
             {Determine whether a specified type of NDF access is available}
 \noteroutineC{\xlabel{ndfIsbas}void \htmlref{ndfIsbas}{NDF_ISBAS}}{( int indf, int $*$isbas, int $*$status );}
             {Enquire if an NDF is a base NDF}
+\noteroutineC{\xlabel{ndfIsin}void \htmlref{ndfIsin}{NDF_ISIN}}{( int indf1, int indf2, int *isin, int $*$status );}
+            {Enquire if one NDF is contained within another NDF}
 \noteroutineC{\xlabel{ndfIstmp}void \htmlref{ndfIstmp}{NDF_ISTMP}}{( int indf, int $*$istmp, int $*$status );}
             {Determine if an NDF is temporary}
 \noteroutineC{\xlabel{ndfLoc}void \htmlref{ndfLoc}{NDF_LOC}}{( int indf, const char $*$mode, char loc[ DAT\_\_SZLOC ], int $*$status );}

@@ -452,6 +452,11 @@ void ndfIsbas( int indf,
                int *isbas,
                int *status );
 
+void ndfIsin( int indf1,
+              int indf2,
+              int *isin,
+              int *status );
+
 void ndfIstmp( int indf,
                int *istmp,
                int *status );

@@ -113,7 +113,7 @@ ndf_unmap.f ndf_valid.f ndf_xdel.f ndf_xgt0x.f ndf_xiary.f ndf_xloc.f  \
 ndf_xname.f ndf_xnew.f ndf_xnumb.f ndf_xpt0x.f ndf_xstat.f ndf1_cvcmd.f \
 ndf1_farg.f ndf_ptszx.f ndf_gtszx.f ndf_sctyp.f ndf1_sctyp.f ndf1_vstyp.f \
 ndf1_wclim.f ndf1_wplim.f ndf1_mpanl.f ndf1_mpspt.f ndf_hgmod.f \
-ndf_hsdat.f ndf1_chtim.f ndf1_hcopy.f ndf1_hsrt.f
+ndf_hsdat.f ndf1_chtim.f ndf1_hcopy.f ndf1_hsrt.f ndf_isin.f
 
 #  Additional Fortran routines required for the standalone library.
 

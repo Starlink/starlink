@@ -1975,6 +1975,36 @@ DECLARE_INTEGER(fstatus);
    return;
 }
 
+F77_SUBROUTINE(ndf_isin)( INTEGER(indf1),
+                          INTEGER(indf2),
+                          LOGICAL(isin),
+                          INTEGER(status) );
+
+void ndfIsin( int indf1,
+              int indf2,
+              int *isin,
+              int *status ) {
+
+DECLARE_INTEGER(findf1);
+DECLARE_INTEGER(findf2);
+DECLARE_LOGICAL(fisin);
+DECLARE_INTEGER(fstatus);
+
+   F77_EXPORT_INTEGER( indf1, findf1 );
+   F77_EXPORT_INTEGER( indf2, findf2 );
+   F77_EXPORT_INTEGER( *status, fstatus );
+
+   F77_CALL(ndf_isin)( INTEGER_ARG(&findf1),
+                       INTEGER_ARG(&findf2),
+                       LOGICAL_ARG(&fisin),
+                       INTEGER_ARG(&fstatus) );
+
+   F77_IMPORT_LOGICAL( fisin, *isin );
+   F77_IMPORT_INTEGER( fstatus, *status );
+
+   return;
+}
+
 F77_SUBROUTINE(ndf_istmp)( INTEGER(indf),
                            LOGICAL(istmp),
                            INTEGER(status) );
