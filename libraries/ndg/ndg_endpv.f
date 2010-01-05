@@ -86,6 +86,8 @@
 *     1-SEP-2008 (DSB):
 *        Only include provenance from input NDFs that have had their Data
 *        array mapped for read or update.
+*     5-JAN-2010 (DSB):
+*        Ignore any input NDF that is contained within another input NDF.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -113,17 +115,22 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
+      INTEGER CHR_LEN
       EXTERNAL NDG1_HNDLR
 
 *  Local Variables:
       CHARACTER AUTOPV*10
       CHARACTER RDNDF*512
+      CHARACTER RDNDF2*512
       CHARACTER WRNDF*512
       INTEGER INDF1
       INTEGER INDF2
       INTEGER IPROV
       INTEGER IR
+      INTEGER IR2
       INTEGER IW
+      INTEGER LEN1
+      INTEGER LEN2
       INTEGER NR
       INTEGER NW
       INTEGER PLACE
@@ -171,6 +178,48 @@
 *  We only propagate provenance if AUTOPROV is set to '1', or if AUTOPROV 
 *  is unset and at least one input NDF had a provenance extension.
          IF( AUTOPV .EQ. '1' .OR. AUTOPV .EQ. ' ' ) THEN
+
+*  Check the KeyMap holding the input NDFs to see if any of the input
+*  NDFs are contained within other input NDFs. Remove any such child NDFs
+*  from the KeyMap.
+            NR = AST_MAPSIZE( RDKMP_COM1, STATUS )
+            IR = 1
+            DO WHILE( IR .LT. NR )
+               RDNDF = AST_MAPKEY( RDKMP_COM1, IR, STATUS )
+               LEN1 = CHR_LEN( RDNDF )
+
+               IR2 = IR + 1
+               DO WHILE( IR2 .LE. NR )
+                  RDNDF2 = AST_MAPKEY( RDKMP_COM1, IR2, STATUS )
+                  LEN2 = CHR_LEN( RDNDF2 )
+
+*  See if NDF2 is a child of NDF1. If so, remove NDF2 from the KeyMap,
+*  and then proceed to check the next NDF again NDF2.
+                  IF( LEN2 .GT. LEN1 .AND.
+     :                RDNDF2( : LEN1 ) .EQ. RDNDF( : LEN1 ) .AND.
+     :                RDNDF2( LEN1 + 1 : LEN1 + 1 ) .EQ. '.' ) THEN
+                     CALL AST_MAPREMOVE( RDKMP_COM1, RDNDF2, STATUS ) 
+                     NR = NR - 1
+        
+*  See if NDF1 is a child of NDF2. If so, remove NDF1 from the KeyMap,
+*  and then break out of the NDF2 loop in order to establish a new NDF1.
+                  ELSE IF( LEN1 .GT. LEN2 .AND. 
+     :                     RDNDF( : LEN2 ) .EQ. RDNDF2( : LEN2 ) .AND.
+     :                     RDNDF( LEN2 + 1 : LEN2 + 1 ) .EQ. '.' ) THEN
+                     CALL AST_MAPREMOVE( RDKMP_COM1, RDNDF, STATUS ) 
+                     NR = NR - 1
+                     IR2 = NR + 1
+                     IR = IR - 1
+
+*  If there is no relation between NDF1 and NDF2, proceed to check the
+*  next NDF2.                          
+                  ELSE
+                     IR2 = IR2 + 1
+                  END IF
+               END DO
+
+               IR = IR + 1
+            END DO
 
 *  Loop round each output NDF
             NW = AST_MAPSIZE( WRKMP_COM1, STATUS )
