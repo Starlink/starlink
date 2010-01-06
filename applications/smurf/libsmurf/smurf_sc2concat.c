@@ -22,22 +22,24 @@
 *  Description:
 *     Given a list of input files this task concatenates them into larger
 *     files. The rules it follows are:
-*     - data files are grouped by subarray
-*     - files are only concatenated if they are continuous in time
-*     - the longest a concatenated file may be is given by MAXLEN (in sec.)
+*     - data files are grouped by subarray;
+*     - files are only concatenated if they are continuous in time;
+*     - the longest a concatenated file may be is given by MAXLEN (in sec.);
 *     - for each continuous chunk of data, shorter than MAXLEN, a file
 *     is generated on disk for each subarray. The file name is determined
 *     as the name of the first input file for the chunk, with a suffix
 *     "_con". The can be modified using the parameter OUT.
 
 *  ADAM Parameters:
-*     FLAT = LOGICAL (Read)
+*     FLAT = _LOGICAL (Read)
 *          If set ensure data are flatfielded. If not set do not scale the
-*          data in any way (but convert to DOUBLE) [TRUE]
+*          data in any way (but convert to DOUBLE). [TRUE]
 *     IN = NDF (Read)
-*          Input file(s)
+*          Input file(s).
 *     MAXLEN = _DOUBLE (Read)
-*          Maximum length (in seconds) concatenated file).
+*          Maximum length (in seconds) for concatenated file. The
+*          default is to use all data if possible (subject to
+*          available memory). [!]
 *     MSG_FILTER = _CHAR (Read)
 *          Control the verbosity of the application. Values can be
 *          NONE (no messages), QUIET (minimal messages), NORMAL,
@@ -49,11 +51,11 @@
 *          all the output NDFs created by this application (one per
 *          line). If a null (!) value is supplied no file is created. [!]
 *     PADEND = _INTEGER (Read)
-*          Number of samples to pad at end.
+*          Number of samples to pad at end. Default is no padding. [!]
 *     PADSTART = _INTEGER (Read)
-*          Number of samples to pad at start.
-*     USEDARKS = LOGICAL (Read)
-*          If set, use darks to mask data [TRUE]
+*          Number of samples to pad at start. Default is no padding. [!]
+*     USEDARKS = _LOGICAL (Read)
+*          Use darks to mask data. [TRUE]
 
 *  Related Applications:
 *     SMURF: SC2FFT, SC2CLEAN

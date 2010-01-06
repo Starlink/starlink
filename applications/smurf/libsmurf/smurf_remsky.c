@@ -20,8 +20,8 @@
 *        Pointer to global status.
 
 *  Description:
-*     This command can be used to investigate the sky signal from a SCUBA-2 time
-*     series file.
+*     This command can be used to fit and remove the sky signal from a
+*     SCUBA-2 time series file.
 
 *  ADAM Parameters:
 *     BPM = NDF (Read)
@@ -31,17 +31,17 @@
 *          mask the closest following will be used. It is not an error for
 *          no mask to match. A NULL parameter indicates no mask files to be
 *          supplied. [!]
-*     FIT = CHAR (Read)
+*     FIT = _CHAR (Read)
 *          Type of fit to be carried out for the PLANE sky removal
 *          method. Choices are Mean, Slope (to fit in elevation only)
-*          or Plane
-*     GROUP = LOGICAL (Read)
+*          or Plane. No default.
+*     GROUP = _LOGICAL (Read)
 *          If true, group related files together for processing as a
-*          single data set, else process each file independently
+*          single data set, else process each file independently. [FALSE]
 *     IN = NDF (Read)
-*          Input file(s)
-*     METHOD = CHAR (Read)
-*          Sky removal method, either POLY or PLANE
+*          Input file(s).
+*     METHOD = _CHAR (Read)
+*          Sky removal method, either POLY or PLANE.
 *     MSG_FILTER = _CHAR (Read)
 *          Control the verbosity of the application. Values can be
 *          NONE (no messages), QUIET (minimal messages), NORMAL,
@@ -71,7 +71,7 @@
 *     2006-02-16 (AGG):
 *        Initial test version
 *     2006-12-20 (TIMJ):
-*        Open related files in UPDATE mode to prevent overwrite of propogated 
+*        Open related files in UPDATE mode to prevent overwrite of propogated
 *        components
 *     2008-04-17 (EC):
 *        Modified smf_grp_related interface
@@ -199,7 +199,7 @@ void smurf_remsky( int * status ) {
   smf_request_mask( "BPM", &bpms, status );
 
   /* Get sky subtraction METHOD */
-  parChoic( "METHOD", "PLANE", "Plane, Polynomial", 1,  method, 
+  parChoic( "METHOD", "PLANE", "Plane, Polynomial", 1,  method,
             LEN__METHOD, status);
 
   /* Do we want to group related files? */
@@ -208,7 +208,7 @@ void smurf_remsky( int * status ) {
   /* Get desired plane-fitting method */
   if ( strncmp( method, "PL", 2 ) == 0 ) {
     /* Timeslice-based sky removal */
-    parChoic( "FIT", "SLOPE", "Mean, Slope, Plane", 
+    parChoic( "FIT", "SLOPE", "Mean, Slope, Plane",
               1, fittype, LEN__METHOD, status);
   }
 

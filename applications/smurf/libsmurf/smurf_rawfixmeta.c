@@ -4,7 +4,7 @@
 *     RAWFIXMETA
 
 *  Purpose:
-*     Fix meta data associated with a raw data file.
+*     Fix metadata associated with a raw data file.
 
 *  Language:
 *     Starlink ANSI C
@@ -20,9 +20,10 @@
 *        Pointer to global status.
 
 *  Description:
-*     Report any issues associated the metadata of a particular file. In most
-*     cases SMURF applications will automatically apply these corrections but the
-*     command can be used to investigate issues prior to making a map.
+*     Report any issues associated the metadata of a particular
+*     file. In most cases SMURF applications will automatically apply
+*     these corrections but the command can be used to investigate
+*     issues prior to making a map.
 
 *  Notes:
 *     - Supports ACSIS raw data files

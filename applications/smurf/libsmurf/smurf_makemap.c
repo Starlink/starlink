@@ -25,15 +25,17 @@
 *
 *     The "REBIN" method can be used to make a map by coadding all the samples
 *     in the correct location using a number of different convolution
-*     techniques. This is useful when the time series have been processed
+*     techniques. This is useful when the time series has been processed
 *     independently of the map-maker and the map should be made "as-is".
 *     Raw data will be flatfielded but this method will not apply any
 *     extinction correction, sky removal or filtering. It is assumed that
 *     this has been handled by other tasks prior to making the map.
 
-*     The "ITERATE" method takes a holistic approach to map making and
-*     will attempt to do all that can be done to make a map. Details
-*     of the map making can be controlled using the CONFIG file.
+*     The "ITERATE" method takes a more holistic approach to map
+*     making using an iterative technique to fit for a number of
+*     models for noise and instrumental behaviour, one of which is the
+*     underlying astronomical image. Details of the map making can be
+*     controlled using the CONFIG file.
 
 *  ADAM Parameters:
 *     ALIGNSYS = _LOGICAL (Read)
@@ -60,14 +62,14 @@
 *
 *          The supplied value should be either a comma-separated list of
 *          strings or the name of a text file preceded by an up-arrow
-*          character "^", containing one or more comma-separated list of
+*          character "^", containing one or more comma-separated lists of
 *          strings. Each string is either a "keyword=value" setting, or
 *          the name of a text file preceded by an up-arrow character
 *          "^". Such text files should contain further comma-separated
 *          lists which will be read and interpreted in the same manner
 *          (any blank lines or lines beginning with "#" are
 *          ignored). Within a text file, newlines can be used as
-*          delimiters as well as commas. Settings are applied in the
+*          delimiters, as well as commas. Settings are applied in the
 *          order in which they occur within the list, with later
 *          settings over-riding any earlier settings given for the same
 *          keyword.
@@ -76,26 +78,26 @@
 *
 *             <keyword>=<value>
 *
-*          The parameters available for are listed in the "Configuration
+*          The parameters available are listed in the "Configuration
 *          Parameters" sections below. Default values will be used for
 *          any unspecified parameters. Unrecognised options are ignored
 *          (that is, no error is reported). [current value]
 *     CROTA = _REAL (Read)
-*          Only accessed if a null value is supplied for parameter REF.
 *          The angle, in degrees, from north through east (in the
 *          coordinate system specified by the SYSTEM parameter) to the
-*          second pixel axis in the output cube.
+*          second pixel axis in the output cube.  Only accessed if a
+*          null value is supplied for parameter REF.
 *     FBL( ) = _DOUBLE (Write)
 *          Sky coordinates (radians) of the bottom left corner of the
 *          output map (the corner with the smallest PIXEL dimension for
-*          axis 1 and the smallest pixel dimension for axis 2). No check
-*          is made that the pixel corresponds valid data. Note that the
+*          axis 1 and the smallest PIXEL dimension for axis 2). No check
+*          is made that the pixel corresponds to valid data. Note that the
 *          position is reported for the centre of the pixel.
 *     FBR( ) = _DOUBLE (Write)
 *          Sky coordinates (radians) of the bottom right corner of the
 *          output map (the corner with the largest PIXEL dimension for
-*          axis 1 and the smallest pixel dimension for axis 2). No check
-*          is made that the pixel corresponds valid data. Note that the
+*          axis 1 and the smallest PIXEL dimension for axis 2). No check
+*          is made that the pixel corresponds to valid data. Note that the
 *          position is reported for the centre of the pixel.
 *     FLBND( ) = _DOUBLE (Write)
 *          The lower bounds of the bounding box enclosing the output map
@@ -103,26 +105,26 @@
 *          even if no output cube is created. Celestial axis values will
 *          be in units of radians.  The parameter is named to be
 *          consistent with KAPPA NDFTRACE output.
+*     FTL( ) = _DOUBLE (Write)
+*          Sky coordinates (radians) of the top left corner of the
+*          output map (the corner with the smallest PIXEL dimension for
+*          axis 1 and the largest PIXEL dimension for axis 2). No check
+*          is made that the pixel corresponds to valid data. Note that the
+*          position is reported for the centre of the pixel.
+*     FTR( ) = _DOUBLE (Write)
+*          Sky coordinates (radians) of the top right corner of the
+*          output map (the corner with the largest PIXEL dimension for
+*          axis 1 and the largest PIXEL dimension for axis 2). No check
+*          is made that the pixel corresponds to valid data. Note that the
+*          position is reported for the centre of the pixel.
 *     FUBND( ) = _DOUBLE (Write)
 *          The upper bounds of the bounding box enclosing the output map
 *          in the selected output WCS Frame. The values are calculated
 *          even if no output cube is created. Celestial axis values will
 *          be in units of radians.  The parameter is named to be
 *          consistent with KAPPA NDFTRACE output.
-*     FTL( ) = _DOUBLE (Write)
-*          Sky coordinates (radians) of the top left corner of the
-*          output map (the corner with the smallest PIXEL dimension for
-*          axis 1 and the largest pixel dimension for axis 2). No check
-*          is made that the pixel corresponds valid data. Note that the
-*          position is reported for the centre of the pixel.
-*     FTR( ) = _DOUBLE (Write)
-*          Sky coordinates (radians) of the top right corner of the
-*          output map (the corner with the largest PIXEL dimension for
-*          axis 1 and the largest pixel dimension for axis 2). No check
-*          is made that the pixel corresponds valid data. Note that the
-*          position is reported for the centre of the pixel.
 *     IN = NDF (Read)
-*          Input file(s)
+*          Input file(s).
 *     LBND( 2 ) = _INTEGER (Read)
 *          An array of values giving the lower pixel index bound on each
 *          spatial axis of the output NDF. The suggested default values
@@ -132,34 +134,35 @@
 *          written to this output parameter even if a null value is supplied
 *          for parameter OUT.
 *     MAXMEM = _INTEGER (Read)
-*          Maximum memory available for map-making in Mb
+*          Maximum memory available for map-making in Mb.
 *     METHOD = LITERAL (Read)
-*          Specify which map maker should be used to construct the map. The
-*          parameter can take the following values:
+*          Specify which map-maker should be used to construct the
+*          map. The parameter can take the following values:
 *          - "REBIN" -- Use a single pass rebinning algorithm. This
 *          technique assumes that the data have previously had
 *          atmosphere and instrument signatures removed. It makes use
 *          of the standard AST library rebinning algorithms (see also
-*          KAPPA WCSMOSAIC). It's an excellent choice for obtaining an
+*          KAPPA WCSMOSAIC). It is an excellent choice for obtaining an
 *          image quickly, especially of a bright source.
 *          - "ITERATE" -- Use the iterative map maker. This map maker
 *          is much slower than the REBIN algorithm because it
 *          continually makes a map, constructs models for different
-*          data components (common-mode, spikes etc) See CONFIG for parameters
-*          controlling the iterative map maker.
+*          data components (common-mode, spikes etc.). See CONFIG for
+*          parameters controlling the iterative map maker.
+*          [REBIN]
 *     MSG_FILTER = _CHAR (Read)
 *          Control the verbosity of the application. Values can be
 *          NONE (no messages), QUIET (minimal messages), NORMAL,
 *          VERBOSE, DEBUG or ALL. [NORMAL]
 *     NTILE = _INTEGER (Write)
 *          The number of output tiles used to hold the entire output
-*          array (see parameter TILEDIMS). If no input data falls within
+*          array (see parameter TILEDIMS). If no input data fall within
 *          a specified tile, then no output NDF will be created for the
-*          tile, but the tile will still be included in the tile numbering
+*          tile, but the tile will still be included in the tile numbering.
 *     OUT = NDF (Write)
-*          Output file
+*          Output file.
 *     OUTFILES = LITERAL (Write)
-*          The name of text file to create, in which to put the names of
+*          The name of a text file to create, in which to put the names of
 *          all the output NDFs created by this application via parameter
 *          OUT (one per line). If a null (!) value is supplied no file is
 *          created. [!]
@@ -201,7 +204,7 @@
 *     REFLAT = LITERAL (Read)
 *          The formatted celestial latitude value at the tangent point of
 *          the spatial projection in the output cube. This should be provided
-*          in the system specified by parameter SYSTEM.
+*          in the coordinate system specified by parameter SYSTEM.
 *     REFLON = LITERAL (Read)
 *          The formatted celestial longitude value at the tangent point of
 *          the spatial projection in the output cube. This should be provided
@@ -241,7 +244,7 @@
 *          - "Somb" -- Uses the somb(pi*x) kernel, where x is the pixel
 *          offset from the transformed input pixel centre, and
 *          somb(z)=2*J1(z)/z (J1 is the first-order Bessel function of the
-*          first kind.  This scheme is similar to the "Sinc" scheme.
+*          first kind).  This scheme is similar to the "Sinc" scheme.
 *
 *          - "SombCos" -- Uses the somb(pi*x)cos(k*pi*x) kernel.  This
 *          scheme is similar to the "SincCos" scheme.
@@ -257,11 +260,11 @@
 *          ICRS, GAPPT, FK5, FK4, FK4-NO-E, AZEL, GALACTIC, ECLIPTIC. It
 *          can also be given the value "TRACKING", in which case the
 *          system used will be which ever system was used as the tracking
-*          system during in the observation.
+*          system during the observation.
 *
 *          The choice of system also determines if the telescope is
 *          considered to be tracking a moving object such as a planet or
-*          asteroid. If system is GAPPT or AZEL, then each time slice in
+*          asteroid. If the system is GAPPT or AZEL, then each time slice in
 *          the input data will be shifted in order to put the base
 *          telescope position (given by TCS_AZ_BC1/2 in the JCMTSTATE
 *          extension of the input NDF) at the same pixel position that it
@@ -328,7 +331,7 @@
 
 *  Configuration Parameters:
 *
-*     *** General parameters controlling iterative map-maker ***
+*     i) General parameters controlling the iterative map-maker.
 *
 *     NUMITER = INTEGER
 *       A positive value if a set number of iterations are desired. A
@@ -338,7 +341,7 @@
 *       Maximum difference in chi^2 between subsequent iterations required
 *       to stop if NUMITER is negative.
 *     VARMAPMETHOD = LOGICAL
-*       Method of estimating variance map. If 0 calculate theoretical
+*       Method of estimating the variance map. If 0 calculate theoretical
 *       uncertainties propagated from the time-domain noise measurements. If
 *       1 calculate the weighted sample variance of data points that land in
 *       each pixel of the map.
@@ -347,7 +350,7 @@
 *       (limited by MAXMEM ADAM parameter, and MAXLEN Config
 *       parameter). Otherwise visit each file on disk for each
 *       iteration. This latter choice is not memory limited, but much
-*       slower, and will not produce as good of a final map since
+*       slower, and will not produce as good a final map, because
 *       discontinuities exist at each file boundary (since, for
 *       example, operations like FFT filtering will pad part of the
 *       boundary around file edges).
@@ -361,31 +364,32 @@
 *       map-maker, e.g. "(com,gai,ext,ast,flt,noi)". Each component has a
 *       three-character abbreviation. The following components may be
 *       specified:
-*         dks = fit and remove dark squid for the column
-*         com = remove common-mode signal
-*         gai = if com specified, fit gain/offset of common mode
-*         ext = apply extinction correction
-*         ast = estimate the map and astronomical signal
-*         flt = apply filter to time streams
-*         noi = estimate time-domain variance
+*         - dks = fit and remove dark squid for the column
+*         - com = remove common-mode signal
+*         - gai = if com specified, fit gain/offset of common mode
+*         - ext = apply extinction correction
+*         - ast = estimate the map and astronomical signal
+*         - flt = apply filter to time streams
+*         - noi = estimate time-domain variance
+*
 *       If MEMITER=0 files will be produced of the form "[input
 *       filename]_[model component].dimm", but will be deleted upon
-*       completion of the map if DELDIMM is set. Set EXPORTNDF if you
-*       wish to produce Starlink ".sdf" files that can be viewed using
+*       completion of the map if DELDIMM is set. Set EXPORTNDF
+*       to produce Starlink ".sdf" files that can be viewed using
 *       tools such as Kappa and Gaia regardless of the value of MEMITER.
 *     EXPORTNDF( ) = STRING
 *       Export model components to Starlink ".sdf" files. Specify 1 or
 *       0 to export all or none of the components respectively. One
 *       can also specify an array of components to export using the
 *       same format as modelorder. Note that you can specify
-*       additional components 'res' (residual signal upon removal of
-*       all model components) and 'qua' (quality component) to what
-*       may be provided to modelorder. Exportation of 'res' is implied
-*       if either 'noi' or 'qua' are specified as they become the
-*       variance and quality components of the resulting NDF for 'res'
+*       additional components `res' (residual signal upon removal of
+*       all model components) and `qua' (quality component) to what
+*       may be provided to modelorder. Exportation of `res' is implied
+*       if either `noi' or `qua' are specified as they become the
+*       variance and quality components of the resulting NDF for `res'
 *       respectively.
 *
-*     *** The following parameters control pre-iteration data-cleaning steps ***
+*     ii) Parameters controlling pre-iteration data-cleaning steps.
 *
 *     PADSTART = INTEGER
 *       Number of samples of padding to add to start before filtering.
@@ -395,17 +399,17 @@
 *       Apodize signals (smoothly roll-off) using sine/cosine functions at
 *       start and end of the signal across this many samples.
 *     ORDER = INTEGER
-*       Subtract a fitted baseline polynomial of this order (0 to remove mean)
+*       Subtract a fitted baseline polynomial of this order (0 to remove mean).
 *     BADFRAC = REAL
 *       Flag entire bolometer as dead if at least this fraction of the samples
 *       in a detector time series were flagged as bad by the DA system.
 *     FLAGSTAT = REAL
 *       Flag data taken while the telescope was stationary so that it
-*       is ignored in the final map. The value given is a threshold
+*       they are ignored in the final map. The value given is a threshold
 *       slew velocity (arcsec/sec) measured in tracking coordinates
 *       below which the telescope is considered to be stationary.
 *     DCTHRESH = REAL
-*       Threshold S/N to detect and flag DC (baseline steps).
+*       Threshold S/N to detect and flag DC (baseline) steps.
 *     DCBOX = REAL
 *       Number of samples (box size) in which the signal RMS is measured for
 *       the DC step finder.
@@ -423,7 +427,7 @@
 *     FILT_NOTCHLOW( ) = REAL
 *       Array of lower-edge frequencies corresponding to FILT_NOTCHHIGH.
 *
-*     *** The following parameters control calculation of model components ***
+*     iii) Parameters controlling the calculation of model components.
 *
 *     COM.BOXCAR = INTEGER
 *       If COM model component specified, boxcar smooth by this number of
@@ -435,33 +439,9 @@
 *       If COM.BOXFACT specified, this value is the minimum boxcar filter length
 *       in samples.
 *     DKS.BOXCAR = INTEGER
-*       If DKS (dark squid) model component requested, boxcar dark squid
+*       If DKS (dark squid) model component requested, boxcar the dark squid
 *       signal by this many samples before fitting/removing from each detector
 *       in the same column.
-*     NOI.SPIKETHRESH = REAL
-*       If NOI specified, flag new spikes in the residual after each iteration
-*       before measuring noise. This is the S/N threshold for detecting
-*       spikes with sigma-clipper.
-*     NOI.SPIKEITER = INTEGER
-*       If NOI specified, flag new spikes in the residual after each iteration
-*       before measuring noise. This value gives the number of iterations for
-*       the sigma clipper, or 0 to iterate to convergence.
-*     FLT.FILT_EDGEHIGH = REAL
-*       If FLT specified, perform filtering as an iterative component, rather
-*       than doing it once at the beginning as a pre-processing step. See
-*       FILT_EDGEHIGH.
-*     FLT.FILT_EDGELOW = REAL
-*       If FLT specified, perform filtering as an iterative component, rather
-*       than doing it once at the beginning as a pre-processing step. See
-*       FILT_EDGELOW.
-*     FLT.FILT_NOTCHHIGH( ) = REAL
-*       If FLT specified, perform filtering as an iterative component, rather
-*       than doing it once at the beginning as a pre-processing step. See
-*       FILT_ NOTCHHIGH.
-*     FLT.FILT_NOTCHLOW( ) = REAL
-*       If FLT specified, perform filtering as an iterative component, rather
-*       than doing it once at the beginning as a pre-processing step. See
-*       FILT_ NOTCHLOW.
 *     EXT.TAUSRC = STRING
 *       As with EXTINCTION task, specify source of optical depth data:
 *          - WVMRAW    - use the water vapour monitor time series data
@@ -484,6 +464,30 @@
 *       the current wavelength. Only used if TAUSRC equals
 *       "FILTERTAU". Note that no check is made to ensure that all the
 *       input files share the same filter.
+*     FLT.FILT_EDGEHIGH = REAL
+*       If FLT specified, perform filtering as an iterative component, rather
+*       than doing it once at the beginning as a pre-processing step. See
+*       FILT_EDGEHIGH.
+*     FLT.FILT_EDGELOW = REAL
+*       If FLT specified, perform filtering as an iterative component, rather
+*       than doing it once at the beginning as a pre-processing step. See
+*       FILT_EDGELOW.
+*     FLT.FILT_NOTCHHIGH( ) = REAL
+*       If FLT specified, perform filtering as an iterative component, rather
+*       than doing it once at the beginning as a pre-processing step. See
+*       FILT_ NOTCHHIGH.
+*     FLT.FILT_NOTCHLOW( ) = REAL
+*       If FLT specified, perform filtering as an iterative component, rather
+*       than doing it once at the beginning as a pre-processing step. See
+*       FILT_ NOTCHLOW.
+*     NOI.SPIKETHRESH = REAL
+*       If NOI specified, flag new spikes in the residual after each iteration
+*       before measuring noise. This is the S/N threshold for detecting
+*       spikes with sigma-clipper.
+*     NOI.SPIKEITER = INTEGER
+*       If NOI specified, flag new spikes in the residual after each iteration
+*       before measuring noise. This value gives the number of iterations for
+*       the sigma clipper, or 0 to iterate to convergence.
 
 *  Related Applications:
 *     SMURF: QLMAKEMAP
@@ -494,15 +498,15 @@
 *     FITS extension, a FITS keyword must be present in the NDF extension
 *     of every input NDF, and it must have the same value in all input
 *     NDFs. In addition, certain headers that relate to start and end
-*     events are propogated from the oldest and newest file respectively.
-*     - The output NDF will contain an extension named "SMURF" containing
-*     an NDF named "EXP_TIME" containing the exposure time associated with
-*     each pixel.
-*     - The FITS keyword EXP_TIME is added to the output
-*     FITS extension. This header contains the median
-*     value of the EXP_TIME array (stored in the SMURF extension
-*     of the output NDF).
-*     corresponding FITS keyword is assigned a blank value.
+*     events are propogated from the oldest and newest files respectively.
+*     - The output NDF will contain an extension named "SMURF"
+*     containing an NDF named "EXP_TIME", which contains the exposure
+*     time associated with each pixel.
+*     - The FITS keyword EXP_TIME is added to the output FITS
+*     extension. This header contains the median value of the EXP_TIME
+*     array (stored in the SMURF extension of the output NDF).If this
+*     value cannot be calculated for any reason, the corresponding
+*     FITS keyword is assigned a blank value.
 *     - FITS keywords NUMTILES and TILENUM are added to the output FITS
 *     header. These are the number of tiles used to hold the output data,
 *     and the index of the NDF containing the header, in the range 1 to
@@ -681,11 +685,11 @@
 *        - re-tabbed some sections to fit into 80 columns
 *        - define MAXMEM ADAM parameter
 *        - Added "Configuration Parameters" section
-*     2009-10-07 (DSB): 
+*     2009-10-07 (DSB):
 *        Update to reflect new smf_choosetiles behaviour.
 *     2009-10-08 (EC):
 *        Calculate dynamic default value for MAXMEM using sysconf call
-*     2009-10-27 (DSB): 
+*     2009-10-27 (DSB):
 *        Add a spectral axis to the output NDF.
 *     {enter_further_changes_here}
 
@@ -1378,14 +1382,14 @@ void smurf_makemap( int *status ) {
                 "Index of this tile (1->NUMTILES)", status );
 
       /* If the FitsChan is not empty, store it in the FITS extension of the
-         output NDF (any existing FITS extension is deleted). Do not annul 
+         output NDF (any existing FITS extension is deleted). Do not annul
          it as it is needed by smf_add_spectral_axis below, and will be
          annulled automatically by astEnd anyway. */
       if( astGetI( fchan, "NCard" ) > 0 ) kpgPtfts( ondf, fchan, status );
 
-      /* Clone the main output NDF identifier so it will be available to 
+      /* Clone the main output NDF identifier so it will be available to
          smf_add_spectral_axis below. */
-      ndfClone( ondf, &tndf, status ); 
+      ndfClone( ondf, &tndf, status );
 
       /* For each open output NDF (the main tile NDF, and any extension NDFs),
          first clone the NDF identifier, then close the file (which will unmap
@@ -1586,18 +1590,18 @@ void smurf_makemap( int *status ) {
     /* If the FitsChan is not empty, store it in the FITS extension of the
        output NDF (any existing FITS extension is deleted). No need to
        annul the FitsChan as it will be annulled when astEnd is called in
-       the monolith function (there should really be an all-encompassing 
-       astBegin/astEnd block in this function too). Also, the FitsChan is 
+       the monolith function (there should really be an all-encompassing
+       astBegin/astEnd block in this function too). Also, the FitsChan is
        needed below by smf_add_spectral_axis. */
     if( astGetI( fchan, "NCard" ) > 0 ) kpgPtfts( ondf, fchan, status );
 
     /* Before closing the output file, clone the NDF identifier so that
-       we can pass it to smf_add_spectral_axis later (smf_close_file 
-       annuls the NDF identifier from which "ondf" was copied). Do it 
-       this way, rather than calling smf_add_spectral_axis now, before 
+       we can pass it to smf_add_spectral_axis later (smf_close_file
+       annuls the NDF identifier from which "ondf" was copied). Do it
+       this way, rather than calling smf_add_spectral_axis now, before
        closing the file, to avoid any chance of the changes introduced by
        smf_add_spectral_axis upsetting the behaviour of smf_close_file. */
-    ndfClone( ondf, &tndf, status ); 
+    ndfClone( ondf, &tndf, status );
     smf_close_file ( &tdata, status );
     smf_close_file ( &wdata, status );
     smf_close_file ( &odata, status );
@@ -1605,7 +1609,7 @@ void smurf_makemap( int *status ) {
    /* Convert the output NDF form 2D to 3D by adding a spectral axis
       spanning a single pixel. Then the output NDF identifier. */
     smf_add_spectral_axis( tndf, fchan, status );
-    ndfAnnul( &tndf, status );    
+    ndfAnnul( &tndf, status );
 
   } else {
     /* no idea what mode */

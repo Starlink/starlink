@@ -31,8 +31,9 @@
 *     the MEANWVM tau value (at 225 GHz) from the FITS header.
 
 *     The quick bounds determination implies that this routine should
-*     not be used for multi-observation mosaics. The intent of this command
-*     is to reduce a single observation as quickly as possible.
+*     not be used for multi-observation mosaics. The intent of this
+*     command is to reduce a single observation in order to see
+*     results as quickly as possible.
 
 *  ADAM Parameters:
 *     BPM = NDF (Read)
@@ -79,11 +80,11 @@
 *          spectra, good results are often obtained by approximately
 *          matching the FWHM of the envelope function, given by PARAMS(2),
 *          to the point-spread function of the input data.  []
-*     PIXSIZE = REAL (Read)
-*          Pixel size in output image, in arcsec. Default value depends on
+*     PIXSIZE = _REAL (Read)
+*          Pixel size in the output image, in arcsec. Default value depends on
 *          the wavelength of the supplied data.
 *     SPREAD = LITERAL (Read)
-*          The method to use when spreading each input pixel value out
+*          The method to use when spreading out each input pixel value
 *          between a group of neighbouring output pixels. If SPARSE is set
 *          TRUE, then SPREAD is not accessed and a value of "Nearest" is
 *          always assumed. SPREAD can take the following values:
@@ -117,7 +118,7 @@
 *          - "Somb" -- Uses the somb(pi*x) kernel, where x is the pixel
 *          offset from the transformed input pixel centre, and
 *          somb(z)=2*J1(z)/z (J1 is the first-order Bessel function of the
-*          first kind.  This scheme is similar to the "Sinc" scheme.
+*          first kind).  This scheme is similar to the "Sinc" scheme.
 *
 *          - "SombCos" -- Uses the somb(pi*x)cos(k*pi*x) kernel.  This
 *          scheme is similar to the "SincCos" scheme.
@@ -129,7 +130,21 @@
 *          For further details of these schemes, see the descriptions of
 *          routine AST_REBINx in SUN/211. ["Nearest"]
 *     SYSTEM = LITERAL (Read)
-*          The celestial coordinate system for the output map/
+*          The celestial coordinate system for the output map. One of
+*          ICRS, GAPPT, FK5, FK4, FK4-NO-E, AZEL, GALACTIC, ECLIPTIC. It
+*          can also be given the value "TRACKING", in which case the
+*          system used will be which ever system was used as the tracking
+*          system during the observation.
+*
+*          The choice of system also determines if the telescope is
+*          considered to be tracking a moving object such as a planet or
+*          asteroid. If the system is GAPPT or AZEL, then each time slice in
+*          the input data will be shifted in order to put the base
+*          telescope position (given by TCS_AZ_BC1/2 in the JCMTSTATE
+*          extension of the input NDF) at the same pixel position that it
+*          had for the first time slice. For any other system, no such
+*          shifts are applied, even if the base telescope position is
+*          changing through the observation. [TRACKING]
 
 *  Related Applications:
 *     SMURF: MAKEMAP

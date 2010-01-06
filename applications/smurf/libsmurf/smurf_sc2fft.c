@@ -20,25 +20,26 @@
 *        Pointer to global status.
 
 *  Description:
-*     This routine performs for the forward or inverse FFT of SCUBA-2 data.
-*     The FFT of the data are stored in a 4-dimensional array with dimensions
-*     frequency, xbolo, ybolo, component (where component is a dimension
-*     of length 2 holding the real and imaginary parts). The inverse flag
-*     is used to transform back to the time domain from the frequency domain.
-*     If the data are already in the requested domain, the ouput file is
+*     This routine performs the forward or inverse FFT of SCUBA-2
+*     time-series data.  The FFT of the data are stored in a
+*     4-dimensional array with dimensions frequency, xbolo, ybolo,
+*     component (where component is a dimension of length 2 holding
+*     the real and imaginary parts). The inverse flag is used to
+*     transform back to the time domain from the frequency domain.  If
+*     the data are already in the requested domain, the ouput file is
 *     simply a copy of the input file.
 
 *  Notes:
 *     Transforming data loses the VARIANCE and QUALITY components.
 
 *  ADAM Parameters:
-*     FLAT = LOGICAL (Read)
+*     FLAT = _LOGICAL (Read)
 *          If set ensure data are flatfielded. If not set do not scale the
-*          data in any way (but convert to DOUBLE) [TRUE]
+*          data in any way (but convert to DOUBLE). [TRUE]
 *     IN = NDF (Read)
-*          Input files to be transformed
+*          Input files to be transformed.
 *     INVERSE = _LOGICAL (Read)
-*          If true perform inverse transform
+*          Perform inverse transform. [FALSE]
 *     MSG_FILTER = _CHAR (Read)
 *          Control the verbosity of the application. Values can be
 *          NONE (no messages), QUIET (minimal messages), NORMAL,
@@ -53,9 +54,11 @@
 *          all the output NDFs created by this application (one per
 *          line). If a null (!) value is supplied no file is created. [!]
 *     POLAR = _LOGICAL (Read)
-*          If true use polar representation (amplitude,argument) of FFT
+*          Use polar representation (amplitude, argument) of
+*          FFT. [FALSE]
 *     POWER = _LOGICAL (Read)
-*          If set use polar representation of FFT with squared amplitudes
+*          Use polar representation of FFT with squared
+*          amplitudes. [FALSE]
 
 *  Related Applications:
 *     SMURF: SC2CONCAT, SC2CLEAN, CALCNOISE

@@ -22,66 +22,67 @@
 *  Description:
 *     This command is a  stand-alone task for cleaning SCUBA-2
 *     time-series data. Cleaning operations include:
-*     - (i) flag entire bolometer
+*     - flag entire bolometer
 *     data streams as bad based on a threshold fraction of bad
 *     samples;
-*     - (ii) removing large-scale detector drifts by fitting
+*     - removing large-scale detector drifts by fitting
 *     and removing low-order polynomial baselines;
-*     - (iii) identifying and repairing DC steps;
-*     - (iv) flagging spikes;
-*     - (v) replacing spikes and other gaps in the data with a constrained
+*     - identifying and repairing DC steps;
+*     - flagging spikes;
+*     - replacing spikes and other gaps in the data with a constrained
 *     realization of noise; and
-*     - (vi) applying other frequency-domain filters, such
+*     - applying other frequency-domain filters, such
 *     as a high-pass or correction of the DA system response.
 
 *  Notes:
-*     - Point (v) is not yet implemented.
+*     Replacing spikes with noise is not yet implemented.
 
 *  ADAM Parameters:
 *     APOD = _INTEGER (Read)
 *          Apodize time series start and end with a Hanning window that rolls
-*          off in APOD samples.
+*          off in APOD samples. [0]
 *     BADFRAC = _DOUBLE (Read)
 *          Fraction of bad samples in order for entire bolometer to be
-*          flagged as bad
+*          flagged as bad. [0.0]
 *     DCBAD = _LOGICAL (Read)
-*          If true, instead of repairing DC steps, flag bolo as bad
+*          If true, instead of repairing DC steps, flag bolo as bad. [TRUE]
 *     DCBOX = _INTEGER (Read)
 *          Width of the box (samples) over which to estimate the mean
-*          signal level for DC step detection
+*          signal level for DC step detection. [0]
 *     DCTHRESH = _DOUBLE (Read)
-*          N-sigma threshold at which to detect DC steps
+*          N-sigma threshold at which to detect DC steps. [150.0]
 *     DKCLEAN = _LOGICAL (Read)
-*          If true fit and remove dark squid signals
+*          If true fit and remove dark squid signals. [FALSE]
 *     FILT_EDGEHIGH = _DOUBLE (Read)
-*          Apply a hard-edged high-pass filter at this frequency (Hz)
+*          Apply a hard-edged high-pass filter at this frequency (Hz). [0.0]
 *     FILT_EDGELOW = _DOUBLE (Read)
-*          Apply a hard-edged low-pass filter at this frequency (Hz)
+*          Apply a hard-edged low-pass filter at this frequency (Hz). [0.0]
 *     FILT_NOTCHHIGH = _DOUBLE (Read)
-*          Array of upper-frequency edges for hard notch filters (Hz)
+*          Array of upper-frequency edges for hard notch filters (Hz). [0.0]
 *     FILT_NOTCHLOW = _DOUBLE (Read)
-*          Array of lower-frequency edges for hard notch filters (Hz)
+*          Array of lower-frequency edges for hard notch filters (Hz). [0.0]
 *     FLAGSTAT = _DOUBLE (Read)
-*          Flag data during slew speeds less than FLAGSTAT (arcsec/sec)
+*          Flag data during slew speeds less than FLAGSTAT (arcsec/sec). [0.0]
 *     IN = NDF (Read)
-*          Input files to be uncompressed and flatfielded
+*          Input files to be uncompressed and flatfielded.
 *     MSG_FILTER = _CHAR (Read)
 *          Control the verbosity of the application. Values can be
 *          NONE (no messages), QUIET (minimal messages), NORMAL,
 *          VERBOSE, DEBUG or ALL. [NORMAL]
-*     ORDER = INTEGER (Read)
-*          Fit and remove polynomial baselines of this order
+*     ORDER = _INTEGER (Read)
+*          Fit and remove polynomial baselines of this order. No
+*          fitting is done if negative. [-1]
 *     OUT = NDF (Write)
-*          Output file(s)
+*          Output file(s).
 *     OUTFILES = LITERAL (Write)
 *          The name of text file to create, in which to put the names of
 *          all the output NDFs created by this application (one per
 *          line). If a null (!) value is supplied no file is created. [!]
 *     SPIKEITER = _INTEGER (Read)
 *          If 0 iteratively find spikes until convergence. Otherwise
-*          execute precisely this many iterations.
+*          execute precisely this many iterations. [0]
 *     SPIKETHRESH = _DOUBLE (Read)
-*          Flag spikes SPIKETHRESH-sigma away from mean
+*          Flag spikes SPIKETHRESH-sigma away from the mean. [0.0]
 
 *  Related Applications:
 *     SMURF: SC2FFT

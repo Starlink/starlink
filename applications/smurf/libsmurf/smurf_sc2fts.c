@@ -4,7 +4,7 @@
 *     SC2FTS
 
 *  Purpose:
-*     Fourier Transform Spectrometer specialist routines (incomplete)
+*     Fourier Transform Spectrometer specialist routines (incomplete).
 
 *  Language:
 *     Starlink ANSI C
@@ -21,25 +21,25 @@
 
 *  Description:
 *     This command can be used to process Fourier Transform Spectrometer
-*     data for SCUBA-2. The commands are incomplete and should not be used
-*     at this time and it may look very different when finally released.
+*     data for SCUBA-2. The commands are incomplete, should not be used
+*     at this time and may look very different when finally released.
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
-*          Name of input data file
+*          Name of input data file.
 *     MSG_FILTER = _CHAR (Read)
 *          Control the verbosity of the application. Values can be
 *          NONE (no messages), QUIET (minimal messages), NORMAL,
 *          VERBOSE, DEBUG or ALL. [NORMAL]
 *     OUT = NDF (Write)
-*          Name of processed output file
+*          Name of processed output file.
 
 *  Authors:
 *     Baoshe Zhang (UoL)
 *     {enter_new_authors_here}
 
 *  Notes:
-*      Do not use this command.
+*      Do not use this command yet.
 
 *  History:
 *     2008-03-16 (BZ):
@@ -106,7 +106,7 @@
 #define TASK_NAME "SC2FTS"
 
 void smurf_sc2fts ( int *status ) {
-  
+
   /* enter the FTS-2 smurf data reduction */
   sc2fts_entry( status );
 

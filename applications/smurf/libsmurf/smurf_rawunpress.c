@@ -32,7 +32,7 @@
 *          NONE (no messages), QUIET (minimal messages), NORMAL,
 *          VERBOSE, DEBUG or ALL. [NORMAL]
 *     OUT = NDF (Write)
-*          Output file
+*          Output file.
 
 *  Related Applications:
 *     SMURF: FLATFIELD
