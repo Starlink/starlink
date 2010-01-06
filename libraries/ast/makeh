@@ -36,6 +36,11 @@
 #        the temporary directory.
 #     2-MAR-2006 (DSB):
 #        Check for "config.h" as well as <config.h>
+#     6-JAN-2010 (DSB):
+#        Add work-around for GCC 4.4.2 problem - the pre-processor seesm to simply 
+#        throw away backslshes that escape newlines in the input header file. Reported
+#        by Bryan Irby at GSFC.
+
 #-
 
 ( $#ARGV >= 0 ) || Usage();
@@ -232,6 +237,9 @@ sub protect_copy_file {
    open( INCLUDE, "$srcdir/$file" )
        || die "Can't open input file " . $srcdir/$file;
 
+#  Inicate we have no deferred text to write out.
+   $total = "";
+
 #  Open an output file with the same name in the temporary directory.
    $tmp_file = $file;
    $tmp_file =~ s|^.*/||;
@@ -270,8 +278,25 @@ line: while ( <INCLUDE> ) {
       s/__LINE__/___LINE__/g;
       s/__FILE__/___FILE__/g;
 
-#  Write the modified include file.
-      print( TEMP );
+#  Some pre-processors (e.g. GCC 4.4.2) seem to simply throw away trailing 
+#  backslashes used to concatenate consecutive lines, producing two 
+#  independent lines in the output rather than one. This completely fouls 
+#  up the resulting header file. To avoid this, we concatenate such lines 
+#  explicitly, before writing them out to the temporary output file.
+#  If the current line ends with an escaped newline, remove the escape
+#  character and newline, and concatenate it with any previously deferred 
+#  lines. 
+      if( /^(.*)\\\s*$/ ) {
+         $total .= $1;
+
+#  If the current line does not end with an escaped newline, concatenate it 
+#  with any previously deferred lines, and write the total string out. Then 
+#  reset the total string to indicate we have no deferred text.
+      } else {
+         $total .= $_;
+         print TEMP $total;
+         $total = "";
+      }
    }
 
 #  Close each file when done.
