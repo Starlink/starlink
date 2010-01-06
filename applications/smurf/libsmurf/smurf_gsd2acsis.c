@@ -21,11 +21,11 @@
 
 *  Description:
 *     Opens a GSD file for reading, and checks the version (currently
-*     gsd2acsis only supports GSD version 5.3).  gsd2acsis then
-*     writes out ACSIS formatted files converted from the GSD input file.
+*     only supports GSD version 5.3). The data are converted to ACSIS
+*     format and written to disk.
 
 *  ADAM Parameters:
-*     DIRECTORY = CHAR (Read)
+*     DIRECTORY = _CHAR (Read)
 *          Directory for output ACSIS files. A NULL value will use the
 *          current working directory. This command will create a subdir
 *          in this directory named after the observation number.
@@ -36,11 +36,12 @@
 *          NONE (no messages), QUIET (minimal messages), NORMAL,
 *          VERBOSE, DEBUG or ALL. [NORMAL]
 *     OBSNUM = INT (Read)
-*          Observation number for files prior to Feb 03. For newer observations
-*          this parameter is not required. Default value will be the observation
-*          number read from the file but prior to Feb 03 this number was the number
-*          within the project rather than the number from the night and may lead
-*          to name clashes since ACSIS data are numbered for a UT date.
+*          Observation number for files prior to Feb 03. For newer
+*          observations this parameter is not required. Default value
+*          will be the observation number read from the file but prior
+*          to Feb 03 this number was the number within the project
+*          rather than the number from the night and may lead to name
+*          clashes since ACSIS data are numbered for a UT date.
 
 *  Related Applications:
 *     SMURF: MAKECUBE, GSDSHOW;
@@ -50,10 +51,11 @@
 *     JCMTDR
 
 *  Notes:
-*     - Whilst this command does a reasonable job of converting common data to ACSIS
-*     format it still has to undergo extensive testing to ensure that it is always
-*     doing the correct thing. Testing of this command and comparing its results with
-*     SPECX maps will be welcomed.
+*     Whilst this command does a reasonable job of converting common
+*     data to ACSIS format it still has to undergo extensive testing
+*     to ensure that it is always doing the correct thing. Testing of
+*     this command and comparing its results with SPECX maps will be
+*     welcomed.
 
 *  Authors:
 *     Jen Balfour (JAC, UBC)
@@ -79,7 +81,7 @@
 *     04-APR-2008 (JB):
 *        Alphabetize local variables.
 *     21-APR-2008 (JB):
-*        Add ADAM parameter documentation. 
+*        Add ADAM parameter documentation.
 *     22-APR-2008 (JB):
 *        Use gsdac_flagBad.
 
@@ -101,7 +103,7 @@
 *     You should have received a copy of the GNU General Public
 *     License along with this program; if not, write to the Free
 *     Software Foundation, Inc., 59 Temple Place,Suite 330, Boston,
-*     MA 02111-1307, USA
+*     MA 02111-1307, USA.
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -156,8 +158,8 @@ void smurf_gsd2acsis( int *status ) {
   /* Get the user defined input and output file names */
   parGet0c ( "IN", filename, MAXNAME, status );
 
-  if ( *status != SAI__OK ) return;  
-   
+  if ( *status != SAI__OK ) return;
+
   parGet0c ( "DIRECTORY", directory, MAXNAME, status );
 
   if ( *status == PAR__NULL ) {
@@ -165,35 +167,35 @@ void smurf_gsd2acsis( int *status ) {
     strcpy ( directory, "." );
   }
 
-  msgOutif(MSG__VERB," ", 
-	     "Opening GSD file for reading", status); 
+  msgOutif(MSG__VERB," ",
+	     "Opening GSD file for reading", status);
 
   /* Open the GSD file. */
-  CALLGSD( gsdOpenRead ( filename, &version, label, &nitem, 
-                            &fptr, &(gsd.fileDsc), &(gsd.itemDsc), 
+  CALLGSD( gsdOpenRead ( filename, &version, label, &nitem,
+                            &fptr, &(gsd.fileDsc), &(gsd.itemDsc),
 			   &(gsd.dataPtr) ),
-           status, 
+           status,
            errRep ( FUNC_NAME, "gsdOpenRead : Could not find input GSD file.", status ); );
 
   if ( *status != SAI__OK ) return;
 
-  msgOutif(MSG__VERB," ", 
-	     "Checking backend name", status); 
+  msgOutif(MSG__VERB," ",
+	     "Checking backend name", status);
 
   /* Check to see if this is DAS or AOSC data. */
-  gsdac_get0c ( &gsd, "C1BKE", gsdVars.backend, status ); 
+  gsdac_get0c ( &gsd, "C1BKE", gsdVars.backend, status );
 
   if ( *status != SAI__OK ) return;
 
-  if ( strncmp ( gsdVars.backend, "DAS", 3 ) != 0 
-       && strncmp ( gsdVars.backend, "AOSC", 4 ) != 0 ) { 
+  if ( strncmp ( gsdVars.backend, "DAS", 3 ) != 0
+       && strncmp ( gsdVars.backend, "AOSC", 4 ) != 0 ) {
     *status = SAI__ERROR;
     errRep ( FUNC_NAME, "File does not contain DAS or AOSC data", status );
-    return;  
-  }  
+    return;
+  }
 
-  msgOutif(MSG__VERB," ", 
-	     "Checking version of GSD file", status); 
+  msgOutif(MSG__VERB," ",
+	     "Checking version of GSD file", status);
 
   /* Check the version of the opened file. */
   if ( fabs(version - 5.300 ) > 0.0001 ) {
@@ -207,23 +209,23 @@ void smurf_gsd2acsis( int *status ) {
 
   if ( *status != SAI__OK ) return;
 
-  if ( dasFlag == DAS_NONE ) 
-    msgOutif(MSG__VERB," ", 
+  if ( dasFlag == DAS_NONE )
+    msgOutif(MSG__VERB," ",
 	     "DAS file type is DAS_NONE", status);
-  else if ( dasFlag == DAS_TP ) 
-    msgOutif(MSG__VERB," ", 
-	     "DAS file type is DAS_TP", status); 
-  else if ( dasFlag == DAS_CONT_CAL ) 
-    msgOutif(MSG__VERB," ", 
-	     "DAS file type is DAS_CONT_CAL", status); 
-  else if ( dasFlag == DAS_CROSS_CORR ) 
-    msgOutif(MSG__VERB," ", 
-	     "DAS file type is DAS_CROSS_CORR", status); 
+  else if ( dasFlag == DAS_TP )
+    msgOutif(MSG__VERB," ",
+	     "DAS file type is DAS_TP", status);
+  else if ( dasFlag == DAS_CONT_CAL )
+    msgOutif(MSG__VERB," ",
+	     "DAS file type is DAS_CONT_CAL", status);
+  else if ( dasFlag == DAS_CROSS_CORR )
+    msgOutif(MSG__VERB," ",
+	     "DAS file type is DAS_CROSS_CORR", status);
   else {
     *status = SAI__ERROR;
     errRep ( FUNC_NAME, "Could not identify DAS file type.", status );
-    return;    
-  }    
+    return;
+  }
 
   /* Get the GSD file headers and data arrays. */
   gsdac_getGSDVars ( &gsd, dasFlag, &gsdVars, status );
@@ -237,12 +239,12 @@ void smurf_gsd2acsis( int *status ) {
   }
 
   /* Close the GSD file. */
-  msgOutif(MSG__VERB," ", 
-	     "Closing GSD file", status); 
+  msgOutif(MSG__VERB," ",
+	     "Closing GSD file", status);
 
   /* Close the GSD file. */
   CALLGSD( gsdClose ( fptr, gsd.fileDsc, gsd.itemDsc, gsd.dataPtr ),
-           status, 
+           status,
            errRep ( FUNC_NAME, "gsdClose : Error closing GSD file.", status ); );
 
   if ( *status != SAI__OK ) return;
@@ -256,8 +258,8 @@ void smurf_gsd2acsis( int *status ) {
   gsdac_freeArrays ( dasFlag, &gsdVars, status );
 
   if ( *status == SAI__OK ) {
-    msgOutif(MSG__VERB," ", 
-	     "Conversion completed successfully", status); 
+    msgOutif(MSG__VERB," ",
+	     "Conversion completed successfully", status);
   }
 
 }

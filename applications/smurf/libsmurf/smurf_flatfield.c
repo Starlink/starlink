@@ -28,9 +28,9 @@
 
 *  Notes:
 *     - Darks will be subtracted prior to flatfielding.
-*     - At the moment an output file is propagated regardless of whether
-*     the input data are already flatfield or not. This is a waste of
-*     disk space :)
+*     - At the moment an output file is propagated regardless of
+*     whether the input data are already flatfielded or not. This is
+*     clearly a waste of disk space.
 
 *  ADAM Parameters:
 *     BPM = NDF (Read)
@@ -52,7 +52,7 @@
 *     OUTFILES = LITERAL (Write)
 *          The name of text file to create, in which to put the names of
 *          all the output NDFs created by this application (one per
-*          line). If a null (!) value is supplied no file is created. [!]
+*          line). If a NULL (!) value is supplied no file is created. [!]
 
 *  Related Applications:
 *     SMURF: CALCFLAT, RAWUNPRESS

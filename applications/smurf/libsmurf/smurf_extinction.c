@@ -31,26 +31,26 @@
 *          mask the closest following will be used. It is not an error for
 *          no mask to match. A NULL parameter indicates no mask files to be
 *          supplied. [!]
-*     CSOTAU = REAL (Read)
+*     CSOTAU = _REAL (Read)
 *          Value of the 225 GHz zenith optical depth. Only used if
-*          TAUSRC equals "CSOTAU". If a null (!) value is given, the task
-*          will use the value from the FITS header for each
+*          TAUSRC equals `CSOTAU'. If a NULL (!) value is given, the task
+*          will use the appropriate value from the FITS header of each
 *          file. Note that if a value is entered by the user, that
 *          value is used for all input files.
-*     FILTERTAU = REAL (Read)
+*     FILTERTAU = _REAL (Read)
 *          Value of the zenith optical depth for the current
-*          wavelength. Only used if TAUSRC equals "FILTERTAU". Note that no
+*          wavelength. Only used if TAUSRC equals `FILTERTAU'. Note that no
 *          check is made to ensure that all the input files share the same
 *          filter.
-*     HASSKYREM = LOGICAL (Read)
+*     HASSKYREM = _LOGICAL (Read)
 *          Indicate that the data have been sky removed even if the
-*          fact can not be verified. This is useful for the case where you
-*          have removed the sky background using an application
-*          other than SMURF REMSKY. Default is false.
+*          fact can not be verified. This is useful for the case where
+*          the sky background has been removed using an application
+*          other than SMURF REMSKY. [FALSE]
 *     IN = NDF (Read)
 *          Input file(s). The input data must have had the sky signal
 *          removed
-*     METHOD = CHAR (Read)
+*     METHOD = _CHAR (Read)
 *          Method to use for airmass calculation. Options are:
 *          - ADAPTIVE  - Determine whether to use QUICK or FULL
 *          based on the elevation of the source and the opacity.
@@ -68,10 +68,10 @@
 *          The name of text file to create, in which to put the names of
 *          all the output NDFs created by this application (one per
 *          line). If a null (!) value is supplied no file is created. [!]
-*     TAUSRC = CHAR (Read)
+*     TAUSRC = _CHAR (Read)
 *          Source of optical depth data. Options are:
-*          - WVMRAW    - use the water vapour monitor time series data
-*          - CSOTAU    - use a single 225GHz tau value
+*          - WVMRAW    - use the Water Vapour Monitor time series data
+*          - CSOTAU    - use a single 225 GHz tau value
 *          - FILTERTAU - use a single tau value for this wavelength
 
 *  Notes:
@@ -166,7 +166,7 @@
 *     You should have received a copy of the GNU General Public
 *     License along with this program; if not, write to the Free
 *     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-*     MA 02111-1307, USA
+*     MA 02111-1307, USA.
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -250,7 +250,7 @@ void smurf_extinction( int * status ) {
   smf_request_mask( "BPM", &bpms, status );
 
   /* Get tau source */
-  parChoic( "TAUSRC", "CSOTAU", 
+  parChoic( "TAUSRC", "CSOTAU",
             "CSOtau, Filtertau, WVMraw", 1,
             tausource, sizeof(tausource), status);
 

@@ -4,7 +4,7 @@
 *     GSDSHOW
 
 *  Purpose:
-*     Display the contents of a GSD file's headers and arrays.
+*     Display the contents of headers and arrays for GSD files.
 
 *  Language:
 *     Starlink ANSI C
@@ -21,20 +21,20 @@
 
 *  Description:
 *     Opens a GSD file for reading, and checks the version (currently
-*     gsd2acsis only supports GSD version 5.3).  gsdshow then
-*     displays the contents of the file's headers and arrays.
+*     only supports GSD version 5.3). Then displays the contents of
+*     the headers and data arrays.
 
 *  ADAM Parameters:
-*     DESCRIPTIONS = LOGICAL (Read)
-*          Flag for showing header descriptions.
+*     DESCRIPTIONS = _LOGICAL (Read)
+*          Flag for showing header descriptions. [FALSE]
 *     IN = CHAR (Read)
 *          Name of the input GSD file to be listed.
 *     MSG_FILTER = _CHAR (Read)
 *          Control the verbosity of the application. Values can be
 *          NONE (no messages), QUIET (minimal messages), NORMAL,
 *          VERBOSE, DEBUG or ALL. [NORMAL]
-*     SHOWDATA = LOCICAL (Read)
-*          Flag for showing data array.
+*     SHOWDATA = _LOGICAL (Read)
+*          Flag for showing data array. [FALSE]
 
 *  Related Applications:
 *     SMURF: GSD2ACSIS;
@@ -70,7 +70,7 @@
 *     You should have received a copy of the GNU General Public
 *     License along with this program; if not, write to the Free
 *     Software Foundation, Inc., 59 Temple Place,Suite 330, Boston,
-*     MA 02111-1307, USA
+*     MA 02111-1307, USA.
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -144,37 +144,37 @@ void smurf_gsdshow ( int *status ) {
     showData = 0;
   }
 
-  if ( *status != SAI__OK ) return;  
-   
-  msgOutif(MSG__VERB," ", 
-	     "Opening GSD file for reading", status); 
+  if ( *status != SAI__OK ) return;
+
+  msgOutif(MSG__VERB," ",
+	     "Opening GSD file for reading", status);
 
   /* Open the GSD file. */
-  CALLGSD( gsdOpenRead ( filename, &version, label, &nitem, 
-                         &fptr, &(gsd.fileDsc), &(gsd.itemDsc), 
+  CALLGSD( gsdOpenRead ( filename, &version, label, &nitem,
+                         &fptr, &(gsd.fileDsc), &(gsd.itemDsc),
 			 &(gsd.dataPtr) ),
-           status, 
+           status,
            errRep ( FUNC_NAME, "gsdOpenRead : Could not find input GSD file.", status ); );
 
   if ( *status != SAI__OK ) return;
 
-  msgOutif(MSG__VERB," ", 
-	     "Checking backend name", status); 
+  msgOutif(MSG__VERB," ",
+	     "Checking backend name", status);
 
   /* Check to see if this is DAS or AOSC data. */
-  gsdac_get0c ( &gsd, "C1BKE", gsdVars.backend, status ); 
+  gsdac_get0c ( &gsd, "C1BKE", gsdVars.backend, status );
 
   if ( *status != SAI__OK ) return;
 
-  if ( strncmp ( gsdVars.backend, "DAS", 3 ) != 0 
-       && strncmp ( gsdVars.backend, "AOSC", 4 ) != 0 ) { 
+  if ( strncmp ( gsdVars.backend, "DAS", 3 ) != 0
+       && strncmp ( gsdVars.backend, "AOSC", 4 ) != 0 ) {
     *status = SAI__ERROR;
     errRep ( FUNC_NAME, "File does not contain DAS or AOSC data", status );
-    return;  
-  }  
+    return;
+  }
 
-  msgOutif(MSG__VERB," ", 
-	     "Checking version of GSD file", status); 
+  msgOutif(MSG__VERB," ",
+	     "Checking version of GSD file", status);
 
   /* Check the version of the opened file. */
   if ( fabs(version - 5.300 ) > 0.0001 ) {
@@ -188,23 +188,23 @@ void smurf_gsdshow ( int *status ) {
 
   if ( *status != SAI__OK ) return;
 
-  if ( dasFlag == DAS_NONE ) 
-    msgOutif(MSG__VERB," ", 
+  if ( dasFlag == DAS_NONE )
+    msgOutif(MSG__VERB," ",
 	     "DAS file type is DAS_NONE", status);
-  else if ( dasFlag == DAS_TP ) 
-    msgOutif(MSG__VERB," ", 
-	     "DAS file type is DAS_TP", status); 
-  else if ( dasFlag == DAS_CONT_CAL ) 
-    msgOutif(MSG__VERB," ", 
-	     "DAS file type is DAS_CONT_CAL", status); 
-  else if ( dasFlag == DAS_CROSS_CORR ) 
-    msgOutif(MSG__VERB," ", 
-	     "DAS file type is DAS_CROSS_CORR", status); 
+  else if ( dasFlag == DAS_TP )
+    msgOutif(MSG__VERB," ",
+	     "DAS file type is DAS_TP", status);
+  else if ( dasFlag == DAS_CONT_CAL )
+    msgOutif(MSG__VERB," ",
+	     "DAS file type is DAS_CONT_CAL", status);
+  else if ( dasFlag == DAS_CROSS_CORR )
+    msgOutif(MSG__VERB," ",
+	     "DAS file type is DAS_CROSS_CORR", status);
   else {
     *status = SAI__ERROR;
     errRep ( FUNC_NAME, "Could not identify DAS file type.", status );
-    return;    
-  }    
+    return;
+  }
 
   /* Get the GSD file headers and data arrays. */
   gsdac_getGSDVars ( &gsd, dasFlag, &gsdVars, status );
@@ -215,12 +215,12 @@ void smurf_gsdshow ( int *status ) {
   }
 
   /* Close the GSD file. */
-  msgOutif(MSG__VERB," ", 
-	     "Closing GSD file", status); 
+  msgOutif(MSG__VERB," ",
+	     "Closing GSD file", status);
 
   /* Close the GSD file. */
   CALLGSD( gsdClose ( fptr, gsd.fileDsc, gsd.itemDsc, gsd.dataPtr ),
-           status, 
+           status,
            errRep ( FUNC_NAME, "gsdClose : Error closing GSD file.", status ); );
 
   if ( *status != SAI__OK ) return;
@@ -271,7 +271,7 @@ void smurf_gsdshow ( int *status ) {
 
   if ( (int)gsdVars.centreMoving )
     logConv[0] = 'T';
-  else 
+  else
     logConv[0] = 'F';
 
   gsdac_printHdr ( "C4MCF", "CENTRE_MOVING", 5,
@@ -426,7 +426,7 @@ void smurf_gsdshow ( int *status ) {
 
   if ( (int)gsdVars.obsCalibration )
     logConv[0] = 'T';
-  else 
+  else
     logConv[0] = 'F';
 
   gsdac_printHdr ( "C3CAL", "OBS_CALIBRATION", 5,
@@ -435,7 +435,7 @@ void smurf_gsdshow ( int *status ) {
 
   if ( (int)gsdVars.obsCentre )
     logConv[0] = 'T';
-  else 
+  else
     logConv[0] = 'F';
 
   gsdac_printHdr ( "C3CEN", "OBS_CENTRE", 5,
@@ -444,7 +444,7 @@ void smurf_gsdshow ( int *status ) {
 
   if ( (int)gsdVars.obsContinuous )
     logConv[0] = 'T';
-  else 
+  else
     logConv[0] = 'F';
 
   gsdac_printHdr ( "C3FLY", "OBS_CONTINUOUS", 5,
@@ -462,7 +462,7 @@ void smurf_gsdshow ( int *status ) {
 
   if ( (int)gsdVars.obsMap )
     logConv[0] = 'T';
-  else 
+  else
     logConv[0] = 'F';
 
   gsdac_printHdr ( "C3MAP", "OBS_MAP", 5,
@@ -495,7 +495,7 @@ void smurf_gsdshow ( int *status ) {
 
   if ( (int)gsdVars.scanRev )
     logConv[0] = 'T';
-  else 
+  else
     logConv[0] = 'F';
 
   gsdac_printHdr ( "C6REV", "SCAN_REVERSAL", 5,
@@ -508,7 +508,7 @@ void smurf_gsdshow ( int *status ) {
 
   if ( (int)gsdVars.mapPosX )
     logConv[0] = 'T';
-  else 
+  else
     logConv[0] = 'F';
 
   gsdac_printHdr ( "C6XPOS", "X_MAP_POSITIVE", 5,
@@ -517,7 +517,7 @@ void smurf_gsdshow ( int *status ) {
 
   if ( (int)gsdVars.mapPosY )
     logConv[0] = 'T';
-  else 
+  else
     logConv[0] = 'F';
 
   gsdac_printHdr ( "C6YPOS", "Y_MAP_POSITIVE", 5,
@@ -630,7 +630,7 @@ void smurf_gsdshow ( int *status ) {
 
   if ( (int)gsdVars.chopping )
     logConv[0] = 'T';
-  else 
+  else
     logConv[0] = 'F';
 
   gsdac_printHdr ( "C4SM", "CHOPPING", 5,
@@ -1039,13 +1039,13 @@ void smurf_gsdshow ( int *status ) {
 
   gsdac_printHdr ( "C12SCAN_TABLE_1", "SCAN_TABLE1", 3,
                    "Begin scan table",
-                   gsdVars.scanTable1, 1, 
+                   gsdVars.scanTable1, 1,
                    gsdVars.nScanVars1 * gsdVars.noScans,
                    showDesc, status );
 
   gsdac_printHdr ( "C12SCAN_TABLE_2", "SCAN_TABLE2", 3,
                    "End scan table",
-                   gsdVars.scanTable2, 1, 
+                   gsdVars.scanTable2, 1,
                    gsdVars.nScanVars2 * gsdVars.noScans,
                    showDesc, status );
 
@@ -1057,7 +1057,7 @@ void smurf_gsdshow ( int *status ) {
 
   gsdac_printHdr ( "C11VD", "PHASE_VARS", 5,
                    "Names of the cols. of phase table",
-                   gsdVars.phaseVars, 1, 
+                   gsdVars.phaseVars, 1,
                    gsdVars.nPhaseVars,
                    showDesc, status );
 
@@ -1259,7 +1259,7 @@ void smurf_gsdshow ( int *status ) {
                    gsdVars.nBESections,
                    showDesc, status );
 
-  if ( dasFlag == DAS_CONT_CAL ) {  
+  if ( dasFlag == DAS_CONT_CAL ) {
 
     gsdac_printHdr ( "C12TSKYIM", "BES_T_SKY_IM", 3,
                      "Frontend-derived Tsky, image sideband",
@@ -1333,13 +1333,13 @@ void smurf_gsdshow ( int *status ) {
 
     gsdac_printHdr ( "C55HOTPOWER", "DAS_HOT_POWER", 3,
                      "Total power measurement on hot load",
-                     gsdVars.hotPower, 1, 
+                     gsdVars.hotPower, 1,
                      gsdVars.nBESections * gsdVars.IFPerSection,
                      showDesc, status );
 
     gsdac_printHdr ( "C55SKYPOWER", "DAS_SKY_POWER", 3,
                      "Total power measurement on hot load",
-                     gsdVars.skyPower, 1, 
+                     gsdVars.skyPower, 1,
                      gsdVars.nBESections * gsdVars.IFPerSection,
                      showDesc, status );
 

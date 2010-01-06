@@ -4,7 +4,7 @@
 *     CALCRESP
 
 *  Purpose:
-*     Calculate bolometer responsivity from stored flatfield solution
+*     Calculate bolometer responsivity from stored flatfield solution.
 
 *  Language:
 *     Starlink ANSI C
@@ -20,21 +20,20 @@
 *        Pointer to global status.
 
 *  Description:
-*     This routine can calculate a bolometer responsivity image from a stored
-*     flatfield solution. To calculate a new flatfield solution, use the CALCFLAT
-*     command on a FLATFIELD observation.
+*     This routine calculates a bolometer responsivity image from a
+*     stored flatfield solution. To calculate a new flatfield
+*     solution, use the CALCFLAT command on a FLATFIELD observation.
 
 *  Notes:
-*     - Works on all raw data files. The responsivity image will be identical
-*     for all files in a single observation since it is only updated following
-*     a FLATFIELD observation.
-*     - Provenance is *not* propagated to the output files since the output files
-*     do not depend on the bolometer data.
-*     - The responsivity data are filtered using a signal-to-noise ratio of 5.0.
-*     The number of bolometers passing this criterion is reported in the NGOOD
-*     parameter. The variance is stored in the output files so additional filtering
-*     is possible.
-
+*     - Works on all raw data files. The responsivity image will be
+*       identical for all files in a single observation since it is
+*       only updated following a FLATFIELD observation.
+*     - Provenance is not propagated to the output files, since the
+*       output files do not depend on the bolometer data.
+*     - The responsivity data are filtered using a signal-to-noise
+*       ratio of 5.0. The number of bolometers passing this criterion
+*       is reported in the NGOOD parameter. The variance is stored in
+*       the output files so additional filtering is possible.
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
@@ -86,7 +85,7 @@
 *     You should have received a copy of the GNU General Public
 *     License along with this program; if not, write to the Free
 *     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-*     MA 02111-1307, USA
+*     MA 02111-1307, USA.
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -150,7 +149,7 @@ void smurf_calcresp( int *status ) {
       errRep("", "Unable to read flatfield information from input file ^I", status);
     }
 
-    /* Abort if we had trouble. Alternative is to loop round to the next file but 
+    /* Abort if we had trouble. Alternative is to loop round to the next file but
        it is safer to tell people there is a problem */
     if (*status != SAI__OK) {
       if (idata) smf_close_file( &idata, status );

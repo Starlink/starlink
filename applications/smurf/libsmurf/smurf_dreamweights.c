@@ -4,7 +4,7 @@
 *     DREAMWEIGHTS
 
 *  Purpose:
-*     Generate DREAM weights matrix
+*     Generate DREAM weights matrix.
 
 *  Language:
 *     Starlink ANSI C
@@ -28,7 +28,7 @@
 *       limitation in smf_open_file)
 *     - Should allow for a list of bad (dead) bolometers.
 *     - This application interface is not finalised. Please do not rely on this
-*     command in scripts.
+*       command in scripts.
 
 *  ADAM Parameters:
 *     CONFIG = Literal (Read)
@@ -133,7 +133,7 @@
 *     You should have received a copy of the GNU General Public
 *     License along with this program; if not, write to the Free
 *     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-*     MA 02111-1307, USA
+*     MA 02111-1307, USA.
 
 *  Bugs:
 *     {note_any_bugs_here}

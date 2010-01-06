@@ -20,20 +20,21 @@
 *        Pointer to global status.
 
 *  Description:
-*     Given a set of dark observations, calculate the dark frame from each.
-*     A bad pixel mask can be supplied to remove known bad pixels. Does not flatfield.
+*     Given a set of dark observations, calculate a mean dark frame
+*     from each. A bad bolometer mask can be supplied to remove known
+*     bad bolometers. Does not flatfield.
 
 *  Notes:
-*     Dark files will be subtracted from raw data during the flatfielding step.
-*     Commands that flatfield data can use either raw dark files or the output from
-*     CALCDARK.
+*     Dark files will be subtracted from raw data during the
+*     flatfielding step. Commands that flatfield data can use either
+*     raw dark files or the output from CALCDARK.
 
 *  ADAM Parameters:
 *     BPM = NDF (Read)
-*          Group of files to be used as bad pixel masks. Each data file
+*          Group of files to be used as bad bolometer masks. Each data file
 *          specified with the IN parameter will be masked. The corresponding
 *          previous mask for a subarray will be used. If there is no previous
-*          mask the closest following will be used. It is not an error for
+*          mask the closest following one will be used. It is not an error for
 *          no mask to match. A NULL parameter indicates no mask files to be
 *          supplied. [!]
 *     IN = NDF (Read)
@@ -43,9 +44,9 @@
 *          NONE (no messages), QUIET (minimal messages), NORMAL,
 *          VERBOSE, DEBUG or ALL. [NORMAL]
 *     OUT = NDF (Write)
-*          Output dark files. These can be used as bad pixel masks in
-*          subsequent processing steps via the BPM parameter in other
-*          SCUBA-2 SMURF commands.
+*          Output dark files. These can be used as bad bolometer masks
+*          in subsequent processing steps via the BPM parameter in
+*          other SCUBA-2 SMURF commands.
 
 *  Related Applications:
 *     SMURF: FLATFIELD, MAKEMAP
@@ -83,7 +84,7 @@
 *     You should have received a copy of the GNU General Public
 *     License along with this program; if not, write to the Free
 *     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-*     MA 02111-1307, USA
+*     MA 02111-1307, USA.
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -116,7 +117,7 @@
 
 void smurf_calcdark( int *status ) {
 
-  smfArray *bpms = NULL;    /* Bad pixel masks */
+  smfArray *bpms = NULL;    /* Bad bolometer masks */
   smfArray *darks = NULL;   /* set of processed darks */
   Grp *dgrp = NULL;         /* Group of darks */
   size_t i;                 /* Loop index */
@@ -143,7 +144,7 @@ void smurf_calcdark( int *status ) {
   kpg1Wgndf( "OUT", dgrp, size, size, "More output files required...",
              &ogrp, &outsize, status );
 
-  /* Get group of pixel masks and read them into a smfArray */
+  /* Get group of bolometer masks and read them into a smfArray */
   smf_request_mask( "BPM", &bpms, status );
 
   for (i=1; i<=size && *status == SAI__OK; i++ ) {

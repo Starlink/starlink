@@ -4,7 +4,7 @@
 *     DREAMSOLVE
 
 *  Purpose:
-*     Solve DREAM observations and generate 2-D image.
+*     Solve DREAM observations and generate 2-D images.
 
 *  Language:
 *     Starlink ANSI C
@@ -20,8 +20,9 @@
 *        Pointer to global status.
 
 *  Description:
-*     This command reconstructs a series of 2-D images from
-*     DREAM observations.
+*     This command reconstructs a series of 2-D images from DREAM
+*     observations. The images are written as NDFs under the
+*     .MORE.SCU2RED extension.
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
@@ -80,7 +81,7 @@
 *     You should have received a copy of the GNU General Public
 *     License along with this program; if not, write to the Free
 *     Software Foundation, Inc., 59 Temple Place,Suite 330, Boston,
-*     MA 02111-1307, USA
+*     MA 02111-1307, USA.
 
 *  Bugs:
 *     {note_any_bugs_here}

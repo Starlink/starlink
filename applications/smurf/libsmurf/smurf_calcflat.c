@@ -4,7 +4,7 @@
 *     CALCFLAT
 
 *  Purpose:
-*     Calculate a flatfield solution
+*     Calculate a flatfield solution from a flatfield observation.
 
 *  Language:
 *     Starlink ANSI C
@@ -20,18 +20,21 @@
 *        Pointer to global status.
 
 *  Description:
-*     This routine can calculate a flatfield solution from a flatfield observation.
+*     This routine calculates a flatfield solution from a flatfield
+*     observation.
 *
-*     The flatfield observation consists of a series of measurements taken at
-*     various pixel heater settings. One standard SCUBA-2 raw data file is stored for
-*     each measurement.
+*     The flatfield observation consists of a series of measurements
+*     taken at various pixel heater settings. One standard SCUBA-2 raw
+*     data file is stored for each measurement.
 *
-*     Some optimum pixel heater setting is chosen. The procedure is to record
-*     measurements at heater settings around this optimum value, continually returning
-*     to the optimum which is used as a reference to subtract pixel zero-point drifts.
+*     An optimum pixel heater setting is chosen at the time of
+*     observation. The procedure is to record measurements at heater
+*     settings around this optimum value, continually returning to the
+*     optimum, which is used as a reference to subtract pixel
+*     zero-point drifts.
 
 *  Notes:
-*     - Works with Dark and Sky flatfields but not with black-body flatfields.
+*     Works with Dark and Sky flatfields but not with black-body flatfields.
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
@@ -46,24 +49,27 @@
 *     OUT = NDF (Write)
 *          Output flatfield file. The primary data array contains the
 *          dark subtracted measurements for each heater setting. The
-*          flatfield itself is stored in the .MORE.SCUBA2.FLATCAL 
-*          extension. A default output filename based on the date of observation
-*          number, subarray name and observation number will be suggested.
+*          flatfield itself is stored in the .MORE.SCUBA2.FLATCAL
+*          extension. A default output filename based on the date of
+*          observation number, subarray name and observation number
+*          will be suggested.
 *     REFRES = _DOUBLE (Read)
 *          Reference pixel heat resistance. Defines the mean power scale to
-*          be used. Defaults to 2.0.
+*          be used. [2.0]
 *     RESIST = GROUP (Read)
-*          Resistor settings for each bolometer. This is a text file, an
-*          example can be found in $STARLINK_DIR/share/smurf/resist.cfg
+*          Name of a text file with Resistor settings for each
+*          bolometer. An example can be found in
+*          $STARLINK_DIR/share/smurf/resist.cfg
 *     RESP = NDF (Write)
 *          Responsivity image with variance. No image is written
-*          if Null [!]
+*          if NULL. [!]
 *     RESPMASK = _LOGICAL (Read)
 *          If true, responsivity data will be used to mask bolometer data
-*          when calculating the flatfield [TRUE]
+*          when calculating the flatfield. [TRUE]
 *     SNRMIN = _DOUBLE (Read)
-*          Signal-to-noise ratio threshold to use when filtering the responsivity
-*          data to determine valid bolometers for the flatfield.
+*          Signal-to-noise ratio threshold to use when filtering the
+*          responsivity data to determine valid bolometers for the
+*          flatfield. [3.0]
 
 *  Related Applications:
 *     SMURF: CALCRESP, FLATFIELD
@@ -112,7 +118,7 @@
 *     You should have received a copy of the GNU General Public
 *     License along with this program; if not, write to the Free
 *     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-*     MA 02111-1307, USA
+*     MA 02111-1307, USA.
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -249,7 +255,7 @@ void smurf_calcflat( int *status ) {
   /* Get the bolometer resistor settings */
   kpg1Gtgrp( "RESIST", &resgrp, &ksize, status );
   kpg1Kymap( resgrp, &resmap, status );
-  if( resgrp ) grpDelet( &resgrp, status );  
+  if( resgrp ) grpDelet( &resgrp, status );
 
   if (*status != SAI__OK) goto CLEANUP;
 
