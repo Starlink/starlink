@@ -13,7 +13,7 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardoccopyright} 
+\newcommand{\stardoccopyright}
 {Copyright \copyright\ 2009 University of British Columbia, Science \& Technology Facilities Council}
 
 % Variable part - replace [xxx] as appropriate.
@@ -90,7 +90,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -175,7 +175,7 @@
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
 
-\newcommand{\starlink}{\htmladdnormallink{Starlink}{http://starlink.jach.hawaii.edu}} 
+\newcommand{\starlink}{\htmladdnormallink{Starlink}{http://starlink.jach.hawaii.edu}}
 
 % Shorthand and HTML references for other Starlink tasks
 \newcommand{\CCDPACK}{\textsc{ccdpack}}
@@ -195,7 +195,7 @@
 
 % Application tasks
 \newcommand{\task}[1]{\textsf{#1}}
- 
+
 % SMURF tasks
 \newcommand{\badbolos}{\xref{\task{badbolos}}{sun258}{BADBOLOS}}
 \newcommand{\calcdark}{\xref{\task{calcdark}}{sun258}{CALCDARK}}
@@ -218,7 +218,7 @@
 \newcommand{\smurfcopy}{\xref{\task{smurfcopy}}{sun258}{SMURFCOPY}}
 \newcommand{\starecalc}{\xref{\task{starecalc}}{sun258}{STARECALC}}
 \newcommand{\timesort}{\xref{\task{timesort}}{sun258}{TIMESORT}}
-\newcommand{\unmakecube}{\xref{\task{unmakecube}}{sun258}{UNMAKECUBE}}    
+\newcommand{\unmakecube}{\xref{\task{unmakecube}}{sun258}{UNMAKECUBE}}
 
 \newcommand{\extinction}{\xref{\task{extinction}}{sun258}{EXTINCTION}}
 \newcommand{\flatfield}{\xref{\task{flatfield}}{sun258}{FLATFIELD}}
@@ -639,12 +639,12 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://starlink.jach.hawaii.edu/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -929,9 +929,9 @@ precision for all calculations.
 \section{\xlabel{acsis}ACSIS Data Reduction\label{se:acsisdr}}
 
 SMURF contains a small number of commands specifically directed towards
-the reduction of ACSIS data. This section contains an introduction to 
-each of these commands. The reduction of ACSIS data is described 
-more fully in the {\em ACSIS Data Reduction Cookbook}: 
+the reduction of ACSIS data. This section contains an introduction to
+each of these commands. The reduction of ACSIS data is described
+more fully in the {\em ACSIS Data Reduction Cookbook}:
 \htmladdnormallink{\texttt{http://www.jach.hawaii.edu/JCMT/spectral\_line/data\_reduction/acsisdr/}}
 {http://www.jach.hawaii.edu/JCMT/spectral_line/data_reduction/acsisdr/}.
 
@@ -971,7 +971,7 @@ which are:
 \begin{itemize}
 
 \item The output data can be split up amongst multiple output cubes, thus
-reducing the size of each individual cube. 
+reducing the size of each individual cube.
 
 \item The world co-ordinate system used by the output cubes can be
 specified. This includes both the nature of the WCS axes themselves and
@@ -983,7 +983,7 @@ in the output cube be copied from a specified reference NDF.
 
 \item Output variance values can be calculated either on the basis
 of the spread of the input data values that contribute to each output pixel,
-or on the basis of the system noise temperature values supplied in the 
+or on the basis of the system noise temperature values supplied in the
 input NDFs.
 
 \item Input data from specified receptors can be excluded.
@@ -997,13 +997,13 @@ used input sample value.
 
 \subsection{The timesort command}
 
-The \makecube\ commands turns time-series cubes into spatial cubes. Each 
-plane in a time-series cube contains a set of spectra - one for each 
-used receptor - observed simultaneously at a time given by the position 
+The \makecube\ commands turns time-series cubes into spatial cubes. Each
+plane in a time-series cube contains a set of spectra - one for each
+used receptor - observed simultaneously at a time given by the position
 of the plane on the third axis. It should be noted that the times
 associated with this third axis are not guaranteed to increase
 monotonically, although that will often be the case. For various reasons,
-the writing out of some times slices to the time-series cube may be delayed, 
+the writing out of some times slices to the time-series cube may be delayed,
 resulting in backwards steps in time along the third axis. This in itself
 is not a problem for \makecube\, which makes no assumptions about the
 order in which time-slices are stored in the time-series cube. However,
@@ -1020,13 +1020,13 @@ cube using \KAPPA\ \display. In these cases, the time-series cube can be
 ``rectified'' using \timesort. This produces a copy of the cube in which
 the time slices are in monotonic order.
 
-In addition, \timesort\ can also be used to assemble and re-order the time 
-slices from multiple input cubes relating to the same observation, and then 
+In addition, \timesort\ can also be used to assemble and re-order the time
+slices from multiple input cubes relating to the same observation, and then
 write them out again into a set of time-series cubes, each of a specified
 size. In this situation, if a single time slice is split across two
 input cubes (which can happen - spectra from some detectors being recorded
 in one file and those from the other detectors in another file), they
-will be merged together into a single plane in one of the output cubes. 
+will be merged together into a single plane in one of the output cubes.
 
 
 \subsection{The unmakecube command}
@@ -1050,7 +1050,7 @@ A typical scheme for using unmakecube is:
 \begin{enumerate}
 \item use makecube to convert a set of ``genuine'' time-series cubes into
 a spatial cube.
-\item use unmakecube to generate a set of ``artificial'' time-series cubes 
+\item use unmakecube to generate a set of ``artificial'' time-series cubes
 from the makecube output spatial cube. The original ``genuine''
 time-series cubes are used as templates for the new time-series cubes, so
 that they will be aligned sample-for-sample.
@@ -1255,7 +1255,7 @@ be used effectively\cite{archibald,sc2ana002}.
 In a single sample the signal collected from an astronomical source is
 negligible in comparison with the contribution from the
 atmosphere. Many samples are required to collect a statistically
-significant signal from the source. 
+significant signal from the source.
 
 The \SMURF\ routine that removes the sky is called \remsky\ and has
 several options for fitting and removing the atmospheric contribution
@@ -1320,7 +1320,7 @@ follows:
 
 Using Equation \ref{eq:tau}, rewrite Equation \ref{eq:iobs} as:
 \begin{equation}
-I_{\rm obs} = I_{\rm atm} + I_{\rm src} \exp \left( 
+I_{\rm obs} = I_{\rm atm} + I_{\rm src} \exp \left(
 \frac{-\tau_{\rm zenith}}{\cos(90^\circ-\phi)}\right).
 \end{equation}
 %The top graph in Figure ??? shows how the observed signal varies with elevation
@@ -1328,7 +1328,7 @@ I_{\rm obs} = I_{\rm atm} + I_{\rm src} \exp \left(
 
 The elevation angle of each bolometer can be calculated, and given
 $\tau_{\rm zenith}$ \remsky\ calculates the $\tau_{\rm obs}$ at the
-elevation angle of each bolometer. 
+elevation angle of each bolometer.
 
 The zenith optical depth can be obtained via three methods:
 \begin{enumerate}
@@ -1394,7 +1394,7 @@ This step is not required for the simplified workflow.
 
 \SMURF\ provides separate routines for calculating images from STARE
 and DREAM data. STARE images are calculated with \starecalc; DREAM
-images are calculated with \dreamsolve. 
+images are calculated with \dreamsolve.
 
 In \starecalc\ the user may specify how many samples to average to
 create images (the default is to calculate averages once a second).
@@ -1489,7 +1489,7 @@ different ways:
 \end{enumerate}
 In both cases a one-pass rebinning algorithm is applied to the data,
 which regrids the signal from each bolometer onto a map in the desired
-co-ordinate system. 
+co-ordinate system.
 
 As outlined in \ref{se:dsworkflow}, the procedure for processing
 SCUBA-2 data follows these steps:
@@ -1585,7 +1585,7 @@ in Table~\ref{tab:dimm_components}.
 \hline
 $COM$ & Removes common-mode signal, i.e., the signal seen by all bolometers. This removes most of the atmospheric emission. In addition bad detectors are also flagged if there signal does not resemble the common mode measured by the other detectors. \\
 $GAI$ & If $COM$ specified, a gain and offset is used to fit $COM$ to each detector before removal. \\
-$DKS$ & Fits gain and offset to remove signal recorded by dark squids. \\  
+$DKS$ & Fits gain and offset to remove signal recorded by dark squids. \\
 $EXT$ & Applies the extinction correction. \\
 $AST$ & Triggers map estimation, and removal of astronomical signal from the time-series. \\
 $FLT$ & Applies a frequency domain filter. \\
@@ -1620,8 +1620,8 @@ offsets are present.
 The first successful observations with SCUBA-2 used test arrays that
 exhibited strong signals correlated along columns (believed to be
 caused by magnetic field pick-up). Dark squids, $DKS$, (readouts with
-no thermal absorbers) at the ends of 
-%the $j$th 
+no thermal absorbers) at the ends of
+%the $j$th
 each
 column seem to provide
 a good measurement of this signal. Similar to $COM$, the DIMM can fit
@@ -1857,8 +1857,8 @@ and options have to applied:
 \item Create a configuration file, e.g.\ config.lis, containing all the
   required parameters listed in the form `keyword=value'. The
   configuration parameters are summarized in Table \ref{tab:dimmconfig}
-  and the default values are shown in the third column. A default 
-  configuration file is located at 
+  and the default values are shown in the third column. A default
+  configuration file is located at
   \texttt{\$STARLINK/share/smurf/dimmconfig.lis}.
 \item Set the \aparam{METHOD} parameter to \aparam{ITERATE}.
 \item Set the correct pixel size for the observed wavelength using the
@@ -2005,11 +2005,11 @@ simulated. The basic procedure is outlined below:
 \item Run simulation.
 \end{itemize}
 It is not necessary to recalculate a model atmosphere or flatfield
-solution for every simulation, even for different input sky images. 
+solution for every simulation, even for different input sky images.
 
 Example files are installed as part of \SMURF\ and may be found in the
 \texttt{\$STARLINK\_DIR/share/smurf} directory. An explanation may be
-found in the \texttt{README} file in that directory. 
+found in the \texttt{README} file in that directory.
 
 \subsubsection{Astronomical image}
 
@@ -2041,7 +2041,7 @@ at the time of simulation according to the particular wavelength.
 Before a data simulation can take place, the flatfield solution for
 each subarray must be calculated. This is achieved by specifying a
 special observing mode called \texttt{heatrun} and running a
-simulation. 
+simulation.
 
 The flatfield solution is written to a file using a naming scheme
 which follows that for raw data. The convention is
@@ -2143,14 +2143,14 @@ Buckle~J.~V., et~al., 2009, MNRAS, in press
 
 %\bibitem{sc2cook}
 %Chapin~E.~L., 2009, \textit{The SMURF SCUBA-2 Data Analysis Cookbook},
-%\xref{Starlink Cookbook 19}{sc19}{} 
+%\xref{Starlink Cookbook 19}{sc19}{}
 
 %\bibitem{kappa}
 %Currie~M.~J., 1997, {\it KAPPA -- Kernel Application Package},
 %\xref{Starlink User Note 95}{sun95}{}
 
 %\bibitem{gaia}
-%Draper~P.~W., 1997, {\it GAIA -- Graphical Astronomy and Image 
+%Draper~P.~W., 1997, {\it GAIA -- Graphical Astronomy and Image
 %Analysis Tool},
 %\xref{Starlink User Note 214}{sun214}{}
 
@@ -2191,13 +2191,13 @@ Van Engelen~A., Scott~D., 2005, {\it A Correlation Study using SCUBA
 %\xref{Starlink User Note 211}{sun211}{}
 
 %\bibitem{ndf}
-%Warren-Smith~R.~F., Berry~D.~S., 2009, 
+%Warren-Smith~R.~F., Berry~D.~S., 2009,
 %{\it NDF -- Routines for Accessing the Extensible N-Dimensional Data
 %  Format},
 %\xref{Starlink User Note 33}{sun33}{}
 
 \end{thebibliography}
- 
+
 
 \section{Release Notes---V0.5.2}
 
@@ -2247,7 +2247,7 @@ Retrieve OCS XML configuration used to generate the raw data.}
 \menuitem{GSD2ACSIS}{
  Convert a GSD format DAS data file to an ACSIS format NDF. (beta test)}
 \menuitem{GSDSHOW}{
- Display the contens of a GSD file's headers and arrays.}
+ Display the contents of a GSD file's headers and arrays.}
 \menuitem{IMPAZTEC}{
   Import AzTEC NETCDF files and produce SCUBA-2 format data files. (untested)}
 \menuitem{jcmtstate2cat}{
@@ -2269,7 +2269,7 @@ Dump JCMTSTATE information to ASCII table.}
 \menuitem{SC2CONCAT}{
  Concatenate files from a single observation into a single file.}
 \menuitem{SC2FFT}{
- Perform an forward or inverse FFT on SCUBA-2 data.}
+ Perform a forward or inverse FFT on SCUBA-2 data.}
 \menuitem{SC2FTS}{
  FTS-2 data processing (disabled).}
 \menuitem{SC2SIM}{
@@ -2281,9 +2281,9 @@ SCUBA-2 simulator.}
 \menuitem{SMURFCOPY}{
 Copy a 2d image out of a time series file.}
 \menuitem{SMURFHELP}{
-Gives help about SMURF.}
+Give help about SMURF.}
 \menuitem{STARECALC}{
- Calculate a map from a Stare-mode observation.}
+ Calculate a map from a STARE-mode observation.}
 \menuitem{TIMESORT}{
  Re-order time slices in a raw data cube into increasing time.}
 \menuitem{UNMAKECUBE}{
@@ -2311,7 +2311,7 @@ Retrieve OCS XML configuration used to generate the raw data.
 \classitem{jcmtstate2cat}
 Dump JCMTSTATE information to ASCII table.
 \classitem{SMURFHELP}
-Gives help about SMURF.
+Give help about SMURF.
 \end{description}
 
 {\large
@@ -2324,7 +2324,7 @@ Gives help about SMURF.
 \classitem{CALCDARK}
  Calculate the 2d dark frame from a dark observation.
 \classitem{CALCFLAT}
- Calculate a flatfield solution
+ Calculate a flatfield solution.
 \classitem{CALCRESP}
  Calculate bolometer responsivity from stored flatfield solution.
 \classitem{DREAMSOLVE}
@@ -2348,7 +2348,7 @@ Gives help about SMURF.
 \classitem{SC2CONCAT}
  Concatenate files from a single observation into a single file.
 \classitem{SC2FFT}
- Perform an forward or inverse FFT on SCUBA-2 data.
+ Perform a forward or inverse FFT on SCUBA-2 data.
 \classitem{SC2FTS}
  FTS-2 data processing (disabled).
 \classitem{SCANFIT}
@@ -2356,7 +2356,7 @@ Gives help about SMURF.
 \classitem{SMURFCOPY}
 Copy a 2d image out of a time series file.
 \classitem{STARECALC}
- Calculate a map from a Stare-mode observation.
+ Calculate a map from a STARE-mode observation.
 \end{description}
 
 {\large
@@ -2386,9 +2386,9 @@ Copy a 2d image out of a time series file.
 \classitem{GSD2ACSIS}
  Convert a GSD format DAS data file to an ACSIS format NDF. (beta test)
 \classitem{GSDSHOW}
- Display the contens of a GSD file's headers and arrays.
+ Display the contents of a GSD file's headers and arrays.
 \classitem{IMPAZTEC}
-  Import AzTEC NETCDF files and produce SCUBA-2 format data files. (untested)
+ Import AzTEC NETCDF files and produce SCUBA-2 format data files. (untested)
 \end{description}
 
 {\large
@@ -2410,7 +2410,10 @@ SCUBA-2 simulator.
 
 \section{\xlabel{ap_full}Specifications of SMURF Applications\label{ap:full}}
 
-The following pages describe all the SMURF commands in detail.
+The following pages describe all the SMURF commands in detail. Default
+values for parameters are quoted in square brackets. Parameters for
+which an array should be supplied (or are returned) are shown with
+parentheses after the parameter name.
 
 \input{../../libsmurf/smurfmon}
 
