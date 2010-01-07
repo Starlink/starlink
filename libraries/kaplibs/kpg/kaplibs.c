@@ -771,14 +771,14 @@ void kpg1Mxmnd( int bad, int el, double *array, int *ninval, double *maxmum,
 
 F77_SUBROUTINE(kpg1_fit1d)( INTEGER(LBND), 
                             INTEGER(UBND), 
-                            DOUBLE_ARRAY(X), 
                             DOUBLE_ARRAY(Y), 
+                            DOUBLE_ARRAY(X), 
                             DOUBLE(M), 
                             DOUBLE(C),
                             DOUBLE(RMS),
                             INTEGER(STATUS) );
 
-void kpg1Fit1d( int lbnd, int ubnd, double *x, double *y, double *m, 
+void kpg1Fit1d( int lbnd, int ubnd, double *y, double *x, double *m, 
                 double *c, double *rms, int *status ){
 
    DECLARE_INTEGER(LBND);
@@ -800,8 +800,8 @@ void kpg1Fit1d( int lbnd, int ubnd, double *x, double *y, double *m,
 
    F77_CALL(kpg1_fit1d)( INTEGER_ARG(&LBND),
                          INTEGER_ARG(&UBND),
-                         DOUBLE_ARRAY_ARG(X),
                          DOUBLE_ARRAY_ARG(Y),
+                         DOUBLE_ARRAY_ARG(X),
                          DOUBLE_ARG(&M),
                          DOUBLE_ARG(&C),
                          DOUBLE_ARG(&RMS),
@@ -818,9 +818,7 @@ void kpg1Fit1d( int lbnd, int ubnd, double *x, double *y, double *m,
 }
 
 
-
-
-
+/* ------------------------------- */
 
 F77_SUBROUTINE(kpg1_medud)( LOGICAL(BAD),  
                             INTEGER(EL), 
