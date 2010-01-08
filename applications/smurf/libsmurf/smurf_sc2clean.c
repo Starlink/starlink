@@ -45,10 +45,13 @@
 *          Fraction of bad samples in order for entire bolometer to be
 *          flagged as bad. [0.0]
 *     DCBAD = _LOGICAL (Read)
-*          If true, instead of repairing DC steps, flag bolo as bad. [TRUE]
+*          If true, instead of repairing DC steps, flag bolo as bad. [FALSE]
 *     DCBOX = _INTEGER (Read)
 *          Width of the box (samples) over which to estimate the mean
 *          signal level for DC step detection. [0]
+*     DCFLAGALL = _LOGICAL (Read)
+*          If true, at locations of DC steps repair/flag all bolometers
+*          at that location (overrides DCBAD). [FALSE]
 *     DCTHRESH = _DOUBLE (Read)
 *          N-sigma threshold at which to detect DC steps. [150.0]
 *     DKCLEAN = _LOGICAL (Read)
@@ -171,6 +174,8 @@ void smurf_sc2clean( int *status ) {
   smfArray *darks = NULL;   /* Dark data */
   int dcbad;                /* Flag bolometers with steps as bad */
   dim_t dcbox=0;            /* width of box for measuring DC steps */
+  int dcflag;               /* flag for DC step finder */
+  int dcflagall;            /* Flag for repairing all bolos at step */
   double dcthresh=0;        /* n-sigma threshold for DC steps */
   int dkclean;              /* Flag for dark squid cleaning */
   double flagstat;          /* Threshold for flagging stationary regions */
@@ -230,6 +235,8 @@ void smurf_sc2clean( int *status ) {
     atlGetParam( "DCTHRESH", keymap, status );
     parGet0l( "DCBAD", &dcbad, status );
     astMapPut0I( keymap, "DCBAD", dcbad, NULL );
+    parGet0l( "DCFLAGALL", &dcflagall, status );
+    astMapPut0I( keymap, "DCFLAGALL", dcflagall, NULL );
     atlGetParam( "DCBOX", keymap, status );
     parGet0l( "DKCLEAN", &dkclean, status );
     astMapPut0I( keymap, "DKCLEAN", dkclean, NULL );
@@ -242,7 +249,7 @@ void smurf_sc2clean( int *status ) {
     atlGetParam( "SPIKEITER", keymap, status );
     atlGetParam( "SPIKETHRESH", keymap, status );
 
-    smf_get_cleanpar( keymap, &apod, &badfrac, &dcbox, &dcbad, &dcthresh,
+    smf_get_cleanpar( keymap, &apod, &badfrac, &dcbox, &dcflag, &dcthresh,
                       &dkclean, NULL, NULL, NULL, NULL, NULL, NULL,
                       &flagstat, &order, &spikethresh, &spikeiter, status );
   }
@@ -286,16 +293,20 @@ void smurf_sc2clean( int *status ) {
     if( dcthresh && dcbox ) {
       msgSetd("DCTHRESH",dcthresh);
       msgSeti("DCBOX",dcbox);
-      if( dcbad ) {
+      if( dcflag==1 ) {
+        msgOutif(MSG__VERB," ",
+                 "Flagging bolos with ^DCTHRESH-sigma DC steps in ^DCBOX "
+                 "samples", status);
+      } else if( dcflag==2 ) {
         msgOutif(MSG__VERB," ",
                  "Flagging bolos with ^DCTHRESH-sigma DC steps in ^DCBOX "
                  "samples", status);
       } else {
         msgOutif(MSG__VERB," ",
-	       "Fixing DC steps of size ^DCTHRESH-sigma in ^DCBOX samples",
+                 "Fixing ALL BOLOS at locations of DC steps size ^DCTHRESH-sigma in ^DCBOX samples",
                  status);
       }
-      smf_correct_steps( ffdata, NULL, dcthresh, dcbox, dcbad, NULL, status );
+      smf_correct_steps( ffdata, NULL, dcthresh, dcbox, dcflag, NULL, status );
     }
 
     /* Flag spikes */

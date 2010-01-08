@@ -2001,7 +2001,7 @@ package @PACKAGE@ {
                 vpath {DEFAULT}
                 prompt {Flag entire bolo bad if DC step is found}
                 ppath GLOBAL CURRENT
-                default TRUE
+                default FALSE
                 helpkey *
             }
 
@@ -2010,6 +2010,15 @@ package @PACKAGE@ {
                 vpath {DEFAULT}
                 prompt {Size of box (samples) to measure means for DC step-finding}
                 default 0
+                helpkey *
+            }
+
+            parameter dcflagall {
+                type _LOGICAL
+                vpath {DEFAULT}
+                prompt {Flag/repair ALL BOLOS at locations of DC steps}
+                ppath GLOBAL CURRENT
+                default FALSE
                 helpkey *
             }
 

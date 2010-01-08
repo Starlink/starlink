@@ -13,12 +13,12 @@
 *     C function
 
 *  Invocation:
-*     smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac, 
-*                       dim_t *dcbox, int *dcbad, double *dcthresh, 
+*     smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
+*                       dim_t *dcbox, int *dcflag, double *dcthresh,
 *                       int *dkclean, double *filt_edgelow,
 *                       double *filt_edgehigh, double *filt_notchlow,
-*                       double *filt_notchhigh, int *filt_nnotch, int *dofilt, 
-*                       double *flagstat, int *order, double *spikethresh, 
+*                       double *filt_notchhigh, int *filt_nnotch, int *dofilt,
+*                       double *flagstat, int *order, double *spikethresh,
 *                       size_t *spikeiter, int *status )
 
 *  Arguments:
@@ -32,8 +32,10 @@
 *     dcbox = dim_t* (Returned)
 *        Width of the box (samples) over which to estimate the mean
 *        signal level for DC step detection (NULL:0)
-*     dcbad = int* (Returned)
-*        If true, instead of repairing DC steps, flag bolo as bad (NULL:0)
+*     dcflag = int* (Returned)
+*        if 0 handle all bolos independently and attempt to fix steps (NULL:0)
+*        if 1 just flag entire bolo as bad if step encountered
+*        if 2 identify steps, and then repair/flag ALL bolometers at those spots
 *     dcthresh = double* (Returned)
 *        N-sigma threshold at which to detect DC steps (NULL:0)
 *     dkclean = int* (Returned)
@@ -85,12 +87,14 @@
 *  History:
 *     2009-04-15 (EC):
 *        Initial version.
+*     2010-01-08 (EC):
+*        Add parameter dcflagall to dcflag (renamed from dcbad)
 *     {enter_further_changes_here}
 
 *  Notes:
 
 *  Copyright:
-*     Copyright (C) 2009 University of British Columbia
+*     Copyright (C) 2009-2010 University of British Columbia
 *     All Rights Reserved.
 
 *  Licence:
@@ -133,7 +137,7 @@
 #define FUNC_NAME "smf_get_cleanpar"
 
 void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
-                       dim_t *dcbox, int *dcbad, double *dcthresh,
+                       dim_t *dcbox, int *dcflag, double *dcthresh,
                        int *dkclean, double *filt_edgelow, 
                        double *filt_edgehigh, double *filt_notchlow,
                        double *filt_notchhigh, int *filt_nnotch,
@@ -193,19 +197,36 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
                *dcbox );
   }
 
-  if( dcbad ) {
+  if( dcflag ) {
+    *dcflag = 0;
+
     if( astMapGet0I( keymap, "DCBAD", &temp ) ) {
       if( (temp < 0) || (temp > 1) ) {
         *status = SAI__ERROR;
         errRep(FUNC_NAME, "DCBAD must be either 0 or 1.", status );
       } else {
-        *dcbad = temp;
+        *dcflag = temp;
       }
-    } else {
-      *dcbad = 0;
     }
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DCBAD=%i", status,
-               *dcbad );
+
+    if( astMapGet0I( keymap, "DCFLAGALL", &temp ) ) {
+
+      if( (temp < 0) && (temp > 1) ) {
+        *status = SAI__ERROR;
+        errRep(FUNC_NAME, "DCFLAGALL must be either 0 or 1.", status );
+      } else {
+
+        if( (*dcflag == 1) && (temp) ) {
+          msgOutif( MSG__VERB, "", FUNC_NAME ": DCFLAGALL overriding DCBAD",
+                    status );
+        }
+
+        *dcflag = temp*2;
+      }
+    }
+
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DCFLAG=%i", status,
+               *dcflag );
   }
 
   if( dcthresh ) {
@@ -219,7 +240,7 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
     msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DCTHRESH=%f", status,
                *dcthresh );
   }
-  
+
   if( dkclean ) {
     if( astMapGet0I( keymap, "DKCLEAN", &temp ) ) {
       if( (temp < 0) || (temp > 1) ) {

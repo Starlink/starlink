@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_correct_steps( smfData *data, unsigned char *quality,
-*                        double dcthresh, dim_t dcbox, int flagbolo,
+*                        double dcthresh, dim_t dcbox, int dcflag,
 *                        size_t *nsteps, int *status )
 
 *  Arguments:
@@ -28,20 +28,23 @@
 *        N-sigma threshold for DC jump to be detected
 *     dcbox = dim_t (Given)
 *        Length of box (in samples) over which to calculate statistics
-*     flagbolo = int (Given)
-*        If set don't repair. Instead flag entire bolo as bad when step found.
+*     dcflag = int (Given)
+*        if 0 handle all bolos independently and attempt to fix steps
+*        if 1 just flag entire bolo as bad if step encountered
+*        if 2 identify steps, and then repair/flag ALL bolometers at those spots
 *     nsteps = size_t* (Returned)
-*        Number of DC steps encountered (number of flagged bolos if flagbolo
+*        Number of DC steps encountered (number of flagged bolos if dcflag
 *        set). Can be NULL.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
 *  Description:
-*     First estimate white-noise level as r.m.s. in box of length dcbox.
-*     Then calculate running averages in two adjacent intervals of
-*     length dcbox. Jumps are flagged and corrected at peak values of
-*     difference between the averages in two intervals. If flagbolo is set,
-*     instead of repairing the step just flag entire bolometer as SMF__Q_BADB.
+*     First estimate white-noise level as r.m.s. in box of length
+*     dcbox.  Then calculate running averages in two adjacent
+*     intervals of length dcbox. Jumps are flagged and corrected at
+*     peak values of difference between the averages in two
+*     intervals. If dcflag is set to 1, instead of repairing the
+*     step just flag entire bolometer as SMF__Q_BADB.
 
 *  Notes:
 
@@ -63,12 +66,14 @@
 *        Use msgFlevok rather than msgIflev
 *     2009-11-17 (EC):
 *        stridify and fix numerous array index bugs
+*     2010-01-08 (EC):
+*        add flagging of all bolos at step locations
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2009 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
-*     Copyright (C) 2008-2009 University of British Columbia.
+*     Copyright (C) 2008-2010 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -110,24 +115,50 @@
 
 #define FUNC_NAME "smf_correct_steps"
 
+/* -------------------------------------------------------------------------- */
+/* Local routine for correcting baseline steps */
+
+void smf_correct_steps_baseline( double *dat, unsigned char *qua,
+                                 dim_t ntslice, size_t tstride,
+                                 double *alljump ) {
+  double baseline;
+  size_t i;
+
+  baseline = 0;
+  for( i=1; i<ntslice; i++ ) {
+    if( alljump[i] ) {
+      /* Update the baseline at each sample in which jumps occured */
+      baseline += alljump[i];
+
+      /* Flag the jump in QUALITY */
+      qua[i*tstride] |= SMF__Q_JUMP;
+    }
+
+    /* Correct the data by the current baseline estimate */
+    dat[i*tstride] -= baseline;
+  }
+}
+
+/* ------------------------------------------------------------------------- */
+/* Public routine */
+
 void smf_correct_steps( smfData *data, unsigned char *quality,
-                        double dcthresh, dim_t dcbox, int flagbolo,
+                        double dcthresh, dim_t dcbox, int dcflag,
                         size_t *nsteps, int *status ) {
 
   /* Local Variables */
   double *alljump=NULL;         /* Buffer containing DC jumps */
   size_t base;                  /* Index to start of current bolo */
-  double baseline;              /* Current baseline estimate  */
   double *dat=NULL;             /* Pointer to bolo data */
   double dcstep;                /* Size of DC steps to detect */
   size_t bstride;               /* Bolo stride */
-  size_t tstride;               /* Bolo stride */
   dim_t i;                      /* Loop Counter */
   size_t iend;                  /* Index end of data stream */
   int injump;                   /* Flag for DC jump detection */
   int isbad;                    /* Set if bolo is bad */
   size_t istart;                /* Index start of data stream */
   dim_t j;                      /* Loop Counter */
+  dim_t k;                      /* Loop Counter */
   double maxdiff;               /* Max difference between mean1 and mean2 */
   dim_t maxind;                 /* index to location of maxdiff */
   double mean1;                 /* Box means to search for DC steps */
@@ -138,6 +169,7 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
   dim_t nmean2;                 /* Number of samples in mean1 */
   dim_t ntslice=0;              /* Number of time slices */
   unsigned char *qua=NULL;      /* Pointer to quality flags */
+  size_t tstride;               /* Bolo stride */
   size_t wherebad=0;            /* Index causing bad bolo */
 
   /* Main routine */
@@ -197,7 +229,7 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
   if( dcbox && dcthresh && (*status == SAI__OK) ) {
 
     /* allocate alljump buffer */
-    alljump = smf_malloc( ntslice, sizeof(*alljump), 0, status );
+    alljump = smf_malloc( ntslice, sizeof(*alljump), 1, status );
 
     /* identify first and last samples before/after padding+apodization */
     smf_get_goodrange( qua, ntslice, 1, SMF__Q_PAD|SMF__Q_APOD,
@@ -224,7 +256,11 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
                                   status ) * dcthresh;
 
         if( *status == SAI__OK ) {
-          memset( alljump, 0, ntslice*sizeof(*alljump) );
+          /* If handling all bolos independently, zero alljump here */
+          if( dcflag != 2 ) {
+            memset( alljump, 0, ntslice*sizeof(*alljump) );
+          }
+
           injump = 0;  /* jump occured somewhere in boxes */
           maxdiff = 0; /* max difference between mean1 and mean2 for jump */
           maxind = 0;  /* index to location of maxdiff */
@@ -247,28 +283,55 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
               if( !injump ) {
                 /* Starting new jump, initialize search */
                 maxdiff = mean2 - mean1;
-                maxind = j; 
+                maxind = j;
                 injump = 1;
               } else if( fabs(mean2 - mean1) > fabs(maxdiff) ) {
                 /* Update the search for the maximum step size */
                 maxdiff = mean2 - mean1;
                 maxind = j;
               }
+
             } else {
               /* If difference is small, but injump is set, that means we've
                  finished the search for the last step */
               if( injump ) {
-                alljump[maxind] = maxdiff;
-                /* update wherebad to more precise location */
-                wherebad = maxind;
-                injump = 0;
+
+                /* if dcflag==2 first check to see if a jump near this
+                   spot was already flagged. Only record the biggest one */
+
+                if( dcflag== 2 ) {
+                  double biggest = maxdiff;
+                  size_t wherebiggest = maxind;
+
+                  /* Find biggest in interval */
+                  for( k=maxind-dcbox; k<maxind+dcbox; k++ ) {
+                    if( alljump[k] && (fabs(alljump[k]) > fabs(biggest))  ) {
+                      biggest = alljump[k];
+                      wherebiggest = k;
+                    }
+                  }
+
+                  /* Zero entire interval and record only biggest */
+                  for( k=maxind-dcbox; k<maxind+dcbox; k++ ) {
+                    alljump[k] = 0;
+                  }
+
+                  alljump[wherebiggest] = biggest;
+                  wherebad = wherebiggest;
+                } else {
+                  alljump[maxind] = maxdiff;
+                  /* update wherebad to more precise location */
+                  wherebad = maxind;
+                }
+                  injump = 0;
+
               }
             }
 
             /* Move along the boxes and update the mean estimates */
             if( !(qua[base + (j-dcbox)*tstride] & SMF__Q_MOD) ) {
               /* Drop sample at j-dcbox from mean1 */
-              mean1 = (nmean1*mean1 - dat[base + (j-dcbox)*tstride]) / 
+              mean1 = (nmean1*mean1 - dat[base + (j-dcbox)*tstride]) /
                 (nmean1-1);
               nmean1 --;
             }
@@ -288,36 +351,14 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
               nmean2 ++;
             }
 
-            /* Don't need to continue if bad bolo, and flagbolo set */
-            if( flagbolo && isbad ) break;
+            /* Don't need to continue if bad bolo, and dcflag set to 1 */
+            if( (dcflag==1) && isbad ) break;
           }
 
           /* calculate the new corrected baseline if requested */
-          if( !flagbolo ) {
-            baseline = 0;
-            for( j=1; j<ntslice; j++ ) {
-              if( alljump[j] ) {
-
-                /* Update the baseline at each sample in which jumps occured */
-                baseline += alljump[j];
-
-                /* Flag the jump in QUALITY */
-                qua[base+j*tstride] |= SMF__Q_JUMP;
-
-                if( msgFlevok( MSG__DEBUG, status ) ) {
-                  msgSeti( "BOL", i );
-                  msgSeti( "T", j );
-                  msgSetd( "STEP", alljump[j] );
-                  msgSetd( "THRESH", dcstep );
-                  msgOutif( MSG__DEBUG, "",
-                            "jump ^STEP (>^THRESH) in bolo ^BOL at ^T",
-                            status );
-                }
-              }
-
-              /* Correct the data by the current baseline estimate */
-              dat[base+j*tstride] -= baseline;
-            }
+          if( !dcflag ) {
+            smf_correct_steps_baseline( dat+i*bstride, qua+i*bstride,
+                                        ntslice, tstride, alljump );
           }
         }
       }
@@ -328,7 +369,7 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
         isbad = 1;
       }
 
-      if( isbad && flagbolo) {
+      if( isbad && (dcflag==1) ) {
         msgOutiff( MSG__DEBUG, "", FUNC_NAME ": flagging bad bolo %li at %li",
                    status, i, wherebad );
         for(j=0; j<ntslice; j++) {
@@ -337,6 +378,49 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
 
         qua[base+wherebad*tstride] |= SMF__Q_JUMP;
       }
+    }
+
+    /* If dcflag==2, go back to all locations of steps in each bolometer
+       and correct / flag (handle small DC steps correlated with big ones) */
+    if( (dcflag == 2) && (*status==SAI__OK) ) {
+      double *thisjump=NULL;
+      thisjump = smf_malloc( ntslice, sizeof(*thisjump), 1, status );
+
+      for( i=0; (*status==SAI__OK)&&(i<nbolo); i++ ) {
+        if( !(qua[i*bstride] & SMF__Q_BADB) ) {
+          /* Loop over time slices for this bolometer and calc thisjump */
+          memset( thisjump, 0, ntslice*sizeof(*thisjump) );
+
+          for( j=0; j<ntslice; j++ ) {
+            /* Jump previously found. Measure mean before and after */
+            if( alljump[j] ) {
+              smf_stats1D( dat+i*bstride+(j-dcbox)*tstride, tstride, dcbox,
+                           qua+i*bstride+(j-dcbox)*tstride, SMF__Q_MOD, &mean1,
+                           NULL, &nmean1, status);
+
+              smf_stats1D( dat+i*bstride+j*tstride, tstride, dcbox,
+                           qua+i*bstride+j*tstride, SMF__Q_MOD, &mean2,
+                           NULL, &nmean2, status);
+              if( *status == SMF__INSMP ) {
+                /* If insufficient samples just annul and continue */
+                errAnnul( status );
+              } else {
+                thisjump[j] = mean2 - mean1;
+              }
+
+              /* Flag entire 2*DCBOX window */
+              for( k=j-dcbox; k<j+dcbox; k++ ) {
+                qua[i*bstride+k*tstride] |= SMF__Q_JUMP;
+              }
+            }
+          }
+
+          smf_correct_steps_baseline( dat+i*bstride, qua+i*bstride,
+                                      ntslice, tstride, thisjump );
+        }
+      }
+
+      thisjump = smf_free( thisjump, status );
     }
 
     /* Return nsteps if requested */
