@@ -55,12 +55,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -69,6 +69,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     BRADC: Brad Cavanagh (JAC, Hawaii)
+*     PWD: Peter W. Draper (Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -76,13 +77,15 @@
 *        Original version.
 *     2009 DEC 30 (BRADC):
 *        Use INTEGER*8 to avoid overflow.
+*     2010 JAN 08 (PWD):
+*        Don't use Fortran 90 MIN() intrinsic, stick to Fortran 77.
 *     {enter_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -111,7 +114,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER*8
+      INTEGER * 8
      :  I, J,                    ! 2-d array indices
      :  L                        ! Loop counter
 
@@ -131,8 +134,14 @@
 *    Fill the array with the list of values, by computing which bin a
 *    given x-y position is situated.
       DO  L = 1, NBIN
-         I = MIN( INT( X( L )  / SX, 8 ) + 1, NX )
-         J = MIN( INT( Y( L )  / SY, 8 ) + 1, NY )
+
+*    Use direct assignment to convert to I*8 from REAL rather than the
+*    INT intrinsic with an f90 kind. Seems to give the correct promotion
+*    and truncation with g77/gfortran/g95/ifort/SUN f95/f77.
+         I = X( L ) / SX
+         I = MIN( I + 1, NX )
+         J = Y( L ) / SY
+         J = MIN( J + 1, NY )
          ARRAY( I, J ) = REAL( Z( L ) )
       END DO
 
