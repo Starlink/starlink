@@ -18,8 +18,8 @@
 
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {258.1}
-\newcommand{\stardocauthors}   {Edward Chapin, Andrew G. Gibb, Tim Jenness \& David S. Berry}
-\newcommand{\stardocdate}      {24 July 2009}
+\newcommand{\stardocauthors}   {Edward Chapin, Andrew G. Gibb, Tim Jenness, David S. Berry  \& Douglas Scott}
+\newcommand{\stardocdate}      {8 January 2010}
 \newcommand{\stardoctitle}     {SMURF -- the Sub-Millimetre User Reduction Facillity}
 \newcommand{\stardocversion}   {Version 0.5}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -882,7 +882,7 @@ a single observation. The FITS header may be viewed with the \KAPPA\
 \fitslist\ command.
 
 Each instrument has further specific components. SCUBA-2 files contain
-dark squid data, the current flatfield solution and a polynomial fit
+dark SQUID data, the current flatfield solution and a polynomial fit
 to detector signal versus raw data (a correction for linear drift).
 ACSIS files contain information about the receptors used.
 
@@ -1585,7 +1585,7 @@ in Table~\ref{tab:dimm_components}.
 \hline
 $COM$ & Removes common-mode signal, i.e., the signal seen by all bolometers. This removes most of the atmospheric emission. In addition bad detectors are also flagged if there signal does not resemble the common mode measured by the other detectors. \\
 $GAI$ & If $COM$ specified, a gain and offset is used to fit $COM$ to each detector before removal. \\
-$DKS$ & Fits gain and offset to remove signal recorded by dark squids. \\
+$DKS$ & Fits gain and offset to remove signal recorded by dark SQUIDs. \\
 $EXT$ & Applies the extinction correction. \\
 $AST$ & Triggers map estimation, and removal of astronomical signal from the time-series. \\
 $FLT$ & Applies a frequency domain filter. \\
@@ -1619,14 +1619,14 @@ offsets are present.
 
 The first successful observations with SCUBA-2 used test arrays that
 exhibited strong signals correlated along columns (believed to be
-caused by magnetic field pick-up). Dark squids, $DKS$, (readouts with
+caused by magnetic field pick-up). Dark SQUIDs, $DKS$, (readouts with
 no thermal absorbers) at the ends of
 %the $j$th
 each
 column seem to provide
 a good measurement of this signal. Similar to $COM$, the DIMM can fit
 a gain and offset, $G_D^i$ and $O_D^i$, to each detector for the
-appropriate dark squid signal in the $j$th column.
+appropriate dark SQUID signal in the $j$th column.
 
 The actual astronomical signal from which we wish to make a map,
 $AST$, is attenuated by an extinction factor, $EXT$, resulting from
@@ -1938,7 +1938,7 @@ com.boxcar       & A low-pass boxcar filter that assists with convergence. Speci
 com.boxfact      & Reduce the width of the boxcar by this box factor in each           &   0.5 \\
                  & iteration.                                                          & \\
 com.boxmin       & The minimum width below which the boxcar can not be reduced.          & 100 \\
-dks.boxcar       & Boxcar smooth dark squid signals before fitting/removing.           & 10 \\
+dks.boxcar       & Boxcar smooth dark SQUID signals before fitting/removing.           & 10 \\
 noi.spikethresh  & Additional despiking after each iteration, within the $NOI$         & 10 \\
                  & calculation.                                                        & \\
 noi.spikeiter    & Additional despiking after each iteration, within the $NOI$         & 0 \\
