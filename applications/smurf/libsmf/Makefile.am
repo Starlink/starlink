@@ -30,6 +30,7 @@ smf_calc_mode.c \
 smf_calc_skyframe.c \
 smf_calc_stareimage.c \
 smf_calc_stats.c \
+smf_calc_subinst.c \
 smf_calc_telpos.c \
 smf_calc_telres.c \
 smf_calc_wvm.c \

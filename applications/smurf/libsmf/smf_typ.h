@@ -153,10 +153,12 @@
  *        Add switching modes.
  *     2009-12-09 (TIMJ):
  *        Add _BIT values from sc2headman_struct.h
+ *     2010-01-08 (TIMJ):
+ *        Add sub instrument enums.
  *     {enter_further_changes_here}
 
  *  Copyright:
- *     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
+ *     Copyright (C) 2008-2010 Science and Technology Facilities Council.
  *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
  *     Copyright (C) 2005-2009 University of British Columbia.
  *     All Rights Reserved.
@@ -695,5 +697,13 @@ typedef enum {
 
 /* and define a combo value to indicate loss of telescope-ness */
 #define DRCNTRL__POSITION ( DRCNTRL__SMU_BIT | DRCNTRL__PTCS_BIT )
+
+/* Sub-instruments */
+
+typedef enum {
+  SMF__SUBINST_NONE,
+  SMF__SUBINST_850,
+  SMF__SUBINST_450
+} smf_subinst_t;
 
 #endif /* SMF_TYP_DEFINED */

@@ -483,6 +483,8 @@ void smf_calc_stats( const smfData *data, const char *mode, const dim_t index,
                      double *mean, double *sigma,
                      int *status);
 
+smf_subinst_t smf_calc_subinst ( const smfHead * hdr, int * status );
+
 void smf_calc_telpos( const double obsgeo[3], const char telName[],
                       double telpos[3], int *status );
 
