@@ -14,7 +14,7 @@
 
  *  Invocation:
  *     smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
- *                          const smfArray *darks, const smfArray *bpms,
+ *                          const smfArray *darks, const smfArray *bbms,
  *                          size_t whichchunk, int ensureflat, int isTordered,
  *                          AstFrameSet *outfset, int moving,
  *                          int *lbnd_out, int *ubnd_out, dim_t padStart,
@@ -29,7 +29,7 @@
  *     darks = const smfArray * (Given)
  *        Collection of darks that can be applied to non-flatfielded data.
  *        Can be NULL.
- *     bpms = smfArray * (Given)
+ *     bbms = smfArray * (Given)
  *        Masks for each subarray (e.g. returned by smf_reqest_mask call)
  *     whichchunk = size_t (Given)
  *        Which continuous subset of igrp will get concatenated?
@@ -133,6 +133,8 @@
  *     2009-10-02 (TIMJ):
  *        Copy more information from reference smfData
  *        Allow flatfielding to be disabled.
+ *     2010-01-08 (AGG):
+ *        Change BPM to BBM.
 
  *  Notes:
  *     If projection information supplied, pointing LUT will not be
@@ -149,7 +151,7 @@
  *     VAL__BADI, and the JCMTState values are all set to 0.
 
  *  Copyright:
- *     Copyright (C) 2007-2009 University of British Columbia.
+ *     Copyright (C) 2007-2010 University of British Columbia.
  *     Copyright (C) 2008 Science and Technology Facilities Council.
  *
  *     All Rights Reserved.
@@ -168,7 +170,7 @@
  *     You should have received a copy of the GNU General Public
  *     License along with this program; if not, write to the Free
  *     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
- *     MA 02111-1307, USA
+ *     MA 02111-1307, USA.
 
  *  Bugs:
  *     {note_any_bugs_here}
@@ -195,7 +197,7 @@
 #define FUNC_NAME "smf_concat_smfGroup"
 
 void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
-                          const smfArray *darks, const smfArray *bpms,
+                          const smfArray *darks, const smfArray *bbms,
                           size_t whichchunk, int ensureflat, int isTordered,
                           AstFrameSet *outfset, int moving,
                           int *lbnd_out, int *ubnd_out, dim_t padStart,
@@ -435,8 +437,8 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
             smf_close_file( &tmpdata, status );
           }
 
-          /* Apply bad pixel mask */
-          smf_apply_mask( refdata, NULL, bpms, SMF__BPM_DATA, status );
+          /* Apply bad bolometer mask */
+          smf_apply_mask( refdata, NULL, bbms, SMF__BBM_DATA, status );
 
           /* Calculate the pointing LUT if requested */
           if( !(flags & SMF__NOCREATE_LUT) && outfset ) {

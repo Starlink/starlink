@@ -13,13 +13,13 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_request_mask( const char *param, smfArray ** bpms, int *status);
+*     smf_request_mask( const char *param, smfArray ** bbms, int *status);
 
 *  Arguments:
 *     param = const char * (Given)
-*        Name of ADAM parameter to use when requesting bad pixel mask
-*        group of files. Usually "BPM".
-*     bpms = smfArray** (Returned)
+*        Name of ADAM parameter to use when requesting bad bolometer mask
+*        group of files. Usually "BBM".
+*     bbms = smfArray** (Returned)
 *        Pointer to smfArray* that will be returned as a valid smfArray
 *        if the parameter contained files. If a NULL parameter is given this
 *        pointer will be NULL.
@@ -36,15 +36,19 @@
 
 *  Authors:
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     AGG: Andy Gibb (UBC)
 *     {enter_new_authors_here}
 
 *  History:
 *     2008-12-11 (TIMJ):
 *        Initial version. Culled from smurf_qlmakemap.c:28576
+*     2010-01-08 (AGG):
+*        Change BPM to BBM.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Faciltiies Council.
+*     Copyright (C) 2010 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -61,7 +65,7 @@
 *     You should have received a copy of the GNU General Public
 *     License along with this program; if not, write to the Free
 *     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-*     MA 02111-1307, USA
+*     MA 02111-1307, USA.
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -76,22 +80,22 @@
 
 #include "smf.h"
 
-void smf_request_mask( const char *param, smfArray ** bpms, int *status) {
-  Grp * bpmgrp = NULL;
-  size_t nbpm;
+void smf_request_mask( const char *param, smfArray ** bbms, int *status) {
+  Grp * bbmgrp = NULL;
+  size_t nbbm;
 
 
   /* initialise return value */
-  *bpms = NULL;
+  *bbms = NULL;
 
   if (*status != SAI__OK) return;
 
-  kpg1Rgndf( param, 0, 1, "", &bpmgrp, &nbpm, status );
+  kpg1Rgndf( param, 0, 1, "", &bbmgrp, &nbbm, status );
   if (*status == PAR__NULL) {
-    bpms = NULL;
+    bbms = NULL;
     errAnnul( status );
   } else {
-    smf_open_group( bpmgrp, NULL, bpms, status );
+    smf_open_group( bbmgrp, NULL, bbms, status );
   }
-  if (bpmgrp) grpDelet( &bpmgrp, status );
+  if (bbmgrp) grpDelet( &bbmgrp, status );
 }

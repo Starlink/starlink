@@ -27,8 +27,8 @@
 *     automatically calculate that number to give 1-second averages.
 
 *  ADAM Parameters:
-*     BPM = NDF (Read)
-*          Group of files to be used as bad pixel masks. Each data file
+*     BBM = NDF (Read)
+*          Group of files to be used as bad bolometer masks. Each data file
 *          specified with the IN parameter will be masked. The corresponding
 *          previous mask for a subarray will be used. If there is no previous
 *          mask the closest following will be used. It is not an error for
@@ -138,7 +138,7 @@
 void smurf_starecalc ( int *status ) {
 
   /* Local Variables */
-  smfArray *bpms = NULL;          /* Bad pixel masks */
+  smfArray *bbms = NULL;          /* Bad bolometer masks */
   smfArray *darks = NULL;         /* Dark data */
   smfData *data = NULL;           /* Input data */
   Grp *fgrp = NULL;               /* Filtered group, no darks */
@@ -174,8 +174,8 @@ void smurf_starecalc ( int *status ) {
        " nothing to do", status );
   }
 
-  /* Get group of pixel masks and read them into a smfArray */
-  smf_request_mask( "BPM", &bpms, status );
+  /* Get group of bad bolometer masks and read them into a smfArray */
+  smf_request_mask( "BBM", &bbms, status );
 
   /* Get number of frames to average over */
   if ( *status == SAI__OK ) {
@@ -196,8 +196,8 @@ void smurf_starecalc ( int *status ) {
     /* Open file and flatfield the data */
     smf_open_and_flatfield( igrp, ogrp, i, darks, &data, status );
 
-    /* Mask out bad pixels - mask data array not quality array */
-    smf_apply_mask( data, NULL, bpms, SMF__BPM_DATA, status );
+    /* Mask out bad bolometers - mask data array not quality array */
+    smf_apply_mask( data, NULL, bbms, SMF__BBM_DATA, status );
 
     smf_calc_stareimage( data, naver, status );
 
@@ -222,7 +222,7 @@ void smurf_starecalc ( int *status ) {
 
   /* Free up resources */
   if (darks) smf_close_related( &darks, status );
-  if (bpms) smf_close_related( &bpms, status );
+  if (bbms) smf_close_related( &bbms, status );
   grpDelet( &igrp, status);
   grpDelet( &ogrp, status);
 

@@ -47,8 +47,8 @@
 *          values of the input data positions being compared directly,
 *          disregarding the fact that a given AZEL will correspond to
 *          different positions on the sky at different times. [FALSE]
-*     BPM = NDF (Read)
-*          Group of files to be used as bad pixel masks. Each data file
+*     BBM = NDF (Read)
+*          Group of files to be used as bad bolometer masks. Each data file
 *          specified with the IN parameter will be masked. The
 *          corresponding previous mask for a subarray will be used. If
 *          there is no previous mask the closest following will be
@@ -691,11 +691,13 @@
 *        Calculate dynamic default value for MAXMEM using sysconf call
 *     2009-10-27 (DSB):
 *        Add a spectral axis to the output NDF.
+*     2010-01-08 (AGG):
+*        Change BPM to BBM.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
-*     Copyright (C) 2005-2009 University of British Columbia.
+*     Copyright (C) 2005-2010 University of British Columbia.
 *     Copyright (C) 2007-2009 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
@@ -772,7 +774,7 @@ void smurf_makemap( int *status ) {
   char basename[ GRP__SZNAM + 1 ]; /* Output base file name */
   int blank=0;                 /* Was a blank line just output? */
   smfBox *boxes = NULL;      /* Pointer to array of i/p file bounding boxes */
-  smfArray *bpms = NULL;     /* Bad pixel masks */
+  smfArray *bbms = NULL;     /* Bad bolometer masks */
   Grp *confgrp = NULL;       /* Group containing configuration file */
   smfArray *darks = NULL;   /* Dark data */
   smfData *data=NULL;        /* Pointer to SCUBA2 data struct */
@@ -881,8 +883,8 @@ void smurf_makemap( int *status ) {
     goto L998;
   }
 
-  /* Get group of pixel masks and read them into a smfArray */
-  smf_request_mask( "BPM", &bpms, status );
+  /* Get group of bolometer masks and read them into a smfArray */
+  smf_request_mask( "BBM", &bbms, status );
 
   /* Get the celestial coordinate system for the output map */
   parChoic( "SYSTEM", "TRACKING", "TRACKING,FK5,ICRS,AZEL,GALACTIC,"
@@ -1115,7 +1117,7 @@ void smurf_makemap( int *status ) {
 
       /* Create FrameSets that are appropriate for this tile. This involves
          remapping the base (GRID) Frame of the full size output WCS so that
-         GRID position (1,1) corresponds to the centre of the first pixel int he
+         GRID position (1,1) corresponds to the centre of the first pixel in the
          tile. */
       wcstile2d = astCopy( outfset );
       if( tile->map2d ) astRemapFrame( wcstile2d, AST__BASE, tile->map2d );
@@ -1283,8 +1285,8 @@ void smurf_makemap( int *status ) {
                       status );
           }
 
-          /* Mask out bad pixels - mask data array not quality array */
-          smf_apply_mask( data, NULL, bpms, SMF__BPM_DATA, status );
+          /* Mask out bad bolometers - mask data array not quality array */
+          smf_apply_mask( data, NULL, bbms, SMF__BBM_DATA, status );
 
           /* Rebin the data onto the output grid. This also closes the
              data file.  */
@@ -1529,7 +1531,7 @@ void smurf_makemap( int *status ) {
 
     /* Call the low-level iterative map-maker */
 
-    smf_iteratemap( wf, igrp, iterrootgrp, bolrootgrp, keymap, NULL, bpms,
+    smf_iteratemap( wf, igrp, iterrootgrp, bolrootgrp, keymap, NULL, bbms,
                     outfset, moving, lbnd_out, ubnd_out, maxmem-mapmem,
                     map, hitsmap, variance, weights, data_units, status );
 
@@ -1631,7 +1633,7 @@ void smurf_makemap( int *status ) {
   if( boxes ) boxes = smf_free( boxes, status );
   if( tiles ) tiles = smf_freetiles( tiles, ntile, status );
   if( darks ) smf_close_related( &darks, status );
-  if( bpms ) smf_close_related( &bpms, status );
+  if( bbms ) smf_close_related( &bbms, status );
   if( keymap ) keymap = astAnnul( keymap );
 
   ndfEnd( status );

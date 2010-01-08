@@ -36,8 +36,8 @@
 *     results as quickly as possible.
 
 *  ADAM Parameters:
-*     BPM = NDF (Read)
-*          Group of files to be used as bad pixel masks. Each data file
+*     BBM = NDF (Read)
+*          Group of files to be used as bad bolometer masks. Each data file
 *          specified with the IN parameter will be masked. The corresponding
 *          previous mask for a subarray will be used. If there is no previous
 *          mask the closest following will be used. It is not an error for
@@ -243,11 +243,13 @@
 *        - Add some timers for debugging
 *     2009-10-08 (DSB):
 *        Re-paralleize smf_bolonoise as the problem should now be fixed.
+*     2010-01-08 (AGG):
+*        Change BPM to BBM.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2006-2007 Particle Physics and Astronomy Research
-*     Council. Copyright (C) 2006-2008 University of British Columbia.
+*     Council. Copyright (C) 2006-2010 University of British Columbia.
 *     Copyright (C) 2007-2008 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
@@ -303,7 +305,7 @@
 void smurf_qlmakemap( int *status ) {
 
   /* Local Variables */
-  smfArray *bpms = NULL;     /* Bad pixel masks */
+  smfArray *bbms = NULL;     /* Bad bolometer masks */
   double *bolonoise=NULL;    /* Noise estimate for each detector */
   smfArray *darks = NULL;    /* Dark data */
   smfData *data = NULL;      /* Pointer to input SCUBA2 data struct */
@@ -376,8 +378,8 @@ void smurf_qlmakemap( int *status ) {
     goto CLEANUP;
   }
 
-  /* Get group of pixel masks and read them into a smfArray */
-  smf_request_mask( "BPM", &bpms, status );
+  /* Get group of bad bolometer masks and read them into a smfArray */
+  smf_request_mask( "BBM", &bbms, status );
 
   /* Get the celestial coordinate system for the output image. */
   parChoic( "SYSTEM", "TRACKING", "TRACKING,FK5,ICRS,AZEL,GALACTIC,"
@@ -466,14 +468,14 @@ void smurf_qlmakemap( int *status ) {
     msgOutif( MSG__VERB," ", "SMURF_QLMAKEMAP: Cleaning bolometer data.",
               status );
 
-    /* Apply bad pixel mask to the quality array - noting that
+    /* Apply bad bolometer mask to the quality array - noting that
        smf_update_valbad will apply the mask to the data array.
        Also note that this uses smf_update_quality to do the masking
        which we call immediately afterwards to mask out dead bolometers.
        Clearly would be more efficient if badfrac could be given to
        smf_apply_mask.
     */
-    smf_apply_mask( data, NULL, bpms, SMF__BPM_QUAL, status );
+    smf_apply_mask( data, NULL, bbms, SMF__BBM_QUAL, status );
 
     /* Update quality array */
     smf_update_quality( data, NULL, 1, NULL, 0.05, status );
@@ -579,7 +581,7 @@ void smurf_qlmakemap( int *status ) {
   if (odata) smf_close_file ( &odata, status );
   if( ogrp ) grpDelet( &ogrp, status );
   if( darks ) smf_close_related( &darks, status );
-  if( bpms ) smf_close_related( &bpms, status );
+  if( bbms ) smf_close_related( &bbms, status );
   grpDelet( &igrp, status );
   if( wf ) wf = smf_destroy_workforce( wf );
 

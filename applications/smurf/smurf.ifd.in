@@ -291,12 +291,12 @@ package @PACKAGE@ {
 
             helplib {$SMURF_HELP}
 
-            parameter bpm {
+            parameter bbm {
                 type NDF
                 access READ
                 vpath DEFAULT
                 ppath CURRENT DEFAULT
-                prompt {Bad pixel masks}
+                prompt {Bad bolometer masks}
                 default !
                 helpkey *
             }
@@ -835,12 +835,12 @@ package @PACKAGE@ {
 
             helplib {$SMURF_HELP}
 
-            parameter bpm {
+            parameter bbm {
                 type NDF
                 access READ
                 vpath DEFAULT
                 ppath CURRENT DEFAULT
-                prompt {Bad pixel masks}
+                prompt {Bad bolometer masks}
                 default !
                 helpkey *
             }
@@ -920,12 +920,12 @@ package @PACKAGE@ {
 
             helplib {$SMURF_HELP}
 
-            parameter bpm {
+            parameter bbm {
                 type NDF
                 access READ
                 vpath DEFAULT
                 ppath CURRENT DEFAULT
-                prompt {Bad pixel masks}
+                prompt {Bad bolometer masks}
                 default !
                 helpkey *
             }
@@ -1084,7 +1084,7 @@ package @PACKAGE@ {
                 type LITERAL
                 ppath DEFAULT
                 vpath DEFAULT
-                prompt {Scheme for determining the output bad pixel mask}
+                prompt {Scheme for determining the output bad bolometer mask}
                 helpkey *
                 default OR
             }
@@ -1470,12 +1470,12 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-            parameter bpm {
+            parameter bbm {
                 type NDF
                 access READ
                 vpath DEFAULT
                 ppath CURRENT DEFAULT
-                prompt {Bad pixel masks}
+                prompt {Bad bolometer masks}
                 default !
                 helpkey *
             }
@@ -1734,12 +1734,12 @@ package @PACKAGE@ {
 
             helplib {$SMURF_HELP}
 
-            parameter bpm {
+            parameter bbm {
                 type NDF
                 access READ
                 vpath DEFAULT
                 ppath CURRENT DEFAULT
-                prompt {Bad pixel masks}
+                prompt {Bad bolometer masks}
                 default !
                 helpkey *
             }
@@ -1912,12 +1912,12 @@ package @PACKAGE@ {
 
             helplib {$SMURF_HELP}
 
-            parameter bpm {
+            parameter bbm {
                 type NDF
                 access READ
                 vpath DEFAULT
                 ppath CURRENT DEFAULT
-                prompt {Bad pixel masks}
+                prompt {Bad bolometer masks}
                 default !
                 helpkey *
             }
@@ -2447,12 +2447,12 @@ package @PACKAGE@ {
 
             helplib {$SMURF_HELP}
 
-            parameter bpm {
+            parameter bbm {
                 type NDF
                 access READ
                 vpath DEFAULT
                 ppath CURRENT DEFAULT
-                prompt {Bad pixel masks}
+                prompt {Bad bolometer masks}
                 default !
                 helpkey *
             }
@@ -2675,12 +2675,12 @@ package @PACKAGE@ {
 
             helplib {$SMURF_HELP}
 
-            parameter bpm {
+            parameter bbm {
                 type NDF
                 access READ
                 vpath DEFAULT
                 ppath CURRENT DEFAULT
-                prompt {Bad pixel masks}
+                prompt {Bad bolometer masks}
                 default !
                 helpkey *
             }

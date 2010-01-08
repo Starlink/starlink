@@ -24,8 +24,8 @@
 *     SCUBA-2 time series file.
 
 *  ADAM Parameters:
-*     BPM = NDF (Read)
-*          Group of files to be used as bad pixel masks. Each data file
+*     BBM = NDF (Read)
+*          Group of files to be used as bad bolometer masks. Each data file
 *          specified with the IN parameter will be masked. The corresponding
 *          previous mask for a subarray will be used. If there is no previous
 *          mask the closest following will be used. It is not an error for
@@ -86,6 +86,8 @@
 *        Add BPM masking.
 *     2009-03-30 (TIMJ):
 *        Add OUTFILES parameter.
+*     2010-01-08 (AGG):
+*        Change BPM to BBM.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -93,7 +95,7 @@
 *     correction has already been applied.
 
 *  Copyright:
-*     Copyright (C) 2006, 2008 University of British Columbia.
+*     Copyright (C) 2006-2010 University of British Columbia.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 *     All Rights Reserved.
@@ -150,7 +152,7 @@
 void smurf_remsky( int * status ) {
 
   /* Local Variables */
-  smfArray *bpms = NULL;     /* Bad pixel masks */
+  smfArray *bbms = NULL;     /* Bad bolometer masks */
   smfArray *darks = NULL;    /* Dark data */
   Grp *fgrp = NULL;          /* Filtered group, no darks */
   size_t i;                  /* Loop counter */
@@ -195,8 +197,8 @@ void smurf_remsky( int * status ) {
 
   if (*status != SAI__OK) goto CLEANUP;
 
-  /* Get group of pixel masks and read them into a smfArray */
-  smf_request_mask( "BPM", &bpms, status );
+  /* Get group of bad bolometer masks and read them into a smfArray */
+  smf_request_mask( "BBM", &bbms, status );
 
   /* Get sky subtraction METHOD */
   parChoic( "METHOD", "PLANE", "Plane, Polynomial", 1,  method,
@@ -219,8 +221,8 @@ void smurf_remsky( int * status ) {
     for (i=1; i<=size; i++) {
       /* This seems inefficient but it works */
       smf_open_and_flatfield( igrp, ogrp, i, darks, &odata, status );
-      /* Mask out bad pixels - mask data array not quality array */
-      smf_apply_mask( odata, NULL, bpms, SMF__BPM_DATA, status );
+      /* Mask out bad bolometers - mask data array not quality array */
+      smf_apply_mask( odata, NULL, bbms, SMF__BBM_DATA, status );
       smf_close_file( &odata, status);
     }
     /* Group output files together now that they exist */
@@ -239,8 +241,8 @@ void smurf_remsky( int * status ) {
       /* Flatfield - if necessary */
       smf_open_and_flatfield( igrp, ogrp, i, darks, &odata, status );
 
-      /* Mask out bad pixels - mask data array not quality array */
-      smf_apply_mask( odata, NULL, bpms, SMF__BPM_DATA, status );
+      /* Mask out bad bolometers - mask data array not quality array */
+      smf_apply_mask( odata, NULL, bbms, SMF__BBM_DATA, status );
 
       if (*status != SAI__OK) {
         /* Tell the user which file it was... */
@@ -281,7 +283,7 @@ void smurf_remsky( int * status ) {
   /* Tidy up after ourselves: release the resources used by the grp routines  */
  CLEANUP:
   if (darks) smf_close_related( &darks, status );
-  if (bpms) smf_close_related( &bpms, status );
+  if (bbms) smf_close_related( &bbms, status );
   grpDelet( &igrp, status);
   grpDelet( &ogrp, status);
 

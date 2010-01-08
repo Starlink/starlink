@@ -25,8 +25,8 @@
 *    of the fit added to the NDF.
 
 *  ADAM Parameters:
-*     BPM = NDF (Read)
-*          Group of files to be used as bad pixel masks. Each data file
+*     BBM = NDF (Read)
+*          Group of files to be used as bad bolometer masks. Each data file
 *          specified with the IN parameter will be masked. The corresponding
 *          previous mask for a subarray will be used. If there is no previous
 *          mask the closest following will be used. It is not an error for
@@ -69,13 +69,15 @@
 *        Add bad pixel masking. Do not trap SMF__FLATN.
 *     2009-03-30 (TIMJ):
 *        Add OUTFILES parameter.
+*     2010-01-08 (AGG):
+*        Change BPM to BBM.
 *     {enter_further_changes_here}
 
 *  Notes:
 
-*  Copyright: 
+*  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
-*     Copyright (C) 2006 University of British Columbia. All Rights
+*     Copyright (C) 2006, 2010 University of British Columbia. All Rights
 *     Reserved.
 
 *  Licence:
@@ -128,8 +130,8 @@
 
 void smurf_scanfit( int * status ) {
 
-  smfArray *bpms = NULL;     /* Bad pixel masks */
-  smfArray *darks = NULL;   /* Dark data */
+  smfArray *bbms = NULL;     /* Bad bolometer masks */
+  smfArray *darks = NULL;    /* Dark data */
   smfData *ffdata = NULL;    /* Pointer to output data struct */
   Grp *fgrp = NULL;          /* Filtered group, no darks */
   size_t i = 0;              /* Loop counter */
@@ -167,8 +169,8 @@ void smurf_scanfit( int * status ) {
   /* Get order of polynomial */
   parGet0i( "ORDER", &order, status);
 
-  /* Get group of pixel masks and read them into a smfArray */
-  smf_request_mask( "BPM", &bpms, status );
+  /* Get group of bad bolometer masks and read them into a smfArray */
+  smf_request_mask( "BBM", &bbms, status );
 
   /* Loop over all files */
   for (i=1; i<=size; i++) {
@@ -183,8 +185,8 @@ void smurf_scanfit( int * status ) {
       errRep(FUNC_NAME, "Unable to flatfield data from file ^I of ^N", status);
     }
 
-    /* Mask out bad pixels - mask data array not quality array */
-    smf_apply_mask( ffdata, NULL, bpms, SMF__BPM_DATA, status );
+    /* Mask out bad bolometers - mask data array not quality array */
+    smf_apply_mask( ffdata, NULL, bbms, SMF__BBM_DATA, status );
 
     smf_scanfit( ffdata, NULL, order, status );
 
@@ -201,7 +203,7 @@ void smurf_scanfit( int * status ) {
 
   /* Tidy up after ourselves */
   if (darks) smf_close_related( &darks, status );
-  if (bpms) smf_close_related( &bpms, status );
+  if (bbms) smf_close_related( &bbms, status );
   grpDelet( &igrp, status);
   grpDelet( &ogrp, status);
 

@@ -30,7 +30,7 @@
 *     raw dark files or the output from CALCDARK.
 
 *  ADAM Parameters:
-*     BPM = NDF (Read)
+*     BBM = NDF (Read)
 *          Group of files to be used as bad bolometer masks. Each data file
 *          specified with the IN parameter will be masked. The corresponding
 *          previous mask for a subarray will be used. If there is no previous
@@ -45,7 +45,7 @@
 *          VERBOSE, DEBUG or ALL. [NORMAL]
 *     OUT = NDF (Write)
 *          Output dark files. These can be used as bad bolometer masks
-*          in subsequent processing steps via the BPM parameter in
+*          in subsequent processing steps via the BBM parameter in
 *          other SCUBA-2 SMURF commands.
 
 *  Related Applications:
@@ -59,15 +59,17 @@
 *  History:
 *     2008-08-22 (TIMJ):
 *        Initial version.
-*     2008-11-12 (AGG)
+*     2008-11-12 (AGG):
 *        Check status before beginning loop
 *     2008-12-12 (TIMJ):
 *        Allow BPM masking.
+*     2010-01-08 (AGG):
+*        Change BPM to BBM.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council,
-*     the University of British Columbia.
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2010 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -117,7 +119,7 @@
 
 void smurf_calcdark( int *status ) {
 
-  smfArray *bpms = NULL;    /* Bad bolometer masks */
+  smfArray *bbms = NULL;    /* Bad bolometer masks */
   smfArray *darks = NULL;   /* set of processed darks */
   Grp *dgrp = NULL;         /* Group of darks */
   size_t i;                 /* Loop index */
@@ -145,7 +147,7 @@ void smurf_calcdark( int *status ) {
              &ogrp, &outsize, status );
 
   /* Get group of bolometer masks and read them into a smfArray */
-  smf_request_mask( "BPM", &bpms, status );
+  smf_request_mask( "BBM", &bbms, status );
 
   for (i=1; i<=size && *status == SAI__OK; i++ ) {
     smfData * dark = (darks->sdata)[i-1]; /* This dark */
@@ -154,7 +156,7 @@ void smurf_calcdark( int *status ) {
        since we do not want to get a large file the wrong size */
     ndgNdfas( dgrp, i, "READ", &indf, status );
 
-    smf_apply_mask( dark, NULL, bpms, SMF__BPM_DATA, status );
+    smf_apply_mask( dark, NULL, bbms, SMF__BBM_DATA, status );
     smf_write_smfData( dark, NULL, NULL, NULL, ogrp, i, indf, status );
     ndfAnnul( &indf, status);
   }
@@ -163,7 +165,7 @@ void smurf_calcdark( int *status ) {
   grpDelet( &dgrp, status);
   grpDelet( &ogrp, status);
   smf_close_related( &darks, status );
-  smf_close_related( &bpms, status );
+  smf_close_related( &bbms, status );
 
   ndfEnd( status );
 }

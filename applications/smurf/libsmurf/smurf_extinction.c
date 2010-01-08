@@ -24,8 +24,8 @@
 *     of ways.
 
 *  ADAM Parameters:
-*     BPM = NDF (Read)
-*          Group of files to be used as bad pixel masks. Each data file
+*     BBM = NDF (Read)
+*          Group of files to be used as bad bolometer masks. Each data file
 *          specified with the IN parameter will be masked. The corresponding
 *          previous mask for a subarray will be used. If there is no previous
 *          mask the closest following will be used. It is not an error for
@@ -144,12 +144,14 @@
 *        Add OUTFILES parameter.
 *     2009-09-29 (EC):
 *        Move parsing of tausrc and extmeth into smf_get_extpar
+*     2010-01-08 (AGG):
+*        Change BPM to BBM.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 *     Copyright (C) 2005 Particle Physics and Astronomy Research
-*     Council. Copyright (C) 2005-2008 University of British
+*     Council. Copyright (C) 2005-2010 University of British
 *     Columbia. All Rights Reserved.
 
 *  Licence:
@@ -204,7 +206,7 @@
 void smurf_extinction( int * status ) {
 
   /* Local Variables */
-  smfArray *bpms = NULL;     /* Bad pixel masks */
+  smfArray *bbms = NULL;     /* Bad bolometer masks */
   smfArray *darks = NULL;    /* Dark data */
   Grp *fgrp = NULL;          /* Filtered group, no darks */
   int has_been_sky_removed = 0;/* Data are sky-removed */
@@ -247,7 +249,7 @@ void smurf_extinction( int * status ) {
   }
 
   /* Get group of pixel masks and read them into a smfArray */
-  smf_request_mask( "BPM", &bpms, status );
+  smf_request_mask( "BBM", &bbms, status );
 
   /* Get tau source */
   parChoic( "TAUSRC", "CSOTAU",
@@ -283,7 +285,7 @@ void smurf_extinction( int * status ) {
     }
 
     /* Mask out bad pixels - mask data array not quality array */
-    smf_apply_mask( odata, NULL, bpms, SMF__BPM_DATA, status );
+    smf_apply_mask( odata, NULL, bbms, SMF__BBM_DATA, status );
 
     /* Now check that the data are sky-subtracted */
     if ( !smf_history_check( odata, "smf_subtract_plane", status ) ) {
@@ -349,7 +351,7 @@ void smurf_extinction( int * status ) {
 
   /* Tidy up after ourselves: release the resources used by the grp routines  */
   if (darks) smf_close_related( &darks, status );
-  if (bpms) smf_close_related( &bpms, status );
+  if (bbms) smf_close_related( &bbms, status );
   grpDelet( &igrp, status);
   grpDelet( &ogrp, status);
   if( keymap ) keymap = astAnnul( keymap );

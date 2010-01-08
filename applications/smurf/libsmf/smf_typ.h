@@ -300,12 +300,12 @@ typedef enum smf_dark_sub_meth {
   SMF__DKSUB_CHOOSE       /* Use one of mean, prev or next */
 } smf_dark_sub_meth;
 
-/* Ways of applying a bad pixel mask - equivalent to bits */
-typedef enum smf_bpm_meth {
-  SMF__BPM_DATA=1,        /* Apply mask to dat array */
-  SMF__BPM_QUAL=2,        /* Apply mask to quality array */
-  SMF__BPM_QQUAL=4        /* Apply mask to first slice of quality array */
-} smf_bpm_meth;
+/* Ways of applying a bad bolometer mask - equivalent to bits */
+typedef enum smf_bbm_meth {
+  SMF__BBM_DATA=1,        /* Apply mask to dat array */
+  SMF__BBM_QUAL=2,        /* Apply mask to quality array */
+  SMF__BBM_QQUAL=4        /* Apply mask to first slice of quality array */
+} smf_bbm_meth;
 
 /* Parts of a header that can have their metadata fixed */
 typedef enum smf_metadata_fixups {

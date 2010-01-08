@@ -17,7 +17,7 @@
 *     smf_iteratemap(smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 *                    const Grp *bolrootgrp,
 *                    AstKeyMap *keymap, const smfArray * darks,
-*                    const smfArray *bpms,
+*                    const smfArray *bbms,
 *                    AstFrameSet *outfset, int moving, int *lbnd_out,
 *                    int *ubnd_out, size_t maxmem, double *map,
 *                    int *hitsmap, double *mapvar, double
@@ -38,7 +38,7 @@
 *        keymap containing parameters to control map-maker
 *     darks = const smfArray * (Given)
 *        Collection of dark frames. Can be NULL.
-*     bpms = smfArray * (Given)
+*     bbms = smfArray * (Given)
 *        Masks for each subarray (e.g. returned by smf_reqest_mask call)
 *     outfset = AstFrameSet* (Given)
 *        Frameset containing the sky->output map mapping if calculating
@@ -229,6 +229,8 @@
 *        after each iteration (matching style of bolomap and bolrootgrp).
 *     2009-11-13 (EC):
 *        If chi^2 increases don't set converged flag; warn user.
+*     2010-01-08 (AGG):
+*        Change BPM to BBM.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -236,7 +238,7 @@
 *  Copyright:
 *     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
-*     Copyright (C) 2006-2009 University of British Columbia
+*     Copyright (C) 2006-2010 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -253,7 +255,7 @@
 *     You should have received a copy of the GNU General Public
 *     License along with this program; if not, write to the Free
 *     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-*     MA 02111-1307, USA
+*     MA 02111-1307, USA.
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -287,7 +289,7 @@
 void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      const Grp *bolrootgrp,
                      AstKeyMap *keymap, const smfArray *darks,
-                     const smfArray *bpms,
+                     const smfArray *bbms,
                      AstFrameSet *outfset, int moving, int *lbnd_out,
                      int *ubnd_out, size_t maxmem, double *map,
                      int *hitsmap, double *mapvar,
@@ -860,7 +862,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         res = smf_malloc( nchunks, sizeof(*res), 1, status );
 
         /* Concatenate (no variance since we calculate it ourselves -- NOI) */
-        smf_concat_smfGroup( wf, igroup, darks, bpms, contchunk, 1, 0, outfset,
+        smf_concat_smfGroup( wf, igroup, darks, bbms, contchunk, 1, 0, outfset,
                              moving, lbnd_out, ubnd_out, padStart, padEnd,
                              SMF__NOCREATE_VARIANCE, &res[0], status );
 
