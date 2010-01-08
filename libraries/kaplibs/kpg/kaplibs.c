@@ -769,57 +769,6 @@ void kpg1Mxmnd( int bad, int el, double *array, int *ninval, double *maxmum,
 
 /* ------------------------------- */
 
-F77_SUBROUTINE(kpg1_fit1d)( INTEGER(LBND), 
-                            INTEGER(UBND), 
-                            DOUBLE_ARRAY(Y), 
-                            DOUBLE_ARRAY(X), 
-                            DOUBLE(M), 
-                            DOUBLE(C),
-                            DOUBLE(RMS),
-                            INTEGER(STATUS) );
-
-void kpg1Fit1d( int lbnd, int ubnd, double *y, double *x, double *m, 
-                double *c, double *rms, int *status ){
-
-   DECLARE_INTEGER(LBND);
-   DECLARE_INTEGER(UBND);
-   DECLARE_DOUBLE_ARRAY_DYN(X);
-   DECLARE_DOUBLE_ARRAY_DYN(Y);
-   DECLARE_DOUBLE(M);
-   DECLARE_DOUBLE(C);
-   DECLARE_DOUBLE(RMS);
-   DECLARE_INTEGER(STATUS);
-
-   F77_EXPORT_INTEGER( lbnd, LBND );
-   F77_EXPORT_INTEGER( ubnd, UBND );
-   F77_CREATE_DOUBLE_ARRAY( X, x );
-   F77_ASSOC_DOUBLE_ARRAY( X, x );
-   F77_CREATE_DOUBLE_ARRAY( Y, y );
-   F77_ASSOC_DOUBLE_ARRAY( Y, y );
-   F77_EXPORT_INTEGER( *status, STATUS );
-
-   F77_CALL(kpg1_fit1d)( INTEGER_ARG(&LBND),
-                         INTEGER_ARG(&UBND),
-                         DOUBLE_ARRAY_ARG(Y),
-                         DOUBLE_ARRAY_ARG(X),
-                         DOUBLE_ARG(&M),
-                         DOUBLE_ARG(&C),
-                         DOUBLE_ARG(&RMS),
-                         INTEGER_ARG(&STATUS) );
-
-   F77_IMPORT_INTEGER( STATUS, *status );
-   F77_IMPORT_DOUBLE( M, *m );
-   F77_IMPORT_DOUBLE( C, *c );
-   F77_IMPORT_DOUBLE( RMS, *rms );
-
-   F77_FREE_DOUBLE( X );
-   F77_FREE_DOUBLE( Y );
-
-}
-
-
-/* ------------------------------- */
-
 F77_SUBROUTINE(kpg1_medud)( LOGICAL(BAD),  
                             INTEGER(EL), 
                             DOUBLE_ARRAY(ARRAY),
