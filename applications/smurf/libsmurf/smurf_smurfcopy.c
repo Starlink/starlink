@@ -4,7 +4,7 @@
 *     SMURFCOPY
 
 *  Purpose:
-*     Copy a 2d image out of a time series file
+*     Copy a 2d image out of a time series file.
 
 *  Language:
 *     Starlink ANSI C
@@ -20,18 +20,18 @@
 *        Pointer to global status.
 
 *  Description:
-*     This task can be used to extract data from a file for a particular
-*     time slice. The world coordinates will be valid on this slice so 
-*     the data can be used for display or image overlay (e.g. when using
-*     the KAPPA OUTLINE command to determine where this slice lay in relation to
-*     the reconstructed map).
+*     This task can be used to extract data from a file for a
+*     particular time slice. The world coordinates will be valid on
+*     this slice so the data can be used for display or image overlay
+*     (e.g. when using the KAPPA OUTLINE command to determine where
+*     this slice lies in relation to the reconstructed map).
 *
 *     KAPPA NDFCOPY will not add the specific astrometry information when
-*     used to extract a slice and so can not be used when WCS is required.
+*     used to extract a slice and so cannot be used when WCS is required.
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
-*          Input file. Can not be a DARK frame. If the input file is
+*          Input file. Cannot be a DARK frame. If the input file is
 *          raw data it will be flatfielded before writing out. This allows
 *          a reasonable bad pixel mask to be applied.
 *     MSG_FILTER = _CHAR (Read)
@@ -59,7 +59,7 @@
 *     {enter_further_changes_here}
 
 *  Notes:
-*     - Currently, this routine can not support multiple input files
+*     - Currently, this routine cannot support multiple input files
 *     or multiple indices from a single input file. Once extracted the
 *     output file can no longer be processed by SMURF routines.
 *     - Currently only understands SCUBA-2 data.
@@ -231,7 +231,7 @@ void smurf_smurfcopy ( int * status ) {
     /* cleanup */
     smf_close_file( &data, status );
     smf_close_file( &odata, status );
-                   
+
   }
 
   /* tidy */

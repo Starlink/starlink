@@ -25,27 +25,27 @@
 *     SMURF and related material; it describes individual commands in
 *     detail.
 *
-*     Here are some of the main options.
-*        smurfhelp
+*     Here are some of the main options:
+*       - smurfhelp
 *           No parameter is given so the introduction and the top-level
 *           help index is displayed.
-*        smurfhelp application/topic
+*       - smurfhelp application/topic
 *           This gives help about the specified application or topic.
-*        smurfhelp application/topic subtopic
+*       - smurfhelp application/topic subtopic
 *           This lists help about a subtopic of the specified
 *           application or topic. The hierarchy of topics has a maximum
 *           of four levels.
-*        smurfhelp Hints
+*       - smurfhelp Hints
 *           This gives hints for new and intermediate users.
-*        smurfhelp summary
+*       - smurfhelp summary
 *           This shows a one-line summary of each application.
-*        smurfhelp classified classification
+*       - smurfhelp classified classification
 *           This lists a one-line summary of each application in the
 *           given functionality classification.
 *
-*     See the Section "Navigating the Help Library" for details how to
-*     move around the help information, and to select the topics you
-*     want to view.
+*     See the Section "Navigating the Help Library" below for details
+*     how to move around the help information, and to select the
+*     topics you want to view.
 
 *  Usage:
 *     smurfhelp [topic] [subtopic] [subsubtopic] [subsubsubtopic]
@@ -61,7 +61,7 @@
 *        Topic for which help is to be given. [" "]
 
 *  Algorithm:
-*     -  Call shlAdam
+*     -  Calls shlAdam
 
 *  Implementation Status:
 *     -  Uses the portable help system.
@@ -76,25 +76,25 @@
 *     describe the topic.
 *
 *     At a prompt you may enter:
-*        o  a topic and/or subtopic name(s) to display the help for that
+*        -  a topic and/or subtopic name(s) to display the help for that
 *           topic or subtopic, so for example, "block parameters box"
 *           gives help on BOX, which is a subtopic of Parameters, which
 *           in turn is a subtopic of BLOCK;
 *
-*        o  a <CR> to see more text at a "Press RETURN to continue ..."
+*        -  a <CR> to see more text at a "Press RETURN to continue ..."
 *           request;
 *
-*        o  a <CR>} at topic and subtopic prompts to move up one level
+*        -  a <CR>} at topic and subtopic prompts to move up one level
 *           in the hierarchy, and if you are at the top level it will
 *           terminate the help session;
 *
-*        o  a CTRL/D (pressing the CTRL and D keys simultaneously) in
+*        -  a CTRL/D (pressing the CTRL and D keys simultaneously) in
 *           response to any prompt will terminate the help session;
 *
-*        o  a question mark "?" to redisplay the text for the current
+*        -  a question mark "?" to redisplay the text for the current
 *           topic, including the list of topic or subtopic names; or
 *
-*        o  an ellipsis "..." to display all the text below the
+*        -  an ellipsis "..." to display all the text below the
 *           current point in the hierarchy.  For example, "BLOCK..."
 *           displays information on the BLOCK topic as well as
 *           information on all the subtopics under BLOCK.
@@ -102,23 +102,23 @@
 *     You can abbreviate any topic or subtopic using the following
 *     rules.
 *
-*        o  Just give the first few characters, e.g. "PARA" for
+*        -  Just give the first few characters, e.g. "PARA" for
 *           Parameters.
 *
-*        o  Some topics are composed of several words separated by
+*        -  Some topics are composed of several words separated by
 *           underscores.  Each word of the keyword may be abbreviated,
 *           e.g. "Colour_Set" can be shortened to "C_S".
 *
-*        o  The characters "%" and "*" act as wildcards, where the
+*        -  The characters "%" and "*" act as wildcards, where the
 *           percent sign matches any single character, and asterisk
 *           matches any sequence of characters.  Thus to display
 *           information on all available topics, type an asterisk in
 *           reply to a prompt.
 *
-*        o  If a word contains, but does end with an asterisk wildcard,
+*        -  If a word contains, but does end with an asterisk wildcard,
 *           it must not be truncated.
 *
-*        o  The entered string must not contain leading or embedded
+*        -  The entered string must not contain leading or embedded
 *           spaces.
 *
 *     Ambiguous abbreviations result in all matches being displayed.

@@ -4,7 +4,7 @@
 *     SKYNOISE
 
 *  Purpose:
-*     Generate a simulated sky background with spatial noise
+*     Generate a simulated sky background with spatial noise.
 
 *  Language:
 *     Starlink ANSI C
@@ -21,7 +21,7 @@
 
 *  Description:
 *     This generates a simulated sky background with spatial noise
-*     gollowing a power law spectrum.
+*     following a power law spectrum.
 
 *  ADAM Parameters:
 *     FILENAME = _CHAR (Write)
@@ -31,22 +31,22 @@
 *          NONE (no messages), QUIET (minimal messages), NORMAL,
 *          VERBOSE, DEBUG or ALL. [NORMAL]
 *     OBSPAR = GROUP (Read)
-*          Specifies values for the observation parameters used by 
-*          skynoise generation. 
+*          Specifies values for the observation parameters used for
+*          skynoise generation.
 *
-*          The supplied value should be either a 
-*          comma-separated list of strings or the name of a text 
-*          file preceded by an up-arrow character "^", containing 
-*          one or more comma-separated (or line-break separated) 
-*          list of strings. Each string is either a "keyword=value" 
-*          setting, or the name of a text file preceded by an up-arrow 
-*          character "^". Such text files should contain further 
-*          comma-separated lists which will be read and interpreted 
-*          in the same manner (any blank lines or lines beginning 
-*          with "#" are ignored). Within a text file, newlines can 
-*          be used as delimiters as well as commas. Settings are 
-*          applied in the order in which they occur within the list, 
-*          with later settings over-riding any earlier settings given 
+*          The supplied value should be either a
+*          comma-separated list of strings or the name of a text
+*          file preceded by an up-arrow character "^", containing
+*          one or more comma-separated (or line-break separated)
+*          lists of strings. Each string is either a "keyword=value"
+*          setting, or the name of a text file preceded by an up-arrow
+*          character "^". Such text files should contain further
+*          comma-separated lists which will be read and interpreted
+*          in the same manner (any blank lines or lines beginning
+*          with "#" are ignored). Within a text file, newlines can
+*          be used as delimiters, as well as commas. Settings are
+*          applied in the order in which they occur within the list,
+*          with later settings over-riding any earlier settings given
 *          for the same keyword.
 *
 *          Each individual setting should be of the form:
@@ -55,14 +55,14 @@
 *
 *          The parameter names and their default values are listed
 *          below.  The default values will be used for any unspecified
-*          parameters.  Unregnized parameters are ignored (i.e. no
+*          parameters.  Unrecognized parameters are ignored (i.e. no
 *          error is reported).
 *     SEED = INTEGER (Read)
 *          Seed for random number generator.  If a seed
 *          is not specified, the clock time in milliseconds
 *          is used.
 *     SIMPAR = GROUP (Read)
-*          Specifies values for the simulation parameters.  See 
+*          Specifies values for the simulation parameters.  See
 *          the description for OBSFILE for the file format.
 *
 *          The parameter names and their default values are listed
@@ -71,24 +71,24 @@
 *          error is reported).
 
 *  Observation Parameters:
-*     lambda (double) : 0.85e-3 (metres)
-*          Wavelength of observation.
+*     lambda (DOUBLE)
+*          Wavelength of observation in m. [0.85e-3]
 
 *  Simulation Parameters:
-*     aomega (double) : 0,179
+*     aomega (DOUBLE)
 *         Coupling factor (0.179 for 850 microns,
-*         0.721 for 450 microns).
-*     atmname (char[]) : ""
-*         Name of the file containing atmospheric
+*         0.721 for 450 microns). [0.179]
+*     atmname (CHAR)
+*         Name of the file containing the atmospheric
 *         sky image.
-*     atmrefnu (double) : 0.5 (Hz)
-*         Atm reference corner frequency.
-*     atmrefvel (double) : 15.0 (m/sec)
-*         Atm reference velocity.
-*     bandGHz (double) : 35.0 (GHz)
-*         Bandwidth in GHz.
-*     tauzen (double) : 0.052583
-*         Optical depth at 225 GHz at the zenith.
+*     atmrefnu (DOUBLE)
+*         Atmospheric reference corner frequency in Hz. [0.5]
+*     atmrefvel (DOUBLE)
+*         Atmospheric reference velocity in m/s. [15.0]
+*     bandGHz (DOUBLE)
+*         Bandwidth in GHz. [35.0]
+*     tauzen (DOUBLE)
+*         Optical depth at 225 GHz at the zenith. [0.052583]
 
 *  Related Applications:
 *     SMURF: SC2SIM
@@ -99,9 +99,9 @@
 *     {enter_new_authors_here}
 
 *  History :
-*     2003-11-12: 
+*     2003-11-12:
 *        Original version (BDK)
-*     2006-09-26: 
+*     2006-09-26:
 *        Converted to smurf_skynoise (JB)
 *     2007-06-27 (EC):
 *        - Removed sigma from interface to sc2sim_invf2d; it will now be used
@@ -199,15 +199,15 @@ void smurf_skynoise ( int *status ) {
    int ubnd[2];                    /* Upper bounds of pixel array */
 
    ndfBegin ();
- 
+
    /* Get input parameters */
    kpg1Gtgrp ("OBSPAR", &obsGrp, &osize, status );
    kpg1Kymap ( obsGrp, &obskeymap, status );
    kpg1Gtgrp ("SIMPAR", &simGrp, &ssize, status );
    kpg1Kymap ( simGrp, &simkeymap, status );
-   parGet0d ("EXPONENT", &exp, status ); 
+   parGet0d ("EXPONENT", &exp, status );
 
-   /* Seed random number generator, either with the time in 
+   /* Seed random number generator, either with the time in
       milliseconds, or from user-supplied seed */
    parGet0i ("SEED", &rseed, status);
    if ( *status == PAR__NULL ) {
@@ -219,7 +219,7 @@ void smurf_skynoise ( int *status ) {
    } else {
       msgSeti( "SEED", rseed );
       msgOutif(MSG__VERB," ","Seeding random numbers with ^SEED", status);
-   } 
+   }
    srand((unsigned int)rseed);
 
    /* Retrieve the simulation parameters */
@@ -237,12 +237,12 @@ void smurf_skynoise ( int *status ) {
       msgOutif(MSG__VERB," ","^FNAME already exists, overwriting.", status);
    }
 
-   /* 15m at 600m subtends 5156 arcsec */     
+   /* 15m at 600m subtends 5156 arcsec */
    pixsize = 2500.0; /* Arcsec */
    size = 512; /* Surely this should be a parameter? */
    corner = ( sinx.atmrefnu * 15.0 ) / ( sinx.atmrefvel * 5156.0 );
    spectrum = smf_malloc ( (size_t)(size*size*2), sizeof(*spectrum), 1, status );
- 
+
    lbnd[0] = 1;
    lbnd[1] = 1;
    ubnd[0] = lbnd[0] + size - 1;
@@ -257,21 +257,21 @@ void smurf_skynoise ( int *status ) {
    sc2sim_invf2d ( corner, exp, pixsize, size, atmsim, spectrum, status );
 
    /* Add the FITS data to the output file */
-   fitschan = astFitsChan ( NULL, NULL, " " ); 
+   fitschan = astFitsChan ( NULL, NULL, " " );
 
    astSetFitsF ( fitschan, "CORNER", corner, "corner frequency in 1/arcsec", 0 );
-   astSetFitsF ( fitschan, "EXPONENT", exp, 
+   astSetFitsF ( fitschan, "EXPONENT", exp,
                  "frequency exponent of inverse power law", 0 );
    astSetFitsF ( fitschan, "PIXSIZE", pixsize, "pixel separation in arcsec", 0 );
 
-   kpgPtfts ( indf, fitschan, status );   
+   kpgPtfts ( indf, fitschan, status );
 
    ndfUnmap ( indf, "DATA", status );
 
    spectrum = smf_free ( spectrum, status );
 
-   if ( simGrp ) grpDelet ( &simGrp, status ); 
-   if ( obsGrp ) grpDelet ( &obsGrp, status ); 
+   if ( simGrp ) grpDelet ( &simGrp, status );
+   if ( obsGrp ) grpDelet ( &obsGrp, status );
 
    ndfEnd ( status );
 

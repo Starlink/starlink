@@ -28,8 +28,14 @@
 *          Control the verbosity of the application. Values can be
 *          NONE (no messages), QUIET (minimal messages), NORMAL,
 *          VERBOSE, DEBUG or ALL. [NORMAL]
-*     NTHREAD = NDF (Read)
-*          Number of threads to use
+*     NCHUNKS = _INTEGER (Read)
+*          Number of time chunks. [2]
+*     NSUB = _INTEGER (Read)
+*          Number of subarrays. [4]
+*     NTHREAD = _INTEGER (Read)
+*          Number of threads to use. [2]
+*     TSTEPS = _INTEGER (Read)
+*          Number of time samples in simulated data chunk. [6000]
 
 *  Authors:
 *     Edward Chapin (UBC)
@@ -161,11 +167,11 @@ void smfParallelTime( void *job_data_ptr, int *status ) {
   /* Message indicating the thread started */
   msgSeti( "C1", data->chunk1);
   msgSeti( "C2", data->chunk2);
-  msgOutif( MSG__DEBUG, "",  
-            "-- parallel time: thread starting on chunks ^C1 -- ^C2", 
+  msgOutif( MSG__DEBUG, "",
+            "-- parallel time: thread starting on chunks ^C1 -- ^C2",
             status );
 
-  /* Loop over time chunk. Some chunks may be flagged to skip if 
+  /* Loop over time chunk. Some chunks may be flagged to skip if
      chunk1=nchunks */
   for( i=data->chunk1; (i<=data->chunk2)&&(i<data->nchunks)&&(*status==SAI__OK);
        i++ ) {
@@ -186,16 +192,16 @@ void smfParallelTime( void *job_data_ptr, int *status ) {
         /* --- Re-order the data --- */
         smf_dataOrder( array[i]->sdata[j], 0, status );
       }
-      
+
       smf_get_dims( array[i]->sdata[j], NULL, NULL, &nbolo, &ntslice, &ndata,
                     NULL, NULL, status );
-      
+
       if( data->type == 1 ) {
         /* --- Boxcar smooth the data --- */
         for( k=0; (*status==SAI__OK)&&(k<nbolo); k++ ) {
           val = array[i]->sdata[j]->pntr[0];
           val += k*ntslice;
-          
+
           /* Boxcar smooth each bolometer by 500 samples */
           smf_boxcar1D( val, ntslice, 500, NULL, 0, status );
         }
@@ -214,8 +220,8 @@ void smfParallelTime( void *job_data_ptr, int *status ) {
   /* Message indicating the thread started */
   msgSeti( "C1", data->chunk1);
   msgSeti( "C2", data->chunk2);
-  msgOutif( MSG__DEBUG, "",  
-            "-- parallel time: thread finished chunks ^C1 -- ^C2", 
+  msgOutif( MSG__DEBUG, "",
+            "-- parallel time: thread finished chunks ^C1 -- ^C2",
             status );
 }
 
@@ -224,7 +230,7 @@ void smfParallelTime( void *job_data_ptr, int *status ) {
 void smurf_sc2threadtest( int *status ) {
 
   /* Local Variables */
-  smfArray **res=NULL;       /* array of smfArrays of test data */ 
+  smfArray **res=NULL;       /* array of smfArrays of test data */
   smfData *data=NULL;        /* Pointer to SCUBA2 data struct */
   dim_t datalen;             /* Number of data points */
   smfFilter *filt=NULL;      /* Frequency domain filter */
@@ -272,8 +278,8 @@ void smurf_sc2threadtest( int *status ) {
   msgSeti("T",tsteps);
   msgSeti("C",nchunks);
   msgSeti("NS",nsub);
-  msgOut( "", TASK_NAME 
-          ": Creating ^NS subarrays of data with ^C chunks * ^T samples", 
+  msgOut( "", TASK_NAME
+          ": Creating ^NS subarrays of data with ^C chunks * ^T samples",
           status );
 
   res = smf_malloc( nchunks, sizeof(*res), 1, status );
@@ -286,7 +292,7 @@ void smurf_sc2threadtest( int *status ) {
       /* Create individual smfDatas and add to array */
       data = smf_create_smfData( SMF__NOCREATE_FILE |
                                  SMF__NOCREATE_DA, status );
-      
+
       if( *status==SAI__OK ) {
         data->dtype=SMF__DOUBLE;
         data->ndims=3;
@@ -295,11 +301,11 @@ void smurf_sc2threadtest( int *status ) {
         data->dims[2]=(dim_t) tsteps;
         datalen=1;
         for( j=0; j<data->ndims; j++ ) datalen *= data->dims[j];
-        
+
         data->hdr->steptime = 0.005;
-        
+
         data->pntr[0] = smf_malloc( datalen, smf_dtype_sz(data->dtype,status),
-                                    1, status ); 
+                                    1, status );
       }
 
       smf_addto_smfArray( res[k], data, status );
@@ -307,10 +313,10 @@ void smurf_sc2threadtest( int *status ) {
   }
 
   /*** TIMER ***/
-  msgOutf( "", "** %f seconds generating data", status, 
+  msgOutf( "", "** %f seconds generating data", status,
            smf_timerupdate(&tv1,&tv2,status) );
 
-  msgOut( "", TASK_NAME 
+  msgOut( "", TASK_NAME
           ": Starting test 1 __parallel time: dataOrder__", status );
 
   /* Create a pool of threads. */
@@ -319,7 +325,7 @@ void smurf_sc2threadtest( int *status ) {
   /* Work out number of chunks per thread */
   joblen = nchunks/nthread;
   if( joblen == 0 ) joblen = 1; /* At least one chunk per thread */
-    
+
   /* The first test will process separate time chunks of data in
      parallel, re-ordering each to bolo-ordered format. All subarrays
      and an integer number of input file chunks all go into a single
@@ -353,7 +359,7 @@ void smurf_sc2threadtest( int *status ) {
     if( pdata->chunk1 >= nchunks ) {
       /* Nothing for this thread to do */
       msgSeti( "W", i+1);
-      msgOutif( MSG__DEBUG, "",  
+      msgOutif( MSG__DEBUG, "",
                 "-- parallel time: skipping thread ^W, nothing to do",
                 status);
     } else {
@@ -368,13 +374,13 @@ void smurf_sc2threadtest( int *status ) {
   smf_wait( wf, status );
 
   /*** TIMER ***/
-  msgOutf( "", "** %f seconds to complete test", status, 
+  msgOutf( "", "** %f seconds to complete test", status,
            smf_timerupdate(&tv1,&tv2,status) );
 
   /* The second test will boxcar smooth bolometers from time chunks in
      parallel */
 
-  msgOut( "", TASK_NAME 
+  msgOut( "", TASK_NAME
           ": Starting test 2 __parallel time: boxcar smooth__", status );
 
   for( i=0; (i<(size_t)nthread) && (*status==SAI__OK); i++ ) {
@@ -385,7 +391,7 @@ void smurf_sc2threadtest( int *status ) {
     if( pdata->chunk1 >= nchunks ) {
       /* Nothing for this thread to do */
       msgSeti( "W", i+1);
-      msgOutif( MSG__DEBUG, "",  
+      msgOutif( MSG__DEBUG, "",
                 "-- parallel time: skipping thread ^W, nothing to do",
                 status);
     } else {
@@ -400,13 +406,13 @@ void smurf_sc2threadtest( int *status ) {
   smf_wait( wf, status );
 
   /*** TIMER ***/
-  msgOutf( "", "** %f seconds to complete test", status, 
+  msgOutf( "", "** %f seconds to complete test", status,
            smf_timerupdate(&tv1,&tv2,status) );
 
   /* The third test will FFT filter bolometers from time chunks in
      parallel */
 
-  msgOut( "", TASK_NAME 
+  msgOut( "", TASK_NAME
           ": Starting test 3 __parallel time: FFT filter__", status );
 
   for( i=0; (i<(size_t)nthread) && (*status==SAI__OK); i++ ) {
@@ -417,7 +423,7 @@ void smurf_sc2threadtest( int *status ) {
     if( pdata->chunk1 >= nchunks ) {
       /* Nothing for this thread to do */
       msgSeti( "W", i+1);
-      msgOutif( MSG__DEBUG, "",  
+      msgOutif( MSG__DEBUG, "",
                 "-- parallel time: skipping thread ^W, nothing to do",
                 status);
     } else {
@@ -432,12 +438,12 @@ void smurf_sc2threadtest( int *status ) {
   smf_wait( wf, status );
 
   /*** TIMER ***/
-  msgOutf( "", "** %f seconds to complete test", status, 
+  msgOutf( "", "** %f seconds to complete test", status,
            smf_timerupdate(&tv1,&tv2,status) );
 
 
-  msgOut( "", TASK_NAME 
-          ": Starting test 4 __FFTW filter using internal threading__", 
+  msgOut( "", TASK_NAME
+          ": Starting test 4 __FFTW filter using internal threading__",
           status );
 
   for( i=0; (*status==SAI__OK)&&(i<nchunks); i++ ) {
@@ -453,7 +459,7 @@ void smurf_sc2threadtest( int *status ) {
     if( filt ) filt = smf_free_smfFilter( filt, status );
   }
   /*** TIMER ***/
-  msgOutf( "", "** %f seconds to complete test", status, 
+  msgOutf( "", "** %f seconds to complete test", status,
            smf_timerupdate(&tv1,&tv2,status) );
 
   /* Series of short single-thread array index tests */
@@ -470,7 +476,7 @@ void smurf_sc2threadtest( int *status ) {
       dat[i*bstride + j*tstride] += 5;
     }
   }
-  msgOutf( "", "** %f seconds to complete test", status, 
+  msgOutf( "", "** %f seconds to complete test", status,
            smf_timerupdate(&tv1,&tv2,status) );
 
   msgOut("","Array index test #2: only index increments",status);
@@ -480,7 +486,7 @@ void smurf_sc2threadtest( int *status ) {
       dat[j] += 5;
     }
   }
-  msgOutf( "", "** %f seconds to complete test", status, 
+  msgOutf( "", "** %f seconds to complete test", status,
            smf_timerupdate(&tv1,&tv2,status) );
 
   msgOut("","Array index test #3: one multiply in outer loop",status);
@@ -493,7 +499,7 @@ void smurf_sc2threadtest( int *status ) {
       offset += tstride;
     }
   }
-  msgOutf( "", "** %f seconds to complete test", status, 
+  msgOutf( "", "** %f seconds to complete test", status,
            smf_timerupdate(&tv1,&tv2,status) );
 
   /* Clean up */

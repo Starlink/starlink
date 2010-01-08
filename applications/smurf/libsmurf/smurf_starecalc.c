@@ -35,7 +35,7 @@
 *          no mask to match. A NULL parameter indicates no mask files to be
 *          supplied. [!]
 *     IN = NDF (Read)
-*          Name of input data files
+*          Name of input data file(s).
 *     MSG_FILTER = _CHAR (Read)
 *          Control the verbosity of the application. Values can be
 *          NONE (no messages), QUIET (minimal messages), NORMAL,
@@ -46,9 +46,9 @@
 *          each input file to give output images which are 1-second
 *          averages. [!]
 *     OUT = NDF (Write)
-*          Name of output file containing STARE images
+*          Name of output file containing STARE images.
 *     OUTFILES = LITERAL (Write)
-*          The name of text file to create, in which to put the names of
+*          The name of a text file to create, in which to put the names of
 *          all the output NDFs created by this application (one per
 *          line). If a null (!) value is supplied no file is created. [!]
 
@@ -186,7 +186,7 @@ void smurf_starecalc ( int *status ) {
 	 how to interpret a negative value */
       naver = -1;
       errAnnul( status );
-      msgOutif(MSG__VERB, "", "Autocalculating NAVER to give 1-second images", 
+      msgOutif(MSG__VERB, "", "Autocalculating NAVER to give 1-second images",
 	       status);
     }
   }
@@ -206,7 +206,7 @@ void smurf_starecalc ( int *status ) {
       /* Tell the user which file it was... */
       msgSeti("I",i);
       msgSeti("N",size);
-      errRep(FUNC_NAME, 
+      errRep(FUNC_NAME,
 	     "Unable to produce STARE images for data from file ^I of ^N", status);
     }
     /* Free resources for output data */
