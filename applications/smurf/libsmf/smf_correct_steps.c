@@ -68,10 +68,12 @@
 *        stridify and fix numerous array index bugs
 *     2010-01-08 (EC):
 *        add flagging of all bolos at step locations
+*     2010-01-08 (TIMJ):
+*        Private routines must be static to hide them from others.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2009 Science and Technology Facilities Council.
+*     Copyright (C) 2009-2010 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2008-2010 University of British Columbia.
 *     All Rights Reserved.
@@ -118,9 +120,9 @@
 /* -------------------------------------------------------------------------- */
 /* Local routine for correcting baseline steps */
 
-void smf_correct_steps_baseline( double *dat, unsigned char *qua,
-                                 dim_t ntslice, size_t tstride,
-                                 double *alljump ) {
+static void smf__correct_steps_baseline( double *dat, unsigned char *qua,
+                                         dim_t ntslice, size_t tstride,
+                                         double *alljump ) {
   double baseline;
   size_t i;
 
@@ -357,8 +359,8 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
 
           /* calculate the new corrected baseline if requested */
           if( !dcflag ) {
-            smf_correct_steps_baseline( dat+i*bstride, qua+i*bstride,
-                                        ntslice, tstride, alljump );
+            smf__correct_steps_baseline( dat+i*bstride, qua+i*bstride,
+                                         ntslice, tstride, alljump );
           }
         }
       }
@@ -415,8 +417,8 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
             }
           }
 
-          smf_correct_steps_baseline( dat+i*bstride, qua+i*bstride,
-                                      ntslice, tstride, thisjump );
+          smf__correct_steps_baseline( dat+i*bstride, qua+i*bstride,
+                                       ntslice, tstride, thisjump );
         }
       }
 
