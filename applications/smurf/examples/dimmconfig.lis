@@ -100,6 +100,9 @@ dcbox = 200
 # if set flag entire bolo with DC step as bad instead of trying to repair
 dcbad = 1
 
+# if set flag/correct ALL bolometers at locations of DC steps
+#dcflagall = 1
+
 # S/N ratio to flag spikes with sigma-clipper
 # spikethresh = 5
 
@@ -171,6 +174,7 @@ noi.spikeiter = 0
 #noi.dcbox = 200
 #noi.dcthresh = 5
 #noi.dcbad = 1
+#noi.dcflagall = 1
 
 # iterative filter.
 flt.filt_edgehigh = 0.1
