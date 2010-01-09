@@ -359,9 +359,9 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
 
           /* calculate the new corrected baseline if requested */
           if( !dcflag ) {
-            smf_correct_steps_baseline( dat+i*bstride+istart*tstride,
-                                        qua+i*bstride+istart*tstride,
-                                        iend-istart, tstride, alljump+istart );
+            smf__correct_steps_baseline( dat+i*bstride+istart*tstride,
+                                         qua+i*bstride+istart*tstride,
+                                         iend-istart, tstride, alljump+istart );
           }
         }
       }
@@ -418,9 +418,9 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
             }
           }
 
-          smf_correct_steps_baseline( dat+i*bstride+istart*tstride,
-                                      qua+i*bstride+istart*tstride,
-                                      iend-istart, tstride, thisjump+istart );
+          smf__correct_steps_baseline( dat+i*bstride+istart*tstride,
+                                       qua+i*bstride+istart*tstride,
+                                       iend-istart, tstride, thisjump+istart );
         }
       }
 
