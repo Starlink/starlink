@@ -35,8 +35,6 @@
 *     before/after boundaries of the gap to avoid ringing when filters are
 *     applied.
 
-*  Notes:
-
 *  Authors:
 *     Edward Chapin (UBC)
 *     David Berry (JAC, Hawaii)
@@ -47,6 +45,8 @@
 *        Initial code stub
 *     2010-01-07 (DSB):
 *        Initial full version.
+*     2010-01-09 (DSB):
+*        Change to use GSL random number generator.
 
 *  Copyright:
 *     Copyright (C) 2010 Univeristy of British Columbia.
@@ -82,9 +82,12 @@
 /* SMURF includes */
 #include "libsmf/smf.h"
 #include "libsmf/smf_err.h"
-#include "libsc2sim/sc2sim.h"
 
-/* Other includes */
+/* System includes */
+#include <gsl/gsl_rng.h>
+#include <gsl/gsl_randist.h>
+
+/* Define the function name for error messages. */
 #define FUNC_NAME "smf_fillgaps"
 
 /* Define the width of the patch used to determine the mean level and
@@ -96,6 +99,7 @@ void  smf_fillgaps( smfData *data, unsigned char *quality, unsigned char mask,
                     int *status ) {
 
 /* Local Variables */
+  const gsl_rng_type *type;     /* GSL random number generator type */
   dim_t i;                      /* Bolometer index */
   dim_t j;                      /* Time-slice index */
   dim_t nbolo;                  /* Number of bolos */
@@ -114,6 +118,7 @@ void  smf_fillgaps( smfData *data, unsigned char *quality, unsigned char mask,
   double sigmar;                /* Standard deviation in right patch */
   double x[ BOX ];              /* Array of sample positions */
   double y[ BOX ];              /* Array of sample values */
+  gsl_rng *r;                   /* GSL random number generator */
   int count;                    /* No. of unflagged since last flagged sample */
   int flagged;                  /* Is the current sample flagged? */
   int inside;                   /* Was previous sample flagged? */
@@ -160,6 +165,10 @@ void  smf_fillgaps( smfData *data, unsigned char *quality, unsigned char mask,
     smf_get_dims( data,  NULL, NULL, &nbolo, &ntslice, NULL, &bstride, &tstride,
                   status );
   }
+
+  /* Create a default GSL random number generator. */
+  type = gsl_rng_default;
+  r = gsl_rng_alloc (type);
 
   /* Pre-calculate a useful constant - the final used value of "j". */
   jfinal = ntslice - 1;
@@ -330,7 +339,7 @@ void  smf_fillgaps( smfData *data, unsigned char *quality, unsigned char mask,
             if( sigma != VAL__BADD ) {
               for( jj = jstart; jj <= jend; jj++ ) {
                 dat[ i*bstride + jj*tstride ] = grad*jj + offset +
-                                                  sc2sim_drand( sigma );
+                                                gsl_ran_gaussian( r, sigma );
               }
             } 
           }
@@ -338,18 +347,10 @@ void  smf_fillgaps( smfData *data, unsigned char *quality, unsigned char mask,
       }
     }
   }
+
+  /* Free resources. */
+  gsl_rng_free( r );
+
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
