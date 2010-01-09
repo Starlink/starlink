@@ -360,7 +360,7 @@ static const size_t SMF__BADIDX = (size_t)-1;
 #define SMF__Q_MOD (SMF__Q_BADS|SMF__Q_BADB|SMF__Q_PAD) /* Samples that can't
                                                            be modified
                                                            by fitted models */
-#define SMF__Q_FIT ~(SMF__Q_APOD|SMF__Q_STAT)           /* Samples that can't
+#define SMF__Q_FIT ~(SMF__Q_APOD|SMF__Q_STAT|SMF__Q_JUMP)/*Samples that can't
                                                            be used to fit
                                                            time-domain models */
 
