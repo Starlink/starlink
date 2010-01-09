@@ -129,7 +129,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   /* Local Variables */
   size_t aiter;                 /* Actual iterations of sigma clipper */
   size_t bstride;               /* bolometer stride */
-  int dcbad;                    /* If set flag bolo as bad instead of repair */
+  int dcflag;                   /* flag for dc step finder/repairer */
   dim_t dcbox;                  /* Width of box for DC step detection */
   double dcthresh;              /* Threshold for DC step detection */
   dim_t i;                      /* Loop counter */
@@ -180,7 +180,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   if( kmap ) {
 
     /* Data-cleaning parameters  */
-    smf_get_cleanpar( kmap, NULL, NULL, &dcbox, &dcbad, &dcthresh,
+    smf_get_cleanpar( kmap, NULL, NULL, &dcbox, &dcflag, &dcthresh,
                       NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                       &spikethresh, &spikeiter, status );
   }
@@ -248,9 +248,8 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
                     "iterations", status, nflag, spikethresh, aiter);
         }
 
-        /* Flag bad detectors with DC steps in them */
         if( dcthresh && dcbox ) {
-          smf_correct_steps( res->sdata[idx], qua_data, dcthresh, dcbox, dcbad,
+          smf_correct_steps( res->sdata[idx], qua_data, dcthresh, dcbox, dcflag,
                              &nflag, status );
           msgOutiff(MSG__VERB, "","   detected %li bolos with DC steps\n",
                     status, nflag);

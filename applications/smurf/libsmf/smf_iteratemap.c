@@ -311,8 +311,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int converged=0;              /* Has stopping criteria been met? */
   smfDIMMData dat;              /* Struct passed around to model components */
   smfData *data=NULL;           /* Temporary smfData pointer */
-  int dcbad=0;                  /* Flag bolos with steps as bad, don't fix */
   dim_t dcbox=0;                /* Box size for fixing DC steps */
+  int dcflag=0;                 /* Flag for dc step finder/repairer */
   double dcthresh;              /* Threshold for fixing DC steps */
   int deldimm=0;                /* Delete temporary .DIMM files */
   int dimmflags;                /* Control flags for DIMM model components */
@@ -506,7 +506,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
 
     /* Data-cleaning parameters (should match SC2CLEAN) */
-    smf_get_cleanpar( keymap, &apod, &badfrac, &dcbox, &dcbad, &dcthresh,
+    smf_get_cleanpar( keymap, &apod, &badfrac, &dcbox, &dcflag, &dcthresh,
                       NULL, &f_edgelow, &f_edgehigh, f_notchlow,
                       f_notchhigh, &f_nnotch, &dofft, &flagstat, &baseorder,
                       &spikethresh, &spikeiter, status );
@@ -1094,9 +1094,11 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                 smf_subtract_poly( data, qua_data, 0, status );
               }
 
+              /* Flag bad detectors with DC steps in them */
+
               if( dcthresh && dcbox ) {
                 msgOutif(MSG__VERB," ", "  find bolos with steps...", status);
-                smf_correct_steps( data, qua_data, dcthresh, dcbox, dcbad,
+                smf_correct_steps( data, qua_data, dcthresh, dcbox, dcflag,
                                    &nflag, status );
                 msgOutiff(MSG__VERB, "","  ...%li flagged\n", status, nflag);
               }
