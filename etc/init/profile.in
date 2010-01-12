@@ -236,6 +236,12 @@ if test -f ${bindir}/datacube/datacube.csh; then
    export DATACUBE_HELP=${starhelpdir}/datacube/datacube
 fi
 
+#  ECHOMOP
+
+if test -f ${bindir}/echomop/echomop.sh; then
+   export ECHOMOP_DIR=${bindir}/echomop
+fi
+
 #  ESP
 
 if test -f ${bindir}/esp/esp.sh; then
@@ -521,6 +527,16 @@ if test -f ${bindir}/dipso/dipsosetup.sh; then
 else
   dipsosetup () { ${STARLINK_DIR}/etc/notinst dipsosetup; }
   dipso () { ${STARLINK_DIR}/etc/notinst dipso; }
+fi
+
+# ECHOMOP
+
+if test -f ${bindir}/echomop/echomop.sh; then
+ echomop () { . $ECHOMOP_DIR/echomop.sh; }
+ echomopsetup () { . $ECHOMOP_DIR/echomop.sh; }
+else
+ echomop () { ${STARLINK_DIR}/etc/notinst esp; }
+ echomopsetup () { ${STARLINK_DIR}/etc/notinst esp; }
 fi
 
 # ESP
