@@ -80,10 +80,12 @@
 *        - Remove NOISAMP/NOICHUNK related parameters since they aren't used
 *     2009-07-31 (EC)
 *        - handle 2d variance arrays
+*     2010-01-12 (EC)
+*        - Handle gap filling
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
-*     Copyright (C) 2005-2009 University of British Columbia.
+*     Copyright (C) 2005-2010 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -132,6 +134,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   int dcflag;                   /* flag for dc step finder/repairer */
   dim_t dcbox;                  /* Width of box for DC step detection */
   double dcthresh;              /* Threshold for DC step detection */
+  int fillgaps;                 /* If set perform gap filling */
   dim_t i;                      /* Loop counter */
   dim_t id;                     /* Loop counter */
   dim_t idx=0;                  /* Index within subgroup */
@@ -181,7 +184,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
     /* Data-cleaning parameters  */
     smf_get_cleanpar( kmap, NULL, NULL, &dcbox, &dcflag, &dcthresh, NULL, 
-                      NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+                      &fillgaps, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                       &spikethresh, &spikeiter, status );
   }
 
@@ -253,6 +256,11 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
                              &nflag, status );
           msgOutiff(MSG__VERB, "","   detected %li bolos with DC steps\n",
                     status, nflag);
+        }
+
+        if( fillgaps ) {
+          msgOutif(MSG__VERB," ", "   gap filling", status);
+          smf_fillgaps( res->sdata[idx], qua_data, SMF__Q_GAP, status );
         }
       }
 
