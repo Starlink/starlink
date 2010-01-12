@@ -71,8 +71,6 @@ void atlMapCopy( AstKeyMap * destkm, AstKeyMap * srckm, int * status ) {
   size_t i;
   size_t nkeys;      /* Number of keys in source */
 
-  printf(">>>>>> ENTER ATL\n");
-
   if (*status != SAI__OK) return;
 
   /* Loop through all the keys in srckm */
@@ -88,8 +86,6 @@ void atlMapCopy( AstKeyMap * destkm, AstKeyMap * srckm, int * status ) {
     int itype = AST__BADTYPE;
     const char * ikey = astMapKey( srckm, i );
     if (!ikey) break;
-
-    printf("Copying key %s<<<<<<<<<<<<<<<<<<<<\n", ikey );
 
     /* now we need to know its type */
     itype = astMapType( srckm, ikey );
