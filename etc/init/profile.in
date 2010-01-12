@@ -535,8 +535,8 @@ if test -f ${bindir}/echomop/echomop.sh; then
  echomop () { . $ECHOMOP_DIR/echomop.sh; }
  echomopsetup () { . $ECHOMOP_DIR/echomop.sh; }
 else
- echomop () { ${STARLINK_DIR}/etc/notinst esp; }
- echomopsetup () { ${STARLINK_DIR}/etc/notinst esp; }
+ echomop () { ${STARLINK_DIR}/etc/notinst echomop; }
+ echomopsetup () { ${STARLINK_DIR}/etc/notinst echomop; }
 fi
 
 # ESP
