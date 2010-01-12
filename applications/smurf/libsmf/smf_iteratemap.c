@@ -1530,6 +1530,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         } else {
           /* Loop over subgroup index (subarray) */
           for( idx=0; idx<res[0]->ndat; idx++ ) {
+            unsigned char *bolomask = NULL;
+            double *bmapweight = NULL;
+            int *bhitsmap = NULL;
 
             /* Pointers to everything we need */
             ast_data = (ast[0]->sdata[idx]->pntr)[0];
@@ -1553,11 +1556,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                will unset BADB for one bolo at a time to make individual
                maps. */
 
-            unsigned char *bolomask = NULL;
             bolomask = smf_malloc( nbolo, sizeof(*bolomask), 0, status );
-            double *bmapweight = NULL;
-            int *bhitsmap = NULL;
-
             bmapweight = smf_malloc(msize,sizeof(*bmapweight),0,status);
             bhitsmap = smf_malloc(msize,sizeof(*bhitsmap),0,status);
 
