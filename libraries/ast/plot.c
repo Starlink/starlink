@@ -662,6 +662,8 @@ f     - Title: The Plot title drawn using AST_GRID
 *        - Take account of zero height bounding boxes in UpdateConcat.
 *        - Correct Dump so that it dumps attributes for all available 
 *        axes (2 for a Plot, 3 for a Plot3D).
+*     12-JAN-2010 (DSB):
+*        Fix various memory leaks.
 *class--
 */
 
@@ -2106,7 +2108,7 @@ static AstPlotCurveData **CleanCdata( AstPlotCurveData **, int * );
 static AstPlotCurveData **DrawGrid( AstPlot *, TickInfo **, int, const char *, const char *, int * );
 static TickInfo **CleanGrid( TickInfo **, int * );
 static TickInfo **GridLines( AstPlot *, double *, double *, int *, const char *, const char *, int * );
-static TickInfo *TickMarks( AstPlot *, int, double *, double *, int *, const char *, const char *, int * );
+static TickInfo *TickMarks( AstPlot *, int, double *, double *, int *, GetTicksStatics **, const char *, const char *, int * );
 static char **CheckLabels2( AstPlot *, AstFrame *, int, double *, int, char **, double, int * );
 static char *FindWord( char *, const char *, const char **, int * );
 static char *GrfItem( int, const char *, int *, int * );
@@ -11437,8 +11439,6 @@ static int EdgeCrossings( AstPlot *this, int edge, int axis, double axval,
          }
 
 /* Anull the original PointSets. */
-         pset1a = astAnnul( pset1a );
-         pset2a = astAnnul( pset2a );
          pset4a = astAnnul( pset4a );
 
 /* If all the physical coordinates are bad, indicate this by setting the
@@ -11447,6 +11447,10 @@ static int EdgeCrossings( AstPlot *this, int edge, int axis, double axval,
          statics->limit = AST__BAD;
       }
       
+/* Anull the original PointSets. */
+      pset1a = astAnnul( pset1a );
+      pset2a = astAnnul( pset2a );
+
 /* Annul the pointer to the mapping from base to current Frame. */
       mapping = astAnnul( mapping );
 
@@ -17519,6 +17523,7 @@ static TickInfo **GridLines( AstPlot *this, double *cen, double *gap,
 
 /* Local Variables: */
    AstFrame *fr;          /* Pointer to current Frame */
+   GetTicksStatics *statics = NULL; /* Pointer to static data for GetTicks */
    TickInfo **info;       /* Returned array of two TickInfo pointers */
    double *lengths;       /* Pointer to lengths of each curve section */
    double *starts;        /* Pointer to start of each curve section */
@@ -17549,14 +17554,15 @@ static TickInfo **GridLines( AstPlot *this, double *cen, double *gap,
 /* Obtain the tick mark values, and the corresponding formatted labels for
    each axis. */
       for( j = 0; j < 2; j++ ){
-         info[ j ] = TickMarks( this, j, cen + j, gap + j, inval, method, 
-                                class, status );
+         info[ j ] = TickMarks( this, j, cen + j, gap + j, inval, 
+                                &statics, method, class, status );
          logticks[ j ] = astGetLogTicks( this, j );
       }
 
 /* Release the resources allocated in the first call to TickMarks. */
       for( j = 0; j < 2; j++ ){
-         (void) TickMarks( NULL, j, NULL, gap, NULL, method, class, status );
+         (void) TickMarks( NULL, j, NULL, gap, NULL, &statics, method, class, 
+                           status );
       }
 
 /* Each major tick value for axis "j" may be marked with a curve parallel
@@ -20543,8 +20549,10 @@ static void Map1( int n, double *dist, double *x, double *y,
       statics->pset2 = astPointSet( n, 2, "", status );   
 
 /* Get work space to hold two positions. */
-      statics->work1 = (double *) astMalloc( sizeof(double)*(size_t)Map1_ncoord );
-      statics->work2 = (double *) astMalloc( sizeof(double)*(size_t)Map1_ncoord );
+      statics->work1 = (double *) astRealloc( (void *) statics->work1,
+                                          sizeof(double)*(size_t)Map1_ncoord );
+      statics->work2 = (double *) astRealloc( (void *) statics->work2,
+                                          sizeof(double)*(size_t)Map1_ncoord );
 
 /* Check the pointer can be used. */
       if( astOK ){
@@ -25833,7 +25841,8 @@ static void Ticker( AstPlot *this, int edge, int axis, double value,
 }
 
 static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap, 
-                            int *inval, const char *method, const char *class, int *status ){
+                            int *inval, GetTicksStatics **pstatics, 
+                            const char *method, const char *class, int *status ){
 /*
 *  Name:
 *     TickMarks
@@ -25848,7 +25857,8 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
 *  Synopsis:
 *     #include "plot.h"
 *     TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap, 
-*                          int *inval, const char *method, const char *class, int *status )
+*                          int *inval, GetTicksStatics **pstatics, 
+*                          const char *method, const char *class, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -25880,6 +25890,12 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
 *        A pointer to a location at which to return a flag indicating if
 *        any invalid physical coordinates were encountered while deciding on 
 *        the tick values.
+*     pstatics
+*        Address of a pointer to a structure holding static data values 
+*        used within the GetTicks function. A NULL pointer should be supplied 
+*        on the first invocation (dynamic memory will then be allocated to
+*        hold ths structure). The memory is freed when a NULL value for
+*        "this" is supplied.
 *     method
 *        Pointer to a string holding the name of the calling method.
 *        This is only for use in constructing error messages.
@@ -25917,7 +25933,6 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
 /* Local Variables: */
    AstAxis *ax;        /* Pointer to the axis. */
    AstFrame *frame;    /* Pointer to the current Frame in the Plot */
-   GetTicksStatics *statics = NULL; /* Pointer to static data for GetTicks */
    TickInfo *ret;      /* Pointer to the returned structure. */
    char **labels;      /* Pointer to list of formatted labels */
    char **newlabels;   /* Pointer to new list of shortened formatted labels */
@@ -25950,7 +25965,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
    allocated within GetTicks, and return. */
    if( !this ){
       (void) GetTicks( NULL, axis, NULL, &ticks, &nmajor, &minticks, &nminor, 
-                       0, inval, &refval, &statics, method, class, status );
+                       0, inval, &refval, pstatics, method, class, status );
       return NULL;
    }      
 
@@ -25987,7 +26002,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
    LogTicks and LogLabel attributes, and so must be done before the
    following block which uses the LogLabel attribute. */
    used_gap = GetTicks( this, axis, cen, &ticks, &nmajor, &minticks, &nminor, 
-                        fmtset, inval, &refval, &statics, method, class, status );
+                        fmtset, inval, &refval, pstatics, method, class, status );
 
 /* See if exponential labels using superscript powers are required.  */
    old_format = NULL;
