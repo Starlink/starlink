@@ -231,6 +231,8 @@
 *        If chi^2 increases don't set converged flag; warn user.
 *     2010-01-08 (AGG):
 *        Change BPM to BBM.
+*     2010-01-11 (EC):
+*        Add fillgaps to data pre-processing (config file)
 *     2010-01-12 (TIMJ):
 *        Add facility for merging keymaps from config file.
 *     {enter_further_changes_here}
@@ -324,6 +326,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int exportNDF=0;              /* If set export DIMM files to NDF at end */
   int *exportNDF_which=NULL;    /* Which models in modelorder will be exported*/
   int noexportsetbad=0;         /* Don't set bad values in exported models */
+  int fillgaps;                 /* If set perform gap filling */
   smfFilter *filt=NULL;         /* Pointer to filter struct */
   double flagstat;              /* Threshold for flagging stationary regions */
   double f_edgelow=0;           /* Freq. cutoff for low-pass edge filter */
@@ -509,7 +512,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
     /* Data-cleaning parameters (should match SC2CLEAN) */
     smf_get_cleanpar( keymap, &apod, &badfrac, &dcbox, &dcflag, &dcthresh,
-                      NULL, &f_edgelow, &f_edgehigh, f_notchlow,
+                      NULL, &fillgaps, &f_edgelow, &f_edgehigh, f_notchlow,
                       f_notchhigh, &f_nnotch, &dofft, &flagstat, &baseorder,
                       &spikethresh, &spikeiter, status );
 
@@ -1126,7 +1129,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                 smf_subtract_poly( data, qua_data, 0, status );
               }
 
-              /* Flag bad detectors with DC steps in them */
+              /* Flag/repair bad detectors with DC steps in them */
 
               if( dcthresh && dcbox ) {
                 msgOutif(MSG__VERB," ", "  find bolos with steps...", status);
@@ -1145,6 +1148,11 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                           status, nflag, aiter );
               }
 
+              if( fillgaps ) {
+                msgOutif(MSG__VERB," ", "  gap filling", status);
+                smf_fillgaps( data, qua_data, SMF__Q_GAP, status );
+              }
+              
               if( apod ) {
                 msgOutif(MSG__VERB," ", "  apodizing data", status);
                 smf_apodize( data, qua_data, apod, status );

@@ -180,7 +180,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   if( kmap ) {
 
     /* Data-cleaning parameters  */
-    smf_get_cleanpar( kmap, NULL, NULL, &dcbox, &dcflag, &dcthresh,
+    smf_get_cleanpar( kmap, NULL, NULL, &dcbox, &dcflag, &dcthresh, NULL, 
                       NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                       &spikethresh, &spikeiter, status );
   }

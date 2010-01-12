@@ -15,7 +15,7 @@
 *  Invocation:
 *     smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
 *                       dim_t *dcbox, int *dcflag, double *dcthresh,
-*                       int *dkclean, double *filt_edgelow,
+*                       int *dkclean, int *fillgaps, double *filt_edgelow,
 *                       double *filt_edgehigh, double *filt_notchlow,
 *                       double *filt_notchhigh, int *filt_nnotch, int *dofilt,
 *                       double *flagstat, int *order, double *spikethresh,
@@ -40,6 +40,9 @@
 *        N-sigma threshold at which to detect DC steps (NULL:0)
 *     dkclean = int* (Returned)
 *        If true, clean dark squids from bolos (NULL:-1)
+*     fillgaps = int* (Returned)
+*        If true, fill regions of data flagged with spikes, DC steps, bad
+*        samples with constrained realization of noise.
 *     filt_edgelow = double* (Returned)
 *        Apply a hard-edged low-pass filter at this frequency (Hz) (NULL:0)
 *     filt_edgehigh = double* (Returned)
@@ -89,6 +92,8 @@
 *        Initial version.
 *     2010-01-08 (EC):
 *        Add parameter dcflagall to dcflag (renamed from dcbad)
+*     2010-01-11 (EC):
+*        Add fillgaps
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -138,7 +143,7 @@
 
 void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
                        dim_t *dcbox, int *dcflag, double *dcthresh,
-                       int *dkclean, double *filt_edgelow, 
+                       int *dkclean, int *fillgaps, double *filt_edgelow, 
                        double *filt_edgehigh, double *filt_notchlow,
                        double *filt_notchhigh, int *filt_nnotch,
                        int *dofilt, double *flagstat, int *order,
@@ -254,6 +259,21 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
     }
     msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DKCLEAN=%i", status,
                *dkclean );
+  }
+
+  if( fillgaps ) {
+    if( astMapGet0I( keymap, "FILLGAPS", &temp ) ) {
+      if( (temp < 0) || (temp > 1) ) {
+        *status = SAI__ERROR;
+        errRep(FUNC_NAME, "FILLGAPS must be either 0 or 1.", status );
+      } else {
+        *fillgaps = temp;
+      }
+    } else {
+      *fillgaps = -1;
+    }
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": FILLGAPS=%i", status,
+               *fillgaps );
   }
 
   if( filt_edgelow ) {

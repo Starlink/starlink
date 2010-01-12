@@ -89,25 +89,29 @@ badfrac = 0.05
 flagstat = 2
 
 
-# --- Many of the following are not useful ---
+# --- Many of the following may not be useful ---
 
 # S/N threshold to detect DC steps
-dcthresh = 1000
+dcthresh = 200
 
 # box size over which to measure rms for DC step finder
-dcbox = 200
+dcbox = 50
 
 # if set flag entire bolo with DC step as bad instead of trying to repair
-dcbad = 1
+#dcbad = 1
 
 # if set flag/correct ALL bolometers at locations of DC steps
-#dcflagall = 1
+dcflagall = 1
 
 # S/N ratio to flag spikes with sigma-clipper
 # spikethresh = 5
 
 # Number of iterations for sigma-clipper (0=until convergence)
 # spikeiter = 0
+
+# Fill vicinity of spikes / DC steps with constrained realization of
+# noise
+fillgaps = 1
 
 # The following filters are applied *before* the iterative loop. It is
 # probably a better idea in general to do filtering with the 'flt'

@@ -2039,6 +2039,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter fillgaps {
+                type _LOGICAL
+                vpath {DEFAULT }
+                prompt {Replace flagged spikes/steps/bad samples with noise}
+                ppath GLOBAL CURRENT
+                default FALSE
+                helpkey *
+            }
+
             parameter filt_edgehigh {
                 type _DOUBLE
                 vpath {DEFAULT}

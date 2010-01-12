@@ -155,12 +155,14 @@
  *        Add _BIT values from sc2headman_struct.h
  *     2010-01-08 (TIMJ):
  *        Add sub instrument enums.
+ *     2010-01-11 (EC):
+ *        Add SMF__Q_GAP (bits that indicate where gaps should be filled)
  *     {enter_further_changes_here}
 
  *  Copyright:
  *     Copyright (C) 2008-2010 Science and Technology Facilities Council.
  *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
- *     Copyright (C) 2005-2009 University of British Columbia.
+ *     Copyright (C) 2005-2010 University of British Columbia.
  *     All Rights Reserved.
 
  *  Licence:
@@ -363,7 +365,8 @@ static const size_t SMF__BADIDX = (size_t)-1;
 #define SMF__Q_FIT ~(SMF__Q_APOD|SMF__Q_STAT|SMF__Q_JUMP)/*Samples that can't
                                                            be used to fit
                                                            time-domain models */
-
+#define SMF__Q_GAP (SMF__Q_BADS|SMF__Q_SPIKE|SMF__Q_JUMP)/* Samples that should
+                                                            be gap-filled */
 /* Flags for smf_open_newfile
    Must be individual bits in a single integer
 */

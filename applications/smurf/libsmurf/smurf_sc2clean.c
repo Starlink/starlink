@@ -56,6 +56,9 @@
 *          N-sigma threshold at which to detect DC steps. [150.0]
 *     DKCLEAN = _LOGICAL (Read)
 *          If true fit and remove dark squid signals. [FALSE]
+*     FILLGAPS = _LOGICAL (Read)
+*          If true fill gaps with constrained realization of noise (e.g.
+*          regions of DC steps, spikes, bad DA samples).
 *     FILT_EDGEHIGH = _DOUBLE (Read)
 *          Apply a hard-edged high-pass filter at this frequency (Hz). [0.0]
 *     FILT_EDGELOW = _DOUBLE (Read)
@@ -110,12 +113,14 @@
 *        Factor filter generation out to smf_filter_fromkeymap
 *     2009-04-30 (EC):
 *        Use threads
+*     2010-01-11 (EC):
+*        Add FILLGAPS parameter
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
-*     Copyright (C) 2008-2009 University of British Columbia.
+*     Copyright (C) 2008-2010 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -178,6 +183,7 @@ void smurf_sc2clean( int *status ) {
   int dcflagall;            /* Flag for repairing all bolos at step */
   double dcthresh=0;        /* n-sigma threshold for DC steps */
   int dkclean;              /* Flag for dark squid cleaning */
+  int fillgaps;             /* Flag to do gap filling */
   double flagstat;          /* Threshold for flagging stationary regions */
   smfData *ffdata = NULL;   /* Pointer to output data struct */
   Grp *fgrp = NULL;         /* Filtered group, no darks */
@@ -240,6 +246,8 @@ void smurf_sc2clean( int *status ) {
     atlGetParam( "DCBOX", keymap, status );
     parGet0l( "DKCLEAN", &dkclean, status );
     astMapPut0I( keymap, "DKCLEAN", dkclean, NULL );
+    parGet0l( "FILLGAPS", &fillgaps, status );
+    astMapPut0I( keymap, "FILLGAPS", fillgaps, NULL );
     atlGetParam( "FILT_EDGEHIGH", keymap, status );
     atlGetParam( "FILT_EDGELOW", keymap, status );
     atlGetParam( "FILT_NOTCHHIGH", keymap, status );
@@ -250,7 +258,7 @@ void smurf_sc2clean( int *status ) {
     atlGetParam( "SPIKETHRESH", keymap, status );
 
     smf_get_cleanpar( keymap, &apod, &badfrac, &dcbox, &dcflag, &dcthresh,
-                      &dkclean, NULL, NULL, NULL, NULL, NULL, NULL,
+                      &dkclean, &fillgaps, NULL, NULL, NULL, NULL, NULL, NULL,
                       &flagstat, &order, &spikethresh, &spikeiter, status );
   }
 
@@ -356,6 +364,13 @@ void smurf_sc2clean( int *status ) {
       smf_clean_dksquid( ffdata, NULL, 0, 100, NULL, 0, 0, status );
     }
 
+
+    /* Gap filling */
+    if( fillgaps ) {
+      msgOutif(MSG__VERB," ", "Gap filling.", status);
+      smf_fillgaps( ffdata, NULL, SMF__Q_GAP, status );
+    }
+
     /* Apodization */
     if( apod ) {
       msgOutif(MSG__VERB," ",
@@ -375,7 +390,6 @@ void smurf_sc2clean( int *status ) {
     }
 
     filt = smf_free_smfFilter( filt, status );
-
 
     /* Ensure that the data is ICD ordered before closing */
     smf_dataOrder( ffdata, 1, status );
