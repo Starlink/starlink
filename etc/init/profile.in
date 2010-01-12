@@ -515,9 +515,9 @@ fi
 # DIPSO
 
 if test -f ${bindir}/dipso/dipsosetup.sh; then
-  export DIPSODIR=${bindir}/dipso
-  dipsosetup () { . $DIPSODIR/dipsosetup.sh; }
-  dipso () { . $DIPSODIR/dipsosetup.sh; }
+  export DIPSO_DIR=${bindir}/dipso
+  dipsosetup () { . $DIPSO_DIR/dipsosetup.sh; }
+  dipso () { . $DIPSO_DIR/dipsosetup.sh; }
 else
   dipsosetup () { ${STARLINK_DIR}/etc/notinst dipsosetup; }
   dipso () { ${STARLINK_DIR}/etc/notinst dipso; }
