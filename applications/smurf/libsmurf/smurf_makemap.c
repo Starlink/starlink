@@ -511,6 +511,9 @@
 *     header. These are the number of tiles used to hold the output data,
 *     and the index of the NDF containing the header, in the range 1 to
 *     NUMTILES. See parameter TILEDIMS.
+*     The model configuration parameters can be sub-instrument dependent.
+*     For example, flt_850.edgelow will copy the edgelow value into the flt
+*     section only for 850 micron data. Similarly for flt_450.edgelow.
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)

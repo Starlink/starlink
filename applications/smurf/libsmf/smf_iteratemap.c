@@ -231,12 +231,14 @@
 *        If chi^2 increases don't set converged flag; warn user.
 *     2010-01-08 (AGG):
 *        Change BPM to BBM.
+*     2010-01-12 (TIMJ):
+*        Add facility for merging keymaps from config file.
 *     {enter_further_changes_here}
 
 *  Notes:
 
 *  Copyright:
-*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2010 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2006-2010 University of British Columbia.
 *     All Rights Reserved.
@@ -701,6 +703,36 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       }
     }
   }
+
+  /* Merge wavelength specific keymap entries - we need to know the wavelength
+     regime of this data so we either open a file or we have a parameter
+     passed in to smf_iteratemap from a previous file opening. Assumes
+     that all input files are same wavelength. */
+  smf_open_file( igrp, 1, "READ", SMF__NOCREATE_DATA, &data, status );
+  if (*status == SAI__OK) {
+    smf_subinst_t subinst;
+    const char  *suffix = NULL;
+    subinst = smf_calc_subinst( data->hdr, status );
+    if (subinst == SMF__SUBINST_850) {
+      suffix = "_850";
+    } else if (subinst == SMF__SUBINST_450) {
+      suffix = "_450";
+    } else {
+      if (*status == SAI__OK) {
+        *status = SAI__ERROR;
+        errRep( "", "Unrecognized sub-instrument", status );
+      }
+    }
+
+    /* these are upper case by this point */
+    smf_merge_keymaps( keymap, "FLT", suffix, status );
+    smf_merge_keymaps( keymap, "COM", suffix, status );
+    smf_merge_keymaps( keymap, "GAI", suffix, status );
+    smf_merge_keymaps( keymap, "EXT", suffix, status );
+    smf_merge_keymaps( keymap, "AST", suffix, status );
+    smf_merge_keymaps( keymap, "NOI", suffix, status );
+  }
+  smf_close_file( &data, status );
 
   if( untilconverge ) {
     msgSeti("MAX",maxiter);
