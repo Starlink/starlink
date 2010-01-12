@@ -1024,6 +1024,9 @@ void smf_mapbounds_approx( Grp *igrp, size_t index, char *system,
 
 void smf_maskacsis( int indf, int *mask, int *status );
 
+void smf_merge_keymaps ( AstKeyMap * keymap, const char * key, const char * suffix,
+                         int * status );
+
 void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
                        smfArray **iarray, dim_t nchunks, smf_modeltype mtype,
                        int isTordered, AstFrameSet *outfset, int moving,
