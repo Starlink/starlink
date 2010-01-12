@@ -27,9 +27,11 @@
 *        Added atlGetParam.
 *     6-JUL-2009 (TIMJ):
 *        Add atlRmblft
+*     2010-01-12 (TIMJ):
+*        Add atlMapCopy
 
 *  Copyright:
-*     Copyright (C) 2009 Science and Technology Facilities Council.
+*     Copyright (C) 2009-2010 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -65,6 +67,7 @@ enum { ATL__MXDIM  = 7 };
 /* Public function prototypes */
 /* -------------------------- */
 AstRegion *atlMatchRegion( AstRegion *, AstFrame *, int * );
+void atlMapCopy( AstKeyMap * destkm, AstKeyMap * srckm, int * status );
 int atlMapGet1S( AstKeyMap *, const char *, int, int, int *, char *, int * );
 void atlAddWcsAxis( AstFrameSet *, AstMapping *, AstFrame *, int *, int *, int * );
 void atlAxtrm( AstFrameSet *, int *, int *, int *, double *, int * );

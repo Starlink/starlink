@@ -9,6 +9,8 @@ by adding one or more axes to the base (GRID) Frame and the current (WCS)
 Frame, using a supplied Mapping to connect the new axes. Any other Frames 
 are left unchanged.
 
+- A new function astMapCopy can copy all the keys from one KeyMap into
+another overwriting any duplicates.
 
 Changes introduced by V1.2:
 
