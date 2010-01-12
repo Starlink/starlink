@@ -5987,7 +5987,8 @@ int StarRtdImage::parseName( const char *imagename, char **fullname,
     if ( isNDFtype( type ) ) {
 
         //  Check that name is a file, if so nothing to do except to check
-        //  that it is a regular file.
+        //  that it is a regular file. Note fullname now has any slice removed.
+        exists = fileExists( *fullname );
         if ( ! exists ) {
             delete[] *fullname;
             *fullname = NULL;
