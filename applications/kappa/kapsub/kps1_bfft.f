@@ -85,7 +85,7 @@
 
 *  Copyright:
 *     Copyright (C) 2007 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2009-2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -106,6 +106,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -130,6 +131,8 @@
 *     2009 December 9 (MJC):
 *        Loosened constraint on size of marginal profiles such that it
 *        it now only restricts to the storage available in KPS1_STPAx.
+*     2010 January 12 (TIMJ):
+*        Ensure that the initial guess lies within the pixel bounds.
 *     {enter_further_changes_here}
 
 *-
@@ -342,6 +345,15 @@
 *  to semi-arbitrary default initial values for the coefficients.
          IF ( STATUS .NE. SAI__OK ) THEN
             CALL ERR_ANNUL( STATUS )
+            SIGMIN = 5.0
+            AXRAT = 1.0
+            ORIENT = 0.0
+            INIT( 1 ) = PIXPOS( IG, 1 )
+            INIT( 2 ) = PIXPOS( IG, 2 )
+         ELSE IF ( INIT(1) .GT. DBLE(FUBND(1)) .OR.
+     :           INIT(2) .GT. DBLE(FUBND(2)) .OR.
+     :           INIT(1) .LT. DBLE(FLBND(1)) .OR.
+     :           INIT(2) .LT. DBLE(FLBND(2)) ) THEN
             SIGMIN = 5.0
             AXRAT = 1.0
             ORIENT = 0.0
