@@ -7313,7 +7313,7 @@ documentation because the residual VMS service no longer exists.
 Added IRAF compatibility libs for Linux systems.  CONVERT should now
 build on any ix86 Linux platform. 
 
-\section{Release Notes -- V1.5-5}
+\subsection{Release Notes -- V1.5-5}
 
 Added FITS-AIPS$++$ and FITS-CLASS encodings to 
 \htmlref{FITS2NDF}{FITS2NDF} and \htmlref{NDF2FITS}{NDF2FITS}.
@@ -7326,7 +7326,7 @@ data, not just the output NDF.
 double-sideband SpecFrame.  See the AST documentation for more details
 on double-sideband spectra.
 
-\section{Release Notes -- V1.5-6}
+\subsection{Release Notes -- V1.5-6}
 
 FITSGZ is a new on-the-fly conversion format for GZIP-compressed FITS
 files.  The recognised extensions are \texttt{fits.gz}, \texttt{fit.gz}, and
@@ -7335,7 +7335,7 @@ files.  The recognised extensions are \texttt{fits.gz}, \texttt{fit.gz}, and
 FITS2NDF supports the new AAO Instruments (AAOMEGA and FMOS) that use
 the 2dF data structures.
   
-\section{Release Notes -- V1.5-7}
+\subsection{Release Notes -- V1.5-7}
 
 \htmlref{FITS2NDF}{FITS2NDF} has a new TYPE group parameter to set the
 data type of the NDF, overriding the value propagated from the FITS
@@ -7361,7 +7361,7 @@ scaled array too.  This new facility preserves the data compression
 of large files.  In the absence of a scaled array, the application
 behaves as if BITPIX=\texttt{-1} were specified.
 
-\section{Release Notes -- V1.5-9}
+\subsection{Release Notes -- V1.5-9}
 
 \htmlref{NDF2FITS}{NDF2FITS} Parameter ENCODING has a new allowed
 value of \texttt{"FITS-WCS(CD)"}.  This is the same as
@@ -7377,7 +7377,7 @@ FITS files.
 and DATASUM at the end of each header if new Parameter CHECKSUMS is 
 \texttt{TRUE}.
 
-\section{Release Notes -- V1.5-11}
+\subsection{Release Notes -- V1.5-11}
 
 \htmlref{NDF2FITS}{NDF2FITS} writes the correct BUNIT keyword value in 
 the IMAGE extension storing the VARIANCE component.  The BUNIT
@@ -7393,7 +7393,7 @@ also in the IMAGE extensions for the VARIANCE and QUALITY arrays.
 SMURF-package extension.  It treats the extension contents as NDFs
 rather than arbitrary HDS structures.
 
-\section{Release Notes -- V1.5-13}
+\subsection{Release Notes -- V1.5-13}
 
 \htmlref{NDF2FITS}{NDF2FITS} supports the propagation of provenance
 information to FITS headers.  There is a choice of generic propagation
@@ -7409,7 +7409,7 @@ structure.
 better, permitting a roundtrip via FITS, perserving the original
 data structures, save for some additional FITS headers.
 
-\section{Release Notes -- V1.5-14}
+\subsection{Release Notes -- V1.5-14}
 
 The creation of AXIS structures by \htmlref{SPECX2NDF}{SPECX2NDF} can 
 now be suppressed using its new AXIS parameter.
@@ -7417,14 +7417,14 @@ now be suppressed using its new AXIS parameter.
 \htmlref{NDF2FITS}{NDF2FITS} is now much quicker when writing out WCS
 information that includes a large table of values.
 
-\section{Release Notes -- V1.5-15}
+\subsection{Release Notes -- V1.5-15}
 
 The CADC provenance processing now also modifies the PRODUCT keyword's
 value in FITS extensions to the original PRODUCT string followed by 
 underscore and the extension name in lowercase.  Also the CADC 
 provenance now only records unique OBSIDD values.
 
-\section{Release Notes -- V1.5-16}
+\subsection{Release Notes -- V1.5-16}
 
 The FITS converters use the new NDG provenance system that inherits
 history records too.  \htmlref{NDF2FITS}{NDF2FITS} also ignores hidden
@@ -7462,13 +7462,12 @@ and variance whenever the quality array is exported to the FITS file
 too.  A new section of the NDF2FITS reference documentation explains
 this in more detail.
 
-\htmlref{FITS2NDF}{FITS2NDF} recognises the new {\tt "Group:"} heading
-in HISTORY headers that originally came from an exported NDF.  [This
-lists all the NDFs stored within a GRP group used in an application.]
-Thus the original paragraph and indentation may be preserved after an
-NDFÂ$\rightarrow$FITS$\rightarrow$NDF cycle.
+Removed default history recording in FITS2NDF's output NDF since 
+you can control automatic history creation via the 
+\xref{NDF\_AUTO\_HISTORY}{sun33}{preparing_to_record_history_information}
+environment variable.
 
-\section{Release Notes -- V1.5-19}
+\subsection{Release Notes -- V1.5-19}
 
 \htmlref{NDF2FITS}{NDF2FITS} now recognises the modified data type of
 the SMURF extension. It also handles component names that are too long
