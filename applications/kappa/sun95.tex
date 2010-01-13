@@ -12,10 +12,10 @@
 % ? Document identification
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun95.36}
-\newcommand{\stardocnumber}    {95.36}
+\newcommand{\stardocsource}    {sun95.37}
+\newcommand{\stardocnumber}    {95.37}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2009 December 8}
+\newcommand{\stardocdate}      {2010 January 13}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.11}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -56863,14 +56863,22 @@ The following applications have been modified:
   longer used.  See
   \hyperref{Verbosity of Messages}{Section }{}{se:msglev} for details.
 
-  \item Added support and documentation for the new FRACTION Frame supplied 
-  with every NDF.  Documented how NDF sections can now be defined by 
-  percentages along each dimension. 
-
+  \item Added support and documentation for the new \htmlref{FRACTION
+  Frame}{se:domains} supplied with every NDF.  
+  \htmlref{Documented}{se:ndfsec-fraext} how NDF sections can now be
+  defined by percentages along each dimension. 
+  
   \item The default for the CATFRAME parameter (used by various
-  applications to indicate the Frame in which axis values should be
-  stored within an output catalogue) has changed. It is now the current
-  Frame in the WCS FrameSet associated with the input data.
+  applications to indicate the \xref{Frame}{sun210}{Frame}~ in which
+  axis values should be stored within an output catalogue) has
+  changed. It is now the current Frame in the \htmlref{WCS
+  FrameSet}{se:curframe} associated with the input data.
+
+  \item Additional colour tables from \GAIAref\ have been added.
+
+  \item Application parameters that take \htmlref{groups}{se:groups}
+  of values are now stored in expanded form in the \htmlref{HISTORY
+  component}{apndf:history} of any output NDFs.
 
 \end{itemize}
 
@@ -56909,7 +56917,9 @@ The following applications have been modified:
         `data minus fit' evaluations rather than the reverse sense.
         \item The total background-subtracted data sum in the 
         multi-Gaussian fit is now written to the output parameter SUM.
-
+        \item After a bug fix it is now possible to fit beams within an
+        arbitrary plane of a cube.
+        \item Relax a constraint to cater better for a poor initial position.
       \end{itemize}
 
    \item [\htmlref{BLOCK}{BLOCK}]\mbox{}
@@ -56925,6 +56935,8 @@ The following applications have been modified:
         smoothing of axes is now generalised, so for example, you can
         smooth all lines in an image or cube; or all lines, planes, or
         cubes in a hypercube.
+        \item It reports the input NDF's dimensionality if it is more than
+        one, before prompting for Parameter BOX.
       \end{itemize}
 
    \item [\htmlref{CENTROID}{CENTROID}]\mbox{}
@@ -56932,6 +56944,19 @@ The following applications have been modified:
         \item Parameter QUIET has been withdrawn.  Instead set the
         MSG\_FILTER environment variable to {\tt QUIET} to suppress display
         of the centroid positions.
+      \end{itemize}
+
+   \item [\htmlref{CHANMAP}{CHANMAP}]\mbox{}
+      \begin{itemize}
+        \item Fix bug whereby Cmean and Csigma estimators were not 
+        amongst the allowed options.
+        \item Allow ESTIMATOR=Median to operate on just three channels.
+      \end{itemize}
+
+   \item [\htmlref{COPYBAD}{COPYBAD}]\mbox{}
+      \begin{itemize}
+        \item  The output NDF inherits data type of the input NDF, instead
+        of the NDF given by Parameter REF.
       \end{itemize}
 
    \item [\htmlref{CREFRAME}{CREFRAME}]\mbox{}
@@ -56952,6 +56977,7 @@ The following applications have been modified:
       \begin{itemize}
         \item Parameter ILEVEL has been withdrawn.  Instead use the 
         MSG\_FILTER environment variable to control the output messages.
+        \item Now works with double-precision data.
       \end{itemize}
 
    \item [\htmlref{FITSLIST}{FITSLIST}]\mbox{}
@@ -56959,6 +56985,30 @@ The following applications have been modified:
         \item New Parameters ENCODING and FULLWCS allow the list of displayed 
         FITS cards to include cards derived from the NDF WCS component, in 
         addition to those read from the FITS extension.
+      \end{itemize}
+
+   \item [\htmlref{HISTAT}{HISTAT}]\mbox{}
+      \begin{itemize}
+        \item Works for data ranges smaller than the type precision.
+        \item The minimum sparseness increased from 4 to 16 percent to cope
+        with extreme outliers, at the cost of poorer handling of quantized 
+        distributions.
+        \item Generates a new histogram between any narrowed value limits 
+        to yield more-accurate statistics.
+      \end{itemize}
+
+   \item [\htmlref{HISTOGRAM}{HISTOGRAM}]\mbox{}
+      \begin{itemize}
+        \item This now displays an improved $X$-axis label on its plot.
+      \end{itemize}
+
+   \item [\htmlref{LINPLOT}{lLINPLOT}]\mbox{}
+      \begin{itemize}
+        \item The $Y$-axis Symbol has changed from the NDF's label to
+	the name of its plotted array component.  A long Symbol
+	including spaces caused issues in other tasks like CURSOR,
+	where the Symbol is used as a column name in the output
+	catalogue.
       \end{itemize}
 
    \item [\htmlref{LISTSHOW}{LISTSHOW}]\mbox{}
@@ -56982,6 +57032,9 @@ The following applications have been modified:
       \begin{itemize}
         \item Parameter ILEVEL has been withdrawn.  Instead use the 
         MSG\_FILTER environment variable to control the output messages.
+        \item Fix bug whereby Cmean and Csigma estimators were not 
+        amongst the allowed options.
+        \item Allow ESTIMATOR=Median to operate on just three NDFs.
       \end{itemize}
 
    \item [\htmlref{NDFCOPY}{NDFCOPY}] \mbox{}
@@ -57018,8 +57071,11 @@ The following applications have been modified:
       \begin{itemize}
         \item There is a new DOTFILE parameter that permits a summary of the
          provenance tree to be written to a text file in ``dot'' format,
-         suitable for visualising with third-party tools such as Graphviz,
-         ZGRViewer or OmniGraffle.
+         suitable for visualising with third-party tools such as 
+         \htmladdnormallink{GraphViz}{http://www.graphviz.org/}, 
+         \htmladdnormallink{ZGRViewer}{http://zvtm.sourceforge.net/zgrviewer.html}
+         or
+         \htmladdnormallink{OmniGraffle}{http://www.omnigroup.com/applications/OmniGraffle/}.
       \end{itemize}
 
    \item [\htmlref{REGRID}{REGRID}]\mbox{}

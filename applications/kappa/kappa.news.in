@@ -19,6 +19,12 @@
    stored within an output catalogue) has changed. It is now the 
    current Frame in the WCS FrameSet associated with the input data.
 
+   o  Additional colour tables from GAIA have been added.
+
+   o  Application parameters that take "groups" of values are now
+   stored in expanded form in the HISTORY component of any output
+   NDFs.
+   
 2 New_applications
 
 The following new applications have been added:
@@ -43,6 +49,10 @@ The following new applications have been added:
       `data minus fit' evaluations rather than the reverse sense.
       -  The total background-subtracted data sum in the 
       multi-Gaussian fit is now written to the output parameter SUM.
+      -  After a bug fix it is now possible to fit beams within an
+      arbitrary plane of a cube.
+      -  Relax a constraint to cater better for a poor initial 
+      position.
 
    o  BLOCK
 
@@ -57,6 +67,24 @@ The following new applications have been added:
       smoothing of axes is now generalised, so for example, you can
       smooth all lines in an image or cube; or all lines, planes,
       or cubes in a hypercube.
+      -  It reports the input NDF's dimensionality if it is more 
+      than one, before prompting for Parameter BOX.
+
+   o  CHANMAP, MSTATS
+
+      -  Fix bug whereby Cmean and Csigma estimators were not 
+      amongst the allowed options.
+      -  Allow ESTIMATOR=Median to operate on just three channels
+      or NDFs.
+
+   o  COPYBAD
+
+      - The output NDF inherits data type of the input NDF, not that
+      of the NDF given by Parameter REF.
+
+   o  FFCLEAN 
+   
+      -  Now works with double-precision data.
 
    o  FFCLEAN, MSTATS, WCSMOSAIC
 
@@ -69,6 +97,26 @@ The following new applications have been added:
       -  New Parameters ENCODING and FULLWCS allow the list of 
       displayed FITS cards to include cards derived from the NDF WCS 
       component, in addition to those read from the FITS extension.
+
+   o  HISTAT 
+
+      -  Works for data ranges smaller than the type precision.
+      -  The minimum sparseness increased from 4 to 16 percent to cope
+      with extreme outliers, at the cost of poorer handling of
+      quantized distributions.
+      -  Generates a new histogram between any narrowed value limits 
+      to yield more-accurate statistics.
+
+   o  HISTOGRAM 
+
+      -  This now displays an improved X-axis label on its plot.
+
+   o  LINPLOT
+
+      -  The Y-axis Symbol has changed from the NDF's label to the name
+      of its plotted array component.  A long Symbol including spaces 
+      caused issues in other tasks like CURSOR, where the Symbol is used 
+      as a column name in the output catalogue.
 
    o  LOOK
 
