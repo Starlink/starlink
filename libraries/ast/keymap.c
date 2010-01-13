@@ -5272,9 +5272,10 @@ c     astMapType()
 f     AST_MAPTYPE = INTEGER
 *        One of AST__INTTYPE (for integer), AST__DOUBLETYPE (for double
 *        precision floating point), AST__FLOATTYPE (for single 
-*        precision floating point), AST__STRINGTYPE (for character string)
-*        or AST__OBJECTTYPE (for AST Object pointer). AST__BADTYPE is
-*        returned if the supplied key is not found in the KeyMap.
+*        precision floating point), AST__STRINGTYPE (for character string),
+*        AST__OBJECTTYPE (for AST Object pointer) or AST__POINTERTYPE (for 
+*        arbitrary C pointer). AST__BADTYPE is returned if the supplied 
+*        key is not found in the KeyMap.
 
 *  Notes:
 *     - A function value of AST__BADTYPE will be returned if an error has 
