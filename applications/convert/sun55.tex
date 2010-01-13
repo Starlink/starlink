@@ -17,13 +17,13 @@
 {Copyright \copyright\ 2005 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {55.25}
+\newcommand{\stardocnumber}    {55.26}
 \newcommand{\stardocauthors}   {Malcolm J. Currie\\
                                 G.J.Privett\\
                                 A.J.Chipperfield\\
                                 D.S.Berry\\
                                 A.C.Davenhall}
-\newcommand{\stardocdate}      {2009 November 30}
+\newcommand{\stardocdate}      {2010 January 13}
 \newcommand{\stardoctitle}     {CONVERT\\
                                 A Format-conversion Package}
 \newcommand{\stardocversion}   {Version 1.5-19}
@@ -7443,13 +7443,18 @@ Various internal improvements were made, particularly to reuse
 Correct a bug in \htmlref{FITS2NDF}{FITS2NDF} affecting the import of
 SMURF data containing VARIANCE or QUALITY that was formerly in an NDF.
 
-\section{Release Notes -- V1.5-17}
+\subsection{Release Notes -- V1.5-17}
 
 The bash \CONVERT\ initialisation script has been changed so that it
 now works from any Bourne-compatible shell.
 
+\subsection{Release Notes -- V1.5-18}
 
-\section{Release Notes -- V1.5-18}
+\htmlref{FITS2NDF}{FITS2NDF} recognises the new {\tt "Group:"} heading
+in HISTORY headers that originally came from an exported NDF.  [This
+lists all the NDFs stored within a GRP group used in an application.]
+Thus the original paragraph and indentation may be preserved after an
+NDF$\rightarrow$FITS$\rightarrow$NDF cycle.
 
 \htmlref{NDF2FITS}{NDF2FITS} allows three-letter permutations for 
 Parameter COMP.  There is now no automatic quality masking of data 
@@ -7472,5 +7477,7 @@ uses the Long-string convention.
 
 Added support for the SMURF\_EXT type for the SMURF extension, and for
 extensions within the SMURF extension's NDFs.
+
+Propagate LABEL keyword to NDF label in \htmlref{FITS2NDF}{FITS2NDF}.
 
 \end{document}
