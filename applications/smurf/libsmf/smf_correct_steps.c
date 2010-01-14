@@ -70,6 +70,8 @@
 *        add flagging of all bolos at step locations
 *     2010-01-08 (TIMJ):
 *        Private routines must be static to hide them from others.
+*     2010-01-14 (EC):
+*        In single bolo case flag 2*box window instead of single sample
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -361,7 +363,7 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
           if( !dcflag ) {
             smf__correct_steps_baseline( dat+i*bstride+istart*tstride,
                                          qua+i*bstride+istart*tstride,
-                                         iend-istart, tstride, alljump+istart );
+                                         iend-istart, tstride, alljump+istart);
           }
         }
       }
@@ -378,8 +380,11 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
         for(j=0; j<ntslice; j++) {
           qua[base+j*tstride] |= SMF__Q_BADB;
         }
+      }
 
-        qua[base+wherebad*tstride] |= SMF__Q_JUMP;
+      /* Flag entire 2*DCBOX window */
+      for( j=wherebad-dcbox; j<wherebad+dcbox; j++ ) {
+        qua[base+j*tstride] |= SMF__Q_JUMP;
       }
     }
 
