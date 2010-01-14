@@ -142,6 +142,7 @@ smf_fix_metadata.c \
 smf_fix_metadata_acsis.c \
 smf_fix_metadata_scuba2.c \
 smf_flag_spikes.c \
+smf_flag_spikes2.c \
 smf_flag_stationary.c \
 smf_flat_responsivity.c \
 smf_flat_standardpow.c \

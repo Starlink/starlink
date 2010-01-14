@@ -13,7 +13,6 @@
 *     Library routine
 
 *  Invocation:
-
 *     smf_flag_spikes( smfData *data, double *bolovar, unsigned char *quality, 
 *                      unsigned char mask, double thresh, size_t niter, 
 *                      size_t maxiter, size_t *aiter, size_t *nflagged,
@@ -36,9 +35,13 @@
 *        N-sigma threshold for spike detection
 *     niter = size_t (Given)
 *        Number of iterations. If set to 0 iterate until the list of
-*        flagged sources doesn't change (converges).
+*        flagged sources doesn't change (converges). If a value of 10000
+*        is supplied, then smf_flag_spikes2 will be invoked to flag the 
+*        spikes, with the box size being set to "maxiter". See 
+*        smf_flag_spikes2 for further details.
 *     maxiter = size_t (Given)
-*        If niter=0 maxiter is a maximum number of iterations
+*        If niter=0 maxiter is a maximum number of iterations. If
+*        niter=1000 maxiter is the box size to use with smf_flag_spikes2.
 *     aiter = size_t * (Returned)
 *        The actual number of iterations executed. May be NULL.
 *     nflagged = size_t * (Returned)
@@ -47,11 +50,18 @@
 *        Pointer to global status.
 
 *  Description:
-*     Measures the rms and mean of each bolometer, excluding data that
-*     has been flagged with bits specified in mask. Samples that lie a
-*     factor of thresh * rms away from the mean are flagged
-*     SMF__Q_SPIKE. This process can be run a fixed number of times,
-*     or until the list of flagged samples converges (niter=0).
+*     Flags spikes using one of teo different algorithms, as specified by
+*     the "niter" argument. 
+*
+*     If niter is not equal to 10000, measures the rms and mean of each 
+*     bolometer, excluding data that has been flagged with bits specified 
+*     in mask. Samples that lie a factor of thresh * rms away from the mean 
+*     are flagged SMF__Q_SPIKE. This process can be run a fixed number of 
+*     times, or until the list of flagged samples converges (niter=0).
+*
+*     If niter is 10000, smf_flag_spikes2 is called to flag the spikes,
+*     using the value of "maxiter" as the box size. See smf_flag_spikes2 
+*     for details of the algorithm.
 
 *  Notes:
 *     This routine asserts bolo-ordered data.
@@ -59,6 +69,7 @@
 *  Authors:
 *     Edward Chapin (UBC)
 *     Tim Jenness (JAC, Hawaii)
+*     David Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -72,10 +83,12 @@
 *        - use size_t in interface
 *     2009-11-25 (TIMJ):
 *        Tidy up status handling a bit.
+*     2010-01-14 (DSB):
+*        Call smf_flag_spikes2 if "niter" is 10000.
 
 *  Copyright:
 *     Copyright (C) 2008 Univeristy of British Columbia.
-*     Copyright (C) 2009 Science and Technology Facilities Council.
+*     Copyright (C) 2010 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -139,6 +152,12 @@ void smf_flag_spikes( smfData *data, double *bolovar, unsigned char *quality,
 
   /* Main routine */
   if (*status != SAI__OK) return;
+
+  /* If requested, use the alternative spike flagged. */
+  if( niter == 10000 ) {
+     smf_flag_spikes2( data, quality, mask, thresh, maxiter, nflagged, status );
+     return;
+  }
 
   if (!smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status )) return;
 
