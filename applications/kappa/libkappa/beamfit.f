@@ -1030,6 +1030,7 @@
 *  SkyRefIs origin means an offset plot about the reference position,
 *  so therefore in this co-ordinate system the reference position is
 *  at the origin.
+      REFLAB = ' '
       GOTREF = .FALSE.
       IF ( ISSKY ) THEN
          SKYREF = AST_GETC( CFRM, 'SkyRefIs', STATUS )      
@@ -1291,13 +1292,17 @@
       CALL LPG_PROP( NDFI, 'NOLABEL,WCS,AXIS', 'RESID', NDFR, STATUS )
 
 *  A null status can be ignored.  This means that no output NDF was
-*  required. Set a flag indicating that KPS1_BFREx should not form 
+*  required.  Set a flag indicating that KPS1_BFREx should not form 
 *  the residuals, and stored (unused) values in the pointer variables.
       IF ( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
          RESID = .FALSE.
          IPRES = 0
          IPD = 0
+
+*  Determine the data type to use for the summation
+         CALL NDF_MTYPE( '_REAL,_DOUBLE', NDFI, NDFI, 'Data', ITYPE,
+     :                   DTYPE, STATUS )
 
 *  If an output NDF was given, set the flag to indicate that KPS1_BFREx 
 *  should form the residuals.
@@ -1320,12 +1325,10 @@
 
 *  Store a label.
          CALL NDF_CPUT( 'BEAMFIT residuals map', NDFR, 'Lab', STATUS )
-
       END IF
 
 *  Fill the data array with the evaluated point-spread function less
-*  the original array. This also find the total data sum in the fit.
-*  Since we 
+*  the original array.  This also finds the total data sum in the fit.
       IF ( ITYPE .EQ. '_DOUBLE' ) THEN
          CALL KPS1_BFRED( DIMS( 1 ), DIMS( 2 ), %VAL( CNF_PVAL( IPD ) ),
      :                    SLBND, NPOS, MXCOEF, FPAR, RESID,
