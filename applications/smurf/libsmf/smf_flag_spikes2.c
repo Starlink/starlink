@@ -532,13 +532,13 @@ void smf_flag_spikes2( smfData *data, unsigned char *quality,
                } else {
                   noise = VAL__BADD; 
                }
-            }
 
 /* Store the new value in the noise box, over-writing the oldest value,
    and increment the index at which to store the next value. If the index
    reaches the end of the array, wrap around to the start of the array. */
-            noisebox[ inoise++ ] = dnew;
-            if( inoise == (int) box ) inoise = 0;
+               noisebox[ inoise++ ] = dnew;
+               if( inoise == (int) box ) inoise = 0;
+            }
 
 /* Get pointers to the next central data and quality value for the current
    bolometer. */
