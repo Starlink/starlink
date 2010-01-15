@@ -69,10 +69,12 @@
 *     2009-12-09 (TIMJ):
 *        Check for valid astrometry using JOS_DRCONTROL (which became
 *        valid for SCUBA-2 on 20091205)
+*     2010-01-14 (TIMJ):
+*        Check for bad SMU explicitly.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2007-2009 Science & Technology Facilities Council.
+*     Copyright (C) 2007-2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -162,7 +164,8 @@ AstMapping *smf_rebin_totmap( smfData *data, dim_t itime,
 
    /* Sometimes it is possible for the DA to drop some state structures.
       We need to trap that. */
-   if ( *status == SAI__OK && hdr->state->tcs_az_bc1 == VAL__BADD ) {
+   if ( *status == SAI__OK &&
+        (hdr->state->tcs_az_bc1 == VAL__BADD || hdr->state->smu_az_jig_x == VAL__BADD)) {
      return NULL;
    }
 

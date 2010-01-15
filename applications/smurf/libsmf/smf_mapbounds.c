@@ -146,13 +146,15 @@
 *        Use DRCONTROL flags to check whether we got data from the SMU and TCS.
 *        For older data also check SMU information since bad values from the
 *        SMU can break sc2ast_createwcs.
+*     2010-01-14 (TIMJ):
+*        Include SMU offset in excursion.
 *     {enter_further_changes_here}
 
 *  Notes:
 *     The par[7] array used in this routine is documented in smf_get_projpar.c
 
 *  Copyright:
-*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2010 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2005-2008 University of British Columbia.
 *     All Rights Reserved.
@@ -516,6 +518,10 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
 
             /* calculate the separation of ACTUAL from BASE */
             slaDs2tp(ac1,ac2,bc1,bc2, &offx, &offy, &jstat );
+
+            /* add on the smu tangent plane correction */
+            if (state.smu_tr_jig_x != VAL__BADD) offx += state.smu_tr_jig_x * DAS2R;
+            if (state.smu_tr_jig_y != VAL__BADD) offy += state.smu_tr_jig_y * DAS2R;
 
             if ( offx < flbnd[0] ) { flbnd[0] = offx; textreme[0] = j; }
             if ( offy < flbnd[1] ) { flbnd[1] = offy; textreme[1] = j; }

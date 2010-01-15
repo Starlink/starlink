@@ -1032,10 +1032,9 @@ int *status             /* global status (given and returned) */
    } else {
 /* Create a ShiftMap which moves the origin of projection plane (X,Y)
    coords to take account of the small offsets of SMU jiggle pattern. */
-      shifts[ 0 ] = state->smu_az_jig_x + state->smu_az_chop_x;
-      shifts[ 1 ] = state->smu_az_jig_y + state->smu_az_chop_y;
+      shifts[ 0 ] = (state->smu_az_jig_x + state->smu_az_chop_x) * AST__DD2R / 3600.0;
+      shifts[ 1 ] = (state->smu_az_jig_y + state->smu_az_chop_y) * AST__DD2R / 3600.0;
       jigglemap = astShiftMap( 2, shifts, " " );
-
 
       mapping = (AstMapping *) astCmpMap( cache->map[ subnum ], 
 					  astCmpMap( jigglemap, azelmap, 1, 
