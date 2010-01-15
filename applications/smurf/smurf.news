@@ -1,3 +1,13 @@
+1 SMURF_Version_1.0.0_(Hawaiki)
+
+ o First version suitable for use for real SCUBA-2 data.
+
+ o New SCUBA-2 commands: CALCNOISE, COPYFLAT, STACKFRAMES
+
+ o MAKECUBE can now avoid generating very thin tiles when tiling is enabled.
+
+ o JCMTSTATE2CAT now calculates DRA and DDEC as arcsecond offsets from base position.
+
 1 SMURF_Version_0.5-2_(Nanahope)
 
  o A summary of input observations is now presented.
