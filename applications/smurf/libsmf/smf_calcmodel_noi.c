@@ -260,7 +260,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
         if( fillgaps ) {
           msgOutif(MSG__VERB," ", "   gap filling", status);
-          smf_fillgaps( res->sdata[idx], qua_data, SMF__Q_GAP, status );
+          smf_fillgaps( wf, res->sdata[idx], qua_data, SMF__Q_GAP, status );
         }
       }
 

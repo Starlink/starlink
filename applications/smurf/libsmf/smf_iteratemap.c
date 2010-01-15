@@ -1150,7 +1150,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
               if( fillgaps ) {
                 msgOutif(MSG__VERB," ", "  gap filling", status);
-                smf_fillgaps( data, qua_data, SMF__Q_GAP, status );
+                smf_fillgaps( wf, data, qua_data, SMF__Q_GAP, status );
               }
               
               if( apod ) {

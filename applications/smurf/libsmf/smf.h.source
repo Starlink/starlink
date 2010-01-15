@@ -757,8 +757,8 @@ void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status );
 smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
                        int *status );
 
-void  smf_fillgaps( smfData *data, unsigned char *quality, unsigned char mask, 
-                    int *status );
+void  smf_fillgaps( smfWorkForce *wf, smfData *data, unsigned char *quality, 
+                    unsigned char mask, int *status );
 
 void smf_filter_edge( smfFilter *filt, double f, int lowpass, int *status );
 

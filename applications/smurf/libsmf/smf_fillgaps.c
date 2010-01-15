@@ -13,10 +13,12 @@
 *     Library routine
 
 *  Invocation:
-*     smf_fillgaps( smfData *data, unsigned char *quality,
+*     smf_fillgaps( smfWorkForce *wf, smfData *data, unsigned char *quality,
 *                   unsigned char mask, int *status )
 
 *  Arguments:
+*     wf = smfWorkForce * (Given)
+*        Pointer to a pool of worker threads (can be NULL)
 *     data = smfData * (Given and Returned)
 *        The data that will be flagged
 *     quality = unsigned char * (Given and Returned)
@@ -47,6 +49,8 @@
 *        Initial full version.
 *     2010-01-09 (DSB):
 *        Change to use GSL random number generator.
+*     2010-01-15 (DSB):
+*        Add multi-threading.
 
 *  Copyright:
 *     Copyright (C) 2010 Univeristy of British Columbia.
@@ -95,49 +99,49 @@
    arbitrary. */
 #define BOX 10
 
-void  smf_fillgaps( smfData *data, unsigned char *quality, unsigned char mask, 
-                    int *status ) {
+/* Structure containing information about blocks of bolos to be
+   filled by each thread. */
+typedef struct smfFillGapsData {
+  dim_t nbolo;                  /* Number of bolos */
+  dim_t ntslice;                /* Number of time slices */
+  double *dat;                  /* Pointer to bolo data */
+  gsl_rng *r;                   /* GSL random number generator */
+  size_t b1;                    /* Index of first bolometer to be filledd */
+  size_t b2;                    /* Index of last bolometer to be filledd */
+  size_t bstride;               /* bolo stride */
+  size_t tstride;               /* time slice stride */
+  unsigned char *qua;           /* Pointer to quality array */
+  unsigned char mask;           /* Quality mask for bad samples */
+} smfFillGapsData;
+
+
+/* Prototype for the function to be executed in each thread. */
+static void smfFillGapsParallel( void *job_data_ptr, int *status );
+
+
+
+
+void  smf_fillgaps( smfWorkForce *wf, smfData *data, unsigned char *quality, 
+                    unsigned char mask, int *status ) {
 
 /* Local Variables */
   const gsl_rng_type *type;     /* GSL random number generator type */
+  dim_t bpt;                    /* Number of bolos per thread */
   dim_t i;                      /* Bolometer index */
-  dim_t j;                      /* Time-slice index */
   dim_t nbolo;                  /* Number of bolos */
   dim_t ntslice;                /* Number of time slices */
   double *dat=NULL;             /* Pointer to bolo data */
-  double cl;                    /* Offset of fit at left end of block */
-  double cr;                    /* Offset of fit at right end of block */
-  double grad;                  /* Gradient of line joining patch mid-points */
-  double meanl;                 /* Mean value in left patch */
-  double meanr;                 /* Mean value in right patch */
-  double ml;                    /* Gradient of fit at left end of block */
-  double mr;                    /* Gradient of fit at right end of block */
-  double offset;                /* Offset of line joining patch mid-points */
-  double sigma;                 /* Mean standard deviation */
-  double sigmal;                /* Standard deviation in left patch */
-  double sigmar;                /* Standard deviation in right patch */
-  double x[ BOX ];              /* Array of sample positions */
-  double y[ BOX ];              /* Array of sample values */
   gsl_rng *r;                   /* GSL random number generator */
-  int count;                    /* No. of unflagged since last flagged sample */
-  int flagged;                  /* Is the current sample flagged? */
-  int inside;                   /* Was previous sample flagged? */
-  int jend;                     /* Index of last flagged sample in block */
-  int jfinal;                   /* Final time-slice index */
-  int jj;                       /* Time-slice index */
-  int jstart;                   /* Index of first flagged sample in block */
-  int k;                        /* Loop count */
-  int leftend;                  /* Index at end of left hand patch */
-  int leftstart;                /* Index at start of left hand patch */
-  int rightend;                 /* Index at end of right hand patch */
-  int rightstart;               /* Index at start of right hand patch */
   size_t bstride;               /* bolo stride */
   size_t tstride;               /* time slice stride */
+  smfFillGapsData *job_data;    /* Structures holding data for worker threads */
+  smfFillGapsData *pdata;       /* Pointer to data for next worker thread */
   unsigned char *qua=NULL;      /* Pointer to quality array */
 
 /* Main routine */
   if (*status != SAI__OK) return;
 
+/* Check we have double precision data floating point data. */
   if (!smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status )) return;
 
 /* Pointers to data and quality */
@@ -166,15 +170,125 @@ void  smf_fillgaps( smfData *data, unsigned char *quality, unsigned char mask,
                   status );
   }
 
+  /* Determine how many bolometers to process in each thread, and create
+     the structures used to pass data to the threads. */
+  if( wf ) {
+     bpt = nbolo/wf->nworker;
+     if( wf->nworker*bpt < nbolo ) bpt++;
+     job_data = astMalloc( sizeof( smfFillGapsData )*wf->nworker );
+  } else {
+     bpt = nbolo;
+     job_data = astMalloc( sizeof( smfFillGapsData ) );
+  }
+
   /* Create a default GSL random number generator. */
   type = gsl_rng_default;
   r = gsl_rng_alloc (type);
 
-  /* Pre-calculate a useful constant - the final used value of "j". */
+  /* Begin a job context. */
+  smf_begin_job_context( wf, status );
+
+  /* Loop over bolometer in groups of "bpt". */
+  pdata = job_data;
+  for( i = 0; i < nbolo; i += bpt, pdata++ ) {
+  
+    /* Store information for this group in the  next smfFillGapsData
+       structure. */
+    pdata->nbolo = nbolo;
+    pdata->ntslice = ntslice;
+    pdata->dat = dat;
+    pdata->r = r;
+    pdata->b1 = i;
+    pdata->b2 = i + bpt - 1;
+    if( pdata->b2 >= nbolo ) pdata->b2 = nbolo - 1;
+    pdata->bstride = bstride;
+    pdata->tstride = tstride;
+    pdata->qua = qua;
+    pdata->mask = mask;
+
+    /* Submit a job to the workforce to process this group of bolometers. */
+    (void) smf_add_job( wf, 0, pdata, smfFillGapsParallel, NULL, status );
+  }
+
+  /* Wait until all jobs in the current job context have completed. */
+  smf_wait( wf, status );
+
+  /* End the job context. */
+  smf_end_job_context( wf, status );
+
+  /* Free resources. */
+  gsl_rng_free( r );
+  job_data = astFree( job_data );
+}
+
+
+
+
+
+/* Function to be executed in thread: fill gaps in all bolos from b1 to b2 */
+
+static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
+
+/* Local Variables */
+  dim_t i;                      /* Bolometer index */
+  dim_t j;                      /* Time-slice index */
+  dim_t nbolo;                  /* Number of bolos */
+  dim_t ntslice;                /* Number of time slices */
+  double *dat = NULL;           /* Pointer to bolo data */
+  double cl;                    /* Offset of fit at left end of block */
+  double cr;                    /* Offset of fit at right end of block */
+  double grad;                  /* Gradient of line joining patch mid-points */
+  double meanl;                 /* Mean value in left patch */
+  double meanr;                 /* Mean value in right patch */
+  double ml;                    /* Gradient of fit at left end of block */
+  double mr;                    /* Gradient of fit at right end of block */
+  double offset;                /* Offset of line joining patch mid-points */
+  double sigma;                 /* Mean standard deviation */
+  double sigmal;                /* Standard deviation in left patch */
+  double sigmar;                /* Standard deviation in right patch */
+  double x[ BOX ];              /* Array of sample positions */
+  double y[ BOX ];              /* Array of sample values */
+  gsl_rng *r;                   /* GSL random number generator */
+  int count;                    /* No. of unflagged since last flagged sample */
+  int flagged;                  /* Is the current sample flagged? */
+  int inside;                   /* Was previous sample flagged? */
+  int jend;                     /* Index of last flagged sample in block */
+  int jfinal;                   /* Final time-slice index */
+  int jj;                       /* Time-slice index */
+  int jstart;                   /* Index of first flagged sample in block */
+  int k;                        /* Loop count */
+  int leftend;                  /* Index at end of left hand patch */
+  int leftstart;                /* Index at start of left hand patch */
+  int rightend;                 /* Index at end of right hand patch */
+  int rightstart;               /* Index at start of right hand patch */
+  size_t b1;                    /* Index of first bolometer to be filledd */
+  size_t b2;                    /* Index of last bolometer to be filledd */
+  size_t bstride;               /* bolo stride */
+  size_t tstride;               /* time slice stride */
+  smfFillGapsData *pdata = NULL;/* Pointer to job data */
+  unsigned char mask;           /* Quality mask for bad samples */
+  unsigned char *qua = NULL;    /* Pointer to quality array */
+
+  /* Pointer to the structure holding information needed by this thread. */
+  pdata = (smfFillGapsData *) job_data_ptr;
+
+  /* Copy data from the above structure into local variables. */
+  b1 = pdata->b1;
+  b2 = pdata->b2;
+  bstride = pdata->bstride;
+  dat = pdata->dat;
+  nbolo = pdata->nbolo;
+  ntslice = pdata->ntslice;
+  qua = pdata->qua;
+  r = pdata->r;
+  tstride = pdata->tstride;
+  mask = pdata->mask;
+
+   /* Pre-calculate a useful constant - the final used value of "j". */
   jfinal = ntslice - 1;
 
   /* Loop over bolometer */
-  for( i=0; i<nbolo; i++ ) if( !(qua[i*bstride] & SMF__Q_BADB) ) {
+  for( i = b1; i <= b2; i++ ) if( !(qua[ i*bstride ] & SMF__Q_BADB) ) {
 
     /* Initialise a flag to indicate that the current sample is not
        inside a block of flagged samples. */
@@ -282,7 +396,9 @@ void  smf_fillgaps( smfData *data, unsigned char *quality, unsigned char mask,
                 x[ k ] = jj;
                 y[ k ] = dat[ i*bstride + jj*tstride ];
               }
+
               kpg1Fit1d( 1, k, y, x, &mr, &cr, &sigmar, status );
+
             } else {
               mr = VAL__BADD;
               cr = VAL__BADD;
@@ -318,10 +434,15 @@ void  smf_fillgaps( smfData *data, unsigned char *quality, unsigned char mask,
   
             /* Find the gradient and offset for the straight line used to
                create the replacement values for the flagged block. */
+
+
+
+
+
             if( jstart <= 0 ) {
               grad = mr;
               offset = cr;
-  
+
             } else if( jend >= jfinal ) {
               grad = ml;
               offset = cl;
@@ -340,6 +461,8 @@ void  smf_fillgaps( smfData *data, unsigned char *quality, unsigned char mask,
               for( jj = jstart; jj <= jend; jj++ ) {
                 dat[ i*bstride + jj*tstride ] = grad*jj + offset +
                                                 gsl_ran_gaussian( r, sigma );
+
+
               }
             } 
           }
@@ -347,10 +470,6 @@ void  smf_fillgaps( smfData *data, unsigned char *quality, unsigned char mask,
       }
     }
   }
-
-  /* Free resources. */
-  gsl_rng_free( r );
-
 }
 
 

@@ -368,7 +368,7 @@ void smurf_sc2clean( int *status ) {
     /* Gap filling */
     if( fillgaps ) {
       msgOutif(MSG__VERB," ", "Gap filling.", status);
-      smf_fillgaps( ffdata, NULL, SMF__Q_GAP, status );
+      smf_fillgaps( wf, ffdata, NULL, SMF__Q_GAP, status );
     }
 
     /* Apodization */
