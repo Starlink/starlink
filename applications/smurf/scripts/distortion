@@ -150,8 +150,9 @@ foreach indir ($dir_list)
 #  from a single subscan (with flat).
          echo "$n" > in.lis
          echo "^../darks.lis" >> in.lis
+         rm -f junk.log
          $SMURF_DIR/makemap ^in.lis method=iter out=junk \
-              config="'^$SMURF_DIR/../../share/smurf/dimmconfig.lis,exportndf=(ast,res,qua)'" >& junk.log
+              config="'^$SMURF_DIR/../../share/smurf/dimmconfig_distortionmap.lis,exportndf=(ast,res,qua),bolomap=0'" >& junk.log
          cat junk.log
 
 #  Check makemap ran succesfully
@@ -284,6 +285,7 @@ foreach indir ($dir_list)
 #  Find the centroid at the peak position, and its error. Use a smallish 
 #  search box to exclude the effect of pixels that remain lit up for some 
 #  time after the source has passed over them.
+               rm -f junk.log
                $KAPPA_DIR/centroid backoff\(,,$iz\) mode=inter init="'$px $py'" \
                            maxshift=5 search=5 cerror=yes >& junk.log
       
@@ -342,7 +344,7 @@ foreach indir ($dir_list)
 
 #  Use the iterative mapmaker to create map for each individual bolometers.
       $SMURF_DIR/makemap "$indir/*" method=iter out=junk system=AZEL \
-                alignsys=t config="'^$SMURF_DIR/../../share/smurf/dimmconfig.lis,bolomap=1'" | tee makemap.log
+                alignsys=t config="'^$SMURF_DIR/../../share/smurf/dimmconfig_distortionmap.lis,bolomap=1'" | tee makemap.log
       
 #  Get the subarray name, and its corresponding integer index. 
       set subarray = `$KAPPA_DIR/fitsmod junk edit=print keyword=SUBARRAY`
