@@ -57,6 +57,9 @@
 *     - The darks will be returned in time order.
 *     - Observations which have a SEQ_TYPE header and whose value differs
 *       OBS_TYPE will be filtered out and not copied to outgrp.
+*     - Observations with inconsistent SEQSTART and RTS_NUM entries will be
+*       filtered out. These are commonly caused by the DA system using a
+*       header from the previous file.
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
@@ -84,9 +87,12 @@
 *        Quick hack to filter out SEQ_TYPE ne OBS_TYPE observations. Proper
 *        solution is for an additional smfArray to be returned with these
 *        items.
+*     2010-01-14 (TIMJ):
+*        Ignore files that have corrupt FITS header by seeing if the first RTS_NUM
+*        matches the SEQSTART value.
 
 *  Copyright:
-*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2010 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -210,10 +216,19 @@ void smf_find_darks( const Grp * ingrp, Grp **outgrp, Grp **darkgrp,
       /* compare sequence type with observation type and drop it (for now)
          if they differ */
       if ( infile->hdr->obstype == infile->hdr->seqtype ) {
-        /* store the file in the output group */
-        ndgCpsup( ingrp, i, ogrp, status );
+        /* Sanity check the header for corruption. Compare RTS_NUM with SEQSTART */
+        int seqstart = 0;
+        JCMTState *tmpState = NULL;
+        smf_getfitsi( infile->hdr, "SEQSTART", &seqstart, status );
+        tmpState = infile->hdr->allState;
         msgSetc("F", infile->file->name);
-        msgOutif(MSG__DEBUG, " ", "Non-dark file: ^F",status);
+        if ( (tmpState[0]).rts_num == seqstart ) {
+          /* store the file in the output group */
+          ndgCpsup( ingrp, i, ogrp, status );
+          msgOutif(MSG__DEBUG, " ", "Non-dark file: ^F",status);
+        } else {
+          msgOutif( MSG__QUIET, "", "File ^F has a corrupt FITS header. Ignoring it.", status );
+        }
       } else {
         msgSetc("F", infile->file->name);
         msgOutif(MSG__DEBUG, " ", "Sequence type mismatch with observation type: ^F",status);
