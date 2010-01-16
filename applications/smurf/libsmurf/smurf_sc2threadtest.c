@@ -44,9 +44,11 @@
 *  History:
 *     2008-11-14 (EC):
 *        Initial version -- copy thread infrastructure from makemap
+*     2010-01-15 (EC):
+*        Add test for merging status from several threads
 
 *  Copyright:
-*     Copyright (C) 2005-2008 University of British Columbia.
+*     Copyright (C) 2008-2010 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -223,6 +225,11 @@ void smfParallelTime( void *job_data_ptr, int *status ) {
   msgOutif( MSG__DEBUG, "",
             "-- parallel time: thread finished chunks ^C1 -- ^C2",
             status );
+
+  /* Try setting some status in thread to test merging mechanism */
+  *status = SMF__INSMP;
+  errRepf( " ", "Set SMF__INSMP in thread chunks %i -- %i", status,
+           data->chunk1, data->chunk2 );
 }
 
 /* --------------------------------------------------------------------------*/
@@ -372,6 +379,16 @@ void smurf_sc2threadtest( int *status ) {
 
   /* Wait until all of the submitted jobs have completed */
   smf_wait( wf, status );
+
+  /* Annul the bad status that we set in smfParallelTime */
+  if( *status == SMF__INSMP ) {
+    errAnnul( status );
+    msgOut( "", " *** Annulled SMF__INSMP set in smfParallelTime *** ", 
+            status );
+  } else {
+    msgOut( "", " *** Flushing good status *** ", status );
+    errFlush( status );
+  }
 
   /*** TIMER ***/
   msgOutf( "", "** %f seconds to complete test", status,
