@@ -313,7 +313,7 @@ typedef enum smf_bbm_meth {
 typedef enum smf_metadata_fixups {
   SMF__FIXED_FITSHDR=1,   /* Updated FITS header */
   SMF__FIXED_JCMTSTATE=2, /* Updated JCMTSTATE information */
-  SMF__FIXED_ACSIS=4,     /* Updated ACSIS extension information */
+  SMF__FIXED_ACSIS=4     /* Updated ACSIS extension information */
 } smf_metadata_fixups;
 
 /* Indicate a bad array index */
