@@ -38,6 +38,11 @@ Print version information.
 
 Print the full documentation to STDOUT.
 
+=item B<--with-mce>
+
+Include SCUBA-2 MCE information in output table. This adds a lot of data to
+the output files and much of it is constant for the observation.
+
 =back
 
 =head1 NOTES
@@ -75,10 +80,11 @@ use Astro::FITS::Header::NDF;
 use NDF; # For VAL__BADD
 use Scalar::Util qw/ looks_like_number /;
 
-my ($help, $man, $version);
+my ($help, $man, $version, $with_mce);
 my $ostatus = GetOptions( "help" => \$help,
                           "man" => \$man,
-                          "version" => \$version
+                          "version" => \$version,
+                          "with-mce" => \$with_mce,
                         );
 pod2usage(1) if $help;
 pod2usage(-exitstatus => 0, -verbose =>2) if $man;
@@ -119,7 +125,7 @@ for my $f (@files) {
   }
 
   # See if we have an MCEHEAD from a SCUBA-2 file
-  {
+  if ($with_mce) {
     my ($cols, $mcedata) = read_mce( $f );
     if (defined $cols) {
       push(@columns, @$cols);
