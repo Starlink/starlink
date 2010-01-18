@@ -1825,6 +1825,25 @@ $(MANIFESTS)/one: \
 	cd libraries/one \
 	  && $(MAKE_CPT)
 
+$(MANIFESTS)/pamela: \
+		$(MANIFESTS)/chr \
+		$(MANIFESTS)/cnf \
+		$(MANIFESTS)/ems \
+		$(MANIFESTS)/fio \
+		$(MANIFESTS)/generic \
+		$(MANIFESTS)/hds \
+		$(MANIFESTS)/hlp \
+		$(MANIFESTS)/mers \
+		$(MANIFESTS)/par \
+		$(MANIFESTS)/pcs \
+		$(MANIFESTS)/prm \
+		$(MANIFESTS)/psx \
+		$(MANIFESTS)/sae \
+		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil
+	cd applications/pamela \
+	  && $(MAKE_CPT)
+
 $(MANIFESTS)/par: \
 		$(MANIFESTS)/chr \
 		$(MANIFESTS)/cnf \
@@ -1861,6 +1880,7 @@ $(MANIFESTS)/pcs: \
 $(MANIFESTS)/pda: \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/generic \
+		$(MANIFESTS)/messgen \
 		$(MANIFESTS)/prm \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/star2html \
@@ -3100,6 +3120,7 @@ SUPPORTED_COMPONENTS = \
 	$(MANIFESTS)/ndf \
 	$(MANIFESTS)/ndg \
 	$(MANIFESTS)/news \
+	$(MANIFESTS)/pamela \
 	$(MANIFESTS)/par \
 	$(MANIFESTS)/pcs \
 	$(MANIFESTS)/pda \
