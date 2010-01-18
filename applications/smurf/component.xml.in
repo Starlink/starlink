@@ -5,12 +5,13 @@
 <component id="@PACKAGE@">
   <version>@PACKAGE_VERSION@</version>
   <path>applications/smurf</path>
-  <description>SURF2 - SCUBA-2 User Reduction Facility</description>
+  <description>SMURF - Sub-mm User Reduction Facility</description>
   <abstract><p>
-SURF2 is a set of ADAM tasks necessary for reducing raw
+SMURF is a set of ADAM tasks necessary for reducing raw
 Submillimetre Common-User Bolometer Array 2 (SCUBA-2) data obtained from
 the James Clerk Maxwell Telescope. The tasks allows one to completely
-reduce your SCUBA-2 data.
+reduce your SCUBA-2 data. It can also be used to make maps obtained
+with the ACSIS correlator at JCMT.
   </p></abstract>
   <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
     @STAR_DEPENDENCIES_CHILDREN@
@@ -19,6 +20,18 @@ reduce your SCUBA-2 data.
     <person>
       <name>Tim Jenness</name>
       <uname>timj</uname>
+    </person>
+    <person>
+      <name>David S. Berry</name>
+      <uname>dsb</uname>
+    </person>
+    <person>
+      <name>Ed Chapin</name>
+      <uname>ec</uname>
+    </person>
+    <person>
+      <name>Andy Gibb</name>
+      <uname>agg</uname>
     </person>
   </developers>
   <documentation>@STAR_DOCUMENTATION@</documentation>
