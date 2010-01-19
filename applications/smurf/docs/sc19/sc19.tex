@@ -51,11 +51,11 @@
 \newcommand{\stardoccategory}  {Starlink Cookbook}
 \newcommand{\stardocinitials}  {SC}
 \newcommand{\stardocsource}    {sc\stardocnumber}
-\newcommand{\stardoccopyright} 
+\newcommand{\stardoccopyright}
 {Copyright \copyright\ 2009 University of British Columbia}
-\newcommand{\stardocnumber}    {19}
-\newcommand{\stardocauthors}   {Edward Chapin \& Douglas Scott}
-\newcommand{\stardocdate}      {18 January 2009}
+\newcommand{\stardocnumber}    {19.2}
+\newcommand{\stardocauthors}   {Edward Chapin, Douglas Scott \& Tim Jenness}
+\newcommand{\stardocdate}      {18 January 2010}
 \newcommand{\stardoctitle}     {The SMURF SCUBA-2 Data Analysis Cookbook}
 \newcommand{\stardocversion}   {1.0}
 \newcommand{\stardocmanual}    {\ }
@@ -67,21 +67,21 @@
 
 }
 % ? End of document identification
- 
+
 % A new environment for quoting verbatim
 % Environment for indenting and using a small font.
 \newenvironment{myquote}{\begin{quote}\begin{small}}{\end{small}\end{quote}}
- 
+
 
 
 \newcommand{\text}[1]{{\small \texttt{#1}}}
- 
+
 % SCUBA reference
 %\newcommand{\scuba}{\htmladdnormallink{SCUBA}{http://www.jach.hawaii.edu/JCMT/}}
 
- 
+
 % Starlink Package names
-\newcommand{\starlink}{\htmladdnormallink{Starlink}{http://starlink.jach.hawaii.edu}} 
+\newcommand{\starlink}{\htmladdnormallink{Starlink}{http://starlink.jach.hawaii.edu}}
 
 % set up some common package names
 \newcommand{\Kappa}{\xref{\textsc{Kappa}}{sun95}{}}
@@ -101,13 +101,15 @@
 \newcommand{\GKS}{\xref{GKS}{sun83}{}}
 \newcommand{\oracdr}{\xref{\textsc{orac-dr}}{sun231}{}}
 \newcommand{\smurf}{\xref{\textsc{Smurf}}{sun258}{}}
+\newcommand{\topcat}{\xref{\textsc{Topcat}}{sun253}{}}
+
 
 % Application tasks
 \newcommand{\task}[1]{\textsf{#1}}
- 
+
 % ADAM parameters
 \newcommand{\param}[1]{\texttt{#1}}
- 
+
 % SMURF tasks
 \newcommand{\concat}{\xref{\task{sc2concat}}{sun258}{SC2CONCAT}}
 \newcommand{\fft}{\xref{\task{sc2fft}}{sun258}{SC2FFT}}
@@ -115,10 +117,10 @@
 \newcommand{\flatfield}{\xref{\task{flatfield}}{sun258}{FLATFIELD}}
 \newcommand{\makemap}{\xref{\task{makemap}}{sun258}{MAKEMAP}}
 \newcommand{\jcmtstate}{\xref{\task{jcmtstate2cat}}{sun258}{JCMTSTATE2CAT}}
- 
+
 % Non surf tasks
 
-% KAPPA 
+% KAPPA
 \newcommand{\qualtobad}{\xref{\task{qualtobad}}{sun95}{QUALTOBAD}}
 \newcommand{\showqual}{\xref{\task{showqual}}{sun95}{SHOWQUAL}}
 \newcommand{\display}{\xref{\task{display}}{sun95}{DISPLAY}}
@@ -260,14 +262,14 @@
 
 %  Hypertext definitions.
 %  ======================
-% These are used by the LaTeX2HTML translator in conjunction with 
+% These are used by the LaTeX2HTML translator in conjunction with
 % star2html.
 
 %  Comment.sty: version 2.0, 19 June 1992
 %  Selectively in/exclude pieces of text.
 %
 %  Author
-%    Victor Eijkhout                                      
+%    Victor Eijkhout
 %    <eijkhout@cs.utk.edu>
 %    Department of Computer Science
 %    University Tennessee at Knoxville
@@ -275,7 +277,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -314,11 +316,11 @@
 \excludecomment{htmlonly}
 
 %  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos 
+%  file supplied with LaTeX2HTML by: Nikos Drakos
 %  <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML 
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML
 %  documentation
-%  should be consulted about all commands (and the environments 
+%  should be consulted about all commands (and the environments
 %  defined above)
 %  except \xref and \xlabel which are Starlink specific.
 
@@ -353,7 +355,7 @@
 
 %  Debugging.
 %  =========
-%  Remove % on the following to debug links in the HTML version using 
+%  Remove % on the following to debug links in the HTML version using
 %  Latex.
 
 % \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
@@ -380,7 +382,7 @@
 %  Latex document header.
 %  ======================
 \begin{latexonly}
-   \textsc{University of British Columbia} \hfill {\textbf 
+   \textsc{University of British Columbia} \hfill {\textbf
 \stardocname}\\
    {\large  Science \& Technology Facilities Council}\\
    {\large Starlink Project\\}
@@ -437,7 +439,7 @@
       \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
       \htmladdnormallink{Rutherford Appleton Laboratory}
                         {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research 
+      \htmladdnormallink{Particle Physics \& Astronomy Research
 Council}
                         {http://www.pparc.ac.uk} \\
    \begin{rawhtml} </H3> <H2> \end{rawhtml}
@@ -446,13 +448,13 @@ Council}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to 
+%  Add table of contents header and a navigation button to return to
 %  this point in the document (this should always go before the
-%  abstract \section). 
+%  abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -503,7 +505,7 @@ The purpose of this guide is to help SCUBA-2 users become familiar
 with the basic facilities for analyzing and visualizing data using
 \smurf\ \cite{smurf}, and the \starlink\ packages \Kappa \cite{kappa},
 and \gaia \cite{gaia}.  This guide is {\em not} aimed at users of the
-polarimeter (POL) or Fourier transform spectrometer (FTS), neither of
+polarimeter (POL-2) or Fourier transform spectrometer (FTS-2), neither of
 which are operational at the time of writing.
 
 A brief description of raw SCUBA-2 data is given in
@@ -523,7 +525,7 @@ are distributed with this \starlink\ release. They may be found in
 
 \begin{myquote}
 \begin{verbatim}
-$STARLINK/share/smurf/s4a20091214_00015_000*.sdf
+$STARLINK_DIR/share/smurf/s4a20091214_00015_000*.sdf
 \end{verbatim}
 \end{myquote}
 
@@ -545,8 +547,6 @@ type:
         Type smurfhelp for help on SMURF commands.
         Type 'showme sun258' to browse the hypertext documentation.
         Type 'showme sc19' to view the SCUBA-2 map-making cookbook.
-
-    
 
 \end{verbatim}
 \end{myquote}
@@ -590,7 +590,7 @@ operational at the time (s4a):
 As noted in the introduction, the first two files containing data from
 the actual scan of Uranus are included with this \starlink\ release in:
 \begin{verbatim}
-$STARLINK/share/smurf/s4a20091214_00015_000*.sdf
+$STARLINK_DIR/share/smurf/s4a20091214_00015_000*.sdf
 \end{verbatim}
 
 \Kappa\ tasks such as \fitslist\ and \ndftrace\ can be used to see the
@@ -631,7 +631,7 @@ features of SCUBA-2 data, but will not result in a science-grade image
 at the end. If you are interested only in making the best possible map
 with minimal effort go immediately to Section~\ref{sec:maps}.
 
-\subsection{\xlabel{concat}Concatenating data} 
+\subsection{\xlabel{concat}Concatenating data}
 
 Since SCUBA-2 data for a given subarray are broken into many pieces by
 the DA system, it is useful for visualization to first concatenate the
@@ -665,9 +665,36 @@ information into a simple ASCII tab separated table:
 \end{verbatim}
 \end{myquote}
 
-... talk about TOPCAT ...
+\begin{figure}
+\begin{center}
+\includegraphics{scan_pattern}
+\caption{The telescope positions during observation number 7 on
+  20090107. The plot is created by \topcat\ from the output from
+\jcmtstate\ plotting the DRA columns against the DDEC column. The pong
+scan pattern is clearly visible.}
+\label{fig:topcat}
+\end{center}
+\end{figure}
 
-\subsection{\xlabel{display_cube}Displaying data cubes} 
+The `-h' option to \jcmtstate\ can be used to find more information on
+the command. In particular, multiple files can be supplied to the
+command using standard shell wild cards (not escaped) and for SCUBA-2
+data the `--with-mce' option can be used to dump the low-level MCE
+header information.
+
+This catalogue can be loaded into \topcat\ for plotting, making sure
+that \topcat\ is told that the TST format is to be used for reading.
+
+\begin{myquote}
+\begin{verbatim}
+% topcat -f tst state.tst
+\end{verbatim}
+\end{myquote}
+
+An example plot of the scan pattern for this observation generated by
+\topcat\ can be seen in Fig.~\ref{fig:topcat}.
+
+\subsection{\xlabel{display_cube}Displaying data cubes}
 
 \begin{figure}
 \begin{center}
@@ -735,7 +762,7 @@ the time-varying component of the signals are quite similar.
 \end{center}
 \end{figure}
 
-\subsection{\xlabel{regrid_map}Regridding data into a map} 
+\subsection{\xlabel{regrid_map}Regridding data into a map}
 
 A `naive' map can be made from a data cube using the \smurf\ \makemap\
 task. The following will produce a map directly from the raw
@@ -767,7 +794,7 @@ that nothing can really be seen in the resulting image with \gaia.
 \end{center}
 \end{figure}
 
-\subsection{\xlabel{clean}Cleaning data} 
+\subsection{\xlabel{clean}Cleaning data}
 
 The previous examples illustrate the need for some kind of data
 cleaning before there is any hope of seeing astronomical sources. A
@@ -778,7 +805,7 @@ also accessible within the DIMM (Section~\ref{sec:maps}), so in
 practice the user does not issue this command directly before making
 the final map.
 
-\subsubsection{\xlabel{clean_average}Removing detector averages and DC Steps} 
+\subsubsection{\xlabel{clean_average}Removing detector averages and DC Steps}
 
 The following will remove a 0th-order polynomial (the mean) from each
 detector time stream, storing the cleaned data in a file called
@@ -817,7 +844,7 @@ be identified and repaired using some extra parameters to \clean:
 \begin{myquote}
 \begin{verbatim}
 % sc2clean s4a20091214_00015_0002_con.sdf clean2 order=0 dcbox=50 \
-dcthresh=200 dcflagall fillgaps 
+dcthresh=200 dcflagall fillgaps
 \end{verbatim}
 \end{myquote}
 
@@ -845,7 +872,7 @@ Fig.~\ref{fig:map_dc_mean}.
 \end{center}
 \end{figure}
 
-\subsubsection{\xlabel{movie}Watching a movie} 
+\subsubsection{\xlabel{movie}Watching a movie}
 
 \gaia\ has the ability to animate the display of a data cube. We will
 use this feature to make a `movie' of the array data. Load
@@ -863,7 +890,7 @@ telescope motion, and other drifts in the individual detectors. At
 times it is also (just barely) possible to see Uranus itself as the
 array scans.
 
-\subsubsection{\xlabel{fftfilter}Frequency-domain filtering} 
+\subsubsection{\xlabel{fftfilter}Frequency-domain filtering}
 
 \clean\ can also perform frequency domain filtering on the
 detectors. In order for this to work properly, the data must first be
@@ -917,7 +944,7 @@ at the start and end of the data have been added as padding. The call
 to \clean\ has done several things: removed the mean value of each
 detector; corrected DC steps; apodized over a range of 1000 samples;
 and finally performed a high-pass filter with a hard lower cutoff
-frequency of 0.5\,Hz. 
+frequency of 0.5\,Hz.
 
 Fig.~\ref{fig:highpass} shows the filtered bolometer signal for
 (13,23), as well as a map produced from the data. The filtering has
@@ -926,7 +953,7 @@ Fig.~\ref{fig:map_dc_mean}, but the filtering has now introduced
 negative ringing around the source which results in a negative cross
 pattern along the scan directions.
 
-\subsection{\xlabel{pspec}Detector power-spectra} 
+\subsection{\xlabel{pspec}Detector power-spectra}
 
 The frequency-domain power spectra of SCUBA-2 detectors can be
 produced with the \smurf\ task \fft. Using the padded, concatenated
@@ -999,7 +1026,7 @@ just below 1\,Hz.
 \end{center}
 \end{figure}
 
-\subsection{\xlabel{quality}Data quality flagging} 
+\subsection{\xlabel{quality}Data quality flagging}
 
 NDF files manipulated by \smurf\ use the standard \starlink\ named
 Quality mechanism (see discussion in \xref{Masking, Bad Values, and
@@ -1023,7 +1050,7 @@ the previous example:
      parameter lists. See the 'Release Notes' section of SUN/95 for
      details.
 
-   
+
 
 % showqual clean4 yes
   BADSAM          (bit 1) - "Set iff a sample is flagged by the DA" (4416000)
@@ -1069,7 +1096,7 @@ slices, where the data were padded, to the magic value.  If
 `badmasked' is subsequently viewed with \gaia, none of those portions
 of the data will be visible.
 
-\section{\xlabel{maps}Dynamic Iterative Map-Making} 
+\section{\xlabel{maps}Dynamic Iterative Map-Making}
 \label{sec:maps}
 
 Rather than manually cleaning the data by hand and then re-gridding it
@@ -1079,7 +1106,7 @@ all at the end, we can instead do everything in one go using the
 The DIMM is enabled using the \texttt{method=iterate} switch to the
 \makemap\ task. In the following example we will produce a map of
 Uranus using the test data supplied with this \starlink\ distribution
-in {\texttt \$STARLINK/share/smurf/s4a20091214\_00015\_000*.sdf}. All
+in {\texttt \$STARLINK\_DIR/share/smurf/s4a20091214\_00015\_000*.sdf}. All
 of the settings for the DIMM are stored in the configuration file
 `\texttt{dimmconfig.lis}'. In this example we will use the default
 configuration file that is installed in the \starlink\ tree, which is
@@ -1090,7 +1117,7 @@ pixels:
 
 \begin{myquote}
 \begin{verbatim}
-% makemap '$STARLINK/share/smurf/s4a20091214_00015_000?.sdf' uranus 2 \
+% makemap '$STARLINK_DIR/share/smurf/s4a20091214_00015_000?.sdf' uranus 2 \
 method=iterate config=^$STARLINK_DIR/share/smurf/dimmconfig.lis
 
 Out of 2 input files, 0 were darks and 2 were not darks
@@ -1210,15 +1237,15 @@ Re-running the iterative map-maker with this modified
 
 \begin{myquote}
 \begin{verbatim}
-s4a20091214_00015_0002_con_ast.sdf  
-s4a20091214_00015_0002_con_com.sdf  
+s4a20091214_00015_0002_con_ast.sdf
+s4a20091214_00015_0002_con_com.sdf
 s4a20091214_00015_0002_con_gai.sdf
 s4a20091214_00015_0002_con_flt.sdf
 s4a20091214_00015_0002_con_res.sdf
 \end{verbatim}
 \end{myquote}
 
-Note that the quality and variance for the data become are stored as
+Note that the quality and variance for the data are stored as
 the Variance and Quality components within the residual file NDF.
 
 As with the input data, these are all standard \starlink\ NDF files
@@ -1276,19 +1303,19 @@ model components.
 \bibitem{smurf}
 Chapin~E.~L., et~al., 2009, \textit{SMURF -- Sub-Millimetre User Reduction
 Facility},
-\xref{Starlink User Note 258}{sun258}{} 
+\xref{Starlink User Note 258}{sun258}{}
 
 \bibitem{kappa}
 Currie~M.~J., 1997, {\it KAPPA --- Kernel Application Package},
 \xref{Starlink User Note 95}{sun95}{}
 
 \bibitem{gaia}
-Draper~P.~W., 1997, {\it GAIA -- Graphical Astronomy and Image 
+Draper~P.~W., 1997, {\it GAIA -- Graphical Astronomy and Image
 Analysis Tool},
 \xref{Starlink User Note 214}{sun214}{}
 
 \end{thebibliography}
- 
+
 \end{document}
 
-      
+
