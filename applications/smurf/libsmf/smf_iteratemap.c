@@ -235,6 +235,8 @@
 *        Add fillgaps to data pre-processing (config file)
 *     2010-01-12 (TIMJ):
 *        Add facility for merging keymaps from config file.
+*     2010-01-18 (EC):
+*        Export data before dying if SMF__INSMP status set
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -1664,7 +1666,10 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
          input flatfielded data.
          Also - check that a filename is defined in the smfFile! */
 
-      if( exportNDF && (*status == SAI__OK) ) {
+      if( exportNDF && ((*status == SAI__OK) || (*status == SMF__INSMP)) ) {
+
+        errBegin( status );
+
         msgOut(" ", FUNC_NAME ": Export model components to NDF files.",
                status);
 
@@ -1851,6 +1856,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                    ": ** %f s Exporting models",
                    status, smf_timerupdate(&tv1,&tv2,status) );
 
+        errEnd( status );
       }
     }
 
