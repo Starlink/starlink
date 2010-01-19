@@ -287,16 +287,6 @@ void smurf_sc2clean( int *status ) {
     /* Update quality flags to match bad samples, and to apply badfrac */
     smf_update_quality( ffdata, NULL, 1, NULL, badfrac, status );
 
-    /* Remove baselines */
-    if( order >= 0 ) {
-      msgSeti("ORDER",order);
-      msgOutif(MSG__VERB," ",
-               "Fitting and removing ^ORDER-order polynomial baselines",
-               status);
-      smf_scanfit( ffdata, NULL, order, status );
-      smf_subtract_poly( ffdata, NULL, 0, status );
-    }
-
     /* Fix large DC steps */
     if( dcthresh && dcbox ) {
       msgSetd("DCTHRESH",dcthresh);
@@ -304,14 +294,14 @@ void smurf_sc2clean( int *status ) {
       if( dcflag==1 ) {
         msgOutif(MSG__VERB," ",
                  "Flagging bolos with ^DCTHRESH-sigma DC steps in ^DCBOX "
-                 "samples", status);
+                 "samples as bad", status);
       } else if( dcflag==2 ) {
         msgOutif(MSG__VERB," ",
-                 "Flagging bolos with ^DCTHRESH-sigma DC steps in ^DCBOX "
-                 "samples", status);
+                 "Fixing ALL BOLOS at locations of DC steps size ^DCTHRESH-sigma in ^DCBOX samples",
+                 status);
       } else {
         msgOutif(MSG__VERB," ",
-                 "Fixing ALL BOLOS at locations of DC steps size ^DCTHRESH-sigma in ^DCBOX samples",
+                 "Fixing bolos at locations of DC steps size ^DCTHRESH-sigma in ^DCBOX samples",
                  status);
       }
       smf_correct_steps( ffdata, NULL, dcthresh, dcbox, dcflag, NULL, status );
@@ -369,6 +359,16 @@ void smurf_sc2clean( int *status ) {
     if( fillgaps ) {
       msgOutif(MSG__VERB," ", "Gap filling.", status);
       smf_fillgaps( wf, ffdata, NULL, SMF__Q_GAP, status );
+    }
+
+    /* Remove baselines */
+    if( order >= 0 ) {
+      msgSeti("ORDER",order);
+      msgOutif(MSG__VERB," ",
+               "Fitting and removing ^ORDER-order polynomial baselines",
+               status);
+      smf_scanfit( ffdata, NULL, order, status );
+      smf_subtract_poly( ffdata, NULL, 0, status );
     }
 
     /* Apodization */
