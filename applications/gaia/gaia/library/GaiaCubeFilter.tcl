@@ -278,7 +278,7 @@ itcl::class gaia::GaiaCubeFilter {
    #  Set the filter type.
    protected method set_filter_type_ {type} {
       set filter_type_ $type
-      
+
       #  Enable/disabled appropriate elements.
       toggle_type_
    }
@@ -385,7 +385,7 @@ itcl::class gaia::GaiaCubeFilter {
          set keep_units_ ""
       }
 
-      #  Create name for the new cube, needs to be different to the 
+      #  Create name for the new cube, needs to be different to the
       #  currently displayed one.
       incr count_
       set output_name_ [gaia::GaiaTempName::make_name \
@@ -393,6 +393,50 @@ itcl::class gaia::GaiaCubeFilter {
       $itk_component(outputfile) configure -value ""
 
       set axis [$itk_option(-gaiacube) get_axis]
+
+      switch -exact $filter_type_ {
+         "square" {
+            set box [get_box_ $axis $boxsize1_ $boxsize1_]
+            $blocktask_ runwiths "in=$input_name out=$output_name_ \
+                        box=$box estimator=$combination_type_ \
+                        accept"
+         }
+         "rectangle" {
+            set box [get_box_ $axis $boxsize1_ $boxsize2_]
+            $blocktask_ runwiths "in=$input_name out=$output_name_ \
+                        box=$box estimator=$combination_type_ \
+                        accept"
+         }
+         "gaussian" {
+            set axes [get_axes_ $axis]
+            $gausstask_ runwiths "in=$input_name out=$output_name_ \
+                        box=$boxsize1_ fwhm=$fwhm1_ orient=! \
+                        axes=$axes accept"
+         }
+         "gaussian-elliptical" {
+            set axes [get_axes_ $axis]
+            $gausstask_ runwiths "in=$input_name out=$output_name_ \
+                        box=\[$boxsize1_,$boxsize2_\] \
+                        fwhm=\[$fwhm1_,$fwhm2_\] orient=$orient_ \
+                        axes=$axes accept"
+         }
+      }
+   }
+
+   #  Create a BOX parameter for the given image plane sides and axis.
+   protected method get_box_ {axis side1 side2} {
+      if { $axis == 1 } {
+         set box "\[1,$side1,$side2,1\]"
+      } elseif { $axis == 2 } {
+         set box "\[$side1,1,$side2\]"
+      } else {
+         set box "\[$side1,$side2,1\]"
+      }
+      return $box
+   }
+
+   #  Create an AXES parameter for the given image axis.
+   protected method get_axes_ {axis} {
       if { $axis == 1 } {
          set axes "\[2,3\]"
       } elseif { $axis == 2 } {
@@ -400,31 +444,7 @@ itcl::class gaia::GaiaCubeFilter {
       } else {
          set axes "\[1,2\]"
       }
-
-      switch -exact $filter_type_ {
-         "square" {
-            $blocktask_ runwiths "in=$input_name out=$output_name_ \
-                        box=$boxsize1_ estimator=$combination_type_ \
-                        axes=$axes accept"
-         }
-         "rectangle" {
-            $blocktask_ runwiths "in=$input_name out=$output_name_ \
-                        box=\[$boxsize1_,$boxsize2_\] \
-                        estimator=$combination_type_ \
-                        axes=$axes accept"
-         }
-         "gaussian" {
-            $gausstask_ runwiths "in=$input_name out=$output_name_ \
-                        box=$boxsize1_ fwhm=$fwhm1_ orient=! \
-                        axes=$axes accept"
-         }
-         "gaussian-elliptical" {
-            $gausstask_ runwiths "in=$input_name out=$output_name_ \
-                        box=\[$boxsize1_,$boxsize2_\] \
-                        fwhm=\[$fwhm1_,$fwhm2_\] orient=$orient_ \
-                        axes=$axes accept"
-         }
-      }
+      return $axes
    }
 
    #  Do the presentation of the result now the application has completed.
