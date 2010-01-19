@@ -35,13 +35,12 @@
 *        N-sigma threshold for spike detection
 *     niter = size_t (Given)
 *        Number of iterations. If set to 0 iterate until the list of
-*        flagged sources doesn't change (converges). If a value of 10000
-*        is supplied, then smf_flag_spikes2 will be invoked to flag the 
-*        spikes, with the box size being set to "maxiter". See 
-*        smf_flag_spikes2 for further details.
+*        flagged sources doesn't change (converges). If a value greather
+*        than 10000 is supplied, then smf_flag_spikes2 will be invoked to 
+*        flag the spikes, with the box size being set to "niter - 10000". 
+*        See smf_flag_spikes2 for further details.
 *     maxiter = size_t (Given)
-*        If niter=0 maxiter is a maximum number of iterations. If
-*        niter=1000 maxiter is the box size to use with smf_flag_spikes2.
+*        If niter=0 maxiter is a maximum number of iterations. 
 *     aiter = size_t * (Returned)
 *        The actual number of iterations executed. May be NULL.
 *     nflagged = size_t * (Returned)
@@ -59,9 +58,9 @@
 *     are flagged SMF__Q_SPIKE. This process can be run a fixed number of 
 *     times, or until the list of flagged samples converges (niter=0).
 *
-*     If niter is 10000, smf_flag_spikes2 is called to flag the spikes,
-*     using the value of "maxiter" as the box size. See smf_flag_spikes2 
-*     for details of the algorithm.
+*     If niter is greater than 10000, smf_flag_spikes2 is called to flag 
+*     the spikes, using the value of "niter-10000" as the box size. See 
+*     smf_flag_spikes2 for details of the algorithm.
 
 *  Notes:
 *     This routine asserts bolo-ordered data.
@@ -85,6 +84,9 @@
 *        Tidy up status handling a bit.
 *     2010-01-14 (DSB):
 *        Call smf_flag_spikes2 if "niter" is 10000.
+*     2010-01-19 (DSB):
+*        Do not use "maxiter" when invoking smf_flag_spikes2 as it cannot
+*        be specified in the config file.
 
 *  Copyright:
 *     Copyright (C) 2008 Univeristy of British Columbia.
@@ -153,9 +155,10 @@ void smf_flag_spikes( smfData *data, double *bolovar, unsigned char *quality,
   /* Main routine */
   if (*status != SAI__OK) return;
 
-  /* If requested, use the alternative spike flagged. */
-  if( niter == 10000 ) {
-     smf_flag_spikes2( data, quality, mask, thresh, maxiter, nflagged, status );
+  /* If requested, use the alternative spike flagger. */
+  if( niter > 10000 ) {
+     smf_flag_spikes2( data, quality, mask, thresh, niter-10000, nflagged, 
+                       status );
      return;
   }
 
