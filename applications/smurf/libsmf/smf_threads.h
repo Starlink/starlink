@@ -43,6 +43,14 @@
 
 /* Type definitions */
 /* ---------------- */
+
+/* Describes the error status upon completion of a job by a worker. */
+typedef struct smfJobStatus {
+   int ems_status;             
+   int nmessage;
+   char **messages;
+} smfJobStatus;
+
 /* Describes a single job in a linked list of jobs. */
 typedef struct smfJob smfJob;
 typedef struct smfWorkForce smfWorkForce;
@@ -59,25 +67,26 @@ struct smfJob {
   smfJob *next;               /* Next job in list */
   smfJob *prev;               /* Previous job in list */
   int conid;                  /* Context idenrifier for job */
+  smfJobStatus *status;       /* The error status upon completion of the job */
 };
 
 /* Structure describing the whole work force. */
 struct smfWorkForce {
-  int nworker;                   /* No. of workers in the work force */
-  smfJob *finished_jobs;         /* Linked list of finished jobs */
-  smfJob *active_jobs;           /* Linked list of active jobs */
-  smfJob *free_jobs;             /* Linked list of free jobs structures */
-  smfJob *available_jobs;        /* Linked list of jobs available to run */
-  smfJob *waiting_jobs;          /* Linked list of jobs waiting on other jobs */
-  pthread_cond_t job_done;       /* Signals "another job has completed" */
-  pthread_cond_t all_done;       /* Signals "no more jobs to be done" */
-  pthread_cond_t page;           /* Signals worker to return to job desk */
-  pthread_mutex_t jd_mutex;      /* Mutex controlling access to the job desk */
-  int status;                    /* Inherited status value for the workforce */
-  int kill;                      /* No. of workers still to be terminated */
-  int ncontext;                  /* Number of context identifiers issued so far */
-  int *contexts;                 /* List of job context identifiers. */
-  int condepth;                  /* Depth of job context nesting */
+  int nworker;                /* No. of workers in the work force */
+  smfJob *finished_jobs;      /* Linked list of finished jobs */
+  smfJob *active_jobs;        /* Linked list of active jobs */
+  smfJob *free_jobs;          /* Linked list of free jobs structures */
+  smfJob *available_jobs;     /* Linked list of jobs available to run */
+  smfJob *waiting_jobs;       /* Linked list of jobs waiting on other jobs */
+  pthread_cond_t job_done;    /* Signals "another job has completed" */
+  pthread_cond_t all_done;    /* Signals "no more jobs to be done" */
+  pthread_cond_t page;        /* Signals worker to return to job desk */
+  pthread_mutex_t jd_mutex;   /* Mutex controlling access to the job desk */
+  int kill;                   /* No. of workers still to be terminated */
+  int ncontext;               /* Number of context identifiers issued so far */
+  int *contexts;              /* List of job context identifiers. */
+  int condepth;               /* Depth of job context nesting */
+  smfJobStatus *status;       /* First bad error status reported by a worker */
 };
 
 

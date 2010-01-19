@@ -82,6 +82,16 @@
 *        again.
 *     8-OCT-2009 (DSB):
 *        Added smf_begin_job_context and smf_end_job_context.
+*     19-JAN-2010 (DSB):
+*        Major re-vamp of the way errors are handled. Do not rely on EMS
+*        to communicate error reports from the worker threads to the
+*        manager thread, as EMS only seems to merges status values when
+*        the threads die. Instead, details of any errors reported during
+*        the execution of a job are stored in the job structure. Details
+*        of the first error to occur within a job context are also copied
+*        into the workforce structure. When smf_wait exist, it
+*        re-establishes any error status described in the workforce
+*        structure.
 */
 
 
@@ -96,17 +106,26 @@
 #include "ast.h"
 #include "sae_par.h"
 #include "ems.h"
-#include "mers.h"
+#include "ems_par.h"
 
 /* Definition of the public interface of this module */
 #include "smf_threads.h"
 #include "smf_typ.h"
 
-/* Module macros: */
+/* Module macros */
+/* ------------- */
 #define DESK "BLACK"
 #define WAIT "RED"
 #define ACTIVE "GREEN"
 #define smf_thread_log(text,col,job) {if( fd ) smf_thread_log_(text,col,job);}
+
+/* Module types */
+/* ------------ */
+typedef struct JobError {
+   int *status;
+   int nmessage;
+   char **messages;
+} JobError;
 
 /* Module variables */
 /* ---------------- */
@@ -114,22 +133,27 @@ static FILE *fd = NULL;
 static int njob = 0;
 pthread_mutex_t fd_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-/* Prototypes */
-/* ---------- */
-
-/* Private functions used in this module */
-static void *smf_run_worker( void *worker_ptr );
-static void smf_remove_from_list( smfJob *job, smfJob **head, int *status );
-static void smf_push_list_head( smfJob *job, smfJob **head, int *status );
-static void smf_push_list_foot( smfJob *job, smfJob **head, int *status );
-static smfJob *smf_find_job( smfJob *head, int ijob, int conid, int *status );
-static smfJob *smf_pop_list_head( smfJob **head, int *status );
-static void smf_thread_log_( const char *text, const char *colour, int ijob );
+/* Module Prototypes */
+/* ----------------- */
 static int smf_get_job_context( smfWorkForce *workforce, int *status );
-static void smf_init_job( smfJob *job, int *status );
-static void smf_export_jobs( smfJob *head, int old, int new, int *status );
 static int smf_list_isempty( int conid, smfJob *head, int *status );
+static smfJob *smf_find_job( smfJob *head, int ijob, int conid, int *status );
+static smfJob *smf_free_job( smfJob *job );
 static smfJob *smf_pop_list_first( smfJob **head, int conid, int *status );
+static smfJob *smf_pop_list_head( smfJob **head, int *status );
+static smfJobStatus *smf_copy_status( smfJobStatus *status );
+static smfJobStatus *smf_free_status( smfJobStatus *status );
+static smfJobStatus *smf_get_status( int *ems_status );
+static smfJobStatus *smf_make_status( void );
+static smfJobStatus *smf_report_status( smfJobStatus *status, int *ems_status );
+static void *smf_run_worker( void *worker_ptr );
+static void smf_clear_status( smfJobStatus *status );
+static void smf_export_jobs( smfJob *head, int old, int new, int *status );
+static void smf_init_job( smfJob *job, int *status );
+static void smf_push_list_foot( smfJob *job, smfJob **head, int *status );
+static void smf_push_list_head( smfJob *job, smfJob **head, int *status );
+static void smf_remove_from_list( smfJob *job, smfJob **head, int *status );
+static void smf_thread_log_( const char *text, const char *colour, int ijob );
 
 
 /* Public workforce-related functions */
@@ -226,6 +250,7 @@ int smf_add_job( smfWorkForce *workforce, int flags, void *data,
    job = smf_pop_list_head( &(workforce->free_jobs), status );
    if( ! job ) {
       job = astMalloc( sizeof( smfJob ) );
+      if( job ) job->status = NULL;
       smf_init_job( job, status );
    }
 
@@ -260,52 +285,6 @@ int smf_add_job( smfWorkForce *workforce, int flags, void *data,
 /* Return the job identifier. */
    return job->ijob;
 }
-
-void smf_begin_job_context( smfWorkForce *workforce, int *status ){
-/*
-*  Name:
-*     smf_job_context
-
-*  Purpose:
-*     Starts a new job context.
-
-*  Language:
-*     Starlink ANSI C
-
-*  Type of Module:
-*     C function
-
-*  Invocation:
-*     #include "smf_threads.h"
-*     void smf_begin_job_context( smfWorkForce *workforce, int *status )
-
-*  Arguments:
-*     workforce
-*        Pointer to the workforce performing the jobs.
-*     status
-*        Pointer to the inherited status value.
-
-*  Description:
-*     This function indicates that all jobs created before the subsequent matching 
-*     call to smf_end_job_context should be grouped together. This affects the 
-*     behaviour of functions smf_wait and smf_job_wait.
-
-*/
-
-/* Check inherited status */
-   if( *status != SAI__OK ) return;
-
-/* Increment the depth of context nesting. */
-   (workforce->condepth)++;
-
-/* Ensure the array of context identifiers held in the workforce is large enough. */
-   workforce->contexts = astGrow( workforce->contexts, workforce->condepth, sizeof( int ) );
-
-/* Create a new identifier for the new context and store it as the last entry in the list
-   of context identifiers in the workforce. */
-   (workforce->contexts)[ workforce->condepth-1 ] = (workforce->ncontext)++;
-}
-
 
 smfWorkForce *smf_create_workforce( int nworker, int *status ) {
 /*
@@ -407,7 +386,6 @@ smfWorkForce *smf_create_workforce( int nworker, int *status ) {
       result->finished_jobs = NULL;
       result->available_jobs = NULL;
       result->waiting_jobs = NULL;
-      result->status = *status;
       result->kill = 0;
       result->ncontext = 0;
       result->contexts = NULL;
@@ -416,6 +394,7 @@ smfWorkForce *smf_create_workforce( int nworker, int *status ) {
       smf_cond_init( &( result->job_done ), status );
       smf_cond_init( &( result->page ), status );
       smf_mutex_init( &( result->jd_mutex ), status );
+      result->status = NULL;
       
 /* Create the threads to host the workers. Each thread remains alive 
    until the workforce is destroyed. During its life, the thread
@@ -498,36 +477,31 @@ smfWorkForce *smf_destroy_workforce( smfWorkForce *workforce ) {
 /* Free the job description structures. */
       job = smf_pop_list_head( &(workforce->active_jobs), &status );
       while( job ) {
-         job->waiting = astFree( job->waiting );
-         job = astFree( job );
+         job = smf_free_job( job );
          job = smf_pop_list_head( &(workforce->active_jobs), &status );
       }
 
       job = smf_pop_list_head( &(workforce->free_jobs), &status );
       while( job ) {
-         job->waiting = astFree( job->waiting );
-         job = astFree( job );
+         job = smf_free_job( job );
          job = smf_pop_list_head( &(workforce->free_jobs), &status );
       }
 
       job = smf_pop_list_head( &(workforce->available_jobs), &status );
       while( job ) {
-         job->waiting = astFree( job->waiting );
-         job = astFree( job );
+         job = smf_free_job( job );
          job = smf_pop_list_head( &(workforce->available_jobs), &status );
       }
 
       job = smf_pop_list_head( &(workforce->finished_jobs), &status );
       while( job ) {
-         job->waiting = astFree( job->waiting );
-         job = astFree( job );
+         job = smf_free_job( job );
          job = smf_pop_list_head( &(workforce->finished_jobs), &status );
       }
 
       job = smf_pop_list_head( &(workforce->waiting_jobs), &status );
       while( job ) {
-         job->waiting = astFree( job->waiting );
-         job = astFree( job );
+         job = smf_free_job( job );
          job = smf_pop_list_head( &(workforce->waiting_jobs), &status );
       }
 
@@ -542,6 +516,9 @@ smfWorkForce *smf_destroy_workforce( smfWorkForce *workforce ) {
 
 /* Free the list of job context identifiers. */
       workforce->contexts = astFree( workforce->contexts );
+
+/* Free the workforce status structure. */
+      workforce->status = smf_free_status( workforce->status );
 
 /* Free the memory holding the workforce. */
       workforce = astFree( workforce );
@@ -678,13 +655,58 @@ void *smf_get_job_data( int ijob, smfWorkForce *workforce, int *status ){
    if( !job ) job = smf_find_job( workforce->active_jobs, ijob, -1, status );
    if( !job && *status == SAI__OK ) {
       *status = SAI__ERROR;
-      msgSeti( "I", ijob );
+      emsSeti( "I", ijob );
       emsRep( "", "smf_get_job_data: No job with given 'job' identifier "
               "(^I) found.", status );
    }
       
 /* Return the required pointer. */
    return ( *status == SAI__OK ) ? job->data : NULL;
+}
+
+void smf_begin_job_context( smfWorkForce *workforce, int *status ){
+/*
+*  Name:
+*     smf_job_context
+
+*  Purpose:
+*     Starts a new job context.
+
+*  Language:
+*     Starlink ANSI C
+
+*  Type of Module:
+*     C function
+
+*  Invocation:
+*     #include "smf_threads.h"
+*     void smf_begin_job_context( smfWorkForce *workforce, int *status )
+
+*  Arguments:
+*     workforce
+*        Pointer to the workforce performing the jobs.
+*     status
+*        Pointer to the inherited status value.
+
+*  Description:
+*     This function indicates that all jobs created before the subsequent matching 
+*     call to smf_end_job_context should be grouped together. This affects the 
+*     behaviour of functions smf_wait and smf_job_wait.
+
+*/
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
+
+/* Increment the depth of context nesting. */
+   (workforce->condepth)++;
+
+/* Ensure the array of context identifiers held in the workforce is large enough. */
+   workforce->contexts = astGrow( workforce->contexts, workforce->condepth, sizeof( int ) );
+
+/* Create a new identifier for the new context and store it as the last entry in the list
+   of context identifiers in the workforce. */
+   (workforce->contexts)[ workforce->condepth-1 ] = (workforce->ncontext)++;
 }
 
 int smf_job_wait( smfWorkForce *workforce, int *status ) {
@@ -733,10 +755,13 @@ int smf_job_wait( smfWorkForce *workforce, int *status ) {
 */
 
 /* Local Variables: */
+   int conid;         
    int result = 0;
-   int wf_status;
    smfJob *job;
-   int conid;
+   smfJobStatus *job_status = NULL;
+
+/* Check we have a non-NULL workforce pointer. */
+   if( !workforce ) return result;
 
 /* Start a new error reporting context. */
    emsBegin( status );
@@ -761,11 +786,11 @@ int smf_job_wait( smfWorkForce *workforce, int *status ) {
 
 /* Wait until there is a job within the current context available on the finished
    jobs list. Put it in a loop because of spurious wake ups. */ 
-   while( smf_list_isempty( conid, workforce->finished_jobs, status ) ){
+   while( smf_list_isempty( conid, workforce->finished_jobs, status ) &&
+          *status == SAI__OK ){
       smf_thread_log( "job_wait: Waiting for a job (any job) to complete", WAIT, -1 );
       smf_cond_wait( &( workforce->job_done ), &( workforce->jd_mutex ), 
                      status );
-      if( *status != SAI__OK ) break;
    }
 
 /* Pop the first job for the current context off the finished list, and note its 
@@ -775,22 +800,24 @@ int smf_job_wait( smfWorkForce *workforce, int *status ) {
       result = job->ijob;
       smf_thread_log( "job_wait: Job completed", DESK, result );
 
+/* Copy the details of any errors that occurred during the job to a new
+   structure. We do not yet report those errors using EMS as that would
+   cause remaining functions called within this function to return
+   without action. */
+      job_status = smf_copy_status( job->status );      
+
 /* Clear the job data, and put the job structure onto the list of free
    job structures. */
       smf_init_job( job, status );
       smf_push_list_head( job, &(workforce->free_jobs), status );
-   }
-
-/* Note the workforce status whilst we still have the job desk mutex. */
-   wf_status = workforce->status;
+   } 
 
 /* Unlock the mutex so that the next thread can access the job desk. */
    smf_mutex_unlock( &( workforce->jd_mutex ), status );
    smf_thread_log( "job_wait: Left desk", ACTIVE, result );
 
-/* Return the workforce status unless some other error has already
-   occurred. */
-   if( *status == SAI__OK ) *status = wf_status;
+/* Report errors using EMS if any errors occurred during the job. */
+   job_status = smf_report_status( job_status, status );
 
 /* End the error reporting context. */
    emsEnd( status );
@@ -798,7 +825,6 @@ int smf_job_wait( smfWorkForce *workforce, int *status ) {
 /* Return the job identifier. */
    return result;
 }
-
 
 void smf_wait( smfWorkForce *workforce, int *status ) {
 /*
@@ -841,10 +867,13 @@ void smf_wait( smfWorkForce *workforce, int *status ) {
 */
 
 /* Local Variables: */
+   int conid;
    smfJob *job;
    smfJob *new_finished_head;
-   int conid;
-   int wf_status;
+   smfJobStatus *wf_status = NULL;
+
+/* Check we have a non-NULL workforce pointer. */
+   if( !workforce ) return;
 
 /* Start a new error reporting context. */
    emsBegin( status );
@@ -867,7 +896,7 @@ void smf_wait( smfWorkForce *workforce, int *status ) {
    and to get new jobs. */
    while( ( !smf_list_isempty( conid, workforce->available_jobs, status ) ||
             !smf_list_isempty( conid, workforce->active_jobs, status ) ) && 
-          *status == SAI__OK && workforce->status == SAI__OK ) {
+          *status == SAI__OK ) {
       smf_thread_log( "wait: waiting for all done", WAIT, njob );
       smf_cond_wait( &( workforce->all_done ), &( workforce->jd_mutex ), 
                      status );
@@ -893,8 +922,17 @@ void smf_wait( smfWorkForce *workforce, int *status ) {
    jobs that do not belong to the current job context). */
    workforce->finished_jobs = new_finished_head;
 
-/* Note the workforce status whilst we still have the job desk mutex. */
-   wf_status = workforce->status;
+/* If an error occurred whilst executing any of the jobs in the current
+   context, the details of the first such error will be stored in the
+   workforce status. Copy the details of any such errors to a new 
+   structure. We do not yet report those errors using EMS as that would
+   cause remaining functions called within this function to return
+   without action. */
+   wf_status = smf_copy_status( workforce->status );      
+
+/* Clear the workforce status so that the workforce can be re-used, even
+   if an error occurred in the current job context. */
+   smf_clear_status( workforce->status );
 
 /* Once the condition is signalled, the pthread_cond_wait will continue
    to wait until it can lock the specified mutex (the job desk mutex). So
@@ -902,10 +940,10 @@ void smf_wait( smfWorkForce *workforce, int *status ) {
    smf_mutex_unlock( &( workforce->jd_mutex ), status );
    smf_thread_log( "wait: Leaving desk", ACTIVE, njob );
 
-/* Return the workforce status. */
-   if( *status == SAI__OK ) *status = wf_status;
+/* Report errors using EMS if any jobs failed. */
+   wf_status = smf_report_status( wf_status, status );
 
-/* End the error reporting context. */
+/* End the outer error reporting context. */
    emsEnd( status );
 }
 
@@ -979,7 +1017,7 @@ int smf_wait_on_job( smfWorkForce *workforce, int ijob1, int ijob2,
    if( !job1 ) job1 = smf_find_job( workforce->waiting_jobs, ijob1, -1, status );
    if( !job1 && *status == SAI__OK ) {
       *status = SAI__ERROR;
-      msgSeti( "I", ijob1 );
+      emsSeti( "I", ijob1 );
       emsRep( "", "smf_wait_on_job: No job with given 'job1' identifier "
               "(^I) found.", status );
    }
@@ -1008,6 +1046,108 @@ int smf_wait_on_job( smfWorkForce *workforce, int ijob1, int ijob2,
 
 /* Private workforce-related functions */
 /* ----------------------------------- */
+static void smf_clear_status( smfJobStatus *status ){
+/*
+*  Name:
+*     smf_clear_status
+
+*  Purpose:
+*     Resets a smfJobStatus structure to indicate no error.
+
+*  Language:
+*     Starlink ANSI C
+
+*  Type of Module:
+*     C function
+
+*  Invocation:
+*     #include "smf_threads.h"
+*     void smf_clear_status( smfJobStatus *status )
+
+*  Arguments:
+*     status
+*        Pointer to the structure describing the job status. May be NULL.
+
+*  Description:
+*     This resets all fields of the supplied structure to indicate that
+*     no error has occurred.
+
+*/
+   int i;
+
+   if( status ) {
+      status->ems_status = SAI__OK;
+      for( i = 0; i < status->nmessage; i++ ) {
+         (status->messages)[ i ] = astFree( (status->messages)[ i ] );
+      }
+      status->messages = astFree( status->messages );
+      status->nmessage = 0;
+   }
+}
+
+static smfJobStatus *smf_copy_status( smfJobStatus *status ){
+/*
+*  Name:
+*     smf_copy_status
+
+*  Purpose:
+*     Copies the details from an existing smfJobStatus structure to a new
+*     one.
+
+*  Language:
+*     Starlink ANSI C
+
+*  Type of Module:
+*     C function
+
+*  Invocation:
+*     #include "smf_threads.h"
+*     smfJobStatus *smf_copy_status( smfJobStatus *status )
+
+*  Arguments:
+*     status
+*        Pointer to the structure holding the job status to retrieve.
+
+*  Returned Value:
+*     A pointer to a new smfJobStatus structure, or NULL if "status" is
+*     NULL.
+
+*  Description:
+*     This function returns a new smfJobStatus structure holding a copy
+*     of the information in the supplied smfJobStatus structure.
+
+*/
+
+/* Local Variables: */
+   const char *mess;
+   int i;
+   smfJobStatus *result;
+
+/* Check we have a usable pointer. */
+   if( !status ) return NULL;
+
+/* Create a new smfJobStatus structure. */
+   result = smf_make_status();
+
+/* Copy details from the supplied smfJobStatus. */
+   result->ems_status = status->ems_status;
+   result->messages = astMalloc( sizeof( char *)*status->nmessage );
+   if( astOK ) {
+      result->nmessage = status->nmessage;
+      for( i = 0; i < status->nmessage; i++ ) {
+         mess = (status->messages)[ i ];
+         if( mess ) {
+            (result->messages)[ i ] = astStore( NULL, mess, strlen( mess ) + 1 );
+         } else {
+            (result->messages)[ i ] = NULL;
+         }
+      }
+   }
+
+/* Free the new structure. */
+   return result;
+}
+
 static void smf_export_jobs( smfJob *head, int old, int new, int *status ){
 /*
 *  Name:
@@ -1140,6 +1280,62 @@ static smfJob *smf_find_job( smfJob *head, int ijob, int conid, int *status ){
    return result;
 }
 
+static smfJob *smf_free_job( smfJob *job ) {
+/*
+*  Name:
+*     smf_free_job
+
+*  Purpose:
+*     Release the resources used by a job.
+
+*  Language:
+*     Starlink ANSI C
+
+*  Type of Module:
+*     C function
+
+*  Invocation:
+*     #include "smf_threads.h"
+*     smfJob *smf_free_job( smfJob *job )
+
+*  Description:
+*     This releases the memory used to hold a job description.
+
+*/
+   if( job ) {
+      job->status = smf_free_status( job->status );
+      job->waiting = astFree( job->waiting );
+      job = astFree( job );
+   }
+   return job;
+}
+
+static smfJobStatus *smf_free_status( smfJobStatus *status ){
+/*
+*  Name:
+*     smf_free_status
+
+*  Purpose:
+*     Free the memory used by a smfJobStatus structure.
+
+*  Language:
+*     Starlink ANSI C
+
+*  Type of Module:
+*     C function
+
+*  Invocation:
+*     #include "smf_threads.h"
+*     smfJobStatus *smf_free_status( smfJobStatus *status )
+
+*  Description:
+*     This frees the memory used by a smfJobStatus structure.
+
+*/
+   smf_clear_status( status );
+   return astFree( status );
+}
+
 static int smf_get_job_context( smfWorkForce *workforce, int *status ){
 /*
 *  Name:
@@ -1191,6 +1387,93 @@ static int smf_get_job_context( smfWorkForce *workforce, int *status ){
    return result;
 }
 
+static smfJobStatus *smf_get_status( int *ems_status ){
+/*
+*  Name:
+*     smf_get_status
+
+*  Purpose:
+*     Creates a new smfJobStatus structure holding details of the current 
+*     EMS error.
+
+*  Language:
+*     Starlink ANSI C
+
+*  Type of Module:
+*     C function
+
+*  Invocation:
+*     #include "smf_threads.h"
+*     smfJobStatus *smf_get_status( int *ems_status )
+
+*  Arguments:
+*     ems_status
+*        The EMS status value. Always returned equal to SAI__OK.
+
+*  Returned Value:
+*     If an EMS error exists on exntry, a pointer to a new smfJobStatus 
+*     holding details of the EMS error is returned. Otherwise, a NULL pointer 
+*     is returned. 
+
+*  Description:
+*     If the current EMS status value is not SAI__OK, the current EMS status 
+*     value and message stack are copied into a new smfJobStatus structure, 
+*     and the EMS error context is then annulled.
+
+*/
+
+/* Local Variables: */
+   char opstr[ EMS__SZMSG + 1 ]; /* Buffer for expanded message text */
+   char param[ EMS__SZMSG + 1 ]; /* Buffer for parameter name */
+   int *old_status;              /* Pointer to previous AST status value */
+   int ast_status;               /* The AST status value */
+   int oplen;                    /* Used length of string in opstr */
+   int parlen;                   /* Used length of string in param */
+   smfJobStatus *result = NULL;  /* Returned pointer */
+
+/* Return without further action if no error has been reported using EMS. */
+   if( *ems_status != SAI__OK ) {
+
+/* Tell AST to use a temporary status value - otherwise all the AST
+   memory management functions will return without action due to the EMS
+   error status. */
+      ast_status = SAI__OK;
+      old_status = astWatch( &ast_status );
+
+/* Create a new smfJobStatus. */
+      result = smf_make_status();
+
+/* Store the EMS status value in the smfJobStatus structure. */
+      result->ems_status = *ems_status;
+
+/* Get the first entry on the message stack. */
+      emsEload( param, &parlen, opstr, &oplen, ems_status );
+
+/* Loop round all the messages in the current EMS error context (this
+   also annuls the context). */
+      while( *ems_status != SAI__OK ) {
+
+/* Append the opstr string to the list of messages in the smfJobStatus
+   structure. */
+         result->messages = astGrow( result->messages, result->nmessage + 1,
+                                     sizeof( char * ) );
+         if( astOK ) {
+            (result->messages)[ (result->nmessage)++ ] = astStore( NULL,
+                                                            opstr, oplen + 1 );
+         }
+
+/* Get the next entry on the message stack. */
+         emsEload( param, &parlen, opstr, &oplen, ems_status );
+      }
+
+/* Re-instate the original AST status value. */
+      astWatch( old_status );
+   }
+
+/* Return the new smfJobStatus pointer. */
+   return result;
+}
+
 static void smf_init_job( smfJob *job, int *status ){
 /*
 *  Name:
@@ -1234,6 +1517,7 @@ static void smf_init_job( smfJob *job, int *status ){
    job->data = NULL;
    job->checker = NULL;
    job->nwaiting = 0;
+   job->status = smf_free_status( job->status );
 }
 
 static int smf_list_isempty( int conid, smfJob *head, int *status ){
@@ -1299,6 +1583,38 @@ static int smf_list_isempty( int conid, smfJob *head, int *status ){
 
 /* Return the result. */
    return result;
+}
+
+static smfJobStatus *smf_make_status( void ){
+/*
+*  Name:
+*     smf_make_status
+
+*  Purpose:
+*     Create a smfJobStatus structure and initialise it.
+
+*  Language:
+*     Starlink ANSI C
+
+*  Type of Module:
+*     C function
+
+*  Invocation:
+*     #include "smf_threads.h"
+*     smfJobStatus *smf_make_status( void )
+
+*  Description:
+*     This creates a new smfJobStatus structure and sets all its fields 
+*     to indicate that no error has occurred.
+
+*/
+   smfJobStatus *status = astMalloc( sizeof( *status ) );
+   if( status ) {
+      status->ems_status = SAI__OK;
+      status->messages = NULL;
+      status->nmessage = 0;
+   }
+   return status;
 }
 
 static smfJob *smf_pop_list_first( smfJob **head, int conid, int *status ){
@@ -1630,6 +1946,69 @@ static void smf_remove_from_list( smfJob *job, smfJob **head, int *status ){
    job->prev = NULL;
 }
 
+static smfJobStatus *smf_report_status( smfJobStatus *status, int *ems_status ){
+/*
+*  Name:
+*     smf_report_status
+
+*  Purpose:
+*     Gets the status value and messages from the given smfJobStatus 
+*     and reports corresponding EMS errors.
+
+*  Language:
+*     Starlink ANSI C
+
+*  Type of Module:
+*     C function
+
+*  Invocation:
+*     #include "smf_threads.h"
+*     smfJobStatus *smf_report_status( smfJobStatus *status, int *ems_status )
+
+*  Arguments:
+*     status
+*        Pointer to the structure holding the job status to retrieve.
+*     ems_status
+*        The inherited EMS status value.
+
+*  Returned Value:
+*     A NULL pointer.
+
+*  Description:
+*     If the supplied smfJobStatus describes an error, and the EMS error
+*     status is currently SAI__OK, the error described in the smfJobStatus
+*     is reported using EMS. The smfJobStatus is then freed, and a NULL
+*     pointer returned.
+
+*/
+
+/* Local Variables: */
+   int i;                        /* Loop count */
+
+/* Check the current EMS error status, and check we have a usable pointer. */
+   if( *ems_status == SAI__OK && status ) {
+
+/* Do nothing if the supplied smfJobStatus does not describe an error. */
+      if( status->ems_status != SAI__OK ) {
+
+/* Set the EMS status value. */
+         *ems_status = status->ems_status;
+
+/* Loop round the error messagesstored in the smfJobSTatus, reporting
+   each one in turn. */
+         for( i = 0; i < status->nmessage; i++ ) {
+            emsRep( " ", (status->messages)[ i ], ems_status );
+         }
+
+/* Clear the supplied structure. */
+         smf_clear_status( status );
+      }
+   }
+
+/* Free the status structure and return a NULL pointer. */
+   return smf_free_status( status );
+}
+
 static void *smf_run_worker( void *wf_ptr ) {
 /*
 *  Name:
@@ -1662,15 +2041,13 @@ static void *smf_run_worker( void *wf_ptr ) {
 
 /* Local Variables: */
    int i;
-   int job_status = SAI__OK;
    int jobs_available;
    int run;         
    int status;
    smfJob *job = NULL;
    smfWorkForce *wf;
 
-/* Initialise the status value that describes the success of the thread
-   handling infra-structure. */
+/* Initialise the local status value. */
    status = SAI__OK;
 
 /* Get a pointer to the workforce description. */
@@ -1683,14 +2060,15 @@ static void *smf_run_worker( void *wf_ptr ) {
 /* Switch on AST memory caching for this thread. */
    (void) astTune( "MemoryCaching", 1 ); 
 
-/* Tell AST to watch the local job status variable. */
-   astWatch( &job_status );
+/* Tell AST to watch the local status variable. */
+   astWatch( &status );
 
 /* Join the end of the queue of workers at the job desk. This call will
    block until you reach the head of the queue. */
    smf_mutex_lock( &(wf->jd_mutex), &status );
 
-/* Loop until an error occurs in the threading infrastructure. */
+/* Loop until an error occurs (errors that occur within jobs do not
+   affect "status"). */
    while( status == SAI__OK ) {
 
 /* You are now at the job desk and have exclusive access to all the 
@@ -1703,10 +2081,9 @@ static void *smf_run_worker( void *wf_ptr ) {
          smf_thread_log( "run_worker: Worker at desk to report job done", 
                          DESK, job->ijob );
 
-/* If the job failed, transfer the job status to the workforce so long 
-   as this is the first failed job. This causes all subsequent jobs to 
-   return without action if an error has occurred. */
-         if( wf->status == SAI__OK ) wf->status = job_status;
+/* If the job failed, copy information about the error into the workforce 
+   so long as this is the first failed job. */
+         if( !wf->status ) wf->status = smf_copy_status( job->status );
 
 /* Remove the job from the list of currently active jobs. */
          smf_remove_from_list( job, &(wf->active_jobs), &status );
@@ -1736,6 +2113,7 @@ static void *smf_run_worker( void *wf_ptr ) {
             job->data = NULL;
             job->checker = NULL;
             job->nwaiting = 0;
+            job->status = smf_free_status( job->status );
             smf_push_list_head( job, &(wf->free_jobs), &status );
          }
 
@@ -1751,7 +2129,7 @@ static void *smf_run_worker( void *wf_ptr ) {
          break;
       }
 
-/* Now attempt to aquire a new job from the list of available jobs.
+/* Now attempt to acquire a new job from the list of available jobs.
    Some of the available jobs may not be ready to run, so loop until you
    find one that is, or the list of available jobs is exhausted. */
       while( !job ) {
@@ -1794,9 +2172,6 @@ static void *smf_run_worker( void *wf_ptr ) {
             smf_cond_broadcast( &(wf->page), &status );
          }
 
-/* Use the workforce's inherited status */
-         job_status = wf->status;
-
 /* Add the job to the list of active jobs. */
          smf_push_list_head( job, &(wf->active_jobs), &status );
 
@@ -1806,15 +2181,22 @@ static void *smf_run_worker( void *wf_ptr ) {
          smf_thread_log( "run_worker: left desk to do job", ACTIVE, 
                          job->ijob );
 
-/* Do the job. */
-         (*job->func)( job->data, &job_status );
-         smf_thread_log( "run_worker: completed job - joining queue",
-                         WAIT, job->ijob );
+/* If no error has occurred, do the job. */
+         if( status == SAI__OK ) {
+            (*job->func)( job->data, &status );
+            smf_thread_log( "run_worker: completed job - joining queue",
+                            WAIT, job->ijob );
+
+/* If the job failed, errors will have been reported using EMS. Copy
+   details of these errors into the job structure, and annull the EMS error
+   condition. If no error has occurred, a NULL pointer is returned by
+   smf_get_status. */
+            job->status = smf_get_status( &status );
 
 /* Now the job is complete, re-join the end of the job desk queue to report 
    its completion and get a new job. */
-         smf_mutex_lock( &(wf->jd_mutex), &status );
-         wf->status = job_status;
+            smf_mutex_lock( &(wf->jd_mutex), &status );
+         }
 
 /* If you still have no job, it means that there are no jobs currently
    available for running. */
@@ -1854,10 +2236,8 @@ static void *smf_run_worker( void *wf_ptr ) {
 
    smf_thread_log( "run_worker: worker has died", DESK, -1 );
 
-/* If something goes wrong in the threads infrastructure, store the bad
-   status value in the work force and abort the current job by signalling 
-   "all done". */
-   wf->status = status;
+/* If something goes wrong in the threads infrastructure, abort the current 
+   job by signalling "all done". */
    pthread_cond_signal( &(wf->all_done) );
    pthread_mutex_unlock( &(wf->jd_mutex) );
 
@@ -1870,6 +2250,8 @@ static void *smf_run_worker( void *wf_ptr ) {
 /* The pthreads library requires us to return a pointer. */
    return NULL;
 }
+
+
 
 /* Public pthreads wrapper functions */
 /* --------------------------------- */
