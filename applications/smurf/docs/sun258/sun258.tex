@@ -14,14 +14,14 @@
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardoccopyright}
-{Copyright \copyright\ 2009 University of British Columbia, Science \& Technology Facilities Council}
+{Copyright \copyright\ 2010 University of British Columbia \& the Science \& Technology Facilities Council}
 
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {258.2}
 \newcommand{\stardocauthors}   {Edward Chapin, Andrew G. Gibb, Tim Jenness, David S. Berry  \& Douglas Scott}
 \newcommand{\stardocdate}      {18 January 2010}
 \newcommand{\stardoctitle}     {SMURF -- the Sub-Millimetre User Reduction Facillity}
-\newcommand{\stardocversion}   {Version 0.5}
+\newcommand{\stardocversion}   {Version 1.0.0}
 \newcommand{\stardocmanual}    {User's Guide}
 \newcommand{\stardocabstract}  {
 
@@ -200,7 +200,9 @@
 \newcommand{\badbolos}{\xref{\task{badbolos}}{sun258}{BADBOLOS}}
 \newcommand{\calcdark}{\xref{\task{calcdark}}{sun258}{CALCDARK}}
 \newcommand{\calcflat}{\xref{\task{calcflat}}{sun258}{CALCFLAT}}
+\newcommand{\calcnoise}{\xref{\task{calcnoise}}{sun258}{CALCNOISE}}
 \newcommand{\calcresp}{\xref{\task{calcresp}}{sun258}{CALCRESP}}
+\newcommand{\copyflat}{\xref{\task{copyflat}}{sun258}{COPYFLAT}}
 \newcommand{\dreamsolve}{\xref{\task{dreamsolve}}{sun258}{DREAMSOLVE}}
 \newcommand{\dreamweights}{\xref{\task{dreamweights}}{sun258}{DREAMWEIGHTS}}
 \newcommand{\gsdtoacsis}{\xref{\task{gsd2acsis}}{sun258}{GSD2ACSIS}}
@@ -216,6 +218,7 @@
 \newcommand{\scanfit}{\xref{\task{scanfit}}{sun258}{SCANFIT}}
 \newcommand{\skynoise}{\xref{\task{skynoise}}{sun258}{SKYNOISE}}
 \newcommand{\smurfcopy}{\xref{\task{smurfcopy}}{sun258}{SMURFCOPY}}
+\newcommand{\stackframes}{\xref{\task{stackframes}}{sun258}{STACKFRAMES}}
 \newcommand{\starecalc}{\xref{\task{starecalc}}{sun258}{STARECALC}}
 \newcommand{\timesort}{\xref{\task{timesort}}{sun258}{TIMESORT}}
 \newcommand{\unmakecube}{\xref{\task{unmakecube}}{sun258}{UNMAKECUBE}}
@@ -2125,10 +2128,11 @@ observations and should be processed in the same way.
 \section{Acknowledgments}
 
 The authors are grateful for the documentation written by Maria Kelly
-on which this SUN is based, and Christa van Laerhoven for an earlier
-version. The SCUBA-2 simulator code was originally written as a
-standalone application by Dennis Kelly at the UK Astronomy Technology
-Centre and implemented as a \SMURF\ task by Jen Balfour.
+on which the SCUBA-2 part of this SUN was originally based, and
+Christa van Laerhoven for an earlier version. The SCUBA-2 simulator
+code was originally written as a standalone application by Dennis
+Kelly at the UK Astronomy Technology Centre and converted to a \SMURF\
+task by Jen Balfour.
 
 % End of main text
 
@@ -2139,7 +2143,7 @@ Centre and implemented as a \SMURF\ task by Jen Balfour.
 Archibald~E.~N., et~al., 2002, MNRAS, 336, 1
 
 \bibitem{acsis}
-Buckle~J.~V., et~al., 2009, MNRAS, in press
+Buckle~J.~V., et~al., 2009, MNRAS, 399, 1026
 
 %\bibitem{sc2cook}
 %Chapin~E.~L., 2009, \textit{The SMURF SCUBA-2 Data Analysis Cookbook},
@@ -2158,7 +2162,7 @@ Buckle~J.~V., et~al., 2009, MNRAS, in press
 Holland~W.~S., et~al., 2006, Proc. SPIE, 6275, 45
 
 \bibitem{jenness}
-Jenness~T., et~al., 2006, MNRAS, 336, 14
+Jenness~T., et~al., 2002, MNRAS, 336, 14
 
 \bibitem{dream}
 Le~Poole~R.~S., van~Someren~Greve~H.~W., 1998, Proc. SPIE, 3357, 638
@@ -2198,23 +2202,74 @@ Van Engelen~A., Scott~D., 2005, {\it A Correlation Study using SCUBA
 
 \end{thebibliography}
 
+\section{Release Notes}
 
-\section{Release Notes---V0.5.2}
+\subsection{V1.0.0 (hawaiki)}
 
-\subsection{Global changes}
+First official release supporting SCUBA-2 raw data (rather than simulated data).
+
+\subsubsection*{New applications}
+\begin{itemize}
+\item New command CALCNOISE for calculating the noise properties of a SCUBA-2 observation.
+\item New command COPYFLAT to copy a flatfield from one SCUBA-2 observation to another.
+\item New command STACKFRAMES for taking a collection of 2-D images
+  (eg noise images or responsivities) and placing them into a time
+  series cube.
+\end{itemize}
+
+\subsubsection*{Modified applications}
+\begin{itemize}
+\item SC2FFT will now concatenate all related files before calculating the FFT.
+\item MAKECUBE can now avoid generating very thin tiles when tiling is enabled.
+\item MAKECUBE now uses offset sky co-ordinates in the output cube if,
+  and only if, the input tracking system is (Az,El) or geocentric
+  apparent (RA,Dec).
+\item JCMTSTATE2CAT now calculates DRA and DDEC columns to indicate
+  arcsecond offsets from base position. Additionally DAZ and DEL are
+  now given as offsets from BASE rather than offsets from the first
+  base position. For SCUBA-2 files JCMTSTATE2CAT will now optionally include
+  MCE header information and will calculate the tau dynamically from the
+  raw WVM data.
+\end{itemize}
+
+\subsection{V0.5.2 (nanahope)}
+
+\subsubsection*{Global changes}
 \begin{itemize}
 \item Improve description of SCUBA-2 processing routines for Nanahope
-  Starlink release
+  Starlink release.
+\item A summary of input observations is now presented.
+\item If an output file is derived from multiple observations the
+  output FITS header will now include start and end information (such
+  as date and airmass from the oldest observation and date and airmass
+  from the newest observation).
+
 \end{itemize}
 
-\subsection{New applications}
+\subsubsection*{New applications}
 \begin{itemize}
-  \item calcresp...
+  \item New command CALCRESP for calculating responsivities from
+    flatfield solutions.
 \end{itemize}
 
-\subsection{Modified applications}
+\subsubsection*{Modified applications}
 \begin{itemize}
-  \item makemap
+  \item MAKECUBE can now fix up most issues associated with older ACSIS data from 2006 and 2007.
+  \item MAKECUBE output catalogues can now contain additional JCMTSTATE information by using the EXTRACOLS parameter.
+  \item TIMESORT is now significantly faster.
+  \item MAKECUBE, MAKEMAP and QLMAKEMAP are now multi-threaded by default on multi-processor machines.
+  \item MAKECUBE now issues a warning message if WCS information implied by the RECEPPOS and FPLANEX/Y values in an input NDF is inconsistent.
+  \item TIMESORT can now handle single time slice data cubes.
+  \item Many enhancements to SCUBA-2 functionality including support for bad pixel masks and interpolated darks.
+ \item jcmtstate2cat now reports AZ and EL as well as DAZ and DEL.
+\end{itemize}
+
+\subsubsection*{Bug Fixes}
+
+\begin{itemize}
+\item MAKECUBE formerly mis-interpreted non-zero instrument aperture (INSTAP) values in recent ACSIS data.
+\item MAKECUBE now ignores input data values that have negative input Tsys values.
+\item TIMESORT now sets the correct pixel origin in the output NDFs.
 \end{itemize}
 
 \newpage
