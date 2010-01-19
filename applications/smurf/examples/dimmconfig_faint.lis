@@ -53,7 +53,7 @@ deldimm = 1
 # data. If 0 attempt to concatenate entire continuous chunks.
 maxlen = 0
 
-# Model components/order (space delimited list)
+# Model components/order (comma separated list in brackets)
 # Note: components specified AFTER 'ast' will not be calculated for the
 # first time until the second iteration.
 #  dks = fit and remove dark squid for the column
