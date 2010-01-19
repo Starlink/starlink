@@ -84,6 +84,8 @@ examples/obspar_stare.lis \
 examples/pongobs.lis \
 examples/pongsim.lis \
 examples/resist.cfg \
+examples/s4a20091214_00015_0002.sdf \
+examples/s4a20091214_00015_0003.sdf \
 examples/simpar.lis \
 examples/simpar_dream.lis \
 examples/simpar_heatrun.lis \
