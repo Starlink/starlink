@@ -219,9 +219,9 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
       if( (temp < 0) && (temp > 1) ) {
         *status = SAI__ERROR;
         errRep(FUNC_NAME, "DCFLAGALL must be either 0 or 1.", status );
-      } else {
+      } else if( temp == 1 ) {
 
-        if( (*dcflag == 1) && (temp) ) {
+        if( *dcflag == 1 ) {
           msgOutif( MSG__VERB, "", FUNC_NAME ": DCFLAGALL overriding DCBAD",
                     status );
         }
