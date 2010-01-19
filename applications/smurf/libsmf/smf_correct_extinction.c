@@ -53,6 +53,9 @@
 *     significant enough to cross the threshold. This is not important if a static
 *     correction method (eg CSO tau) is in use. For CSOTAU and TAU modes the check is
 *     performed once based on either the start or end airmass (since the tau is not changing).
+*
+*     If the wvm values are bad then the previous tau value is used. This should only occur
+*     when the data acquisition has failed and many JCMTSTATE entries are missing.
 
 *  Authors:
 *     Andy Gibb (UBC)
@@ -138,10 +141,13 @@
 *        this by picking a recent airmass. Won't be completely accurate
 *        but will be good enough for extinction correction of points that
 *        will not be gridded into a map.
+*     2010-01-18 (TIMJ):
+*        Trap for bad WVM values and reuse the previous tau. The WVM C code
+*        does not trap for this itself and so returns Inf.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2010 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
 *     Council. Copyright (C) 2005-2008 University of British
 *     Columbia. All Rights Reserved.
@@ -420,10 +426,15 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
       newtwvm[0] = hdr->state->wvm_t12;
       newtwvm[1] = hdr->state->wvm_t42;
       newtwvm[2] = hdr->state->wvm_t78;
-      /* Have any of the temperatures changed? */
-      if ( (newtwvm[0] != oldtwvm[0]) || 
-           (newtwvm[1] != oldtwvm[1]) || 
-           (newtwvm[2] != oldtwvm[2]) ) {
+      /* Have any of the temperatures changed? Are any of the new
+         temperatures bad? If bad we'll just reuse the previous value. */
+      if ( newtwvm[0] == VAL__BADR ||
+           newtwvm[1] == VAL__BADR ||
+           newtwvm[2] == VAL__BADR ) {
+        newtau = 0;
+      } else if ( (newtwvm[0] != oldtwvm[0]) ||
+                  (newtwvm[1] != oldtwvm[1]) ||
+                  (newtwvm[2] != oldtwvm[2]) ) {
         newtau = 1;
         oldtwvm[0] = newtwvm[0];
         oldtwvm[1] = newtwvm[1];

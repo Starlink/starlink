@@ -35,6 +35,7 @@
 *     - See also smf_scale_tau.c for scaling between filters/wavelengths
 *     - If the TCS_AIRMASS value is missing "approxam" is used instead.
 *       If this is a bad value then AMSTART or AMEND will be examined.
+*     - Returns VAL__BADD if any of the temperature values are the bad value.
 
 *  Authors:
 *     Andy Gibb (UBC)
@@ -54,10 +55,12 @@
 *        - use smf_cso2filt_tau
 *     2009-11-04 (TIMJ):
 *        Add fallback airmass value in case we have bad TCS data.
+*     2010-01-18 (TIMJ):
+*        Check for bad values in the WVM temperature readings.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2010 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research
 *     Council.  Copyright (C) 2006-2008 University of British
 *     Columbia.  All Rights Reserved.
@@ -126,6 +129,11 @@ double smf_calc_wvm( const smfHead *hdr, double approxam, int *status ) {
   wvm[0] = state->wvm_t12;
   wvm[1] = state->wvm_t42;
   wvm[2] = state->wvm_t78;
+
+  if (wvm[0] == VAL__BADR || wvm[1] == VAL__BADR || wvm[2] == VAL__BADR ) {
+    return VAL__BADD;
+  }
+
   airmass = state->tcs_airmass;
 
   if (airmass == VAL__BADD) {
