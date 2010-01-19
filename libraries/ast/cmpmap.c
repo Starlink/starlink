@@ -147,7 +147,6 @@ f     The CmpMap class does not define any new routines beyond those
 /* Interface definitions. */
 /* ---------------------- */
 
-#include "globals.h"             /* Thread-safe global data access */
 #include "error.h"               /* Error reporting facilities */
 #include "memory.h"              /* Memory allocation facilities */
 #include "object.h"              /* Base Object class */
