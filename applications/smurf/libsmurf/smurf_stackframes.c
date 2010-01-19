@@ -32,7 +32,8 @@
 *  ADAM Parameters:
 *     IN = NDF (Read)
 *          Input file(s). Files must all be 2-d and have the same
-*          dimensions and must have a DATE-OBS FITS header.
+*          dimensions. For the SORT option to be available they must
+*          have a DATE-OBS FITS header.
 *     MSG_FILTER = _CHAR (Read)
 *          Control the verbosity of the application. Values can be
 *          NONE (no messages), QUIET (minimal messages), NORMAL,
@@ -52,6 +53,8 @@
 *     put them into a single cube with a time axis.
 *     - Variations in pixel origin are ignored. Make sure images are aligned
 *     and are the same size.
+*     - Useful for looking at the variations in bolometer parameters such as
+*     images created by CALCNOISE or CALCFLAT.
 
 *  Related Applications:
 *     SMURF: CALCNOISE, CALCFLAT, MAKEMAP

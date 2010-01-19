@@ -17,9 +17,9 @@
 {Copyright \copyright\ 2009 University of British Columbia, Science \& Technology Facilities Council}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {258.1}
+\newcommand{\stardocnumber}    {258.2}
 \newcommand{\stardocauthors}   {Edward Chapin, Andrew G. Gibb, Tim Jenness, David S. Berry  \& Douglas Scott}
-\newcommand{\stardocdate}      {8 January 2010}
+\newcommand{\stardocdate}      {18 January 2010}
 \newcommand{\stardoctitle}     {SMURF -- the Sub-Millimetre User Reduction Facillity}
 \newcommand{\stardocversion}   {Version 0.5}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -739,7 +739,7 @@ Enable the \SMURF\ environment by typing \verb+smurf+ at the shell
 prompt. The welcome message will appear as shown below:
 \begin{verbatim}
 
-        SMURF commands are now available -- (Version 0.5.2)
+        SMURF commands are now available -- (Version 1.0.0)
 
         Type smurfhelp for help on SMURF commands.
         Type 'showme sun258' to browse the hypertext documentation.
@@ -2232,18 +2232,26 @@ Van Engelen~A., Scott~D., 2005, {\it A Correlation Study using SCUBA
  Calculate the 2d dark frame from a dark observation.}
 \menuitem{CALCFLAT}{
  Calculate a flatfield solution.}
+\menuitem{CALCNOISE}{
+Calculate the noise properties of a SCUBA-2 observation.}
 \menuitem{CALCRESP}{
  Calculate bolometer responsivity from stored flatfield solution.}
+\menuitem{COPYFLAT}{
+Copy the flatfield solution from one SCUBA-2 observation to another.}
 \menuitem{DREAMSOLVE}{
  DREAM solver.}
 \menuitem{DREAMWEIGHTS}{
  DREAM weight matrix generation.}
+\menuitem{DSUTILS}{
+Utility functions for estimating focal plane distortions.}
 \menuitem{dumpocscfg}{
 Retrieve OCS XML configuration used to generate the raw data.}
 \menuitem{EXTINCTION}{
  Extinction correct SCUBA-2 data.}
 \menuitem{FLATFIELD}{
  Flatfield SCUBA-2 data.}
+\menuitem{GETTSYS}{
+Retrieve TSYS (or TRX) from ACSIS data files.}
 \menuitem{GSD2ACSIS}{
  Convert a GSD format DAS data file to an ACSIS format NDF. (beta test)}
 \menuitem{GSDSHOW}{
@@ -2282,6 +2290,8 @@ SCUBA-2 simulator.}
 Copy a 2d image out of a time series file.}
 \menuitem{SMURFHELP}{
 Give help about SMURF.}
+\menuitem{STACKFRAMES}{
+Stack multiple 2-d images into a 3d cube, optionally sorted by time.}
 \menuitem{STARECALC}{
  Calculate a map from a STARE-mode observation.}
 \menuitem{TIMESORT}{
@@ -2312,6 +2322,8 @@ Retrieve OCS XML configuration used to generate the raw data.
 Dump JCMTSTATE information to ASCII table.
 \classitem{SMURFHELP}
 Give help about SMURF.
+\classitem{STACKFRAMES}
+Stack multiple 2-d images into a 3d cube, optionally sorted by time.
 \end{description}
 
 {\large
@@ -2325,12 +2337,18 @@ Give help about SMURF.
  Calculate the 2d dark frame from a dark observation.
 \classitem{CALCFLAT}
  Calculate a flatfield solution.
+\classitem{CALCNOISE}
+Calculate the noise properties of a SCUBA-2 observation.
 \classitem{CALCRESP}
  Calculate bolometer responsivity from stored flatfield solution.
+\classitem{COPYFLAT}
+Copy the flatfield solution from one SCUBA-2 observation to another.
 \classitem{DREAMSOLVE}
  DREAM solver.
 \classitem{DREAMWEIGHTS}
  DREAM weight matrix generation.
+\classitem{DSUTILS}
+Utility functions for estimating focal plane distortions.
 \classitem{EXTINCTION}
  Extinction correct SCUBA-2 data.
 \classitem{FLATFIELD}
@@ -2366,6 +2384,8 @@ Copy a 2d image out of a time series file.
 }
 
 \begin{description}
+\classitem{GETTSYS}
+Retrieve TSYS (or TRX) from ACSIS data files.
 \classitem{MAKECUBE}
  Regrid ACSIS spectra into a data cube.
 \classitem{RAWFIXMETA}
