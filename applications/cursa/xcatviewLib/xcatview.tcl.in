@@ -795,7 +795,8 @@
     text .display.output  -wrap none  -state disabled  -height 24 \
        -width $screenWidth  \
        -xscroll {.display.xscroll set} \
-       -yscroll {.display.yscroll set}
+       -yscroll {.display.yscroll set} \
+       -font TkFixedFont
 
     pack .display.yscroll  -side right   -fill y
     pack .display.xscroll  -side bottom  -fill x
@@ -890,7 +891,8 @@
        -relief sunken  -bd 2
     text .messages.output  -wrap none  -state disabled  -height 8 \
        -width $screenWidth  \
-       -yscroll {.messages.yscroll set}
+       -yscroll {.messages.yscroll set} \
+       -font TkFixedFont
 
     pack .messages.yscroll  -side right   -fill y
     pack .messages.output   -expand 1 -fill both
