@@ -1,4 +1,4 @@
-#!@ENV@ starperl
+#!/usr/bin/env starperl
 #
 # Program: newsmaint
 # Version: 1.0
