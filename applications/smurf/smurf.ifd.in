@@ -208,6 +208,8 @@
 #         new msgIfget behaviour.
 #     14-OCT-2009 (TIMJ):
 #         Alphabetize. Remove MSG_FILTER definitions.
+#     2010-01-20 (TIMJ):
+#         Use starperl in perl aliases
 #     {enter_changes_here}
 
 #  Bugs:
@@ -2917,15 +2919,15 @@ package @PACKAGE@ {
     }
 
     command jcmtstate2cat {
-        obey {@PERL@ $SMURF_DIR/jcmtstate2cat}
+        obey {starperl $SMURF_DIR/jcmtstate2cat}
     }
 
     command dumpocscfg {
-        obey {@PERL@ $SMURF_DIR/dumpocscfg}
+        obey {starperl $SMURF_DIR/dumpocscfg}
     }
 
     command gettsys {
-        obey {@PERL@ $SMURF_DIR/gettsys}
+        obey {starperl $SMURF_DIR/gettsys}
     }
 
     command distortion {
