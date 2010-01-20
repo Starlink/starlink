@@ -314,8 +314,8 @@ void smurf_sc2clean( int *status ) {
                  "Fixing bolos at locations of DC steps size ^DCTHRESH-sigma in ^DCBOX samples",
                  status);
       }
-      smf_correct_steps( ffdata, NULL, dcthresh, dcthresh2, dcbox, dcflag, 
-                         NULL, status );
+      smf_correct_steps( NULL, ffdata, NULL, dcthresh, dcthresh2, dcbox, 
+                         dcflag, NULL, status );
     }
 
     /* Flag spikes */

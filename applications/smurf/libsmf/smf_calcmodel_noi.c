@@ -256,7 +256,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         }
 
         if( dcthresh && dcbox ) {
-          smf_correct_steps( res->sdata[idx], qua_data, dcthresh, dcthresh2, 
+          smf_correct_steps( wf, res->sdata[idx], qua_data, dcthresh, dcthresh2, 
                              dcbox, dcflag, &nflag, status );
           msgOutiff(MSG__VERB, "","   detected %li bolos with DC steps\n",
                     status, nflag);
