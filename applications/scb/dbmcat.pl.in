@@ -1,4 +1,4 @@
-#! @PERL@ -w -I@bindir@
+#!/usr/bin/env starperl -w -I@bindir@
 
 #+
 #  Name:
