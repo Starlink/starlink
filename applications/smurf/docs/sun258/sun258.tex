@@ -177,6 +177,10 @@
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
 
+% A new environment for quoting verbatim
+% Environment for indenting and using a small font.
+\newenvironment{myquote}{\begin{quote}\begin{small}}{\end{small}\end{quote}}
+
 \newcommand{\starlink}{\htmladdnormallink{Starlink}{http://starlink.jach.hawaii.edu}}
 
 % Shorthand and HTML references for other Starlink tasks
@@ -187,6 +191,7 @@
 \newcommand{\HDSTRACE}{\textsc{hdstrace}}
 \newcommand{\HDSTRACEref}{\xref{\HDSTRACE}{sun102}{}}
 \newcommand{\KAPPA}{\textsc{kappa}}
+\newcommand{\CURSA}{\xref{\textsc{cursa}}{sun190}{}}
 \newcommand{\KAPPAref}{\xref{(SUN/95)}{sun95}{}}
 \newcommand{\SMURF}{\textsc{smurf}}
 \newcommand{\SMURFcook}{\xref{SC/19}{sc19}{}}
@@ -228,7 +233,9 @@
 \newcommand{\extinction}{\xref{\task{extinction}}{sun258}{EXTINCTION}}
 \newcommand{\flatfield}{\xref{\task{flatfield}}{sun258}{FLATFIELD}}
 \newcommand{\jcmtstate}{\xref{\task{jcmtstate2cat}}{sun258}{JCMTSTATE2CAT}}
+\newcommand{\dumpocscfg}{\xref{\task{dumpocscfg}}{sun258}{DUMPOCSCFG}}
 \newcommand{\makemap}{\xref{\task{makemap}}{sun258}{MAKEMAP}}
+\newcommand{\gettsys}{\xref{\task{gettsys}}{sun258}{GETTSYS}}
 
 \newcommand{\remsky}{\xref{\task{remsky}}{sun258}{REMSKY}}
 \newcommand{\clean}{\xref{\task{sc2clean}}{sun258}{SC2CLEAN}}
@@ -242,6 +249,9 @@
 % Other tasks
 \newcommand{\makemos}{\xref{\task{makemos}}{sun139}{MAKEMOS}}
 \newcommand{\csub}{\xref{\task{csub}}{sun95}{CSUB}}
+\newcommand{\clinplot}{\xref{\task{clinplot}}{sun95}{CLINPLOT}}
+\newcommand{\mlinplot}{\xref{\task{mlinplot}}{sun95}{MLINPLOT}}
+\newcommand{\collapse}{\xref{\task{collapse}}{sun95}{COLLAPSE}}
 \newcommand{\fitsedit}{\xref{\task{fitsedit}}{sun95}{FITSEDIT}}
 \newcommand{\kapdiv}{\xref{\task{div}}{sun95}{DIV}}
 \newcommand{\ndfcopy}{\xref{\task{ndfcopy}}{sun95}{NDFCOPY}}
@@ -252,6 +262,8 @@
 \newcommand{\wcsattrib}{\xref{\task{wcsattrib}}{sun95}{WCSATTRIB}}
 \newcommand{\fitslist}{\xref{\task{fitslist}}{sun95}{FITSLIST}}
 \newcommand{\display}{\xref{\task{display}}{sun95}{DISPLAY}}
+\newcommand{\topcat}{\xref{\textsc{Topcat}}{sun253}{}}
+
 
 % macros for typesetting parameters
 \newcommand{\aparam}[1]{\texttt{#1}}     % ADAM parameter
@@ -742,6 +754,7 @@ listed in the bibliography.
 
 Enable the \SMURF\ environment by typing \verb+smurf+ at the shell
 prompt. The welcome message will appear as shown below:
+\begin{myquote}
 \begin{verbatim}
 
         SMURF commands are now available -- (Version 1.0.0)
@@ -753,8 +766,8 @@ prompt. The welcome message will appear as shown below:
         parameter lists. See the 'Release Notes' section of SUN/258 for
         details.
 
-
 \end{verbatim}
+\end{myquote}
 This defines aliases for each \SMURF\ command, gives a reminder of the
 help command and shows the version number. You can now use \SMURF\
 routines or ask for help.
@@ -776,7 +789,37 @@ Access the \SMURF\ online help system as follows:
   to the shell prompt.
 \end{enumerate}
 Further help on the help system maybe obtained by accessing the topic
-\verb+smurfhelp+ from within \smurfhelp.
+\verb+smurfhelp+ from within \smurfhelp. If you know which topic you
+want help on you can access it directly using
+
+\begin{myquote}
+\begin{verbatim}
+% smurfhelp makemap parameters
+\end{verbatim}
+\end{myquote}
+
+If an application prompts you for input and you do not know what the
+parameter means, you can use \verb+?+ at the prompt for more
+information.
+
+\begin{myquote}
+\begin{verbatim}
+% calcflat
+IN - Input flatfield files > ?
+
+CALCFLAT
+
+  Parameters
+
+    IN
+
+      IN = NDF (Read)
+         Input files to be processed. Must all be from the same
+         observation and the same subarray.
+
+IN - Input flatfield files >
+\end{verbatim}
+\end{myquote}
 
 \subsubsection{SMURF parameters}
 
@@ -792,7 +835,11 @@ writes to the screen when executing routines. The default setting for
 the message filter is \verb+normal+. Table \ref{tab:msgfilter} lists
 the available values for \verb+msg_filter+. Be aware that specifying
 \verb+verbose+ or \verb+debug+ will slow down execution due to the
-(potentially vast) number of messages written to the terminal.
+(potentially vast) number of messages written to the terminal. It is
+also possible to control message output by setting the
+\verb+MSG_FILTER+ environment variable to one of the values listed in
+this table. To hide all message a quick option is to add \verb+QUIET+
+to the command line.
 
 \begin{table}
 \centering
@@ -832,24 +879,33 @@ Example SCUBA-2 filename: s8a20090620\_00075\_0001.sdf
 
 Files can be processed either singly or in batches. It is more
 efficient to process multiple files at the same time. To work with
-multiple files:
-\begin{enumerate}
-\item Create an input file listing the filename of each subscan you
-  wish to process.
-\item Create an output file listing corresponding output filenames for
-  each input subscan, if appropriate.
-\item When specifying an input (or output list file for a routine,
-  type \verb+`in=^infiles.lis'+ or \verb+`out=^outfiles.lis'+. The caret
-  (\verb+^+) indicates that the input file is a list file.
-\end{enumerate}
-Note that the output filenames should be listed in the same order as
-the input filenames, otherwise the processed data will be written under
+multiple files you can specify them in a text file using group file
+indirection syntax (the `\verb+^+' caret before the filename), using shell
+wildcards (escaped from the shell itself) or by listing them
+explicitly separated by commas. For more information on specifying
+groups of objects for input and output see \xref{the section
+  \textit{Specifying Groups of Objects} in
+  SUN/95}{sun95}{se_groups}. Examples of valid inputs are:
+\begin{myquote}
+\begin{verbatim}
+IN=s8a20090620_00075_0001.sdf
+IN=s8a20090620_00075_*
+IN=s8a20090620_00075_00??
+IN=file1,file2
+IN=^myfile.lis
+OUT=*_out
+\end{verbatim}
+\end{myquote}
+
+Note that if you are providing a text file containing output
+filenames, those should be listed in the same order as the input
+filenames, otherwise the processed data will be written under
 the wrong filenames. Take care to supply a different output file name
 from the input as the contents are overwritten!
 
 \subsection{Data file structure}
 
-Data files for both ACSIS and SCUBA-2 use the Starlink N-Dimensional
+Data files for both ACSIS and SCUBA-2 \cite{sc2ic01} use the Starlink N-Dimensional
 data format (NDF, see \ndfref), a hierarchical format which allows
 additional data and metadata to be stored within a single file. Raw
 files contain a number of NDF components which store
@@ -862,23 +918,56 @@ The main (top-level) components are:
 \item Raw data (a 3-dimensional array);
 \item World Coordinate System information;
 \item History;
-\item Raw data units (K for ACSIS, current units for raw SCUBA-2 data,
-  W for flatfielded SCUBA-2 data).
+\item Raw data units (K for ACSIS, DAC units (possibly as compressed integers) for raw SCUBA-2 data,
+  pW for flatfielded SCUBA-2 data).
 \end{itemize}
 For ACSIS, the raw data are stored as $N_{\rm chan} \times N_{\rm
   receptors} \times N_{\rm samp}$, while SCUBA-2 data are stored as
-$N_{\rm rows} \times N_{\rm columns} \times N_{\rm samp}$, where
+$N_{\rm columns} \times N_{\rm rows} \times N_{\rm samp}$, where
 $N_{\rm samp}$ is the number of time samples in a file.
 
 The files also contain additional NDF components common to both
 instruments:
 \begin{itemize}
-\item JCMT State structure (the telescope pointing record);
-\item JCMT Observatory Control System (OCS) information, with the
+\item JCMT State structure (the telescope pointing record) and other
+  metadata that potentially varies for every sample;
+\item JCMT Observatory Control System (OCS) configuration, with the
   contents of the XML file used to set up the observation;
 \item Flexible Image Transport System (FITS) header containing
   information that does not change during a subscan.
 \end{itemize}
+
+The \jcmtstate\ command can be used to extract the time varying
+metadata and store it in a tab-separated table
+(\xref{TST}{sun190}{ACCESS}) format catalogue.\footnote{This is a
+  standard format historically supported by \CURSA\ and ESO SkyCat} so
+that it can be visualised using \topcat. An example \topcat\ plot of the
+telescope motion for a particular observation can be seen in
+\ref{fig:topcat}. The JCMTSTATE extension contains information from
+the telescope, secondary mirror and real-time sequencer (RTS). ACSIS
+observations include environmental weather information and SCUBA-2
+observations include SCUBA-2 data (such as the mixing chamber
+temperature) and the water vapour monitor (WVM) raw data. \jcmtstate\
+converts the telescope and SMU information to additional columns
+showing the tracking and AZEL offsets and also converts raw WVM data
+to a tau (CSO units). Finally, SCUBA-2 data has additional low-level
+MCE information that can be included in the output catalogue using the
+`\verb+--with-mce+` option.
+
+\begin{figure}
+\begin{center}
+\includegraphics{sun258_scan_pattern}
+\caption{The telescope positions during observation number 7 on
+  20090107. The plot is created by \topcat\ from the output from
+\jcmtstate\ plotting the DRA columns against the DDEC column. The pong
+scan pattern is clearly visible.}
+\label{fig:topcat}
+\end{center}
+\end{figure}
+
+The original XML used to specify the details of the observation can be
+obtained from any data file using the \dumpocscfg\ command.
+
 The FITS header is used to store information that either does not
 change or changes by a small amount during the course of an
 observation. Note that in the particular case of SCUBA-2 data a
@@ -887,9 +976,11 @@ a single observation. The FITS header may be viewed with the \KAPPA\
 \fitslist\ command.
 
 Each instrument has further specific components. SCUBA-2 files contain
-dark SQUID data, the current flatfield solution and a polynomial fit
-to detector signal versus raw data (a correction for linear drift).
-ACSIS files contain information about the receptors used.
+dark SQUID data, the current flatfield solution, an image of the
+bolometers used for heater tracking and possibly information
+indicating how to uncompress the raw data. ACSIS files contain
+information about the receptors used including their coordinates in
+the focal plane.
 
 Output files created by \SMURF\ may contain some or all of these, plus
 new components with information about the output data. These are noted
@@ -1070,17 +1161,24 @@ SCUBA-2 has two primary observing modes where the telescope is either
 stationary relative to the source (DREAM, STARE and typically when the
 FTS or polarimeter are in use), or moving (SCAN). The data processing
 differs in detail for each observing mode, though the general
-procedure is the same.
+procedure is the same.\footnote{At the time of writing only SCAN mode
+  is functional.}
 
 In addition to data files, each observation is bracketed by dark
 frames. In some cases dark frames may also be recorded part-way
-through an observation. These dark frames are necessary for correcting
+through an observation. These dark frames may be used for correcting
 for the drift in the bolometer zero-point and should be provided in
-the list of input files for all tasks that read raw data. Maps made
-without correcting for this drift will be sub-optimal (or even
-unusable in the worst cases). Dark frames can be identified by
-searching for the FITS keyword \texttt{SHUTTER}, which is 0 for dark
-frames.
+the list of input files for some observing modes or map-making
+techniques. The iterative map-maker used for SCAN data (see
+\S\ref{se:dimm}) does not require the darks and will ignore them.
+ tasks that read raw data. Dark frames can be identified by searching
+ for the FITS keyword \texttt{SHUTTER}, which is 0 for dark
+ frames. Additionally, it is possible for short flatfield ramps to be
+ taken at the start and end of an observation (see the
+ \texttt{SEQ\_TYPE} FITS header) to improve the calibration. These
+ files should usually be included when making maps. In general, it is
+ safe to include all the files for a particular observation and leave
+ it up to \SMURF\ to sort them out.
 
 Two general approaches may be taken to reducing data. The first,
 outlined by the steps in Sections \ref{se:dsworkflow} and
@@ -1101,17 +1199,18 @@ of superior quality.
 Data from array calibration observations (such as FLATFIELD and NOISE)
 are processed with \SMURF. NOISE observations are used to identify
 bolometers which are not in spec, from which a bad-bolometer mask can
-be created. There is usually no need to re-process these data, but
-they are included here for completeness. Note that for both
-observation types the data are all `dark', i.e.\ the value of
-\texttt{SHUTTER} is 0.
-% SKYDIP to be described here?
+be created. There is usually no need to re-process flatfield data
+since the results have already been applied to subsequence observations, but
+the techniques are included here for completeness. Both NOISE and
+FLATFIELD observations can be done with the shutter closed or with the
+shutter open.\footnote{Skydip observations are not available at the
+  time of writing}
 
 \subsubsection{\xlabel{flatcal}FLATFIELD\label{se:flatcal}}
 
 FLATFIELD observations are processed with the \calcflat\ command. The
 input data must be from the same observation and the same
-subarray. The data are a series of dark frames in which the current
+subarray. The data are a series of frames in which the current
 supplied to the internal pixel heaters is varied about a nominal value
 (see the FITS keyword \texttt{PIXHEAT}). \calcflat\ solves for the
 optimum heater setting given a list of resistances for each bolometer
@@ -1124,46 +1223,62 @@ The output from processing a FLATFIELD observation is a data file
 (named automatically if not supplied) which contains the flatfield
 solution in the NDF extension \texttt{.MORE.SCUBA2.FLATCAL}, the same
 location as for the raw data. The main data array for this output file
-is a three-dimensional array containing the dark-subtracted
+is a three-dimensional array containing the reference-subtracted
 measurements for each heater setting ($N_{\rm row}\times N_{\rm
   column} \times N_{\rm heat}$).
 
 In addition to generating the flatfield solution, \calcflat\ can also
 create a responsivity image for the current subarray. The
 \aparam{RESP} parameter may be specified to store the
-responsivity. The responsivity has units of amperes per watt (A/W).
-%WHAT ELSE CAN WE SAY ABOUT THE RESPONSIVITY?
+responsivity. The responsivity has units of amperes per watt
+(A/W). Since each observation contains the flatfield, it is possible
+to extract the responsibity data from any file by using the \calcresp\
+command.
+
+If for some reason this flatfield should be applied to existing data
+files the \copyflat\ command can be used to copy from the file
+generated by \calcflat. This is sometimes useful if a flatfield was
+accepted by mistake and it needs to be corrected.
 
 \subsubsection{NOISE}
 
 NOISE observations are designed to check that the bolometers are
 operating within specifications. This is achieved by calculating the
-power spectrum and comparing the relative noise power at two
-frequencies.  Excessively noisy bolometers are noted and a bad
-bolometer mask generated. There is no single \SMURF\ command that
-processes NOISE observations in this way but the procedure for
-creating a bad bolometer mask is as follows:
-\begin{itemize}
-\item Calculate the power spectrum with \SMURF\ \fft;
-\item Select data at the two chosen frequencies with \KAPPA\ \ndfcopy\
-  (collapsing the data cube along the frequency axis, if necessary, to
-  calculate an average over a small frequency range);
-\item Form the ratio of those two files with \KAPPA\ \kapdiv;
-\item Use \KAPPA\ \thresh\ (multiple times if necessary) to define a
-  bad-bolometer mask.
-\end{itemize}
+power spectrum and looking at the mean power between two frequencies
+(usually 2 and 10 Hz). Excessively noisy bolometers are noted and a bad
+bolometer mask generated.  The \calcnoise\ command can be used to
+analyze any SCUBA-2 time series. It can be used to generate both a
+noise image (in pA/rt(Hz)) and a NEP image (in W/rt(Hz)) from raw
+data. The noise image will be the image in the main part of the data
+file and the NEP image will be in the .MORE.SMURF.NEP extension. If
+the data have been flatfielded the NEP image extension will not be
+written since the primary image will already be in power units. A
+noise ratio image (.MORE.SMURF.NOISERATIO) is also created to give an
+indication of the mean power relative to the power at a particular frequency.
 
 Bad bolometer masks are supported by the \flatfield, \extinction,
 \remsky, \qlmakemap\ and \makemap\ tasks through the \aparam{BBM}
-parameter.
+parameter. A mask can be generated from the noise images using the
+\KAPPA\ \thresh\ command.
+
+\subsubsection{Comparing multiple noise or flatfield observations}
+
+Sometimes you will find that you have many noise or responsivity
+images from multiple observations and you would like to investigate the
+bolometer stability. The \stackframes\ command can make this simple as
+it lets you convert a directory of 2-d images into one data cube where
+each frame is sorted by time. Once you have this cube you can load it
+into \GAIA\ for easy visualization, use \KAPPA\ \collapse\ with
+different estimators, or plot variations using \KAPPA\ \clinplot\ or \mlinplot.
 
 \subsection{\xlabel{dsworkflow}DREAM/STARE data reduction workflow\label{se:dsworkflow}}
 
 The DREAM/STARE observing modes (\cite{scuba2}) were originally
 designed for mapping compact sources, i.e.\ those which are smaller
 than the field of view of SCUBA-2 (approximately 8 arcmin). Although
-it is now expected that SCAN will be the default mode, it is
-nevertheless more straightforward to discuss DREAM and STARE first.
+these modes have not been commissioned at the time of writing and it
+is thought that STARE mode will not work, it is nevertheless more
+straightforward to discuss DREAM and STARE first.
 
 The workflow for processing DREAM and STARE data may proceed in one of
 two ways: a simplified workflow using images calculated by the data
@@ -1474,8 +1589,9 @@ array of detectors \cite{sc2ana001,sc2ana005,sc2ana006}.
 The rebinning method may be adequate for bright compact sources
 (bright enough to be detected in one sample and smaller than the field
 of view of the array). The rebin method is also suitable for obtaining
-a `quick-look' image. The \SMURF\ tasks \qlmakemap\ and \makemap\
-support this map-making method.
+a `quick-look' image and vital when you wish to make maps of some of
+the models generated by the iterative map-maker. The \SMURF\ tasks
+\qlmakemap\ and \makemap\ support this map-making method.
 
 In practice, the dynamic iterative map maker (DIMM; see Section
 \ref{se:dimm}) will generally give superior results, though it is more
@@ -1500,6 +1616,8 @@ As outlined in \ref{se:dsworkflow}, the procedure for processing
 SCUBA-2 data follows these steps:
 \begin{enumerate}
 \item Apply the flatfield correction (see Section \ref{se:flatfield});
+\item Clean the data set using \clean. This can remove spikes, DC
+  steps and low- and high-frequency components in the data.
 \item Remove the contribution of atmosphere to the signal (see Section
   \ref{se:skysub});
 \item Correct for atmospheric extinction (see Section
@@ -1512,8 +1630,8 @@ bolometer between neighbouring output map pixels, as determined by the
 pixel-spreading function. The value of each pixel in the map is the
 sum of the signal from every bolometer that observed at that position.
 
-There are many options for the pixel spreading scheme (see Table ???
-for a summary). The fastest option is to use the nearest-neighbour
+There are many options for the pixel spreading scheme (see the \wcsmosaic\
+documentation for a summary). The fastest option is to use the nearest-neighbour
 pixel spreading scheme (`Nearest'), which assigns the whole signal
 from one bolometer to the nearest map pixel. This option does not
 always produce smooth maps (if the map is poorly sampled, for example,
@@ -1548,12 +1666,6 @@ removed by this particular workflow.
     \label{fig:rebinmap}
   \end{center}
 \end{figure}
-
-\subsubsection{\xlabel{iter}Dynamic iterative map-maker\label{se:iter}}
-
-The iterative map-maker is described more fully below in Section
-\ref{se:dimm}.
-
 
 \section{\xlabel{dimm}SCUBA-2 Dynamic Iterative Map-Maker\label{se:dimm}}
 
@@ -2166,6 +2278,11 @@ Holland~W.~S., et~al., 2006, Proc. SPIE, 6275, 45
 \bibitem{jenness}
 Jenness~T., et~al., 2002, MNRAS, 336, 14
 
+\bibitem{sc2ic01}
+Jenness~T., Gibb,~A., 2007, \textit{Data Acquisition/Data Reduction
+  Pipeline Interface Control Document}, SCUBA-2 Data Reduction
+document SC2/SOF/IC210/01
+
 \bibitem{dream}
 Le~Poole~R.~S., van~Someren~Greve~H.~W., 1998, Proc. SPIE, 3357, 638
 
@@ -2301,7 +2418,7 @@ Copy the flatfield solution from one SCUBA-2 observation to another.}
  DREAM weight matrix generation.}
 \menuitem{DSUTILS}{
 Utility functions for estimating focal plane distortions.}
-\menuitem{dumpocscfg}{
+\menuitem{DUMPOCSCFG}{
 Retrieve OCS XML configuration used to generate the raw data.}
 \menuitem{EXTINCTION}{
  Extinction correct SCUBA-2 data.}
@@ -2315,7 +2432,7 @@ Retrieve TSYS (or TRX) from ACSIS data files.}
  Display the contents of a GSD file's headers and arrays.}
 \menuitem{IMPAZTEC}{
   Import AzTEC NETCDF files and produce SCUBA-2 format data files. (untested)}
-\menuitem{jcmtstate2cat}{
+\menuitem{JCMTSTATE2CAT}{
 Dump JCMTSTATE information to ASCII table.}
 \menuitem{MAKECUBE}{
  Regrid ACSIS spectra into a data cube.}
@@ -2373,9 +2490,9 @@ functions as follows.
 }
 
 \begin{description}
-\classitem{dumpocscfg}
+\classitem{DUMPOCSCFG}
 Retrieve OCS XML configuration used to generate the raw data.
-\classitem{jcmtstate2cat}
+\classitem{JCMTSTATE2CAT}
 Dump JCMTSTATE information to ASCII table.
 \classitem{SMURFHELP}
 Give help about SMURF.
