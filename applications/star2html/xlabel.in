@@ -1,4 +1,4 @@
-#!@ENV@ starperl
+#!/usr/bin/env starperl
 #
 #+
 #  Name:

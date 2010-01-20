@@ -1,4 +1,4 @@
-#!@ENV@ starperl
+#!/usr/bin/env starperl
 #
 #+
 #  Name:
@@ -51,7 +51,7 @@
 #        in the footer of each page. The default statement is found from
 #        the \stardoccopyright command if there is one in the document,
 #        or failing that from the environment variable HTX_COPYRIGHT if
-#        defined, or failing that the default is: "Copyright © YYYY
+#        defined, or failing that the default is: "Copyright ?? YYYY
 #        Science and Technology Facilities Council" (where YYYY is the
 #        current year). To prevent any copyright statement from appearing,
 #        specify "-c none" or, in the absence of a \stardoccopyright
