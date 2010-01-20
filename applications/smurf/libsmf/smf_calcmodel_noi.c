@@ -47,6 +47,7 @@
 
 *  Authors:
 *     Edward Chapin (UBC)
+*     David Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -82,6 +83,8 @@
 *        - handle 2d variance arrays
 *     2010-01-12 (EC)
 *        - Handle gap filling
+*     2010-01-19 (DSB)
+*        - Add dcthresh2 config parameter.
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -134,6 +137,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   int dcflag;                   /* flag for dc step finder/repairer */
   dim_t dcbox;                  /* Width of box for DC step detection */
   double dcthresh;              /* Threshold for DC step detection */
+  double dcthresh2;             /* Threshold for secondary DC step detection */
   int fillgaps;                 /* If set perform gap filling */
   dim_t i;                      /* Loop counter */
   dim_t id;                     /* Loop counter */
@@ -183,9 +187,9 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   if( kmap ) {
 
     /* Data-cleaning parameters  */
-    smf_get_cleanpar( kmap, NULL, NULL, &dcbox, &dcflag, &dcthresh, NULL, 
-                      &fillgaps, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-                      &spikethresh, &spikeiter, status );
+    smf_get_cleanpar( kmap, NULL, NULL, &dcbox, &dcflag, &dcthresh, &dcthresh2,
+                      NULL, &fillgaps, NULL, NULL, NULL, NULL, NULL, NULL, 
+                      NULL, NULL, &spikethresh, &spikeiter, status );
   }
 
 
@@ -252,8 +256,8 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         }
 
         if( dcthresh && dcbox ) {
-          smf_correct_steps( res->sdata[idx], qua_data, dcthresh, dcbox, dcflag,
-                             &nflag, status );
+          smf_correct_steps( res->sdata[idx], qua_data, dcthresh, dcthresh2, 
+                             dcbox, dcflag, &nflag, status );
           msgOutiff(MSG__VERB, "","   detected %li bolos with DC steps\n",
                     status, nflag);
         }

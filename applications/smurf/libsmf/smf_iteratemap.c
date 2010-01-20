@@ -74,6 +74,7 @@
 *  Authors:
 *     EC: Edward Chapin (UBC)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     DSB: David Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -237,6 +238,8 @@
 *        Add facility for merging keymaps from config file.
 *     2010-01-18 (EC):
 *        Export data before dying if SMF__INSMP status set
+*     2010-01-19 (DSB)
+*        - Add dcthresh2 config parameter.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -319,7 +322,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   smfData *data=NULL;           /* Temporary smfData pointer */
   dim_t dcbox=0;                /* Box size for fixing DC steps */
   int dcflag=0;                 /* Flag for dc step finder/repairer */
-  double dcthresh;              /* Threshold for fixing DC steps */
+  double dcthresh;              /* Threshold for fixing primary DC steps */
+  double dcthresh2;             /* Threshold for fixing secondary DC steps */
   int deldimm=0;                /* Delete temporary .DIMM files */
   int dimmflags;                /* Control flags for DIMM model components */
   int dofft=0;                  /* Set if freq. domain filtering the data */
@@ -514,9 +518,10 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
     /* Data-cleaning parameters (should match SC2CLEAN) */
     smf_get_cleanpar( keymap, &apod, &badfrac, &dcbox, &dcflag, &dcthresh,
-                      NULL, &fillgaps, &f_edgelow, &f_edgehigh, f_notchlow,
-                      f_notchhigh, &f_nnotch, &dofft, &flagstat, &baseorder,
-                      &spikethresh, &spikeiter, status );
+                      &dcthresh2, NULL, &fillgaps, &f_edgelow,
+                      &f_edgehigh, f_notchlow, f_notchhigh, &f_nnotch,
+                      &dofft, &flagstat, &baseorder, &spikethresh,
+                      &spikeiter, status ); 
 
     /* Maximum length of a continuous chunk */
     if( astMapGet0D( keymap, "MAXLEN", &dtemp ) ) {
@@ -1135,8 +1140,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
               if( dcthresh && dcbox ) {
                 msgOutif(MSG__VERB," ", "  find bolos with steps...", status);
-                smf_correct_steps( data, qua_data, dcthresh, dcbox, dcflag,
-                                   &nflag, status );
+                smf_correct_steps( data, qua_data, dcthresh, dcthresh2, dcbox, 
+                                   dcflag, &nflag, status );
                 msgOutiff(MSG__VERB, "","  ...%li flagged\n", status, nflag);
               }
 

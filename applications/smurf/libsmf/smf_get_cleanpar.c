@@ -15,11 +15,12 @@
 *  Invocation:
 *     smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
 *                       dim_t *dcbox, int *dcflag, double *dcthresh,
-*                       int *dkclean, int *fillgaps, double *filt_edgelow,
-*                       double *filt_edgehigh, double *filt_notchlow,
-*                       double *filt_notchhigh, int *filt_nnotch, int *dofilt,
-*                       double *flagstat, int *order, double *spikethresh,
-*                       size_t *spikeiter, int *status )
+*                       double *dcthresh2, int *dkclean, int *fillgaps, 
+*                       double *filt_edgelow, double *filt_edgehigh, 
+*                       double *filt_notchlow, double *filt_notchhigh, 
+*                       int *filt_nnotch, int *dofilt, double *flagstat, 
+*                       int *order, double *spikethresh, size_t *spikeiter, 
+*                       int *status )
 
 *  Arguments:
 *     keymap = AstKeyMap* (Given)
@@ -37,7 +38,9 @@
 *        if 1 just flag entire bolo as bad if step encountered
 *        if 2 identify steps, and then repair/flag ALL bolometers at those spots
 *     dcthresh = double* (Returned)
-*        N-sigma threshold at which to detect DC steps (NULL:0)
+*        N-sigma threshold at which to detect primary DC steps (NULL:0)
+*     dcthresh2 = double* (Returned)
+*        N-sigma threshold at which to detect secondary DC steps (NULL:0)
 *     dkclean = int* (Returned)
 *        If true, clean dark squids from bolos (NULL:-1)
 *     fillgaps = int* (Returned)
@@ -143,12 +146,13 @@
 
 void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
                        dim_t *dcbox, int *dcflag, double *dcthresh,
-                       int *dkclean, int *fillgaps, double *filt_edgelow, 
-                       double *filt_edgehigh, double *filt_notchlow,
-                       double *filt_notchhigh, int *filt_nnotch,
-                       int *dofilt, double *flagstat, int *order,
-                       double *spikethresh, size_t *spikeiter, int *status ) {
-  
+                       double *dcthresh2, int *dkclean, int *fillgaps,
+                       double *filt_edgelow, double *filt_edgehigh,
+                       double *filt_notchlow, double *filt_notchhigh, 
+                       int *filt_nnotch, int *dofilt, double *flagstat,
+                       int *order, double *spikethresh, size_t *spikeiter,
+                       int *status ) {        
+
   int dofft=0;                  /* Flag indicating that filtering is required */
   int f_nnotch=0;               /* Number of notch filters in array */
   int f_nnotch2=0;              /* Number of notch filters in array */
@@ -244,6 +248,18 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
 
     msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DCTHRESH=%f", status,
                *dcthresh );
+  }
+
+  if( dcthresh2 ) {
+    if( !astMapGet0D( keymap, "DCTHRESH2", dcthresh2 ) ) {
+      *dcthresh2 = 0;
+    } else if( *dcthresh2 < 0 ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "DCTHRESH2 must be >= 0.", status );
+    }
+
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DCTHRESH2=%f", status,
+               *dcthresh2 );
   }
 
   if( dkclean ) {

@@ -14,8 +14,8 @@
 
 *  Invocation:
 *     smf_correct_steps( smfData *data, unsigned char *quality,
-*                        double dcthresh, dim_t dcbox, int dcflag,
-*                        size_t *nsteps, int *status )
+*                        double dcthresh, double dcthresh2, dim_t dcbox, 
+*                        int dcflag, size_t *nsteps, int *status )
 
 *  Arguments:
 *     data = smfData * (Given and Returned)
@@ -25,13 +25,21 @@
 *        If NULL, use the QUALITY associated with data. Locations of steps
 *        will have bit SMF__Q_JUMP set.
 *     dcthresh = double (Given)
-*        N-sigma threshold for DC jump to be detected
+*        N-sigma threshold for primary DC jump to be detected.
+*     dcthresh2 = double (Given)
+*        N-sigma threshold for secondary DC jump to be detected.
+*        Secondary jumps are those induced by a primary jump in another 
+*        bolometer. Secondary jumps are assumed to occur at the same time 
+*        slice as the primary jump that induces them. dcthresh2 should 
+*        have a lower value than dcthresh.
 *     dcbox = dim_t (Given)
 *        Length of box (in samples) over which to calculate statistics
 *     dcflag = int (Given)
 *        if 0 handle all bolos independently and attempt to fix steps
 *        if 1 just flag entire bolo as bad if step encountered
-*        if 2 identify steps, and then repair/flag ALL bolometers at those spots
+*        if 2 identify steps, and then repair/flag all bolometers at those 
+*        spots that show a dc step of greater than "dcthresh2" times the
+*        noise level.
 *     nsteps = size_t* (Returned)
 *        Number of DC steps encountered (number of flagged bolos if dcflag
 *        set). Can be NULL.
@@ -51,6 +59,7 @@
 *  Authors:
 *     Edward Chapin (UBC)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     DSB: David Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -72,7 +81,8 @@
 *        Private routines must be static to hide them from others.
 *     2010-01-14 (EC):
 *        In single bolo case flag 2*box window instead of single sample
-*     {enter_further_changes_here}
+*     2010-01-20 (DSB):
+*        Added argument dcthresh2.
 
 *  Copyright:
 *     Copyright (C) 2009-2010 Science and Technology Facilities Council.
@@ -147,12 +157,13 @@ static void smf__correct_steps_baseline( double *dat, unsigned char *qua,
 /* Public routine */
 
 void smf_correct_steps( smfData *data, unsigned char *quality,
-                        double dcthresh, dim_t dcbox, int dcflag,
-                        size_t *nsteps, int *status ) {
+                        double dcthresh, double dcthresh2, dim_t dcbox, 
+                        int dcflag, size_t *nsteps, int *status ) {
 
   /* Local Variables */
   double *alljump=NULL;         /* Buffer containing DC jumps */
   size_t base;                  /* Index to start of current bolo */
+  int correct;                  /* Are there any secondary steps to correct? */
   double *dat=NULL;             /* Pointer to bolo data */
   double dcstep;                /* Size of DC steps to detect */
   size_t bstride;               /* Bolo stride */
@@ -394,10 +405,15 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
       double *thisjump=NULL;
       thisjump = smf_malloc( ntslice, sizeof(*thisjump), 1, status );
 
+     /* Set the minimum step size to be corrected to dcthresh2*noise level. */
+     dcstep = dcthresh2/dcthresh;
+
       for( i=0; (*status==SAI__OK)&&(i<nbolo); i++ ) {
         if( !(qua[i*bstride] & SMF__Q_BADB) ) {
           /* Loop over time slices for this bolometer and calc thisjump */
           memset( thisjump, 0, ntslice*sizeof(*thisjump) );
+
+          correct = 0;
 
           for( j=0; j<ntslice; j++ ) {
             /* Jump previously found. Measure mean before and after */
@@ -416,16 +432,30 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
                 thisjump[j] = mean2 - mean1;
               }
 
-              /* Flag entire 2*DCBOX window */
-              for( k=j-dcbox; k<j+dcbox; k++ ) {
-                qua[i*bstride+k*tstride] |= SMF__Q_JUMP;
+              /* Flag entire 2*DCBOX window if the jump is significant,
+                 and set a flag indicating we need to call the correction
+                 function. */
+              if( fabs( thisjump[j] ) > dcstep ) {
+                for( k=j-dcbox; k<j+dcbox; k++ ) {
+                  qua[i*bstride+k*tstride] |= SMF__Q_JUMP;
+                }
+                correct = 1;
+
+              /* Otherwise set the jump magnitude to zero to prevent it
+                 introducing any correction. */
+              } else {
+                 thisjump[j] = 0.0;
               }
             }
           }
 
-          smf__correct_steps_baseline( dat+i*bstride+istart*tstride,
-                                       qua+i*bstride+istart*tstride,
-                                       iend-istart, tstride, thisjump+istart );
+/* Permform the correction only if any significant jumps were found in this
+   bolometer. */
+          if( correct ) {
+             smf__correct_steps_baseline( dat+i*bstride+istart*tstride,
+                                          qua+i*bstride+istart*tstride,
+                                          iend-istart, tstride, thisjump+istart );
+          }
         }
       }
 
