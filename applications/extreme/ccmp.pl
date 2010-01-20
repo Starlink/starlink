@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env starperl
 
 #  Open.
       my( $f1, $f2 ) = @ARGV[ 0, 1 ];
