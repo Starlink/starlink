@@ -1,44 +1,101 @@
-#!/local/bin/perl -s
-########################################################################
-####             J C M T   S O F T W A R E   G R O U P              ####
-#                -------------------------------------
-#
-#   Language:		PERL
-#
-#   Application:	acsis_index, scuba2_index
-#
-#   Purpose:
-#	Script to read JCMT observation files in a directory and create an
-#       index, a table with the basic information on the files. Can be
-#       invoked as acsis_index (default) or scuba2_index depending on the
-#       desired instrument listing.
-#
-#   Internal Routines:
-#	function()	: This is the description of the internal fn.
-#
-#   Creation Date:      Jan 28, 1998
-#
-#   SCCS Data           : @(#)
-#       Module Name     : acsis_index, scuba2_index
-#       Version Number  : 2.0
-#       Release Number  : 1
-#       Last Updated    : 2008/07/01
-#
-#   Programmer(s):      Remo Tilanus (JAC)
-#
-#   Comments:
-#
-#   Modification History:
-#       DD/MM/YY: INIT  Comments
-#       --------- ----  --------
-#       04/01/06: rpt   Adapted for ACSIS files
-#       17/01/06: rpt   Skip duplicate lines for ACSIS
-#       07/01/08: rpt   Preliminary version SCUBA-2
-#       12/10/09: rpt   Added support from SCUBA-2
-#
-####                                                                ####
-########################################################################
-#
+#!/usr/bin/env starperl
+
+=head1 NAME
+
+print_index - Provide a listing of SCUBA-2 or ACSIS data files in a directory
+
+=head1 SYNOPSIS
+
+  scuba2_index  [-v | -h | -d | -o] [-a] [-e] [-f] [datadir] [scuba2_array]
+  acsis_index   [-v | -h | -d | -o] [-a] [-c] [-e] [-f] [-t/T -r/R -s/S]
+                  [datadir]
+
+=head1 DESCRIPTION
+
+Script to read JCMT observation files in a directory and create an
+index, a table with the basic information on the files. Can be
+invoked as C<acsis_index> (default) or C<scuba2_index> depending on the
+desired instrument listing.
+
+=head1 OPTIONS
+
+The following options are supported:
+
+=over 4
+
+=item B<all>
+
+Print information on all files even if the headers are identical. For example,
+include multiple subbands (subsystems) and sub-scans.
+
+=item B<-debug>
+
+Print debugging information.
+
+=item B<-extended>
+
+Print extended lines. Can add AZ, EL, pointing offsets and bandwidth.
+
+=item B<-force>
+
+Force a subdirectory search. If no files are found in the directory itself, as
+would be the case for a raw data tree, the program will automatically search subdirecties.
+This option forces the subdirectory search.
+
+=item B<-help>
+
+Print help information.
+
+=item B<-man>
+
+Print the full documentation to STDOUT.
+
+=item B<-ocscfg>
+
+Print the OCS configuration XML file.
+
+=item B<-version>
+
+Print version information.
+
+=back
+
+ACSIS-specific options:
+
+=over 4
+
+=item B<-cal>
+
+Only print calibration observations.
+
+=item B<-skip>
+
+Skip observation information when printing Tsys or Trx
+
+=item B<-stdev>
+
+Include the standard deviation when print Tsys or Trx.
+
+=item B<-trx>
+
+Print media receiver temperature.
+
+=item B<-tsys>
+
+Print median system temperature.
+
+=back
+
+=head1 ARGUMENTS
+
+The primary argument is the data directory to index. If a yyyymmdd string is
+given it will default to the SCUBA-2/ACSIS data for the specified data unless
+there is a local subdirectory named yyyymmdd. Will default to the value of the
+$DATADIR environment variable if set.
+
+C<scuba2_index> can take a specific sub-array directory to index. Defaults to s8d.
+
+=cut
 
 use File::Basename;
 
@@ -51,6 +108,10 @@ use Starlink::AST;
 # Load in the GSD module
 use GSD;
 
+# Option handling
+use Getopt::Long;
+use Pod::Usage;
+
 # Smurf command GETTSYS
 $stardir = $ENV{'STARLINK_DIR'};
 unless (defined $stardir || $stardir != '') {
@@ -62,8 +123,6 @@ $tsyscmd = "${stardir}/bin/smurf/gettsys";
 # ----------------------------------------------------------------------
 # Parse the command line options
 
-$prog = (split(/\//,"$0"))[-1];
-
 $version = "2.0";
 
 $acsis_root = "/jcmtdata/raw/acsis/spectra";
@@ -71,62 +130,88 @@ $acsis_root = "/jcmtdata/raw/acsis/spectra";
 $default_array = "s8d";
 $scuba2_root  = "/jcmtdata/raw/scuba2/${default_array}";
 
+my ($help, $man, $doversion, $debug, $extended, $ocscfg, $force, $prtall);
+my ($cal_only, $skip, $tsys, $trx, $stdev);
+my $use_scuba2;
+my $result = GetOptions(
+                        "help" => \$help,         # Help text
+                        "man"   => \$man,         # Manual page
+                        "version" => \$doversion, # Version information
+                        "debug" => \$debug,       # Debugging
+                        "extended" => \$extended, # Print extended lines?
+                        "ocscfg" => \$ocscfg,     # Print ocs config file
+                        "force" => \$force,       # Force subdirectory search
+                        "all" => \$prtall,        # Print info on all files even if headers identical
+                        # ACSIS
+                        "cal" => \$cal_only,      # Only print calibration observations
+                        "skip" => \$skip,         # Skip obs-info (for Tsys/Rrx-only listing)
+                        "tsys" => \$tsys,       # Print median Tsys
+                        "trx"  => \$trx,        # Print median Trx
+                        "stdev" => \$stdev,       # Include standard deviation for Tsys and Trx
+                        # Explicit mode switching
+                        "scuba2" => \$use_scuba2,     # Choose scuba-2 mode
+                       );
+
+pod2usage(1) if $help;
+pod2usage(-exitstatus => 0, -verbose =>2) if $man;
+if ($doversion) {
+  ver_text();
+  exit;
+}
+
+
+$prog = (split(/\//,"$0"))[-1];
+$prog = "scuba2_index" if $use_scuba2;
 # Provide output from SCUBA or HETERODYNE data (default):
 ($prog =~ /scuba/) ? ($data_root = $scuba2_root) :
                      ($data_root = $acsis_root);
 
-($v) && do { &ver_text; exit; };
-
-($h || $help || $man || ($#ARGV == 0 && $ARGV[0] =~ /help/i) ||  $#ARGV > 1)
-       && do { &help_text; exit; };
-
 $sw = "";
 # debug = 2 prints detected header items
-$debug = 0;
-($d) && do { $debug = 1; $sw .= "-d" };
+$sw .= " -d" if $debug;
 
 # Print ocscfg info in case of ACSIS files
-$ocscfg = 0;
-($o) && do { $ocscfg = 1; $sw .= " -o" };
+$sw .= " -o" if $ocscfg;
 
 # Print extended lines?
 $pformat = "SHORT";
-($e) && do { $pformat = "LONG"; $sw .= " -e" };
+($extended) && do { $pformat = "LONG"; $sw .= " -e" };
 
 # Force subdirectory search
-$force = 0;
-($f) && do { $force = 1; $sw .= " -f" };
+$sw .= " -f" if $force;
 
 # Cal only?
-$cal_only = 0;
-($c) && do { $cal_only = 1; $sw .= " -c" };
+$sw .= " -c" if $cal_only;
 
 # Print info on all files even if headers identical?
-$prtall = 0;
-($a) && do { $prtall = 1; $sw .= " -a" };
+$sw .= " -a" if $ptrall;
 
-$skip = 0;
-$tsys = 0;
-$tsysrms = 0;
-$trx = 0;
-$trxrms = 0;
+my $tsysrms = 0;
+my $trxrms = 0;
 
 if ( $prog !~ /scuba/ ) {
   # Skip obs_info line for Tsys or Trx list only
-  ($s) && do { $skip = 1; $sw .= " -s" };
+  $sw .= " -s" if $skip;
 
   # Print Tsys?
-  ($t) && do { $tsys = 1; $sw .= " -t" };
-  ($T) && do { $tsys = 1; $tsysrms = 1; $sw .= " -T" };
+  $sw .= " -t" if $tsys;
+  if ($tsys && $stdev) {
+    $tsysrms = 1;
+    $sw .= " -T";
+  }
 
   # Print Trx?
-  ($r) && do { $trx = 1; $sw .= " -r" };
-  ($R) && do { $trx = 1; $trxrms = 1; $sw .= " -R" };
+  $sw .= " -r" if $trx;
+  if ($trx && $stdev) {
+    $trxrms = 1;
+    $sw .= " -R";
+  }
+
 }
 
 print "Running: ${prog} $sw\n" if ($debug);
 
-if ($skip == 1 and $tsys == 0 and $trx == 0) {
+if ($skip && (!$tsys || $trx) ) {
   print "\n*ERROR*: -s (skip) is only valid with -t/T (Tsys) and/or -r/R (Trx)";
   &help_text;
   exit;
@@ -1027,3 +1112,31 @@ sub acsis_tsys {
   }
 
 }
+
+=head1 AUTHOR
+
+Remo Tilanus E<lt>r.tilanus@jach.hawaii.eduE<gt>,
+Tim Jenness E<lt>t.jenness@jach.hawaii.eduE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2006-2007 Particle Physics and Astronomy Research Council.
+Copyright (C) 2007-2010 Science and Technology Facilities Council.
+All Rights Reserved.
+
+=head1 LICENCE
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 3 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful,but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+Place,Suite 330, Boston, MA  02111-1307, USA
+
+=cut
