@@ -2611,7 +2611,173 @@ time. Parameters for which an array should be supplied (or are
 returned) are shown with parentheses after the parameter name. A
 number within those parentheses indicates the size of the array.
 
+\subsection{ADAM routines}
+
 \input{../../libsmurf/smurfmon}
+\clearpage
+\subsection{Scripts}
+
+%% These are currently generated manually
+
+\sstroutine{
+   DUMPOCSCFG
+}{
+   Retrieve OCS configuration XML from data file.
+}{
+  \sstdescription{
+Searches for the OCS configuration in the file (if present) and writes
+it to standard output. If the configuration is not present in the file
+(older data will not contain it) the OCS configuration name is
+retrieved and an attempt made to locate the file on the file system
+(only valid at JAC).
+ }
+ \sstusage{
+  dumpocscfg a20070105\_00050\_01\_0001.sdf
+ }
+  \sstparameters{
+     \sstsubsection{
+        $-$help
+      }{
+            Print help information.
+      }
+      \sstsubsection{
+         $-$version
+       }{
+            Print version information.
+       }
+       \sstsubsection{
+         $-$man
+       }{
+            Print the full documentation to STDOUT.
+       }
+  }
+
+}
+
+\clearpage
+\sstroutine{
+  GETTSYS
+}{
+  Get system temperature information from ACSIS data
+}{
+  \sstdescription{
+Simple program to list TSYS or TRX information for receptors from an ACSIS data file. Optionally, calculates statistics.
+
+  }
+  \sstusage{
+  gettsys --statistics a20070105\_00050\_01\_0001.sdf
+
+  gettsys -trx --receptor h10 a20070105\_00050\_01\_0001.sdf
+  }
+ \sstparameters{
+     \sstsubsection{
+        $-$help
+      }{
+            Print help information.
+      }
+      \sstsubsection{
+         $-$version
+       }{
+            Print version information.
+       }
+       \sstsubsection{
+         $-$man
+       }{
+            Print the full documentation to STDOUT.
+       }
+   \sstsubsection{
+      $-$trx
+    }{
+     Lists all TRX values for each receptor instead of TSYS.
+    }
+    \sstsubsection{
+         $-$receptor
+     }{
+       Only report information for the current receptor.
+    }
+   \sstsubsection{
+      $-$statistics
+    }{
+Report statistics in addition to the values. For tabular
+form, the statistics are included at the end of the table
+as additional lines of median, mean and standard deviation.
+   }
+
+  }
+
+}
+
+\clearpage
+
+\sstroutine{
+   JCMTSTATE2CAT
+}{
+   convert JCMT state structure into TST format
+}{
+   \sstdescription{
+      Reads a set of SCUBA-2 or ACSIS files and writes a catalogue of
+      the state information to standard out. The output file is in TST
+      format and can be read into the TOPCAT application (but may
+      require that TOPCAT is told explicitly that the catalogue is in
+      TST format, e.g. with the {\tt "}-f tst{\tt "} command line option).
+
+      This information includes the telescope pointing position (Actual,
+      Demand and Base) in both the tracking system and AZEL coordinate
+      frames, jiggle patterns, telescope row/offset index amongst
+      others.
+   }
+  \sstusage{
+      jcmtstate2cat *.sdf > catalogue.tst
+
+      topcat -f tst catalogue.tst
+   }
+  \sstparameters{
+     \sstsubsection{
+        $-$help
+      }{
+            Print help information.
+      }
+      \sstsubsection{
+         $-$version
+       }{
+            Print version information.
+       }
+       \sstsubsection{
+         $-$man
+       }{
+            Print the full documentation to STDOUT.
+       }
+      \sstsubsection{
+         $-$$-$with$-$mce
+       }{
+            Include SCUBA-2 MCE information in output table. This adds a
+            lot of data to the output files and much of it is constant for
+            the observation.
+      }
+   }
+   \sstnotes{
+    \sstitemlist{
+      \sstitem Eight columns are generated in addition to writing the simple
+      contents of the JCMT state structure. All are a combination of the
+      telescope position and secondary mirror. {\tt "}ra{\tt "} and {\tt "}dec{\tt "} contain
+      the tracking coordinates (noting that if the tracking system is
+      GALACTIC the columns will still be called {\tt "}ra{\tt "} and {\tt "}dec{\tt "}). {\tt "}dra{\tt "}
+      and {\tt "}ddec{\tt "} are the tracking offsets from the base position in
+      arcseconds. {\tt "}az{\tt "} and {\tt "}el{\tt "} contain the (moving) azimuth and
+      elevation. {\tt "}daz{\tt "} and {\tt "}del{\tt "} are the azimuth and elevation offsets
+      from the base position in arcseconds. AZEL coordinates are
+      calculated directly from the state information without converting
+      first to RA/Dec.
+
+      \sstitem Note that information from the ACSIS extension is not included at
+      this time. This is partly because this extension can change in
+      shape between observations.
+      MCE header information is included for SCUBA-2 data files.
+    }
+  }
+
+}
+
 
 \end{document}
 
