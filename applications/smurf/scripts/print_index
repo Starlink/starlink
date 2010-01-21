@@ -205,7 +205,7 @@ if ($skip && (!$tsys || $trx) ) {
 # ----------------------------------------------------------------------
 # Command-line arguments
 
-my $datadir = $ENV{'DATADIR'};            # The default data directory
+my $datadir = $ENV{DATADIR};            # The default data directory
 
 # Get observation directory and (optional) scuba array from arguments
 my $scuba2_array = $default_array;
@@ -355,12 +355,12 @@ sub sdf_header {
 # Branch between SCUBA, SCUBA2 and ACSIS
 
     my $cur_obs = "";
-    if ("${$fitsitem}{'INSTRUME'}" =~ /^scuba$/i) {
+    if ($fitsitem->{INSTRUME} =~ /^scuba$/i) {
       print "SCUBA observation\n" if ($debug);
       $cur_obs =
          scuba_header($path, $basename, $suffix,
                       $fitsitem, $prev_obs, $pformat, $debug);
-    } elsif ("${$fitsitem}{'INSTRUME'}" =~ /^scuba-2$/i) {
+    } elsif ($fitsitem->{INSTRUME} =~ /^scuba-2$/i) {
 
       print "SCUBA-2 observation\n" if ($debug);
 
@@ -385,15 +385,15 @@ sub sdf_header {
       my $listlast = $#subfiles;
       my $found = 0;
       while ($found == 0 && $listlast > 0 &&
-             "${$fitsitem}{'OBS_TYPE'}" ne "flatfield" ) {
+             $fitsitem->{OBS_TYPE} ne "flatfield" ) {
         my $basename2 = $subfiles[$listlast];
         $basename2 =~ s/\.sdf$//;
         my $sdffile2 = $path . '/' . $basename2;
         print "Read last non-dark file: $sdffile2\n" if ($debug);
         $fitsitem2 = read_fits_header( $sdffile2 );
         if (defined $fitsitem2) {
-          if ( "${$fitsitem2}{'AZEND'}" ne "" &&
-               "${$fitsitem2}{'ELEND'}" ne "" ) {
+          if ( $fitsitem2->{AZEND} ne "" &&
+               $fitsitem2->{ELEND} ne "" ) {
             $found = 1;
 	  }
 	}
@@ -457,25 +457,25 @@ sub acsis_header {
 
     do {foreach (keys %$fitsitem) { print "$_\n";}} if ($debug > 1);
 
-    my $projid = "\L${$fitsitem}{'PROJECT'}";
-    my $run    = "\L${$fitsitem}{'OBSNUM'}";
-    my $cfgfile = ${$fitsitem}{'OCSCFG'};
-    my ($date, $ut) = split(/T/, ${$fitsitem}{'DATE-OBS'});
+    my $projid = lc($fitsitem->{PROJECT});
+    my $run    = lc($fitsitem->{OBSNUM});
+    my $cfgfile = $fitsitem->{OCSCFG};
+    my ($date, $ut) = split(/T/, $fitsitem->{'DATE-OBS'});
     $date =~ s/\-/\//g;
     my $datetime = "$date $ut";
-    my $obstype  = "\U${$fitsitem}{'OBS_TYPE'}";
-    my $mode   = "\U${$fitsitem}{'RECIPE'}";
+    my $obstype  = uc($fitsitem->{OBS_TYPE});
+    my $mode   = uc($fitsitem->{RECIPE});
     if ($mode =~ /science/i) {
-      $mode = "\U${$fitsitem}{'SAM_MODE'}" . "_" . "\U${$fitsitem}{'SW_MODE'}";
+      $mode = uc($fitsitem->{SAM_MODE}) . "_" . uc($fitsitem->{SW_MODE});
       $mode =~ s/JIGGLE/JIG/;
       $mode =~ s/RASTER/RAS/;
       $mode =~ s/GRID/GRD/;
     } else {
       $mode =~ s/REDUCE_//i;
     }
-    my $object = "\L${$fitsitem}{'OBJECT'}";
+    my $object = lc($fitsitem->{OBJECT});
 
-    my $rx     = "\L${$fitsitem}{'INSTRUME'}";
+    my $rx     = lc($fitsitem->{INSTRUME});
     $rx     =~ s/harpb/harp/;
     $rx     =~ s/^fe_//;
     $rx     =~ s/^rx//i;
@@ -483,39 +483,39 @@ sub acsis_header {
     my $freq   = sprintf("%.1f", $fitsitem->{RESTFREQ});
     my $cfreq  = "${rx}/${freq}";
     my $vel    = sprintf("%.2f", $fitsitem->{VELOCITY});
-    my $cvref  = "$vel" . "/" . substr("\L${$fitsitem}{'DOPPLER'}",0,3) .
-              substr("\L${$fitsitem}{'SPECSYS'}",0,3);
-    my $bwmode = ${$fitsitem}{'BWMODE'};
+    my $cvref  = "$vel" . "/" . substr(lc($fitsitem->{DOPPLER}),0,3) .
+              substr(lc($fitsitem->{SPECSYS}),0,3);
+    my $bwmode = $fitsitem->{BWMODE};
 
-    my $step = "${$fitsitem}{'STEPTIME'}";
-    my $josmult = ( ${$fitsitem}{'JOS_MULT'} > ${$fitsitem}{'JOS_MIN'} ?
+    my $step = $fitsitem->{STEPTIME};
+    my $josmult = ( $fitsitem->{JOS_MULT} > $fitsitem->{JOS_MIN} ?
                     $fitsitem->{JOS_MULT} : $fitsitem->{JOS_MIN});
     my $numnods = ( $fitsitem->{NUM_NODS} ne '' ? 4*$fitsitem->{NUM_NODS} : 1 );
-    my $intt = 0.1*int(10.0*${$fitsitem}{'NUM_CYC'}*$numnods*$josmult*$step+0.5);
+    my $intt = 0.1*int(10.0*$fitsitem->{NUM_CYC}*$numnods*$josmult*$step+0.5);
 
-    my $az     = 0.5*(${$fitsitem}{'AZSTART'}+${$fitsitem}{'AZEND'});
-    my $el     = 0.5*(${$fitsitem}{'ELSTART'}+${$fitsitem}{'ELEND'});
-    my $uaz    = ${$fitsitem}{'UAZ'};
-    my $uel    = ${$fitsitem}{'UEL'};
+    my $az     = 0.5*($fitsitem->{AZSTART}+$fitsitem->{AZEND});
+    my $el     = 0.5*($fitsitem->{ELSTART}+$fitsitem->{ELEND});
+    my $uaz    = $fitsitem->{UAZ};
+    my $uel    = $fitsitem->{UEL};
 
     my $seeing = 0.01 * int(100.0*
-                            0.5*(${$fitsitem}{'SEEINGST'}+${$fitsitem}{'SEEINGEN'})+0.5)
-        if ("${$fitsitem}{'SEEINGST'}" ne "");
+                            0.5*($fitsitem->{SEEINGST}+$fitsitem->{SEEINGEN})+0.5)
+        if ($fitsitem->{SEEINGST} ne "");
     my $csotau = 0.01 * int(100.0*
-                            0.5*(${$fitsitem}{'TAU225ST'}+${$fitsitem}{'TAU225EN'})+0.5)
-        if ("${$fitsitem}{'TAU225ST'}" ne "");
+                            0.5*($fitsitem->{TAU225ST}+$fitsitem->{TAU225EN})+0.5)
+        if ($fitsitem->{TAU225ST} ne "");
     my $wvmtau = 0.01 * int(100.0*
-                            0.5*(${$fitsitem}{'WVMTAUST'}+${$fitsitem}{'WVMTAUEN'})+0.5)
-        if ("${$fitsitem}{'WVMTAUST'}" ne "");
+                            0.5*($fitsitem->{WVMTAUST}+$fitsitem->{WVMTAUEN})+0.5)
+        if ($fitsitem->{WVMTAUST} ne "");
     my $lseeing = 0.001 * int(1000.0*
-                              0.5*(${$fitsitem}{'SEEINGST'}+${$fitsitem}{'SEEINGEN'})+0.5)
-        if ("${$fitsitem}{'SEEINGST'}" ne "");
+                              0.5*($fitsitem->{SEEINGST}+$fitsitem->{SEEINGEN})+0.5)
+        if ($fitsitem->{SEEINGST} ne "");
     my $lcsotau = 0.001 * int(1000.0*
-                              0.5*(${$fitsitem}{'TAU225ST'}+${$fitsitem}{'TAU225EN'})+0.5)
-        if ("${$fitsitem}{'TAU225ST'}" ne "");
+                              0.5*($fitsitem->{TAU225ST}+$fitsitem->{TAU225EN})+0.5)
+        if ($fitsitem->{TAU225ST} ne "");
     my $lwvmtau = 0.001 * int(1000.0*
-                              0.5*(${$fitsitem}{'WVMTAUST'}+${$fitsitem}{'WVMTAUEN'})+0.5)
-        if ("${$fitsitem}{'WVMTAUST'}" ne "");
+                              0.5*($fitsitem->{WVMTAUST}+$fitsitem->{WVMTAUEN})+0.5)
+        if ($fitsitem->{WVMTAUST} ne "");
 
 #    print "$run $mode $ut \'$object\' $projid $rx $boloms $filter $csotau $seeing\n";
 
@@ -586,27 +586,27 @@ sub scuba2_header {
     my $sdffile = $path . '/' . $basename;
     do {foreach (keys %$fitsitem) { print "$_\n";}} if ($debug > 1);
 
-    my $projid = "\L${$fitsitem}{'PROJECT'}";
-    my $cfgfile = ${$fitsitem}{'OCSCFG'};
-    my $run    = "\L${$fitsitem}{'OBSNUM'}";
-    my ($date, $ut) = split(/T/, ${$fitsitem}{'DATE-OBS'});
+    my $projid = lc($fitsitem->{PROJECT});
+    my $cfgfile = $fitsitem->{OCSCFG};
+    my $run    = lc($fitsitem->{OBSNUM});
+    my ($date, $ut) = split(/T/, $fitsitem->{'DATE-OBS'});
     $date =~ s/\-/\//g;
     my $datetime = "$date $ut";
 
-    my $obstype  = "\U${$fitsitem}{'OBS_TYPE'}";
-    my $mode   = "\U${$fitsitem}{'RECIPE'}";
+    my $obstype  = uc($fitsitem->{OBS_TYPE});
+    my $mode   = uc($fitsitem->{RECIPE});
     $mode =~ s/REDUCE_//i;
     $mode =~ s/FIELD/FLD/i;
-    $mode = "\U${$fitsitem}{'SCAN_PAT'}" if ($mode eq "SCAN");
+    $mode = uc($fitsitem->{SCAN_PAT}) if ($mode eq "SCAN");
     $mode =~ s/CURVY_PONG/CRVYPONG/i;
 
-    my $object = "\L${$fitsitem}{'OBJECT'}";
+    my $object = lc($fitsitem->{OBJECT});
     $object =~ s/_science//;
-    my $filter  = "$fitsitem->{FILTER}";
-    my $step = int(1000*${$fitsitem}{'STEPTIME'}) . "ms";
+    my $filter  = $fitsitem->{FILTER};
+    my $step = int(1000*$fitsitem->{STEPTIME}) . "ms";
 
     my ($mapx, $mapy);
-    my $mpx = ${$fitsitem}{'MAP_WDTH'};
+    my $mpx = $fitsitem->{MAP_WDTH};
     if ($mpx > 3600.0) {
       $mapx = sprintf "%4.1fd", $mpx/3600.0;
     } elsif ($mpx > 60.0) {
@@ -614,7 +614,7 @@ sub scuba2_header {
     } else {
       $mapx = sprintf "%2d\"", $mpx;
     }
-    my $mpy = int(${$fitsitem}{'MAP_HGHT'});
+    my $mpy = int($fitsitem->{MAP_HGHT});
     if ($mpy > 3600.0) {
       $mapy = sprintf "%4.1fd", $mpy/3600.0;
     } elsif ($mpy > 60.0) {
@@ -628,13 +628,13 @@ sub scuba2_header {
     my $map = "";
     $map = sprintf "%5sx%-5s", $mapx, $mapy unless ($mpx == 0 || $mpy == 0);
 
-    my $az     = 0.5*(${$fitsitem}{'AZSTART'}+${$fitsitem2}{'AZEND'});
-    my $el     = 0.5*(${$fitsitem}{'ELSTART'}+${$fitsitem2}{'ELEND'});
+    my $az     = 0.5*($fitsitem->{AZSTART}+$fitsitem2->{AZEND});
+    my $el     = 0.5*($fitsitem->{ELSTART}+$fitsitem2->{ELEND});
     if ($az == 0 && $el == 0) {
       $az = ""; $el = "";
     }
-    my $uaz    = ${$fitsitem}{'UAZ'};
-    my $uel    = ${$fitsitem}{'UEL'};
+    my $uaz    = $fitsitem->{UAZ};
+    my $uel    = $fitsitem->{UEL};
 
     my $seeing = " n/a";
     my $csotau = " n/a";
@@ -644,23 +644,23 @@ sub scuba2_header {
     my $lwvmtau = " n/a";
 
     $seeing = 0.01 * int(100.0*
-              0.5*(${$fitsitem}{'SEEINGST'}+${$fitsitem2}{'SEEINGEN'})+0.5)
-              if ("${$fitsitem}{'SEEINGST'}" ne "");
+                         0.5*($fitsitem->{SEEINGST}+$fitsitem2->{SEEINGEN})+0.5)
+      if ($fitsitem->{SEEINGST} ne "");
     $csotau = 0.01 * int(100.0*
-              0.5*(${$fitsitem}{'TAU225ST'}+${$fitsitem2}{'TAU225EN'})+0.5)
-              if ("${$fitsitem}{'TAU225ST'}" ne "");
+                         0.5*($fitsitem->{TAU225ST}+$fitsitem2->{TAU225EN})+0.5)
+      if ($fitsitem->{TAU225ST} ne "");
     $wvmtau = 0.01 * int(100.0*
-              0.5*(${$fitsitem}{'WVMTAUST'}+${$fitsitem2}{'WVMTAUEN'})+0.5)
-              if ("${$fitsitem}{'WVMTAUST'}" ne "");
+                         0.5*($fitsitem->{WVMTAUST}+$fitsitem2->{WVMTAUEN})+0.5)
+      if ($fitsitem->{WVMTAUST} ne "");
     $lseeing = 0.001 * int(1000.0*
-              0.5*(${$fitsitem}{'SEEINGST'}+${$fitsitem2}{'SEEINGEN'})+0.5)
-              if ("${$fitsitem}{'SEEINGST'}" ne "");
+                           0.5*($fitsitem->{SEEINGST}+$fitsitem2->{SEEINGEN})+0.5)
+      if ($fitsitem->{SEEINGST} ne "");
     $lcsotau = 0.001 * int(1000.0*
-              0.5*(${$fitsitem}{'TAU225ST'}+${$fitsitem2}{'TAU225EN'})+0.5)
-              if ("${$fitsitem}{'TAU225ST'}" ne "");
+                           0.5*($fitsitem->{TAU225ST}+$fitsitem2->{TAU225EN})+0.5)
+      if ($fitsitem->{TAU225ST} ne "");
     $lwvmtau = 0.001 * int(1000.0*
-              0.5*(${$fitsitem}{'WVMTAUST'}+${$fitsitem2}{'WVMTAUEN'})+0.5)
-              if ("${$fitsitem}{'WVMTAUST'}" ne "");
+                           0.5*($fitsitem->{WVMTAUST}+$fitsitem2->{WVMTAUEN})+0.5)
+      if ($fitsitem->{WVMTAUST} ne "");
 
 #    print "$run $mode $ut \'$object\' $projid $rx $boloms $filter $csotau $seeing\n";
 
@@ -730,31 +730,31 @@ sub scuba_header {
 
     do {foreach (keys %$fitsitem) { print "$_\n";}} if ($debug >1);
 
-    my $projid = "\L${$fitsitem}{'PROJ_ID'}";
-    my $run    = "\L${$fitsitem}{'RUN'}";
-    my ($yy,$mm,$dd,$rest) = split(/\:/, ${$fitsitem}{'UTDATE'}, 4);
+    my $projid = lc($fitsitem->{PROJ_ID});
+    my $run    = lc($fitsitem->{RUN});
+    my ($yy,$mm,$dd,$rest) = split(/\:/, $fitsitem->{UTDATE}, 4);
     if ($mm < 10) {$mm = "0$mm"};
     if ($dd < 10) {$dd = "0$dd"};
-    (my $h,my $m,my $s,$rest) = split(/\:/, ${$fitsitem}{'UTSTART'}, 4);
+    (my $h,my $m,my $s,$rest) = split(/\:/, $fitsitem->{UTSTART}, 4);
     if ($h < 10) {$h = "0$h"};
     $s = substr($s,0,5);
     my $datetime = "${yy}/${mm}/${dd} ${h}:${m}:${s}";
     $s = int($s+0.5);
     if ($s < 10) {$s = "0$s"};
     my $ut = "${h}:${m}:${s}";
-    my $mode   = "\U${$fitsitem}{'MODE'}";
-    my $object = "\L${$fitsitem}{'OBJECT'}";
+    my $mode   = uc($fitsitem->{MODE});
+    my $object = lc($fitsitem->{OBJECT});
     my $rx     = "SCUBA";
-    my $n_meas = "\L${$fitsitem}{'N_MEASUR'}";
-    my $n_int  = "\L${$fitsitem}{'N_INT'}";
-    my $boloms = substr(${$fitsitem}{'BOLOMS'},0,10);
-    my $filter = "\L${$fitsitem}{'FILTER'}";
-    my $az     = 0.5*(${$fitsitem}{'STRT_AZD'}+${$fitsitem}{'END_AZD'});
-    my $el     = 0.5*(${$fitsitem}{'STRT_ELD'}+${$fitsitem}{'END_ELD'});
-    my $uaz    = ${$fitsitem}{'UAZ'};
-    my $uel    = ${$fitsitem}{'UEL'};
-    my $seeing = 0.01 * int(100.0*${$fitsitem}{'SEEING'}+0.5);
-    my $csotau = 0.01 * int(100.0*${$fitsitem}{'TAU_225'}+0.5);
+    my $n_meas = lc($fitsitem->{N_MEASUR});
+    my $n_int  = lc($fitsitem->{N_INT});
+    my $boloms = substr($fitsitem->{BOLOMS},0,10);
+    my $filter = lc($fitsitem->{FILTER});
+    my $az     = 0.5*($fitsitem->{STRT_AZD}+$fitsitem->{END_AZD});
+    my $el     = 0.5*($fitsitem->{STRT_ELD}+$fitsitem->{END_ELD});
+    my $uaz    = $fitsitem->{UAZ};
+    my $uel    = $fitsitem->{UEL};
+    my $seeing = 0.01 * int(100.0*$fitsitem->{SEEING}+0.5);
+    my $csotau = 0.01 * int(100.0*$fitsitem->{TAU_225}+0.5);
 
 #    print "$run $mode $ut \'$object\' $projid $rx/$boloms/$filter/ $csotau $seeing\n";
 
@@ -777,7 +777,7 @@ $run, $ut, $mode, $projid, $object, $n_meas, $n_int, $csotau, $seeing, $filter, 
 .
 format SHORT_NOISE =
 @<< @<<<< @<<<<<<< @<<<<<<< @<<<<<<<< @>/@<< @<<< @<<< @<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<
-$run, $ut, $mode, $projid, $fitsitem->{'OBJ_TYPE'}, $n_meas, $n_int, $csotau, $seeing, $filter, $boloms
+$run, $ut, $mode, $projid, $fitsitem->{OBJ_TYPE}, $n_meas, $n_int, $csotau, $seeing, $filter, $boloms
 .
 
 format SHORT_SKYDIP =
@@ -791,7 +791,7 @@ $run, $ut, $mode, $projid, $object, $n_meas, $n_int, $csotau, $seeing, $filter, 
 
 format LONG_NOISE =
 @<< @<<<< @<<<<<<< @<<<<<<< @<<<<<<<< @>/@<< @<<< @<<< @<<<<<<<< @<<<<<<<<<<<<<< @<<<< @<<<< @<<<< @<<<<
-$run, $ut, $mode, $projid, $fitsitem->{'OBJ_TYPE'}, $n_meas, $n_int, $csotau, $seeing, $filter, $boloms, $az, $el, $uaz, $uel
+$run, $ut, $mode, $projid, $fitsitem->{OBJ_TYPE}, $n_meas, $n_int, $csotau, $seeing, $filter, $boloms, $az, $el, $uaz, $uel
 .
 
 format LONG_SKYDIP =
@@ -805,9 +805,9 @@ $run, $ut, $mode, $projid, $n_meas, $n_int, $csotau, $seeing, $filter, $az, $el,
     $~ = ($mode =~ /^$/ ? "NOFITS" : $mode);
 
     if ($~ !~ /NOFITS/) {
-	if (${$fitsitem}{'MODE'} eq 'NOISE') {
+	if ($fitsitem->{MODE} eq 'NOISE') {
 	    $~ = "${pformat}_NOISE";
-	} elsif (${$fitsitem}{'MODE'} eq 'SKYDIP') {
+	} elsif ($fitsitem->{MODE} eq 'SKYDIP') {
 	    $~ = "${pformat}_SKYDIP";
 	} else {
 	    $~ = "${pformat}_SCU";
@@ -878,38 +878,38 @@ sub gsd_header {
     tie %gsditem, 'GSD', "${obsfile}";
     do {foreach (keys %gsditem) { print "$_\n";}} if ($debug > 1);
 
-    my $projid = "\L$gsditem{'C1PID'}";
-    my $run    = "\L$gsditem{'C1SNO'}";
-    my $mode   = "\U$gsditem{'C6ST'}";
-    my $object = "\L$gsditem{'C1SNA1'}";
-    my $rx     = "\U$gsditem{'C1RCV'}";
-    my $utdate = $gsditem{'C3DAT'};
+    my $projid = lc($gsditem{C1PID});
+    my $run    = lc($gsditem{C1SNO});
+    my $mode   = uc($gsditem{C6ST});
+    my $object = lc($gsditem{C1SNA1});
+    my $rx     = uc($gsditem{C1RCV});
+    my $utdate = $gsditem{C3DAT};
     $utdate =~ s/\.//g;
     # fix silly GSD error that causes ending 0's to be stripped
     $utdate = substr("${utdate}0000",0,8);
-    my $uttime = $gsditem{'C3UT'};
+    my $uttime = $gsditem{C3UT};
     my $uth    = int ($uttime);
     my $utm    = int (60.0 * ($uttime-$uth));
     my $uts    = int (3600.0 * ($uttime-($uth+$utm/60.0)));
     my $ut     = sprintf "%8s %2.2d:%2.2d",${utdate},${uth},${utm};
     my $freq;
-    if ($gsditem{'C3NRS'} == 1) {     # TimJ is too clever for his own good :)
-      $freq   = 0.01 * int(100.0*$gsditem{'C12RF'}+0.5);
+    if ($gsditem{C3NRS} == 1) {     # TimJ is too clever for his own good :)
+      $freq   = 0.01 * int(100.0*$gsditem{C12RF}+0.5);
     } else {
-      $freq   = 0.01 * int(100.0*${$gsditem{'C12RF'}}[0]+0.5);
+      $freq   = 0.01 * int(100.0*$gsditem{C12RF}->[0]+0.5);
     }
     my $cfreq  = "${rx}/$freq";
-    my $vel    = 0.01 * int(100.0*$gsditem{'C7VR'}+0.5);
-    my $cvref = "$vel" . "/" . substr("\L$gsditem{'C12VDEF'}",0,3) .
-	"\L$gsditem{'C12VREF'}";
-    my $n_meas = "\L$gsditem{'C3CL'}";
-    my $n_int  = "\L$gsditem{'C3NCYCLE'}";
-    my $az     = $gsditem{'C4AZ'};
-    my $el     = $gsditem{'C4EL'};
-    my $uaz    = $gsditem{'UAZ'};
-    my $uel    = $gsditem{'UEL'};
-    my $seeing = 0.01 * int(100.0*$gsditem{'C7SEEING'}+0.5);
-    my $csotau = 0.01 * int(100.0*$gsditem{'C7TAU225'}+0.5);
+    my $vel    = 0.01 * int(100.0*$gsditem{C7VR}+0.5);
+    my $cvref = "$vel" . "/" . substr(lc($gsditem{C12VDEF}),0,3) .
+	lc($gsditem{C12VREF});
+    my $n_meas = lc($gsditem{C3CL});
+    my $n_int  = lc($gsditem{C3NCYCLE});
+    my $az     = $gsditem{C4AZ};
+    my $el     = $gsditem{C4EL};
+    my $uaz    = $gsditem{UAZ};
+    my $uel    = $gsditem{UEL};
+    my $seeing = 0.01 * int(100.0*$gsditem{C7SEEING}+0.5);
+    my $csotau = 0.01 * int(100.0*$gsditem{C7TAU225}+0.5);
 
     # Set format
 format NOFITS =
