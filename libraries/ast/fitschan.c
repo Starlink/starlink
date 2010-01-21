@@ -6799,10 +6799,10 @@ static void DistortMaps( AstFitsChan *this, FitsStore *store, char s,
 
 /* First check each known distortion type... */
 
-/* "-SIP": SIRTF (http://sirtf.caltech.edu/SSC/documents/WCSkeywords_v1.3.pdf)
+/* "-SIP": Spitzer (http://ssc.spitzer.caltech.edu/postbcd/doc/shupeADASS.pdf)
    ============= */
 
-/* SIRTF distortion is limited to 2D. Check the first two axes to see if
+/* Spitzer distortion is limited to 2D. Check the first two axes to see if
    they have "-SIP" codes in their CTYPE values. If they do, terminate the
    ctype string in order to exclude the distortion code (this is so that
    later functions do not need to allow for the possibility of a distortion
@@ -6818,7 +6818,7 @@ static void DistortMaps( AstFitsChan *this, FitsStore *store, char s,
 
 /* Create a Mapping describing the distortion (other axes are passed
    unchanged by this Mapping), and add it in series with the returned map2 
-   (SIRTF distortion is applied to the translated pixel coordinates). */
+   (Spitzer distortion is applied to the translated pixel coordinates). */
                tmap1 = SIPMapping( store, s, naxes, method, class, status );
                if( ! *map2 ) {
                   *map2 = tmap1;
@@ -22713,7 +22713,7 @@ static AstMapping *SIPMapping( FitsStore *store, char s, int naxes,
 *     SIPMapping
 
 *  Purpose:
-*     Create a Mapping descriping "-SIP" (SIRTF) distortion.
+*     Create a Mapping descriping "-SIP" (Spitzer) distortion.
 
 *  Type:
 *     Private function.
@@ -22728,9 +22728,9 @@ static AstMapping *SIPMapping( FitsStore *store, char s, int naxes,
 *  Description:
 *     This function uses the values in the supplied FitsStore to create a
 *     Mapping which implements the "-SIP" distortion code. This is the
-*     code used by the SIRTF project and is described in:
-
-*     http://sirtf.caltech.edu/SSC/documents/WCSkeywords_v1.3.pdf
+*     code used by the Spitzer project and is described in:
+*
+*     http://ssc.spitzer.caltech.edu/postbcd/doc/shupeADASS.pdf
 *
 *     SIP distortion can only be applied to axes 0 and 1. Other axes are
 *     passed unchanged by the returned Mapping.
@@ -28950,7 +28950,7 @@ static void WcsFcRead( AstFitsChan *fc, AstFitsChan *fc2, FitsStore *store,
          }
 
 /* Following keywords are used to describe "-SIP" distortion as used by
-   the SIRTF project... */
+   the Spitzer project... */
 
 /* Is this a primary A keyword? */
       } else if( Match( keynam, "A_%d_%d", 2, fld, &nfld, method, class, status ) ){

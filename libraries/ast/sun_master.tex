@@ -19448,26 +19448,24 @@ This paper proposes that an additional 4 character code be appended to
 the end of the CTYPE\emph{i} keyword to specify the nature of any
 distortion away from the basic algorithm described by the first 8
 characters of the CTYPE\emph{i} value. Currently AST ignores all such
-codes when reading a FrameSet from a
-FitsChan (except for the ``-SIP'' code
-defined by the SIRTF project - see below). This means that a FrameSet can
-still be read from such headers, but the Mapping which 
-gives the WCS
-position associated with a given pixel position will reflect only the
-basic algorithm and will not include the effects of the distortion.
+codes when reading a FrameSet from a FitsChan (except for the ``-SIP'' code
+defined by the Spitzer Space Telescope project - see below). This means that 
+a FrameSet can still be read from such headers, but the Mapping which gives 
+the WCS position associated with a given pixel position will reflect only 
+the basic algorithm and will not include the effects of the distortion.
 
 If such a FrameSet is then written out to a FitsChan, the resulting 
 CTYPE\emph{i} keywords will include no distortion code.
 
 \subsubsection{The ``-SIP'' distortion code}
 
-The SIRTF project
-(\htmladdnormallink{http://sirtf.caltech.edu/SSC/}{http://sirtf.caltech.edu/SSC/})
+The Spitzer Space Telescope project
+(\htmladdnormallink{http://www.spitzer.caltech.edu/}{http://www.spitzer.caltech.edu/)
 has developed its own system for encoding 2-dimensional image distortion
 within a FITS header, based on the proposals of paper IV. A description
 of this system is available in \htmladdnormallink
-{http://sirtf.caltech.edu/SSC/documents/WCSkeywords\_v1.3.pdf}
-{http://sirtf.caltech.edu/SSC/documents/WCSkeywords\_v1.3.pdf}. In this
+{http://ssc.spitzer.caltech.edu/postbcd/doc/shupeADASS.pdf}
+{http://ssc.spitzer.caltech.edu/postbcd/doc/shupeADASS.pdf}. In this
 system, the presence of distortion is indicated by appending the
 distortion code ``-SIP'' to the CTYPE\emph{i} keyword values for the
 celestial axes. The distortion takes the form of a polynomial function
@@ -20684,11 +20682,11 @@ algorithm code) is not supported.
 distortion codes which are present in CTYPE keywords. Here, a ``distortion 
 code'' is the final group of four characters in a CTYPE value of the
 form ``xxxx-yyy-zzz'', as described in FITS-WCS paper IV. The exception
-to this is that the ``-SIP'' distortion code (as used by the SIRTF
-project - see 
+to this is that the ``-SIP'' distortion code (as used by the Spitzer
+Space Telescope project - see 
 \htmladdnormallink{
-http://sirtf.caltech.edu/SSC/documents/WCSkeywords\_v1.3.pdf}{
-http://sirtf.caltech.edu/SSC/documents/WCSkeywords\_v1.3.pdf}) is
+http://ssc.spitzer.caltech.edu/postbcd/doc/shupeADASS.pdf}{
+http://ssc.spitzer.caltech.edu/postbcd/doc/shupeADASS.pdf}) is
 interpreted correctly and results in a PolyMap being used to represent
 the distortion in the resulting FrameSet. Note, ``-SIP'' distortion codes
 can only be read, not written. A FrameSet which uses a PolyMap will not
