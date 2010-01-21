@@ -132,6 +132,9 @@ my $acsis_root = "/jcmtdata/raw/acsis/spectra";
 my $default_array = "s8d";
 my $scuba2_root  = "/jcmtdata/raw/scuba2/${default_array}";
 
+# Store the arguments for debugging purposes
+my @args = @ARGV;
+
 my ($help, $man, $doversion, $debug, $extended, $ocscfg, $force, $prtall);
 my ($cal_only, $skip, $tsys, $trx, $stdev);
 my $use_scuba2;
@@ -139,7 +142,7 @@ my $result = GetOptions(
                         "help" => \$help,         # Help text
                         "man"   => \$man,         # Manual page
                         "version" => \$doversion, # Version information
-                        "debug" => \$debug,       # Debugging
+                        "debug" => \$debug,       # Debugging (debug = 2 prints header items)
                         "extended" => \$extended, # Print extended lines?
                         "ocscfg" => \$ocscfg,     # Print ocs config file
                         "force" => \$force,       # Force subdirectory search
@@ -169,53 +172,31 @@ if ($doversion) {
 # Provide output from SCUBA or HETERODYNE data (default):
 my $data_root = ( $prog =~ /scuba/ ? $scuba2_root : $acsis_root );
 
-my $sw = "";
-# debug = 2 prints detected header items
-$sw .= " -d" if $debug;
-
-# Print ocscfg info in case of ACSIS files
-$sw .= " -o" if $ocscfg;
-
 # Print extended lines?
-my $pformat = "SHORT";
-($extended) && do { $pformat = "LONG"; $sw .= " -e" };
-
-# Force subdirectory search
-$sw .= " -f" if $force;
-
-# Cal only?
-$sw .= " -c" if $cal_only;
-
-# Print info on all files even if headers identical?
-$sw .= " -a" if $prtall;
+my $pformat = ( $extended ? "LONG" : "SHORT");
 
 my $tsysrms = 0;
 my $trxrms = 0;
 
 if ( $prog !~ /scuba/ ) {
-  # Skip obs_info line for Tsys or Trx list only
-  $sw .= " -s" if $skip;
-
   # Print Tsys?
-  $sw .= " -t" if $tsys;
   if ($tsys && $stdev) {
     $tsysrms = 1;
-    $sw .= " -T";
   }
 
   # Print Trx?
-  $sw .= " -r" if $trx;
   if ($trx && $stdev) {
     $trxrms = 1;
-    $sw .= " -R";
   }
 
 }
 
+# Create string of arguments
+my $sw = join( " ", grep { $_ !~ /^\-scu/i } @args);
 print "Running: ${prog} $sw\n" if ($debug);
 
 if ($skip && (!$tsys || $trx) ) {
-  print "\n*ERROR*: -s (skip) is only valid with -t/T (Tsys) and/or -r/R (Trx)";
+  print "\n*ERROR*: -skip is only valid with -tsys and/or -trx";
   pod2usage(1);
   exit;
 }
@@ -227,14 +208,16 @@ my $datadir = $ENV{'DATADIR'};            # The default data directory
 
 # Get observation directory and (optional) scuba array from arguments
 my $scuba2_array = $default_array;
-for ( my $i = $#ARGV; $i > -1; $i-- ) {
-  chomp($ARGV[$i]);
-  print "ARGV ${i}: $ARGV[$i]\n" if ($debug);
-  unless ( $ARGV[$i] =~ /^s\d\w/i ) {
-    $datadir = $ARGV[$i];
+my $i = $#ARGV;
+for my $arg (reverse @ARGV) {
+  chomp($arg);
+  print "ARGV ${i}: $arg\n" if ($debug);
+  if ( $arg =~ /^s\d\w/i ) {
+    $scuba2_array = $arg;
   } else {
-    $scuba2_array = $ARGV[$i];
+    $datadir = $arg;
   }
+  $i--;
 }
 
 $datadir = $data_root.'/'.$datadir
