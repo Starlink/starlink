@@ -104,6 +104,7 @@
       data purged,other/'purged    ','other'/
 
       loop = .true.
+      status = SAI__OK
 
       do while( loop )
         nnums = 3
