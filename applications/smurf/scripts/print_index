@@ -1,4 +1,4 @@
-#!/usr/bin/env starperl
+#!/usr/bin/env starperl    -*- cperl -*-
 
 =head1 NAME
 
@@ -97,9 +97,12 @@ C<scuba2_index> can take a specific sub-array directory to index. Defaults to s8
 
 =cut
 
+use strict;
+
 use File::Basename;
 
 # Load in the SDF module
+use Astro::FITS::Header::NDF;
 use NDF;
 
 # Astrometry
@@ -112,23 +115,22 @@ use GSD;
 use Getopt::Long;
 use Pod::Usage;
 
-# Smurf command GETTSYS
-$stardir = $ENV{'STARLINK_DIR'};
-unless (defined $stardir || $stardir != '') {
-    $stardir = "/star";
+# Smurf command GETTSYS is used for some options
+my $tsyscmd;
+if (exists $ENV{SMURF_DIR} && defined $ENV{SMURF_DIR}) {
+    $tsyscmd = $^X. " ". File::Spec->catfile( $ENV{SMURF_DIR},
+                                              "gettsys" )
 }
-$stardir =~ s/\/$//;
-$tsyscmd = "${stardir}/bin/smurf/gettsys";
 
 # ----------------------------------------------------------------------
 # Parse the command line options
 
-$version = "2.0";
+our $VERSION = "2.0";
 
-$acsis_root = "/jcmtdata/raw/acsis/spectra";
+my $acsis_root = "/jcmtdata/raw/acsis/spectra";
 
-$default_array = "s8d";
-$scuba2_root  = "/jcmtdata/raw/scuba2/${default_array}";
+my $default_array = "s8d";
+my $scuba2_root  = "/jcmtdata/raw/scuba2/${default_array}";
 
 my ($help, $man, $doversion, $debug, $extended, $ocscfg, $force, $prtall);
 my ($cal_only, $skip, $tsys, $trx, $stdev);
@@ -152,21 +154,22 @@ my $result = GetOptions(
                         "scuba2" => \$use_scuba2,     # Choose scuba-2 mode
                        );
 
+my $prog = (split(/\//,"$0"))[-1];
+$prog = "scuba2_index" if $use_scuba2;
+
 pod2usage(1) if $help;
 pod2usage(-exitstatus => 0, -verbose =>2) if $man;
 if ($doversion) {
-  ver_text();
+  print "\n\t$prog --- version $VERSION\n";
+  print "\tCreate an index of the files in \$DATADIR\n";
+  print "\tContact Remo Tilanus (rpt\@jach.hawaii.edu) for more information\n\n";
   exit;
 }
 
-
-$prog = (split(/\//,"$0"))[-1];
-$prog = "scuba2_index" if $use_scuba2;
 # Provide output from SCUBA or HETERODYNE data (default):
-($prog =~ /scuba/) ? ($data_root = $scuba2_root) :
-                     ($data_root = $acsis_root);
+my $data_root = ( $prog =~ /scuba/ ? $scuba2_root : $acsis_root );
 
-$sw = "";
+my $sw = "";
 # debug = 2 prints detected header items
 $sw .= " -d" if $debug;
 
@@ -174,7 +177,7 @@ $sw .= " -d" if $debug;
 $sw .= " -o" if $ocscfg;
 
 # Print extended lines?
-$pformat = "SHORT";
+my $pformat = "SHORT";
 ($extended) && do { $pformat = "LONG"; $sw .= " -e" };
 
 # Force subdirectory search
@@ -184,7 +187,7 @@ $sw .= " -f" if $force;
 $sw .= " -c" if $cal_only;
 
 # Print info on all files even if headers identical?
-$sw .= " -a" if $ptrall;
+$sw .= " -a" if $prtall;
 
 my $tsysrms = 0;
 my $trxrms = 0;
@@ -213,18 +216,18 @@ print "Running: ${prog} $sw\n" if ($debug);
 
 if ($skip && (!$tsys || $trx) ) {
   print "\n*ERROR*: -s (skip) is only valid with -t/T (Tsys) and/or -r/R (Trx)";
-  &help_text;
+  pod2usage(1);
   exit;
 }
 
 # ----------------------------------------------------------------------
 # Command-line arguments
 
-$datadir = $ENV{'DATADIR'};            # The default data directory
+my $datadir = $ENV{'DATADIR'};            # The default data directory
 
 # Get observation directory and (optional) scuba array from arguments
-$scuba2_array = $default_array;
-for ( $i = $#ARGV; $i > -1; $i-- ) {
+my $scuba2_array = $default_array;
+for ( my $i = $#ARGV; $i > -1; $i-- ) {
   chomp($ARGV[$i]);
   print "ARGV ${i}: $ARGV[$i]\n" if ($debug);
   unless ( $ARGV[$i] =~ /^s\d\w/i ) {
@@ -250,22 +253,23 @@ $datadir =~ s/\/$//;
 print "Path: $datadir   Files: all\n" if ($debug);
 my @obsfiles;
 
-opendir( DIR,"${datadir}" ) or die "Can't open directory '${datadir}'! :\n\t $!\n";
+opendir( my $DIR,"${datadir}" ) or die "Can't open directory '${datadir}'! :\n\t $!\n";
+my @ofiles;
 unless ($prog =~ /scuba/) {
    @ofiles = sort
           grep( /dem_|obs_|cbe_|das_|ac\d{8}_\d{5}|a\d{8}_\d{5}|\@/,
-          grep( /sdf|dat|gsd/, readdir(DIR)) );
+          grep( /sdf|dat|gsd/, readdir($DIR)) );
  }else {
    @ofiles = sort
           grep( /s\d\w\d{8}_\d{5}_\d{4}|\@/,
-          grep( /sdf|dat|gsd/, readdir(DIR)) );
+          grep( /sdf|dat|gsd/, readdir($DIR)) );
 }
-closedir(DIR);
+closedir($DIR);
 
 # If: Found valid files in the flat directory
 if ($#ofiles > 0 && $force == 0) {
   print "Found $#ofiles files in ${datadir}\n" if ($debug);
-  foreach $of (@ofiles) {
+  foreach my $of (@ofiles) {
     push(@obsfiles,"${datadir}/${of}");
   }
 
@@ -276,8 +280,8 @@ if ($#ofiles > 0 && $force == 0) {
     print "No files found: " unless ($force);
     print " try scanning subdirs of ${datadir}\n";
   }
-  open(FIND, "find $datadir -name \\\*_0001.sdf -print | sort |");
-  while(<FIND>) {
+  open(my $FIND, "find $datadir -name \\\*_0001.sdf -print | sort |");
+  while(<$FIND>) {
     chomp;
     if ( $prog !~ /scuba/ && $_ =~ /a\d{8}_\d{5}/  ) {
       push(@obsfiles,$_);
@@ -285,10 +289,11 @@ if ($#ofiles > 0 && $force == 0) {
       push(@obsfiles,$_);
     }
   }
-  close(FIND);
+  close($FIND);
 }
 
-$datadir =~ /[1,2][9,0,1](\d{6})/ && ($origin = $1) || ($origin = "");
+my $origin = "";
+$origin = $1 if $datadir =~ /[1,2][9,0,1](\d{6})/;
 
 #-----------------------------------------------------------------------
 # Handle each file
@@ -308,219 +313,45 @@ sub sort_by_scan {
   }
 };
 
-$prev_obs = "";
+my $prev_obs = "";
 
 my @suffixlist = ( "sdf", "dat", "gsd" );
 
-foreach $obsfile ( @obsfiles )
+foreach my $obsfile ( @obsfiles )
 {
 
-  ($basename,$path,$suffix) = fileparse($obsfile,@suffixlist);
+  (my $basename,my $path,my $suffix) = fileparse($obsfile,@suffixlist);
   $basename =~ s/\.$//;
   $path =~ s/\/$//;
   print "File $basename, Suffix: $suffix, Path: $path\n" if ($debug);
 
-  $cur_obs = "";
+  my $cur_obs = "";
   # ..and recover the PROJECT_ID and update INDEX.
   if ( "$suffix" eq "sdf" || "$suffix" eq "" ) {
       $cur_obs = sdf_header ( $path, $basename, $suffix,
-                 $projid, $prev_obs, $pformat, $debug);
+                 $prev_obs, $pformat, $debug);
   } else {
       $cur_obs = gsd_header ( $path, $basename, $suffix,
-                 $projid, $prev_obs, $pformat, $debug);
+                 $prev_obs, $pformat, $debug);
   }
 
   $prev_obs = $cur_obs;
 }
 
-# ------------------------ FORMATS -------------------------------------
-#
-
-format STDOUT_SHORT_ACS =
-@<<<<< UT  Projid     Mode     Source  Intt/Stp Tau  WVM  Rx/Freq   Vel/Velsys
-$origin
-.
-
-format STDOUT_SHORT_SCU2 =
-@<<<<< UT  Projid     Mode     Source      Map      Step  Tau  WVM  See  Fltr
-$origin
-.
-
-format STDOUT_SHORT_SCU =
-@<<<<< UT Mode     Projid   Source    Me/Int Tau  See  Filter    Bolometers
-$origin
-.
-
-format STDOUT_SHORT_HET =
-@<<<<<<<< UT       Mode     Source   Sec/Cyc Tau  See  Rx/Freq   Vel/Velsys
-$origin
-.
-
-format STDOUT_SHORT_HET2 =
-@<<<<< UT  Projid     Mode     Source   Sec/Cyc Tau  See  Rx/Freq   Vel/Velsys
-$origin
-.
-
-format STDOUT_LONG_ACS =
-@<<<<< UT  Projid     Mode     Source  Intt/Stp Tau   WVM   Rx/Freq   Vel/Velsys   Az    El    Uaz   Uel   Bwmode
-$origin
-.
-
-format STDOUT_LONG_SCU2 =
-@<<<<< UT  Projid     Mode     Source      Map     Step  Tau   WVM   See   Fltr    Az    El    Uaz   Uel
-$origin
-.
-
-format STDOUT_LONG_SCU =
-@<<<<< UT Mode     Projid   Source    Me/Int Tau  See  Filter    Bolometers      Az    El    Uaz   Uel
-$origin
-.
-
-format STDOUT_LONG_HET =
-@<<<<<<<< UT       Mode     Source   Sec/Cyc Tau  See  Rx/Freq   Vel/Velsys   Az    El    Uaz   Uel
-$origin
-.
-
-
-format STDOUT_LONG_HET2 =
-@<<<<< UT  Projid     Mode     Source   Sec/Cyc Tau  See  Rx/Freq   Vel/Velsys   Az    El    Uaz   Uel
-$origin
-.
-
-format NOFITS =
---------- No FITS entry for @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-$basename
-.
-
-format SHORT_ACS =
-@<< @<<<<< @<<<<<<<<< @<<<<<<< @<<<<<< @>>>/@<< @<<< @<<< @<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<
-$run, substr($ut,0,5), $projid, $mode, $object, $intt, $step, $csotau, $wvmtau, $cfreq, $cvref
-.
-
-format SHORT_SCU2 =
-@<< @<<<<< @<<<<<<<<< @<<<<<<< @<<<<<< @<<<<<<<<<<< @<<<< @<<< @<<< @<<<  @<<<<
-$run, substr($ut,0,5), $projid, $mode, $object, $map, $step, $csotau, $wvmtau,$seeing, $filter
-.
-
-format SHORT_SCU =
-@<< @<<<< @<<<<<<< @<<<<<<< @<<<<<<<< @>/@<< @<<< @<<< @<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<
-$run, $ut, $mode, $projid, $object, $n_meas, $n_int, $csotau, $seeing, $filter, $boloms
-.
-
-format SHORT_HET =
-@<< @<<<<<<<<<<<<< @<<<<<<< @<<<<<<<< @>/@<< @<<< @<<< @<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<
-$run, $ut, $mode, $object, $n_meas, $n_int, $csotau, $seeing, $cfreq, $cvref
-.
-
-format SHORT_HET2 =
-@<< @<<<<< @<<<<<<<<< @<<<<<<< @<<<<<<<< @>/@<< @<<< @<<< @<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<
-$run, substr($ut,9,5), $projid, $mode, $object, $n_meas, $n_int, $csotau, $seeing, $cfreq, $cvref
-.
-
-format SHORT_NOISE =
-@<< @<<<< @<<<<<<< @<<<<<<< @<<<<<<<< @>/@<< @<<< @<<< @<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<
-$run, $ut, $mode, $projid, $fitsitem{'OBJ_TYPE'}, $n_meas, $n_int, $csotau, $seeing, $filter, $boloms
-.
-
-format SHORT_SKYDIP =
-@<< @<<<< @<<<<<<< @<<<<<<< SKY       @>/@<< @<<< @<<< @<<<<<<<< PHOT. PIXELS
-$run, $ut, $mode, $projid, $n_meas, $n_int, $csotau, $seeing, $filter
-.
-
-format LONG_ACS =
-@<< @<<<<< @<<<<<<<<< @<<<<<<< @<<<<<< @>>>/@<< @<<<< @<<<< @<<<<<<<< @<<<<<<<<<<< @<<<< @<<<< @<<<< @<<<< @<<<<<<<<<<<
-$run, substr($ut,0,5), $projid, $mode, $object, $intt, $step, $lcsotau, $lwvmtau, $cfreq, $cvref, $az, $el, $uaz, $uel, $bwmode
-.
-
-format LONG_SCU2 =
-@<< @<<<<< @<<<<<<<<< @<<<<<<< @<<<<<< @<<<<<<<<<< @<<<< @<<<< @<<<< @<<<<  @<<<<< @<<<< @<<<< @<<<< @<<<<
-$run, substr($ut,0,5), $projid, $mode, $object, $map, $step, $lcsotau, $lwvmtau, $lseeing, $filter, $az, $el, $uaz, $uel
-.
-
-format LONG_SCU =
-@<< @<<<< @<<<<<<< @<<<<<<< @<<<<<<<< @>/@<< @<<< @<<< @<<<<<<<< @<<<<<<<<<<<<<< @<<<< @<<<< @<<<< @<<<<
-$run, $ut, $mode, $projid, $object, $n_meas, $n_int, $csotau, $seeing, $filter, $boloms, $az, $el, $uaz, $uel
-.
-
-format LONG_HET =
-@<< @<<<<<<<<<<<<< @<<<<<<< @<<<<<<<< @>/@<< @<<< @<<< @<<<<<<<< @<<<<<<<<<<< @<<<< @<<<< @<<<< @<<<<
-$run, $ut, $mode, $object, $n_meas, $n_int, $csotau, $seeing, $cfreq, $cvref, $az, $el, $uaz, $uel
-.
-
-format LONG_HET2 =
-@<< @<<<<< @<<<<<<<<< @<<<<<<< @<<<<<<<< @>/@<< @<<< @<<< @<<<<<<<< @<<<<<<<<<<< @<<<< @<<<< @<<<< @<<<<
-$run, substr($ut,9,5), $projid, $mode, $object, $n_meas, $n_int, $csotau, $seeing, $cfreq, $cvref, $az, $el, $uaz, $uel
-.
-
-format LONG_NOISE =
-@<< @<<<< @<<<<<<< @<<<<<<< @<<<<<<<< @>/@<< @<<< @<<< @<<<<<<<< @<<<<<<<<<<<<<< @<<<< @<<<< @<<<< @<<<<
-$run, $ut, $mode, $projid, $fitsitem{'OBJ_TYPE'}, $n_meas, $n_int, $csotau, $seeing, $filter, $boloms, $az, $el, $uaz, $uel
-.
-
-format LONG_SKYDIP =
-@<< @<<<< @<<<<<<< @<<<<<<< SKY       @>/@<< @<<< @<<< @<<<<<<<< PHOT. PIXELS    @<<<< @<<<< @<<<< @<<<<
-$run, $ut, $mode, $projid, $n_meas, $n_int, $csotau, $seeing, $filter, $az, $el, $uaz, $uel
-.
-
 # ---------------------- SUBROUTINES -----------------------------------
-# We write good unix utilities ergo the -v and -h flags work
 
-sub ver_text {
-
-    print "\n\t$prog --- version $version\n";
-    print "\tCreate an index of the files in \$DATADIR\n";
-    print "\tContact Remo Tilanus (rpt\@jach.hawaii.edu) for more information\n\n";
-
-}
-
-sub help_text {
-
-  print qq{
-\nName: $prog - Create an index of observation files
-Version: $version\n};
-
-  if ($prog =~ /scuba/) {
-    print qq{
-Use:  $prog [-v | -h | -d | -o] [-a] [-e] [-f] [datadir] [scuba2_array]\n};
-  } else {
-    print qq{
-Use:  $prog [-v | -h | -d | -o] [-a] [-c] [-e] [-f] [-t/T -r/R -s/S]
-                  [datadir]\n};
-}
-
-  print qq{
-\t-a: \tall: print for all files e.g. multiple subbands, sub-rasters\n
-\t-d: \tswitch on debug output\n
-\t-e: \textended: add AZ, EL, pointing offsets, bandwidth\n
-\t-f: \tforce: if no files are found in the directory itself, as
-\t    \twould be the case for a raw data tree, $prog will
-\t    \tautomatically search subdirecties. This option forces
-\t    \tthe subdirectory search.\n
-\t-h: \tthis help\n
-\t-o: \tprint OCSCFG file name\n};
-
-  unless ($prog =~ /scuba/) {
-    print qq{
-\t-c:\tOnly print calibration observations\n
-\t-r,R: \tprint median Trx;  'R': add standard deviation\n
-\t-s: \tskip obs-info (for Tsys/Trx-only listing)\n
-\t-t,T: \tprint median Tsys; 'T': add standard deviation\n};
+# Read a FITS header and return a hash reference
+sub read_fits_header {
+  my $file = shift;
+  # Read the FITS header and tie it
+  my $fitshdr = Astro::FITS::Header::NDF->new( File => $file );
+  if (!$fitshdr) {
+    print "Error reading FITS in $file\n";
+    return;
   }
-
-  print qq{
-\t-v: \tversion\n
-\tdatadir: directory to index. If a yyyymmdd string is
-           \tgiven it will default to the SCUBA/ACSIS spectra
-           \tfor the specified date, unless there is a local
-           \tsubdirectory yyyymmdd.
-\t\tDefaults: \$DATADIR, if defined, else current dir.\n};
-
-  if ($prog =~ /scuba/) {
-    print qq{
-\tscuba2_array: sub-array directory to index. Default: s8d.\n};
-
-  }
-  print "\n";
+  my %tiedhdr;
+  tie %tiedhdr, "Astro::FITS::Header", $fitshdr, tiereturnsref => 1;
+  return \%tiedhdr;
 }
 
 # ----------------------------------------------------------------------
@@ -528,44 +359,28 @@ Use:  $prog [-v | -h | -d | -o] [-a] [-c] [-e] [-f] [-t/T -r/R -s/S]
 
 sub sdf_header {
 
-    ($path, $basename, $suffix, $projid, $prev_obs, $pformat, $debug) = @_;
+    my ($path, $basename, $suffix, $prev_obs, $pformat, $debug) = @_;
     my $sdffile = $path . '/' . $basename;
-
-# NDF name for FITS information in SCUBA RO files
-    $rohead = ".HEADER";
-
-# Open the NDF environment
-    $status = &NDF::SAI__OK;
-    ndf_begin;
-    err_begin($status);
-
-# Is this a SCUBA ro_ file: append the sdf section to the sdffile
-    $sdffile =~ /^ro_|_red_/ && ($sdffile .= $rohead);
-
-# Now read the header
-    my ($fitsitem,$status) = fits_read_header("$sdffile");
-    if ($status != 0) {
-      print "Error reading FITS in $sdffile\n";
-      return ("");
-    }
+    my $fitsitem = read_fits_header( $sdffile );
+    return "" unless defined $fitsitem;
 
 # Branch between SCUBA, SCUBA2 and ACSIS
 
-    $cur_obs = "";
+    my $cur_obs = "";
     if ("${$fitsitem}{'INSTRUME'}" =~ /^scuba$/i) {
       print "SCUBA observation\n" if ($debug);
       $cur_obs =
-         scuba_header($path, $basename, $suffix, $projid,
+         scuba_header($path, $basename, $suffix,
                       $fitsitem, $prev_obs, $pformat, $debug);
     } elsif ("${$fitsitem}{'INSTRUME'}" =~ /^scuba-2$/i) {
 
       print "SCUBA-2 observation\n" if ($debug);
 
       # Find sub-files of observation
-      opendir( ODIR,"${path}" ) or die "Can't open observation '${path}'! : $!\n";
-      @subfiles = sort
-          grep( /s\d\w\d{8}_\d{5}_\d{4}/,grep(/sdf/, readdir(ODIR)) );
-      closedir(ODIR);
+      opendir( my $ODIR,"${path}" ) or die "Can't open observation '${path}'! : $!\n";
+      my @subfiles = sort
+          grep( /s\d\w\d{8}_\d{5}_\d{4}/,grep(/sdf/, readdir($ODIR)) );
+      closedir($ODIR);
 
       # Skip the initial DARK
       if ($#subfiles > 0) {
@@ -573,27 +388,22 @@ sub sdf_header {
         $basename =~ s/\.sdf$//;
         $sdffile = $path . '/' . $basename;
         print "Read non-dark file: $sdffile\n" if ($debug);
-        ($fitsitem,$status) = fits_read_header("$sdffile");
-        if ($status != 0) {
-          print "Error reading FITS in $sdffile\n";
-          return ("");
-        }
+        $fitsitem = read_fits_header($sdffile);
+        return "" unless defined $fitsitem;
       }
 
       # Try reading the last non-DARK file as well
-      $fitsitem2 = $fitsitem;
-      $listlast = $#subfiles;
-      $found = 0;
+      my $fitsitem2 = $fitsitem;
+      my $listlast = $#subfiles;
+      my $found = 0;
       while ($found == 0 && $listlast > 0 &&
              "${$fitsitem}{'OBS_TYPE'}" ne "flatfield" ) {
         my $basename2 = $subfiles[$listlast];
         $basename2 =~ s/\.sdf$//;
-        $sdffile2 = $path . '/' . $basename2;
+        my $sdffile2 = $path . '/' . $basename2;
         print "Read last non-dark file: $sdffile2\n" if ($debug);
-        ($fitsitem2,$status) = fits_read_header("$sdffile2");
-        if ($status != 0) {
-          print "Error reading FITS in $sdffile2\n";
-        } else {
+        $fitsitem2 = read_fits_header( $sdffile2 );
+        if (defined $fitsitem2) {
           if ( "${$fitsitem2}{'AZEND'}" ne "" &&
                "${$fitsitem2}{'ELEND'}" ne "" ) {
             $found = 1;
@@ -603,14 +413,14 @@ sub sdf_header {
       }
 
       $cur_obs =
-         scuba2_header($path, $basename, $suffix, $projid, $fitsitem,
+         scuba2_header($path, $basename, $suffix, $fitsitem,
                        $fitsitem2, $prev_obs, $pformat, $debug);
 
     } else {
 
       print "ACSIS observation\n" if ($debug);
       $cur_obs =
-         acsis_header($path, $basename, $suffix, $projid, $fitsitem,
+         acsis_header($path, $basename, $suffix, $fitsitem,
                       $prev_obs, $pformat, $debug);
     }
 
@@ -622,7 +432,7 @@ sub sdf_header {
 
 sub acsis_header {
 
-    ($path, $basename, $suffix, $projid, $fitsitem, $prev_obs, $pformat, $debug) = @_;
+    my ($path, $basename, $suffix, $fitsitem, $prev_obs, $pformat, $debug) = @_;
     my $sdffile = $path . '/' . $basename;
 
     # Get the rest frequency
@@ -659,14 +469,14 @@ sub acsis_header {
 
     do {foreach (keys %$fitsitem) { print "$_\n";}} if ($debug > 1);
 
-    $projid = "\L${$fitsitem}{'PROJECT'}";
-    $run    = "\L${$fitsitem}{'OBSNUM'}";
-    $cfgfile = ${$fitsitem}{'OCSCFG'};
-    ($date, $ut) = split(/T/, ${$fitsitem}{'DATE-OBS'});
+    my $projid = "\L${$fitsitem}{'PROJECT'}";
+    my $run    = "\L${$fitsitem}{'OBSNUM'}";
+    my $cfgfile = ${$fitsitem}{'OCSCFG'};
+    my ($date, $ut) = split(/T/, ${$fitsitem}{'DATE-OBS'});
     $date =~ s/\-/\//g;
-    $datetime = "$date $ut";
-    $obstype  = "\U${$fitsitem}{'OBS_TYPE'}";
-    $mode   = "\U${$fitsitem}{'RECIPE'}";
+    my $datetime = "$date $ut";
+    my $obstype  = "\U${$fitsitem}{'OBS_TYPE'}";
+    my $mode   = "\U${$fitsitem}{'RECIPE'}";
     if ($mode =~ /science/i) {
       $mode = "\U${$fitsitem}{'SAM_MODE'}" . "_" . "\U${$fitsitem}{'SW_MODE'}";
       $mode =~ s/JIGGLE/JIG/;
@@ -675,52 +485,77 @@ sub acsis_header {
     } else {
       $mode =~ s/REDUCE_//i;
     }
-    $object = "\L${$fitsitem}{'OBJECT'}";
+    my $object = "\L${$fitsitem}{'OBJECT'}";
 
-    $rx     = "\L${$fitsitem}{'INSTRUME'}";
+    my $rx     = "\L${$fitsitem}{'INSTRUME'}";
     $rx     =~ s/harpb/harp/;
     $rx     =~ s/^fe_//;
     $rx     =~ s/^rx//i;
     $rx     =~ s/^scuba-2/scu/i;
-    $freq   = sprintf("%.1f", $fitsitem->{RESTFREQ});
-    $cfreq  = "${rx}/${freq}";
-    $vel    = sprintf("%.2f", $fitsitem->{VELOCITY});
-    $cvref  = "$vel" . "/" . substr("\L${$fitsitem}{'DOPPLER'}",0,3) .
+    my $freq   = sprintf("%.1f", $fitsitem->{RESTFREQ});
+    my $cfreq  = "${rx}/${freq}";
+    my $vel    = sprintf("%.2f", $fitsitem->{VELOCITY});
+    my $cvref  = "$vel" . "/" . substr("\L${$fitsitem}{'DOPPLER'}",0,3) .
               substr("\L${$fitsitem}{'SPECSYS'}",0,3);
-    $bwmode = ${$fitsitem}{'BWMODE'};
+    my $bwmode = ${$fitsitem}{'BWMODE'};
 
-    $step = "${$fitsitem}{'STEPTIME'}";
-    (${$fitsitem}{'JOS_MULT'} > ${$fitsitem}{'JOS_MIN'}) ?
-              ($josmult = ${$fitsitem}{'JOS_MULT'}) : ($josmult = ${$fitsitem}{'JOS_MIN'});
-    (${$fitsitem}{'NUM_NODS'} ne '') ?
-              ($numnods = 4*${$fitsitem}{'NUM_NODS'}) : ($numnods = 1);
-    $intt = 0.1*int(10.0*${$fitsitem}{'NUM_CYC'}*$numnods*$josmult*$step+0.5);
+    my $step = "${$fitsitem}{'STEPTIME'}";
+    my $josmult = ( ${$fitsitem}{'JOS_MULT'} > ${$fitsitem}{'JOS_MIN'} ?
+                    $fitsitem->{JOS_MULT} : $fitsitem->{JOS_MIN});
+    my $numnods = ( $fitsitem->{NUM_NODS} ne '' ? 4*$fitsitem->{NUM_NODS} : 1 );
+    my $intt = 0.1*int(10.0*${$fitsitem}{'NUM_CYC'}*$numnods*$josmult*$step+0.5);
 
-    $az     = 0.5*(${$fitsitem}{'AZSTART'}+${$fitsitem}{'AZEND'});
-    $el     = 0.5*(${$fitsitem}{'ELSTART'}+${$fitsitem}{'ELEND'});
-    $uaz    = ${$fitsitem}{'UAZ'};
-    $uel    = ${$fitsitem}{'UEL'};
+    my $az     = 0.5*(${$fitsitem}{'AZSTART'}+${$fitsitem}{'AZEND'});
+    my $el     = 0.5*(${$fitsitem}{'ELSTART'}+${$fitsitem}{'ELEND'});
+    my $uaz    = ${$fitsitem}{'UAZ'};
+    my $uel    = ${$fitsitem}{'UEL'};
 
-    $seeing = 0.01 * int(100.0*
-              0.5*(${$fitsitem}{'SEEINGST'}+${$fitsitem}{'SEEINGEN'})+0.5)
-              if ("${$fitsitem}{'SEEINGST'}" ne "");
-    $csotau = 0.01 * int(100.0*
-              0.5*(${$fitsitem}{'TAU225ST'}+${$fitsitem}{'TAU225EN'})+0.5)
-              if ("${$fitsitem}{'TAU225ST'}" ne "");
-    $wvmtau = 0.01 * int(100.0*
-              0.5*(${$fitsitem}{'WVMTAUST'}+${$fitsitem}{'WVMTAUEN'})+0.5)
-              if ("${$fitsitem}{'WVMTAUST'}" ne "");
-    $lseeing = 0.001 * int(1000.0*
-              0.5*(${$fitsitem}{'SEEINGST'}+${$fitsitem}{'SEEINGEN'})+0.5)
-              if ("${$fitsitem}{'SEEINGST'}" ne "");
-    $lcsotau = 0.001 * int(1000.0*
-              0.5*(${$fitsitem}{'TAU225ST'}+${$fitsitem}{'TAU225EN'})+0.5)
-              if ("${$fitsitem}{'TAU225ST'}" ne "");
-    $lwvmtau = 0.001 * int(1000.0*
-              0.5*(${$fitsitem}{'WVMTAUST'}+${$fitsitem}{'WVMTAUEN'})+0.5)
-              if ("${$fitsitem}{'WVMTAUST'}" ne "");
+    my $seeing = 0.01 * int(100.0*
+                            0.5*(${$fitsitem}{'SEEINGST'}+${$fitsitem}{'SEEINGEN'})+0.5)
+        if ("${$fitsitem}{'SEEINGST'}" ne "");
+    my $csotau = 0.01 * int(100.0*
+                            0.5*(${$fitsitem}{'TAU225ST'}+${$fitsitem}{'TAU225EN'})+0.5)
+        if ("${$fitsitem}{'TAU225ST'}" ne "");
+    my $wvmtau = 0.01 * int(100.0*
+                            0.5*(${$fitsitem}{'WVMTAUST'}+${$fitsitem}{'WVMTAUEN'})+0.5)
+        if ("${$fitsitem}{'WVMTAUST'}" ne "");
+    my $lseeing = 0.001 * int(1000.0*
+                              0.5*(${$fitsitem}{'SEEINGST'}+${$fitsitem}{'SEEINGEN'})+0.5)
+        if ("${$fitsitem}{'SEEINGST'}" ne "");
+    my $lcsotau = 0.001 * int(1000.0*
+                              0.5*(${$fitsitem}{'TAU225ST'}+${$fitsitem}{'TAU225EN'})+0.5)
+        if ("${$fitsitem}{'TAU225ST'}" ne "");
+    my $lwvmtau = 0.001 * int(1000.0*
+                              0.5*(${$fitsitem}{'WVMTAUST'}+${$fitsitem}{'WVMTAUEN'})+0.5)
+        if ("${$fitsitem}{'WVMTAUST'}" ne "");
 
 #    print "$run $mode $ut \'$object\' $projid $rx $boloms $filter $csotau $seeing\n";
+
+    # Declare formats here since it has to be in scope of the lexical variables
+format NOFITS =
+--------- No FITS entry for @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+$basename
+.
+
+format STDOUT_SHORT_ACS =
+@<<<<< UT  Projid     Mode     Source  Intt/Stp Tau  WVM  Rx/Freq   Vel/Velsys
+$origin
+.
+
+format STDOUT_LONG_ACS =
+@<<<<< UT  Projid     Mode     Source  Intt/Stp Tau   WVM   Rx/Freq   Vel/Velsys   Az    El    Uaz   Uel   Bwmode
+$origin
+.
+
+format SHORT_ACS =
+@<< @<<<<< @<<<<<<<<< @<<<<<<< @<<<<<< @>>>/@<< @<<< @<<< @<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<
+$run, substr($ut,0,5), $projid, $mode, $object, $intt, $step, $csotau, $wvmtau, $cfreq, $cvref
+.
+
+format LONG_ACS =
+@<< @<<<<< @<<<<<<<<< @<<<<<<< @<<<<<< @>>>/@<< @<<<< @<<<< @<<<<<<<< @<<<<<<<<<<< @<<<< @<<<< @<<<< @<<<< @<<<<<<<<<<<
+$run, substr($ut,0,5), $projid, $mode, $object, $intt, $step, $lcsotau, $lwvmtau, $cfreq, $cvref, $az, $el, $uaz, $uel, $bwmode
+.
 
     # Set format
 
@@ -739,7 +574,7 @@ sub acsis_header {
 
     }
 
-    &acsis_tsys( $sdffile ) if ($tsys or $trx);
+    &acsis_tsys( $sdffile, $projid, $mode, $run, $freq ) if ($tsys or $trx);
 
     if ($skip == 0) {
 
@@ -759,31 +594,31 @@ sub acsis_header {
 
 sub scuba2_header {
 
-    ($path, $basename, $suffix, $projid, $fitsitem, $fitsitem2, $prev_obs, $pformat, $debug) = @_;
+    my ($path, $basename, $suffix, $fitsitem, $fitsitem2, $prev_obs, $pformat, $debug) = @_;
     my $sdffile = $path . '/' . $basename;
-
     do {foreach (keys %$fitsitem) { print "$_\n";}} if ($debug > 1);
 
-    $projid = "\L${$fitsitem}{'PROJECT'}";
-    $cfgfile = ${$fitsitem}{'OCSCFG'};
-    $run    = "\L${$fitsitem}{'OBSNUM'}";
-    ($date, $ut) = split(/T/, ${$fitsitem}{'DATE-OBS'});
+    my $projid = "\L${$fitsitem}{'PROJECT'}";
+    my $cfgfile = ${$fitsitem}{'OCSCFG'};
+    my $run    = "\L${$fitsitem}{'OBSNUM'}";
+    my ($date, $ut) = split(/T/, ${$fitsitem}{'DATE-OBS'});
     $date =~ s/\-/\//g;
-    $datetime = "$date $ut";
+    my $datetime = "$date $ut";
 
-    $obstype  = "\U${$fitsitem}{'OBS_TYPE'}";
-    $mode   = "\U${$fitsitem}{'RECIPE'}";
+    my $obstype  = "\U${$fitsitem}{'OBS_TYPE'}";
+    my $mode   = "\U${$fitsitem}{'RECIPE'}";
     $mode =~ s/REDUCE_//i;
     $mode =~ s/FIELD/FLD/i;
     $mode = "\U${$fitsitem}{'SCAN_PAT'}" if ($mode eq "SCAN");
     $mode =~ s/CURVY_PONG/CRVYPONG/i;
 
-    $object = "\L${$fitsitem}{'OBJECT'}";
+    my $object = "\L${$fitsitem}{'OBJECT'}";
     $object =~ s/_science//;
-    $filter  = "$fitsitem->{FILTER}";
-    $step = int(1000*${$fitsitem}{'STEPTIME'}) . "ms";
+    my $filter  = "$fitsitem->{FILTER}";
+    my $step = int(1000*${$fitsitem}{'STEPTIME'}) . "ms";
 
-    $mpx = ${$fitsitem}{'MAP_WDTH'};
+    my ($mapx, $mapy);
+    my $mpx = ${$fitsitem}{'MAP_WDTH'};
     if ($mpx > 3600.0) {
       $mapx = sprintf "%4.1fd", $mpx/3600.0;
     } elsif ($mpx > 60.0) {
@@ -791,7 +626,7 @@ sub scuba2_header {
     } else {
       $mapx = sprintf "%2d\"", $mpx;
     }
-    $mpy = int(${$fitsitem}{'MAP_HGHT'});
+    my $mpy = int(${$fitsitem}{'MAP_HGHT'});
     if ($mpy > 3600.0) {
       $mapy = sprintf "%4.1fd", $mpy/3600.0;
     } elsif ($mpy > 60.0) {
@@ -802,23 +637,23 @@ sub scuba2_header {
     $mapx =~ s/^\s+//;
     $mapy =~ s/^\s+//;
 
-    $map = "";
+    my $map = "";
     $map = sprintf "%5sx%-5s", $mapx, $mapy unless ($mpx == 0 || $mpy == 0);
 
-    $az     = 0.5*(${$fitsitem}{'AZSTART'}+${$fitsitem2}{'AZEND'});
-    $el     = 0.5*(${$fitsitem}{'ELSTART'}+${$fitsitem2}{'ELEND'});
+    my $az     = 0.5*(${$fitsitem}{'AZSTART'}+${$fitsitem2}{'AZEND'});
+    my $el     = 0.5*(${$fitsitem}{'ELSTART'}+${$fitsitem2}{'ELEND'});
     if ($az == 0 && $el == 0) {
       $az = ""; $el = "";
     }
-    $uaz    = ${$fitsitem}{'UAZ'};
-    $uel    = ${$fitsitem}{'UEL'};
+    my $uaz    = ${$fitsitem}{'UAZ'};
+    my $uel    = ${$fitsitem}{'UEL'};
 
-    $seeing = " n/a";
-    $csotau = " n/a";
-    $wvmtau = " n/a";
-    $lseeing = " n/a";
-    $lcsotau = " n/a";
-    $lwvmtau = " n/a";
+    my $seeing = " n/a";
+    my $csotau = " n/a";
+    my $wvmtau = " n/a";
+    my $lseeing = " n/a";
+    my $lcsotau = " n/a";
+    my $lwvmtau = " n/a";
 
     $seeing = 0.01 * int(100.0*
               0.5*(${$fitsitem}{'SEEINGST'}+${$fitsitem2}{'SEEINGEN'})+0.5)
@@ -841,6 +676,32 @@ sub scuba2_header {
 
 #    print "$run $mode $ut \'$object\' $projid $rx $boloms $filter $csotau $seeing\n";
 
+    # Declare formats here since it has to be in scope of the lexical variables
+format NOFITS =
+--------- No FITS entry for @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+$basename
+.
+
+format SHORT_SCU2 =
+@<< @<<<<< @<<<<<<<<< @<<<<<<< @<<<<<< @<<<<<<<<<<< @<<<< @<<< @<<< @<<<  @<<<<
+$run, substr($ut,0,5), $projid, $mode, $object, $map, $step, $csotau, $wvmtau,$seeing, $filter
+.
+
+format LONG_SCU2 =
+@<< @<<<<< @<<<<<<<<< @<<<<<<< @<<<<<< @<<<<<<<<<< @<<<< @<<<< @<<<< @<<<<  @<<<<< @<<<< @<<<< @<<<< @<<<<
+$run, substr($ut,0,5), $projid, $mode, $object, $map, $step, $lcsotau, $lwvmtau, $lseeing, $filter, $az, $el, $uaz, $uel
+.
+
+format STDOUT_SHORT_SCU2 =
+@<<<<< UT  Projid     Mode     Source      Map      Step  Tau  WVM  See  Fltr
+$origin
+.
+
+format STDOUT_LONG_SCU2 =
+@<<<<< UT  Projid     Mode     Source      Map     Step  Tau   WVM   See   Fltr    Az    El    Uaz   Uel
+$origin
+.
+
     # Set format
 
     $= = 999;
@@ -857,8 +718,6 @@ sub scuba2_header {
       }
 
     }
-
-#    &acsis_tsys( $sdffile) if ($tsys or $trx);
 
     if ($skip == 0) {
 
@@ -878,40 +737,80 @@ sub scuba2_header {
 
 sub scuba_header {
 
-    ($path, $basename, $suffix, $projid, $fitsitem, $prev_obs, $pformat, $debug) = @_;
+    my ($path, $basename, $suffix, $fitsitem, $prev_obs, $pformat, $debug) = @_;
     my $sdffile = $path . '/' . $basename;
 
     do {foreach (keys %$fitsitem) { print "$_\n";}} if ($debug >1);
 
-    $projid = "\L${$fitsitem}{'PROJ_ID'}";
-    $run    = "\L${$fitsitem}{'RUN'}";
-    ($yy,$mm,$dd,$rest) = split(/\:/, ${$fitsitem}{'UTDATE'}, 4);
+    my $projid = "\L${$fitsitem}{'PROJ_ID'}";
+    my $run    = "\L${$fitsitem}{'RUN'}";
+    my ($yy,$mm,$dd,$rest) = split(/\:/, ${$fitsitem}{'UTDATE'}, 4);
     if ($mm < 10) {$mm = "0$mm"};
     if ($dd < 10) {$dd = "0$dd"};
-    ($h,$m,$s,$rest) = split(/\:/, ${$fitsitem}{'UTSTART'}, 4);
+    (my $h,my $m,my $s,$rest) = split(/\:/, ${$fitsitem}{'UTSTART'}, 4);
     if ($h < 10) {$h = "0$h"};
     $s = substr($s,0,5);
-    $datetime = "${yy}/${mm}/${dd} ${h}:${m}:${s}";
+    my $datetime = "${yy}/${mm}/${dd} ${h}:${m}:${s}";
     $s = int($s+0.5);
     if ($s < 10) {$s = "0$s"};
-    $ut = "${h}:${m}:${s}";
-    $mode   = "\U${$fitsitem}{'MODE'}";
-    $object = "\L${$fitsitem}{'OBJECT'}";
-    $rx     = "SCUBA";
-    $n_meas = "\L${$fitsitem}{'N_MEASUR'}";
-    $n_int  = "\L${$fitsitem}{'N_INT'}";
-    $boloms = substr(${$fitsitem}{'BOLOMS'},0,10);
-    $filter = "\L${$fitsitem}{'FILTER'}";
-    $az     = 0.5*(${$fitsitem}{'STRT_AZD'}+${$fitsitem}{'END_AZD'});
-    $el     = 0.5*(${$fitsitem}{'STRT_ELD'}+${$fitsitem}{'END_ELD'});
-    $uaz    = ${$fitsitem}{'UAZ'};
-    $uel    = ${$fitsitem}{'UEL'};
-    $seeing = 0.01 * int(100.0*${$fitsitem}{'SEEING'}+0.5);
-    $csotau = 0.01 * int(100.0*${$fitsitem}{'TAU_225'}+0.5);
+    my $ut = "${h}:${m}:${s}";
+    my $mode   = "\U${$fitsitem}{'MODE'}";
+    my $object = "\L${$fitsitem}{'OBJECT'}";
+    my $rx     = "SCUBA";
+    my $n_meas = "\L${$fitsitem}{'N_MEASUR'}";
+    my $n_int  = "\L${$fitsitem}{'N_INT'}";
+    my $boloms = substr(${$fitsitem}{'BOLOMS'},0,10);
+    my $filter = "\L${$fitsitem}{'FILTER'}";
+    my $az     = 0.5*(${$fitsitem}{'STRT_AZD'}+${$fitsitem}{'END_AZD'});
+    my $el     = 0.5*(${$fitsitem}{'STRT_ELD'}+${$fitsitem}{'END_ELD'});
+    my $uaz    = ${$fitsitem}{'UAZ'};
+    my $uel    = ${$fitsitem}{'UEL'};
+    my $seeing = 0.01 * int(100.0*${$fitsitem}{'SEEING'}+0.5);
+    my $csotau = 0.01 * int(100.0*${$fitsitem}{'TAU_225'}+0.5);
 
 #    print "$run $mode $ut \'$object\' $projid $rx/$boloms/$filter/ $csotau $seeing\n";
 
     # Set format
+format NOFITS =
+--------- No FITS entry for @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+$basename
+.
+format STDOUT_LONG_SCU =
+@<<<<< UT Mode     Projid   Source    Me/Int Tau  See  Filter    Bolometers      Az    El    Uaz   Uel
+$origin
+.
+format STDOUT_SHORT_SCU =
+@<<<<< UT Mode     Projid   Source    Me/Int Tau  See  Filter    Bolometers
+$origin
+.
+format SHORT_SCU =
+@<< @<<<< @<<<<<<< @<<<<<<< @<<<<<<<< @>/@<< @<<< @<<< @<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<
+$run, $ut, $mode, $projid, $object, $n_meas, $n_int, $csotau, $seeing, $filter, $boloms
+.
+format SHORT_NOISE =
+@<< @<<<< @<<<<<<< @<<<<<<< @<<<<<<<< @>/@<< @<<< @<<< @<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<
+$run, $ut, $mode, $projid, $fitsitem->{'OBJ_TYPE'}, $n_meas, $n_int, $csotau, $seeing, $filter, $boloms
+.
+
+format SHORT_SKYDIP =
+@<< @<<<< @<<<<<<< @<<<<<<< SKY       @>/@<< @<<< @<<< @<<<<<<<< PHOT. PIXELS
+$run, $ut, $mode, $projid, $n_meas, $n_int, $csotau, $seeing, $filter
+.
+format LONG_SCU =
+@<< @<<<< @<<<<<<< @<<<<<<< @<<<<<<<< @>/@<< @<<< @<<< @<<<<<<<< @<<<<<<<<<<<<<< @<<<< @<<<< @<<<< @<<<<
+$run, $ut, $mode, $projid, $object, $n_meas, $n_int, $csotau, $seeing, $filter, $boloms, $az, $el, $uaz, $uel
+.
+
+format LONG_NOISE =
+@<< @<<<< @<<<<<<< @<<<<<<< @<<<<<<<< @>/@<< @<<< @<<< @<<<<<<<< @<<<<<<<<<<<<<< @<<<< @<<<< @<<<< @<<<<
+$run, $ut, $mode, $projid, $fitsitem->{'OBJ_TYPE'}, $n_meas, $n_int, $csotau, $seeing, $filter, $boloms, $az, $el, $uaz, $uel
+.
+
+format LONG_SKYDIP =
+@<< @<<<< @<<<<<<< @<<<<<<< SKY       @>/@<< @<<< @<<< @<<<<<<<< PHOT. PIXELS    @<<<< @<<<< @<<<< @<<<<
+$run, $ut, $mode, $projid, $n_meas, $n_int, $csotau, $seeing, $filter, $az, $el, $uaz, $uel
+.
+
 
     $= = 999;
     $^ = "STDOUT_${pformat}_SCU";
@@ -928,7 +827,7 @@ sub scuba_header {
     }
 
     unless ($skip == 1) {
-      if ((not $cal_only) or ($cal_only and  projid =~ /cal/i)) {
+      if ((not $cal_only) or ($cal_only and  $projid =~ /cal/i)) {
         write if ("${run}_${ut}" ne "${prev_obs}" || ($prtall));
       }
     }
@@ -942,24 +841,23 @@ sub scuba_header {
 # Define non-calibration modes (rather than the other way around since
 # there are only a few) and objects:
 
-    @obsmodes = ("PHOTOM", "MAP");
-    @calobjects = ("mars", "uranus", "neptune", "crl618", "hltau",
+    my @obsmodes = ("PHOTOM", "MAP");
+    my @calobjects = ("mars", "uranus", "neptune", "crl618", "hltau",
 		   "crl2688", "irc10216", "irc+10216", "oh231.8",
 		   "twhya", "vycma", "mercury", "venus",
                    "jupiter", "saturn", "pluto");
 
-
-    ($projid eq "scuba" ) && ($calibration = 1)  || ($calibration = 0);
+    my $calibration = ( $projid eq 'scuba' ? 1 : 0 );
     if ($calibration == 0) {
 	$calibration = 1;
-	foreach $obsmode ( @obsmodes ) {
+	foreach my $obsmode ( @obsmodes ) {
 	    if ($mode eq $obsmode) {
 		$calibration = 0;
 		last;
 	    }
 	}
 	if ($calibration == 0) {
-	    foreach $calobject ( @calobjects ) {
+	    foreach my $calobject ( @calobjects ) {
 		if ($object eq $calobject) {
 		    $calibration = 1;
 		    last;
@@ -979,51 +877,97 @@ sub scuba_header {
 
 sub gsd_header {
 
-    ($path, $basename, $suffix, $projid, $prev_obs, $pformat, $debug) = @_;
+    my ($path, $basename, $suffix, $prev_obs, $pformat, $debug) = @_;
 
-    $obsfile = $path . '/' . $basename . '.' . $suffix;
+    my $obsfile = $path . '/' . $basename . '.' . $suffix;
 
 # Read the file header
 
-    $het_format = "";
+    my $het_format = "";
     $het_format = "since_03a" if ($datadir =~ /\d{8}$/);
 
+    my %gsditem;
     tie %gsditem, 'GSD', "${obsfile}";
     do {foreach (keys %gsditem) { print "$_\n";}} if ($debug > 1);
 
-    $projid = "\L$gsditem{'C1PID'}";
-    $run    = "\L$gsditem{'C1SNO'}";
-    $mode   = "\U$gsditem{'C6ST'}";
-    $object = "\L$gsditem{'C1SNA1'}";
-    $rx     = "\U$gsditem{'C1RCV'}";
-    $utdate = $gsditem{'C3DAT'};
+    my $projid = "\L$gsditem{'C1PID'}";
+    my $run    = "\L$gsditem{'C1SNO'}";
+    my $mode   = "\U$gsditem{'C6ST'}";
+    my $object = "\L$gsditem{'C1SNA1'}";
+    my $rx     = "\U$gsditem{'C1RCV'}";
+    my $utdate = $gsditem{'C3DAT'};
     $utdate =~ s/\.//g;
     # fix silly GSD error that causes ending 0's to be stripped
     $utdate = substr("${utdate}0000",0,8);
-    $uttime = $gsditem{'C3UT'};
-    $uth    = int ($uttime);
-    $utm    = int (60.0 * ($uttime-$uth));
-    $uts    = int (3600.0 * ($uttime-($uth+$utm/60.0)));
-    $ut     = sprintf "%8s %2.2d:%2.2d",${utdate},${uth},${utm};
+    my $uttime = $gsditem{'C3UT'};
+    my $uth    = int ($uttime);
+    my $utm    = int (60.0 * ($uttime-$uth));
+    my $uts    = int (3600.0 * ($uttime-($uth+$utm/60.0)));
+    my $ut     = sprintf "%8s %2.2d:%2.2d",${utdate},${uth},${utm};
+    my $freq;
     if ($gsditem{'C3NRS'} == 1) {     # TimJ is too clever for his own good :)
       $freq   = 0.01 * int(100.0*$gsditem{'C12RF'}+0.5);
     } else {
       $freq   = 0.01 * int(100.0*${$gsditem{'C12RF'}}[0]+0.5);
     }
-    $cfreq  = "${rx}/$freq";
-    $vel    = 0.01 * int(100.0*$gsditem{'C7VR'}+0.5);
-    $cvref = "$vel" . "/" . substr("\L$gsditem{'C12VDEF'}",0,3) .
+    my $cfreq  = "${rx}/$freq";
+    my $vel    = 0.01 * int(100.0*$gsditem{'C7VR'}+0.5);
+    my $cvref = "$vel" . "/" . substr("\L$gsditem{'C12VDEF'}",0,3) .
 	"\L$gsditem{'C12VREF'}";
-    $n_meas = "\L$gsditem{'C3CL'}";
-    $n_int  = "\L$gsditem{'C3NCYCLE'}";
-    $az     = $gsditem{'C4AZ'};
-    $el     = $gsditem{'C4EL'};
-    $uaz    = $gsditem{'UAZ'};
-    $uel    = $gsditem{'UEL'};
-    $seeing = 0.01 * int(100.0*$gsditem{'C7SEEING'}+0.5);
-    $csotau = 0.01 * int(100.0*$gsditem{'C7TAU225'}+0.5);
+    my $n_meas = "\L$gsditem{'C3CL'}";
+    my $n_int  = "\L$gsditem{'C3NCYCLE'}";
+    my $az     = $gsditem{'C4AZ'};
+    my $el     = $gsditem{'C4EL'};
+    my $uaz    = $gsditem{'UAZ'};
+    my $uel    = $gsditem{'UEL'};
+    my $seeing = 0.01 * int(100.0*$gsditem{'C7SEEING'}+0.5);
+    my $csotau = 0.01 * int(100.0*$gsditem{'C7TAU225'}+0.5);
 
     # Set format
+format NOFITS =
+--------- No FITS entry for @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+$basename
+.
+
+format STDOUT_SHORT_HET =
+@<<<<<<<< UT       Mode     Source   Sec/Cyc Tau  See  Rx/Freq   Vel/Velsys
+$origin
+.
+
+format STDOUT_SHORT_HET2 =
+@<<<<< UT  Projid     Mode     Source   Sec/Cyc Tau  See  Rx/Freq   Vel/Velsys
+$origin
+.
+
+format STDOUT_LONG_HET =
+@<<<<<<<< UT       Mode     Source   Sec/Cyc Tau  See  Rx/Freq   Vel/Velsys   Az    El    Uaz   Uel
+$origin
+.
+
+format STDOUT_LONG_HET2 =
+@<<<<< UT  Projid     Mode     Source   Sec/Cyc Tau  See  Rx/Freq   Vel/Velsys   Az    El    Uaz   Uel
+$origin
+.
+
+format SHORT_HET =
+@<< @<<<<<<<<<<<<< @<<<<<<< @<<<<<<<< @>/@<< @<<< @<<< @<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<
+$run, $ut, $mode, $object, $n_meas, $n_int, $csotau, $seeing, $cfreq, $cvref
+.
+
+format SHORT_HET2 =
+@<< @<<<<< @<<<<<<<<< @<<<<<<< @<<<<<<<< @>/@<< @<<< @<<< @<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<
+$run, substr($ut,9,5), $projid, $mode, $object, $n_meas, $n_int, $csotau, $seeing, $cfreq, $cvref
+.
+
+format LONG_HET =
+@<< @<<<<<<<<<<<<< @<<<<<<< @<<<<<<<< @>/@<< @<<< @<<< @<<<<<<<< @<<<<<<<<<<< @<<<< @<<<< @<<<< @<<<<
+$run, $ut, $mode, $object, $n_meas, $n_int, $csotau, $seeing, $cfreq, $cvref, $az, $el, $uaz, $uel
+.
+
+format LONG_HET2 =
+@<< @<<<<< @<<<<<<<<< @<<<<<<< @<<<<<<<< @>/@<< @<<< @<<< @<<<<<<<< @<<<<<<<<<<< @<<<< @<<<< @<<<< @<<<<
+$run, substr($ut,9,5), $projid, $mode, $object, $n_meas, $n_int, $csotau, $seeing, $cfreq, $cvref, $az, $el, $uaz, $uel
+.
 
     $= = 999;
     if ($het_format eq 'since_03a') {
@@ -1042,7 +986,7 @@ sub gsd_header {
     }
 
     unless ($skip == 1) {
-      if ((not $cal_only) or ($cal_only and  projid =~ /cal/i)) {
+      if ((not $cal_only) or ($cal_only and  $projid =~ /cal/i)) {
         write if ("${run}_${ut}" ne "${prev_obs}" || ($prtall));
       }
     }
@@ -1056,17 +1000,18 @@ sub gsd_header {
 
 sub acsis_tsys {
 
-  my ($sdffile) = @_;
+  my $REC_HEADER_DONE;
+  my ($sdffile, $projid, $mode, $run, $freq ) = @_;
 
   if ((not $cal_only) or ($cal_only and  $projid =~ /cal/i)) {
 
     unless ($mode eq "POINTING" or $mode eq "FOCUS") {
 
-      $obsnr     = "";
-      $obslab    = "";
-      $datestamp = "";
-      $rfreq = "";
-      $rflab = "";
+      my $obsnr     = "";
+      my $obslab    = "";
+      my $datestamp = "";
+      my $rfreq = "";
+      my $rflab = "";
 
       if ($skip) {
         $obsnr     = "$run";
@@ -1077,7 +1022,7 @@ sub acsis_tsys {
       }
 
       if ($tsys) {
-        @tsys_all = split(/\n/,
+        my @tsys_all = split(/\n/,
            `${tsyscmd} -statistics ${sdffile} | grep '[A-z]'`);
         $tsys_all[1] =~ s/\[median\]/\[Tsys\]/;
         $tsys_all[3] =~  s/\[stdev\]/\[ \+\/\-\]/;
@@ -1092,13 +1037,13 @@ sub acsis_tsys {
       }
 
       if ($trx) {
-        @trx_all =  split(/\n/,
+        my @trx_all =  split(/\n/,
            `${tsyscmd} -trx -statistics ${sdffile} | grep '[A-z]'`);
         $trx_all[1] =~ s/\[median\]/\[Trx\]/;
         $trx_all[3] =~  s/\[stdev\]/\[ \+\/\-\]/;
 
         unless (defined $REC_HEADER_DONE) {
-          printf "%-3s %s %s %6s\n", $obslab,$rflab, $tsys_all[0], $datestamp;
+          printf "%-3s %s %s %6s\n", $obslab,$rflab, $trx_all[0], $datestamp;
           $REC_HEADER_DONE = 1;
         }
         printf "%-3s %s %s\n", $obsnr, $rfreq, $trx_all[1];
