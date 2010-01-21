@@ -1,4 +1,4 @@
-#!/usr/bin/env starperl    -*- cperl -*-
+#!/usr/bin/env starperl   # -*- cperl -*-
 
 =head1 NAME
 
@@ -100,6 +100,7 @@ C<scuba2_index> can take a specific sub-array directory to index. Defaults to s8
 use strict;
 
 use File::Basename;
+use File::Spec;
 
 # Load in the SDF module
 use Astro::FITS::Header::NDF;
@@ -130,7 +131,7 @@ our $VERSION = "2.0";
 my $acsis_root = "/jcmtdata/raw/acsis/spectra";
 
 my $default_array = "s8d";
-my $scuba2_root  = "/jcmtdata/raw/scuba2/${default_array}";
+my $scuba2_root  = File::Spec->catdir("/jcmtdata/raw/scuba2",${default_array});
 
 # Store the arguments for debugging purposes
 my @args = @ARGV;
@@ -157,7 +158,7 @@ my $result = GetOptions(
                         "scuba2" => \$use_scuba2,     # Choose scuba-2 mode
                        );
 
-my $prog = (split(/\//,"$0"))[-1];
+my $prog = basename($0);
 $prog = "scuba2_index" if $use_scuba2;
 
 pod2usage(1) if $help;
@@ -220,8 +221,8 @@ for my $arg (reverse @ARGV) {
   $i--;
 }
 
-$datadir = $data_root.'/'.$datadir
-     if ( defined $datadir && $datadir =~ /^\d{8}$/ && not -e "$datadir");
+$datadir = File::Spec->catdir( $data_root, $datadir )
+     if ( defined $datadir && $datadir =~ /^\d{8}$/ && not -e $datadir);
 
 unless (defined $datadir || $datadir != '') {
     chomp($datadir = `pwd`);
@@ -236,7 +237,7 @@ $datadir =~ s/\/$//;
 print "Path: $datadir   Files: all\n" if ($debug);
 my @obsfiles;
 
-opendir( my $DIR,"${datadir}" ) or die "Can't open directory '${datadir}'! :\n\t $!\n";
+opendir( my $DIR,$datadir ) or die "Can't open directory '${datadir}'! :\n\t $!\n";
 my @ofiles;
 unless ($prog =~ /scuba/) {
    @ofiles = sort
@@ -253,7 +254,7 @@ closedir($DIR);
 if ($#ofiles > 0 && $force == 0) {
   print "Found $#ofiles files in ${datadir}\n" if ($debug);
   foreach my $of (@ofiles) {
-    push(@obsfiles,"${datadir}/${of}");
+    push(@obsfiles, File::Spec->catfile($datadir,$of));
   }
 
 # Else: Try to find spectra-like files in subdirs
@@ -288,14 +289,6 @@ if ($obsfiles[0] !~ /sdf$/) {
   @obsfiles = sort sort_by_scan @unsorted;
 }
 
-sub sort_by_scan {
-  if ($a =~ /gsd$/) {
-    (split(/\_/,$a,4))[3] <=> (split(/\_/,$b,4))[3];
-  } else {
-    (split(/\_/,$a,3))[2] <=> (split(/\_/,$b,3))[2];
-  }
-};
-
 my $prev_obs = "";
 
 my @suffixlist = ( "sdf", "dat", "gsd" );
@@ -321,7 +314,19 @@ foreach my $obsfile ( @obsfiles )
   $prev_obs = $cur_obs;
 }
 
+exit;
+
 # ---------------------- SUBROUTINES -----------------------------------
+
+# Sort routine for GSD data
+sub sort_by_scan {
+  if ($a =~ /gsd$/) {
+    (split(/\_/,$a,4))[3] <=> (split(/\_/,$b,4))[3];
+  } else {
+    (split(/\_/,$a,3))[2] <=> (split(/\_/,$b,3))[2];
+  }
+};
+
 
 # Read a FITS header and return a hash reference
 sub read_fits_header {
