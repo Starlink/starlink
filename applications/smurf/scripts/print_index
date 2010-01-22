@@ -98,6 +98,7 @@ C<scuba2_index> can take a specific sub-array directory to index. Defaults to s8
 =cut
 
 use strict;
+use warnings;
 
 use File::Basename;
 use File::Spec;
@@ -297,6 +298,12 @@ foreach my $obsfile ( @obsfiles )
 {
 
   (my $basename,my $path,my $suffix) = fileparse($obsfile,@suffixlist);
+
+format NOFITS =
+--------- No FITS entry for @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+$basename
+.
+
   $basename =~ s/\.$//;
   $path =~ s/\/$//;
   print "File $basename, Suffix: $suffix, Path: $path\n" if ($debug);
@@ -348,7 +355,7 @@ sub read_fits_header {
 sub sdf_header {
 
     my ($path, $basename, $suffix, $prev_obs, $pformat, $debug) = @_;
-    my $sdffile = $path . '/' . $basename;
+    my $sdffile = File::Spec->catfile($path, $basename);
     my $fitsitem = read_fits_header( $sdffile );
     return "" unless defined $fitsitem;
 
@@ -374,7 +381,7 @@ sub sdf_header {
       if ($#subfiles > 0) {
         my $basename = $subfiles[1];
         $basename =~ s/\.sdf$//;
-        $sdffile = $path . '/' . $basename;
+        $sdffile = File::Spec->catfile($path, $basename);
         print "Read non-dark file: $sdffile\n" if ($debug);
         $fitsitem = read_fits_header($sdffile);
         return "" unless defined $fitsitem;
@@ -388,12 +395,12 @@ sub sdf_header {
              $fitsitem->{OBS_TYPE} ne "flatfield" ) {
         my $basename2 = $subfiles[$listlast];
         $basename2 =~ s/\.sdf$//;
-        my $sdffile2 = $path . '/' . $basename2;
+        my $sdffile2 = File::Spec->catfile($path, $basename2);
         print "Read last non-dark file: $sdffile2\n" if ($debug);
         $fitsitem2 = read_fits_header( $sdffile2 );
         if (defined $fitsitem2) {
-          if ( $fitsitem2->{AZEND} ne "" &&
-               $fitsitem2->{ELEND} ne "" ) {
+          if ( $fitsitem2->{AZEND} &&
+               $fitsitem2->{ELEND}) {
             $found = 1;
 	  }
 	}
@@ -421,7 +428,7 @@ sub sdf_header {
 sub acsis_header {
 
     my ($path, $basename, $suffix, $fitsitem, $prev_obs, $pformat, $debug) = @_;
-    my $sdffile = $path . '/' . $basename;
+    my $sdffile = File::Spec->catfile($path, $basename);
 
     # Get the rest frequency
     my $status = &NDF::SAI__OK;
@@ -456,8 +463,13 @@ sub acsis_header {
     } else {
       $fitsitem->{VELOCITY} = 0;
     }
+    if (!exists $fitsitem->{SPECSYS}) {
+      eval { 
+        $fitsitem->{SPECSYS} = $wcs->Get( "sourcevrf" );
+      };
+    }
 
-    do {foreach (keys %$fitsitem) { print "$_\n";}} if ($debug > 1);
+    do {foreach (keys %$fitsitem) { print "$_\n";}} if (defined $debug && $debug > 1);
 
     my $rx     = lc($fitsitem->{INSTRUME});
     $rx     =~ s/harpb/harp/;
@@ -466,15 +478,21 @@ sub acsis_header {
     $rx     =~ s/^scuba-2/scu/i;
     my $freq   = sprintf("%.1f", $fitsitem->{RESTFREQ});
     my $cfreq  = "${rx}/${freq}";
-    my $vel    = sprintf("%.2f", $fitsitem->{VELOCITY});
+    my $fmt = '%.2f';
+    if ($fitsitem->{VELOCITY} > 1000.0 ) {
+      $fmt = '%.0f';
+    }
+    my $vel = sprintf($fmt, $fitsitem->{VELOCITY});
     my $cvref  = "$vel" . "/" . substr(lc($fitsitem->{DOPPLER}),0,3) .
               substr(lc($fitsitem->{SPECSYS}),0,3);
     my $bwmode = $fitsitem->{BWMODE};
 
+    # Back of the envelope integration time estimate
     my $step = $fitsitem->{STEPTIME};
-    my $josmult = ( $fitsitem->{JOS_MULT} > $fitsitem->{JOS_MIN} ?
-                    $fitsitem->{JOS_MULT} : $fitsitem->{JOS_MIN});
-    my $numnods = ( $fitsitem->{NUM_NODS} ne '' ? 4*$fitsitem->{NUM_NODS} : 1 );
+    my $josmult = (defined $fitsitem->{JOS_MULT} ? $fitsitem->{JOS_MULT} : 0);
+    my $josmin = (defined $fitsitem->{JOS_MIN} ? $fitsitem->{JOS_MIN} : 0);
+    $josmult = ( $josmult > $josmin ? $josmult : $josmin );
+    my $numnods = ( defined $fitsitem->{NUM_NODS} ? 4*$fitsitem->{NUM_NODS} : 1 );
     my $intt = 0.1*int(10.0*$fitsitem->{NUM_CYC}*$numnods*$josmult*$step+0.5);
 
     my %A = calc_shared_scuba2_acsis( $fitsitem, $fitsitem );
@@ -491,11 +509,6 @@ sub acsis_header {
 #    print "$A{RUN} $mode $A{UT} \'$A{OBJECT}\' $A{PROJECT} $rx $boloms $filter $A{CSOTAU} $A{SEEING}\n";
 
     # Declare formats here since it has to be in scope of the lexical variables
-format NOFITS =
---------- No FITS entry for @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-$basename
-.
-
 format STDOUT_SHORT_ACS =
 @<<<<< UT  Projid     Mode     Source  Intt/Stp Tau  WVM  Rx/Freq   Vel/Velsys
 $origin
@@ -524,7 +537,7 @@ $A{RUN}, substr($A{UT},0,5), $A{PROJECT}, $mode, $A{OBJECT}, $intt, $step, $A{LC
 
     $~ = "${pformat}_ACS" if ($~ !~ /NOFITS/);
 
-    unless ($skip == 1) {
+    unless ($skip) {
 
       if ((not $cal_only) or ($cal_only and  $A{PROJECT} =~ /cal/i)) {
         write if ("$A{RUN}_$A{UT}" ne "${prev_obs}" || ($prtall));
@@ -535,7 +548,7 @@ $A{RUN}, substr($A{UT},0,5), $A{PROJECT}, $mode, $A{OBJECT}, $intt, $step, $A{LC
 
     &acsis_tsys( $sdffile, $A{PROJECT}, $mode, $A{RUN}, $freq ) if ($tsys or $trx);
 
-    if ($skip == 0) {
+    if (!$skip ) {
 
       if ((not $cal_only) or ($cal_only and  $A{PROJECT} =~ /cal/i)) {
 
@@ -554,34 +567,40 @@ $A{RUN}, substr($A{UT},0,5), $A{PROJECT}, $mode, $A{OBJECT}, $intt, $step, $A{LC
 sub scuba2_header {
 
     my ($path, $basename, $suffix, $fitsitem, $fitsitem2, $prev_obs, $pformat, $debug) = @_;
-    my $sdffile = $path . '/' . $basename;
-    do {foreach (keys %$fitsitem) { print "$_\n";}} if ($debug > 1);
+    my $sdffile = File::Spec->catfile($path, $basename);
+    do {foreach (keys %$fitsitem) { print "$_\n";}} if (defined $debug && $debug > 1);
 
     my $filter  = $fitsitem->{FILTER};
     my $step = int(1000*$fitsitem->{STEPTIME}) . "ms";
 
     my ($mapx, $mapy);
     my $mpx = $fitsitem->{MAP_WDTH};
-    if ($mpx > 3600.0) {
-      $mapx = sprintf "%4.1fd", $mpx/3600.0;
-    } elsif ($mpx > 60.0) {
-      $mapx = sprintf "%4.1f'", $mpx/60.0;
-    } else {
-      $mapx = sprintf "%2d\"", $mpx;
+    if (defined $mpx) {
+      $mpx = int($mpx);
+      if ($mpx > 3600.0) {
+        $mapx = sprintf "%4.1fd", $mpx/3600.0;
+      } elsif ($mpx > 60.0) {
+        $mapx = sprintf "%4.1f'", $mpx/60.0;
+      } else {
+        $mapx = sprintf "%2d\"", $mpx;
+      }
     }
-    my $mpy = int($fitsitem->{MAP_HGHT});
-    if ($mpy > 3600.0) {
-      $mapy = sprintf "%4.1fd", $mpy/3600.0;
-    } elsif ($mpy > 60.0) {
-      $mapy = sprintf "%4.1f'", $mpy/60.0;
-    } else {
-      $mapy = sprintf "%2d\"", $mpy;
+    my $mpy = $fitsitem->{MAP_HGHT};
+    if (defined $mpy) {
+      $mpy = int($mpy);
+      if ($mpy > 3600.0) {
+        $mapy = sprintf "%4.1fd", $mpy/3600.0;
+      } elsif ($mpy > 60.0) {
+        $mapy = sprintf "%4.1f'", $mpy/60.0;
+      } else {
+        $mapy = sprintf "%2d\"", $mpy;
+      }
     }
-    $mapx =~ s/^\s+//;
-    $mapy =~ s/^\s+//;
+    $mapx =~ s/^\s+// if $mapx;
+    $mapy =~ s/^\s+// if $mapy;
 
     my $map = "";
-    $map = sprintf "%5sx%-5s", $mapx, $mapy unless ($mpx == 0 || $mpy == 0);
+    $map = sprintf "%5sx%-5s", $mapx, $mapy if (defined $mapx && defined $mapy);
 
     my %S = calc_shared_scuba2_acsis( $fitsitem, $fitsitem2 );
     $S{OBJECT} =~ s/_science//;
@@ -599,11 +618,6 @@ sub scuba2_header {
 #    print "$S{RUN} $mode $S{UT} \'$S{OBJECT}\' $S{PROJECT} $rx $boloms $filter $S{CSOTAU} $S{SEEING}\n";
 
     # Declare formats here since it has to be in scope of the lexical variables
-format NOFITS =
---------- No FITS entry for @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-$basename
-.
-
 format SHORT_SCU2 =
 @<< @<<<<< @<<<<<<<<< @<<<<<<< @<<<<<< @<<<<<<<<<<< @<<<< @<<< @<<< @<<<  @<<<<
 $S{RUN}, substr($S{UT},0,5), $S{PROJECT}, $mode, $S{OBJECT}, $map, $step, $S{CSOTAU}, $S{WVMTAU},$S{SEEING}, $filter
@@ -632,7 +646,7 @@ $origin
 
     $~ = "${pformat}_SCU2" if ($~ !~ /NOFITS/);
 
-    unless ($skip == 1) {
+    unless ($skip) {
 
       if ((not $cal_only) or ($cal_only and  $S{PROJECT} =~ /cal/i)) {
         write if ("$S{RUN}_$S{UT}" ne "${prev_obs}" || ($prtall));
@@ -641,7 +655,7 @@ $origin
 
     }
 
-    if ($skip == 0) {
+    if (!$skip) {
 
       if ((not $cal_only) or ($cal_only and  $S{PROJECT} =~ /cal/i)) {
 
@@ -660,9 +674,9 @@ $origin
 sub scuba_header {
 
     my ($path, $basename, $suffix, $fitsitem, $prev_obs, $pformat, $debug) = @_;
-    my $sdffile = $path . '/' . $basename;
+    my $sdffile = File::Spec->catfile($path, $basename);
 
-    do {foreach (keys %$fitsitem) { print "$_\n";}} if ($debug >1);
+    do {foreach (keys %$fitsitem) { print "$_\n";}} if (defined $debug && $debug >1);
 
     my $projid = lc($fitsitem->{PROJ_ID});
     my $run    = lc($fitsitem->{RUN});
@@ -693,10 +707,6 @@ sub scuba_header {
 #    print "$run $mode $ut \'$object\' $projid $rx/$boloms/$filter/ $csotau $seeing\n";
 
     # Set format
-format NOFITS =
---------- No FITS entry for @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-$basename
-.
 format STDOUT_LONG_SCU =
 @<<<<< UT Mode     Projid   Source    Me/Int Tau  See  Filter    Bolometers      Az    El    Uaz   Uel
 $origin
@@ -748,7 +758,7 @@ $run, $ut, $mode, $projid, $n_meas, $n_int, $csotau, $seeing, $filter, $az, $el,
 	}
     }
 
-    unless ($skip == 1) {
+    unless ($skip) {
       if ((not $cal_only) or ($cal_only and  $projid =~ /cal/i)) {
         write if ("${run}_${ut}" ne "${prev_obs}" || ($prtall));
       }
@@ -801,7 +811,7 @@ sub gsd_header {
 
     my ($path, $basename, $suffix, $prev_obs, $pformat, $debug) = @_;
 
-    my $obsfile = $path . '/' . $basename . '.' . $suffix;
+    my $obsfile = File::Spec->catfile($path, $basename . '.' . $suffix);
 
 # Read the file header
 
@@ -810,7 +820,7 @@ sub gsd_header {
 
     my %gsditem;
     tie %gsditem, 'GSD', "${obsfile}";
-    do {foreach (keys %gsditem) { print "$_\n";}} if ($debug > 1);
+    do {foreach (keys %gsditem) { print "$_\n";}} if (defined $debug && $debug > 1);
 
     my $projid = lc($gsditem{C1PID});
     my $run    = lc($gsditem{C1SNO});
@@ -846,11 +856,6 @@ sub gsd_header {
     my $csotau = 0.01 * int(100.0*$gsditem{C7TAU225}+0.5);
 
     # Set format
-format NOFITS =
---------- No FITS entry for @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-$basename
-.
-
 format STDOUT_SHORT_HET =
 @<<<<<<<< UT       Mode     Source   Sec/Cyc Tau  See  Rx/Freq   Vel/Velsys
 $origin
@@ -907,7 +912,7 @@ $run, substr($ut,9,5), $projid, $mode, $object, $n_meas, $n_int, $csotau, $seein
       }
     }
 
-    unless ($skip == 1) {
+    unless ($skip) {
       if ((not $cal_only) or ($cal_only and  $projid =~ /cal/i)) {
         write if ("${run}_${ut}" ne "${prev_obs}" || ($prtall));
       }
@@ -972,7 +977,7 @@ sub acsis_tsys {
         printf "%-3s %s %s\n", $obsnr, $rfreq, $trx_all[3] if ($trxrms);
       }
 
-      $REC_HEADER_DONE = undef unless ($skip);
+      $REC_HEADER_DONE = undef unless $skip;
 
     }
 
@@ -994,17 +999,17 @@ sub calc_shared_scuba2_acsis {
   $date =~ s/\-/\//g;
   $results{DATETIME} = "$date $results{UT}";
   $results{OBSTYPE}  = uc($fitsitem->{OBS_TYPE});
-  $results{OBJECT}   = lc($fitsitem->{OBJECT});
+  $results{OBJECT}   = (defined $fitsitem->{OBJECT} ? lc($fitsitem->{OBJECT}) : "");
 
-  my $az     = 0.5*($fitsitem->{AZSTART}+$fitsitem2->{AZEND});
-  my $el     = 0.5*($fitsitem->{ELSTART}+$fitsitem2->{ELEND});
-  if ($az == 0 && $el == 0) {
-    $az = ""; $el = "";
-  }
+  my $az     = (defined $fitsitem->{AZSTART} ?
+                0.5*($fitsitem->{AZSTART}+$fitsitem2->{AZEND}) : "" );
+  my $el     = (defined $fitsitem->{ELSTART} ?
+                0.5*($fitsitem->{ELSTART}+$fitsitem2->{ELEND}) : "" );
+
   $results{AZ}     = $az;
   $results{EL}     = $el;
-  $results{UAZ}    = $fitsitem->{UAZ};
-  $results{UEL}    = $fitsitem->{UEL};
+  $results{UAZ}    = (defined $fitsitem->{UAZ} ? $fitsitem->{UAZ} : "" );
+  $results{UEL}    = (defined $fitsitem->{UEL} ? $fitsitem->{UEL} : "" );
 
   my $seeing = " n/a";
   my $csotau = " n/a";
@@ -1015,22 +1020,22 @@ sub calc_shared_scuba2_acsis {
 
   $seeing = 0.01 * int(100.0*
                        0.5*($fitsitem->{SEEINGST}+$fitsitem2->{SEEINGEN})+0.5)
-    if ($fitsitem->{SEEINGST} ne "");
+    if defined $fitsitem->{SEEINGST};
   $csotau = 0.01 * int(100.0*
                        0.5*($fitsitem->{TAU225ST}+$fitsitem2->{TAU225EN})+0.5)
-    if ($fitsitem->{TAU225ST} ne "");
+    if defined $fitsitem->{TAU225ST};
   $wvmtau = 0.01 * int(100.0*
                        0.5*($fitsitem->{WVMTAUST}+$fitsitem2->{WVMTAUEN})+0.5)
-    if ($fitsitem->{WVMTAUST} ne "");
+    if defined $fitsitem->{WVMTAUST};
   $lseeing = 0.001 * int(1000.0*
                          0.5*($fitsitem->{SEEINGST}+$fitsitem2->{SEEINGEN})+0.5)
-    if ($fitsitem->{SEEINGST} ne "");
+    if defined $fitsitem->{SEEINGST};
   $lcsotau = 0.001 * int(1000.0*
                          0.5*($fitsitem->{TAU225ST}+$fitsitem2->{TAU225EN})+0.5)
-    if ($fitsitem->{TAU225ST} ne "");
+    if defined $fitsitem->{TAU225ST};
   $lwvmtau = 0.001 * int(1000.0*
                          0.5*($fitsitem->{WVMTAUST}+$fitsitem2->{WVMTAUEN})+0.5)
-    if ($fitsitem->{WVMTAUST} ne "");
+    if defined $fitsitem->{WVMTAUST};
 
   %results = ( %results,
                SEEING => $seeing,
