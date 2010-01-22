@@ -2942,6 +2942,14 @@ package @PACKAGE@ {
         obey {$SMURF_DIR/tobeam}
     }
 
+    command scuba2_index {
+        obey {starperl $SMURF_DIR/print_index -scuba2}
+    }
+
+    command acsis_index {
+        obey {starperl $SMURF_DIR/print_index }
+    }
+
     icl {defhelp @PACKAGE@ $@PACKAGE_UPCASE@_HELP 0}
 
     display {
