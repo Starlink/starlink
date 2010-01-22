@@ -425,10 +425,15 @@ sub acsis_header {
 
     # Get the rest frequency
     my $status = &NDF::SAI__OK;
+    err_begin($status);
     ndf_begin();
     ndf_find( NDF::DAT__ROOT, $sdffile, my $indf, $status);
 
     my $wcs = ndfGtwcs( $indf, $status );
+    ndf_annul( $indf, $status );
+    ndf_end( $status );
+    err_end($status);
+
     $fitsitem->{RESTFREQ} = 0;
     eval {
       $fitsitem->{RESTFREQ} = $wcs->Get( "restfreq" );
@@ -451,9 +456,6 @@ sub acsis_header {
     } else {
       $fitsitem->{VELOCITY} = 0;
     }
-
-    ndf_annul( $indf, $status );
-    ndf_end( $status );
 
     do {foreach (keys %$fitsitem) { print "$_\n";}} if ($debug > 1);
 
