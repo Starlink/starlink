@@ -86,6 +86,8 @@
 *     2010-01-20 (DSB):
 *        - Added argument dcthresh2. 
 *        - Use threads.
+*     2010-01-21 (EC):
+*        Fixed up to work in single-thread mode
 
 *  Copyright:
 *     Copyright (C) 2009-2010 Science and Technology Facilities Council.
@@ -309,13 +311,14 @@ void smf_correct_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
     smf_get_goodrange( qua, ntslice, 1, SMF__Q_PAD|SMF__Q_APOD,
                        &istart, &iend, status );
 
-    /* Begin a job context. */
-    smf_begin_job_context( wf, status );
-  
+    if( wf ) {
+      /* Begin a job context. */
+      smf_begin_job_context( wf, status );
+    }
+
     /* Loop over bolometer in groups of "bpt". */
     pdata = job_data;
     for( i = 0; i < nbolo; i += bpt, pdata++ ) {
-    
       /* Store information for this group in the next smfCorrectStepsData
          structure. */
       pdata->alljump = alljump;
@@ -334,15 +337,23 @@ void smf_correct_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
       pdata->qua = qua;
       pdata->tstride = tstride;
 
-      /* Submit a job to the workforce to process this group of bolometers. */
-      (void) smf_add_job( wf, 0, pdata, smfCorrectStepsParallel, NULL, status );
+      if( wf ) {
+        /* Submit a job to the workforce to process this group of bolometers. */
+        (void) smf_add_job( wf, 0, pdata, smfCorrectStepsParallel, NULL, 
+                            status );
+      } else {
+        /* If no workforce call function directly */
+        smfCorrectStepsParallel( pdata, status );
+      }
     }
-  
-    /* Wait until all jobs in the current job context have completed. */
-    smf_wait( wf, status );
-  
-    /* End the job context. */
-    smf_end_job_context( wf, status );
+
+    if( wf ) {
+      /* Wait until all jobs in the current job context have completed. */
+      smf_wait( wf, status );
+
+      /* End the job context. */
+      smf_end_job_context( wf, status );
+    }
 
     /* Add up the number of samples flagged by each thread. */
     pdata = job_data;
@@ -369,9 +380,11 @@ void smf_correct_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
          job_data2 = astMalloc( sizeof( smfCorrectStepsData2 ) );
       }
 
-      /* Begin a job context. */
-      smf_begin_job_context( wf, status );
-  
+      if( wf ) {
+        /* Begin a job context. */
+        smf_begin_job_context( wf, status );
+      }
+
       /* Loop over bolometer in groups of "bpt". */
       pdata2 = job_data2;
       for( i = 0; i < nbolo; i += bpt, pdata2++ ) {
@@ -391,15 +404,23 @@ void smf_correct_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
         pdata2->qua = qua;
         pdata2->tstride = tstride;
   
-        /* Submit a job to the workforce to process this group of bolometers. */
-        (void) smf_add_job( wf, 0, pdata2, smfCorrectStepsParallel2, NULL, status );
+        if( wf ) {
+          /* Submit a job to the workforce to process this group of bolos. */
+          (void) smf_add_job( wf, 0, pdata2, smfCorrectStepsParallel2, NULL, 
+                              status );
+        } else {
+          /* If no workforce call function directly */
+          smfCorrectStepsParallel2( pdata2, status );
+        }
       }
-  
-      /* Wait until all jobs in the current job context have completed. */
-      smf_wait( wf, status );
-  
-      /* End the job context. */
-      smf_end_job_context( wf, status );
+
+      if( wf ){
+        /* Wait until all jobs in the current job context have completed. */
+        smf_wait( wf, status );
+
+        /* End the job context. */
+        smf_end_job_context( wf, status );
+      }
 
       /* Free resouces. */
       job_data2 = astFree( job_data2 );
@@ -624,7 +645,7 @@ static void smfCorrectStepsParallel( void *job_data_ptr, int *status ) {
         if( !dcflag ) {
           smf__correct_steps_baseline( dat+i*bstride+istart*tstride,
                                        qua+i*bstride+istart*tstride,
-                                       iend-istart, tstride, alljump+istart);
+                                       iend-istart+1, tstride, alljump+istart);
         }
       }
     }
@@ -756,7 +777,7 @@ static void smfCorrectStepsParallel2( void *job_data_ptr, int *status ) {
       if( correct ) {
          smf__correct_steps_baseline( dat+i*bstride+istart*tstride,
                                       qua+i*bstride+istart*tstride,
-                                      iend-istart, tstride, thisjump+istart );
+                                      iend-istart+1, tstride, thisjump+istart );
       }
     }
   } 
