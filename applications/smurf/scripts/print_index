@@ -457,16 +457,6 @@ sub acsis_header {
 
     do {foreach (keys %$fitsitem) { print "$_\n";}} if ($debug > 1);
 
-    my $mode   = uc($fitsitem->{RECIPE});
-    if ($mode =~ /science/i) {
-      $mode = uc($fitsitem->{SAM_MODE}) . "_" . uc($fitsitem->{SW_MODE});
-      $mode =~ s/JIGGLE/JIG/;
-      $mode =~ s/RASTER/RAS/;
-      $mode =~ s/GRID/GRD/;
-    } else {
-      $mode =~ s/REDUCE_//i;
-    }
-
     my $rx     = lc($fitsitem->{INSTRUME});
     $rx     =~ s/harpb/harp/;
     $rx     =~ s/^fe_//;
@@ -486,6 +476,15 @@ sub acsis_header {
     my $intt = 0.1*int(10.0*$fitsitem->{NUM_CYC}*$numnods*$josmult*$step+0.5);
 
     my %A = calc_shared_scuba2_acsis( $fitsitem, $fitsitem );
+
+    my $mode = $A{OBSTYPE};
+    if ($mode =~ /science/i) {
+      $mode = uc($fitsitem->{SAM_MODE}) . "_" . uc($fitsitem->{SW_MODE});
+      $mode =~ s/JIGGLE/JIG/;
+      $mode =~ s/RASTER/RAS/;
+      $mode =~ s/GRID/GRD/;
+    }
+
 
 #    print "$A{RUN} $mode $A{UT} \'$A{OBJECT}\' $A{PROJECT} $rx $boloms $filter $A{CSOTAU} $A{SEEING}\n";
 
@@ -511,8 +510,8 @@ $A{RUN}, substr($A{UT},0,5), $A{PROJECT}, $mode, $A{OBJECT}, $intt, $step, $A{CS
 .
 
 format LONG_ACS =
-@<< @<<<<< @<<<<<<<<< @<<<<<<< @<<<<<< @>>>/@<< @<<<< @<<<< @<<<<<<<< @<<<<<<<<<<< @<<<< @<<<< @<<<< @<<<< @<<<<<<<<<<<
-$A{RUN}, substr($A{UT},0,5), $A{PROJECT}, $mode, $A{OBJECT}, $intt, $step, $A{LCSOTAU}, $A{LWVMTAU}, $cfreq, $cvref, $A{AZ}, $A{EL}, $A{UAZ}, $A{uel}, $bwmode
+@<< @<<<<< @<<<<<<<<< @<<<<<<< @<<<<<< @>>>/@<< @<<<< @<<<< @<<<<<<<< @<<<<<<<<<<< @<<<< @<<<< @<<<< @<<<< @>>>>>>>>>>>
+$A{RUN}, substr($A{UT},0,5), $A{PROJECT}, $mode, $A{OBJECT}, $intt, $step, $A{LCSOTAU}, $A{LWVMTAU}, $cfreq, $cvref, $A{AZ}, $A{EL}, $A{UAZ}, $A{UEL}, $bwmode
 .
 
     # Set format
@@ -556,12 +555,6 @@ sub scuba2_header {
     my $sdffile = $path . '/' . $basename;
     do {foreach (keys %$fitsitem) { print "$_\n";}} if ($debug > 1);
 
-    my $mode   = uc($fitsitem->{RECIPE});
-    $mode =~ s/REDUCE_//i;
-    $mode =~ s/FIELD/FLD/i;
-    $mode = uc($fitsitem->{SCAN_PAT}) if ($mode eq "SCAN");
-    $mode =~ s/CURVY_PONG/CRVYPONG/i;
-
     my $filter  = $fitsitem->{FILTER};
     my $step = int(1000*$fitsitem->{STEPTIME}) . "ms";
 
@@ -590,6 +583,16 @@ sub scuba2_header {
 
     my %S = calc_shared_scuba2_acsis( $fitsitem, $fitsitem2 );
     $S{OBJECT} =~ s/_science//;
+
+    # Mode depends on the observation type
+    my $mode = $S{OBSTYPE};
+    if ($mode =~ /science/i) {
+      $mode = uc($fitsitem->{SAM_MODE});
+      $mode = uc($fitsitem->{SCAN_PAT}) if ($mode eq "SCAN");
+      $mode =~ s/CURVY_PONG/CRVYPONG/i;
+    } else {
+      $mode =~ s/FIELD/FLD/i;
+    }
 
 #    print "$S{RUN} $mode $S{UT} \'$S{OBJECT}\' $S{PROJECT} $rx $boloms $filter $S{CSOTAU} $S{SEEING}\n";
 
