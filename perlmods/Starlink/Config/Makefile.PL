@@ -128,9 +128,9 @@ rather than in every single Starlink module.
 The locations of the relevant directories are set during build time.
 The location of the starlink system is determined by first looking for
 $STARCONF_DEFAULT_STARLINK, then $STARLINK, then
-$STARCONF_DEFAULT_PREFIX and finally $INSTALL else failling back to
-'/star' (if found) and then '/stardev'. If none of these directories
-exists the build fails.
+$STARCONF_DEFAULT_PREFIX, then $STARLINK_DIR and finally $INSTALL (for
+historical reasons) else failling back to '/star' (if found) and then
+'/stardev'. If none of these directories exists the build fails.
 
 When used, a hash is imported into the current namespace called
 C<%StarConfig>. This hash contains the following keys:
@@ -173,10 +173,10 @@ tag.
 
   use Starlink::Config qw/ :override /;
 
-This will then look at $STARLINK or $STARCONF_DEFAULT_STARLINK
-in order to provide a new tree. If you would like a verbose message
-that this is happening (important when building modules) use the
-C<:verbose> switch.
+This will then look at the current values of $STARCONF_DEFAULT_STARLINK,
+$STARLINK and $STARLINK_DIR in order to provide a new tree. If you would
+like a verbose message that this is happening (important when building modules)
+use the C<:verbose> switch.
 
   use Starlink::Config qw/ :override :verbose /;
 
