@@ -101,7 +101,9 @@ use strict;
 use warnings;
 
 use File::Basename;
+use File::Find;
 use File::Spec;
+use Cwd;
 
 # Load in the SDF module
 use Astro::FITS::Header::NDF;
@@ -225,8 +227,9 @@ for my $arg (reverse @ARGV) {
 $datadir = File::Spec->catdir( $data_root, $datadir )
      if ( defined $datadir && $datadir =~ /^\d{8}$/ && not -e $datadir);
 
-unless (defined $datadir || $datadir != '') {
-    chomp($datadir = `pwd`);
+# Fallback to current directory
+if (!$datadir) {
+    chomp($datadir = getcwd());
 }
 
 # Replace any array string with the requested one:
@@ -238,21 +241,20 @@ $datadir =~ s/\/$//;
 print "Path: $datadir   Files: all\n" if ($debug);
 my @obsfiles;
 
+# Pattern matches for certain types of file
+my $SCU2PATT = qr/s\d\w\d{8}_\d{5}_\d{4}/;
+my $NONSCU2PATT = qr/dem_|obs_|cbe_|das_|ac\d{8}_\d{5}|a\d{8}_\d{5}|\@/;
+my $FILSUFPATT = qr/\.(sdf|data|gsd)$/;
+
+# and determine which one to use
+my $FILE_PATTERN = ( $prog =~ /scuba/ ? $SCU2PATT : $FILSUFPATT );
+
 opendir( my $DIR,$datadir ) or die "Can't open directory '${datadir}'! :\n\t $!\n";
-my @ofiles;
-unless ($prog =~ /scuba/) {
-   @ofiles = sort
-          grep( /dem_|obs_|cbe_|das_|ac\d{8}_\d{5}|a\d{8}_\d{5}|\@/,
-          grep( /sdf|dat|gsd/, readdir($DIR)) );
- }else {
-   @ofiles = sort
-          grep( /s\d\w\d{8}_\d{5}_\d{4}|\@/,
-          grep( /sdf|dat|gsd/, readdir($DIR)) );
-}
+my @ofiles = sort grep { /$FILE_PATTERN/ } grep { /$FILSUFPATT/ } readdir($DIR);
 closedir($DIR);
 
 # If: Found valid files in the flat directory
-if ($#ofiles > 0 && $force == 0) {
+if ($#ofiles > 0 && !$force) {
   print "Found $#ofiles files in ${datadir}\n" if ($debug);
   foreach my $of (@ofiles) {
     push(@obsfiles, File::Spec->catfile($datadir,$of));
@@ -265,16 +267,19 @@ if ($#ofiles > 0 && $force == 0) {
     print "No files found: " unless ($force);
     print " try scanning subdirs of ${datadir}\n";
   }
-  open(my $FIND, "find $datadir -name \\\*_0001.sdf -print | sort |");
-  while(<$FIND>) {
-    chomp;
-    if ( $prog !~ /scuba/ && $_ =~ /a\d{8}_\d{5}/  ) {
-      push(@obsfiles,$_);
-    } elsif ( $prog =~ /scuba/ && $_ =~ /s\d\w\d{8}_\d{5}_\d{4}/ ) {
-      push(@obsfiles,$_);
-    }
+  # We want to look for relevant files in the directory tree
+  # We do not want to bother reading many many SCUBA-2
+  # files that will have almost identical headers so
+  # we restrict the basic pattern to the first subscan
+  # This speeds things up significantly for SCUBA-2
+  sub wanted {
+    return if -d $File::Find::name;
+    return unless /$FILSUFPATT/;
+    return unless /_0001\.sdf$/;
+    push @obsfiles, $File::Find::name if /$FILE_PATTERN/;
   }
-  close($FIND);
+  find(\&wanted, $datadir);
+  @obsfiles = sort @obsfiles;
 }
 
 my $origin = "";
@@ -464,7 +469,7 @@ sub acsis_header {
       $fitsitem->{VELOCITY} = 0;
     }
     if (!exists $fitsitem->{SPECSYS}) {
-      eval { 
+      eval {
         $fitsitem->{SPECSYS} = $wcs->Get( "sourcevrf" );
       };
     }
