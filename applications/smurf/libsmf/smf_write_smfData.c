@@ -78,6 +78,9 @@
 *        Use pixel origin from smfData
 *     2009-10-13 (TIMJ):
 *        Add Grp argument
+*     2010-01-25 (TIMJ):
+*        Write variance for 2d images. For 3d images with 3d variance do a quick
+*        memcpy.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -194,6 +197,14 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
     nbolo = 1;
     dbstride = 0;
     dtstride = 1;
+  } else if ( data->ndims == 2 ) {
+    ntslice = 1;
+    nelem = data->dims[0] * data->dims[1];
+    nbolo = nelem;
+    var = (data->pntr)[1];
+    dbstride = 0;
+    dtstride = 1;
+    if( var ) flags |= SMF__MAP_VAR;
   } else if( data->ndims == 3 ) {
     /* Dimensions for 3-d data */
     smf_get_dims( data, NULL, NULL, &nbolo, &ntslice, &nelem, &dbstride,
@@ -228,7 +239,7 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
 
     if( var ) flags |= SMF__MAP_VAR;
   } else {
-    /* For strange dimensions (especially 2- or 4-dimensions for FFTs) don't
+    /* For strange dimensions don't
        try to write variance or quality */
     var = NULL;
     qual = NULL;
@@ -269,13 +280,20 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
                                     nelem * nbperel );
 
       /* Do variance on a timeslice basis in case we are repeating a 2-d
-         variance array over time slice */
+         variance array over time slice. */
       if( var ) {
         outvar = (outdata->pntr)[1];
-        for( i=0; i<nbolo; i++ ) {
-          for( j=0; j<ntslice; j++ ) {
-            outvar[i*dbstride+j*dtstride] = var[i*vbstride+
-                                                (j%vntslice)*vtstride];
+        /* special cae 2d */
+        if (data->ndims == 2) {
+          if (outvar) memcpy( outvar, var, nelem * nbperel );
+        } else if (data->ndims == 3 && nelem == (vnbolo*vntslice) ) {
+          if (outvar) memcpy( outvar, var, nelem * nbperel );
+        } else {
+          for( i=0; i<nbolo; i++ ) {
+            for( j=0; j<ntslice; j++ ) {
+              outvar[i*dbstride+j*dtstride] = var[i*vbstride+
+                                                  (j%vntslice)*vtstride];
+            }
           }
         }
       }
