@@ -37,6 +37,7 @@
 *       _DOUBLE does not mean the data have been flatfielded.
 *     - Actually a general purpose "subtract 2d image from time series"
 *       function. Now has a bad name.
+*     - Propogates variance
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
@@ -59,10 +60,12 @@
 *        Add CHOOSE method.
 *     03-DEC-2008 (TIMJ):
 *        Add additional sanity check for time ordered data.
+*     2010-01-22 (TIMJ):
+*        Propogate variance
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008,2010 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -115,11 +118,14 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
 
   int *idark = NULL;    /* Pointer to int dark frame to subtract */
   double *ddark = NULL; /* Pointer to double frame to subtract */
+  int *ivdark = NULL;   /* Pointer to int dark frame variance to subtract */
+  double *dvdark = NULL;/* Pointer to double frame variance to subtract */
 
-  void *dark = NULL;    /* pointer to dark frame for this slice */
-  double *dkbuf = NULL;   /* malloced buffer for dark */
-  size_t i;            /* loop counter */
-  size_t nbols;        /* number of bolometers */
+  double *dkbuf = NULL; /* malloced buffer for dark */
+  double *dkvbuf = NULL; /* malloced buffer for dark variance */
+
+  size_t i;             /* loop counter */
+  size_t nbols;         /* number of bolometers */
   size_t nslices;       /* number of time slices in input data */
 
 
@@ -218,8 +224,8 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
       return;
     }
 
-    smf_select_pntr( dark1->pntr, dark1->dtype, &ddark, NULL,
-                     &idark, NULL, status );
+    smf_select_pntr( dark1->pntr, dark1->dtype, &ddark, &dvdark,
+                     &idark, &ivdark, status );
     break;
 
   case SMF__DKSUB_NEXT:
@@ -230,8 +236,8 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
       return;
     }
 
-    smf_select_pntr( dark2->pntr, dark2->dtype, &ddark, NULL,
-                     &idark, NULL, status );
+    smf_select_pntr( dark2->pntr, dark2->dtype, &ddark, &dvdark,
+                     &idark, &ivdark, status );
     break;
 
   case SMF__DKSUB_INTERP:
@@ -246,7 +252,6 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
              status );
       return;
     }
-    dark = NULL;
     break;
 
   default:
@@ -264,13 +269,19 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
     double *ddkp1;
     int *idkp2;
     double *ddkp2;
-    
-    smf_select_pntr( dark1->pntr, dark1->dtype, &ddkp1, NULL,
-                     &idkp1, NULL, status );
-    smf_select_pntr( dark2->pntr, dark2->dtype, &ddkp2, NULL,
-                     &idkp2, NULL, status );
+    int *idkpv1;
+    double *ddkpv1;
+    int *idkpv2;
+    double *ddkpv2;
+
+    smf_select_pntr( dark1->pntr, dark1->dtype, &ddkp1, &ddkpv1,
+                     &idkp1, &idkpv1, status );
+    smf_select_pntr( dark2->pntr, dark2->dtype, &ddkp2, &ddkpv2,
+                     &idkp2, &idkpv2, status );
     dkbuf = smf_malloc( nbols, sizeof(*dkbuf), 0, status );
+    dkvbuf = smf_malloc( nbols, sizeof(*dkvbuf), 0, status );
     ddark = dkbuf;
+    dvdark = dkvbuf;
 
     if (ddkp1 && ddkp2) {
       for (i = 0; i < nbols; i++) {
@@ -280,6 +291,13 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
         } else {
           dkbuf[i] = VAL__BADD;
         }
+        if (ddkpv1[i] != VAL__BADD && ddkpv2[i] != VAL__BADD) {
+          /* worry about numerical overflow.. */
+          dkvbuf[i] = ddkpv1[i] + ddkpv2[i];
+        } else {
+          dkvbuf[i] = VAL__BADD;
+        }
+
       }
     } else if (idkp1 && idkp1) {
       for (i = 0; i < nbols; i++) {
@@ -289,6 +307,12 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
             (0.5 * (double)idkp2[i]);
         } else {
           dkbuf[i] = VAL__BADD;
+        }
+        if (idkpv1[i] != VAL__BADI && idkpv2[i] != VAL__BADI) {
+          /* worry about numerical overflow */
+          dkvbuf[i] = (double)idkpv1[i] + (double)idkpv2[i];
+        } else {
+          dkvbuf[i] = VAL__BADD;
         }
       }
     } else {
@@ -321,29 +345,39 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
 
       if (*status == SAI__OK) {
         double * ddata;
+        double * dvar;
         int * idata;
+        int * ivar;
         size_t j;
         size_t startidx;
 
         /* get the correct input data pointer */
-        smf_select_pntr( indata->pntr, indata->dtype, &ddata, NULL,
-                         &idata, NULL, status);
+        smf_select_pntr( indata->pntr, indata->dtype, &ddata, &dvar,
+                         &idata, &ivar, status);
 
         if (ddata) {
           double * slice;
+          double * vslice;
 
           for (i = 0; i < nslices; i++) {
             startidx = i * nbols;
             slice = &(ddata[startidx]);
+            vslice = &(dvar[startidx]);
             for (j=0;  j < nbols; j++) {
               if (slice[j] != VAL__BADD) {
                 double darkval = VAL__BADD;
+                double darkvar = VAL__BADD;
 
                 /* Get the relevant dark value */
                 if (ddark) {
                   darkval = ddark[j];
                 } else if (idark && idark[j] != VAL__BADI) {
                   darkval = (double)idark[j];
+                }
+                if (dvdark) {
+                  darkvar = dvdark[j];
+                } else if (ivdark && ivdark[j] != VAL__BADI) {
+                  darkvar = (double)ivdark[j];
                 }
 
                 /* subtract it if non-bad */
@@ -352,19 +386,28 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
                 } else {
                   slice[j] = VAL__BADD;
                 }
+                /* add if non-bad */
+                if (darkvar != VAL__BADD && vslice[j] != VAL__BADD) {
+                  vslice[j] += darkvar;
+                } else {
+                  vslice[j] = VAL__BADD;
+                }
 
               }
             }
           }
         } else if (idata) {
           int *slice;
+          int * vslice;
 
           for (i = 0; i < nslices; i++) {
             startidx = i * nbols;
             slice = &(idata[startidx]);
+            vslice = &(ivar[startidx]);
             for (j=0;  j < nbols; j++) {
               if (slice[j] != VAL__BADI) {
                 int darkval = VAL__BADI;
+                int darkvar = VAL__BADI;
 
                 /* Get the relevant dark value */
                 if (idark) {
@@ -372,12 +415,22 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
                 } else if (ddark && ddark[j] != VAL__BADD) {
                   darkval = (int)ddark[j];
                 }
+                if (ivdark) {
+                  darkvar = ivdark[j];
+                } else if (dvdark && dvdark[j] != VAL__BADD) {
+                  darkvar = (int)dvdark[j];
+                }
 
                 /* subtract it if non-bad */
                 if (darkval != VAL__BADI) {
                   slice[j] -= darkval;
                 } else {
                   slice[j] = VAL__BADI;
+                }
+                if (darkvar != VAL__BADI && vslice[j] != VAL__BADI) {
+                  vslice[j] -= darkvar;
+                } else {
+                  vslice[j] = VAL__BADI;
                 }
 
               }
@@ -404,6 +457,7 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
   }
 
   if (dkbuf) dkbuf = smf_free( dkbuf, status );
+  if (dkvbuf) dkvbuf = smf_free( dkvbuf, status );
 
   return;
 }
