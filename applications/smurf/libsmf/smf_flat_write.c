@@ -62,10 +62,12 @@
 *        Rewrite for SMURF from sc2flat.c
 *     2008-09-02 (TIMJ):
 *        Write out variance
+*     2010-01-25 (TIMJ):
+*        Write out variance as a _DOUBLE to prevent numerical overflow
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2007-2008 Science and Technology Facilities Council.
+*     Copyright (C) 2007-2008,2010 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -112,10 +114,10 @@ void smf_flat_write( const char * flatname, const smfArray * bbhtframes,
   char fitsrec[SC2STORE__MAXFITS*80+1]; /* Store for FITS records */
   int *ibuf = NULL;            /* int buffer for mean data */
   int indf = NDF__NOID;        /* NDF identifier for output file */
-  int *ivar = NULL;            /* int buffer for variance of data */
   smfData * frame = NULL;      /* single frame */
   size_t ncards;               /* number of fits cards */
   size_t numbols;              /* number of bolometers */
+  double *outvar = NULL;       /* buffer for variance of data */
   int place = NDF__NOPL;       /* Dummy placeholder for NDF */
   size_t rowsize;              /* number of rows */
   JCMTState *state;            /* State for this flatfield */
@@ -158,10 +160,11 @@ void smf_flat_write( const char * flatname, const smfArray * bbhtframes,
   /* Create a FITS header for DA */
   smf_fits_export2DA( frame->hdr->fitshdr, &ncards, fitsrec, status );
 
-  /* Copy the data as integers so it can be written to data file */
+  /* Copy the data as integers so it can be written to data file. To
+     prevent overflow in the variance we store that as doubles */
 
-  ibuf = smf_malloc( numbols * bbhtframes->ndat, sizeof(*dbuf), 0, status );
-  ivar = smf_malloc( numbols * bbhtframes->ndat, sizeof(*dbuf), 0, status );
+  ibuf = smf_malloc( numbols * bbhtframes->ndat, sizeof(*ibuf), 0, status );
+  outvar = smf_malloc( numbols * bbhtframes->ndat, sizeof(*outvar), 0, status );
 
   for (j = 0; j < bbhtframes->ndat; j++) {
     frame = (bbhtframes->sdata)[j];
@@ -169,19 +172,18 @@ void smf_flat_write( const char * flatname, const smfArray * bbhtframes,
     dvar = (frame->pntr)[1];
     for (i = 0; i < numbols; i++ ) {
       size_t index = j*numbols+i;
+      /* These started off as integers so the mean value must fit in
+         an integer */
       if ( dbuf[i] == VAL__BADD) {
         ibuf[index] = VAL__BADI;
       } else {
         ibuf[index] = (int)dbuf[i];
       }
+      /* Same data type so no need to convert bad values */
       if (dvar) {
-        if ( dvar[i] == VAL__BADD || dvar[i] > (double)VAL__MAXI) {
-          ivar[index] = VAL__BADI;
-        } else {
-          ivar[index] = (int)dvar[i];
-        }
+        outvar[index] = dvar[i];
       } else {
-        ivar[index] = VAL__BADI;
+        outvar[index] = VAL__BADD;
       }
     }
   }
@@ -220,12 +222,13 @@ void smf_flat_write( const char * flatname, const smfArray * bbhtframes,
   /* make sure that history is not written twice */
   ndfHsmod( "SKIP", indf, status );
 
-  if (ivar) {
+  if (outvar) {
     void *pntr[3];
     int el;
-    ndfMap( indf, "VARIANCE", "_INTEGER", "WRITE", pntr, &el, status );
+    ndfStype( "_DOUBLE", indf, "VARIANCE", status );
+    ndfMap( indf, "VARIANCE", "_DOUBLE", "WRITE", pntr, &el, status );
     if (*status == SAI__OK) {
-      memcpy( pntr[0], ivar, sizeof(int)*el );
+      memcpy( pntr[0], outvar, sizeof(*outvar)*el );
     }
   }
 
@@ -278,7 +281,7 @@ void smf_flat_write( const char * flatname, const smfArray * bbhtframes,
   ndfAnnul( &indf, status);
 
   if (ibuf) ibuf = smf_free( ibuf, status );
-  if (ivar) ivar = smf_free( ivar, status );
+  if (outvar) outvar = smf_free( outvar, status );
   if (dksquid) dksquid = smf_free( dksquid, status );
   if (state) state = smf_free( state, status );
 }
