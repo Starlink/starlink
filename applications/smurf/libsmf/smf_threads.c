@@ -92,6 +92,11 @@
 *        into the workforce structure. When smf_wait exist, it
 *        re-establishes any error status described in the workforce
 *        structure.
+*     26-JAN-2010 (DSB):
+*        Ensure all public functions can be called with a null workforce
+*        without causing an error to be reported. The only significant
+*        change is that smf_add_job now executes the supplied job immediately 
+*        in the current thread if no workforce is supplied. 
 */
 
 
@@ -185,7 +190,9 @@ int smf_add_job( smfWorkForce *workforce, int flags, void *data,
 
 *  Arguments:
 *     workforce
-*        Pointer to the workforce.
+*        Pointer to the workforce. If NULL is supplied, the job is
+*        executed immediately in the current thread by calling "func",
+*        and the "flags" and "checker" arguments are ignored.
 *     flags
 *        Flags controlling how the job behaves. See "Job Control Flags:" 
 *        below.
@@ -237,6 +244,13 @@ int smf_add_job( smfWorkForce *workforce, int flags, void *data,
 
 /* Check inherited status */
    if( *status != SAI__OK ) return 0;
+
+/* If no work force was supplied, execute the job immediately in the
+   current thread, and then return. */
+   if( !workforce ) {
+      (*func)( data, status );
+      return 0;
+   }
 
 /* Wait until we are at the head of the queue at the job desk. We then
    have exclusive access to the workforce structure, etc. */
@@ -431,9 +445,10 @@ smfWorkForce *smf_destroy_workforce( smfWorkForce *workforce ) {
 
 *  Arguments:
 *     workforce
-*        Pointer to the workforce to be destroyed.
+*        Pointer to the workforce to be destroyed. If NULL is supplied,
+*        this function returns without action.
 
-*  Returned ValueL
+*  Returned Value:
 *     A NULL pointer is returned.      
 
 *  Description:
@@ -550,7 +565,8 @@ void smf_end_job_context( smfWorkForce *workforce, int *status ){
 
 *  Arguments:
 *     workforce
-*        Pointer to the workforce performing the jobs.
+*        Pointer to the workforce performing the jobs. If NULL is
+*        supplied, this function returns without action.
 *     status
 *        Pointer to the inherited status value.
 
@@ -566,7 +582,7 @@ void smf_end_job_context( smfWorkForce *workforce, int *status ){
    int new;
 
 /* Check inherited status */
-   if( *status != SAI__OK ) return;
+   if( *status != SAI__OK || !workforce ) return;
 
 /* Wait in the job desk queue until we have exclusive access to the job 
    desk. */
@@ -626,7 +642,9 @@ void *smf_get_job_data( int ijob, smfWorkForce *workforce, int *status ){
 *     ijob
 *        Identifier for the job.
 *     workforce
-*        Pointer to the workforce performing the jobs.
+*        Pointer to the workforce performing the jobs. If NULL is
+*        supplied, this function returns a NULL pointer, and "ijob" is
+*        ignored.
 *     status
 *        Pointer to the inherited status value.
 
@@ -643,7 +661,7 @@ void *smf_get_job_data( int ijob, smfWorkForce *workforce, int *status ){
    smfJob *job;
 
 /* Check inherited status */
-   if( *status != SAI__OK ) return NULL;
+   if( *status != SAI__OK || !workforce ) return NULL;
 
 /* Get a pointer to the structure describing the job. Search each
    list of jobs in turn. Report an error if the job is not found.
@@ -684,7 +702,8 @@ void smf_begin_job_context( smfWorkForce *workforce, int *status ){
 
 *  Arguments:
 *     workforce
-*        Pointer to the workforce performing the jobs.
+*        Pointer to the workforce performing the jobs. If NULL is
+*        supplied, this function returns without action.
 *     status
 *        Pointer to the inherited status value.
 
@@ -696,7 +715,7 @@ void smf_begin_job_context( smfWorkForce *workforce, int *status ){
 */
 
 /* Check inherited status */
-   if( *status != SAI__OK ) return;
+   if( *status != SAI__OK || !workforce ) return;
 
 /* Increment the depth of context nesting. */
    (workforce->condepth)++;
@@ -729,7 +748,8 @@ int smf_job_wait( smfWorkForce *workforce, int *status ) {
 
 *  Arguments:
 *     workforce
-*        Pointer to the workforce.
+*        Pointer to the workforce. If NULL is supplied, this function 
+*        exits immediately, returning a value of zero.
 *     status
 *        Pointer to the inherited status value.
 
@@ -846,7 +866,8 @@ void smf_wait( smfWorkForce *workforce, int *status ) {
 
 *  Arguments:
 *     workforce
-*        Pointer to the workforce.
+*        Pointer to the workforce. If NULL is supplied, this function 
+*        returns immediately.
 *     status
 *        Pointer to the inherited status value.
 
@@ -969,7 +990,9 @@ int smf_wait_on_job( smfWorkForce *workforce, int ijob1, int ijob2,
 
 *  Arguments:
 *     workforce
-*        Pointer to the workforce performing the jobs.
+*        Pointer to the workforce performing the jobs. If NULL is
+*        supplied, this function returns without action (a value of one
+*        is returned).
 *     ijob1
 *        Identifier for the first job. An error is reported if no pending
 *        job with this identifier can be found.
@@ -1008,7 +1031,7 @@ int smf_wait_on_job( smfWorkForce *workforce, int ijob1, int ijob2,
    result = 1;
 
 /* Check inherited status */
-   if( *status != SAI__OK ) return result;
+   if( *status != SAI__OK || !workforce ) return result;
 
 /* Get a pointer to the structure describing the first job. Search each
    list of available and waiting jobs in turn. Report an error if the job 
