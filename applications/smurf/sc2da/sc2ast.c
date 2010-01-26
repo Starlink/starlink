@@ -18,6 +18,13 @@
  */
 #define COLROW 1
 
+/* The CURRENT macro specifies the index of the current Frame in the
+   FrameSet returned by sc2ast_createwcs(2). This current Frame is 
+   re-established (in case it was changed by the calling code) each time
+   sc2ast_createwcs(2) is called. */
+#define CURRENT 3
+
+
 static char errmess[132];              /* For DRAMA error messages */
 
 #define MM2RAD 2.4945e-5               /* scale at array in radians */
@@ -57,6 +64,15 @@ int *status             /* global status (given and returned) */
      If telescope state is NULL, a focal plane frameset will be returned.
 
    Notes :
+     - No changes should be made to the returned FrameSet since any such
+     changes could affect future use of the FrameSet by this function.
+     The one exception is that the current Frame in the returned FrameSet
+     may safely be changed - this function will re-instate the original 
+     current Frame each time it is called. If any other changes need to
+     be made to the returned FrameSet, then the changes should be applied
+     to a deep copy of the returned FrameSet (produced using astCopy), 
+     rather than to the returned FrameSet itself.
+
      - Because of its use of a static cache, this function should be used 
      only when thread-safety is not an issue. For threaded applications,
      use sc2ast_createwcs2 instead.
@@ -160,7 +176,16 @@ int *status             /* global status (given and returned) */
      If telescope state is NULL, a focal plane frameset will be returned.
 
    Notes :
-     After the first call the cached part of the frameset contains information
+     - No changes should be made to the returned FrameSet since any such
+     changes could affect future use of the FrameSet by this function.
+     The one exception is that the current Frame in the returned FrameSet
+     may safely be changed - this function will re-instate the original 
+     current Frame each time it is called. If any other changes need to
+     be made to the returned FrameSet, then the changes should be applied
+     to a deep copy of the returned FrameSet (produced using astCopy), 
+     rather than to the returned FrameSet itself.
+
+     - After the first call the cached part of the frameset contains information
      specific to the SCUBA-2 instrument, observatory location etc. If you
      wish to subsequently calculate framesets for a different instrument
      or observatory location ensure that you first clear the cache by
@@ -243,6 +268,9 @@ int *status             /* global status (given and returned) */
                  this will leave the NEW* mappings unchanged, but will 
                  change ORIGINAL. Report an error if SMURF_DISTORTION has 
                  an unknown value.
+     26Jan2010 : Reset the current Frame in the cached FrameSet each time
+                 this function is called, in case the caller has changed
+                 it. (DSB)
 */
 {
 
@@ -777,8 +805,11 @@ int *status             /* global status (given and returned) */
       sc2ast_make_bolo_frame( &bfrm, &bmap, status );
       astAddFrame( cache->frameset[ subnum ], AST__BASE, bmap, bfrm );
 
-/* We add a second 2D Frame to the FrameSet. Without this, the first call to 
-   astRemoveFrame below would remove the BOLO Frame we have just added. */
+/* We add a another 2D Frame to the FrameSet (which becomes Frame number
+   3 in the FrameSet). Without this, the first call to astRemoveFrame below 
+   would remove the BOLO Frame we have just added. NOTE, if in future we add 
+   any further Frames in here, the value of the CURRENT macro (defined
+   above) should be changed. */
       astAddFrame( cache->frameset[ subnum ], AST__BASE, 
                    astUnitMap( 2, " " ), astFrame( 2, " " ) );
 
@@ -989,6 +1020,10 @@ int *status             /* global status (given and returned) */
                   "be 2).", nout ); 
          ErsRep( 0, status, errmess );
       }
+
+/* Ensure the original current Frame is still the CURRENT Frame (the caller 
+   may have changed the current Frame - e.g. to access the BOLO Frame). */
+      astSetI( cache->frameset[ subnum ], "Current", CURRENT );
    }
 
    /* If state is NULL we are simply returning the focal plane coordinate
@@ -1004,6 +1039,7 @@ int *status             /* global status (given and returned) */
      astAddFrame( *fset, AST__BASE, cache->map[ subnum ],
 		  fp_pos_frame );
      astSet( *fset, "unit(1)=arcsec,unit(2)=arcsec" );
+
      /* Return early rather than embed the subsequent code in a big else.
 	A bit dangerous if more is added at the end */
      astExport( *fset );
