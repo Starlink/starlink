@@ -345,6 +345,16 @@ foreach indir ($dir_list)
 #  Use the iterative mapmaker to create map for each individual bolometers.
       $SMURF_DIR/makemap "$indir/*" method=iter out=junk system=AZEL \
                 alignsys=t config="'^$SMURF_DIR/../../share/smurf/dimmconfig_distortionmap.lis,bolomap=1'" | tee makemap.log
+
+#  See if the data has been flat-fielded (as implied by the map units being "pW"). If not, 
+#  the source features will be negative in the bolomaps.
+      $KAPPA_DIR/ndftrace junk quiet
+      set units = `$KAPPA_DIR/parget UNITS ndftrace`
+      if( $units == "pW" ) then
+         set negative = 0;
+      else 
+         set negative = 1;
+      endif
       
 #  Get the subarray name, and its corresponding integer index. 
       set subarray = `$KAPPA_DIR/fitsmod junk edit=print keyword=SUBARRAY`
@@ -528,6 +538,12 @@ foreach indir ($dir_list)
                   $KAPPA_DIR/wcsattrib $ndf set 'format(1)' "%5.3f"
                   $KAPPA_DIR/wcsattrib $ndf set 'format(2)' "%5.3f"
          
+#  If source features are negative in the bolomap, negate the bolomap so that they become positive. 
+                  if( $negative == 1 ) then
+                     $KAPPA_DIR/cmult $ndf -1 pos
+                     set ndf = "pos"
+                  endif
+                   
 #  Find the pixel coords at the centre of the feature. The feature is 
 #  nominally at the reference point and so should, in the absence of errors 
 #  and incorrect polymaps, have pixel coords (0.5,0.5). PSF fails unless a good 
