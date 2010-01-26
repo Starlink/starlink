@@ -329,6 +329,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int dofft=0;                  /* Set if freq. domain filtering the data */
   dim_t dsize;                  /* Size of data arrays in containers */
   double dtemp;                 /* temporary double */
+  int ensureflat=1;             /* flatfield data as they are loaded */
   int exportNDF=0;              /* If set export DIMM files to NDF at end */
   int *exportNDF_which=NULL;    /* Which models in modelorder will be exported*/
   int noexportsetbad=0;         /* Don't set bad values in exported models */
@@ -493,6 +494,11 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
     /* Are we going to produce maps for each iteration? */
     if( !astMapGet0I( keymap, "ITERMAP", &itermap ) ) {
       itermap = 0;
+    }
+
+    /* Are we going to apply the flatfield when we load data? */
+    if( !astMapGet0I( keymap, "ENSUREFLAT", &ensureflat ) ) {
+      ensureflat = 1;
     }
 
     /* Are we going to set bad values in exported models? */
@@ -904,13 +910,18 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         res = smf_malloc( nchunks, sizeof(*res), 1, status );
 
         /* Concatenate (no variance since we calculate it ourselves -- NOI) */
-        smf_concat_smfGroup( wf, igroup, darks, bbms, contchunk, 1, 0, outfset,
-                             moving, lbnd_out, ubnd_out, padStart, padEnd,
-                             SMF__NOCREATE_VARIANCE, &res[0], status );
+        smf_concat_smfGroup( wf, igroup, darks, bbms, contchunk, ensureflat,
+                             0, outfset, moving, lbnd_out, ubnd_out, padStart,
+                             padEnd, SMF__NOCREATE_VARIANCE, &res[0], status );
 
         /*** TIMER ***/
         msgOutiff( MSG__DEBUG, "", FUNC_NAME ": ** %f s concatenating data",
                    status, smf_timerupdate(&tv1,&tv2,status) );
+      } else {
+        if( !ensureflat ) {
+          msgOut( "", FUNC_NAME ": *** WARNING: ensureflat=0 not supported "
+                  "if memiter set. Data will be flat-fielded! ***", status );
+        }
       }
     }
 

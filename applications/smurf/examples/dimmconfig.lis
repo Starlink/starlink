@@ -59,6 +59,12 @@ exportndf = 0
 # Create single-beam maps in addition to main map?
 #bolomap = 1
 
+# Apply the flatfield if loading raw data? Default is 1 (true) -- you must
+# explicitly set this to 0 if you want to produce a map in raw DAC units (and
+# also supply raw data).
+
+# ensureflat=0
+
 # ----------------------------------------------------------------------------
 # The following parameters control data-cleaning before iterations start
 # ----------------------------------------------------------------------------
