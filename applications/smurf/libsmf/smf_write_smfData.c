@@ -81,11 +81,13 @@
 *     2010-01-25 (TIMJ):
 *        Write variance for 2d images. For 3d images with 3d variance do a quick
 *        memcpy.
+*     2010-01-26 (EC):
+*        Write out dark squids
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
-*     Copyright (C) 2008,2009 University of British Columbia.
+*     Copyright (C) 2008-2010 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2010 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -146,6 +148,7 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
   HDSLoc *jcmtstateloc=NULL;    /* HDS Locator for JCMT headers */
   int lbnd[NDF__MXDIM];         /* Lower pixel bounds */
   dim_t nbolo;                  /* number of bolos */
+  dim_t ncols;                  /* number of columns */
   dim_t nelem;                  /* total number of elements in data array */
   dim_t ntslice=0;              /* Number of time slices */
   Grp * ogrp = NULL;            /* Small group for output filename */
@@ -207,7 +210,7 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
     if( var ) flags |= SMF__MAP_VAR;
   } else if( data->ndims == 3 ) {
     /* Dimensions for 3-d data */
-    smf_get_dims( data, NULL, NULL, &nbolo, &ntslice, &nelem, &dbstride,
+    smf_get_dims( data, NULL, &ncols, &nbolo, &ntslice, &nelem, &dbstride,
                   &dtstride, status );
 
     /* Only handle variance for 3d data */
@@ -340,7 +343,41 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
           sc2store_headput( i, inhdr->allState[i], status );
         }
       }
+    }
 
+    /* Dark squids */
+    if( *status == SAI__OK ) {
+      smfDA *da = data->da;
+      HDSLoc *loc=NULL;
+      int id;
+      int nmap;
+      void *pntr[1];
+      int *outdksquid=NULL;
+
+      if( da && da->dksquid && outdata && outdata->file &&
+          outdata->file->ndfid && (outdata->file->ndfid != NDF__NOID) ) {
+
+        loc = smf_get_xloc( outdata, "SCUBA2", "SCUBA2", "UPDATE", 0, 0,
+                            status );
+
+        lbnd[0]=0;
+        lbnd[1]=1;
+        ubnd[0]=lbnd[0]+ncols-1;
+        ubnd[1]=lbnd[1]+ntslice-1;
+
+        id = smf_get_ndfid( loc, "DKSQUID", "WRITE", "UNKNOWN", "_INTEGER",
+                            2, lbnd, ubnd, status );
+
+        ndfMap( id, "DATA", "_INTEGER", "WRITE", pntr, &nmap, status );
+        outdksquid = pntr[0];
+
+        if( (*status == SAI__OK) && (outdksquid) ) {
+          memcpy( outdksquid, da->dksquid, nmap*sizeof(*(da->dksquid)) );
+        }
+
+        ndfAnnul( &id, status );
+        datAnnul( &loc, status );
+      }
     }
   }
 
