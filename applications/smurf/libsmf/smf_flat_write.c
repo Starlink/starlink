@@ -63,7 +63,9 @@
 *     2008-09-02 (TIMJ):
 *        Write out variance
 *     2010-01-25 (TIMJ):
-*        Write out variance as a _DOUBLE to prevent numerical overflow
+*        o Write out variance as a _DOUBLE to prevent numerical overflow
+*        o Use atlAddWcsAxis to build up output frameset. And use BOLO frame
+*          by default.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -94,6 +96,8 @@
 #include "smf_typ.h"
 #include "smf.h"
 #include "smurf_par.h"
+#include "star/atl.h"
+#include "star/kaplibs.h"
 
 #include "sc2da/sc2store.h"
 #include "sc2da/sc2ast.h"
@@ -123,9 +127,6 @@ void smf_flat_write( const char * flatname, const smfArray * bbhtframes,
   JCMTState *state;            /* State for this flatfield */
   int subnum;                  /* subarray number */
 
-  AstCmpFrame *totfrm;
-  AstCmpMap *totmap;
-  AstFrame *gridfrm;
   AstFrameSet *result, *spacefset;
   AstLutMap *heatmap;
   AstFrame *heatfrm;
@@ -238,27 +239,23 @@ void smf_flat_write( const char * flatname, const smfArray * bbhtframes,
   /* Create frame for focal plane coordinates */
   sc2ast_createwcs( subnum, NULL, NULL, NULL, &spacefset, status );
 
+  /* Copy it to make sure we do not mess with the cache */
+  result = astCopy( spacefset );
+
+  /* and switch to BOLO frame which is best for bolometer analysis */
+  {
+    int frnum = AST__NOFRAME;
+    kpg1Asffr( result, "BOLO", &frnum, status );
+    if (frnum != AST__NOFRAME) astSetI( result, "CURRENT", frnum );
+  }
+
   /* Create a simple frame for heater settings */
   heatfrm = astFrame( 1, "Domain=HEATER,Label(1)=Heater Setting" );
   heatmap = astLutMap( bbhtframes->ndat, heater, 1.0, 1.0, " " );
 
-  /* Join the frames and mappings */
-  totfrm = astCmpFrame( spacefset, heatfrm, " " );
-  totmap = astCmpMap( spacefset, heatmap, 0, " " );
-
-  /* Create a 3D GRID frame */
-  gridfrm = astFrame( 3, "Domain=GRID,Title=FITS pixel coordinates" );
-  astSet( gridfrm, "Unit(1)=pixel,Label(1)=FITS pixel axis 1" );
-  astSet( gridfrm, "Unit(2)=pixel,Label(2)=FITS pixel axis 2" );
-  astSet( gridfrm, "Unit(3)=pixel,Label(2)=FITS pixel axis 3" );
-
-  /* Create the FrameSet to return, initially containing just the above
-     GRID Frame. */
-  result = astFrameSet( gridfrm, " " );
-
-  /* Add the total Frame into the FrameSet using the total Mapping to
-     connect it to the base (i.e. GRID) Frame. */
-  astAddFrame( result, AST__BASE, totmap, totfrm );
+  /* Append the heater axis to the spatial frameset */
+  atlAddWcsAxis( result, (AstMapping *)heatmap, (AstFrame *) heatfrm,
+                 NULL, NULL, status );
 
   /* write it to the NDF */
   ndfPtwcs( result, indf, status );
