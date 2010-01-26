@@ -428,7 +428,7 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
                   slice[j] = VAL__BADI;
                 }
                 if (darkvar != VAL__BADI && vslice[j] != VAL__BADI) {
-                  vslice[j] -= darkvar;
+                  vslice[j] += darkvar;
                 } else {
                   vslice[j] = VAL__BADI;
                 }
