@@ -62,6 +62,8 @@
 *        Add additional sanity check for time ordered data.
 *     2010-01-22 (TIMJ):
 *        Propogate variance
+*     2010-01-25 (TIMJ):
+*        Make sure that the intput and output smfData have variance.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -291,7 +293,7 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
         } else {
           dkbuf[i] = VAL__BADD;
         }
-        if (ddkpv1[i] != VAL__BADD && ddkpv2[i] != VAL__BADD) {
+        if (ddkpv1 && ddkpv2 && ddkpv1[i] != VAL__BADD && ddkpv2[i] != VAL__BADD) {
           /* worry about numerical overflow.. */
           dkvbuf[i] = ddkpv1[i] + ddkpv2[i];
         } else {
@@ -308,7 +310,7 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
         } else {
           dkbuf[i] = VAL__BADD;
         }
-        if (idkpv1[i] != VAL__BADI && idkpv2[i] != VAL__BADI) {
+        if (idkpv1 && idkpv2 && idkpv1[i] != VAL__BADI && idkpv2[i] != VAL__BADI) {
           /* worry about numerical overflow */
           dkvbuf[i] = (double)idkpv1[i] + (double)idkpv2[i];
         } else {
@@ -357,12 +359,12 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
 
         if (ddata) {
           double * slice;
-          double * vslice;
+          double * vslice = NULL;
 
           for (i = 0; i < nslices; i++) {
             startidx = i * nbols;
             slice = &(ddata[startidx]);
-            vslice = &(dvar[startidx]);
+            if (dvar) vslice = &(dvar[startidx]);
             for (j=0;  j < nbols; j++) {
               if (slice[j] != VAL__BADD) {
                 double darkval = VAL__BADD;
@@ -387,23 +389,24 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
                   slice[j] = VAL__BADD;
                 }
                 /* add if non-bad */
-                if (darkvar != VAL__BADD && vslice[j] != VAL__BADD) {
-                  vslice[j] += darkvar;
-                } else {
-                  vslice[j] = VAL__BADD;
+                if (vslice) {
+                  if (darkvar != VAL__BADD && vslice[j] != VAL__BADD) {
+                    vslice[j] += darkvar;
+                  } else {
+                    vslice[j] = VAL__BADD;
+                  }
                 }
-
               }
             }
           }
         } else if (idata) {
           int *slice;
-          int * vslice;
+          int * vslice = NULL;
 
           for (i = 0; i < nslices; i++) {
             startidx = i * nbols;
             slice = &(idata[startidx]);
-            vslice = &(ivar[startidx]);
+            if (ivar) vslice = &(ivar[startidx]);
             for (j=0;  j < nbols; j++) {
               if (slice[j] != VAL__BADI) {
                 int darkval = VAL__BADI;
@@ -427,12 +430,13 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
                 } else {
                   slice[j] = VAL__BADI;
                 }
-                if (darkvar != VAL__BADI && vslice[j] != VAL__BADI) {
-                  vslice[j] += darkvar;
-                } else {
-                  vslice[j] = VAL__BADI;
+                if (vslice) {
+                  if (darkvar != VAL__BADI && vslice[j] != VAL__BADI) {
+                    vslice[j] += darkvar;
+                  } else {
+                    vslice[j] = VAL__BADI;
+                  }
                 }
-
               }
             }
           }
