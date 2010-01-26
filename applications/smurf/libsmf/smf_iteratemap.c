@@ -521,7 +521,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                       &dcthresh2, NULL, &fillgaps, &f_edgelow,
                       &f_edgehigh, f_notchlow, f_notchhigh, &f_nnotch,
                       &dofft, &flagstat, &baseorder, &spikethresh,
-                      &spikeiter, status ); 
+                      &spikeiter, status );
 
     /* Maximum length of a continuous chunk */
     if( astMapGet0D( keymap, "MAXLEN", &dtemp ) ) {
@@ -1140,7 +1140,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
               if( dcthresh && dcbox ) {
                 msgOutif(MSG__VERB," ", "  find bolos with steps...", status);
-                smf_correct_steps( wf, data, qua_data, dcthresh, dcthresh2, dcbox, 
+                smf_correct_steps( wf, data, qua_data, dcthresh, dcthresh2, dcbox,
                                    dcflag, &nflag, status );
                 msgOutiff(MSG__VERB, "","  ...%li flagged\n", status, nflag);
               }
@@ -1159,7 +1159,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                 msgOutif(MSG__VERB," ", "  gap filling", status);
                 smf_fillgaps( wf, data, qua_data, SMF__Q_GAP, status );
               }
-              
+
               if( apod ) {
                 msgOutif(MSG__VERB," ", "  apodizing data", status);
                 smf_apodize( data, qua_data, apod, status );
