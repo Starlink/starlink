@@ -28,7 +28,7 @@ chitol = 1e-3
 # method of estimating variance map
 #  0 = propagate from the time-domain noise (requires noi model component)
 #  1 = sample variance of data that land in each pixel
-varmapmethod = 1
+varmapmethod = 0
 
 # Perform iterations in memory?
 memiter = 1
@@ -117,7 +117,7 @@ flagstat = 2
 # --- Many of the following may not be useful ---
 
 # S/N threshold to detect DC steps
-dcthresh = 2000
+dcthresh = 5000
 
 # box size over which to measure rms for DC step finder
 dcbox = 50
@@ -188,7 +188,7 @@ com.boxcar = 10
 # com.gain_tol: n-sigma away from mean gain coefficient tolerance
 # com.gain_tolabs: absolute factor away from mean gain coefficient tolerance
 
-com.corr_tol = 5
+com.corr_tol = 7
 com.gain_tol = 5
 com.gain_abstol = 3
 
@@ -198,13 +198,13 @@ dks.boxcar = 100
 
 # additional despiking / DC step finding after each iteration within noi
 # calculation
-noi.spikethresh = 100
-noi.spikeiter = 0
+#noi.spikethresh = 100
+#noi.spikeiter = 0
 #noi.dcbox = 200
 #noi.dcthresh = 5
 #noi.dcbad = 1
 #noi.dcflagall = 1
-noi.fillgaps = 1
+#noi.fillgaps = 1
 
 # iterative filter.
 flt.filt_edgehigh = 0.1
