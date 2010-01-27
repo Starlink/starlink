@@ -40,18 +40,18 @@
 *     numbers and so estimate the responsivity in Amps/Watt for each step in
 *     power. Assume the response for a good bolometer should be nearly linear,
 *     and so analyse the set of responsivities to determine the mean and
-*     evaluate the quality. Write the results to a text file.
+*     evaluate the quality. Write the results to the supplied smfData.
 
 *  Returned Value:
 *     size_t = number of good responsivities.
 
 *  Notes:
 *     - powval and bolval are calculated by smf_flat_standardpow.
-*     - "raw2current" converts raw (10 or 20 kHz) data numbers to
+*     - "RAW2CURRENT" converts raw (10 or 20 kHz) data numbers to
 *       current through a TES
 *     - The MCE firmware low-pass filters the raw data and subsamples
 *       down to 200 Hz. This filtering is the reason for the "mcepass"
-*       factor.
+*       factor included in the RAW2CURRENT macro.
 *     - The bolometers are nominally supposed to have a responsivity
 *       of -1.0e6 Amps/Watt.
 
