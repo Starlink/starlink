@@ -57,9 +57,9 @@
 *          Reference pixel heat resistance. Defines the mean power scale to
 *          be used. [2.0]
 *     RESIST = GROUP (Read)
-*          Name of a text file with Resistor settings for each
-*          bolometer. An example can be found in
-*          $STARLINK_DIR/share/smurf/resist.cfg
+*          A group expression containing the resistor settings for each bolometer.
+*          Usually specified as a text file using "^" syntax. An example can be found in
+*          $STARLINK_DIR/share/smurf/resist.cfg [$STARLINK_DIR/share/smurf/resist.cfg]
 *     RESP = NDF (Write)
 *          Responsivity image with variance. No image is written
 *          if NULL. [!]
