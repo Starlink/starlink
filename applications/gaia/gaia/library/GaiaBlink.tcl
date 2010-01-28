@@ -151,6 +151,10 @@ itcl::class gaia::GaiaBlink {
       add_short_help $itk_component(menubar).actions \
          {Choose an action}
 
+      add_menuitem $Actions command "Position like main image" \
+         {Position scroll so that image (1) is visible as displayed} \
+         -command [code $this position_like_image_ 0]
+
       add_menuitem $Actions command "Apply grid positions" \
          {Align images at lower left corner} \
          -command [code $this fix_origins_]
@@ -455,6 +459,9 @@ itcl::class gaia::GaiaBlink {
 
       #  Make <Return> cycle through the images.
       bind $canvas_ <Return>  [code $this view_next]
+
+      #  A "c" positions like the main image.
+      bind $w_ <KeyPress-c> [code $this position_like_image_ 0]
 
       #  <1> in canvas area gives it focus
       bind $canvas_ <1> [code focus $canvas_]
@@ -800,6 +807,19 @@ itcl::class gaia::GaiaBlink {
       }
    }
 
+   #  Modify the scroll to reflect the positioning the given clones parent
+   #  display (so we roughly can see what it shows).
+   protected method position_like_image_ {n} {
+      if { [info exists clones_($n)] } {
+         #set_scroll_region_
+         set canvas [$clones_($n) get_canvas]
+         lassign [$canvas xview] x0 x1
+         lassign [$canvas yview] y0 y1
+         hscroll moveto $x0
+         vscroll moveto $y0
+      }
+   }
+
    #  Set the canvas positions of the images to reflect any image
    #  origins available. All images are first positioned at 0 0,
    #  i.e. the upper left of canvas (this is already true at start,
@@ -957,7 +977,7 @@ itcl::class gaia::GaiaBlink {
    #  Set the relative positions of any images using WCS information.
    #  This attempts to "orient" images (as in flip x, y or
    #  interchange), so that they can be more easily compared (or
-   #  positioned in the case of the INT CCD Mosaic). Clearly fraction 
+   #  positioned in the case of the INT CCD Mosaic). Clearly fraction
    #  scale and arbitrary orientations are not supported.
    protected method set_wcs_origins_ {} {
       catch {
@@ -987,7 +1007,7 @@ itcl::class gaia::GaiaBlink {
                # Pixel shift from mobile image upper left to this one.
                set dx $xo
                set dy [expr [$image_($mobile_) height]-1.0-$yo]
-               
+
                # Equivalent canvas shift.
                $image_($mobile_) convert dist $dx $dy image dx dy canvas
 
