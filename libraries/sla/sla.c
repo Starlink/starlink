@@ -38,6 +38,7 @@
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     DSB: David S. Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     PWD: Peter W. Draper (Durham University)
 
 *  History:
 *     12-NOV-1996 (RFWS):
@@ -1944,6 +1945,97 @@ void slaAmp( double ra, double da, double date, double eq,
   *rm = RM;
   *dm = DM;
 
+}
+
+F77_SUBROUTINE(sla_aop)( 
+                         DOUBLE(RAP),
+                         DOUBLE(DAP),
+                         DOUBLE(DATE),
+                         DOUBLE(DUT),
+                         DOUBLE(ELONGM),
+                         DOUBLE(PHIM),
+                         DOUBLE(HM),
+                         DOUBLE(XP),
+                         DOUBLE(YP),
+                         DOUBLE(TDK),
+                         DOUBLE(PMB),
+                         DOUBLE(RH),
+                         DOUBLE(WL),
+                         DOUBLE(TLR),
+                         DOUBLE(AOB),
+                         DOUBLE(ZOB),
+                         DOUBLE(HOB),
+                         DOUBLE(DOB),
+                         DOUBLE(ROB) );
+
+void slaAop ( double rap, double dap, double date, double dut,
+              double elongm, double phim, double hm, double xp,
+              double yp, double tdk, double pmb, double rh,
+              double wl, double tlr,
+              double *aob, double *zob, double *hob,
+              double *dob, double *rob ) {
+
+    DECLARE_DOUBLE(RAP);
+    DECLARE_DOUBLE(DAP);
+    DECLARE_DOUBLE(DATE);
+    DECLARE_DOUBLE(DUT);
+    DECLARE_DOUBLE(ELONGM);
+    DECLARE_DOUBLE(PHIM);
+    DECLARE_DOUBLE(HM);
+    DECLARE_DOUBLE(XP);
+    DECLARE_DOUBLE(YP);
+    DECLARE_DOUBLE(TDK);
+    DECLARE_DOUBLE(PMB);
+    DECLARE_DOUBLE(RH);
+    DECLARE_DOUBLE(WL);
+    DECLARE_DOUBLE(TLR);
+    DECLARE_DOUBLE(AOB);
+    DECLARE_DOUBLE(ZOB);
+    DECLARE_DOUBLE(HOB);
+    DECLARE_DOUBLE(DOB);
+    DECLARE_DOUBLE(ROB);
+
+    RAP = rap;
+    DAP = dap;
+    DATE = date;
+    DUT  = dut;
+    ELONGM = elongm;
+    PHIM = phim;
+    HM = hm;
+    XP = xp;
+    YP = yp;
+    TDK = tdk;
+    PMB = pmb;
+    RH = rh;
+    WL = wl;
+    TLR = tlr;
+
+    F77_CALL(sla_aop)(
+                      DOUBLE_ARG(&RAP),
+                      DOUBLE_ARG(&DAP),
+                      DOUBLE_ARG(&DATE),
+                      DOUBLE_ARG(&DUT),
+                      DOUBLE_ARG(&ELONGM),
+                      DOUBLE_ARG(&PHIM),
+                      DOUBLE_ARG(&HM),
+                      DOUBLE_ARG(&XP),
+                      DOUBLE_ARG(&YP),
+                      DOUBLE_ARG(&TDK),
+                      DOUBLE_ARG(&PMB),
+                      DOUBLE_ARG(&RH),
+                      DOUBLE_ARG(&WL),
+                      DOUBLE_ARG(&TLR),
+                      DOUBLE_ARG(&AOB),
+                      DOUBLE_ARG(&ZOB),
+                      DOUBLE_ARG(&HOB),
+                      DOUBLE_ARG(&DOB),
+                      DOUBLE_ARG(&ROB) );
+
+    *aob = AOB;
+    *zob = ZOB;
+    *hob = HOB;
+    *dob = DOB;
+    *rob = ROB;
 }
 
 F77_SUBROUTINE(sla_cldj)( INTEGER(IY),
