@@ -350,7 +350,7 @@ foreach indir ($dir_list)
 #  the source features will be negative in the bolomaps.
       $KAPPA_DIR/ndftrace junk quiet
       set units = `$KAPPA_DIR/parget UNITS ndftrace`
-      if( $units == "pW" ) then
+      if( "$units" == "pW" ) then
          set negative = 0;
       else 
          set negative = 1;
