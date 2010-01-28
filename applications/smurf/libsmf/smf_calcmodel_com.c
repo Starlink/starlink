@@ -696,19 +696,14 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
       }
     }
 
-    if( nw > 1 ) {
-      for( ii=0; ii<nw; ii++ ) {
-        /* Submit the job */
-        pdata = job_data + ii;
-        pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata,
-                                   smfCalcmodelComPar, NULL, status );
-      }
-      /* Wait until all of the submitted jobs have completed */
-      smf_wait( wf, status );
-    } else {
-      /* Call smfCalcmodelComPar directly using 1 core */
-      smfCalcmodelComPar( job_data, status );
+    for( ii=0; ii<nw; ii++ ) {
+      /* Submit the job */
+      pdata = job_data + ii;
+      pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata,
+                                 smfCalcmodelComPar, NULL, status );
     }
+    /* Wait until all of the submitted jobs have completed */
+    smf_wait( wf, status );
   }
 
   /* Outer loop re-calculates common-mode until the list of "good" bolometers
@@ -758,19 +753,14 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         pdata->weight = weight;
       }
 
-      if( nw > 1 ) {
-        for( ii=0; ii<nw; ii++ ) {
-          /* Submit the job */
-          pdata = job_data + ii;
-          pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata,
-                                     smfCalcmodelComPar, NULL, status );
-        }
-        /* Wait until all of the submitted jobs have completed */
-        smf_wait( wf, status );
-      } else {
-        /* Call smfCalcmodelComPar directly using 1 core */
-        smfCalcmodelComPar( job_data, status );
+      for( ii=0; ii<nw; ii++ ) {
+        /* Submit the job */
+        pdata = job_data + ii;
+        pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata,
+                                   smfCalcmodelComPar, NULL, status );
       }
+      /* Wait until all of the submitted jobs have completed */
+      smf_wait( wf, status );
     }
 
     /* Re-normalize the model, or set model to 0 if no data. */
@@ -837,19 +827,14 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
           pdata->weight = weight;
         }
 
-        if( nw > 1 ) {
-          for( ii=0; ii<nw; ii++ ) {
-            /* Submit the job */
-            pdata = job_data + ii;
-            pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata,
-                                       smfCalcmodelComPar, NULL, status );
-          }
-          /* Wait until all of the submitted jobs have completed */
-          smf_wait( wf, status );
-        } else {
-          /* Call smfCalcmodelComPar directly using 1 core */
-          smfCalcmodelComPar( job_data, status );
+        for( ii=0; ii<nw; ii++ ) {
+          /* Submit the job */
+          pdata = job_data + ii;
+          pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata,
+                                     smfCalcmodelComPar, NULL, status );
         }
+        /* Wait until all of the submitted jobs have completed */
+        smf_wait( wf, status );
 
         /* Calculate mean and r.m.s. of correlation coefficients and
            gains to flag outlier bolometers as bad */

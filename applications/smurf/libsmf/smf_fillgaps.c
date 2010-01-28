@@ -188,7 +188,7 @@ void  smf_fillgaps( smfWorkForce *wf, smfData *data, unsigned char *quality,
   r = gsl_rng_alloc (type);
 
   /* Begin a job context. */
-  if( wf ) smf_begin_job_context( wf, status );
+  smf_begin_job_context( wf, status );
 
   /* Loop over bolometer in groups of "bpt". */
   pdata = job_data;
@@ -209,19 +209,14 @@ void  smf_fillgaps( smfWorkForce *wf, smfData *data, unsigned char *quality,
     pdata->mask = mask;
 
     /* Submit a job to the workforce to process this group of bolometers. */
-    if( wf ) {
-      (void) smf_add_job( wf, 0, pdata, smfFillGapsParallel, NULL, status );
-    } else {
-      smfFillGapsParallel( pdata, status );
-    }
+    (void) smf_add_job( wf, 0, pdata, smfFillGapsParallel, NULL, status );
   }
 
   /* Wait until all jobs in the current job context have completed, and
      then end the job context. */
-  if( wf ) {
-    smf_wait( wf, status );
-    smf_end_job_context( wf, status );
-  }
+
+  smf_wait( wf, status );
+  smf_end_job_context( wf, status );
 
   /* Free resources. */
   gsl_rng_free( r );

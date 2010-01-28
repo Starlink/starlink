@@ -311,10 +311,8 @@ void smf_correct_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
     smf_get_goodrange( qua, ntslice, 1, SMF__Q_PAD|SMF__Q_APOD,
                        &istart, &iend, status );
 
-    if( wf ) {
-      /* Begin a job context. */
-      smf_begin_job_context( wf, status );
-    }
+    /* Begin a job context. */
+    smf_begin_job_context( wf, status );
 
     /* Loop over bolometer in groups of "bpt". */
     pdata = job_data;
@@ -337,23 +335,16 @@ void smf_correct_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
       pdata->qua = qua;
       pdata->tstride = tstride;
 
-      if( wf ) {
-        /* Submit a job to the workforce to process this group of bolometers. */
-        (void) smf_add_job( wf, 0, pdata, smfCorrectStepsParallel, NULL, 
-                            status );
-      } else {
-        /* If no workforce call function directly */
-        smfCorrectStepsParallel( pdata, status );
-      }
+      /* Submit a job to the workforce to process this group of bolometers. */
+      (void) smf_add_job( wf, 0, pdata, smfCorrectStepsParallel, NULL, 
+                          status );
     }
 
-    if( wf ) {
-      /* Wait until all jobs in the current job context have completed. */
-      smf_wait( wf, status );
+    /* Wait until all jobs in the current job context have completed. */
+    smf_wait( wf, status );
 
-      /* End the job context. */
-      smf_end_job_context( wf, status );
-    }
+    /* End the job context. */
+    smf_end_job_context( wf, status );
 
     /* Add up the number of samples flagged by each thread. */
     pdata = job_data;
@@ -380,10 +371,8 @@ void smf_correct_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
          job_data2 = astMalloc( sizeof( smfCorrectStepsData2 ) );
       }
 
-      if( wf ) {
-        /* Begin a job context. */
-        smf_begin_job_context( wf, status );
-      }
+      /* Begin a job context. */
+      smf_begin_job_context( wf, status );
 
       /* Loop over bolometer in groups of "bpt". */
       pdata2 = job_data2;
@@ -404,23 +393,16 @@ void smf_correct_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
         pdata2->qua = qua;
         pdata2->tstride = tstride;
   
-        if( wf ) {
-          /* Submit a job to the workforce to process this group of bolos. */
-          (void) smf_add_job( wf, 0, pdata2, smfCorrectStepsParallel2, NULL, 
-                              status );
-        } else {
-          /* If no workforce call function directly */
-          smfCorrectStepsParallel2( pdata2, status );
-        }
+        /* Submit a job to the workforce to process this group of bolos. */
+        (void) smf_add_job( wf, 0, pdata2, smfCorrectStepsParallel2, NULL, 
+                            status );
       }
 
-      if( wf ){
-        /* Wait until all jobs in the current job context have completed. */
-        smf_wait( wf, status );
+      /* Wait until all jobs in the current job context have completed. */
+      smf_wait( wf, status );
 
-        /* End the job context. */
-        smf_end_job_context( wf, status );
-      }
+      /* End the job context. */
+      smf_end_job_context( wf, status );
 
       /* Free resouces. */
       job_data2 = astFree( job_data2 );

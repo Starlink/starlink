@@ -403,21 +403,15 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt,
   }
  
   /* Execute the filter */
-  if( nw > 1 ) {
-    /* Submit jobs in parallel if we have multiple worker threads */
-    for( i=0; (*status==SAI__OK)&&i<nw; i++ ) {
-      pdata = job_data + i;
-      pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata, 
-                                 smfFilterExecuteParallel, 
-                                 NULL, status );
-    }
-    /* Wait until all of the submitted jobs have completed */
-    smf_wait( wf, status );
-  } else {
-    /* If there is only a single thread call smfFilterExecuteParallel directly*/
-    pdata = job_data;
-    smfFilterExecuteParallel( job_data, status );
+  for( i=0; (*status==SAI__OK)&&i<nw; i++ ) {
+    pdata = job_data + i;
+    pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata, 
+                               smfFilterExecuteParallel, 
+                               NULL, status );
   }
+
+  /* Wait until all of the submitted jobs have completed */
+  smf_wait( wf, status );
 
   /* Clean up the job data array */
   if( job_data ) {

@@ -524,23 +524,16 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
   }
 
   /* Do the FFTs */
-  if( nw > 1 ) {
-    /* Submit jobs in parallel if we have multiple worker threads */
-    smf_begin_job_context( wf, status );
-    for( i=0; (*status==SAI__OK)&&i<nw; i++ ) {
-      pdata = job_data + i;
-      pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata,
-                                 smfFFTDataParallel, NULL, status );
-    }
-    /* Wait until all of the submitted jobs have completed */
-    smf_wait( wf, status );
-    smf_end_job_context( wf, status );
-
-  } else {
-    /* If there is only a single thread call smfFFTDataParallel directly*/
-    pdata = job_data;
-    smfFFTDataParallel( job_data, status );
+  smf_begin_job_context( wf, status );
+  for( i=0; (*status==SAI__OK)&&i<nw; i++ ) {
+    pdata = job_data + i;
+    pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata,
+                               smfFFTDataParallel, NULL, status );
   }
+
+  /* Wait until all of the submitted jobs have completed */
+  smf_wait( wf, status );
+  smf_end_job_context( wf, status );
 
   /* Each sample needs to have a normalization applied if forward FFT */
   if( (*status==SAI__OK) && !inverse ) {
