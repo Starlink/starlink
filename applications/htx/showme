@@ -227,7 +227,6 @@
       done
 
 #  Export variables required by related scripts.
-      export DISPLAY
       export HTX_DIR
       export HTX_SCRIPT
       export HTX_TTY

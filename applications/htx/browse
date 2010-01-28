@@ -52,12 +52,6 @@
 #     growing without limit.
 
 #  Environment Variables Used:
-#     DISPLAY
-#        Normally, this should be set to identify the X display in use. If
-#        it is not set, an attempt will be made to run the Starlink "xdisplay"
-#        utility to define it, although this may slow down document display.
-#        If the DISPLAY variable cannot be set in this way, then an error will
-#        result. Not required on Apple OS X.
 #     HTX_BROWSER
 #        This should be used to select the web browser to be used
 #        to view documents.  The variable should contain a string corresponding
@@ -159,6 +153,10 @@
 #        Merge all netscape, mozilla and firefox code into one.
 #     8-JAN-2008 (PWD):
 #        Use SUSV3 "tail -n +3" command, "tail +3" is non-standard.
+#     19-JAN-2010 (PWD):
+#        Add provisional support for google-chrome. Remove cruft checking if
+#        DISPLAY variable is set. No longer needed as X should be secure now
+#        and not bypass that. 
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -170,7 +168,6 @@
       url="${1}"
 
 #  Export variables required by related scripts.
-      export DISPLAY
       export HTX_BROWSER
 
 #  Include the definition of the "settrap" function which is used to define
@@ -301,43 +298,6 @@
             if test -n "${oldfiles}"; then rm -f ${oldfiles}; fi
          fi
 
-#  Ensure DISPLAY is set.
-#  ---------------------
-#  The DISPLAY variable is always required for netscape, so see if it is
-#  defined.
-         wasset='1'
-         if test ! -n "${DISPLAY}"; then
-            wasset=''
-
-#  If it was not defined, then search relative to directories ending in "/bin"
-#  that appear in $PATH to see if the Starlink "xdisplay" executable is
-#  available.
-            xdisplay="`IFS=':'; for dir in ${PATH}; do
-               case "${dir}" in */bin)
-                  file="${dir}/../etc/xdisplay"
-                  test -x "${file}" -a ! -d "${file}" && echo "${file}" \
-                                                      && break;;
-               esac
-            done`"
-
-#  If "xdisplay" was found, then use it to set a DISPLAY value. If possible,
-#  redirect standard input to the controlling terminal, since this affects
-#  results on some systems.
-            if test -n "${xdisplay}"; then
-               if test -n ${HTX_TTY}; then
-                  DISPLAY="`${xdisplay} <${HTX_TTY}`"
-               else
-                  DISPLAY="`${xdisplay}`"
-               fi
-
-#  If it could not be found, abort with an error message.
-            else
-               echo >&2 \
-               "${HTX_SCRIPT}: please set DISPLAY to identify your X display"
-               exit 1
-            fi
-         fi
-
 #  Prepare to communicate with Netscape.
 #  ------------------------------------
 #  Generate the Netscape remote command required to make an existing browser
@@ -369,14 +329,8 @@
 #  Start a new invocation of Netscape.
 #  -----------------------------------
 #  If the attempt to use an existing browser failed, then we must start a new
-#  one. Before doing so, check if the DISPLAY variable was set before invoking
-#  this script. If not, then issue a warning because running "xdisplay" each
-#  time will slow down document access.
+#  one.
          else
-            if test ! "${wasset}" = '1'; then
-               echo >&2 \
-"${HTX_SCRIPT}: for faster access, please set DISPLAY to identify your X display"
-            fi
 
 #  Start a new browser, supplying the URL generated above. Suppress warning
 #  messages if required.
@@ -604,41 +558,7 @@
                mosclean
             fi
 
-#  Ensure that DISPLAY is set.
-#  --------------------------
-#  If a new browser invocation is required, check if the DISPLAY variable is
-#  defined.
          else
-            if test ! -n "${DISPLAY}"; then
-
-#  If it was not defined, then search relative to directories ending in "/bin"
-#  that appear in $PATH to see if the Starlink "xdisplay" executable is
-#  available.
-               xdisplay="`IFS=':'; for dir in ${PATH}; do
-                  case "${dir}" in */bin)
-                     file="${dir}/../etc/xdisplay"
-                     test -x "${file}" -a ! -d "${file}" && echo "${file}" \
-                                                         && break;;
-                  esac
-               done`"
-
-#  If "xdisplay" was found, then use it to set a DISPLAY value. If possible,
-#  redirect standard input to the controlling terminal, since this affects
-#  results on some systems.
-               if test -n "${xdisplay}"; then
-                  if test -n ${HTX_TTY}; then
-                     DISPLAY="`${xdisplay} <${HTX_TTY}`"
-                  else
-                     DISPLAY="`${xdisplay}`"
-                  fi
-
-#  If it could not be found, abort with an error message.
-               else
-                  echo >&2 \
-                  "${HTX_SCRIPT}: please set DISPLAY to identify your X display"
-                  exit 1
-               fi
-            fi
 
 #  Start a new invocation of Mosaic.
 #  --------------------------------
@@ -686,6 +606,67 @@
 #  If necessary, disable the trap associated with temporary files.
             if test "${HTX_WHERE}" = 'i'; then settrap; fi
          fi
+         ;;
+
+      google-chrome)
+
+#  Open the URL with google-chrome
+#  -------------------------------
+
+#  Manage scratch file space.
+#  -------------------------
+#  If the document to be viewed is being supplied on standard input, then
+#  we must generate a name for a temporary file to store it.
+         if test "${HTX_WHERE}" = 'i'; then
+
+#  Use "ls" to list all the temporary file names so far used in reverse order
+#  of their creation time.
+            tempfiles="`ls -t ${tmpdir}/htx-browse-netscape-${LOGNAME}-*.html \
+                        2>/dev/null`"
+
+#  Pass this list of file names through "sed" to extract the sequence number
+#  field, quitting once that corresponding to the most recently created file
+#  has been obtained.
+            n="`echo "${tempfiles}" \
+            | sed -n 's%^.*/htx-browse-chrome-'"${LOGNAME}"'-\([1-9][0-9]*\)\.html$%\1%p
+                      t done
+                      b
+                      :done
+                      q'`"
+
+#  If no sequence number was found, then use 1. Otherwise increment it.
+            if test ! -n "${n}"; then n='1'; else n="`expr "${n}" + 1`"; fi
+
+#  Generate the temporary file name and replace the URL value with it. This
+#  name must be unique to the current machine, software, browser, user and
+#  temporary document sequence number.
+            url="${tmpdir}/htx-browse-chrome-${LOGNAME}-${n}.html"
+
+#  Select the names of all but the most recent few temporary files and remove
+#  these older ones if necessary.
+            oldfiles="`echo "${tempfiles}" | tail -n +3`"
+            if test -n "${oldfiles}"; then rm -f ${oldfiles}; fi
+         fi
+
+#  If necessary, read the document from standard input into its temporary file.
+#  Before doing so, set a trap to remove the file if this script is aborted.
+         if test "${HTX_WHERE}" = 'i'; then
+            settrap 'rm -f "${url}"'
+            cat >"${url}" || exit
+         fi
+
+#  Start a new browser, supplying the URL generated above. Suppress warning
+#  messages if required. Note for chrome this the only possible action.
+#  A second invocation will reuse an existing instance.
+         echo "Starting ${HTX_BROWSER} WWW browser..."
+         if test "${HTX_WARN}" = '1'; then
+            ${HTX_BROWSER} "${url}" &
+         else
+            ${HTX_BROWSER} 2>/dev/null "${url}" &
+         fi
+
+#  Disable the trap associated with temporary files, if necessary.
+         if test "${HTX_WHERE}" = 'i'; then settrap; fi
          ;;
 
 #  Unknown browser.

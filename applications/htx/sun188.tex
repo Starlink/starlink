@@ -5,10 +5,10 @@
 % ? Document identification
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocnumber}    {188.5}
-\newcommand{\stardocsource}    {sun188.5}
+\newcommand{\stardocnumber}    {188.6}
+\newcommand{\stardocsource}    {sun188.6}
 \newcommand{\stardocauthors}   {R.F.~Warren-Smith \& P.W~Draper}
-\newcommand{\stardocdate}      {17th August 2006}
+\newcommand{\stardocdate}      {20th January 2010}
 \newcommand{\stardoctitle}     {HTX\\[1ex]
                                 Hypertext Cross-Reference Utilities}
 \newcommand{\stardocversion}   {Version 1.3-1}
@@ -2574,37 +2574,6 @@ Note that this command should not be an alias (\st{e.g.}\ if you
 normally use the C~shell).
 
 Currently, HTX can work only with the browsers listed above.
-
-\subsection{\xlabel{defining_your_X_display}Defining Your X~Display}
-
-In order to run a \htmlref{WWW browser}{sect:usingwwwbrowsers} on an
-X~windows display, the environment variable \hi{DISPLAY} should first
-be defined to identify the display you want to
-use. \htmlref{HTX}{sect:HTX} only supports WWW browsers which use
-\st{X~displays}.
-
-If you are a regular user of an X~display, you will probably already
-have the necessary command in your \hi{.login} file. If not, you may
-want to use the Starlink \hi{xdisplay} command (described in
-\xref{SUN/129}{sun129}{}) to make the appropriate definition.
-
-If HTX detects that the \hi{DISPLAY} variable has not been defined, it
-will attempt to run the \hi{xdisplay} utility itself before starting a
-WWW browser. For this to succeed, \hi{xdisplay} must be installed on
-your system and the directory \hi{/star/bin}\footnote{Or the
-equivalent if your Starlink software is not installed under the
-standard \hi{/star} directory.} must be on your UNIX \hi{PATH}. If the
-\hi{xdisplay} command cannot be found (and the \hi{DISPLAY}
-environment variable is undefined), then an error will result.
-
-Because the \hi{xdisplay} command may take some time to complete, you
-will be warned if this must be repeated by each subsequent HTX
-command (not all WWW browsers require this), as it will slow down your
-access to documents. Defining the \hi{DISPLAY} environment variable
-yourself will eliminate this delay.
-
-The DISPLAY variable is not required on Mac OS X. HTX does not support
-X-based WWW browsers on OS X.
 
 \subsection{\label{sect:browsercommunication}\xlabel{WWW_browser_communication}WWW Browser Communication}
 

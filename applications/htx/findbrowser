@@ -24,7 +24,8 @@
 #     HTX_BROWSER
 #        An optional command which will be used to invoke the WWW browser.
 #        This should contain a string corresponding to one of the supported
-#        WWW browsers (firefox, mozilla, netscape, safari and mosaic).
+#        WWW browsers (firefox, mozilla, netscape, safari, google-chrome and 
+#        mosaic).
 
 #  Notes: 
 #     Both the PATH and HTX_BROWSER variables may contain spaces in the
@@ -66,7 +67,7 @@
 
 #  Define the default set of browsers to look for, extend this as needed, also
 #  prune from time-to-time. Note this defines the preferred order.
-    browser_list="firefox mozilla netscape mosaic"
+    browser_list="firefox mozilla google-chrome netscape mosaic"
     browser_list="$browser_list Mozilla Netscape Mosaic"
 
 #  Save IFS for use in the htx_cmd_inpath function.

@@ -432,7 +432,6 @@
       done
 
 #  Export variables used by related scripts.
-      export DISPLAY
       export HTX_BRIEF
       export HTX_CASE
       export HTX_DIR
