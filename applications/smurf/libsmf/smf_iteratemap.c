@@ -1382,9 +1382,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                  memcpy( imapdata->pntr[1], thisvar, msize*sizeof(*thismap) );
                }
 
-               /* Write WCS */
+               /* Write WCS (protecting the pointer dereference) */
                smf_set_moving(outfset,status);
-               ndfPtwcs( outfset, imapdata->file->ndfid, status );
+               if (*status == SAI__OK && imapdata) ndfPtwcs( outfset, imapdata->file->ndfid, status );
 
                /* Clean up */
                if( mgrp ) grpDelet( &mgrp, status );
