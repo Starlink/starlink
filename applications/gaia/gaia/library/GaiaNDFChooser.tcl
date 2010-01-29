@@ -119,6 +119,10 @@ itcl::class gaia::GaiaNDFChooser {
       make_buttons_
       make_short_help_
 
+      #  Pack main components, so that buttons are always shown.
+      pack $itk_component(buttons) -side bottom -fill x -expand 1
+      pack $itk_component(table) -side top -fill both -expand 1
+
       #  And start it up.
       show_hdu_list
    }
@@ -139,10 +143,10 @@ itcl::class gaia::GaiaNDFChooser {
                         -headings $headings \
                         -width [expr [string length $headings]*2]]
       }
-      pack $itk_component(table) -side top -fill both -expand 1
 
       bind $table_.listbox <ButtonRelease-1> [code $this select_ndf_]
       bind $table_.listbox <Double-ButtonPress-1> [code $this set_ndf_ "data"]
+      bind $table_.listbox <Return> [code $this set_ndf_ "data"]
    }
 
    #  Make a subwindow for displaying miniature versions of image
@@ -218,7 +222,6 @@ itcl::class gaia::GaiaNDFChooser {
       pack $itk_component(display) -side left -expand 1
       pack $itk_component(show) -side left -fill y -expand 1
       pack $itk_component(close) -side left -expand 1
-      pack $itk_component(buttons) -side top -fill x -expand 1
    }
 
    # Set the cut levels for the image extensions to the given percent
