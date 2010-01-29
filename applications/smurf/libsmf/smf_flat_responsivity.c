@@ -13,9 +13,9 @@
 *     Subroutine
 
 *  Invocation:
-*     size_t smf_flat_responsivity ( smfData *respmap, double snrmin, size_t nheat,
-*                                  const double powval[], const double bolval[],
-*                                  int *status );
+*     size_t smf_flat_responsivity ( smfData *respmap, double snrmin,
+*                                    const smfData * powval, const smfData * bolval,
+*                                    int *status );
 
 *  Arguments:
 *     respmap = smfData * (Given & Returned)
@@ -25,13 +25,12 @@
 *        Minimum acceptable signal-to-noise ratio for a responsivity fit.
 *        Below this value the fit will be treated as bad and the bolometer
 *        will be disabled.
-*     nheat = size_t (Given)
-*        Number of measurements. 3rd dimension of bolval. Size of powval.
-*     powval = const double [] (Given)
-*        Resistance input powers. Must be nheat elements.
-*     bolval = const double [] (Given)
+*     powval = const smfData * (Given)
+*        Resistance input powers. Is the number of heater measurements.
+*     bolval = const smfData * (Given)
 *        Response of each bolometer to powval. Dimensioned as number of
-*        number of bolometers (size of respmap) time nheat.
+*        number of bolometers (size of respmap) times number of heater
+*        measurements (size of powval).
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -73,10 +72,12 @@
 *     2009-10-08 (TIMJ):
 *        WSH requests that responsivities are returned as positive numbers.
 *        Add SNR argument.
+*     2010-01-28 (TIMJ):
+*        Switch to a smfData API
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2007-2009 Science and Technology Facilities Council.
+*     Copyright (C) 2007-2010 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -110,14 +111,15 @@
 
 #include "gsl/gsl_fit.h"
 
-size_t smf_flat_responsivity ( smfData *respmap, double snrmin, size_t nheat,
-                               const double powval[], const double bolval[],
+size_t smf_flat_responsivity ( smfData *respmap, double snrmin,
+                               const smfData * powvald, const smfData * bolvald,
                                int *status ) {
 
   size_t bol;                  /* Bolometer offset into array */
   double * bolv = NULL;        /* Temp space for bol values */
   size_t k;                    /* loop counter */
   size_t nbol;                 /* number of bolometers */
+  size_t nheat;                /* number of heater measurements */
   size_t ngood = 0;            /* number of valid responsivities */
   int nrgood;                  /* number of good responsivities for bolo */
   double *powv = NULL;         /* Temp space for power values */
@@ -125,12 +127,25 @@ size_t smf_flat_responsivity ( smfData *respmap, double snrmin, size_t nheat,
   double *resps = NULL;        /* responsivities for a bolometer at each step */
   double *respvar = NULL;      /* responsivity variance */
 
+  double * powval = NULL;      /* pointer to data in smfData */
+  double * bolval = NULL;      /* pointer to data in smfData */
+  double * bolvalvar = NULL;   /* pointer to variance in smfData bolvald */
+
   if (*status != SAI__OK) return ngood;
 
   if (!smf_dtype_check_fatal(respmap, NULL, SMF__DOUBLE, status)) return ngood;
+  if (!smf_dtype_check_fatal(powvald, NULL, SMF__DOUBLE, status)) return ngood;
+  if (!smf_dtype_check_fatal(bolvald, NULL, SMF__DOUBLE, status)) return ngood;
 
+  /* Extract relevant information from the smfData */
   respdata = (respmap->pntr)[0];
   respvar  = (respmap->pntr)[1];
+
+  powval = (powvald->pntr)[0];
+  bolval = (bolvald->pntr)[0];
+  bolvalvar = (bolvald->pntr)[1];
+
+  nheat = (powvald->dims)[0];
 
   /* Responsivities */
   resps = smf_malloc( nheat, sizeof(*resps), 0, status );

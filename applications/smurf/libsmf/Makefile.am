@@ -145,6 +145,7 @@ smf_flag_spikes.c \
 smf_flag_spikes2.c \
 smf_flag_stationary.c \
 smf_flat_responsivity.c \
+smf_flat_smfData.c \
 smf_flat_standardpow.c \
 smf_flat_write.c \
 smf_flatfield.c \

@@ -15,7 +15,7 @@
 *  Invocation:
 *     smf_flat_standardpow( const smfArray * heatframes, double refohms,
 *                           const double heatref[], const double resistance[],
-*                           double powref[], double bolref[], int * status);
+*                           smfData** powref, smfData ** bolref, int * status);
 
 *  Arguments:
 *     heatframes = const smfArray* (Given)
@@ -27,14 +27,14 @@
 *        was used.
 *     resistance = const double [] (Given)
 *        Resistance for each pixel heater. One value for each bolometer.
-*     powref = double [] (Returned)
+*     powref = smfData**  (Returned)
 *        Resistance input powers. Must have space for the same number of
-*        elements as frames stored in "heatframes". Memory allocated by
-*        caller.
-*     bolref = double [] (Returned)
+*        elements as frames stored in "heatframes". Struct allocated by
+*        this routine. Will be NULL on error.
+*     bolref = smfData** (Returned)
 *        Response of each bolometer to powref. Dimensioned as number of
-*        frames in "heatframes" times the number of bolometers. Memory
-*        allocated by caller.
+*        bolometers  time the number of frames in "heatframes". Struct
+*        allocated by this routine. Will be NULL on error.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -60,10 +60,12 @@
 *        Rewrite for SMURF from sc2flat.c
 *     2008-09-03 (TIMJ):
 *        Throw out any bolometers that have any bad values in their darks.
+*     2010-01-28 (TIMJ):
+*        Switch to a smfData API
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2007-2008 Science and Technology Facilities Council.
+*     Copyright (C) 2007-2008, 2010 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -97,7 +99,7 @@
 void
 smf_flat_standardpow( const smfArray * heatframes, double refohms,
                       const double heatref[], const double resistance[],
-                      double powref[], double bolref[], int * status) {
+                      smfData ** powrefd, smfData ** bolrefd, int * status) {
 
   double current;         /* current through heaters */
   double **heatframe = NULL; /* Pointers to nheat heatframes */
@@ -109,11 +111,44 @@ smf_flat_standardpow( const smfArray * heatframes, double refohms,
   double *powbol = NULL;  /* pointer to individual bolometer powers */
   double s;               /* interpolation slope factor */
 
+  double * powref = NULL; /* Data array inside powrefd */
+  double * bolref = NULL; /* Data array inside bolrefd */
+  double * bolrefvar = NULL; /* Variance inside bolrefd */
+
+  void *pntr[] = { NULL, NULL, NULL };          /* pointers for smfData */
+  dim_t dims[] = { 1, 1, 1 };
+
+  *powrefd = NULL;
+  *bolrefd = NULL;
+
   if (*status != SAI__OK) return;
 
   nheat = heatframes->ndat;
   numbol = (heatframes->sdata)[0]->dims[0] *
     (heatframes->sdata)[0]->dims[1];
+
+  /* Create a smfData for powref and bolref */
+  powref = smf_malloc( nheat, sizeof(*powref), 1, status );
+  bolref = smf_malloc( nheat * numbol, sizeof(*bolref), 1, status );
+  bolrefvar = smf_malloc( nheat * numbol, sizeof(*bolref), 1, status );
+
+  pntr[0] = powref;
+  pntr[1] = NULL;
+  pntr[2] = NULL;
+  dims[0] = nheat;
+  *powrefd = smf_construct_smfData( NULL, NULL, NULL, NULL, SMF__DOUBLE,
+                                    pntr, 1, dims, NULL, 1, 0, 0, NULL,
+                                    NULL, status );
+
+  pntr[0] = bolref;
+  pntr[1] = bolrefvar;
+  pntr[2] = NULL;
+  dims[0] = (heatframes->sdata)[0]->dims[0];
+  dims[1] = (heatframes->sdata)[0]->dims[1];
+  dims[2] = nheat;
+  *bolrefd = smf_construct_smfData( NULL, NULL, NULL, NULL, SMF__DOUBLE,
+                                    pntr, 1, dims, NULL, 3, 0, 0, NULL,
+                                    NULL, status );
 
   /* Get some memory -
      bolometer power per input frame */
@@ -236,5 +271,10 @@ smf_flat_standardpow( const smfArray * heatframes, double refohms,
  CLEANUP:
   if (powbol) powbol = smf_free ( powbol, status );
   if (heatframe) heatframe = smf_free( heatframe, status );
+
+  if (*status != SAI__OK) {
+    if (*bolrefd) smf_close_file( bolrefd, status );
+    if (*powrefd) smf_close_file( powrefd, status );
+  }
 
 }

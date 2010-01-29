@@ -97,10 +97,12 @@
 *        Add support for sky flatfields
 *     2009-11-24 (TIMJ):
 *        Handle case where no darks are supplied.
+*     2010-01-28 (TIMJ):
+*        Flatfield routines now use smfData
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2010 Science and Technology Facilities Council.
 *     Copyright (C) 2009 University of British Columbia.
 *     All Rights Reserved.
 
@@ -159,7 +161,7 @@
 void smurf_calcflat( int *status ) {
 
   smfArray * bbhtframe = NULL; /* Data (non-reference) frames */
-  double *bolref = NULL;    /* response of each bolometer to powref */
+  smfData *bolref = NULL;   /* response of each bolometer to powref */
   smfArray * darks = NULL;  /* Darks */
   smfData *ddata = NULL;    /* A heater file */
   Grp * dkgrp = NULL;       /* Group of darks */
@@ -183,7 +185,7 @@ void smurf_calcflat( int *status ) {
   Grp *ogrp = NULL;         /* Output group of files */
   double *pixheat = NULL;   /* Pixel heater settings for each input file */
   char *pname = NULL;       /* Temporary pointer */
-  double *powref = NULL;    /* Reference input powers */
+  smfData *powref = NULL;    /* Reference input powers */
   double refohms;           /* reference pixel heater resistance */
   double *resistance = NULL; /* Bolometer resistance settings */
   Grp *resgrp =  NULL;       /* Resistor group */
@@ -418,13 +420,8 @@ void smurf_calcflat( int *status ) {
        Generate a set of reference heater power settings in pW, and calculate the
        expected measurement from each bolometer at each power setting.
      */
-
-    bolref = smf_malloc( bbhtframe->ndat * nbols, sizeof(*bolref), 0,
-                         status );
-    powref = smf_malloc( bbhtframe->ndat, sizeof(*powref), 0, status );
-
     smf_flat_standardpow( bbhtframe, refohms, pixheat, resistance,
-                          powref, bolref, status );
+                          &powref, &bolref, status );
 
 
     /* See if we need an output file for responsivities or some temporary
@@ -451,7 +448,7 @@ void smurf_calcflat( int *status ) {
     /* Calculate the responsivity in Amps/Watt (using the supplied
        signal-to-noise ratio minimum */
     parGet0d( "SNRMIN", &snrmin, status );
-    ngood = smf_flat_responsivity( respmap, snrmin, bbhtframe->ndat, powref, bolref,
+    ngood = smf_flat_responsivity( respmap, snrmin, powref, bolref,
                                    status );
 
     /* Report the number of good responsivities */
@@ -471,8 +468,11 @@ void smurf_calcflat( int *status ) {
         if ( respdata[i] == VAL__BADD) {
           thisbol = 0;
           for (j=0; j<bbhtframe->ndat; j++) {
-            if (bolref[j*nbols+i] != VAL__BADD) {
-              bolref[j*nbols+i] = VAL__BADD;
+            double * dpntr = (bolref->pntr)[0];
+            double * vpntr = (bolref->pntr)[1];
+            if (dpntr[j*nbols+i] != VAL__BADD) {
+              dpntr[j*nbols+i] = VAL__BADD;
+              if (vpntr) vpntr[j*nbols+i] = VAL__BADD;
               thisbol++;
             }
           }
@@ -525,8 +525,8 @@ void smurf_calcflat( int *status ) {
   if (dkgrp) grpDelet( &dkgrp, status );
   if (resistance) resistance = smf_free( resistance, status );
   if (pixheat) pixheat = smf_free( pixheat, status );
-  if (bolref) bolref = smf_free( bolref, status );
-  if (powref) powref = smf_free( powref, status );
+  if (bolref) smf_close_file( &bolref, status );
+  if (powref) smf_close_file( &powref, status );
 
   ndfEnd( status );
 }

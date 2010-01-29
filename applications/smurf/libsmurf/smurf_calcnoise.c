@@ -83,10 +83,12 @@
 *     2009-11-30 (TIMJ):
 *        Add quality mask so that bolometers known to be masked by
 *        bad responsivity will be masked in the noise data.
+*     2010-01-28 (TIMJ):
+*        Flatfield routines now use smfData
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2009 Science and Technology Facilities Council.
+*     Copyright (C) 2009-2010 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -336,8 +338,10 @@ void smurf_calcnoise( int *status ) {
             if (*status == SAI__OK) {
               /* use a snr of 5 since we don't mind if we get a lot of
                  bolometers that are a bit dodgy since the point is the NEP */
-              ngood = smf_flat_responsivity( respmap, 5.0, da->nflat, da->flatpar,
-                                             da->flatcal, status );
+              smfData * powval;
+              smfData * bolval;
+              smf_flat_smfData( thedata, &powval, &bolval, status );
+              ngood = smf_flat_responsivity( respmap, 5.0, powval, bolval, status);
             }
           } else {
             if (do_nep) {

@@ -848,17 +848,20 @@ void smf_flag_stationary( smfData *data, unsigned char *quality,
                           double sthresh, size_t *nflagged,
                           int *status );
 
-size_t smf_flat_responsivity ( smfData *respmap, double snrmin, size_t nheat,
-                               const double powval[], const double bolval[],
+size_t smf_flat_responsivity ( smfData *respmap, double snrmin,
+                               const smfData * powval, const smfData * bolval,
                                int *status );
+
+void smf_flat_smfData ( const smfData *data, smfData ** powval, smfData **bolval,
+                        int *status );
 
 void smf_flat_standardpow( const smfArray * heatframes, double refohms,
                            const double heatref[], const double resistance[],
-                           double powref[], double bolref[], int * status);
+                           smfData ** powref, smfData ** bolref, int * status);
 
 void smf_flat_write( const char * flatname, const smfArray * bbhtframes,
-                     const double heater[], const double powref[],
-                     const double bolref[], const Grp* prvgrp, int * status );
+                     const double heater[], const smfData * powref,
+                     const smfData * bolref, const Grp* prvgrp, int * status );
 
 void smf_flatfield ( const smfData *idata, smfData **odata, const int flags,
                      int *status );

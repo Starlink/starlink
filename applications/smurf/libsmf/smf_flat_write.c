@@ -14,8 +14,8 @@
 
 *  Invocation:
 *     void smf_flat_write( const char * flatname, const smfArray * bbhtframes,
-*                          const double heater[], const double powref[],
-*                          const double bolref[], const Grp * prvgrp,
+*                          const double heater[], const smfData * powref,
+*                          const smfData * bolref, const Grp * prvgrp,
 *                          int * status );
 
 *  Arguments:
@@ -25,10 +25,10 @@
 *        Collection of heat frames.
 *     heater = const double [] (Given)
 *        Heater settings. One for each heatframe.
-*     powref = const double [] (Given)
+*     powref = const smfData * (Given)
 *        Heater power settings in pW. Must be same number of elements
 *        as present in "heatframes".
-*     bolref = const double [] (Given)
+*     bolref = const smfData * (Given)
 *        Bolometer calibration values. Dimensioned as number of 
 *        number of bolometers times number of heat frames.
 *     prvgrp = const Grp * (Given)
@@ -66,6 +66,8 @@
 *        o Write out variance as a _DOUBLE to prevent numerical overflow
 *        o Use atlAddWcsAxis to build up output frameset. And use BOLO frame
 *          by default.
+*     2010-01-28 (TIMJ):
+*        Switch to a smfData API
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -108,8 +110,8 @@
 #include "par_par.h"
 
 void smf_flat_write( const char * flatname, const smfArray * bbhtframes,
-                     const double heater[], const double powref[],
-                     const double bolref[], const Grp * prvgrp,
+                     const double heater[], const smfData * powref,
+                     const smfData * bolref, const Grp * prvgrp,
                      int * status ) {
 
   size_t colsize;              /* number of columns */
@@ -209,8 +211,8 @@ void smf_flat_write( const char * flatname, const smfArray * bbhtframes,
   sc2store_wrtstream ( flatname, subnum, ncards,
                        fitsrec, colsize, rowsize, bbhtframes->ndat,
                        bbhtframes->ndat, 0, "TABLE", state, NULL,
-                       ibuf, dksquid, bolref, powref, "FLATCAL",
-                       mcehead, NULL, mceheadsz, jig_vert,
+                       ibuf, dksquid, (bolref->pntr)[0], (powref->pntr)[0],
+                       "FLATCAL", mcehead, NULL, mceheadsz, jig_vert,
                        nvert, jig_path, npath, xmlfile, status );
 
   sc2store_free ( status );

@@ -65,10 +65,12 @@
 *        Original version.
 *     2009-11-03 (TIMJ):
 *        Actually close the files that we open...
+*     2010-01-28 (TIMJ):
+*        Flatfield routines now use smfData
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2009 Science and Technology Facilities Council.
+*     Copyright (C) 2009-2010 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -145,6 +147,7 @@ void smurf_calcresp( int *status ) {
     /* Abort if we have no flatfield information */
     if (*status == SAI__OK && ! idata->da ) {
       msgSeti( "I", i);
+      smf_dump_smfData( idata, 0, status );
       *status = SAI__ERROR;
       errRep("", "Unable to read flatfield information from input file ^I", status);
     }
@@ -161,9 +164,12 @@ void smurf_calcresp( int *status ) {
 
     /* "bolref" and "powref" written by CALCFLAT correspond to parameters
        "flatcal" and "flatpar" in sc2store_wrtstream. */
-    ngood[i-1] = smf_flat_responsivity( respmap, snrmin, idata->da->nflat,
-                                        idata->da->flatpar, idata->da->flatcal,
-                                        status );
+    {
+      smfData * powval;
+      smfData * bolval;
+      smf_flat_smfData( idata, &powval, &bolval, status );
+      ngood[i-1] = smf_flat_responsivity( respmap, snrmin, powval, bolval, status );
+    }
 
     /* Report the number of good responsivities */
     msgSeti( "NG", ngood[i-1] );
