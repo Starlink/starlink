@@ -190,10 +190,14 @@
  *        Move TCS_TAI fix up to smf_fix_metadata
  *     2009-08-25 (MJC):
  *        Add star/irq.h include as it is no longer in star/kaplibs.h.
+ *     2010-01-28 (TIMJ):
+ *        Flatfield output files have mixed type for data and variance
+ *        so assume they are raw data for the purposes of reading the
+ *        DA extension. Also tidy up some string sizing.
  *     {enter_further_changes_here}
 
  *  Copyright:
- *     Copyright (C) 2007-2009 Science and Technology Facilities Council.
+ *     Copyright (C) 2007-2010 Science and Technology Facilities Council.
  *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
  *     Copyright (C) 2005-2008 University of British Columbia.
  *     All Rights Reserved.
@@ -255,7 +259,8 @@ static char * smf__read_ocsconfig ( int ndfid, int *status);
 void smf_open_file( const Grp * igrp, size_t index, const char * mode,
                     int flags, smfData ** data, int *status) {
 
-  char dtype[NDF__SZTYP+1];  /* String for DATA type */
+  char datatype[NDF__SZTYP+1];  /* String for DATA type */
+  char dtype[NDF__SZTYP+1];  /* String for DATA/VARIANCE type */
   int indf;                  /* NDF identified for input file */
   int lbnd[NDF__MXDIM];      /* Lower pixel bounds of NDF */
   int ubnd[NDF__MXDIM];      /* Upper pixel bounds of NDF */
@@ -337,7 +342,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
 
   /* Get filename from the group */
   pname = filename;
-  grpGet( igrp, index, 1, &pname, SMF_PATH_MAX, status);
+  grpGet( igrp, index, 1, &pname, sizeof(filename), status);
 
   /* Return the NDF identifier */
   if (*status == SAI__OK) {
@@ -357,7 +362,19 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
   ndfDim( indf, NDF__MXDIM, ndfdims, &ndims, status );
 
   /* Check type of DATA and VARIANCE arrays (they should both be the same!) */
-  ndfType( indf, "DATA,VARIANCE", dtype, NDF__SZTYP+1, status);
+  ndfType( indf, "DATA,VARIANCE", dtype, sizeof(dtype), status);
+  ndfType( indf, "DATA", datatype, sizeof(datatype), status );
+
+  /* for flatfield output files the variance can be double but the data
+     _INTEGER. Since in this case we want the flatfield information
+     we force lesser type. */
+  if (strncmp( datatype, "_INTEGER", 8) == 0 &&
+      strncmp( dtype,    "_DOUBLE", 7) == 0 ) {
+    msgOutif( MSG__DEBUG, "",
+              "Input file is mixed _INTEGER/_DOUBLE", status );
+    one_strlcpy( dtype, "_INTEGER", sizeof(dtype), status );
+  }
+
 
   /* Check dimensionality: 2D is a .In image, 3D is a time series */
   if (ndims == 2) {
@@ -366,7 +383,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
       msgOutif( MSG__DEBUG, "", 
                 "Input file is _REAL, will map as _DOUBLE for internal handling", 
                 status );
-      strncpy( dtype, "_DOUBLE", NDF__SZTYP+1 );
+      one_strlcpy( dtype, "_DOUBLE", sizeof(dtype), status );
     }
     isFlat = 1;    /* Data have been flat-fielded */
     isTseries = 0; /* Data are not in time series format */
@@ -374,7 +391,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
     /* Check if raw timeseries - _WORD, _UWORD or _INTEGER */
     /* Note that _INTEGER may or may not have been flatfielded */
     if ( (strncmp(dtype, "_WORD", 5) == 0 ) ||     /* Compressed */
-         (strncmp(dtype, "_INTEGER", 7) == 0 ) ||  /* Uncompressed */
+         (strncmp(dtype, "_INTEGER", 8) == 0 ) ||  /* Uncompressed */
          (strncmp(dtype, "_UWORD", 6) == 0 ) ) {   /* Old format */
       isFlat = 0;  /* Data have not been flatfielded */
     } else {
