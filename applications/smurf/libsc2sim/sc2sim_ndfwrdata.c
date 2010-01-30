@@ -232,11 +232,13 @@
  *        Use astSetFitsCM instead of astSetFitsCN
  *     2009-08-18 (TIMJ):
  *        Use new API for sc2store_putimage that supports provenance
+ *     2010-01-29 (AGG):
+ *        Write BASETEMP, SEQSTART and SEQEND to the FITS header for SCAN obs
 
  *  Copyright:
  *     Copyright (C) 2007-2009 Science and Technology Facilities Council.
  *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
- *     Council. Copyright (C) 2005-2008 University of British
+ *     Council. Copyright (C) 2005-2010 University of British
  *     Columbia. All Rights Reserved.
 
  *  Licence:
@@ -253,7 +255,7 @@
  *     You should have received a copy of the GNU General Public
  *     License along with this program; if not, write to the Free
  *     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
- *     MA 02111-1307, USA
+ *     MA 02111-1307, USA.
 
  *  Bugs:
  *     {note_any_bugs_here}
@@ -630,6 +632,10 @@ void sc2sim_ndfwrdata
   } else {
     astSetFitsI ( fitschan, "N_SUB", 0,
                   "Number of sub-scans written to file", 0 );
+    astSetFitsI ( fitschan, "SEQSTART", (head[0].rts_num),
+		  "RTS index number of first frame in image", 0 );
+    astSetFitsI ( fitschan, "SEQEND", (head[numsamples - 1].rts_num ),
+		  "RTS index number of last frame in image", 0 );
   }
 
   /* Write out details for FOCUS observation */
@@ -674,6 +680,9 @@ void sc2sim_ndfwrdata
 
   astSetFitsF ( fitschan, "MEANWVM", meanwvm,
                 "Mean zenith tau at 225 GHz from WVM", 0 );
+
+  astSetFitsF ( fitschan, "BASETEMP", 0.1,
+                "[K] Base temperature", 0 );
 
   /* Convert the AstFitsChan data to a char array */
   smf_fits_export2DA ( fitschan, &nrec, fitsrec, status );
