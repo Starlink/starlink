@@ -1,0 +1,326 @@
+#!/bin/tcsh -x
+
+#  Check a list of observations has been supplied on the command line.
+if( $# < 1 ) then
+   echo 
+   echo "Create Bolometer Amplitude and Sum images"
+   echo 
+   echo "Usage: cbas <inlist> [-p]"
+   echo
+   echo "   <inlist> is a text file in which each line contains the path"
+   echo "   to a directory holding the raw time series cubes for a single"
+   echo "   planet observation."
+   echo
+   echo "A pair of images is created for each observation, one (with "
+   echo "prefix '_amp') contains the peak amplitude of the fitted"
+   echo "source in each bolometer map, and the other (with prefix '_sum')"
+   echo "the total data sum in the source in each bolometer map. By default," 
+   echo "this total data sum is the sum of the pixel values in a 60 arc-sec"
+   echo "circular aperture (bad pixels are replaced using kappa:fillbad prior"
+   echo "to finding the sum), but if the -p option is supplied it will be the" 
+   echo "integral of the model star profile found by the kappa:psf command."
+   echo
+   exit
+endif
+
+#  Ensure ADAM tasks fail rather than prompt for parameter values
+setenv ADAM_NOPROMPT 1
+   
+#  Expand the supplied list of directories into absolute paths and check
+#  they exist.
+set dir_list = " "
+foreach dir (`cat $1`)
+   set indir = `readlink -f $dir`
+   if( ! -d "$indir" ) then
+      echo " "
+      echo ">>>>  Cannot find directory $indir \!\!\!\!\!"
+      echo " "
+      exit
+   endif
+   set dir_list = "$dir_list $indir"
+end
+
+#  If we are creating images of peak value and total sum, see if the total 
+#  sum should be the sum of the values in a 60 arc-sec aperture, or the 
+#  integral of the model psf.
+set sum_method = APERADD
+if( $# > 1 ) then
+   if( "$2" == "-p" ) then
+      set sum_method = PSF
+   else   
+      echo "Unknown second command line argument - $2"
+      exit
+   endif
+endif
+
+#  Create a temporary directory to hold all the intermediate files, and
+#  move into it.
+rm -rf cbas-tmp >& /dev/null
+mkdir cbas-tmp
+cd cbas-tmp
+
+#  Create a temporary ADAM directory within the above directory.
+mkdir adam
+setenv ADAM_USER $PWD/adam 
+
+#  Loop round each observation.
+set idir = 0
+foreach indir ($dir_list)
+
+#  Create a new directory in which to process this observation, and move
+#  into it.
+   @ idir = $idir + 1
+   set pdir = "obs$idir"
+   mkdir $pdir
+   cd $pdir
+
+#  Ensure NDG does not try to fork processes to expand shell meta-characters 
+#  for output NDFs ("fork" can fail when creating the bolomaps due to lack 
+#  of memory on big data sets).
+   setenv NDG_NOSHELL 1
+   
+#  Tell the user what's happening
+   echo "-----------------------------------------------"
+   echo "Processing directory $indir ....."
+   echo " "
+
+#  Use the iterative mapmaker to create map for each individual bolometers.
+   $SMURF_DIR/makemap "$indir/*" method=iter out=junk system=AZEL \
+             alignsys=t config="'^$SMURF_DIR/../../share/smurf/dimmconfig_distortionmap.lis,bolomap=1'" | tee makemap.log
+
+#  Get the subarray name, and its corresponding integer index. 
+   set subarray = `$KAPPA_DIR/fitsmod junk edit=print keyword=SUBARRAY`
+   if( $subarray == "s8a" ) then
+      set array = 0
+   else if( $subarray == "s8b" ) then
+      set array = 1
+   else if( $subarray == "s8c" ) then
+      set array = 2
+   else if( $subarray == "s8d" ) then
+      set array = 3
+   else if( $subarray == "s4a" ) then
+      set array = 4
+   else if( $subarray == "s4b" ) then
+      set array = 5
+   else if( $subarray == "s4c" ) then
+      set array = 6
+   else if( $subarray == "s4d" ) then
+      set array = 7
+   else 
+      echo "Unknown subarray - $subarray"
+      exit
+   endif
+
+#  Get the date and the observation number.
+   set date = `$KAPPA_DIR/fitsmod junk edit=print keyword=UTDATE`
+   set obsnum = `$KAPPA_DIR/fitsmod junk edit=print keyword=OBSNUM`
+
+#  Set the names for the final returned amp and sum NDFs (including all chunks).
+   set amp_ndf = "../../$subarray$date-$obsnum-amp"
+   set sum_ndf = "../../$subarray$date-$obsnum-sum"
+
+#  See if the data has been flat-fielded (as implied by the map units being "pW"). If not, 
+#  the source features will be negative in the bolomaps.
+   $KAPPA_DIR/ndftrace junk quiet
+   set units = `$KAPPA_DIR/parget UNITS ndftrace`
+   if( "$units" == "pW" ) then
+      set negative = 0;
+   else 
+      set negative = 1;
+   endif
+
+#  See if the bolomaps have a chunk number in the NDF name or not. If so, get 
+#  the highest chunk number (only check up to 5 chunks).
+   grep "Writing single bolo map" makemap.log | grep CH05 > /dev/null
+   if( $status == 0 ) then
+      set top_chunk = 5
+   else
+      grep "Writing single bolo map" makemap.log | grep CH04 > /dev/null
+      if( $status == 0 ) then
+         set top_chunk = 4
+      else
+         grep "Writing single bolo map" makemap.log | grep CH03 > /dev/null
+         if( $status == 0 ) then
+            set top_chunk = 3
+         else
+            grep "Writing single bolo map" makemap.log | grep CH02 > /dev/null
+            if( $status == 0 ) then
+               set top_chunk = 2
+            else
+               grep "Writing single bolo map" makemap.log | grep CH01 > /dev/null
+               if( $status == 0 ) then
+                  set top_chunk = 1
+               else
+                  set top_chunk = 0
+               endif
+            endif
+         endif
+      endif
+   endif
+      
+#  Loop round all chunks (if any)
+   set ich = -1
+   while( $ich < $top_chunk ) 
+      @ ich = $ich + 1
+
+#  Create an image to receive the peak source values for every bolometer in 
+#  the current observation and chunk, and another to receive the total data 
+#  sum. Fill them with bad values. These NDFs initially have a pixel origin 
+#  of (1,1) so that pixel and grid indices are equal.
+      set camp_ndf = "../../$subarray$date-$obsnum-ch$ich-amp"
+      set csum_ndf = "../../$subarray$date-$obsnum-ch$ich-sum"
+      $KAPPA_DIR/maths exp="0*xa*xb+<bad>" lbound=\[1,1\] ubound=\[32,40\] \
+                       type=_double out=$camp_ndf
+      cp $camp_ndf.sdf $csum_ndf.sdf
+
+#  Loop round all GRID X columns (1 to 32)
+      set ix = 0
+      while( $ix < 32 ) 
+         @ ix = $ix + 1
+      
+#  Loop round all GRID Y rows (1 to 40).
+         set iy = 0
+         while( $iy < 40 ) 
+            @ iy = $iy + 1
+
+#  Construct the name of the bolometer map.
+            if( $top_chunk > 0 ) then
+               set bolo_name = "CH0${ich}"
+            else
+               set bolo_name = ""
+            endif
+      
+            if( $ix < 10 ) then
+               set bolo_name = "${bolo_name}C0${ix}"
+            else
+               set bolo_name = "${bolo_name}C${ix}"
+            endif
+      
+            if( $iy < 10 ) then
+               set bolo_name = "${bolo_name}R0${iy}"
+            else
+               set bolo_name = "${bolo_name}R${iy}"
+            endif
+         
+#  Skip if the bolomap was not created by makemap.
+            grep -i $bolo_name makemap.log > /dev/null
+            if( $status == 1 ) then
+               echo "Skipping bolomap $bolo_name"
+            else
+               echo "Doing bolomap $bolo_name"
+         
+#  Get the full path to the bolomap NDF.
+               set ndf = "junk.more.smurf.bolomaps.$bolo_name"
+         
+#  From here on, use pixel coords to refer to positions within the bolomap,
+#  increasing the format precision from the one decimal place provided by 
+#  the NDF library. NDF does not allow us to change the Format attributes for 
+#  the PIXEL Frame directly, so take a copy of the PIXEL Frame first, and set 
+#  the Format attributes of the copy.
+               $KAPPA_DIR/wcsadd $ndf frame=pixel domain=newpix maptype=unit accept 
+               $KAPPA_DIR/wcsattrib $ndf set 'format(1)' "%5.3f"
+               $KAPPA_DIR/wcsattrib $ndf set 'format(2)' "%5.3f"
+         
+#  If source features are negative in the bolomap, negate the bolomap so that they become positive. 
+               if( $negative == 1 ) then
+                  $KAPPA_DIR/cmult $ndf -1 pos
+                  set ndf = "pos"
+               endif
+                   
+#  Find the pixel coords at the centre of the feature. The feature is 
+#  nominally at the reference point and so should, in the absence of errors 
+#  and incorrect polymaps, have pixel coords (0.5,0.5). PSF fails unless a good 
+#  central position is supplied, so first find the peak value in a box centred 
+#  on (0,0)
+               $KAPPA_DIR/stats $ndf'(0~20,0~20)' quiet
+               set maxco = `$KAPPA_DIR/parget maxcoord stats`
+               rm -f coin > /dev/null
+               echo $maxco > coin
+               $KAPPA_DIR/psf $ndf incat=! cofile=coin isize=31 norm=f device=! | grep \!\! >& /dev/null
+         
+#  Check a psf was found succesfully.
+               if( $status == 1 ) then
+
+#  Get the parameters of the psf.
+                  set amp = `$KAPPA_DIR/parget amp1 psf`
+                  set posxy = `$KAPPA_DIR/parget centre psf`
+
+#  Get the total data sum. Two methods - 1) aperture photometry...
+                  if( $sum_method == APERADD ) then
+
+#  Choose the aperture size in pixels (60 arc-secs assuming default makemap pixel sizes of 2 
+#  and 4 arc-seconds).. 
+                     if( $array > 3 ) then
+                        set diam = 30
+                     else
+                        set diam = 15
+                     endif
+
+#  Replace any bad pixels within a box centred on the max pixel with sides twice 
+#  the above diameter.
+                     @ size = $diam + $diam
+                     $KAPPA_DIR/fillbad in=$ndf\($maxco[1]~$size,$maxco[2]~$size\) size=2 out=filled | grep \!\! >& /dev/null
+         
+#  Do the aperture photometry within the filled image. Check some bad pixels 
+#  were filled. If not, use $ndf instead of "filled".
+                     if( $status == 1 ) then
+                        $KAPPA_DIR/aperadd filled centre="'$posxy'" diam=$diam
+                     else
+                        $KAPPA_DIR/aperadd $ndf centre="'$posxy'" diam=$diam
+                     endif
+                     set fsum = `$KAPPA_DIR/parget total aperadd`
+         
+#  Alternatively - 2) use the integral of the model PSF as the souce total data sum.
+                  else
+                     set fsum = `$KAPPA_DIR/parget total psf`
+                  endif
+
+#  Poke the sum and amplitude values into the returned NDFs for this chunk.
+                  $KAPPA_DIR/chpix in=$camp_ndf out=tmp section=\"$ix,$iy\" \
+                                   newval=$amp
+                  mv -f tmp.sdf $camp_ndf.sdf
+                  $KAPPA_DIR/chpix in=$csum_ndf out=tmp section=\"$ix,$iy\" \
+                                   newval=$fsum
+		  mv -f tmp.sdf $csum_ndf.sdf
+
+               else
+                  echo "  psf failure"
+               endif
+            endif
+      
+         end
+      end
+
+#  Set the pixel origin to (0,0) 
+      $KAPPA_DIR/setorigin $csum_ndf origin=\[0,0\]
+      $KAPPA_DIR/setorigin $camp_ndf origin=\[0,0\]
+
+# If we have just done the first chunk, use copies of the chunk amp and sum 
+# images to initialise the cumulative amp and sum images for all chunks.
+      if( $ich == 0 ) then
+         if( $top_chunk == 0 ) then
+            mv -f $csum_ndf.sdf $sum_ndf.sdf
+            mv -f $camp_ndf.sdf $amp_ndf.sdf
+         else
+            cp -f $csum_ndf.sdf $sum_ndf.sdf
+            cp -f $camp_ndf.sdf $amp_ndf.sdf
+         endif
+
+# If the chunk we have just done is not the first chunk, add them onto the 
+# cumulative amp and sum images for all chunks.
+      else
+         $KAPPA_DIR/add $sum_ndf $csum_ndf tmp
+         mv -f tmp.sdf $sum_ndf.sdf
+         $KAPPA_DIR/add $amp_ndf $camp_ndf tmp
+         mv -f tmp.sdf $amp_ndf.sdf
+      endif
+   end 
+
+#  Move back to the main working directory
+   cd ..
+
+end
+
+
+
+

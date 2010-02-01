@@ -2932,6 +2932,10 @@ package @PACKAGE@ {
         obey {starperl $SMURF_DIR/gettsys}
     }
 
+    command cbas {
+        obey {$SMURF_DIR/cbas}
+    }
+
     command distortion {
         obey {$SMURF_DIR/distortion}
     }
