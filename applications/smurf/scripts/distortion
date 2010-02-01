@@ -68,8 +68,8 @@ endif
 #  If we are creating images of peak value and total sum, see if the total 
 #  sum should be the sum of the values in a 60 arc-sec aperture, or the 
 #  integral of the model psf.
+set sum_method = APERADD
 if( $make_extra ) then
-   set sum_method = APERADD
    if( $# > 2 ) then
       if( "$3" == "-p" ) then
          set sum_method = PSF
