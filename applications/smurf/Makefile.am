@@ -112,7 +112,8 @@ DYNSCRIPTS = smurf.sh smurf.csh smurf.icl
 
 # Install without modification
 STATICSCRIPTS = scripts/jcmtstate2cat scripts/dumpocscfg scripts/gettsys \
-scripts/distortion scripts/showdistortion scripts/tobeam scripts/print_index
+scripts/distortion scripts/showdistortion scripts/tobeam scripts/print_index \
+scripts/cbas
 
 # IFL files
 IFL_FILES = $(smurf_mon_TASKS:=.ifl) smurf_mon.ifl
