@@ -105,6 +105,11 @@
 *        -  the NDF array as selected by COMP is written to the text
 *        file in records following an optional header.  When FIXED is
 *        FALSE all records are padded out to the recordlength.
+*        -  The NDF array elements are written in Fortran order, i.e.
+*        the first dimension varies fastest, followed by the second 
+*        dimension and so on.  For example, a 2x2x2-element cube's
+*        indices will appear in the order (1,1,1), (2,1,1), (1,2,1), 
+*        (2,2,1), (1,1,2), (2,1,2), (1,2,2), (2,2,2).
 *        -  HISTORY is not propagated.
 *        -  ORIGIN information is lost.
 *

@@ -23,7 +23,7 @@
                                 A.J.Chipperfield\\
                                 D.S.Berry\\
                                 A.C.Davenhall}
-\newcommand{\stardocdate}      {2010 January 13}
+\newcommand{\stardocdate}      {2010 February 2}
 \newcommand{\stardoctitle}     {CONVERT\\
                                 A Format-conversion Package}
 \newcommand{\stardocversion}   {Version 1.5-19}
@@ -3899,6 +3899,13 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
             the NDF array as selected by COMP is written to the ASCII
             file in records following an optional header.  When FIXED is
             \texttt{FALSE} all records are padded out to the recordlength.
+
+         \sstitem
+            The NDF array elements are written in Fortran order, \emph{i.e.}
+            the first dimension varies fastest, followed by the second 
+            dimension and so on.  For example, a 2x2x2-element cube's
+            indices will appear in the order (1,1,1), (2,1,1), (1,2,1), 
+            (2,2,1), (1,1,2), (2,1,2), (1,2,2), (2,2,2).
 
          \sstitem
             HISTORY is not propagated.
