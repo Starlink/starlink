@@ -22,8 +22,8 @@
 
 #  Notes:
 #     This interface requires that the extensions [incr Tcl], BLT and
-#     TclADAM are available (built into the wish executable that 
-#     invokes this file).  
+#     TclADAM are available (built into the wish executable that
+#     invokes this file).
 
 #  Copyright:
 #     Copyright (C) 1995, 2000, 2003 Central Laboratory of the Research
@@ -109,7 +109,7 @@
 #  Set the help browser. This is either set by the HTX_BROWSER variable,
 #  or by checking that a known one exists on the PATH. This will
 #  be overidden by a ~/.ccdpack assignment.
-   if { [info exists env(HTX_BROWSER)] } { 
+   if { [info exists env(HTX_BROWSER)] } {
       set CCDbrowser $env(HTX_BROWSER)
    } else {
       set CCDbrowser {}
@@ -126,19 +126,14 @@
 
 #  Check that we have an input file (and it exists).
    set file [lindex $argv 0]
-   if { $file == "" } { 
+   if { $file == "" } {
       CCDIssueError "No input file given"
       exit 1
    }
-   if { ! [file readable $file] } { 
+   if { ! [file readable $file] } {
       CCDIssueError "Cannot read file \"$file\""
       exit 1
    }
-
-#  Open a pipe to tail -f to monitor the file (do this now so that 
-#  we can close pipe cleanly).
-   set pipe [open "|tail +0f $file"]
-   set pipeproc [pid $pipe]
 
 #------------------------------------------------------------------------------
 #  Widget creation.
@@ -171,26 +166,15 @@
 
 #  Override trap of destruction by window manager of top-level, making
 #  sure that . is destroyed too.
-   wm protocol $top WM_DELETE_WINDOW \
-      "catch {exec kill $pipeproc}
-       catch {close $pipe}
-       CCDExit
-      "
+   wm protocol $top WM_DELETE_WINDOW CCDExit
 
 #  Add file item to exit.
    $Menubar addbutton File 0
-   $Menubar addcommand File Exit \
-      "catch {exec kill $pipeproc}
-       catch {close $pipe}
-       CCDExit
-      "
+   $Menubar addcommand File Exit CCDExit
 
 #  Button to exit from application.
-   $Control addbutton Exit \
-      "catch {exec kill $pipeproc}
-       catch {close $pipe}
-       CCDExit
-      "
+   $Control addbutton Exit CCDExit
+
 #------------------------------------------------------------------------------
 #  Add help.
 #------------------------------------------------------------------------------
@@ -208,15 +192,26 @@
 #------------------------------------------------------------------------------
 #  Interface activation.
 #------------------------------------------------------------------------------
-#  Simple procedure to up date the contents
+#  Simple procedure to continually update the contents with new content
+#  from the given file identifier "pipe".
    proc CCDReadLogFile { w pipe file } {
-      gets $pipe line
-      $w insert end "$line \n"
-      update idletasks
+      if { [gets $pipe line] >= 0 } {
+         $w insert end "$line \n"
+         update idletasks
+      }
+      after 1000 CCDReadLogFile $w $pipe $file
    }
 
-#  Set the fileevent handler.
+#  Wait for UI to realise.
    tkwait visibility $top
-   fileevent $pipe readable [list CCDReadLogFile $Contents $pipe $file]
-   
+
+#  Open the file to monitor.
+   set pipe [::open $file]
+
+#  Display current file contents.
+   $Contents insert end [::read $pipe]
+
+#  Start the update display.
+   CCDReadLogFile $Contents $pipe $file
+
 # $Id$
