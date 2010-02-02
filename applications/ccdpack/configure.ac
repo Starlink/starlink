@@ -18,7 +18,7 @@ STAR_MESSGEN(user_err.msg)
 TCL_VERSION=8.5
 ITCL_VERSION=3.4
 IWIDGETS_VERSION=4.0.1
-BLT_VERSION=24
+BLT_VERSION=30
 
 AC_PATH_XTRA
 
@@ -49,7 +49,7 @@ if test "${TCL_PREFIX}" != ""; then
    my_save_LIBS="$LIBS"
    LIBS="$LIBS $X_LIBS $X_EXTRA_LIBS $X_PRE_LIBS -lX11"
    AC_CHECK_LIB(itcl$ITCL_VERSION,Itcl_Init,,[unset have_itcl],[$TCL_LIBS])
-   AC_CHECK_LIB(itk$ITCL_VERSION,Itk_Init,,[unset have_itcl],[-litcl$ITCL_VERSION -litclstub3.3 $TK_LIBS $TCL_LIBS])
+   AC_CHECK_LIB(itk$ITCL_VERSION,Itk_Init,,[unset have_itcl],[-litcl$ITCL_VERSION -litclstub$ITCL_VERSION $TK_LIBS $TCL_LIBS])
    AC_MSG_CHECKING([whether to use incr tcl])
    if test -n "$have_itcl"; then
       AC_MSG_RESULT(yes)
@@ -64,12 +64,12 @@ if test "${TCL_PREFIX}" != ""; then
    have_blt=1
    my_save_LIBS="$LIBS"
    LIBS="$LIBS $X_LIBS $X_EXTRA_LIBS $X_PRE_LIBS -lX11"
-   AC_CHECK_LIB(BLT$BLT_VERSION,Blt_Init,,[unset have_blt],[-lBLT$BLT_VERSION $TK_LIBS $TCL_LIBS])
+   AC_CHECK_LIB(BLTX$BLT_VERSION,Blt_Init,,[unset have_blt],[-lBLTX$BLT_VERSION -lBLTCore$BLT_VERSION $TK_LIBS $TCL_LIBS])
    AC_MSG_CHECKING([whether to use BLT])
    if test -n "$have_blt"; then
       AC_MSG_RESULT(yes)
       AC_DEFINE(HAVE_BLT, 1, [Is BLT present?])
-      BLT_LIBS="-lBLT$BLT_VERSION"
+      BLT_LIBS="-lBLTX$BLT_VERSION -lBLTCore$BLT_VERSION"
       AC_SUBST(BLT_LIBS)
    else
       AC_MSG_RESULT(no)
