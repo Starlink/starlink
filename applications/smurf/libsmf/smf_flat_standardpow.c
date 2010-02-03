@@ -62,6 +62,8 @@
 *        Throw out any bolometers that have any bad values in their darks.
 *     2010-01-28 (TIMJ):
 *        Switch to a smfData API
+*     2010-02-03 (TIMJ):
+*        Propagate variance
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -103,9 +105,11 @@ smf_flat_standardpow( const smfArray * heatframes, double refohms,
 
   double current;         /* current through heaters */
   double **heatframe = NULL; /* Pointers to nheat heatframes */
+  double **heatframevar = NULL; /* Pointers to nheat heatframes variance */
   size_t i;               /* loop counter */
   size_t j;               /* loop counter */
   size_t k;               /* loop counter */
+  int lbnd[3];            /* lower pixel bounds */
   size_t nheat;           /* Number of input frames */
   size_t numbol;          /* Number of bolometers */
   double *powbol = NULL;  /* pointer to individual bolometer powers */
@@ -146,8 +150,12 @@ smf_flat_standardpow( const smfArray * heatframes, double refohms,
   dims[0] = (heatframes->sdata)[0]->dims[0];
   dims[1] = (heatframes->sdata)[0]->dims[1];
   dims[2] = nheat;
+  lbnd[0] = (heatframes->sdata)[0]->lbnd[0];
+  lbnd[1] = (heatframes->sdata)[0]->lbnd[1];
+  lbnd[2] = 1;
+
   *bolrefd = smf_construct_smfData( NULL, NULL, NULL, NULL, SMF__DOUBLE,
-                                    pntr, 1, dims, NULL, 3, 0, 0, NULL,
+                                    pntr, 1, dims, lbnd, 3, 0, 0, NULL,
                                     NULL, status );
 
   /* Get some memory -
@@ -156,6 +164,7 @@ smf_flat_standardpow( const smfArray * heatframes, double refohms,
 
   /* pointers to the data array associated with each input frame */
   heatframe = smf_malloc( nheat, sizeof(*heatframe), 0, status );
+  heatframevar = smf_malloc( nheat, sizeof(*heatframevar), 0, status );
 
   /* Choose the reference heater powers to be the actual heater settings acting on
      the adopted reference resistance.  */
@@ -170,6 +179,7 @@ smf_flat_standardpow( const smfArray * heatframes, double refohms,
     smfData * fr = (heatframes->sdata)[j];
     if (!smf_dtype_check_fatal( fr, NULL, SMF__DOUBLE, status )) break;
     heatframe[j] = (fr->pntr)[0];
+    heatframevar[j] = (fr->pntr)[1];
   }
 
   if (*status != SAI__OK) goto CLEANUP;
@@ -217,30 +227,68 @@ smf_flat_standardpow( const smfArray * heatframes, double refohms,
           if ( powbol[0] == VAL__BADD )
             {
               bolref[j*numbol+i] = VAL__BADD;
+              bolrefvar[j*numbol+i] = VAL__BADD;
             }
           else
             {
               if ( powref[j] < powbol[0] )
                 {
+                  double var = VAL__BADD;
 
                   /* Standard point is below actual measured range for this bolometer,
                      extrapolate */
 
                   s = ( heatframe[1][i] - heatframe[0][i] ) /
                     ( powbol[1] - powbol[0] );
+
+                  /* calculate error in gradient using standard rules */
+                  if (heatframevar[1] && heatframevar[1][i] != VAL__BADD &&
+                      heatframevar[0] && heatframevar[0][i] != VAL__BADD) {
+                    var = ( heatframevar[1][i] + heatframevar[0][i] )
+                      / pow( powbol[1] - powbol[0], 2 );
+                  }
+
                   bolref[j*numbol+i] = heatframe[0][i] +
                     s * ( powref[j] - powbol[0] );
+
+                  if (var != VAL__BADD) {
+                    bolrefvar[j*numbol+i] = heatframevar[0][i] +
+                      ( var * pow( powref[j] - powbol[0], 2 ));
+                    printf("Setting extrapolate 1 variance to %f\n", bolrefvar[j*numbol+i]);
+                  } else {
+                    bolrefvar[j*numbol+i] = VAL__BADD;
+                  }
+
+
                 }
               else if ( powref[j] > powbol[nheat-1] )
                 {
+                  double var = VAL__BADD;
 
                   /* Standard point is above actual measured range for this bolometer,
                      extrapolate */
 
                   s = ( heatframe[nheat-1][i] - heatframe[nheat-2][i] ) /
                     ( powbol[nheat-1] - powbol[nheat-2] );
+
+                  /* calculate error in gradient using standard rules */
+                  if (heatframevar[nheat-1] && heatframevar[nheat-1][i] != VAL__BADD &&
+                      heatframevar[nheat-2] && heatframevar[nheat-2][i] != VAL__BADD) {
+                    var = ( heatframevar[nheat-1][i] + heatframevar[nheat-2][i] )
+                      / pow( powbol[nheat-1] - powbol[nheat-2], 2 );
+                  }
+
                   bolref[j*numbol+i] = heatframe[nheat-2][i] +
                     s * ( powref[j] - powbol[nheat-2] );
+
+                  if (var != VAL__BADD) {
+                    bolrefvar[j*numbol+i] = heatframevar[nheat-2][i] +
+                      ( var * pow( powref[j] - powbol[nheat-2], 2 ));
+                    printf("Setting extrapolate 2 variance to %f\n", bolrefvar[j*numbol+i]);
+                  } else {
+                    bolrefvar[j*numbol+i] = VAL__BADD;
+                  }
+
                 }
               else
                 {
@@ -252,11 +300,26 @@ smf_flat_standardpow( const smfArray * heatframes, double refohms,
                     {
                       if ( powref[j] <= powbol[k] )
                         {
+                          double var = VAL__BADD;
                           s = ( heatframe[k][i] -
                                 heatframe[k-1][i] ) /
                             ( powbol[k] - powbol[k-1] );
+
+                          /* calculate error in gradient using standard rules */
+                          if (heatframevar[k] && heatframevar[k][i] != VAL__BADD &&
+                              heatframevar[k-1] && heatframevar[k-1][i] != VAL__BADD) {
+                            var = ( heatframevar[k][i] + heatframevar[k-1][i] )
+                              / pow( powbol[k] - powbol[k-1], 2 );
+                          }
                           bolref[j*numbol+i] = heatframe[k-1][i] +
                             s * ( powref[j] - powbol[k-1] );
+
+                          if (var != VAL__BADD) {
+                            bolrefvar[j*numbol+i] = heatframevar[k-1][i] +
+                              ( var * pow( powref[j] - powbol[k-1], 2 ));
+                          } else {
+                            bolrefvar[j*numbol+i] = VAL__BADD;
+                          }
 
                           break;
                         }
@@ -271,6 +334,7 @@ smf_flat_standardpow( const smfArray * heatframes, double refohms,
  CLEANUP:
   if (powbol) powbol = smf_free ( powbol, status );
   if (heatframe) heatframe = smf_free( heatframe, status );
+  if (heatframevar) heatframevar = smf_free( heatframevar, status );
 
   if (*status != SAI__OK) {
     if (*bolrefd) smf_close_file( bolrefd, status );
