@@ -83,6 +83,8 @@
 *        memcpy.
 *     2010-01-26 (EC):
 *        Write out dark squids
+*     2010-01-29 (TIMJ):
+*        Fix writing of 3d variance for 3d data
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -238,6 +240,10 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
 
     } else {
       var = (data->pntr)[1];
+      vntslice = ntslice;
+      vnbolo = nbolo;
+      vbstride = dbstride;
+      vtstride = dtstride;
     }
 
     if( var ) flags |= SMF__MAP_VAR;
