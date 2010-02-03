@@ -13,9 +13,9 @@
 *     Subroutine
 
 *  Invocation:
-*     size_t smf_flat_responsivity ( smfData *respmap, double snrmin,
+*     size_t smf_flat_responsivity ( smfData *respmap, double snrmin, size_t order,
 *                                    const smfData * powval, const smfData * bolval,
-*                                    int *status );
+*                                    smfData ** polyfit, int *status );
 
 *  Arguments:
 *     respmap = smfData * (Given & Returned)
@@ -25,12 +25,19 @@
 *        Minimum acceptable signal-to-noise ratio for a responsivity fit.
 *        Below this value the fit will be treated as bad and the bolometer
 *        will be disabled.
+*     order = size_t (Given)
+*        If the data are being fitted this is the order of polynomial
+*        to use.
 *     powval = const smfData * (Given)
 *        Resistance input powers. Is the number of heater measurements.
 *     bolval = const smfData * (Given)
 *        Response of each bolometer to powval. Dimensioned as number of
 *        number of bolometers (size of respmap) times number of heater
 *        measurements (size of powval).
+*     poly = smfData ** (Returned)
+*        If a polynomial is being fitted this is the polynomial expansion
+*        for each powval coordinate for direct comparison with "bolval".
+*        Can be NULL.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -74,6 +81,10 @@
 *        Add SNR argument.
 *     2010-01-28 (TIMJ):
 *        Switch to a smfData API
+*     2010-01-29 (TIMJ):
+*        Use shared 1d polynomial fitting routine.
+*     2010-02-02 (TIMJ):
+*        Add poly smfData and support cubic fits.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -111,25 +122,32 @@
 
 #include "gsl/gsl_fit.h"
 
-size_t smf_flat_responsivity ( smfData *respmap, double snrmin,
+size_t smf_flat_responsivity ( smfData *respmap, double snrmin, size_t order,
                                const smfData * powvald, const smfData * bolvald,
-                               int *status ) {
+                               smfData ** polyfit, int *status ) {
 
   size_t bol;                  /* Bolometer offset into array */
   double * bolv = NULL;        /* Temp space for bol values */
+  double * bolvv = NULL;       /* Temp space for bol variance values */
+  double * coeffs = NULL;      /* Polynomial coefficients of 1d fit */
+  size_t * goodidx = NULL;     /* Indices of good heater values */
   size_t k;                    /* loop counter */
   size_t nbol;                 /* number of bolometers */
   size_t nheat;                /* number of heater measurements */
   size_t ngood = 0;            /* number of valid responsivities */
   int nrgood;                  /* number of good responsivities for bolo */
+  double *poly = NULL;         /* polynomial expansion of each fit */
+  double *polybol = NULL;      /* polynomial expansion for all bolometers */
   double *powv = NULL;         /* Temp space for power values */
   double *respdata = NULL;     /* responsivity data */
-  double *resps = NULL;        /* responsivities for a bolometer at each step */
   double *respvar = NULL;      /* responsivity variance */
+  double * varcoeffs = NULL;   /* variance in polynomial coefficients of 1d fit */
 
   double * powval = NULL;      /* pointer to data in smfData */
   double * bolval = NULL;      /* pointer to data in smfData */
   double * bolvalvar = NULL;   /* pointer to variance in smfData bolvald */
+
+  const int usevar = 1;
 
   if (*status != SAI__OK) return ngood;
 
@@ -147,14 +165,30 @@ size_t smf_flat_responsivity ( smfData *respmap, double snrmin,
 
   nheat = (powvald->dims)[0];
 
-  /* Responsivities */
-  resps = smf_malloc( nheat, sizeof(*resps), 0, status );
-
   /* Space for fit data */
   bolv = smf_malloc( nheat, sizeof(*bolv), 0, status );
+  if (usevar && bolvalvar) bolvv = smf_malloc( nheat, sizeof(*bolvv), 0, status );
   powv = smf_malloc( nheat, sizeof(*powv), 0, status );
 
   nbol = (respmap->dims)[0] * (respmap->dims)[1];
+
+  /* Polynomial expansion */
+  if (polyfit) polybol = smf_malloc( nheat*nbol, sizeof(*polybol), 0, status );
+  poly = smf_malloc( nheat, sizeof(*poly), 0, status );
+
+  /* prefil polynomial with bad */
+  if (polybol) {
+    for (k=0; k < nheat*nbol; k++) {
+      polybol[k] = VAL__BADD;
+    }
+  }
+
+  /* some memory for good indices */
+  goodidx = smf_malloc( nheat, sizeof(*goodidx), 1, status );
+
+  /* coefficients */
+  coeffs = smf_malloc( order+1, sizeof(*coeffs), 1, status );
+  varcoeffs = smf_malloc( order+1, sizeof(*varcoeffs), 1, status );
 
   /* dim1 must change slower than dim0 */
   for (bol=0; bol < nbol; bol++) {
@@ -164,48 +198,96 @@ size_t smf_flat_responsivity ( smfData *respmap, double snrmin,
     for (k = 0; k < nheat; k++) {
       if ( bolval[k*nbol+bol] != VAL__BADD &&
            powval[k] != VAL__BADD) {
-        bolv[k] = RAW2CURRENT * bolval[k*nbol+bol];
-        powv[k] = powval[k];
+        bolv[nrgood] = RAW2CURRENT * bolval[k*nbol+bol];
+        powv[nrgood] = powval[k];
+        if (bolvv) {
+          if  (bolvalvar[k*nbol+bol] != VAL__BADD) {
+            bolvv[nrgood] = bolvalvar[k*nbol+bol] * pow(RAW2CURRENT,2);
+          } else {
+            bolvv[nrgood] = VAL__BADD;
+          }
+        }
+        goodidx[nrgood] = k;
         nrgood++;
       }
     }
 
     if (nrgood > 3) {
-      double c0, c1, cov00, cov01, cov11, sumsq;
+      double resp = 0.0;
+      double varresp = 0.0;
       double snr;
 
-      /* we have not propagated variance from standardpow so we can not
-         weight the fit */
-      gsl_fit_linear( powv, 1, bolv, 1, nrgood, &c0, &c1, &cov00, &cov01,
-                      &cov11, &sumsq);
+      /* Now fit a polynomial */
+      smf_fit_poly1d( order, nrgood, powv, bolv, bolvv, coeffs, varcoeffs, poly, status );
+
+      /* we take the responsivity to be the gradient at the middle heater setting */
+      for (k=1; k<order+1; k++) {
+        /* standard differential of a polynomial */
+        double xterm = k * pow( powval[nheat/2], k-1 );
+        resp += coeffs[k] * xterm;
+        varresp += pow(xterm, 2) * varcoeffs[k];
+      }
 
       /* Wayne wants a positive responsivity. Dennis wants it to be
          properly negative. */
-      c1 = fabs( c1 );
+      resp = fabs( resp );
 
       /* Calculate the signal to noise ratio */
-      snr = c1 / sqrt( cov11 );
+      snr = resp / sqrt( varresp );
 
       /* Nominal responsivity is -1.0e6 but we allow a bigger range
          through */
-      if ( fabs(c1) > 5.0e6 || fabs(c1) < 0.1e6 || snr < snrmin ) {
+      if ( fabs(resp) > 5.0e6 || fabs(resp) < 0.1e6 || snr < snrmin ) {
         respdata[bol] = VAL__BADD;
         respvar[bol] = VAL__BADD;
       } else {
-        respdata[bol] = c1;
-        respvar[bol] = cov11;
+        respdata[bol] = resp;
+        respvar[bol] = varresp;
         ngood++;
+      }
+
+      /* copy out the polynomial expansion */
+      if (polybol) {
+        for (k=0; k<nrgood; k++) {
+          size_t idx = goodidx[k];
+          polybol[k*nbol+bol] = poly[idx] / (RAW2CURRENT);
+        }
       }
 
     } else {
       respdata[bol] = VAL__BADD;
       respvar[bol] = VAL__BADD;
+
+      if (polybol) {
+        for (k=0; k<nheat; k++) {
+          polybol[k*nbol+bol] = VAL__BADD;
+        }
+      }
+
     }
 
   }
 
-  if (resps) smf_free( resps, status );
+  if (polybol) {
+    if (polyfit) {
+      void *pntr[3];
+      pntr[0] = polybol;
+      pntr[1] = NULL;
+      pntr[2] = NULL;
+      *polyfit = smf_construct_smfData( NULL, NULL, NULL, NULL, SMF__DOUBLE,
+                                        pntr, 1, bolvald->dims, bolvald->lbnd, 3, 0, 0, NULL,
+                                        NULL, status );
+    } else {
+      smf_free( polybol, status );
+    }
+  }
+
+  if (goodidx) smf_free( goodidx, status );
+  if (coeffs) smf_free( coeffs, status );
+  if (varcoeffs) smf_free( varcoeffs, status );
+  if (poly) smf_free( poly, status );
   if (bolv) smf_free( bolv, status );
+  if (bolvv) smf_free( bolvv, status );
   if (powv) smf_free( powv, status );
 
   return ngood;

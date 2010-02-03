@@ -85,6 +85,8 @@
 *        bad responsivity will be masked in the noise data.
 *     2010-01-28 (TIMJ):
 *        Flatfield routines now use smfData
+*     2010-02-03 (TIMJ):
+*        Update smf_flat_responsivity API
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -341,7 +343,7 @@ void smurf_calcnoise( int *status ) {
               smfData * powval;
               smfData * bolval;
               smf_flat_smfData( thedata, &powval, &bolval, status );
-              ngood = smf_flat_responsivity( respmap, 5.0, powval, bolval, status);
+              ngood = smf_flat_responsivity( respmap, 5.0, 1, powval, bolval, NULL, status);
             }
           } else {
             if (do_nep) {

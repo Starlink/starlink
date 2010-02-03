@@ -798,6 +798,10 @@ void smf_find_subarray ( const smfHead * hdr, char subarray[],
 void smf_fit_poly( const smfData *data, unsigned char *quality,
                    const size_t order, double *poly, int *status);
 
+void smf_fit_poly1d ( size_t order, size_t nelem, const double x[], const double y[],
+                      const double vary[], double coeffs[], double varcoeffs[],
+                      double polydata[], int *status );
+
 void smf_fits_crchan( size_t nfits, const char * headrec, AstFitsChan ** fits,
                       int *status);
 
@@ -848,9 +852,9 @@ void smf_flag_stationary( smfData *data, unsigned char *quality,
                           double sthresh, size_t *nflagged,
                           int *status );
 
-size_t smf_flat_responsivity ( smfData *respmap, double snrmin,
+size_t smf_flat_responsivity ( smfData *respmap, double snrmin, size_t order,
                                const smfData * powval, const smfData * bolval,
-                               int *status );
+                               smfData ** polyfit, int *status );
 
 void smf_flat_smfData ( const smfData *data, smfData ** powval, smfData **bolval,
                         int *status );
@@ -861,7 +865,8 @@ void smf_flat_standardpow( const smfArray * heatframes, double refohms,
 
 void smf_flat_write( const char * flatname, const smfArray * bbhtframes,
                      const double heater[], const smfData * powref,
-                     const smfData * bolref, const Grp* prvgrp, int * status );
+                     const smfData * bolref, const smfData * flatpoly,
+                     const Grp* prvgrp, int * status );
 
 void smf_flatfield ( const smfData *idata, smfData **odata, const int flags,
                      int *status );

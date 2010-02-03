@@ -99,6 +99,8 @@
 *        Handle case where no darks are supplied.
 *     2010-01-28 (TIMJ):
 *        Flatfield routines now use smfData
+*     2010-02-03 (TIMJ):
+*        Update smf_flat_responsivity and smf_flat_write API
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -169,6 +171,7 @@ void smurf_calcflat( int *status ) {
   char flatname[GRP__SZNAM+1]; /* Actual output file name */
   smfArray * flatfiles = NULL; /* Flatfield data from all files */
   Grp *flatgrp = NULL;      /* Output flatfield group */
+  smfData * flatpoly = NULL;/* Polynomial expansion of fit */
   size_t flatsize;          /* Size ouf output flatfield group */
   Grp * fgrp = NULL;        /* Filtered group */
   double heatref;           /* Reference heater setting */
@@ -448,8 +451,8 @@ void smurf_calcflat( int *status ) {
     /* Calculate the responsivity in Amps/Watt (using the supplied
        signal-to-noise ratio minimum */
     parGet0d( "SNRMIN", &snrmin, status );
-    ngood = smf_flat_responsivity( respmap, snrmin, powref, bolref,
-                                   status );
+    ngood = smf_flat_responsivity( respmap, snrmin, 1, powref, bolref,
+                                   &flatpoly, status );
 
     /* Report the number of good responsivities */
     msgSeti( "NG", ngood );
@@ -502,7 +505,7 @@ void smurf_calcflat( int *status ) {
     if (flatgrp) grpDelet( &flatgrp, status );
 
     /* write out the flatfield */
-    smf_flat_write( flatname, bbhtframe, pixheat, powref, bolref, igrp, status );
+    smf_flat_write( flatname, bbhtframe, pixheat, powref, bolref, flatpoly, igrp, status );
 
     if (respmap) {
       /* write the provenance at the end since we have some problems with A-tasks
@@ -527,6 +530,7 @@ void smurf_calcflat( int *status ) {
   if (pixheat) pixheat = smf_free( pixheat, status );
   if (bolref) smf_close_file( &bolref, status );
   if (powref) smf_close_file( &powref, status );
+  if (flatpoly) smf_close_file( &flatpoly, status );
 
   ndfEnd( status );
 }

@@ -67,6 +67,8 @@
 *        Actually close the files that we open...
 *     2010-01-28 (TIMJ):
 *        Flatfield routines now use smfData
+*     2010-02-03 (TIMJ):
+*        Update smf_flat_responsivity API
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -168,7 +170,7 @@ void smurf_calcresp( int *status ) {
       smfData * powval;
       smfData * bolval;
       smf_flat_smfData( idata, &powval, &bolval, status );
-      ngood[i-1] = smf_flat_responsivity( respmap, snrmin, powval, bolval, status );
+      ngood[i-1] = smf_flat_responsivity( respmap, snrmin, 1, powval, bolval, NULL, status );
     }
 
     /* Report the number of good responsivities */

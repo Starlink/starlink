@@ -15,8 +15,8 @@
 *  Invocation:
 *     void smf_flat_write( const char * flatname, const smfArray * bbhtframes,
 *                          const double heater[], const smfData * powref,
-*                          const smfData * bolref, const Grp * prvgrp,
-*                          int * status );
+*                          const smfData * bolref, const smfData * polyfit,
+*                          const Grp * prvgrp, int * status );
 
 *  Arguments:
 *     flatname = const char * (Given)
@@ -29,8 +29,11 @@
 *        Heater power settings in pW. Must be same number of elements
 *        as present in "heatframes".
 *     bolref = const smfData * (Given)
-*        Bolometer calibration values. Dimensioned as number of 
+*        Bolometer calibration values. Dimensioned as number of
 *        number of bolometers times number of heat frames.
+*     polyfit = const smfData * (Given)
+*        Bolometer values derived from the polynomial fit. Can be NULL.
+*        Will be written to flatname.MORE.SMURF.FLATFIT
 *     prvgrp = const Grp * (Given)
 *        Group of files contributing provenance to the output flatfield
 *        file. Can be NULL.
@@ -38,7 +41,8 @@
 *        Pointer to global status.
 
 *  Description:
-*     Insert the vales into the flatfield component of the NDF.
+*     Write the flatfield measurements into the primary data array and
+*     insert the flatfield results into the flatfield component of the NDF.
 
 *  Notes:
 *     - powval and bolval are calculated by smf_flat_standardpow.
@@ -68,6 +72,8 @@
 *          by default.
 *     2010-01-28 (TIMJ):
 *        Switch to a smfData API
+*     2010-02-03 (TIMJ):
+*        Add ability to write the polynomial expansion to an extension.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -100,6 +106,7 @@
 #include "smurf_par.h"
 #include "star/atl.h"
 #include "star/kaplibs.h"
+#include "star/one.h"
 
 #include "sc2da/sc2store.h"
 #include "sc2da/sc2ast.h"
@@ -111,8 +118,8 @@
 
 void smf_flat_write( const char * flatname, const smfArray * bbhtframes,
                      const double heater[], const smfData * powref,
-                     const smfData * bolref, const Grp * prvgrp,
-                     int * status ) {
+                     const smfData * bolref, const smfData * polyfit,
+                     const Grp * prvgrp, int * status ) {
 
   size_t colsize;              /* number of columns */
   double *dbuf = NULL;         /* input double buffer for mean data */
@@ -262,7 +269,6 @@ void smf_flat_write( const char * flatname, const smfArray * bbhtframes,
   /* write it to the NDF */
   ndfPtwcs( result, indf, status );
 
-  astEnd;
 
   /* Write provenance information */
   if (prvgrp) {
@@ -276,6 +282,25 @@ void smf_flat_write( const char * flatname, const smfArray * bbhtframes,
 
   }
 
+  /* Write the polynomial expansion into an extension */
+  if (polyfit) {
+    char fitfile[GRP__SZNAM+1];
+    int fndf = NDF__NOID;
+    int place = NDF__NOPL;
+    one_strlcpy( fitfile, flatname, sizeof(fitfile), status );
+    one_strlcat( fitfile, ".MORE.SMURF.FLATFIT", sizeof(fitfile), status );
+
+    /* create the file */
+    smf_write_smfData( polyfit, NULL, NULL, fitfile, NULL, 0, NDF__NOID, status );
+
+    /* Same WCS as the main file */
+    ndfOpen( NULL, fitfile, "UPDATE", "OLD", &fndf, &place, status );
+    ndfPtwcs( result, fndf, status );
+    ndfAnnul( &fndf, status );
+
+  }
+
+  astEnd;
 
   ndfAnnul( &indf, status);
 
