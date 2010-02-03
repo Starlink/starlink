@@ -254,7 +254,7 @@ smf_flat_standardpow( const smfArray * heatframes, double refohms,
                   if (var != VAL__BADD) {
                     bolrefvar[j*numbol+i] = heatframevar[0][i] +
                       ( var * pow( powref[j] - powbol[0], 2 ));
-                    printf("Setting extrapolate 1 variance to %f\n", bolrefvar[j*numbol+i]);
+
                   } else {
                     bolrefvar[j*numbol+i] = VAL__BADD;
                   }
@@ -284,7 +284,7 @@ smf_flat_standardpow( const smfArray * heatframes, double refohms,
                   if (var != VAL__BADD) {
                     bolrefvar[j*numbol+i] = heatframevar[nheat-2][i] +
                       ( var * pow( powref[j] - powbol[nheat-2], 2 ));
-                    printf("Setting extrapolate 2 variance to %f\n", bolrefvar[j*numbol+i]);
+
                   } else {
                     bolrefvar[j*numbol+i] = VAL__BADD;
                   }
