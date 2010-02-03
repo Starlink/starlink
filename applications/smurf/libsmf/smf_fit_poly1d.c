@@ -99,7 +99,7 @@ void smf_fit_poly1d ( size_t order, size_t nelem, const double x[], const double
   double * xptr = NULL;
 
   memset(coeffs, 0, sizeof(*coeffs)*(order+1));
-  memset(varcoeffs, 0, sizeof(*varcoeffs)*(order+1));
+  if (varcoeffs) memset(varcoeffs, 0, sizeof(*varcoeffs)*(order+1));
 
   if (*status != SAI__OK) return;
 
@@ -184,7 +184,6 @@ void smf_fit_poly1d ( size_t order, size_t nelem, const double x[], const double
     /* evaluate the polynomial */
     if (polydata) {
       double y_err;
-      printf("\n");
       for (i = 0; i<nelem; i++) {
         double yval;
         gsl_fit_linear_est( xx[i], c0, c1, cov00, cov01, cov11, &(polydata[i]), &y_err);
