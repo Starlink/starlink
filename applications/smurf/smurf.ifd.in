@@ -2243,6 +2243,23 @@ package @PACKAGE@ {
 
             helplib {$SMURF_HELP}
 
+            parameter avpspec {
+                type _LOGICAL
+                vpath {DEFAULT }
+                prompt {Calculate average power spectrum of good detectors?}
+                ppath GLOBAL CURRENT
+                default FALSE
+                helpkey *
+            }
+
+            parameter avpspecthresh {
+                type _DOUBLE
+                vpath {DEFAULT}
+                prompt {N-sigma threshold for defining good detectors for average power spectrum}
+                default 3
+                helpkey *
+            }
+
             parameter FLAT {
                 type _LOGICAL
                 vpath {DEFAULT }

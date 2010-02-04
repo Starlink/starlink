@@ -14,21 +14,24 @@
 *     Subroutine
 
 *  Invocation:
-*     void smf_stats1<X>( CGEN_TYPE *data, dim_t stride, dim_t nsamp,
-*                         unsigned char *qual, unsigned char mask, double *mean,
-*                         double *sigma, dim_t *ngood, int *status )
+*     void smf_stats1<X>( CGEN_TYPE *data, size_t stride, size_t nsamp,
+*                         unsigned char *qual, size_t qstride,
+*                         unsigned char mask, double *mean,
+*                         double *sigma, size_t *ngood, int *status )
 
 *  Arguments:
 *     data = CGEN_TYPE* (Given)
 *        Pointer to input data array
-*     stride = dim_t (Given)
+*     stride = size_t (Given)
 *        Index stride between elements
-*     nsamp = dim_t (Given)
+*     nsamp = size_t (Given)
 *        Length of the interval to analyze
 *     qual = usigned char* (Given)
 *        If specified, use this QUALITY array to decide which samples
 *        to use (provided mask). Otherwise data are only ignored if set
 *        to CGEN_BAD.
+*     qstride = size_t (Given)
+*        Stride for qual. If 0 assumed to be stride.
 *     mask = unsigned char (Given)
 *        Use with qual to define which bits in quality are relevant to
 *        ignore data in the calculation.
@@ -38,7 +41,7 @@
 *        Pointer to variable that will contain the standard deviation of
 *        the data. If NULL this routine will run faster and not calculate
 *        the standard deviation.
-*     ngood = dim_t* (Given and Returned)
+*     ngood = size_t* (Given and Returned)
 *        Pointer to variable that will indicate how many samples were used
 *        to calculate the statistics.
 *     status = int* (Given and Returned)
@@ -70,11 +73,14 @@
 *        Remove initial time slice from interface, and add stride parameter.
 *     2009-12-03 (EC):
 *        Make this a generic function
+*     2010-02-04 (EC):
+*        Add qstride to interface, and switch to size_t from dim_t for
+*        stride/nsamp
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
-*     Copyright (C) 2008,2009 University of British Columbia.
+*     Copyright (C) 2008-2010 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -117,14 +123,16 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_stats1"
 
-void CGEN_FUNCTION(smf_stats1)( CGEN_TYPE *data, dim_t stride, dim_t nsamp,
-                                unsigned char *qual, unsigned char mask,
-                                double *mean, double *sigma, dim_t *ngood,
+void CGEN_FUNCTION(smf_stats1)( CGEN_TYPE *data, size_t stride, size_t nsamp,
+                                unsigned char *qual, size_t qstride,
+                                unsigned char mask, double *mean,
+                                double *sigma, size_t *ngood,
                                 int *status ) {
 
   /* Local variables */
-  dim_t count=0;              /* Number of samples in estimate */
-  dim_t i;                    /* Loop counter */
+  size_t count=0;             /* Number of samples in estimate */
+  size_t i;                   /* Loop counter */
+  size_t j;                   /* Loop counter */
   double mu=0;                /* Estimate of the mean */
   double sum=0;               /* Sum of the data */
   double sumsq=0;             /* Sum of the square of the data */
@@ -143,26 +151,35 @@ void CGEN_FUNCTION(smf_stats1)( CGEN_TYPE *data, dim_t stride, dim_t nsamp,
     return;
   }
 
-  /* Initialization */
+  /* Assume qstride = stride if not specified */
+  if( !qstride ) {
+    qstride = stride;
+  }
 
+  /* Initialization */
   if( qual ) {
     /* Quality checking version */
     if( sigma ) {
       /* Standard deviation calculating version */
+      j = 0;
       for( i=0; i<nsamp*stride; i+=stride ) {
-
-        if( !(qual[i] & mask) ) {
+        if( !(qual[j] & mask) ) {
           sum += (double) data[i];
           sumsq += ((double) data[i]) * ((double) data[i]);
           count++;
         }
+        j += qstride;
       }
     } else {
       /* Mean only */
-      for( i=0; i<nsamp*stride; i+=stride ) if( !(qual[i] & mask) ) {
+      j = 0;
+      for( i=0; i<nsamp*stride; i+=stride ) {
+        if( !(qual[j] & mask) ) {
           sum += (double) data[i];
           count++;
         }
+        j += qstride;
+      }
     }
   } else {
     /* CGEN_BAD checking version */

@@ -164,7 +164,7 @@ void smf_bolonoise( smfWorkForce *wf, const smfData *data,
   dim_t nbolo;             /* Number of bolometers */
   dim_t ndata;             /* Number of data points */
   dim_t nf;                /* Number of frequencies */
-  dim_t ngood;             /* Number of good samples */
+  size_t ngood;            /* Number of good samples */
   dim_t ntslice;           /* Number of time slices */
   double p_low;            /* Power at f_low */
   double p_white;          /* Average power from f_white1 to f_white2 */
@@ -235,8 +235,8 @@ void smf_bolonoise( smfWorkForce *wf, const smfData *data,
     /* Measure the power */
     if( *status == SAI__OK ) {
       p_low = base[i_low];
-      smf_stats1D( base+i_w1, 1, i_w2-i_w1+1, NULL, 0, &p_white, NULL, &ngood,
-                   status );
+      smf_stats1D( base+i_w1, 1, i_w2-i_w1+1, NULL, 0, 0, &p_white, NULL, 
+                   &ngood, status );
 
       /* It's OK if bad status was generated as long as a mean was calculated */
       if( *status==SMF__INSMP ) {

@@ -124,7 +124,7 @@ double smf_quick_noise( smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk,
   dim_t len;                    /* Length of interval including starts */
   double minsig;                /* Minimum measured r.m.s. */
   dim_t nbolo;                  /* Number of bolometers */
-  dim_t ngood;                  /* Number of good samples in r.m.s. check */
+  size_t ngood;                 /* Number of good samples in r.m.s. check */
   dim_t ntslice;                /* Number of time slices */
   unsigned char *qua=NULL;      /* Pointer to quality flags */
   double retval=0;              /* Return value */
@@ -213,8 +213,8 @@ double smf_quick_noise( smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk,
 
   for( i=0; i<nchunk; i++ ) {
     /* Calculate the r.m.s. of this chunk */
-    smf_stats1D( dat+bolo*ntslice+istart+i*len/(nchunk-1), 1, nsamp, 
-                 qua+bolo*ntslice+istart+i*len/(nchunk-1), mask, NULL, &sig, 
+    smf_stats1D( dat+bolo*ntslice+istart+i*len/(nchunk-1), 1, nsamp,
+                 qua+bolo*ntslice+istart+i*len/(nchunk-1), 0, mask, NULL, &sig,
                  &ngood, status );
 
     if( *status == SMF__INSMP ) {

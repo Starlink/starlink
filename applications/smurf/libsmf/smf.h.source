@@ -752,12 +752,15 @@ void smf_ext2km( int indf, const char *xname, AstKeyMap *keymap, int mode,
 void smf_extracols( smfHead *hdr, Grp *colgrp, void **cols_info,
                     AstKeyMap **km, int *status );
 
+smfData *smf_fft_avpspec( const smfData *pspec, unsigned char *quality,
+                          size_t qstride, unsigned char mask, int *status );
+
 void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status );
 
 smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
                        int *status );
 
-void  smf_fillgaps( smfWorkForce *wf, smfData *data, unsigned char *quality, 
+void  smf_fillgaps( smfWorkForce *wf, smfData *data, unsigned char *quality,
                     unsigned char mask, int *status );
 
 void smf_filter_edge( smfFilter *filt, double f, int lowpass, int *status );

@@ -384,14 +384,14 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   int do_boxcar=0;              /* flag to do boxcar smooth */
   int do_boxfact=0;             /* flag to damp boxcar width */
   int do_boxmin=0;              /* flag for minimum boxcar */
-  dim_t cgood;                  /* Number of good corr. coeff. samples */
+  size_t cgood;                 /* Number of good corr. coeff. samples */
   double cmean;                 /* mean of common-mode correlation coeff */
   double *corr=NULL;            /* Array to hold correlation coefficients */
   double corr_tol=5;            /* n-sigma correlation coeff. tolerance */
   double csig;                  /* standard deviation "                  */
   double *gcoeff=NULL;          /* Array to hold gain coefficients */
   int gflat=0;                  /* If set use GAIn to adjust flatfield */
-  dim_t ggood;                  /* Number of good gain. coeff. samples */
+  size_t ggood;                 /* Number of good gain. coeff. samples */
   double gmean;                 /* mean of common-mode correlation gain */
   double gsig;                  /* standard deviation "                  */
   double g;                     /* temporary gain */
@@ -855,13 +855,15 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
           }
         }
 
-        smf_stats1D( corr, 1, nbolo, NULL, 0, &cmean, &csig, &cgood, status );
+        smf_stats1D( corr, 1, nbolo, NULL, 0, 0, &cmean, &csig, &cgood,
+                     status );
         msgSeti("N",cgood);
         msgOutif( MSG__VERB, "", "    ^N good bolos", status );
         msgOutiff( MSG__DEBUG, "",
                    "    corr coeff %8.5f +/- %8.5f", status, cmean, csig );
 
-        smf_stats1D( gcoeff, 1, nbolo, NULL, 0, &gmean, &gsig, &ggood, status );
+        smf_stats1D( gcoeff, 1, nbolo, NULL, 0, 0, &gmean, &gsig, &ggood,
+                     status );
         msgOutiff( MSG__DEBUG, " ",
                    "    log(abs(gain coeff)) %8.5f +/- %8.5f", status,
                    gmean, gsig);

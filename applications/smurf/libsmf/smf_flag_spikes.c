@@ -13,8 +13,8 @@
 *     Library routine
 
 *  Invocation:
-*     smf_flag_spikes( smfData *data, double *bolovar, unsigned char *quality, 
-*                      unsigned char mask, double thresh, size_t niter, 
+*     smf_flag_spikes( smfData *data, double *bolovar, unsigned char *quality,
+*                      unsigned char mask, double thresh, size_t niter,
 *                      size_t maxiter, size_t *aiter, size_t *nflagged,
 *                      int *status )
 
@@ -148,7 +148,7 @@ void smf_flag_spikes( smfData *data, double *bolovar, unsigned char *quality,
   double mean;                  /* Bolometer signal mean */
   dim_t nbolo=0;                /* Number of bolometers */
   size_t nflag;                 /* Number of samples flagged */
-  dim_t ngood;                  /* How many good samples in measurement */
+  size_t ngood;                 /* How many good samples in measurement */
   dim_t ntslice=0;              /* Number of time slices */
   double sig;                   /* Bolometer signal rms */
 
@@ -234,7 +234,7 @@ void smf_flag_spikes( smfData *data, double *bolovar, unsigned char *quality,
       } else {
         /* Calculate mean and rms of the bolometer */
         if (*status == SAI__OK) {
-          smf_stats1D( dat+base, 1, ntslice, qua+base, mask, &mean,
+          smf_stats1D( dat+base, 1, ntslice, qua+base, 0, mask, &mean,
                        &sig, &ngood, status );
 
           if( *status == SMF__INSMP ) {

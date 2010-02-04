@@ -199,7 +199,7 @@ void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)), smfDIMMData *d
     }
 
     /* Find the mean hits in the map */
-    smf_stats1I( hitsmap, 1, dat->msize, NULL, 0, &meanhits, NULL, &ngood,
+    smf_stats1I( hitsmap, 1, dat->msize, NULL, 0, 0, &meanhits, NULL, &ngood,
                  status );
 
     msgOutiff( MSG__DEBUG, "", FUNC_NAME

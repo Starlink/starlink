@@ -33,6 +33,10 @@
 *     Transforming data loses the VARIANCE and QUALITY components.
 
 *  ADAM Parameters:
+*     AVPSPEC = _LOGICAL (Read)
+*          Calculate average power spectrum over "good" bolometers
+*     AVPSPECTHRESH = _DOUBLE (Read)
+*          N-sigma noise threshold to define "good" bolometers for AVPSPEC
 *     FLAT = _LOGICAL (Read)
 *          If set ensure data are flatfielded. If not set do not scale the
 *          data in any way (but convert to DOUBLE). [TRUE]
@@ -139,24 +143,28 @@
 
 void smurf_sc2fft( int *status ) {
 
+  int avpspec=0;            /* Flag for doing average power spectrum */
+  double avpspecthresh=0;   /* Threshold noise for detectors in avpspec */
   Grp * basegrp = NULL;     /* Basis group for output filenames */
-  smfArray *concat=NULL;     /* Pointer to a smfArray */
-  size_t contchunk;          /* Continuous chunk counter */
+  smfArray *concat=NULL;    /* Pointer to a smfArray */
+  size_t contchunk;         /* Continuous chunk counter */
   smfArray *darks = NULL;   /* dark frames */
-  int ensureflat;            /* Flag for flatfielding data */
+  int ensureflat;           /* Flag for flatfielding data */
   Grp *fgrp = NULL;         /* Filtered group, no darks */
-  size_t gcount=0;           /* Grp index counter */
-  smfGroup *igroup=NULL;     /* smfGroup corresponding to igrp */
+  size_t gcount=0;          /* Grp index counter */
+  smfGroup *igroup=NULL;    /* smfGroup corresponding to igrp */
   Grp *igrp = NULL;         /* Input group of files */
   int inverse=0;            /* If set perform inverse transform */
-  dim_t maxconcat=0;         /* Longest continuous chunk length in samples */
-  size_t ncontchunks=0;      /* Number continuous chunks outside iter loop */
+  int isfft=0;              /* Are data fft or real space? */
+  dim_t maxconcat=0;        /* Longest continuous chunk length in samples */
+  size_t ncontchunks=0;     /* Number continuous chunks outside iter loop */
   smfData *odata=NULL;      /* Pointer to output smfData to be exported */
   Grp *ogrp = NULL;         /* Output group of files */
   size_t outsize;           /* Total number of NDF names in the output group */
   int polar=0;              /* Flag for FFT in polar coordinates */
   int power=0;              /* Flag for squaring amplitude coeffs */
   size_t size;              /* Number of files in input group */
+  smfData *tempdata=NULL;   /* Temporary smfData pointer */
   smfWorkForce *wf = NULL;  /* Pointer to a pool of worker threads */
 
   /* Main routine */
@@ -214,6 +222,14 @@ void smurf_sc2fft( int *status ) {
   /* Are we going to assume amplitudes are squared? */
   parGet0l( "POWER", &power, status );
 
+  /* Are we calculating the average power spectrum? */
+  parGet0l( "AVPSPEC", &avpspec, status );
+
+  if( avpspec ) {
+    power = 1;
+    parGet0d( "AVPSPECTHRESH", &avpspecthresh, status );
+  }
+
   /* If power is true, we must be in polar form */
   if( power && !polar) {
     msgOutif( MSG__NORM, " ", TASK_NAME
@@ -238,30 +254,109 @@ void smurf_sc2fft( int *status ) {
         int provid = NDF__NOID;
 
         /* Check whether we need to transform the data at all */
-        if( smf_isfft(idata,NULL,NULL,NULL,status) == inverse ) {
+        isfft = smf_isfft(idata,NULL,NULL,NULL,status);
 
-          /* If inverse transform, convert to cartesian representation first */
-          if( inverse && polar ) {
-            smf_fft_cart2pol( idata, 1, power, status );
-          }
+        if( isfft && avpspec ) {
+          *status = SAI__ERROR;
+          errRep( "", FUNC_NAME
+                  ": to calculate average power spectrum input data cannot "
+                  "be FFT", status );
+        }
 
-          /* Tranform the data */
-          odata = smf_fft_data( wf, idata, inverse, status );
-          smf_convert_bad( odata, status );
+        if( (*status == SAI__OK) &&
+            (smf_isfft(idata,NULL,NULL,NULL,status) == inverse) ) {
 
-          if( inverse ) {
-            /* If output is time-domain, ensure that it is ICD bolo-ordered */
-            smf_dataOrder( odata, 1, status );
-          } else if( polar ) {
-            /* Store FFT of data in polar form */
-            smf_fft_cart2pol( odata, 0, power, status );
+          if( avpspec ) {
+            /* If calculating average power spectrum do the transforms with
+               smf_bolonoise so that we can also measure the noise of
+               each detector */
+
+            double *whitenoise=NULL;
+            dim_t nbolo;                /* Number of detectors  */
+            unsigned char *bolomask=NULL;
+            double mean, sig;
+            size_t i, ngood, newgood;
+
+            smf_get_dims( idata,  NULL, NULL, &nbolo, NULL, NULL, NULL, NULL,
+                          status );
+            whitenoise = smf_malloc( nbolo, sizeof(*whitenoise), 1, status );
+            bolomask = smf_malloc( nbolo, sizeof(*bolomask), 1, status );
+
+            smf_bolonoise( wf, idata, NULL, 1, 0.01, SMF__F_WHITELO,
+                           SMF__F_WHITEHI, 0, 1, whitenoise, NULL, &odata,
+                           status );
+
+            /* Initialize quality */
+            for( i=0; i<nbolo; i++ ) {
+              if( whitenoise[i] == VAL__BADD ) {
+                bolomask[i] = SMF__Q_BADB;
+              }
+            }
+
+            ngood=-1;
+            newgood=0;
+
+            /* Iteratively cut n-sigma noisy outlier detectors */
+            while( ngood != newgood ) {
+              ngood = newgood;
+              smf_stats1D( whitenoise, 1, nbolo, bolomask, 1, SMF__Q_BADB,
+                           &mean, &sig, NULL, status );
+              msgOutiff( MSG__DEBUG, "",
+                         "SC2FFT: mean=%lf sig=%lf ngood=%li\n", status,
+                         mean, sig, ngood);
+
+              newgood=0;
+              for( i=0; i<nbolo; i++ ) {
+                if( whitenoise[i] != VAL__BADD ){
+                  if( (whitenoise[i] - mean) > 3.*sig ) {
+                    whitenoise[i] = VAL__BADD;
+                    bolomask[i] = SMF__Q_BADB;
+                  } else {
+                    newgood++;
+                  }
+                }
+              }
+            }
+
+            msgOutf( "",
+                     "SC2FFT: Calculating average power spectrum of best %li "
+                     " bolometers.", status, newgood);
+
+            /* Calculate the average power spectrum of good detectors */
+            tempdata = smf_fft_avpspec( odata, bolomask, 1, SMF__Q_BADB,
+                                        status );
+            smf_close_file( &odata, status );
+            whitenoise = smf_free( whitenoise, status );
+            bolomask = smf_free( bolomask, status );
+            odata = tempdata;
+            tempdata = NULL;
+          } else {
+            /* Otherwise do forward/inverse transforms here as needed */
+
+            /* If inverse transform convert to cartesian representation first */
+            if( inverse && polar ) {
+              smf_fft_cart2pol( idata, 1, power, status );
+            }
+
+            /* Tranform the data */
+            odata = smf_fft_data( wf, idata, inverse, status );
+            smf_convert_bad( odata, status );
+
+            if( inverse ) {
+              /* If output is time-domain, ensure that it is ICD bolo-ordered */
+              smf_dataOrder( odata, 1, status );
+            } else if( polar ) {
+              /* Store FFT of data in polar form */
+              smf_fft_cart2pol( odata, 0, power, status );
+            }
           }
 
           /* open a reference input file for provenance propagation */
           ndgNdfas( basegrp, gcount, "READ", &provid, status );
 
           /* Export the data to a new file */
-          smf_write_smfData( odata, NULL, NULL, NULL, ogrp, gcount, provid, status );
+          smf_write_smfData( odata, NULL, NULL, NULL, ogrp, gcount, provid,
+                             status );
 
           /* Free resources */
           ndfAnnul( &provid, status );

@@ -13,8 +13,9 @@
 *     Library routine
 
 *  Invocation:
-*     smf_correct_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
-*                        double dcthresh, double dcthresh2, dim_t dcbox, 
+*     smf_correct_steps( smfWorkForce *wf, smfData *data,
+*                        unsigned char *quality,
+*                        double dcthresh, double dcthresh2, dim_t dcbox,
 *                        int dcflag, size_t *nsteps, int *status )
 
 *  Arguments:
@@ -459,8 +460,8 @@ static void smfCorrectStepsParallel( void *job_data_ptr, int *status ) {
   double mean1;                 /* Box means to search for DC steps */
   double mean2;                 /* "    "                           */
   size_t ns=0;                  /* Number of steps encountered */
-  dim_t nmean1;                 /* Number of samples in mean1 */
-  dim_t nmean2;                 /* Number of samples in mean1 */
+  size_t nmean1;                /* Number of samples in mean1 */
+  size_t nmean2;                /* Number of samples in mean1 */
   dim_t ntslice=0;              /* Number of time slices */
   smfCorrectStepsData *pdata = NULL;/* Pointer to job data */
   unsigned char *qua=NULL;      /* Pointer to quality flags */
@@ -504,11 +505,11 @@ static void smfCorrectStepsParallel( void *job_data_ptr, int *status ) {
 
       /* initial conditions for jump detection */
       smf_stats1D( dat+base+istart*tstride, tstride, dcbox,
-                   qua+base+istart*tstride, SMF__Q_MOD, &mean1, NULL,
+                   qua+base+istart*tstride, 0, SMF__Q_MOD, &mean1, NULL,
                    &nmean1, status);
       smf_stats1D( dat+base+(istart+dcbox)*tstride, tstride, dcbox,
-                   qua+base+(istart+dcbox)*tstride, SMF__Q_MOD,
-                   &mean2, NULL,&nmean2, status );
+                   qua+base+(istart+dcbox)*tstride, 0, SMF__Q_MOD,
+                   &mean2, NULL, &nmean2, status );
 
       /* Estimate expected rms in a box as the bolo rms */
       dcstep = smf_quick_noise( data, i, dcbox, 10, qua, SMF__Q_MOD,
@@ -724,11 +725,11 @@ static void smfCorrectStepsParallel2( void *job_data_ptr, int *status ) {
         /* Jump previously found. Measure mean before and after */
         if( alljump[j] ) {
           smf_stats1D( dat+i*bstride+(j-dcbox)*tstride, tstride, dcbox,
-                       qua+i*bstride+(j-dcbox)*tstride, SMF__Q_MOD, &mean1,
+                       qua+i*bstride+(j-dcbox)*tstride, 0, SMF__Q_MOD, &mean1,
                        NULL, &nmean1, status);
-  
+
           smf_stats1D( dat+i*bstride+j*tstride, tstride, dcbox,
-                       qua+i*bstride+j*tstride, SMF__Q_MOD, &mean2,
+                       qua+i*bstride+j*tstride, 0, SMF__Q_MOD, &mean2,
                        NULL, &nmean2, status);
           if( *status == SMF__INSMP ) {
             /* If insufficient samples just annul and continue */
