@@ -1,24 +1,33 @@
-#!/bin/tcsh -x
+#!/bin/tcsh 
 
 #  Check a list of observations has been supplied on the command line.
 if( $# < 1 ) then
    echo 
    echo "Create Bolometer Amplitude and Sum images"
    echo 
-   echo "Usage: cbas <inlist> [-p]"
+   echo "Usage: cbas <inlist> [-p] [-c <config-file>]"
    echo
    echo "   <inlist> is a text file in which each line contains the path"
    echo "   to a directory holding the raw time series cubes for a single"
    echo "   planet observation."
    echo
-   echo "A pair of images is created for each observation, one (with "
-   echo "prefix '_amp') contains the peak amplitude of the fitted"
-   echo "source in each bolometer map, and the other (with prefix '_sum')"
-   echo "the total data sum in the source in each bolometer map. By default," 
-   echo "this total data sum is the sum of the pixel values in a 60 arc-sec"
-   echo "circular aperture (bad pixels are replaced using kappa:fillbad prior"
-   echo "to finding the sum), but if the -p option is supplied it will be the" 
-   echo "integral of the model star profile found by the kappa:psf command."
+   echo "   Three images are created for each observation, the first (with"
+   echo "   prefix '_amp') contains the peak amplitude of the fitted source"
+   echo "   in each bolometer map, the second (with prefix '_sum') contains"
+   echo "   the total data sum in the source in each bolometer map, and the"
+   echo "   third (with prefix '_map') contains the map created by"
+   echo "   smurf:makemap (including individual bolometer maps in the SMURF"
+   echo "   extension). "
+   echo 
+   echo "   By default, this total data sum is the sum of the pixel values in"
+   echo "   60 arc-sec circular aperture (bad pixels are replaced using"
+   echo "   prior to finding the sum), but if the -p option is"
+   echo "   it will be the integral of the model star profile found"
+   echo "   the kappa:psf command."
+   echo
+   echo "   By default, smurf:makemap uses the configuration parameters"
+   echo "   in file dimmconfig_distortionmap.lis, but an alternative "
+   echo "   file may be supplied using the -c option."
    echo
    exit
 endif
@@ -40,18 +49,41 @@ foreach dir (`cat $1`)
    set dir_list = "$dir_list $indir"
 end
 
-#  If we are creating images of peak value and total sum, see if the total 
-#  sum should be the sum of the values in a 60 arc-sec aperture, or the 
-#  integral of the model psf.
+#  Initialise other parameter values
 set sum_method = APERADD
-if( $# > 1 ) then
+set config = "^$SMURF_DIR/../../share/smurf/dimmconfig_distortionmap.lis,bolomap=1" 
+
+#  loop round all remaining values on the command line
+while( $# > 1 ) 
+
+#  Look for -p option. 
    if( "$2" == "-p" ) then
       set sum_method = PSF
+
+#  Look for -c option
+   else if( "$2" == "-c" ) then
+      shift 
+      set config = `readlink -f $2`
+      if( ! -e "$config" ) then
+         echo " "
+         echo ">>>>  Cannot find config file $config \!\!\!\!\!"
+         echo " "
+         exit
+
+#  If the supplied fiel exists, prefix it with an "^" character to convert 
+#  it into a group expression.
+      else
+         set config = "^$config"
+      endif
+
+#  Unknown command line option.
    else   
-      echo "Unknown second command line argument - $2"
+      echo "Unknown command line argument - $2"
       exit
    endif
-endif
+
+   shift
+end
 
 #  Create a temporary directory to hold all the intermediate files, and
 #  move into it.
@@ -86,7 +118,7 @@ foreach indir ($dir_list)
 
 #  Use the iterative mapmaker to create map for each individual bolometers.
    $SMURF_DIR/makemap "$indir/*" method=iter out=junk system=AZEL \
-             alignsys=t config="'^$SMURF_DIR/../../share/smurf/dimmconfig_distortionmap.lis,bolomap=1'" | tee makemap.log
+             alignsys=t config=\"$config\" | tee makemap.log
 
 #  Get the subarray name, and its corresponding integer index. 
    set subarray = `$KAPPA_DIR/fitsmod junk edit=print keyword=SUBARRAY`
@@ -115,9 +147,11 @@ foreach indir ($dir_list)
    set date = `$KAPPA_DIR/fitsmod junk edit=print keyword=UTDATE`
    set obsnum = `$KAPPA_DIR/fitsmod junk edit=print keyword=OBSNUM`
 
-#  Set the names for the final returned amp and sum NDFs (including all chunks).
+#  Set the names for the final returned amp, sum and map NDFs (including all 
+#  chunks).
    set amp_ndf = "../../$subarray$date-$obsnum-amp"
    set sum_ndf = "../../$subarray$date-$obsnum-sum"
+   set map_ndf = "../../$subarray$date-$obsnum-map"
 
 #  See if the data has been flat-fielded (as implied by the map units being "pW"). If not, 
 #  the source features will be negative in the bolomaps.
@@ -314,6 +348,10 @@ foreach indir ($dir_list)
          $KAPPA_DIR/add $amp_ndf $camp_ndf tmp
          mv -f tmp.sdf $amp_ndf.sdf
       endif
+
+# Copy the map to its final resting place.
+      mv junk.sdf $map_ndf.sdf
+       
    end 
 
 #  Move back to the main working directory
