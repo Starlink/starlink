@@ -52,6 +52,9 @@
 *  History:
 *     2010-01-29 (TIMJ):
 *        First version.
+*     2010-02-04 (TIMJ):
+*        Add better debugging reports for fits. Initialise all returned arrays to bad.
+*        Handle NaN before returning.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -97,9 +100,14 @@ void smf_fit_poly1d ( size_t order, size_t nelem, const double x[], const double
 
   const double * xx = NULL;
   double * xptr = NULL;
+  size_t i;
 
-  memset(coeffs, 0, sizeof(*coeffs)*(order+1));
-  if (varcoeffs) memset(varcoeffs, 0, sizeof(*varcoeffs)*(order+1));
+  /* initialise to bad */
+  for (i=0; i<order+1; i++) {
+    coeffs[i] = VAL__BADD;
+    if (varcoeffs) varcoeffs[i] = VAL__BADD;
+    if (polydata) polydata[i] = VAL__BADD;
+  }
 
   if (*status != SAI__OK) return;
 
@@ -120,7 +128,6 @@ void smf_fit_poly1d ( size_t order, size_t nelem, const double x[], const double
   if (x) {
     xx = x;
   } else {
-    size_t i;
     xptr = smf_malloc( nelem, sizeof(*xptr), 0, status );
     for ( i = 0; i < nelem; i++) {
       xptr[i] = i;
@@ -130,8 +137,8 @@ void smf_fit_poly1d ( size_t order, size_t nelem, const double x[], const double
 
   /* Special case a first order linear regression */
   if (order == 1 ) {
-    size_t i;
     double c0, c1, cov00, cov01, cov11, chisq;
+    size_t nrgood = 0;
 
     if (vary) {
       /* Space for the weights */
@@ -144,6 +151,7 @@ void smf_fit_poly1d ( size_t order, size_t nelem, const double x[], const double
           w[i] = 0.0;
         } else {
           w[i] = 1.0 / vary[i];
+          nrgood++;
         }
       }
 
@@ -156,7 +164,6 @@ void smf_fit_poly1d ( size_t order, size_t nelem, const double x[], const double
          for x and y */
       double * fx = smf_malloc( nelem, sizeof(*fx), 0, status );
       double * fy = smf_malloc( nelem, sizeof(*fy), 0, status );
-      size_t nrgood = 0;
 
       for (i = 0; i < nelem; i++) {
         if ( xx[i] != VAL__BADD && y[i] != VAL__BADD ) {
@@ -187,19 +194,18 @@ void smf_fit_poly1d ( size_t order, size_t nelem, const double x[], const double
       for (i = 0; i<nelem; i++) {
         double yval;
         gsl_fit_linear_est( xx[i], c0, c1, cov00, cov01, cov11, &(polydata[i]), &y_err);
-        yval = xx[i] * c1 + c0;
+        if (isnan(polydata[i])) polydata[i] = VAL__BADD;
       }
     }
 
     /* Report the fit details */
     if (msgFlevok( MSG__DEBUG2, status ) ) {
-      msgOutiff( MSG__DEBUG2, "", "Best fit = %g + %g X  Reduced chisq = %f",
-                 status, c0, c1, chisq / (nelem - order) );
+      msgOutiff( MSG__DEBUG2, "", "Best fit (%s) = %g + %g X  Reduced chisq = %f (%zd / %zd values)",
+                 status, (vary ? "weighted" : "unweighted"), c0, c1, chisq / (nelem - order), nrgood, nelem );
     }
 
   } else {
     const int use_sc2math = 0;
-    size_t i;
 
     if ( use_sc2math && order == 3 ) {
       /* unweighted fit using sc2math for a cubic */
@@ -222,6 +228,7 @@ void smf_fit_poly1d ( size_t order, size_t nelem, const double x[], const double
       gsl_vector * Y = NULL;
       gsl_multifit_linear_workspace *work = NULL;
       double chisq;
+      size_t nrgood = 0;
 
       /* allocate space */
       work = gsl_multifit_linear_alloc( nelem, ncoeff );
@@ -252,8 +259,10 @@ void smf_fit_poly1d ( size_t order, size_t nelem, const double x[], const double
             w = 0.0;
           } else {
             w = 1.0 / vary[i];
+            nrgood++;
           }
         } else {
+          nrgood++;
           w = 1.0;  /* equal weighting */
         }
         gsl_vector_set( W, i, w );
@@ -275,15 +284,17 @@ void smf_fit_poly1d ( size_t order, size_t nelem, const double x[], const double
           }
           if (k<ncoeff-1) msgSetc( "POLY", " +");
         }
-        msgOutiff( MSG__DEBUG2, "", "Best fit = ^POLY  Reduced chisq = %f",
-                   status, chisq / (nelem - order) );
+        msgOutiff( MSG__DEBUG2, "", "Best fit (%s) = ^POLY  Reduced chisq = %f (%zd / %zd values)",
+                   status, (vary ? "weighted" : "unweighted"), chisq / (nelem - order), nrgood, nelem );
       }
 
       /* Store coefficients */
       for (k=0; k<ncoeff; k++) {
         coeffs[k] = gsl_vector_get( mcoeffs, k );
+        if(isnan(coeffs[k])) coeffs[k] = VAL__BADD;
         if (varcoeffs) {
           varcoeffs[k] = gsl_matrix_get( mcov, k, k );
+          if (isnan(varcoeffs[k])) varcoeffs[k] = VAL__BADD;
         }
       }
 
