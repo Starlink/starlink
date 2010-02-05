@@ -40,6 +40,11 @@
 *     IN = NDF (Read)
 *          Input files to be processed. Must all be from the same
 *          observation and the same subarray.
+*     METHOD = _CHAR (Read)
+*          Method to use to calculate the flatfield solution. Options
+*          are POLYNOMIAL and TABLE. Polynomial fits a polynomial to
+*          the measured signal. Table uses an interpolation scheme
+*          between the measurements to determine the power. [POLYNOMIAL]
 *     MSG_FILTER = _CHAR (Read)
 *          Control the verbosity of the application. Values can be
 *          NONE (no messages), QUIET (minimal messages), NORMAL,
@@ -53,6 +58,9 @@
 *          extension. A default output filename based on the date of
 *          observation number, subarray name and observation number
 *          will be suggested.
+*     ORDER = _INTEGER (Read)
+*          The order of polynomial to use when choosing POLYNOMIAL method.
+*          [1]
 *     REFRES = _DOUBLE (Read)
 *          Reference pixel heat resistance. Defines the mean power scale to
 *          be used. [2.0]
@@ -101,6 +109,8 @@
 *        Flatfield routines now use smfData
 *     2010-02-03 (TIMJ):
 *        Update smf_flat_responsivity and smf_flat_write API
+*     2010-02-04 (TIMJ):
+*        Add METHOD and ORDER to allow POLYNOMIAL mode.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -176,8 +186,10 @@ void smurf_calcflat( int *status ) {
   Grp * fgrp = NULL;        /* Filtered group */
   double heatref;           /* Reference heater setting */
   size_t i = 0;             /* Counter, index */
+  int istable = 0;          /* Are we using TABLE mode? */
   size_t j;                 /* Counter */
   size_t ksize;             /* Size of key map group */
+  char method[SC2STORE_FLATLEN]; /* Flatfield method to use */
   size_t nbols;             /* Number of bolometers */
   int ncols;                /* Number of columns */
   int nrows;                /* Number of rows */
@@ -426,6 +438,32 @@ void smurf_calcflat( int *status ) {
     smf_flat_standardpow( bbhtframe, refohms, pixheat, resistance,
                           &powref, &bolref, status );
 
+    /* See if we want to use TABLE or POLYNOMIAL mode */
+    parChoic( "METHOD", "POLYNOMIAL", "POLYNOMIAL, TABLE", 1,
+              method, sizeof(method), status );
+
+    /* only need to do something if we have a POLYNOMIAL
+       since TABLE is what we get straight out of standardpow */
+    if (strcmp( method, "POLYNOMIAL" ) == 0 ) {
+      int order = 1;
+      smfData * coeffs = NULL;
+
+      /* need an order for the polynomial */
+      parGdr0i( "ORDER", 1, 1, 3, 1, &order, status );
+
+      smf_flat_fitpoly ( powref, bolref, order, &coeffs,
+                         &flatpoly, status );
+
+      /* now coeffs is in fact the new bolval */
+      if (*status == SAI__OK && coeffs) {
+        smf_close_file( &bolref, status );
+        bolref = coeffs;
+      }
+
+    } else {
+      istable = 1;
+    }
+
 
     /* See if we need an output file for responsivities or some temporary
        memory */
@@ -451,8 +489,8 @@ void smurf_calcflat( int *status ) {
     /* Calculate the responsivity in Amps/Watt (using the supplied
        signal-to-noise ratio minimum */
     parGet0d( "SNRMIN", &snrmin, status );
-    ngood = smf_flat_responsivity( respmap, snrmin, 1, powref, bolref,
-                                   &flatpoly, status );
+    ngood = smf_flat_responsivity( method, respmap, snrmin, 1, powref, bolref,
+                                   (istable ? &flatpoly : NULL), status );
 
     /* Report the number of good responsivities */
     msgSeti( "NG", ngood );
@@ -470,7 +508,7 @@ void smurf_calcflat( int *status ) {
       for (i = 0; i < nbols; i++ ) {
         if ( respdata[i] == VAL__BADD) {
           thisbol = 0;
-          for (j=0; j<bbhtframe->ndat; j++) {
+          for (j=0; j<(bolref->dims)[2]; j++) {
             double * dpntr = (bolref->pntr)[0];
             double * vpntr = (bolref->pntr)[1];
             if (dpntr[j*nbols+i] != VAL__BADD) {
@@ -505,7 +543,7 @@ void smurf_calcflat( int *status ) {
     if (flatgrp) grpDelet( &flatgrp, status );
 
     /* write out the flatfield */
-    smf_flat_write( flatname, bbhtframe, pixheat, powref, bolref, flatpoly, igrp, status );
+    smf_flat_write( method, flatname, bbhtframe, pixheat, powref, bolref, flatpoly, igrp, status );
 
     if (respmap) {
       /* write the provenance at the end since we have some problems with A-tasks
@@ -515,7 +553,6 @@ void smurf_calcflat( int *status ) {
     }
 
   }
-
 
   /* Tidy up after ourselves: release the resources used by the grp routines  */
  CLEANUP:

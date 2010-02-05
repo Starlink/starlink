@@ -13,12 +13,17 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_flat_smfData ( const smfData *data, smfData **powval,
-*                        smfData **bolval, int *status );
+*     smf_flat_smfData ( const smfData *data, char flatmethod[], size_t methodlen,
+*                        smfData **powval, smfData **bolval, int *status );
 
 *  Arguments:
 *     data = const smfData * (Given)
 *        smfData from which to extract the flatfield information.
+*     flatmethod = char [] (Returned)
+*        Buffer of size methodlen to return the flatfield method. Should
+*        be large enough to hold "POLYNOMIAL". (ie at least 11).
+*     methodlen = size_t (Given)
+*        Allocated size of flatmethod.
 *     powval = smfData ** (Returned)
 *        Resistance input powers. Will be returned NULL on error or if
 *        no DA extension is present.
@@ -40,6 +45,8 @@
 *  History:
 *     2010-01-28 (TIMJ):
 *        Original version
+*     2010-02-03 (TIMJ):
+*        Set lbnd in returned smfData and also indicate the flat method.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -71,11 +78,13 @@
 #include "smf.h"
 #include "smurf_par.h"
 
+#include "star/one.h"
 #include "mers.h"
 #include "prm_par.h"
 #include "sae_par.h"
 
-void smf_flat_smfData ( const smfData *data, smfData ** powval, smfData **bolval,
+void smf_flat_smfData ( const smfData *data, char flatmethod[], size_t methlen,
+                        smfData ** powval, smfData **bolval,
                         int *status ) {
   smfDA * da = NULL;
   void * pntr[3];
@@ -84,6 +93,7 @@ void smf_flat_smfData ( const smfData *data, smfData ** powval, smfData **bolval
 
   *powval = NULL;
   *bolval = NULL;
+  if (flatmethod) flatmethod[0] = '\0';
 
   if (*status != SAI__OK) return;
 
@@ -113,6 +123,8 @@ void smf_flat_smfData ( const smfData *data, smfData ** powval, smfData **bolval
   *bolval = smf_construct_smfData( NULL, NULL, NULL, NULL, SMF__DOUBLE,
                                    pntr, 1, dims, lbnd, 3, 0, 0, NULL,
                                    NULL, status );
+
+  one_strlcpy( flatmethod, da->flatname, methlen, status );
 
   if (*status != SAI__OK) {
     if (*bolval) smf_close_file( bolval, status );

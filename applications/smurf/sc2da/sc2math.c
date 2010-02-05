@@ -1313,6 +1313,7 @@ int *status               /* global status (given and returned) */
     31Oct2007 : use const for appropriate arguments (bdk)
     26Aug2008 : trap for bad value in input data (timj)
     14Nov2008 : rearrange TABLE processing to make it a bit faster (timj)
+    04Feb2010 : trap for bad values in polynomial coefficients (timj)
 */
 
 {
@@ -1336,12 +1337,19 @@ int *status               /* global status (given and returned) */
             {
               if (inptr[j*nboll+i] != VAL__BADD)
                 {
-                  t = inptr[j*nboll+i] - fcal[i+nboll];
-                  inptr[j*nboll+i] = fcal[i] 
-                    + fcal[i+2*nboll] 
-                    + fcal[i+3*nboll] * t 
-                    + fcal[i+4*nboll] * t * t
-                    + fcal[i+5*nboll] * t * t * t;
+                  if (fcal[i] == VAL__BADD)
+                    {
+                      inptr[j*nboll+i] = VAL__BADD;
+                    }
+                  else
+                    {
+                      t = inptr[j*nboll+i] - fcal[i+nboll];
+                      inptr[j*nboll+i] = fcal[i]
+                        + fcal[i+2*nboll]
+                        + fcal[i+3*nboll] * t
+                        + fcal[i+4*nboll] * t * t
+                        + fcal[i+5*nboll] * t * t * t;
+                    }
                 }
             }
         }

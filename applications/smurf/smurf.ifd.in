@@ -339,6 +339,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter method {
+                type _CHAR
+                prompt {Flatfield calculation method}
+                vpath PROMPT
+                ppath CURRENT DEFAULT
+                default POLYNOMIAL
+                helpkey *
+            }
+
             parameter ngood {
                 type _INTEGER
                 access WRITE
@@ -356,6 +365,15 @@ package @PACKAGE@ {
                 vpath {PROMPT }
                 association ->GLOBAL.DATA_ARRAY
                 prompt {Processed flatfield file}
+                helpkey *
+            }
+
+            parameter order {
+                type _INTEGER
+                access READ
+                vpath PROMPT
+                vpath CURRENT DEFAULT
+                default 1
                 helpkey *
             }
 

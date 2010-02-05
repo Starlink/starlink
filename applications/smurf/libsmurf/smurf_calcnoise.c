@@ -87,6 +87,9 @@
 *        Flatfield routines now use smfData
 *     2010-02-03 (TIMJ):
 *        Update smf_flat_responsivity API
+*     2010-02-04 (TIMJ):
+*        New smf_flat_responsibity and smf_flat_smfData API to support
+*        flatfield method.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -342,8 +345,11 @@ void smurf_calcnoise( int *status ) {
                  bolometers that are a bit dodgy since the point is the NEP */
               smfData * powval;
               smfData * bolval;
-              smf_flat_smfData( thedata, &powval, &bolval, status );
-              ngood = smf_flat_responsivity( respmap, 5.0, 1, powval, bolval, NULL, status);
+              char flatmethod[SC2STORE_FLATLEN];
+              smf_flat_smfData( thedata,flatmethod, sizeof(flatmethod), &powval, &bolval, status );
+              ngood = smf_flat_responsivity( flatmethod, respmap, 5.0, 1, powval, bolval, NULL, status);
+              if (powval) smf_close_file( &powval, status );
+              if (bolval) smf_close_file( &bolval, status );
             }
           } else {
             if (do_nep) {

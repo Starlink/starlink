@@ -34,6 +34,11 @@
 *       ratio of 5.0. The number of bolometers passing this criterion
 *       is reported in the NGOOD parameter. The variance is stored in
 *       the output files so additional filtering is possible.
+*     - For TABLE flatfields the CALCFLAT calculation of responsivity
+*       can use the variance of each measurement to calculate a weighted fit.
+*       The data files themselves do not store the variance in the flatfield
+*       solution so the answer from CALCRESP may differ slightly to the
+*       answer calculated with CALCFLAT.
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
@@ -69,6 +74,9 @@
 *        Flatfield routines now use smfData
 *     2010-02-03 (TIMJ):
 *        Update smf_flat_responsivity API
+*     2010-02-04 (TIMJ):
+*        New smf_flat_responsibity and smf_flat_smfData API to support
+*        flatfield method.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -169,8 +177,11 @@ void smurf_calcresp( int *status ) {
     {
       smfData * powval;
       smfData * bolval;
-      smf_flat_smfData( idata, &powval, &bolval, status );
-      ngood[i-1] = smf_flat_responsivity( respmap, snrmin, 1, powval, bolval, NULL, status );
+      char flatmethod[SC2STORE_FLATLEN];
+      smf_flat_smfData( idata, flatmethod, sizeof(flatmethod), &powval, &bolval, status );
+      ngood[i-1] = smf_flat_responsivity( flatmethod, respmap, snrmin, 1, powval, bolval, NULL, status );
+      if (powval) smf_close_file( &powval, status );
+      if (bolval) smf_close_file( &bolval, status );
     }
 
     /* Report the number of good responsivities */

@@ -13,12 +13,15 @@
 *     Subroutine
 
 *  Invocation:
-*     void smf_flat_write( const char * flatname, const smfArray * bbhtframes,
-*                          const double heater[], const smfData * powref,
-*                          const smfData * bolref, const smfData * polyfit,
-*                          const Grp * prvgrp, int * status );
+*     void smf_flat_write( const char * flatmeth, const char * flatname,
+*                          const smfArray * bbhtframes, const double heater[],
+*                          const smfData * powref,const smfData * bolref,
+*                          const smfData * polyfit, const Grp * prvgrp, int * status );
 
 *  Arguments:
+*     flatmeth = const char * (Given)
+*        Flatfield method (TABLE or POLYNOMIAL) used for powref and
+*        bolref.
 *     flatname = const char * (Given)
 *        Name to be used for flatfield file.
 *     heatframes = const smfArray* (Given)
@@ -45,7 +48,8 @@
 *     insert the flatfield results into the flatfield component of the NDF.
 
 *  Notes:
-*     - powval and bolval are calculated by smf_flat_standardpow.
+*     - powval and bolval are calculated by smf_flat_standardpow. If POLYNOMIAL
+*       method is used they are further processed by smf_flat_fitpoly.
 *     - uses sc2store to make a pseudo-time series containing the dark
 *       subtracted and averaged flatfield data. The flatfield values themselves
 *       are stored in the standard flatfield SCUBA2 extension.
@@ -116,10 +120,10 @@
 #include "sae_par.h"
 #include "par_par.h"
 
-void smf_flat_write( const char * flatname, const smfArray * bbhtframes,
-                     const double heater[], const smfData * powref,
-                     const smfData * bolref, const smfData * polyfit,
-                     const Grp * prvgrp, int * status ) {
+void smf_flat_write( const char * flatmeth, const char * flatname,
+                     const smfArray * bbhtframes, const double heater[],
+                     const smfData * powref, const smfData * bolref,
+                     const smfData * polyfit, const Grp * prvgrp, int * status ) {
 
   size_t colsize;              /* number of columns */
   double *dbuf = NULL;         /* input double buffer for mean data */
@@ -217,7 +221,7 @@ void smf_flat_write( const char * flatname, const smfArray * bbhtframes,
   sc2store_setcompflag ( 0, status );
   sc2store_wrtstream ( flatname, subnum, ncards,
                        fitsrec, colsize, rowsize, bbhtframes->ndat,
-                       bbhtframes->ndat, 0, "TABLE", state, NULL,
+                       (bolref->dims)[2], 0, flatmeth, state, NULL,
                        ibuf, dksquid, (bolref->pntr)[0], (powref->pntr)[0],
                        "FLATCAL", mcehead, NULL, mceheadsz, jig_vert,
                        nvert, jig_path, npath, xmlfile, status );
