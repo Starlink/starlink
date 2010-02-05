@@ -80,6 +80,7 @@ void smf_flat_smfData ( const smfData *data, smfData ** powval, smfData **bolval
   smfDA * da = NULL;
   void * pntr[3];
   dim_t dims[3];
+  int lbnd[3];
 
   *powval = NULL;
   *bolval = NULL;
@@ -106,8 +107,11 @@ void smf_flat_smfData ( const smfData *data, smfData ** powval, smfData **bolval
   dims[0] = (data->dims)[0];
   dims[1] = (data->dims)[1];
   dims[2] = da->nflat;
+  lbnd[0] = (data->lbnd)[0];
+  lbnd[1] = (data->lbnd)[1];
+  lbnd[2] = 1;
   *bolval = smf_construct_smfData( NULL, NULL, NULL, NULL, SMF__DOUBLE,
-                                   pntr, 1, dims, NULL, 3, 0, 0, NULL,
+                                   pntr, 1, dims, lbnd, 3, 0, 0, NULL,
                                    NULL, status );
 
   if (*status != SAI__OK) {
