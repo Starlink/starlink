@@ -97,6 +97,7 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
   size_t bol;               /* bolometer index */
   double * bolval = NULL;   /* Pointer to bolvald smfData */
   double * bolvar = NULL;   /* Pointer to bolvald variance */
+  const double CLIP = 3.0;  /* Sigma clipping for polynomial fit */
   double * coptr = NULL;    /* pointer to coefficients data array */
   size_t * goodidx = NULL;     /* Indices of good measurements */
   double * ht = NULL;       /* Heater values corrected for reference */
@@ -207,6 +208,7 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
        two values we add for flatfield. */
     if (nrgood > 0) {
       int badcoeffs = 0;
+      size_t nused;
 
       /* initialise scoeff to bad */
       for (i=0; i<= order+1; i++) {
@@ -221,7 +223,7 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
         double c0;
         double c1;
 
-        smf_fit_poly1d( order, nrgood, ht, scan, scanvar, scoeff, NULL, poly, status);
+        smf_fit_poly1d( order, nrgood, CLIP, ht, scan, scanvar, scoeff, NULL, poly, &nused, status);
 
         /* and calculate the fitted polynomial */
         if (polybol) {
@@ -247,7 +249,7 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
 
       } else {
         /* disable variance and fit the other way */
-        smf_fit_poly1d( order, nrgood, scan, ht, NULL, scoeff, NULL, NULL, status);
+        smf_fit_poly1d( order, nrgood, CLIP, scan, ht, NULL, scoeff, NULL, NULL, &nused, status);
       }
 
       /* copy the result into coptr */

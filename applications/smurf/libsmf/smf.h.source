@@ -801,9 +801,9 @@ void smf_find_subarray ( const smfHead * hdr, char subarray[],
 void smf_fit_poly( const smfData *data, unsigned char *quality,
                    const size_t order, double *poly, int *status);
 
-void smf_fit_poly1d ( size_t order, size_t nelem, const double x[], const double y[],
+void smf_fit_poly1d ( size_t order, size_t nelem, double clip, const double x[], const double y[],
                       const double vary[], double coeffs[], double varcoeffs[],
-                      double polydata[], int *status );
+                      double polydata[], size_t * nused, int *status );
 
 void smf_fits_crchan( size_t nfits, const char * headrec, AstFitsChan ** fits,
                       int *status);

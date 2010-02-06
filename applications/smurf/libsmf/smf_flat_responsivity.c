@@ -157,6 +157,7 @@ size_t smf_flat_responsivity ( const char method[], smfData *respmap, double snr
   const int usevar = 1;
   const double MINRESP = 0.1e6;/* Minimum "in specification" responsivity A/W */
   const double MAXRESP = 5.0e6;/* Maximum "in specification" responsivity A/W */
+  const double CLIP    = 3.0;  /* Sigma clipping for responsivity fit */
 
   if (*status != SAI__OK) return ngood;
 
@@ -238,9 +239,10 @@ size_t smf_flat_responsivity ( const char method[], smfData *respmap, double snr
         double resp = 0.0;
         double varresp = 0.0;
         double snr = VAL__BADD;
+        size_t nused;
 
         /* Now fit a polynomial */
-        smf_fit_poly1d( order, nrgood, powv, bolv, bolvv, coeffs, varcoeffs, poly, status );
+        smf_fit_poly1d( order, nrgood, 5.0, powv, bolv, bolvv, coeffs, varcoeffs, poly, &nused, status );
 
         /* we take the responsivity to be the gradient at the middle heater setting */
         for (k=1; k<order+1; k++) {
