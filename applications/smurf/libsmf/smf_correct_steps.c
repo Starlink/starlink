@@ -352,10 +352,10 @@ void smf_correct_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
     for( i = 0; i < nbolo; i += bpt, pdata++ ) ns += pdata->ns;
 
     /* Free resouces. */
-    pthread_mutex_destroy( &alljump_mutex );
+    if( dcflag == 2 ) {
+      pthread_mutex_destroy( &alljump_mutex );
+    }
     job_data = astFree( job_data );
-
-
 
 
     /* If dcflag==2, go back to all locations of steps in each bolometer
