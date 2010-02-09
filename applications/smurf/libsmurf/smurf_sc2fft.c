@@ -87,11 +87,14 @@
 *        Concatenate files from the same sequence.
 *     2009-12-07 (EC):
 *        Add FLAT parameter.
+*     2010-02-09 (AGG):
+*        Store number of good bolometers used to create average power
+*        spectrum in NGOOD parameter
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2008-2009 Science and Technology Facilities Council.
-*     Copyright (C) 2008-2009 University of British Columbia.
+*     Copyright (C) 2008-2010 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -330,6 +333,8 @@ void smurf_sc2fft( int *status ) {
             bolomask = smf_free( bolomask, status );
             odata = tempdata;
             tempdata = NULL;
+	    /* Store the number of good bolometers */
+	    parPut0i( "NGOOD", newgood, status );
           } else {
             /* Otherwise do forward/inverse transforms here as needed */
 

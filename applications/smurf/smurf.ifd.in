@@ -210,6 +210,8 @@
 #         Alphabetize. Remove MSG_FILTER definitions.
 #     2010-01-20 (TIMJ):
 #         Use starperl in perl aliases
+#     2010-02-09 (AGG):
+#         Add NGOOD output parameter for SC2FFT
 #     {enter_changes_here}
 
 #  Bugs:
@@ -2305,6 +2307,15 @@ package @PACKAGE@ {
                 ppath GLOBAL CURRENT
                 default FALSE
                 helpkey *
+            }
+
+            parameter ngood {
+                type _INTEGER
+                access WRITE
+                vpath DEFAULT
+                prompt {Number of good bolometers in average power spectrum}
+                helpkey *
+		default 0
             }
 
             parameter out {
