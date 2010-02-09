@@ -4259,10 +4259,14 @@ msgIflev(filter, status)
  ALIAS:
   NDF::msg_iflev = 2
  PROTOTYPE: $$
+ PREINIT:
+  char filbuf[MSG__SZLEV+1];
  CODE:
+  filter=filbuf;
   RETVAL = msgIflev(filter,&status);
  OUTPUT:
   RETVAL
+  filter
   status
 
 void

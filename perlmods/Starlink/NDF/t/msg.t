@@ -1,6 +1,6 @@
 #!perl -w
 
-use Test::More tests => 7;
+use Test::More tests => 9;
 use strict;
 use_ok( "NDF" );
 
@@ -82,5 +82,10 @@ $tokans{l} = ' -1' if $^O eq 'dec_osf';
 msg_tune('SZOUT', 23, $status);
 msg_tune('SZOUT', 0, $status);
 is($status, $good, "Check status");
+
+# get the message level
+my $iflev = msg_iflev( my $as_string, $status );
+is($iflev, &NDF::MSG__VERB, "Check level integer");
+is($as_string, "VERBOSE", "Check level string");
 
 err_end($status);
