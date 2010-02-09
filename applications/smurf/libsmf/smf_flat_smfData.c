@@ -47,6 +47,9 @@
 *        Original version
 *     2010-02-03 (TIMJ):
 *        Set lbnd in returned smfData and also indicate the flat method.
+*     2010-02-08 (TIMJ):
+*        Need to malloc the memory for the local copy since the pointers
+*        will be freed when the main file containing the smfDA is freed.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -90,6 +93,7 @@ void smf_flat_smfData ( const smfData *data, char flatmethod[], size_t methlen,
   void * pntr[3];
   dim_t dims[3];
   int lbnd[3];
+  size_t nelem = 0;
 
   *powval = NULL;
   *bolval = NULL;
@@ -102,8 +106,13 @@ void smf_flat_smfData ( const smfData *data, char flatmethod[], size_t methlen,
 
   da = data->da;
 
+  /* we need to malloc space to make sure that we do not free the pointers
+     twice. There really needs to be a way to tell smf_close_file to free
+     everything except the pointers to the data. */
+
   /* flatpar is powval */
-  pntr[0] = da->flatpar;
+  pntr[0] = smf_malloc( da->nflat, sizeof(*(da->flatpar)), 0, status);
+  memcpy( pntr[0], da->flatpar, da->nflat * sizeof(*(da->flatpar)) );
   pntr[1] = NULL;
   pntr[2] = NULL;
   dims[0] = da->nflat;
@@ -111,12 +120,14 @@ void smf_flat_smfData ( const smfData *data, char flatmethod[], size_t methlen,
                                    pntr, 1, dims, NULL, 1, 0, 0, NULL,
                                    NULL, status );
 
-  pntr[0] = da->flatcal;
-  pntr[1] = NULL;
-  pntr[2] = NULL;
   dims[0] = (data->dims)[0];
   dims[1] = (data->dims)[1];
   dims[2] = da->nflat;
+  nelem = dims[0] * dims[1] * dims[2];
+  pntr[0] = smf_malloc( nelem, sizeof(*(da->flatcal)), 0, status );
+  memcpy( pntr[0], da->flatcal, nelem * sizeof(*(da->flatcal)) );
+  pntr[1] = NULL;
+  pntr[2] = NULL;
   lbnd[0] = (data->lbnd)[0];
   lbnd[1] = (data->lbnd)[1];
   lbnd[2] = 1;
