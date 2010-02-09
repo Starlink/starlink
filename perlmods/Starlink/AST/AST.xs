@@ -3695,7 +3695,7 @@ astMark(this, type, ...)
  PREINIT:
   double * cin;
   int ncoords;
-  int nmarks;
+  int nmarks = 0;
   int indim;
   int size;
   int i;
@@ -3779,7 +3779,7 @@ astPolyCurve(this, ...)
  PREINIT:
   double * cin;
   int ncoords;
-  int npoints;
+  int npoints = 0;
   int indim;
   int size;
   int i;

@@ -82,9 +82,7 @@ static char NAMESPACE[14] = "Starlink::AST";
 */
 
 SV* createPerlObject( char * xsntype, AstObject * var ) {
-  SV** retval;
   HV * hash_object = newHV();
-  SV * pval;
   SV * rv;
   SV * myobject;
 
@@ -303,7 +301,7 @@ int ReportPerlError( int astcode ) {
       /* Remove newline character from end of string */
       if (errbuff[length-1] == '\n') errbuff[length-1] = '\0';
 
-      astError( astcode, errbuff );
+      astError( astcode, "%s", errbuff );
 
       strindex += length;
     }
