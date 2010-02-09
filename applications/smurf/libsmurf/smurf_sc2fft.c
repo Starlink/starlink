@@ -48,6 +48,9 @@
 *          Control the verbosity of the application. Values can be
 *          NONE (no messages), QUIET (minimal messages), NORMAL,
 *          VERBOSE, DEBUG or ALL. [NORMAL]
+*     NGOOD = _INTEGER (Write)
+*          Number of good bolometers which contribute to average power
+*          spectrum.
 *     OUT = NDF (Write)
 *          Output files. The number of output files can differ from
 *          the number of input files due to darks being filtered out
@@ -88,8 +91,10 @@
 *     2009-12-07 (EC):
 *        Add FLAT parameter.
 *     2010-02-09 (AGG):
-*        Store number of good bolometers used to create average power
-*        spectrum in NGOOD parameter
+*        - Store number of good bolometers used to create average power
+*          spectrum in NGOOD parameter.
+*        - Calculate lowest available frequency based on length of input
+*          data stream.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -277,7 +282,7 @@ void smurf_sc2fft( int *status ) {
             double *whitenoise=NULL;
             dim_t nbolo;                /* Number of detectors  */
             unsigned char *bolomask=NULL;
-            double mean, sig;
+            double mean, sig, freqlo;
             size_t i, ngood, newgood;
 
             smf_get_dims( idata,  NULL, NULL, &nbolo, NULL, NULL, NULL, NULL,
@@ -285,7 +290,9 @@ void smurf_sc2fft( int *status ) {
             whitenoise = smf_malloc( nbolo, sizeof(*whitenoise), 1, status );
             bolomask = smf_malloc( nbolo, sizeof(*bolomask), 1, status );
 
-            smf_bolonoise( wf, idata, NULL, 1, 0.01, SMF__F_WHITELO,
+	    freqlo = 1. / (idata->hdr->steptime * idata->hdr->nframes);
+
+            smf_bolonoise( wf, idata, NULL, 1, freqlo, SMF__F_WHITELO,
                            SMF__F_WHITEHI, 0, 1, whitenoise, NULL, &odata,
                            status );
 
