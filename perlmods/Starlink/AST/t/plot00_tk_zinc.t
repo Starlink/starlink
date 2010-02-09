@@ -18,7 +18,7 @@ BEGIN {
  }
 
  # we can test
- plan tests => 16;
+ plan tests => 18;
 };
 
 require_ok("Starlink::AST");

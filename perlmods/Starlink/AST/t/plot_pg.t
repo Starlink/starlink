@@ -11,8 +11,7 @@ use File::Spec;
 
 BEGIN {
  
- use PGPLOT;
- eval { PGPLOT::pgbegin(0,"/xw",1,1) };
+ eval { require PGPLOT; PGPLOT::pgbegin(0,"/xw",1,1) };
  if ( $@ ) {
    plan skip_all => "PGPLOT module not installed.";
    exit;

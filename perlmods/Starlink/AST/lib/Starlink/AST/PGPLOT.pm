@@ -9,7 +9,7 @@ use PGPLOT;
 use Starlink::AST;
 use Carp;
 
-'$Revision$ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+$VERSION = '2.00';
 
 =head1 NAME
 
@@ -45,10 +45,6 @@ to support alternative graphics systems.
 All teh functions in this module are private, and are intended to be called
 from the AST module. None of these functions should be considered to be part
 of the packages public interface.
-
-=head1 REVISION
-
-$Id$
 
 =head1 METHODS
 
@@ -762,6 +758,7 @@ sub ReportGrfError {
 
 =head1 COPYRIGHT
 
+Copyright (C) 2004 Particle Physics and Astronomy Research Council.
 Copyright (C) 2004 University of Exeter. All Rights Reserved.
 
 This program is free software; you can redistribute it and/or modify 

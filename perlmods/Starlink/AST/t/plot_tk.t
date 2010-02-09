@@ -3,23 +3,10 @@
 use strict;
 use Test::More;
 use Data::Dumper;
-use File::Spec;
 
 BEGIN {
 
- eval "use Tk";
- if ($@) {
-   plan skip_all => "Tk module not installed";
-   exit;
- }
-
- eval "use Tk::Zinc";
- if ($@) {
-   plan skip_all => "Tk::Zinc module not installed";
-   exit;
- }
-
- eval "use Tk::Button";
+ eval "use Tk; use Tk::Button";
  if ( $@ ) {
    plan skip_all => "Tk modules not installed";
    exit;
@@ -43,6 +30,8 @@ BEGIN {
 
 require_ok("Starlink::AST");
 require_ok("Starlink::AST::Tk");
+
+use File::Spec;
 
 my $zoom = 1;
 my @factor;
@@ -90,13 +79,13 @@ print "# xmin = $xmin, ymin = $ymin\n";
 
 # Plot image
 # ---------
-my $jpeg = File::Spec->catfile( File::Spec->updir(), "data", "m31.jpg" );
+my $jpeg = File::Spec->catfile( "data", "m31.jpg" );
 my $jpg = $c->Photo( -format => 'jpeg', -file => $jpeg );
 
 my $image = $c->Photo();
 $image->copy($jpg, -zoom => ($zoom, $zoom));
-$c->add( 'icon', 1, -position => [$xmin, $ymin], -image => $image, -anchor => 'sw', 
-	 -tags => [ 'image' ] );
+$c->createImage( $xmin, $ymin, -image => $image, -anchor => 'sw', 
+                 -tags => [ 'image' ] );
 
 # Handle data 
 # -----------
@@ -141,11 +130,11 @@ $plot->Mark( 24, [$ra1, $ra2], [$dec1, $dec2] );
 
 $plot->Set( Current => 1 );
 print "\n# Current Frame " . $plot->Get( "Domain" ) . "\n";
-$plot->Text("Test Text 1", [0.4,0.4],[-0.5,0.866],"CC");
-$plot->Set( Colour => 3  );
-$plot->Text("Test Text 2", [0.5,0.5],[0.0,-1.0],"CC");
-$plot->Set( Colour => 4 );
-$plot->Text("Test Text 3", [0.6,0.6],[0.5,0.866],"CC");
+#plot->Text("Test Text 1", [0.4,0.4],[0.0,1.0],"CC");
+#$plot->Set( Colour => 3  );
+#$plot->Text("Test Text 2", [0.5,0.5],[0.0,1.0],"CC");
+#$plot->Set( Colour => 4 );
+#$plot->Text("Test Text 3", [0.6,0.6],[0.0,1.0],"CC");
 
 #$plot->Set( Colour => 6, Width => 5 );
 $plot->Mark( 24, [0.6,0.5,0.4], [0.4, 0.3,0.3]  );
@@ -178,10 +167,10 @@ sub create_window {
    $MW->after( 3000, sub { exit; } );
 
    # create the canvas widget
-   my $canvas = $MW->Zinc( -width       => $axes[0]*$zoom*$$factor[0],
-			   -height      => $axes[1]*$zoom*$$factor[1], 
-			   -backcolor  => 'darkgrey',
-			   -borderwidth => 3 );
+   my $canvas = $MW->Canvas( -width       => $axes[0]*$zoom*$$factor[0],
+                             -height      => $axes[1]*$zoom*$$factor[1], 
+                             -background  => 'dark grey',
+                             -borderwidth => 3 );
    $canvas->pack();
 
    my $frame = $MW->Frame( -relief => 'flat', -borderwidth => 1 );

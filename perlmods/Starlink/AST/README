@@ -19,20 +19,18 @@ The AST library provides:
   - A generic plotting interface whereby you can
 
      + Have pluggable backends for the plotting system (currently
-       PGPLOT, PLplot and Tk canvas)
+       PGPLOT, PLplot and Tk (or Tk::Zinc) canvas)
 
      + The ability to draw annotations, great circles and marks
        in a coordinate frame most useful to you (eg sky coordinate,
        a wavelength) and have AST map that directly to the underlying
        graphics coordinate system.
 
-**** CURRENTLY AN ALPHA RELEASE SINCE THE INTERFACE NEEDS TIDYING ****
-
 REQUIREMENTS
 ------------
 
 Has been tested with AST v1.8 onwards (AST is currently at v4.1)
-and with perl 5.005 through perl 5.8.3. Also known to work on Linux,
+and with perl 5.005 through perl 5.10.1. Also known to work on Linux,
 Mac OS X, Solaris and Digital Unix.
 
 You will need to install the AST library. See
@@ -61,10 +59,10 @@ is supported and the PGPLOT and PLplot interfaces do work).
 AUTHOR
 ------
 
-Tim Jenness <tjenness@cpan.org> with help from Alasdair Allan
+Tim Jenness <tjenness@cpan.org> with some help from Alasdair Allan
 (especially the PGPLOT and Tk plotting backends) and Brad Cavanagh.
 
-Copyright (C) 2004-2005 Tim Jenness. All Rights Reserved.
+Copyright (C) 2004-2010 Tim Jenness. All Rights Reserved.
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -82,6 +80,9 @@ Place,Suite 330, Boston, MA  02111-1307, USA
 
 HISTORY
 -------
+
+v0.99 - + Many improvements and bug fixes. Almost complete API support.
+        + Add support for Tk::Zinc
 
 v0.04 - + Much improved Tk canvas support
         + Channel and XmlChan source functions now work properly

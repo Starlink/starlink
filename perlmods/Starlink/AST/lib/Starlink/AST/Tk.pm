@@ -53,7 +53,7 @@ use Starlink::AST;
 use Carp;
 use Data::Dumper;
 
-'$Revision$ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+$VERSION = '2.00';
 
 # Constants describing locations in the external array
 use constant EXT_ATTR => 9;
@@ -1104,8 +1104,9 @@ sub _init_canvas_attrs {
 
 =head1 COPYRIGHT
 
+Copyright (C) 2010 Science and Technology Facilities Council.
 Copyright (C) 2004 University of Exeter.
-Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+Copyright (C) 2005,2006 Particle Physics and Astronomy Research Council.
 All Rights Reserved.
 
 This program is free software; you can redistribute it and/or modify it under
@@ -1123,8 +1124,10 @@ Place,Suite 330, Boston, MA  02111-1307, USA
 
 =head1 AUTHORS
 
-Alasdair Allan E<lt>aa@astro.ex.ac.ukE<gt>,
 Tim Jenness E<lt>t.jenness@jach.hawaii.eduE<gt>
+Alasdair Allan E<lt>aa@astro.ex.ac.ukE<gt>,
+Russell Kackley E<lt>r.kackley@jach.hawaii.eduE<gt>
+
 
 =cut
 

@@ -5,6 +5,7 @@ use ExtUtils::MakeMaker;
 use Config;
 use strict;
 use vars qw/ %StarConfig /;
+use File::Spec;
 
 # Try looking up the config system
 eval "use Starlink::Config qw/ :override :verbose/;";
@@ -42,11 +43,13 @@ $libs = "-L/opt/SUNWspro/lib $libs" if $^O eq 'solaris' && $astlibs =~ /lM77/;
 my @typemaps = ( "typemap" );
 unshift( @typemaps, "typemap.561") if $] < 5.008;
 
+# Location of AST.pm
+my $ast_pm = File::Spec->catfile( "lib", "Starlink", "AST.pm" );
 
 # Write the makefile....
 WriteMakefile(
     'NAME'      => 'Starlink::AST',
-    'VERSION_FROM'   => 'AST.pm',
+    'VERSION_FROM'   => $ast_pm,
     'LIBS'      => [ $libs ],   # e.g., '-lm' 
     'INC'       => "-I$StarConfig{Star_Inc}", # e.g., '-I/usr/include/other' 
     'TYPEMAPS'  => \@typemaps,
@@ -55,7 +58,7 @@ WriteMakefile(
     'dist'      => {'COMPRESS'=>'gzip -9f', 'SUFFIX' => 'gz',
                     'ZIP'=>'/usr/bin/zip','ZIPFLAGS'=>'-rl'},
   ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
-     (ABSTRACT_FROM => 'AST.pm',
+     (ABSTRACT_FROM => $ast_pm,
       AUTHOR     => 'Tim Jenness <tjenness@cpan.org>') : ()),
 );
 
