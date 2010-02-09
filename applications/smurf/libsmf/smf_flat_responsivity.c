@@ -27,7 +27,7 @@
 *     snrmin = double (Given)
 *        Minimum acceptable signal-to-noise ratio for a responsivity fit.
 *        Below this value the fit will be treated as bad and the bolometer
-*        will be disabled.
+*        will be disabled. Only used when fitting TABLE data.
 *     order = size_t (Given)
 *        If the data are being fitted this is the order of polynomial
 *        to use. Ignored if method is POLYNOMIAL.
@@ -64,6 +64,8 @@
 *       factor included in the RAW2CURRENT macro.
 *     - The bolometers are nominally supposed to have a responsivity
 *       of -1.0e6 Amps/Watt.
+*     - Does not attempt to "pre-condition" TABLE data. Assumption
+*       is that CALCFLAT has already done this.
 
 *  Authors:
 *     BDK: Dennis Kelly (UKATC)

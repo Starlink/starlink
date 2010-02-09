@@ -77,7 +77,7 @@
 *     SNRMIN = _DOUBLE (Read)
 *          Signal-to-noise ratio threshold to use when filtering the
 *          responsivity data to determine valid bolometers for the
-*          flatfield. [3.0]
+*          flatfield. Only used in TABLE mode. [3.0]
 
 *  Related Applications:
 *     SMURF: CALCRESP, FLATFIELD
@@ -111,6 +111,8 @@
 *        Update smf_flat_responsivity and smf_flat_write API
 *     2010-02-04 (TIMJ):
 *        Add METHOD and ORDER to allow POLYNOMIAL mode.
+*     2010-02-08 (TIMJ):
+*        Remove obvious problems with data prior to fitting.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -451,6 +453,9 @@ void smurf_calcflat( int *status ) {
       /* need an order for the polynomial */
       parGdr0i( "ORDER", 1, 1, 3, 1, &order, status );
 
+      /* precondition the data prior to fitting */
+      smf_flat_precondition(0, powref, bolref, status );
+
       smf_flat_fitpoly ( powref, bolref, order, &coeffs,
                          &flatpoly, status );
 
@@ -462,6 +467,9 @@ void smurf_calcflat( int *status ) {
 
     } else {
       istable = 1;
+
+      /* get rid of obviously bad bolometers */
+      smf_flat_precondition( 1, powref, bolref, status );
     }
 
 

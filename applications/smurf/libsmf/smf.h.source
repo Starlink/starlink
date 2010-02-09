@@ -859,6 +859,9 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
                         size_t order, smfData **coeffs, smfData ** polyfit,
                         int *status );
 
+void smf_flat_precondition( int allbad, smfData * powvald, smfData * bolvald,
+                            int *status );
+
 size_t smf_flat_responsivity ( const char method[], smfData *respmap, double snrmin, size_t order,
                                const smfData * powval, const smfData * bolval,
                                smfData ** polyfit, int *status );
