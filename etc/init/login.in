@@ -198,7 +198,7 @@ endif
 #
 #  WWW server.  If WWW_HOME is not defined, point it
 #  to the Starlink WWW server at RAL.
-if ( ! ${?WWW_HOME} ) setenv WWW_HOME http://www.starlink.rl.ac.uk/
+if ( ! ${?WWW_HOME} ) setenv WWW_HOME http://www.starlink.ac.uk/
 
 #
 #  MAN pages.  If none defined, create a default, then add to it.

@@ -399,7 +399,7 @@ sub PDL::propndfx {  # Write a PDL to a NDF format file
 =head1 NOTES
 
 The perl NDF module must be available. This is available from the 
-author or from Starlink (http://www.starlink.rl.ac.uk).
+author or from Starlink (http://www.starlink.ac.uk).
 
 If an NDF is read which contains AST World Coordinate information
 (a .WCS component) this information is currently ignored. Currently

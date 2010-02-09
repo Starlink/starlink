@@ -1,7 +1,7 @@
 #! /usr/bin/perl -w
 #    Copyright 2000, 2001, Council of the Central
 #    Laboratory of the Research Councils.  See
-#    http://www.starlink.rl.ac.uk/store/conditions.html for
+#    http://www.starlink.ac.uk/store/conditions.html for
 #    conditions.
 
 $RCSID='$Id$';
@@ -105,7 +105,7 @@ $ident_string = 'Starlink SGML Kit, release ((PKG_VERS))';
 #  <copyright>
 #    <p>Copyright 2000, 2001, Council of the Central
 #    Laboratory of the Research Councils.  See
-#    <url>http://www.starlink.rl.ac.uk/store/conditions.html</url> for
+#    <url>http://www.starlink.ac.uk/store/conditions.html</url> for
 #    conditions.
 #
 #  <history>

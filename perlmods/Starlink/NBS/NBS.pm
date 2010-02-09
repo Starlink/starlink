@@ -1203,7 +1203,7 @@ facilities.
 
 More information on NBS systems can be found in Starlink User
 Note 77 (D.J. Allan, 1995).
-Starlink can be contacted at http://star-www.rl.ac.uk/
+Starlink can be contacted at http://www.starlink.ac.uk/
 
 =head1 AUTHOR
 

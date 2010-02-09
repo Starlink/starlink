@@ -190,7 +190,7 @@
       <p>Everyone should start with the
         <docxref doc="SUG" text="Starlink User's Guide" />, which should be
         available at your site, and is on the web at
-        <url>http://star-www.rl.ac.uk/star/docs/sug.htx/sug.html</url>.
+        <url>http://www.starlink.ac.uk/star/docs/sug.htx/sug.html</url>.
       </p>
 
       <subsect id="s.unix" export="export">
@@ -283,7 +283,7 @@
           this, Brian McIlwrath wrote an overview of available text
           editors in the September 1998 (issue 21) edition of the
           <webref
-          url="http://star-www.rl.ac.uk/bulletin/98sep/node15.html">Starlink
+          url="http://www.starlink.ac.uk/bulletin/98sep/node15.html">Starlink
           Bulletin</webref>.
         </p>
 
@@ -3566,7 +3566,7 @@ m=s2*a3</verbatim>
             one of a number of standard data formats.  Clive Davenhall
             wrote an article on this in the September 1998 issue of
             the <webref
-            url="http://star-www.rl.ac.uk/bulletin/98sep/node12.html">Starlink
+            url="http://www.starlink.ac.uk/bulletin/98sep/node12.html">Starlink
             Bulletin</webref>.  This covered reading and writing using
             the IMG library (<docxref doc="SUN/160" text="SUN/160" />),
             using NDF files and the HDS files they are a special case
@@ -3655,7 +3655,7 @@ packaging for release a TeX distribution.  This is typically based
 on one of the standard TeX distributions, plus an effort to ensure
 that the distribution includes packages of interest to astronomers,
 particularly some of the relevant journal style files.  See the 
-<webref url="http://star-www.rl.ac.uk/%7eacc/tex/tex.html">Starlink LaTeX page</webref>
+<webref url="http://www.starlink.ac.uk/%7eacc/tex/tex.html">Starlink LaTeX page</webref>
 for details.
 </p>
 

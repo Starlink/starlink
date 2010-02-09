@@ -1299,7 +1299,7 @@ All Rights Reserved.
 
 The NDF library is by Rodney Warren-Smith and is part of the Starlink
 Software Collection (Starlink Project, Rutherford Appleton Lab).
-For more information on Starlink go to http://star-www.rl.ac.uk.
+For more information on Starlink go to http://www.starlink.ac.uk.
 See Starlink User Note 33 for details on using the NDF library routines.
 
 

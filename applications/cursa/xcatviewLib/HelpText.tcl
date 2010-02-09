@@ -111,7 +111,7 @@ catalogues and tables.  CURSA is documented in SUN/190.  There is also
 a 'home page' giving additional information about CURSA (and xcatview)
 available via the World Wide Web.  Its URL is:
 
-   http://www.starlink.rl.ac.uk/cursa/
+   http://www.starlink.ac.uk/cursa/
 
 The various catalogue formats which xcatview can access are fully
 described in these documents.

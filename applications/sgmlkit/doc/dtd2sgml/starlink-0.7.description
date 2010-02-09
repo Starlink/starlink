@@ -476,7 +476,7 @@ example above, so that the last word in the `description' part of the
 public identifier is of the form <code>XXX/NNN</code> (for example,
 <code>SUN/123</code>), then the document will make a link to the
 corresponding document at the central <webref
-url="http://www.starlink.rl.ac.uk/docscode.html" >Starlink document
+url="http://www.starlink.ac.uk/docscode.html" >Starlink document
 server</webref>.  If you also supply a `loc' attribute, the system
 will add that to the end of the generated URL.</p>
 
