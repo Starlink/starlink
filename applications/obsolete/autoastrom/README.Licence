@@ -8,7 +8,7 @@ However, there is a complication.  Autoastrom is essentially a wrapper
 for (in the sense that it cannot be used without) the application
 ASTROM, and that application is Copyright, 1994--98, P T Wallace and,
 as far as I am aware, released under the `old' Starlink licence,
-available at <http://www.starlink.rl.ac.uk/store/conditions.html>, and
+available at <http://www.starlink.ac.uk/store/conditions.html>, and
 a copy of which is included in the file LICENCE.Starlink.  There is
 one routine in the module autoastrom.pm (decompose_transform) which is
 a direct port to Perl of the SLALIB routine dcmpf.c, also copyright

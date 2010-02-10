@@ -221,7 +221,7 @@ lut=$KAPPA_DIR/logo_lut axes=yes mode=scale style=^$KAPPA_DIR/sty0 accept"}
       text "KAPPA is a package of about 180 general-purpose commands for
       astronomical image processing and data visualisation. It is
       developed and maintained by the UK Starlink project (see <URL
-      http://www.starlink.rl.ac.uk/>)."
+      http://www.starlink.ac.uk/>)."
 
       pause 8
       head "Current topic: Control and execution of KAPPA commands"

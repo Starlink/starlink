@@ -12,7 +12,7 @@ available.  The NDF library (libndf.a) is dependent on many other
 libraries in the Starlink distribution. If you have the Starlink
 software collection all these libraries should be available, if not
 the libraries must be downloaded from the Starlink Software Store
-(http://star-www.rl.ac.uk/cgi-store/storetop).
+(http://www.starlink.ac.uk/cgi-store/storetop).
 
 As of 5th November 1996, the following libraries are required in order
 to use the NDF module (via the Starlink ndf_link command):

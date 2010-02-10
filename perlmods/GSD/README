@@ -23,9 +23,9 @@ on Sparc Solaris 2.5. More recently it has been tested on perl 5.8.0
 and RedHat 7.3.
 
 The C GSD library is available separately. See
-http://www.starlink.rl.ac.uk/cgi-store/storeform1?GSD
+http://www.starlink.ac.uk/cgi-store/storeform1?GSD
 with documentation at 
-http://www.starlink.rl.ac.uk/star/docs/sun229.htx/sun229.html
+http://www.starlink.ac.uk/star/docs/sun229.htx/sun229.html
 
 
 The library will only work on Alpha/OSF1, Sun Solaris and SunOS.

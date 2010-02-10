@@ -860,7 +860,7 @@ sub WriteTableFile
          print TABLEFILE "Tab-Separated Table (TST) \n";
          print TABLEFILE "# For a description of this format see ";
          print TABLEFILE "Starlink User Note 190 or URL \n";
-         print TABLEFILE "# http://www.starlink.rl.ac.uk/cursa/ \n\n";
+         print TABLEFILE "# http://www.starlink.ac.uk/cursa/ \n\n";
 
 #
 #       A description of the selection as text.
