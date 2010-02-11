@@ -211,7 +211,7 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
       size_t nused;
 
       /* initialise scoeff to bad */
-      for (i=0; i<= order+1; i++) {
+      for (i=0; i< order+1; i++) {
         scoeff[i] = VAL__BADD;
       }
 
@@ -243,8 +243,6 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
           /* simple inverse of straight line fit */
           scoeff[0] = -1.0 * c0 / c1;
           scoeff[1] = 1.0 / c1;
-          scoeff[2] = 0.0;
-          scoeff[3] = 0.0;
         }
 
       } else {
