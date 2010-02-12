@@ -7636,7 +7636,7 @@ package kappa {
             prompt {NDF to be masked}
             ppath GLOBAL
             association <-GLOBAL.DATA_ARRAY
-            help "*"
+            helpkey *
          }
          parameter inside {
             type _LOGICAL
@@ -9271,7 +9271,7 @@ package kappa {
             ppath GLOBAL
             association <-GLOBAL.DATA_ARRAY
             prompt {NDF to be modified}
-            help "*"
+            helpkey *
          }
 
          parameter newval {
@@ -10180,7 +10180,7 @@ package kappa {
             prompt {NDF to be summed}
             ppath GLOBAL
             association <-GLOBAL.DATA_ARRAY
-            help "*"
+            helpkey *
          }
          parameter out {
             position 2
@@ -14220,7 +14220,7 @@ iraf! {
             prompt {NDF to be smoothed}
             ppath GLOBAL
             association <-GLOBAL.DATA_ARRAY
-            help "*"
+            helpkey *
          }
          parameter out {
             position 2
@@ -14293,7 +14293,7 @@ iraf! {
             prompt {NDF to be masked}
             ppath GLOBAL
             association <-GLOBAL.DATA_ARRAY
-            help "*"
+            helpkey *
          }
          parameter inside {
             type _LOGICAL
@@ -15287,7 +15287,7 @@ iraf! {
             prompt {NDF to be masked}
             ppath GLOBAL
             association <-GLOBAL.DATA_ARRAY
-            help "*"
+            helpkey *
          }
 
          parameter inside {
