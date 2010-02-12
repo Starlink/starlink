@@ -161,10 +161,13 @@
 *        Switch to 2d variance array (one value for each bolometer)
 *     2009-09-29 (EC):
 *        Allow multiple extinction correction methods
+*     2010-02-12 (TIMJ):
+*        Do not scale the CSO tau to filter and then ask the extinction
+*        function to scale again.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008,2010 Science and Technology Facilities Council.
 *     Copyright (C) 2006-2009 University of British Columbia.
 *     All Rights Reserved.
 
@@ -784,31 +787,27 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
                  (with only the header mapped) and store the correction
                  factors in the model bufffer */
 
+              tau = VAL__BADD;
               if( !astMapGet0A( keymap, "EXT", &kmap ) ) {
                 /* No keymap parameters: use adaptive method + WVM by default */
                 kmap = NULL;
                 tausrc = SMF__TAUSRC_WVMRAW;
                 extmeth = SMF__EXTMETH_ADAPT;
-                tau = VAL__BADD;
               } else {
                 /* Use sub-keymap containing EXT parameters */
                 smf_get_extpar( kmap, &tausrc, &extmeth, status );
                 if( tausrc == SMF__TAUSRC_CSOTAU ) {
                   if( !astMapGet0D( kmap, "CSOTAU", &tau ) ) {
                     /* is using CSO tau but no specific value supplied get
-                       from the header */
+                       from the header (and change tau source) */
                     tau = smf_cso2filt_tau( idata->hdr, VAL__BADD, status );
+                    tausrc = SMF__TAUSRC_TAU;
                   } else {
                     msgOut( "", "*** EXTINCTION WARNING: single opacity value "
                             "will be used for ALL input files.", status );
                   }
-                }
-
-                if( tausrc == SMF__TAUSRC_TAU ) {
-                  if( !astMapGet0D( kmap, "FILTERTAU", &tau ) ) {
-                    /* is using filter tau but no specific value supplied */
-                    tau = VAL__BADD;
-                  } else{
+                } else if( tausrc == SMF__TAUSRC_TAU ) {
+                  if( astMapGet0D( kmap, "FILTERTAU", &tau ) ) {
                     msgOut( "", "*** EXTINCTION WARNING: single opacity value "
                             "will be used for ALL input files.", status );
                   }
