@@ -880,6 +880,8 @@ f     - AST_TESTFITS: Test if a keyword has a defined value in a FitsChan
 *        Add new function astSetFitsCM.
 *     30-JUL-2009 (DSB):
 *        Fix axis numbering in SkyPole.
+*     12-FEB-2010 (DSB):
+*        Use "<bad>" to represent AST__BAD externally.
 *class--
 */
 
@@ -991,6 +993,9 @@ f     - AST_TESTFITS: Test if a keyword has a defined value in a FitsChan
 
 #define FL  1.0/298.257  /*  Reference spheroid flattening factor */
 #define A0  6378140.0    /*  Earth equatorial radius (metres) */
+
+/* String used to represent AST__BAD externally. */
+#define BAD_STRING "<bad>"
 
 /* Each card in the fitschan has a set of flags associated with it,
    stored in different bits of the "flags" item within each FitsCard
@@ -5719,8 +5724,12 @@ static int CnvType( int otype, void *odata, size_t osize, int type, int undef,
             (void) memcpy( buff, odata, osize );
    
          } else if( type == AST__STRING || type == AST__CONTINUE  ){
-            (void) sprintf( cnvtype_text, "%.*g", DBL_DIG, odouble );
-            CheckZero( cnvtype_text, odouble, 0, status );
+            if( odouble != AST__BAD ) {
+               (void) sprintf( cnvtype_text, "%.*g", DBL_DIG, odouble );
+               CheckZero( cnvtype_text, odouble, 0, status );
+            } else {
+               strcpy( cnvtype_text, BAD_STRING );
+            }
             *( (char **) buff ) = cnvtype_text;
 
          } else if( type == AST__INT      ){
@@ -5750,6 +5759,11 @@ static int CnvType( int otype, void *odata, size_t osize, int type, int undef,
 
          if( type == AST__FLOAT ){
             if( nc = 0, 
+                    ( 0 == astSscanf( ostring, BAD_STRING " %n", &nc ) )
+                  && (nc >= len ) ){
+               *( (double *) buff ) = AST__BAD;
+
+            } else if( nc = 0, 
                      ( 1 != astSscanf( ostring, "%lf %n", (double *) buff, &nc ) )
                   || (nc < len ) ){
                ret = 0;
@@ -19118,8 +19132,15 @@ static void NewCard( AstFitsChan *this, const char *name, int type,
             new->data = astStore( NULL, (void *) data, sizeof( double ) );
 
          } else if( type == AST__COMPLEXF ){
-            new->size = 2*sizeof( double );
-            new->data = astStore( NULL, (void *) data, 2*sizeof( double ) );
+            if( *( (double *) data ) != AST__BAD ) {
+               new->size = 2*sizeof( double );
+               new->data = astStore( NULL, (void *) data, 2*sizeof( double ) );
+            } else {
+               nc = strlen( BAD_STRING );
+               new->size = (size_t)( nc + 1 );
+               new->data = astStore( NULL, BAD_STRING, (size_t)( nc + 1 ) );
+               ( (char *) new->data)[ nc ] = 0;
+            }
 
          } else if( type == AST__COMPLEXI ){
             new->size = 2*sizeof( int );

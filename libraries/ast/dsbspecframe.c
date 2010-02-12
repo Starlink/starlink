@@ -827,12 +827,12 @@ static double GetLO( AstDSBSpecFrame *this, const char *check_msg,
    intermediate frequency. */
    if( result < fabs( f_if ) && astOK ) {
       astError( AST__ATTIN, "%s(%s): The local oscillator frequency (%g Hz) "
-                "is too low (less than the intermediate frequency - %g Hz).", 
+                "is too low (less than the intermediate frequency: %g Hz).", 
                 status, method, astGetClass( this ), result, fabs( f_if ) );
-      astError( AST__ATTIN, "%s(%s): This could be caused by a bad value for"
-                " either the IF attribute (currently %g) or the DSBCentre "
-                "attribute (currently %g).", status, method, 
-                astGetClass( this ), f_if, astGetDSBCentre( this ) );
+      astError( AST__ATTIN, "   This could be caused by a bad value for"
+                " either the IF attribute (currently %g Hz) or the DSBCentre "
+                "attribute (currently %g Hz).", status, f_if, 
+                astGetDSBCentre( this ) );
    }
 
 /* If an error has occurrred, return AST__BAD. */

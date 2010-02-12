@@ -131,6 +131,9 @@ f     - AST_MAPTYPE: Return the data type of a named entry in a map.
 *         Added astMapGetElem<X>.
 *     1-SEP-2009 (DSB):
 *         Added KeyError attribute.
+*     12-FEB-2010 (DSB):
+*         When converting an entry value between double and string, treat 
+*         "<bad>" as the formatted version of AST__BAD.
 *class--
 */
 
@@ -148,6 +151,8 @@ f     - AST_MAPTYPE: Return the data type of a named entry in a map.
    value is exceeded the hash table will be doubled in size. */
 #define MAX_ENTRIES_PER_TABLE_ENTRY 10
 
+/* String used to represent the formatetd version of AST__BAD. */
+#define BAD_STRING "<bad>"
 
 /* Include files. */
 /* ============== */
@@ -844,12 +849,16 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type, int *
    decimal places by two produces a saving of 10 or more characters, 
    assume the least significant two characters are rounding error. */
       } else if( out_type == AST__STRINGTYPE ) {
-         n1 = sprintf( convertvalue_buff, "%.*g", DBL_DIG - 2, dval );
-         n2 = sprintf( convertvalue_buff, "%.*g", DBL_DIG, dval );
-         if( n2 - n1 > 9 ) {
-            (void) sprintf( convertvalue_buff, "%.*g", DBL_DIG - 2, dval );
-         } 
-         cvalue = convertvalue_buff;
+         if( dval != AST__BAD ) {
+            n1 = sprintf( convertvalue_buff, "%.*g", DBL_DIG - 2, dval );
+            n2 = sprintf( convertvalue_buff, "%.*g", DBL_DIG, dval );
+            if( n2 - n1 > 9 ) {
+               (void) sprintf( convertvalue_buff, "%.*g", DBL_DIG - 2, dval );
+            } 
+            cvalue = convertvalue_buff;
+         } else {
+            cvalue = BAD_STRING;
+         }
 
 /* Consider conversion to "AstObject *". */
       } else if( out_type == AST__OBJECTTYPE ) {
@@ -927,9 +936,15 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type, int *
 /* Consider conversion to "double". */
       } else if( out_type == AST__DOUBLETYPE ) {
          nc = 0;
-         nval = astSscanf( cval, " %lf %n", &dval, &nc );
-         if( ( nval == 1 ) && ( nc >= (int) strlen( cval ) ) ) {
+         nval = astSscanf( cval, " " BAD_STRING " %n", &nc );
+         if( ( astSscanf( cval, " " BAD_STRING " %n", &nc ) == 0 ) && 
+             ( nc >= (int) strlen( cval ) ) ) {
+            if( out ) *( (double *) out ) = AST__BAD;
+
+         } else if( ( astSscanf( cval, " %lf %n", &dval, &nc ) == 1 ) && 
+                     ( nc >= (int) strlen( cval ) ) ) {
             if( out ) *( (double *) out ) = dval;
+
          } else {
             result = 0;
          }

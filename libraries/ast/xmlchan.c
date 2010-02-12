@@ -81,6 +81,8 @@ f     The XmlChan class does not define any new routines beyond those
 *        an XmlChan.
 *     7-DEC-2005 (DSB):
 *        Free memory allocated by calls to astReadString.
+*     12-FEB-2010 (DSB):
+*        Represent AST__BAD externally using the string "<bad>".
 *class--
 
 * Further STC work:
@@ -186,6 +188,9 @@ f     The XmlChan class does not define any new routines beyond those
 /* Returns string "an" or "a" depending on whether the first character of
    the supplied string is a vowel or not. */
 #define ANA(t) (t?(strchr("AaEeIiOoUu",t[0])?"an":"a"):"")
+
+/* String used to represent AST__BAD externally. */
+#define BAD_STRING "<bad>"
 
 /* Include files. */
 /* ============== */
@@ -7309,14 +7314,20 @@ static double ReadDouble( AstChannel *this_channel, const char *name, double def
    element = FindAttribute( this, name, status );
 
 /* If an element was found, attempt to decode the string to give a double 
-   value, checking that the entire string is read. If this fails, then the
+   value, checking that the entire string is read (and checking for the 
+   magic string used to represent bad values). If this fails, then the
    wrong name has probably been given, or the input data are corrupt,
    so report an error. */
    if( element ) {
       value = astXmlGetAttributeValue( element, VALUE );
       if( value ) {
          nc = 0;
-         if ( !( ( 1 == astSscanf( value, " %lf %n", &result, &nc ) )
+         if ( ( 0 == astSscanf( value, " " BAD_STRING " %n",
+                                                   &nc ) )
+                 && ( nc >= (int) strlen( value ) ) ) {
+            result = AST__BAD;
+
+         } else if ( !( ( 1 == astSscanf( value, " %lf %n", &result, &nc ) )
                  && ( nc >= (int) strlen( value ) ) ) ) {
             astError( AST__BADIN, "astRead(XmlChan): The value \"%s = %s\" "
                       "cannot be read as a double precision floating point "
@@ -12265,11 +12276,16 @@ static void WriteDouble( AstChannel *this_channel, const char *name,
          astXmlAddAttr( elem, NAME, name, NULL );
 
 /* Format the value as a string and store it as the VALUE attribute.
-   Make sure "-0" isn't produced. */
-         (void) sprintf( buff, "%.*g", DBL_DIG, value );
-         if ( !strcmp( buff, "-0" ) ) {
-            buff[ 0 ] = '0';
-            buff[ 1 ] = '\0';
+   Make sure "-0" isn't produced. Use a magic string to represent bad 
+   values. */
+         if( value != AST__BAD ) {
+            (void) sprintf( buff, "%.*g", DBL_DIG, value );
+            if ( !strcmp( buff, "-0" ) ) {
+               buff[ 0 ] = '0';
+               buff[ 1 ] = '\0';
+            }
+         } else {
+            strcpy( buff, BAD_STRING );
          }
          astXmlAddAttr( elem, VALUE, buff, NULL );
 

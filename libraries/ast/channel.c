@@ -108,6 +108,8 @@ f     - AST_WRITE: Write an Object to a Channel
 *        Enable astChannelData to be used from within astRead.
 *     7-DEC-2009 (DSB):
 *        Added Indent attribute.
+*     12-FEB-2010 (DSB):
+*        Represent AST__BAD externally using the string "<bad>".
 *class--
 */
 
@@ -126,6 +128,9 @@ f     - AST_WRITE: Write an Object to a Channel
 
 /* Max length of string returned by GetAttrib */
 #define GETATTRIB_BUFF_LEN 50    
+
+/* String used to represent AST__BAD externally. */
+#define BAD_STRING "<bad>"
 
 /* Include files. */
 /* ============== */
@@ -2781,11 +2786,16 @@ static double ReadDouble( AstChannel *this, const char *name, double def, int *s
          if ( !value->is_object ) {
 
 /* If so, then attempt to decode the string to give a double value,
-   checking that the entire string is read. If this fails, then the
-   wrong name has probably been given, or the input data are corrupt,
-   so report an error. */
+   checking that the entire string is read (and checking for the magic string
+   used to represent bad values). If this fails, then the wrong name has 
+   probably been given, or the input data are corrupt, so report an error. */
             nc = 0;
-            if ( !( ( 1 == astSscanf( value->ptr.string, " %lf %n",
+            if ( ( 0 == astSscanf( value->ptr.string, " " BAD_STRING " %n",
+                                                      &nc ) )
+                    && ( nc >= (int) strlen( value->ptr.string ) ) ) {
+               result = AST__BAD;
+
+            } else if ( !( ( 1 == astSscanf( value->ptr.string, " %lf %n",
                                                       &result, &nc ) )
                     && ( nc >= (int) strlen( value->ptr.string ) ) ) ) {
                astError( AST__BADIN,
@@ -3975,11 +3985,15 @@ static void WriteDouble( AstChannel *this, const char *name,
       line = astAppendString( line, &nc, " = " );
 
 /* Format the value as a string and append this. Make sure "-0" isn't
-   produced. */
-      (void) sprintf( buff, "%.*g", DBL_DIG, value );
-      if ( !strcmp( buff, "-0" ) ) {
-         buff[ 0 ] = '0';
-         buff[ 1 ] = '\0';
+   produced. Use a magic string to represent bad values. */
+      if( value != AST__BAD ) {
+         (void) sprintf( buff, "%.*g", DBL_DIG, value );
+         if ( !strcmp( buff, "-0" ) ) {
+            buff[ 0 ] = '0';
+            buff[ 1 ] = '\0';
+         }
+      } else {
+         strcpy( buff, BAD_STRING );
       }
       line = astAppendString( line, &nc, buff );
 

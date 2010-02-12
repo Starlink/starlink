@@ -19460,7 +19460,7 @@ CTYPE\emph{i} keywords will include no distortion code.
 \subsubsection{The ``-SIP'' distortion code}
 
 The Spitzer Space Telescope project
-(\htmladdnormallink{http://www.spitzer.caltech.edu/}{http://www.spitzer.caltech.edu/)
+(\htmladdnormallink{http://www.spitzer.caltech.edu/}{http://www.spitzer.caltech.edu/})
 has developed its own system for encoding 2-dimensional image distortion
 within a FITS header, based on the proposals of paper IV. A description
 of this system is available in \htmladdnormallink
@@ -21909,6 +21909,17 @@ f+
 AST\_WRITE.
 f-
 The StcsIndent and XmlIndent attributes have been removed.
+
+\item All classes of Channel now use the string ``<bad>'' to represent the
+floating point value AST\_\_BAD, rather than the literal formatted value
+(typically ``-1.79769313486232e+308'' ). 
+
+\item The KeyMap class now uses the string ``<bad>'' to represent the
+floating point value AST\_\_BAD, rather than the literal formatted value
+(typically ``-1.79769313486232e+308'' ). 
+
+\item The DSBSpecFrame class now reports an error if the local oscillator
+frequency is less than the absoliute value of the intermediate frequency.
 
 
 \end{enumerate}
