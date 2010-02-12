@@ -144,6 +144,8 @@
 *     2010-01-18 (TIMJ):
 *        Trap for bad WVM values and reuse the previous tau. The WVM C code
 *        does not trap for this itself and so returns Inf.
+*     2010-02-12 (TIMJ):
+*        Handle bad telescope data in "full" mode.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -456,34 +458,34 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
       }
     }
 
-    /* If we're using the FAST application method, we assume a single
-       airmass and tau for the whole array */
-    if (quick) {
-      /* For 2-D data, get airmass from the FITS header rather than
-         the state structure */
-      if ( ndims == 2 ) {
-        /* This may change depending on exact FITS keyword */
-        airmass = amstart;
+    /* in all modes we need to keep track of the previous airmass in case
+       we need to gap fill bad telescope data */
+    if ( quick && ndims == 2 ) {
+      /* for 2-D we use the FITS header directly */
+      /* This may change depending on exact FITS keyword */
+      airmass = amstart;
 
-        /* speed is not an issue for a 2d image */
+      /* speed is not an issue for a 2d image */
+      adaptive = 0;
+
+    } else {
+      /* Else use airmass value in state structure */
+      airmass = hdr->state->tcs_airmass;
+
+      /* if things have gone bad use the previous value else store
+         this value. We also need to switch to quick mode and disable adaptive. */
+      if (airmass == VAL__BADD) {
+        airmass = amprev;
+        quick = 1;
         adaptive = 0;
-
       } else {
-        /* Else use airmass value in state structure */
-        airmass = hdr->state->tcs_airmass;
-
-        /* if things have gone bad use the previous value else store
-           this value. We also need to switch to quick mode and disable adaptive. */
-        if (airmass == VAL__BADD) {
-          airmass = amprev;
-          quick = 1;
-          adaptive = 0;
-        } else {
-          amprev = airmass;
-        }
-
+        amprev = airmass;
       }
+    }
 
+    /* If we're using the FAST application method, we assume a single
+       airmass and tau for the whole array but we have to consider adaptive mode */
+    if (quick) {
       /* we have an airmass, see if we need to provide per-pixel correction */
       if (adaptive) {
         if (is_large_delta_atau( airmass, hdr->state->tcs_az_ac2, tau, status) ) {
@@ -514,11 +516,12 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
           }
         }
       } else {
-        /* Throw an error if no WCS */
-        if ( *status == SAI__OK ) {
-          *status = SAI__ERROR;
-          errRep("", "Error: input file has no WCS", status);
-        }
+        /* this time slice may have bad telescope data so we trap for this and re-enable
+           "quick" with a default value. We'll only get here if airmass was good but
+           SMU was bad so we use the good airmass. The map-maker won't be using this
+           data but we need to use something plausible so that we do not throw off the FFTs */
+        quick = 1;
+        extcorr = exp(airmass*tau);
       }
     } 
     /* Loop over data in time slice. Start counting at 1 since this is
@@ -546,13 +549,18 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
         allextcorr[index] = extcorr;
       } else {
         /* Otherwise Correct the data */
-        if( indata && (indata[index] != VAL__BADD) ) {
-          indata[index] *= extcorr;
-        }
+        if (extcorr != VAL__BADD) {
+          if( indata && (indata[index] != VAL__BADD) ) {
+            indata[index] *= extcorr;
+          }
 
-        /* Correct the variance */
-        if( vardata && (vardata[index] != VAL__BADD) ) {
-          vardata[index] *= extcorr * extcorr;
+          /* Correct the variance */
+          if( vardata && (vardata[index] != VAL__BADD) ) {
+            vardata[index] *= extcorr * extcorr;
+          }
+        } else {
+          indata[index] = VAL__BADD;
+          vardata[index] = VAL__BADD;
         }
       }
 
