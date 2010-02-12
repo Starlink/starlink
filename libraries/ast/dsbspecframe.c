@@ -115,6 +115,9 @@ f     The DSBSpecFrame class does not define any new routines beyond those
 *        Modify SubFrame so that DSBSpecFrames are aligned in the
 *        observed sideband (LSB or USB) rather than always being aligned
 *        in the USB.
+*     12-FEB-2010 (DSB):
+*        Report an error if the local oscillator frequency looks silly
+*        (specifically, if it less than the absolute intermediate frequency).
 *class--
 
 *  Implementation Deficiencies:
@@ -257,6 +260,7 @@ static AstMapping *ToUSBMapping( AstDSBSpecFrame *, const char *, int * );
 static const char *GetAttrib( AstObject *, const char *, int * );
 static const char *GetLabel( AstFrame *, int, int * );
 static double GetImagFreq( AstDSBSpecFrame *, int * );
+static double GetLO( AstDSBSpecFrame *, const char *, const char *, int * );
 static int Match( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame **, int * );
 static int SubFrame( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame **, int * );
 static int TestAttrib( AstObject *, const char *, int * );
@@ -750,6 +754,92 @@ static const char *GetLabel( AstFrame *this, int axis, int *status ) {
 /* Return the result. */
    return result;
 
+}
+
+static double GetLO( AstDSBSpecFrame *this, const char *check_msg,
+                     const char *method, int *status ) {
+/*
+*  Name:
+*     GetLO
+
+*  Purpose:
+*     Get the Local Oscillator frequency.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "dsbspecframe.h"
+*     double GetLO( AstDSBSpecFrame *this, const char *check_msg,
+*                   const char *method, int *status )
+
+*  Class Membership:
+*     DSBSpecFrame method.
+
+*  Description:
+*     This function returns the local oscillator frequency in topocentric
+*     frequency.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     check_msg
+*        If not NULL, an error will be reported if either the DSBCentre 
+*        or IF attribute has not been set to an explicit value. In this
+*        case, the error message will include the supplied text.
+*     method
+*        The name of the calling method - used in error messages.
+*     status 
+*        Pointer to the inherited status value.
+
+*  Returned Value:
+*     The local oscillator frequency, in Hz.
+
+*  Notes:
+*     - An error is reported if the local oscillator frequency looks
+*     un-physical (specifically, if it is less than the absolute value of 
+*     the intermediate frequency).
+*     - A value of AST__BAD will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*-
+*/
+
+/* Local Variables: */
+   double f_if;              /* Intermediate frequency (topo,HZ) */
+   double result;            /* The returned frequency */
+
+/* Check the global error status. */
+   if ( !astOK ) return AST__BAD;
+
+/* If required, check that explicit values have been assigned to the required
+   attributes (i.e. report an error if a default value would be used for 
+   either attribute). */
+   if( check_msg ) VerifyAttrs( this, check_msg, "IF DSBCentre", method, 
+                                status );
+
+/* The local oscillator is the sum of the intermediate frequency and the 
+   observation centre frequency. */
+   f_if = astGetIF( this );
+   result = astGetDSBCentre( this ) + f_if;
+
+/* Check the local  oscillator frequency is no smaller than the absolute
+   intermediate frequency. */
+   if( result < fabs( f_if ) && astOK ) {
+      astError( AST__ATTIN, "%s(%s): The local oscillator frequency (%g Hz) "
+                "is too low (less than the intermediate frequency - %g Hz).", 
+                status, method, astGetClass( this ), result, fabs( f_if ) );
+      astError( AST__ATTIN, "%s(%s): This could be caused by a bad value for"
+                " either the IF attribute (currently %g) or the DSBCentre "
+                "attribute (currently %g).", status, method, 
+                astGetClass( this ), f_if, astGetDSBCentre( this ) );
+   }
+
+/* If an error has occurrred, return AST__BAD. */
+   if( !astOK ) result = AST__BAD;
+
+/* Return the result. */
+   return result;
 }
 
 void astInitDSBSpecFrameVtab_(  AstDSBSpecFrameVtab *vtab, const char *name, int *status ) {
@@ -1792,9 +1882,8 @@ static AstMapping *ToLOMapping( AstDSBSpecFrame *this, const char *method, int *
       tmap = TopoMap( this, 1, method, status );         
 
 /* Calculate the local oscillator frequency (topocentric in Hertz). */
-      VerifyAttrs( this, "create a Mapping to upper sideband", 
-                   "IF DSBCentre", "astGetImagFreq", status );
-      f_lo = astGetDSBCentre( this ) + astGetIF( this );
+      f_lo = GetLO( this, "create a Mapping to upper sideband",
+                    "astGetImagFreq", status );
 
 /* Create a 1D WinMap which converts f_in to f_out. */
       if( sb == LSB ) {
@@ -1911,9 +2000,8 @@ static AstMapping *ToLSBMapping( AstDSBSpecFrame *this, const char *method, int 
       tmap = TopoMap( this, 1, method, status );         
 
 /* Calculate the local oscillator frequency (topocentric in Hertz). */
-      VerifyAttrs( this, "create a Mapping to lower sideband", 
-                   "IF DSBCentre", "astGetImagFreq", status );
-      f_lo = astGetDSBCentre( this ) + astGetIF( this );
+      f_lo = GetLO( this, "create a Mapping to lower sideband",
+                    "astGetImagFreq", status );
 
 /* Create a 1D WinMap which converts USB or LO to LSB. */
       if( sb == USB ) {
@@ -2133,9 +2221,8 @@ static AstMapping *ToUSBMapping( AstDSBSpecFrame *this, const char *method, int 
       tmap = TopoMap( this, 1, method, status );         
 
 /* Calculate the local oscillator frequency (topocentric in Hertz). */
-      VerifyAttrs( this, "create a Mapping to upper sideband", 
-                   "IF DSBCentre", "astGetImagFreq", status );
-      f_lo = astGetDSBCentre( this ) + astGetIF( this );
+      f_lo = GetLO( this, "create a Mapping to upper sideband",
+                    "astGetImagFreq", status );
 
 /* Create a 1D WinMap which converts f_in to f_out. */
       if( sb == LSB ) {
