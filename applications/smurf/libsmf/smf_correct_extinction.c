@@ -370,13 +370,13 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
     /* and choose a correction method */
     if (is_large_delta_atau( refam, refel, tau, status) ) {
       method = SMF__EXTMETH_FULL;
-      msgOutif(MSG__DEBUG, " ",
+      msgOutiff(MSG__DEBUG, " ",
                "Adaptive extinction algorithm selected per-bolometer airmass value "
-               "per time slice", status);
+               "per time slice (am=%g, tau=%g)", status, refam, tau);
     } else {
-      msgOutif(MSG__DEBUG, " ",
-               "Adaptive extinction algorithm selected single airmass value per time slice",
-               status);
+      msgOutiff(MSG__DEBUG, " ",
+               "Adaptive extinction algorithm selected single airmass value per time slice"
+               " (am=%g, tau=%g)", status, refam, tau);
       method = SMF__EXTMETH_SINGLE;
     }
 
