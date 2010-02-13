@@ -171,9 +171,10 @@ void CGEN_FUNCTION(smf_templateFit1)( CGEN_TYPE *data, unsigned char *qual,
     return;
   }
 
-  /* Initialize gain and offset to bad values */
+  /* Initialize gain, offset and correlation to bad values */
   if( gain ) *gain = VAL__BADD;
   if( offset ) *offset = VAL__BADD;
+  if( corr ) *corr = VAL__BADD;
 
   if( qual ) {  /* QUALITY checking version */
     /* Calculate sums in case of non-contiguous data */

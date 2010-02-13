@@ -158,6 +158,7 @@ smf_free.c \
 smf_free_smfFilter.c \
 smf_freepolbins.c \
 smf_freetiles.c \
+smf_gandoff.c \
 smf_geod.c \
 smf_get_cleanpar.c \
 smf_get_dims.c \

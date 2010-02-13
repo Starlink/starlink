@@ -101,15 +101,18 @@ void smf_calcmodel_gai( smfWorkForce *wf __attribute__((unused)),
 
   /* Local Variables */
   size_t bstride;               /* bolometer stride */
+  dim_t gain_box=2000;          /* No. of time slices in a block */
   size_t gbstride;              /* GAIn bolo stride */
   size_t gcstride;              /* GAIn coeff stride */
   int gflat=0;                  /* correct flatfield using GAI */
   dim_t i;                      /* Loop counter */
   dim_t idx=0;                  /* Index within subgroup */
+  int ival;                     /* Integer argument value */
   dim_t j;                      /* Loop counter */
   AstKeyMap *kmap=NULL;         /* Local GAIn keymap */
   smfArray *model=NULL;         /* Pointer to model at chunk */
   double *model_data=NULL;      /* Pointer to DATA component of model */
+  dim_t nblock;                 /* No. of time slice blocks */
   dim_t nbolo;                  /* Number of bolometers */
   dim_t ndata;                  /* Number of data points */
   smfArray *noi=NULL;           /* Pointer to NOI at chunk */
@@ -117,17 +120,30 @@ void smf_calcmodel_gai( smfWorkForce *wf __attribute__((unused)),
   size_t noibstride;            /* bolo stride for noise */
   dim_t nointslice;             /* number of time slices for noise */
   size_t noitstride;            /* Time stride for noise */
+  size_t npar;                  /* No. of parameters per bolometer */
   dim_t ntslice;                /* Number of time slices */
   smfArray *qua=NULL;           /* Pointer to QUA at chunk */
   unsigned char *qua_data=NULL; /* Pointer to quality data */
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DAT */
-  double scale;                 /* Scale factor */
+  double *scale;                /* Pointer to scale factor */
   size_t tstride;               /* time slice stride */
+  double *wg;                   /* Workspace holding time slice gains */
+  double *woff;                 /* Workspace holding time slice offsets */
 
   /* Main routine */
   if( *status != SAI__OK ) return;
   if( !(flags&SMF__DIMM_INVERT) ) return;
+
+  /* Get the number of blocks into which to split each time series. Each box 
+     (except possibly the last one contains "gain_box" time slices. */
+  gain_box = 2000;
+  if( astMapGet0A( keymap, "COM", &kmap ) ) {
+     if( astMapGet0I( kmap, "GAIN_BOX", &ival ) ) {
+        gain_box = ival;
+     }
+     kmap = astAnnul( kmap );
+  }                 
 
   /* Obtain pointer to sub-keymap containing GAI parameters */
   if( astMapGet0A( keymap, "GAI", &kmap ) ) {
@@ -172,32 +188,53 @@ void smf_calcmodel_gai( smfWorkForce *wf __attribute__((unused)),
       smf_get_dims( res->sdata[idx],  NULL, NULL, &nbolo, &ntslice, &ndata,
                     &bstride, &tstride, status);
 
-      smf_get_dims( model->sdata[idx],  NULL, NULL, NULL, NULL, NULL,
+      smf_get_dims( model->sdata[idx],  NULL, NULL, NULL, &npar, NULL,
                     &gbstride, &gcstride, status);
+
+      /* Allocate work space for the gain and offset for each time slice. */
+      woff = astMalloc( ntslice*sizeof( *woff ) );
+      wg = astMalloc( ntslice*sizeof( *wg ) );
+
+      /* Get the number of blocks into which the time stream is divided.
+         Each block has a separate gain, offset and correlation factor 
+         for each bolometer. */
+      nblock = npar/3;
 
       /* Undo the gain correction stored in GAI (the gain is applied to
          the signal and noise in smf_calcmodel_com) */
       for( i=0; i<nbolo; i++ ) {
-        if( !(qua_data[i*bstride]&SMF__Q_BADB) && (model_data[i*gbstride]>0) ) {
-          scale = model_data[i*gbstride];
+        if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {
+
+          /* Get the gain and offset for each time slice of this bolometer. */
+          smf_gandoff( i, 0, ntslice - 1, ntslice, gbstride, gcstride, 
+                       model_data, nblock, gain_box, wg, woff, status );
 
           /* First undo the flatfield correction to the signal */
-          for( j=0; j<ntslice; j++ ) {
-            if( !(qua_data[i*bstride + j*tstride]&SMF__Q_MOD) ) {
-              res_data[i*bstride + j*tstride] *= scale;
+          scale = wg;
+          for( j=0; j<ntslice; j++,scale++ ) {
+            if( !(qua_data[i*bstride + j*tstride]&SMF__Q_MOD) &&
+                *scale != VAL__BADD && *scale > 0.0 ) {
+              res_data[i*bstride + j*tstride] *= *scale;
             }
           }
 
           /* Then scale the noise. */
           if( noi ) {
-            for( j=0; j<nointslice; j++ ) {
-              if( noi_data[i*noibstride + j*noitstride] != VAL__BADD ) {
-                noi_data[i*noibstride + j*noitstride] *= (scale*scale);
+            scale = wg;
+            for( j=0; j<nointslice; j++,scale++ ) {
+              if( noi_data[i*noibstride + j*noitstride] != VAL__BADD &&
+                  *scale != VAL__BADD && *scale > 0.0 ) {
+                noi_data[i*noibstride + j*noitstride] *= (*scale) * (*scale);
               }
             }
           }
         }
       }
+
+      /* Free work space. */
+      woff = astFree( woff );
+      wg = astFree( wg );
+
     }
   }
 

@@ -53,6 +53,13 @@
 *        Add multi-threading.
 *     2010-01-22 (DSB):
 *        Correct single-threaded case.
+*     2010-02-10 (DSB):
+*        - Change BOX from 10 to 50 to get a more reasonable estimate of
+*        the noise.
+*        - If a gap is found at the start or end of the time series, use
+*        a gradient of zero when filling it, since the gradient estimate 
+*        within a single box can be very unrepresentative (i.e. unusually
+*        high or low).
 
 *  Copyright:
 *     Copyright (C) 2010 Univeristy of British Columbia.
@@ -99,7 +106,7 @@
 /* Define the width of the patch used to determine the mean level and
    noise adjacent to each flagged block. The current value is pretty well
    arbitrary. */
-#define BOX 10
+#define BOX 50
 
 /* Structure containing information about blocks of bolos to be
    filled by each thread. */
@@ -214,7 +221,6 @@ void  smf_fillgaps( smfWorkForce *wf, smfData *data, unsigned char *quality,
 
   /* Wait until all jobs in the current job context have completed, and
      then end the job context. */
-
   smf_wait( wf, status );
   smf_end_job_context( wf, status );
 
@@ -436,17 +442,12 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
   
             /* Find the gradient and offset for the straight line used to
                create the replacement values for the flagged block. */
-
-
-
-
-
             if( jstart <= 0 ) {
-              grad = mr;
+              grad = 0.0;
               offset = cr;
 
             } else if( jend >= jfinal ) {
-              grad = ml;
+              grad = 0.0;
               offset = cl;
   
             } else {

@@ -801,9 +801,10 @@ void smf_find_subarray ( const smfHead * hdr, char subarray[],
 void smf_fit_poly( const smfData *data, unsigned char *quality,
                    const size_t order, double *poly, int *status);
 
-void smf_fit_poly1d ( size_t order, size_t nelem, double clip, const double x[], const double y[],
-                      const double vary[], double coeffs[], double varcoeffs[],
-                      double polydata[], size_t * nused, int *status );
+void smf_fit_poly1d ( size_t order, size_t nelem, double clip, const double x[],
+                      const double y[], const double vary[], double coeffs[],
+                      double varcoeffs[], double polydata[], size_t * nused,
+                      int *status );
 
 void smf_fits_crchan( size_t nfits, const char * headrec, AstFitsChan ** fits,
                       int *status);
@@ -892,6 +893,11 @@ int ***smf_freepolbins( int nndf, int npbin, double **pangle, int ***ptime,
                         int *status );
 
 smfTile *smf_freetiles( smfTile *tiles, int size, int *status );
+
+void smf_gandoff( dim_t ibolo, dim_t time0, dim_t time1, dim_t ntime, 
+                  dim_t gbstride, dim_t gcstride, double *gai_data, 
+                  dim_t nblock, dim_t gain_box, double *wg, double *woff, 
+                  int *status );
 
 void smf_geod( const double pos[3], double *phi, double *h, double *lambda );
 

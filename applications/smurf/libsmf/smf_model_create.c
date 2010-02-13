@@ -238,13 +238,16 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
   int fd=0;                     /* File descriptor */
   int flag=0;                   /* Flag */
   char fname_grpex[GRP__SZNAM+1];/* String for holding filename grpex */
+  dim_t gain_box=2000;          /* No. of time slices in a block */
   smfDIMMHead head;             /* Header for the file */
   size_t headlen=0;             /* Size of header in bytes */
   void *headptr=NULL;           /* Pointer to header portion of buffer */
   dim_t i;                      /* Loop counter */
+  dim_t ibase;                  /* Base offset */
   smfData *idata=NULL;          /* Pointer to input smfdata data */
   int idx=0;                    /* Index within subgroup */
   size_t isize=0;               /* Number of files in input group */
+  int ival;                     /* Integer value */
   dim_t j;                      /* Loop counter */
   size_t k;                     /* Loop counter */
   AstKeyMap *kmap=NULL;         /* Local keymap */
@@ -254,10 +257,12 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
   const char *mname=NULL;       /* String model component name */
   size_t msize=0;               /* Number of files in model group */
   char name[GRP__SZNAM+1];      /* Name of container file without suffix */
+  dim_t nblock=0;               /* Number of time blocks */
   dim_t nbolo;                  /* Number of bolometers */
-  dim_t ndata=0;               /* Number of elements in data array */
+  dim_t ndata=0;                /* Number of elements in data array */
   size_t nflag;                 /* Number of flagged samples */
   dim_t nrel=0;                 /* Number of related elements (subarrays) */
+  dim_t ntslice=0;              /* Number of time slices */
   int oflag=0;                  /* Flags for opening template file */
   char *pname=NULL;             /* Poiner to fname */
   char suffix[] = SMF__DIMM_SUFFIX; /* String containing model suffix */
@@ -586,13 +591,31 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
             smf_set_clabels( "Common-mode Gain/Offset/Correlation", "Value",
                              "", &head.hdr, status );
 
+            /* Get the number of blocks into which to split each
+               time series. Each box (except possibly the last one
+               contains "gain_box" time slices. */
+
+            gain_box = 2000;
+            if( astMapGet0A( keymap, "COM", &kmap ) ) {
+               if( astMapGet0I( kmap, "GAIN_BOX", &ival ) ) {
+                  gain_box = ival;
+               }
+               kmap = astAnnul( kmap );
+            }                 
+            if( isTordered ) { 
+              ntslice = (idata->dims)[2];
+            } else { 
+              ntslice = (idata->dims)[0];
+            }
+            nblock = 1 + ( ntslice - 1 )/gain_box;
+
             /* Note that we're using the time axis to store the coefficients */
             if( isTordered ) {
               head.data.dims[SC2STORE__ROW_INDEX] =
                 (idata->dims)[SC2STORE__ROW_INDEX];
               head.data.dims[SC2STORE__COL_INDEX] =
                 (idata->dims)[SC2STORE__COL_INDEX];
-              head.data.dims[2] = 3;
+              head.data.dims[2] = 3*nblock;
 
               head.data.lbnd[SC2STORE__ROW_INDEX] =
                 (idata->lbnd)[SC2STORE__ROW_INDEX];
@@ -600,7 +623,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
                 (idata->lbnd)[SC2STORE__COL_INDEX];
               head.data.lbnd[2] = 1;
             } else {
-              head.data.dims[0] = 3;
+              head.data.dims[0] = 3*nblock;
               head.data.dims[1+SC2STORE__ROW_INDEX] =
                 (idata->dims)[1+SC2STORE__ROW_INDEX];
               head.data.dims[1+SC2STORE__COL_INDEX] =
@@ -842,14 +865,17 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
               /* Initialize gain to 1, offset to 0, correlation to 0 */
               smf_get_dims( &(head.data), NULL, NULL, &nbolo, NULL, NULL,
                              &bstride, &tstride, status);
-
-              for( k=0; k<3; k++ ) { /* planes along tslice axis */
-                if( k==0 ) val = 1;
-                else val = 0;
+  
+              for( k=0; k<nblock; k++ ) { 
+                ibase = k*tstride;
                 for( l=0; l<nbolo; l++ ) {
-                  ((double *)dataptr)[l*bstride + k*tstride] = val;
+                  ((double *)dataptr)[ibase] = 1.0;
+                  ((double *)dataptr)[nblock*tstride + ibase] = 0.0;
+                  ((double *)dataptr)[2*nblock*tstride + ibase] = 0.0;
+                  ibase += bstride;
                 }
               }
+
             } else {
               /* otherwise zero the buffer */
               memset( dataptr, 0, datalen );
