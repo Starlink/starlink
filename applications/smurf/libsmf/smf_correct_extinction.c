@@ -145,7 +145,10 @@
 *        Trap for bad WVM values and reuse the previous tau. The WVM C code
 *        does not trap for this itself and so returns Inf.
 *     2010-02-12 (TIMJ):
-*        Handle bad telescope data in "full" mode.
+*        - Handle bad telescope data in "full" mode.
+*        - Take control of our default cso tau for WVM mode and initialise
+*          the "old" wvm array to bads rather than zero because the WVM
+*          uses zero itself.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -226,7 +229,7 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
   dim_t npts = 0;          /* Number of data points */
   dim_t nx = 0;            /* # pixels in x-direction */
   dim_t ny = 0;            /* # pixels in y-direction */
-  double oldtwvm[3] = {0.0, 0.0, 0.0}; /* Cached value of WVM temperatures */
+  float oldtwvm[3] = {VAL__BADR, VAL__BADR, VAL__BADR}; /* Cached value of WVM temperatures */
   int ubnd[2];             /* Upper bound */
   double *vardata = NULL;  /* Pointer to variance array */
   AstFrameSet *wcs = NULL; /* Pointer to AST WCS frameset */
@@ -405,6 +408,12 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
 
   /* Store the previous good airmass if we need it for a gap */
   amprev = amstart;
+
+  /* initialise the tau if we are in WVM mode. Use an intelligent
+     default in case we have some bad wvm data at the start.*/
+  if (tausrc == SMF__TAUSRC_WVMRAW) {
+    tau = smf_cso2filt_tau( hdr, VAL__BADD, status );
+  }
 
   /* Loop over number of time slices/frames */
 
