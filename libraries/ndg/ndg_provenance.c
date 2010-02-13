@@ -137,6 +137,9 @@
 *        deep copy of a Provenance structure.
 *     20-JUL-2009 (DSB):
 *        Added ndgWriteVotProv and ndgReadVotProv.
+*     13-FEB-2010 (DSB):
+*        Do not purge duplicate entries before leaving ndg1Rmprv, as
+*        removing any such entries would upset subsequent ancestor indexing.
 */
 
 
@@ -333,6 +336,9 @@ F77_SUBROUTINE(ndg_copyprov)( INTEGER(iprov), LOGICAL(cleanse),
 *        If .TRUE., then any ancestors which have been hidden using
 *        NDG_HIDEPROV are removed from the returned Provenance structure
 *        (see NDG_REMOVEPROV).
+*     IPROV2 = INTEGER (Returned)
+*        An identifier for the new Provenance structure, which should be freed
+*        using NDG_FREEPROV when no longer needed.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -5611,9 +5617,6 @@ static void ndg1Rmprv( Provenance *prov, int ianc, int *status ){
       }
       prov->provs[ i - 1 ] = NULL;
       ( prov->nprov )--;
-
-/* Purge any duplicate entries in the provenance information. */
-      ndg1PurgeProvenance( prov, status );
 
 /* Report an error if the ianc value is bad. */
    } else if( *status == SAI__OK ) {
