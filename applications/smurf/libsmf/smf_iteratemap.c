@@ -1887,7 +1887,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       msgOut( "", " ************************* Warning! ************************* ", status );
       msgOut( "", " This data chunk failed due to insufficient good samples.",
               status );
-      msgOut( "", " This is oftern due to strict bad-bolo flagging.", status );
+      msgOut( "", " This is often due to strict bad-bolo flagging.", status );
       msgOut( "", " Annuling the bad status and trying to continue...", status);
       msgOut( "", " ************************************************************ ", status );
     } else {
