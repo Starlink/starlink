@@ -140,6 +140,8 @@
 *     13-FEB-2010 (DSB):
 *        Do not purge duplicate entries before leaving ndg1Rmprv, as
 *        removing any such entries would upset subsequent ancestor indexing.
+*     15-FEB-2010 (DSB):
+*        - Purge duplicate entries before leaving ndgModifyProv.
 */
 
 
@@ -1991,6 +1993,11 @@ void ndgModifyProv( NdgProvenance *prov, int ianc, AstKeyMap *km,
 /* Free the KeyMap pointer. */
             more2 = astAnnul( more2 );
          }
+
+/* It is possioble that the changes may have resulted in the ancestor
+   having the same path as another ancestor. So now check for duplicated
+   ancestors and purge them. */
+         ndg1PurgeProvenance( provenance, status );
 
 /* Report an error if the ianc value is bad. */
       } else if( *status == SAI__OK ) {
