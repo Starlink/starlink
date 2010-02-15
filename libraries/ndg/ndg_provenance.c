@@ -142,6 +142,8 @@
 *        removing any such entries would upset subsequent ancestor indexing.
 *     15-FEB-2010 (DSB):
 *        - Purge duplicate entries before leaving ndgModifyProv.
+*        - Report an error if inconsitent entries for the same ancestor
+*        are found within a provenance structure.
 */
 
 
@@ -284,6 +286,7 @@ static char ndg1XmlSource( void *, int * );
 static const char *ndg1Date( int * );
 static const char *ndg1WriteProvenanceXml( Provenance *, int * );
 static int *ndg1ParentIndicies( Prov *, Provenance *, int *, int *, int * );
+static int ndg1CheckSameParents( Prov *, Prov *, int * );
 static int ndg1FindAncestorIndex( Prov *, Provenance *, int * );
 static int ndg1GetLogicalComp( HDSLoc *, const char *, int, int * );
 static int ndg1HashFun( const char *, int * );
@@ -2876,6 +2879,83 @@ static void ndg1AddHistKM( AstKeyMap *km, const char *key, Prov *prov,
    }
 }
 
+static int ndg1CheckSameParents( Prov *prov1, Prov *prov2, int *status ) {
+/*
+*  Name:
+*     ndg1CheckSameParents
+
+*  Purpose:
+*     Checks if two Prov structures have the same parents.
+
+*  Invocation:
+*     void ndg1CheckSameParents( Prov *prov1, Prov *prov2, int *status )
+
+*  Description:
+*     This function returns a flag indicating if the two supplied Prov 
+*     structures have the same parents. 
+*
+*     Note, two parents are considered equal if they have the same path.
+
+*  Arguments:
+*     prov1
+*        The first Prov structure.
+*     prov2
+*        The second Prov structure.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     Non-zero if the two supplied Prov structures have the same list of
+*     parents. Zero otherwise, or if an error occurs.
+
+*/
+
+/* Local Variables: */
+   AstKeyMap *km;
+   int result;
+   int i;
+
+/* Check the inherited status value. */
+   if( *status != SAI__OK ) return 0;
+
+/* Initialise */
+   result = 1;
+
+/* Create a KeyMap. */
+   km = astKeyMap( " " );
+
+/* Add an entry to the KeyMap for each parent of prov1. The key is the
+   path to parent and the (integer) value is set arbitrarily to zero. */
+   for( i = 0; i < prov1->nparent; i++ ) {
+      astMapPut0I( km, prov1->parents[ i ]->path, 0, NULL );
+   }
+
+/* Loop round all the parents of prov2. */
+   for( i = 0; i < prov2->nparent; i++ ) {
+
+/* Clear the returned flag and leave the loop if the KeyMap does not 
+   contain an entry with key equal to the path of the current parent. */
+      if( ! astMapHasKey( km, prov2->parents[ i ]->path ) ) {
+         result = 0;
+         break;
+
+/* If the parent was found in the KeyMap, remove the entry. */
+      } else {
+         astMapRemove( km, prov2->parents[ i ]->path );
+      }
+   }
+
+/* If any entries remain in the KeyMap (indicating parents of prov1
+   that are not parents of prov2), clear the returned flag. */
+   if( result && astMapSize( km ) > 0 ) result = 0;
+
+/* Free resources. */
+   km = astAnnul( km );
+
+/* Return the result. */
+   return result;
+}
+
 static void ndg1CopyComps( HDSLoc *loc1, HDSLoc *loc2, int *status ){
 /*
 *  Name:
@@ -4804,12 +4884,27 @@ static void ndg1PurgeProvenance( Provenance *provenance,
             prov2 = provenance->provs[ j ];
             if( prov2 ) {
                keep = ndg1TheSame( prov1, prov2, status );
+
+/* If the two provenance structures refer to the same NDF, check they have 
+   the same list of parents, and report an error if not. */
                if( keep ) {
+                  if( !ndg1CheckSameParents( prov1, prov2, status ) ) {
+                     if( *status == SAI__OK ) {
+                        *status = SAI__ERROR;
+                        msgSetc( "N", prov1->path );
+                        errRep( " ", "The ancestor NDF '^N' was included "
+                                "twice within the provenance structure, but "
+                                "each occurrence specifies a different set "
+                                "of parents.", status );
+                     }
+                  }
+               }
 
 /* If the two provenance structures refer to the same NDF, break the
    parent-child link for the poorer Prov and register the better Prov with
    the parent in place of the poorer Prov. The better Prov is the one
    that contains most information. */
+               if( keep && *status == SAI__OK ) {
                   if( keep == 1 ) {
                      better = prov1;
                      poorer = prov2;
@@ -4823,6 +4918,9 @@ static void ndg1PurgeProvenance( Provenance *provenance,
                      ndg1Disown( poorer, child, status );
                      ndg1ParentChild( better, child, status );
                   }
+
+               } else {
+                 keep = 0;
                }
             }
          }
