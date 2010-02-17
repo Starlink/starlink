@@ -23,12 +23,19 @@
 
 *  Description:
 *     This function reads the FITS header to determine the mean tau
-*     in CSO units.
+*     in CSO units. Preference is given to values derived from the WVM
+*     FITS headers. If those are invalid CSO tau headers will be used.
+*
+*     Looks at the date headers of the tau readings to determine whether
+*     the values should be associated with the observation. For CSO tau
+*     the threshold is 15 minutes for WVM data the threshold is 5 minutes.
 
 *  Return Value:
 *     tau = double
-*        Tau in CSO units.
-     
+*        Tau in CSO units. Returns bad value on error and 0.0 if
+*        no valid value can be obtained. Does not set status to
+*        bad if tau can not be determined.
+
 *  Authors:
 *     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
@@ -36,15 +43,21 @@
 *  History:
 *     2008-07-28 (TIMJ):
 *        Initial version.
+*     2010-02-16 (TIMJ):
+*        Search WVM and TAU225 headers.
 
 *  Notes:
 *     - May calculate the mean from two values or may read a single
 *       mean header value.
 *     - could be expanded in the future to handle scaling from CSO
-*       to filter tau.
+*       to filter tau. See smf_cso2filt_tau
+*     - Does not see whether the start reading is within a reasonable
+*       time of the observation, only that the end reading is close
+*       enough. Assumes that if the end reading is reasonable the
+*       start reading will also be reasonable.
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008,2010 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -72,26 +85,81 @@
 
 /* Starlink includes */
 #include "mers.h"
+#include "ast.h"
 #include "sae_par.h"
 #include "star/one.h"
+#include "prm_par.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"
 
 #define FUNC_NAME "smf_calc_meantau"
 
-double smf_calc_meantau ( const smfHead * hdr, int *status ) {
-  double tau1;         /* Tau at start */
-  double tau2;         /* Tau at end of file */
-  double retval;
+double
+smf__calc_meantau_from_fits( const smfHead * hdr, double refmjd, double threshold,
+                             const char datecard[], const char startcard[],
+                             const char endcard[], int *status );
 
-  retval = 0.0;
+
+double smf_calc_meantau ( const smfHead * hdr, int *status ) {
+  double dateobs;      /* date of observation (MJD) */
+  double retval = VAL__BADD;
+
   if (*status != SAI__OK) return retval;
 
-  smf_fits_getD( hdr, "WVMTAUST", &tau1, status );
-  smf_fits_getD( hdr, "WVMTAUEN", &tau2, status );
+  /* get a reference MJD for this observation */
+  smf_find_dateobs( hdr, &dateobs, NULL, status );
+
+  /* we can read from either the WVM or the TAU headers */
+  retval = smf__calc_meantau_from_fits( hdr, dateobs, 5.0, "WVMDATEN", "WVMTAUST",
+                                        "WVMTAUEN", status );
+
+  if (retval == VAL__BADD) {
+    retval = smf__calc_meantau_from_fits( hdr, dateobs, 15.0, "TAUDATEN", "TAU225ST",
+                                          "TAU225EN", status );
+  }
+
+  if (retval == VAL__BADD) {
+    msgOutif( MSG__NORM, "", "Unable to determine tau from FITS headers. Assuming 0.0",
+              status );
+    retval = 0.0;
+  }
+
+  return retval;
+}
+
+double
+smf__calc_meantau_from_fits( const smfHead * hdr, double refmjd, double threshold,
+                             const char datecard[], const char startcard[],
+                             const char endcard[], int *status ) {
+
+  char iso[81];
+  double mjd = VAL__BADD;
+  double tau1;
+  double tau2;
+  AstTimeFrame * tf = NULL;
+  double retval = VAL__BADD;
+
+  if (*status != SAI__OK) return retval;
+
+  /* see whether the date is reasonable. The date can't be in the future beyond
+     the end of the observation so we just check the start. */
+  smf_fits_getS( hdr, datecard, iso, sizeof(iso), status );
+  tf = astTimeFrame( "TimeOrigin=%s,TimeScale=UTC", iso);
+  mjd = astGetD( tf, "TimeOrigin" );
+
+  /* threshold is in minutes */
+  if ( (SPD/60.0) * (refmjd - mjd) > threshold ) return retval;
+
+  smf_fits_getD( hdr, startcard, &tau1, status );
+  smf_fits_getD( hdr, endcard, &tau2, status );
   if (*status == SAI__OK) {
     retval = (tau1 + tau2) / 2.0;
   }
+
+  msgOutiff( MSG__NORM, "", "Determined tau of %g from %s and related FITS headers",
+             status, retval, datecard );
+
+
   return retval;
 }
