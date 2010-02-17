@@ -203,12 +203,17 @@ flt.filt_edgehigh = 0.1
 # function of time stored with each observation. This is the default if
 # nothing is specified.
 #
-# tausrc   : wvmraw, csotau, filtertau
+# tausrc   : auto, wvmraw, csotau, filtertau
 # taumethod: adaptive, full, quick
+
+# filtertau "tausrc" requires a filtertau entry
+# csotau is optional for "auto" and "csotau" tausrc. If not provided
+# the value will be calculated from the header.
+
 # csotau   : use value only if tausrc=csotau
 # filtertau: use only if tausrc=filtertau
 
-ext.tausrc    =wvmraw
+ext.tausrc    =auto
 ext.taumethod =adaptive
 #ext.csotau    = 0.2
 #ext.filtertau = 0.2
