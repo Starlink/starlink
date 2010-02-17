@@ -164,6 +164,10 @@
 *     2010-02-12 (TIMJ):
 *        Do not scale the CSO tau to filter and then ask the extinction
 *        function to scale again.
+*     2010-02-16 (TIMJ):
+*        Add support for AUTO extinction tau source. Remove call to
+*        smf_cso2filt_tau since smf_correct_extinction will do that
+*        anyhow.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -812,27 +816,26 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
 
               tau = VAL__BADD;
               if( !astMapGet0A( keymap, "EXT", &kmap ) ) {
-                /* No keymap parameters: use adaptive method + WVM by default */
+                /* No keymap parameters: use adaptive method + AUTO by default */
                 kmap = NULL;
-                tausrc = SMF__TAUSRC_WVMRAW;
+                tausrc = SMF__TAUSRC_AUTO;
                 extmeth = SMF__EXTMETH_ADAPT;
               } else {
                 /* Use sub-keymap containing EXT parameters */
                 smf_get_extpar( kmap, &tausrc, &extmeth, status );
-                if( tausrc == SMF__TAUSRC_CSOTAU ) {
-                  if( !astMapGet0D( kmap, "CSOTAU", &tau ) ) {
-                    /* is using CSO tau but no specific value supplied get
-                       from the header (and change tau source) */
-                    tau = smf_cso2filt_tau( idata->hdr, VAL__BADD, status );
-                    tausrc = SMF__TAUSRC_TAU;
-                  } else {
-                    msgOut( "", "*** EXTINCTION WARNING: single opacity value "
-                            "will be used for ALL input files.", status );
+                if( tausrc == SMF__TAUSRC_CSOTAU ||
+                    tausrc == SMF__TAUSRC_AUTO ) {
+                  /* In AUTO mode we can let people specify a fallback CSO tau.
+                     In CSO mode a hard-coded value will be used for all files. */
+                  if( astMapGet0D( kmap, "CSOTAU", &tau ) ) {
+                    msgOutf( "", "*** EXTINCTION WARNING: single opacity value "
+                             "of CSO %g %s be used for ALL input files.", status,
+                             tau, ( tausrc == SMF__TAUSRC_CSOTAU ? "will" : "might" ) );
                   }
                 } else if( tausrc == SMF__TAUSRC_TAU ) {
                   if( astMapGet0D( kmap, "FILTERTAU", &tau ) ) {
-                    msgOut( "", "*** EXTINCTION WARNING: single opacity value "
-                            "will be used for ALL input files.", status );
+                    msgOutf( "", "*** EXTINCTION WARNING: single opacity value "
+                             "of %g will be used for ALL input files.", status, tau );
                   }
                 }
                 kmap = astAnnul( kmap );

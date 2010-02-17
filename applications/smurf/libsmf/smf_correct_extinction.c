@@ -22,6 +22,7 @@
 *        smfData struct
 *     tausrc = smf_tausrc (Given)
 *        Source of opacity value. Options are:
+*          SMF__TAUSRC_AUTO: Use WVM if available, else use CSO tau.
 *          SMF__TAUSRC_CSOTAU: Use the supplied "tau" argument as if it is CSO tau.
 *          SMF__TAUSRC_WVMRAW: Use the WVM time series data.
 *          SMF__TAUSRC_TAU: Use the tau value as if it is for this filter.
@@ -31,7 +32,8 @@
 *          SMF__EXTMETH_FULL: Calculate airmass for each bolometer.
 *          SMF__EXTMETH_ADAPT: Use FULL only if warranted. Else use FAST.
 *     tau = double (Given)
-*        Optical depth at 225 GHz. Only used if tausrc is TAU or CSOTAU.
+*        Optical depth at 225 GHz. Only used if tausrc is AUTO, TAU or CSOTAU. If
+*        the bad value is used a default value will be used from the header.
 *     allextcorr = double* (Given and Returned)
 *        If given, store calculated corrections for each bolo/time slice. Must
 *        have same dimensions as bolos in *data
@@ -149,6 +151,8 @@
 *        - Take control of our default cso tau for WVM mode and initialise
 *          the "old" wvm array to bads rather than zero because the WVM
 *          uses zero itself.
+*     2010-02-16 (TIMJ):
+*        Add auto mode to use WVM if available else CSO.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -301,10 +305,52 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
     if ( *status == SAI__OK ) {
       *status = SAI__ERROR;
       errRep( FUNC_NAME, "Method WVMRaw can not be used on 2-D image data", status );
+      return;
+    }
+  } else if (ndims != 3) {
+    if (*status == SAI__OK) {
+      *status = SAI__ERROR;
+      errRepf( FUNC_NAME, "Can not extinction correct data with %zd dimension(s)", status,
+              ndims );
+      return;
     }
   }
 
-  /* If we have a CSO Tau then convert it to the current filter */
+  /* Check auto mode */
+  if (tausrc == SMF__TAUSRC_AUTO && *status == SAI__OK) {
+    if (data && data->file && data->file->name) {
+      msgSetc( "FILE", data->file->name );
+    } else {
+      msgSetc( "FILE", "<unknown>" );
+    }
+    if (ndims == 2) {
+      /* have to use CSO mode */
+      tausrc = SMF__TAUSRC_CSOTAU;
+    } else if (ndims == 3) {
+      /* check first and last WVM reading. At least one should be good */
+      JCMTState * curstate = hdr->allState;
+      JCMTState * endstate = &((hdr->allState)[nframes-1]);
+      if (curstate->wvm_time != VAL__BADR && curstate->wvm_time > 0) {
+        tausrc = SMF__TAUSRC_WVMRAW;
+      } else if ( endstate->wvm_time != VAL__BADR && endstate->wvm_time > 0.0) {
+        tausrc = SMF__TAUSRC_WVMRAW;
+      } else {
+        tausrc = SMF__TAUSRC_CSOTAU;
+      }
+    }
+    if (tausrc == SMF__TAUSRC_CSOTAU) {
+      msgOutiff( MSG__VERB, "", "Selecting CSO mode for extinction correction of ^FILE", status );
+    } else if (tausrc == SMF__TAUSRC_WVMRAW) {
+      msgOutiff( MSG__VERB, "", "Selecting WVM mode for extinction correction of ^FILE", status );
+    } else {
+      /* oops. Fall back position */
+      tausrc = SMF__TAUSRC_CSOTAU;
+      msgOutiff( MSG__VERB, "", "Selecting CSO mode as unexpected fallback for extinction correction of ^FILE", status );
+    }
+  }
+
+  /* If we have a CSO Tau then convert it to the current filter. This will also
+     convert bad values to a value derived from the header if appropriate. */
   if ( tausrc == SMF__TAUSRC_CSOTAU ) {
     tau = smf_cso2filt_tau( hdr, tau, status );
     /* The tau source is now a real tau */

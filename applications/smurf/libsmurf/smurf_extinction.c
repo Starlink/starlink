@@ -33,10 +33,11 @@
 *          supplied. [!]
 *     CSOTAU = _REAL (Read)
 *          Value of the 225 GHz zenith optical depth. Only used if
-*          TAUSRC equals `CSOTAU'. If a NULL (!) value is given, the task
+*          TAUSRC equals `CSOTAU' or 'AUTO'. If a NULL (!) value is given, the task
 *          will use the appropriate value from the FITS header of each
 *          file. Note that if a value is entered by the user, that
-*          value is used for all input files.
+*          value is used for all input files. In AUTO mode the value
+*          might not be used.
 *     FILTERTAU = _REAL (Read)
 *          Value of the zenith optical depth for the current
 *          wavelength. Only used if TAUSRC equals `FILTERTAU'. Note that no
@@ -73,6 +74,9 @@
 *          - WVMRAW    - use the Water Vapour Monitor time series data
 *          - CSOTAU    - use a single 225 GHz tau value
 *          - FILTERTAU - use a single tau value for this wavelength
+*          - AUTO      - Use WVM if available, else 225 GHz tau
+*
+*          [AUTO]
 
 *  Notes:
 *     - The iterative map-maker will extinction correct the data itself
@@ -146,10 +150,12 @@
 *        Move parsing of tausrc and extmeth into smf_get_extpar
 *     2010-01-08 (AGG):
 *        Change BPM to BBM.
+*     2010-02-16 (TIMJ):
+*        Add AUTO option.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2010 Science and Technology Facilities Council.
 *     Copyright (C) 2005 Particle Physics and Astronomy Research
 *     Council. Copyright (C) 2005-2010 University of British
 *     Columbia. All Rights Reserved.
@@ -252,8 +258,8 @@ void smurf_extinction( int * status ) {
   smf_request_mask( "BBM", &bbms, status );
 
   /* Get tau source */
-  parChoic( "TAUSRC", "CSOTAU",
-            "CSOtau, Filtertau, WVMraw", 1,
+  parChoic( "TAUSRC", "Auto",
+            "Auto,CSOtau, Filtertau, WVMraw", 1,
             tausource, sizeof(tausource), status);
 
   /* Decide how the correction is to be applied - convert to flag */
@@ -304,6 +310,7 @@ void smurf_extinction( int * status ) {
        time through. */
     if ( *status == SAI__OK && i == 1 ) {
       if (tausrc == SMF__TAUSRC_CSOTAU ||
+          tausrc == SMF__TAUSRC_AUTO ||
           tausrc == SMF__TAUSRC_TAU) {
         double deftau;
         const char * param = NULL;
@@ -313,7 +320,7 @@ void smurf_extinction( int * status ) {
         deftau = smf_calc_meantau( ohdr, status );
 
         /* Now ask for desired CSO tau */
-        if ( tausrc == SMF__TAUSRC_CSOTAU ) {
+        if ( tausrc == SMF__TAUSRC_CSOTAU || tausrc == SMF__TAUSRC_AUTO) {
           param = "CSOTAU";
         } else if (tausrc == SMF__TAUSRC_TAU) {
           param = "FILTERTAU";

@@ -37,16 +37,20 @@
 *     
 *  Authors:
 *     EC: Edward Chapin (UBC)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     2009-09-29 (EC):
 *        Initial version factored out of smurf_extinction
+*     2010-02-16 (TIMJ):
+*        Add "auto" mode detection.
 *     {enter_further_changes_here}
 
 *  Notes:
 
 *  Copyright:
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     Copyright (C) 2009 University of British Columbia
 *     All Rights Reserved.
 
@@ -105,6 +109,9 @@ void smf_get_extpar( AstKeyMap *keymap, smf_tausrc *tausrc,
     if( astMapGet0C( keymap, "TAUSRC", &tempstr ) ) {
       
       switch( toupper(tempstr[0]) ) {
+      case 'A':
+        *tausrc = SMF__TAUSRC_AUTO;
+        break;
       case 'C':
         *tausrc = SMF__TAUSRC_CSOTAU;
         break;
