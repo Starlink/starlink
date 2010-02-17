@@ -157,7 +157,7 @@ smf__calc_meantau_from_fits( const smfHead * hdr, double refmjd, double threshol
     retval = (tau1 + tau2) / 2.0;
   }
 
-  msgOutiff( MSG__NORM, "", "Determined tau of %g from %s and related FITS headers",
+  msgOutiff( MSG__VERB, "", "Determined tau of %g from %s and related FITS headers",
              status, retval, datecard );
 
 
