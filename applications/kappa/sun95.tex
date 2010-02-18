@@ -30143,8 +30143,8 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
       catalogue should have the form of a positions list as produced, for
       instance, by applications LISTMAKE and CURSOR.  By default all positions
       in the catalogue are reported, but a subset may be reported by
-      specifying a range of \emph{position identifiers}~ (see Parameters FIRST
-      and LAST).
+      specifying a range of \emph{position identifiers}~ (see Parameters FIRST,
+      LAST and STEP).
  
       Positions may be reported in a range of \htmlref{co-ordinate Frames}{se:domains}~ dependent
       on the information stored in the supplied positions list (see Parameter
@@ -30453,6 +30453,13 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
          DIM.  The axis values may not be in the same units as the
          formatted values shown on the screen.  For instance, unformatted
          celestial co-ordinate values are stored in units of radians.
+      }
+      \sstsubsection{
+         STEP = \_INTEGER (Read)
+      }{
+         The increment between position identifiers to be displayed. 
+         Specifying a value larger than 1 causes a subset of the position
+         identifiers between FIRST and LAST to be displayed. {\tt [1]}
       }
       \sstsubsection{
          STCSCOL = LITERAL (Read)
@@ -57013,6 +57020,8 @@ The following applications have been modified:
 
    \item [\htmlref{LISTSHOW}{LISTSHOW}]\mbox{}
       \begin{itemize}
+        \item A new parameter STEP has been added that allows a subset of
+        the positions identifiers between FIRSt and LAST to be displayed.
         \item Parameter QUIET has been withdrawn.  Instead set the
         MSG\_FILTER environment variable to {\tt QUIET} to suppress display
         of the positions.

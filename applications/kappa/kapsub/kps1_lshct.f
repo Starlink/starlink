@@ -1,4 +1,5 @@
-      SUBROUTINE KPS1_LSHCT( NPOS, IDS, FIRST, LAST, NDISP, STATUS )
+      SUBROUTINE KPS1_LSHCT( NPOS, IDS, FIRST, LAST, STEP, NDISP, 
+     :                       STATUS )
 *+
 *  Name:
 *     KPS1_LSHCT
@@ -10,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_LSHCT( NPOS, IDS, FIRST, LAST, NDISP, STATUS )
+*     CALL KPS1_LSHCT( NPOS, IDS, FIRST, LAST, STEP, NDISP, STATUS )
 
 *  Description:
 *     This routine counts the number of positions identifiers between the
@@ -25,6 +26,8 @@
 *        The lowest position identifier to be selected.
 *     LAST = INTEGER (Given)
 *        The highest position identifier to be selected.
+*     STEP = INTEGER (Given)
+*        The increment between position identifier to be selected.
 *     NDISP = INTEGER (Returned)
 *        The number of positions identifiers within IDS which are within
 *        the range FIRST to LAST (inclusive).
@@ -33,6 +36,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -58,6 +62,8 @@
 *  History:
 *     16-SEP-1998 (DSB):
 *        Original version.
+*     18-FEB-2010 (DSB):
+*        Added argument STEP.
 *     {enter_further_changes_here}
 
 *-
@@ -73,6 +79,7 @@
       INTEGER IDS( NPOS )
       INTEGER FIRST
       INTEGER LAST
+      INTEGER STEP
 
 *  Arguments Returned:
       INTEGER NDISP
@@ -93,7 +100,8 @@
 *  Check each identifier.
       DO I = 1, NPOS
          IF( IDS( I ) .GE. FIRST .AND. 
-     :       IDS( I ) .LE. LAST ) NDISP = NDISP + 1
+     :       IDS( I ) .LE. LAST .AND.
+     :       MOD( IDS( I ) - FIRST, STEP ) .EQ. 0 ) NDISP = NDISP + 1
       END DO
 
       END

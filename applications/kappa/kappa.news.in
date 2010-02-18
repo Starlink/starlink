@@ -118,6 +118,11 @@ The following new applications have been added:
       caused issues in other tasks like CURSOR, where the Symbol is used 
       as a column name in the output catalogue.
 
+   o  LISTSHOW
+
+      -   A new parameter STEP has been added that allows a subset of
+      the positions identifiers between FIRSt and LAST to be displayed.
+
    o  LOOK
 
       -  A bug has been fixed that caused logfile output to be 

@@ -1,5 +1,5 @@
-      SUBROUTINE KPS1_LSHCP( FIRST, LAST, NPOS, NCAX, LABIN, POS, ID, 
-     :                       NDISP, SID, SPOS, LABOUT, STATUS )
+      SUBROUTINE KPS1_LSHCP( FIRST, LAST, STEP, NPOS, NCAX, LABIN, POS, 
+     :                       ID, NDISP, SID, SPOS, LABOUT, STATUS )
 *+
 *  Name:
 *     KPS1_LSHCP
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_LSHCP( FIRST, LAST, NPOS, NCAX, LABIN, POS, ID, NDISP, 
+*     CALL KPS1_LSHCP( FIRST, LAST, STEP, NPOS, NCAX, LABIN, POS, ID, NDISP, 
 *                      SID, SPOS, LABOUT, STATUS )
 
 *  Description:
@@ -24,6 +24,8 @@
 *        The lowest position identifier to be selected.
 *     LAST = INTEGER (Given)
 *        The highest position identifier to be selected.
+*     STEP = INTEGER (Given)
+*        The increment between position identifier to be selected.
 *     NPOS = INTEGER (Given)
 *        The number of supplied position identifiers.
 *     NCAX = INTEGER (Given)
@@ -51,6 +53,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -78,6 +81,8 @@
 *        Original version.
 *     21-NOV-2006 (DSB):
 *        Added arguments LABIN and LABOUT.
+*     18-FEB-2010 (DSB):
+*        Added argument STEP.
 *     {enter_further_changes_here}
 
 *-
@@ -92,6 +97,7 @@
 *  Arguments Given:
       INTEGER FIRST
       INTEGER LAST
+      INTEGER STEP
       INTEGER NPOS
       INTEGER NCAX
       INTEGER LABIN
@@ -131,7 +137,8 @@
 
 *  If this position identifier is within the sipplied range...
          IF( ID( I ) .GE. FIRST .AND. 
-     :       ID( I ) .LE. LAST ) THEN
+     :       ID( I ) .LE. LAST .AND.
+     :       MOD( ID( I ) - FIRST, STEP ) .EQ. 0 ) THEN
 
 *  Find the index of the position in the output arrays. Skip the position
 *  if we have found too many.

@@ -25,7 +25,7 @@
 *     for instance, by applications LISTMAKE and CURSOR.  By default all
 *     positions in the catalogue are reported, but a subset may be
 *     reported by specifying a range of "position identifiers" (see
-*     parameters FIRST and LAST). 
+*     parameters FIRST, LAST and STEP). 
 *
 *     Positions may be reported in a range of co-ordinate Frames
 *     dependent on the information stored in the supplied positions 
@@ -264,6 +264,10 @@
 *        units as the formatted values shown on the screen.  For 
 *        instance, unformatted celestial co-ordinate values are stored 
 *        in units of radians.  
+*     STEP = _INTEGER (Read)
+*        The increment between position identifiers to be displayed. 
+*        Specifying a value larger than 1 causes a subset of the position
+*        identifiers between FIRST and LAST to be displayed. [1]
 *     STCSCOL = LITERAL (Read)
 *        The name of a catalogue column containing an STC-S description 
 *        of a two-dimensional spatial shape associated with each 
@@ -433,6 +437,8 @@
 *     2009 July 24 (MJC):
 *        Remove QUIET parameter and use the current reporting level
 *        instead (set by the global MSG_FILTER environment variable).
+*     18-FEB-2010 (DSB):
+*        Added parameter STEP.
 *     {enter_further_changes_here}
 
 *-
@@ -498,6 +504,7 @@
       INTEGER NSTR               ! Number of marker strings supplied
       INTEGER SIZE               ! Number of elements in group
       INTEGER STCSKM             ! KeyMap holding STCS descriptions
+      INTEGER STEP               ! Increment between displayed positions
       LOGICAL CLOSE              ! Close the polygon?
       LOGICAL DESC               ! Describe each Coordinate Frame?
       LOGICAL GEO                ! Draw geodesic polygon?
@@ -776,10 +783,14 @@
       CALL PAR_GDR0I( 'LAST', LAST, FIRST, LAST, .TRUE., LAST, 
      :                STATUS )
 
+*  Get the increment between positions to be displayed.  
+      CALL PAR_GDR0I( 'STEP', 1, 1, LAST - FIRST + 1, .TRUE., STEP, 
+     :                STATUS )
+
 *  Count the number of positions within the supplied range of position
 *  identifiers.
       CALL KPS1_LSHCT( NPOS, %VAL( CNF_PVAL( IPID ) ), 
-     :                 FIRST, LAST, NDISP, STATUS )
+     :                 FIRST, LAST, STEP, NDISP, STATUS )
 
 *  Give a suitable message, store zero for NUMBER, and abort if no
 *  positions were selected.
@@ -814,7 +825,7 @@
 
 *  Copy the selected positions and identifiers into the work arrays and
 *  erase the unused elements in the labels group.
-      CALL KPS1_LSHCP( FIRST, LAST, NPOS, NBAX, IGRP3,
+      CALL KPS1_LSHCP( FIRST, LAST, STEP, NPOS, NBAX, IGRP3,
      :                 %VAL( CNF_PVAL( IPPOS ) ),
      :                 %VAL( CNF_PVAL( IPID ) ), NDISP, 
      :                 %VAL( CNF_PVAL( IPW0 ) ), 
