@@ -17754,6 +17754,16 @@ iraf! {
             helpkey *
          }
 
+         parameter step {
+            type _INTEGER
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Increment between displayed positions}
+            helpkey *
+         }
+
          parameter stcscol {
             type LITERAL
             vpath CURRENT DEFAULT
