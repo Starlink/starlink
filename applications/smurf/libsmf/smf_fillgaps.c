@@ -60,6 +60,9 @@
 *        a gradient of zero when filling it, since the gradient estimate 
 *        within a single box can be very unrepresentative (i.e. unusually
 *        high or low).
+*     2010-02-18 (DSB):
+*        Gaps at start or end were using the offset at time zero, rather 
+*        than the offset at the boundary of the good data.
 
 *  Copyright:
 *     Copyright (C) 2010 Univeristy of British Columbia.
@@ -444,11 +447,11 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
                create the replacement values for the flagged block. */
             if( jstart <= 0 ) {
               grad = 0.0;
-              offset = cr;
+              offset = mr*( jend + 1 ) + cr;
 
             } else if( jend >= jfinal ) {
               grad = 0.0;
-              offset = cl;
+              offset = ml*( jstart - 1 ) + cl;
   
             } else {
               meanl = ml*( jstart - 1 ) + cl;

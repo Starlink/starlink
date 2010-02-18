@@ -105,6 +105,11 @@
 *        - Changed to fit a separate gain and offset to each block of
 *        "gain_box" time slices, rather than fitting a single gain and
 *        offset to the whole time stream.
+*     2010-02-18 (DSB):
+*        - Changed the default for GAIN_BOX from 2000 to 6000.
+*        - Put a lower absolute limit (0.2) on acceptable correlation coefficients.
+*        - The initial guess at the gain of a bolometer used to be 1.0. It is now 
+*          the RMS value of the bolometer data stream.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -185,6 +190,7 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
   dim_t block_size;        /* Number of time slices in block */
   size_t bstride;          /* bolometer stride for res/qua */
   double *gai_data;        /* pointer to gain model (can be NULL) data */
+  double gain;             /* Gain value */
   dim_t gain_box;          /* Nominal number of time slices per block */
   size_t gbstride;         /* gain bolo stride */
   size_t gcstride;         /* gain coefficient stride */
@@ -197,12 +203,14 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
   double *model_data;      /* pointer to common mode data */
   dim_t nbolo;             /* number of bolometers */
   dim_t nblock;            /* Number of time blocks */
+  dim_t nsum;              /* Number of values summed in "sum" */
   dim_t ntime;             /* Number of remaining time slices */
   dim_t ntslice;           /* number of time slices */
   smfCalcmodelComData *pdata=NULL; /* Pointer to job data */
   double *pg;              /* Pointer to next gain value */
   double *poff;            /* Pointer to next offset value */
   double *res_data;        /* Pointer to common residual data */
+  double sum;              /* Running sum of values */
   size_t tstride;          /* time stride for res/qua */
   unsigned char *qua_data; /* Pointer to common quality data */
   double *weight=NULL;     /* Weight at each point in model */
@@ -267,6 +275,10 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
     /* Loop round all the bolometers being processed by this thread. */
     for( j = pdata->b1; j <= pdata->b2 && *status == SAI__OK; j++ ) {
 
+      /* Initialise sums iused to fidn RMS bolometer value. */
+      sum = 0.0;
+      nsum = 0;
+
       /* Initialise the index of the first time slice for the current
          bolometer within the res_data and qua_data arrays. */
       size_t ijindex = j*bstride;
@@ -287,11 +299,40 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
              a call to smf_calcmodel_gai in smf_iteratemap. */
           if( !(qua_data[ ijindex ] & SMF__Q_MOD ) ) {
             res_data[ ijindex ] += wg[ i ]*model_data[ i ] + woff[ i ];
+
+            /* Increment the sums used to find the RMS bolometer value. */
+            sum += res_data[ ijindex ]*res_data[ ijindex ];
+            nsum++;            
           }
 
           /* Advance to next element of res_data and qua_data arrays. */
           ijindex += tstride;
         }
+
+        /* If all bolometer values are zero or bad, indicate that the
+           whole bolometer is bad by assigning SMF__Q_BADB to all samples. */
+        if( sum <= 0.0 ) {
+          ijindex = j*bstride;
+          for( i = 0; i < ntslice; i++ ) { 
+            qua_data[ ijindex ] |= SMF__Q_BADB;
+            ijindex += tstride;
+          }
+        } 
+      }
+
+      /* Find the RMS bolometer value. We use this as the new initial
+         estimate of the bolometer gain. This means that the bolometers
+         will be normalized to a common level when forming the first 
+         estimate of the common mode signal. */
+      gain = ( sum > 0.0 ) ? sqrtf( sum/nsum ) : VAL__BADD;
+
+      /* Initialise the bolometer fit parameters for every block. */
+      ijindex = j*gbstride;
+      for( i = 0; i < nblock; i++ ) {
+        gai_data[ ijindex ] = gain;   /* Gain */
+        gai_data[ ijindex + nblock*gcstride ] = 0.0;   /* Offset */
+        gai_data[ ijindex + 2*nblock*gcstride ] = 1.0;   /* Correlation */
+        ijindex += gcstride;
       }
     }
 
@@ -386,9 +427,6 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
 
 
 
-
-
-
   } else if( pdata->operation == 2 ) {
     /* Loop over the block of bolos for this thread and fit the template */
 
@@ -462,6 +500,9 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
                status, pdata->operation, pdata->b1, pdata->b2,
                smf_timerupdate(&tv1, &tv2, status) );
 
+
+
+
   } else {
     *status = SAI__ERROR;
     errRep( "", "smfCalcmodelComPar: invalid operation specifier", status );
@@ -491,6 +532,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   dim_t cgood;                  /* Number of good corr. coeff. samples */
   double cmean;                 /* mean of common-mode correlation coeff */
   double *corr=NULL;            /* Array to hold correlation coefficients */
+  double corr_abstol=0.2;       /* Absolute lowest corr. coeff. limit */
   dim_t corr_offset=0;          /* Offset from gain to correlation value */
   double corr_tol=5;            /* n-sigma correlation coeff. tolerance */
   double csig;                  /* standard deviation "                  */
@@ -507,7 +549,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   double *gai_data=NULL;        /* Pointer to DATA component of GAI */
   double **gai_data_copy=NULL;  /* copy of gai_data for all subarrays */
   double gain_abstol=5;         /* absolute gain coeff. tolerance */
-  dim_t gain_box=2000;          /* No. of time slices in a block */
+  dim_t gain_box=6000;          /* No. of time slices in a block */
   double gain_tol=5;            /* n-sigma gain coeff. tolerance */
   size_t gbstride;              /* GAIn bolo stride */
   size_t gcstride;              /* GAIn coeff stride */
@@ -616,7 +658,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
     }
 
     if( !astMapGet0I(kmap, "GAIN_BOX", &ival) ) {
-      gain_box = 2000;
+      gain_box = 6000;
     } else { 
       gain_box = ival;
     }
@@ -729,7 +771,12 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
 
   /* Add the previous estimate of the common mode signal back on to the
-     bolometer residuals.
+     bolometer residuals. If we do not yet have an estimate of the common 
+     mode signal, then the bolometer residuals are left unchanged, but
+     the gain values in the "gai" model are set to the rms value of the
+     bolometer data stream. This is to ensure that the very high gain
+     bolometers do not dominate the initial estimate of the common mode
+     signal calculated below.
      --------------------------------------------------------------  */
 
   /* Loop over index in subgrp (subarray). */
@@ -889,28 +936,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
       /* Get pointers to data/quality/model */
       res_data = (res->sdata[idx]->pntr)[0];
       qua_data = (qua->sdata[idx]->pntr)[0];
-      if( gai ) {
-        gai_data = (gai->sdata[idx]->pntr)[0];
-
-      /* If this is the first pass, initialize gains, offsets and correlation 
-         values to indicate that no blocks have yet been rejected. */
-        if( first ) {
-          for( i = 0; i < nbolo; i++ ) {
-            size_t ibase = i*gbstride;
-            for( j = 0; j < nblock; j++ ) {
-              gai_data[ ibase ] = 1.0;
-              gai_data[ ibase + off_offset ] = 0.0;
-              gai_data[ ibase + corr_offset ] = 1.0;
-              ibase += gcstride;
-            }
-          }
-        }
-      }
-
-
-
-
-
+      if( gai ) gai_data = (gai->sdata[idx]->pntr)[0];
 
 
 
@@ -918,11 +944,13 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
       /* Calculate a new estimate of the common mode signal excluding
          blocks rejected on previous passes round the outer loop. The new
          common mode signal is the mean of the remaining scaled bolometer 
-         data (scaled using the inverse of the previous linear fit).
+         data (scaled using the inverse of the previous linear fit). The
+         initial gain will have been set to the bolometer RMS value at
+         the same time that the old common mode was added back on to the 
+         residuals (above).
          ---------------------------------------------------------- */
 
       /* Set up the job data and calculate new common mode */
-
       for( ii=0; (*status==SAI__OK)&&(ii<nw); ii++ ) {
         pdata = job_data + ii;
 
@@ -949,6 +977,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata,
                                    smfCalcmodelComPar, NULL, status );
       }
+
       /* Wait until all of the submitted jobs have completed */
       smf_wait( wf, status );
     }
@@ -1083,11 +1112,12 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
             if( gcoeff[ i ] != VAL__BADD ) {
 
-              if( gcoeff[ i ] > 0.0 && corr[ i ] > 0.0 ){
+              if( gcoeff[ i ] > 0.0 && corr[ i ] > corr_abstol ){
                  gcoeff[ i ] = log( gcoeff[ i ] );
                  allbad = 0;
               } else {
                 gcoeff[ i ] = VAL__BADD;
+                corr[ i ] = VAL__BADD;
               }
 
             } else {
@@ -1133,6 +1163,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
                  or high gain. */
               if( corr[ i ] == VAL__BADD || gcoeff[ i ] == VAL__BADD || 
                   ( (cmean - corr[ i ]) > corr_tol*csig ) || /* only flag worse bolos */
+                  ( corr[ i ] < corr_abstol ) || 
                   ( fabs( gcoeff[ i ]-gmean ) > gain_tol*gsig ) ||
                   ( fabs( gcoeff[ i ]-gmean ) > gain_abstol ) ) {
 
