@@ -770,6 +770,14 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter itime {
+                type _INTEGER
+                prompt {Index of time slice to dump to an output NDF}
+                vpath DEFAULT
+                default !
+                helpkey *
+            }
+
             parameter lowfactor {
                 type _REAL
                 prompt {Factor for lowest usable data sum}
@@ -837,6 +845,15 @@ package @PACKAGE@ {
                 default !
                 helpkey *
             }
+
+            parameter outslice {
+                type NDF
+                access WRITE
+                prompt {Output NDF holding time slice data}
+                ppath CURRENT
+                helpkey *
+            }
+
             parameter subarray {
                 type LITERAL
                 prompt {SCUBA-2 sub-array name}

@@ -95,6 +95,8 @@
 *          can be used to get the WCS Mapping for a typical time slice, or
 *          the OUTCAT parameter can be used to create a catalogue holding
 *          details of the source position and amplitude in every time slice.
+*          A single time slice from this cube can also be written to an
+*          output NDF (see parameter OUTSLICE).
 *     INFITX = NDF (Read)
 *          A 2D NDF holding fitted focal plane X offsets (in mm) at every
 *          bolometer, or null (!). This NDF shoudl have been created by
@@ -117,6 +119,10 @@
 *          (see OUTDX and OUTDY). An output catalogue can also be
 *          produced holding extra columns, and from which abberant rows
 *          have been rejected (see parameter OUTCAT).
+*     ITIME = _INTEGER (Read)
+*          The integer index of a time slice to be dumped to an NDF (see
+*          OUTSLICE). If supplied, the application terminates without
+*          further action once the NDF has been created. [!]
 *     LOWFACTOR = _REAL (Read)
 *          Only accessed if a value is supplied for parameter IN. It gives
 *          the lowest time slice data sum (as a fraction of the largest
@@ -166,6 +172,10 @@
 *          the outline of any sub-array can be over-plotted by changing
 *          the current coordinate Frame and then using KAPPA:ARDPLOT (for
 *          instance "wcsframe outmag s8a" followed by "ardplot s8a"). [!]
+*     OUTSLICE = NDF (Write)
+*          If a value was supplied for IN and ITIME, then OUTSLICE gives the 
+*          name of  the NDF in which to store the bolometer data for the
+*          given time slice, including celestial WCS.
 *     SUBARRAY = LITERAL (Write)
 *          The name of the subarray being processed: one of "s8a", "s8b",
 *          "s8b", "s8d", "s4a", "s4b", "s4b", "s4d".
@@ -188,6 +198,8 @@
 *        written to paremeter OUTCODE.
 *     2010-01-18 (TIMJ):
 *        Prologue tweaks for hawaiki release
+*     18-FEB-2010 (DSB):
+*        Added parameters ITIME and OUTSLICE.
 
 *  Copyright:
 *     Copyright (C) 2009-2010 Science and Technology Facilities Council.
@@ -290,6 +302,7 @@ static void PasteNDF( const char *subarray, int *lb, int *ub, int nvals,
 static void Filter( int n, double *flags, double *vals, double nsigma,
                     const char *title, int * status );
 static int SaveBoloMapping( const char *param, smfData *data, int *status );
+static int SaveTimeSlice( const char *param1, const char *param2, smfData *data, int *status );
 static AstKeyMap *GetHeader( FILE *fp, int *status );
 static int GetColIndex( AstKeyMap *header, const char *colname, int *status );
 static void AddColName( AstKeyMap *header, const char *colname, const char *desc,
@@ -1297,7 +1310,8 @@ void smurf_dsutils( int *status ) {
 /* If a input time series NDF is supplied, we can either create a Mapping
    describing a typical time slice in it, or create an output catalogue
    holding the telescope base positions, peak positions, and data sums
-   at each time slice.
+   at each time slice, or extract a specified time slice into an output
+   NDF.
    -------------------------------------------------------------------- */
 
 /* Attempt to get the name of the input NDF. */
@@ -1318,6 +1332,9 @@ void smurf_dsutils( int *status ) {
    coords (0,0,0.0) ) is shifted so that it co-incides with the sky
    reference point ). If succesful, do nothing more. */
     if( SaveBoloMapping( "BMAP", data, status ) ) goto L998;
+
+/* Write out a specified time slice to a 2D NDF. */
+    if( SaveTimeSlice( "OUTSLICE", "ITIME", data, status ) ) goto L998;
 
 /* Convenience pointers */
     file = data->file;
@@ -2033,6 +2050,107 @@ static int SaveBoloMapping( const char *param, smfData *data, int *status ){
 
   return result;
 }
+
+
+
+
+/* Write the bolometer data form a given timeslice to a 2D NDF. 
+   ---------------------------------------------------------- */
+
+static int SaveTimeSlice( const char *param1, const char *param2, 
+                          smfData *data, int *status ){
+
+/* Local Variables: */
+   dim_t itime;
+   dim_t ntslice;
+   double *d_data = NULL;
+   double *ipd = NULL;
+   int *i_data = NULL;
+   int *ipi = NULL;
+   int el;
+   int i;
+   int indf;
+   int ival; 
+   int lbnd[ 3 ];
+   int result;
+   int ubnd[ 3 ];
+   size_t bstride;
+   size_t tstride;
+
+/* Initialise */
+   result = 0;
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return result;
+
+/* Get the strides for the data */
+   smf_get_dims( data,  NULL, NULL, NULL, &ntslice, NULL,
+                 &bstride, &tstride, status );
+
+/* Get the index of the required time slice. */
+   parGdr0i( param2, 1, 1, (int) ntslice, 0, &ival, status );
+   itime = ival;
+
+/* If a null value supplied, annul the error and return. */
+   if( *status == PAR__NULL ) {
+      errAnnul( status );
+      return result;
+   }
+
+/* Store the spatial pixel index bounds of the time slice. */
+   if( bstride == 1 ) {
+      lbnd[ 0 ] = data->lbnd[ 0 ];
+      ubnd[ 0 ] = lbnd[ 0 ] + data->dims[ 0 ] - 1;
+      lbnd[ 1 ] = data->lbnd[ 1 ];
+      ubnd[ 1 ] = lbnd[ 1 ] + data->dims[ 1 ] - 1;
+   } else {
+      lbnd[ 0 ] = data->lbnd[ 1 ];
+      ubnd[ 0 ] = lbnd[ 1 ] + data->dims[ 1 ] - 1;
+      lbnd[ 1 ] = data->lbnd[ 2 ];
+      ubnd[ 1 ] = lbnd[ 2 ] + data->dims[ 2 ] - 1;
+   }
+
+/* Branch on data type. First _DOUBLE. */
+   if( data->dtype == SMF__DOUBLE ) {
+
+/* Create and map the output NDF. */
+      ndfCreat( param1, "_DOUBLE", 2, lbnd, ubnd, &indf, status ); 
+      ndfMap( indf, "Data", "_DOUBLE", "Write", (void **) &ipd, &el,
+              status ); 
+
+/* Copy the bolometer values into the NDF Data array. */
+      d_data = (double *)(data->pntr)[0] + itime*tstride;
+      for( i = 0; i < el; i++ ) {
+         *(ipd++) = *d_data;
+         d_data += bstride;
+      }
+
+/* Now do the same for _INTEGER. */
+   } else if( data->dtype == SMF__INTEGER ) {
+
+/* Create and map the output NDF. */
+      ndfCreat( param1, "_INTEGER", 2, lbnd, ubnd, &indf, status ); 
+      ndfMap( indf, "Data", "_INTEGER", "Write", (void **) &ipi, &el,
+              status ); 
+
+/* Copy the bolometer values into the NDF Data array. */
+      i_data = (int *)(data->pntr)[0] + itime*tstride;
+      for( i = 0; i < el; i++ ) {
+         *(ipi++) = *i_data;
+         i_data += bstride;
+      }
+   }
+
+/* Get the WCS FrameSet describing the time slice, and store it in the NDF */
+   smf_tslice_ast( data, itime, 1, status );
+   ndfPtwcs( data->hdr->wcs, indf, status );
+
+/* Annul the NDF. */
+   ndfAnnul( &indf, status );
+
+   return 1;
+}
+
 
 /* Return a KeyMap holding information about the columns in the catalogue
    read from the supplied open file pointer.
