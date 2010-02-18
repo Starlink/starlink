@@ -5843,6 +5843,8 @@ static int ndg1TheSame( Prov *prov1, Prov *prov2, int *status ) {
 
       if( prov1->date && prov2->date ) {
          if( strcmp( prov1->date, prov2->date ) ) result = 0;
+      } else if( prov1->date || prov2->date ) {
+         result = 0;
       }
 
 /* If they refer to the same NDF, count the number of items of information 
