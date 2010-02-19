@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_find_science(const Grp * ingrp, Grp **outgrp, Grp **darkgrp,
-*                     int reduce, smf_dtype dtype, smfArray ** darks,
+*                     int reducedark, smf_dtype darktype, smfArray ** darks,
 *                     int * status );
 
 *  Arguments:
@@ -26,12 +26,12 @@
 *     darkgrp = Grp ** (Returned)
 *        If non-null, will contain the group of dark files. Will not be
 *        created if no darks were found.
-*     reduce = int (Given)
+*     reducedark = int (Given)
 *        Logical, if true the darks are reduced (if needed) and converted
 *        to 2d images from the time series. If false, the darks are not
 *        touched. Only accessed if "darks" is true.
-*     dtype = smf_dtype (Given)
-*        Data type to use for reduced dark. Only accessed if "reduce" is
+*     darktype = smf_dtype (Given)
+*        Data type to use for reduced dark. Only accessed if "reducedark" is
 *        true. SMF__NULL will indicate that the data type should be the
 *        same as the input type.
 *     darks = smfArray ** (Returned)
@@ -147,7 +147,7 @@
 #define FUNC_NAME "smf_find_science"
 
 void smf_find_science( const Grp * ingrp, Grp **outgrp, Grp **darkgrp,
-                     int reduce, smf_dtype dtype, smfArray ** darks,
+                     int reducedark, smf_dtype darktype, smfArray ** darks,
                      int * status ) {
 
   smfSortInfo *alldarks; /* array of sort structs */
@@ -263,9 +263,9 @@ void smf_find_science( const Grp * ingrp, Grp **outgrp, Grp **darkgrp,
           smf_open_file( dgrp, i, "READ", 0, &infile, status );
 
           /* do we have to process these darks? */
-          if (reduce) {
+          if (reducedark) {
             smfData *outfile = NULL;
-            smf_reduce_dark( infile, dtype, &outfile, status );
+            smf_reduce_dark( infile, darktype, &outfile, status );
             if (outfile) {
               smf_close_file( &infile, status );
               infile = outfile;
