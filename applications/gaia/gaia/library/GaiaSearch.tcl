@@ -771,17 +771,21 @@ itcl::class gaia::GaiaSearch {
    protected proc browsed_open_ {id w type name {naxes 0}} {
       if { $type == "table" } {
 
-         #  Set the catalog config entry from the $catinfo table
-         if { [catch {$astrocat_ entry get $name}] } {
-            if { "[string index $name 0]" != "/"} {
-               set fname "[pwd]/$name"
-            } else {
-               set fname "$name"
+         #  Set the catalog config entry from the $catinfo table if this
+         #  isn't just a simple filename (note this still may cause problems
+         #  updating the catalog info from the headers).
+         if { ! [::file exists $name] } {
+            if { [catch {$astrocat_ entry get $name}] } {
+               if { "[string index $name 0]" != "/"} {
+                  set fname "[pwd]/$name"
+               } else {
+                  set fname "$name"
+               }
+               $astrocat_ entry add \
+                  [list "serv_type local" "long_name $fname" \
+                      "short_name $name" "url $fname"]
             }
-            $astrocat_ entry add \
-               [list "serv_type local" "long_name $fname" "short_name $name" \
-                   "url $fname"]
-          }
+         }
 
          #  Display the catalogue.
          gaia::GaiaSearch::new_local_catalog "$name" $id ::gaia::GaiaSearch "catalog" $w

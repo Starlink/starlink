@@ -1,8 +1,12 @@
     Version 4.4-1
     =============
 
-    The blink toolbox can now be scrolled to show the same position
-    as the main window by pressing the "c" key.
+    The blink toolbox can now be scrolled to show approximately the same 
+    position as the main window by pressing the "c" key.
+
+    A bug loading local tab tables has been fixed. Previously new tables
+    could not have X-Y coordinate systems defined as the x_col: and y_col:
+    parameters were ignored. This bug was introduced at version 4.2-2.
 
   Hawaiki release
   ===============
