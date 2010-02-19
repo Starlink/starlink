@@ -1,10 +1,10 @@
 /*
 *+
 *  Name:
-*     smf_find_darks
+*     smf_find_science
 
 *  Purpose:
-*     Extract darks from an input group
+*     Extract science data from an input group
 
 *  Language:
 *     Starlink ANSI C
@@ -13,15 +13,15 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_find_darks(const Grp * ingrp, Grp **outgrp, Grp **darkgrp,
+*     smf_find_science(const Grp * ingrp, Grp **outgrp, Grp **darkgrp,
 *                     int reduce, smf_dtype dtype, smfArray ** darks,
 *                     int * status );
 
 *  Arguments:
 *     ingrp = const Grp* (Given)
-*        Input group consisting of dark and non-dark observations.
+*        Input group consisting of science and non-science observations.
 *     outgrp = Grp ** (Returned)
-*        Output group consisting of all the non-dark observations. Can be
+*        Output group consisting of all the science observations. Can be
 *        NULL.
 *     darkgrp = Grp ** (Returned)
 *        If non-null, will contain the group of dark files. Will not be
@@ -43,9 +43,10 @@
 
 *  Description:
 *     This routine opens each of the files in the input group to read
-*     the header and determine whether it is associated with a dark. If it
-*     is a dark the data are read and stored in the output smfArray. If it
-*     is not a dark the group entry is copied to the output group and the
+*     the header and determine whether it is science data or non-science
+*     (a dark or a fast flat) data. If it is a dark the data are read
+*     and stored in the output smfArray. If it is science data
+*     the group entry is copied to the output group and the
 *     file is closed.
 
 *  Notes:
@@ -90,6 +91,8 @@
 *     2010-01-14 (TIMJ):
 *        Ignore files that have corrupt FITS header by seeing if the first RTS_NUM
 *        matches the SEQSTART value.
+*     2010-02-18 (TIMJ):
+*        Rename to smf_find_science from smf_find_darks.
 
 *  Copyright:
 *     Copyright (C) 2008-2010 Science and Technology Facilities Council.
@@ -141,9 +144,9 @@
 #include "smf_typ.h"
 #include "smf_err.h"
 
-#define FUNC_NAME "smf_find_darks"
+#define FUNC_NAME "smf_find_science"
 
-void smf_find_darks( const Grp * ingrp, Grp **outgrp, Grp **darkgrp,
+void smf_find_science( const Grp * ingrp, Grp **outgrp, Grp **darkgrp,
                      int reduce, smf_dtype dtype, smfArray ** darks,
                      int * status ) {
 

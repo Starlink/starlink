@@ -783,15 +783,15 @@ void smf_find_acsis_corners( smfData *data, double xc[4], double yc[4],
 
 int *smf_find_bad_dets( Grp *igrp,  int size, int *nbaddet, int *status );
 
-void smf_find_darks( const Grp * ingrp, Grp **outgrp, Grp **darkgrp,
-                     int reduce, smf_dtype dtype, smfArray ** darks,
-                     int * status );
-
 void smf_find_dateobs(  const smfHead * hdr, double *dateobs,
                         double *dateend, int *status);
 
 int *smf_find_median( const float *farray, const double *darray, size_t nel,
                       int *hist, float *median, int *status );
+
+void smf_find_science( const Grp * ingrp, Grp **outgrp, Grp **darkgrp,
+                     int reduce, smf_dtype dtype, smfArray ** darks,
+                     int * status );
 
 void smf_find_seqcount( const smfHead * hdr, int *seqcount, int *status );
 
