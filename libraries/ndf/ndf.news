@@ -8,6 +8,10 @@ V1.10
    - A new function NDF_ISIN has been added, which determines if one NDF
    is contained within another NDF.
 
+   - The NDF_SCOPY and NDF_PROP functions now allow an asterisk to be
+   used within the CLIST argument as a wild card to match all extension 
+   names.
+
 V1.9
    - A new standard WCS Frame called FRACTION has been introduced, This
    Frame is created automatically by the NDF library in the same that the

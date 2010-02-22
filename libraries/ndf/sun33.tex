@@ -4570,6 +4570,24 @@ information but is not required in the output data structure.
 The alternative (of propagating the extension, then deleting it) is less
 efficient and may lead to an unnecessarily large output file. 
 
+An asterisk may be used to indicate ``all extensions''. Thus 
+
+\small
+\begin{verbatim}
+      CALL NDF_PROP( INDF1, 'Axis,Noext(*)', 'OUT', INDF2, STATUS )
+\end{verbatim}
+\normalsize
+
+would inhibit the propagation of all extensions. Likewise, 
+
+\small
+\begin{verbatim}
+      CALL NDF_PROP( INDF1, 'Axis,Noext(*),Ext(IRAS)', 'OUT', INDF2, STATUS )
+\end{verbatim}
+\normalsize
+
+would propagate just the IRAS extension.
+
 
 \section{\xlabel{ndf_sections}\label{ss:ndfsections}NDF SECTIONS}
 
@@ -16244,6 +16262,11 @@ locator}{sun92}{using_locators}}
          {\tt '}EXTENSION(){\tt '} in a similar manner at a later point in the CLIST
          value.
 
+         \sstitem An asterisk ($*$) may be used as a wild card to match all 
+         extension names. Thus {\tt '}NOEXTENSION($*$),EXTENSION(IRAS){\tt '} 
+         may be used to indicate that only the IRAS extension should be 
+         propagated.
+
          \sstitem
          Whether or not a named extension is propagated by default can be
          controlled via an NDF tuning parameter (see NDF\_TUNE). The defaults
@@ -16886,6 +16909,11 @@ locator}{sun92}{using_locators}}
          suppressed extensions may be re-enabled by specifying
          {\tt '}EXTENSION(){\tt '} in a similar manner at a later point in the CLIST
          value.
+
+         \sstitem An asterisk ($*$) may be used as a wild card to match all 
+         extension names. Thus {\tt '}NOEXTENSION($*$),EXTENSION(IRAS){\tt '} 
+         may be used to indicate that only the IRAS extension should be 
+         propagated.
 
          \sstitem
          Whether or not a named extension is propagated by default can be
@@ -19135,10 +19163,10 @@ to be created with a specified date.
 
 \end{enumerate}
 
-\subsection{\xlabel{list_of_most_recent_changes}Changes Introduced in V1.9}
+\subsection{Changes Introduced in V1.9}
 
 The following describes the most significant changes which occurred in
-the NDF\_ system between versions V1.8 and V1.9 (the current version):
+the NDF\_ system between versions V1.8 and V1.9:
 
 \begin{enumerate}
 
@@ -19157,6 +19185,22 @@ the NDF\_ system between versions V1.8 and V1.9 (the current version):
    created by NDF\_CREAT and NDF\_NEW if the ``NDF\_AUTO\_HISTORY'' environment
    variable, or ``AUTO\_HISTORY'' tuning parameter, is set to a non-zero 
    integer.
+
+\end{enumerate}
+
+\subsection{\xlabel{list_of_most_recent_changes}Changes Introduced in V1.10}
+
+The following describes the most significant changes which occurred in
+the NDF\_ system between versions V1.9 and V1.10 (the current version):
+
+\begin{enumerate}
+
+   \item A new function NDF\_ISIN has been added, which determines if one NDF
+   is contained within another NDF.
+
+   \item The NDF\_SCOPY and NDF\_PROP functions now allow an asterisk to be
+   used within the CLIST argument as a wild card to match all extension 
+   names.
 
 \end{enumerate}
 

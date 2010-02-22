@@ -67,6 +67,9 @@
 *     suppressed extensions may be re-enabled by specifying
 *     'EXTENSION()' in a similar manner at a later point in the CLIST
 *     value.
+*     -  An asterisk (*) may be used as a wild card to match all extension
+*     names. Thus 'NOEXTENSION(*),EXTENSION(IRAS)' may be used to indicate
+*     that only the IRAS extension should be propagated.
 *     -  Whether or not a named extension is propagated by default can be 
 *     controlled via an NDF tuning parameter (see NDF_TUNE). The defaults
 *     established using NDF_TUNE can be over-ridden by specifying the 
@@ -123,6 +126,9 @@
 *        Changed to support foreign file formats.
 *     1-NOV-2007 (DSB):
 *        Add support for the PXT... tuning parameters.
+*     22-FEB-2010 (DSB):
+*        Allow an asterisk to be used as a wild card to match all
+*        extension names.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -174,9 +180,13 @@
 *  disturb any pre-existing error stack contents.
       CALL ERR_MARK
 
-*  Import the input NDF identifier and parse the component propagation
-*  expression.
+*  Import the input NDF identifier.
       CALL NDF1_IMPID( INDF1, IACB1, STATUS )
+
+*  Get a list of all available extensions in the input NDF.
+      CALL NDF1_XLST( IACB1, NDF__MXEXT, EXTN, NEXTN, STATUS )
+
+*  Parse the component propagation expression.
       CALL NDF1_PSCPX( CLIST, NDF__MXEXT, EXTN, NEXTN, CPF, STATUS )
 
 *  Find the parameter index in the parameter tables.

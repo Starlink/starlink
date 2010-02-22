@@ -20,6 +20,10 @@
 *     if INCLUD is TRUE. The comma separated list may specify names for 
 *     EXCLUSION (i.e. extensions not to be copied) or INCLUSION (i.e. 
 *     extensions to be copied, over-riding a previous inclusion).
+*
+*     If a name equal to "*" is encountered, all entries currently in 
+*     the KeyMap are set to 1 (if INCLUD is .TRUE.) or 0 (if INCLUD is
+*     .FALSE.).
 
 *  Arguments:
 *     INCLUD = LOGICAL (Given)
@@ -35,7 +39,7 @@
 
 *  Copyright:
 *     Copyright (C) 1989, 1991 Science & Engineering Research Council.
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007-2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -67,6 +71,9 @@
 *     1-NOV-2007 (DSB):
 *        Use an AST KeyMap to hold the results rather than an array of
 *        characters.
+*     22-FEB-2010 (DSB):
+*        Allow an asterisk to be used as a wild card to match all
+*        extension names.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -97,12 +104,22 @@
       INTEGER I                  ! Loop counter for list entries
       INTEGER I1                 ! Position of start of list element
       INTEGER I2                 ! Position of end of list element
+      INTEGER IKEY               ! KeyMap entry index
+      INTEGER KEYVAL             ! Value to assign to KeyMap entries
       INTEGER L                  ! Last character position of name
+      INTEGER NKEY               ! Number of entries in the keymap
 
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Get the value to assign to entries in the keymap.
+      IF( INCLUD ) THEN
+         KEYVAL = 1
+      ELSE
+         KEYVAL = 0
+      END IF
 
 *  Initialise a pointer to the character position of the start of the
 *  "current" extension name.
@@ -131,22 +148,31 @@
                F = F + I1 - 1
                L = L + I1 - 1
 
-*  Check the name for validity.
-               CALL NDF1_CHXNM( STR( F : L ), STATUS )
-               IF ( STATUS .EQ. SAI__OK ) THEN
+*  If the name is just an asterisk, assign 1 or 0 to all entries
+*  currently in the KeyMap. 
+               IF( STR( F : L ) .EQ. '*' ) THEN
+                  NKEY = AST_MAPSIZE( KEYMAP, STATUS )
+                  DO IKEY = 1, NKEY
+                     CALL AST_MAPPUT0I( KEYMAP, AST_MAPKEY( KEYMAP, 
+     :                                                   IKEY, STATUS ),
+     :                                  KEYVAL, ' ', STATUS )
+                  END DO
+
+*  Otherwise, check the name for validity.
+               ELSE 
+                  CALL NDF1_CHXNM( STR( F : L ), STATUS )
+                  IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Extract the name and convert to upper case.
-                  NAME = STR( F : L )
-                  CALL CHR_UCASE( NAME )
+                     NAME = STR( F : L )
+                     CALL CHR_UCASE( NAME )
 
 *  Add an entry to the KeyMap. This will over-write any existing entry
 *  for this extension name.
-                  IF( INCLUD ) THEN
-                     CALL AST_MAPPUT0I( KEYMAP, NAME, 1, ' ', STATUS )
-                  ELSE
-                     CALL AST_MAPPUT0I( KEYMAP, NAME, 0, ' ', STATUS )
+                     CALL AST_MAPPUT0I( KEYMAP, NAME, KEYVAL, ' ', 
+     :                                  STATUS )
+   
                   END IF
-
                END IF
             END IF
          END IF

@@ -68,6 +68,9 @@
 *     suppressed extensions may be re-enabled by specifying
 *     'EXTENSION()' in a similar manner at a later point in the CLIST
 *     value.
+*     -  An asterisk (*) may be used as a wild card to match all extension
+*     names. Thus 'NOEXTENSION(*),EXTENSION(IRAS)' may be used to indicate
+*     that only the IRAS extension should be propagated.
 *     -  Whether or not a named extension is propagated by default can be 
 *     controlled via an NDF tuning parameter (see NDF_TUNE). The defaults
 *     established using NDF_TUNE can be over-ridden by specifying the 
@@ -106,6 +109,9 @@
 *        Original version, derived from NDF_COPY.
 *     4-NOV-1993 (RFWS):
 *        Changed to support foreign format files.
+*     22-FEB-2010 (DSB):
+*        Allow an asterisk to be used as a wild card to match all
+*        extension names.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -157,13 +163,15 @@
       IPCB = 0
       CALL NDF1_IMPPL( PLACE, IPCB, STATUS )
 
-*  Parse the component propagation expression.
-      CALL NDF1_PSCPX( CLIST, NDF__MXEXT, EXTN, NEXTN, CPF, STATUS )
-
-*  If there has been no error at all so far, then import the input
-*  NDF identifier.
+*  If there has been no error so far, then import the input NDF identifier.
       IF ( ( STATUS .EQ. SAI__OK ) .AND. ( TSTAT .EQ. SAI__OK ) ) THEN
          CALL NDF1_IMPID( INDF1, IACB1, STATUS )
+
+*  Get a list of all available extensions in the input NDF.
+         CALL NDF1_XLST( IACB1, NDF__MXEXT, EXTN, NEXTN, STATUS )
+
+*  Parse the component propagation expression.
+         CALL NDF1_PSCPX( CLIST, NDF__MXEXT, EXTN, NEXTN, CPF, STATUS )
 
 *  Selectively propagate the components of the input NDF to create a
 *  new base NDF and an ACB entry to describe it.

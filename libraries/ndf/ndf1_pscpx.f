@@ -28,8 +28,9 @@
 *     items with a list of the extensions to be affected contained
 *     within the parentheses. The same component name may appear more
 *     than once in the list, and the effects of each occurrence are
-*     cumulative (i.e. the latter occurrence takes precedence).  The
-*     routine returns an array of logical component propagation flags
+*     cumulative (i.e. the latter occurrence takes precedence).  An
+*     asterisk (*) can be used as a wild card to match all extensions.
+*     The routine returns an array of logical component propagation flags
 *     and a list of the names of extensions which are not to be
 *     propagated.
 
@@ -39,11 +40,14 @@
 *     MXEXTN = INTEGER (Given)
 *        Maximum number of names to be returned in the EXTN array (i.e.
 *        the declared size of this array).
-*     EXTN( MXEXTN ) = CHARACTER * ( DAT__SZNAM ) (Returned)
-*        List of the names of NDF extensions which are not to be
+*     EXTN( MXEXTN ) = CHARACTER * ( DAT__SZNAM ) (Given and Returned)
+*        On entry, a list of the names of all available NDF extensions. On 
+*        exit, a list of the names of NDF extensions which are not to be
 *        propagated.
-*     NEXTN = INTEGER (Returned)
-*        Number of extension names returned in the EXTN array.
+*     NEXTN = INTEGER (Given and Returned)
+*        On entry, the number of available extension names supplied in
+*        the EXTN array. On exit, the number of extension names returned 
+*        in the EXTN array.
 *     CPF( NDF__MXCPF ) = LOGICAL (Returned)
 *        Array of component propagation flags. Symbolic constants are
 *        defined in the include file NDF_CONST to identify the elements
@@ -55,6 +59,7 @@
 *     Copyright (C) 1997 Rutherford Appleton Laboratory
 *     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  License:
@@ -110,6 +115,9 @@
 *     1-NOV-2007 (DSB):
 *        Use the "PXT..." tuning parameters to determine whether or not
 *        to propagate named extsnions by default.
+*     22-FEB-2010 (DSB):
+*        Allow an asterisk (*) be used as a wild card to match all 
+*        extension names.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -137,9 +145,11 @@
       CHARACTER * ( * ) STR
       INTEGER MXEXTN
 
-*  Arguments Returned:
+*  Arguments Given and Returned:
       CHARACTER * ( DAT__SZNAM ) EXTN( MXEXTN )
       INTEGER NEXTN
+
+*  Arguments Returned:
       LOGICAL CPF( NDF__MXCPF )
 
 *  Status:
@@ -171,11 +181,31 @@
 *  If the TCB contains an AST KeyMap holding default propagation flags
 *  for NDF extensions, then take a copy of it so we can modify it without
 *  making any permanatent changes. Otherwise, create a new empty KeyMap.
+*  Also, store the names of all available extensions in the KeyMap. Each 
+*  is given an associated value of one, indicating that the extension 
+*  should be copied. Any "NOEXTENSION" elements in the supplied expression
+*  may cause some of these values to be set to zero, indicating that the 
+*  extension is not to be copied.
       IF( TCB_PXT .NE. AST__NULL ) THEN
          PXT = AST_COPY( TCB_PXT, STATUS )
-      ELSE 
+
+         DO I = 1, NEXTN
+            IF( .NOT. AST_MAPHASKEY( PXT, EXTN( I ), STATUS ) ) THEN
+               CALL AST_MAPPUT0I( PXT, EXTN( I ), 1, ' ', STATUS ) 
+            END IF
+         END DO
+
+      ELSE
          PXT = AST_KEYMAP( ' ', STATUS )
+
+         DO I = 1, NEXTN
+            CALL AST_MAPPUT0I( PXT, EXTN( I ), 1, ' ', STATUS ) 
+         END DO
+
       END IF
+
+*  Initialise the count of returned extensions.
+      NEXTN = 0
 
 *  Initialise the component propagation flags.
       CPF( NDF__ACPF ) = .FALSE.
@@ -188,9 +218,6 @@
       CPF( NDF__VCPF ) = .FALSE.
       CPF( NDF__WCPF ) = .FALSE.
       
-*  Initialise the count of excluded extensions.
-      NEXTN = 0
-
 *  Initialise a pointer to the start of the "current" item in the
 *  component list.
       I1 = 1

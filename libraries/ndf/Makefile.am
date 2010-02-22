@@ -93,7 +93,7 @@ ndf1_vccn.f ndf1_vcpx.f ndf1_vcre.f ndf1_vdat.f ndf1_vfrm.f	       \
 ndf1_vftp.f ndf1_vimp.f ndf1_vmap.f ndf1_vmmd.f ndf1_vmod.f	       \
 ndf1_vrst.f ndf1_vsbd.f ndf1_vsftp.f ndf1_vsta.f ndf1_vstat.f	       \
 ndf1_vtyp.f ndf1_vump.f ndf1_vwcs.f ndf1_wrast.f ndf1_wrwcs.f	       \
-ndf1_wsbnd.f ndf1_wsta.f ndf1_wwrt.f ndf1_xcpy.f ndf1_xtfor.f	       \
+ndf1_wsbnd.f ndf1_wsta.f ndf1_wwrt.f ndf1_xcpy.f ndf1_xlst.f ndf1_xtfor.f \
 ndf_acget.f ndf_aclen.f ndf_acmsg.f ndf_acput.f ndf_acre.f ndf_aform.f \
 ndf_amap.f ndf_annul.f ndf_anorm.f ndf_arest.f ndf_asnrm.f ndf_astat.f \
 ndf_astyp.f ndf_atype.f ndf_aunmp.f ndf_bad.f ndf_base.f ndf_bb.f      \
