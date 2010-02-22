@@ -143,7 +143,9 @@ itcl::class gaia::GaiaSampAgent {
                              -type ".TAB" -exists 0]
       }
       set tst_file [$temp_files_ get_name]
-      exec $::gaia_dir/vot2tab $url 0 $tst_file
+
+      #  Note don't use stderr output as error indicator.
+      exec -ignorestderr $::gaia_dir/vot2tab $url 0 $tst_file
       if {! [file exists $tst_file]} {
          error "VOTable conversion failed"
       }

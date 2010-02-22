@@ -8,6 +8,10 @@
     could not have X-Y coordinate systems defined as the x_col: and y_col:
     parameters were ignored. This bug was introduced at version 4.2-2.
 
+    VOTables sent to GAIA using SAMP were being rejected if they contained
+    non-fatal problems. This no longer happens and the warnings are written
+    to the console.
+
   Hawaiki release
   ===============
 
