@@ -15,9 +15,9 @@
 \newcommand{\stardocsource}    {sun95.37}
 \newcommand{\stardocnumber}    {95.37}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2010 January 13}
+\newcommand{\stardocdate}      {2010 February 21}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {1.11}
+\newcommand{\stardocversion}   {1.12}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -30144,7 +30144,7 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
       instance, by applications LISTMAKE and CURSOR.  By default all positions
       in the catalogue are reported, but a subset may be reported by
       specifying a range of \emph{position identifiers}~ (see Parameters FIRST,
-      LAST and STEP).
+      LAST, and STEP).
  
       Positions may be reported in a range of \htmlref{co-ordinate Frames}{se:domains}~ dependent
       on the information stored in the supplied positions list (see Parameter
@@ -56859,7 +56859,7 @@ The following applications have been modified:
 \renewcommand{\thesection}{A\Alph{section}}
 %\renewcommand{\thesubsection}{\section.\arabic{subsection}}
 
-\section{\xlabel{se_changes}Release Notes---V1.11\label{se:changes}}
+\section{\xlabel{se_changes}Release Notes---V1.11}
 
 \subsection{Global changes}
 
@@ -57020,8 +57020,6 @@ The following applications have been modified:
 
    \item [\htmlref{LISTSHOW}{LISTSHOW}]\mbox{}
       \begin{itemize}
-        \item A new parameter STEP has been added that allows a subset of
-        the positions identifiers between FIRSt and LAST to be displayed.
         \item Parameter QUIET has been withdrawn.  Instead set the
         MSG\_FILTER environment variable to {\tt QUIET} to suppress display
         of the positions.
@@ -57129,6 +57127,22 @@ The following applications have been modified:
         for the axes.
       \end{itemize}
 
+
+\end{description}
+
+
+\section{\xlabel{se_changes}Release Notes---V1.12\label{se:changes}}
+
+\subsection{Modified Commands}
+The following applications have been modified:
+
+\begin{description}
+
+   \item [\htmlref{LISTSHOW}{LISTSHOW}]\mbox{}
+      \begin{itemize}
+        \item A new parameter STEP has been added that allows a subset of
+        the positions identifiers between FIRST and LAST to be displayed.
+      \end{itemize}
 
 \end{description}
 

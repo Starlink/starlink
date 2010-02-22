@@ -1,10 +1,25 @@
-1 KAPPA_Version_1.11
+1 KAPPA_Version_1.12
 
    A new release of KAPPA (@PACKAGE_VERSION@) is under development.  The main
    changes so far are listed below.  For complete details of all 
    changes, see the "Release Notes" appendix in SUN/95.
 
+2 Modified_applications
+
+   o  LISTSHOW
+
+      -   A new Parameter STEP has been added that allows a subset of
+      the positions identifiers between FIRST and LAST to be displayed.
+
+
+1 KAPPA_Version_1.11
+
+   A new release of KAPPA (V1.11-11) is available.  The main changes 
+   are listed below.  For complete details of all changes, see the 
+   "Release Notes" appendix in SUN/95.
+
 2 Global_changes
+
    o  Control of the verbosity of informational messages is now
    possible through the environment variable MSG_FILTER.  ILEVEL
    and QUIET parameters that previously controlled messaging are no 
@@ -117,11 +132,6 @@ The following new applications have been added:
       of its plotted array component.  A long Symbol including spaces 
       caused issues in other tasks like CURSOR, where the Symbol is used 
       as a column name in the output catalogue.
-
-   o  LISTSHOW
-
-      -   A new parameter STEP has been added that allows a subset of
-      the positions identifiers between FIRSt and LAST to be displayed.
 
    o  LOOK
 
