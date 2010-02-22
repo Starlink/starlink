@@ -78,9 +78,8 @@ int main( int argc, char* argv[] )
 
         /*  Output table descriptions. */
         table->list( cout );
+        return 0;
     }
-    else {
-        cerr << "Failed to open VOTable " << argv[1] << endl;
-    }
+    cerr << "Failed to open VOTable " << argv[1] << endl;
     return 1;
 }
