@@ -38,13 +38,15 @@
 *        Don't fail if smfData is not data from a known instrument.
 *     2009-04-24 (TIMJ):
 *        Add ACSIS observing modes.
+*     2010-02-19 (TIMJ):
+*        Recognize fast flatfields.
 
 *  Notes:
 *     This function relies on an accurate hdr->instrument. i.e. call
 *     smf_inst_get first.
 
 *  Copyright:
-*     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2010 Science and Technology Facilities Council.
 *     Copyright (C) 2006-2007 University of British Columbia.
 *     All Rights Reserved.
 
@@ -196,6 +198,8 @@ static smf_obstype smf__parse_obstype ( char obs_type[], int *status ) {
     type = SMF__TYP_SKYDIP;
   } else if (strcasecmp( obs_type, "FLATFIELD" ) == 0) {
     type = SMF__TYP_FLATFIELD;
+  } else if (strcasecmp( obs_type, "FASTFLAT" ) == 0) {
+    type = SMF__TYP_FASTFLAT;
   } else if (strcasecmp( obs_type, "NOISE" ) == 0) {
     type = SMF__TYP_NOISE;
   } else {

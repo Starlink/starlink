@@ -272,7 +272,8 @@ typedef enum smf_obstype {
   SMF__TYP_FOCUS,
   SMF__TYP_SKYDIP,
   SMF__TYP_FLATFIELD,
-  SMF__TYP_NOISE
+  SMF__TYP_NOISE,
+  SMF__TYP_FASTFLAT
 } smf_obstype;
 
 /* Source of tau for extinction correction */
