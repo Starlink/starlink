@@ -197,35 +197,32 @@
       PARAMETER ( SZFMT = 2 * VAL__SZD )
 
 *  Local Variables:
-      CHARACTER COSTR*( NDF__MXDIM * ( SZFMT + 1 ) + 1 ) 
-                                   ! Formatted co-ordinate string
       CHARACTER DOM*30             ! Current Frame domain
-      CHARACTER PAXIS*( VAL__SZI ) ! Buffer for new axis number
-      CHARACTER QAXIS*( VAL__SZI ) ! Buffer for original axis number
       CHARACTER TTL*80             ! NDF title
-      DOUBLE PRECISION CONST( NDF__MXDIM )! Constants for unassigned axes
       DOUBLE PRECISION OFFSET      ! Axis offset scale factor
       DOUBLE PRECISION SCALE       ! Axis scale factor
       INTEGER AX( NDF__MXDIM )     ! Axis indices to check for monotonicity
       INTEGER DIM                  ! Pixel dimension
       INTEGER FRM                  ! Pointer to a Frame in IWCS
       INTEGER I                    ! Axis index
-      INTEGER IBASE                ! Index of original Base Frame in IWCS
+      INTEGER IAXI1                ! Index of original AXIS Frame in NEWFS
+      INTEGER IAXI2                ! Index of original AXIS Frame in IWCS
       INTEGER ICURR                ! Index of original Current Frame in IWCS
+      INTEGER IFRA1                ! Index of original FRACTION Frame in NEWFS
+      INTEGER IFRA2                ! Index of original FRACTION Frame in IWCS
+      INTEGER IGRI1                ! Index of original GRID Frame in NEWFS
+      INTEGER IGRI2                ! Index of original GRID Frame in IWCS
       INTEGER INPRM( NDF__MXDIM )  ! Input axis permutation array
-      INTEGER IPIX                 ! Index of original PIXEL Frame in IWCS
+      INTEGER IPIX1                ! Index of original PIXEL Frame in NEWFS
+      INTEGER IPIX2                ! Index of original PIXEL Frame in IWCS
       INTEGER IPWORK               ! Pointer to work space
       INTEGER LBND( NDF__MXDIM )   ! Original NDF bounds
       INTEGER LTTL                 ! Used length of TTL
       INTEGER MXDIM                ! Largest selected pixel dimension
       INTEGER NBAX                 ! Number of axes in GRID Frame
-      INTEGER NC                   ! No. of characters in text buffer
-      INTEGER NCP                  ! No. of characters in PAXIS text buffer
-      INTEGER NCQ                  ! No. of characters in QAXIS text buffer
       INTEGER NDIMS                ! No. of genuine axes in the NDF
-      INTEGER NEWBAS               ! Pointer to the new Base Frame
       INTEGER NEWFS                ! Pointer to a FrameSet with new Base Frame
-      INTEGER NEWPIX               ! Pointer to the new PIXEL Frame
+      INTEGER NFRAME               ! No. of Frames in FrameSet
       INTEGER OUTPRM( NDF__MXDIM ) ! Output axis permutation array
       INTEGER PMAP                 ! AST pointer to a PermMap
       INTEGER UBND( NDF__MXDIM )   ! Original NDF bounds
@@ -285,55 +282,45 @@
 *  Save the number of axes in the Base Frame.
       NBAX = AST_GETI( IWCS, 'NIN', STATUS ) 
 
-*  If the Base Frame has the wrong number of axes, create a new Base
-*  Frame by picking axes from the original.
+*  If the number of GRID axes in the NDF is wrong, create a FrameSet
+*  containing the NDF-special Frames (GRID, AXIS, PIXEL and FRACTION)
+*  appropriate for an NDF with the returned bounds.
       IF( NBAX .NE. NDIM ) THEN
+         CALL KPG1_ASNDF( INDF, NDIM, SLBND, SUBND, NEWFS, STATUS )
 
-*  Create a new GRID Frame with NDIM axes.
-         NEWBAS = AST_FRAME( NDIM, 'DOMAIN=GRID', STATUS )
+*  Find the indicies of the NDF special Frames within this FrameSet
+         IPIX1 = -1
+         IGRI1 = -1
+         IFRA1 = -1
+         IAXI1 = -1
 
-*  Create a title for it, including the grid co-ordinates of the first
-*  pixel, i.e. (1.0,1.0,...) 
-         NC = 0
-         CALL CHR_PUTC( '(', COSTR, NC )
-         DO I = 1, NDIM
-            IF ( I .GT. 1 ) CALL CHR_PUTC( ',', COSTR, NC )
-            CALL CHR_PUTC( '1.0', COSTR, NC )
-         END DO
-         CALL CHR_PUTC( ')', COSTR, NC )
+         NFRAME = AST_GETI( NEWFS, 'NFRAME', STATUS )
+         DO I = 1, NFRAME
+            FRM = AST_GETFRAME( NEWFS, I, STATUS )
+            DOM = AST_GETC( FRM, 'DOMAIN', STATUS )
 
-*  Store the title in the Frame.
-         IF ( NDIM .EQ. 1 ) THEN
-            CALL AST_SETC( NEWBAS, 'Title', 'Data grid index; first '//
-     :                     'pixel at ' // COSTR( : NC ), STATUS )
-         ELSE
-            CALL AST_SETC( NEWBAS, 'Title', 'Data grid indices; '//
-     :                     'first pixel at ' // COSTR( : NC ), STATUS ) 
-         END IF
+            IF( DOM .EQ. 'PIXEL' ) THEN
+               IPIX1 = I
 
-*  For each axis, set up a label, symbol and unit value. Use the original
-*  NDF axis numbers.
-         DO I = 1, NDIM
-            NCP = 0
-            NCQ = 0
+            ELSE IF( DOM .EQ. 'FRACTION' ) THEN
+               IFRA1 = I
 
-            CALL CHR_PUTI( I, PAXIS, NCP )
-            CALL CHR_PUTI( SDIM( I ), QAXIS, NCQ )
+            ELSE IF( DOM .EQ. 'AXIS' ) THEN
+               IAXI1 = I
 
-            CALL AST_SETC( NEWBAS, 'Label(' // PAXIS( : NCP ) // ')',
-     :                     'Data grid index ' // QAXIS( : NCQ ), 
-     :                     STATUS )
-            CALL AST_SETC( NEWBAS, 'Symbol(' // PAXIS( : NCP ) // ')',
-     :                     'g' // QAXIS( : NCQ ), STATUS )
-            CALL AST_SETC( NEWBAS, 'Unit(' // PAXIS( : NCP ) // ')',
-     :                     'pixel', STATUS )
+            ELSE IF( DOM .EQ. 'GRID' ) THEN
+               IGRI1 = I
+
+            END IF
+
+            CALL AST_ANNUL( FRM, STATUS )
 
          END DO
 
-*  Create a PermMap which goes from this new NDIM-dimensional GRID Frame 
-*  to the original NBAX-dimensional GRID Frame. First, initialise the axis 
-*  permutation arrays so that all input and output axes take the value of 
-*  the first constant supplied to AST_PERMMAP (i.e. 1.0).
+*  Create a PermMap which goes from the NDIM-dimensional GRID Frame in this
+*  FrameSet to the original NBAX-dimensional GRID Frame. First, initialise 
+*  the axis permutation arrays so that all input and output axes take the 
+*  value of the first constant supplied to AST_PERMMAP (i.e. 1.0).
          DO I = 1, NBAX
             OUTPRM( I ) = -1
          END DO
@@ -355,159 +342,95 @@
          PMAP = AST_PERMMAP( NDIM, INPRM, NBAX, OUTPRM, 1.0D0, ' ', 
      :                       STATUS ) 
 
-*  Create a new FrameSet holding just the new GRID Frame.
-         NEWFS = AST_FRAMESET( NEWBAS, ' ', STATUS )
+*  Find the indicies of the NDF special Frames in the FrameSet read from
+*  the NDF.
+         IPIX2 = -1
+         IGRI2 = -1
+         IFRA2 = -1
+         IAXI2 = -1
 
-*  Note the indices of the original Base and Current Frames.
-         IBASE = AST_GETI( IWCS, 'BASE', STATUS )
-         ICURR = AST_GETI( IWCS, 'CURRENT', STATUS )
+         NFRAME = AST_GETI( IWCS, 'NFRAME', STATUS )
+         DO I = 1, NFRAME
+            FRM = AST_GETFRAME( IWCS, I, STATUS )
+            DOM = AST_GETC( FRM, 'DOMAIN', STATUS )
 
-*  Make the GRID Frame the Current Frame (AST_ADDFRAME uses the Current
-*  Frame).
-         CALL AST_SETI( IWCS, 'CURRENT', IBASE, STATUS )
-         
-*  Add in the FrameSet read from the NDF, using the PermMap created above
-*  to connect the Base (GRID) Frame to the new FrameSet. 
+            IF( DOM .EQ. 'PIXEL' ) THEN
+               IPIX2 = I
+
+            ELSE IF( DOM .EQ. 'FRACTION' ) THEN
+               IFRA2 = I
+
+            ELSE IF( DOM .EQ. 'AXIS' ) THEN
+               IAXI2 = I
+
+            ELSE IF( DOM .EQ. 'GRID' ) THEN
+               IGRI2 = I
+
+            END IF
+
+            CALL AST_ANNUL( FRM, STATUS )
+
+         END DO
+
+*  Record the original current Frame index.
+         ICURR = AST_GETI( IWCS, 'Current', STATUS )
+
+*  Record the original number of Frames in the new FrameSet.
+         NFRAME = AST_GETI( NEWFS, 'NFRAME', STATUS )
+
+*  Add the FrameSet read from the NDF into the new FrameSet, using the 
+*  PermMap created above to connect the Base (GRID) Frame to the new FrameSet. 
+*  We need to make the old GRID Frame the current Frame first since
+*  AST_ADDFRAME uses the current Frame.
+         CALL AST_SETI( IWCS, 'Current', IGRI2, STATUS )
          CALL AST_ADDFRAME( NEWFS, AST__BASE, PMAP, IWCS, STATUS )
          CALL AST_ANNUL( PMAP, STATUS )
 
-*  Remove the original GRID Frame. Its index will have increased by 1
-*  because of the single Frame which was already in NEWFS.
-         CALL AST_REMOVEFRAME( NEWFS, IBASE + 1, STATUS )
+*  Adjust the Frame indices found above so that they refer to the
+*  expanded FrameSet.
+         IPIX2 = IPIX2 + NFRAME
+         IAXI2 = IAXI2 + NFRAME
+         IFRA2 = IFRA2 + NFRAME
+         IGRI2 = IGRI2 + NFRAME
+         ICURR = ICURR + NFRAME
 
-*  Re-instate the original Current Frame.
-         CALL AST_SETI( NEWFS, 'CURRENT', ICURR, STATUS )
+*  If the original current Frame was one of the NDF special Frames, set
+*  the current Frame to the appropriate new Frame.
+         IF( ICURR .EQ. IPIX2 ) THEN
+            ICURR = IPIX1
+
+         ELSE IF( ICURR .EQ. IFRA2 ) THEN
+            ICURR = IFRA1
+
+         ELSE IF( ICURR .EQ. IAXI2 ) THEN
+            ICURR = IAXI1
+
+         ELSE IF( ICURR .EQ. IGRI2 ) THEN
+            ICURR = IGRI1
+         END IF
+
+         CALL AST_SETI( NEWFS, 'Current', ICURR, STATUS )
+
+*  Rename the original PIXEL Frame as NEW_PIXEL.
+         FRM = AST_GETFRAME( NEWFS, IPIX2, STATUS )
+         CALL AST_SETC( FRM, 'DOMAIN', 'NDF_PIXEL', STATUS )
+         CALL AST_ANNUL( FRM, STATUS )          
+
+*  Delete the other three original NDF special Frames.
+         CALL AST_REMOVEFRAME( NEWFS, IAXI2, STATUS )
+         IF( IFRA2 .GT. IAXI2 ) IFRA2 = IFRA2 - 1
+         IF( IGRI2 .GT. IAXI2 ) IGRI2 = IGRI2 - 1
+
+         CALL AST_REMOVEFRAME( NEWFS, IFRA2, STATUS )
+         IF( IGRI2 .GT. IFRA2 ) IGRI2 = IGRI2 - 1
+
+         CALL AST_REMOVEFRAME( NEWFS, IGRI2, STATUS )
 
 *  Annul the original FrameSet and use the new one instead.
          CALL AST_ANNUL( IWCS, STATUS )
          IWCS = NEWFS
 
       END IF       
-
-*  Re-map the PIXEL Frame by selecting the chosen axes.
-*  ====================================================
-
-*  If the PIXEL Frame has the wrong number of axes, create a new PIXEL
-*  Frame by picking axes from the original.
-      IF( NBAX .NE. NDIM ) THEN
-
-*  Create a new PIXEL Frame with NDIM axes.
-         NEWPIX = AST_FRAME( NDIM, 'DOMAIN=PIXEL', STATUS )
-
-*  Create a title for it, including the pixel co-ordinates of the first
-*  pixel.
-         NC = 0
-         CALL CHR_PUTC( '(', COSTR, NC )
-         DO I = 1, NDIM
-            IF ( I .GT. 1 ) CALL CHR_PUTC( ',', COSTR, NC )
-            CALL CHR_PUTR( REAL( SLBND( I ) ) - 0.5, COSTR, NC )
-         END DO
-         CALL CHR_PUTC( ')', COSTR, NC )
-
-*  Store the title in the Frame.
-         IF ( NDIM .EQ. 1 ) THEN
-            CALL AST_SETC( NEWPIX, 'Title', 'Pixel co-ordinate; '//
-     :                     'first pixel at ' // COSTR( : NC ), STATUS )
-         ELSE
-            CALL AST_SETC( NEWPIX, 'Title', 'Pixel co-ordinates; '//
-     :                     'first pixel at ' // COSTR( : NC ), STATUS ) 
-         END IF
-
-*  For each axis, set up a label, symbol and unit value. Use the original
-*  NDF axis numbers.
-         DO I = 1, NDIM
-            NCP = 0
-            NCQ = 0
-
-            CALL CHR_PUTI( I, PAXIS, NCP )
-            CALL CHR_PUTI( SDIM( I ), QAXIS, NCQ )
-
-            CALL AST_SETC( NEWPIX, 'Label(' // PAXIS( : NCP ) // ')',
-     :                     'Pixel co-ordinate ' // QAXIS( : NCQ ), 
-     :                     STATUS )
-            CALL AST_SETC( NEWPIX, 'Symbol(' // PAXIS( : NCP ) // ')',
-     :                     'p' // QAXIS( : NCQ ), STATUS )
-            CALL AST_SETC( NEWPIX, 'Unit(' // PAXIS( : NCP ) // ')',
-     :                     'pixel', STATUS )
-
-         END DO
-
-*  Store the pixel co-ordinate at the centre of the low bound pixel on each
-*  axis. These are the constants used by AST_PERMMAP.
-         DO I = 1, NDF__MXDIM
-            CONST( I ) = DBLE( LBND( I ) ) - 0.5D0
-         END DO
-
-*  Create a PermMap which goes from this new NDIM-dimensional PIXEL Frame 
-*  to the original NBAX-dimensional PIXEL Frame. First, initialise the axis 
-*  permutation arrays so that all input and output axes take the value of 
-*  the corresponding axis lower bound. Nagative values index the array of
-*  constants set up above.
-         DO I = 1, NBAX
-            OUTPRM( I ) = -I
-         END DO
-
-         DO I = 1, NDIM
-            INPRM( I ) = -SDIM( I )
-         END DO
-
-*  Now over-write elements of the axis permutation arrays which correspond to 
-*  genuine axes.
-         DO I = 1, NDIM
-            IF( SDIM( I ) .LE. NBAX ) THEN
-               INPRM( I ) = SDIM( I )
-               OUTPRM( SDIM( I ) ) = I
-            END IF 
-         END DO
-
-*  Create the PermMap.
-         PMAP = AST_PERMMAP( NDIM, INPRM, NBAX, OUTPRM, CONST, ' ', 
-     :                       STATUS ) 
-
-*  Find the original PIXEL Frame, and change its Domain to NDF_PIXEL.
-         IPIX = 0
-         DO I = 1, AST_GETI( IWCS, 'NFRAME', STATUS )
-            FRM = AST_GETFRAME( IWCS, I, STATUS )
-            IF( AST_GETC( FRM, 'DOMAIN', STATUS ) .EQ. 'PIXEL' ) THEN
-               CALL AST_SETC( FRM, 'DOMAIN', 'NDF_PIXEL', STATUS )
-               CALL AST_ANNUL( FRM, STATUS )
-               IPIX = I
-               GO TO 10
-            END IF
-            CALL AST_ANNUL( FRM, STATUS )
-         END DO
- 10      CONTINUE
-
-*  Report an error if no PIXEL Frame was found.
-         IF( IPIX .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN
-            STATUS = SAI__ERROR
-            CALL NDF_MSG( 'NDF', INDF )
-            CALL ERR_REP( 'KPG1_ASGET_1', 'No PIXEL Frame found '//
-     :                    'in WCS component of ''^NDF'' (possible '//
-     :                    'programming error).', STATUS )      
-         END IF
-
-*  Invert the PermMap so that its forward mapping goes from the original 
-*  PIXEL Frame to the new one. This is the direction required by
-*  AST_ADDFRAME.
-         CALL AST_INVERT( PMAP, STATUS )
-
-*  Save the index of the Current Frame (changed by AST_ADDFRAME).
-         ICURR = AST_GETI( IWCS, 'CURRENT', STATUS )
-         
-*  Add the new PIXEL Frame on to the end of the FrameSet, using the above
-*  PermMap to connect it to the original PIXEL Frame. The new PIXEL Frame
-*  becomes the Current Frame.
-         CALL AST_ADDFRAME( IWCS, IPIX, PMAP, NEWPIX, STATUS )
-
-*  Re-instate the original Current Frame, unless this was the original PIXEL 
-*  Frame (in which case the new PIXEL Frame is left as the Current Frame).
-         IF( ICURR .NE. IPIX ) CALL AST_SETI( IWCS, 'CURRENT', ICURR,
-     :                                        STATUS ) 
-
-      END IF       
-
-
 
 *  Now modify the Current Frame if required to have exactly NDIM axes.
 *  ===================================================================
@@ -564,8 +487,8 @@
      :                    STATUS )
 
          IF( .NOT. MONO ) THEN
-            CALL KPG1_ASFFR( IWCS, 'PIXEL', IPIX, STATUS )
-            CALL AST_SETI( IWCS, 'Current', IPIX, STATUS )
+            CALL KPG1_ASFFR( IWCS, 'PIXEL', IPIX2, STATUS )
+            CALL AST_SETI( IWCS, 'Current', IPIX2, STATUS )
             CALL MSG_OUT( 'KPG1_GTWCS_MSG4', 'PIXEL co-ordinates will'//
      :                    ' be used instead of AXIS co-ordinates.', 
      :                    STATUS )
