@@ -52,7 +52,7 @@
 *        The number of blocks into which the time stream is divided.
 *     gain_box = dim_t * (Given)
 *        The number of time slices in each block (note, the final block
-*        may contain fewer than "gain_box" slices ).
+*        may contain more than "gain_box" slices ).
 *     wg = double * (Returned)
 *        Pointer to an array in which to return the gain values for 
 *        bolometer "ibolo". It should have at least "time1-time0+1"
@@ -229,14 +229,14 @@ void smf_gandoff( dim_t ibolo, dim_t time0, dim_t time1, dim_t ntime,
 /* Get the gain, offset and time at the end of the new section. Increment
    the count of sections and check that a new gain and offset value are
    available (i.e. we have not already reached the end). Also take care
-   because the last block may contain fewer than gain_box time slices. */
+   because the last block may contain more than gain_box time slices. */
          isection++;
          if( isection < nblock ) { /* most sections have "gain_box" slices */
             gain1 = gai_data[ igbase ];
             off1 = gai_data[ igbase + off_offset ];
             dt = gain_box;
 
-         } else if( isection == nblock ){ /* penultimate section may be short */
+         } else if( isection == nblock ){ /* penultimate section may be long */
             gain1 = gai_data[ igbase ];
             off1 = gai_data[ igbase + off_offset ];
             dt = ( ntime - next_section )/2 + gain_box/4;

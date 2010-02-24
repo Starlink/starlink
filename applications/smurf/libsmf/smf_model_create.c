@@ -242,7 +242,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
   int fd=0;                     /* File descriptor */
   int flag=0;                   /* Flag */
   char fname_grpex[GRP__SZNAM+1];/* String for holding filename grpex */
-  dim_t gain_box=2000;          /* No. of time slices in a block */
+  dim_t gain_box=6000;          /* No. of time slices in a block */
   smfDIMMHead head;             /* Header for the file */
   size_t headlen=0;             /* Size of header in bytes */
   void *headptr=NULL;           /* Pointer to header portion of buffer */
@@ -596,10 +596,10 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
                              "", &head.hdr, status );
 
             /* Get the number of blocks into which to split each
-               time series. Each box (except possibly the last one
+               time series. Each box (except possibly the last one)
                contains "gain_box" time slices. */
 
-            gain_box = 2000;
+            gain_box = 6000;
             if( astMapGet0A( keymap, "COM", &kmap ) ) {
                if( astMapGet0I( kmap, "GAIN_BOX", &ival ) ) {
                   gain_box = ival;
@@ -611,7 +611,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
             } else { 
               ntslice = (idata->dims)[0];
             }
-            nblock = 1 + ( ntslice - 1 )/gain_box;
+            nblock = ntslice/gain_box;
 
             /* Note that we're using the time axis to store the coefficients */
             if( isTordered ) {

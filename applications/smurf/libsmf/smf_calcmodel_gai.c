@@ -101,7 +101,7 @@ void smf_calcmodel_gai( smfWorkForce *wf __attribute__((unused)),
 
   /* Local Variables */
   size_t bstride;               /* bolometer stride */
-  dim_t gain_box=2000;          /* No. of time slices in a block */
+  dim_t gain_box=6000;          /* No. of time slices in a block */
   size_t gbstride;              /* GAIn bolo stride */
   size_t gcstride;              /* GAIn coeff stride */
   int gflat=0;                  /* correct flatfield using GAI */
@@ -137,7 +137,7 @@ void smf_calcmodel_gai( smfWorkForce *wf __attribute__((unused)),
 
   /* Get the number of blocks into which to split each time series. Each box 
      (except possibly the last one contains "gain_box" time slices. */
-  gain_box = 2000;
+  gain_box = 6000;
   if( astMapGet0A( keymap, "COM", &kmap ) ) {
      if( astMapGet0I( kmap, "GAIN_BOX", &ival ) ) {
         gain_box = ival;
