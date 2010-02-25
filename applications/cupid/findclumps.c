@@ -161,8 +161,10 @@ void findclumps( int *status ) {
 *        algorithm given by parameter METHOD is assumed. The parameters 
 *        available for each algorithm are listed in the "Configuration 
 *        Parameters" sections below. Default values will be used for any 
-*        unspecified parameters. Unrecognised options are ignored (that is, 
-*        no error is reported). [current value]
+*        unspecified parameters. Assigning the value "<def>" (case
+*        insensitive) to a keyword has the effect of reseting it to its 
+*        default value. Unrecognised options are ignored (that is, no error 
+*        is reported). [current value]
 *     DECONV = _LOGICAL (Read)
 *        Determines if the clump properties stored in the output catalogue 
 *        and NDF extension should be corrected to remove the effect of the 

@@ -18274,66 +18274,6 @@ related items to be removed.
    }
 }
 \sstroutine{
-   KPG1\_FIT1D
-}{
-   Fit a least squares straight line to supplied data
-}{
-   \sstdescription{
-      A straight line is fitted to the data supplied in X and Y, using
-      the least squares criterion. The returned values of M and C are
-      the gradient and intercept of the fit, so that y = M.x $+$ C. The
-      RMS residual of the Y data from the fit is returned in RMS.
-
-      An error is reported if there are less than two good data values
-      in Y, or if the X values cover a range of zero.
-   }
-   \sstinvocation{
-      CALL KPG1\_FIT1D( LBND, UBND, Y, X, M, C, RMS, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         LBND = INTEGER (Given)
-      }{
-         The lower bound of the X and Y arrays.
-      }
-      \sstsubsection{
-         UBND = INTEGER (Given)
-      }{
-         The upper bound of the X and Y arrays.
-      }
-      \sstsubsection{
-         Y( LBND : UBND ) = DOUBLE PRECISION (Given)
-      }{
-         The Y data values. Any bad values are ignored.
-      }
-      \sstsubsection{
-         X( LBND : UBND ) = DOUBLE PRECISION (Given)
-      }{
-         The X positions corresponding to each Y data value.
-      }
-      \sstsubsection{
-         M = DOUBLE PRECISION (Returned)
-      }{
-         The gradient.
-      }
-      \sstsubsection{
-         C = DOUBLE PRECISION (Returned)
-      }{
-         The intercept.
-      }
-      \sstsubsection{
-         RMS = DOUBLE PRECISION (Returned)
-      }{
-         The RMS residual between the Y values and the fit.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
    KPG1\_FLOOR
 }{
    Return the largest integer smaller than or equal to a supplied value
@@ -39173,6 +39113,57 @@ related items to be removed.
    }
 }
 \sstroutine{
+   KPG1\_ASNDF
+}{
+   Create a FrameSet containing NDF-special Frames with given bounds
+}{
+   \sstdescription{
+      This function creates a FrameSet containing the NDF-special Frames,
+      GRID, PIXEL, FRACTION and AXIS, appropriate to an NDF with the
+      supplied dimensionality and pixel index bounds. Optionally, AXIS
+      information can be propagated from a supplied NDF.
+   }
+   \sstinvocation{
+      CALL KPG1\_ASNDF( INDF, NDIM, LBND, UBND, IWCS, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         INDF = INTEGER (Given)
+      }{
+         An NDF from which to propagate AXIS information. May be NDF\_\_NOID,
+         in which case the AXIS Frame in the returned FrameSet will describe
+         the default AXIS coordinate system (i.e. pixel coords).
+      }
+      \sstsubsection{
+         NDIM = INTEGER (Given)
+      }{
+         The number of pixel axes in the modified FrameSet.
+      }
+      \sstsubsection{
+         LBND( NDIM ) = INTEGER (Given)
+      }{
+         The lower pixel index bounds in the modified FrameSet.
+      }
+      \sstsubsection{
+         UBND( NDIM ) = INTEGER (Given)
+      }{
+         The upper pixel index bounds in the modified FrameSet.
+      }
+      \sstsubsection{
+         IWCS = INTEGER (Returned)
+      }{
+         Pointer to a new FrameSet holding GRID, FRACTION, PIXEL and AXIS
+         Frames describing the supplied NDF bounds, plus AXIS information
+         from the supplied NDF.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
    KPG1\_CH2PM
 }{
    Create an AST PolyMap describing a Starlink POLYNOMIAL HDS structure
@@ -39471,6 +39462,17 @@ related items to be removed.
       and {\tt "}deltat{\tt "}, which will have primitive scalar values {\tt "}2{\tt "} and {\tt "}2.0{\tt "}.
       The value associated with the {\tt "}method{\tt "} entry will be the primitive
       scalar value {\tt "}gaussclumps{\tt "}.
+
+      Assigning the value {\tt "}$<$def$>${\tt "} (case insensitive) to a keyword has the
+      effect of removing the keyword from the KeyMap. For example:
+
+      $\wedge$global.lis
+      method = $<$def$>$
+
+      reads keyword values from the file {\tt "}global.lis{\tt "}, and then ensures
+      that the KeyMap does not contain a value for keyword {\tt "}method{\tt "}. The
+      calling application should then usually use a default value for
+      {\tt "}method{\tt "}.
    }
    \sstinvocation{
       CALL KPG1\_KYMAP( IGRP, KEYMAP, STATUS )

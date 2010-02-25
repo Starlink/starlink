@@ -46,6 +46,17 @@ F77_SUBROUTINE(kpg1_kymap)( INTEGER(IGRP), INTEGER(KEYMAP), INTEGER(STATUS) ) {
 *     and "deltat", which will have primitive scalar values "2" and "2.0". 
 *     The value associated with the "method" entry will be the primitive 
 *     scalar value "gaussclumps".
+*
+*     Assigning the value "<def>" (case insensitive) to a keyword has the
+*     effect of removing the keyword from the KeyMap. For example:
+*
+*     ^global.lis
+*     method = <def>
+*
+*     reads keyword values from the file "global.lis", and then ensures
+*     that the KeyMap does not contain a value for keyword "method". The
+*     calling application should then usually use a default value for
+*     "method".
 
 *  Arguments:
 *     IGRP = INTEGER (Given)
@@ -72,6 +83,7 @@ F77_SUBROUTINE(kpg1_kymap)( INTEGER(IGRP), INTEGER(KEYMAP), INTEGER(STATUS) ) {
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -97,6 +109,8 @@ F77_SUBROUTINE(kpg1_kymap)( INTEGER(IGRP), INTEGER(KEYMAP), INTEGER(STATUS) ) {
 *  History:
 *     30-SEP-2005 (DSB):
 *        Original version.
+*     25-FEB-2010(DSB):
+*        Document the "keyword=<def>" facility.
 *     {enter_further_changes_here}
 
 *  Bugs:

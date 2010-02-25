@@ -44,6 +44,8 @@ void kpg1Kymp2( const char *string, AstKeyMap *keymap, int *status ){
 *     Otherwise, a scalar entry will be created. 
 *     - To include a comma or a closing parenthesis literally in a vector 
 *     value, preceed it with a backslash.
+*     - If the string has the form "keyword=<def>" (case insensitive), then 
+*     any entry for the specified keyword is removed from the KeyMap.
 *     - Component names must contain only alphanumerical characters,
 *     underscores, plus and minus signs [a-zA-Z0-9_+\-], 
 *     - Any lower case characters contained in a component name will be
@@ -51,7 +53,7 @@ void kpg1Kymp2( const char *string, AstKeyMap *keymap, int *status ){
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2008-2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -85,6 +87,8 @@ void kpg1Kymp2( const char *string, AstKeyMap *keymap, int *status ){
 *        Add support for vector values.
 *     29-SEP-2009 (EC):
 *        Use c instead of equals+1 as pointer to value in scalar case
+*     25-FEB-2010 (DSB):
+*        Allow "keyword=<def>" syntax to be used for clearing a parameter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -252,6 +256,11 @@ void kpg1Kymp2( const char *string, AstKeyMap *keymap, int *status ){
             }
             vector = astFree( vector );         
          }
+
+/* If the value string is "<def>" (case insensitive) then remove any
+   value from the KeyMap. */
+      } else if( astChrMatch( c, "<def>" ) ) {
+         astMapRemove( keymap, comp );
 
 /* Now store scalar values. */
       } else {

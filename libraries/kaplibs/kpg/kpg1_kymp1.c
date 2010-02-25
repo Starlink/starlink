@@ -48,6 +48,17 @@ void kpg1Kymp1( const Grp *igrp, AstKeyMap **keymap, int *status ){
 *     and "deltat", which will have primitive scalar values "2" and "2.0". 
 *     The value associated with the "method" entry will be the primitive 
 *     scalar value "gaussclumps".
+*
+*     Assigning the value "<def>" (case insensitive) to a keyword has the
+*     effect of removing the keyword from the KeyMap. For example:
+*
+*     ^global.lis
+*     method = <def>
+*
+*     reads keyword values from the file "global.lis", and then ensures
+*     that the KeyMap does not contain a value for keyword "method". The
+*     calling application should then usually use a default value for
+*     "method".
 
 *  Arguments:
 *     igrp
@@ -76,6 +87,7 @@ void kpg1Kymp1( const Grp *igrp, AstKeyMap **keymap, int *status ){
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -104,6 +116,8 @@ void kpg1Kymp1( const Grp *igrp, AstKeyMap **keymap, int *status ){
 *        Original version.
 *     15-JUL-2008 (TIMJ):
 *        Tweak to GRP C API.
+*     25-FEB-2010(DSB):
+*        Document the "keyword=<def>" facility.
 *     {enter_further_changes_here}
 
 *  Bugs:

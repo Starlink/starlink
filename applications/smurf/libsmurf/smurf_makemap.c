@@ -80,8 +80,10 @@
 *
 *          The parameters available are listed in the "Configuration
 *          Parameters" sections below. Default values will be used for
-*          any unspecified parameters. Unrecognised options are ignored
-*          (that is, no error is reported). [current value]
+*          any unspecified parameters. Assigning the value "<def>" (case
+*          insensitive) to a keyword has the effect of reseting it to its 
+*          default value. Unrecognised options are ignored (that is, no 
+*          error is reported). [current value]
 *     CROTA = _REAL (Read)
 *          The angle, in degrees, from north through east (in the
 *          coordinate system specified by the SYSTEM parameter) to the
