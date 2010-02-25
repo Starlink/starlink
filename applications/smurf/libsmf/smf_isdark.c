@@ -37,6 +37,7 @@
 *     - If there is a fits header but no SHUTTER keyword, this will be an error.
 *     ie complete lack of knowledge indicates not a dark, but some knowledge
 *     indicates an error.
+*     - A fast flat is not a dark even if the shutter is closed.
 
 *  History:
 *     2008-07-17 (TIMJ):
@@ -47,9 +48,11 @@
 *        but leave in support for string.
 *     2008-12-09 (TIMJ):
 *        with no information at all, assume not a dark.
+*     2010-02-22 (TIMJ):
+*        Handle fast flat fields in the dark.
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008,2010 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -117,6 +120,9 @@ int smf_isdark( const smfData * indata, int * status ) {
 
   /* if this is ACSIS data return */
   if (indata->hdr->instrument == INST__ACSIS) return 0;
+
+  /* Check sequence type */
+  if (indata->hdr->seqtype == SMF__TYP_FASTFLAT) return 0;
 
   /* Shutter is no a double. 0 indicates closed */
   smf_fits_getD( indata->hdr, "SHUTTER", &shutval, status );
