@@ -110,6 +110,8 @@
 *  History:
 *     16-APR-2008 (DSB):
 *        Original Version.
+*     25-FEB-2010 (DSB):
+*        Fix nasty bug in calculation of shifts when using ABS parameter.
 *     {enter_further_changes_here}
 
 *-
@@ -222,12 +224,10 @@
 *  resulting position is stored in OBJ.
             CALL AST_OFFSET( IWCS, P1, P2, SHIFT( I ), OBJ, STATUS )
 
-*  Re-instate the original geodesic end-point.
-            P2( I ) = P1( I ) 
-
 *  The end of this offset becomes the start of the next offset.
             DO J = 1, NWCS
                P1( J ) = OBJ( J )
+               P2( J ) = OBJ( J )
             END DO
 
          END DO            

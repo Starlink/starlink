@@ -158,6 +158,11 @@ The following new applications have been added:
       longitude or latitude axis, the axis units are now converted
       correctly from radians to degrees.
 
+   o  WCSSLIDE
+
+      - A bug has been fixed that could lead to incorrect shifts when using 
+      the ABS parameter.
+
    o  WCSTRAN
 
       - There is a new SKYDEG parameter that can be used to force
