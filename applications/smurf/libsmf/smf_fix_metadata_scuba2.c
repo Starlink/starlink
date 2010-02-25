@@ -60,9 +60,11 @@
 *  History:
 *     2009-11-27 (TIMJ):
 *        Split from smf_fix_metadata
+*     2010-02-24 (TIMJ):
+*        Fix SHUTTER header for 20100223 fast flatfield ramps.
 
 *  Copyright:
-*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2009-2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -175,6 +177,16 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
     smf_fits_updateU( hdr, "BASETEMP", "[K] Base temperature", status );
     smf_fits_updateD( hdr, "MUXTEMP", muxtemp, "[K] Mux temperature", status );
     msgOutif( msglev, "", INDENT "Mux temperature is being read from BASETEMP header.", status );
+  }
+
+  /* Fast flats had incorrect SHUTTER settings for one night */
+  if (fitsvals.utdate == 20100223) {
+    char buff[100];
+    smf_getfitss( hdr, "SEQ_TYPE", buff, sizeof(buff), status );
+    if (strcmp( buff, "FASTFLAT") == 0) {
+      smf_fits_updateD( hdr, "SHUTTER", 1.0, "shutter position 0-Closed 1-Open", status );
+      msgOutif( msglev, "", INDENT "Shutter was open for fast flatfield ramp. Correcting.", status );
+    }
   }
 
   /* SEQ_TYPE header turned up in 200911xx but we do not need to fix that by copying
