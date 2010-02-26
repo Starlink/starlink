@@ -21183,7 +21183,7 @@ static void TranGridWithBlocking( AstMapping *this, const double *linear_fit,
 
 /* All the blocks have been processed once the position along the most
    significant dimension has been reset. */
-               done = ( ++idim == ndim_out );
+               done = ( ++idim == ndim_in );
             }
          } while ( !done );
       }
