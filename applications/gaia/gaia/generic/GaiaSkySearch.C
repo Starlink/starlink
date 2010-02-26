@@ -1077,14 +1077,25 @@ int GaiaSkySearch::getQueryResult( int numCols, char **colNames,
 
             //  Slight wart is if the image doesn't show RA and Dec. In that
             //  case the catalogue positions will not interpreted as hours.
+            //  Also it may have RA and Dec swapped. Sky requires RA and Dec
+            //  in that order.
             int current = astGetI( frmset, "Current" );
             int base = astGetI( frmset, "Base" );
             astSetI( frmset, "Current", base );
+
+            astime1 = astGetI( frmset, "astime(1)" );
+            astime2 = astGetI( frmset, "astime(2)" );
+
+            int image_ra_index = 1;
+            if ( astime2 ) {
+                image_ra_index  = 2;
+            }
+
             int image_radec = 1;
-            if ( astGetI( frmset, "astime(1)" ) == 0 &&
-                 astGetI( frmset, "astime(2)" ) == 0 ) {
+            if ( astime1 == 0 && astime2 == 0 ) {
                 image_radec = 0;
             }
+
             astSetI( frmset, "Current", current );
 
             for ( int row = 0; row < numRows; row++ ) {
@@ -1122,13 +1133,26 @@ int GaiaSkySearch::getQueryResult( int numCols, char **colNames,
                     xin[0] = pos.ra_deg() * d2r_;
                     yin[0] = pos.dec_deg() * d2r_;
 
-                    //  RA and Dec could be swapped.
+                    //  The catalogue RA and Dec could be swapped (not for
+                    //  normal Skycat) as could the image RA and Dec. We
+                    //  need these back in RA/Dec order when done.
                     if ( ra_index == 1 ) {
-                        astTran2( frmset, 1, xin, yin, 0, xout, yout );
+                        if ( image_ra_index == 1 ) {
+                            astTran2( frmset, 1, xin, yin, 0, xout, yout );
+                        }
+                        else {
+                            astTran2( frmset, 1, xin, yin, 0, yout, xout );
+                        }
                     }
                     else {
-                        astTran2( frmset, 1, yin, xin, 0, xout, yout );
+                        if ( image_ra_index == 1 ) {
+                            astTran2( frmset, 1, yin, xin, 0, xout, yout );
+                        }
+                        else {
+                            astTran2( frmset, 1, yin, xin, 0, yout, xout );
+                        }
                     }
+
                     if ( ! astOK ) {
                         astClearStatus;
                         raStr[0] = decStr[0] = '\0';
@@ -1291,7 +1315,13 @@ int GaiaSkySearch::imgplotCmd( int argc, char* argv[] )
             StarWCS *wcs = (StarWCS *) image->image()->wcs().rep();
             AstFrameSet *imagewcs = (AstFrameSet *) wcs->astWCSCopy();
             frmset = (AstFrameSet *) astConvert( imagewcs, catwcs, "SKY" );
+            if ( imagewcs != NULL ) {
+                imagewcs = (AstFrameSet *) astAnnul( imagewcs );
+            }
             if ( ! astOK ) {
+                if ( frmset != NULL ) {
+                    frmset = (AstFrameSet *) astAnnul( frmset );
+                }
                 astClearStatus;
                 return error( "Failed to connect image and catalogue"
                               " coordinates" );
@@ -1315,6 +1345,9 @@ int GaiaSkySearch::imgplotCmd( int argc, char* argv[] )
     else {
         //  Use headings list.
         if ( Tcl_SplitList(interp_, argv[3], &numCols, &colNames) != TCL_OK ) {
+            if ( frmset != NULL ) {
+                frmset = (AstFrameSet *) astAnnul( frmset );
+            }
             return TCL_ERROR;
         }
         freeColNames++;
@@ -1325,6 +1358,9 @@ int GaiaSkySearch::imgplotCmd( int argc, char* argv[] )
     r.entry( cat_->entry() );
     int status = getQueryResult( numCols, (char**)colNames, argv[1],
                                  frmset, r );
+    if ( frmset != NULL ) {
+        frmset = (AstFrameSet *) astAnnul( frmset );
+    }
     if ( status == TCL_OK ) {
         status = plot( image, r );
     }

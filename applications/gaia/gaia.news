@@ -1,8 +1,11 @@
     Version 4.4-1
     =============
 
-    The blink toolbox can now be scrolled to show approximately the same 
+    The blink toolbox can now be scrolled to show approximately the same
     position as the main window by pressing the "c" key.
+
+    Images with swapped sky RA/Dec axes would no longer display catalogue
+    symbols. This has been fixed.
 
     A bug loading local tab tables has been fixed. Previously new tables
     could not have X-Y coordinate systems defined as the x_col: and y_col:
@@ -43,7 +46,7 @@
 
     The X, Y, RA and DEC coordinate readouts have been changed so you can now
     enter a new position and centre on it (assuming the position isn't
-    off image, or near to an edge, in those cases the image will just 
+    off image, or near to an edge, in those cases the image will just
     scroll to the edge).
 
     The "Filter" button in a Skycat catalogue window has been enhanced so
@@ -56,25 +59,25 @@
     be done using the graphics toolbox facilities.
 
     The optional coordinate label in the spectral extraction plot can
-    now have the filename displayed as a prefix to the coordinates of 
+    now have the filename displayed as a prefix to the coordinates of
     the extraction. To enable this select the "Full coordinate label"
     item in the "Options" menu. Note that this and the old "Coordinate label"
     are now session persistent.
 
     A problem displaying CUPID catalogues that include extra columns
     (using the extracols=1 parameter) has been fixed. Previously an "Unknown
-    STC shape" error was thrown. 
-    
+    STC shape" error was thrown.
+
     The detection of compressed images in FITS file has been improved.
-    Previously only those with EXTNAME of COMPRESSED_IMAGE where 
+    Previously only those with EXTNAME of COMPRESSED_IMAGE where
     detected.
 
     A bug in the 2D mask toolbox caused GAIA to crash when a given mask
     didn't exist. This has been fixed.
 
-    The Skycat catalogue windows now have a "Clear all objects" item in 
+    The Skycat catalogue windows now have a "Clear all objects" item in
     the "Options" menu. This quickly clears all the plotting symbols from the
-    image. 
+    image.
 
     The UCAC3 catalogue has been added to the standard Skycat catalogues.
 
@@ -91,9 +94,9 @@
 
     If the current directory or the one pointed to by GAIA_TEMP_DIR is
     not writable temporary files will be written into /tmp instead.
-  
+
     The presence of illegal negative variance values should be handled
-    when requesting that they be displayed as errors. Previously this 
+    when requesting that they be displayed as errors. Previously this
     condition caused GAIA to abort.
 
     Version 4.3-1
