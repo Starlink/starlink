@@ -275,6 +275,30 @@ F77_LOGICAL_FUNCTION(ast_linearapprox)( INTEGER(THIS),
    return RESULT;
 }
 
+F77_LOGICAL_FUNCTION(ast_quadapprox)( INTEGER(THIS),
+                                      DOUBLE_ARRAY(LBND),
+                                      DOUBLE_ARRAY(UBND),
+                                      DOUBLE(NX),
+                                      DOUBLE(NY),
+                                      DOUBLE_ARRAY(FIT),
+                                      DOUBLE(RMS),
+                                      INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_DOUBLE_ARRAY(LBND)
+   GENPTR_DOUBLE_ARRAY(UBND)
+   GENPTR_INTEGER(NX)
+   GENPTR_INTEGER(NY)
+   GENPTR_DOUBLE_ARRAY(FIT)
+   GENPTR_DOUBLE(RMS)
+   F77_LOGICAL_TYPE(RESULT);
+
+   astAt( "AST_QUADAPPROX", NULL, 0 );
+   astWatchSTATUS(
+      RESULT = astQuadApprox( astI2P( *THIS ), LBND, UBND, *NX, *NY, FIT, RMS );
+   )
+   return RESULT;
+}
+
 F77_SUBROUTINE(ast_mapbox)( INTEGER(THIS),
                             DOUBLE_ARRAY(LBND_IN),
                             DOUBLE_ARRAY(UBND_IN),

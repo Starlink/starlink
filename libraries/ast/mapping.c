@@ -49,6 +49,7 @@ c     - astInvert: Invert a Mapping
 c     - astLinearApprox: Calculate a linear approximation to a Mapping
 c     - astMapBox: Find a bounding box for a Mapping
 c     - astMapSplit: Split a Mapping up into parallel component Mappings
+c     - astQuadApprox: Calculate a quadratic approximation to a 2D Mapping
 c     - astRate: Calculate the rate of change of a Mapping output
 c     - astRebin<X>: Rebin a region of a data grid
 f     - astRebinSeq<X>: Rebin a region of a sequence of data grids
@@ -63,6 +64,7 @@ f     - AST_DECOMPOSE: Decompose a Mapping into two component Mappings
 f     - AST_TRANGRID: Transform a grid of positions
 f     - AST_INVERT: Invert a Mapping
 f     - AST_LINEARAPPROX: Calculate a linear approximation to a Mapping
+f     - AST_QUADAPPROX: Calculate a quadratic approximation to a 2D Mapping
 f     - AST_MAPBOX: Find a bounding box for a Mapping
 f     - AST_MAPSPLIT: Split a Mapping up into parallel component Mappings
 f     - AST_RATE: Calculate the rate of change of a Mapping output
@@ -280,6 +282,8 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        n-D code (i.e. the KERNEL_ND macro) incorrectly uses the first 
 *        user-supplied parameter as the full kernel width rather than the
 *        half-width. This has been fixed.
+*     26-FEB-2010 (DSB):
+*        Add astQuadApprox.
 *class--
 */
 
@@ -314,6 +318,7 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 #include "cmpmap.h"              /* Compund Mappings */
 #include "unitmap.h"             /* Unit Mappings */
 #include "permmap.h"             /* Axis permutations */
+#include "winmap.h"              /* Window scalings */
 #include "pal.h"                 /* SLALIB interface */
 #include "globals.h"             /* Thread-safe global data access */
 
@@ -532,6 +537,7 @@ static int MapList( AstMapping *, int, int, int *, AstMapping ***, int **, int *
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
 static int MaxI( int, int, int * );
 static int MinI( int, int, int * );
+static int QuadApprox( AstMapping *, const double[2], const double[2], int, int, double *, double *, int * );
 static int ResampleAdaptively( AstMapping *, int, const int *, const int *, const void *, const void *, DataType, int, void (*)(), const double *, int, double, int, const void *, int, const int *, const int *, const int *, const int *, void *, void *, int * );
 static int ResampleB( AstMapping *, int, const int [], const int [], const signed char [], const signed char [], int, void (*)(), const double [], int, double, int, signed char, int, const int [], const int [], const int [], const int [], signed char [], signed char [], int * );
 static int ResampleD( AstMapping *, int, const int [], const int [], const double [], const double [], int, void (*)(), const double [], int, double, int, double, int, const int [], const int [], const int [], const int [], double [], double [], int * );
@@ -2725,6 +2731,7 @@ void astInitMappingVtab_(  AstMappingVtab *vtab, const char *name, int *status )
    vtab->MapList = MapList;
    vtab->MapMerge = MapMerge;
    vtab->MapSplit = MapSplit;
+   vtab->QuadApprox = QuadApprox;
    vtab->Rate = Rate;
    vtab->ReportPoints = ReportPoints;
    vtab->RebinD = RebinD;
@@ -8449,6 +8456,440 @@ static double NewVertex( const MapData *mapdata, int lo, double scale,
 
 /* Return the value at the new vertex. */
    return fnew;
+}
+
+static int QuadApprox( AstMapping *this,  const double lbnd[2], 
+                       const double ubnd[2], int nx, int ny, double *fit, 
+                       double *rms, int *status ){
+/*
+*++
+*  Name:
+c     astQuadApprox
+f     AST_QUADAPPROX
+
+*  Purpose:
+*     Obtain a quadratic approximation to a 2D Mapping.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "mapping.h"
+c     int QuadApprox( AstMapping *this,  const double lbnd[2], 
+c                     const double ubnd[2], int nx, int ny, double *fit,
+c                     double *rms )
+f     RESULT = AST_QUADAPPROX( THIS, LBND, UBND, NX, NY, FIT, RMS, STATUS )
+
+*  Class Membership:
+*     Mapping function.
+
+*  Description:
+*     This function returns the co-efficients of a quadratic fit to the 
+*     supplied Mapping over the input area specified by 
+c     "lbnd" and "ubnd". 
+f     LBND and UBND.
+*     The Mapping must have 2 inputs, but may have any number of outputs. 
+*     The i'th Mapping output is modelled as a quadratic function of the 
+*     2 inputs (x,y):
+*
+*     output_i = a_i_0 + a_i_1*x + a_i_2*y + a_i_3*x*y + a_i_4*x*x + 
+*                a_i_5*y*y
+*
+c     The "fit" 
+f     The FIT
+*     array is returned holding the values of the co-efficients a_0_0, 
+*     a_0_1, etc.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Mapping. 
+c     lbnd
+f     LBND( * ) = DOUBLE PRECISION (Given)
+c        Pointer to an array of doubles
+f        An array
+*        containing the lower bounds of a box defined within the input 
+*        coordinate system of the Mapping. The number of elements in this 
+*        array should equal the value of the Mapping's Nin attribute. This
+*        box should specify the region over which the fit is to be
+*        performed.
+c     ubnd
+f     UBND( * ) = DOUBLE PRECISION (Given)
+c        Pointer to an array of doubles
+f        An array
+*        containing the upper bounds of the box specifying the region over
+*        which the fit is to be performed.
+c     nx
+f     NX = INTEGER (Given)
+*        The number of points to place along the first Mapping input. The
+*        first point is at 
+c        "lbnd[0]" and the last is at "ubnd[0]". 
+f        LBND( 1 ) and the last is at UBND( 1 ). 
+*        If a value less than three is supplied a value of three will be used.
+c     ny
+f     NY = INTEGER (Given)
+*        The number of points to place along the second Mapping input. The
+*        first point is at 
+c        "lbnd[1]" and the last is at "ubnd[1]". 
+f        LBND( 2 ) and the last is at UBND( 2 ). 
+*        If a value less than three is supplied a value of three will be used.
+c     fit
+f     FIT( * ) = DOUBLE PRECISION (Returned)
+c        Pointer to an array of doubles 
+f        An array
+*        in which to return the co-efficients of the quadratic
+*        approximation to the specified transformation. This array should
+*        have at least "6*Nout", elements. The first 6 elements hold the 
+*        fit to the first Mapping output. The next 6 elements hold the 
+*        fit to the second Mapping output, etc. So if the Mapping has 2 
+*        inputs and 2 outputs the quadratic approximation to the forward 
+*        transformation is:
+*
+c           X_out = fit[0] + fit[1]*X_in + fit[2]*Y_in + fit[3]*X_in*Y_in +
+c                   fit[4]*X_in*X_in + fit[5]*Y_in*Y_in
+c           Y_out = fit[6] + fit[7]*X_in + fit[8]*Y_in + fit[9]*X_in*Y_in +
+c                   fit[10]*X_in*X_in + fit[11]*Y_in*Y_in
+f           X_out = fit(1) + fit(2)*X_in + fit(3)*Y_in + fit(4)*X_in*Y_in +
+f                   fit(5)*X_in*X_in + fit(6)*Y_in*Y_in
+f           Y_out = fit(7) + fit(8)*X_in + fit(9)*Y_in + fit(10)*X_in*Y_in +
+f                   fit(11)*X_in*X_in + fit(12)*Y_in*Y_in
+*
+c     rms
+f     RMS = DOUBLE PRECISION (Returned)
+c        Pointer to a double in which to return the
+f        The
+*        RMS residual between the fit and the Mapping, summed over all
+*        Mapping outputs.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Returned Value:
+c     astQuadApprox()
+f     AST_QUADAPPROX = LOGICAL
+*        If a quadratic approximation was created, 
+c        a non-zero value is returned. Otherwise zero is returned 
+f        .TRUE is returned. Otherwise .FALSE. is returned
+*        and the fit co-efficients are set to AST__BAD.
+
+*  Notes:
+*     - This function fits the Mapping's forward transformation. To fit
+*     the inverse transformation, the Mapping should be inverted using
+c     astInvert
+f     AST_INVERT
+*     before invoking this function.
+c     - A value of zero
+f     - A value of .FALSE.
+*     will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*--
+
+*/
+
+/* Local Variables: */
+   AstCmpMap *newmap;
+   AstWinMap *wm;
+   double *ofit;
+   double *px;
+   double *py;
+   double *pz;
+   double *work2;
+   double *work1;
+   double det;
+   double ina[ 2 ];
+   double inb[ 2 ];
+   double mat[ 6*6 ];
+   double outa[ 2 ];
+   double outb[ 2 ];
+   double sx2;
+   double sx2y2;
+   double sx2y;
+   double sx3;
+   double sx3y;
+   double sx4;
+   double sx;
+   double sxy2;
+   double sxy3;
+   double sxy;
+   double sy2;
+   double sy3;
+   double sy4;
+   double sy;
+   double sz;
+   double sz2;
+   double szx2;
+   double szx;
+   double szxy;
+   double szy2;
+   double szy;
+   double x;
+   double xx;
+   double xy;
+   double y;
+   double yy;
+   double z;
+   int i;
+   int ilbnd[ 2 ];
+   int iout;
+   int iubnd[ 2 ];
+   int iw[ 6 ];
+   int n;
+   int nin;
+   int nout;
+   int np;
+   int ntot;
+   int result;
+   int sing;
+      
+/* Initialise the returned values. */
+   result = 0;
+   fit[ 0 ] = AST__BAD;
+   *rms = AST__BAD;
+
+/* Check the global error status. */
+   if( !astOK ) return result;
+
+/* Get the number of Mapping inputs and outputs. Report an error if not 
+   correct. */
+   nin = astGetI( this, "Nin" );
+   nout = astGetI( this, "Nout" );
+   if( nin != 2 && astOK ) {
+      astError( AST__BADNI, "astQuadApprox(%s): Input Mapping has %d %s - "
+                "it must have 2 inputs.", status, astGetClass( this ), nin, 
+                (nin==1)?"input":"inputs" );
+   }
+
+/* Ensure we are using at least 3 points on each of the two input axes. */
+   if( nx < 3 ) nx = 3;
+   if( ny < 3 ) ny = 3;
+
+/* Get the total number of grid points. */
+   np = nx*ny;
+
+/* Allocate a work array to hold the input axis values at a regular grid
+   of input positions. */
+   work1 = astMalloc( 2*np*sizeof( double ) );
+
+/* Allocate a work array to hold the output axis values at a regular grid
+   of input positions. */
+   work2 = astMalloc( nout*np*sizeof( double ) );
+
+/* Check the memory allocation (and everything else) was succesful. */
+   if( astOK ) {
+
+/* We will use astTranGrid to create the grid of points to be fitted. But
+   astTranGrid assumes a unit step between grid points. So we need to add
+   a WinMap on to the start of the supplied Mapping that maps point on a
+   unit grid to points on the requied grid. Create the WinMap and then
+   put it in series with the supplied Mapping. */
+      ina[ 0 ] = 1.0;
+      ina[ 1 ] = 1.0;
+      inb[ 0 ] = (double) nx;
+      inb[ 1 ] = (double) ny;
+      outa[ 0 ] = lbnd[ 0 ];
+      outa[ 1 ] = lbnd[ 1 ];
+      outb[ 0 ] = ubnd[ 0 ];
+      outb[ 1 ] = ubnd[ 1 ];
+      wm = astWinMap( 2, ina, inb, outa, outb, " ", status );
+      newmap = astCmpMap( wm, this, 1, " ", status );
+
+/* Store the integer bounds of the region to use within the input space
+   of "wm" and "newmap". */
+      ilbnd[ 0 ] = 1;
+      ilbnd[ 1 ] = 1;
+      iubnd[ 0 ] = nx;
+      iubnd[ 1 ] = ny;
+
+/* Create a regular grid of points covering the given bounds within the
+   input space of the Mapping, and store their input axis value. */
+      astTranGrid( wm, 2, ilbnd, iubnd, 0.0, 100, 1, 2, np, work1 );
+
+/* Create a regular grid of points covering the given bounds within the
+   input space of the Mapping, and store their output axis value. */
+      astTranGrid( newmap, 2, ilbnd, iubnd, 0.0, 100, 1, nout, np, work2 );
+
+/* Assume the approximation can be created. */
+      result = 1;
+      *rms = 0.0;
+      ntot = 0;
+
+/* Loop round each Mapping output. */
+      for( iout = 0; iout < nout && astOK; iout++ ) {
+
+/* Get a pointer to the first element of the fit array for this output. */
+         ofit = fit + 6*iout;   
+
+/* Form the required sums. */
+         n = 0;
+         sx = 0.0;
+         sy = 0.0;
+         sxy = 0.0;
+         sx2 = 0.0;
+         sy2 = 0.0;
+         sx2y = 0.0;
+         sx3 = 0.0;
+         sxy2 = 0.0;
+         sy3 = 0.0;
+         sx2y2 = 0.0;
+         sx3y = 0.0;
+         sxy3 = 0.0;
+         sx4 = 0.0;
+         sy4 = 0.0;
+         sz = 0.0;
+         sz2 = 0.0;
+         szx = 0.0;
+         szy = 0.0;
+         szxy = 0.0;
+         szx2 = 0.0;
+         szy2 = 0.0;
+
+         px = work1;
+         py = work1 + np;
+         pz = work2 + np*iout;
+
+         for( i = 0; i < np; i++ ) {
+            x = *(px++);
+            y = *(py++);
+            z = *(pz++);
+
+            if( x != AST__BAD && y != AST__BAD && z != AST__BAD ) {
+               xx = x*x;
+               yy = y*y;
+               xy = x*y;
+
+               n++;
+               sx += x;
+               sy += y;
+               sxy += xy;
+               sx2 += xx;
+               sy2 += yy;
+               sx2y += xx*y;
+               sx3 += xx*x;
+               sxy2 += x*yy;
+               sy3 += yy*y;
+               sx2y2 += xx*yy;
+               sx3y += xx*xy;
+               sxy3 += xy*yy;
+               sx4 += xx*xx;
+               sy4 += yy*yy;
+               sz += z;
+               sz2 += z*z;
+               szx += z*x;
+               szy += z*y;
+               szxy += z*xy;
+               szx2 += z*xx;
+               szy2 += z*yy;
+            }
+         }
+
+/* Form a matrix (M) and vector (V) such that M.X = V, where X is the
+   solution vector holding the required best fit parameter values (V is
+   stored in ofit). */
+         mat[ 0 ] = n;
+         mat[ 1 ] = sx;
+         mat[ 2 ] = sy;
+         mat[ 3 ] = sxy;
+         mat[ 4 ] = sx2;
+         mat[ 5 ] = sy2;
+         mat[ 6 ] = sx;
+         mat[ 7 ] = sx2;
+         mat[ 8 ] = sxy;
+         mat[ 9 ] = sx2y;
+         mat[ 10 ] = sx3;
+         mat[ 11 ] = sx2y2;
+         mat[ 12 ] = sy;
+         mat[ 13 ] = sxy;
+         mat[ 14 ] = sy2;
+         mat[ 15 ] = sxy2;
+         mat[ 16 ] = sx2y;
+         mat[ 17 ] = sy3;
+         mat[ 18 ] = sxy;
+         mat[ 19 ] = sx2y;
+         mat[ 20 ] = sxy2;
+         mat[ 21 ] = sx2y2;
+         mat[ 22 ] = sx3y;
+         mat[ 23 ] = sxy3;
+         mat[ 24 ] = sx2;
+         mat[ 25 ] = sx3;
+         mat[ 26 ] = sx2y;
+         mat[ 27 ] = sx3y;
+         mat[ 28 ] = sx4;
+         mat[ 29 ] = sx2y2;
+         mat[ 30 ] = sy2;
+         mat[ 31 ] = sxy2;
+         mat[ 32 ] = sy3;
+         mat[ 33 ] = sxy3;
+         mat[ 34 ] = sx2y2;
+         mat[ 35 ] = sy4;
+
+         ofit[ 0 ] = sz;
+         ofit[ 1 ] = szx;
+         ofit[ 2 ] = szy;
+         ofit[ 3 ] = szxy;
+         ofit[ 4 ] = szx2;
+         ofit[ 5 ] = szy2;
+
+/* Now find the solution vector (the solution over-writes teh current
+   contents of "ofit"). */
+         palSlaDmat( 6, mat, ofit, &det, &sing, iw );
+
+/* If the fit failed, fill the coefficient array with bad values. */
+         if( sing != 0 ) {
+            for( i = 0; i < 6; i++ ) ofit[ i ] = AST__BAD;
+            result = 0;
+            break;
+
+/* If the fit succeeded, update the summ of the squared residuals. */
+         } else {
+            ntot += n;
+            *rms += ofit[ 0 ]*ofit[ 0 ] +
+                    2*ofit[ 0 ]*ofit[ 1 ]*sx +
+                    2*ofit[ 0 ]*ofit[ 2 ]*sy +
+                    2*( ofit[ 0 ]*ofit[ 3 ] + ofit[ 1 ]*ofit[ 2 ] )*sxy +
+                    ( 2*ofit[ 0 ]*ofit[ 4 ] + ofit[ 1 ]*ofit[ 1 ] )*sx2 +
+                    ( 2*ofit[ 0 ]*ofit[ 5 ] + ofit[ 2 ]*ofit[ 2 ] )*sy2 +
+                    2*ofit[ 1 ]*ofit[ 4 ]*sx3 +
+                    2*( ofit[ 1 ]*ofit[ 3 ] + ofit[ 2 ]*ofit[ 4 ] )*sx2y +
+                    2*( ofit[ 1 ]*ofit[ 5 ] + ofit[ 2 ]*ofit[ 3 ] )*sxy2 +
+                    2*ofit[ 2 ]*ofit[ 5 ]*sy3 +
+                    ofit[ 4 ]*ofit[ 4 ]*sx4 +
+                    2*ofit[ 3 ]*ofit[ 4 ]*sx3y +
+                    ( 2*ofit[ 4 ]*ofit[ 5 ] + ofit[ 3 ]*ofit[ 3 ] )*sx2y2 +
+                    2*ofit[ 3 ]*ofit[ 5 ]*sxy3 +
+                    ofit[ 5 ]*ofit[ 5 ]*sy4 +
+                    sz2 - 2*(
+                       ofit[ 0 ]*sz + 
+                       ofit[ 1 ]*szx + 
+                       ofit[ 2 ]*szy + 
+                       ofit[ 3 ]*szxy + 
+                       ofit[ 4 ]*szx2 + 
+                       ofit[ 5 ]*szy2 
+                    );
+         } 
+      }
+
+/* Free resources. */
+      wm = astAnnul( wm );
+      newmap = astAnnul( newmap );
+   }
+
+/* Free resources. */
+   work1 = astFree( work1 );
+   work2 = astFree( work2 );
+
+/* Return AST__BAD if anything went wrong. */
+   if( !astOK || ntot == 0 ) {
+      result = 0;
+      fit[ 0 ] = AST__BAD;
+      *rms = AST__BAD;
+
+/* Otherwise normalise the returned RMS. */
+   } else {
+      *rms = sqrt( *rms/ntot );
+   }
+
+/* Return result */
+   return result;
 }
 
 static double Random( long int *seed, int *status ) {
@@ -23224,6 +23665,17 @@ int astLinearApprox_( AstMapping *this, const double *lbnd,
    if ( !astOK ) return 0;
    return (**astMEMBER(this,Mapping,LinearApprox))( this, lbnd, ubnd, tol, fit, status );
 }
+
+
+int astQuadApprox_( AstMapping *this,  const double lbnd[2], 
+                    const double ubnd[2], int nx, int ny, double *fit, 
+                    double *rms, int *status ){
+   if ( !astOK ) return 0;
+   return (**astMEMBER(this,Mapping,QuadApprox))( this, lbnd, ubnd, nx,
+                                                  ny, fit, rms, status );
+}
+
+
 
 /* Public Interface Function Prototypes. */
 /* ------------------------------------- */

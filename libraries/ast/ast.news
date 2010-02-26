@@ -41,6 +41,8 @@ floating point value AST__BAD, rather than the literal formatted value
 - The DSBSpecFrame class now reports an error if the local oscillator
 frequency is less than the absoliute value of the intermediate frequency.
 
+- A new method astQuadApprox produces a quadratic fit to a 2D Mapping.
+
 
 Main Changes in Version 5.3
 ---------------------------

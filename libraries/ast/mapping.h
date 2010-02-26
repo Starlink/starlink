@@ -107,6 +107,8 @@
 *           Form a linear approximation to a Mapping
 *        astMapBox
 *           Find a bounding box for a Mapping.
+*        astQuadApprox
+*           Form a quadratic approximation to a Mapping
 *        astRate
 *           Find rate of change of a Mapping output
 *        astRebin<X>
@@ -305,6 +307,8 @@
 *        Add astTranGrid.
 *     5-MAY-2009 (DSB):
 *        Add astRemoveRegions.
+*     26-FEB-2010 (DSB):
+*        Added method astQuadApprox.
 *--
 */
 
@@ -431,6 +435,7 @@ typedef struct AstMappingVtab {
    int (* GetIsLinear)( AstMapping *, int * );
    int (* LinearApprox)( AstMapping *, const double *, const double *, double, double *, int * );
    int (* MapMerge)( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
+   int (* QuadApprox)( AstMapping *, const double[2], const double[2], int, int, double *, double *, int * );
    void (* RebinD)( AstMapping *, double, int, const int [], const int [], const double [], const double [], int, const double [], int, double, int, double, int, const int [], const int [], const int [], const int [], double [], double [], int * );
    void (* RebinF)( AstMapping *, double, int, const int [], const int [], const float [], const float [], int, const double [], int, double, int, float, int, const int [], const int [], const int [], const int [], float [], float [], int * );
    void (* RebinI)( AstMapping *, double, int, const int [], const int [], const int [], const int [], int, const double [], int, double, int, int, int, const int [], const int [], const int [], const int [], int [], int [], int * );
@@ -542,6 +547,7 @@ int astResampleUL_( AstMapping *, int, const int [], const int [], const unsigne
 int astResampleUS_( AstMapping *, int, const int [], const int [], const unsigned short int [], const unsigned short int [], int, void (*)(void), const double [], int, double, int, unsigned short int, int, const int [], const int [], const int [], const int [], unsigned short int [], unsigned short int [], int * );
 void astInvert_( AstMapping *, int * );
 int astLinearApprox_( AstMapping *, const double *, const double *, double, double *, int * );
+int astQuadApprox_( AstMapping *, const double[2], const double[2], int, int, double *, double *, int * );
 void astTran1_( AstMapping *, int, const double [], int, double [], int * );
 void astTran2_( AstMapping *, int, const double [], const double [], int, double [], double [], int * );
 void astTranGrid_( AstMapping *, int, const int[], const int[], double, int, int, int, int, double *, int * );
@@ -634,6 +640,8 @@ astINVOKE(V,astRebinSeqLD_(astCheckMapping(this),wlim,ndim_in,lbnd_in,ubnd_in,in
 astINVOKE(V,astInvert_(astCheckMapping(this),STATUS_PTR))
 #define astLinearApprox(this,lbnd,ubnd,tol,fit) \
 astINVOKE(V,astLinearApprox_(astCheckMapping(this),lbnd,ubnd,tol,fit,STATUS_PTR)) 
+#define astQuadApprox(this,lbnd,ubnd,nx,ny,fit,rms) \
+astINVOKE(V,astQuadApprox_(astCheckMapping(this),lbnd,ubnd,nx,ny,fit,rms,STATUS_PTR)) 
 #define astRebinD(this,wlim,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
 astINVOKE(V,astRebinD_(astCheckMapping(this),wlim,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var,STATUS_PTR))
 #define astRebinF(this,wlim,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
