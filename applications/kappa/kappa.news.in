@@ -11,6 +11,10 @@
       -   A new Parameter STEP has been added that allows a subset of
       the positions identifiers between FIRST and LAST to be displayed.
 
+   o  WCSSLIDE
+
+      - A bug has been fixed that could lead to incorrect shifts when using 
+      the ABS parameter.
 
 1 KAPPA_Version_1.11
 
@@ -167,11 +171,6 @@ The following new applications have been added:
       -  If MODE is "WCS" and the selected axis is a celestial
       longitude or latitude axis, the axis units are now converted
       correctly from radians to degrees.
-
-   o  WCSSLIDE
-
-      - A bug has been fixed that could lead to incorrect shifts when using 
-      the ABS parameter.
 
    o  WCSTRAN
 
