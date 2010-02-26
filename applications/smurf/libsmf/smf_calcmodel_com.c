@@ -125,6 +125,9 @@
 *        Fix 32-bit incompatibility.
 *        Remove C90 incompatibility by not mixing declarations with code after a block
 *        has started.
+*     2010-02-26 (DSB):
+*        - Fix problem with short scans containing fewer than "gain_box"
+*        time slices.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -479,8 +482,9 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
         for( iblock=0; iblock < nblock && *status == SAI__OK; iblock++ ){
 
           /* Calculate the number of time slices in this block. The last
-          block may have more than gain_box. */
-          block_size = ( ntime >= 2*gain_box ) ? gain_box : ntime;
+          block (index iblock-1 ) contains all remaining time slices,
+          which may not be gain_box in number. */
+          block_size = ( iblock < nblock - 1 ) ? gain_box : ntime;
 
           /* Skip blocks that have already been rejected. */
           if( gai_data[ igbase ] != VAL__BADD ) {
@@ -796,6 +800,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
        of time slices from a single bolometer has its own gain, offset and
        correlation values. */
     nblock = (model->sdata[0]->dims)[0]/gain_box;
+    if( nblock == 0 ) nblock = 1;
 
     /* Find the minimum number of good blocks required for a usable
        bolometer. */
@@ -1137,7 +1142,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
           size_t igbase = iblock*gcstride;
           size_t ibase = 0;
 
-          block_size = ( ntime >= 2*gain_box ) ? gain_box : ntime;
+          block_size = ( iblock < nblock - 1 ) ? gain_box : ntime;
           ntime -= block_size;
 
           allbad = 1;
@@ -1273,7 +1278,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
               ntime = ntslice;
               igbase = i*gbstride;
               for( iblock = 0; iblock < nblock; iblock++ ) {
-                block_size = ( ntime >= 2*gain_box ) ? gain_box : ntime;
+                block_size = ( iblock < nblock - 1 ) ? gain_box : ntime;
                 ntime -= block_size;
 
                 g = gai_data[ igbase ];
