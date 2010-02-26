@@ -3269,6 +3269,63 @@ iraf! {
           }
       }
 
+      action astquadapprox {
+         helplib {$ATOOLS_HELP}
+         parameter nx {
+            position 4
+            type _INTEGER
+            access READ
+            prompt {Number of points to place along the first input axis}
+            ppath CURRENT DEFAULT
+            default 10
+            helpkey *
+          }
+         parameter ny {
+            position 5
+            type _INTEGER
+            access READ
+            prompt {Number of points to place along the second input axis}
+            ppath CURRENT DEFAULT
+            default 10
+            helpkey *
+          }
+         parameter lbnd {
+            position 2
+            type _DOUBLE
+            prompt {Lower bounds of input region}
+            ppath CURRENT
+            helpkey *
+          }
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The input Mapping}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+         parameter ubnd {
+            position 3
+            type _DOUBLE
+            prompt {Upper bounds of input region}
+            ppath CURRENT
+            helpkey *
+          }
+         parameter fit {
+            type _DOUBLE
+            access WRITE
+            vpath INTERNAL
+            helpkey *
+          }
+         parameter rms {
+            type _DOUBLE
+            access WRITE
+            vpath DEFAULT
+            default 0
+            helpkey *
+          }
+      }
+
       action asttrangrid {
          helplib {$ATOOLS_HELP}
 
