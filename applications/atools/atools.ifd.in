@@ -3268,6 +3268,76 @@ iraf! {
             helpkey *
           }
       }
+
+      action asttrangrid {
+         helplib {$ATOOLS_HELP}
+
+         parameter forward {
+            position 6
+            type _LOGICAL
+            access READ
+            prompt {Use the forward transformation?}
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            helpkey *
+          }
+
+         parameter lbnd {
+            position 2
+            type _INTEGER
+            prompt {Lower pixel index bounds of output NDF}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter maxpix {
+            position 5
+            type _INTEGER
+            prompt {Initial scale size in input grid points}
+            vpath DEFAULT
+            ppath CURRENT,DEFAULT
+            default 100
+            helpkey *
+          }
+
+         parameter result {
+            position 7
+            type NDF
+            access WRITE
+            vpath PROMPT
+            association ->GLOBAL.DATA_ARRAY
+            prompt {The NDF containing the transformed positions}
+            helpkey *
+          }
+
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The input Mapping}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+         parameter tol {
+            position 4
+            type _DOUBLE
+            prompt {Maximum tolerable geometrical distortion}
+            vpath DEFAULT
+            ppath CURRENT,DEFAULT
+            default 0.0
+            helpkey *
+          }
+
+         parameter ubnd {
+            position 3
+            type _INTEGER
+            prompt {Upper pixel index bounds of output NDF}
+            ppath CURRENT
+            helpkey *
+          }
+      }
    }
 
    command astshow {

@@ -9,6 +9,10 @@
  high-level interface to the AST library. 
 
 
+  Changes in V1.9-7
+
+  - New commands asttrangrid.
+
   Changes in V1.9-6
 
   - New commands astmask, astmatchaxes, astgetregframe.
