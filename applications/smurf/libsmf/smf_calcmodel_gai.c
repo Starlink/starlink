@@ -43,6 +43,7 @@
 
 *  Authors:
 *     Edward Chapin (UBC)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -52,12 +53,14 @@
 *        Add inverse capability
 *     2009-10-25 (EC):
 *        Only invert if common-mode being used to flatfield data
+*     2010-02-25 (TIMJ):
+*        Fix 32-bit incompatibility.
 *     {enter_further_changes_here}
 
 
 *  Copyright:
 *     Copyright (C) 2008-2009 University of British Columbia.
-*
+*     Copyright (C) 2010 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -120,7 +123,7 @@ void smf_calcmodel_gai( smfWorkForce *wf __attribute__((unused)),
   size_t noibstride;            /* bolo stride for noise */
   dim_t nointslice;             /* number of time slices for noise */
   size_t noitstride;            /* Time stride for noise */
-  size_t npar;                  /* No. of parameters per bolometer */
+  dim_t npar;                   /* No. of parameters per bolometer */
   dim_t ntslice;                /* Number of time slices */
   smfArray *qua=NULL;           /* Pointer to QUA at chunk */
   unsigned char *qua_data=NULL; /* Pointer to quality data */

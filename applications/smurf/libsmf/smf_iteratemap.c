@@ -1153,7 +1153,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                 msgOutif(MSG__VERB," ", "  find bolos with steps...", status);
                 smf_correct_steps( wf, data, qua_data, dcthresh, dcthresh2, dcbox,
                                    dcflag, &nflag, status );
-                msgOutiff(MSG__VERB, "","  ...%li flagged\n", status, nflag);
+                msgOutiff(MSG__VERB, "","  ...%zd flagged\n", status, nflag);
               }
 
               if( spikethresh ) {
@@ -1162,7 +1162,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                                  ~(SMF__Q_JUMP|SMF__Q_STAT),
                                  spikethresh, spikeiter, 100,
                                  &aiter, &nflag, status );
-                msgOutiff(MSG__VERB,"", "  ...found %li in %li iterations",
+                msgOutiff(MSG__VERB,"", "  ...found %zd in %zd iterations",
                           status, nflag, aiter );
               }
 
@@ -1362,7 +1362,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                one_strlcpy( name, tmpname, sizeof(name), status );
                one_strlcat( name, ".", sizeof(name), status );
                if (ncontchunks > 1) {
-                 sprintf(tempstr, "CH%02lu", contchunk);
+                 sprintf(tempstr, "CH%02zd", contchunk);
                  one_strlcat( name, tempstr, sizeof(name), status );
                }
                sprintf( tempstr, "I%03i", iter+1 );
@@ -1612,7 +1612,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                   one_strlcat( name, ".", sizeof(name), status );
                   if (ncontchunks > 1) {
                     char tempstr[20];
-                    sprintf(tempstr, "CH%02lu", contchunk);
+                    sprintf(tempstr, "CH%02zd", contchunk);
                     one_strlcat( name, tempstr, sizeof(name), status );
                   }
                   sprintf( thisbol, "C%02luR%02lu",

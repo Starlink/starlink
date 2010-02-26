@@ -40,6 +40,8 @@
 
 *  Authors:
 *     Edward Chapin (UBC)
+*     David Berry (JAC)
+*     Tim Jenness (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -119,10 +121,15 @@
 *        - Reject blocks that have anomolous gains when compared to the other 
 *        blocks for the same bolometer.
 *        - Reject entire bolometers if they have too few good blocks.
+*     2010-02-25 (TIMJ):
+*        Fix 32-bit incompatibility.
+*        Remove C90 incompatibility by not mixing declarations with code after a block
+*        has started.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2006-2009 University of British Columbia.
+*     Copyright (C) 2010 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -286,14 +293,13 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
 
     /* Loop round all the bolometers being processed by this thread. */
     for( j = pdata->b1; j <= pdata->b2 && *status == SAI__OK; j++ ) {
+      /* Initialise the index of the first time slice for the current
+         bolometer within the res_data and qua_data arrays. */
+      size_t ijindex = j*bstride;
 
       /* Initialise sums iused to fidn RMS bolometer value. */
       sum = 0.0;
       nsum = 0;
-
-      /* Initialise the index of the first time slice for the current
-         bolometer within the res_data and qua_data arrays. */
-      size_t ijindex = j*bstride;
 
       /* Skip bad bolometers */
       if( !(qua_data[ ijindex ] & SMF__Q_BADB ) ) {
@@ -545,7 +551,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   int do_boxfact=0;             /* flag to damp boxcar width */
   int do_boxmin=0;              /* flag for minimum boxcar */
   double c;                     /* temporary corr coeff */
-  dim_t cgood;                  /* Number of good corr. coeff. samples */
+  size_t cgood;                 /* Number of good corr. coeff. samples */
   double cmean;                 /* mean of common-mode correlation coeff */
   double *corr=NULL;            /* Array to hold correlation coefficients */
   double corr_abstol=0.2;       /* Absolute lowest corr. coeff. limit */
@@ -557,7 +563,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   int first;                    /* First pass round loop? */
   double *gcoeff=NULL;          /* Array to hold gain coefficients */
   int gflat=0;                  /* If set use GAIn to adjust flatfield */
-  dim_t ggood;                  /* Number of good gain. coeff. samples */
+  size_t ggood;                  /* Number of good gain. coeff. samples */
   dim_t glim = 1;               /* Lowest acceptable number of good blocks */
   double gmax;                  /* Largest acceptable gain */
   double gmin;                  /* Smallest acceptable gain */
@@ -1128,11 +1134,13 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         newbad = 0;
         ntime = ntslice;
         for( iblock = 0; iblock < nblock && *status == SAI__OK; iblock++ ) {
+          size_t igbase = iblock*gcstride;
+          size_t ibase = 0;
+
           block_size = ( ntime >= 2*gain_box ) ? gain_box : ntime;
           ntime -= block_size;
 
           allbad = 1;
-          size_t igbase = iblock*gcstride;
           for( i = 0; i < nbolo; i++ ) {
 
             /* Copy correlation coefficients into an array that has VAL__BADD
@@ -1186,7 +1194,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
           /* Flag new bad bolometers in the current block of time slices */
           igbase = iblock*gcstride;
-          size_t ibase = iblock*gain_box*tstride;
+          ibase = iblock*gain_box*tstride;
 
           for( i = 0; i < nbolo && *status == SAI__OK; i++ ) {
 
@@ -1232,6 +1240,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         for( i = 0; i < nbolo && *status == SAI__OK; i++ ) {
           size_t ibase = i*bstride;
           if( !( qua_data[ ibase ] & SMF__Q_BADB) ) {
+            size_t igbase = i*gbstride;
 
             /* Find the count of blocks with good gain values, and find
                the mean gain value for this bolometer, use the
@@ -1240,7 +1249,6 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
             ggood = 0;
             csum = 0.0;
 
-            size_t igbase = i*gbstride;
             for( iblock = 0; iblock < nblock; iblock++ ) {
               g = gai_data[ igbase ];
               c = gai_data[ igbase + corr_offset ];

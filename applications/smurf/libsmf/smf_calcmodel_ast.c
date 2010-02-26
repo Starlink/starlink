@@ -72,10 +72,13 @@
 *        -don't re-add last model to residual because handled in smf_iteratemap
 *     2009-12-10 (EC)
 *        -add ast.zero_lowhits config parameter for zeroing the border
+*     2010-02-25 (TIMJ):
+*        Fix 32-bit incompatibility.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2006-2009 University of British Columbia.
+*     Copyright (C) 2010 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -137,7 +140,7 @@ void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)), smfDIMMData *d
   dim_t ndata;                  /* Number of data points */
   size_t ndchisq=0;             /* number of elements contributing to dchisq */
   size_t newzero;               /* number new pixels zeroed */
-  dim_t ngood;                  /* Number good samples for stats */
+  size_t ngood;                 /* Number good samples for stats */
   smfArray *noi=NULL;           /* Pointer to NOI at chunk */
   double *noi_data=NULL;        /* Pointer to DATA component of model */
   size_t noibstride;            /* bolo stride for noise */
@@ -203,7 +206,7 @@ void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)), smfDIMMData *d
                  status );
 
     msgOutiff( MSG__DEBUG, "", FUNC_NAME
-               ": mean hits = %lf, ngood = %li", status, meanhits, ngood );
+               ": mean hits = %lf, ngood = %zd", status, meanhits, ngood );
 
     /* Apply boundary condition */
     newzero = 0;

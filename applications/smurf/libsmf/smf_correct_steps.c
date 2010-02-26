@@ -89,6 +89,8 @@
 *        - Use threads.
 *     2010-01-21 (EC):
 *        Fixed up to work in single-thread mode
+*     2010-02-25 (TIMJ):
+*        Fix 32-bit incompatibility.
 
 *  Copyright:
 *     Copyright (C) 2009-2010 Science and Technology Facilities Council.
@@ -411,7 +413,7 @@ void smf_correct_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
 
     /* Return nsteps if requested */
     if( nsteps ) {
-      msgOutiff( MSG__DEBUG, "", FUNC_NAME ": %li bolos flagged", status,
+      msgOutiff( MSG__DEBUG, "", FUNC_NAME ": %zd bolos flagged", status,
                  ns );
       *nsteps = ns;
     }
@@ -640,7 +642,7 @@ static void smfCorrectStepsParallel( void *job_data_ptr, int *status ) {
     }
 
     if( isbad && (dcflag==1) ) {
-      msgOutiff( MSG__DEBUG, "", FUNC_NAME ": flagging bad bolo %li at %li",
+      msgOutiff( MSG__DEBUG, "", FUNC_NAME ": flagging bad bolo %" DIM_T_FMT " at %zd",
                  status, i, wherebad );
       for(j=0; j<ntslice; j++) {
         qua[base+j*tstride] |= SMF__Q_BADB;
@@ -686,8 +688,8 @@ static void smfCorrectStepsParallel2( void *job_data_ptr, int *status ) {
   dim_t k;                      /* Loop Counter */
   double mean1;                 /* Box means to search for DC steps */
   double mean2;                 /* "    "                           */
-  dim_t nmean1;                 /* Number of samples in mean1 */
-  dim_t nmean2;                 /* Number of samples in mean1 */
+  size_t nmean1;                /* Number of samples in mean1 */
+  size_t nmean2;                /* Number of samples in mean1 */
   dim_t ntslice=0;              /* Number of time slices */
   smfCorrectStepsData2 *pdata2 = NULL;/* Pointer to job data */
   unsigned char *qua=NULL;      /* Pointer to quality flags */

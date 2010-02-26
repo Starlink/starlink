@@ -46,11 +46,14 @@
 
 *  Authors:
 *     Ed Chapin (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     2010-02-04 (EC):
 *        Initial version
+*     2010-02-25 (TIMJ):
+*        Fix 32-bit incompatibility.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -105,7 +108,7 @@ smfData *smf_fft_avpspec( const smfData *pspec, unsigned char *quality,
   double *idptr=NULL;           /* Pointer to input data */
   double mean;                  /* Mean value at time slice */
   dim_t nbolo=0;                /* Number of detectors  */
-  dim_t ngood;                  /* Number of good samples */
+  size_t ngood;                 /* Number of good samples */
   size_t ndata;                 /* Total number of data points */
   dim_t ntslice=0;              /* Number of time slices */
   dim_t nf=0;                   /* Number of frequencies in FFT */
