@@ -284,6 +284,9 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        half-width. This has been fixed.
 *     26-FEB-2010 (DSB):
 *        Add astQuadApprox.
+*     27-FEB-2010 (DSB):
+*        - Make astQuadApprox faster, and fix a bug in the calculation of
+*        the matrix.
 *class--
 */
 
@@ -8587,20 +8590,18 @@ f     - A value of .FALSE.
 */
 
 /* Local Variables: */
-   AstCmpMap *newmap;
-   AstWinMap *wm;
+   AstPointSet *pset1;
+   AstPointSet *pset2;
+   double **pdat1;
+   double **pdat2;
    double *ofit;
    double *px;
    double *py;
    double *pz;
-   double *work2;
-   double *work1;
    double det;
-   double ina[ 2 ];
-   double inb[ 2 ];
+   double dx;
+   double dy;
    double mat[ 6*6 ];
-   double outa[ 2 ];
-   double outb[ 2 ];
    double sx2;
    double sx2y2;
    double sx2y;
@@ -8629,10 +8630,10 @@ f     - A value of .FALSE.
    double yy;
    double z;
    int i;
-   int ilbnd[ 2 ];
    int iout;
-   int iubnd[ 2 ];
    int iw[ 6 ];
+   int ix;
+   int iy;
    int n;
    int nin;
    int nout;
@@ -8666,47 +8667,36 @@ f     - A value of .FALSE.
 /* Get the total number of grid points. */
    np = nx*ny;
 
-/* Allocate a work array to hold the input axis values at a regular grid
-   of input positions. */
-   work1 = astMalloc( 2*np*sizeof( double ) );
+/* Create a PointSet to hold the 2D grid of input positions. */
+   pset1 = astPointSet( np, 2, " ", status );
+   pdat1 = astGetPoints( pset1 );
 
-/* Allocate a work array to hold the output axis values at a regular grid
-   of input positions. */
-   work2 = astMalloc( nout*np*sizeof( double ) );
+/* Create a PointSet to hold the N-D grid of output positions. */
+   pset2 = astPointSet( np, nout, " ", status );
+   pdat2 = astGetPoints( pset2 );
 
 /* Check the memory allocation (and everything else) was succesful. */
    if( astOK ) {
 
-/* We will use astTranGrid to create the grid of points to be fitted. But
-   astTranGrid assumes a unit step between grid points. So we need to add
-   a WinMap on to the start of the supplied Mapping that maps point on a
-   unit grid to points on the requied grid. Create the WinMap and then
-   put it in series with the supplied Mapping. */
-      ina[ 0 ] = 1.0;
-      ina[ 1 ] = 1.0;
-      inb[ 0 ] = (double) nx;
-      inb[ 1 ] = (double) ny;
-      outa[ 0 ] = lbnd[ 0 ];
-      outa[ 1 ] = lbnd[ 1 ];
-      outb[ 0 ] = ubnd[ 0 ];
-      outb[ 1 ] = ubnd[ 1 ];
-      wm = astWinMap( 2, ina, inb, outa, outb, " ", status );
-      newmap = astCmpMap( wm, this, 1, " ", status );
+/* Find the cell dimensions on X and Y input axes. */
+      dx = ( ubnd[ 0 ] - lbnd[ 0 ] )/( nx - 1 );
+      dy = ( ubnd[ 1 ] - lbnd[ 1 ] )/( ny - 1 );
 
-/* Store the integer bounds of the region to use within the input space
-   of "wm" and "newmap". */
-      ilbnd[ 0 ] = 1;
-      ilbnd[ 1 ] = 1;
-      iubnd[ 0 ] = nx;
-      iubnd[ 1 ] = ny;
+/* Create a regular grid of input positions. */
+      px = pdat1[ 0 ];
+      py = pdat1[ 1 ];
+      for( iy = 0; iy < ny; iy++ ) {
+         x = lbnd[ 0 ];
+         y = lbnd[ 1 ] + iy*dy;
+         for( ix = 0; ix < nx; ix++ ) {
+            *(px++) = x;
+            *(py++) = y;
+            x += dx;
+         }
+      }
 
-/* Create a regular grid of points covering the given bounds within the
-   input space of the Mapping, and store their input axis value. */
-      astTranGrid( wm, 2, ilbnd, iubnd, 0.0, 100, 1, 2, np, work1 );
-
-/* Create a regular grid of points covering the given bounds within the
-   input space of the Mapping, and store their output axis value. */
-      astTranGrid( newmap, 2, ilbnd, iubnd, 0.0, 100, 1, nout, np, work2 );
+/* Use the supplied Mapping to transform this grid into the output space. */
+      (void) astTransform( this, pset1, 1, pset2 );
 
 /* Assume the approximation can be created. */
       result = 1;
@@ -8743,9 +8733,9 @@ f     - A value of .FALSE.
          szx2 = 0.0;
          szy2 = 0.0;
 
-         px = work1;
-         py = work1 + np;
-         pz = work2 + np*iout;
+         px = pdat1[ 0 ];
+         py = pdat1[ 1 ];
+         pz = pdat2[ iout ];
 
          for( i = 0; i < np; i++ ) {
             x = *(px++);
@@ -8791,30 +8781,35 @@ f     - A value of .FALSE.
          mat[ 3 ] = sxy;
          mat[ 4 ] = sx2;
          mat[ 5 ] = sy2;
+
          mat[ 6 ] = sx;
          mat[ 7 ] = sx2;
          mat[ 8 ] = sxy;
          mat[ 9 ] = sx2y;
          mat[ 10 ] = sx3;
-         mat[ 11 ] = sx2y2;
+         mat[ 11 ] = sxy2;
+
          mat[ 12 ] = sy;
          mat[ 13 ] = sxy;
          mat[ 14 ] = sy2;
          mat[ 15 ] = sxy2;
          mat[ 16 ] = sx2y;
          mat[ 17 ] = sy3;
+
          mat[ 18 ] = sxy;
          mat[ 19 ] = sx2y;
          mat[ 20 ] = sxy2;
          mat[ 21 ] = sx2y2;
          mat[ 22 ] = sx3y;
          mat[ 23 ] = sxy3;
+
          mat[ 24 ] = sx2;
          mat[ 25 ] = sx3;
          mat[ 26 ] = sx2y;
          mat[ 27 ] = sx3y;
          mat[ 28 ] = sx4;
          mat[ 29 ] = sx2y2;
+
          mat[ 30 ] = sy2;
          mat[ 31 ] = sxy2;
          mat[ 32 ] = sy3;
@@ -8867,15 +8862,11 @@ f     - A value of .FALSE.
                     );
          } 
       }
-
-/* Free resources. */
-      wm = astAnnul( wm );
-      newmap = astAnnul( newmap );
    }
 
 /* Free resources. */
-   work1 = astFree( work1 );
-   work2 = astFree( work2 );
+   pset1 = astAnnul( pset1 );
+   pset2 = astAnnul( pset2 );
 
 /* Return AST__BAD if anything went wrong. */
    if( !astOK || ntot == 0 ) {
@@ -8885,7 +8876,11 @@ f     - A value of .FALSE.
 
 /* Otherwise normalise the returned RMS. */
    } else {
-      *rms = sqrt( *rms/ntot );
+      if( *rms > 0.0 ) {
+         *rms = sqrt( *rms/ntot );
+      } else {
+         *rms = 0.0;
+      }
    }
 
 /* Return result */
