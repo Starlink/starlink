@@ -234,10 +234,11 @@
 *  Output the fit and rms.
          CALL PAR_PUT1D( 'FIT', 6 * NOUT, FIT, STATUS )
          CALL PAR_PUT0D( 'RMS', RMS, STATUS )
-      ELSE
-         IF ( STATUS .EQ. SAI__OK ) THEN 
-            STATUS = SAI__ERROR
-         END IF
+
+      ELSE IF ( STATUS .EQ. SAI__OK ) THEN 
+         STATUS = SAI__ERROR
+         CALL ERR_REP( ' ', 'The least squares quadratic fit could '//
+     :                 'not be determined.', STATUS )
       ENDIF
 
 *  Tidy up.
