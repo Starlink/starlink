@@ -8742,7 +8742,7 @@ f     - A value of .FALSE.
             y = *(py++);
             z = *(pz++);
 
-            if( x != AST__BAD && y != AST__BAD && z != AST__BAD ) {
+            if( z != AST__BAD ) {
                xx = x*x;
                yy = y*y;
                xy = x*y;
@@ -8837,7 +8837,7 @@ f     - A value of .FALSE.
 /* If the fit succeeded, update the summ of the squared residuals. */
          } else {
             ntot += n;
-            *rms += ofit[ 0 ]*ofit[ 0 ] +
+            *rms += ofit[ 0 ]*ofit[ 0 ]*n +
                     2*ofit[ 0 ]*ofit[ 1 ]*sx +
                     2*ofit[ 0 ]*ofit[ 2 ]*sy +
                     2*( ofit[ 0 ]*ofit[ 3 ] + ofit[ 1 ]*ofit[ 2 ] )*sxy +
