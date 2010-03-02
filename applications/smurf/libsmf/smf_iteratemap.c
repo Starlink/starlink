@@ -240,6 +240,9 @@
 *        Export data before dying if SMF__INSMP status set
 *     2010-01-19 (DSB)
 *        - Add dcthresh2 config parameter.
+*     2010-03-02 (EC)
+*        When creating the continuous chunks round up to the nearest
+*        integral number of files.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -362,6 +365,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int *lut_data=NULL;           /* Pointer to DATA component of lut */
   smfGroup *lutgroup=NULL;      /* smfGroup of lut model files */
   dim_t maxconcat;              /* Longest continuous chunk length in samples*/
+  dim_t maxfile;                /* Longest file length in time samples*/
   int maxiter=0;                /* Maximum number of iterations */
   dim_t maxlen=0;               /* Max chunk length in samples */
   int memiter=0;                /* If set iterate completely in memory */
@@ -774,24 +778,28 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
              " ", "  ^MNAME", status );
   }
 
-  /* Create an ordered smfGrp which keeps track of files corresponding to
-     different subarrays (observed simultaneously), as well as time-ordering
-     the files. Now added "chunk" to smfGroup as well -- this is used to
-     concatenate _only_ continuous pieces of data. We subtract padStart
-     and padEnd from maxlen since these also add to the file length. */
+  /* Create an ordered smfGrp which keeps track of files corresponding
+     to different subarrays (observed simultaneously), as well as
+     time-ordering the files. Now added "chunk" to smfGroup as well --
+     this is used to concatenate _only_ continuous pieces of data. Maxconcat
+     will be the length of the largest continuous chunk, or maxlen,
+     whichever comes first -- but excluding padding. */
 
-  smf_grp_related( igrp, isize, 1, maxlen-padStart-padEnd, &maxconcat,
-                   &igroup, NULL, status );
+  smf_grp_related( igrp, isize, 1, maxlen, &maxconcat, &maxfile, &igroup,
+                   NULL, status );
 
   /* Once we've run smf_grp_related we know how many subarrays there
      are.  We also know the maximum length of a concatenated piece of
      data, and which model components were requested. Use this
-     information to check that enough memory is available. */
+     information to check that enough memory is available -- but now
+     add in the extra length required for padding. */
 
   if( *status == SAI__OK ) {
+    maxconcat += padStart + padEnd;
 
-    smf_checkmem_dimm( maxconcat, INST__SCUBA2, igroup->nrelated, modeltyps,
-                       nmodels, maxmem, &memneeded, status );
+    smf_checkmem_dimm( maxconcat, INST__SCUBA2,
+                       igroup->nrelated, modeltyps, nmodels, maxmem,
+                       &memneeded, status );
 
     if( *status == SMF__NOMEM ) {
       /* If we need too much memory, generate a warning message and then try
@@ -802,12 +810,21 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       msgSeti( "LEN", maxconcat );
       msgSeti( "AVAIL", maxmem/SMF__MB );
       msgSeti( "NEED", memneeded/SMF__MB );
-      msgOut( " ", "  ^LEN continuous samples requires ^NEED Mb > ^AVAIL Mb",
+      msgOut( " ", "  ^LEN continuous samples (including padding) require "
+              "^NEED Mb > ^AVAIL Mb",
               status );
 
       /* Try is meant to be the largest chunks of ~equal length that fit in
          memory */
-      try = maxconcat / ((size_t) ((double) memneeded/maxmem)+1)+1;
+      try = maxconcat / ((size_t) ((double)memneeded/maxmem)+1)+1;
+
+      /* Round up to get integral number of files including padding at start,
+         but subtract off one file if it exceeds available memory */
+      try += try - ((try/maxfile)*maxfile + padStart);
+
+      if( try > (maxconcat*( (double) maxmem / (double) memneeded )) ) {
+        try -= maxfile;
+      }
 
       msgSeti( "TRY", try );
       msgOut( " ", "  Will try to re-group data in chunks < ^TRY samples long",
@@ -820,7 +837,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         smf_close_smfGroup( &igroup, status );
       }
 
-      smf_grp_related( igrp, isize, 1, try, &maxconcat, &igroup, NULL, status );
+      smf_grp_related( igrp, isize, 1, try, &maxconcat, NULL, &igroup, NULL,
+                       status );
     }
   }
 

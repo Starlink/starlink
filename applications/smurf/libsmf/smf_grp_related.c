@@ -14,8 +14,8 @@
 
  *  Invocation:
  *     smf_grp_related( const Grp *igrp, const int grpsize, const int grpbywave,
- *                      dim_t maxlen, dim_t *maxconcatlen, smfGroup **group,
- *                      Grp **basegrp, int *status );
+ *                      dim_t maxlen, dim_t *maxconcatlen, dim_t *maxfilelen,
+ *                      smfGroup **group, Grp **basegrp, int *status );
 
  *  Arguments:
  *     igrp = const Grp* (Given)
@@ -30,6 +30,8 @@
  *     maxconcatlen = dim_t* (Returned)
  *        The actual length in time samples of the longest continuous chunk.
  *        Can be NULL.
+ *     maxfilelen = dim_t* (Returned)
+ *        Max length in time samples of an individual data file.
  *     group = smfGroup ** (Returned)
  *        Returned smfGroup
  *     basegrp = Grp ** (Returned)
@@ -111,11 +113,13 @@
  *        Use smf_find_seqcount
  *     2009-10-01 (TIMJ):
  *        Add basegrp argument.
+ *     2010-03-02 (EC):
+ *        Added maxfilelen to interface.
  *     {enter_further_changes_here}
 
  *  Copyright:
  *     Copyright (C) 2008-2009 Science and Technology Facilities Council.
- *     Copyright (C) 2006-2008 University of British Columbia.
+ *     Copyright (C) 2006-2010 University of British Columbia.
  *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
  *     All Rights Reserved.
 
@@ -167,8 +171,9 @@
 
 #define FUNC_NAME "smf_grp_related"
 
-void smf_grp_related(  const Grp *igrp, const size_t grpsize, const int grpbywave,
-                       dim_t maxlen, dim_t *maxconcatlen, smfGroup **group,
+void smf_grp_related(  const Grp *igrp, const size_t grpsize,
+                       const int grpbywave, dim_t maxlen,
+                       dim_t *maxconcatlen, dim_t *maxfilelen, smfGroup **group,
                        Grp **basegrp, int *status ) {
 
   /* Local variables */
@@ -192,6 +197,7 @@ void smf_grp_related(  const Grp *igrp, const size_t grpsize, const int grpbywav
   double *lambda = NULL;      /* Wavelength - only used if grpbywave is true */
   int matchsubsys;            /* Flag for matched subarrays */
   dim_t maxconcat=0;          /* Longest continuous chunk length */
+  dim_t maxflen=0;            /* Max file length in time steps */
   dim_t maxnelem=0;           /* Max elem (subarrays) encountered */
   dim_t *nbolx = NULL;        /* Number of bolometers in X direction */
   dim_t *nboly = NULL;        /* Number of bolometers in Y direction */
@@ -414,6 +420,11 @@ void smf_grp_related(  const Grp *igrp, const size_t grpsize, const int grpbywav
       /* Add length to running total */
       totlen += thislen;
 
+      /* Update maxflen */
+      if( thislen > maxflen ) {
+        maxflen = thislen;
+      }
+
       /* Update maxconcat */
       if( totlen > maxconcat ) {
         maxconcat = totlen;
@@ -617,6 +628,11 @@ void smf_grp_related(  const Grp *igrp, const size_t grpsize, const int grpbywav
 
   *group = smf_construct_smfGroup( igrp, new_subgroups, new_chunk, new_ngroups,
                                    maxnelem, 0, status );
+
+  /* Return maxfilelen if requested */
+  if( maxfilelen ) {
+    *maxfilelen = maxflen;
+  }
 
   /* Return maxconcatlen if requested */
   if( maxconcatlen ) {

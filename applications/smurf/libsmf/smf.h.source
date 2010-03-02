@@ -972,9 +972,10 @@ void smf_getrefwcs( const char *param, AstFrameSet **specwcs,
 AstKeyMap *smf_groupscans( Grp *igrp,  int size, int *maxsyspop,
                            int *conform, Grp **ogrp, int *status );
 
-void smf_grp_related( const Grp *igrp, const size_t grpsize, const int grpbywave,
-                      dim_t maxlen, dim_t *maxconcatlen, smfGroup **group,
-                      Grp **basegrp, int *status );
+void smf_grp_related(  const Grp *igrp, const size_t grpsize,
+                       const int grpbywave, dim_t maxlen,
+                       dim_t *maxconcatlen, dim_t *maxfilelen, smfGroup **group,
+                       Grp **basegrp, int *status );
 
 void smf_history_add( smfData* data, const char * appl,
                       int *status);

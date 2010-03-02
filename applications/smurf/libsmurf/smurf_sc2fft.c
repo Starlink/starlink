@@ -197,7 +197,7 @@ void smurf_sc2fft( int *status ) {
 
   /* We now need to combine files from the same subarray and same sequence
      to form a continuous time series */
-  smf_grp_related( igrp, size, 1, 0, &maxconcat, &igroup,
+  smf_grp_related( igrp, size, 1, 0, &maxconcat, NULL, &igroup,
                    &basegrp, status );
 
   /* Get output file(s) */
