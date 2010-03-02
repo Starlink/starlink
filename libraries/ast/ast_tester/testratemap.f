@@ -64,7 +64,7 @@
 
       rm = ast_ratemap( m, 1, 3, ' ', status )
       call ast_trann( rm, 1, 4, 1, at, 1, 1, 1, r, status )
-      if( r .ne. 0.25D0 ) call stopit( 5, r, status )
+      if( abs( r - 0.25D0 ) .gt. 1.0D-6 ) call stopit( 5, r, status )
 
       rm = ast_ratemap( m, 1, 4, ' ', status )
       call ast_trann( rm, 1, 4, 1, at, 1, 1, 1, r, status )
@@ -106,11 +106,13 @@
 
       rm = ast_ratemap( m, 3, 1, ' ', status )
       call ast_trann( rm, 1, 4, 1, at, 1, 1, 1, r, status )
-      if( r .ne. 12.0D0/7.0D0 ) call stopit( 15, r, status )
+      if( abs( r - 12.0D0/7.0D0 ) .gt. 1.0E-6 ) 
+     :                          call stopit( 15, r, status )
 
       rm = ast_ratemap( m, 3, 2, ' ', status )
       call ast_trann( rm, 1, 4, 1, at, 1, 1, 1, r, status )
-      if( r .ne. -8.0D0/7.0D0 ) call stopit( 16, r, status )
+      if( abs( r - (-8.0D0/7.0D0) ) .gt. 1.0E-6 ) 
+     :                          call stopit( 16, r, status )
 
       rm = ast_ratemap( m, 3, 3, ' ', status )
       call ast_trann( rm, 1, 4, 1, at, 1, 1, 1, r, status )

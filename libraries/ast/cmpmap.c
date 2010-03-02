@@ -851,8 +851,14 @@ void astInitCmpMapVtab_(  AstCmpMapVtab *vtab, const char *name, int *status ) {
    mapping->MapMerge = MapMerge;
    mapping->Simplify = Simplify;
    mapping->RemoveRegions = RemoveRegions;
-   mapping->Rate = Rate;
    mapping->GetIsLinear = GetIsLinear;
+
+/* For some reason the CmpMap implementation of astRate can be immensely
+   slow for complex Mapping, so it's currently disable until such time as 
+   I have time to sort it out.
+
+   mapping->Rate = Rate;
+*/
 
 /* Declare the copy constructor, destructor and class dump function. */
    astSetCopy( vtab, Copy );

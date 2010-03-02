@@ -1728,10 +1728,8 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2, int *status 
    outperm = astGetInvert( this ) ? map->inperm : map->outperm;
    if( outperm ) {
       result = ( ax2 == outperm[ ax1 ] ) ? 1.0 : 0.0;
-
    } else {
-      inperm = astGetInvert( this ) ? map->outperm : map->inperm;
-      result = ( inperm[ ax2 ] == ax1 ) ? 1.0 : 0.0;
+      result = ( ax2 == ax1 ) ? 1.0 : 0.0;
    }
 
    return result;

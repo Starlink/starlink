@@ -274,7 +274,7 @@
       if( r .ne. 0.0D0 ) call stopit( 56, r, status )
 
       r = ast_rate( m, at, 1, 3, status )
-      if( r .ne. 0.25D0 ) call stopit( 57, r, status )
+      if( abs( r - 0.25D0 ) .gt. 1.0D-6 ) call stopit( 57, r, status )
 
       r = ast_rate( m, at, 1, 4, status )
       if( r .ne. 0.5D0 ) call stopit( 58, r, status )
@@ -307,10 +307,12 @@
       if( r .ne. 0.0D0 ) call stopit( 66, r, status )
 
       r = ast_rate( m, at, 3, 1, status )
-      if( r .ne. 12.0D0/7.0D0 ) call stopit( 67, r, status )
+      if( abs( r - 12.0D0/7.0D0 ) .gt. 1.0D-6 ) 
+     :                            call stopit( 67, r, status )
 
       r = ast_rate( m, at, 3, 2, status )
-      if( r .ne. -8.0D0/7.0D0 ) call stopit( 68, r, status )
+      if( abs( r - (-8.0D0/7.0D0) ) .gt. 1.0D-6 ) 
+     :                            call stopit( 68, r, status )
 
       r = ast_rate( m, at, 3, 3, status )
       if( r .ne. 0.0D0 ) call stopit( 69, r, status )
