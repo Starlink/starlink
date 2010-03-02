@@ -454,15 +454,8 @@ itcl::class gaia::Gaia {
          }
       }
 
-      #  Start the internal debug logging, if required. When set to greater
-      #  than 1, Don't buffer so that we see all messages immediately.
-      if { $itk_option(-debuglog) } {
-         set fid [::open "GaiaDebug.log" w]
-         if { $itk_option(-debuglog) > 1 } {
-            fconfigure $fid -buffering none
-         }
-         cmdtrace on notruncate $fid
-      }
+      #  Start the internal debug logging, if required.
+      start_debuglog_
 
       #  Set the blank and background colours for the first time.
       set_blankcolour
@@ -478,6 +471,33 @@ itcl::class gaia::Gaia {
       util::setXdefaults
       SkyCat::setXdefaults
       gaia::setXdefaults
+   }
+
+
+   #  Start or stop the debug log. If the debuglog value is greater than 1
+   #  then buffering is switched off so that the updates are immediate, useful
+   #  when dealing with an aborting process that might miss output. If logging
+   #  is already active new output is appended.
+   protected method start_debuglog_ {} {
+      if { $itk_option(-debuglog) } {
+
+         #  If already started the log, we append new output.
+         if { $debug_started_ } {
+            set mode "a"
+         } else {
+            set mode "w"
+         }
+         set fid [::open "GaiaDebug.log" $mode]
+         if { $itk_option(-debuglog) > 1 } {
+            fconfigure $fid -buffering none
+         }
+         cmdtrace on notruncate $fid
+         set debug_started_ 1
+      } else {
+         if { $debug_started_ } {
+            cmdtrace off
+         }
+      }
    }
 
    #  Display a window while the application is starting up, overriden
@@ -770,6 +790,16 @@ itcl::class gaia::Gaia {
       #  UKIRT quick look likes to attach to camera immediately.
       if { $itk_option(-ukirt_ql) || $itk_option(-ukirt_xy) } {
          attach_camera
+      }
+
+      #  Toggle debug logging. Only show in developer mode.
+      if { $itk_option(-developer) } {
+         $m add separator
+         add_menuitem $m checkbutton "Debug logging" \
+            {Switch debug logging to GaiaDebug.log on and off} \
+            -variable [scope itk_option(-debuglog)] \
+            -onvalue 1 -offvalue 0 \
+            -command [code $this start_debuglog_]
       }
    }
 
@@ -1293,7 +1323,7 @@ itcl::class gaia::Gaia {
 
       #  If the window exists then just raise it. Can happen if control-e is
       #  pressed repeatably.
-      if { [info exists itk_component($name)] && 
+      if { [info exists itk_component($name)] &&
            [winfo exists $itk_component($name)] } {
          wm deiconify $itk_component($name)
          raise $itk_component($name)
@@ -2776,6 +2806,9 @@ window gives you access to this."
    #  Create debugging log.
    itk_option define -debuglog debuglog DebugLog 0
 
+   #  If in developer mode allow control of debug logging.
+   itk_option define -developer developer Developer 0
+
    #  Protected variables: (available to instance)
    #  --------------------
 
@@ -2826,6 +2859,9 @@ window gives you access to this."
 
    #  Last world coordinates of position of interest.
    protected variable last_position_of_interest_ {}
+
+   #  Whether or not debugging is already started.
+   protected variable debug_started_ 0
 
    #  Common variables: (shared by all instances)
    #  -----------------
