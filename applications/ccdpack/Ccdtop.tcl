@@ -450,7 +450,10 @@ class Ccdtop {
 #-----------------------------------------------------------------------
 #  This method is called if the toplevel window receives a configure
 #  event, which will happen, for instance, if it is resized.
-         configure -geometry [ winfo geometry $itk_interior ]
+         set newgeo [winfo geometry $itk_interior]
+         if { $itk_option(-geometry) != $newgeo } {
+            configure -geometry $newgeo
+         } 
       }
 
 
