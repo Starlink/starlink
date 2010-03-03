@@ -21,6 +21,7 @@
 *     AST_MAPGET0<X>
 *     AST_MAPGET1<X>
 *     AST_MAPGETELEM<X>
+*     AST_MAPPUTELEM<X>
 *     AST_MAPREMOVE
 *     AST_MAPSIZE
 *     AST_MAPLENGTH
@@ -942,6 +943,114 @@ F77_LOGICAL_FUNCTION(ast_mapgetelemc)( INTEGER(THIS),
       astFree( values );
    )
    return RESULT;
+}
+
+
+F77_SUBROUTINE(ast_mapputelemi)( INTEGER(THIS),
+                                 CHARACTER(KEY),
+                                 INTEGER(ELEM),
+                                 INTEGER(VALUE),
+                                 INTEGER(STATUS)
+                                 TRAIL(KEY) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(KEY)
+   GENPTR_INTEGER(ELEM)
+   GENPTR_INTEGER(VALUE)
+   char *key;
+
+   astAt( "AST_MAPPUTELEMI", NULL, 0 );
+   astWatchSTATUS(
+      key = astString( KEY, KEY_length );
+      astMapPutElemI( astI2P( *THIS ), key, *ELEM - 1, *VALUE );
+      astFree( key );
+   )
+}
+
+
+F77_SUBROUTINE(ast_mapputelemd)( INTEGER(THIS),
+                                 CHARACTER(KEY),
+                                 INTEGER(ELEM),
+                                 DOUBLE(VALUE),
+                                 INTEGER(STATUS)
+                                 TRAIL(KEY) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(KEY)
+   GENPTR_INTEGER(ELEM)
+   GENPTR_DOUBLE(VALUE)
+   char *key;
+
+   astAt( "AST_MAPPUTELEMD", NULL, 0 );
+   astWatchSTATUS(
+      key = astString( KEY, KEY_length );
+      astMapPutElemD( astI2P( *THIS ), key, *ELEM - 1, *VALUE );
+      astFree( key );
+   )
+}
+
+F77_SUBROUTINE(ast_mapputelemr)( INTEGER(THIS),
+                                 CHARACTER(KEY),
+                                 INTEGER(ELEM),
+                                 REAL(VALUE),
+                                 INTEGER(STATUS)
+                                 TRAIL(KEY) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(KEY)
+   GENPTR_INTEGER(ELEM)
+   GENPTR_REAL(VALUE)
+   char *key;
+
+   astAt( "AST_MAPPUTELEMR", NULL, 0 );
+   astWatchSTATUS(
+      key = astString( KEY, KEY_length );
+      astMapPutElemF( astI2P( *THIS ), key, *ELEM - 1, *VALUE );
+      astFree( key );
+   )
+}
+
+
+F77_SUBROUTINE(ast_mapputelema)( INTEGER(THIS),
+                                 CHARACTER(KEY),
+                                 INTEGER(ELEM),
+                                 INTEGER(VALUE),
+                                 INTEGER(STATUS)
+                                 TRAIL(KEY) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(KEY)
+   GENPTR_INTEGER(ELEM)
+   GENPTR_INTEGER(VALUE)
+   char *key;
+
+   astAt( "AST_MAPPUTELEMA", NULL, 0 );
+   astWatchSTATUS(
+      key = astString( KEY, KEY_length );
+      astMapPutElemA( astI2P( *THIS ), key, *ELEM - 1, astI2P( *VALUE ) );
+      astFree( key );
+   )
+}
+
+
+F77_SUBROUTINE(ast_mapputelemc)( INTEGER(THIS),
+                                 CHARACTER(KEY),
+                                 INTEGER(ELEM),
+                                 CHARACTER(VALUE),
+                                 INTEGER(STATUS)
+                                 TRAIL(KEY)
+                                 TRAIL(VALUE) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(KEY)
+   GENPTR_INTEGER(ELEM)
+   GENPTR_CHARACTER(VALUE)
+   char *key;
+   char *value;
+
+   astAt( "AST_MAPPUTELEMC", NULL, 0 );
+   astWatchSTATUS(
+      key = astString( KEY, KEY_length );
+      value = astString( VALUE, VALUE_length );
+      astMapPutElemC( astI2P( *THIS ), key, *ELEM - 1, value );
+      astFree( key );
+      astFree( value );
+   )
 }
 
 

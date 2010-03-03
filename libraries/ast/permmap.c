@@ -1712,7 +1712,6 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2, int *status 
 /* Local Variables: */
    AstPermMap *map;
    int *outperm;
-   int *inperm;
    int result;
 
 /* Check inherited status */

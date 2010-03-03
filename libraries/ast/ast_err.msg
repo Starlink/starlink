@@ -172,6 +172,9 @@ MPVIN           <invalid integer index supplied for a KeyMap vector element>
 OPRIN           <operation specifier invalid>
 NONIN           <no inside point found>
 MPKER           <requested key not found in KeyMap>
+MPPER           <error putting a named value into a KeyMap>
+
+
 
 
 .END

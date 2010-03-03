@@ -1,14 +1,17 @@
       program testkeymap
       implicit none
       include 'AST_PAR'
+      include 'AST_ERR'
       include 'SAE_PAR'
-      integer status,map,map2,ival,aval,l,ivec(2),avec(4),nval,i,iat
+      integer status,map,map2,ival,aval,l,ivec(2),avec(4),nval,i,iat,
+     :        map3
       character cval*20,cvec(3)*10,key*20,cval0*40
       double precision dval, dvec(2)
       logical gota, gotc, gotd, goti, gotr
       real rval
 
       status = sai__ok
+      call err_mark( status )
 
       map = ast_keymap( ' ', status )
 
@@ -471,6 +474,102 @@ c  Read single elements of vector entries as scalars.
       end if
 
       call checkDump( map, 'checkDump 2 ', status )
+
+
+
+c  Test putting single elements into vector entries.
+      map = ast_keymap( ' ', status )
+
+      ivec(1) = 1
+      ivec(2) = 2
+      call ast_mapput1i( map, 'Fredi', 2, ivec, 'com 1', STATUS )
+
+      call ast_mapputelemi( map, 'Fredi', 1, -1, STATUS )
+      if( .not. ast_mapgetelemi( map, 'Fredi', 1, ival, 
+     :                           status ) ) then
+         call stopit( status, 'Error GETELEM_1' )
+      else if( ival .ne. -1 ) then
+         write(*,*) ival
+         call stopit( status, 'Error GETELEM_2' )
+      end if  
+
+      call ast_mapputelemi( map, 'Fredi', 10, -2, STATUS )
+      if( .not. ast_mapgetelemi( map, 'Fredi', 3, ival, 
+     :                           status ) ) then
+         call stopit( status, 'Error GETELEM_3' )
+      else if( ival .ne. -2 ) then
+         write(*,*) ival
+         call stopit( status, 'Error GETELEM_4' )
+      end if  
+
+      call ast_mapputelemi( map, 'Fredi', 0, -3, STATUS )
+      if( .not. ast_mapgetelemi( map, 'Fredi', 4, ival, 
+     :                           status ) ) then
+         call stopit( status, 'Error GETELEM_5' )
+      else if( ival .ne. -3 ) then
+         write(*,*) ival
+         call stopit( status, 'Error GETELEM_6' )
+      end if  
+
+      if( ast_maplength( map, 'Fredi', status ) .ne. 4 ) then
+         write(*,*) ast_maplength( map, 'Fredi', status )
+         call stopit( status, 'Error GETELEM_7' )
+      end if  
+
+      map2 = ast_keymap( ' ', status )
+      call ast_mapputelema( map2, 'A A', 1, map, STATUS )
+      if( ast_maplength( map2, 'A A', status ) .ne. 1 ) then
+         write(*,*) ast_maplength( map, 'Fredi', status )
+         call stopit( status, 'Error GETELEM_8' )
+      end if  
+
+      if( .not. ast_mapgetelema( map2, 'A A', 1, map3, 
+     :                           status ) ) then
+         call stopit( status, 'Error GETELEM_9' )
+      else if( .not. ast_mapgetelemi( map3, 'Fredi', 4, ival, 
+     :                           status ) ) then
+         call stopit( status, 'Error GETELEM_10' )
+      else if( ival .ne. -3 ) then
+         write(*,*) ival
+         call stopit( status, 'Error GETELEM_11' )
+      end if  
+
+      if( status .eq. sai__ok ) then
+         call ast_mapputelema( map2, 'A A', 1, map2, STATUS )
+         if( status .eq. ast__kycir ) then
+            call err_annul( status )
+         else 
+            call stopit( status, 'Error GETELEM_12' )
+         end if
+      end if
+
+      call ast_mapput0c( map, ' B', 'Hello', ' ', status )
+      call ast_mapputelemc( map, ' B ', 3, 'YES YES', STATUS )
+
+      if( ast_maplength( map, ' B', status ) .ne. 2 ) then
+         write(*,*) ast_maplength( map, ' B', status )
+         call stopit( status, 'Error GETELEM_13' )
+
+      else if( .not. ast_mapgetelemc( map, ' B ', 2, cval0, 
+     :                                status ) ) then
+         call stopit( status, 'Error GETELEM_14' )
+
+      else if( cval0 .ne. 'YES YES' ) then
+         write(*,*) cval0
+         call stopit( status, 'Error GETELEM_15' )
+      end if
+
+
+
+
+
+
+
+      call ast_annul( map, status )
+
+
+
+      call err_rlse( status )
 
       if( status .eq. sai__ok ) then
          write(*,*) 'All KeyMap tests passed'

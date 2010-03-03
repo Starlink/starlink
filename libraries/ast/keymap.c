@@ -50,6 +50,7 @@ c     - astMapLenC: Get the length of a named character entry in a KeyMap
 c     - astMapLength: Get the length of a named entry in a KeyMap
 c     - astMapPut0<X>: Add a new scalar entry to a KeyMap
 c     - astMapPut1<X>: Add a new vector entry to a KeyMap
+c     - astMapPutElem<X>: Puts a value into a vector entry in a KeyMap
 c     - astMapRemove: Removed a named entry from a KeyMap
 c     - astMapSize: Get the number of entries in a KeyMap
 c     - astMapType: Return the data type of a named entry in a map.
@@ -62,6 +63,7 @@ f     - AST_MAPLENC: Get the length of a named character entry in a KeyMap
 f     - AST_MAPLENGTH: Get the length of a named entry in a KeyMap
 f     - AST_MAPPUT0<X>: Add a new scalar entry to a KeyMap
 f     - AST_MAPPUT1<X>: Add a new vector entry to a KeyMap
+f     - AST_MAPPUTELEM<X>: Puts a value into a vector entry in a KeyMap
 f     - AST_MAPREMOVE: Removed a named entry from a KeyMap
 f     - AST_MAPSIZE: Get the number of entries in a KeyMap
 f     - AST_MAPTYPE: Return the data type of a named entry in a map.
@@ -69,7 +71,7 @@ f     - AST_MAPTYPE: Return the data type of a named entry in a map.
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
 *     Research Councils
-*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2008-2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -134,6 +136,8 @@ f     - AST_MAPTYPE: Return the data type of a named entry in a map.
 *     12-FEB-2010 (DSB):
 *         When converting an entry value between double and string, treat 
 *         "<bad>" as the formatted version of AST__BAD.
+*     3-MAR-2010 (DSB):
+*         Added astMapPutElem<X>.
 *class--
 */
 
@@ -377,6 +381,12 @@ static int MapGetElemC( AstKeyMap *, const char *, int, int, char *, int * );
 static int MapGetElemD( AstKeyMap *, const char *, int, double *, int * );
 static int MapGetElemF( AstKeyMap *, const char *, int, float *, int * );
 static int MapGetElemI( AstKeyMap *, const char *, int, int *, int * );
+static void MapPutElemA( AstKeyMap *, const char *, int, AstObject *, int * );
+static void MapPutElemP( AstKeyMap *, const char *, int, void *, int * );
+static void MapPutElemC( AstKeyMap *, const char *, int, const char *, int * );
+static void MapPutElemD( AstKeyMap *, const char *, int, double, int * );
+static void MapPutElemF( AstKeyMap *, const char *, int, float, int * );
+static void MapPutElemI( AstKeyMap *, const char *, int, int, int * );
 static int MapHasKey( AstKeyMap *, const char *, int * );
 static int MapLenC( AstKeyMap *, const char *, int * );
 static int MapLength( AstKeyMap *, const char *, int * );
@@ -543,45 +553,54 @@ static void CheckCircle( AstKeyMap *this, AstObject *obj, const char *method, in
    if( obj && astIsAKeyMap( obj ) ) {
       keymap = (AstKeyMap *) obj;
 
-/* Loop through all the entries in the KeyMap looking for AstObject
-   entries. */
-      nkey = astMapSize( keymap );
-      for( i = 0; i < nkey && astOK; i++ ) {
-         key = astMapKey( keymap, i );
-         if( astMapType( keymap, key ) == AST__OBJECTTYPE ) {
+/* First check if the supplied Objects are the same. You cannot store a
+   KeyMap as an entry within itself. */
+      if( keymap == this ) {
+         astError( AST__KYCIR, "%s(%s): Cannot add a KeyMap into another "
+                   "KeyMap because they are same KeyMap.", status, method, 
+                   astGetClass( this ) );
 
+/* Otherwise, loop through all the entries in the KeyMap looking for AstObject
+   entries. */
+      } else {
+         nkey = astMapSize( keymap );
+         for( i = 0; i < nkey && astOK; i++ ) {
+            key = astMapKey( keymap, i );
+            if( astMapType( keymap, key ) == AST__OBJECTTYPE ) {
+   
 /* Find the number of AstObject pointers stored in this entry, and
    allocate memory to store a copy of the every pointer. */
-            len = astMapLength( keymap, key );
-            vec = astMalloc( sizeof( AstObject *) * len );
-            if( vec ) {
-
+               len = astMapLength( keymap, key );
+               vec = astMalloc( sizeof( AstObject *) * len );
+               if( vec ) {
+   
 /* Extract pointers to the AstObjects at this entry, and loop round them. */
-               astMapGet1A( keymap, key, len, &len, vec );
-               for( j = 0; j < len; j++ ) {
-
+                  astMapGet1A( keymap, key, len, &len, vec );
+                  for( j = 0; j < len; j++ ) {
+   
 /* If this entry is a KeyMap, we need to check if is the same as "this"
    or contains "this". */
-                  if( astIsAKeyMap( vec[ j ] ) ) {
-
+                     if( astIsAKeyMap( vec[ j ] ) ) {
+   
 /* If it is the same as "this", report an error. */
-                     if( vec[ j ] == (AstObject *) this ) {
-                        astError( AST__KYCIR, "%s(%s): Cannot add a KeyMap "
-                                  "into another KeyMap because the first "
-                                  "KeyMap contains the second KeyMap.", status,
-                                  method, astGetClass( this ) );
-                        break;
-
+                        if( vec[ j ] == (AstObject *) this ) {
+                           astError( AST__KYCIR, "%s(%s): Cannot add a KeyMap "
+                                     "into another KeyMap because the first "
+                                     "KeyMap contains the second KeyMap.", status,
+                                     method, astGetClass( this ) );
+                           break;
+   
 /* Otherwise, see if it contains "this". */
-                     } else {
-                        CheckCircle( this, vec[ j ], method, status );
+                        } else {
+                           CheckCircle( this, vec[ j ], method, status );
+                        }
                      }
-                  }
-
+   
 /* Free resources. */
-                  vec[ j ] = astAnnul( vec[ j ] );
+                     vec[ j ] = astAnnul( vec[ j ] );
+                  }
+                  vec = astFree( vec );
                }
-               vec = astFree( vec );
             }
          }
       }
@@ -2327,6 +2346,12 @@ void astInitKeyMapVtab_(  AstKeyMapVtab *vtab, const char *name, int *status ) {
    vtab->MapGetElemD = MapGetElemD;
    vtab->MapGetElemF = MapGetElemF;
    vtab->MapGetElemI = MapGetElemI;
+   vtab->MapPutElemP = MapPutElemP;
+   vtab->MapPutElemA = MapPutElemA;
+   vtab->MapPutElemC = MapPutElemC;
+   vtab->MapPutElemD = MapPutElemD;
+   vtab->MapPutElemF = MapPutElemF;
+   vtab->MapPutElemI = MapPutElemI;
    vtab->MapPut0A = MapPut0A;
    vtab->MapPut0P = MapPut0P;
    vtab->MapPut0C = MapPut0C;
@@ -5245,6 +5270,288 @@ f     AST_MAPLENGTH = INTEGER
 
 }
 
+/*
+*++
+*  Name:
+c     astMapPutElem<X>
+f     AST_MAPPUTELEM<X>
+
+*  Purpose:
+*     Put a value into an element of a vector value in a KeyMap.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "ast.h"
+c     void astMapPutElem<X>( AstKeyMap *this, const char *key, int elem, 
+c                            <X>type *value )
+f     CALL AST_MAPPUTELEM<X>( THIS, KEY, ELEM, VALUE, STATUS )
+
+*  Class Membership:
+*     KeyMap method.
+
+*  Description:
+*     This is a set of functions for storing a value in a single element of 
+*     a vector value in a KeyMap. You should replace <X> in the generic 
+*     function name 
+c     astMapPutElem<X> 
+f     AST_MAPPUTELEM<X> 
+*     by an appropriate 1-character type code (see the "Data Type Codes" 
+*     section below for the code appropriate to each supported data type).
+*     The supplied value is converted from the data type indicated by <X>
+*     to the data type of the KeyMap entry before being stored (an error 
+*     is reported if it is not possible to convert the value to the
+*     required data type).
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the KeyMap.
+c     key
+f     KEY = CHARACTER * ( * ) (Given)
+*        The character string identifying the value to be retrieved. Trailing 
+*        spaces are ignored.
+c     elem
+f     ELEM = INTEGER (Given)
+*        The index of the vector element to modify, starting at 
+c        zero.
+f        one.
+*        If the index is outside the range of the vector, the length of
+*        the vector will be increased by one element and the supplied 
+*        value will be stored at the end of the vector in the new element.
+c     value
+f     VALUE = <X>type (Given)
+*        The value to store.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Notes:
+*     - If the entry originally holds a scalar value, it will be treated
+*     like a vector entry of length 1.
+*     - If the specified key cannot be found in the given KeyMap, a new
+*     vector entry with the given name, and data type implied by <X>, is
+*     created and the supplied value is store din its first entry.
+*     - Key names are case sensitive, and white space is considered
+*     significant.
+
+*  Data Type Codes:
+*     To select the appropriate 
+c     function, you should replace <X> in the generic function name
+c     astMapPutElem<X>
+f     routine, you should replace <X> in the generic routine name 
+f     AST_MAPPUTELEM<X>
+*     with a 1-character data type code, so as to match the data type <X>type 
+*     of the data you are processing, as follows:
+c     - D: double
+c     - F: float
+c     - I: int
+c     - C: "const" pointer to null terminated character string
+c     - A: Pointer to AstObject
+c     - P: Generic "void *" pointer
+f     - D: DOUBLE PRECISION
+f     - R: REAL
+f     - I: INTEGER
+f     - C: CHARACTER
+f     - A: INTEGER used to identify an AstObject
+*
+c     For example, astMapPutElemD would be used to put a "double" value, while 
+c     astMapPutElemI would be used to put an "int" value, etc. For D or I, the 
+c     supplied "value" parameter should be a double or int. For 
+c     C, the supplied "value" parameter should be a pointer to a character 
+c     string. For A, the supplied "value" parameter should be an AstObject 
+c     pointer.
+f     For example, AST_MAPPUTELEMD would be used to put a DOUBLE PRECISION 
+f     value, while AST_MAPPUTELEMI would be used to put an INTEGER value, etc.
+
+*--
+*/
+/* Define a macro to implement the function for a specific data type
+(excluding "C" since that needs an extra parameter). */
+#define MAKE_MAPPUTELEM(X,Xtype,Itype) \
+static void MapPutElem##X( AstKeyMap *this, const char *key, int elem, \
+                           Xtype value, int *status ) { \
+\
+/* Local Variables: */ \
+   AstMapEntry *mapentry;  /* Pointer to parent MapEntry structure */ \
+   int itab;               /* Index of hash table element to use */ \
+   int nel;                /* Number of elements in raw vector */ \
+   int raw_type;           /* Data type of stored value */ \
+   size_t raw_size;        /* Size of a single raw value */ \
+   unsigned long hash;     /* Full width hash value */ \
+   void *raw;              /* Pointer to stored value */ \
+\
+/* Check the global error status. */ \
+   if ( !astOK ) return; \
+\
+/* Perform any necessary checks on the supplied value to be stored. */ \
+   CHECK_##X \
+\
+/* Use the hash function to determine the element of the hash table in \
+   which the key will be stored. */ \
+   itab = HashFun( key, this->mapsize - 1, &hash, status ); \
+\
+/* Search the relevent table entry for the required MapEntry. */ \
+   mapentry = SearchTableEntry( this, itab, key, status ); \
+\
+/* If the key was not found, create a new one with a single element, \
+   and store the supplied value in it. */ \
+   if( !mapentry ) { \
+      astMapPut1##X( this, key, 1, &value, NULL ); \
+\
+/* If the key was found.... */ \
+   } else { \
+\
+/* Get the current length of the vector (0=>scalar), and the data type. */ \
+      nel = mapentry->nel; \
+      raw_type = mapentry->type; \
+\
+/* Do each data type in turn. */ \
+      if( raw_type == AST__INTTYPE ){ \
+\
+/* If the existing entry is scalar, create a new vector entry with the \
+   same name, value, data type and comment. Then get a pointer to the new \
+   entry, and indicate that we now have a vector entry of length 1. */ \
+         if( nel == 0 ) { \
+            astMapPut1I( this, key, 1, &( ((Entry0I *)mapentry)->value ), \
+                         mapentry->comment ); \
+            mapentry = SearchTableEntry( this, itab, key, status ); \
+            nel = 1; \
+         } \
+\
+/* Get the address of the first raw value in the vector. Also get \
+   the size of each element of the vector. */ \
+         raw = ((Entry1I *)mapentry)->value; \
+         raw_size = sizeof( int ); \
+\
+/* Handle other data type in the same way. */ \
+      } else if( raw_type == AST__DOUBLETYPE ){ \
+         if( nel == 0 ) { \
+            astMapPut1D( this, key, 1, &( ((Entry0D *)mapentry)->value ), \
+                         mapentry->comment ); \
+            mapentry = SearchTableEntry( this, itab, key, status ); \
+            nel = 1; \
+         } \
+         raw = ((Entry1D *)mapentry)->value; \
+         raw_size = sizeof( double ); \
+\
+      } else if( raw_type == AST__POINTERTYPE ){ \
+         if( nel == 0 ) { \
+            astMapPut1P( this, key, 1, &( ((Entry0P *)mapentry)->value ), \
+                         mapentry->comment ); \
+            mapentry = SearchTableEntry( this, itab, key, status ); \
+            nel = 1; \
+         } \
+         raw = ((Entry1P *)mapentry)->value; \
+         raw_size = sizeof( void * ); \
+\
+      } else if( raw_type == AST__FLOATTYPE ){ \
+         if( nel == 0 ) { \
+            astMapPut1F( this, key, 1, &( ((Entry0F *)mapentry)->value ), \
+                         mapentry->comment ); \
+            mapentry = SearchTableEntry( this, itab, key, status ); \
+            nel = 1; \
+         } \
+         raw = ((Entry1F *)mapentry)->value; \
+         raw_size = sizeof( float ); \
+\
+      } else if( raw_type == AST__STRINGTYPE ){ \
+         if( nel == 0 ) { \
+            astMapPut1C( this, key, 1, &( ((Entry0C *)mapentry)->value ), \
+                         mapentry->comment ); \
+            mapentry = SearchTableEntry( this, itab, key, status ); \
+            nel = 1; \
+         } \
+         raw = ((Entry1C *)mapentry)->value; \
+         raw_size = sizeof( const char * ); \
+\
+      } else if( raw_type == AST__OBJECTTYPE ){ \
+         if( nel == 0 ) { \
+            astMapPut1A( this, key, 1, &( ((Entry0A *)mapentry)->value ), \
+                         mapentry->comment ); \
+            mapentry = SearchTableEntry( this, itab, key, status ); \
+            nel = 1; \
+         } \
+         raw = ((Entry1A *)mapentry)->value; \
+         raw_size = sizeof( AstObject * ); \
+\
+      } else { \
+         raw_size = 0; \
+         raw = NULL; \
+         astError( AST__INTER, "astMapPutElem<X>(KeyMap): Illegal map entry " \
+                   "data type %d encountered (internal AST programming " \
+                   "error).", status, raw_type ); \
+      } \
+\
+/* If the requested element is outside the bounds of the vector, extend \
+   the vector by one element. */ \
+      if( elem >= nel || elem < 0 ) { \
+         elem = nel++; \
+         raw = astGrow( raw, nel, raw_size ); \
+         if( astOK ) { \
+            mapentry->nel = nel; \
+            if( raw_type == AST__INTTYPE ){ \
+               ((Entry1I *)mapentry)->value = (int *) raw; \
+            } else if( raw_type == AST__DOUBLETYPE ){ \
+               ((Entry1D *)mapentry)->value = (double *) raw; \
+            } else if( raw_type == AST__POINTERTYPE ){ \
+               ((Entry1P *)mapentry)->value = (void *) raw; \
+            } else if( raw_type == AST__FLOATTYPE ){ \
+               ((Entry1F *)mapentry)->value = (float *) raw; \
+            } else if( raw_type == AST__STRINGTYPE ){ \
+               ((Entry1C *)mapentry)->value = (const char **) raw; \
+            } else if( raw_type == AST__OBJECTTYPE ){ \
+               ((Entry1A *)mapentry)->value = (AstObject **) raw; \
+            } \
+         } \
+      } \
+\
+/* Get a pointer to the requested element. */ \
+      if( astOK ) { \
+         raw = (char *) raw + elem*raw_size; \
+\
+/* Convert the supplied value, storing the result in the requested element. \
+   Report an error if conversion is not possible. */ \
+         if( !ConvertValue( &value, Itype, raw, raw_type, status ) && astOK ){ \
+            astError( AST__MPPER, "astMapPutElem" #X "(%s): The supplied " \
+                      "value cannot be converted to the data type of " \
+                      "KeyMap key \"%s\".", status, astGetClass( this ), \
+                      key ); \
+         } \
+      } \
+   } \
+}
+
+/* Define macros which perform any necessary checks on the supplied value 
+   to be stored. For Object entries, check that we are not adding a KeyMap 
+   which already contains "this". This avoids circular dependencies.
+   Other types do not need any checks. */ 
+#define CHECK_A CheckCircle( this, value, "astMapPutElemA", status );
+#define CHECK_I
+#define CHECK_D
+#define CHECK_F
+#define CHECK_C
+#define CHECK_P
+
+/* Expand the above macro to generate a function for each required 
+   data type. */
+MAKE_MAPPUTELEM(I,int,AST__INTTYPE)
+MAKE_MAPPUTELEM(D,double,AST__DOUBLETYPE)
+MAKE_MAPPUTELEM(F,float,AST__FLOATTYPE)
+MAKE_MAPPUTELEM(A,AstObject *,AST__OBJECTTYPE)
+MAKE_MAPPUTELEM(P,void *,AST__POINTERTYPE)
+MAKE_MAPPUTELEM(C,const char *,AST__STRINGTYPE)
+
+/* Undefine the macro. */
+#undef MAKE_MAPPUTELEM
+#undef CHECK_A
+#undef CHECK_I
+#undef CHECK_D
+#undef CHECK_F
+#undef CHECK_C
+#undef CHECK_P
+
+
 static int MapType( AstKeyMap *this, const char *key, int *status ) {
 /*
 *++
@@ -6878,6 +7185,20 @@ int astMapGetElemC_( AstKeyMap *this, const char *key, int l, int elem,
    if ( !astOK ) return 0;
    return (**astMEMBER(this,KeyMap,MapGetElemC))(this,key,l,elem,value,status);
 }
+
+#define MAKE_MAPPUTELEM_(X,Xtype) \
+void astMapPutElem##X##_( AstKeyMap *this, const char *key, int elem, \
+                         Xtype value, int *status ){ \
+   if ( !astOK ) return; \
+   (**astMEMBER(this,KeyMap,MapPutElem##X))(this,key,elem,value,status); \
+}
+MAKE_MAPPUTELEM_(D,double)
+MAKE_MAPPUTELEM_(F,float)
+MAKE_MAPPUTELEM_(I,int)
+MAKE_MAPPUTELEM_(A,AstObject *)
+MAKE_MAPPUTELEM_(C,const char *)
+MAKE_MAPPUTELEM_(P,void *)
+#undef MAKE_MAPPUTELEM_
 
 void astMapRemove_( AstKeyMap *this, const char *key, int *status ){ 
    if ( !astOK ) return;

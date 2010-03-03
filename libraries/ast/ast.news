@@ -38,6 +38,11 @@ floating point value AST__BAD, rather than the literal formatted value
 floating point value AST__BAD, rather than the literal formatted value
 (typically "-1.79769313486232e+308" ). 
 
+- The KeyMap class has a new method called astMapPutElem<X>/AST_MAPPUTELEM<X>
+that allows a value to be put into a single element of a vector entry in
+a KeyMap. The vector entry is extended automatically to hold the new
+element if required.
+
 - The DSBSpecFrame class now reports an error if the local oscillator
 frequency is less than the absoliute value of the intermediate frequency.
 
