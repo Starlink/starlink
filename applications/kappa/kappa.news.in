@@ -11,6 +11,11 @@
       -   A new Parameter STEP has been added that allows a subset of
       the positions identifiers between FIRST and LAST to be displayed.
 
+   o  PSF
+
+      - A bug has fixed in the normalisation of the fit in cases where 
+      both the NORM and GAUSS parameters are set FALSE.
+
    o  WCSSLIDE
 
       - A bug has been fixed that could lead to incorrect shifts when using 

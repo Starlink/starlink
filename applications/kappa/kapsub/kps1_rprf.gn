@@ -94,19 +94,18 @@
 *        An estimate of the full width at half maximum across the minor
 *        axis of a star image.
 *     AMP = REAL (Returned)
-*        The Gaussian amplitude of the fitted mean point-spread
-*        function.
+*        The amplitude of the fitted mean point-spread function.
 *     BACK = REAL (Returned)
 *        The background level of the mean point-spread function.
 *     SIGMA = REAL (Returned)
-*        The Gaussian width (sigma) of the fitted mean point-spread
-*        function across the minor axis.
+*        The width (sigma) of the fitted mean point-spread function 
+*        across the minor axis.
 *     GAMMA = REAL (Returned)
 *        Star radial-profile parameter, gamma, of the fitted mean
 *        point-spread function.
 *     AMP1 = REAL (Returned)
-*        The Gaussian amplitude of the fitted point-spread function for
-*        the first usable star.
+*        The amplitude of the fitted point-spread function for the 
+*        first usable star.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -119,8 +118,11 @@
 
 *  Copyright:
 *     Copyright (C) 1981, 1990-1992 Science & Engineering Research
-*     Council. Copyright (C) 1998-2000 Central Laboratory of the
-*     Research Councils. All Rights Reserved.
+*     Council. 
+*     Copyright (C) 1998-2000 Central Laboratory of the Research 
+*     Councils. 
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -169,6 +171,9 @@
 *        AST.
 *     2-MAY-2000 (DSB):
 *        Added argument AMP1.
+*     4-MAR-2010 (DSB):
+*        Modify AMP1 to return the amplitude of the final fit (rather
+*        than the Gaussian fit) for the first star.
 *     {enter_further_changes_here}
 
 *-
@@ -524,11 +529,15 @@
 
       FWHM = VAL__BADR
 
-*  If fit was not successful.
+*  If fit was successful.
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Calculate full-width-half-maximum seeing.
          FWHM = 2.0 * SIGMA * ( 1.38629 ** ( 1.0 / GAMMA ) )
+
+*  Correct the returned first star amplitude to take account of any 
+*  non-Gaussian nature in the fitted star profile.
+         IF ( AMP1 .NE. VAL__BADR ) AMP1 = AMP1*AMP
 
       END IF
 

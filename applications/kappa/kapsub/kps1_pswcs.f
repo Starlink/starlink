@@ -17,7 +17,7 @@
 *     holding the model PSF (INDF). It is assumed that the centre of the 
 *     model PSF is at the centre of the output image.
 *
-*     The Frame added has DOmain OFFSET, and becomes the Current Frame.
+*     The Frame added has Domain OFFSET, and becomes the Current Frame.
 *     It measures geodesic distance from the centre of the PSF in the 
 *     direction of the two pixel axes. The output image scale is the 
 *     same as the input image scale at the supplied star position (PX,PY).
@@ -40,6 +40,7 @@
 
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -65,6 +66,8 @@
 *  History:
 *     21-SEP-1999 (DSB):
 *        Original version.
+*     4-MAR-2010 (DSB):
+*        Cater for NDFs that contain extra insignificant pixel axes.
 *     {enter_further_changes_here}
 
 *-
@@ -74,6 +77,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'NDF_PAR'          ! NDF constants 
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
 
 *  Arguments Given:
@@ -103,12 +107,15 @@
       DOUBLE PRECISION DIST0     ! Distance from first pixel to centre
       DOUBLE PRECISION E( 2 )    ! Cur. Frame co-ords at a pixel in LutMap
       INTEGER CMAP               ! Final combined Mapping
+      INTEGER DIMS( NDF__MXDIM ) ! Dimensions of all pixel axes in NDF
       INTEGER FRM                ! Current Frame
       INTEGER I                  ! Index count
+      INTEGER INPERM( NDF__MXDIM )! Permutation array for Permmap inputs
       INTEGER IWCS               ! Output WCS FrameSet
       INTEGER LMAP1              ! LutMap for axis 1
       INTEGER LMAP2              ! LutMap for axis 2
       INTEGER MAP                ! Base to Current Mapping
+      INTEGER NDIM               ! Total number of pixel axes in NDF
       INTEGER NEWFRM             ! Current Frame for output NDF
       INTEGER NP                 ! Number of points in each LutMap
       INTEGER SDIM( 2 )          ! Significant axis indices
@@ -259,7 +266,35 @@
       CALL AST_SETC( NEWFRM, 'LABEL(2)', 'Offset on axis 2', STATUS )
       CALL AST_SETC( NEWFRM, 'DOMAIN', 'OFFSET', STATUS )
 
-*  Add this Frame into the default FrameSet using the Mapping found above.
+*  Determine the total number of pixel axes in the NDF.
+      CALL NDF_DIM(  INDF, NDF__MXDIM, DIMS, NDIM, STATUS )
+
+*  The NDF may contain more than 2 pixel axes (i.e. there may be some
+*  additional insignificant pixel axes that were ignored by KPG1_ASGET).
+*  If so we need to modify the Mapping created above to include the
+*  ignored pixel axes. 
+      IF( NDIM .GT. 2 ) THEN
+
+*  Create a PermMap that transforms NDIM-dimensional GRID coords within
+*  the NDF into the 2-dimensional GRID coords described by the base Frame
+*  in IWCS. Combine this PermMap in series with the Mapping created above.
+         DO I = 1, NDIM
+            INPERM( I ) = -1
+         END DO
+
+         INPERM( SDIM( 1 ) ) = 1
+         INPERM( SDIM( 2 ) ) = 2
+
+         CMAP = AST_CMPMAP( AST_PERMMAP( NDIM, INPERM, 2, SDIM, 1.0D0, 
+     :                                   ' ', STATUS ),
+     :                      CMAP, .TRUE., ' ', STATUS )
+
+*  Get the full WCS FrameSet from the NDF, retaining all pixel axes.
+         CALL KPG1_GTWCS( INDF, IWCS, STATUS )
+
+      END IF
+
+*  Add the OFFSET Frame into the FrameSet using the Mapping found above.
       CALL AST_ADDFRAME( IWCS, AST__BASE, CMAP, NEWFRM, STATUS ) 
 
 *  Save the modified FrameSet in the output NDF.

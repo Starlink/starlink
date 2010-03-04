@@ -41696,7 +41696,7 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
       }{
          If {\tt TRUE}, the model PSF is normalized so that it has a peak value
          of unity.  Otherwise, its peak value is equal to the peak
-         value of the first usable star, in the data units of the input
+         value of the fit to the first usable star, in the data units of the input
          NDF.  {\tt [TRUE]}
       }
       \sstsubsection{
@@ -57136,6 +57136,13 @@ The following applications have been modified:
       \begin{itemize}
         \item A new parameter STEP has been added that allows a subset of
         the positions identifiers between FIRST and LAST to be displayed.
+      \end{itemize}
+
+   \item [\htmlref{PSF}{PSF}]\mbox{}
+      \begin{itemize}
+        \item A bug has fixed that could cause incorrect normalisation of 
+        the fit in cases where both the NORM and GAUSS parameters are set 
+        FALSE.
       \end{itemize}
 
    \item [\htmlref{WCSSLIDE}{WCSSLIDE}]\mbox{}

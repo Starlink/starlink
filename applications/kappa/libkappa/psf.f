@@ -153,8 +153,8 @@
 *     NORM = _LOGICAL (Read)
 *        If TRUE, the model PSF is normalized so that it has a peak
 *        value of unity.  Otherwise, its peak value is equal to the peak
-*        value of the first usable star, in the data units of the input
-*        NDF.  [TRUE]
+*        value of the fit to the first usable star, in the data units of 
+*        the input NDF.  [TRUE]
 *     ORIENT = _REAL (Write)
 *        The orientation of the major axis of the star images, in 
 *        degrees.  If the current Frame of the NDF is a SKY Frame, this 
@@ -466,8 +466,14 @@
 *        parameters.
 *     2007 August 8: (MJC)
 *        Added TOTAL output parameter.
+*     4-MAR-2010 (DSB):
+*        Changed behaviour of NORM parameter. Previously, setting NORM=NO
+*        resulted in the fit being normalised to the peak value in the
+*        intermediate *Gaussian* fit to the first star. Now, the fit 
+*        is normalised to the peak value in the final, potentially 
+*        *non-Gaussian*, fit to the first star (i.e. the fit that may 
+*        have a gamma value different to 2.0).
 *     {enter_further_changes_here}
-
 *-
       
 *  Type Definitions:
