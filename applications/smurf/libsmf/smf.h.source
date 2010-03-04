@@ -865,6 +865,9 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
                         size_t order, smfData **coeffs, smfData ** polyfit,
                         int *status );
 
+void smf_flat_malloc( size_t nheat, const smfData * refdata,
+                      smfData ** powvald, smfData **bolvald, int *status );
+
 void smf_flat_precondition( int allbad, smfData * powvald, smfData * bolvald,
                             int *status );
 

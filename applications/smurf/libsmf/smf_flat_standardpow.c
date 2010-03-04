@@ -64,6 +64,8 @@
 *        Switch to a smfData API
 *     2010-02-03 (TIMJ):
 *        Propagate variance
+*     2010-03-03 (TIMJ):
+*        Use smf_flat_malloc
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -109,7 +111,6 @@ smf_flat_standardpow( const smfArray * heatframes, double refohms,
   size_t i;               /* loop counter */
   size_t j;               /* loop counter */
   size_t k;               /* loop counter */
-  int lbnd[3];            /* lower pixel bounds */
   size_t nheat;           /* Number of input frames */
   size_t numbol;          /* Number of bolometers */
   double *powbol = NULL;  /* pointer to individual bolometer powers */
@@ -118,9 +119,6 @@ smf_flat_standardpow( const smfArray * heatframes, double refohms,
   double * powref = NULL; /* Data array inside powrefd */
   double * bolref = NULL; /* Data array inside bolrefd */
   double * bolrefvar = NULL; /* Variance inside bolrefd */
-
-  void *pntr[] = { NULL, NULL, NULL };          /* pointers for smfData */
-  dim_t dims[] = { 1, 1, 1 };
 
   *powrefd = NULL;
   *bolrefd = NULL;
@@ -132,31 +130,13 @@ smf_flat_standardpow( const smfArray * heatframes, double refohms,
     (heatframes->sdata)[0]->dims[1];
 
   /* Create a smfData for powref and bolref */
-  powref = smf_malloc( nheat, sizeof(*powref), 1, status );
-  bolref = smf_malloc( nheat * numbol, sizeof(*bolref), 1, status );
-  bolrefvar = smf_malloc( nheat * numbol, sizeof(*bolref), 1, status );
+  smf_flat_malloc( nheat, (heatframes->sdata)[0], powrefd, bolrefd, status );
 
-  pntr[0] = powref;
-  pntr[1] = NULL;
-  pntr[2] = NULL;
-  dims[0] = nheat;
-  *powrefd = smf_construct_smfData( NULL, NULL, NULL, NULL, SMF__DOUBLE,
-                                    pntr, 1, dims, NULL, 1, 0, 0, NULL,
-                                    NULL, status );
-
-  pntr[0] = bolref;
-  pntr[1] = bolrefvar;
-  pntr[2] = NULL;
-  dims[0] = (heatframes->sdata)[0]->dims[0];
-  dims[1] = (heatframes->sdata)[0]->dims[1];
-  dims[2] = nheat;
-  lbnd[0] = (heatframes->sdata)[0]->lbnd[0];
-  lbnd[1] = (heatframes->sdata)[0]->lbnd[1];
-  lbnd[2] = 1;
-
-  *bolrefd = smf_construct_smfData( NULL, NULL, NULL, NULL, SMF__DOUBLE,
-                                    pntr, 1, dims, lbnd, 3, 0, 0, NULL,
-                                    NULL, status );
+  if (*status == SAI__OK) {
+    powref = (*powrefd)->pntr[0];
+    bolref = (*bolrefd)->pntr[0];
+    bolrefvar = (*bolrefd)->pntr[1];
+  }
 
   /* Get some memory -
      bolometer power per input frame */

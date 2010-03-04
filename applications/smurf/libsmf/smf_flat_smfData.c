@@ -50,6 +50,8 @@
 *     2010-02-08 (TIMJ):
 *        Need to malloc the memory for the local copy since the pointers
 *        will be freed when the main file containing the smfDA is freed.
+*     2010-03-03 (TIMJ):
+*        Use smf_flat_malloc
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -90,10 +92,6 @@ void smf_flat_smfData ( const smfData *data, char flatmethod[], size_t methlen,
                         smfData ** powval, smfData **bolval,
                         int *status ) {
   smfDA * da = NULL;
-  void * pntr[3];
-  dim_t dims[3];
-  int lbnd[3];
-  size_t nelem = 0;
 
   *powval = NULL;
   *bolval = NULL;
@@ -109,31 +107,14 @@ void smf_flat_smfData ( const smfData *data, char flatmethod[], size_t methlen,
   /* we need to malloc space to make sure that we do not free the pointers
      twice. There really needs to be a way to tell smf_close_file to free
      everything except the pointers to the data. */
+  smf_flat_malloc( da->nflat, data, powval, bolval, status );
 
   /* flatpar is powval */
-  pntr[0] = smf_malloc( da->nflat, sizeof(*(da->flatpar)), 0, status);
-  memcpy( pntr[0], da->flatpar, da->nflat * sizeof(*(da->flatpar)) );
-  pntr[1] = NULL;
-  pntr[2] = NULL;
-  dims[0] = da->nflat;
-  *powval = smf_construct_smfData( NULL, NULL, NULL, NULL, SMF__DOUBLE,
-                                   pntr, 1, dims, NULL, 1, 0, 0, NULL,
-                                   NULL, status );
-
-  dims[0] = (data->dims)[0];
-  dims[1] = (data->dims)[1];
-  dims[2] = da->nflat;
-  nelem = dims[0] * dims[1] * dims[2];
-  pntr[0] = smf_malloc( nelem, sizeof(*(da->flatcal)), 0, status );
-  memcpy( pntr[0], da->flatcal, nelem * sizeof(*(da->flatcal)) );
-  pntr[1] = NULL;
-  pntr[2] = NULL;
-  lbnd[0] = (data->lbnd)[0];
-  lbnd[1] = (data->lbnd)[1];
-  lbnd[2] = 1;
-  *bolval = smf_construct_smfData( NULL, NULL, NULL, NULL, SMF__DOUBLE,
-                                   pntr, 1, dims, lbnd, 3, 0, 0, NULL,
-                                   NULL, status );
+  if (*status == SAI__OK) {
+    size_t nelem = (*bolval)->dims[0] * (*bolval)->dims[1] * (*bolval)->dims[2];
+    memcpy( (*powval)->pntr[0], da->flatpar, da->nflat * sizeof(*(da->flatpar)) );
+    memcpy( (*bolval)->pntr[0], da->flatcal, nelem * sizeof(*(da->flatcal)) );
+  }
 
   one_strlcpy( flatmethod, da->flatname, methlen, status );
 
