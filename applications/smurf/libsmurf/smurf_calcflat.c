@@ -113,6 +113,8 @@
 *        Add METHOD and ORDER to allow POLYNOMIAL mode.
 *     2010-02-08 (TIMJ):
 *        Remove obvious problems with data prior to fitting.
+*     2010-03-05 (TIMJ):
+*        Use smf_flat_mergedata and new smf_flat_standardpow API
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -436,9 +438,18 @@ void smurf_calcflat( int *status ) {
     /* We now have data for the various pixel heater settings.
        Generate a set of reference heater power settings in pW, and calculate the
        expected measurement from each bolometer at each power setting.
+
+       First we merge the smfArray into a single smfData.
      */
-    smf_flat_standardpow( bbhtframe, refohms, pixheat, resistance,
-                          &powref, &bolref, status );
+    {
+      smfData *bolval = NULL;
+      smf_flat_mergedata( bbhtframe, pixheat, &bolval, status );
+
+      smf_flat_standardpow( bolval, refohms, resistance,
+                            &powref, &bolref, status );
+
+      if (bolval) smf_close_file( &bolval, status );
+    }
 
     /* See if we want to use TABLE or POLYNOMIAL mode */
     parChoic( "METHOD", "POLYNOMIAL", "POLYNOMIAL, TABLE", 1,
