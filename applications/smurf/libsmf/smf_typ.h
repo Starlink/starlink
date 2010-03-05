@@ -450,14 +450,17 @@ typedef struct smfHead {
 } smfHead;
 
 /* This structure contains ancilliary information obtained from a raw
-   data file that may be useful to SMURF.
+   data file that may be useful to SMURF. "heatval" is not read
+   directly using smf_open_file but is used for flatfield calculations.
 */
 
 typedef struct smfDA {
   double *flatcal;           /* pointer to flatfield calibration */
   double *flatpar;           /* pointer to flatfield parameters */
+  double *heatval;           /* Heater values in DAC units for flatfield */
   char flatname[SC2STORE_FLATLEN]; /* name of flatfield algorithm */
   size_t nflat;              /* number of flat coeffs per bol */
+  size_t nheat;              /* number of elements in heatval */
   int *dksquid;              /* dark squid for each column */
 } smfDA;
 

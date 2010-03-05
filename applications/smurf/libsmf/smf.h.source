@@ -590,8 +590,8 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
                           smfArray **concat, int *status );
 
 smfDA *smf_construct_smfDA( smfDA * tofill, int *dksquid, double * flatcal,
-                            double * flatpar, const char * flatname, int nflat,
-                            int * status );
+                            double * flatpar, const char * flatname,
+                            int nflat, double * heatval, int nheat, int * status );
 
 smfData *smf_construct_smfData( smfData * tofill, smfFile * file,
                                 smfHead * hdr, smfDA * da, smf_dtype dtype,

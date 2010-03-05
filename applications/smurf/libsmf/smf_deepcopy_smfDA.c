@@ -46,10 +46,12 @@
 *        size of the allocated buffers can be determined.
 *     2008-07-11 (TIMJ):
 *        Propagate dark squid. Use one_strlcpy.
+*     2010-03-04 (TIMJ):
+*        Add protection against NULL pointers and add heater entry.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008, 2010 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research
 *     Council. University of British Columbia. All Rights Reserved.
 
@@ -96,7 +98,9 @@ smf_deepcopy_smfDA( const smfData *old, int * status ) {
   int *dksquid = NULL;    /* pointer to dark squid */
   double *flatcal;        /* pointer to flatfield calibration */
   double *flatpar;        /* pointer to flatfield parameters */
+  double *heatval;        /* pointer to heater values */
   char flatname[SC2STORE_FLATLEN];/* name of flatfield algorithm */
+  size_t nheat;           /* number of entries in heatval */
   size_t nflat;           /* number of flat coeffs per bol */
   size_t nbol;            /* Number of bolometers */
   size_t ncol;            /* Number of columns */
@@ -111,6 +115,7 @@ smf_deepcopy_smfDA( const smfData *old, int * status ) {
 
   /* Copy elements */
   nflat = oldda->nflat;
+  nheat = oldda->nheat;
 
   /* Need the number of bolometers, columns and time slices */
   nbol = (old->dims)[0] * (old->dims)[1];
@@ -118,13 +123,24 @@ smf_deepcopy_smfDA( const smfData *old, int * status ) {
   ntslice = (old->dims)[2];
 
   /* Allocate space for and copy contents of pointers */
-  flatcal = smf_malloc( nbol * nflat, sizeof(*flatcal), 0, status );
-  if ( flatcal != NULL ) {
-    memcpy( flatcal, oldda->flatcal, sizeof(*flatcal)*nbol*nflat );
+  if (oldda->flatcal && nflat > 0 ) {
+    flatcal = smf_malloc( nbol * nflat, sizeof(*flatcal), 0, status );
+    if ( flatcal != NULL ) {
+      memcpy( flatcal, oldda->flatcal, sizeof(*flatcal)*nbol*nflat );
+    }
   }
-  flatpar = smf_malloc( nflat, sizeof(*flatpar), 0, status );
-  if ( flatpar != NULL ) {
-    memcpy( flatpar, oldda->flatpar, sizeof(*flatpar)*nflat);
+  if (oldda->flatpar && nflat > 0) {
+    flatpar = smf_malloc( nflat, sizeof(*flatpar), 0, status );
+    if ( flatpar != NULL ) {
+      memcpy( flatpar, oldda->flatpar, sizeof(*flatpar)*nflat);
+    }
+  }
+
+  if (oldda->heatval && nheat > 0) {
+    heatval = smf_malloc( nflat, sizeof(*heatval), 0, status );
+    if ( heatval != NULL ) {
+      memcpy( heatval, oldda->heatval, sizeof(*heatval)*nflat);
+    }
   }
 
   if (oldda->dksquid) {
@@ -142,7 +158,7 @@ smf_deepcopy_smfDA( const smfData *old, int * status ) {
 
   /* Construct the new smfData */
   newda = smf_construct_smfDA( newda, dksquid, flatcal, flatpar, flatname,
-                               nflat, status);
+                               nflat, heatval, nheat, status);
 
   return newda;
 }

@@ -14,8 +14,9 @@
 
 *  Invocation:
 *     pntr = smf_construct_smfDA( smfDA * tofill, int *dksquid,
-*                    double * flatcal, double * flatpar, 
-*                    const char * flatname, int nflat, int * status );
+*                    double * flatcal, double * flatpar,
+*                    const char * flatname, int nflat, double * heatval,
+*                    int nheat, int * status );
 
 *  Arguments:
 *     tofill = smfDA* (Given)
@@ -31,6 +32,10 @@
 *        Name of flatfield algorithm. The string is copied.
 *     nflat = int (Given)
 *        Number of flatfield parameters per bolometer
+*     heatval = double * (Given)
+*        Pointer to array of heater values used for flatfield calculations.
+*     nheat = int (Given)
+*        Number of elements in heatval.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -110,8 +115,8 @@
 
 smfDA *
 smf_construct_smfDA( smfDA * tofill, int *dksquid, double * flatcal,
-		     double * flatpar, const char * flatname, int nflat,
-		     int * status ) {
+		     double * flatpar, const char * flatname,
+                     int nflat, double * heatval, int nheat, int * status ) {
 
   smfDA * da = NULL;   /* File components */
 
@@ -128,7 +133,9 @@ smf_construct_smfDA( smfDA * tofill, int *dksquid, double * flatcal,
     da->dksquid = dksquid;
     da->flatcal = flatcal;
     da->flatpar = flatpar;
+    da->heatval = heatval;
     da->nflat = nflat;
+    da->nheat = nheat;
     if (flatname != NULL) {
       one_strlcpy(da->flatname, flatname, sizeof(da->flatname), status);
     } else {
