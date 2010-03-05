@@ -84,6 +84,17 @@ bolomap = 1
 
 ensureflat=0
 
+# The gap (in time slices) between full calculations of the output map
+# bolometer positions. Setting a larger value for this will speed up 
+# the map maker but will introduce larger spatial errors. The default 
+# value of 100 seems to produce spatial errors of under 0.1 arc-sec. This 
+# level of errors seems to cause about 1% of bolometers samples to be 
+# pushed into a neighouring map pixel. For tstep=100, the calculation of
+# bolometer positions speeds up by about a factor of 60. Setting tstep to 
+# 1 (or zero) causes all bolometer positions to be calculated in full, 
+# without any approximation. 
+#tstep = 100
+
 # ----------------------------------------------------------------------------
 # The following parameters control data-cleaning before iterations start
 # ----------------------------------------------------------------------------

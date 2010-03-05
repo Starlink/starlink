@@ -274,7 +274,6 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
   smf_tausrc tausrc;            /* Type of tau monitor */
   dim_t thisnrel;               /* Number of related items for this model */
   size_t tstride;               /* Time slice stride in data array */
-  double val;                   /* Temporary value */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -436,8 +435,11 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
             /* Calculate the LUT if necessary */
 
             if( mtype == SMF__LUT ) {
+              int tstep;
+              if( !astMapGet0I( keymap, "TSTEP", &tstep ) ) tstep = 100;
               smf_calc_mapcoord( wf, idata, outfset, moving, lbnd_out,
-                                 ubnd_out, SMF__NOCREATE_FILE, status );
+                                 ubnd_out, SMF__NOCREATE_FILE, tstep,
+                                 status );
             }
 
           }

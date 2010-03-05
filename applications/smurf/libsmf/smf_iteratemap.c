@@ -328,6 +328,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   double dcthresh;              /* Threshold for fixing primary DC steps */
   double dcthresh2;             /* Threshold for fixing secondary DC steps */
   int deldimm=0;                /* Delete temporary .DIMM files */
+  int tstep = 100;              /* Time step between full WCS calculations */
   int dimmflags;                /* Control flags for DIMM model components */
   int dofft=0;                  /* Set if freq. domain filtering the data */
   dim_t dsize;                  /* Size of data arrays in containers */
@@ -458,6 +459,11 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         maxiter = numiter;
         untilconverge = 0;
       }
+    }
+
+    /* Required positional accuracy, in output map pixels. */
+    if( !astMapGet0I( keymap, "TSTEP", &tstep ) ) {
+      tstep = 100;
     }
 
     /* Chisquared change tolerance for stopping */
@@ -930,7 +936,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         /* Concatenate (no variance since we calculate it ourselves -- NOI) */
         smf_concat_smfGroup( wf, igroup, darks, bbms, contchunk, ensureflat,
                              0, outfset, moving, lbnd_out, ubnd_out, padStart,
-                             padEnd, SMF__NOCREATE_VARIANCE, &res[0], status );
+                             padEnd, SMF__NOCREATE_VARIANCE, tstep, &res[0], 
+                             status );
 
         /*** TIMER ***/
         msgOutiff( MSG__DEBUG, "", FUNC_NAME ": ** %f s concatenating data",

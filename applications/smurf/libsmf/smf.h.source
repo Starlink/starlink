@@ -457,7 +457,7 @@ double smf_calc_fcon( smfData *data, dim_t nchan, int report,
 
 void smf_calc_mapcoord( smfWorkForce *wf, smfData *data, AstFrameSet *outfset,
                         int moving, int *lbnd_out, int *ubnd_out, int flags,
-                        int *status );
+                        int tstep, int *status );
 
 double smf_calc_mappa( smfHead *hdr, const char *system, AstFrame *sf,
                        int *status );
@@ -586,8 +586,8 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
                           size_t whichchunk, int ensureflat, int isTordered,
                           AstFrameSet *outfset, int moving,
                           int *lbnd_out, int *ubnd_out, dim_t padStart,
-                          dim_t padEnd, int flags, smfArray **concat,
-                          int *status );
+                          dim_t padEnd, int flags,  int tstep,
+                          smfArray **concat, int *status );
 
 smfDA *smf_construct_smfDA( smfDA * tofill, int *dksquid, double * flatcal,
                             double * flatpar, const char * flatname, int nflat,
@@ -626,6 +626,11 @@ smfHead *smf_construct_smfHead( smfHead * tofill, inst_t instrument,
                                 int * status );
 
 void smf_convert_bad( smfData *data, int *status );
+
+void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
+                     dim_t itime_hi, AstSkyFrame *abskyfrm, 
+                     AstMapping *oskymap, int moving, int olbnd[ 2 ],
+                     int oubnd[ 2 ], int *lut, int *status );
 
 void smf_copytime( struct timeval *target, struct timeval *source,
                    int *status);
@@ -1356,6 +1361,11 @@ void smf_terr( double phi, double h, double lambda, double pos[3] );
 void smf_timerinit( struct timeval *tv1, struct timeval *tv2, int *status);
 
 double smf_timerupdate( struct timeval *tv1, struct timeval *tv2, int *status);
+
+void smf_track_approx( smfData *data, int tstep, dim_t itime_lo, 
+                       dim_t itime_hi, AstSkyFrame *skyfrm, 
+                       double *tai_ref, dim_t *ntimes, double **times, 
+                       dim_t **itimes, int *status );
 
 void smf_tslice_ast (smfData * data, dim_t index, int needwcs, int * status );
 

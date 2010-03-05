@@ -16,7 +16,7 @@
 *  Invocation:
 *     smf_calc_mapcoord( smfWorkForce *wf, smfData *data, AstFrameSet *outfset, 
 *                        int moving, int *lbnd_out, int *ubnd_out, int flags, 
-*                        int *status );
+*                        int tstep, int *status );
 
 *  Arguments:
 *     wf = smfWorkForce * (Given)
@@ -34,6 +34,9 @@
 *     flags = int (Given)
 *        If set to SMF__NOCREATE_FILE don't attempt to write extension
 *        to file.
+*     tstep = int (Given)
+*        The increment in time slices between full Mapping calculations.
+*        The Mapping for intermediate time slices will be approximated.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -49,6 +52,7 @@
 *  Authors:
 *     EC: Edward Chapin (UBC)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     DSB: David S Berry (JAC, Hawaii)
 
 *  History:
 *     2006-05-16 (EC):
@@ -80,6 +84,10 @@
 *        -Parellelized, borrowing code from smf_rebinmap and smf_rebinslices
 *     2009-11-03 (TIMJ):
 *        Skip bad bolo2map mappings.
+*     2010-02-25 (DSB):
+*        Only perform full Mapping calculations periodically. The Mappings 
+*        for intervening time slices are estimated using a cubic-spline 
+*        interpolation scheme.
 
 *  Notes:
 *     This routines asserts ICD data order.
@@ -140,6 +148,7 @@ typedef struct smfCalcMapcoordData {
   size_t t1;               /* Index of first timeslice of block */
   size_t t2;               /* Index of last timeslice of block */
   int *ubnd_out;
+  int tstep;          
 } smfCalcMapcoordData;
 
 /* Function to be executed in thread: coordinates for blocks of tslices*/
@@ -148,10 +157,7 @@ void smfCalcMapcoordPar( void *job_data_ptr, int *status );
 
 void smfCalcMapcoordPar( void *job_data_ptr, int *status ) {
   AstSkyFrame *abskyfrm=NULL;
-  AstMapping *bolo2map=NULL;
   smfData *data=NULL;
-  size_t i;                /* Loop counter */
-  size_t j;                /* Loop counter */
   int lbnd_in[ 2 ];        /* Lower pixel bounds for input maps */
   int *lbnd_out=NULL;
   int *lut=NULL;
@@ -160,13 +166,10 @@ void smfCalcMapcoordPar( void *job_data_ptr, int *status ) {
   int *ubnd_out=NULL;
   dim_t nbolo;             /* number of bolometers */
   dim_t ntslice;           /* number of time slices */
-  double *outmapcoord=NULL;/* Coordinates of each bolo */
   smfCalcMapcoordData *pdata=NULL; /* Pointer to job data */
   AstMapping *sky2map=NULL;
   struct timeval tv1;      /* Timer */
   struct timeval tv2;      /* Timer */
-  int xnear;               /* x-nearest neighbour pixel */
-  int ynear;               /* y-nearest neighbour pixel */
 
   if( *status != SAI__OK ) return;
 
@@ -216,61 +219,19 @@ void smfCalcMapcoordPar( void *job_data_ptr, int *status ) {
   astLock( sky2map, 0 );
   smf_lock_data( data, 1, status );
 
-  /* Calculate the number of bolometers and allocate space for the
-     x- and y- output map coordinates */
-  outmapcoord = smf_malloc( nbolo*2, sizeof(*outmapcoord), 0, status );
-      
-  /* Loop over time slices */
-  for( i=pdata->t1; i<=pdata->t2; i++ ) {
-
-    /* Calculate the bolometer to map-pixel transformation for tslice */
-    bolo2map = smf_rebin_totmap( data, i, abskyfrm, sky2map, moving,
-                                 status );
-
-    if( *status == SAI__OK ) {
-      /* skip if we did not get a mapping this time round but fill the LUT
-         with bads */
-      if (!bolo2map) {
-        for ( j=0; j<nbolo; j++) {
-          lut[i*nbolo+j] = VAL__BADI;
-        }
-      } else {
-
-        astTranGrid( bolo2map, 2, lbnd_in, ubnd_in, 0.1, 1000000, 1,
-                     2, nbolo, outmapcoord );
-
-        for( j=0; j<nbolo; j++ ) {
-          xnear = (int) (outmapcoord[j] - 0.5);
-          ynear = (int) (outmapcoord[nbolo+j] - 0.5);
-
-          if( (xnear >= 0) && (xnear <= ubnd_out[0] - lbnd_out[0]) &&
-              (ynear >= 0) && (ynear <= ubnd_out[1] - lbnd_out[1]) ) {
-            /* Point lands on map */
-            lut[i*nbolo+j] = ynear*(ubnd_out[0]-lbnd_out[0]+1) + xnear;
-          } else {
-            /* Point lands outside map */
-            lut[i*nbolo+j] = VAL__BADI;
-          }
-        }
-      }
-    }
-    /* clean up ast objects */
-    if (bolo2map) bolo2map = astAnnul( bolo2map );
-
-    /* Break out of loop over time slices if bad status */
-    if (*status != SAI__OK) {
-      i = pdata->t2;
-    }
-  }
+  /* Calculate and store the LUT values for the range of time slices
+     being processed by this thread. A generic algorithm is used for
+     moving targets, but a faster algorithm can be used for stationary 
+     targets. */
+  smf_coords_lut( data, pdata->tstep, pdata->t1, pdata->t2, 
+                  abskyfrm, sky2map, moving, lbnd_out, ubnd_out,
+                  lut + pdata->t1*nbolo, status );
 
   /* Unlock the supplied AST object pointers so that other threads can use
      them. */
   smf_lock_data( data, 0, status );
   astUnlock( abskyfrm, 1 );
   astUnlock( sky2map, 1 );
-
-  /* Clean up */
-  if( outmapcoord ) outmapcoord = smf_free( outmapcoord, status );
 
   msgOutiff( MSG__DEBUG, "", 
              "smfCalcMapcoordPar: thread finishing tslices %zu -- %zu (%.3f sec)",
@@ -283,7 +244,7 @@ void smfCalcMapcoordPar( void *job_data_ptr, int *status ) {
 
 void smf_calc_mapcoord( smfWorkForce *wf, smfData *data, AstFrameSet *outfset, 
                         int moving, int *lbnd_out, int *ubnd_out, int flags,
-                        int *status ) {
+                        int tstep, int *status ) {
 
   /* Local Variables */
 
@@ -519,8 +480,10 @@ void smf_calc_mapcoord( smfWorkForce *wf, smfData *data, AstFrameSet *outfset,
        map2sky) */
     oskyfrm = astGetFrame( outfset, AST__CURRENT );
     sky2map = astGetMapping( outfset, AST__BASE, AST__CURRENT );
+
     /* Invert it to get Output SKY to output map coordinates */
     astInvert( sky2map );
+
     /* Create a SkyFrame in absolute coordinates */
     abskyfrm = astCopy( oskyfrm );
     astClear( abskyfrm, "SkyRefIs" );
@@ -567,6 +530,7 @@ void smf_calc_mapcoord( smfWorkForce *wf, smfData *data, AstFrameSet *outfset,
         pdata->lbnd_out = lbnd_out;
         pdata->moving = moving;
         pdata->ubnd_out = ubnd_out;
+        pdata->tstep = tstep;
 
         /* Make deep copies of AST objects and unlock them so that each
            thread can then lock them for their own exclusive use */

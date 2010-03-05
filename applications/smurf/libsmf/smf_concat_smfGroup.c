@@ -18,8 +18,8 @@
  *                          size_t whichchunk, int ensureflat, int isTordered,
  *                          AstFrameSet *outfset, int moving,
  *                          int *lbnd_out, int *ubnd_out, dim_t padStart,
- *                          dim_t padEnd, int flags, smfArray **concat,
- *                          int *status )
+ *                          dim_t padEnd, int flags, int tstep,
+ *                          smfArray **concat, int *status )
 
  *  Arguments:
  *     wf = smfWorkForce * (Given)
@@ -58,6 +58,9 @@
  *     flags = int (Given)
  *        Additional flags to control processing of individual data files
  *        as they are being concatenated.
+ *     tstep = int (Given)
+ *        The increment in time slices between full Mapping calculations.
+ *        The Mapping for intermediate time slices will be approximated.
  *     concat = smfArray ** (Returned)
  *        smfArray containing concatenated data for each subarray
  *     status = int* (Given and Returned)
@@ -201,8 +204,8 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
                           size_t whichchunk, int ensureflat, int isTordered,
                           AstFrameSet *outfset, int moving,
                           int *lbnd_out, int *ubnd_out, dim_t padStart,
-                          dim_t padEnd, int flags, smfArray **concat,
-                          int *status ) {
+                          dim_t padEnd, int flags, int tstep,
+                          smfArray **concat, int *status ) {
 
   /* Local Variables */
   size_t bstr;                  /* Concatenated bolo stride */
@@ -448,7 +451,7 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
 
             /* Calculate the LUT for this chunk */
             smf_calc_mapcoord( wf, refdata, outfset, moving, lbnd_out, ubnd_out,
-                               SMF__NOCREATE_FILE, status );
+                               SMF__NOCREATE_FILE, tstep, status );
           } else {
             havelut = 0;
           }
@@ -746,7 +749,7 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
     }
 
     /* Shift the origin of the time axis in the WCS if padStart != 0 */
-    if( padStart && data->hdr && data->hdr->tswcs ) {
+    if( *status == SAI__OK && padStart && data->hdr && data->hdr->tswcs ) {
       /* Figure out the length of a sample in seconds */
       steptime = data->hdr->steptime;
 
