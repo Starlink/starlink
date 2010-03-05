@@ -13,8 +13,8 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_flat_standardpow( int allbad, smfData *powref, smfData *bolref,
-*                           int *status );
+*     smf_flat_precondition( int allbad, smfData *powref, smfData *bolref,
+*                            int *status );
 
 *  Arguments:
 *     allbad = int (Given)
