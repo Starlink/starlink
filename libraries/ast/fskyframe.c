@@ -94,3 +94,16 @@ F77_INTEGER_FUNCTION(ast_skyframe)( CHARACTER(OPTIONS),
    )
    return RESULT;
 }
+
+F77_INTEGER_FUNCTION(ast_skyoffsetmap)( INTEGER(THIS),
+                                        INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   F77_INTEGER_TYPE(RESULT);
+
+   astAt( "AST_SKYOFFSETMAP", NULL, 0 );
+   astWatchSTATUS(
+      RESULT = astP2I( astSkyOffsetMap( astI2P( *THIS ) ) );
+   )
+   return RESULT;
+}
+

@@ -48,6 +48,9 @@ frequency is less than the absoliute value of the intermediate frequency.
 
 - A new method astQuadApprox produces a quadratic fit to a 2D Mapping.
 
+- A new method astSkyOffsetMap produces a Mapping from absolute SkyFrame
+coordinates to offset SkyFrame coordinates.
+
 
 Main Changes in Version 5.3
 ---------------------------

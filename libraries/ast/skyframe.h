@@ -207,6 +207,7 @@ typedef struct AstSkyFrameVtab {
    AstClassIdentifier id;
 
 /* Properties (e.g. methods) specific to this class. */
+   AstMapping *(* SkyOffsetMap)( AstSkyFrame *, int * );
    const char *(* GetProjection)( AstSkyFrame *, int * );
    double (* GetEquinox)( AstSkyFrame *, int * );
    int (* GetNegLon)( AstSkyFrame *, int * );
@@ -314,6 +315,8 @@ void astInitSkyFrameGlobals_( AstSkyFrameGlobals * );
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
+AstMapping *astSkyOffsetMap_( AstSkyFrame *, int * );
+
 #if defined(astCLASS)            /* Protected */
 const char *astGetProjection_( AstSkyFrame *, int * );
 double astGetEquinox_( AstSkyFrame *, int * );
@@ -401,7 +404,8 @@ astINVOKE(O,astLoadSkyFrame_(mem,size,vtab,name,astCheckChannel(channel),STATUS_
 /* Interfaces to public member functions. */
 /* -------------------------------------- */
 
-/* None. */
+#define astSkyOffsetMap(this) \
+astINVOKE(O,astSkyOffsetMap_(astCheckSkyFrame(this),STATUS_PTR))
 
 /* Interfaces to protected member functions. */
 /* ----------------------------------------- */

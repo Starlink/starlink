@@ -49,13 +49,22 @@ f     display by using AST_FORMAT.
 *     - SkyRefP: Position defining orientation of the offset coordinate system
 
 *  Functions:
-c     The SkyFrame class does not define any new functions beyond those
-f     The SkyFrame class does not define any new routines beyond those
-*     which are applicable to all Frames.
+*     In addition to those 
+c     functions 
+f     routines
+*     applicable to all Frames, the following 
+c     functions 
+f     routines
+*     may also be applied to all SkyFrames:
+*
+c     - astSkyOffsetMap: Obtain a Mapping from absolute to offset coordinates
+f     - AST_SKYOFFSETMAP: Obtain a Mapping from absolute to offset coordinates
 
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
 *     Research Councils
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -271,6 +280,8 @@ f     The SkyFrame class does not define any new routines beyond those
 *        a second of the required epoch (this tolerance used to be 
 *        0.1 seconds).
 *        - Do not clear the cached LAST value in SetEpoch and ClearEpoch.
+*     8-MAR-2010 (DSB):
+*        Add astSkyOffsetMap method.
 *class--
 */
 
@@ -859,7 +870,7 @@ static int class_init = 0;       /* Virtual function table initialised? */
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
 static AstLineDef *LineDef( AstFrame *, const double[2], const double[2], int * );
-static AstMapping *OffsetMap( AstSkyFrame *, int * );
+static AstMapping *SkyOffsetMap( AstSkyFrame *, int * );
 static AstPointSet *ResolvePoints( AstFrame *, const double [], const double [], AstPointSet *, AstPointSet *, int * );
 static AstSystemType GetAlignSystem( AstFrame *, int * );
 static AstSystemType GetSystem( AstFrame *, int * );
@@ -4322,6 +4333,7 @@ void astInitSkyFrameVtab_(  AstSkyFrameVtab *vtab, const char *name, int *status
    vtab->SetEquinox = SetEquinox;
    vtab->SetNegLon = SetNegLon;
    vtab->SetProjection = SetProjection;
+   vtab->SkyOffsetMap = SkyOffsetMap;
    vtab->TestAsTime = TestAsTime;
    vtab->TestEquinox = TestEquinox;
    vtab->TestNegLon = TestNegLon;
@@ -5986,7 +5998,7 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
    Form the Mapping from the target coordinate system to the associated
    offset system. A UnitMap is returned if the target does not use an
    offset system. */
-   omap = OffsetMap( target, status );
+   omap = SkyOffsetMap( target, status );
    
 /* Invert it to get the Mapping from the actual used system (whther
    offsets or coordinates) to the coordinate system. */
@@ -6002,7 +6014,7 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
 /* Now form the Mapping from the result coordinate system to the associated
    offset system. A UnitMap is returned if the result does not use an
    offset system. */
-   omap = OffsetMap( result, status );
+   omap = SkyOffsetMap( result, status );
    
 /* Combine it with the above CmpMap, so that the CmpMap outputs feed the
    new Mapping inputs. Annul redundant pointers afterwards. */
@@ -6884,45 +6896,56 @@ static void Offset( AstFrame *this_frame, const double point1[],
    }
 }
 
-static AstMapping *OffsetMap( AstSkyFrame *this, int *status ){
+static AstMapping *SkyOffsetMap( AstSkyFrame *this, int *status ){
 /*
+*++
 *  Name:
-*     OffsetMap
+c     astSkyOffsetMap
+f     AST_SKYOFFSETMAP
 
 *  Purpose:
-*     Returns a Mapping which goes from System coordinates to offsets.
+*     Returns a Mapping which goes from absolute coordinates to offset 
+*     coordinates.
 
 *  Type:
-*     Private function.
+*     Public virtual function.
 
 *  Synopsis:
-*     #include "skyframe.h"
-*     AstMapping *OffsetMap( AstSkyFrame *this, int *status )
+c     #include "skyframe.h"
+c     AstMapping *astSkyOffsetMap( AstSkyFrame *this )
+f     RESULT = AST_SKYOFFSETMAP( THIS, STATUS )
 
 *  Class Membership:
-*     SkyFrame member function.
+*     SkyFrame method.
 
 *  Description:
 *     This function returns a Mapping in which the forward transformation
 *     transforms a position in the coordinate system given by the System
-*     attribute, into the offset coordinate system specified by the SkyRef,
-*     SkyRefP and SkyRefIs attributes.
+*     attribute of the supplied SkyFrame, into the offset coordinate system 
+*     specified by the SkyRef, SkyRefP and SkyRefIs attributes of the
+*     supplied SkyFrame.
 *
-*     A UnitMap is returned if the SkyFrame does not define am offset
+*     A UnitMap is returned if the SkyFrame does not define an offset
 *     coordinate system.
 
 *  Parameters:
-*     this
+c     this
+f     THIS = INTEGER (Given)
 *        Pointer to the SkyFrame.
-*     status
-*        Pointer to the inherited status variable.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
 
 *  Returned Value:
-*     A pointer to the new Mapping.
+c     astSkyOffsetMap()
+f     AST_SKYOFFSETMAP = INTEGER
+*        Pointer to the returned Mapping.
 
 *  Notes:
-*     - This function will return NULL if an error has already occurred,
-*     or if the function fails for any reason.
+*     - A null Object pointer (AST__NULL) will be returned if this
+c     function is invoked with the AST error status set, or if it
+f     function is invoked with STATUS set to an error value, or if it
+*     should fail for any reason.
+*--
 */
 
 /* Local Variables: */
@@ -11489,6 +11512,10 @@ int astGetLonAxis_( AstSkyFrame *this, int *status ) {
 double astGetSkyRefP_( AstSkyFrame *this, int axis, int *status ) { 
    if ( !astOK ) return 0.0; 
    return (**astMEMBER(this,SkyFrame,GetSkyRefP))( this, axis, status ); 
+}
+AstMapping *astSkyOffsetMap_( AstSkyFrame *this, int *status ) {
+   if ( !astOK ) return NULL;
+   return (**astMEMBER(this,SkyFrame,SkyOffsetMap))( this, status );
 }
 
 /* Special public interface functions. */
