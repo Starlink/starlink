@@ -1362,11 +1362,6 @@ void smf_timerinit( struct timeval *tv1, struct timeval *tv2, int *status);
 
 double smf_timerupdate( struct timeval *tv1, struct timeval *tv2, int *status);
 
-void smf_track_approx( smfData *data, int tstep, dim_t itime_lo, 
-                       dim_t itime_hi, AstSkyFrame *skyfrm, 
-                       double *tai_ref, dim_t *ntimes, double **times, 
-                       dim_t **itimes, int *status );
-
 void smf_tslice_ast (smfData * data, dim_t index, int needwcs, int * status );
 
 void smf_update_quality( smfData *data, unsigned char *target, int syncbad,

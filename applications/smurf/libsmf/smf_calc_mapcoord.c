@@ -85,15 +85,13 @@
 *     2009-11-03 (TIMJ):
 *        Skip bad bolo2map mappings.
 *     2010-02-25 (DSB):
-*        Only perform full Mapping calculations periodically. The Mappings 
-*        for intervening time slices are estimated using a cubic-spline 
-*        interpolation scheme.
+*        Only perform full Mapping calculations periodically. 
 
 *  Notes:
 *     This routines asserts ICD data order.
 
 *  Copyright:
-*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2009-2010 Science & Technology Facilities Council.
 *     Copyright (C) 2005-2009 University of British Columbia.
 *     All Rights Reserved.
 
