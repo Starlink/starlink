@@ -917,10 +917,14 @@
 
 *  Extend these bounds slightly.
          DX = 0.005*( BHI ( 1 ) - BLO( 1 ) )         
+         IF( DX .EQ. 0 ) DX = 0.005*BHI( 1 )
+         IF( DX .EQ. 0 ) DX = 1.0
          BLO( 1 ) = BLO( 1 ) - DX
          BHI( 1 ) = BHI( 1 ) + DX
 
          DY = 0.005*( BHI ( 2 ) - BLO( 2 ) )         
+         IF( DY .EQ. 0 ) DY = 0.005*BHI( 2 )
+         IF( DY .EQ. 0 ) DY = 1.0
          BLO( 2 ) = BLO( 2 ) - DY
          BHI( 2 ) = BHI( 2 ) + DY
 

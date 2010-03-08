@@ -40,6 +40,8 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
  
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
@@ -58,8 +60,12 @@
 *        Added TOKEN argument to KPG1_ASFRM calls.
 *     2-FEB-2001 (DSB):
 *        Changed to allow Base Frame to be 3D.
-*     14-FEB-2001 (DSB:
+*     14-FEB-2001 (DSB):
 *        Remove arguments PARAM, EPARAM and CONST.
+*     8-MAR-2010 (DSB):
+*        If the catalogue is in TST format, consider the columns
+*        specified by the RA_COL and DEC_COL parameters to hold RA and
+*        DEC values.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -200,7 +206,7 @@
 *  See if the supplied column names include RA and DEC columns.
          RAAX = 0
          DECAX = 0
-         DO J = 1, NDIM
+         DO I = 1, NDIM
             IF( CHR_SIMLR( NAME( I ), 'RA' ) ) THEN
                RAAX = I
             ELSE IF( CHR_SIMLR( NAME( I ), 'DEC' ) ) THEN
@@ -208,12 +214,41 @@
             END IF
          END DO
 
-*  If so, we create a SkyFrame (i.e. a CURSA "Target List" - see SUN/190).
+*  If not, see if the catalogue contains integer-valued parameters RA_COL
+*  and DEC_COL. These are assumed to be the zero-based index of the RA
+*  and DEC columns.
+         IF( RAAX .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN 
+            CALL CAT_TIDNT( CI, 'RA_COL', GC, STATUS )
+            IF( STATUS .EQ. SAI__OK ) THEN
+               CALL CAT_TIQAI( GC, 'VALUE', RAAX, STATUS )
+
+               CALL CAT_TIDNT( CI, 'DEC_COL', GC, STATUS )
+               IF( STATUS .EQ. SAI__OK ) THEN
+                  CALL CAT_TIQAI( GC, 'VALUE', DECAX, STATUS )
+                  IF( DECAX .GE. 0 .AND. RAAX .GE. 0 ) THEN
+                     DECAX = DECAX + 1
+                     RAAX = RAAX + 1
+                  ELSE
+                     DECAX = 0
+                     RAAX = 0
+                  END IF
+               ELSE
+                  RAAX = 0
+                  CALL ERR_ANNUL( STATUS )
+               END IF
+
+            ELSE
+               CALL ERR_ANNUL( STATUS )
+            END IF
+         END IF
+
+*  If we now have RA and DEC columns, we create a SkyFrame (i.e. a CURSA 
+*  "Target List" - see SUN/190).
          FRM1 = AST__NULL 
          IF( RAAX .NE. 0 .AND. DECAX .NE. 0 ) THEN
             FRM1 = AST_SKYFRAME( ' ', STATUS )
 
-*  Look for the EPOCH and EQUINOX catalogue parameters. If supplied
+*  Look for EPOCH, EQUINOX and SYSTEM catalogue parameters. If supplied
 *  set the corresponding attributes in the SkyFrame, and then retrieve
 *  them as floating point values.
             IF( STATUS .EQ. SAI__OK ) THEN 
@@ -240,23 +275,35 @@
                EP = -1.0D0
             END IF
 
-*  Choose the reference frame (FK4 or FK5). 
-            IF( EQ .NE. -1.0D0 ) THEN
-               IF( EQ .LT. 1984.0D0 ) THEN
-                  SYS = 'FK4'
-               ELSE
-                  SYS = 'FK5'
-               END IF
+            CALL CAT_TIDNT( CI, 'SYSTEM', GC, STATUS )
+            IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
 
-            ELSE IF( EP .NE. -1.0D0 ) THEN
-               IF( EP .LT. 1984.0D0 ) THEN
-                  SYS = 'FK4'
-               ELSE
-                  SYS = 'FK5'
-               END IF
-
+            IF( GC .NE. CAT__NOID ) THEN
+               CALL CAT_TIQAC( GC, 'VALUE', SYS, STATUS )
             ELSE
-               SYS = 'FK5'
+               SYS = ' '
+            END IF
+
+*  If no System parameter was found, choose a system based on the 
+*  epoch and equinox.
+            IF( SYS .EQ. ' ' ) THEN
+               IF( EQ .NE. -1.0D0 ) THEN
+                  IF( EQ .LT. 1984.0D0 ) THEN
+                     SYS = 'FK4'
+                  ELSE
+                     SYS = 'FK5'
+                  END IF
+   
+               ELSE IF( EP .NE. -1.0D0 ) THEN
+                  IF( EP .LT. 1984.0D0 ) THEN
+                     SYS = 'FK4'
+                  ELSE
+                     SYS = 'FK5'
+                  END IF
+   
+               ELSE
+                  SYS = 'FK5'
+               END IF
             END IF
 
             CALL AST_SETC( FRM1, 'SYSTEM', SYS, STATUS )
