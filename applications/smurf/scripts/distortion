@@ -129,32 +129,50 @@ foreach indir ($dir_list)
 #  ===================================
    if( $method == TIMESLICES ) then
 
-#  Need to identify the darks and the non-darks. Loop round all scans in
-#  the current directory.
-      touch darks.lis
-      set nondarks = ""
+#  Need to identify usable scans. Loop round all scans in the current directory.
+#  Store the names of the unusable scans in a text file in the temp directory. 
+#  Store the names of the usable scans in a variable.
+      touch unusable.lis
+      set usable = ""
       foreach n ($indir/s*_*_*.sdf)
 
-#  Check the file has a SHUTTER keyword in its FITS extension
-         set there = `$KAPPA_DIR/fitsmod $n edit=exist keyword=SHUTTER`
+#  If the file has SEQ_TYPE and OBS_TYPE headers, the scan is usable if
+#  the values of these headers are equal
+         set there = `$KAPPA_DIR/fitsmod $n edit=exist keyword=SEQ_TYPE`
          if( "$there" == "TRUE" ) then      
+            set there = `$KAPPA_DIR/fitsmod $n edit=exist keyword=OBS_TYPE`
+            if( "$there" == "TRUE" ) then      
+               set seq_type = `$KAPPA_DIR/fitsmod $n edit=print keyword=SEQ_TYPE`
+               set obs_type = `$KAPPA_DIR/fitsmod $n edit=print keyword=OBS_TYPE`
+               if( "$seq_type" != "$obs_type" ) then
+                  echo $n >> unusable.lis
+               else
+                  set usable = "$usable $n"
+               endif
+            endif
+         endif 
 
-#  If the value of SHUTTER is zero, the scan is a dark. Store the names of 
-#  the darks in a text file in the temp directory. Store the names of the 
-#  non-darks in a variable.
-            set val = `$KAPPA_DIR/fitsmod $n edit=print keyword=SHUTTER`
-            if( "$val" == "0" ) then
-               echo $n >> darks.lis
-            else
-               set nondarks = "$nondarks $n"
+#  If either the SEQ_TYPE or OBS_TYPE header was not found, check the file has 
+#  a SHUTTER keyword in its FITS extension
+         if( "$there" != "TRUE" ) then  
+            set there = `$KAPPA_DIR/fitsmod $n edit=exist keyword=SHUTTER`
+            if( "$there" == "TRUE" ) then      
+
+#  If the value of SHUTTER is zero, the scan is a dark (unusable). 
+               set val = `$KAPPA_DIR/fitsmod $n edit=print keyword=SHUTTER`
+               if( "$val" == "0" ) then
+                  echo $n >> unusable.lis
+               else
+                  set usable = "$usable $n"
+               endif
             endif
          endif
       end
 
-#  We process each non-dark separately. Loop round them all.
+#  We process each usable scan separately. Loop round them all.
       set cats = " "
       set iscan = 0
-      foreach n ($nondarks)
+      foreach n ($usable)
          @ iscan = $iscan + 1
          set scandir = `basename $n .sdf`
          mkdir $scandir
@@ -168,7 +186,7 @@ foreach indir ($dir_list)
 #  Use the iterative mapmaker to extract the astronomical and residual signals
 #  from a single subscan (with flat).
          echo "$n" > in.lis
-         echo "^../darks.lis" >> in.lis
+         echo "^../unusable.lis" >> in.lis
          rm -f junk.log
          $SMURF_DIR/makemap ^in.lis method=iter out=junk \
               config="'^$SMURF_DIR/../../share/smurf/dimmconfig_distortionmap.lis,exportndf=(ast,res,qua),bolomap=0'" >& junk.log
@@ -438,36 +456,52 @@ foreach indir ($dir_list)
 #  Get the observation number.
       set obsnum = `$KAPPA_DIR/fitsmod junk edit=print keyword=OBSNUM`
       
-#  Need to identify a non dark subscan. Loop round all subscans in the 
-#  current directory.
-      set nondark = " "
+#  Need to identify a usable subscan. Loop round all subscans in the 
+#  current directory. 
+      set usable = " "
       foreach n ($indir/s*_*_*.sdf)
-      
-#  Check the file has a SHUTTER keyword in its FITS extension
-         set there = `$KAPPA_DIR/fitsmod $n edit=exist keyword=SHUTTER`
+
+#  If the file has SEQ_TYPE and OBS_TYPE headers, the scan is usable if
+#  the values of these headers are equal
+         set there = `$KAPPA_DIR/fitsmod $n edit=exist keyword=SEQ_TYPE`
          if( "$there" == "TRUE" ) then      
-      
-#  If the value of SHUTTER is zero, the scan is a dark. If not, store the name 
-#  of the scan for future use.
-            set val = `$KAPPA_DIR/fitsmod $n edit=print keyword=SHUTTER`
-            if( "$val" != "0" ) then
-               set nondark = "$n"
+            set there = `$KAPPA_DIR/fitsmod $n edit=exist keyword=OBS_TYPE`
+            if( "$there" == "TRUE" ) then      
+               set seq_type = `$KAPPA_DIR/fitsmod $n edit=print keyword=SEQ_TYPE`
+               set obs_type = `$KAPPA_DIR/fitsmod $n edit=print keyword=OBS_TYPE`
+               if( "$seq_type" == "$obs_type" ) then
+                  set usable = "$n"
+               endif
+            endif
+         endif 
+
+#  If either the SEQ_TYPE or OBS_TYPE header was not found, check the file has 
+#  a SHUTTER keyword in its FITS extension
+         if( "$there" != "TRUE" ) then  
+            set there = `$KAPPA_DIR/fitsmod $n edit=exist keyword=SHUTTER`
+            if( "$there" == "TRUE" ) then      
+
+#  If the value of SHUTTER is zero, the scan is a dark (unusable). 
+               set val = `$KAPPA_DIR/fitsmod $n edit=print keyword=SHUTTER`
+               if( "$val" != "0" ) then
+                  set usable = "$n"
+               endif
             endif
          endif
       end
       
-      if( "$nondark" == " " ) then
-         echo "All scans are darks"
+      if( "$usable" == " " ) then
+         echo "No usable scans found"
          exit
       endif
       
 #  Get a Mapping from bolometer array pixel offsets from the reference point, 
 #  to (Az,El) offsets from the reference point, for a typical time slice, 
-#  in the non-dark scan found above, and invert it so it goes the other way. 
+#  in the usable scan found above, and invert it so it goes the other way. 
 #  Using this bolomaps approach, we need to assume that all the time slices 
 #  are rotated in the same way on the sky. The timeslices approach does not 
 #  suffer from this assumption.
-      $SMURF_DIR/dsutils in=$nondark bmap=bmap.ast
+      $SMURF_DIR/dsutils in=$usable bmap=bmap.ast
       $ATOOLS_DIR/astinvert bmap.ast bmap.ast
       
 #  Write the header for the output catalogue. 
