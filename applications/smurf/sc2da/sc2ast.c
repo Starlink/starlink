@@ -5,6 +5,7 @@
 
 #include "star/slalib.h"
 #include "sae_par.h"
+#include "prm_par.h"
 #include "ast.h"
 #include "ndf.h"
 #include "Ers.h"
@@ -271,6 +272,7 @@ int *status             /* global status (given and returned) */
      26Jan2010 : Reset the current Frame in the cached FrameSet each time
                  this function is called, in case the caller has changed
                  it. (DSB)
+     09Mar2010 : Check SMU values are not VAL__BADD before using them.
 */
 {
 
@@ -1054,9 +1056,12 @@ int *status             /* global status (given and returned) */
    azelmap = sc2ast_maketanmap( state->tcs_az_ac1, state->tcs_az_ac2,
 				cache->azel, state->tcs_az_ac2, status );
 
-/* Calculate final mapping with SMU position correction only if needed */
-   if( (!state->smu_az_jig_x)  && (!state->smu_az_jig_y) &&
-       (!state->smu_az_chop_x) && (!state->smu_az_chop_y) ) {
+/* Calculate final mapping with SMU position correction only if needed
+   (i.e. ignore SMU if all four values are zero or if any single value is bad) */
+   if( ( (!state->smu_az_jig_x) && (!state->smu_az_jig_y) &&
+         (!state->smu_az_chop_x) && (!state->smu_az_chop_y) ) ||
+       state->smu_az_jig_x == VAL__BADD || state->smu_az_jig_y == VAL__BADD ||
+       state->smu_az_chop_x == VAL__BADD || state->smu_az_chop_y == VAL__BADD ){
     
 /* Combine these with the cached Mapping (from GRID coords for subarray 
    to Tanplane Nasmyth coords in rads), to get total Mapping from GRID 
