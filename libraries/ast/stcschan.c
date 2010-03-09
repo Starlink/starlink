@@ -437,6 +437,7 @@ static char *AddItem( AstStcsChan *this, AstKeyMap *km, const char *key,
 
 /* Initialise */
    result = line;
+   len = 0;
 
 /* Check the global error status. */
    if ( !astOK ) return result;
@@ -2447,8 +2448,6 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
    AstTimeScaleType ts;      /* TimeFrame TimeScale attribute value */
    WordContext con;          /* Context for finding next source word */
    char *fbuf;               /* Pointer to buffer holding document fragment */
-   char *frame;              /* Space frame name */
-   char *unit;               /* Pointer to unit string */
    const char *new_ts;       /* Time scale string */
    double epoch;             /* Value to use for the Epoch attribue */
    double fill;              /* Filling factor */
@@ -2493,12 +2492,14 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
    time_enc = NULL;
    space_co = NULL;
    space_enc = NULL;
+   spacefrm = NULL;
    spec_co = NULL;
    spec_enc = NULL;
    red_co = NULL;
    red_enc = NULL;
    use_co = 1;
    use_enc = 0;
+   scale = 1.0;
 
 /* Read the STC-S description from the external source, parse it, and
    create a KeyMap containing the parsed property values. */
@@ -2678,7 +2679,7 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
          } else if( astOK ) {
             astError( AST__BADIN, "astRead(StcsChan): Unsupported "
                       "units (%s) for the time axis within an "
-                      "STC-S description.", status, unit );
+                      "STC-S description.", status, cval );
          }
 
       } else {
@@ -2780,6 +2781,7 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
          }
 
       } else {
+         cval = "UNKNOWNFrame";
          sys = AST__UNKNOWN;
          astAddWarning( this, 1, "Space frame defaulting to 'UNKNOWNFrame' "
                         "in an STC-S description.", "astRead", status );
@@ -2791,7 +2793,7 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
 
 /* If we have a basic Frame, set the Domain equal to the STC-S frame value. */
       } else {
-         astSetDomain( spacefrm, frame );
+         astSetDomain( spacefrm, cval );
       }
 
 /* Set the epoch of the space frame. */

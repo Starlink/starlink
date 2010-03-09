@@ -4717,6 +4717,10 @@ static int Match( AstFrame *template_frame, AstFrame *target,
 /* Obtain a pointer to the template CmpFrame structure. */
    template = (AstCmpFrame *) template_frame;
 
+/* Further initialisation to avoid compiler warnings. */
+   naxes_min = 0;
+   naxes_max = 0;
+
 /* Obtain the maximum number of axes that the template CmpFrame, and each 
    component Frame of the template CmpFrame, can match. If the MaxAxes
    attribute is set for the template, use it and assume that each

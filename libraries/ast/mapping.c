@@ -8646,6 +8646,7 @@ f     - A value of .FALSE.
    result = 0;
    fit[ 0 ] = AST__BAD;
    *rms = AST__BAD;
+   ntot = 0;
 
 /* Check the global error status. */
    if( !astOK ) return result;
@@ -8701,7 +8702,6 @@ f     - A value of .FALSE.
 /* Assume the approximation can be created. */
       result = 1;
       *rms = 0.0;
-      ntot = 0;
 
 /* Loop round each Mapping output. */
       for( iout = 0; iout < nout && astOK; iout++ ) {
