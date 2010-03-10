@@ -171,7 +171,5 @@ void smf_flat_mergedata( const smfArray * heatframes,
     (*bolvald)->da = da;
   }
 
-  smf_write_smfData( *bolvald, NULL, NULL, "testme2", NULL, 0, 0, status );
-
   return;
 }
