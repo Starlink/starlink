@@ -147,11 +147,13 @@ smf_fix_metadata_scuba2.c \
 smf_flag_spikes.c \
 smf_flag_spikes2.c \
 smf_flag_stationary.c \
+smf_flat_calcflat.c \
 smf_flat_fitpoly.c \
 smf_flat_malloc.c \
 smf_flat_mergedata.c \
 smf_flat_methcode.c \
 smf_flat_methstring.c \
+smf_flat_params.c \
 smf_flat_precondition.c \
 smf_flat_responsivity.c \
 smf_flat_smfData.c \

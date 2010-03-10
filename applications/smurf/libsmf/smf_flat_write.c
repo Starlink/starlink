@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     void smf_flat_write( smf_flatmeth flatmeth, const char * flatname,
-*                          const smfArray * bbhtframes, const double heater[],
+*                          const smfData * bolval,
 *                          const smfData * powref,const smfData * bolref,
 *                          const smfData * polyfit, const Grp * prvgrp, int * status );
 
@@ -24,10 +24,9 @@
 *        bolref.
 *     flatname = const char * (Given)
 *        Name to be used for flatfield file.
-*     heatframes = const smfArray* (Given)
-*        Collection of heat frames.
-*     heater = const double [] (Given)
-*        Heater settings. One for each heatframe.
+*     bolval = const smfData * (Given)
+*        Merged flatfield bolometer data as calculated by smf_flat_fastflat
+*        or smf_flat_mergedata.
 *     powref = const smfData * (Given)
 *        Heater power settings in pW. Must be same number of elements
 *        as present in "heatframes".
@@ -78,6 +77,9 @@
 *        Switch to a smfData API
 *     2010-02-03 (TIMJ):
 *        Add ability to write the polynomial expansion to an extension.
+*     2010-03-08 (TIMJ):
+*        Change API to use merged flatfield raw data so that we can share
+*        code with smf_flat_fastflat and smf_flat_mergedata.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -111,17 +113,18 @@
 #include "star/atl.h"
 #include "star/kaplibs.h"
 #include "star/one.h"
-
-#include "sc2da/sc2store.h"
-#include "sc2da/sc2ast.h"
-
 #include "star/grp.h"
 #include "prm_par.h"
 #include "sae_par.h"
 #include "par_par.h"
+#include "mers.h"
+
+#include "sc2da/sc2store.h"
+#include "sc2da/sc2ast.h"
+
 
 void smf_flat_write( smf_flatmeth flatmeth, const char * flatname,
-                     const smfArray * bbhtframes, const double heater[],
+                     const smfData * bolval,
                      const smfData * powref, const smfData * bolref,
                      const smfData * polyfit, const Grp * prvgrp, int * status ) {
 
@@ -131,13 +134,12 @@ void smf_flat_write( smf_flatmeth flatmeth, const char * flatname,
   char fitsrec[SC2STORE__MAXFITS*80+1]; /* Store for FITS records */
   int *ibuf = NULL;            /* int buffer for mean data */
   int indf = NDF__NOID;        /* NDF identifier for output file */
-  smfData * frame = NULL;      /* single frame */
   size_t ncards;               /* number of fits cards */
   size_t numbols;              /* number of bolometers */
   double *outvar = NULL;       /* buffer for variance of data */
   int place = NDF__NOPL;       /* Dummy placeholder for NDF */
   size_t rowsize;              /* number of rows */
-  JCMTState *state;            /* State for this flatfield */
+  JCMTState *state = NULL;     /* State for this flatfield */
   int subnum;                  /* subarray number */
 
   AstFrameSet *result, *spacefset;
@@ -146,72 +148,77 @@ void smf_flat_write( smf_flatmeth flatmeth, const char * flatname,
 
 
   int *dksquid;           /* pointer to dummy dark SQUID data */
-  size_t i;                  /* loop counter */
-  size_t j;                  /* loop counter */
+  size_t j;               /* loop counter */
   int jig_vert[1][2];     /* dummy jiggle vertices */
   double jig_path[1][2];  /* dummy jiggle path */
   int *mcehead = NULL;    /* dummy mce header */
   size_t mceheadsz = 0;   /* dummy mce header size */
+  size_t nframes = 0;     /* Number of frames in bolval */
   int npath = 0;          /* size of jiggle path */
   int nvert = 0;          /* number of jiggle vertices */
   char *xmlfile = NULL;   /* dummy xmlfile name */
 
   if (*status != SAI__OK) return;
 
-  frame = (bbhtframes->sdata)[0];
+  if (!bolval->da) {
+    *status = SAI__ERROR;
+    errRep( "", "No flatfield solution provided for writing",
+            status );
+    return;
+  }
+
+  if (!bolval->da->heatval) {
+    *status = SAI__ERROR;
+    errRep( "", "Must provide heater values in DA struct to smf_flat_write"
+            " (possible programming error)", status );
+    return;
+  }
 
   /* note that colsize is the number of rows and rowsize is the number of
      columns */
-  colsize = (frame->dims)[SC2STORE__ROW_INDEX];
-  rowsize = (frame->dims)[SC2STORE__COL_INDEX];
+  colsize = (bolval->dims)[SC2STORE__ROW_INDEX];
+  rowsize = (bolval->dims)[SC2STORE__COL_INDEX];
   numbols = colsize * rowsize;
+  nframes = (bolval->dims)[2];
 
   /* Make sure we have a FLAT header that reflects this file
      as the flatfield solution */
-  smf_fits_updateS( frame->hdr, "FLAT", flatname, "Name of flat-field file",
+  smf_fits_updateS( bolval->hdr, "FLAT", flatname, "Name of flat-field file",
                     status );
 
   /* Create a FITS header for DA */
-  smf_fits_export2DA( frame->hdr->fitshdr, &ncards, fitsrec, status );
+  smf_fits_export2DA( bolval->hdr->fitshdr, &ncards, fitsrec, status );
 
   /* Copy the data as integers so it can be written to data file. To
      prevent overflow in the variance we store that as doubles */
 
-  ibuf = smf_malloc( numbols * bbhtframes->ndat, sizeof(*ibuf), 0, status );
-  outvar = smf_malloc( numbols * bbhtframes->ndat, sizeof(*outvar), 0, status );
+  ibuf = smf_malloc( numbols * nframes, sizeof(*ibuf), 0, status );
+  outvar = smf_malloc( numbols * nframes, sizeof(*outvar), 0, status );
 
-  for (j = 0; j < bbhtframes->ndat; j++) {
-    frame = (bbhtframes->sdata)[j];
-    dbuf = (frame->pntr)[0];
-    dvar = (frame->pntr)[1];
-    for (i = 0; i < numbols; i++ ) {
-      size_t index = j*numbols+i;
-      /* These started off as integers so the mean value must fit in
-         an integer */
-      if ( dbuf[i] == VAL__BADD) {
-        ibuf[index] = VAL__BADI;
-      } else {
-        ibuf[index] = (int)dbuf[i];
-      }
-      /* Same data type so no need to convert bad values */
-      if (dvar) {
-        outvar[index] = dvar[i];
-      } else {
-        outvar[index] = VAL__BADD;
-      }
+  dbuf = (bolval->pntr)[0];
+  dvar = (bolval->pntr)[1];
+
+  for (j = 0; j < (nframes * numbols); j++) {
+    /* These started off as integers so the mean value must fit in
+       an integer */
+    if ( dbuf[j] == VAL__BADD) {
+      ibuf[j] = VAL__BADI;
+    } else {
+      ibuf[j] = (int)dbuf[j];
+    }
+    /* Same data type so no need to convert bad values */
+    if (dvar) {
+      outvar[j] = dvar[j];
+    } else {
+      outvar[j] = VAL__BADD;
     }
   }
 
-  /* Get the representative jcmtstate and sub array number */
-  state = smf_malloc( bbhtframes->ndat, sizeof(*state), 0, status );
-  for (i = 0; i < bbhtframes->ndat; i++) {
-    frame = (bbhtframes->sdata)[i];
-    memcpy( &(state[i]), &(frame->hdr->allState)[0], sizeof(*state) );
-  }
-  smf_find_subarray( frame->hdr, NULL, 0, &subnum, status );
+  /* get subarray number */
+  smf_find_subarray( bolval->hdr, NULL, 0, &subnum, status );
 
   /* Create dummy components for output file */
-  dksquid = smf_malloc ( rowsize* bbhtframes->ndat, sizeof(*dksquid),1,
+  dksquid = smf_malloc ( rowsize* nframes, sizeof(*dksquid),1,
                          status );
   jig_vert[0][0] = 0;
   jig_vert[0][1] = 0;
@@ -220,9 +227,9 @@ void smf_flat_write( smf_flatmeth flatmeth, const char * flatname,
 
   sc2store_setcompflag ( 0, status );
   sc2store_wrtstream ( flatname, subnum, ncards,
-                       fitsrec, colsize, rowsize, bbhtframes->ndat,
+                       fitsrec, colsize, rowsize, nframes,
                        (bolref->dims)[2], 0, smf_flat_methstring( flatmeth, status ),
-                       state, NULL,
+                       bolval->hdr->allState, NULL,
                        ibuf, dksquid, (bolref->pntr)[0], (powref->pntr)[0],
                        "FLATCAL", mcehead, NULL, mceheadsz, jig_vert,
                        nvert, jig_path, npath, xmlfile, status );
@@ -265,7 +272,7 @@ void smf_flat_write( smf_flatmeth flatmeth, const char * flatname,
 
   /* Create a simple frame for heater settings */
   heatfrm = astFrame( 1, "Domain=HEATER,Label(1)=Heater Setting" );
-  heatmap = astLutMap( bbhtframes->ndat, heater, 1.0, 1.0, " " );
+  heatmap = astLutMap( nframes, bolval->da->heatval, 1.0, 1.0, " " );
 
   /* Append the heater axis to the spatial frameset */
   atlAddWcsAxis( result, (AstMapping *)heatmap, (AstFrame *) heatfrm,
@@ -291,7 +298,7 @@ void smf_flat_write( smf_flatmeth flatmeth, const char * flatname,
   if (polyfit) {
     char fitfile[GRP__SZNAM+1];
     int fndf = NDF__NOID;
-    int place = NDF__NOPL;
+    place = NDF__NOPL;
     one_strlcpy( fitfile, flatname, sizeof(fitfile), status );
     one_strlcat( fitfile, ".MORE.SMURF.FLATFIT", sizeof(fitfile), status );
 
