@@ -49,6 +49,8 @@
 *  History:
 *     2010-03-04 (TIMJ):
 *        Initial version
+*     2010-03-09 (TIMJ):
+*        Also merge JCMTSTATE information.
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -145,6 +147,16 @@ void smf_flat_mergedata( const smfArray * heatframes,
         }
       }
     }
+  }
+
+  /* Get the representative jcmtstate information */
+  if (*status == SAI__OK) {
+    JCMTState * state = smf_malloc( nheat, sizeof(*state), 0, status );
+    for (i = 0; i < nheat; i++) {
+      smfData * frame = (heatframes->sdata)[i];
+      memcpy( &(state[i]), &(frame->hdr->allState)[0], sizeof(*state) );
+    }
+    (*bolvald)->hdr->allState = state;
   }
 
   /* Store the heater values in a smfDA */
