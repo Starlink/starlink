@@ -294,6 +294,7 @@ void smf_close_file( smfData ** data, int * status ) {
     da->flatcal = smf_free( da->flatcal, status );
     da->flatpar = smf_free( da->flatpar, status );
     da->dksquid = smf_free( da->dksquid, status );
+    da->heatval = smf_free( da->heatval, status );
     da = smf_free( da, status );
   }
 
