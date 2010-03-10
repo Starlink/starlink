@@ -31,16 +31,16 @@
 *        N-sigma threshold for primary DC jump to be detected.
 *     dcthresh2 = double (Given)
 *        N-sigma threshold for secondary DC jump to be detected.
-*        Secondary jumps are those induced by a primary jump in another 
-*        bolometer. Secondary jumps are assumed to occur at the same time 
-*        slice as the primary jump that induces them. dcthresh2 should 
+*        Secondary jumps are those induced by a primary jump in another
+*        bolometer. Secondary jumps are assumed to occur at the same time
+*        slice as the primary jump that induces them. dcthresh2 should
 *        have a lower value than dcthresh.
 *     dcbox = dim_t (Given)
 *        Length of box (in samples) over which to calculate statistics
 *     dcflag = int (Given)
 *        if 0 handle all bolos independently and attempt to fix steps
 *        if 1 just flag entire bolo as bad if step encountered
-*        if 2 identify steps, and then repair/flag all bolometers at those 
+*        if 2 identify steps, and then repair/flag all bolometers at those
 *        spots that show a dc step of greater than "dcthresh2" times the
 *        noise level.
 *     nsteps = size_t* (Returned)
@@ -85,7 +85,7 @@
 *     2010-01-14 (EC):
 *        In single bolo case flag 2*box window instead of single sample
 *     2010-01-20 (DSB):
-*        - Added argument dcthresh2. 
+*        - Added argument dcthresh2.
 *        - Use threads.
 *     2010-01-21 (EC):
 *        Fixed up to work in single-thread mode
@@ -210,7 +210,7 @@ static void smf__correct_steps_baseline( double *dat, unsigned char *qua,
 /* Public routine */
 
 void smf_correct_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
-                        double dcthresh, double dcthresh2, dim_t dcbox, 
+                        double dcthresh, double dcthresh2, dim_t dcbox,
                         int dcflag, size_t *nsteps, int *status ) {
 
   /* Local Variables */
@@ -301,7 +301,7 @@ void smf_correct_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
     }
 
     /* For dcflag==2, all threads need to use the same "alljump" buffer,
-       so allocate it now, and initialise a mutex to guard access to it. 
+       so allocate it now, and initialise a mutex to guard access to it.
        For other dclfags values, each thread creates its own alljump array. */
     if( dcflag == 2 ) {
       alljump = smf_malloc( ntslice, sizeof(*alljump), 1, status );
@@ -339,7 +339,7 @@ void smf_correct_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
       pdata->tstride = tstride;
 
       /* Submit a job to the workforce to process this group of bolometers. */
-      (void) smf_add_job( wf, 0, pdata, smfCorrectStepsParallel, NULL, 
+      (void) smf_add_job( wf, 0, pdata, smfCorrectStepsParallel, NULL,
                           status );
     }
 
@@ -395,9 +395,9 @@ void smf_correct_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
         pdata2->ntslice = ntslice;
         pdata2->qua = qua;
         pdata2->tstride = tstride;
-  
+
         /* Submit a job to the workforce to process this group of bolos. */
-        (void) smf_add_job( wf, 0, pdata2, smfCorrectStepsParallel2, NULL, 
+        (void) smf_add_job( wf, 0, pdata2, smfCorrectStepsParallel2, NULL,
                             status );
       }
 
@@ -585,7 +585,7 @@ static void smfCorrectStepsParallel( void *job_data_ptr, int *status ) {
                 alljump[wherebiggest] = biggest;
                 wherebad = wherebiggest;
 
-                /* Unlock the alljump mutex so that other threads can 
+                /* Unlock the alljump mutex so that other threads can
                    access the alljump array. */
                 smf_mutex_unlock( pdata->alljump_mutex, status );
 
@@ -739,7 +739,7 @@ static void smfCorrectStepsParallel2( void *job_data_ptr, int *status ) {
           } else {
             thisjump[j] = mean2 - mean1;
           }
-  
+
           /* Flag entire 2*DCBOX window if the jump is significant,
              and set a flag indicating we need to call the correction
              function. */
@@ -748,7 +748,7 @@ static void smfCorrectStepsParallel2( void *job_data_ptr, int *status ) {
               qua[i*bstride+k*tstride] |= SMF__Q_JUMP;
             }
             correct = 1;
-  
+
           /* Otherwise set the jump magnitude to zero to prevent it
              introducing any correction. */
           } else {
@@ -756,7 +756,7 @@ static void smfCorrectStepsParallel2( void *job_data_ptr, int *status ) {
           }
         }
       }
-  
+
       /* Permform the correction only if any significant jumps were found in this
          bolometer. */
       if( correct ) {
@@ -765,7 +765,7 @@ static void smfCorrectStepsParallel2( void *job_data_ptr, int *status ) {
                                       iend-istart+1, tstride, thisjump+istart );
       }
     }
-  } 
+  }
 
   /* Free resources */
   thisjump = smf_free( thisjump, status );
