@@ -15,7 +15,7 @@
 *  Invocation:
 *     pntr = smf_construct_smfDA( smfDA * tofill, int *dksquid,
 *                    double * flatcal, double * flatpar,
-*                    const char * flatname, int nflat, double * heatval,
+*                    smf_flatmeth flatmeth, int nflat, double * heatval,
 *                    int nheat, int * status );
 
 *  Arguments:
@@ -28,8 +28,8 @@
 *        Pointer to array of flat calibration values.
 *     flatpar = double* (Given)
 *        Pointer to array of flat parameters
-*     flatname = const char * (Given)
-*        Name of flatfield algorithm. The string is copied.
+*     flatmeth = smf_flatmeth (Given)
+*        Flatfield method enum.
 *     nflat = int (Given)
 *        Number of flatfield parameters per bolometer
 *     heatval = double * (Given)
@@ -69,10 +69,12 @@
 *        Use smf_create_smfDA to create an empty smfDA
 *     2008-07-11 (TIMJ):
 *        use one_strlcpy. Add dksquid.
+*     2010-03-09 (TIMJ):
+*        flatname is now flatmeth
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008,2010 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research
 *     Council. University of British Columbia. All Rights Reserved.
 
@@ -115,7 +117,7 @@
 
 smfDA *
 smf_construct_smfDA( smfDA * tofill, int *dksquid, double * flatcal,
-		     double * flatpar, const char * flatname,
+		     double * flatpar, smf_flatmeth flatmeth,
                      int nflat, double * heatval, int nheat, int * status ) {
 
   smfDA * da = NULL;   /* File components */
@@ -136,11 +138,7 @@ smf_construct_smfDA( smfDA * tofill, int *dksquid, double * flatcal,
     da->heatval = heatval;
     da->nflat = nflat;
     da->nheat = nheat;
-    if (flatname != NULL) {
-      one_strlcpy(da->flatname, flatname, sizeof(da->flatname), status);
-    } else {
-      (da->flatname)[0] = '\0';
-    }
+    da->flatmeth = flatmeth;
   } else {
     msgOutif(MSG__VERB," ", 
 	     "Unable to allocate memory for new smfDA", status);

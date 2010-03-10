@@ -36,6 +36,7 @@
 *  Authors:
 *     Andy Gibb (UBC)
 *     Ed Chapin (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -48,6 +49,8 @@
 *        Propagate dark squid. Use one_strlcpy.
 *     2010-03-04 (TIMJ):
 *        Add protection against NULL pointers and add heater entry.
+*     2010-03-09 (TIMJ):
+*        Method is now an enum
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -99,7 +102,7 @@ smf_deepcopy_smfDA( const smfData *old, int * status ) {
   double *flatcal;        /* pointer to flatfield calibration */
   double *flatpar;        /* pointer to flatfield parameters */
   double *heatval;        /* pointer to heater values */
-  char flatname[SC2STORE_FLATLEN];/* name of flatfield algorithm */
+  smf_flatmeth flatmeth;  /* Flatfield method */
   size_t nheat;           /* number of entries in heatval */
   size_t nflat;           /* number of flat coeffs per bol */
   size_t nbol;            /* Number of bolometers */
@@ -116,6 +119,7 @@ smf_deepcopy_smfDA( const smfData *old, int * status ) {
   /* Copy elements */
   nflat = oldda->nflat;
   nheat = oldda->nheat;
+  flatmeth = oldda->flatmeth;
 
   /* Need the number of bolometers, columns and time slices */
   nbol = (old->dims)[0] * (old->dims)[1];
@@ -150,14 +154,8 @@ smf_deepcopy_smfDA( const smfData *old, int * status ) {
     }
   }
 
-  if (oldda->flatname != NULL) {
-    one_strlcpy(flatname, oldda->flatname, sizeof(flatname), status);
-  } else {
-    flatname[0] = '\0';
-  }
-
   /* Construct the new smfData */
-  newda = smf_construct_smfDA( newda, dksquid, flatcal, flatpar, flatname,
+  newda = smf_construct_smfDA( newda, dksquid, flatcal, flatpar, flatmeth,
                                nflat, heatval, nheat, status);
 
   return newda;

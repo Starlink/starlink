@@ -77,6 +77,8 @@
 *     2010-02-04 (TIMJ):
 *        New smf_flat_responsibity and smf_flat_smfData API to support
 *        flatfield method.
+*     2010-03-09 (TIMJ):
+*        Change type of flatfield method in smfDA
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -177,8 +179,8 @@ void smurf_calcresp( int *status ) {
     {
       smfData * powval;
       smfData * bolval;
-      char flatmethod[SC2STORE_FLATLEN];
-      smf_flat_smfData( idata, flatmethod, sizeof(flatmethod), &powval, &bolval, status );
+      smf_flatmeth flatmethod;
+      smf_flat_smfData( idata, &flatmethod, &powval, &bolval, status );
       ngood[i-1] = smf_flat_responsivity( flatmethod, respmap, snrmin, 1, powval, bolval, NULL, status );
       if (powval) smf_close_file( &powval, status );
       if (bolval) smf_close_file( &bolval, status );

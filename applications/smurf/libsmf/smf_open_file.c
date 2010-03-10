@@ -194,6 +194,8 @@
  *        Flatfield output files have mixed type for data and variance
  *        so assume they are raw data for the purposes of reading the
  *        DA extension. Also tidy up some string sizing.
+ *     2010-03-09 (TIMJ):
+ *        Change type of flatfield method in smfDA
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -664,6 +666,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
     } else {
       char units[SC2STORE_UNITLEN];
       char dlabel[SC2STORE_LABLEN];
+      char flatname[SC2STORE_FLATLEN];
 
       /* Get the time series WCS if header exists */
       if( hdr ) {
@@ -703,11 +706,13 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
       sc2store_rdtstream( pname, "READ", SC2STORE_FLATLEN,
                           SC2STORE__MAXFITS, 
                           &nfits, fitsrec, units, dlabel, &colsize, &rowsize,
-                          &nframes, &(da->nflat), da->flatname,
+                          &nframes, &(da->nflat), flatname,
                           &tmpState, ptdata, pdksquid, 
                           &flatcal, &flatpar, &jigvert, &nvert, &jigpath, 
                           &nsampcycle, status);
       if (ptdata) outdata[0] = rawts;
+
+      da->flatmeth = smf_flat_methcode( flatname, status );
 
       if (*status == SAI__OK) {
         /* Free header info if no longer needed */

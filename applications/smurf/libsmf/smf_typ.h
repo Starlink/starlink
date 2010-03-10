@@ -318,6 +318,13 @@ typedef enum smf_metadata_fixups {
   SMF__FIXED_ACSIS=4     /* Updated ACSIS extension information */
 } smf_metadata_fixups;
 
+/* Flatfield method */
+typedef enum smf_flatmeth {
+  SMF__FLATMETH_NULL,
+  SMF__FLATMETH_TABLE,
+  SMF__FLATMETH_POLY
+} smf_flatmeth;
+
 /* Indicate a bad array index */
 static const size_t SMF__BADIDX = (size_t)-1;
 
@@ -458,7 +465,7 @@ typedef struct smfDA {
   double *flatcal;           /* pointer to flatfield calibration */
   double *flatpar;           /* pointer to flatfield parameters */
   double *heatval;           /* Heater values in DAC units for flatfield */
-  char flatname[SC2STORE_FLATLEN]; /* name of flatfield algorithm */
+  smf_flatmeth flatmeth;     /* Flatfield algorithm name */
   size_t nflat;              /* number of flat coeffs per bol */
   size_t nheat;              /* number of elements in heatval */
   int *dksquid;              /* dark squid for each column */

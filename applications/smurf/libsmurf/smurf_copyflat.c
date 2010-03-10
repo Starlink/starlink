@@ -49,10 +49,12 @@
 *  History:
 *     2009-10-07 (TIMJ):
 *        Original version
+*     2010-03-09 (TIMJ):
+*        Change type of flatfield method in smfDA
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2009 Science and Technology Facilities Council.
+*     Copyright (C) 2010 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -191,7 +193,7 @@ void smurf_copyflat( int *status ) {
     /* Get the filename and update the flatfield */
     grpGet( flatgrp, i, 1, &pname, SMF_PATH_MAX, status );
     sc2store_updflatcal( pname, colsize, rowsize,
-                         refda->nflat, refda->flatname, refda->flatcal,
+                         refda->nflat, smf_flat_methstring(refda->flatmeth,status), refda->flatcal,
                          refda->flatpar, status );
 
     /* Now we need to update the FITS header - can not use the smfData

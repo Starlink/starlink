@@ -24,20 +24,24 @@
 *        Pointer to global status.
 
 *  Description:
-
 *     This function checks all elements of a smfDA structure and
 *     copies values from the input structure if necessary
 
 *  Authors:
 *     Andy Gibb (UBC)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     2006-04-03 (AGG):
 *        Initial version.
+*     2010-03-09 (TIMJ):
+*        Change type of flatname. Use smf_flatmeth.
+*        Add support for heatcal copying.
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2010 Science and Technology Facilities Council.
 *     Copyright (C) 2006 University of British Columbia. All Rights
 *     Reserved.
 
@@ -123,33 +127,36 @@ void smf_check_smfDA( const smfData *idata, smfData *odata, int * status ) {
     }
     nflat = oda->nflat;
     /* OK output smfDA is not NULL so check individual components */
-    if ( oda->flatcal == NULL ) {
+    if ( oda->flatcal == NULL && ida->flatcal) {
       nbol = (odata->dims)[0] * (odata->dims)[1];
-      flatcal = smf_malloc( nbol*nflat, sizeof(double), 0, status );
+      flatcal = smf_malloc( nbol*nflat, sizeof(*flatcal), 0, status );
       if ( flatcal != NULL ) {
-	memcpy( flatcal, ida->flatcal, nbol*nflat*sizeof(double) );
+	memcpy( flatcal, ida->flatcal, nbol*nflat*sizeof(*flatcal) );
       }
       oda->flatcal = flatcal;
     }
 
-    if ( oda->flatpar == NULL ) {
-      flatpar = smf_malloc( nflat, sizeof(double), 0, status );
+    if ( oda->flatpar == NULL && ida->flatcal ) {
+      flatpar = smf_malloc( nflat, sizeof(*flatpar), 0, status );
       if ( flatpar != NULL ) {
-	memcpy( flatpar, ida->flatpar, nflat*sizeof(double));
+	memcpy( flatpar, ida->flatpar, nflat*sizeof(*flatpar));
       }
       oda->flatpar = flatpar;
     }
 
-    if (oda->flatname == NULL) {
-      if ( ida->flatname != NULL ) {
-	strncpy(oda->flatname, ida->flatname, SC2STORE_FLATLEN);
-	(oda->flatname)[SC2STORE_FLATLEN-1] = '\0';
-      } else {
-	if ( *status == SAI__OK) {
-	  *status = SAI__ERROR;
-	  errRep(FUNC_NAME, "Name of flatfield algorithm is not set. Possible programmign error.", status);
-	}
+    if (oda->flatmeth == SMF__FLATMETH_NULL ) oda->flatmeth = ida->flatmeth;
+
+    if (!(oda->nheat)) {
+      oda->nheat = ida->nheat;
+    }
+    if ( oda->heatval == NULL && ida->heatval ) {
+      double * heatval;
+      nbol = (odata->dims)[0] * (odata->dims)[1];
+      heatval = smf_malloc( nbol*oda->nheat, sizeof(*heatval), 0, status );
+      if ( heatval ) {
+	memcpy( heatval, ida->heatval, nbol*nflat*sizeof(*heatval) );
       }
+      oda->heatval = heatval;
     }
 
   }

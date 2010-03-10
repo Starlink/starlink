@@ -13,17 +13,15 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_flat_smfData ( const smfData *data, char flatmethod[], size_t methodlen,
+*     smf_flat_smfData ( const smfData *data, smf_flatmeth * flatmethod,
 *                        smfData **powval, smfData **bolval, int *status );
 
 *  Arguments:
 *     data = const smfData * (Given)
 *        smfData from which to extract the flatfield information.
-*     flatmethod = char [] (Returned)
-*        Buffer of size methodlen to return the flatfield method. Should
-*        be large enough to hold "POLYNOMIAL". (ie at least 11).
-*     methodlen = size_t (Given)
-*        Allocated size of flatmethod.
+*     flatmethod = smf_flatmeth * (Returned)
+*        Flatfield method used for bolval. SMF__FLATMETH_TABLE or
+*        SMF__FLATMETH_POLY.
 *     powval = smfData ** (Returned)
 *        Resistance input powers. Will be returned NULL on error or if
 *        no DA extension is present.
@@ -52,6 +50,8 @@
 *        will be freed when the main file containing the smfDA is freed.
 *     2010-03-03 (TIMJ):
 *        Use smf_flat_malloc
+*     2010-03-05 (TIMJ):
+*        Use a smf_flatmeth type for flatfield method.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -88,14 +88,14 @@
 #include "prm_par.h"
 #include "sae_par.h"
 
-void smf_flat_smfData ( const smfData *data, char flatmethod[], size_t methlen,
+void smf_flat_smfData ( const smfData *data, smf_flatmeth * flatmethod,
                         smfData ** powval, smfData **bolval,
                         int *status ) {
   smfDA * da = NULL;
 
   *powval = NULL;
   *bolval = NULL;
-  if (flatmethod) flatmethod[0] = '\0';
+  *flatmethod = SMF__FLATMETH_NULL;
 
   if (*status != SAI__OK) return;
 
@@ -116,7 +116,7 @@ void smf_flat_smfData ( const smfData *data, char flatmethod[], size_t methlen,
     memcpy( (*bolval)->pntr[0], da->flatcal, nelem * sizeof(*(da->flatcal)) );
   }
 
-  one_strlcpy( flatmethod, da->flatname, methlen, status );
+  *flatmethod = da->flatmeth;
 
   if (*status != SAI__OK) {
     if (*bolval) smf_close_file( bolval, status );

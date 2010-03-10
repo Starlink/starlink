@@ -13,14 +13,14 @@
 *     Subroutine
 
 *  Invocation:
-*     size_t smf_flat_responsivity ( const char method[], smfData *respmap, double snrmin,
+*     size_t smf_flat_responsivity ( smf_flatmeth method, smfData *respmap, double snrmin,
 *                                    size_t order, const smfData * powval, const smfData * bolval,
 *                                    smfData ** polyfit, int *status );
 
 *  Arguments:
-*     method = const char[] (Given)
+*     method = smf_flatmeth (Given)
 *        Type of flatfield being presented in bolval and powval. Can
-*        be POLYNOMIAL or TABLE.
+*        be SMF__FLATMETH_POLYNOMIAL or SMF__FLATMETH_TABLE.
 *     respmap = smfData * (Given & Returned)
 *        smfData to receive the responsivity map. Must be _DOUBLE.
 *        Will be assumed to be the correct size as compared to bolval.
@@ -93,6 +93,8 @@
 *        Add poly smfData and support cubic fits.
 *     2010-02-03 (TIMJ):
 *        Add method argument and handle POLYNOMIAL flatfield solutions.
+*     2010-03-05 (TIMJ):
+*        Change type of method to an enum
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -130,7 +132,7 @@
 
 #include "gsl/gsl_fit.h"
 
-size_t smf_flat_responsivity ( const char method[], smfData *respmap, double snrmin,
+size_t smf_flat_responsivity ( smf_flatmeth method, smfData *respmap, double snrmin,
                                size_t order, const smfData * powvald, const smfData * bolvald,
                                smfData ** polyfit, int *status ) {
 
@@ -168,10 +170,7 @@ size_t smf_flat_responsivity ( const char method[], smfData *respmap, double snr
   if (!smf_dtype_check_fatal(bolvald, NULL, SMF__DOUBLE, status)) return ngood;
 
   /* Calculate a boolean for table mode */
-  istable = 0;
-  if (strncmp( method, "TABLE", 5) == 0) {
-    istable = 1;
-  }
+  istable = ( method == SMF__FLATMETH_TABLE ? 1 : 0 );
 
   /* Extract relevant information from the smfData */
   respdata = (respmap->pntr)[0];

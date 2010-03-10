@@ -44,6 +44,8 @@
 *        Remove dksquid entry for now
 *     2008-07-11 (TIMJ):
 *        Add dksquid.
+*     2010-03-09 (TIMJ):
+*        flatname is now flatmeth. Add heatval/nheat.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -95,7 +97,7 @@ smf_create_smfDA( int * status ) {
 
   if (*status != SAI__OK) return NULL;
 
-  da = smf_malloc( 1, sizeof(smfDA), 0, status );
+  da = smf_malloc( 1, sizeof(*da), 0, status );
 
   if (*status != SAI__OK) {
     errRep(FUNC_NAME,"Unable to allocate memory for smfDA structure",
@@ -107,8 +109,10 @@ smf_create_smfDA( int * status ) {
   da->flatcal = NULL;
   da->flatpar = NULL;
   da->dksquid = NULL;
-  (da->flatname)[0] = '\0';
+  da->flatmeth = SMF__FLATMETH_NULL;
   da->nflat = 0;
+  da->heatval = NULL;
+  da->nheat = 0;
 
   return da;
 }

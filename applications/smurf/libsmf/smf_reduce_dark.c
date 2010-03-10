@@ -47,9 +47,11 @@
 *        Initial version
 *     2008-08-28 (TIMJ):
 *        Use the flatfield to mask out bolometers
+*     2010-03-09 (TIMJ):
+*        Change type of flatfield method in smfDA
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008, 2010 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -134,7 +136,7 @@ void smf_reduce_dark( const smfData *indark, smf_dtype dtype,
 
   if (indark->da && indark->da->flatcal
       && indark->hdr->obstype != SMF__TYP_FLATFIELD
-      && strcmp( indark->da->flatname, "NULL") != 0 ) {
+      && indark->da->flatmeth != SMF__FLATMETH_NULL ) {
     size_t nbols = (indark->dims)[0] * (indark->dims)[1];
     size_t i;
     double *flatcal = indark->da->flatcal;

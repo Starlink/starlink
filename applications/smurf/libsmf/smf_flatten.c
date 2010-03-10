@@ -39,9 +39,12 @@
 *        set quality to SMF__Q_BADS
 *     2008-03-14 (AGG):
 *        Check for quality array after flatfield and set if present
+*     2010-03-09 (TIMJ):
+*        Change type of flatfield method in smfDA
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2010 Science & Technology Facilities Council.
 *     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
 *     2005-2008 University of British Columbia.
 *     All Rights Reserved.
@@ -128,7 +131,7 @@ void smf_flatten ( smfData *data, int *status ) {
     nframes = (data->dims)[2];
 
     /* Flatfielder */
-    sc2math_flatten( nboll, nframes, da->flatname, da->nflat, da->flatcal,
+    sc2math_flatten( nboll, nframes, smf_flat_methstring(da->flatmeth,status), da->nflat, da->flatcal,
 		     da->flatpar, dataArr, status);
 
     /* Update units and title if we have a header */

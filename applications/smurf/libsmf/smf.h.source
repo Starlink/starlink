@@ -590,7 +590,7 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
                           smfArray **concat, int *status );
 
 smfDA *smf_construct_smfDA( smfDA * tofill, int *dksquid, double * flatcal,
-                            double * flatpar, const char * flatname,
+                            double * flatpar, smf_flatmeth flatmeth,
                             int nflat, double * heatval, int nheat, int * status );
 
 smfData *smf_construct_smfData( smfData * tofill, smfFile * file,
@@ -872,14 +872,18 @@ void smf_flat_mergedata( const smfArray * heatframes,
                          const double heatval[], smfData ** bolvald,
                          int * status );
 
+smf_flatmeth smf_flat_methcode ( const char * flatname, int * status );
+
+const char * smf_flat_methstring( smf_flatmeth flatmeth, int * status );
+
 void smf_flat_precondition( int allbad, smfData * powvald, smfData * bolvald,
                             int *status );
 
-size_t smf_flat_responsivity ( const char method[], smfData *respmap, double snrmin, size_t order,
+size_t smf_flat_responsivity ( smf_flatmeth method, smfData *respmap, double snrmin, size_t order,
                                const smfData * powval, const smfData * bolval,
                                smfData ** polyfit, int *status );
 
-void smf_flat_smfData ( const smfData *data,  char flatmethod[], size_t methlen,
+void smf_flat_smfData ( const smfData *data, smf_flatmeth * flatmethod,
                         smfData ** powval, smfData **bolval,
                         int *status );
 
@@ -887,7 +891,7 @@ void smf_flat_standardpow( const smfData * bolvald, double refohms,
                            const double resistance[],
                            smfData ** powref, smfData ** bolref, int * status);
 
-void smf_flat_write( const char * flatmeth, const char * flatname,
+void smf_flat_write( smf_flatmeth flatmeth, const char * flatname,
                      const smfArray * bbhtframes, const double heater[],
                      const smfData * powref, const smfData * bolref,
                      const smfData * polyfit, const Grp * prvgrp, int * status );

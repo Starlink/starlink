@@ -56,11 +56,13 @@
 *       Report pixel origin.
 *     2009-10-02 (TIMJ):
 *       Add explicit history listing.
+*     2010-03-09 (TIMJ):
+*       Change flatfield type in smfDA
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2008 University of British Columbia.
-*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2010 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -412,8 +414,8 @@ void smf_dump_smfData( const smfData *data, int showflags __attribute__((unused)
     }
     msgOut("", "    flatpar = ^F", status);
     /* Flatfield algorithm */
-    msgSetc("F",da->flatname);
-    msgOut("", "    flatname = ^F", status);
+    msgSetc("F",smf_flat_methstring(da->flatmeth,status));
+    msgOut("", "    flatmeth = ^F", status);
     /* Number of flatfield coefficients per bolometer */
     msgSeti("F",(int)da->nflat);
     msgOut("", "    nflat = ^F", status);
