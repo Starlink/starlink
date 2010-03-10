@@ -79,6 +79,8 @@
 *  History:
 *     3-MAR-2010 (DSB):
 *        Initial version.
+*     10-MAR-2010 (DSB):
+*        Check slice FrameSet is not null before exporting it.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -375,8 +377,9 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
    outmapcoord = astFree( outmapcoord );
 
 /* Export the WCS pointer in the data header since it will be annulled at
-   a higher level. */
-   astExport( data->hdr->wcs );
+   a higher level. Note the FrameSet pointer may be null if the last 
+   full calculation was for a slice with bad telescope data. */
+   if( data->hdr->wcs ) astExport( data->hdr->wcs );
 
 /* End the AST context. */
    astEnd;
