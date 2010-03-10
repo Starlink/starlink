@@ -247,12 +247,7 @@ smf_flat_calcflat( msglev_t msglev, const char flatname[],
   }
 
   /* Now we need to attach the flatfield result to the flatfield data */
-  if (*status == SAI__OK) {
-    smfDA * da = flatdata->da;
-    
-
-  }
-
+  smf_flat_assign( 0, flatmeth, powref, bolref, flatdata, status );
 
   /* write out the flatfield */
   if (flatname) smf_flat_write( flatmeth, flatname, flatdata, powref, bolref, flatpoly, prvgrp, status );

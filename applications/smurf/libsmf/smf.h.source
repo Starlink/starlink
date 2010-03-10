@@ -860,6 +860,8 @@ void smf_flag_spikes( smfData *data, double *bolovar, unsigned char *quality,
 void smf_flag_stationary( smfData *data, unsigned char *quality,
                           double sthresh, size_t *nflagged,
                           int *status );
+void smf_flat_assign ( int use_da, smf_flatmeth inflatmeth, const smfData * powval,
+                       const smfData * bolval, smfData * updata, int *status );
 
 size_t
 smf_flat_calcflat( msglev_t msglev, const char flatname[],
