@@ -148,7 +148,7 @@ void smf_flat_malloc( size_t nheat, const smfData * refdata,
        information to propagate. */
     hdr = smf_construct_smfHead( NULL, oldhdr->instrument, NULL, NULL,
                                  astCopy( oldhdr->fitshdr ), NULL, 0,
-                                 oldhdr->instap, oldhdr->nframes, oldhdr->steptime,
+                                 oldhdr->instap, nheat, oldhdr->steptime,
                                  oldhdr->obsmode, oldhdr->swmode, oldhdr->obstype,
                                  0, NULL, NULL, NULL, NULL, 0, NULL,
                                  "Flatfield measurement", "Response", oldhdr->units, oldhdr->telpos,
