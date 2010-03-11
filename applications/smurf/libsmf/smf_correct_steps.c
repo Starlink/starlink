@@ -635,23 +635,34 @@ static void smfCorrectStepsParallel( void *job_data_ptr, int *status ) {
       }
     }
 
-    /* If we got a SMF__INSMP, flag entire bolometer as bad and annul */
     if( *status == SMF__INSMP ) {
+      /* If we got a SMF__INSMP, flag entire bolometer as bad and annul */
       errAnnul( status );
-      isbad = 1;
-    }
 
-    if( isbad && (dcflag==1) ) {
-      msgOutiff( MSG__DEBUG, "", FUNC_NAME ": flagging bad bolo %" DIM_T_FMT " at %zd",
-                 status, i, wherebad );
+      msgOutiff( MSG__DEBUG, "", FUNC_NAME
+                 ": flagging entire bad bolo %" DIM_T_FMT
+                 ", due to insufficient samples",
+                 status, i );
       for(j=0; j<ntslice; j++) {
         qua[base+j*tstride] |= SMF__Q_BADB;
       }
-    }
+    } else if( isbad ) {
+      /* Do flagging here if isbad */
 
-    /* Flag entire 2*DCBOX window */
-    for( j=wherebad-dcbox; j<wherebad+dcbox; j++ ) {
-      qua[base+j*tstride] |= SMF__Q_JUMP;
+      if( dcflag == 1 ) {
+        /* Flag entire bolo bad */
+        msgOutiff( MSG__DEBUG, "", FUNC_NAME
+                   ": flagging bad bolo %" DIM_T_FMT " at %zd",
+                 status, i, wherebad );
+        for(j=0; j<ntslice; j++) {
+          qua[base+j*tstride] |= SMF__Q_BADB;
+        }
+      } else {
+        /* Just flag 2*DCBOX window */
+        for( j=wherebad-dcbox; j<wherebad+dcbox; j++ ) {
+          qua[base+j*tstride] |= SMF__Q_JUMP;
+        }
+      }
     }
   }
 
