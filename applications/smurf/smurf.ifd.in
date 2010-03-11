@@ -375,6 +375,7 @@ package @PACKAGE@ {
                 access READ
                 vpath PROMPT
                 vpath CURRENT DEFAULT
+                prompt {Order of polynomial to use for flatfield fitting}
                 default 1
                 helpkey *
             }
@@ -413,7 +414,7 @@ package @PACKAGE@ {
                 type _LOGICAL
                 vpath {PROMPT }
                 prompt {Mask bolometers with bad responsivity?}
-                ppath GLOBAL CURRENT
+                ppath CURRENT
                 default TRUE
                 helpkey *
             }
@@ -488,6 +489,66 @@ package @PACKAGE@ {
                 vpath {PROMPT }
                 default !
                 prompt {Power spectra files}
+                helpkey *
+            }
+
+            # These are the generic flatfield parameters. Not in alphabetical order
+            # with the other parameters to make it easier to do bulk copies
+
+            parameter flatmeth {
+                type _CHAR
+                prompt {Flatfield calculation method}
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                default POLYNOMIAL
+                helpkey *
+            }
+
+            parameter flatorder {
+                type _INTEGER
+                access READ
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Order of polynomial to use for flatfield fitting}
+                default 1
+                helpkey *
+            }
+
+            parameter flatsnr {
+                type _DOUBLE
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                default 10.0
+                prompt {Signal-to-noise threshold for responsivity data}
+                helpkey *
+            }
+
+            parameter refres {
+                type _DOUBLE
+                access READ
+                vpath  DYNAMIC CURRENT
+                ppath  DYNAMIC CURRENT
+                prompt {Reference pixel heater resistance}
+                helpkey *
+            }
+
+            parameter resist {
+                type LITERAL
+                access READ
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                default {^$STARLINK_DIR/share/smurf/resist.cfg}
+                prompt {Heater resistance information}
+                helpkey *
+            }
+
+            parameter respmask {
+                type _LOGICAL
+                vpath {PROMPT }
+                prompt {Mask bolometers with bad responsivity?}
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                default TRUE
                 helpkey *
             }
 
@@ -955,6 +1016,66 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            # These are the generic flatfield parameters. Not in alphabetical order
+            # with the other parameters to make it easier to do bulk copies
+
+            parameter flatmeth {
+                type _CHAR
+                prompt {Flatfield calculation method}
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                default POLYNOMIAL
+                helpkey *
+            }
+
+            parameter flatorder {
+                type _INTEGER
+                access READ
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Order of polynomial to use for flatfield fitting}
+                default 1
+                helpkey *
+            }
+
+            parameter flatsnr {
+                type _DOUBLE
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                default 10.0
+                prompt {Signal-to-noise threshold for responsivity data}
+                helpkey *
+            }
+
+            parameter refres {
+                type _DOUBLE
+                access READ
+                vpath  DYNAMIC CURRENT
+                ppath  DYNAMIC CURRENT
+                prompt {Reference pixel heater resistance}
+                helpkey *
+            }
+
+            parameter resist {
+                type LITERAL
+                access READ
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                default {^$STARLINK_DIR/share/smurf/resist.cfg}
+                prompt {Heater resistance information}
+                helpkey *
+            }
+
+            parameter respmask {
+                type _LOGICAL
+                vpath {PROMPT }
+                prompt {Mask bolometers with bad responsivity?}
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                default TRUE
+                helpkey *
+            }
+
         }
 
         action flatfield {
@@ -997,6 +1118,66 @@ package @PACKAGE@ {
                 default !
                 vpath DEFAULT
                 ppath CURRENT DEFAULT
+                helpkey *
+            }
+
+            # These are the generic flatfield parameters. Not in alphabetical order
+            # with the other parameters to make it easier to do bulk copies
+
+            parameter flatmeth {
+                type _CHAR
+                prompt {Flatfield calculation method}
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                default POLYNOMIAL
+                helpkey *
+            }
+
+            parameter flatorder {
+                type _INTEGER
+                access READ
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Order of polynomial to use for flatfield fitting}
+                default 1
+                helpkey *
+            }
+
+            parameter flatsnr {
+                type _DOUBLE
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                default 10.0
+                prompt {Signal-to-noise threshold for responsivity data}
+                helpkey *
+            }
+
+            parameter refres {
+                type _DOUBLE
+                access READ
+                vpath  DYNAMIC CURRENT
+                ppath  DYNAMIC CURRENT
+                prompt {Reference pixel heater resistance}
+                helpkey *
+            }
+
+            parameter resist {
+                type LITERAL
+                access READ
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                default {^$STARLINK_DIR/share/smurf/resist.cfg}
+                prompt {Heater resistance information}
+                helpkey *
+            }
+
+            parameter respmask {
+                type _LOGICAL
+                vpath {PROMPT }
+                prompt {Mask bolometers with bad responsivity?}
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                default TRUE
                 helpkey *
             }
 
@@ -1769,6 +1950,66 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            # These are the generic flatfield parameters. Not in alphabetical order
+            # with the other parameters to make it easier to do bulk copies
+
+            parameter flatmeth {
+                type _CHAR
+                prompt {Flatfield calculation method}
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                default POLYNOMIAL
+                helpkey *
+            }
+
+            parameter flatorder {
+                type _INTEGER
+                access READ
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Order of polynomial to use for flatfield fitting}
+                default 1
+                helpkey *
+            }
+
+            parameter flatsnr {
+                type _DOUBLE
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                default 10.0
+                prompt {Signal-to-noise threshold for responsivity data}
+                helpkey *
+            }
+
+            parameter refres {
+                type _DOUBLE
+                access READ
+                vpath  DYNAMIC CURRENT
+                ppath  DYNAMIC CURRENT
+                prompt {Reference pixel heater resistance}
+                helpkey *
+            }
+
+            parameter resist {
+                type LITERAL
+                access READ
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                default {^$STARLINK_DIR/share/smurf/resist.cfg}
+                prompt {Heater resistance information}
+                helpkey *
+            }
+
+            parameter respmask {
+                type _LOGICAL
+                vpath {PROMPT }
+                prompt {Mask bolometers with bad responsivity?}
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                default TRUE
+                helpkey *
+            }
+
         }
 
         action qlmakemap {
@@ -2016,6 +2257,66 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            # These are the generic flatfield parameters. Not in alphabetical order
+            # with the other parameters to make it easier to do bulk copies
+
+            parameter flatmeth {
+                type _CHAR
+                prompt {Flatfield calculation method}
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                default POLYNOMIAL
+                helpkey *
+            }
+
+            parameter flatorder {
+                type _INTEGER
+                access READ
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Order of polynomial to use for flatfield fitting}
+                default 1
+                helpkey *
+            }
+
+            parameter flatsnr {
+                type _DOUBLE
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                default 10.0
+                prompt {Signal-to-noise threshold for responsivity data}
+                helpkey *
+            }
+
+            parameter refres {
+                type _DOUBLE
+                access READ
+                vpath  DYNAMIC CURRENT
+                ppath  DYNAMIC CURRENT
+                prompt {Reference pixel heater resistance}
+                helpkey *
+            }
+
+            parameter resist {
+                type LITERAL
+                access READ
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                default {^$STARLINK_DIR/share/smurf/resist.cfg}
+                prompt {Heater resistance information}
+                helpkey *
+            }
+
+            parameter respmask {
+                type _LOGICAL
+                vpath {PROMPT }
+                prompt {Mask bolometers with bad responsivity?}
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                default TRUE
+                helpkey *
+            }
+
         }
 
         action sc2clean {
@@ -2190,6 +2491,66 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            # These are the generic flatfield parameters. Not in alphabetical order
+            # with the other parameters to make it easier to do bulk copies
+
+            parameter flatmeth {
+                type _CHAR
+                prompt {Flatfield calculation method}
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                default POLYNOMIAL
+                helpkey *
+            }
+
+            parameter flatorder {
+                type _INTEGER
+                access READ
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Order of polynomial to use for flatfield fitting}
+                default 1
+                helpkey *
+            }
+
+            parameter flatsnr {
+                type _DOUBLE
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                default 10.0
+                prompt {Signal-to-noise threshold for responsivity data}
+                helpkey *
+            }
+
+            parameter refres {
+                type _DOUBLE
+                access READ
+                vpath  DYNAMIC CURRENT
+                ppath  DYNAMIC CURRENT
+                prompt {Reference pixel heater resistance}
+                helpkey *
+            }
+
+            parameter resist {
+                type LITERAL
+                access READ
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                default {^$STARLINK_DIR/share/smurf/resist.cfg}
+                prompt {Heater resistance information}
+                helpkey *
+            }
+
+            parameter respmask {
+                type _LOGICAL
+                vpath {PROMPT }
+                prompt {Mask bolometers with bad responsivity?}
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                default TRUE
+                helpkey *
+            }
+
         }
 
         action sc2concat {
@@ -2274,6 +2635,67 @@ package @PACKAGE@ {
                 default TRUE
                 helpkey *
             }
+
+            # These are the generic flatfield parameters. Not in alphabetical order
+            # with the other parameters to make it easier to do bulk copies
+
+            parameter flatmeth {
+                type _CHAR
+                prompt {Flatfield calculation method}
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                default POLYNOMIAL
+                helpkey *
+            }
+
+            parameter flatorder {
+                type _INTEGER
+                access READ
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Order of polynomial to use for flatfield fitting}
+                default 1
+                helpkey *
+            }
+
+            parameter flatsnr {
+                type _DOUBLE
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                default 10.0
+                prompt {Signal-to-noise threshold for responsivity data}
+                helpkey *
+            }
+
+            parameter refres {
+                type _DOUBLE
+                access READ
+                vpath  DYNAMIC CURRENT
+                ppath  DYNAMIC CURRENT
+                prompt {Reference pixel heater resistance}
+                helpkey *
+            }
+
+            parameter resist {
+                type LITERAL
+                access READ
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                default {^$STARLINK_DIR/share/smurf/resist.cfg}
+                prompt {Heater resistance information}
+                helpkey *
+            }
+
+            parameter respmask {
+                type _LOGICAL
+                vpath {PROMPT }
+                prompt {Mask bolometers with bad responsivity?}
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                default TRUE
+                helpkey *
+            }
+
         }
 
         action sc2fft {
@@ -2370,6 +2792,66 @@ package @PACKAGE@ {
                 prompt {Calculate power spectrum (in polar coordinates)?}
                 ppath GLOBAL CURRENT
                 default FALSE
+                helpkey *
+            }
+
+            # These are the generic flatfield parameters. Not in alphabetical order
+            # with the other parameters to make it easier to do bulk copies
+
+            parameter flatmeth {
+                type _CHAR
+                prompt {Flatfield calculation method}
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                default POLYNOMIAL
+                helpkey *
+            }
+
+            parameter flatorder {
+                type _INTEGER
+                access READ
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Order of polynomial to use for flatfield fitting}
+                default 1
+                helpkey *
+            }
+
+            parameter flatsnr {
+                type _DOUBLE
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                default 10.0
+                prompt {Signal-to-noise threshold for responsivity data}
+                helpkey *
+            }
+
+            parameter refres {
+                type _DOUBLE
+                access READ
+                vpath  DYNAMIC CURRENT
+                ppath  DYNAMIC CURRENT
+                prompt {Reference pixel heater resistance}
+                helpkey *
+            }
+
+            parameter resist {
+                type LITERAL
+                access READ
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                default {^$STARLINK_DIR/share/smurf/resist.cfg}
+                prompt {Heater resistance information}
+                helpkey *
+            }
+
+            parameter respmask {
+                type _LOGICAL
+                vpath {PROMPT }
+                prompt {Mask bolometers with bad responsivity?}
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                default TRUE
                 helpkey *
             }
 
@@ -2574,6 +3056,66 @@ package @PACKAGE@ {
                 default !
                 vpath DEFAULT
                 ppath CURRENT DEFAULT
+                helpkey *
+            }
+
+            # These are the generic flatfield parameters. Not in alphabetical order
+            # with the other parameters to make it easier to do bulk copies
+
+            parameter flatmeth {
+                type _CHAR
+                prompt {Flatfield calculation method}
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                default POLYNOMIAL
+                helpkey *
+            }
+
+            parameter flatorder {
+                type _INTEGER
+                access READ
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Order of polynomial to use for flatfield fitting}
+                default 1
+                helpkey *
+            }
+
+            parameter flatsnr {
+                type _DOUBLE
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                default 10.0
+                prompt {Signal-to-noise threshold for responsivity data}
+                helpkey *
+            }
+
+            parameter refres {
+                type _DOUBLE
+                access READ
+                vpath  DYNAMIC CURRENT
+                ppath  DYNAMIC CURRENT
+                prompt {Reference pixel heater resistance}
+                helpkey *
+            }
+
+            parameter resist {
+                type LITERAL
+                access READ
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                default {^$STARLINK_DIR/share/smurf/resist.cfg}
+                prompt {Heater resistance information}
+                helpkey *
+            }
+
+            parameter respmask {
+                type _LOGICAL
+                vpath {PROMPT }
+                prompt {Mask bolometers with bad responsivity?}
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                default TRUE
                 helpkey *
             }
 
