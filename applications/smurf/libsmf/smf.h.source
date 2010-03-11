@@ -871,6 +871,8 @@ smf_flat_calcflat( msglev_t msglev, const char flatname[],
                    const char snrminpar[], const Grp * prvgrp,
                    smfData *flatdata, int *status );
 
+void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status );
+
 void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
                         size_t order, smfData **coeffs, smfData ** polyfit,
                         int *status );
