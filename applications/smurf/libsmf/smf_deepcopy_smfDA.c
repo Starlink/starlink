@@ -37,6 +37,7 @@
 *     Andy Gibb (UBC)
 *     Ed Chapin (UBC)
 *     Tim Jenness (JAC, Hawaii)
+*     David Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -51,6 +52,10 @@
 *        Add protection against NULL pointers and add heater entry.
 *     2010-03-09 (TIMJ):
 *        Method is now an enum
+*     2010-03-11 (DSB):
+*        Initialise to NULL the pointers that are passed to
+*        smf_construct_smfDA in case the supplied smfDA does not contain
+*        the corresponding arrays.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -99,9 +104,9 @@ smfDA *
 smf_deepcopy_smfDA( const smfData *old, int * status ) {
 
   int *dksquid = NULL;    /* pointer to dark squid */
-  double *flatcal;        /* pointer to flatfield calibration */
-  double *flatpar;        /* pointer to flatfield parameters */
-  double *heatval;        /* pointer to heater values */
+  double *flatcal = NULL; /* pointer to flatfield calibration */
+  double *flatpar = NULL; /* pointer to flatfield parameters */
+  double *heatval = NULL; /* pointer to heater values */
   smf_flatmeth flatmeth;  /* Flatfield method */
   size_t nheat;           /* number of entries in heatval */
   size_t nflat;           /* number of flat coeffs per bol */
