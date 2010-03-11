@@ -115,6 +115,8 @@
 *        Remove obvious problems with data prior to fitting.
 *     2010-03-05 (TIMJ):
 *        Use smf_flat_mergedata and new smf_flat_standardpow API
+*     2010-03-10 (TIMJ):
+*        Process fast flatfield ramps.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -172,20 +174,22 @@
 #define TASK_NAME "CALCFLAT"
 
 /* minimum number of files for a good flatfield */
-#define MINFLAT 5
+#define MINFLAT 7
 
 void smurf_calcflat( int *status ) {
 
   smfArray * bbhtframe = NULL; /* Data (non-reference) frames */
   smfData *bolval = NULL;   /* merged flatfield values */
   smfArray * darks = NULL;  /* Darks */
-  smfData *ddata = NULL;    /* A heater file */
   Grp * dkgrp = NULL;       /* Group of darks */
   char defname[GRP__SZNAM+1]; /* default output file name */
+  int isfastramp = 0;        /* are we processing a fast ramp? */
+  smfArray * fflats = NULL;  /* Fast flatfield ramps */
   char flatname[GRP__SZNAM+1]; /* Actual output file name */
   smfArray * flatfiles = NULL; /* Flatfield data from all files */
   Grp *flatgrp = NULL;      /* Output flatfield group */
   size_t flatsize;          /* Size ouf output flatfield group */
+  Grp * ffgrp = NULL;       /* Fast flatfield group */
   Grp * fgrp = NULL;        /* Filtered group */
   double heatref;           /* Reference heater setting */
   size_t i = 0;             /* Counter, index */
@@ -205,11 +209,11 @@ void smurf_calcflat( int *status ) {
   /* Main routine */
   ndfBegin();
 
-  /* Get input file(s) */
-  kpg1Rgndf( "IN", 0, MINFLAT, "", &igrp, &size, status );
+  /* Get input file(s)  MINFLAT needed for non-fast ramp */
+  kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
   /* Find darks (might be all) */
-  smf_find_science( igrp, &fgrp, &dkgrp, NULL, 1, 0, SMF__DOUBLE, &darks, NULL, status );
+  smf_find_science( igrp, &fgrp, &dkgrp, &ffgrp, 1, 0, SMF__DOUBLE, &darks, &fflats, status );
 
   /* input group is now the filtered group so we can use that and
      free the old input group */
@@ -218,8 +222,34 @@ void smurf_calcflat( int *status ) {
   igrp = fgrp;
   fgrp = NULL;
 
-  /* See whether we had all darks or science + dark */
-  if ( size == 0 ) {
+  /* See whether we had all darks or science + dark or fast flatfields. For some reason
+     grpGrpsz returns 1 if status is bad */
+  if ( *status == SAI__OK && grpGrpsz( ffgrp, status ) > 0 && fflats ) {
+    size_t fsize = grpGrpsz( ffgrp, status );
+
+    if (fsize > 1) {
+      if (*status == SAI__OK) {
+        *status = SAI__ERROR;
+        errRep( "", "CALCFLAT can only process one ramp at a time",
+                status );
+      }
+    }
+
+    /* Clear igrp and reassign ffgrp to that */
+    grpDelet( &igrp, status );
+    igrp = ffgrp;
+    ffgrp = NULL;
+
+    /* this is a fast ramp */
+    isfastramp = 1;
+
+    /* and assign the smfData */
+    bolval = (fflats->sdata)[0];
+
+    /* and find the subarray */
+    smf_find_subarray( bolval->hdr, subarray, sizeof(subarray), NULL, status );
+
+  } else if ( size == 0 ) {
     /* everything is in the dark */
     flatfiles = darks;
     darks = NULL;
@@ -257,109 +287,121 @@ void smurf_calcflat( int *status ) {
 
   if ( *status == SAI__OK ) {
 
-    /* Get reference subarray */
-    smf_find_subarray( (flatfiles->sdata)[0]->hdr, subarray, sizeof(subarray), &subnum, status );
-    if (*status != SAI__OK) goto CLEANUP;
+    /* slow mode */
+    if (!isfastramp) {
 
-    /* check that we are all from the same observation and same subarray */
-    for (i = 1; i < flatfiles->ndat; i++) {
-      int nsub;
-
-      if (strcmp( (flatfiles->sdata)[0]->hdr->obsidss,
-                  (flatfiles->sdata)[i]->hdr->obsidss ) != 0 ) {
+      if (*status == SAI__OK && flatfiles->ndat < MINFLAT ) {
         *status = SAI__ERROR;
-        errRep(" ", "Flatfield can not be calculated from multiple observations",
-               status);
-        goto CLEANUP;
+        errRepf( "", "Discrete flatfield requires at least %d files",
+                status, MINFLAT );
       }
 
-      smf_find_subarray( (flatfiles->sdata)[i]->hdr, NULL, 0, &nsub, status );
-      if (nsub != subnum) {
-        *status = SAI__ERROR;
-        errRep( " ", "Flatfield command does not yet handle multiple subarrays in a single call",
-                status );
-        goto CLEANUP;
-      }
+      /* Get reference subarray */
+      smf_find_subarray( (flatfiles->sdata)[0]->hdr, subarray, sizeof(subarray), &subnum, status );
+      if (*status != SAI__OK) goto CLEANUP;
 
-    }
+      /* check that we are all from the same observation and same subarray */
+      for (i = 1; i < flatfiles->ndat; i++) {
+        int nsub;
 
-    /* Okay, single observation, flatfield files in time order */
-
-    /* Report reference heater setting */
-    smf_fits_getD( (flatfiles->sdata)[0]->hdr, "PIXHEAT", &heatref,
-                   status );
-    msgSetd( "PX", heatref );
-    msgOutif( MSG__NORM, " ", "Reference heater setting: ^PX", status );
-
-    /* get some memory for pixel heater settings */
-    pixheat = smf_malloc( flatfiles->ndat, sizeof(*pixheat), 0, status );
-
-    /* and some memory for non-reference frames */
-    bbhtframe = smf_create_smfArray( status );
-    if (*status != SAI__OK) goto CLEANUP;
-
-    /* this smfArray does not own the data */
-    bbhtframe->owndata = 0;
-
-    /* Need odd number of flatfiles */
-    nflatfiles = flatfiles->ndat;
-    if (flatfiles->ndat % 2 == 0) {
-      msgOutif( MSG__NORM, " ",
-                "Observed an even number of sequences. Dropping last one from processing.",
-                status);
-      nflatfiles--;
-    }
-
-    /* Loop over every other frame. Assumes start and end on dark
-       but note that this branch assumes all files are flatfield observations but with
-       varying PIXHEAT */
-    for (i = 1; i < nflatfiles; i+=2) {
-      double heater;
-      double ref1;
-      double ref2;
-
-      /* get the pixel heater settings and make sure they are consistent */
-      smf_fits_getD( (flatfiles->sdata)[i]->hdr, "PIXHEAT", &heater,
-                     status );
-
-      msgSetd( "PX", heater );
-      msgOutif( MSG__NORM, " ", "Processing heater setting ^PX", status );
-
-      /* Get reference */
-      smf_fits_getD( (flatfiles->sdata)[i-1]->hdr, "PIXHEAT", &ref1,
-                     status );
-      smf_fits_getD( (flatfiles->sdata)[i+1]->hdr, "PIXHEAT", &ref2,
-                     status );
-
-      if (ref1 != heatref || ref2 != heatref) {
-        if (*status == SAI__OK) {
+        if (strcmp( (flatfiles->sdata)[0]->hdr->obsidss,
+                    (flatfiles->sdata)[i]->hdr->obsidss ) != 0 ) {
           *status = SAI__ERROR;
-          msgSetd( "REF", heatref );
-          msgSetd( "R1", ref1 );
-          msgSetd( "R2", ref2 );
-          errRep( " ", "Bracketing sequences have inconsistent heater settings"
-                  " (^REF ref cf ^R1 and ^R2)", status );
-          break;
+          errRep(" ", "Flatfield can not be calculated from multiple observations",
+                 status);
+          goto CLEANUP;
         }
+
+        smf_find_subarray( (flatfiles->sdata)[i]->hdr, NULL, 0, &nsub, status );
+        if (nsub != subnum) {
+          *status = SAI__ERROR;
+          errRep( " ", "Flatfield command does not yet handle multiple subarrays in a single call",
+                  status );
+          goto CLEANUP;
+        }
+
       }
 
-      /* Subtract bracketing files using MEAN */
-      smf_subtract_dark( (flatfiles->sdata)[i], (flatfiles->sdata)[i-1],
-                         (flatfiles->sdata)[i+1], SMF__DKSUB_MEAN, status);
+      /* Okay, single observation, flatfield files in time order */
 
-      /* Store the frame for later */
-      smf_addto_smfArray( bbhtframe, (flatfiles->sdata)[i], status );
+      /* Report reference heater setting */
+      smf_fits_getD( (flatfiles->sdata)[0]->hdr, "PIXHEAT", &heatref,
+                     status );
+      msgSetd( "PX", heatref );
+      msgOutif( MSG__NORM, " ", "Reference heater setting: ^PX", status );
 
-      pixheat[bbhtframe->ndat - 1] = heater;
+      /* get some memory for pixel heater settings */
+      pixheat = smf_malloc( flatfiles->ndat, sizeof(*pixheat), 0, status );
+
+      /* and some memory for non-reference frames */
+      bbhtframe = smf_create_smfArray( status );
+      if (*status != SAI__OK) goto CLEANUP;
+
+      /* this smfArray does not own the data */
+      bbhtframe->owndata = 0;
+
+      /* Need odd number of flatfiles */
+      nflatfiles = flatfiles->ndat;
+      if (flatfiles->ndat % 2 == 0) {
+        msgOutif( MSG__NORM, " ",
+                  "Observed an even number of sequences. Dropping last one from processing.",
+                  status);
+        nflatfiles--;
+      }
+
+      /* Loop over every other frame. Assumes start and end on dark
+         but note that this branch assumes all files are flatfield observations but with
+         varying PIXHEAT */
+      for (i = 1; i < nflatfiles; i+=2) {
+        double heater;
+        double ref1;
+        double ref2;
+
+        /* get the pixel heater settings and make sure they are consistent */
+        smf_fits_getD( (flatfiles->sdata)[i]->hdr, "PIXHEAT", &heater,
+                       status );
+
+        msgSetd( "PX", heater );
+        msgOutif( MSG__NORM, " ", "Processing heater setting ^PX", status );
+
+        /* Get reference */
+        smf_fits_getD( (flatfiles->sdata)[i-1]->hdr, "PIXHEAT", &ref1,
+                       status );
+        smf_fits_getD( (flatfiles->sdata)[i+1]->hdr, "PIXHEAT", &ref2,
+                       status );
+
+        if (ref1 != heatref || ref2 != heatref) {
+          if (*status == SAI__OK) {
+            *status = SAI__ERROR;
+            msgSetd( "REF", heatref );
+            msgSetd( "R1", ref1 );
+            msgSetd( "R2", ref2 );
+            errRep( " ", "Bracketing sequences have inconsistent heater settings"
+                    " (^REF ref cf ^R1 and ^R2)", status );
+            break;
+          }
+        }
+
+        /* Subtract bracketing files using MEAN */
+        smf_subtract_dark( (flatfiles->sdata)[i], (flatfiles->sdata)[i-1],
+                           (flatfiles->sdata)[i+1], SMF__DKSUB_MEAN, status);
+
+        /* Store the frame for later */
+        smf_addto_smfArray( bbhtframe, (flatfiles->sdata)[i], status );
+
+        pixheat[bbhtframe->ndat - 1] = heater;
+
+      }
+
+      /* Merge the data into standard form */
+      smf_flat_mergedata( bbhtframe, pixheat, &bolval, status );
 
     }
-
 
     /* Work out the output filename  - provide a default */
-    ddata = (bbhtframe->sdata)[0];
-    if (ddata) {
-      smf_fits_getI( ddata->hdr, "UTDATE", &utdate, status );
-      smf_fits_getI( ddata->hdr, "OBSNUM", &obsnum, status );
+    if (bolval) {
+      smf_fits_getI( bolval->hdr, "UTDATE", &utdate, status );
+      smf_fits_getI( bolval->hdr, "OBSNUM", &obsnum, status );
       snprintf( defname, sizeof(defname), "%s%08d_%05d_flat",
                 subarray, utdate, obsnum );
     } else {
@@ -371,15 +413,11 @@ void smurf_calcflat( int *status ) {
     grpGet( flatgrp, 1, 1, &pname, sizeof(flatname), status );
     if (flatgrp) grpDelet( &flatgrp, status );
 
-    /* We now have data for the various pixel heater settings.
+    /* Calculate the flatfield. We now have data for the various pixel heater settings.
        Generate a set of reference heater power settings in pW, and calculate the
        expected measurement from each bolometer at each power setting.
-
-       First we merge the smfArray into a single smfData.
      */
-    smf_flat_mergedata( bbhtframe, pixheat, &bolval, status );
 
-    /* and calculate the flatfield */
     ngood = smf_flat_calcflat( MSG__NORM, flatname, "REFRES", "RESIST", "METHOD", "ORDER",
                                "RESP", "RESPMASK", "SNRMIN", igrp, bolval, status );
     parPut0i( "NGOOD", ngood, status );
@@ -390,13 +428,19 @@ void smurf_calcflat( int *status ) {
  CLEANUP:
   if (bbhtframe) smf_close_related( &bbhtframe, status );
   if (darks) smf_close_related( &darks, status );
+  if (fflats) smf_close_related( &fflats, status );
   if (flatfiles) smf_close_related( &flatfiles, status );
   if (igrp) grpDelet( &igrp, status);
   if (ogrp) grpDelet( &ogrp, status);
   if (fgrp) grpDelet( &fgrp, status);
+  if (ffgrp) grpDelet( &ffgrp, status);
   if (dkgrp) grpDelet( &dkgrp, status );
   if (pixheat) pixheat = smf_free( pixheat, status );
-  if (bolval) smf_close_file( &bolval, status );
+
+  /* bolval is a simple pointer copy in fast ramp mode and will be freed when fflats is freed */
+  if (!isfastramp) {
+    if (bolval) smf_close_file( &bolval, status );
+  }
 
   ndfEnd( status );
 
