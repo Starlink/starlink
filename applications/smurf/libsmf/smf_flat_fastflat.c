@@ -48,6 +48,9 @@
 *  History:
 *     2010-03-03 (TIMJ):
 *        Initial version
+*     2010-03-11 (TIMJ):
+*        Compensate for sky variation during ramp by subtracting a
+*        polynomial fit to the reference heater values.
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -102,6 +105,7 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
   size_t bstride = 0;         /* Bolometer stride */
   smfHead * hdr = NULL;       /* Local header of fflat */
   AstKeyMap * heatmap = NULL; /* KeyMap of heater settings */
+  int heatref = 0;            /* Reference heater setting */
   char heatstr[20];           /* Buffer for heater settings as strings */
   int * heatval = NULL;       /* Heater values in sorted order */
   size_t i = 0;
@@ -109,6 +113,7 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
   dim_t nbols = 0;            /* number of bolometers */
   size_t nheat = 0;           /* Number of distinct heater settings */
   dim_t nframes = 0;          /* Total number of frames in fflat */
+  const size_t skyorder = 3;  /* Order to use for sky correction */
   size_t tstride = 0;         /* Time stride */
 
   if (*status != SAI__OK) return;
@@ -136,6 +141,10 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
 
   /* get properties of data array */
   smf_get_dims( fflat, NULL, NULL, &nbols, &nframes, NULL, &bstride, &tstride, status );
+
+  /* Find the reference heater setting */
+  smf_fits_getI( hdr, "PIXHEAT", &heatref, status );
+  msgOutiff( MSG__NORM, " ", "Reference heater setting: %d", status, heatref );
 
   /* First analyse the heater settings to see how many distinct values we have. We are going
      to use a KeyMap and treat this whole thing like we would a perl hash. Store the indices
@@ -199,11 +208,17 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
   if (*status == SAI__OK) {
     double * bolval = (*bolvald)->pntr[0];
     double * bolvalvar = (*bolvald)->pntr[1];
+    double *coeff = NULL;
+    double *coeffvar = NULL;
     int * indices = NULL;
     int * idata = NULL;
     int * ffdata = (fflat->pntr)[0];
     JCMTState * instate = hdr->allState;
     JCMTState * outstate = NULL;
+    double * skycoeffs = NULL;
+    double * skycoeffsvar = NULL;
+    int nind = 0;
+    size_t bol;
 
     /* get some memory for the indices */
     indices = smf_malloc( maxfound, sizeof(*indices), 1, status );
@@ -212,54 +227,121 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
     idata = smf_malloc( maxfound, smf_dtype_sz( fflat->dtype, status ),
                        1, status );
 
-
     /* Need some memory for the JCMTSTATE information. */
     outstate = smf_malloc( nheat, sizeof(*outstate), 0, status );
     (*bolvald)->hdr->allState = outstate;
 
-    /* for each heater value we now need to calculate the measured signal */
-    for ( i = 0; i < nheat; i++) {
-      int nind = 0;
-      size_t bol;
+    /* First need to compensate for any drift in the DC sky level.
+       We do this by looking at the heater measurements for the reference
+       heater as a function of time (index) for each bolometer and then
+       fitting it with a polynomial. */
+    skycoeffs = smf_malloc( nbols * (skyorder+1), sizeof(*skycoeffs), 1, status );
+    skycoeffsvar = smf_malloc( nbols * (skyorder+1), sizeof(*skycoeffs), 1, status );
 
-      /* get the key based on this heater integer */
-      sprintf( heatstr, "%d", heatval[i] );
+    /* temp memory to hold the coefficients for a single bolometer */
+    coeff = smf_malloc( skyorder + 1, sizeof(*coeff), 1, status );
+    coeffvar = smf_malloc( skyorder + 1, sizeof(*coeffvar), 1, status );
+
+    /* check status after memory allocation */
+    if (*status == SAI__OK) {
+      double * ddata = NULL;
+      double * dindices = NULL;
+
+      /* get the key based on the reference heater integer */
+      sprintf( heatstr, "%d", heatref );
 
       /* and hence we can get all the relevant indices */
       astMapGet1I( heatmap, heatstr, maxfound, &nind, indices );
 
-      /* Copy state from the first entry */
-      if (*status == SAI__OK) memcpy( &(outstate[i]), &(instate[indices[0]]), sizeof(*outstate));
+      /* and _DOUBLE versions because smf_fit_poly1d takes doubles */
+      ddata = smf_malloc( maxfound, sizeof(*ddata), 1, status);
+      dindices = smf_malloc( maxfound, sizeof(*dindices), 1, status );
 
-      /* now we need to loop over each bolometer to calculate the statistics. */
-      for ( bol = 0; bol < nbols; bol++) {
-        double mean = VAL__BADD;
-        double sigma = VAL__BADD;
-        size_t ngood;
-        int idx;
+      if (*status == SAI__OK) {
+        for (bol = 0; bol < nbols; bol++) {
+          int idx;
+          size_t nused;
+          for (idx = 0; idx < nind; idx++) {
+            size_t slice = indices[idx];
+            ddata[idx] = ffdata[ bol * bstride + slice*tstride ];
+            dindices[idx] = slice;
+          }
 
-        for (idx = 0; idx < nind; idx++ ) {
-          size_t slice = indices[idx];
-          idata[idx] = ffdata[ bol*bstride + slice*tstride ];
-        }
+          smf_fit_poly1d( skyorder, nind, 0, dindices, ddata, NULL,
+                          coeff, coeffvar, NULL, &nused, status );
 
-        smf_stats1I( idata, 1, nind, NULL, 0, 0, &mean, &sigma, &ngood, status );
-
-        /* store the answer */
-        idx = bol + i*nbols;
-        if (sigma == VAL__BADD || sigma == 0.0) {
-          bolval[ idx ] = VAL__BADD;
-          bolvalvar[ idx ] = VAL__BADD;
-        } else {
-          bolval[ idx ] = mean;
-          bolvalvar[ idx ] = sigma * sigma;
+          /* copy coefficients into array */
+          for (idx = 0; idx <= skyorder; idx++) {
+            skycoeffs[ bol + idx*nbols ] = coeff[idx];
+            skycoeffsvar[ bol + idx*nbols ] = coeffvar[idx];
+          }
         }
       }
 
+      if (ddata) ddata = smf_free( ddata, status );
+      if (dindices) dindices = smf_free( dindices, status );
+
+      /* for each heater value we now need to calculate the measured signal */
+      for ( i = 0; i < nheat; i++) {
+
+        /* get the key based on this heater integer */
+        sprintf( heatstr, "%d", heatval[i] );
+
+        /* and hence we can get all the relevant indices */
+        astMapGet1I( heatmap, heatstr, maxfound, &nind, indices );
+
+        /* Copy state from the first entry */
+        if (*status == SAI__OK) memcpy( &(outstate[i]), &(instate[indices[0]]), sizeof(*outstate));
+
+        /* now we need to loop over each bolometer to calculate the statistics. */
+        for ( bol = 0; bol < nbols; bol++) {
+          double mean = VAL__BADD;
+          double sigma = VAL__BADD;
+          size_t ngood = 0;
+          int idx;
+
+          /* Get the polynomial data */
+          for (idx = 0; idx <= skyorder; idx++) {
+            coeff[idx] = skycoeffs[ bol + idx*nbols ];
+            coeffvar[idx] = skycoeffsvar[ bol + idx * nbols ];
+          }
+
+          /* Obtain the measurements for that bolometer */
+          for (idx = 0; idx < nind; idx++ ) {
+            size_t slice = indices[idx];
+            double poly = 0.0;
+            idata[idx] = ffdata[ bol*bstride + slice*tstride ];
+
+            if (idata[idx] != VAL__BADI) {
+              /* calculate the reference value */
+              EVALPOLY( poly, slice, skyorder, coeff );
+              if (poly != VAL__BADD) idata[idx] -= poly;
+              ngood++;
+            }
+          }
+
+          smf_stats1I( idata, 1, nind, NULL, 0, 0, &mean, &sigma, &ngood, status );
+
+          /* store the answer */
+          idx = bol + i*nbols;
+          if (sigma == VAL__BADD || sigma == 0.0) {
+            bolval[ idx ] = VAL__BADD;
+            bolvalvar[ idx ] = VAL__BADD;
+          } else {
+            bolval[ idx ] = mean;
+            bolvalvar[ idx ] = sigma * sigma;
+          }
+        }
+
+      }
     }
 
     if (idata) idata = smf_free( idata, status );
     if (indices) indices = smf_free( indices, status );
+    if (coeff) coeff = smf_free( coeff, status );
+    if (coeffvar) coeffvar = smf_free( coeffvar, status );
+    if (skycoeffs) skycoeffs = smf_free( skycoeffs, status );
+    if (skycoeffsvar) skycoeffsvar = smf_free( skycoeffsvar, status );
 
   }
 
