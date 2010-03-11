@@ -467,11 +467,7 @@ void smf__fit_poly1d ( size_t order, size_t nelem, const double x[], const doubl
 
     if (polydata) {
       for (i=0; i<nelem; i++) {
-        size_t j;
-        polydata[i] = coeffs[0];
-        for ( j = 1; j <= order; j++) {
-          polydata[i] += coeffs[j] * pow(xx[i], j );
-        }
+        EVALPOLY( polydata[i], xx[i], order, coeffs )
       }
     }
 

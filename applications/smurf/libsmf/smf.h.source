@@ -418,6 +418,21 @@
 /* Returns nearest integer to "x" */
 #define NINT(x) ( ( (x) > 0 ) ? (int)( (x) + 0.5 ) : (int)( (x) - 0.5 ) )
 
+/* Evaluates a polynomial at coordinate "x" and stores the result in "result".
+   coeffs is an array of size order+1 */
+#define EVALPOLY( result, x, order, coeffs ) { \
+  size_t _j; \
+  double _temp; \
+  double _xx = x; \
+  _temp = coeffs[0]; \
+  if (_temp != VAL__BADD) { \
+    for ( _j = 1; _j <= order; _j++ ) { \
+      _temp += coeffs[_j] * pow( _xx, _j ); \
+    } \
+  } \
+  result = _temp; \
+}
+
 
 void smf_accumulate_prov( const smfData * data, const Grp* igrp, size_t index,
                           int ondf, const char *creator, int * status );
