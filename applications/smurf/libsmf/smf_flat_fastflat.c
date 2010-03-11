@@ -202,6 +202,8 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
     int * indices = NULL;
     int * idata = NULL;
     int * ffdata = (fflat->pntr)[0];
+    JCMTState * instate = hdr->allState;
+    JCMTState * outstate = NULL;
 
     /* get some memory for the indices */
     indices = smf_malloc( maxfound, sizeof(*indices), 1, status );
@@ -210,6 +212,10 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
     idata = smf_malloc( maxfound, smf_dtype_sz( fflat->dtype, status ),
                        1, status );
 
+
+    /* Need some memory for the JCMTSTATE information. */
+    outstate = smf_malloc( nheat, sizeof(*outstate), 0, status );
+    (*bolvald)->hdr->allState = outstate;
 
     /* for each heater value we now need to calculate the measured signal */
     for ( i = 0; i < nheat; i++) {
@@ -221,6 +227,9 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
 
       /* and hence we can get all the relevant indices */
       astMapGet1I( heatmap, heatstr, maxfound, &nind, indices );
+
+      /* Copy state from the first entry */
+      if (*status == SAI__OK) memcpy( &(outstate[i]), &(instate[indices[0]]), sizeof(*outstate));
 
       /* now we need to loop over each bolometer to calculate the statistics. */
       for ( bol = 0; bol < nbols; bol++) {
