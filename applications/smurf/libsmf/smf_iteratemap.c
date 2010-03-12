@@ -983,17 +983,17 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
            bolo-ordered data although the work has already been done at
            the concatenation stage. */
 
-        smf_model_create( wf, NULL, res, nchunks, SMF__LUT, 0,
+        smf_model_create( wf, NULL, res, darks, bbms, nchunks, SMF__LUT, 0,
                           NULL, 0, NULL, NULL,
                           NULL, memiter,
                           memiter, lut, 0, keymap, status );
 
-        smf_model_create( wf, NULL, res, nchunks, SMF__AST, 0,
+        smf_model_create( wf, NULL, res, darks, bbms, nchunks, SMF__AST, 0,
                           NULL, 0, NULL, NULL,
                           NULL, memiter,
                           memiter, ast, 0, keymap, status );
 
-        smf_model_create( wf, NULL, res, nchunks, SMF__QUA, 0,
+        smf_model_create( wf, NULL, res, darks, bbms, nchunks, SMF__QUA, 0,
                           NULL, 0, NULL, NULL,
                           NULL, memiter,
                           memiter, qua, flagstat, keymap, status );
@@ -1014,22 +1014,22 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
         res = smf_malloc( nchunks, sizeof(*res), 1, status );
 
-        smf_model_create( wf, igroup, NULL, 0, SMF__RES, 0,
+        smf_model_create( wf, igroup, NULL, darks, bbms, 0, SMF__RES, 0,
                           NULL, 0, NULL, NULL,
                           &resgroup, memiter,
                           memiter, res, 0, keymap, status );
 
-        smf_model_create( wf, igroup, NULL, 0, SMF__LUT, 0,
+        smf_model_create( wf, igroup, NULL, darks, bbms, 0, SMF__LUT, 0,
                           outfset, moving, lbnd_out, ubnd_out,
                           &lutgroup, memiter,
                           memiter, lut, 0, keymap, status );
 
-        smf_model_create( wf, igroup, NULL, 0, SMF__AST, 0,
+        smf_model_create( wf, igroup, NULL, darks, bbms, 0, SMF__AST, 0,
                           NULL, 0, NULL, NULL,
                           &astgroup, memiter,
                           memiter, ast, 0, keymap, status );
 
-        smf_model_create( wf, igroup, NULL, 0, SMF__QUA, 0,
+        smf_model_create( wf, igroup, NULL, darks, bbms, 0, SMF__QUA, 0,
                           NULL, 0, NULL, NULL,
                           &quagroup, memiter,
                           memiter, qua, flagstat, keymap, status );
@@ -1055,13 +1055,13 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         model[i] = smf_malloc( nchunks, sizeof(**model), 1, status );
 
         if( memiter ) {
-          smf_model_create( wf, NULL, res, nchunks, modeltyps[i], 0,
+          smf_model_create( wf, NULL, res, darks, bbms, nchunks, modeltyps[i], 0,
                             NULL, 0, NULL, NULL,
                             NULL, memiter, memiter, model[i], 0, keymap,
                             status );
 
         } else {
-          smf_model_create( wf, igroup, NULL, 0, modeltyps[i], 0,
+          smf_model_create( wf, igroup, NULL, darks, bbms, 0, modeltyps[i], 0,
                             NULL, 0, NULL, NULL, &modelgroups[i],
                             memiter, memiter, model[i], 0, keymap,
                             status );
