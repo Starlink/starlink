@@ -95,10 +95,12 @@
 *          spectrum in NGOOD parameter.
 *        - Calculate lowest available frequency based on length of input
 *          data stream.
+*     2010-03-11 (TIMJ):
+*        Support flatfield ramps.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2010 Science and Technology Facilities Council.
 *     Copyright (C) 2008-2010 University of British Columbia.
 *     All Rights Reserved.
 
@@ -159,6 +161,7 @@ void smurf_sc2fft( int *status ) {
   smfArray *darks = NULL;   /* dark frames */
   int ensureflat;           /* Flag for flatfielding data */
   Grp *fgrp = NULL;         /* Filtered group, no darks */
+  smfArray *flatramps = NULL;/* Flatfield ramps */
   size_t gcount=0;          /* Grp index counter */
   smfGroup *igroup=NULL;    /* smfGroup corresponding to igrp */
   Grp *igrp = NULL;         /* Input group of files */
@@ -186,7 +189,7 @@ void smurf_sc2fft( int *status ) {
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
   /* Filter out darks */
-  smf_find_science( igrp, &fgrp, NULL, NULL, 1, 0, SMF__NULL, &darks, NULL, status );
+  smf_find_science( igrp, &fgrp, NULL, NULL, 1, 1, SMF__NULL, &darks, &flatramps, status );
 
   /* input group is now the filtered group so we can use that and
      free the old input group */
@@ -251,7 +254,7 @@ void smurf_sc2fft( int *status ) {
 
     /* Concatenate this continuous chunk but forcing a raw data read.
        We will need quality. */
-    smf_concat_smfGroup( wf, igroup, darks, NULL, contchunk, ensureflat, 1,
+    smf_concat_smfGroup( wf, igroup, darks, NULL, flatramps, contchunk, ensureflat, 1,
                          NULL, 0, NULL, NULL, 0, 0, 0, 1, &concat, status );
 
     /* Now loop over each subarray */
@@ -401,6 +404,7 @@ void smurf_sc2fft( int *status ) {
   if (basegrp) grpDelet( &basegrp, status );
   if( igroup ) smf_close_smfGroup( &igroup, status );
   if( wf ) wf = smf_destroy_workforce( wf );
+  if( flatramps ) smf_close_related( &flatramps, status );
 
   ndfEnd( status );
 

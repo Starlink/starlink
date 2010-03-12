@@ -88,6 +88,8 @@
 *        Add OUTFILES parameter.
 *     2010-01-08 (AGG):
 *        Change BPM to BBM.
+*     2010-03-11 (TIMJ):
+*        Support flatfield ramps.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -155,6 +157,7 @@ void smurf_remsky( int * status ) {
   smfArray *bbms = NULL;     /* Bad bolometer masks */
   smfArray *darks = NULL;    /* Dark data */
   Grp *fgrp = NULL;          /* Filtered group, no darks */
+  smfArray *flatramps = NULL;/* Flatfield ramps */
   size_t i;                  /* Loop counter */
   Grp *igrp = NULL;          /* Input group */
   smfData *odata = NULL;     /* Output data struct */
@@ -177,7 +180,7 @@ void smurf_remsky( int * status ) {
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
   /* Filter out darks */
-  smf_find_science( igrp, &fgrp, NULL, NULL, 1, 0, SMF__NULL, &darks, NULL, status );
+  smf_find_science( igrp, &fgrp, NULL, NULL, 1, 1, SMF__NULL, &darks, &flatramps, status );
 
   /* input group is now the filtered group so we can use that and
      free the old input group */
@@ -220,7 +223,7 @@ void smurf_remsky( int * status ) {
     /* Propagate input files to output */
     for (i=1; i<=size; i++) {
       /* This seems inefficient but it works */
-      smf_open_and_flatfield( igrp, ogrp, i, darks, &odata, status );
+      smf_open_and_flatfield( igrp, ogrp, i, darks, flatramps, &odata, status );
       /* Mask out bad bolometers - mask data array not quality array */
       smf_apply_mask( odata, NULL, bbms, SMF__BBM_DATA, status );
       smf_close_file( &odata, status);
@@ -239,7 +242,7 @@ void smurf_remsky( int * status ) {
   } else {
     for (i=1; i<=size && *status == SAI__OK; i++) {
       /* Flatfield - if necessary */
-      smf_open_and_flatfield( igrp, ogrp, i, darks, &odata, status );
+      smf_open_and_flatfield( igrp, ogrp, i, darks, flatramps, &odata, status );
 
       /* Mask out bad bolometers - mask data array not quality array */
       smf_apply_mask( odata, NULL, bbms, SMF__BBM_DATA, status );
@@ -284,6 +287,7 @@ void smurf_remsky( int * status ) {
  CLEANUP:
   if (darks) smf_close_related( &darks, status );
   if (bbms) smf_close_related( &bbms, status );
+  if ( flatramps ) smf_close_related( &flatramps, status );
   grpDelet( &igrp, status);
   grpDelet( &ogrp, status);
 

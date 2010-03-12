@@ -152,6 +152,8 @@
 *        Change BPM to BBM.
 *     2010-02-16 (TIMJ):
 *        Add AUTO option.
+*     2010-03-11 (TIMJ):
+*        Support flatfield ramps.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -215,6 +217,7 @@ void smurf_extinction( int * status ) {
   smfArray *bbms = NULL;     /* Bad bolometer masks */
   smfArray *darks = NULL;    /* Dark data */
   Grp *fgrp = NULL;          /* Filtered group, no darks */
+  smfArray *flatramps = NULL;/* Flatfield ramps */
   int has_been_sky_removed = 0;/* Data are sky-removed */
   size_t i;                  /* Loop counter */
   Grp *igrp = NULL;          /* Input group */
@@ -236,7 +239,7 @@ void smurf_extinction( int * status ) {
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
   /* Filter out darks */
-  smf_find_science( igrp, &fgrp, NULL, NULL, 1, 0, SMF__NULL, &darks, NULL, status );
+  smf_find_science( igrp, &fgrp, NULL, NULL, 1, 1, SMF__NULL, &darks, &flatramps, status );
 
   /* input group is now the filtered group so we can use that and
      free the old input group */
@@ -282,7 +285,7 @@ void smurf_extinction( int * status ) {
   for (i=1; i<=size && ( *status == SAI__OK ); i++) {
 
     /* Flatfield - if necessary */
-    smf_open_and_flatfield( igrp, ogrp, i, darks, &odata, status );
+    smf_open_and_flatfield( igrp, ogrp, i, darks, flatramps, &odata, status );
 
     if (*status != SAI__OK) {
       /* Error flatfielding: tell the user which file it was */
@@ -359,6 +362,7 @@ void smurf_extinction( int * status ) {
   /* Tidy up after ourselves: release the resources used by the grp routines  */
   if (darks) smf_close_related( &darks, status );
   if (bbms) smf_close_related( &bbms, status );
+  if( flatramps ) smf_close_related( &flatramps, status );
   grpDelet( &igrp, status);
   grpDelet( &ogrp, status);
   if( keymap ) keymap = astAnnul( keymap );

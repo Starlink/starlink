@@ -71,12 +71,14 @@
 *        Add OUTFILES parameter.
 *     2010-01-08 (AGG):
 *        Change BPM to BBM.
+*     2010-03-11 (TIMJ):
+*        Support flatfield ramps.
 *     {enter_further_changes_here}
 
 *  Notes:
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008, 2010 Science and Technology Facilities Council.
 *     Copyright (C) 2006, 2010 University of British Columbia. All Rights
 *     Reserved.
 
@@ -134,6 +136,7 @@ void smurf_scanfit( int * status ) {
   smfArray *darks = NULL;    /* Dark data */
   smfData *ffdata = NULL;    /* Pointer to output data struct */
   Grp *fgrp = NULL;          /* Filtered group, no darks */
+  smfArray *flatramps = NULL;/* Flatfield ramps */
   size_t i = 0;              /* Loop counter */
   Grp *igrp = NULL;          /* Input group */
   Grp *ogrp = NULL;          /* Input group */
@@ -148,7 +151,7 @@ void smurf_scanfit( int * status ) {
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
   /* Filter out darks */
-  smf_find_science( igrp, &fgrp, NULL, NULL, 1, 0, SMF__NULL, &darks, NULL, status );
+  smf_find_science( igrp, &fgrp, NULL, NULL, 1, 1, SMF__NULL, &darks, &flatramps, status );
 
   /* input group is now the filtered group so we can use that and
      free the old input group */
@@ -177,7 +180,7 @@ void smurf_scanfit( int * status ) {
     if (*status != SAI__OK) break;
 
     /* Flatfield if necessary */
-    smf_open_and_flatfield( igrp, ogrp, i, darks, &ffdata, status );
+    smf_open_and_flatfield( igrp, ogrp, i, darks, flatramps, &ffdata, status );
 
     if (*status != SAI__OK) {
       msgSeti("I",i);
@@ -204,6 +207,7 @@ void smurf_scanfit( int * status ) {
   /* Tidy up after ourselves */
   if (darks) smf_close_related( &darks, status );
   if (bbms) smf_close_related( &bbms, status );
+  if( flatramps ) smf_close_related( &flatramps, status );
   grpDelet( &igrp, status);
   grpDelet( &ogrp, status);
 

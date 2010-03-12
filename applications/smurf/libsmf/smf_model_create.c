@@ -15,7 +15,7 @@
 *  Invocation:
 *     smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarray,
 *                       const smfArray *darks, const smfArray *bbms,
-*                       dim_t nchunks, smf_modeltype mtype,
+*                       const smfArray* flatramps, dim_t nchunks, smf_modeltype mtype,
 *                       int isTordered, AstFrameSet *outfset, int moving,
 *                       int *lbnd_out, int *ubnd_out, smfGroup **mgroup,
 *                       int nofile, int leaveopen, smfArray **mdata,
@@ -34,6 +34,8 @@
 *        Can be NULL.
 *     bbms = const smfArray * (Given)
 *        Masks for each subarray (e.g. returned by smf_reqest_mask call)
+*     flatramps = const smfArray * (Given)
+*        Collection of flatfield ramps. Will be passed to smf_open_and_flatfield.
 *     nchunks = dim_t (Given)
 *        If iarray specified instead of igroup, nchunks gives number of
 *        smfArrays in iarray (otherwise it is derived from igroup).
@@ -176,6 +178,7 @@
 *        anyhow.
 *     2010-03-11 (TIMJ):
 *        Add darks and mask arguments to sync with smf_concat_smfGroup
+*        Add flatramps argument.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -233,7 +236,7 @@
 
 void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarray,
                        const smfArray *darks, const smfArray *bbms,
-                       dim_t nchunks, smf_modeltype mtype,
+                       const smfArray * flatramps, dim_t nchunks, smf_modeltype mtype,
                        int isTordered, AstFrameSet *outfset, int moving,
                        int *lbnd_out, int *ubnd_out, smfGroup **mgroup,
                        int nofile, int leaveopen, smfArray **mdata,
@@ -435,7 +438,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
                do an open_and_flatfield */
 
             if( !(oflag&SMF__NOCREATE_DATA) ) {
-              smf_open_and_flatfield( igroup->grp, NULL, idx, darks,
+              smf_open_and_flatfield( igroup->grp, NULL, idx, darks, flatramps,
                                       &idata, status );
               smf_apply_mask( idata, NULL, bbms, SMF__BBM_DATA, status );
 

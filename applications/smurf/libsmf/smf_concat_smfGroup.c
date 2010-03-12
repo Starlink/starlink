@@ -15,6 +15,7 @@
  *  Invocation:
  *     smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
  *                          const smfArray *darks, const smfArray *bbms,
+ *                          const smfArray *flatramps,
  *                          size_t whichchunk, int ensureflat, int isTordered,
  *                          AstFrameSet *outfset, int moving,
  *                          int *lbnd_out, int *ubnd_out, dim_t padStart,
@@ -29,8 +30,10 @@
  *     darks = const smfArray * (Given)
  *        Collection of darks that can be applied to non-flatfielded data.
  *        Can be NULL.
- *     bbms = smfArray * (Given)
+ *     bbms = const smfArray * (Given)
  *        Masks for each subarray (e.g. returned by smf_reqest_mask call)
+ *     flatramps = const smfArray * (Given)
+ *        Collection of flatfield ramps. Will be passed to smf_open_and_flatfield.
  *     whichchunk = size_t (Given)
  *        Which continuous subset of igrp will get concatenated?
  *     ensureflat = int (Given)
@@ -138,6 +141,8 @@
  *        Allow flatfielding to be disabled.
  *     2010-01-08 (AGG):
  *        Change BPM to BBM.
+ *     2010-03-11 (TIMJ):
+ *        Add flatramps argument.
 
  *  Notes:
  *     If projection information supplied, pointing LUT will not be
@@ -201,7 +206,8 @@
 
 void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
                           const smfArray *darks, const smfArray *bbms,
-                          size_t whichchunk, int ensureflat, int isTordered,
+                          const smfArray *flatramps, size_t whichchunk,
+                          int ensureflat, int isTordered,
                           AstFrameSet *outfset, int moving,
                           int *lbnd_out, int *ubnd_out, dim_t padStart,
                           dim_t padEnd, int flags, int tstep,
@@ -424,7 +430,7 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
              require flat-fielding. */
           if (ensureflat) {
             smf_open_and_flatfield( igrp->grp, NULL, igrp->subgroups[j][i],
-                                    darks, &refdata, status );
+                                    darks, flatramps, &refdata, status );
           } else {
             /* open as raw if raw else just open as whatever we have */
             smfData * tmpdata = NULL;
@@ -435,7 +441,7 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
                                      darks, &refdata, status );
             } else {
               smf_open_and_flatfield( igrp->grp, NULL, igrp->subgroups[j][i],
-                                      darks, &refdata, status );
+                                      darks, flatramps, &refdata, status );
             }
             smf_close_file( &tmpdata, status );
           }

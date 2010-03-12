@@ -162,7 +162,7 @@ void smurf_dreamsolve ( int *status ) {
   /* Loop over number of files */
   for ( i=1; i<=size; i++) {
     /* Open file and flatfield the data */
-    smf_open_and_flatfield( igrp, ogrp, i, darks, &data, status );
+    smf_open_and_flatfield( igrp, ogrp, i, darks, NULL, &data, status );
     smf_dreamsolve( data, status );
 
     /* Check status to see if there was a problem */

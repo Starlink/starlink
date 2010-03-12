@@ -163,7 +163,7 @@ void smurf_smurfcopy ( int * status ) {
   for (i=1; i<=size; i++) {
 
     /* Open the input file using standard routine */
-    smf_open_and_flatfield( igrp, NULL, i, NULL, &data, status );
+    smf_open_and_flatfield( igrp, NULL, i, NULL, NULL, &data, status );
     if (*status != SAI__OK) break;
 
     if (*status == SAI__OK) {

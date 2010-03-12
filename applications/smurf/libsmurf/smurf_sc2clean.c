@@ -121,10 +121,12 @@
 *        Use threads
 *     2010-01-11 (EC):
 *        Add FILLGAPS parameter
+*     2010-03-11 (TIMJ):
+*        Support flatfield ramps.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2010 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2008-2010 University of British Columbia.
 *     All Rights Reserved.
@@ -192,6 +194,7 @@ void smurf_sc2clean( int *status ) {
   int dkclean;              /* Flag for dark squid cleaning */
   int fillgaps;             /* Flag to do gap filling */
   double flagstat;          /* Threshold for flagging stationary regions */
+  smfArray *flatramps = NULL;/* Flatfield ramps */
   smfData *ffdata = NULL;   /* Pointer to output data struct */
   Grp *fgrp = NULL;         /* Filtered group, no darks */
   size_t i = 0;             /* Counter, index */
@@ -219,7 +222,7 @@ void smurf_sc2clean( int *status ) {
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
   /* Filter out darks */
-  smf_find_science( igrp, &fgrp, NULL, NULL, 1, 0, SMF__NULL, &darks, NULL, status );
+  smf_find_science( igrp, &fgrp, NULL, NULL, 1, 1, SMF__NULL, &darks, &flatramps, status );
 
   /* input group is now the filtered group so we can use that and
      free the old input group */
@@ -274,7 +277,7 @@ void smurf_sc2clean( int *status ) {
   if( *status == SAI__OK ) for( i=1; i<=size; i++ ) {
 
     /* Open and flatfield in case we're using raw data */
-    smf_open_and_flatfield(igrp, ogrp, i, darks, &ffdata, status);
+    smf_open_and_flatfield(igrp, ogrp, i, darks, flatramps, &ffdata, status);
 
     /* Check status to see if data are already flatfielded */
     if (*status == SMF__FLATN) {
@@ -418,6 +421,7 @@ void smurf_sc2clean( int *status ) {
 
   /* Tidy up after ourselves: release the resources used by the grp routines */
   if (darks) smf_close_related( &darks, status );
+  if (flatramps) smf_close_related( &flatramps, status );
   grpDelet( &igrp, status);
   grpDelet( &ogrp, status);
   if( keymap ) keymap = astAnnul( keymap );

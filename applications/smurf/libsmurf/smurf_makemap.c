@@ -698,6 +698,8 @@
 *        Add a spectral axis to the output NDF.
 *     2010-01-08 (AGG):
 *        Change BPM to BBM.
+*     2010-03-11 (TIMJ):
+*        Support flatfield ramps.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -789,6 +791,7 @@ void smurf_makemap( int *status ) {
   Grp * fgrp = NULL;         /* Filtered group, no darks */
   smfFile *file=NULL;        /* Pointer to SCUBA2 data file struct */
   int first;                 /* Is this the first input file? */
+  smfArray *flatramps = NULL;/* Flatfield ramps */
   int *histogram = NULL;     /* Histogram for calculating exposure statistics */
   int *hitsmap;              /* Hitsmap array calculated in ITERATE method */
   dim_t i;                   /* Loop counter */
@@ -873,7 +876,7 @@ void smurf_makemap( int *status ) {
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
   /* Filter out darks */
-  smf_find_science( igrp, &fgrp, NULL, NULL, 1, 0, SMF__NULL, &darks, NULL, status );
+  smf_find_science( igrp, &fgrp, NULL, NULL, 1, 1, SMF__NULL, &darks, &flatramps, status );
 
   /* input group is now the filtered group so we can use that and
      free the old input group */
@@ -1235,7 +1238,7 @@ void smurf_makemap( int *status ) {
         if( !pt || pt[ 0 ] < VAL__MAXI ) {
 
           /* Read data from the ith input file in the group */
-          smf_open_and_flatfield( tile->grp, NULL, ifile, darks, &data,
+          smf_open_and_flatfield( tile->grp, NULL, ifile, darks, flatramps, &data,
                                   status );
 
           /* Check that the data dimensions are 3 (for time ordered data) */
@@ -1537,7 +1540,7 @@ void smurf_makemap( int *status ) {
     /* Call the low-level iterative map-maker */
 
     smf_iteratemap( wf, igrp, iterrootgrp, bolrootgrp, keymap, NULL, bbms,
-                    outfset, moving, lbnd_out, ubnd_out, maxmem-mapmem,
+                    flatramps, outfset, moving, lbnd_out, ubnd_out, maxmem-mapmem,
                     map, hitsmap, variance, weights, data_units, status );
 
     if( bolrootgrp ) grpDelet( &bolrootgrp, status );
@@ -1638,6 +1641,7 @@ void smurf_makemap( int *status ) {
   if( boxes ) boxes = smf_free( boxes, status );
   if( tiles ) tiles = smf_freetiles( tiles, ntile, status );
   if( darks ) smf_close_related( &darks, status );
+  if( flatramps ) smf_close_related( &flatramps, status );
   if( bbms ) smf_close_related( &bbms, status );
   if( keymap ) keymap = astAnnul( keymap );
 

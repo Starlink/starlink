@@ -463,7 +463,7 @@ void smurf_qlmakemap( int *status ) {
   msgOutif( MSG__VERB," ", "SMURF_QLMAKEMAP: Process data files", status );
   for ( i=1; i<=size && *status == SAI__OK; i++ ) {
     /* Read data from the ith input file in the group */
-    smf_open_and_flatfield( igrp, NULL, i, darks, &data, status );
+    smf_open_and_flatfield( igrp, NULL, i, darks, NULL, &data, status );
 
     msgOutif( MSG__VERB," ", "SMURF_QLMAKEMAP: Cleaning bolometer data.",
               status );

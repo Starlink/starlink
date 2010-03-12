@@ -598,6 +598,7 @@ void smf_collapse_tseries( const smfData *indata, int nclip, const float clip[],
 
 void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
                           const smfArray *darks, const smfArray *bpms,
+                          const smfArray *flatramps,
                           size_t whichchunk, int ensureflat, int isTordered,
                           AstFrameSet *outfset, int moving,
                           int *lbnd_out, int *ubnd_out, dim_t padStart,
@@ -1051,7 +1052,7 @@ int smf_isfft( const smfData *indata, dim_t *ntslice, dim_t *nbolo,
 void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      const Grp * bolrootgrp,
                      AstKeyMap *keymap, const smfArray *darks,
-                     const smfArray *bpms,
+                     const smfArray *bpms, const smfArray * flatramps,
                      AstFrameSet *outfset, int moving, int *lbnd_out,
                      int *ubnd_out, size_t maxmem, double *map,
                      int *hitsmap, double *mapvar,
@@ -1110,7 +1111,7 @@ void smf_merge_keymaps ( AstKeyMap * keymap, const char * key, const char * suff
 
 void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarray,
                        const smfArray *darks, const smfArray *bbms,
-                       dim_t nchunks, smf_modeltype mtype,
+                       const smfArray *flatramps, dim_t nchunks, smf_modeltype mtype,
                        int isTordered, AstFrameSet *outfset, int moving,
                        int *lbnd_out, int *ubnd_out, smfGroup **mgroup,
                        int nofile, int leaveopen, smfArray **mdata,
@@ -1140,8 +1141,8 @@ const char * smf_obsmode_str( smf_obsmode type, int * status );
 const char * smf_obstype_str( smf_obstype type, int * status );
 
 int smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
-                             const smfArray * darks, smfData **ffdata,
-                             int *status);
+                             const smfArray * darks, const smfArray * ramps,
+                             smfData **ffdata, int *status);
 
 void smf_open_file( const Grp * igrp, size_t index, const char * mode,
                     int withHdr, smfData ** data, int *status);

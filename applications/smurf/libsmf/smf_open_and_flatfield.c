@@ -15,7 +15,7 @@
 *  Invocation:
 *     didflat = smf_open_and_flatfield( const Grp *igrp, const Grp *ogrp,
 *                             size_t index, const smfArray* darks,
-*                              smfData **data, int *status );
+*                             const smfArray* flatramps, smfData **data, int *status );
 
 *  Arguments:
 *     igrp = const Grp* (Given)
@@ -26,6 +26,9 @@
 *        Index into the group
 *     darks = const smfArray* (Given)
 *        Set of darks that could be applied. Can be NULL.
+*     flatramps = const smfArray * (Given)
+*        Set of flatfield ramps to be assigned to any relevant data files.
+*        Can be NULL.
 *     data = smfData** (Returned)
 *        Pointer to a pointer to smfData struct containing flatfielded data.
 *        Will be created by this routine, or NULL on error.
@@ -163,8 +166,8 @@
 #define FUNC_NAME "smf_open_and_flatfield"
 
 int smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
-                              const smfArray *darks, smfData **ffdata,
-                              int *status) {
+                             const smfArray *darks, const smfArray * flatramps,
+                             smfData **ffdata, int *status) {
 
   smfData *data = NULL;     /* Pointer to input data struct */
   smfFile *file = NULL;     /* Pointer to input file struct */

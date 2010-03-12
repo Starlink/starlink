@@ -92,6 +92,8 @@
 *        flatfield method.
 *     2010-03-09 (TIMJ):
 *        Change type of flatfield method in smfDA
+*     2010-03-11 (TIMJ):
+*        Support flatfield ramps.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -162,6 +164,7 @@ void smurf_calcnoise( int *status ) {
   Grp *dkgrp = NULL;        /* Group of dark frames */
   size_t dksize = 0;        /* Number of darks found */
   Grp *fgrp = NULL;         /* Filtered group, no darks */
+  smfArray * flatramps = NULL; /* Flatfield ramps */
   size_t gcount=0;           /* Grp index counter */
   size_t i=0;               /* Counter, index */
   Grp *igrp = NULL;         /* Input group of files */
@@ -200,7 +203,7 @@ void smurf_calcnoise( int *status ) {
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
   /* Filter out darks */
-  smf_find_science( igrp, &fgrp, &dkgrp, NULL, 1, 0, SMF__NULL, NULL, NULL, status );
+  smf_find_science( igrp, &fgrp, &dkgrp, NULL, 1, 1, SMF__NULL, NULL, &flatramps, status );
 
   /* input group is now the filtered group so we can use that and
      free the old input group */
@@ -257,7 +260,7 @@ void smurf_calcnoise( int *status ) {
 
     /* Concatenate this continuous chunk but forcing a raw data read.
        We will need quality. */
-    smf_concat_smfGroup( wf, igroup, NULL, NULL, contchunk, 0, 1, NULL, 0, NULL,
+    smf_concat_smfGroup( wf, igroup, NULL, NULL, flatramps, contchunk, 0, 1, NULL, 0, NULL,
                          NULL, 0, 0, 0, 1, &concat, status );
 
     /* Now loop over each subarray */
@@ -471,6 +474,7 @@ void smurf_calcnoise( int *status ) {
   if (powgrp) grpDelet( &powgrp, status );
   if (basegrp) grpDelet( &basegrp, status );
   if( igroup ) smf_close_smfGroup( &igroup, status );
+  if( flatramps ) smf_close_related( &flatramps, status );
   if( wf ) wf = smf_destroy_workforce( wf );
 
   ndfEnd( status );

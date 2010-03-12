@@ -194,7 +194,7 @@ void smurf_starecalc ( int *status ) {
   /* Loop over number of files */
   for ( i=1; i<=size; i++) {
     /* Open file and flatfield the data */
-    smf_open_and_flatfield( igrp, ogrp, i, darks, &data, status );
+    smf_open_and_flatfield( igrp, ogrp, i, darks, NULL, &data, status );
 
     /* Mask out bad bolometers - mask data array not quality array */
     smf_apply_mask( data, NULL, bbms, SMF__BBM_DATA, status );

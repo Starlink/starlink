@@ -78,12 +78,14 @@
 *        Add USEDARKS parameter.
 *     2009-12-07 (EC):
 *        Add FLAT parameter.
+*     2010-03-11 (TIMJ):
+*        Support flatfield ramps.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2005-2009 University of British Columbia.
-*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2010 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -147,6 +149,7 @@ void smurf_sc2concat( int *status ) {
   smfData *data=NULL;        /* Pointer to a smfData */
   int ensureflat;            /* Flag for flatfielding data */
   Grp *fgrp = NULL;          /* Filtered group, no darks */
+  smfArray * flatramps = NULL; /* Flatfield ramps */
   size_t gcount=0;           /* Grp index counter */
   size_t idx;                /* Subarray counter */
   int usedarks;              /* flag for using darks */
@@ -177,7 +180,7 @@ void smurf_sc2concat( int *status ) {
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &isize, status );
 
   /* Filter out darks */
-  smf_find_science( igrp, &fgrp, NULL, NULL, 1, 0, SMF__NULL, &darks, NULL, status );
+  smf_find_science( igrp, &fgrp, NULL, NULL, 1, 1, SMF__NULL, &darks, &flatramps, status );
 
   /* input group is now the filtered group so we can use that and
      free the old input group */
@@ -241,7 +244,7 @@ void smurf_sc2concat( int *status ) {
   for( contchunk=0;(*status==SAI__OK)&&contchunk<ncontchunks; contchunk++ ) {
 
     /* Concatenate this continuous chunk */
-    smf_concat_smfGroup( wf, igroup, usedarks ? darks:NULL, NULL, contchunk,
+    smf_concat_smfGroup( wf, igroup, usedarks ? darks:NULL, NULL, flatramps, contchunk,
                          ensureflat, 1, NULL, 0, NULL, NULL, padStart, padEnd,
                          0, 1, &concat, status );
 
@@ -276,6 +279,7 @@ void smurf_sc2concat( int *status ) {
  CLEANUP:
   if( wf ) wf = smf_destroy_workforce( wf );
   if( darks ) smf_close_related( &darks, status );
+  if( flatramps ) smf_close_related( &flatramps, status );
   if( igrp ) grpDelet( &igrp, status);
   if( basegrp ) grpDelet( &basegrp, status );
   if( ogrp ) grpDelet( &ogrp, status );
