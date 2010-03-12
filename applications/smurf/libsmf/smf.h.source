@@ -1108,8 +1108,9 @@ void smf_maskacsis( int indf, int *mask, int *status );
 void smf_merge_keymaps ( AstKeyMap * keymap, const char * key, const char * suffix,
                          int * status );
 
-void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
-                       smfArray **iarray, dim_t nchunks, smf_modeltype mtype,
+void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarray,
+                       const smfArray *darks, const smfArray *bbms,
+                       dim_t nchunks, smf_modeltype mtype,
                        int isTordered, AstFrameSet *outfset, int moving,
                        int *lbnd_out, int *ubnd_out, smfGroup **mgroup,
                        int nofile, int leaveopen, smfArray **mdata,

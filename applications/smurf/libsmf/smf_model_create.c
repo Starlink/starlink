@@ -13,8 +13,9 @@
 *     Library routine
 
 *  Invocation:
-*     smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
-*                       smfArray **iarray, dim_t nchunks, smf_modeltype mtype,
+*     smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarray,
+*                       const smfArray *darks, const smfArray *bbms,
+*                       dim_t nchunks, smf_modeltype mtype,
 *                       int isTordered, AstFrameSet *outfset, int moving,
 *                       int *lbnd_out, int *ubnd_out, smfGroup **mgroup,
 *                       int nofile, int leaveopen, smfArray **mdata,
@@ -28,6 +29,11 @@
 *     iarray = const smfArray ** (Given)
 *        If igroup unspecified, use an array of smfArrays as the template
 *        instead. In this case nchunks must also be specified.
+*     darks = const smfArray * (Given)
+*        Collection of darks that can be applied to non-flatfielded data.
+*        Can be NULL.
+*     bbms = const smfArray * (Given)
+*        Masks for each subarray (e.g. returned by smf_reqest_mask call)
 *     nchunks = dim_t (Given)
 *        If iarray specified instead of igroup, nchunks gives number of
 *        smfArrays in iarray (otherwise it is derived from igroup).
@@ -168,6 +174,8 @@
 *        Add support for AUTO extinction tau source. Remove call to
 *        smf_cso2filt_tau since smf_correct_extinction will do that
 *        anyhow.
+*     2010-03-11 (TIMJ):
+*        Add darks and mask arguments to sync with smf_concat_smfGroup
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -223,8 +231,9 @@
 
 #define FUNC_NAME "smf_model_create"
 
-void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
-                       smfArray **iarray, dim_t nchunks, smf_modeltype mtype,
+void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarray,
+                       const smfArray *darks, const smfArray *bbms,
+                       dim_t nchunks, smf_modeltype mtype,
                        int isTordered, AstFrameSet *outfset, int moving,
                        int *lbnd_out, int *ubnd_out, smfGroup **mgroup,
                        int nofile, int leaveopen, smfArray **mdata,
@@ -426,8 +435,10 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
                do an open_and_flatfield */
 
             if( !(oflag&SMF__NOCREATE_DATA) ) {
-              smf_open_and_flatfield( igroup->grp, NULL, idx, NULL,
+              smf_open_and_flatfield( igroup->grp, NULL, idx, darks,
                                       &idata, status );
+              smf_apply_mask( idata, NULL, bbms, SMF__BBM_DATA, status );
+
             } else {
               smf_open_file( igroup->grp, idx, "READ", oflag, &idata, status );
             }
