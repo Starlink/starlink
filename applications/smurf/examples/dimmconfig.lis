@@ -66,14 +66,14 @@ exportndf = 0
 # ensureflat=0
 
 # The gap (in time slices) between full calculations of the output map
-# bolometer positions. Setting a larger value for this will speed up 
-# the map maker but will introduce larger spatial errors. The default 
-# value of 100 seems to produce spatial errors of under 0.1 arc-sec. This 
-# level of errors seems to cause about 1% of bolometers samples to be 
+# bolometer positions. Setting a larger value for this will speed up
+# the map maker but will introduce larger spatial errors. The default
+# value of 100 seems to produce spatial errors of under 0.1 arc-sec. This
+# level of errors seems to cause about 1% of bolometers samples to be
 # pushed into a neighouring map pixel. For tstep=100, the calculation of
-# bolometer positions speeds up by about a factor of 60. Setting tstep to 
-# 1 (or zero) causes all bolometer positions to be calculated in full, 
-# without any approximation. 
+# bolometer positions speeds up by about a factor of 60. Setting tstep to
+# 1 (or zero) causes all bolometer positions to be calculated in full,
+# without any approximation.
 #tstep = 100
 
 # ----------------------------------------------------------------------------
@@ -117,8 +117,10 @@ dcbox = 50
 # if set flag entire bolo with DC step as bad instead of trying to repair
 #dcbad = 1
 
-# if set flag/correct ALL bolometers at locations of DC steps
-dcflagall = 1
+# This has also been turned off for now as there still seem to be problems
+# with over-flagging DC steps.
+# if set flag/correct ALL bolometers at locations of DC steps.
+#dcflagall = 1
 
 # S/N ratio to flag spikes with sigma-clipper
 # spikethresh = 5
@@ -174,7 +176,7 @@ com.boxcar = 10
 # with bizarre gains, or shapes if they have for example steps in them). These
 # are basically sigma-clippers; outliers are removed at the given threshold
 # and then new means and sample standard deviations are measured until
-# convergence. The time axis is divided up into one or more equal sized boxes, 
+# convergence. The time axis is divided up into one or more equal sized boxes,
 # and a separate fit is performed for each box.
 #
 # com.gain_box: the number of time slices in a box
@@ -188,7 +190,10 @@ com.boxcar = 10
 com.corr_tol = 5
 com.gain_tol = 5
 com.gain_abstol = 3
-#com.gain_box = 6000
+
+# com.gain_box currently set to something large as there still seems to
+# some off behaviour to work out with the chunked common-mode code.
+com.gain_box = 600000
 #com.corr_abstol = 0.2
 #com.gain_fgood = 0.25
 #com.gain_rat = 4.0
@@ -198,17 +203,23 @@ com.gain_abstol = 3
 dks.boxcar = 100
 
 # additional despiking / DC step finding after each iteration within noi
-# calculation
+# calculation.
 noi.spikethresh = 10
 noi.spikeiter = 0
-#noi.dcbox = 200
-#noi.dcthresh = 5
-#noi.dcbad = 1
-#noi.dcflagall = 1
 noi.fillgaps = 1
 
+# explicitly turn off iterative DC step finding for now
+noi.dcbox = 0
+noi.dcthresh = 0
+noi.dcbad = 0
+noi.dcflagall = 0
+
+
 # iterative filter.
-flt.filt_edgehigh = 0.1
+
+flt_450.filt_edgehigh = 0.1
+flt_850.filt_edgelow = 0.3
+
 #flt.filt_edgelow = 90
 #flt.filt_notchlow  = (25,55)
 #flt.filt_notchhigh = (35,65)

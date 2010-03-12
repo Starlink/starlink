@@ -1,16 +1,23 @@
-# *** Specialized config for long scans of fainter sources ***
+^$STARLINK_DIR/share/smurf/dimmconfig.lis
+
+# *** Specialized config for long scans of faint/compact sources ***
 #
 # The main feature of this config file is that we lower the thresholds
-# for flagging bag detectors: com.*_tol are set to 3 to heavily reject
-# detectors that deviate from the common-mode signal, and we turn on
-# iterative flagging of remaining (small) DC steps using noi.dc*. In
-# order for this to work reasonably well it is important that the scan
-# is long, and relatively faint astronomical source when compared to
-# the total low-frequency drift of the detectors. If this dimmconfig
-# were to be used for a short scan of a bright calibrator, the
-# astronomical signal variations can be significant, and perfectly
-# good detectors that see the source could be excluded from the map
-# since they deviate significantly from the common-mode.
+# for flagging bag detectors (com.*_tol), and we turn on iterative
+# flagging of remaining (small) DC steps using noi.dc*. In order for
+# this to work reasonably well it is important that the scan is long,
+# and relatively faint astronomical source when compared to the total
+# low-frequency drift of the detectors. If this dimmconfig were to be
+# used for a short scan of a bright calibrator, the astronomical
+# signal variations can be significant, and perfectly good detectors
+# that see the source could be excluded from the map since they
+# deviate significantly from the common-mode.
+#
+# We turn on the chunked common-mode rejection, using pieces about 5 min.
+# in length. The reason for this is that the thresholds used for rejecting
+# bolometers (comparing with common-mode) seem to depend on the length of
+# the time series. Restricting the length will hopefully give more uniform
+# results for different data sets.
 #
 # Since this dimmconfig file is more of an attempt at producing
 # "science grade maps" the itermap=1 flag has been set. This will
@@ -20,87 +27,14 @@
 #
 #   gaia [output map name].more.smurf.itermaps
 #
-# Since the number of iterations has been set to 10, by flipping
-# through the more.smurf.itermaps extension it is possible to get a
-# good feel for how well the map is converging (and whether you would
-# like more or less iterations).
-#
-# Finally, good results seem to be obtained at 850um setting
-# flt.filt_edgehigh = 0.3, and at 450um setting it to 0.1.
+# By flipping through the more.smurf.itermaps extension it is possible
+# to get a good feel for how well the map is converging (and whether
+# you would like more or less iterations).
 #
 # ***********************************************************
 
-# Number of iterations
-#  postive number  = fixed number of iterations
-#  negative number = maximum iterations if using chi^2 stopping criteria
-numiter = -5
-
-# chi^2 tolerance in negative-numiter case (requires noi model component)
-chitol = 1e-3
-
-# method of estimating variance map
-#  0 = propagate from the time-domain noise (requires noi model component)
-#  1 = sample variance of data that land in each pixel
-varmapmethod = 1
-
-# Perform iterations in memory?
-memiter = 1
-
-# Delete temporary .DIMM files if memiter=0?
-deldimm = 1
-
-# If performing iterations in memory, maximum length (seconds) for concatenated
-# data. If 0 attempt to concatenate entire continuous chunks.
-maxlen = 0
-
-# Model components/order (comma separated list in brackets)
-# Note: components specified AFTER 'ast' will not be calculated for the
-# first time until the second iteration.
-#  dks = fit and remove dark squid for the column
-#  com = remove common-mode signal
-#  gai = if com specified, fit gain/offset of common mode
-#  ext = apply extinction correction
-#  ast = estimate the map and astronomical signal
-#  flt = apply filter to time streams
-#  noi = estimate time-domain variance
-
-modelorder = (com,gai,ext,flt,ast,noi)
-
-# Export model files as NDF?
-# Specify a value of 1 or 0 to export all or none of the components
-# You can also specify an array of components to export using the same
-# format as modelorder. Note that you can specify additional
-# components 'res' and 'qua' to what may be provided to modelorder if
-# you wish to export the residual model or quality arrays
-# respectively. Exportation of 'res' is implied if either 'noi' or
-# 'qua' are specified as they become the variance and quality
-# components of the resulting NDF for 'res' respectively.
-
-exportndf = 0
-#exportndf = (com,gai,ast,flt,res,noi,qua)
-
-# Normally all data points in exported model components are set to BAD values
-# wherever there is a bad bolometer established during map-making. Set
-# this flag to prevent this behaviour.
-
-#noexportsetbad = 1
-
-# Create an extension containing the map after each iteration?
+# Create an extension containing the map after each iteration
 itermap = 1
-
-# Create single-beam maps in addition to main map?
-#bolomap = 1
-
-# The gap (in time slices) between full calculations of the output map
-# bolometer positions. Setting a larger value for this will speed up 
-# the map maker but will introduce larger spatial errors. The default 
-# value of 100 seems to produce spatial errors of under 0.1 arc-sec. This 
-# level of errors seems to cause about 1% of bolometers samples to be 
-# pushed into a neighouring map pixel. For tstep=100, the calculation of
-# bolometer positions speeds up by about a factor of 60. Setting tstep to 
-# 1 (or zero) causes all bolometer positions to be calculated in full, 
-# without any approximation. 
-#tstep = 100
 
 # ----------------------------------------------------------------------------
 # The following parameters control data-cleaning before iterations start
@@ -108,157 +42,35 @@ itermap = 1
 
 # --- Padding, apodization and mean subtraction are all fairly useful ---
 
-# Number of samples of padding to add to start and end before filtering
+# Longer padding/apodization intervals to really try to avoid ringing
+
 padstart = 1000
 padend = 1000
-
-# Apodize signals with a sin function roll-off across apod samples
 apod = 1000
-
-# subtract a baseline polynomial of this order
-order = 0
-
-
-# --- badfrac ensures that bad data from DA system are ignored ---
-
-# fraction of samples to be bad to flag entire bolo as dead
-badfrac = 0.05
-
-
-# --- flag data when we're stationary because insensitive to sky signal ---
-
-# Flag data taken while telescope was stationary (value is a threshold
-# slew velocity (arcsec/sec) measured in tracking coordinates
-flagstat = 2
-
-
-# --- Many of the following are not useful ---
-
-# S/N threshold to detect DC steps
-dcthresh = 1000
-
-# box size over which to measure rms for DC step finder
-dcbox = 200
-
-# if set flag entire bolo with DC step as bad instead of trying to repair
-dcbad = 1
-
-# S/N ratio to flag spikes with sigma-clipper
-# spikethresh = 5
-
-# Number of iterations for sigma-clipper (0=until convergence)
-# spikeiter = 0
-
-# The following filters are applied *before* the iterative loop. It is
-# probably a better idea in general to do filtering with the 'flt'
-# model component as described in the next section.
-
-# Hard-edge high-pass frequency-domain filter
-#   e.g. keep only frequencies >= 0.1 Hz
-# filt_edgehigh = 0.1
-
-# Hard-edge low-pass frequency-domain filter
-#   e.g. keep only frequencies <= 90 Hz
-# filt_edgelow = 90
-
-# Hard-edge band-cut frequency-domain notch filters.
-# filt_notchlow gives lower edges of frequencies to cut in Hz
-# filt_notchhigh gives upper edges of frequencies to cut in Hz
-#   e.g. remove 25--35 Hz  and 55--65 Hz
-#filt_notchlow  = (25,55)
-#filt_notchhigh = (35,65)
 
 
 # ----------------------------------------------------------------------------
 # These parameters control the iterative model components
 # ----------------------------------------------------------------------------
 
-# delay calculation of COM until after the first iteration? (good if
-# the astronomical signal is expected to dominate the sky signal)
-
-#com.notfirst = 1
-
-# low-pass boxcar filter on COM (samples) to assist with convergence
-# if boxfact set reduce width of boxcar by this factor each iteration
-# boxmin specifies a minimum width below which it can't be reduced
-
-com.boxcar = 10
-#com.boxcar  = 400
-#com.boxfact = 0.5
-#com.boxmin  = 10
-
-# the following COM parameters control the rejection of bad detectors
-# based on the gain and correlation coefficients for the fit of the
-# common-mode signal to each detector (good at identifying bolo signals
-# with bizarre gains, or shapes if they have for example steps in them). These
-# are basically sigma-clippers; outliers are removed at the given threshold
-# and then new means and sample standard deviations are measured until
-# convergence. The time axis is divided up into one or more equal sized boxes, 
-# and a separate fit is performed for each box.
-#
-# com.gain_box: the number of time slices in a box
-# com.corr_tol: n-sigma away from mean correlation coefficient tolerance
-# com.corr_abstol: the absolute lower limit of acceptable correlation
-# com.gain_tol: n-sigma away from mean gain coefficient tolerance
-# com.gain_abstol: absolute factor away from mean gain coefficient tolerance
-# com.gain_fgood: minimum fraction of good boxes for a usable bolometer
-# com.gain_rat: ratio of largest usable gain to mean gain for a bolometer
-
+# be more aggressive about rejecting bad detectors
 com.corr_tol = 3.5
 com.gain_tol = 3.5
 com.gain_abstol = 3
 #com.corr_abstol = 0.2
-#com.gain_box = 6000
-#com.gain_fgood = 0.25
-#com.gain_rat = 4.0
 
 # low-pass filter dark squid signals using boxcar of this width (if dks
 # model is specified)
 dks.boxcar = 100
 
-# additional despiking / DC step finding after each iteration within noi
-# calculation
-noi.spikethresh = 20
-noi.spikeiter = 0
-noi.dcbox = 200
-noi.dcthresh = 5
-noi.dcbad = 1
+# Turn on some iterative dc step finding here
+noi.dcbox = 50
+noi.dcthresh = 100
+noi.dcbad = 0
+noi.dcflagall = 0
+noi.fillgaps = 1
 
-# iterative filter.
+# heavoier high-pass filtering
 
-# Good for 450um as independent detector drift drowned out by sky?
-#flt.filt_edgehigh = 0.1
-
-# Better for 850um
-flt.filt_edgehigh = 0.3
-
-#flt.filt_edgelow = 90
-#flt.filt_notchlow  = (25,55)
-#flt.filt_notchhigh = (35,65)
-
-# extinction correction (see EXTINCTION task for further information)
-# Best is to use WVM, uses continuously varying measurements as a
-# function of time stored with each observation. This is the default if
-# nothing is specified.
-#
-# tausrc   : auto, wvmraw, csotau, filtertau
-# taumethod: adaptive, full, quick
-# csotau   : use value only if tausrc=csotau
-# filtertau: use only if tausrc=filtertau
-
-ext.tausrc    =auto
-ext.taumethod =adaptive
-#ext.csotau    = 0.2
-#ext.filtertau = 0.2
-
-# Use the GAIn/COMmon mode to re-calculate the flatfield? Probably a
-# good idea in most cases, but dangerous for short scans of very bright
-# sources because the astronomical signal may completely dominate
-# sky signal.
-
-#gai.flatfield = 1
-
-# Constrain boundary regions with low hit count to 0. The threshold is where
-# the hits are this fraction lower than the mean
-
-#ast.zero_lowhits = 0.5
+flt_450.filt_edgehigh = 0.2
+flt_850.filt_edgelow = 0.6

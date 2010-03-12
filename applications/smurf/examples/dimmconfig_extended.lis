@@ -1,0 +1,59 @@
+^$STARLINK_DIR/share/smurf/dimmconfig.lis
+
+# *** Specialized config for scans of bright/extended structure ***
+#
+# To try and do better on the large scales, we do two main things
+# differently: More low-pass filtering of the common-mode signal (since
+# large-scale structure and the common-mode signal are degenerate
+# on scales of the array footprint or larger), and we jack up the
+# number of iterations so that the larger-scale stuff has a chance
+# to converge (much slower than small-scale stuff).
+#
+# *****************************************************************
+
+# Lots of iterations. Look at more.smurf.itermaps extension to see if
+# you want more/less iterations after running once.
+
+numiter = 20
+
+# Create an extension containing the map after each iteration
+itermap = 1
+
+
+# ----------------------------------------------------------------------------
+# The following parameters control data-cleaning before iterations start
+# ----------------------------------------------------------------------------
+
+# --- Padding, apodization and mean subtraction are all fairly useful ---
+
+# Longer padding/apodization intervals to really try to avoid ringing
+
+padstart = 1000
+padend = 1000
+apod = 1000
+
+# Bigger threshold for steps to avoid detecting bright sources accidentally
+dcthresh = 1000
+dcbox = 50
+dcbad = 0
+dcflagall = 0
+
+# ----------------------------------------------------------------------------
+# These parameters control the iterative model components
+# ----------------------------------------------------------------------------
+
+# start with a strong low-pass filter on com, and then step down by 0.5
+# each time (but no smaller boxcar that 10 samples -- reached after 8
+# iterations).
+
+com.boxcar = 2000
+com.boxfact = 0.5
+com.boxmin  = 10
+
+# these high-pass filter numbers are decent for preserving scales a bit
+# larger than the array footprint for typical scan speeds (e.g. 2 arcmin
+# footprint, 150arcsec/sec scan, about 1 Hz... we're filtering at lower
+# frequencies than that).
+
+flt_450.filt_edgehigh = 0.1
+flt_850.filt_edgelow = 0.3

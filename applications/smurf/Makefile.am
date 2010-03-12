@@ -70,6 +70,7 @@ examples/atm.sdf \
 examples/candycanes.sdf \
 examples/dimmconfig.lis \
 examples/dimmconfig_distortionmap.lis \
+examples/dimmconfig_extended.lis \
 examples/dimmconfig_faint.lis \
 examples/dimmconfig_veryshort.lis \
 examples/dreamobs.lis \
