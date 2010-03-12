@@ -2300,13 +2300,11 @@ itcl::class gaia::GaiaSextractor {
                   #  command fails).
                   file delete [get_catname_]
 
-                  #  Generate file names, include MEF extension if given.
+                  #  Generate file names, include MEF extension so that only
+                  #  this extension is processed. Otherwise all image
+                  #  extensions would be done.
                   set hdunum [$itk_option(-rtdimage) hdu]
-                  if { $hdunum > 1 } {
-                     set fitsname "$diskimage\[$hdunum\]"
-                  } else {
-                     set fitsname $diskimage
-                  }
+                  set fitsname "$diskimage\[$hdunum\]"
 
                   #  Run program, monitoring output...
                   if { $detect == "" } {

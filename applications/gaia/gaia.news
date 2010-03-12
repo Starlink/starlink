@@ -15,6 +15,13 @@
     non-fatal problems. This no longer happens and the warnings are written
     to the console.
 
+    The object detection toolbox has been changed so that only the current
+    FITS image will be scanned for images. Previously if the primary HDU
+    contained an image and other images where located in any extensions
+    all the images would be processed when attempting to process just the 
+    primary image. This behaviour was in conflict with images in extensions
+    which were just processed individually.
+
   Hawaiki release
   ===============
 
