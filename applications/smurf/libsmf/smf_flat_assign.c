@@ -145,7 +145,7 @@ void smf_flat_assign ( int use_da, smf_flatmeth inflatmeth, const smfData * powv
 
     /* Get values from the smfDatas */
     flatmeth = inflatmeth;
-    nflat = (powval->dims)[2];
+    nflat = (bolval->dims)[2];
     flatpar = (powval->pntr)[0];
     flatcal = (bolval->pntr)[0];
 
