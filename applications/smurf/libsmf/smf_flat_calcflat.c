@@ -68,6 +68,9 @@
 *  History:
 *     2010-03-09 (TIMJ):
 *        Initial version
+*     2010-03-12 (TIMJ):
+*        Update powval (aka FLATPAR) to correctly reflect the change
+*        of usage in POLYNOMIAL mode.
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -166,8 +169,19 @@ smf_flat_calcflat( msglev_t msglev, const char flatname[],
 
     /* now coeffs is in fact the new bolval */
     if (*status == SAI__OK && coeffs) {
+      double *flatpar = (powref->pntr)[0];
+      int idx = 0;
+
       smf_close_file( &bolref, status );
       bolref = coeffs;
+
+      /* Fix up powref to reflect the change in bolref to store coefficients
+         (see sc2sim_fitheat) */
+      for ( idx=0; idx<(bolref->dims)[2]; idx++ ) {
+        flatpar[idx] = idx - 2;
+      }
+      (powref->dims)[2] = (bolref->dims)[2];
+
     }
 
   } else {
