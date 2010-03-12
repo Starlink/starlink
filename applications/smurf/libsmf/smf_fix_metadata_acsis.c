@@ -66,9 +66,12 @@
 *  History:
 *     2009-11-27 (TIMJ):
 *        Split from smf_fix_metadata
+*     2010-03-12 (TIMJ):
+*        Fix brokenness since split. "steptime" was not being set so any fixups
+*        involving steptime were broken.
 
 *  Copyright:
-*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2009-2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -386,6 +389,8 @@ int smf_fix_metadata_acsis ( msglev_t msglev, smfData * data, int have_fixed, in
   smf_getfitss( hdr, "INSTRUME", fitsvals.instrume, sizeof(fitsvals.instrume), status );
   smf_getobsidss( hdr->fitshdr, fitsvals.obsid, sizeof(fitsvals.obsid), fitsvals.obsidss,
                   sizeof(fitsvals.obsidss), status );
+
+  smf_getfitsd( hdr, "STEPTIME", &steptime, status );
 
   /* Do ROVER before printing out the obs description */
 
@@ -826,9 +831,17 @@ int smf_fix_metadata_acsis ( msglev_t msglev, smfData * data, int have_fixed, in
              Note that in more recent observations the JOS calculates NREFSTEP
              dynamically for each row.
           */
-          /* If nrefstep is 0 we make up a number. eg for 20070507. A 0.0 second
+          /* If nrefstep is 0 we either make up a number or hope that the old
+             acs_no_prev_ref is okay. eg for 20070507. A 0.0 second
              off time causes problems in the weighted coadd. */
-          if (nrefstep == 0) nrefstep = 5;
+          if (nrefstep == 0) {
+            int nrefstate = tmpState[0].acs_no_prev_ref;
+            if ( nrefstate != VAL__BADI && nrefstep > 0 ) {
+              nrefstep = nrefstate;
+            } else {
+              nrefstep = 5;
+            }
+          }
 
           off_time = 1.5 * nrefstep * steptime;
           if (missing_off) {
