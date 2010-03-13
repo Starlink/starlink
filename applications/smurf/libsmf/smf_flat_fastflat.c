@@ -51,6 +51,9 @@
 *     2010-03-11 (TIMJ):
 *        Compensate for sky variation during ramp by subtracting a
 *        polynomial fit to the reference heater values.
+*     2010-03-12 (TIMJ):
+*        Allow a single ramp of a single measurment to propogate through.
+*        Variance on the single is not used even if present.
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -114,6 +117,7 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
   size_t nheat = 0;           /* Number of distinct heater settings */
   dim_t nframes = 0;          /* Total number of frames in fflat */
   const size_t skyorder = 3;  /* Order to use for sky correction */
+
   size_t tstride = 0;         /* Time stride */
 
   if (*status != SAI__OK) return;
@@ -261,14 +265,25 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
         for (bol = 0; bol < nbols; bol++) {
           int idx;
           size_t nused;
+
           for (idx = 0; idx < nind; idx++) {
             size_t slice = indices[idx];
             ddata[idx] = ffdata[ bol * bstride + slice*tstride ];
             dindices[idx] = slice;
           }
 
-          smf_fit_poly1d( skyorder, nind, 0, dindices, ddata, NULL,
-                          coeff, coeffvar, NULL, &nused, status );
+          if (nind > 1) {
+            smf_fit_poly1d( skyorder, nind, 0, dindices, ddata, NULL,
+                            coeff, coeffvar, NULL, &nused, status );
+
+          } else {
+            coeff[0] = ddata[0];
+            coeffvar[0] = 0.0;
+            for ( idx = 1; idx <= skyorder; idx++) {
+              coeff[idx] = 0.0;
+              coeffvar[idx] = 0.0;
+            }
+          }
 
           /* copy coefficients into array */
           for (idx = 0; idx <= skyorder; idx++) {
@@ -320,7 +335,15 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
             }
           }
 
-          smf_stats1I( idata, 1, nind, NULL, 0, 0, &mean, &sigma, &ngood, status );
+          if (nind > 1) {
+            smf_stats1I( idata, 1, nind, NULL, 0, 0, &mean, &sigma, &ngood, status );
+          } else {
+            mean = idata[0];
+            /* put in a small value rather than zero so that everything will be
+               equally weighted. Currently the polynomial fitter thinks that 0
+               variance is a bad point */
+            sigma = 0.1;
+          }
 
           /* store the answer */
           idx = bol + i*nbols;
