@@ -13,7 +13,7 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_flatfield( smfData *idata, smfData **odata, int *status );
+*     smf_flatfield( smfData *idata, smfData **odata, const int flags, int *status );
 
 *  Arguments:
 *     idata = smfData* (Given)
@@ -21,6 +21,8 @@
 *     odata = smfData** (Given and Returned)
 *        Pointer to a smfData struct. If *odata is NULL a new smfData*
 *        will be created and stored in this location.
+*     flags = const int (Given)
+*        Flags to be passed to either smf_check_smfData or smf_deepcopy_smfData.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -71,9 +73,12 @@
 *     2006-04-21 (AGG):
 *        - update subroutine calls due to changed API
 *        - add history updates
+*     2010-03-15 (TIMJ):
+*        Update prologue with new API. Slight clean ups.
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2010 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2006 University of British Columbia &
 *     Particle Physics and Astronomy Research Council.  All
 *     Rights Reserved.
@@ -131,48 +136,42 @@ void smf_flatfield ( const smfData *idata, smfData **odata, const int flags, int
     errAnnul(status);
     /* check *odata */
     if ( *odata == NULL) {
-      msgOutif(MSG__DEBUG," ", 
-	       "OK, data are flatfielded and output struct is NULL: cloning input", 
-	       status);
+      msgOutif(MSG__DEBUG1," ",
+               "OK, data are flatfielded and output struct is NULL: cloning input",
+               status);
       /* If NULL then we need to clone idata to odata i.e. copy the
-	 pointer ONLY */
+         pointer ONLY */
       smf_clone_data( idata, odata, status );
     } else {
-      msgOutif(MSG__DEBUG," ",
-	       "OK, data are flatfielded and odata exists", status);
+      msgOutif(MSG__DEBUG1," ",
+               "OK, data are flatfielded and odata exists", status);
       /* Check and set */
       smf_check_smfData( idata, *odata, flags, status );
     }
-  } else if ( *status == SAI__OK ) { 
+  } else if ( *status == SAI__OK ) {
 
     /* OK data are not flatfielded: create smfData based on input and
        apply flatfield */
     /* Check if *odata exists */
     if ( *odata == NULL) {
-      msgOutif(MSG__DEBUG," ","Data not FF, no odata", status);
+      msgOutif(MSG__DEBUG1," ","Data not flatfielded, no output data file.", status);
       /* If NULL then we need create odata not associated with a file
-	 (i.e. leave smfFile NULL) */
+         (i.e. leave smfFile NULL) */
       /* Allocate space for *odata and all necessary cpts */
       /* Set the rawconvert flag to return doubles in the DATA array */
       *odata = smf_deepcopy_smfData( idata, 1, flags, status );
     } else {
       /* OK, *odata exists */
-      msgOutif(MSG__DEBUG," ","Data not FF, odata exists", status);
+      msgOutif(MSG__DEBUG1," ","Data not flatfielded, output data file exists.", status);
       /* Check and set */
       smf_check_smfData( idata, *odata, flags, status );
     }
+
     /* OK now apply flatfield calibration */
     smf_flatten( *odata, status);
+
     /* Write history entry to file */
-    if ( *status == SAI__OK ) {
-      smf_history_add( *odata, FUNC_NAME, status);
-    } else {
-      errRep(FUNC_NAME, "Error: status set bad. Possible programming error.", 
-	     status);
-    }
-  } else {
-    msgOut(" ", 
-	   "Hmm status is something other than it should be....", status);
+    smf_history_add( *odata, FUNC_NAME, status);
   }
 }
 
