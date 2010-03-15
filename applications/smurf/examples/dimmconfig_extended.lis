@@ -56,4 +56,4 @@ com.boxmin  = 10
 # frequencies than that).
 
 flt_450.filt_edgehigh = 0.1
-flt_850.filt_edgelow = 0.3
+flt_850.filt_edgehigh = 0.3

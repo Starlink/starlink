@@ -70,7 +70,7 @@ noi.dcbad = 0
 noi.dcflagall = 0
 noi.fillgaps = 1
 
-# heavoier high-pass filtering
+# heavier high-pass filtering
 
 flt_450.filt_edgehigh = 0.2
-flt_850.filt_edgelow = 0.6
+flt_850.filt_edgehigh = 0.6
