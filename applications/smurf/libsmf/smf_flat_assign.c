@@ -35,8 +35,6 @@
 *     updata = smfData * (Given)
 *        The smfData to receive the updated flatfield information. "heatval" will
 *        only be updated if present in bolval, otherwise it will be left unchanged.
-*     data = const smfData * (Given)
-*        smfData from which to extract the flatfield information.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
