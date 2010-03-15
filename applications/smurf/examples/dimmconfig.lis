@@ -218,7 +218,7 @@ noi.dcflagall = 0
 # iterative filter.
 
 flt_450.filt_edgehigh = 0.1
-flt_850.filt_edgelow = 0.3
+flt_850.filt_edgehigh = 0.3
 
 #flt.filt_edgelow = 90
 #flt.filt_notchlow  = (25,55)
