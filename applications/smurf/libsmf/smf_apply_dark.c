@@ -13,7 +13,7 @@
 *     C function
 
 *  Invocation:
-*     void smf_apply_dark( smfData *indata, const smfArray *darks,
+*     int smf_apply_dark( smfData *indata, const smfArray *darks,
 *                          int *status);
 
 *  Arguments:
@@ -23,6 +23,10 @@
 *        Set of dark observations to search. Can be NULL to ignore darks.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
+
+*  Returned Value:
+*     Returns true if a dark was subtracted, returns false if the data
+*     are unchanged.
 
 *  Description:
 *     Search through the supplied darks looking for relevant ones, then
@@ -36,8 +40,11 @@
 *  History:
 *     2008-11-26 (TIMJ):
 *        Initial version. Copied from smf_open_and_flatfield.
+*     2010-03-12 (TIMJ):
+*        Add return value to indicate whether a dark was subtracted or not.
 
 *  Copyright:
+*     Copyright (C) 2010 Science & Technology Facilities Council.
 *     Copyright (C) 2008 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
@@ -73,7 +80,7 @@
 #include "libsmf/smf.h"
 
 
-void smf_apply_dark( smfData *indata, const smfArray *darks,
+int smf_apply_dark( smfData *indata, const smfArray *darks,
                      int *status) {
 
   size_t dark1;
@@ -81,9 +88,10 @@ void smf_apply_dark( smfData *indata, const smfArray *darks,
   smfData * dkdata1 = NULL;
   smfData * dkdata2 = NULL;
   smfFile * file = NULL;
+  int retval = 0;
 
-  if (*status != SAI__OK) return;
-  if (!darks) return;
+  if (*status != SAI__OK) return retval;
+  if (!darks) return retval;
 
   /* work out which darks are suitable */
   smf_choose_darks( darks, indata, &dark1, &dark2, status );
@@ -114,10 +122,12 @@ void smf_apply_dark( smfData *indata, const smfArray *darks,
     msgOutif(MSG__VERB," ", "Dark subtracting ^FILE."
              " Prior dark: ^PRIOR  Following dark: ^POST", status);
     smf_subtract_dark( indata, dkdata1, dkdata2, SMF__DKSUB_CHOOSE, status );
+    retval = 1;
   } else {
     msgOutif(MSG__QUIET, " ",
              "Warning: File ^FILE has no suitable dark frame",
              status);
   }
 
+  return retval;
 }
