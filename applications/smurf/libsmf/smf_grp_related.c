@@ -228,16 +228,6 @@ void smf_grp_related(  const Grp *igrp, const size_t grpsize,
 
   if ( *status != SAI__OK ) return;
 
-  /* Check that the Grp size is reasonable */
-  if ( grpsize < 1 || grpsize > GRP__MAXG ) {
-    if ( *status == SAI__OK ) {
-      msgSeti("SZ",grpsize);
-      msgSeti("MAX",GRP__MAXG);
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, "Invalid input Grp size, ^SZ. Must lie between 1 and ^MAX", status);
-    }
-  }
-
   /* Allocate space for groups array - can't be any bigger than
      grpsize so use that. Initialize everything to NULL */
   subgroups = smf_malloc( grpsize, sizeof(*subgroups), 1, status );
