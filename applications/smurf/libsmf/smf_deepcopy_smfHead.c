@@ -74,10 +74,12 @@
 *        smf_construct_smfHead API tweak
 *     2009-06-23 (TIMJ):
 *        ocsconfig added to smfHead
+*     2010-03-15 (TIMJ):
+*        Include seqtype and obsidss.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2010 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research
 *     Council. Copyright (C) 2006-2007 University of British Columbia.
 *     All Rights Reserved.
@@ -214,10 +216,11 @@ smf_deepcopy_smfHead( const smfHead *old, int * status ) {
   /* Insert elements into new smfHead */
   new = smf_construct_smfHead( new, instrument, wcs, tswcs, fitshdr,
                                allState, curframe, instap, nframes,
-                               old->steptime, old->obsmode, old->swmode, old->obstype,ndet,
+                               old->steptime, old->obsmode, old->swmode, old->obstype,
+                               old->seqtype, ndet,
                                fplanex, fplaney, detpos,detname, old->dpazel,
                                tsys, old->title, old->dlabel, old->units,
-                               old->telpos, ocsconfig, status );
+                               old->telpos, ocsconfig, old->obsidss, status );
 
   /* set isCloned to 0 since we have allocated this memory */
   if (new) new->isCloned = 0;

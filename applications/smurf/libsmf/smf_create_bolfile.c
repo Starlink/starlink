@@ -60,12 +60,14 @@
 *        Preferentially select BOLO frame for output WCS
 *     2009-11-30 (TIMJ):
 *        Add ability to enable quality.
+*     2010-03-15 (TIMJ):
+*        New API for smf_construct_smfHead
 
 *  Notes:
 *     - Does not propogate provenance or history from refdata.
 
 *  Copyright:
-*     Copyright (C) 2009 Science and Technology Facilities Council.
+*     Copyright (C) 2009-2010 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -175,9 +177,10 @@ void smf_create_bolfile( const Grp * bgrp, size_t index,
                                              wcs, astCopy( refdata->hdr->fitshdr ),
                                              NULL, NULL, 0, refdata->hdr->instap, 1,
                                              refdata->hdr->steptime, refdata->hdr->obsmode,
-                                             refdata->hdr->swmode, refdata->hdr->obstype, 0, NULL, NULL,
+                                             refdata->hdr->swmode, refdata->hdr->obstype,
+                                             refdata->hdr->seqtype, 0, NULL, NULL,
                                              NULL, NULL, 0, NULL, buffer, datalabel,
-                                             units, refdata->hdr->telpos, NULL, status );
+                                             units, refdata->hdr->telpos, NULL, refdata->hdr->obsidss, status );
 
     /* write WCS and FITS information to file and sync other information */
     if (bgrp) {

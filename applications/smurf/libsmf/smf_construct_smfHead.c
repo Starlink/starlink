@@ -17,12 +17,13 @@
 *              AstFrameSet * wcs, AstFrameSet * tswcs,
 *              AstFitsChan * fitshdr, const JCMTState * allState,
 *              dim_t curframe, smf_obsmode obsmode, smf_swmode swmode,
-*              smf_obstype obstype, unsigned int ndet,
+*              smf_obstype obstype, smf_obstype seqtype, unsigned int ndet,
 *              const double fplanex[], const double fplaney[],
 *              const double detpos[], const char *detname, int dpazel,
 *              const double tsys[],
 *              const char title[], const char dlabel[], const char units[],
-*              const double telpos[], char *ocsconfig, int * status );
+*              const double telpos[], char *ocsconfig,
+*              const char obsidss[], int * status );
 
 *  Arguments:
 *     tofill = smfHead* (Given)
@@ -52,6 +53,8 @@
 *        Switching mode.
 *     obstype = smf_obstype (Given)
 *        Observation type
+*     seqtype = smf_obstype (Given)
+*        Sequence type
 *     ndet = unsigned int (Given)
 *        Number of positions in fplanex, fplaney arrays. Number of detectors.
 *     fplanex = const double[] (Given)
@@ -78,6 +81,8 @@
 *        The telscope position.
 *     ocsconfig = char * (Given)
 *        OCS Configuration XML
+*     obsidss = const char [] (Given)
+*        Observation subsystem identifier.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -101,8 +106,10 @@
 *       to false.
 *     - Free this memory using smf_close_file, via a smfData structure.
 *     - Can be freed with a smf_free if header resources are freed first.
-*     - units, data label and title are copied into this header and will
+*     - obsidss, units, data label and title are copied into this header and will
 *       not be freed (they are a defined part of the struct, not dynamic memory).
+*     - ocsconfig is assigned to this struct and not copied. It is assumed
+*       to be dynamic memory.
 
 *  Authors:
 *     Tim Jenness (TIMJ)
@@ -144,10 +151,12 @@
 *        Add switching mode.
 *     2009-06-23 (TIMJ):
 *        Add ocsconfig
+*     2010-03-15 (TIMJ):
+*        Add seqtype and obsidss. Use one_strlcpy
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2010 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research
 *     Council. Copyright (C) 2006-2007 University of British Columbia.
 *     All Rights Reserved.
@@ -179,8 +188,7 @@
 
 /* Starlink includes */
 #include "sae_par.h"
-#include "mers.h"
-#include "ndf.h"
+#include "star/one.h"
 
 /* SMURF routines */
 #include "jcmt/state.h"
@@ -196,12 +204,13 @@ smf_construct_smfHead( smfHead * tofill, inst_t instrument,
                        AstFitsChan * fitshdr,
                        JCMTState * allState, dim_t curframe,
                        const double instap[], dim_t nframes, double steptime,
-                       smf_obsmode obsmode, smf_swmode swmode, smf_obstype obstype, unsigned int ndet,
-                       double fplanex[], double fplaney[],
-                       double detpos[], char *detname,
+                       smf_obsmode obsmode, smf_swmode swmode, smf_obstype obstype,
+                       smf_obstype seqtype, unsigned int ndet, double fplanex[],
+                       double fplaney[], double detpos[], char *detname,
                        int dpazel, double tsys[], const char title[],
                        const char dlabel[], const char units[],
-                       const double telpos[], char * ocsconfig, int * status ) {
+                       const double telpos[], char * ocsconfig, const char obsidss[],
+                       int * status ) {
 
   smfHead * hdr = NULL;   /* Header components */
 
@@ -237,14 +246,15 @@ smf_construct_smfHead( smfHead * tofill, inst_t instrument,
     hdr->obsmode = obsmode;
     hdr->swmode = swmode;
     hdr->obstype = obstype;
+    hdr->seqtype = seqtype;
     hdr->steptime= steptime;
     hdr->ocsconfig = ocsconfig;
 
-    /* Have to copy the string items in since the struct has a slot for them -
-       we know these fit in the struct */
-    if (units) strcpy(hdr->units, units );
-    if (dlabel) strcpy(hdr->dlabel, dlabel );
-    if (title) strcpy(hdr->title, title );
+    /* Have to copy the string items in since the struct has a slot for them */
+    if (units) one_strlcpy( hdr->units, units, sizeof(hdr->units), status );
+    if (dlabel) one_strlcpy(hdr->dlabel, dlabel, sizeof(hdr->dlabel), status );
+    if (title) one_strlcpy(hdr->title, title, sizeof(hdr->title), status );
+    if (obsidss) one_strlcpy( hdr->obsidss, obsidss, sizeof(hdr->obsidss), status );
 
   }
 

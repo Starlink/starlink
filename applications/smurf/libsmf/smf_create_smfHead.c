@@ -73,10 +73,12 @@
 *        Add switching mode.
 *     2009-06-23 (TIMJ):
 *        Add ocsconfig.
+*     2010-03-15 (TIMJ):
+*        Initialise sequence type
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2010 Science and Technology Facilities Council.
 *     Copyright (C) 2006-2007 Particle Physics and Astronomy Research
 *     Council.
 *     Copyright (C) 2006-2007 University of British Columbia.
@@ -162,6 +164,7 @@ smf_create_smfHead( int * status ) {
   hdr->tsys = NULL;
   hdr->obsmode = SMF__OBS_NULL;
   hdr->obstype = SMF__TYP_NULL;
+  hdr->seqtype = SMF__TYP_NULL;
   hdr->swmode = SMF__SWM_NULL;
   hdr->steptime = VAL__BADD;
   hdr->ocsconfig = NULL;

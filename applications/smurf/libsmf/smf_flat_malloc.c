@@ -150,9 +150,9 @@ void smf_flat_malloc( size_t nheat, const smfData * refdata,
                                  astCopy( oldhdr->fitshdr ), NULL, 0,
                                  oldhdr->instap, nheat, oldhdr->steptime,
                                  oldhdr->obsmode, oldhdr->swmode, oldhdr->obstype,
-                                 0, NULL, NULL, NULL, NULL, 0, NULL,
+                                 oldhdr->seqtype, 0, NULL, NULL, NULL, NULL, 0, NULL,
                                  "Flatfield measurement", "Response", oldhdr->units, oldhdr->telpos,
-                                 NULL, status );
+                                 NULL, oldhdr->obsidss, status );
 
     *bolvald = smf_construct_smfData( NULL, NULL, hdr, NULL, SMF__DOUBLE,
                                       pntr, 1, dims, lbnd, 3, 0, 0, NULL,
