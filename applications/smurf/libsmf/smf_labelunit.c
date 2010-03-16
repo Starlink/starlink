@@ -43,11 +43,13 @@
 *        Modified interface to smf_open_file.
 *     7-MAY-2009 (DSB):
 *        Use SMF__CHARLABEL to define lengths of NDF character components.
+*     2010-03-16 (TIMJ):
+*        Use smf_smfFile_msg instead of msgSetc
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
-*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2009-2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -143,7 +145,7 @@ void smf_labelunit( Grp *igrp,  int size, smfData *odata, int *status ){
          msgSeti( "I", ifile );
          msgSetc( "L1", label1 );
          msgSetc( "L", label );
-         ndfMsg( "N", indf );
+         smf_smfFile_msg( data->file, "N", 1, "<unknown file>", status );
          msgOutif( MSG__NORM, " ", "   WARNING: Input ^I (^N) has Label "
                    "'^L' but the first input had Label '^L1'.", status );
 
@@ -151,7 +153,7 @@ void smf_labelunit( Grp *igrp,  int size, smfData *odata, int *status ){
          msgSeti( "I", ifile );
          msgSetc( "U1", unit1 );
          msgSetc( "U", unit );
-         ndfMsg( "N", indf );
+         smf_smfFile_msg( data->file, "N", 1, "<unknown file>", status );
          msgOutif( MSG__NORM, " ", "   WARNING: Input ^I (^N) has Unit "
                    "'^U' but the first input had Unit '^U1'.", status );
 

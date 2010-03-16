@@ -256,7 +256,7 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, Grp **darkgrp, Grp **flat
         smf_getfitsi( infile->hdr, "SEQEND", &seqend, status );
         tmpState = infile->hdr->allState;
         firstnum = (tmpState[0]).rts_num;
-        msgSetc("F", infile->file->name);
+        smf_smfFile_msg( infile->file, "F", 1, "<unknown file>", status);
         if ( firstnum >= seqstart && firstnum <= seqend ) {
           /* store the file in the output group */
           ndgCpsup( ingrp, i, ogrp, status );
@@ -269,7 +269,7 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, Grp **darkgrp, Grp **flat
         /* Assume these are fast ramps - need to put them in a sort struct */
         ffcount = smf__addto_sortinfo( infile, allfflats, i, ffcount, "Fast flat", status );
       } else {
-        msgSetc("F", infile->file->name);
+        smf_smfFile_msg( infile->file, "F", 1, "<unknown file>", status);
         msgOutif(MSG__DEBUG, " ", "Sequence type mismatch with observation type: ^F",status);
       }
     }

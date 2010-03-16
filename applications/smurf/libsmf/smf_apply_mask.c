@@ -60,6 +60,8 @@
 *        Added optional external quality array
 *     2010-01-08 (AGG):
 *        Change BPM to BBM.
+*     2010-03-16 (TIMJ):
+*        Use smf_smfFile_msg
 
 *  Notes:
 *      - for efficiency use SMF__BBM_QQUAL alone. All other methods
@@ -140,12 +142,7 @@ void smf_apply_mask( smfData *indata, unsigned char *quality,
   }
 
   /* get the file struct and create a token */
-  file = indata->file;
-  if (file) {
-    msgSetc( "FILE", file->name );
-  } else {
-    msgSetc( "FILE", "<no file>" );
-  }
+  smf_smfFile_msg( indata->file, "FILE", 1, "<no file>", status);
 
   /* and correct for dark */
   if (previdx != SMF__BADIDX) bbm1 = bbms->sdata[previdx];

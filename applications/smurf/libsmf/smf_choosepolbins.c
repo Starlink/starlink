@@ -346,7 +346,7 @@ int ***smf_choosepolbins( Grp *igrp, int size, float binsize, float binzero,
             } else if( *status == SAI__OK ) {
                *status = SAI__ERROR;
                msgSetc( "POLCRD", polcrd );            
-               msgSetc( "NDF", data->file->name );
+               smf_smfFile_msg( data->file, "NDF", 1, "<unknown file>", status);
                errRep( "", "Unrecognised value '^POLCRD' for POL_CRD "
                        "header in ^NDF.", status );
             }

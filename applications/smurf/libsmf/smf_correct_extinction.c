@@ -318,11 +318,8 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
 
   /* Check auto mode */
   if (tausrc == SMF__TAUSRC_AUTO && *status == SAI__OK) {
-    if (data && data->file && data->file->name) {
-      msgSetc( "FILE", data->file->name );
-    } else {
-      msgSetc( "FILE", "<unknown>" );
-    }
+    smf_smfFile_msg( data->file, "FILE", 1, "<unknown>", status );
+
     if (ndims == 2) {
       /* have to use CSO mode */
       tausrc = SMF__TAUSRC_CSOTAU;

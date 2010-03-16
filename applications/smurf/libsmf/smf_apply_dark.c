@@ -42,6 +42,8 @@
 *        Initial version. Copied from smf_open_and_flatfield.
 *     2010-03-12 (TIMJ):
 *        Add return value to indicate whether a dark was subtracted or not.
+*     2010-03-16 (TIMJ):
+*        Use smf_smfFile_msg
 
 *  Copyright:
 *     Copyright (C) 2010 Science & Technology Facilities Council.
@@ -97,12 +99,7 @@ int smf_apply_dark( smfData *indata, const smfArray *darks,
   smf_choose_darks( darks, indata, &dark1, &dark2, status );
 
   /* get the file struct and create a token */
-  file = indata->file;
-  if (file) {
-    msgSetc( "FILE", file->name );
-  } else {
-    msgSetc( "FILE", "<no file>" );
-  }
+  smf_smfFile_msg( indata->file, "FILE", 1, "<no file>", status );
 
   /* and correct for dark */
   if (dark1 != SMF__BADIDX) dkdata1 = darks->sdata[dark1];

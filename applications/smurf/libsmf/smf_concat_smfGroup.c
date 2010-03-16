@@ -338,7 +338,7 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
           /* Verify that the array is 3-dimensional and compatible with the
              reference array dimensions. */
           if( *status == SAI__OK ) {
-            msgSetc( "FILE", refdata->file->name );
+            smf_smfFile_msg( refdata->file, "FILE", 1, "<unknown file", status );
 
             if( refdata->ndims != 3 ) {
               *status = SAI__ERROR;
