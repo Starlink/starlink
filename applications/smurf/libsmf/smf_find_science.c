@@ -113,6 +113,9 @@
 *        matches the SEQSTART value.
 *     2010-02-18 (TIMJ):
 *        Rename to smf_find_science from smf_find_darks.
+*     2010-03-15 (TIMJ):
+*        Modify the SEQSTART test to simply check that the rtsnum lies
+*        between SEQSTART and SEQEND. This allows for NDF sections to be supplied.
 
 *  Copyright:
 *     Copyright (C) 2008-2010 Science and Technology Facilities Council.
@@ -242,13 +245,19 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, Grp **darkgrp, Grp **flat
       /* compare sequence type with observation type and drop it (for now)
          if they differ */
       if ( infile->hdr->obstype == infile->hdr->seqtype ) {
-        /* Sanity check the header for corruption. Compare RTS_NUM with SEQSTART */
+        /* Sanity check the header for corruption. Compare RTS_NUM with SEQSTART
+           and SEQEND. The first RTS_NUM must either be SEQSTART or else between
+           SEQSTART and SEQEND (if someone has giving us a section) */
         int seqstart = 0;
+        int seqend = 0;
+        int firstnum = 0;
         JCMTState *tmpState = NULL;
         smf_getfitsi( infile->hdr, "SEQSTART", &seqstart, status );
+        smf_getfitsi( infile->hdr, "SEQEND", &seqend, status );
         tmpState = infile->hdr->allState;
+        firstnum = (tmpState[0]).rts_num;
         msgSetc("F", infile->file->name);
-        if ( (tmpState[0]).rts_num == seqstart ) {
+        if ( firstnum >= seqstart && firstnum <= seqend ) {
           /* store the file in the output group */
           ndgCpsup( ingrp, i, ogrp, status );
           msgOutif(MSG__DEBUG, " ", "Non-dark file: ^F",status);
