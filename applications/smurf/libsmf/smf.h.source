@@ -566,6 +566,9 @@ void smf_choose_closest( const smfArray *alldata, const smfData *indata,
 void smf_choose_darks( const smfArray *darks, const smfData *indata,
                        size_t *dark1, size_t *dark2, int * status );
 
+void smf_choose_flat( const smfArray *flats, const smfData *indata,
+                      size_t *flatidx, int * status );
+
 int ***smf_choosepolbins( Grp *igrp, int size, float binsize, float binzero,
                           AstFrameSet *wcsout2d, int *npbin, double **pangle,
                           int *status );

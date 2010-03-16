@@ -53,6 +53,7 @@ smf_checkmem_dimm.c \
 smf_checkmem_map.c \
 smf_choose_closest.c \
 smf_choose_darks.c \
+smf_choose_flat.c \
 smf_choosepolbins.c \
 smf_choosetiles.c \
 smf_clean_dksquid.c \
