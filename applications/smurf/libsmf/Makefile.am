@@ -275,6 +275,7 @@ smf_scanfit.c \
 smf_select_pntr.c \
 smf_set_clabels.c \
 smf_set_moving.c \
+smf_smfFile_msg.c \
 smf_sort_bytime.c \
 smf_sparsebounds.c \
 smf_spreadwidth.c \
