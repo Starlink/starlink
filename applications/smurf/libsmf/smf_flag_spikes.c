@@ -159,6 +159,10 @@ void smf_flag_spikes( smfData *data, double *bolovar, unsigned char *quality,
   if( niter > 10000 ) {
      smf_flag_spikes2( data, quality, mask, thresh, niter-10000, nflagged, 
                        status );
+     /* Set aiter to something since smf_flag_spikes2 doesn't */
+     if( aiter ) {
+       *aiter = 0;
+     }
      return;
   }
 
