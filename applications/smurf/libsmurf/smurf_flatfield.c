@@ -195,7 +195,7 @@ void smurf_flatfield( int *status ) {
     if (*status != SAI__OK) break;
 
     /* Call flatfield routine */
-    didflat = smf_open_and_flatfield(igrp, ogrp, i, darks, NULL, &ffdata, status);
+    didflat = smf_open_and_flatfield(igrp, ogrp, i, darks, flatramps, &ffdata, status);
 
     /* Report failure by adding a message indicating which file failed */
     msgSeti("I",i);
