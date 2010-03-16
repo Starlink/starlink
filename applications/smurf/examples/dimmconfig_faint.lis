@@ -63,12 +63,17 @@ com.gain_abstol = 3
 # model is specified)
 dks.boxcar = 100
 
-# Turn on some iterative dc step finding here
+# Turn on some iterative dc step finding here, and a lower spike threshold.
+# Since the signal is small, and since this comes after all the other
+# model components, the data should be fairly flat, so this is less dangerous.
+
 noi.dcbox = 50
 noi.dcthresh = 100
 noi.dcbad = 0
 noi.dcflagall = 0
 noi.fillgaps = 1
+
+noi.spikethresh = 5
 
 # heavier high-pass filtering
 
