@@ -15,11 +15,11 @@
 *  Invocation:
 
 *     smf_iteratemap(smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
-*                    const Grp *bolrootgrp, AstKeyMap *keymap, const smfArray * darks,
-*                    const smfArray *bbms, const smfArray * flatramps,
-*                    AstFrameSet *outfset, int moving, int *lbnd_out,
-*                    int *ubnd_out, size_t maxmem, double *map,
-*                    int *hitsmap, double *mapvar, double
+*                    const Grp *bolrootgrp, AstKeyMap *keymap,
+*                    const smfArray * darks, const smfArray *bbms,
+*                    const smfArray * flatramps, AstFrameSet *outfset,
+*                    int moving, int *lbnd_out, int *ubnd_out, size_t maxmem,
+*                    double *map, int *hitsmap, double *mapvar, double
 *                    *weights, char data_units[], int *status );
 
 *  Arguments:
@@ -937,10 +937,10 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         res = smf_malloc( nchunks, sizeof(*res), 1, status );
 
         /* Concatenate (no variance since we calculate it ourselves -- NOI) */
-        smf_concat_smfGroup( wf, igroup, darks, bbms, flatramps, contchunk, ensureflat,
-                             0, outfset, moving, lbnd_out, ubnd_out, padStart,
-                             padEnd, SMF__NOCREATE_VARIANCE, tstep, &res[0], 
-                             status );
+        smf_concat_smfGroup( wf, igroup, darks, bbms, flatramps, contchunk,
+                             ensureflat, 0, outfset, moving, lbnd_out,
+                             ubnd_out, padStart, padEnd,
+                             SMF__NOCREATE_VARIANCE, tstep, &res[0], status );
 
         /*** TIMER ***/
         msgOutiff( MSG__DEBUG, "", FUNC_NAME ": ** %f s concatenating data",
@@ -986,17 +986,20 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
            bolo-ordered data although the work has already been done at
            the concatenation stage. */
 
-        smf_model_create( wf, NULL, res, darks, bbms, flatramps, nchunks, SMF__LUT, 0,
+        smf_model_create( wf, NULL, res, darks, bbms, flatramps, nchunks,
+                          SMF__LUT, 0,
                           NULL, 0, NULL, NULL,
                           NULL, memiter,
                           memiter, lut, 0, keymap, status );
 
-        smf_model_create( wf, NULL, res, darks, bbms, flatramps, nchunks, SMF__AST, 0,
+        smf_model_create( wf, NULL, res, darks, bbms, flatramps, nchunks,
+                          SMF__AST, 0,
                           NULL, 0, NULL, NULL,
                           NULL, memiter,
                           memiter, ast, 0, keymap, status );
 
-        smf_model_create( wf, NULL, res, darks, bbms, flatramps, nchunks, SMF__QUA, 0,
+        smf_model_create( wf, NULL, res, darks, bbms, flatramps, nchunks,
+                          SMF__QUA, 0,
                           NULL, 0, NULL, NULL,
                           NULL, memiter,
                           memiter, qua, flagstat, keymap, status );
@@ -1017,22 +1020,26 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
         res = smf_malloc( nchunks, sizeof(*res), 1, status );
 
-        smf_model_create( wf, igroup, NULL, darks, bbms, flatramps, 0, SMF__RES, 0,
+        smf_model_create( wf, igroup, NULL, darks, bbms, flatramps, 0,
+                          SMF__RES, 0,
                           NULL, 0, NULL, NULL,
                           &resgroup, memiter,
                           memiter, res, 0, keymap, status );
 
-        smf_model_create( wf, igroup, NULL, darks, bbms, flatramps, 0, SMF__LUT, 0,
+        smf_model_create( wf, igroup, NULL, darks, bbms, flatramps, 0,
+                          SMF__LUT, 0,
                           outfset, moving, lbnd_out, ubnd_out,
                           &lutgroup, memiter,
                           memiter, lut, 0, keymap, status );
 
-        smf_model_create( wf, igroup, NULL, darks, bbms, flatramps, 0, SMF__AST, 0,
+        smf_model_create( wf, igroup, NULL, darks, bbms, flatramps, 0,
+                          SMF__AST, 0,
                           NULL, 0, NULL, NULL,
                           &astgroup, memiter,
                           memiter, ast, 0, keymap, status );
 
-        smf_model_create( wf, igroup, NULL, darks, bbms, flatramps, 0, SMF__QUA, 0,
+        smf_model_create( wf, igroup, NULL, darks, bbms, flatramps, 0,
+                          SMF__QUA, 0,
                           NULL, 0, NULL, NULL,
                           &quagroup, memiter,
                           memiter, qua, flagstat, keymap, status );
@@ -1058,13 +1065,15 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         model[i] = smf_malloc( nchunks, sizeof(**model), 1, status );
 
         if( memiter ) {
-          smf_model_create( wf, NULL, res, darks, bbms, flatramps, nchunks, modeltyps[i], 0,
+          smf_model_create( wf, NULL, res, darks, bbms, flatramps, nchunks,
+                            modeltyps[i], 0,
                             NULL, 0, NULL, NULL,
                             NULL, memiter, memiter, model[i], 0, keymap,
                             status );
 
         } else {
-          smf_model_create( wf, igroup, NULL, darks, bbms, flatramps, 0, modeltyps[i], 0,
+          smf_model_create( wf, igroup, NULL, darks, bbms, flatramps, 0,
+                            modeltyps[i], 0,
                             NULL, 0, NULL, NULL, &modelgroups[i],
                             memiter, memiter, model[i], 0, keymap,
                             status );
@@ -1179,8 +1188,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
               if( dcthresh && dcbox ) {
                 msgOutif(MSG__VERB," ", "  find bolos with steps...", status);
-                smf_correct_steps( wf, data, qua_data, dcthresh, dcthresh2, dcbox,
-                                   dcflag, &nflag, status );
+                smf_correct_steps( wf, data, qua_data, dcthresh, dcthresh2,
+                                   dcbox, dcflag, &nflag, status );
                 msgOutiff(MSG__VERB, "","  ...%zd flagged\n", status, nflag);
               }
 
@@ -1412,7 +1421,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
                /* Write WCS (protecting the pointer dereference) */
                smf_set_moving(outfset,status);
-               if (*status == SAI__OK && imapdata) ndfPtwcs( outfset, imapdata->file->ndfid, status );
+               if (*status == SAI__OK && imapdata) {
+                 ndfPtwcs( outfset, imapdata->file->ndfid, status );
+               }
 
                /* Clean up */
                if( mgrp ) grpDelet( &mgrp, status );
