@@ -71,6 +71,9 @@
 *     2010-03-12 (TIMJ):
 *        Update powval (aka FLATPAR) to correctly reflect the change
 *        of usage in POLYNOMIAL mode.
+*     2010-03-16 (TIMJ):
+*        Add a smfFile to returned smfData so that we know where the flat
+*        comes from.
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
