@@ -33,7 +33,7 @@
 *     bstride = size_t* (Returned)
 *        How many elements to skip to get to the next bolometer at a given
 *        time slice.
-*     tstride - size_t* (Returned)
+*     tstride = size_t* (Returned)
 *        How many elements to skip to get to the next time slice for the
 *        current bolometer.
 *     status = int * (Given and Returned)
