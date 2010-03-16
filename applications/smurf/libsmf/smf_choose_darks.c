@@ -49,6 +49,8 @@
 *        Be more lenient with time gaps for scan mode. Use SMF__BADIDX
 *     2008-11-14 (TIMJ):
 *        Use SEQCOUNT to decide relatedness rather than time.
+*     2010-03-15 (TIMJ):
+*        Ensure that darks come from the same observation as indata.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -95,6 +97,8 @@ void smf_choose_darks( const smfArray *darks, const smfData *indata,
   *dark2 = SMF__BADIDX;
 
   if (*status  != SAI__OK) return;
+  if (!darks) return;
+  if (!smf_validate_smfData( indata, 1, 0, status ) ) return;
 
   /* get reference sequence counter and subarray number */
   smf_find_seqcount( indata->hdr, &refseq, status );
@@ -108,7 +112,8 @@ void smf_choose_darks( const smfArray *darks, const smfData *indata,
     smf_find_subarray( thisdark->hdr, NULL, (size_t)0, &thissubnum, status );
 
     /* see if we even need to look at the sequence counter */
-    if (thissubnum == refsubnum) {
+    if (thissubnum == refsubnum &&
+        strcmp( indata->hdr->obsidss, thisdark->hdr->obsidss ) == 0 ) {
       int thisseq;
       int seqdiff;
       smf_find_seqcount( thisdark->hdr, &thisseq, status );
