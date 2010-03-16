@@ -1188,6 +1188,10 @@ int smf_pattern_extract ( const char * sourcestr, const char * pattern,
 
 void smf_polext( int ondf, double angle, int *status );
 
+void smf_qualstats( const unsigned char *qual, dim_t nbolo, size_t bstride,
+                    size_t ntslice, size_t tstride,  size_t qcount[8],
+                    size_t *ngoodbolo, int *status );
+
 double smf_quick_noise( smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk,
                         unsigned char *quality, unsigned char mask,
                         int *status );
