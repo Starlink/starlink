@@ -22,17 +22,21 @@
 *     indata = const smfData * (Given)
 *        Reference science observation to choose darks.
 *     dark1 = size_t * (Returned)
-*        Index in smfArray for the closest previous dark. SMF__BADIDX if none
-*        can be found.
+*        Index in smfArray for the previous dark associated with this sequence.
+*        SMF__BADIDX if none can be found.
 *     dark2 = size_t * (Returned)
-*        Index in smfArray for the closest following dark. SMF__BADIDX if none
-*        can be found.
+*        Index in smfArray for the dark following the sequence of indata.
+*        SMF__BADIDX if none can be found.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
 *  Description:
-*     Search through the supplied darks to find the closest observations
-*     to the supplied reference science observation.
+*     Search through the supplied darks to find the darks taken either
+*     size of the supplied reference science observation.
+
+*  Notes:
+*     Uses the SEQCOUNT and SUBARRAY information to determine related
+*     darks.
 
 *  Authors:
 *     TIMJ: Tim Jenness (JAC, Hawaii)
