@@ -203,9 +203,14 @@ com.gain_box = 600000
 dks.boxcar = 100
 
 # additional despiking / DC step finding after each iteration within noi
-# calculation.
+# calculation. Setting noi.spikeiter to 10050 will check for excursions
+# from a rolling median filter in a box length (10050-10000 = 50) samples
+# long. If we instead set noi.spikeiter to something < 10000 it will
+# look for excursions from the mean, where the value is the number of
+# iterations to use when identifying spikes (0 means repeat until
+# convergence...).
 noi.spikethresh = 10
-noi.spikeiter = 0
+noi.spikeiter = 10050
 noi.fillgaps = 1
 
 # explicitly turn off iterative DC step finding for now
