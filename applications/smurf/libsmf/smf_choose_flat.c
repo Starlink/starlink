@@ -104,9 +104,6 @@ void smf_choose_flat( const smfArray *flats, const smfData *indata,
     smf_find_subarray( thisflat->hdr, NULL, (size_t)0, &thissubnum, status );
 
     /* see if we even need to look at the obsidss */
-    printf( " Subnum = %d and %d  obsidess = '%s' and '%s'\n",
-            thissubnum, refsubnum, thisflat->hdr->obsidss,
-            indata->hdr->obsidss);
     if (thissubnum == refsubnum &&
         strcmp( indata->hdr->obsidss, thisflat->hdr->obsidss ) == 0 ) {
       int thisseq;
