@@ -54,6 +54,8 @@
 *  History:
 *     2010-03-10 (TIMJ):
 *        Original version
+*     2010-03-16 (TIMJ):
+*        Update the FLAT fits header
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -186,6 +188,19 @@ void smf_flat_assign ( int use_da, smf_flatmeth inflatmeth, const smfData * powv
     if (*status == SAI__OK) {
       memcpy( outda->flatcal, flatcal, nbols * nflat * sizeof(*flatcal) );
       memcpy( outda->flatpar, flatpar, nflat * sizeof(*flatpar) );
+    }
+
+    /* if we have a filename in bolval copy it to the FLAT FITS header */
+    smf_dump_smfData( updata, 0 , status );
+    if ( bolval->file && strlen(bolval->file->name) && updata->hdr && updata->hdr->fitshdr ) {
+      char buffer[80];
+      int oplen = 0;
+      errMark();
+      smf_smfFile_msg( bolval->file, "FILE", 1, "<none>", status );
+      msgLoad( "", "^FILE", buffer, sizeof(buffer), &oplen, status );
+      errRlse();
+      smf_fits_updateS( updata->hdr, "FLAT", buffer,
+                        "Name of flat-field file", status );
     }
 
   }
