@@ -234,9 +234,11 @@
  *        Use new API for sc2store_putimage that supports provenance
  *     2010-01-29 (AGG):
  *        Write BASETEMP, SEQSTART and SEQEND to the FITS header for SCAN obs
+ *     2010-03-16 (TIMJ):
+ *        Use one_strlcat not strncat
 
  *  Copyright:
- *     Copyright (C) 2007-2009 Science and Technology Facilities Council.
+ *     Copyright (C) 2007-2010 Science and Technology Facilities Council.
  *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
  *     Council. Copyright (C) 2005-2010 University of British
  *     Columbia. All Rights Reserved.
@@ -372,8 +374,8 @@ void sc2sim_ndfwrdata
   JCMTState state;                /* Dummy JCMT state structure for creating WCS */
   int subnum;                     /* sub array index */
   AstFrameSet *wcs;               /* WCS frameset for output image */
-  char weightsname[SZFITSCARD] = "\0"; /* Name of weights file for DREAM
-                                          reconstruction */
+  char weightsname[SZFITSCARD];   /* Name of weights file for DREAM
+                                     reconstruction */
   double x_max = -1.0e38;         /* X extent of pointing centre offsets */
   double x_min =  1.0e38;         /* X extent of pointing centre offsets */
   double y_max = -1.0e38;         /* Y extent of pointing centre offsets */
@@ -557,9 +559,9 @@ void sc2sim_ndfwrdata
     astSetFitsF ( fitschan, "JIG_SCAL", inx->jig_step_x,
                   "[arcsec] SMU jiggle pattern scale factor", 0 );
     /* Construct weights name from subarray */
-    strncat( weightsname, "dreamweights_", 13);
-    strncat( weightsname, (sinx->subname)[subindex], 3);
-    strncat( weightsname, ".sdf", 4);
+    one_strlcpy( weightsname, "dreamweights_", sizeof(weightsname), status );
+    one_strlcat( weightsname, (sinx->subname)[subindex], sizeof(weightsname), status );
+    one_strlcat( weightsname, ".sdf", sizeof(weightsname), status );
     astSetFitsS ( fitschan, "DRMWGHTS", weightsname,
                   "Name of DREAM weights file", 0 );
   } else {
