@@ -387,8 +387,8 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
     return;
   }
 
-  memset( inx->mspat_x, 0, SC2SIM__MXMSTP*sizeof(double) );
-  memset( inx->mspat_y, 0, SC2SIM__MXMSTP*sizeof(double) );
+  memset( inx->mspat_x, 0, SC2SIM__MXMSTP*sizeof(*(inx->mspat_x)) );
+  memset( inx->mspat_y, 0, SC2SIM__MXMSTP*sizeof(*(inx->mspat_y)) );
   if ( !astMapGet0I ( keymap, "NMICSTEP", &(inx->nmicstep) ) ) {
     inx->nmicstep = 1;
   }
