@@ -159,7 +159,6 @@ void smurf_calcresp( int *status ) {
     /* Abort if we have no flatfield information */
     if (*status == SAI__OK && ! idata->da ) {
       msgSeti( "I", i);
-      smf_dump_smfData( idata, 0, status );
       *status = SAI__ERROR;
       errRep("", "Unable to read flatfield information from input file ^I", status);
     }

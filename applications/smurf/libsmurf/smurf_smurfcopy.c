@@ -204,7 +204,7 @@ void smurf_smurfcopy ( int * status ) {
 
     /* protect against null pointer smfFile */
     if (*status == SAI__OK) {
-      smf_dump_smfData( data, 0, status );
+
       /* sort out provenance */
       smf_accumulate_prov( data, igrp, i, ofile->ndfid,
                            "SMURF:SMURFCOPY", status );
