@@ -934,8 +934,8 @@ void smf_flat_write( smf_flatmeth flatmeth, const char * flatname,
                      const smfData * powref, const smfData * bolref,
                      const smfData * polyfit, const Grp * prvgrp, int * status );
 
-void smf_flatfield ( const smfData *idata, smfData **odata, const int flags,
-                     int *status );
+void smf_flatfield ( const smfData *idata, const smfArray * flats, smfData **odata,
+                     const int flags, int *status );
 
 void smf_flatten ( smfData *data, int *status );
 

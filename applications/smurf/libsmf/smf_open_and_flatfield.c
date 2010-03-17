@@ -112,10 +112,12 @@
 *     2009-10-06 (TIMJ):
 *        Do not need to malloc _DOUBLE for raw if smf_deepcopy_smfData
 *        is being called with rawconvert true.
+*     2010-03-15 (TIMJ):
+*        Assign flatfield overrides.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2010 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2006-2008 University of British Columbia.
 *     All Rights Reserved.
@@ -273,7 +275,7 @@ int smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
     smf_apply_dark( data, darks, status );
 
     /* Flatfield the data */
-    smf_flatfield( data, ffdata, flags, status );
+    smf_flatfield( data, flatramps, ffdata, flags, status );
 
     if (*status == SAI__OK) retval = 1;
 

@@ -13,11 +13,15 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_flatfield( smfData *idata, smfData **odata, const int flags, int *status );
+*     smf_flatfield( smfData *idata, const smfArray * flats,
+*                    smfData **odata, const int flags, int *status );
 
 *  Arguments:
 *     idata = smfData* (Given)
 *        Pointer to a smfData struct
+*     flats = const smfArray * (Given)
+*        Array of flatfield data. If a relevant flatfield is found it
+*        will be applied to idata before flatfielding is calculated.
 *     odata = smfData** (Given and Returned)
 *        Pointer to a smfData struct. If *odata is NULL a new smfData*
 *        will be created and stored in this location.
@@ -75,6 +79,8 @@
 *        - add history updates
 *     2010-03-15 (TIMJ):
 *        Update prologue with new API. Slight clean ups.
+*     2010-03-16 (TIMJ):
+*        Accept override flatfields and assign them before processing.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -124,7 +130,8 @@
 
 #define FUNC_NAME "smf_flatfield"
 
-void smf_flatfield ( const smfData *idata, smfData **odata, const int flags, int *status ) {
+void smf_flatfield ( const smfData *idata, const smfArray * flats, smfData **odata,
+                     const int flags, int *status ) {
 
   if ( *status != SAI__OK ) return;
 
@@ -149,6 +156,7 @@ void smf_flatfield ( const smfData *idata, smfData **odata, const int flags, int
       smf_check_smfData( idata, *odata, flags, status );
     }
   } else if ( *status == SAI__OK ) {
+    size_t flatidx = SMF__BADIDX;
 
     /* OK data are not flatfielded: create smfData based on input and
        apply flatfield */
@@ -165,6 +173,20 @@ void smf_flatfield ( const smfData *idata, smfData **odata, const int flags, int
       msgOutif(MSG__DEBUG1," ","Data not flatfielded, output data file exists.", status);
       /* Check and set */
       smf_check_smfData( idata, *odata, flags, status );
+    }
+
+    /* See if we have an override flatfield. */
+    smf_choose_flat( flats, *odata, &flatidx, status );
+
+    if ( flatidx != SMF__BADIDX ) {
+      const smfData * flatdata = (flats->sdata)[flatidx];
+
+      smf_smfFile_msg( idata->file, "INF", 1, "<unknown>", status );
+      smf_smfFile_msg( flatdata->file, "FLAT", 1, "<unknown>", status );
+      msgOutif( MSG__VERB, "", "Override flatfield of ^INF"
+                " using ^FLAT", status );
+      smf_flat_assign( 1, SMF__FLATMETH_NULL, NULL, flatdata,
+                       *odata, status );
     }
 
     /* OK now apply flatfield calibration */
