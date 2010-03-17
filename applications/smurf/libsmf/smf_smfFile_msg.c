@@ -113,13 +113,12 @@ smf_smfFile_msg( const smfFile * file, const char token[],
     }
   } else if ( file->ndfid != NDF__NOID ) {
     if (strip) {
-      const char localtok[] = "_MYTOK_";
       int oplen = 0;
       /* we need to get the value from the NDF subsystem
          and we need to do it without clearing tokens */
       errMark();
-      ndfMsg( localtok, file->ndfid );
-      msgLoad( "", localtok, path, sizeof(path), &oplen, status );
+      ndfMsg( "LOCALTOK", file->ndfid );
+      msgLoad( "", "^LOCALTOK", path, sizeof(path), &oplen, status );
       errRlse();
 
     } else {
