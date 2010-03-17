@@ -36,6 +36,8 @@
 *  History:
 *     2008-07-24 (TIMJ):
 *        Initial version, copied from smf_dtype_str.
+*     2010-03-16 (TIMJ):
+*        Add fastflat
 
 *  Notes:
 *     - See also smf_dtype_str, smf_obsmode_str.
@@ -112,6 +114,9 @@ const char * smf_obstype_str( smf_obstype type, int * status ) {
     break;
   case SMF__TYP_NOISE:
     retval = "noise";
+    break;
+  case SMF__TYP_FASTFLAT:
+    retval = "fastflat";
     break;
   default:
     retval = NULL;
