@@ -24,20 +24,23 @@
 *        Pointer to global status.
 
 *  Description:
-
 *     This function checks all elements of a smfFile structure and
 *     copies values from the input structure if necessary
 
 *  Authors:
 *     Andy Gibb (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     2006-04-03 (AGG):
 *        Initial version.
+*     2010-03-16 (TIMJ):
+*        ofile->name is non-NULL by definition because it's part of the struct.
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2010 Science & Technology Facilities Council.
 *     Copyright (C) 2006 University of British Columbia. All Rights
 *     Reserved.
 
@@ -98,7 +101,7 @@ void smf_check_smfFile( const smfData *idata, smfData *odata, int * status ) {
   /* Check NDF ID & filename simultaneously */
   /* If both exist then we have to assume that everything's OK */
   if ( ofile->ndfid == 0 ) {
-    if ( ofile->name == NULL) {
+    if ( ofile->name == NULL || strlen(ofile->name) == 0) {
       msgOutif(MSG__VERB," ", "NDF ID is zero, and filename is NULL. Assuming that is correct...", status);
     } else {
       if ( *status == SAI__OK ) {
@@ -107,7 +110,7 @@ void smf_check_smfFile( const smfData *idata, smfData *odata, int * status ) {
       }
     }
   } else {
-    if ( ofile->name == NULL) {
+    if ( ofile->name == NULL || strlen(ofile->name) == 0) {
       if ( *status == SAI__OK ) {
         *status = SAI__ERROR;
         errRep(FUNC_NAME, "NDF ID is not zero, but filename is NULL.", status);
