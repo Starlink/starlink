@@ -184,6 +184,7 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
     char buff[100];
     smf_getfitss( hdr, "SEQ_TYPE", buff, sizeof(buff), status );
     if (strcmp( buff, "FASTFLAT") == 0) {
+      have_fixed |= SMF__FIXED_FITSHDR;
       smf_fits_updateD( hdr, "SHUTTER", 1.0, "shutter position 0-Closed 1-Open", status );
       msgOutif( msglev, "", INDENT "Shutter was open for fast flatfield ramp. Correcting.", status );
     }
