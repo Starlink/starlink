@@ -97,9 +97,11 @@
  *     2008-04-24 (AGG)
  *        - use errRep when setting bad status
  *        - add keywords for focus observation
+ *     2010-03-16 (TIMJ):
+ *        Use one_strlcpy
 
  *  Copyright:
- *     Copyright (C) 2007 Science and Technology Facilities Council.
+ *     Copyright (C) 2007, 2010 Science and Technology Facilities Council.
  *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
  *     Council. Copyright (C) 2005-2008 University of British Columbia.
  *     All Rights Reserved.
@@ -141,6 +143,7 @@
 #include "sae_par.h"
 #include "prm_par.h"
 #include "mers.h"
+#include "star/one.h"
 
 void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
                         int *status ) {
@@ -205,16 +208,16 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
     inx->conv_sig = 1.0;
 
   if ( !astMapGet0C ( keymap, "COORDFRAME", &temp ) )
-    strncpy ( inx->coordframe, "RADEC", SC2SIM__FLEN );
+    one_strlcpy ( inx->coordframe, "RADEC", sizeof(inx->coordframe), status );
   else {
-    strncpy ( convert, temp, SC2SIM__FLEN );
+    one_strlcpy ( convert, temp, sizeof(convert), status );
     /* Convert to uppercase */
     thischar = convert;
     while ( *thischar != '\0' ) {
       *thischar = toupper (*thischar);
       thischar++;
     }
-    strncpy ( inx->coordframe, convert, SC2SIM__FLEN );
+    one_strlcpy ( inx->coordframe, convert, sizeof(inx->coordframe), status);
   }
 
   if ( !astMapGet0C ( keymap, "DEC", &temp ) )
@@ -222,7 +225,7 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
   else {
     /* Get the double representation of the sexagesimal string and
        convert from degrees to radians */
-    strncpy ( convert, temp, SC2SIM__FLEN );
+    one_strlcpy ( convert, temp, sizeof(convert), status );
     sc2sim_sex2double ( convert, &dec, status );
     dec *= DD2R;
     inx->dec = dec;
@@ -237,9 +240,9 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
     inx->dut1 = 0.0;
 
   if ( !astMapGet0C ( keymap, "FLATNAME", &temp ) )
-    strncpy ( inx->flatname, "TABLE", SC2SIM__FLEN );
+    one_strlcpy ( inx->flatname, "TABLE", sizeof(inx->flatname), status );
   else
-    strncpy ( inx->flatname, temp, SC2SIM__FLEN );
+    one_strlcpy ( inx->flatname, temp, sizeof(inx->flatname), status );
 
   if ( !astMapGet0D ( keymap, "FOCSTART", &(inx->focstart) ) )
     inx->focstart = -3.0;
@@ -278,9 +281,9 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
     inx->height = 2000.0;
 
   if ( !astMapGet0C ( keymap, "INSTAP", &temp ) ) {
-    strncpy ( inx->instap, "", SC2SIM__FLEN );
+    one_strlcpy ( inx->instap, "", sizeof(inx->instap), status );
   } else {
-    strncpy ( inx->instap, temp, SC2SIM__FLEN );
+    one_strlcpy ( inx->instap, temp, sizeof(inx->instap), status );
   }
 
   if ( !astMapGet0D ( keymap, "INSTAP_X", &(inx->instap_x) ) )
@@ -452,31 +455,31 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
   astMapGet0C ( keymap, "OBSMODE", &temp );
 
   if ( !astMapGet0C ( keymap, "OBSMODE", &temp ) )
-    strncpy ( inx->obsmode, "PONG", SC2SIM__FLEN );
+    one_strlcpy ( inx->obsmode, "PONG", sizeof(inx->obsmode), status );
   else {
     /* Convert to uppercase */
-    strncpy ( convert, temp, SC2SIM__FLEN );
+    one_strlcpy ( convert, temp, sizeof(convert), status );
     thischar = convert;
     while ( *thischar != '\0' ) {
       *thischar = toupper (*thischar);
       thischar++;
     }
-    strncpy ( inx->obsmode, convert, SC2SIM__FLEN );
+    one_strlcpy ( inx->obsmode, convert, sizeof(inx->obsmode), status );
   }
 
   astMapGet0C ( keymap, "OBSTYPE", &temp );
 
   if ( !astMapGet0C ( keymap, "OBSTYPE", &temp ) )
-    strncpy ( inx->obstype, "SCIENCE", SC2SIM__FLEN );
+    one_strlcpy ( inx->obstype, "SCIENCE", sizeof(inx->obstype), status );
   else {
     /* Convert to uppercase */
-    strncpy ( convert, temp, SC2SIM__FLEN );
+    one_strlcpy ( convert, temp, sizeof(convert), status );
     thischar = convert;
     while ( *thischar != '\0' ) {
       *thischar = toupper (*thischar);
       thischar++;
     }
-    strncpy ( inx->obstype, convert, SC2SIM__FLEN );
+    one_strlcpy ( inx->obstype, convert, sizeof(inx->obstype), status );
   }
   /* Reset nfocstep if not a focus observation */
   if ( strncmp( inx->obstype, "FOCUS", 5 ) ) {
@@ -486,7 +489,7 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
 
   /* For heatrun define the obstype as flatfield */
   if ( strncmp( inx->obsmode, "HEAT", 4) == 0 ) {
-    strncpy( inx->obstype, "FLATFIELD", SC2SIM__FLEN);
+    one_strlcpy( inx->obstype, "FLATFIELD", sizeof(inx->obstype), status);
   }
 
   /* Check if a planet has been requested */
@@ -531,16 +534,16 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
     inx->pong_angle = 0.0;
 
   if ( !astMapGet0C ( keymap, "PONG_TYPE", &temp ) )
-    strncpy ( inx->pong_type, "STRAIGHT", SC2SIM__FLEN );
+    one_strlcpy ( inx->pong_type, "STRAIGHT", sizeof(inx->pong_type), status );
   else {
-    strncpy ( convert, temp, SC2SIM__FLEN );
+    one_strlcpy ( convert, temp, sizeof(convert), status );
     /* Convert to uppercase */
     thischar = convert;
     while ( *thischar != '\0' ) {
       *thischar = toupper (*thischar);
       thischar++;
     }
-    strncpy ( inx->pong_type, convert, SC2SIM__FLEN );
+    one_strlcpy ( inx->pong_type, convert, sizeof(inx->pong_type), status );
   }
 
   if ( !astMapGet0C ( keymap, "RA", &temp ) )
@@ -548,7 +551,7 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
   else {
     /* Get the double representation of the sexagesimal string and
        convert from hours to radians */
-    strncpy ( convert, temp, SC2SIM__FLEN );
+    one_strlcpy ( convert, temp, sizeof(convert), status );
     sc2sim_sex2double ( convert, &ra, status );
     ra *= DH2R;
     inx->ra = ra;

@@ -33,6 +33,7 @@
  *     J. Balfour (UBC)
  *     E. Chapin (UBC)
  *     A.G. Gibb (UBC)
+ *     Tim Jenness (JAC, Hawaii)
  *     {enter_new_authors_here}
 
  *  History :
@@ -61,9 +62,12 @@
  *        Use one_strlcpy rather than strlcpy
  *     2009-11-20 (DSB):
  *        Add sinx->params and sinx->interp.
+ *     2010-03-16 (TIMJ):
+ *        Use one_strlcpy
  *     {enter_further_changes_here}
 
  *  Copyright:
+ *     Copyright (C) 2009-2010 Science & Technology Facilities Council.
  *     Copyright (C) 2005-2009 University of British Columbia. All
  *     Rights Reserved.
 
@@ -134,9 +138,9 @@ void sc2sim_getsimpar ( AstKeyMap *keymap, struct sc2sim_sim_struct *sinx,
     sinx->antrans = 100.0;
 
   if ( !astMapGet0C ( keymap, "ASTNAME", &temp ) )
-    strncpy ( sinx->astname, "ast.sdf", SC2SIM__FLEN );
+    one_strlcpy ( sinx->astname, "ast.sdf", sizeof(sinx->astname), status );
   else
-    strncpy ( sinx->astname, temp, SC2SIM__FLEN );
+    one_strlcpy ( sinx->astname, temp, sizeof(sinx->astname), status );
 
   if ( !astMapGet0D ( keymap, "ASTPOL", &(sinx->astpol) ) )
     sinx->astpol = 10.0;
@@ -145,9 +149,9 @@ void sc2sim_getsimpar ( AstKeyMap *keymap, struct sc2sim_sim_struct *sinx,
     sinx->atend = 5.0;
 
   if ( !astMapGet0C ( keymap, "ATMNAME", &temp ) )
-    strncpy ( sinx->atmname, "atm.sdf", SC2SIM__FLEN );
+    one_strlcpy ( sinx->atmname, "atm.sdf", sizeof(sinx->atmname), status );
   else
-    strncpy ( sinx->atmname, temp, SC2SIM__FLEN );
+    one_strlcpy ( sinx->atmname, temp, sizeof(sizeof(sinx->atmname)), status );
 
   if ( !astMapGet0D ( keymap, "ATMREFNU", &(sinx->atmrefnu) ) )
     sinx->atmrefnu = 0.5;
@@ -228,7 +232,7 @@ void sc2sim_getsimpar ( AstKeyMap *keymap, struct sc2sim_sim_struct *sinx,
     sinx->spike_t0 = 20.0;
 
   if ( !astMapGet1C ( keymap, "SUBNAME", SC2SIM__SUBLEN, SC2SIM__MAXSUBS, &(sinx->nsubarrays), subnames ) ) {
-    strncpy ( (sinx->subname)[0], "s8a", SC2SIM__SUBLEN );
+    one_strlcpy ( (sinx->subname)[0], "s8a", SC2SIM__SUBLEN, status );
     sinx->nsubarrays = 1;
   } else {
     char *ptr = subnames;

@@ -37,6 +37,7 @@
 
 *  Authors:
 *     Ed Chapin (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -52,11 +53,13 @@
 *     2007-12-14 (EC):
 *        -DIMM files now leave both header + data mapped
 *        -Include isTordered flag stored in DIMM files
+*     2010-03-16 (TIMJ):
+*        Use one_strlcpy instead of strncpy.
 
 *  Notes:
 
 *  Copyright:
-*     Copyright (C) 2007 Science and Technology Facilities Council.
+*     Copyright (C) 2007, 2010 Science and Technology Facilities Council.
 *     Copyright (C) 2006-2007 University of British Columbia.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
@@ -96,6 +99,7 @@
 #include "star/ndg.h"
 #include "prm_par.h"
 #include "par_par.h"
+#include "star/one.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"
@@ -181,7 +185,7 @@ void smf_open_model( const Grp *igrp, int index, const char *mode,
     (*data)->file->fd = fd;
 
     /* Copy the DIMM filename into the smfFile */
-    strncpy( (*data)->file->name, name, SMF_PATH_MAX );
+    one_strlcpy( (*data)->file->name, name, sizeof((*data)->file->name), status );
   }
 
 }

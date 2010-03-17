@@ -64,8 +64,11 @@
  *        0 MB usage
  *     2007-12-11 (AGG):
  *        Make output a little more user-friendly
+ *     2010-03-16 (TIMJ):
+ *        Use one_strlcpy
 
  *  Copyright:
+ *     Copyright (C) 2010 Science & Technology Facilities Council.
  *     Copyright (C) 2007 University of British Columbia and Particle Physics and
  *     Astronomy Research Council. All Rights Reserved.
 
@@ -96,6 +99,7 @@
 /* Starlink includes */
 #include "sae_par.h"
 #include "mers.h"
+#include "star/one.h"
 
 /* SC2SIM includes */
 #include "sc2sim.h"
@@ -122,16 +126,16 @@ void sc2sim_simstats ( int npoints, double samptime, int maxwrite, int nbol,
   simlength = npoints * samptime;
   if ( simlength > 60 && simlength < 3600 ) {
     simlength /= 60.0;
-    strncpy( temp, "min", SZTEMP );
+    one_strlcpy( temp, "min", sizeof(temp), status );
   } else if ( simlength >= 3600 ) {
     simlength /= 3600.0;
     if ( fabs(simlength - 1.0) < 0.01 ) {
-      strncpy( temp, "hr", SZTEMP);
+      one_strlcpy( temp, "hr", sizeof(temp), status);
     } else {
-      strncpy( temp, "hrs", SZTEMP);
+      one_strlcpy( temp, "hrs", sizeof(temp), status);
     }
   } else {
-    strncpy( temp, "sec", SZTEMP);
+    one_strlcpy( temp, "sec", sizeof(temp), status);
   }
   printf( "  Simulation represents an observation of %5.2f %s\n", simlength,temp);
 
@@ -140,12 +144,12 @@ void sc2sim_simstats ( int npoints, double samptime, int maxwrite, int nbol,
   simlength = 400.0 * (npoints * samptime) / 142.0;
   if ( simlength > 60 && simlength < 3600 ) {
     simlength /= 60.0;
-    strncpy( temp, "min", SZTEMP );
+    one_strlcpy( temp, "min", sizeof(temp), status );
   } else if ( simlength > 3600 ) {
     simlength /= 3600.0;
-    strncpy( temp, "hrs", SZTEMP);
+    one_strlcpy( temp, "hrs", sizeof(temp), status);
   } else {
-    strncpy( temp, "sec", SZTEMP);
+    one_strlcpy( temp, "sec", sizeof(temp), status);
   }
   printf("  ...and will take ~ %5.2f *(1.6GHz/CPU) %s to run\n", simlength,temp);
 
@@ -155,9 +159,9 @@ void sc2sim_simstats ( int npoints, double samptime, int maxwrite, int nbol,
   /* Use SI definition of Giga/Mega... */
   if ( rawdata > 1000.0 ) {
     rawdata /= 1000.0;
-    strncpy( temp, "GB", SZTEMP );
+    one_strlcpy( temp, "GB", sizeof(temp), status );
   } else {
-    strncpy( temp, "MB", SZTEMP );
+    one_strlcpy( temp, "MB", sizeof(temp), status );
   }
   printf( "  ...and will generate at least %4.1f %s of raw data\n",
           rawdata,temp );

@@ -196,6 +196,8 @@
  *        DA extension. Also tidy up some string sizing.
  *     2010-03-09 (TIMJ):
  *        Change type of flatfield method in smfDA
+ *     2010-03-16 (TIMJ):
+ *        Use one_strlcpy instead of strncpy
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -863,7 +865,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
     /* Store info in smfData struct */
     if (*status == SAI__OK) {
       (*data)->dtype = itype;
-      strncpy(file->name, pname, SMF_PATH_MAX);
+      one_strlcpy( file->name, pname, sizeof(file->name), status );
 
       /* Store the data in the smfData struct if needed */
       if ( !(flags & SMF__NOCREATE_DATA) ) {

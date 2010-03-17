@@ -14,13 +14,15 @@
 
  *  Invocation:
  *     sc2sim_get_recipe ( const struct sc2sim_obs_struct *inx, char *recipe,
- *                         int *status )
+ *                         size_t reclen, int *status )
 
  *  Arguments:
  *     inx = const sc2sim_obs_struct* (Given)
  *        Pointer to observation struct
  *     recipe = char* (Returned)
  *        Name of recipe
+ *     reclen = size_t (Given)
+ *        Allocated size of "recipe".
  *     status = int* (Given and Returned)
  *        Pointer to global status.
 
@@ -41,8 +43,11 @@
  *        Add support for Lissajous observing mode
  *     2008-10-10 (AGG):
  *        Add support for NOISE observing mode
+ *     2010-03-16 (TIMJ):
+ *        Use one_strlcpy and change API.
 
  *  Copyright:
+ *     Copyright (C) 2010 Science & Technology Facilities Council.
  *     Copyright (C) 2008 University of British Columbia. All Rights Reserved.
 
  *  Licence:
@@ -74,12 +79,13 @@
 /* Starlink includes */
 #include "sae_par.h"
 #include "mers.h"
+#include "star/one.h"
 
 /* SC2SIM includes */
 #include "sc2sim.h"
 
 void sc2sim_get_recipe ( const struct sc2sim_obs_struct *inx, char *recipe,
-                         int *status ) {
+                         size_t reclen, int *status ) {
 
   /* Local variable */
   int scan = 0;           /* Flag to denote SCAN mode data*/
@@ -99,25 +105,25 @@ void sc2sim_get_recipe ( const struct sc2sim_obs_struct *inx, char *recipe,
 
   /* Do we have FOCUS data? */
   if ( (strncmp( inx->obstype, "FOCUS", 5) == 0) ) {
-    strncpy( recipe, "REDUCE_FOCUS", 13);
+    one_strlcpy( recipe, "REDUCE_FOCUS", reclen, status);
     if ( scan ) {
-      strncat( recipe, "_SCAN", 5);
+      one_strlcat( recipe, "_SCAN", reclen, status);
     }
   } else if ( (strncmp( inx->obstype, "POINT", 5) == 0) ) {
     /* POINTING observation */
-    strncpy( recipe, "REDUCE_POINTING", 16);
+    one_strlcpy( recipe, "REDUCE_POINTING", reclen, status);
     if ( scan ) {
-      strncat( recipe, "_SCAN", 5);
+      one_strlcat( recipe, "_SCAN", reclen, status);
     }
   } else if ( (strncmp( inx->obstype, "SCIENCE", 7) == 0) ) {
     /* SCIENCE observation - now check obsmode */
     if ( scan ) {
-      strncpy( recipe, "REDUCE_SCAN", 12);
+      one_strlcpy( recipe, "REDUCE_SCAN", reclen, status);
     } else if ( (strncmp( inx->obsmode, "DREAM", 5) == 0) ||
                 (strncmp( inx->obsmode, "STARE", 5) == 0) ) {
-      strncpy( recipe, "REDUCE_DREAMSTARE", 18);
+      one_strlcpy( recipe, "REDUCE_DREAMSTARE", reclen, status);
     } else if (strncmp( inx->obsmode, "NOISE", 5) == 0) {
-      strncpy( recipe, "REDUCE_NOISE", 13);
+      one_strlcpy( recipe, "REDUCE_NOISE", reclen, status);
     } else {
       /* Shouldn't get here... */
       *status = SAI__ERROR;

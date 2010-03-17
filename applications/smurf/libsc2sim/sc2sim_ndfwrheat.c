@@ -168,7 +168,7 @@ void sc2sim_ndfwrheat
   if ( *status != SAI__OK ) return;
 
   /* Add the FITS data to the output file */
-  fitschan = astFitsChan ( NULL, NULL, "" );
+  fitschan = astFitsChan ( NULL, NULL, " " );
 
   /* Kludged to write generic date */
   sc2sim_dateobs( inx->mjdaystart, dateobs, status );

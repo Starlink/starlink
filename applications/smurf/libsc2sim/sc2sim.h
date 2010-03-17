@@ -498,7 +498,7 @@ int *status        /* global status (given and returned) */
 );
 
 void sc2sim_get_recipe ( const struct sc2sim_obs_struct *inx, char *recipe, 
-			 int *status );
+			 size_t reclen, int *status );
 
 void sc2sim_get_drgroup ( const struct sc2sim_obs_struct *inx, const char *filter, 
 			  const char *object, char *drgroup, int *status );

@@ -513,7 +513,7 @@ void sc2sim_ndfwrdata
   astSetFitsCM ( fitschan, "-- OMP & ORAC-DR parameters --", 0 );
   astSetFitsS ( fitschan, "PROJECT", "M08AC00",
                 "The proposal ID for the PROJECT", 0 );
-  sc2sim_get_recipe( inx, recipe, status );
+  sc2sim_get_recipe( inx, recipe, sizeof(recipe), status );
   astSetFitsS ( fitschan, "RECIPE", recipe, "The ORAC-DR recipe", 0 );
   astSetFitsS ( fitschan, "DRGROUP", "",
                 "Name of group to combine current observation with", 0 );
