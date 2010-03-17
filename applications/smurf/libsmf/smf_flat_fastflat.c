@@ -150,7 +150,7 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
 
   /* Find the reference heater setting */
   smf_fits_getI( hdr, "PIXHEAT", &heatref, status );
-  msgOutiff( MSG__NORM, " ", "Reference heater setting: %d", status, heatref );
+  msgOutiff( MSG__VERB, " ", "Reference heater setting: %d", status, heatref );
 
   /* First analyse the heater settings to see how many distinct values we have. We are going
      to use a KeyMap and treat this whole thing like we would a perl hash. Store the indices
