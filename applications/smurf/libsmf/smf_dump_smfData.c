@@ -316,7 +316,13 @@ void smf_dump_smfData( const smfData *data, int showflags __attribute__((unused)
     } else {
       msgSetc( "TYP", "<NULL>" );
     }
-    msgOut(" ", "    obsmode = ^MOD / switch mode = ^SW / obstype = ^TYP", status );
+    tempstr = smf_obstype_str( hdr->seqtype, status );
+    if (tempstr) {
+      msgSetc( "SEQ", tempstr );
+    } else {
+      msgSetc( "SEQ", "<NULL>" );
+    }
+    msgOut(" ", "    obsmode=^MOD / switch mode=^SW / obstype=^TYP (^SEQ)", status );
 
     /* Step time */
     msgSetd( "ST", hdr->steptime );
@@ -390,7 +396,7 @@ void smf_dump_smfData( const smfData *data, int showflags __attribute__((unused)
     msgOut(" ","    label = ^U", status);
     msgSetc( "U", hdr->title );
     msgOut(" ","    title = ^U", status);
-
+    msgOutf("","    obsidss = %s", status, hdr->obsidss);
   }
 
   /* smfDA */
@@ -419,6 +425,8 @@ void smf_dump_smfData( const smfData *data, int showflags __attribute__((unused)
     /* Number of flatfield coefficients per bolometer */
     msgSeti("F",(int)da->nflat);
     msgOut("", "    nflat = ^F", status);
+    msgOutf("","    heatval = %s", status, ( da->heatval ? "OK" : "NULL" ));
+    msgOutf("","    nheat = %zd", status, da->nheat);
   }
 
   /* smfDream */
