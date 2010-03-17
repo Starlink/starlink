@@ -54,6 +54,8 @@
 *     2010-03-12 (TIMJ):
 *        Allow a single ramp of a single measurment to propogate through.
 *        Variance on the single is not used even if present.
+*     2010-03-16 (TIMJ):
+*        Store the flatfield name in the smfFile
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -383,6 +385,12 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
     (*bolvald)->da = da;
   }
 
+  /* Store the ramp filename in a smfFile so that we know where the flatfield
+     data came from */
+  if (fflat->file) {
+    (*bolvald)->file = smf_construct_smfFile( (*bolvald)->file, NDF__NOID, 0, 0,
+                                              fflat->file->name, status );
+  }
 
   if (heatval) heatval = smf_free( heatval, status );
   heatmap = astAnnul( heatmap );
