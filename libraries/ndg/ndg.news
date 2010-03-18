@@ -1,5 +1,12 @@
 1 NDG_library
 
+Version 5.9
+
+   o  Change internal usage of ONE_FIND_FILE to PSX_WORDEXP.
+   This stops the program from forking when expanding the wildcards
+   and shell meta characters. Forking can be problematic when a
+   lot of memory is in use.
+
 Version 5.8
    o  Added functions for appending GRP group contents to default
    history records written by the NDF library.

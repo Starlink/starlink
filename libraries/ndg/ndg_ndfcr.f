@@ -42,6 +42,7 @@
 *        The global status.
 
 *  Copyright:
+*     Copyright (C) 2010 Science & Technology Facilities Council.
 *     Copyright (C) 1992 Science & Engineering Research Council.
 *     Copyright (C) 1997 Central Laboratory of the Research Councils.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
@@ -65,6 +66,7 @@
 
 *  Authors:
 *     DSB: D.S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -74,6 +76,8 @@
 *        Modified to use automatica NDF data conversion.
 *     7-MAR-2006 (DSB):
 *        Switch off interpretation of shell metacharacters by HDS.
+*     2010-03-18 (TIMJ):
+*        Use PSX_WORDEXP instead of ONE_SHELL_ECHO
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -108,6 +112,7 @@
 *  Local Variables:
       CHARACTER NAME*(GRP__SZNAM)! NDF file name (without file type).
       CHARACTER ENAME*(GRP__SZNAM)! Expanded NDF file name
+      INTEGER CONTEXT            ! Context for shell expansion
       INTEGER PLACE              ! NDF placeholder.
       INTEGER SHELL              ! Original value of HDS SHELL tuning param
 *.
@@ -134,7 +139,14 @@
 *  Expand any shell metacharacters in it. Having done this we can safely
 *  switch off HDS metacharacter interpretation, since HDS has problems
 *  with spaces in file names.
-      CALL ONE_SHELL_ECHO( NAME, ENAME, STATUS )      
+      CONTEXT = 0
+      CALL PSX_WORDEXP( NAME, CONTEXT, ENAME, STATUS )
+      IF (STATUS .EQ. SAI__OK .AND. CONTEXT .NE. 0) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( ' ', 'Received multiple results '//
+     :      'from shell expansion', STATUS )
+      END IF
+
       CALL HDS_GTUNE( 'SHELL', SHELL, STATUS )         
       CALL HDS_TUNE( 'SHELL', -1, STATUS )         
       
