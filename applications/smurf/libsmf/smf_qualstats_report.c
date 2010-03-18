@@ -244,14 +244,14 @@ void smf_qualstats_report( const smfArray *qua,
                 100. * (double) this_qcount[i] / (double) ndata,
                 scalestr);
       } else {
-        msgOutf("","%6s: %10zu (%5.2lf%%),%20s,change %10zu (%+6.2lf%%)",
+        msgOutf("","%6s: %10zu (%5.2lf%%),%20s,change %10li (%+6.2lf%%)",
                 status,
                 smf_qual_str(i,status),
                 this_qcount[i],
                 100. * (double) this_qcount[i] / (double) ndata,
                 scalestr,
-                this_qcount[i]-last_qcount[i],
-                100. * (double) (this_qcount[i]-last_qcount[i]) /
+                (long) this_qcount[i] - (long) last_qcount[i],
+                100. * ((double) this_qcount[i] - (double) last_qcount[i]) /
                 (double) ndata );
       }
     }
