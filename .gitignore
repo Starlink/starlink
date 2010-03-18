@@ -1242,6 +1242,7 @@ libraries/psx/test_stat
 libraries/psx/test_term
 libraries/psx/test_time
 libraries/psx/test_uname
+libraries/psx/test_wordexp
 libraries/ref/ref_test
 libraries/sgs/sgs_test
 libraries/sgs/sgs_workstations

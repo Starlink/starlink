@@ -12,4 +12,5 @@ NOMEM	<Could not get required memory>
 ERRNO   <System error during POSIX call>
 TRUNC   <Truncated string>
 BADIT	<Unknown item of file information requested>
+BDWXP   <Error from word expansion>
 .END
