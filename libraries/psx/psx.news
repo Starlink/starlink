@@ -1,5 +1,8 @@
 1 PSX - POSIX interface routines
                                                           Expires: **.**.**
+v0.5-5:
+     Added PSX_WORDEXP for shell metacharacter expansion.
+
 v0.5-4:
      Added PSX_STAT
 
