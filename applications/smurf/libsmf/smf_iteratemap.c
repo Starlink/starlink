@@ -246,6 +246,8 @@
 *        integral number of files.
 *     2010-03-11 (TIMJ):
 *        Add flatramps argument.
+*     2010-03-18 (EC):
+*        Add reporting on quality flag statistics each iteration
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -392,6 +394,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   dim_t padEnd=0;               /* How many samples of padding at the end */
   dim_t padStart=0;             /* How many samples of padding at the start */
   char *pname=NULL;             /* Poiner to name */
+  size_t qcount_last[SMF__NQBITS];/* quality bit counter -- last itertaion */
+  size_t qcount_new[SMF__NQBITS]; /* quality bit counter -- current iteration */
   smfArray **qua=NULL;          /* Quality flags for each file */
   unsigned char *qua_data=NULL; /* Pointer to DATA component of qua */
   smfGroup *quagroup=NULL;      /* smfGroup of quality model files */
@@ -1164,6 +1168,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
           /* If first iteration pre-condition the data */
           if( iter == 0 ) {
+
             msgOut(" ", FUNC_NAME ": Pre-conditioning chunk", status);
             goodbolo=0; /* Initialize good bolo count for this chunk */
             for( idx=0; idx<res[i]->ndat; idx++ ) {
@@ -1174,6 +1179,10 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
               msgOutif(MSG__VERB," ", "  update quality", status);
               smf_update_quality( data, qua_data, 1, NULL, badfrac, status );
+
+              /* initialize quality report */
+              smf_qualstats_report( qua[i], qcount_last, qcount_new,
+                                    1, status );
 
               if( baseorder >= 0 ) {
                 msgOutif(MSG__VERB," ", "  fit polynomial baselines", status);
@@ -1537,6 +1546,11 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             msgOutiff( MSG__DEBUG, "", FUNC_NAME
                        ": ** %f s calculating AST",
                        status, smf_timerupdate(&tv1,&tv2,status) );
+
+
+            /* report on the quality flags for this iterations before closing
+             the quality */
+            smf_qualstats_report( qua[i], qcount_last, qcount_new, 0, status );
 
             /* Close files if memiter not set */
             if( !memiter ) {

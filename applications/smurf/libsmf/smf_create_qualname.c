@@ -13,7 +13,7 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_create_qualname( const char *mode, int indf, IRQLocs **qlocs, 
+*     smf_create_qualname( const char *mode, int indf, IRQLocs **qlocs,
 *                          int *status );
 
 *  Arguments:
@@ -61,6 +61,8 @@
 *        Added PAD for SMF__Q_PAD
 *     2009-09-18 (TIMJ):
 *        use c-preprocessor to define extension name.
+*     2010-03-18 (EC):
+*        Simplify using smf_qual_str
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -101,36 +103,13 @@
 #include "libsmf/smf.h"
 #include "libsmf/smf_err.h"
 
-/* Private static function to return a quality bit number based on the
-   quality bit flag value */
-static int smf_get_fixbit ( int myqual, int *status ) {
-
-  int mybit = 1;
-
-  if ( *status != SAI__OK ) return -1;
-
-  /* Make sure the given integer is in range */
-  if ( myqual < 1 || myqual > 128 ) {
-    msgSeti("M",myqual);
-    *status = SAI__ERROR;
-    errRep("", "Integer out of range, ^M - must be 2**N where N is in the range"
-           " (0,7). Possible programming error?", status);
-    return -1;
-  } else {
-    while ( myqual >> mybit) {
-      mybit++;
-    }
-  }
-  return mybit;
-}
-
 #define FUNC_NAME "smf_create_qualname"
 
-void smf_create_qualname( const char *mode, int indf, IRQLocs **qlocs, 
+void smf_create_qualname( const char *mode, int indf, IRQLocs **qlocs,
                           int *status ) {
 
-  int fixbit;                /* Value of bit to be fixed in named quality */
   int fixed;                 /* Flag to denote whether quality bit is fixed */
+  size_t i;                  /* loop counter */
   int value;                 /* Value of current quality bit */
   int there = 0;             /* Flag to denote presence of NDF extension */
   HDSLoc *smurfloc = NULL;   /* HDS locator for the SMURF extension */
@@ -139,7 +118,7 @@ void smf_create_qualname( const char *mode, int indf, IRQLocs **qlocs,
 
   /* Check for access mode */
   if (strncmp(mode,"READ",4) == 0 ) {
-    msgOutif(MSG__DEBUG, "", 
+    msgOutif(MSG__DEBUG, "",
 	     "Input file is read-only - unable to create quality names "
              "extension",
 	     status);
@@ -156,49 +135,30 @@ void smf_create_qualname( const char *mode, int indf, IRQLocs **qlocs,
   /* Create new quality names extension */
   irqNew( indf, SMURF__EXTNAME, qlocs, status );
 
-  /* Add SMURF quality names */
+  /* Add SMURF quality names -- check against smf_qual_str */
   msgOutif(MSG__DEBUG, "", "Adding SMURF quality names", status);
-  irqAddqn( *qlocs, "BADSAM", 0, 
+  irqAddqn( *qlocs, smf_qual_str(0,status), 0,
 	    "Set iff a sample is flagged by the DA", status );
-  irqAddqn( *qlocs, "BADBOL", 0, 
-	    "Set iff all data from bolo to be ignored", 
-	    status );
-  irqAddqn( *qlocs, "SPIKE", 0, "Set iff a spike is detected", 
-	    status );
-  irqAddqn( *qlocs, "DCJUMP", 0, "Set iff a DC jump is present", 
-	    status );
-  irqAddqn( *qlocs, "PAD", 0, "Set iff data are padding", 
-	    status );
-  irqAddqn( *qlocs, "APOD", 0, "Set iff data are apodized/boundary", 
-	    status );
-  irqAddqn( *qlocs, "STAT", 0, "Set iff telescope was stationary", 
-	    status );
+  irqAddqn( *qlocs, smf_qual_str(1,status), 0,
+	    "Set iff all data from bolo to be ignored", status );
+  irqAddqn( *qlocs, smf_qual_str(2,status), 0,
+            "Set iff a spike is detected", status );
+  irqAddqn( *qlocs, smf_qual_str(3,status), 0,
+            "Set iff a DC jump is present", status );
+  irqAddqn( *qlocs, smf_qual_str(4,status), 0,
+            "Set iff data are padding", status );
+  irqAddqn( *qlocs, smf_qual_str(5,status), 0,
+            "Set iff data are apodized/boundary", status );
+  irqAddqn( *qlocs, smf_qual_str(6,status), 0,
+            "Set iff telescope was stationary", status );
 
-  /* Now fix the bits to the desired values */
-  fixbit = smf_get_fixbit(SMF__Q_BADS, status);
-  irqFxbit( *qlocs, "BADSAM", fixbit, &fixed, status );
-  fixbit = smf_get_fixbit(SMF__Q_BADB, status);
-  irqFxbit( *qlocs, "BADBOL", fixbit, &fixed, status );
-  fixbit = smf_get_fixbit(SMF__Q_SPIKE, status);
-  irqFxbit( *qlocs, "SPIKE",  fixbit, &fixed, status );
-  fixbit = smf_get_fixbit(SMF__Q_JUMP, status);
-  irqFxbit( *qlocs, "DCJUMP", fixbit, &fixed, status );
-  fixbit = smf_get_fixbit(SMF__Q_PAD, status);
-  irqFxbit( *qlocs, "PAD", fixbit, &fixed, status );
-  fixbit = smf_get_fixbit(SMF__Q_APOD, status);
-  irqFxbit( *qlocs, "APOD", fixbit, &fixed, status );
-  fixbit = smf_get_fixbit(SMF__Q_STAT, status);
-  irqFxbit( *qlocs, "STAT", fixbit, &fixed, status );
+  for( i=0; (i<SMF__NQBITS)&&(*status==SAI__OK); i++ ) {
+    /* Now fix the bits to the desired values */
+    irqFxbit( *qlocs, smf_qual_str(i,status), i+1, &fixed, status );
 
-  /* Set names to read only */
-  irqRwqn( *qlocs, "BADSAM", 1, 1, &value, status );
-  irqRwqn( *qlocs, "BADBOL", 1, 1, &value, status );
-  irqRwqn( *qlocs, "SPIKE",  1, 1, &value, status );
-  irqRwqn( *qlocs, "DCJUMP", 1, 1, &value, status );
-  irqRwqn( *qlocs, "PAD", 1, 1, &value, status );
-  irqRwqn( *qlocs, "APOD", 1, 1, &value, status );
-  irqRwqn( *qlocs, "STAT", 1, 1, &value, status );
+    /* Set names to read only */
+    irqRwqn( *qlocs, smf_qual_str(i,status), 1, 1, &value, status );
+  }
 
   if ( smurfloc ) datAnnul( &smurfloc, status);
-
 }

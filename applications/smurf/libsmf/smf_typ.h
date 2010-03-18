@@ -376,6 +376,10 @@ static const size_t SMF__BADIDX = (size_t)-1;
                                                            time-domain models */
 #define SMF__Q_GAP (SMF__Q_BADS|SMF__Q_SPIKE|SMF__Q_JUMP)/* Samples that should
                                                             be gap-filled */
+
+/* Number of active quality bits */
+#define SMF__NQBITS 7
+
 /* Flags for smf_open_newfile
    Must be individual bits in a single integer
 */

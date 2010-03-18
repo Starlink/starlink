@@ -4,7 +4,7 @@
 *     smf_qualstats
 
 *  Purpose:
-*     Produce statistics on quality flagging
+*     Produce statistics on quality flagging in a single array.
 
 *  Language:
 *     Starlink ANSI C
@@ -94,8 +94,9 @@
 #define FUNC_NAME "smf_qualstats"
 
 void smf_qualstats( const unsigned char *qual, dim_t nbolo, size_t bstride,
-                    size_t ntslice, size_t tstride,  size_t qcount[8],
-                    size_t *ngoodbolo, int *status ) {
+                    size_t ntslice, size_t tstride,
+                    size_t qcount[SMF__NQBITS], size_t *ngoodbolo,
+                    int *status ) {
 
   /* Local Variables */
   size_t i;                     /* Loop counter */
@@ -113,7 +114,7 @@ void smf_qualstats( const unsigned char *qual, dim_t nbolo, size_t bstride,
   }
 
   /* Initialize the counters */
-  memset( qcount, 0, sizeof(qcount) );
+  memset( qcount, 0, SMF__NQBITS*sizeof(*qcount) );
   if( ngoodbolo ) {
     *ngoodbolo = 0;
   }
@@ -128,8 +129,8 @@ void smf_qualstats( const unsigned char *qual, dim_t nbolo, size_t bstride,
 
     for( j=0; j<ntslice; j++ ) {
       /* Loop over bits */
-      for( k=0; k<sizeof(qcount); k++ ) {
-        if( qual[i*bstride+k*tstride] & (unsigned char) (1 << k) ) {
+      for( k=0; k<SMF__NQBITS; k++ ) {
+        if( qual[i*bstride+j*tstride] & ((unsigned char) (1 << k)) ) {
           qcount[k]++;
         }
       }
