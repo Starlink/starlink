@@ -45,6 +45,8 @@
 *        Use SMF__CHARLABEL to define lengths of NDF character components.
 *     2010-03-16 (TIMJ):
 *        Use smf_smfFile_msg instead of msgSetc
+*     2010-03-18 (TIMJ):
+*        Make use of the fact that a smfData now include data label and unit
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -79,18 +81,14 @@
 #include <math.h>
 
 /* Starlink includes */
-#include "ast.h"
 #include "mers.h"
 #include "sae_par.h"
-#include "prm_par.h"
-#include "star/ndg.h"
-#include "star/slalib.h"
-#include "star/kaplibs.h"
+#include "star/grp.h"
+#include "star/one.h"
 
 /* SMURF includes */
 #include "smurf_par.h"
 #include "libsmf/smf.h"
-#include "sc2da/sc2ast.h"
 
 #define FUNC_NAME "smf_labelunit"
 
@@ -98,11 +96,8 @@ void smf_labelunit( Grp *igrp,  int size, smfData *odata, int *status ){
 
 /* Local Variables */
    char label1[ SMF__CHARLABEL ];/* Label from first NDF */
-   char label[ SMF__CHARLABEL ]; /* Label from current NDF */
    char unit1[ SMF__CHARLABEL ]; /* Unit from first NDF */
-   char unit[ SMF__CHARLABEL ];  /* Unit from current NDF */
    int ifile;            /* Index of current input file */
-   int indf;             /* NDF Identifier for current input NDF */
    smfData *data = NULL; /* Pointer to data struct for current input file */
 
 /* Check inherited status */
@@ -110,23 +105,19 @@ void smf_labelunit( Grp *igrp,  int size, smfData *odata, int *status ){
 
 /* Loop round all the input NDFs. */
    for( ifile = 1; ifile <= size && *status == SAI__OK; ifile++ ) {
+     char * unit = NULL;
+     char * label = NULL;
 
 /* Obtain information about the current input NDF. */
-      smf_open_file( igrp, ifile, "READ", 0, &data, status );
+     smf_open_file( igrp, ifile, "READ", 0, &data, status );
 
-/* Get the input NDF identifier. */
-      indf = data->file->ndfid;
-
-/* Get the Label and Unit components from the input NDF. */
-      label[ 0 ] = 0;
-      ndfCget( indf, "Label", label, SMF__CHARLABEL, status ); 
-
-      unit[ 0 ] = 0;
-      ndfCget( indf, "Unit", unit, SMF__CHARLABEL, status ); 
+     if (*status == SAI__OK) {
+       unit = data->hdr->units;
+       label = data->hdr->dlabel;
 
 /* If this is the first input NDF, copy the Label and Unit string to the
    output NDF, and save them for later use. */
-      if( ifile == 1 ) {
+       if( ifile == 1 ) {
          if( strlen( label ) ) {
             ndfCput( label, odata->file->ndfid, "Label", status ); 
          }
@@ -135,13 +126,13 @@ void smf_labelunit( Grp *igrp,  int size, smfData *odata, int *status ){
             ndfCput( unit, odata->file->ndfid, "Unit", status ); 
          }
 
-         strcpy( label1, label );
-         strcpy( unit1, unit );
+         one_strlcpy( label1, label, sizeof(label1), status );
+         one_strlcpy( unit1, unit, sizeof(unit1), status );
 
 /* Otherwise, compare the Label and Unit strings for this input NDF with
    those from the first input NDF. If any difference is found issue a
    warning. */
-      } else if( *status == SAI__OK && strcmp( label, label1 ) ) {
+       } else if( *status == SAI__OK && strcmp( label, label1 ) ) {
          msgSeti( "I", ifile );
          msgSetc( "L1", label1 );
          msgSetc( "L", label );
@@ -149,7 +140,7 @@ void smf_labelunit( Grp *igrp,  int size, smfData *odata, int *status ){
          msgOutif( MSG__NORM, " ", "   WARNING: Input ^I (^N) has Label "
                    "'^L' but the first input had Label '^L1'.", status );
 
-      } else if( *status == SAI__OK && strcmp( unit, unit1 ) ) {
+       } else if( *status == SAI__OK && strcmp( unit, unit1 ) ) {
          msgSeti( "I", ifile );
          msgSetc( "U1", unit1 );
          msgSetc( "U", unit );
@@ -157,7 +148,8 @@ void smf_labelunit( Grp *igrp,  int size, smfData *odata, int *status ){
          msgOutif( MSG__NORM, " ", "   WARNING: Input ^I (^N) has Unit "
                    "'^U' but the first input had Unit '^U1'.", status );
 
-      }
+       }
+     }
 
 /* Close the current input data file. */
       smf_close_file( &data, status );
