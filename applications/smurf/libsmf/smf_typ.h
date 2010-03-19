@@ -157,6 +157,8 @@
  *        Add sub instrument enums.
  *     2010-01-11 (EC):
  *        Add SMF__Q_GAP (bits that indicate where gaps should be filled)
+ *     2010-03-19 (EC):
+ *        Renamed SMF__Q_BADS to SMF__Q_BADDA, and added SMF__Q_COM
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -356,29 +358,30 @@ static const size_t SMF__BADIDX = (size_t)-1;
 #define SMF__NOFIX_METADATA 128 /* Do not fix up metadata */
 #define SMF__NOTTSERIES   256    /* File is not time series data */
 
-/* Data quality bit mask (bits in single byte for QUALITY arrays */
-#define SMF__Q_BADS 1     /* Bad sample (VAL__BADD) flagged by DA system  */
+/* Data quality bit mask (bits in single byte for QUALITY arrays) */
+#define SMF__Q_BADDA 1    /* Bad sample flagged by DA system  */
 #define SMF__Q_BADB 2     /* All samples from this bolo should be ignored */
 #define SMF__Q_SPIKE 4    /* Location of a spike */
 #define SMF__Q_JUMP 8     /* Location of a DC jump */
 #define SMF__Q_PAD 16     /* Padded data */
 #define SMF__Q_APOD 32    /* Apodized/boundary data */
 #define SMF__Q_STAT 64    /* Telescope stationary */
+#define SMF__Q_COM 128    /* Flagged as bad chunk in common-mode rejection */
 
 /* These macros are for several commonly-used combinations of quality flags */
 #define SMF__Q_GOOD 255            /* Samples that don't go into the map. Also
                                       don't include in chi^2 */
-#define SMF__Q_MOD (SMF__Q_BADS|SMF__Q_BADB|SMF__Q_PAD) /* Samples that can't
+#define SMF__Q_MOD (SMF__Q_BADDA|SMF__Q_BADB|SMF__Q_PAD) /* Samples that can't
                                                            be modified
                                                            by fitted models */
 #define SMF__Q_FIT ~(SMF__Q_APOD|SMF__Q_STAT|SMF__Q_JUMP)/*Samples that can't
                                                            be used to fit
                                                            time-domain models */
-#define SMF__Q_GAP (SMF__Q_BADS|SMF__Q_SPIKE|SMF__Q_JUMP)/* Samples that should
+#define SMF__Q_GAP (SMF__Q_BADDA|SMF__Q_SPIKE|SMF__Q_JUMP)/* Samples that should
                                                             be gap-filled */
 
 /* Number of active quality bits */
-#define SMF__NQBITS 7
+#define SMF__NQBITS 8
 
 /* Flags for smf_open_newfile
    Must be individual bits in a single integer

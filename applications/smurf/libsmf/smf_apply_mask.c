@@ -238,7 +238,7 @@ void smf_apply_mask( smfData *indata, unsigned char *quality,
     }
 
     /* mask the quality array after masking the data array. This results
-       in the bad values from the mask being set to SMF__Q_BADS as well
+       in the bad values from the mask being set to SMF__Q_BADDA as well
        as SMF__Q_BADB if data array masking is enabled. This may or may
        not be a good idea.
     */

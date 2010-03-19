@@ -228,7 +228,7 @@ void smf_qualstats_report( const smfArray *qua,
       /* Report numbers of detectors or time slices if it makes sense for
          the given quality bit */
       switch( 1<<i ) {
-      case SMF__Q_BADS: /* flatfield or DA flagged -- usually entire bolos */
+      case SMF__Q_BADDA: /* flatfield or DA flagged -- usually entire bolos */
         sprintf( scalestr, "%7zu bolos  ",
                  qcount[i] / ntslice );
         break;

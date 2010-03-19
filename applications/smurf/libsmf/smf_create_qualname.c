@@ -63,6 +63,8 @@
 *        use c-preprocessor to define extension name.
 *     2010-03-18 (EC):
 *        Simplify using smf_qual_str
+*     2010-03-19 (EC):
+*        Added SMF__Q_COM
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -151,6 +153,8 @@ void smf_create_qualname( const char *mode, int indf, IRQLocs **qlocs,
             "Set iff data are apodized/boundary", status );
   irqAddqn( *qlocs, smf_qual_str(6,status), 0,
             "Set iff telescope was stationary", status );
+  irqAddqn( *qlocs, smf_qual_str(7,status), 0,
+            "Set iff data common-mode rejected", status );
 
   for( i=0; (i<SMF__NQBITS)&&(*status==SAI__OK); i++ ) {
     /* Now fix the bits to the desired values */

@@ -27,6 +27,7 @@
 *  Authors:
 *     Andy Gibb (UBC)
 *     Tim Jenness (JAC, Hawaii)
+*     Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -41,6 +42,8 @@
 *        Check for quality array after flatfield and set if present
 *     2010-03-09 (TIMJ):
 *        Change type of flatfield method in smfDA
+*     2010-03-19 (EC):
+*        Renamed SMF__Q_BADS to SMF__Q_BADDA
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -143,14 +146,14 @@ void smf_flatten ( smfData *data, int *status ) {
       /* Check for BAD values from flatfield routine and set QUALITY
 	 accordingly. Any bad values at this point means that those
 	 samples were flagged as such by the DA system and thus should
-	 be assigned a quality value of SMF__Q_BADS */
+	 be assigned a quality value of SMF__Q_BADDA */
       msgOutif(MSG__DEBUG, "", 
-	       "smfData has a valid QUALITY array: setting SMF__Q_BADS flags", 
+	       "smfData has a valid QUALITY array: setting SMF__Q_BADDA flags", 
 	       status);
       ndat = nboll * nframes;
       for (i=0; i<ndat; i++) {
 	if ( dataArr[i] == VAL__BADD ) {
-	  qual[i] = SMF__Q_BADS; /* quality should not be set here so can be lazy */
+	  qual[i] |= SMF__Q_BADDA;
 	}
       }
     } else {

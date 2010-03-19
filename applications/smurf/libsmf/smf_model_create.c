@@ -90,7 +90,7 @@
 
 *  Notes:
 *     QUAlity components are initialized to 0. Before using the caller
-*     should synchronize the SMF__Q_BADS bits with
+*     should synchronize the SMF__Q_BADDA bits with
 *     smf_update_quality. In addition, the "flagstat" option can be
 *     specified to set the quality bit SMF__Q_STAT based on pointing
 *     information in the header. This is useful to calculate here

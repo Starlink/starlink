@@ -128,10 +128,12 @@
 *     2010-02-26 (DSB):
 *        - Fix problem with short scans containing fewer than "gain_box"
 *        time slices.
+*     2010-03-19 (EC):
+*        Use new SMF__Q_COM flag instead of SMF__Q_BADS for clarity.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006-2009 University of British Columbia.
+*     Copyright (C) 2006-2010 University of British Columbia.
 *     Copyright (C) 2010 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
@@ -498,7 +500,7 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
             /* If no fit could be performed. */
             if( *status == SMF__DIVBZ || *status == SMF__INSMP ) {
               for( j=0; j<block_size; j++ ) {
-                qua_data[ibase+j*tstride] |= SMF__Q_BADS;
+                qua_data[ibase+j*tstride] |= SMF__Q_COM;
               }
               errAnnul( status );
             } 
@@ -1219,7 +1221,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
                 quit = 0;
 
                 for( j = 0; j < block_size; j++ ) {
-                  qua_data[ ibase + j*tstride] |= SMF__Q_BADS;
+                  qua_data[ ibase + j*tstride] |= SMF__Q_COM;
                 }
 
                 gai_data[ igbase ] = VAL__BADD;
@@ -1285,7 +1287,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
                 if( g != VAL__BADD && ( g > gmax || g < gmin ) ) {
 
                   for( j = 0; j < block_size; j++ ) {
-                    qua_data[ ibase ] |= SMF__Q_BADS;
+                    qua_data[ ibase ] |= SMF__Q_COM;
                     ibase += tstride;
                   }
 
@@ -1358,7 +1360,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
                   ndchisq++;
                 }
               } else {
-                 qua_data[ijindex] = SMF__Q_BADS;
+                 qua_data[ijindex] |= SMF__Q_COM;
               }
             }
           }
@@ -1485,7 +1487,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
                     }
                   }
                 } else {
-                  qua_data[ijindex] = SMF__Q_BADS;
+                  qua_data[ijindex] |= SMF__Q_COM;
                 }
               }
             }
@@ -1513,7 +1515,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   if( fillgaps ) {
     for( idx=0; (idx<res->ndat)&&(*status==SAI__OK); idx++ ) {
       qua_data = (unsigned char *)(qua->sdata[idx]->pntr)[0];
-      smf_fillgaps( wf, res->sdata[idx], qua_data, SMF__Q_BADS, status );
+      smf_fillgaps( wf, res->sdata[idx], qua_data, SMF__Q_COM, status );
     }
   }
 

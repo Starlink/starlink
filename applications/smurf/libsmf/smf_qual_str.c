@@ -36,6 +36,8 @@
 *  History:
 *     2010-03-18 (EC):
 *        Initial version, copied from smf_dtype_str.c
+*     2010-03-19 (EC):
+*        Rename SMF__Q_BADS to SMF__Q_BADDA, and added SMF__Q_COM
 
 *  Notes:
 *     Make sure these strings match descriptions in smf_create_qualname
@@ -91,8 +93,8 @@ const char *smf_qual_str( int bit, int *status ) {
 
   /* now switch on bit mask */
   switch( 1<<bit ) {
-  case SMF__Q_BADS:
-    retval = "BADSAM";
+  case SMF__Q_BADDA:
+    retval = "BADDA";
     break;
 
   case SMF__Q_BADB:
@@ -117,6 +119,10 @@ const char *smf_qual_str( int bit, int *status ) {
 
   case SMF__Q_STAT:
     retval = "STAT";
+    break;
+
+  case SMF__Q_COM:
+    retval = "COM";
     break;
 
   default:
