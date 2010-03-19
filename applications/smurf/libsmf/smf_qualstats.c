@@ -101,7 +101,8 @@ void smf_qualstats( const unsigned char *qual, dim_t nbolo, size_t bstride,
   /* Local Variables */
   size_t i;                     /* Loop counter */
   size_t j;                     /* Loop counter */
-  size_t k;              /* Loop counter */
+  size_t k;                     /* Loop counter */
+  size_t numgoodbolo=0;
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -115,16 +116,13 @@ void smf_qualstats( const unsigned char *qual, dim_t nbolo, size_t bstride,
 
   /* Initialize the counters */
   memset( qcount, 0, SMF__NQBITS*sizeof(*qcount) );
-  if( ngoodbolo ) {
-    *ngoodbolo = 0;
-  }
 
   /* Loop over bolo and time slice, and count occurrences of quality bits */
   for( i=0; i<nbolo; i++ ) {
 
     /* Count good bolos */
-    if( ngoodbolo && !(qual[i*bstride]&SMF__Q_BADB) ) {
-      *ngoodbolo++;
+    if( !(qual[i*bstride]&SMF__Q_BADB) ) {
+      numgoodbolo++;
     }
 
     for( j=0; j<ntslice; j++ ) {
@@ -135,6 +133,11 @@ void smf_qualstats( const unsigned char *qual, dim_t nbolo, size_t bstride,
         }
       }
     }
+  }
+
+  /* Return ngoodbolo */
+  if( ngoodbolo ) {
+    *ngoodbolo = numgoodbolo;
   }
 
 }
