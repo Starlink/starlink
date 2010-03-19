@@ -16,7 +16,7 @@
 
 *     smf_qualstats_report( const smfArray *qua,
 *                           size_t last_qcount[SMF__NQBITS],
-*                           size_t this_qcount[SMF__NQBITS],
+*                           size_t *last_nmap,
 *                           int init, int *status )
 
 *  Arguments:
@@ -24,11 +24,11 @@
 *        Pointer to smfArray of smfData's containing quality
 *     last_qcount = size_t[8] (Given and Returned)
 *        Pointer to array that countains number of occurences of each
-*        quality bit in qual from the last call. Updated at the end. May
-*        be set to NULL.
-*     this_qcount = size_t[8] (Given and Returned)
-*        Pointer to array that countains number of occurences of each
-*        quality bit in current call.
+*        quality bit in qual from the last call. Updated to current counts
+*        upon return.
+*     last_nmap = size_t* (Given and Returned)
+*        Pointer to number of samples that would have gone into the map
+*        last iteration. Updated to current number upon return.
 *     init = int (Given)
 *        If set, first call so initialize the qcount buffers.
 *     status = int* (Given and Returned)
@@ -52,6 +52,8 @@
 *  History:
 *     2010-03-16 (EC):
 *        Initial Version
+*     2010-03-19 (EC):
+*        Simplify interface, and keep track of total samples in map
 
 *  Copyright:
 *     Copyright (C) 2010 University of British Columbia.
@@ -94,7 +96,7 @@
 
 void smf_qualstats_report( const smfArray *qua,
                            size_t last_qcount[SMF__NQBITS],
-                           size_t this_qcount[SMF__NQBITS], int init,
+                           size_t *last_nmap, int init,
                            int *status ) {
 
   /* Local Variables */
@@ -104,11 +106,16 @@ void smf_qualstats_report( const smfArray *qua,
   dim_t nbolo;                  /* number of bolos */
   size_t nbolo_tot;             /* total bolos in all subarrays */
   size_t ndata;                 /* total number of data points */
+  size_t nmap;                  /* number of good map samples */
+  size_t nmax;                  /* theoretical maximum good map samples */
   dim_t ntslice;                /* number of time slices */
   dim_t ntslice_ref;            /* reference number of time slices */
-  size_t qcount[8];             /* temporary quality bit counter */
+  size_t qcount[8];             /* total current quality bit counter */
   unsigned char *qual=NULL;     /* pointer to quality buffer */
   double steptime=0.005;        /* length of sample -- assume 200 Hz data */
+  size_t subqcount[8];          /* subarray quality bit counter */
+  size_t subnmap;               /* nmap for subarray */
+  size_t subnmax;               /* nmax for subarray */
   size_t tstride;               /* time slice stride */
 
   /* Main routine */
@@ -121,23 +128,32 @@ void smf_qualstats_report( const smfArray *qua,
     return;
   }
 
-  if( !this_qcount ) {
+  if( !last_qcount ) {
     *status = SAI__ERROR;
-     errRep(" ", FUNC_NAME
-            ": NULL this_qcount pointer supplied.", status);
+    errRep(" ", FUNC_NAME
+           ": NULL last_qcount pointer supplied.", status);
+    return;
+  }
+
+  if( !last_nmap ) {
+    *status = SAI__ERROR;
+    errRep(" ", FUNC_NAME
+           ": NULL last_nmap pointer supplied.", status);
     return;
   }
 
   if( init ) {
     /* Initialize last_qcount */
     memset( last_qcount, 0, SMF__NQBITS*sizeof(*last_qcount) );
-  } else {
-    /* Set last_qcount to this_qcount */
-    memcpy(last_qcount, this_qcount, SMF__NQBITS*sizeof(*last_qcount));
+
+    /* Initialize last_namp */
+    *last_nmap = 0;
   }
 
-  /* Initialize this_qcount */
-  memset( this_qcount, 0, SMF__NQBITS*sizeof(*this_qcount) );
+  /* Initialize counts */
+  memset( qcount, 0, SMF__NQBITS*sizeof(*qcount) );
+  nmap = 0;
+  nmax = 0;
 
   /* Loop over subarray */
   nbolo_tot = 0;
@@ -161,8 +177,8 @@ void smf_qualstats_report( const smfArray *qua,
 
 
       /* get quality statistics for the current subarray */
-      smf_qualstats( qual, nbolo, bstride, ntslice, tstride, qcount, NULL,
-                     status );
+      smf_qualstats( qual, nbolo, bstride, ntslice, tstride, subqcount, NULL,
+                     &subnmap, &subnmax, status );
 
       /* add to total number of bolometers and check for length consistency */
       nbolo_tot += nbolo;
@@ -178,10 +194,13 @@ void smf_qualstats_report( const smfArray *qua,
       }
 
       if( *status == SAI__OK ) {
-        /* Add quality counts from this subarray to the total */
+        /* Add counts from this subarray to the total */
         for( i=0; i<SMF__NQBITS; i++ ) {
-          this_qcount[i] += qcount[i];
+          qcount[i] += subqcount[i];
         }
+
+        nmap += subnmap;
+        nmax += subnmax;
       }
 
     }
@@ -211,27 +230,27 @@ void smf_qualstats_report( const smfArray *qua,
       switch( 1<<i ) {
       case SMF__Q_BADS: /* flatfield or DA flagged -- usually entire bolos */
         sprintf( scalestr, "%7zu bolos  ",
-                 this_qcount[i] / ntslice );
+                 qcount[i] / ntslice );
         break;
 
       case SMF__Q_BADB: /* Entire bolos */
         sprintf( scalestr, "%7zu bolos  ",
-                 this_qcount[i] / ntslice );
+                 qcount[i] / ntslice );
         break;
 
       case SMF__Q_PAD: /* Padding is for all bolos at given tslice */
         sprintf( scalestr, "%7zu tslices",
-                 this_qcount[i] / nbolo_tot );
+                 qcount[i] / nbolo_tot );
         break;
 
       case SMF__Q_APOD: /* Apodization is for all bolos at given tslice */
         sprintf( scalestr, "%7zu tslices",
-                 this_qcount[i] / nbolo_tot );
+                 qcount[i] / nbolo_tot );
         break;
 
       case SMF__Q_STAT: /* Stationary is for all bolos at given tslice */
         sprintf( scalestr, "%7zu tslices",
-                 this_qcount[i] / nbolo_tot );
+                 qcount[i] / nbolo_tot );
         break;
 
       default:
@@ -242,22 +261,44 @@ void smf_qualstats_report( const smfArray *qua,
       if( init ) {
         msgOutf("","%6s: %10zu (%5.2lf%%),%20s", status,
                 smf_qual_str(i,status),
-                this_qcount[i],
-                100. * (double) this_qcount[i] / (double) ndata,
+                qcount[i],
+                100. * (double) qcount[i] / (double) ndata,
                 scalestr);
       } else {
         msgOutf("","%6s: %10zu (%5.2lf%%),%20s,change %10li (%+.2lf%%)",
                 status,
                 smf_qual_str(i,status),
-                this_qcount[i],
-                100. * (double) this_qcount[i] / (double) ndata,
+                qcount[i],
+                100. * (double) qcount[i] / (double) ndata,
                 scalestr,
-                (long) this_qcount[i] - (long) last_qcount[i],
-                (this_qcount[i] - last_qcount[i]) ?
-                100. * ((double) this_qcount[i] - (double) last_qcount[i]) /
+                (long) qcount[i] - (long) last_qcount[i],
+                ((long) qcount[i] - (long) last_qcount[i]) ?
+                100. * ((double) qcount[i] - (double) last_qcount[i]) /
                 (double) last_qcount[i] : 0 );
       }
     }
+
+    /* Total number of samples for the map */
+    msgOutf("",
+            "Total samples available for map: %10zu, %5.2lf%% of max",
+            status, nmap, 100. * (double) nmap / (double) nmax );
+
+    if( !init ) {
+      msgOutf("",
+              "     Change from last iteration: %10li, %+.2lf%% of previous",
+              status, (long) nmap - (long) *last_nmap,
+              ((long) nmap - (long) *last_nmap) ?
+              100. * ((double) nmap - (double) *last_nmap) /
+              (double) *last_nmap : 0 );
+    }
+  }
+
+  if( *status == SAI__OK ) {
+    /* Update last_qcount to qcount */
+    memcpy(last_qcount, qcount, SMF__NQBITS*sizeof(*last_qcount));
+
+    /* Update last_nmap to nmap */
+    *last_nmap = nmap;
   }
 
 }

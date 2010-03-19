@@ -16,7 +16,8 @@
 
 *     smf_qualstats( const unsigned char *qual, dim_t nbolo, size_t bstride,
 *                    size_t ntslice, size_t tstride,  size_t qcount[8],
-*                    size_t *ngoodbolo, int *status )
+*                    size_t *ngoodbolo, size_t *nmap, size_t *nmax,
+*                    int *status )
 
 *  Arguments:
 *     qual = const unsigned char * (Given)
@@ -35,8 +36,14 @@
 *        Pointer to array that will count number of occurences of each
 *        quality bit in qual.
 *     ngoodbolo = size_t* (Returned)
-*        If specified, also return number of bolometers that are flagged as
-*        good.
+*        If specified, return number of bolometers that are flagged as good.
+*     nmap = size_t* (Returned)
+*        If specified, return total number of samples that could be used
+*        in the map (i.e., no quality bits in SMF__Q_GOOD set).
+*     nmax = size_t* (Returned)
+*        If specified, return the maximum theoretical number of samples that
+*        could be used for a map -- excluding only SMF__Q_PAD|SMF__Q_APOD
+*        (padding/apodization).
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -53,6 +60,8 @@
 *  History:
 *     2010-03-16 (EC):
 *        Initial Version
+*     2010-03-19 (EC):
+*        Track samples that could go into the map (nmap, nmax)
 
 *  Copyright:
 *     Copyright (C) 2010 University of British Columbia.
@@ -96,6 +105,7 @@
 void smf_qualstats( const unsigned char *qual, dim_t nbolo, size_t bstride,
                     size_t ntslice, size_t tstride,
                     size_t qcount[SMF__NQBITS], size_t *ngoodbolo,
+                    size_t *nmap, size_t *nmax,
                     int *status ) {
 
   /* Local Variables */
@@ -103,6 +113,9 @@ void smf_qualstats( const unsigned char *qual, dim_t nbolo, size_t bstride,
   size_t j;                     /* Loop counter */
   size_t k;                     /* Loop counter */
   size_t numgoodbolo=0;
+  size_t nummap=0;
+  size_t nummax=0;
+  size_t offset;
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -126,18 +139,38 @@ void smf_qualstats( const unsigned char *qual, dim_t nbolo, size_t bstride,
     }
 
     for( j=0; j<ntslice; j++ ) {
+      offset = i*bstride+j*tstride;
+
+      /* Count samples for nmap and nmax */
+      if( !(qual[offset]&SMF__Q_GOOD) ) {
+        nummap++;
+      }
+
+      if( !(qual[offset]&(SMF__Q_PAD|SMF__Q_APOD)) ) {
+        nummax++;
+      }
+
       /* Loop over bits */
       for( k=0; k<SMF__NQBITS; k++ ) {
-        if( qual[i*bstride+j*tstride] & ((unsigned char) (1 << k)) ) {
+        if( qual[offset] & ((unsigned char) (1 << k)) ) {
           qcount[k]++;
         }
       }
     }
   }
 
-  /* Return ngoodbolo */
+  /* Return extra requested values */
   if( ngoodbolo ) {
     *ngoodbolo = numgoodbolo;
   }
+
+  if( nmap ) {
+    *nmap = nummap;
+  }
+
+  if( nmax ) {
+    *nmax = nummax;
+  }
+
 
 }
