@@ -14,8 +14,10 @@
 
 *  Invocation:
 
-*     smf_qualstats_report( const smfArray *qua, size_t last_qcount[8],
-*                    size_t this_qcount[8], int init, int *status )
+*     smf_qualstats_report( const smfArray *qua,
+*                           size_t last_qcount[SMF__NQBITS],
+*                           size_t this_qcount[SMF__NQBITS],
+*                           int init, int *status )
 
 *  Arguments:
 *     qua = const smfArray *qua (Given)
@@ -244,15 +246,16 @@ void smf_qualstats_report( const smfArray *qua,
                 100. * (double) this_qcount[i] / (double) ndata,
                 scalestr);
       } else {
-        msgOutf("","%6s: %10zu (%5.2lf%%),%20s,change %10li (%+6.2lf%%)",
+        msgOutf("","%6s: %10zu (%5.2lf%%),%20s,change %10li (%+.2lf%%)",
                 status,
                 smf_qual_str(i,status),
                 this_qcount[i],
                 100. * (double) this_qcount[i] / (double) ndata,
                 scalestr,
                 (long) this_qcount[i] - (long) last_qcount[i],
+                (this_qcount[i] - last_qcount[i]) ?
                 100. * ((double) this_qcount[i] - (double) last_qcount[i]) /
-                (double) ndata );
+                (double) last_qcount[i] : 0 );
       }
     }
   }
