@@ -535,9 +535,9 @@
 *  Calculate full-width-half-maximum seeing.
          FWHM = 2.0 * SIGMA * ( 1.38629 ** ( 1.0 / GAMMA ) )
 
-*  Correct the returned first star amplitude to take account of any 
+*  Correct the returned first-star amplitude to take account of any 
 *  non-Gaussian nature in the fitted star profile.
-         IF ( AMP1 .NE. VAL__BADR ) AMP1 = AMP1*AMP
+         IF ( AMP1 .NE. VAL__BADR ) AMP1 = AMP1 * AMP
 
       END IF
 
