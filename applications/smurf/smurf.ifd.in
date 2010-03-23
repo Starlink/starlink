@@ -2632,7 +2632,7 @@ package @PACKAGE@ {
                 vpath {DEFAULT }
                 prompt {If set mask data using darks}
                 ppath GLOBAL CURRENT
-                default TRUE
+                default FALSE
                 helpkey *
             }
 
