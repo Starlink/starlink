@@ -109,22 +109,23 @@
 *        offset to the whole time stream.
 *     2010-02-18 (DSB):
 *        - Changed the default for GAIN_BOX from 2000 to 6000.
-*        - Put a lower absolute limit (0.2) on acceptable correlation coefficients.
-*        - The initial guess at the gain of a bolometer used to be 1.0. It is now 
-*          the RMS value of the bolometer data stream.
+*        - Put a lower absolute limit (0.2) on acceptable correlation
+*          coefficients.
+*        - The initial guess at the gain of a bolometer used to be 1.0. It is
+*          now the RMS value of the bolometer data stream.
 *     2010-02-23 (DSB):
-*        - If there is a short block at the end of a time stream, include it in the 
-*        penultimate block. This means the last block will be between
+*        - If there is a short block at the end of a time stream, include it in
+*        the penultimate block. This means the last block will be between
 *        gain_box and 2*gain_box in length.
-*        - Use only unflagged data when calculating the fit between residuals and 
-*        common mode.
-*        - Reject blocks that have anomolous gains when compared to the other 
+*        - Use only unflagged data when calculating the fit between residuals
+*        and common mode.
+*        - Reject blocks that have anomolous gains when compared to the other
 *        blocks for the same bolometer.
 *        - Reject entire bolometers if they have too few good blocks.
 *     2010-02-25 (TIMJ):
 *        Fix 32-bit incompatibility.
-*        Remove C90 incompatibility by not mixing declarations with code after a block
-*        has started.
+*        Remove C90 incompatibility by not mixing declarations with code after
+*        a block has started.
 *     2010-02-26 (DSB):
 *        - Fix problem with short scans containing fewer than "gain_box"
 *        time slices.
@@ -271,7 +272,7 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
   weight = pdata->weight;
   gain_box = pdata->gain_box;
   nblock = pdata->nblock;
-  
+
 
 
 
@@ -310,11 +311,11 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
       if( !(qua_data[ ijindex ] & SMF__Q_BADB ) ) {
 
         /* Get the gain and offset for each time slice. */
-        smf_gandoff( j, 0, ntslice-1, ntslice, gbstride, gcstride, gai_data, 
+        smf_gandoff( j, 0, ntslice-1, ntslice, gbstride, gcstride, gai_data,
                      nblock, gain_box, wg, woff, status );
 
         /* Loop over all time slices. */
-        for( i = 0; i < ntslice; i++ ) { 
+        for( i = 0; i < ntslice; i++ ) {
 
           /* Add scaled template back on. Note that this also applies
              in the case that the common-mode was used to flatfield,
@@ -325,7 +326,7 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
 
             /* Increment the sums used to find the RMS bolometer value. */
             sum += res_data[ ijindex ]*res_data[ ijindex ];
-            nsum++;            
+            nsum++;
           }
 
           /* Advance to next element of res_data and qua_data arrays. */
@@ -336,16 +337,16 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
            whole bolometer is bad by assigning SMF__Q_BADB to all samples. */
         if( sum <= 0.0 ) {
           ijindex = j*bstride;
-          for( i = 0; i < ntslice; i++ ) { 
+          for( i = 0; i < ntslice; i++ ) {
             qua_data[ ijindex ] |= SMF__Q_BADB;
             ijindex += tstride;
           }
-        } 
+        }
       }
 
       /* Find the RMS bolometer value. We use this as the new initial
          estimate of the bolometer gain. This means that the bolometers
-         will be normalized to a common level when forming the first 
+         will be normalized to a common level when forming the first
          estimate of the common mode signal. */
       gain = ( sum > 0.0 ) ? sqrtf( sum/nsum ) : VAL__BADD;
 
@@ -396,7 +397,7 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
 
     /* Initialise the arrays if this is the first chunk. */
     if( idx == 0 ) {
-      for( i = pdata->t1; i <= pdata->t2; i++ ) { 
+      for( i = pdata->t1; i <= pdata->t2; i++ ) {
         model_data[ i ] = 0.0;
         weight[ i ] = 0.0;
       }
@@ -417,13 +418,13 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
         ijindex += pdata->t1*tstride;
 
         /* Get the bolometer's gain and offset for the required time slices. */
-        smf_gandoff( j, pdata->t1, pdata->t2, ntslice, gbstride, gcstride, 
+        smf_gandoff( j, pdata->t1, pdata->t2, ntslice, gbstride, gcstride,
                      gai_data, nblock, gain_box, wg, woff, status );
 
         /* Loop round all the time slices being processed by this thread. */
         pg = wg;
         poff = woff;
-        for( i = pdata->t1; i <= pdata->t2; i++,pg++,poff++ ) { 
+        for( i = pdata->t1; i <= pdata->t2; i++,pg++,poff++ ) {
 
           /* Skip previously flagged samples or bolometers that have zero
              gain. Otherwise, increment the running sums. */
@@ -475,9 +476,9 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
 
       if( !(qua_data[ibase]&SMF__Q_BADB) ) {
 
-        /* Initialise the number of time slices still to be processed, and then 
-           loop round each block of time slices, fitting the common mode to the 
-           bolometer signal and finding a gain, offset and correlation for each 
+        /* Initialise the number of time slices still to be processed, and then
+           loop round each block of time slices, fitting the common mode to the
+           bolometer signal and finding a gain, offset and correlation for each
            block. The final block may contain more than "gain_box" slices. */
         ntime = ntslice;
         m = model_data;
@@ -496,14 +497,14 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
                                tstride, m, 0, gai_data+igbase,
                                gai_data+block_cstride+igbase,
                                gai_data+2*block_cstride+igbase, status );
-  
+
             /* If no fit could be performed. */
             if( *status == SMF__DIVBZ || *status == SMF__INSMP ) {
               for( j=0; j<block_size; j++ ) {
                 qua_data[ibase+j*tstride] |= SMF__Q_COM;
               }
               errAnnul( status );
-            } 
+            }
           }
 
           ntime -= block_size;
@@ -705,7 +706,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
     if( !astMapGet0I(kmap, "GAIN_BOX", &ival) ) {
       gain_box = 6000;
-    } else { 
+    } else {
       gain_box = ival;
     }
 
@@ -796,11 +797,12 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
     weight = smf_malloc( (model->sdata[0]->dims)[0], sizeof(*weight), 0,
 			 status );
 
-    /* Find the number of blocks of time slices per bolometer. Each block contains
-       "gain_box" time slices (except possibly for the last time slice which may 
-       contain more than gain_box but will be less than 2*gain_box). Each block 
-       of time slices from a single bolometer has its own gain, offset and
-       correlation values. */
+    /* Find the number of blocks of time slices per bolometer. Each
+       block contains "gain_box" time slices (except possibly for the
+       last time slice which may contain more than gain_box but will
+       be less than 2*gain_box). Each block of time slices from a
+       single bolometer has its own gain, offset and correlation
+       values. */
     nblock = (model->sdata[0]->dims)[0]/gain_box;
     if( nblock == 0 ) nblock = 1;
 
@@ -824,7 +826,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
 
   /* Add the previous estimate of the common mode signal back on to the
-     bolometer residuals. If we do not yet have an estimate of the common 
+     bolometer residuals. If we do not yet have an estimate of the common
      mode signal, then the bolometer residuals are left unchanged, but
      the gain values in the "gai" model are set to the rms value of the
      bolometer data stream. This is to ensure that the very high gain
@@ -992,10 +994,10 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
       /* Calculate a new estimate of the common mode signal excluding
          blocks rejected on previous passes round the outer loop. The new
-         common mode signal is the mean of the remaining scaled bolometer 
+         common mode signal is the mean of the remaining scaled bolometer
          data (scaled using the inverse of the previous linear fit). The
          initial gain will have been set to the bolometer RMS value at
-         the same time that the old common mode was added back on to the 
+         the same time that the old common mode was added back on to the
          residuals (above).
          ---------------------------------------------------------- */
 
@@ -1038,7 +1040,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
       if( weight[i] ) {
         model_data[i] /= weight[i];
       } else {
-        model_data[i] = VAL__BADD; 
+        model_data[i] = VAL__BADD;
       }
     }
 
@@ -1059,10 +1061,10 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
 
 
-    /* Now try to fit the remaining bolometer data to the new common mode 
-       estimate. Each bolometer is split into blocks of "gain_box" time 
-       slices, and a linear fit is performed between the bolometer values 
-       in a block and the corresponding values in the new common mode 
+    /* Now try to fit the remaining bolometer data to the new common mode
+       estimate. Each bolometer is split into blocks of "gain_box" time
+       slices, and a linear fit is performed between the bolometer values
+       in a block and the corresponding values in the new common mode
        estimate.
        ---------------------------------------------------------------- */
 
@@ -1080,13 +1082,13 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
       if( gai ) {
 
-        /* If GAIn model supplied, fit gain/offset of sky model to each 
+        /* If GAIn model supplied, fit gain/offset of sky model to each
            block of time slices from each bolometer independently. These
-           are stored as 3 group of planes, each plane holding nbolo samples: 
-           the first group holds bolo gains, the second offsets, and the 
-           third correlation coefficients. Each group contains "nblock" 
-           planes (i.e. one for each block of time slices).The fitting is a 
-           bottleneck, so we use multiple threads to handle blocks of bolos 
+           are stored as 3 group of planes, each plane holding nbolo samples:
+           the first group holds bolo gains, the second offsets, and the
+           third correlation coefficients. Each group contains "nblock"
+           planes (i.e. one for each block of time slices).The fitting is a
+           bottleneck, so we use multiple threads to handle blocks of bolos
            in parallel.
         */
 
@@ -1130,7 +1132,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
         /* Identify blocks for which the fit is either too poor to use
            (i.e. low correlation), or very different from the fits for
-           the other bolometers at the same block. 
+           the other bolometers at the same block.
            --------------------------------------------------      */
 
         /* Allocate work space. */
@@ -1177,7 +1179,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
             igbase += gbstride;
           }
-  
+
           if( !allbad ) {
              smf_stats1D( corr, 1, nbolo, NULL, 0, 0, &cmean, &csig, &cgood,
                           status );
@@ -1189,7 +1191,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
           msgOutif( MSG__VERB, "", "    Block ^B has ^N good bolos", status );
           msgOutiff( MSG__DEBUG, "",
                      "    corr coeff %8.5f +/- %8.5f", status, cmean, csig );
-     
+
           if( !allbad ) {
              smf_stats1D( gcoeff, 1, nbolo, NULL, 0, 0, &gmean, &gsig, &ggood, status );
           } else {
@@ -1212,9 +1214,9 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
                  gain (indicated by bad values), or 2) have an unusually
                  low correlation coeffcient, or 3) have an unusally low
                  or high gain. */
-              if( corr[ i ] == VAL__BADD || gcoeff[ i ] == VAL__BADD || 
-                  ( (cmean - corr[ i ]) > corr_tol*csig ) || /* only flag worse bolos */
-                  ( corr[ i ] < corr_abstol ) || 
+              if( corr[ i ] == VAL__BADD || gcoeff[ i ] == VAL__BADD ||
+                  ( (cmean - corr[ i ]) > corr_tol*csig ) || /*flag worse bols*/
+                  ( corr[ i ] < corr_abstol ) ||
                   ( fabs( gcoeff[ i ]-gmean ) > gain_tol*gsig ) ||
                   ( fabs( gcoeff[ i ]-gmean ) > gain_abstol ) ) {
 
@@ -1239,10 +1241,10 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         }
 
 
-        /* Now consider the consistency of the 'nblock' gain values for 
+        /* Now consider the consistency of the 'nblock' gain values for
            each individual bolometer. We reject blocks for which the a
            gain value is very different to the other gain values for the same
-           bolometer. We also reject the entire boloemeter if it has too 
+           bolometer. We also reject the entire boloemeter if it has too
            few good blocks. Loop round all remaining bolometers. */
         for( i = 0; i < nbolo && *status == SAI__OK; i++ ) {
           size_t ibase = i*bstride;
@@ -1296,7 +1298,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
                   gai_data[ igbase + corr_offset ] = VAL__BADD;
 
                   newbad++;
- 
+
                 } else {
                    ibase += block_size*tstride;
                 }
@@ -1385,9 +1387,9 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
 
 
- /* Once the common mode converged and if we're fitting the common mode 
-    gain and offset, form the residuals by removing the scaled common mode 
-    estimate from the bolometer data. 
+ /* Once the common mode converged and if we're fitting the common mode
+    gain and offset, form the residuals by removing the scaled common mode
+    estimate from the bolometer data.
     ----------------------------------------------------------------- */
   if( gai) {
 
@@ -1419,33 +1421,33 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         /* Initialise the index of the first time slice for the current
            bolometer within the res_data and qua_data arrays. */
         size_t ijindex = j*bstride;
-  
+
         /* Skip bad bolometers */
         if( !(qua_data[ ijindex ] & SMF__Q_BADB ) ) {
           size_t inbase = j*noibstride;
 
           /* Get the gain and offset for each time slice. */
-          smf_gandoff( j, 0, ntslice-1, ntslice, gbstride, gcstride, 
+          smf_gandoff( j, 0, ntslice-1, ntslice, gbstride, gcstride,
                        gai_data, nblock, gain_box, wg, woff, status );
 
           /* Also get the previous gain and offset for each time slice. */
-          smf_gandoff( j, 0, ntslice-1, ntslice, gbstride, gcstride, 
-                       gai_data_copy[ idx ], nblock, gain_box, wg_copy, 
+          smf_gandoff( j, 0, ntslice-1, ntslice, gbstride, gcstride,
+                       gai_data_copy[ idx ], nblock, gain_box, wg_copy,
                        woff_copy, status );
 
           /* Loop over all time slices. */
-          for( i = 0; i < ntslice; i++ ) { 
+          for( i = 0; i < ntslice; i++ ) {
 
             g = wg[ i ];
             off = woff[ i ];
             g_copy = wg_copy[ i ];
             off_copy = woff_copy[ i ];
-  
+
             if( (g!=VAL__BADD) && (g!=0) ) {
 
               /* Important: if flat-fielding data re-scale noi. May have
                different dimensions from res. */
-              if( gflat && noi && i < nointslice && 
+              if( gflat && noi && i < nointslice &&
                   noi_data[ inbase + i*noitstride ] != VAL__BADD ) {
                 noi_data[ inbase + i*noitstride ] /= (g*g);
               }
@@ -1467,7 +1469,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
                   if( noi &&
                       (noi_data[inbase+(i%nointslice)*noitstride] != 0) &&
                       !(qua_data[ijindex]&SMF__Q_GOOD) ) {
-  
+
                     if( gflat ) {
                       /* Compare change in template + offset/g */
                       dchisq += ( (model_data[i] + off/g) -
