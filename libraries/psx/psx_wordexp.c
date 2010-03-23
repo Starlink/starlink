@@ -108,7 +108,7 @@ F77_SUBROUTINE(psx_wordexp)( CHARACTER(WORDS), INTEGER(CONTEXT),
 
     /* memory for the C version of WORDS */
     if (*STATUS == SAI__OK) {
-      words = cnfMalloc( WORDS_length * sizeof(*words) );
+      words = cnfMalloc( (1 + WORDS_length) * sizeof(*words) );
       if (!words) {
         *STATUS = PSX__NOMEM;
         psx1_rep_c( "PSX_WORDEXP_ERR2",
