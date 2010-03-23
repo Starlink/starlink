@@ -53,7 +53,6 @@ smf_checkmem_dimm.c \
 smf_checkmem_map.c \
 smf_choose_closest.c \
 smf_choose_darks.c \
-smf_choose_flat.c \
 smf_choosepolbins.c \
 smf_choosetiles.c \
 smf_clean_dksquid.c \
@@ -145,6 +144,7 @@ smf_fits_updateU.c \
 smf_fix_metadata.c \
 smf_fix_metadata_acsis.c \
 smf_fix_metadata_scuba2.c \
+smf_fix_steps.c \
 smf_flag_spikes.c \
 smf_flag_spikes2.c \
 smf_flag_stationary.c \
@@ -240,9 +240,6 @@ smf_open_related.c \
 smf_open_related_model.c \
 smf_pattern_extract.c \
 smf_polext.c \
-smf_qual_str.c \
-smf_qualstats.c \
-smf_qualstats_report.c \
 smf_quick_noise.c \
 smf_realloc.c \
 smf_rebin_totmap.c \
@@ -278,7 +275,6 @@ smf_scanfit.c \
 smf_select_pntr.c \
 smf_set_clabels.c \
 smf_set_moving.c \
-smf_smfFile_msg.c \
 smf_sort_bytime.c \
 smf_sparsebounds.c \
 smf_spreadwidth.c \
@@ -317,11 +313,11 @@ BUILT_SOURCES = smf_err.h smf.h $(BUILT_C_ROUTINES)
 $(C_ROUTINES:.c=.o): smf.h
 
 smf.h: smf.h.source make_h
-	./make_h 
+	./make_h
 
-# Create the .c file which defines type-specific code generated from each 
+# Create the .c file which defines type-specific code generated from each
 # .cgen file.
-$(CGENERIC_ROUTINES:.cgen=.c): 
+$(CGENERIC_ROUTINES:.cgen=.c):
 	echo "/*" > $@
 	echo "*  Name:" >> $@
 	echo "*    $@" >> $@

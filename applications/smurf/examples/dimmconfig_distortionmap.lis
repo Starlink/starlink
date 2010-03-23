@@ -49,16 +49,10 @@ ensureflat=0
 
 # Less aggressive to ensure that as much usable data get through as
 # possible.
-dcthresh = 5000
+dcthresh = 1000
 
 # box size over which to measure rms for DC step finder
-dcbox = 50
-
-# repair detector instead of removing it entirely.
-dcbad = 0
-
-# Handle detectors independently as much as possible.
-dcflagall = 0
+dcbox = 200
 
 
 # ----------------------------------------------------------------------------

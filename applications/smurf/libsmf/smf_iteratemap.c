@@ -1197,8 +1197,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
               if( dcthresh && dcbox ) {
                 msgOutif(MSG__VERB," ", "  find bolos with steps...", status);
-                smf_correct_steps( wf, data, qua_data, dcthresh, dcthresh2,
-                                   dcbox, dcflag, &nflag, status );
+                smf_fix_steps( wf, data, qua_data, dcthresh, dcthresh2, dcbox,
+                               dcflag, &nflag, status );
                 msgOutiff(MSG__VERB, "","  ...%zd flagged\n", status, nflag);
               }
 

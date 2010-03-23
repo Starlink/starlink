@@ -41,7 +41,7 @@
 *     estimate chi^2 by comparison the scatter in the final residual to the
 *     white noise level. The (reduced) chi^2 calculated should ideally
 *     converge to 1 provided that the models are correct, and the white noise
-*     has been measured correctly. 
+*     has been measured correctly.
 
 *  Notes:
 
@@ -188,7 +188,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
     /* Data-cleaning parameters  */
     smf_get_cleanpar( kmap, NULL, NULL, &dcbox, &dcflag, &dcthresh, &dcthresh2,
-                      NULL, &fillgaps, NULL, NULL, NULL, NULL, NULL, NULL, 
+                      NULL, &fillgaps, NULL, NULL, NULL, NULL, NULL, NULL,
                       NULL, NULL, &spikethresh, &spikeiter, status );
   }
 
@@ -256,7 +256,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         }
 
         if( dcthresh && dcbox ) {
-          smf_correct_steps( wf, res->sdata[idx], qua_data, dcthresh, dcthresh2, 
+          smf_fix_steps( wf, res->sdata[idx], qua_data, dcthresh, dcthresh2,
                              dcbox, dcflag, &nflag, status );
           msgOutiff(MSG__VERB, "","   detected %li bolos with DC steps\n",
                     status, nflag);

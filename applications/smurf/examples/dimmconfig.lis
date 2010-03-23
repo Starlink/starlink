@@ -109,18 +109,10 @@ flagstat = 2
 # --- Many of the following may not be useful ---
 
 # S/N threshold to detect DC steps
-dcthresh = 200
+dcthresh = 3
 
 # box size over which to measure rms for DC step finder
-dcbox = 50
-
-# if set flag entire bolo with DC step as bad instead of trying to repair
-#dcbad = 1
-
-# This has also been turned off for now as there still seem to be problems
-# with over-flagging DC steps.
-# if set flag/correct ALL bolometers at locations of DC steps.
-#dcflagall = 1
+dcbox = 200
 
 # S/N ratio to flag spikes with sigma-clipper
 # spikethresh = 5
@@ -217,7 +209,6 @@ noi.fillgaps = 1
 noi.dcbox = 0
 noi.dcthresh = 0
 noi.dcbad = 0
-noi.dcflagall = 0
 
 
 # iterative filter.
