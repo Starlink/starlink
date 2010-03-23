@@ -104,7 +104,7 @@
 smfData *smf_fft_avpspec( const smfData *pspec, unsigned char *quality,
                           size_t qstride, unsigned char mask, int *status ) {
 
-  size_t i,j;                    /* Loop counter */
+  size_t i;                     /* Loop counter */
   double *idptr=NULL;           /* Pointer to input data */
   double mean;                  /* Mean value at time slice */
   dim_t nbolo=0;                /* Number of detectors  */

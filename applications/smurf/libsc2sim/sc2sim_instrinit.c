@@ -161,21 +161,17 @@ void sc2sim_instrinit( struct sc2sim_obs_struct *inx,
                        double **ybolo, int *status ) {
 
   /* Local variables */
-  double azimuth;                /* Azimuth in radians */
   double decay;                  /* bolometer time constant (msec) */
   AstFrameSet *fset=NULL;        /* Frameset to calculate xbc + ybc */
   double instap[2];              /* Focal plane instrument offsets */
   int j;                         /* loop counter */
-  double lst;                    /* local sidereal time in radians */
   int nbol=0;                    /* total number of bolometers */
-  double p;                      /* parallactic angle (radians) */
   double photonsigma;            /* typical photon noise level in pW */
   double samptime;               /* sample time in sec */
   double startatm;               /* mean expected atmospheric signal (pW) */
   JCMTState state;               /* Telescope state at one time slice */
   int subnum;                    /* subarray number */
   double telpos[3];              /* Geodetic location of the telescope */
-  double trans;                  /* average transmission */
 
   /* Check status */
   if ( !StatusOkP(status) ) return;

@@ -149,7 +149,6 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
                         int *status ) {
 
   char convert[SC2SIM__FLEN]; /* String for converting values */
-  char *curtok=NULL;     /* current jig vertex being parsed */
   double dec;            /* Double representation of Dec */
   int grid_max_x;        /* The reconstruction grid max X */
   int grid_max_y;        /* The reconstruction grid max Y */

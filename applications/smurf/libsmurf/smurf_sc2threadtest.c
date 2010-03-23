@@ -228,7 +228,7 @@ void smfParallelTime( void *job_data_ptr, int *status ) {
 
   /* Try setting some status in thread to test merging mechanism */
   *status = SMF__INSMP;
-  errRepf( " ", "Set SMF__INSMP in thread chunks %i -- %i", status,
+  errRepf( " ", "Set SMF__INSMP in thread chunks %zu -- %zu", status,
            data->chunk1, data->chunk2 );
 }
 

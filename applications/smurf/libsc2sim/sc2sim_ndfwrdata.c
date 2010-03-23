@@ -342,11 +342,11 @@ void sc2sim_ndfwrdata
   int fitsfind;
   char fitsrec[SC2STORE__MAXFITS*80+1]; /* Store for FITS records */
   int framesize;                  /* Number of points in a single `frame' */
-  int i;                          /* Loop counter */
+  size_t i;                       /* Loop counter */
   double instap[2];               /* Instrument aperture */
-  int j;                          /* Loop counter */
+  size_t j;                       /* Loop counter */
   int jigvert[SC2SIM__MXVERT][2]; /* Temp array to jig_vert */
-  int k;                          /* Loop counter */
+  size_t k;                       /* Loop counter */
   int naver;                      /* Number of frames to average */
   int ndim;                       /* Dimensionality of output image */
   size_t nrec;                    /* number of FITS header records */

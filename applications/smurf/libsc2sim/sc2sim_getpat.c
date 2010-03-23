@@ -126,7 +126,7 @@ void sc2sim_getpat
 
 {
   /* Local variables */
-  int j;
+  size_t j;
   double frac;
   double vertex_t;    /* time interval between jiggle vertices in msec */
 

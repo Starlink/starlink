@@ -104,7 +104,6 @@ void sc2sim_instap_calc
   double halfy;
   double instap_arr[2]={0,0};
   double instap_ms[2]={0,0};
-  int i;
 
   /* Check status */
   if ( *status != SAI__OK ) return;

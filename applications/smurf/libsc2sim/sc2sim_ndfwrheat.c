@@ -162,7 +162,7 @@ void sc2sim_ndfwrheat
   int jigvert[SC2SIM__MXVERT][2]; /* Temp array to jig_vert */
   size_t nrec = 0;                 /* number of FITS header records */
   int subnum;                      /* subarray index */
-  int i, j;
+  size_t i, j;
 
   /* Check status */
   if ( *status != SAI__OK ) return;

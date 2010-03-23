@@ -100,10 +100,10 @@ void smf_flag_stationary( smfData *data, unsigned char *quality,
   unsigned char *flag=NULL;     /* Array indicating which samples to flag */
   dim_t i;                      /* Loop Counter */
   dim_t j;                      /* Loop Counter */
-  double pos1_ac1;              /* Coordinates in 3-sample neighbourhood */
-  double pos1_ac2;              /* "                                     */
-  double pos2_ac1;              /* "                                     */
-  double pos2_ac2;              /* "                                     */
+  double pos1_ac1=0;            /* Coordinates in 3-sample neighbourhood */
+  double pos1_ac2=0;            /* "                                     */
+  double pos2_ac1=0;            /* "                                     */
+  double pos2_ac2=0;            /* "                                     */
   double pos3_ac1;              /* "                                     */
   double pos3_ac2;              /* "                                     */
   dim_t nbolo=0;                /* Number of bolometers */
@@ -113,7 +113,7 @@ void smf_flag_stationary( smfData *data, unsigned char *quality,
   double sep1;                  /* Angular separation between samples */
   double sep2;                  /* Angular separation between samples */
   double speed;                 /* Current speed */
-  double steptime;              /* Step time in seconds */
+  double steptime=0;            /* Step time in seconds */
   size_t tstride;               /* Time stride */
 
   /* Main routine */
