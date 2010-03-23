@@ -142,10 +142,11 @@ int smf_get_ndfid ( const HDSLoc *loc, const char *name, const char *accmode,
        to be overwritten. */
     msgSetc("N",name);
     msgSetc("A",accmode);
-    if ( strncmp( state, "NEW", 3 ) == 0 ) {
-      msgOutif(MSG__VERB," ", "Opening new NDF ^N with ^A access", status);
+    if ( (strncmp( state, "NEW", 3 ) == 0) ||
+         (strncmp( state, "UNKNOWN", 3 ) == 0 ) ) {
+      msgOutif(MSG__DEBUG," ", "Opening new NDF ^N with ^A access", status);
     } else {
-      msgOutif(MSG__VERB," ", "Opening NDF ^N with ^A access"
+      msgOutif(MSG__DEBUG," ", "Opening NDF ^N with ^A access"
 		"NDF ^N may already exist: opening this NDF will clear the current contents.", status);
     }
   }
