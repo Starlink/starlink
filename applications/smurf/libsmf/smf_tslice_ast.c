@@ -105,7 +105,7 @@
 
 *  Notes:
 *     The API is currently uncertain since it may make more sense to pass in a
-*     smfHead rather than a smfData (assuming the xloc field is moved to 
+*     smfHead rather than a smfData (assuming the xloc field is moved to
 *     smfHead).
 
 *  Copyright:
@@ -158,7 +158,7 @@ void smf_tslice_ast (smfData * data, dim_t index, int needwcs, int * status ) {
   smfHead *hdr;              /* Local copy of the header structure */
   dim_t ntslice;             /* Number of time-slices in data */
   const JCMTState *tmpState; /* Local pointer to STATE */
-  double dut1=0.0;           /* UT1-UTC correction, in days */ 
+  double dut1=0.0;           /* UT1-UTC correction, in days */
   int subsysnum;             /* Subsystem numeric id. 0 - 8 */
 
   if (*status != SAI__OK) return;
@@ -225,25 +225,25 @@ void smf_tslice_ast (smfData * data, dim_t index, int needwcs, int * status ) {
                                          hdr->cache1, status );
       }
       break;
-      
-    case INST__AZTEC:
 
+    case INST__AZTEC:
       hdr->cache2 = smf_create_lutwcs( 0, hdr->fplanex, hdr->fplaney, hdr->ndet,
                                        tmpState, dut1, hdr->instap, hdr->telpos,
                                        &(hdr->wcs), hdr->cache2, status );
       break;
-      
-/* For ACSIS data, use the .MORE.ACSIS.RECEPPOS values if they are
-   still available in the smfHead. Otherwise, use the FPLANEX/Y values. */
+
     case INST__ACSIS:
+      /* For ACSIS data, use the .MORE.ACSIS.RECEPPOS values if they are
+         still available in the smfHead. Otherwise, use the FPLANEX/Y values. */
+
       if( hdr->detpos ) {
-        hdr->cache3 = smf_detpos_wcs( hdr, index, dut1, hdr->telpos, &(hdr->wcs), 
-                                      hdr->cache3, status );
+        hdr->cache3 = smf_detpos_wcs( hdr, index, dut1, hdr->telpos,
+                                      &(hdr->wcs), hdr->cache3, status );
 
       } else {
-        hdr->cache2 = smf_create_lutwcs( 0, hdr->fplanex, hdr->fplaney, 
-                                         hdr->ndet, tmpState, dut1, hdr->instap, 
-                                         hdr->telpos, &(hdr->wcs), hdr->cache2, 
+        hdr->cache2 = smf_create_lutwcs( 0, hdr->fplanex, hdr->fplaney,
+                                         hdr->ndet, tmpState, dut1, hdr->instap,
+                                         hdr->telpos, &(hdr->wcs), hdr->cache2,
                                          status );
       }
 
@@ -252,9 +252,7 @@ void smf_tslice_ast (smfData * data, dim_t index, int needwcs, int * status ) {
     default:
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Don't know how to calculate WCS for data created with this instrument", status);
-
     }
-    
   }
   return;
 }
