@@ -103,7 +103,7 @@
 
 
 
-
+/* --- DEBUG CODE --- leave in until it has all been shown to work...
 
 #define RECORD_BOLO (ibolo==669||ibolo==232||ibolo==144||ibolo==826||ibolo==1105)
 
@@ -131,8 +131,7 @@ typedef struct Tmp {
    double step_hgt;
 } Tmp;
 
-
-
+*/
 
 
 /* Prototypes for private functions. */
@@ -144,6 +143,10 @@ static double smf1_running_median( dim_t box, double **dat,
                                   unsigned char **qua, size_t tstride,
                                   unsigned char mask, double *w1, double *w2,
                                   dim_t *iold, dim_t *inbox, int *status );
+
+
+
+
 
 
 void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
@@ -234,29 +237,24 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
    *nsteps = 0;
 
 
+/* --- DEBUG CODE --- leave in until it has all been shown to work...
    static int nentry = 0;
    char buf[ 200 ];
 
+   sprintf( buf, "bolo_%d.asc", ++nentry );
+   FILE *fd1 = fopen( buf, "w" );
+   fprintf( fd1, "# dcthresh=%g\n", dcthresh );
+   fprintf( fd1, "# dctmedianwidth=%d\n", dcmedianwidth );
+   fprintf( fd1, "# dcfitbox=%d\n", dcfitbox );
+   fprintf( fd1, "# dcmaxsteps=%d\n", dcmaxsteps );
+   fprintf( fd1, "# ibolo ngood nstep rms thresh rejected\n");
 
+   sprintf( buf, "data_%d.asc", nentry );
+   FILE *fd2 = fopen( buf, "w" );
+   fprintf( fd2, "# itime indata inquality outdata outquality ibolo jump "
+                 "flag lostart loend histart hiend lorms hirms step_hgt\n");
 
-
-sprintf( buf, "bolo_%d.asc", ++nentry );
-FILE *fd1 = fopen( buf, "w" );
-fprintf( fd1, "# dcthresh=%g\n", dcthresh );
-fprintf( fd1, "# dctmedianwidth=%d\n", dcmedianwidth );
-fprintf( fd1, "# dcfitbox=%d\n", dcfitbox );
-fprintf( fd1, "# dcmaxsteps=%d\n", dcmaxsteps );
-fprintf( fd1, "# ibolo ngood nstep rms thresh rejected\n");
-
-sprintf( buf, "data_%d.asc", nentry );
-FILE *fd2 = fopen( buf, "w" );
-fprintf( fd2, "# itime indata inquality outdata outquality ibolo jump "
-              "flag lostart loend histart hiend lorms hirms step_hgt\n");
-
-
-
-
-
+*/
 
 
 
@@ -324,19 +322,9 @@ fprintf( fd2, "# itime indata inquality outdata outquality ibolo jump "
       ntime = itime_end - itime_start + 1;
 
 
-
-
-
-
-Tmp *tmp = astMalloc( ntime*sizeof( *tmp ) );
-
-
-
-
-
-
-
-
+/* --- DEBUG CODE --- leave in until it has all been shown to work...
+   Tmp *tmp = astMalloc( ntime*sizeof( *tmp ) );
+*/
 
 /* Allocate work arrays. */
       w1a = astMalloc( sizeof( *w1a )*dcmedianwidth );
@@ -360,50 +348,34 @@ Tmp *tmp = astMalloc( ntime*sizeof( *tmp ) );
          if( !(qua[ base ] & SMF__Q_BADB) ) {
 
 
+/* --- DEBUG CODE --- leave in until it has all been shown to work...
 
+   if( RECORD_BOLO ) {
+      int kk;
+      pd = dat + base;
+      pq = qua + base;
+      for( kk = 0; kk < ntime; kk++ ) {
+         tmp[ kk ].ibolo = ibolo;
+         tmp[ kk ].indata = !( *pq & SMF__Q_MOD ) ? *pd : VAL__BADD;
+         tmp[ kk ].inquality = (int) *pq;
+         tmp[ kk ].outdata = VAL__BADD;
+         tmp[ kk ].outquality = 0;
+         tmp[ kk ].jump = VAL__BADD;
+         tmp[ kk ].flag = 0;
+         tmp[ kk ].lostart = VAL__BADD;
+         tmp[ kk ].loend = VAL__BADD;
+         tmp[ kk ].histart = VAL__BADD;
+         tmp[ kk ].hiend = VAL__BADD;
+         tmp[ kk ].lorms = VAL__BADD;
+         tmp[ kk ].hirms= VAL__BADD;
+         tmp[ kk ].step_hgt = VAL__BADD;
 
+         pd += tstride;
+         pq += tstride;
+      };
+   }
 
-
-
-
-
-
-
-
-if( RECORD_BOLO ) {
-   int kk;
-   pd = dat + base;
-   pq = qua + base;
-   for( kk = 0; kk < ntime; kk++ ) {
-      tmp[ kk ].ibolo = ibolo;
-      tmp[ kk ].indata = !( *pq & SMF__Q_MOD ) ? *pd : VAL__BADD;
-      tmp[ kk ].inquality = (int) *pq;
-      tmp[ kk ].outdata = VAL__BADD;
-      tmp[ kk ].outquality = 0;
-      tmp[ kk ].jump = VAL__BADD;
-      tmp[ kk ].flag = 0;
-      tmp[ kk ].lostart = VAL__BADD;
-      tmp[ kk ].loend = VAL__BADD;
-      tmp[ kk ].histart = VAL__BADD;
-      tmp[ kk ].hiend = VAL__BADD;
-      tmp[ kk ].lorms = VAL__BADD;
-      tmp[ kk ].hirms= VAL__BADD;
-      tmp[ kk ].step_hgt = VAL__BADD;
-
-      pd += tstride;
-      pq += tstride;
-   };
-}
-
-
-
-
-
-
-
-
-
-
+*/
 
 /* Indicate nothing found yet. */
             nstep = 0;
@@ -446,16 +418,9 @@ if( RECORD_BOLO ) {
                   tsum2 += diff*diff;
                   tpop++;
 
-
-
-
-
-
-tmp[ itime ].jump = diff;
-
-
-
-
+/* --- DEBUG CODE --- leave in until it has all been shown to work...
+   tmp[ itime ].jump = diff;
+*/
 
                } else {
                   *pw2 = VAL__BADD;
@@ -484,6 +449,8 @@ tmp[ itime ].jump = diff;
 
 /* Indicate we are currently looking for the start of a step. */
             step_start = -1;
+            step_end = -1;
+            step_limit = -1;
 
 /* Find the minimum significant gradient. */
             thresh = rms*dcthresh;
@@ -510,15 +477,9 @@ tmp[ itime ].jump = diff;
 
                   if( diff != 0.0 ) {
 
-
-
-
-
-tmp[ itime ].flag |= 1;
-
-
-
-
+/* --- DEBUG CODE --- leave in until it has all been shown to work...
+   tmp[ itime ].flag |= 1;
+*/
 
 /* And we are currently looking for the start of a new step, record the
    index of the step start. */
@@ -587,6 +548,7 @@ tmp[ itime ].flag |= 1;
             for( iblock = 0; iblock < nblock; iblock++) {
                step_start = block[ 0 ];
                step_end = block[ 1 ];
+               step_width = step_end - step_start + 1;
 
 /* Store the current correction up to the start of the current block. */
                for( ; itime < step_start; itime++,pw++ ) {
@@ -601,19 +563,11 @@ tmp[ itime ].flag |= 1;
                }
 
 
-
-
-
-
-
-for( jtime = step_start; jtime <= step_end; jtime++ ) {
-   tmp[ jtime ].flag |= 2;
-}
-
-
-
-
-
+/* --- DEBUG CODE --- leave in until it has all been shown to work...
+   for( jtime = step_start; jtime <= step_end; jtime++ ) {
+      tmp[ jtime ].flag |= 2;
+   }
+*/
 
 
 /* We now fit a straight line to the data just before the step. We use a
@@ -644,22 +598,11 @@ for( jtime = step_start; jtime <= step_end; jtime++ ) {
                if( mlo != VAL__BADD ) {
                   start_value = mlo*( boxlen + step_width/2 ) + clo;
 
-
-
-
-
-
-
-tmp[ boxstart ].lostart = clo;
-tmp[ boxstart + boxlen ].loend = mlo*boxlen + clo;
-tmp[ step_start ].lorms = rmslo;
-
-
-
-
-
-
-
+/* --- DEBUG CODE --- leave in until it has all been shown to work...
+   tmp[ boxstart ].lostart = clo;
+   tmp[ boxstart + boxlen ].loend = mlo*boxlen + clo;
+   tmp[ step_start ].lorms = rmslo;
+*/
 
 
                } else {
@@ -682,14 +625,13 @@ tmp[ step_start ].lorms = rmslo;
                }
 
                if( mhi != VAL__BADD ) {
-                  end_value = mhi*(-step_width/2) + chi;
+                  end_value = mhi*( -step_width/2 ) + chi;
 
-
-tmp[ boxstart ].histart = chi;
-tmp[ boxstart + boxlen ].hiend = mhi*boxlen + chi;
-tmp[ step_end ].hirms = rmshi;
-
-
+/* --- DEBUG CODE --- leave in until it has all been shown to work...
+   tmp[ boxstart ].histart = chi;
+   tmp[ boxstart + boxlen ].hiend = mhi*boxlen + chi;
+   tmp[ step_end ].hirms = rmshi;
+*/
 
 
                } else {
@@ -700,12 +642,11 @@ tmp[ step_end ].hirms = rmshi;
                if( end_value != VAL__BADD && start_value != VAL__BADD ) {
 
 
-
-
-for( jtime = step_start; jtime <= step_end; jtime++ ) {
-   tmp[ jtime ].flag |= 4;
-}
-
+/* --- DEBUG CODE --- leave in until it has all been shown to work...
+   for( jtime = step_start; jtime <= step_end; jtime++ ) {
+      tmp[ jtime ].flag |= 4;
+   }
+*/
 
 /* Check the step is large enough. */
                   diff = end_value - start_value;
@@ -715,29 +656,17 @@ for( jtime = step_start; jtime <= step_end; jtime++ ) {
                      thresh = rmshi*dcthresh;
                   }
 
-
-
-
-
-tmp[ (step_end + step_start )/2].step_hgt = diff;
-
-
-
-
-
+/* --- DEBUG CODE --- leave in until it has all been shown to work...
+   tmp[ (step_end + step_start )/2].step_hgt = diff;
+*/
 
                   if( fabs( diff ) >= thresh ) {
 
-
-
-
-
-for( jtime = step_start; jtime <= step_end; jtime++ ) {
-   tmp[ jtime ].flag |= 8;
-}
-
-
-
+/* --- DEBUG CODE --- leave in until it has all been shown to work...
+   for( jtime = step_start; jtime <= step_end; jtime++ ) {
+      tmp[ jtime ].flag |= 8;
+   }
+*/
 
 
 /* Increment the number of steps found in this bolometer. */
@@ -806,16 +735,7 @@ for( jtime = step_start; jtime <= step_end; jtime++ ) {
                }
             }
 
-
-
-
-
-
-
-
-
-
-
+/* --- DEBUG CODE --- leave in until it has all been shown to work...
    if( RECORD_BOLO ) {
       pd = dat + base;
       pq = qua + base;
@@ -846,13 +766,7 @@ for( jtime = step_start; jtime <= step_end; jtime++ ) {
    fprintf( fd1, "%d %d %d %g %g %d\n", ibolo, ngood, nstep, rms, thresh, (ncorr==0) );
 } else {
    fprintf( fd1, "%d null null null null null\n", ibolo );
-
-
-
-
-
-
-
+*/
 
 
          }
@@ -867,16 +781,9 @@ for( jtime = step_start; jtime <= step_end; jtime++ ) {
       work2 = astFree( work2 );
       blocks = astFree( blocks );
 
-
-
-
-
-tmp = astFree (tmp );
-
-
-
-
-
+/* --- DEBUG CODE --- leave in until it has all been shown to work...
+   tmp = astFree (tmp );
+*/
 
    }
 
@@ -886,13 +793,10 @@ tmp = astFree (tmp );
                  status, (int) *nsteps );
    }
 
-
-
-fclose( fd1 );
-fclose( fd2 );
-
-
-
+/* --- DEBUG CODE --- leave in until it has all been shown to work...
+   fclose( fd1 );
+   fclose( fd2 );
+*/
 
 }
 
