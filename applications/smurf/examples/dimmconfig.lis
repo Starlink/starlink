@@ -123,7 +123,7 @@ dcmaxsteps = 10
 
 # The width of the median filter used to smooth a bolometer data stream
 # prior to finding DC jumps
-dcmedianwidth = 40;
+dcmedianwidth = 40
 
 # S/N ratio to flag spikes with sigma-clipper
 # spikethresh = 5
