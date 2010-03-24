@@ -47,7 +47,7 @@ ensureflat=0
 
 # Less aggressive to ensure that as much usable data get through as
 # possible.
-dcthresh = 1000
+dcthresh = 200
 
 # box size over which to fit the data with a straight line on each side of
 # a potential DC jump.

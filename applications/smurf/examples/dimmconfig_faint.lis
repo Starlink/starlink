@@ -68,7 +68,7 @@ dks.boxcar = 100
 # model components, the data should be fairly flat, so this is less dangerous.
 
 noi.dcfitbox = 400
-noi.dcthresh = 3
+noi.dcthresh = 2
 noi.fillgaps = 1
 
 noi.spikethresh = 5

@@ -109,7 +109,7 @@ flagstat = 2
 # --- Many of the following may not be useful ---
 
 # S/N threshold to detect DC steps
-dcthresh = 3
+dcthresh = 2
 
 # box size over which to fit data with a straight line on either side of
 # a potential DC jump.
@@ -119,7 +119,11 @@ dcfitbox = 400
 # good data (i.e. per 12000 samples) from a bolometer before the entire
 # bolometer is flagged as bad. A value of zero will cause a bolometer to
 # be rejected if any steps are found in the bolometer data stream.
-dcmaxsteps = 8
+dcmaxsteps = 10
+
+# The width of the median filter used to smooth a bolometer data stream
+# prior to finding DC jumps
+dcmedianwidth = 40;
 
 # S/N ratio to flag spikes with sigma-clipper
 # spikethresh = 5

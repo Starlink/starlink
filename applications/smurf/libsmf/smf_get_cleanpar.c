@@ -213,7 +213,7 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
   }
 
   if( dcmaxsteps ) {
-    *dcmaxsteps = 8;
+    *dcmaxsteps = 10;
 
     if( astMapGet0I( keymap, "DCMAXSTEPS", &temp ) ) {
       if( (temp < 0) ) {

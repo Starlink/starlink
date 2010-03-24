@@ -33,7 +33,7 @@ padend = 1000
 apod = 1000
 
 # Bigger threshold for steps to avoid detecting bright sources accidentally
-dcthresh = 200
+dcthresh = 50
 dcfitbox = 400
 
 # ----------------------------------------------------------------------------

@@ -331,7 +331,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   smfDIMMData dat;              /* Struct passed around to model components */
   smfData *data=NULL;           /* Temporary smfData pointer */
   dim_t dcfitbox=0;             /* Box size for linear fit on either side of a DC steps */
-  int dcmaxsteps=8;             /* Max number of DC jumps in a bolometer */
+  int dcmaxsteps=10;            /* Max number of DC jumps in a bolometer */
   double dcthresh;              /* Threshold for fixing primary DC steps */
   dim_t dcmedianwidth;          /* Median filter width for DC steps detection */
   int deldimm=0;                /* Delete temporary .DIMM files */
