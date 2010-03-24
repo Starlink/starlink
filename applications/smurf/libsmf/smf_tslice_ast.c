@@ -217,7 +217,8 @@ void smf_tslice_ast (smfData * data, dim_t index, int needwcs, int * status ) {
     case INST__SCUBA2:
       /* only do this if we know we have a valid telescope position. For some
          data between 20091205 and 20091124 jos_drcontrol was negative. */
-      if ( tmpState->jos_drcontrol < 0 ||  ! tmpState->jos_drcontrol & DRCNTRL__POSITION ) {
+      if ( (tmpState->jos_drcontrol < 0) ||
+           !(tmpState->jos_drcontrol & DRCNTRL__POSITION) ) {
         /* Need to get the subarray number */
         smf_find_subarray( hdr, NULL, 0, &subsysnum, status );
         hdr->cache1 = sc2ast_createwcs2( subsysnum, tmpState, dut1, hdr->instap,
