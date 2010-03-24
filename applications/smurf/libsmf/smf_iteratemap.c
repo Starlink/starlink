@@ -470,205 +470,215 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       }
     }
 
-    /* Required positional accuracy, in output map pixels. */
-    if( !astMapGet0I( keymap, "TSTEP", &tstep ) ) {
-      tstep = 100;
-    }
+    if( *status == SAI__OK ) {
+      /* Required positional accuracy, in output map pixels. */
+      if( !astMapGet0I( keymap, "TSTEP", &tstep ) ) {
+        tstep = 100;
+      }
 
-    /* Chisquared change tolerance for stopping */
-    if( !astMapGet0D( keymap, "CHITOL", &chitol ) ) {
-      chitol = 0.0001;
-    }
+      /* Chisquared change tolerance for stopping */
+      if( !astMapGet0D( keymap, "CHITOL", &chitol ) ) {
+        chitol = 0.0001;
+      }
 
-    if( chitol <= 0 ) {
-      *status = SAI__ERROR;
-      msgSetd("CHITOL",chitol);
-      errRep(FUNC_NAME,
-             FUNC_NAME ": CHITOL is ^CHITOL, must be > 0", status);
+      if( chitol <= 0 ) {
+        *status = SAI__ERROR;
+        msgSetd("CHITOL",chitol);
+        errRep(FUNC_NAME,
+               FUNC_NAME ": CHITOL is ^CHITOL, must be > 0", status);
+      }
     }
 
     /* Do iterations completely in memory - minimize disk I/O */
-    if( !astMapGet0I( keymap, "MEMITER", &memiter ) ) {
-      memiter = 0;
-    }
+    if( *status == SAI__OK ) {
 
-    if( memiter ) {
-      msgOutif(MSG__VERB, " ",
-               FUNC_NAME ": MEMITER set; perform iterations in memory",
-               status );
-    } else {
-      msgOutif(MSG__VERB, " ",
-               FUNC_NAME ": MEMITER not set; perform iterations on disk",
-               status );
+      if( !astMapGet0I( keymap, "MEMITER", &memiter ) ) {
+        memiter = 0;
+      }
 
-      /* Should temporary .DIMM files be deleted at the end? */
-      astMapGet0I( keymap, "DELDIMM", &deldimm );
-    }
+      if( memiter ) {
+        msgOutif(MSG__VERB, " ",
+                 FUNC_NAME ": MEMITER set; perform iterations in memory",
+                 status );
+      } else {
+        msgOutif(MSG__VERB, " ",
+                 FUNC_NAME ": MEMITER not set; perform iterations on disk",
+                 status );
 
-    /* Are we going to produce single-bolo maps? */
-    if( !astMapGet0I( keymap, "BOLOMAP", &bolomap ) ) {
-      bolomap = 0;
-    }
+        /* Should temporary .DIMM files be deleted at the end? */
+        astMapGet0I( keymap, "DELDIMM", &deldimm );
+      }
 
-    /* Are we going to produce maps for each iteration? */
-    if( !astMapGet0I( keymap, "ITERMAP", &itermap ) ) {
-      itermap = 0;
-    }
+      /* Are we going to produce single-bolo maps? */
+      if( !astMapGet0I( keymap, "BOLOMAP", &bolomap ) ) {
+        bolomap = 0;
+      }
 
-    /* Are we going to apply the flatfield when we load data? */
-    if( !astMapGet0I( keymap, "ENSUREFLAT", &ensureflat ) ) {
-      ensureflat = 1;
-    }
+      /* Are we going to produce maps for each iteration? */
+      if( !astMapGet0I( keymap, "ITERMAP", &itermap ) ) {
+        itermap = 0;
+      }
 
-    /* Are we going to set bad values in exported models? */
-    if( !astMapGet0I( keymap, "NOEXPORTSETBAD", &noexportsetbad ) ) {
-      noexportsetbad = 0;
-    }
+      /* Are we going to apply the flatfield when we load data? */
+      if( !astMapGet0I( keymap, "ENSUREFLAT", &ensureflat ) ) {
+        ensureflat = 1;
+      }
 
-    /* Method to use for calculating the variance map */
-    if( !astMapGet0I( keymap, "VARMAPMETHOD", &varmapmethod ) ) {
-      varmapmethod = 0;
-    }
+      /* Are we going to set bad values in exported models? */
+      if( !astMapGet0I( keymap, "NOEXPORTSETBAD", &noexportsetbad ) ) {
+        noexportsetbad = 0;
+      }
 
-    if( varmapmethod ) {
-      msgOutif(MSG__VERB, " ",
-               FUNC_NAME ": Will use sample variance to estimate"
-               " variance map", status );
-    } else {
-      msgOutif(MSG__VERB, " ",
-               FUNC_NAME ": Will use error propagation to estimate"
-               " variance map", status );
+      /* Method to use for calculating the variance map */
+      if( !astMapGet0I( keymap, "VARMAPMETHOD", &varmapmethod ) ) {
+        varmapmethod = 0;
+      }
+
+      if( varmapmethod ) {
+        msgOutif(MSG__VERB, " ",
+                 FUNC_NAME ": Will use sample variance to estimate"
+                 " variance map", status );
+      } else {
+        msgOutif(MSG__VERB, " ",
+                 FUNC_NAME ": Will use error propagation to estimate"
+                 " variance map", status );
+      }
     }
 
 
     /* Data-cleaning parameters (should match SC2CLEAN) */
-    smf_get_cleanpar( keymap, &apod, &badfrac, &dcfitbox, &dcmaxsteps, &dcthresh,
-                      &dcmedianwidth, NULL, &fillgaps, &f_edgelow,
+    smf_get_cleanpar( keymap, &apod, &badfrac, &dcfitbox, &dcmaxsteps,
+                      &dcthresh, &dcmedianwidth, NULL, &fillgaps, &f_edgelow,
                       &f_edgehigh, f_notchlow, f_notchhigh, &f_nnotch,
                       &dofft, &flagstat, &baseorder, &spikethresh,
                       &spikeiter, status );
 
     /* Maximum length of a continuous chunk */
-    if( astMapGet0D( keymap, "MAXLEN", &dtemp ) ) {
+    if( *status == SAI__OK ) {
+      if( astMapGet0D( keymap, "MAXLEN", &dtemp ) ) {
 
-      if( dtemp < 0.0 ) {
-        /* Trap negative MAXLEN */
-        *status = SAI__ERROR;
-        errRep(FUNC_NAME, "Negative value for MAXLEN supplied.", status);
-      } else if( dtemp == 0 ) {
-        /* 0 is OK... gets ignored later */
-        maxlen = 0;
-      } else {
-        /* Obtain sample length from header of first file in igrp */
-        smf_open_file( igrp, 1, "READ", SMF__NOCREATE_DATA, &data, status );
-        if( (*status == SAI__OK) && (data->hdr) ) {
-          steptime = data->hdr->steptime;
+        if( dtemp < 0.0 ) {
+          /* Trap negative MAXLEN */
+          *status = SAI__ERROR;
+          errRep(FUNC_NAME, "Negative value for MAXLEN supplied.", status);
+        } else if( dtemp == 0 ) {
+          /* 0 is OK... gets ignored later */
+          maxlen = 0;
+        } else {
+          /* Obtain sample length from header of first file in igrp */
+          smf_open_file( igrp, 1, "READ", SMF__NOCREATE_DATA, &data, status );
+          if( (*status == SAI__OK) && (data->hdr) ) {
+            steptime = data->hdr->steptime;
 
-          if( steptime > 0 ) {
-            maxlen = (dim_t) (dtemp / steptime);
-          } else {
-            /* Trap invalid sample length in header */
-            *status = SAI__ERROR;
-            errRep(FUNC_NAME, "Invalid STEPTIME in FITS header.", status);
+            if( steptime > 0 ) {
+              maxlen = (dim_t) (dtemp / steptime);
+            } else {
+              /* Trap invalid sample length in header */
+              *status = SAI__ERROR;
+              errRep(FUNC_NAME, "Invalid STEPTIME in FITS header.", status);
+            }
           }
+          smf_close_file( &data, status );
         }
-        smf_close_file( &data, status );
+      } else {
+        maxlen = 0;
       }
-
-    } else {
-      maxlen = 0;
     }
 
     /* Padding */
-
-    if( astMapGet0I( keymap, "PADSTART", &temp ) ) {
-      if( temp < 0 ) {
-        *status = SAI__ERROR;
-        errRep(FUNC_NAME, "PADSTART cannot be < 0.", status );
+    if( *status == SAI__OK ) {
+      if( astMapGet0I( keymap, "PADSTART", &temp ) ) {
+        if( temp < 0 ) {
+          *status = SAI__ERROR;
+          errRep(FUNC_NAME, "PADSTART cannot be < 0.", status );
+        } else {
+          padStart = (dim_t) temp;
+        }
       } else {
-        padStart = (dim_t) temp;
+        padStart = 0;
       }
-    } else {
-      padStart = 0;
     }
 
-    if( astMapGet0I( keymap, "PADEND", &temp ) ) {
-      if( temp < 0 ) {
-        *status = SAI__ERROR;
-        errRep(FUNC_NAME, "PADEND cannot be < 0.", status );
+    if( *status == SAI__OK ) {
+      if( astMapGet0I( keymap, "PADEND", &temp ) ) {
+        if( temp < 0 ) {
+          *status = SAI__ERROR;
+          errRep(FUNC_NAME, "PADEND cannot be < 0.", status );
+        } else {
+          padEnd = (dim_t) temp;
+        }
       } else {
-        padEnd = (dim_t) temp;
+        padEnd = 0;
       }
-    } else {
-      padEnd = 0;
     }
 
     /* Type and order of models to fit from MODELORDER keyword */
     havenoi = 0;
     haveext = 0;
 
-    if(astMapGet1C(keymap, "MODELORDER", 4, SMF_MODEL_MAX, &nm, modelnames)) {
-      nmodels = (dim_t) nm;
+    if( *status == SAI__OK ) {
+      if(astMapGet1C(keymap, "MODELORDER", 4, SMF_MODEL_MAX, &nm, modelnames)) {
+        nmodels = (dim_t) nm;
 
-      /* Allocate modeltyps */
-      if( nmodels >= 1 ) {
-        modeltyps = smf_malloc( nmodels, sizeof(*modeltyps), 1, status );
-        /* Extra components for exportNDF_which for 'res', 'qua' */
-        exportNDF_which = smf_malloc( nmodels+2, sizeof(*exportNDF_which),
-                                      1, status );
-      } else {
-        msgOut(" ", FUNC_NAME ": No valid models in MODELORDER",
-               status );
-      }
+        /* Allocate modeltyps */
+        if( nmodels >= 1 ) {
+          modeltyps = smf_malloc( nmodels, sizeof(*modeltyps), 1, status );
+          /* Extra components for exportNDF_which for 'res', 'qua' */
+          exportNDF_which = smf_malloc( nmodels+2, sizeof(*exportNDF_which),
+                                        1, status );
+        } else {
+          msgOut(" ", FUNC_NAME ": No valid models in MODELORDER",
+                 status );
+        }
 
-      /* Loop over names and figure out enumerated type */
-      for( i=0; (*status==SAI__OK)&&(i<nmodels); i++ ) {
-        modelname = modelnames+i*4; /* Pointer to current name */
-        thismodel = smf_model_gettype( modelname, status );
+        /* Loop over names and figure out enumerated type */
+        for( i=0; (*status==SAI__OK)&&(i<nmodels); i++ ) {
+          modelname = modelnames+i*4; /* Pointer to current name */
+          thismodel = smf_model_gettype( modelname, status );
 
-        if( *status == SAI__OK ) {
-          modeltyps[i] = thismodel;
+          if( *status == SAI__OK ) {
+            modeltyps[i] = thismodel;
 
-          /* set haveast/whichast */
-          if( thismodel == SMF__AST ) {
-            haveast = 1;
-            whichast = i;
-          }
+            /* set haveast/whichast */
+            if( thismodel == SMF__AST ) {
+              haveast = 1;
+              whichast = i;
+            }
 
-          /* set havenoi/whichnoi */
-          if( thismodel == SMF__NOI ) {
-            havenoi = 1;
-            whichnoi = i;
-          }
+            /* set havenoi/whichnoi */
+            if( thismodel == SMF__NOI ) {
+              havenoi = 1;
+              whichnoi = i;
+            }
 
-          /* set haveext/whichext */
-          if( thismodel == SMF__EXT ) {
-            haveext = 1;
-            whichext = i;
-          }
+            /* set haveext/whichext */
+            if( thismodel == SMF__EXT ) {
+              haveext = 1;
+              whichext = i;
+            }
 
-          /* set havegai/whichgai */
-          if( thismodel == SMF__GAI ) {
-            havegai = 1;
-            whichgai = i;
+            /* set havegai/whichgai */
+            if( thismodel == SMF__GAI ) {
+              havegai = 1;
+              whichgai = i;
+            }
           }
         }
+      } else {
+        *status = SAI__ERROR;
+        errRep("", FUNC_NAME ": MODELORDER must be specified in config file!",
+               status);
+        nmodels = 0;
       }
-
-    } else {
-      *status = SAI__ERROR;
-      errRep("", FUNC_NAME ": MODELORDER must be specified in config file!",
-             status);
-      nmodels = 0;
     }
 
     /* If !havenoi can't measure convergence, so turn off untilconverge */
     if( !havenoi ) {
-    untilconverge = 0;
+      untilconverge = 0;
     }
 
     /* Fail if no AST model component was specified */
-    if( !haveast ) {
+    if( (*status == SAI__OK) && !haveast ) {
       *status = SAI__ERROR;
       errRep("", FUNC_NAME ": AST must be member of MODELORDER in config file!",
              status);
@@ -737,6 +747,13 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         }
       }
     }
+  }
+
+  /* Trap bad AST status here from all the keymap calls */
+  if( (*status==SAI__OK) && !astOK ) {
+    *status = SAI__ERROR;
+    errRep("", FUNC_NAME ": AST error detected parsing config file!",
+           status);
   }
 
   /* Merge wavelength specific keymap entries - we need to know the wavelength
