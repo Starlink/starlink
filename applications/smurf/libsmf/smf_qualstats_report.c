@@ -214,7 +214,7 @@ void smf_qualstats_report( const smfArray *qua,
       msgOut( "", "--- Size of the entire data array ------------------------------------------",
               status );
       msgOutf("", "bolos  : %zu", status, nbolo_tot );
-      msgOutf("", "tslices: %zu bound(%4.1lfmin) + %zu map(%5.1lfmin) = %zu(%5.1lfmin)", status,
+      msgOutf("", "tslices: bnd:%zu(%.1lf min), map:%zu(%.1lf min), tot:%zu(%.1lf min)", status,
               ntslice-nmax/nbolo_tot, (ntslice-nmax/nbolo_tot)*steptime/60.,
               nmax/nbolo_tot, (nmax/nbolo_tot)*steptime/60.,
               ntslice, ntslice*steptime/60.);
