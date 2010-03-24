@@ -145,6 +145,7 @@ smf_fits_updateU.c \
 smf_fix_metadata.c \
 smf_fix_metadata_acsis.c \
 smf_fix_metadata_scuba2.c \
+smf_fix_steps.c \
 smf_flag_spikes.c \
 smf_flag_spikes2.c \
 smf_flag_stationary.c \
@@ -317,11 +318,11 @@ BUILT_SOURCES = smf_err.h smf.h $(BUILT_C_ROUTINES)
 $(C_ROUTINES:.c=.o): smf.h
 
 smf.h: smf.h.source make_h
-	./make_h 
+	./make_h
 
-# Create the .c file which defines type-specific code generated from each 
+# Create the .c file which defines type-specific code generated from each
 # .cgen file.
-$(CGENERIC_ROUTINES:.cgen=.c): 
+$(CGENERIC_ROUTINES:.cgen=.c):
 	echo "/*" > $@
 	echo "*  Name:" >> $@
 	echo "*    $@" >> $@

@@ -5,9 +5,7 @@
 # To produce focal plane distortion maps we produce very finely-spaced
 # maps of bright calibrators so that we can produce fully-sampled images
 # for each bolometer. Bright sources can easily be confused as steps/spikes,
-# so the thresholds have been set quite high. dcflagall is turned off
-# since source will almost certainly always be in one of the bolometers, so
-# it is better to try and repair steps on a per-bolometer basis. S/N is
+# so the thresholds have been set quite high. S/N is
 # also very high, so a fairly weak high-pass filter is applied (0.1 Hz) at
 # both wavelengths.
 #
@@ -49,16 +47,11 @@ ensureflat=0
 
 # Less aggressive to ensure that as much usable data get through as
 # possible.
-dcthresh = 5000
+dcthresh = 200
 
-# box size over which to measure rms for DC step finder
-dcbox = 50
-
-# repair detector instead of removing it entirely.
-dcbad = 0
-
-# Handle detectors independently as much as possible.
-dcflagall = 0
+# box size over which to fit the data with a straight line on each side of
+# a potential DC jump.
+dcfitbox = 400
 
 
 # ----------------------------------------------------------------------------
@@ -82,8 +75,5 @@ dks.boxcar = 100
 
 noi.spikethresh = 0
 noi.spikeiter = 0
-noi.dcbox = 0
-noi.dcthresh = 0
-noi.dcbad = 0
-noi.dcflagall = 0
+noi.dcfitbox = 0
 noi.fillgaps = 0

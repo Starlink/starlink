@@ -67,10 +67,8 @@ dks.boxcar = 100
 # Since the signal is small, and since this comes after all the other
 # model components, the data should be fairly flat, so this is less dangerous.
 
-noi.dcbox = 50
-noi.dcthresh = 100
-noi.dcbad = 0
-noi.dcflagall = 0
+noi.dcfitbox = 400
+noi.dcthresh = 2
 noi.fillgaps = 1
 
 noi.spikethresh = 5

@@ -14,12 +14,12 @@
 
 *  Invocation:
 *     smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
-*                       dim_t *dcbox, int *dcflag, double *dcthresh,
-*                       double *dcthresh2, int *dkclean, int *fillgaps, 
-*                       double *filt_edgelow, double *filt_edgehigh, 
-*                       double *filt_notchlow, double *filt_notchhigh, 
-*                       int *filt_nnotch, int *dofilt, double *flagstat, 
-*                       int *order, double *spikethresh, size_t *spikeiter, 
+*                       dim_t *dcfitbox, int *dcmaxsteps, double *dcthresh,
+*                       dim_t dcmedianwidth, int *dkclean, int *fillgaps,
+*                       double *filt_edgelow, double *filt_edgehigh,
+*                       double *filt_notchlow, double *filt_notchhigh,
+*                       int *filt_nnotch, int *dofilt, double *flagstat,
+*                       int *order, double *spikethresh, size_t *spikeiter,
 *                       int *status )
 
 *  Arguments:
@@ -30,17 +30,20 @@
 *     badfrac = double* (Returned)
 *        Fraction of bad samples in order for entire bolometer to be
 *        flagged as bad (NULL:0)
-*     dcbox = dim_t* (Returned)
-*        Width of the box (samples) over which to estimate the mean
-*        signal level for DC step detection (NULL:0)
-*     dcflag = int* (Returned)
-*        if 0 handle all bolos independently and attempt to fix steps (NULL:0)
-*        if 1 just flag entire bolo as bad if step encountered
-*        if 2 identify steps, and then repair/flag ALL bolometers at those spots
+*     dcfitbox = dim_t* (Returned)
+*        Length of box (in samples) over which each linear fit is
+*        performed when detecting DC steps. If zero, no steps will be
+*        corrected.
+*     dcmaxsteps = int* (Returned)
+*        The maximum number of DC jumps that can be corrected in each minute
+*        of good data (i.e. per 12000 samples) from a bolometer before the
+*        entire bolometer is flagged as bad. A value of zero will cause a
+*        bolometer to be rejected if any jumps are found in the bolometer
+*        data stream.
 *     dcthresh = double* (Returned)
-*        N-sigma threshold at which to detect primary DC steps (NULL:0)
-*     dcthresh2 = double* (Returned)
-*        N-sigma threshold at which to detect secondary DC steps (NULL:0)
+*        N-sigma threshold at which to detect DC steps
+*     dcmedianwidth = dim_t (Returned)
+*        Width of median filter for DC step detection.
 *     dkclean = int* (Returned)
 *        If true, clean dark squids from bolos (NULL:-1)
 *     fillgaps = int* (Returned)
@@ -51,10 +54,10 @@
 *     filt_edgehigh = double* (Returned)
 *        Apply a hard-edged high-pass filter at this frequency (Hz) (NULL:0)
 *     filt_notchlow = double* (Returned)
-*        Array of lower-frequency edges for hard notch filters (Hz). The 
+*        Array of lower-frequency edges for hard notch filters (Hz). The
 *        maximum length of this array is SMF__MXNOTCH.
 *     filt_notchhigh = double* (Returned)
-*        Array of upper-frequency edges for hard notch filters (Hz). The 
+*        Array of upper-frequency edges for hard notch filters (Hz). The
 *        maximum length of this array is SMF__MXNOTCH.
 *     filt_nnotch = int* (Returned)
 *        Number of notches in notch filter (NULL:0)
@@ -67,7 +70,7 @@
 *     spikethresh = double* (Returned)
 *        Flag spikes SPIKETHRESH-sigma away from mean (NULL:0)
 *     spikeiter = size_t* (Returned)
-*        If 0 iteratively find spikes until convergence. Otherwise 
+*        If 0 iteratively find spikes until convergence. Otherwise
 *        execute precisely this many iterations (NULL:0)
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -85,9 +88,10 @@
 *     special cases (FILT_NOTCHHIGH/NOTCHLOW), if no values are present in the
 *     keymap, the way the caller can detect this is by checking the value
 *     of filt_nnotch (which will be set to 0).
-*     
+*
 *  Authors:
 *     EC: Edward Chapin (UBC)
+*     DSB: David S. Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -97,6 +101,8 @@
 *        Add parameter dcflagall to dcflag (renamed from dcbad)
 *     2010-01-11 (EC):
 *        Add fillgaps
+*     2010-03-23 (DSB):
+*        Replace old DC jump config parameters with new ones.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -145,13 +151,13 @@
 #define FUNC_NAME "smf_get_cleanpar"
 
 void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
-                       dim_t *dcbox, int *dcflag, double *dcthresh,
-                       double *dcthresh2, int *dkclean, int *fillgaps,
+                       dim_t *dcfitbox, int *dcmaxsteps, double *dcthresh,
+                       dim_t *dcmedianwidth, int *dkclean, int *fillgaps,
                        double *filt_edgelow, double *filt_edgehigh,
-                       double *filt_notchlow, double *filt_notchhigh, 
+                       double *filt_notchlow, double *filt_notchhigh,
                        int *filt_nnotch, int *dofilt, double *flagstat,
                        int *order, double *spikethresh, size_t *spikeiter,
-                       int *status ) {        
+                       int *status ) {
 
   int dofft=0;                  /* Flag indicating that filtering is required */
   int f_nnotch=0;               /* Number of notch filters in array */
@@ -190,57 +196,41 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
                *badfrac );
   }
 
-  if( dcbox ) {
-    if( astMapGet0I( keymap, "DCBOX", &temp ) ) {
+  if( dcfitbox ) {
+    if( astMapGet0I( keymap, "DCFITBOX", &temp ) ) {
       if( temp < 0 ) {
         *status = SAI__ERROR;
-        errRep(FUNC_NAME, "DCBOX cannot be < 0.", status );
+        errRep(FUNC_NAME, "dcfitbox cannot be < 0.", status );
       } else {
-        *dcbox = (dim_t) temp;
+        *dcfitbox = (dim_t) temp;
       }
     } else {
-      *dcbox = 0;
+      *dcfitbox = 0;
     }
 
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DCBOX=%" DIM_T_FMT, status,
-               *dcbox );
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DCFITBOX=%" DIM_T_FMT, status,
+               *dcfitbox );
   }
 
-  if( dcflag ) {
-    *dcflag = 0;
+  if( dcmaxsteps ) {
+    *dcmaxsteps = 10;
 
-    if( astMapGet0I( keymap, "DCBAD", &temp ) ) {
-      if( (temp < 0) || (temp > 1) ) {
+    if( astMapGet0I( keymap, "DCMAXSTEPS", &temp ) ) {
+      if( (temp < 0) ) {
         *status = SAI__ERROR;
-        errRep(FUNC_NAME, "DCBAD must be either 0 or 1.", status );
+        errRep(FUNC_NAME, "DCMAXSTEPS must be 0 or more.", status );
       } else {
-        *dcflag = temp;
+        *dcmaxsteps = temp;
       }
     }
 
-    if( astMapGet0I( keymap, "DCFLAGALL", &temp ) ) {
-
-      if( (temp < 0) && (temp > 1) ) {
-        *status = SAI__ERROR;
-        errRep(FUNC_NAME, "DCFLAGALL must be either 0 or 1.", status );
-      } else if( temp == 1 ) {
-
-        if( *dcflag == 1 ) {
-          msgOutif( MSG__VERB, "", FUNC_NAME ": DCFLAGALL overriding DCBAD",
-                    status );
-        }
-
-        *dcflag = temp*2;
-      }
-    }
-
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DCFLAG=%i", status,
-               *dcflag );
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DCMAXSTEPS=%i", status,
+               *dcmaxsteps );
   }
 
   if( dcthresh ) {
     if( !astMapGet0D( keymap, "DCTHRESH", dcthresh ) ) {
-      *dcthresh = 0;
+      *dcthresh = 3.0;
     } else if( *dcthresh < 0 ) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "DCTHRESH must be >= 0.", status );
@@ -250,16 +240,15 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
                *dcthresh );
   }
 
-  if( dcthresh2 ) {
-    if( !astMapGet0D( keymap, "DCTHRESH2", dcthresh2 ) ) {
-      *dcthresh2 = 0;
-    } else if( *dcthresh2 < 0 ) {
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, "DCTHRESH2 must be >= 0.", status );
+  if( dcmedianwidth ) {
+    if( !astMapGet0I( keymap, "DCMEDIANWIDTH", &temp ) ) {
+      *dcmedianwidth = 40;
+    } else {
+      *dcmedianwidth = temp;
     }
 
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DCTHRESH2=%f", status,
-               *dcthresh2 );
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DCMEDIANWIDTH=%d", status,
+               *dcmedianwidth );
   }
 
   if( dkclean ) {
@@ -308,7 +297,7 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
   if( filt_edgehigh ) {
     if( !astMapGet0D( keymap, "FILT_EDGEHIGH", filt_edgehigh ) ) {
       *filt_edgehigh = 0;
-    } 
+    }
 
     if( *filt_edgehigh ) {
       dofft = 1;
@@ -320,26 +309,26 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
 
 
   if( filt_notchlow ) {
-    if( !astMapGet1D( keymap, "FILT_NOTCHLOW", SMF__MXNOTCH, &f_nnotch, 
+    if( !astMapGet1D( keymap, "FILT_NOTCHLOW", SMF__MXNOTCH, &f_nnotch,
                       filt_notchlow ) ) {
       f_nnotch=0;
     }
   }
 
   if( filt_notchhigh ) {
-    if( !astMapGet1D( keymap, "FILT_NOTCHHIGH", SMF__MXNOTCH, &f_nnotch2, 
+    if( !astMapGet1D( keymap, "FILT_NOTCHHIGH", SMF__MXNOTCH, &f_nnotch2,
                       filt_notchhigh ) ) {
       f_nnotch2=0;
     }
   }
-  
+
   if( f_nnotch && f_nnotch2 ) {
     /* Number of upper and lower edges must match */
     if( f_nnotch != f_nnotch2 ) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, 
-             ": Elements in FILT_NOTCHHIGH != number in FILT_NOTCHLOW", 
-             status);      
+      errRep(FUNC_NAME,
+             ": Elements in FILT_NOTCHHIGH != number in FILT_NOTCHLOW",
+             status);
     } else if( (f_nnotch > 1) || (filt_notchlow[0] && filt_notchhigh[0]) ) {
       /* Make sure we have multiple notches, or if there is only 1, that
          the edges are not both set to 0 (defaults from smurf_sc2clean if
@@ -349,7 +338,7 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
         *filt_nnotch = f_nnotch;
       }
 
-      msgOutiff( MSG__DEBUG, "", FUNC_NAME 
+      msgOutiff( MSG__DEBUG, "", FUNC_NAME
                  ": number components in notch filter=%i", status,
                  f_nnotch );
 

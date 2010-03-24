@@ -41,7 +41,7 @@
 *     estimate chi^2 by comparison the scatter in the final residual to the
 *     white noise level. The (reduced) chi^2 calculated should ideally
 *     converge to 1 provided that the models are correct, and the white noise
-*     has been measured correctly. 
+*     has been measured correctly.
 
 *  Notes:
 
@@ -85,6 +85,8 @@
 *        - Handle gap filling
 *     2010-01-19 (DSB)
 *        - Add dcthresh2 config parameter.
+*     2010-02-23 (DSB)
+*        - Replace dcthresh2 with dcmedianwidth config parameter.
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -134,10 +136,10 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   /* Local Variables */
   size_t aiter;                 /* Actual iterations of sigma clipper */
   size_t bstride;               /* bolometer stride */
-  int dcflag;                   /* flag for dc step finder/repairer */
-  dim_t dcbox;                  /* Width of box for DC step detection */
+  int dcmaxsteps;               /* Maximum allowed number of dc jumps */
+  dim_t dcfitbox;               /* Width of box for DC step detection */
   double dcthresh;              /* Threshold for DC step detection */
-  double dcthresh2;             /* Threshold for secondary DC step detection */
+  dim_t dcmedianwidth;          /* Width of median filter in DC step detection */
   int fillgaps;                 /* If set perform gap filling */
   dim_t i;                      /* Loop counter */
   dim_t id;                     /* Loop counter */
@@ -187,8 +189,8 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   if( kmap ) {
 
     /* Data-cleaning parameters  */
-    smf_get_cleanpar( kmap, NULL, NULL, &dcbox, &dcflag, &dcthresh, &dcthresh2,
-                      NULL, &fillgaps, NULL, NULL, NULL, NULL, NULL, NULL, 
+    smf_get_cleanpar( kmap, NULL, NULL, &dcfitbox, &dcmaxsteps, &dcthresh, &dcmedianwidth,
+                      NULL, &fillgaps, NULL, NULL, NULL, NULL, NULL, NULL,
                       NULL, NULL, &spikethresh, &spikeiter, status );
   }
 
@@ -255,9 +257,9 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
                     "iterations", status, nflag, spikethresh, aiter);
         }
 
-        if( dcthresh && dcbox ) {
-          smf_correct_steps( wf, res->sdata[idx], qua_data, dcthresh, dcthresh2, 
-                             dcbox, dcflag, &nflag, status );
+        if( dcthresh && dcfitbox ) {
+          smf_fix_steps( wf, res->sdata[idx], qua_data, dcthresh, dcmedianwidth,
+                             dcfitbox, dcmaxsteps, &nflag, status );
           msgOutiff(MSG__VERB, "","   detected %li bolos with DC steps\n",
                     status, nflag);
         }

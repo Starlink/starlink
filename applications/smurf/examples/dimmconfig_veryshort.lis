@@ -29,9 +29,9 @@ apod = 0
 
 # With such a short data stream, just try to detect big steps and flag
 # bolo as bad if any found.
-dcthresh = 1000
-dcbox = 200
-dcbad = 1
+dcthresh = 100
+dcfitbox = 400
+dcbad = 0
 
 # ----------------------------------------------------------------------------
 # These parameters control the iterative model components

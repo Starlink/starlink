@@ -33,10 +33,8 @@ padend = 1000
 apod = 1000
 
 # Bigger threshold for steps to avoid detecting bright sources accidentally
-dcthresh = 1000
-dcbox = 50
-dcbad = 0
-dcflagall = 0
+dcthresh = 50
+dcfitbox = 400
 
 # ----------------------------------------------------------------------------
 # These parameters control the iterative model components
