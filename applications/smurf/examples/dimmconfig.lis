@@ -111,8 +111,15 @@ flagstat = 2
 # S/N threshold to detect DC steps
 dcthresh = 3
 
-# box size over which to measure rms for DC step finder
-dcbox = 200
+# box size over which to fit data with a straight line on either side of
+# a potential DC jump.
+dcfitbox = 400
+
+# The maximum number of steps that can be corrected in each minute of
+# good data (i.e. per 12000 samples) from a bolometer before the entire
+# bolometer is flagged as bad. A value of zero will cause a bolometer to
+# be rejected if any steps are found in the bolometer data stream.
+dcmaxsteps = 8
 
 # S/N ratio to flag spikes with sigma-clipper
 # spikethresh = 5
@@ -206,9 +213,7 @@ noi.spikeiter = 10050
 noi.fillgaps = 1
 
 # explicitly turn off iterative DC step finding for now
-noi.dcbox = 0
-noi.dcthresh = 0
-noi.dcbad = 0
+noi.dcfitbox = 0
 
 
 # iterative filter.

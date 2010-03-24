@@ -53,6 +53,7 @@ smf_checkmem_dimm.c \
 smf_checkmem_map.c \
 smf_choose_closest.c \
 smf_choose_darks.c \
+smf_choose_flat.c \
 smf_choosepolbins.c \
 smf_choosetiles.c \
 smf_clean_dksquid.c \
@@ -240,6 +241,9 @@ smf_open_related.c \
 smf_open_related_model.c \
 smf_pattern_extract.c \
 smf_polext.c \
+smf_qual_str.c \
+smf_qualstats.c \
+smf_qualstats_report.c \
 smf_quick_noise.c \
 smf_realloc.c \
 smf_rebin_totmap.c \
@@ -275,6 +279,7 @@ smf_scanfit.c \
 smf_select_pntr.c \
 smf_set_clabels.c \
 smf_set_moving.c \
+smf_smfFile_msg.c \
 smf_sort_bytime.c \
 smf_sparsebounds.c \
 smf_spreadwidth.c \

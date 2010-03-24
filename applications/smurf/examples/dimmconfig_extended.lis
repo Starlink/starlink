@@ -34,7 +34,7 @@ apod = 1000
 
 # Bigger threshold for steps to avoid detecting bright sources accidentally
 dcthresh = 200
-dcbox = 200
+dcfitbox = 400
 
 # ----------------------------------------------------------------------------
 # These parameters control the iterative model components

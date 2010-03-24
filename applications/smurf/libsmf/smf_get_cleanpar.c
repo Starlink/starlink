@@ -14,8 +14,8 @@
 
 *  Invocation:
 *     smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
-*                       dim_t *dcbox, int *dcflag, double *dcthresh,
-*                       double *dcthresh2, int *dkclean, int *fillgaps,
+*                       dim_t *dcfitbox, int *dcmaxsteps, double *dcthresh,
+*                       dim_t dcmedianwidth, int *dkclean, int *fillgaps,
 *                       double *filt_edgelow, double *filt_edgehigh,
 *                       double *filt_notchlow, double *filt_notchhigh,
 *                       int *filt_nnotch, int *dofilt, double *flagstat,
@@ -30,20 +30,20 @@
 *     badfrac = double* (Returned)
 *        Fraction of bad samples in order for entire bolometer to be
 *        flagged as bad (NULL:0)
-*     dcbox = dim_t* (Returned)
+*     dcfitbox = dim_t* (Returned)
 *        Length of box (in samples) over which each linear fit is
 *        performed when detecting DC steps. If zero, no steps will be
 *        corrected.
-*     dcflag = int* (Returned)
-*        The maximum number of steps that can be corrected in a
-*        bolometer before the entire bolometer is flagged as bad. A value
-*        of zero will cause a bolometer to be rejected if any steps are
-*        found in the bolometer data stream.
+*     dcmaxsteps = int* (Returned)
+*        The maximum number of DC jumps that can be corrected in each minute
+*        of good data (i.e. per 12000 samples) from a bolometer before the
+*        entire bolometer is flagged as bad. A value of zero will cause a
+*        bolometer to be rejected if any jumps are found in the bolometer
+*        data stream.
 *     dcthresh = double* (Returned)
 *        N-sigma threshold at which to detect DC steps
-*     dcthresh2 = double* (Returned)
-*        N-sigma threshold used for rejecting aberrant points in the
-*        linear fit to the data on either side of a candidate jump.
+*     dcmedianwidth = dim_t (Returned)
+*        Width of median filter for DC step detection.
 *     dkclean = int* (Returned)
 *        If true, clean dark squids from bolos (NULL:-1)
 *     fillgaps = int* (Returned)
@@ -102,8 +102,7 @@
 *     2010-01-11 (EC):
 *        Add fillgaps
 *     2010-03-23 (DSB):
-*        Modify descriptions and defaults for DC jump parameters. Removed
-*        DCFLAGALL.
+*        Replace old DC jump config parameters with new ones.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -152,8 +151,8 @@
 #define FUNC_NAME "smf_get_cleanpar"
 
 void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
-                       dim_t *dcbox, int *dcflag, double *dcthresh,
-                       double *dcthresh2, int *dkclean, int *fillgaps,
+                       dim_t *dcfitbox, int *dcmaxsteps, double *dcthresh,
+                       dim_t *dcmedianwidth, int *dkclean, int *fillgaps,
                        double *filt_edgelow, double *filt_edgehigh,
                        double *filt_notchlow, double *filt_notchhigh,
                        int *filt_nnotch, int *dofilt, double *flagstat,
@@ -197,36 +196,36 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
                *badfrac );
   }
 
-  if( dcbox ) {
-    if( astMapGet0I( keymap, "DCBOX", &temp ) ) {
+  if( dcfitbox ) {
+    if( astMapGet0I( keymap, "DCFITBOX", &temp ) ) {
       if( temp < 0 ) {
         *status = SAI__ERROR;
-        errRep(FUNC_NAME, "DCBOX cannot be < 0.", status );
+        errRep(FUNC_NAME, "dcfitbox cannot be < 0.", status );
       } else {
-        *dcbox = (dim_t) temp;
+        *dcfitbox = (dim_t) temp;
       }
     } else {
-      *dcbox = 0;
+      *dcfitbox = 0;
     }
 
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DCBOX=%" DIM_T_FMT, status,
-               *dcbox );
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DCFITBOX=%" DIM_T_FMT, status,
+               *dcfitbox );
   }
 
-  if( dcflag ) {
-    *dcflag = 20;
+  if( dcmaxsteps ) {
+    *dcmaxsteps = 8;
 
-    if( astMapGet0I( keymap, "DCBAD", &temp ) ) {
+    if( astMapGet0I( keymap, "DCMAXSTEPS", &temp ) ) {
       if( (temp < 0) ) {
         *status = SAI__ERROR;
-        errRep(FUNC_NAME, "DCBAD must be 0 or more.", status );
+        errRep(FUNC_NAME, "DCMAXSTEPS must be 0 or more.", status );
       } else {
-        *dcflag = temp;
+        *dcmaxsteps = temp;
       }
     }
 
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DCFLAG=%i", status,
-               *dcflag );
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DCMAXSTEPS=%i", status,
+               *dcmaxsteps );
   }
 
   if( dcthresh ) {
@@ -241,16 +240,15 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
                *dcthresh );
   }
 
-  if( dcthresh2 ) {
-    if( !astMapGet0D( keymap, "DCTHRESH2", dcthresh2 ) ) {
-      *dcthresh2 = 7.0;
-    } else if( *dcthresh2 < 0 ) {
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, "DCTHRESH2 must be >= 0.", status );
+  if( dcmedianwidth ) {
+    if( !astMapGet0I( keymap, "DCMEDIANWIDTH", &temp ) ) {
+      *dcmedianwidth = 40;
+    } else {
+      *dcmedianwidth = temp;
     }
 
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DCTHRESH2=%f", status,
-               *dcthresh2 );
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DCMEDIANWIDTH=%d", status,
+               *dcmedianwidth );
   }
 
   if( dkclean ) {

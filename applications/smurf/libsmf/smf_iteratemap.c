@@ -248,6 +248,8 @@
 *        Add flatramps argument.
 *     2010-03-18 (EC):
 *        Add reporting on quality flag statistics each iteration
+*     2010-03-23 (DSB)
+*        - Replace dcthresh2 with dcmedianwidth config parameter.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -328,10 +330,10 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int converged=0;              /* Has stopping criteria been met? */
   smfDIMMData dat;              /* Struct passed around to model components */
   smfData *data=NULL;           /* Temporary smfData pointer */
-  dim_t dcbox=0;                /* Box size for fixing DC steps */
-  int dcflag=0;                 /* Flag for dc step finder/repairer */
+  dim_t dcfitbox=0;             /* Box size for linear fit on either side of a DC steps */
+  int dcmaxsteps=8;             /* Max number of DC jumps in a bolometer */
   double dcthresh;              /* Threshold for fixing primary DC steps */
-  double dcthresh2;             /* Threshold for fixing secondary DC steps */
+  dim_t dcmedianwidth;          /* Median filter width for DC steps detection */
   int deldimm=0;                /* Delete temporary .DIMM files */
   int tstep = 100;              /* Time step between full WCS calculations */
   int dimmflags;                /* Control flags for DIMM model components */
@@ -540,8 +542,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
 
     /* Data-cleaning parameters (should match SC2CLEAN) */
-    smf_get_cleanpar( keymap, &apod, &badfrac, &dcbox, &dcflag, &dcthresh,
-                      &dcthresh2, NULL, &fillgaps, &f_edgelow,
+    smf_get_cleanpar( keymap, &apod, &badfrac, &dcfitbox, &dcmaxsteps, &dcthresh,
+                      &dcmedianwidth, NULL, &fillgaps, &f_edgelow,
                       &f_edgehigh, f_notchlow, f_notchhigh, &f_nnotch,
                       &dofft, &flagstat, &baseorder, &spikethresh,
                       &spikeiter, status );
@@ -1195,10 +1197,10 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
               /* Flag/repair bad detectors with DC steps in them */
 
-              if( dcthresh && dcbox ) {
+              if( dcthresh && dcfitbox ) {
                 msgOutif(MSG__VERB," ", "  find bolos with steps...", status);
-                smf_fix_steps( wf, data, qua_data, dcthresh, dcthresh2, dcbox,
-                               dcflag, &nflag, status );
+                smf_fix_steps( wf, data, qua_data, dcthresh, dcmedianwidth, dcfitbox,
+                               dcmaxsteps, &nflag, status );
                 msgOutiff(MSG__VERB, "","  ...%zd flagged\n", status, nflag);
               }
 

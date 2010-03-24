@@ -30,7 +30,7 @@ apod = 0
 # With such a short data stream, just try to detect big steps and flag
 # bolo as bad if any found.
 dcthresh = 100
-dcbox = 200
+dcfitbox = 400
 dcbad = 0
 
 # ----------------------------------------------------------------------------
