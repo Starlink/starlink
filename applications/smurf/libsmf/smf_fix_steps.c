@@ -57,6 +57,14 @@
 *  History:
 *     11-MAR-2010 (DSB):
 *        Original version.
+*     25-MAR-2010 (DSB):
+*        - Change dcminstepwidth from 20 to 0.8*dcmedianwidth (instantaneous
+*        steps should have a width of dcmedianwidth).
+*        - Change the way the median filtering is done to use one filter
+*        rather than two. This should be faster.
+*        - Reject blocks of steep samples if the median value at the
+*        start and end of the block are insufficiently different.
+*        - Extract median filtering code into another routine.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -129,6 +137,8 @@ typedef struct Tmp {
    double lorms;
    double hirms;
    double step_hgt;
+   double median;
+   double merit;
 } Tmp;
 
 #endif
@@ -139,10 +149,11 @@ static void smf1_step_linefit( int box, float minfrac, int stride, double *dat,
                                unsigned char *qua, double nsigma, double *m,
                                double *c, double *rms, int *status );
 
-static double smf1_running_median( dim_t box, double **dat,
-                                  unsigned char **qua, size_t tstride,
-                                  unsigned char mask, double *w1, double *w2,
-                                  dim_t *iold, dim_t *inbox, int *status );
+
+
+
+
+
 
 
 
@@ -155,23 +166,15 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
 
 /* Local Variables */
    dim_t ibolo;                /* Index of bolometer */
-   dim_t inboxa;               /* No. of values in current lower median box */
-   dim_t inboxb;               /* No. of values in current upper median box */
-   dim_t iolda;                /* Index of oldest value in "w2a" */
-   dim_t ioldb;                /* Index of oldest value in "w2b" */
    dim_t nbolo;                /* Number of bolometers */
    dim_t ntslice;              /* Number of time slices */
    double *dat = NULL;         /* Pointer to bolo data */
    double *pd;
-   double *pmdata;
-   double *pmdatb;
+   double *pw1;
    double *pw2;
    double *pw;
-   double *w1a;
-   double *w1b;
-   double *w2a;
-   double *w2b;
-   double *work2;
+   double *w1;
+   double *w2;
    double *work;
    double avecorr;
    double chi;
@@ -179,8 +182,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
    double corr;
    double diff;
    double end_value;
-   double meda;
-   double medb;
+   double fac;
    double mhi;
    double mlo;
    double rms;
@@ -201,7 +203,6 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
    int jtime;                  /* Index of time slice */
    int nblock;
    int ncorr;
-   int ngood;
    int nsign;
    int nstep;
    int ntime;                  /* Number of time slices in usable range */
@@ -215,8 +216,6 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
    size_t itime_end;           /* Time index at end of usable data stream */
    size_t itime_start;         /* Time index at start of usable data stream */
    size_t tstride;             /* Bolo stride */
-   unsigned char *pmquaa;
-   unsigned char *pmquab;
    unsigned char *pq1;
    unsigned char *pq;
    unsigned char *qua = NULL;  /* Pointer to quality flags */
@@ -228,7 +227,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
    float dcminpop = 0.05;
    int dcmediangap = 3;
    int dcminsignratio = 0.8;
-   int dcminstepwidth = 20;
+   int dcminstepwidth = 0.7*dcmedianwidth;
    int dcmaxstepwidth = 1.8*dcmedianwidth;
    int dcminbox = 100;
    int dcminstepgap = 50;
@@ -252,7 +251,8 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
    sprintf( buf, "data_%d.asc", nentry );
    FILE *fd2 = fopen( buf, "w" );
    fprintf( fd2, "# itime indata inquality outdata outquality ibolo jump "
-                 "flag lostart loend histart hiend lorms hirms step_hgt\n");
+                 "flag lostart loend histart hiend lorms hirms step_hgt "
+                 "median merit\n");
 #endif
 
 
@@ -326,19 +326,16 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
 #endif
 
 /* Allocate work arrays. */
-      w1a = astMalloc( sizeof( *w1a )*dcmedianwidth );
-      w2a = astMalloc( sizeof( *w2a )*dcmedianwidth );
-      w1b = astMalloc( sizeof( *w1b )*dcmedianwidth );
-      w2b = astMalloc( sizeof( *w2b )*dcmedianwidth );
+      w1 = astMalloc( sizeof( *w1 )*dcmedianwidth );
+      w2 = astMalloc( sizeof( *w2 )*dcmedianwidth );
       work = astMalloc( sizeof( *work )*ntime );
-      work2 = astMalloc( sizeof( *work2 )*ntime );
       blocks = astMalloc( sizeof( *blocks )*200 );
 
 /* Get the index of the time slice mid way between the two median boxes
-   at the first and last usable time slices. Use the lower of the two
+   at the first and last usable time slices. Use the upper of the two
    middle indices if there is an even number. */
-      itime_lo = dcmedianwidth + ( dcmediangap - 1 )/2;
-      itime_hi = ntime - dcmedianwidth - dcmediangap/2 - 1;
+      itime_lo = dcmedianwidth + dcmediangap/2;
+      itime_hi = ntime - dcmedianwidth - ( dcmediangap + 1 )/2;
 
 /* Loop round all usable bolometers. "base" holds the offset to the start
    of the usable data for the bolometer.  */
@@ -368,6 +365,8 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
          tmp[ kk ].lorms = VAL__BADD;
          tmp[ kk ].hirms= VAL__BADD;
          tmp[ kk ].step_hgt = VAL__BADD;
+         tmp[ kk ].median = VAL__BADD;
+         tmp[ kk ].merit = VAL__BADD;
 
          pd += tstride;
          pq += tstride;
@@ -380,59 +379,37 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
             nstep = 0;
             nblock = 0;
 
-/* Initialise pointers to the oldest (i.e.lowest index) value in the two
-   median boxes. */
-            pmdata = dat + base;
-            pmquaa = qua + base;
-            pmdatb = pmdata + (dcmedianwidth + dcmediangap)*tstride;
-            pmquab = pmquaa + (dcmedianwidth + dcmediangap)*tstride;
+/* Smooth the bolometer data stream using a median block filter. Put the
+   smoothed data in "work". */
+            smf_median_smooth( dcmedianwidth, ntime, dat + base, qua + base,
+                               tstride, SMF__Q_MOD, work, w1, w2, status );
 
-/* Initialise the "iold" values to indicate that smf1_running_median
-   should initialise the description of the median box before calculating
-   the median. */
-            iolda = ioldb = INIT;
-
-/* Store the differences between the two median box values in the "work2"
-   array. */
+/* For each time slice, find the difference between the median value
+   before and after the time slice. We leave a small gap between the two
+   median boxes to allow for some rise time in any potential step. Find
+   the RMS value of these differences. If not defined, flag the entire
+   bolometer as bad, and pass on to the next bolometer. */
             tpop = 0;
             tsum2 = 0.0;
-            ngood = 0;
-            pw2 = work2 + itime_lo;
-            pq = qua + base + itime_lo*tstride;
-            for( itime = itime_lo; itime <= itime_hi; itime++,pw2++ ) {
-
-/* Get the median values of the data in the two boxes. */
-               meda = smf1_running_median( dcmedianwidth, &pmdata, &pmquaa,
-                                          tstride, SMF__Q_MOD, w1a, w2a,
-                                          &iolda, &inboxa, status );
-
-               medb = smf1_running_median( dcmedianwidth, &pmdatb, &pmquab,
-                                          tstride, SMF__Q_MOD, w1b, w2b,
-                                          &ioldb, &inboxb, status );
-
-/* Check they are both defined, and store the difference. */
-               if( meda != VAL__BADD && medb != VAL__BADD ) {
-                  diff = medb - meda;
-                  *pw2 = diff;
+            pw1 = work + dcmedianwidth/2;
+            pw2 = pw1 + dcmedianwidth + dcmediangap;
+            for( itime = itime_lo; itime <= itime_hi; itime++,pw1++,pw2++ ) {
+               if( *pw1 != VAL__BADD && *pw2 != VAL__BADD ) {
+                  diff = *pw2 - *pw1;
                   tsum2 += diff*diff;
                   tpop++;
 
+
 #ifdef DEBUG_STEPS
    tmp[ itime ].jump = diff;
+   tmp[ itime ].median = work[ itime ];
 #endif
 
-               } else {
-                  *pw2 = VAL__BADD;
-               }
 
-/* Also count the usable samples. */
-               if( !( *pq & SMF__Q_MOD ) ) ngood++;
-               pq +=  tstride;
+               }
             }
 
-/* Get the RMS difference value. If not defined, flag the entire
-   bolometer as bad. */
-            if( tpop > 10 ) {
+            if( tpop > SMF__MINSTATSAMP ) {
                rms = sqrtf( tsum2/tpop );
             } else {
                msgOutiff( MSG__DEBUG, "", "smf_fix_steps: flagging "
@@ -450,22 +427,26 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
             step_start = -1;
             step_end = -1;
             step_limit = -1;
+            start_value = VAL__BADD;
+            end_value = VAL__BADD;
 
 /* Find the minimum significant gradient. */
             thresh = rms*dcthresh;
 
 /* Scan through the range of time slices for which both median box values
    can be found. The "itime" variable gives the index of the central
-   sample in the gap between the two median boxes (the lower of the two
+   sample in the gap between the two median boxes (the upper of the two
    central samples if dcmediangap is even). */
-            for( itime = itime_lo; itime <= itime_hi; itime++ ) {
+            pw1 = work + dcmedianwidth/2;
+            pw2 = pw1 + dcmedianwidth + dcmediangap;
+            for( itime = itime_lo; itime <= itime_hi; itime++,pw1++,pw2++ ) {
 
 /* Get the difference at this time */
-               diff = work2[ itime ];
-               if( diff != VAL__BADD ) {
+               if( *pw1 != VAL__BADD && *pw2 != VAL__BADD ) {
+                  diff = *pw2 - *pw1;
 
-/* If the difference between the two median values is greater than the
-   minimum significant step height... */
+/* If the absolute difference between the two median values is greater than the
+   minimum significant step height, note the sign of the difference. */
                   if( diff > thresh ) {
                      diff = 1.0;
                   } else if( diff < -thresh ) {
@@ -474,27 +455,31 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
                      diff = 0.0;
                   }
 
+/* Skip times for which the median values of the data before and after
+   the time are insufficiently different. */
                   if( diff != 0.0 ) {
 
 #ifdef DEBUG_STEPS
    tmp[ itime ].flag |= 1;
 #endif
 
-/* And we are currently looking for the start of a new step, record the
-   index of the step start. */
+/* If we are currently looking for the start of a new step, record the
+   index of the step start, and the median value before the start. */
                      if( step_start == -1 ) {
                         step_start = itime;
+                        start_value = *pw1;
                         nsign = 0;
                      }
 
-/* Update the index of the step end, and also update the earliest time
-   at which the step can be considered complete. */
+/* Update the index of the step end, the earliest time at which the step
+   can be considered complete, and the median value after the end. */
                      step_end = itime;
                      step_limit = itime + dcminstepgap;
+                     end_value = *pw2;
 
 /* Find the difference between the number of positive and negative
    excursions. A clear step should be predominantly either positive or
-   negative, although in practice a few some contrary values can exist
+   negative, although in practice some contrary values can exist
    in a genuine step. */
                      if( diff > 0.0 ) {
                         nsign++;
@@ -504,7 +489,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
 
 /* If the difference between the two median values is smaller than the
    minimum significant step height, and we are currently looking for the
-   end of a step, and the we have reached the earliest possible time at
+   end of a step, and we have reached the earliest possible time at
    which the step could end, we now know where the step ends. */
                   } else if( step_start != -1 && itime >= step_limit ) {
 
@@ -515,14 +500,34 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
                          step_width <= dcmaxstepwidth &&
                          abs( nsign ) >= dcminsignratio*step_width ) {
 
+
+
+
+/* We also ignore it if the total change in data value across the step is
+   too low. Raise the threshold in proportion to the width of the step if
+   the step is wider than the width expected for an instantaneous step. */
+                        fac = (double) step_width/(double)( dcmedianwidth
+                                                          + dcminstepgap );
+                        if( fac < 1.0 ) fac = 1.0;
+
+
+#ifdef DEBUG_STEPS
+   tmp[step_end].merit = fabs( start_value - end_value )/( thresh*fac );
+#endif
+
+
+
+                        if( fabs( start_value - end_value ) > thresh*fac ) {
+
 /* Store the indices of the step start and end in the "blocks" array,
    expanding the array if necessary. */
-                        iblock = nblock++;
-                        blocks = astGrow( blocks, 2*nblock, sizeof( *blocks ) );
-                        if( *status == SAI__OK ) {
-                           block = blocks + 2*iblock;
-                           block[ 0 ] = step_start;
-                           block[ 1 ] = step_end;
+                           iblock = nblock++;
+                           blocks = astGrow( blocks, 2*nblock, sizeof( *blocks ) );
+                           if( *status == SAI__OK ) {
+                              block = blocks + 2*iblock;
+                              block[ 0 ] = step_start;
+                              block[ 1 ] = step_end;
+                           }
                         }
                      }
 
@@ -699,7 +704,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
 
 /* If this bolometer has no usable corrections or has too many steps, set
    the entire bolo bad. */
-            if( ncorr == 0 || nstep > dcmaxsteps*( ((double) ngood)/12000.0 ) ) {
+            if( ncorr == 0 || nstep > dcmaxsteps*( ((double) tpop)/12000.0 ) ) {
                (*nsteps)++;
                pq1 = qua + ibolo*bstride;
                for( jtime = 0; jtime < (int) ntslice; jtime++) {
@@ -759,10 +764,12 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
          TOPCAT( fd2, tmp[itime].lorms );
          TOPCAT( fd2, tmp[itime].hirms );
          TOPCAT( fd2, tmp[itime].step_hgt );
+         TOPCAT( fd2, tmp[itime].median );
+         TOPCAT( fd2, tmp[itime].merit );
          fprintf( fd2, "\n" );
       }
    }
-   fprintf( fd1, "%d %d %d %g %g %d\n", ibolo, ngood, nstep, rms, thresh, (ncorr==0) );
+   fprintf( fd1, "%d %d %d %g %g %d\n", ibolo, tpop, nstep, rms, thresh, (ncorr==0) );
 } else {
    fprintf( fd1, "%d null null null null null\n", ibolo );
 #endif
@@ -772,12 +779,9 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
       }
 
 /* Free workspace */
-      w1a = astFree( w1a );
-      w2a = astFree( w2a );
-      w1b = astFree( w1b );
-      w2b = astFree( w2b );
+      w1 = astFree( w1 );
+      w2 = astFree( w2 );
       work = astFree( work );
-      work2 = astFree( work2 );
       blocks = astFree( blocks );
 
 #ifdef DEBUG_STEPS
@@ -796,6 +800,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
    fclose( fd1 );
    fclose( fd2 );
 #endif
+
 
 }
 
@@ -946,203 +951,5 @@ static void smf1_step_linefit( int box, float minfrac, int stride, double *dat,
       *c = VAL__BADD;
    }
 }
-
-
-
-
-
-static double smf1_running_median( dim_t box, double **dat,
-                                  unsigned char **qua, size_t tstride,
-                                  unsigned char mask, double *w1, double *w2,
-                                  dim_t *iold, dim_t *inbox, int *status ){
-
-/* Local Variables: */
-   dim_t ibox;                 /* Index within box */
-   double *pdat = NULL;        /* Pointer to next bolo data value */
-   double *pw1 = NULL;         /* Pointer to next "w1" value */
-   double *pw2 = NULL;         /* Pointer to next "w2" value */
-   double dnew;                /* Data value being added into the filter box */
-   double dold;                /* Data value being removed from the filter box */
-   double median;              /* Median value in current filter box */
-   int iadd;                   /* Index within box at which to store new value */
-   int iremove;                /* Index within box of element to be removed */
-   unsigned char *pqua = NULL; /* Pointer to next quality flag */
-
-/* Initialise */
-   median = VAL__BADD;
-
-/* Check inherited status */
-   if( *status != SAI__OK ) return median;
-
-/* Save the original pointers. */
-   pdat = *dat;
-   pqua = *qua;
-
-/* If the supplied "iold" value is INIT, first initialise the filter
-   box to contain the first "box" values from the current bolometer
-   time-series. Do not store bad or flagged values in the filter box. The
-   good values are stored at the start of the "w1" array, with no gaps.
-   The "w2" array holds all values in the box, good or bad, in the order
-   they occur in the time-series (i.e. un-sorted). */
-   if( *iold == INIT ) {
-      pw1 = w1;
-      pw2 = w2;
-      for( ibox = 0; ibox < box; ibox++ ) {
-
-         if( !( *pqua & mask ) && *pdat != VAL__BADD ) {
-            *(pw2++) = *(pw1++) = *pdat;
-         } else {
-            *(pw2++) = VAL__BADD;
-         }
-
-/* Get pointers to the next data and quality values for the current
-   bolometer. */
-         pdat += tstride;
-         pqua += tstride;
-      }
-
-/* Initialise the index at which to store the next bolometer data value in the
-   "w2" array. The first new value added to the box will over-write element
-   zero - the oldest value in the box. */
-      *iold = 0;
-
-/* Note the number of good values stored in the filter box. */
-      *inbox = (int)( pw1 - w1 );
-
-/* If there are any bad data values, pad out the w1 array with bad
-   values. */
-       for( ibox = *inbox; ibox < box; ibox++ ) w1[ ibox ] = VAL__BADD;
-
-/* If any good values are stored in the filter box, we now sort them. */
-       if( *inbox > 0 ) gsl_sort( w1, 1, *inbox );
-
-/* If the supplied "iold" value is not negative, advance the box by one
-   sample and update the supplied values accordingly. */
-   } else {
-
-/* Get the data value for the time slice that is about to enter the filter
-   box. Set it bad if it is flagged in the quality array. */
-      dnew = pdat[ box ];
-      if( pqua[ box ] & mask ) dnew = VAL__BADD;
-
-/* Get the data value for the time slice that is about to leave the filter
-   box. */
-      dold = w2[ *iold ];
-
-/* Store the new value in "w2" in place of the old value, and then
-   increment the index of the next "w2" value to be removed, wrapping back
-   to the start when the end of the array is reached. */
-      w2[ (*iold)++ ] = dnew;
-      if( *iold == box ) *iold = 0;
-
-/* If the new value to be added into the box is good... */
-      if( dnew != VAL__BADD ) {
-
-/* Find the index (iadd) within the w1 box at which to store the new
-   value so as to maintain the ordering of the values in the box. Could do
-   a binary chop here, but the box size is presumably going to be very
-   small and so it's probably not worth it. At the same time, look for
-   the value that is leaving the box (if it is not bad). */
-         iremove = -1;
-         iadd = -1;
-
-         if( dold != VAL__BADD ) {
-            for( ibox = 0; ibox < *inbox; ibox++ ) {
-               if( iremove == -1 && w1[ ibox ] == dold ) {
-                  iremove = ibox;
-                  if( iadd != -1 ) break;
-               }
-               if( iadd == -1 && w1[ ibox ] >= dnew ) {
-                  iadd = ibox;
-                  if( iremove != -1 ) break;
-               }
-            }
-
-         } else {
-            for( iadd = 0; iadd < (int) *inbox; iadd++ ) {
-               if( w1[ iadd ] >= dnew ) break;
-            }
-         }
-
-/* If the new value is larger than any value currently in w1, we add it
-   to the end. */
-         if( iadd == -1 ) iadd = *inbox;
-
-/* If the value being removed is bad, shuffle all the good values greater
-   than the new value up one element, and increment the number of good
-   values for this bolometer box. */
-         if( iremove == -1 ) {
-            for( ibox = *inbox; (int) ibox > iadd; ibox-- ) {
-               w1[ ibox ] = w1[ ibox - 1 ];
-            }
-            (*inbox)++;
-
-/* If the value being removed is good and the value being added is greater
-   than the value being removed, shuffle all the intermediate values down
-   one element within the box. */
-         } else if( (int) iadd > iremove ) {
-            for( ibox = iremove; (int) ibox < iadd - 1; ibox++ ) {
-               w1[ ibox ] = w1[ ibox + 1 ];
-            }
-            iadd--;
-
-/* If the value being removed is good and the value being added is less
-   than or equal to the value being removed, shuffle all the intermediate
-   values up one element within the box. */
-         } else {
-            for( ibox = iremove; (int) ibox > iadd; ibox-- ) {
-               w1[ ibox ] = w1[ ibox - 1 ];
-            }
-         }
-
-/* Store the new value in the box. */
-         w1[ iadd ] = dnew;
-
-/* If the value being added is bad but the value being removed is good... */
-      } else if( dold != VAL__BADD ){
-
-/* Find the index (iremove) within the w1 box at which is stored the value
-   that is leaving the box. */
-         iremove = -1;
-         for( iremove = 0; iremove < (int) *inbox; iremove++ ) {
-            if( w1[ iremove ] == dold ) break;
-         }
-
-/* Move all the larger values down one element in "w1" to fill the gap
-   left by the removal. */
-         for( iremove++; iremove < (int) *inbox; iremove++ ) {
-            w1[ iremove - 1 ] = w1[ iremove ];
-         }
-
-/* Over-write the un-used last element with a bad value, and decrement
-   the number of values in "w1". */
-         w1[ iremove - 1 ] = VAL__BADD;
-         (*inbox)--;
-      }
-
-/* Update the supplied pointers. */
-      *dat += tstride;
-      *qua += tstride;
-   }
-
-/* If the current sorted filter box contains an odd number of good values,
-   use the central good value as the median value. If the box contains an
-   even number of good values, use the mean of the two central values as
-   the median value. If the box is empty use VAL__BADD. */
-   if( *inbox == 0 ) {
-      median = VAL__BADD;
-
-   } else if( *inbox % 2 == 1 ) {
-      median = w1[ *inbox/2 ];
-
-   } else {
-      ibox = *inbox/2;
-      median = 0.5*( w1[ ibox ] + w1[ ibox - 1 ] );
-   }
-
-/* Return the median value. */
-   return median;
-}
-
 
 
