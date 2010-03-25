@@ -103,7 +103,7 @@
 
 
 
-/* --- DEBUG CODE --- leave in until it has all been shown to work...
+#ifdef DEBUG_STEPS
 
 #define RECORD_BOLO (ibolo==669||ibolo==232||ibolo==144||ibolo==826||ibolo==1105)
 
@@ -131,7 +131,7 @@ typedef struct Tmp {
    double step_hgt;
 } Tmp;
 
-*/
+#endif
 
 
 /* Prototypes for private functions. */
@@ -237,7 +237,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
    *nsteps = 0;
 
 
-/* --- DEBUG CODE --- leave in until it has all been shown to work...
+#ifdef DEBUG_STEPS
    static int nentry = 0;
    char buf[ 200 ];
 
@@ -253,8 +253,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
    FILE *fd2 = fopen( buf, "w" );
    fprintf( fd2, "# itime indata inquality outdata outquality ibolo jump "
                  "flag lostart loend histart hiend lorms hirms step_hgt\n");
-
-*/
+#endif
 
 
 
@@ -322,9 +321,9 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
       ntime = itime_end - itime_start + 1;
 
 
-/* --- DEBUG CODE --- leave in until it has all been shown to work...
+#ifdef DEBUG_STEPS
    Tmp *tmp = astMalloc( ntime*sizeof( *tmp ) );
-*/
+#endif
 
 /* Allocate work arrays. */
       w1a = astMalloc( sizeof( *w1a )*dcmedianwidth );
@@ -348,7 +347,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
          if( !(qua[ base ] & SMF__Q_BADB) ) {
 
 
-/* --- DEBUG CODE --- leave in until it has all been shown to work...
+#ifdef DEBUG_STEPS
 
    if( RECORD_BOLO ) {
       int kk;
@@ -375,7 +374,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
       };
    }
 
-*/
+#endif
 
 /* Indicate nothing found yet. */
             nstep = 0;
@@ -418,9 +417,9 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
                   tsum2 += diff*diff;
                   tpop++;
 
-/* --- DEBUG CODE --- leave in until it has all been shown to work...
+#ifdef DEBUG_STEPS
    tmp[ itime ].jump = diff;
-*/
+#endif
 
                } else {
                   *pw2 = VAL__BADD;
@@ -477,9 +476,9 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
 
                   if( diff != 0.0 ) {
 
-/* --- DEBUG CODE --- leave in until it has all been shown to work...
+#ifdef DEBUG_STEPS
    tmp[ itime ].flag |= 1;
-*/
+#endif
 
 /* And we are currently looking for the start of a new step, record the
    index of the step start. */
@@ -563,11 +562,11 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
                }
 
 
-/* --- DEBUG CODE --- leave in until it has all been shown to work...
+#ifdef DEBUG_STEPS
    for( jtime = step_start; jtime <= step_end; jtime++ ) {
       tmp[ jtime ].flag |= 2;
    }
-*/
+#endif
 
 
 /* We now fit a straight line to the data just before the step. We use a
@@ -598,11 +597,11 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
                if( mlo != VAL__BADD ) {
                   start_value = mlo*( boxlen + step_width/2 ) + clo;
 
-/* --- DEBUG CODE --- leave in until it has all been shown to work...
+#ifdef DEBUG_STEPS
    tmp[ boxstart ].lostart = clo;
    tmp[ boxstart + boxlen ].loend = mlo*boxlen + clo;
    tmp[ step_start ].lorms = rmslo;
-*/
+#endif
 
 
                } else {
@@ -627,11 +626,11 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
                if( mhi != VAL__BADD ) {
                   end_value = mhi*( -step_width/2 ) + chi;
 
-/* --- DEBUG CODE --- leave in until it has all been shown to work...
+#ifdef DEBUG_STEPS
    tmp[ boxstart ].histart = chi;
    tmp[ boxstart + boxlen ].hiend = mhi*boxlen + chi;
    tmp[ step_end ].hirms = rmshi;
-*/
+#endif
 
 
                } else {
@@ -642,11 +641,11 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
                if( end_value != VAL__BADD && start_value != VAL__BADD ) {
 
 
-/* --- DEBUG CODE --- leave in until it has all been shown to work...
+#ifdef DEBUG_STEPS
    for( jtime = step_start; jtime <= step_end; jtime++ ) {
       tmp[ jtime ].flag |= 4;
    }
-*/
+#endif
 
 /* Check the step is large enough. */
                   diff = end_value - start_value;
@@ -656,17 +655,17 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
                      thresh = rmshi*dcthresh;
                   }
 
-/* --- DEBUG CODE --- leave in until it has all been shown to work...
+#ifdef DEBUG_STEPS
    tmp[ (step_end + step_start )/2].step_hgt = diff;
-*/
+#endif
 
                   if( fabs( diff ) >= thresh ) {
 
-/* --- DEBUG CODE --- leave in until it has all been shown to work...
+#ifdef DEBUG_STEPS
    for( jtime = step_start; jtime <= step_end; jtime++ ) {
       tmp[ jtime ].flag |= 8;
    }
-*/
+#endif
 
 
 /* Increment the number of steps found in this bolometer. */
@@ -735,7 +734,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
                }
             }
 
-/* --- DEBUG CODE --- leave in until it has all been shown to work...
+#ifdef DEBUG_STEPS
    if( RECORD_BOLO ) {
       pd = dat + base;
       pq = qua + base;
@@ -766,7 +765,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
    fprintf( fd1, "%d %d %d %g %g %d\n", ibolo, ngood, nstep, rms, thresh, (ncorr==0) );
 } else {
    fprintf( fd1, "%d null null null null null\n", ibolo );
-*/
+#endif
 
 
          }
@@ -781,9 +780,9 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
       work2 = astFree( work2 );
       blocks = astFree( blocks );
 
-/* --- DEBUG CODE --- leave in until it has all been shown to work...
+#ifdef DEBUG_STEPS
    tmp = astFree (tmp );
-*/
+#endif
 
    }
 
@@ -793,10 +792,10 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
                  status, (int) *nsteps );
    }
 
-/* --- DEBUG CODE --- leave in until it has all been shown to work...
+#ifdef DEBUG_STEPS
    fclose( fd1 );
    fclose( fd2 );
-*/
+#endif
 
 }
 
