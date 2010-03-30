@@ -109,7 +109,7 @@ flagstat = 2
 # --- Many of the following may not be useful ---
 
 # S/N threshold to detect DC steps
-dcthresh = 2
+dcthresh = 5
 
 # box size over which to fit data with a straight line on either side of
 # a potential DC jump.
