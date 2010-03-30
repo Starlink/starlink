@@ -14,7 +14,7 @@
 
 *  Invocation:
 
-*     smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt, 
+*     smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt,
 *                         int *status )
 
 *  Arguments:
@@ -31,10 +31,10 @@
 *  Description:
 *     Filter a smfData. If a pool of threads is supplied (wf), this routine
 *     will filter multiple blocks of bolometers in parallel. If a NULL pointer
-*     is supplied smf_filter_execute will not use any of the smf_threads 
+*     is supplied smf_filter_execute will not use any of the smf_threads
 *     routines. However, this function is thread safe, so that
 *     smf_filter_execute can be called as part of a higher-level parallelized
-*     routine in this case. 
+*     routine in this case.
 
 *  Notes:
 *     Currently getting sporadic segfaults when wf != NULL
@@ -174,7 +174,7 @@ void smfFilterExecuteParallel( void *job_data_ptr, int *status ) {
 
   if( !filt ) {
     *status = SAI__ERROR;
-    errRep( "", "smfFilterExecuteParallel: No valid smfFilter supplied", 
+    errRep( "", "smfFilterExecuteParallel: No valid smfFilter supplied",
             status );
     return;
   }
@@ -187,72 +187,72 @@ void smfFilterExecuteParallel( void *job_data_ptr, int *status ) {
   }
 
   /* Debugging message indicating thread started work */
-  msgOutiff( MSG__DEBUG, "", 
+  msgOutiff( MSG__DEBUG, "",
              "smfFilterExecuteParallel: thread starting on bolos %zu -- %zu",
              status, pdata->b1, pdata->b2 );
 
 
   /* Filter the data one bolo at a time */
-  smf_get_dims( data, NULL, NULL, &nbolo, &ntslice, NULL, &bstride, NULL, 
+  smf_get_dims( data, NULL, NULL, &nbolo, &ntslice, NULL, &bstride, NULL,
                 status );
 
   /* if b1 past end of the work, nothing to do so we return */
   if( pdata->b1 >= nbolo ) {
-    msgOutif( MSG__DEBUG, "", 
+    msgOutif( MSG__DEBUG, "",
                "smfFilterExecuteParallel: nothing for thread to do, returning",
                status);
     return;
   }
 
 
-  for( i=pdata->b1; (*status==SAI__OK) && (i<=pdata->b2); i++ ) 
+  for( i=pdata->b1; (*status==SAI__OK) && (i<=pdata->b2); i++ )
     if( !qua || !(qua[i*bstride]&SMF__Q_BADB) ) { /* Check for bad bolo flag */
-      
+
       /* Obtain pointer to the correct chunk of data */
       base = data->pntr[0];
       base += i*bstride;
 
       /* Execute forward transformation using the guru interface */
-      fftw_execute_split_dft_r2c( pdata->plan_forward, base, 
+      fftw_execute_split_dft_r2c( pdata->plan_forward, base,
                                   data_fft_r, data_fft_i );
-      
+
       /* Apply the frequency-domain filter */
       if( filt->isComplex ) {
         for( j=0; j<filt->dim; j++ ) {
           /* Complex times complex, using only 3 multiplies */
           ac = data_fft_r[j] * filt->real[j];
           bd = data_fft_i[j] * filt->imag[j];
-          
+
           aPb = data_fft_r[j] + data_fft_i[j];
           cPd = filt->real[j] + filt->imag[j];
-          
+
           data_fft_r[j] = ac - bd;
           data_fft_i[j] = aPb*cPd - ac - bd;
         }
-      } else { 
+      } else {
         for( j=0; j<filt->dim; j++ ) {
           /* Complex times real */
           data_fft_r[j] *= filt->real[j];
           data_fft_i[j] *= filt->real[j];
         }
-      }    
+      }
 
       /* Perform inverse transformation using guru interface */
-      fftw_execute_split_dft_c2r( pdata->plan_inverse, data_fft_r, 
+      fftw_execute_split_dft_c2r( pdata->plan_inverse, data_fft_r,
                                   data_fft_i, base );
     }
 
-  msgOutiff( MSG__DEBUG, "", 
+  msgOutiff( MSG__DEBUG, "",
              "smfFilterExecuteParallel: thread finishing bolos %zu -- %zu",
              status, pdata->b1, pdata->b2 );
-  
+
 }
 
 /* ------------------------------------------------------------------------ */
 
 #define FUNC_NAME "smf_filter_execute"
 
-void smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt, 
+void smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt,
                          int *status ) {
 
   /* Local Variables */
@@ -310,7 +310,7 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt,
       *status = SAI__ERROR;
       msgSeti("DATALEN",ntslice);
       msgSeti("FILTLEN",filt->ntslice);
-      errRep( "", FUNC_NAME 
+      errRep( "", FUNC_NAME
              ": Filter for length ^FILTLEN doesn't match data length ^FILTLEN",
              status);
     }
@@ -319,7 +319,7 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt,
   if( *status != SAI__OK ) return;
 
   /* Describe the input and output array dimensions for FFTW guru interface.
-     - dims describes the length and stepsize of time slices within a bolometer 
+     - dims describes the length and stepsize of time slices within a bolometer
   */
 
   dims.n = ntslice;
@@ -346,9 +346,9 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt,
       pdata->b2=nbolo-1;
     }
     pdata->data = data;
-    pdata->data_fft_r = smf_malloc( filt->dim, sizeof(*pdata->data_fft_r), 0, 
+    pdata->data_fft_r = smf_malloc( filt->dim, sizeof(*pdata->data_fft_r), 0,
                                     status );
-    pdata->data_fft_i = smf_malloc( filt->dim, sizeof(*pdata->data_fft_i), 0, 
+    pdata->data_fft_i = smf_malloc( filt->dim, sizeof(*pdata->data_fft_i), 0,
                                     status );
     pdata->filt = filt;
     pdata->ijob = -1;   /* Flag job as ready to start */
@@ -363,50 +363,50 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt,
          the guru interface allows you to use the same plans for multiple
          transforms. */
       pdata->plan_forward = fftw_plan_guru_split_dft_r2c( 1, &dims, 0, NULL,
-                                                          data->pntr[0], 
+                                                          data->pntr[0],
                                                           pdata->data_fft_r,
-                                                          pdata->data_fft_i, 
-                                                          FFTW_ESTIMATE | 
+                                                          pdata->data_fft_i,
+                                                          FFTW_ESTIMATE |
                                                           FFTW_UNALIGNED );
     }
-    
+
     smf_mutex_unlock( &smf_filter_execute_mutex, status );
-    
+
     if( !pdata->plan_forward && (*status == SAI__OK) ) {
       *status = SAI__ERROR;
-      errRep( "", FUNC_NAME 
+      errRep( "", FUNC_NAME
               ": FFTW3 could not create plan for forward transformation",
               status);
     }
-    
+
     /* Setup inverse FFT plan using guru interface */
     smf_mutex_lock( &smf_filter_execute_mutex, status );
-    
+
     if( *status == SAI__OK ) {
       pdata->plan_inverse = fftw_plan_guru_split_dft_c2r( 1, &dims, 0, NULL,
                                                           pdata->data_fft_r,
-                                                          pdata->data_fft_i, 
-                                                          data->pntr[0], 
-                                                          FFTW_ESTIMATE | 
+                                                          pdata->data_fft_i,
+                                                          data->pntr[0],
+                                                          FFTW_ESTIMATE |
                                                           FFTW_UNALIGNED);
     }
-    
+
     smf_mutex_unlock( &smf_filter_execute_mutex, status );
-    
+
     if( !pdata->plan_inverse && (*status==SAI__OK) ) {
       *status = SAI__ERROR;
-      errRep( "", FUNC_NAME 
+      errRep( "", FUNC_NAME
               ": FFTW3 could not create plan for inverse transformation",
               status);
     }
 
   }
- 
+
   /* Execute the filter */
   for( i=0; (*status==SAI__OK)&&i<nw; i++ ) {
     pdata = job_data + i;
-    pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata, 
-                               smfFilterExecuteParallel, 
+    pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata,
+                               smfFilterExecuteParallel,
                                NULL, status );
   }
 
@@ -417,11 +417,11 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt,
   if( job_data ) {
     for( i=0; i<nw; i++ ) {
       pdata = job_data + i;
-      if( pdata->data_fft_r ) pdata->data_fft_r = smf_free( pdata->data_fft_r, 
+      if( pdata->data_fft_r ) pdata->data_fft_r = smf_free( pdata->data_fft_r,
                                                             status);
-      if( pdata->data_fft_i ) pdata->data_fft_i = smf_free( pdata->data_fft_i, 
+      if( pdata->data_fft_i ) pdata->data_fft_i = smf_free( pdata->data_fft_i,
                                                             status);
-      /* Destroy the plans */ 
+      /* Destroy the plans */
       smf_mutex_lock( &smf_filter_execute_mutex, status );
       fftw_destroy_plan( pdata->plan_forward );
       fftw_destroy_plan( pdata->plan_inverse );
