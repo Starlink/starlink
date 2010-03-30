@@ -116,7 +116,10 @@ void smf_qualstats_report( const smfArray *qua,
   size_t subqcount[8];          /* subarray quality bit counter */
   size_t subnmap;               /* nmap for subarray */
   size_t subnmax;               /* nmax for subarray */
+  size_t tbound;                /* time slices in boundary */
+  size_t tpad;                  /* time slices in padding */
   size_t tstride;               /* time slice stride */
+  size_t whichbit;              /* which bit is set */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -206,6 +209,16 @@ void smf_qualstats_report( const smfArray *qua,
     }
   }
 
+  /* Calculate time slices in boundary */
+  tbound = ntslice-nmax/nbolo_tot;
+
+  /* Calculate time slices in padding */
+  whichbit = 0;
+  while( !((1<<whichbit) & SMF__Q_PAD) ) { /* which bit is SMF__Q_PAD? */
+    whichbit++;
+  }
+  tpad = qcount[whichbit] / nbolo_tot;
+
   /* Generate report */
   if( *status == SAI__OK ) {
     ndata = nbolo_tot*ntslice;
@@ -215,8 +228,8 @@ void smf_qualstats_report( const smfArray *qua,
               status );
       msgOutf("", "bolos  : %zu", status, nbolo_tot );
       msgOutf("", "tslices: bnd:%zu(%.1lf min), map:%zu(%.1lf min), tot:%zu(%.1lf min)", status,
-              ntslice-nmax/nbolo_tot, (ntslice-nmax/nbolo_tot)*steptime/60.,
-              nmax/nbolo_tot, (nmax/nbolo_tot)*steptime/60.,
+              ntslice-nmax/nbolo_tot, tbound*steptime/60.,
+              nmax/nbolo_tot, (ntslice-tbound)*steptime/60.,
               ntslice, ntslice*steptime/60.);
       msgOutf("", "Total samples: %zu", status, ndata );
     }
@@ -230,9 +243,9 @@ void smf_qualstats_report( const smfArray *qua,
       /* Report numbers of detectors or time slices if it makes sense for
          the given quality bit */
       switch( 1<<i ) {
-      case SMF__Q_BADDA: /* flatfield or DA flagged -- usually entire bolos */
+      case SMF__Q_BADDA: /* flatfield or DA flagged -- bolo excluding padding*/
         sprintf( scalestr, "%7zu bolos  ",
-                 qcount[i] / ntslice );
+                 qcount[i] / (ntslice-tpad) );
         break;
 
       case SMF__Q_BADB: /* Entire bolos */
@@ -287,7 +300,7 @@ void smf_qualstats_report( const smfArray *qua,
 
     if( !init ) {
       msgOutf("",
-              "     Change from last iteration: %10li, %+.2lf%% of previous",
+              "     Change from last report: %10li, %+.2lf%% of previous",
               status, (long) nmap - (long) *last_nmap,
               ((long) nmap - (long) *last_nmap) ?
               100. * ((double) nmap - (double) *last_nmap) /
