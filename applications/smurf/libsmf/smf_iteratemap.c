@@ -1216,8 +1216,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
               if( dcthresh && dcfitbox ) {
                 msgOutif(MSG__VERB," ", "  find bolos with steps...", status);
-                smf_fix_steps( wf, data, qua_data, dcthresh, dcmedianwidth, dcfitbox,
-                               dcmaxsteps, &nflag, status );
+                smf_fix_steps( wf, data, qua_data, dcthresh, dcmedianwidth,
+                               dcfitbox, dcmaxsteps, &nflag, status );
                 msgOutiff(MSG__VERB, "","  ...%zd flagged\n", status, nflag);
               }
 
@@ -1260,6 +1260,10 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                 }
               }
             }
+
+            /* report again after pre-processing to see what it did */
+            smf_qualstats_report( qua[i], qcount_last, qcount_new,
+                                  0, status );
 
             /*** TIMER ***/
             msgOutiff( MSG__DEBUG, "", FUNC_NAME
