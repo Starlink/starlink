@@ -733,8 +733,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             /* If the model type is 'qua' handle it here */
             if( thismodel == SMF__QUA ) {
               exportNDF = 1;
-              /* Like noi, qua becomes quality component of res */
-              exportNDF_which[nmodels]=1;
+              /* qua will be attached to any 3d model component */
               exportNDF_which[nmodels+1]=1;
             }
 
@@ -1887,7 +1886,10 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                                        qua_data, 0, 0, SMF__Q_BADB, status );
                   }
 
-                  smf_write_smfData( ast[i]->sdata[idx], NULL, NULL, name,
+                  /* Also export QUAlity if requested */
+                  smf_write_smfData( ast[i]->sdata[idx], NULL,
+                                     exportNDF_which[nmodels+1] ?
+                                     qua_data : NULL, name,
                                      NULL, 0, NDF__NOID, status );
                 } else {
                   msgOut( " ",
@@ -1905,6 +1907,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                   (modeltyps[j] != SMF__AST) && model[j][i]->sdata[idx] &&
                   exportNDF_which[j] ) {
                 if( (model[j][i]->sdata[idx]->file->name)[0] ) {
+                  int writequal;
+
                   smf_model_createHdr( model[j][i]->sdata[idx], modeltyps[j],
                                        hdr,status );
                   smf_model_stripsuffix( model[j][i]->sdata[idx]->file->name,
@@ -1916,8 +1920,16 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                                        status );
                   }
 
-                  smf_write_smfData( model[j][i]->sdata[idx], NULL, NULL, name,
-                                     NULL, 0, NDF__NOID, status );
+                  /* decide if we're writing quality: has to be requested,
+                     and need to have 3d data array (check array dimensions) */
+                  writequal = exportNDF_which[nmodels+1] &&
+                    smf_samedims_smfData( model[j][i]->sdata[idx],
+                                          qua[i]->sdata[idx], status );
+
+                  smf_write_smfData( model[j][i]->sdata[idx],
+                                     NULL,
+                                     writequal ? qua_data : NULL,
+                                     name, NULL, 0, NDF__NOID, status );
                 } else {
                   msgSetc("MOD",smf_model_getname(modeltyps[j], status) );
                   msgOut( " ",

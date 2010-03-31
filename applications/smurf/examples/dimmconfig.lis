@@ -35,14 +35,17 @@ maxlen = 0
 modelorder = (com,gai,ext,flt,ast,noi)
 
 # Export model files as NDF?
+
 # Specify a value of 1 or 0 to export all or none of the components
 # You can also specify an array of components to export using the same
 # format as modelorder. Note that you can specify additional
 # components 'res' and 'qua' to what may be provided to modelorder if
 # you wish to export the residual model or quality arrays
-# respectively. Exportation of 'res' is implied if either 'noi' or
-# 'qua' are specified as they become the variance and quality
-# components of the resulting NDF for 'res' respectively.
+# respectively. Exportation of 'res' is implied if 'noi' is specified
+# as it becomes the variance components of the resulting NDF for
+# 'res'. 'qua' will become the quality component of any full 3-dimensional
+# model (e.g. 'res', 'ast', 'flt', 'ext'), but no quality will be
+# written to model components with different dimensions.
 
 exportndf = 0
 #exportndf = (com,gai,ast,flt,res,noi,qua)
