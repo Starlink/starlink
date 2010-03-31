@@ -1574,6 +1574,15 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
              the quality */
             smf_qualstats_report( qua[i], qcount_last, qcount_new, 0, status );
 
+            /* Check for consistency between quality and data arrays */
+            /*
+            for( idx=0; idx<res[i]->ndat; idx++ ) {
+              smf_check_quality( res[i]->sdata[idx],
+                                 (unsigned char*)(qua[i]->sdata[idx]->pntr)[0],
+                                 1, status );
+            }
+            */
+
             /* Close files if memiter not set */
             if( !memiter ) {
               smf_close_related( &ast[i], status );

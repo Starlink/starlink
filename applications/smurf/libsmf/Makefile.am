@@ -43,6 +43,7 @@ smf_calcmodel_gai.c \
 smf_calcmodel_noi.c \
 smf_check_detpos.c \
 smf_check_flat.c \
+smf_check_quality.c \
 smf_check_smfDA.c \
 smf_check_smfData.c \
 smf_check_smfFile.c \
