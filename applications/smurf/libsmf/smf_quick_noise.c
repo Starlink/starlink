@@ -14,8 +14,8 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_quick_noise( smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk, 
-*                      unsigned char *quality, unsigned char mask, 
+*     smf_quick_noise( smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk,
+*                      unsigned char *quality, unsigned char mask,
 *                      int *status )
 
 *  Arguments:
@@ -41,14 +41,14 @@
 *  Description:
 *     This routine returns the approximate white-noise level of a given
 *     bolometer by measuring the r.m.s. in a small window at a number of
-*     different locations in the time stream. The routine returns the 
+*     different locations in the time stream. The routine returns the
 *     smallest r.m.s. of all the windows that it checks. As long as the
 *     window is small enough the r.m.s. is dominated by high-frequency
 *     noise rather than slower baseline drift and should give a reasonable
-*     relative noise level for the requested detector.  
+*     relative noise level for the requested detector.
 
-*  Notes: 
-*     The routine expects bolo-ordered data. If ICD-compliant data is 
+*  Notes:
+*     The routine expects bolo-ordered data. If ICD-compliant data is
 *     supplied instead, SMF__TORDB status is set and the function returns.
 
 *  Authors:
@@ -59,7 +59,7 @@
 *     2008-03-28 (EC):
 *        Initial version
 *     2008-04-17 (EC):
-*        Fixed indexing problem 
+*        Fixed indexing problem
 *     2008-04-18 (EC):
 *        Improved range checking on inputs
 *     2009-11-17 (EC):
@@ -67,7 +67,7 @@
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008-2009 University of British Columbia. 
+*     Copyright (C) 2008-2009 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -111,8 +111,8 @@
 #define FUNC_NAME "smf_quick_noise"
 
 
-double smf_quick_noise( smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk, 
-			unsigned char *quality, unsigned char mask, 
+double smf_quick_noise( smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk,
+			unsigned char *quality, unsigned char mask,
 			int *status ) {
 
   /* Local variables */
@@ -152,7 +152,7 @@ double smf_quick_noise( smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk,
 
   /* Obtain data dimensions */
   smf_get_dims( data,  NULL, NULL, &nbolo, &ntslice, NULL, NULL, NULL, status );
-  
+
   /* Check for reasonable bolo/nsamp/nchunk */
   if( bolo >= nbolo ) {
     *status = SAI__ERROR;
@@ -163,11 +163,11 @@ double smf_quick_noise( smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk,
     return retval;
   }
 
-  if( nsamp < SMF__MINSTATSAMP ) { 
+  if( nsamp < SMF__MINSTATSAMP ) {
     *status = SAI__ERROR;
     msgSeti("MIN",SMF__MINSTATSAMP);
     msgSeti("NSAMP",nsamp);
-    errRep(FUNC_NAME, 
+    errRep(FUNC_NAME,
 	   "Invalid nsamp: ^NSAMP, must be > ^MIN",
 	   status);
     return retval;
@@ -191,7 +191,7 @@ double smf_quick_noise( smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk,
 
   if( nchunk > ntslice) {
     msgSeti("NCHUNK",nchunk);
-    msgOutif( MSG__VERB, " ", 
+    msgOutif( MSG__VERB, " ",
 	      "SMF_QUICK_NOISE: Shortening nchunk ^NCHUNK to 1", status);
     nchunk = 1;
   }
@@ -235,7 +235,7 @@ double smf_quick_noise( smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk,
       if( !minsig ) {
 	minsig = sig;
       } else if( sig < minsig ) {
-	minsig = sig; 
+	minsig = sig;
       }
     }
   }
@@ -247,5 +247,5 @@ double smf_quick_noise( smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk,
   }
 
   return minsig;
-  
+
 }
