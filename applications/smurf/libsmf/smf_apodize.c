@@ -33,7 +33,7 @@
 
 *  Description:
 *     Before operations such as filtering it can be useful to apodize
-*     time-series data to avoid ringing caused sharp edges. This
+*     time-series data to avoid ringing caused by sharp edges. This
 *     routine multiplies the start and end of each bolometer time
 *     stream by a trig function that rolls-off to 0 in len samples (a
 *     Hanning window):
@@ -49,9 +49,9 @@
 *     before for the roll-off at the end). Apodized sections are
 *     quality flagged SMF__Q_APOD. In addition to the LEN samples at
 *     the start and end that are apodized, an additional section of
-*     data beyond that are also quality flagged SMF__Q_APOD to ensure
-*     that ringing caused by filtering does not get used in the final
-*     map.
+*     data LEN samples long beyond that are also quality flagged
+*     SMF__Q_APOD to ensure that ringing caused by filtering does not
+*     get used in the final map.
 
 *  Notes:
 
@@ -70,10 +70,12 @@
 *       Move range checking into smf_get_goodrange
 *     2009-12-01 (EC):
 *       Apodize and mask all detectors to ensure that smf_get_goodrange works!
+*     2010-03-31 (EC):
+*       Only apodize working detectors, even though all detectors are flagged.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008-2009 University of British Columbia.
+*     Copyright (C) 2008-2010 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -184,23 +186,28 @@ void smf_apodize( smfData *data, unsigned char *quality, size_t len,
     if( *status == SAI__OK ) {
 
       /* Quality recording version */
-      if( qua ) { 
+      if( qua ) {
 
-        /* First roll-off the signal */
-        for( j=0; j<thelen; j++ ) {
-          ap = 0.5 - 0.5*cos( AST__DPI * (double) j / thelen );
+        /* First roll-off the signal, working detectors only */
+        if( !(qua[i*bstride] & SMF__Q_BADB) ) {
+          for( j=0; j<thelen; j++ ) {
+            ap = 0.5 - 0.5*cos( AST__DPI * (double) j / thelen );
 
-          /* Set the quality bit */
-          qua[i*bstride+(first+j)*tstride]|=SMF__Q_APOD;
-          qua[i*bstride+(last-j)*tstride]|=SMF__Q_APOD;
+            /* scale the signal */
+            if( !(qua[i*bstride+(first+j)*tstride]&SMF__Q_MOD) ) {
+              dat[i*bstride+(first+j)*tstride]*=ap;
+            }
 
-          /* scale the signal */
-          dat[i*bstride+(first+j)*tstride]*=ap;
-          dat[i*bstride+(last-j)*tstride]*=ap;
+            if( !(qua[i*bstride+(last-j)*tstride]&SMF__Q_MOD) ) {
+              dat[i*bstride+(last-j)*tstride]*=ap;
+            }
+          }
         }
 
-        /* then put in some extra flags, thelen samples again*/
-        for( j=thelen; j<2*thelen; j++ ) {
+        /* Set quality for all detectors regardless of whether they are
+           bad or not -- across 2*len samples at both start and finish. */
+
+        for( j=0; j<2*thelen; j++ ) {
           qua[i*bstride+(first+j)*tstride]|=SMF__Q_APOD;
           qua[i*bstride+(last-j)*tstride]|=SMF__Q_APOD;
         }
