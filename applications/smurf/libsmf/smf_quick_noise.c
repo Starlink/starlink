@@ -200,8 +200,7 @@ double smf_quick_noise( smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk,
      with length nsamp, and skipping over padding/apodization */
 
   if( qua ) {
-    smf_get_goodrange( qua, ntslice, 1, SMF__Q_PAD|SMF__Q_APOD,
-                       &istart, &iend, status );
+    smf_get_goodrange( qua, ntslice, 1, SMF__Q_BOUND, &istart, &iend, status );
   } else {
     istart = 0;
     iend = ntslice-1;

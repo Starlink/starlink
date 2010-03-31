@@ -146,7 +146,7 @@ void smf_qualstats( const unsigned char *qual, dim_t nbolo, size_t bstride,
         nummap++;
       }
 
-      if( !(qual[offset]&(SMF__Q_PAD|SMF__Q_APOD)) ) {
+      if( !(qual[offset]&SMF__Q_BOUND) ) {
         nummax++;
       }
 

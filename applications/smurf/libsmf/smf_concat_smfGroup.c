@@ -148,15 +148,19 @@
  *     If projection information supplied, pointing LUT will not be
  *     concatenated if SMF__NOCREATE_LUT is specified. By default, a
  *     QUALITY array is created even if one is not present in the
- *     template file. This behaviour can be avoided by setting flag bit
- *     SMF__NOCREATE_QUALITY. Additionally, if VARIANCE and/or QUALITY
- *     is present in the template, prevent propagation to the
+ *     template file. This behaviour can be avoided by setting flag
+ *     bit SMF__NOCREATE_QUALITY. Additionally, if VARIANCE and/or
+ *     QUALITY is present in the template, prevent propagation to the
  *     concatenated file by setting SMF__NOCREATE_VARIANCE /
  *     SMF__NOCREATE_QUALITY. Specifying padStart and/or padEnd will
- *     pad the data with the specified number of samples. DATA and VARIANCE
- *     are set to 0 in this region. QUALITY to SMF__Q_PAD | SMF__Q_BADB (if
- *     the BADB flag was set at the start of the real data). LUT is set to
- *     VAL__BADI, and the JCMTState values are all set to 0.
+ *     pad the data with the specified number of samples. Also note
+ *     that the new padded region will have:
+ *       - DATA and VARIANCE values set to 0
+ *       - QUALITY set to SMF__Q_PAD
+ *       - QUALITY also set to SMF__Q_BADB if the BADB flag was set at the
+ *         start of the real data
+ *       - LUT is set to VAL__BADI
+ *       - the JCMTState values all set to 0
 
  *  Copyright:
  *     Copyright (C) 2007-2010 University of British Columbia.

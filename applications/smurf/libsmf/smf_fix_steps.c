@@ -314,7 +314,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
    if( dcfitbox && (*status == SAI__OK) ) {
 
 /* Identify the first and last samples before/after padding+apodization */
-      smf_get_goodrange( qua, ntslice, 1, SMF__Q_PAD|SMF__Q_APOD,
+      smf_get_goodrange( qua, ntslice, 1, SMF__Q_BOUND,
                          &itime_start, &itime_end, status );
 
 /* Store the number of time slices in the good range. */

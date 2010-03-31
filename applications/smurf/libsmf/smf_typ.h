@@ -380,6 +380,8 @@ static const size_t SMF__BADIDX = (size_t)-1;
 #define SMF__Q_GAP (SMF__Q_BADDA|SMF__Q_SPIKE|SMF__Q_JUMP|SMF__Q_COM)/* Samples
                                                            that should
                                                            be gap-filled */
+#define SMF__Q_BOUND (SMF__Q_PAD|SMF__Q_APOD)            /* apodized/padded
+                                                            boundary */
 
 /* Number of active quality bits */
 #define SMF__NQBITS 8
