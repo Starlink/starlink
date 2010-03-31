@@ -99,6 +99,7 @@ size_t smf_check_quality( smfData *data, unsigned char *quality,
   int badqual;                  /* Bad quality at this sample? */
   double *d=NULL;               /* Pointer to data array */
   size_t i;                     /* loop counter */
+  int isbad;                    /* inconsistency found */
   size_t j;                     /* loop counter */
   size_t nbad=0;                /* inconsistency counter */
   dim_t nbolo;                  /* Number of bolometers */
@@ -155,11 +156,13 @@ size_t smf_check_quality( smfData *data, unsigned char *quality,
     /* Traverse array checking for inconsistencies */
     for( i=0; i<nbolo; i++ ) {
       for( j=0; j<ntslice; j++ ) {
+        isbad = 0;
+
         badqual = qual[i*bstride+j*tstride]&SMF__Q_BADDA;
         val = d[i*bstride+j*tstride];
 
         if( (val==VAL__BADD) && !badqual ) {
-          nbad++;
+          isbad = 1;
           if( showbad ) {
             msgOutf( "", "b%zu t%zu: VAL__BADD without SMF__Q_BADDA",
                      status, i, j );
@@ -167,7 +170,7 @@ size_t smf_check_quality( smfData *data, unsigned char *quality,
         }
 
         if( badqual && (val!=VAL__BADD) ) {
-          nbad++;
+          isbad = 1;
           if( showbad ) {
             msgOutf( "", "b%zu t%zu: SMF__Q_BADDA without VAL__BADD",
                      status, i, j );
@@ -175,11 +178,15 @@ size_t smf_check_quality( smfData *data, unsigned char *quality,
         }
 
         if( !isfinite(val) ) {
-          nbad++;
+          isbad = 1;
           if( showbad ) {
             msgOutf( "", "b%zu t%zu: non-finite value encountered",
                      status, i, j );
           }
+        }
+
+        if( isbad ) {
+          nbad++;
         }
       }
     }
