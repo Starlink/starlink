@@ -13,8 +13,8 @@
 *     Library routine
 
 *  Invocation:
-*     smf_flag_stationary( smfData *data, unsigned char *quality, 
-*                          double sthresh, size_t *nflagged, 
+*     smf_flag_stationary( smfData *data, unsigned char *quality,
+*                          double sthresh, size_t *nflagged,
 *                          int *status )
 
 *  Arguments:
@@ -22,7 +22,7 @@
 *        The data that will be flagged
 *     quality = unsigned char * (Given and Returned)
 *        If set, use this buffer instead of QUALITY associated with data.
-*        If NULL, use the QUALITY associated with data. 
+*        If NULL, use the QUALITY associated with data.
 *     sthresh = double (Given)
 *        Speed threshold (arcsec/sec) below which data are flagged.
 *     nflagged = size_t * (Returned)
@@ -32,7 +32,7 @@
 
 *  Description:
 *     Portions of scan data taken while the telescope was stationary
-*     is not useful for producing maps. This routine flags data with 
+*     is not useful for producing maps. This routine flags data with
 *     SMF__Q_STAT that were taken when the requested speed in tracking
 *     coordinates was less than 5 arcsec/sec.
 
@@ -45,9 +45,11 @@
 *  History:
 *     2009-01-05 (EC):
 *        Initial Version
+*     2010-03-31 (EC):
+*        Don't flag regions of padding
 
 *  Copyright:
-*     Copyright (C) 2009 University of British Columbia.
+*     Copyright (C) 2009-2010 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -89,8 +91,8 @@
 
 #define FUNC_NAME "smf_flag_stationary"
 
-void smf_flag_stationary( smfData *data, unsigned char *quality, 
-                          double sthresh, size_t *nflagged, 
+void smf_flag_stationary( smfData *data, unsigned char *quality,
+                          double sthresh, size_t *nflagged,
                           int *status ) {
 
   /* Local Variables */
@@ -120,7 +122,7 @@ void smf_flag_stationary( smfData *data, unsigned char *quality,
   if (*status != SAI__OK) return;
 
   /* obtain data dimensions */
-  smf_get_dims( data,  NULL, NULL, &nbolo, &ntslice, NULL, &bstride, &tstride, 
+  smf_get_dims( data,  NULL, NULL, &nbolo, &ntslice, NULL, &bstride, &tstride,
                 status );
 
   /* other validity checks */
@@ -140,11 +142,11 @@ void smf_flag_stationary( smfData *data, unsigned char *quality,
     errRep( "", FUNC_NAME ": Supplied smfData has no header", status );
   } else if( !data->hdr->allState ) {
     *status = SAI__ERROR;
-    errRep( "", FUNC_NAME ": Supplied smfData has no JCMTState in its header", 
+    errRep( "", FUNC_NAME ": Supplied smfData has no JCMTState in its header",
             status );
   } else if( data->hdr->steptime <= 0 ) {
     *status = SAI__ERROR;
-    errRep( "", FUNC_NAME ": Supplied smfData has invalid STEPTIME", 
+    errRep( "", FUNC_NAME ": Supplied smfData has invalid STEPTIME",
             status );
   }
 
@@ -167,7 +169,7 @@ void smf_flag_stationary( smfData *data, unsigned char *quality,
   if( *status == SAI__OK ) {
     allState = data->hdr->allState;
     steptime = data->hdr->steptime;
-    /* Use tracking coordinate system so that we are measuring motion 
+    /* Use tracking coordinate system so that we are measuring motion
        relative to target. Use demand rather than actual since it is
        a cleaner data set and doesn't require filtering. */
     pos1_ac1 = allState[0].tcs_tr_dc1;
@@ -205,14 +207,14 @@ void smf_flag_stationary( smfData *data, unsigned char *quality,
   /* Set first and last flag values to nearest estimate */
   if( *status == SAI__OK ) {
     flag[0] = flag[1];
-    flag[ntslice-1] = flag[ntslice-2]; 
+    flag[ntslice-1] = flag[ntslice-2];
 
-    /* Set quality bits */
+    /* Set quality bits -- wherever we don't have padding */
     for( i=0; i<ntslice; i++ ) {
-      if( flag[i]) {
+      if( flag[i] && !(qua[i*tstride]&SMF__Q_PAD) ) {
         /* Is this a new flagged sample? */
         if( !(qua[i*tstride]&SMF__Q_STAT) ) nflag++;
-        
+
         /* Set flag bits for all detectors */
         for( j=0; j<nbolo; j++ ) {
           qua[i*tstride+j*bstride] |= SMF__Q_STAT;
