@@ -715,6 +715,8 @@ applications/specx/src/TITLE
 
 applications/spt/forconv
 
+applications/sst/all.f
+applications/sst/prohlp
 applications/sst/sst.csh
 applications/sst/sst.icl
 applications/sst/sst.sh
