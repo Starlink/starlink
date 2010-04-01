@@ -131,6 +131,9 @@
 *        time slices.
 *     2010-03-19 (EC):
 *        Use new SMF__Q_COM flag instead of SMF__Q_BADS for clarity.
+*     2010-04-01 (DSB):
+*        - Check for VAL__BADD in the supplied model array.
+*        - Avoid some "type-punned" compiler warnings.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -321,7 +324,9 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
              in the case that the common-mode was used to flatfield,
              since the gain correction will already have been un-done in
              a call to smf_calcmodel_gai in smf_iteratemap. */
-          if( !(qua_data[ ijindex ] & SMF__Q_MOD ) ) {
+          if( !(qua_data[ ijindex ] & SMF__Q_MOD ) &&
+               model_data[ i ] != VAL__BADD ) {
+
             res_data[ ijindex ] += wg[ i ]*model_data[ i ] + woff[ i ];
 
             /* Increment the sums used to find the RMS bolometer value. */
@@ -428,7 +433,8 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
 
           /* Skip previously flagged samples or bolometers that have zero
              gain. Otherwise, increment the running sums. */
-          if( !( qua_data[ ijindex ] & SMF__Q_FIT ) && *pg != 0.0 ) {
+          if( !( qua_data[ ijindex ] & SMF__Q_FIT ) && *pg != 0.0 &&
+               model_data[ i ] != VAL__BADD ) {
             model_data[ i ] += ( res_data[ ijindex ] - *poff)/(*pg);
             weight[ i ]++;
           }
@@ -503,6 +509,7 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
               for( j=0; j<block_size; j++ ) {
                 qua_data[ibase+j*tstride] |= SMF__Q_COM;
               }
+              *(gai_data+igbase) = VAL__BADD;
               errAnnul( status );
             }
           }
@@ -513,8 +520,7 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
           igbase += gcstride;
         }
 
-      /* Store bad gain, offset and correlation values for every block if
-         the whole bolometer is bad. */
+      /* Store bad gain values for every block if the whole bolometer is bad. */
       } else {
         for( j = 0; j < 3*nblock; j++ ){
           gai_data[ igbase ] = VAL__BADD;
@@ -615,6 +621,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   dim_t ntime;                  /* Number of remaining time slices */
   dim_t ntslice=0;              /* Number of time slices */
   int nw;                       /* Number of worker threads */
+  AstObject *obj;               /* Used to avoid "type-punned" compiler warnings */
   double off=0;                 /* Temporary offset */
   dim_t off_offset=0;           /* Offset from offset to correlation value */
   double off_copy=0;            /* copy of off */
@@ -642,13 +649,17 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   nw = wf ? wf->nworker : 1;
 
   /* Obtain pointer to sub-keymap containing COM parameters */
-  if( !astMapGet0A( keymap, "COM", &kmap ) ) {
+  if( !astMapGet0A( keymap, "COM", &obj ) ) {
     kmap = NULL;
+  } else {
+    kmap = (AstKeyMap *) obj;
   }
 
   /* Obtain pointer to sub-keymap containing GAI parameters */
-  if( !astMapGet0A( keymap, "GAI", &gkmap ) ) {
+  if( !astMapGet0A( keymap, "GAI", &obj ) ) {
     gkmap = NULL;
+  } else {
+    gkmap = (AstKeyMap *) obj;
   }
 
   /* Parse parameters */
@@ -825,6 +836,10 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
 
 
+
+
+
+
   /* Add the previous estimate of the common mode signal back on to the
      bolometer residuals. If we do not yet have an estimate of the common
      mode signal, then the bolometer residuals are left unchanged, but
@@ -852,6 +867,16 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
       nbolo = thisnbolo;
       ntslice = thisntslice;
       ndata = thisndata;
+
+
+
+
+
+
+
+
+
+
 
       /*  --- Set up the division of labour for threads --- */
 
@@ -1183,23 +1208,25 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
           if( !allbad ) {
              smf_stats1D( corr, 1, nbolo, NULL, 0, 0, &cmean, &csig, &cgood,
                           status );
+             msgSeti("B",iblock);
+             msgSeti("N",cgood);
+             msgOutif( MSG__VERB, "", "    Block ^B has ^N good bolos", status );
+             msgOutiff( MSG__DEBUG, "",
+                        "    corr coeff %8.5f +/- %8.5f", status, cmean, csig );
           } else {
              cgood = 0;
+             msgSeti("B",iblock);
+             msgOutif( MSG__VERB, "", "    Block ^B has no good bolos", status );
           }
-          msgSeti("B",iblock);
-          msgSeti("N",cgood);
-          msgOutif( MSG__VERB, "", "    Block ^B has ^N good bolos", status );
-          msgOutiff( MSG__DEBUG, "",
-                     "    corr coeff %8.5f +/- %8.5f", status, cmean, csig );
 
           if( !allbad ) {
              smf_stats1D( gcoeff, 1, nbolo, NULL, 0, 0, &gmean, &gsig, &ggood, status );
+             msgOutiff( MSG__DEBUG, " ",
+                        "    log(gain coeff) %8.5f +/- %8.5f", status,
+                        gmean, gsig);
           } else {
              ggood = 0;
           }
-          msgOutiff( MSG__DEBUG, " ",
-                     "    log(gain coeff) %8.5f +/- %8.5f", status,
-                     gmean, gsig);
 
           /* Flag new bad bolometers in the current block of time slices */
           igbase = iblock*gcstride;
