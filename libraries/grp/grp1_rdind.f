@@ -60,6 +60,7 @@
 *        The global status.
 
 *  Copyright:
+*     Copyright (C) 2010 Science & Technology Facilities Council.
 *     Copyright (C) 1994 Science & Engineering Research Council.
 *     Copyright (C) 1999, 2000, 2003, 2004 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
@@ -97,6 +98,8 @@
 *        Expand shell meta-characters using GRP1_WILD.
 *     2-SEP-2004 (TIMJ):
 *        Switch from private GRP1_WILD to ONE_FIND_FILE
+*     2010-03-19 (TIMJ):
+*        Use PSX_WORDEXP instead of ONE_FIND_FILE
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -112,7 +115,6 @@
       INCLUDE 'GRP_PAR'          ! GRP public constants.
       INCLUDE 'GRP_CONST'        ! GRP private constants.
       INCLUDE 'GRP_ERR'          ! GRP error values.
-      INCLUDE 'ONE_ERR'          ! ONE error values
 
 *  Arguments Given:
       INTEGER UNIT
@@ -135,11 +137,10 @@
       INTEGER CHR_LEN            ! Used length of a string
       INTEGER GRP1_INDEX         ! Finds un-escaped control characters
       LOGICAL GRP1_CHKCC         ! See if a character is a control character
-      LOGICAL ONE_FIND_FILE      ! Start a wild card file search
-      EXTERNAL ONE_FIND_FILE
 
 *  Local Variables:
       CHARACTER COMC*1           ! Groups current omment character.
+      CHARACTER DUMMY*(GRP__SZFNM) ! Dummy buffer for PSX_WORDEXP
       CHARACTER ESCC*1           ! The escape character
       CHARACTER FILE*(GRP__SZFNM)! A line of text read from the file
       CHARACTER FLAGC*1          ! Current flag character
@@ -158,7 +159,6 @@
       LOGICAL EOF                ! Has end of file has been reached ?
       LOGICAL ESCOK              ! Is the escape character defined?
       LOGICAL FLAGOK             ! Is a flag character defined?
-      LOGICAL FOUND              ! Found a file
       LOGICAL KCLOK              ! Is closing kernel delimiter defined?
       LOGICAL KOPOK              ! Is opening kernel delimiter defined?
       LOGICAL VERB               ! Are we in a verbatim section?
@@ -171,14 +171,21 @@
 *  searching context will be started.
       ICONTX = 0
 
-*  Use ONE_FIND_FILE to expand any shell meta-characters in the supplied file
+*  Use PSX_WORDEXP to expand any shell meta-characters in the supplied file
 *  name. If the file name includes any wild-cards, the first matching file
 *  name is returned.
       FILE = ' '
-      FOUND = ONE_FIND_FILE( INFILE, .TRUE., FILE, ICONTX, STATUS )
+      CALL PSX_WORDEXP( INFILE, ICONTX, FILE, STATUS )
+
+*  Currently no way to free the memory if we are not interested in additional
+*  results so we have to read them back anyhow.
+      DO WHILE ( ICONTX .NE. 0 )
+         CALL PSX_WORDEXP( INFILE, ICONTX, DUMMY, STATUS )
+      END DO
+
 
 *  If a file was found which matches the name...
-      IF( FOUND .AND. STATUS .EQ. SAI__OK ) THEN
+      IF( FILE .NE. ' ' .AND. STATUS .EQ. SAI__OK ) THEN
 
 *  Open the text file specified after the first character.
          OPEN( UNIT = UNIT, FILE = FILE, STATUS = 'OLD',
@@ -325,21 +332,9 @@
 
          END IF
 
-*  Re-report the error if no file matched the supplied template.
-      ELSE IF( STATUS .EQ. ONE__NOFILES ) THEN
-         CALL ERR_ANNUL( STATUS )
-         STATUS = GRP__FIOER
-         CALL MSG_SETC( 'FNAME', INFILE )
-         CALL MSG_SETI( 'UNIT', UNIT )
-         CALL ERR_REP( 'GRP1_RDIND_ERR1', 'GRP1_RDIND: Error '//
-     :                 'opening text file ^FNAME on Fortran '//
-     :                 'unit ^UNIT - "File not found".', STATUS )
       END IF
 
 *  End the search context.
  999  CONTINUE
-
-*  End the search context.
-      CALL ONE_FIND_FILE_END( ICONTX, STATUS )
 
       END

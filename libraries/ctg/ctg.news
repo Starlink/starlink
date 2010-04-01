@@ -1,0 +1,11 @@
+1 CTG_library
+                                             Expires: ???
+
+V3.0-1
+
+ o Replace call to ONE_FIND_FILE with call to PSX_WORDEXP. Removes forking
+   overhead.
+
+V3.0
+
+ o Removed from KAPLIBS. Now a standalone library. No other changes.

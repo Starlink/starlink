@@ -84,6 +84,8 @@
 *     6-MAR-2006 (DSB):
 *        Escape any spaces in the supplied filename template before using
 *        ONE_FIND_FILE.
+*     2010-03-19 (TIMJ):
+*        Use PSX_WORDEXP instead of ONE_FIND_FILE
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -99,7 +101,6 @@
       INCLUDE 'GRP_PAR'          ! GRP constants.
       INCLUDE 'CTG_CONST'        ! CTG constants.
       INCLUDE 'PSX_ERR'          ! PSX error constants
-      INCLUDE 'ONE_ERR'          ! ONE error constants
 
 *  Arguments Given:
       CHARACTER GRPEXP*(*)
@@ -117,8 +118,6 @@
 
 *  Externals:
       INTEGER CHR_LEN
-      LOGICAL ONE_FIND_FILE
-      EXTERNAL ONE_FIND_FILE
 
 *  Local Constants:
       INTEGER MXTYP              ! Max. number of foreign data formats
@@ -282,7 +281,7 @@
 *  meta-characters.
          IF( DIR1 .NE. ' ' ) THEN
 
-*  Initialise the context value used by CTG1_WILD so that a new file
+*  Initialise the context value used by PSX_WORDEXP so that a new file
 *  searching context will be started.
             ICONTX = 0
 
@@ -291,11 +290,16 @@
 *  than the contents of the directory.
             IAT = CHR_LEN( DIR1 )
             DIR2 = ' '
-            FOUND = ONE_FIND_FILE( DIR1( : IAT ), .FALSE., DIR2,
-     :           ICONTX, STATUS )
+            CALL PSX_WORDEXP( DIR1( : IAT ), ICONTX, DIR2, STATUS )
+
+            IF (STATUS .EQ. SAI__OK .AND. ICONTX .NE. 0) THEN
+               STATUS = SAI__ERROR
+               CALL ERR_REP( ' ', 'Received multiple results '//
+     :              'from shell expansion', STATUS )
+            END IF
 
 *  If found, use the expanded directory path.
-            IF( FOUND .AND. STATUS .EQ. SAI__OK ) THEN
+            IF( DIR2 .NE. ' ' .AND. STATUS .EQ. SAI__OK ) THEN
                DIR1 = DIR2
 
 *  Some versions of "ls -d" retain the trailing "/" and some dont.
@@ -312,12 +316,6 @@
                CALL CHR_APPND( EXT1, NAME, IAT )
 
             END IF
-
-*  Clear status if no more files
-         IF (STATUS .EQ. ONE__NOFILES) CALL ERR_ANNUL( STATUS )
-
-*  End the search context.
-            CALL ONE_FIND_FILE_END( ICONTX, STATUS )
 
          END IF
 

@@ -22,8 +22,8 @@ AC_PROG_FC
 AC_PROG_LIBTOOL
 
 dnl    Declare the build and use dependencies for this package
-STAR_DECLARE_DEPENDENCIES([build], [cat grp one prm psx sae])
-STAR_DECLARE_DEPENDENCIES([link], [cat chr grp mers one par pcs prm psx] )
+STAR_DECLARE_DEPENDENCIES([build], [cat grp prm psx sae])
+STAR_DECLARE_DEPENDENCIES([link], [cat chr grp mers par pcs prm psx] )
 STAR_DECLARE_DEPENDENCIES(sourceset, [htx sst])
 
 STAR_CNF_COMPATIBLE_SYMBOLS

@@ -36,6 +36,7 @@
 *        The global status.
 
 *  Copyright:
+*     Copyright (C) 2010 Science & Technology Facilities Council.
 *     Copyright (C) 1990, 1994 Science & Engineering Research Council.
 *     All Rights Reserved.
 
@@ -56,6 +57,7 @@
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -74,6 +76,8 @@
 *        (overcomes problem of shared disk quota).
 *     5-DEC-1994 (PDRAPER):
 *        Now uses UNIX find_file call.
+*     2010-03-19 (TIMJ):
+*        Use PSX_WORDEXP instead of ONE_FIND_FILE
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -87,7 +91,6 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'FIO_PAR'          ! FIO_ public constants
-      INCLUDE 'ONE_ERR'          ! ONE_ public constants
 
 *  Arguments Given:
       INTEGER NSPEC
@@ -122,7 +125,7 @@
       INTEGER ISPEC              ! Loop counter for file specifications
       INTEGER NC                 ! No. characters in file name
       LOGICAL OPENED             ! Has a file been opened?
-      LOGICAL FOUND              ! We have found a file
+      LOGICAL FIRST              ! First time calling PSX_WORDEXP?
 
 *.
 
@@ -167,17 +170,19 @@
 
 *  Initialise the wild card search context.
          ICONTX = 0
+         FIRST = .TRUE.
 
 *  Get file specification.
          SSPEC = SPEC( ISPEC )
 
 *  Loop to obtain file names until no more are found.
-2        CONTINUE                ! Start of 'DO WHILE' loop
-         FOUND = ONE_FIND_FILE( SSPEC, .TRUE.,FNAME, ICONTX, STATUS )
-         IF ( STATUS .EQ. SAI__OK) THEN
+         DO WHILE ( FIRST .OR. ICONTX .NE. 0 )
+            FNAME = ' '
+            FIRST = .FALSE.
+            CALL PSX_WORDEXP( SSPEC, ICONTX, FNAME, STATUS )
+            IF ( FNAME .NE. ' ' .AND. STATUS .EQ. SAI__OK) THEN
 
 *  When a file name is found, write it to the output unit.
-            IF ( FOUND ) THEN
                NC = MAX( 1, CHR_LEN( FNAME ) )
                WRITE( UNIT, '( A )', IOSTAT = IOERR ) FNAME( : NC )
 
@@ -199,14 +204,7 @@
 *  Count the number of file names written successfully.
                NFILE = NFILE + 1
             END IF
-            GO TO 2
-         END IF
-
-*  End the file search.
-         CALL ONE_FIND_FILE_END( ICONTX, STATUS )
-
-*  Clear status if no more files
-         IF (STATUS .EQ. ONE__NOFILES) CALL ERR_ANNUL( STATUS )
+         END DO
 
 1     CONTINUE
 

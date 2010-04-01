@@ -1,6 +1,11 @@
 1 GRP_library
                                              Expires: ???
 
+V3.4-1
+
+ o Replace call to ONE_FIND_FILE with call to PSX_WORDEXP. Removes forking
+   overhead.
+
 A new release (V3.4) of the GRP library is now available. It includes
 the following changes:
 

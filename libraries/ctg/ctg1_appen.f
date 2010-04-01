@@ -32,6 +32,7 @@
 *        The global status.
 
 *  Copyright:
+*     Copyright (C) 2010 Science & Technology Facilities Council.
 *     Copyright (C) 1999, 2004 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
 
@@ -63,6 +64,8 @@
 *        Added options argument to ctg1_wild call.
 *     2-SEP-2004 (TIMJ):
 *        Switch to using ONE_FIND_FILE
+*     2010-03-19 (TIMJ):
+*        Switch from ONE_FIND_FILE to PSX_WORDEXP
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -76,7 +79,6 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GRP_PAR'          ! GRP constants.
-      INCLUDE 'ONE_ERR'          ! ONE error constants
 
 *  Arguments Given:
       INTEGER IGRP1
@@ -88,13 +90,11 @@
       INTEGER STATUS             ! Global status
 
 *  External references:
-      LOGICAL ONE_FIND_FILE
-      EXTERNAL ONE_FIND_FILE
 
 *  Local Variables:
       CHARACTER FILE*(GRP__SZFNM) ! The file spec of the matching file
-      INTEGER ICONTX             ! Context for one_find_file
-      LOGICAL FOUND              ! Matched a filename
+      INTEGER ICONTX             ! Context for psx_wordexp
+      LOGICAL FIRST              ! First time through if true
 *.
 
 *  Check inherited global status.
@@ -103,21 +103,23 @@
 *  Ignore blank templates.
       IF( TEMPLT .NE. ' ' ) THEN
 
-*  Initialise the context value used by ONE_FIND_FILE so that a new file
+*  Initialise the context value used by PSX_WORDEXP so that a new file
 *  searching context will be started.
          ICONTX = 0
+         FIRST = .TRUE.
 
 *  Loop round looking for matching files until we get bad status
 *  (which may include ONE__NOFILES)
-         DO WHILE( STATUS .EQ. SAI__OK )
+         DO WHILE( STATUS .EQ. SAI__OK .AND.
+     :        ( FIRST .OR. ICONTX .NE. 0 ) )
 
+            FIRST = .FALSE.
 *  Attempt to find the next matching file.
             FILE = ' '
-            FOUND = ONE_FIND_FILE( TEMPLT, .TRUE., FILE, ICONTX,
-     :           STATUS )
+            CALL PSX_WORDEXP( TEMPLT, ICONTX, FILE, STATUS )
 
 *  If another file was found which matches the name...
-            IF ( FOUND .AND. STATUS .EQ. SAI__OK ) THEN
+            IF ( FILE .NE. ' ' .AND. STATUS .EQ. SAI__OK ) THEN
 
 *  Append it to the group.
                CALL GRP_PUT( IGRP1, 1, FILE, 0, STATUS )
@@ -128,12 +130,6 @@
             END IF
 
          END DO
-
-*  Clear status if no more files
-         IF (STATUS .EQ. ONE__NOFILES) CALL ERR_ANNUL( STATUS )
-
-*  End the search context.
-         CALL ONE_FIND_FILE_END( ICONTX, STATUS )
 
       END IF
 

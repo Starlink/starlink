@@ -72,6 +72,11 @@
       END DO
       PRINT *, ' '
 
+      PRINT *, ' Expand wildcard when no file matches'
+      CONTEXT = 0
+      CALL PSX_WORDEXP( './*.boo', CONTEXT, EXPAN, STATUS )
+      PRINT *,' Result = ',EXPAN
+
       CALL EMS_END( STATUS )
 
       END
