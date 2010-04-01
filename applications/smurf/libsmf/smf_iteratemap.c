@@ -1245,7 +1245,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
               smf_filter_fromkeymap( filt, keymap, &dofft, status );
               if( dofft ) {
                 msgOutif( MSG__VERB," ", "  frequency domain filter", status );
-                smf_filter_execute( NULL, data, filt, status );
+                smf_filter_execute( NULL, data, qua_data, filt, status );
               }
               filt = smf_free_smfFilter( filt, status );
 
@@ -1575,13 +1575,22 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             smf_qualstats_report( qua[i], qcount_last, qcount_new, 0, status );
 
             /* Check for consistency between quality and data arrays */
-            /*
-            for( idx=0; idx<res[i]->ndat; idx++ ) {
-              smf_check_quality( res[i]->sdata[idx],
-                                 (unsigned char*)(qua[i]->sdata[idx]->pntr)[0],
-                                 1, status );
+            for( idx=0; (*status==SAI__OK)&&(idx<res[i]->ndat); idx++ ) {
+              size_t nbad;
+              nbad = smf_check_quality( res[i]->sdata[idx],
+                                        (unsigned char*)(qua[i]->sdata[idx]->pntr)[0],
+                                        0, status );
+              if( nbad ) {
+                msgOut( "", FUNC_NAME ": *** Possible programming error! ***",
+                        status );
+                msgOutf( "", FUNC_NAME ": %zu QUALITY/DATA inconsistencies "
+                         "chunk %zu subarray %zu", status, nbad, i, idx );
+                msgOut( "", FUNC_NAME ": ***********************************",
+                        status );
+              }
+
             }
-            */
+
 
             /* Close files if memiter not set */
             if( !memiter ) {

@@ -211,7 +211,7 @@ void smfParallelTime( void *job_data_ptr, int *status ) {
 
       if( data->type == 2 ) {
         /* --- FFT filter the data --- */
-        smf_filter_execute( NULL, array[i]->sdata[j], filt, status );
+        smf_filter_execute( NULL, array[i]->sdata[j], NULL, filt, status );
       }
     }
 
@@ -470,7 +470,7 @@ void smurf_sc2threadtest( int *status ) {
     for( j=0; (*status==SAI__OK)&&(j<nsub); j++ ) {
       msgOutiff( MSG__DEBUG, "", "  filter chunk %zu/%zu, bolo %zu/%zu",
                  status, i+1, nchunks, j+1, nsub );
-      smf_filter_execute( wf, res[i]->sdata[j], filt, status );
+      smf_filter_execute( wf, res[i]->sdata[j], NULL, filt, status );
     }
 
     if( filt ) filt = smf_free_smfFilter( filt, status );
