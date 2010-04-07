@@ -27,10 +27,10 @@
 *     AST_GET(C,D,I,L,R)
 *     AST_ISAOBJECT
 *     AST_NULL
-*     AST_SET 
+*     AST_SET
 *     AST_SET(C,D,I,L,R)
 *     AST_SHOW
-*     AST_VERSION 
+*     AST_VERSION
 *     AST_LISTISSUED   (only if macro DEBUG is defined)
 *     AST_SETWATCHID   (only if macro DEBUG is defined)
 *     AST_TUNE
@@ -44,12 +44,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -118,7 +118,7 @@ F77_SUBROUTINE(ast_begin)( INTEGER(STATUS) ) {
    astAt( "AST_BEGIN", NULL, 0 );
    astWatchSTATUS(
       int dummy = *status; /* Avoid "unused variable 'status'" messages */
-      *status = dummy;   
+      *status = dummy;
       astBegin;
    )
 }
@@ -264,7 +264,7 @@ F77_SUBROUTINE(ast_getc)( CHARACTER_RETURN_VALUE(RESULT),
    GENPTR_INTEGER(THIS)
    GENPTR_CHARACTER(ATTRIB)
    char *attrib;
-   const char *result; 
+   const char *result;
    int i;
 
    astAt( "AST_GETC", NULL, 0 );
@@ -433,6 +433,25 @@ F77_LOGICAL_FUNCTION(ast_test)( INTEGER(THIS),
    return RESULT;
 }
 
+F77_LOGICAL_FUNCTION(ast_hasattribute)( INTEGER(THIS),
+                                        CHARACTER(ATTRIB),
+                                        INTEGER(STATUS)
+                                        TRAIL(ATTRIB) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(ATTRIB)
+   F77_LOGICAL_TYPE(RESULT);
+   char *attrib;
+
+   astAt( "AST_HASATTRIBUTE", NULL, 0 );
+   astWatchSTATUS(
+      attrib = astString( ATTRIB, ATTRIB_length );
+      RESULT = astHasAttribute( astI2P( *THIS ), attrib ) ? F77_TRUE : F77_FALSE;
+      astFree( attrib );
+   )
+   return RESULT;
+}
+
+
 F77_LOGICAL_FUNCTION(ast_same)( INTEGER(THIS),
                                 INTEGER(THAT),
                                 INTEGER(STATUS) ) {
@@ -514,7 +533,7 @@ F77_SUBROUTINE(ast_endpm)( void ) {
 
 F77_INTEGER_FUNCTION(ast_tune)( CHARACTER(NAME),
                                 INTEGER(VALUE),
-                                INTEGER(STATUS) 
+                                INTEGER(STATUS)
                                 TRAIL(NAME) ) {
    GENPTR_INTEGER(VALUE)
    GENPTR_CHARACTER(NAME)
@@ -534,7 +553,7 @@ F77_LOGICAL_FUNCTION(ast_chrsub)( CHARACTER(TEST),
                                   CHARACTER(PATTERN),
                                   CHARACTER(RESULT),
                                   INTEGER(STATUS)
-                                  TRAIL(TEST) 
+                                  TRAIL(TEST)
                                   TRAIL(PATTERN)
                                   TRAIL(RESULT) ) {
    GENPTR_CHARACTER(TEST)
@@ -542,7 +561,7 @@ F77_LOGICAL_FUNCTION(ast_chrsub)( CHARACTER(TEST),
    GENPTR_CHARACTER(RESULT)
    F77_LOGICAL_TYPE(MATCH);
 
-   char *test, *pattern, *result; 
+   char *test, *pattern, *result;
    int i;
 
    astAt( "AST_CHRSUB", NULL, 0 );

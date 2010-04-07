@@ -4,7 +4,7 @@ AST Library
 now available.
 
    AST provides a comprehensive range of facilities for attaching
-world coordinate systems (such as RA/Dec, frequency, etc) to astronomical 
+world coordinate systems (such as RA/Dec, frequency, etc) to astronomical
 data, for retrieving and interpreting that information and for generating
 graphical output based on it.
 
@@ -16,27 +16,35 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
-- A bug has been fixed in the astRebin(Seq)/AST_REBIN(SEQ) methods 
+- The Object class has a new method called astHasAttribute/AST_HASATTRIBUTE
+that returns a boolean value indicating if a specified Object has a named
+attribute.
+
+- The SkyFrame class has two new read-only boolean attributes called
+IsLatAxis and IsLonAxis that can be used to determine the nature of a
+specified SkyFrame axis.
+
+- A bug has been fixed in the astRebin(Seq)/AST_REBIN(SEQ) methods
 that could cause flux to be lost from the edges of the supplied array.
 
-- A bug has been fixed in the astRebin(Seq)/AST_REBIN(SEQ) methods 
+- A bug has been fixed in the astRebin(Seq)/AST_REBIN(SEQ) methods
 that caused the first user supplied parameter to be interpreted as the
 full width of the spreading kernel, rather than the half-width.
 
 - The StcsChan class now ignores case when reading STC-S phrases (except
 that units strings are still case sensitive).
 
-- The Channel class now has an Indent attribute that controls indentation 
+- The Channel class now has an Indent attribute that controls indentation
 in the text created by astWrite/AST_WRITE. The StcsIndent and XmlIndent
 attributes have been removed.
 
 - All classes of Channel now use the string "<bad>" to represent the
 floating point value AST__BAD, rather than the literal formatted value
-(typically "-1.79769313486232e+308" ). 
+(typically "-1.79769313486232e+308" ).
 
 - The KeyMap class now uses the string "<bad>" to represent the
 floating point value AST__BAD, rather than the literal formatted value
-(typically "-1.79769313486232e+308" ). 
+(typically "-1.79769313486232e+308" ).
 
 - The KeyMap class has a new method called astMapPutElem<X>/AST_MAPPUTELEM<X>
 that allows a value to be put into a single element of a vector entry in
@@ -69,7 +77,7 @@ conversion between the two Frames being achieved using a UnitMap.
 - Added method astMatchAxes (AST_MATCHAXES) to the Frame class. This
 allows corresponding axes in two Frames to be identified.
 
-- The astAddFrame (AST_ADDFRAME) method can now be used to append one or 
+- The astAddFrame (AST_ADDFRAME) method can now be used to append one or
 more axes to all Frames in a FrameSet.
 
 
@@ -77,7 +85,7 @@ Main Changes in Version 5.1
 ---------------------------
 
 - A new method called astSetFitsCM (AST_SETFITSCM) has been added to
-the FitsChan class. It stores a pure comment card in a FitsChan (that 
+the FitsChan class. It stores a pure comment card in a FitsChan (that
 is, a card with no keyword name or equals sign).
 
 - A new attribute called ObsAlt has been added to the Frame class. It
@@ -85,21 +93,21 @@ records the geodetic altitude of the observer, in metres. It defaults to
 zero. It is used when converting times to or from the TDB timescale, or
 converting spectral positions to or from the topocentric rest frame, or
 converting sky positions to or from horizon coordinates. The FitsChan
-class will include its effect when creating a set of values for the 
+class will include its effect when creating a set of values for the
 OBSGEO-X/Y/Z keywords, and will also assign a value to it when reading a
 set of OBSGEO-X/Y/Z keyword values from a FITS header.
 
 - The TimeMap conversions "TTTOTDB" and "TDBTOTT", and the SpecMap
-conversions "TPF2HL" and "HLF2TP", now have an additional argument - 
+conversions "TPF2HL" and "HLF2TP", now have an additional argument -
 the observer's geodetic altitude.
 
 - The Polygon class has been modified to make it consistent with the
 IVOA STC definition of a Polygon. Specifically, the inside of a polygon
-is now the area to the left of each edge as the vertices are traversed in 
+is now the area to the left of each edge as the vertices are traversed in
 an anti-clockwise manner, as seen from the inside of the celestial sphere.
 Previously, AST used the anti-clockwise convention, but viewed from the
-outside of the celestial sphere instead of the inside. Any Polygon saved 
-using previous versions of AST will be identified and negated automatically 
+outside of the celestial sphere instead of the inside. Any Polygon saved
+using previous versions of AST will be identified and negated automatically
 when read by AST V5.2.
 
 - A new class of Channel, called StcsChan, has been added that allows
@@ -133,7 +141,7 @@ an error if an entry with the requested key does not exist in the KeyMap.
 Main Changes in Version 5.1
 ---------------------------
 
-- The astUnlock function now has an extra parameter that controls whether 
+- The astUnlock function now has an extra parameter that controls whether
 or not an error is reported if the Object is currently locked by another
 thread.
 
@@ -141,16 +149,16 @@ thread.
 been changed from "yes" and "no" to "1" and "0".
 
 - The PointList class has a new method, astPoints, that copies the axis
-values from the PointList into a supplied array. 
+values from the PointList into a supplied array.
 
-- The PointList class has a new (read-only) attribute, ListSize, that 
+- The PointList class has a new (read-only) attribute, ListSize, that
 gives the number of points stored in the PointList.
 
 - A new method (astIntersect) has been added to the Frame class. It
 determines the position at which two geodesic curves intersect.
 
-- The XmlStrict attribute and astXmlWarnings function have been removed. 
-The same functionality is now available via the existing Strict attribute, 
+- The XmlStrict attribute and astXmlWarnings function have been removed.
+The same functionality is now available via the existing Strict attribute,
 a new attribute called ReportLevel, and a new function called astWarnings.
 
 - A bug in the type-checking of Objects passed as arguments to constructor
@@ -162,9 +170,9 @@ supplied as an argument to a constructor.
 applied to a Region. If this is not possible, a Frame will be returned as
 before.
 
-- The default gap size between the ISO date/time labels used by the Plot 
+- The default gap size between the ISO date/time labels used by the Plot
 class when displaying an annotated axis described by a TimeFrame has been
-changed. The changes are meant to improve the labelling of calendar time 
+changed. The changes are meant to improve the labelling of calendar time
 axes that span intervals from a day to a few years.
 
 Main Changes in Version 5.0
@@ -172,10 +180,10 @@ Main Changes in Version 5.0
 
 -  AST is now thread-safe. Many of the macro definitions in the "ast.h"
 header file have changed, and so all source code that include "ast.h"
-should be re-compiled. 
+should be re-compiled.
 
 -  The TimeFrame class now support Local Time as a time scale. The offset
-from UTC to Local Time is specified by a new TimeFrame attribute called 
+from UTC to Local Time is specified by a new TimeFrame attribute called
 LTOffset.
 
 -  Addition of a new class called Plot3D that provides facilities for
@@ -210,7 +218,7 @@ before being used to create the FITS-CLASS header.
 - The value stored in the FITS-CLASS keyword "VELO-LSR" has been changed
 from the velocity of the source to the velocity of the reference channel.
 
-- Addition of a new method call astPurgeWCS (AST_PURGEWCS) to the FitsChan 
+- Addition of a new method call astPurgeWCS (AST_PURGEWCS) to the FitsChan
 class. This method removes all WCS-related header cards from a FitsChan.
 
 - The astRebinSeq functions now have an extra parameter that is used to
@@ -221,8 +229,8 @@ REQUIRE EXISTING CODE THAT USES ASTREBINSEQ TO BE MODIFIED TO INCLUDE THE
 NEW PARAMETER (CALLED "NUSED").
 - The Plot class now honours the value of the LabelUp attribute even if
 numerical labels are placed around the edge of the Plot. Previously
-LabelUp was only used if the labels were drawn within the interior of 
-the plot. The LabelUp attribute controls whether numerical labels are 
+LabelUp was only used if the labels were drawn within the interior of
+the plot. The LabelUp attribute controls whether numerical labels are
 drawn horizontally or parallel to the axis they describe.
 - The Plot class has a new attribute called GrfContext that can be used
 to comminicate context information between an application and any
@@ -231,11 +239,11 @@ graphics functions registered with the Plot class via the astGrfSet
 - Functions registered with the Plot class using astGrfSet (AST_GRFSET)
 now take a new additional integer parameter, "grfcon". The Plot class
 sets this parameter to value of the Plot's GrfContext attribute before
-calling the graphics function. NOTE, THIS CHANGE WILL REQUIRE EXISTING 
+calling the graphics function. NOTE, THIS CHANGE WILL REQUIRE EXISTING
 CODE THAT USES astGrfSet (AST_GRFSET) TO BE MODIFIED TO INCLUDE THE
 NEW PARAMETER.
 -  Support has been added for the FITS-WCS "HPX" projection (HEALPix).
--  A new flag "AST__VARWGT" can be supplied to astRebinSeq. This causes 
+-  A new flag "AST__VARWGT" can be supplied to astRebinSeq. This causes
 the input data values to be weighted using the reciprocals of the input
 variances (if supplied).
 - The Frame class has a new read-only attribute called NormUnit that
@@ -245,7 +253,7 @@ Unit value of "s*(m/s)" would result in a NormUnit value of "m".
 - A new method astShowMesh has been added to the Region class. It
 displays a mesh of points covering the surface of a Region by writing out
 a table of axis values to standard output.
-- A bug has been fixed that could segmentation violations when setting 
+- A bug has been fixed that could segmentation violations when setting
 attribute values.
 
 Main Changes in Version 4.4
@@ -269,16 +277,16 @@ specifies whether or not to take account of the SideBand attributes when
 aligning two DSBSpecFrames using astConvert (AST_CONVERT).
 
 - The Frame class has a new attribute called Dut1 that can be used to
-store a value for the difference between the UT1 and UTC timescales at 
-the epoch referred to by the Frame. 
+store a value for the difference between the UT1 and UTC timescales at
+the epoch referred to by the Frame.
 
-- The number of digits used to format the Frame attributes ObsLat and 
+- The number of digits used to format the Frame attributes ObsLat and
 ObsLon has been increased.
 
 - The use of the SkyFrame attribute AlignOffset has been changed. This
 attribute is used to control how two SkyFrames are aligned by astConvert.
-If the template and target SkyFrames both have a non-zero value for 
-AlignOffset, then alignment occurs within the offset coordinate systems 
+If the template and target SkyFrames both have a non-zero value for
+AlignOffset, then alignment occurs within the offset coordinate systems
 (that is, a UnitMap will always be used to align the two SkyFrames).
 
 - The Plot class has a new attribute called ForceExterior that can be
@@ -293,7 +301,7 @@ Main Changes in Version 4.3
 ---------------------------
 
 - The SpecFrame class has a new attribute called SourceSys that specified
-whether the SourceVel attribute (which specifies the rest frame of the 
+whether the SourceVel attribute (which specifies the rest frame of the
 source) should be accessed as an apparent radial velocity or a redshift.
 Note, any existing software that assumes that SourceVel always represents
 a velocity in km/s should be changed to allow for the possibility of
@@ -309,7 +317,7 @@ Main Changes in Version 4.2
 
 - The SideBand attribute of the DSBSpecFrame class can now take the
 option "LO" in addition to "USB" and "LSB". The new option causes the
-DSBSpecFrame to represent the offset from the local oscillator frequency, 
+DSBSpecFrame to represent the offset from the local oscillator frequency,
 rather than either of the two sidebands.
 
 - The FitsChan class has been changed so that it writes out a VELOSYS
@@ -328,12 +336,12 @@ of the AST Object will be stripped from the FitsChan afte a read operation.
 options, and always link against the minimal cut-down version of SLALIB
 distributed as part of AST.
 
-- A problem with unaligned memory access that could cause bus errors on 
+- A problem with unaligned memory access that could cause bus errors on
 Solaris has been fixed.
 
-- A new function called astTune (or AST_TUNE) has been added which can be 
-used to get and set global AST tuning parameters. At the moment there are 
-only two such parameter, both of which are concerned with memory management 
+- A new function called astTune (or AST_TUNE) has been added which can be
+used to get and set global AST tuning parameters. At the moment there are
+only two such parameter, both of which are concerned with memory management
 within AST.
 
 - A new method called astTranGrid (AST_TRANGRID in Fortran) has been
@@ -365,20 +373,20 @@ axes (i.e. for the SpecFrame axis in the above example).
 Main Changes in Version 4.1
 ---------------------------
 
-- A new control flag has been added to the AST_RESAMPLE<X>/astResample<X> 
+- A new control flag has been added to the AST_RESAMPLE<X>/astResample<X>
 functions which produces approximate flux conservation.
 
 - The SkyFrame class now supports a System value of "AZEL" corresponding
 to horizon (azimuth/elevation) coordinates.
 
-- The FitsChan class allows the non-standard strings "AZ--" and "EL--" to 
+- The FitsChan class allows the non-standard strings "AZ--" and "EL--" to
 be used as axis types in FITS-WCS CTYPE keyword values.
 
 - The Frame class now has attributes ObsLon and ObsLat to specify
 the geodetic longitude and latitude of the observer.
 
 - The ClockLon and ClockLat attributes have been removed from the
-TimeFrame class. Likewise, the GeoLon and GeoLat attributes have been 
+TimeFrame class. Likewise, the GeoLon and GeoLat attributes have been
 removed from the SpecFrame class. Both classes now use the ObsLon and
 ObsLat attributes of the parent Frame class instead. However, the old
 attribute names can be used as synonyms for ObsLat and ObsLon. Also,
@@ -392,7 +400,7 @@ parallel, are equivalent to the original Mapping.
 - The default value for the SkyRefIs attribute has been changed from
 "Origin" to "Ignored". This means that if you want to use a SkyFrame
 to represent offsets from some origin position, you must now set the
-SkyRefIs attribute explicitly to either "Pole" or "Origin", in addition 
+SkyRefIs attribute explicitly to either "Pole" or "Origin", in addition
 to assigning the required origin position to the SkyRef attribute.
 
 
@@ -403,8 +411,8 @@ Main Changes in Version 4.0
 descriptions using the XmlChan class has been added. Support is included
 for a subset of V1.20 of the draft STC specification.
 
-- A new set of methods (AST_REBIN<X>/astRebin<X>) has been added to 
-the Mapping class. These are accurately flux-conserving alternatives to the 
+- A new set of methods (AST_REBIN<X>/astRebin<X>) has been added to
+the Mapping class. These are accurately flux-conserving alternatives to the
 existing AST_RESAMPLE<X>/astResample<X> methods.
 
 
@@ -432,7 +440,7 @@ simple Frame.
 clipping performed by AST at the plot boundary.
 
 - The PolyMap class has been modified to allow a PolyMap to be written
-succesfully to a FitsChan using Native encoding. 
+succesfully to a FitsChan using Native encoding.
 
 - A mimimal cut down subset of the C version of SLALIB is now included
 with the AST distribution and built as part of building AST. This means
@@ -451,17 +459,17 @@ Main Changes in Version 3.5
 - AST now provides facilities for representing regions of various
 shapes within a coordinate system. The Region class provides general
 facilities which are independent of the specific shape of region being
-used. Various sub-classes of Region are also now available which provide 
+used. Various sub-classes of Region are also now available which provide
 means of creating Regions of specific shape. Facilities provided by the
 Region class include testing points to see if they are inside the
 Region, testing two Regions for overlap, transforming Regions from one
 coordinate system to another, etc.
 
-- A new class of 1-dimensional Frame called FluxFrame has been added which 
-can be used to describe various systems for describing ovserved value at a 
-single fixed spectral position. 
+- A new class of 1-dimensional Frame called FluxFrame has been added which
+can be used to describe various systems for describing ovserved value at a
+single fixed spectral position.
 
-- A new class of 2-dimensional Frame called SpecFluxFrame has been added which 
+- A new class of 2-dimensional Frame called SpecFluxFrame has been added which
 can be used to describe a 2-d frame spanned by a spectral position axis
 and and an observed value axis.
 

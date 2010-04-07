@@ -104,7 +104,7 @@ environment-independent.
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -173,7 +173,7 @@ environment-independent.
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  Redefine the \tableofcontents command. This procrastination is necessary
 %  to stop the automatic creation of a second table of contents page
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
@@ -645,12 +645,12 @@ f-
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -700,7 +700,7 @@ f-
               \stardocversion} \\ [2ex]
    \rule{80mm}{0.5mm}
 
-   \vspace{10mm}   
+   \vspace{10mm}
 c+
    {\em{This is the C version of this document.\\
         For the Fortran version, please see SUN/210.}}
@@ -723,8 +723,8 @@ coordinates ({\em{e.g.}}\ wavelength, frequency, {\em{etc.}}), or
 other coordinate system information, then this library should be of
 interest. It provides solutions for most of the problems you will meet
 and allows you to write robust and flexible software. It is able to read
-and write WCS information in a variety of formats, including 
-\htmladdnormallink{FITS-WCS}{http://fits.gsfc.nasa.gov/fits_wcs.html}. 
+and write WCS information in a variety of formats, including
+\htmladdnormallink{FITS-WCS}{http://fits.gsfc.nasa.gov/fits_wcs.html}.
 
 %\subsection{TBW---What is a World Coordinate System?}
 
@@ -737,10 +737,10 @@ provides:
 \begin{description}
 \item[1. The Variety of Coordinate Systems]\mbox{}\\
 Astronomers use a wide range of differing coordinate systems to describe
-positions within a variety of physical domains. For instance, there are a 
+positions within a variety of physical domains. For instance, there are a
 large number of celestial coordinate systems in use within astronomy to
-describe positions on the sky. Understanding these, and knowing how to 
-convert coordinates between them, can require considerable expertise. It 
+describe positions on the sky. Understanding these, and knowing how to
+convert coordinates between them, can require considerable expertise. It
 can also be difficult to decide which of them your software should support.
 The same applies to coordinate systems describing other domains, such as
 position within an electro-magnetic spectrum.
@@ -815,7 +815,7 @@ are described here:
 \begin{enumerate}
 \item {\bf{Minimum Software Dependencies.}}
 The AST library depends on no other other software\footnote{It now comes with a
-minimal cut-down version of the widely-available SLALIB positional astronomy 
+minimal cut-down version of the widely-available SLALIB positional astronomy
 library (\xref{SUN/67}{sun67}{}), including just those functions needed
 by AST, and the previous dependency on SLALIB is no longer present}.
 
@@ -865,9 +865,9 @@ extern "C" {
 \normalsize
 \end{quote}
 
-A JNI interface (known as ``JNIAST'' - see 
+A JNI interface (known as ``JNIAST'' - see
 \htmladdnormallink{http://www.starlink.ac.uk/jniast/}
-{http://www.starlink.ac.uk/jniast/}) has also been developed by Starlink 
+{http://www.starlink.ac.uk/jniast/}) has also been developed by Starlink
 which allows AST to be used from Java.
 
 \item {\bf{Object Oriented Design.}}
@@ -918,7 +918,7 @@ The relationships between coordinate systems are represented in AST by
 Objects called Mappings. A Mapping does not represent a coordinate
 system itself, but merely the process by which you move from one
 coordinate system to another related one.
- 
+
 \begin{latexonly}
    A convenient picture of a Mapping is as a ``black box''
    (Figure~\ref{fig:mapping}) into which you can feed sets of
@@ -1258,10 +1258,10 @@ specific physical domain. This ranges from tasks such as formatting axis
 values, to complex tasks such as determining the transformation between
 any pair of related coordinate systems. For instance, the SkyFrame
 (Figure~\ref{fig:frames}b,c), represents celestial coordinate systems,
-the SpecFrame represents spectral coordinate systems, and the TimeFrame 
-represents time coordinate systems. All these provide a wide range of 
-different systems for describing positions within their associated physical 
-domain, and these may be selected by setting appropriate attributes.  
+the SpecFrame represents spectral coordinate systems, and the TimeFrame
+represents time coordinate systems. All these provide a wide range of
+different systems for describing positions within their associated physical
+domain, and these may be selected by setting appropriate attributes.
 
 \begin{latexonly}
    As with compound Mappings (\secref{ss:cmpmapoverview}), it is possible
@@ -1316,7 +1316,7 @@ f-
 \end{htmlonly}
 
 {\bf{Further reading:}} For a more complete description of Frames see
-\secref{ss:frames}, for SkyFrames see \secref{ss:skyframes} and for 
+\secref{ss:frames}, for SkyFrames see \secref{ss:skyframes} and for
 SpecFrames see \secref{ss:specframes}.  Also see the Frame, SkyFrame,
 SpecFrame, TimeFrame and CmpFrame entries in \appref{ss:classdescriptions}.
 
@@ -1374,7 +1374,7 @@ context, the base Frame represents the ``native'' coordinate system
 (for example, the pixel coordinates of an image).  Similarly, one
 Frame is termed the {\em{current}} Frame and represents the
 ``currently-selected'' coordinates.  It might, typically, be a
-celestial or spectral coordinate system and would be used during 
+celestial or spectral coordinate system and would be used during
 interactions with
 a user, as when plotting axes on a graph or producing a table of
 results.  Other Frames within the FrameSet represent a library of
@@ -1401,7 +1401,7 @@ may be redirected to/from any chosen external data store, such as a
 text file, an astronomical dataset, or a network connection.
 
 The text format used by the basic Channel class is peculiar to the AST
-library - no other software will understand it. However, more specialised 
+library - no other software will understand it. However, more specialised
 forms of Channel are provided which use text formats more widely
 understood.
 
@@ -1436,8 +1436,8 @@ IVOA STC-S region descriptions. STC-S (see \htmladdnormallink{
 http://www.ivoa.net/Documents/latest/STC-S.html}{
 http://www.ivoa.net/Documents/latest/STC-S.html}) is a linear string
 syntax that allows simple specification of STC metadata. AST supports a
-subset of the STC-S specification, allowing an STC-S description of a 
-region within an AST-supported astronomical coordinate system to be converted 
+subset of the STC-S specification, allowing an STC-S description of a
+region within an AST-supported astronomical coordinate system to be converted
 into an equivalent AST Region object, and vice-versa.
 
 {\bf{Further reading:}} For a more complete description of Channels
@@ -1553,16 +1553,16 @@ reading are given after each example, just in case they don't quite do
 what you want.
 
 \subsection{\ldots Obtain and Install AST}
-The AST library is available both as a stand-alone package and also as 
-part of the Starlink Software Collection\footnote{The Starlink Software 
+The AST library is available both as a stand-alone package and also as
+part of the Starlink Software Collection\footnote{The Starlink Software
 Collection can be downloaded from
 \htmladdnormallink{http://www.starlink.ac.uk/Download/}
 {http://www.starlink.ac.uk/Download/}.}. If your site has the Starlink
-Software Collection installed then AST should already be available. 
+Software Collection installed then AST should already be available.
 
 If not, you can download the AST library by itself from
 \htmladdnormallink{http://www.starlink.ac.uk/ast/}
-{http://www.starlink.ac.uk/ast/}. 
+{http://www.starlink.ac.uk/ast/}.
 
 \subsection{\ldots Structure an AST Program}
 
@@ -1654,7 +1654,7 @@ f77 program.f -L/star/lib -I/star/include `ast_link` -o program
 
 On Linux systems you should usually use \verb+g77 -fno-second-underscore+ in
 place of \verb+f77+ - see \xref{``Software development on Linux''}{sun212}
-{software_development_on_linux} in \xref{SUN/212}{sun212}{}. 
+{software_development_on_linux} in \xref{SUN/212}{sun212}{}.
 f-
 
 To build a program which uses PGPLOT for graphics, use:
@@ -1677,7 +1677,7 @@ f77 program.f -L/star/lib `ast_link -pgplot` -o program
 \normalsize
 \end{quote}
 
-again using \verb+g77 -fno-second-underscore+ in place of \verb+f77+ 
+again using \verb+g77 -fno-second-underscore+ in place of \verb+f77+
 on Linux systems.
 f-
 
@@ -1703,7 +1703,7 @@ Precisely how you extract world coordinate system (WCS) information
 from a dataset obviously depends on what type of dataset it
 is. Usually, however, you should be able to obtain a set of FITS
 header cards which contain the WCS information (and probably much more
-besides). Suppose that ``cards'' is a pointer to a string 
+besides). Suppose that ``cards'' is a pointer to a string
 containing a complete set of concatenated FITS header cards (such as
 produced by the CFITSIO function fits\_hdr2str). Then proceed as follows:
 
@@ -1718,7 +1718,7 @@ int nkeys, status;
 
 ...
 
-/* Obtain all the cards in the header concatenated into a single dynamically 
+/* Obtain all the cards in the header concatenated into a single dynamically
    allocated null-terminated character string. Note, we do not exclude
    any cards since we may later modify the WCS information within the
    header and consequently want to write the entire header out again. */
@@ -1740,7 +1740,7 @@ int nkeys, status;
       wcsinfo = astRead( fitschan );
 
       ...
-  
+
 \end{verbatim}
 \normalsize
 \end{quote}
@@ -2055,14 +2055,14 @@ f-
 \subsection{\label{ss:howtotestforspectral}\ldots Test if a WCS is a Spectral Coordinate System}
 Testing for a spectral coordinate system is basically the same as testing
 for a celestial coordinate system (see the previous section). The one
-difference is that you use the 
+difference is that you use the
 c+
 astIsASpecFrame function
 c-
 f+
 AST\_ISASPECFRAME routine
 f-
-in place of the 
+in place of the
 c+
 astIsASkyFrame function.
 c-
@@ -2382,15 +2382,15 @@ f-
 
 \subsection{\label{ss:howtocreatenewwcs}\ldots Create a New WCS Calibration}
 
-This section describes how to add a WCS calibration to a data set which you 
-are creating from scratch, rather than modifying an existing data set. 
+This section describes how to add a WCS calibration to a data set which you
+are creating from scratch, rather than modifying an existing data set.
 
 In most common cases, the simplest way to create a new WCS calibration
 from scratch is probably to create a set of strings describing the
 required calibration in terms of the keywords used by the FITS WCS
 standard, and then convert these strings into an AST FrameSet describing
 the calibration. This FrameSet can then be used for many other purposes, or
-simply stored in the data set. 
+simply stored in the data set.
 
 The full FITS-WCS standard is quite involved, currently running to four
 separate papers, but the basic kernel is quite simple, involving the
@@ -2399,24 +2399,24 @@ indicated below by $<i>$):
 
 \begin{description}
 \item[CRPIX<i>]\mbox{}\\
-hold the pixel coordinates at a reference point 
+hold the pixel coordinates at a reference point
 \item[CRVAL<i>]\mbox{}\\
-hold the corresponding WCS coordinates at the reference point 
+hold the corresponding WCS coordinates at the reference point
 \item[CTYPE<i>]\mbox{}\\
 name the quantity represented by the WCS axes, together with the
-projection algorithm used to convert the scaled and rotated pixel coordinates 
+projection algorithm used to convert the scaled and rotated pixel coordinates
 to WCS coordinates.
 \item[CD<i>\_<j>]\mbox{}\\
 a set of keywords which specify the elements of a matrix. This matrix scales
 pixel offsets from the reference point into the offsets required as input
-by the projection algorithm specified by the CTYPE keywords. This matrix 
+by the projection algorithm specified by the CTYPE keywords. This matrix
 specifies the scale and rotation of the image. If there is no rotation
 the off-diagonal elements of the matrix (\emph{e.g.} CD1\_2 and
-CD2\_1) can be omitted. 
+CD2\_1) can be omitted.
 \end{description}
 
-As an example consider the common case of a simple 2D image of the sky in 
-which north is parallel to the second pixel axis and east parallel to the 
+As an example consider the common case of a simple 2D image of the sky in
+which north is parallel to the second pixel axis and east parallel to the
 (negative) first pixel axis. The image scale is 1.2 arc-seconds per pixel
 on both axes, and the image is presumed to have been obtained with a
 tangent plane projection. Furthermore, it is known that pixel coordinates
@@ -2440,7 +2440,7 @@ CD2_2   = 0.0003333333     / Decimal degrees equivalent of 1.2 arc-seconds
 
 Notes:
 \begin{itemize}
-\item a FITS header card begins with the keyword name starting at column 1, 
+\item a FITS header card begins with the keyword name starting at column 1,
 has an equals sign in column 9, and the keyword value in columns 11 to 80.
 \item string values must be enclosed in single quotes.
 \item celestial longitude and latitude must both be specified in decimal degrees.
@@ -2452,14 +2452,14 @@ you should add:
 \begin{quote}
 \small
 \begin{verbatim}
-RADESYS = 'FK5'           
-EQUINOX = 2005.6 
+RADESYS = 'FK5'
+EQUINOX = 2005.6
 \end{verbatim}
 \normalsize
 \end{quote}
 
 The EQUINOX value defaults to J2000.0 if omitted. FK4 can also be used in
-place of FK5, in which case EQUINOX defaults to B1950.0. 
+place of FK5, in which case EQUINOX defaults to B1950.0.
 
 \end{itemize}
 
@@ -2468,17 +2468,17 @@ store them in a FitsChan and then read the corresponding FrameSet from the
 FitsChan. How to do this is described in \secref{ss:howtoreadwcs}.
 
 Having created the WCS calibration, you may want to store it in a data
-file. How to do this is described in \secref{ss:howtowritewcs}).\footnote{If 
+file. How to do this is described in \secref{ss:howtowritewcs}).\footnote{If
 you are writing the WCS calibration to a FITS file you obviously
 have the choice of storing the FITS-WCS cards directly.}
 
-If the required WCS calibration cannot be described as a set of FITS-WCS 
+If the required WCS calibration cannot be described as a set of FITS-WCS
 headers, then a different approach is necessary. In this case, you should
 first create a Frame describing pixel coordinates, and store this Frame
 in a new FrameSet. You should then create a new Frame describing the
 world coordinate system. This Frame may be a specific subclass of Frame such
 as a SkyFrame for celestial coordinates, a SpecFrame for spectral
-coordinates, a Timeframe for time coordinates, or a CmpFrame for a combination 
+coordinates, a Timeframe for time coordinates, or a CmpFrame for a combination
 of different coordinates.
 You also need to create a suitable Mapping which transforms pixel
 coordinates into world coordinates. AST provides many different types of
@@ -3188,7 +3188,7 @@ f+
          XRIGHT  = 0.5 * ( X1 + X2 + NX * SCALE )
          YBOTTOM = 0.5 * ( Y1 + Y2 - NY * SCALE )
          YTOP    = 0.5 * ( Y1 + Y2 + NY * SCALE )
- 
+
 *  Set up a PGPLOT coordinate transformation matrix and display the
 *  image data as a grey scale map (these details are specific to
 *  PGPLOT).
@@ -4738,7 +4738,7 @@ see if the POSIX threads library (``{\tt pthreads}'') is available. If so,
 appropriate {\tt pthreads} calls are inserted into the AST source code to
 ensure that AST is thread-safe, and the AST\_\_THREADSAFE macro (defined
 in the ``ast.h'' header file) is set to ``{\tt 1}''. If the {\tt pthreads}
-library cannot be found when AST is built, a working version of the AST 
+library cannot be found when AST is built, a working version of the AST
 library will still be created, but it will not be thread-safe. In this
 case the AST\_\_THREADSAFE macro will be set to ``{\tt 0}'' in ast.h. The
 rest of this section assumes that the thread-safe version of AST is being
@@ -4749,10 +4749,10 @@ the source and sink functions used by the Channel class or the graphics
 primitives functions used by the Plot class). AST does not know whether
 such functions are thread-safe or not. For this reason, invocations of these
 functions within a multi-threaded environment are serialised using a mutex
-in order to avoid two or more threads executing an external function 
+in order to avoid two or more threads executing an external function
 simultaneously.
 
-If an application uses more than one thread, the possibility arises that 
+If an application uses more than one thread, the possibility arises that
 an Object created by one thread may be accessed by another thread, potentially
 simultaneously. If any of the threads modifies any aspect of the Object,
 this could lead to serious problems within the other threads. For this
@@ -4782,7 +4782,7 @@ must unlock the Object using astUnlock and the second thread must then lock
 it using astLock.
 
 If a thread attempts to lock an Object that is already locked by another
-thread, it can choose to report an error immediately or to wait until the 
+thread, it can choose to report an error immediately or to wait until the
 Object is available.
 
 The astThread function can be used to determine whether an Object is
@@ -4802,10 +4802,10 @@ is called, only Objects that are locked by the current thread will
 be annulled.
 
 If an Object is unlocked by a thread using astUnlock, it is exempted from
-context handling so that subsequent invocations of astEnd will not cause it 
+context handling so that subsequent invocations of astEnd will not cause it
 to be annulled (this is similar to using astExempt on the Object). When the
 Object is subsequently locked by another thread using astLock, it will be
-imported into the context that was active when astLock was called. 
+imported into the context that was active when astLock was called.
 
 c-
 
@@ -5543,7 +5543,7 @@ f-
 function can be used to find the rate of change of any Mapping output
 with respect to any Mapping input, at a given input position. The method
 used produces good accuracy (typically a relative error of 10E-10 or
-less) but may require the Mapping to be evaluated 100 or more times. 
+less) but may require the Mapping to be evaluated 100 or more times.
 An estimate of the second derivative is also produced by this function.
 
 
@@ -6531,8 +6531,8 @@ In this section we will discuss only basic Frames, which represent
 Cartesian coordinate systems. More specialised types of Frame
 ({\em{e.g.}}\ the SkyFrame, which represents celestial coordinate
 systems, and the SpecFrame, which represents spectral coordinate
-systems) are covered later (\secref{ss:skyframes} and \secref{ss:specframes}) 
-and, naturally, inherit the properties and behaviour of the simple Frames 
+systems) are covered later (\secref{ss:skyframes} and \secref{ss:specframes})
+and, naturally, inherit the properties and behaviour of the simple Frames
 discussed here.
 
 \subsection{The Frame Model}
@@ -6870,13 +6870,13 @@ in more detail in \secref{ss:framedomains}.
 \item[System]\mbox{}\\
 A character string which identifies the specific coordinate system used
 to describe positions within the physical domain represented by the Frame.
-For a simple Frame, this attribute currently has a fixed value of 
+For a simple Frame, this attribute currently has a fixed value of
 ``Cartesian'', but could in principle be extended to include options such
 as ``Polar'', ``Cylindrical'', {\em{etc}}. More specialised Frames such
 as the SkyFrame, TimeFrame  and SpecFrame, re-define the allowed values to be
 appropriate to the domain which they describe. For instance, the SkyFrame
 allows values such as ``FK4'' and ``Galactic'', and the SpecFrame allows
-values such as ``frequency'' and ``wavelength''. 
+values such as ``frequency'' and ``wavelength''.
 
 \item[Epoch]\mbox{}\\
 This value is used to qualify a coordinate system by giving the moment in
@@ -6998,9 +6998,9 @@ Even finer control is possible by setting the (character string)
 Format attribute for a Frame axis. The string given should contain a
 {\em{format specifier}} which explicitly determines how the values on
 that axis should be formatted. This will over-ride the effects of any
-Digits value\footnote{The exception to this rule is that if the Format value 
-includes a precision of ``$.*$'', then Digits will be used to determine 
-the actual precision used.}.  Unfortunately for Fortran programmers, this must 
+Digits value\footnote{The exception to this rule is that if the Format value
+includes a precision of ``$.*$'', then Digits will be used to determine
+the actual precision used.}.  Unfortunately for Fortran programmers, this must
 be a C language format specifier,\footnote{This is a consequence of
 implementing the AST library in C.} so you might find the Digits
 approach preferable.
@@ -7797,25 +7797,25 @@ associated with the longitude axis?}
 f-
 
 \subsection{\label{ss:distanceandoffset}Calculating Distances, Angles and Offsets}
-Some complementary 
+Some complementary
 c+
-functions 
+functions
 c-
 f+
-routines 
+routines
 f-
 are provided for use with Frames to allow you to perform geometric
 operations without needing to know the nature of the coordinate system
 represented by the Frame.
 
 c+
-Functions 
+Functions
 c-
 f+
-Routines 
+Routines
 f-
-can be used to find the distance between two points, and to offset a 
-specified distance along a line joining two points, {\em{etc.}} In essence, 
+can be used to find the distance between two points, and to offset a
+specified distance along a line joining two points, {\em{etc.}} In essence,
 these define the metric of the coordinate space which the Frame represents. In
 the case of a basic Frame, this is a Cartesian metric.
 
@@ -7961,20 +7961,20 @@ f+
 The AST\_OFFSET2 routine is similar to AST\_OFFSET, but instead of using the
 f-
 geodesic which passes through two positions, it uses the geodesic which
-passes at a given position angle through the starting position. 
+passes at a given position angle through the starting position.
 
-Position angles are always measured from the positive direction of the 
-second Frame axis to the required line, with positive angles being in the 
-same sense as rotation from the positive direction of the second axis to 
+Position angles are always measured from the positive direction of the
+second Frame axis to the required line, with positive angles being in the
+same sense as rotation from the positive direction of the second axis to
 the positive direction of the first Frame axis. This definition applies
 to all classes of Frame, including SkyFrame. The default ordering of axes
 in a SkyFrame makes the second axis equivalent to north, and so the
-definition of position angle given above corresponds to the normal 
+definition of position angle given above corresponds to the normal
 astronomical usage, ``from north, through east''. However, it should be
 remembered that it is possible to permute the axes of a SkyFrame (or
 indeed any Frame), so that north becomes axis 1. In this case, an AST
-``position angle'' would be the angle ``from east, through north''. 
-Always take the axis ordering into account when deriving an astronomical 
+``position angle'' would be the angle ``from east, through north''.
+Always take the axis ordering into account when deriving an astronomical
 position angle from an AST position angle.
 
 Within a Cartesian coordinate system, the position angle of a geodesic
@@ -7982,9 +7982,9 @@ Within a Cartesian coordinate system, the position angle of a geodesic
 this is not necessarily true of other coordinate systems. Within a
 spherical coordinate system, for instance, the position angle of a geodesic
 will vary along its length (except for the special cases of a meridian and
-the equator). In addition to returning the required offset position, the 
+the equator). In addition to returning the required offset position, the
 c+
-astOffset2 function 
+astOffset2 function
 c-
 f+
 AST\_OFFSET2 routine
@@ -7992,30 +7992,30 @@ f-
 returns the position angle of the geodesic at the
 offset position. This is useful if you want to trace out a path which
 involves turning through specified angles. For instance, tracing out a
-rectangle in which each side is a geodesic involves turning through 90 
+rectangle in which each side is a geodesic involves turning through 90
 c+
 degrees at the corners. To do this, use astOffset2 to calculate the
-position of each corner, and then add (or subtract) 90 degrees from the 
+position of each corner, and then add (or subtract) 90 degrees from the
 position angle returned by astOffset2.
 c-
 f+
 degrees at the corners. To do this, use AST\_OFFSET2 to calculate the
-position of each corner, and then add (or subtract) 90 degrees from the 
+position of each corner, and then add (or subtract) 90 degrees from the
 position angle returned by AST\_OFFSET2.
 f-
 
 c+
-The astAngle function 
+The astAngle function
 c-
 f+
-The AST\_ANGLE routine 
+The AST\_ANGLE routine
 f-
 calculates the angle subtended by two points, at a third point.
 If used with a 2-dimensional Frame the returned angle
 is signed to indicate the sense of rotation (clockwise or anti-clockwise)
 in taking the ``shortest route'' from the first point to the second.
 If the Frame has more than 2 axes, the result is un-signed and is always
-in the range zero to $\pi$. 
+in the range zero to $\pi$.
 
 c+
 The astAxAngle function is similar to astAngle,
@@ -8023,8 +8023,8 @@ c-
 f+
 The AST\_AXANGLE routine is similar to AST\_AXANGLE,
 f-
-but the ``reference direction'', from which angles are measured, is 
-a specified axis. 
+but the ``reference direction'', from which angles are measured, is
+a specified axis.
 
 c+
 The astResolve function
@@ -8032,11 +8032,11 @@ c-
 f+
 The AST\_RESOLVE routine
 f-
-resolves a given displacement within a Frame into two components, parallel and 
-perpendicular to a given reference direction. 
+resolves a given displacement within a Frame into two components, parallel and
+perpendicular to a given reference direction.
 
 The displacement is specified by two positions within the Frame; the
-starting and ending positions. The reference direction is defined by the 
+starting and ending positions. The reference direction is defined by the
 geodesic curve passing through the starting position and a third specified
 position. The lengths of the two components are returned, together with
 the position on the reference geodesic which is closest to the third
@@ -8260,9 +8260,9 @@ different coordinate systems to be used (frequency, wavelength,
 {\em{etc}}). The default Domain value for a SpecFrame is SPECTRUM.
 
 \item[TIME]\mbox{}\\
-Identifies the domain used to describe moments in time. The AST TimeFrame 
+Identifies the domain used to describe moments in time. The AST TimeFrame
 class describes positions within this domain, allowing a wide range of
-different coordinate systems and timescales to be used. The default Domain 
+different coordinate systems and timescales to be used. The default Domain
 value for a TimeFrame is TIME.
 
 \end{description}
@@ -8278,17 +8278,17 @@ document) and we recommend it.
 
 \subsection{\label{ss:frameunits}The Unit Attribute}
 Each axis of a Frame has a Unit attribute which holds the physical units used
-to describe positions on the axis. The index of the axis to which the 
+to describe positions on the axis. The index of the axis to which the
 attribute refers should normally be placed in parentheses following the
 attribute name (``Unit(2)'' for instance). However, if the Frame has only
 a single axis, then the axis index can be omitted.
 
 In versions of AST prior to version 2.0, the Unit attribute was nothing
 more than a descriptive string intended purely for human readers---no
-part of the AST system used the Unit string for any purpose (other than 
+part of the AST system used the Unit string for any purpose (other than
 inclusion in axis labels produced by the Plot class). In particular, no
 account was taken of the Unit attribute when finding the Mapping between
-two Frames. Thus if the conversion between a pair of 1-dimensional Frames 
+two Frames. Thus if the conversion between a pair of 1-dimensional Frames
 representing velocity was found (using
 c+
 astConvert
@@ -8301,12 +8301,12 @@ attributes of the two Frames were ``km/h'' and ``m/s''. This behaviour is
 referred to below as a \emph{passive} Unit attribute.
 
 As of AST version 2.0, a facility exists which allows the Unit attribute
-to be \emph{active}; that is, differences in the 
+to be \emph{active}; that is, differences in the
 Unit attribute may be taken into account when finding the Mapping between
-two Frames. In order to minimise the risk of breaking older software, the 
-\emph{default} behaviour of simple Frames and SkyFrames is unchanged from 
-previous versions (\emph{i.e.} they have passive Unit attributes). However, 
-the new 
+two Frames. In order to minimise the risk of breaking older software, the
+\emph{default} behaviour of simple Frames and SkyFrames is unchanged from
+previous versions (\emph{i.e.} they have passive Unit attributes). However,
+the new
 c+
 functions astSetActiveUnit and astGetActiveUnit
 c-
@@ -8314,7 +8314,7 @@ f+
 routines AST\_SETACTIVEUNIT and AST\_GETACTIVEUNIT
 f-
 allow this default behaviour to be changed. The SpecFrame and TimeFrame
-classes \emph{always} have an active Unit attribute (attempts to change this 
+classes \emph{always} have an active Unit attribute (attempts to change this
 are ignored).
 
 For instance, consider the above example of two 1-dimensional Frames
@@ -8427,14 +8427,14 @@ units have no such definitions. Derived units may be represented by their
 own \emph{symbol} (\emph{e.g.} ``Jy''---the Jansky) or by a
 \emph{mathematical expression} which combines other symbols and constants
 to form a definition of the unit (\emph{e.g.} ``km/s''---kilometres per
-second). Unit symbols may be prefixed by a string representing a standard 
+second). Unit symbols may be prefixed by a string representing a standard
 multiple or sub-multiple.
 
 In addition to the unit symbols listed in FITS-WCS Paper I, any other
 arbitrary unit symbol may be used, with the proviso that it will not be
 possible to convert between Frames using such units. The exception to
 this is if both Frames refer to the same unknown unit string. For instance,
-an axis with unknown unit symbol "flop" \emph{could} be converted to an axis 
+an axis with unknown unit symbol "flop" \emph{could} be converted to an axis
 with  unit "Mflop" (Mega-flop).
 
 Unit symbols (optionally prefixed with a multiple or sub-multiple) can be
@@ -8444,7 +8444,7 @@ parentheses and numerical constants (these may optionally use
 ``scientific'' notation including an ``E'' character to represent the
 power of 10).
 
-The following tables list the symbols for the basic and derived units which 
+The following tables list the symbols for the basic and derived units which
 may be included in a units string, the standard prefixes for multiples
 and sub-multiples, and the strings which may be used to represent
 mathematical operators and functions.
@@ -8456,7 +8456,7 @@ mathematical operators and functions.
 \multicolumn{3}{|c|}{{\large Basic units}} \\ \hline
 \multicolumn{1}{|c|}{Quantity} & \multicolumn{1}{|c|}{Symbol} &
 \multicolumn{1}{c|}{Full Name} \\ \hline
-length              & m   & metre \\ 
+length              & m   & metre \\
 mass                & g   & gram \\
 time                & s   & second \\
 plane angle         & rad & radian \\
@@ -8533,11 +8533,11 @@ time  & min & minute & 60 s \\
 \begin{center}
 \begin{tabular}{|lll|lll|}
 \hline
-\multicolumn{6}{|c|}{{\large Prefixes for multiples \& 
+\multicolumn{6}{|c|}{{\large Prefixes for multiples \&
 sub-multiples}} \\ \hline
-\multicolumn{1}{|c}{Sub-multiple} & \multicolumn{1}{c}{Name} & 
+\multicolumn{1}{|c}{Sub-multiple} & \multicolumn{1}{c}{Name} &
 \multicolumn{1}{c|}{Prefix} &
-\multicolumn{1}{|c}{Sub-multiple} & \multicolumn{1}{c}{Name} & 
+\multicolumn{1}{|c}{Sub-multiple} & \multicolumn{1}{c}{Name} &
 \multicolumn{1}{c|}{Prefix} \\ \hline
 $10^{-1}$ & deci & d & $10$ & deca & da \\
 $10^{-2}$ & centi & c & $10^{2}$ & hecto & h \\
@@ -8561,7 +8561,7 @@ $10^{-24}$ & yocto & y & $10^{24}$ & yotta & Y \\
 \multicolumn{2}{|c|}{{\large Mathematical operators \& functions}} \\
 \hline
 \multicolumn{1}{|c|}{String} & \multicolumn{1}{|c|}{Meaning} \\ \hline
-sym1 sym2           & multiplication (a space) \\ 
+sym1 sym2           & multiplication (a space) \\
 sym1*sym2           & multiplication (an asterisk) \\
 sym1.sym2           & multiplication (a dot) \\
 sym1/sym2           & division \\
@@ -8577,15 +8577,15 @@ sqrt(sym1)          & square root \\
 \end{table}
 
 \subsubsection{Side-effects of Changing the Unit attribute}
-If an Axis has an active Unit attribute, changing its value (either by 
-setting a new value or by clearing it so that the default value is 
+If an Axis has an active Unit attribute, changing its value (either by
+setting a new value or by clearing it so that the default value is
 re-instated) may cause the Label and Symbol attributes to be changed
 accordingly. For instance, if an Axis has Unit, Label and Symbol of ``Hz'',
 ``Frequency'' and ``nu'', then changing its Unit attribute to ``log(Hz)''
-will cause AST to change its Label and Symbol to ``log(Frequency)'' and 
+will cause AST to change its Label and Symbol to ``log(Frequency)'' and
 ``Log(nu)''. These changes are only made if the Unit attribute is active,
 and a Mapping can be found from the old units to the new units. On the other
- hand, changing the Unit from ``Hz'' to ``MHz'' would not cause any change 
+ hand, changing the Unit from ``Hz'' to ``MHz'' would not cause any change
 to the Label or Symbol attributes.
 
 \cleardoublepage
@@ -8615,7 +8615,7 @@ coordinate systems can be represented by a SkyFrame, as we will see
 shortly.
 
 A SkyFrame can represent any of the commonly used celestial coordinate
-systems. Optionally, the origin of the longitude/latitude system can be 
+systems. Optionally, the origin of the longitude/latitude system can be
 moved to any specified point in the standard celestial system, allowing
 a SkyFrame to represent offsets from a specified sky position.
 
@@ -8671,7 +8671,7 @@ f+
 f-
 
 Such a SkyFrame would represent the default celestial coordinate
-system which, at present, is the ICRS system (the default was "FK5(J2000)" 
+system which, at present, is the ICRS system (the default was "FK5(J2000)"
 in versions of AST prior to 3.0).
 
 \subsection{Specifying a Particular Celestial Coordinate System}
@@ -8716,8 +8716,8 @@ of equatorial coordinate systems, together with ecliptic and galactic
 coordinates.
 
 General spherical coordinates are supported by specifying
-``System$=$unknown''. You should note, though, that no Mapping can be 
-created to convert between ``unknown'' coordinates and any of the other 
+``System$=$unknown''. You should note, though, that no Mapping can be
+created to convert between ``unknown'' coordinates and any of the other
 celestial coordinate systems (see \secref{ss:introducingconversion} ).
 
 \subsection{Attributes which Qualify Celestial Coordinate Systems}
@@ -8740,8 +8740,8 @@ values whenever possible rather than relying on defaults. Attribute
 should only be left at their default value if you ``don't care'' what
 value is used. In certain circumstances (particularly, when aligning two
 Frames), a default value for an attribute may be replaced by the value
-from another similar Frame. Such value replacement can be prevented by 
-assigning an explicit value to the attribute, rather than simply relying on 
+from another similar Frame. Such value replacement can be prevented by
+assigning an explicit value to the attribute, rather than simply relying on
 the default.
 
 
@@ -8753,7 +8753,7 @@ The main SkyFrame attributes which qualify the System attribute are:
 \item[\label{ss:epochitem}Epoch]\mbox{}\\
 This attribute is inherited from the Frame class. It gives the moment in
 time when the coordinates are correct for the astronomical source
-under study (usually the date of observation). 
+under study (usually the date of observation).
 
 \item[\label{ss:equinoxitem}Equinox]\mbox{}\\
 This value is used to qualify celestial coordinate systems that are
@@ -8858,7 +8858,7 @@ The output from this might look like the following:
 \begin{quote}
 \begin{verbatim}
  Begin SkyFrame         # Description of celestial coordinate system
-#   Title = "FK4 equatorial coordinates; no E-terms; mean equinox B1950.0; 
+#   Title = "FK4 equatorial coordinates; no E-terms; mean equinox B1950.0;
 epoch B1958.0"   # Title of coordinate system
     Naxes = 2   # Number of coordinate axes
 #   Domain = "SKY"      # Coordinate system domain
@@ -8992,8 +8992,8 @@ between angle and time may be made by including ``t'' to request time.
 
 \item The number of decimal places (for the final field) is indicated
 using ``{\tt{.}}'' followed by an integer. An asterisk can be used in
-place of an integer, in which case the number of decimal places is 
-chosen so that the total number of digits in the formatted value is equal 
+place of an integer, in which case the number of decimal places is
+chosen so that the total number of digits in the formatted value is equal
 to the value of the Digits attribute.
 
 \item ``b'' causes fields to be separated by blanks, while ``l''
@@ -9268,7 +9268,7 @@ system is referred to as an ``offset'' coordinate syetem. First, the System
 attribute should be set to represent the celestial coordinate system in
 which the origin is to be specified. Then the SkyRef attribute should be
 set to hold the coordinates of the origin within the selected celestial
-coordinate system. 
+coordinate system.
 
 By default, ``north'' in the new offset coordinate system is parallel to
 north in the original celestial coordinate system. However, the direction
@@ -9286,14 +9286,14 @@ sort of offset coordinate system you want. Setting SkyRefIs to
 approximately Cartesian close to the specified position. Setting SkyRefIs
 to
 ``Pole'' produces an offset coordinate system which is approximately Polar
-close to the specified position. 
+close to the specified position.
 
 \cleardoublepage
 \section{\xlabel{ss_specframes}\label{ss:specframes}Spectral Coordinate Systems (SpecFrames)}
 
-The SpecFrame is a Frame which is specialised for representing coordinate 
+The SpecFrame is a Frame which is specialised for representing coordinate
 systems which describe a position within an electro-magnetic spectrum.
-In this section we examine the additional properties and behaviour of a 
+In this section we examine the additional properties and behaviour of a
 SpecFrame that distinguish it from a basic Frame (\secref{ss:frames}).
 
 \subsection{The SpecFrame Model}
@@ -9345,9 +9345,9 @@ f+
 \normalsize
 f-
 
-Such a SpecFrame would represent the default coordinate system which is 
-heliocentric wavelength in metres (i.e. wavelength corrected to take into 
-account the Doppler shift caused by the velocity of the observer around the 
+Such a SpecFrame would represent the default coordinate system which is
+heliocentric wavelength in metres (i.e. wavelength corrected to take into
+account the Doppler shift caused by the velocity of the observer around the
 sun).
 
 \subsection{Specifying a Particular Spectral Coordinate System}
@@ -9390,7 +9390,7 @@ Many spectral coordinate systems have some additional free parameters
 which serve to identify a particular coordinate system from amongst a
 broader class of related coordinate systems. For example, the
 velocity systems are all parameterised by a rest frequency---the
-frequency which defines zero velocity, and all coordinate systems 
+frequency which defines zero velocity, and all coordinate systems
 are qualified by a `standard of rest'' which indicates the rest frame to
 which the values refer.
 
@@ -9404,8 +9404,8 @@ values whenever possible rather than relying on defaults. Attribute
 should only be left at their default value if you ``don't care'' what
 value is used. In certain circumstances (particularly, when aligning two
 Frames), a default value for an attribute may be replaced by the value
-from another similar Frame. Such value replacement can be prevented by 
-assigning an explicit value to the attribute, rather than simply relying on 
+from another similar Frame. Such value replacement can be prevented by
+assigning an explicit value to the attribute, rather than simply relying on
 the default.
 
 
@@ -9417,7 +9417,7 @@ The main SpecFrame attributes which qualify the System attribute are:
 \item[Epoch]\mbox{}\\
 This attribute is inherited from the Frame class. It gives the moment in
 time when the coordinates are correct for the astronomical source
-under study (usually the date of observation). It is needed in order to 
+under study (usually the date of observation). It is needed in order to
 calculate the Doppler shift produced by the velocity of the observer
 relative to the centre of the earth, and of the earth relative to the sun.
 
@@ -9425,7 +9425,7 @@ relative to the centre of the earth, and of the earth relative to the sun.
 This specifies the rest frame in which the coordinates are correct.
 Transforming between different standards of rest involves taking account
 of the Doppler shift introduced by the relative motion of the two
-standards of rest. 
+standards of rest.
 
 \item[RestFreq]\mbox{}\\
 Specifies the frequency which correspond to zero velocity. When setting a
@@ -9491,7 +9491,7 @@ c-
 f+
 \small
 \begin{verbatim}
-      CALL AST_SHOW( AST_SPECFRAME( 'System=Vopt, RestFreq=250 GHz', STATUS ), 
+      CALL AST_SHOW( AST_SPECFRAME( 'System=Vopt, RestFreq=250 GHz', STATUS ),
      :               STATUS )
 \end{verbatim}
 \normalsize
@@ -9527,7 +9527,7 @@ for the particular velocity system that the SpecFrame represents.
 
 These choices would be appropriate for a System value of ``Vopt'',
 but if a different System value were set, the defaults would be
-correspondingly different. For example, by default frequency is measured in 
+correspondingly different. For example, by default frequency is measured in
 units of GHz, not $km/s$, so setting ``System=freq''
 would change the appropriate line above from:
 
@@ -9567,11 +9567,11 @@ f+
 \normalsize
 f-
 
-No error will be reported if you accidentally set an inappropriate Unit value 
+No error will be reported if you accidentally set an inappropriate Unit value
 (say "J" - Joules)---after all, AST cannot tell what you are about to do,
 and you \emph{may} be about to change the System value to ``Energy''.
 However, an error \emph{will} be reported if you attempt to find a
-conversion between two SpecFrames (for instance using 
+conversion between two SpecFrames (for instance using
 c+
 astConvert
 c-
@@ -9599,7 +9599,7 @@ values for as many attributes as possible.
 \subsection{\label{ss:creatingspectralcubes}Creating Spectral Cubes}
 You can use a SpecFrame to describe the spectral axis in a data cube
 containing two spatial axes and a spectral axis. To do this you would
-create an appropriate SpecFrame, together with a 2-dimensional Frame 
+create an appropriate SpecFrame, together with a 2-dimensional Frame
 (often a SkyFrame) to describe the spatial axes. You would then combine
 these two Frames together into a single CmpFrame.
 
@@ -9635,7 +9635,7 @@ f-
 
 In the resulting CmpFrame, axis 1 will be RA, axis 2 will be Dec and axis
 3 will be Frequency. If this is not the order you want, you can permute
-the axes using 
+the axes using
 c+
 astPermAxes.
 c-
@@ -9659,7 +9659,7 @@ Unfortunately, the SpecFrame class cannot do this (since it is purely a
 1-dimensional Frame), and so some small degree of error will be
 introduced when converting between standards of rest, the size of the
 error varying from pixel to pixel. It is hoped that at some point in the
-future a sub-class of CmpFrame (a SpecCubeFrame) will be added to AST which 
+future a sub-class of CmpFrame (a SpecCubeFrame) will be added to AST which
 allows for this spatial variation in Doppler shift.
 
 The maximum velocity error introduced by this problem is of the order of
@@ -9677,7 +9677,7 @@ view.
 Dual sideband super-heterodyne receivers produce spectra in which each channel
 contains contributions from two different frequencies, referred to as the
 ``upper sideband frequency'' and the ``lower sideband frequency''. In the
-rest frame of the observer (topocentric), these are related to each other as 
+rest frame of the observer (topocentric), these are related to each other as
 follows:
 
 \begin{quote}
@@ -9702,7 +9702,7 @@ SpecFrame, called DSBSpecFrame, which overcomes this difficulty.
 A DSBSpecFrame has a SideBand attribute which indicates if the
 DSBSpecFrame is currently being used to describe the upper or lower
 sideband spectral axis. The value of this attribute can be changed at any
-time. If you use the 
+time. If you use the
 c+
 astConvert
 c-
@@ -9718,11 +9718,11 @@ c-
 f+
 AST\_CONVERT
 f-
-to find a Mapping from the original to the modified copy, the resulting 
+to find a Mapping from the original to the modified copy, the resulting
 Mapping will be of the form of equation \ref{eqn:dsb} (if the
 DSBSpecFrame has its StdOfRest attribute set to ``Topocentric'').
 
-In general, when finding a Mapping between two arbitrary DSBSpecFrames, 
+In general, when finding a Mapping between two arbitrary DSBSpecFrames,
 the total Mapping is made of of three parts in series:
 
 \begin{enumerate}
@@ -9730,11 +9730,11 @@ the total Mapping is made of of three parts in series:
 sideband representation. If the DSBSpecFrame already represents its upper
 sideband, this Mapping will be a UnitMap.
 \item A Mapping which converts from the first to the second DSBSpecFrame,
-treating them as if they were both basic SpecFrames. This takes account of 
+treating them as if they were both basic SpecFrames. This takes account of
 any difference in units, standard of rest, system, \emph{etc} between the
-two DSBSpecFrames. 
+two DSBSpecFrames.
 \item A Mapping which converts the second DSBSpecFrame from its upper
-sideband representation to its current sideband. If the DSBSpecFrame 
+sideband representation to its current sideband. If the DSBSpecFrame
 currently represents its upper sideband, this Mapping will be a UnitMap.
 \end{enumerate}
 
@@ -9763,9 +9763,9 @@ oscillator. So:
 \end{small}
 \end{quote}
 
-The DSBSpecFrame class uses the DSBCentre attribute to specify the central 
-spectral position ($f_{central}$), and the IF attribute to specify the 
-intermediate frequency ($f_{if}$). The DSBCentre value is given and returned 
+The DSBSpecFrame class uses the DSBCentre attribute to specify the central
+spectral position ($f_{central}$), and the IF attribute to specify the
+intermediate frequency ($f_{if}$). The DSBCentre value is given and returned
 in the spectral system described by the DSBSpecFrame (thus you do not need to
 calculate the corresponding topocentric frequency yourself - this will be
 done automatically by the DSBSpecFrame when you assign a new value to the
@@ -9781,7 +9781,7 @@ value for IF indicates that the DSBCentre value is in the lower sideband
 \section{\xlabel{ss_timeframes}\label{ss:timeframes}Time Systems (TimeFrames)}
 
 The TimeFrame is a Frame which is specialised for representing moments in
-time. In this section we examine the additional properties and behaviour of a 
+time. In this section we examine the additional properties and behaviour of a
 TimeFrame that distinguish it from a basic Frame (\secref{ss:frames}).
 
 \subsection{The TimeFrame Model}
@@ -9797,11 +9797,11 @@ When used as a Frame, however, a TimeFrame represents a wide range of
 different 1-dimensional coordinate system which can be used to describe
 moments in time. Absolute times and relative (i.e. elapsed) times are
 supported (attribute TimeOrigin), as are a range of different time scales
-(attribute TimeScale). An absolute or relative value in any time scale can 
-be represented in different forms such as Modified Julian Date, Julian Epoch, 
+(attribute TimeScale). An absolute or relative value in any time scale can
+be represented in different forms such as Modified Julian Date, Julian Epoch,
 \emph{etc} (attribute System). AST extends the definition of these systems to
-allow them to be used with any unit of time (attribute Unit). The TimeFrame 
-class also allows times to formatted as either a simple floating point value 
+allow them to be used with any unit of time (attribute Unit). The TimeFrame
+class also allows times to formatted as either a simple floating point value
 or as a Gregorian date and time of day (attribute Format).
 
 \subsection{Creating a TimeFrame}
@@ -9838,19 +9838,19 @@ f+
 \normalsize
 f-
 
-Such a TimeFrame would represent the default coordinate system which is 
-Modified Julian Date (with the usual units of days) in the International 
+Such a TimeFrame would represent the default coordinate system which is
+Modified Julian Date (with the usual units of days) in the International
 Atomic Time (TAI) time scale.
 
 \subsection{Specifying a Particular Time System}
-By setting the System attribute appropriately, the TimeFrame can represent 
+By setting the System attribute appropriately, the TimeFrame can represent
 Julian Date, Modified Julian Date, Julian Epoch or Besselian Epoch (the
 time scale is specified by a separate attribute called TimeScale).
 
 Selection of a particular coordinate system is performed simply by
 setting a value for the TimeFrame's (character string) System
 attribute. This setting is most conveniently done when the TimeFrame is
-created. For example, a TimeFrame representing Julian Epoch would be created 
+created. For example, a TimeFrame representing Julian Epoch would be created
 by:
 
 c+
@@ -9880,23 +9880,23 @@ description in \appref{ss:attributedescriptions}.
 
 \subsection{Attributes which Qualify Time Coordinate Systems}
 
-Time coordinate systems require some additional free parameters to identify 
-a particular coordinate system from amongst a broader class of related 
-coordinate systems. For example, all TimeFrames are qualified by the time 
+Time coordinate systems require some additional free parameters to identify
+a particular coordinate system from amongst a broader class of related
+coordinate systems. For example, all TimeFrames are qualified by the time
 scale (that is, the physical process used to define the flow of time),
 and some require the position of the observer's clock.
 
 In AST, these free parameters are represented by additional TimeFrame
-attributes, each of which has a default appropriate to ({\em{i.e.}}\ defined 
-by) the setting of the main System attribute. Each of these {\em{qualifying 
-attributes}} may, however, be assigned an explicit value so as to select a 
+attributes, each of which has a default appropriate to ({\em{i.e.}}\ defined
+by) the setting of the main System attribute. Each of these {\em{qualifying
+attributes}} may, however, be assigned an explicit value so as to select a
 particular coordinate system. Note, it is usually best to assign explicit
 values whenever possible rather than relying on defaults. Attribute
 should only be left at their default value if you ``don't care'' what
 value is used. In certain circumstances (particularly, when aligning two
 Frames), a default value for an attribute may be replaced by the value
-from another similar Frame. Such value replacement can be prevented by 
-assigning an explicit value to the attribute, rather than simply relying on 
+from another similar Frame. Such value replacement can be prevented by
+assigning an explicit value to the attribute, rather than simply relying on
 the default.
 
 The main TimeFrame attributes which qualify the System attribute are:
@@ -9928,8 +9928,8 @@ the System settings for which they are relevant, see the description
 of the System attribute (also in \appref{ss:attributedescriptions}).
 
 Note that it does no harm to assign values to qualifying attributes
-which are not relevant to the main System or TimeScale value. Any such 
-values are stored, but are not used unless the System and/or TimeScale 
+which are not relevant to the main System or TimeScale value. Any such
+values are stored, but are not used unless the System and/or TimeScale
 value is later set so that they become relevant.
 
 \cleardoublepage
@@ -9953,7 +9953,7 @@ A very common use for a CmpFrame within astronomy is to represent a
 represents position within a spectrum, and the other two axes represent
 position on the sky (or some other spatial domain such as the focal plane
 of a telescope). As an example, we create such a CmpFrame in which axes
-1 and 2 represent Right Ascension and Declination (ICRS), and axis 3 
+1 and 2 represent Right Ascension and Declination (ICRS), and axis 3
 represents wavelength (these are the default coordinate Systems
 represented by a SkyFrame and a SpecFrame respectively):
 
@@ -9987,7 +9987,7 @@ f+
 f-
 
 If it was desired to make RA and Dec correspond to axes 1 and 3, with
-axis 2 being the spectral axis, then the axes of the CmpFrame created 
+axis 2 being the spectral axis, then the axes of the CmpFrame created
 above would need to be permuted as follows:
 
 c+
@@ -10000,7 +10000,7 @@ int perm[ 3 ];
 perm[ 0 ] = 0;
 perm[ 1 ] = 2;
 perm[ 2 ] = 1;
-astPermAxes( cmpframe, perm ); 
+astPermAxes( cmpframe, perm );
 \end{verbatim}
 \normalsize
 \end{quote}
@@ -10014,7 +10014,7 @@ f+
       PERM( 1 ) = 1
       PERM( 2 ) = 3
       PERM( 3 ) = 2
-      CALL AST_PERMAXES( CMPFRAME, PERM, STATUS ) 
+      CALL AST_PERMAXES( CMPFRAME, PERM, STATUS )
 \end{verbatim}
 \normalsize
 f-
@@ -10024,10 +10024,10 @@ f-
 A CmpFrame \emph{is a} Frame and so has all the attributes of a Frame.
 The default value for the Domain attribute for a CmpFrame is formed by
 concatenating the Domains of the two component Frames, separated by a
-minus sign (``-'').\footnote{If both component Frames have blank Domains, 
-then the default Domain for the CmpFrame is the string ``CMP''.} The (fixed) 
-value for its System attribute is ``Compound''.\footnote{Any attempt to 
-change the System value of a CmpFrame is ignored.} A CmpFrame has no 
+minus sign (``-'').\footnote{If both component Frames have blank Domains,
+then the default Domain for the CmpFrame is the string ``CMP''.} The (fixed)
+value for its System attribute is ``Compound''.\footnote{Any attempt to
+change the System value of a CmpFrame is ignored.} A CmpFrame has no
 further attributes over and above those common to all Frames. However,
 attributes of the two component Frames can be accessed as if they were
 attributes of the CmpFrame, as described below.
@@ -10044,7 +10044,7 @@ which do not normally have such an index (System, Domain, Epoch, Title,
 \emph{etc}). If this is done, the access request is forwarded to the
 component Frame containing the indicated axis. For instance, if a
 CmpFrame contains a SpecFrame and a SkyFrame in that order, and the axes
-have not been permuted, then getting the value of attribute ``System'' will 
+have not been permuted, then getting the value of attribute ``System'' will
 return  ``Compound'' as mentioned above (that is, the System value of the
 CmpFrame as a whole), whereas getting the value of attribute
 ``System(1)'' will return ``Spectral''(that is, the System value of the
@@ -10081,8 +10081,8 @@ which recognises the attribute have the attribute value cleared.
 In this section, we start to look at techniques for converting between
 different coordinate systems.  At this stage, the tools we have available
 are Frames (\secref{ss:frames}), SkyFrames (\secref{ss:skyframes}),
-SpecFrames (\secref{ss:specframes}), TimeFrames (\secref{ss:timeframes}) and 
-various Mappings (\secref{ss:mappings}). These are sufficient to allow us to 
+SpecFrames (\secref{ss:specframes}), TimeFrames (\secref{ss:timeframes}) and
+various Mappings (\secref{ss:mappings}). These are sufficient to allow us to
 begin examining the problem, but more sophisticated approaches will also emerge
 later (\secref{ss:framesetconverting}).
 
@@ -10471,7 +10471,7 @@ f+
       SPECFRAME1 = AST_SPECFRAME( ' ', STATUS )
       CALL AST_SETC( SPECFRAME1, 'System=vradio', STATUS )
       CALL AST_SETC( SPECFRAME1, 'Unit=km/s', STATUS )
-      CALL AST_SETC( SPECFRAME1, 'Epoch=1996-Oct-2 12:13:56.985', 
+      CALL AST_SETC( SPECFRAME1, 'Epoch=1996-Oct-2 12:13:56.985',
      :               STATUS )
       CALL AST_SETC( SPECFRAME1, 'ObsLon=W155:28:18', STATUS )
       CALL AST_SETC( SPECFRAME1, 'ObsLat=N19:49:34', STATUS )
@@ -10479,7 +10479,7 @@ f+
       CALL AST_SETC( SPECFRAME1, 'RefDec=-4:40:49', STATUS )
       CALL AST_SETC( SPECFRAME1, 'RestFreq=230.538 GHz', STATUS )
       CALL AST_SETC( SPECFRAME1, 'StdOfRest=LSRK', STATUS )
-      
+
       SPECFRAME2 = AST_COPY( SPECFRAME1, STATUS )
       CALL AST_SETC( SPECFRAME1, 'System=freq', STATUS )
       CALL AST_SETC( SPECFRAME1, 'Unit=GHz', STATUS )
@@ -10537,7 +10537,7 @@ f-
 
 A before, this will give us a FrameSet (assuming conversion is possible,
 which should always be the case for our example), and we can use the
-FrameSet to convert between the two spectral coordinate systems. We use 
+FrameSet to convert between the two spectral coordinate systems. We use
 c+
 astTran1 in place of astTran2
 c-
@@ -10595,7 +10595,7 @@ f-
 
 \subsection{Converting between Time Coordinate Systems}
 All the principles outlined in the previous section about aligning
-spectral cocordinate systems (SpecFrames) can be applied directly to the 
+spectral cocordinate systems (SpecFrames) can be applied directly to the
 problem of aligning time coordinate systems (TimeFrames).
 
 \subsection{\label{ss:convertingpermutedaxes}Handling SkyFrame Axis Permutations}
@@ -12947,7 +12947,7 @@ external representations based on a textual format referred to as the AST
 ``native format''. These are implemented using a new kind of Object---a
 Channel. We will examine later how to use other representations, based on
 an XML format or on the use of FITS headers, for storing Objects. These
-are implemented using more specialised forms of Channel called XmlChan 
+are implemented using more specialised forms of Channel called XmlChan
 (\secref{ss:xmlchan}) and FitsChan (\secref{ss:nativefits}).
 
 \subsection{The Channel Model}
@@ -13345,7 +13345,7 @@ transferred to the new Object when a copy is made. Consequently, it is
 safest to set the value of the ID attribute immediately before you
 perform the write.
 
-\subsection{\label{ss:textualoutputformat}The Textual Output Format} 
+\subsection{\label{ss:textualoutputformat}The Textual Output Format}
 
 Let us now examine the format of the textual output produced by
 writing an Object to a basic Channel
@@ -13821,7 +13821,7 @@ display those found:
       INCLUDE 'AST_PAR'
       INTEGER CHANNEL, OBJECT, STATUS
 
-      STATUS = 0      
+      STATUS = 0
       CHANNEL = AST_CHANNEL( AST_NULL, AST_NULL, 'Skip=1', STATUS )
  1    OBJECT = AST_READ( CHANNEL, STATUS )
       IF ( OBJECT .NE. AST__NULL ) THEN
@@ -13903,7 +13903,7 @@ length. It sets this length to be negative if there is no more input:
       CALL AST_PUTLINE( BUFFER, LEN( BUFFER ), STATUS )
       RETURN
 
- 99   CALL AST_PUTLINE( BUFFER, -1, STATUS )      
+ 99   CALL AST_PUTLINE( BUFFER, -1, STATUS )
       END
 \end{verbatim}
 \normalsize
@@ -14297,7 +14297,7 @@ it will be called when the FitsChan is deleted in order to write out
 any FITS cards that remain in it (\secref{ss:fitssourceandsink}).
 f-
 \end{enumerate}
- 
+
 Note, in particular, that reading an AST Object from a FitsChan is
 {\em{destructive.}} That is, it deletes the FITS cards that describe the
 Object. The reason for this is explained in
@@ -14502,7 +14502,7 @@ FitsChan is regarded as being positioned at its {\em{end-of-file.}} In
 this case there is no current card and an attempt to obtain a value
 for the Card attribute will always return the value Ncard~$+$~1. When
 a FitsChan is empty, it is always at the end-of-file.
- 
+
 \subsection{\label{ss:writingnativefits}Writing Native Objects to a FitsChan}
 
 c+
@@ -14583,21 +14583,21 @@ Each ``continuation'' card will have the keyword {\tt CONTINUE} in
 columns 1 to 8, and will contain a space in column 9 (instead of the
 usual equals sign). An ampersand (``{\tt \&}'') is appended to the end of
 each of the strings (except the last one) to indicate that the string is
-continued on the next card. 
+continued on the next card.
 
 c+
 Note, this splitting of long strings over several cards only occurs when
 writing AST Objects to a FitsChan using the astWrite function and the
 {\em native} encoding. If a long string is stored in a FitsChan using
 (for instance) the astPutFits or astPutCards function, it will simply be truncated.
-c- 
+c-
 
 f+
 Note, this splitting of long strings over several cards only occurs when
 writing AST Objects to a FitsChan using the AST\_WRITE routine and the
 {\em native} encoding. If a long string is stored in a FitsChan using
 (for instance) the AST\_PUTFITS or AST\_PUTCARDS routine, it will simply be truncated.
-f- 
+f-
 
 \subsection{\label{ss:extractingfitscards}Extracting Individual Cards from a FitsChan}
 
@@ -14696,18 +14696,18 @@ like the following:
 COMMENT AST ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ AST
 COMMENT AST            Beginning of AST data for SkyFrame object             AST
 COMMENT AST ................................................................ AST
-BEGAST_A= 'SkyFrame'           / Description of celestial coordinate system     
-NAXES_A =                    2 / Number of coordinate axes                      
-AX1_A   = '        '           / Axis number 1                                  
-BEGAST_B= 'SkyAxis '           / Celestial coordinate axis                      
-ENDAST_A= 'SkyAxis '           / End of object definition                       
-AX2_A   = '        '           / Axis number 2                                  
-BEGAST_C= 'SkyAxis '           / Celestial coordinate axis                      
-ENDAST_B= 'SkyAxis '           / End of object definition                       
-ISA_A   = 'Frame   '           / Coordinate system description                  
-SYSTEM_A= 'FK4-NO-E'           / Celestial coordinate system type               
-EPOCH_A =               1958.0 / Besselian epoch of observation                 
-ENDAST_C= 'SkyFrame'           / End of object definition                       
+BEGAST_A= 'SkyFrame'           / Description of celestial coordinate system
+NAXES_A =                    2 / Number of coordinate axes
+AX1_A   = '        '           / Axis number 1
+BEGAST_B= 'SkyAxis '           / Celestial coordinate axis
+ENDAST_A= 'SkyAxis '           / End of object definition
+AX2_A   = '        '           / Axis number 2
+BEGAST_C= 'SkyAxis '           / Celestial coordinate axis
+ENDAST_B= 'SkyAxis '           / End of object definition
+ISA_A   = 'Frame   '           / Coordinate system description
+SYSTEM_A= 'FK4-NO-E'           / Celestial coordinate system type
+EPOCH_A =               1958.0 / Besselian epoch of observation
+ENDAST_C= 'SkyFrame'           / End of object definition
 COMMENT AST ................................................................ AST
 COMMENT AST               End of AST data for SkyFrame object                AST
 COMMENT AST ---------------------------------------------------------------- AST
@@ -14888,7 +14888,7 @@ f-
 
 \subsection{\label{ss:addingmulticards}Adding Concatenated Cards to a FitsChan}
 
-If you have all your cards concatenated together into a single long string, 
+If you have all your cards concatenated together into a single long string,
 each occupying 80 characters (with no delimiters), you can insert them
 into a FitsChan in a single call using
 c+
@@ -14897,9 +14897,9 @@ c-
 f+
 AST\_PUTCARDS.
 f-
-This call first empties the supplied FitsChan of any existing cards, then 
+This call first empties the supplied FitsChan of any existing cards, then
 inserts the new cards, and finally rewinds the FitsChan so that a
-subsequent call to 
+subsequent call to
 c+
 astRead
 c-
@@ -15253,7 +15253,7 @@ f-
 c+
 The use of source and sink functions with a FitsChan is optional. This
 is because you can always arrange to explicitly fill a FitsChan with
-FITS cards (\secref{ss:addingfitscards} and \secref{ss:addingmulticards}) 
+FITS cards (\secref{ss:addingfitscards} and \secref{ss:addingmulticards})
 and you can also extract any
 cards that remain and write them out yourself
 (\secref{ss:extractingfitscards}) before you delete the FitsChan.
@@ -15261,7 +15261,7 @@ c-
 f+
 The use of source and sink routines with a FitsChan is optional. This
 is because you can always arrange to explicitly fill a FitsChan with
-FITS cards (\secref{ss:addingfitscards} and \secref{ss:addingmulticards}) 
+FITS cards (\secref{ss:addingfitscards} and \secref{ss:addingmulticards})
 and you can also extract any
 cards that remain and write them out yourself
 (\secref{ss:extractingfitscards}) before you delete the FitsChan.
@@ -15405,9 +15405,9 @@ information using this encoding and then to write it back out again,
 so long as only minor changes have been made.
 
 \item[FITS-WCS]\mbox{}\\
-This encoding is very important because it is based on a new FITS standard 
-which should, for the first time, address the problem of celestial coordinate 
-systems in a proper manner, by considerably extending the original FITS 
+This encoding is very important because it is based on a new FITS standard
+which should, for the first time, address the problem of celestial coordinate
+systems in a proper manner, by considerably extending the original FITS
 standard.
 
 The conventions used are described in a series of papers by
@@ -15415,8 +15415,8 @@ E.W.\,Greisen, M.\,Calabretta, \emph{et. al.}, often referred to as the
 ``FITS-WCS papers''. They are described at
 \htmladdnormallink{http://fits.gsfc.nasa.gov/fits\_wcs.html}
 {http://fits.gsfc.nasa.gov/fits_wcs.html}. Now that the first two papers
-in this series have been agreed, this encoding should be understood by any 
-FITS-WCS compliant software and it is likely to be adopted widely for FITS 
+in this series have been agreed, this encoding should be understood by any
+FITS-WCS compliant software and it is likely to be adopted widely for FITS
 data in future.  For details of the coverage of these conventions provided
 by the FitsChan class, see \appref{ss:fitswcscoverage}.
 
@@ -15459,7 +15459,7 @@ features of FITS-PC and FITS-IRAF.
 \end{quote}
 
 For more detail about the above encodings, see the description of the
-Encoding attribute in \appref{ss:attributedescriptions}. 
+Encoding attribute in \appref{ss:attributedescriptions}.
 
 \subsection{\label{ss:foreignfitslimitations}Limitations of Foreign Encodings}
 
@@ -15888,22 +15888,22 @@ The output, if we started with the example FITS header in
 \begin{quote}
 \small
 \begin{verbatim}
-SIMPLE  =                    T /  Written by IDL:  30-Jul-1997 05:35:42.00      
-BITPIX  =                  -32 /  Bits per pixel.                               
-NAXIS   =                    2 /  Number of dimensions                          
-NAXIS1  =                  300 /  Length of x axis.                             
-NAXIS2  =                  300 /  Length of y axis.                             
-SURVEY  = 'COBE DIRBE'                                                          
-BUNITS  = 'MJy/sr  '                                                            
-ORIGIN  = 'CDAC    '           /  Cosmology Data Analysis Center                
-TELESCOP= 'COBE    '           /  COsmic Background Explorer satellite          
-INSTRUME= 'DIRBE   '           /  COBE instrument [DIRBE, DMR, FIRAS]           
-PIXRESOL=                    9 /  Quad tree pixel resolution [6, 9]             
-DATE    = '27/09/94'           /  FITS file creation date (dd/mm/yy)            
-DATE-MAP= '16/09/94'           /  Date of original file creation (dd/mm/yy)     
-COMMENT     COBE specific keywords                                              
-DATE-BEG= '08/12/89'           /  date of initial data represented (dd/mm/yy)   
-DATE-END= '25/09/90'           /  date of final data represented   (dd/mm/yy)   
+SIMPLE  =                    T /  Written by IDL:  30-Jul-1997 05:35:42.00
+BITPIX  =                  -32 /  Bits per pixel.
+NAXIS   =                    2 /  Number of dimensions
+NAXIS1  =                  300 /  Length of x axis.
+NAXIS2  =                  300 /  Length of y axis.
+SURVEY  = 'COBE DIRBE'
+BUNITS  = 'MJy/sr  '
+ORIGIN  = 'CDAC    '           /  Cosmology Data Analysis Center
+TELESCOP= 'COBE    '           /  COsmic Background Explorer satellite
+INSTRUME= 'DIRBE   '           /  COBE instrument [DIRBE, DMR, FIRAS]
+PIXRESOL=                    9 /  Quad tree pixel resolution [6, 9]
+DATE    = '27/09/94'           /  FITS file creation date (dd/mm/yy)
+DATE-MAP= '16/09/94'           /  Date of original file creation (dd/mm/yy)
+COMMENT     COBE specific keywords
+DATE-BEG= '08/12/89'           /  date of initial data represented (dd/mm/yy)
+DATE-END= '25/09/90'           /  date of final data represented   (dd/mm/yy)
 \end{verbatim}
 \normalsize
 \end{quote}
@@ -16141,7 +16141,7 @@ That is:
 \begin{enumerate}
 \item Start by trying the FITS-WCS encoding, on the grounds that FITS
 should provide a universal interchange standard in which all WCS
-information should be expressed if possible. 
+information should be expressed if possible.
 
 \item If that fails, then try the original encoding used for the input
 WCS information, on the grounds that you are at least not making the
@@ -16198,15 +16198,15 @@ is fast becoming the standard format for passing structured data around
 the internet, and much general purpose software has been written for
 tasks such as the parsing, editing, display and transformation of XML
 data. The XmlChan class (a specialised form of Channel) provides
-facilities for storing AST objects externally in the form of XML documents, 
+facilities for storing AST objects externally in the form of XML documents,
 thus allowing such software to be used.
 
 The primary XML format used by the XmlChan class is a fairly close
 transliteration of the AST native format produced by the basic Channel
-class. Currently, there is no DTD or schema defining the structure of data 
-produced in this format by an XmlChan. The following is a native AST 
-representation of a simple 1-D Frame (including comments and with the Full 
-attribute set to zero so that some default attribute values are included 
+class. Currently, there is no DTD or schema defining the structure of data
+produced in this format by an XmlChan. The following is a native AST
+representation of a simple 1-D Frame (including comments and with the Full
+attribute set to zero so that some default attribute values are included
 as extra comments):
 
 \begin{quote}
@@ -16232,16 +16232,16 @@ The corresponding XmlChan output would look like:
 \begin{quote}
 \small
 \begin{verbatim}
- <Frame xmlns="http://www.starlink.ac.uk/ast/xml/" 
+ <Frame xmlns="http://www.starlink.ac.uk/ast/xml/"
         desc="Coordinate system description">
     <_attribute name="Title" quoted="true" value="1-d coordinate system"
                 desc="Title of coordinate system" default="true"/>
     <_attribute name="Naxes" value="1" desc="Number of coordinate axes"/>
     <_attribute name="Domain" quoted="true" value="SCREEN"
                 desc="Coordinate system domain"/>
-    <_attribute name="Lbl1" quoted="true" value="Axis 1" 
+    <_attribute name="Lbl1" quoted="true" value="Axis 1"
                 desc="Label for axis 1" default="true"/>
-    <_attribute name="Uni1" quoted="true" value="cm" 
+    <_attribute name="Uni1" quoted="true" value="cm"
                 desc="Units for axis 1" default="true"/>
     <Axis label="Ax1" desc="Coordinate axis">
        <!--Axis number 1-->
@@ -16256,7 +16256,7 @@ The corresponding XmlChan output would look like:
 Notes:
 
 \begin{enumerate}
-\item The AST class name is used as the name for an XML element which contain 
+\item The AST class name is used as the name for an XML element which contain
 a description of an AST object.
 
 \item AST attributes are described by XML elements with the name
@@ -16264,12 +16264,12 @@ a description of an AST object.
 to refer to a ``name=value'' pair within an element start tag. So for
 instance, the ``Title'' attribute of the AST Frame object is described
 within an XML element with name ``\_attribute'' in which the XML attribute
-``name'' has the value ``Title'', and the XML attribute ``value'' has the 
-value ``1-d coordinate system''. The moral is always to be clear clear 
-about the context (AST or XML) in which the word \emph{attribute} is being 
+``name'' has the value ``Title'', and the XML attribute ``value'' has the
+value ``1-d coordinate system''. The moral is always to be clear clear
+about the context (AST or XML) in which the word \emph{attribute} is being
 used!
 
-\item The XML includes comments both as XML attributes with the name ``desc'', 
+\item The XML includes comments both as XML attributes with the name ``desc'',
 and as separate comment tags.
 
 \item Elements which describe default values are identified by the fact
@@ -16311,13 +16311,13 @@ the start of an AST object is found. this allows an AST object to be
 located within a larger XML document.
 
 \subsection{Reading IVOA Space-Time-Coordinates XML (STC-X) Descriptions}
-The XmlChan class also provides support for reading (but not writing) XML 
-documents which use a restricted subset of an early draft (V1.20) of the 
-IVOA Space-Time-Coordinates XML (STC-X) system. The version of STC-X 
-finally adopted by the IVOA differs in several significant respects from 
-V1.20, and so the STC-X support currently provided by AST is mainly of 
-historical interest. Note, AST also supports the alternative ``STC-S'' 
-linear string description of the STC model (see \secref{ss:stcschans}). 
+The XmlChan class also provides support for reading (but not writing) XML
+documents which use a restricted subset of an early draft (V1.20) of the
+IVOA Space-Time-Coordinates XML (STC-X) system. The version of STC-X
+finally adopted by the IVOA differs in several significant respects from
+V1.20, and so the STC-X support currently provided by AST is mainly of
+historical interest. Note, AST also supports the alternative ``STC-S''
+linear string description of the STC model (see \secref{ss:stcschans}).
 
 STC-X V1.20 is documented at \htmladdnormallink{
 http://www.ivoa.net/Documents/WD/STC/STC-20050225.html}{
@@ -16342,11 +16342,11 @@ http://www.ivoa.net/Documents/latest/STC-S.html}{
 http://www.ivoa.net/Documents/latest/STC-S.html}) is a linear string
 syntax that allows simple specification of the STC metadata describing a
 region in an astronomical coordinate system. AST supports a
-subset of the STC-S specification, allowing an STC-S description of a 
-region within an AST-supported astronomical coordinate system to be converted 
+subset of the STC-S specification, allowing an STC-S description of a
+region within an AST-supported astronomical coordinate system to be converted
 into an equivalent AST Region object, and vice-versa. For further
-details, see the full description of the StcsChan class in 
-\appref{ss:classdescriptions}. 
+details, see the full description of the StcsChan class in
+\appref{ss:classdescriptions}.
 
 
 \cleardoublepage
@@ -17354,7 +17354,7 @@ void MaxTran( AstMapping *this, int npoint, int ncoord_in,
          for ( point = 0; point < npoint; point++ ) {
             ptr_out[ coord ][ point ] = ptr_in[ 0 ][ point ];
          }
-      }      
+      }
    }
 }
 \end{verbatim}
@@ -17856,7 +17856,7 @@ line in physical coordinates can potentially turn into a curve in
 graphical coordinates. We therefore start by considering how to draw
 geodesic curves.  These are curves which trace the path of shortest
 distance between two points in physical coordinates
- and are the basic drawing element in a Plot. 
+ and are the basic drawing element in a Plot.
 
 c+
 In many instances, the geodesic will, in fact, be a straight line, but
@@ -18047,7 +18047,7 @@ We have seen how geodesic curves and grid lines can be drawn. The Plot
 class includes another method,
 c+
 astGenCurve,
-c- 
+c-
 f+
 AST\_GENCURVE,
 f-
@@ -18058,7 +18058,7 @@ start of the curve is at offset 0.0 and the end of the curve is at offset
 corresponding position in the current Frame of the Plot.
 c+
 astGenCurve,
-c- 
+c-
 f+
 AST\_GENCURVE,
 f-
@@ -18067,14 +18067,14 @@ choice of exactly which positions along the curve are to be used to
 define the curve is also made by
 c+
 astGenCurve,
-c- 
+c-
 f+
 AST\_GENCURVE,
 f-
 using an adaptive algorithm which concentrates points around areas where
 the curve is bending sharply or is discontinuous in graphics coordinates.
 
-The IntraMap class may be of particular use in this context since it allows 
+The IntraMap class may be of particular use in this context since it allows
 you to code your own Mappings to do any transformation you choose.
 
 
@@ -18413,7 +18413,7 @@ f-
 Further control over the appearance of the text is possible by setting
 values for various Plot attributes, for example Colour, Font and Size.
 Sub-strings within the displayed text can be given different appearances,
-or turned into super-scripts or sub-scripts, by the inclusion of escape 
+or turned into super-scripts or sub-scripts, by the inclusion of escape
 sequences (see section~\secref{ss:escapes}) within the supplied text string.
 
 \subsection{\label{ss:plottingagrid}Plotting a Grid}
@@ -18453,10 +18453,10 @@ f-
 It will draw both linear and curvilinear axes and grids, as required
 by the particular Plot. The appearance of the output can be modified
 in a wide variety of ways by setting various Plot attributes.
-The Label attributes of the current Frame are displayed as the axis 
-labels in the grid, and the Title attribute as the plot title. Sub-strings 
+The Label attributes of the current Frame are displayed as the axis
+labels in the grid, and the Title attribute as the plot title. Sub-strings
 within these strings can be given different appearances, or turned into
-super-scripts or sub-scripts, by the inclusion of escape sequences (see 
+super-scripts or sub-scripts, by the inclusion of escape sequences (see
 section~\secref{ss:escapes}) within the Label attributes.
 
 \subsection{\label{ss:escapes}Controlling the Appearance of Sub-strings}
@@ -18478,7 +18478,7 @@ be raised by 50\% of the height of a normal character.
 
 Such escape sequences can be used in the strings assigned to textual
 attributes of the Plot (such as the axis Labels), and may also be
-included in strings plotted using 
+included in strings plotted using
 c+
 astText.
 c-
@@ -18509,7 +18509,7 @@ frequency axis to a non-zero value. This causes several things to happen:
 
 \begin{enumerate}
 
-\item The Mapping between the base Frame of the Plot (which represents 
+\item The Mapping between the base Frame of the Plot (which represents
 the underlying graphics world coordinate system) and the base Frame of
 the FrameSet supplied when the Plot was created, is modified. By
 default, this mapping is linear on both axes, but setting LogPlot non-zero
@@ -18523,27 +18523,27 @@ zero).
 are spaced logarithmically rather than linearly. That is, major axis
 values are chosen so that there is a constant ratio between adjacent
 tick mark values. This ratio is constrained to be a power of ten. The
-minor tick marks are drawn at linearly distributed points between the 
-adjoining major tick values. Thus if a pair of adjacent major tick values 
-are drawn at axis values 10.0 and 100.0, minor ticks will be placed at 
+minor tick marks are drawn at linearly distributed points between the
+adjoining major tick values. Thus if a pair of adjacent major tick values
+are drawn at axis values 10.0 and 100.0, minor ticks will be placed at
 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0 and 90.0 (note only 8 minor tick
 marks are drawn).
 
 \item If possible, numerical axis labels are shown as powers of ten.
 This depends on the facilities implemented by the graphics wrapper
 functions (see the next section). Extra functions were introduced to this
-set of wrapper functions at AST V3.2 which enable super-scripts and 
+set of wrapper functions at AST V3.2 which enable super-scripts and
 sub-scripts to be produced. Some older wrappers may not yet have
 implemented these functiosn and this will result in axis labels being
 drawn in usual scientific or decimal notation.
 
 \end{enumerate}
 
-Whilst the LogPlot attribute can be used to control all three of the above 
+Whilst the LogPlot attribute can be used to control all three of the above
 facilities, it is possible to control them individually as well. The
 LogTicks and LogLabel attributes control the behaviour specified in items
 2 and 3 above, but the default values for these attributes depend on the
-setting of the LogPlot attribute. This means that setting LogPlot 
+setting of the LogPlot attribute. This means that setting LogPlot
 non-zero will swicth all three facilites on, so long as zero values have
 not been assigned explicitly to LogTicks or LogLabel.
 
@@ -18563,25 +18563,25 @@ which then call functions from your graphics package to provide the
 required functionality. AST comes with wrapper functions suitable for
 the PGPLOT graphics package (see \xref{SUN/15}{sun15}{}).
 
-There are two ways of indicating which wrapper functions are to be used by 
+There are two ways of indicating which wrapper functions are to be used by
 the Plot class:
 \begin{enumerate}
 
 \item A file containing C functions with pre-defined names can be written
 and linked with the application using options of the ast\_link command.
 (see \secref{ss:howtobuild} and \appref{ss:commanddescriptions}). AST is
-distributed with such a file (called {\tt grf\_pgplot.c}) which calls PGPLOT 
+distributed with such a file (called {\tt grf\_pgplot.c}) which calls PGPLOT
 functions to implement the required functionality. This file can be used
 as a template for writing your own.
 f+
 Currently, it is not possible to write such ``grf modules'' in Fortran.
-If you want to use wrapper functions written in Fortran, then you must 
+If you want to use wrapper functions written in Fortran, then you must
 use the AST\_GRFSET method as described below.
 f-
 
-\item The 
+\item The
 c+
-astGrfSet 
+astGrfSet
 c-
 f+
 AST\_GRFSET
@@ -18594,7 +18594,7 @@ method described above.
 
 \end{enumerate}
 
-For details of the interfaces of the wrapper routines, see 
+For details of the interfaces of the wrapper routines, see
 c+
 either the {\tt grf\_pgplot.c} file included in the AST source
 distribution, or the reference documentation for the astGrfSet method.
@@ -18622,7 +18622,7 @@ f+
 f-
 
 c+
-The ``ast.h'' header file defines the external interface to the AST library, 
+The ``ast.h'' header file defines the external interface to the AST library,
 including all constants, function prototypes, macros, {\em{etc.}}. This file
 should be located using the usual compiler options for finding C
 include files, for instance:
@@ -18678,7 +18678,7 @@ for instance, include:
 
 (that is, there is no need to include the directory within the INCLUDE
 statement). If your compiler does not provide such an option then your
-source code must contain an absolute file name identifying the directory 
+source code must contain an absolute file name identifying the directory
 where the include files reside, for instance:
 
 \small
@@ -18723,7 +18723,7 @@ f77 prog.f -L/star/lib `ast_link` -o prog
 
 On Linux systems you should usually use \verb+g77 -fno-second-underscore+ in
 place of \verb+f77+ - see \xref{``Software development on Linux''}{sun212}
-{software_development_on_linux} in \xref{SUN/212}{sun212}{}. 
+{software_development_on_linux} in \xref{SUN/212}{sun212}{}.
 
 f-
 
@@ -18766,7 +18766,7 @@ f77 prog.f -L/star/lib `ast_link -pgplot` -o prog
 \normalsize
 \end{quote}
 
-again using \verb+g77 -fno-second-underscore+ in place of \verb+f77+ 
+again using \verb+g77 -fno-second-underscore+ in place of \verb+f77+
 on Linux systems.
 
 f-
@@ -18871,7 +18871,7 @@ Object             - Base class for all AST Objects
       PcdMap       - Apply 2-dimensional pincushion/barrel distortion
       PermMap      - Coordinate permutation Mapping
       PolyMap      - General N-dimensional polynomial Mapping
-      RateMap      - Calculates an element of a Mapping's Jacobian matrix 
+      RateMap      - Calculates an element of a Mapping's Jacobian matrix
       SelectorMap  - Locates positions within a set of Regions
       ShiftMap     - Shifts each axis by a constant amount
       SlaMap       - Sequence of celestial coordinate conversions
@@ -18950,14 +18950,14 @@ available at
 used only if the Encoding attribute of the FitsChan
 has the value ``FITS-WCS'' (whether set explicitly or defaulted). It
 should always be possible for a FrameSet to be read
-(using the 
+(using the
 c+
 astRead
 c-
 f+
 AST\_READ
 f-
-function) from a FitsChan containing a header which conforms to these 
+function) from a FitsChan containing a header which conforms to these
 conventions. However, only those FrameSets which are compatible with the
 FITS-WCS model can be \emph{written} to a FitsChan using the
 c+
@@ -18973,10 +18973,10 @@ and so will not be written out successfully to a FitsChan.
 
 The following sub-sections describe the details of the implementation of
 each of the first four FITS-WCS papers. Here, the term ``pixel axes'' is
-used to refer to the FITS pixel coordinates (i.e. the centre of the 
-first image pixel has a value 1.0 on each pixel axis); the term ``IWC 
-axes'' is used to refer to the axes of the Intermediate World Coordinate 
-system; and the term ``WCS axes'' is used to refer to the axes of the final 
+used to refer to the FITS pixel coordinates (i.e. the centre of the
+first image pixel has a value 1.0 on each pixel axis); the term ``IWC
+axes'' is used to refer to the axes of the Intermediate World Coordinate
+system; and the term ``WCS axes'' is used to refer to the axes of the final
 physical coordinate system described by the CTYPE\emph{i} keywords.
 
 \subsection{Paper I - General Linear Coordinates}
@@ -18984,7 +18984,7 @@ When reading a FrameSet from a FitsChan, these conventions are used if the CTYPE
 values within the FitsChan do not conform to the conventions described in
 later papers, in which case the axes are assumed to be linear. When
 writing a FrameSet to a FitsChan, these conventions are used for axes
-which are described by a simple Frame (\emph{i.e.} not a 
+which are described by a simple Frame (\emph{i.e.} not a
 SkyFrame, SpecFrame, \emph{etc.}).
 
 Table \ref{tab:fitspaper1} describes the use made by AST of each keyword
@@ -18993,7 +18993,7 @@ defined by FITS-WCS paper I.
 \begin{table}[htbp]
 \begin{tabular}{|l|p{2.5in}|p{2.5in}|}
 \hline
-\multicolumn{1}{|c|}{{\bf Keyword}} & \multicolumn{1}{c|}{{\bf Read}} 
+\multicolumn{1}{|c|}{{\bf Keyword}} & \multicolumn{1}{c|}{{\bf Read}}
 & \multicolumn{1}{c|}{{\bf Write}} \\ \hline
 
 \fitskey{WCSAXES\emph{a}}{Ignored.}{Set to the number of axes in the WCS
@@ -19007,7 +19007,7 @@ Point'' below).}
 written (see ``Choice of Reference Point'' below).}
 
 \fitskey{CDELT\emph{ia}}{Used to create the pixel to WCS Mapping.}{Only
-written if the CDMatrix attribute of the FitsChan is 
+written if the CDMatrix attribute of the FitsChan is
 set to zero.}
 
 \fitskey{CROTA\emph{i}}{Used to create the pixel to WCS Mapping.}{Only
@@ -19061,7 +19061,7 @@ operation will fail if this is not the case.
 
 \subsubsection{Use and Choice of CTYPE\emph{i} keywords}
 When reading a FrameSet from a FitsChan the CTYPE\emph{i} values in the FitsChan are used to set the
-Symbol attributes of the corresponding WCS Frame. The Label attributes of the WCS Frame are set from 
+Symbol attributes of the corresponding WCS Frame. The Label attributes of the WCS Frame are set from
 the CNAME\emph{i} keywords, if present in the header. Otherwise they are set
 from the CTYPE\emph{i} comments strings in the header, so long as each
 axis has a unique non-blank comment. Otherwise, the Label attributes are
@@ -19082,19 +19082,19 @@ according to the conventions of papers II and III, as described below.
 
 \subsubsection{Choice of Reference Point}
 When writing a FrameSet to a
-FitsChan, the pixel coordinates of the 
-reference point for linear axes (i.e. the CRPIX\emph{j} values) are 
+FitsChan, the pixel coordinates of the
+reference point for linear axes (i.e. the CRPIX\emph{j} values) are
 chosen as follows:
 
 \begin{itemize}
 \item If the FrameSet is being written to a FitsChan which previously
-contained a set of axis descriptions with the same identifying letter, 
-then the previous CRVAL\emph{j}values are converted into the coordinate system 
+contained a set of axis descriptions with the same identifying letter,
+then the previous CRVAL\emph{j}values are converted into the coordinate system
 of the Frame being written (if possible). These values are then
 transformed into the pixel Frame, and the closest integer pixel values
 are used as the CRPIX keywords.
 \item If the above step could not be performed for any reason, the
-central pixel is used as the reference point. This requires the image 
+central pixel is used as the reference point. This requires the image
 dimensions to be present in the FitsChan in the form of a set of
 NAXIS\emph{j} keyword values.
 \item If both the above two steps failed for any axis, then the pixel
@@ -19105,7 +19105,7 @@ The pixel to WCS Mapping is then used to find the corresponding
 CRVAL\emph{j}values.
 
 Again, the above procedure is over-ridden if the Frame is a
-SkyFrame or a SpecFrame, in which 
+SkyFrame or a SpecFrame, in which
 case the conventions of papers II and III are used as described below.
 
 
@@ -19123,10 +19123,10 @@ header will not necessarily be the same as that in the AST Frame.
 \subsubsection{Alternate Axis Descriptions}
 When reading a FrameSet from a
 FitsChan which contains alternate axis descriptions,
-each complete set of axis descriptions results in a single Frame being added 
-to the final FrameSet, connected via an appropriate 
-Mapping to the base pixel Frame. The Ident attribute of the Frame is set to hold the single alphabetical 
-character which is used to identify the set of axis descriptions within 
+each complete set of axis descriptions results in a single Frame being added
+to the final FrameSet, connected via an appropriate
+Mapping to the base pixel Frame. The Ident attribute of the Frame is set to hold the single alphabetical
+character which is used to identify the set of axis descriptions within
 the FITS header (a single space is used for the primary axis descriptions).
 
 When writing a FrameSet to a FitsChan, it is assumed that the base Frame
@@ -19146,22 +19146,22 @@ successfully.
 
 \subsection{Paper II - Celestial Coordinates}
 These conventions are used when reading a FrameSet
-from a FitsChan containing appropriate CTYPE\emph{i} 
+from a FitsChan containing appropriate CTYPE\emph{i}
 values, and when writing a FrameSet in which the WCS Frame
 is a SkyFrame.
 
 Table \ref{tab:fitspaper2} describes the use made by AST of each keyword
-whose meaning is defined or extended by FITS-WCS paper II. 
+whose meaning is defined or extended by FITS-WCS paper II.
 
 \begin{table}[htbp]
 \begin{tabular}{|l|p{2.5in}|p{2.5in}|}
 \hline
-\multicolumn{1}{|c|}{{\bf Keyword}} & \multicolumn{1}{c|}{{\bf Read}} 
+\multicolumn{1}{|c|}{{\bf Keyword}} & \multicolumn{1}{c|}{{\bf Read}}
 & \multicolumn{1}{c|}{{\bf Write}} \\ \hline
 
 \fitskey{CTYPE\emph{ia}}{All coordinate systems and projection types
 listed in paper II are supported (note, ``CUBEFACE'' axes are treated as
-unknown linear axes). In addition, "-HPX" (HEALPix) is supported.}{Determined by the System attribute 
+unknown linear axes). In addition, "-HPX" (HEALPix) is supported.}{Determined by the System attribute
 of the SkyFrame and the WcsType attribute of the
 WcsMap within the FrameSet.}
 
@@ -19186,7 +19186,7 @@ values supported except that ecliptic coordinates are currently always
 assumed to be FK5.}{Always written. Determined by the System attribute of
 the SkyFrame.}
 
-\fitskey{EQUINOX\emph{a}}{Used to set the Equinox attribute 
+\fitskey{EQUINOX\emph{a}}{Used to set the Equinox attribute
 of the SkyFrame.}{Written if relevant. Determined by the Equinox attribute of
 the SkyFrame.}
 
@@ -19194,7 +19194,7 @@ the SkyFrame.}
 written if using FITS-AIPS and FITS-AIPS++ encodings. Determined by the Equinox attribute
 of the SkyFrame.}
 
-\fitskey{MJD-OBS}{Used to set the Epoch attribute of the 
+\fitskey{MJD-OBS}{Used to set the Epoch attribute of the
 SkyFrame. DATE-OBS is used if MJD-OBS is not present. A default value based on
 RADESYS and EQUINOX is used if used if DATE-OBS is not present
 either.}{Determined by the Epoch attribute of the SkyFrame. Only written
@@ -19211,13 +19211,13 @@ DATE-OBS is also written).}
 \subsubsection{Requirements for a Successful Write Operation}
 When writing a FrameSet in which the WCS
 Frame is a SkyFrame to a
-FitsChan, success depends on the following conditions 
+FitsChan, success depends on the following conditions
 being met:
 
 \begin{enumerate}
-\item The Mapping from pixel coordinates (the base Frame 
+\item The Mapping from pixel coordinates (the base Frame
 in the FrameSet) to the WCS SkyFrame includes a WcsMap.
-\item The Mapping prior to the WcsMap (\emph{i.e.} from pixel to IWC) is linear. 
+\item The Mapping prior to the WcsMap (\emph{i.e.} from pixel to IWC) is linear.
 \item The Mapping after the WcsMap (\emph{i.e.} from native spherical to
 celestial coordinates) is a spherical rotation for the
 celestial axes, and linear for any other axes.
@@ -19227,15 +19227,15 @@ If any of the above conditions do not hold, the write operation will be
 unsuccessful.
 
 \subsubsection{Choice of LONPOLE/LATPOLE}
-When writing a FrameSet to a FitsChan, 
+When writing a FrameSet to a FitsChan,
 the choice of LONPOLE and LATPOLE values is determined as follows:
 
 \begin{enumerate}
 
-\item If the projection represented by the WcsMap is 
-azimuthal, then any values set for attributes ``PV\emph{i}\_3'' 
-and ``PV\emph{i}\_4'' (where ``\emph{i}'' is the index of the longitude axis) 
-within the WcsMap are used as the LONPOLE and LATPOLE values. Reading a 
+\item If the projection represented by the WcsMap is
+azimuthal, then any values set for attributes ``PV\emph{i}\_3''
+and ``PV\emph{i}\_4'' (where ``\emph{i}'' is the index of the longitude axis)
+within the WcsMap are used as the LONPOLE and LATPOLE values. Reading a
 FrameSet from a FITS-WCS header
 results in the original LONPOLE and LATPOLE values being stored within a
 WcsMap within the FrameSet. Consequently, if a FrameSet is read from a
@@ -19267,10 +19267,10 @@ When reading a FrameSet from a FitsChan, projection parameters
 PV\emph{i}\_0, PV\emph{i}\_1 and PV\emph{i}\_2 (for longitude axis
 ``\emph{i}'') are used to indicate a user-defined fiducial point as
 described in section 2.5 of paper II. This results in a shift of IWC
-origin being applied \emph{before} the WcsMap which converts 
+origin being applied \emph{before} the WcsMap which converts
 IWC into
 native spherical coordinates. The values of these projection parameters,
-if supplied, are stored as the corresponding PVi\_m attributes 
+if supplied, are stored as the corresponding PVi\_m attributes
 of the WcsMap.
 
 When writing a FrameSet to a FitsChan, the PV attributes of the WcsMap
@@ -19283,7 +19283,7 @@ keywords.
 
 \subsubsection{Common Non-Standard Features}
 A collection of common non-standard features are supported when reading a
-FrameSet from a FitsChan, in addition 
+FrameSet from a FitsChan, in addition
 to those embodied within the
 available encodings of the FitsChan class. These are translated into the
 equivalent standard features before being used to create a FrameSet.
@@ -19294,21 +19294,21 @@ class). The supported non-standard features include:
 
 \begin{itemize}
 \item EQUINOX keywords with string values equal to a date preceded
-by the letter B or J (\emph{e.g.} ``B1995.0''). 
+by the letter B or J (\emph{e.g.} ``B1995.0'').
 
-\item EQUINOX or EPOCH keywords with value zero  (these are converted to 
-B1950). 
+\item EQUINOX or EPOCH keywords with value zero  (these are converted to
+B1950).
 
 \item The IRAF ``ZPX'' projection is represented by a
 WcsMap with type of
 AST\_\_ZPN. Projection parameter values are read from any WAT\emph{i\_nnn}
-keywords, and corresponding PVi\_m attributes are set in the 
-WcsMap. The WAT\emph{i\_nnn} keywords may specify corrections to the basic 
-ZPN projection by including ``lngcor'' or ``latcor'' terms. There is no 
-direct equivalent in FITS-WCS to these terms and so they are ignored. If 
-these correction terms are found, ASTWARN keywords are added to the FitsChan 
+keywords, and corresponding PVi\_m attributes are set in the
+WcsMap. The WAT\emph{i\_nnn} keywords may specify corrections to the basic
+ZPN projection by including ``lngcor'' or ``latcor'' terms. There is no
+direct equivalent in FITS-WCS to these terms and so they are ignored. If
+these correction terms are found, ASTWARN keywords are added to the FitsChan
 containing a warning message (but only if the Warnings
-attribute of the FitsChan is set appropriately). 
+attribute of the FitsChan is set appropriately).
 
 \item The IRAF ``TNX'' projection is represented by a WcsMap with type of
 AST\_\_TPN (a distorted TAN projection retained within the WcsMap class
@@ -19319,35 +19319,35 @@ converted exactly into an AST\_\_TPN projection, ASTWARN keywords are
 added to the FitsChan containing a warning message (but only if the
 Warnings attribute of the FitsChan is set appropriately).
 
-\item ``QV'' parameters for TAN projections (as produced by 
-\htmladdnormallink{AUTOASTROM}{http://www.astro.gla.ac.uk/users/norman/star/autoastrom/} 
+\item ``QV'' parameters for TAN projections (as produced by
+\htmladdnormallink{AUTOASTROM}{http://www.astro.gla.ac.uk/users/norman/star/autoastrom/}
 are renamed to the equivalent ``PV'' parameters.
 
 \end{itemize}
 
 \subsection{Paper III - Spectral Coordinates}
-These conventions are used when reading a FrameSet 
-from a FitsChan which includes appropriate 
+These conventions are used when reading a FrameSet
+from a FitsChan which includes appropriate
 CTYPE\emph{i} values, and when writing a FrameSet in which
 the WCS Frame is a SpecFrame.
 
 Table \ref{tab:fitspaper3} describes the use made by AST of each keyword
-whose meaning is defined or extended by FITS-WCS paper III. 
+whose meaning is defined or extended by FITS-WCS paper III.
 
 \begin{table}[htbp]
 \begin{tabular}{|l|p{2.5in}|p{2.5in}|}
 \hline
-\multicolumn{1}{|c|}{{\bf Keyword}} & \multicolumn{1}{c|}{{\bf Read}} 
+\multicolumn{1}{|c|}{{\bf Keyword}} & \multicolumn{1}{c|}{{\bf Read}}
 & \multicolumn{1}{c|}{{\bf Write}} \\ \hline
 
 \fitskey{CTYPE\emph{ia}}{All coordinate systems and projection types
 listed in paper III are supported, except for the ``-TAB''
-algorithm (the ``-LOG'' algorithm may also be applied to non-spectral linear 
-axes).}{Determined by the System attribute of the 
+algorithm (the ``-LOG'' algorithm may also be applied to non-spectral linear
+axes).}{Determined by the System attribute of the
 SpecFrame and the nature of the pixel to SpecFrame
 Mapping.}
 
-\fitskey{CUNIT\emph{ia}}{Used to set the Units attribute of 
+\fitskey{CUNIT\emph{ia}}{Used to set the Units attribute of
 the SpecFrame (note, SpecFrames always have an ``active'' Units attribute
 (see astSetActiveUnit).}{Always written.}
 
@@ -19357,14 +19357,14 @@ are stored as attributes of a GrismMap).}
 
 \fitskey{SPECSYS\emph{a}}{Used to set the StdOfRest
 attribute of the SpecFrame (all systems are supported except CMBDIPOL).}
-{Set from the StdOfRest attribute of the SpecFrame, but only if it has been 
+{Set from the StdOfRest attribute of the SpecFrame, but only if it has been
 set explicitly.}
 
 \fitskey{SSYSOBS\emph{a}}{Ignored.}{Never written.}
 
 \fitskey{OBSGEO-X/Y/Z}{Used to set the ObsLon and
 ObsLat attributes of the Frame (the observers
-height above sea level is ignored).}{Set from the ObsLon and ObsLat 
+height above sea level is ignored).}{Set from the ObsLon and ObsLat
 attributes of the Frame, if they have been set explicitly (it is
 assumed that the observer is at sea level).}
 
@@ -19373,13 +19373,13 @@ the SpecFrame.}{Set from the Epoch attribute of the SpecFrame, if it has
 been set explicitly.}
 
 \fitskey{SSYSSRC\emph{a}}{Used to set the SourceVRF attribute of the
-SpecFrame 
-(all systems are supported except CMBDIPOL).} {Set from the SourceVRF 
+SpecFrame
+(all systems are supported except CMBDIPOL).} {Set from the SourceVRF
 attribute of the SpecFrame.}
 
 \fitskey{ZSOURCE\emph{a}}{Used to set the SourceVel
 attribute of the SpecFrame (the SourceVRF attribute
-is first set to the system indicated by the SSYSSRC keyword, and the 
+is first set to the system indicated by the SSYSSRC keyword, and the
 ZSOURCE value is then converted to an apparent radial velocity and stored
 as the SourceVel attribute).}
 {Set from the SourceVel attribute of
@@ -19391,17 +19391,17 @@ SpecFrame that define the standard of rest and the observers position.}
 
 \fitskey{RESTFRQ\emph{a}}{Used to set the RestFreq
 attribute of the SpecFrame.}{Set from the RestFreq attribute of the
-SpecFrame, but only if the System attribute is not set to 
-``WAVE'', ``VOPT'', ``ZOPT'' or ``AWAV'', and only if RestFreq has been set 
+SpecFrame, but only if the System attribute is not set to
+``WAVE'', ``VOPT'', ``ZOPT'' or ``AWAV'', and only if RestFreq has been set
 explicitly.}
 
 \fitskey{RESTWAV\emph{a}}{Used to set the RestFreq
 attribute of the SpecFrame (after conversion from wavelength to frequency).}
-{Set from the RestFreq attribute of the SpecFrame (after conversion), but only if the 
-System attribute is set to ``WAVE'', ``VOPT'', ``ZOPT'' or 
+{Set from the RestFreq attribute of the SpecFrame (after conversion), but only if the
+System attribute is set to ``WAVE'', ``VOPT'', ``ZOPT'' or
 ``AWAV'', and only if RestFreq has been set explicitly.}
 
-\fitskey{CNAME\emph{ia}}{Used to set the Label attributes of 
+\fitskey{CNAME\emph{ia}}{Used to set the Label attributes of
 the WCS Frame keywords.}{Set from the Label attributes of the WCS Frame,
 if they have been set explicitly.}
 \hline
@@ -19412,9 +19412,9 @@ if they have been set explicitly.}
 \end{table}
 
 \subsubsection{Requirements for a Successful Write Operation}
-When writing a FrameSet in which the WCS Frame is a SpecFrame to a 
+When writing a FrameSet in which the WCS Frame is a SpecFrame to a
 FitsChan, the write operation is successful only if
-the Mapping from pixel coordinates (the base Frame 
+the Mapping from pixel coordinates (the base Frame
 in the FrameSet) to the SpecFrame satisfies one of the following conditions:
 
 \begin{enumerate}
@@ -19423,7 +19423,7 @@ in the FrameSet) to the SpecFrame satisfies one of the following conditions:
 \item It is linear if the SpecFrame were to be re-mapped into one of the
 other spectral systems supported by FITS-WCS paper III.
 \item It contains a GrismMap, and the Mapping before the GrismMap (from
-pixel coordinates to grism parameter) is linear, and the Mapping after the 
+pixel coordinates to grism parameter) is linear, and the Mapping after the
 GrismMap is either null or represents a change of spectral system from wavelength (air or
 vacuum) to one of the supported spectral systems.
 \end{enumerate}
@@ -19437,7 +19437,7 @@ axes from a FitsChan:
 
 \begin{itemize}
 \item Conversion of ``-WAV'', ``-FRQ'' and ``-VEL'' algorithm codes
-(specified in early drafts of paper III) to the corresponding 
+(specified in early drafts of paper III) to the corresponding
 ``-X2P'' form.
 \item Conversion of ``RESTFREQ'' to ``RESTFRQ''
 \end{itemize}
@@ -19449,12 +19449,12 @@ the end of the CTYPE\emph{i} keyword to specify the nature of any
 distortion away from the basic algorithm described by the first 8
 characters of the CTYPE\emph{i} value. Currently AST ignores all such
 codes when reading a FrameSet from a FitsChan (except for the ``-SIP'' code
-defined by the Spitzer Space Telescope project - see below). This means that 
-a FrameSet can still be read from such headers, but the Mapping which gives 
-the WCS position associated with a given pixel position will reflect only 
+defined by the Spitzer Space Telescope project - see below). This means that
+a FrameSet can still be read from such headers, but the Mapping which gives
+the WCS position associated with a given pixel position will reflect only
 the basic algorithm and will not include the effects of the distortion.
 
-If such a FrameSet is then written out to a FitsChan, the resulting 
+If such a FrameSet is then written out to a FitsChan, the resulting
 CTYPE\emph{i} keywords will include no distortion code.
 
 \subsubsection{The ``-SIP'' distortion code}
@@ -19473,7 +19473,7 @@ which is applied to the pixel coordinates, after subtraction of the
 CRPIX\emph{j} values.
 
 This system is a strictly 2 dimensional system. When reading a
-FrameSet from a FitsChan which 
+FrameSet from a FitsChan which
 includes the ``-SIP'' distortion code, AST assumes that it
 is only applied to the first 2 WCS axes in a FITS header (i.e.
 CTYPE1 and CTYPE2). If the ``-SIP'' distortion code is attached to other
@@ -19484,7 +19484,7 @@ If a FrameSet is read from a FitsChan which includes ``-SIP''
 distortion, and an attempt is then made to write this FrameSet out to a
 FitsChan, the write operation will fail unless the distortion is
 insignificant (\emph{i.e.} is so small that the tests for linearity built
-into AST are passed). In this case, no distortion code will be appended to 
+into AST are passed). In this case, no distortion code will be appended to
 the resulting CTYPE\emph{i} keyword values.
 
 \newpage
@@ -19938,9 +19938,9 @@ of {\tt CDj\_i} keywords instead of a combination of {\tt PCjjjiii} and
 \item Projection parameters are now associated with particular axes and
 are represented by {\tt PVi\_m} keywords instead of the {\tt PROJPm}
 keywords.
-\item The tangent plane projection (``TAN'') can now include optional 
+\item The tangent plane projection (``TAN'') can now include optional
 polynomial correction terms.
-\item An entire set of keywords must be supplied for each set of secondary 
+\item An entire set of keywords must be supplied for each set of secondary
 axis descriptions, and each such keyword must finish with a single
 character indicating which set it belongs to. This means that keywords
 which previously occupied eight characters have been shorten to seven to
@@ -19959,7 +19959,7 @@ to version 1.5 of AST. This encoding is provided to allow existing data
 which use these conventions to be read. It should not in general be used
 to create new data.
 
-\item [FITS-AIPS] This encoding is based on the conventions described in the 
+\item [FITS-AIPS] This encoding is based on the conventions described in the
 document ``Non-linear Coordinate Systems in AIPS'' by Eric W. Greisen
 (revised 9th September, 1994 and available by ftp from fits.cv.nrao.edu
 /fits/documents/wcs/aips27.ps.Z). This encoding uses {\tt CROTAi} and
@@ -19967,7 +19967,7 @@ document ``Non-linear Coordinate Systems in AIPS'' by Eric W. Greisen
 
 \end{description}
 
-\item The FitsChan class now provides some support for the IRAF-specific 
+\item The FitsChan class now provides some support for the IRAF-specific
 ``TNX'' sky projection, which is converted transparently into the
 equivalent FITS ``TAN'' projection (see the description of the Encoding
 attribute for details).
@@ -19979,7 +19979,7 @@ possible: FrameSets originally read from a FITS-WCS encoded FITS header
 and which use a TAN projection can now be written out using the DSS
 encoding.
 
-\item The algorithm used by the FitsChan class to verify that a FrameSet 
+\item The algorithm used by the FitsChan class to verify that a FrameSet
 conforms to the FITS-WCS model has been improved so that FrameSets
 including more complex mixtures of parallel and serial Mappings
 can be written out using the FITS-WCS encoding.
@@ -20002,14 +20002,14 @@ for which default values will be used, {\em etc}.
 FITS-WCS encoding in the FitsChan class:
 \begin{itemize}
 \item Projection parameters are now associated with a particular axis and
-are specified using a new set of attributes called PVj\_m. Here, ``j'' is 
-the index of an axis of WcsMap, and ``m'' is the index of the projection 
+are specified using a new set of attributes called PVj\_m. Here, ``j'' is
+the index of an axis of WcsMap, and ``m'' is the index of the projection
 parameter.
 \item The old attributes ProjP(0) to ProjP(9) are still available but are
-now deprecated in favour of the new PVj\_m attributes. They are interpreted 
-as aliases for PV(axlat)\_0 to PV(axlat)\_9, where ``axlat'' is the index of 
+now deprecated in favour of the new PVj\_m attributes. They are interpreted
+as aliases for PV(axlat)\_0 to PV(axlat)\_9, where ``axlat'' is the index of
 the latitude axis.
-\item The GLS projection projection has been renamed as SFL, but the 
+\item The GLS projection projection has been renamed as SFL, but the
 AST\_\_GLS type has been retained as an alias for AST\_\_SFL.
 \end{itemize}
 
@@ -20030,45 +20030,45 @@ to the simpler ``double *''. Using the old types may result in non-fatal
 compiler warnings, but should not change the behaviour of the methods.
 c-
 
-\item A bug has been fixed in the Plot class which could cause groups 
+\item A bug has been fixed in the Plot class which could cause groups
 of tick marks to be skipped when using very small gaps.
 
 \item A bug has been fixed in the Plot class which could cause axes to be
 labeled outside the visible window, resulting in no axes being visible.
 
 \item The FITS-WCS encoding used by the FitsChan class now includes the
-WCSNAME keyword. When creating a FrameSet from FITS headers, the values of 
-the WCSNAME keywords are now used as the Domain names for the corresponding 
+WCSNAME keyword. When creating a FrameSet from FITS headers, the values of
+the WCSNAME keywords are now used as the Domain names for the corresponding
 Frames in the returned FrameSet. When writing a FrameSet to a FITS header
 the Domain names of each Frame are stored in WCSNAME keywords in the
-header. 
+header.
 
 \item The FITS-WCS encoding used by the FitsChan class now attempts to
 retain the identification letter associated with multiple axis
-descriptions. When reading a FrameSet from a FITS header, the identification 
+descriptions. When reading a FrameSet from a FITS header, the identification
 letter is stored in the Ident attribute for each Frame. When writing a
 FrameSet to a FITS header, the identification letter is read from the
 Ident attribute of each Frame. The letter to associate with each Frame
 can be changed by assigning a new value to the Frame's Ident attribute.
 
-\item The FITS-WCS, FITS-PC, FITS-IRAF and FITS-AIPS encodings used by the 
-FitsChan class now create a SkyFrame with the System attribute set to 
+\item The FITS-WCS, FITS-PC, FITS-IRAF and FITS-AIPS encodings used by the
+FitsChan class now create a SkyFrame with the System attribute set to
 ``Unknown'' if the CTYPE keywords in the supplied header refers to an
 unknown celestial coordinate system. Previously, a Frame was used instead
 of a SkyFrame.
 
-\item The FITS-WCS, FITS-PC, FITS-IRAF and FITS-AIPS encodings used by the 
+\item The FITS-WCS, FITS-PC, FITS-IRAF and FITS-AIPS encodings used by the
 FitsChan class no longer report an error if the FITS header contains no
-CTYPE keywords. It is assumed that a missing CTYPE keyword implies that 
+CTYPE keywords. It is assumed that a missing CTYPE keyword implies that
 the world coordinate system is linear and identically equal to
 ``intermediate world coordinates''.
 
-\item The new value ``noctype'' is now recognized by the Warnings attribute 
+\item The new value ``noctype'' is now recognized by the Warnings attribute
 of the FitsChan class. This value causes warnings to be issued if CTYPE
 keywords are missing from foreign encodings.
 
-\item A new attribute called AllWarnings has been added to the FitsChan 
-class. This is a read-only, space separated list of all the known condition 
+\item A new attribute called AllWarnings has been added to the FitsChan
+class. This is a read-only, space separated list of all the known condition
 names which can be specified in the Warnings attribute.
 
 \item The FitsChan class now attempts to assigns a Title to each Frame in
@@ -20077,9 +20077,9 @@ name of the Frame. If the Frame has no Domain name, the default Title
 supplied by the Frame class is retained.
 
 \item The FitsChan class uses the comments associated with CTYPE
-keywords as axis labels when reading a foreign encoding. This behaviour 
+keywords as axis labels when reading a foreign encoding. This behaviour
 has been modified so that the default labels provided by the Frame class
-are retained (instead of using the CTYPE comments) if any of the CTYPE 
+are retained (instead of using the CTYPE comments) if any of the CTYPE
 comments are identical.
 
 \item A new ``interpolation'' scheme identified by the symbolic constant
@@ -20099,7 +20099,7 @@ This serves the same purpose as the existing ID attribute, but (unlike ID)
 its value is transferred to the new Object when a copy is made.
 
 \item A bug has been fixed which could prevent complex CmpFrames
-behaving correctly (for instance, resulting in the failure of attempts 
+behaving correctly (for instance, resulting in the failure of attempts
 to find a Mapping between a CmpFrame and itself).
 
 \end{enumerate}
@@ -20111,7 +20111,7 @@ occurred in the AST library between versions V1.6 and V1.7:
 
 \begin{enumerate}
 
-\item The Frame class has a new method called 
+\item The Frame class has a new method called
 f+
 AST\_ANGLE
 f-
@@ -20121,7 +20121,7 @@ c-
 which returns the angle subtended by two points at a third point within a
 2 or 3 dimensional Frame.
 
-\item The Frame class has a new method called 
+\item The Frame class has a new method called
 f+
 AST\_OFFSET2
 f-
@@ -20133,7 +20133,7 @@ point by a specified distance along a geodesic curve which passes
 through the starting point at a given position angle. It can only be used
 with 2-dimensional Frames.
 
-\item The Frame class has a new method called 
+\item The Frame class has a new method called
 f+
 AST\_AXDISTANCE
 f-
@@ -20144,7 +20144,7 @@ which returns the increment between two supplied axis values. For
 axes belonging to SkyFrames, the returned value is normalized into
 the range $\pm\pi$.
 
-\item The Frame class has a new method called 
+\item The Frame class has a new method called
 f+
 AST\_AXOFFSET
 f-
@@ -20156,7 +20156,7 @@ value. For axes belonging to SkyFrames, the returned value is normalized into
 the range $\pm\pi$ (for latitude axes) or zero to $2\pi$ (for longitude
 axes).
 
-\item The Plot class has a new method called 
+\item The Plot class has a new method called
 f+
 AST\_GENCURVE
 f-
@@ -20169,12 +20169,12 @@ into the corresponding position in the current Frame of the Plot. The new
 method then maps these current Frame position into graphics coordinates,
 taking care of any non-linearities or discontinuities in the mapping.
 
-\item The Plot class has a new method called 
+\item The Plot class has a new method called
 f+
-AST\_GRFSET 
+AST\_GRFSET
 f-
 c+
-astGrfSet 
+astGrfSet
 c-
 which allows the underlying primitive graphics functions to be selected
 at run-time. Previously, the functions used by the Plot class to produce
@@ -20205,11 +20205,11 @@ to be corrupted after transforming any points.
 
 \item Bugs have been fixed in the FitsChan class which could cause
 inappropriate ordering of headers within a FitsChan when writing or
-reading objects using NATIVE encodings.  
+reading objects using NATIVE encodings.
 
 \item A bug has been fixed in the FitsChan class which could cause the
 celestial longitude of a pixel to be estimated incorrectly by 180 degrees
-if the reference point is at either the north or the south pole. 
+if the reference point is at either the north or the south pole.
 
 \end{enumerate}
 
@@ -20222,27 +20222,27 @@ occurred in the AST library between versions V1.7 and V1.8-2:
 \begin{enumerate}
 
 \item The SkyFrame class has a new attribute called NegLon which allows
-   longitude values to be displayed in the range $-\pi$ to $+\pi$, instead 
+   longitude values to be displayed in the range $-\pi$ to $+\pi$, instead
    of the usual range zero to $2.\pi$.
 
-\item Some new 
+\item Some new
 c+
-functions (astAngle, astAxAngle, astResolve, astOffset2, astAxOffset, 
-astAxDistance) 
+functions (astAngle, astAxAngle, astResolve, astOffset2, astAxOffset,
+astAxDistance)
 c-
 f+
-routines (AST\_ANGLE, AST\_AXANGLE, AST\_RESOLVE, AST\_OFFSET2, AST\_AXOFFSET, 
-AST\_AXDISTANCE) 
+routines (AST\_ANGLE, AST\_AXANGLE, AST\_RESOLVE, AST\_OFFSET2, AST\_AXOFFSET,
+AST\_AXDISTANCE)
 f-
-have been added to the Frame class to allow navigation of the coordinate space 
+have been added to the Frame class to allow navigation of the coordinate space
 to be performed without needing to know the underlying geometry
 of the co-ordinate system (for instance, whether it is Cartesian or
-spherical). 
+spherical).
 
-Note, version 1.8-1 contained many of these facilities, but 
+Note, version 1.8-1 contained many of these facilities, but
 some have been changed in version 1.8-2. Particularly, positions angles
 are now referred to the second Frame axis for {\em all} classes of Frames
-(including SkyFrames), and the 
+(including SkyFrames), and the
 c+
 astBear function has been replaced by astAxAngle.
 c-
@@ -20260,11 +20260,11 @@ occurred in the AST library between versions V1.8-2 and V1.8-3:
 \begin{enumerate}
 
 \item A new method called astDecompose has been added to the Mapping class
-which enables pointers to be obtained to the component parts of CmpMap and 
+which enables pointers to be obtained to the component parts of CmpMap and
 CmpFrame objects.
 
-\item Functions within proj.c and wcstrig.c have been renamed to avoid name 
-clashes with functions in more recent versions of Mark Calabretta's wcslib 
+\item Functions within proj.c and wcstrig.c have been renamed to avoid name
+clashes with functions in more recent versions of Mark Calabretta's wcslib
 library.
 
 \end{enumerate}
@@ -20276,7 +20276,7 @@ occurred in the AST library between versions V1.8-3 and V1.8-4:
 
 \begin{enumerate}
 
-\item The FitsChan class has a new attribute called DefB1950 which can be 
+\item The FitsChan class has a new attribute called DefB1950 which can be
 used to select the default reference frame and equinox to be used if
 a FitsChan with foreign encoding contains no indication of the
 reference frame or equinox.
@@ -20286,14 +20286,14 @@ astWrite from creating a set of FITS headers from an otherwise valid
 FrameSet, when when using FITS-AIPS encoding.
 
 \item A bug has been fixed in the FitsChan class which could cause
-astRead to mis-interpret the FITS CROTA keyword when using FITS-AIPS 
+astRead to mis-interpret the FITS CROTA keyword when using FITS-AIPS
 encoding.
 
 \end{enumerate}
 
 \subsection{Changes Introduced in V1.8-5}
 
-The following describes the most significant changes which 
+The following describes the most significant changes which
 occurred in the AST library between versions V1.8-4 and V1.8-5:
 
 \begin{enumerate}
@@ -20317,34 +20317,34 @@ occurred in the AST library between versions V1.8-5 and V1.8-7:
 
 \item A new attribute called CarLin has been added to the FitsChan class
 which controls the way CAR projections are handled when reading a
-FrameSet from a non-native FITS header. Some FITS writers use a CAR 
+FrameSet from a non-native FITS header. Some FITS writers use a CAR
 projection to represent a simple linear transformation between pixel
 coordinates and celestial sky coordinates. This is not consistent with
 the definition of the CAR projection in the draft FITS-WCS standard, which
 requires the resultant Mapping to include a 3D rotation from native
 spherical coordinates to celestial spherical coordinates, thus making the
-Mapping non-linear. Setting CarLin to 1 forces 
+Mapping non-linear. Setting CarLin to 1 forces
 c+
 astRead
 c-
 f+
 AST\_READ
 f-
-to ignore the FITS-WCS standard and treat any CAR projections as simple 
+to ignore the FITS-WCS standard and treat any CAR projections as simple
 linear Mappings from pixel coordinates to celestial coordinates.
 
 \item A bug has been fixed which could result in axis Format attributes
 set by the user being ignored under certain circumstances.
 
 \item A bug in the way tick marks positions are selected in the Plot class
-has been fixed. This bug could result in extra ticks marks being displayed at 
-inappropriate positions. This bug manifested itself, for instance, if the 
+has been fixed. This bug could result in extra ticks marks being displayed at
+inappropriate positions. This bug manifested itself, for instance, if the
 Mapping represented by the Plot was a simple Cartesian to Polar Mapping.
 In this example, the bug caused tick marks to be drawn at negative radius
 values.
 
 \item A bug has been fixed which could prevent attribute settings from
-being read correctly by 
+being read correctly by
 c+
 astSet,
 c-
@@ -20364,12 +20364,12 @@ occurred in the AST library between versions V1.8-7 and V1.8-8:
 
 \item A bug has been fixed in the FitsChan class which could cause
 problems when creating a FrameSet from a FITS header containing WCS
-information stored in the form of Digitised Digitised Sky Survey (DSS) 
+information stored in the form of Digitised Digitised Sky Survey (DSS)
 keywords. These problems only occurred for DSS fields in the southern
 hemisphere, and resulted in pixel positions being mapped to sky positions
 close to the corresponding {\em northern} hemispshere field.
 
-\item A new method called 
+\item A new method called
 c+
 astBoundingBox
 c-
@@ -20382,7 +20382,7 @@ the previous graphical output produced by a Plot method.
 \item A new attribute called Invisible has been added to the Plot class
 which suppresses the graphical output normally produced by Plot methods.
 All the calculations needed to produce the normal output are still
-performed however, and so the bounding box returned by the new 
+performed however, and so the bounding box returned by the new
 c+
 astBoundingBox
 c-
@@ -20391,10 +20391,10 @@ AST\_BOUNDINGBOX
 f-
 method is still usable.
 
-\item Bugs have been fixed related to the appearance of graphical output 
-produced by the Plot class. These bugs were to do with the way in which 
-graphical elements relating to a specific axis (e.g. {\tt Colour(axis1)}, etc.) 
-interacted with the corresponding generic element (e.g. 
+\item Bugs have been fixed related to the appearance of graphical output
+produced by the Plot class. These bugs were to do with the way in which
+graphical elements relating to a specific axis (e.g. {\tt Colour(axis1)}, etc.)
+interacted with the corresponding generic element (e.g.
 {\tt Colour(axes)}, etc.).
 
 \end{enumerate}
@@ -20409,12 +20409,12 @@ in the AST library between versions V1.8-8 and V1.8-13:
 
 \item The FitsChan class has been modified so that LONPOLE keywords
 c+
-are only produced by astWrite when necessary. For zenithal projections such as 
+are only produced by astWrite when necessary. For zenithal projections such as
 TAN, the LONPOLE keyword can always take its default value and so is
 not included in the FITS header produced by astWrite.
 c-
 f+
-are only produced by AST\_WRITE when necessary. For zenithal projections such as 
+are only produced by AST\_WRITE when necessary. For zenithal projections such as
 TAN, the LONPOLE keyword can always take its default value and so is
 not included in the FITS header produced by AST\_WRITE
 f-
@@ -20425,25 +20425,25 @@ LONPOLE keyword (such as FITS-IRAF).
 \item The FitsChan class has been modified to retain leading and trailing
 spaces within COMMENT cards.
 
-\item The FitsChan class has been modified to only use CTYPE comments as 
+\item The FitsChan class has been modified to only use CTYPE comments as
 axis labels if all non-celestial axes have unique non-blank comments
 (otherwise the CTYPE keyword values are used as labels).
 
 \item The FitsChan class has been modified so that it does not append a
 trailing ``Z'' character to the end of DATE-OBS keyword values.
 
-\item The FitsChan class has been modified to use latest list of FITS-WCS 
+\item The FitsChan class has been modified to use latest list of FITS-WCS
 projections, as described in the FITS-WCS paper II, ``Representations of
 celestial coordinates in FITS'' (Calabretta \& Greisen, draft dated 23
 April 2002). Support has been retained for the polynomial correction
 terms which previous drafts have allowed to be associated with TAN
-projections. 
+projections.
 
 \item The WcsMap class has additional projection types of AST\_\_TPN
 (which implements a distorted TAN projection) and AST\_\_SZP. The AST\_\_TAN
-projection type now represents a simple TAN projection and has no 
-associated projection parameters. In addition, the usage of projection 
-parameters has been brought into line with the the FITS-WCS paper II. 
+projection type now represents a simple TAN projection and has no
+associated projection parameters. In addition, the usage of projection
+parameters has been brought into line with the the FITS-WCS paper II.
 
 \item The WcsMap class has been modified so that a ``get'' operation on a
 projection parameter attribute will return the default value defined in the
@@ -20463,7 +20463,7 @@ f-
 
 \subsection{Changes Introduced in V2.0}
 
-Note, Frame descriptions created using AST V2.0 will not be readable by 
+Note, Frame descriptions created using AST V2.0 will not be readable by
 applications linked with earlier versions of AST. This applies to Frame
 descriptions created using:
 \begin{itemize}
@@ -20486,17 +20486,17 @@ current version):
 
 \begin{enumerate}
 
-\item The default value for the Domain attribute provided by the CmpFrame 
+\item The default value for the Domain attribute provided by the CmpFrame
 class has been changed from ``CMP'' to a string formed by concatenating
 the Domain attributes of the two component Frames, separated by a minus
 sign. If both component Domains are blank, then the old default of
 ``CMP'' is retained for the CmpFrame Domain.
 
-\item The implementation of the 
+\item The implementation of the
 c+
 astWrite function
 c-
-f+ 
+f+
 AST\_WRITE routine
 f-
 within the FitsChan class has been modified. It will now attempt to
@@ -20507,11 +20507,11 @@ has always been possible with NATIVE encoding, but has not previously
 been possible for foreign encodings. The WCSAXES keyword is used to store
 the number of WCS axes in the FITS header.
 
-\item Another change to the 
+\item Another change to the
 c+
 astWrite function
 c-
-f+ 
+f+
 AST\_WRITE routine
 f-
 within the FitsChan class is that the ordering of ``foreign'' axes
@@ -20538,7 +20538,7 @@ between two Frames. In previous versions of AST, the Unit attribute was a
 purely descriptive item intended only for human readers - changing the
 value of Unit made no difference to the behaviour of the Frame. As of
 version 2.0, the Unit attribute can influence the nature of the Mappings
-between Frames. For instance, if the 
+between Frames. For instance, if the
 c+
 astFindrame or astConvert
 c-
@@ -20546,33 +20546,33 @@ f+
 AST\_FINDRAME or AST\_CONVERT
 f-
 method is used to find the Mapping between an Axis with Unit set to ``m''
-and another Axis with Unit set to ``km'', then the method will return a 
+and another Axis with Unit set to ``km'', then the method will return a
 ZoomMap which introduces a scaling factor of 0.001 between the two axes.
 These facilities assume that units are specified following the rules
 included in FITS-WCS paper I ({\em Representation of World
 Coordinates in FITS}, Greisen \& Calabretta).
 
-In order to minimise the risk of breaking existing software, the default 
+In order to minimise the risk of breaking existing software, the default
 behaviour for simple Frames is to ignore the Unit attribute ({\em{i.e.}}
-to retain the previous behaviour). However, the new Frame method 
+to retain the previous behaviour). However, the new Frame method
 c+
 astSetActiveUnit
 c-
 f+
 AST\_SETACTIVEUNIT
 f-
-may be used to ``activate'' (or deactivate) the new facilities within a 
+may be used to ``activate'' (or deactivate) the new facilities within a
 specific Frame. Note, the new SpecFrame class is different to the simple
 Frame class in that the new facilities for handling units are always active
-within a SpecFrame. 
- 
+within a SpecFrame.
+
 \item The System and Epoch attributes fo the SkyFrame class have been
 moved to the parent Frame class. This enables all sub-classes of Frame
 (such as the new SpecFrame class) to share these attributes, and to provide
 suitable options for each class.
 
-\item The Frame class has a new attribute called AlignSystem, which allows 
-control over the alignment process performed by the methods 
+\item The Frame class has a new attribute called AlignSystem, which allows
+control over the alignment process performed by the methods
 c+
 astFindFrame and astConvert.
 c-
@@ -20581,15 +20581,15 @@ AST\_FINDFRAME and AST\_CONVERT.
 f-
 
 
-\item The CmpFrame class has been modified so that attributes of a 
+\item The CmpFrame class has been modified so that attributes of a
 component Frame can be accessed without needing to extract the Frame first.
 To do this, append an axis index to the end of the attribute name. For
-instance, if a CmpFrame contains a SpecFrame and a SkyFrame (in that order), 
+instance, if a CmpFrame contains a SpecFrame and a SkyFrame (in that order),
 then the StdOfRest attribute of the SpecFrame can be referred to as the
 ``StdOfRest(1)'' attribute of the CmpFrame. Likewise, the Equinox attribute
 of the SkyFrame can be accessed as the ``Equinox(2)'' (or equivalently
 ``Equinox(3)'') attribute of the CmpFrame. The ``System(1)'' attribute of the
-CmpFrame will refer to the System attribute of the SpecFrame, whereas the 
+CmpFrame will refer to the System attribute of the SpecFrame, whereas the
 ``System(2)'' and ``System(3)'' attributes of the CmpFrame will refer to the
 System attribute of the SkyFrame (the ``System'' attribute without an axis
 specifier will refer to the System attribute of the CmpFrame as a whole,
@@ -20598,14 +20598,14 @@ so has its own System value which is independant of the System attributes
 of its component Frames).
 
 \item The algorithms used by the Plot class for determining when to omit
-overlapping axis labels, and the abbreviation of redundant leading fields 
+overlapping axis labels, and the abbreviation of redundant leading fields
 within sexagesimal axis labels, have been improved to avoid some anomolous
 behaviour in previous versions.
 
 \item The curve drawing algorithm used by the Plot class has been
 modified to reduce the chance of it ``missing'' small curve sections,
 such as may be produced if a grid line cuts across the plot very close to
-a corner. Previously, these missed sections could sometimes result in 
+a corner. Previously, these missed sections could sometimes result in
 axis labels being omitted.
 
 \item A new function
@@ -20629,7 +20629,7 @@ order to take advantage of these new facilities.
 
 \subsection{Changes Introduced in V3.0}
 
-The following describes the most significant changes which 
+The following describes the most significant changes which
 occurred in the AST library between versions V2.0 and V3.0:
 
 \begin{enumerate}
@@ -20650,7 +20650,7 @@ header.
 \item The FITS-WCS encoding now supports most of the conventions
 described in FITS-WCS paper III for the description of spectral
 coordinates. The exceptions are that the SSYSOBS keyword is not
-supported, and WCS stored in tabular form (as indicated by the ``-TAB'' 
+supported, and WCS stored in tabular form (as indicated by the ``-TAB''
 algorithm code) is not supported.
 
 
@@ -20658,15 +20658,15 @@ algorithm code) is not supported.
 supported by FitsChans which use FITS-WCS encoding. This use keywords
 PVi\_0, PVi\_1 and PVi\_2 for the longitude axis.
 
-\item  When reading a FITS-WCS header, a FitsChan will now use keywords PVi\_3 
-and PVi\_4 for the longitude axis (if present) in preference to any LONPOLE 
-and LATPOLE keywords which may be present. When writing a FITS-WCS header, 
+\item  When reading a FITS-WCS header, a FitsChan will now use keywords PVi\_3
+and PVi\_4 for the longitude axis (if present) in preference to any LONPOLE
+and LATPOLE keywords which may be present. When writing a FITS-WCS header,
 both forms are written out.
 
 \item The number of WCS axes is stored in the WCSAXES keyword if its value
 would be different to that of the NAXIS keyword.
 
-\item Helio-ecliptic coordinates are now supported by FitsChans which use 
+\item Helio-ecliptic coordinates are now supported by FitsChans which use
 FITS-WCS encoding. This uses CTYPE codes ``HLON'' and ``HLAT''. The
 resulting SkyFrame will have a System value of ``HELIOECLIPTIC'', and all
 the usual facilities, such as conversion to other celestial systems, are
@@ -20675,15 +20675,15 @@ available.
 \item The FITS-WCS encoding now supports most of the conventions
 described in FITS-WCS paper III for the description of spectral
 coordinates. The exceptions are that the SSYSOBS keyword is not
-supported, and WCS stored in tabular form (as indicated by the ``-TAB'' 
+supported, and WCS stored in tabular form (as indicated by the ``-TAB''
 algorithm code) is not supported.
 
 \item When reading a FITS-WCS header, a FitsChan will now ignore any
-distortion codes which are present in CTYPE keywords. Here, a ``distortion 
+distortion codes which are present in CTYPE keywords. Here, a ``distortion
 code'' is the final group of four characters in a CTYPE value of the
 form ``xxxx-yyy-zzz'', as described in FITS-WCS paper IV. The exception
 to this is that the ``-SIP'' distortion code (as used by the Spitzer
-Space Telescope project - see 
+Space Telescope project - see
 \htmladdnormallink{
 http://ssc.spitzer.caltech.edu/postbcd/doc/shupeADASS.pdf}{
 http://ssc.spitzer.caltech.edu/postbcd/doc/shupeADASS.pdf}) is
@@ -20693,8 +20693,8 @@ can only be read, not written. A FrameSet which uses a PolyMap will not
 in general be able to be written out to a FitsChan using any foreign
 encoding (although NATIVE encoding can of course be used).
 
-\item The Warnings attribute of the FitsChan class now accepts values 
-``BadVal'' (which gives warnings about conversion errors when reading 
+\item The Warnings attribute of the FitsChan class now accepts values
+``BadVal'' (which gives warnings about conversion errors when reading
 FITS keyword values), ``Distortion'' (which gives warnings about
 unsupported distortion codes within CTYPE values), and ``BadMat'' (which
 gives a warning if the rotation/scaling matrix cannot be inverted).
@@ -20704,17 +20704,17 @@ encoding, the comment associated with any card already in the FitsChan
 will be retained if the keyword value being written is the same as the
 keyword value already in the FitsChan.
 
-\item A FrameSet which uses the non-FITS projection type AST\_\_TPN (a TAN 
-projection with polynomial distortion terms) can now be written to a 
+\item A FrameSet which uses the non-FITS projection type AST\_\_TPN (a TAN
+projection with polynomial distortion terms) can now be written to a
 FitsChan if the Encoding attribute is set to FITS-WCS. The standard
 ``-TAN'' code is used within the CTYPE values, and the distortion
-coefficients are encoded in keywords of the form `` QVi\_ma'', which are 
+coefficients are encoded in keywords of the form `` QVi\_ma'', which are
 directly analogous to the standard ``PVi\_ma'' projection parameter keywords.
 Thus a FITS reader which does not recognise the QV keywords will still
 be able to read the header, but the distortion will be ignored.
 
 \item The default value for DefB1950 attribute now depends on the value
-of the Encoding attribute. 
+of the Encoding attribute.
 
 \item A new appendix has been added to SUN/210 and SUN/211 giving details
 of the implementation provided by the FitsChan class of the
@@ -20722,18 +20722,18 @@ conventions contained in the first four FITS-WCS papers.
 \end{itemize}
 
 \item The SkyFrame class now supports two new coordinate systems ``ICRS''
-and ``HELIOECLIPTIC''. The default for the System attribute for SkyFrames 
+and ``HELIOECLIPTIC''. The default for the System attribute for SkyFrames
 has been changed from ``FK5'' to ``ICRS''.
 
-\item The 
+\item The
 c+
 astRate
 c-
 f+
 AST\_RATE
 f-
-function has been added which allows an estimate to be made of the rate of 
-change of a Mapping output with respect to one of the Mapping inputs. 
+function has been added which allows an estimate to be made of the rate of
+change of a Mapping output with respect to one of the Mapping inputs.
 
 \item All attribute names for Frames of any class may now include an optional
 axis specifier. This includes those attributes which describe a property
@@ -20755,11 +20755,11 @@ models the spectral dispersion produced by a grating, prism or grism.
 constant values onto all coordinates (this is equivalent to a WinMap
 with unit scaling on all axes).
 
-\item Minor bugs have been fixed within the Plot class to do with the choice 
+\item Minor bugs have been fixed within the Plot class to do with the choice
 and placement of numerical axis labels.
 
-\item The SphMap class has a new attribute called PolarLong which gives the 
-longitude value to be returned when a Cartesian position corresponding to 
+\item The SphMap class has a new attribute called PolarLong which gives the
+longitude value to be returned when a Cartesian position corresponding to
 either the north or south pole is transformed into spherical coordinates.
 
 \item The WcsMap class now assigns a longitude of zero to output
@@ -20768,14 +20768,14 @@ celestial coordinates which have a latitude of plus or minus 90 degrees.
 \item The NatLat and NatLon attributes of the WcsMap class have been
 changed so that they now return the fixed native coordinates of the
 projection reference point, rather than the native coordinates of the
-user-defined fiducial point. 
+user-defined fiducial point.
 
-\item Notation has been changed in both the WcsMap and FitsChan classes to 
+\item Notation has been changed in both the WcsMap and FitsChan classes to
 reflect the convention used in the FITS-WCS papers that index ``i'' refers
 to a world coordinate axis, and index ``j'' refers to a pixel axis.
 
 \item Changes have been made to several Mapping classes in order to allow
-the 
+the
 c+
 astSimplify
 c-
@@ -20803,7 +20803,7 @@ occurred in the AST library between versions V3.0 and V3.1 (the
 current version):
 
 \begin{enumerate}
-\item Addition of a new class called XmlChan - a Channel which 
+\item Addition of a new class called XmlChan - a Channel which
 reads and writes AST objects in the form of XML.
 \item A bug has been fixed in the Plot class which could cause incorrect
 graphical attributes to be used for various parts of the plot if either
@@ -20829,8 +20829,8 @@ c-
 f+
 routine AST\_PUTCARDS
 f-
-has been added to the FitsChan class. This allows multiple concatenated header 
-cards to be stored in a FitsChan in a single call, providing an alternative to 
+has been added to the FitsChan class. This allows multiple concatenated header
+cards to be stored in a FitsChan in a single call, providing an alternative to
 the existing
 c+
 astPutCards function.
@@ -20844,21 +20844,21 @@ f-
  bugs have also been fixed which could result in an infinite loop being
  entered when attempting to simplify certain Mappings.
 
-\item The FitsChan class now translates the spectral algorithm codes 
-``-WAV'', ``-FRQ'' and ``-VEL'' (specified in early drafts of paper III) to 
+\item The FitsChan class now translates the spectral algorithm codes
+``-WAV'', ``-FRQ'' and ``-VEL'' (specified in early drafts of paper III) to
 the corresponding ``-X2P'' form when reading a spectral axis description
 from a set of FITS header cards.
 
-\item A bug has been fixed in the FitsChan class which could cause 
+\item A bug has been fixed in the FitsChan class which could cause
 keywords associated with alternate axis descriptions to be mis-interpreted.
 
 \item The Plot class now provides facilities for modifying the appearance
 of sub-strings within text strings such as axis labels, titles, \emph{etc},
-by producing super-scripts, sub-scripts, changing the font colour, size, 
+by producing super-scripts, sub-scripts, changing the font colour, size,
 \emph{etc}. See attribute Escape.
 
 \item The default value of the Tol attribute of the Plot class has been
-changed from 0.001 to 0.01. This should not usually cause any significant 
+changed from 0.001 to 0.01. This should not usually cause any significant
 visible change to the plot, but should make the plotting faster. You may
 need to set a lower value for Tol if you are producing a particularly
 large plot.
@@ -20866,7 +20866,7 @@ large plot.
 \item The algorithm for finding the default value for the Gap attribute
 has been changed. This attribute specifies the gap between major axis
 values in an annotated grid drawn by the Plot class. The change in
-algorithm may cause the default value to be different to previous versions 
+algorithm may cause the default value to be different to previous versions
 in cirtain circumstances.
 
 \item Some bugs have been fixed in the Plot class which could cause the
@@ -20874,12 +20874,12 @@ system to hang for a long time while drawing certain all-sky grids
 (notable some of the FITS Quad-cube projections).
 
 \item The SkyAxis class has extended the Format attribute by the addition
-of the ``g'' option. this option is similar to the older ``l'' option in that 
-it results in characters (``h'', ``m'', ``s'', \emph{etc}) being used as 
+of the ``g'' option. this option is similar to the older ``l'' option in that
+it results in characters (``h'', ``m'', ``s'', \emph{etc}) being used as
 delimiters between the sexagesimal fields of the celestial position. The
 difference is that the ``g'' option includes graphics escape sequences
-in the returned formatted string which result in the field delimiter 
-characters being drawn as super-scripts when plotted as numerical axis values 
+in the returned formatted string which result in the field delimiter
+characters being drawn as super-scripts when plotted as numerical axis values
 by a Plot.
 
 \item The Plot class has been extended to include facilities for producing
@@ -20893,15 +20893,15 @@ any change. However, the facilities for interpreting escape sequences
 within strings drawn by the Plot class will not be available unless the
 new grf functions are implemented. If you choose to implement them, you
 should modify your linking procedure to use the \verb+-grf+ switch in
-place of the older \verb+-mygrf+ switch. See the description of the ast\_link 
+place of the older \verb+-mygrf+ switch. See the description of the ast\_link
 command for details of the new switches. Also note that the astGQch
 function, whilst included in verb+grf.h+ in pervious versions of AST, was
-not actually called. As of this version of AST, calls are made to the 
+not actually called. As of this version of AST, calls are made to the
 astGQch function, and so any bugs in the implementation of astGQch may
 cause spurious behaviour when plotting text strings.
 
-\item A new 'static' method called astEscapes has been added which is used 
-to control and enquire whether astGetC and astFormat will strip any graphical 
+\item A new 'static' method called astEscapes has been added which is used
+to control and enquire whether astGetC and astFormat will strip any graphical
 escape sequences which may be present out of the returned value.
 
 \item New attribute XmlPrefix has been added to the XmlChan class. It
@@ -20928,19 +20928,19 @@ occurred in the AST library between versions V3.2 and V3.3:
 \begin{enumerate}
 
 \item Options have been added to the SkyFrame class which allows the
-origin 
+origin
 of celestial coordinates to be moved to any specified point. See the new
 attributes SkyRef, SkyRefIs, SkyRefP and AlignOffset.
 
 \item An option has been added to the FitsChan class which allows extra
-Frames representing cartesian projection plane coordinates (``intermediate 
+Frames representing cartesian projection plane coordinates (``intermediate
 world coordinates'' in the parlance of FITS-WCS) to be created when
-reading 
+reading
 WCS information from a foreign FITS header. This option is controlled by
 a new attribute called Iwc.
 
 \item The FitsChan class which been modified to interpret FITS-WCS CAR
-projection headers correctly if the longitude reference pixel (CRPIX) is 
+projection headers correctly if the longitude reference pixel (CRPIX) is
 very large.
 
 \item The  FITS-AIPS++ encoding in the FitsChan class now recognised
@@ -20958,14 +20958,14 @@ building it have been changed. Whereas AST used to be built and installed
 with \verb+./mk build; ./mk install+, it now builds using the more standard
 idiom \verb+./configure; make; make install+. The installation location is
 controlled by the \verb+--prefix+ argument to ./configure (as is usual
-for other packages which use this scheme).  Note that the INSTALL environment 
+for other packages which use this scheme).  Note that the INSTALL environment
 variable now has a \emph{different} meaning to that which it had
 before, and it should generally be \emph{unset}. Also, there is no need to
 set the SYSTEM variable.
 
 \item Shared libraries are now installed in the same directory as the
-static libraries. In addition, links to sharable libraries are installed 
-with names which include version information, and ``libtool libraries'' 
+static libraries. In addition, links to sharable libraries are installed
+with names which include version information, and ``libtool libraries''
 are also installed (see \htmladdnormallink{http://www.gnu.org/software/libtool/manual.html}{
 http://www.gnu.org/software/libtool/manual.html}).
 
@@ -20988,7 +20988,7 @@ occurred in the AST library between versions V3.3 and V3.4:
 
 \begin{enumerate}
 
-\item The Mapping class has a new method 
+\item The Mapping class has a new method
 c+
 (astLinearApprox)
 c-
@@ -21014,7 +21014,7 @@ superscripts), and the Digits(1) value is unset, then the seconds field
 will have a number of decimal places which results in no pair of labels
 being identical.
 
-\item Addition of a new class classed DSBSpecFrame. This is a 
+\item Addition of a new class classed DSBSpecFrame. This is a
 sub-class of SpecFrame which can be used to describe spectral axes
 associated with dual sideband spectral data.
 
@@ -21023,8 +21023,8 @@ projection code, converting them to the corresponding modern ``-SFL'' code,
 provided that the celestial axes are not rotated.
 
 \item The FitsChan class has a new Encoding, ``FITS-CLASS'', which allows
-the reading and writing of FITS headers using the conventions of the CLASS 
-package - see 
+the reading and writing of FITS headers using the conventions of the CLASS
+package - see
 \htmladdnormallink{
 http://www.iram.fr/IRAMFR/GILDAS/doc/html/class-html/class.html}{
 http://www.iram.fr/IRAMFR/GILDAS/doc/html/class-html/class.html}).
@@ -21042,17 +21042,17 @@ occurred in the AST library between versions V3.4 and V3.5:
 \item AST now provides facilities for representing regions of various
 shapes within a coordinate system. The Region class provides general
 facilities which are independent of the specific shape of region being
-used. Various sub-classes of Region are also now available which provide 
+used. Various sub-classes of Region are also now available which provide
 means of creating Regions of specific shape. Facilities provided by the
 Region class include testing points to see if they are inside the
 Region, testing two Regions for overlap, transforming Regions from one
 coordinate system to another \emph{etc}.
 
-\item A new class of 1-dimensional Frame called FluxFrame has been added which 
-can be used to describe various systems for describing ovserved value at a 
-single fixed spectral position. 
+\item A new class of 1-dimensional Frame called FluxFrame has been added which
+can be used to describe various systems for describing ovserved value at a
+single fixed spectral position.
 
-\item A new class of 2-dimensional Frame called SpecFluxFrame has been added which 
+\item A new class of 2-dimensional Frame called SpecFluxFrame has been added which
 can be used to describe a 2-d frame spanned by a spectral position axis
 and and an observed value axis.
 
@@ -21067,21 +21067,21 @@ This system is an equatorial system based on the mean dynamical equator and
 equinox at J2000, and differs slightly from an FK5(J2000) system.
 
 \item A new class called KeyMap has been added. A KeyMap can be used to
-store a collection of vector or scalar values or Objects, indexed by a 
+store a collection of vector or scalar values or Objects, indexed by a
 character string rather than an integer.
 
-\item The parameter list for the 
+\item The parameter list for the
 c+
-astRate 
+astRate
 c-
 f+
 AST\_RATE
 f-
-method of the Mapping class has been modified. It no longer returns a second 
-derivative estimate. Existing code which uses this method will need to be 
+method of the Mapping class has been modified. It no longer returns a second
+derivative estimate. Existing code which uses this method will need to be
 changed.
 
-\item Methods 
+\item Methods
 c+
 (astSetFits<X>)
 c-
@@ -21096,7 +21096,7 @@ keywords to be changed or added.
 
 \subsection{Changes Introduced in V3.6}
 
-The following describes the most significant changes which 
+The following describes the most significant changes which
 occurred in the AST library between versions V3.5 and V3.6:
 
 \begin{enumerate}
@@ -21138,8 +21138,8 @@ occurred in the AST library between versions V3.6 and V3.7:
 \item Support for time coordinate systems has been introduced
 throught the addition of two new classes, TimeFrame and TimeMap.
 The TimeFrame is a 1-dimensional Frame which can be used to describe
-moments in time (either absolute or relative) in various systems (MJD, 
-Julian Epoch, \emph{etc.}) and referred to various time scales (TAI, UTC, 
+moments in time (either absolute or relative) in various systems (MJD,
+Julian Epoch, \emph{etc.}) and referred to various time scales (TAI, UTC,
 UT1, GMST, \emph{etc}). The TimeMap is a Mapping which can transform time
 values between these various systems and time scales. Note,
 FitsChans which have a foreign encoding (\emph{i.e.} any encoding other
@@ -21150,7 +21150,7 @@ than NATIVE) are not able to read or write these new classes.
 
 \subsection{Changes Introduced in V4.0}
 
-The following describes the most significant changes which 
+The following describes the most significant changes which
 occurred in the AST library between versions V3.7 and V4.0:
 
 \begin{enumerate}
@@ -21159,7 +21159,7 @@ occurred in the AST library between versions V3.7 and V4.0:
 descriptions using the XmlChan class has been added. Support is included
 for a subset of V1.20 of the draft STC specification.
 
-\item A new set of methods (AST\_REBIN<X>/astRebin<X>) has been added to 
+\item A new set of methods (AST\_REBIN<X>/astRebin<X>) has been added to
 the Mapping class. These are flux-conserving alternatives to the existing
 AST\_RESAMPLE<X>/astResample<X> methods.
 
@@ -21168,22 +21168,22 @@ AST\_RESAMPLE<X>/astResample<X> methods.
 
 \subsection{Changes Introduced in V4.1}
 
-The following describes the most significant changes which 
+The following describes the most significant changes which
 occurred in the AST library between versions V4.0 and V4.1:
 
 \begin{enumerate}
 
-\item A new control flag has been added to the AST\_RESAMPLE<X>/astResample<X> 
+\item A new control flag has been added to the AST\_RESAMPLE<X>/astResample<X>
 functions which produces approximate flux conservation.
 
-\item New constants AST\_\_SOMB and AST\_\_SOMBCOS have been added to 
+\item New constants AST\_\_SOMB and AST\_\_SOMBCOS have been added to
 c+
 ast.h. These specify kernels for astResample and astRebin
 c-
 f+
 AST\_PAR. These specify kernels for AST\_RESAMPLE and AST\_REBIN
 f-
-based on the ``Sombrero'' function ( $2*J1(x)/x$ where $J1(x)$ is the 
+based on the ``Sombrero'' function ( $2*J1(x)/x$ where $J1(x)$ is the
 first order Bessel function of the first kind).
 
 \item The SkyFrame class now supports a System value of AZEL corresponding
@@ -21196,22 +21196,22 @@ to horizon (azimuth/elevation) coordinates.
 the geodetic longitude and latitude of the observer.
 
 \item The ClockLon and ClockLat attributes have been removed from the
-TimeFrame class. Likewise, the GeoLon and GeoLat attributes have been 
+TimeFrame class. Likewise, the GeoLon and GeoLat attributes have been
 removed from the SpecFrame class. Both classes now use the ObsLon and
 ObsLat attributes of the parent Frame class instead. However, the old
 attribute names can be used as synonyms for ObsLat and ObsLon. Also,
 dumps created using the old scheme can be read succesfully by AST V4.1
 and converted to the new form.
 
-\item A new 
+\item A new
 c+
 function astMapSplit
 c-
 f+
 routine AST\_MAPSPLIT
 f-
-has been added to the Mapping class. This splits a Mapping into two component 
-Mappings which, when combined in parallel, are equivalent to the original 
+has been added to the Mapping class. This splits a Mapping into two component
+Mappings which, when combined in parallel, are equivalent to the original
 Mapping.
 
 \item The default value for the SkyRefIs attribute has been changed from
@@ -21224,22 +21224,22 @@ addition to assigning the required origin position to the SkyRef attribute.
 
 \subsection{Changes Introduced in V4.2}
 
-The following describes the most significant changes which 
+The following describes the most significant changes which
 occurred in the AST library between versions V4.1 and V4.2:
 
 \begin{enumerate}
 
 \item The SideBand attribute of the DSBSpecFrame class can now take the
 option ``LO'' in addition to ``USB'' and ``LSB''. The new option causes the
-DSBSpecFrame to represent the offset from the local oscillator frequency, 
+DSBSpecFrame to represent the offset from the local oscillator frequency,
 rather than either of the two sidebands.
 
 \item The FitsChan class has been changed so that it writes out a VELOSYS
-keyword when creating a FITS-WCS encoding (VELOSYS indicates the topocentric 
-apparent velocity of the standard of rest). FitsChan also strips out VELOSYS 
+keyword when creating a FITS-WCS encoding (VELOSYS indicates the topocentric
+apparent velocity of the standard of rest). FitsChan also strips out VELOSYS
 keywords when reading a FrameSet from a FITS-WCS encoding.
 
-\item The FitsChan class has a new method called 
+\item The FitsChan class has a new method called
 c+
 astRetainFits
 c-
@@ -21251,18 +21251,18 @@ stripped out of the FitsChan when an AST Object is read from the FitsChan.
 Unless this method is used, all cards that were involved in the creation
 of the AST Object will be stripped from the FitsChan afte a read operation.
 
-\item A problem with unaligned memory access that could cause bus errors on 
+\item A problem with unaligned memory access that could cause bus errors on
 Solaris has been fixed.
 
 \item A new read-only attribute called ObjSize has been added to the base
 Object Class. This gives the number of bytes of memory occupied by the
-Object. Note, this is the size of the internal in-memory representation of 
+Object. Note, this is the size of the internal in-memory representation of
 the Object, not the size of the textual representation produced by
 writing the Object out through a Channel.
 
-\item A new function 
+\item A new function
 c+
-astTune 
+astTune
 c-
 f+
 AST\_TUNE
@@ -21271,14 +21271,14 @@ has been added which can be used to get and set global AST tuning
 parameters. At the moment there are only two such parameter, both of
 which are concerned with memory management within AST.
 
-\item A new method called 
+\item A new method called
 c+
 astTranGrid
 c-
 f+
 AST\_TRANGRID
 f-
-has been added to the Mapping class. This method creates a regular 
+has been added to the Mapping class. This method creates a regular
 grid of points covering a rectangular region within the input space of a
 Mapping, and then transforms this set of points into the output space of the
 Mapping, using a piecewise-continuous linear approximation to the Mapping
@@ -21302,14 +21302,14 @@ f+
 AST\_CONVERT
 f-
 method when trying to align a CmpFrame with another Frame has been
-modified. If no conversion between positions in the Frame and CmpFrame 
+modified. If no conversion between positions in the Frame and CmpFrame
 can be found, an attempt is now made to find a conversion between the
 Frame and one of two component Frames contained within the CmpFrame. Thus
 is should now be possible to align a SkyFrame with a CmpFrame containing a
 SkyFrame and a SpecFrame (for instance). The returned Mapping produces bad
 values for the extra axes (i.e. for the SpecFrame axis in the above example).
 
-\item The ``ast\_link\_adam'' and ``ast\_link'' scripts now ignore the 
+\item The ``ast\_link\_adam'' and ``ast\_link'' scripts now ignore the
 \verb+-fsla+ and \verb+-csla+ options, and always link against the
 minimal cut-down version of SLALIB distributed as part of AST.
 
@@ -21317,23 +21317,23 @@ minimal cut-down version of SLALIB distributed as part of AST.
 
 \subsection{Changes Introduced in V4.3}
 
-The following describes the most significant changes which occurred in the 
+The following describes the most significant changes which occurred in the
 AST library between versions V4.2 and V4.3:
 
 \begin{enumerate}
 
-\item The 
+\item The
 c+
-astGetFitsS 
+astGetFitsS
 c-
 f+
 AST\_GETFITSS
 f-
-function now strips trailing white space from the returned string, if the 
+function now strips trailing white space from the returned string, if the
 original string contains 8 or fewer characters
 
 \item The SpecFrame class has a new attribute called SourceSys that specified
-whether the SourceVel attribute (which specifies the rest frame of the 
+whether the SourceVel attribute (which specifies the rest frame of the
 source) should be accessed as an apparent radial velocity or a redshift.
 Note, any existing software that assumes that SourceVel always represents
 a velocity in km/s should be changed to allow for the possibility of
@@ -21349,9 +21349,9 @@ the AST library between versions V4.3 and V4.4:
 
 \begin{enumerate}
 
-\item The 
+\item The
 c+
-astFindFrame 
+astFindFrame
 c-
 f+
 AST\_FINDFRAME
@@ -21359,36 +21359,36 @@ f-
 function can now be used to search a CmpFrame for an instance of a more
 specialised class of Frame (SkyFrame, TimeFrame, SpecFrame, DSBSpecFrame
 or FluxFrame). That is, if an instance of one of these classes is used as
-the ``template'' when calling 
+the ``template'' when calling
 c+
 astFindFrame,
 c-
 f+
 AST\_FINDFRAME,
 f-
-and the ``target'' being searched is a CmpFrame (or a FrameSet in which the 
-current Frame is a CmpFrame), then the component Frames within the CmpFrame 
-will be searched for an instance of the supplied template Frame, and, if 
-found, a suitable Mapping (which will include a PermMap to select the 
-required axes from the CmpFrame) will be returned by 
+and the ``target'' being searched is a CmpFrame (or a FrameSet in which the
+current Frame is a CmpFrame), then the component Frames within the CmpFrame
+will be searched for an instance of the supplied template Frame, and, if
+found, a suitable Mapping (which will include a PermMap to select the
+required axes from the CmpFrame) will be returned by
 c+
 astFindFrame.
 c-
 f+
 AST\_FINDFRAME.
 f-
-Note, for this to work, the MaxAxes and MinAxes attributes of the template 
-Frame must be set so that they cover a range that includes the number of axes 
+Note, for this to work, the MaxAxes and MinAxes attributes of the template
+Frame must be set so that they cover a range that includes the number of axes
 in the target CmpFrame.
 
-\item The SkyFrame, SpecFrame, DSBSpecFrame, TimeFrame and FluxFrame classes 
+\item The SkyFrame, SpecFrame, DSBSpecFrame, TimeFrame and FluxFrame classes
 now allow the MaxAxes and MinAxes attributes to be set freely to any value.
 In previous versions of AST, any attempt to change the value of MinAxes
 or MaxAxes was ignored, resulting in them always taking the default values.
 
 \item The DSBSpecFrame class has a new attribute called AlignSB that
 specifies whether or not to take account of the SideBand attributes when
-aligning two DSBSpecFrames using 
+aligning two DSBSpecFrames using
 c+
 astConvert.
 c-
@@ -21397,27 +21397,27 @@ AST\_CONVERT.
 f-
 
 \item The Frame class has a new attribute called Dut1 that can be used to
-store a value for the difference between the UT1 and UTC timescales at 
-the epoch referred to by the Frame. 
+store a value for the difference between the UT1 and UTC timescales at
+the epoch referred to by the Frame.
 
-\item The number of digits used to format the Frame attributes ObsLat and 
+\item The number of digits used to format the Frame attributes ObsLat and
 ObsLon has been increased.
 
 \item The use of the SkyFrame attribute AlignOffset has been changed. This
-attribute is used to control how two SkyFrames are aligned by 
+attribute is used to control how two SkyFrames are aligned by
 c+
 astConvert.
 c-
 f+
 AST\_CONVERT.
 f-
-If the template and target SkyFrames both have a non-zero value for 
-AlignOffset, then alignment occurs between the offset coordinate systems 
+If the template and target SkyFrames both have a non-zero value for
+AlignOffset, then alignment occurs between the offset coordinate systems
 (that is, a UnitMap will always be used to align the two SkyFrames).
 
 \item The Plot class has a new attribute called ForceExterior that can be
 used to force exterior (rather than interior) tick marks to be produced.
-By default, exterior ticks are only produced if this would result in 
+By default, exterior ticks are only produced if this would result in
 more than 3 tick marks being drawn.
 
 \item The TimeFrame class now supports conversion between angle based
@@ -21435,7 +21435,7 @@ occurred in the AST library between versions V4.4 and V4.5:
 
 
 \item All FITS-CLASS headers are now created with a frequency axis. If the
-FrameSet supplied to 
+FrameSet supplied to
 c+
 astWrite
 c-
@@ -21449,64 +21449,64 @@ before being used to create the FITS-CLASS header.
 \item The value stored in the FITS-CLASS keyword ``VELO-LSR'' has been changed
 from the velocity of the source to the velocity of the reference channel.
 
-\item Addition of a new method call 
+\item Addition of a new method call
 c+
 astPurgeWCS
 c-
 f+
 AST\_PURGEWCS
 f-
-to the FitsChan 
+to the FitsChan
 class. This method removes all WCS-related header cards from a FitsChan.
 
 \item The Plot class has a new attribute called GrfContext that can be used
 to comminicate context information between an application and any
-graphics functions registered with the Plot class via the 
+graphics functions registered with the Plot class via the
 c+
 astGrfSet function.
 c-
 f+
 AST\_GRFSET routine.
 f-
-\item Functions registered with the Plot class using 
+\item Functions registered with the Plot class using
 c+
-astGrfSet 
+astGrfSet
 c-
 f+
 AST\_GRFSET
 f-
 now take a new additional integer parameter, ``grfcon''. The Plot class
 sets this parameter to the value of the Plot's GrfContext attribute before
-calling the graphics function. NOTE, THIS CHANGE WILL REQUIRE EXISTING 
-CODE THAT USES 
+calling the graphics function. NOTE, THIS CHANGE WILL REQUIRE EXISTING
+CODE THAT USES
 c+
-astGrfSet 
+astGrfSet
 c-
 f+
 AST\_GRFSET
 f-
 TO BE MODIFIED TO INCLUDE THE NEW PARAMETER.
-\item The 
+\item The
 c+
 astRebinSeq functions
 c-
 f+
 AST\_REBINSEQ routines
 f-
-now have an extra parameter that is used to record the total number of input 
-data values added into the output array. This is necessary to correct a 
-flaw in the calculation of output variances based on the spread of input 
-values. NOTE, THIS CHANGE WILL REQUIRE EXISTING CODE TO BE MODIFIED TO 
+now have an extra parameter that is used to record the total number of input
+data values added into the output array. This is necessary to correct a
+flaw in the calculation of output variances based on the spread of input
+values. NOTE, THIS CHANGE WILL REQUIRE EXISTING CODE TO BE MODIFIED TO
 INCLUDE THE NEW PARAMETER (CALLED "NUSED").
 \item Support has been added for the FITS-WCS ``HPX'' (HEALPix) projection.
-\item A new flag ``AST\_\_VARWGT'' can be supplied to 
+\item A new flag ``AST\_\_VARWGT'' can be supplied to
 c+
 astRebinSeq.
 c-
 f+
 AST\_REBINSEQ.
 f-
-This causes the input data values to be weighted using the reciprocals of 
+This causes the input data values to be weighted using the reciprocals of
 the input variances (if supplied).
 
 \item The Frame class has a new read-only attribute called NormUnit that
@@ -21514,9 +21514,9 @@ returns the normalised value of the Unit attribute for an axis. Here,
 ``normalisation'' means cancelling redundant units, etc. So for instance, a
 Unit value of ``s*(m/s)'' would result in a NormUnit value of ``m''.
 
-\item A new 
+\item A new
 c+
-function astShowMesh 
+function astShowMesh
 c-
 f+
 routine AST\_SHOWMESH
@@ -21527,11 +21527,11 @@ output.
 
 \item The Plot class now honours the value of the LabelUp attribute even if
 numerical labels are placed around the edge of the Plot. Previously
-LabelUp was only used if the labels were drawn within the interior of 
-the plot. The LabelUp attribute controls whether numerical labels are 
+LabelUp was only used if the labels were drawn within the interior of
+the plot. The LabelUp attribute controls whether numerical labels are
 drawn horizontally or parallel to the axis they describe.
 
-\item A bug has been fixed that could segmentation violations when setting 
+\item A bug has been fixed that could segmentation violations when setting
 attribute values.
 
 \end{enumerate}
@@ -21544,7 +21544,7 @@ occurred in the AST library between versions V4.5 and V4.6:
 \begin{enumerate}
 
 \item The TimeFrame class now support Local Time as a time scale. The offset
-from UTC to Local Time is specified by a new TimeFrame attribute called 
+from UTC to Local Time is specified by a new TimeFrame attribute called
 LTOffset.
 
 \item A new class called Plot3D has been added. The Plot3D class allows
@@ -21563,13 +21563,13 @@ celestial coordinate systems.
 
 \subsection{Changes Introduced in V5.0}
 
-The following describes the most significant changes which 
+The following describes the most significant changes which
 occurred in the AST library between versions V4.6 and V5.0:
 
 \begin{enumerate}
 
 
-\item The AST library is now thread-safe (assuming that the POSIX pthreads 
+\item The AST library is now thread-safe (assuming that the POSIX pthreads
 library is available when AST is built). Many of the macros defined in
 the ast.h header file have changed. It is therefore necessary to
 re-compile all source code that includes ast.h.
@@ -21578,7 +21578,7 @@ re-compile all source code that includes ast.h.
 for exclusive use by a thread.
 
 \item The TimeFrame class now support Local Time as a time scale. The offset
-from UTC to Local Time is specified by a new TimeFrame attribute called 
+from UTC to Local Time is specified by a new TimeFrame attribute called
 LTOffset.
 
 \item The Channel class has a new attribute called Strict which controls
@@ -21592,13 +21592,13 @@ input items were encountered.
 
 \subsection{Changes Introduced in V5.1}
 
-The following describes the most significant changes which occurred in the 
+The following describes the most significant changes which occurred in the
 AST library between versions V5.0 and V5.1:
 
 \begin{enumerate}
 
 c+
-\item The astUnlock function now has an extra parameter that controls whether 
+\item The astUnlock function now has an extra parameter that controls whether
 or not an error is reported if the Object is currently locked by another
 thread.
 c-
@@ -21623,22 +21623,22 @@ f-
 is called.  The changes mean that more types of Prism will now simplify
 into a simpler class of Region.
 
-\item The PointList class has a new method, 
+\item The PointList class has a new method,
 c+
-astPoints, 
+astPoints,
 c-
 f+
 AST\_POINTS,
 f-
-that copies the axis values from the PointList into a supplied array. 
+that copies the axis values from the PointList into a supplied array.
 
-\item The PointList class has a new (read-only) attribute, ListSize, that 
+\item The PointList class has a new (read-only) attribute, ListSize, that
 gives the number of points stored in the PointList.
 
 \item The handling of warnings within different classes of Channel has
-been rationalised. The XmlStrict attribute and 
+been rationalised. The XmlStrict attribute and
 c+
-astXmlWarnings 
+astXmlWarnings
 c-
 f+
 AST\_XMLWARNINGS
@@ -21647,7 +21647,7 @@ function have been removed. The same functionality is now available via
 the existing Strict attribute (which has had its remit widened), a new
 attribute called ReportLevel, and the new
 c+
-astWarnings 
+astWarnings
 c-
 f+
 AST\_WARNINGS
@@ -21655,16 +21655,16 @@ f-
 function. This new function can be used on any class of Channel. Teh
 FitsChan class retains its long standing ability to store warnings as
 header cards within the FitsChan, but it also now stores warnings in the
-parent Channel structure, from where they can be retrieved using the 
+parent Channel structure, from where they can be retrieved using the
 c+
-astWarnings 
+astWarnings
 c-
 f+
 AST\_WARNINGS
 f-
 function.
 
-\item A new function called 
+\item A new function called
 c+
 astIntercept
 c-
@@ -21679,19 +21679,19 @@ functions has been fixed. This bug could lead to applications crashing or
 showing strange behaviour if an inappropriate class of Object was
 supplied as an argument to a constructor.
 
-\item The 
+\item The
 c+
-astPickAxes 
+astPickAxes
 c-
 f+
 AST\_PICKAXES
 f-
-function will now return a Region, if possible, when applied to a Region. If 
+function will now return a Region, if possible, when applied to a Region. If
 this is not possible, a Frame will be returned as before.
 
-\item The default gap size between the ISO date/time labels used by the Plot 
+\item The default gap size between the ISO date/time labels used by the Plot
 class when displaying an annotated axis described by a TimeFrame has been
-changed. The changes are meant to improve the labelling of calendar time 
+changed. The changes are meant to improve the labelling of calendar time
 axes that span intervals from a day to a few years.
 
 \item A new function called
@@ -21705,7 +21705,7 @@ has been added to the FitsChan class. This function tests a FitsChan to
 see if it contains a defined value for specified FITS keyword.
 
 \item The AST\_\_UNDEF<X> parameters used to flag undefined FITS keyword values
-have been removed. Use the new 
+have been removed. Use the new
 c+
 astTestFits
 c-
@@ -21728,9 +21728,9 @@ occurred in the AST library between versions V5.1 and V5.2:
 
 \begin{enumerate}
 
-\item A new method called 
+\item A new method called
 c+
-astSetFitsCM 
+astSetFitsCM
 c-
 f+
 AST\_SETFITSCM
@@ -21743,40 +21743,40 @@ records the geodetic altitude of the observer, in metres. It defaults to
 zero. It is used when converting times to or from the TDB timescale, or
 converting spectral positions to or from the topocentric rest frame, or
 converting sky positions to or from horizon coordinates. The FitsChan
-class will include its effect when creating a set of values for the 
+class will include its effect when creating a set of values for the
 OBSGEO-X/Y/Z keywords, and will also assign a value to it when reading a
 set of OBSGEO-X/Y/Z keyword values from a FITS header.
 
 \item The TimeMap conversions ``TTTOTDB'' and ``TDBTOTT'', and the SpecMap
-conversions ``TPF2HL'' and ``HLF2TP'', now have an additional argument - 
+conversions ``TPF2HL'' and ``HLF2TP'', now have an additional argument -
 the observer's geodetic altitude.
 
 \item The Polygon class has been modified to make it consistent with the
 IVOA STC definition of a Polygon. Specifically, the inside of a polygon
-is now the area to the left of each edge as the vertices are traversed in 
+is now the area to the left of each edge as the vertices are traversed in
 an anti-clockwise manner, as seen from the inside of the celestial sphere.
 Previously, AST used the anti-clockwise convention, but viewed from the
-outside of the celestial sphere instead of the inside. Any Polygon saved 
-using previous versions of AST will be identified and negated automatically 
+outside of the celestial sphere instead of the inside. Any Polygon saved
+using previous versions of AST will be identified and negated automatically
 when read by AST V5.2.
 
 \item A new class of Channel, called StcsChan, has been added that allows
 conversion of suitable AST Objects to and from IVOA STC-S format.
 
-\item A new method called 
+\item A new method called
 c+
-astRemoveRegions 
+astRemoveRegions
 c-
 f+
 AST\_REMOVEREGIONS
 f-
 has been added to the Mapping class. It searches a (possibly compound)
-Mapping (or Frame) for any instances of the AST Region class, and either 
+Mapping (or Frame) for any instances of the AST Region class, and either
 removes them, or replaces them with UnitMaps (or equivalent Frames). It
 can be used to remove the masking effects of Regions from a compound
 Mapping or Frame.
 
-\item A new method called 
+\item A new method called
 c+
 astDownsize
 c-
@@ -21785,12 +21785,12 @@ AST\_DOWNSIZE
 f-
 has been added to the Polygon class. It produces a new Polygon that
 contains a subset of the vertices in the supplied Polygon. The subset is
-chosen to retain the main features of the supplied Polygion, in so far 
+chosen to retain the main features of the supplied Polygion, in so far
 as that is possible, within specified constraints.
 
-\item A new constructor called 
+\item A new constructor called
 c+
-astOutline 
+astOutline
 c-
 f+
 AST\_OUTLINE
@@ -21800,7 +21800,7 @@ the boundary of a region within the array that holds pixels with
 specified values. It then creates a new Polygon to describe this boundary
 to a specified accuracy.
 
-\item A new set of methods, called 
+\item A new set of methods, called
 c+
 astMapGetElem<X>
 c-
@@ -21811,21 +21811,21 @@ has been added to the KeyMap class. They allow a single element of a vector
 valued entry to be returned.
 
 \item A new attribute called KeyError has been added to the KeyMap Class. It
-controls whether the 
+controls whether the
 c+
-astMapGet... 
+astMapGet...
 c-
 f+
 AST\_MAPGET...
 f-
-family of functions report an error if an entry with the requested key does 
+family of functions report an error if an entry with the requested key does
 not exist in the KeyMap.
 
 \end{enumerate}
 
 \subsection{Changes Introduced in V5.3}
 
-The following describes the most significant changes which 
+The following describes the most significant changes which
 occurred in the AST library between versions V5.2 and V5.3:
 
 \begin{enumerate}
@@ -21840,7 +21840,7 @@ f-
 functions have been changed. The changes mean that a Frame can now be
 aligned with an instance of a sub-class of Frame, so long as the number
 of axes and the Domain values are consistent. For instance, a basic
-2-dimensional Frame with Domain ``SKY'' will now align succesfully with 
+2-dimensional Frame with Domain ``SKY'' will now align succesfully with
 a SkyFrame, conversion between the two Frames being achieved using a
 UnitMap.
 
@@ -21849,7 +21849,7 @@ c+
 declared ``const''.
 c-
 
-\item Added method 
+\item Added method
 c+
 astMatchAxes
 c-
@@ -21859,7 +21859,7 @@ f-
 to the Frame class. This method allows corresponding axes within two
 Frames to be identified.
 
-\item The 
+\item The
 c+
 astAddFrame
 c-
@@ -21878,7 +21878,15 @@ current version):
 
 \begin{enumerate}
 
-\item A bug has been fixed in the 
+\item The Object class has a new method called astHasAttribute/AST_HASATTRIBUTE
+that returns a boolean value indicating if a specified Object has a named
+attribute.
+
+\item The SkyFrame class has two new read-only boolean attributes called
+IsLatAxis and IsLonAxis that can be used to determine the nature of a
+specified SkyFrame axis.
+
+\item A bug has been fixed in the
 c+
 astRebin(Seq)
 c-
@@ -21887,7 +21895,7 @@ AST\_REBIN(SEQ)
 f-
 methods that could cause flux to be lost from the edges of the supplied array.
 
-\item A bug has been fixed in the 
+\item A bug has been fixed in the
 c+
 astRebin(Seq)
 c-
@@ -21900,7 +21908,7 @@ full width of the spreading kernel, rather than the half-width.
 \item The StcsChan class now ignores case when reading STC-S phrases (except
 that units strings are still case sensitive).
 
-\item A new Mapping method, 
+\item A new Mapping method,
 c+
 astQuadApprox,
 c-
@@ -21909,18 +21917,18 @@ AST\_QUADAPPROX,
 f-
 produces a quadratic least-squares fit to a 2D Mapping.
 
-\item A new Mapping method, 
+\item A new Mapping method,
 c+
 astSkyOffsetMap,
 c-
 f+
 AST\_SKYOFFSETMAP,
 f-
-produces a Mapping from absolute SkyFrame coordinates to offset SkyFrame 
+produces a Mapping from absolute SkyFrame coordinates to offset SkyFrame
 coordinates.
 
-\item The Channel class now has an Indent attribute that controls indentation 
-in the text created by 
+\item The Channel class now has an Indent attribute that controls indentation
+in the text created by
 c+
 astWrite.
 c-
@@ -21931,13 +21939,13 @@ The StcsIndent and XmlIndent attributes have been removed.
 
 \item All classes of Channel now use the string ``<bad>'' to represent the
 floating point value AST\_\_BAD, rather than the literal formatted value
-(typically ``-1.79769313486232e+308'' ). 
+(typically ``-1.79769313486232e+308'' ).
 
 \item The KeyMap class now uses the string ``<bad>'' to represent the
 floating point value AST\_\_BAD, rather than the literal formatted value
-(typically ``-1.79769313486232e+308'' ). 
+(typically ``-1.79769313486232e+308'' ).
 
-\item The KeyMap class has a new method called 
+\item The KeyMap class has a new method called
 c+
 astMapPutElem<X>
 c-

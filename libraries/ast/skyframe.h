@@ -51,12 +51,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -144,8 +144,8 @@
 
 /* Define constants used to size global arrays in this module. */
 /* Define other numerical constants for use in this module. */
-#define AST__SKYFRAME_GETATTRIB_BUFF_LEN 200   
-#define AST__SKYFRAME_GETFORMAT_BUFF_LEN 50    
+#define AST__SKYFRAME_GETATTRIB_BUFF_LEN 200
+#define AST__SKYFRAME_GETFORMAT_BUFF_LEN 50
 #define AST__SKYFRAME_GETLABEL_BUFF_LEN 40
 #define AST__SKYFRAME_GETSYMBOL_BUFF_LEN 20
 #define AST__SKYFRAME_GETTITLE_BUFF_LEN 200
@@ -212,6 +212,8 @@ typedef struct AstSkyFrameVtab {
    double (* GetEquinox)( AstSkyFrame *, int * );
    int (* GetNegLon)( AstSkyFrame *, int * );
    int (* GetAsTime)( AstSkyFrame *, int, int * );
+   int (* GetIsLatAxis)( AstSkyFrame *, int, int * );
+   int (* GetIsLonAxis)( AstSkyFrame *, int, int * );
    int (* GetLatAxis)( AstSkyFrame *, int * );
    int (* GetLonAxis)( AstSkyFrame *, int * );
    int (* TestAsTime)( AstSkyFrame *, int, int * );
@@ -253,11 +255,11 @@ typedef struct AstSkyFrameVtab {
 
 } AstSkyFrameVtab;
 
-#if defined(THREAD_SAFE) 
+#if defined(THREAD_SAFE)
 
 /* The AstSkyFrameGlobals structure makes a forward reference to the
    AstTimeFrame structure which is not defined here (since the
-   timeframe.h file includes skyframe.h). Hence make a preliminary 
+   timeframe.h file includes skyframe.h). Hence make a preliminary
    definition available now. */
 struct AstTimeFrame;
 
@@ -308,7 +310,7 @@ AstSkyFrame *astLoadSkyFrame_( void *, size_t, AstSkyFrameVtab *,
                                const char *, AstChannel *channel, int * );
 
 /* Thread-safe initialiser for all global data used by this module. */
-#if defined(THREAD_SAFE) 
+#if defined(THREAD_SAFE)
 void astInitSkyFrameGlobals_( AstSkyFrameGlobals * );
 #endif
 #endif
@@ -322,6 +324,8 @@ const char *astGetProjection_( AstSkyFrame *, int * );
 double astGetEquinox_( AstSkyFrame *, int * );
 int astGetNegLon_( AstSkyFrame *, int * );
 int astGetAsTime_( AstSkyFrame *, int, int * );
+int astGetIsLatAxis_( AstSkyFrame *, int, int * );
+int astGetIsLonAxis_( AstSkyFrame *, int, int * );
 int astGetLatAxis_( AstSkyFrame *, int * );
 int astGetLonAxis_( AstSkyFrame *, int * );
 int astTestAsTime_( AstSkyFrame *, int, int * );
@@ -428,6 +432,10 @@ astINVOKE(V,astGetAsTime_(astCheckSkyFrame(this),axis,STATUS_PTR))
 astINVOKE(V,astGetEquinox_(astCheckSkyFrame(this),STATUS_PTR))
 #define astGetNegLon(this) \
 astINVOKE(V,astGetNegLon_(astCheckSkyFrame(this),STATUS_PTR))
+#define astGetIsLatAxis(this,axis) \
+astINVOKE(V,astGetIsLatAxis_(astCheckSkyFrame(this),axis,STATUS_PTR))
+#define astGetIsLonAxis(this,axis) \
+astINVOKE(V,astGetIsLonAxis_(astCheckSkyFrame(this),axis,STATUS_PTR))
 #define astGetLatAxis(this) \
 astINVOKE(V,astGetLatAxis_(astCheckSkyFrame(this),STATUS_PTR))
 #define astGetLonAxis(this) \
