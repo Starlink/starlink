@@ -13,7 +13,7 @@
 *     Library routine
 
 *  Invocation:
-*     smf_model_createHdr( smfData *model, smf_modeltype type, 
+*     smf_model_createHdr( smfData *model, smf_modeltype type,
 *                            AstFrameSet *refwcs, int *status );
 
 *  Arguments:
@@ -27,11 +27,11 @@
 *        Pointer to global status.
 
 *  Description:
-*     Calculate a "time series" WCS frameset compatible with the model 
+*     Calculate a "time series" WCS frameset compatible with the model
 *     container, so that we can later call ndfPtwcs when we export. Requires
-*     both the model smfData itself, and the tswcs from the original data. 
+*     both the model smfData itself, and the tswcs from the original data.
 *     Also copies over the FITS header from the reference header. If
-*     the reference contains neither the WCS or FITS header information 
+*     the reference contains neither the WCS or FITS header information
 *     the model header pointers are left in the initialized state (NULL).
 *     Old tswcs and FITS headers are annulled.
 
@@ -89,16 +89,16 @@
 
 #define FUNC_NAME "smf_model_createHdr"
 
-void smf_model_createHdr( smfData *model, smf_modeltype type, 
+void smf_model_createHdr( smfData *model, smf_modeltype type,
                           smfHead *refhdr, int *status ) {
 
   /* Local Variables */
   AstMapping *cbmap=NULL;       /* Pointer to current->base mapping */
-  AstFrameSet *fset=NULL;       /* the returned framset */ 
+  AstFrameSet *fset=NULL;       /* the returned framset */
   int out[NDF__MXDIM];          /* Indices outputs of mapping */
   AstFitsChan *reffits=NULL;    /* Reference FITS header */
   AstFrameSet *refwcs=NULL;     /* Reference time series WCS */
-  int taxis;                    /* Index of time axis */ 
+  int taxis;                    /* Index of time axis */
   AstFrame *tfrm=NULL;          /* 1D frame (TimeFrame) */
   AstMapping *tmap=NULL;        /* Mapping for time axis */
 
@@ -119,46 +119,46 @@ void smf_model_createHdr( smfData *model, smf_modeltype type,
   if( !model->hdr ) {
     model->hdr = smf_create_smfHead( status );
   }
-      
+
   /* Calculate TSWCS */
   if( refwcs ) {
     astBegin;
 
     /* Create frameset for each model type. Many have same dimensions as the
        raw data, so just return a copy of refwcs */
-    
+
     switch( type ) {
-      
+
     case SMF__CUM:
       fset = astCopy( refwcs );
       break;
-      
+
     case SMF__RES:
       fset = astCopy( refwcs );
       break;
-      
+
     case SMF__AST:
       fset = astCopy( refwcs );
       break;
-      
+
     case SMF__COM:
       /* For 1=dimensional data, assume it is the time axis which we
          extract from the 3d WCS */
-      
+
       /* Get a pointer to the current->base Mapping (i.e. the Mapping from
          WCS coords to GRID coords). */
       cbmap = astGetMapping( refwcs, AST__CURRENT, AST__BASE );
-      
+
       /* Use astMapSplit to split off the Mapping for the time
          axis. This assumes that the time axis is the 3rd axis
          (i.e. index 2) */
-      
+
       taxis = 3;
       astMapSplit( cbmap, 1, &taxis, out, &tmap );
-      
+
       /* We now check that the Mapping was split succesfully. This should
-         always be the case for the time axis since the time axis is 
-         independent of the others, but it is as well to check in case of 
+         always be the case for the time axis since the time axis is
+         independent of the others, but it is as well to check in case of
          bugs, etc. */
       if( !tmap ) {
         /* The "tmap" mapping will have 1 input (the WCS time value) -
@@ -170,46 +170,46 @@ void smf_model_createHdr( smfData *model, smf_modeltype type,
                 status );
       } else if( astGetI( tmap, "Nout" ) != 1 ) {
         *status = SAI__ERROR;
-        errRep( "", FUNC_NAME 
+        errRep( "", FUNC_NAME
                 ": Time-axis mapping has incorrect number of outputs",
                 status );
       } else {
-        
+
         /* Create a new FrameSet containing a 1D GRID Frame. */
         fset = astFrameSet( astFrame( 1, "Domain=GRID" ), " " );
-        
+
         /* Extract the 1D Frame (presumably a TimeFrame)
            describing time from the current (WCS) 3D Frame. */
         tfrm = astPickAxes( refwcs, 1, &taxis, NULL);
-        
+
         /* Add the time frame into the 1D FrameSet, using the
            Mapping returned by astMapSplit. Note, this Mapping
            goes from time to grid, so we invert it first so that
            it goes from grid to time, as required by
            astAddFrame. */
-        
+
         astInvert( tmap );
         astAddFrame( fset, AST__BASE, tmap, tfrm );
       }
-      
+
       break;
-      
+
     case SMF__NOI:
       fset = astCopy( refwcs );
       break;
-      
+
     case SMF__EXT:
       fset = astCopy( refwcs );
       break;
-      
+
     case SMF__LUT:
       fset = astCopy( refwcs );
       break;
-      
+
     case SMF__QUA:
       fset = astCopy( refwcs );
       break;
-      
+
     case SMF__DKS:
       /* Don't know how to make a particularly meaningful framset */
       fset = NULL;
@@ -219,37 +219,37 @@ void smf_model_createHdr( smfData *model, smf_modeltype type,
       /* Don't know how to make a particularly meaningful framset */
       fset = NULL;
       break;
-      
+
     case SMF__FLT:
       fset = astCopy( refwcs );
       break;
 
     default:
       *status = SAI__ERROR;
-      errRep( "", FUNC_NAME ": Invalid smf_modeltype given.", status);        
+      errRep( "", FUNC_NAME ": Invalid smf_modeltype given.", status);
     }
-    
+
     /* Trap additional Ast errors */
     if( (*status == SAI__OK) && !astOK ) {
       *status = SAI__ERROR;
       msgSetc("MODEL", smf_model_getname( type, status ) );
       errRep( "", FUNC_NAME ": Ast error creating frameset for ^MODEL", status);
     }
-    
+
     if( (*status==SAI__OK) && fset ) {
       /* Export the frameset before ending the ast context */
       astExport( fset );
-      
+
       /* Annul old tswcs if one exists */
       if( (*status==SAI__OK) && model->hdr->tswcs ) {
         model->hdr->tswcs = astAnnul( model->hdr->tswcs );
       }
-      
+
       /* Store the new frameset in the header */
       if( *status==SAI__OK ) model->hdr->tswcs = fset;
-      
+
     }
-    
+
     astEnd;
   }
 
@@ -269,7 +269,7 @@ void smf_model_createHdr( smfData *model, smf_modeltype type,
     if( !astOK ) {
       *status = SAI__ERROR;
       msgSetc("MODEL", smf_model_getname( type, status ) );
-      errRep( "", FUNC_NAME ": Ast error creating FITS header for ^MODEL", 
+      errRep( "", FUNC_NAME ": Ast error creating FITS header for ^MODEL",
               status);
     }
   }
