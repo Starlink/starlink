@@ -49,10 +49,12 @@
 *        added.
 *     2009-03-12 (EC):
 *        Added SMF__FLT
+*     2010-04-08 (EC):
+*        Propagate JCMTState if present.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2005-2009 University of British Columbia.
+*     Copyright (C) 2008-2010 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -272,5 +274,15 @@ void smf_model_createHdr( smfData *model, smf_modeltype type,
       errRep( "", FUNC_NAME ": Ast error creating FITS header for ^MODEL",
               status);
     }
+  }
+
+  /* Propagate JCMTState */
+  if( (*status==SAI__OK) && (refhdr->allState) ) {
+    model->hdr->nframes = refhdr->nframes;
+    model->hdr->allState = smf_malloc( refhdr->nframes,
+                                       sizeof(*(model->hdr->allState)),
+                                       1, status );
+    memcpy( model->hdr->allState, refhdr->allState,
+            refhdr->nframes*sizeof(*refhdr->allState) );
   }
 }
