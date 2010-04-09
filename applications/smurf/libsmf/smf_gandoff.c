@@ -14,8 +14,8 @@
 
 *  Invocation:
 *     void smf_gandoff( dim_t ibolo, dim_t time0, dim_t time1, dim_t ntime,
-*                       dim_t gbstride, dim_t gcstride, double *gai_data, 
-*                       dim_t nblock, dim_t gain_box, double *wg, 
+*                       dim_t gbstride, dim_t gcstride, double *gai_data,
+*                       dim_t nblock, dim_t gain_box, double *wg,
 *                       double *woff, int *status )
 
 *  Arguments:
@@ -36,8 +36,8 @@
 *     gai_data = double * (Given)
 *        Array holding the gain, offset and correlation coefficient for
 *        the linear fit of each block of time slices to the common mode
-*        signal. This is nominally like a normal 2D array spanned by
-*        bolometer index and time index, and so would be indexed as:
+*        signal, or NULL. This is nominally like a normal 2D array spanned
+*        by bolometer index and time index, and so would be indexed as:
 *
 *           gai_data[ ibolo*gbstride + itime*gcstride ];
 *
@@ -48,29 +48,32 @@
 *        "nblock" is the number of blocks used to describe the entire
 *        time series, and "ipar" is the index of the required fit
 *        parameter (0=gain, 1=offset, 2=correlation).
+*
+*        If NULL, the returned gain array will be filled with the value
+*        1.0 amd the returned offset array will be filled with the value 0.0.
 *     nblock = dim_t * (Given)
 *        The number of blocks into which the time stream is divided.
 *     gain_box = dim_t * (Given)
 *        The number of time slices in each block (note, the final block
 *        may contain more than "gain_box" slices ).
 *     wg = double * (Returned)
-*        Pointer to an array in which to return the gain values for 
+*        Pointer to an array in which to return the gain values for
 *        bolometer "ibolo". It should have at least "time1-time0+1"
 *        elements.
 *     woff = double * (Returned)
-*        Pointer to an array in which to return the offset values for 
+*        Pointer to an array in which to return the offset values for
 *        bolometer "ibolo". It should have at least "time1-time0+1"
 *        elements.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
 *  Description:
-*     For each time slice in a given range, this function retrieves the gain 
-*     and offset of the linear mapping from common mode signal to a specific 
+*     For each time slice in a given range, this function retrieves the gain
+*     and offset of the linear mapping from common mode signal to a specific
 *     bolometer signal. The gain and offset for each time slice are
 *     returned in two asupplied arrays.
 *
-*     Time slices in a bolometer time stream are grouped into blocks, and 
+*     Time slices in a bolometer time stream are grouped into blocks, and
 *     each block has an associated gain and offset value. However, to avoid
 *     dis-continutities associated with changing the gain suddenly at the
 *     end of each block, linear interpolation is performed between blocks
@@ -87,7 +90,7 @@
 *     Time slices in the first half of the first block are all given the
 *     gain and offset associated with the first block. Likewise, the time
 *     slices in the second half of the last block are all given the gain
-*     and offset associated with the last block. 
+*     and offset associated with the last block.
 
 *  Authors:
 *     DSB: David S Berry (JAC, Hawaii)
@@ -96,6 +99,8 @@
 *  History:
 *     9-FEB-2009 (DSB):
 *        Original version
+*     9-APR-2009 (DSB):
+*        Return default values if no gain data is supplied.
 
 *  Copyright:
 *     Copyright (C) 2010 Science & Technology Facilities Council.
@@ -130,9 +135,9 @@
 /* SMURF includes */
 #include "libsmf/smf.h"
 
-void smf_gandoff( dim_t ibolo, dim_t time0, dim_t time1, dim_t ntime, 
-                  dim_t gbstride, dim_t gcstride, double *gai_data, 
-                  dim_t nblock, dim_t gain_box, double *wg, double *woff, 
+void smf_gandoff( dim_t ibolo, dim_t time0, dim_t time1, dim_t ntime,
+                  dim_t gbstride, dim_t gcstride, double *gai_data,
+                  dim_t nblock, dim_t gain_box, double *wg, double *woff,
                   int *status ){
 
 /* Local Variables; */
@@ -173,6 +178,17 @@ void smf_gandoff( dim_t ibolo, dim_t time0, dim_t time1, dim_t ntime,
               status );
    }
 
+/* If no gain values have been supplied, just fil the arrays with default
+   values and return. */
+   if( !gai_data ) {
+      g = wg;
+      off = woff;
+      for( itime = time0; itime <= time1; itime++ ) {
+         *(g++) = 1.0;
+         *(off++) = 0.0;
+      }
+      return;
+   }
 
 /* Offset to start of offset values within gai_data. */
    off_offset = nblock*gcstride;
@@ -189,20 +205,19 @@ void smf_gandoff( dim_t ibolo, dim_t time0, dim_t time1, dim_t ntime,
    gain0 = VAL__BADD;
    off0 = VAL__BADD;
 
-
-/* Initialise the (floating point) time at the start and end of the section. 
+/* Initialise the (floating point) time at the start and end of the section.
    This is measured from the centre of the first time slice. */
    end_time = 0.5*( gain_box - 1.0 );
    start_time = end_time - gain_box;
 
-/* Initialise the (integer) index of the first time slice in the next linear 
+/* Initialise the (integer) index of the first time slice in the next linear
    interpolation section. */
    next_section = gain_box/2;
 
 /* Set the index of gain value associated with the next block. */
    igbase += gcstride;
 
-/* Initialise the index of the block at the end of the *next* linear 
+/* Initialise the index of the block at the end of the *next* linear
    interpolation section. */
    isection = 1;
    k1 = VAL__BADD;
@@ -213,14 +228,14 @@ void smf_gandoff( dim_t ibolo, dim_t time0, dim_t time1, dim_t ntime,
 /* Loop over all time slices, up to the last required time slice. */
    g = wg;
    off = woff;
-   for( itime = 0; itime <= time1; itime++ ) { 
+   for( itime = 0; itime <= time1; itime++ ) {
 
-/* If we have reached the start of a new linear interpolation section, find 
-   the constants that give the gain and offset for each time slice in the new 
+/* If we have reached the start of a new linear interpolation section, find
+   the constants that give the gain and offset for each time slice in the new
    section. */
       if( itime == next_section ) {
 
-/* The gain, offset and time at the end of the previous section are used to 
+/* The gain, offset and time at the end of the previous section are used to
    define the start of the new section. */
          gain0 = gain1;
          off0 = off1;
@@ -251,7 +266,7 @@ void smf_gandoff( dim_t ibolo, dim_t time0, dim_t time1, dim_t ntime,
 /* Advance the index of gain value associated with the next block. */
          igbase += gcstride;
 
-/* Advance the index of the first time slice in the next linear interpolation  
+/* Advance the index of the first time slice in the next linear interpolation
    section. */
          next_section += dt;
 
@@ -283,15 +298,15 @@ void smf_gandoff( dim_t ibolo, dim_t time0, dim_t time1, dim_t ntime,
          if( k1 != VAL__BADD ) {
             *(g++) = k1*( (double) itime ) + k2;
             *(off++) = k3*( (double) itime ) + k4;
-   
+
          } else if( gain0 != VAL__BADD ) {
             *(g++) = gain0;
             *(off++) = off0;
-   
+
          } else if( gain1 != VAL__BADD ) {
             *(g++) = gain1;
             *(off++) = off1;
-   
+
          } else {
             *(g++) = 1.0;
             *(off++) = 0.0;

@@ -134,6 +134,8 @@
 *     2010-04-01 (DSB):
 *        - Check for VAL__BADD in the supplied model array.
 *        - Avoid some "type-punned" compiler warnings.
+*     2010-04-09 (DSB):
+*        - Prevent segvio if no gain model is supplied.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -356,12 +358,14 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
       gain = ( sum > 0.0 ) ? sqrtf( sum/nsum ) : VAL__BADD;
 
       /* Initialise the bolometer fit parameters for every block. */
-      ijindex = j*gbstride;
-      for( i = 0; i < nblock; i++ ) {
-        gai_data[ ijindex ] = gain;   /* Gain */
-        gai_data[ ijindex + nblock*gcstride ] = 0.0;   /* Offset */
-        gai_data[ ijindex + 2*nblock*gcstride ] = 1.0;   /* Correlation */
-        ijindex += gcstride;
+      if( gai_data ) {
+         ijindex = j*gbstride;
+         for( i = 0; i < nblock; i++ ) {
+           gai_data[ ijindex ] = gain;      /* Gain */
+           gai_data[ ijindex + nblock*gcstride ] = 0.0;      /* Offset */
+           gai_data[ ijindex + 2*nblock*gcstride ] = 1.0;      /* Correlation */
+           ijindex += gcstride;
+         }
       }
     }
 
