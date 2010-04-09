@@ -14,7 +14,8 @@
 
 *  Invocation:
 
-*     smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt,
+*     smf_filter_execute( smfWorkForce *wf, smfData *data,
+*                         unsigned char *quality, smfFilter *filt,
 *                         int *status )
 
 *  Arguments:
@@ -22,6 +23,8 @@
 *        Pointer to a pool of worker threads (can be NULL)
 *     data = smfData * (Given and Returned)
 *        The data to be filtered (performed in-place)
+*     quality = unsigned char * (Given and Returned)
+*        If set, use this buffer instead of QUALITY associated with data
 *     srate = double (Given)
 *        If nonzero specifies sample rate of data in Hz (otherwise taken
 *        from JCMTState associated with data).
@@ -65,6 +68,8 @@
 *     2009-04-27 (EC):
 *        - Modified so that it can optionally use multiple threads internally
 *        - Each thread gets its own plan, rather than reusing same one
+*     2010-04-01 (EC):
+*        - add option of an external quality array
 
 *  Copyright:
 *     Copyright (C) 2007-2009 University of British Columbia.
@@ -126,6 +131,7 @@ typedef struct smfFilterExecuteData {
   int ijob;                /* Job identifier */
   fftw_plan plan_forward;  /* for forward transformation */
   fftw_plan plan_inverse;  /* for inverse transformation */
+  unsigned char *qua;      /* quality pointer */
 } smfFilterExecuteData;
 
 /* Function to be executed in thread: filter all of the bolos from b1 to b2
@@ -161,14 +167,15 @@ void smfFilterExecuteParallel( void *job_data_ptr, int *status ) {
   }
 
   data = pdata->data;
-  qua = data->pntr[2];
   filt = pdata->filt;
   data_fft_r = pdata->data_fft_r;
   data_fft_i = pdata->data_fft_i;
+  qua = pdata->qua;
 
   if( !data ) {
     *status = SAI__ERROR;
-    errRep( "", "smfFilterExecuteParallel: No valid smfData supplied", status );
+    errRep( "", "smfFilterExecuteParallel: No valid smfData supplied",
+            status );
     return;
   }
 
@@ -252,7 +259,8 @@ void smfFilterExecuteParallel( void *job_data_ptr, int *status ) {
 
 #define FUNC_NAME "smf_filter_execute"
 
-void smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt,
+void smf_filter_execute( smfWorkForce *wf, smfData *data,
+                         unsigned char *quality, smfFilter *filt,
                          int *status ) {
 
   /* Local Variables */
@@ -346,6 +354,13 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt,
       pdata->b2=nbolo-1;
     }
     pdata->data = data;
+
+    if( quality ) {
+      pdata->qua = quality;
+    } else {
+      pdata->qua = data->pntr[2];
+    }
+
     pdata->data_fft_r = smf_malloc( filt->dim, sizeof(*pdata->data_fft_r), 0,
                                     status );
     pdata->data_fft_i = smf_malloc( filt->dim, sizeof(*pdata->data_fft_i), 0,

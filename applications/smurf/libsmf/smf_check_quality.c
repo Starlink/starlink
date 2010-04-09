@@ -115,19 +115,20 @@ size_t smf_check_quality( smfData *data, unsigned char *quality,
   /* Check for DATA */
   if( !data ) {
     *status = SAI__ERROR;
-    errRep( FUNC_NAME, "NULL data supplied", status );
+    errRep( "", FUNC_NAME ": NULL data supplied", status );
     return 0;
   }
 
   if( !data->pntr[0] ) {
     *status = SAI__ERROR;
-    errRep( FUNC_NAME, "smfData does not contain a DATA component", status );
+    errRep( "", FUNC_NAME ": smfData does not contain a DATA component",
+            status );
     return 0;
   }
 
   if( data->dtype != SMF__DOUBLE ) {
     *status = SAI__ERROR;
-    errRep( FUNC_NAME, "smfData does not have type SMF__DOUBLE", status );
+    errRep( "", FUNC_NAME ": smfData does not have type SMF__DOUBLE", status );
     return 0;
   }
 
@@ -142,7 +143,7 @@ size_t smf_check_quality( smfData *data, unsigned char *quality,
 
   if( !qual ) {
     *status = SAI__ERROR;
-    errRep( FUNC_NAME, "NULL quality supplied", status);
+    errRep( "", FUNC_NAME ": NULL quality supplied", status);
     return 0;
   }
 
