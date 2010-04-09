@@ -41,7 +41,7 @@
 *        external medium such as a data file. There is no restriction
 *        on the string's contents. The default is an empty string.
 *     Ident (string)
-*        Like ID, this is an identification string which may be used 
+*        Like ID, this is an identification string which may be used
 *        to identify the Object. Unlike ID, Ident is transferred when an
 *        Object is copied.
 *     UseDefs (int)
@@ -193,7 +193,7 @@
 *           The AST library major version number.
 *        AST__VMINOR
 *           The AST library minor version number.
-*        AST__RELEASE 
+*        AST__RELEASE
 *           The AST library release number.
 *
 *     Protected:
@@ -255,18 +255,20 @@
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
 *     Research Councils
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -316,11 +318,13 @@
 *        Make all system includes unconditional, so that makeh is not
 *        confused when creating ast.h.
 *     22-JUN-2007 (DSB):
-*        - Make astVSet return a pointer to dynamic memory holding the 
+*        - Make astVSet return a pointer to dynamic memory holding the
 *        expanded setting string.
 *        - Add ast astSetVtab and astCast.
 *     22-APR-2008 (DSB):
 *        Added astSame.
+*     7-APR-2010 (DSB):
+*        Added astHasAttribute.
 *--
 */
 
@@ -359,7 +363,7 @@
 #  define  __attribute__(x)  /*NOTHING*/
 #endif
 
-/* Set to "1" (yes) or "0" (no) to indicate if AST was build with threads 
+/* Set to "1" (yes) or "0" (no) to indicate if AST was build with threads
    support. */
 #define AST__THREADSAFE @THREADS@
 
@@ -519,9 +523,9 @@ astERROR_INVOKE(astRet##rettype##_(function))
 *        function.
 *     force
 *        Type checking takes time, and so can be disabled within the
-*        protected context in order to save time. Setting "force" to 
-*        zero causes the astINVOKE_CHECK macro to skip the class check 
-*        in a protected context (it assumes that AST "knows what it is 
+*        protected context in order to save time. Setting "force" to
+*        zero causes the astINVOKE_CHECK macro to skip the class check
+*        in a protected context (it assumes that AST "knows what it is
 *        doing"). Setting "force" to a non-zero value forces the class
 *        check even in a protected context.
 
@@ -747,7 +751,7 @@ void astClear##attribute##_( Ast##class *this, int *status ) { \
 \
 /* Invoke the required method via the virtual function table. */ \
    (**astMEMBER(this,class,Clear##attribute))( this, status ); \
-}   
+}
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -1156,7 +1160,7 @@ int astTest##attribute##_( Ast##class *this, int *status ) { \
 *-
 */
 
-/* A subsiduary macro that returns a pointer to the vtab of an object, 
+/* A subsiduary macro that returns a pointer to the vtab of an object,
    cast to an AstObjectVtab. */
 #define astVTAB(this) (((AstObject*)(this))->vtab)
 
@@ -1215,8 +1219,8 @@ int astTest##attribute##_( Ast##class *this, int *status ) { \
 #define astMAX(aa,bb) ((aa)>(bb)?(aa):(bb))
 #define astMIN(aa,bb) ((aa)<(bb)?(aa):(bb))
 
-/* Check for equality of floating point values. We cannot compare bad values 
-   directly because of the danger of floating point exceptions, so bad 
+/* Check for equality of floating point values. We cannot compare bad values
+   directly because of the danger of floating point exceptions, so bad
    values are dealt with explicitly. */
 #define astEQUAL(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E5*astMAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
 
@@ -1232,7 +1236,7 @@ int astTest##attribute##_( Ast##class *this, int *status ) { \
 /* Test the validy of an attribute value  */
 /* -------------------------------------  */
 /* If the set attribute value is invalid, clear it. These macros should
-   be used in a context in which error reporting has been deferred by 
+   be used in a context in which error reporting has been deferred by
    calling astReporting( 0 ). */
 
 #define astCLEAN_ATTRIB(attr) \
@@ -1242,7 +1246,7 @@ int astTest##attribute##_( Ast##class *this, int *status ) { \
          astClearStatus; \
          astClear##attr( this ); \
       } \
-   }  
+   }
 
 #define astCLEAN_INDEXED_ATTRIB(attr,index) \
    if( astTest##attr(this,index) ) { \
@@ -1251,7 +1255,7 @@ int astTest##attribute##_( Ast##class *this, int *status ) { \
          astClearStatus; \
          astClear##attr( this, index ); \
       } \
-   }  
+   }
 
 #endif
 
@@ -1328,6 +1332,7 @@ typedef struct AstObjectVtab {
    int (* TestAttrib)( AstObject *, const char *, int * );
    int (* TestID)( AstObject *, int * );
    int (* Same)( AstObject *, AstObject *, int * );
+   int (* HasAttribute)( AstObject *, const char *, int * );
    int (* TestIdent)( AstObject *, int * );
    void (* Clear)( AstObject *, const char *, int * );
    void (* ClearAttrib)( AstObject *, const char *, int * );
@@ -1374,15 +1379,15 @@ typedef struct AstObjectVtab {
    object.c file. */
 
 typedef struct AstObjectGlobals {
-   AstObjectVtab Class_Vtab; 
+   AstObjectVtab Class_Vtab;
    int Class_Init;
-   int Retain_Esc; 
-   int Context_Level; 
-   int *Active_Handles; 
-   char GetAttrib_Buff[ AST__GETATTRIB_BUFF_LEN + 1 ];  
-   char *AstGetC_Strings[ AST__ASTGETC_MAX_STRINGS ];  
-   int AstGetC_Istr;           
-   int AstGetC_Init; 
+   int Retain_Esc;
+   int Context_Level;
+   int *Active_Handles;
+   char GetAttrib_Buff[ AST__GETATTRIB_BUFF_LEN + 1 ];
+   char *AstGetC_Strings[ AST__ASTGETC_MAX_STRINGS ];
+   int AstGetC_Istr;
+   int AstGetC_Init;
    int Nvtab;
    AstObjectVtab **Known_Vtabs;
 } AstObjectGlobals;
@@ -1423,7 +1428,7 @@ void astInitObjectVtab_( AstObjectVtab *, const char *, int * );
 AstObject *astLoadObject_( void *, size_t, AstObjectVtab *,
                            const char *, AstChannel *channel, int * );
 
-#if defined(THREAD_SAFE) 
+#if defined(THREAD_SAFE)
 void astInitObjectGlobals_( AstObjectGlobals * );
 #endif
 
@@ -1469,6 +1474,7 @@ double astGetD_( AstObject *, const char *, int * );
 float astGetF_( AstObject *, const char *, int * );
 int astEqual_( AstObject *, AstObject *, int * );
 int astGetI_( AstObject *, const char *, int * );
+int astHasAttribute_( AstObject *, const char *, int * );
 int astSame_( AstObject *, AstObject *, int * );
 int astTest_( AstObject *, const char *, int * );
 long astGetL_( AstObject *, const char *, int * );
@@ -1632,6 +1638,8 @@ astINVOKE(V,astShow_(astCheckObject(this),STATUS_PTR))
 astINVOKE(V,astTest_(astCheckObject(this),attrib,STATUS_PTR))
 #define astSame(this,that) \
 astINVOKE(V,astSame_(astCheckObject(this),astCheckObject(that),STATUS_PTR))
+#define astHasAttribute(this,attrib) \
+astINVOKE(V,astHasAttribute_(astCheckObject(this),attrib,STATUS_PTR))
 
 #if defined(astCLASS)            /* Protected */
 
@@ -1639,7 +1647,7 @@ astINVOKE(V,astSame_(astCheckObject(this),astCheckObject(that),STATUS_PTR))
 #define astManageLock(this,mode,extra,fail) \
 astINVOKE(V,astManageLock_(astCheckObject(this),mode, extra,fail,STATUS_PTR))
 #else
-#define astManageLock(this,mode,extra,fail) 
+#define astManageLock(this,mode,extra,fail)
 #endif
 
 #define astCleanAttribs(this) astINVOKE(V,astCleanAttribs_(astCheckObject(this),STATUS_PTR))
@@ -1705,7 +1713,7 @@ void astHandleAlarm_( const char *, va_list );
 
 #define astWatchHandle
 #define astHandleUse
-#define astHandleAlarm 
+#define astHandleAlarm
 
 #endif
 
