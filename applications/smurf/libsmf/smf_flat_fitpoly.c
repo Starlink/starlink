@@ -58,6 +58,7 @@
 *        Rewritten in SMURF based upon logic from sc2sim_fitheat.
 *     2010-04-09 (TIMJ):
 *        Add snr filter for fit in linear case.
+*        Use correct power values in the presence of bad data.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -105,6 +106,7 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
   double * bolvar = NULL;   /* Pointer to bolvald variance */
   const double CLIP = 3.0;  /* Sigma clipping for polynomial fit */
   double * coptr = NULL;    /* pointer to coefficients data array */
+  double * goodht = NULL;   /* Heater values for good measurements */
   size_t * goodidx = NULL;     /* Indices of good measurements */
   double * ht = NULL;       /* Heater values corrected for reference */
   size_t j;
@@ -175,6 +177,7 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
   scan = smf_malloc ( nheat, sizeof(*scan), 1, status );
   if (bolvar) scanvar = smf_malloc ( nheat, sizeof(*scanvar), 1, status );
   ht = smf_malloc ( nheat, sizeof(*ht), 1, status );
+  goodht = smf_malloc ( nheat, sizeof(*goodht), 1, status );
   scoeff = smf_malloc( order + 1, sizeof(*scoeff), 0, status );
   scoeffvar = smf_malloc( order + 1, sizeof(*scoeffvar), 0, status );
   goodidx = smf_malloc( nheat, sizeof(*goodidx), 1, status );
@@ -205,6 +208,7 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
     for (i=0; i<nheat; i++) {
       if (bolval[nbol*i+bol] != VAL__BADD && bolvar[nbol*i+bol] != VAL__BADD) {
         scan[nrgood] = bolval[nbol*i+bol] - refval;
+        goodht[nrgood] = ht[i];
         if (scanvar) {
           scanvar[nrgood] = bolvar[nbol*i+bol] + refvar;
         }
@@ -233,7 +237,7 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
         double c0;
         double c1;
 
-        smf_fit_poly1d( order, nrgood, CLIP, ht, scan, scanvar, scoeff, scoeffvar, poly, &nused, status);
+        smf_fit_poly1d( order, nrgood, CLIP, goodht, scan, scanvar, scoeff, scoeffvar, poly, &nused, status);
 
         /* and calculate the fitted polynomial */
         if (polybol) {
@@ -268,7 +272,7 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
 
       } else {
         /* disable variance and fit the other way */
-        smf_fit_poly1d( order, nrgood, CLIP, scan, ht, NULL, scoeff, NULL, NULL, &nused, status);
+        smf_fit_poly1d( order, nrgood, CLIP, scan, goodht, NULL, scoeff, NULL, NULL, &nused, status);
       }
 
       /* copy the result into coptr */
@@ -336,6 +340,7 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
   if (scoeff) scoeff = smf_free( scoeff, status );
   if (scoeffvar) scoeff = smf_free( scoeffvar, status );
   if (ht) ht = smf_free( ht, status );
+  if (goodht) goodht = smf_free( goodht, status );
   if (goodidx) goodidx = smf_free( goodidx, status );
 
   if (*status != SAI__OK) {
