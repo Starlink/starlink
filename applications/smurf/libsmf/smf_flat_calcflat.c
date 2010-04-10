@@ -74,6 +74,8 @@
 *     2010-03-16 (TIMJ):
 *        Add a smfFile to returned smfData so that we know where the flat
 *        comes from.
+*     2010-04-09 (TIMJ):
+*        Move SNRMIN parameter and now pass into smf_flat_fitpoly.
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -142,15 +144,14 @@ smf_flat_calcflat( msglev_t msglev, const char flatname[],
   double *resistance = NULL;/* Resistance data for each bolometer */
   smfData * respmap = NULL; /* Responsivity data */
   int respmask = 0;         /* Mask bolometers that have bad responsivity? */
-  double snrmin = 5.0;      /* Default SNR minimum value for good responsivity */
+  double snrmin = 10.0;     /* Default SNR minimum value for good responsivity */
 
   if (*status != SAI__OK) return ngood;
 
   /* Get flatfield processing parameters */
-  smf_flat_params( flatdata, refrespar, resistpar, methpar, orderpar,
+  smf_flat_params( flatdata, refrespar, resistpar, methpar, orderpar, snrminpar,
                    &refohms, &resistance,  NULL, NULL,
-                   &flatmeth, &order, status );
-
+                   &flatmeth, &order, &snrmin, status );
 
   /* We now have data for the various pixel heater settings.
      Generate a set of reference heater power settings in pW, and calculate the
@@ -167,7 +168,7 @@ smf_flat_calcflat( msglev_t msglev, const char flatname[],
     /* precondition the data prior to fitting */
     smf_flat_precondition(0, powref, bolref, status );
 
-    smf_flat_fitpoly ( powref, bolref, order, &coeffs,
+    smf_flat_fitpoly ( powref, bolref, snrmin, order, &coeffs,
                        &flatpoly, status );
 
     /* now coeffs is in fact the new bolval */
@@ -218,9 +219,6 @@ smf_flat_calcflat( msglev_t msglev, const char flatname[],
 
   /* Calculate the responsivity in Amps/Watt (using the supplied
      signal-to-noise ratio minimum */
-  if (snrminpar) {
-    parGet0d( snrminpar, &snrmin, status );
-  }
   ngood = smf_flat_responsivity( flatmeth, respmap, snrmin, 1, powref, bolref,
                                  (flatmeth == SMF__FLATMETH_TABLE ? &flatpoly : NULL), status );
 

@@ -15,9 +15,9 @@
 *  Invocation:
 *     smf_flat_params( const smfData * refdata, const char refrespar[],
 *                      const char resistpar[], const char methpar[], const char orderpar[],
-*                      double * refres, double **resistance, int * nrows,
+*                      const char snrminpar[], double * refres, double **resistance, int * nrows,
 *                      int * ncols, smf_flatmeth *flatmeth,
-*                      int * order, int * status );
+*                      int * order, double * snrmin, int * status );
 
 *  Arguments:
 *     refdata = const smfData * (Given)
@@ -33,6 +33,9 @@
 *     orderpar = const char [] (Given)
 *        Name of the parameter to use to request the polynomial order.
 *        Only used if methpar indicates a polynomial is to be used.
+*     snrminpar = const char [] (Given)
+*        Name of the parameter to use to request the minimum signal-to-noise
+*        ratio for a fit. Can be NULL.
 *     refres = double * (Returned)
 *        Reference resistance in ohms.
 *     resistance = double ** (Returned)
@@ -47,6 +50,9 @@
 *        Flatfield method.
 *     order = int * (Returned)
 *        Polynomial order.
+*     snrmin = double * (Returned)
+*        Signal-to-noise ratio minimum for a good fit. Will be unchanged if
+*        "snrminpar" is NULL.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -63,6 +69,8 @@
 *  History:
 *     2010-02-05 (TIMJ):
 *        Original version.
+*     2010-04-09 (TIMJ):
+*        Add SNRMIN
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -102,10 +110,10 @@
 
 void
 smf_flat_params( const smfData * refdata, const char refrespar[], const char resistpar[],
-                 const char methpar[], const char orderpar[],
+                 const char methpar[], const char orderpar[], const char snrminpar[],
                  double * refohms, double **resistance, int * outrows,
                  int * outcols, smf_flatmeth  *flatmeth,
-                 int * order, int * status ) {
+                 int * order, double * snrmin, int * status ) {
 
   size_t j = 0;             /* Counter, index */
   size_t ksize;             /* Size of key map group */
@@ -203,6 +211,15 @@ smf_flat_params( const smfData * refdata, const char refrespar[], const char res
   if (*flatmeth == SMF__FLATMETH_POLY) {
     /* need an order for the polynomial */
     parGdr0i( orderpar, 1, 1, 3, 1, order, status );
+
+    /* and if the order is 1 then we can ask for the snr min */
+    if (snrminpar && *order == 1) {
+      parGet0d( snrminpar, snrmin, status );
+    }
+
+  } else {
+    /* need an snr min for table mode responsivities */
+    if (snrminpar) parGet0d( snrminpar, snrmin, status );
   }
 
   if (outrows) *outrows = nrows;

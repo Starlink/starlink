@@ -903,8 +903,8 @@ smf_flat_calcflat( msglev_t msglev, const char flatname[],
 void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status );
 
 void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
-                        size_t order, smfData **coeffs, smfData ** polyfit,
-                        int *status );
+                        double snrmin, size_t order, smfData **coeffs,
+                        smfData ** polyfit, int *status );
 
 void smf_flat_malloc( size_t nheat, const smfData * refdata,
                       smfData ** powvald, smfData **bolvald, int *status );
@@ -919,10 +919,10 @@ const char * smf_flat_methstring( smf_flatmeth flatmeth, int * status );
 
 void
 smf_flat_params( const smfData * refdata, const char refrespar[], const char resistpar[],
-                 const char methpar[], const char orderpar[],
+                 const char methpar[], const char orderpar[], const char snrminpar[],
                  double * refohms, double **resistance, int * nrows,
                  int * ncols, smf_flatmeth  *flatmeth,
-                 int * order, int * status );
+                 int * order, double * snrmin, int * status );
 
 void smf_flat_precondition( int allbad, smfData * powvald, smfData * bolvald,
                             int *status );

@@ -14,8 +14,8 @@
 
 *  Invocation:
 *     void smf_flat_fitpoly ( const smfData * powval, const smfData * bolval,
-*                             size_t order, smfData ** coeffs, smfData ** polyfit,
-*                             int *status );
+*                             double snrmin, size_t order, smfData ** coeffs,
+*                             smfData ** polyfit, int *status );
 
 *  Arguments:
 *     powval = const smfData * (Given)
@@ -23,6 +23,10 @@
 *     bolval = const smfData * (Given)
 *        Response of each bolometer to powval. Dimensioned as number of
 *        number of bolometers times dimension of powval.
+*     snrmin = double (Given)
+*        Minimum acceptable signal-to-noise ratio for the gradient.
+*        Below this value the fit will be treated as bad and the bolometer
+*        will be disabled. Only used when doing a linear fit.
 *     order = size_t (Given)
 *        Order of fit. Must lie between 1 (linear) and 3 (cubic).
 *     coeffs = smfData ** (Returned)
@@ -52,6 +56,8 @@
 *        Original version written for the simulator (latterly called sc2sim_fitheat)
 *     2010-02-04 (TIMJ):
 *        Rewritten in SMURF based upon logic from sc2sim_fitheat.
+*     2010-04-09 (TIMJ):
+*        Add snr filter for fit in linear case.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -91,8 +97,8 @@
 #include "gsl/gsl_fit.h"
 
 void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
-                        size_t order, smfData **coeffs, smfData **polyfit,
-                        int *status ) {
+                        double snrmin, size_t order, smfData **coeffs,
+                        smfData **polyfit, int *status ) {
 
   size_t bol;               /* bolometer index */
   double * bolval = NULL;   /* Pointer to bolvald smfData */
@@ -105,6 +111,7 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
   const size_t NCOEFF = 6;  /* Max number of coefficients per bolometer */
   size_t nbol = 0;          /* Number of bolometers */
   size_t nheat = 0;         /* Number of measurements */
+  size_t nsnr = 0;          /* Number of bolometers flagged by SNR limit */
   double *poly = NULL;      /* polynomial expansion of each fit */
   double *polybol = NULL;   /* polynomial expansion for all bolometers */
   double * powval = NULL;   /* Pointer to powvald smfData */
@@ -112,6 +119,7 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
   double * scan = NULL;     /* corrected bol values for a single bolometer */
   double * scanvar = NULL;  /* Variance on corrected bol (if bolvar) */
   double * scoeff = NULL;   /* Coefficients for a single scan */
+  double * scoeffvar = NULL;/* Error in Coefficients for a single scan */
 
   *coeffs = NULL;
 
@@ -168,6 +176,7 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
   if (bolvar) scanvar = smf_malloc ( nheat, sizeof(*scanvar), 1, status );
   ht = smf_malloc ( nheat, sizeof(*ht), 1, status );
   scoeff = smf_malloc( order + 1, sizeof(*scoeff), 0, status );
+  scoeffvar = smf_malloc( order + 1, sizeof(*scoeffvar), 0, status );
   goodidx = smf_malloc( nheat, sizeof(*goodidx), 1, status );
 
   /* Assume that we have monotonically increasing heater settings and so
@@ -213,6 +222,7 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
       /* initialise scoeff to bad */
       for (i=0; i< order+1; i++) {
         scoeff[i] = VAL__BADD;
+        scoeffvar[i] = VAL__BADD;
       }
 
       /* Note that we want a polynomial that fits the heater values given
@@ -223,7 +233,7 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
         double c0;
         double c1;
 
-        smf_fit_poly1d( order, nrgood, CLIP, ht, scan, scanvar, scoeff, NULL, poly, &nused, status);
+        smf_fit_poly1d( order, nrgood, CLIP, ht, scan, scanvar, scoeff, scoeffvar, poly, &nused, status);
 
         /* and calculate the fitted polynomial */
         if (polybol) {
@@ -238,6 +248,17 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
 
         c0 = (isnan(scoeff[0]) ? VAL__BADD : scoeff[0] );
         c1 = (isnan(scoeff[0]) ? VAL__BADD : scoeff[1] );
+
+        /* Check signal to noise of gradient */
+        if (scoeffvar && c1 != VAL__BADD) {
+          double snr = fabs(c1) / sqrt( scoeffvar[1] );
+          msgOutiff( MSG__DEBUG20, "", "SNR of flatfield fit for bolometer %zd = %g\n", status, bol, snr );
+          if (snr < snrmin ) {
+            c0 = VAL__BADD;
+            c1 = VAL__BADD;
+            nsnr++;
+          }
+        }
 
         if (c0 != VAL__BADD && c1 != VAL__BADD) {
           /* simple inverse of straight line fit */
@@ -291,6 +312,9 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
 
   }
 
+  msgOutiff( MSG__VERB, "", "Flagged %zd bolometers with gradients failing SNR > %g",
+             status, nsnr, snrmin);
+
   if (polybol) {
     if (polyfit) {
       void *pntr[3];
@@ -310,6 +334,7 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
   if (scan) scan = smf_free( scan, status );
   if (scanvar) scanvar = smf_free( scanvar, status );
   if (scoeff) scoeff = smf_free( scoeff, status );
+  if (scoeffvar) scoeff = smf_free( scoeffvar, status );
   if (ht) ht = smf_free( ht, status );
   if (goodidx) goodidx = smf_free( goodidx, status );
 
