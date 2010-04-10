@@ -1,0 +1,78 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+bolcoords - Simple bolometer number to coordinate convertor
+
+=head1 SYNOPSIS
+
+  bolcoords 365
+  bolcoords 5 23
+
+=head1 DESCRIPTION
+
+Given a zero-based bolometer number (0 to 1279) returns the PIXEL and GRID
+coordinates (column first). Given a 0-based bolometer coordinate (ie PIXEL
+coordinates) returns the bolometer number (0 to 1279).
+
+=cut
+
+use strict;
+use warnings;
+use Pod::Usage;
+
+my $nrows = 40;
+my $ncols = 32;
+
+if (@ARGV == 1) {
+  my $bolnum = shift(@ARGV);
+
+  # Work out the 0-based row number
+  my $rownum = int( $bolnum / $ncols );
+
+  # Number of bolometers in previous rows
+  my $nprev = $rownum * $ncols;
+
+  # Column number
+  my $colnum = $bolnum - $nprev;
+
+  print "PIXEL: $colnum, $rownum\n";
+  print "GRID : ".($colnum+1).", ".($rownum+1)."\n";
+
+} elsif (@ARGV == 2) {
+
+  my ($colnum, $rownum) = @ARGV;
+
+  my $bolnum = ($rownum * $ncols) + $colnum;
+
+  print "Bolometer number: $bolnum\n";
+
+
+} else {
+  pod2usage( 1 );
+}
+
+
+=head1 AUTHOR
+
+Tim Jenness E<lt>t.jenness@jach.hawaii.eduE<gt>
+
+Copyright (C) 2010 Science & Technology Facilities Council.
+All Rights Reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 3 of
+the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied
+warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public
+License along with this program; if not, write to the Free
+Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+MA 02111-1307, USA
+
+=cut
