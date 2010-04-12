@@ -13,8 +13,8 @@
 *     CALL NDG1_APPEN( IGRP1, IGRP2, TEMPLT, REST, STATUS )
 
 *  Description:
-*     All files matching the supplied file template are appended to IGRP1. 
-*     For each such file appended to IGRP1, a copy of REST is also appended 
+*     All files matching the supplied file template are appended to IGRP1.
+*     For each such file appended to IGRP1, a copy of REST is also appended
 *     to IGRP2.
 
 *  Arguments:
@@ -41,12 +41,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -67,6 +67,8 @@
 *        Switch to using ONE_FIND_FILE
 *     2010-03-18 (TIMJ):
 *        Use PSX_WORDEXP instead of ONE_FIND_FILE
+*     12-apr-2010 (DSB):
+*        Check for wild-cards in file name returned by PSX_WORDEXP.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -80,18 +82,15 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GRP_PAR'          ! GRP constants.
-      INCLUDE 'ONE_ERR'          ! ONE_ constants
 
 *  Arguments Given:
       INTEGER IGRP1
       INTEGER IGRP2
       CHARACTER TEMPLT*(*)
       CHARACTER REST*(*)
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
-
-*  External references:
 
 *  Local Variables:
       CHARACTER FILE*(GRP__SZFNM) ! The file spec of the matching file
@@ -105,30 +104,39 @@
 *  Ignore blank templates.
       IF( TEMPLT .NE. ' ' ) THEN
 
-*  Initialise the context value used by ONE_FIND_FILE so that a new file
+*  Initialise the context value used by PSX_WORDEXP so that a new file
 *  searching context will be started.
          ICONTX = 0
          FIRST = .TRUE.
 
 *  Loop round looking for matching files until we get bad status
-*  (which may include ONE__NOFILES)
          DO WHILE( STATUS .EQ. SAI__OK .AND.
      :        ( FIRST .OR. ICONTX .NE. 0 ) )
 
             FIRST = .FALSE.
+
 *  Attempt to find the next matching file.
             FILE = ' '
             CALL PSX_WORDEXP( TEMPLT, ICONTX, FILE, STATUS )
 
-*  If another file was found which matches the name...
+*  If the WORDEXP function is supplied with a template that contains
+*  wild-cards, but no matching files are found, a "file name" is returned
+*  that contains the original wild cards, but no error is reported. Check
+*  for this.
             IF( FILE .NE. ' ' .AND. STATUS .EQ. SAI__OK ) THEN
+               IF( INDEX( FILE, '*' ) .EQ. 0 .AND.
+     :             INDEX( FILE, '?' ) .EQ. 0 .AND.
+     :             INDEX( FILE, '[' ) .EQ. 0 .AND.
+     :             INDEX( FILE, ']' ) .EQ. 0 ) THEN
 
 *  Append it to the group.
-               CALL GRP_PUT( IGRP1, 1, FILE, 0, STATUS )
+                  CALL GRP_PUT( IGRP1, 1, FILE, 0, STATUS )
 
 *  Append a copy of REST to the second group.
-               CALL GRP_PUT( IGRP2, 1, REST, 0, STATUS )
-           
+                  CALL GRP_PUT( IGRP2, 1, REST, 0, STATUS )
+
+               END IF
+
             END IF
 
          END DO
