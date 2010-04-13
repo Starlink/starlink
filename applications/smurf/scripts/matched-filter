@@ -20,7 +20,13 @@
 #                        sum( psf_i**2/input_variance_i )
 
 #  Invocation:
-#    matched-filter <in> <out> [<psf>]
+#    matched-filter [-np] <in> <out>  [<psf>]
+
+#  Options:
+#    -np - If the script creates a new PSF (i.e. if the <psf> parameter is
+#          not supplied on the command line), then normalise the new PSF to
+#          a peak value of unity. Without this option, the new PSF is
+#          normalised to a total data sum of unity.
 
 #  Parameters:
 #    <in> - The input image.
@@ -32,7 +38,6 @@
 #      equal to the Airy disk radius.
 #    - The centre of the supplied PSF is assumed to be at pixel (0,0).
 #    - The PSF must not contain any bad values.
-#    - The PSF should be normalised to a peak value of unity.
 #    - The input must contain a variance component.
 #    - The input and PSF must contain floating point values.
 
@@ -43,7 +48,10 @@
 #    2010-1-05 (DSB):
 #       Initial revision
 #    2010-4-13 (DSB):
-#       Correct the expression used for calculating the output variances.
+#       - Correct the expression used for calculating the output variances.
+#       - By default, normalise the PSF to a total data sum of unity, and
+#         provide the "-np" option to retain the old behaviour (normalising
+#         to a peak value of unity).
 
 #  Copyright:
 #     Copyright (C) 2010 Science & Technology Facilities Council.
@@ -67,10 +75,32 @@
 
 #-
 
+#  Search the command line for options starting with a minus sign, and set
+#  shell variables to the corresponding values. Also copy non-option arguments
+#  (e.g. NDF names) to a separate list held in "arg_list".
+   set norm = sum
+   set arg_list = ""
+
+   while( $# > 0 )
+      set arg = $1
+      shift
+
+      if( $arg == "-np" ) then
+         set norm = peak
+
+      else if( $arg == "-ns" ) then
+         set norm = sum
+
+      else
+         set arg_list = ($arg_list $arg)
+      endif
+
+   end
+
 #  Check the input and output NDFs and the PSF were specified on the
 #  command line.
-if( $# < 2 ) then
-   echo "Usage: matched-filter <in.sdf> <out.sdf> [<psf.sdf>]"
+if( $#arg_list < 2 ) then
+   echo "Usage: matched-filter [-ns] [-np] <in.sdf> <out.sdf> [<psf.sdf>]"
    exit
 endif
 
@@ -79,21 +109,21 @@ setenv ADAM_NOPROMPT 1
 
 #  The supplied NDFs may or may not have a ".sdf" suffix. Ensure we have the
 #  NDF names without ".sdf".
-set dir = `dirname $1`
-set base = `basename $1 .sdf`
+set dir = `dirname $arg_list[1]`
+set base = `basename $arg_list[1] .sdf`
 set in = "$dir/$base"
 if( ! -e "$in.sdf" ) then
    echo "Cannot find $in.sdf"
    exit
 endif
 
-set dir = `dirname $2`
-set base = `basename $2 .sdf`
+set dir = `dirname $arg_list[2]`
+set base = `basename $arg_list[2] .sdf`
 set out = "$dir/$base"
 
-if( $# > 2 ) then
-   set dir = `dirname $3`
-   set base = `basename $3 .sdf`
+if( $#arg_list > 2 ) then
+   set dir = `dirname $arg_list[3]`
+   set base = `basename $arg_list[3] .sdf`
    set psf = "$dir/$base"
    if( ! -e "$psf.sdf" ) then
       echo "Cannot find $psf.sdf"
@@ -151,13 +181,17 @@ else
 # This produces a Gaussian PSF image. NOTE, the FWHM is the Airy radius, not
 # the diameter as might be expected. In practice it seems like the FWHM of
 # the point sources in a SCUBA-2 map is much closer to the Airy radius than
-# the Airy diameter.
-   $KAPPA_DIR/gausmooth in=mf_temp2 fwhm=$airy_pix out=mf_temp3
+# the Airy diameter. GAUSMOOTH preserves total data sum, so the output PSF
+#  image will have a total data sum of unity.
+   $KAPPA_DIR/gausmooth in=mf_temp2 fwhm=$airy_pix out=mf_psf
 
-# Normalise the PSF to a peak value of 1.0.
-   $KAPPA_DIR/stats mf_temp3 quiet
-   set peak = `$KAPPA_DIR/parget maximum stats`
-   $KAPPA_DIR/cdiv in=mf_temp3 scalar=$peak out=mf_psf
+# If required, normalise the PSF to a peak value of 1.0.
+   if( $norm == peak ) then
+      $KAPPA_DIR/stats mf_psf quiet
+      set peak = `$KAPPA_DIR/parget maximum stats`
+      $KAPPA_DIR/cdiv in=mf_psf scalar=$peak out=mf_temp3
+      mv mf_temp3.sdf mf_psf.sdf
+   endif
 
 # Use the new PSF.
    set psf = mf_psf
