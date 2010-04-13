@@ -20,13 +20,25 @@
 #                        sum( psf_i**2/input_variance_i )
 
 #  Invocation:
-#    matched-filter [-np] <in> <out>  [<psf>]
+#    matched-filter [-np] [-s sigma2] <in> <out>  [<psf>]
 
 #  Options:
 #    -np - If the script creates a new PSF (i.e. if the <psf> parameter is
 #          not supplied on the command line), then normalise the new PSF to
 #          a peak value of unity. Without this option, the new PSF is
 #          normalised to a total data sum of unity.
+#    -s  - If the script creates a new PSF (i.e. if the <psf> parameter is
+#          not supplied on the command line), then use a double Gaussian
+#          PSF. The sigma (in arc-seconds) for the secondary Gaussian should
+#          be given following the "-s" option (e.g. "matched-filter -s 19"
+#          to use a secondary Gaussian with sigma=19 arc-sec). The double
+#          Gaussian PSF is formed by creating the normal single Gaussian PSF,
+#          and then subtracting from it a Gaussian PSF with the specified
+#          secondary sigma. Prior to taking their difference, the primary and
+#          secondary Gaussians both have a total data value of unity. After
+#          the difference is taken, the resulting PSF is re-normalised to
+#          have a total data sum of unity (or a peak value of unity if the
+#          "-np" option is supplied).
 
 #  Parameters:
 #    <in> - The input image.
@@ -52,6 +64,7 @@
 #       - By default, normalise the PSF to a total data sum of unity, and
 #         provide the "-np" option to retain the old behaviour (normalising
 #         to a peak value of unity).
+#       - Added the "-s" option.
 
 #  Copyright:
 #     Copyright (C) 2010 Science & Technology Facilities Council.
@@ -80,16 +93,21 @@
 #  (e.g. NDF names) to a separate list held in "arg_list".
    set norm = sum
    set arg_list = ""
+   set sigma2 = ""
 
    while( $# > 0 )
       set arg = $1
       shift
 
-      if( $arg == "-np" ) then
+      if( "$arg" == "-np" ) then
          set norm = peak
 
-      else if( $arg == "-ns" ) then
+      else if( "$arg" == "-ns" ) then
          set norm = sum
+
+      else if( "$arg" == "-s" ) then
+         set sigma2 = $1
+         shift
 
       else
          set arg_list = ($arg_list $arg)
@@ -182,10 +200,34 @@ else
 # the diameter as might be expected. In practice it seems like the FWHM of
 # the point sources in a SCUBA-2 map is much closer to the Airy radius than
 # the Airy diameter. GAUSMOOTH preserves total data sum, so the output PSF
-#  image will have a total data sum of unity.
+# image will have a total data sum of unity.
    $KAPPA_DIR/gausmooth in=mf_temp2 fwhm=$airy_pix out=mf_psf
 
-# If required, normalise the PSF to a peak value of 1.0.
+# If we are adding a second component to the PSF...
+   if( "$sigma2" != "" ) then
+
+# Convert sigma2 from arc-sec to input pixels, and convert from sigma to FWHM.
+# The constant 2.35482 is 2*sqrt(2*ln(2.0))
+      set fwhm2_pix = `$KAPPA_DIR/calc exp="'2.35482*pa/pb'" pa=$sigma2 pb=$insize`
+
+# Smooth the spike image using a Gaussian kernel with this FWHM.
+      $KAPPA_DIR/gausmooth in=mf_temp2 fwhm=$fwhm2_pix out=mf_psf2
+
+# Since gausmooth conserves total data value, we know that the mf_psf and
+# mf_psf2 images each have a total data sum of unity, and so are normalised
+# correctly with respect to each other. So we can just subtract them to get
+# the final PSF.
+      $KAPPA_DIR/sub in1=mf_psf in2=mf_psf2 out=mf_temp3
+
+# Normalise the new double PSF to a total data sum of unity, over-writing
+# the old (single) PSF.
+      $KAPPA_DIR/stats mf_temp3 quiet
+      set sum = `$KAPPA_DIR/parget total stats`
+      $KAPPA_DIR/cdiv in=mf_temp3 scalar=$sum out=mf_psf
+   endif
+
+# If required, normalise the PSF to a peak value of 1.0 instead of a total
+# value of 1.0
    if( $norm == peak ) then
       $KAPPA_DIR/stats mf_psf quiet
       set peak = `$KAPPA_DIR/parget maximum stats`
