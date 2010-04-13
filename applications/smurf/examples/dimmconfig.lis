@@ -56,11 +56,15 @@ exportndf = 0
 
 #noexportsetbad = 1
 
-# Create an extension containing the map after each iteration?
+# Create .MORE.SMURF.ITERMAPS extensions after each iteration?
 #itermap = 1
 
-# Create single-beam maps in addition to main map?
+# Create .MORE.SMURF.BOLOMAPS single-beam map extensions?
 #bolomap = 1
+
+# Create .MORE.SMURF.SHORTMAPS extensions containing maps of every "shortmap"
+# time slices?
+#shortmap=1000
 
 # Apply the flatfield if loading raw data? Default is 1 (true) -- you must
 # explicitly set this to 0 if you want to produce a map in raw DAC units (and

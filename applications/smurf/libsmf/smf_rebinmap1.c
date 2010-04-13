@@ -14,9 +14,9 @@
 
 *  Invocation:
 *     smf_rebinmap1( smfData *data, smfData *variance, int *lut,
-*                    unsigned char *qual, unsigned char mask,
-*                    int sampvar, int flags, double *map,
-*                    double *mapweight, int *hitsmap,
+*                    unsigned char *qual, size_t tslice1, size_t tslice2,
+*                    int trange, unsigned char mask, int sampvar, int flags,
+*                    double *map, double *mapweight, int *hitsmap,
 *                    double *mapvar, dim_t msize, double *scalevariance,
 *                    int *status )
 
@@ -35,6 +35,12 @@
 *        If specified, use this QUALITY array to decide which samples
 *        to use (provided mask). Otherwise data are only ignored if set
 *        to VAL__BADD. Same dimensions as data.
+*     tslice1 = size_t (Given)
+*        If tslice2 >= tslice1 and trange set, regrid to tslice1 to tslice2
+*     tslice2 = size_t (Given)
+*        If tslice2 >= tslice1 and trange set, regrid to tslice1 to tslice2
+*     trange = int (Given)
+*        If set, regrid from tslice1 to tslice2
 *     mask = unsigned char (Given)
 *        Use with qual to define which bits in quality are relevant to
 *        ignore data in the calculation.
@@ -88,6 +94,8 @@
 *        Use dim_t for dsize/msize
 *     2009-07-30 (EC):
 *        Use smfDatas for data & variance in preparation for 2d variance arrays
+*     2010-04-13 (EC):
+*        Add ability to regrid a time range (tslice1, tslice2, trange)
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -104,8 +112,7 @@
 *                  N = number of samples in this pixel
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
-*     Copyright (C) 2006-2009 University of British Columbia
+*     Copyright (C) 2006-2010 University of British Columbia
 *     All Rights Reserved.
 
 *  Licence:
@@ -145,9 +152,9 @@
 #define FUNC_NAME "smf_rebinmap1"
 
 void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
-                    unsigned char *qual, unsigned char mask,
-                    int sampvar, int flags, double *map,
-                    double *mapweight, int *hitsmap,
+                    unsigned char *qual, size_t tslice1, size_t tslice2,
+                    int trange, unsigned char mask, int sampvar,
+                    int flags, double *map, double *mapweight, int *hitsmap,
                     double *mapvar, dim_t msize, double *scalevariance,
                     int *status ) {
 
@@ -155,7 +162,6 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
   double *dat=NULL;          /* Pointer to data array */
   size_t dbstride;           /* bolo stride of data */
   dim_t di;                  /* data array index */
-  dim_t dsize;               /* total number of elements in data */
   size_t dtstride;           /* tstride of data */
   size_t i;                  /* Loop counter */
   size_t j;                  /* Loop counter */
@@ -163,6 +169,7 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
   dim_t ntslice;             /* number of time slices */
   double scalevar;           /* variance scale factor */
   double scaleweight;        /* weights for calculating scalevar */
+  size_t t1, t2;             /* range of time slices to re-grid */
   double thisweight;         /* The weight at this point */
   double *var=NULL;          /* Pointer to variance array */
   size_t vbstride;           /* bolo stride of variance */
@@ -189,7 +196,7 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
   }
 
   dat = data->pntr[0];
-  smf_get_dims( data, NULL, NULL, &nbolo, &ntslice, &dsize, &dbstride,
+  smf_get_dims( data, NULL, NULL, &nbolo, &ntslice, NULL, &dbstride,
                 &dtstride, status );
 
   if( variance ) {
@@ -204,6 +211,30 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
              status );
       return;
     }
+  }
+
+  /* Range of time slices to regrid */
+  if( trange ) {
+
+    if( tslice2 >= ntslice ) {
+      *status = SAI__ERROR;
+      errRepf( "", FUNC_NAME ": tslice2 (%zu) can't be >= ntslice (%zu)",
+               status, tslice2, ntslice );
+      return;
+    }
+
+    if( tslice1 > tslice2  ) {
+      *status = SAI__ERROR;
+      errRepf( "", FUNC_NAME ": tslice1 (%zu) > tslice2 (%zu)",
+               status, tslice1, tslice2 );
+      return;
+    }
+
+    t1 = tslice1;
+    t2 = tslice2;
+  } else {
+    t1 = 0;
+    t2 = ntslice-1;
   }
 
   /* If this is the first data to be accumulated zero the arrays */
@@ -221,7 +252,7 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
       /* Measure weighted sample variance for varmap */
       if( qual ) {       /* QUALITY checking version */
 	for( i=0; i<nbolo; i++ ) {
-          if( !(qual[i*dbstride]&SMF__Q_BADB) ) for( j=0; j<ntslice; j++ ) {
+          if( !(qual[i*dbstride]&SMF__Q_BADB) ) for( j=t1; j<=t2; j++ ) {
 
             di = i*dbstride + j*dtstride;
             vi = i*vbstride + (j%vntslice)*vtstride;
@@ -240,7 +271,7 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
 	}
       } else {           /* VAL__BADD checking version */
 	for( i=0; i<nbolo; i++ ) {
-          for( j=0; j<ntslice; j++ ) {
+          for( j=t1; j<=t2; j++ ) {
 
             di = i*dbstride + j*dtstride;
             vi = i*vbstride + (j%vntslice)*vtstride;
@@ -266,7 +297,7 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
 
       if( qual ) {       /* QUALITY checking version */
 	for( i=0; i<nbolo; i++ ) {
-          if( !(qual[i*dbstride]&SMF__Q_BADB) ) for( j=0; j<ntslice; j++ ) {
+          if( !(qual[i*dbstride]&SMF__Q_BADB) ) for( j=t1; j<=t2; j++ ) {
 
             di = i*dbstride + j*dtstride;
             vi = i*vbstride + (j%vntslice)*vtstride;
@@ -282,7 +313,7 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
         }
       } else {           /* VAL__BADD checking version */
 	for( i=0; i<nbolo; i++ ) {
-          for( j=0; j<ntslice; j++ ) {
+          for( j=t1; j<=t2; j++ ) {
 
             di = i*dbstride + j*dtstride;
             vi = i*vbstride + (j%vntslice)*vtstride;
@@ -305,7 +336,7 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
 
     if( qual ) {       /* QUALITY checking version */
       for( i=0; i<nbolo; i++ ) {
-        if( !(qual[i*dbstride]&SMF__Q_BADB) ) for( j=0; j<ntslice; j++ ) {
+        if( !(qual[i*dbstride]&SMF__Q_BADB) ) for( j=t1; j<=t2; j++ ) {
 
           di = i*dbstride + j*dtstride;
 
@@ -321,16 +352,17 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
         }
       }
     } else {           /* VAL__BADD checking version */
-      for( i=0; i<dsize; i++ ) {
-	/* Check that the LUT, data and variance values are valid */
-	if( (lut[i] != VAL__BADI) && (dat[i] != VAL__BADD) ) {
-	  map[lut[i]] += dat[i];
-	  mapweight[lut[i]] ++;
-	  hitsmap[lut[i]] ++;
+      for( i=0; i<nbolo; i++ ) {
+        for( j=t1; j<=t2; j++ ) {
+          di = i*dbstride + j*dtstride;
 
-	  /* Calculate this sum to estimate E(x^2) */
-	  mapvar[lut[i]] += dat[i]*dat[i];
-	}
+          map[lut[di]] += dat[di];
+          mapweight[lut[di]] ++;
+          hitsmap[lut[di]] ++;
+
+          /* Calculate this sum to estimate E(x^2) */
+          mapvar[lut[di]] += dat[di]*dat[di];
+        }
       }
     }
   }

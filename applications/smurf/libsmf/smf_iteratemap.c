@@ -15,12 +15,13 @@
 *  Invocation:
 
 *     smf_iteratemap(smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
-*                    const Grp *bolrootgrp, AstKeyMap *keymap,
-*                    const smfArray * darks, const smfArray *bbms,
-*                    const smfArray * flatramps, AstFrameSet *outfset,
-*                    int moving, int *lbnd_out, int *ubnd_out, size_t maxmem,
-*                    double *map, int *hitsmap, double *mapvar, double
-*                    *weights, char data_units[], int *status );
+*                    const Grp *bolrootgrp, const Grp *shortrootgrp,
+*                    AstKeyMap *keymap, const smfArray * darks,
+*                    const smfArray *bbms, const smfArray * flatramps,
+*                    AstFrameSet *outfset, int moving, int *lbnd_out,
+*                    int *ubnd_out, size_t maxmem, double *map, int *hitsmap,
+*                    double *mapvar, double *weights, char data_units[],
+*                    int *status );
 
 *  Arguments:
 *     wf = smfWorkForce * (Given)
@@ -32,6 +33,9 @@
 *        path to an HDS container.
 *     bolrootgrp = const Grp * (Given)
 *        Root name to use for bolometer output maps (if required). Can be a
+*        path to an HDS container.
+*     shortrootgrp = const Grp * (Given)
+*        Root name to use for short output maps (if required). Can be a
 *        path to an HDS container.
 *     keymap = AstKeyMap* (Given)
 *        keymap containing parameters to control map-maker
@@ -250,6 +254,8 @@
 *        Add reporting on quality flag statistics each iteration
 *     2010-03-23 (DSB)
 *        - Replace dcthresh2 with dcmedianwidth config parameter.
+*     2010-04-13 (EC)
+*        Add shortmap to config file -- creates .MORE.SMURF.SHORTMAPS extension
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -306,7 +312,7 @@
 #define FUNC_NAME "smf_iteratemap"
 
 void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
-                     const Grp *bolrootgrp,
+                     const Grp *bolrootgrp, const Grp *shortrootgrp,
                      AstKeyMap *keymap, const smfArray *darks,
                      const smfArray *bbms, const smfArray * flatramps,
                      AstFrameSet *outfset, int moving, int *lbnd_out,
@@ -392,6 +398,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   size_t nflag;                 /* Number of flagged detectors */
   int nm=0;                     /* Signed int version of nmodels */
   dim_t nmodels=0;              /* Number of model components / iteration */
+  dim_t ntslice;                /* Number of time slices */
   int numiter;                  /* Total number iterations */
   dim_t padEnd=0;               /* How many samples of padding at the end */
   dim_t padStart=0;             /* How many samples of padding at the start */
@@ -407,6 +414,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   double *res_data=NULL;        /* Pointer to DATA component of res */
   smfGroup *resgroup=NULL;      /* smfGroup of model residual files */
   double scalevar=0;            /* scale factor for variance */
+  int shortmap=0;               /* If set, produce maps every shortmap tslices*/
   size_t spikeiter=0;           /* Number of iter for spike detection */
   double spikethresh;           /* Threshold for spike detection */
   double steptime;              /* Length of a sample in seconds */
@@ -517,6 +525,11 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       /* Are we going to produce maps for each iteration? */
       if( !astMapGet0I( keymap, "ITERMAP", &itermap ) ) {
         itermap = 0;
+      }
+
+      /* Are we going to produce short maps every SHORTMAP time slices? */
+      if( !astMapGet0I( keymap, "SHORTMAP", &shortmap ) ) {
+        shortmap = 0;
       }
 
       /* Are we going to apply the flatfield when we load data? */
@@ -1378,8 +1391,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                 var_data = NULL;
               }
 
-              dsize = (ast[i]->sdata[idx]->dims)[0] *
-                (ast[i]->sdata[idx]->dims)[1] * (ast[i]->sdata[idx]->dims)[2];
+              smf_get_dims( ast[i]->sdata[idx], NULL, NULL, NULL, NULL, &dsize,
+                            NULL, NULL, status );
 
               for( k=0; k<dsize; k++ ) {
                 if( !(qua_data[k]&SMF__Q_MOD) && (ast_data[k]!=VAL__BADD) ) {
@@ -1402,9 +1415,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
               /* Rebin the residual + astronomical signal into a map */
               smf_rebinmap1( res[i]->sdata[idx],
                              dat.noi ? dat.noi[i]->sdata[idx] : NULL,
-                             lut_data, qua_data, SMF__Q_GOOD, varmapmethod,
-                             rebinflags, thismap, thisweight, thishits,
-                             thisvar, msize, &scalevar, status );
+                             lut_data, qua_data, 0, 0, 0, SMF__Q_GOOD,
+                             varmapmethod, rebinflags, thismap, thisweight,
+                             thishits, thisvar, msize, &scalevar, status );
             }
 
             /*** TIMER ***/
@@ -1727,7 +1740,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
                   smf_rebinmap1( res[0]->sdata[idx],
                                  dat.noi ? dat.noi[0]->sdata[idx] : NULL,
-                                 lut_data, qua_data,
+                                 lut_data, qua_data, 0, 0, 0,
                                  SMF__Q_GOOD, varmapmethod,
                                  AST__REBININIT | AST__REBINEND,
                                  mapdata->pntr[0],
@@ -1767,6 +1780,152 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
               }
             }
           }
+        }
+      }
+
+      /* Create short maps using every SHORTMAP samples if requested */
+
+      if( shortmap && (*status == SAI__OK) ) {
+        /* Currently only support memiter=1 case to avoid having to do
+           a separate chunk loop. */
+        if( !memiter ) {
+          msgOut( "", FUNC_NAME
+                  ": *** WARNING *** shortmap=1, but memiter=0", status );
+        } else {
+          size_t istart, iend, nshort=0;
+          size_t sc;
+          double *shortmapweight = NULL;
+          int *shorthitsmap = NULL;
+
+          /* Allocate space for the arrays */
+          shortmapweight = smf_malloc(msize,sizeof(*shortmapweight),0,status);
+          shorthitsmap = smf_malloc(msize,sizeof(*shorthitsmap),0,status);
+
+          /* Use first subarray to figure out time dimension. Get the
+             useful start and end points of the time series, and then
+             determine "nshort" -- the number of complete blocks of
+             shortmap time slices in the useful range. */
+
+          smf_get_dims( qua[0]->sdata[0], NULL, NULL, &nbolo, &ntslice,
+                        NULL, &bstride, &tstride, status );
+
+          qua_data = (qua[0]->sdata[0]->pntr)[0];
+          smf_get_goodrange( qua_data, ntslice, tstride, SMF__Q_BOUND,
+                             &istart, &iend, status );
+
+
+          if( *status == SAI__OK ) {
+            nshort = (iend-istart+1)/shortmap;
+
+            if( nshort ) {
+              msgOutf( "", FUNC_NAME
+                       ": writing %zu short maps of length %i time slices.",
+                       status, nshort, shortmap );
+            } else {
+              /* Generate warning message if requested short maps are too long*/
+              msgOutf( "", FUNC_NAME
+                       ": Warning! short maps of lengths %i requested, but "
+                       "data only %zu time slices.", status, shortmap,
+                       iend-istart+1 );
+            }
+          }
+
+          /* Loop over short maps */
+          for( sc=0; (sc<nshort)&&(*status==SAI__OK); sc++ ) {
+
+            Grp *mgrp=NULL;             /* Temporary group for map names */
+            smfData *mapdata=NULL;      /* smfData for new map */
+            char tmpname[GRP__SZNAM+1]; /* temp name buffer */
+            char thisshort[20];         /* name particular to this shortmap */
+
+            /* Create a name for the new map, take into account the
+               chunk number. Only required if we are using a single
+               output container. */
+            pname = tmpname;
+            grpGet( shortrootgrp, 1, 1, &pname, sizeof(tmpname), status );
+            one_strlcpy( name, tmpname, sizeof(name), status );
+            one_strlcat( name, ".", sizeof(name), status );
+            if (ncontchunks > 1) {
+              char tempstr[20];
+              sprintf(tempstr, "CH%02zd", contchunk);
+              one_strlcat( name, tempstr, sizeof(name), status );
+            }
+            sprintf( thisshort, "SH%04zu", sc );
+            one_strlcat( name, thisshort, sizeof(name), status );
+            mgrp = grpNew( "shortmap", status );
+            grpPut1( mgrp, name, 0, status );
+
+            msgOutf( "", "*** Writing short map (%zu / %zu) %s", status,
+                     sc+1, nshort, name );
+
+            smf_open_newfile ( mgrp, 1, SMF__DOUBLE, 2, lbnd_out,
+                               ubnd_out, SMF__MAP_VAR, &mapdata,
+                               status);
+
+            /* Loop over subgroup index (subarray) -- only continue if
+               nshort > 0! */
+            for( idx=0; (idx<res[0]->ndat)&&(nshort)&&(*status==SAI__OK);
+                 idx++ ){
+              int rebinflag = 0;
+
+              /* Pointers to everything we need */
+              ast_data = (ast[0]->sdata[idx]->pntr)[0];
+              res_data = (res[0]->sdata[idx]->pntr)[0];
+              lut_data = (lut[0]->sdata[idx]->pntr)[0];
+              qua_data = (qua[0]->sdata[idx]->pntr)[0];
+
+              smf_get_dims( res[0]->sdata[idx], NULL, NULL, &nbolo, &ntslice,
+                            &dsize, &bstride, &tstride, status );
+
+
+              /* Add ast back into res. Mask should match ast_calcmodel_ast. */
+              for( k=0; k<dsize; k++ ) {
+                if( !(qua_data[k]&SMF__Q_MOD) && (ast_data[k]!=VAL__BADD) ) {
+                  res_data[k] += ast_data[k];
+                }
+              }
+
+
+              /* Rebin the data for this range of tslices. */
+              if( idx == 0 ) {
+                rebinflag |= AST__REBININIT;
+              }
+
+              if( idx == (res[0]->ndat-1) ) {
+                rebinflag |= AST__REBINEND;
+              }
+
+              smf_rebinmap1( res[0]->sdata[idx],
+                             dat.noi ? dat.noi[0]->sdata[idx] : NULL,
+                             lut_data, qua_data,
+                             istart+sc*shortmap, istart+(sc+1)*shortmap-1, 1,
+                             SMF__Q_GOOD, varmapmethod,
+                             rebinflag,
+                             mapdata->pntr[0],
+                             shortmapweight, shorthitsmap, mapdata->pntr[1],
+                             msize, NULL, status );
+
+              /* Remove ast from res once again */
+              for( k=0; k<dsize; k++ ) {
+                if( !(qua_data[k]&SMF__Q_MOD) && (ast_data[k]!=VAL__BADD) ) {
+                  res_data[k] -= ast_data[k];
+                }
+              }
+            }
+
+            /* Write WCS */
+            smf_set_moving(outfset,status);
+            ndfPtwcs( outfset, mapdata->file->ndfid, status );
+
+            /* Clean up */
+            if( mgrp ) grpDelet( &mgrp, status );
+            smf_close_file( &mapdata, status );
+
+          }
+
+          /* Free up memory */
+          if( shortmapweight ) shortmapweight = smf_free(shortmapweight,status);
+          if( shorthitsmap ) shorthitsmap = smf_free( shorthitsmap, status );
         }
       }
 

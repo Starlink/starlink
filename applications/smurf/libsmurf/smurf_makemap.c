@@ -700,6 +700,8 @@
 *        Change BPM to BBM.
 *     2010-03-11 (TIMJ):
 *        Support flatfield ramps.
+*     2010-04-13 (EC):
+*        Support short maps with smf_iteratemap.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -1445,6 +1447,7 @@ void smurf_makemap( int *status ) {
   } else if ( iterate ) {
     Grp *bolrootgrp = NULL;
     Grp *iterrootgrp = NULL;
+    Grp *shortrootgrp = NULL;
     char tempfile[GRP__SZNAM+1];
 
     /************************* I T E R A T E *************************************/
@@ -1472,11 +1475,16 @@ void smurf_makemap( int *status ) {
 
     /* Similarly, work out the name for the root file path if itermaps
        are being created */
-
     grpGet( ogrp, 1, 1, &pname, sizeof(tempfile), status );
     one_strlcat( tempfile, ".MORE.SMURF.ITERMAPS", sizeof(tempfile), status);
     iterrootgrp = grpNew( "itermap root", status );
     grpPut1( iterrootgrp, tempfile, 0, status );
+
+    /* Work out the name for the root file path if shortmaps are being created*/
+    grpGet( ogrp, 1, 1, &pname, sizeof(tempfile), status );
+    one_strlcat( tempfile, ".MORE.SMURF.SHORTMAPS", sizeof(tempfile), status);
+    shortrootgrp = grpNew( "shortmap root", status );
+    grpPut1( shortrootgrp, tempfile, 0, status );
 
     /* Compute number of pixels in output map */
     nxy = (ubnd_out[0] - lbnd_out[0] + 1) * (ubnd_out[1] - lbnd_out[1] + 1);
@@ -1539,12 +1547,14 @@ void smurf_makemap( int *status ) {
 
     /* Call the low-level iterative map-maker */
 
-    smf_iteratemap( wf, igrp, iterrootgrp, bolrootgrp, keymap, NULL, bbms,
-                    flatramps, outfset, moving, lbnd_out, ubnd_out, maxmem-mapmem,
-                    map, hitsmap, variance, weights, data_units, status );
+    smf_iteratemap( wf, igrp, iterrootgrp, bolrootgrp, shortrootgrp,
+                    keymap, NULL, bbms, flatramps, outfset, moving, lbnd_out,
+                    ubnd_out, maxmem-mapmem, map, hitsmap, variance, weights,
+                    data_units, status );
 
     if( bolrootgrp ) grpDelet( &bolrootgrp, status );
     if( iterrootgrp ) grpDelet( &iterrootgrp, status );
+    if( shortrootgrp ) grpDelet( &shortrootgrp, status );
 
     /* Calculate exposure time per output pixel from hitsmap */
     for (i=0; (i<nxy) && (*status == SAI__OK); i++) {

@@ -1063,7 +1063,7 @@ int smf_isfft( const smfData *indata, dim_t *ntslice, dim_t *nbolo,
                dim_t *nf, int *status );
 
 void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
-                     const Grp * bolrootgrp,
+                     const Grp * bolrootgrp, const Grp * shortrootgrp,
                      AstKeyMap *keymap, const smfArray *darks,
                      const smfArray *bpms, const smfArray * flatramps,
                      AstFrameSet *outfset, int moving, int *lbnd_out,
@@ -1315,9 +1315,9 @@ void smf_rebinmap( smfWorkForce *wf, smfData *data, double *bolovar,
                    double *weights, int *nused, int *status );
 
 void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
-                    unsigned char *qual, unsigned char mask,
-                    int sampvar, int flags, double *map,
-                    double *mapweight, int *hitsmap,
+                    unsigned char *qual, size_t tslice1, size_t tslice2,
+                    int trange, unsigned char mask, int sampvar,
+                    int flags, double *map, double *mapweight, int *hitsmap,
                     double *mapvar, dim_t msize, double *scalevariance,
                     int *status );
 
