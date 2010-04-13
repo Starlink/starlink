@@ -1,0 +1,229 @@
+#!/bin/tcsh
+#+
+#  Name:
+#    matched-filter
+
+#  Purpose:
+#    Applies a matched filter to the supplied input NDF by smoothing it
+#    using either a supplied PSF image or an automatically generated
+#    Gaussian PSF. Each output pixel value is given by:
+#
+#                      sum( (psf_i/input_variance_i)*input_data_i )
+#      output_data  =  --------------------------------------------
+#                           sum( psf_i**2/input_variance_i )
+#
+#    where the sum is over all input pixels that contribute to the output
+#    pixel. The variances stored with the resulting image are given by:
+#
+#                                      1.0
+#      output_variance = --------------------------------
+#                        sum( psf_i**2/input_variance_i )
+
+#  Invocation:
+#    matched-filter <in> <out> [<psf>]
+
+#  Parameters:
+#    <in> - The input image.
+#    <out> - The output image.
+#    <psf> - An optional PSF image.
+
+#  Notes:"
+#    - If no PSF is supplied, a Gaussian PSF is used with FWHM
+#      equal to the Airy disk radius.
+#    - The centre of the supplied PSF is assumed to be at pixel (0,0).
+#    - The PSF must not contain any bad values.
+#    - The PSF should be normalised to a peak value of unity.
+#    - The input must contain a variance component.
+#    - The input and PSF must contain floating point values.
+
+#  Authors:
+#    DSB: David S. Berry (JAC)
+
+#  History:
+#    2010-1-05 (DSB):
+#       Initial revision
+#    2010-4-13 (DSB):
+#       Correct the expression used for calculating the output variances.
+
+#  Copyright:
+#     Copyright (C) 2010 Science & Technology Facilities Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 3 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public
+#     License along with this program; if not, write to the Free
+#     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+#     MA 02111-1307, USA
+
+#-
+
+#  Check the input and output NDFs and the PSF were specified on the
+#  command line.
+if( $# < 2 ) then
+   echo "Usage: matched-filter <in.sdf> <out.sdf> [<psf.sdf>]"
+   exit
+endif
+
+#  Ensure ADAM tasks fail rather than prompt for parameter values
+setenv ADAM_NOPROMPT 1
+
+#  The supplied NDFs may or may not have a ".sdf" suffix. Ensure we have the
+#  NDF names without ".sdf".
+set dir = `dirname $1`
+set base = `basename $1 .sdf`
+set in = "$dir/$base"
+if( ! -e "$in.sdf" ) then
+   echo "Cannot find $in.sdf"
+   exit
+endif
+
+set dir = `dirname $2`
+set base = `basename $2 .sdf`
+set out = "$dir/$base"
+
+if( $# > 2 ) then
+   set dir = `dirname $3`
+   set base = `basename $3 .sdf`
+   set psf = "$dir/$base"
+   if( ! -e "$psf.sdf" ) then
+      echo "Cannot find $psf.sdf"
+      exit
+   endif
+
+# If no PSF was supplied, create a Gaussian PSF with FWHM equal to the
+# Airy disk radius.
+else
+
+# Check the data is from JCMT.
+   set telescope = `$KAPPA_DIR/fitsmod $in edit=print keyword=TELESCOP`
+
+   echo $telescope | grep \!\! >& /dev/null
+   if( $status == 0 ) then
+      echo "Error determining telescope name"
+      echo $telescope
+      exit
+   endif
+
+   if( $telescope != "JCMT" ) then
+      echo "Data is not from JCMT"
+      exit
+   endif
+
+# Get the input pixel size, in arc-second. Note, cannot use QUIET=YES here,
+# as it seems to stop the output parameter values being written to the
+# ndftrace parameter file in ~/adam. We assume the first pixel axis is a
+# spatial axis, and that pixels are square.
+   $KAPPA_DIR/ndftrace $in fullframe > /dev/null
+   set insize = `$KAPPA_DIR/parget fpixscale\(1\) ndftrace`
+
+# Get the wavelength (in metres).
+   set wavelen = `$KAPPA_DIR/fitsmod $in edit=print keyword=WAVELEN`
+
+# Calculate the radius of the Airy disk in arc-sec, assuming a
+# mirror diameter of 15.0 metres.
+   set airy = `$KAPPA_DIR/calc exp="'(1.22*pa/15.0)*3600.0*180.0/3.1415927'" \
+                           pa=$wavelen`
+
+# Convert Airy radius from arc-sec to input pixels.
+   set airy_pix = `$KAPPA_DIR/calc exp="'pa/pb'" pa=$airy pb=$insize`
+
+# Get the number of input pixels in 2 Airy radii.
+   set npix = `$KAPPA_DIR/calc exp="'2*pa'" pa=$airy_pix`
+
+# Create a flat image with value zero with bounds (-npix:npix,-npix:npix)
+   $KAPPA_DIR/creframe lbound=\[-$npix,-$npix\] ubound=\[$npix,$npix\] \
+                       mode=fl mean=0 out=mf_temp1
+
+# Set the central pixel to a value of 1.0
+   $KAPPA_DIR/chpix in=mf_temp1 out=mf_temp2 section=\"0,0\" newval=1
+
+# Smooth this spike using a Gaussian kernel of FWHM equal to the Airy radius.
+# This produces a Gaussian PSF image. NOTE, the FWHM is the Airy radius, not
+# the diameter as might be expected. In practice it seems like the FWHM of
+# the point sources in a SCUBA-2 map is much closer to the Airy radius than
+# the Airy diameter.
+   $KAPPA_DIR/gausmooth in=mf_temp2 fwhm=$airy_pix out=mf_temp3
+
+# Normalise the PSF to a peak value of 1.0.
+   $KAPPA_DIR/stats mf_temp3 quiet
+   set peak = `$KAPPA_DIR/parget maximum stats`
+   $KAPPA_DIR/cdiv in=mf_temp3 scalar=$peak out=mf_psf
+
+# Use the new PSF.
+   set psf = mf_psf
+
+endif
+
+# From Per's document the value of each output pixel is as follows:
+#
+#                   sum( (psf_i/input_var_i)*input_data_i )
+#   output_data  =  ---------------------------------------
+#                   sum( psf_i**2/input_var_i )
+#
+# where the sums are over "i" - all the pixels that have non-zero value
+# in the PSF. Thus the output is the ratio of two images:
+#
+#   output_data = A/B
+#
+#   A = sum( (psf_i/input_var_i)*input_data_i )
+#     = sum( psf_i*( input_data_i/input_var_i ) )
+#
+#   B = sum( psf_i**2/input_var_i )
+#     = sum( psf_i**2*( 1.0/input_var_i) )
+#
+# In words, A is formed by dividing the data array by the variance array
+# and then smoothing the result using the supplied PSF (without normalising
+# by the sum of the PSF values as is often done). B is formed by taking the
+# reciprocal of the variances and smoothing then with the square of the
+# PSF, again without any normalisation.
+#
+# First get the ratio of the data to the variance in the input image.
+$KAPPA_DIR/maths exp="IA/VA" ia=$in out=mf_temp1
+
+# Smooth this using the supplied psf.
+$KAPPA_DIR/convolve in=mf_temp1 out=mf_temp2 psf=$psf xcentre=0 ycentre=0
+
+# The kappa:convolve command normalises the output NDF by dividing the
+# data values by the total data sum in the PSF. We do not want this
+# normalisation, so we now scale the output image created above by the
+# total data sum in the PSF.
+
+$KAPPA_DIR/stats $psf quiet
+set psf_sum = `$KAPPA_DIR/parget total stats`
+$KAPPA_DIR/cmult in=mf_temp2 out=mf_a scalar=$psf_sum
+
+# Now go on to create image B. Get the reciprocal of the variances from
+# the input image.
+$KAPPA_DIR/maths exp="1/VA" va=$in out=mf_temp1
+
+# Get the square of the PSF.
+$KAPPA_DIR/mult in1=$psf in2=$psf out=mf_temp3
+
+# Smooth the reciprocal of the variancess using the squared PSF.
+$KAPPA_DIR/convolve in=mf_temp1 out=mf_temp2 psf=mf_temp3 xcentre=0 ycentre=0
+
+# Undo the normalisation produced by kappa:convolve.
+$KAPPA_DIR/stats mf_temp3 quiet
+set psf2_sum = `$KAPPA_DIR/parget total stats`
+$KAPPA_DIR/cmult in=mf_temp2 out=mf_b scalar=$psf2_sum
+
+# The output image is the ratio of A and B.
+$KAPPA_DIR/div in1=mf_a in2=mf_b out=$out
+
+# The variance in the output image is the reciprocal of B.
+$KAPPA_DIR/maths exp="1/IA" ia=mf_b out=mf_temp1
+$KAPPA_DIR/setvar ndf=$out from=mf_temp1 comp=data
+
+#  Clean up.
+rm -f mf_temp1.sdf mf_temp2.sdf mf_temp3.sdf mf_psf.sdf a.sdf b.sdf
+
