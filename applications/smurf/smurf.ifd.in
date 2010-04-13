@@ -732,7 +732,7 @@ package @PACKAGE@ {
             }
 
             parameter fpixsize {
-                type _DOUBLE 
+                type _DOUBLE
                 prompt {Pixel size in focal plane units (mm)}
                 vpath CURRENT DEFAULT
                 default 1
@@ -740,7 +740,7 @@ package @PACKAGE@ {
             }
 
             parameter fxlo {
-                type _DOUBLE 
+                type _DOUBLE
                 prompt {Lower focal plane X limit, in mm}
                 vpath CURRENT DEFAULT
                 default -50
@@ -748,7 +748,7 @@ package @PACKAGE@ {
             }
 
             parameter fxhi {
-                type _DOUBLE 
+                type _DOUBLE
                 prompt {Upper focal plane X limit, in mm}
                 vpath CURRENT DEFAULT
                 default 50
@@ -756,7 +756,7 @@ package @PACKAGE@ {
             }
 
             parameter fxoff {
-                type _DOUBLE 
+                type _DOUBLE
                 prompt {Focal plane X value at ref point, in mm}
                 ppath CURRENT DEFAULT
                 vpath DEFAULT
@@ -765,7 +765,7 @@ package @PACKAGE@ {
             }
 
             parameter fylo {
-                type _DOUBLE 
+                type _DOUBLE
                 prompt {Lower focal plane Y limit, in mm}
                 vpath CURRENT DEFAULT
                 default -50
@@ -773,7 +773,7 @@ package @PACKAGE@ {
             }
 
             parameter fyhi {
-                type _DOUBLE 
+                type _DOUBLE
                 prompt {Upper focal plane Y limit, in mm}
                 vpath CURRENT DEFAULT
                 default 50
@@ -781,7 +781,7 @@ package @PACKAGE@ {
             }
 
             parameter fyoff {
-                type _DOUBLE 
+                type _DOUBLE
                 prompt {Focal plane Y value at ref point, in mm}
                 ppath CURRENT DEFAULT
                 vpath DEFAULT
@@ -825,7 +825,7 @@ package @PACKAGE@ {
             parameter incat {
                 type LITERAL
                 prompt {Name of input catalogue text file}
-                vpath DEFAULT 
+                vpath DEFAULT
                 ppath CURRENT DEFAULT
                 default !
                 helpkey *
@@ -885,14 +885,14 @@ package @PACKAGE@ {
             parameter outcat {
                 type LITERAL
                 prompt {Name of output catalogue text file}
-                ppath CURRENT 
+                ppath CURRENT
                 helpkey *
             }
 
             parameter outcode {
                 type LITERAL
                 prompt {Name of output C source file}
-                ppath CURRENT 
+                ppath CURRENT
                 helpkey *
             }
 
@@ -3539,6 +3539,10 @@ package @PACKAGE@ {
 
     command cbas {
         obey {$SMURF_DIR/cbas}
+    }
+
+    command matched-filter {
+        obey {$SMURF_DIR/matched-filter}
     }
 
     command distortion {
