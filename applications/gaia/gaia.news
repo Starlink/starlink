@@ -22,6 +22,10 @@
     primary image. This behaviour was in conflict with images in extensions
     which were just processed individually.
 
+    The page up and page down keys will now scroll the main image up and 
+    down and control page up and down left and right (requires the keyboard
+    focus to be in the main image).
+
   Hawaiki release
   ===============
 

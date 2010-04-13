@@ -164,6 +164,15 @@ itcl::class gaia::GaiaImageCtrl {
       bind $canvas_ <Control-Button> [code $this handle_control_button_ %b]
       bind $canvas_ <Shift-Button> [code $this handle_shift_button_ %W %b]
 
+      #  Page up and down also to move image, up down and control go left
+      #  right.
+      bind $canvas_ <KeyPress-Next> [code $this handle_page_up_down_ %W "up"]
+      bind $canvas_ <KeyPress-Prior> [code $this handle_page_up_down_ %W "down"]
+      bind $canvas_ <Control-KeyPress-Next> \
+         [code $this handle_page_up_down_ %W "left"]
+      bind $canvas_ <Control-KeyPress-Prior> \
+         [code $this handle_page_up_down_ %W "right"]
+
       #  Pass on UKIRT quick look configs.
       $image_ configure -ukirt_ql $itk_option(-ukirt_ql)
       $image_ configure -ukirt_xy $itk_option(-ukirt_xy)
@@ -207,6 +216,19 @@ itcl::class gaia::GaiaImageCtrl {
          inc_zoom 1
       } elseif { $n == 7 } {
          inc_zoom -1
+      }
+   }
+
+   #  Page up and down handler.
+   protected method handle_page_up_down_ {w dir} {
+      if { $dir == "up" } {
+         $w yview scroll 1 pages
+      } elseif { $dir == "down" } {
+         $w yview scroll -1 pages
+      } elseif { $dir == "left" } {
+         $w xview scroll 1 pages
+      } else {
+         $w xview scroll -1 pages
       }
    }
 
