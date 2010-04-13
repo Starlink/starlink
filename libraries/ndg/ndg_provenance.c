@@ -10,11 +10,11 @@
 
 *  Description:
 *     This file defines all the functions used for reading, writing,
-*     modifying and querying provenance information in an NDF. 
+*     modifying and querying provenance information in an NDF.
 *
-*     The provenance information in an NDF encapsulates details of all 
+*     The provenance information in an NDF encapsulates details of all
 *     the other NDFs that were used in the creation of the NDF. The
-*     information is heirarchical and includes parents, grandparents, 
+*     information is heirarchical and includes parents, grandparents,
 *     great-grandparents, etc., all the way back to "root ancestors" (a
 *     root ancestor is an ancestor NDF that has no recorded parents).
 *
@@ -31,8 +31,8 @@
 *  Functions Provides:
 *     This modules provides the following public functions. There is an
 *     equivalent set of F77 routines with names formed by converting the
-*     C name to upper case and inserting an underscore after the initial 
-*     "NDG" string (C and F77 versions are documented individually in 
+*     C name to upper case and inserting an underscore after the initial
+*     "NDG" string (C and F77 versions are documented individually in
 *     separate prologues below):
 *
 *     - ndgCopyProv: Create a deep copy of a provenance structure.
@@ -54,43 +54,43 @@
 
 *  The PROVENANCE Extension:
 *     - The PROVENANCE extension in an NDF contains four components:
-*     "PARENTS", "ANCESTORS", "CREATOR", "DATE" and "HASH". The DATE 
-*     component is a character string holding the date and time at which the 
-*     information in the provenance extension was last modified. The date is 
+*     "PARENTS", "ANCESTORS", "CREATOR", "DATE" and "HASH". The DATE
+*     component is a character string holding the date and time at which the
+*     information in the provenance extension was last modified. The date is
 *     UTC formatted by PSX_ASCTIME. The ANCESTORS component is a 1D array
 *     of "PROV" structures (described below). Each element describes a
 *     single NDF that was used in the creation of the main NDF, either
-*     directly or indirectly. The PARENTS component is a 1D integer 
+*     directly or indirectly. The PARENTS component is a 1D integer
 *     array holding the indices within the ANCESTORS array of the NDFs
 *     that are the direct parents of the main NDF. The CREATOR component
 *     holds an arbitrary identifier for the software that created the
 *     main NDF. The HASH component is an integer that identifies the
-*     contents of the current History record in the NDF at the time the 
+*     contents of the current History record in the NDF at the time the
 *     PROVENANCE extension was created. This is used to determine which
 *     history records to copy into the PROVENANCE extension if the main
 *     NDF is used in the creation of another NDF.
 *     - Each PROV structure describes a single NDF that was used in the
-*     creation of the main NDF, and can contain the following components; 
-*     "PARENTS", "DATE", "PATH", "CREATOR", "HISTORY" and "MORE". If present, 
-*     the PARENTS component is a 1D integer array holding the the indices 
-*     within the ANCESTORS array of the direct parents of the ancestor NDF. 
-*     If PARENTS is not present, the ancestor NDF is a "root" NDF (that is, 
-*     it has no known parents). If present, the DATE component is a string 
-*     holding the formatted UTC date at which the provenance information for 
-*     the ancestor NDF was determined. If this date is not known, the DATE 
-*     component will not be present (this will be the case, for instance, for 
-*     all root NDFs). The PATH component will always be present, and is a 
-*     string holding the full path to the ancestor NDF. This includes any HDS 
-*     path within the container file, but will not include any NDF or HDS 
-*     section specifier. Neither will it include the trailing ".sdf" suffix. 
-*     If present, the MORE component is an arbitrary HDS structure in which 
+*     creation of the main NDF, and can contain the following components;
+*     "PARENTS", "DATE", "PATH", "CREATOR", "HISTORY" and "MORE". If present,
+*     the PARENTS component is a 1D integer array holding the the indices
+*     within the ANCESTORS array of the direct parents of the ancestor NDF.
+*     If PARENTS is not present, the ancestor NDF is a "root" NDF (that is,
+*     it has no known parents). If present, the DATE component is a string
+*     holding the formatted UTC date at which the provenance information for
+*     the ancestor NDF was determined. If this date is not known, the DATE
+*     component will not be present (this will be the case, for instance, for
+*     all root NDFs). The PATH component will always be present, and is a
+*     string holding the full path to the ancestor NDF. This includes any HDS
+*     path within the container file, but will not include any NDF or HDS
+*     section specifier. Neither will it include the trailing ".sdf" suffix.
+*     If present, the MORE component is an arbitrary HDS structure in which
 *     any extra information about the ancestor NDF can be stored. The
-*     CREATOR component holds an arbitrary identifier for the software that 
-*     created the ancestor NDF. The HISTORY component is an array of "HISREC" 
+*     CREATOR component holds an arbitrary identifier for the software that
+*     created the ancestor NDF. The HISTORY component is an array of "HISREC"
 *     structures, each containing a copy of a single History record from
 *     the NDF described by the PROV structure. Only History records that
-*     describe operations performed on the NDF itself are stored (including 
-*     the record that describes the creation of the NDF). That is, History 
+*     describe operations performed on the NDF itself are stored (including
+*     the record that describes the creation of the NDF). That is, History
 *     records inherited from the NDF's own parents are not included.
 *     - Each HISREC structure contains the following components (all
 *     taken from the corresponding items in the NDF History record):
@@ -109,12 +109,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -126,8 +126,8 @@
 *  History:
 *     20-JUN-2009 (DSB):
 *        Original version, based on earlier provenance module. All public
-*        function names have been changed, and they now use AST KeyMaps 
-*        rather than HDS structures for communicating provenance 
+*        function names have been changed, and they now use AST KeyMaps
+*        rather than HDS structures for communicating provenance
 *        information, (except that an HDS locator is still used for the
 *        MORE component). Also, each ancestor in the PROVENANCE extension
 *        now stores NDF history information that is speciifc to that
@@ -144,8 +144,11 @@
 *        - Purge duplicate entries before leaving ndgModifyProv.
 *        - Report an error if inconsitent entries for the same ancestor
 *        are found within a provenance structure.
+*     13-APR-2010 (DSB):
+*        - Modify ndg1TheSame so that CREATOR must match (in addition to
+*        PATH and DATE) for two Prov structures to be considered the same.
+*        - Remove trailing white space.
 */
-
 
 
 /* Module Macros. */
@@ -200,7 +203,7 @@
 /* C header files. */
 #include <stdio.h>
 #include <string.h>
-#include <time.h> 
+#include <time.h>
 
 /* Module Variables. */
 /* ----------------- */
@@ -217,10 +220,10 @@ static int history_length = 0;
 /* Type Definitions. */
 /* ----------------- */
 /* A structure that stores history information for a single ancestor.
-   These are just the same as the corresponding fields in the NDF 
+   These are just the same as the corresponding fields in the NDF
    history record.  */
 typedef struct HistRec {
-   char *date;                 
+   char *date;
    char *command;
    char *user;
    char *text;
@@ -231,21 +234,21 @@ typedef struct HistRec {
 typedef struct Prov {
    char *path;                 /* String holding the NDF path as returned
                                   by ndfMsg */
-   char *date;                 /* String holding the formated UTC date & time 
+   char *date;                 /* String holding the formated UTC date & time
                                   at which the NDF's provenance was recorded */
-   char *creator;              /* String describing the software that created 
+   char *creator;              /* String describing the software that created
                                   the NDF */
    HDSLoc *more;               /* A temporary HDS object holding a copy
                                   of the MORE structure describing the NDF */
-   struct Prov **parents;      /* Array of pointers to the Prov structures for 
+   struct Prov **parents;      /* Array of pointers to the Prov structures for
                                   the direct parents of the NDF */
-   struct Prov **children;     /* Array of pointers to the Prov structures for 
+   struct Prov **children;     /* Array of pointers to the Prov structures for
                                   the direct children of the NDF */
    int nparent;                /* The length of the parents array */
    int nchild;                 /* The length of the children array */
    int index;                  /* The index within the ANCESTORS array, or
                                   -1 if the index is not currently known */
-   int hhash;                  /* A hash code for the most recent NDF history 
+   int hhash;                  /* A hash code for the most recent NDF history
                                   record at the time provenance info was
                                   stored in the ancestor. */
    HistRec *hist_recs;         /* Array of history records */
@@ -257,9 +260,9 @@ typedef struct Prov {
 /* A structure that stores an ordered list of all Prov structures that
    are derived from a given NDF PROVENANCE extension. */
 typedef struct Provenance {
-   Prov *main;                 /* Pointer to the Prov structure for the main 
+   Prov *main;                 /* Pointer to the Prov structure for the main
                                   NDF */
-   Prov **provs;               /* Array of pointers to Prov structures for the 
+   Prov **provs;               /* Array of pointers to Prov structures for the
                                   main NDF and all ancestors NDFs */
    int nprov;                  /* The length of the "provs" array */
 } Provenance;
@@ -308,11 +311,12 @@ static void ndg1ResetIndices( Provenance *, int * );
 static void ndg1Rmprv( Provenance *, int, int * );
 static void ndg1WriteProvenanceExtension( Provenance *, HDSLoc *, int * );
 static void ndg1WriteProvenanceNDF( Provenance *, int, int, int * );
+static AstKeyMap *ndg1ShowProv( Prov *, int, AstKeyMap *, int * );
 
 /* Public F77 wrapper functions. */
 /* ============================= */
 
-F77_SUBROUTINE(ndg_copyprov)( INTEGER(iprov), LOGICAL(cleanse), 
+F77_SUBROUTINE(ndg_copyprov)( INTEGER(iprov), LOGICAL(cleanse),
                               INTEGER(iprov2), INTEGER(status) ){
 /*
 *+
@@ -329,13 +333,13 @@ F77_SUBROUTINE(ndg_copyprov)( INTEGER(iprov), LOGICAL(cleanse),
 *     CALL NDG_COPYPROV( IPROV, CLENSE, IPROV2, STATUS )
 
 *  Description:
-*     This routine produces a deep copy of the supplied Provenance 
-*     structure, and then optionally uses NDG_REMOVEPROV to remove any 
-*     hidden ancestors from the copy. 
+*     This routine produces a deep copy of the supplied Provenance
+*     structure, and then optionally uses NDG_REMOVEPROV to remove any
+*     hidden ancestors from the copy.
 
 *  Arguments:
 *     IPROV = INTEGER (Given)
-*        An identifier for a structure holding the provenance information 
+*        An identifier for a structure holding the provenance information
 *        read from an NDF, as returned by NDG_READPROV.
 *     CLEANSE = LOGICAL (Given)
 *        If .TRUE., then any ancestors which have been hidden using
@@ -354,11 +358,11 @@ F77_SUBROUTINE(ndg_copyprov)( INTEGER(iprov), LOGICAL(cleanse),
    GENPTR_LOGICAL(cleanse)
    GENPTR_INTEGER(iprov2)
    GENPTR_INTEGER(status)
-   *iprov2 = astP2I( ndgCopyProv( (NdgProvenance *) astI2P( *iprov ), 
+   *iprov2 = astP2I( ndgCopyProv( (NdgProvenance *) astI2P( *iprov ),
                                   F77_ISTRUE( *cleanse ) ? 1 : 0, status ) );
 }
 
-F77_SUBROUTINE(ndg_countprov)( INTEGER(iprov), INTEGER(count) , 
+F77_SUBROUTINE(ndg_countprov)( INTEGER(iprov), INTEGER(count) ,
                                INTEGER(status) ){
 /*
 *+
@@ -375,12 +379,12 @@ F77_SUBROUTINE(ndg_countprov)( INTEGER(iprov), INTEGER(count) ,
 *     CALL NDG_COUNTPROV( IPROV, COUNT, STATUS )
 
 *  Description:
-*     This routine returns the number of ancestors described in the 
+*     This routine returns the number of ancestors described in the
 *     supplied provenance structure.
 
 *  Arguments:
 *     IPROV = INTEGER (Given)
-*        An identifier for a structure holding the provenance information 
+*        An identifier for a structure holding the provenance information
 *        read from an NDF, as returned by NDG_READPROV.
 *     COUNT = INTEGER (Returned)
 *        The number of ancestors in the supplied provenance structure.
@@ -415,9 +419,9 @@ F77_SUBROUTINE(ndg_formatprov)( INTEGER(iprov), LOGICAL(base), INTEGER(fkeymap),
 *     containing information taken from the supplied provenance structure.
 *
 *     The returned KeyMap has an entry with key "0" that describes the NDF
-*     from which the provenance was read. It also has an entry describing 
+*     from which the provenance was read. It also has an entry describing
 *     each ancestor NDF. These entries have keys "1", "2", "3", etc, up to
-*     the number of ancestors in the NDF. 
+*     the number of ancestors in the NDF.
 *
 *     Each of these entries contains a pointer to another AST KeyMap
 *     which may contain any subset of the following entries (all of which,
@@ -439,40 +443,40 @@ F77_SUBROUTINE(ndg_formatprov)( INTEGER(iprov), LOGICAL(base), INTEGER(fkeymap),
 *            with the NDF.
 *
 *     "HISTORY" - A vector entry holding one or more KeyMaps. Each
-*            KeyMap contains items that describe an action performed on 
-*            the ancestor. The actions are stored in chronological order 
-*            within the vector entry. The last KeyMap in the vector 
-*            describes the action that created the ancestor NDF. Any 
+*            KeyMap contains items that describe an action performed on
+*            the ancestor. The actions are stored in chronological order
+*            within the vector entry. The last KeyMap in the vector
+*            describes the action that created the ancestor NDF. Any
 *            earlier KeyMaps in the vector describe any subsequent actions
-*            performed on the ancestor NDF prior to it being used in the 
+*            performed on the ancestor NDF prior to it being used in the
 *            creation of its parent. Each KeyMap contains the following
-*            scalar character entries (all taken from the corresponding 
+*            scalar character entries (all taken from the corresponding
 *            record in the NDF HISTORY component):
 *
 *            - "DATE": The date and time of the action (e.g. "2009-JUN-24
 *                      14:00:53.752" ).
 *            - "COMMAND": An indication of the command that performed the
 *                      action (e.g. "WCSATTRIB (KAPPA 1.10-6)" ).
-*            - "USER": The user name that performed the action 
+*            - "USER": The user name that performed the action
 *                      (e.g. "dsb").
 *            - "TEXT": The full text of the NDF history record. This is
-*                      arbitrary, but for NDFs created by Starlink 
-*                      software it will usually include environment 
-*                      parameter values, and the full path of the command 
+*                      arbitrary, but for NDFs created by Starlink
+*                      software it will usually include environment
+*                      parameter values, and the full path of the command
 *                      that performed the action.
 *
 *     Finally, the returned KeyMap has an entry with key "MXLEN" that is
-*     again a pointer to another KeyMap with the same entries listed 
-*     above (except that it has no "HISTORY" entry). However, this time 
-*     the entries are integers, not strings, and holds the maximum field 
+*     again a pointer to another KeyMap with the same entries listed
+*     above (except that it has no "HISTORY" entry). However, this time
+*     the entries are integers, not strings, and holds the maximum field
 *     width used to format the strings.
 
 *  Arguments:
 *     IPROV = INTEGER (Given)
-*        An identifier for a structure holding the provenance information 
+*        An identifier for a structure holding the provenance information
 *        read from an NDF, as returned by NDG_READPROV.
 *     BASE = LOGICAL (Given)
-*        If .TRUE., then the PATH field in the returned KeyMap holds the 
+*        If .TRUE., then the PATH field in the returned KeyMap holds the
 *        base name of each NDF rather than the full path.
 *     KEYMAP = INTEGER (Returned)
 *        A pointer to the returned AST KeyMap.
@@ -512,7 +516,7 @@ F77_SUBROUTINE(ndg_freeprov)( INTEGER(iprov), INTEGER(status) ){
 
 *  Arguments:
 *     IPROV = INTEGER (Given and Returned)
-*        An identifier for a structure holding the provenance information 
+*        An identifier for a structure holding the provenance information
 *        read from an NDF, as returned by NDG_READPROV. Returned holding
 *        NDG__NULL.
 *     STATUS = INTEGER (Given and Returned)
@@ -526,12 +530,12 @@ F77_SUBROUTINE(ndg_freeprov)( INTEGER(iprov), INTEGER(status) ){
 
    GENPTR_INTEGER(iprov)
    GENPTR_INTEGER(status)
-   *iprov = astP2I( ndgFreeProv( (NdgProvenance *) astI2P( *iprov ), 
+   *iprov = astP2I( ndgFreeProv( (NdgProvenance *) astI2P( *iprov ),
                                  status ) );
 }
 
-F77_SUBROUTINE(ndg_getprov)( INTEGER(iprov), INTEGER(ianc), 
-                             INTEGER(km), CHARACTER(fmore), 
+F77_SUBROUTINE(ndg_getprov)( INTEGER(iprov), INTEGER(ianc),
+                             INTEGER(km), CHARACTER(fmore),
                              INTEGER(status) TRAIL(fmore) ){
 /*
 *+
@@ -548,46 +552,46 @@ F77_SUBROUTINE(ndg_getprov)( INTEGER(iprov), INTEGER(ianc),
 *     CALL NDG_GETPROV( IPROV, IANC, KM, MORE, STATUS )
 
 *  Description:
-*     This routine returns information about a specified ancestor in the 
-*     supplied provenance structure. 
+*     This routine returns information about a specified ancestor in the
+*     supplied provenance structure.
 
 *  Arguments:
 *     IPROV = INTEGER (Given)
-*        An identifier for a structure holding the provenance information 
+*        An identifier for a structure holding the provenance information
 *        read from an NDF, as returned by NDG_READPROV.
 *     IANC = INTEGER (Given)
 *        The index of the ancestor NDF for which information should be
 *        returned. A value of zero will result in information being returned
-*        that describes the NDF from which the provenance information was 
-*        read. Otherwise, the IANC value is used as an index into the 
+*        that describes the NDF from which the provenance information was
+*        read. Otherwise, the IANC value is used as an index into the
 *        ANCESTORS array. No error is reported if IANC is too large, but a
 *        null identifier will be returned as the function value.
 *     KM = INTEGER (Returned)
-*        A pointer to an AST KeyMap containing entries with the following 
+*        A pointer to an AST KeyMap containing entries with the following
 *        keys and values:
-*        
+*
 *        - "PATH": A string holding the path of the ancestor NDF.
-*        - "DATE": A string holding the formatted UTC date and time at 
-*          which the provenance information for the ancestor NDF was 
+*        - "DATE": A string holding the formatted UTC date and time at
+*          which the provenance information for the ancestor NDF was
 *          recorded.
 *        - "CREATOR": A string identifying the software that created the
 *          ancestor NDF.
 *        - "PARENTS": A 1D vector of integers that are the indices of the
 *          immediate parents of the ancestor.
-*        - "MORE": A KeyMap containing any scalar or vector primitive 
-*          values stored at the top level of the associated HDS MORE 
-*          structure. The HDS name of the component is used as the key. 
-*          The full contents of the MORE structure are returned by the 
+*        - "MORE": A KeyMap containing any scalar or vector primitive
+*          values stored at the top level of the associated HDS MORE
+*          structure. The HDS name of the component is used as the key.
+*          The full contents of the MORE structure are returned by the
 *          MORE argument (see above).
 *        - "HISTORY": A vector entry holding one or more KeyMaps. Each
-*          KeyMap contains items that describe an action performed on 
-*          the ancestor. The actions are stored in chronological order 
-*          within the vector entry. The last KeyMap in the vector 
-*          describes the action that created the ancestor NDF. Any 
-*          earlier KeyMaps in the vector describe any subsequent actions 
-*          performed on the ancestor NDF prior to it being used in the 
+*          KeyMap contains items that describe an action performed on
+*          the ancestor. The actions are stored in chronological order
+*          within the vector entry. The last KeyMap in the vector
+*          describes the action that created the ancestor NDF. Any
+*          earlier KeyMaps in the vector describe any subsequent actions
+*          performed on the ancestor NDF prior to it being used in the
 *          creation of its parent. Each KeyMap contains the following
-*          scalar character entries (all taken from the corresponding 
+*          scalar character entries (all taken from the corresponding
 *          record in the NDF HISTORY component):
 *          - "DATE": The date and time of the action (e.g. "2009-JUN-24
 *            14:00:53.752" ).
@@ -598,25 +602,25 @@ F77_SUBROUTINE(ndg_getprov)( INTEGER(iprov), INTEGER(ianc),
 *            arbitrary, but for NDFs created by Starlink software it will
 *            usually include environment parameter values, and the full
 *            path of the command that performed the action.
-*        
+*
 *        If the specified ancestor does not have any of these items of
-*        information, then the corresponding entry will not be present 
-*        in the returned KeyMap. For instance, if the ancestor has no 
-*        immediate parent NDFs, then the "PARENTS" entry will not be 
+*        information, then the corresponding entry will not be present
+*        in the returned KeyMap. For instance, if the ancestor has no
+*        immediate parent NDFs, then the "PARENTS" entry will not be
 *        present in the KeyMap. A NULL pointer will be returned if the
 *        NDF has no provenance extension, or if "ianc" is outside the
 *        bounds of the ANCESTORS array (and is not zero). The returned
 *        KeyMap pointer should be annulled when it is no longer needed,
-*        either by calling astAnnul explicitly, or by relying on astEnd 
+*        either by calling astAnnul explicitly, or by relying on astEnd
 *        to annul it (together with all the other AST Objects created in
 *        the current AST Object context).
 *     MORE = CHARACTER * (DAT__SZLOC) (Returned)
-*        A locator for a temporary HDS object containing a full deep copy 
-*        of each component of the MORE structure associated with the 
-*        requested ancestor. The returned locator should be annulled using 
-*        DAT_ANNUL when no longer needed. A value of DAT__NOLOC will be 
-*        returned if the requested ancestor has no MORE component. Note, 
-*        the returned object will be assigned an arbitrary HDS Name, which 
+*        A locator for a temporary HDS object containing a full deep copy
+*        of each component of the MORE structure associated with the
+*        requested ancestor. The returned locator should be annulled using
+*        DAT_ANNUL when no longer needed. A value of DAT__NOLOC will be
+*        returned if the requested ancestor has no MORE component. Note,
+*        the returned object will be assigned an arbitrary HDS Name, which
 *        will not in general be "MORE".
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -626,7 +630,7 @@ F77_SUBROUTINE(ndg_getprov)( INTEGER(iprov), INTEGER(ianc),
    GENPTR_INTEGER(iprov)
    GENPTR_INTEGER(ianc)
    GENPTR_INTEGER(km)
-   GENPTR_CHARACTER(fmore) 
+   GENPTR_CHARACTER(fmore)
    GENPTR_INTEGER(status)
    HDSLoc *more = NULL;
 
@@ -634,7 +638,7 @@ F77_SUBROUTINE(ndg_getprov)( INTEGER(iprov), INTEGER(ianc),
    datExportFloc( &more, 0, fmore_length, fmore, status );
 }
 
-F77_SUBROUTINE(ndg_hideprov)( INTEGER(iprov), INTEGER(ianc), 
+F77_SUBROUTINE(ndg_hideprov)( INTEGER(iprov), INTEGER(ianc),
                               INTEGER(status) ){
 /*
 *+
@@ -649,16 +653,16 @@ F77_SUBROUTINE(ndg_hideprov)( INTEGER(iprov), INTEGER(ianc),
 
 *  Description:
 *     This function flags a specified ancestor as "hidden". The only
-*     effect this has is that the ancestor will not be included in 
+*     effect this has is that the ancestor will not be included in
 *     Provenance structures created by the NDG_COPYPROV function.
 
 *  Arguments:
 *     IPROV = INTEGER (Given)
-*        An identifier for a structure holding the provenance information 
+*        An identifier for a structure holding the provenance information
 *        read from an NDF, as returned by NDG_READPROV.
 *     IANC = INTEGER (Given)
-*        The index of the ancestor NDF to be hidden. The value is used as an 
-*        index into the ANCESTORS array. An error will be reported if the 
+*        The index of the ancestor NDF to be hidden. The value is used as an
+*        index into the ANCESTORS array. An error will be reported if the
 *        value is too large, or is less than 1 (the main NDF cannot be
 *        hidden).
 *     STATUS = INTEGER (Given and Returned)
@@ -671,7 +675,7 @@ F77_SUBROUTINE(ndg_hideprov)( INTEGER(iprov), INTEGER(ianc),
    ndgHideProv( astI2P( *iprov ), *ianc, status );
 }
 
-F77_SUBROUTINE(ndg_ishiddenprov)( INTEGER(iprov), INTEGER(ianc), 
+F77_SUBROUTINE(ndg_ishiddenprov)( INTEGER(iprov), INTEGER(ianc),
                                   LOGICAL(hidden), INTEGER(status) ){
 /*
 *+
@@ -688,16 +692,16 @@ F77_SUBROUTINE(ndg_ishiddenprov)( INTEGER(iprov), INTEGER(ianc),
 *     CALL NDG_ISHIDDENPROV( IPROV, IANC, HIDDEN, STATUS )
 
 *  Description:
-*     This function returns a TRUE. value for HIDDEN if the specified 
+*     This function returns a TRUE. value for HIDDEN if the specified
 *     ancestor has been hidden. See NDG_HIDEPROV and NDG_COPYPROV.
 
 *  Arguments:
 *     IPROV = INTEGER (Given)
-*        An identifier for a structure holding the provenance information 
+*        An identifier for a structure holding the provenance information
 *        read from an NDF, as returned by NDG_READPROV.
 *     IANC = INTEGER (Given)
-*        The index of the ancestor NDF to be checked. The value is used as 
-*        an index into the ANCESTORS array. An error will be reported if the 
+*        The index of the ancestor NDF to be checked. The value is used as
+*        an index into the ANCESTORS array. An error will be reported if the
 *        value is too large, or is less than 0.
 *     HIDDEN = LOGICAL (Returned)
 *        .TRUE. if the ancestor is hidden.
@@ -709,7 +713,7 @@ F77_SUBROUTINE(ndg_ishiddenprov)( INTEGER(iprov), INTEGER(ianc),
    GENPTR_INTEGER(ianc)
    GENPTR_LOGICAL(hidden)
    GENPTR_INTEGER(status)
-   *hidden = ndgIsHiddenProv( astI2P( *iprov ), *ianc, status ) ? 
+   *hidden = ndgIsHiddenProv( astI2P( *iprov ), *ianc, status ) ?
              F77_TRUE : F77_FALSE;
 }
 
@@ -730,53 +734,53 @@ F77_SUBROUTINE(ndg_modifyprov)( INTEGER(iprov), INTEGER(ianc), INTEGER(km),
 *     CALL NDG_MODIFYPROV( IPROV, IANC, KM, MORE, STATUS )
 
 *  Description:
-*     This routine modifies the information stored for a given ancestor 
-*     in the supplied provenance structure. The new values to store 
+*     This routine modifies the information stored for a given ancestor
+*     in the supplied provenance structure. The new values to store
 *     are supplied in an AST KeyMap such as returned by NDG_GETPROV.
 
 *  Arguments:
 *     IPROV = INTEGER (Given)
-*        An identifier for a structure holding the provenance information 
+*        An identifier for a structure holding the provenance information
 *        read from an NDF, as returned by NDG_READPROV.
 *     IANC = INTEGER (Given)
 *        The index of the ancestor NDF for which information should be
-*        modified. A value of zero will result in information about the NDF 
+*        modified. A value of zero will result in information about the NDF
 *        specified by INDF being modified. Otherwise, the IANC value
-*        is used as an index into the ANCESTORS array. An error is reported 
+*        is used as an index into the ANCESTORS array. An error is reported
 *        if IANC is too large.
 *     KM = INTEGER (Given)
 *        A pointer to an AST KeyMap containing the values to store. Entries
 *        with the following keys are recognised:
 *
 *        - "PATH": A string holding the path of the ancestor NDF.
-*        - "DATE": A string holding the formatted UTC date and time at 
-*          which the provenance information for the ancestor NDF was 
+*        - "DATE": A string holding the formatted UTC date and time at
+*          which the provenance information for the ancestor NDF was
 *          recorded.
 *        - "CREATOR": A string identifying the software that created the
 *          ancestor NDF.
-*        - "MORE": A KeyMap containing extra information to store at the 
-*        top level of the MORE component for the ancestor. Only entries 
-*        holding primitive data values (scalar or vector) are used - 
-*        entries holding nested KeyMaps, etc, are ignored. If an entry in 
-*        this KeyMap has the same name as a component in the supplied 
-*        MORE HDS structure, then the KeyMap value is used in preference to 
+*        - "MORE": A KeyMap containing extra information to store at the
+*        top level of the MORE component for the ancestor. Only entries
+*        holding primitive data values (scalar or vector) are used -
+*        entries holding nested KeyMaps, etc, are ignored. If an entry in
+*        this KeyMap has the same name as a component in the supplied
+*        MORE HDS structure, then the KeyMap value is used in preference to
 *        the HDS value.
 *
-*        If the "DATE" or "CREATOR" components are missing then the 
-*        corresponding item of information will be deleted from the 
+*        If the "DATE" or "CREATOR" components are missing then the
+*        corresponding item of information will be deleted from the
 *        provenance extension. To delete the "MORE" component in the
 *        provenance extension, supply a KeyMap without a MORE entry, and
-*        also supply DAT_NOLOC for the "more" argument. An error is 
-*        reported if the supplied KeyMap has no "PATH" entry. Note, the 
-*        PARENTS list and HISTORY information stored with the specified 
-*        ancestor cannot be modified (any "PARENTS" or "HISTORY" 
+*        also supply DAT_NOLOC for the "more" argument. An error is
+*        reported if the supplied KeyMap has no "PATH" entry. Note, the
+*        PARENTS list and HISTORY information stored with the specified
+*        ancestor cannot be modified (any "PARENTS" or "HISTORY"
 *        component in the supplied HDS structure will be ignored).
 *     MORE = CHARACTER * (DAT__SZLOC) (Given)
 *        A locator for an HDS object containing additional information to
-*        be associated with the requested ancestor. DAT__NOLOC may be 
+*        be associated with the requested ancestor. DAT__NOLOC may be
 *        supplied for this argument. The contents of the MORE component
 *        in the provenance extension will be the union of any structure
-*        supplied through this argument, and any values supplied through 
+*        supplied through this argument, and any values supplied through
 *        the MORE entry in the supplied KeyMap. If the same component
 *        name occurs in both, then the KeyMap value takes precedence.
 *     STATUS = INTEGER (Given and Returned)
@@ -786,7 +790,7 @@ F77_SUBROUTINE(ndg_modifyprov)( INTEGER(iprov), INTEGER(ianc), INTEGER(km),
    GENPTR_INTEGER(iprov)
    GENPTR_INTEGER(ianc)
    GENPTR_INTEGER(km)
-   GENPTR_CHARACTER(fmore) 
+   GENPTR_CHARACTER(fmore)
    GENPTR_INTEGER(status)
    HDSLoc *more = NULL;
 
@@ -818,33 +822,33 @@ F77_SUBROUTINE(ndg_putprov)( INTEGER(iprov), INTEGER(indf), CHARACTER(fmore),
 *     CALL NDG_PUTPROV( IPROV, INDF, MORE, MORE2, ISROOT, STATUS )
 
 *  Description:
-*     This routine modifies the supplied provenance structure to indicate 
+*     This routine modifies the supplied provenance structure to indicate
 *     that a given NDF was used in the creation of the NDF associated with
 *     the supplied provenance structure.
 
 *  Arguments:
 *     IPROV = INTEGER (Given)
-*        An identifier for a structure holding the provenance information 
+*        An identifier for a structure holding the provenance information
 *        read from an NDF, as returned by NDG_READPROV.
 *     INDF = INTEGER (Given)
 *        An identifier for an NDF that is to be added into the list of
 *        ancestor NDFs in the supplied provenance information.
 *     MORE = CHARACTER * (DAT__SZLOC) (Given)
-*        A locator for an HDS structure containing arbitrary additional 
-*        information about the new ancestor NDF, and how it was used in the 
-*        creation of the output NDF. 
+*        A locator for an HDS structure containing arbitrary additional
+*        information about the new ancestor NDF, and how it was used in the
+*        creation of the output NDF.
 *     MORE2 = INTEGER (Given)
-*        A pointer to an AstKeyMap holding extra items of information 
-*        to be added into the MORE component. Only entries holding primitive 
+*        A pointer to an AstKeyMap holding extra items of information
+*        to be added into the MORE component. Only entries holding primitive
 *        data values (scalar or vector) are used - entries holding nested
-*        KeyMaps, etc, are ignored. If an entry in this KeyMap has the same 
-*        name as a component in the supplied MORE HDS structure, then the 
+*        KeyMaps, etc, are ignored. If an entry in this KeyMap has the same
+*        name as a component in the supplied MORE HDS structure, then the
 *        KeyMap value is used in preference to the HDS value.
 *     ISROOT = LOGICAL (Given)
-*        If TRUE, then the new ancestor NDF will be treated as a root 
-*        NDF. That is, any provenance information in the supplied NDF is 
-*        ignored. If FALSE, then any provenance information in the NDF is 
-*        copied into the supplied provenance structure. The new ancestor NDF 
+*        If TRUE, then the new ancestor NDF will be treated as a root
+*        NDF. That is, any provenance information in the supplied NDF is
+*        ignored. If FALSE, then any provenance information in the NDF is
+*        copied into the supplied provenance structure. The new ancestor NDF
 *        is then only a root NDF if it contains no provenance information.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -852,7 +856,7 @@ F77_SUBROUTINE(ndg_putprov)( INTEGER(iprov), INTEGER(indf), CHARACTER(fmore),
 */
    GENPTR_INTEGER(iprov)
    GENPTR_INTEGER(indf)
-   GENPTR_CHARACTER(fmore) 
+   GENPTR_CHARACTER(fmore)
    GENPTR_INTEGER(more2)
    GENPTR_LOGICAL(isroot)
    GENPTR_INTEGER(status)
@@ -868,8 +872,8 @@ F77_SUBROUTINE(ndg_putprov)( INTEGER(iprov), INTEGER(indf), CHARACTER(fmore),
                F77_ISTRUE( *isroot ), status );
 }
 
-F77_SUBROUTINE(ndg_readprov)( INTEGER(indf), CHARACTER(fcreator), 
-                              INTEGER(iprov), INTEGER(status) 
+F77_SUBROUTINE(ndg_readprov)( INTEGER(indf), CHARACTER(fcreator),
+                              INTEGER(iprov), INTEGER(status)
                               TRAIL(fcreator) ){
 /*
 *+
@@ -888,19 +892,19 @@ F77_SUBROUTINE(ndg_readprov)( INTEGER(indf), CHARACTER(fcreator),
 *  Description:
 *     This function reads the information stored in the "PROVENANCE"
 *     extension of an NDF, storing it in a memory-resident structure for
-*     faster access. An identifier for this structure is returned, and 
-*     can be passed to other NDG provenance functions to manipulate the 
+*     faster access. An identifier for this structure is returned, and
+*     can be passed to other NDG provenance functions to manipulate the
 *     contents of the structure.
 *
 *     If the NDF has no provenance information (for instance, if it is a
-*     newly created NDF), the returned structure will contain just the 
-*     supplied creator name (which may be blank), and an empty ancestor 
+*     newly created NDF), the returned structure will contain just the
+*     supplied creator name (which may be blank), and an empty ancestor
 *     list.
 *
-*     The structure should be freed when it is no longer needed by 
+*     The structure should be freed when it is no longer needed by
 *     calling NDG_FREEPROV.
 *
-*     The structure should be freed when it is no longer needed by 
+*     The structure should be freed when it is no longer needed by
 *     calling NDG_FREEPROV.
 
 *  Arguments:
@@ -912,7 +916,7 @@ F77_SUBROUTINE(ndg_readprov)( INTEGER(indf), CHARACTER(fcreator),
 *        name of the calling application). The format of the identifier
 *        is arbitrary, but the form "PACKAGE:COMMAND" is recommended.
 *     IPROV = INTEGER (Returned)
-*        An identifier for the structure holding the provenance information 
+*        An identifier for the structure holding the provenance information
 *        read from the NDF. NDG__NULL is returned if an error occurs.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -920,7 +924,7 @@ F77_SUBROUTINE(ndg_readprov)( INTEGER(indf), CHARACTER(fcreator),
 *-
 */
    GENPTR_INTEGER(indf)
-   GENPTR_CHARACTER(fcreator) 
+   GENPTR_CHARACTER(fcreator)
    GENPTR_INTEGER(iprov)
    GENPTR_INTEGER(status)
    char *creator = NULL;
@@ -947,23 +951,23 @@ F77_SUBROUTINE(ndg_removeprov)( INTEGER(iprov), INTEGER(nanc),
 *     CALL NDG_REMOVEPROV( IPROV, NANC, IANC, STATUS )
 
 *  Description:
-*     This routine removes one or more ancestors from the supplied 
-*     provenance structure. The direct parents of the removed ancestor 
+*     This routine removes one or more ancestors from the supplied
+*     provenance structure. The direct parents of the removed ancestor
 *     are assigned to the direct children of the removed ancestor. Note,
 *     any history records stored in the removed ancestors are lost.
 
 *  Arguments:
 *     IPROV = INTEGER (Given)
-*        An identifier for a structure holding the provenance information 
+*        An identifier for a structure holding the provenance information
 *        read from an NDF, as returned by NDG_READPROV.
 *     NANC = INTEGER (Given)
 *        The length of the ANC array.
 *     ANC( * )  = INTEGER (Given)
-*        An array holding the indices of the ancestor NDFs to be removed. 
-*        Each supplied value must be at least 1, and must be no more than 
-*        the number of ancestors in the provenance extension (as returned 
-*        by NDG_COUNTPROV). An error is reported otherwise. The supplied 
-*        list is sorted into decreasing order before use so that the 
+*        An array holding the indices of the ancestor NDFs to be removed.
+*        Each supplied value must be at least 1, and must be no more than
+*        the number of ancestors in the provenance extension (as returned
+*        by NDG_COUNTPROV). An error is reported otherwise. The supplied
+*        list is sorted into decreasing order before use so that the
 *        highest index ancestor is removed first.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -995,21 +999,21 @@ F77_SUBROUTINE(ndg_rootprov)( INTEGER(iprov), INTEGER(km), INTEGER(status) ){
 
 *  Description:
 *     This routine searches the supplied provenance structure for root
-*     ancestors, and returns information about them. An ancestor is a root 
+*     ancestors, and returns information about them. An ancestor is a root
 *     ancestor if it does not itself have any ancestors.
 
 *  Arguments:
 *     IPROV = INTEGER (Given)
-*        An identifier for a structure holding the provenance information 
+*        An identifier for a structure holding the provenance information
 *        read from an NDF, as returned by NDG_READPROV.
 *     KM = INTEGER (Returned)
-*        A pointer to an AST KeyMap containing an entry for each root 
-*        ancestor. The key associated with each entry is the path to the 
-*        NDF and the value of the entry is an integer that gives the 
-*        position of the root ancestor within the list of all ancestors. 
-*        This integer value can be supplied to ndgGetProv in order to get 
+*        A pointer to an AST KeyMap containing an entry for each root
+*        ancestor. The key associated with each entry is the path to the
+*        NDF and the value of the entry is an integer that gives the
+*        position of the root ancestor within the list of all ancestors.
+*        This integer value can be supplied to ndgGetProv in order to get
 *        further information about the root ancestor. The first ancestor NDF
-*        has an index of one. An index of zero refers to the NDF from which 
+*        has an index of one. An index of zero refers to the NDF from which
 *        the provenance information was read.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -1021,7 +1025,7 @@ F77_SUBROUTINE(ndg_rootprov)( INTEGER(iprov), INTEGER(km), INTEGER(status) ){
    *km = astP2I( ndgRootProv( astI2P( *iprov ), status ) );
 }
 
-F77_SUBROUTINE(ndg_unhideprov)( INTEGER(iprov), INTEGER(ianc), 
+F77_SUBROUTINE(ndg_unhideprov)( INTEGER(iprov), INTEGER(ianc),
                                 INTEGER(status) ){
 /*
 *+
@@ -1035,16 +1039,16 @@ F77_SUBROUTINE(ndg_unhideprov)( INTEGER(iprov), INTEGER(ianc),
 *     CALL NDG_UNHIDEPROV( IPROV, IANC, STATUS )
 
 *  Description:
-*     This function ensures that a given ancestor is not flagged as 
+*     This function ensures that a given ancestor is not flagged as
 *     "hidden". See NDG_HIDEPROV and NDG_COPYPROV.
 
 *  Arguments:
 *     IPROV = INTEGER (Given)
-*        An identifier for a structure holding the provenance information 
+*        An identifier for a structure holding the provenance information
 *        read from an NDF, as returned by ndgReadProv
 *     IANC = INTEGER (Given)
-*        The index of the ancestor NDF to be un-hidden. The value is used as 
-*        an index into the ANCESTORS array. An error will be reported if the 
+*        The index of the ancestor NDF to be un-hidden. The value is used as
+*        an index into the ANCESTORS array. An error will be reported if the
 *        value is too large, or is less than 0.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -1083,7 +1087,7 @@ F77_SUBROUTINE(ndg_writeprov)( INTEGER(iprov), INTEGER(indf), INTEGER(whdef),
 
 *  Arguments:
 *     IPROV = INTEGER (Given)
-*        An identifier for a structure holding the provenance information 
+*        An identifier for a structure holding the provenance information
 *        read from an NDF, as returned by NDG_READPROV.
 *     INDF = INTEGER (Given)
 *        Identifier for the NDF in which to store the provenance
@@ -1102,13 +1106,13 @@ F77_SUBROUTINE(ndg_writeprov)( INTEGER(iprov), INTEGER(indf), INTEGER(whdef),
 *        information will not yet have been recorded, resulting in
 *        incorrect information being stored in the PROVENANCE extension.
 *        For this reason, the WHDEF argument is supplied. If it is set
-*        to .TRUE., a check is made to see if default history has already 
-*        been stored in the NDF. If .FALSE., default history is stored 
-*        in the NDF before going on to create the PROVENANCE extension. 
-*        Applications that do not use the default history recording 
-*        mechanism, but instead store their own history information, 
-*        should supply .FALSE. for WHDEF, and should also ensure that 
-*        history information has been stored in the NDF before calling 
+*        to .TRUE., a check is made to see if default history has already
+*        been stored in the NDF. If .FALSE., default history is stored
+*        in the NDF before going on to create the PROVENANCE extension.
+*        Applications that do not use the default history recording
+*        mechanism, but instead store their own history information,
+*        should supply .FALSE. for WHDEF, and should also ensure that
+*        history information has been stored in the NDF before calling
 *        this routine.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -1138,12 +1142,12 @@ NdgProvenance *ndgCopyProv( NdgProvenance *prov, int cleanse, int *status ){
 *     Copy a Provenance structure, optionally removing any hidden ancestors.
 
 *  Invocation:
-*     NdgProvenance *ndgCopyProv( NdgProvenance *prov, int cleanse, 
+*     NdgProvenance *ndgCopyProv( NdgProvenance *prov, int cleanse,
 *                                 int *status )
 
 *  Description:
-*     This function produces a deep copy of the supplied Provenance 
-*     structure, and then optionally uses ndgRemoveProv to remove any 
+*     This function produces a deep copy of the supplied Provenance
+*     structure, and then optionally uses ndgRemoveProv to remove any
 *     hidden ancestors from the copy. A pointer to the copy is returned.
 
 *  Arguments:
@@ -1169,7 +1173,7 @@ NdgProvenance *ndgCopyProv( NdgProvenance *prov, int cleanse, int *status ){
    Provenance *newprov;
    Provenance *provenance;
    int *old_status;
-   int i;              
+   int i;
    int ianc;
    int index;
 
@@ -1214,27 +1218,27 @@ NdgProvenance *ndgCopyProv( NdgProvenance *prov, int cleanse, int *status ){
    parents in the new provenance structure. */
          for( ianc = 0; ianc < newprov->nprov; ianc++ ) {
 
-/* Get pointers to the old and new Prov structures describing the ancestor 
+/* Get pointers to the old and new Prov structures describing the ancestor
    with index "ianc". */
             prov1 = provenance->provs[ ianc ];
             prov2 = newprov->provs[ ianc ];
 
 /* For each child of the "prov1" ancestor,  find its index by searching
-   the old provenance for the same pointer. Then store a pointer to the 
+   the old provenance for the same pointer. Then store a pointer to the
    corresponding Prov structure within the new provenance. */
             for( i = 0; i < prov1->nchild; i++ ) {
-               index = ndg1FindAncestorIndex( prov1->children[ i ], 
+               index = ndg1FindAncestorIndex( prov1->children[ i ],
                                               provenance, status );
                prov2->children[ i ] = newprov->provs[ index ];
             }
-      
+
 /* Do the same for the parents. */
             for( i = 0; i < prov1->nparent; i++ ) {
-               index = ndg1FindAncestorIndex( prov1->parents[ i ], 
+               index = ndg1FindAncestorIndex( prov1->parents[ i ],
                                               provenance, status );
                prov2->parents[ i ] = newprov->provs[ index ];
             }
-         }      
+         }
 
 /* If required, remove hidden ancestors. */
          if( cleanse ) {
@@ -1242,8 +1246,8 @@ NdgProvenance *ndgCopyProv( NdgProvenance *prov, int cleanse, int *status ){
 /* Work backwards through the ancestors list. */
             for( ianc = newprov->nprov - 1; ianc >= 0; ianc-- ) {
 
-/* If the ancestor has been hidden, remove it. */         
-               if( newprov->provs[ ianc ]->hidden ) ndg1Rmprv( newprov, ianc, 
+/* If the ancestor has been hidden, remove it. */
+               if( newprov->provs[ ianc ]->hidden ) ndg1Rmprv( newprov, ianc,
                                                                status );
             }
 
@@ -1253,7 +1257,7 @@ NdgProvenance *ndgCopyProv( NdgProvenance *prov, int cleanse, int *status ){
          }
       }
 
-/* If no error has occurred, encode the pointer to the new Provenance into 
+/* If no error has occurred, encode the pointer to the new Provenance into
    an AST KeyMap pointer to be returned. Otherwise free the new
    Provenance structure. */
       if( *status == SAI__OK ) {
@@ -1283,18 +1287,18 @@ int ndgCountProv( NdgProvenance *prov, int *status ){
 *     result = ndgCountProv( NdgProvenance *prov, int *status )
 
 *  Description:
-*     This function returns the number of ancestors described in the 
+*     This function returns the number of ancestors described in the
 *     supplied provenance structure.
 
 *  Arguments:
 *     prov
-*        An identifier for a structure holding the provenance information 
+*        An identifier for a structure holding the provenance information
 *        as returned by ndgReadProv or ndgReadVotProv.
-*     status 
+*     status
 *        The global status.
 
 *  Returned Value:
-*     The number of ancestor NDFs stored in the supplied provenance 
+*     The number of ancestor NDFs stored in the supplied provenance
 *     structure, or zero if an error occurs.
 *-
 */
@@ -1331,7 +1335,7 @@ int ndgCountProv( NdgProvenance *prov, int *status ){
    return result;
 }
 
-void ndgFormatProv( NdgProvenance *prov, int base, AstKeyMap **keymap, 
+void ndgFormatProv( NdgProvenance *prov, int base, AstKeyMap **keymap,
                     int *status ){
 /*
 *+
@@ -1342,7 +1346,7 @@ void ndgFormatProv( NdgProvenance *prov, int base, AstKeyMap **keymap,
 *     Format the information in a provenance structure.
 
 *  Invocation:
-*     void ndgFormatProv( NdgProvenance *prov, int base, AstKeyMap **keymap, 
+*     void ndgFormatProv( NdgProvenance *prov, int base, AstKeyMap **keymap,
 *                         int *status )
 
 *  Description:
@@ -1350,12 +1354,12 @@ void ndgFormatProv( NdgProvenance *prov, int base, AstKeyMap **keymap,
 *     containing information taken from the supplied provenance structure.
 *
 *     The returned KeyMap has an entry with key "0" that describes the NDF
-*     from which the provenance was read. It also has an entry describing 
-*     each ancestor NDF. These entries have keys "1", "2", "3", etc, up to 
-*     the number of ancestors in the NDF. 
+*     from which the provenance was read. It also has an entry describing
+*     each ancestor NDF. These entries have keys "1", "2", "3", etc, up to
+*     the number of ancestors in the NDF.
 *
 *     Each of these entries contains a pointer to another AST KeyMap
-*     which may contain any subset of the following entries (all of which 
+*     which may contain any subset of the following entries (all of which
 *     are strings):
 *
 *     "ID" - the integer index within the ancestors array (zero for the
@@ -1374,40 +1378,40 @@ void ndgFormatProv( NdgProvenance *prov, int base, AstKeyMap **keymap,
 *            with the NDF.
 *
 *     "HISTORY" - A vector entry holding one or more KeyMaps. Each
-*            KeyMap contains items that describe an action performed on 
-*            the ancestor. The actions are stored in chronological order 
-*            within the vector entry. The last KeyMap in the vector 
-*            describes the action that created the ancestor NDF. Any 
+*            KeyMap contains items that describe an action performed on
+*            the ancestor. The actions are stored in chronological order
+*            within the vector entry. The last KeyMap in the vector
+*            describes the action that created the ancestor NDF. Any
 *            earlier KeyMaps in the vector describe any subsequent actions
-*            performed on the ancestor NDF prior to it being used in the 
+*            performed on the ancestor NDF prior to it being used in the
 *            creation of its parent. Each KeyMap contains the following
-*            scalar character entries (all taken from the corresponding 
+*            scalar character entries (all taken from the corresponding
 *            record in the NDF HISTORY component):
 *
 *            - "DATE": The date and time of the action (e.g. "2009-JUN-24
 *                      14:00:53.752" ).
 *            - "COMMAND": An indication of the command that performed the
 *                      action (e.g. "WCSATTRIB (KAPPA 1.10-6)" ).
-*            - "USER": The user name that performed the action 
+*            - "USER": The user name that performed the action
 *                      (e.g. "dsb").
 *            - "TEXT": The full text of the NDF history record. This is
-*                      arbitrary, but for NDFs created by Starlink 
-*                      software it will usually include environment 
-*                      parameter values, and the full path of the command 
+*                      arbitrary, but for NDFs created by Starlink
+*                      software it will usually include environment
+*                      parameter values, and the full path of the command
 *                      that performed the action.
 *
 *     Finally, the returned KeyMap has an entry with key "MXLEN" that is
-*     again a pointer to another KeyMap with the same entries listed 
-*     above (except that it has no "HISTORY" entry). However, this time 
-*     the entries are integers, not strings, and holds the maximum field 
+*     again a pointer to another KeyMap with the same entries listed
+*     above (except that it has no "HISTORY" entry). However, this time
+*     the entries are integers, not strings, and holds the maximum field
 *     width used to format the strings.
 
 *  Arguments:
 *     prov
-*        An identifier for a structure holding the provenance information 
+*        An identifier for a structure holding the provenance information
 *        as returned by ndgReadProv or ndgReadVotProv.
 *     base
-*        If non-zero, then the PATH field in the returned KeyMap holds the 
+*        If non-zero, then the PATH field in the returned KeyMap holds the
 *        base name of each NDF rather than the full path.
 *     keymap
 *        A location at which to returned a pointer to the returned AST KeyMap.
@@ -1422,7 +1426,7 @@ void ndgFormatProv( NdgProvenance *prov, int base, AstKeyMap **keymap,
    Provenance *provenance = NULL;
    char key[10];
    int *old_status;
-   int i;              
+   int i;
 
 /* Initialise */
    *keymap = NULL;
@@ -1440,30 +1444,30 @@ void ndgFormatProv( NdgProvenance *prov, int base, AstKeyMap **keymap,
 
 /* Create the returned KeyMap. */
       *keymap = astKeyMap( " " );
-   
+
 /* Create a KeyMap to hold the field widths. */
       mxkey = astKeyMap( " " );
-   
+
 /* Loop round every ancestor. */
       for( i = 0; i < provenance->nprov;  i++ ) {
-   
-/* Create a new KeyMap holding the formatted details of the ancestor. 
-   This also updates the maximum field widths for each field (held in 
+
+/* Create a new KeyMap holding the formatted details of the ancestor.
+   This also updates the maximum field widths for each field (held in
    "mxkey"). */
          anckey = ndg1FormatProv( provenance, i, base, mxkey, status );
-   
+
 /* Put the "anckey" KeyMap into the returned KeyMap, using the formatted
    integer index as the key. */
          sprintf( key, "%d", i );
          astMapPut0A( *keymap, key, anckey, NULL );
-   
+
 /* Free resources specific to this ancestor. */
          (void) astAnnul( anckey );
       }
-   
+
 /* Put the "mxkey" KeyMap into the returned KeyMap. */
       astMapPut0A( *keymap, "MXLEN", mxkey, NULL );
-   
+
 /* Free resources. */
       mxkey = astAnnul( mxkey );
    }
@@ -1485,7 +1489,7 @@ NdgProvenance *ndgFreeProv( NdgProvenance *prov, int *status ){
 *     NdgProvenance *ndgFreeProv( NdgProvenance *prov, int *status )
 
 *  Description:
-*     This function frees the resources used to hold a provenance 
+*     This function frees the resources used to hold a provenance
 *     structure.
 
 *  Arguments:
@@ -1530,7 +1534,7 @@ NdgProvenance *ndgFreeProv( NdgProvenance *prov, int *status ){
    return prov;
 }
 
-AstKeyMap *ndgGetProv( NdgProvenance *prov, int ianc, HDSLoc **more, 
+AstKeyMap *ndgGetProv( NdgProvenance *prov, int ianc, HDSLoc **more,
                        int *status ){
 /*
 *+
@@ -1541,22 +1545,22 @@ AstKeyMap *ndgGetProv( NdgProvenance *prov, int ianc, HDSLoc **more,
 *     Create a KeyMap holding information about an ancestor.
 
 *  Invocation:
-*     result = ndgGetProv( NdgProvenance *prov, int ianc, HDSLoc **more, 
+*     result = ndgGetProv( NdgProvenance *prov, int ianc, HDSLoc **more,
 *                          int *status )
 
 *  Description:
-*     This function returns information about a specified ancestor in the 
-*     supplied provenance structure. 
+*     This function returns information about a specified ancestor in the
+*     supplied provenance structure.
 
 *  Arguments:
 *     prov
-*        An identifier for a structure holding the provenance information 
+*        An identifier for a structure holding the provenance information
 *        as returned by ndgReadProv or ndgReadVotProv.
 *     ianc
 *        The index of the ancestor NDF for which information should be
 *        returned. A value of zero will result in information being returned
-*        that describes the NDF from which the provenance information was 
-*        read. Otherwise, the "ianc" value is used as an index into the 
+*        that describes the NDF from which the provenance information was
+*        read. Otherwise, the "ianc" value is used as an index into the
 *        ANCESTORS array. No error is reported if "ianc" is too large, but a
 *        NULL pointer will be returned as the function value.
 *     more
@@ -1569,35 +1573,35 @@ AstKeyMap *ndgGetProv( NdgProvenance *prov, int ianc, HDSLoc **more,
 *        returned if the requested ancestor has no MORE component. Note,
 *        the returned object will be assigned an arbitrary HDS Name,
 *        which will not in general be "MORE".
-*     status 
+*     status
 *        The global status.
 
 *  Returned Value:
-*     A pointer to an AST KeyMap containing entries with the following 
+*     A pointer to an AST KeyMap containing entries with the following
 *     keys and values:
 *
 *     - "PATH": A string holding the path of the ancestor NDF.
-*     - "DATE": A string holding the formatted UTC date and time at 
-*       which the provenance information for the ancestor NDF was 
+*     - "DATE": A string holding the formatted UTC date and time at
+*       which the provenance information for the ancestor NDF was
 *       recorded.
 *     - "CREATOR": A string identifying the software that created the
 *       ancestor NDF.
-*     - "PARENTS": A 1D vector of integers that are the indices of 
+*     - "PARENTS": A 1D vector of integers that are the indices of
 *       the immediate parents of the ancestor.
-*     - "MORE": A KeyMap containing any scalar or vector primitive 
-*       values stored at the top level of the associated HDS MORE 
-*       structure. The HDS name of the component is used as the key. 
-*       The full contents of the MORE structure are returned by the 
+*     - "MORE": A KeyMap containing any scalar or vector primitive
+*       values stored at the top level of the associated HDS MORE
+*       structure. The HDS name of the component is used as the key.
+*       The full contents of the MORE structure are returned by the
 *       "more" argument (see above).
 *     - "HISTORY": A vector entry holding one or more KeyMaps. Each
-*       KeyMap contains items that describe an action performed on 
-*       the ancestor. The actions are stored in chronological order 
-*       within the vector entry. The last KeyMap in the vector 
-*       describes the action that created the ancestor NDF. Any 
-*       earlier KeyMaps in the vector describe any subsequent actions 
-*       performed on the ancestor NDF prior to it being used in the 
+*       KeyMap contains items that describe an action performed on
+*       the ancestor. The actions are stored in chronological order
+*       within the vector entry. The last KeyMap in the vector
+*       describes the action that created the ancestor NDF. Any
+*       earlier KeyMaps in the vector describe any subsequent actions
+*       performed on the ancestor NDF prior to it being used in the
 *       creation of its parent. Each KeyMap contains the following
-*       scalar character entries (all taken from the corresponding 
+*       scalar character entries (all taken from the corresponding
 *       record in the NDF HISTORY component):
 *       - "DATE": The date and time of the action (e.g. "2009-JUN-24
 *         14:00:53.752" ).
@@ -1610,14 +1614,14 @@ AstKeyMap *ndgGetProv( NdgProvenance *prov, int ianc, HDSLoc **more,
 *         path of the command that performed the action.
 *
 *     If the specified ancestor does not have any of these items of
-*     information, then the corresponding entry will not be present 
-*     in the returned KeyMap. For instance, if the ancestor has no 
-*     immediate parent NDFs, then the "PARENTS" entry will not be 
+*     information, then the corresponding entry will not be present
+*     in the returned KeyMap. For instance, if the ancestor has no
+*     immediate parent NDFs, then the "PARENTS" entry will not be
 *     present in the KeyMap. A NULL pointer will be returned if the
 *     NDF has no provenance extension, or if "ianc" is outside the
 *     bounds of the ANCESTORS array (and is not zero). The returned
 *     KeyMap pointer should be annulled when it is no longer needed,
-*     either by calling astAnnul explicitly, or by relying on astEnd 
+*     either by calling astAnnul explicitly, or by relying on astEnd
 *     to annul it (together with all the other AST Objects created in
 *     the current AST Object context).
 *-
@@ -1660,7 +1664,7 @@ AstKeyMap *ndgGetProv( NdgProvenance *prov, int ianc, HDSLoc **more,
          result = astKeyMap( " " );
 
 /* Get an array holding the indices of the direct parents of the NDF. */
-         parents = ndg1ParentIndicies( prov1, provenance, NULL, &npar, 
+         parents = ndg1ParentIndicies( prov1, provenance, NULL, &npar,
                                        status );
 
 /* Store the required values in the KeyMap. */
@@ -1679,7 +1683,7 @@ AstKeyMap *ndgGetProv( NdgProvenance *prov, int ianc, HDSLoc **more,
    temporary HDS object containing a copy of it. */
             if( more ) *more = ndg1TCopy( prov1->more, status );
 
-/* Create a KeyMap containing the top-level primitive values in the MORE 
+/* Create a KeyMap containing the top-level primitive values in the MORE
    structure, and add it into the returned KeyMap. */
             more2 = astKeyMap( " " );
             ndg1H2a( prov1->more, more2, status );
@@ -1689,7 +1693,7 @@ AstKeyMap *ndgGetProv( NdgProvenance *prov, int ianc, HDSLoc **more,
             more2 = astAnnul( more2 );
          }
 
-/* Add a vector entry to the KeyMap holding a list of KeyMaps containing 
+/* Add a vector entry to the KeyMap holding a list of KeyMaps containing
    any history records in the ancestor. */
          ndg1AddHistKM( result, HIST_NAME, prov1, status );
       }
@@ -1715,16 +1719,16 @@ void ndgHideProv( NdgProvenance *prov, int ianc, int *status ){
 
 *  Description:
 *     This function flags a specified ancestor as "hidden". The only
-*     effect this has is that the ancestor will not be included in 
+*     effect this has is that the ancestor will not be included in
 *     Provenance structures created by the ndgCopyProv function.
 
 *  Arguments:
 *     prov
-*        An identifier for a structure holding the provenance information 
+*        An identifier for a structure holding the provenance information
 *        as returned by ndgReadProv or ndgReadVotProv.
 *     ianc
-*        The index of the ancestor NDF to be hidden. The value is used as an 
-*        index into the ANCESTORS array. An error will be reported if the 
+*        The index of the ancestor NDF to be hidden. The value is used as an
+*        index into the ANCESTORS array. An error will be reported if the
 *        value is too large, or is less than 1 (the main NDF cannot be
 *        hidden).
 *     status
@@ -1743,7 +1747,7 @@ void ndgHideProv( NdgProvenance *prov, int ianc, int *status ){
    old_status = astWatch( status );
 
 /* Report an error if "ianc" is zero. */
-   if( ianc == 0 ) {      
+   if( ianc == 0 ) {
       *status = SAI__ERROR;
       errRep( " ", "ndgHideProv: Ancestor zero (the main NDF) cannot be "
               "hidden.", status );
@@ -1790,11 +1794,11 @@ int ndgIsHiddenProv( NdgProvenance *prov, int ianc, int *status ){
 
 *  Arguments:
 *     prov
-*        An identifier for a structure holding the provenance information 
+*        An identifier for a structure holding the provenance information
 *        as returned by ndgReadProv or ndgReadVotProv.
 *     ianc
-*        The index of the ancestor NDF to be checked. The value is used as 
-*        an index into the ANCESTORS array. An error will be reported if the 
+*        The index of the ancestor NDF to be checked. The value is used as
+*        an index into the ANCESTORS array. An error will be reported if the
 *        value is too large, or is less than 0.
 *     status
 *        The global status.
@@ -1842,7 +1846,7 @@ int ndgIsHiddenProv( NdgProvenance *prov, int ianc, int *status ){
 
 }
 
-void ndgModifyProv( NdgProvenance *prov, int ianc, AstKeyMap *km, 
+void ndgModifyProv( NdgProvenance *prov, int ianc, AstKeyMap *km,
                     HDSLoc *more, int *status ){
 /*
 *+
@@ -1857,56 +1861,56 @@ void ndgModifyProv( NdgProvenance *prov, int ianc, AstKeyMap *km,
 *                         HDSLoc *more, int *status )
 
 *  Description:
-*     This function modifies the information stored for a given ancestor 
-*     in the supplied provenance structure. The new values to store 
+*     This function modifies the information stored for a given ancestor
+*     in the supplied provenance structure. The new values to store
 *     are supplied in an Ast KeyMap such as returned by ndgGetProv.
 
 *  Arguments:
 *     prov
-*        An identifier for a structure holding the provenance information 
+*        An identifier for a structure holding the provenance information
 *        as returned by ndgReadProv or ndgReadVotProv.
 *     ianc
 *        The index of the ancestor NDF for which information should be
-*        modified. A value of zero will result in information being modified 
+*        modified. A value of zero will result in information being modified
 *        for the NDF from which the the supplied provenance structure was
-*        read. Otherwise, the "ianc" value is used as an index into the 
+*        read. Otherwise, the "ianc" value is used as an index into the
 *        ANCESTORS array. An error is reported if "ianc" is too large.
 *     km
 *        A pointer to an AST KeyMap containing the values to store. Entries
 *        with the following keys are recognised:
 *
 *        - "PATH": A string holding the path of the ancestor NDF.
-*        - "DATE": A string holding the formatted UTC date and time at 
-*          which the provenance information for the ancestor NDF was 
+*        - "DATE": A string holding the formatted UTC date and time at
+*          which the provenance information for the ancestor NDF was
 *          recorded.
 *        - "CREATOR": A string identifying the software that created the
 *          ancestor NDF.
-*        - "MORE": A KeyMap containing extra information to store at the 
-*        top level of the MORE component for the ancestor. Only entries 
-*        holding primitive data values (scalar or vector) are used - 
-*        entries holding nested KeyMaps, etc, are ignored. If an entry in 
-*        this KeyMap has the same name as a component in the supplied 
+*        - "MORE": A KeyMap containing extra information to store at the
+*        top level of the MORE component for the ancestor. Only entries
+*        holding primitive data values (scalar or vector) are used -
+*        entries holding nested KeyMaps, etc, are ignored. If an entry in
+*        this KeyMap has the same name as a component in the supplied
 *        "more" HDS structure, then the KeyMap value is used in preference
 *        to the HDS value.
 *
-*        If the "DATE" or "CREATOR" components are missing then the 
-*        corresponding item of information will be deleted from the 
+*        If the "DATE" or "CREATOR" components are missing then the
+*        corresponding item of information will be deleted from the
 *        provenance extension. To delete the "MORE" component in the
 *        provenance extension, supply a KeyMap without a MORE entry, and
-*        also supply DAT_NOLOC for the "more" argument. An error is 
-*        reported if the supplied KeyMap has no "PATH" entry. Note, the 
-*        PARENTS list and HISTORY information stored with the specified 
-*        ancestor cannot be modified (any "PARENTS" or "HISTORY" 
+*        also supply DAT_NOLOC for the "more" argument. An error is
+*        reported if the supplied KeyMap has no "PATH" entry. Note, the
+*        PARENTS list and HISTORY information stored with the specified
+*        ancestor cannot be modified (any "PARENTS" or "HISTORY"
 *        component in the supplied HDS structure will be ignored).
 *     more
 *        A locator for an HDS object containing additional information to
-*        be associated with the requested ancestor. A NULL pointer may be 
+*        be associated with the requested ancestor. A NULL pointer may be
 *        supplied for this argument The contents of the MORE component
 *        in the provenance extension will be the union of any structure
-*        supplied through this argument, and any values supplied through 
+*        supplied through this argument, and any values supplied through
 *        the MORE entry in the supplied KeyMap. If the same component
 *        name occurs in both, then the KeyMap value takes precedence.
-*     status 
+*     status
 *        The global status.
 *-
 */
@@ -1917,7 +1921,7 @@ void ndgModifyProv( NdgProvenance *prov, int ianc, AstKeyMap *km,
    Provenance *provenance = NULL;
    const char *cval = NULL;
    int *old_status;
-   int nc;         
+   int nc;
 
 /* Check the inherited status. */
    if( *status != SAI__OK ) return;
@@ -1944,7 +1948,7 @@ void ndgModifyProv( NdgProvenance *prov, int ianc, AstKeyMap *km,
          if( astMapGet0C( km, PATH_NAME, &cval ) && cval &&
              ( nc = strlen( cval ) ) ) {
             anc->path = astStore( anc->path, cval, nc + 1 );
-   
+
          } else if( *status == SAI__OK ){
             *status = SAI__ERROR;
             errRep( " ", "ndgModifyProv: Cannot modify provenance "
@@ -1955,7 +1959,7 @@ void ndgModifyProv( NdgProvenance *prov, int ianc, AstKeyMap *km,
          if( astMapGet0C( km, DATE_NAME, &cval ) && cval &&
              ( nc = strlen( cval ) ) ) {
             anc->date = astStore( anc->date, cval, nc + 1 );
-   
+
          } else {
             anc->date = astFree( anc->date );
          }
@@ -1964,14 +1968,14 @@ void ndgModifyProv( NdgProvenance *prov, int ianc, AstKeyMap *km,
          if( astMapGet0C( km, CREATOR_NAME, &cval ) && cval &&
              ( nc = strlen( cval ) ) ) {
             anc->creator = astStore( anc->creator, cval, nc + 1 );
-   
+
          } else {
             anc->creator = astFree( anc->creator );
          }
 
 /* Delete any pre-existing MORE component and then, if a new one has been
-   supplied, copy it into the Provenance structure. This copies all the 
-   top-level contents of "more" into the top-level of the temporary HDS 
+   supplied, copy it into the Provenance structure. This copies all the
+   top-level contents of "more" into the top-level of the temporary HDS
    object. */
          if( anc->more ) datAnnul( &(anc->more), status );
          if( more ) {
@@ -1985,7 +1989,7 @@ void ndgModifyProv( NdgProvenance *prov, int ianc, AstKeyMap *km,
             if( more2 && astMapSize( more2 ) > 0 ) {
 
 /* First ensure that there is a temporary HDS object. */
-               if( !anc->more ) datTemp( TEMP_TYPE, 0, NULL, 
+               if( !anc->more ) datTemp( TEMP_TYPE, 0, NULL,
                                          &( anc->more ), status );
 
 /* Now copy each primitive top-level entry in the KeyMap into a
@@ -2009,14 +2013,14 @@ void ndgModifyProv( NdgProvenance *prov, int ianc, AstKeyMap *km,
          msgSeti( "N", provenance->nprov );
          errRep( " ", "ndgModifyProv; Cannot modify provenance ancestor "
                  "^IANC: only ^N ancestors found.", status );
-      } 
-   } 
+      }
+   }
 
 /* Re-instate the original AST status variable. */
    astWatch( old_status );
 }
 
-void ndgPutProv( NdgProvenance *prov, int indf, HDSLoc *more, 
+void ndgPutProv( NdgProvenance *prov, int indf, HDSLoc *more,
                  AstKeyMap *more2, int isroot, int *status ){
 /*
 *+
@@ -2027,41 +2031,41 @@ void ndgPutProv( NdgProvenance *prov, int indf, HDSLoc *more,
 *     Add an NDF to the list of ancestors.
 
 *  Invocation:
-*     ndgPutProv( NdgProvenance *prov, int indf, HDSLoc *more, 
+*     ndgPutProv( NdgProvenance *prov, int indf, HDSLoc *more,
 *                 AstKeyMap *more2, int isroot, int *status )
 
 *  Description:
-*     This function modifies the supplied provenance structure to indicate 
-*     that a given NDF was used in the creation of the NDF associated with 
+*     This function modifies the supplied provenance structure to indicate
+*     that a given NDF was used in the creation of the NDF associated with
 *     the supplied provenance structure.
 
 *  Arguments:
 *     prov
-*        An identifier for a structure holding the provenance information 
+*        An identifier for a structure holding the provenance information
 *        as returned by ndgReadProv or ndgReadVotProv.
 *     indf
 *        An identifier for an NDF that is to be added into the list of
 *        ancestor NDFs in the supplied provenance information.
-*     more 
-*        A locator for an HDS structure containing arbitrary additional 
-*        information about the new ancestor NDF, and how it was used in the 
+*     more
+*        A locator for an HDS structure containing arbitrary additional
+*        information about the new ancestor NDF, and how it was used in the
 *        creation of the output NDF. A NULL pointer can be supplied if
 *        required.
 *     more2
-*        A pointer to an AstKeyMap holding extra items of information 
-*        to be added into the MORE component. Only entries holding primitive 
+*        A pointer to an AstKeyMap holding extra items of information
+*        to be added into the MORE component. Only entries holding primitive
 *        data values (scalar or vector) are used - entries holding nested
-*        KeyMaps, etc, are ignored. If an entry in this KeyMap has the same 
-*        name as a component in the supplied "more" HDS structure, then the 
-*        KeyMap value is used in preference to the HDS value. A NULL pointer 
+*        KeyMaps, etc, are ignored. If an entry in this KeyMap has the same
+*        name as a component in the supplied "more" HDS structure, then the
+*        KeyMap value is used in preference to the HDS value. A NULL pointer
 *        can be supplied if required.
-*     isroot 
-*        If non-zero, then the new ancestor NDF will be treated as a root 
-*        NDF. That is, any provenance information in the supplied NDF is 
-*        ignored. If zero, then any provenance information in the NDF is 
-*        copied into the supplied provenance structure. The new ancestor NDF 
+*     isroot
+*        If non-zero, then the new ancestor NDF will be treated as a root
+*        NDF. That is, any provenance information in the supplied NDF is
+*        ignored. If zero, then any provenance information in the NDF is
+*        copied into the supplied provenance structure. The new ancestor NDF
 *        is then only a root NDF if it contains no provenance information.
-*     status 
+*     status
 *        The global status.
 *-
 */
@@ -2076,7 +2080,7 @@ void ndgPutProv( NdgProvenance *prov, int indf, HDSLoc *more,
    int hhash;
    int i;
    int irec;
-   int there;                
+   int there;
 
 /* Check the inherited status. */
    if( *status != SAI__OK ) return;
@@ -2096,33 +2100,33 @@ void ndgPutProv( NdgProvenance *prov, int indf, HDSLoc *more,
    freed when ndgFreeProvenance is called. */
       free_provs = 1;
 
-/* Extend the "provs" list in "provenance" so that we can add pointers to 
+/* Extend the "provs" list in "provenance" so that we can add pointers to
    all the Prov structures in "prov2. */
       if( provenance && prov2 ) {
-         provenance->provs = astGrow( provenance->provs, 
+         provenance->provs = astGrow( provenance->provs,
                                       provenance->nprov + prov2->nprov,
                                       sizeof( Prov *) );
       }
       if( astOK ) {
 
 
-/* Copy history records from the NDF HISTORY component into the main 
-   Prov structure in "prov2". We do not copy records that were 
+/* Copy history records from the NDF HISTORY component into the main
+   Prov structure in "prov2". We do not copy records that were
    propagated to the NDF from input NDFs since such records will already
    be present in the other Prov structures in "prov2". Thus, the only
    records copied are those that describe modifications that have been
    made to the NDF since it was created (e.g. changing a WCS attribute,
    changing a value in the FITS extension, etc), plus the record that
-   describes the creation of the NDF. So we work backwards through the 
-   HISTORY component, from youngest to oldest history record, until the 
-   record is reached that describes the creation of the NDF (as 
-   indicated by the fact that its hash code matches the hash code 
+   describes the creation of the NDF. So we work backwards through the
+   HISTORY component, from youngest to oldest history record, until the
+   record is reached that describes the creation of the NDF (as
+   indicated by the fact that its hash code matches the hash code
    stored when provenance information was added to the NDF, i.e. at
    its creation). Each such record (including the final one) is coped
    into the Prov structure. We copy *all* history records if the NDF is
    to be treated as a root ndf. We copy *no* records if the main ndf has
    no hash code. */
-         ndfState( indf, "History", &there, status ); 
+         ndfState( indf, "History", &there, status );
          hhash = prov2->main->hhash;
          if( there && ( hhash || isroot ) ) {
             ndfHnrec( indf, &irec, status );
@@ -2132,20 +2136,20 @@ void ndgPutProv( NdgProvenance *prov, int indf, HDSLoc *more,
             for( ; irec > 0; irec-- ) {
                ndg1ReadHistRec( prov2->main, indf, irec, ph, status );
                if( ph && *ph == hhash ) break;
-            }   
+            }
          }
 
 /* Copy the Prov pointers from "prov2" to "provenance". */
          for( i = 0; i < prov2->nprov; i++ ) {
             provenance->provs[ i + provenance->nprov ] = prov2->provs[ i ];
-         }   
+         }
 
 /* Update the length of the "provs" array in "provenance". */
-         provenance->nprov += prov2->nprov;   
+         provenance->nprov += prov2->nprov;
 
-/* Indicate that the "Prov" structures referred to by "prov2" should not 
-   be freed when ndgFreeProvenance is called. This is because they are 
-   now the responsibility of "provenance", having been copied into the 
+/* Indicate that the "Prov" structures referred to by "prov2" should not
+   be freed when ndgFreeProvenance is called. This is because they are
+   now the responsibility of "provenance", having been copied into the
    provenance->provs list above. */
          free_provs = 0;
 
@@ -2184,15 +2188,15 @@ NdgProvenance *ndgReadProv( int indf, const char *creator, int *status ){
 *     This function reads the information stored in the "PROVENANCE"
 *     extension of an NDF, storing it in a memory-resident structure for
 *     faster access. A pointer that identifies this structure is returned,
-*     and can be passed to other NDG provenance functions to manipulate 
+*     and can be passed to other NDG provenance functions to manipulate
 *     the contents of the structure.
 *
 *     If the NDF has no provenance information (for instance, if it is a
-*     newly created NDF), the returned structure will contain just the 
-*     supplied creator name (which may be blank), and an empty ancestor 
+*     newly created NDF), the returned structure will contain just the
+*     supplied creator name (which may be blank), and an empty ancestor
 *     list.
 *
-*     The structure should be freed when it is no longer needed by 
+*     The structure should be freed when it is no longer needed by
 *     calling ndgFreeProv.
 
 *  Arguments:
@@ -2218,11 +2222,11 @@ NdgProvenance *ndgReadProv( int indf, const char *creator, int *status ){
 
 /* Read the provenance extension from the NDF, and encode the resulting
    "Provenance *" pointer into an opaque identifier to be returned. */
-   return ndg1Encode( ndg1ReadProvenanceNDF( indf, NULL, NULL, creator, 
+   return ndg1Encode( ndg1ReadProvenanceNDF( indf, NULL, NULL, creator,
                                              0, status ), status );
 }
 
-NdgProvenance *ndgReadVotProv( const char *xml, const char *path, 
+NdgProvenance *ndgReadVotProv( const char *xml, const char *path,
                                const char *creator, int *status ){
 /*
 *+
@@ -2233,28 +2237,28 @@ NdgProvenance *ndgReadVotProv( const char *xml, const char *path,
 *     Read the provenance information from a VOTABLE.
 
 *  Invocation:
-*     NdgProvenance *ndgReadVotProv( const char *xml, const char *path, 
+*     NdgProvenance *ndgReadVotProv( const char *xml, const char *path,
 *                                    const char *creator, int *status )
 
 *  Description:
 *     This function reads provenance information from a string of XML text
 *     read from a VOTABLE, storing it in a memory-resident structure for
 *     faster access. A pointer that identifies this structure is returned,
-*     and can be passed to other NDG provenance functions to manipulate 
+*     and can be passed to other NDG provenance functions to manipulate
 *     the contents of the structure.
 *
-*     If the XML text has no provenance information, the returned structure 
-*     will contain just the supplied creator name (which may be blank), and 
+*     If the XML text has no provenance information, the returned structure
+*     will contain just the supplied creator name (which may be blank), and
 *     an empty ancestor list.
 *
-*     The structure should be freed when it is no longer needed by 
+*     The structure should be freed when it is no longer needed by
 *     calling ndgFreeProv.
 
 *  Arguments:
 *     xml
 *        Pointer to a null terminated string holding XML read from a
 *        VOTABLE. The provenance information is read from the first
-*        element found in the text that has the opening tag: 
+*        element found in the text that has the opening tag:
 *
 *        "<GROUP name="PROVENANCE" utype="hds_type:PROVENANCE">"
 *
@@ -2263,9 +2267,9 @@ NdgProvenance *ndgReadVotProv( const char *xml, const char *path,
 *        The path to the file from which the XML provenance text was read.
 *     creator
 *        A text identifier for the software that created the NDF with
-*        which the provnance is associated (usually the name of the calling 
-*        application). The format of the identifier is arbitrary, but the 
-*        form "PACKAGE:COMMAND" is recommended. This value is only used if 
+*        which the provnance is associated (usually the name of the calling
+*        application). The format of the identifier is arbitrary, but the
+*        form "PACKAGE:COMMAND" is recommended. This value is only used if
 *        the the supplied XML text does not contain any provenance information.
 *     status
 *        The global status.
@@ -2280,7 +2284,7 @@ NdgProvenance *ndgReadVotProv( const char *xml, const char *path,
 
 /* Read the provenance extension from the XML, and encode the resulting
    "Provenance *" pointer into an opaque identifier to be returned. */
-   return ndg1Encode( ndg1ReadProvenanceXml( xml, path, creator, status ), 
+   return ndg1Encode( ndg1ReadProvenanceXml( xml, path, creator, status ),
                       status );
 }
 
@@ -2294,27 +2298,27 @@ void ndgRemoveProv( NdgProvenance *prov, int nanc, int *anc, int *status ){
 *     Remove one or more ancestors from a provenance structure.
 
 *  Invocation:
-*     void ndgRemoveProv( NdgProvenance *prov, int nanc, int *anc, 
+*     void ndgRemoveProv( NdgProvenance *prov, int nanc, int *anc,
 *                         int *status )
 
 *  Description:
-*     This routine removes one or more ancestors from the supplied 
-*     provenance structure. The direct parents of the removed ancestor 
+*     This routine removes one or more ancestors from the supplied
+*     provenance structure. The direct parents of the removed ancestor
 *     are assigned to the direct children of the removed ancestor. Note,
 *     any history records stored in the removed ancestors are lost.
 
 *  Arguments:
 *     prov
-*        An identifier for a structure holding the provenance information 
+*        An identifier for a structure holding the provenance information
 *        as returned by ndgReadProv or ndgReadVotProv.
 *     nanc
 *        The length of the "anc" array.
 *     anc
-*        Pointer to an array holding the indices of the ancestor NDFs to be 
-*        removed. Each supplied value must be at least 1, and must be no 
-*        more than the number of ancestors in the provenance extension 
+*        Pointer to an array holding the indices of the ancestor NDFs to be
+*        removed. Each supplied value must be at least 1, and must be no
+*        more than the number of ancestors in the provenance extension
 *        (as returned by ndgCountProv). An error is reported otherwise. The
-*        supplied list is sorted into decreasing order before use so that 
+*        supplied list is sorted into decreasing order before use so that
 *        the highest index ancestor is removed first.
 *     status
 *        The global status.
@@ -2324,9 +2328,9 @@ void ndgRemoveProv( NdgProvenance *prov, int nanc, int *anc, int *status ){
 /* Local Variables: */
    Provenance *provenance = NULL;
    int *old_status;
-   int *sanc;        
-   int i;             
-   int ianc;          
+   int *sanc;
+   int i;
+   int ianc;
 
 /* Check the inherited status. */
    if( *status != SAI__OK ) return;
@@ -2387,24 +2391,24 @@ AstKeyMap *ndgRootProv( NdgProvenance *prov, int *status ){
 
 *  Description:
 *     This function searches the supplied provenance structure for root
-*     ancestors, and returns information about them. An ancestor is a root 
+*     ancestors, and returns information about them. An ancestor is a root
 *     ancestor if it does not itself have any ancestors.
 
 *  Arguments:
 *     prov
-*        An identifier for a structure holding the provenance information 
+*        An identifier for a structure holding the provenance information
 *        as returned by ndgReadProv or ndgReadVotProv.
-*     status 
+*     status
 *        The global status.
 
 *  Returned Value:
-*     A pointer to an AST KeyMap containing an entry for each root 
-*     ancestor. The key associated with each entry is the path to the 
-*     NDF and the value of the entry is an integer that gives the 
-*     position of the root ancestor within the list of all ancestors. 
-*     This integer value can be supplied to ndgGetProv in order to get 
+*     A pointer to an AST KeyMap containing an entry for each root
+*     ancestor. The key associated with each entry is the path to the
+*     NDF and the value of the entry is an integer that gives the
+*     position of the root ancestor within the list of all ancestors.
+*     This integer value can be supplied to ndgGetProv in order to get
 *     further information about the root ancestor. The first ancestor NDF
-*     has an index of one. An index of zero refers to the NDF from which 
+*     has an index of one. An index of zero refers to the NDF from which
 *     the provenance information was read.
 *-
 */
@@ -2414,7 +2418,7 @@ AstKeyMap *ndgRootProv( NdgProvenance *prov, int *status ){
    Prov *prov1 = NULL;
    Provenance *provenance = NULL;
    int *old_status;
-   int i;           
+   int i;
 
 /* Check the inherited status. */
    if( *status != SAI__OK ) return result;
@@ -2459,16 +2463,16 @@ void ndgUnhideProv( NdgProvenance *prov, int ianc, int *status ){
 *     ndgUnhideProv( NdgProvenance *prov, int ianc, int *status )
 
 *  Description:
-*     This function ensures that a given ancestor is not flagged as 
+*     This function ensures that a given ancestor is not flagged as
 *     "hidden". See ndgHideProv and ndgCopyProv.
 
 *  Arguments:
 *     prov
-*        An identifier for a structure holding the provenance information 
+*        An identifier for a structure holding the provenance information
 *        as returned by ndgReadProv or ndgReadVotProv.
 *     ianc
-*        The index of the ancestor NDF to be un-hidden. The value is used as 
-*        an index into the ANCESTORS array. An error will be reported if the 
+*        The index of the ancestor NDF to be un-hidden. The value is used as
+*        an index into the ANCESTORS array. An error will be reported if the
 *        value is too large, or is less than 0.
 *     status
 *        The global status.
@@ -2522,7 +2526,7 @@ void ndgWriteProv( NdgProvenance *prov, int indf, int whdef, int *status ){
 *     Write provenance information to an NDF.
 
 *  Invocation:
-*     void ndgWriteProv( NdgProvenance *prov, int indf, int whdef, 
+*     void ndgWriteProv( NdgProvenance *prov, int indf, int whdef,
 *                        int *status )
 
 *  Description:
@@ -2601,7 +2605,7 @@ const char *ndgWriteVotProv( NdgProvenance *prov, int *status ){
 
 *  Description:
 *     This function writes the contents of the supplied provenance
-*     structure out as a text string holding an XML snippet suitable 
+*     structure out as a text string holding an XML snippet suitable
 *     for inclusion in a VOTABLE.
 
 *  Arguments:
@@ -2612,14 +2616,14 @@ const char *ndgWriteVotProv( NdgProvenance *prov, int *status ){
 
 *  Returned Value:
 *     A pointer to a dyamically allocated string holding the XML text, or
-*     NULL if an error occurs. The string should be freed using astFree 
+*     NULL if an error occurs. The string should be freed using astFree
 *     when it is no longer needed. The text will contain a single top
 *     level element with the following opening tag:
 *
 *        "<GROUP name="PROVENANCE" utype="hds_type:PROVENANCE">"
 *
 *     The HDS structure of an NDF PROVENANCE extension is replicated
-*     using PARAM elements to hold primitive values and GROUP elements to 
+*     using PARAM elements to hold primitive values and GROUP elements to
 *     hold structures. The "utype" attributes are used to hold the
 *     corresponding HDS data types.
 
@@ -2671,19 +2675,19 @@ static void ndg1A2h( AstKeyMap *keymap, HDSLoc *loc, int *status ){
 *     void ndg1A2h( AstKeyMap *keymap, HDSLoc *loc, int *status )
 
 *  Description:
-*     This routine copies top level primitive (vector or scalar) values 
-*     from an AST KeyMap into a supplied HDS structure. Any AST Object 
+*     This routine copies top level primitive (vector or scalar) values
+*     from an AST KeyMap into a supplied HDS structure. Any AST Object
 *     pointers or generic C pointers in the KeyMap are ignored. Any
-*     pre-existing HDS component that has the name of an entry in the 
+*     pre-existing HDS component that has the name of an entry in the
 *     KeyMap is first erased.
 
 *  Arguments:
-*     keymap 
+*     keymap
 *        An AST pointer to the KeyMap.
-*     loc 
+*     loc
 *        A locator for the HDS object into which the KeyMap contents
 *        are to be copied.
-*     status 
+*     status
 *        The inherited status.
 
 */
@@ -2712,7 +2716,7 @@ static void ndg1A2h( AstKeyMap *keymap, HDSLoc *loc, int *status ){
    size = astMapSize( keymap );
    for( i = 0; i < size; i++ ) {
 
-/* Get the key. the data type and the vector length for the current 
+/* Get the key. the data type and the vector length for the current
    KeyMap entry. */
       key = astMapKey( keymap, i );
       type = astMapType( keymap, key );
@@ -2734,7 +2738,7 @@ static void ndg1A2h( AstKeyMap *keymap, HDSLoc *loc, int *status ){
                (void) astMapGet0I( keymap, key, &ival );
                datPut0I( cloc, ival, status );
                datAnnul( &cloc, status );
-            
+
             } else {
                datNew1I( loc, key, veclen, status );
                datFind( loc, key, &cloc, status );
@@ -2743,7 +2747,7 @@ static void ndg1A2h( AstKeyMap *keymap, HDSLoc *loc, int *status ){
                datUnmap( cloc, status );
                datAnnul( &cloc, status );
             }
-   
+
          } else if( type == AST__DOUBLETYPE ){
             if( veclen == 1 ) {
                datNew0D( loc, key, status );
@@ -2751,7 +2755,7 @@ static void ndg1A2h( AstKeyMap *keymap, HDSLoc *loc, int *status ){
                (void) astMapGet0D( keymap, key, &dval );
                datPut0D( cloc, dval, status );
                datAnnul( &cloc, status );
-            
+
             } else {
                datNew1D( loc, key, veclen, status );
                datFind( loc, key, &cloc, status );
@@ -2760,7 +2764,7 @@ static void ndg1A2h( AstKeyMap *keymap, HDSLoc *loc, int *status ){
                datUnmap( cloc, status );
                datAnnul( &cloc, status );
             }
-   
+
          } else if( type == AST__FLOATTYPE ){
             if( veclen == 1 ) {
                datNew0R( loc, key, status );
@@ -2768,7 +2772,7 @@ static void ndg1A2h( AstKeyMap *keymap, HDSLoc *loc, int *status ){
                (void) astMapGet0F( keymap, key, &fval );
                datPut0R( cloc, fval, status );
                datAnnul( &cloc, status );
-            
+
             } else {
                datNew1R( loc, key, veclen, status );
                datFind( loc, key, &cloc, status );
@@ -2777,10 +2781,10 @@ static void ndg1A2h( AstKeyMap *keymap, HDSLoc *loc, int *status ){
                datUnmap( cloc, status );
                datAnnul( &cloc, status );
             }
-   
+
          } else if( type == AST__STRINGTYPE ){
             lenc = astMapLenC( keymap, key );
-   
+
             if( veclen == 1 ) {
                (void) astMapGet0C( keymap, key, &cval );
                ndg1PutTextComp( loc, key, cval, status );
@@ -2799,7 +2803,7 @@ static void ndg1A2h( AstKeyMap *keymap, HDSLoc *loc, int *status ){
    }
 }
 
-static void ndg1AddHistKM( AstKeyMap *km, const char *key, Prov *prov, 
+static void ndg1AddHistKM( AstKeyMap *km, const char *key, Prov *prov,
                            int *status ){
 /*
 *  Name:
@@ -2809,15 +2813,15 @@ static void ndg1AddHistKM( AstKeyMap *km, const char *key, Prov *prov,
 *     Copy history records from a Prov structure into a KeyMap.
 
 *  Invocation:
-*     void ndg1AddHistKM( AstKeyMap *km, const char *key, Prov *prov, 
+*     void ndg1AddHistKM( AstKeyMap *km, const char *key, Prov *prov,
 *                         int *status )
 
 *  Description:
 *     This function returns without action unless the supplied Prov
-*     structure contains one or more history records.Otherwise, it adds 
+*     structure contains one or more history records.Otherwise, it adds
 *     a vector entry to the supplied KeyMap to hold a list of KeyMap
 *     pointers. It then creates these KeyMaps, one for each history
-*     record in the Prov structure, and copies the history information 
+*     record in the Prov structure, and copies the history information
 *     into them.
 
 *  Arguments:
@@ -2837,7 +2841,7 @@ static void ndg1AddHistKM( AstKeyMap *km, const char *key, Prov *prov,
    AstKeyMap *kmrec = NULL;
    AstObject **vector = NULL;
    HistRec *hrec = NULL;
-   int i;                
+   int i;
 
 /* Check the inherited status value. */
    if( *status != SAI__OK ) return;
@@ -2865,9 +2869,9 @@ static void ndg1AddHistKM( AstKeyMap *km, const char *key, Prov *prov,
          astMapPut0C( kmrec, TEXT_NAME, hrec->text, NULL );
       }
 
-/* Store the KeyMap pointers in a new vector entry in the supplied 
+/* Store the KeyMap pointers in a new vector entry in the supplied
    KeyMap. */
-      astMapPut1A( km, key, prov->nhrec, vector, NULL ); 
+      astMapPut1A( km, key, prov->nhrec, vector, NULL );
 
 /* Annul the individual KeyMap pointers. */
       for( i = 0; i < prov->nhrec; i++ ) {
@@ -2891,8 +2895,8 @@ static int ndg1CheckSameParents( Prov *prov1, Prov *prov2, int *status ) {
 *     void ndg1CheckSameParents( Prov *prov1, Prov *prov2, int *status )
 
 *  Description:
-*     This function returns a flag indicating if the two supplied Prov 
-*     structures have the same parents. 
+*     This function returns a flag indicating if the two supplied Prov
+*     structures have the same parents.
 *
 *     Note, two parents are considered equal if they have the same path.
 
@@ -2933,7 +2937,7 @@ static int ndg1CheckSameParents( Prov *prov1, Prov *prov2, int *status ) {
 /* Loop round all the parents of prov2. */
    for( i = 0; i < prov2->nparent; i++ ) {
 
-/* Clear the returned flag and leave the loop if the KeyMap does not 
+/* Clear the returned flag and leave the loop if the KeyMap does not
    contain an entry with key equal to the path of the current parent. */
       if( ! astMapHasKey( km, prov2->parents[ i ]->path ) ) {
          result = 0;
@@ -2966,7 +2970,7 @@ static void ndg1CopyComps( HDSLoc *loc1, HDSLoc *loc2, int *status ){
 
 *  Invocation:
 *     void ndg1CopyComps( HDSLoc *loc1, HDSLoc *loc2, int *status )
-     
+
 *  Description:
 *     This function copies every component from "loc1" into "loc2".
 
@@ -2975,7 +2979,7 @@ static void ndg1CopyComps( HDSLoc *loc1, HDSLoc *loc2, int *status ){
 *        Locator for the source object.
 *     loc2
 *        Locator for the destination object.
-*     status 
+*     status
 *        The global status.
 
 */
@@ -3054,13 +3058,13 @@ static Prov *ndg1CopyProv( Prov *prov, int *status ){
    if( result ) {
 
 /* For safety, first nullify all pointers in the copy. */
-      result->path = NULL;             
-      result->date = NULL;             
-      result->creator = NULL;          
-      result->more = NULL;           
-      result->parents = NULL;  
-      result->children = NULL; 
-      result->hist_recs = NULL;     
+      result->path = NULL;
+      result->date = NULL;
+      result->creator = NULL;
+      result->more = NULL;
+      result->parents = NULL;
+      result->children = NULL;
+      result->hist_recs = NULL;
 
 /* Produce copies of all the strings in the Prov structure. */
       len = prov->path ? strlen( prov->path ) + 1 : 0;
@@ -3100,19 +3104,19 @@ static Prov *ndg1CopyProv( Prov *prov, int *status ){
          outrec = result->hist_recs;
          inrec = prov->hist_recs;
          for( i = 0; i < prov->nhrec; i++, outrec++, inrec++ ) {
-         
+
             len = inrec->date ? strlen( inrec->date ) + 1 : 0;
             outrec->date = astStore( NULL, inrec->date, len*sizeof( char ) );
-      
+
             len = inrec->command ? strlen( inrec->command ) + 1 : 0;
             outrec->command = astStore( NULL, inrec->command, len*sizeof( char ) );
-      
+
             len = inrec->text ? strlen( inrec->text ) + 1 : 0;
             outrec->text = astStore( NULL, inrec->text, len*sizeof( char ) );
-      
+
             len = inrec->user ? strlen( inrec->user ) + 1 : 0;
             outrec->user = astStore( NULL, inrec->user, len*sizeof( char ) );
-         
+
          }
       }
    }
@@ -3172,7 +3176,7 @@ static Provenance *ndg1Decode( NdgProvenance *prov, const char *method,
 *     ndg1Decode
 
 *  Purpose:
-*     Convert an NdgProvenance identifier into a pointer to a Provenance 
+*     Convert an NdgProvenance identifier into a pointer to a Provenance
 *     structure.
 
 *  Invocation:
@@ -3240,8 +3244,8 @@ static void ndg1Disown( Prov *parent, Prov *child, int *status ){
 *     void ndg1Disown( Prov *parent, Prov *child, int *status )
 
 *  Description:
-*     This function first checks to see that the supplied "parent" Prov 
-*     is genuinely a parent of the supplied "child" Prov. If so, it breaks 
+*     This function first checks to see that the supplied "parent" Prov
+*     is genuinely a parent of the supplied "child" Prov. If so, it breaks
 *     the parent-child relationship between them.
 *
 *     Each Prov structure describes a single NDF. The parent NDF is used
@@ -3264,7 +3268,7 @@ static void ndg1Disown( Prov *parent, Prov *child, int *status ){
 /* Check the inherited status value, and the two pointers. */
    if( *status != SAI__OK || !parent || !child ) return;
 
-/* NULLify all occurrences of the supplied parent within the list of 
+/* NULLify all occurrences of the supplied parent within the list of
    parents stored in the supplied child. */
    for( i = 0; i < child->nparent; i++ ) {
       if( child->parents[ i ] == parent ) child->parents[ i ] = NULL;
@@ -3285,7 +3289,7 @@ static void ndg1Disown( Prov *parent, Prov *child, int *status ){
 /* Reduce the number of parents. */
    child->nparent = j;
 
-/* NULLify all occurrences of the supplied child within the list of 
+/* NULLify all occurrences of the supplied child within the list of
    children stored in the supplied parent. */
    for( i = 0; i < parent->nchild; i++ ) {
       if( parent->children[ i ] == child ) parent->children[ i ] = NULL;
@@ -3314,7 +3318,7 @@ static NdgProvenance *ndg1Encode( Provenance *prov, int *status ) {
 *     ndg1Encode
 
 *  Purpose:
-*     Convert a pointer to a Provenance structure into an NdgProvenance 
+*     Convert a pointer to a Provenance structure into an NdgProvenance
 *     identifier.
 
 *  Invocation:
@@ -3401,7 +3405,7 @@ static int ndg1FindAncestorIndex( Prov *prov, Provenance *provenance,
    result = prov->index;
 
 /* If the index is not known, find it now. */
-   if( result < 0 ) { 
+   if( result < 0 ) {
 
 /* Find the index of the supplied Prov within the provs array. Also
    note the index of the main NDF in the provs array. */
@@ -3450,7 +3454,7 @@ static AstKeyMap *ndg1FormatProv( Provenance *provenance, int i, int base,
 
 *  Description:
 *     This function formats the information in a Prov structure and
-*     puts the formatted strings into a new AstKeyMap. It also updates 
+*     puts the formatted strings into a new AstKeyMap. It also updates
 *     the maximum length for any formatted item.
 *
 *     The returned KeyMap has string entries for a subset of the following
@@ -3458,40 +3462,40 @@ static AstKeyMap *ndg1FormatProv( Provenance *provenance, int i, int base,
 *
 *        "ID" - the integer index within the ancestors array (zero for the
 *               main NDF).
-*        
+*
 *        "PATH" - The full path or base name for the NDF (see "base").
-*        
+*
 *        "DATE" - The date of creation of the NDF.
-*        
+*
 *        "CREATOR" - The software item that created the NDF.
-*        
+*
 *        "PARENTS" - A comma-separated list of indices into the ancestors
 *                    array that identifies the direct parents of the NDF.
-*        
+*
 *        "MORE" - A summary of the contents of the MORE structure associated
 *                 with the NDF.
 *
 *        "HISTORY" - A vector entry holding one or more KeyMaps. Each
 *               KeyMap contains items that describe an action performed
-*               on the ancestor. The actions are stored in chronological 
-*               order within the vector entry. The last KeyMap in the 
+*               on the ancestor. The actions are stored in chronological
+*               order within the vector entry. The last KeyMap in the
 *               vector describes the action that created the ancestor NDF.
-*               Any earlier KeyMaps in the vector describe any subsequent 
-*               actions performed on the ancestor NDF prior to it being 
-*               used in the creation of its parent. Each KeyMap contains 
-*               the following scalar character entries (all taken from the 
+*               Any earlier KeyMaps in the vector describe any subsequent
+*               actions performed on the ancestor NDF prior to it being
+*               used in the creation of its parent. Each KeyMap contains
+*               the following scalar character entries (all taken from the
 *               corresponding record in the NDF HISTORY component):
-*        
-*               - "DATE": The date and time of the action 
+*
+*               - "DATE": The date and time of the action
 *                         (e.g. "2009-JUN-24 14:00:53.752" ).
-*               - "COMMAND": An indication of the command that performed 
+*               - "COMMAND": An indication of the command that performed
 *                         the action (e.g. "WCSATTRIB (KAPPA 1.10-6)" ).
-*               - "USER": The user name that performed the action 
+*               - "USER": The user name that performed the action
 *                         (e.g. "dsb").
 *               - "TEXT": The full text of the NDF history record. This is
-*                         arbitrary, but for NDFs created by Starlink 
-*                         software it will usually include environment 
-*                         parameter values, and the full path of the 
+*                         arbitrary, but for NDFs created by Starlink
+*                         software it will usually include environment
+*                         parameter values, and the full path of the
 *                         command that performed the action.
 *
 *     A key will be missing in the returned KeyMap if the Provenance
@@ -3499,21 +3503,21 @@ static AstKeyMap *ndg1FormatProv( Provenance *provenance, int i, int base,
 
 *  Arguments:
 *     provenance
-*        Pointer to the Provenance structure that contains the Prov 
+*        Pointer to the Provenance structure that contains the Prov
 *        structure that is to be formatted.
 *     i
-*        The index of the Prov structure to be formatted within the 
+*        The index of the Prov structure to be formatted within the
 *        supplied Provenance structure.
 *     base
 *        If non-zero, then the PATH field in the returned KeyMap holds the
 *        base name of each NDF rather than the full path.
 *     mxlenkey
-*        Pointer to an existing KeyMap. On exit it will contain an entry 
+*        Pointer to an existing KeyMap. On exit it will contain an entry
 *        for each of the keys listed under "Description:" above (except
-*        it will not have a "HISTORY" entry). All entries will be be 
-*        scalar integers. Each integer value is updated by this function 
-*        so that it holds the larger of the supplied value and the field 
-*        width used to format the corresponding item in the returned 
+*        it will not have a "HISTORY" entry). All entries will be be
+*        scalar integers. Each integer value is updated by this function
+*        so that it holds the larger of the supplied value and the field
+*        width used to format the corresponding item in the returned
 *        KeyMap. The supplied value is left unchanged if the returned
 *        KeyMap does not contain a value.
 *     status
@@ -3576,7 +3580,7 @@ static AstKeyMap *ndg1FormatProv( Provenance *provenance, int i, int base,
       nc = strlen( prov->path );
       if( base ) {
          p = prov->path + nc - 1;
-         while( p > prov->path && p[ -1 ] != '/' ) p--;        
+         while( p > prov->path && p[ -1 ] != '/' ) p--;
          nc = strlen( p );
       } else {
          p = prov->path;
@@ -3626,7 +3630,7 @@ static AstKeyMap *ndg1FormatProv( Provenance *provenance, int i, int base,
    nc = 0;
 
 /* If the supplied Prov structure has any parents, store a comma-separated
-   list of the corresponding ANCESTOR indices in the returned KeyMap, and 
+   list of the corresponding ANCESTOR indices in the returned KeyMap, and
    update the maximum length of the "PARENTS" field. */
    if( prov->nparent > 0 ) {
 
@@ -3634,7 +3638,7 @@ static AstKeyMap *ndg1FormatProv( Provenance *provenance, int i, int base,
       for( k = 0; k < prov->nparent && *status == SAI__OK; k++ ) {
 
 /* Find the index of this parent in the ANCESTORS array, and format it. */
-         sprintf( buf, "%d", ndg1FindAncestorIndex( prov->parents[ k ], 
+         sprintf( buf, "%d", ndg1FindAncestorIndex( prov->parents[ k ],
                                                      provenance, status ) );
 
 /* Append this string to the end of the comma-separated list, preceeding
@@ -3644,13 +3648,13 @@ static AstKeyMap *ndg1FormatProv( Provenance *provenance, int i, int base,
       }
    }
 
-/* If the list is not empty, store it in the returned KeyMap, and then 
+/* If the list is not empty, store it in the returned KeyMap, and then
    free it. */
    if( list ) {
       astMapPut0C( result, PARENTS_NAME, list, NULL );
       list = astFree( list );
-   } 
-      
+   }
+
 /* Find the maximum of the current field width and the previous maximum
    field width. */
    if( astMapGet0I( mxlenkey, PARENTS_NAME, &mxlen ) ) {
@@ -3697,7 +3701,7 @@ static AstKeyMap *ndg1FormatProv( Provenance *provenance, int i, int base,
          nc = len;
          list = astMalloc( ( nc + 1 )* sizeof( char ) );
          datGet0C( prov->more, list, nc + 1, status );
-      
+
 /* Otherwise the MORE object is a single structure. Loop round each of its
    components. */
       } else {
@@ -3760,7 +3764,7 @@ static AstKeyMap *ndg1FormatProv( Provenance *provenance, int i, int base,
                      if( iel == 10 ) break;
                   }
 
-                  if( dims[ 0 ] > 10 ) list = astAppendString( list, &nc, 
+                  if( dims[ 0 ] > 10 ) list = astAppendString( list, &nc,
                                                                ",..." );
                   list = astAppendString( list, &nc, ")" );
                   val = astFree( val );
@@ -3774,7 +3778,7 @@ static AstKeyMap *ndg1FormatProv( Provenance *provenance, int i, int base,
                   list = astAppendString( list, &nc, ">(" );
                   sprintf( buf, "%d", dims[ 0 ] );
                   list = astAppendString( list, &nc, buf );
-         
+
                   for( idim = 1; idim < ndim; idim++ ) {
                      list = astAppendString( list, &nc, "," );
                      sprintf( buf, "%d", dims[ idim ] );
@@ -3791,12 +3795,12 @@ static AstKeyMap *ndg1FormatProv( Provenance *provenance, int i, int base,
       }
    }
 
-/* If the summary is not empty, store it in the returned KeyMap, and then 
+/* If the summary is not empty, store it in the returned KeyMap, and then
    free it. */
    if( list ) {
       astMapPut0C( result, MORE_NAME, list, NULL );
       list = astFree( list );
-   } 
+   }
 
 /* Find the maximum of the current field width and the previous maximum
    field width. */
@@ -3848,7 +3852,7 @@ static Prov *ndg1FreeProv( Prov *prov, int *status ){
    HistRec *hist_rec;
 
 /* Check that something has been supplied, but ignore the inherited
-   status since we want this function to execute even if an error has 
+   status since we want this function to execute even if an error has
    occurred. */
    if( !prov ) return NULL;
 
@@ -3880,7 +3884,7 @@ static Prov *ndg1FreeProv( Prov *prov, int *status ){
    return astFree( prov );
 }
 
-static Provenance *ndg1FreeProvenance( Provenance *provenance, 
+static Provenance *ndg1FreeProvenance( Provenance *provenance,
                                        int free_provs, int *status ){
 /*
 *  Name:
@@ -3890,12 +3894,12 @@ static Provenance *ndg1FreeProvenance( Provenance *provenance,
 *     Release the resources used by a Provenance structure.
 
 *  Invocation:
-*     Provenance *ndg1FreeProvenance( Provenance *provenance, 
+*     Provenance *ndg1FreeProvenance( Provenance *provenance,
 *                                     int free_provs, int *status )
 
 *  Description:
 *     This function releases all the resoures used by a Provenance
-*     structure, including (if required) all the enclosed Prov structures, 
+*     structure, including (if required) all the enclosed Prov structures,
 *     and returns a NULL pointer.
 
 *  Arguments:
@@ -3915,7 +3919,7 @@ static Provenance *ndg1FreeProvenance( Provenance *provenance,
    int i;
 
 /* Check that something has been supplied, but ignore the inherited
-   status since we want this function to execute even if an error has 
+   status since we want this function to execute even if an error has
    occurred. */
    if( !provenance ) return NULL;
 
@@ -3926,7 +3930,7 @@ static Provenance *ndg1FreeProvenance( Provenance *provenance,
                                                     status );
       }
 
-/* Otherwise, just nullify each Prov pointer listed in the Provenance 
+/* Otherwise, just nullify each Prov pointer listed in the Provenance
    structure. */
    } else {
       for( i = 0; i < provenance->nprov; i++ ) provenance->provs[ i ] = NULL;
@@ -3940,12 +3944,12 @@ static Provenance *ndg1FreeProvenance( Provenance *provenance,
    structure. */
    provenance->provs = astFree( provenance->provs );
 
-/* Free the memory used to hold the Provenance itself, and return a NULL 
+/* Free the memory used to hold the Provenance itself, and return a NULL
    pointer. */
    return astFree( provenance );
 }
 
-static int ndg1GetLogicalComp( HDSLoc *loc, const char *comp, int def, 
+static int ndg1GetLogicalComp( HDSLoc *loc, const char *comp, int def,
                                int *status ){
 /*
 *  Name:
@@ -3955,19 +3959,19 @@ static int ndg1GetLogicalComp( HDSLoc *loc, const char *comp, int def,
 *     Return a pointer to a string holding the value of an HDS _CHAR component
 
 *  Invocation:
-*     int ndg1GetLogicalComp( HDSLoc *loc, const char *comp, int def, 
+*     int ndg1GetLogicalComp( HDSLoc *loc, const char *comp, int def,
 *                             int *status )
 
 *  Description:
 *     This function reads the value of a named logical component in a
-*     supplied HDS structure. If the component exists its value is 
-*     returned. Otherwise, the supplied default value is returned (without 
+*     supplied HDS structure. If the component exists its value is
+*     returned. Otherwise, the supplied default value is returned (without
 *     error).
 
 *  Arguments:
 *     loc
 *        Locator for the HDS structure.
-*     comp 
+*     comp
 *        The name of the component to read.
 *     def
 *        The default value to return, if the named component does not
@@ -4002,14 +4006,14 @@ static int ndg1GetLogicalComp( HDSLoc *loc, const char *comp, int def,
       datGet0L( cloc, &result, status );
 
 /* Annul the component locator. */
-      datAnnul( &cloc, status ); 
+      datAnnul( &cloc, status );
    }
 
 /* Return the result. */
    return result;
 }
 
-static char *ndg1GetTextComp( HDSLoc *loc, const char *comp, char *buf, 
+static char *ndg1GetTextComp( HDSLoc *loc, const char *comp, char *buf,
                               size_t buflen, int *status ){
 /*
 *  Name:
@@ -4019,19 +4023,19 @@ static char *ndg1GetTextComp( HDSLoc *loc, const char *comp, char *buf,
 *     Return a pointer to a string holding the value of an HDS _CHAR component
 
 *  Invocation:
-*     char *ndg1GetTextComp( HDSLoc *loc, const char *comp, char *buf, 
+*     char *ndg1GetTextComp( HDSLoc *loc, const char *comp, char *buf,
 *                            size_t buflen, int *status )
 
 *  Description:
 *     This function reads the value of a named character component in a
 *     supplied HDS structure. If the component exists a pointer to its
-*     value is returned. Otherwise, a NULL pointer is returned (without 
+*     value is returned. Otherwise, a NULL pointer is returned (without
 *     error).
 
 *  Arguments:
 *     loc
 *        Locator for the HDS structure.
-*     comp 
+*     comp
 *        The name of the component to read.
 *     buf
 *        A pointer to a buff in which to store the value, if it exists.
@@ -4046,7 +4050,7 @@ static char *ndg1GetTextComp( HDSLoc *loc, const char *comp, char *buf,
 *  Returned Value:
 *     Pointer to a string holding the component value, or a NULL pointer
 *     if the component does not exist in the structure. If "buf" is NULL,
-*     this pointer will point to newly allocated dynamic memory that should 
+*     this pointer will point to newly allocated dynamic memory that should
 *     be freed using astFree when no longer needed. This buffer will be
 *     long enough to hold the whole component value. If "buf" is not NULL,
 *     then the returned pointer will equal "buf" (if the component was
@@ -4084,7 +4088,7 @@ static char *ndg1GetTextComp( HDSLoc *loc, const char *comp, char *buf,
       if( result ) datGet0C( cloc, result, buflen + 1, status );
 
 /* Annul the component locator. */
-      datAnnul( &cloc, status ); 
+      datAnnul( &cloc, status );
    }
 
 /* Return the result. */
@@ -4103,7 +4107,7 @@ static HDSLoc *ndg1GtAnc( HDSLoc *xloc, size_t *nanc, int *status ){
 *     HDSLoc *ndg1GtAnc( HDSLoc *xloc, size_t *nanc, int *status )
 
 *  Description:
-*     This function returns a locator for the ANCESTORS array in the 
+*     This function returns a locator for the ANCESTORS array in the
 *     supplied PROVENANCE structure, and also returns its length.
 
 *  Arguments:
@@ -4113,12 +4117,12 @@ static HDSLoc *ndg1GtAnc( HDSLoc *xloc, size_t *nanc, int *status ){
 *        Pointer to an int in which to store the length of the ANCESTORS
 *        array. Zero is returned if the supplied structure does not
 *        contain an ANCESTORS array.
-*     status 
+*     status
 *        The global status.
 
 *  Returned Value:
-*     A pointer to an HDS locator for the ANCESTORS array in the supplied 
-*     structure, or NULL if the supplied structure does not contain an 
+*     A pointer to an HDS locator for the ANCESTORS array in the supplied
+*     structure, or NULL if the supplied structure does not contain an
 *     ANCESTORS array.
 
 */
@@ -4159,18 +4163,18 @@ static void ndg1H2a( HDSLoc *loc, AstKeyMap *keymap, int *status ){
 *     void ndg1H2a( HDSLoc *loc, AstKeyMap *keymap, int *status )
 
 *  Description:
-*     This routine copies top level primitive (vector or scalar) values 
-*     from an HDS Object into a supplied AST KeyMap. Any structure 
+*     This routine copies top level primitive (vector or scalar) values
+*     from an HDS Object into a supplied AST KeyMap. Any structure
 *     components in the HDS object are ignored. Any pre-existing KeyMap
 *     entry that has the name of an HDS component is first erased.
 
 *  Arguments:
-*     loc 
+*     loc
 *        A locator for the HDS object.
-*     keymap 
+*     keymap
 *        An AST pointer to the KeyMap into which the HDS components
 *        are to be copied
-*     status  
+*     status
 *        The inherited status.
 
 */
@@ -4202,10 +4206,10 @@ static void ndg1H2a( HDSLoc *loc, AstKeyMap *keymap, int *status ){
          datName( cloc, name, status );
          datType( cloc, type, status );
 
-/* Map the HDS object as a vector, and create a corresponding KeyMap vector 
-   entry to hold the values. For string types, datMapV returns a pointer to 
-   a concatenated list of fixed length strings. So we use wrappers in the 
-   ATL library that convert to and fro between concatenated fixed length 
+/* Map the HDS object as a vector, and create a corresponding KeyMap vector
+   entry to hold the values. For string types, datMapV returns a pointer to
+   a concatenated list of fixed length strings. So we use wrappers in the
+   ATL library that convert to and fro between concatenated fixed length
    strings and null-terminated strings. */
          if( !strncmp( type, "_CHAR", 5 ) ) {
             datMapV( cloc, "_CHAR", "READ", &pntr, &el, status );
@@ -4216,11 +4220,11 @@ static void ndg1H2a( HDSLoc *loc, AstKeyMap *keymap, int *status ){
          } else if( !strcmp( type, "_REAL" ) ) {
             datMapV( cloc, "_REAL", "READ", &pntr, &el, status );
             astMapPut1F( keymap, name, el, (float *) pntr, NULL );
-   
+
          } else if( !strcmp( type, "_DOUBLE" ) ) {
             datMapV( cloc, "_DOUBLE", "READ", &pntr, &el, status );
             astMapPut1D( keymap, name, el, (double *) pntr, NULL );
-   
+
          } else {
             datMapV( cloc, "_INTEGER", "READ", &pntr, &el, status );
             astMapPut1I( keymap, name, el, (int *) pntr, NULL );
@@ -4263,19 +4267,19 @@ static int ndg1HashFun( const char *text, int *status ){
 */
 
 /* Local Variables: */
-   int c;            
+   int c;
    unsigned long ihash;
 
 /* Check the local error status. */
    if ( !astOK ) return 0;
 
-/* djb2: This hash function was first reported by Dan Bernstein many years 
-   ago in comp.lang.c Each pass through the "while" loop corresponds to 
+/* djb2: This hash function was first reported by Dan Bernstein many years
+   ago in comp.lang.c Each pass through the "while" loop corresponds to
    "hash = hash*33 + c ". Ignore spaces so that trailing spaces used to
-   pad F77 character variables will be ignored. */   
+   pad F77 character variables will be ignored. */
    ihash = 5381;
    while( (c = *text++) ) {
-      if( c != ' ' ) {     
+      if( c != ' ' ) {
          ihash = ((ihash << 5) + ihash) + c;
       }
    }
@@ -4296,8 +4300,8 @@ static void ndg1Hout1( int nlines, char *const text[], int *status ){
 *  Description:
 *     This is a service function called by ndfHout. It concatenates
 *     all the lines of text from a single history record into a
-*     single string, and then, optionally, calculates an integer hash 
-*     code for the text. It stores the hash code and concatenated string 
+*     single string, and then, optionally, calculates an integer hash
+*     code for the text. It stores the hash code and concatenated string
 *     in global variables (the NDF library does not provide any other
 *     means of communication).
 
@@ -4311,7 +4315,7 @@ static void ndg1Hout1( int nlines, char *const text[], int *status ){
 
 */
 
-/* Local Variables: */   
+/* Local Variables: */
    int i;
 
 /* Check inherited status */
@@ -4320,13 +4324,13 @@ static void ndg1Hout1( int nlines, char *const text[], int *status ){
 /* Loop round all lines of text, concatenating them into a single
    dynamically allocated memory area. */
    history_length = 0;
-   history_text = astAppendString( history_text, &history_length, 
+   history_text = astAppendString( history_text, &history_length,
                                    text[ 0 ] );
    for( i = 1; i < nlines; i++ ) {
       history_text = astAppendString( history_text, &history_length, " " );
-      history_text = astAppendString( history_text, &history_length, 
+      history_text = astAppendString( history_text, &history_length,
                                       text[ i ] );
-   }      
+   }
 
 /* If required, form a hash code from the concatenated text. */
    if( history_hash ) history_hash = ndg1HashFun( history_text, status );
@@ -4345,8 +4349,8 @@ static int ndg1IntCmp( const void *a, const void *b ){
 *     int ndg1IntCmp(const void *a, const void *b );
 
 *  Description:
-*     This function returns a positive, zero, or negative value if 
-*     the integer pointed to by "b" is larger than, equal to, or 
+*     This function returns a positive, zero, or negative value if
+*     the integer pointed to by "b" is larger than, equal to, or
 *     less than, the integer pointed to by "a". Note, this results in
 *     qsort sorting into descending order, rather than ascending.
 
@@ -4358,9 +4362,9 @@ static int ndg1IntCmp( const void *a, const void *b ){
 
 */
 
-    const int *ia = (const int *) a; 
+    const int *ia = (const int *) a;
     const int *ib = (const int *) b;
-    return *ib  - *ia; 
+    return *ib  - *ia;
 }
 
 static int ndg1IsWanted( AstXmlElement *elem, int *status ){
@@ -4375,9 +4379,9 @@ static int ndg1IsWanted( AstXmlElement *elem, int *status ){
 *     int ndg1IsWanted( AstXmlElement *elem, int *status )
 
 *  Description:
-*     This function is called by astXmlReadDocument to decide if the 
-*     client is interested in each element start tag which has just 
-*     been read. 
+*     This function is called by astXmlReadDocument to decide if the
+*     client is interested in each element start tag which has just
+*     been read.
 
 *  Arguments:
 *     elem
@@ -4388,7 +4392,7 @@ static int ndg1IsWanted( AstXmlElement *elem, int *status ){
 *          an interesting element, so look through the content and
 *          ask the client again about any elements found inside it.
 *      0 : the element definately contains nothing of interest to
-*          the client. kip its content and continue looking for new 
+*          the client. kip its content and continue looking for new
 *          elements.
 *      1 : the element is definately of interest to the client so
 *          read its contents and return a pointer to it.
@@ -4400,7 +4404,7 @@ static int ndg1IsWanted( AstXmlElement *elem, int *status ){
    const char *utype = NULL;
    int result;
 
-/* Initialise the result to indicate that the element is not itself of 
+/* Initialise the result to indicate that the element is not itself of
    interest but it may contain an interesting element. */
    result = -1;
 
@@ -4417,7 +4421,7 @@ static int ndg1IsWanted( AstXmlElement *elem, int *status ){
 /* Check they are both defined and have the expected values. If so,
    indicate that the element is definiately of interest. */
       if( name && !strcmp( name, EXT_NAME ) &&
-          utype && !strncmp( utype, "hds_type:", 9 ) 
+          utype && !strncmp( utype, "hds_type:", 9 )
                 && !strcmp( utype + 9, EXT_TYPE ) ) {
          result = 1;
       }
@@ -4427,9 +4431,9 @@ static int ndg1IsWanted( AstXmlElement *elem, int *status ){
    return result;
 }
 
-static Prov *ndg1MakeProv( int index, const char *path, const char *date, 
-                           const char *creator, int hhash, HDSLoc *more, 
-                           AstKeyMap *more2, Provenance *provenance, 
+static Prov *ndg1MakeProv( int index, const char *path, const char *date,
+                           const char *creator, int hhash, HDSLoc *more,
+                           AstKeyMap *more2, Provenance *provenance,
                            int hidden, int *status ){
 /*
 *  Name:
@@ -4439,9 +4443,9 @@ static Prov *ndg1MakeProv( int index, const char *path, const char *date,
 *     Make a new Prov structure and add it into an existing Provenance.
 
 *  Invocation:
-*     Prov *ndg1MakeProv( int index, const char *path, const char *date, 
-*                         const char *creator, int hhash, HDSLoc *more, 
-*                         AstKeyMap *more2, Provenance *provenance, 
+*     Prov *ndg1MakeProv( int index, const char *path, const char *date,
+*                         const char *creator, int hhash, HDSLoc *more,
+*                         AstKeyMap *more2, Provenance *provenance,
 *                         int hidden, int *status )
 
 *  Description:
@@ -4466,7 +4470,7 @@ static Prov *ndg1MakeProv( int index, const char *path, const char *date,
 *        Pointer to a string holding an arbitrary identifier for the
 *        software that created the NDF.
 *     hhash
-*        An integer hash code representing the youngest NDF history record 
+*        An integer hash code representing the youngest NDF history record
 *        at the time the provenance information was written to the NDF.
 *     creator
 *        Pointer to a string holding an arbitrary identifier for the
@@ -4474,11 +4478,11 @@ static Prov *ndg1MakeProv( int index, const char *path, const char *date,
 *        Pointer to a locator for an HDS object holding extra information
 *        about the NDF. A deep copy is taken of the supplied structure.
 *     more2
-*        A pointer to an AstKeyMap holding extra items of information 
-*        to be added into the MORE component. Only entries holding primitive 
+*        A pointer to an AstKeyMap holding extra items of information
+*        to be added into the MORE component. Only entries holding primitive
 *        data values (scalar or vector) are used - entries holding nested
-*        KeyMaps, etc, are ignored. If an entry in this KeyMap has the same 
-*        name as a component in the supplied "more" HDS structure, then the 
+*        KeyMaps, etc, are ignored. If an entry in this KeyMap has the same
+*        name as a component in the supplied "more" HDS structure, then the
 *        KeyMap value is used in preference to the HDS value.
 *     provenance
 *        Pointer to an existing Provenance structure to which the new
@@ -4537,7 +4541,7 @@ static Prov *ndg1MakeProv( int index, const char *path, const char *date,
       if( more2 && astMapSize( more2 ) > 0 ) {
 
 /* First ensure that there is a temporary HDS object. */
-         if( !result->more ) datTemp( TEMP_TYPE, 0, NULL, &( result->more ), 
+         if( !result->more ) datTemp( TEMP_TYPE, 0, NULL, &( result->more ),
                                       status );
 
 /* Copy primtive values from the KeyMap to the temporary HDS object. */
@@ -4560,7 +4564,7 @@ static Prov *ndg1MakeProv( int index, const char *path, const char *date,
 
 /* Extend the provs array in the supplied Provenance structure. */
       if( provenance ) {
-         provenance->provs = astGrow( provenance->provs, 
+         provenance->provs = astGrow( provenance->provs,
                                       provenance->nprov + 1,
                                       sizeof( Prov *) );
 
@@ -4589,7 +4593,7 @@ static Provenance *ndg1MakeProvenance( Prov *main, int * status ){
 *     Provenance *ndg1MakeProvenance( Prov *main, int * status )
 
 *  Description:
-*     This function allocates dynamic memory to hold a new Provenance 
+*     This function allocates dynamic memory to hold a new Provenance
 *     structure, and stores the supplied main NDF Prov structure in it.
 *
 *     A Provenance structure represents the entire NDF PROVENANCE extension
@@ -4599,7 +4603,7 @@ static Provenance *ndg1MakeProvenance( Prov *main, int * status ){
 *  Arguments:
 *     main
 *        Pointer to a Prov structure describing the main NDF. The
-*        returned Provenance structure represents the PROVENANCE extension 
+*        returned Provenance structure represents the PROVENANCE extension
 *        in the main NDF.
 *     status
 *        Pointer to the inherited status variable.
@@ -4632,7 +4636,7 @@ static Provenance *ndg1MakeProvenance( Prov *main, int * status ){
       if( astOK ) {
          result->provs[ 0 ] = main;
          result->nprov = 1;
-      } else {  
+      } else {
          result->nprov = 0;
       }
    }
@@ -4656,7 +4660,7 @@ static void ndg1ParentChild( Prov *parent, Prov *child, int *status ){
 *     void ndg1ParentChild( Prov *parent, Prov *child, int *status )
 
 *  Description:
-*     This function joins the two supplied Prov structures together into 
+*     This function joins the two supplied Prov structures together into
 *     a parent-child relationsip.
 *
 *     Each Prov structure describes a single NDF. The parent NDF is used
@@ -4694,20 +4698,20 @@ static void ndg1ParentChild( Prov *parent, Prov *child, int *status ){
 /* Extend the array of parent pointers within the child, and add the new
    parent to the end of the array, incrementing the count of parents in the
    child. */
-      child->parents = astGrow( child->parents, child->nparent + 1, 
+      child->parents = astGrow( child->parents, child->nparent + 1,
                                 sizeof( Prov * ) );
       if( astOK ) child->parents[ child->nparent++ ] = parent;
 
 /* Extend the array of child pointers within the parent, and add the new
    child to the end of the array, incrementing the count of children in the
    parent. */
-      parent->children = astGrow( parent->children, parent->nchild + 1, 
+      parent->children = astGrow( parent->children, parent->nchild + 1,
                                   sizeof( Prov * ) );
       if( astOK ) parent->children[ parent->nchild++ ] = child;
    }
 }
 
-static void ndg1ParentChildIndex( Provenance *provenance, int iparent, 
+static void ndg1ParentChildIndex( Provenance *provenance, int iparent,
                                   int ichild, int *status ){
 /*
 *  Name:
@@ -4718,7 +4722,7 @@ static void ndg1ParentChildIndex( Provenance *provenance, int iparent,
 *     indices.
 
 *  Invocation:
-*     void ndg1ParentChildIndex( Provenance *provenance, int iparent, 
+*     void ndg1ParentChildIndex( Provenance *provenance, int iparent,
 *                                int ichild, int *status )
 
 *  Description:
@@ -4759,7 +4763,7 @@ static void ndg1ParentChildIndex( Provenance *provenance, int iparent,
    ndg1ParentChild( parent, child, status );
 }
 
-static int *ndg1ParentIndicies( Prov *prov, Provenance *provenance, 
+static int *ndg1ParentIndicies( Prov *prov, Provenance *provenance,
                                 int *array, int *npar, int *status ){
 /*
 *  Name:
@@ -4769,7 +4773,7 @@ static int *ndg1ParentIndicies( Prov *prov, Provenance *provenance,
 *     Find the indices of the direct parents of a given ancestor.
 
 *  Invocation:
-*     int *ndg1ParentIndicies( Prov *prov, Provenance *provenance, 
+*     int *ndg1ParentIndicies( Prov *prov, Provenance *provenance,
 *                              int *array, int *npar, int *status )
 
 *  Description:
@@ -4794,7 +4798,7 @@ static int *ndg1ParentIndicies( Prov *prov, Provenance *provenance,
 
 *  Returned Value:
 *     A pointer to the array in which the indices have been stored. If
-*     NULL was supplied for "array", the returned pointer should be freed 
+*     NULL was supplied for "array", the returned pointer should be freed
 *     using astFree when it is no onger needed.
 
 */
@@ -4826,14 +4830,14 @@ static int *ndg1ParentIndicies( Prov *prov, Provenance *provenance,
       for( k = 0; k < prov->nparent && *status == SAI__OK; k++ ) {
 
 /* Find and store the index of this parent in the ANCESTORS array. */
-         result[ k ] = ndg1FindAncestorIndex( prov->parents[ k ], 
+         result[ k ] = ndg1FindAncestorIndex( prov->parents[ k ],
                                               provenance, status );
       }
    }
    return result;
 }
 
-static void ndg1PurgeProvenance( Provenance *provenance, 
+static void ndg1PurgeProvenance( Provenance *provenance,
                                  int *status ){
 /*
 *  Name:
@@ -4843,7 +4847,7 @@ static void ndg1PurgeProvenance( Provenance *provenance,
 *     Purge duplicate ancestors from a Provenance structure.
 
 *  Invocation:
-*     void ndg1PurgeProvenance( Provenance *provenance, 
+*     void ndg1PurgeProvenance( Provenance *provenance,
 *                               int *status )
 
 *  Description:
@@ -4885,7 +4889,7 @@ static void ndg1PurgeProvenance( Provenance *provenance,
             if( prov2 ) {
                keep = ndg1TheSame( prov1, prov2, status );
 
-/* If the two provenance structures refer to the same NDF, check they have 
+/* If the two provenance structures refer to the same NDF, check they have
    the same list of parents, and report an error if not. */
                if( keep ) {
                   if( !ndg1CheckSameParents( prov1, prov2, status ) ) {
@@ -4912,7 +4916,7 @@ static void ndg1PurgeProvenance( Provenance *provenance,
                      better = prov2;
                      poorer = prov1;
                   }
-   
+
                   for( ichild = 0; ichild < poorer->nchild; ichild++ ) {
                      child = poorer->children[ ichild ];
                      ndg1Disown( poorer, child, status );
@@ -4976,7 +4980,7 @@ static void ndg1PurgeProvenance( Provenance *provenance,
 
 }
 
-static void ndg1PutTextComp( HDSLoc *loc, const char *comp, const char *value, 
+static void ndg1PutTextComp( HDSLoc *loc, const char *comp, const char *value,
                              int *status ){
 /*
 *  Name:
@@ -4986,7 +4990,7 @@ static void ndg1PutTextComp( HDSLoc *loc, const char *comp, const char *value,
 *     Write a string to a new HDS _CHAR component.
 
 *  Invocation:
-*     void ndg1PutTextComp( HDSLoc *loc, const char *comp, const char *value, 
+*     void ndg1PutTextComp( HDSLoc *loc, const char *comp, const char *value,
 *                           int *status )
 
 *  Description:
@@ -4996,7 +5000,7 @@ static void ndg1PutTextComp( HDSLoc *loc, const char *comp, const char *value,
 *  Arguments:
 *     loc
 *        Locator for the HDS structure.
-*     comp 
+*     comp
 *        The name of the component to create.
 *     value
 *        A pointer to the text string to store.
@@ -5019,7 +5023,7 @@ static void ndg1PutTextComp( HDSLoc *loc, const char *comp, const char *value,
 /* Check a string pointer was supplied. */
    if( value ) {
 
-/* Create the component. */  
+/* Create the component. */
       datNew0C( loc, comp, strlen( value ), status );
 
 /* Get a locator to the new component. */
@@ -5044,14 +5048,14 @@ static void ndg1ReadHistRec( Prov *prov, int indf, int irec, int *hash,
 *     and calculate its hash code.
 
 *  Invocation:
-*     void ndg1ReadHistRec( Prov *prov, int indf, int irec, int *hash,   
+*     void ndg1ReadHistRec( Prov *prov, int indf, int irec, int *hash,
 *                           int *status )
 
 *  Description:
-*     This function reads a specified record from the HISTORY *     of the given NDF. It then optionally creates a new empty HistRec 
-*     structure by extending the "hist_recs" array in the supplied Prov 
+*     This function reads a specified record from the HISTORY *     of the given NDF. It then optionally creates a new empty HistRec
+*     structure by extending the "hist_recs" array in the supplied Prov
 *     structure and copies the history record into it. Additionally,
-*     if "hash" is not NULL, it computes a hash code for the history 
+*     if "hash" is not NULL, it computes a hash code for the history
 *     record is created and returned in "*hash".
 
 *  Arguments:
@@ -5086,10 +5090,10 @@ static void ndg1ReadHistRec( Prov *prov, int indf, int irec, int *hash,
 /* Check the inherited status value. */
    if( *status != SAI__OK ) return;
 
-/* If a Prov structure was supplied, extend the "hist_recs" array 
+/* If a Prov structure was supplied, extend the "hist_recs" array
    within it and get a pointer to the new HistRec structure. */
    if( prov ) {
-      prov->hist_recs = astGrow( prov->hist_recs, ++(prov->nhrec), 
+      prov->hist_recs = astGrow( prov->hist_recs, ++(prov->nhrec),
                                  sizeof( HistRec ) );
       histrec = prov->hist_recs + prov->nhrec - 1;
    }
@@ -5100,12 +5104,12 @@ static void ndg1ReadHistRec( Prov *prov, int indf, int irec, int *hash,
 /* Get the history text and, if required, calculate a hash value from
    it. The NDF library does not provide direct access to the history
    text, so we use the ndg1Hout1 function to process each line of
-   text supplied to it by the NDF library. A pointer to the text is 
-   returned in the global variable "history_text", and the hash value 
+   text supplied to it by the NDF library. A pointer to the text is
+   returned in the global variable "history_text", and the hash value
    is returned in global variable "history_hash" (the hash code is
    only calculated if "history_hash" initially contains a non-zero
    value, so initialise it using "hash"). */
-      history_hash = ( hash != NULL );      
+      history_hash = ( hash != NULL );
       ndfHout( indf, irec, ndg1Hout1, status );
 
 /* If we are creating a new HistRec structure, store the text
@@ -5126,11 +5130,11 @@ static void ndg1ReadHistRec( Prov *prov, int indf, int irec, int *hash,
       history_length = 0;
 
 /* Get the text of the APPLICATION item in the history record. */
-      ndfHinfo( indf, "APPLICATION", irec, text, TEXT_LEN, status ); 
+      ndfHinfo( indf, "APPLICATION", irec, text, TEXT_LEN, status );
 
-/* If we are creating a new HistRec structure, store a copy of the 
+/* If we are creating a new HistRec structure, store a copy of the
    APPLICATION text in the new HistRec. */
-      if( histrec ) histrec->command = astStore( NULL, text, 
+      if( histrec ) histrec->command = astStore( NULL, text,
                                     (strlen( text ) + 1)*sizeof( char ) );
 
 /* If we are creating a hash code, create a hash code for the
@@ -5139,27 +5143,27 @@ static void ndg1ReadHistRec( Prov *prov, int indf, int irec, int *hash,
       if( hash ) history_hash ^= ndg1HashFun( text, status );
 
 /* Do the same for the other items of the HistRec structure. */
-      ndfHinfo( indf, "DATE", irec, text, TEXT_LEN, status ); 
-      if( histrec ) histrec->date = astStore( NULL, text, 
+      ndfHinfo( indf, "DATE", irec, text, TEXT_LEN, status );
+      if( histrec ) histrec->date = astStore( NULL, text,
                                     (strlen( text ) + 1)*sizeof( char ) );
       if( hash ) history_hash ^= ndg1HashFun( text, status );
 
-      ndfHinfo( indf, "USER", irec, text, TEXT_LEN, status ); 
-      if( histrec ) histrec->user = astStore( NULL, text, 
+      ndfHinfo( indf, "USER", irec, text, TEXT_LEN, status );
+      if( histrec ) histrec->user = astStore( NULL, text,
                                     (strlen( text ) + 1)*sizeof( char ) );
       if( hash ) history_hash ^= ndg1HashFun( text, status );
 
-/* The remaining items of history information are not stored in 
-   the HistRec structure, but we include them in the hash code if  
+/* The remaining items of history information are not stored in
+   the HistRec structure, but we include them in the hash code if
    required. */
       if( hash ) {
-         ndfHinfo( indf, "HOST", irec, text, TEXT_LEN, status ); 
+         ndfHinfo( indf, "HOST", irec, text, TEXT_LEN, status );
          history_hash ^= ndg1HashFun( text, status );
-      
-         ndfHinfo( indf, "NLINES", irec, text, TEXT_LEN, status ); 
+
+         ndfHinfo( indf, "NLINES", irec, text, TEXT_LEN, status );
          history_hash ^= ndg1HashFun( text, status );
-      
-         ndfHinfo( indf, "REFERENCE", irec, text, TEXT_LEN, status ); 
+
+         ndfHinfo( indf, "REFERENCE", irec, text, TEXT_LEN, status );
          history_hash ^= ndg1HashFun( text, status );
 
 /* Return the hash code. */
@@ -5168,7 +5172,7 @@ static void ndg1ReadHistRec( Prov *prov, int indf, int irec, int *hash,
    }
 
 /* Undefine local constants: */
-#undef TEXT_LEN 
+#undef TEXT_LEN
 }
 
 static Provenance *ndg1ReadProvenanceExtension( HDSLoc *xloc, const char *npath,
@@ -5193,8 +5197,8 @@ static Provenance *ndg1ReadProvenanceExtension( HDSLoc *xloc, const char *npath,
 *     structure, and copies provenance information from the supplied HDS
 *     structure into the new Provenance structure.
 *
-*     If a NULL pointer is supplied for "xloc", then the returned 
-*     Provenance structure contains only a single Prov structure, for the 
+*     If a NULL pointer is supplied for "xloc", then the returned
+*     Provenance structure contains only a single Prov structure, for the
 *     supplied NDF itself. The only items stored in this Prov structure is
 *     the NDF path, plus any "more" and "creator" values supplied as
 *     arguments to this function.
@@ -5205,11 +5209,11 @@ static Provenance *ndg1ReadProvenanceExtension( HDSLoc *xloc, const char *npath,
 *     npath
 *        The path of the NDF from which the provenance was read.
 *     more
-*        An optional HDS structure holding additional information. This is 
+*        An optional HDS structure holding additional information. This is
 *        stored in the main Prov structure in the returned Provenance.
 *     more2
 *        An optional KeyMap holding additional primitive (scalar or vector)
-*        information. This is added into the HDS structure specified by 
+*        information. This is added into the HDS structure specified by
 *        "more", over-writing any components with the same names.
 *     creator
 *        An optional text string to be stored as the "creator" string in
@@ -5241,9 +5245,9 @@ static Provenance *ndg1ReadProvenanceExtension( HDSLoc *xloc, const char *npath,
    Provenance *result = NULL;
    char *date = NULL;
    char *path = NULL;
-   char creator_buf[ CREATOR_LEN + 1 ];     
-   char date_buf[ DATE_LEN + 1 ];     
-   char path_buf[ PATH_LEN + 1 ];     
+   char creator_buf[ CREATOR_LEN + 1 ];
+   char date_buf[ DATE_LEN + 1 ];
+   char path_buf[ PATH_LEN + 1 ];
    hdsdim  dim[ 1 ];
    hdsdim  subs;
    int *parents = NULL;
@@ -5265,13 +5269,13 @@ static Provenance *ndg1ReadProvenanceExtension( HDSLoc *xloc, const char *npath,
    information is being read. */
    hhash = 0;
 
-/* See if a provenance extension was supplied. If we are pretending that the 
-   NDF is a root NDF (i.e. if we are ignoring any provenance information 
+/* See if a provenance extension was supplied. If we are pretending that the
+   NDF is a root NDF (i.e. if we are ignoring any provenance information
    within it) then skip this bit. */
    if( xloc && !isroot ) {
 
 /* Get the values of the DATE, CREATOR and HASH components, if they exist. */
-      date = ndg1GetTextComp( xloc, DATE_NAME, date_buf, 
+      date = ndg1GetTextComp( xloc, DATE_NAME, date_buf,
                               DATE_LEN, status );
       creator = ndg1GetTextComp( xloc, CREATOR_NAME, creator_buf,
                                  CREATOR_LEN, status );
@@ -5287,7 +5291,7 @@ static Provenance *ndg1ReadProvenanceExtension( HDSLoc *xloc, const char *npath,
    }
 
 /* Create a Prov structure to describe the main NDF. */
-   main_prov = ndg1MakeProv( 0, npath, date, creator, hhash, more, more2, 
+   main_prov = ndg1MakeProv( 0, npath, date, creator, hhash, more, more2,
                              NULL, 0, status );
 
 /* Create the basic Provenance structure. As yet it only contains
@@ -5305,7 +5309,7 @@ static Provenance *ndg1ReadProvenanceExtension( HDSLoc *xloc, const char *npath,
          datCell( aloc, 1, dim, &cloc, status );
 
 /* Get the PATH, DATE, CREATOR and HIDDEN components. */
-         date = ndg1GetTextComp( cloc, DATE_NAME, date_buf, 
+         date = ndg1GetTextComp( cloc, DATE_NAME, date_buf,
                                  DATE_LEN, status );
          path = ndg1GetTextComp( cloc, PATH_NAME, path_buf,
                                  PATH_LEN, status );
@@ -5342,12 +5346,12 @@ static Provenance *ndg1ReadProvenanceExtension( HDSLoc *xloc, const char *npath,
                for( irec = 0; irec < nhrec; irec++,hist_rec++ ) {
                   subs = irec + 1;
                   datCell( hloc, 1, &subs, &hcloc, status );
-   
+
                   hist_rec->date = ndg1GetTextComp( hcloc, DATE_NAME, NULL, 0, status );
                   hist_rec->command = ndg1GetTextComp( hcloc, COMMAND_NAME, NULL, 0, status );
                   hist_rec->user = ndg1GetTextComp( hcloc, USER_NAME, NULL, 0, status );
                   hist_rec->text = ndg1GetTextComp( hcloc, TEXT_NAME, NULL, 0, status );
-   
+
                   datAnnul( &hcloc, status );
                }
             }
@@ -5364,7 +5368,7 @@ static Provenance *ndg1ReadProvenanceExtension( HDSLoc *xloc, const char *npath,
       datThere( xloc, PARENTS_NAME, &there, status );
       if( there ) {
          datFind( xloc, PARENTS_NAME, &ploc, status );
-         datMapV( ploc, "_INTEGER", "READ", (void **) &parents, &npar, 
+         datMapV( ploc, "_INTEGER", "READ", (void **) &parents, &npar,
                   status );
 
 /* For each, establish a parent-child link between the main NDF Prov
@@ -5391,7 +5395,7 @@ static Provenance *ndg1ReadProvenanceExtension( HDSLoc *xloc, const char *npath,
          datThere( cloc, PARENTS_NAME, &there, status );
          if( there ) {
             datFind( cloc, PARENTS_NAME, &ploc, status );
-            datMapV( ploc, "_INTEGER", "READ", (void **) &parents, &npar, 
+            datMapV( ploc, "_INTEGER", "READ", (void **) &parents, &npar,
                      status );
 
 /* For each, establish a parent-child link between the ancestor NDF Prov
@@ -5421,7 +5425,7 @@ static Provenance *ndg1ReadProvenanceExtension( HDSLoc *xloc, const char *npath,
    return result;
 }
 
-static Provenance *ndg1ReadProvenanceNDF( int indf, HDSLoc *more, 
+static Provenance *ndg1ReadProvenanceNDF( int indf, HDSLoc *more,
                                           AstKeyMap *more2,
                                           const char *creator,
                                           int isroot, int *status ){
@@ -5433,7 +5437,7 @@ static Provenance *ndg1ReadProvenanceNDF( int indf, HDSLoc *more,
 *     Create a new Provenance structure from an NDF PROVENANCE extension.
 
 *  Invocation:
-*     Provenance *ndg1ReadProvenanceNDF( int indf, HDSLoc *more, 
+*     Provenance *ndg1ReadProvenanceNDF( int indf, HDSLoc *more,
 *                                        AstKeyMap *more2,
 *                                        const char *creator,
 *                                        int isroot, int *status )
@@ -5443,7 +5447,7 @@ static Provenance *ndg1ReadProvenanceNDF( int indf, HDSLoc *more,
 *     structure, and copies provenance information from the PROVENANCE
 *     extension of the supplied NDF into the new Provenance structure.
 *     If the NDF does not have a PROVENANCE extension, then the returned
-*     Provenance structure contains only a single Prov structure, for the 
+*     Provenance structure contains only a single Prov structure, for the
 *     supplied NDF itself. The only items stored in this Prov structure is
 *     the NDF path, plus any "more" and "creator" values supplied as
 *     arguments to this function.
@@ -5481,22 +5485,22 @@ static Provenance *ndg1ReadProvenanceNDF( int indf, HDSLoc *more,
    HDSLoc *xloc = NULL;
    Provenance *result = NULL;
    char *path = NULL;
-   char path_buf[ PATH_LEN + 1 ];     
+   char path_buf[ PATH_LEN + 1 ];
    int path_len;
    int there;
 
 /* Check the inherited status value. */
    if( *status != SAI__OK ) return result;
 
-/* See if the supplied NDF has a provenance extension. If it has, get a 
+/* See if the supplied NDF has a provenance extension. If it has, get a
    HDS locator to it. If we are pretending that the NDF is a root NDF
    (i.e. if we are ignoring any provenance information within it) then skip
    this bit. */
-   ndfXstat( indf, EXT_NAME, &there, status ); 
-   if( there && !isroot ) ndfXloc( indf, EXT_NAME, "Read", &xloc, status ); 
+   ndfXstat( indf, EXT_NAME, &there, status );
+   if( there && !isroot ) ndfXloc( indf, EXT_NAME, "Read", &xloc, status );
 
 /* Get the path to the supplied NDF. */
-   ndfMsg( "NDF", indf ); 
+   ndfMsg( "NDF", indf );
    msgLoad( " ", "^NDF", path_buf, PATH_LEN, &path_len, status );
    path = path_buf;
 
@@ -5511,7 +5515,7 @@ static Provenance *ndg1ReadProvenanceNDF( int indf, HDSLoc *more,
    return result;
 }
 
-static Provenance *ndg1ReadProvenanceXml( const char *xml, const char *path, 
+static Provenance *ndg1ReadProvenanceXml( const char *xml, const char *path,
                                           const char *creator, int *status ){
 /*
 *  Name:
@@ -5521,7 +5525,7 @@ static Provenance *ndg1ReadProvenanceXml( const char *xml, const char *path,
 *     Create a new Provenance structure from XML text taken from a VOTABLE.
 
 *  Invocation:
-*     Provenance *ndg1ReadProvenanceXml( const char *xml, const char *path, 
+*     Provenance *ndg1ReadProvenanceXml( const char *xml, const char *path,
 *                                        const char *creator, int *status )
 
 *  Description:
@@ -5536,7 +5540,7 @@ static Provenance *ndg1ReadProvenanceXml( const char *xml, const char *path,
 *        The path to the file from which the XML provenance text was read.
 *     creator
 *        An optional text string to be stored as the "creator" string in
-*        the returned Prov structure. This is only used if there is no 
+*        the returned Prov structure. This is only used if there is no
 *        creator string in the supplied provenance.
 *     status
 *        Pointer to the inherited status variable.
@@ -5548,7 +5552,7 @@ static Provenance *ndg1ReadProvenanceXml( const char *xml, const char *path,
 */
 
 /* Local Variables: */
-   AstXmlDocument *doc = NULL; 
+   AstXmlDocument *doc = NULL;
    AstXmlElement *elem = NULL;
    HDSLoc *tloc = NULL;
    HDSLoc *xloc = NULL;
@@ -5560,7 +5564,7 @@ static Provenance *ndg1ReadProvenanceXml( const char *xml, const char *path,
 
 /* Convert the supplied text into an AstXmlElement. */
    text = xml;
-   elem = astXmlReadDocument( &doc, ndg1IsWanted, 0, ndg1XmlSource, 
+   elem = astXmlReadDocument( &doc, ndg1IsWanted, 0, ndg1XmlSource,
                               (void *) &text );
 
 /* Create a temporary HDS structure to hold the provenance information
@@ -5601,11 +5605,11 @@ static void ndg1ResetIndices( Provenance *provenance, int *status ){
 *  Description:
 *     This function stores -1 for the "index" component of each "Rrov"
 *     stucture in the supplied Provenance. This causes the next
-*     invocation of the ndg1FindAncestorIndex function to re-calculate 
-*     the index of the Prov. 
+*     invocation of the ndg1FindAncestorIndex function to re-calculate
+*     the index of the Prov.
 *
 *     This function should be called whener anything is done to the
-*     Provenance that may cause the indices of individual ancestors to 
+*     Provenance that may cause the indices of individual ancestors to
 *     change (e.g. when an ancestor is added, deleted or moved).
 
 *  Arguments:
@@ -5645,7 +5649,7 @@ static void ndg1Rmprv( Provenance *prov, int ianc, int *status ){
 
 *  Description:
 *     This function removes a given ancestor from the supplied Provenance
-*     structure. The direct parents of the removed ancestor are assigned 
+*     structure. The direct parents of the removed ancestor are assigned
 *     to the direct children of the removed ancestor.
 
 *  Arguments:
@@ -5665,7 +5669,7 @@ static void ndg1Rmprv( Provenance *prov, int ianc, int *status ){
    Prov *anc = NULL;
    Prov *child = NULL;
    Prov *parent = NULL;
-   int i;             
+   int i;
    int ichild;
    int iparent;
    int n;
@@ -5689,7 +5693,7 @@ static void ndg1Rmprv( Provenance *prov, int ianc, int *status ){
          child = anc->children[ 0 ];
 
 /* Break the parent-child link between the ancestor and the current
-   child. This reduces the number of children in anc (i.e. anc->nchild) 
+   child. This reduces the number of children in anc (i.e. anc->nchild)
    by 1. */
          ndg1Disown( anc, child, status );
 
@@ -5751,8 +5755,8 @@ static HDSLoc *ndg1TCopy( HDSLoc *loc, int *status ){
 
 *  Arguments:
 *     loc
-*        locator for the HDS object to copy. 
-*     status 
+*        locator for the HDS object to copy.
+*     status
 *        The global status.
 
 *  Returned Value:
@@ -5789,7 +5793,7 @@ static int ndg1TheSame( Prov *prov1, Prov *prov2, int *status ) {
 *     Checks if two Prov structures are for the same NDF.
 
 *  Invocation:
-*     int ndg1TheSame( Prov *prov1, Prov *prov2, int *status ) 
+*     int ndg1TheSame( Prov *prov1, Prov *prov2, int *status )
 
 *  Description:
 *     This function returns non-zero if the two supplied Prov structures
@@ -5826,8 +5830,8 @@ static int ndg1TheSame( Prov *prov1, Prov *prov2, int *status ) {
    if( prov1 == prov2 ) {
       result = 2;
 
-/* Otherwise, we assume a match if the NDF path and (if known) the date 
-   of the provenance information are the same. */
+/* Otherwise, we assume a match if the NDF path and (if known) the date
+   and (if known) the creator of the provenance information are the same. */
    } else {
       result = 1;
 
@@ -5847,7 +5851,13 @@ static int ndg1TheSame( Prov *prov1, Prov *prov2, int *status ) {
          result = 0;
       }
 
-/* If they refer to the same NDF, count the number of items of information 
+      if( prov1->creator && prov2->creator ) {
+         if( strcmp( prov1->creator, prov2->creator ) ) result = 0;
+      } else if( prov1->creator || prov2->creator ) {
+         result = 0;
+      }
+
+/* If they refer to the same NDF, count the number of items of information
    stored for "prov1" and "prov2". */
       if( result ) {
          nitem1 = 0;
@@ -5862,7 +5872,7 @@ static int ndg1TheSame( Prov *prov1, Prov *prov2, int *status ) {
          if( prov2->more ) nitem2++;
          if( prov2->nparent ) nitem2++;
 
-/* Return a non-zero result indicating which of the two Prov structures 
+/* Return a non-zero result indicating which of the two Prov structures
    contains the most information. */
          result = ( nitem1 > nitem2 ) ? 1 : 2;
 
@@ -5873,7 +5883,7 @@ static int ndg1TheSame( Prov *prov1, Prov *prov2, int *status ) {
    return result;
 }
 
-static void ndg1WriteProvenanceExtension( Provenance *provenance, 
+static void ndg1WriteProvenanceExtension( Provenance *provenance,
                                           HDSLoc *xloc, int *status ){
 /*
 *  Name:
@@ -5883,7 +5893,7 @@ static void ndg1WriteProvenanceExtension( Provenance *provenance,
 *     Create a new HDS structure from a Provenance structure.
 
 *  Invocation:
-*     void ndg1WriteProvenanceExtension( Provenance *provenance, 
+*     void ndg1WriteProvenanceExtension( Provenance *provenance,
 *                                        HDSLoc *xloc, int *status )
 
 *  Description:
@@ -5918,7 +5928,7 @@ static void ndg1WriteProvenanceExtension( Provenance *provenance,
    int i;
    int irec;
    int len;
-   time_t t;            
+   time_t t;
 
 /* Check the inherited status value. */
    if( *status != SAI__OK ) return;
@@ -5934,9 +5944,9 @@ static void ndg1WriteProvenanceExtension( Provenance *provenance,
 /* Loop round all the Prov structures. */
    for( i = 0; i < provenance->nprov; i++ ) {
       prov = provenance->provs[ i ];
-      
+
 /* Get a locator to the place where this Prov structure should be
-   written. The Prov structure for the main NDF is written to the 
+   written. The Prov structure for the main NDF is written to the
    PROVENANCE extension itself. Other Prov structures are written
    to an element of the ANCESTORS array. */
       if( prov == provenance->main ) {
@@ -5956,7 +5966,7 @@ static void ndg1WriteProvenanceExtension( Provenance *provenance,
 /* If it is the main NDF provenance, do not write out the PATH (since the
    NDF may subsequently be moved), and force the DATE to the current
    date. Also no "more" information is stored for the main NDF since the
-   information that may be stored in "more" will usually be available at 
+   information that may be stored in "more" will usually be available at
    other places in the NDF. It is the responsibilty of each application
    to extract the information it thinks is relevant from each input NDF
    and store it in the "more" structure with the input NDF's provenance
@@ -6000,7 +6010,7 @@ static void ndg1WriteProvenanceExtension( Provenance *provenance,
          }
       }
 
-/* If we are writing the provenance for the main NDF, write out the history 
+/* If we are writing the provenance for the main NDF, write out the history
    record hash code. */
       if( prov == provenance->main ) {
          if( prov->hhash != 0 ) {
@@ -6032,7 +6042,7 @@ static void ndg1WriteProvenanceExtension( Provenance *provenance,
       }
 
 /* Store a deep copy of "more". Note, the "more" variable is a locator
-   for a temporary structure that contains the required components for the 
+   for a temporary structure that contains the required components for the
    MORE structure. */
       if( more ) datCopy( more, cloc, MORE_NAME, status );
 
@@ -6045,7 +6055,7 @@ static void ndg1WriteProvenanceExtension( Provenance *provenance,
 
 /* Put the indices of the direct parents of the ancestor into the mapped
    array. */
-         (void) ndg1ParentIndicies( prov, provenance, parents, NULL, 
+         (void) ndg1ParentIndicies( prov, provenance, parents, NULL,
                                     status );
 
 /* Free the parents array. */
@@ -6055,13 +6065,13 @@ static void ndg1WriteProvenanceExtension( Provenance *provenance,
 
 /* Free the locator to the Prov structure. */
       datAnnul( &cloc, status );
-   } 
+   }
 
 /* Free resources */
    if( aloc ) datAnnul( &aloc, status );
 }
 
-static void ndg1WriteProvenanceNDF( Provenance *provenance, int indf, 
+static void ndg1WriteProvenanceNDF( Provenance *provenance, int indf,
                                     int whdef, int *status ){
 /*
 *  Name:
@@ -6071,7 +6081,7 @@ static void ndg1WriteProvenanceNDF( Provenance *provenance, int indf,
 *     Create a new NDF PROVENANCE extension from a Provenance structure.
 
 *  Invocation:
-*     void ndg1WriteProvenanceNDF( Provenance *provenance, int indf, 
+*     void ndg1WriteProvenanceNDF( Provenance *provenance, int indf,
 *                                  int whdef, int *status )
 
 *  Description:
@@ -6121,21 +6131,21 @@ static void ndg1WriteProvenanceNDF( Provenance *provenance, int indf,
 
 /* See if the supplied NDF has a provenance extension. If it has, delete
    it. */
-   ndfXstat( indf, EXT_NAME, &there, status ); 
-   if( there ) ndfXdel( indf, EXT_NAME, status ); 
+   ndfXstat( indf, EXT_NAME, &there, status );
+   if( there ) ndfXdel( indf, EXT_NAME, status );
 
 /* If a Provenance structure was supplied, create a new PROVENANCE
    extension. */
    if( provenance ) {
-      ndfXnew( indf, EXT_NAME, EXT_TYPE, 0, NULL, &xloc, status ); 
+      ndfXnew( indf, EXT_NAME, EXT_TYPE, 0, NULL, &xloc, status );
 
-/* If the provenance for the main NDF does not have a hash code for the most 
-   recent history record at the time the structure was first stored in the 
+/* If the provenance for the main NDF does not have a hash code for the most
+   recent history record at the time the structure was first stored in the
    NDF, get one now. */
       if( provenance->main->hhash == 0 ) {
 
 /* Check the NDF has a history component. */
-         ndfState( indf, "History", &there, status ); 
+         ndfState( indf, "History", &there, status );
          if( there ) {
 
 /* If the default history may not yet have been written, ensure it is
@@ -6150,7 +6160,7 @@ static void ndg1WriteProvenanceNDF( Provenance *provenance, int indf,
 /* Get the index of the current history record, and if there is a current
    record, get its hash code. */
             ndfHnrec( indf, &irec, status );
-            if( irec ) ndg1ReadHistRec( NULL, indf, irec, 
+            if( irec ) ndg1ReadHistRec( NULL, indf, irec,
                                         &(provenance->main->hhash), status );
          }
       }
@@ -6186,14 +6196,14 @@ static const char *ndg1WriteProvenanceXml( Provenance *provenance, int *status )
 
 *  Returned Value:
 *     A pointer to a dyamically allocated string holding the XML text, or
-*     NULL if an error occurs. The string should be freed using astFree 
+*     NULL if an error occurs. The string should be freed using astFree
 *     when it is no longer needed. The text will contain a single top
 *     level element with the following opening tag:
 *
 *        "<GROUP name="PROVENANCE" utype="hds_type:PROVENANCE">"
 *
 *     The HDS structure of an NDF PROVENANCE extension is replicated
-*     using PARAM elements to hold primitive values and GROUP elements to 
+*     using PARAM elements to hold primitive values and GROUP elements to
 *     hold structures. The "utype" attributes are used to hold the
 *     corresponding HDS data types.
 
@@ -6270,4 +6280,100 @@ static char ndg1XmlSource( void *data, int *status ){
 
 
 
+static AstKeyMap *ndg1ShowProv( Prov *prov, int depth, AstKeyMap *km, int *status ){
+/*
+*  Name:
+*     ndg1ShowProv
 
+*  Purpose:
+*     Display a Prov structure with all its parents and children.
+
+*  Invocation:
+*     AstKeyMap *ndg1ShowProv( Prov *prov, int depth, AstKeyMap *km,
+*                              int *status )
+
+*  Description:
+*     This function is a debugging tool that displays a Prov structure.
+*
+*     The displayed information is a bit confusing at the moment. Could be
+*     improved.
+
+*  Arguments:
+*     prov
+*        Pointer to the Prov structure to display.
+*     depth
+*        The level of recursive nesting.
+*     km
+*        A KeyMap containing the addresses of the Prov structurs already
+*        displayed, or NULL if no structures have yet been displayed.
+*     status
+*        Inherited status pointer.
+
+*  Returned Value:
+*     A pointer to a KeyMap holding the address of all the Prov
+*     structures displayed. Should be freed using astAnnul after the top
+*     level entry to this fuhnction returns.
+
+*/
+
+/* Local Variables: */
+   AstKeyMap *result;
+   char indent[2000];
+   char key[100];
+   int i;
+
+/* Initialise */
+   result = km;
+
+/* Check status */
+   if( *status != SAI__OK ) return result;
+
+/* A keyMap to store the addresses of the Prov structures that have already
+   been show. */
+   if( !result ) result = astKeyMap( " " );
+
+/* Get a string representation of the address of the supplied Prov
+   structure. */
+   sprintf( key, "%p", prov );
+
+/* Set up the indentation string. */
+   for( i = 0; i < 2*depth; i++ ) indent[ i ] = ' ';
+   indent[ 2*depth ] = 0;
+
+/* Display teh path */
+   printf( "%s path: %s\n", indent, prov->path ? prov->path : "" );
+
+/* If the Prov has already been displayed, issue a warning. */
+   if( astMapHasKey( result, key ) ) {
+      printf( "%s >>> This Prov structure has already been displayed\n",
+              indent );
+
+/* Otherwise, display the remaining details of this Prov */
+   } else {
+      printf( "%s date: %s\n", indent, prov->date ? prov->date : "" );
+      printf( "%s creator: %s\n", indent, prov->creator ? prov->creator : "" );
+      printf( "%s index: %d\n", indent, prov->index );
+      printf( "%s hidden: %d\n", indent, prov->hidden );
+
+/* Store the Prov address in the KeyMap so that the following recursive
+   calls to this function can detect if the same Prov is reached by a
+   second path. */
+      astMapPut0I( result, key, 1, NULL );
+
+/* Display the child Provs (to avoid infinite loops). */
+      for( i = 0; i < prov->nchild; i++ ) {
+         printf( "%s child %d:\n", indent, i );
+         (void) ndg1ShowProv( prov->children[ i ], depth + 1, result, status );
+      }
+
+/* Display the parent Provs (to avoid infinite loops). */
+      for( i = 0; i < prov->nparent; i++ ) {
+         printf( "%s parent %d:\n", indent, i );
+         (void) ndg1ShowProv( prov->parents[ i ], depth + 1, result, status );
+      }
+
+   }
+
+/* Return a pointer to the KeyMap. */
+   return result;
+}
