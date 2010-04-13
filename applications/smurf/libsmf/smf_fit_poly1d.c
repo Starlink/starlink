@@ -345,8 +345,13 @@ void smf__fit_poly1d ( size_t order, size_t nelem, const double x[], const doubl
 
     /* Report the fit details */
     if (msgFlevok( MSG__DEBUG2, status ) ) {
-      msgOutiff( MSG__DEBUG2, "", "Best fit (%s) = %g + %g X  Reduced chisq = %f (%zd / %zd values)",
-                 status, (vary ? "weighted" : "unweighted"), c0, c1, *rchisq, nrgood, nelem );
+      if (nrgood == nelem) {
+        msgSeti( "NVAL", nrgood);
+      } else {
+        msgFmt( "NVAL", "%zd/%zd", nrgood, nelem);
+      }
+      msgOutiff( MSG__DEBUG2, "", "Fit (%s) = %g + %g X Red. chisq = %f (^NVAL pnts)",
+                 status, (vary ? "weighted" : "unweighted"), c0, c1, *rchisq );
     }
 
     if (nused) *nused = nrgood;
@@ -439,7 +444,7 @@ void smf__fit_poly1d ( size_t order, size_t nelem, const double x[], const doubl
           }
           if (k<ncoeff-1) msgSetc( "POLY", " +");
         }
-        msgOutiff( MSG__DEBUG2, "", "Best fit (%s) = ^POLY  Reduced chisq = %f (%zd / %zd values)",
+        msgOutiff( MSG__DEBUG2, "", "Fit (%s) = ^POLY  Red. chisq = %f (%zd/%zd pnts)",
                    status, (vary ? "weighted" : "unweighted"), *rchisq, nrgood, nelem );
       }
 
