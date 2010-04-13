@@ -205,15 +205,27 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
       refvar = bolvar[nbol*(nheat/2)+bol];
     }
 
-    for (i=0; i<nheat; i++) {
-      if (bolval[nbol*i+bol] != VAL__BADD && bolvar[nbol*i+bol] != VAL__BADD) {
-        scan[nrgood] = bolval[nbol*i+bol] - refval;
-        goodht[nrgood] = ht[i];
-        if (scanvar) {
-          scanvar[nrgood] = bolvar[nbol*i+bol] + refvar;
+    /* if refval is bad then this really means that there was a flagged measurement
+       right at the middle heater value. This is a bit of a problem since it might
+       be a reasonable ramp otherwise. Chances are it's a dodgy ramp so we leave
+       it for now. One solution is to store the reference value when calculating the
+       average ramp and pass it through to this routine independently. Alternatively
+       at least store the value prior to the precondition step. */
+    if (refval != VAL__BADD) {
+      for (i=0; i<nheat; i++) {
+        if (bolval[nbol*i+bol] != VAL__BADD && bolvar[nbol*i+bol] != VAL__BADD) {
+          scan[nrgood] = bolval[nbol*i+bol] - refval;
+          goodht[nrgood] = ht[i];
+          if (scanvar) {
+            if (refvar != VAL__BADD) {
+              scanvar[nrgood] = bolvar[nbol*i+bol] + refvar;
+            } else {
+              scanvar[nrgood] = VAL__BADD;
+            }
+          }
+          goodidx[nrgood] = i;
+          nrgood++;
         }
-        goodidx[nrgood] = i;
-        nrgood++;
       }
     }
 
