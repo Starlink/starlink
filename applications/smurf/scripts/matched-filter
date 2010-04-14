@@ -139,11 +139,9 @@ set dir = `dirname $arg_list[2]`
 set base = `basename $arg_list[2] .sdf`
 set out = "$dir/$base"
 
-# Get the input pixel size, in arc-second. Note, cannot use QUIET=YES here,
-# as it seems to stop the output parameter values being written to the
-# ndftrace parameter file in ~/adam. We assume the first pixel axis is a
-# spatial axis, and that pixels are square.
-$KAPPA_DIR/ndftrace $in fullframe > /dev/null
+# Get the input pixel size, in arc-second. We assume the first pixel axis
+# is a spatial axis, and that pixels are square.
+$KAPPA_DIR/ndftrace $in fullframe quiet
 set insize = `$KAPPA_DIR/parget fpixscale\(1\) ndftrace`
 
 # If a PSF was given, check it exists.
