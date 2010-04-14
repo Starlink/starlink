@@ -1763,8 +1763,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
               /* Set quality back to its original state */
               for( k=0; k<nbolo; k++ ) {
-                bolomask[k] = qua_data[k*bstride];
-                qua_data[k*bstride] = SMF__Q_BADB;
+                qua_data[k*bstride] = bolomask[k];
               }
             }
 
@@ -1806,13 +1805,12 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
              determine "nshort" -- the number of complete blocks of
              shortmap time slices in the useful range. */
 
-          smf_get_dims( qua[0]->sdata[0], NULL, NULL, &nbolo, &ntslice,
-                        NULL, &bstride, &tstride, status );
+          smf_get_dims( qua[0]->sdata[0], NULL, NULL, NULL, &ntslice,
+                        NULL, NULL, &tstride, status );
 
           qua_data = (qua[0]->sdata[0]->pntr)[0];
           smf_get_goodrange( qua_data, ntslice, tstride, SMF__Q_BOUND,
                              &istart, &iend, status );
-
 
           if( *status == SAI__OK ) {
             nshort = (iend-istart+1)/shortmap;
