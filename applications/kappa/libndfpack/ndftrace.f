@@ -34,9 +34,9 @@
 *     -  attributes of the main data array and any other array
 *     components present (including the type and storage form and an
 *     indication of whether `bad' pixels may be present);
-*     -  attributes of the current co-ordinate Frame in the WCS 
-*     component (title, domain, and, optionally, axis labels and axis 
-*     units, plus the system epoch and projection for sky co-ordinate 
+*     -  attributes of the current co-ordinate Frame in the WCS
+*     component (title, domain, and, optionally, axis labels and axis
+*     units, plus the system epoch and projection for sky co-ordinate
 *     Frames).  In addition the bounding box of the NDF within the Frame
 *     is displayed.
 *     -  optionally, attributes of all other co-ordinate Frames in the
@@ -102,34 +102,34 @@
 *        NEXTN is positive.
 *     FDIM( ) = _INTEGER (Write)
 *        The numbers of axes in each co-ordinate Frame stored in the WCS
-*        component of the NDF.  The elements in this parameter 
+*        component of the NDF.  The elements in this parameter
 *        correspond to those in the FDOMAIN and FTITLE parameters.  The
 *        number of elements in each of these parameters is given by
 *        NFRAME.
 *     FDOMAIN( ) = LITERAL (Write)
 *        The domain of each co-ordinate Frame stored in the WCS
 *        component of the NDF.  The elements in this parameter
-*        correspond to those in the FDIM and FTITLE parameters.  The 
+*        correspond to those in the FDIM and FTITLE parameters.  The
 *        number of elements in each of these parameters is given by
 *        NFRAME.
 *     FLABEL( ) = LITERAL (Write)
-*        The axis labels from the current WCS Frame of the NDF.  
+*        The axis labels from the current WCS Frame of the NDF.
 *     FLBND( ) = _DOUBLE (Write)
 *        The lower bounds of the bounding box enclosing the NDF in the
 *        current WCS Frame.  The number of elements in this parameter is
-*        equal to the number of axes in the current WCS Frame (see 
+*        equal to the number of axes in the current WCS Frame (see
 *        FDIM).  Celestial axis values will be in units of radians.
 *     FUBND( ) = _DOUBLE (Write)
 *        The upper bounds of the bounding box enclosing the NDF in the
 *        current WCS Frame.  The number of elements in this parameter is
-*        equal to the number of axes in the current WCS Frame (see 
+*        equal to the number of axes in the current WCS Frame (see
 *        FDIM).  Celestial axis values will be in units of radians.
 *     FORM = LITERAL (Write)
 *        The storage form of the NDF's data array. This will be "SIMPLE",
 *        "PRIMITIVE" or "SCALED".
 *     FPIXSCALE( ) = LITERAL (Write)
 *        The nominal WCS pixel scale for each axis in the current WCS
-*        Frame. For celestial axes, the value stored will be in 
+*        Frame. For celestial axes, the value stored will be in
 *        arc-seconds. For other axes, the value stored will be in the
 *        units given by the corresponding element of FUNIT.
 *     FTITLE( ) = LITERAL (Write)
@@ -145,17 +145,17 @@
 *        axis arrays will also be given. [FALSE]
 *     FULLFRAME = _LOGICAL (Read)
 *        If a FALSE value is given for this parameter then only the
-*        Title and Domain attributes plus the axis labels and units are 
-*        displayed for a co-ordinate Frame.  Otherwise, a more complete 
+*        Title and Domain attributes plus the axis labels and units are
+*        displayed for a co-ordinate Frame.  Otherwise, a more complete
 *        description is given, including the bounds of the NDF within
 *        the Frame. [FALSE]
 *     FULLWCS = _LOGICAL (Read)
 *        If a TRUE value is given for this parameter then all
 *        co-ordinate Frames in the WCS component of the NDF are
-*        displayed.  Otherwise, only the current co-ordinate Frame is 
+*        displayed.  Otherwise, only the current co-ordinate Frame is
 *        displayed. [FALSE]
 *     FUNIT( ) = LITERAL (Write)
-*        The axis units from the current WCS Frame of the NDF.  
+*        The axis units from the current WCS Frame of the NDF.
 *     HISTORY = _LOGICAL (Write)
 *        Whether or not the NDF contains HISTORY records.
 *     LABEL = LITERAL (Write)
@@ -170,7 +170,7 @@
 *        The number of extensions in the NDF.
 *     NFRAME = _INTEGER (Write)
 *        The number of WCS Frames described by parameters FDIM, FDOMAIN
-*        and FTITLE.  Set to zero if WCS is FALSE. 
+*        and FTITLE.  Set to zero if WCS is FALSE.
 *     QUALITY = _LOGICAL (Write)
 *        Whether or not the NDF contains a QUALITY array.
 *     SCALE = _DOUBLE (Write)
@@ -179,7 +179,7 @@
 *        SCTYPE, ZERO and FORM. The unscaled data values are derived from
 *        the scaled values as follows: "unscaled = SCALE*scaled + ZERO".
 *     SCTYPE = LITERAL (Write)
-*        The data type of the scaled values stored in the NDF's data 
+*        The data type of the scaled values stored in the NDF's data
 *        array. This will be the same as TYPE unless the Data array is
 *        stored in SCALED form. See also FORM, SCALE and ZERO.
 *     TITLE = LITERAL (Write)
@@ -216,16 +216,16 @@
 *        into the ICL variable mdim.
 
 *  Notes:
-*     -  If the WCS component of the NDF is undefined, then an attempt 
-*     is made to find WCS information from two other sources: first, an 
-*     IRAS90 astrometry structure, and second, the FITS extension.  If 
+*     -  If the WCS component of the NDF is undefined, then an attempt
+*     is made to find WCS information from two other sources: first, an
+*     IRAS90 astrometry structure, and second, the FITS extension.  If
 *     either of these sources yield usable WCS information, then it is
 *     displayed in the same way as the NDF WCS component.  Other KAPPA
 *     applications will use this WCS information as if it were stored in
 *     the WCS component.
 *     -  The reporting of NDF attributes is suppressed when the message
 *     filter environment variable MSG_FILTER is set to QUIET.  It
-*     benefits procedures and scripts where only the output parameters 
+*     benefits procedures and scripts where only the output parameters
 *     are needed.  The creation of output parameters is unaffected
 *     by MSG_FILTER.
 
@@ -237,7 +237,7 @@
 *     Copyright (C) 1995, 1997, 1999-2000, 2003-2004 Central Laboratory
 *     of the Research Councils. Copyright (C) 2005-2006 Particle
 *     Physics & Astronomy Research Council.
-*     Copyright (C) 2009 Science and Technology Facilities Council. 
+*     Copyright (C) 2009 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 
@@ -300,7 +300,7 @@
 *     30-SEP-2004 (PWD):
 *        Moved CNF_PAR out of executable code.
 *     16-MAR-2005 (DSB):
-*        Only write AXIS-related output parameters if the NDF has an 
+*        Only write AXIS-related output parameters if the NDF has an
 *        AXIS structure.
 *     17-MAR-2005 (DSB):
 *        Added FLBND and FUBND.
@@ -323,10 +323,13 @@
 *     2009 July 24 (MJC):
 *        Remove QUIET parameter and use the current reporting level
 *        instead (set by the global MSG_FILTER environment variable).
+*     13-APR-2010 (DSB):
+*        Always call KPG1_DSFRM, even if reporting is switched off, since
+*        it writes out the out value for output parameter FPIXSCALE.
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -651,7 +654,7 @@
 *  Instead we issue a warning message so that the application can
 *  continue by using world co-ordinates.
             CALL ERR_BEGIN( STATUS )
-            CALL KPG1_MONOD( .TRUE., EL, 
+            CALL KPG1_MONOD( .TRUE., EL,
      :                       %VAL( CNF_PVAL( AXPNTR( 1 ) ) ),
      :                       MONOTO( IAXIS ), STATUS )
             IF ( STATUS .NE. SAI__OK ) THEN
@@ -675,7 +678,7 @@
                CALL NDF_AMAP( INDF, 'Centre,Width', IAXIS, '_DOUBLE',
      :                        'READ', PNTR, EL, STATUS )
                CALL KPG1_AXRNG( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                          %VAL( CNF_PVAL( PNTR( 2 ) ) ), 
+     :                          %VAL( CNF_PVAL( PNTR( 2 ) ) ),
      :                          ASTART( IAXIS ),
      :                          AEND( IAXIS ), STATUS )
                CALL NDF_AUNMP( INDF, 'Centre,Width', IAXIS, STATUS )
@@ -737,7 +740,7 @@
 
 *  Axis Width Array:
 *  =================
-*  See whether or not the axis width array is defined.  If it is, then 
+*  See whether or not the axis width array is defined.  If it is, then
 *  obtain its attributes.
                CALL NDF_ASTAT( INDF, 'Width', IAXIS, WIDTH( IAXIS ),
      :                         STATUS )
@@ -856,14 +859,14 @@
                CALL MSG_OUT( 'DATA_ZERO',  '         Zero offset :  '//
      :                       '^ZERO', STATUS )
 
-            ELSE 
+            ELSE
                CALL MSG_SETI( 'SCAL', NINT( SCALE ) )
                CALL MSG_OUT( 'DATA_SCALE', '         Scale factor:  '//
      :                       '^SCAL', STATUS )
                CALL MSG_SETI( 'ZERO', NINT( ZERO ) )
                CALL MSG_OUT( 'DATA_ZERO',  '         Zero offset :  '//
      :                       '^ZERO', STATUS )
-            END IF    
+            END IF
          END IF
 
       ELSE
@@ -882,7 +885,7 @@
          CALL PAR_PUT0R( 'SCALE', REAL( SCALE ), STATUS )
          CALL PAR_PUT0R( 'ZERO', REAL( ZERO ), STATUS )
 
-      ELSE 
+      ELSE
          CALL PAR_PUT0I( 'SCALE', NINT( SCALE ), STATUS )
          CALL PAR_PUT0I( 'ZERO', NINT( ZERO ), STATUS )
       END IF
@@ -959,10 +962,10 @@
          IF( FORM .EQ. 'SCALED' ) THEN
             CALL NDF_SCTYP( INDF, 'Variance', SCTYP, STATUS )
             CALL NDF_GTSZD( INDF, 'Variance', SCALE, ZERO, STATUS )
-         
+
             IF ( REPORT ) THEN
                CALL MSG_SETC( 'SCTY', SCTYP )
-               CALL MSG_OUT( 'VAR_SCTYP', 
+               CALL MSG_OUT( 'VAR_SCTYP',
      :                       '         Scaled type :  ^SCTY', STATUS )
 
                IF( FTYPE .EQ. '_DOUBLE' ) THEN
@@ -981,14 +984,14 @@
                   CALL MSG_OUT( 'VAR_ZERO',  '         Zero offset :'//
      :                          '  ^ZERO', STATUS )
 
-               ELSE 
+               ELSE
                   CALL MSG_SETI( 'SCAL', NINT( SCALE ) )
                   CALL MSG_OUT( 'VAR_SCALE', '         Scale factor:'//
      :                          '  ^SCAL', STATUS )
                   CALL MSG_SETI( 'ZERO', NINT( ZERO ) )
                   CALL MSG_OUT( 'VAR_ZERO',  '         Zero offset :'//
      :                          '  ^ZERO', STATUS )
-               END IF    
+               END IF
             END IF
          END IF
 
@@ -1071,9 +1074,9 @@
 
 *  WCS component:
 *  ==============
-*  Get an AST pointer for the FrameSet defining the NDF's World 
+*  Get an AST pointer for the FrameSet defining the NDF's World
 *  Co-ordinate Systems.  Store the number of co-ordinate systems
-*  ("Frames") described by the FrameSet. 
+*  ("Frames") described by the FrameSet.
       CALL KPG1_GTWCS( INDF, IWCS, STATUS )
       NFRAME = AST_GETI( IWCS, 'NFRAME', STATUS )
 
@@ -1081,10 +1084,10 @@
       NFRM = 0
 
 *  Only proceed if there are more than the basic three Frames (GRID,
-*  PIXEL and AXIS) in the WCS FrameSet, or a listing of all Frames 
+*  PIXEL and AXIS) in the WCS FrameSet, or a listing of all Frames
 *  has been requested.
       IF ( NFRAME .GT. 3 .OR. FULLWC ) THEN
-         
+
 *  Start an AST context.
          CALL AST_BEGIN( STATUS )
 
@@ -1117,16 +1120,16 @@
                CALL MSG_BLANK( STATUS )
                CALL MSG_SETI( 'N', ICURR )
                CALL MSG_OUT( 'WCS_CURRENT',
-     :                 '      Current co-ordinate Frame (Frame ^N):', 
+     :                 '      Current co-ordinate Frame (Frame ^N):',
      :                       STATUS )
             END IF
 
          END IF
 
 *  Store the GRID co-ordinates of the centre of the first pixel.  This
-*  is defined to be (1.0,1.0,...).  This position will be mapped into 
-*  each of the other Frames, to find the co-ordinates of the first 
-*  pixel.  Also store the lower and upper bounds of the NDF in GRID 
+*  is defined to be (1.0,1.0,...).  This position will be mapped into
+*  each of the other Frames, to find the co-ordinates of the first
+*  pixel.  Also store the lower and upper bounds of the NDF in GRID
 *  co-ordinates.
          DO 301 IAXIS = 1, NDIM
             GFIRST( 1, IAXIS ) = 1.0D0
@@ -1138,7 +1141,7 @@
          DO 304 IFRAME = 1, NFRAME
 
 *  Make this Frame the current Frame
-            CALL AST_SETI( IWCS, 'CURRENT', IFRAME, STATUS )            
+            CALL AST_SETI( IWCS, 'CURRENT', IFRAME, STATUS )
 
 *  Get the Frame title, domain and dimensionality.
             FRMTTL = AST_GETC( IWCS, 'TITLE', STATUS )
@@ -1148,9 +1151,9 @@
 *  Remove any PGPLOT escape sequences from the title.
             CALL KPG1_PGESC( FRMTTL, STATUS )
 
-*  Put the title, domain and dimensionality in the arrays to be stored 
-*  in the output parameters if there is room. 
-            IF( NFRM .LT. MXFRM ) THEN               
+*  Put the title, domain and dimensionality in the arrays to be stored
+*  in the output parameters if there is room.
+            IF( NFRM .LT. MXFRM ) THEN
                NFRM = NFRM + 1
                WCSTTL( NFRM ) = FRMTTL
                WCSDMN( NFRM ) = FRMDMN
@@ -1160,11 +1163,11 @@
 *  If this is the current Frame, or if we are reporting full information
 *  on all Frames, get the bounds of the NDF in this Frame.
             IF( IFRAME .EQ. ICURR .OR. ( REPORT .AND. FULLFR ) ) THEN
-               MAP = AST_GETMAPPING( IWCS, AST__BASE, AST__CURRENT, 
+               MAP = AST_GETMAPPING( IWCS, AST__BASE, AST__CURRENT,
      :                              STATUS )
                DO IAXIS = 1, FRMNAX
                   CALL AST_MAPBOX( MAP, LBIN, UBIN, .TRUE., IAXIS,
-     :                             LBOUT( IAXIS ), UBOUT( IAXIS ), XL, 
+     :                             LBOUT( IAXIS ), UBOUT( IAXIS ), XL,
      :                             XU, STATUS )
                END DO
                CALL AST_ANNUL( MAP, STATUS )
@@ -1173,9 +1176,9 @@
                CALL AST_NORM( IWCS, LBOUT, STATUS )
                CALL AST_NORM( IWCS, UBOUT, STATUS )
 
-*  If this is the current Frame, write the bounds units and labels to 
+*  If this is the current Frame, write the bounds units and labels to
 *  the output parameters.
-               IF( IFRAME .EQ. ICURR ) THEN 
+               IF( IFRAME .EQ. ICURR ) THEN
                   CALL PAR_PUT1D( 'FLBND', FRMNAX, LBOUT, STATUS )
                   CALL PAR_PUT1D( 'FUBND', FRMNAX, UBOUT, STATUS )
 
@@ -1200,41 +1203,56 @@
                END IF
             END IF
 
-*  The rest we only do if we are reporting information on the screen. 
-*  Only display the Current Frame if parameter FULLWCS is FALSE.
-            IF ( REPORT .AND. ( FULLWC .OR. IFRAME .EQ. ICURR ) ) THEN
+*  If required (i.e. if this is the current Frame or we are displaying
+*  all Frames), display the Frame description. We need to call KPG1_DSFRM
+*  even if we are not reporting (e.g. due to QUIET=YES), because
+*  KPG1_DSFRM writes out the value to output parameter FPIXSCALE. Note,
+*  only include the "NDFTRACE:" prefix (which causes KPG1_DSFRM to write
+*  out the FPIXSCALE parameter value) if we are displaying the current
+*  Frame.
+            IF( IFRAME .EQ. ICURR .OR. FULLWC ) THEN
 
-*  Display the Frame index.
-               CALL MSG_SETI( 'INDEX', IFRAME )
+               IF( IFRAME .EQ. ICURR ) THEN
+                  BUF = 'NDFTRACE:'
+                  IAT = 9
+               ELSE
+                  BUF = ' '
+                  IAT = 0
+               END IF
+
                IF( FULLWC ) THEN
-                  CALL KPG1_DSFRM( IWCS, 
-     :                  'NDFTRACE:      Frame index: ^INDEX', 
-     :                             FULLFR, STATUS )
+                  CALL CHR_APPND( '      Frame index: ^INDEX', BUF,
+     :                            IAT )
 
                ELSE IF( FULLFR ) THEN
-                  CALL KPG1_DSFRM( IWCS, 
-     :                  'NDFTRACE:        Index               : ^INDEX',
-     :                             FULLFR, STATUS )
-               ELSE
-                  CALL KPG1_DSFRM( IWCS, 'NDFTRACE: ', FULLFR, STATUS )
-
+                  CALL CHR_APPND( '        Index               : '//
+     :                            '^INDEX', BUF, IAT )
                END IF
+
+               CALL MSG_SETI( 'INDEX', IFRAME )
+               CALL KPG1_DSFRM( IWCS, BUF( : IAT ), FULLFR, STATUS )
+
+            END IF
+
+*  The rest we only do if we are reporting information on the screen.
+*  Only display the Current Frame if parameter FULLWCS is FALSE.
+            IF ( REPORT .AND. ( FULLWC .OR. IFRAME .EQ. ICURR ) ) THEN
 
 *  Display the bounds of the NDF in this Frame if full frame information
 *  is being displayed.
                IF( FULLFR ) THEN
-                  CALL MSG_OUT( 'WCS_WBND1', 
+                  CALL MSG_OUT( 'WCS_WBND1',
      :                          '        NDF Bounding Box:', STATUS )
                   CALL MSG_BLANK( STATUS )
 
                   DO IAXIS = 1, FRMNAX
                      CALL MSG_SETI( 'I', IAXIS )
-                     CALL MSG_SETC( 'L', AST_FORMAT( IWCS, IAXIS, 
+                     CALL MSG_SETC( 'L', AST_FORMAT( IWCS, IAXIS,
      :                                        LBOUT( IAXIS ), STATUS ) )
-                     CALL MSG_SETC( 'U', AST_FORMAT( IWCS, IAXIS, 
+                     CALL MSG_SETC( 'U', AST_FORMAT( IWCS, IAXIS,
      :                                        UBOUT( IAXIS ), STATUS ) )
-                     CALL MSG_OUT( 'WCS_WBND2', 
-     :                             '           Axis ^I: ^L -> ^U', 
+                     CALL MSG_OUT( 'WCS_WBND2',
+     :                             '           Axis ^I: ^L -> ^U',
      :                             STATUS )
                   END DO
 
@@ -1243,7 +1261,7 @@
                END IF
             END IF
 
- 304     CONTINUE 
+ 304     CONTINUE
 
 *  Re-instate the original current Frame.
          CALL AST_SETI( IWCS, 'CURRENT', ICURR, STATUS )
