@@ -20,7 +20,7 @@
 #                        sum( psf_i**2/input_variance_i )
 
 #  Invocation:
-#    matched-filter [-np] [-s sigma2] <in> <out>  [<psf>]
+#    matched-filter [-np] [-s fwhm] <in> <out>  [<psf>]
 
 #  Options:
 #    -np - If the script creates a new PSF (i.e. if the <psf> parameter is
@@ -28,24 +28,22 @@
 #          a peak value of unity. Without this option, the new PSF is
 #          normalised to a total data sum of unity.
 #    -s  - If the script creates a new PSF (i.e. if the <psf> parameter is
-#          not supplied on the command line), then use a double Gaussian
-#          PSF. The sigma (in arc-seconds) for the secondary Gaussian should
-#          be given following the "-s" option (e.g. "matched-filter -s 19"
-#          to use a secondary Gaussian with sigma=19 arc-sec). The double
-#          Gaussian PSF is formed by creating the normal single Gaussian PSF,
-#          and then subtracting from it a Gaussian PSF with the specified
-#          secondary sigma. Prior to taking their difference, the primary and
-#          secondary Gaussians both have a total data value of unity. After
-#          the difference is taken, the resulting PSF is re-normalised to
-#          have a total data sum of unity (or a peak value of unity if the
-#          "-np" option is supplied).
+#          not supplied on the command line), then a slowly varying background
+#          is estimated and removed from the supplied image before the filter
+#          is applied. The background to remove is created by smoothing the
+#          image with a wide Gaussian. The FWHM of this Gaussian should be
+#          specified (in arc-seconds) on the command line after the "-s"
+#          option. In order to compensate for this, the PSF is also
+#          processed in the same way (i.e. it is smoothed using the wide
+#          Gaussian and the smoothed PSF is then removed from the original
+#          PSF).
 
 #  Parameters:
 #    <in> - The input image.
 #    <out> - The output image.
 #    <psf> - An optional PSF image.
 
-#  Notes:"
+#  Notes:
 #    - If no PSF is supplied, a Gaussian PSF is used with FWHM
 #      equal to the Airy disk radius.
 #    - The centre of the supplied PSF is assumed to be at pixel (0,0).
@@ -65,6 +63,8 @@
 #         provide the "-np" option to retain the old behaviour (normalising
 #         to a peak value of unity).
 #       - Added the "-s" option.
+#    2010-4-14 (DSB):
+#       - Changed to use Ed's way of removing background variations.
 
 #  Copyright:
 #     Copyright (C) 2010 Science & Technology Facilities Council.
@@ -93,7 +93,7 @@
 #  (e.g. NDF names) to a separate list held in "arg_list".
    set norm = sum
    set arg_list = ""
-   set sigma2 = ""
+   set fwhm_bg = ""
 
    while( $# > 0 )
       set arg = $1
@@ -106,7 +106,7 @@
          set norm = sum
 
       else if( "$arg" == "-s" ) then
-         set sigma2 = $1
+         set fwhm_bg = $1
          shift
 
       else
@@ -118,7 +118,7 @@
 #  Check the input and output NDFs and the PSF were specified on the
 #  command line.
 if( $#arg_list < 2 ) then
-   echo "Usage: matched-filter [-ns] [-np] <in.sdf> <out.sdf> [<psf.sdf>]"
+   echo "Usage: matched-filter [-np] [-s fwhm] <in.sdf> <out.sdf> [<psf.sdf>]"
    exit
 endif
 
@@ -139,6 +139,14 @@ set dir = `dirname $arg_list[2]`
 set base = `basename $arg_list[2] .sdf`
 set out = "$dir/$base"
 
+# Get the input pixel size, in arc-second. Note, cannot use QUIET=YES here,
+# as it seems to stop the output parameter values being written to the
+# ndftrace parameter file in ~/adam. We assume the first pixel axis is a
+# spatial axis, and that pixels are square.
+$KAPPA_DIR/ndftrace $in fullframe > /dev/null
+set insize = `$KAPPA_DIR/parget fpixscale\(1\) ndftrace`
+
+# If a PSF was given, check it exists.
 if( $#arg_list > 2 ) then
    set dir = `dirname $arg_list[3]`
    set base = `basename $arg_list[3] .sdf`
@@ -166,13 +174,6 @@ else
       echo "Data is not from JCMT"
       exit
    endif
-
-# Get the input pixel size, in arc-second. Note, cannot use QUIET=YES here,
-# as it seems to stop the output parameter values being written to the
-# ndftrace parameter file in ~/adam. We assume the first pixel axis is a
-# spatial axis, and that pixels are square.
-   $KAPPA_DIR/ndftrace $in fullframe > /dev/null
-   set insize = `$KAPPA_DIR/parget fpixscale\(1\) ndftrace`
 
 # Get the wavelength (in metres).
    set wavelen = `$KAPPA_DIR/fitsmod $in edit=print keyword=WAVELEN`
@@ -203,29 +204,6 @@ else
 # image will have a total data sum of unity.
    $KAPPA_DIR/gausmooth in=mf_temp2 fwhm=$airy_pix out=mf_psf
 
-# If we are adding a second component to the PSF...
-   if( "$sigma2" != "" ) then
-
-# Convert sigma2 from arc-sec to input pixels, and convert from sigma to FWHM.
-# The constant 2.35482 is 2*sqrt(2*ln(2.0))
-      set fwhm2_pix = `$KAPPA_DIR/calc exp="'2.35482*pa/pb'" pa=$sigma2 pb=$insize`
-
-# Smooth the spike image using a Gaussian kernel with this FWHM.
-      $KAPPA_DIR/gausmooth in=mf_temp2 fwhm=$fwhm2_pix out=mf_psf2
-
-# Since gausmooth conserves total data value, we know that the mf_psf and
-# mf_psf2 images each have a total data sum of unity, and so are normalised
-# correctly with respect to each other. So we can just subtract them to get
-# the final PSF.
-      $KAPPA_DIR/sub in1=mf_psf in2=mf_psf2 out=mf_temp3
-
-# Normalise the new double PSF to a total data sum of unity, over-writing
-# the old (single) PSF.
-      $KAPPA_DIR/stats mf_temp3 quiet
-      set sum = `$KAPPA_DIR/parget total stats`
-      $KAPPA_DIR/cdiv in=mf_temp3 scalar=$sum out=mf_psf
-   endif
-
 # If required, normalise the PSF to a peak value of 1.0 instead of a total
 # value of 1.0
    if( $norm == peak ) then
@@ -237,6 +215,35 @@ else
 
 # Use the new PSF.
    set psf = mf_psf
+
+endif
+
+# If a background fwhm was given on the command line, remove a background
+# from the supplied image and from the PSF.
+if( "$fwhm_bg" != "" ) then
+
+# Convert the supplied FWHM from arc-sec to input pixels.
+   set fwhm_pix = `$KAPPA_DIR/calc exp="'pa/pb'" pa=$fwhm_bg pb=$insize`
+
+#  Smooth the input image with a Gaussian of this FWHM to get an estimate
+#  of the background in the image.
+   $KAPPA_DIR/gausmooth in=$in fwhm=$fwhm_pix out=mf_temp1
+
+#  Remove this background from the supplied image.
+   $KAPPA_DIR/sub in1=$in in2=mf_temp1 out=mf_in
+
+#  Use this instead of the supplied input image in future.
+   set in = mf_in
+
+#  Smooth the PSF with a Gaussian of this FWHM to get an estimate
+#  of the "background" (sort of) in the PSF.
+   $KAPPA_DIR/gausmooth in=$psf fwhm=$fwhm_pix out=mf_temp1
+
+#  Remove this background from the PSF.
+   $KAPPA_DIR/sub in1=$psf in2=mf_temp1 out=mf_psf2
+
+#  Use this instead of the original PSF in future.
+   set psf = mf_psf2
 
 endif
 
@@ -301,5 +308,6 @@ $KAPPA_DIR/maths exp="1/IA" ia=mf_b out=mf_temp1
 $KAPPA_DIR/setvar ndf=$out from=mf_temp1 comp=data
 
 #  Clean up.
-rm -f mf_temp1.sdf mf_temp2.sdf mf_temp3.sdf mf_psf.sdf a.sdf b.sdf
+rm -f mf_in.sdf mf_psf2.sdf mf_temp1.sdf mf_temp2.sdf mf_temp3.sdf \
+      mf_psf.sdf mf_a.sdf mf_b.sdf
 
