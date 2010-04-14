@@ -59,6 +59,11 @@
 *     2010-04-09 (TIMJ):
 *        Add snr filter for fit in linear case.
 *        Use correct power values in the presence of bad data.
+*     2010-04-14 (TIMJ):
+*        Use correlation coefficient to flag fits where the data doesn't
+*        really look like the fitted function. The issue is that the error
+*        bars are large enough in some cases that a curvy flatfield can be
+*        fit by a straight line with a reasonable signal-to-noise.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -106,12 +111,15 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
   double * bolvar = NULL;   /* Pointer to bolvald variance */
   const double CLIP = 3.0;  /* Sigma clipping for polynomial fit */
   double * coptr = NULL;    /* pointer to coefficients data array */
+  double * corrs = NULL;    /* correlation coefficients for each bolometer */
+  double corr_thresh = 0.0; /* threshold for correlation coefficient thresholding */
   double * goodht = NULL;   /* Heater values for good measurements */
   size_t * goodidx = NULL;     /* Indices of good measurements */
   double * ht = NULL;       /* Heater values corrected for reference */
   size_t j;
   const size_t NCOEFF = 6;  /* Max number of coefficients per bolometer */
   size_t nbol = 0;          /* Number of bolometers */
+  size_t ncorr = 0;          /* Number of bolometers flagged due to bad correlation coefficient */
   size_t nheat = 0;         /* Number of measurements */
   size_t nsnr = 0;          /* Number of bolometers flagged by SNR limit */
   double *poly = NULL;      /* polynomial expansion of each fit */
@@ -181,6 +189,7 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
   scoeff = smf_malloc( order + 1, sizeof(*scoeff), 0, status );
   scoeffvar = smf_malloc( order + 1, sizeof(*scoeffvar), 0, status );
   goodidx = smf_malloc( nheat, sizeof(*goodidx), 1, status );
+  corrs = smf_malloc( nbol, sizeof(*corrs), 0, status );
 
   /* Assume that we have monotonically increasing heater settings and so
      pick a value from the middle as a reference. Ramps may well have an
@@ -200,6 +209,9 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
     double refvar = 0.0;
     size_t i;
     size_t nrgood = 0;
+
+    /* initialise the correlation coefficients array */
+    if (corrs) corrs[bol] = VAL__BADD;
 
     if (bolvar) {
       refvar = bolvar[nbol*(nheat/2)+bol];
@@ -248,6 +260,9 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
       if (order == 1) {
         double c0;
         double c1;
+        double gain;
+        double offset;
+        double corr;
 
         smf_fit_poly1d( order, nrgood, CLIP, goodht, scan, scanvar, scoeff, scoeffvar, poly, &nused, status);
 
@@ -276,6 +291,18 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
           }
         }
 
+        /* Now compare the fit to the data and get a correlation coefficient to decide
+           whether the data really do look like the fit. We need this because sometimes a nice
+           curvy line gets a high signal-to-noise linear fit. Ignore non-linear for the moment. Only
+           do this test if the SNR test has passed. */
+
+        if (c0 != VAL__BADD && c1 != VAL__BADD) {
+          smf_templateFit1D( scan, NULL, 0, 0, nrgood, 1, poly, 0, &gain, &offset, &corr, status );
+          msgOutiff(MSG__DEBUG20, "",
+                    " Template: Bol %zd Gain = %g offset = %g corr = %g", status, bol, gain, offset, corr );
+          corrs[bol] = corr;
+        }
+
         if (c0 != VAL__BADD && c1 != VAL__BADD) {
           /* simple inverse of straight line fit */
           scoeff[0] = -1.0 * c0 / c1;
@@ -286,6 +313,7 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
         /* disable variance and fit the other way */
         smf_fit_poly1d( order, nrgood, CLIP, scan, goodht, NULL, scoeff, NULL, NULL, &nused, status);
       }
+
 
       /* copy the result into coptr */
       for (i=0; i<=order; i++) {
@@ -328,8 +356,52 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
 
   }
 
+  /* Analyze correlation coefficients */
+  if (corrs) {
+    double csig = VAL__BADD;
+    double cmean = VAL__BADD;
+    size_t ngood = 0;
+    double corr_bigtol = 3.0;
+    double corr_smalltol = 0.75;
+    double delta_mean = 0.0;
+
+    smf_stats1D( corrs, 1, nbol, NULL, 0, 0, &cmean, &csig, &ngood, status );
+
+    msgOutiff( MSG__DEBUG20, "", "Fit Correlation coefficients = %g +/- %g (%zd)\n",
+               status, cmean, csig, ngood);
+
+    /* Now loop over the bolometers and throw out the ones on the lower end of the
+       scale. If the mean is within 0.5 sigma of 1.0 we use a "mean - 1 sigma" threshold,
+       else we use a "mean - 3 sigma" threshold. We do this because the case where the
+       distribution is jammed up against 1.0 is decidedly non-gaussian. */
+    delta_mean = ( 1.0 - cmean ) / csig;
+    if ( delta_mean < 0.5 ) {
+      corr_thresh = corr_smalltol;
+    } else {
+      corr_thresh = corr_bigtol;
+    }
+    corr_thresh = cmean - ( csig * corr_thresh );
+    for ( bol = 0; bol < nbol; bol++ ) {
+      if (corrs[bol] != VAL__BADD && corrs[bol] < corr_thresh ) {
+        size_t i;
+        ncorr++;
+        /* blank that bolometer */
+        for (i=0; i<NCOEFF;i++) {
+          coptr[i*nbol+bol] = VAL__BADD;
+        }
+      }
+    }
+
+  }
+
+
   msgOutiff( MSG__VERB, "", "Flagged %zd bolometers with gradients failing SNR > %g",
              status, nsnr, snrmin);
+  if (ncorr > 0) {
+    msgOutiff( MSG__VERB, "", "Flagged %zd bolometers with fit correlation coefficients < %g",
+               status, ncorr, corr_thresh );
+  }
+
 
   if (polybol) {
     if (polyfit) {
@@ -354,6 +426,7 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
   if (ht) ht = smf_free( ht, status );
   if (goodht) goodht = smf_free( goodht, status );
   if (goodidx) goodidx = smf_free( goodidx, status );
+  if (corrs) corrs = smf_free( corrs, status );
 
   if (*status != SAI__OK) {
     if (*coeffs) smf_close_file( coeffs, status );
