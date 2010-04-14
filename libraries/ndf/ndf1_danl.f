@@ -56,12 +56,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -117,7 +117,7 @@
 *     1-JUL-1997 (RFWS):
 *        Added support for the WCS component.
 *     21-AUG-2000 (DSB):
-*       Release the NDF data object as a whole, and release the DCB slot 
+*       Release the NDF data object as a whole, and release the DCB slot
 *       associated with the data object, even if it has no DATA_ARRAY.
 *     31-OCT-2007 (DSB):
 *        Add call to NDF1_EVENT.
@@ -129,7 +129,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -232,7 +232,7 @@
 
 *  Begin a new error reporting environment.
       CALL ERR_BEGIN( STATUS )
-       
+
 *  Decrement the data object reference count.
       STATUS = SAI__OK
       DCB_REFCT( IDCB ) = DCB_REFCT( IDCB ) - 1
@@ -242,7 +242,7 @@
       IF ( DCB_REFCT( IDCB ) .LE. 0 ) THEN
 
 *  Assign the name of the data file to the MSG token "NDF_EVENT"
-         CALL NDF1_DMSG( 'NDF_EVENT', IDCB )
+         CALL NDF1_EVMSG( 'NDF_EVENT', IDCB )
 
 *  Raise an NDF event, describing the closing of a new NDF.
          CALL NDF1_EVENT( 'CLOSE_NDF', STATUS )
@@ -433,19 +433,19 @@
                CALL NDF1_HDERR( IDCB, .TRUE., STATUS )
             END IF
 
-*  If there is any chance that the history records are not in chronological 
+*  If there is any chance that the history records are not in chronological
 *  order, sort them.
             CALL ERR_BEGIN( STATUS )
             IF( DCB_HSORT( IDCB ) ) THEN
-               CALL PSX_CALLOC( DCB_HNREC( IDCB ), '_DOUBLE', IPW1, 
+               CALL PSX_CALLOC( DCB_HNREC( IDCB ), '_DOUBLE', IPW1,
      :                          STATUS )
-               CALL PSX_CALLOC( DCB_HNREC( IDCB ), '_INTEGER', IPW2, 
+               CALL PSX_CALLOC( DCB_HNREC( IDCB ), '_INTEGER', IPW2,
      :                          STATUS )
-	       
-               CALL NDF1_HSRT( IDCB, DCB_HNREC( IDCB ), 
+
+               CALL NDF1_HSRT( IDCB, DCB_HNREC( IDCB ),
      :                         %VAL( CNF_PVAL( IPW1 ) ),
      :                         %VAL( CNF_PVAL( IPW2 ) ), STATUS )
-	       
+
                CALL PSX_FREE( IPW1, STATUS )
                CALL PSX_FREE( IPW2, STATUS )
                DCB_HSORT( IDCB ) = .FALSE.
@@ -482,7 +482,7 @@
 *  Release the DCB slot associated with the data object.
          CALL NDF1_RLS( NDF__DCB, IDCB, STATUS )
       END IF
-       
+
 *  Call the error tracing routine if appropriate.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_DANL', STATUS )
 

@@ -57,12 +57,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -121,7 +121,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -152,11 +152,11 @@
 *        DCB_MOD( NDF__MXDCB ) = CHARACTER * ( NDF__SZMOD ) (Read and
 *        Write)
 *           The NDF's access mode.
-      
+
       INCLUDE 'NDF_ACB'          ! NDF_ Access Control Block
 *        ACB_IDCB( NDF__MXACB ) = INTEGER (Read)
 *           Index to data object entry in the DCB.
-      
+
       INCLUDE 'NDF_FCB'          ! NDF_ Format Conversion Block
 *        FCB_FEX1( 2 * NDF__MXFMT ) = INTEGER (Read)
 *           Character positions of start of each foreign format file
@@ -269,20 +269,20 @@
 *  Foreign formats.
 *  ===============
 *  If there are foreign formats to be recognised, then first check for URI's
-*  and construct an appropriate standard foreign file format, then split the 
+*  and construct an appropriate standard foreign file format, then split the
 *  NDF name into an object name and an (optional) subscript expression.
          ELSE
             IF( INDEX( NAME, '://' ) .GT. 0 ) URL = .TRUE.
             CALL NDF1_NSPLT( NAME, .FALSE., O1, O2, S1, S2, STATUS )
             IF ( STATUS .EQ. SAI__OK ) THEN
 
-*  The object name found above may include a foreign extension specifier 
+*  The object name found above may include a foreign extension specifier
 *  (e.g. a FITS extension). Locate the start and and of any such string.
                CALL NDF1_FORXT( NAME( : O2 ), X1, X2, STATUS )
 
 *  At the moment, foreign extension specifiers can only be used when
 *  converting from a foreign format to NDF, not the other way round.
-*  Therefore, report an error if the object name includes a foreign 
+*  Therefore, report an error if the object name includes a foreign
 *  extension specifier and the access mode is not READ.
                IF ( VMODE .NE. 'READ' .AND. X1 .LE. X2 .AND.
      :              STATUS .EQ. SAI__OK ) THEN
@@ -290,7 +290,7 @@
                   CALL MSG_SETC( 'MODE', VMODE )
                   CALL MSG_SETC( 'FILE', NAME )
                   CALL ERR_REP( 'NDF1_OPFOR_FXSA1', 'Unable to open '//
-     :            'the foreign format file ''^FILE'' for ^MODE access.', 
+     :            'the foreign format file ''^FILE'' for ^MODE access.',
      :                           STATUS )
                   CALL MSG_SETC( 'EX', NAME( X1 : X2 ) )
                   CALL ERR_REP( 'NDF1_OPFOR_FXSA2', 'Extension '//
@@ -370,11 +370,11 @@
                      CALL NDF1_CMPFL( FEXT,
      :                                FCB_FMT( F1 : F2 ), FOUND,
      :                                STATUS )
-     
+
 *  Quit searching if a match is found or an error occurs.
                      IF ( FOUND .OR. ( STATUS .NE. SAI__OK ) ) GO TO 2
  1                CONTINUE
- 2                CONTINUE                 
+ 2                CONTINUE
 
 *  If the file name extension was not recognised, then open the NDF
 *  directly as a native format object, using the original name string.
@@ -397,7 +397,7 @@
                         ELSE
                            REPORT = .TRUE.
                         END IF
-                        
+
                         CALL NDF1_FILEX( EXPFIL( : LEXP ), VMODE,
      :                                   REPORT, FOUND, STATUS )
 
@@ -439,7 +439,7 @@
 *  code be returned (now that we know the file exists and is
 *  accessible). Save the results for later use.
                         IF ( CVT ) THEN
-                           IF( URL ) THEN 
+                           IF( URL ) THEN
                               FORFIL = EXPFIL
                               LFOR = LEXP
                               FORID = ' '
@@ -526,7 +526,7 @@
                         IF ( ( STATUS .NE. SAI__OK ) .OR.
      :                       FOUND ) GO TO 4
  3                   CONTINUE
- 4                   CONTINUE                 
+ 4                   CONTINUE
 
 *  If no suitable file was found, then report an error.
                      IF ( STATUS .EQ. SAI__OK ) THEN
@@ -590,22 +590,22 @@
 *  existing DCB entry.
                   CALL NDF1_FORXT( DCB_FORFL( IDCB ), XX1, XX2, STATUS )
 
-*  If neither the new entry, nor the existing entry refer to a specific 
+*  If neither the new entry, nor the existing entry refer to a specific
 *  foreign extension, indicate that the require structure is already
 *  active.
                   IF ( XX1 .GT. XX2 .AND. X1 .GT. X2 ) THEN
                      ACTIVE = .TRUE.
 
-*  If one but not both entries refer to a specific foreign extension, 
+*  If one but not both entries refer to a specific foreign extension,
 *  indicate that the require structure is not already active.
                   ELSE IF ( XX1 .GT. XX2 .OR. X1 .GT. X2 ) THEN
                      ACTIVE = .FALSE.
 
-*  If both entries refer to the same foreign extension, indicate that the 
+*  If both entries refer to the same foreign extension, indicate that the
 *  require structure is already active.
-                  ELSE 
+                  ELSE
                      ACTIVE = ( DCB_FORFL( IDCB )( XX1 : XX2 ) .EQ.
-     :                          NAME( X1 : X2 ) ) 
+     :                          NAME( X1 : X2 ) )
                   ENDIF
 
 *  Leave the loop if we have found that the new entry is already active.
@@ -614,7 +614,7 @@
                END IF
                GO TO 5
             END IF
- 6          CONTINUE           
+ 6          CONTINUE
 
 *  If the foreign file is already associated with an NDF, then that NDF
 *  will contain a converted copy, so there is no need to repeat the
@@ -655,9 +655,9 @@
                   CALL NDF1_NTFOR( FORFIL( : LFOR ), IFMT, TCB_KEEP,
      :                             NDFLOC, NDFNAM, LNAM, STATUS )
 
-*  If we are getting an 'SDF' file (i.e. no file type) from a URL there will 
-*  be no true conversion step to produce the NDF specified by NDF1_NTFOR, so 
-*  we force NDFNAM to the name of the NDF being retrieved but preceded by 
+*  If we are getting an 'SDF' file (i.e. no file type) from a URL there will
+*  be no true conversion step to produce the NDF specified by NDF1_NTFOR, so
+*  we force NDFNAM to the name of the NDF being retrieved but preceded by
 *  'URL'. This NDF will be affected by the KEEP tuning parameter.
                   IF ( URL ) THEN
                      IF( T2 .LE. T1 ) THEN
@@ -774,7 +774,7 @@
       END IF
 
 *  Assign the name of the data file to the MSG token "NDF_EVENT"
-      CALL NDF1_DMSG( 'NDF_EVENT', ACB_IDCB( IACB ) )
+      CALL NDF1_EVMSG( 'NDF_EVENT', ACB_IDCB( IACB ) )
 
 *  Raise an NDF event, describing the opening of an existing NDF.
       IF( VMODE .EQ. 'READ' ) THEN

@@ -55,12 +55,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -147,7 +147,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -289,7 +289,7 @@
 *  read" event. If the caller has registered a handler for this type of
 *  event (using NDF_HNDLR), it will be called.
             IF( STATUS .EQ. SAI__OK ) THEN
-               CALL NDF1_DMSG( 'NDF_EVENT', IDCB1  )
+               CALL NDF1_EVMSG( 'NDF_EVENT', IDCB1  )
                CALL NDF1_EVENT( 'READ_DATA', STATUS )
             END IF
 
@@ -430,7 +430,7 @@
          CALL NDF1_VFRM( IACB1, DCB_VFRM( IDCB2 ), STATUS )
          CALL NDF1_CBFRM( NDIM, LBND, UBND, DCB_VFRM( IDCB2 ), STATUS )
          IF ( STATUS .EQ. SAI__OK ) THEN
-         
+
 *  If the variance component is being propagated, then see if the old
 *  ACB ARY_ system identifier for the variance array is valid. If not,
 *  then the variance array does not exist, so there is nothing more to
@@ -511,7 +511,7 @@
          CALL NDF1_CRNBN( IDCB2, IACB2, STATUS )
 
 *  Assign the name of the data file to the MSG token "NDF_EVENT"
-         CALL NDF1_DMSG( 'NDF_EVENT', IDCB2 )
+         CALL NDF1_EVMSG( 'NDF_EVENT', IDCB2 )
 
 *  Raise an NDF event, describing the opening of a new NDF.
          CALL NDF1_EVENT( 'OPEN_NEW_NDF', STATUS )

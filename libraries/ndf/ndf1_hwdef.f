@@ -49,12 +49,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -89,7 +89,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -197,11 +197,11 @@
                IF ( STATUS .EQ. SAI__OK ) THEN
                   DCB_HDEF( IDCB ) = .FALSE.
 
-*  Use NDF1_EVENT to flag a "default history written" event. If the caller 
-*  has registered a handler for this type of event (using NDF_HNDLR), it 
-*  will be called. First, assign the name of the NDF to the MSG token 
+*  Use NDF1_EVENT to flag a "default history written" event. If the caller
+*  has registered a handler for this type of event (using NDF_HNDLR), it
+*  will be called. First, assign the name of the NDF to the MSG token
 *  "NDF_EVENT", then raise the event.
-                  CALL NDF1_DMSG( 'NDF_EVENT', IDCB )
+                  CALL NDF1_EVMSG( 'NDF_EVENT', IDCB )
                   CALL NDF1_EVENT( 'DEF_HISTORY', STATUS )
 
                END IF

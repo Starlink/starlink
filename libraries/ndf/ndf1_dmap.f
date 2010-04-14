@@ -81,12 +81,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -121,7 +121,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -230,7 +230,7 @@
 *  the ACB.
          CALL ARY_BAD( ACB_DID( IACB ), .FALSE., ACB_DMBAD( IACB ),
      :                 STATUS )
-       
+
 *  If a modifiable copy of the mapped values is required, but they may
 *  be held in a read-only buffer, then a copy must be made in a
 *  temporary array.
@@ -301,15 +301,15 @@
       IF( STATUS .EQ. SAI__OK ) THEN
 
 *  Assign the name of the data file to the MSG token "NDF_EVENT"
-         CALL NDF1_DMSG( 'NDF_EVENT', ACB_IDCB( IACB ) )
+         CALL NDF1_EVMSG( 'NDF_EVENT', ACB_IDCB( IACB ) )
 
 *  Raise an appropriate NDF event.
          IF( MODE .EQ. 'READ' ) THEN
             CALL NDF1_EVENT( 'READ_DATA', STATUS )
-   
+
          ELSE IF( MODE .EQ. 'WRITE' ) THEN
             CALL NDF1_EVENT( 'WRITE_DATA', STATUS )
-   
+
          ELSE IF( MODE .EQ. 'UPDATE' ) THEN
             CALL NDF1_EVENT( 'UPDATE_DATA', STATUS )
          END IF

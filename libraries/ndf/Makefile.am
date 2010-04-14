@@ -67,8 +67,8 @@ ndf1_dav.f ndf1_daw.f ndf1_dbad.f ndf1_dc.f ndf1_dcre.f ndf1_dcrep.f   \
 ndf1_dd.f ndf1_del.f ndf1_delob.f ndf1_dh.f ndf1_dimp.f ndf1_dlfor.f   \
 ndf1_dmap.f ndf1_dmsg.f ndf1_dnfor.f ndf1_dq.f ndf1_dqanl.f	       \
 ndf1_dump.f ndf1_dv.f ndf1_dvanl.f ndf1_dw.f ndf1_dx.f ndf1_ellip.f    \
-ndf1_expid.f ndf1_exppl.f ndf1_ffs.f ndf1_filex.f ndf1_fmhdt.f	       \
-ndf1_forxt.f ndf1_fsplt.f ndf1_gadex.f ndf1_gawex.f       \
+ndf1_expid.f ndf1_exppl.f ndf1_evmsg.f ndf1_ffs.f ndf1_filex.f         \
+ndf1_fmhdt.f ndf1_forxt.f ndf1_fsplt.f ndf1_gadex.f ndf1_gawex.f       \
 ndf1_gtbb.f ndf1_gtenv.f ndf1_gthdt.f ndf1_gtxtn.f ndf1_h2ast.f	       \
 ndf1_hcpy.f ndf1_hdcre.f ndf1_hderr.f ndf1_htlen.f ndf1_fr2px.f \
 ndf1_hfwrt.f ndf1_hincr.f ndf1_hlerr.f ndf1_hnew.f ndf1_hprp.f	       \
@@ -159,4 +159,4 @@ ndf_cnulltest_LDADD = libndf.la `$(srcdir)/ndf_link` `cnfrtl_link`  @FCLIBS@
 dist_starnews_DATA = ndf.news
 dist_pkgdata_DATA = LICENCE
 
-EXTRA_DIST = $(PRIVATE_INCLUDES) 
+EXTRA_DIST = $(PRIVATE_INCLUDES)

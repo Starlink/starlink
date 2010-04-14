@@ -13,26 +13,31 @@
 *     CALL NDG_ENDPV( CREATR, STATUS )
 
 *  Description:
-*     This routine should be called to mark the end of an NDF 
-*     provenance block. The block should have been started by a 
-*     matching call to NDG_BEGPV. Note, provenance blocks must 
+*     This routine should be called to mark the end of an NDF
+*     provenance block. The block should have been started by a
+*     matching call to NDG_BEGPV. Note, provenance blocks must
 *     not be nested.
 *
-*     During a provenance block, a list is maintained of all the 
-*     existing NDFs that have had their Data array mapped (either in 
-*     read or update mode) during the block. Another list is maintained 
-*     of all the NDFs that have been written (either existing NDFs 
+*     During a provenance block, a list is maintained of all the
+*     existing NDFs that have had their Data array mapped (either in
+*     read or update mode) during the block. Another list is maintained
+*     of all the NDFs that have been written (either existing NDFs
 *     accessed in update mode or new NDFs) during the block.
 *
-*     When the block ends, the provenance information within each 
+*     When the block ends, the provenance information within each
 *     NDF in the second may be modified to include all the NDFs in the
 *     first list as parents. Whether or not this occurs is controlled by
 *     the AUTOPROV environment variable. If AUTOPROV is set to '1' then
 *     the input NDFs are added to the provenance information in the
 *     output NDF. If AUTOPROV is set to anything other than '1' then the
-*     output provenance is not updated. If AUTOPROV is not set at all, 
-*     then the output provenance will be updated only if one or more of 
-*     the input NDFs contains a PROVENANCE extension.
+*     output provenance is not updated. If AUTOPROV is not set at all,
+*     the default behaviour is different for native and foreign format
+*     NDFs. For native format output NDFs, the provenance will be updated
+*     if one or more of the input NDFs contains a PROVENANCE extension
+*     (foreign format input NDFs are ignored). The provenance within foreign
+*     format output NDFs is never updated unless AUTPOPROV is set explicitly
+*     to '1' (this is to avoid the potentially costly process of format
+*     conversion).
 
 *  Arguments:
 *     CREATR = CHARACTER * ( * ) (Given)
@@ -43,7 +48,7 @@
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 2007-2008 Science & Technology Facilities Council.
+*     Copyright (C) 2007-2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -51,12 +56,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -70,7 +75,7 @@
 *     31-OCT-2007 (DSB):
 *        Original version.
 *     5-NOV-2007 (DSB):
-*        - Allow propagation of provenance to be controlled by the AUTOPROV 
+*        - Allow propagation of provenance to be controlled by the AUTOPROV
 *        environment variable.
 *        - Annul errors and continue if any NDF cannot be opened.
 *     21-NOV-2007 (DSB):
@@ -81,20 +86,22 @@
 *        names, which can be very slow for large numbers of NDFs).
 *     4-JUL-2008 (DSB):
 *        Set the history update mode of the output NDF to SKIP, in
-*        order to prevent a new history record being added to the output 
+*        order to prevent a new history record being added to the output
 *        NDF as a consequence of it being re-opened.
 *     1-SEP-2008 (DSB):
 *        Only include provenance from input NDFs that have had their Data
 *        array mapped for read or update.
 *     5-JAN-2010 (DSB):
 *        Ignore any input NDF that is contained within another input NDF.
+*     13-APR-2010 (DSB):
+*        Do not propagate provenance by default for foreign format NDFs.
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -109,7 +116,7 @@
       INCLUDE 'NDG_COM1'         ! Global provenance information
 
 *  Arguments Given:
-      CHARACTER CREATR*(*) 
+      CHARACTER CREATR*(*)
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -120,9 +127,11 @@
 
 *  Local Variables:
       CHARACTER AUTOPV*10
+      CHARACTER PATH*512
       CHARACTER RDNDF*512
       CHARACTER RDNDF2*512
       CHARACTER WRNDF*512
+      INTEGER IAT
       INTEGER INDF1
       INTEGER INDF2
       INTEGER IPROV
@@ -134,6 +143,7 @@
       INTEGER NR
       INTEGER NW
       INTEGER PLACE
+      LOGICAL FORFMT
       LOGICAL HASHIS
       LOGICAL INPRV
       LOGICAL OLD
@@ -161,21 +171,21 @@
       CALL ERR_END( STATUS )
 
 *  If no error has occurred, update the provenance information in each
-*  NDF writen during the provenance block if required. 
+*  NDF writen during the provenance block if required.
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  See if the environment variable AUTOPROV is defined. If so, get its
 *  value.
          CALL PSX_GETENV( 'AUTOPROV', AUTOPV, STATUS )
 
-*  If the environment variable was not defined, annul the error, and 
+*  If the environment variable was not defined, annul the error, and
 *  indicate that it is not defined.
          IF( STATUS .EQ. PSX__NOENV ) THEN
             CALL ERR_ANNUL( STATUS )
             AUTOPV = ' '
          END IF
 
-*  We only propagate provenance if AUTOPROV is set to '1', or if AUTOPROV 
+*  We only propagate provenance if AUTOPROV is set to '1', or if AUTOPROV
 *  is unset and at least one input NDF had a provenance extension.
          IF( AUTOPV .EQ. '1' .OR. AUTOPV .EQ. ' ' ) THEN
 
@@ -198,21 +208,21 @@
                   IF( LEN2 .GT. LEN1 .AND.
      :                RDNDF2( : LEN1 ) .EQ. RDNDF( : LEN1 ) .AND.
      :                RDNDF2( LEN1 + 1 : LEN1 + 1 ) .EQ. '.' ) THEN
-                     CALL AST_MAPREMOVE( RDKMP_COM1, RDNDF2, STATUS ) 
+                     CALL AST_MAPREMOVE( RDKMP_COM1, RDNDF2, STATUS )
                      NR = NR - 1
-        
+
 *  See if NDF1 is a child of NDF2. If so, remove NDF1 from the KeyMap,
 *  and then break out of the NDF2 loop in order to establish a new NDF1.
-                  ELSE IF( LEN1 .GT. LEN2 .AND. 
+                  ELSE IF( LEN1 .GT. LEN2 .AND.
      :                     RDNDF( : LEN2 ) .EQ. RDNDF2( : LEN2 ) .AND.
      :                     RDNDF( LEN2 + 1 : LEN2 + 1 ) .EQ. '.' ) THEN
-                     CALL AST_MAPREMOVE( RDKMP_COM1, RDNDF, STATUS ) 
+                     CALL AST_MAPREMOVE( RDKMP_COM1, RDNDF, STATUS )
                      NR = NR - 1
                      IR2 = NR + 1
                      IR = IR - 1
 
 *  If there is no relation between NDF1 and NDF2, proceed to check the
-*  next NDF2.                          
+*  next NDF2.
                   ELSE
                      IR2 = IR2 + 1
                   END IF
@@ -226,22 +236,35 @@
             DO IW = 1, NW
                WRNDF = AST_MAPKEY( WRKMP_COM1, IW, STATUS )
 
-*  Check no error has occurred.
-               IF( STATUS .EQ. SAI__OK ) THEN 
+*  See if this output NDF is a foreign format file. If so, remove the
+*  format code from the end of the NDF path.
+               IAT = INDEX( WRNDF, '::' )
+               IF( IAT .NE. 0 ) THEN
+                  FORFMT = .TRUE.
+                  PATH = WRNDF( : IAT - 1 )
+               ELSE
+                  FORFMT = .FALSE.
+                  PATH = WRNDF
+               END IF
+
+*  Check no error has occurred. Also skip this NDF if it is a foreign
+*  format file and AUTOPROV has not been set explicitly to '1'.
+               IF( STATUS .EQ. SAI__OK .AND.
+     :              ( .NOT. FORFMT .OR. AUTOPV .EQ. '1' ) ) THEN
 
 *  Get an NDF identifier for it.
-                  CALL NDF_OPEN( DAT__ROOT, WRNDF, 'UPDATE', 'OLD', 
-     :                           INDF1, PLACE, STATUS )            
+                  CALL NDF_OPEN( DAT__ROOT, PATH, 'UPDATE', 'OLD',
+     :                           INDF1, PLACE, STATUS )
 
 *  If the output NDF could not be opened (e.g. if it was a temporary NDF
 *  that has since been deleted), annul the error and pass on.
                   IF( STATUS .NE. SAI__OK ) THEN
                      CALL ERR_ANNUL( STATUS )
                      INDF1 =  NDF__NOID
-                      
+
 *  Otherwise, see if this output NDF has a PROVENANCE extenion
                   ELSE
-                     CALL NDF_XSTAT( INDF1, 'PROVENANCE', THERE, 
+                     CALL NDF_XSTAT( INDF1, 'PROVENANCE', THERE,
      :                               STATUS )
                   END IF
 
@@ -264,33 +287,50 @@
 *  to make sure we are not establishing an NDF as its own parent. Also,
 *  check the Data array of the NDF was mapped for READ or UPDATE. Also
 *  check no error has occurred.
-                        IF( WRNDF .NE. RDNDF .AND. 
-     :                      AST_MAPHASKEY( MPKMP_COM1, RDNDF, STATUS ) 
-     :                      .AND. STATUS .EQ. SAI__OK ) THEN 
+                        IF( WRNDF .NE. RDNDF .AND.
+     :                      AST_MAPHASKEY( MPKMP_COM1, RDNDF, STATUS )
+     :                      .AND. STATUS .EQ. SAI__OK ) THEN
+
+*  See if this input NDF is a foreign format file. If so, remove the
+*  format code from the end of the NDF path.
+                           IAT = INDEX( RDNDF, '::' )
+                           IF( IAT .NE. 0 ) THEN
+                              FORFMT = .TRUE.
+                              PATH = RDNDF( : IAT - 1 )
+                           ELSE
+                              FORFMT = .FALSE.
+                              PATH = RDNDF
+                           END IF
+
+*  If this input is a native format file, or AUTOPROV was explicitly set
+*  to '1', copy it's provenanceinfo into the output NDF.
+                           IF( .NOT. FORFMT .OR. AUTOPV .EQ. '1' ) THEN
 
 *  Get an NDF identifier for it. This will fail if the NDF has been
-*  deleted (e.g. if it was a temporary NDF), so annul the error if an 
+*  deleted (e.g. if it was a temporary NDF), so annul the error if an
 *  error is reported.
-                           CALL NDF_OPEN( DAT__ROOT, RDNDF, 'READ', 
-     :                                    'OLD', INDF2, PLACE, STATUS )
-                           IF( STATUS .NE. SAI__OK ) THEN
-                              CALL ERR_ANNUL( STATUS )
+                              CALL NDF_OPEN( DAT__ROOT, RDNDF, 'READ',
+     :                                       'OLD', INDF2, PLACE,
+     :                                       STATUS )
+                              IF( STATUS .NE. SAI__OK ) THEN
+                                 CALL ERR_ANNUL( STATUS )
 
-*  Otherwise, modify the provenance information in INDF1 to include 
-*  INDF2 as a parent of INDF1. This also transfers all the ancestors 
+*  Otherwise, modify the provenance information in INDF1 to include
+*  INDF2 as a parent of INDF1. This also transfers all the ancestors
 *  of INDF2 to INDF1.
-                           ELSE
-                              CALL NDG_PUTPROV( IPROV, INDF2, 
-     :                                          DAT__NOLOC, AST__NULL, 
-     :                                          .FALSE., STATUS )
+                              ELSE
+                                 CALL NDG_PUTPROV( IPROV, INDF2,
+     :                                            DAT__NOLOC, AST__NULL,
+     :                                            .FALSE., STATUS )
 
 *  Set the flag that indicates if any INPUT NDF had a provenance extension.
-                              CALL NDF_XSTAT( INDF2, 'PROVENANCE', 
-     :                                        THERE, STATUS )
-                              IF( THERE ) INPRV = .TRUE.
+                                 CALL NDF_XSTAT( INDF2, 'PROVENANCE',
+     :                                           THERE, STATUS )
+                                 IF( THERE ) INPRV = .TRUE.
 
 *  Annul the NDF identifiers.
-                              CALL NDF_ANNUL( INDF2, STATUS )               
+                                 CALL NDF_ANNUL( INDF2, STATUS )
+                              END IF
                            END IF
                         END IF
                      END DO
@@ -306,14 +346,14 @@
                      END IF
 
                   END IF
-   
-*  If we have an NDF, close it. If the NDF has a history component, set its 
-*  history update mode to SKIP before closing it. This means that no history 
-*  record will be added to the NDF when it is closed, but the history update 
+
+*  If we have an NDF, close it. If the NDF has a history component, set its
+*  history update mode to SKIP before closing it. This means that no history
+*  record will be added to the NDF when it is closed, but the history update
 *  mode stored in the NDF structure on disk will not be changed.
                   IF( INDF1 .NE. NDF__NOID ) THEN
                      CALL NDF_STATE( INDF1, 'History', HASHIS, STATUS )
-                     IF( HASHIS ) CALL NDF_HSMOD( 'SKIP', INDF1, 
+                     IF( HASHIS ) CALL NDF_HSMOD( 'SKIP', INDF1,
      :                                            STATUS )
                      CALL NDF_ANNUL( INDF1, STATUS )
                   END IF

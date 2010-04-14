@@ -15,9 +15,9 @@ typedef void (* NdfEventHandler)( CHARACTER(EVNAME), CHARACTER(TEXT), INTEGER( S
 #define NTYPE 9
 
 /* The names of the different event types. */
-static const char *types[ NTYPE ] = { "OPEN_NEW_NDF", 
+static const char *types[ NTYPE ] = { "OPEN_NEW_NDF",
                                       "READ_EXISTING_NDF",
-                                      "WRITE_EXISTING_NDF", 
+                                      "WRITE_EXISTING_NDF",
                                       "UPDATE_EXISTING_NDF",
                                       "CLOSE_NDF",
                                       "READ_DATA",
@@ -60,26 +60,26 @@ F77_SUBROUTINE(ndf_hndlr)( CHARACTER(EVNAME),
 *     CALL NDF_HNDLR( EVNAME, HANDLR, SET, STATUS )
 
 *  Description:
-*     The routine can be called by an application to register 
-*     interest in a particular class of NDF event. When an event 
-*     of the specified type occurs within the NDF library, the 
+*     The routine can be called by an application to register
+*     interest in a particular class of NDF event. When an event
+*     of the specified type occurs within the NDF library, the
 *     supplied subroutine is called.
 *
 *     This is currently an undocumented experimental facility.
 
 *  Arguments:
 *     EVNAME = CHARACTER * ( * ) (Given)
-*        A case-insensitive string indicating the sort of event about 
-*        which the application wishes to be notified. See "Event Types:" 
+*        A case-insensitive string indicating the sort of event about
+*        which the application wishes to be notified. See "Event Types:"
 *        below.
 *     HANDLR = SUBROUTINE (Given)
 *        A routine that should be called when an event of the specified
 *        type occurs within the the NDF library. It should be declared
 *        EXTERNAL in the calling routine. It should take three arguments,
-*        the first two are character variables which will be filled before 
+*        the first two are character variables which will be filled before
 *        the handler is invoked with the name of the event, and any
-*        additional descriptive information associated with the event. The 
-*        third argument is the usual inherited STATUS argument. 
+*        additional descriptive information associated with the event. The
+*        third argument is the usual inherited STATUS argument.
 *     SET = LOGICAL (Given)
 *        If .TRUE., then the specified handler is registered to be called
 *        when the specified event type occurs. If .FALSE., then the
@@ -91,48 +91,52 @@ F77_SUBROUTINE(ndf_hndlr)( CHARACTER(EVNAME),
 *  Event Types:
 *     The following event types are currently defined:
 *
-*     - READ_EXISTING_NDF: Occurs after an existing NDF has been opened for 
+*     - READ_EXISTING_NDF: Occurs after an existing NDF has been opened for
 *     READ access. The "descriptive information" is the path to the
 *     NDF that was opened.
 *
-*     - WRITE_EXISTING_NDF: Occurs after an existing NDF has been opened for 
+*     - WRITE_EXISTING_NDF: Occurs after an existing NDF has been opened for
 *     WRITE access. The "descriptive information" is the path to the
 *     NDF that was opened.
 *
 *     - UPDATE_EXISTING_NDF: Occurs after an existing NDF has been opened for
-*     UPDATE access. The "descriptive information" is the path 
+*     UPDATE access. The "descriptive information" is the path
 *     to the NDF that was opened.
 *
-*     - OPEN_NEW_NDF: Occurs after a new NDF has been opened. The "descriptive 
+*     - OPEN_NEW_NDF: Occurs after a new NDF has been opened. The "descriptive
 *     information" is the path to the NDF that was opened.
 *
-*     - CLOSE_NDF: Occurs before an NDF is closed. The "descriptive information" is 
+*     - CLOSE_NDF: Occurs before an NDF is closed. The "descriptive information" is
 *     the path to the NDF that is about to be closed.
 *
 *     - READ_DATA: Occurs when the DATA component of an NDF is mapped for
-*     read access. The "descriptive information" is the path to the NDF that 
+*     read access. The "descriptive information" is the path to the NDF that
 *     is mapped.
 *
 *     - WRITE_DATA: Occurs when the DATA component of an NDF is mapped for
-*     write access. The "descriptive information" is the path to the NDF that 
+*     write access. The "descriptive information" is the path to the NDF that
 *     is mapped.
 *
 *     - UPDATE_DATA: Occurs when the DATA component of an NDF is mapped for
-*     update access. The "descriptive information" is the path to the NDF that 
+*     update access. The "descriptive information" is the path to the NDF that
 *     is mapped.
 *
 *     - DEF_HISTORY: Occurs immediately after a default history record has
-*     been writtent to an NDF. The "descriptive information" is the path to 
+*     been writtent to an NDF. The "descriptive information" is the path to
 *     the NDF.
 
 *  Notes:
+*     - In the above event descriptions, the "path to the NDF" will be
+*     extended with the string "::<code>" if the NDF is a foreign format
+*     file, where "<code>" is replaced by the name of the foreign data
+*     format.
 *     - Any number of handlers can be registered with a given event type.
 *     They will each be invoked when an event occurs (the order in
 *     which they were invoked is unspecified).
 *     -  This routine is intended to be callable from Fortran.
 
 *  Copyright:
-*     Copyright (C) 2007-2009 Science & Technology Facilities Council.
+*     Copyright (C) 2007-2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -140,12 +144,12 @@ F77_SUBROUTINE(ndf_hndlr)( CHARACTER(EVNAME),
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -186,7 +190,7 @@ F77_SUBROUTINE(ndf_hndlr)( CHARACTER(EVNAME),
 /* Make AST use the supplied status variable. */
    old_status = astWatch( STATUS );
 
-/* Get a pointer to dynamic memory holding a null-terminated copy of the supplied 
+/* Get a pointer to dynamic memory holding a null-terminated copy of the supplied
    EVNAME string. */
    evname = astString( EVNAME, EVNAME_length );
 
@@ -210,7 +214,7 @@ F77_SUBROUTINE(ndf_hndlr)( CHARACTER(EVNAME),
                if( unused == -1 ) unused = i;
             } else if(  handler_list[ i ] == HANDLR ) {
                there = 1;
-            }          
+            }
          }
 
 /* Do nothing more if the handler is already registered. */
@@ -220,7 +224,7 @@ F77_SUBROUTINE(ndf_hndlr)( CHARACTER(EVNAME),
             if( unused == -1 ) {
                astBeginPM;
                unused = nhandlers[ ihandler ];
-               handlers[ ihandler ] = astGrow( handler_list, 
+               handlers[ ihandler ] = astGrow( handler_list,
                                                ++nhandlers[ ihandler ],
                                                sizeof( NdfEventHandler ) );
                handler_list = handlers[ ihandler ];
@@ -239,7 +243,7 @@ F77_SUBROUTINE(ndf_hndlr)( CHARACTER(EVNAME),
                handler_list[ i ] = NULL;
             }
          }
-      } 
+      }
    }
 
 /* Free resources */
@@ -303,12 +307,12 @@ F77_SUBROUTINE(ndf1_event)( CHARACTER(EVNAME),
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -350,7 +354,7 @@ F77_SUBROUTINE(ndf1_event)( CHARACTER(EVNAME),
 /* Make AST use the supplied status variable. */
    old_status = astWatch( STATUS );
 
-/* Get a pointer to dynamic memory holding a null-terminated copy of the supplied 
+/* Get a pointer to dynamic memory holding a null-terminated copy of the supplied
    EVNAME string. */
    evname = astString( EVNAME, EVNAME_length );
 
@@ -376,7 +380,7 @@ F77_SUBROUTINE(ndf1_event)( CHARACTER(EVNAME),
 /* Invoke the handler. */
             ( *handler_list[ i ] )( CHARACTER_ARG(EVNAME),
                                     CHARACTER_ARG(SHORTTEXT),
-                                    INTEGER_ARG(STATUS) 
+                                    INTEGER_ARG(STATUS)
                                     TRAIL_ARG(EVNAME)
                                     TRAIL_ARG(SHORTTEXT) );
          }
@@ -411,7 +415,7 @@ static int CheckType( const char *evname, int *status ) {
 
    for( ihandler = 0; ihandler < NTYPE; ihandler++ ) {
       if( astChrMatch( evname, types[ ihandler ] ) ) break;
-   }         
+   }
 
    if( ihandler == NTYPE ) {
        *status = NDF__NAMIN;
