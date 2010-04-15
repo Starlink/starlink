@@ -61,18 +61,13 @@
 *        The number of good values used to form the histogram.
 *     NUMPER = INTEGER (Given)
 *        The number of percentiles.
-*     PERCNT( NUMPER ) = REAL (Given & Returned)
+*     PERCNT( NUMPER ) = REAL (Given)
 *        The sorted percentiles in increasing order that must include 
 *        values of 25 and 75.  They may just comprise these two 
 *        for the inter-quartile range, but there could be user-selected 
 *        values too.  
-*
-*        On exit the first value is set to bad if there are no user
-*        percentiles so that these percentiles are not reported or 
-*        logged.
 *     PERVAL( NUMPER ) = DOUBLE PRECISION (Given & Returned)
 *        The values corresponding the percentiles given in PERCNT.
-*
 *        On exit the 25 and 75 percentiles are set to bad to avoid
 *        them being reported or logged.
 *     MODE = DOUBLE PRECISION (Returned)
@@ -118,6 +113,9 @@
 *  History:
 *     2007 June 29 (MJC):
 *       Original version.
+*     15-APR-2010 (DSB):
+*       Make the NUMPER.EQ.2 and NUMPER.NE.2 cases consistent regarding
+*       the way they return bad values in PERVAL/PERCNT.
 *     {enter_further_changes_here}
 
 *-
@@ -197,7 +195,8 @@
       IF ( NUMPER .EQ. 2 ) THEN
          P25 = PERVAL( 1 )
          P75 = PERVAL( 2 )
-         PERCNT( 1 ) = VAL__BADR
+         PERVAL( 1 ) = VAL__BADD
+         PERVAL( 2 ) = VAL__BADD
       ELSE
 
 *  Hunt for the 25 and 75 percentiles.  Set the percentile values bad 

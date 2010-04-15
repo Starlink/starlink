@@ -263,6 +263,9 @@
 *        References.
 *     2009 June 25 (MJC):
 *        Initialise PERVAL for valgrind.
+*     15-APR-2010 (DSB):
+*        Ensure that bad percentile values introduced by KPS1_HMSO<x> are
+*        not included in the value written to output parameter PERVAL.
 *     {enter_further_changes_here}
 
 *-
@@ -304,11 +307,13 @@
       INTEGER IMAX( 1 )          ! Vector index of max. pixel
       INTEGER IMIN( 1 )          ! Vector index of min. pixel
       INTEGER IWCS               ! Pointer to WCS FrameSet
+      INTEGER J                  ! Counter for percentiles
       INTEGER LBND( NDF__MXDIM ) ! NDF lower bounds
       LOGICAL LOGFIL             ! Log file is required
       DOUBLE PRECISION MAXC( NDF__MXDIM ) ! Co-ordinates of max. pixel
       CHARACTER*8 MCOMP          ! Component name for mapping arrays
       INTEGER MAXP( NDF__MXDIM ) ! Indices of maximum-valued pixel
+      INTEGER MAXPER             ! Max. no. of prcntles to get from user
       INTEGER MINP( NDF__MXDIM ) ! Indices of minimum-valued pixel
       DOUBLE PRECISION MEAN      ! Mean of pixels in array
       DOUBLE PRECISION MEDIAN    ! Median of pixels in array
@@ -380,11 +385,18 @@
      :                .TRUE., METHOD, STATUS )
       USEHIS = METHOD .EQ. 'HISTOGRAM' .OR. METHOD .EQ. 'MOMENTS'
 
+*  If required, ensure we leave two slots spare in the PERCNT array.
+      IF( USEHIS ) THEN
+         MAXPER = NPRCTL - 2
+      ELSE 
+         MAXPER = NPRCTL
+      END IF
+
 *  Defer error reporting and obtain an array of percentiles to be
 *  calculated.  Constrain the values to be between the minimum and
 *  maximum data values.
       CALL ERR_MARK
-      CALL PAR_GDRVR( 'PERCENTILES', NPRCTL, 0.0, 100.0, PERCNT, NUMPER,
+      CALL PAR_GDRVR( 'PERCENTILES', MAXPER, 0.0, 100.0, PERCNT, NUMPER,
      :                STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
 
@@ -410,14 +422,13 @@
       CALL ERR_RLSE
 
 *  We need extra percentiles to derive the inter-quartile range for
-*  the histogram method to derive the mode.
+*  the histogram method to derive the mode. We know there will be room 
+*  in PERCNT for these extra values, so no need to check.
       IF ( USEHIS ) THEN
-         IF ( NUMPER .LT. NPRCTL - 1 ) THEN
-            PERCNT( NUMPER + 1 ) = 25.0
-            PERCNT( NUMPER + 2 ) = 75.0
-            NUMPER = NUMPER + 2
-            DOPRCT = .TRUE.
-         END IF
+         PERCNT( NUMPER + 1 ) = 25.0
+         PERCNT( NUMPER + 2 ) = 75.0
+         NUMPER = NUMPER + 2
+         DOPRCT = .TRUE.
       END IF
 
 *  Obtain the statistics.
@@ -527,6 +538,19 @@
      :                        NUMPER, PERCNT, PERVAL, MODE, STATUS )
 
          END IF
+
+*  Shuffle the percentile values down to remove the bad values introduced 
+*  by KPS1_HSMO<x>
+         J = 1
+         DO I = 1, NUMPER
+            IF( PERVAL( I ) .NE. VAL__BADD ) THEN
+               PERVAL( J ) = PERVAL ( I )
+               PERCNT( J ) = PERCNT ( I )
+               J = J + 1
+            END IF
+         END DO               
+         NUMPER = J - 1
+
       END IF
 
 *  Logging
@@ -674,8 +698,9 @@
       CALL PAR_PUT0C( 'MAXWCS', MAXWCS, STATUS )
       CALL PAR_PUT0C( 'MINWCS', MINWCS, STATUS )
 
-*  Only write percentiles values if any percentiles were given.
-      IF ( DOPRCT ) CALL PAR_PUT1D( 'PERVAL', NUMPER, PERVAL, STATUS )
+*  Only write percentiles values if any percentiles are left.
+      IF( NUMPER .GT. 0 ) CALL PAR_PUT1D( 'PERVAL', NUMPER, PERVAL, 
+     :                                    STATUS )
 
 *  Arrive here if an error occurs.
   999 CONTINUE
