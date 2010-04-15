@@ -1,4 +1,4 @@
-      SUBROUTINE ARY_NEWP( FTYPE, NDIM, UBND, PLACE, IARY, STATUS ) 
+      SUBROUTINE ARY_NEWP( FTYPE, NDIM, UBND, PLACE, IARY, STATUS )
 *+
 *  Name:
 *     ARY_NEWP
@@ -72,12 +72,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -102,7 +102,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -149,11 +149,11 @@
 
 *  Set an initial value for the IARY argument.
       IARY = ARY__NOID
-       
+
 *  Save the STATUS value and mark the error stack.
       TSTAT = STATUS
       CALL ERR_MARK
-       
+
 *  Import the array placeholder, converting it to a PCB index.
       STATUS = SAI__OK
       IPCB = 0
@@ -183,8 +183,8 @@
 *  Create a new simple array structure in place of the placeholder
 *  object, obtaining a DCB entry which refers to it.
             IF ( STATUS .EQ. SAI__OK ) THEN
-               CALL ARY1_DCREP( .FALSE., VTYPE, NDIM, UBND, 
-     :                          PCB_TMP( IPCB ), PCB_LOC( IPCB ), IDCB, 
+               CALL ARY1_DCREP( .FALSE., VTYPE, NDIM, UBND,
+     :                          PCB_TMP( IPCB ), PCB_LOC( IPCB ), IDCB,
      :                          STATUS )
             END IF
          END IF
@@ -195,7 +195,7 @@
 *  Export an identifier for the array.
          CALL ARY1_EXPID( IACB, IARY, STATUS )
       END IF
-       
+
 *  Annul the placeholder, erasing the associated object if any error has
 *  occurred.
       IF ( IPCB .NE. 0 ) THEN

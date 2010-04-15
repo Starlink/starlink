@@ -1,4 +1,4 @@
-      SUBROUTINE ARY1_DCREP( DEFER, TYPE, NDIM, UBND, TEMP, LOC, IDCB, 
+      SUBROUTINE ARY1_DCREP( DEFER, TYPE, NDIM, UBND, TEMP, LOC, IDCB,
      :                       STATUS )
 *+
 *  Name:
@@ -25,8 +25,8 @@
 *        it is mapped? This is useful if the properties of the array
 *        (i.e. bounds and type) may be changed before it is mapped in
 *        such a way as to reduce the size of the array. If the creation
-*        of the HDS array is not deferred, then the final size of the 
-*        container file may be larger than necessary size HDS does not 
+*        of the HDS array is not deferred, then the final size of the
+*        container file may be larger than necessary size HDS does not
 *        clean up any unneeded disk space leftby reducing the size of a
 *        previously created object. A deferred array is indicated by the
 *        fact that it has a null locator for its non-imaginary component.
@@ -89,12 +89,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -121,7 +121,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -235,17 +235,17 @@
          CALL DAT_ANNUL( LOC, STATUS )
          LOC = ARY__NOLOC
          CALL DAT_ERASE( LOCP, NAME, STATUS )
-         
-*  If we are not defering the creation of the HDS array, create a new 
-*  primitive array of the required type and shape in its place and obtain 
+
+*  If we are not defering the creation of the HDS array, create a new
+*  primitive array of the required type and shape in its place and obtain
 *  a new locator to it.
          IF( .NOT. DEFER ) THEN
-            CALL DAT_NEW( LOCP, NAME, TYPE, NDIM, UBND, STATUS ) 
+            CALL DAT_NEW( LOCP, NAME, TYPE, NDIM, UBND, STATUS )
             CALL DAT_FIND( LOCP, NAME, LOC, STATUS )
 
 *  If we are defering creation of the array, create an ARRAY structure
 *  containing a single component called Variant that is set to the value
-*  "PRIMITIVE". This is picked up by the ARY1_DFRM routine, and used as 
+*  "PRIMITIVE". This is picked up by the ARY1_DFRM routine, and used as
 *  an indication that the array is primitive (actually, will be primitive
 *  when it is created).
          ELSE
@@ -268,11 +268,11 @@
          CALL HDS_TRACE( DCB_LOC( IDCB ), NLEV, DCB_PATH( IDCB ),
      :                   DCB_FILE( IDCB ), STATUS )
 
-*  If we are not deferring creation of the array, obtain a non-imaginary 
+*  If we are not deferring creation of the array, obtain a non-imaginary
 *  component locator by cloning the data object locator. If we are
 *  deferring creation, retain a null locator.
          DCB_DLOC( IDCB ) = ARY__NOLOC
-         IF( .NOT. DEFER ) CALL DAT_CLONE( DCB_LOC( IDCB ), 
+         IF( .NOT. DEFER ) CALL DAT_CLONE( DCB_LOC( IDCB ),
      :                                     DCB_DLOC( IDCB ), STATUS )
 
 *  Set a null imaginary component locator.
@@ -344,7 +344,7 @@
 4           CONTINUE
          END IF
       END IF
-       
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL ARY1_TRACE( 'ARY1_DCREP', STATUS )
 

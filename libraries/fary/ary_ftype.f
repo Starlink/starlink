@@ -52,12 +52,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -79,7 +79,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -115,7 +115,7 @@
       CHARACTER TY*(DAT__SZTYP)  ! Intermediate data type
       INTEGER IACB               ! Index to ACB entry
       INTEGER IDCB               ! Index to data object entry in the DCB
-    
+
 *.
 
 *  Check inherited global status.
@@ -133,7 +133,7 @@
          CALL ARY1_DTYP( IDCB, STATUS )
          CALL ARY1_DSCL( IDCB, STATUS )
 
-*  For scaled arrays, return the data type of the scale and zero terms. 
+*  For scaled arrays, return the data type of the scale and zero terms.
 *  For other storage forms, return the data type of the DCB entry.
          IF( DCB_FRM( IDCB ) .EQ. 'SCALED' ) THEN
             CALL CMP_TYPE( DCB_SCLOC( IDCB ), 'SCALE', TY, STATUS )
@@ -150,7 +150,7 @@
             CALL ARY1_CCPY( TY, FTYPE, STATUS )
          END IF
       END IF
-       
+
 *  If an error occurred, then report context information and call the
 *  error tracing routine.
       IF ( STATUS .NE. SAI__OK ) THEN

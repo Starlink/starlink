@@ -1,5 +1,5 @@
-      SUBROUTINE ARY1_REBND( DEFER, PAREN, NAME, TYPE, STATE, NDIM, 
-     :                       LBND, UBND, NNDIM, NLBND, NUBND, LOC, SAME, 
+      SUBROUTINE ARY1_REBND( DEFER, PAREN, NAME, TYPE, STATE, NDIM,
+     :                       LBND, UBND, NNDIM, NLBND, NUBND, LOC, SAME,
      :                       DRX, LX, UX, STATUS )
 *+
 *  Name:
@@ -12,8 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARY1_REBND( DEFER, PAREN, NAME, TYPE, STATE, NDIM, LBND, 
-*                      UBND, NNDIM, NLBND, NUBND, LOC, SAME, DRX, LX, 
+*     CALL ARY1_REBND( DEFER, PAREN, NAME, TYPE, STATE, NDIM, LBND,
+*                      UBND, NNDIM, NLBND, NUBND, LOC, SAME, DRX, LX,
 *                      UX, STATUS )
 
 *  Description:
@@ -144,12 +144,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -189,7 +189,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -369,7 +369,7 @@
 
 *  Read the appropriate part of the old array into this workspace.
                CALL ARY1_GTN( .FALSE., TYPE, LOC, NDIM, LBND, UBND,
-     :                        LX, UX, TYPE, LX, UX, .FALSE., 
+     :                        LX, UX, TYPE, LX, UX, .FALSE.,
      :                        DAT__NOLOC, TPNTR, DCE, STATUS )
             END IF
 
@@ -380,7 +380,7 @@
 
 *  Do not change the HDS object if the creation of the HDS data array
 *  has been deferred.
-            IF( .NOT. DEFER ) THEN 
+            IF( .NOT. DEFER ) THEN
 
 *  If a new data object is required, then annul the locator to the
 *  original object and erase it.
@@ -396,7 +396,7 @@
                   CALL DAT_FIND( PAREN, NAME, LOC, STATUS )
 
 *  If the same data object is being re-used, then alter its shape.
-               ELSE 
+               ELSE
                   CALL DAT_ALTER( LOC, NNDIM, DIM, STATUS )
 
 *  Ensure that the object is in the expected state by resetting it if
@@ -447,7 +447,7 @@
 *  final dimension increases by 1).
                      STRIDE = 1
                      DO 13 I = 1, NNDIM - 1
-                        STRIDE = STRIDE * ( NUBND( I ) - NLBND( I ) 
+                        STRIDE = STRIDE * ( NUBND( I ) - NLBND( I )
      :                                                           + 1 )
 13                   CONTINUE
 
@@ -470,7 +470,7 @@
      :                               STATUS )
 
 *  Map the slice and set it to "bad" values.
-                     CALL DAT_MAPV( LOCS, TYPE, 'WRITE', PNTR, EL, 
+                     CALL DAT_MAPV( LOCS, TYPE, 'WRITE', PNTR, EL,
      :                              STATUS )
                      CALL ARY1_VBAD( TYPE, EL, PNTR, STATUS )
 
@@ -493,7 +493,7 @@
             END IF
          END IF
       END IF
-       
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL ARY1_TRACE( 'ARY1_REBND', STATUS )
 

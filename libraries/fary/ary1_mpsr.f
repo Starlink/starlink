@@ -86,12 +86,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -118,7 +118,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -219,7 +219,7 @@
 1     CONTINUE
 
 *  If the mapping region (and mapping transfer region) comprises the
-*  whole data object and no data type conversion or scaling is required, then 
+*  whole data object and no data type conversion or scaling is required, then
 *  clone a locator to the entire data component and map it for access directly
 *  using HDS.
       IF ( MCB_WHOLE( IMCB ) .AND.
@@ -278,7 +278,7 @@
          COPY = .TRUE.
          DCE = .FALSE.
       END IF
-       
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL ARY1_TRACE( 'ARY1_MPSR', STATUS )
 

@@ -34,12 +34,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -58,7 +58,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -96,7 +96,7 @@
 
 *  If not, report an error.
       IF ( .NOT. THERE ) THEN
-         IF( STATUS .EQ. SAI__OK ) THEN 
+         IF( STATUS .EQ. SAI__OK ) THEN
             STATUS = ARY__SCLIN
             CALL ERR_REP( 'ARY1_VSCL_BSIN',
      :                 'The SCALE component in missing (internal ARY '//
@@ -124,7 +124,7 @@
 *  Report an error if it is zero or negative or bad.
          CALL DAT_GET0D( LOC2, SCALE, STATUS )
          IF( SCALE .LE. 0.0 .OR. SCALE .EQ. VAL__BADD ) THEN
-            IF( STATUS .EQ. SAI__OK ) THEN 
+            IF( STATUS .EQ. SAI__OK ) THEN
                STATUS = ARY__SCLIN
                CALL MSG_SETD( 'SCALE', SCALE )
                CALL ERR_REP( 'ARY1_VSCL_BSIN',
@@ -142,7 +142,7 @@
 
 *  If not, report an error.
       IF ( .NOT. THERE ) THEN
-         IF( STATUS .EQ. SAI__OK ) THEN 
+         IF( STATUS .EQ. SAI__OK ) THEN
             STATUS = ARY__SCLIN
             CALL ERR_REP( 'ARY1_VSCL_BSIN',
      :                 'The ZERO component in missing (internal ARY '//
@@ -170,7 +170,7 @@
 *  Report an error if it is bad.
          CALL DAT_GET0D( LOC2, ZERO, STATUS )
          IF( ZERO .EQ. VAL__BADD ) THEN
-            IF( STATUS .EQ. SAI__OK ) THEN 
+            IF( STATUS .EQ. SAI__OK ) THEN
                STATUS = ARY__SCLIN
                CALL ERR_REP( 'ARY1_VSCL_BSIN',
      :                 'The ZERO component has an invalid <bad> '//
@@ -180,7 +180,7 @@
 
 *  Report an error if they have different data types.
          IF( STYP .NE. ZTYP ) THEN
-            IF( STATUS .EQ. SAI__OK ) THEN 
+            IF( STATUS .EQ. SAI__OK ) THEN
                STATUS = ARY__SCLIN
                CALL ERR_REP( 'ARY1_VSCL_BSIN',
      :                 'The ZERO and SCALE components have different '//

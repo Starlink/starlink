@@ -1,5 +1,5 @@
       SUBROUTINE ARY1_GTN( BAD, HTYPE, LOC, NDIM, LBNDD, UBNDD, LSUB,
-     :                     USUB, ATYPE, LBNDA, UBNDA, PAD, SCLOC, 
+     :                     USUB, ATYPE, LBNDA, UBNDA, PAD, SCLOC,
      :                     PNTR, DCE, STATUS )
 *+
 *  Name:
@@ -19,8 +19,8 @@
 *     The routine extracts an n-dimensional subregion of any numeric
 *     data type from a primitive numeric HDS array, making use of lower
 *     and upper bounds information for both arrays. Data type conversion
-*     and scaling is performed if necessary, with bad pixel testing if 
-*     required. Optionally, the surrounding region of the output array which 
+*     and scaling is performed if necessary, with bad pixel testing if
+*     required. Optionally, the surrounding region of the output array which
 *     does not receive data may be padded with "bad" values. The output array
 *     which receives the extracted data is passed by pointer.
 
@@ -101,12 +101,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -133,7 +133,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -159,7 +159,7 @@
       LOGICAL PAD
       CHARACTER * ( * ) SCLOC
       INTEGER PNTR
-       
+
 *  Arguments Returned:
       LOGICAL DCE
 
@@ -190,37 +190,37 @@
             CALL ARY1_GTNB( BAD, HTYPE, LOC, NDIM, LBNDD, UBNDD,
      :                      LSUB, USUB, LBNDA, UBNDA, PAD, SCLOC,
      :                      %VAL( CNF_PVAL( PNTR ) ), DCE, STATUS )
- 
+
          ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
             CALL ARY1_GTNUB( BAD, HTYPE, LOC, NDIM, LBNDD, UBNDD,
      :                       LSUB, USUB, LBNDA, UBNDA, PAD, SCLOC,
      :                       %VAL( CNF_PVAL( PNTR ) ), DCE, STATUS )
- 
+
          ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
             CALL ARY1_GTND( BAD, HTYPE, LOC, NDIM, LBNDD, UBNDD,
      :                      LSUB, USUB, LBNDA, UBNDA, PAD, SCLOC,
      :                      %VAL( CNF_PVAL( PNTR ) ), DCE, STATUS )
- 
+
          ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
             CALL ARY1_GTNI( BAD, HTYPE, LOC, NDIM, LBNDD, UBNDD,
      :                      LSUB, USUB, LBNDA, UBNDA, PAD, SCLOC,
      :                      %VAL( CNF_PVAL( PNTR ) ), DCE, STATUS )
- 
+
          ELSE IF ( TYPE .EQ. '_REAL' ) THEN
             CALL ARY1_GTNR( BAD, HTYPE, LOC, NDIM, LBNDD, UBNDD,
      :                      LSUB, USUB, LBNDA, UBNDA, PAD, SCLOC,
      :                      %VAL( CNF_PVAL( PNTR ) ), DCE, STATUS )
- 
+
          ELSE IF ( TYPE .EQ. '_WORD' ) THEN
             CALL ARY1_GTNW( BAD, HTYPE, LOC, NDIM, LBNDD, UBNDD,
      :                      LSUB, USUB, LBNDA, UBNDA, PAD, SCLOC,
      :                      %VAL( CNF_PVAL( PNTR ) ), DCE, STATUS )
- 
+
          ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
             CALL ARY1_GTNUW( BAD, HTYPE, LOC, NDIM, LBNDD, UBNDD,
      :                       LSUB, USUB, LBNDA, UBNDA, PAD, SCLOC,
      :                       %VAL( CNF_PVAL( PNTR ) ), DCE, STATUS )
- 
+
 
 *  Note if the data type string is not recognised.
          ELSE
@@ -238,7 +238,7 @@
      :   'Routine ^ROUTINE called with an invalid ATYPE argument ' //
      :   'of ''^BADATYPE'' (internal programming error).', STATUS )
       END IF
-       
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL ARY1_TRACE( 'ARY1_GTN', STATUS )
 

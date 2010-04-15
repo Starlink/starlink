@@ -80,12 +80,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -112,7 +112,7 @@
 *     5-MAY-2006 (DSB):
 *        Installed support for scaled arrays.
 *     12-JUL-2006 (DSB):
-*        Changed so that that duplicating a scaled array produces a simple 
+*        Changed so that that duplicating a scaled array produces a simple
 *        array.
 *     17-JUL-2006 (DSB):
 *        Changed so that creation of the HDS array is deferred until it
@@ -124,7 +124,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -260,7 +260,7 @@
 *  Create a new data object with the same attributes and an entry in the
 *  DCB. This is a simple array. The act of duplicating a scaled array
 *  creates a simple array.
-                  CALL ARY1_DCRE( .TRUE., DCB_TYP( IDCB1 ), 
+                  CALL ARY1_DCRE( .TRUE., DCB_TYP( IDCB1 ),
      :                            DCB_CPX( IDCB1 ), ACB_NDIM( IACB1 ),
      :                            ACB_LBND( 1, IACB1 ),
      :                            ACB_UBND( 1, IACB1 ), PCB_TMP( IPCB ),
@@ -300,14 +300,14 @@
 
 *  Reset the PLACE argument.
       PLACE = ARY__NOPL
-       
+
 *  Annul any error if STATUS was previously bad, otherwise let the new
 *  error report stand.
       IF ( STATUS .NE. SAI__OK ) THEN
          IF ( TSTAT .NE. SAI__OK ) THEN
             CALL ERR_ANNUL( STATUS )
             STATUS = TSTAT
-             
+
 *  Report context information and call the error tracing routine if
 *  appropriate.
          ELSE

@@ -108,12 +108,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -164,7 +164,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -542,7 +542,7 @@ C                     END IF
 *  It is necessary to read values from the array, but these values are
 *  undefined and an initialisation option has not been supplied. Report
 *  an error.
-               ELSE   
+               ELSE
                   STATUS = ARY__UNDEF
                   CALL DAT_MSG( 'ARRAY', DCB_LOC( IDCB ) )
                   CALL MSG_SETC( 'BADMODE', MODE )
@@ -582,7 +582,7 @@ C                     END IF
             END IF
          END IF
       END IF
-       
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL ARY1_TRACE( 'ARY1_MAPS', STATUS )
 

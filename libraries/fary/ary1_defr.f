@@ -13,13 +13,13 @@
 *     RESULT = ARY1_DEFR( IDCB, STATUS )
 
 *  Description:
-*     Arrays created via ARY_DUPE initially have no HDS data objects to 
+*     Arrays created via ARY_DUPE initially have no HDS data objects to
 *     contain the real and imaginary array values. The creation of these
 *     arrays is deferred until they are mapped. This is done so that
 *     any changes made to the properties (e.g. type, bounds, etc) of
-*     the deferred array (before it is mapped) are reflected in the size 
+*     the deferred array (before it is mapped) are reflected in the size
 *     of the corresponding HDS container file. If the array creation is
-*     not deferred, then any changes which should produce a reduction in 
+*     not deferred, then any changes which should produce a reduction in
 *     the container file size do not in fact do so because HDS never
 *     shrinks the size of a container file (it is just padded with unused
 *     space).
@@ -32,7 +32,7 @@
 
 *  Function value:
 *     ARY1_DEFR = LOGICAL
-*        If .TRUE. then the HDS arrays holding the real and imaginary 
+*        If .TRUE. then the HDS arrays holding the real and imaginary
 *        array values have not yet been created.
 
 *  Copyright:
@@ -44,12 +44,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -68,7 +68,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -108,7 +108,7 @@
 *  single component called VARIANT.
       IF( DCB_DLOC( IDCB ) .EQ. ARY__NOLOC ) THEN
          CALL DAT_PRIM( DCB_LOC( IDCB ), PRIM, STATUS )
-         IF( .NOT. PRIM ) THEN 
+         IF( .NOT. PRIM ) THEN
             ARY1_DEFR = .TRUE.
             CALL DAT_NCOMP( DCB_LOC( IDCB ), NCOMP, STATUS )
             DO I = 1, NCOMP

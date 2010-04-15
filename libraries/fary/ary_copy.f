@@ -31,7 +31,7 @@
 *        The global status.
 
 *  Notes:
-*     - The result of copying a scaled array will be an equivalent simple 
+*     - The result of copying a scaled array will be an equivalent simple
 *     array.
 *     - If this routine is called with STATUS set, then a value of
 *     ARY__NOID will be returned for the IARY2 argument, although no
@@ -64,12 +64,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -92,7 +92,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -136,7 +136,7 @@
 *  Save the STATUS value and mark the error stack.
       TSTAT = STATUS
       CALL ERR_MARK
-       
+
 *  Import the array placeholder, converting it to a PCB index.
       STATUS = SAI__OK
       IPCB = 0
@@ -154,7 +154,7 @@
 *  Export an identifier for the new array.
          CALL ARY1_EXPID( IACB2, IARY2, STATUS )
       END IF
-       
+
 *  Annul the placeholder, erasing the associated object if any error has
 *  occurred.
       IF ( IPCB .NE. 0 ) THEN
@@ -171,7 +171,7 @@
          IF ( TSTAT .NE. SAI__OK ) THEN
             CALL ERR_ANNUL( STATUS )
             STATUS = TSTAT
-             
+
 *  If appropriate, reset the IARY2 argument, report the error context
 *  and call the error tracing routine.
          ELSE
